@@ -101,6 +101,34 @@ assert.equal(evaluate('todayISO'),evaluate('localDateISO()'));
 evaluate("cfg.domain = 'sport'; renderDomainState(); selectTimerMode(30,'focus',null); updateTimerDisplay();");
 assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30m');
 assert.equal(document.getElementById('modeFocusBtn').textContent, '30m');
+// Selecting an activity must not discard an active or paused focus session without consent.
+evaluate("cfg.domain='sport'; renderDomainState(); selectTimerMode(30,'focus',null); toggleTimerPlay();");
+const runningSnapshot = evaluate('JSON.stringify({domain:cfg.domain,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})');
+let domainPrompts = 0;
+sandbox.window.confirm = () => { domainPrompts++; return false; };
+evaluate("switchActivityDomain('sport',document.getElementById('domBtn-sport'))");
+assert.equal(domainPrompts,0,'Tapping the selected activity is a no-op');
+assert.equal(evaluate('JSON.stringify({domain:cfg.domain,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})'),runningSnapshot);
+evaluate("switchActivityDomain('read',document.getElementById('domBtn-read'))");
+assert.equal(domainPrompts,1,'Switching an active session asks for consent');
+assert.equal(evaluate('JSON.stringify({domain:cfg.domain,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})'),runningSnapshot);
+sandbox.window.confirm = () => true;
+evaluate("switchActivityDomain('read',document.getElementById('domBtn-read'))");
+assert.equal(evaluate('cfg.domain'),'read');
+assert.equal(evaluate('timerTotal'),20*60);
+assert.equal(evaluate('timerRunning'),false);
+assert.equal(document.getElementById('domBtn-read').getAttribute('aria-pressed'),'true');
+assert.equal(document.getElementById('domBtn-sport').getAttribute('aria-pressed'),'false');
+// Pausing a partially elapsed session must also retain it when a switch is declined.
+evaluate("toggleTimerPlay(); timerTargetTime=Date.now()+1190000; toggleTimerPlay()");
+assert.equal(evaluate('timerRunning'),false);
+const pausedSnapshot = evaluate('JSON.stringify({domain:cfg.domain,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})');
+sandbox.window.confirm = () => false;
+evaluate("switchActivityDomain('work',document.getElementById('domBtn-work'))");
+assert.equal(evaluate('JSON.stringify({domain:cfg.domain,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})'),pausedSnapshot);
+sandbox.window.confirm = () => true;
+evaluate("switchActivityDomain('sport',document.getElementById('domBtn-sport'))");
+
 // Multiple records created within a single millisecond must receive different IDs.
 const firstId = evaluate('nextRecordId()');
 const secondId = evaluate('nextRecordId()');
