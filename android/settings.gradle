@@ -1,0 +1,2 @@
+rootProject.name = "ZenStudyFocus"
+include ':app'

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Zen Study Focus Pro</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --card: rgba(22, 29, 41, 0.85);
+      --card-light: rgba(255, 255, 255, 0.04);
+      --primary: #4ecca3;
+      --primary-glow: rgba(78, 204, 163, 0.22);
+      --accent: #64b5f6;
+      --warn: #f0a500;
+      --text: #eef2f6;
+      --muted: #8b95a5;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: radial-gradient(circle at top, #141d2b 0%, var(--bg) 70%); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 16px 14px 30px; overflow-x: hidden; }
+    
+    /* Top Bar & Stats */
+    .top-bar { width: 100%; max-width: 390px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .brand { display: flex; align-items: center; gap: 8px; }
+    .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+    .brand h1 { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+    .stats-pill { background: var(--card); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 0.78rem; color: var(--primary); font-weight: 600; display: flex; gap: 10px; }
+    .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px; border-radius: 12px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+
+    /* Mode Selector */
+    .mode-switch { display: flex; background: var(--card); padding: 4px; border-radius: 18px; border: 1px solid var(--border); margin-bottom: 18px; width: 100%; max-width: 390px; }
+    .mode-btn { flex: 1; padding: 9px 0; border: none; background: transparent; color: var(--muted); font-size: 0.85rem; font-weight: 600; border-radius: 14px; cursor: pointer; transition: 0.25s; }
+    .mode-btn.active { background: var(--primary); color: #081018; box-shadow: 0 4px 14px var(--primary-glow); }
+
+    /* Timer Circle */
+    .timer-wrap { position: relative; width: 230px; height: 230px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+    .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .circle-bg { fill: none; stroke: rgba(255, 255, 255, 0.05); stroke-width: 7; }
+    .circle-prog { fill: none; stroke: var(--primary); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.8s linear, stroke 0.3s; }
+    .timer-center { position: absolute; text-align: center; }
+    .time-text { font-size: 3.1rem; font-weight: 700; letter-spacing: 1.5px; font-variant-numeric: tabular-nums; }
+    .quick-adjust { display: flex; gap: 8px; justify-content: center; margin-top: 6px; }
+    .adj-btn { background: var(--card-light); border: 1px solid var(--border); color: var(--muted); padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; cursor: pointer; }
+    .adj-btn:active { background: var(--primary); color: #000; }
+
+    /* Controls */
+    .controls { display: flex; gap: 10px; width: 100%; max-width: 340px; margin-bottom: 20px; }
+    .btn { padding: 13px 20px; border-radius: 16px; border: 1px solid var(--border); font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-main { background: var(--primary); color: #071018; border: none; flex: 2; box-shadow: 0 4px 16px var(--primary-glow); }
+    .btn-sec { background: var(--card); color: var(--text); flex: 1; }
+
+    /* Navigation Tabs */
+    .tabs { display: flex; gap: 6px; width: 100%; max-width: 390px; margin-bottom: 12px; }
+    .tab-btn { flex: 1; padding: 10px 4px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: var(--muted); font-size: 0.8rem; font-weight: 600; cursor: pointer; text-align: center; transition: 0.2s; }
+    .tab-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(78, 204, 163, 0.08); }
+
+    /* Panels */
+    .panel { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 16px; width: 100%; max-width: 390px; backdrop-filter: blur(12px); }
+    .panel.active { display: block; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Sounds Grid */
+    .sound-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sound-card { background: var(--card-light); border: 1px solid var(--border); border-radius: 14px; padding: 12px; transition: 0.2s; }
+    .sound-card.on { border-color: var(--primary); background: rgba(78, 204, 163, 0.09); }
+    .sound-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600; margin-bottom: 10px; cursor: pointer; }
+    .sound-desc { font-size: 0.7rem; color: var(--muted); margin-bottom: 8px; }
+    .slider { width: 100%; -webkit-appearance: none; background: rgba(255,255,255,0.12); height: 4px; border-radius: 2px; outline: none; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); cursor: pointer; }
+
+    /* Tasks Checklist */
+    .task-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .input-box { flex: 1; background: rgba(10,14,22,0.7); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; color: var(--text); font-size: 0.85rem; outline: none; }
+    .input-box:focus { border-color: var(--primary); }
+    .add-btn { background: var(--primary); color: #071018; border: none; padding: 0 16px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+    .task-list { list-style: none; max-height: 170px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .task-item { display: flex; align-items: center; justify-content: space-between; background: var(--card-light); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); font-size: 0.85rem; }
+    .task-item.done span { text-decoration: line-through; color: var(--muted); }
+    .task-del { background: none; border: none; color: #ff6b6b; font-size: 0.9rem; cursor: pointer; }
+
+    /* Notes */
+    .notes-area { width: 100%; height: 130px; background: rgba(10,14,22,0.7); border: 1px solid var(--border); border-radius: 14px; padding: 12px; color: var(--text); font-size: 0.88rem; line-height: 1.5; resize: none; outline: none; }
+    .notes-area:focus { border-color: var(--primary); }
+    .notes-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.75rem; color: var(--muted); }
+    .small-btn { background: var(--card-light); border: 1px solid var(--border); color: var(--primary); padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; }
+
+    /* Breathing Exercise */
+    .breath-box { text-align: center; padding: 14px 0; }
+    .breath-circle { width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, var(--primary-glow), transparent); border: 2px solid var(--primary); margin: 10px auto 16px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 600; color: var(--primary); transition: transform 4s ease-in-out; }
+    .breath-circle.inhale { transform: scale(1.32); }
+    .breath-circle.exhale { transform: scale(0.85); }
+
+    /* Settings Modal */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+    .modal.open { display: flex; }
+    .modal-card { background: #141c28; border: 1px solid var(--border); border-radius: 20px; padding: 20px; width: 100%; max-width: 340px; }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; font-size: 0.9rem; }
+    .num-input { width: 70px; padding: 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-align: center; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <h1>Zen Study</h1>
+    </div>
+    <div class="stats-pill">
+      <span id="statMin">0 دقيقة اليوم</span>
+      <span>•</span>
+      <span id="statSess">0 جلسات</span>
+    </div>
+    <button class="icon-btn" onclick="openSettings()" title="تعديل الأوقات">⚙️</button>
+  </div>
+
+  <div class="mode-switch">
+    <button class="mode-btn active" id="btnFocus" onclick="setMode('focus')">تركيز (<span id="lblFocus">25</span>د)</button>
+    <button class="mode-btn" id="btnShort" onclick="setMode('short')">قصيرة (<span id="lblShort">5</span>د)</button>
+    <button class="mode-btn" id="btnLong" onclick="setMode('long')">طويلة (<span id="lblLong">15</span>د)</button>
+  </div>
+
+  <div class="timer-wrap">
+    <svg class="timer-svg" viewBox="0 0 230 230">
+      <circle class="circle-bg" cx="115" cy="115" r="105"></circle>
+      <circle class="circle-prog" id="progCircle" cx="115" cy="115" r="105"></circle>
+    </svg>
+    <div class="timer-center">
+      <div class="time-text" id="timeDisplay">25:00</div>
+      <div class="quick-adjust">
+        <button class="adj-btn" onclick="adjustMinutes(-5)">-5 د</button>
+        <button class="adj-btn" onclick="adjustMinutes(-1)">-1 د</button>
+        <button class="adj-btn" onclick="adjustMinutes(1)">+1 د</button>
+        <button class="adj-btn" onclick="adjustMinutes(5)">+5 د</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-main" id="startBtn" onclick="toggleTimer()">بدء الجلسة</button>
+    <button class="btn btn-sec" onclick="resetTimer()">إعادة</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab('sounds', this)">🌿 الأصوات</button>
+    <button class="tab-btn" onclick="openTab('tasks', this)">✅ المهام</button>
+    <button class="tab-btn" onclick="openTab('notes', this)">📝 ملاحظات</button>
+    <button class="tab-btn" onclick="openTab('breath', this)">🧘 تهدئة</button>
+  </div>
+
+  <!-- Tab 1: Nature Sounds (No Music) -->
+  <div class="panel active" id="tab-sounds">
+    <div class="sound-grid">
+      <div class="sound-card" id="card-rain">
+        <div class="sound-top" onclick="toggleSound('rain')"><span>🌧️ مطر ناعم</span><input type="checkbox" id="chk-rain" onclick="event.stopPropagation(); toggleSound('rain')"></div>
+        <div class="sound-desc">قطرات هادئة للتركيز</div>
+        <input type="range" class="slider" min="0.05" max="1" step="0.05" value="0.5" oninput="changeVol('rain', this.value)">
+      </div>
+      <div class="sound-card" id="card-brown">
+        <div class="sound-top" onclick="toggleSound('brown')"><span>🛡️ ضوضاء بنية</span><input type="checkbox" id="chk-brown" onclick="event.stopPropagation(); toggleSound('brown')"></div>
+        <div class="sound-desc">عزل عميق للضجيج</div>
+        <input type="range" class="slider" min="0.05" max="1" step="0.05" value="0.6" oninput="changeVol('brown', this.value)">
+      </div>
+      <div class="sound-card" id="card-ocean">
+        <div class="sound-top" onclick="toggleSound('ocean')"><span>🌊 أمواج الشاطئ</span><input type="checkbox" id="chk-ocean" onclick="event.stopPropagation(); toggleSound('ocean')"></div>
+        <div class="sound-desc">مد وجزر طبيعي متهادٍ</div>
+        <input type="range" class="slider" min="0.05" max="1" step="0.05" value="0.5" oninput="changeVol('ocean', this.value)">
+      </div>
+      <div class="sound-card" id="card-wind">
+        <div class="sound-top" onclick="toggleSound('wind')"><span>🍃 نسيم الأشجار</span><input type="checkbox" id="chk-wind" onclick="event.stopPropagation(); toggleSound('wind')"></div>
+        <div class="sound-desc">هواء هادئ مريح للأعصاب</div>
+        <input type="range" class="slider" min="0.05" max="1" step="0.05" value="0.45" oninput="changeVol('wind', this.value)">
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Study Tasks -->
+  <div class="panel" id="tab-tasks">
+    <div class="task-input-row">
+      <input type="text" class="input-box" id="taskInput" placeholder="أضف فصلاً أو مهمة دراسية...">
+      <button class="add-btn" onclick="addTask()">إضافة</button>
+    </div>
+    <ul class="task-list" id="taskList"></ul>
+  </div>
+
+  <!-- Tab 3: Brain-Dump Notes -->
+  <div class="panel" id="tab-notes">
+    <textarea class="notes-area" id="notesBox" placeholder="دوّن ملاحظاتك الدراسية أو أي فكرة عابرة هنا ليتم حفظها تلقائياً..." oninput="saveNotes()"></textarea>
+    <div class="notes-bar">
+      <span id="noteStatus">محفوظ تلقائياً</span>
+      <div style="display:flex;gap:8px;">
+        <button class="small-btn" onclick="copyNotes()">نسخ النص</button>
+        <button class="small-btn" style="color:#ff8787;" onclick="clearNotes()">مسح</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 4: Calm Breathing -->
+  <div class="panel" id="tab-breath">
+    <div class="breath-box">
+      <div class="breath-circle" id="breathCircle">اضغط للبدء</div>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px;">تمرين التنفس المربع لتهدئة نبضات القلب وزيادة الاستيعاب قبل المذاكرة</p>
+      <button class="small-btn" id="breathBtn" onclick="toggleBreathing()">بدء تمرين التهدئة</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-card">
+      <h3 style="margin-bottom:14px;color:var(--primary);">⚙️ تخصيص أوقات المؤقت (بالدقائق)</h3>
+      <div class="modal-row"><span>وقت التركيز والمذاكرة:</span><input type="number" id="inpFocus" class="num-input" min="1" max="180" value="25"></div>
+      <div class="modal-row"><span>الاستراحة القصيرة:</span><input type="number" id="inpShort" class="num-input" min="1" max="60" value="5"></div>
+      <div class="modal-row"><span>الاستراحة الطويلة:</span><input type="number" id="inpLong" class="num-input" min="1" max="90" value="15"></div>
+      <div style="display:flex;gap:10px;margin-top:18px;">
+        <button class="btn btn-main" style="padding:10px;" onclick="saveSettings()">حفظ الأوقات</button>
+        <button class="btn btn-sec" style="padding:10px;" onclick="closeSettings()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* --- 1. Timer & Custom Settings Logic --- */
+    const savedModes = JSON.parse(localStorage.getItem('zen_durations') || '{"focus":25,"short":5,"long":15}');
+    let currentMode = 'focus';
+    let totalSeconds = savedModes.focus * 60;
+    let leftSeconds = totalSeconds;
+    let timerId = null;
+    let running = false;
+    const circumference = 2 * Math.PI * 105;
+
+    function syncDurationLabels() {
+      document.getElementById('lblFocus').textContent = savedModes.focus;
+      document.getElementById('lblShort').textContent = savedModes.short;
+      document.getElementById('lblLong').textContent = savedModes.long;
+    }
+
+    function renderTimer() {
+      const m = Math.floor(leftSeconds / 60).toString().padStart(2, '0');
+      const s = (leftSeconds % 60).toString().padStart(2, '0');
+      document.getElementById('timeDisplay').textContent = `${m}:${s}`;
+      const offset = circumference - (leftSeconds / Math.max(1, totalSeconds)) * circumference;
+      document.getElementById('progCircle').style.strokeDashoffset = offset;
+    }
+
+    function setMode(mode) {
+      if (running) toggleTimer();
+      currentMode = mode;
+      totalSeconds = savedModes[mode] * 60;
+      leftSeconds = totalSeconds;
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(mode === 'focus' ? 'btnFocus' : mode === 'short' ? 'btnShort' : 'btnLong').classList.add('active');
+      document.getElementById('progCircle').style.stroke = mode === 'focus' ? 'var(--primary)' : 'var(--accent)';
+      document.getElementById('startBtn').textContent = 'بدء الجلسة';
+      renderTimer();
+    }
+
+    function adjustMinutes(delta) {
+      const next = Math.max(60, Math.min(180 * 60, leftSeconds + delta * 60));
+      leftSeconds = next;
+      if (leftSeconds > totalSeconds) totalSeconds = leftSeconds;
+      renderTimer();
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById('startBtn');
+      if (running) {
+        clearInterval(timerId);
+        running = false;
+        btn.textContent = 'متابعة';
+      } else {
+        initAudio();
+        running = true;
+        btn.textContent = 'إيقاف مؤقت';
+        timerId = setInterval(() => {
+          if (leftSeconds > 0) {
+            leftSeconds--;
+            renderTimer();
+          } else {
+            clearInterval(timerId);
+            running = false;
+            playSoftBell();
+            if (currentMode === 'focus') {
+              recordCompletedSession(Math.round(totalSeconds / 60));
+              setMode('short');
+            } else {
+              setMode('focus');
+            }
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      if (running) toggleTimer();
+      totalSeconds = savedModes[currentMode] * 60;
+      leftSeconds = totalSeconds;
+      document.getElementById('startBtn').textContent = 'بدء الجلسة';
+      renderTimer();
+    }
+
+    function openSettings() {
+      document.getElementById('inpFocus').value = savedModes.focus;
+      document.getElementById('inpShort').value = savedModes.short;
+      document.getElementById('inpLong').value = savedModes.long;
+      document.getElementById('settingsModal').classList.add('open');
+    }
+    function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
+    function saveSettings() {
+      savedModes.focus = Math.max(1, parseInt(document.getElementById('inpFocus').value) || 25);
+      savedModes.short = Math.max(1, parseInt(document.getElementById('inpShort').value) || 5);
+      savedModes.long  = Math.max(1, parseInt(document.getElementById('inpLong').value) || 15);
+      localStorage.setItem('zen_durations', JSON.stringify(savedModes));
+      syncDurationLabels();
+      setMode(currentMode);
+      closeSettings();
+    }
+
+    /* --- 2. Daily Stats Tracking --- */
+    const todayKey = new Date().toISOString().slice(0, 10);
+    let stats = JSON.parse(localStorage.getItem('zen_stats_' + todayKey) || '{"mins":0,"sessions":0}');
+    function renderStats() {
+      document.getElementById('statMin').textContent = `${stats.mins} دقيقة اليوم`;
+      document.getElementById('statSess').textContent = `${stats.sessions} جلسات`;
+    }
+    function recordCompletedSession(mins) {
+      stats.mins += mins;
+      stats.sessions += 1;
+      localStorage.setItem('zen_stats_' + todayKey, JSON.stringify(stats));
+      renderStats();
+    }
+
+    /* --- 3. Realistic Generative Nature Audio Engine (LFO Modulated, Zero Music) --- */
+    let audioCtx = null;
+    const activeSounds = {};
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function buildNaturalSound(type) {
+      initAudio();
+      const bufferSize = audioCtx.sampleRate * 3;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const out = buffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0, lastOut = 0;
+
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        if (type === 'brown' || type === 'ocean') {
+          lastOut = (lastOut + (0.02 * white)) / 1.02;
+          out[i] = lastOut * 3.2;
+        } else {
+          // Pink-ish natural texture for rain & wind
+          b0 = 0.99765 * b0 + white * 0.0990460;
+          b1 = 0.96300 * b1 + white * 0.2965164;
+          b2 = 0.57000 * b2 + white * 1.0526913;
+          out[i] = (b0 + b1 + b2 + white * 0.1848) * 0.06;
+        }
+      }
+
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      src.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      const masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.5;
+
+      let lfo = null;
+      if (type === 'rain') {
+        filter.type = 'bandpass';
+        filter.frequency.value = 1100;
+        filter.Q.value = 0.7;
+        src.connect(filter);
+        filter.connect(masterGain);
+      } else if (type === 'brown') {
+        filter.type = 'lowpass';
+        filter.frequency.value = 340;
+        src.connect(filter);
+        filter.connect(masterGain);
+      } else if (type === 'ocean') {
+        filter.type = 'lowpass';
+        filter.frequency.value = 480;
+        const waveGain = audioCtx.createGain();
+        waveGain.gain.value = 0.55;
+        lfo = audioCtx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0.12; // 8-second soothing ocean wave cycle
+        const lfoDepth = audioCtx.createGain();
+        lfoDepth.gain.value = 0.38;
+        lfo.connect(lfoDepth);
+        lfoDepth.connect(waveGain.gain);
+        lfo.start();
+        src.connect(filter);
+        filter.connect(waveGain);
+        waveGain.connect(masterGain);
+      } else if (type === 'wind') {
+        filter.type = 'bandpass';
+        filter.frequency.value = 380;
+        filter.Q.value = 3.5;
+        lfo = audioCtx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0.18;
+        const lfoFilterDepth = audioCtx.createGain();
+        lfoFilterDepth.gain.value = 180;
+        lfo.connect(lfoFilterDepth);
+        lfoFilterDepth.connect(filter.frequency);
+        lfo.start();
+        src.connect(filter);
+        filter.connect(masterGain);
+      }
+
+      masterGain.connect(audioCtx.destination);
+      src.start(0);
+      return { src, lfo, gain: masterGain };
+    }
+
+    function toggleSound(type) {
+      initAudio();
+      const chk = document.getElementById('chk-' + type);
+      const card = document.getElementById('card-' + type);
+      if (activeSounds[type]) {
+        activeSounds[type].src.stop();
+        if (activeSounds[type].lfo) activeSounds[type].lfo.stop();
+        delete activeSounds[type];
+        chk.checked = false;
+        card.classList.remove('on');
+      } else {
+        activeSounds[type] = buildNaturalSound(type);
+        chk.checked = true;
+        card.classList.add('on');
+      }
+    }
+
+    function changeVol(type, val) {
+      if (activeSounds[type] && audioCtx) {
+        activeSounds[type].gain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
+      }
+    }
+
+    function playSoftBell() {
+      initAudio();
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(528, audioCtx.currentTime);
+      g.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.2);
+      osc.connect(g);
+      g.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 2.2);
+    }
+
+    /* --- 4. Tabs Navigation --- */
+    function openTab(tabName, btn) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    /* --- 5. Study Tasks Checklist --- */
+    let tasks = JSON.parse(localStorage.getItem('zen_tasks') || '[]');
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      tasks.forEach((t, idx) => {
+        const li = document.createElement('li');
+        li.className = 'task-item' + (t.done ? ' done' : '');
+        li.innerHTML = `
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;" onclick="toggleTask(${idx})">
+            <input type="checkbox" ${t.done ? 'checked' : ''} onclick="event.stopPropagation();toggleTask(${idx})">
+            <span>${t.text}</span>
+          </label>
+          <button class="task-del" onclick="deleteTask(${idx})">✕</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+    function addTask() {
+      const inp = document.getElementById('taskInput');
+      const text = inp.value.trim();
+      if (!text) return;
+      tasks.push({ text, done: false });
+      inp.value = '';
+      localStorage.setItem('zen_tasks', JSON.stringify(tasks));
+      renderTasks();
+    }
+    function toggleTask(idx) {
+      tasks[idx].done = !tasks[idx].done;
+      localStorage.setItem('zen_tasks', JSON.stringify(tasks));
+      renderTasks();
+    }
+    function deleteTask(idx) {
+      tasks.splice(idx, 1);
+      localStorage.setItem('zen_tasks', JSON.stringify(tasks));
+      renderTasks();
+    }
+
+    /* --- 6. Study Notes --- */
+    function saveNotes() {
+      localStorage.setItem('zen_notes', document.getElementById('notesBox').value);
+      const st = document.getElementById('noteStatus');
+      st.textContent = '✓ تم الحفظ';
+      setTimeout(() => st.textContent = 'محفوظ تلقائياً', 1200);
+    }
+    function copyNotes() {
+      const val = document.getElementById('notesBox').value;
+      if (navigator.clipboard) navigator.clipboard.writeText(val);
+      document.getElementById('noteStatus').textContent = '✓ تم نسخ الملاحظات';
+    }
+    function clearNotes() {
+      if (confirm('هل تريد مسح جميع الملاحظات؟')) {
+        document.getElementById('notesBox').value = '';
+        localStorage.removeItem('zen_notes');
+      }
+    }
+
+    /* --- 7. Box Breathing Exercise --- */
+    let breathTimer = null;
+    function toggleBreathing() {
+      const circle = document.getElementById('breathCircle');
+      const btn = document.getElementById('breathBtn');
+      if (breathTimer) {
+        clearInterval(breathTimer);
+        breathTimer = null;
+        circle.className = 'breath-circle';
+        circle.textContent = 'اضغط للبدء';
+        btn.textContent = 'بدء تمرين التهدئة';
+      } else {
+        const phases = [
+          { text: 'شهيق ببطء...', cls: 'inhale' },
+          { text: 'احبس النفس...', cls: 'inhale' },
+          { text: 'زفير هادئ...', cls: 'exhale' },
+          { text: 'استرخاء...', cls: 'exhale' }
+        ];
+        let step = 0;
+        const runStep = () => {
+          circle.textContent = phases[step].text;
+          circle.className = 'breath-circle ' + phases[step].cls;
+          step = (step + 1) % 4;
+        };
+        runStep();
+        breathTimer = setInterval(runStep, 4000);
+        btn.textContent = 'إيقاف التمرين';
+      }
+    }
+
+    /* Init */
+    document.getElementById('notesBox').value = localStorage.getItem('zen_notes') || '';
+    syncDurationLabels();
+    renderStats();
+    renderTasks();
+    renderTimer();
+  </script>
+</body>
+</html>
