@@ -1,5 +1,6 @@
 package com.zenstudy.focus;
 
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
@@ -16,6 +17,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        // Security: Disable WebView debugging to prevent mod tampering
+        WebView.setWebContentsDebuggingEnabled(false);
+
         webView = new WebView(this);
         setContentView(webView);
 
@@ -24,12 +28,19 @@ public class MainActivity extends AppCompatActivity {
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
-        settings.setAllowContentAccess(true);
+        settings.setAllowContentAccess(false);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        settings.setSaveFormData(false);
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
+
+        String pkg = getPackageName();
+        if (!"com.zenstudy.focus".equals(pkg)) {
+            finish();
+            return;
+        }
+
         webView.loadUrl("file:///android_asset/web/index.html");
     }
 

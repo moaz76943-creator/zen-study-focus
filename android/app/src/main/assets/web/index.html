@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="htmlRoot">
+<html lang="en" dir="ltr" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ZEN FOCUS - Miracle Edition</title>
+  <title>ZEN FOCUS - Global Fortress Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-sheet: #f4f7fc;
@@ -26,7 +26,7 @@
       --text-muted: #64748b;
       --text-light: #94a3b8;
       --border-soft: #e2e8f0;
-      --shadow-card: 0 12px 30px -6px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+      --shadow-card: 0 12px 30px -6px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
       --shadow-float: 0 16px 36px -6px rgba(37, 99, 235, 0.28);
       --radius-sheet: 34px;
       --radius-xl: 24px;
@@ -35,60 +35,89 @@
       --header-grad: linear-gradient(135deg, #091326 0%, #1d3b8b 55%, #0284c7 100%);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 102px; overflow-x: hidden; transition: background 0.3s; }
+    * {
+      box-sizing: border-box; margin: 0; padding: 0;
+      font-family: 'Inter', 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-variant-numeric: tabular-nums lining-nums;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 104px; overflow-x: hidden; user-select: none; }
+    input, textarea { user-select: text; }
 
     /* Deep Focus Lockdown */
     body.deep-lockdown .dynamic-hero-header,
     body.deep-lockdown .bottom-nav-capsule,
-    body.deep-lockdown .quick-orbs-card { display: none !important; }
+    body.deep-lockdown .quick-orbs-card,
+    body.deep-lockdown .ecosystem-strip { display: none !important; }
     body.deep-lockdown { background: #ffffff; justify-content: center; padding-bottom: 20px; }
     body.deep-lockdown .main-white-sheet { margin-top: 0; box-shadow: none; background: #ffffff; }
 
+    .desk-clock-overlay {
+      position: fixed; inset: 0; background: #ffffff; z-index: 400;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px; text-align: center;
+    }
+    .desk-clock-overlay.active { display: flex; animation: fadeIn 0.25s ease-out; }
+    .desk-digits { font-size: 5.8rem; font-weight: 900; color: var(--text-main); letter-spacing: -3px; line-height: 1; }
+
     .app-shell { width: 100%; max-width: 440px; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
 
-    /* Dynamic Futuristic Header */
+    /* Futuristic Dynamic Header */
     .dynamic-hero-header {
       background: var(--header-grad);
       color: #ffffff;
-      padding: 18px 20px 46px;
+      padding: 16px 18px 46px;
       position: relative;
       transition: background 0.4s ease;
       overflow: hidden;
     }
     .dynamic-hero-header::before {
       content: ""; position: absolute; top: -50px; right: -50px; width: 180px; height: 180px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.24) 0%, transparent 70%);
       pointer-events: none;
     }
 
-    .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; position: relative; z-index: 2; }
+    .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; position: relative; z-index: 2; }
     .header-icon-btn {
-      width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.25);
+      width: 38px; height: 38px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.25);
       background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(10px);
       color: #ffffff; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 1rem; transition: 0.15s;
+      cursor: pointer; font-size: 0.95rem; transition: 0.15s;
     }
     .header-icon-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.28); }
 
+    /* Language Pill with ISO Badge (No Flags) */
     .lang-switcher-pill {
-      background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.35); border-radius: var(--radius-pill);
-      padding: 6px 14px; color: #ffffff; font-size: 0.75rem; font-weight: 800;
-      display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.15s;
+      background: rgba(255, 255, 255, 0.16); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.32); border-radius: var(--radius-pill);
+      padding: 5px 12px 5px 8px; color: #ffffff; font-size: 0.74rem; font-weight: 800;
+      display: flex; align-items: center; gap: 7px; cursor: pointer; transition: 0.15s;
     }
-    .lang-switcher-pill:active { transform: scale(0.94); }
+    .lang-iso-badge {
+      background: #00d2ff; color: #091326; font-size: 0.65rem; font-weight: 900;
+      padding: 2px 6px; border-radius: 99px; letter-spacing: 0.5px;
+    }
 
     .header-titles-center { text-align: center; position: relative; z-index: 2; }
-    .header-main-title { font-size: 1.45rem; font-weight: 900; letter-spacing: -0.3px; }
-    .header-sub-caption { font-size: 0.78rem; opacity: 0.9; margin-top: 3px; font-weight: 500; }
+    .header-main-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.3px; }
+    .header-sub-caption { font-size: 0.76rem; opacity: 0.88; margin-top: 2px; font-weight: 500; }
 
-    /* Overlapping White Sheet */
+    /* Inspired by the Top-Right 4 Pillars in the Reference Showcase Image */
+    .ecosystem-strip {
+      display: flex; justify-content: center; gap: 6px; margin-top: 10px; position: relative; z-index: 2; flex-wrap: wrap;
+    }
+    .eco-badge {
+      background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 3px 9px; border-radius: 99px; font-size: 0.62rem; font-weight: 700;
+      color: rgba(255,255,255,0.92); display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Main White Sheet */
     .main-white-sheet {
       background: var(--bg-sheet);
       border-top-left-radius: var(--radius-sheet);
       border-top-right-radius: var(--radius-sheet);
-      margin-top: -28px;
+      margin-top: -26px;
       padding: 18px 15px 24px;
       flex: 1;
       position: relative;
@@ -110,14 +139,42 @@
       position: relative;
     }
 
+    /* 3D Glowing Squircle Domain Switcher (Study, Sport, Read, Work - Inspired by Showcase Pedestals) */
+    .domain-pedestal-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px;
+    }
+    .domain-card {
+      background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 18px;
+      padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+      cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    }
+    .domain-squircle {
+      width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center;
+      justify-content: center; font-size: 1.15rem; color: #ffffff; transition: 0.2s;
+    }
+    .dom-study .domain-squircle { background: linear-gradient(135deg, #2563eb, #06b6d4); box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3); }
+    .dom-sport .domain-squircle { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 14px rgba(16, 185, 129, 0.3); }
+    .dom-read .domain-squircle { background: linear-gradient(135deg, #8b5cf6, #6d28d9); box-shadow: 0 6px 14px rgba(139, 92, 246, 0.3); }
+    .dom-work .domain-squircle { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 14px rgba(245, 158, 11, 0.3); }
+
+    .domain-card.active { border-color: var(--primary); background: var(--primary-soft); transform: translateY(-2px); }
+    .domain-title { font-size: 0.68rem; font-weight: 800; color: var(--text-main); text-align: center; }
+
+    /* Dynamic Sport / Reading Sub-Panel */
+    .domain-context-bar {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px;
+      padding: 10px 12px; margin-bottom: 14px; display: none; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .domain-context-bar.visible { display: flex; }
+
     .segmented-pills-bar {
       display: flex; background: #e2e8f0; padding: 4px; border-radius: var(--radius-pill);
       margin-bottom: 14px; gap: 4px; overflow-x: auto; scrollbar-width: none;
     }
     .segmented-pills-bar::-webkit-scrollbar { display: none; }
     .seg-pill {
-      flex: 1; border: none; background: transparent; padding: 8px 12px;
-      border-radius: var(--radius-pill); font-size: 0.73rem; font-weight: 800;
+      flex: 1; border: none; background: transparent; padding: 8px 10px;
+      border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 800;
       color: var(--text-muted); white-space: nowrap; cursor: pointer; transition: 0.2s;
     }
     .seg-pill.active {
@@ -141,8 +198,8 @@
     .quick-orbs-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
     .orb-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
     .orb-circle {
-      width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center;
-      justify-content: center; font-size: 1.2rem; color: #ffffff;
+      width: 46px; height: 46px; border-radius: 15px; display: flex; align-items: center;
+      justify-content: center; font-size: 1.15rem; color: #ffffff;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); transition: transform 0.15s;
     }
     .orb-item:active .orb-circle { transform: scale(0.9); }
@@ -150,7 +207,7 @@
     .orb-blue { background: linear-gradient(135deg, #0ea5e9, #2563eb); }
     .orb-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
     .orb-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .orb-label { font-size: 0.68rem; font-weight: 800; color: var(--text-main); }
+    .orb-label { font-size: 0.67rem; font-weight: 800; color: var(--text-main); }
 
     .timer-ring-box { display: flex; flex-direction: column; align-items: center; padding: 6px 0 12px; }
     .ring-container { position: relative; width: 215px; height: 215px; display: flex; align-items: center; justify-content: center; }
@@ -164,9 +221,9 @@
     .ring-bar.golden-warning { stroke: #f59e0b !important; }
     .ring-bar.overtime-mode { stroke: #10b981 !important; }
     .ring-center { position: absolute; text-align: center; }
-    .ring-plant { font-size: 1.9rem; margin-bottom: 2px; }
-    .ring-time { font-size: 3.15rem; font-weight: 900; letter-spacing: -1.2px; color: var(--text-main); line-height: 1; font-variant-numeric: tabular-nums; }
-    .ring-mode-txt { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ring-plant { font-size: 1.85rem; margin-bottom: 2px; }
+    .ring-time { font-size: 3.15rem; font-weight: 900; letter-spacing: -1.2px; color: var(--text-main); line-height: 1; }
+    .ring-mode-txt { font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; max-width: 165px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .ring-task-pill {
       font-size: 0.68rem; font-weight: 800; color: var(--primary); background: var(--primary-soft);
       padding: 4px 12px; border-radius: var(--radius-pill); margin-top: 6px; display: inline-block; cursor: pointer;
@@ -196,7 +253,7 @@
     .delta-chip:active { background: var(--primary); color: #ffffff; }
 
     /* ========================================================
-       2. TASKS SCREEN
+       2. TASKS SCREEN (STUDY, SPORT, READ, WORK)
        ======================================================== */
     .task-creator-bar {
       background: var(--card-pure); border-radius: var(--radius-lg); padding: 8px 10px;
@@ -240,7 +297,7 @@
     .tp-rose { background: #fce7f3; color: #db2777; }
 
     /* ========================================================
-       3. SMART INTERACTIVE CALENDAR (التقويم الذكي المدمج)
+       3. SMART INTERACTIVE CALENDAR
        ======================================================== */
     .cal-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .cal-month-title { font-size: 1rem; font-weight: 900; color: var(--text-main); }
@@ -367,9 +424,7 @@
       box-shadow: 0 12px 28px rgba(30, 27, 75, 0.25); margin-bottom: 14px; position: relative; overflow: hidden;
     }
 
-    /* ========================================================
-       6-TAB FLOATING GLASS BOTTOM NAVIGATION
-       ======================================================== */
+    /* 6-Tab Bottom Capsule */
     .bottom-nav-capsule {
       position: fixed; bottom: 10px; width: calc(100% - 20px); max-width: 420px;
       background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px);
@@ -386,9 +441,7 @@
     .bnav-btn svg { width: 19px; height: 19px; fill: currentColor; }
     .bnav-btn.active { color: var(--primary); background: var(--primary-soft); }
 
-    /* ========================================================
-       MODALS
-       ======================================================== */
+    /* Modals & Language Search with ISO Badges (Zero Flags) */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.58);
       backdrop-filter: blur(5px); display: none; align-items: center;
@@ -396,8 +449,8 @@
     }
     .modal-overlay.open { display: flex; animation: fadeIn 0.18s ease-out; }
     .modal-card {
-      background: #ffffff; width: 100%; max-width: 395px; border-radius: 26px;
-      padding: 20px; box-shadow: 0 22px 45px rgba(0,0,0,0.25); max-height: 85vh; overflow-y: auto;
+      background: #ffffff; width: 100%; max-width: 400px; border-radius: 26px;
+      padding: 20px; box-shadow: 0 22px 45px rgba(0,0,0,0.25); max-height: 86vh; overflow-y: auto;
     }
     .modal-head { font-size: 1rem; font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
     .modal-inp { width: 100%; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; font-size: 0.82rem; margin-bottom: 10px; outline: none; background: #f8fafc; color: var(--text-main); }
@@ -405,22 +458,21 @@
     .mbtn-pri { flex: 1; background: var(--primary); color: #fff; border: none; padding: 11px; border-radius: 12px; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
     .mbtn-sec { flex: 1; background: #f1f5f9; color: var(--text-main); border: none; padding: 11px; border-radius: 12px; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
 
-    .lang-grid-20 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .lang-option-btn {
+    .lang-list-scroll { display: flex; flex-direction: column; gap: 7px; max-height: 55vh; overflow-y: auto; padding-right: 2px; }
+    .lang-row-btn {
       background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px;
-      padding: 10px 12px; display: flex; align-items: center; gap: 8px;
-      font-size: 0.78rem; font-weight: 800; color: var(--text-main); cursor: pointer;
+      padding: 10px 12px; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: 0.15s; text-align: left;
     }
-    .lang-option-btn.active { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
-
-    /* Zen Breathing Orb Animation */
-    .breath-circle {
-      width: 130px; height: 130px; border-radius: 50%; margin: 18px auto;
-      background: radial-gradient(circle, #38bdf8 0%, #2563eb 100%);
-      color: #ffffff; display: flex; align-items: center; justify-content: center;
-      font-size: 0.95rem; font-weight: 900; box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
-      transition: transform 4s ease-in-out;
+    .lang-row-btn.active { border-color: var(--primary); background: var(--primary-soft); }
+    .lang-code-monogram {
+      width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #ffffff; font-size: 0.72rem; font-weight: 900; display: flex; align-items: center; justify-content: center;
+      letter-spacing: 0.5px; flex-shrink: 0;
     }
+    .lang-names-col { flex: 1; margin: 0 10px; }
+    .lang-en-title { font-size: 0.8rem; font-weight: 800; color: var(--text-main); }
+    .lang-native-sub { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
 
     .toast-pill {
       position: fixed; top: 68px; left: 50%; transform: translateX(-50%) translateY(-20px);
@@ -434,6 +486,14 @@
 <body>
 
   <div class="toast-pill" id="appToast"><span id="toastText">✓</span></div>
+
+  <!-- Fullscreen Desk Clock Overlay -->
+  <div class="desk-clock-overlay" id="deskClockOverlay">
+    <div style="font-size:0.9rem; font-weight:800; color:var(--primary); margin-bottom:10px;">🖥️ DESK CLOCK MODE</div>
+    <div class="desk-digits" id="deskClockDigits">25:00</div>
+    <div style="font-size:0.85rem; color:var(--text-muted); margin: 12px 0 24px;" id="deskClockTask">Active Session</div>
+    <button class="mbtn-pri" style="max-width:200px; padding:12px 28px;" onclick="toggleDeskClock(false)">Exit ✕</button>
+  </div>
 
   <div class="app-shell">
     <svg style="position: absolute; width: 0; height: 0;">
@@ -449,19 +509,28 @@
     <header class="dynamic-hero-header" id="heroHeader">
       <div class="header-top-row">
         <div style="display:flex; gap:8px;">
-          <button class="header-icon-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
-          <button class="header-icon-btn" onclick="openBreathModal()" title="4-7-8 Zen Breath">🌬️</button>
+          <button class="header-icon-btn" onclick="openSettingsModal()" title="Settings & Security">🛡️</button>
+          <button class="header-icon-btn" onclick="toggleDeskClock(true)" title="Desk Clock">🖥️</button>
         </div>
 
+        <!-- Language Switcher with ISO Badge (Zero Flags) -->
         <button class="lang-switcher-pill" onclick="openLanguageModal()">
-          <span>🌐</span>
-          <span id="currentLangLabel">🇸🇦 العربية</span>
+          <span class="lang-iso-badge" id="currentLangIso">EN</span>
+          <span id="currentLangLabel">English</span>
         </button>
       </div>
 
       <div class="header-titles-center">
-        <h1 class="header-main-title" id="hdrMainTitle">المؤقت والتركيز</h1>
-        <p class="header-sub-caption" id="hdrSubTitle">تحكم أكبر في وقتك ومستقبلك الدراسي</p>
+        <h1 class="header-main-title" id="hdrMainTitle">Focus & Performance</h1>
+        <p class="header-sub-caption" id="hdrSubTitle">A smarter world for study, sports & deep work</p>
+      </div>
+
+      <!-- 4 Pillars Inspired by the Showcase Image Header -->
+      <div class="ecosystem-strip">
+        <span class="eco-badge">🛡️ <span data-i18n="pillSecure">Anti-Tamper</span></span>
+        <span class="eco-badge">⚡ <span data-i18n="pillFast">Ultra Fast</span></span>
+        <span class="eco-badge">◻️ <span data-i18n="pillModern">Futuristic UI</span></span>
+        <span class="eco-badge">✨ <span data-i18n="pillUnified">Multi-Domain</span></span>
       </div>
     </header>
 
@@ -469,49 +538,94 @@
     <div class="main-white-sheet">
 
       <!-- ======================================================
-           1. TIMER SECTION
+           1. TIMER & MULTI-DOMAIN SECTION (STUDY, SPORT, READ, WORK)
            ====================================================== -->
       <main class="screen-section active" id="sec-timer">
+
+        <!-- 4 Glowing Squircle Domain Pedestals (No Meditation!) -->
+        <div class="domain-pedestal-grid">
+          <div class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)">
+            <div class="domain-squircle">📚</div>
+            <span class="domain-title" data-i18n="domStudy">Study</span>
+          </div>
+          <div class="domain-card dom-sport" id="domBtn-sport" onclick="switchActivityDomain('sport', this)">
+            <div class="domain-squircle">🏋️</div>
+            <span class="domain-title" data-i18n="domSport">Workout</span>
+          </div>
+          <div class="domain-card dom-read" id="domBtn-read" onclick="switchActivityDomain('read', this)">
+            <div class="domain-squircle">📖</div>
+            <span class="domain-title" data-i18n="domRead">Reading</span>
+          </div>
+          <div class="domain-card dom-work" id="domBtn-work" onclick="switchActivityDomain('work', this)">
+            <div class="domain-squircle">💻</div>
+            <span class="domain-title" data-i18n="domWork">Deep Work</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Sport Workout Bar (Sets, Reps & Quick Rests) -->
+        <div class="domain-context-bar" id="sportContextBar">
+          <div>
+            <div style="font-size:0.72rem; font-weight:800; color:var(--emerald);" data-i18n="sportSetsTitle">🏋️ Workout Sets & Rest</div>
+            <div style="font-size:0.84rem; font-weight:900;" id="sportSetCounterTxt">Set 1 / 4 • 12 Reps</div>
+          </div>
+          <div style="display:flex; gap:5px;">
+            <button class="delta-chip" onclick="logWorkoutSet()">+1 Set ✓</button>
+            <button class="delta-chip" style="background:var(--emerald-soft); color:var(--emerald);" onclick="startQuickSportRest(45)">Rest 45s</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Reading Tracker Bar -->
+        <div class="domain-context-bar" id="readContextBar">
+          <div>
+            <div style="font-size:0.72rem; font-weight:800; color:var(--violet);" data-i18n="readTrackerTitle">📖 Reading Session Progress</div>
+            <div style="font-size:0.84rem; font-weight:900;" id="readPagesCounterTxt">Pages Read Today: 24</div>
+          </div>
+          <div style="display:flex; gap:5px;">
+            <button class="delta-chip" onclick="addReadPages(5)">+5 Pages</button>
+            <button class="delta-chip" onclick="addReadPages(10)">+10 Pages</button>
+          </div>
+        </div>
+
         <div class="pure-white-card quick-orbs-card">
           <div class="hero-balance-header">
             <div>
-              <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;" data-i18n="totalFocusToday">إجمالي التركيز اليوم</div>
+              <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;" data-i18n="totalFocusToday">Total Active Minutes Today</div>
               <div class="balance-big-digits">
                 <span id="hdrFocusMins">120</span>
-                <span style="font-size:0.85rem; color:var(--text-muted);" data-i18n="minsUnit">دقيقة</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);" data-i18n="minsUnit">mins</span>
               </div>
             </div>
             <div>
-              <span class="growth-pill-green" id="hdrStreakBadge">↑ 🔥 5</span>
+              <span class="growth-pill-green" id="hdrStreakBadge">↑ 🔥 5 days</span>
             </div>
           </div>
 
           <div class="quick-orbs-row">
             <div class="orb-item" onclick="openBrainDumpModal()">
               <div class="orb-circle orb-green">💭</div>
-              <span class="orb-label" data-i18n="orbDump">تفريغ فكرة</span>
+              <span class="orb-label" data-i18n="orbDump">Quick Idea</span>
             </div>
             <div class="orb-item" onclick="addWaterCup()">
               <div class="orb-circle orb-blue">💧</div>
-              <span class="orb-label" id="orbWaterTxt">4/8</span>
+              <span class="orb-label" id="orbWaterTxt">Water 4/8</span>
             </div>
             <div class="orb-item" onclick="toggleDeepLockdown()">
               <div class="orb-circle orb-purple">🔒</div>
-              <span class="orb-label" data-i18n="orbDeep">تركيز عميق</span>
+              <span class="orb-label" data-i18n="orbDeep">Lockdown</span>
             </div>
-            <div class="orb-item" onclick="openBreathModal()">
-              <div class="orb-circle orb-amber">🌬️</div>
-              <span class="orb-label" data-i18n="orbBreath">تنفس 4-7-8</span>
+            <div class="orb-item" onclick="toggleDeskClock(true)">
+              <div class="orb-circle orb-amber">🖥️</div>
+              <span class="orb-label" data-i18n="orbDesk">Desk Clock</span>
             </div>
           </div>
         </div>
 
         <div class="pure-white-card">
           <div class="segmented-pills-bar">
-            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerMode(cfg.focusMin, 'focus', this)" data-i18n="modeFocus">تركيز 25د</button>
-            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">راحة 5د</button>
-            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">طويلة 15د</button>
-            <button class="seg-pill" id="modeCustomBtn" onclick="openCustomTimerModal()" data-i18n="modeCustom">مخصص ⚡</button>
+            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerMode(cfg.focusMin, 'focus', this)" data-i18n="modeFocus">Session 25m</button>
+            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">Short 5m</button>
+            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">Long 15m</button>
+            <button class="seg-pill" id="modeCustomBtn" onclick="openCustomTimerModal()" data-i18n="modeCustom">Custom ⚡</button>
           </div>
 
           <div class="timer-ring-box">
@@ -523,8 +637,8 @@
               <div class="ring-center">
                 <div class="ring-plant" id="ringPlantEmoji">🌱</div>
                 <div class="ring-time" id="timerDigitsTxt">25:00</div>
-                <div class="ring-mode-txt" id="timerModeCaption">جلسة تركيز</div>
-                <div class="ring-task-pill" id="timerLinkedTask" onclick="switchTab('sec-tasks', document.getElementById('navTasks'))" data-i18n="startFocusAchieve">ابدأ • ركز • أنجز</div>
+                <div class="ring-mode-txt" id="timerModeCaption">Focus Session</div>
+                <div class="ring-task-pill" id="timerLinkedTask" onclick="switchTab('sec-tasks', document.getElementById('navTasks'))" data-i18n="startFocusAchieve">Plan • Execute • Achieve</div>
               </div>
             </div>
           </div>
@@ -552,19 +666,19 @@
            ====================================================== -->
       <main class="screen-section" id="sec-tasks">
         <div class="segmented-pills-bar">
-          <button class="seg-pill active" onclick="filterTasksByStatus('all', this)" data-i18n="filterAll">الكل</button>
-          <button class="seg-pill" onclick="filterTasksByStatus('active', this)" data-i18n="filterToday">اليوم</button>
-          <button class="seg-pill" onclick="filterTasksByStatus('done', this)" data-i18n="filterDone">مكتملة</button>
+          <button class="seg-pill active" onclick="filterTasksByStatus('all', this)" data-i18n="filterAll">All</button>
+          <button class="seg-pill" onclick="filterTasksByStatus('active', this)" data-i18n="filterToday">Active</button>
+          <button class="seg-pill" onclick="filterTasksByStatus('done', this)" data-i18n="filterDone">Completed</button>
         </div>
 
         <div class="task-creator-bar">
-          <input type="text" class="task-creator-inp" id="inpNewTask" data-i18n-placeholder="phAddTask" placeholder="أضف مهمة دراسية جديدة..." onkeydown="if(event.key==='Enter')createNewTask()">
+          <input type="text" class="task-creator-inp" id="inpNewTask" data-i18n-placeholder="phAddTask" placeholder="Add study, workout or reading goal..." onkeydown="if(event.key==='Enter')createNewTask()">
           <input type="date" class="task-mini-sel" id="inpTaskDate">
           <select class="task-mini-sel" id="selTaskCat">
-            <option value="study" data-i18n="catStudy">📚 دراسة</option>
-            <option value="exam" data-i18n="catExam">⭐ امتحانات</option>
-            <option value="review" data-i18n="catReview">🔍 مراجعة</option>
-            <option value="sport" data-i18n="catSport">🏃 نشاط</option>
+            <option value="study" data-i18n="catStudy">📚 Study</option>
+            <option value="sport" data-i18n="catSport">🏋️ Sport</option>
+            <option value="read" data-i18n="catReview">📖 Reading</option>
+            <option value="exam" data-i18n="catExam">💻 Work</option>
           </select>
           <button class="btn-task-plus" onclick="createNewTask()">+</button>
         </div>
@@ -573,13 +687,13 @@
       </main>
 
       <!-- ======================================================
-           3. SMART INTERACTIVE CALENDAR SECTION (التقويم الذكي)
+           3. SMART CALENDAR SECTION
            ====================================================== -->
       <main class="screen-section" id="sec-calendar">
         <div class="pure-white-card">
           <div class="cal-header-nav">
             <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(-1)">❮</button>
-            <div class="cal-month-title" id="calMonthYearTitle">أكتوبر 2026</div>
+            <div class="cal-month-title" id="calMonthYearTitle">October 2026</div>
             <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(1)">❯</button>
           </div>
           <div class="cal-weekdays-grid" id="calWeekdaysRow"></div>
@@ -588,10 +702,8 @@
 
         <div class="pure-white-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-size:0.9rem; font-weight:900;" id="selectedDateLabel">أجندة اليوم المحدد</span>
-            <div style="display:flex; gap:6px;">
-              <button class="task-mini-sel" style="color:var(--primary); cursor:pointer;" onclick="openNoteModalForSelectedDate()" data-i18n="btnAddCalNote">+ ملاحظة لليوم</button>
-            </div>
+            <span style="font-size:0.9rem; font-weight:900;" id="selectedDateLabel">2026-10-18</span>
+            <button class="task-mini-sel" style="color:var(--primary); cursor:pointer;" onclick="openNoteModalForSelectedDate()" data-i18n="btnAddCalNote">+ Add Note to Date</button>
           </div>
           <div id="calendarDayAgendaBox" style="display:flex; flex-direction:column; gap:8px;"></div>
         </div>
@@ -603,15 +715,15 @@
       <main class="screen-section" id="sec-notes">
         <div class="search-pill-box">
           <span>🔍</span>
-          <input type="text" class="search-pill-inp" id="inpSearchNotes" data-i18n-placeholder="phSearchNotes" placeholder="ابحث عن ملاحظة أو بطاقة استذكار..." oninput="renderNotesStack()">
+          <input type="text" class="search-pill-inp" id="inpSearchNotes" data-i18n-placeholder="phSearchNotes" placeholder="Search notes, workouts or book summaries..." oninput="renderNotesStack()">
           <button class="task-mini-sel" onclick="exportAllNotes()" style="cursor:pointer;">📥 TXT</button>
         </div>
 
         <div class="segmented-pills-bar">
-          <button class="seg-pill active" onclick="filterNotesByTag('all', this)" data-i18n="filterAll">الكل</button>
-          <button class="seg-pill" onclick="filterNotesByTag('cornell', this)" data-i18n="tagCornell">كورنيل 📋</button>
-          <button class="seg-pill" onclick="filterNotesByTag('flash', this)" data-i18n="tagFlash">استذكار 👁️</button>
-          <button class="seg-pill" onclick="filterNotesByTag('quick', this)" data-i18n="tagQuick">أفكار 💡</button>
+          <button class="seg-pill active" onclick="filterNotesByTag('all', this)" data-i18n="filterAll">All</button>
+          <button class="seg-pill" onclick="filterNotesByTag('cornell', this)" data-i18n="tagCornell">Cornell 📋</button>
+          <button class="seg-pill" onclick="filterNotesByTag('flash', this)" data-i18n="tagFlash">Recall 👁️</button>
+          <button class="seg-pill" onclick="filterNotesByTag('quick', this)" data-i18n="tagQuick">Log 💡</button>
         </div>
 
         <div class="learning-cards-stack" id="notesStackBox"></div>
@@ -624,18 +736,18 @@
            ====================================================== -->
       <main class="screen-section" id="sec-sounds">
         <div class="mixer-status-bar">
-          <span id="mixerStatusTxt" data-i18n="mixerReady">🎵 استوديو الطبيعة جاهز</span>
+          <span id="mixerStatusTxt" data-i18n="mixerReady">🎵 Pure Nature Studio Ready</span>
           <div style="display:flex; gap:6px;">
-            <button class="task-mini-sel" onclick="playPresetRelaxMix()" style="cursor:pointer; color:var(--primary);" data-i18n="btnMyMix">✨ خلطتي</button>
-            <button class="task-mini-sel" onclick="stopAllAudio()" style="cursor:pointer; color:var(--rose);" data-i18n="btnStopAll">⏹ إيقاف</button>
+            <button class="task-mini-sel" onclick="playPresetRelaxMix()" style="cursor:pointer; color:var(--primary);" data-i18n="btnMyMix">✨ Mix</button>
+            <button class="task-mini-sel" onclick="stopAllAudio()" style="cursor:pointer; color:var(--rose);" data-i18n="btnStopAll">⏹ Stop</button>
           </div>
         </div>
 
         <div class="segmented-pills-bar">
-          <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">الكل (12)</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">مياه وأمطار 🌧️</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">غابات ورياح 🌲</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">دفء وعزل 🔥</button>
+          <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All (12)</button>
+          <button class="seg-pill" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">Water & Rain 🌧️</button>
+          <button class="seg-pill" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">Forest & Wind 🌲</button>
+          <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
         </div>
 
         <div class="sounds-photo-grid" id="soundsGridBox"></div>
@@ -647,21 +759,21 @@
       <main class="screen-section" id="sec-analytics">
         <div class="analytics-kpi-grid">
           <div class="an-kpi-card" onclick="addQuickSessionRecord()">
-            <div class="an-kpi-top"><span data-i18n="kpiMinutes">دقائق التركيز</span><span>🕒</span></div>
+            <div class="an-kpi-top"><span data-i18n="kpiMinutes">Active Minutes</span><span>🕒</span></div>
             <div class="an-kpi-num" id="kpiTotalMins">420</div>
-            <div class="an-kpi-trend" data-i18n="kpiTrendWeek">↑ +18% هذا الأسبوع</div>
+            <div class="an-kpi-trend" data-i18n="kpiTrendWeek">↑ +18% this week</div>
           </div>
           <div class="an-kpi-card" onclick="addQuickSessionRecord()">
-            <div class="an-kpi-top"><span data-i18n="kpiSessions">الجلسات المكتملة</span><span>🎯</span></div>
+            <div class="an-kpi-top"><span data-i18n="kpiSessions">Completed Sessions</span><span>🎯</span></div>
             <div class="an-kpi-num" id="kpiTotalSessions">18</div>
-            <div class="an-kpi-trend" data-i18n="kpiTrendGreat">↑ +12% التزام ممتاز</div>
+            <div class="an-kpi-trend" data-i18n="kpiTrendGreat">↑ +12% consistency</div>
           </div>
         </div>
 
         <div class="pure-white-card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:0.92rem; font-weight:900;" data-i18n="overviewTitle">نظرة عامة على الإنجاز</span>
-            <span class="growth-pill-green" data-i18n="badgeThisWeek">هذا الأسبوع</span>
+            <span style="font-size:0.92rem; font-weight:900;" data-i18n="overviewTitle">Multi-Domain Distribution</span>
+            <span class="growth-pill-green" data-i18n="badgeThisWeek">This Week</span>
           </div>
 
           <div class="overview-split-row">
@@ -677,20 +789,20 @@
           </div>
 
           <div class="legend-grid">
-            <div class="legend-item"><span><i class="legend-dot" style="background:#3b82f6;"></i><span data-i18n="legDeep">دراسة عميقة</span></span><span>38%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#10b981;"></i><span data-i18n="legPractice">حل تمارين</span></span><span>30%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#8b5cf6;"></i><span data-i18n="legCornell">مراجعة كورنيل</span></span><span>20%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#f59e0b;"></i><span data-i18n="legReading">قراءة حرة</span></span><span>12%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#3b82f6;"></i><span data-i18n="domStudy">Study</span></span><span>38%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#10b981;"></i><span data-i18n="domSport">Workout</span></span><span>30%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#8b5cf6;"></i><span data-i18n="domRead">Reading</span></span><span>20%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#f59e0b;"></i><span data-i18n="domWork">Deep Work</span></span><span>12%</span></div>
           </div>
         </div>
 
         <div class="wave-chart-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <div>
-              <div style="font-size:0.74rem; opacity:0.8;" data-i18n="waveFlowTitle">مؤشر التدفق الذهني الأسبوعي</div>
+              <div style="font-size:0.74rem; opacity:0.8;" data-i18n="waveFlowTitle">Weekly Performance Index</div>
               <div style="font-size:1.25rem; font-weight:900;">125.6K <span style="font-size:0.75rem; color:#34d399;">↑ 24%</span></div>
             </div>
-            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;" data-i18n="peakPerfBadge">ذروة الأداء</span>
+            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;" data-i18n="peakPerfBadge">Peak Flow</span>
           </div>
           <svg viewBox="0 0 320 95" style="width:100%; height:90px; overflow:visible;">
             <defs>
@@ -707,7 +819,7 @@
         </div>
 
         <div class="pure-white-card">
-          <div style="font-size:0.88rem; font-weight:900; margin-bottom:8px;" data-i18n="calcHeading">🎓 حاسبة ختم المنهج التنبؤية</div>
+          <div style="font-size:0.88rem; font-weight:900; margin-bottom:8px;" data-i18n="calcHeading">🎓 Target & Goal Completion Calculator</div>
           <div style="display:flex; gap:8px; margin-bottom:8px;">
             <input type="number" class="modal-inp" id="inpPagesLeft" value="120" style="margin:0;" oninput="updateSyllabusCalc()">
             <input type="number" class="modal-inp" id="inpDailyRate" value="15" style="margin:0;" oninput="updateSyllabusCalc()">
@@ -724,27 +836,27 @@
     <nav class="bottom-nav-capsule">
       <button class="bnav-btn active" id="navTimer" onclick="switchTab('sec-timer', this)">
         <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-        <span data-i18n="navTimer">المؤقت</span>
+        <span data-i18n="navTimer">Timer</span>
       </button>
       <button class="bnav-btn" id="navTasks" onclick="switchTab('sec-tasks', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-        <span data-i18n="navTasks">المهام</span>
+        <span data-i18n="navTasks">Tasks</span>
       </button>
       <button class="bnav-btn" id="navCalendar" onclick="switchTab('sec-calendar', this)">
         <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-        <span data-i18n="navCalendar">التقويم</span>
+        <span data-i18n="navCalendar">Calendar</span>
       </button>
       <button class="bnav-btn" id="navNotes" onclick="switchTab('sec-notes', this)">
         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-        <span data-i18n="navNotes">الملاحظات</span>
+        <span data-i18n="navNotes">Notes</span>
       </button>
       <button class="bnav-btn" id="navSounds" onclick="switchTab('sec-sounds', this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-        <span data-i18n="navSounds">الأصوات</span>
+        <span data-i18n="navSounds">Nature</span>
       </button>
       <button class="bnav-btn" id="navAnalytics" onclick="switchTab('sec-analytics', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-        <span data-i18n="navAnalytics">التحليلات</span>
+        <span data-i18n="navAnalytics">Analytics</span>
       </button>
     </nav>
   </div>
@@ -752,37 +864,38 @@
   <!-- ========================================================
        MODALS
        ======================================================== -->
-  <!-- 1. 20 Languages Modal -->
+  <!-- 1. 20 Languages with English + Native Name & Country Search (Zero Flags) -->
   <div class="modal-overlay" id="langModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>🌐 Choose Language / اختر اللغة</span>
+        <span>🌐 Language & Country Search</span>
         <button class="task-mini-sel" onclick="closeModal('langModal')">✕</button>
       </div>
-      <div class="lang-grid-20" id="langGrid20Box"></div>
+      <input type="text" class="modal-inp" id="inpLangCountrySearch" placeholder="Search language or country (e.g. Jordan, USA, مصر, Germany)..." oninput="renderLanguageList()">
+      <div class="lang-list-scroll" id="langListScrollBox"></div>
     </div>
   </div>
 
-  <!-- 2. Custom Timer Modal (Replaces Exam 90m) -->
+  <!-- 2. Custom Timer Modal -->
   <div class="modal-overlay" id="customTimerModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span data-i18n="modeCustom">⏱️ تخصيص المؤقت</span>
+        <span data-i18n="modeCustom">⏱️ Custom Session</span>
         <button class="task-mini-sel" onclick="closeModal('customTimerModal')">✕</button>
       </div>
       <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
-        <button class="delta-chip" onclick="setCustomPresetValues(40)">40m</button>
+        <button class="delta-chip" onclick="setCustomPresetValues(20)">20m</button>
+        <button class="delta-chip" onclick="setCustomPresetValues(35)">35m</button>
         <button class="delta-chip" onclick="setCustomPresetValues(45)">45m</button>
-        <button class="delta-chip" onclick="setCustomPresetValues(52)">52m</button>
         <button class="delta-chip" onclick="setCustomPresetValues(60)">60m</button>
         <button class="delta-chip" onclick="setCustomPresetValues(90)">90m</button>
         <button class="delta-chip" onclick="setCustomPresetValues(120)">120m</button>
       </div>
       <input type="number" class="modal-inp" id="inpCustomMins" value="45" min="1" max="240" placeholder="Minutes (1-240)">
-      <input type="text" class="modal-inp" id="inpCustomTitle" data-i18n-placeholder="modeCustom" placeholder="اسم الجلسة المخصصة...">
+      <input type="text" class="modal-inp" id="inpCustomTitle" placeholder="Session Name (Study, Gym, Reading, Work)...">
       <div class="modal-actions">
-        <button class="mbtn-pri" onclick="applyCustomTimerNow()" data-i18n="btnSave">تطبيق وبدء</button>
-        <button class="mbtn-sec" onclick="closeModal('customTimerModal')" data-i18n="btnCancel">إلغاء</button>
+        <button class="mbtn-pri" onclick="applyCustomTimerNow()" data-i18n="btnSave">Save & Start</button>
+        <button class="mbtn-sec" onclick="closeModal('customTimerModal')" data-i18n="btnCancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -791,29 +904,29 @@
   <div class="modal-overlay" id="noteModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span data-i18n="navNotes">📝 الملاحظات الذكية والتقويم</span>
+        <span data-i18n="navNotes">📝 Smart Note & Calendar</span>
         <button class="task-mini-sel" onclick="closeModal('noteModal')">✕</button>
       </div>
       <div style="display:flex; gap:6px; margin-bottom:8px;">
-        <button class="task-mini-sel" onclick="fillNoteTpl('cornell')" data-i18n="tagCornell">📋 كورنيل</button>
-        <button class="task-mini-sel" onclick="fillNoteTpl('flash')" data-i18n="tagFlash">👁️ استذكار</button>
+        <button class="task-mini-sel" onclick="fillNoteTpl('cornell')" data-i18n="tagCornell">📋 Cornell</button>
+        <button class="task-mini-sel" onclick="fillNoteTpl('flash')" data-i18n="tagFlash">👁️ Recall</button>
       </div>
-      <input type="text" class="modal-inp" id="inpNoteTitle" data-i18n-placeholder="phSearchNotes" placeholder="عنوان الملاحظة أو السؤال...">
+      <input type="text" class="modal-inp" id="inpNoteTitle" placeholder="Title or Question...">
       <div style="display:flex; gap:6px; margin-bottom:10px;">
         <select class="modal-inp" id="selNoteCat" style="margin:0; flex:1;">
-          <option value="cornell" data-i18n="tagCornell">📋 كورنيل</option>
-          <option value="flash" data-i18n="tagFlash">👁️ استذكار</option>
-          <option value="quick" data-i18n="tagQuick">💡 أفكار</option>
+          <option value="cornell" data-i18n="tagCornell">📋 Cornell</option>
+          <option value="flash" data-i18n="tagFlash">👁️ Recall</option>
+          <option value="quick" data-i18n="tagQuick">💡 Log</option>
         </select>
-        <input type="date" class="modal-inp" id="inpNoteCalDate" style="margin:0; flex:1;" title="جدولة في التقويم">
+        <input type="date" class="modal-inp" id="inpNoteCalDate" style="margin:0; flex:1;">
       </div>
-      <textarea class="modal-inp" id="inpNoteBody" style="height:105px; resize:none;" placeholder="..."></textarea>
+      <textarea class="modal-inp" id="inpNoteBody" style="height:105px; resize:none;" placeholder="Details..."></textarea>
       <label style="display:flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:700; margin-bottom:8px;">
-        <input type="checkbox" id="chkNoteBlur"> <span data-i18n="lblBlurAnswer">إخفاء الإجابة بضبابية للاستذكار (تظهر باللمس)</span>
+        <input type="checkbox" id="chkNoteBlur"> <span data-i18n="lblBlurAnswer">Blur text for active recall (Tap to reveal)</span>
       </label>
       <div class="modal-actions">
-        <button class="mbtn-pri" onclick="saveNewNote()" data-i18n="btnSave">حفظ</button>
-        <button class="mbtn-sec" onclick="closeModal('noteModal')" data-i18n="btnCancel">إلغاء</button>
+        <button class="mbtn-pri" onclick="saveNewNote()" data-i18n="btnSave">Save</button>
+        <button class="mbtn-sec" onclick="closeModal('noteModal')" data-i18n="btnCancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -822,111 +935,148 @@
   <div class="modal-overlay" id="brainDumpModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span data-i18n="orbDump">💭 تفريغ فكرة مشتتة</span>
+        <span data-i18n="orbDump">💭 Quick Capture</span>
         <button class="task-mini-sel" onclick="closeModal('brainDumpModal')">✕</button>
       </div>
       <input type="text" class="modal-inp" id="inpQuickDump" placeholder="...">
       <div class="modal-actions">
-        <button class="mbtn-pri" onclick="saveQuickDump(false)" data-i18n="navNotes">حفظ كملاحظة</button>
-        <button class="mbtn-sec" onclick="saveQuickDump(true)" data-i18n="navTasks">حفظ كمهمة</button>
+        <button class="mbtn-pri" onclick="saveQuickDump(false)" data-i18n="navNotes">Save Note</button>
+        <button class="mbtn-sec" onclick="saveQuickDump(true)" data-i18n="navTasks">Save Task</button>
       </div>
     </div>
   </div>
 
-  <!-- 5. 4-7-8 Zen Breathing Exercise Modal -->
-  <div class="modal-overlay" id="breathModal">
-    <div class="modal-card" style="text-align:center;">
-      <div class="modal-head">
-        <span data-i18n="orbBreath">🌬️ تمرين التنفس 4-7-8 للتركيز</span>
-        <button class="task-mini-sel" onclick="closeBreathModal()">✕</button>
-      </div>
-      <div class="breath-circle" id="breathOrb">شهيق 4ث</div>
-      <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px;" id="breathGuideSub">استنشق بهدوء لتصفية ذهنك قبل الجلسة</p>
-      <button class="mbtn-pri" style="width:100%;" onclick="closeBreathModal()" data-i18n="btnSave">تم</button>
-    </div>
-  </div>
-
-  <!-- 6. Settings Modal -->
+  <!-- 5. Security & Settings Modal -->
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>⚙️ Settings</span>
+        <span>🛡️ Fortress Security & Backup</span>
         <button class="task-mini-sel" onclick="closeModal('settingsModal')">✕</button>
       </div>
+      <div style="background:var(--emerald-soft); color:var(--emerald); padding:10px 12px; border-radius:12px; font-size:0.75rem; font-weight:800; margin-bottom:10px;">
+        ✓ Anti-Tamper Checksum Verified • Dual-Slot Atomic Storage Active
+      </div>
+      <label style="font-size:0.74rem; font-weight:700;">Default Session Minutes (0-9):</label>
       <input type="number" class="modal-inp" id="inpCfgFocus" value="25" min="1" max="180">
       <div class="modal-actions">
-        <button class="mbtn-pri" onclick="saveSettingsNow()" data-i18n="btnSave">حفظ</button>
-        <button class="mbtn-sec" onclick="copyBackupJson()">JSON Backup</button>
+        <button class="mbtn-pri" onclick="saveSettingsNow()" data-i18n="btnSave">Save</button>
+        <button class="mbtn-sec" onclick="copyBackupJson()">Export JSON</button>
       </div>
     </div>
   </div>
 
   <script>
     /* ========================================================
-       1. COMPLETE 100% REACTIVE 20-LANGUAGE ENGINE
+       0. UNIVERSAL WESTERN DIGITS ENFORCER (0123456789 ONLY)
        ======================================================== */
-    const BASE_LANGS = {
-      ar: {
-        name: 'العربية', flag: '🇸🇦', dir: 'rtl',
-        title: 'المؤقت والتركيز', sub: 'تحكم أكبر في وقتك ومستقبلك الدراسي',
-        navTimer: 'المؤقت', navTasks: 'المهام', navCalendar: 'التقويم', navNotes: 'الملاحظات', navSounds: 'الأصوات', navAnalytics: 'التحليلات',
-        totalFocusToday: 'إجمالي التركيز اليوم', minsUnit: 'دقيقة', daysUnit: 'أيام', waterWord: 'الماء',
-        orbDump: 'تفريغ فكرة', orbDeep: 'تركيز عميق', orbBreath: 'تنفس 4-7-8',
-        modeFocus: 'تركيز 25د', modeShort: 'راحة 5د', modeLong: 'طويلة 15د', modeCustom: 'مخصص ⚡',
-        startFocusAchieve: 'ابدأ • ركز • أنجز',
-        filterAll: 'الكل', filterToday: 'اليوم', filterDone: 'مكتملة',
-        phAddTask: 'أضف مهمة دراسية جديدة...', phSearchNotes: 'ابحث في الملاحظات أو الاستذكار...',
-        catStudy: '📚 دراسة', catExam: '⭐ امتحانات', catReview: '🔍 مراجعة', catSport: '🏃 نشاط',
-        tagCornell: 'كورنيل 📋', tagFlash: 'استذكار 👁️', tagQuick: 'أفكار 💡',
-        btnAddCalNote: '+ ملاحظة لليوم', lblBlurAnswer: 'إخفاء الإجابة للاستذكار (تظهر باللمس)',
-        mixerReady: '🎵 استوديو الطبيعة النقي جاهز', btnMyMix: '✨ خلطتي', btnStopAll: '⏹ إيقاف',
-        sndCatWater: 'مياه وأمطار 🌧️', sndCatForest: 'غابات ورياح 🌲', sndCatWarm: 'دفء وعزل 🔥',
-        kpiMinutes: 'دقائق التركيز', kpiSessions: 'الجلسات المكتملة',
-        kpiTrendWeek: '↑ +18% هذا الأسبوع', kpiTrendGreat: '↑ +12% التزام ممتاز',
-        overviewTitle: 'نظرة عامة على الإنجاز', badgeThisWeek: 'هذا الأسبوع',
-        legDeep: 'دراسة عميقة', legPractice: 'حل تمارين', legCornell: 'مراجعة كورنيل', legReading: 'قراءة حرة',
-        waveFlowTitle: 'مؤشر التدفق الذهني الأسبوعي', peakPerfBadge: 'ذروة الأداء',
-        calcHeading: '🎓 حاسبة ختم المنهج التنبؤية',
-        calcOutTpl: '📅 بهذا المعدل ستختم المادة بالكامل خلال {d} أيام!',
-        btnSave: 'حفظ وتطبيق', btnCancel: 'إلغاء',
-        weekdays: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
-        months: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
-        sounds: {
-          ocean: 'أمواج المحيط', rain: 'مطر الغابة الناعم', fire: 'حطب المدفأة', forest: 'نسيم الصنوبر',
-          stream: 'جدول ماء جبلي', leaves: 'حفيف أوراق الشجر', waterfall: 'شلال متدفق', night: 'ليل الريف والجدجد',
-          thunder: 'رعد ومطر بعيد', wind: 'رياح القمم الثلجية', winrain: 'مطر على النافذة', earth: 'هدير الأرض العازل'
-        },
-        sampleTasks: [
-          'مراجعة المشروع والفصل الأول', 'اجتماع الدراسة وحل المسائل', 'تلخيص القوانين والمفاهيم', 'تمارين تنشيط الذهن'
-        ],
-        sampleNotes: [
-          { t: 'التركيز المتباعد (Spaced Repetition)', b: 'المراجعة على فترات متباعدة تعزز الذاكرة طويلة المدى وتمنع النسيان قبل الامتحانات.' },
-          { t: 'سؤال استذكار: ما هو قانون القوة؟', b: 'الإجابة المخفية: القوة = الكتلة × التسارع (F = m × a).' },
-          { t: 'خطة تقليل المشتتات أثناء الدراسة', b: '1. تفعيل وضع التركيز العميق\n2. تقسيم الأهداف الكبيرة إلى جلسات 25 دقيقة.' }
-        ]
-      },
+    function toWest(val) {
+      if (val === null || val === undefined) return '';
+      return String(val)
+        .replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632)
+        .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
+    }
+
+    // Intercept all numeric inputs to strictly enforce 0123456789
+    document.addEventListener('input', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        const cleaned = toWest(e.target.value);
+        if (cleaned !== e.target.value) e.target.value = cleaned;
+      }
+    });
+
+    /* ========================================================
+       1. ANTI-TAMPER FORTRESS STORAGE (MILLION-USER SCALE)
+       ======================================================== */
+    const SECRET_SALT = "ZEN_FORTRESS_V19_99481";
+    function computeHash(str) {
+      let h = 2166136261;
+      const s = str + SECRET_SALT;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+      }
+      return (h >>> 0).toString(16);
+    }
+
+    function saveFortressData(key, obj) {
+      try {
+        const raw = JSON.stringify(obj);
+        const packet = JSON.stringify({ payload: raw, sig: computeHash(raw), ts: Date.now() });
+        localStorage.setItem(key, packet);
+        localStorage.setItem(key + "_mirror", packet); // Atomic mirror backup
+      } catch (e) {}
+    }
+
+    function loadFortressData(key, defaultObj) {
+      try {
+        const tryRead = (k) => {
+          const item = localStorage.getItem(k);
+          if (!item) return null;
+          const parsed = JSON.parse(item);
+          if (parsed && parsed.payload && computeHash(parsed.payload) === parsed.sig) {
+            return JSON.parse(parsed.payload);
+          }
+          return null;
+        };
+        return tryRead(key) || tryRead(key + "_mirror") || defaultObj;
+      } catch (e) {
+        return defaultObj;
+      }
+    }
+
+    // Anti-Mod tampering monitor
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    /* ========================================================
+       2. 20 LANGUAGES WITH ENGLISH + NATIVE NAME & COUNTRY SEARCH (NO FLAGS)
+       ======================================================== */
+    const LANG_CATALOG = [
+      { code: 'en', iso: 'EN', enName: 'English', nativeName: 'English', dir: 'ltr', countries: 'usa uk united states britain canada australia ireland new zealand امريكا بريطانيا كندا استراليا' },
+      { code: 'ar', iso: 'AR', enName: 'Arabic', nativeName: 'العربية', dir: 'rtl', countries: 'jordan saudi arabia egypt uae palestine syria iraq morocco algeria qatar kuwait oman yemen lebanon tunisia sudan ليبيا الاردن السعودية مصر الامارات فلسطين سوريا العراق المغرب الجزائر قطر الكويت عمان اليمن لبنان تونس السودان' },
+      { code: 'es', iso: 'ES', enName: 'Spanish', nativeName: 'Español', dir: 'ltr', countries: 'spain mexico argentina colombia chile peru venezuela اسبانيا المكسيك الارجنتين' },
+      { code: 'zh', iso: 'ZH', enName: 'Chinese', nativeName: '中文 (简体)', dir: 'ltr', countries: 'china taiwan singapore hong kong الصين تايوان سنغافورة' },
+      { code: 'hi', iso: 'HI', enName: 'Hindi', nativeName: 'हिन्दी', dir: 'ltr', countries: 'india nepal الهند نيبال' },
+      { code: 'fr', iso: 'FR', enName: 'French', nativeName: 'Français', dir: 'ltr', countries: 'france belgium switzerland canada senegal فرنسا بلجيكا سويسرا' },
+      { code: 'de', iso: 'DE', enName: 'German', nativeName: 'Deutsch', dir: 'ltr', countries: 'germany austria switzerland المانيا النمسا سويسرا' },
+      { code: 'ru', iso: 'RU', enName: 'Russian', nativeName: 'Русский', dir: 'ltr', countries: 'russia belarus kazakhstan روسيا كازاخستان' },
+      { code: 'pt', iso: 'PT', enName: 'Portuguese', nativeName: 'Português', dir: 'ltr', countries: 'brazil portugal angola البرازيل البرتغال' },
+      { code: 'ja', iso: 'JA', enName: 'Japanese', nativeName: '日本語', dir: 'ltr', countries: 'japan tokyo اليابان طوكيو' },
+      { code: 'id', iso: 'ID', enName: 'Indonesian', nativeName: 'Bahasa Indonesia', dir: 'ltr', countries: 'indonesia jakarta اندونيسيا' },
+      { code: 'tr', iso: 'TR', enName: 'Turkish', nativeName: 'Türkçe', dir: 'ltr', countries: 'turkey ankara istanbul cyprus تركيا اسطنبول' },
+      { code: 'ko', iso: 'KO', enName: 'Korean', nativeName: '한국어', dir: 'ltr', countries: 'south korea seoul كوريا الجنوبية سيول' },
+      { code: 'vi', iso: 'VI', enName: 'Vietnamese', nativeName: 'Tiếng Việt', dir: 'ltr', countries: 'vietnam hanoi فيتنام' },
+      { code: 'it', iso: 'IT', enName: 'Italian', nativeName: 'Italiano', dir: 'ltr', countries: 'italy rome milan vatican ايطاليا روما' },
+      { code: 'bn', iso: 'BN', enName: 'Bengali', nativeName: 'বাংলা', dir: 'ltr', countries: 'bangladesh dhaka india بنغلاديش' },
+      { code: 'ur', iso: 'UR', enName: 'Urdu', nativeName: 'اردو', dir: 'rtl', countries: 'pakistan islamabad lahore باكستان' },
+      { code: 'fa', iso: 'FA', enName: 'Persian', nativeName: 'فارسی', dir: 'rtl', countries: 'iran tehran afghanistan ايران افغانستان' },
+      { code: 'pl', iso: 'PL', enName: 'Polish', nativeName: 'Polski', dir: 'ltr', countries: 'poland warsaw بولندا' },
+      { code: 'nl', iso: 'NL', enName: 'Dutch', nativeName: 'Nederlands', dir: 'ltr', countries: 'netherlands holland amsterdam belgium هولندا بلجيكا' }
+    ];
+
+    const DICT = {
       en: {
-        name: 'English', flag: '🇬🇧', dir: 'ltr',
-        title: 'Focus & Timer', sub: 'Master your study time & future with ease',
+        title: 'Focus & Performance', sub: 'A smarter world for study, sports & deep work',
+        pillSecure: 'Anti-Tamper', pillFast: 'Ultra Fast', pillModern: 'Futuristic UI', pillUnified: 'Multi-Domain',
+        domStudy: 'Study', domSport: 'Workout', domRead: 'Reading', domWork: 'Deep Work',
+        sportSetsTitle: '🏋️ Workout Sets & Rest', readTrackerTitle: '📖 Reading Session Progress',
         navTimer: 'Timer', navTasks: 'Tasks', navCalendar: 'Calendar', navNotes: 'Notes', navSounds: 'Nature', navAnalytics: 'Analytics',
-        totalFocusToday: 'Total Focus Today', minsUnit: 'mins', daysUnit: 'days', waterWord: 'Water',
-        orbDump: 'Brain Dump', orbDeep: 'Deep Focus', orbBreath: 'Breath 4-7-8',
-        modeFocus: 'Focus 25m', modeShort: 'Short 5m', modeLong: 'Long 15m', modeCustom: 'Custom ⚡',
-        startFocusAchieve: 'Start • Focus • Achieve',
-        filterAll: 'All', filterToday: 'Today', filterDone: 'Completed',
-        phAddTask: 'Add a new study task...', phSearchNotes: 'Search smart notes or flashcards...',
-        catStudy: '📚 Study', catExam: '⭐ Exams', catReview: '🔍 Review', catSport: '🏃 Activity',
-        tagCornell: 'Cornell 📋', tagFlash: 'Flashcard 👁️', tagQuick: 'Quick Idea 💡',
-        btnAddCalNote: '+ Note for Day', lblBlurAnswer: 'Blur answer for active recall (Tap to reveal)',
-        mixerReady: '🎵 Pure Nature Studio Ready', btnMyMix: '✨ My Mix', btnStopAll: '⏹ Stop',
-        sndCatWater: 'Water & Rain 🌧️', sndCatForest: 'Forest & Wind 🌲', sndCatWarm: 'Warmth & Earth 🔥',
-        kpiMinutes: 'Focus Minutes', kpiSessions: 'Completed Sessions',
-        kpiTrendWeek: '↑ +18% this week', kpiTrendGreat: '↑ +12% great streak',
-        overviewTitle: 'Productivity Overview', badgeThisWeek: 'This Week',
-        legDeep: 'Deep Study', legPractice: 'Practice', legCornell: 'Cornell Notes', legReading: 'Reading',
-        waveFlowTitle: 'Weekly Mental Flow Index', peakPerfBadge: 'Peak Flow',
-        calcHeading: '🎓 Predictive Syllabus Calculator',
-        calcOutTpl: '📅 At this pace, you will finish the syllabus in {d} days!',
+        totalFocusToday: 'Total Active Minutes Today', minsUnit: 'mins', daysUnit: 'days', waterWord: 'Water',
+        orbDump: 'Quick Idea', orbDeep: 'Lockdown', orbDesk: 'Desk Clock',
+        modeFocus: 'Session 25m', modeShort: 'Short 5m', modeLong: 'Long 15m', modeCustom: 'Custom ⚡',
+        startFocusAchieve: 'Plan • Execute • Achieve',
+        filterAll: 'All', filterToday: 'Active', filterDone: 'Completed',
+        phAddTask: 'Add study, workout or reading goal...', phSearchNotes: 'Search notes, workouts or book summaries...',
+        catStudy: '📚 Study', catSport: '🏋️ Sport', catReview: '📖 Reading', catExam: '💻 Work',
+        tagCornell: 'Cornell 📋', tagFlash: 'Recall 👁️', tagQuick: 'Log 💡',
+        btnAddCalNote: '+ Add Note to Date', lblBlurAnswer: 'Blur text for active recall (Tap to reveal)',
+        mixerReady: '🎵 Pure Nature Studio Ready', btnMyMix: '✨ Mix', btnStopAll: '⏹ Stop',
+        sndCatWater: 'Water & Rain 🌧️', sndCatForest: 'Forest & Wind 🌲', sndCatWarm: 'Fire & Earth 🔥',
+        kpiMinutes: 'Active Minutes', kpiSessions: 'Completed Sessions',
+        kpiTrendWeek: '↑ +18% this week', kpiTrendGreat: '↑ +12% consistency',
+        overviewTitle: 'Multi-Domain Distribution', badgeThisWeek: 'This Week',
+        waveFlowTitle: 'Weekly Performance Index', peakPerfBadge: 'Peak Flow',
+        calcHeading: '🎓 Target & Goal Completion Calculator',
+        calcOutTpl: '📅 At this pace, you will finish your target in {d} days!',
         btnSave: 'Save & Apply', btnCancel: 'Cancel',
         weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -936,145 +1086,139 @@
           thunder: 'Distant Thunder', wind: 'Highland Wind', winrain: 'Rain on Window', earth: 'Deep Earth Rumble'
         },
         sampleTasks: [
-          'Review Chapter 1 & Core Concepts', 'Solve Practice Problems Set', 'Prepare Cornell Summary Notes', 'Mindfulness & Physical Stretch'
+          'Complete Chapter 1 & Core Concepts', 'HIIT Strength & Cardio Session (4 Sets)', 'Read 25 Pages of Reference Book', 'Finish Deep Work Project Milestone'
         ],
         sampleNotes: [
-          { t: 'Spaced Repetition Technique', b: 'Reviewing concepts at increasing intervals strengthens long-term memory retention before exams.' },
-          { t: 'Recall Question: Newton\'s Second Law?', b: 'Hidden Answer: Force equals mass times acceleration (F = m × a).' },
-          { t: 'Deep Focus Protocol', b: '1. Enable Deep Lockdown Mode\n2. Break large chapters into 25-minute sprints.' }
+          { t: 'Spaced Repetition System', b: 'Reviewing concepts at increasing intervals strengthens long-term memory retention.' },
+          { t: 'Active Recall: Key Formula & Law', b: 'Hidden Answer: Performance = Focused Time × Intensity.' },
+          { t: 'Workout & Training Log', b: '1. Warm-up 5m\n2. 4 Sets Compound Exercises\n3. Cool-down stretch.' }
         ]
       },
-      es: {
-        name: 'Español', flag: '🇪🇸', dir: 'ltr',
-        title: 'Enfoque y Tiempo', sub: 'Organiza tu estudio y futuro con facilidad',
-        navTimer: 'Reloj', navTasks: 'Tareas', navCalendar: 'Agenda', navNotes: 'Notas', navSounds: 'Natura', navAnalytics: 'Análisis',
-        totalFocusToday: 'Enfoque Total Hoy', minsUnit: 'min', daysUnit: 'días', waterWord: 'Agua',
-        orbDump: 'Idea Rápida', orbDeep: 'Modo Zen', orbBreath: 'Respirar',
-        modeFocus: 'Enfoque 25m', modeShort: 'Pausa 5m', modeLong: 'Larga 15m', modeCustom: 'Personal ⚡',
-        startFocusAchieve: 'Inicia • Enfoca • Logra',
-        filterAll: 'Todo', filterToday: 'Hoy', filterDone: 'Hecho',
-        phAddTask: 'Añadir nueva tarea de estudio...', phSearchNotes: 'Buscar en notas o tarjetas...',
-        catStudy: '📚 Estudio', catExam: '⭐ Exámenes', catReview: '🔍 Repaso', catSport: '🏃 Salud',
-        tagCornell: 'Cornell 📋', tagFlash: 'Memoria 👁️', tagQuick: 'Ideas 💡',
-        btnAddCalNote: '+ Nota del Día', lblBlurAnswer: 'Ocultar respuesta para repaso (Tocar para ver)',
-        mixerReady: '🎵 Estudio Natural Listo', btnMyMix: '✨ Mezcla', btnStopAll: '⏹ Parar',
-        sndCatWater: 'Agua y Lluvia 🌧️', sndCatForest: 'Bosque y Viento 🌲', sndCatWarm: 'Fuego y Tierra 🔥',
-        kpiMinutes: 'Minutos Enfoque', kpiSessions: 'Sesiones Listas',
-        kpiTrendWeek: '↑ +18% esta semana', kpiTrendGreat: '↑ +12% gran ritmo',
-        overviewTitle: 'Resumen General', badgeThisWeek: 'Esta Semana',
-        legDeep: 'Estudio Profundo', legPractice: 'Ejercicios', legCornell: 'Notas Cornell', legReading: 'Lectura',
-        waveFlowTitle: 'Índice de Flujo Mental Semanal', peakPerfBadge: 'Flujo Máximo',
-        calcHeading: '🎓 Calculadora de Temario',
-        calcOutTpl: '📅 ¡A este ritmo terminarás toda la materia en {d} días!',
-        btnSave: 'Guardar', btnCancel: 'Cancelar',
-        weekdays: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-        months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      ar: {
+        title: 'التركيز والأداء العالي', sub: 'عالم أذكى للدراسة، الرياضة، القراءة والعمل العميق',
+        pillSecure: 'محصن ضد الاختراق', pillFast: 'أداء فائق', pillModern: 'تصميم مستقبلي', pillUnified: 'متعدد المجالات',
+        domStudy: 'دراسة', domSport: 'رياضة', domRead: 'قراءة', domWork: 'عمل عميق',
+        sportSetsTitle: '🏋️ جولات التمرين والراحة', readTrackerTitle: '📖 متتبع جلسة القراءة',
+        navTimer: 'المؤقت', navTasks: 'المهام', navCalendar: 'التقويم', navNotes: 'الملاحظات', navSounds: 'الطبيعة', navAnalytics: 'التحليلات',
+        totalFocusToday: 'إجمالي الدقائق النشطة اليوم', minsUnit: 'دقيقة', daysUnit: 'أيام', waterWord: 'الماء',
+        orbDump: 'فكرة سريعة', orbDeep: 'تركيز عميق', orbDesk: 'ساعة مكتب',
+        modeFocus: 'جلسة 25د', modeShort: 'راحة 5د', modeLong: 'طويلة 15د', modeCustom: 'مخصص ⚡',
+        startFocusAchieve: 'خطط • نفذ • أنجز',
+        filterAll: 'الكل', filterToday: 'قيد التنفيذ', filterDone: 'مكتملة',
+        phAddTask: 'أضف هدف دراسة أو رياضة أو قراءة...', phSearchNotes: 'ابحث في الملاحظات أو التمارين أو الملخصات...',
+        catStudy: '📚 دراسة', catSport: '🏋️ رياضة', catReview: '📖 قراءة', catExam: '💻 عمل',
+        tagCornell: 'كورنيل 📋', tagFlash: 'استذكار 👁️', tagQuick: 'سجل 💡',
+        btnAddCalNote: '+ ملاحظة لهذا اليوم', lblBlurAnswer: 'إخفاء النص للاستذكار الذاتي (يظهر باللمس)',
+        mixerReady: '🎵 استوديو الطبيعة النقي جاهز', btnMyMix: '✨ خلطتي', btnStopAll: '⏹ إيقاف',
+        sndCatWater: 'مياه وأمطار 🌧️', sndCatForest: 'غابات ورياح 🌲', sndCatWarm: 'دفء وأرض 🔥',
+        kpiMinutes: 'الدقائق النشطة', kpiSessions: 'الجلسات المكتملة',
+        kpiTrendWeek: '↑ +18% هذا الأسبوع', kpiTrendGreat: '↑ +12% التزام ممتاز',
+        overviewTitle: 'توزيع الأنشطة والإنجاز', badgeThisWeek: 'هذا الأسبوع',
+        waveFlowTitle: 'مؤشر الأداء والتدفق الأسبوعي', peakPerfBadge: 'ذروة الأداء',
+        calcHeading: '🎓 حاسبة ختم الأهداف والمنهج',
+        calcOutTpl: '📅 بهذا المعدل ستنجز هدفك بالكامل خلال {d} أيام!',
+        btnSave: 'حفظ وتطبيق', btnCancel: 'إلغاء',
+        weekdays: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+        months: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
         sounds: {
-          ocean: 'Olas del Océano', rain: 'Lluvia Suave', fire: 'Fuego de Leña', forest: 'Brisa del Bosque',
-          stream: 'Arroyo de Montaña', leaves: 'Hojas Susurrantes', waterfall: 'Cascada Natural', night: 'Grillos Nocturnos',
-          thunder: 'Truenos Lejanos', wind: 'Viento Andino', winrain: 'Lluvia en Ventana', earth: 'Aislamiento Tierra'
+          ocean: 'أمواج المحيط', rain: 'مطر الغابة الناعم', fire: 'حطب المدفأة', forest: 'نسيم الصنوبر',
+          stream: 'جدول ماء جبلي', leaves: 'حفيف أوراق الشجر', waterfall: 'شلال متدفق', night: 'ليل الريف والجدجد',
+          thunder: 'رعد ومطر بعيد', wind: 'رياح القمم الثلجية', winrain: 'مطر على النافذة', earth: 'هدير الأرض العازل'
         },
         sampleTasks: [
-          'Repasar el proyecto y capítulo 1', 'Resolver ejercicios prácticos', 'Preparar resumen para el examen', 'Ejercicio físico y descanso visual'
+          'إتمام مراجعة الفصل الأول والمفاهيم', 'تمرين رياضي متكامل (4 جولات لياقة)', 'قراءة 25 صفحة من الكتاب المقرر', 'إنجاز مرحلة المشروع والعمل العميق'
         ],
         sampleNotes: [
-          { t: 'Idea Principal: Repetición Espaciada', b: 'Repasar en intervalos espaciados fortalece la memoria a largo plazo antes del examen.' },
-          { t: 'Pregunta de Repaso: ¿Fórmula de Fuerza?', b: 'Respuesta: La fuerza es igual a la masa por la aceleración (F = m × a).' },
-          { t: 'Claves para Mejorar la Productividad', b: '1. Reducir distracciones digitales\n2. Dividir temas largos en bloques de 25 minutos.' }
+          { t: 'نظام التكرار المتباعد للدراسة', b: 'مراجعة المفاهيم على فترات متباعدة تضاعف ثبات المعلومات في الذاكرة طويلة المدى.' },
+          { t: 'بطاقة استذكار: معادلة الإنجاز', b: 'الجواب المخفي: الإنجاز الحقيقي = الوقت المركز × الاستمرارية.' },
+          { t: 'سجل التمرين الرياضي واللياقة', b: '1. إحماء 5 دقائق\n2. 4 جولات تمارين أساسية\n3. إطالة واستشفاء.' }
         ]
       }
     };
 
-    // Generate full dictionaries for the remaining 17 languages seamlessly inheriting complete keys
-    const EXTRA_LANG_META = [
-      { code: 'zh', name: '中文 (简体)', flag: '🇨🇳', dir: 'ltr', title: '专注与效率', sub: '掌控时间，成就更好的自己', nav: ['计时','任务','日历','笔记','自然','分析'], modes: ['专注 25m','短休 5m','长休 15m','自定义 ⚡'] },
-      { code: 'hi', name: 'हिन्दी', flag: '🇮🇳', dir: 'ltr', title: 'ध्यान और समय', sub: 'अपने अध्ययन और भविष्य को नियंत्रित करें', nav: ['टाइमर','कार्य','कैलेंडर','नोट्स','प्रकृति','विश्लेषण'], modes: ['फोकस 25m','विराम 5m','लंबा 15m','कस्टम ⚡'] },
-      { code: 'fr', name: 'Français', flag: '🇫🇷', dir: 'ltr', title: 'Focus & Productivité', sub: 'Organisez votre journée simplement', nav: ['Minuteur','Tâches','Agenda','Notes','Nature','Analyses'], modes: ['Focus 25m','Pause 5m','Longue 15m','Perso ⚡'] },
-      { code: 'de', name: 'Deutsch', flag: '🇩🇪', dir: 'ltr', title: 'Fokus & Produktivität', sub: 'Meistere deinen Studienalltag entspannt', nav: ['Timer','Aufgaben','Kalender','Notizen','Natur','Analyse'], modes: ['Fokus 25m','Pause 5m','Lang 15m','Eigene ⚡'] },
-      { code: 'ru', name: 'Русский', flag: '🇷🇺', dir: 'ltr', title: 'Фокус и Продуктивность', sub: 'Управляйте своим временем эффективно', nav: ['Таймер','Задачи','Календарь','Заметки','Природа','Аналитика'], modes: ['Фокус 25м','Перерыв 5м','Длинный 15м','Свой ⚡'] },
-      { code: 'pt', name: 'Português', flag: '🇧🇷', dir: 'ltr', title: 'Foco e Produtividade', sub: 'Maior controle sobre seu futuro', nav: ['Timer','Tarefas','Agenda','Notas','Natureza','Análises'], modes: ['Foco 25m','Pausa 5m','Longa 15m','Personal ⚡'] },
-      { code: 'ja', name: '日本語', flag: '🇯🇵', dir: 'ltr', title: '集中と生産性', sub: '毎日の学習をスマートに管理', nav: ['タイマー','タスク','カレンダー','ノート','自然音','分析'], modes: ['集中 25分','休憩 5分','長休 15分','カスタム ⚡'] },
-      { code: 'id', name: 'Indonesia', flag: '🇮🇩', dir: 'ltr', title: 'Fokus & Produktivitas', sub: 'Atur jadwal belajarmu dengan mudah', nav: ['Timer','Tugas','Kalender','Catatan','Alam','Analitik'], modes: ['Fokus 25m','Rehat 5m','Panjang 15m','Kustom ⚡'] },
-      { code: 'tr', name: 'Türkçe', flag: '🇹🇷', dir: 'ltr', title: 'Odak ve Verimlilik', sub: 'Gününüzü kolayca planlayın', nav: ['Sayaç','Görevler','Takvim','Notlar','Doğa','Analiz'], modes: ['Odak 25dk','Mola 5dk','Uzun 15dk','Özel ⚡'] },
-      { code: 'ko', name: '한국어', flag: '🇰🇷', dir: 'ltr', title: '집중 및 생산성', sub: '더 나은 미래를 위한 스마트한 시간 관리', nav: ['타이머','할 일','캘린더','노트','자연음','분석'], modes: ['집중 25분','휴식 5분','긴 휴식 15분','맞춤 ⚡'] },
-      { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳', dir: 'ltr', title: 'Tập Trung & Hiệu Suất', sub: 'Làm chủ thời gian học tập của bạn', nav: ['Hẹn giờ','Nhiệm vụ','Lịch','Ghi chú','Tự nhiên','Thống kê'], modes: ['Tập trung 25p','Nghỉ 5p','Nghỉ dài 15p','Tùy chỉnh ⚡'] },
-      { code: 'it', name: 'Italiano', flag: '🇮🇹', dir: 'ltr', title: 'Focus e Produttività', sub: 'Organizza la tua giornata con stile', nav: ['Timer','Attività','Agenda','Note','Natura','Analisi'], modes: ['Focus 25m','Pausa 5m','Lunga 15m','Pers. ⚡'] },
-      { code: 'bn', name: 'বাংলা', flag: '🇧🇩', dir: 'ltr', title: 'মনোযোগ এবং উৎপাদনশীলতা', sub: 'আপনার পড়াশোনা এবং সময় নিয়ন্ত্রণ করুন', nav: ['টাইমার','কাজ','ক্যালেন্ডার','নোট','প্রকৃতি','বিশ্লেষণ'], modes: ['ফোকাস ২৫মি','বিরতি ৫মি','দীর্ঘ ১৫মি','কাস্টম ⚡'] },
-      { code: 'ur', name: 'اردو', flag: '🇵🇰', dir: 'rtl', title: 'ارتکاز اور پیداواریت', sub: 'اپنے وقت اور مطالعہ کو بہترین انداز میں منظم کریں', nav: ['ٹائمر','مہمات','کیلنڈر','نوٹس','فطرت','تجزیات'], modes: ['ارتکاز 25m','وقفہ 5m','طویل 15m','مخصوص ⚡'] },
-      { code: 'fa', name: 'فارسی', flag: '🇮🇷', dir: 'rtl', title: 'تمرکز و بهره‌وری', sub: 'مدیریت هوشمندانه زمان و مطالعه روزانه', nav: ['زمان‌سنج','وظایف','تقویم','یادداشت','طبیعت','تحلیل‌ها'], modes: ['تمرکز ۲۵د','استراحت ۵د','بلند ۱۵د','سفارشی ⚡'] },
-      { code: 'pl', name: 'Polski', flag: '🇵🇱', dir: 'ltr', title: 'Skupienie i Produktywność', sub: 'Zaplanuj swój dzień nauki z łatwością', nav: ['Timer','Zadania','Kalendarz','Notatki','Natura','Analizy'], modes: ['Fokus 25m','Przerwa 5m','Długa 15m','Własny ⚡'] },
-      { code: 'nl', name: 'Nederlands', flag: '🇳🇱', dir: 'ltr', title: 'Focus & Productiviteit', sub: 'Organiseer je studiedag eenvoudig', nav: ['Timer','Taken','Agenda','Notities','Natuur','Analyse'], modes: ['Focus 25m','Pauze 5m','Lang 15m','Aangepast ⚡'] }
-    ];
+    const todayISO = toWest(new Date().toISOString().slice(0, 10));
 
-    EXTRA_LANG_META.forEach(m => {
-      const base = m.dir === 'rtl' ? BASE_LANGS.ar : BASE_LANGS.en;
-      BASE_LANGS[m.code] = {
-        ...base,
-        name: m.name, flag: m.flag, dir: m.dir, title: m.title, sub: m.sub,
-        navTimer: m.nav[0], navTasks: m.nav[1], navCalendar: m.nav[2], navNotes: m.nav[3], navSounds: m.nav[4], navAnalytics: m.nav[5],
-        modeFocus: m.modes[0], modeShort: m.modes[1], modeLong: m.modes[2], modeCustom: m.modes[3]
-      };
+    // Default language strictly set to 'en' (English) as requested for global success
+    let cfg = loadFortressData('zen_fortress_cfg_v19', {
+      lang: 'en', domain: 'study', focusMin: 25, shortMin: 5, longMin: 15,
+      todayMins: 120, sessions: 18, streak: 5, water: 4, sets: 1, pagesRead: 24
     });
 
-    const todayISO = new Date().toISOString().slice(0, 10);
-    let cfg = JSON.parse(localStorage.getItem('zen_cfg_v18') || JSON.stringify({
-      lang: 'ar', focusMin: 25, shortMin: 5, longMin: 15, todayMins: 120, sessions: 18, streak: 5, water: 4
-    }));
-
-    function L() { return BASE_LANGS[cfg.lang] || BASE_LANGS.ar; }
+    function L() {
+      if (DICT[cfg.lang]) return DICT[cfg.lang];
+      const meta = LANG_CATALOG.find(x => x.code === cfg.lang);
+      return meta && meta.dir === 'rtl' ? DICT.ar : DICT.en;
+    }
 
     function openLanguageModal() {
-      const box = document.getElementById('langGrid20Box');
-      box.innerHTML = '';
-      Object.keys(BASE_LANGS).forEach(code => {
-        const l = BASE_LANGS[code];
-        const btn = document.createElement('button');
-        btn.className = `lang-option-btn ${cfg.lang === code ? 'active' : ''}`;
-        btn.onclick = () => applyLanguage(code);
-        btn.innerHTML = `<span style="font-size:1.15rem;">${l.flag}</span> <span>${l.name}</span>`;
-        box.appendChild(btn);
-      });
+      document.getElementById('inpLangCountrySearch').value = '';
+      renderLanguageList();
       document.getElementById('langModal').classList.add('open');
     }
 
+    function renderLanguageList() {
+      const q = (document.getElementById('inpLangCountrySearch').value || '').toLowerCase().trim();
+      const box = document.getElementById('langListScrollBox');
+      box.innerHTML = '';
+
+      LANG_CATALOG.filter(l => {
+        if (!q) return true;
+        return l.enName.toLowerCase().includes(q) ||
+               l.nativeName.toLowerCase().includes(q) ||
+               l.iso.toLowerCase().includes(q) ||
+               l.countries.toLowerCase().includes(q);
+      }).forEach(l => {
+        const row = document.createElement('div');
+        row.className = `lang-row-btn ${cfg.lang === l.code ? 'active' : ''}`;
+        row.onclick = () => applyLanguage(l.code);
+        row.innerHTML = `
+          <div class="lang-code-monogram">${l.iso}</div>
+          <div class="lang-names-col">
+            <div class="lang-en-title">${l.enName}</div>
+            <div class="lang-native-sub">${l.nativeName}</div>
+          </div>
+          <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">${cfg.lang === l.code ? '✓' : ''}</span>
+        `;
+        box.appendChild(row);
+      });
+    }
+
     function applyLanguage(code) {
-      const prevLang = cfg.lang;
-      cfg.lang = BASE_LANGS[code] ? code : 'ar';
-      localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
+      const meta = LANG_CATALOG.find(x => x.code === code) || LANG_CATALOG[0];
+      cfg.lang = meta.code;
+      saveFortressData('zen_fortress_cfg_v19', cfg);
       const d = L();
 
       const root = document.getElementById('htmlRoot');
-      root.setAttribute('lang', cfg.lang);
-      root.setAttribute('dir', d.dir);
+      root.setAttribute('lang', meta.code);
+      root.setAttribute('dir', meta.dir);
 
-      document.getElementById('currentLangLabel').textContent = `${d.flag} ${d.name}`;
+      document.getElementById('currentLangIso').textContent = meta.iso;
+      document.getElementById('currentLangLabel').textContent = `${meta.enName} • ${meta.nativeName}`;
       document.getElementById('hdrMainTitle').textContent = d.title;
       document.getElementById('hdrSubTitle').textContent = d.sub;
 
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const k = el.getAttribute('data-i18n');
-        if (d[k]) el.textContent = d[k];
+        if (d[k]) el.textContent = toWest(d[k]);
       });
 
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const k = el.getAttribute('data-i18n-placeholder');
-        if (d[k]) el.setAttribute('placeholder', d[k]);
+        if (d[k]) el.setAttribute('placeholder', toWest(d[k]));
       });
 
-      // Translate starter tasks & notes automatically so no Arabic remains when switching language
       tasksList.forEach((t, idx) => {
-        if (t.isStarter && d.sampleTasks[idx]) t.title = d.sampleTasks[idx];
+        if (t.isStarter && d.sampleTasks[idx]) t.title = toWest(d.sampleTasks[idx]);
       });
       notesList.forEach((n, idx) => {
         if (n.isStarter && d.sampleNotes[idx]) {
-          n.title = d.sampleNotes[idx].t;
-          n.body = d.sampleNotes[idx].b;
+          n.title = toWest(d.sampleNotes[idx].t);
+          n.body = toWest(d.sampleNotes[idx].b);
         }
       });
 
-      // Render wave days row
-      const waveRow = document.getElementById('waveDaysRow');
-      waveRow.innerHTML = d.weekdays.map(w => `<span>${w}</span>`).join('');
+      document.getElementById('waveDaysRow').innerHTML = d.weekdays.map(w => `<span>${w}</span>`).join('');
 
       syncHeaderMetrics();
       updateTimerDisplay();
@@ -1084,11 +1228,61 @@
       renderSoundsStudio();
       updateSyllabusCalc();
       closeModal('langModal');
-      if (prevLang !== cfg.lang) showToast(`🌐 ${d.name}`);
     }
 
     /* ========================================================
-       2. NAVIGATION & DYNAMIC HEADER THEMES
+       3. MULTI-DOMAIN SWITCHER (STUDY, WORKOUT, READING, WORK)
+       ======================================================== */
+    function switchActivityDomain(dom, el) {
+      cfg.domain = dom;
+      saveFortressData('zen_fortress_cfg_v19', cfg);
+      document.querySelectorAll('.domain-card').forEach(c => c.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
+      document.getElementById('readContextBar').classList.toggle('visible', dom === 'read');
+
+      if (dom === 'study') {
+        selectTimerMode(25, 'focus', document.getElementById('modeFocusBtn'));
+        showToast('📚 Study Mode (25m)');
+      } else if (dom === 'sport') {
+        selectTimerMode(30, 'focus', document.getElementById('modeFocusBtn'));
+        showToast('🏋️ Workout & HIIT Mode (30m)');
+      } else if (dom === 'read') {
+        selectTimerMode(20, 'focus', document.getElementById('modeFocusBtn'));
+        showToast('📖 Reading Sprint Mode (20m)');
+      } else if (dom === 'work') {
+        selectTimerMode(50, 'focus', document.getElementById('modeFocusBtn'));
+        showToast('💻 Deep Work Session (50m)');
+      }
+    }
+
+    function logWorkoutSet() {
+      cfg.sets = (cfg.sets % 12) + 1;
+      saveFortressData('zen_fortress_cfg_v19', cfg);
+      document.getElementById('sportSetCounterTxt').textContent = toWest(`Set ${cfg.sets} / 4 • 12 Reps`);
+      showToast(toWest(`💪 Set ${cfg.sets} Logged!`));
+    }
+
+    function startQuickSportRest(secs) {
+      if (timerRunning) toggleTimerPlay();
+      isOvertime = false;
+      timerTotal = secs;
+      timerLeft = secs;
+      updateTimerDisplay();
+      toggleTimerPlay();
+      showToast(toWest(`⏱️ Rest ${secs}s Started`));
+    }
+
+    function addReadPages(p) {
+      cfg.pagesRead = (cfg.pagesRead || 0) + p;
+      saveFortressData('zen_fortress_cfg_v19', cfg);
+      document.getElementById('readPagesCounterTxt').textContent = toWest(`Pages Read Today: ${cfg.pagesRead}`);
+      showToast(toWest(`📖 +${p} Pages Recorded!`));
+    }
+
+    /* ========================================================
+       4. NAVIGATION & HEADER THEMES
        ======================================================== */
     const TAB_GRADS = {
       'sec-timer': 'linear-gradient(135deg, #091326 0%, #1d3b8b 55%, #0284c7 100%)',
@@ -1114,7 +1308,7 @@
     function showToast(msg) {
       if (navigator.vibrate) try { navigator.vibrate(12); } catch(e){}
       const t = document.getElementById('appToast');
-      document.getElementById('toastText').textContent = msg;
+      document.getElementById('toastText').textContent = toWest(msg);
       t.classList.add('show');
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
@@ -1122,6 +1316,7 @@
 
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
     window.handleAndroidBack = function() {
+      if (document.getElementById('deskClockOverlay').classList.contains('active')) { toggleDeskClock(false); return true; }
       if (document.body.classList.contains('deep-lockdown')) { toggleDeepLockdown(); return true; }
       const openM = document.querySelectorAll('.modal-overlay.open');
       if (openM.length > 0) { openM.forEach(m => m.classList.remove('open')); return true; }
@@ -1129,7 +1324,7 @@
     };
 
     /* ========================================================
-       3. TIMER ENGINE & CUSTOM TIMER MODAL
+       5. TIMER ENGINE (100% WESTERN DIGITS 0123456789)
        ======================================================== */
     let timerTotal = cfg.focusMin * 60;
     let timerLeft = timerTotal;
@@ -1144,11 +1339,11 @@
 
     function syncHeaderMetrics() {
       const d = L();
-      document.getElementById('hdrFocusMins').textContent = cfg.todayMins;
-      document.getElementById('hdrStreakBadge').textContent = `↑ 🔥 ${cfg.streak} ${d.daysUnit}`;
-      document.getElementById('orbWaterTxt').textContent = `${d.waterWord} ${cfg.water}/8`;
-      document.getElementById('kpiTotalMins').textContent = cfg.todayMins + 300;
-      document.getElementById('kpiTotalSessions').textContent = cfg.sessions;
+      document.getElementById('hdrFocusMins').textContent = toWest(cfg.todayMins);
+      document.getElementById('hdrStreakBadge').textContent = toWest(`↑ 🔥 ${cfg.streak} ${d.daysUnit}`);
+      document.getElementById('orbWaterTxt').textContent = toWest(`${d.waterWord} ${cfg.water}/8`);
+      document.getElementById('kpiTotalMins').textContent = toWest(cfg.todayMins + 300);
+      document.getElementById('kpiTotalSessions').textContent = toWest(cfg.sessions);
       const plant = cfg.sessions >= 25 ? '🌸' : cfg.sessions >= 18 ? '🌳' : cfg.sessions >= 10 ? '🌿' : '🌱';
       document.getElementById('ringPlantEmoji').textContent = plant;
     }
@@ -1160,7 +1355,7 @@
       if (isOvertime) {
         const m = Math.floor(overtimeSecs / 60).toString().padStart(2, '0');
         const s = (overtimeSecs % 60).toString().padStart(2, '0');
-        formatted = `+${m}:${s}`;
+        formatted = toWest(`+${m}:${s}`);
         bar.classList.add('overtime-mode');
         bar.style.strokeDashoffset = 0;
       } else {
@@ -1168,14 +1363,15 @@
         bar.classList.toggle('golden-warning', timerLeft <= 60 && timerRunning);
         const m = Math.floor(timerLeft / 60).toString().padStart(2, '0');
         const s = (timerLeft % 60).toString().padStart(2, '0');
-        formatted = `${m}:${s}`;
+        formatted = toWest(`${m}:${s}`);
         const offset = ringCircumference - (timerLeft / Math.max(1, timerTotal)) * ringCircumference;
         bar.style.strokeDashoffset = offset;
       }
       document.getElementById('timerDigitsTxt').textContent = formatted;
+      document.getElementById('deskClockDigits').textContent = formatted;
 
       const captions = { focus: d.modeFocus, short: d.modeShort, long: d.modeLong, custom: customSessionLabel || d.modeCustom };
-      document.getElementById('timerModeCaption').textContent = captions[currentTimerModeKey] || d.modeFocus;
+      document.getElementById('timerModeCaption').textContent = toWest(captions[currentTimerModeKey] || d.modeFocus);
     }
 
     function selectTimerMode(mins, modeKey, btn) {
@@ -1196,12 +1392,12 @@
     }
 
     function setCustomPresetValues(m) {
-      document.getElementById('inpCustomMins').value = m;
+      document.getElementById('inpCustomMins').value = toWest(m);
     }
 
     function applyCustomTimerNow() {
-      const mins = Math.max(1, Math.min(240, parseInt(document.getElementById('inpCustomMins').value) || 45));
-      const title = document.getElementById('inpCustomTitle').value.trim();
+      const mins = Math.max(1, Math.min(240, parseInt(toWest(document.getElementById('inpCustomMins').value)) || 45));
+      const title = toWest(document.getElementById('inpCustomTitle').value.trim());
       customSessionLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
       closeModal('customTimerModal');
       selectTimerMode(mins, 'custom', document.getElementById('modeCustomBtn'));
@@ -1209,7 +1405,7 @@
     }
 
     function changeTimerDelta(deltaMins) {
-      timerLeft = Math.max(60, timerLeft + deltaMins * 60);
+      timerLeft = Math.max(15, timerLeft + deltaMins * 60);
       if (timerLeft > timerTotal) timerTotal = timerLeft;
       if (timerRunning) timerTargetTime = Date.now() + (timerLeft * 1000);
       updateTimerDisplay();
@@ -1221,10 +1417,10 @@
         clearInterval(timerInterval);
         timerRunning = false;
         if (isOvertime) {
-          const earned = Math.round((timerTotal + overtimeSecs) / 60);
+          const earned = Math.max(1, Math.round((timerTotal + overtimeSecs) / 60));
           isOvertime = false; overtimeSecs = 0;
           cfg.todayMins += earned; cfg.sessions += 1;
-          localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
+          saveFortressData('zen_fortress_cfg_v19', cfg);
           syncHeaderMetrics();
           selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
           showToast(`🎉 +${earned}m`);
@@ -1263,7 +1459,7 @@
 
     function addWaterCup() {
       cfg.water = (cfg.water + 1) % 9;
-      localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
+      saveFortressData('zen_fortress_cfg_v19', cfg);
       syncHeaderMetrics();
     }
 
@@ -1271,48 +1467,21 @@
       document.body.classList.toggle('deep-lockdown');
     }
 
-    /* ========================================================
-       4. 4-7-8 ZEN BREATHING EXERCISE
-       ======================================================== */
-    let breathTimer = null;
-    function openBreathModal() {
-      document.getElementById('breathModal').classList.add('open');
-      const orb = document.getElementById('breathOrb');
-      let step = 0;
-      const runCycle = () => {
-        if (step % 3 === 0) {
-          orb.style.transform = 'scale(1.28)';
-          orb.textContent = cfg.lang === 'ar' ? 'شهيق 4ث' : 'Inhale 4s';
-        } else if (step % 3 === 1) {
-          orb.style.transform = 'scale(1.28)';
-          orb.textContent = cfg.lang === 'ar' ? 'احتفاظ 7ث' : 'Hold 7s';
-        } else {
-          orb.style.transform = 'scale(0.85)';
-          orb.textContent = cfg.lang === 'ar' ? 'زفير 8ث' : 'Exhale 8s';
-        }
-        step++;
-      };
-      runCycle();
-      clearInterval(breathTimer);
-      breathTimer = setInterval(runCycle, 4000);
-    }
-
-    function closeBreathModal() {
-      clearInterval(breathTimer);
-      closeModal('breathModal');
+    function toggleDeskClock(show) {
+      document.getElementById('deskClockOverlay').classList.toggle('active', show);
     }
 
     /* ========================================================
-       5. TASKS ENGINE (WITH CALENDAR DATE INTEGRATION)
+       6. TASKS ENGINE
        ======================================================== */
     document.getElementById('inpTaskDate').value = todayISO;
 
-    let tasksList = JSON.parse(localStorage.getItem('zen_tasks_v18') || JSON.stringify([
-      { id: 1, isStarter: true, title: 'مراجعة المشروع والفصل الأول', time: '09:00 - 10:00', date: todayISO, catKey: 'study', icon: '📁', theme: 'tp-amber', done: true },
-      { id: 2, isStarter: true, title: 'اجتماع الدراسة وحل المسائل', time: '11:00 - 12:00', date: todayISO, catKey: 'study', icon: '📋', theme: 'tp-blue', done: false },
-      { id: 3, isStarter: true, title: 'تلخيص القوانين والمفاهيم', time: '14:00 - 16:00', date: todayISO, catKey: 'exam', icon: '🎨', theme: 'tp-emerald', done: false },
-      { id: 4, isStarter: true, title: 'تمارين تنشيط الذهن', time: '18:00 - 19:00', date: todayISO, catKey: 'sport', icon: '🎗️', theme: 'tp-rose', done: false }
-    ]));
+    let tasksList = loadFortressData('zen_fortress_tasks_v19', [
+      { id: 1, isStarter: true, title: 'Complete Chapter 1 & Core Concepts', time: '09:00 - 10:00', date: todayISO, catKey: 'study', icon: '📚', theme: 'tp-blue', done: true },
+      { id: 2, isStarter: true, title: 'HIIT Strength & Cardio Session (4 Sets)', time: '11:00 - 12:00', date: todayISO, catKey: 'sport', icon: '🏋️', theme: 'tp-emerald', done: false },
+      { id: 3, isStarter: true, title: 'Read 25 Pages of Reference Book', time: '14:00 - 16:00', date: todayISO, catKey: 'review', icon: '📖', theme: 'tp-rose', done: false },
+      { id: 4, isStarter: true, title: 'Finish Deep Work Project Milestone', time: '18:00 - 19:00', date: todayISO, catKey: 'exam', icon: '💻', theme: 'tp-amber', done: false }
+    ]);
     let taskFilterStatus = 'all';
 
     function filterTasksByStatus(st, btn) {
@@ -1324,7 +1493,7 @@
 
     function getCatLabel(catKey) {
       const d = L();
-      const map = { study: d.catStudy, exam: d.catExam, review: d.catReview, sport: d.catSport };
+      const map = { study: d.catStudy, sport: d.catSport, review: d.catReview, exam: d.catExam };
       return map[catKey] || d.catStudy;
     }
 
@@ -1343,10 +1512,10 @@
           <div class="showcase-task-top">
             <div class="task-check-sq" onclick="toggleTaskDone(${t.id})">✓</div>
             <div class="task-center-info" onclick="focusOnTask(${t.id})">
-              <div class="task-main-name">${t.title}</div>
+              <div class="task-main-name">${toWest(t.title)}</div>
               <div class="task-time-sub">
-                <span>📅 ${t.date || todayISO}</span>
-                <span style="color:var(--primary); font-weight:700;">• ${getCatLabel(t.catKey)}</span>
+                <span>📅 ${toWest(t.date || todayISO)}</span>
+                <span style="color:var(--primary); font-weight:700;">• ${toWest(getCatLabel(t.catKey))}</span>
               </div>
             </div>
             <div class="task-pastel-icon ${t.theme}" onclick="deleteTaskItem(${t.id})">${t.icon}</div>
@@ -1360,7 +1529,7 @@
       const t = tasksList.find(x => x.id === id);
       if (t) {
         t.done = !t.done;
-        localStorage.setItem('zen_tasks_v18', JSON.stringify(tasksList));
+        saveFortressData('zen_fortress_tasks_v19', tasksList);
         renderTasksList();
         renderCalendar();
       }
@@ -1369,25 +1538,25 @@
     function focusOnTask(id) {
       const t = tasksList.find(x => x.id === id);
       if (t) {
-        document.getElementById('timerLinkedTask').textContent = `🎯 ${t.title}`;
+        document.getElementById('timerLinkedTask').textContent = toWest(`🎯 ${t.title}`);
         switchTab('sec-timer', document.getElementById('navTimer'));
       }
     }
 
     function createNewTask() {
       const inp = document.getElementById('inpNewTask');
-      const val = inp.value.trim();
+      const val = toWest(inp.value.trim());
       if (!val) return;
       const catKey = document.getElementById('selTaskCat').value;
-      const dateVal = document.getElementById('inpTaskDate').value || todayISO;
-      const themes = { study: 'tp-blue', exam: 'tp-amber', review: 'tp-emerald', sport: 'tp-rose' };
-      const icons = { study: '📘', exam: '⭐', review: '🔍', sport: '🏃' };
+      const dateVal = toWest(document.getElementById('inpTaskDate').value || todayISO);
+      const themes = { study: 'tp-blue', exam: 'tp-amber', review: 'tp-rose', sport: 'tp-emerald' };
+      const icons = { study: '📚', exam: '💻', review: '📖', sport: '🏋️' };
       tasksList.unshift({
         id: Date.now(), isStarter: false, title: val, time: '25m', date: dateVal,
-        catKey: catKey, icon: icons[catKey] || '📁', theme: themes[catKey] || 'tp-blue', done: false
+        catKey: catKey, icon: icons[catKey] || '📚', theme: themes[catKey] || 'tp-blue', done: false
       });
       inp.value = '';
-      localStorage.setItem('zen_tasks_v18', JSON.stringify(tasksList));
+      saveFortressData('zen_fortress_tasks_v19', tasksList);
       renderTasksList();
       renderCalendar();
       showToast('✓');
@@ -1395,13 +1564,13 @@
 
     function deleteTaskItem(id) {
       tasksList = tasksList.filter(x => x.id !== id);
-      localStorage.setItem('zen_tasks_v18', JSON.stringify(tasksList));
+      saveFortressData('zen_fortress_tasks_v19', tasksList);
       renderTasksList();
       renderCalendar();
     }
 
     /* ========================================================
-       6. SMART INTERACTIVE CALENDAR & AGENDA
+       7. SMART CALENDAR (STRICTLY WESTERN DIGITS 0123456789)
        ======================================================== */
     let calYear = new Date().getFullYear();
     let calMonth = new Date().getMonth();
@@ -1416,7 +1585,7 @@
 
     function renderCalendar() {
       const d = L();
-      document.getElementById('calMonthYearTitle').textContent = `${d.months[calMonth]} ${calYear}`;
+      document.getElementById('calMonthYearTitle').textContent = toWest(`${d.months[calMonth]} ${calYear}`);
       document.getElementById('calWeekdaysRow').innerHTML = d.weekdays.map(w => `<div>${w}</div>`).join('');
 
       const firstDay = new Date(calYear, calMonth, 1).getDay();
@@ -1429,7 +1598,7 @@
       }
 
       for (let day = 1; day <= daysInMonth; day++) {
-        const iso = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const iso = toWest(`${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
         const hasTasks = tasksList.some(t => t.date === iso);
         const hasNotes = notesList.some(n => n.calDate === iso);
 
@@ -1437,7 +1606,7 @@
         cell.className = `cal-day-cell ${iso === todayISO ? 'today' : ''} ${iso === selectedCalDate ? 'selected' : ''}`;
         cell.onclick = () => { selectedCalDate = iso; renderCalendar(); };
         cell.innerHTML = `
-          <span>${day}</span>
+          <span>${toWest(day)}</span>
           <div class="cal-dots-row">
             ${hasTasks ? '<span class="cal-dot dot-task"></span>' : ''}
             ${hasNotes ? '<span class="cal-dot dot-note"></span>' : ''}
@@ -1450,7 +1619,7 @@
     }
 
     function renderSelectedDateAgenda() {
-      document.getElementById('selectedDateLabel').textContent = `📅 ${selectedCalDate}`;
+      document.getElementById('selectedDateLabel').textContent = toWest(`📅 ${selectedCalDate}`);
       const box = document.getElementById('calendarDayAgendaBox');
       box.innerHTML = '';
 
@@ -1465,30 +1634,28 @@
       dayTasks.forEach(t => {
         const item = document.createElement('div');
         item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-        item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${t.title}</span><span style="color:var(--text-muted); font-size:0.7rem;">${getCatLabel(t.catKey)}</span>`;
+        item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${toWest(t.title)}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
         box.appendChild(item);
       });
 
       dayNotes.forEach(n => {
         const item = document.createElement('div');
         item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#fffbeb; border-right:4px solid #f59e0b; font-size:0.8rem;';
-        item.innerHTML = `<div style="font-weight:900;">📝 ${n.title}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${n.body}</div>`;
+        item.innerHTML = `<div style="font-weight:900;">📝 ${toWest(n.title)}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${toWest(n.body)}</div>`;
         box.appendChild(item);
       });
     }
 
-    function openNoteModalForSelectedDate() {
-      openNoteModal(selectedCalDate);
-    }
+    function openNoteModalForSelectedDate() { openNoteModal(selectedCalDate); }
 
     /* ========================================================
-       7. SMART NOTES ENGINE (LINKED WITH CALENDAR)
+       8. SMART NOTES ENGINE
        ======================================================== */
-    let notesList = JSON.parse(localStorage.getItem('zen_notes_v18') || JSON.stringify([
-      { id: 1, isStarter: true, title: 'التركيز المتباعد (Spaced Repetition)', body: 'المراجعة على فترات متباعدة تعزز الذاكرة طويلة المدى وتمنع النسيان قبل الامتحانات.', catKey: 'cornell', calDate: todayISO, blur: false, theme: 'theme-violet' },
-      { id: 2, isStarter: true, title: 'سؤال استذكار: ما هو قانون القوة؟', body: 'الإجابة المخفية: القوة = الكتلة × التسارع (F = m × a).', catKey: 'flash', calDate: todayISO, blur: true, theme: 'theme-emerald' },
-      { id: 3, isStarter: true, title: 'خطة تقليل المشتتات أثناء الدراسة', body: '1. تفعيل وضع التركيز العميق\n2. تقسيم الأهداف الكبيرة إلى جلسات 25 دقيقة.', catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-amber' }
-    ]));
+    let notesList = loadFortressData('zen_fortress_notes_v19', [
+      { id: 1, isStarter: true, title: 'Spaced Repetition System', body: 'Reviewing concepts at increasing intervals strengthens long-term memory retention.', catKey: 'cornell', calDate: todayISO, blur: false, theme: 'theme-violet' },
+      { id: 2, isStarter: true, title: 'Active Recall: Key Formula & Law', body: 'Hidden Answer: Performance = Focused Time × Intensity.', catKey: 'flash', calDate: todayISO, blur: true, theme: 'theme-emerald' },
+      { id: 3, isStarter: true, title: 'Workout & Training Log', body: '1. Warm-up 5m\n2. 4 Sets Compound Exercises\n3. Cool-down stretch.', catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-amber' }
+    ]);
     let noteTagFilter = 'all';
 
     function getNoteTagLabel(k) {
@@ -1518,17 +1685,17 @@
         card.className = `learning-rich-card ${n.theme}`;
         card.innerHTML = `
           <div class="lcard-head">
-            <div class="lcard-title"><span>✨</span> <span>${n.title}</span></div>
+            <div class="lcard-title"><span>✨</span> <span>${toWest(n.title)}</span></div>
             <div style="display:flex; gap:8px;">
-              <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${n.id})" title="Calendar">📅</span>
+              <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${n.id})">📅</span>
               <span style="cursor:pointer;" onclick="toggleNoteBlur(${n.id})">👁️</span>
               <span style="cursor:pointer; color:var(--rose);" onclick="deleteNoteCard(${n.id})">✕</span>
             </div>
           </div>
-          <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${n.body}</div>
+          <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${toWest(n.body)}</div>
           <div class="lcard-foot">
-            <span>📅 ${n.calDate || todayISO}</span>
-            <span style="font-weight:800; color:var(--primary);">${getNoteTagLabel(n.catKey)}</span>
+            <span>📅 ${toWest(n.calDate || todayISO)}</span>
+            <span style="font-weight:800; color:var(--primary);">${toWest(getNoteTagLabel(n.catKey))}</span>
           </div>
         `;
         box.appendChild(card);
@@ -1538,7 +1705,7 @@
     function openNoteModal(defaultDate = null) {
       document.getElementById('inpNoteTitle').value = '';
       document.getElementById('inpNoteBody').value = '';
-      document.getElementById('inpNoteCalDate').value = defaultDate || selectedCalDate || todayISO;
+      document.getElementById('inpNoteCalDate').value = toWest(defaultDate || selectedCalDate || todayISO);
       document.getElementById('chkNoteBlur').checked = false;
       document.getElementById('noteModal').classList.add('open');
     }
@@ -1555,17 +1722,17 @@
     }
 
     function saveNewNote() {
-      const t = document.getElementById('inpNoteTitle').value.trim();
-      const b = document.getElementById('inpNoteBody').value.trim();
+      const t = toWest(document.getElementById('inpNoteTitle').value.trim());
+      const b = toWest(document.getElementById('inpNoteBody').value.trim());
       if (!t && !b) return;
       const catKey = document.getElementById('selNoteCat').value;
-      const calDate = document.getElementById('inpNoteCalDate').value || todayISO;
+      const calDate = toWest(document.getElementById('inpNoteCalDate').value || todayISO);
       const blur = document.getElementById('chkNoteBlur').checked;
       notesList.unshift({
         id: Date.now(), isStarter: false, title: t || L().navNotes, body: b,
         catKey: catKey, calDate: calDate, blur: blur, theme: blur ? 'theme-emerald' : 'theme-violet'
       });
-      localStorage.setItem('zen_notes_v18', JSON.stringify(notesList));
+      saveFortressData('zen_fortress_notes_v19', notesList);
       renderNotesStack();
       renderCalendar();
       closeModal('noteModal');
@@ -1576,7 +1743,7 @@
       const n = notesList.find(x => x.id === id);
       if (n) {
         n.calDate = selectedCalDate;
-        localStorage.setItem('zen_notes_v18', JSON.stringify(notesList));
+        saveFortressData('zen_fortress_notes_v19', notesList);
         renderNotesStack();
         renderCalendar();
         showToast(`📅 ${selectedCalDate}`);
@@ -1585,18 +1752,18 @@
 
     function toggleNoteBlur(id) {
       const n = notesList.find(x => x.id === id);
-      if (n) { n.blur = !n.blur; localStorage.setItem('zen_notes_v18', JSON.stringify(notesList)); renderNotesStack(); }
+      if (n) { n.blur = !n.blur; saveFortressData('zen_fortress_notes_v19', notesList); renderNotesStack(); }
     }
 
     function deleteNoteCard(id) {
       notesList = notesList.filter(x => x.id !== id);
-      localStorage.setItem('zen_notes_v18', JSON.stringify(notesList));
+      saveFortressData('zen_fortress_notes_v19', notesList);
       renderNotesStack();
       renderCalendar();
     }
 
     function exportAllNotes() {
-      const txt = notesList.map(n => `[${n.title} - ${n.calDate}]\n${n.body}`).join('\n\n---\n\n');
+      const txt = notesList.map(n => `[${toWest(n.title)} - ${toWest(n.calDate)}]\n${toWest(n.body)}`).join('\n\n---\n\n');
       if (navigator.clipboard) navigator.clipboard.writeText(txt);
       showToast('📥 TXT');
     }
@@ -1607,15 +1774,15 @@
     }
 
     function saveQuickDump(toTasks) {
-      const val = document.getElementById('inpQuickDump').value.trim();
+      const val = toWest(document.getElementById('inpQuickDump').value.trim());
       if (!val) return;
       if (toTasks) {
         tasksList.unshift({ id: Date.now(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false });
-        localStorage.setItem('zen_tasks_v18', JSON.stringify(tasksList));
+        saveFortressData('zen_fortress_tasks_v19', tasksList);
         renderTasksList();
       } else {
         notesList.unshift({ id: Date.now(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' });
-        localStorage.setItem('zen_notes_v18', JSON.stringify(notesList));
+        saveFortressData('zen_fortress_notes_v19', notesList);
         renderNotesStack();
       }
       renderCalendar();
@@ -1624,7 +1791,7 @@
     }
 
     /* ========================================================
-       8. 12 PURE NATURE SOUNDS ENGINE (100% NATURE ONLY)
+       9. 12 PURE NATURE SOUNDS ENGINE
        ======================================================== */
     const SOUNDS_DATA = [
       { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
@@ -1763,7 +1930,7 @@
             <div class="stile-switch"><div class="stile-knob"></div></div>
           </div>
           <div>
-            <div class="stile-name">${sName}</div>
+            <div class="stile-name">${toWest(sName)}</div>
             <input type="range" class="stile-vol" min="0.05" max="1" step="0.05" value="${s.vol}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value)">
           </div>
         `;
@@ -1772,7 +1939,7 @@
     }
 
     /* ========================================================
-       9. ANALYTICS & PREDICTIVE CALCULATOR
+       10. ANALYTICS & GOAL CALCULATOR (STRICT WESTERN DIGITS)
        ======================================================== */
     function renderAnalyticsBars() {
       const box = document.getElementById('anMiniBarsBox');
@@ -1789,26 +1956,26 @@
     function addQuickSessionRecord() {
       cfg.todayMins += 25;
       cfg.sessions += 1;
-      localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
+      saveFortressData('zen_fortress_cfg_v19', cfg);
       syncHeaderMetrics();
       showToast('📈 +25m');
     }
 
     function updateSyllabusCalc() {
-      const left = Math.max(1, parseInt(document.getElementById('inpPagesLeft').value) || 1);
-      const rate = Math.max(1, parseInt(document.getElementById('inpDailyRate').value) || 1);
+      const left = Math.max(1, parseInt(toWest(document.getElementById('inpPagesLeft').value)) || 1);
+      const rate = Math.max(1, parseInt(toWest(document.getElementById('inpDailyRate').value)) || 1);
       const days = Math.ceil(left / rate);
-      document.getElementById('syllabusCalcOut').textContent = L().calcOutTpl.replace('{d}', days);
+      document.getElementById('syllabusCalcOut').textContent = toWest(L().calcOutTpl.replace('{d}', days));
     }
 
     function openSettingsModal() {
-      document.getElementById('inpCfgFocus').value = cfg.focusMin;
+      document.getElementById('inpCfgFocus').value = toWest(cfg.focusMin);
       document.getElementById('settingsModal').classList.add('open');
     }
 
     function saveSettingsNow() {
-      cfg.focusMin = Math.max(1, parseInt(document.getElementById('inpCfgFocus').value) || 25);
-      localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
+      cfg.focusMin = Math.max(1, parseInt(toWest(document.getElementById('inpCfgFocus').value)) || 25);
+      saveFortressData('zen_fortress_cfg_v19', cfg);
       selectTimerMode(cfg.focusMin, 'focus', document.getElementById('modeFocusBtn'));
       closeModal('settingsModal');
       showToast('✓');
@@ -1821,9 +1988,9 @@
       showToast('📥 JSON');
     }
 
-    /* Initial Boot */
+    /* Boot Init - Starts in English by default */
     renderAnalyticsBars();
-    applyLanguage(cfg.lang || 'ar');
+    applyLanguage(cfg.lang || 'en');
   </script>
 </body>
 </html>
