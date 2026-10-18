@@ -79,4 +79,11 @@ const forgedPacket = JSON.stringify({
 const forgedCode = 'ZEN21::' + Buffer.from(forgedPacket, 'utf8').toString('base64');
 assert.equal(evaluate('verifyAndRestoreBackupCode(' + JSON.stringify(forgedCode) + ')'),false);
 assert.equal(evaluate('cfg.sessions'),1);
-console.log('PASS: boot, 20 languages, local dates, focus accounting, breaks, XSS, invalid or malicious backups.');
+// Credit actual measured focus duration, not the original planned 25 minutes.
+evaluate("selectTimerMode(25,'focus',null); toggleTimerPlay(); timerResumeMs = Date.now()-120000; timerTargetTime = Date.now()-100; runTimerTick();");
+assert.equal(evaluate('cfg.sessions'),2);
+assert.equal(evaluate('cfg.todayMins'),3,'Two real active minutes counted instead of 25 planned minutes');
+// Keep the default date synchronized after crossing midnight.
+evaluate("todayISO = '2000-01-01'; syncDailyRollover();");
+assert.equal(evaluate('todayISO'),evaluate('localDateISO()'));
+console.log('PASS: boot, 20 locales, rollover, actual focus time, breaks, XSS and malicious backup rejection.');
