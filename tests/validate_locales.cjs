@@ -38,7 +38,7 @@ for (const lang of names) {
 }
 // Exercise the actual app locale builder, not only source file presence.
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const cutoff = app.indexOf('const todayISO =');
+const cutoff = app.indexOf('let todayISO =');
 assert.ok(cutoff > 0, 'Locale initialization not found');
 context.document = {addEventListener() {}};
 context.console = console;
