@@ -62,6 +62,12 @@ class HomeLayoutRegression(unittest.TestCase):
     def test_engine_loaded_before_main_js(self):
         self.assertLess(HTML.index('src="quick_training.js"'),HTML.index('src="app.js"'))
 
+    def test_timer_home_overrides_shared_page_chrome(self):
+        # The generic later theme must not push the primary timer down.
+        self.assertIn('body.timer-home:not(.deep-lockdown) .dynamic-hero-header', HTML)
+        self.assertIn('body.timer-home:not(.deep-lockdown) .main-white-sheet', HTML)
+        self.assertIn('padding:8px 14px 30px;', HTML)
+
     def test_white_visual_system_and_reduced_motion_kept(self):
         self.assertIn('background:var(--page-ambient', HTML)
         self.assertIn('prefers-reduced-motion', HTML)
