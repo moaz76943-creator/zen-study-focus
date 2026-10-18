@@ -41,6 +41,7 @@ jobs:
           node --check android/app/src/main/assets/web/locale_rows.js
           node --check android/app/src/main/assets/web/locale_extras.js
           node tests/validate_locales.cjs
+          node tests/smoke_app.cjs
       - name: Build test APK and unsigned Play bundle
         working-directory: android
         run: gradle assembleDebug bundleRelease --no-daemon
