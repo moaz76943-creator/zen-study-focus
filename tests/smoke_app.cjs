@@ -8,11 +8,11 @@ const map = new Map();
 const store = new Map();
 function node(id = '') {
   return {
-    id, value: '', textContent: '', innerHTML: '', checked: false, style: {setProperty(name,value){this[name]=value;}},
+    id, value: '', textContent: '', innerHTML: '', checked: false, children: [], style: {setProperty(name,value){this[name]=value;}},
     className: '', title: '',
     classList: {add(){},remove(){},toggle(){return false;},contains(){return false;}},
     setAttribute(k,v){this[k] = v;}, getAttribute(k){return this[k];},
-    appendChild(){}, addEventListener(){},
+    appendChild(child){this.children.push(child);return child;}, addEventListener(){},
     parentElement:{querySelectorAll(){return [];}},
     querySelectorAll(){return [];},
     scrollIntoView(){}
@@ -234,12 +234,23 @@ assert.equal(document.getElementById('todayPlanPercent').textContent,'0%',
   'No fabricated progress on a fresh installation');
 // Add a real task to the home plan, then complete it using the existing task store.
 evaluate("tasksList.unshift({id: nextRecordId(), isStarter:false, title:'Real focus item', date:localDateISO(), catKey:'study', done:false})");
+const planBox = document.getElementById('todayPlanPreview');
+planBox.children = [];
 evaluate('renderTodayPlan()');
 assert.equal(document.getElementById('todayPlanRatio').textContent,'0/1');
-const homeTask = evaluate("tasksList.find(t => t.title === 'Real focus item').id");
-evaluate("toggleTaskDone(" + homeTask + ")");
+assert.equal(planBox.children.length,1,'Daily plan contains only one real task');
+const planCheck = planBox.children[0].children[0];
+const planFocus = planBox.children[0].children[1];
+assert.equal(planCheck.className,'today-plan-check');
+assert.equal(planFocus.className,'today-plan-link');
+assert.equal(planCheck.getAttribute('aria-pressed'),'false');
+assert.equal(planFocus.children[0].textContent,'Real focus item');
+planCheck.onclick();
 assert.equal(document.getElementById('todayPlanRatio').textContent,'1/1');
 assert.equal(document.getElementById('todayPlanPercent').textContent,'100%');
+assert.equal(evaluate("tasksList.find(t => t.title === 'Real focus item').done"),true);
+planFocus.onclick();
+assert.ok(document.getElementById('timerLinkedTask').textContent.includes('Real focus item'));
 // Real white-home shortcuts use the original focus engine and never lose a live session.
 evaluate("selectTimerMode(25,'focus',null); toggleTimerPlay()");
 const homeRunning = evaluate('JSON.stringify({mode:currentTimerModeKey,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})');
