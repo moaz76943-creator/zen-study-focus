@@ -1038,30 +1038,48 @@ const activePlayers = {};
 let webAudioCtx = null;
 
 function createNatureSynthFallback(id, vol) {
-  if (!webAudioCtx) webAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) throw new Error('Web Audio is unavailable');
+  if (!webAudioCtx) webAudioCtx = new AudioCtx();
   if (webAudioCtx.state === 'suspended') webAudioCtx.resume();
-  const sr = webAudioCtx.sampleRate, len = sr * 5;
+  const sr = webAudioCtx.sampleRate, len = Math.round(sr * 8);
   const buf = webAudioCtx.createBuffer(1, len, sr);
-  const data = buf.getChannelData(0);
-  let last = 0;
+  const samples = buf.getChannelData(0);
+  let smoothed = 0, slow = 0;
+  // Offline synthesizer: a distinct fluid waterfall or insect-night texture,
+  // NEVER presented as a genuine field recording.
   for (let i = 0; i < len; i++) {
-    const w = Math.random() * 2 - 1;
-    last = (last + 0.016 * w) / 1.016;
-    data[i] = last * 1.6;
+    const time = i / sr, noise = Math.random() * 2 - 1;
+    smoothed = smoothed * 0.92 + noise * 0.08;
+    slow = slow * 0.998 + noise * 0.002;
+    let value;
+    if (id === 'night') {
+      const chirp1 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 2.7 * time)), 9);
+      const chirp2 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 3.5 * time + 1.4)), 11);
+      value = (Math.sin(2 * Math.PI * 3100 * time) * chirp1 * 0.09
+            + Math.sin(2 * Math.PI * 3900 * time) * chirp2 * 0.065
+            + smoothed * 0.16);
+    } else if (id === 'waterfall') {
+      const surge = 0.65 + 0.12 * Math.sin(2 * Math.PI * 0.19 * time);
+      value = (noise * 0.20 + smoothed * 1.15 + slow * 0.5) * surge;
+    } else {
+      value = smoothed * 0.85 + slow * 0.35;
+    }
+    samples[i] = Math.max(-0.8, Math.min(0.8, value));
   }
-  const src = webAudioCtx.createBufferSource();
-  src.buffer = buf; src.loop = true;
+  const source = webAudioCtx.createBufferSource();
+  source.buffer = buf;
+  source.loop = true;
   const filter = webAudioCtx.createBiquadFilter();
-  filter.type = 'lowpass';
-  const freqs = { ocean: 300, rain: 850, fire: 420, waterfall: 950, thunder: 220, earth: 180 };
-  filter.frequency.value = freqs[id] || 520;
+  filter.type = id === 'night' ? 'lowpass' : 'lowpass';
+  filter.frequency.value = id === 'night' ? 5500 : id === 'waterfall' ? 2600 : 650;
   const gain = webAudioCtx.createGain();
-  gain.gain.value = vol * 0.6;
-  src.connect(filter); filter.connect(gain); gain.connect(webAudioCtx.destination);
-  src.start(0);
+  gain.gain.value = Math.max(0, Math.min(1, vol)) * 0.55;
+  source.connect(filter); filter.connect(gain); gain.connect(webAudioCtx.destination);
+  source.start();
   return {
-    pause: () => { try { src.stop(); } catch(e){} },
-    setVol: (v) => { gain.gain.setValueAtTime(v * 0.6, webAudioCtx.currentTime); }
+    pause: () => { try { source.stop(); } catch (e) {} },
+    setVol: v => gain.gain.setValueAtTime(Math.max(0, Math.min(1, v)) * 0.55, webAudioCtx.currentTime)
   };
 }
 
@@ -1084,7 +1102,8 @@ function toggleSoundTile(id) {
     const activateFallback = () => {
       if (fallbackUsed) return;
       fallbackUsed = true;
-      activePlayers[id] = createNatureSynthFallback(id, s.vol);
+      try { activePlayers[id] = createNatureSynthFallback(id, s.vol); }
+      catch (err) { delete activePlayers[id]; showToast('⚠️ Audio output unavailable'); }
       renderSoundsStudio();
     };
 
