@@ -478,7 +478,10 @@ function logWorkoutSet() {
 
 function startQuickSportRest(secs) {
   if (timerRunning) toggleTimerPlay();
+  currentTimerModeKey = 'short';
   timerTotal = secs; timerLeft = secs;
+  timerSessionId = null;
+  storeTimerSession();
   updateTimerDisplay(); toggleTimerPlay();
   showToast(toWest(`⏱️ Rest ${secs}s Started`));
 }
@@ -535,6 +538,70 @@ let timerInterval = null;
 let timerTargetTime = null;
 let currentTimerModeKey = 'focus';
 let customSessionLabel = '';
+let timerSessionId = null;
+const TIMER_STORAGE_KEY = 'zen_fortress_active_timer_v21';
+function storeTimerSession() {
+  saveFortressData(TIMER_STORAGE_KEY, {
+    total: timerTotal, left: timerLeft, running: timerRunning,
+    endAt: timerRunning ? timerTargetTime : null,
+    mode: currentTimerModeKey, label: customSessionLabel,
+    sessionId: timerSessionId
+  });
+}
+function creditCompletedSession() {
+  if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
+  if (!timerSessionId) return;
+  const ids = Array.isArray(cfg.completedTimerIds) ? cfg.completedTimerIds : [];
+  if (ids.includes(timerSessionId)) return;
+  const earned = Math.max(1, Math.round(timerTotal / 60));
+  cfg.todayMins = Number(cfg.todayMins || 0) + earned;
+  cfg.sessions = Number(cfg.sessions || 0) + 1;
+  cfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
+  if (!Array.isArray(cfg.sessionHistory)) cfg.sessionHistory = [];
+  cfg.sessionHistory.push({id: timerSessionId, date: localDateISO(), minutes: earned, domain: cfg.domain || 'study'});
+  saveFortressData('zen_fortress_cfg_v21', cfg);
+  syncHeaderMetrics();
+}
+function finalizeTimerSession(shouldChime) {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  timerRunning = false;
+  timerLeft = 0;
+  creditCompletedSession();
+  storeTimerSession();
+  updateTimerDisplay();
+  document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent);
+  selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
+}
+function runTimerTick() {
+  timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
+  if (timerLeft <= 0) return finalizeTimerSession(true);
+  updateTimerDisplay();
+}
+function restoreTimerSession() {
+  const snap = loadFortressData(TIMER_STORAGE_KEY, null);
+  if (!snap || typeof snap !== 'object' || !Number.isFinite(snap.total) || !Number.isFinite(snap.left)) return;
+  if (snap.total < 1 || snap.total > 86400 || snap.left < 0 || snap.left > 86400) return;
+  timerTotal = snap.total;
+  timerLeft = snap.left;
+  currentTimerModeKey = ['focus','short','long','custom'].includes(snap.mode) ? snap.mode : 'focus';
+  customSessionLabel = typeof snap.label === 'string' ? snap.label.slice(0, 100) : '';
+  timerSessionId = typeof snap.sessionId === 'string' ? snap.sessionId : null;
+  if (snap.running && Number.isFinite(snap.endAt)) {
+    timerTargetTime = snap.endAt;
+    timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
+    if (timerLeft === 0) {
+      // Native foreground timer has already emitted the expiry notification.
+      finalizeTimerSession(false);
+      return;
+    }
+    timerRunning = true;
+    document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+    timerInterval = setInterval(runTimerTick, 500);
+  }
+  updateTimerDisplay();
+}
 const ringCircumference = 2 * Math.PI * 105;
 
 function syncHeaderMetrics() {
@@ -574,6 +641,8 @@ function selectTimerMode(mins, modeKey, btn) {
     btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   }
+  timerSessionId = null;
+  storeTimerSession();
   updateTimerDisplay();
 }
 
@@ -597,6 +666,7 @@ function changeTimerDelta(deltaMins) {
       window.ZenNative.startBackgroundService(timerLeft, document.getElementById('timerModeCaption').textContent);
     }
   }
+  storeTimerSession();
   updateTimerDisplay();
 }
 
@@ -606,7 +676,10 @@ function toggleTimerPlay() {
 
   if (timerRunning) {
     clearInterval(timerInterval);
+    timerInterval = null;
+    timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
     timerRunning = false;
+    storeTimerSession();
     if (window.ZenNative && window.ZenNative.stopBackgroundService) {
       try { window.ZenNative.stopBackgroundService(); } catch(e){}
     }
@@ -617,41 +690,27 @@ function toggleTimerPlay() {
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
     } catch(e){}
 
+    if (!timerSessionId) timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
     timerRunning = true;
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     timerTargetTime = Date.now() + (timerLeft * 1000);
+    storeTimerSession();
 
     if (window.ZenNative && window.ZenNative.startBackgroundService) {
       try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch(e){}
     }
 
-    timerInterval = setInterval(() => {
-      const rem = Math.round((timerTargetTime - Date.now()) / 1000);
-      if (rem > 0) {
-        timerLeft = rem;
-        updateTimerDisplay();
-      } else {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        timerLeft = 0;
-        updateTimerDisplay();
-        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-
-        playRichCompletionChime(activeTitle);
-
-        const earned = Math.max(1, Math.round(timerTotal / 60));
-        cfg.todayMins += earned;
-        cfg.sessions += 1;
-        saveFortressData('zen_fortress_cfg_v21', cfg);
-        syncHeaderMetrics();
-        selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
-        showToast(`🎉 +${earned}m`);
-      }
-    }, 500);
+    timerInterval = setInterval(runTimerTick, 500);
   }
 }
 
-function resetTimerNow() { if (timerRunning) toggleTimerPlay(); timerLeft = timerTotal; updateTimerDisplay(); }
+function resetTimerNow() {
+  if (timerRunning) toggleTimerPlay();
+  timerLeft = timerTotal;
+  timerSessionId = null;
+  storeTimerSession();
+  updateTimerDisplay();
+}
 function skipTimerPhase() { if (timerRunning) toggleTimerPlay(); selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn')); }
 function addWaterCup() { cfg.water = (cfg.water + 1) % 9; saveFortressData('zen_fortress_cfg_v21', cfg); syncHeaderMetrics(); }
 function toggleDeskClock(show) { document.getElementById('deskClockOverlay').classList.toggle('active', show); }
@@ -1110,3 +1169,4 @@ function updateSyllabusCalc() {
 /* Boot Init */
 renderAnalyticsBars();
 applyLanguage(cfg.lang || 'en');
+restoreTimerSession();
