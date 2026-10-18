@@ -5,7 +5,7 @@ const QUICK_KEYS = [
   'addExercise','presetTabata','presetWorkout','presetReading','presetWork',
   'skipStep','stopTraining','startTraining','todayProgress','todayPlan','viewAll',
   'chooseActivity','domainsHint','emptyPlan','workPhase','restPhase','round',
-  'done','cancelPrompt','replacePrompt','invalidDuration','started','finished'
+  'done','cancelPrompt','replacePrompt','invalidDuration','started','finished','quickSessions'
 ];
 const QUICK_TRANSLATIONS = {
   en: ['✦ Focus space','Ready to focus','In progress','Paused','Quick training','Custom work-and-rest intervals',
@@ -13,13 +13,13 @@ const QUICK_TRANSLATIONS = {
     '+ Add','Intervals 20/10','Workout 4/1','Reading 20/5','Deep work 50/10','Skip phase','End training',
     '▶ Start training','✧ Your progress','Today’s plan','View all ↗','Choose your activity','A tailored session for every goal',
     'No tasks for today yet','Work','Rest','Round','Completed','End the current training session?',
-    'Changing activities or modes ends your current session. Continue?','Enter valid MM:SS durations','Training started','Training completed!'],
+    'Changing activities or modes ends your current session. Continue?','Enter valid MM:SS durations','Training started','Training completed!','Quick sessions'],
   ar: ['✦ مساحة التركيز','جاهز للتركيز','الوقت يعمل','متوقف مؤقتًا','تدريب سريع','جولات عمل وراحة قابلة للتخصيص',
     'المجموعات','العمل (د:ث)','الراحة (د:ث)','تخطي الراحة الأخيرة','التمارين المتتابعة','مثل: تمارين الإطالة أو القراءة المركزة',
     '+ إضافة','تدريب 20/10','رياضة 4/1','قراءة 20/5','عمل 50/10','تخطي المرحلة','إنهاء التدريب',
     '▶ ابدأ التدريب','✧ تقدمك اليوم','خطة اليوم','عرض الكل ↗','اختر نوع نشاطك','لكل نشاط جلسته المناسبة',
     'لا توجد مهام لهذا اليوم بعد','عمل','راحة','الجولة','مكتمل','هل تريد إنهاء التدريب الحالي؟',
-    'تغيير النشاط أو الوضع سينهي الجلسة الحالية. هل تريد المتابعة؟','أدخل مدة صحيحة بصيغة د:ث','بدأ التدريب','اكتمل التدريب!']
+    'تغيير النشاط أو الوضع سينهي الجلسة الحالية. هل تريد المتابعة؟','أدخل مدة صحيحة بصيغة د:ث','بدأ التدريب','اكتمل التدريب!','جلسات سريعة']
 };
 let quickTraining = null;
 let quickInternalChange = false;
@@ -238,9 +238,53 @@ function updateFocusStatus() {
   const el=document.getElementById('focusStatusLabel');
   if(el)el.textContent=quickText(timerRunning?'running':timerSessionId?'paused':'ready');
 }
+/* Real seven-day navigation: dates come from the local calendar, never demo data. */
+function renderHomeWeekStrip() {
+  const strip = document.getElementById('homeWeekStrip');
+  if (!strip) return;
+  strip.textContent = '';
+  const now = new Date();
+  const start = (now.getDay() + 6) % 7; // Monday-first week
+  const today = localDateISO(now);
+  const weekdays = L().weekdays;
+  for (let offset = 0; offset < 7; offset++) {
+    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - start + offset);
+    const iso = localDateISO(date);
+    const weekday = weekdays[date.getDay()] || '';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'home-week-day';
+    button.setAttribute('aria-current', iso === today ? 'date' : 'false');
+    button.setAttribute('aria-label', toWest(weekday + ' ' + iso));
+    const dayName = document.createElement('span');
+    dayName.textContent = weekday.slice(0, 3);
+    const dayNumber = document.createElement('span');
+    dayNumber.className = 'home-week-number';
+    dayNumber.textContent = toWest(String(date.getDate()));
+    button.appendChild(dayName);
+    button.appendChild(dayNumber);
+    button.onclick = () => goToHomeAgenda(iso);
+    strip.appendChild(button);
+  }
+}
+function goToHomeAgenda(iso) {
+  if (typeof iso !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(iso)) return false;
+  const [year, month, day] = iso.split('-').map(Number);
+  const target = new Date(year, month - 1, day);
+  if (target.getFullYear() !== year || target.getMonth() !== month - 1 ||
+      target.getDate() !== day) return false;
+  selectedCalDate = iso;
+  calYear = year;
+  calMonth = month - 1;
+  switchTab('sec-calendar', document.getElementById('navCalendar'));
+  renderCalendar();
+  return true;
+}
+
 function renderTodayPlan() {
   const box=document.getElementById('todayPlanPreview');
   if(!box || typeof tasksList==='undefined')return;
+  renderHomeWeekStrip();
   const today=localDateISO();
   const dated=tasksList.filter(t=>t && t.date===today);
   const complete=dated.filter(t=>t.done).length;
