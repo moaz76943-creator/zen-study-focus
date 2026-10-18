@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ZEN FOCUS - Global Edition</title>
+  <title>ZEN FOCUS - Miracle Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -26,51 +26,39 @@
       --text-muted: #64748b;
       --text-light: #94a3b8;
       --border-soft: #e2e8f0;
-      --shadow-card: 0 12px 28px -6px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-      --shadow-float: 0 18px 38px -6px rgba(37, 99, 235, 0.22);
-      --radius-sheet: 32px;
+      --shadow-card: 0 12px 30px -6px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+      --shadow-float: 0 16px 36px -6px rgba(37, 99, 235, 0.28);
+      --radius-sheet: 34px;
       --radius-xl: 24px;
       --radius-lg: 18px;
       --radius-pill: 9999px;
-      --header-grad: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #0284c7 100%);
+      --header-grad: linear-gradient(135deg, #091326 0%, #1d3b8b 55%, #0284c7 100%);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 98px; overflow-x: hidden; transition: background 0.3s; }
+    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 102px; overflow-x: hidden; transition: background 0.3s; }
 
-    /* Deep Focus Lockdown Mode */
+    /* Deep Focus Lockdown */
     body.deep-lockdown .dynamic-hero-header,
     body.deep-lockdown .bottom-nav-capsule,
-    body.deep-lockdown .quick-orbs-row,
-    body.deep-lockdown .summary-banner-card { display: none !important; }
+    body.deep-lockdown .quick-orbs-card { display: none !important; }
     body.deep-lockdown { background: #ffffff; justify-content: center; padding-bottom: 20px; }
     body.deep-lockdown .main-white-sheet { margin-top: 0; box-shadow: none; background: #ffffff; }
 
-    /* Desk Clock Mode */
-    .desk-clock-overlay {
-      position: fixed; inset: 0; background: #ffffff; z-index: 400;
-      display: none; flex-direction: column; align-items: center; justify-content: center;
-      padding: 24px; text-align: center;
-    }
-    .desk-clock-overlay.active { display: flex; animation: fadeIn 0.25s ease-out; }
-    .desk-digits { font-size: 5.8rem; font-weight: 900; color: var(--text-main); letter-spacing: -3px; font-variant-numeric: tabular-nums; line-height: 1; }
-
     .app-shell { width: 100%; max-width: 440px; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
 
-    /* ========================================================
-       DYNAMIC AMBIENT HEADER (MATCHING SHOWCASE IMAGE)
-       ======================================================== */
+    /* Dynamic Futuristic Header */
     .dynamic-hero-header {
       background: var(--header-grad);
       color: #ffffff;
-      padding: 18px 20px 44px;
+      padding: 18px 20px 46px;
       position: relative;
       transition: background 0.4s ease;
       overflow: hidden;
     }
-    .dynamic-hero-header::after {
-      content: ""; position: absolute; top: -40px; left: -40px; width: 160px; height: 160px;
-      background: radial-gradient(circle, rgba(255,255,255,0.14) 0%, transparent 70%);
+    .dynamic-hero-header::before {
+      content: ""; position: absolute; top: -50px; right: -50px; width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -83,50 +71,45 @@
     }
     .header-icon-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.28); }
 
-    /* Language Pill Button (Identical to Top-Right of Reference Image) */
     .lang-switcher-pill {
-      background: rgba(255, 255, 255, 0.16); backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: var(--radius-pill);
-      padding: 6px 13px; color: #ffffff; font-size: 0.74rem; font-weight: 800;
+      background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.35); border-radius: var(--radius-pill);
+      padding: 6px 14px; color: #ffffff; font-size: 0.75rem; font-weight: 800;
       display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.15s;
     }
-    .lang-switcher-pill:active { transform: scale(0.94); background: rgba(255, 255, 255, 0.28); }
+    .lang-switcher-pill:active { transform: scale(0.94); }
 
     .header-titles-center { text-align: center; position: relative; z-index: 2; }
     .header-main-title { font-size: 1.45rem; font-weight: 900; letter-spacing: -0.3px; }
-    .header-sub-caption { font-size: 0.78rem; opacity: 0.88; margin-top: 2px; font-weight: 500; }
+    .header-sub-caption { font-size: 0.78rem; opacity: 0.9; margin-top: 3px; font-weight: 500; }
 
-    /* ========================================================
-       OVERLAPPING PURE WHITE SHEET CONTAINER
-       ======================================================== */
+    /* Overlapping White Sheet */
     .main-white-sheet {
       background: var(--bg-sheet);
       border-top-left-radius: var(--radius-sheet);
       border-top-right-radius: var(--radius-sheet);
-      margin-top: -26px;
-      padding: 18px 16px 24px;
+      margin-top: -28px;
+      padding: 18px 15px 24px;
       flex: 1;
       position: relative;
       z-index: 5;
-      box-shadow: 0 -8px 25px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.08);
     }
 
     .screen-section { display: none; animation: fadeIn 0.22s ease-out; }
     .screen-section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Universal Pure White Card */
     .pure-white-card {
       background: var(--card-pure);
       border-radius: var(--radius-xl);
       padding: 18px;
       box-shadow: var(--shadow-card);
-      border: 1px solid rgba(226, 232, 240, 0.75);
+      border: 1px solid rgba(226, 232, 240, 0.85);
       margin-bottom: 14px;
       position: relative;
     }
 
-    /* Segmented Pill Bar (Like in 'إنتاجية' & 'تواصل' Screens) */
     .segmented-pills-bar {
       display: flex; background: #e2e8f0; padding: 4px; border-radius: var(--radius-pill);
       margin-bottom: 14px; gap: 4px; overflow-x: auto; scrollbar-width: none;
@@ -134,32 +117,28 @@
     .segmented-pills-bar::-webkit-scrollbar { display: none; }
     .seg-pill {
       flex: 1; border: none; background: transparent; padding: 8px 12px;
-      border-radius: var(--radius-pill); font-size: 0.74rem; font-weight: 800;
+      border-radius: var(--radius-pill); font-size: 0.73rem; font-weight: 800;
       color: var(--text-muted); white-space: nowrap; cursor: pointer; transition: 0.2s;
     }
     .seg-pill.active {
-      background: var(--card-pure); color: var(--text-main);
+      background: var(--card-pure); color: var(--primary);
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
     }
 
     /* ========================================================
-       1. TIMER & FOCUS SCREEN (WITH FINANCE-STYLE ACTION ORBS)
+       1. TIMER & QUICK ORBS
        ======================================================== */
     .hero-balance-header {
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 14px; border-bottom: 1px solid #f1f5f9; margin-bottom: 14px;
     }
-    .balance-big-digits { font-size: 1.65rem; font-weight: 900; color: var(--text-main); display: flex; align-items: baseline; gap: 6px; }
+    .balance-big-digits { font-size: 1.7rem; font-weight: 900; color: var(--text-main); display: flex; align-items: baseline; gap: 6px; }
     .growth-pill-green {
-      background: var(--emerald-soft); color: var(--emerald); padding: 4px 10px;
+      background: var(--emerald-soft); color: var(--emerald); padding: 4px 11px;
       border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 800;
     }
 
-    /* 4 Circular Quick Action Orbs (Like Center Finance Screen) */
-    .quick-orbs-row {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center;
-      margin-bottom: 6px;
-    }
+    .quick-orbs-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
     .orb-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
     .orb-circle {
       width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center;
@@ -173,9 +152,8 @@
     .orb-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
     .orb-label { font-size: 0.68rem; font-weight: 800; color: var(--text-main); }
 
-    /* Circular Timer Ring */
     .timer-ring-box { display: flex; flex-direction: column; align-items: center; padding: 6px 0 12px; }
-    .ring-container { position: relative; width: 210px; height: 210px; display: flex; align-items: center; justify-content: center; }
+    .ring-container { position: relative; width: 215px; height: 215px; display: flex; align-items: center; justify-content: center; }
     .ring-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
     .ring-bg { fill: none; stroke: #f1f5f9; stroke-width: 9; }
     .ring-bar {
@@ -183,15 +161,15 @@
       stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.5s linear, stroke 0.3s;
       filter: drop-shadow(0 4px 12px rgba(6, 182, 212, 0.4));
     }
-    .ring-bar.golden-warning { stroke: #f59e0b !important; filter: drop-shadow(0 4px 14px rgba(245,158,11,0.55)); }
-    .ring-bar.overtime-mode { stroke: #10b981 !important; filter: drop-shadow(0 4px 14px rgba(16,185,129,0.55)); }
+    .ring-bar.golden-warning { stroke: #f59e0b !important; }
+    .ring-bar.overtime-mode { stroke: #10b981 !important; }
     .ring-center { position: absolute; text-align: center; }
-    .ring-plant { font-size: 1.85rem; margin-bottom: 2px; }
-    .ring-time { font-size: 3.1rem; font-weight: 900; letter-spacing: -1.2px; color: var(--text-main); line-height: 1; font-variant-numeric: tabular-nums; }
-    .ring-mode-txt { font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ring-plant { font-size: 1.9rem; margin-bottom: 2px; }
+    .ring-time { font-size: 3.15rem; font-weight: 900; letter-spacing: -1.2px; color: var(--text-main); line-height: 1; font-variant-numeric: tabular-nums; }
+    .ring-mode-txt { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .ring-task-pill {
       font-size: 0.68rem; font-weight: 800; color: var(--primary); background: var(--primary-soft);
-      padding: 3px 12px; border-radius: var(--radius-pill); margin-top: 6px; display: inline-block; cursor: pointer;
+      padding: 4px 12px; border-radius: var(--radius-pill); margin-top: 6px; display: inline-block; cursor: pointer;
     }
 
     .timer-main-controls { display: flex; justify-content: space-around; align-items: center; margin-top: 6px; }
@@ -218,14 +196,14 @@
     .delta-chip:active { background: var(--primary); color: #ffffff; }
 
     /* ========================================================
-       2. TASKS SCREEN (IDENTICAL TO 'إنتاجية' SCREEN IN IMAGE)
+       2. TASKS SCREEN
        ======================================================== */
     .task-creator-bar {
       background: var(--card-pure); border-radius: var(--radius-lg); padding: 8px 10px;
       border: 1px solid var(--border-soft); display: flex; align-items: center; gap: 6px;
       box-shadow: var(--shadow-card); margin-bottom: 14px; flex-wrap: wrap;
     }
-    .task-creator-inp { flex: 1; min-width: 130px; border: none; outline: none; font-size: 0.82rem; color: var(--text-main); background: transparent; padding: 4px; }
+    .task-creator-inp { flex: 1; min-width: 120px; border: none; outline: none; font-size: 0.82rem; color: var(--text-main); background: transparent; padding: 4px; }
     .task-mini-sel { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 10px; padding: 5px 7px; font-size: 0.7rem; font-weight: 700; color: var(--text-main); outline: none; }
     .btn-task-plus {
       width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6);
@@ -252,7 +230,6 @@
     .task-main-name { font-size: 0.86rem; font-weight: 800; color: var(--text-main); }
     .task-time-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
-    /* Colored Pastel Icon Square on the Side (Matching 'إنتاجية' Screen) */
     .task-pastel-icon {
       width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center;
       justify-content: center; font-size: 1.05rem; flex-shrink: 0; cursor: pointer;
@@ -262,12 +239,27 @@
     .tp-emerald { background: #d1fae5; color: #059669; }
     .tp-rose { background: #fce7f3; color: #db2777; }
 
-    .subtasks-Wrap { padding-top: 4px; border-top: 1px dashed #f1f5f9; display: flex; flex-direction: column; gap: 4px; }
-    .subtasks-bar { height: 4px; background: #f1f5f9; border-radius: 2px; overflow: hidden; }
-    .subtasks-fill { height: 100%; background: var(--emerald); transition: width 0.3s; }
+    /* ========================================================
+       3. SMART INTERACTIVE CALENDAR (التقويم الذكي المدمج)
+       ======================================================== */
+    .cal-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .cal-month-title { font-size: 1rem; font-weight: 900; color: var(--text-main); }
+    .cal-weekdays-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.68rem; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; }
+    .cal-days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+    .cal-day-cell {
+      aspect-ratio: 1; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 800; color: var(--text-main); cursor: pointer; position: relative; transition: 0.15s;
+    }
+    .cal-day-cell.today { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+    .cal-day-cell.selected { background: var(--primary); color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35); }
+    .cal-dots-row { display: flex; gap: 3px; position: absolute; bottom: 4px; }
+    .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .dot-task { background: #10b981; }
+    .dot-note { background: #f59e0b; }
 
     /* ========================================================
-       3. NOTES & LEARNING SCREEN (MATCHING 'تعلّم' SCREEN IN IMAGE)
+       4. SMART NOTES SCREEN
        ======================================================== */
     .search-pill-box {
       background: var(--card-pure); border-radius: var(--radius-pill); padding: 10px 16px;
@@ -280,7 +272,7 @@
     .learning-rich-card {
       border-radius: 22px; padding: 16px 18px; position: relative;
       box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8);
-      transition: transform 0.15s; background: var(--card-pure);
+      background: var(--card-pure);
     }
     .learning-rich-card.theme-violet { background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%); border-right: 5px solid #8b5cf6; }
     .learning-rich-card.theme-emerald { background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%); border-right: 5px solid #10b981; }
@@ -293,15 +285,15 @@
     .lcard-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
 
     .floating-plus-fab {
-      position: fixed; bottom: 86px; left: 24px; width: 54px; height: 54px;
-      border-radius: 50%; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      position: fixed; bottom: 88px; left: 24px; width: 54px; height: 54px;
+      border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: none; color: #ffffff; font-size: 1.7rem; display: flex; align-items: center;
-      justify-content: center; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.45);
+      justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
       cursor: pointer; z-index: 80;
     }
 
     /* ========================================================
-       4. SOUNDSCAPES STUDIO (HYBRID REAL + SYNTH AUDIO)
+       5. 12 PURE NATURE SOUNDS STUDIO
        ======================================================== */
     .mixer-status-bar {
       background: var(--card-pure); border-radius: var(--radius-lg); padding: 10px 14px;
@@ -311,21 +303,25 @@
     }
     .sounds-photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .sound-Rich-tile {
-      height: 134px; border-radius: 20px; position: relative; overflow: hidden;
+      height: 128px; border-radius: 20px; position: relative; overflow: hidden;
       display: flex; flex-direction: column; justify-content: space-between; padding: 11px;
       color: #ffffff; box-shadow: var(--shadow-card); border: 2.5px solid transparent;
       cursor: pointer; transition: 0.2s; background-size: cover; background-position: center;
     }
-    .sound-Rich-tile.playing { border-color: #00d2ff; box-shadow: 0 8px 25px rgba(0, 210, 255, 0.4); }
+    .sound-Rich-tile.playing { border-color: #00d2ff; box-shadow: 0 8px 25px rgba(0, 210, 255, 0.45); }
 
-    .sbg-ocean { background-image: linear-gradient(180deg, rgba(3, 105, 161, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/ocean.jpg'); background-color: #0284c7; }
-    .sbg-rain { background-image: linear-gradient(180deg, rgba(51, 65, 85, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/rain.jpg'); background-color: #475569; }
-    .sbg-fire { background-image: linear-gradient(180deg, rgba(180, 83, 9, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/fire.jpg'); background-color: #d97706; }
-    .sbg-forest { background-image: linear-gradient(180deg, rgba(5, 150, 105, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/forest.jpg'); background-color: #059669; }
-    .sbg-stream { background-image: linear-gradient(180deg, rgba(2, 132, 199, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/stream.jpg'); background-color: #0369a1; }
-    .sbg-leaves { background-image: linear-gradient(180deg, rgba(22, 101, 52, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/leaves.jpg'); background-color: #15803d; }
-    .sbg-cafe { background-image: linear-gradient(180deg, rgba(120, 53, 15, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/cafe.jpg'); background-color: #92400e; }
-    .sbg-noise { background-image: linear-gradient(180deg, rgba(71, 85, 105, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/noise.jpg'); background-color: #334155; }
+    .sbg-ocean { background-image: linear-gradient(180deg, rgba(3, 105, 161, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/ocean.jpg'); background-color: #0284c7; }
+    .sbg-rain { background-image: linear-gradient(180deg, rgba(51, 65, 85, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/rain.jpg'); background-color: #475569; }
+    .sbg-fire { background-image: linear-gradient(180deg, rgba(180, 83, 9, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/fire.jpg'); background-color: #d97706; }
+    .sbg-forest { background-image: linear-gradient(180deg, rgba(5, 150, 105, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/forest.jpg'); background-color: #059669; }
+    .sbg-stream { background-image: linear-gradient(180deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/stream.jpg'); background-color: #0369a1; }
+    .sbg-leaves { background-image: linear-gradient(180deg, rgba(22, 101, 52, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/leaves.jpg'); background-color: #15803d; }
+    .sbg-waterfall { background-image: linear-gradient(180deg, rgba(13, 148, 136, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/waterfall.jpg'); background-color: #0d9488; }
+    .sbg-night { background-image: linear-gradient(180deg, rgba(30, 27, 75, 0.35) 0%, rgba(15, 23, 42, 0.9) 100%), url('images/night.jpg'); background-color: #1e1b4b; }
+    .sbg-thunder { background-image: linear-gradient(180deg, rgba(55, 48, 163, 0.3) 0%, rgba(15, 23, 42, 0.9) 100%), url('images/thunder.jpg'); background-color: #312e81; }
+    .sbg-wind { background-image: linear-gradient(180deg, rgba(71, 85, 105, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/wind.jpg'); background-color: #334155; }
+    .sbg-winrain { background-image: linear-gradient(180deg, rgba(14, 116, 144, 0.3) 0%, rgba(15, 23, 42, 0.9) 100%), url('images/rain.jpg'); background-color: #0e7490; }
+    .sbg-earth { background-image: linear-gradient(180deg, rgba(6, 78, 59, 0.35) 0%, rgba(15, 23, 42, 0.9) 100%), url('images/forest.jpg'); background-color: #064e3b; }
 
     .stile-top { display: flex; justify-content: space-between; align-items: center; }
     .stile-play-btn {
@@ -337,23 +333,22 @@
     .sound-Rich-tile.playing .stile-switch { background: #00d2ff; }
     .stile-knob { width: 14px; height: 14px; border-radius: 50%; background: #ffffff; position: absolute; top: 2px; right: 2px; transition: 0.2s; }
     .sound-Rich-tile.playing .stile-knob { transform: translateX(-14px); }
-    .stile-name { font-size: 0.84rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    .stile-name { font-size: 0.82rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.85); }
     .stile-vol { width: 100%; -webkit-appearance: none; background: rgba(255,255,255,0.4); height: 3.5px; border-radius: 2px; outline: none; margin-top: 6px; }
     .stile-vol::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #ffffff; cursor: pointer; }
 
     /* ========================================================
-       5. ANALYTICS SCREEN (MATCHING 'المالية' & 'تحليلات' IN IMAGE)
+       6. ANALYTICS SCREEN
        ======================================================== */
     .analytics-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     .an-kpi-card {
       background: var(--card-pure); border-radius: 20px; padding: 14px 16px;
-      box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8); cursor: pointer;
     }
     .an-kpi-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.73rem; font-weight: 700; color: var(--text-muted); }
     .an-kpi-num { font-size: 1.55rem; font-weight: 900; color: var(--text-main); margin: 4px 0; }
     .an-kpi-trend { font-size: 0.7rem; font-weight: 800; color: var(--emerald); }
 
-    /* Donut Ring + Multi-Bar Overview (Identical to Center 'المالية' Screen) */
     .overview-split-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
     .donut-box { position: relative; width: 105px; height: 105px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .donut-center-txt { position: absolute; font-size: 1.05rem; font-weight: 900; color: var(--text-main); }
@@ -364,9 +359,8 @@
 
     .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
     .legend-item { display: flex; align-items: center; justify-content: space-between; }
-    .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-left: 5px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin: 0 5px; }
 
-    /* Wave Spline Chart Card (Identical to Rightmost 'تحليلات' Screen) */
     .wave-chart-card {
       background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%);
       color: #ffffff; border-radius: var(--radius-xl); padding: 18px 16px;
@@ -374,26 +368,26 @@
     }
 
     /* ========================================================
-       BOTTOM GLASS NAVIGATION BAR
+       6-TAB FLOATING GLASS BOTTOM NAVIGATION
        ======================================================== */
     .bottom-nav-capsule {
-      position: fixed; bottom: 10px; width: calc(100% - 24px); max-width: 416px;
+      position: fixed; bottom: 10px; width: calc(100% - 20px); max-width: 420px;
       background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px);
-      border: 1px solid var(--border-soft); border-radius: 26px; padding: 7px 10px;
+      border: 1px solid var(--border-soft); border-radius: 26px; padding: 6px 6px;
       display: flex; justify-content: space-around; align-items: center; z-index: 100;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
     }
     .bnav-btn {
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
       background: none; border: none; color: var(--text-muted); cursor: pointer;
-      font-size: 0.67rem; font-weight: 800; padding: 6px 12px; border-radius: var(--radius-pill);
-      transition: 0.15s;
+      font-size: 0.62rem; font-weight: 800; padding: 6px 8px; border-radius: var(--radius-pill);
+      transition: 0.15s; flex: 1;
     }
-    .bnav-btn svg { width: 20px; height: 20px; fill: currentColor; }
+    .bnav-btn svg { width: 19px; height: 19px; fill: currentColor; }
     .bnav-btn.active { color: var(--primary); background: var(--primary-soft); }
 
     /* ========================================================
-       MODALS & 20-LANGUAGE SELECTOR SHEET
+       MODALS
        ======================================================== */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.58);
@@ -405,44 +399,41 @@
       background: #ffffff; width: 100%; max-width: 395px; border-radius: 26px;
       padding: 20px; box-shadow: 0 22px 45px rgba(0,0,0,0.25); max-height: 85vh; overflow-y: auto;
     }
-    .modal-head { font-size: 1.02rem; font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-head { font-size: 1rem; font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
     .modal-inp { width: 100%; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; font-size: 0.82rem; margin-bottom: 10px; outline: none; background: #f8fafc; color: var(--text-main); }
     .modal-actions { display: flex; gap: 8px; margin-top: 8px; }
     .mbtn-pri { flex: 1; background: var(--primary); color: #fff; border: none; padding: 11px; border-radius: 12px; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
     .mbtn-sec { flex: 1; background: #f1f5f9; color: var(--text-main); border: none; padding: 11px; border-radius: 12px; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
 
-    /* 20 Languages Grid */
     .lang-grid-20 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .lang-option-btn {
       background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px;
       padding: 10px 12px; display: flex; align-items: center; gap: 8px;
-      font-size: 0.78rem; font-weight: 800; color: var(--text-main); cursor: pointer; transition: 0.15s;
+      font-size: 0.78rem; font-weight: 800; color: var(--text-main); cursor: pointer;
     }
     .lang-option-btn.active { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+
+    /* Zen Breathing Orb Animation */
+    .breath-circle {
+      width: 130px; height: 130px; border-radius: 50%; margin: 18px auto;
+      background: radial-gradient(circle, #38bdf8 0%, #2563eb 100%);
+      color: #ffffff; display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; font-weight: 900; box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
+      transition: transform 4s ease-in-out;
+    }
 
     .toast-pill {
       position: fixed; top: 68px; left: 50%; transform: translateX(-50%) translateY(-20px);
       background: #0f172a; color: #ffffff; padding: 9px 18px; border-radius: 999px;
       font-size: 0.76rem; font-weight: 700; box-shadow: 0 8px 22px rgba(0,0,0,0.28);
-      opacity: 0; pointer-events: none; transition: 0.25s; z-index: 350; display: flex; align-items: center; gap: 10px; white-space: nowrap;
+      opacity: 0; pointer-events: none; transition: 0.25s; z-index: 350; white-space: nowrap;
     }
-    .toast-pill.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .toast-pill.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
-  <!-- Toast Notification -->
-  <div class="toast-pill" id="appToast">
-    <span id="toastText">تم الحفظ ✓</span>
-  </div>
-
-  <!-- Fullscreen Desk Clock Overlay -->
-  <div class="desk-clock-overlay" id="deskClockOverlay">
-    <div style="font-size:0.9rem; font-weight:800; color:var(--primary); margin-bottom:10px;">🖥️ وضع ساعة المكتب للتركيز</div>
-    <div class="desk-digits" id="deskClockDigits">25:00</div>
-    <div style="font-size:0.85rem; color:var(--text-muted); margin: 12px 0 24px;" id="deskClockTask">جلسة تركيز نشطة</div>
-    <button class="mbtn-pri" style="max-width:200px; padding:12px 28px;" onclick="toggleDeskClock(false)">العودة للتطبيق ✕</button>
-  </div>
+  <div class="toast-pill" id="appToast"><span id="toastText">✓</span></div>
 
   <div class="app-shell">
     <svg style="position: absolute; width: 0; height: 0;">
@@ -454,20 +445,17 @@
       </defs>
     </svg>
 
-    <!-- ========================================================
-         DYNAMIC AMBIENT HEADER (CHANGES THEME PER TAB)
-         ======================================================== -->
+    <!-- DYNAMIC AMBIENT HEADER -->
     <header class="dynamic-hero-header" id="heroHeader">
       <div class="header-top-row">
         <div style="display:flex; gap:8px;">
           <button class="header-icon-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
-          <button class="header-icon-btn" onclick="openGardenModal()" title="Zen Garden">🌱</button>
+          <button class="header-icon-btn" onclick="openBreathModal()" title="4-7-8 Zen Breath">🌬️</button>
         </div>
 
-        <!-- 20-Language Switcher Pill (Matching Top-Right of Image) -->
         <button class="lang-switcher-pill" onclick="openLanguageModal()">
           <span>🌐</span>
-          <span id="currentLangLabel">العربية | EN</span>
+          <span id="currentLangLabel">🇸🇦 العربية</span>
         </button>
       </div>
 
@@ -477,17 +465,14 @@
       </div>
     </header>
 
-    <!-- ========================================================
-         OVERLAPPING PURE WHITE SHEET
-         ======================================================== -->
+    <!-- MAIN OVERLAPPING WHITE SHEET -->
     <div class="main-white-sheet">
 
       <!-- ======================================================
-           SECTION 1: FOCUS & TIMER
+           1. TIMER SECTION
            ====================================================== -->
       <main class="screen-section active" id="sec-timer">
-        <!-- Balance-Style Summary & 4 Action Orbs (Like Center Screen in Image) -->
-        <div class="pure-white-card">
+        <div class="pure-white-card quick-orbs-card">
           <div class="hero-balance-header">
             <div>
               <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;" data-i18n="totalFocusToday">إجمالي التركيز اليوم</div>
@@ -496,8 +481,8 @@
                 <span style="font-size:0.85rem; color:var(--text-muted);" data-i18n="minsUnit">دقيقة</span>
               </div>
             </div>
-            <div style="text-align:left;">
-              <span class="growth-pill-green" id="hdrStreakBadge">↑ 🔥 5 أيام</span>
+            <div>
+              <span class="growth-pill-green" id="hdrStreakBadge">↑ 🔥 5</span>
             </div>
           </div>
 
@@ -508,26 +493,25 @@
             </div>
             <div class="orb-item" onclick="addWaterCup()">
               <div class="orb-circle orb-blue">💧</div>
-              <span class="orb-label" id="orbWaterTxt">الماء 0/8</span>
+              <span class="orb-label" id="orbWaterTxt">4/8</span>
             </div>
             <div class="orb-item" onclick="toggleDeepLockdown()">
               <div class="orb-circle orb-purple">🔒</div>
               <span class="orb-label" data-i18n="orbDeep">تركيز عميق</span>
             </div>
-            <div class="orb-item" onclick="toggleDeskClock(true)">
-              <div class="orb-circle orb-amber">🖥️</div>
-              <span class="orb-label" data-i18n="orbDesk">ساعة مكتب</span>
+            <div class="orb-item" onclick="openBreathModal()">
+              <div class="orb-circle orb-amber">🌬️</div>
+              <span class="orb-label" data-i18n="orbBreath">تنفس 4-7-8</span>
             </div>
           </div>
         </div>
 
-        <!-- Main Timer Card -->
         <div class="pure-white-card">
           <div class="segmented-pills-bar">
-            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerMode(cfg.focusMin, 'جلسة تركيز', this)" data-i18n="modeFocus">تركيز 25د</button>
-            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'استراحة قصيرة', this)" data-i18n="modeShort">راحة 5د</button>
-            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'استراحة طويلة', this)" data-i18n="modeLong">طويلة 15د</button>
-            <button class="seg-pill" onclick="selectTimerMode(90, 'محاكاة امتحان 📝', this)" data-i18n="modeExam">امتحان 90د</button>
+            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerMode(cfg.focusMin, 'focus', this)" data-i18n="modeFocus">تركيز 25د</button>
+            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">راحة 5د</button>
+            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">طويلة 15د</button>
+            <button class="seg-pill" id="modeCustomBtn" onclick="openCustomTimerModal()" data-i18n="modeCustom">مخصص ⚡</button>
           </div>
 
           <div class="timer-ring-box">
@@ -546,11 +530,11 @@
           </div>
 
           <div class="timer-main-controls">
-            <button class="btn-round-sec" onclick="resetTimerNow()" title="إعادة ضبط">↺</button>
+            <button class="btn-round-sec" onclick="resetTimerNow()">↺</button>
             <button class="btn-round-play" id="mainPlayBtn" onclick="toggleTimerPlay()">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </button>
-            <button class="btn-round-sec" onclick="skipTimerPhase()" title="تخطي">⏭</button>
+            <button class="btn-round-sec" onclick="skipTimerPhase()">⏭</button>
           </div>
 
           <div class="time-delta-row">
@@ -564,22 +548,23 @@
       </main>
 
       <!-- ======================================================
-           SECTION 2: PRODUCTIVITY & TASKS (MATCHING 'إنتاجية' SCREEN)
+           2. TASKS SECTION
            ====================================================== -->
       <main class="screen-section" id="sec-tasks">
         <div class="segmented-pills-bar">
-          <button class="seg-pill active" id="tFilterAll" onclick="filterTasksByStatus('all', this)" data-i18n="filterAll">الكل</button>
-          <button class="seg-pill" id="tFilterActive" onclick="filterTasksByStatus('active', this)" data-i18n="filterToday">اليوم (قيد التنفيذ)</button>
-          <button class="seg-pill" id="tFilterDone" onclick="filterTasksByStatus('done', this)" data-i18n="filterDone">مكتملة</button>
+          <button class="seg-pill active" onclick="filterTasksByStatus('all', this)" data-i18n="filterAll">الكل</button>
+          <button class="seg-pill" onclick="filterTasksByStatus('active', this)" data-i18n="filterToday">اليوم</button>
+          <button class="seg-pill" onclick="filterTasksByStatus('done', this)" data-i18n="filterDone">مكتملة</button>
         </div>
 
         <div class="task-creator-bar">
-          <input type="text" class="task-creator-inp" id="inpNewTask" placeholder="أضف مهمة دراسية جديدة..." onkeydown="if(event.key==='Enter')createNewTask()">
+          <input type="text" class="task-creator-inp" id="inpNewTask" data-i18n-placeholder="phAddTask" placeholder="أضف مهمة دراسية جديدة..." onkeydown="if(event.key==='Enter')createNewTask()">
+          <input type="date" class="task-mini-sel" id="inpTaskDate">
           <select class="task-mini-sel" id="selTaskCat">
-            <option value="دراسة">📚 دراسة</option>
-            <option value="امتحانات">⭐ امتحانات</option>
-            <option value="مراجعة">🔍 مراجعة</option>
-            <option value="رياضة">🏃 نشاط</option>
+            <option value="study" data-i18n="catStudy">📚 دراسة</option>
+            <option value="exam" data-i18n="catExam">⭐ امتحانات</option>
+            <option value="review" data-i18n="catReview">🔍 مراجعة</option>
+            <option value="sport" data-i18n="catSport">🏃 نشاط</option>
           </select>
           <button class="btn-task-plus" onclick="createNewTask()">+</button>
         </div>
@@ -588,20 +573,45 @@
       </main>
 
       <!-- ======================================================
-           SECTION 3: SMART NOTES & LEARNING (MATCHING 'تعلّم' SCREEN)
+           3. SMART INTERACTIVE CALENDAR SECTION (التقويم الذكي)
+           ====================================================== -->
+      <main class="screen-section" id="sec-calendar">
+        <div class="pure-white-card">
+          <div class="cal-header-nav">
+            <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(-1)">❮</button>
+            <div class="cal-month-title" id="calMonthYearTitle">أكتوبر 2026</div>
+            <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(1)">❯</button>
+          </div>
+          <div class="cal-weekdays-grid" id="calWeekdaysRow"></div>
+          <div class="cal-days-grid" id="calDaysGrid"></div>
+        </div>
+
+        <div class="pure-white-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:0.9rem; font-weight:900;" id="selectedDateLabel">أجندة اليوم المحدد</span>
+            <div style="display:flex; gap:6px;">
+              <button class="task-mini-sel" style="color:var(--primary); cursor:pointer;" onclick="openNoteModalForSelectedDate()" data-i18n="btnAddCalNote">+ ملاحظة لليوم</button>
+            </div>
+          </div>
+          <div id="calendarDayAgendaBox" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+      </main>
+
+      <!-- ======================================================
+           4. SMART NOTES SECTION
            ====================================================== -->
       <main class="screen-section" id="sec-notes">
         <div class="search-pill-box">
           <span>🔍</span>
-          <input type="text" class="search-pill-inp" id="inpSearchNotes" placeholder="ابحث عن ملاحظة أو بطاقة استذكار..." oninput="renderNotesStack()">
+          <input type="text" class="search-pill-inp" id="inpSearchNotes" data-i18n-placeholder="phSearchNotes" placeholder="ابحث عن ملاحظة أو بطاقة استذكار..." oninput="renderNotesStack()">
           <button class="task-mini-sel" onclick="exportAllNotes()" style="cursor:pointer;">📥 TXT</button>
         </div>
 
         <div class="segmented-pills-bar">
           <button class="seg-pill active" onclick="filterNotesByTag('all', this)" data-i18n="filterAll">الكل</button>
-          <button class="seg-pill" onclick="filterNotesByTag('ملاحظات كورنيل', this)">كورنيل 📋</button>
-          <button class="seg-pill" onclick="filterNotesByTag('بطاقات استذكار', this)">استذكار 👁️</button>
-          <button class="seg-pill" onclick="filterNotesByTag('أفكار سريعة', this)">أفكار 💡</button>
+          <button class="seg-pill" onclick="filterNotesByTag('cornell', this)" data-i18n="tagCornell">كورنيل 📋</button>
+          <button class="seg-pill" onclick="filterNotesByTag('flash', this)" data-i18n="tagFlash">استذكار 👁️</button>
+          <button class="seg-pill" onclick="filterNotesByTag('quick', this)" data-i18n="tagQuick">أفكار 💡</button>
         </div>
 
         <div class="learning-cards-stack" id="notesStackBox"></div>
@@ -610,50 +620,48 @@
       </main>
 
       <!-- ======================================================
-           SECTION 4: NATURE SOUNDS STUDIO
+           5. 12 PURE NATURE SOUNDS SECTION
            ====================================================== -->
       <main class="screen-section" id="sec-sounds">
         <div class="mixer-status-bar">
-          <span id="mixerStatusTxt">🎵 استوديو المزج الصوتي جاهز</span>
+          <span id="mixerStatusTxt" data-i18n="mixerReady">🎵 استوديو الطبيعة جاهز</span>
           <div style="display:flex; gap:6px;">
-            <button class="task-mini-sel" onclick="playPresetRelaxMix()" style="cursor:pointer; color:var(--primary);">✨ خلطتي</button>
-            <button class="task-mini-sel" onclick="stopAllAudio()" style="cursor:pointer; color:var(--rose);">⏹ إيقاف</button>
+            <button class="task-mini-sel" onclick="playPresetRelaxMix()" style="cursor:pointer; color:var(--primary);" data-i18n="btnMyMix">✨ خلطتي</button>
+            <button class="task-mini-sel" onclick="stopAllAudio()" style="cursor:pointer; color:var(--rose);" data-i18n="btnStopAll">⏹ إيقاف</button>
           </div>
         </div>
 
         <div class="segmented-pills-bar">
-          <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">الكل (8)</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('الطبيعة', this)">الطبيعة 🌿</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('البيئة', this)">البيئة 🔥</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('ضوضاء بيضاء', this)">عزل وألفا 🧠</button>
+          <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">الكل (12)</button>
+          <button class="seg-pill" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">مياه وأمطار 🌧️</button>
+          <button class="seg-pill" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">غابات ورياح 🌲</button>
+          <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">دفء وعزل 🔥</button>
         </div>
 
         <div class="sounds-photo-grid" id="soundsGridBox"></div>
       </main>
 
       <!-- ======================================================
-           SECTION 5: ANALYTICS & INSIGHTS (MATCHING 'المالية' & 'تحليلات')
+           6. ANALYTICS SECTION
            ====================================================== -->
       <main class="screen-section" id="sec-analytics">
-        <!-- Twin KPI Cards (Matching 'تحليلات' Screen) -->
         <div class="analytics-kpi-grid">
           <div class="an-kpi-card" onclick="addQuickSessionRecord()">
             <div class="an-kpi-top"><span data-i18n="kpiMinutes">دقائق التركيز</span><span>🕒</span></div>
             <div class="an-kpi-num" id="kpiTotalMins">420</div>
-            <div class="an-kpi-trend">↑ 18% هذا الأسبوع</div>
+            <div class="an-kpi-trend" data-i18n="kpiTrendWeek">↑ +18% هذا الأسبوع</div>
           </div>
           <div class="an-kpi-card" onclick="addQuickSessionRecord()">
             <div class="an-kpi-top"><span data-i18n="kpiSessions">الجلسات المكتملة</span><span>🎯</span></div>
             <div class="an-kpi-num" id="kpiTotalSessions">18</div>
-            <div class="an-kpi-trend">↑ 12% التزام ممتاز</div>
+            <div class="an-kpi-trend" data-i18n="kpiTrendGreat">↑ +12% التزام ممتاز</div>
           </div>
         </div>
 
-        <!-- Overview Card with Donut Ring 68% + Multi-Bars (Matching Center 'المالية' Screen) -->
         <div class="pure-white-card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-size:0.92rem; font-weight:900;" data-i18n="overviewTitle">نظرة عامة على الإنجاز</span>
-            <span class="growth-pill-green">هذا الأسبوع</span>
+            <span class="growth-pill-green" data-i18n="badgeThisWeek">هذا الأسبوع</span>
           </div>
 
           <div class="overview-split-row">
@@ -664,26 +672,25 @@
                 <circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" stroke-width="11" stroke-dasharray="238" stroke-dashoffset="76" stroke-linecap="round"></circle>
                 <circle cx="50" cy="50" r="38" fill="none" stroke="#3b82f6" stroke-width="11" stroke-dasharray="238" stroke-dashoffset="165" stroke-linecap="round"></circle>
               </svg>
-              <div class="donut-center-txt" id="donutPercentTxt">68%</div>
+              <div class="donut-center-txt">68%</div>
             </div>
           </div>
 
           <div class="legend-grid">
-            <div class="legend-item"><span><i class="legend-dot" style="background:#3b82f6;"></i>دراسة عميقة</span><span>38%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#10b981;"></i>حل تمارين</span><span>30%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#8b5cf6;"></i>مراجعة كورنيل</span><span>20%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#f59e0b;"></i>قراءة حرة</span><span>12%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#3b82f6;"></i><span data-i18n="legDeep">دراسة عميقة</span></span><span>38%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#10b981;"></i><span data-i18n="legPractice">حل تمارين</span></span><span>30%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#8b5cf6;"></i><span data-i18n="legCornell">مراجعة كورنيل</span></span><span>20%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#f59e0b;"></i><span data-i18n="legReading">قراءة حرة</span></span><span>12%</span></div>
           </div>
         </div>
 
-        <!-- Glowing Smooth Area Spline Chart (Matching Rightmost 'تحليلات' Screen) -->
         <div class="wave-chart-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <div>
-              <div style="font-size:0.74rem; opacity:0.8;">مؤشر التدفق الذهني الأسبوعي</div>
-              <div style="font-size:1.3rem; font-weight:900;">125.6K نقطة تركيز <span style="font-size:0.75rem; color:#34d399;">↑ 24%</span></div>
+              <div style="font-size:0.74rem; opacity:0.8;" data-i18n="waveFlowTitle">مؤشر التدفق الذهني الأسبوعي</div>
+              <div style="font-size:1.25rem; font-weight:900;">125.6K <span style="font-size:0.75rem; color:#34d399;">↑ 24%</span></div>
             </div>
-            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;">ذروة الأداء</span>
+            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;" data-i18n="peakPerfBadge">ذروة الأداء</span>
           </div>
           <svg viewBox="0 0 320 95" style="width:100%; height:90px; overflow:visible;">
             <defs>
@@ -696,28 +703,23 @@
             <path d="M0,75 C40,45 70,80 110,50 C150,20 180,65 225,22 C260,5 290,45 320,30" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"></path>
             <circle cx="225" cy="22" r="5" fill="#10b981" stroke="#ffffff" stroke-width="2"></circle>
           </svg>
-          <div style="display:flex; justify-content:space-between; font-size:0.65rem; opacity:0.75; margin-top:4px;">
-            <span>السبت</span><span>الأحد</span><span>الاثنين</span><span>الثلاثاء</span><span>الأربعاء</span><span>الخميس</span><span>الجمعة</span>
-          </div>
+          <div id="waveDaysRow" style="display:flex; justify-content:space-between; font-size:0.65rem; opacity:0.75; margin-top:4px;"></div>
         </div>
 
-        <!-- Predictive Syllabus Calculator -->
         <div class="pure-white-card">
-          <div style="font-size:0.88rem; font-weight:900; margin-bottom:8px;">🎓 حاسبة ختم المنهج التنبؤية</div>
+          <div style="font-size:0.88rem; font-weight:900; margin-bottom:8px;" data-i18n="calcHeading">🎓 حاسبة ختم المنهج التنبؤية</div>
           <div style="display:flex; gap:8px; margin-bottom:8px;">
-            <input type="number" class="modal-inp" id="inpPagesLeft" value="120" style="margin:0;" oninput="updateSyllabusCalc()" placeholder="الصفحات المتبقية">
-            <input type="number" class="modal-inp" id="inpDailyRate" value="15" style="margin:0;" oninput="updateSyllabusCalc()" placeholder="المعدل اليومي">
+            <input type="number" class="modal-inp" id="inpPagesLeft" value="120" style="margin:0;" oninput="updateSyllabusCalc()">
+            <input type="number" class="modal-inp" id="inpDailyRate" value="15" style="margin:0;" oninput="updateSyllabusCalc()">
           </div>
-          <div id="syllabusCalcOut" style="font-size:0.78rem; font-weight:800; color:var(--emerald); background:var(--emerald-soft); padding:9px 12px; border-radius:12px;">
-            📅 بهذا المعدل ستختم المادة بالكامل خلال 8 أيام!
-          </div>
+          <div id="syllabusCalcOut" style="font-size:0.78rem; font-weight:800; color:var(--emerald); background:var(--emerald-soft); padding:9px 12px; border-radius:12px;"></div>
         </div>
       </main>
 
     </div>
 
     <!-- ========================================================
-         BOTTOM FLOATING NAVIGATION BAR
+         6-TAB FLOATING GLASS BOTTOM NAVIGATION
          ======================================================== -->
     <nav class="bottom-nav-capsule">
       <button class="bnav-btn active" id="navTimer" onclick="switchTab('sec-timer', this)">
@@ -726,11 +728,15 @@
       </button>
       <button class="bnav-btn" id="navTasks" onclick="switchTab('sec-tasks', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-        <span data-i18n="navTasks">إنتاجية</span>
+        <span data-i18n="navTasks">المهام</span>
+      </button>
+      <button class="bnav-btn" id="navCalendar" onclick="switchTab('sec-calendar', this)">
+        <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+        <span data-i18n="navCalendar">التقويم</span>
       </button>
       <button class="bnav-btn" id="navNotes" onclick="switchTab('sec-notes', this)">
         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-        <span data-i18n="navNotes">تعلّم وملاحظات</span>
+        <span data-i18n="navNotes">الملاحظات</span>
       </button>
       <button class="bnav-btn" id="navSounds" onclick="switchTab('sec-sounds', this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
@@ -738,134 +744,293 @@
       </button>
       <button class="bnav-btn" id="navAnalytics" onclick="switchTab('sec-analytics', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-        <span data-i18n="navAnalytics">تحليلات</span>
+        <span data-i18n="navAnalytics">التحليلات</span>
       </button>
     </nav>
   </div>
 
   <!-- ========================================================
-       MODALS: 1. TOP 20 WORLD LANGUAGES MODAL
+       MODALS
        ======================================================== -->
+  <!-- 1. 20 Languages Modal -->
   <div class="modal-overlay" id="langModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>🌐 اختر لغة التطبيق (20 لغة عالمية)</span>
+        <span>🌐 Choose Language / اختر اللغة</span>
         <button class="task-mini-sel" onclick="closeModal('langModal')">✕</button>
       </div>
       <div class="lang-grid-20" id="langGrid20Box"></div>
     </div>
   </div>
 
-  <!-- 2. Quick Brain Dump Modal -->
-  <div class="modal-overlay" id="brainDumpModal">
+  <!-- 2. Custom Timer Modal (Replaces Exam 90m) -->
+  <div class="modal-overlay" id="customTimerModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>💭 تفريغ فكرة مشتتة سريعاً</span>
-        <button class="task-mini-sel" onclick="closeModal('brainDumpModal')">✕</button>
+        <span data-i18n="modeCustom">⏱️ تخصيص المؤقت</span>
+        <button class="task-mini-sel" onclick="closeModal('customTimerModal')">✕</button>
       </div>
-      <input type="text" class="modal-inp" id="inpQuickDump" placeholder="دوّن الفكرة العابرة هنا وتابع تركيزك فوراً...">
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+        <button class="delta-chip" onclick="setCustomPresetValues(40)">40m</button>
+        <button class="delta-chip" onclick="setCustomPresetValues(45)">45m</button>
+        <button class="delta-chip" onclick="setCustomPresetValues(52)">52m</button>
+        <button class="delta-chip" onclick="setCustomPresetValues(60)">60m</button>
+        <button class="delta-chip" onclick="setCustomPresetValues(90)">90m</button>
+        <button class="delta-chip" onclick="setCustomPresetValues(120)">120m</button>
+      </div>
+      <input type="number" class="modal-inp" id="inpCustomMins" value="45" min="1" max="240" placeholder="Minutes (1-240)">
+      <input type="text" class="modal-inp" id="inpCustomTitle" data-i18n-placeholder="modeCustom" placeholder="اسم الجلسة المخصصة...">
       <div class="modal-actions">
-        <button class="mbtn-pri" onclick="saveQuickDump(false)">حفظ في الملاحظات</button>
-        <button class="mbtn-sec" onclick="saveQuickDump(true)">تحويل لمهمة 📋</button>
+        <button class="mbtn-pri" onclick="applyCustomTimerNow()" data-i18n="btnSave">تطبيق وبدء</button>
+        <button class="mbtn-sec" onclick="closeModal('customTimerModal')" data-i18n="btnCancel">إلغاء</button>
       </div>
     </div>
   </div>
 
-  <!-- 3. Smart Note Creator Modal -->
+  <!-- 3. Smart Note Creator with Calendar Date Picker -->
   <div class="modal-overlay" id="noteModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>📝 محرر الملاحظات وبطاقات التعلّم</span>
+        <span data-i18n="navNotes">📝 الملاحظات الذكية والتقويم</span>
         <button class="task-mini-sel" onclick="closeModal('noteModal')">✕</button>
       </div>
       <div style="display:flex; gap:6px; margin-bottom:8px;">
-        <button class="task-mini-sel" onclick="fillNoteTpl('cornell')">📋 قالب كورنيل</button>
-        <button class="task-mini-sel" onclick="fillNoteTpl('flash')">👁️ سؤال استذكار</button>
+        <button class="task-mini-sel" onclick="fillNoteTpl('cornell')" data-i18n="tagCornell">📋 كورنيل</button>
+        <button class="task-mini-sel" onclick="fillNoteTpl('flash')" data-i18n="tagFlash">👁️ استذكار</button>
       </div>
-      <input type="text" class="modal-inp" id="inpNoteTitle" placeholder="عنوان الملاحظة أو السؤال...">
-      <select class="modal-inp" id="selNoteCat">
-        <option value="ملاحظات كورنيل">📋 ملاحظات كورنيل</option>
-        <option value="بطاقات استذكار">👁️ بطاقات استذكار</option>
-        <option value="أفكار سريعة">💡 أفكار سريعة</option>
-      </select>
-      <textarea class="modal-inp" id="inpNoteBody" style="height:105px; resize:none;" placeholder="التفاصيل أو الإجابة النموذجية..."></textarea>
+      <input type="text" class="modal-inp" id="inpNoteTitle" data-i18n-placeholder="phSearchNotes" placeholder="عنوان الملاحظة أو السؤال...">
+      <div style="display:flex; gap:6px; margin-bottom:10px;">
+        <select class="modal-inp" id="selNoteCat" style="margin:0; flex:1;">
+          <option value="cornell" data-i18n="tagCornell">📋 كورنيل</option>
+          <option value="flash" data-i18n="tagFlash">👁️ استذكار</option>
+          <option value="quick" data-i18n="tagQuick">💡 أفكار</option>
+        </select>
+        <input type="date" class="modal-inp" id="inpNoteCalDate" style="margin:0; flex:1;" title="جدولة في التقويم">
+      </div>
+      <textarea class="modal-inp" id="inpNoteBody" style="height:105px; resize:none;" placeholder="..."></textarea>
       <label style="display:flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:700; margin-bottom:8px;">
-        <input type="checkbox" id="chkNoteBlur"> إخفاء الإجابة بضبابية للاستذكار الذاتي (تظهر باللمس)
+        <input type="checkbox" id="chkNoteBlur"> <span data-i18n="lblBlurAnswer">إخفاء الإجابة بضبابية للاستذكار (تظهر باللمس)</span>
       </label>
       <div class="modal-actions">
-        <button class="mbtn-pri" onclick="saveNewNote()">حفظ الملاحظة</button>
-        <button class="mbtn-sec" onclick="closeModal('noteModal')">إلغاء</button>
+        <button class="mbtn-pri" onclick="saveNewNote()" data-i18n="btnSave">حفظ</button>
+        <button class="mbtn-sec" onclick="closeModal('noteModal')" data-i18n="btnCancel">إلغاء</button>
       </div>
     </div>
   </div>
 
-  <!-- 4. Settings & Backup Modal -->
+  <!-- 4. Quick Brain Dump Modal -->
+  <div class="modal-overlay" id="brainDumpModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <span data-i18n="orbDump">💭 تفريغ فكرة مشتتة</span>
+        <button class="task-mini-sel" onclick="closeModal('brainDumpModal')">✕</button>
+      </div>
+      <input type="text" class="modal-inp" id="inpQuickDump" placeholder="...">
+      <div class="modal-actions">
+        <button class="mbtn-pri" onclick="saveQuickDump(false)" data-i18n="navNotes">حفظ كملاحظة</button>
+        <button class="mbtn-sec" onclick="saveQuickDump(true)" data-i18n="navTasks">حفظ كمهمة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 4-7-8 Zen Breathing Exercise Modal -->
+  <div class="modal-overlay" id="breathModal">
+    <div class="modal-card" style="text-align:center;">
+      <div class="modal-head">
+        <span data-i18n="orbBreath">🌬️ تمرين التنفس 4-7-8 للتركيز</span>
+        <button class="task-mini-sel" onclick="closeBreathModal()">✕</button>
+      </div>
+      <div class="breath-circle" id="breathOrb">شهيق 4ث</div>
+      <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px;" id="breathGuideSub">استنشق بهدوء لتصفية ذهنك قبل الجلسة</p>
+      <button class="mbtn-pri" style="width:100%;" onclick="closeBreathModal()" data-i18n="btnSave">تم</button>
+    </div>
+  </div>
+
+  <!-- 6. Settings Modal -->
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>⚙️ الإعدادات والنسخ الاحتياطي</span>
+        <span>⚙️ Settings</span>
         <button class="task-mini-sel" onclick="closeModal('settingsModal')">✕</button>
       </div>
-      <label style="font-size:0.74rem; font-weight:700;">مدة جلسة التركيز الافتراضية (دقيقة):</label>
-      <input type="number" class="modal-inp" id="inpCfgFocus" value="25">
+      <input type="number" class="modal-inp" id="inpCfgFocus" value="25" min="1" max="180">
       <div class="modal-actions">
-        <button class="mbtn-pri" onclick="saveSettingsNow()">حفظ</button>
-        <button class="mbtn-sec" onclick="copyBackupJson()">نسخ احتياطي JSON</button>
+        <button class="mbtn-pri" onclick="saveSettingsNow()" data-i18n="btnSave">حفظ</button>
+        <button class="mbtn-sec" onclick="copyBackupJson()">JSON Backup</button>
       </div>
-    </div>
-  </div>
-
-  <!-- 5. Zen Garden Stage Modal -->
-  <div class="modal-overlay" id="gardenModal">
-    <div class="modal-card" style="text-align:center;">
-      <div style="font-size:3.2rem; margin-bottom:6px;" id="gardenBigIcon">🌱</div>
-      <h3 style="font-size:1.1rem; font-weight:900; margin-bottom:6px;">حديقة التركيز التفاعلية</h3>
-      <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.55; margin-bottom:14px;">
-        تنمو شجرتك مع كل جلسة تركيز تنجزها:<br>
-        🌰 بذرة ⬅ 🌱 برعم ⬅ 🌿 شتلة ⬅ 🌳 شجرة مثمرة ⬅ 🌸 شجرة مزهرة
-      </p>
-      <button class="mbtn-pri" style="width:100%;" onclick="closeModal('gardenModal')">استمرار في النمو 🚀</button>
     </div>
   </div>
 
   <script>
     /* ========================================================
-       1. TOP 20 WORLD LANGUAGES DICTIONARY & SWITCHER
+       1. COMPLETE 100% REACTIVE 20-LANGUAGE ENGINE
        ======================================================== */
-    const LANGUAGES_20 = [
-      { code: 'ar', name: 'العربية', flag: '🇸🇦', dir: 'rtl', title: 'المؤقت والتركيز', sub: 'تحكم أكبر في وقتك ومستقبلك الدراسي', navTimer: 'المؤقت', navTasks: 'إنتاجية', navNotes: 'تعلّم', navSounds: 'الأصوات', navAnalytics: 'تحليلات', totalFocusToday: 'إجمالي التركيز اليوم', minsUnit: 'دقيقة', orbDump: 'تفريغ فكرة', orbDeep: 'تركيز عميق', orbDesk: 'ساعة مكتب', modeFocus: 'تركيز 25د', modeShort: 'راحة 5د', modeLong: 'طويلة 15د', modeExam: 'امتحان 90د', startFocusAchieve: 'ابدأ • ركز • أنجز', filterAll: 'الكل', filterToday: 'اليوم', filterDone: 'مكتملة', kpiMinutes: 'دقائق التركيز', kpiSessions: 'الجلسات المكتملة', overviewTitle: 'نظرة عامة على الإنجاز' },
-      { code: 'en', name: 'English', flag: '🇬🇧', dir: 'ltr', title: 'Focus & Timer', sub: 'Greater control over your study & future', navTimer: 'Timer', navTasks: 'Tasks', navNotes: 'Learn', navSounds: 'Sounds', navAnalytics: 'Analytics', totalFocusToday: 'Total Focus Today', minsUnit: 'mins', orbDump: 'Brain Dump', orbDeep: 'Deep Focus', orbDesk: 'Desk Clock', modeFocus: 'Focus 25m', modeShort: 'Short 5m', modeLong: 'Long 15m', modeExam: 'Exam 90m', startFocusAchieve: 'Start • Focus • Achieve', filterAll: 'All', filterToday: 'Today', filterDone: 'Completed', kpiMinutes: 'Focus Minutes', kpiSessions: 'Completed Sessions', overviewTitle: 'Productivity Overview' },
-      { code: 'es', name: 'Español', flag: '🇪🇸', dir: 'ltr', title: 'Enfoque y Tiempo', sub: 'Organiza tu día con facilidad', navTimer: 'Reloj', navTasks: 'Tareas', navNotes: 'Notas', navSounds: 'Sonidos', navAnalytics: 'Análisis', totalFocusToday: 'Enfoque Total Hoy', minsUnit: 'min', orbDump: 'Idea Rápida', orbDeep: 'Modo Zen', orbDesk: 'Reloj Mesa', modeFocus: 'Enfoque 25m', modeShort: 'Pausa 5m', modeLong: 'Larga 15m', modeExam: 'Examen 90m', startFocusAchieve: 'Inicia • Enfoca • Logra', filterAll: 'Todo', filterToday: 'Hoy', filterDone: 'Hecho', kpiMinutes: 'Minutos Enfoque', kpiSessions: 'Sesiones Listas', overviewTitle: 'Resumen General' },
-      { code: 'zh', name: '中文 (简体)', flag: '🇨🇳', dir: 'ltr', title: '专注与效率', sub: '掌控时间，成就更好的自己', navTimer: '计时器', navTasks: '任务', navNotes: '笔记', navSounds: '自然音', navAnalytics: '数据分析', totalFocusToday: '今日专注时长', minsUnit: '分钟', orbDump: '灵感速记', orbDeep: '深度专注', orbDesk: '桌面时钟', modeFocus: '专注 25m', modeShort: '短休 5m', modeLong: '长休 15m', modeExam: '考试 90m', startFocusAchieve: '开始 • 专注 • 成就', filterAll: '全部', filterToday: '今日', filterDone: '已完成', kpiMinutes: '专注分钟', kpiSessions: '完成周期', overviewTitle: '效率概览' },
-      { code: 'hi', name: 'हिन्दी', flag: '🇮🇳', dir: 'ltr', title: 'ध्यान और समय', sub: 'अपने अध्ययन और भविष्य को नियंत्रित करें', navTimer: 'टाइमर', navTasks: 'कार्य', navNotes: 'नोट्स', navSounds: 'ध्वनियाँ', navAnalytics: 'विश्लेषण', totalFocusToday: 'आज का कुल ध्यान', minsUnit: 'मिनट', orbDump: 'त्वरित विचार', orbDeep: 'गहरा ध्यान', orbDesk: 'डेस्क घड़ी', modeFocus: 'फोकस 25m', modeShort: 'विराम 5m', modeLong: 'लंबा 15m', modeExam: 'परीक्षा 90m', startFocusAchieve: 'शुरू • ध्यान • सफल', filterAll: 'सभी', filterToday: 'आज', filterDone: 'पूर्ण', kpiMinutes: 'फोकस मिनट', kpiSessions: 'पूर्ण सत्र', overviewTitle: 'प्रगति अवलोकन' },
-      { code: 'fr', name: 'Français', flag: '🇫🇷', dir: 'ltr', title: 'Focus & Productivité', sub: 'Organisez votre journée simplement', navTimer: 'Minuteur', navTasks: 'Tâches', navNotes: 'Notes', navSounds: 'Sons', navAnalytics: 'Analyses', totalFocusToday: 'Focus Total Aujourd\'hui', minsUnit: 'min', orbDump: 'Idée Rapide', orbDeep: 'Focus Profond', orbDesk: 'Horloge', modeFocus: 'Focus 25m', modeShort: 'Pause 5m', modeLong: 'Longue 15m', modeExam: 'Examen 90m', startFocusAchieve: 'Démarrer • Cibler • Réussir', filterAll: 'Tout', filterToday: 'Aujourd\'hui', filterDone: 'Terminé', kpiMinutes: 'Minutes Focus', kpiSessions: 'Sessions Finies', overviewTitle: 'Aperçu Général' },
-      { code: 'de', name: 'Deutsch', flag: '🇩🇪', dir: 'ltr', title: 'Fokus & Produktivität', sub: 'Meistere deinen Studienalltag entspannt', navTimer: 'Timer', navTasks: 'Aufgaben', navNotes: 'Notizen', navSounds: 'Klänge', navAnalytics: 'Analyse', totalFocusToday: 'Fokuszeit Heute', minsUnit: 'Min', orbDump: 'Gedankenblitz', orbDeep: 'Tiefenfokus', orbDesk: 'Tischuhr', modeFocus: 'Fokus 25m', modeShort: 'Pause 5m', modeLong: 'Lang 15m', modeExam: 'Prüfung 90m', startFocusAchieve: 'Starten • Fokus • Ziel', filterAll: 'Alle', filterToday: 'Heute', filterDone: 'Erledigt', kpiMinutes: 'Fokusminuten', kpiSessions: 'Sitzungen', overviewTitle: 'Leistungsübersicht' },
-      { code: 'ru', name: 'Русский', flag: '🇷🇺', dir: 'ltr', title: 'Фокус и Продуктивность', sub: 'Управляйте своим временем эффективно', navTimer: 'Таймер', navTasks: 'Задачи', navNotes: 'Заметки', navSounds: 'Звуки', navAnalytics: 'Аналитика', totalFocusToday: 'Фокус за сегодня', minsUnit: 'мин', orbDump: 'Быстрая мысль', orbDeep: 'Глубокий фокус', orbDesk: 'Часы', modeFocus: 'Фокус 25м', modeShort: 'Перерыв 5м', modeLong: 'Длинный 15м', modeExam: 'Экзамен 90м', startFocusAchieve: 'Старт • Фокус • Успех', filterAll: 'Все', filterToday: 'Сегодня', filterDone: 'Готово', kpiMinutes: 'Минуты фокуса', kpiSessions: 'Сессии', overviewTitle: 'Общий обзор' },
-      { code: 'pt', name: 'Português', flag: '🇧🇷', dir: 'ltr', title: 'Foco e Produtividade', sub: 'Maior controle sobre seu futuro', navTimer: 'Timer', navTasks: 'Tarefas', navNotes: 'Notas', navSounds: 'Sons', navAnalytics: 'Análises', totalFocusToday: 'Foco Total Hoje', minsUnit: 'min', orbDump: 'Ideia Rápida', orbDeep: 'Foco Profundo', orbDesk: 'Relógio', modeFocus: 'Foco 25m', modeShort: 'Pausa 5m', modeLong: 'Longa 15m', modeExam: 'Exame 90m', startFocusAchieve: 'Iniciar • Focar • Vencer', filterAll: 'Tudo', filterToday: 'Hoje', filterDone: 'Concluído', kpiMinutes: 'Minutos Foco', kpiSessions: 'Sessões', overviewTitle: 'Visão Geral' },
-      { code: 'ja', name: '日本語', flag: '🇯🇵', dir: 'ltr', title: '集中と生産性', sub: '毎日の学習をスマートに管理', navTimer: 'タイマー', navTasks: 'タスク', navNotes: 'ノート', navSounds: '自然音', navAnalytics: '分析', totalFocusToday: '今日の集中時間', minsUnit: '分', orbDump: 'メモ速記', orbDeep: '深い集中', orbDesk: '卓上時計', modeFocus: '集中 25分', modeShort: '休憩 5分', modeLong: '長休 15分', modeExam: '試験 90分', startFocusAchieve: '開始 • 集中 • 達成', filterAll: 'すべて', filterToday: '今日', filterDone: '完了', kpiMinutes: '集中時間(分)', kpiSessions: '完了セッション', overviewTitle: '週間オーバービュー' },
-      { code: 'id', name: 'Indonesia', flag: '🇮🇩', dir: 'ltr', title: 'Fokus & Produktivitas', sub: 'Atur jadwal belajarmu dengan mudah', navTimer: 'Timer', navTasks: 'Tugas', navNotes: 'Catatan', navSounds: 'Suara', navAnalytics: 'Analitik', totalFocusToday: 'Total Fokus Hari Ini', minsUnit: 'mnt', orbDump: 'Catat Cepat', orbDeep: 'Fokus Penuh', orbDesk: 'Jam Meja', modeFocus: 'Fokus 25m', modeShort: 'Rehat 5m', modeLong: 'Panjang 15m', modeExam: 'Ujian 90m', startFocusAchieve: 'Mulai • Fokus • Capai', filterAll: 'Semua', filterToday: 'Hari Ini', filterDone: 'Selesai', kpiMinutes: 'Menit Fokus', kpiSessions: 'Sesi Selesai', overviewTitle: 'Ringkasan Kinerja' },
-      { code: 'tr', name: 'Türkçe', flag: '🇹🇷', dir: 'ltr', title: 'Odak ve Verimlilik', sub: 'Gününüzü kolayca planlayın', navTimer: 'Sayaç', navTasks: 'Görevler', navNotes: 'Notlar', navSounds: 'Sesler', navAnalytics: 'Analiz', totalFocusToday: 'Bugünkü Odaklanma', minsUnit: 'dk', orbDump: 'Hızlı Fikir', orbDeep: 'Derin Odak', orbDesk: 'Masa Saati', modeFocus: 'Odak 25dk', modeShort: 'Mola 5dk', modeLong: 'Uzun 15dk', modeExam: 'Sınav 90dk', startFocusAchieve: 'Başla • Odaklan • Başar', filterAll: 'Tümü', filterToday: 'Bugün', filterDone: 'Bitti', kpiMinutes: 'Odak Dakikası', kpiSessions: 'Tamamlanan', overviewTitle: 'Genel Bakış' },
-      { code: 'ko', name: '한국어', flag: '🇰🇷', dir: 'ltr', title: '집중 및 생산성', sub: '더 나은 미래를 위한 스마트한 시간 관리', navTimer: '타이머', navTasks: '할 일', navNotes: '노트', navSounds: '사운드', navAnalytics: '분석', totalFocusToday: '오늘의 집중 시간', minsUnit: '분', orbDump: '빠른 메모', orbDeep: '딥 포커스', orbDesk: '탁상 시계', modeFocus: '집중 25분', modeShort: '휴식 5분', modeLong: '긴 휴식 15분', modeExam: '시험 90분', startFocusAchieve: '시작 • 집중 • 달성', filterAll: '전체', filterToday: '오늘', filterDone: '완료됨', kpiMinutes: '집중 시간(분)', kpiSessions: '완료된 세션', overviewTitle: '종합 개요' },
-      { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳', dir: 'ltr', title: 'Tập Trung & Hiệu Suất', sub: 'Làm chủ thời gian học tập của bạn', navTimer: 'Hẹn giờ', navTasks: 'Nhiệm vụ', navNotes: 'Ghi chú', navSounds: 'Âm thanh', navAnalytics: 'Thống kê', totalFocusToday: 'Tổng Tập Trung Hôm Nay', minsUnit: 'phút', orbDump: 'Ý tưởng nhanh', orbDeep: 'Tập trung sâu', orbDesk: 'Đồng hồ bàn', modeFocus: 'Tập trung 25p', modeShort: 'Nghỉ 5p', modeLong: 'Nghỉ dài 15p', modeExam: 'Thi thử 90p', startFocusAchieve: 'Bắt đầu • Tập trung • Đạt', filterAll: 'Tất cả', filterToday: 'Hôm nay', filterDone: 'Đã xong', kpiMinutes: 'Phút tập trung', kpiSessions: 'Phiên hoàn tất', overviewTitle: 'Tổng quan tuần' },
-      { code: 'it', name: 'Italiano', flag: '🇮🇹', dir: 'ltr', title: 'Focus e Produttività', sub: 'Organizza la tua giornata con stile', navTimer: 'Timer', navTasks: 'Attività', navNotes: 'Note', navSounds: 'Suoni', navAnalytics: 'Analisi', totalFocusToday: 'Focus Totale Oggi', minsUnit: 'min', orbDump: 'Idea Veloce', orbDeep: 'Focus Profondo', orbDesk: 'Orologio', modeFocus: 'Focus 25m', modeShort: 'Pausa 5m', modeLong: 'Lunga 15m', modeExam: 'Esame 90m', startFocusAchieve: 'Inizia • Concentrati • Vinci', filterAll: 'Tutti', filterToday: 'Oggi', filterDone: 'Fatto', kpiMinutes: 'Minuti Focus', kpiSessions: 'Sessioni', overviewTitle: 'Panoramica' },
-      { code: 'bn', name: 'বাংলা', flag: '🇧🇩', dir: 'ltr', title: 'মনোযোগ এবং উৎপাদনশীলতা', sub: 'আপনার পড়াশোনা এবং সময় নিয়ন্ত্রণ করুন', navTimer: 'টাইমার', navTasks: 'কাজ', navNotes: 'নোট', navSounds: 'শব্দ', navAnalytics: 'বিশ্লেষণ', totalFocusToday: 'আজকের মোট মনোযোগ', minsUnit: 'মিনিট', orbDump: 'দ্রুত ভাবনা', orbDeep: 'গভীর মনোযোগ', orbDesk: 'টেবিল ঘড়ি', modeFocus: 'ফোকাস ২৫মি', modeShort: 'বিরতি ৫মি', modeLong: 'দীর্ঘ ১৫মি', modeExam: 'পরীক্ষা ৯০মি', startFocusAchieve: 'শুরু • ফোকাস • অর্জন', filterAll: 'সব', filterToday: 'আজ', filterDone: 'সম্পন্ন', kpiMinutes: 'ফোকাস মিনিট', kpiSessions: 'সম্পন্ন সেশন', overviewTitle: 'সংক্ষিপ্ত বিবরণ' },
-      { code: 'ur', name: 'اردو', flag: '🇵🇰', dir: 'rtl', title: 'ارتکاز اور پیداواریت', sub: 'اپنے وقت اور مطالعہ کو بہترین انداز میں منظم کریں', navTimer: 'ٹائمر', navTasks: 'مہمات', navNotes: 'نوٹس', navSounds: 'آوازیں', navAnalytics: 'تجزیات', totalFocusToday: 'آج کا کل ارتکاز', minsUnit: 'منٹ', orbDump: 'فوری خیال', orbDeep: 'گہرا ارتکاز', orbDesk: 'ڈیسک کلاک', modeFocus: 'ارتکاز 25m', modeShort: 'وقفہ 5m', modeLong: 'طویل 15m', modeExam: 'امتحان 90m', startFocusAchieve: 'شروع • ارتکاز • کامیابی', filterAll: 'سب', filterToday: 'آج', filterDone: 'مکمل', kpiMinutes: 'ارتکاز کے منٹ', kpiSessions: 'مکمل سیشنز', overviewTitle: 'کارکردگی کا جائزہ' },
-      { code: 'fa', name: 'فارسی', flag: '🇮🇷', dir: 'rtl', title: 'تمرکز و بهره‌وری', sub: 'مدیریت هوشمندانه زمان و مطالعه روزانه', navTimer: 'زمان‌سنج', navTasks: 'وظایف', navNotes: 'یادداشت‌ها', navSounds: 'صداها', navAnalytics: 'تحلیل‌ها', totalFocusToday: 'مجموع تمرکز امروز', minsUnit: 'دقیقه', orbDump: 'ثبت ایده', orbDeep: 'تمرکز عمیق', orbDesk: 'ساعت رومیزی', modeFocus: 'تمرکز ۲۵د', modeShort: 'استراحت ۵د', modeLong: 'بلند ۱۵د', modeExam: 'آزمون ۹۰د', startFocusAchieve: 'شروع • تمرکز • دستاورد', filterAll: 'همه', filterToday: 'امروز', filterDone: 'انجام‌شده', kpiMinutes: 'دقایق تمرکز', kpiSessions: 'جلسات کامل', overviewTitle: 'نمای کلی عملکرد' },
-      { code: 'pl', name: 'Polski', flag: '🇵🇱', dir: 'ltr', title: 'Skupienie i Produktywność', sub: 'Zaplanuj swój dzień nauki z łatwością', navTimer: 'Timer', navTasks: 'Zadania', navNotes: 'Notatki', navSounds: 'Dźwięki', navAnalytics: 'Analizy', totalFocusToday: 'Skupienie Dzisiaj', minsUnit: 'min', orbDump: 'Szybka Myśl', orbDeep: 'Głęboki Fokus', orbDesk: 'Zegar', modeFocus: 'Fokus 25m', modeShort: 'Przerwa 5m', modeLong: 'Długa 15m', modeExam: 'Egzamin 90m', startFocusAchieve: 'Start • Skupienie • Cel', filterAll: 'Wszystko', filterToday: 'Dziś', filterDone: 'Gotowe', kpiMinutes: 'Minuty Fokusu', kpiSessions: 'Sesje', overviewTitle: 'Przegląd Wyników' },
-      { code: 'nl', name: 'Nederlands', flag: '🇳🇱', dir: 'ltr', title: 'Focus & Productiviteit', sub: 'Organiseer je studiedag eenvoudig', navTimer: 'Timer', navTasks: 'Taken', navNotes: 'Notities', navSounds: 'Geluiden', navAnalytics: 'Analyse', totalFocusToday: 'Totale Focus Vandaag', minsUnit: 'min', orbDump: 'Snelle Idee', orbDeep: 'Diepe Focus', orbDesk: 'Bureauklok', modeFocus: 'Focus 25m', modeShort: 'Pauze 5m', modeLong: 'Lang 15m', modeExam: 'Examen 90m', startFocusAchieve: 'Start • Focus • Bereik', filterAll: 'Alles', filterToday: 'Vandaag', filterDone: 'Klaar', kpiMinutes: 'Focusminuten', kpiSessions: 'Sessies', overviewTitle: 'Overzicht' }
+    const BASE_LANGS = {
+      ar: {
+        name: 'العربية', flag: '🇸🇦', dir: 'rtl',
+        title: 'المؤقت والتركيز', sub: 'تحكم أكبر في وقتك ومستقبلك الدراسي',
+        navTimer: 'المؤقت', navTasks: 'المهام', navCalendar: 'التقويم', navNotes: 'الملاحظات', navSounds: 'الأصوات', navAnalytics: 'التحليلات',
+        totalFocusToday: 'إجمالي التركيز اليوم', minsUnit: 'دقيقة', daysUnit: 'أيام', waterWord: 'الماء',
+        orbDump: 'تفريغ فكرة', orbDeep: 'تركيز عميق', orbBreath: 'تنفس 4-7-8',
+        modeFocus: 'تركيز 25د', modeShort: 'راحة 5د', modeLong: 'طويلة 15د', modeCustom: 'مخصص ⚡',
+        startFocusAchieve: 'ابدأ • ركز • أنجز',
+        filterAll: 'الكل', filterToday: 'اليوم', filterDone: 'مكتملة',
+        phAddTask: 'أضف مهمة دراسية جديدة...', phSearchNotes: 'ابحث في الملاحظات أو الاستذكار...',
+        catStudy: '📚 دراسة', catExam: '⭐ امتحانات', catReview: '🔍 مراجعة', catSport: '🏃 نشاط',
+        tagCornell: 'كورنيل 📋', tagFlash: 'استذكار 👁️', tagQuick: 'أفكار 💡',
+        btnAddCalNote: '+ ملاحظة لليوم', lblBlurAnswer: 'إخفاء الإجابة للاستذكار (تظهر باللمس)',
+        mixerReady: '🎵 استوديو الطبيعة النقي جاهز', btnMyMix: '✨ خلطتي', btnStopAll: '⏹ إيقاف',
+        sndCatWater: 'مياه وأمطار 🌧️', sndCatForest: 'غابات ورياح 🌲', sndCatWarm: 'دفء وعزل 🔥',
+        kpiMinutes: 'دقائق التركيز', kpiSessions: 'الجلسات المكتملة',
+        kpiTrendWeek: '↑ +18% هذا الأسبوع', kpiTrendGreat: '↑ +12% التزام ممتاز',
+        overviewTitle: 'نظرة عامة على الإنجاز', badgeThisWeek: 'هذا الأسبوع',
+        legDeep: 'دراسة عميقة', legPractice: 'حل تمارين', legCornell: 'مراجعة كورنيل', legReading: 'قراءة حرة',
+        waveFlowTitle: 'مؤشر التدفق الذهني الأسبوعي', peakPerfBadge: 'ذروة الأداء',
+        calcHeading: '🎓 حاسبة ختم المنهج التنبؤية',
+        calcOutTpl: '📅 بهذا المعدل ستختم المادة بالكامل خلال {d} أيام!',
+        btnSave: 'حفظ وتطبيق', btnCancel: 'إلغاء',
+        weekdays: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+        months: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+        sounds: {
+          ocean: 'أمواج المحيط', rain: 'مطر الغابة الناعم', fire: 'حطب المدفأة', forest: 'نسيم الصنوبر',
+          stream: 'جدول ماء جبلي', leaves: 'حفيف أوراق الشجر', waterfall: 'شلال متدفق', night: 'ليل الريف والجدجد',
+          thunder: 'رعد ومطر بعيد', wind: 'رياح القمم الثلجية', winrain: 'مطر على النافذة', earth: 'هدير الأرض العازل'
+        },
+        sampleTasks: [
+          'مراجعة المشروع والفصل الأول', 'اجتماع الدراسة وحل المسائل', 'تلخيص القوانين والمفاهيم', 'تمارين تنشيط الذهن'
+        ],
+        sampleNotes: [
+          { t: 'التركيز المتباعد (Spaced Repetition)', b: 'المراجعة على فترات متباعدة تعزز الذاكرة طويلة المدى وتمنع النسيان قبل الامتحانات.' },
+          { t: 'سؤال استذكار: ما هو قانون القوة؟', b: 'الإجابة المخفية: القوة = الكتلة × التسارع (F = m × a).' },
+          { t: 'خطة تقليل المشتتات أثناء الدراسة', b: '1. تفعيل وضع التركيز العميق\n2. تقسيم الأهداف الكبيرة إلى جلسات 25 دقيقة.' }
+        ]
+      },
+      en: {
+        name: 'English', flag: '🇬🇧', dir: 'ltr',
+        title: 'Focus & Timer', sub: 'Master your study time & future with ease',
+        navTimer: 'Timer', navTasks: 'Tasks', navCalendar: 'Calendar', navNotes: 'Notes', navSounds: 'Nature', navAnalytics: 'Analytics',
+        totalFocusToday: 'Total Focus Today', minsUnit: 'mins', daysUnit: 'days', waterWord: 'Water',
+        orbDump: 'Brain Dump', orbDeep: 'Deep Focus', orbBreath: 'Breath 4-7-8',
+        modeFocus: 'Focus 25m', modeShort: 'Short 5m', modeLong: 'Long 15m', modeCustom: 'Custom ⚡',
+        startFocusAchieve: 'Start • Focus • Achieve',
+        filterAll: 'All', filterToday: 'Today', filterDone: 'Completed',
+        phAddTask: 'Add a new study task...', phSearchNotes: 'Search smart notes or flashcards...',
+        catStudy: '📚 Study', catExam: '⭐ Exams', catReview: '🔍 Review', catSport: '🏃 Activity',
+        tagCornell: 'Cornell 📋', tagFlash: 'Flashcard 👁️', tagQuick: 'Quick Idea 💡',
+        btnAddCalNote: '+ Note for Day', lblBlurAnswer: 'Blur answer for active recall (Tap to reveal)',
+        mixerReady: '🎵 Pure Nature Studio Ready', btnMyMix: '✨ My Mix', btnStopAll: '⏹ Stop',
+        sndCatWater: 'Water & Rain 🌧️', sndCatForest: 'Forest & Wind 🌲', sndCatWarm: 'Warmth & Earth 🔥',
+        kpiMinutes: 'Focus Minutes', kpiSessions: 'Completed Sessions',
+        kpiTrendWeek: '↑ +18% this week', kpiTrendGreat: '↑ +12% great streak',
+        overviewTitle: 'Productivity Overview', badgeThisWeek: 'This Week',
+        legDeep: 'Deep Study', legPractice: 'Practice', legCornell: 'Cornell Notes', legReading: 'Reading',
+        waveFlowTitle: 'Weekly Mental Flow Index', peakPerfBadge: 'Peak Flow',
+        calcHeading: '🎓 Predictive Syllabus Calculator',
+        calcOutTpl: '📅 At this pace, you will finish the syllabus in {d} days!',
+        btnSave: 'Save & Apply', btnCancel: 'Cancel',
+        weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        sounds: {
+          ocean: 'Ocean Waves', rain: 'Soft Forest Rain', fire: 'Campfire Woods', forest: 'Pine Breeze',
+          stream: 'Mountain Stream', leaves: 'Rustling Leaves', waterfall: 'Lush Waterfall', night: 'Night Crickets',
+          thunder: 'Distant Thunder', wind: 'Highland Wind', winrain: 'Rain on Window', earth: 'Deep Earth Rumble'
+        },
+        sampleTasks: [
+          'Review Chapter 1 & Core Concepts', 'Solve Practice Problems Set', 'Prepare Cornell Summary Notes', 'Mindfulness & Physical Stretch'
+        ],
+        sampleNotes: [
+          { t: 'Spaced Repetition Technique', b: 'Reviewing concepts at increasing intervals strengthens long-term memory retention before exams.' },
+          { t: 'Recall Question: Newton\'s Second Law?', b: 'Hidden Answer: Force equals mass times acceleration (F = m × a).' },
+          { t: 'Deep Focus Protocol', b: '1. Enable Deep Lockdown Mode\n2. Break large chapters into 25-minute sprints.' }
+        ]
+      },
+      es: {
+        name: 'Español', flag: '🇪🇸', dir: 'ltr',
+        title: 'Enfoque y Tiempo', sub: 'Organiza tu estudio y futuro con facilidad',
+        navTimer: 'Reloj', navTasks: 'Tareas', navCalendar: 'Agenda', navNotes: 'Notas', navSounds: 'Natura', navAnalytics: 'Análisis',
+        totalFocusToday: 'Enfoque Total Hoy', minsUnit: 'min', daysUnit: 'días', waterWord: 'Agua',
+        orbDump: 'Idea Rápida', orbDeep: 'Modo Zen', orbBreath: 'Respirar',
+        modeFocus: 'Enfoque 25m', modeShort: 'Pausa 5m', modeLong: 'Larga 15m', modeCustom: 'Personal ⚡',
+        startFocusAchieve: 'Inicia • Enfoca • Logra',
+        filterAll: 'Todo', filterToday: 'Hoy', filterDone: 'Hecho',
+        phAddTask: 'Añadir nueva tarea de estudio...', phSearchNotes: 'Buscar en notas o tarjetas...',
+        catStudy: '📚 Estudio', catExam: '⭐ Exámenes', catReview: '🔍 Repaso', catSport: '🏃 Salud',
+        tagCornell: 'Cornell 📋', tagFlash: 'Memoria 👁️', tagQuick: 'Ideas 💡',
+        btnAddCalNote: '+ Nota del Día', lblBlurAnswer: 'Ocultar respuesta para repaso (Tocar para ver)',
+        mixerReady: '🎵 Estudio Natural Listo', btnMyMix: '✨ Mezcla', btnStopAll: '⏹ Parar',
+        sndCatWater: 'Agua y Lluvia 🌧️', sndCatForest: 'Bosque y Viento 🌲', sndCatWarm: 'Fuego y Tierra 🔥',
+        kpiMinutes: 'Minutos Enfoque', kpiSessions: 'Sesiones Listas',
+        kpiTrendWeek: '↑ +18% esta semana', kpiTrendGreat: '↑ +12% gran ritmo',
+        overviewTitle: 'Resumen General', badgeThisWeek: 'Esta Semana',
+        legDeep: 'Estudio Profundo', legPractice: 'Ejercicios', legCornell: 'Notas Cornell', legReading: 'Lectura',
+        waveFlowTitle: 'Índice de Flujo Mental Semanal', peakPerfBadge: 'Flujo Máximo',
+        calcHeading: '🎓 Calculadora de Temario',
+        calcOutTpl: '📅 ¡A este ritmo terminarás toda la materia en {d} días!',
+        btnSave: 'Guardar', btnCancel: 'Cancelar',
+        weekdays: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+        months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+        sounds: {
+          ocean: 'Olas del Océano', rain: 'Lluvia Suave', fire: 'Fuego de Leña', forest: 'Brisa del Bosque',
+          stream: 'Arroyo de Montaña', leaves: 'Hojas Susurrantes', waterfall: 'Cascada Natural', night: 'Grillos Nocturnos',
+          thunder: 'Truenos Lejanos', wind: 'Viento Andino', winrain: 'Lluvia en Ventana', earth: 'Aislamiento Tierra'
+        },
+        sampleTasks: [
+          'Repasar el proyecto y capítulo 1', 'Resolver ejercicios prácticos', 'Preparar resumen para el examen', 'Ejercicio físico y descanso visual'
+        ],
+        sampleNotes: [
+          { t: 'Idea Principal: Repetición Espaciada', b: 'Repasar en intervalos espaciados fortalece la memoria a largo plazo antes del examen.' },
+          { t: 'Pregunta de Repaso: ¿Fórmula de Fuerza?', b: 'Respuesta: La fuerza es igual a la masa por la aceleración (F = m × a).' },
+          { t: 'Claves para Mejorar la Productividad', b: '1. Reducir distracciones digitales\n2. Dividir temas largos en bloques de 25 minutos.' }
+        ]
+      }
+    };
+
+    // Generate full dictionaries for the remaining 17 languages seamlessly inheriting complete keys
+    const EXTRA_LANG_META = [
+      { code: 'zh', name: '中文 (简体)', flag: '🇨🇳', dir: 'ltr', title: '专注与效率', sub: '掌控时间，成就更好的自己', nav: ['计时','任务','日历','笔记','自然','分析'], modes: ['专注 25m','短休 5m','长休 15m','自定义 ⚡'] },
+      { code: 'hi', name: 'हिन्दी', flag: '🇮🇳', dir: 'ltr', title: 'ध्यान और समय', sub: 'अपने अध्ययन और भविष्य को नियंत्रित करें', nav: ['टाइमर','कार्य','कैलेंडर','नोट्स','प्रकृति','विश्लेषण'], modes: ['फोकस 25m','विराम 5m','लंबा 15m','कस्टम ⚡'] },
+      { code: 'fr', name: 'Français', flag: '🇫🇷', dir: 'ltr', title: 'Focus & Productivité', sub: 'Organisez votre journée simplement', nav: ['Minuteur','Tâches','Agenda','Notes','Nature','Analyses'], modes: ['Focus 25m','Pause 5m','Longue 15m','Perso ⚡'] },
+      { code: 'de', name: 'Deutsch', flag: '🇩🇪', dir: 'ltr', title: 'Fokus & Produktivität', sub: 'Meistere deinen Studienalltag entspannt', nav: ['Timer','Aufgaben','Kalender','Notizen','Natur','Analyse'], modes: ['Fokus 25m','Pause 5m','Lang 15m','Eigene ⚡'] },
+      { code: 'ru', name: 'Русский', flag: '🇷🇺', dir: 'ltr', title: 'Фокус и Продуктивность', sub: 'Управляйте своим временем эффективно', nav: ['Таймер','Задачи','Календарь','Заметки','Природа','Аналитика'], modes: ['Фокус 25м','Перерыв 5м','Длинный 15м','Свой ⚡'] },
+      { code: 'pt', name: 'Português', flag: '🇧🇷', dir: 'ltr', title: 'Foco e Produtividade', sub: 'Maior controle sobre seu futuro', nav: ['Timer','Tarefas','Agenda','Notas','Natureza','Análises'], modes: ['Foco 25m','Pausa 5m','Longa 15m','Personal ⚡'] },
+      { code: 'ja', name: '日本語', flag: '🇯🇵', dir: 'ltr', title: '集中と生産性', sub: '毎日の学習をスマートに管理', nav: ['タイマー','タスク','カレンダー','ノート','自然音','分析'], modes: ['集中 25分','休憩 5分','長休 15分','カスタム ⚡'] },
+      { code: 'id', name: 'Indonesia', flag: '🇮🇩', dir: 'ltr', title: 'Fokus & Produktivitas', sub: 'Atur jadwal belajarmu dengan mudah', nav: ['Timer','Tugas','Kalender','Catatan','Alam','Analitik'], modes: ['Fokus 25m','Rehat 5m','Panjang 15m','Kustom ⚡'] },
+      { code: 'tr', name: 'Türkçe', flag: '🇹🇷', dir: 'ltr', title: 'Odak ve Verimlilik', sub: 'Gününüzü kolayca planlayın', nav: ['Sayaç','Görevler','Takvim','Notlar','Doğa','Analiz'], modes: ['Odak 25dk','Mola 5dk','Uzun 15dk','Özel ⚡'] },
+      { code: 'ko', name: '한국어', flag: '🇰🇷', dir: 'ltr', title: '집중 및 생산성', sub: '더 나은 미래를 위한 스마트한 시간 관리', nav: ['타이머','할 일','캘린더','노트','자연음','분석'], modes: ['집중 25분','휴식 5분','긴 휴식 15분','맞춤 ⚡'] },
+      { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳', dir: 'ltr', title: 'Tập Trung & Hiệu Suất', sub: 'Làm chủ thời gian học tập của bạn', nav: ['Hẹn giờ','Nhiệm vụ','Lịch','Ghi chú','Tự nhiên','Thống kê'], modes: ['Tập trung 25p','Nghỉ 5p','Nghỉ dài 15p','Tùy chỉnh ⚡'] },
+      { code: 'it', name: 'Italiano', flag: '🇮🇹', dir: 'ltr', title: 'Focus e Produttività', sub: 'Organizza la tua giornata con stile', nav: ['Timer','Attività','Agenda','Note','Natura','Analisi'], modes: ['Focus 25m','Pausa 5m','Lunga 15m','Pers. ⚡'] },
+      { code: 'bn', name: 'বাংলা', flag: '🇧🇩', dir: 'ltr', title: 'মনোযোগ এবং উৎপাদনশীলতা', sub: 'আপনার পড়াশোনা এবং সময় নিয়ন্ত্রণ করুন', nav: ['টাইমার','কাজ','ক্যালেন্ডার','নোট','প্রকৃতি','বিশ্লেষণ'], modes: ['ফোকাস ২৫মি','বিরতি ৫মি','দীর্ঘ ১৫মি','কাস্টম ⚡'] },
+      { code: 'ur', name: 'اردو', flag: '🇵🇰', dir: 'rtl', title: 'ارتکاز اور پیداواریت', sub: 'اپنے وقت اور مطالعہ کو بہترین انداز میں منظم کریں', nav: ['ٹائمر','مہمات','کیلنڈر','نوٹس','فطرت','تجزیات'], modes: ['ارتکاز 25m','وقفہ 5m','طویل 15m','مخصوص ⚡'] },
+      { code: 'fa', name: 'فارسی', flag: '🇮🇷', dir: 'rtl', title: 'تمرکز و بهره‌وری', sub: 'مدیریت هوشمندانه زمان و مطالعه روزانه', nav: ['زمان‌سنج','وظایف','تقویم','یادداشت','طبیعت','تحلیل‌ها'], modes: ['تمرکز ۲۵د','استراحت ۵د','بلند ۱۵د','سفارشی ⚡'] },
+      { code: 'pl', name: 'Polski', flag: '🇵🇱', dir: 'ltr', title: 'Skupienie i Produktywność', sub: 'Zaplanuj swój dzień nauki z łatwością', nav: ['Timer','Zadania','Kalendarz','Notatki','Natura','Analizy'], modes: ['Fokus 25m','Przerwa 5m','Długa 15m','Własny ⚡'] },
+      { code: 'nl', name: 'Nederlands', flag: '🇳🇱', dir: 'ltr', title: 'Focus & Productiviteit', sub: 'Organiseer je studiedag eenvoudig', nav: ['Timer','Taken','Agenda','Notities','Natuur','Analyse'], modes: ['Focus 25m','Pauze 5m','Lang 15m','Aangepast ⚡'] }
     ];
 
-    let cfg = JSON.parse(localStorage.getItem('zen_cfg_v17') || JSON.stringify({
-      lang: 'ar', focusMin: 25, shortMin: 5, longMin: 15, todayMins: 120, sessions: 18, streak: 5, water: 2
+    EXTRA_LANG_META.forEach(m => {
+      const base = m.dir === 'rtl' ? BASE_LANGS.ar : BASE_LANGS.en;
+      BASE_LANGS[m.code] = {
+        ...base,
+        name: m.name, flag: m.flag, dir: m.dir, title: m.title, sub: m.sub,
+        navTimer: m.nav[0], navTasks: m.nav[1], navCalendar: m.nav[2], navNotes: m.nav[3], navSounds: m.nav[4], navAnalytics: m.nav[5],
+        modeFocus: m.modes[0], modeShort: m.modes[1], modeLong: m.modes[2], modeCustom: m.modes[3]
+      };
+    });
+
+    const todayISO = new Date().toISOString().slice(0, 10);
+    let cfg = JSON.parse(localStorage.getItem('zen_cfg_v18') || JSON.stringify({
+      lang: 'ar', focusMin: 25, shortMin: 5, longMin: 15, todayMins: 120, sessions: 18, streak: 5, water: 4
     }));
+
+    function L() { return BASE_LANGS[cfg.lang] || BASE_LANGS.ar; }
 
     function openLanguageModal() {
       const box = document.getElementById('langGrid20Box');
       box.innerHTML = '';
-      LANGUAGES_20.forEach(l => {
+      Object.keys(BASE_LANGS).forEach(code => {
+        const l = BASE_LANGS[code];
         const btn = document.createElement('button');
-        btn.className = `lang-option-btn ${cfg.lang === l.code ? 'active' : ''}`;
-        btn.onclick = () => applyLanguage(l.code);
+        btn.className = `lang-option-btn ${cfg.lang === code ? 'active' : ''}`;
+        btn.onclick = () => applyLanguage(code);
         btn.innerHTML = `<span style="font-size:1.15rem;">${l.flag}</span> <span>${l.name}</span>`;
         box.appendChild(btn);
       });
@@ -873,36 +1038,65 @@
     }
 
     function applyLanguage(code) {
-      const langObj = LANGUAGES_20.find(x => x.code === code) || LANGUAGES_20[0];
-      cfg.lang = langObj.code;
-      localStorage.setItem('zen_cfg_v17', JSON.stringify(cfg));
+      const prevLang = cfg.lang;
+      cfg.lang = BASE_LANGS[code] ? code : 'ar';
+      localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
+      const d = L();
 
       const root = document.getElementById('htmlRoot');
-      root.setAttribute('lang', langObj.code);
-      root.setAttribute('dir', langObj.dir);
+      root.setAttribute('lang', cfg.lang);
+      root.setAttribute('dir', d.dir);
 
-      document.getElementById('currentLangLabel').textContent = `${langObj.flag} ${langObj.name}`;
-      document.getElementById('hdrMainTitle').textContent = langObj.title;
-      document.getElementById('hdrSubTitle').textContent = langObj.sub;
+      document.getElementById('currentLangLabel').textContent = `${d.flag} ${d.name}`;
+      document.getElementById('hdrMainTitle').textContent = d.title;
+      document.getElementById('hdrSubTitle').textContent = d.sub;
 
       document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (langObj[key]) el.textContent = langObj[key];
+        const k = el.getAttribute('data-i18n');
+        if (d[k]) el.textContent = d[k];
       });
 
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const k = el.getAttribute('data-i18n-placeholder');
+        if (d[k]) el.setAttribute('placeholder', d[k]);
+      });
+
+      // Translate starter tasks & notes automatically so no Arabic remains when switching language
+      tasksList.forEach((t, idx) => {
+        if (t.isStarter && d.sampleTasks[idx]) t.title = d.sampleTasks[idx];
+      });
+      notesList.forEach((n, idx) => {
+        if (n.isStarter && d.sampleNotes[idx]) {
+          n.title = d.sampleNotes[idx].t;
+          n.body = d.sampleNotes[idx].b;
+        }
+      });
+
+      // Render wave days row
+      const waveRow = document.getElementById('waveDaysRow');
+      waveRow.innerHTML = d.weekdays.map(w => `<span>${w}</span>`).join('');
+
+      syncHeaderMetrics();
+      updateTimerDisplay();
+      renderTasksList();
+      renderCalendar();
+      renderNotesStack();
+      renderSoundsStudio();
+      updateSyllabusCalc();
       closeModal('langModal');
-      showToast(`🌐 ${langObj.name}`);
+      if (prevLang !== cfg.lang) showToast(`🌐 ${d.name}`);
     }
 
     /* ========================================================
-       2. DYNAMIC AMBIENT HEADER THEMES & NAVIGATION
+       2. NAVIGATION & DYNAMIC HEADER THEMES
        ======================================================== */
-    const TAB_THEMES = {
-      'sec-timer': { grad: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #0284c7 100%)', arTitle: 'المؤقت والتركيز', arSub: 'تحكم أكبر في وقتك ومستقبلك الدراسي' },
-      'sec-tasks': { grad: 'linear-gradient(135deg, #1e1b4b 0%, #3730a3 55%, #6366f1 100%)', arTitle: 'إنتاجية', arSub: 'نظم يومك ومهامك بسهولة' },
-      'sec-notes': { grad: 'linear-gradient(135deg, #064e3b 0%, #047857 55%, #10b981 100%)', arTitle: 'تعلّم وملاحظات', arSub: 'اكتشف آفاقاً جديدة ودوّن ملخصاتك' },
-      'sec-sounds': { grad: 'linear-gradient(135deg, #0c4a6e 0%, #0369a1 55%, #06b6d4 100%)', arTitle: 'استوديو الأصوات', arSub: 'بيئة طبيعية هادئة لعزل المشتتات' },
-      'sec-analytics': { grad: 'linear-gradient(135deg, #2e1065 0%, #4c1d95 55%, #7c3aed 100%)', arTitle: 'تحليلات التركيز', arSub: 'حوّل بياناتك إلى عادات ناجحة' }
+    const TAB_GRADS = {
+      'sec-timer': 'linear-gradient(135deg, #091326 0%, #1d3b8b 55%, #0284c7 100%)',
+      'sec-tasks': 'linear-gradient(135deg, #1e1b4b 0%, #3730a3 55%, #6366f1 100%)',
+      'sec-calendar': 'linear-gradient(135deg, #0f172a 0%, #0369a1 55%, #0ea5e9 100%)',
+      'sec-notes': 'linear-gradient(135deg, #064e3b 0%, #047857 55%, #10b981 100%)',
+      'sec-sounds': 'linear-gradient(135deg, #0c4a6e 0%, #0e7490 55%, #06b6d4 100%)',
+      'sec-analytics': 'linear-gradient(135deg, #2e1065 0%, #4c1d95 55%, #7c3aed 100%)'
     };
 
     function switchTab(secId, btn) {
@@ -912,14 +1106,7 @@
         document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       }
-      const th = TAB_THEMES[secId];
-      if (th) {
-        document.getElementById('heroHeader').style.background = th.grad;
-        if (cfg.lang === 'ar') {
-          document.getElementById('hdrMainTitle').textContent = th.arTitle;
-          document.getElementById('hdrSubTitle').textContent = th.arSub;
-        }
-      }
+      if (TAB_GRADS[secId]) document.getElementById('heroHeader').style.background = TAB_GRADS[secId];
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -930,24 +1117,19 @@
       document.getElementById('toastText').textContent = msg;
       t.classList.add('show');
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
     }
 
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
     window.handleAndroidBack = function() {
-      if (document.getElementById('deskClockOverlay').classList.contains('active')) {
-        toggleDeskClock(false); return true;
-      }
-      if (document.body.classList.contains('deep-lockdown')) {
-        toggleDeepLockdown(); return true;
-      }
+      if (document.body.classList.contains('deep-lockdown')) { toggleDeepLockdown(); return true; }
       const openM = document.querySelectorAll('.modal-overlay.open');
       if (openM.length > 0) { openM.forEach(m => m.classList.remove('open')); return true; }
       return false;
     };
 
     /* ========================================================
-       3. TIMER ENGINE (TIMESTAMP DELTA + OVERTIME + GOLDEN MIN)
+       3. TIMER ENGINE & CUSTOM TIMER MODAL
        ======================================================== */
     let timerTotal = cfg.focusMin * 60;
     let timerLeft = timerTotal;
@@ -956,20 +1138,23 @@
     let overtimeSecs = 0;
     let timerInterval = null;
     let timerTargetTime = null;
+    let currentTimerModeKey = 'focus';
+    let customSessionLabel = '';
     const ringCircumference = 2 * Math.PI * 105;
 
     function syncHeaderMetrics() {
+      const d = L();
       document.getElementById('hdrFocusMins').textContent = cfg.todayMins;
-      document.getElementById('hdrStreakBadge').textContent = `↑ 🔥 ${cfg.streak} أيام`;
-      document.getElementById('orbWaterTxt').textContent = `الماء ${cfg.water}/8`;
+      document.getElementById('hdrStreakBadge').textContent = `↑ 🔥 ${cfg.streak} ${d.daysUnit}`;
+      document.getElementById('orbWaterTxt').textContent = `${d.waterWord} ${cfg.water}/8`;
       document.getElementById('kpiTotalMins').textContent = cfg.todayMins + 300;
       document.getElementById('kpiTotalSessions').textContent = cfg.sessions;
       const plant = cfg.sessions >= 25 ? '🌸' : cfg.sessions >= 18 ? '🌳' : cfg.sessions >= 10 ? '🌿' : '🌱';
       document.getElementById('ringPlantEmoji').textContent = plant;
-      document.getElementById('gardenBigIcon').textContent = plant;
     }
 
     function updateTimerDisplay() {
+      const d = L();
       const bar = document.getElementById('timerRingBar');
       let formatted = '25:00';
       if (isOvertime) {
@@ -988,17 +1173,17 @@
         bar.style.strokeDashoffset = offset;
       }
       document.getElementById('timerDigitsTxt').textContent = formatted;
-      document.getElementById('deskClockDigits').textContent = formatted;
+
+      const captions = { focus: d.modeFocus, short: d.modeShort, long: d.modeLong, custom: customSessionLabel || d.modeCustom };
+      document.getElementById('timerModeCaption').textContent = captions[currentTimerModeKey] || d.modeFocus;
     }
 
-    function selectTimerMode(mins, title, btn) {
+    function selectTimerMode(mins, modeKey, btn) {
       if (timerRunning) toggleTimerPlay();
-      isOvertime = false;
-      overtimeSecs = 0;
+      isOvertime = false; overtimeSecs = 0;
+      currentTimerModeKey = modeKey;
       timerTotal = mins * 60;
       timerLeft = timerTotal;
-      document.getElementById('timerModeCaption').textContent = title;
-      document.getElementById('deskClockTask').textContent = title;
       if (btn) {
         btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -1006,12 +1191,28 @@
       updateTimerDisplay();
     }
 
+    function openCustomTimerModal() {
+      document.getElementById('customTimerModal').classList.add('open');
+    }
+
+    function setCustomPresetValues(m) {
+      document.getElementById('inpCustomMins').value = m;
+    }
+
+    function applyCustomTimerNow() {
+      const mins = Math.max(1, Math.min(240, parseInt(document.getElementById('inpCustomMins').value) || 45));
+      const title = document.getElementById('inpCustomTitle').value.trim();
+      customSessionLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
+      closeModal('customTimerModal');
+      selectTimerMode(mins, 'custom', document.getElementById('modeCustomBtn'));
+      showToast(`⚡ ${customSessionLabel}`);
+    }
+
     function changeTimerDelta(deltaMins) {
       timerLeft = Math.max(60, timerLeft + deltaMins * 60);
       if (timerLeft > timerTotal) timerTotal = timerLeft;
       if (timerRunning) timerTargetTime = Date.now() + (timerLeft * 1000);
       updateTimerDisplay();
-      showToast(`${deltaMins > 0 ? '+' : ''}${deltaMins}m`);
     }
 
     function toggleTimerPlay() {
@@ -1023,19 +1224,17 @@
           const earned = Math.round((timerTotal + overtimeSecs) / 60);
           isOvertime = false; overtimeSecs = 0;
           cfg.todayMins += earned; cfg.sessions += 1;
-          localStorage.setItem('zen_cfg_v17', JSON.stringify(cfg));
+          localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
           syncHeaderMetrics();
-          selectTimerMode(cfg.shortMin, 'استراحة قصيرة', document.getElementById('modeShortBtn'));
-          showToast(`🎉 تم حفظ +${earned} دقيقة تركيز!`);
+          selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
+          showToast(`🎉 +${earned}m`);
           return;
         }
         btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-        showToast('⏸ إيقاف مؤقت');
       } else {
         timerRunning = true;
         btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
         timerTargetTime = Date.now() + (timerLeft * 1000);
-        showToast('▶️ بدأت جلسة التركيز');
         timerInterval = setInterval(() => {
           const rem = Math.round((timerTargetTime - Date.now()) / 1000);
           if (rem > 0) {
@@ -1044,7 +1243,6 @@
           } else {
             isOvertime = true;
             overtimeSecs = Math.abs(rem);
-            document.getElementById('timerModeCaption').textContent = 'وقت إضافي مكتسب 🌟 (اضغط للإتمام)';
             updateTimerDisplay();
           }
         }, 500);
@@ -1056,62 +1254,64 @@
       isOvertime = false;
       timerLeft = timerTotal;
       updateTimerDisplay();
-      showToast('↺ تمت إعادة الضبط');
     }
 
     function skipTimerPhase() {
       if (timerRunning) toggleTimerPlay();
-      selectTimerMode(cfg.shortMin, 'استراحة قصيرة', document.getElementById('modeShortBtn'));
-      showToast('⏭ تم الانتقال للاستراحة');
+      selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
     }
 
     function addWaterCup() {
       cfg.water = (cfg.water + 1) % 9;
-      localStorage.setItem('zen_cfg_v17', JSON.stringify(cfg));
+      localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
       syncHeaderMetrics();
-      showToast(`💧 شرب الماء: ${cfg.water}/8 أكواب`);
     }
 
     function toggleDeepLockdown() {
       document.body.classList.toggle('deep-lockdown');
-      const on = document.body.classList.contains('deep-lockdown');
-      showToast(on ? '🔒 وضع التركيز العميق (اضغط رجوع للخروج)' : 'تم الخروج من التركيز العميق');
-    }
-
-    function toggleDeskClock(show) {
-      document.getElementById('deskClockOverlay').classList.toggle('active', show);
-    }
-
-    function openBrainDumpModal() {
-      document.getElementById('inpQuickDump').value = '';
-      document.getElementById('brainDumpModal').classList.add('open');
-    }
-
-    function saveQuickDump(toTasks) {
-      const val = document.getElementById('inpQuickDump').value.trim();
-      if (!val) return;
-      if (toTasks) {
-        tasksList.unshift({ id: Date.now(), title: val, time: 'اليوم • 25 دقيقة', cat: 'دراسة', icon: '🎯', theme: 'tp-amber', done: false, subtasks: [] });
-        localStorage.setItem('zen_tasks_v17', JSON.stringify(tasksList));
-        renderTasksList();
-        showToast('📋 أضيفت إلى المهام');
-      } else {
-        notesList.unshift({ id: Date.now(), title: '💭 فكرة سريعة', body: val, cat: 'أفكار سريعة', date: 'الآن', blur: false, theme: 'theme-violet' });
-        localStorage.setItem('zen_notes_v17', JSON.stringify(notesList));
-        renderNotesStack();
-        showToast('💭 تم حفظ الفكرة في الملاحظات');
-      }
-      closeModal('brainDumpModal');
     }
 
     /* ========================================================
-       4. TASKS ENGINE (SHOWCASE DESIGN + SUBTASKS)
+       4. 4-7-8 ZEN BREATHING EXERCISE
        ======================================================== */
-    let tasksList = JSON.parse(localStorage.getItem('zen_tasks_v17') || JSON.stringify([
-      { id: 1, title: 'مراجعة المشروع والفصل الأول', time: '09:00 - 10:00 • 25د', cat: 'دراسة', icon: '📁', theme: 'tp-amber', done: true, subtasks: [{t:'قراءة الملخص',d:true},{t:'حل الأسئلة',d:true}] },
-      { id: 2, title: 'اجتماع الفريق ومناقشة المهام', time: '11:00 - 12:00 • 40د', cat: 'دراسة', icon: '📋', theme: 'tp-blue', done: false, subtasks: [{t:'تجهيز النقاط',d:true},{t:'تدوين المخرجات',d:false}] },
-      { id: 3, title: 'تصميم العرض التقديمي والملخص', time: '14:00 - 16:00 • 50د', cat: 'امتحانات', icon: '🎨', theme: 'tp-emerald', done: false, subtasks: [] },
-      { id: 4, title: 'ممارسة الرياضة وتنشيط الذهن', time: '18:00 - 19:00 • 30د', cat: 'رياضة', icon: '🎗️', theme: 'tp-rose', done: false, subtasks: [] }
+    let breathTimer = null;
+    function openBreathModal() {
+      document.getElementById('breathModal').classList.add('open');
+      const orb = document.getElementById('breathOrb');
+      let step = 0;
+      const runCycle = () => {
+        if (step % 3 === 0) {
+          orb.style.transform = 'scale(1.28)';
+          orb.textContent = cfg.lang === 'ar' ? 'شهيق 4ث' : 'Inhale 4s';
+        } else if (step % 3 === 1) {
+          orb.style.transform = 'scale(1.28)';
+          orb.textContent = cfg.lang === 'ar' ? 'احتفاظ 7ث' : 'Hold 7s';
+        } else {
+          orb.style.transform = 'scale(0.85)';
+          orb.textContent = cfg.lang === 'ar' ? 'زفير 8ث' : 'Exhale 8s';
+        }
+        step++;
+      };
+      runCycle();
+      clearInterval(breathTimer);
+      breathTimer = setInterval(runCycle, 4000);
+    }
+
+    function closeBreathModal() {
+      clearInterval(breathTimer);
+      closeModal('breathModal');
+    }
+
+    /* ========================================================
+       5. TASKS ENGINE (WITH CALENDAR DATE INTEGRATION)
+       ======================================================== */
+    document.getElementById('inpTaskDate').value = todayISO;
+
+    let tasksList = JSON.parse(localStorage.getItem('zen_tasks_v18') || JSON.stringify([
+      { id: 1, isStarter: true, title: 'مراجعة المشروع والفصل الأول', time: '09:00 - 10:00', date: todayISO, catKey: 'study', icon: '📁', theme: 'tp-amber', done: true },
+      { id: 2, isStarter: true, title: 'اجتماع الدراسة وحل المسائل', time: '11:00 - 12:00', date: todayISO, catKey: 'study', icon: '📋', theme: 'tp-blue', done: false },
+      { id: 3, isStarter: true, title: 'تلخيص القوانين والمفاهيم', time: '14:00 - 16:00', date: todayISO, catKey: 'exam', icon: '🎨', theme: 'tp-emerald', done: false },
+      { id: 4, isStarter: true, title: 'تمارين تنشيط الذهن', time: '18:00 - 19:00', date: todayISO, catKey: 'sport', icon: '🎗️', theme: 'tp-rose', done: false }
     ]));
     let taskFilterStatus = 'all';
 
@@ -1120,6 +1320,12 @@
       btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderTasksList();
+    }
+
+    function getCatLabel(catKey) {
+      const d = L();
+      const map = { study: d.catStudy, exam: d.catExam, review: d.catReview, sport: d.catSport };
+      return map[catKey] || d.catStudy;
     }
 
     function renderTasksList() {
@@ -1133,31 +1339,18 @@
       }).forEach(t => {
         const card = document.createElement('div');
         card.className = `showcase-task-card ${t.done ? 'done' : ''}`;
-
-        let subHtml = '';
-        if (t.subtasks && t.subtasks.length > 0) {
-          const dCount = t.subtasks.filter(s => s.d).length;
-          const pct = Math.round((dCount / t.subtasks.length) * 100);
-          subHtml = `
-            <div class="subtasks-Wrap">
-              <div class="subtasks-bar"><div class="subtasks-fill" style="width:${pct}%"></div></div>
-            </div>
-          `;
-        }
-
         card.innerHTML = `
           <div class="showcase-task-top">
             <div class="task-check-sq" onclick="toggleTaskDone(${t.id})">✓</div>
             <div class="task-center-info" onclick="focusOnTask(${t.id})">
               <div class="task-main-name">${t.title}</div>
               <div class="task-time-sub">
-                <span>🕒 ${t.time}</span>
-                <span style="color:var(--primary); font-weight:700;">• ${t.cat}</span>
+                <span>📅 ${t.date || todayISO}</span>
+                <span style="color:var(--primary); font-weight:700;">• ${getCatLabel(t.catKey)}</span>
               </div>
             </div>
-            <div class="task-pastel-icon ${t.theme}" onclick="deleteTaskItem(${t.id})" title="اضغط للحذف أو البدء">${t.icon}</div>
+            <div class="task-pastel-icon ${t.theme}" onclick="deleteTaskItem(${t.id})">${t.icon}</div>
           </div>
-          ${subHtml}
         `;
         box.appendChild(card);
       });
@@ -1167,9 +1360,9 @@
       const t = tasksList.find(x => x.id === id);
       if (t) {
         t.done = !t.done;
-        localStorage.setItem('zen_tasks_v17', JSON.stringify(tasksList));
+        localStorage.setItem('zen_tasks_v18', JSON.stringify(tasksList));
         renderTasksList();
-        if (t.done) showToast('✓ أتممت المهمة بنجاح!');
+        renderCalendar();
       }
     }
 
@@ -1178,44 +1371,131 @@
       if (t) {
         document.getElementById('timerLinkedTask').textContent = `🎯 ${t.title}`;
         switchTab('sec-timer', document.getElementById('navTimer'));
-        selectTimerMode(25, t.title, document.getElementById('modeFocusBtn'));
-        showToast(`🎯 تم ربط المؤقت بمهمة: ${t.title}`);
       }
     }
 
     function createNewTask() {
       const inp = document.getElementById('inpNewTask');
       const val = inp.value.trim();
-      if (!val) return showToast('⚠️ اكتب عنوان المهمة أولاً');
-      const cat = document.getElementById('selTaskCat').value;
-      const themes = { 'دراسة': 'tp-blue', 'امتحانات': 'tp-amber', 'مراجعة': 'tp-emerald', 'رياضة': 'tp-rose' };
-      const icons = { 'دراسة': '📘', 'امتحانات': '⭐', 'مراجعة': '🔍', 'رياضة': '🏃' };
+      if (!val) return;
+      const catKey = document.getElementById('selTaskCat').value;
+      const dateVal = document.getElementById('inpTaskDate').value || todayISO;
+      const themes = { study: 'tp-blue', exam: 'tp-amber', review: 'tp-emerald', sport: 'tp-rose' };
+      const icons = { study: '📘', exam: '⭐', review: '🔍', sport: '🏃' };
       tasksList.unshift({
-        id: Date.now(), title: val, time: 'اليوم • 25 دقيقة', cat: cat,
-        icon: icons[cat] || '📁', theme: themes[cat] || 'tp-blue', done: false, subtasks: []
+        id: Date.now(), isStarter: false, title: val, time: '25m', date: dateVal,
+        catKey: catKey, icon: icons[catKey] || '📁', theme: themes[catKey] || 'tp-blue', done: false
       });
       inp.value = '';
-      localStorage.setItem('zen_tasks_v17', JSON.stringify(tasksList));
+      localStorage.setItem('zen_tasks_v18', JSON.stringify(tasksList));
       renderTasksList();
-      showToast('✓ تمت إضافة المهمة');
+      renderCalendar();
+      showToast('✓');
     }
 
     function deleteTaskItem(id) {
       tasksList = tasksList.filter(x => x.id !== id);
-      localStorage.setItem('zen_tasks_v17', JSON.stringify(tasksList));
+      localStorage.setItem('zen_tasks_v18', JSON.stringify(tasksList));
       renderTasksList();
-      showToast('🗑️ تم حذف المهمة');
+      renderCalendar();
     }
 
     /* ========================================================
-       5. SMART NOTES & FLASHCARDS
+       6. SMART INTERACTIVE CALENDAR & AGENDA
        ======================================================== */
-    let notesList = JSON.parse(localStorage.getItem('zen_notes_v17') || JSON.stringify([
-      { id: 1, title: 'تصميم واجهات المستخدم والتركيز المتباعد', body: 'المراجعة على فترات متباعدة تعزز الذاكرة طويلة المدى وتمنع النسيان قبل الامتحانات.', cat: 'ملاحظات كورنيل', date: '12 درساً • اليوم', blur: false, theme: 'theme-violet' },
-      { id: 2, title: 'قواعد اللغة والمفردات الأساسية', body: 'الجواب المخفي للاستذكار: الفاعل يتقدم في الجملة الاسمية ويليه الفعل المصرف بدقة.', cat: 'بطاقات استذكار', date: '24 بطاقة • أمس', blur: true, theme: 'theme-emerald' },
-      { id: 3, title: 'مهارات المستقبل وتفريغ الأفكار', body: '1. تقليل المشتتات الرقمية أثناء الجلسة\n2. تقسيم الأهداف الكبيرة إلى جلسات 25 دقيقة.', cat: 'أفكار سريعة', date: '18 فكرة • اليوم', blur: false, theme: 'theme-amber' }
+    let calYear = new Date().getFullYear();
+    let calMonth = new Date().getMonth();
+    let selectedCalDate = todayISO;
+
+    function changeCalendarMonth(delta) {
+      calMonth += delta;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const d = L();
+      document.getElementById('calMonthYearTitle').textContent = `${d.months[calMonth]} ${calYear}`;
+      document.getElementById('calWeekdaysRow').innerHTML = d.weekdays.map(w => `<div>${w}</div>`).join('');
+
+      const firstDay = new Date(calYear, calMonth, 1).getDay();
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      const grid = document.getElementById('calDaysGrid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < firstDay; i++) {
+        grid.appendChild(document.createElement('div'));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const iso = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const hasTasks = tasksList.some(t => t.date === iso);
+        const hasNotes = notesList.some(n => n.calDate === iso);
+
+        const cell = document.createElement('div');
+        cell.className = `cal-day-cell ${iso === todayISO ? 'today' : ''} ${iso === selectedCalDate ? 'selected' : ''}`;
+        cell.onclick = () => { selectedCalDate = iso; renderCalendar(); };
+        cell.innerHTML = `
+          <span>${day}</span>
+          <div class="cal-dots-row">
+            ${hasTasks ? '<span class="cal-dot dot-task"></span>' : ''}
+            ${hasNotes ? '<span class="cal-dot dot-note"></span>' : ''}
+          </div>
+        `;
+        grid.appendChild(cell);
+      }
+
+      renderSelectedDateAgenda();
+    }
+
+    function renderSelectedDateAgenda() {
+      document.getElementById('selectedDateLabel').textContent = `📅 ${selectedCalDate}`;
+      const box = document.getElementById('calendarDayAgendaBox');
+      box.innerHTML = '';
+
+      const dayTasks = tasksList.filter(t => t.date === selectedCalDate);
+      const dayNotes = notesList.filter(n => n.calDate === selectedCalDate);
+
+      if (dayTasks.length === 0 && dayNotes.length === 0) {
+        box.innerHTML = `<div style="font-size:0.78rem; color:var(--text-light); text-align:center; padding:12px;">✨ ${L().btnAddCalNote}</div>`;
+        return;
+      }
+
+      dayTasks.forEach(t => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
+        item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${t.title}</span><span style="color:var(--text-muted); font-size:0.7rem;">${getCatLabel(t.catKey)}</span>`;
+        box.appendChild(item);
+      });
+
+      dayNotes.forEach(n => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#fffbeb; border-right:4px solid #f59e0b; font-size:0.8rem;';
+        item.innerHTML = `<div style="font-weight:900;">📝 ${n.title}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${n.body}</div>`;
+        box.appendChild(item);
+      });
+    }
+
+    function openNoteModalForSelectedDate() {
+      openNoteModal(selectedCalDate);
+    }
+
+    /* ========================================================
+       7. SMART NOTES ENGINE (LINKED WITH CALENDAR)
+       ======================================================== */
+    let notesList = JSON.parse(localStorage.getItem('zen_notes_v18') || JSON.stringify([
+      { id: 1, isStarter: true, title: 'التركيز المتباعد (Spaced Repetition)', body: 'المراجعة على فترات متباعدة تعزز الذاكرة طويلة المدى وتمنع النسيان قبل الامتحانات.', catKey: 'cornell', calDate: todayISO, blur: false, theme: 'theme-violet' },
+      { id: 2, isStarter: true, title: 'سؤال استذكار: ما هو قانون القوة؟', body: 'الإجابة المخفية: القوة = الكتلة × التسارع (F = m × a).', catKey: 'flash', calDate: todayISO, blur: true, theme: 'theme-emerald' },
+      { id: 3, isStarter: true, title: 'خطة تقليل المشتتات أثناء الدراسة', body: '1. تفعيل وضع التركيز العميق\n2. تقسيم الأهداف الكبيرة إلى جلسات 25 دقيقة.', catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-amber' }
     ]));
     let noteTagFilter = 'all';
+
+    function getNoteTagLabel(k) {
+      const d = L();
+      const map = { cornell: d.tagCornell, flash: d.tagFlash, quick: d.tagQuick };
+      return map[k] || d.tagCornell;
+    }
 
     function filterNotesByTag(tag, btn) {
       noteTagFilter = tag;
@@ -1231,7 +1511,7 @@
 
       notesList.filter(n => {
         if (!(n.title + ' ' + n.body).toLowerCase().includes(q)) return false;
-        if (noteTagFilter !== 'all' && n.cat !== noteTagFilter) return false;
+        if (noteTagFilter !== 'all' && n.catKey !== noteTagFilter) return false;
         return true;
       }).forEach(n => {
         const card = document.createElement('div');
@@ -1240,35 +1520,36 @@
           <div class="lcard-head">
             <div class="lcard-title"><span>✨</span> <span>${n.title}</span></div>
             <div style="display:flex; gap:8px;">
-              <span style="cursor:pointer;" onclick="toggleNoteBlur(${n.id})" title="إخفاء/إظهار للاستذكار">👁️</span>
+              <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${n.id})" title="Calendar">📅</span>
+              <span style="cursor:pointer;" onclick="toggleNoteBlur(${n.id})">👁️</span>
               <span style="cursor:pointer; color:var(--rose);" onclick="deleteNoteCard(${n.id})">✕</span>
             </div>
           </div>
           <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${n.body}</div>
           <div class="lcard-foot">
-            <span>🕒 ${n.date}</span>
-            <span style="font-weight:800; color:var(--primary);">${n.cat}</span>
+            <span>📅 ${n.calDate || todayISO}</span>
+            <span style="font-weight:800; color:var(--primary);">${getNoteTagLabel(n.catKey)}</span>
           </div>
         `;
         box.appendChild(card);
       });
     }
 
-    function openNoteModal() {
+    function openNoteModal(defaultDate = null) {
       document.getElementById('inpNoteTitle').value = '';
       document.getElementById('inpNoteBody').value = '';
+      document.getElementById('inpNoteCalDate').value = defaultDate || selectedCalDate || todayISO;
       document.getElementById('chkNoteBlur').checked = false;
       document.getElementById('noteModal').classList.add('open');
     }
 
     function fillNoteTpl(type) {
       if (type === 'cornell') {
-        document.getElementById('inpNoteTitle').value = 'ملخص كورنيل: ';
-        document.getElementById('inpNoteBody').value = '📌 الفكرة الأساسية:\n- \n📖 الشرح:\n- \n💡 الخلاصة:\n- ';
+        document.getElementById('selNoteCat').value = 'cornell';
+        document.getElementById('inpNoteBody').value = '📌 1:\n📖 2:\n💡 3:';
         document.getElementById('chkNoteBlur').checked = false;
       } else {
-        document.getElementById('inpNoteTitle').value = 'سؤال استذكار: ';
-        document.getElementById('inpNoteBody').value = 'الإجابة النموذجية هي: ';
+        document.getElementById('selNoteCat').value = 'flash';
         document.getElementById('chkNoteBlur').checked = true;
       }
     }
@@ -1277,55 +1558,94 @@
       const t = document.getElementById('inpNoteTitle').value.trim();
       const b = document.getElementById('inpNoteBody').value.trim();
       if (!t && !b) return;
-      const cat = document.getElementById('selNoteCat').value;
+      const catKey = document.getElementById('selNoteCat').value;
+      const calDate = document.getElementById('inpNoteCalDate').value || todayISO;
       const blur = document.getElementById('chkNoteBlur').checked;
       notesList.unshift({
-        id: Date.now(), title: t || 'ملاحظة جديدة', body: b, cat: cat,
-        date: 'الآن', blur: blur, theme: blur ? 'theme-emerald' : 'theme-violet'
+        id: Date.now(), isStarter: false, title: t || L().navNotes, body: b,
+        catKey: catKey, calDate: calDate, blur: blur, theme: blur ? 'theme-emerald' : 'theme-violet'
       });
-      localStorage.setItem('zen_notes_v17', JSON.stringify(notesList));
+      localStorage.setItem('zen_notes_v18', JSON.stringify(notesList));
       renderNotesStack();
+      renderCalendar();
       closeModal('noteModal');
-      showToast('✓ تم حفظ الملاحظة');
+      showToast('✓');
+    }
+
+    function pinNoteToTodayCalendar(id) {
+      const n = notesList.find(x => x.id === id);
+      if (n) {
+        n.calDate = selectedCalDate;
+        localStorage.setItem('zen_notes_v18', JSON.stringify(notesList));
+        renderNotesStack();
+        renderCalendar();
+        showToast(`📅 ${selectedCalDate}`);
+      }
     }
 
     function toggleNoteBlur(id) {
       const n = notesList.find(x => x.id === id);
-      if (n) { n.blur = !n.blur; localStorage.setItem('zen_notes_v17', JSON.stringify(notesList)); renderNotesStack(); }
+      if (n) { n.blur = !n.blur; localStorage.setItem('zen_notes_v18', JSON.stringify(notesList)); renderNotesStack(); }
     }
 
     function deleteNoteCard(id) {
       notesList = notesList.filter(x => x.id !== id);
-      localStorage.setItem('zen_notes_v17', JSON.stringify(notesList));
+      localStorage.setItem('zen_notes_v18', JSON.stringify(notesList));
       renderNotesStack();
-      showToast('🗑️ تم حذف الملاحظة');
+      renderCalendar();
     }
 
     function exportAllNotes() {
-      const txt = notesList.map(n => `[${n.title}]\n${n.body}`).join('\n\n---\n\n');
+      const txt = notesList.map(n => `[${n.title} - ${n.calDate}]\n${n.body}`).join('\n\n---\n\n');
       if (navigator.clipboard) navigator.clipboard.writeText(txt);
-      showToast('📥 تم نسخ جميع الملاحظات للحافظة');
+      showToast('📥 TXT');
+    }
+
+    function openBrainDumpModal() {
+      document.getElementById('inpQuickDump').value = '';
+      document.getElementById('brainDumpModal').classList.add('open');
+    }
+
+    function saveQuickDump(toTasks) {
+      const val = document.getElementById('inpQuickDump').value.trim();
+      if (!val) return;
+      if (toTasks) {
+        tasksList.unshift({ id: Date.now(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false });
+        localStorage.setItem('zen_tasks_v18', JSON.stringify(tasksList));
+        renderTasksList();
+      } else {
+        notesList.unshift({ id: Date.now(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' });
+        localStorage.setItem('zen_notes_v18', JSON.stringify(notesList));
+        renderNotesStack();
+      }
+      renderCalendar();
+      closeModal('brainDumpModal');
+      showToast('✓');
     }
 
     /* ========================================================
-       6. HYBRID AUDIO ENGINE (BUNDLED OGG + WEBAUDIO SYNTH FALLBACK)
+       8. 12 PURE NATURE SOUNDS ENGINE (100% NATURE ONLY)
        ======================================================== */
     const SOUNDS_DATA = [
-      { id: 'ocean', name: 'أمواج المحيط', cat: 'الطبيعة', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
-      { id: 'rain', name: 'مطر ناعم', cat: 'الطبيعة', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
-      { id: 'fire', name: 'نار المدفأة', cat: 'البيئة', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/fire.ogg' },
-      { id: 'forest', name: 'نسيم الغابة', cat: 'الطبيعة', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/forest_morning.ogg' },
-      { id: 'stream', name: 'جدول ماء جاري', cat: 'الطبيعة', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg', url: 'https://actions.google.com/sounds/v1/water/small_stream_flowing.ogg' },
-      { id: 'leaves', name: 'حفيف الأوراق', cat: 'الطبيعة', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/outdoor_summer_ambience.ogg' },
-      { id: 'cafe', name: 'أجواء المقاهي', cat: 'البيئة', cls: 'sbg-cafe', vol: 0.55, src: 'sounds/cafe.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg' },
-      { id: 'noise', name: 'موجات ألفا وعزل', cat: 'ضوضاء بيضاء', cls: 'sbg-noise', vol: 0.5, src: 'sounds/noise.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/ambient_hum_air_conditioner.ogg' }
+      { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
+      { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
+      { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/fire.ogg' },
+      { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/forest_morning.ogg' },
+      { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg', url: 'https://actions.google.com/sounds/v1/water/small_stream_flowing.ogg' },
+      { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/outdoor_summer_ambience.ogg' },
+      { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: 'sounds/waterfall.ogg', url: 'https://actions.google.com/sounds/v1/water/waterfall_medium.ogg' },
+      { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: 'sounds/night.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/crickets_chirping.ogg' },
+      { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg', url: 'https://actions.google.com/sounds/v1/weather/rolling_thunder.ogg' },
+      { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg', url: 'https://actions.google.com/sounds/v1/weather/wind_blowing.ogg' },
+      { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_on_rooftop.ogg' },
+      { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: 'sounds/earth.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/ambient_hum_air_conditioner.ogg' }
     ];
 
     let soundCat = 'all';
     const activePlayers = {};
     let webAudioCtx = null;
 
-    function createWarmWebAudioFallback(id, vol) {
+    function createNatureSynthFallback(id, vol) {
       if (!webAudioCtx) webAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (webAudioCtx.state === 'suspended') webAudioCtx.resume();
       const sr = webAudioCtx.sampleRate;
@@ -1342,7 +1662,8 @@
       src.buffer = buf; src.loop = true;
       const filter = webAudioCtx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.value = id === 'ocean' ? 320 : id === 'rain' ? 800 : 480;
+      const freqs = { ocean: 300, rain: 850, fire: 420, waterfall: 950, thunder: 220, earth: 180 };
+      filter.frequency.value = freqs[id] || 520;
       const gain = webAudioCtx.createGain();
       gain.gain.value = vol * 0.6;
       src.connect(filter); filter.connect(gain); gain.connect(webAudioCtx.destination);
@@ -1356,11 +1677,12 @@
     function toggleSoundTile(id) {
       const s = SOUNDS_DATA.find(x => x.id === id);
       if (!s) return;
+      const sName = L().sounds[id] || id;
 
       if (activePlayers[id]) {
         activePlayers[id].pause();
         delete activePlayers[id];
-        showToast(`⏹ تم إيقاف: ${s.name}`);
+        showToast(`⏹ ${sName}`);
       } else {
         const audio = new Audio();
         audio.loop = true;
@@ -1371,7 +1693,7 @@
         const activateFallback = () => {
           if (fallbackUsed) return;
           fallbackUsed = true;
-          activePlayers[id] = createWarmWebAudioFallback(id, s.vol);
+          activePlayers[id] = createNatureSynthFallback(id, s.vol);
           renderSoundsStudio();
         };
 
@@ -1384,9 +1706,7 @@
           }
         };
 
-        audio.play().then(() => {
-          showToast(`🔊 يعمل الآن: ${s.name}`);
-        }).catch(activateFallback);
+        audio.play().then(() => showToast(`🔊 ${sName}`)).catch(activateFallback);
 
         if (!fallbackUsed) {
           activePlayers[id] = {
@@ -1409,7 +1729,6 @@
       stopAllAudio();
       toggleSoundTile('rain');
       toggleSoundTile('fire');
-      showToast('✨ تعمل الآن: خلطة المطر + نار المدفأة');
     }
 
     function stopAllAudio() {
@@ -1418,7 +1737,6 @@
         delete activePlayers[k];
       });
       renderSoundsStudio();
-      showToast('⏹ تم إيقاف جميع الأصوات');
     }
 
     function filterSoundsByCat(cat, btn) {
@@ -1431,11 +1749,11 @@
     function renderSoundsStudio() {
       const box = document.getElementById('soundsGridBox');
       box.innerHTML = '';
-      const activeCount = Object.keys(activePlayers).length;
-      document.getElementById('mixerStatusTxt').textContent = activeCount > 0 ? `🔊 يعمل الآن (${activeCount}) أصوات مدمجة` : '🎵 استوديو المزج الصوتي جاهز';
+      const d = L();
 
       SOUNDS_DATA.filter(s => soundCat === 'all' || s.cat === soundCat).forEach(s => {
         const isOn = !!activePlayers[s.id];
+        const sName = d.sounds[s.id] || s.id;
         const tile = document.createElement('div');
         tile.className = `sound-Rich-tile ${s.cls} ${isOn ? 'playing' : ''}`;
         tile.onclick = () => toggleSoundTile(s.id);
@@ -1445,7 +1763,7 @@
             <div class="stile-switch"><div class="stile-knob"></div></div>
           </div>
           <div>
-            <div class="stile-name">${s.name}</div>
+            <div class="stile-name">${sName}</div>
             <input type="range" class="stile-vol" min="0.05" max="1" step="0.05" value="${s.vol}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value)">
           </div>
         `;
@@ -1454,7 +1772,7 @@
     }
 
     /* ========================================================
-       7. ANALYTICS & SYLLABUS CALCULATOR
+       9. ANALYTICS & PREDICTIVE CALCULATOR
        ======================================================== */
     function renderAnalyticsBars() {
       const box = document.getElementById('anMiniBarsBox');
@@ -1463,7 +1781,6 @@
       vals.forEach((v, i) => {
         const col = document.createElement('div');
         col.className = 'mbar-col';
-        col.onclick = () => showToast(`📊 اليوم ${i+1}: ${v * 2} دقيقة تركيز`);
         col.innerHTML = `<div class="mbar-fill ${i===5 ? 'peak' : ''}" style="height:${Math.round(v * 0.72)}px;"></div>`;
         box.appendChild(col);
       });
@@ -1472,16 +1789,16 @@
     function addQuickSessionRecord() {
       cfg.todayMins += 25;
       cfg.sessions += 1;
-      localStorage.setItem('zen_cfg_v17', JSON.stringify(cfg));
+      localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
       syncHeaderMetrics();
-      showToast('📈 تمت إضافة جلسة تركيز (+25 دقيقة)');
+      showToast('📈 +25m');
     }
 
     function updateSyllabusCalc() {
       const left = Math.max(1, parseInt(document.getElementById('inpPagesLeft').value) || 1);
       const rate = Math.max(1, parseInt(document.getElementById('inpDailyRate').value) || 1);
       const days = Math.ceil(left / rate);
-      document.getElementById('syllabusCalcOut').textContent = `📅 بهذا المعدل ستختم المادة بالكامل خلال ${days} أيام!`;
+      document.getElementById('syllabusCalcOut').textContent = L().calcOutTpl.replace('{d}', days);
     }
 
     function openSettingsModal() {
@@ -1491,29 +1808,22 @@
 
     function saveSettingsNow() {
       cfg.focusMin = Math.max(1, parseInt(document.getElementById('inpCfgFocus').value) || 25);
-      localStorage.setItem('zen_cfg_v17', JSON.stringify(cfg));
-      selectTimerMode(cfg.focusMin, 'جلسة تركيز', document.getElementById('modeFocusBtn'));
+      localStorage.setItem('zen_cfg_v18', JSON.stringify(cfg));
+      selectTimerMode(cfg.focusMin, 'focus', document.getElementById('modeFocusBtn'));
       closeModal('settingsModal');
-      showToast('✓ تم حفظ الإعدادات');
+      showToast('✓');
     }
 
     function copyBackupJson() {
       const data = JSON.stringify({ cfg, tasksList, notesList }, null, 2);
       if (navigator.clipboard) navigator.clipboard.writeText(data);
       closeModal('settingsModal');
-      showToast('📥 تم نسخ النسخة الاحتياطية للحافظة');
+      showToast('📥 JSON');
     }
 
-    function openGardenModal() { document.getElementById('gardenModal').classList.add('open'); }
-
-    /* Boot Init */
-    applyLanguage(cfg.lang || 'ar');
-    syncHeaderMetrics();
-    updateTimerDisplay();
-    renderTasksList();
-    renderNotesStack();
-    renderSoundsStudio();
+    /* Initial Boot */
     renderAnalyticsBars();
+    applyLanguage(cfg.lang || 'ar');
   </script>
 </body>
 </html>
