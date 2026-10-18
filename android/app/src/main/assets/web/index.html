@@ -542,6 +542,55 @@
     #sec-timer .quick-orbs-card {margin-top:0;}
     @media (max-width:350px) {.focus-hero-card .ring-container{width:205px;height:205px}.training-summary{padding:12px}.focus-hero-card .time-delta-row .delta-chip{font-size:.63rem}}
 
+
+    /* Shared white 2100 visual language: no repeated dark marketing masthead. */
+    body:not(.deep-lockdown) .dynamic-hero-header {
+      background:var(--page-ambient,linear-gradient(135deg,#fff,#f3faff)) !important;
+      color:#1c2a47;
+      padding:12px 17px 12px;
+      border-bottom:1px solid rgba(194,214,239,.7);
+    }
+    body:not(.deep-lockdown) .dynamic-hero-header::before {
+      top:-65px;right:-32px;width:185px;height:175px;
+      background:radial-gradient(circle,rgba(115,132,255,.11),transparent 65%);
+    }
+    body:not(.deep-lockdown) .header-top-row {margin-bottom:5px;}
+    body:not(.deep-lockdown) .header-icon-btn {background:#f2f6ff;border-color:#e0e9fa;color:#3c65a1;}
+    body:not(.deep-lockdown) .lang-switcher-pill {background:#f2f6ff;border-color:#dce6f9;color:#33517e;}
+    body:not(.deep-lockdown) .lang-iso-badge {background:#d9f4ff;color:#11639b;}
+    body:not(.deep-lockdown) .header-main-title {font-size:1.05rem;font-weight:750;}
+    body:not(.deep-lockdown) .header-sub-caption {font-size:.69rem;color:#73819a;}
+    body:not(.deep-lockdown) .ecosystem-strip {margin-top:6px;gap:4px;}
+    body:not(.deep-lockdown) .eco-badge {
+      color:#5473a0;background:rgba(255,255,255,.65);
+      border-color:#e0e9f9;padding:4px 8px;font-size:.61rem;
+    }
+    body:not(.deep-lockdown) .main-white-sheet {
+      margin-top:0;border-radius:0;box-shadow:none;
+      background:linear-gradient(180deg,#fff,#fbfdff);
+      padding:12px 14px 30px;
+    }
+    body:not(.deep-lockdown) .pure-white-card {
+      border-color:#e5edfb;
+      box-shadow:0 10px 32px -16px rgba(51,92,163,.16),
+                 0 2px 8px rgba(51,92,163,.025);
+    }
+    .bottom-nav-capsule {
+      background:rgba(255,255,255,.98);
+      border:1px solid #e5ebf9;
+      box-shadow:0 8px 32px -10px rgba(45,87,167,.15);
+    }
+    body:not(.deep-lockdown) #sec-analytics .wave-chart-card {
+      background:linear-gradient(145deg,#f5f9ff 0%,#e8f4ff 65%,#f8f4ff 100%);
+      color:#254069;border:1px solid #dceafa;
+      box-shadow:0 10px 27px -12px rgba(52,95,178,.13);
+    }
+    body:not(.deep-lockdown) #sec-analytics .wave-chart-card .an-kpi-trend {color:#059669;}
+    #sec-analytics .an-kpi-num {font-weight:600;}
+    #sec-tasks .showcase-task-card,#sec-notes .learning-rich-card {
+      border-color:#e5ecf7;box-shadow:0 8px 24px -14px rgba(29,66,137,.12);
+    }
+
     /* Modals */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.58);
