@@ -56,6 +56,9 @@ for(const file of ['locale_rows.js','locale_extras.js','app.js']){
 const evaluate=expr=>vm.runInContext(expr,sandbox,{timeout:2000});
 assert.match(document.getElementById('timerDigitsTxt').textContent,/^[0-9]{2}:[0-9]{2}$/);
 assert.equal(evaluate('Object.keys(DICT).length'),20);
+assert.equal(evaluate('Object.keys(CONFIRMATION_TEXT).length'),20);
+assert.equal(evaluate('Object.values(CONFIRMATION_TEXT).every(x => x.length === 3 && x.every(s => typeof s === "string" && s.length > 6))'),true);
+assert.ok(evaluate("CONFIRMATION_TEXT.ar[2].includes('ملاحظاتك')"));
 assert.equal(evaluate('localDateISO(new Date(2026, 9, 18, 12))'),'2026-10-18');
 assert.equal(evaluate('cfg.sessions'),0,'New install must not have invented sessions');
 assert.equal(evaluate('cfg.todayMins'),0,'New install must not have invented time');
