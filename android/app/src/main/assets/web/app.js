@@ -339,6 +339,115 @@ function L() {
   return DICT[cfg.lang] || DICT.en;
 }
 
+const CONFIRMATION_TEXT = {
+  "en": [
+    "Delete this task? This cannot be undone.",
+    "Delete this note? This cannot be undone.",
+    "Restore this backup? Current tasks, notes and progress will be replaced. Export them first."
+  ],
+  "ar": [
+    "حذف هذه المهمة؟ لا يمكن التراجع عن الحذف.",
+    "حذف هذه الملاحظة؟ لا يمكن التراجع عن الحذف.",
+    "استعادة النسخة الاحتياطية ستستبدل مهامك وملاحظاتك وتقدمك الحالي. احفظ نسخة منه أولًا. هل تريد المتابعة؟"
+  ],
+  "es": [
+    "¿Eliminar esta tarea? No se puede deshacer.",
+    "¿Eliminar esta nota? No se puede deshacer.",
+    "¿Restaurar esta copia? Reemplazará las tareas, notas y el progreso actuales. Guarda una copia primero."
+  ],
+  "fr": [
+    "Supprimer cette tâche ? Cette action est irréversible.",
+    "Supprimer cette note ? Cette action est irréversible.",
+    "Restaurer cette sauvegarde ? Vos tâches, notes et progrès actuels seront remplacés. Exportez-les d’abord."
+  ],
+  "de": [
+    "Diese Aufgabe löschen? Das kann nicht rückgängig gemacht werden.",
+    "Diese Notiz löschen? Das kann nicht rückgängig gemacht werden.",
+    "Sicherung wiederherstellen? Aufgaben, Notizen und Fortschritt werden überschrieben. Vorher bitte sichern."
+  ],
+  "zh": [
+    "删除此任务？此操作无法撤销。",
+    "删除此笔记？此操作无法撤销。",
+    "恢复备份将替换当前任务、笔记和进度。请先导出当前数据。是否继续？"
+  ],
+  "hi": [
+    "यह कार्य मिटाएँ? इसे वापस नहीं लाया जा सकता।",
+    "यह नोट मिटाएँ? इसे वापस नहीं लाया जा सकता।",
+    "बैकअप बहाल करने से मौजूदा कार्य, नोट और प्रगति बदल जाएँगे। पहले इन्हें निर्यात करें।"
+  ],
+  "ru": [
+    "Удалить задачу? Это действие нельзя отменить.",
+    "Удалить заметку? Это действие нельзя отменить.",
+    "Восстановление копии заменит текущие задачи, заметки и прогресс. Сначала сохраните их."
+  ],
+  "pt": [
+    "Excluir esta tarefa? Não é possível desfazer.",
+    "Excluir esta nota? Não é possível desfazer.",
+    "Restaurar o backup substituirá tarefas, notas e progresso atuais. Exporte-os antes."
+  ],
+  "ja": [
+    "このタスクを削除しますか？元に戻せません。",
+    "このノートを削除しますか？元に戻せません。",
+    "バックアップを復元すると現在のタスク・ノート・進捗が置き換わります。先に保存してください。"
+  ],
+  "id": [
+    "Hapus tugas ini? Tindakan ini tidak dapat dibatalkan.",
+    "Hapus catatan ini? Tindakan ini tidak dapat dibatalkan.",
+    "Pemulihan cadangan akan mengganti tugas, catatan, dan kemajuan saat ini. Ekspor terlebih dahulu."
+  ],
+  "tr": [
+    "Bu görev silinsin mi? İşlem geri alınamaz.",
+    "Bu not silinsin mi? İşlem geri alınamaz.",
+    "Yedek geri yüklenirse mevcut görevler, notlar ve ilerleme değişir. Önce dışa aktarın."
+  ],
+  "ko": [
+    "이 작업을 삭제할까요? 되돌릴 수 없습니다.",
+    "이 노트를 삭제할까요? 되돌릴 수 없습니다.",
+    "백업을 복원하면 현재 작업, 노트와 진행 상황이 바뀝니다. 먼저 내보내세요."
+  ],
+  "vi": [
+    "Xóa nhiệm vụ này? Không thể hoàn tác.",
+    "Xóa ghi chú này? Không thể hoàn tác.",
+    "Khôi phục bản sao lưu sẽ thay thế nhiệm vụ, ghi chú và tiến độ hiện tại. Hãy xuất dữ liệu trước."
+  ],
+  "it": [
+    "Eliminare questa attività? Non si può annullare.",
+    "Eliminare questa nota? Non si può annullare.",
+    "Il ripristino sostituirà attività, note e progressi attuali. Esportali prima."
+  ],
+  "bn": [
+    "এই কাজটি মুছবেন? পরে ফিরিয়ে আনা যাবে না।",
+    "এই নোটটি মুছবেন? পরে ফিরিয়ে আনা যাবে না।",
+    "ব্যাকআপ ফিরিয়ে আনলে বর্তমান কাজ, নোট ও অগ্রগতি বদলে যাবে। আগে সেগুলো রপ্তানি করুন।"
+  ],
+  "ur": [
+    "یہ کام حذف کریں؟ اسے واپس نہیں لایا جا سکتا۔",
+    "یہ نوٹ حذف کریں؟ اسے واپس نہیں لایا جا سکتا۔",
+    "بیک اپ بحال کرنے سے موجودہ کام، نوٹس اور پیش رفت بدل جائیں گے۔ پہلے انہیں محفوظ کریں۔"
+  ],
+  "fa": [
+    "این کار حذف شود؟ بازگرداندن آن ممکن نیست.",
+    "این یادداشت حذف شود؟ بازگرداندن آن ممکن نیست.",
+    "بازیابی نسخه پشتیبان، کارها و یادداشت‌ها و پیشرفت فعلی را جایگزین می‌کند. نخست از آن‌ها خروجی بگیرید."
+  ],
+  "pl": [
+    "Usunąć to zadanie? Nie można tego cofnąć.",
+    "Usunąć tę notatkę? Nie można tego cofnąć.",
+    "Przywrócenie kopii zastąpi obecne zadania, notatki i postępy. Najpierw je wyeksportuj."
+  ],
+  "nl": [
+    "Deze taak verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "Deze notitie verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "Het herstellen van de back-up vervangt taken, notities en voortgang. Exporteer ze eerst."
+  ]
+};
+function confirmSensitiveAction(kind) {
+  const copy = CONFIRMATION_TEXT[cfg.lang] || CONFIRMATION_TEXT.en;
+  const index = {task:0, note:1, restore:2}[kind];
+  if (!Number.isInteger(index)) return false;
+  return window.confirm(copy[index]);
+}
+
 function openLanguageModal() {
   document.getElementById('inpLangCountrySearch').value = '';
   renderLanguageList();
@@ -468,7 +577,7 @@ function verifyAndRestoreBackupCode(codeStr) {
     const verified = validateImportedBackup(JSON.parse(decoded.bundle));
     if (!verified) throw new Error('Invalid backup schema');
     // Validation must complete before writes. Never replace a user's work silently.
-    if (!window.confirm('Restore backup? This replaces the current tasks, notes and progress. Export your current backup first.')) return false;
+    if (!confirmSensitiveAction('restore')) return false;
     // Build and verify every storage packet before replacing any saved record.
     // If a write fails (e.g. storage quota), roll back all six original keys.
     const imports = [
@@ -1031,7 +1140,7 @@ function createNewTask() {
 }
 
 function deleteTaskItem(id) {
-  if (!window.confirm('Delete this task? This action cannot be undone.')) return;
+  if (!confirmSensitiveAction('task')) return;
   tasksList = tasksList.filter(x => x.id !== id);
   saveFortressData('zen_fortress_tasks_v21', tasksList);
   renderTasksList(); renderCalendar();
@@ -1208,7 +1317,7 @@ function toggleNoteBlur(id) {
 }
 
 function deleteNoteCard(id) {
-  if (!window.confirm('Delete this note? This action cannot be undone.')) return;
+  if (!confirmSensitiveAction('note')) return;
   notesList = notesList.filter(x => x.id !== id);
   saveFortressData('zen_fortress_notes_v21', notesList);
   renderNotesStack(); renderCalendar();
