@@ -68,16 +68,22 @@ jobs:
       ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
       ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
       ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
+      ZEN_MEDIA_LICENSES_APPROVED: ${{ vars.ZEN_MEDIA_LICENSES_APPROVED }}
+      ZEN_DEVICE_QA_APPROVED: ${{ vars.ZEN_DEVICE_QA_APPROVED }}
+      ZEN_RELEASE_APPROVED_SHA: ${{ vars.ZEN_RELEASE_APPROVED_SHA }}
     steps:
       - name: Verify signing requirements
         id: sign
         shell: bash
         run: |
-          if [[ -n "$KEYSTORE_B64" && -n "$ZEN_UPLOAD_STORE_PASSWORD" && -n "$ZEN_UPLOAD_KEY_ALIAS" && -n "$ZEN_UPLOAD_KEY_PASSWORD" ]]; then
+          if [[ -n "$KEYSTORE_B64" && -n "$ZEN_UPLOAD_STORE_PASSWORD" && -n "$ZEN_UPLOAD_KEY_ALIAS" && -n "$ZEN_UPLOAD_KEY_PASSWORD" \
+             && "$ZEN_MEDIA_LICENSES_APPROVED" == "true" \
+             && "$ZEN_DEVICE_QA_APPROVED" == "true" \
+             && "$ZEN_RELEASE_APPROVED_SHA" == "$GITHUB_SHA" ]]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Play release not published: configure ZEN_UPLOAD_KEYSTORE_BASE64 and three upload-key secrets."
+            echo "::notice::Play release is blocked until upload signing, explicit media/device QA approvals and reviewed HEAD SHA match."
           fi
       - uses: actions/checkout@v4
         if: steps.sign.outputs.ready == 'true'
