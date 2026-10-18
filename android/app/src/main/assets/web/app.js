@@ -248,11 +248,11 @@ OTHER_LANGS.forEach(item => {
   const locale = EXTRA_NATIVE_LOCALE[item.c] || item.c;
   const weekdays = Array.from({length: 7}, (_, d) => {
     const date = new Date(Date.UTC(2023, 0, 1 + d, 12));
-    return new Intl.DateTimeFormat(locale, {weekday:'short', timeZone:'UTC'}).format(date);
+    return new Intl.DateTimeFormat(locale, {weekday:'short', calendar:'gregory', timeZone:'UTC'}).format(date);
   });
   const months = Array.from({length: 12}, (_, m) => {
     const date = new Date(Date.UTC(2023, m, 1, 12));
-    return new Intl.DateTimeFormat(locale, {month:'long', timeZone:'UTC'}).format(date);
+    return new Intl.DateTimeFormat(locale, {month:'long', calendar:'gregory', timeZone:'UTC'}).format(date);
   });
   DICT[item.c] = {
     ...text,
