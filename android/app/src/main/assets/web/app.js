@@ -285,7 +285,7 @@ function escapeHtmlText(value) {
 
 let cfg = loadFortressData('zen_fortress_cfg_v21', {
   lang: 'en', domain: 'study', focusMin: 25, shortMin: 5, longMin: 15,
-  todayMins: 0, sessions: 0, streak: 0, water: 0, sets: 1, pagesRead: 0
+  todayMins: 0, sessions: 0, streak: 0, water: 0, sets: 0, pagesRead: 0
 });
 
 function computeActualStreak(history, now = new Date()) {
