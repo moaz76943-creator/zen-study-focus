@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // Display stays awake only in user-selected Desk Clock mode.
 
         if (Build.VERSION.SDK_INT >= 33) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -84,6 +84,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
+        public void setDeskClockWake(boolean awake) {
+            runOnUiThread(() -> {
+                if (awake) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            });
+        }
+
+        @JavascriptInterface
         public void shareAppInvite(String statsSummary) {
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
@@ -96,9 +104,9 @@ public class MainActivity extends AppCompatActivity {
         public void syncBackupToGoogleEmailOrDrive(String encryptedBackupPayload) {
             Intent send = new Intent(Intent.ACTION_SEND);
             send.setType("text/plain");
-            send.putExtra(Intent.EXTRA_SUBJECT, "ZEN FOCUS Cloud Backup (" + java.time.LocalDate.now() + ")");
+            send.putExtra(Intent.EXTRA_SUBJECT, "ZEN FOCUS Manual Backup (UNENCRYPTED) (" + java.time.LocalDate.now() + ")");
             send.putExtra(Intent.EXTRA_TEXT,
-                "Save this message in your Google Email (Gmail) or Google Drive to restore your progress on any phone.\n\n" +
+                "This code contains readable notes and tasks. Save it privately: it is NOT encrypted.\n\n" +
                 "--- COPY CODE BELOW ---\n" + encryptedBackupPayload
             );
             startActivity(Intent.createChooser(send, "Save Backup to Gmail / Google Drive"));
@@ -108,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (webView != null) {
-            webView.evaluateJavascript("if(window.handleAndroidBack && window.handleAndroidBack()){}else{history.back();}", null);
+            webView.evaluateJavascript("Boolean(window.handleAndroidBack && window.handleAndroidBack())", result -> { if (!"true".equals(result)) finish(); });
         } else {
             super.onBackPressed();
         }
