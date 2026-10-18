@@ -737,14 +737,6 @@
             <button class="delta-chip" onclick="changeTimerDelta(5)">+5m</button>
             <button class="delta-chip" onclick="changeTimerDelta(10)">+10m</button>
           </div>
-          <div class="home-quick-sessions" aria-label="Focus session shortcuts">
-            <div class="home-quick-heading"><span data-qt="quickSessions">جلسات سريعة</span></div>
-            <div class="home-quick-options" role="group" aria-label="Quick focus durations">
-              <button type="button" class="home-quick-chip" id="homeQuick10" aria-pressed="false" onclick="selectHomeQuickSession(10)">10:00</button>
-              <button type="button" class="home-quick-chip" id="homeQuick25" aria-pressed="true" onclick="selectHomeQuickSession(25)">25:00</button>
-              <button type="button" class="home-quick-chip" id="homeQuick50" aria-pressed="false" onclick="selectHomeQuickSession(50)">50:00</button>
-            </div>
-          </div>
         </div>
         <div class="home-domains-heading"><span data-qt="chooseActivity">اختر نوع نشاطك</span><small data-qt="domainsHint">لكل نشاط جلسته المناسبة</small></div>
         <div class="domain-pedestal-grid">
@@ -768,6 +760,15 @@
             <span class="domain-title" data-i18n="domWork">Deep Work</span>
             <span class="domain-duration">50:00</span>
           </button>
+        </div>
+
+        <div class="home-quick-sessions" aria-label="Focus session shortcuts">
+          <div class="home-quick-heading"><span data-qt="quickSessions">جلسات سريعة</span></div>
+          <div class="home-quick-options" role="group" aria-label="Quick focus durations">
+            <button type="button" class="home-quick-chip" id="homeQuick10" aria-pressed="false" onclick="selectHomeQuickSession(10)">10:00</button>
+            <button type="button" class="home-quick-chip" id="homeQuick25" aria-pressed="true" onclick="selectHomeQuickSession(25)">25:00</button>
+            <button type="button" class="home-quick-chip" id="homeQuick50" aria-pressed="false" onclick="selectHomeQuickSession(50)">50:00</button>
+          </div>
         </div>
 
         <div class="domain-context-bar" id="sportContextBar">
