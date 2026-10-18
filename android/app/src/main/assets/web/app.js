@@ -227,20 +227,48 @@ const OTHER_LANGS = [
   { c: 'nl', t: 'Focus & Prestatie', s: 'Studie, Sport, Lezen & Diep Werk', nav: ['Timer','Taken','Agenda','Notities','Natuur','Analyse'], dom: ['Studie','Sport','Lezen','Werk'] }
 ];
 
+const EXTRA_NATIVE_LOCALE = {
+  zh: 'zh-CN', pt: 'pt-BR', ur: 'ur-PK', bn: 'bn-BD',
+  fa: 'fa-IR', hi: 'hi-IN', id: 'id-ID', ja: 'ja-JP', ko: 'ko-KR'
+};
+const EXTRA_SOUND_IDS = Object.keys(DICT.en.sounds);
 OTHER_LANGS.forEach(item => {
-  const isRtl = (item.c === 'ur' || item.c === 'fa');
-  const base = isRtl ? DICT.ar : DICT.en;
+  const keys = window.ZEN_LOCALE_FIELD_KEYS || [];
+  const row = window.ZEN_LOCALE_ROWS && window.ZEN_LOCALE_ROWS[item.c];
+  const extra = window.ZEN_LOCALE_EXTRAS && window.ZEN_LOCALE_EXTRAS[item.c];
+  if (!row || row.length !== keys.length || !extra ||
+      extra.sounds.length !== EXTRA_SOUND_IDS.length ||
+      extra.tasks.length !== 4 || extra.notes.length !== 3) {
+    console.error('Incomplete localization pack', item.c);
+    // Do not crash the user's existing data if assets are unexpectedly missing.
+    DICT[item.c] = DICT.en;
+    return;
+  }
+  const text = Object.fromEntries(keys.map((k, i) => [k, row[i]]));
+  const locale = EXTRA_NATIVE_LOCALE[item.c] || item.c;
+  const weekdays = Array.from({length: 7}, (_, d) => {
+    const date = new Date(Date.UTC(2023, 0, 1 + d, 12));
+    return new Intl.DateTimeFormat(locale, {weekday:'short', timeZone:'UTC'}).format(date);
+  });
+  const months = Array.from({length: 12}, (_, m) => {
+    const date = new Date(Date.UTC(2023, m, 1, 12));
+    return new Intl.DateTimeFormat(locale, {month:'long', timeZone:'UTC'}).format(date);
+  });
   DICT[item.c] = {
-    ...base,
+    ...text,
     title: item.t, sub: item.s,
-    navTimer: item.nav[0], navTasks: item.nav[1], navCalendar: item.nav[2], navNotes: item.nav[3], navSounds: item.nav[4], navAnalytics: item.nav[5],
-    domStudy: item.dom[0], domSport: item.dom[1], domRead: item.dom[2], domWork: item.dom[3]
+    navTimer: item.nav[0], navTasks: item.nav[1], navCalendar: item.nav[2],
+    navNotes: item.nav[3], navSounds: item.nav[4], navAnalytics: item.nav[5],
+    domStudy: item.dom[0], domSport: item.dom[1],
+    domRead: item.dom[2], domWork: item.dom[3],
+    modeFocus: '25m', modeShort: '5m', modeLong: '15m',
+    weekdays, months,
+    sounds: Object.fromEntries(EXTRA_SOUND_IDS.map((key,i) => [key, extra.sounds[i]])),
+    sampleTasks: extra.tasks,
+    sampleNotes: extra.notes.map(([t,b]) => ({t,b}))
   };
 });
 
-function localDateISO(d = new Date()) {
-  return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
-}
 const todayISO = localDateISO();
 function escapeHtmlText(value) {
   return String(value === null || value === undefined ? '' : value)
