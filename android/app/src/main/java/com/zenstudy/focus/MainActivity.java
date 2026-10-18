@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("text/plain");
-                String filename = "zen-focus-" +
+                String filename = "deep-focus-" +
                     new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
                         .format(new java.util.Date()) + ".zenbackup";
                 intent.putExtra(Intent.EXTRA_TITLE, filename);
@@ -145,16 +145,16 @@ public class MainActivity extends AppCompatActivity {
         public void shareAppInvite(String statsSummary) {
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
-            share.putExtra(Intent.EXTRA_SUBJECT, "ZEN FOCUS — Study, Workout & Deep Work App");
+            share.putExtra(Intent.EXTRA_SUBJECT, "Deep Focus — Study, Workout & Deep Work App");
             share.putExtra(Intent.EXTRA_TEXT, statsSummary);
-            startActivity(Intent.createChooser(share, "Share ZEN FOCUS via"));
+            startActivity(Intent.createChooser(share, "Share Deep Focus via"));
         }
 
         @JavascriptInterface
         public void syncBackupToGoogleEmailOrDrive(String encryptedBackupPayload) {
             Intent send = new Intent(Intent.ACTION_SEND);
             send.setType("text/plain");
-            send.putExtra(Intent.EXTRA_SUBJECT, "ZEN FOCUS Manual Backup (UNENCRYPTED) (" + new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date()) + ")");
+            send.putExtra(Intent.EXTRA_SUBJECT, "Deep Focus Manual Backup (UNENCRYPTED) (" + new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date()) + ")");
             send.putExtra(Intent.EXTRA_TEXT,
                 "This code contains readable notes and tasks. Save it privately: it is NOT encrypted.\n\n" +
                 "--- COPY CODE BELOW ---\n" + encryptedBackupPayload

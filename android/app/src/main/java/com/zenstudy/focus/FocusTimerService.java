@@ -24,7 +24,7 @@ public class FocusTimerService extends Service {
     public static final String CHANNEL_ALARM = "zen_completion_alarm_channel";
     private CountDownTimer countDownTimer;
     private PowerManager.WakeLock wakeLock;
-    private String currentTitle = "ZEN FOCUS";
+    private String currentTitle = "Deep Focus";
 
     @Override
     public void onCreate() {
@@ -104,7 +104,7 @@ public class FocusTimerService extends Service {
         return new NotificationCompat.Builder(this, CHANNEL_ONGOING)
             .setSmallIcon(R.drawable.ic_launcher)
             .setContentTitle("⏱️ " + timeStr + " • " + title)
-            .setContentText("ZEN FOCUS is running in background — Tap to open")
+            .setContentText("Deep Focus is running in background — Tap to open")
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -146,7 +146,7 @@ public class FocusTimerService extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ALARM)
             .setSmallIcon(R.drawable.ic_launcher)
-            .setContentTitle("🎉 ZEN FOCUS — Time is Up!")
+            .setContentTitle("🎉 Deep Focus — Time is Up!")
             .setContentText(title)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

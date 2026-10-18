@@ -494,7 +494,7 @@ function applyLanguage(code) {
 
   document.getElementById('currentLangIso').textContent = meta.iso;
   document.getElementById('currentLangLabel').textContent = `${meta.enName} • ${meta.nativeName}`;
-  document.getElementById('hdrMainTitle').textContent = d.title;
+  document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -663,7 +663,7 @@ function downloadEncryptedBackupFile() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `zen-focus-backup-${todayISO}.zenbackup`;
+  a.download = `deep-focus-backup-${todayISO}.zenbackup`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 60000);
   showToast("💾 Backup exported — NOT encrypted");
@@ -685,7 +685,7 @@ function restoreFromFileInput(ev) {
 }
 
 function shareAppWithFriends() {
-  const msg = toWest(`🌿 ZEN FOCUS — My Progress Today: ${cfg.todayMins} active mins (${cfg.sessions} sessions completed, 🔥 ${cfg.streak} days streak)!`);
+  const msg = toWest(`🌿 Deep Focus — My Progress Today: ${cfg.todayMins} active mins (${cfg.sessions} sessions completed, 🔥 ${cfg.streak} days streak)!`);
   if (window.ZenNative && window.ZenNative.shareAppInvite) {
     window.ZenNative.shareAppInvite(msg);
   } else if (navigator.clipboard) {
