@@ -860,7 +860,17 @@ function creditCompletedSession() {
   if (!timerSessionId) return;
   const ids = Array.isArray(cfg.completedTimerIds) ? cfg.completedTimerIds : [];
   if (ids.includes(timerSessionId)) return;
-  const earned = Math.max(1, Math.round(timerActiveMs / 60000));
+  // Short intervals such as 20/10 must not credit a whole minute for 20 seconds.
+  // Accumulate real seconds across work rounds; legacy timer accounting is preserved.
+  let earned;
+  if (quickTraining?.active) {
+    const accumulated = Math.max(0, Number(cfg.quickFocusRemainderSec) || 0)
+      + Math.max(0, Math.round(timerActiveMs / 1000));
+    earned = Math.floor(accumulated / 60);
+    cfg.quickFocusRemainderSec = accumulated % 60;
+  } else {
+    earned = Math.max(1, Math.round(timerActiveMs / 60000));
+  }
   cfg.todayMins = Number(cfg.todayMins || 0) + earned;
   cfg.sessions = Number(cfg.sessions || 0) + 1;
   cfg.metricsDate = localDateISO();
