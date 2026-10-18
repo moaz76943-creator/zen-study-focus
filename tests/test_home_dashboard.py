@@ -48,6 +48,35 @@ class HomeLayoutRegression(unittest.TestCase):
             )
         self.assertIn('.domain-card:focus-visible', HTML)
 
+    def test_white_2100_reference_layout_is_real_ui_not_an_image(self):
+        skin = ROOT / "android/app/src/main/assets/web/white_2100.css"
+        self.assertTrue(skin.exists(), "The final white design stylesheet must ship in Android assets")
+        css = skin.read_text(encoding="utf-8")
+        self.assertIn('href="white_2100.css"', HTML)
+        self.assertIn('id="focusHeroCard"', HTML)
+        self.assertIn('id="homeQuick10"', HTML)
+        self.assertIn('id="homeQuick25"', HTML)
+        self.assertIn('id="homeQuick50"', HTML)
+        self.assertIn('id="homeWeekStrip"', HTML)
+        for domain, duration in (("study", "25"), ("sport", "30"), ("read", "20"), ("work", "50")):
+            self.assertIn('id="domBtn-' + domain + '"', HTML)
+            self.assertIn('class="domain-duration">' + duration + ':00', HTML)
+        self.assertIn('.focus-hero-card .ring-container', css)
+        self.assertIn('.home-quick-chip[aria-pressed="true"]', css)
+        self.assertIn('@media (max-width: 360px)', css)
+        self.assertIn('prefers-reduced-motion', css)
+
+    def test_existing_utilities_and_screens_stay_interactive(self):
+        for name in ('resetTimerNow()', 'skipTimerPhase()', 'changeTimerDelta(-5)',
+                     'openCustomTimerModal()', 'startQuickTraining()', 'openBrainDumpModal()',
+                     'openCloudBackupModal()', 'toggleDeskClock(true)', 'addWaterCup()'):
+            self.assertIn(name, HTML)
+        for feature in ("timer", "tasks", "calendar", "notes", "sounds", "analytics"):
+            self.assertIn('id="sec-' + feature + '"', HTML)
+        self.assertIn('function selectHomeQuickSession(', APP)
+        self.assertIn('function goToHomeAgenda(', QUICK)
+        self.assertIn('function renderHomeWeekStrip(', QUICK)
+
     def test_no_medical_meditation_or_language_course_added(self):
         self.assertNotIn('id="sec-meditation"', HTML)
         self.assertNotIn('id="sec-learn-languages"', HTML)
