@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         public void syncBackupToGoogleEmailOrDrive(String encryptedBackupPayload) {
             Intent send = new Intent(Intent.ACTION_SEND);
             send.setType("text/plain");
-            send.putExtra(Intent.EXTRA_SUBJECT, "ZEN FOCUS Manual Backup (UNENCRYPTED) (" + java.time.LocalDate.now() + ")");
+            send.putExtra(Intent.EXTRA_SUBJECT, "ZEN FOCUS Manual Backup (UNENCRYPTED) (" + new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date()) + ")");
             send.putExtra(Intent.EXTRA_TEXT,
                 "This code contains readable notes and tasks. Save it privately: it is NOT encrypted.\n\n" +
                 "--- COPY CODE BELOW ---\n" + encryptedBackupPayload
