@@ -36,4 +36,24 @@ for (const lang of names) {
   const fmt = new Intl.DateTimeFormat(lang, {month:'long', weekday:'long'});
   assert.ok(fmt.format(new Date(Date.UTC(2026,9,18))).length > 0);
 }
-console.log('Verified 17 added complete locale packs + 3 existing original dictionaries (20 total).');
+// Exercise the actual app locale builder, not only source file presence.
+const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+const cutoff = app.indexOf('const todayISO =');
+assert.ok(cutoff > 0, 'Locale initialization not found');
+context.document = {addEventListener() {}};
+context.console = console;
+vm.runInContext(app.slice(0, cutoff) + '\\nthis._builtLanguages = DICT;', context, {filename: 'app.js:i18n-init'});
+const built = context._builtLanguages;
+assert.equal(Object.keys(built).length, 20);
+const expectedKeys = Object.keys(built.en).sort();
+for (const lang of ['en','ar','es',...names]) {
+  const dict = built[lang];
+  assert.ok(dict, lang + ' missing dictionary');
+  assert.deepEqual(Object.keys(dict).sort(), expectedKeys, lang + ' dictionary missing UI keys');
+  assert.equal(Object.keys(dict.sounds).length, 12);
+  assert.equal(dict.weekdays.length, 7);
+  assert.equal(dict.months.length, 12);
+  assert.equal(dict.sampleTasks.length, 4);
+  assert.equal(dict.sampleNotes.length, 3);
+}
+console.log('Verified 20 fully shaped app locale dictionaries, including runtime assembly.');
