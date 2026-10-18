@@ -97,6 +97,12 @@ assert.equal(evaluate('todayISO'),evaluate('localDateISO()'));
 evaluate("cfg.domain = 'sport'; renderDomainState(); selectTimerMode(30,'focus',null); updateTimerDisplay();");
 assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30m');
 assert.equal(document.getElementById('modeFocusBtn').textContent, '30m');
+// Multiple records created within a single millisecond must receive different IDs.
+const firstId = evaluate('nextRecordId()');
+const secondId = evaluate('nextRecordId()');
+assert.ok(secondId > firstId);
+assert.equal(evaluate('Number.isSafeInteger(nextRecordId())'), true);
+
 // Simulate a quota failure while restoring. No storage key may remain half-updated.
 const backupCodeForRollback = evaluate('generateEncryptedBackupCode()');
 const savedBeforeRestore = new Map(store);
