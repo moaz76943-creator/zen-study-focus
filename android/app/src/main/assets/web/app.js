@@ -378,25 +378,56 @@ function generateEncryptedBackupCode() {
   return "ZEN21::" + encoded;
 }
 
+function validateImportedBackup(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw) || raw.v !== 21) return null;
+  if (!raw.cfg || typeof raw.cfg !== 'object' || Array.isArray(raw.cfg)) return null;
+  if (!Array.isArray(raw.tasksList) || !Array.isArray(raw.notesList)) return null;
+  if (raw.tasksList.length > 10000 || raw.notesList.length > 10000) return null;
+  const okTask = x => x && typeof x === 'object' && !Array.isArray(x)
+    && (typeof x.id === 'string' || typeof x.id === 'number')
+    && typeof x.title === 'string' && x.title.length <= 20000
+    && typeof x.done === 'boolean';
+  const okNote = x => x && typeof x === 'object' && !Array.isArray(x)
+    && (typeof x.id === 'string' || typeof x.id === 'number')
+    && typeof x.title === 'string' && x.title.length <= 20000
+    && typeof x.body === 'string' && x.body.length <= 500000;
+  if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)) return null;
+  const candidateCfg = {...cfg, ...raw.cfg};
+  if (!LANG_CATALOG.some(l => l.code === candidateCfg.lang)) candidateCfg.lang = 'en';
+  for (const key of ['todayMins', 'sessions', 'streak', 'water']) {
+    const n = Number(candidateCfg[key]);
+    if (!Number.isFinite(n) || n < 0 || n > 100000000) return null;
+    candidateCfg[key] = n;
+  }
+  if (candidateCfg.sessionHistory !== undefined
+      && (!Array.isArray(candidateCfg.sessionHistory) || candidateCfg.sessionHistory.length > 100000)) return null;
+  return {cfg: candidateCfg, tasksList: raw.tasksList, notesList: raw.notesList};
+}
+
 function verifyAndRestoreBackupCode(codeStr) {
   try {
-    const clean = codeStr.trim();
-    const rawB64 = clean.includes("::") ? clean.split("::")[1].trim() : clean;
+    const clean = String(codeStr || '').trim();
+    if (clean.length > 14000000 || !clean) throw new Error('Invalid backup size');
+    const rawB64 = clean.startsWith('ZEN21::') ? clean.slice(7).trim() : clean;
     const decoded = JSON.parse(decodeURIComponent(escape(atob(rawB64))));
-    if (!decoded || !decoded.bundle || computeHash(decoded.bundle) !== decoded.sig) {
-      showToast("⚠️ Invalid or Tampered Backup Code!");
-      return false;
-    }
-    const data = JSON.parse(decoded.bundle);
-    if (data.cfg) { cfg = data.cfg; saveFortressData('zen_fortress_cfg_v21', cfg); }
-    if (data.tasksList) { tasksList = data.tasksList; saveFortressData('zen_fortress_tasks_v21', tasksList); }
-    if (data.notesList) { notesList = data.notesList; saveFortressData('zen_fortress_notes_v21', notesList); }
-    applyLanguage(cfg.lang || 'en');
+    if (!decoded || typeof decoded.bundle !== 'string' || !decoded.sig
+        || computeHash(decoded.bundle) !== decoded.sig) throw new Error('Integrity check failed');
+    const verified = validateImportedBackup(JSON.parse(decoded.bundle));
+    if (!verified) throw new Error('Invalid backup schema');
+    // Validation is complete BEFORE mutating any stored user data.
+    cfg = verified.cfg;
+    tasksList = verified.tasksList;
+    notesList = verified.notesList;
+    saveFortressData('zen_fortress_cfg_v21', cfg);
+    saveFortressData('zen_fortress_tasks_v21', tasksList);
+    saveFortressData('zen_fortress_notes_v21', notesList);
+    syncDailyRollover();
+    applyLanguage(cfg.lang);
     closeModal('cloudBackupModal');
-    showToast("🎉 Progress Restored Successfully!");
+    showToast('✓ Backup restored');
     return true;
   } catch (e) {
-    showToast("⚠️ Corrupted Backup Code!");
+    showToast('⚠️ Backup invalid — original data left unchanged');
     return false;
   }
 }
