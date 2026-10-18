@@ -104,6 +104,16 @@ class HomeLayoutRegression(unittest.TestCase):
         self.assertIn('body.timer-home:not(.deep-lockdown) .main-white-sheet', HTML)
         self.assertIn('padding:8px 14px 30px;', HTML)
 
+    def test_timer_navigation_is_visually_central_without_losing_tabs(self):
+        nav = HTML.split('<nav class="bottom-nav-capsule" aria-label="Main navigation">', 1)[1].split('</nav>', 1)[0]
+        expected = ("navTasks", "navCalendar", "navTimer", "navNotes", "navSounds", "navAnalytics")
+        positions = [nav.index('id="' + name + '"') for name in expected]
+        self.assertEqual(positions, sorted(positions))
+        for name in expected:
+            self.assertEqual(nav.count('id="' + name + '"'), 1)
+        css = (ROOT / "android/app/src/main/assets/web/white_2100.css").read_text(encoding="utf-8")
+        self.assertIn('.bottom-nav-capsule #navTimer.active svg', css)
+
     def test_white_visual_system_and_reduced_motion_kept(self):
         self.assertIn('background:var(--page-ambient', HTML)
         self.assertIn('prefers-reduced-motion', HTML)

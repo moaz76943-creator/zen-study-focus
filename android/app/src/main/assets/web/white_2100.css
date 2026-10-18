@@ -373,6 +373,19 @@ body:not(.deep-lockdown) .orb-blue {background:linear-gradient(135deg,#b7f6ff,#5
 body:not(.deep-lockdown) .orb-purple {background:linear-gradient(135deg,#d7ccff,#9872fa);}
 body:not(.deep-lockdown) .orb-amber {background:linear-gradient(135deg,#fff1cb,#efb669);}
 body:not(.deep-lockdown) .orb-label {font-weight:600;color:#5a6c91;}
+/* Six original tabs retained. The focus tab is now the visible central action. */
+body:not(.deep-lockdown) .bottom-nav-capsule #navTimer {padding:4px 3px 2px;min-width:0;position:relative;background:transparent;}
+body:not(.deep-lockdown) .bottom-nav-capsule #navTimer svg {
+  width:35px;height:35px;box-sizing:border-box;padding:8px;
+  border-radius:50%;background:linear-gradient(145deg,#e7f5ff,#f1edff);
+  box-shadow:0 4px 12px -8px rgba(49,104,217,.18);
+  transform:translateY(-4px);
+}
+body:not(.deep-lockdown) .bottom-nav-capsule #navTimer.active svg {
+  fill:#fff;background:var(--zen-rainbow);
+  box-shadow:0 9px 20px -6px rgba(58,103,238,.45);
+}
+body:not(.deep-lockdown) .bottom-nav-capsule #navTimer span {font-size:.59rem;font-weight:650;margin-top:-3px;}
 @media (max-width: 360px) {
   body:not(.deep-lockdown) .main-white-sheet {padding-left:10px;padding-right:10px;}
   body.timer-home:not(.deep-lockdown) .focus-hero-card {padding:11px 10px 12px;}
