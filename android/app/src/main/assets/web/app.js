@@ -238,11 +238,19 @@ OTHER_LANGS.forEach(item => {
   };
 });
 
-const todayISO = toWest(new Date().toISOString().slice(0, 10));
+function localDateISO(d = new Date()) {
+  return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
+}
+const todayISO = localDateISO();
+function escapeHtmlText(value) {
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 let cfg = loadFortressData('zen_fortress_cfg_v21', {
   lang: 'en', domain: 'study', focusMin: 25, shortMin: 5, longMin: 15,
-  todayMins: 120, sessions: 18, streak: 5, water: 4, sets: 1, pagesRead: 24
+  todayMins: 0, sessions: 0, streak: 0, water: 0, sets: 1, pagesRead: 0
 });
 
 function L() {
@@ -534,7 +542,7 @@ function syncHeaderMetrics() {
   document.getElementById('hdrFocusMins').textContent = toWest(cfg.todayMins);
   document.getElementById('hdrStreakBadge').textContent = toWest(`↑ 🔥 ${cfg.streak} ${d.daysUnit}`);
   document.getElementById('orbWaterTxt').textContent = toWest(`${d.waterWord} ${cfg.water}/8`);
-  document.getElementById('kpiTotalMins').textContent = toWest(cfg.todayMins + 300);
+  document.getElementById('kpiTotalMins').textContent = toWest(cfg.todayMins || 0);
   document.getElementById('kpiTotalSessions').textContent = toWest(cfg.sessions);
   const plant = cfg.sessions >= 25 ? '🌸' : cfg.sessions >= 18 ? '🌳' : cfg.sessions >= 10 ? '🌿' : '🌱';
   document.getElementById('ringPlantEmoji').textContent = plant;
@@ -689,10 +697,10 @@ function renderTasksList() {
       <div class="showcase-task-top">
         <div class="task-check-sq" onclick="toggleTaskDone(${t.id})">✓</div>
         <div class="task-center-info" onclick="focusOnTask(${t.id})">
-          <div class="task-main-name">${toWest(t.title)}</div>
+          <div class="task-main-name">${escapeHtmlText(toWest(t.title))}</div>
           <div class="task-time-sub">
-            <span>📅 ${toWest(t.date || todayISO)}</span>
-            <span style="color:var(--primary); font-weight:700;">• ${toWest(getCatLabel(t.catKey))}</span>
+            <span>📅 ${escapeHtmlText(toWest(t.date || todayISO))}</span>
+            <span style="color:var(--primary); font-weight:700;">• ${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>
           </div>
         </div>
         <div class="task-pastel-icon ${t.theme}" onclick="deleteTaskItem(${t.id})">${t.icon}</div>
@@ -730,6 +738,7 @@ function createNewTask() {
 }
 
 function deleteTaskItem(id) {
+  if (!window.confirm('Delete this task? This action cannot be undone.')) return;
   tasksList = tasksList.filter(x => x.id !== id);
   saveFortressData('zen_fortress_tasks_v21', tasksList);
   renderTasksList(); renderCalendar();
@@ -794,14 +803,14 @@ function renderSelectedDateAgenda() {
   dayTasks.forEach(t => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${toWest(t.title)}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
+    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
     box.appendChild(item);
   });
 
   dayNotes.forEach(n => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#fffbeb; border-right:4px solid #f59e0b; font-size:0.8rem;';
-    item.innerHTML = `<div style="font-weight:900;">📝 ${toWest(n.title)}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${toWest(n.body)}</div>`;
+    item.innerHTML = `<div style="font-weight:900;">📝 ${escapeHtmlText(toWest(n.title))}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${escapeHtmlText(toWest(n.body))}</div>`;
     box.appendChild(item);
   });
 }
@@ -842,17 +851,17 @@ function renderNotesStack() {
     card.className = `learning-rich-card ${n.theme}`;
     card.innerHTML = `
       <div class="lcard-head">
-        <div class="lcard-title"><span>✨</span> <span>${toWest(n.title)}</span></div>
+        <div class="lcard-title"><span>✨</span> <span>${escapeHtmlText(toWest(n.title))}</span></div>
         <div style="display:flex; gap:8px;">
           <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${n.id})">📅</span>
           <span style="cursor:pointer;" onclick="toggleNoteBlur(${n.id})">👁️</span>
           <span style="cursor:pointer; color:var(--rose);" onclick="deleteNoteCard(${n.id})">✕</span>
         </div>
       </div>
-      <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${toWest(n.body)}</div>
+      <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${escapeHtmlText(toWest(n.body))}</div>
       <div class="lcard-foot">
-        <span>📅 ${toWest(n.calDate || todayISO)}</span>
-        <span style="font-weight:800; color:var(--primary);">${toWest(getNoteTagLabel(n.catKey))}</span>
+        <span>📅 ${escapeHtmlText(toWest(n.calDate || todayISO))}</span>
+        <span style="font-weight:800; color:var(--primary);">${escapeHtmlText(toWest(getNoteTagLabel(n.catKey)))}</span>
       </div>
     `;
     box.appendChild(card);
@@ -904,6 +913,7 @@ function toggleNoteBlur(id) {
 }
 
 function deleteNoteCard(id) {
+  if (!window.confirm('Delete this note? This action cannot be undone.')) return;
   notesList = notesList.filter(x => x.id !== id);
   saveFortressData('zen_fortress_notes_v21', notesList);
   renderNotesStack(); renderCalendar();
@@ -1059,7 +1069,7 @@ function renderSoundsStudio() {
         <div class="stile-switch"><div class="stile-knob"></div></div>
       </div>
       <div>
-        <div class="stile-name">${toWest(sName)}</div>
+        <div class="stile-name">${escapeHtmlText(toWest(sName))}</div>
         <input type="range" class="stile-vol" min="0.05" max="1" step="0.05" value="${s.vol}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value)">
       </div>
     `;
@@ -1083,9 +1093,7 @@ function renderAnalyticsBars() {
 }
 
 function addQuickSessionRecord() {
-  cfg.todayMins += 25; cfg.sessions += 1;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
-  syncHeaderMetrics(); showToast('📈 +25m');
+  showToast('ℹ️ Statistics update only after a completed focus session');
 }
 
 function updateSyllabusCalc() {
