@@ -325,7 +325,7 @@ function applyLanguage(code) {
     }
   });
 
-  document.getElementById('waveDaysRow').innerHTML = d.weekdays.map(w => `<span>${w}</span>`).join('');
+  renderAnalyticsBars();
 
   syncHeaderMetrics();
   updateTimerDisplay();
@@ -613,6 +613,7 @@ function syncHeaderMetrics() {
   document.getElementById('kpiTotalSessions').textContent = toWest(cfg.sessions);
   const plant = cfg.sessions >= 25 ? '🌸' : cfg.sessions >= 18 ? '🌳' : cfg.sessions >= 10 ? '🌿' : '🌱';
   document.getElementById('ringPlantEmoji').textContent = plant;
+  renderAnalyticsBars();
 }
 
 function updateTimerDisplay() {
@@ -1140,14 +1141,80 @@ function renderSoundsStudio() {
    8. ANALYTICS & GOAL CALCULATOR (100% WESTERN DIGITS)
    ======================================================== */
 function renderAnalyticsBars() {
-  const box = document.getElementById('anMiniBarsBox');
-  box.innerHTML = '';
-  const vals = [45, 70, 55, 85, 60, 95, 75];
-  vals.forEach((v, i) => {
-    const col = document.createElement('div');
-    col.className = 'mbar-col';
-    col.innerHTML = `<div class="mbar-fill ${i===5 ? 'peak' : ''}" style="height:${Math.round(v * 0.72)}px;"></div>`;
-    box.appendChild(col);
+  const hist = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
+  const recent = Array.from({length: 7}, (_, i) => {
+    const date = new Date(); date.setHours(12, 0, 0, 0); date.setDate(date.getDate() - (6-i));
+    const key = localDateISO(date);
+    return { key, weekday: date.getDay(), minutes: 0 };
+  });
+  const domains = {study: 0, sport: 0, read: 0, work: 0};
+  for (const entry of hist) {
+    if (!entry || typeof entry.date !== 'string') continue;
+    const minute = Number(entry.minutes);
+    if (!Number.isFinite(minute) || minute < 0 || minute > 1440) continue;
+    const day = recent.find(d => d.key === entry.date);
+    if (!day) continue;
+    day.minutes += minute;
+    const domain = entry.domain === 'exam' ? 'work' : entry.domain === 'review' ? 'read' : entry.domain;
+    if (Object.prototype.hasOwnProperty.call(domains, domain)) domains[domain] += minute;
+  }
+  const total = recent.reduce((a, b) => a + b.minutes, 0);
+  const all = Object.values(domains).reduce((a,b) => a+b, 0);
+  const colors = {study:'#3b82f6', sport:'#10b981', read:'#8b5cf6', work:'#f59e0b'};
+  let accumulated = 0;
+  const sections = [];
+  for (const k of Object.keys(domains)) {
+    const percent = all ? domains[k]/all*100 : 0;
+    const el = document.getElementById('share-' + k);
+    if (el) el.textContent = all ? Math.round(percent) + '%' : '—';
+    if (percent) {
+      sections.push(colors[k] + ' ' + accumulated.toFixed(2) + '% ' + (accumulated+percent).toFixed(2) + '%');
+      accumulated += percent;
+    }
+  }
+  const donut = document.getElementById('activityDonut');
+  if (donut) donut.style.background = sections.length ? 'conic-gradient(' + sections.join(',') + ')' : '#f1f5f9';
+  const donutText = document.getElementById('activityDonutText');
+  if (donutText) donutText.textContent = all ? Math.round(domains.study/all*100)+'%' : '—';
+  const trend = document.getElementById('kpiWeeklyTrend');
+  if (trend) trend.textContent = total + ' recorded minutes / 7 days';
+  const sessionsTrend = document.getElementById('kpiSessionTrend');
+  if (sessionsTrend) sessionsTrend.textContent = hist.filter(h => recent.some(d => d.key === h.date)).length + ' verified sessions / 7 days';
+  const minsLabel = document.getElementById('waveRecordedMinutes');
+  if (minsLabel) minsLabel.textContent = String(total);
+  const barBox = document.getElementById('anMiniBarsBox');
+  if (barBox) {
+    barBox.textContent = '';
+    const maxMinutes = Math.max(1, ...recent.map(d => d.minutes));
+    recent.forEach((d,i) => {
+      const col = document.createElement('div');
+      col.className = 'mbar-col';
+      const bar = document.createElement('div');
+      bar.className = 'mbar-fill' + (d.minutes === maxMinutes && d.minutes > 0 ? ' peak' : '');
+      bar.style.height = (d.minutes > 0 ? Math.max(3, Math.round(d.minutes/maxMinutes*75)) : 2) + 'px';
+      bar.title = d.key + ': ' + d.minutes + ' min';
+      col.appendChild(bar);
+      barBox.appendChild(col);
+    });
+  }
+  const max = Math.max(1, ...recent.map(d=>d.minutes));
+  const points = recent.map((d,i) => [i*(320/6), 95-(d.minutes/max)*75]);
+  const dline = points.map((p,i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const line = document.getElementById('waveLine'), area = document.getElementById('waveArea'), peak = document.getElementById('wavePeak');
+  if (line) line.setAttribute('d',dline);
+  if (area) area.setAttribute('d',dline + ' L320 95 L0 95 Z');
+  if (peak) {
+    const i = recent.findIndex(d => d.minutes === Math.max(...recent.map(x=>x.minutes)));
+    peak.setAttribute('cx',points[i][0]); peak.setAttribute('cy',points[i][1]);
+    peak.style.visibility = total ? 'visible' : 'hidden';
+  }
+  const d = L();
+  const daysRow = document.getElementById('waveDaysRow');
+  if (daysRow) daysRow.textContent = '';
+  if (daysRow) recent.forEach(day => {
+    const label = document.createElement('span');
+    label.textContent = d.weekdays[day.weekday] || String(day.weekday);
+    daysRow.appendChild(label);
   });
 }
 
