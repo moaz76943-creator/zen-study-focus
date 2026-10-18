@@ -114,7 +114,6 @@ public class FocusTimerService extends Service {
 
     private void triggerCompletionAlarm(String title) {
         try {
-            // Play Native System Alarm / Notification Sound
             Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
             if (alarmUri == null) {
                 alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -122,7 +121,6 @@ public class FocusTimerService extends Service {
             Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), alarmUri);
             if (ringtone != null) {
                 ringtone.play();
-                // Stop alarm automatically after 4.5 seconds so it doesn't ring forever
                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
                     try { if (ringtone.isPlaying()) ringtone.stop(); } catch (Exception ignored) {}
                 }, 4500);

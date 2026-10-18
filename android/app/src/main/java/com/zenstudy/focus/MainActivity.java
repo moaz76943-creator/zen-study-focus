@@ -2,11 +2,7 @@ package com.zenstudy.focus;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -27,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Request Notification Permission for Android 13+ (API 33+)
         if (Build.VERSION.SDK_INT >= 33) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -35,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // Anti-Mod & Anti-Tamper Verification
         WebView.setWebContentsDebuggingEnabled(false);
         if (!"com.zenstudy.focus".equals(getPackageName())) {
             finish();
