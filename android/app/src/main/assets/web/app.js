@@ -995,6 +995,19 @@ function focusOnTask(id) {
   if (t) { document.getElementById('timerLinkedTask').textContent = toWest(`🎯 ${t.title}`); switchTab('sec-timer', document.getElementById('navTimer')); }
 }
 
+let lastAllocatedRecordId = 0;
+function nextRecordId() {
+  const existing = new Set(
+    [...tasksList, ...notesList]
+      .map(x => Number(x.id))
+      .filter(Number.isSafeInteger)
+  );
+  let id = Math.max(Date.now(), lastAllocatedRecordId + 1);
+  while (existing.has(id)) id++;
+  lastAllocatedRecordId = id;
+  return id;
+}
+
 function createNewTask() {
   const inp = document.getElementById('inpNewTask');
   const val = toWest(inp.value.trim());
@@ -1004,7 +1017,7 @@ function createNewTask() {
   const themes = { study: 'tp-blue', exam: 'tp-amber', review: 'tp-rose', sport: 'tp-emerald' };
   const icons = { study: '📚', exam: '💻', review: '📖', sport: '🏋️' };
   tasksList.unshift({
-    id: Date.now(), isStarter: false, title: val, time: '25m', date: dateVal,
+    id: nextRecordId(), isStarter: false, title: val, time: '25m', date: dateVal,
     catKey: catKey, icon: icons[catKey] || '📚', theme: themes[catKey] || 'tp-blue', done: false
   });
   inp.value = '';
@@ -1172,7 +1185,7 @@ function saveNewNote() {
   const calDate = toWest(document.getElementById('inpNoteCalDate').value || todayISO);
   const blur = document.getElementById('chkNoteBlur').checked;
   notesList.unshift({
-    id: Date.now(), isStarter: false, title: t || L().navNotes, body: b,
+    id: nextRecordId(), isStarter: false, title: t || L().navNotes, body: b,
     catKey: catKey, calDate: calDate, blur: blur, theme: blur ? 'theme-emerald' : 'theme-violet'
   });
   saveFortressData('zen_fortress_notes_v21', notesList);
@@ -1211,11 +1224,11 @@ function saveQuickDump(toTasks) {
   const val = toWest(document.getElementById('inpQuickDump').value.trim());
   if (!val) return;
   if (toTasks) {
-    tasksList.unshift({ id: Date.now(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false });
+    tasksList.unshift({ id: nextRecordId(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false });
     saveFortressData('zen_fortress_tasks_v21', tasksList);
     renderTasksList();
   } else {
-    notesList.unshift({ id: Date.now(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' });
+    notesList.unshift({ id: nextRecordId(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' });
     saveFortressData('zen_fortress_notes_v21', notesList);
     renderNotesStack();
   }
