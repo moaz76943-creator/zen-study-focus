@@ -3,229 +3,272 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Zen Study Pro - الإتقان والإنتاجية</title>
+  <title>Zen Study Pro - الملاحظات والإنتاجية الذكية</title>
   <style>
     :root {
-      --canvas-bg: #f4f6fa;
-      --header-gradient: linear-gradient(135deg, #0d1b2a 0%, #1b263b 60%, #1e3a5f 100%);
+      --canvas-bg: #f5f7fb;
+      --header-grad: linear-gradient(135deg, #0b1329 0%, #172554 60%, #1e3a8a 100%);
       --card-white: #ffffff;
-      --primary: #0ea5e9;
-      --primary-dark: #0284c7;
+      --primary: #0284c7;
       --primary-soft: #e0f2fe;
-      --success: #10b981;
+      --success: #059669;
       --success-soft: #d1fae5;
-      --amber: #f59e0b;
+      --amber: #d97706;
       --amber-soft: #fef3c7;
-      --purple: #8b5cf6;
+      --purple: #7c3aed;
       --purple-soft: #ede9fe;
-      --danger: #ef4444;
-      --danger-soft: #fee2e2;
+      --rose: #e11d48;
+      --rose-soft: #ffe4e6;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --text-light: #94a3b8;
       --border-soft: #e2e8f0;
-      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.03);
-      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 6px 10px -4px rgba(15, 23, 42, 0.02);
       --radius-lg: 24px;
       --radius-md: 16px;
       --radius-pill: 9999px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--canvas-bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 90px; }
+    body { background-color: var(--canvas-bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 86px; overflow-x: hidden; }
 
     .app-viewport { width: 100%; max-width: 440px; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
 
     /* Top Ambient App Header */
     .app-header {
-      background: var(--header-gradient);
+      background: var(--header-grad);
       color: #ffffff;
-      padding: 24px 20px 28px;
-      border-bottom-left-radius: 32px;
-      border-bottom-right-radius: 32px;
-      box-shadow: 0 12px 30px rgba(13, 27, 42, 0.15);
-      position: relative;
+      padding: 22px 20px 24px;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+      box-shadow: 0 12px 28px rgba(11, 19, 41, 0.18);
     }
     .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .brand-group { display: flex; align-items: center; gap: 10px; }
-    .brand-icon-box { width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-    .header-title { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; }
-    .header-subtitle { font-size: 0.78rem; opacity: 0.85; margin-top: 1px; }
+    .brand-wrap { display: flex; align-items: center; gap: 10px; }
+    .brand-avatar { width: 38px; height: 38px; border-radius: 12px; background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; }
+    .brand-title { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; }
+    .brand-sub { font-size: 0.74rem; opacity: 0.85; margin-top: 1px; }
 
     .header-actions { display: flex; gap: 8px; }
     .action-circle-btn {
-      width: 38px; height: 38px; border-radius: 50%; border: none;
+      width: 36px; height: 36px; border-radius: 50%; border: none;
       background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(8px);
       color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: transform 0.2s, background 0.2s;
+      cursor: pointer; transition: transform 0.15s, background 0.15s;
     }
     .action-circle-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.25); }
 
-    /* Floating Metric Banner inside Header */
-    .header-metric-card {
+    .header-metric-bar {
       background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: var(--radius-md);
-      padding: 10px 16px;
+      padding: 9px 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 6px;
+      margin-top: 4px;
     }
-    .metric-item { display: flex; flex-direction: column; }
-    .metric-label { font-size: 0.7rem; opacity: 0.8; }
-    .metric-value { font-size: 1rem; font-weight: 800; }
+    .metric-subitem { display: flex; flex-direction: column; }
+    .metric-sublabel { font-size: 0.68rem; opacity: 0.8; }
+    .metric-subval { font-size: 0.95rem; font-weight: 800; }
 
-    /* Content Area for Active View */
-    .view-content { padding: 18px 16px; flex: 1; display: none; animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+    /* Content Area */
+    .view-content { padding: 18px 16px; flex: 1; display: none; animation: fadeInView 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     .view-content.active { display: block; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInView { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* White Surface Cards */
+    /* Universal White Cards */
     .white-card {
       background: var(--card-white);
       border-radius: var(--radius-lg);
-      padding: 20px;
+      padding: 18px;
       box-shadow: var(--shadow-md);
       border: 1px solid var(--border-soft);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-    .card-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .card-title { font-size: 0.95rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-    .badge-pill { padding: 4px 10px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; }
-    .badge-blue { background: var(--primary-soft); color: var(--primary-dark); }
-    .badge-green { background: var(--success-soft); color: var(--success); }
-    .badge-amber { background: var(--amber-soft); color: var(--amber); }
+    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .card-title-txt { font-size: 0.92rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .pill-badge { padding: 4px 10px; border-radius: var(--radius-pill); font-size: 0.7rem; font-weight: 700; }
+    .pill-blue { background: var(--primary-soft); color: var(--primary); }
+    .pill-green { background: var(--success-soft); color: var(--success); }
+    .pill-amber { background: var(--amber-soft); color: var(--amber); }
 
-    /* View 1: Focus & Timer */
-    .timer-display-wrap { display: flex; flex-direction: column; align-items: center; padding: 14px 0 10px; }
-    .circular-timer { position: relative; width: 230px; height: 230px; display: flex; align-items: center; justify-content: center; }
-    .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-    .t-circle-bg { fill: none; stroke: #f1f5f9; stroke-width: 10; }
-    .t-circle-bar { fill: none; stroke: var(--primary); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s linear, stroke 0.3s; filter: drop-shadow(0 4px 10px rgba(14, 165, 233, 0.3)); }
-    .timer-core { position: absolute; text-align: center; }
-    .timer-digits { font-size: 3.2rem; font-weight: 900; letter-spacing: -1px; color: var(--text-main); font-variant-numeric: tabular-nums; line-height: 1; }
-    .timer-mode-tag { font-size: 0.78rem; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 3px 12px; border-radius: var(--radius-pill); margin-top: 8px; display: inline-block; }
+    /* =====================================
+       VIEW 1: TIMER
+       ===================================== */
+    .segmented-control { display: flex; background: #eef2f6; padding: 4px; border-radius: var(--radius-pill); margin-bottom: 16px; gap: 4px; }
+    .seg-btn { flex: 1; border: none; background: transparent; padding: 8px 0; border-radius: var(--radius-pill); font-size: 0.74rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+    .seg-btn.active { background: var(--card-white); color: var(--text-main); box-shadow: var(--shadow-sm); }
 
-    .segmented-control { display: flex; background: #eef2f6; padding: 4px; border-radius: var(--radius-pill); margin-bottom: 20px; gap: 4px; }
-    .segment-btn { flex: 1; border: none; background: transparent; padding: 9px 0; border-radius: var(--radius-pill); font-size: 0.76rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
-    .segment-btn.active { background: var(--card-white); color: var(--text-main); box-shadow: var(--shadow-sm); }
+    .timer-wrap { display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
+    .circ-timer { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; }
+    .circ-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .circ-bg { fill: none; stroke: #f1f5f9; stroke-width: 9; }
+    .circ-bar { fill: none; stroke: var(--primary); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s linear; filter: drop-shadow(0 4px 10px rgba(2, 132, 199, 0.28)); }
+    .circ-center { position: absolute; text-align: center; }
+    .timer-digits { font-size: 3rem; font-weight: 900; letter-spacing: -1px; color: var(--text-main); font-variant-numeric: tabular-nums; line-height: 1; }
+    .timer-mode-pill { font-size: 0.74rem; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 3px 12px; border-radius: var(--radius-pill); margin-top: 6px; display: inline-block; }
 
-    .timer-controls-row { display: flex; gap: 10px; margin-top: 14px; width: 100%; }
-    .btn-action-primary { flex: 2; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #ffffff; border: none; padding: 14px 20px; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px rgba(14, 165, 233, 0.35); transition: transform 0.15s; }
-    .btn-action-primary:active { transform: scale(0.97); }
-    .btn-action-sec { flex: 1; background: #f8fafc; border: 1px solid var(--border-soft); color: var(--text-main); padding: 14px 12px; border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 700; cursor: pointer; }
+    .timer-btns { display: flex; gap: 10px; margin-top: 14px; width: 100%; }
+    .btn-main { flex: 2; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; border: none; padding: 13px 18px; border-radius: var(--radius-md); font-size: 0.92rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px rgba(2, 132, 199, 0.35); }
+    .btn-main:active { transform: scale(0.98); }
+    .btn-sec { flex: 1; background: #f8fafc; border: 1px solid var(--border-soft); color: var(--text-main); padding: 13px 10px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 
-    .adjust-row { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
-    .btn-micro { background: #f1f5f9; border: none; padding: 5px 12px; border-radius: var(--radius-pill); font-size: 0.74rem; font-weight: 700; color: var(--text-muted); cursor: pointer; }
-    .btn-micro:active { background: var(--primary-soft); color: var(--primary-dark); }
+    .adjust-row { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+    .btn-adj { background: #f1f5f9; border: none; padding: 4px 10px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); cursor: pointer; }
+    .btn-adj:active { background: var(--primary-soft); color: var(--primary); }
 
-    /* View 2: Nature Soundscapes (Zero Music) */
-    .sound-category-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; scrollbar-width: none; }
-    .sound-category-scroll::-webkit-scrollbar { display: none; }
-    .sound-pill-btn { background: var(--card-white); border: 1px solid var(--border-soft); padding: 7px 15px; border-radius: var(--radius-pill); font-size: 0.76rem; font-weight: 700; color: var(--text-muted); white-space: nowrap; cursor: pointer; }
-    .sound-pill-btn.active { background: var(--text-main); color: #ffffff; border-color: var(--text-main); }
+    /* =====================================
+       VIEW 2: TASKS
+       ===================================== */
+    .task-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .clean-input { flex: 1; background: var(--card-white); border: 1px solid var(--border-soft); padding: 10px 14px; border-radius: var(--radius-md); font-size: 0.82rem; outline: none; box-shadow: var(--shadow-sm); }
+    .clean-input:focus { border-color: var(--primary); }
+    .btn-icon-add { background: var(--primary); color: #ffffff; border: none; padding: 0 16px; border-radius: var(--radius-md); font-weight: 800; font-size: 1.1rem; cursor: pointer; }
 
-    .sound-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .sound-tile {
+    .task-list-flow { display: flex; flex-direction: column; gap: 8px; }
+    .task-item-card {
       background: var(--card-white);
       border-radius: var(--radius-md);
-      padding: 14px;
+      padding: 12px 14px;
       border: 1px solid var(--border-soft);
       box-shadow: var(--shadow-sm);
-      display: flex; flex-direction: column; justify-content: space-between;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
     }
-    .sound-tile.on { border-color: var(--primary); box-shadow: 0 6px 18px rgba(14, 165, 233, 0.15); background: #f8fcff; }
-    .sound-tile-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .sound-tile-title { font-size: 0.82rem; font-weight: 800; color: var(--text-main); }
-    .switch-toggle { width: 34px; height: 20px; background: #cbd5e1; border-radius: var(--radius-pill); position: relative; cursor: pointer; transition: background 0.25s; }
-    .switch-toggle.active { background: var(--primary); }
-    .switch-dot { width: 14px; height: 14px; background: #ffffff; border-radius: 50%; position: absolute; top: 3px; right: 3px; transition: transform 0.25s; }
-    .switch-toggle.active .switch-dot { transform: translateX(-14px); }
-    .sound-slider { width: 100%; -webkit-appearance: none; background: #e2e8f0; height: 4px; border-radius: 2px; outline: none; margin-top: 10px; }
-    .sound-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .task-left { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; }
+    .task-checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 0.75rem; }
+    .task-item-card.done .task-checkbox { background: var(--success); border-color: var(--success); color: #fff; }
+    .task-item-card.done .t-name { text-decoration: line-through; color: var(--text-light); }
+    .t-name { font-size: 0.82rem; font-weight: 700; color: var(--text-main); }
+    .t-sub { font-size: 0.66rem; color: var(--text-muted); }
 
-    /* View 3: Productivity & Tasks (Like 'إنتاجية' Screen) */
-    .task-input-bar { display: flex; gap: 8px; margin-bottom: 14px; }
-    .clean-input { flex: 1; background: var(--card-white); border: 1px solid var(--border-soft); padding: 11px 14px; border-radius: var(--radius-md); font-size: 0.82rem; outline: none; box-shadow: var(--shadow-sm); }
-    .clean-input:focus { border-color: var(--primary); }
-    .btn-add-task { background: var(--primary); color: #ffffff; border: none; padding: 0 18px; border-radius: var(--radius-md); font-weight: 800; font-size: 1.1rem; cursor: pointer; }
+    /* =====================================
+       VIEW 3: DEDICATED SMART NOTES (الملاحظات الذكية)
+       ===================================== */
+    .notes-search-wrap { display: flex; gap: 8px; margin-bottom: 10px; }
+    .filter-chips-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
+    .filter-chips-row::-webkit-scrollbar { display: none; }
+    .filter-chip-btn { background: var(--card-white); border: 1px solid var(--border-soft); padding: 6px 13px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); white-space: nowrap; cursor: pointer; }
+    .filter-chip-btn.active { background: var(--text-main); color: #ffffff; border-color: var(--text-main); }
 
-    .tasks-stream { display: flex; flex-direction: column; gap: 10px; }
-    .task-card-item {
+    /* Quick Action Banners for Note Creation */
+    .quick-templates-bar { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
+    .quick-templates-bar::-webkit-scrollbar { display: none; }
+    .btn-template-chip {
+      background: #f1f5f9; border: 1px dashed #cbd5e1;
+      padding: 6px 11px; border-radius: var(--radius-pill);
+      font-size: 0.7rem; font-weight: 700; color: var(--primary);
+      white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 4px;
+    }
+    .btn-template-chip:active { background: var(--primary-soft); }
+
+    /* Notes Composer Drawer / Card */
+    .note-editor-card {
+      background: var(--card-white);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-soft);
+      margin-bottom: 14px;
+    }
+    .note-textarea {
+      width: 100%; height: 95px; border: 1px solid var(--border-soft); border-radius: 12px;
+      padding: 10px; font-size: 0.8rem; color: var(--text-main); line-height: 1.45;
+      resize: none; outline: none; background: #fafbfc;
+    }
+    .note-textarea:focus { border-color: var(--primary); background: #ffffff; }
+    .note-editor-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+
+    /* Notes Cards Stream */
+    .notes-stream { display: flex; flex-direction: column; gap: 10px; }
+    .note-card-item {
       background: var(--card-white);
       border-radius: var(--radius-md);
       padding: 14px 16px;
       border: 1px solid var(--border-soft);
       box-shadow: var(--shadow-sm);
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      position: relative;
+      border-right: 4px solid var(--primary);
+      transition: transform 0.15s;
     }
-    .task-left-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
-    .task-check-circle { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-    .task-card-item.done .task-check-circle { background: var(--success); border-color: var(--success); color: #fff; }
-    .task-card-item.done .task-name { text-decoration: line-through; color: var(--text-light); }
-    .task-info-block { display: flex; flex-direction: column; }
-    .task-name { font-size: 0.84rem; font-weight: 700; color: var(--text-main); }
-    .task-time-pill { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+    .note-card-item.pinned { border-right-color: var(--amber); background: #fffdfa; }
+    .note-card-item.dump { border-right-color: var(--purple); }
+    .note-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .note-tag-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
+    .tag-cornell { background: var(--primary-soft); color: var(--primary); }
+    .tag-dump { background: var(--purple-soft); color: var(--purple); }
+    .tag-exam { background: var(--amber-soft); color: var(--amber); }
+    .tag-general { background: #f1f5f9; color: var(--text-muted); }
+    .note-card-body { font-size: 0.8rem; line-height: 1.5; color: var(--text-main); white-space: pre-wrap; }
+    .note-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.67rem; color: var(--text-light); }
+    .note-card-btns { display: flex; gap: 8px; }
+    .btn-micro-icon { background: none; border: none; cursor: pointer; font-size: 0.85rem; color: var(--text-muted); }
 
-    /* View 4: Active Recall & Flashcards (Like 'تعلّم' Screen) */
-    .flashcard-hero {
-      background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
-      border: 1.5px solid #a7f3d0;
-      border-radius: var(--radius-lg);
-      padding: 30px 20px;
-      min-height: 160px;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      text-align: center; cursor: pointer;
-      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.08);
-      margin-bottom: 14px;
+    /* =====================================
+       VIEW 4: SOUNDS (ZERO MUSIC)
+       ===================================== */
+    .sound-tiles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sound-tile-item {
+      background: var(--card-white);
+      border-radius: var(--radius-md);
+      padding: 13px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-sm);
+      display: flex; flex-direction: column; justify-content: space-between;
     }
-    .fc-prompt-tag { font-size: 0.7rem; font-weight: 800; color: var(--success); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .fc-main-text { font-size: 1.05rem; font-weight: 800; color: var(--text-main); line-height: 1.4; }
+    .sound-tile-item.on { border-color: var(--primary); background: #f8fcff; }
+    .sound-head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .sound-tile-label { font-size: 0.8rem; font-weight: 800; color: var(--text-main); }
+    .toggle-switch { width: 32px; height: 18px; background: #cbd5e1; border-radius: var(--radius-pill); position: relative; cursor: pointer; transition: 0.2s; }
+    .toggle-switch.active { background: var(--primary); }
+    .toggle-switch-dot { width: 12px; height: 12px; background: #fff; border-radius: 50%; position: absolute; top: 3px; right: 3px; transition: transform 0.2s; }
+    .toggle-switch.active .toggle-switch-dot { transform: translateX(-14px); }
+    .volume-slider { width: 100%; -webkit-appearance: none; background: #e2e8f0; height: 4px; border-radius: 2px; outline: none; margin-top: 8px; }
+    .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--primary); cursor: pointer; }
 
-    /* View 5: Analytics & Growth (Like 'تحليلات' Screen) */
-    .stats-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .kpi-card { background: var(--card-white); border: 1px solid var(--border-soft); border-radius: var(--radius-md); padding: 14px; box-shadow: var(--shadow-sm); }
-    .kpi-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
-    .kpi-value { font-size: 1.35rem; font-weight: 900; color: var(--text-main); margin-top: 4px; }
-    .kpi-trend { font-size: 0.68rem; font-weight: 700; color: var(--success); display: flex; align-items: center; gap: 2px; margin-top: 2px; }
+    /* =====================================
+       VIEW 5: ANALYTICS & STATS
+       ===================================== */
+    .kpi-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .kpi-stat-box { background: var(--card-white); border: 1px solid var(--border-soft); border-radius: var(--radius-md); padding: 14px; box-shadow: var(--shadow-sm); }
+    .kpi-stat-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
+    .kpi-stat-val { font-size: 1.3rem; font-weight: 900; color: var(--text-main); margin-top: 2px; }
 
-    /* Bottom Navigation Bar (Identical to Mobile Showcase) */
+    /* Bottom Navigation Bar (Matched to Mobile Showcase) */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       width: 100%;
       max-width: 440px;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--border-soft);
-      padding: 10px 14px 18px;
+      padding: 9px 12px 16px;
       display: flex;
       justify-content: space-around;
       align-items: center;
       z-index: 100;
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
     }
-    .nav-tab-item {
+    .nav-tab-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       background: none;
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      font-size: 0.68rem;
+      font-size: 0.67rem;
       font-weight: 700;
-      transition: color 0.2s, transform 0.15s;
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
+      padding: 4px 8px;
+      transition: color 0.15s, transform 0.15s;
     }
-    .nav-tab-item.active { color: var(--primary-dark); }
-    .nav-tab-item .nav-icon { font-size: 1.25rem; transition: transform 0.2s; }
-    .nav-tab-item.active .nav-icon { transform: translateY(-2px); }
+    .nav-tab-btn.active { color: var(--primary); }
+    .nav-tab-btn .tab-ico { font-size: 1.25rem; transition: transform 0.2s; }
+    .nav-tab-btn.active .tab-ico { transform: translateY(-2px); }
   </style>
 </head>
 <body>
@@ -234,273 +277,498 @@
     <!-- Header -->
     <header class="app-header">
       <div class="header-top">
-        <div class="brand-group">
-          <div class="brand-icon-box">✨</div>
+        <div class="brand-wrap">
+          <div class="brand-avatar">✨</div>
           <div>
-            <h1 class="header-title">عالم الإنتاجية والتركيز</h1>
-            <p class="header-subtitle">Zen Study Focus Pro</p>
+            <h1 class="brand-title">Zen Study Focus Pro</h1>
+            <p class="brand-sub">عالم من المذاكرة الهادئة والإنتاجية</p>
           </div>
         </div>
         <div class="header-actions">
-          <button class="action-circle-btn" id="masterMuteBtn" onclick="toggleAudioMute()" title="كتم الأصوات">🔊</button>
-          <button class="action-circle-btn" onclick="switchView('view-timer')" title="المؤقت">⏱️</button>
+          <button class="action-circle-btn" id="masterMuteBtn" onclick="toggleMasterAudio()" title="كتم/تشغيل الأصوات">🔊</button>
+          <button class="action-circle-btn" onclick="exportNotesFile()" title="تصدير الملاحظات">💾</button>
         </div>
       </div>
-      <div class="header-metric-card">
-        <div class="metric-item">
-          <span class="metric-label">إجمالي التركيز اليوم</span>
-          <span class="metric-value" id="hdrFocusTime">0 دقيقة</span>
+      <div class="header-metric-bar">
+        <div class="metric-subitem">
+          <span class="metric-sublabel">دقائق التركيز اليوم</span>
+          <span class="metric-subval" id="hdrFocusVal">0 دقيقة</span>
         </div>
-        <div class="metric-item" style="text-align: left;">
-          <span class="metric-label">سلسلة الالتزام</span>
-          <span class="metric-value" id="hdrStreak">🔥 0 جلسات</span>
+        <div class="metric-subitem" style="text-align: left;">
+          <span class="metric-sublabel">سلسلة الإنجاز</span>
+          <span class="metric-subval" id="hdrStreakVal">🔥 0 جلسات</span>
         </div>
       </div>
     </header>
 
-    <!-- VIEW 1: التركيز والمؤقت (Focus) -->
+    <!-- VIEW 1: TIMER -->
     <main class="view-content active" id="view-timer">
       <div class="white-card">
         <div class="segmented-control">
-          <button class="segment-btn active" id="seg-25" onclick="setTimerPreset(25, 'جلسة تركيز', this)">تركيز 25د</button>
-          <button class="segment-btn" id="seg-5" onclick="setTimerPreset(5, 'استراحة قصيرة', this)">راحة 5د</button>
-          <button class="segment-btn" id="seg-15" onclick="setTimerPreset(15, 'استراحة عميقة', this)">طويلة 15د</button>
-          <button class="segment-btn" id="seg-52" onclick="setTimerPreset(52, 'جلسة 52/17', this)">52/17 ⚡</button>
+          <button class="seg-btn active" id="seg-focus" onclick="setTimerMode(25, 'جلسة تركيز', this)">تركيز 25د</button>
+          <button class="seg-btn" id="seg-short" onclick="setTimerMode(5, 'راحة قصيرة', this)">راحة 5د</button>
+          <button class="seg-btn" id="seg-long" onclick="setTimerMode(15, 'استراحة عميقة', this)">طويلة 15د</button>
+          <button class="seg-btn" id="seg-5217" onclick="setTimerMode(52, 'جلسة 52/17 ⚡', this)">52/17 ⚡</button>
         </div>
 
-        <div class="timer-display-wrap">
-          <div class="circular-timer">
-            <svg class="timer-svg" viewBox="0 0 230 230">
-              <circle class="t-circle-bg" cx="115" cy="115" r="105"></circle>
-              <circle class="t-circle-bar" id="timerSvgBar" cx="115" cy="115" r="105"></circle>
+        <div class="timer-wrap">
+          <div class="circ-timer">
+            <svg class="circ-svg" viewBox="0 0 230 230">
+              <circle class="circ-bg" cx="115" cy="115" r="105"></circle>
+              <circle class="circ-bar" id="timerSvgBar" cx="115" cy="115" r="105"></circle>
             </svg>
-            <div class="timer-core">
-              <div class="timer-digits" id="timerDigitsText">25:00</div>
-              <span class="timer-mode-tag" id="timerTagText">جلسة تركيز</span>
+            <div class="circ-center">
+              <div class="timer-digits" id="timerDigits">25:00</div>
+              <span class="timer-mode-pill" id="timerTag">جلسة تركيز</span>
             </div>
           </div>
+
           <div class="adjust-row">
-            <button class="btn-micro" onclick="adjustTimer(-5)">-5 دقائق</button>
-            <button class="btn-micro" onclick="adjustTimer(-1)">-1 دقيقة</button>
-            <button class="btn-micro" onclick="adjustTimer(1)">+1 دقيقة</button>
-            <button class="btn-micro" onclick="adjustTimer(5)">+5 دقائق</button>
+            <button class="btn-adj" onclick="adjustTimerMinutes(-5)">-5 دقائق</button>
+            <button class="btn-adj" onclick="adjustTimerMinutes(-1)">-1 دقيقة</button>
+            <button class="btn-adj" onclick="adjustTimerMinutes(1)">+1 دقيقة</button>
+            <button class="btn-adj" onclick="adjustTimerMinutes(5)">+5 دقائق</button>
           </div>
         </div>
 
-        <div class="timer-controls-row">
-          <button class="btn-action-primary" id="timerToggleBtn" onclick="toggleTimer()">بدء الجلسة</button>
-          <button class="btn-action-sec" onclick="resetTimer()">إعادة ضبط</button>
+        <div class="timer-btns">
+          <button class="btn-main" id="timerBtn" onclick="toggleTimer()">بدء الجلسة</button>
+          <button class="btn-sec" onclick="resetTimer()">إعادة ضبط</button>
         </div>
       </div>
     </main>
 
-    <!-- VIEW 2: الأصوات الطبيعية (Soundscapes - Zero Music) -->
-    <main class="view-content" id="view-sounds">
-      <div class="sound-category-scroll">
-        <button class="sound-pill-btn active" onclick="filterSounds('all', this)">كل الأصوات (12)</button>
-        <button class="sound-pill-btn" onclick="filterSounds('cozy', this)">🔥 الدفء والراحة</button>
-        <button class="sound-pill-btn" onclick="filterSounds('nature', this)">🌲 الطبيعة الحية</button>
-        <button class="sound-pill-btn" onclick="filterSounds('focus', this)">🛡️ العزل الصوتي</button>
-      </div>
-
-      <div class="sound-cards-grid" id="soundGridContainer"></div>
-    </main>
-
-    <!-- VIEW 3: الإنتاجية والمهام (Tasks Planner) -->
+    <!-- VIEW 2: TASKS -->
     <main class="view-content" id="view-tasks">
       <div class="white-card">
-        <div class="card-title-row">
-          <div class="card-title"><span>📋</span> جدول المهام الدراسية</div>
-          <span class="badge-pill badge-blue" id="taskDoneBadge">0 من 0 مكتمل</span>
+        <div class="card-head">
+          <div class="card-title-txt"><span>📋</span> جدول المهام الدراسية</div>
+          <span class="pill-badge pill-blue" id="tasksDoneCount">0 من 0 مكتمل</span>
         </div>
-        <div class="task-input-bar">
-          <input type="text" class="clean-input" id="newTaskInp" placeholder="أضف مهمة جديدة للتركيز عليها...">
-          <button class="btn-add-task" onclick="addNewTask()">+</button>
+        <div class="task-input-row">
+          <input type="text" class="clean-input" id="taskInputInp" placeholder="أضف مهمة جديدة للتركيز عليها...">
+          <button class="btn-icon-add" onclick="addTaskItem()">+</button>
         </div>
-        <div class="tasks-stream" id="tasksStreamContainer"></div>
+        <div class="task-list-flow" id="tasksContainer"></div>
       </div>
     </main>
 
-    <!-- VIEW 4: الاستذكار والتعلّم (Active Recall) -->
-    <main class="view-content" id="view-learn">
+    <!-- VIEW 3: DEDICATED SMART NOTES (الملاحظات الذكية) -->
+    <main class="view-content" id="view-notes">
+      <div class="notes-search-wrap">
+        <input type="text" class="clean-input" id="notesSearchInp" placeholder="🔍 ابحث في الملاحظات أو الأفكار..." oninput="filterNotes()">
+        <button class="btn-sec" style="padding: 10px 14px;" onclick="exportNotesFile()">تصدير TXT</button>
+      </div>
+
+      <!-- Quick Templates & Brain-Dump Bar -->
+      <div class="quick-templates-bar">
+        <button class="btn-template-chip" onclick="applyTemplate('dump')">⚡ تفريغ فكرة مشتتة</button>
+        <button class="btn-template-chip" onclick="applyTemplate('cornell')">📋 قالب كورنيل</button>
+        <button class="btn-template-chip" onclick="applyTemplate('exam')">⭐ أسئلة الامتحان</button>
+        <button class="btn-template-chip" onclick="applyTemplate('formula')">📐 قانون هام</button>
+      </div>
+
+      <!-- Note Creator Card -->
+      <div class="note-editor-card">
+        <textarea class="note-textarea" id="noteEditorArea" placeholder="دوّن ملخصاً دراسياً أو فرّغ خاطرة مشتتة للعودة للتركيز..."></textarea>
+        <div class="note-editor-actions">
+          <select class="clean-input" id="noteTagSelect" style="width: auto; padding: 6px 10px; font-size: 0.74rem;">
+            <option value="general">📚 عام</option>
+            <option value="dump">💭 تفريغ مشتت</option>
+            <option value="cornell">📋 كورنيل</option>
+            <option value="exam">⭐ امتحان</option>
+          </select>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn-main" style="padding: 8px 14px; font-size: 0.76rem;" onclick="saveNoteCard()">+ حفظ الملاحظة</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="filter-chips-row">
+        <button class="filter-chip-btn active" onclick="setNotesFilter('all', this)">الكل (<span id="cntAll">0</span>)</button>
+        <button class="filter-chip-btn" onclick="setNotesFilter('pinned', this)">📌 المثبتة (<span id="cntPin">0</span>)</button>
+        <button class="filter-chip-btn" onclick="setNotesFilter('dump', this)">💭 مشتتات (<span id="cntDump">0</span>)</button>
+        <button class="filter-chip-btn" onclick="setNotesFilter('cornell', this)">📋 كورنيل (<span id="cntCornell">0</span>)</button>
+      </div>
+
+      <!-- Notes Feed -->
+      <div class="notes-stream" id="notesFeed"></div>
+    </main>
+
+    <!-- VIEW 4: SOUNDS (100% ZERO MUSIC) -->
+    <main class="view-content" id="view-sounds">
       <div class="white-card">
-        <div class="card-title-row">
-          <div class="card-title"><span>💡</span> بطاقات الاستذكار النشط (Flashcards)</div>
-          <span class="badge-pill badge-green" id="fcIndexBadge">1 / 3</span>
+        <div class="card-head">
+          <div class="card-title-txt"><span>🌿</span> أصوات طبيعية نقية (بدون موسيقى)</div>
+          <span class="pill-badge pill-green">توليد فيزيائي</span>
         </div>
-        <div class="flashcard-hero" onclick="flipFlashcard()" id="fcCardHero">
-          <div class="fc-prompt-tag" id="fcSidePrompt">السؤال (اضغط للكشف عن الإجابة)</div>
-          <div class="fc-main-text" id="fcCardText">ما هو تأثير التكرار المتباعد (Spaced Repetition) على تثبيت المعلومات؟</div>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn-action-sec" style="flex: 1;" onclick="prevFlashcard()">◀ السابق</button>
-          <button class="btn-action-primary" style="flex: 1;" onclick="nextFlashcard()">التالي ▶</button>
-        </div>
+        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 14px;">
+          أصوات مهدئة مُولّدة برمجياً لعزل الضجيج الخارجي ومساعدتك على الانغماس التام.
+        </p>
+        <div class="sound-tiles-grid" id="soundTilesBox"></div>
       </div>
     </main>
 
-    <!-- VIEW 5: التحليلات والإنجاز (Analytics & Stats) -->
+    <!-- VIEW 5: ANALYTICS -->
     <main class="view-content" id="view-analytics">
-      <div class="stats-kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-title">دقائق التركيز اليوم</div>
-          <div class="kpi-value" id="kpiMinsVal">0 د</div>
-          <div class="kpi-trend">↑ أداء ممتاز</div>
+      <div class="kpi-row-grid">
+        <div class="kpi-stat-box">
+          <div class="kpi-stat-label">دقائق التركيز اليوم</div>
+          <div class="kpi-stat-val" id="kpiTodayMins">0 د</div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-title">الجلسات المنجزة</div>
-          <div class="kpi-value" id="kpiSessionsVal">0</div>
-          <div class="kpi-trend">🔥 سلسلة مستمرة</div>
+        <div class="kpi-stat-box">
+          <div class="kpi-stat-label">الجلسات المكتملة</div>
+          <div class="kpi-stat-val" id="kpiCompletedSessions">0</div>
         </div>
       </div>
 
       <div class="white-card">
-        <div class="card-title-row">
-          <div class="card-title"><span>🌱</span> حديقة الإنجاز ورتبتك</div>
-          <span class="badge-pill badge-amber" id="kpiRankBadge">متعلم طموح</span>
+        <div class="card-head">
+          <div class="card-title-txt"><span>🌱</span> رتبة الانضباط وحديقة الإنجاز</div>
+          <span class="pill-badge pill-amber" id="kpiRankText">متعلم طموح 🌱</span>
         </div>
         <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
-          كل جلسة تركيز تنهيها تغذي شجرتك الافتراضية وتساعدك على بناء انضباط مستدام خالٍ من المشتتات.
+          تنمو شجرة تركيزك وتزهر كلما أنجزت جلسات بدون مقاطعة، وتساعدك على بناء عادة دراسية مستدامة.
         </p>
       </div>
     </main>
 
-    <!-- Bottom Navigation Bar (Matched to Design Showcase) -->
+    <!-- Bottom Navigation Bar (5 Golden Tabs) -->
     <nav class="bottom-nav">
-      <button class="nav-tab-item active" onclick="switchView('view-timer', this)">
-        <span class="nav-icon">⏱️</span>
+      <button class="nav-tab-btn active" onclick="switchView('view-timer', this)">
+        <span class="tab-ico">⏱️</span>
         <span>المؤقت</span>
       </button>
-      <button class="nav-tab-item" onclick="switchView('view-sounds', this)">
-        <span class="nav-icon">🌿</span>
-        <span>الأصوات</span>
-      </button>
-      <button class="nav-tab-item" onclick="switchView('view-tasks', this)">
-        <span class="nav-icon">📋</span>
+      <button class="nav-tab-btn" onclick="switchView('view-tasks', this)">
+        <span class="tab-ico">📋</span>
         <span>المهام</span>
       </button>
-      <button class="nav-tab-item" onclick="switchView('view-learn', this)">
-        <span class="nav-icon">💡</span>
-        <span>التعلّم</span>
+      <button class="nav-tab-btn" onclick="switchView('view-notes', this)">
+        <span class="tab-ico">📝</span>
+        <span>الملاحظات</span>
       </button>
-      <button class="nav-tab-item" onclick="switchView('view-analytics', this)">
-        <span class="nav-icon">📊</span>
+      <button class="nav-tab-btn" onclick="switchView('view-sounds', this)">
+        <span class="tab-ico">🌿</span>
+        <span>الأصوات</span>
+      </button>
+      <button class="nav-tab-btn" onclick="switchView('view-analytics', this)">
+        <span class="tab-ico">📊</span>
         <span>التحليلات</span>
       </button>
     </nav>
   </div>
 
   <script>
-    /* ==========================================================
-       1. NAVIGATION ROUTING
-       ========================================================== */
+    /* ========================================================
+       1. ROUTING & NAVIGATION
+       ======================================================== */
     function switchView(viewId, btn) {
       document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
       if (btn) {
-        document.querySelectorAll('.nav-tab-item').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       }
     }
 
-    /* ==========================================================
-       2. TIMER LOGIC
-       ========================================================== */
+    /* ========================================================
+       2. TIMER LOGIC (WITH REAL-TIME DELTA SYNC)
+       ======================================================== */
     let totalSeconds = 25 * 60;
     let leftSeconds = totalSeconds;
     let timerRunning = false;
     let timerInterval = null;
-    let completedSessions = 0;
-    let totalMinsToday = 0;
-    const circumference = 2 * Math.PI * 105;
+    let expectedEndTime = null;
+    let completedSessions = parseInt(localStorage.getItem('zen_completed_sessions') || '0');
+    let totalMinsToday = parseInt(localStorage.getItem('zen_today_mins') || '0');
+    const circPerimeter = 2 * Math.PI * 105;
 
-    function updateTimerUI() {
+    function renderTimer() {
       const m = Math.floor(leftSeconds / 60).toString().padStart(2, '0');
       const s = (leftSeconds % 60).toString().padStart(2, '0');
-      document.getElementById('timerDigitsText').textContent = `${m}:${s}`;
-      const offset = circumference - (leftSeconds / totalSeconds) * circumference;
+      document.getElementById('timerDigits').textContent = `${m}:${s}`;
+      const offset = circPerimeter - (leftSeconds / totalSeconds) * circPerimeter;
       document.getElementById('timerSvgBar').style.strokeDashoffset = offset;
     }
 
-    function setTimerPreset(mins, tag, btn) {
+    function setTimerMode(mins, label, btn) {
       if (timerRunning) toggleTimer();
       totalSeconds = mins * 60;
       leftSeconds = totalSeconds;
-      document.getElementById('timerTagText').textContent = tag;
-      document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('timerTag').textContent = label;
+      document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
-      updateTimerUI();
+      renderTimer();
     }
 
-    function adjustTimer(deltaMins) {
-      leftSeconds = Math.max(60, leftSeconds + deltaMins * 60);
+    function adjustTimerMinutes(delta) {
+      leftSeconds = Math.max(60, leftSeconds + delta * 60);
       if (leftSeconds > totalSeconds) totalSeconds = leftSeconds;
-      updateTimerUI();
+      if (timerRunning) expectedEndTime = Date.now() + (leftSeconds * 1000);
+      renderTimer();
     }
 
     function toggleTimer() {
-      const btn = document.getElementById('timerToggleBtn');
+      const btn = document.getElementById('timerBtn');
       if (timerRunning) {
         clearInterval(timerInterval);
         timerRunning = false;
         btn.textContent = 'متابعة';
       } else {
-        initAudioEngine();
+        initAudio();
         timerRunning = true;
         btn.textContent = 'إيقاف مؤقت';
+        expectedEndTime = Date.now() + (leftSeconds * 1000);
         timerInterval = setInterval(() => {
-          if (leftSeconds > 0) {
-            leftSeconds--;
-            updateTimerUI();
+          const now = Date.now();
+          const remaining = Math.round((expectedEndTime - now) / 1000);
+          if (remaining > 0) {
+            leftSeconds = remaining;
+            renderTimer();
           } else {
             clearInterval(timerInterval);
             timerRunning = false;
+            leftSeconds = 0;
+            renderTimer();
             btn.textContent = 'بدء الجلسة';
             completedSessions++;
             totalMinsToday += Math.round(totalSeconds / 60);
-            updateStatsUI();
-            setTimerPreset(5, 'استراحة قصيرة', document.getElementById('seg-5'));
+            localStorage.setItem('zen_completed_sessions', completedSessions);
+            localStorage.setItem('zen_today_mins', totalMinsToday);
+            updateStats();
+            setTimerMode(5, 'راحة قصيرة', document.getElementById('seg-short'));
           }
-        }, 1000);
+        }, 500);
       }
     }
 
     function resetTimer() {
       if (timerRunning) toggleTimer();
       leftSeconds = totalSeconds;
-      document.getElementById('timerToggleBtn').textContent = 'بدء الجلسة';
-      updateTimerUI();
+      document.getElementById('timerBtn').textContent = 'بدء الجلسة';
+      renderTimer();
     }
 
-    /* ==========================================================
-       3. 100% PURE GENERATIVE NATURE SOUNDS (ZERO MUSIC)
-       ========================================================== */
-    const SOUND_CATALOG = [
-      { id: 'fire', cat: 'cozy', name: '🔥 نار الحطب', vol: 0.6 },
-      { id: 'attic', cat: 'cozy', name: '🏠 مطر السقف', vol: 0.5 },
-      { id: 'car', cat: 'cozy', name: '🚗 مطر السيارة', vol: 0.5 },
-      { id: 'rain', cat: 'nature', name: '🌧️ مطر ناعم', vol: 0.5 },
-      { id: 'ocean', cat: 'nature', name: '🌊 أمواج الشاطئ', vol: 0.55 },
-      { id: 'wind', cat: 'nature', name: '🍃 نسيم الغابة', vol: 0.45 },
-      { id: 'stream', cat: 'nature', name: '🏞️ جدول مائي', vol: 0.5 },
-      { id: 'crickets', cat: 'nature', name: '🦗 ليل الريف', vol: 0.35 },
-      { id: 'brown', cat: 'focus', name: '🛡️ ضوضاء بنية', vol: 0.6 },
-      { id: 'pink', cat: 'focus', name: '🌸 ضوضاء وردية', vol: 0.45 },
-      { id: 'fan', cat: 'focus', name: '🌀 مروحة عازلة', vol: 0.45 },
-      { id: 'library', cat: 'focus', name: '🏛️ سكون المكتبة', vol: 0.4 }
+    /* ========================================================
+       3. TASKS PLANNER
+       ======================================================== */
+    let tasksList = JSON.parse(localStorage.getItem('zen_tasks_v8') || JSON.stringify([
+      { text: 'فهم ومراجعة النقاط الأساسية بعمق', done: false },
+      { text: 'حل التمارين والأسئلة التطبيقية', done: true }
+    ]));
+
+    function renderTasks() {
+      const box = document.getElementById('tasksContainer');
+      box.innerHTML = '';
+      let done = 0;
+      tasksList.forEach((t, i) => {
+        if (t.done) done++;
+        const card = document.createElement('div');
+        card.className = 'task-item-card' + (t.done ? ' done' : '');
+        card.innerHTML = `
+          <div class="task-left" onclick="toggleTaskStatus(${i})">
+            <div class="task-checkbox">${t.done ? '✓' : ''}</div>
+            <div>
+              <div class="t-name">${t.text}</div>
+              <div class="t-sub">جلسة مذاكرة تقديرية: 25 دقيقة</div>
+            </div>
+          </div>
+          <button style="background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:0.9rem;" onclick="deleteTaskItem(${i})">✕</button>
+        `;
+        box.appendChild(card);
+      });
+      document.getElementById('tasksDoneCount').textContent = `${done} من ${tasksList.length} مكتمل`;
+    }
+
+    function addTaskItem() {
+      const inp = document.getElementById('taskInputInp');
+      const val = inp.value.trim();
+      if (!val) return;
+      tasksList.unshift({ text: val, done: false });
+      inp.value = '';
+      localStorage.setItem('zen_tasks_v8', JSON.stringify(tasksList));
+      renderTasks();
+    }
+    function toggleTaskStatus(i) { tasksList[i].done = !tasksList[i].done; localStorage.setItem('zen_tasks_v8', JSON.stringify(tasksList)); renderTasks(); }
+    function deleteTaskItem(i) { tasksList.splice(i, 1); localStorage.setItem('zen_tasks_v8', JSON.stringify(tasksList)); renderTasks(); }
+
+    /* ========================================================
+       4. DEDICATED SMART NOTES SYSTEM
+       ======================================================== */
+    let notesList = JSON.parse(localStorage.getItem('zen_notes_v8') || JSON.stringify([
+      {
+        id: 1,
+        text: "📌 الفكرة الأساسية: التكرار المتباعد\n- المراجعة قبل لحظة النسيان تثبت المعلومة في الذاكرة طويلة المدى.\n💡 النتيجة: 20 دقيقة مراجعة تعادل ساعات حفظ عشوائي.",
+        tag: "cornell",
+        pinned: true,
+        date: "اليوم 10:30 ص"
+      },
+      {
+        id: 2,
+        text: "تذكرت شراء بطاقات الملاحظات المسائية بعد إنهاء جلسة المذاكرة.",
+        tag: "dump",
+        pinned: false,
+        date: "اليوم 11:15 ص"
+      }
+    ]));
+
+    let currentNotesFilter = 'all';
+
+    function renderNotes() {
+      const feed = document.getElementById('notesFeed');
+      const q = (document.getElementById('notesSearchInp').value || '').toLowerCase();
+      feed.innerHTML = '';
+
+      let pinnedCount = 0, dumpCount = 0, cornellCount = 0;
+      notesList.forEach(n => {
+        if (n.pinned) pinnedCount++;
+        if (n.tag === 'dump') dumpCount++;
+        if (n.tag === 'cornell') cornellCount++;
+      });
+      document.getElementById('cntAll').textContent = notesList.length;
+      document.getElementById('cntPin').textContent = pinnedCount;
+      document.getElementById('cntDump').textContent = dumpCount;
+      document.getElementById('cntCornell').textContent = cornellCount;
+
+      const filtered = notesList.filter(n => {
+        const matchesQuery = n.text.toLowerCase().includes(q);
+        if (!matchesQuery) return false;
+        if (currentNotesFilter === 'pinned') return n.pinned;
+        if (currentNotesFilter === 'dump') return n.tag === 'dump';
+        if (currentNotesFilter === 'cornell') return n.tag === 'cornell';
+        return true;
+      });
+
+      // Sort pinned first
+      filtered.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+      filtered.forEach(n => {
+        const item = document.createElement('div');
+        item.className = `note-card-item ${n.pinned ? 'pinned' : ''} ${n.tag === 'dump' ? 'dump' : ''}`;
+        const tagNames = { cornell: 'قالب كورنيل', dump: 'تفريغ فكرة', exam: 'سؤال امتحان', general: 'ملاحظة عامة' };
+        const tagClasses = { cornell: 'tag-cornell', dump: 'tag-dump', exam: 'tag-exam', general: 'tag-general' };
+
+        item.innerHTML = `
+          <div class="note-card-head">
+            <span class="note-tag-badge ${tagClasses[n.tag] || 'tag-general'}">${tagNames[n.tag] || 'ملاحظة'}</span>
+            <div class="note-card-btns">
+              <button class="btn-micro-icon" onclick="togglePinNote(${n.id})" title="تثبيت">${n.pinned ? '⭐' : '☆'}</button>
+              <button class="btn-micro-icon" onclick="copyNoteText(${n.id})" title="نسخ">📋</button>
+              <button class="btn-micro-icon" style="color:var(--rose);" onclick="deleteNoteItem(${n.id})" title="حذف">✕</button>
+            </div>
+          </div>
+          <div class="note-card-body">${n.text}</div>
+          <div class="note-card-footer">
+            <span>${n.date}</span>
+          </div>
+        `;
+        feed.appendChild(item);
+      });
+    }
+
+    function applyTemplate(type) {
+      const area = document.getElementById('noteEditorArea');
+      const sel = document.getElementById('noteTagSelect');
+      if (type === 'dump') {
+        area.value = "💭 فكرة مشتتة: ";
+        sel.value = 'dump';
+      } else if (type === 'cornell') {
+        area.value = "📌 الفكرة الرئيسية:\n- \n❓ الأسئلة الهامة:\n- \n💡 الملخص الختامي:\n- ";
+        sel.value = 'cornell';
+      } else if (type === 'exam') {
+        area.value = "⭐ سؤال متوقع:\n- \n✅ الإجابة النموذجية:\n- ";
+        sel.value = 'exam';
+      } else if (type === 'formula') {
+        area.value = "📐 القانون:\n- \n⚠️ شروط التطبيق:\n- ";
+        sel.value = 'general';
+      }
+      area.focus();
+    }
+
+    function saveNoteCard() {
+      const area = document.getElementById('noteEditorArea');
+      const txt = area.value.trim();
+      if (!txt) return;
+      const tag = document.getElementById('noteTagSelect').value;
+      const nowStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+      notesList.unshift({
+        id: Date.now(),
+        text: txt,
+        tag: tag,
+        pinned: tag === 'dump' ? false : false,
+        date: `اليوم ${nowStr}`
+      });
+      area.value = '';
+      localStorage.setItem('zen_notes_v8', JSON.stringify(notesList));
+      renderNotes();
+    }
+
+    function togglePinNote(id) {
+      const item = notesList.find(n => n.id === id);
+      if (item) item.pinned = !item.pinned;
+      localStorage.setItem('zen_notes_v8', JSON.stringify(notesList));
+      renderNotes();
+    }
+
+    function deleteNoteItem(id) {
+      notesList = notesList.filter(n => n.id !== id);
+      localStorage.setItem('zen_notes_v8', JSON.stringify(notesList));
+      renderNotes();
+    }
+
+    function copyNoteText(id) {
+      const item = notesList.find(n => n.id === id);
+      if (item && navigator.clipboard) {
+        navigator.clipboard.writeText(item.text);
+        alert('✓ تم نسخ الملاحظة إلى الحافظة');
+      }
+    }
+
+    function setNotesFilter(filter, btn) {
+      currentNotesFilter = filter;
+      document.querySelectorAll('.filter-chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderNotes();
+    }
+
+    function filterNotes() { renderNotes(); }
+
+    function exportNotesFile() {
+      const fullTxt = notesList.map(n => `[${n.date} - ${n.tag}]\n${n.text}`).join('\n\n====================\n\n');
+      const blob = new Blob([fullTxt], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `zen-study-notes-${new Date().toISOString().slice(0,10)}.txt`;
+      a.click();
+    }
+
+    /* ========================================================
+       5. 100% PURE GENERATIVE NATURE SOUNDS (ZERO MUSIC)
+       ======================================================== */
+    const SOUNDS = [
+      { id: 'fire', name: '🔥 نار الحطب', vol: 0.65 },
+      { id: 'attic', name: '🏠 مطر السقف', vol: 0.5 },
+      { id: 'rain', name: '🌧️ مطر ناعم', vol: 0.5 },
+      { id: 'ocean', name: '🌊 أمواج الشاطئ', vol: 0.55 },
+      { id: 'wind', name: '🍃 نسيم الغابة', vol: 0.45 },
+      { id: 'stream', name: '🏞️ جدول ماء جاري', vol: 0.5 },
+      { id: 'brown', name: '🛡️ ضوضاء بنية عازلة', vol: 0.6 },
+      { id: 'fan', name: '🌀 مروحة هادئة', vol: 0.45 }
     ];
 
     let audioCtx = null;
-    const activeNodes = {};
+    const activeAudioNodes = {};
     let isMasterMuted = false;
 
-    function initAudioEngine() {
+    function initAudio() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    function createProceduralSound(id, vol) {
-      initAudioEngine();
+    function buildProceduralSound(id, vol) {
+      initAudio();
       const sr = audioCtx.sampleRate;
       const len = sr * 3;
       const buffer = audioCtx.createBuffer(1, len, sr);
@@ -513,7 +781,7 @@
           lastOut = (lastOut + 0.02 * white) / 1.02;
           const pop = Math.random() < 0.002 ? (Math.random() * 2 - 1) * 0.7 : 0;
           data[i] = (lastOut * 2.2) + pop;
-        } else if (['brown','ocean','fan','attic','car'].includes(id)) {
+        } else if (['brown','ocean','fan','attic'].includes(id)) {
           lastOut = (lastOut + (0.02 * white)) / 1.02;
           data[i] = lastOut * 3.0;
         } else {
@@ -551,139 +819,69 @@
       return { src, gain, baseVol: vol };
     }
 
-    function renderSoundTiles(cat = 'all') {
-      const container = document.getElementById('soundGridContainer');
-      container.innerHTML = '';
-      SOUND_CATALOG.filter(s => cat === 'all' || s.cat === cat).forEach(s => {
-        const isOn = !!activeNodes[s.id];
+    function renderSoundTiles() {
+      const box = document.getElementById('soundTilesBox');
+      box.innerHTML = '';
+      SOUNDS.forEach(s => {
+        const isOn = !!activeAudioNodes[s.id];
         const tile = document.createElement('div');
-        tile.className = 'sound-tile' + (isOn ? ' on' : '');
+        tile.className = 'sound-tile-item' + (isOn ? ' on' : '');
         tile.innerHTML = `
-          <div class="sound-tile-top">
-            <span class="sound-tile-title">${s.name}</span>
-            <div class="switch-toggle ${isOn ? 'active' : ''}" onclick="toggleSoundNode('${s.id}')">
-              <div class="switch-dot"></div>
+          <div class="sound-head-row">
+            <span class="sound-tile-label">${s.name}</span>
+            <div class="toggle-switch ${isOn ? 'active' : ''}" onclick="toggleAudioNode('${s.id}')">
+              <div class="toggle-switch-dot"></div>
             </div>
           </div>
-          <input type="range" class="sound-slider" min="0.05" max="1" step="0.05" value="${s.vol}" oninput="setSoundVol('${s.id}', this.value)">
+          <input type="range" class="volume-slider" min="0.05" max="1" step="0.05" value="${s.vol}" oninput="setAudioNodeVol('${s.id}', this.value)">
         `;
-        container.appendChild(tile);
+        box.appendChild(tile);
       });
     }
 
-    function toggleSoundNode(id) {
-      const item = SOUND_CATALOG.find(s => s.id === id);
-      if (activeNodes[id]) {
-        try { activeNodes[id].src.stop(); } catch(e){}
-        delete activeNodes[id];
+    function toggleAudioNode(id) {
+      const item = SOUNDS.find(s => s.id === id);
+      if (activeAudioNodes[id]) {
+        try { activeAudioNodes[id].src.stop(); } catch(e){}
+        delete activeAudioNodes[id];
       } else {
-        activeNodes[id] = createProceduralSound(id, item.vol);
+        activeAudioNodes[id] = buildProceduralSound(id, item.vol);
       }
       renderSoundTiles();
     }
 
-    function setSoundVol(id, val) {
-      if (activeNodes[id] && audioCtx) {
-        activeNodes[id].gain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
+    function setAudioNodeVol(id, val) {
+      if (activeAudioNodes[id] && audioCtx) {
+        activeAudioNodes[id].gain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
       }
     }
 
-    function toggleAudioMute() {
+    function toggleMasterAudio() {
       isMasterMuted = !isMasterMuted;
       document.getElementById('masterMuteBtn').textContent = isMasterMuted ? '🔇' : '🔊';
-      Object.values(activeNodes).forEach(n => {
+      Object.values(activeAudioNodes).forEach(n => {
         if (audioCtx) n.gain.gain.setValueAtTime(isMasterMuted ? 0 : n.baseVol, audioCtx.currentTime);
       });
     }
 
-    function filterSounds(cat, btn) {
-      document.querySelectorAll('.sound-pill-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderSoundTiles(cat);
-    }
-
-    /* ==========================================================
-       4. TASKS STREAM
-       ========================================================= */
-    let tasks = [
-      { text: 'مراجعة الفصل الأول بعمق وتدوين النقاط', done: false, time: '25 دقيقة' },
-      { text: 'حل التمارين والمسائل التدريبية', done: true, time: '50 دقيقة' }
-    ];
-
-    function renderTasksStream() {
-      const container = document.getElementById('tasksStreamContainer');
-      container.innerHTML = '';
-      let done = 0;
-      tasks.forEach((t, i) => {
-        if (t.done) done++;
-        const card = document.createElement('div');
-        card.className = 'task-card-item' + (t.done ? ' done' : '');
-        card.innerHTML = `
-          <div class="task-left-wrap" onclick="toggleTask(${i})">
-            <div class="task-check-circle">${t.done ? '✓' : ''}</div>
-            <div class="task-info-block">
-              <span class="task-name">${t.text}</span>
-              <span class="task-time-pill">جلسة تقديرية: ${t.time}</span>
-            </div>
-          </div>
-          <button style="background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:0.9rem;" onclick="deleteTask(${i})">✕</button>
-        `;
-        container.appendChild(card);
-      });
-      document.getElementById('taskDoneBadge').textContent = `${done} من ${tasks.length} مكتمل`;
-    }
-
-    function addNewTask() {
-      const inp = document.getElementById('newTaskInp');
-      const val = inp.value.trim();
-      if (!val) return;
-      tasks.unshift({ text: val, done: false, time: '25 دقيقة' });
-      inp.value = '';
-      renderTasksStream();
-    }
-
-    function toggleTask(i) { tasks[i].done = !tasks[i].done; renderTasksStream(); }
-    function deleteTask(i) { tasks.splice(i, 1); renderTasksStream(); }
-
-    /* ==========================================================
-       5. ACTIVE RECALL FLASHCARDS
-       ========================================================= */
-    const flashcards = [
-      { q: "ما هو تأثير التكرار المتباعد (Spaced Repetition) على تثبيت المعلومات؟", a: "يضاعف قدرة الدماغ على استرجاع المعلومات عبر مراجعتها قبيل لحظة نسيانها مباشرة." },
-      { q: "ما هي قاعدة الـ 5 ثوانٍ للتغلب على التسويف؟", a: "العد التنازلي (5-4-3-2-1) ثم الانطلاق فوراً في الفعل لقطع إشارات التردد في الدماغ." },
-      { q: "لماذا تُعتبر الضوضاء البنية (Brown Noise) ممتازة للتركيز؟", a: "لأنها تخمد الأصوات الخارجية المفاجئة بترددات منخفضة تحاكي أصوات الطبيعة الهادئة." }
-    ];
-    let fcIndex = 0;
-    let fcFlipped = false;
-
-    function renderFlashcard() {
-      document.getElementById('fcIndexBadge').textContent = `${fcIndex + 1} / ${flashcards.length}`;
-      document.getElementById('fcSidePrompt').textContent = fcFlipped ? "💡 الإجابة النموذجية" : "❓ السؤال (اضغط للكشف)";
-      document.getElementById('fcCardText').textContent = fcFlipped ? flashcards[fcIndex].a : flashcards[fcIndex].q;
-    }
-
-    function flipFlashcard() { fcFlipped = !fcFlipped; renderFlashcard(); }
-    function nextFlashcard() { fcIndex = (fcIndex + 1) % flashcards.length; fcFlipped = false; renderFlashcard(); }
-    function prevFlashcard() { fcIndex = (fcIndex - 1 + flashcards.length) % flashcards.length; fcFlipped = false; renderFlashcard(); }
-
-    /* ==========================================================
+    /* ========================================================
        6. ANALYTICS & STATS
-       ========================================================= */
-    function updateStatsUI() {
-      document.getElementById('hdrFocusTime').textContent = `${totalMinsToday} دقيقة`;
-      document.getElementById('hdrStreak').textContent = `🔥 ${completedSessions} جلسات`;
-      document.getElementById('kpiMinsVal').textContent = `${totalMinsToday} د`;
-      document.getElementById('kpiSessionsVal').textContent = completedSessions;
+       ======================================================== */
+    function updateStats() {
+      document.getElementById('hdrFocusVal').textContent = `${totalMinsToday} دقيقة`;
+      document.getElementById('hdrStreakVal').textContent = `🔥 ${completedSessions} جلسات`;
+      document.getElementById('kpiTodayMins').textContent = `${totalMinsToday} د`;
+      document.getElementById('kpiCompletedSessions').textContent = completedSessions;
       const rank = completedSessions >= 4 ? 'خبير تركيز 🎓' : completedSessions >= 2 ? 'مثابر نشيط 🌿' : 'متعلم طموح 🌱';
-      document.getElementById('kpiRankBadge').textContent = rank;
+      document.getElementById('kpiRankText').textContent = rank;
     }
 
-    /* Boot Init */
-    updateTimerUI();
+    /* Initial Boot */
+    renderTimer();
+    renderTasks();
+    renderNotes();
     renderSoundTiles();
-    renderTasksStream();
-    renderFlashcard();
-    updateStatsUI();
+    updateStats();
   </script>
 </body>
 </html>
