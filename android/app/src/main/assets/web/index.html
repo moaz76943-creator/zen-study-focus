@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-sheet: #f4f7fc;
+      --bg-sheet: #fbfdff;
       --card-pure: #ffffff;
       --primary: #2563eb;
       --primary-cyan: #06b6d4;
@@ -26,7 +26,7 @@
       --text-muted: #64748b;
       --text-light: #94a3b8;
       --border-soft: #e2e8f0;
-      --shadow-card: 0 12px 30px -6px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+      --shadow-card: 0 8px 24px -8px rgba(15, 23, 42, 0.07), 0 2px 8px -3px rgba(15, 23, 42, 0.025);
       --shadow-float: 0 16px 36px -6px rgba(37, 99, 235, 0.28);
       --radius-sheet: 34px;
       --radius-xl: 24px;
@@ -57,7 +57,7 @@
       padding: 24px; text-align: center;
     }
     .desk-clock-overlay.active { display: flex; animation: fadeIn 0.25s ease-out; }
-    .desk-digits { font-size: 5.8rem; font-weight: 900; color: var(--text-main); letter-spacing: -3px; line-height: 1; }
+    .desk-digits { font-size: 5.8rem; font-weight: 600; color: var(--text-main); letter-spacing: -3px; line-height: 1; }
 
     .app-shell { width: 100%; max-width: 440px; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
 
@@ -97,7 +97,7 @@
     }
 
     .header-titles-center { text-align: center; position: relative; z-index: 2; }
-    .header-main-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.3px; }
+    .header-main-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
     .header-sub-caption { font-size: 0.76rem; opacity: 0.88; margin-top: 2px; font-weight: 500; }
 
     .ecosystem-strip {
@@ -111,7 +111,7 @@
 
     /* Main White Sheet */
     .main-white-sheet {
-      background: var(--bg-sheet);
+      background: #ffffff;
       border-top-left-radius: var(--radius-sheet);
       border-top-right-radius: var(--radius-sheet);
       margin-top: -26px;
@@ -183,7 +183,7 @@
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 14px; border-bottom: 1px solid #f1f5f9; margin-bottom: 14px;
     }
-    .balance-big-digits { font-size: 1.7rem; font-weight: 900; color: var(--text-main); display: flex; align-items: baseline; gap: 6px; }
+    .balance-big-digits { font-size: 1.7rem; font-weight: 600; color: var(--text-main); display: flex; align-items: baseline; gap: 6px; }
     .growth-pill-green {
       background: var(--emerald-soft); color: var(--emerald); padding: 4px 11px;
       border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 800;
@@ -215,7 +215,7 @@
     .ring-bar.golden-warning { stroke: #f59e0b !important; }
     .ring-center { position: absolute; text-align: center; }
     .ring-plant { font-size: 1.85rem; margin-bottom: 2px; }
-    .ring-time { font-size: 3.15rem; font-weight: 900; letter-spacing: -1.2px; color: var(--text-main); line-height: 1; }
+    .ring-time { font-size: 3.15rem; font-weight: 600; letter-spacing: -1.5px; color: var(--text-main); line-height: 1; }
     .ring-mode-txt { font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; max-width: 165px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .ring-task-pill {
       font-size: 0.68rem; font-weight: 800; color: var(--primary); background: var(--primary-soft);
@@ -386,7 +386,7 @@
       box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8); cursor: pointer;
     }
     .an-kpi-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.73rem; font-weight: 700; color: var(--text-muted); }
-    .an-kpi-num { font-size: 1.55rem; font-weight: 900; color: var(--text-main); margin: 4px 0; }
+    .an-kpi-num { font-size: 1.55rem; font-weight: 600; color: var(--text-main); margin: 4px 0; }
     .an-kpi-trend { font-size: 0.7rem; font-weight: 800; color: var(--emerald); }
 
     .overview-split-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
@@ -423,6 +423,26 @@
     }
     .bnav-btn svg { width: 19px; height: 19px; fill: currentColor; }
     .bnav-btn.active { color: var(--primary); background: var(--primary-soft); }
+
+    /* Accessibility, readable saved notes, and compact phones */
+    .lcard-body { user-select: text; -webkit-user-select: text; }
+    button:focus-visible, input:focus-visible, select:focus-visible,
+    textarea:focus-visible, .domain-card:focus-visible {
+      outline: 2px solid var(--primary-cyan);
+      outline-offset: 2px;
+    }
+    .lang-switcher-pill { max-width: 56%; min-width: 0; }
+    #currentLangLabel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @media (max-width: 350px) {
+      .bottom-nav-capsule { width: calc(100% - 12px); padding: 5px 3px; }
+      .bnav-btn { padding: 5px 2px; font-size: .56rem; min-width: 0; }
+      .bnav-btn svg { width: 18px; height: 18px; }
+      .ring-container { width: 195px; height: 195px; }
+      .ring-time { font-size: 2.9rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
 
     /* Modals */
     .modal-overlay {
