@@ -251,6 +251,101 @@ body:not(.deep-lockdown) .modal-card {
 button:focus-visible,.home-week-day:focus-visible,.home-quick-chip:focus-visible {
   outline:2px solid #328cff;outline-offset:3px;
 }
+/* The same surface language continues on all six existing screens. */
+body:not(.deep-lockdown) .screen-section:not(#sec-timer) > .segmented-pills-bar {
+  background:#f1f5fc;border:1px solid #e7ecf9;gap:4px;padding:4px;border-radius:17px;
+}
+body:not(.deep-lockdown) .screen-section:not(#sec-timer) .seg-pill {
+  font-size:.73rem;font-weight:600;padding:9px 8px;
+}
+body:not(.deep-lockdown) .screen-section:not(#sec-timer) .seg-pill.active {
+  color:#266de0;background:#fff;box-shadow:0 3px 12px -8px #6a94df;
+}
+body:not(.deep-lockdown) #sec-tasks .task-creator-bar,
+body:not(.deep-lockdown) #sec-notes .search-pill-box,
+body:not(.deep-lockdown) #sec-sounds .mixer-status-bar {
+  background:linear-gradient(145deg,#fff,#fafdff);
+  border:1px solid #e2eafb;border-radius:20px;box-shadow:var(--zen-shadow);
+}
+body:not(.deep-lockdown) #sec-tasks .task-creator-bar {gap:7px;padding:10px;}
+body:not(.deep-lockdown) #sec-tasks .task-creator-inp {min-height:36px;font-weight:500;}
+body:not(.deep-lockdown) #sec-tasks .task-mini-sel {max-width:100%;min-width:0;}
+body:not(.deep-lockdown) #sec-tasks .btn-task-plus,
+body:not(.deep-lockdown) #sec-notes .floating-plus-fab {
+  background:var(--zen-rainbow);
+  box-shadow:0 9px 23px -9px rgba(59,109,238,.42);
+}
+body:not(.deep-lockdown) #sec-tasks .showcase-task-card,
+body:not(.deep-lockdown) #sec-notes .learning-rich-card {
+  background:linear-gradient(155deg,#fff,#fbfdff);
+  border-radius:22px;border:1px solid #e5ecfb;
+  box-shadow:var(--zen-shadow);
+}
+body:not(.deep-lockdown) #sec-tasks .task-main-name,
+body:not(.deep-lockdown) #sec-notes .lcard-title {
+  color:#24375e;font-weight:700;
+}
+body:not(.deep-lockdown) #sec-calendar .cal-month-title {
+  font-size:1.06rem;font-weight:700;color:#1b3660;
+}
+body:not(.deep-lockdown) #sec-calendar .cal-day-cell {
+  background:linear-gradient(155deg,#fff,#f6f9ff);
+  border:1px solid #e9effb;border-radius:13px;
+  font-variant-numeric:tabular-nums;color:#3b547c;
+}
+body:not(.deep-lockdown) #sec-calendar .cal-day-cell.today {
+  background:linear-gradient(150deg,#ebfaff,#f4f3ff);
+  border-color:#99c9ff;color:#245abc;font-weight:700;
+}
+body:not(.deep-lockdown) #sec-calendar .cal-day-cell.selected {
+  background:var(--zen-rainbow);border-color:transparent;
+  color:#fff;box-shadow:0 7px 17px -8px #428aeb;
+}
+body:not(.deep-lockdown) #sec-notes .search-pill-box {
+  padding:10px 14px;border-radius:17px;
+}
+body:not(.deep-lockdown) #sec-sounds .mixer-status-bar {padding:12px 13px;gap:8px;}
+body:not(.deep-lockdown) #sec-sounds .sounds-photo-grid {gap:11px;}
+body:not(.deep-lockdown) #sec-sounds .sound-Rich-tile {
+  border-radius:21px;overflow:hidden;box-shadow:0 11px 23px -14px rgba(26,56,115,.35);
+}
+body:not(.deep-lockdown) #sec-analytics .analytics-kpi-grid {gap:10px;margin-bottom:14px;}
+body:not(.deep-lockdown) #sec-analytics .an-kpi-card {
+  background:linear-gradient(145deg,#fff,#f7fbff);
+  border:1px solid #e3ecfc;border-radius:21px;
+  box-shadow:var(--zen-shadow);padding:14px 13px;
+}
+body:not(.deep-lockdown) #sec-analytics .an-kpi-num {
+  font-size:1.65rem;font-weight:600;color:#1f3769;
+}
+body:not(.deep-lockdown) #sec-analytics .an-kpi-trend {
+  font-size:.69rem;font-weight:550;color:#138f79;
+}
+body:not(.deep-lockdown) #sec-analytics .mbar-fill {
+  border-radius:7px;background:linear-gradient(0deg,#41c8ef,#3f86ff);
+}
+body:not(.deep-lockdown) #sec-analytics .mbar-fill.peak {
+  background:linear-gradient(0deg,#477cfe,#a064f3);
+}
+body:not(.deep-lockdown) #sec-analytics .donut-center-txt {
+  color:#1e3866;font-weight:700;
+}
+body:not(.deep-lockdown) #sec-analytics .wave-chart-card {
+  border-radius:24px;box-shadow:var(--zen-shadow);
+}
+body:not(.deep-lockdown) .orb-item {
+  border:0;background:transparent;min-width:0;
+  padding:3px 0;appearance:none;font:inherit;text-align:center;
+}
+body:not(.deep-lockdown) .orb-circle {
+  border:1px solid rgba(255,255,255,.8);
+  box-shadow:0 7px 19px -9px rgba(39,86,174,.26);
+}
+body:not(.deep-lockdown) .orb-green {background:linear-gradient(135deg,#b2fce6,#3cceab);}
+body:not(.deep-lockdown) .orb-blue {background:linear-gradient(135deg,#b7f6ff,#55b5fc);}
+body:not(.deep-lockdown) .orb-purple {background:linear-gradient(135deg,#d7ccff,#9872fa);}
+body:not(.deep-lockdown) .orb-amber {background:linear-gradient(135deg,#fff1cb,#efb669);}
+body:not(.deep-lockdown) .orb-label {font-weight:600;color:#5a6c91;}
 @media (max-width: 360px) {
   body:not(.deep-lockdown) .main-white-sheet {padding-left:10px;padding-right:10px;}
   body.timer-home:not(.deep-lockdown) .focus-hero-card {padding:11px 10px 12px;}
