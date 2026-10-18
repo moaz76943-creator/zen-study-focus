@@ -418,12 +418,14 @@ function validateImportedBackup(raw) {
   if (!raw.cfg || typeof raw.cfg !== 'object' || Array.isArray(raw.cfg)) return null;
   if (!Array.isArray(raw.tasksList) || !Array.isArray(raw.notesList)) return null;
   if (raw.tasksList.length > 10000 || raw.notesList.length > 10000) return null;
+  const safeRecordId = id => /^\\d{1,16}$/.test(String(id))
+    && Number.isSafeInteger(Number(id));
   const okTask = x => x && typeof x === 'object' && !Array.isArray(x)
-    && (typeof x.id === 'string' || typeof x.id === 'number')
+    && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
     && typeof x.done === 'boolean';
   const okNote = x => x && typeof x === 'object' && !Array.isArray(x)
-    && (typeof x.id === 'string' || typeof x.id === 'number')
+    && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
     && typeof x.body === 'string' && x.body.length <= 500000;
   if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)) return null;
@@ -861,19 +863,23 @@ function renderTasksList() {
     if (taskFilterStatus === 'done') return t.done;
     return true;
   }).forEach(t => {
+    const id = Number(t.id);
+    if (!Number.isSafeInteger(id) || id < 0) return;
+    const safeIcon = escapeHtmlText(t.icon || '🎯');
+    const safeTheme = ['tp-blue','tp-amber','tp-emerald','tp-rose'].includes(t.theme) ? t.theme : 'tp-blue';
     const card = document.createElement('div');
     card.className = `showcase-task-card ${t.done ? 'done' : ''}`;
     card.innerHTML = `
       <div class="showcase-task-top">
-        <div class="task-check-sq" onclick="toggleTaskDone(${t.id})">✓</div>
-        <div class="task-center-info" onclick="focusOnTask(${t.id})">
+        <div class="task-check-sq" onclick="toggleTaskDone(${id})">✓</div>
+        <div class="task-center-info" onclick="focusOnTask(${id})">
           <div class="task-main-name">${escapeHtmlText(toWest(t.title))}</div>
           <div class="task-time-sub">
             <span>📅 ${escapeHtmlText(toWest(t.date || todayISO))}</span>
             <span style="color:var(--primary); font-weight:700;">• ${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>
           </div>
         </div>
-        <div class="task-pastel-icon ${t.theme}" onclick="deleteTaskItem(${t.id})">${t.icon}</div>
+        <div class="task-pastel-icon ${safeTheme}" onclick="deleteTaskItem(${id})">${safeIcon}</div>
       </div>
     `;
     box.appendChild(card);
@@ -1017,15 +1023,17 @@ function renderNotesStack() {
     if (noteTagFilter !== 'all' && n.catKey !== noteTagFilter) return false;
     return true;
   }).forEach(n => {
+    const id = Number(n.id);
+    if (!Number.isSafeInteger(id) || id < 0) return;
     const card = document.createElement('div');
     card.className = `learning-rich-card ${n.theme}`;
     card.innerHTML = `
       <div class="lcard-head">
         <div class="lcard-title"><span>✨</span> <span>${escapeHtmlText(toWest(n.title))}</span></div>
         <div style="display:flex; gap:8px;">
-          <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${n.id})">📅</span>
-          <span style="cursor:pointer;" onclick="toggleNoteBlur(${n.id})">👁️</span>
-          <span style="cursor:pointer; color:var(--rose);" onclick="deleteNoteCard(${n.id})">✕</span>
+          <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${id})">📅</span>
+          <span style="cursor:pointer;" onclick="toggleNoteBlur(${id})">👁️</span>
+          <span style="cursor:pointer; color:var(--rose);" onclick="deleteNoteCard(${id})">✕</span>
         </div>
       </div>
       <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${escapeHtmlText(toWest(n.body))}</div>
