@@ -565,14 +565,19 @@ function testCompletionSoundChime() {
 /* ========================================================
    5. MULTI-DOMAIN & TIMER ENGINE
    ======================================================== */
+function renderDomainState() {
+  const dom = ['study', 'sport', 'read', 'work'].includes(cfg.domain) ? cfg.domain : 'study';
+  document.querySelectorAll('.domain-card').forEach(c => c.classList.remove('active'));
+  const active = document.getElementById('domBtn-' + dom);
+  if (active) active.classList.add('active');
+  document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
+  document.getElementById('readContextBar').classList.toggle('visible', dom === 'read');
+}
+
 function switchActivityDomain(dom, el) {
   cfg.domain = dom;
   saveFortressData('zen_fortress_cfg_v21', cfg);
-  document.querySelectorAll('.domain-card').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-
-  document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
-  document.getElementById('readContextBar').classList.toggle('visible', dom === 'read');
+  renderDomainState();
 
   const d = L();
   if (dom === 'study') { selectTimerMode(25, 'focus', document.getElementById('modeFocusBtn')); showToast(`📚 ${d.domStudy} (25m)`); }
@@ -1416,4 +1421,5 @@ function updateSyllabusCalc() {
 syncDailyRollover();
 renderAnalyticsBars();
 applyLanguage(cfg.lang || 'en');
+renderDomainState();
 restoreTimerSession();
