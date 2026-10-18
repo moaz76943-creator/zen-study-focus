@@ -593,6 +593,8 @@ function startQuickSportRest(secs) {
   currentTimerModeKey = 'short';
   timerTotal = secs; timerLeft = secs;
   timerSessionId = null;
+  timerActiveMs = 0;
+  timerResumeMs = null;
   storeTimerSession();
   updateTimerDisplay(); toggleTimerPlay();
   showToast(toWest(`⏱️ Rest ${secs}s Started`));
@@ -657,13 +659,23 @@ let timerTargetTime = null;
 let currentTimerModeKey = 'focus';
 let customSessionLabel = '';
 let timerSessionId = null;
+let timerActiveMs = 0;
+let timerResumeMs = null;
+function accumulateActiveTime() {
+  if (timerResumeMs === null) return;
+  const now = Date.now();
+  const through = Number.isFinite(timerTargetTime) ? Math.min(now, timerTargetTime) : now;
+  timerActiveMs += Math.max(0, through - timerResumeMs);
+  timerResumeMs = null;
+}
 const TIMER_STORAGE_KEY = 'zen_fortress_active_timer_v21';
 function storeTimerSession() {
   saveFortressData(TIMER_STORAGE_KEY, {
     total: timerTotal, left: timerLeft, running: timerRunning,
     endAt: timerRunning ? timerTargetTime : null,
     mode: currentTimerModeKey, label: customSessionLabel,
-    sessionId: timerSessionId
+    sessionId: timerSessionId,
+    activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null
   });
 }
 function creditCompletedSession() {
@@ -671,7 +683,7 @@ function creditCompletedSession() {
   if (!timerSessionId) return;
   const ids = Array.isArray(cfg.completedTimerIds) ? cfg.completedTimerIds : [];
   if (ids.includes(timerSessionId)) return;
-  const earned = Math.max(1, Math.round(timerTotal / 60));
+  const earned = Math.max(1, Math.round(timerActiveMs / 60000));
   cfg.todayMins = Number(cfg.todayMins || 0) + earned;
   cfg.sessions = Number(cfg.sessions || 0) + 1;
   cfg.metricsDate = localDateISO();
@@ -685,6 +697,7 @@ function creditCompletedSession() {
 function finalizeTimerSession(shouldChime) {
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = null;
+  accumulateActiveTime();
   timerRunning = false;
   timerLeft = 0;
   creditCompletedSession();
@@ -708,6 +721,11 @@ function restoreTimerSession() {
   currentTimerModeKey = ['focus','short','long','custom'].includes(snap.mode) ? snap.mode : 'focus';
   customSessionLabel = typeof snap.label === 'string' ? snap.label.slice(0, 100) : '';
   timerSessionId = typeof snap.sessionId === 'string' ? snap.sessionId : null;
+  timerActiveMs = Number.isFinite(snap.activeMs) && snap.activeMs >= 0 && snap.activeMs <= 86400000
+    ? snap.activeMs : Math.max(0, (timerTotal - timerLeft) * 1000);
+  timerResumeMs = snap.running
+    ? (Number.isFinite(snap.resumedAt) ? snap.resumedAt : Date.now() - Math.max(0, (timerTotal - timerLeft) * 1000))
+    : null;
   if (snap.running && Number.isFinite(snap.endAt)) {
     timerTargetTime = snap.endAt;
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
@@ -765,6 +783,8 @@ function selectTimerMode(mins, modeKey, btn) {
     btn.classList.add('active');
   }
   timerSessionId = null;
+  timerActiveMs = 0;
+  timerResumeMs = null;
   storeTimerSession();
   updateTimerDisplay();
 }
@@ -801,6 +821,7 @@ function toggleTimerPlay() {
     clearInterval(timerInterval);
     timerInterval = null;
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
+    accumulateActiveTime();
     timerRunning = false;
     storeTimerSession();
     if (window.ZenNative && window.ZenNative.stopBackgroundService) {
@@ -816,7 +837,8 @@ function toggleTimerPlay() {
     if (!timerSessionId) timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
     timerRunning = true;
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-    timerTargetTime = Date.now() + (timerLeft * 1000);
+    timerResumeMs = Date.now();
+    timerTargetTime = timerResumeMs + (timerLeft * 1000);
     storeTimerSession();
 
     if (window.ZenNative && window.ZenNative.startBackgroundService) {
@@ -831,6 +853,8 @@ function resetTimerNow() {
   if (timerRunning) toggleTimerPlay();
   timerLeft = timerTotal;
   timerSessionId = null;
+  timerActiveMs = 0;
+  timerResumeMs = null;
   storeTimerSession();
   updateTimerDisplay();
 }
