@@ -32,6 +32,11 @@ class HomeLayoutRegression(unittest.TestCase):
         self.assertIn('id="kpiTotalMins"', HTML)
         self.assertIn('id="deskClockOverlay"', HTML)
 
+    def test_focus_preset_tracks_selected_activity(self):
+        self.assertIn('selectTimerMode(getDomainFocusMinutes()', HTML)
+        self.assertIn('function getDomainFocusMinutes(', APP)
+        self.assertIn('getDomainFocusMinutes(domain)', QUICK)
+
     def test_activity_controls_are_accessible_buttons(self):
         for domain in ("study", "sport", "read", "work"):
             self.assertRegex(
