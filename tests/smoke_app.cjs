@@ -164,6 +164,7 @@ assert.ok(evaluate('timerRunning'));
 evaluate("timerTargetTime=Date.now()-5; timerResumeMs=Date.now()-20000; runTimerTick()");
 assert.equal(evaluate('quickTraining.phase'),'rest');
 assert.equal(evaluate('timerTotal'),10);
+assert.equal(evaluate('cfg.todayMins'),3,'A 20-second round must not be credited as a full minute');
 const beforeBreakCredit=evaluate('cfg.sessions');
 evaluate("timerTargetTime=Date.now()-5; timerResumeMs=Date.now()-10000; runTimerTick()");
 assert.equal(evaluate('quickTraining.currentSet'),1);
@@ -176,6 +177,15 @@ assert.equal(evaluate('cfg.sessions'),beforeSkip);
 evaluate('cancelQuickTraining(true)');
 assert.equal(evaluate('quickTraining'),null);
 assert.equal(evaluate('timerRunning'),false);
+// Three 20s rounds (with zero rest) add exactly one actual minute.
+const minutesBeforeShortRounds=evaluate('cfg.todayMins');
+evaluate("applyQuickTrainingPreset('tabata'); document.getElementById('qtSets').value='3'; document.getElementById('qtRest').value='00:00'; startQuickTraining()");
+for(let i=0;i<3;i++)
+  evaluate("timerResumeMs=Date.now()-20000; timerTargetTime=Date.now()-4; runTimerTick()");
+assert.equal(evaluate('cfg.todayMins'),minutesBeforeShortRounds+1);
+assert.equal(evaluate('quickTraining'),null,'Training completes on the last round');
+assert.equal(evaluate('timerRunning'),false);
+assert.equal(evaluate('timerTotal'),1800,'Finishing workout restores the sport focus duration');
 // A real today-plan preview uses saved tasks, not invented percentages.
 assert.equal(evaluate('typeof renderTodayPlan'), 'function');
 console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');
