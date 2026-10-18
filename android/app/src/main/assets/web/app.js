@@ -329,6 +329,7 @@ function syncDailyRollover() {
     cfg.water = 0;
     cfg.sets = 0;
     cfg.pagesRead = 0;
+    cfg.quickFocusRemainderSec = 0;
   }
   cfg.metricsDate = current;
   cfg.streak = computeActualStreak(cfg.sessionHistory);
