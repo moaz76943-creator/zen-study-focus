@@ -783,12 +783,12 @@ function addReadPages(p) {
 }
 
 const TAB_GRADS = {
-  'sec-timer': 'linear-gradient(135deg, #091326 0%, #1d3b8b 55%, #0284c7 100%)',
-  'sec-tasks': 'linear-gradient(135deg, #1e1b4b 0%, #3730a3 55%, #6366f1 100%)',
-  'sec-calendar': 'linear-gradient(135deg, #0f172a 0%, #0369a1 55%, #0ea5e9 100%)',
-  'sec-notes': 'linear-gradient(135deg, #064e3b 0%, #047857 55%, #10b981 100%)',
-  'sec-sounds': 'linear-gradient(135deg, #0c4a6e 0%, #0e7490 55%, #06b6d4 100%)',
-  'sec-analytics': 'linear-gradient(135deg, #2e1065 0%, #4c1d95 55%, #7c3aed 100%)'
+  'sec-timer': 'linear-gradient(125deg,#ffffff 0%,#f0faff 75%,#f7f7ff 100%)',
+  'sec-tasks': 'linear-gradient(125deg,#ffffff 0%,#f7f5ff 70%,#edfaff 100%)',
+  'sec-calendar': 'linear-gradient(125deg,#ffffff 0%,#f1f9ff 75%,#f6f5ff 100%)',
+  'sec-notes': 'linear-gradient(125deg,#ffffff 0%,#f1fffb 70%,#f4f7ff 100%)',
+  'sec-sounds': 'linear-gradient(125deg,#ffffff 0%,#effdff 75%,#eff7ff 100%)',
+  'sec-analytics': 'linear-gradient(125deg,#ffffff 0%,#f6f5ff 70%,#f1faff 100%)'
 };
 
 function switchTab(secId, btn) {
@@ -800,7 +800,7 @@ function switchTab(secId, btn) {
     document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   }
-  if (TAB_GRADS[secId]) document.getElementById('heroHeader').style.background = TAB_GRADS[secId];
+  if (TAB_GRADS[secId]) document.getElementById('heroHeader').style.setProperty('--page-ambient', TAB_GRADS[secId]);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1666,5 +1666,6 @@ applyLanguage(cfg.lang || 'en');
 renderDomainState();
 restoreTimerSession();
 document.body.classList.add('timer-home');
+document.getElementById('heroHeader').style.setProperty('--page-ambient', TAB_GRADS['sec-timer']);
 initQuickTraining();
 renderTodayPlan();
