@@ -253,6 +253,37 @@ let cfg = loadFortressData('zen_fortress_cfg_v21', {
   todayMins: 0, sessions: 0, streak: 0, water: 0, sets: 1, pagesRead: 0
 });
 
+function computeActualStreak(history, now = new Date()) {
+  const days = new Set(
+    (Array.isArray(history) ? history : [])
+      .filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && Number(e.minutes) > 0)
+      .map(e => e.date)
+  );
+  const day = new Date(now);
+  day.setHours(12, 0, 0, 0);
+  if (!days.has(localDateISO(day))) day.setDate(day.getDate() - 1);
+  let count = 0;
+  while (count < 10000 && days.has(localDateISO(day))) {
+    count += 1;
+    day.setDate(day.getDate() - 1);
+  }
+  return count;
+}
+
+function syncDailyRollover() {
+  const current = localDateISO();
+  if (cfg.metricsDate && cfg.metricsDate !== current) {
+    const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
+    cfg.todayMins = entries
+      .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
+      .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
+    cfg.water = 0;
+  }
+  cfg.metricsDate = current;
+  cfg.streak = computeActualStreak(cfg.sessionHistory);
+  saveFortressData('zen_fortress_cfg_v21', cfg);
+}
+
 function L() {
   return DICT[cfg.lang] || DICT.en;
 }
@@ -503,6 +534,7 @@ const TAB_GRADS = {
 };
 
 function switchTab(secId, btn) {
+  syncDailyRollover();
   document.querySelectorAll('.screen-section').forEach(s => s.classList.remove('active'));
   document.getElementById(secId).classList.add('active');
   if (btn) {
@@ -561,9 +593,11 @@ function creditCompletedSession() {
   const earned = Math.max(1, Math.round(timerTotal / 60));
   cfg.todayMins = Number(cfg.todayMins || 0) + earned;
   cfg.sessions = Number(cfg.sessions || 0) + 1;
+  cfg.metricsDate = localDateISO();
   cfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
   if (!Array.isArray(cfg.sessionHistory)) cfg.sessionHistory = [];
   cfg.sessionHistory.push({id: timerSessionId, date: localDateISO(), minutes: earned, domain: cfg.domain || 'study'});
+  cfg.streak = computeActualStreak(cfg.sessionHistory);
   saveFortressData('zen_fortress_cfg_v21', cfg);
   syncHeaderMetrics();
 }
@@ -1266,6 +1300,7 @@ function updateSyllabusCalc() {
 }
 
 /* Boot Init */
+syncDailyRollover();
 renderAnalyticsBars();
 applyLanguage(cfg.lang || 'en');
 restoreTimerSession();
