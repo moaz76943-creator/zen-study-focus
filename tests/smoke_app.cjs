@@ -97,6 +97,23 @@ assert.equal(evaluate('todayISO'),evaluate('localDateISO()'));
 evaluate("cfg.domain = 'sport'; renderDomainState(); selectTimerMode(30,'focus',null); updateTimerDisplay();");
 assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30m');
 assert.equal(document.getElementById('modeFocusBtn').textContent, '30m');
+// Simulate a quota failure while restoring. No storage key may remain half-updated.
+const backupCodeForRollback = evaluate('generateEncryptedBackupCode()');
+const savedBeforeRestore = new Map(store);
+const originalSetItem = storage.setItem;
+let failOnce = true;
+storage.setItem = function(key, value) {
+  if (key === 'zen_fortress_notes_v21' && failOnce) {
+    failOnce = false;
+    throw new Error('Simulated storage quota failure');
+  }
+  return originalSetItem.call(this, key, value);
+};
+assert.equal(evaluate('verifyAndRestoreBackupCode(' + JSON.stringify(backupCodeForRollback) + ')'), false);
+storage.setItem = originalSetItem;
+assert.deepEqual([...store.entries()], [...savedBeforeRestore.entries()]);
+assert.equal(evaluate('cfg.sessions'), 2, 'In-memory progress survives failed restore');
+
 // A delayed media error must never restart a sound that the user already stopped.
 evaluate("toggleSoundTile('rain')");
 assert.equal(audioInstances.length, 1);
