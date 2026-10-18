@@ -86,4 +86,8 @@ assert.equal(evaluate('cfg.todayMins'),3,'Two real active minutes counted instea
 // Keep the default date synchronized after crossing midnight.
 evaluate("todayISO = '2000-01-01'; syncDailyRollover();");
 assert.equal(evaluate('todayISO'),evaluate('localDateISO()'));
-console.log('PASS: boot, 20 locales, rollover, actual focus time, breaks, XSS and malicious backup rejection.');
+// A selected activity must remain visible and show its true duration.
+evaluate("cfg.domain = 'sport'; renderDomainState(); selectTimerMode(30,'focus',null); updateTimerDisplay();");
+assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30m');
+assert.equal(document.getElementById('modeFocusBtn').textContent, '30m');
+console.log('PASS: boot, 20 locales, rollover, actual focus time, activity UI, breaks, XSS and malicious backups.');
