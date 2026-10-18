@@ -282,24 +282,53 @@ function goToHomeAgenda(iso) {
 }
 
 function renderTodayPlan() {
-  const box=document.getElementById('todayPlanPreview');
-  if(!box || typeof tasksList==='undefined')return;
+  const box = document.getElementById('todayPlanPreview');
+  if (!box || typeof tasksList === 'undefined') return;
   renderHomeWeekStrip();
-  const today=localDateISO();
-  const dated=tasksList.filter(t=>t && t.date===today);
-  const complete=dated.filter(t=>t.done).length;
-  document.getElementById('todayPlanRatio').textContent=complete+'/'+dated.length;
-  document.getElementById('todayPlanPercent').textContent=dated.length?Math.round(complete/dated.length*100)+'%':'0%';
-  document.getElementById('todayPlanFill').style.width=(dated.length?complete/dated.length*100:0)+'%';
-  box.textContent='';
-  if(!dated.length){
-    const p=document.createElement('div');p.className='today-plan-entry';p.textContent=quickText('emptyPlan');box.appendChild(p);
+  const today = localDateISO();
+  // Starter examples belong to the tasks showcase, not the user's actual daily plan.
+  const dated = tasksList.filter(t => t && t.date === today && t.isStarter !== true);
+  const complete = dated.filter(t => t.done).length;
+  const progress = dated.length ? Math.round(complete / dated.length * 100) : 0;
+  document.getElementById('todayPlanRatio').textContent = complete + '/' + dated.length;
+  document.getElementById('todayPlanPercent').textContent = progress + '%';
+  document.getElementById('todayPlanFill').style.width = progress + '%';
+  box.textContent = '';
+  if (!dated.length) {
+    const empty = document.createElement('div');
+    empty.className = 'today-plan-entry';
+    empty.textContent = quickText('emptyPlan');
+    box.appendChild(empty);
     return;
   }
-  dated.slice(0,2).forEach(t=>{
-    const row=document.createElement('div');row.className='today-plan-entry';
-    const status=document.createElement('span');status.textContent=t.done?'✅':'◯';
-    const label=document.createElement('span');label.textContent=toWest(t.title||'');
-    row.appendChild(status);row.appendChild(label);box.appendChild(row);
+  dated.slice(0, 3).forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'today-plan-entry';
+    const check = document.createElement('button');
+    check.type = 'button';
+    check.className = 'today-plan-check';
+    check.textContent = t.done ? '✓' : '○';
+    check.setAttribute('aria-pressed', String(Boolean(t.done)));
+    check.setAttribute('aria-label',
+      (cfg.lang === 'ar' ? 'تغيير إنجاز المهمة: ' : 'Toggle completion: ') + toWest(t.title || ''));
+    check.onclick = () => toggleTaskDone(t.id);
+
+    const focus = document.createElement('button');
+    focus.type = 'button';
+    focus.className = 'today-plan-link';
+    focus.setAttribute('aria-label',
+      (cfg.lang === 'ar' ? 'التركيز على: ' : 'Focus on: ') + toWest(t.title || ''));
+    const name = document.createElement('span');
+    name.className = 'today-plan-task-name';
+    name.textContent = toWest(t.title || '');
+    const details = document.createElement('small');
+    details.className = 'today-plan-task-detail';
+    details.textContent = toWest(getCatLabel(t.catKey) + (t.time ? ' · ' + t.time : ''));
+    focus.appendChild(name);
+    focus.appendChild(details);
+    focus.onclick = () => focusOnTask(t.id);
+    row.appendChild(check);
+    row.appendChild(focus);
+    box.appendChild(row);
   });
 }
