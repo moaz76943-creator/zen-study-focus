@@ -32,6 +32,11 @@ class ReleaseGuardTests(unittest.TestCase):
     def test_export_disclosure(self):
         self.assertIn("They are NOT encrypted", INDEX)
 
+    def test_all_twenty_languages_have_full_localization(self):
+        # The current v21 OTHER_LANGS pack spreads English/Arabic into 17 locales.
+        # This must not be advertised as complete until native strings exist.
+        self.assertNotIn("...base,", APP, "Incomplete fallback translations for 17 languages")
+
     def test_nature_audio_files_are_not_html_error_pages(self):
         invalid = []
         for sound in sorted((WEB / "sounds").glob("*.ogg")):
