@@ -526,6 +526,7 @@ function applyLanguage(code) {
   renderSoundsStudio();
   updateSyllabusCalc();
   closeModal('langModal');
+  quickL10n();
 }
 
 /* ========================================================
@@ -738,6 +739,12 @@ function renderDomainState() {
 }
 
 function switchActivityDomain(dom, el) {
+  if(quickTraining?.active) {
+    if(!window.confirm(quickText('replacePrompt')))return;
+    quickTraining=null;
+    if(timerRunning)toggleTimerPlay();
+    renderQuickTraining();
+  }
   cfg.domain = dom;
   saveFortressData('zen_fortress_cfg_v21', cfg);
   renderDomainState();
@@ -786,6 +793,7 @@ const TAB_GRADS = {
 
 function switchTab(secId, btn) {
   syncDailyRollover();
+  document.body.classList.toggle('timer-home', secId === 'sec-timer');
   document.querySelectorAll('.screen-section').forEach(s => s.classList.remove('active'));
   document.getElementById(secId).classList.add('active');
   if (btn) {
@@ -843,7 +851,8 @@ function storeTimerSession() {
     endAt: timerRunning ? timerTargetTime : null,
     mode: currentTimerModeKey, label: customSessionLabel,
     sessionId: timerSessionId,
-    activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null
+    activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null,
+    training: quickTraining && quickTraining.active ? {...quickTraining} : null
   });
 }
 function creditCompletedSession() {
@@ -869,6 +878,12 @@ function finalizeTimerSession(shouldChime) {
   timerRunning = false;
   timerLeft = 0;
   creditCompletedSession();
+  if(quickTraining?.active) {
+    if(advanceQuickTrainingStep()) {
+      if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true);
+      return;
+    }
+  }
   storeTimerSession();
   updateTimerDisplay();
   document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
@@ -889,6 +904,7 @@ function restoreTimerSession() {
   currentTimerModeKey = ['focus','short','long','custom'].includes(snap.mode) ? snap.mode : 'focus';
   customSessionLabel = typeof snap.label === 'string' ? snap.label.slice(0, 100) : '';
   timerSessionId = typeof snap.sessionId === 'string' ? snap.sessionId : null;
+  quickTraining = validQuickSnapshot(snap.training);
   timerActiveMs = Number.isFinite(snap.activeMs) && snap.activeMs >= 0 && snap.activeMs <= 86400000
     ? snap.activeMs : Math.max(0, (timerTotal - timerLeft) * 1000);
   timerResumeMs = snap.running
@@ -922,6 +938,7 @@ function syncHeaderMetrics() {
   const plant = cfg.sessions >= 25 ? '🌸' : cfg.sessions >= 18 ? '🌳' : cfg.sessions >= 10 ? '🌿' : '🌱';
   document.getElementById('ringPlantEmoji').textContent = plant;
   renderAnalyticsBars();
+  renderTodayPlan();
 }
 
 function updateTimerDisplay() {
@@ -945,9 +962,15 @@ function updateTimerDisplay() {
     custom: customSessionLabel || d.modeCustom
   };
   document.getElementById('timerModeCaption').textContent = toWest(captions[currentTimerModeKey] || d.modeFocus);
+  updateFocusStatus();
 }
 
 function selectTimerMode(mins, modeKey, btn) {
+  if(quickTraining?.active && !quickInternalChange) {
+    if(!window.confirm(quickText('replacePrompt')))return;
+    quickTraining=null;
+    renderQuickTraining();
+  }
   if (timerRunning) toggleTimerPlay();
   currentTimerModeKey = modeKey;
   timerTotal = mins * 60;
@@ -1024,6 +1047,10 @@ function toggleTimerPlay() {
 }
 
 function resetTimerNow() {
+  if(quickTraining?.active) {
+    cancelQuickTraining();
+    return;
+  }
   if (timerRunning) toggleTimerPlay();
   timerLeft = timerTotal;
   timerSessionId = null;
@@ -1032,7 +1059,11 @@ function resetTimerNow() {
   storeTimerSession();
   updateTimerDisplay();
 }
-function skipTimerPhase() { if (timerRunning) toggleTimerPlay(); selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn')); }
+function skipTimerPhase() {
+  if(quickTraining?.active) { skipQuickTrainingStep(); return; }
+  if (timerRunning) toggleTimerPlay();
+  selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
+}
 function addWaterCup() { cfg.water = (cfg.water + 1) % 9; saveFortressData('zen_fortress_cfg_v21', cfg); syncHeaderMetrics(); }
 function toggleDeskClock(show) {
   document.getElementById('deskClockOverlay').classList.toggle('active', show);
@@ -1097,6 +1128,7 @@ function renderTasksList() {
     `;
     box.appendChild(card);
   });
+  renderTodayPlan();
 }
 
 function toggleTaskDone(id) {
@@ -1633,3 +1665,6 @@ renderAnalyticsBars();
 applyLanguage(cfg.lang || 'en');
 renderDomainState();
 restoreTimerSession();
+document.body.classList.add('timer-home');
+initQuickTraining();
+renderTodayPlan();
