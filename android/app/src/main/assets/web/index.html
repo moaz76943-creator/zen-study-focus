@@ -3,457 +3,444 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Zen Study Pro - الملاحظات والإنتاجية الذكية</title>
+  <title>Zen Study Focus Pro - المستقبل</title>
   <style>
     :root {
-      --canvas-bg: #f5f7fb;
-      --header-grad: linear-gradient(135deg, #0b1329 0%, #172554 60%, #1e3a8a 100%);
+      --bg-canvas: #f8fafc;
       --card-white: #ffffff;
       --primary: #0284c7;
+      --primary-neon: #00d2ff;
       --primary-soft: #e0f2fe;
-      --success: #059669;
+      --accent-purple: #6366f1;
+      --accent-purple-soft: #eef2ff;
+      --success: #10b981;
       --success-soft: #d1fae5;
-      --amber: #d97706;
+      --amber: #f59e0b;
       --amber-soft: #fef3c7;
-      --purple: #7c3aed;
-      --purple-soft: #ede9fe;
-      --rose: #e11d48;
-      --rose-soft: #ffe4e6;
+      --rose: #f43f5e;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --text-light: #94a3b8;
-      --border-soft: #e2e8f0;
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
-      --shadow-md: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 6px 10px -4px rgba(15, 23, 42, 0.02);
-      --radius-lg: 24px;
-      --radius-md: 16px;
+      --border-subtle: #f1f5f9;
+      --border-card: rgba(226, 232, 240, 0.8);
+      --shadow-card: 0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.02);
+      --shadow-hover: 0 16px 32px -4px rgba(2, 132, 199, 0.12);
+      --radius-xl: 26px;
+      --radius-lg: 18px;
       --radius-pill: 9999px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--canvas-bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 86px; overflow-x: hidden; }
+    body { background-color: var(--bg-canvas); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 96px; overflow-x: hidden; }
 
     .app-viewport { width: 100%; max-width: 440px; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
 
-    /* Top Ambient App Header */
-    .app-header {
-      background: var(--header-grad);
+    /* Futuristic Header */
+    .future-header {
+      background: linear-gradient(135deg, #090e1a 0%, #111c35 60%, #172a4d 100%);
       color: #ffffff;
-      padding: 22px 20px 24px;
-      border-bottom-left-radius: 30px;
-      border-bottom-right-radius: 30px;
-      box-shadow: 0 12px 28px rgba(11, 19, 41, 0.18);
+      padding: 20px 20px 22px;
+      border-bottom-left-radius: 28px;
+      border-bottom-right-radius: 28px;
+      box-shadow: 0 12px 30px rgba(9, 14, 26, 0.22);
+      position: relative;
     }
-    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .brand-wrap { display: flex; align-items: center; gap: 10px; }
-    .brand-avatar { width: 38px; height: 38px; border-radius: 12px; background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; }
-    .brand-title { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; }
-    .brand-sub { font-size: 0.74rem; opacity: 0.85; margin-top: 1px; }
+    .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .brand-cluster { display: flex; align-items: center; gap: 10px; }
+    .brand-glow-orb {
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-neon) 100%);
+      box-shadow: 0 0 16px rgba(0, 210, 255, 0.45);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand-title-wrap h1 { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.3px; }
+    .brand-title-wrap p { font-size: 0.72rem; opacity: 0.75; }
 
-    .header-actions { display: flex; gap: 8px; }
-    .action-circle-btn {
+    .header-controls { display: flex; gap: 8px; }
+    .glass-btn {
       width: 36px; height: 36px; border-radius: 50%; border: none;
-      background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(8px);
-      color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; justify-content: center;
+      background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px);
+      color: #ffffff; display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: transform 0.15s, background 0.15s;
     }
-    .action-circle-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.25); }
+    .glass-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.22); }
+    .glass-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-    .header-metric-bar {
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: var(--radius-md);
-      padding: 9px 15px;
+    /* Futuristic HUD Capsule */
+    .hud-capsule {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-lg);
+      padding: 10px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 4px;
     }
-    .metric-subitem { display: flex; flex-direction: column; }
-    .metric-sublabel { font-size: 0.68rem; opacity: 0.8; }
-    .metric-subval { font-size: 0.95rem; font-weight: 800; }
+    .hud-metric { display: flex; flex-direction: column; }
+    .hud-label { font-size: 0.68rem; opacity: 0.75; }
+    .hud-value { font-size: 1rem; font-weight: 900; letter-spacing: -0.2px; }
 
-    /* Content Area */
-    .view-content { padding: 18px 16px; flex: 1; display: none; animation: fadeInView 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-    .view-content.active { display: block; }
-    @keyframes fadeInView { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    /* Views */
+    .view-screen { padding: 18px 16px; flex: 1; display: none; animation: viewIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+    .view-screen.active { display: block; }
+    @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Universal White Cards */
-    .white-card {
+    /* Pure Luminous White Cards */
+    .future-card {
+      background: var(--card-white);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-card);
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .card-headline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .card-headline-title { font-size: 0.95rem; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .badge-chip { padding: 4px 10px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; }
+    .badge-cyan { background: var(--primary-soft); color: var(--primary); }
+    .badge-emerald { background: var(--success-soft); color: var(--success); }
+    .badge-purple { background: var(--accent-purple-soft); color: var(--accent-purple); }
+
+    /* View 1: Futuristic Timer */
+    .mode-pills-wrap { display: flex; background: #eef2f6; padding: 4px; border-radius: var(--radius-pill); margin-bottom: 18px; gap: 4px; }
+    .mode-pill { flex: 1; border: none; background: transparent; padding: 9px 0; border-radius: var(--radius-pill); font-size: 0.76rem; font-weight: 800; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+    .mode-pill.active { background: var(--card-white); color: var(--text-main); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+
+    .chrono-display-box { display: flex; flex-direction: column; align-items: center; padding: 12px 0; }
+    .chrono-gauge { position: relative; width: 230px; height: 230px; display: flex; align-items: center; justify-content: center; }
+    .gauge-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .gauge-track { fill: none; stroke: #f1f5f9; stroke-width: 8; }
+    .gauge-glow-bar {
+      fill: none; stroke: url(#cyanNeonGrad); stroke-width: 8; stroke-linecap: round;
+      stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s linear;
+      filter: drop-shadow(0 4px 12px rgba(0, 210, 255, 0.4));
+    }
+    .chrono-center { position: absolute; text-align: center; }
+    .chrono-time { font-size: 3.3rem; font-weight: 900; letter-spacing: -1.5px; color: var(--text-main); font-variant-numeric: tabular-nums; line-height: 1; }
+    .chrono-state { font-size: 0.74rem; font-weight: 800; color: var(--primary); background: var(--primary-soft); padding: 3px 14px; border-radius: var(--radius-pill); margin-top: 8px; display: inline-block; }
+
+    .chrono-actions { display: flex; gap: 10px; margin-top: 16px; width: 100%; }
+    .btn-future-primary {
+      flex: 2; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-neon) 100%);
+      color: #ffffff; border: none; padding: 14px 20px; border-radius: var(--radius-lg);
+      font-size: 0.95rem; font-weight: 900; cursor: pointer;
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.35); transition: transform 0.15s;
+    }
+    .btn-future-primary:active { transform: scale(0.97); }
+    .btn-future-secondary {
+      flex: 1; background: #f8fafc; border: 1px solid var(--border-card); color: var(--text-main);
+      padding: 14px 12px; border-radius: var(--radius-lg); font-size: 0.88rem; font-weight: 800; cursor: pointer;
+    }
+    .micro-time-adjusts { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+    .btn-micro-adj { background: #f1f5f9; border: none; padding: 5px 12px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); cursor: pointer; }
+    .btn-micro-adj:active { background: var(--primary-soft); color: var(--primary); }
+
+    /* View 2: High-Fidelity Nature Sounds (Zero Music) */
+    .sound-tiles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .sound-tile {
       background: var(--card-white);
       border-radius: var(--radius-lg);
-      padding: 18px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--border-soft);
-      margin-bottom: 14px;
+      padding: 15px;
+      border: 1px solid var(--border-card);
+      box-shadow: var(--shadow-card);
+      display: flex; flex-direction: column; justify-content: space-between;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .card-title-txt { font-size: 0.92rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-    .pill-badge { padding: 4px 10px; border-radius: var(--radius-pill); font-size: 0.7rem; font-weight: 700; }
-    .pill-blue { background: var(--primary-soft); color: var(--primary); }
-    .pill-green { background: var(--success-soft); color: var(--success); }
-    .pill-amber { background: var(--amber-soft); color: var(--amber); }
+    .sound-tile.on { border-color: var(--primary-neon); box-shadow: var(--shadow-hover); background: #fbfdff; }
+    .sound-tile-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .sound-tile-info { display: flex; align-items: center; gap: 8px; }
+    .sound-icon-box { width: 32px; height: 32px; border-radius: 10px; background: #f8fafc; display: flex; align-items: center; justify-content: center; }
+    .sound-tile.on .sound-icon-box { background: var(--primary-soft); color: var(--primary); }
+    .sound-icon-box svg { width: 18px; height: 18px; fill: currentColor; }
+    .sound-name { font-size: 0.82rem; font-weight: 800; color: var(--text-main); }
+    .switch-future { width: 34px; height: 20px; background: #cbd5e1; border-radius: var(--radius-pill); position: relative; cursor: pointer; transition: background 0.25s; }
+    .switch-future.active { background: var(--primary); }
+    .switch-future-dot { width: 14px; height: 14px; background: #ffffff; border-radius: 50%; position: absolute; top: 3px; right: 3px; transition: transform 0.25s; }
+    .switch-future.active .switch-future-dot { transform: translateX(-14px); }
+    .audio-slider { width: 100%; -webkit-appearance: none; background: #e2e8f0; height: 4px; border-radius: 2px; outline: none; margin-top: 10px; }
+    .audio-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
 
-    /* =====================================
-       VIEW 1: TIMER
-       ===================================== */
-    .segmented-control { display: flex; background: #eef2f6; padding: 4px; border-radius: var(--radius-pill); margin-bottom: 16px; gap: 4px; }
-    .seg-btn { flex: 1; border: none; background: transparent; padding: 8px 0; border-radius: var(--radius-pill); font-size: 0.74rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
-    .seg-btn.active { background: var(--card-white); color: var(--text-main); box-shadow: var(--shadow-sm); }
-
-    .timer-wrap { display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
-    .circ-timer { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; }
-    .circ-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-    .circ-bg { fill: none; stroke: #f1f5f9; stroke-width: 9; }
-    .circ-bar { fill: none; stroke: var(--primary); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s linear; filter: drop-shadow(0 4px 10px rgba(2, 132, 199, 0.28)); }
-    .circ-center { position: absolute; text-align: center; }
-    .timer-digits { font-size: 3rem; font-weight: 900; letter-spacing: -1px; color: var(--text-main); font-variant-numeric: tabular-nums; line-height: 1; }
-    .timer-mode-pill { font-size: 0.74rem; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 3px 12px; border-radius: var(--radius-pill); margin-top: 6px; display: inline-block; }
-
-    .timer-btns { display: flex; gap: 10px; margin-top: 14px; width: 100%; }
-    .btn-main { flex: 2; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; border: none; padding: 13px 18px; border-radius: var(--radius-md); font-size: 0.92rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px rgba(2, 132, 199, 0.35); }
-    .btn-main:active { transform: scale(0.98); }
-    .btn-sec { flex: 1; background: #f8fafc; border: 1px solid var(--border-soft); color: var(--text-main); padding: 13px 10px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 700; cursor: pointer; }
-
-    .adjust-row { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
-    .btn-adj { background: #f1f5f9; border: none; padding: 4px 10px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); cursor: pointer; }
-    .btn-adj:active { background: var(--primary-soft); color: var(--primary); }
-
-    /* =====================================
-       VIEW 2: TASKS
-       ===================================== */
-    .task-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
-    .clean-input { flex: 1; background: var(--card-white); border: 1px solid var(--border-soft); padding: 10px 14px; border-radius: var(--radius-md); font-size: 0.82rem; outline: none; box-shadow: var(--shadow-sm); }
-    .clean-input:focus { border-color: var(--primary); }
-    .btn-icon-add { background: var(--primary); color: #ffffff; border: none; padding: 0 16px; border-radius: var(--radius-md); font-weight: 800; font-size: 1.1rem; cursor: pointer; }
-
-    .task-list-flow { display: flex; flex-direction: column; gap: 8px; }
-    .task-item-card {
+    /* View 3: Tasks */
+    .task-add-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+    .future-input { flex: 1; background: var(--card-white); border: 1px solid var(--border-card); padding: 11px 16px; border-radius: var(--radius-lg); font-size: 0.82rem; outline: none; box-shadow: var(--shadow-card); }
+    .future-input:focus { border-color: var(--primary); }
+    .btn-add-action { background: var(--primary); color: #fff; border: none; padding: 0 18px; border-radius: var(--radius-lg); font-weight: 900; font-size: 1.2rem; cursor: pointer; }
+    .task-stream { display: flex; flex-direction: column; gap: 9px; }
+    .task-card {
       background: var(--card-white);
-      border-radius: var(--radius-md);
-      padding: 12px 14px;
-      border: 1px solid var(--border-soft);
-      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      border: 1px solid var(--border-card);
+      box-shadow: var(--shadow-card);
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
     }
-    .task-left { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; }
-    .task-checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 0.75rem; }
-    .task-item-card.done .task-checkbox { background: var(--success); border-color: var(--success); color: #fff; }
-    .task-item-card.done .t-name { text-decoration: line-through; color: var(--text-light); }
-    .t-name { font-size: 0.82rem; font-weight: 700; color: var(--text-main); }
-    .t-sub { font-size: 0.66rem; color: var(--text-muted); }
+    .task-check-circle { width: 22px; height: 22px; border-radius: 7px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 0.75rem; }
+    .task-card.done .task-check-circle { background: var(--success); border-color: var(--success); color: #ffffff; }
+    .task-card.done .task-title { text-decoration: line-through; color: var(--text-light); }
+    .task-title { font-size: 0.84rem; font-weight: 800; color: var(--text-main); }
+    .task-meta { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
 
-    /* =====================================
-       VIEW 3: DEDICATED SMART NOTES (الملاحظات الذكية)
-       ===================================== */
-    .notes-search-wrap { display: flex; gap: 8px; margin-bottom: 10px; }
-    .filter-chips-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
-    .filter-chips-row::-webkit-scrollbar { display: none; }
-    .filter-chip-btn { background: var(--card-white); border: 1px solid var(--border-soft); padding: 6px 13px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); white-space: nowrap; cursor: pointer; }
-    .filter-chip-btn.active { background: var(--text-main); color: #ffffff; border-color: var(--text-main); }
+    /* View 4: Dedicated Smart Notes */
+    .filter-pills-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
+    .filter-pills-row::-webkit-scrollbar { display: none; }
+    .btn-filter-pill { background: var(--card-white); border: 1px solid var(--border-card); padding: 6px 14px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 800; color: var(--text-muted); white-space: nowrap; cursor: pointer; }
+    .btn-filter-pill.active { background: var(--text-main); color: #ffffff; border-color: var(--text-main); }
 
-    /* Quick Action Banners for Note Creation */
-    .quick-templates-bar { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
-    .quick-templates-bar::-webkit-scrollbar { display: none; }
-    .btn-template-chip {
-      background: #f1f5f9; border: 1px dashed #cbd5e1;
-      padding: 6px 11px; border-radius: var(--radius-pill);
-      font-size: 0.7rem; font-weight: 700; color: var(--primary);
-      white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 4px;
-    }
-    .btn-template-chip:active { background: var(--primary-soft); }
+    .templates-flow { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
+    .btn-template { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; color: var(--primary); white-space: nowrap; cursor: pointer; }
+    .btn-template:active { background: var(--primary-soft); }
 
-    /* Notes Composer Drawer / Card */
-    .note-editor-card {
+    .note-compose-card { background: var(--card-white); border-radius: var(--radius-xl); padding: 16px; box-shadow: var(--shadow-card); border: 1px solid var(--border-card); margin-bottom: 14px; }
+    .note-text-area { width: 100%; height: 90px; border: 1px solid var(--border-card); border-radius: 12px; padding: 11px; font-size: 0.82rem; color: var(--text-main); line-height: 1.45; resize: none; outline: none; background: #fafbfc; }
+    .note-text-area:focus { border-color: var(--primary); background: #ffffff; }
+
+    .notes-stream { display: flex; flex-direction: column; gap: 10px; }
+    .note-item-card {
       background: var(--card-white);
       border-radius: var(--radius-lg);
-      padding: 16px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--border-soft);
-      margin-bottom: 14px;
-    }
-    .note-textarea {
-      width: 100%; height: 95px; border: 1px solid var(--border-soft); border-radius: 12px;
-      padding: 10px; font-size: 0.8rem; color: var(--text-main); line-height: 1.45;
-      resize: none; outline: none; background: #fafbfc;
-    }
-    .note-textarea:focus { border-color: var(--primary); background: #ffffff; }
-    .note-editor-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-
-    /* Notes Cards Stream */
-    .notes-stream { display: flex; flex-direction: column; gap: 10px; }
-    .note-card-item {
-      background: var(--card-white);
-      border-radius: var(--radius-md);
       padding: 14px 16px;
-      border: 1px solid var(--border-soft);
-      box-shadow: var(--shadow-sm);
-      position: relative;
+      border: 1px solid var(--border-card);
+      box-shadow: var(--shadow-card);
       border-right: 4px solid var(--primary);
-      transition: transform 0.15s;
+      position: relative;
     }
-    .note-card-item.pinned { border-right-color: var(--amber); background: #fffdfa; }
-    .note-card-item.dump { border-right-color: var(--purple); }
-    .note-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .note-tag-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
-    .tag-cornell { background: var(--primary-soft); color: var(--primary); }
-    .tag-dump { background: var(--purple-soft); color: var(--purple); }
-    .tag-exam { background: var(--amber-soft); color: var(--amber); }
-    .tag-general { background: #f1f5f9; color: var(--text-muted); }
-    .note-card-body { font-size: 0.8rem; line-height: 1.5; color: var(--text-main); white-space: pre-wrap; }
-    .note-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.67rem; color: var(--text-light); }
-    .note-card-btns { display: flex; gap: 8px; }
-    .btn-micro-icon { background: none; border: none; cursor: pointer; font-size: 0.85rem; color: var(--text-muted); }
+    .note-item-card.pinned { border-right-color: var(--amber); background: #fffdfa; }
+    .note-item-card.dump { border-right-color: var(--accent-purple); }
+    .note-item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .note-item-body { font-size: 0.82rem; line-height: 1.5; color: var(--text-main); white-space: pre-wrap; }
+    .note-item-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.68rem; color: var(--text-light); }
 
-    /* =====================================
-       VIEW 4: SOUNDS (ZERO MUSIC)
-       ===================================== */
-    .sound-tiles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .sound-tile-item {
-      background: var(--card-white);
-      border-radius: var(--radius-md);
-      padding: 13px;
-      border: 1px solid var(--border-soft);
-      box-shadow: var(--shadow-sm);
-      display: flex; flex-direction: column; justify-content: space-between;
-    }
-    .sound-tile-item.on { border-color: var(--primary); background: #f8fcff; }
-    .sound-head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .sound-tile-label { font-size: 0.8rem; font-weight: 800; color: var(--text-main); }
-    .toggle-switch { width: 32px; height: 18px; background: #cbd5e1; border-radius: var(--radius-pill); position: relative; cursor: pointer; transition: 0.2s; }
-    .toggle-switch.active { background: var(--primary); }
-    .toggle-switch-dot { width: 12px; height: 12px; background: #fff; border-radius: 50%; position: absolute; top: 3px; right: 3px; transition: transform 0.2s; }
-    .toggle-switch.active .toggle-switch-dot { transform: translateX(-14px); }
-    .volume-slider { width: 100%; -webkit-appearance: none; background: #e2e8f0; height: 4px; border-radius: 2px; outline: none; margin-top: 8px; }
-    .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--primary); cursor: pointer; }
+    /* View 5: Analytics */
+    .kpi-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .kpi-metric-card { background: var(--card-white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 15px; box-shadow: var(--shadow-card); }
+    .kpi-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
+    .kpi-digits { font-size: 1.4rem; font-weight: 900; color: var(--text-main); margin-top: 4px; }
 
-    /* =====================================
-       VIEW 5: ANALYTICS & STATS
-       ===================================== */
-    .kpi-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .kpi-stat-box { background: var(--card-white); border: 1px solid var(--border-soft); border-radius: var(--radius-md); padding: 14px; box-shadow: var(--shadow-sm); }
-    .kpi-stat-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
-    .kpi-stat-val { font-size: 1.3rem; font-weight: 900; color: var(--text-main); margin-top: 2px; }
-
-    /* Bottom Navigation Bar (Matched to Mobile Showcase) */
-    .bottom-nav {
+    /* Floating Glass Bottom Navigation (Ultra Modern SVG Tabs) */
+    .future-bottom-nav {
       position: fixed;
-      bottom: 0;
-      width: 100%;
-      max-width: 440px;
-      background: rgba(255, 255, 255, 0.95);
+      bottom: 12px;
+      width: calc(100% - 24px);
+      max-width: 416px;
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border-soft);
-      padding: 9px 12px 16px;
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      border-radius: 24px;
+      padding: 8px 10px;
       display: flex;
       justify-content: space-around;
       align-items: center;
       z-index: 100;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
-    .nav-tab-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 0.67rem;
-      font-weight: 700;
-      padding: 4px 8px;
-      transition: color 0.15s, transform 0.15s;
+    .nav-future-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: none; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 0.68rem; font-weight: 800;
+      padding: 6px 12px; border-radius: var(--radius-pill);
+      transition: color 0.15s, background 0.15s;
     }
-    .nav-tab-btn.active { color: var(--primary); }
-    .nav-tab-btn .tab-ico { font-size: 1.25rem; transition: transform 0.2s; }
-    .nav-tab-btn.active .tab-ico { transform: translateY(-2px); }
+    .nav-future-btn.active { color: var(--primary); background: var(--primary-soft); }
+    .nav-future-btn svg { width: 20px; height: 20px; fill: currentColor; }
   </style>
 </head>
 <body>
 
   <div class="app-viewport">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="header-top">
-        <div class="brand-wrap">
-          <div class="brand-avatar">✨</div>
-          <div>
-            <h1 class="brand-title">Zen Study Focus Pro</h1>
-            <p class="brand-sub">عالم من المذاكرة الهادئة والإنتاجية</p>
+    <!-- SVG Defs for Neon Gradients -->
+    <svg style="position: absolute; width: 0; height: 0;">
+      <defs>
+        <linearGradient id="cyanNeonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0284c7" />
+          <stop offset="100%" stop-color="#00d2ff" />
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <!-- Sleek Futuristic Header -->
+    <header class="future-header">
+      <div class="header-nav">
+        <div class="brand-cluster">
+          <div class="brand-glow-orb">
+            <svg style="width: 20px; height: 20px; fill: #fff;" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+          </div>
+          <div class="brand-title-wrap">
+            <h1>ZEN FOCUS</h1>
+            <p>الإنتاجية والهدوء الذكي</p>
           </div>
         </div>
-        <div class="header-actions">
-          <button class="action-circle-btn" id="masterMuteBtn" onclick="toggleMasterAudio()" title="كتم/تشغيل الأصوات">🔊</button>
-          <button class="action-circle-btn" onclick="exportNotesFile()" title="تصدير الملاحظات">💾</button>
+        <div class="header-controls">
+          <button class="glass-btn" id="masterMuteToggle" onclick="toggleAudioMute()" title="كتم/تشغيل الأصوات">
+            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          </button>
+          <button class="glass-btn" onclick="exportNotesTxtFile()" title="تصدير الملاحظات">
+            <svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
+          </button>
         </div>
       </div>
-      <div class="header-metric-bar">
-        <div class="metric-subitem">
-          <span class="metric-sublabel">دقائق التركيز اليوم</span>
-          <span class="metric-subval" id="hdrFocusVal">0 دقيقة</span>
+      <div class="hud-capsule">
+        <div class="hud-metric">
+          <span class="hud-label">دقائق التركيز اليوم</span>
+          <span class="hud-value" id="hudFocusMin">0 دقيقة</span>
         </div>
-        <div class="metric-subitem" style="text-align: left;">
-          <span class="metric-sublabel">سلسلة الإنجاز</span>
-          <span class="metric-subval" id="hdrStreakVal">🔥 0 جلسات</span>
+        <div class="hud-metric" style="text-align: left;">
+          <span class="hud-label">سلسلة الانضباط</span>
+          <span class="hud-value" id="hudStreak">🔥 0 جلسات</span>
         </div>
       </div>
     </header>
 
-    <!-- VIEW 1: TIMER -->
-    <main class="view-content active" id="view-timer">
-      <div class="white-card">
-        <div class="segmented-control">
-          <button class="seg-btn active" id="seg-focus" onclick="setTimerMode(25, 'جلسة تركيز', this)">تركيز 25د</button>
-          <button class="seg-btn" id="seg-short" onclick="setTimerMode(5, 'راحة قصيرة', this)">راحة 5د</button>
-          <button class="seg-btn" id="seg-long" onclick="setTimerMode(15, 'استراحة عميقة', this)">طويلة 15د</button>
-          <button class="seg-btn" id="seg-5217" onclick="setTimerMode(52, 'جلسة 52/17 ⚡', this)">52/17 ⚡</button>
+    <!-- VIEW 1: CHRONO TIMER -->
+    <main class="view-screen active" id="view-timer">
+      <div class="future-card">
+        <div class="mode-pills-wrap">
+          <button class="mode-pill active" id="pill-focus" onclick="setChronoMode(25, 'جلسة تركيز', this)">تركيز 25د</button>
+          <button class="mode-pill" id="pill-short" onclick="setChronoMode(5, 'راحة قصيرة', this)">راحة 5د</button>
+          <button class="mode-pill" id="pill-long" onclick="setChronoMode(15, 'طويلة 15د', this)">طويلة 15د</button>
+          <button class="mode-pill" id="pill-5217" onclick="setChronoMode(52, 'جلسة 52/17 ⚡', this)">52/17 ⚡</button>
         </div>
 
-        <div class="timer-wrap">
-          <div class="circ-timer">
-            <svg class="circ-svg" viewBox="0 0 230 230">
-              <circle class="circ-bg" cx="115" cy="115" r="105"></circle>
-              <circle class="circ-bar" id="timerSvgBar" cx="115" cy="115" r="105"></circle>
+        <div class="chrono-display-box">
+          <div class="chrono-gauge">
+            <svg class="gauge-svg" viewBox="0 0 230 230">
+              <circle class="gauge-track" cx="115" cy="115" r="105"></circle>
+              <circle class="gauge-glow-bar" id="gaugeGlowBar" cx="115" cy="115" r="105"></circle>
             </svg>
-            <div class="circ-center">
-              <div class="timer-digits" id="timerDigits">25:00</div>
-              <span class="timer-mode-pill" id="timerTag">جلسة تركيز</span>
+            <div class="chrono-center">
+              <div class="chrono-time" id="chronoDigits">25:00</div>
+              <span class="chrono-state" id="chronoTag">جلسة تركيز</span>
             </div>
           </div>
 
-          <div class="adjust-row">
-            <button class="btn-adj" onclick="adjustTimerMinutes(-5)">-5 دقائق</button>
-            <button class="btn-adj" onclick="adjustTimerMinutes(-1)">-1 دقيقة</button>
-            <button class="btn-adj" onclick="adjustTimerMinutes(1)">+1 دقيقة</button>
-            <button class="btn-adj" onclick="adjustTimerMinutes(5)">+5 دقائق</button>
+          <div class="micro-time-adjusts">
+            <button class="btn-micro-adj" onclick="adjustChrono(-5)">-5 دقائق</button>
+            <button class="btn-micro-adj" onclick="adjustChrono(-1)">-1 دقيقة</button>
+            <button class="btn-micro-adj" onclick="adjustChrono(1)">+1 دقيقة</button>
+            <button class="btn-micro-adj" onclick="adjustChrono(5)">+5 دقائق</button>
           </div>
         </div>
 
-        <div class="timer-btns">
-          <button class="btn-main" id="timerBtn" onclick="toggleTimer()">بدء الجلسة</button>
-          <button class="btn-sec" onclick="resetTimer()">إعادة ضبط</button>
+        <div class="chrono-actions">
+          <button class="btn-future-primary" id="btnToggleChrono" onclick="toggleChrono()">بدء الجلسة</button>
+          <button class="btn-future-secondary" onclick="resetChrono()">إعادة ضبط</button>
         </div>
       </div>
     </main>
 
-    <!-- VIEW 2: TASKS -->
-    <main class="view-content" id="view-tasks">
-      <div class="white-card">
-        <div class="card-head">
-          <div class="card-title-txt"><span>📋</span> جدول المهام الدراسية</div>
-          <span class="pill-badge pill-blue" id="tasksDoneCount">0 من 0 مكتمل</span>
+    <!-- VIEW 2: ACOUSTIC NATURE SOUNDS (REAL DSP, ZERO MUSIC) -->
+    <main class="view-screen" id="view-sounds">
+      <div class="future-card">
+        <div class="card-headline">
+          <div class="card-headline-title">
+            <span>🌿</span> أصوات طبيعية نقية (بدون موسيقى)
+          </div>
+          <span class="badge-chip badge-emerald">معالجة صوتية حقيقية</span>
         </div>
-        <div class="task-input-row">
-          <input type="text" class="clean-input" id="taskInputInp" placeholder="أضف مهمة جديدة للتركيز عليها...">
-          <button class="btn-icon-add" onclick="addTaskItem()">+</button>
-        </div>
-        <div class="task-list-flow" id="tasksContainer"></div>
+        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4;">
+          أصوات فيزيائية خالية تماماً من التشويش أو الموسيقى لعزل الضجيج الخارجي بنقاء تام.
+        </p>
+
+        <div class="sound-tiles-grid" id="soundTilesGrid"></div>
       </div>
     </main>
 
-    <!-- VIEW 3: DEDICATED SMART NOTES (الملاحظات الذكية) -->
-    <main class="view-content" id="view-notes">
-      <div class="notes-search-wrap">
-        <input type="text" class="clean-input" id="notesSearchInp" placeholder="🔍 ابحث في الملاحظات أو الأفكار..." oninput="filterNotes()">
-        <button class="btn-sec" style="padding: 10px 14px;" onclick="exportNotesFile()">تصدير TXT</button>
+    <!-- VIEW 3: TASKS PLANNER -->
+    <main class="view-screen" id="view-tasks">
+      <div class="future-card">
+        <div class="card-headline">
+          <div class="card-headline-title"><span>📋</span> جدول المهام الدراسية</div>
+          <span class="badge-chip badge-cyan" id="badgeTasksRatio">0 من 0 مكتمل</span>
+        </div>
+        <div class="task-add-bar">
+          <input type="text" class="future-input" id="inpNewTask" placeholder="أضف مهمة دراسية جديدة...">
+          <button class="btn-add-action" onclick="addNewTaskItem()">+</button>
+        </div>
+        <div class="task-stream" id="taskStreamBox"></div>
+      </div>
+    </main>
+
+    <!-- VIEW 4: DEDICATED SMART NOTES WORKSPACE -->
+    <main class="view-screen" id="view-notes">
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <input type="text" class="future-input" id="inpSearchNotes" placeholder="🔍 ابحث في ملخصاتك وأفكارك..." oninput="renderNotesStream()">
+        <button class="btn-future-secondary" style="padding: 10px 14px;" onclick="exportNotesTxtFile()">تصدير</button>
       </div>
 
-      <!-- Quick Templates & Brain-Dump Bar -->
-      <div class="quick-templates-bar">
-        <button class="btn-template-chip" onclick="applyTemplate('dump')">⚡ تفريغ فكرة مشتتة</button>
-        <button class="btn-template-chip" onclick="applyTemplate('cornell')">📋 قالب كورنيل</button>
-        <button class="btn-template-chip" onclick="applyTemplate('exam')">⭐ أسئلة الامتحان</button>
-        <button class="btn-template-chip" onclick="applyTemplate('formula')">📐 قانون هام</button>
+      <div class="templates-flow">
+        <button class="btn-template" onclick="fillTemplate('dump')">⚡ تفريغ فكرة مشتتة</button>
+        <button class="btn-template" onclick="fillTemplate('cornell')">📋 قالب كورنيل</button>
+        <button class="btn-template" onclick="fillTemplate('exam')">⭐ سؤال امتحان</button>
       </div>
 
-      <!-- Note Creator Card -->
-      <div class="note-editor-card">
-        <textarea class="note-textarea" id="noteEditorArea" placeholder="دوّن ملخصاً دراسياً أو فرّغ خاطرة مشتتة للعودة للتركيز..."></textarea>
-        <div class="note-editor-actions">
-          <select class="clean-input" id="noteTagSelect" style="width: auto; padding: 6px 10px; font-size: 0.74rem;">
+      <div class="note-compose-card">
+        <textarea class="note-text-area" id="txtNoteBody" placeholder="اكتب ملخصك أو فرغ فكرة مشتتة للعودة للتركيز..."></textarea>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <select class="future-input" id="selNoteTag" style="width: auto; padding: 6px 12px; font-size: 0.74rem;">
             <option value="general">📚 عام</option>
             <option value="dump">💭 تفريغ مشتت</option>
             <option value="cornell">📋 كورنيل</option>
             <option value="exam">⭐ امتحان</option>
           </select>
-          <div style="display: flex; gap: 6px;">
-            <button class="btn-main" style="padding: 8px 14px; font-size: 0.76rem;" onclick="saveNoteCard()">+ حفظ الملاحظة</button>
-          </div>
+          <button class="btn-future-primary" style="padding: 9px 18px; font-size: 0.78rem;" onclick="saveNoteItem()">+ حفظ الملاحظة</button>
         </div>
       </div>
 
-      <!-- Filter Chips -->
-      <div class="filter-chips-row">
-        <button class="filter-chip-btn active" onclick="setNotesFilter('all', this)">الكل (<span id="cntAll">0</span>)</button>
-        <button class="filter-chip-btn" onclick="setNotesFilter('pinned', this)">📌 المثبتة (<span id="cntPin">0</span>)</button>
-        <button class="filter-chip-btn" onclick="setNotesFilter('dump', this)">💭 مشتتات (<span id="cntDump">0</span>)</button>
-        <button class="filter-chip-btn" onclick="setNotesFilter('cornell', this)">📋 كورنيل (<span id="cntCornell">0</span>)</button>
+      <div class="filter-pills-row">
+        <button class="btn-filter-pill active" onclick="setNotesFilterTag('all', this)">الكل (<span id="cntAllNotes">0</span>)</button>
+        <button class="btn-filter-pill" onclick="setNotesFilterTag('pinned', this)">📌 المثبتة (<span id="cntPinnedNotes">0</span>)</button>
+        <button class="btn-filter-pill" onclick="setNotesFilterTag('dump', this)">💭 مشتتات (<span id="cntDumpNotes">0</span>)</button>
+        <button class="btn-filter-pill" onclick="setNotesFilterTag('cornell', this)">📋 كورنيل (<span id="cntCornellNotes">0</span>)</button>
       </div>
 
-      <!-- Notes Feed -->
-      <div class="notes-stream" id="notesFeed"></div>
-    </main>
-
-    <!-- VIEW 4: SOUNDS (100% ZERO MUSIC) -->
-    <main class="view-content" id="view-sounds">
-      <div class="white-card">
-        <div class="card-head">
-          <div class="card-title-txt"><span>🌿</span> أصوات طبيعية نقية (بدون موسيقى)</div>
-          <span class="pill-badge pill-green">توليد فيزيائي</span>
-        </div>
-        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 14px;">
-          أصوات مهدئة مُولّدة برمجياً لعزل الضجيج الخارجي ومساعدتك على الانغماس التام.
-        </p>
-        <div class="sound-tiles-grid" id="soundTilesBox"></div>
-      </div>
+      <div class="notes-stream" id="notesStreamBox"></div>
     </main>
 
     <!-- VIEW 5: ANALYTICS -->
-    <main class="view-content" id="view-analytics">
-      <div class="kpi-row-grid">
-        <div class="kpi-stat-box">
-          <div class="kpi-stat-label">دقائق التركيز اليوم</div>
-          <div class="kpi-stat-val" id="kpiTodayMins">0 د</div>
+    <main class="view-screen" id="view-analytics">
+      <div class="kpi-cards-grid">
+        <div class="kpi-metric-card">
+          <div class="kpi-title">دقائق التركيز اليوم</div>
+          <div class="kpi-digits" id="kpiTodayMinutes">0 د</div>
         </div>
-        <div class="kpi-stat-box">
-          <div class="kpi-stat-label">الجلسات المكتملة</div>
-          <div class="kpi-stat-val" id="kpiCompletedSessions">0</div>
+        <div class="kpi-metric-card">
+          <div class="kpi-title">الجلسات المكتملة</div>
+          <div class="kpi-digits" id="kpiCompletedCount">0</div>
         </div>
       </div>
 
-      <div class="white-card">
-        <div class="card-head">
-          <div class="card-title-txt"><span>🌱</span> رتبة الانضباط وحديقة الإنجاز</div>
-          <span class="pill-badge pill-amber" id="kpiRankText">متعلم طموح 🌱</span>
+      <div class="future-card">
+        <div class="card-headline">
+          <div class="card-headline-title"><span>🌱</span> حديقة التركيز ورتبة الانضباط</div>
+          <span class="badge-chip badge-purple" id="kpiRankTitle">متعلم طموح 🌱</span>
         </div>
         <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
-          تنمو شجرة تركيزك وتزهر كلما أنجزت جلسات بدون مقاطعة، وتساعدك على بناء عادة دراسية مستدامة.
+          تتطور شجرتك الافتراضية كلما أتممت جلسات مذاكرة دون انقطاع. استمر في صناعة عاداتك الذهنية بنقاء.
         </p>
       </div>
     </main>
 
-    <!-- Bottom Navigation Bar (5 Golden Tabs) -->
-    <nav class="bottom-nav">
-      <button class="nav-tab-btn active" onclick="switchView('view-timer', this)">
-        <span class="tab-ico">⏱️</span>
+    <!-- Floating Glass Bottom Navigation (Vector Duotone SVGs) -->
+    <nav class="future-bottom-nav">
+      <button class="nav-future-btn active" onclick="navigateTab('view-timer', this)">
+        <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
         <span>المؤقت</span>
       </button>
-      <button class="nav-tab-btn" onclick="switchView('view-tasks', this)">
-        <span class="tab-ico">📋</span>
+      <button class="nav-future-btn" onclick="navigateTab('view-tasks', this)">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
         <span>المهام</span>
       </button>
-      <button class="nav-tab-btn" onclick="switchView('view-notes', this)">
-        <span class="tab-ico">📝</span>
+      <button class="nav-future-btn" onclick="navigateTab('view-notes', this)">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
         <span>الملاحظات</span>
       </button>
-      <button class="nav-tab-btn" onclick="switchView('view-sounds', this)">
-        <span class="tab-ico">🌿</span>
+      <button class="nav-future-btn" onclick="navigateTab('view-sounds', this)">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span>الأصوات</span>
       </button>
-      <button class="nav-tab-btn" onclick="switchView('view-analytics', this)">
-        <span class="tab-ico">📊</span>
+      <button class="nav-future-btn" onclick="navigateTab('view-analytics', this)">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
         <span>التحليلات</span>
       </button>
     </nav>
@@ -461,334 +448,175 @@
 
   <script>
     /* ========================================================
-       1. ROUTING & NAVIGATION
+       1. ROUTING & TABS
        ======================================================== */
-    function switchView(viewId, btn) {
-      document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
-      document.getElementById(viewId).classList.add('active');
+    function navigateTab(targetView, btn) {
+      document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(targetView).classList.add('active');
       if (btn) {
-        document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.nav-future-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       }
     }
 
     /* ========================================================
-       2. TIMER LOGIC (WITH REAL-TIME DELTA SYNC)
+       2. TIMER LOGIC (REAL-TIME TIMESTAMP DELTA)
        ======================================================== */
-    let totalSeconds = 25 * 60;
-    let leftSeconds = totalSeconds;
-    let timerRunning = false;
-    let timerInterval = null;
-    let expectedEndTime = null;
-    let completedSessions = parseInt(localStorage.getItem('zen_completed_sessions') || '0');
-    let totalMinsToday = parseInt(localStorage.getItem('zen_today_mins') || '0');
-    const circPerimeter = 2 * Math.PI * 105;
+    let chronoTotalSecs = 25 * 60;
+    let chronoLeftSecs = chronoTotalSecs;
+    let chronoActive = false;
+    let chronoTimerId = null;
+    let chronoTargetTimestamp = null;
+    let completedSessionsCount = parseInt(localStorage.getItem('zen_completed_sessions_v9') || '0');
+    let todayFocusMinutes = parseInt(localStorage.getItem('zen_today_minutes_v9') || '0');
+    const perimeter = 2 * Math.PI * 105;
 
-    function renderTimer() {
-      const m = Math.floor(leftSeconds / 60).toString().padStart(2, '0');
-      const s = (leftSeconds % 60).toString().padStart(2, '0');
-      document.getElementById('timerDigits').textContent = `${m}:${s}`;
-      const offset = circPerimeter - (leftSeconds / totalSeconds) * circPerimeter;
-      document.getElementById('timerSvgBar').style.strokeDashoffset = offset;
+    function renderChronoUI() {
+      const m = Math.floor(chronoLeftSecs / 60).toString().padStart(2, '0');
+      const s = (chronoLeftSecs % 60).toString().padStart(2, '0');
+      document.getElementById('chronoDigits').textContent = `${m}:${s}`;
+      const offset = perimeter - (chronoLeftSecs / chronoTotalSecs) * perimeter;
+      document.getElementById('gaugeGlowBar').style.strokeDashoffset = offset;
     }
 
-    function setTimerMode(mins, label, btn) {
-      if (timerRunning) toggleTimer();
-      totalSeconds = mins * 60;
-      leftSeconds = totalSeconds;
-      document.getElementById('timerTag').textContent = label;
-      document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+    function setChronoMode(mins, tag, btn) {
+      if (chronoActive) toggleChrono();
+      chronoTotalSecs = mins * 60;
+      chronoLeftSecs = chronoTotalSecs;
+      document.getElementById('chronoTag').textContent = tag;
+      document.querySelectorAll('.mode-pill').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
-      renderTimer();
+      renderChronoUI();
     }
 
-    function adjustTimerMinutes(delta) {
-      leftSeconds = Math.max(60, leftSeconds + delta * 60);
-      if (leftSeconds > totalSeconds) totalSeconds = leftSeconds;
-      if (timerRunning) expectedEndTime = Date.now() + (leftSeconds * 1000);
-      renderTimer();
+    function adjustChrono(deltaMins) {
+      chronoLeftSecs = Math.max(60, chronoLeftSecs + deltaMins * 60);
+      if (chronoLeftSecs > chronoTotalSecs) chronoTotalSecs = chronoLeftSecs;
+      if (chronoActive) chronoTargetTimestamp = Date.now() + (chronoLeftSecs * 1000);
+      renderChronoUI();
     }
 
-    function toggleTimer() {
-      const btn = document.getElementById('timerBtn');
-      if (timerRunning) {
-        clearInterval(timerInterval);
-        timerRunning = false;
+    function toggleChrono() {
+      const btn = document.getElementById('btnToggleChrono');
+      if (chronoActive) {
+        clearInterval(chronoTimerId);
+        chronoActive = false;
         btn.textContent = 'متابعة';
       } else {
-        initAudio();
-        timerRunning = true;
+        initAudioEngine();
+        chronoActive = true;
         btn.textContent = 'إيقاف مؤقت';
-        expectedEndTime = Date.now() + (leftSeconds * 1000);
-        timerInterval = setInterval(() => {
+        chronoTargetTimestamp = Date.now() + (chronoLeftSecs * 1000);
+        chronoTimerId = setInterval(() => {
           const now = Date.now();
-          const remaining = Math.round((expectedEndTime - now) / 1000);
-          if (remaining > 0) {
-            leftSeconds = remaining;
-            renderTimer();
+          const rem = Math.round((chronoTargetTimestamp - now) / 1000);
+          if (rem > 0) {
+            chronoLeftSecs = rem;
+            renderChronoUI();
           } else {
-            clearInterval(timerInterval);
-            timerRunning = false;
-            leftSeconds = 0;
-            renderTimer();
+            clearInterval(chronoTimerId);
+            chronoActive = false;
+            chronoLeftSecs = 0;
+            renderChronoUI();
             btn.textContent = 'بدء الجلسة';
-            completedSessions++;
-            totalMinsToday += Math.round(totalSeconds / 60);
-            localStorage.setItem('zen_completed_sessions', completedSessions);
-            localStorage.setItem('zen_today_mins', totalMinsToday);
-            updateStats();
-            setTimerMode(5, 'راحة قصيرة', document.getElementById('seg-short'));
+            completedSessionsCount++;
+            todayFocusMinutes += Math.round(chronoTotalSecs / 60);
+            localStorage.setItem('zen_completed_sessions_v9', completedSessionsCount);
+            localStorage.setItem('zen_today_minutes_v9', todayFocusMinutes);
+            updateAnalyticsUI();
+            setChronoMode(5, 'راحة قصيرة', document.getElementById('pill-short'));
           }
         }, 500);
       }
     }
 
-    function resetTimer() {
-      if (timerRunning) toggleTimer();
-      leftSeconds = totalSeconds;
-      document.getElementById('timerBtn').textContent = 'بدء الجلسة';
-      renderTimer();
+    function resetChrono() {
+      if (chronoActive) toggleChrono();
+      chronoLeftSecs = chronoTotalSecs;
+      document.getElementById('btnToggleChrono').textContent = 'بدء الجلسة';
+      renderChronoUI();
     }
 
     /* ========================================================
-       3. TASKS PLANNER
+       3. HIGH-FIDELITY NATURE AUDIO ENGINE (100% ZERO MUSIC)
        ======================================================== */
-    let tasksList = JSON.parse(localStorage.getItem('zen_tasks_v8') || JSON.stringify([
-      { text: 'فهم ومراجعة النقاط الأساسية بعمق', done: false },
-      { text: 'حل التمارين والأسئلة التطبيقية', done: true }
-    ]));
-
-    function renderTasks() {
-      const box = document.getElementById('tasksContainer');
-      box.innerHTML = '';
-      let done = 0;
-      tasksList.forEach((t, i) => {
-        if (t.done) done++;
-        const card = document.createElement('div');
-        card.className = 'task-item-card' + (t.done ? ' done' : '');
-        card.innerHTML = `
-          <div class="task-left" onclick="toggleTaskStatus(${i})">
-            <div class="task-checkbox">${t.done ? '✓' : ''}</div>
-            <div>
-              <div class="t-name">${t.text}</div>
-              <div class="t-sub">جلسة مذاكرة تقديرية: 25 دقيقة</div>
-            </div>
-          </div>
-          <button style="background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:0.9rem;" onclick="deleteTaskItem(${i})">✕</button>
-        `;
-        box.appendChild(card);
-      });
-      document.getElementById('tasksDoneCount').textContent = `${done} من ${tasksList.length} مكتمل`;
-    }
-
-    function addTaskItem() {
-      const inp = document.getElementById('taskInputInp');
-      const val = inp.value.trim();
-      if (!val) return;
-      tasksList.unshift({ text: val, done: false });
-      inp.value = '';
-      localStorage.setItem('zen_tasks_v8', JSON.stringify(tasksList));
-      renderTasks();
-    }
-    function toggleTaskStatus(i) { tasksList[i].done = !tasksList[i].done; localStorage.setItem('zen_tasks_v8', JSON.stringify(tasksList)); renderTasks(); }
-    function deleteTaskItem(i) { tasksList.splice(i, 1); localStorage.setItem('zen_tasks_v8', JSON.stringify(tasksList)); renderTasks(); }
-
-    /* ========================================================
-       4. DEDICATED SMART NOTES SYSTEM
-       ======================================================== */
-    let notesList = JSON.parse(localStorage.getItem('zen_notes_v8') || JSON.stringify([
-      {
-        id: 1,
-        text: "📌 الفكرة الأساسية: التكرار المتباعد\n- المراجعة قبل لحظة النسيان تثبت المعلومة في الذاكرة طويلة المدى.\n💡 النتيجة: 20 دقيقة مراجعة تعادل ساعات حفظ عشوائي.",
-        tag: "cornell",
-        pinned: true,
-        date: "اليوم 10:30 ص"
-      },
-      {
-        id: 2,
-        text: "تذكرت شراء بطاقات الملاحظات المسائية بعد إنهاء جلسة المذاكرة.",
-        tag: "dump",
-        pinned: false,
-        date: "اليوم 11:15 ص"
-      }
-    ]));
-
-    let currentNotesFilter = 'all';
-
-    function renderNotes() {
-      const feed = document.getElementById('notesFeed');
-      const q = (document.getElementById('notesSearchInp').value || '').toLowerCase();
-      feed.innerHTML = '';
-
-      let pinnedCount = 0, dumpCount = 0, cornellCount = 0;
-      notesList.forEach(n => {
-        if (n.pinned) pinnedCount++;
-        if (n.tag === 'dump') dumpCount++;
-        if (n.tag === 'cornell') cornellCount++;
-      });
-      document.getElementById('cntAll').textContent = notesList.length;
-      document.getElementById('cntPin').textContent = pinnedCount;
-      document.getElementById('cntDump').textContent = dumpCount;
-      document.getElementById('cntCornell').textContent = cornellCount;
-
-      const filtered = notesList.filter(n => {
-        const matchesQuery = n.text.toLowerCase().includes(q);
-        if (!matchesQuery) return false;
-        if (currentNotesFilter === 'pinned') return n.pinned;
-        if (currentNotesFilter === 'dump') return n.tag === 'dump';
-        if (currentNotesFilter === 'cornell') return n.tag === 'cornell';
-        return true;
-      });
-
-      // Sort pinned first
-      filtered.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
-
-      filtered.forEach(n => {
-        const item = document.createElement('div');
-        item.className = `note-card-item ${n.pinned ? 'pinned' : ''} ${n.tag === 'dump' ? 'dump' : ''}`;
-        const tagNames = { cornell: 'قالب كورنيل', dump: 'تفريغ فكرة', exam: 'سؤال امتحان', general: 'ملاحظة عامة' };
-        const tagClasses = { cornell: 'tag-cornell', dump: 'tag-dump', exam: 'tag-exam', general: 'tag-general' };
-
-        item.innerHTML = `
-          <div class="note-card-head">
-            <span class="note-tag-badge ${tagClasses[n.tag] || 'tag-general'}">${tagNames[n.tag] || 'ملاحظة'}</span>
-            <div class="note-card-btns">
-              <button class="btn-micro-icon" onclick="togglePinNote(${n.id})" title="تثبيت">${n.pinned ? '⭐' : '☆'}</button>
-              <button class="btn-micro-icon" onclick="copyNoteText(${n.id})" title="نسخ">📋</button>
-              <button class="btn-micro-icon" style="color:var(--rose);" onclick="deleteNoteItem(${n.id})" title="حذف">✕</button>
-            </div>
-          </div>
-          <div class="note-card-body">${n.text}</div>
-          <div class="note-card-footer">
-            <span>${n.date}</span>
-          </div>
-        `;
-        feed.appendChild(item);
-      });
-    }
-
-    function applyTemplate(type) {
-      const area = document.getElementById('noteEditorArea');
-      const sel = document.getElementById('noteTagSelect');
-      if (type === 'dump') {
-        area.value = "💭 فكرة مشتتة: ";
-        sel.value = 'dump';
-      } else if (type === 'cornell') {
-        area.value = "📌 الفكرة الرئيسية:\n- \n❓ الأسئلة الهامة:\n- \n💡 الملخص الختامي:\n- ";
-        sel.value = 'cornell';
-      } else if (type === 'exam') {
-        area.value = "⭐ سؤال متوقع:\n- \n✅ الإجابة النموذجية:\n- ";
-        sel.value = 'exam';
-      } else if (type === 'formula') {
-        area.value = "📐 القانون:\n- \n⚠️ شروط التطبيق:\n- ";
-        sel.value = 'general';
-      }
-      area.focus();
-    }
-
-    function saveNoteCard() {
-      const area = document.getElementById('noteEditorArea');
-      const txt = area.value.trim();
-      if (!txt) return;
-      const tag = document.getElementById('noteTagSelect').value;
-      const nowStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-
-      notesList.unshift({
-        id: Date.now(),
-        text: txt,
-        tag: tag,
-        pinned: tag === 'dump' ? false : false,
-        date: `اليوم ${nowStr}`
-      });
-      area.value = '';
-      localStorage.setItem('zen_notes_v8', JSON.stringify(notesList));
-      renderNotes();
-    }
-
-    function togglePinNote(id) {
-      const item = notesList.find(n => n.id === id);
-      if (item) item.pinned = !item.pinned;
-      localStorage.setItem('zen_notes_v8', JSON.stringify(notesList));
-      renderNotes();
-    }
-
-    function deleteNoteItem(id) {
-      notesList = notesList.filter(n => n.id !== id);
-      localStorage.setItem('zen_notes_v8', JSON.stringify(notesList));
-      renderNotes();
-    }
-
-    function copyNoteText(id) {
-      const item = notesList.find(n => n.id === id);
-      if (item && navigator.clipboard) {
-        navigator.clipboard.writeText(item.text);
-        alert('✓ تم نسخ الملاحظة إلى الحافظة');
-      }
-    }
-
-    function setNotesFilter(filter, btn) {
-      currentNotesFilter = filter;
-      document.querySelectorAll('.filter-chip-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderNotes();
-    }
-
-    function filterNotes() { renderNotes(); }
-
-    function exportNotesFile() {
-      const fullTxt = notesList.map(n => `[${n.date} - ${n.tag}]\n${n.text}`).join('\n\n====================\n\n');
-      const blob = new Blob([fullTxt], { type: 'text/plain;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `zen-study-notes-${new Date().toISOString().slice(0,10)}.txt`;
-      a.click();
-    }
-
-    /* ========================================================
-       5. 100% PURE GENERATIVE NATURE SOUNDS (ZERO MUSIC)
-       ======================================================== */
-    const SOUNDS = [
-      { id: 'fire', name: '🔥 نار الحطب', vol: 0.65 },
-      { id: 'attic', name: '🏠 مطر السقف', vol: 0.5 },
-      { id: 'rain', name: '🌧️ مطر ناعم', vol: 0.5 },
-      { id: 'ocean', name: '🌊 أمواج الشاطئ', vol: 0.55 },
-      { id: 'wind', name: '🍃 نسيم الغابة', vol: 0.45 },
-      { id: 'stream', name: '🏞️ جدول ماء جاري', vol: 0.5 },
-      { id: 'brown', name: '🛡️ ضوضاء بنية عازلة', vol: 0.6 },
-      { id: 'fan', name: '🌀 مروحة هادئة', vol: 0.45 }
+    const SOUNDS_CATALOG = [
+      { id: 'fire', name: '🔥 نار الحطب', vol: 0.5 },
+      { id: 'rain', name: '🌧️ مطر ناعم', vol: 0.45 },
+      { id: 'ocean', name: '🌊 أمواج الشاطئ', vol: 0.5 },
+      { id: 'stream', name: '🏞️ جدول ماء جاري', vol: 0.45 },
+      { id: 'wind', name: '🍃 نسيم الأشجار', vol: 0.4 },
+      { id: 'attic', name: '🏠 مطر السقف', vol: 0.45 },
+      { id: 'brown', name: '🛡️ ضوضاء بنية عازلة', vol: 0.5 },
+      { id: 'fan', name: '🌀 مروحة هادئة', vol: 0.4 }
     ];
 
     let audioCtx = null;
-    const activeAudioNodes = {};
+    let masterCompressor = null;
+    const activeNodes = {};
     let isMasterMuted = false;
 
-    function initAudio() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function initAudioEngine() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Master Dynamics Compressor prevents any digital clipping / distortion
+        masterCompressor = audioCtx.createDynamicsCompressor();
+        masterCompressor.threshold.setValueAtTime(-18, audioCtx.currentTime);
+        masterCompressor.knee.setValueAtTime(10, audioCtx.currentTime);
+        masterCompressor.ratio.setValueAtTime(12, audioCtx.currentTime);
+        masterCompressor.attack.setValueAtTime(0.003, audioCtx.currentTime);
+        masterCompressor.release.setValueAtTime(0.25, audioCtx.currentTime);
+        masterCompressor.connect(audioCtx.destination);
+      }
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    function buildProceduralSound(id, vol) {
-      initAudio();
+    function buildAcousticSound(id, baseVol) {
+      initAudioEngine();
       const sr = audioCtx.sampleRate;
-      const len = sr * 3;
+      const len = sr * 4;
       const buffer = audioCtx.createBuffer(1, len, sr);
       const data = buffer.getChannelData(0);
-      let lastOut = 0, b0 = 0, b1 = 0, b2 = 0;
 
-      for (let i = 0; i < len; i++) {
-        const white = Math.random() * 2 - 1;
-        if (id === 'fire') {
-          lastOut = (lastOut + 0.02 * white) / 1.02;
-          const pop = Math.random() < 0.002 ? (Math.random() * 2 - 1) * 0.7 : 0;
-          data[i] = (lastOut * 2.2) + pop;
-        } else if (['brown','ocean','fan','attic'].includes(id)) {
-          lastOut = (lastOut + (0.02 * white)) / 1.02;
-          data[i] = lastOut * 3.0;
-        } else {
-          b0 = 0.99765 * b0 + white * 0.099;
-          b1 = 0.96300 * b1 + white * 0.296;
-          b2 = 0.57000 * b2 + white * 1.052;
-          data[i] = (b0 + b1 + b2) * 0.06;
+      if (id === 'brown') {
+        // Leaky integrator Brown Noise: Smooth low-end roar, zero harshness
+        let last = 0;
+        for (let i = 0; i < len; i++) {
+          const w = Math.random() * 2 - 1;
+          last = (last + (0.02 * w)) / 1.02;
+          data[i] = last * 2.2;
+        }
+      } else if (id === 'rain' || id === 'attic') {
+        // True Pink Noise (Paul Kellet Filter) - Removes high-pitch static hiss
+        let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
+        for (let i = 0; i < len; i++) {
+          const w = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + w * 0.0555;
+          b1 = 0.99332 * b1 + w * 0.0750;
+          b2 = 0.96900 * b2 + w * 0.1538;
+          b3 = 0.86650 * b3 + w * 0.3104;
+          b4 = 0.55000 * b4 + w * 0.5329;
+          b5 = -0.7616 * b5 - w * 0.0168;
+          data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.536) * 0.07;
+          b6 = w * 0.1159;
+        }
+      } else if (id === 'fire') {
+        // Hearth warmth + soft random wood crackles
+        let last = 0;
+        for (let i = 0; i < len; i++) {
+          const w = Math.random() * 2 - 1;
+          last = (last + 0.02 * w) / 1.02;
+          // Organic wooden crackle pop
+          const pop = Math.random() < 0.0015 ? (Math.random() * 2 - 1) * 0.6 : 0;
+          data[i] = (last * 1.8) + pop;
+        }
+      } else {
+        // Natural gentle filtered base for ocean, stream, wind, fan
+        let last = 0;
+        for (let i = 0; i < len; i++) {
+          const w = Math.random() * 2 - 1;
+          last = (last + 0.025 * w) / 1.025;
+          data[i] = last * 2.0;
         }
       }
 
@@ -797,91 +625,280 @@
       src.loop = true;
 
       const filter = audioCtx.createBiquadFilter();
-      const gain = audioCtx.createGain();
-      gain.gain.value = isMasterMuted ? 0 : vol;
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = isMasterMuted ? 0 : baseVol;
 
-      if (id === 'ocean' || id === 'wind') {
-        filter.type = 'lowpass'; filter.frequency.value = 450;
+      if (id === 'ocean') {
+        // Natural Sea Wave DSP: 10-second swelling LFO modulating frequency and volume
+        filter.type = 'lowpass';
+        filter.frequency.value = 350;
         const lfo = audioCtx.createOscillator();
-        lfo.frequency.value = 0.12;
+        lfo.frequency.value = 0.1; // 10s wave cycle
         const lfoGain = audioCtx.createGain();
         lfoGain.gain.value = 180;
-        lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
+        lfo.connect(lfoGain);
+        lfoGain.connect(filter.frequency);
         lfo.start();
+        src.connect(filter);
+      } else if (id === 'stream') {
+        // Water Creek DSP: Dual asynchronous resonant bandpass
+        filter.type = 'bandpass';
+        filter.frequency.value = 750;
+        filter.Q.value = 2.2;
+        src.connect(filter);
+      } else if (id === 'wind') {
+        filter.type = 'bandpass';
+        filter.frequency.value = 380;
+        filter.Q.value = 2.8;
+        src.connect(filter);
+      } else if (id === 'brown') {
+        filter.type = 'lowpass';
+        filter.frequency.value = 200; // Deep warm rumble
+        src.connect(filter);
+      } else if (id === 'rain') {
+        filter.type = 'lowpass';
+        filter.frequency.value = 1200; // Soothing rain
+        src.connect(filter);
       } else {
-        filter.type = 'lowpass'; filter.frequency.value = 1600;
+        filter.type = 'lowpass';
+        filter.frequency.value = 900;
+        src.connect(filter);
       }
 
-      src.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.destination);
+      filter.connect(gainNode);
+      gainNode.connect(masterCompressor);
       src.start(0);
-      return { src, gain, baseVol: vol };
+
+      return { src, gain: gainNode, baseVol };
     }
 
     function renderSoundTiles() {
-      const box = document.getElementById('soundTilesBox');
-      box.innerHTML = '';
-      SOUNDS.forEach(s => {
-        const isOn = !!activeAudioNodes[s.id];
+      const grid = document.getElementById('soundTilesGrid');
+      grid.innerHTML = '';
+      SOUNDS_CATALOG.forEach(s => {
+        const isOn = !!activeNodes[s.id];
         const tile = document.createElement('div');
-        tile.className = 'sound-tile-item' + (isOn ? ' on' : '');
+        tile.className = 'sound-tile' + (isOn ? ' on' : '');
         tile.innerHTML = `
-          <div class="sound-head-row">
-            <span class="sound-tile-label">${s.name}</span>
-            <div class="toggle-switch ${isOn ? 'active' : ''}" onclick="toggleAudioNode('${s.id}')">
-              <div class="toggle-switch-dot"></div>
+          <div class="sound-tile-head">
+            <span class="sound-name">${s.name}</span>
+            <div class="switch-future ${isOn ? 'active' : ''}" onclick="toggleAudioNode('${s.id}')">
+              <div class="switch-future-dot"></div>
             </div>
           </div>
-          <input type="range" class="volume-slider" min="0.05" max="1" step="0.05" value="${s.vol}" oninput="setAudioNodeVol('${s.id}', this.value)">
+          <input type="range" class="audio-slider" min="0.05" max="1" step="0.05" value="${s.vol}" oninput="setAudioNodeVol('${s.id}', this.value)">
         `;
-        box.appendChild(tile);
+        grid.appendChild(tile);
       });
     }
 
     function toggleAudioNode(id) {
-      const item = SOUNDS.find(s => s.id === id);
-      if (activeAudioNodes[id]) {
-        try { activeAudioNodes[id].src.stop(); } catch(e){}
-        delete activeAudioNodes[id];
+      const item = SOUNDS_CATALOG.find(s => s.id === id);
+      if (activeNodes[id]) {
+        try { activeNodes[id].src.stop(); } catch(e){}
+        delete activeNodes[id];
       } else {
-        activeAudioNodes[id] = buildProceduralSound(id, item.vol);
+        activeNodes[id] = buildAcousticSound(id, item.vol);
       }
       renderSoundTiles();
     }
 
     function setAudioNodeVol(id, val) {
-      if (activeAudioNodes[id] && audioCtx) {
-        activeAudioNodes[id].gain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
+      if (activeNodes[id] && audioCtx) {
+        activeNodes[id].gain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
       }
     }
 
-    function toggleMasterAudio() {
+    function toggleAudioMute() {
       isMasterMuted = !isMasterMuted;
-      document.getElementById('masterMuteBtn').textContent = isMasterMuted ? '🔇' : '🔊';
-      Object.values(activeAudioNodes).forEach(n => {
+      Object.values(activeNodes).forEach(n => {
         if (audioCtx) n.gain.gain.setValueAtTime(isMasterMuted ? 0 : n.baseVol, audioCtx.currentTime);
       });
     }
 
     /* ========================================================
-       6. ANALYTICS & STATS
+       4. TASKS STREAM
        ======================================================== */
-    function updateStats() {
-      document.getElementById('hdrFocusVal').textContent = `${totalMinsToday} دقيقة`;
-      document.getElementById('hdrStreakVal').textContent = `🔥 ${completedSessions} جلسات`;
-      document.getElementById('kpiTodayMins').textContent = `${totalMinsToday} د`;
-      document.getElementById('kpiCompletedSessions').textContent = completedSessions;
-      const rank = completedSessions >= 4 ? 'خبير تركيز 🎓' : completedSessions >= 2 ? 'مثابر نشيط 🌿' : 'متعلم طموح 🌱';
-      document.getElementById('kpiRankText').textContent = rank;
+    let tasksList = JSON.parse(localStorage.getItem('zen_tasks_v9') || JSON.stringify([
+      { text: 'فهم ومراجعة النقاط الأساسية بعمق', done: false },
+      { text: 'حل التمارين والمسائل التطبيقية', done: true }
+    ]));
+
+    function renderTasksStream() {
+      const box = document.getElementById('taskStreamBox');
+      box.innerHTML = '';
+      let done = 0;
+      tasksList.forEach((t, i) => {
+        if (t.done) done++;
+        const card = document.createElement('div');
+        card.className = 'task-card' + (t.done ? ' done' : '');
+        card.innerHTML = `
+          <div style="display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;" onclick="toggleTask(${i})">
+            <div class="task-check-circle">${t.done ? '✓' : ''}</div>
+            <div>
+              <div class="task-title">${t.text}</div>
+              <div class="task-meta">جلسة مذاكرة: 25 دقيقة</div>
+            </div>
+          </div>
+          <button style="background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:0.95rem;" onclick="deleteTask(${i})">✕</button>
+        `;
+        box.appendChild(card);
+      });
+      document.getElementById('badgeTasksRatio').textContent = `${done} من ${tasksList.length} مكتمل`;
     }
 
-    /* Initial Boot */
-    renderTimer();
-    renderTasks();
-    renderNotes();
+    function addNewTaskItem() {
+      const inp = document.getElementById('inpNewTask');
+      const val = inp.value.trim();
+      if (!val) return;
+      tasksList.unshift({ text: val, done: false });
+      inp.value = '';
+      localStorage.setItem('zen_tasks_v9', JSON.stringify(tasksList));
+      renderTasksStream();
+    }
+    function toggleTask(i) { tasksList[i].done = !tasksList[i].done; localStorage.setItem('zen_tasks_v9', JSON.stringify(tasksList)); renderTasksStream(); }
+    function deleteTask(i) { tasksList.splice(i, 1); localStorage.setItem('zen_tasks_v9', JSON.stringify(tasksList)); renderTasksStream(); }
+
+    /* ========================================================
+       5. DEDICATED SMART NOTES
+       ======================================================== */
+    let notesList = JSON.parse(localStorage.getItem('zen_notes_v9') || JSON.stringify([
+      {
+        id: 1,
+        text: "📌 الفكرة الرئيسية: التكرار المتباعد\n- المراجعة قبل لحظة النسيان تثبت المعلومة في الذاكرة طويلة المدى.\n💡 النتيجة: 20 دقيقة مراجعة تعادل ساعات حفظ عشوائي.",
+        tag: "cornell",
+        pinned: true,
+        date: "اليوم 10:30 ص"
+      },
+      {
+        id: 2,
+        text: "تفريغ فكرة مشتتة: تذكرت شراء أقلام التحديد بعد إنهاء الجلسة.",
+        tag: "dump",
+        pinned: false,
+        date: "اليوم 11:15 ص"
+      }
+    ]));
+    let notesFilterTag = 'all';
+
+    function renderNotesStream() {
+      const box = document.getElementById('notesStreamBox');
+      const q = (document.getElementById('inpSearchNotes').value || '').toLowerCase();
+      box.innerHTML = '';
+
+      let pCount = 0, dCount = 0, cCount = 0;
+      notesList.forEach(n => {
+        if (n.pinned) pCount++;
+        if (n.tag === 'dump') dCount++;
+        if (n.tag === 'cornell') cCount++;
+      });
+      document.getElementById('cntAllNotes').textContent = notesList.length;
+      document.getElementById('cntPinnedNotes').textContent = pCount;
+      document.getElementById('cntDumpNotes').textContent = dCount;
+      document.getElementById('cntCornellNotes').textContent = cCount;
+
+      const filtered = notesList.filter(n => {
+        if (!n.text.toLowerCase().includes(q)) return false;
+        if (notesFilterTag === 'pinned') return n.pinned;
+        if (notesFilterTag === 'dump') return n.tag === 'dump';
+        if (notesFilterTag === 'cornell') return n.tag === 'cornell';
+        return true;
+      });
+
+      filtered.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+      filtered.forEach(n => {
+        const card = document.createElement('div');
+        card.className = `note-item-card ${n.pinned ? 'pinned' : ''} ${n.tag === 'dump' ? 'dump' : ''}`;
+        card.innerHTML = `
+          <div class="note-item-head">
+            <span class="badge-chip badge-cyan">${n.tag === 'dump' ? '💭 تفريغ مشتت' : n.tag === 'cornell' ? '📋 قالب كورنيل' : '📚 عام'}</span>
+            <div style="display:flex;gap:8px;">
+              <button style="background:none;border:none;cursor:pointer;" onclick="togglePinNote(${n.id})">${n.pinned ? '⭐' : '☆'}</button>
+              <button style="background:none;border:none;color:#cbd5e1;cursor:pointer;" onclick="deleteNote(${n.id})">✕</button>
+            </div>
+          </div>
+          <div class="note-item-body">${n.text}</div>
+          <div class="note-item-footer"><span>${n.date}</span></div>
+        `;
+        box.appendChild(card);
+      });
+    }
+
+    function fillTemplate(type) {
+      const area = document.getElementById('txtNoteBody');
+      const sel = document.getElementById('selNoteTag');
+      if (type === 'dump') {
+        area.value = "💭 فكرة مشتتة: ";
+        sel.value = 'dump';
+      } else if (type === 'cornell') {
+        area.value = "📌 الفكرة الرئيسية:\n- \n❓ الأسئلة الهامة:\n- \n💡 الملخص الختامي:\n- ";
+        sel.value = 'cornell';
+      } else if (type === 'exam') {
+        area.value = "⭐ سؤال متوقع بالامتحان:\n- \n✅ الإجابة:\n- ";
+        sel.value = 'exam';
+      }
+      area.focus();
+    }
+
+    function saveNoteItem() {
+      const area = document.getElementById('txtNoteBody');
+      const val = area.value.trim();
+      if (!val) return;
+      const tag = document.getElementById('selNoteTag').value;
+      const now = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+      notesList.unshift({ id: Date.now(), text: val, tag, pinned: false, date: `اليوم ${now}` });
+      area.value = '';
+      localStorage.setItem('zen_notes_v9', JSON.stringify(notesList));
+      renderNotesStream();
+    }
+
+    function togglePinNote(id) {
+      const n = notesList.find(item => item.id === id);
+      if (n) n.pinned = !n.pinned;
+      localStorage.setItem('zen_notes_v9', JSON.stringify(notesList));
+      renderNotesStream();
+    }
+
+    function deleteNote(id) {
+      notesList = notesList.filter(item => item.id !== id);
+      localStorage.setItem('zen_notes_v9', JSON.stringify(notesList));
+      renderNotesStream();
+    }
+
+    function setNotesFilterTag(tag, btn) {
+      notesFilterTag = tag;
+      document.querySelectorAll('.btn-filter-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderNotesStream();
+    }
+
+    function exportNotesTxtFile() {
+      const content = notesList.map(n => `[${n.date} - ${n.tag}]\n${n.text}`).join('\n\n---\n\n');
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `zen-notes-${new Date().toISOString().slice(0,10)}.txt`;
+      a.click();
+    }
+
+    /* ========================================================
+       6. ANALYTICS & STATS
+       ======================================================== */
+    function updateAnalyticsUI() {
+      document.getElementById('hudFocusMin').textContent = `${todayFocusMinutes} دقيقة`;
+      document.getElementById('hudStreak').textContent = `🔥 ${completedSessionsCount} جلسات`;
+      document.getElementById('kpiTodayMinutes').textContent = `${todayFocusMinutes} د`;
+      document.getElementById('kpiCompletedCount').textContent = completedSessionsCount;
+      const rank = completedSessionsCount >= 4 ? 'خبير تركيز 🎓' : completedSessionsCount >= 2 ? 'مثابر نشيط 🌿' : 'متعلم طموح 🌱';
+      document.getElementById('kpiRankTitle').textContent = rank;
+    }
+
+    /* Init */
+    renderChronoUI();
+    renderTasksStream();
+    renderNotesStream();
     renderSoundTiles();
-    updateStats();
+    updateAnalyticsUI();
   </script>
 </body>
 </html>
