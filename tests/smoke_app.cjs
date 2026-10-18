@@ -226,6 +226,20 @@ assert.equal(evaluate('timerRunning'),false);
 assert.equal(evaluate('timerTotal'),1800,'Finishing workout restores the sport focus duration');
 // A real today-plan preview uses saved tasks, not invented percentages.
 assert.equal(evaluate('typeof renderTodayPlan'), 'function');
+// The dashboard must never treat starter-example tasks as the user's real plan.
+evaluate('renderTodayPlan()');
+assert.equal(document.getElementById('todayPlanRatio').textContent,'0/0',
+  'Starter task examples are not genuine completed/planned user work');
+assert.equal(document.getElementById('todayPlanPercent').textContent,'0%',
+  'No fabricated progress on a fresh installation');
+// Add a real task to the home plan, then complete it using the existing task store.
+evaluate("tasksList.unshift({id: nextRecordId(), isStarter:false, title:'Real focus item', date:localDateISO(), catKey:'study', done:false})");
+evaluate('renderTodayPlan()');
+assert.equal(document.getElementById('todayPlanRatio').textContent,'0/1');
+const homeTask = evaluate("tasksList.find(t => t.title === 'Real focus item').id");
+evaluate("toggleTaskDone(" + homeTask + ")");
+assert.equal(document.getElementById('todayPlanRatio').textContent,'1/1');
+assert.equal(document.getElementById('todayPlanPercent').textContent,'100%');
 // Real white-home shortcuts use the original focus engine and never lose a live session.
 evaluate("selectTimerMode(25,'focus',null); toggleTimerPlay()");
 const homeRunning = evaluate('JSON.stringify({mode:currentTimerModeKey,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})');
