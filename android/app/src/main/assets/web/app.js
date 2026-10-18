@@ -773,6 +773,23 @@ function switchActivityDomain(dom, el) {
   showToast(toWest(`${icon} ${title} (${minutes}m)`));
 }
 
+/* Home timer shortcuts share the existing engine, never reset an active session silently. */
+function selectHomeQuickSession(minutes) {
+  if (![10, 25, 50].includes(minutes)) return false;
+  if (!quickTraining?.active && currentTimerModeKey === 'focus' &&
+      timerTotal === minutes * 60) return true;
+  if (quickTraining?.active) {
+    if (!window.confirm(quickText('replacePrompt'))) return false;
+    quickTraining = null;
+    if (timerRunning) toggleTimerPlay();
+    renderQuickTraining();
+  } else if (timerRunning || (timerSessionId !== null && timerLeft < timerTotal)) {
+    if (!window.confirm(quickText('replacePrompt'))) return false;
+  }
+  selectTimerMode(minutes, 'focus', document.getElementById('modeFocusBtn'));
+  return true;
+}
+
 function logWorkoutSet() {
   cfg.sets = (cfg.sets % 12) + 1;
   saveFortressData('zen_fortress_cfg_v21', cfg);
@@ -989,6 +1006,17 @@ function updateTimerDisplay() {
     custom: customSessionLabel || d.modeCustom
   };
   document.getElementById('timerModeCaption').textContent = toWest(captions[currentTimerModeKey] || d.modeFocus);
+  if (currentTimerModeKey === 'focus' && !quickTraining?.active) {
+    document.getElementById('modeFocusBtn').textContent = toWest(Math.round(timerTotal / 60) + 'm');
+  }
+  for (const duration of [10, 25, 50]) {
+    const shortcut = document.getElementById('homeQuick' + duration);
+    if (shortcut) {
+      shortcut.setAttribute('aria-pressed', String(
+        currentTimerModeKey === 'focus' && timerTotal === duration * 60
+      ));
+    }
+  }
   updateFocusStatus();
 }
 
