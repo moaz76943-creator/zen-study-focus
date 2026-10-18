@@ -11,6 +11,13 @@ GRADLE = (ROOT / "android/app/build.gradle").read_text(encoding="utf-8")
 
 
 class ReleaseGuardTests(unittest.TestCase):
+    def test_production_publish_requires_explicit_approval(self):
+        workflow = (ROOT / ".github/workflows/build_apk.yml").read_text(encoding="utf-8")
+        for gate in ("ZEN_RELEASE_APPROVED_SHA", "ZEN_DEVICE_QA_APPROVED",
+                     "ZEN_MEDIA_LICENSES_APPROVED", "ZEN_UPLOAD_KEYSTORE_BASE64"):
+            self.assertIn(gate, workflow)
+        self.assertIn('"$ZEN_RELEASE_APPROVED_SHA" == "$GITHUB_SHA"', workflow)
+
     def test_android_target_sdk(self):
         self.assertRegex(GRADLE, r"targetSdk\s+36")
         self.assertRegex(GRADLE, r"compileSdk\s+36")
