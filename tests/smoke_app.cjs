@@ -103,6 +103,15 @@ const secondId = evaluate('nextRecordId()');
 assert.ok(secondId > firstId);
 assert.equal(evaluate('Number.isSafeInteger(nextRecordId())'), true);
 
+// A corrupt primary packet must recover from the existing healthy mirror.
+const cfgKey = 'zen_fortress_cfg_v21';
+const validCfgPacket = store.get(cfgKey);
+const mirroredCfgPacket = store.get(cfgKey + '_mirror');
+assert.ok(validCfgPacket && mirroredCfgPacket, 'Configuration has mirrored storage');
+store.set(cfgKey, '{broken JSON!');
+assert.equal(evaluate("loadFortressData('zen_fortress_cfg_v21', null).sessions"), 2);
+store.set(cfgKey, validCfgPacket);
+
 // Simulate a quota failure while restoring. No storage key may remain half-updated.
 const backupCodeForRollback = evaluate('generateEncryptedBackupCode()');
 const savedBeforeRestore = new Map(store);
