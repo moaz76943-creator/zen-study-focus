@@ -92,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
         public void stopBackgroundService() {
             Intent i = new Intent(MainActivity.this, FocusTimerService.class);
             i.setAction("STOP");
-            startService(i);
+            // stopService works even when Android disallows background service starts.
+            stopService(i);
         }
 
         @JavascriptInterface
