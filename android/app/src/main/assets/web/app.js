@@ -276,7 +276,7 @@ function localDateISO(date = new Date()) {
     String(date.getDate()).padStart(2, '0')
   ].join('-');
 }
-const todayISO = localDateISO();
+let todayISO = localDateISO();
 function escapeHtmlText(value) {
   return String(value === null || value === undefined ? '' : value)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -307,6 +307,17 @@ function computeActualStreak(history, now = new Date()) {
 
 function syncDailyRollover() {
   const current = localDateISO();
+  if (todayISO !== current) {
+    const previousDate = todayISO;
+    todayISO = current;
+    const taskDateInput = document.getElementById('inpTaskDate');
+    if (taskDateInput && taskDateInput.value === previousDate) taskDateInput.value = current;
+    if (typeof selectedCalDate !== 'undefined' && selectedCalDate === previousDate) {
+      selectedCalDate = current;
+      calYear = new Date().getFullYear();
+      calMonth = new Date().getMonth();
+    }
+  }
   if (cfg.metricsDate && cfg.metricsDate !== current) {
     const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
     cfg.todayMins = entries
@@ -718,6 +729,8 @@ function syncHeaderMetrics() {
   document.getElementById('hdrFocusMins').textContent = toWest(cfg.todayMins);
   document.getElementById('hdrStreakBadge').textContent = toWest(`↑ 🔥 ${cfg.streak} ${d.daysUnit}`);
   document.getElementById('orbWaterTxt').textContent = toWest(`${d.waterWord} ${cfg.water}/8`);
+  document.getElementById('sportSetCounterTxt').textContent = toWest(`Set ${cfg.sets || 0} / 4 • 12 Reps`);
+  document.getElementById('readPagesCounterTxt').textContent = toWest(`Pages Read Today: ${cfg.pagesRead || 0}`);
   document.getElementById('kpiTotalMins').textContent = toWest(cfg.todayMins || 0);
   document.getElementById('kpiTotalSessions').textContent = toWest(cfg.sessions);
   const plant = cfg.sessions >= 25 ? '🌸' : cfg.sessions >= 18 ? '🌳' : cfg.sessions >= 10 ? '🌿' : '🌱';
