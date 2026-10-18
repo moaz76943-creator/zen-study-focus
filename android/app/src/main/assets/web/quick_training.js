@@ -268,7 +268,7 @@ function renderHomeWeekStrip() {
   }
 }
 function goToHomeAgenda(iso) {
-  if (typeof iso !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(iso)) return false;
+  if (typeof iso !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return false;
   const [year, month, day] = iso.split('-').map(Number);
   const target = new Date(year, month - 1, day);
   if (target.getFullYear() !== year || target.getMonth() !== month - 1 ||
