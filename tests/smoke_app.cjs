@@ -101,6 +101,16 @@ assert.equal(evaluate('todayISO'),evaluate('localDateISO()'));
 evaluate("cfg.domain = 'sport'; renderDomainState(); selectTimerMode(30,'focus',null); updateTimerDisplay();");
 assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30m');
 assert.equal(document.getElementById('modeFocusBtn').textContent, '30m');
+// One domain preset determines the visible focus button and its actual selected duration.
+for (const [domain, duration] of [['study',25], ['sport',30], ['read',20], ['work',50]]) {
+  evaluate('cfg.domain=' + JSON.stringify(domain) + '; renderDomainState(); selectTimerMode(getDomainFocusMinutes(),\'focus\',null)');
+  assert.equal(evaluate('timerTotal'),duration*60,domain+' focus duration');
+  assert.equal(document.getElementById('modeFocusBtn').textContent,duration+'m');
+}
+// Ending an interval training sequence restores that same domain duration.
+evaluate("cfg.domain='sport'; quickTraining={active:true}; stopQuickTrainingInternal()");
+assert.equal(evaluate('timerTotal'),30*60,'Workout recovery must not return to 25m');
+
 // Selecting an activity must not discard an active or paused focus session without consent.
 evaluate("cfg.domain='sport'; renderDomainState(); selectTimerMode(30,'focus',null); toggleTimerPlay();");
 const runningSnapshot = evaluate('JSON.stringify({domain:cfg.domain,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})');
