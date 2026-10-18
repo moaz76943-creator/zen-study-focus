@@ -633,6 +633,7 @@
     }
     .toast-pill.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
+  <link rel="stylesheet" href="white_2100.css">
 </head>
 <body>
 
@@ -651,6 +652,11 @@
         <linearGradient id="blueCyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#2563eb" />
           <stop offset="100%" stop-color="#06b6d4" />
+        </linearGradient>
+        <linearGradient id="zenFutureGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#23d4ef"/>
+          <stop offset="53%" stop-color="#258bfc"/>
+          <stop offset="100%" stop-color="#9659f5"/>
         </linearGradient>
       </defs>
     </svg>
@@ -718,7 +724,7 @@
 
           <div class="timer-main-controls">
             <button class="btn-round-sec" onclick="resetTimerNow()">↺</button>
-            <button class="btn-round-play" id="mainPlayBtn" onclick="toggleTimerPlay()">
+            <button type="button" class="btn-round-play" id="mainPlayBtn" onclick="toggleTimerPlay()" aria-label="Start or pause timer">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </button>
             <button class="btn-round-sec" onclick="skipTimerPhase()">⏭</button>
@@ -731,24 +737,36 @@
             <button class="delta-chip" onclick="changeTimerDelta(5)">+5m</button>
             <button class="delta-chip" onclick="changeTimerDelta(10)">+10m</button>
           </div>
+          <div class="home-quick-sessions" aria-label="Focus session shortcuts">
+            <div class="home-quick-heading"><span data-qt="quickSessions">جلسات سريعة</span></div>
+            <div class="home-quick-options" role="group" aria-label="Quick focus durations">
+              <button type="button" class="home-quick-chip" id="homeQuick10" aria-pressed="false" onclick="selectHomeQuickSession(10)">10:00</button>
+              <button type="button" class="home-quick-chip" id="homeQuick25" aria-pressed="true" onclick="selectHomeQuickSession(25)">25:00</button>
+              <button type="button" class="home-quick-chip" id="homeQuick50" aria-pressed="false" onclick="selectHomeQuickSession(50)">50:00</button>
+            </div>
+          </div>
         </div>
         <div class="home-domains-heading"><span data-qt="chooseActivity">اختر نوع نشاطك</span><small data-qt="domainsHint">لكل نشاط جلسته المناسبة</small></div>
         <div class="domain-pedestal-grid">
           <button type="button" class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)" aria-pressed="true">
             <div class="domain-squircle">📚</div>
             <span class="domain-title" data-i18n="domStudy">Study</span>
+            <span class="domain-duration">25:00</span>
           </button>
           <button type="button" class="domain-card dom-sport" id="domBtn-sport" onclick="switchActivityDomain('sport', this)" aria-pressed="false">
             <div class="domain-squircle">🏋️</div>
             <span class="domain-title" data-i18n="domSport">Workout</span>
+            <span class="domain-duration">30:00</span>
           </button>
           <button type="button" class="domain-card dom-read" id="domBtn-read" onclick="switchActivityDomain('read', this)" aria-pressed="false">
             <div class="domain-squircle">📖</div>
             <span class="domain-title" data-i18n="domRead">Reading</span>
+            <span class="domain-duration">20:00</span>
           </button>
           <button type="button" class="domain-card dom-work" id="domBtn-work" onclick="switchActivityDomain('work', this)" aria-pressed="false">
             <div class="domain-squircle">💻</div>
             <span class="domain-title" data-i18n="domWork">Deep Work</span>
+            <span class="domain-duration">50:00</span>
           </button>
         </div>
 
@@ -821,6 +839,7 @@
             <div><span class="small-kicker" data-qt="todayProgress">✧ تقدمك اليوم</span><h2 data-qt="todayPlan">خطة اليوم</h2></div>
             <button type="button" onclick="switchTab('sec-tasks',document.getElementById('navTasks'))" data-qt="viewAll">عرض الكل ↗</button>
           </div>
+          <div class="home-week-strip" id="homeWeekStrip" aria-label="This week"></div>
           <div class="today-plan-stats"><strong id="todayPlanRatio">0/0</strong><span id="todayPlanPercent">0%</span></div>
           <div class="today-progress-track"><span id="todayPlanFill"></span></div>
           <div id="todayPlanPreview" class="today-plan-preview"></div>
