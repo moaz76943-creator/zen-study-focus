@@ -324,6 +324,8 @@ function syncDailyRollover() {
       .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
       .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
     cfg.water = 0;
+    cfg.sets = 0;
+    cfg.pagesRead = 0;
   }
   cfg.metricsDate = current;
   cfg.streak = computeActualStreak(cfg.sessionHistory);
@@ -638,8 +640,8 @@ function switchActivityDomain(dom, el) {
 function logWorkoutSet() {
   cfg.sets = (cfg.sets % 12) + 1;
   saveFortressData('zen_fortress_cfg_v21', cfg);
-  document.getElementById('sportSetCounterTxt').textContent = toWest(`Set ${cfg.sets} / 4 • 12 Reps`);
-  showToast(toWest(`💪 Set ${cfg.sets} Logged!`));
+  syncHeaderMetrics();
+  showToast(toWest(`💪 ${L().domSport}: ${cfg.sets}/4`));
 }
 
 function startQuickSportRest(secs) {
@@ -657,8 +659,8 @@ function startQuickSportRest(secs) {
 function addReadPages(p) {
   cfg.pagesRead = (cfg.pagesRead || 0) + p;
   saveFortressData('zen_fortress_cfg_v21', cfg);
-  document.getElementById('readPagesCounterTxt').textContent = toWest(`Pages Read Today: ${cfg.pagesRead}`);
-  showToast(toWest(`📖 +${p} Pages`));
+  syncHeaderMetrics();
+  showToast(toWest(`📖 ${L().domRead}: +${p}`));
 }
 
 const TAB_GRADS = {
@@ -801,8 +803,8 @@ function syncHeaderMetrics() {
   document.getElementById('hdrFocusMins').textContent = toWest(cfg.todayMins);
   document.getElementById('hdrStreakBadge').textContent = toWest(`↑ 🔥 ${cfg.streak} ${d.daysUnit}`);
   document.getElementById('orbWaterTxt').textContent = toWest(`${d.waterWord} ${cfg.water}/8`);
-  document.getElementById('sportSetCounterTxt').textContent = toWest(`Set ${cfg.sets || 0} / 4 • 12 Reps`);
-  document.getElementById('readPagesCounterTxt').textContent = toWest(`Pages Read Today: ${cfg.pagesRead || 0}`);
+  document.getElementById('sportSetCounterTxt').textContent = toWest(`🏋️ ${d.domSport} ${cfg.sets || 0}/4 • 12×`);
+  document.getElementById('readPagesCounterTxt').textContent = toWest(`📖 ${d.domRead} ${cfg.pagesRead || 0}`);
   document.getElementById('kpiTotalMins').textContent = toWest(cfg.todayMins || 0);
   document.getElementById('kpiTotalSessions').textContent = toWest(cfg.sessions);
   const plant = cfg.sessions >= 25 ? '🌸' : cfg.sessions >= 18 ? '🌳' : cfg.sessions >= 10 ? '🌿' : '🌱';
