@@ -231,7 +231,32 @@ body.timer-home:not(.deep-lockdown) .today-progress-track {
   height:7px;background:#edf1fa;
 }
 body.timer-home:not(.deep-lockdown) .today-plan-entry {
-  min-height:41px;border:1px solid #edf1fa;border-radius:13px;
+  min-height:48px;border:1px solid #edf1fa;border-radius:14px;
+  display:flex;align-items:center;gap:9px;padding:6px 10px;
+}
+.today-plan-check {
+  appearance:none;display:grid;place-items:center;flex:0 0 28px;
+  width:28px;height:28px;border-radius:9px;border:1px solid #d4e1f7;
+  background:#fff;color:#8095b5;font:inherit;font-weight:650;cursor:pointer;
+}
+.today-plan-check[aria-pressed="true"] {
+  border-color:#55d1a1;background:#18b981;color:#fff;
+}
+.today-plan-link {
+  appearance:none;display:flex;flex:1;min-width:0;flex-direction:column;
+  align-items:flex-start;text-align:start;gap:2px;padding:3px 0;
+  border:0;background:transparent;color:#2a4066;font:inherit;cursor:pointer;
+}
+.today-plan-task-name {
+  width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:.74rem;font-weight:670;
+}
+.today-plan-task-detail {
+  width:100%;color:#8594ad;font-size:.62rem;font-weight:480;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.today-plan-check:focus-visible,.today-plan-link:focus-visible {
+  outline:2px solid #328cff;outline-offset:2px;
 }
 body.timer-home:not(.deep-lockdown) .quick-orbs-card {background:#fff;}
 body:not(.deep-lockdown) .bottom-nav-capsule {
