@@ -45,6 +45,19 @@ class ReleaseGuardTests(unittest.TestCase):
                     invalid.append(sound.name)
         self.assertEqual([], invalid, "Invalid OGG assets (often HTML 404): " + ", ".join(invalid))
 
+    def test_native_backup_uses_system_document_picker(self):
+        native = (ROOT / "android/app/src/main/java/com/zenstudy/focus/MainActivity.java").read_text(encoding="utf-8")
+        self.assertIn("Intent.ACTION_CREATE_DOCUMENT", native)
+        self.assertIn("getContentResolver().openOutputStream", native)
+        self.assertIn("backupAwaitingSave = null", native)
+        self.assertNotIn("WRITE_EXTERNAL_STORAGE", native)
+        self.assertIn("ZenNative.exportBackupToFile(code)", APP)
+
+    def test_audio_stale_callback_guard(self):
+        self.assertIn("soundGeneration", APP)
+        self.assertIn("soundGeneration[id] !== token", APP)
+        self.assertIn("stopSoundTile(id)", APP)
+
     def test_photo_assets_are_real_images(self):
         invalid = []
         for photo in sorted((WEB / "images").glob("*.jpg")):
