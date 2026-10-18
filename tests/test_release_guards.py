@@ -1,4 +1,4 @@
-"""Pre-release regression gates for the Zen Focus Android WebView app."""
+"""Pre-release regression gates for the Deep Focus Android WebView app."""
 from pathlib import Path
 import re
 import unittest

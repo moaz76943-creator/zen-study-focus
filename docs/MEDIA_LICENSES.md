@@ -1,4 +1,4 @@
-# ZEN FOCUS — bundled-media provenance (v21 recovery)
+# Deep Focus — bundled-media provenance (v21 recovery)
 
 All audio shipped to Google Play must have an actual media header, an appropriate licence, and a source record. Merely giving an HTML error page an `.ogg` extension is not sufficient.
 

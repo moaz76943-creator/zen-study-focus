@@ -51,7 +51,7 @@ jobs:
       - name: Upload test builds - not Play signed
         uses: actions/upload-artifact@v4
         with:
-          name: ZenFocus-Test-APK-and-Unsigned-AAB
+          name: DeepFocus-Test-APK-and-Unsigned-AAB
           if-no-files-found: error
           path: |
             android/app/build/outputs/apk/debug/*.apk
@@ -118,7 +118,7 @@ jobs:
         if: steps.sign.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ZenFocus-Signed-Play-Release
+          name: DeepFocus-Signed-Play-Release
           if-no-files-found: error
           path: |
             android/app/build/outputs/apk/release/*.apk
@@ -128,7 +128,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v21.${{ github.run_number }}
-          name: Zen Focus signed release v21.${{ github.run_number }}
+          name: Deep Focus signed release v21.${{ github.run_number }}
           files: |
             android/app/build/outputs/apk/release/*.apk
             android/app/build/outputs/bundle/release/*.aab

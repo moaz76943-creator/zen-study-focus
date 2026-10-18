@@ -1,4 +1,4 @@
-// Localized Zen Focus interface text, part 1. Kept separate for independent language QA.
+// Localized Deep Focus interface text, part 1. Kept separate for independent language QA.
 window.ZEN_LOCALE_FIELD_KEYS = ["pillCloud","pillSound","pillShare","pillSecure","sportSetsTitle","readTrackerTitle","totalFocusToday","minsUnit","daysUnit","waterWord","orbDump","orbCloud","orbDesk","modeCustom","startFocusAchieve","filterAll","filterToday","filterDone","phAddTask","phSearchNotes","catStudy","catSport","catReview","catExam","tagCornell","tagFlash","tagQuick","btnAddCalNote","lblBlurAnswer","mixerReady","btnMyMix","btnStopAll","sndCatWater","sndCatForest","sndCatWarm","kpiMinutes","kpiSessions","kpiTrendWeek","kpiTrendGreat","overviewTitle","badgeThisWeek","waveFlowTitle","peakPerfBadge","calcHeading","calcOutTpl","btnSave","btnCancel"];
 window.ZEN_LOCALE_ROWS = {
   "fr": [
