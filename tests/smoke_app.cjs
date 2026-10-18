@@ -29,7 +29,14 @@ const storage = {
   setItem(key,v){store.set(key,String(v));},
   removeItem(key){store.delete(key);}
 };
+const audioInstances = [];
+class MockAudio {
+  constructor() { this.volume = 0; this.paused = false; audioInstances.push(this); }
+  play() { return Promise.resolve(); }
+  pause() { this.paused = true; }
+}
 const sandbox = {
+  Audio: MockAudio,
   window:{scrollTo(){},confirm(){return true;}},
   document, localStorage:storage, navigator:{}, console,
   setInterval(){return 1;}, clearInterval(){},
@@ -90,4 +97,17 @@ assert.equal(evaluate('todayISO'),evaluate('localDateISO()'));
 evaluate("cfg.domain = 'sport'; renderDomainState(); selectTimerMode(30,'focus',null); updateTimerDisplay();");
 assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30m');
 assert.equal(document.getElementById('modeFocusBtn').textContent, '30m');
-console.log('PASS: boot, 20 locales, rollover, actual focus time, activity UI, breaks, XSS and malicious backups.');
+// A delayed media error must never restart a sound that the user already stopped.
+evaluate("toggleSoundTile('rain')");
+assert.equal(audioInstances.length, 1);
+const staleAudioError = audioInstances[0].onerror;
+evaluate('stopAllAudio()');
+staleAudioError();
+assert.equal(evaluate("Boolean(activePlayers['rain'])"), false);
+evaluate("toggleSoundTile('rain')");
+assert.equal(evaluate("Boolean(activePlayers['rain'])"), true);
+staleAudioError(); // stale error from the first instance cannot replace the new one
+assert.equal(evaluate("Boolean(activePlayers['rain'])"), true);
+evaluate('stopAllAudio()');
+assert.equal(evaluate('Object.keys(activePlayers).length'), 0);
+console.log('PASS: startup, localization, rollover, active focus time, safe backup, XSS, and audio race regression.');
