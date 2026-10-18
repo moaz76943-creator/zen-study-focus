@@ -451,7 +451,8 @@ function verifyAndRestoreBackupCode(codeStr) {
         || computeHash(decoded.bundle) !== decoded.sig) throw new Error('Integrity check failed');
     const verified = validateImportedBackup(JSON.parse(decoded.bundle));
     if (!verified) throw new Error('Invalid backup schema');
-    // Validation is complete BEFORE mutating any stored user data.
+    // Validation must complete before writes. Never replace a user's work silently.
+    if (!window.confirm('Restore backup? This replaces the current tasks, notes and progress. Export your current backup first.')) return false;
     cfg = verified.cfg;
     tasksList = verified.tasksList;
     notesList = verified.notesList;
@@ -480,7 +481,7 @@ function syncToGoogleCloudNow() {
     window.ZenNative.syncBackupToGoogleEmailOrDrive(code);
   } else if (navigator.clipboard) {
     navigator.clipboard.writeText(code);
-    showToast("☁️ Backup Code Copied! Save in Gmail/Drive");
+    showToast("Backup copied — save privately; NOT encrypted");
   }
 }
 
@@ -491,7 +492,7 @@ function downloadEncryptedBackupFile() {
   a.href = URL.createObjectURL(blob);
   a.download = `zen-focus-backup-${todayISO}.zenbackup`;
   a.click();
-  showToast("💾 Encrypted File Saved!");
+  showToast("💾 Backup exported — NOT encrypted");
 }
 
 function restoreFromEncryptedCode() {
@@ -503,6 +504,7 @@ function restoreFromEncryptedCode() {
 function restoreFromFileInput(ev) {
   const file = ev.target.files[0];
   if (!file) return;
+  if (file.size > 8 * 1024 * 1024) return showToast('⚠️ Backup file is too large');
   const reader = new FileReader();
   reader.onload = (e) => verifyAndRestoreBackupCode(e.target.result);
   reader.readAsText(file);
@@ -522,8 +524,8 @@ function shareAppWithFriends() {
    4. GUARANTEED COMPLETION CHIME & BACKGROUND ALARM
    ======================================================== */
 let chimeCtx = null;
-function playRichCompletionChime(titleText) {
-  if (window.ZenNative && window.ZenNative.triggerCompletionSound) {
+function playRichCompletionChime(titleText, skipNative = false) {
+  if (!skipNative && window.ZenNative && window.ZenNative.triggerCompletionSound) {
     try { window.ZenNative.triggerCompletionSound(titleText || "Session Completed!"); } catch(e){}
   }
   try {
@@ -678,7 +680,7 @@ function finalizeTimerSession(shouldChime) {
   storeTimerSession();
   updateTimerDisplay();
   document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-  if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent);
+  if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent, true);
   selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
 }
 function runTimerTick() {
