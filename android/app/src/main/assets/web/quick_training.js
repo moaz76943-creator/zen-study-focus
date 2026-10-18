@@ -13,13 +13,13 @@ const QUICK_TRANSLATIONS = {
     '+ Add','Intervals 20/10','Workout 4/1','Reading 20/5','Deep work 50/10','Skip phase','End training',
     '▶ Start training','✧ Your progress','Today’s plan','View all ↗','Choose your activity','A tailored session for every goal',
     'No tasks for today yet','Work','Rest','Round','Completed','End the current training session?',
-    'Switching modes will end your interval training. Continue?','Enter valid MM:SS durations','Training started','Training completed!'],
+    'Changing activities or modes ends your current session. Continue?','Enter valid MM:SS durations','Training started','Training completed!'],
   ar: ['✦ مساحة التركيز','جاهز للتركيز','الوقت يعمل','متوقف مؤقتًا','تدريب سريع','جولات عمل وراحة قابلة للتخصيص',
     'المجموعات','العمل (د:ث)','الراحة (د:ث)','تخطي الراحة الأخيرة','التمارين المتتابعة','مثل: تمارين الإطالة أو القراءة المركزة',
     '+ إضافة','تدريب 20/10','رياضة 4/1','قراءة 20/5','عمل 50/10','تخطي المرحلة','إنهاء التدريب',
     '▶ ابدأ التدريب','✧ تقدمك اليوم','خطة اليوم','عرض الكل ↗','اختر نوع نشاطك','لكل نشاط جلسته المناسبة',
     'لا توجد مهام لهذا اليوم بعد','عمل','راحة','الجولة','مكتمل','هل تريد إنهاء التدريب الحالي؟',
-    'تغيير الوضع سينهي التدريب المتتابع. هل تريد المتابعة؟','أدخل مدة صحيحة بصيغة د:ث','بدأ التدريب','اكتمل التدريب!']
+    'تغيير النشاط أو الوضع سينهي الجلسة الحالية. هل تريد المتابعة؟','أدخل مدة صحيحة بصيغة د:ث','بدأ التدريب','اكتمل التدريب!']
 };
 let quickTraining = null;
 let quickInternalChange = false;
