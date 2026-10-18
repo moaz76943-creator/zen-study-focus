@@ -19,6 +19,7 @@ function node(id = '') {
   };
 }
 const document = {
+  body:{classList:{add(){},remove(){},toggle(){},contains(){return false;}}},
   addEventListener(){},
   getElementById(id){if(!map.has(id))map.set(id,node(id));return map.get(id);},
   createElement(){return node();},
@@ -50,7 +51,7 @@ sandbox.window.localStorage = storage;
 sandbox.window.document = document;
 sandbox.window.navigator = sandbox.navigator;
 vm.createContext(sandbox);
-for(const file of ['locale_rows.js','locale_extras.js','app.js']){
+for(const file of ['locale_rows.js','locale_extras.js','quick_training.js','app.js']){
   vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),sandbox,{filename:file,timeout:2000});
 }
 const evaluate=expr=>vm.runInContext(expr,sandbox,{timeout:2000});
@@ -145,4 +146,36 @@ staleAudioError(); // stale error from the first instance cannot replace the new
 assert.equal(evaluate("Boolean(activePlayers['rain'])"), true);
 evaluate('stopAllAudio()');
 assert.equal(evaluate('Object.keys(activePlayers).length'), 0);
-console.log('PASS: startup, localization, rollover, active focus time, safe backup, XSS, and audio race regression.');
+// Quick training must handle exact seconds, preset types, active rounds and zero-rest completion.
+assert.equal(evaluate("parseQuickTime('00:20')"),20);
+assert.equal(evaluate("parseQuickTime('00:00',true)"),0);
+assert.equal(evaluate("parseQuickTime('03:99')"),null);
+assert.equal(evaluate("parseQuickTime('')"),null);
+evaluate("applyQuickTrainingPreset('tabata')");
+assert.equal(document.getElementById('qtWork').value,'00:20');
+assert.equal(document.getElementById('qtRest').value,'00:10');
+assert.equal(document.getElementById('qtSets').value,'8');
+evaluate("selectTimerMode(25,'focus',null); startQuickTraining()");
+assert.equal(evaluate('quickTraining.sets'),8);
+assert.equal(evaluate('quickTraining.phase'),'work');
+assert.equal(evaluate('timerTotal'),20);
+assert.ok(evaluate('timerRunning'));
+// Complete work: record only work; rest auto-starts without credit.
+evaluate("timerTargetTime=Date.now()-5; timerResumeMs=Date.now()-20000; runTimerTick()");
+assert.equal(evaluate('quickTraining.phase'),'rest');
+assert.equal(evaluate('timerTotal'),10);
+const beforeBreakCredit=evaluate('cfg.sessions');
+evaluate("timerTargetTime=Date.now()-5; timerResumeMs=Date.now()-10000; runTimerTick()");
+assert.equal(evaluate('quickTraining.currentSet'),1);
+assert.equal(evaluate('quickTraining.phase'),'work');
+assert.equal(evaluate('cfg.sessions'),beforeBreakCredit);
+// Skipping a work round must not count it.
+const beforeSkip=evaluate('cfg.sessions');
+evaluate('skipQuickTrainingStep()');
+assert.equal(evaluate('cfg.sessions'),beforeSkip);
+evaluate('cancelQuickTraining(true)');
+assert.equal(evaluate('quickTraining'),null);
+assert.equal(evaluate('timerRunning'),false);
+// A real today-plan preview uses saved tasks, not invented percentages.
+assert.equal(evaluate('typeof renderTodayPlan'), 'function');
+console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');
