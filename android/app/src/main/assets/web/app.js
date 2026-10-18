@@ -879,10 +879,10 @@ function finalizeTimerSession(shouldChime) {
   timerLeft = 0;
   creditCompletedSession();
   if(quickTraining?.active) {
-    if(advanceQuickTrainingStep()) {
-      if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true);
-      return;
-    }
+    advanceQuickTrainingStep();
+    if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true);
+    // The next interval or a fresh focus timer was already selected.
+    return;
   }
   storeTimerSession();
   updateTimerDisplay();
