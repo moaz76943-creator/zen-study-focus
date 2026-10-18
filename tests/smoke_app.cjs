@@ -35,7 +35,9 @@ const sandbox = {
   setInterval(){return 1;}, clearInterval(){},
   setTimeout(){return 1;}, clearTimeout(){},
   Date, Math, String, Number, Array, JSON, Intl,
-  Blob, URL, FileReader:class {}
+  Blob, URL, FileReader:class {},
+  atob: s => Buffer.from(s, 'base64').toString('binary'),
+  btoa: s => Buffer.from(s, 'binary').toString('base64')
 };
 sandbox.window.localStorage = storage;
 sandbox.window.document = document;
@@ -67,4 +69,14 @@ assert.equal(evaluate('escapeHtmlText("<img src=x onerror=alert(1)>")'),
 // A broken backup cannot mutate user progress.
 assert.equal(evaluate('verifyAndRestoreBackupCode("invalid-backup")'),false);
 assert.equal(evaluate('cfg.sessions'),1);
-console.log('PASS: boot, 20 languages, local dates, focus accounting, breaks, XSS escaping, invalid backup.');
+const malformedBundle = evaluate(`JSON.stringify({cfg, tasksList:[{
+  id: '1);alert(1)//', title: 'bad', done: false
+}], notesList, v:21})`);
+const forgedPacket = JSON.stringify({
+  bundle: malformedBundle,
+  sig: evaluate('computeHash(' + JSON.stringify(malformedBundle) + ')')
+});
+const forgedCode = 'ZEN21::' + Buffer.from(forgedPacket, 'utf8').toString('base64');
+assert.equal(evaluate('verifyAndRestoreBackupCode(' + JSON.stringify(forgedCode) + ')'),false);
+assert.equal(evaluate('cfg.sessions'),1);
+console.log('PASS: boot, 20 languages, local dates, focus accounting, breaks, XSS, invalid or malicious backups.');
