@@ -444,6 +444,104 @@
       *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
 
+
+    /* ZEN FOCUS / White 2100. Functional screen, not an image background. */
+    :root { --header-grad: linear-gradient(135deg,#f9fcff 0%,#f2f8ff 65%,#fbfaff 100%); --radius-xl: 26px; }
+    body { background: #fbfcff; }
+    body.timer-home .dynamic-hero-header {
+      background: radial-gradient(ellipse at 78% 0%,rgba(101,118,255,.09),transparent 45%),
+                  linear-gradient(135deg,#ffffff 0%,#f5fbff 100%) !important;
+      color: #18253e; padding: 14px 18px 11px;
+      border-bottom: 1px solid rgba(190,212,243,.6);
+    }
+    body.timer-home .dynamic-hero-header::before { opacity:.3; }
+    body.timer-home .dynamic-hero-header .header-top-row { margin-bottom:5px; }
+    body.timer-home .header-icon-btn { background:#f1f6ff; color:#3458a3; border-color:#dce7fb; }
+    body.timer-home .lang-switcher-pill { background:#f1f6ff; color:#253d73; border-color:#dce7fb; }
+    body.timer-home .header-main-title { font-size:1.04rem; font-weight:750; }
+    body.timer-home .header-sub-caption { font-size:.68rem; color:#64748b; margin-top:1px; }
+    body.timer-home .ecosystem-strip { display:none; }
+    body.timer-home .main-white-sheet { margin-top:0; border-radius:0; box-shadow:none; padding:10px 14px 30px; }
+    body.timer-home .pure-white-card { border:1px solid #e7edfa; box-shadow:0 9px 28px -14px rgba(38,80,147,.12),0 2px 8px rgba(52,99,165,.025); }
+    .focus-hero-card { isolation:isolate; overflow:hidden; padding:13px 15px 15px; border-radius:30px; }
+    .focus-hero-card::before { content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+      background:radial-gradient(ellipse 65% 48% at 50% 40%,rgba(56,189,248,.095),transparent 75%),
+      radial-gradient(ellipse 45% 42% at 88% 58%,rgba(153,102,255,.07),transparent 80%),#fff; }
+    .focus-card-topline {display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;gap:8px;}
+    .focus-card-eyebrow {color:#3a5a9f;font-size:.74rem;font-weight:700;letter-spacing:.1px;}
+    .focus-status {font-size:.65rem;color:#109e82;background:#ebfcf7;border:1px solid #d3f8ea;border-radius:50px;padding:4px 11px;}
+    .focus-hero-card .segmented-pills-bar {background:#f1f5fd;margin-bottom:5px;}
+    .focus-hero-card .seg-pill {font-size:.73rem;padding:8px 6px;}
+    .focus-hero-card .seg-pill.active {background:linear-gradient(125deg,#ebf8ff,#fff);color:#1766bb;box-shadow:0 2px 8px rgba(49,114,242,.12);}
+    .focus-hero-card .timer-ring-box {padding:0 0 7px;}
+    .focus-hero-card .ring-container {width:min(59vw,239px);height:min(59vw,239px);max-width:239px;max-height:239px;}
+    .focus-hero-card .ring-container::before {content:"";position:absolute;inset:4%;border-radius:50%;
+      background:radial-gradient(circle at 36% 23%,rgba(255,255,255,.96),rgba(223,244,255,.25) 65%,rgba(224,222,255,.14));
+      box-shadow:inset 0 0 20px rgba(82,131,209,.06),0 0 29px rgba(0,172,237,.07);}
+    .focus-hero-card .ring-bg {stroke:#ebeffd;stroke-width:8;}
+    .focus-hero-card .ring-bar {stroke-width:9;filter:drop-shadow(0 0 6px rgba(8,173,241,.34));}
+    .focus-hero-card .ring-center {width:90%;pointer-events:none;}
+    .focus-hero-card .ring-time {font-size:clamp(2.6rem,12vw,3.45rem);font-weight:600;letter-spacing:-2.2px;}
+    .focus-hero-card .ring-plant {font-size:1.35rem;}
+    .focus-hero-card .ring-task-pill {pointer-events:auto;max-width:190px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+    .focus-hero-card .timer-main-controls {margin:0 auto 1px;max-width:270px;}
+    .focus-hero-card .btn-round-play {width:63px;height:63px;background:linear-gradient(135deg,#19bcf3,#4367ff 58%,#9763ed);box-shadow:0 8px 26px rgba(56,117,232,.28);}
+    .focus-hero-card .btn-round-sec {width:43px;height:43px;border-color:#e1eafa;}
+    .focus-hero-card .time-delta-row {margin-top:12px;gap:5px;flex-wrap:nowrap;}
+    .focus-hero-card .delta-chip {padding:7px 5px;flex:1;min-width:0;font-size:.7rem;font-weight:650;}
+    .home-domains-heading {display:flex;justify-content:space-between;align-items:center;gap:8px;padding:0 6px;margin:7px 0 9px;}
+    .home-domains-heading span {font-size:.93rem;font-weight:750;color:#1d2c4a;}
+    .home-domains-heading small {font-size:.65rem;color:#8391a8;}
+    #sec-timer .domain-pedestal-grid {margin-bottom:12px;}
+    #sec-timer .domain-card {border:1px solid #e6edfb;padding:11px 3px 10px;border-radius:20px;background:linear-gradient(150deg,#ffffff,#f9fbff);box-shadow:0 5px 16px -10px rgba(24,66,131,.18);}
+    #sec-timer .domain-card.active {border-color:#72c2ff;background:linear-gradient(140deg,#eafaff,#f7f5ff);box-shadow:0 0 0 2px rgba(83,168,252,.11),0 7px 22px -11px rgba(52,105,220,.34);transform:none;}
+    #sec-timer .domain-squircle {width:39px;height:39px;border-radius:14px;font-size:1.15rem;}
+    #sec-timer .domain-title {font-size:.73rem;font-weight:650;}
+    #sec-timer .domain-context-bar {background:#fff;border-color:#e6ecfa;}
+    .quick-training-card {padding:0 !important;overflow:hidden;}
+    .training-summary {display:flex;align-items:center;gap:12px;padding:15px;cursor:pointer;list-style:none;}
+    .training-summary::-webkit-details-marker {display:none;}
+    .training-icon {background:linear-gradient(145deg,#e4faff,#e9e5ff);border:1px solid #e7dcff;border-radius:14px;width:43px;height:43px;display:grid;place-items:center;font-size:1.25rem;}
+    .training-summary-text {display:flex;flex-direction:column;flex:1;gap:3px;min-width:0;}
+    .training-summary-text strong {font-size:.92rem;color:#172c53;font-weight:750;}
+    .training-summary-text small {font-size:.68rem;color:#71839f;}
+    .training-chevron {font-size:1.4rem;color:#6a84b7;transition:transform .2s;}
+    details[open] .training-chevron {transform:rotate(180deg);}
+    .training-content {padding:4px 15px 15px;border-top:1px solid #eef2fb;}
+    .training-fields {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px;}
+    .training-fields label {display:flex;flex-direction:column;gap:5px;font-size:.69rem;color:#64758f;text-align:center;}
+    .training-fields input {width:100%;border:1px solid #e0eaf9;border-radius:13px;background:#f7faff;padding:9px 4px;text-align:center;direction:ltr;color:#102a4f;font-size:1.15rem;font-weight:650;font-variant-numeric:tabular-nums;}
+    .training-toggle {display:flex;align-items:center;gap:9px;margin:14px 1px;color:#344b70;font-size:.76rem;}
+    .training-toggle input {accent-color:#18bf95;width:19px;height:19px;}
+    .training-exercises-head {display:flex;justify-content:space-between;align-items:center;margin:11px 0 7px;font-size:.77rem;color:#23385b;}
+    .training-exercises-head span {color:#6684af;}
+    .training-add-row {display:flex;gap:6px;}
+    .training-add-row input {min-width:0;flex:1;border:1px solid #e1e9f7;background:#f9fbff;padding:10px;border-radius:12px;font-size:.73rem;}
+    .training-add-row button,.training-progress-actions button {border:0;border-radius:12px;padding:9px 11px;background:#eef5ff;color:#2e62b2;font-size:.7rem;font-weight:700;cursor:pointer;}
+    .training-exercises {display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+    .training-exercises button {border:1px solid #dce7f9;background:white;color:#54698a;padding:5px 9px;border-radius:30px;font-size:.7rem;}
+    .training-presets {display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:7px 0 13px;}
+    .training-presets button {flex:0 0 auto;background:#f7f9ff;border:1px solid #e0e8fa;border-radius:10px;padding:8px 9px;color:#52688a;font-size:.68rem;cursor:pointer;}
+    .training-progress {margin:3px 0 12px;padding:10px;background:#f4faff;border-radius:14px;color:#2b568d;font-size:.74rem;}
+    .training-progress-bar,.today-progress-track {height:6px;border-radius:10px;overflow:hidden;background:#e6ecf8;margin-top:8px;}
+    .training-progress-bar span,.today-progress-track span {display:block;width:0;height:100%;background:linear-gradient(90deg,#15c6ac,#32b8fa,#8165ff);border-radius:10px;transition:width .2s;}
+    .training-progress-actions {display:flex;gap:8px;margin-top:11px;}
+    .training-progress-actions button:last-child {color:#bc5267;background:#ffedf1;}
+    .training-primary {display:block;width:100%;border:0;border-radius:14px;background:linear-gradient(110deg,#2b83ff,#7055ee);color:#fff;padding:12px;font-size:.86rem;font-weight:750;box-shadow:0 8px 20px -10px #5174f0;cursor:pointer;}
+    .today-plan-card {padding:15px 17px;}
+    .today-plan-title {display:flex;align-items:center;justify-content:space-between;}
+    .today-plan-title h2 {font-size:1rem;font-weight:750;}
+    .small-kicker {font-size:.63rem;color:#4779bb;}
+    .today-plan-title button {border:0;background:#f1f6ff;padding:8px 10px;border-radius:12px;color:#4372c5;font-size:.7rem;}
+    .today-plan-stats {display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:#2b4e83;}
+    .today-plan-stats strong {font-size:.95rem;font-weight:700;}.today-plan-stats span {font-size:.74rem;}
+    .today-plan-preview {display:grid;gap:7px;margin-top:12px;}
+    .today-plan-entry {display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:12px;background:#f9fbff;border:1px solid #f0f4fa;color:#334765;font-size:.72rem;}
+    .today-plan-entry>span:first-child {font-size:1.04rem;}
+    .today-plan-entry>span:nth-child(2) {flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    #sec-timer .quick-orbs-card {margin-top:0;}
+    @media (max-width:350px) {.focus-hero-card .ring-container{width:205px;height:205px}.training-summary{padding:12px}.focus-hero-card .time-delta-row .delta-chip{font-size:.63rem}}
+
     /* Modals */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.58);
@@ -541,7 +639,50 @@
            1. TIMER & MULTI-DOMAIN SECTION
            ====================================================== -->
       <main class="screen-section active" id="sec-timer">
+                <div class="pure-white-card focus-hero-card" id="focusHeroCard">
+          <div class="focus-card-topline">
+            <span class="focus-card-eyebrow" data-qt="focusToday">✦ مساحة التركيز</span>
+            <span class="focus-status" id="focusStatusLabel" data-qt="ready">جاهز للإنجاز</span>
+          </div>
+          <div class="segmented-pills-bar">
+            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerMode(cfg.focusMin, 'focus', this)" data-i18n="modeFocus">25m</button>
+            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">5m</button>
+            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">15m</button>
+            <button class="seg-pill" id="modeCustomBtn" onclick="openCustomTimerModal()" data-i18n="modeCustom">Custom ⚡</button>
+          </div>
 
+          <div class="timer-ring-box">
+            <div class="ring-container">
+              <svg class="ring-svg" viewBox="0 0 230 230">
+                <circle class="ring-bg" cx="115" cy="115" r="105"></circle>
+                <circle class="ring-bar" id="timerRingBar" cx="115" cy="115" r="105"></circle>
+              </svg>
+              <div class="ring-center">
+                <div class="ring-plant" id="ringPlantEmoji">🌱</div>
+                <div class="ring-time" id="timerDigitsTxt">25:00</div>
+                <div class="ring-mode-txt" id="timerModeCaption">Focus Session</div>
+                <div class="ring-task-pill" id="timerLinkedTask" onclick="switchTab('sec-tasks', document.getElementById('navTasks'))" data-i18n="startFocusAchieve">Plan • Execute • Achieve</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timer-main-controls">
+            <button class="btn-round-sec" onclick="resetTimerNow()">↺</button>
+            <button class="btn-round-play" id="mainPlayBtn" onclick="toggleTimerPlay()">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="btn-round-sec" onclick="skipTimerPhase()">⏭</button>
+          </div>
+
+          <div class="time-delta-row">
+            <button class="delta-chip" onclick="changeTimerDelta(-5)">-5m</button>
+            <button class="delta-chip" onclick="changeTimerDelta(-1)">-1m</button>
+            <button class="delta-chip" onclick="changeTimerDelta(1)">+1m</button>
+            <button class="delta-chip" onclick="changeTimerDelta(5)">+5m</button>
+            <button class="delta-chip" onclick="changeTimerDelta(10)">+10m</button>
+          </div>
+        </div>
+        <div class="home-domains-heading"><span data-qt="chooseActivity">اختر نوع نشاطك</span><small data-qt="domainsHint">لكل نشاط جلسته المناسبة</small></div>
         <div class="domain-pedestal-grid">
           <div class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)">
             <div class="domain-squircle">📚</div>
@@ -583,6 +724,57 @@
           </div>
         </div>
 
+
+        <section class="pure-white-card quick-training-card" id="quickTrainingCard" aria-label="Quick training">
+          <details id="quickTrainingDetails">
+            <summary class="training-summary">
+              <span class="training-icon">⚡</span>
+              <span class="training-summary-text"><strong data-qt="trainingTitle">تدريب سريع</strong><small data-qt="trainingSubtitle">جولات عمل وراحة قابلة للتخصيص</small></span>
+              <span class="training-chevron">⌄</span>
+            </summary>
+            <div class="training-content">
+              <div class="training-fields">
+                <label><span data-qt="rounds">المجموعات</span><input id="qtSets" type="text" inputmode="numeric" value="4" maxlength="2" aria-label="Sets"></label>
+                <label><span data-qt="work">عمل (دقيقة)</span><input id="qtWork" type="text" inputmode="numeric" value="4" maxlength="3" aria-label="Work minutes"></label>
+                <label><span data-qt="rest">راحة (ثانية)</span><input id="qtRest" type="text" inputmode="numeric" value="30" maxlength="3" aria-label="Rest seconds"></label>
+              </div>
+              <label class="training-toggle"><input id="qtSkipLast" type="checkbox" checked><span data-qt="skipLastRest">تخطي الراحة الأخيرة</span></label>
+              <div class="training-exercises-head">
+                <strong data-qt="exercises">التمارين المتتابعة</strong>
+                <span id="qtExerciseCount">0</span>
+              </div>
+              <div class="training-add-row">
+                <input id="qtNewExercise" type="text" maxlength="70" data-qt-placeholder="exercisePlaceholder" placeholder="مثل: تمارين الإطالة أو القراءة المركزة">
+                <button type="button" onclick="addQuickExercise()" data-qt="addExercise">+ إضافة</button>
+              </div>
+              <div class="training-exercises" id="qtExerciseList"></div>
+              <div class="training-presets" role="group" aria-label="Training presets">
+                <button type="button" onclick="applyQuickTrainingPreset('tabata')" data-qt="presetTabata">تدريب 20/10</button>
+                <button type="button" onclick="applyQuickTrainingPreset('workout')" data-qt="presetWorkout">رياضة 4/1</button>
+                <button type="button" onclick="applyQuickTrainingPreset('reading')" data-qt="presetReading">قراءة 20/5</button>
+                <button type="button" onclick="applyQuickTrainingPreset('work')" data-qt="presetWork">عمل 50/10</button>
+              </div>
+              <div class="training-progress" id="qtProgressPanel" hidden>
+                <span id="qtProgressTitle"></span>
+                <div class="training-progress-bar"><span id="qtProgressFill"></span></div>
+                <div class="training-progress-actions">
+                  <button type="button" onclick="skipQuickTrainingStep()" data-qt="skipStep">تخطي المرحلة</button>
+                  <button type="button" onclick="cancelQuickTraining()" data-qt="stopTraining">إنهاء التدريب</button>
+                </div>
+              </div>
+              <button type="button" id="qtStartButton" class="training-primary" onclick="startQuickTraining()" data-qt="startTraining">▶ ابدأ التدريب</button>
+            </div>
+          </details>
+        </section>
+        <section class="pure-white-card today-plan-card" aria-label="Today activity snapshot">
+          <div class="today-plan-title">
+            <div><span class="small-kicker" data-qt="todayProgress">✧ تقدمك اليوم</span><h2 data-qt="todayPlan">خطة اليوم</h2></div>
+            <button type="button" onclick="switchTab('sec-tasks',document.getElementById('navTasks'))" data-qt="viewAll">عرض الكل ↗</button>
+          </div>
+          <div class="today-plan-stats"><strong id="todayPlanRatio">0/0</strong><span id="todayPlanPercent">0%</span></div>
+          <div class="today-progress-track"><span id="todayPlanFill"></span></div>
+          <div id="todayPlanPreview" class="today-plan-preview"></div>
+        </section>
         <div class="pure-white-card quick-orbs-card">
           <div class="hero-balance-header">
             <div>
@@ -614,46 +806,6 @@
               <div class="orb-circle orb-amber">🖥️</div>
               <span class="orb-label" data-i18n="orbDesk">Desk Clock</span>
             </div>
-          </div>
-        </div>
-
-        <div class="pure-white-card">
-          <div class="segmented-pills-bar">
-            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerMode(cfg.focusMin, 'focus', this)" data-i18n="modeFocus">25m</button>
-            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">5m</button>
-            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">15m</button>
-            <button class="seg-pill" id="modeCustomBtn" onclick="openCustomTimerModal()" data-i18n="modeCustom">Custom ⚡</button>
-          </div>
-
-          <div class="timer-ring-box">
-            <div class="ring-container">
-              <svg class="ring-svg" viewBox="0 0 230 230">
-                <circle class="ring-bg" cx="115" cy="115" r="105"></circle>
-                <circle class="ring-bar" id="timerRingBar" cx="115" cy="115" r="105"></circle>
-              </svg>
-              <div class="ring-center">
-                <div class="ring-plant" id="ringPlantEmoji">🌱</div>
-                <div class="ring-time" id="timerDigitsTxt">25:00</div>
-                <div class="ring-mode-txt" id="timerModeCaption">Focus Session</div>
-                <div class="ring-task-pill" id="timerLinkedTask" onclick="switchTab('sec-tasks', document.getElementById('navTasks'))" data-i18n="startFocusAchieve">Plan • Execute • Achieve</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="timer-main-controls">
-            <button class="btn-round-sec" onclick="resetTimerNow()">↺</button>
-            <button class="btn-round-play" id="mainPlayBtn" onclick="toggleTimerPlay()">
-              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </button>
-            <button class="btn-round-sec" onclick="skipTimerPhase()">⏭</button>
-          </div>
-
-          <div class="time-delta-row">
-            <button class="delta-chip" onclick="changeTimerDelta(-5)">-5m</button>
-            <button class="delta-chip" onclick="changeTimerDelta(-1)">-1m</button>
-            <button class="delta-chip" onclick="changeTimerDelta(1)">+1m</button>
-            <button class="delta-chip" onclick="changeTimerDelta(5)">+5m</button>
-            <button class="delta-chip" onclick="changeTimerDelta(10)">+10m</button>
           </div>
         </div>
       </main>
