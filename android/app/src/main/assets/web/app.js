@@ -728,6 +728,11 @@ function testCompletionSoundChime() {
 /* ========================================================
    5. MULTI-DOMAIN & TIMER ENGINE
    ======================================================== */
+const DOMAIN_FOCUS_MINUTES = Object.freeze({study: 25, sport: 30, read: 20, work: 50});
+function getDomainFocusMinutes(domain = cfg.domain) {
+  return DOMAIN_FOCUS_MINUTES[domain] || 25;
+}
+
 function renderDomainState() {
   const dom = ['study', 'sport', 'read', 'work'].includes(cfg.domain) ? cfg.domain : 'study';
   for (const key of ['study', 'sport', 'read', 'work']) {
@@ -737,8 +742,7 @@ function renderDomainState() {
     card.classList.toggle('active', selected);
     card.setAttribute('aria-pressed', String(selected));
   }
-  const focusPreset = {study:25, sport:30, read:20, work:50};
-  document.getElementById('modeFocusBtn').textContent = toWest(focusPreset[dom] + 'm');
+  document.getElementById('modeFocusBtn').textContent = toWest(getDomainFocusMinutes(dom) + 'm');
   document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
   document.getElementById('readContextBar').classList.toggle('visible', dom === 'read');
 }
@@ -759,10 +763,14 @@ function switchActivityDomain(dom, el) {
   renderDomainState();
 
   const d = L();
-  if (dom === 'study') { selectTimerMode(25, 'focus', document.getElementById('modeFocusBtn')); showToast(`📚 ${d.domStudy} (25m)`); }
-  else if (dom === 'sport') { selectTimerMode(30, 'focus', document.getElementById('modeFocusBtn')); showToast(`🏋️ ${d.domSport} (30m)`); }
-  else if (dom === 'read') { selectTimerMode(20, 'focus', document.getElementById('modeFocusBtn')); showToast(`📖 ${d.domRead} (20m)`); }
-  else if (dom === 'work') { selectTimerMode(50, 'focus', document.getElementById('modeFocusBtn')); showToast(`💻 ${d.domWork} (50m)`); }
+  const labels = {
+    study: ['📚', d.domStudy], sport: ['🏋️', d.domSport],
+    read: ['📖', d.domRead], work: ['💻', d.domWork]
+  };
+  const [icon, title] = labels[dom];
+  const minutes = getDomainFocusMinutes(dom);
+  selectTimerMode(minutes, 'focus', document.getElementById('modeFocusBtn'));
+  showToast(toWest(`${icon} ${title} (${minutes}m)`));
 }
 
 function logWorkoutSet() {
