@@ -418,7 +418,7 @@ function validateImportedBackup(raw) {
   if (!raw.cfg || typeof raw.cfg !== 'object' || Array.isArray(raw.cfg)) return null;
   if (!Array.isArray(raw.tasksList) || !Array.isArray(raw.notesList)) return null;
   if (raw.tasksList.length > 10000 || raw.notesList.length > 10000) return null;
-  const safeRecordId = id => /^\\d{1,16}$/.test(String(id))
+  const safeRecordId = id => /^\d{1,16}$/.test(String(id))
     && Number.isSafeInteger(Number(id));
   const okTask = x => x && typeof x === 'object' && !Array.isArray(x)
     && safeRecordId(x.id)
