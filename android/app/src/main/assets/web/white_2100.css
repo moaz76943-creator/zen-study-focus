@@ -131,8 +131,10 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
   color:#6e83a8;flex:1;min-width:0;
 }
 .home-quick-sessions {
-  margin-top:12px;padding:11px 10px 4px;
-  border-top:1px solid rgba(219,230,250,.8);
+  margin:0 0 13px;padding:12px 13px 13px;
+  background:linear-gradient(145deg,#fff,#fafdff);
+  border:1px solid #e6edfb;border-radius:22px;
+  box-shadow:var(--zen-shadow);
 }
 .home-quick-heading {
   display:flex;align-items:center;gap:6px;justify-content:space-between;
