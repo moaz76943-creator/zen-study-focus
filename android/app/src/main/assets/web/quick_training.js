@@ -182,7 +182,7 @@ function startQuickTraining() {
 function stopQuickTrainingInternal() {
   quickTraining=null;
   if(timerRunning)toggleTimerPlay();
-  selectTimerMode(cfg.focusMin,'focus',document.getElementById('modeFocusBtn'));
+  selectTimerMode(getDomainFocusMinutes(),'focus',document.getElementById('modeFocusBtn'));
   renderQuickTraining();
 }
 function cancelQuickTraining(skipPrompt=false) {
@@ -201,8 +201,7 @@ function completeQuickTraining() {
   const domain = quickTraining?.domain || cfg.domain || 'study';
   quickTraining = null;
   quickInternalChange = true;
-  const defaults = {study:25,sport:30,read:20,work:50};
-  selectTimerMode(defaults[domain] || 25,'focus',document.getElementById('modeFocusBtn'));
+  selectTimerMode(getDomainFocusMinutes(domain),'focus',document.getElementById('modeFocusBtn'));
   quickInternalChange = false;
   renderQuickTraining();
   showToast(quickText('finished'));
