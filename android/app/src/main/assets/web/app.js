@@ -269,6 +269,13 @@ OTHER_LANGS.forEach(item => {
   };
 });
 
+function localDateISO(date = new Date()) {
+  return [
+    String(date.getFullYear()),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0')
+  ].join('-');
+}
 const todayISO = localDateISO();
 function escapeHtmlText(value) {
   return String(value === null || value === undefined ? '' : value)
