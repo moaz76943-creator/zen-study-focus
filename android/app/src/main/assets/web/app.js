@@ -570,6 +570,8 @@ function renderDomainState() {
   document.querySelectorAll('.domain-card').forEach(c => c.classList.remove('active'));
   const active = document.getElementById('domBtn-' + dom);
   if (active) active.classList.add('active');
+  const focusPreset = {study:25, sport:30, read:20, work:50};
+  document.getElementById('modeFocusBtn').textContent = toWest(focusPreset[dom] + 'm');
   document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
   document.getElementById('readContextBar').classList.toggle('visible', dom === 'read');
 }
@@ -774,7 +776,13 @@ function updateTimerDisplay() {
   document.getElementById('timerDigitsTxt').textContent = formatted;
   document.getElementById('deskClockDigits').textContent = formatted;
 
-  const captions = { focus: d.domStudy + ' ' + d.modeFocus, short: d.modeShort, long: d.modeLong, custom: customSessionLabel || d.modeCustom };
+  const domainText = {study:d.domStudy, sport:d.domSport, read:d.domRead, work:d.domWork};
+  const captions = {
+    focus: (domainText[cfg.domain] || d.domStudy) + ' ' + Math.round(timerTotal / 60) + 'm',
+    short: timerTotal < 60 ? timerTotal + 's' : d.modeShort,
+    long: d.modeLong,
+    custom: customSessionLabel || d.modeCustom
+  };
   document.getElementById('timerModeCaption').textContent = toWest(captions[currentTimerModeKey] || d.modeFocus);
 }
 
