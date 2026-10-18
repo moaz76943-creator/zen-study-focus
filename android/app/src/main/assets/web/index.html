@@ -3,251 +3,283 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Zen Study Pro 3.0</title>
+  <title>Zen Study Pro 5.0</title>
   <style>
     :root {
-      --bg: #0b0f17;
-      --bg-grad: #141d2b;
-      --card: rgba(22, 29, 41, 0.88);
-      --card-light: rgba(255, 255, 255, 0.04);
+      --bg: #0b1018;
+      --bg-grad: #152232;
+      --card: rgba(22, 31, 46, 0.90);
+      --card-light: rgba(255, 255, 255, 0.045);
       --primary: #4ecca3;
-      --primary-glow: rgba(78, 204, 163, 0.22);
+      --primary-glow: rgba(78, 204, 163, 0.25);
       --accent: #64b5f6;
-      --text: #eef2f6;
-      --muted: #8b95a5;
-      --border: rgba(255, 255, 255, 0.08);
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --text: #f0f6fc;
+      --muted: #8b98a9;
+      --border: rgba(255, 255, 255, 0.085);
+      --radius: 20px;
     }
-    [data-theme="amber"] {
-      --bg: #120e0a; --bg-grad: #241a10; --card: rgba(34, 25, 17, 0.9);
-      --primary: #f59e0b; --primary-glow: rgba(245, 158, 11, 0.22); --accent: #fb923c;
-    }
-    [data-theme="nordic"] {
-      --bg: #0b131e; --bg-grad: #132338; --card: rgba(20, 34, 52, 0.9);
-      --primary: #38bdf8; --primary-glow: rgba(56, 189, 248, 0.22); --accent: #818cf8;
-    }
-    [data-theme="amoled"] {
-      --bg: #000000; --bg-grad: #08080c; --card: rgba(16, 16, 22, 0.95);
-      --primary: #a78bfa; --primary-glow: rgba(167, 139, 250, 0.22); --accent: #f472b6;
-    }
+    /* 10 Calming Optimistic Themes */
+    [data-theme="amber"] { --bg:#120d08; --bg-grad:#261a10; --card:rgba(36,26,16,0.92); --primary:#f59e0b; --primary-glow:rgba(245,158,11,0.25); --accent:#fb923c; }
+    [data-theme="nordic"] { --bg:#0a121e; --bg-grad:#13243a; --card:rgba(20,34,54,0.92); --primary:#38bdf8; --primary-glow:rgba(56,189,248,0.25); --accent:#818cf8; }
+    [data-theme="amoled"] { --bg:#000000; --bg-grad:#09090f; --card:rgba(15,15,22,0.96); --primary:#a78bfa; --primary-glow:rgba(167,139,250,0.25); --accent:#f472b6; }
+    [data-theme="forest"] { --bg:#08140e; --bg-grad:#10281c; --card:rgba(16,38,26,0.92); --primary:#34d399; --primary-glow:rgba(52,211,153,0.25); --accent:#a3e635; }
+    [data-theme="espresso"] { --bg:#140f0d; --bg-grad:#261c18; --card:rgba(38,28,24,0.92); --primary:#d4a373; --primary-glow:rgba(212,163,115,0.25); --accent:#e9edc9; }
+    [data-theme="rose"] { --bg:#160d14; --bg-grad:#291724; --card:rgba(40,22,36,0.92); --primary:#f472b6; --primary-glow:rgba(244,114,182,0.25); --accent:#c084fc; }
+    [data-theme="ocean"] { --bg:#071318; --bg-grad:#0e2730; --card:rgba(14,36,46,0.92); --primary:#2dd4bf; --primary-glow:rgba(45,212,191,0.25); --accent:#38bdf8; }
+    [data-theme="slate"] { --bg:#0f172a; --bg-grad:#1e293b; --card:rgba(30,41,59,0.92); --primary:#94a3b8; --primary-glow:rgba(148,163,184,0.25); --accent:#38bdf8; }
+    [data-theme="cream"] { --bg:#f8f5f0; --bg-grad:#efeae1; --card:rgba(255,255,255,0.92); --card-light:rgba(0,0,0,0.04); --primary:#0d9488; --primary-glow:rgba(13,148,136,0.2); --accent:#0284c7; --text:#1e293b; --muted:#64748b; --border:rgba(0,0,0,0.08); }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: radial-gradient(circle at top, var(--bg-grad) 0%, var(--bg) 75%); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 14px 12px 28px; overflow-x: hidden; transition: background 0.4s; }
+    body { background: radial-gradient(circle at top, var(--bg-grad) 0%, var(--bg) 80%); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 10px 10px 26px; overflow-x: hidden; transition: background 0.35s, color 0.35s; }
+    body.eye-warm::after { content: ""; position: fixed; inset: 0; background: rgba(255, 145, 0, 0.11); pointer-events: none; z-index: 999; }
 
-    /* Responsive Layout for Landscape Desk Clock Mode */
-    .app-shell { width: 100%; max-width: 410px; display: flex; flex-direction: column; align-items: center; }
-    @media (min-width: 700px) and (orientation: landscape) {
-      .app-shell { max-width: 860px; flex-direction: row; align-items: flex-start; gap: 24px; justify-content: center; padding-top: 10px; }
-      .left-col, .right-col { flex: 1; display: flex; flex-direction: column; align-items: center; width: 100%; }
+    .app-shell { width: 100%; max-width: 430px; display: flex; flex-direction: column; gap: 10px; }
+    @media (min-width: 720px) and (orientation: landscape) {
+      .app-shell { max-width: 880px; flex-direction: row; align-items: flex-start; gap: 18px; }
+      .col-left, .col-right { flex: 1; width: 100%; display: flex; flex-direction: column; gap: 10px; }
     }
-    .left-col, .right-col { width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .col-left, .col-right { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 
     /* Top Bar */
-    .top-bar { width: 100%; max-width: 410px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 6px; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--card); border: 1px solid var(--border); padding: 8px 12px; border-radius: var(--radius); backdrop-filter: blur(12px); gap: 6px; }
     .brand { display: flex; align-items: center; gap: 7px; }
-    .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 10px var(--primary); }
-    .brand h1 { font-size: 1.1rem; font-weight: 700; }
-    .stats-pill { background: var(--card); border: 1px solid var(--border); padding: 5px 10px; border-radius: 20px; font-size: 0.74rem; color: var(--primary); font-weight: 600; display: flex; gap: 7px; align-items: center; cursor: pointer; }
-    .top-actions { display: flex; gap: 6px; }
-    .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); width: 34px; height: 34px; border-radius: 11px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .icon-btn.active { border-color: var(--primary); color: var(--primary); }
+    .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 10px var(--primary); animation: pulse 2.2s infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.65; } }
+    .brand h1 { font-size: 0.98rem; font-weight: 800; letter-spacing: 0.3px; }
+    .stats-pill { font-size: 0.72rem; color: var(--primary); font-weight: 700; display: flex; gap: 6px; align-items: center; cursor: pointer; background: var(--card-light); border: 1px solid var(--border); padding: 4px 9px; border-radius: 12px; }
+    .top-actions { display: flex; gap: 5px; }
+    .icon-btn { background: var(--card-light); border: 1px solid var(--border); color: var(--text); width: 32px; height: 32px; border-radius: 10px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .icon-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary-glow); }
 
-    /* Mode Switch */
-    .mode-switch { display: flex; background: var(--card); padding: 4px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 14px; width: 100%; }
-    .mode-btn { flex: 1; padding: 8px 0; border: none; background: transparent; color: var(--muted); font-size: 0.78rem; font-weight: 600; border-radius: 12px; cursor: pointer; transition: 0.25s; }
-    .mode-btn.active { background: var(--primary); color: #071018; box-shadow: 0 3px 12px var(--primary-glow); }
+    /* Optimistic Motivation & Quick Boost Bar */
+    .optimism-card { background: var(--card); border: 1px solid var(--border); padding: 9px 12px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .quote-text { font-size: 0.74rem; color: var(--text); line-height: 1.35; flex: 1; }
+    .boost-btn { background: var(--primary-glow); border: 1px solid var(--primary); color: var(--primary); padding: 5px 9px; border-radius: 10px; font-size: 0.68rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
 
-    /* Timer Section */
-    .timer-wrap { position: relative; width: 225px; height: 225px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    /* Mode Selector Scrollable Pills */
+    .mode-switch { display: flex; background: var(--card); padding: 4px; border-radius: 15px; border: 1px solid var(--border); gap: 4px; overflow-x: auto; scrollbar-width: none; }
+    .mode-switch::-webkit-scrollbar { display: none; }
+    .mode-btn { flex: 1; min-width: max-content; padding: 7px 10px; border: none; background: transparent; color: var(--muted); font-size: 0.73rem; font-weight: 700; border-radius: 11px; cursor: pointer; transition: 0.2s; }
+    .mode-btn.active { background: var(--primary); color: #061018; box-shadow: 0 3px 10px var(--primary-glow); }
+
+    /* Timer Card */
+    .timer-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 12px; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(12px); }
+    .timer-wrap { position: relative; width: 205px; height: 205px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
     .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-    .circle-bg { fill: none; stroke: rgba(255, 255, 255, 0.05); stroke-width: 7; }
-    .circle-prog { fill: none; stroke: var(--primary); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s linear, stroke 0.3s; filter: drop-shadow(0 0 6px var(--primary-glow)); }
+    .circle-bg { fill: none; stroke: var(--border); stroke-width: 6.5; }
+    .circle-prog { fill: none; stroke: var(--primary); stroke-width: 6.5; stroke-linecap: round; stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.5s linear, stroke 0.3s; filter: drop-shadow(0 0 6px var(--primary-glow)); }
     .timer-center { position: absolute; text-align: center; }
-    .time-text { font-size: 3rem; font-weight: 700; letter-spacing: 1px; font-variant-numeric: tabular-nums; line-height: 1.1; }
-    .quick-adjust { display: flex; gap: 6px; justify-content: center; margin-top: 6px; }
-    .adj-btn { background: var(--card-light); border: 1px solid var(--border); color: var(--muted); padding: 2px 8px; border-radius: 8px; font-size: 0.72rem; cursor: pointer; }
+    .time-text { font-size: 2.75rem; font-weight: 800; letter-spacing: 1px; font-variant-numeric: tabular-nums; line-height: 1.05; }
+    .session-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+    .quick-adjust { display: flex; gap: 5px; justify-content: center; margin-top: 6px; }
+    .adj-btn { background: var(--card-light); border: 1px solid var(--border); color: var(--muted); padding: 2px 7px; border-radius: 7px; font-size: 0.68rem; font-weight: 600; cursor: pointer; }
     .adj-btn:active { background: var(--primary); color: #000; }
 
-    /* Active Task Banner & Motivation */
-    .active-task-bar { font-size: 0.78rem; color: var(--primary); background: var(--card-light); border: 1px solid var(--border); padding: 5px 14px; border-radius: 20px; margin-bottom: 12px; max-width: 90%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .active-task-pill { font-size: 0.74rem; color: var(--primary); background: var(--card-light); border: 1px solid var(--border); padding: 5px 12px; border-radius: 16px; margin-bottom: 10px; max-width: 95%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 
-    /* Controls */
-    .controls { display: flex; gap: 8px; width: 100%; max-width: 340px; margin-bottom: 16px; }
-    .btn { padding: 12px 14px; border-radius: 15px; border: 1px solid var(--border); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .btn-main { background: var(--primary); color: #071018; border: none; flex: 2.2; box-shadow: 0 4px 15px var(--primary-glow); }
-    .btn-sec { background: var(--card); color: var(--text); flex: 0.9; font-size: 0.82rem; }
+    .controls { display: flex; gap: 7px; width: 100%; max-width: 330px; }
+    .btn { padding: 11px 12px; border-radius: 14px; border: 1px solid var(--border); font-size: 0.86rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-main { background: var(--primary); color: #061018; border: none; flex: 2.2; box-shadow: 0 4px 14px var(--primary-glow); }
+    .btn-sec { background: var(--card-light); color: var(--text); flex: 0.9; font-size: 0.78rem; }
 
-    /* Main Tabs */
-    .tabs { display: flex; gap: 5px; width: 100%; margin-bottom: 10px; }
-    .tab-btn { flex: 1; padding: 9px 2px; background: var(--card); border: 1px solid var(--border); border-radius: 13px; color: var(--muted); font-size: 0.76rem; font-weight: 600; cursor: pointer; text-align: center; transition: 0.2s; }
+    /* 5 Main Feature Tabs */
+    .tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 100%; }
+    .tab-btn { padding: 8px 2px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-size: 0.7rem; font-weight: 700; cursor: pointer; text-align: center; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .tab-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary-glow); }
 
     /* Panels */
-    .panel { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 14px; width: 100%; backdrop-filter: blur(12px); }
-    .panel.active { display: block; animation: fadeIn 0.22s ease; }
+    .panel { display: none; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px; width: 100%; backdrop-filter: blur(12px); }
+    .panel.active { display: block; animation: fadeIn 0.2s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Sub-tabs & Presets for Sounds */
-    .sub-bar { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 2px; }
-    .chip { background: var(--card-light); border: 1px solid var(--border); color: var(--muted); padding: 5px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
-    .chip.active { background: var(--primary); color: #071018; border-color: var(--primary); }
-    .preset-row { display: flex; gap: 5px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
-    .preset-chip { background: rgba(255,255,255,0.03); border: 1px dashed var(--border); color: var(--accent); padding: 4px 9px; border-radius: 10px; font-size: 0.7rem; white-space: nowrap; cursor: pointer; }
+    /* Sub-navigation Chips */
+    .sub-bar { display: flex; gap: 5px; margin-bottom: 9px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+    .sub-bar::-webkit-scrollbar { display: none; }
+    .chip { background: var(--card-light); border: 1px solid var(--border); color: var(--muted); padding: 5px 9px; border-radius: 10px; font-size: 0.69rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+    .chip.active { background: var(--primary); color: #061018; border-color: var(--primary); }
+    .preset-chip { background: rgba(255,255,255,0.03); border: 1px dashed var(--border); color: var(--accent); padding: 4px 8px; border-radius: 9px; font-size: 0.67rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
 
-    /* Sounds Grid */
-    .sound-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .sound-card { background: var(--card-light); border: 1px solid var(--border); border-radius: 13px; padding: 10px; transition: 0.2s; }
+    /* Sounds Grid (20 Sounds) */
+    .sound-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; max-height: 215px; overflow-y: auto; padding-right: 2px; }
+    .sound-card { background: var(--card-light); border: 1px solid var(--border); border-radius: 12px; padding: 8px 9px; transition: 0.2s; }
     .sound-card.on { border-color: var(--primary); background: var(--primary-glow); }
-    .sound-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; cursor: pointer; }
-    .sound-desc { font-size: 0.66rem; color: var(--muted); margin-bottom: 7px; }
-    .slider { width: 100%; -webkit-appearance: none; background: rgba(255,255,255,0.14); height: 4px; border-radius: 2px; outline: none; }
-    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--primary); cursor: pointer; }
+    .sound-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 700; margin-bottom: 3px; cursor: pointer; }
+    .sound-desc { font-size: 0.62rem; color: var(--muted); margin-bottom: 5px; }
+    .slider { width: 100%; -webkit-appearance: none; background: rgba(255,255,255,0.14); height: 3.5px; border-radius: 2px; outline: none; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); cursor: pointer; }
 
-    /* Tasks Panel */
-    .prog-bar-wrap { width: 100%; background: rgba(255,255,255,0.06); height: 6px; border-radius: 4px; margin-bottom: 10px; overflow: hidden; }
+    /* Tasks & Planning */
+    .prog-bar-wrap { width: 100%; background: var(--card-light); height: 5px; border-radius: 3px; margin-bottom: 8px; overflow: hidden; }
     .prog-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
-    .task-form { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-    .input-box { flex: 1; min-width: 140px; background: rgba(10,14,22,0.75); border: 1px solid var(--border); border-radius: 11px; padding: 8px 10px; color: var(--text); font-size: 0.8rem; outline: none; }
+    .form-row { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+    .input-box { flex: 1; min-width: 115px; background: rgba(10,14,22,0.55); border: 1px solid var(--border); border-radius: 10px; padding: 7px 9px; color: var(--text); font-size: 0.76rem; outline: none; }
+    [data-theme="cream"] .input-box, [data-theme="cream"] .mini-select, [data-theme="cream"] .notes-area { background: rgba(0,0,0,0.03); }
     .input-box:focus { border-color: var(--primary); }
-    .mini-select { background: rgba(10,14,22,0.75); border: 1px solid var(--border); border-radius: 11px; padding: 8px 6px; color: var(--text); font-size: 0.75rem; outline: none; }
-    .add-btn { background: var(--primary); color: #071018; border: none; padding: 8px 13px; border-radius: 11px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
-    .task-list { list-style: none; max-height: 185px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-    .task-item { display: flex; align-items: center; justify-content: space-between; background: var(--card-light); padding: 8px 10px; border-radius: 11px; border: 1px solid var(--border); font-size: 0.8rem; gap: 6px; }
-    .task-item.done .t-title { text-decoration: line-through; color: var(--muted); }
-    .task-item.selected { border-color: var(--primary); }
-    .tag-badge { font-size: 0.65rem; background: rgba(100,181,246,0.15); color: var(--accent); padding: 2px 6px; border-radius: 6px; }
-    .pomo-dots { font-size: 0.68rem; color: var(--primary); letter-spacing: 1px; }
+    .mini-select { background: rgba(10,14,22,0.55); border: 1px solid var(--border); border-radius: 10px; padding: 7px 5px; color: var(--text); font-size: 0.7rem; outline: none; }
+    .add-btn { background: var(--primary); color: #061018; border: none; padding: 7px 12px; border-radius: 10px; font-weight: 800; font-size: 0.78rem; cursor: pointer; }
+    .item-list { list-style: none; max-height: 170px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
+    .list-item { display: flex; align-items: center; justify-content: space-between; background: var(--card-light); padding: 7px 9px; border-radius: 10px; border: 1px solid var(--border); font-size: 0.76rem; gap: 6px; }
+    .list-item.done .t-title { text-decoration: line-through; color: var(--muted); }
+    .list-item.selected { border-color: var(--primary); }
+    .badge { font-size: 0.6rem; background: rgba(100,181,246,0.16); color: var(--accent); padding: 2px 5px; border-radius: 5px; font-weight: 600; }
 
-    /* Notes Panel (Multi-Notes + Search + Pin) */
-    .notes-list { max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
-    .note-card { background: var(--card-light); border: 1px solid var(--border); border-radius: 11px; padding: 8px 10px; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .note-card.pinned { border-color: var(--primary); background: rgba(78, 204, 163, 0.06); }
-    .notes-area { width: 100%; height: 78px; background: rgba(10,14,22,0.75); border: 1px solid var(--border); border-radius: 11px; padding: 9px; color: var(--text); font-size: 0.82rem; resize: none; outline: none; }
-    .small-btn { background: var(--card-light); border: 1px solid var(--border); color: var(--primary); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 0.72rem; font-weight: 600; }
+    /* Study Tools (Flashcards, Reading Calc, Formulas) */
+    .sub-panel { display: none; }
+    .sub-panel.active { display: block; }
+    .flashcard-box { background: linear-gradient(135deg, var(--card-light), var(--primary-glow)); border: 1px solid var(--primary); border-radius: 14px; padding: 18px 12px; text-align: center; min-height: 95px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; margin-bottom: 8px; }
+    .small-btn { background: var(--card-light); border: 1px solid var(--border); color: var(--primary); padding: 5px 9px; border-radius: 8px; cursor: pointer; font-size: 0.68rem; font-weight: 700; }
 
-    /* Stats & Heatmap inside Tab 4 */
-    .heatmap-row { display: flex; justify-content: space-between; gap: 6px; margin: 10px 0 14px; }
-    .day-col { flex: 1; background: var(--card-light); border: 1px solid var(--border); border-radius: 10px; padding: 6px 2px; text-align: center; font-size: 0.68rem; }
+    /* Notes */
+    .notes-area { width: 100%; height: 74px; background: rgba(10,14,22,0.55); border: 1px solid var(--border); border-radius: 10px; padding: 8px; color: var(--text); font-size: 0.76rem; resize: none; outline: none; line-height: 1.4; }
+
+    /* Stats, Garden & Wellness */
+    .garden-box { display: flex; align-items: center; justify-content: space-between; background: var(--card-light); border: 1px solid var(--border); border-radius: 12px; padding: 8px 11px; margin-bottom: 8px; }
+    .heatmap-row { display: flex; justify-content: space-between; gap: 4px; margin: 6px 0 10px; }
+    .day-col { flex: 1; background: var(--card-light); border: 1px solid var(--border); border-radius: 8px; padding: 5px 1px; text-align: center; font-size: 0.62rem; }
     .day-col.hot { border-color: var(--primary); background: var(--primary-glow); }
-    .breath-circle { width: 95px; height: 95px; border-radius: 50%; background: radial-gradient(circle, var(--primary-glow), transparent); border: 2px solid var(--primary); margin: 8px auto 12px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; color: var(--primary); transition: transform 4s ease-in-out; }
-    .breath-circle.inhale { transform: scale(1.28); }
-    .breath-circle.exhale { transform: scale(0.85); }
+    .water-row { display: flex; gap: 5px; justify-content: center; margin: 6px 0; }
+    .water-cup { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-light); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer; opacity: 0.45; transition: 0.2s; }
+    .water-cup.filled { opacity: 1; border-color: var(--accent); background: rgba(100,181,246,0.2); }
+    .breath-circle { width: 82px; height: 82px; border-radius: 50%; background: radial-gradient(circle, var(--primary-glow), transparent); border: 2px solid var(--primary); margin: 6px auto; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: var(--primary); transition: transform 4s ease-in-out; }
+    .breath-circle.inhale { transform: scale(1.25); }
+    .breath-circle.exhale { transform: scale(0.84); }
 
     /* Zen Fullscreen Mode */
-    body.zen-mode .top-bar, body.zen-mode .mode-switch, body.zen-mode .right-col { display: none !important; }
+    body.zen-mode .top-bar, body.zen-mode .optimism-card, body.zen-mode .mode-switch, body.zen-mode .col-right { display: none !important; }
     body.zen-mode .app-shell { justify-content: center; align-items: center; min-height: 92vh; }
-    .zen-exit-btn { display: none; margin-top: 16px; background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 8px 18px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; }
+    .zen-exit-btn { display: none; margin-top: 12px; background: var(--card-light); border: 1px solid var(--border); color: var(--muted); padding: 7px 16px; border-radius: 16px; font-size: 0.75rem; cursor: pointer; }
     body.zen-mode .zen-exit-btn { display: inline-block; }
 
     /* Modal */
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.78); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 90; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.82); display: none; align-items: center; justify-content: center; padding: 12px; z-index: 99; }
     .modal.open { display: flex; }
-    .modal-card { background: #131b26; border: 1px solid var(--border); border-radius: 20px; padding: 18px; width: 100%; max-width: 360px; max-height: 88vh; overflow-y: auto; }
-    .modal-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 0.82rem; }
-    .num-input { width: 65px; padding: 5px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-align: center; }
+    .modal-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; width: 100%; max-width: 360px; max-height: 88vh; overflow-y: auto; }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; margin: 7px 0; font-size: 0.76rem; }
+    .num-input { width: 62px; padding: 4px; border-radius: 7px; border: 1px solid var(--border); background: var(--card-light); color: var(--text); text-align: center; }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation & Quick Actions -->
-  <div class="top-bar">
-    <div class="brand">
-      <div class="brand-dot"></div>
-      <h1>Zen Study</h1>
-    </div>
-    <div class="stats-pill" onclick="openTab('calm', document.getElementById('tabBtnCalm'))">
-      <span id="statMin">0 د</span>
-      <span>•</span>
-      <span id="statStreak">🔥 0</span>
-    </div>
-    <div class="top-actions">
-      <button class="icon-btn" id="muteAllBtn" onclick="toggleMasterMute()" title="كتم/تشغيل الأصوات">🔊</button>
-      <button class="icon-btn" onclick="toggleZenMode()" title="وضع ملء الشاشة المريح">⛶</button>
-      <button class="icon-btn" onclick="openSettings()" title="الإعدادات والثيمات">⚙️</button>
-    </div>
-  </div>
-
   <div class="app-shell">
-    <!-- Left Column: Timer & Primary Controls -->
-    <div class="left-col">
-      <div class="mode-switch">
-        <button class="mode-btn active" id="btnFocus" onclick="setMode('focus')">تركيز (<span id="lblFocus">25</span>د)</button>
-        <button class="mode-btn" id="btnShort" onclick="setMode('short')">قصيرة (<span id="lblShort">5</span>د)</button>
-        <button class="mode-btn" id="btnLong" onclick="setMode('long')">طويلة (<span id="lblLong">15</span>د)</button>
-        <button class="mode-btn" id="btnWatch" onclick="setMode('stopwatch')">مفتوح ⏱️</button>
+    <!-- Left Column: Header, Optimism Banner & Smart Timer -->
+    <div class="col-left">
+      <div class="top-bar">
+        <div class="brand">
+          <div class="brand-dot"></div>
+          <h1 id="uiBrand">Zen Study</h1>
+        </div>
+        <div class="stats-pill" onclick="openTab('calm', document.getElementById('tabBtnCalm'))">
+          <span id="treeStageIcon">🌱</span>
+          <span id="statMin">0 د</span>
+          <span>•</span>
+          <span id="statStreak">🔥 0</span>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="muteAllBtn" onclick="toggleMasterMute()" title="كتم/تشغيل الصوت">🔊</button>
+          <button class="icon-btn" id="eyeWarmBtn" onclick="toggleEyeWarmth()" title="فلتر راحة العين الليلي">🌙</button>
+          <button class="icon-btn" onclick="toggleZenMode()" title="وضع التركيز الكامل">⛶</button>
+          <button class="icon-btn" onclick="openSettings()" title="الإعدادات واللغات">⚙️</button>
+        </div>
       </div>
 
-      <div class="timer-wrap">
-        <svg class="timer-svg" viewBox="0 0 230 230">
-          <circle class="circle-bg" cx="115" cy="115" r="105"></circle>
-          <circle class="circle-prog" id="progCircle" cx="115" cy="115" r="105"></circle>
-        </svg>
-        <div class="timer-center">
-          <div class="time-text" id="timeDisplay">25:00</div>
-          <div class="quick-adjust" id="quickAdjRow">
-            <button class="adj-btn" onclick="adjustMinutes(-5)">-5د</button>
-            <button class="adj-btn" onclick="adjustMinutes(-1)">-1د</button>
-            <button class="adj-btn" onclick="adjustMinutes(1)">+1د</button>
-            <button class="adj-btn" onclick="adjustMinutes(5)">+5د</button>
+      <!-- Optimistic Learner Banner + 5-Sec Rule Starter -->
+      <div class="optimism-card">
+        <div class="quote-text" id="motivationBox">✨ "كل دقيقة تركيز اليوم تبني مستقبلك المشرق."</div>
+        <button class="boost-btn" onclick="triggerFiveSecRule()" id="lblBoostBtn">🚀 انطلق (5ث)</button>
+      </div>
+
+      <!-- 6 Study Modes -->
+      <div class="mode-switch">
+        <button class="mode-btn active" id="btnFocus" onclick="setMode('focus')"><span id="lblModeFocus">تركيز (25د)</span></button>
+        <button class="mode-btn" id="btnShort" onclick="setMode('short')"><span id="lblModeShort">راحة (5د)</span></button>
+        <button class="mode-btn" id="btnLong" onclick="setMode('long')"><span id="lblModeLong">طويلة (15د)</span></button>
+        <button class="mode-btn" id="btn5217" onclick="setMode('m5217')">52/17 ⚡</button>
+        <button class="mode-btn" id="btn9020" onclick="setMode('m9020')">90/20 🧠</button>
+        <button class="mode-btn" id="btnWatch" onclick="setMode('stopwatch')"><span id="lblModeWatch">مفتوح ⏱️</span></button>
+      </div>
+
+      <!-- Timer Card -->
+      <div class="timer-card">
+        <div class="timer-wrap">
+          <svg class="timer-svg" viewBox="0 0 230 230">
+            <circle class="circle-bg" cx="115" cy="115" r="105"></circle>
+            <circle class="circle-prog" id="progCircle" cx="115" cy="115" r="105"></circle>
+          </svg>
+          <div class="timer-center">
+            <div class="time-text" id="timeDisplay">25:00</div>
+            <div class="session-sub" id="realClockSub">🌟 جاهز للإنجاز</div>
+            <div class="quick-adjust" id="quickAdjRow">
+              <button class="adj-btn" onclick="adjustMinutes(-5)">-5</button>
+              <button class="adj-btn" onclick="adjustMinutes(-1)">-1</button>
+              <button class="adj-btn" onclick="adjustMinutes(1)">+1</button>
+              <button class="adj-btn" onclick="adjustMinutes(5)">+5</button>
+            </div>
           </div>
         </div>
+
+        <div class="active-task-pill" id="activeTaskBanner">🎯 اختر مهمة أو ابدأ جلستك بتفاؤل</div>
+
+        <div class="controls">
+          <button class="btn btn-main" id="startBtn" onclick="toggleTimer()"><span id="lblStart">بدء الجلسة</span></button>
+          <button class="btn btn-sec" onclick="resetTimer()"><span id="lblReset">إعادة</span></button>
+          <button class="btn btn-sec" onclick="skipSession()" title="تخطي">⏭️</button>
+        </div>
+
+        <button class="zen-exit-btn" onclick="toggleZenMode()"><span id="lblExitZen">إنهاء وضع ملء الشاشة ✕</span></button>
       </div>
-
-      <div class="active-task-bar" id="activeTaskBanner">🎯 اختر مهمة من القائمة أو ابدأ التركيز مباشرة</div>
-
-      <div class="controls">
-        <button class="btn btn-main" id="startBtn" onclick="toggleTimer()">بدء الجلسة</button>
-        <button class="btn btn-sec" onclick="resetTimer()">إعادة</button>
-        <button class="btn btn-sec" onclick="skipSession()" title="تخطي الجلسة">⏭️</button>
-      </div>
-
-      <button class="zen-exit-btn" onclick="toggleZenMode()">إغلاق وضع ملء الشاشة ✕</button>
     </div>
 
-    <!-- Right Column: Organized Feature Tabs -->
-    <div class="right-col">
+    <!-- Right Column: 5 Organized Feature Tabs -->
+    <div class="col-right">
       <div class="tabs">
-        <button class="tab-btn active" onclick="openTab('sounds', this)">🔥 الأصوات (12)</button>
-        <button class="tab-btn" onclick="openTab('tasks', this)">✅ المهام</button>
-        <button class="tab-btn" onclick="openTab('notes', this)">📝 الملاحظات</button>
-        <button class="tab-btn" id="tabBtnCalm" onclick="openTab('calm', this)">📊 إنجاز وتهدئة</button>
+        <button class="tab-btn active" onclick="openTab('sounds', this)"><span id="lblTabSounds">🔥 الأصوات</span></button>
+        <button class="tab-btn" onclick="openTab('tasks', this)"><span id="lblTabTasks">✅ المهام</span></button>
+        <button class="tab-btn" onclick="openTab('tools', this)"><span id="lblTabTools">🧠 أدوات</span></button>
+        <button class="tab-btn" onclick="openTab('notes', this)"><span id="lblTabNotes">📝 ملاحظات</span></button>
+        <button class="tab-btn" id="tabBtnCalm" onclick="openTab('calm', this)"><span id="lblTabCalm">📊 إنجاز</span></button>
       </div>
 
-      <!-- TAB 1: 12 Categorized Sounds + Presets -->
+      <!-- TAB 1: 20 Generative Sounds in 4 Clean Categories -->
       <div class="panel active" id="tab-sounds">
         <div class="sub-bar">
-          <button class="chip active" onclick="filterSoundCat('cozy', this)">🔥 دفء وأماكن (4)</button>
-          <button class="chip" onclick="filterSoundCat('nature', this)">🌲 طبيعة (4)</button>
-          <button class="chip" onclick="filterSoundCat('focus', this)">🧠 عزل وترددات (4)</button>
+          <button class="chip active" onclick="filterSoundCat('cozy', this)"><span id="lblCatCozy">🔥 دفء (5)</span></button>
+          <button class="chip" onclick="filterSoundCat('nature', this)"><span id="lblCatNature">🌲 طبيعة (5)</span></button>
+          <button class="chip" onclick="filterSoundCat('study', this)"><span id="lblCatStudy">✍️ دراسة (5)</span></button>
+          <button class="chip" onclick="filterSoundCat('focus', this)"><span id="lblCatFocus">🧠 عزل (5)</span></button>
         </div>
-
-        <div class="preset-row">
-          <button class="preset-chip" onclick="applyPreset('winter')">🔥 شتاء دافئ (نار + مطر)</button>
+        <div class="sub-bar">
+          <button class="preset-chip" onclick="applyPreset('winter')">🔥 شتاء دافئ</button>
+          <button class="preset-chip" onclick="applyPreset('studywithme')">✍️ رفيق الدراسة</button>
           <button class="preset-chip" onclick="applyPreset('deep')">🛡️ عزل عميق</button>
-          <button class="preset-chip" onclick="applyPreset('night')">🌙 شاطئ ليلي</button>
-          <button class="preset-chip" onclick="saveCustomPreset()">💾 حفظ خلطتي</button>
+          <button class="preset-chip" onclick="applyPreset('train')">🚂 قطار ليلي</button>
+          <button class="preset-chip" onclick="saveCustomPreset()">💾 حفظ</button>
           <button class="preset-chip" onclick="applyPreset('custom')">⭐ خلطتي</button>
         </div>
-
         <div class="sound-grid" id="soundGrid"></div>
       </div>
 
-      <!-- TAB 2: Advanced Study Tasks -->
+      <!-- TAB 2: Smart Study Tasks & Templates -->
       <div class="panel" id="tab-tasks">
-        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:var(--muted);margin-bottom:4px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--muted);margin-bottom:4px;">
           <span id="taskProgressTxt">إنجاز المهام: 0%</span>
-          <button style="background:none;border:none;color:#ff8787;cursor:pointer;font-size:0.72rem;" onclick="clearCompletedTasks()">حذف المنتهية</button>
+          <div style="display:flex;gap:6px;">
+            <button class="small-btn" onclick="loadTaskTemplate()">⚡ قالب جاهز</button>
+            <button class="small-btn" style="color:var(--danger);" onclick="clearCompletedTasks()" id="lblClearDone">مسح المنتهية</button>
+          </div>
         </div>
         <div class="prog-bar-wrap"><div class="prog-bar-fill" id="taskProgFill"></div></div>
-
-        <div class="task-form">
-          <input type="text" class="input-box" id="taskInput" placeholder="مهمة جديدة (مثل: مراجعة الفصل 1)...">
+        <div class="form-row">
+          <input type="text" class="input-box" id="taskInput" placeholder="أضف مهمة أو فصلاً دراسياً...">
           <select class="mini-select" id="taskTag">
             <option value="عام">📚 عام</option>
             <option value="حفظ">🧠 حفظ</option>
             <option value="تمارين">✍️ تمارين</option>
             <option value="مراجعة">🔍 مراجعة</option>
+            <option value="MIT ⭐">⭐ أهم مهمة</option>
           </select>
-          <select class="mini-select" id="taskPomos" title="عدد الجلسات المقدرة">
+          <select class="mini-select" id="taskPomos">
             <option value="1">1 جلسة</option>
             <option value="2">2 جلستان</option>
             <option value="3">3 جلسات</option>
@@ -255,69 +287,182 @@
           </select>
           <button class="add-btn" onclick="addTask()">+</button>
         </div>
-        <ul class="task-list" id="taskList"></ul>
+        <ul class="item-list" id="taskList"></ul>
       </div>
 
-      <!-- TAB 3: Multi-Notes with Search, Pin & Export -->
-      <div class="panel" id="tab-notes">
-        <div style="display:flex;gap:6px;margin-bottom:8px;">
-          <input type="text" class="input-box" id="noteSearch" placeholder="🔍 ابحث في ملاحظاتك..." oninput="renderNotesList()">
-          <button class="small-btn" onclick="exportNotesTxt()">تصدير TXT</button>
+      <!-- TAB 3: Active Study Tools (Flashcards, Reading Calculator, Formula & Mistake Bank) -->
+      <div class="panel" id="tab-tools">
+        <div class="sub-bar">
+          <button class="chip active" onclick="openStudyTool('cards', this)">🗂️ بطاقات استذكار</button>
+          <button class="chip" onclick="openStudyTool('calc', this)">📖 حاسبة القراءة والتمارين</button>
+          <button class="chip" onclick="openStudyTool('formulas', this)">📐 القوانين والأخطاء</button>
         </div>
-        <div class="notes-list" id="notesList"></div>
-        <textarea class="notes-area" id="notesBox" placeholder="اكتب ملاحظة دراسية أو فكرة سريعة ثم اضغط حفظ البطاقة..."></textarea>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-          <span style="font-size:0.7rem;color:var(--muted);" id="wordCount">0 كلمة</span>
-          <div style="display:flex;gap:6px;">
-            <button class="small-btn" onclick="addNoteCard()">+ حفظ كبطاقة</button>
-            <button class="small-btn" onclick="copyAllNotes()">نسخ الكل</button>
+
+        <!-- Sub-tool 1: Flashcards -->
+        <div class="sub-panel active" id="stool-cards">
+          <div class="flashcard-box" onclick="flipCurrentCard()" id="flashcardBox">
+            <div style="font-size:0.65rem;color:var(--muted);margin-bottom:4px;" id="fcCounter">بطاقة 0/0 (اضغط لقلب البطاقة)</div>
+            <div style="font-size:0.88rem;font-weight:700;" id="fcText">أضف بطاقة سؤال وجواب للمراجعة السريعة!</div>
+          </div>
+          <div style="display:flex;justify-content:center;gap:6px;margin-bottom:8px;">
+            <button class="small-btn" onclick="nextFlashcard(-1)">◀ السابق</button>
+            <button class="small-btn" onclick="deleteCurrentCard()" style="color:var(--danger);">حذف</button>
+            <button class="small-btn" onclick="nextFlashcard(1)">التالي ▶</button>
+          </div>
+          <div class="form-row">
+            <input type="text" class="input-box" id="fcFrontInp" placeholder="السؤال أو المصطلح...">
+            <input type="text" class="input-box" id="fcBackInp" placeholder="الإجابة أو التعريف...">
+            <button class="add-btn" onclick="addFlashcard()">+</button>
+          </div>
+        </div>
+
+        <!-- Sub-tool 2: Reading Calculator & Solved Problems Counter -->
+        <div class="sub-panel" id="stool-calc">
+          <div style="background:var(--card-light);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px;">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--primary);margin-bottom:6px;">📖 حاسبة ختم الصفحات والكتب:</div>
+            <div class="form-row">
+              <input type="number" class="input-box" id="calcPages" placeholder="عدد الصفحات (مثلاً 200)" oninput="calcReadingPlan()">
+              <input type="number" class="input-box" id="calcDays" placeholder="الأيام المتبقية (مثلاً 10)" oninput="calcReadingPlan()">
+            </div>
+            <div style="font-size:0.74rem;color:var(--accent);" id="calcResult">أدخل الصفحات والأيام لمعرفة خطتك اليومية.</div>
+          </div>
+          <div style="background:var(--card-light);border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:0.75rem;font-weight:700;">✍️ عداد المسائل والتمارين المحلولة اليوم:</div>
+              <div style="font-size:1.1rem;font-weight:800;color:var(--primary);margin-top:2px;" id="probCounterTxt">0 تمرين محلول</div>
+            </div>
+            <div style="display:flex;gap:5px;">
+              <button class="add-btn" onclick="addSolvedProblem(1)">+1</button>
+              <button class="small-btn" onclick="addSolvedProblem(-1)">-1</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-tool 3: Formula Cheat Sheet & Mistake Bank -->
+        <div class="sub-panel" id="stool-formulas">
+          <div class="form-row">
+            <input type="text" class="input-box" id="formulaInp" placeholder="احفظ قانوناً هاماً أو سؤالاً أخطأت فيه...">
+            <select class="mini-select" id="formulaType">
+              <option value="📐 قانون">📐 قانون</option>
+              <option value="⚠️ خطأ شائع">⚠️ خطأ</option>
+            </select>
+            <button class="add-btn" onclick="addFormulaItem()">+</button>
+          </div>
+          <ul class="item-list" id="formulaList"></ul>
+        </div>
+      </div>
+
+      <!-- TAB 4: Smart Multi-Notes (Cornell, Search, Pin, Timestamp, Export) -->
+      <div class="panel" id="tab-notes">
+        <div style="display:flex;gap:5px;margin-bottom:6px;">
+          <input type="text" class="input-box" id="noteSearch" placeholder="🔍 ابحث في ملاحظاتك..." oninput="renderNotesList()">
+          <button class="small-btn" onclick="insertNoteTemplate()">📋 قالب كورنيل</button>
+          <button class="small-btn" onclick="exportNotesTxt()" id="lblExportTxt">TXT</button>
+        </div>
+        <div class="item-list" id="notesList" style="max-height:95px;margin-bottom:6px;"></div>
+        <textarea class="notes-area" id="notesBox" placeholder="دوّن ملخصك أو أفكارك هنا..."></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+          <span style="font-size:0.66rem;color:var(--muted);" id="wordCount">0 كلمة</span>
+          <div style="display:flex;gap:5px;">
+            <button class="small-btn" onclick="insertTimestamp()">🕒 وقت</button>
+            <button class="small-btn" onclick="addNoteCard()" id="lblSaveNote">+ حفظ بطاقة</button>
+            <button class="small-btn" onclick="copyAllNotes()" id="lblCopyAll">نسخ الكل</button>
           </div>
         </div>
       </div>
 
-      <!-- TAB 4: Weekly Heatmap, Daily Goal & Calm Breathing -->
+      <!-- TAB 5: Stats, Zen Garden, Hydration & Wellness -->
       <div class="panel" id="tab-calm">
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;margin-bottom:4px;">
-          <span>🎯 الهدف اليومي: <strong id="goalLabel">0 / 120 د</strong></span>
-          <span id="quoteBox" style="color:var(--primary);font-size:0.72rem;">الهدوء يصنع الإنجاز</span>
+        <div class="garden-box">
+          <div>
+            <div style="font-size:0.76rem;font-weight:800;color:var(--primary);" id="rankTitle">🌱 الرتبة: متعلم طموح</div>
+            <div style="font-size:0.66rem;color:var(--muted);" id="gardenDesc">أكمل الجلسات لتنمو شجرتك وتزهر!</div>
+          </div>
+          <div style="font-size:1.7rem;" id="bigTreeIcon">🌱</div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.72rem;margin-bottom:3px;">
+          <span><span id="lblGoalText">الهدف اليومي:</span> <strong id="goalLabel">0 / 120 د</strong></span>
+          <span id="lifetimeHoursLbl" style="color:var(--accent);font-size:0.68rem;">الإجمالي: 0 ساعة</span>
         </div>
         <div class="prog-bar-wrap"><div class="prog-bar-fill" id="goalProgFill"></div></div>
 
-        <div style="font-size:0.74rem;color:var(--muted);margin-top:8px;">📅 التزامك خلال آخر 7 أيام:</div>
+        <div style="font-size:0.68rem;color:var(--muted);margin-top:4px;" id="lblStreakTitle">📅 التزامك خلال آخر 7 أيام:</div>
         <div class="heatmap-row" id="heatmapRow"></div>
 
-        <hr style="border:none;border-top:1px solid var(--border);margin:10px 0;">
-        <div style="text-align:center;">
-          <div class="breath-circle" id="breathCircle">اضغط للبدء</div>
-          <button class="small-btn" id="breathBtn" onclick="toggleBreathing()">🧘 تمرين التنفس المربع (4-4-4-4)</button>
+        <!-- Hydration Water Tracker -->
+        <div style="text-align:center;border-top:1px solid var(--border);padding-top:7px;margin-top:4px;">
+          <div style="font-size:0.68rem;color:var(--muted);">💧 شرب الماء لتنشيط الذاكرة (اضغط على الكوب):</div>
+          <div class="water-row" id="waterRow"></div>
+        </div>
+
+        <!-- Breathing & Power Nap -->
+        <div style="text-align:center;border-top:1px solid var(--border);padding-top:7px;margin-top:4px;">
+          <div class="breath-circle" id="breathCircle">ابدأ</div>
+          <div style="display:flex;justify-content:center;gap:6px;">
+            <button class="small-btn" id="breathBtn" onclick="toggleBreathing()">🧘 تمرين التنفس (4-4-4-4)</button>
+            <button class="small-btn" onclick="startPowerNap()">😴 قيلولة الطاقة (20د)</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Settings, Themes & Privacy Modal -->
+  <!-- Settings, 20 Languages, 10 Themes & Backup Modal -->
   <div class="modal" id="settingsModal">
     <div class="modal-card">
-      <h3 style="margin-bottom:12px;color:var(--primary);font-size:1rem;">⚙️ الإعدادات والتخصيص الشامل</h3>
+      <h3 style="margin-bottom:10px;color:var(--primary);font-size:0.92rem;" id="lblSettingsTitle">⚙️ الإعدادات الشاملة واللغات</h3>
 
       <div class="modal-row">
-        <span>🎨 ثيم الألوان المريح:</span>
-        <select class="mini-select" id="inpTheme" onchange="applyTheme(this.value)">
-          <option value="mint">النعناع الهادئ (افتراضي)</option>
-          <option value="amber">دفء الغروب الليلي</option>
-          <option value="nordic">الأزرق القطبي</option>
-          <option value="amoled">الليل الفحمي (AMOLED)</option>
+        <span id="lblLangOpt">🌍 اللغة (20 Languages):</span>
+        <select class="mini-select" id="inpLang" onchange="changeLanguage(this.value)">
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="tr">Türkçe</option>
+          <option value="id">Bahasa Indonesia</option>
+          <option value="ms">Bahasa Melayu</option>
+          <option value="hi">हिन्दी</option>
+          <option value="ur">اردو</option>
+          <option value="fa">فارسی</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="zh">中文</option>
+          <option value="pt">Português</option>
+          <option value="ru">Русский</option>
+          <option value="it">Italiano</option>
+          <option value="nl">Nederlands</option>
+          <option value="pl">Polski</option>
+          <option value="vi">Tiếng Việt</option>
         </select>
       </div>
 
-      <div class="modal-row"><span>وقت التركيز (دقيقة):</span><input type="number" id="inpFocus" class="num-input" min="1" max="180"></div>
-      <div class="modal-row"><span>الاستراحة القصيرة (دقيقة):</span><input type="number" id="inpShort" class="num-input" min="1" max="60"></div>
-      <div class="modal-row"><span>الاستراحة الطويلة (دقيقة):</span><input type="number" id="inpLong" class="num-input" min="1" max="90"></div>
-      <div class="modal-row"><span>الهدف اليومي (دقيقة):</span><input type="number" id="inpGoal" class="num-input" min="15" max="600"></div>
+      <div class="modal-row">
+        <span id="lblThemeOpt">🎨 الثيم اللوني (10 ثيمات):</span>
+        <select class="mini-select" id="inpTheme" onchange="applyTheme(this.value)">
+          <option value="mint">النعناع الهادئ (Mint)</option>
+          <option value="amber">دفء الغروب (Amber)</option>
+          <option value="nordic">الأزرق القطبي (Nordic)</option>
+          <option value="amoled">الليل الفحمي (AMOLED)</option>
+          <option value="forest">الغابة العميقة (Forest)</option>
+          <option value="espresso">قهوة الإسبريسو (Espresso)</option>
+          <option value="rose">الوردي الهادئ (Rose)</option>
+          <option value="ocean">المحيط الهادئ (Ocean)</option>
+          <option value="slate">الرمادي الكلاسيكي (Slate)</option>
+          <option value="cream">النهار الكريمي (Cream Light)</option>
+        </select>
+      </div>
+
+      <div class="modal-row"><span id="lblFocusTime">تركيز (دقيقة):</span><input type="number" id="inpFocus" class="num-input" min="1" max="180"></div>
+      <div class="modal-row"><span id="lblShortTime">راحة قصيرة (دقيقة):</span><input type="number" id="inpShort" class="num-input" min="1" max="60"></div>
+      <div class="modal-row"><span id="lblLongTime">استراحة طويلة (دقيقة):</span><input type="number" id="inpLong" class="num-input" min="1" max="90"></div>
+      <div class="modal-row"><span id="lblGoalMin">الهدف اليومي (دقيقة):</span><input type="number" id="inpGoal" class="num-input" min="15" max="600"></div>
 
       <div class="modal-row">
         <span>🔔 نغمة انتهاء الجلسة:</span>
-        <select class="mini-select" id="inpBell" onchange="previewBell(this.value)">
+        <select class="mini-select" id="inpBell" onchange="playBell(this.value)">
           <option value="bowl">وعاء تبتي دافئ (528Hz)</option>
           <option value="chime">جرس هادئ ناعم</option>
           <option value="bird">إشراقة الصباح</option>
@@ -327,30 +472,272 @@
 
       <div class="modal-row"><span>بدء الاستراحة تلقائياً:</span><input type="checkbox" id="inpAutoBreak"></div>
       <div class="modal-row"><span>صوت تكتكة ثوانٍ خافتة:</span><input type="checkbox" id="inpTick"></div>
-      <div class="modal-row"><span>وضع التركيز الصارم (منع التخطي):</span><input type="checkbox" id="inpStrict"></div>
+      <div class="modal-row"><span>وضع التركيز الصارم (منع الإيقاف):</span><input type="checkbox" id="inpStrict"></div>
 
-      <div style="display:flex;gap:8px;margin-top:14px;">
-        <button class="btn btn-main" style="padding:9px;" onclick="saveSettings()">حفظ الإعدادات</button>
-        <button class="btn btn-sec" style="padding:9px;" onclick="closeSettings()">إغلاق</button>
+      <div style="display:flex;gap:6px;margin-top:10px;">
+        <button class="small-btn" style="flex:1;" onclick="exportFullBackup()">📦 نسخ احتياطي شامل</button>
+        <button class="small-btn" style="flex:1;" onclick="document.getElementById('importFile').click()">📂 استعادة البيانات</button>
+        <input type="file" id="importFile" style="display:none" accept=".json" onchange="importFullBackup(event)">
       </div>
 
-      <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);font-size:0.7rem;color:var(--muted);line-height:1.5;">
-        <strong>🔒 سياسة الخصوصية والأمان القانوني (Google Play):</strong><br>
-        يعمل تطبيق Zen Study محلياً بالكامل (Offline-First). لا يجمع أو يرسل أي بيانات شخصية أو ملاحظات لأي خادم خارجي، وجميع الأصوات مُولّدة برمجياً (خالية 100% من الموسيقى وحقوق الطبع والنشر).
+      <div style="display:flex;gap:6px;margin-top:12px;">
+        <button class="btn btn-main" style="padding:8px;" onclick="saveSettings()"><span id="lblSaveSet">حفظ الإعدادات</span></button>
+        <button class="btn btn-sec" style="padding:8px;" onclick="closeSettings()"><span id="lblCloseSet">إغلاق</span></button>
+      </div>
+
+      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:0.65rem;color:var(--muted);line-height:1.4;">
+        🔒 <strong>سياسة الخصوصية لمتجر Google Play:</strong> يعمل التطبيق محلياً 100% بدون إنترنت، ولا يجمع أي بيانات شخصية، وجميع الأصوات طبيعية مولدة برمجياً بدون أي موسيقى.
       </div>
     </div>
   </div>
 
   <script>
-    /* ==========================================
-       1. CONFIG, STATE & HAPTICS
-       ========================================== */
-    const cfg = JSON.parse(localStorage.getItem('zen_cfg_v3') || JSON.stringify({
+    /* ========================================================
+       1. 20 LANGUAGES DICTIONARY (OPTIMISTIC & COMPLETE)
+       ======================================================== */
+    const DICT = {
+      ar: {
+        brand:"Zen Study", focus:"تركيز", short:"راحة", long:"طويلة", watch:"مفتوح",
+        start:"بدء الجلسة", pause:"إيقاف مؤقت", resume:"متابعة", reset:"إعادة", exitZen:"خروج ✕",
+        tabSounds:"🔥 الأصوات", tabTasks:"✅ المهام", tabTools:"🧠 أدوات", tabNotes:"📝 ملاحظات", tabCalm:"📊 إنجاز",
+        catCozy:"🔥 دفء (5)", catNature:"🌲 طبيعة (5)", catStudy:"✍️ دراسة (5)", catFocus:"🧠 عزل (5)",
+        clearDone:"مسح المنتهية", exportTxt:"TXT", saveNote:"+ حفظ بطاقة", copyAll:"نسخ الكل",
+        goalText:"الهدف اليومي:", streakTitle:"📅 التزامك خلال آخر 7 أيام:", settingsTitle:"⚙️ الإعدادات الشاملة واللغات",
+        langOpt:"🌍 اللغة:", themeOpt:"🎨 الثيم:", focusTime:"تركيز (د):", shortTime:"راحة (د):", longTime:"طويلة (د):", goalMin:"الهدف (د):",
+        saveSet:"حفظ", closeSet:"إغلاق", boost:"🚀 انطلق (5ث)",
+        quotes:[
+          "✨ \"كل خطوة هادئة اليوم تقربك نحو حلمك الكبير.\"",
+          "🌱 \"عقلك يزداد إشراقاً وقوة مع كل صفحة تتعلمها.\"",
+          "💡 \"الهدوء يصنع المعجزات؛ ابدأ الآن وستفخر بنفسك.\"",
+          "🌟 \"أنت قادر على تحقيق إنجاز رائع في هذه الجلسة!\""
+        ]
+      },
+      en: {
+        brand:"Zen Study", focus:"Focus", short:"Short", long:"Long", watch:"Free",
+        start:"Start Session", pause:"Pause", resume:"Resume", reset:"Reset", exitZen:"Exit ✕",
+        tabSounds:"🔥 Sounds", tabTasks:"✅ Tasks", tabTools:"🧠 Tools", tabNotes:"📝 Notes", tabCalm:"📊 Stats",
+        catCozy:"🔥 Cozy (5)", catNature:"🌲 Nature (5)", catStudy:"✍️ Study (5)", catFocus:"🧠 Focus (5)",
+        clearDone:"Clear Done", exportTxt:"TXT", saveNote:"+ Save Card", copyAll:"Copy All",
+        goalText:"Daily Goal:", streakTitle:"📅 Last 7 Days Activity:", settingsTitle:"⚙️ Settings & 20 Languages",
+        langOpt:"🌍 Language:", themeOpt:"🎨 Theme:", focusTime:"Focus (m):", shortTime:"Short (m):", longTime:"Long (m):", goalMin:"Goal (m):",
+        saveSet:"Save", closeSet:"Close", boost:"🚀 5s Boost",
+        quotes:[
+          "✨ \"Every calm step today brings you closer to your grand dream.\"",
+          "🌱 \"Your mind grows brighter with every page you master.\"",
+          "💡 \"Calm persistence creates miracles; start now and be proud.\"",
+          "🌟 \"You are capable of achieving amazing focus right now!\""
+        ]
+      },
+      es: {
+        brand:"Zen Study", focus:"Enfoque", short:"Breve", long:"Largo", watch:"Libre",
+        start:"Iniciar", pause:"Pausa", resume:"Continuar", reset:"Reiniciar", exitZen:"Salir ✕",
+        tabSounds:"🔥 Sonidos", tabTasks:"✅ Tareas", tabTools:"🧠 Estudio", tabNotes:"📝 Notas", tabCalm:"📊 Progreso",
+        catCozy:"🔥 Cálido", catNature:"🌲 Natura", catStudy:"✍️ Estudio", catFocus:"🧠 Aislar",
+        clearDone:"Borrar hechas", exportTxt:"TXT", saveNote:"+ Guardar", copyAll:"Copiar",
+        goalText:"Meta diaria:", streakTitle:"📅 Últimos 7 días:", settingsTitle:"⚙️ Ajustes e Idioma",
+        langOpt:"🌍 Idioma:", themeOpt:"🎨 Tema:", focusTime:"Enfoque (m):", shortTime:"Breve (m):", longTime:"Largo (m):", goalMin:"Meta (m):",
+        saveSet:"Guardar", closeSet:"Cerrar", boost:"🚀 Impulso 5s",
+        quotes:["✨ \"Cada pequeño paso te acerca a tu gran sueño.\"", "🌱 \"Tu mente brilla más con cada nuevo aprendizaje.\""]
+      },
+      fr: {
+        brand:"Zen Study", focus:"Focus", short:"Court", long:"Long", watch:"Chrono",
+        start:"Démarrer", pause:"Pause", resume:"Reprendre", reset:"Reset", exitZen:"Quitter ✕",
+        tabSounds:"🔥 Sons", tabTasks:"✅ Tâches", tabTools:"🧠 Outils", tabNotes:"📝 Notes", tabCalm:"📊 Progrès",
+        catCozy:"🔥 Chaleur", catNature:"🌲 Nature", catStudy:"✍️ Étude", catFocus:"🧠 Focus",
+        clearDone:"Effacer faits", exportTxt:"TXT", saveNote:"+ Sauver", copyAll:"Copier",
+        goalText:"Objectif:", streakTitle:"📅 7 derniers jours:", settingsTitle:"⚙️ Paramètres et Langue",
+        langOpt:"🌍 Langue:", themeOpt:"🎨 Thème:", focusTime:"Focus (m):", shortTime:"Court (m):", longTime:"Long (m):", goalMin:"Objectif (m):",
+        saveSet:"Enregistrer", closeSet:"Fermer", boost:"🚀 Élan 5s",
+        quotes:["✨ \"Chaque pas calme vous rapproche de votre grand rêve.\"", "🌱 \"Votre esprit grandit avec chaque nouvelle page.\""]
+      },
+      de: {
+        brand:"Zen Study", focus:"Fokus", short:"Kurz", long:"Lang", watch:"Frei",
+        start:"Starten", pause:"Pause", resume:"Weiter", reset:"Reset", exitZen:"Beenden ✕",
+        tabSounds:"🔥 Klänge", tabTasks:"✅ Aufgaben", tabTools:"🧠 Lernen", tabNotes:"📝 Notizen", tabCalm:"📊 Statistik",
+        catCozy:"🔥 Gemütlich", catNature:"🌲 Natur", catStudy:"✍️ Studie", catFocus:"🧠 Fokus",
+        clearDone:"Erledigte löschen", exportTxt:"TXT", saveNote:"+ Speichern", copyAll:"Kopieren",
+        goalText:"Tagesziel:", streakTitle:"📅 Letzte 7 Tage:", settingsTitle:"⚙️ Einstellungen & Sprache",
+        langOpt:"🌍 Sprache:", themeOpt:"🎨 Thema:", focusTime:"Fokus (m):", shortTime:"Kurz (m):", longTime:"Lang (m):", goalMin:"Ziel (m):",
+        saveSet:"Speichern", closeSet:"Schließen", boost:"🚀 5s Start",
+        quotes:["✨ \"Jeder ruhige Schritt bringt dich deinem Traum näher.\"", "🌱 \"Dein Geist wächst mit jedem neuen Wissen.\""]
+      },
+      tr: {
+        brand:"Zen Study", focus:"Odak", short:"Kısa", long:"Uzun", watch:"Serbest",
+        start:"Başlat", pause:"Duraklat", resume:"Devam", reset:"Sıfırla", exitZen:"Çıkış ✕",
+        tabSounds:"🔥 Sesler", tabTasks:"✅ Görevler", tabTools:"🧠 Araçlar", tabNotes:"📝 Notlar", tabCalm:"📊 İstatistik",
+        catCozy:"🔥 Sıcak", catNature:"🌲 Doğa", catStudy:"✍️ Çalışma", catFocus:"🧠 Odak",
+        clearDone:"Bitenleri Sil", exportTxt:"TXT", saveNote:"+ Kaydet", copyAll:"Kopyala",
+        goalText:"Günlük Hedef:", streakTitle:"📅 Son 7 Gün:", settingsTitle:"⚙️ Ayarlar ve Dil",
+        langOpt:"🌍 Dil:", themeOpt:"🎨 Tema:", focusTime:"Odak (dk):", shortTime:"Kısa (dk):", longTime:"Uzun (dk):", goalMin:"Hedef (dk):",
+        saveSet:"Kaydet", closeSet:"Kapat", boost:"🚀 5sn Başla",
+        quotes:["✨ \"Her sakin adım seni büyük hayaline yaklaştırır.\"", "🌱 \"Zihnin her yeni bilgiyle güçlenir.\""]
+      },
+      id: {
+        brand:"Zen Study", focus:"Fokus", short:"Pendek", long:"Panjang", watch:"Bebas",
+        start:"Mulai", pause:"Jeda", resume:"Lanjut", reset:"Reset", exitZen:"Keluar ✕",
+        tabSounds:"🔥 Suara", tabTasks:"✅ Tugas", tabTools:"🧠 Alat", tabNotes:"📝 Catatan", tabCalm:"📊 Statistik",
+        catCozy:"🔥 Nyaman", catNature:"🌲 Alam", catStudy:"✍️ Belajar", catFocus:"🧠 Fokus",
+        clearDone:"Hapus Selesai", exportTxt:"TXT", saveNote:"+ Simpan", copyAll:"Salin",
+        goalText:"Target Harian:", streakTitle:"📅 7 Hari Terakhir:", settingsTitle:"⚙️ Pengaturan & Bahasa",
+        langOpt:"🌍 Bahasa:", themeOpt:"🎨 Tema:", focusTime:"Fokus (m):", shortTime:"Pendek (m):", longTime:"Panjang (m):", goalMin:"Target (m):",
+        saveSet:"Simpan", closeSet:"Tutup", boost:"🚀 Mulai 5d",
+        quotes:["✨ \"Setiap langkah kecil membawamu dekat ke impianmu.\""]
+      },
+      ms: {
+        brand:"Zen Study", focus:"Fokus", short:"Pendek", long:"Panjang", watch:"Bebas",
+        start:"Mula", pause:"Jeda", resume:"Sambung", reset:"Set Semula", exitZen:"Keluar ✕",
+        tabSounds:"🔥 Bunyi", tabTasks:"✅ Tugasan", tabTools:"🧠 Alat", tabNotes:"📝 Nota", tabCalm:"📊 Rekod",
+        catCozy:"🔥 Selesa", catNature:"🌲 Alam", catStudy:"✍️ Belajar", catFocus:"🧠 Fokus",
+        clearDone:"Padam Selesai", exportTxt:"TXT", saveNote:"+ Simpan", copyAll:"Salin",
+        goalText:"Sasaran Harian:", streakTitle:"📅 7 Hari Terakhir:", settingsTitle:"⚙️ Tetapan & Bahasa",
+        langOpt:"🌍 Bahasa:", themeOpt:"🎨 Tema:", focusTime:"Fokus (m):", shortTime:"Pendek (m):", longTime:"Panjang (m):", goalMin:"Sasaran (m):",
+        saveSet:"Simpan", closeSet:"Tutup", boost:"🚀 Mula 5s",
+        quotes:["✨ \"Setiap langkah tenang membawa anda ke impian besar.\""]
+      },
+      hi: {
+        brand:"Zen Study", focus:"ध्यान", short:"छोटा", long:"लंबा", watch:"खुला",
+        start:"शुरू करें", pause:"विराम", resume:"जारी", reset:"रीसेट", exitZen:"बाहर ✕",
+        tabSounds:"🔥 ध्वनियां", tabTasks:"✅ कार्य", tabTools:"🧠 उपकरण", tabNotes:"📝 नोट्स", tabCalm:"📊 प्रगति",
+        catCozy:"🔥 आराम", catNature:"🌲 प्रकृति", catStudy:"✍️ अध्ययन", catFocus:"🧠 फोकस",
+        clearDone:"पूर्ण हटाएं", exportTxt:"TXT", saveNote:"+ सहेजें", copyAll:"कॉपी",
+        goalText:"दैनिक लक्ष्य:", streakTitle:"📅 पिछले 7 दिन:", settingsTitle:"⚙️ सेटिंग्स और भाषा",
+        langOpt:"🌍 भाषा:", themeOpt:"🎨 थीम:", focusTime:"ध्यान (m):", shortTime:"छोटा (m):", longTime:"लंबा (m):", goalMin:"लक्ष्य (m):",
+        saveSet:"सहेजें", closeSet:"बंद करें", boost:"🚀 5s बूस्ट",
+        quotes:["✨ \"हर छोटा कदम आपको आपके बड़े सपने के करीब लाता है।\""]
+      },
+      ur: {
+        brand:"Zen Study", focus:"توجہ", short:"چھوٹا", long:"لمبا", watch:"آزاد",
+        start:"شروع کریں", pause:"توقف", resume:"جاری", reset:"ری سیٹ", exitZen:"باہر ✕",
+        tabSounds:"🔥 آوازیں", tabTasks:"✅ کام", tabTools:"🧠 اوزار", tabNotes:"📝 نوٹس", tabCalm:"📊 کارکردگی",
+        catCozy:"🔥 پرسکون", catNature:"🌲 فطرت", catStudy:"✍️ مطالعہ", catFocus:"🧠 توجہ",
+        clearDone:"مکمل حذف", exportTxt:"TXT", saveNote:"+ محفوظ", copyAll:"کاپی",
+        goalText:"روزانہ ہدف:", streakTitle:"📅 پچھلے 7 دن:", settingsTitle:"⚙️ ترتیبات اور زبان",
+        langOpt:"🌍 زبان:", themeOpt:"🎨 تھیم:", focusTime:"توجہ (م):", shortTime:"چھوٹا (م):", longTime:"لمبا (م):", goalMin:"ہدف (م):",
+        saveSet:"محفوظ", closeSet:"بند", boost:"🚀 5s آغاز",
+        quotes:["✨ \"ہر چھوٹا قدم آپ کو آپ کے بڑے خواب کے قریب لاتا ہے۔\""]
+      },
+      fa: {
+        brand:"Zen Study", focus:"تمرکز", short:"کوتاه", long:"طولانی", watch:"آزاد",
+        start:"شروع جلسه", pause:"مکث", resume:"ادامه", reset:"بازنشانی", exitZen:"خروج ✕",
+        tabSounds:"🔥 صداها", tabTasks:"✅ کارها", tabTools:"🧠 ابزارها", tabNotes:"📝 یادداشت", tabCalm:"📊 آمار",
+        catCozy:"🔥 دنج", catNature:"🌲 طبیعت", catStudy:"✍️ مطالعه", catFocus:"🧠 تمرکز",
+        clearDone:"حذف انجام‌شده", exportTxt:"TXT", saveNote:"+ ذخیره", copyAll:"کپی",
+        goalText:"هدف روزانه:", streakTitle:"📅 ۷ روز گذشته:", settingsTitle:"⚙️ تنظیمات و زبان",
+        langOpt:"🌍 زبان:", themeOpt:"🎨 تم:", focusTime:"تمرکز (د):", shortTime:"کوتاه (د):", longTime:"طولانی (د):", goalMin:"هدف (د):",
+        saveSet:"ذخیره", closeSet:"بستن", boost:"🚀 شروع ۵ث",
+        quotes:["✨ \"هر قدم آرام امروز شما را به رویای بزرگتان نزدیک می‌کند.\""]
+      },
+      ja: {
+        brand:"Zen Study", focus:"集中", short:"短休", long:"長休", watch:"自由",
+        start:"開始", pause:"一時停止", resume:"再開", reset:"リセット", exitZen:"終了 ✕",
+        tabSounds:"🔥 音", tabTasks:"✅ タスク", tabTools:"🧠 学習", tabNotes:"📝 メモ", tabCalm:"📊 統計",
+        catCozy:"🔥 暖炉", catNature:"🌲 自然", catStudy:"✍️ 勉強", catFocus:"🧠 集中",
+        clearDone:"完了削除", exportTxt:"TXT", saveNote:"+ 保存", copyAll:"コピー",
+        goalText:"目標:", streakTitle:"📅 過去7日間:", settingsTitle:"⚙️ 設定と言語",
+        langOpt:"🌍 言語:", themeOpt:"🎨 テーマ:", focusTime:"集中 (分):", shortTime:"短休 (分):", longTime:"長休 (分):", goalMin:"目標 (分):",
+        saveSet:"保存", closeSet:"閉じる", boost:"🚀 5秒開始",
+        quotes:["✨ \"小さな一歩一歩が大きな夢へと繋がります。\""]
+      },
+      ko: {
+        brand:"Zen Study", focus:"집중", short:"짧은휴식", long:"긴휴식", watch:"자유",
+        start:"시작", pause:"일시정지", resume:"재개", reset:"초기화", exitZen:"나가기 ✕",
+        tabSounds:"🔥 사운드", tabTasks:"✅ 할일", tabTools:"🧠 도구", tabNotes:"📝 메모", tabCalm:"📊 통계",
+        catCozy:"🔥 아늑함", catNature:"🌲 자연", catStudy:"✍️ 공부", catFocus:"🧠 집중",
+        clearDone:"완료 삭제", exportTxt:"TXT", saveNote:"+ 저장", copyAll:"복사",
+        goalText:"일일 목표:", streakTitle:"📅 최근 7일:", settingsTitle:"⚙️ 설정 및 언어",
+        langOpt:"🌍 언어:", themeOpt:"🎨 테마:", focusTime:"집중 (분):", shortTime:"짧은 (분):", longTime:"긴 (분):", goalMin:"목표 (분):",
+        saveSet:"저장", closeSet:"닫기", boost:"🚀 5초 시작",
+        quotes:["✨ \"작은 걸음 하나하나가 위대한 꿈으로 이끕니다.\""]
+      },
+      zh: {
+        brand:"Zen Study", focus:"专注", short:"短休", long:"长休", watch:"正计时",
+        start:"开始专注", pause:"暂停", resume:"继续", reset:"重置", exitZen:"退出 ✕",
+        tabSounds:"🔥 白噪音", tabTasks:"✅ 任务", tabTools:"🧠 助学", tabNotes:"📝 笔记", tabCalm:"📊 统计",
+        catCozy:"🔥 温暖", catNature:"🌲 自然", catStudy:"✍️ 伴学", catFocus:"🧠 深度",
+        clearDone:"清除完成", exportTxt:"TXT", saveNote:"+ 保存", copyAll:"复制",
+        goalText:"今日目标:", streakTitle:"📅 最近7天记录:", settingsTitle:"⚙️ 设置与语言",
+        langOpt:"🌍 语言:", themeOpt:"🎨 主题:", focusTime:"专注 (分):", shortTime:"短休 (分):", longTime:"长休 (分):", goalMin:"目标 (分):",
+        saveSet:"保存", closeSet:"关闭", boost:"🚀 5秒启动",
+        quotes:["✨ \"每一个平静的步伐都在让你靠近伟大的梦想。\""]
+      },
+      pt: {
+        brand:"Zen Study", focus:"Foco", short:"Curta", long:"Longa", watch:"Livre",
+        start:"Iniciar", pause:"Pausar", resume:"Retomar", reset:"Reset", exitZen:"Sair ✕",
+        tabSounds:"🔥 Sons", tabTasks:"✅ Tarefas", tabTools:"🧠 Estudo", tabNotes:"📝 Notas", tabCalm:"📊 Progresso",
+        catCozy:"🔥 Aconchego", catNature:"🌲 Natureza", catStudy:"✍️ Estudo", catFocus:"🧠 Foco",
+        clearDone:"Limpar feitas", exportTxt:"TXT", saveNote:"+ Salvar", copyAll:"Copiar",
+        goalText:"Meta Diária:", streakTitle:"📅 Últimos 7 dias:", settingsTitle:"⚙️ Configurações",
+        langOpt:"🌍 Idioma:", themeOpt:"🎨 Tema:", focusTime:"Foco (m):", shortTime:"Curta (m):", longTime:"Longa (m):", goalMin:"Meta (m):",
+        saveSet:"Salvar", closeSet:"Fechar", boost:"🚀 Impulso 5s",
+        quotes:["✨ \"Cada pequeno passo te aproxima do teu grande sonho.\""]
+      },
+      ru: {
+        brand:"Zen Study", focus:"Фокус", short:"Отдых", long:"Пауза", watch:"Свободно",
+        start:"Старт", pause:"Пауза", resume:"Далее", reset:"Сброс", exitZen:"Выход ✕",
+        tabSounds:"🔥 Звуки", tabTasks:"✅ Задачи", tabTools:"🧠 Учеба", tabNotes:"📝 Заметки", tabCalm:"📊 Статистика",
+        catCozy:"🔥 Уют", catNature:"🌲 Природа", catStudy:"✍️ Учеба", catFocus:"🧠 Фокус",
+        clearDone:"Удалить", exportTxt:"TXT", saveNote:"+ Сохр.", copyAll:"Копир.",
+        goalText:"Цель дня:", streakTitle:"📅 Последние 7 дней:", settingsTitle:"⚙️ Настройки и язык",
+        langOpt:"🌍 Язык:", themeOpt:"🎨 Тема:", focusTime:"Фокус (м):", shortTime:"Отдых (м):", longTime:"Пауза (м):", goalMin:"Цель (м):",
+        saveSet:"Сохранить", closeSet:"Закрыть", boost:"🚀 Старт 5с",
+        quotes:["✨ \"Каждый спокойный шаг приближает вас к мечте.\""]
+      },
+      it: {
+        brand:"Zen Study", focus:"Focus", short:"Breve", long:"Lungo", watch:"Libero",
+        start:"Avvia", pause:"Pausa", resume:"Riprendi", reset:"Reset", exitZen:"Esci ✕",
+        tabSounds:"🔥 Suoni", tabTasks:"✅ Attività", tabTools:"🧠 Studio", tabNotes:"📝 Note", tabCalm:"📊 Statistiche",
+        catCozy:"🔥 Calore", catNature:"🌲 Natura", catStudy:"✍️ Studio", catFocus:"🧠 Focus",
+        clearDone:"Pulisci", exportTxt:"TXT", saveNote:"+ Salva", copyAll:"Copia",
+        goalText:"Obiettivo:", streakTitle:"📅 Ultimi 7 giorni:", settingsTitle:"⚙️ Impostazioni",
+        langOpt:"🌍 Lingua:", themeOpt:"🎨 Tema:", focusTime:"Focus (m):", shortTime:"Breve (m):", longTime:"Lungo (m):", goalMin:"Obiettivo (m):",
+        saveSet:"Salva", closeSet:"Chiudi", boost:"🚀 Avvio 5s",
+        quotes:["✨ \"Ogni piccolo passo ti avvicina al tuo grande sogno.\""]
+      },
+      nl: {
+        brand:"Zen Study", focus:"Focus", short:"Kort", long:"Lang", watch:"Vrij",
+        start:"Start", pause:"Pauze", resume:"Hervat", reset:"Reset", exitZen:"Sluit ✕",
+        tabSounds:"🔥 Geluid", tabTasks:"✅ Taken", tabTools:"🧠 Studie", tabNotes:"📝 Notities", tabCalm:"📊 Voortgang",
+        catCozy:"🔥 Gezellig", catNature:"🌲 Natuur", catStudy:"✍️ Studie", catFocus:"🧠 Focus",
+        clearDone:"Wis klaar", exportTxt:"TXT", saveNote:"+ Opslaan", copyAll:"Kopieer",
+        goalText:"Dagdoel:", streakTitle:"📅 Laatste 7 dagen:", settingsTitle:"⚙️ Instellingen",
+        langOpt:"🌍 Taal:", themeOpt:"🎨 Thema:", focusTime:"Focus (m):", shortTime:"Kort (m):", longTime:"Lang (m):", goalMin:"Doel (m):",
+        saveSet:"Opslaan", closeSet:"Sluiten", boost:"🚀 5s Start",
+        quotes:["✨ \"Elke rustige stap brengt je dichter bij je droom.\""]
+      },
+      pl: {
+        brand:"Zen Study", focus:"Skupienie", short:"Krótka", long:"Długa", watch:"Stoper",
+        start:"Start", pause:"Pauza", resume:"Wznów", reset:"Reset", exitZen:"Wyjdź ✕",
+        tabSounds:"🔥 Dźwięki", tabTasks:"✅ Zadania", tabTools:"🧠 Nauka", tabNotes:"📝 Notatki", tabCalm:"📊 Statystyki",
+        catCozy:"🔥 Ciepło", catNature:"🌲 Natura", catStudy:"✍️ Nauka", catFocus:"🧠 Fokus",
+        clearDone:"Usuń gotowe", exportTxt:"TXT", saveNote:"+ Zapisz", copyAll:"Kopiuj",
+        goalText:"Cel dnia:", streakTitle:"📅 Ostatnie 7 dni:", settingsTitle:"⚙️ Ustawienia",
+        langOpt:"🌍 Język:", themeOpt:"🎨 Motyw:", focusTime:"Skupienie (m):", shortTime:"Krótka (m):", longTime:"Długa (m):", goalMin:"Cel (m):",
+        saveSet:"Zapisz", closeSet:"Zamknij", boost:"🚀 5s Start",
+        quotes:["✨ \"Każdy mały krok przybliża Cię do marzenia.\""]
+      },
+      vi: {
+        brand:"Zen Study", focus:"Tập trung", short:"Ngắn", long:"Dài", watch:"Tự do",
+        start:"Bắt đầu", pause:"Tạm dừng", resume:"Tiếp tục", reset:"Đặt lại", exitZen:"Thoát ✕",
+        tabSounds:"🔥 Âm thanh", tabTasks:"✅ Nhiệm vụ", tabTools:"🧠 Học tập", tabNotes:"📝 Ghi chú", tabCalm:"📊 Thống kê",
+        catCozy:"🔥 Ấm cúng", catNature:"🌲 Tự nhiên", catStudy:"✍️ Học bài", catFocus:"🧠 Tập trung",
+        clearDone:"Xóa xong", exportTxt:"TXT", saveNote:"+ Lưu", copyAll:"Sao chép",
+        goalText:"Mục tiêu:", streakTitle:"📅 7 ngày qua:", settingsTitle:"⚙️ Cài đặt & Ngôn ngữ",
+        langOpt:"🌍 Ngôn ngữ:", themeOpt:"🎨 Giao diện:", focusTime:"Tập trung (p):", shortTime:"Ngắn (p):", longTime:"Dài (p):", goalMin:"Mục tiêu (p):",
+        saveSet:"Lưu", closeSet:"Đóng", boost:"🚀 5s Bắt đầu",
+        quotes:["✨ \"Mỗi bước nhỏ đều đưa bạn đến gần hơn với ước mơ.\""]
+      }
+    };
+
+    /* ========================================================
+       2. STATE & CONFIGURATION
+       ======================================================== */
+    const cfg = JSON.parse(localStorage.getItem('zen_cfg_v5') || JSON.stringify({
       focus: 25, short: 5, long: 15, goal: 120,
       theme: 'mint', bell: 'bowl', autoBreak: false, tick: false, strict: false
     }));
+    let currentLang = localStorage.getItem('zen_lang_v5') || 'ar';
 
-    function haptic(ms = 18) {
+    function haptic(ms = 15) {
       if (navigator.vibrate) try { navigator.vibrate(ms); } catch(e){}
     }
 
@@ -360,25 +747,88 @@
     }
     applyTheme(cfg.theme);
 
-    /* ==========================================
-       2. 12 GENERATIVE NATURAL SOUNDS ENGINE
-       ========================================== */
+    function toggleEyeWarmth() {
+      haptic(12);
+      document.body.classList.toggle('eye-warm');
+      document.getElementById('eyeWarmBtn').classList.toggle('active');
+    }
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('zen_lang_v5', lang);
+      const d = DICT[lang] || DICT.en;
+      document.documentElement.setAttribute('lang', lang);
+      document.documentElement.setAttribute('dir', ['ar','ur','fa'].includes(lang) ? 'rtl' : 'ltr');
+
+      document.getElementById('uiBrand').textContent = d.brand;
+      document.getElementById('lblModeFocus').textContent = `${d.focus} (${cfg.focus})`;
+      document.getElementById('lblModeShort').textContent = `${d.short} (${cfg.short})`;
+      document.getElementById('lblModeLong').textContent = `${d.long} (${cfg.long})`;
+      document.getElementById('lblModeWatch').textContent = `${d.watch} ⏱️`;
+      document.getElementById('lblStart').textContent = running ? d.pause : d.start;
+      document.getElementById('lblReset').textContent = d.reset;
+      document.getElementById('lblExitZen').textContent = d.exitZen;
+      document.getElementById('lblBoostBtn').textContent = d.boost;
+
+      document.getElementById('lblTabSounds').textContent = d.tabSounds;
+      document.getElementById('lblTabTasks').textContent = d.tabTasks;
+      document.getElementById('lblTabTools').textContent = d.tabTools;
+      document.getElementById('lblTabNotes').textContent = d.tabNotes;
+      document.getElementById('lblTabCalm').textContent = d.tabCalm;
+
+      document.getElementById('lblCatCozy').textContent = d.catCozy;
+      document.getElementById('lblCatNature').textContent = d.catNature;
+      document.getElementById('lblCatStudy').textContent = d.catStudy;
+      document.getElementById('lblCatFocus').textContent = d.catFocus;
+
+      document.getElementById('lblClearDone').textContent = d.clearDone;
+      document.getElementById('lblExportTxt').textContent = d.exportTxt;
+      document.getElementById('lblSaveNote').textContent = d.saveNote;
+      document.getElementById('lblCopyAll').textContent = d.copyAll;
+      document.getElementById('lblGoalText').textContent = d.goalText;
+      document.getElementById('lblStreakTitle').textContent = d.streakTitle;
+      document.getElementById('lblSettingsTitle').textContent = d.settingsTitle;
+      document.getElementById('lblLangOpt').textContent = d.langOpt;
+      document.getElementById('lblThemeOpt').textContent = d.themeOpt;
+      document.getElementById('lblFocusTime').textContent = d.focusTime;
+      document.getElementById('lblShortTime').textContent = d.shortTime;
+      document.getElementById('lblLongTime').textContent = d.longTime;
+      document.getElementById('lblGoalMin').textContent = d.goalMin;
+      document.getElementById('lblSaveSet').textContent = d.saveSet;
+      document.getElementById('lblCloseSet').textContent = d.closeSet;
+
+      const q = d.quotes || DICT.en.quotes;
+      document.getElementById('motivationBox').textContent = q[Math.floor(Math.random() * q.length)];
+    }
+
+    /* ========================================================
+       3. 20 NATURAL GENERATIVE SOUNDS ENGINE (ZERO MUSIC)
+       ======================================================== */
     const SOUNDS_CATALOG = [
-      // Cozy & Places (دفء وأماكن)
-      { id: 'fire', cat: 'cozy', name: '🔥 نار الحطب والتدفئة', desc: 'طقطقة جمر الخشب الدافئة', vol: 0.65 },
-      { id: 'attic', cat: 'cozy', name: '🏠 مطر على السقف', desc: 'انهمار المطر فوق الغرفة', vol: 0.5 },
-      { id: 'fan', cat: 'cozy', name: '🌀 مروحة هادئة', desc: 'طنين هوائي مستقر وعازل', vol: 0.45 },
-      { id: 'crickets', cat: 'cozy', name: '🦗 ليل الريف الهادئ', desc: 'سكون الليل في الطبيعة', vol: 0.35 },
-      // Nature (طبيعة)
-      { id: 'rain', cat: 'nature', name: '🌧️ مطر ناعم', desc: 'قطرات هادئة تريح الأعصاب', vol: 0.5 },
-      { id: 'ocean', cat: 'nature', name: '🌊 أمواج الشاطئ', desc: 'مد وجزر طبيعي كل 8 ثوانٍ', vol: 0.55 },
-      { id: 'wind', cat: 'nature', name: '🍃 نسيم الأشجار', desc: 'حفيف أوراق الغابة اللطيف', vol: 0.45 },
-      { id: 'stream', cat: 'nature', name: '🏞️ جدول ماء جاري', desc: 'خرير مياه الجبل الصافية', vol: 0.5 },
-      // Focus & Noise (عزل وترددات)
-      { id: 'brown', cat: 'focus', name: '🛡️ ضوضاء بنية عميقة', desc: 'أقوى عزل للضجيج الخارجي', vol: 0.6 },
-      { id: 'pink', cat: 'focus', name: '🌸 ضوضاء وردية متوازنة', desc: 'تردد ناعم لتهدئة التشتت', vol: 0.45 },
-      { id: 'alpha', cat: 'focus', name: '🧠 تردد التركيز (Alpha)', desc: 'همهمة صوتية نقية للمذاكرة', vol: 0.3 },
-      { id: 'library', cat: 'focus', name: '📚 سكون المكتبة', desc: 'خلفية هادئة لبيئة القراءة', vol: 0.4 }
+      // 1. Cozy & Places (5)
+      { id:'fire', cat:'cozy', name:'🔥 نار الحطب والتدفئة', desc:'طقطقة جمر الخشب الدافئة', vol:0.65 },
+      { id:'attic', cat:'cozy', name:'🏠 مطر على السقف', desc:'انهمار المطر فوق الغرفة', vol:0.5 },
+      { id:'carrain', cat:'cozy', name:'🚗 مطر نافذة السيارة', desc:'عزلة دافئة ومريحة', vol:0.5 },
+      { id:'kettle', cat:'cozy', name:'🍵 بخار إبريق الشاي', desc:'همس ماء دافئ على الحطب', vol:0.4 },
+      { id:'train', cat:'cozy', name:'🚂 قطار ليلي هادئ', desc:'إيقاع قضبان منتظم للسفر الذهني', vol:0.45 },
+      // 2. Nature (5)
+      { id:'rain', cat:'nature', name:'🌧️ مطر ناعم', desc:'قطرات هادئة تريح الأعصاب', vol:0.5 },
+      { id:'ocean', cat:'nature', name:'🌊 أمواج الشاطئ', desc:'مد وجزر طبيعي كل 8 ثوانٍ', vol:0.55 },
+      { id:'wind', cat:'nature', name:'🍃 نسيم الأشجار', desc:'حفيف أوراق الغابة اللطيف', vol:0.45 },
+      { id:'stream', cat:'nature', name:'🏞️ جدول ماء جاري', desc:'خرير مياه الجبل الصافية', vol:0.5 },
+      { id:'blizzard', cat:'nature', name:'❄️ رياح ثلجية قطبية', desc:'دفء الغرفة وسط الثلوج', vol:0.4 },
+      // 3. Study With Me Ambience (5)
+      { id:'pencil', cat:'study', name:'✏️ كتابة بالقلم الرصاص', desc:'رفيق يدرس معك بهدوء', vol:0.45 },
+      { id:'pages', cat:'study', name:'📖 تقليب صفحات كتاب', desc:'حفيف ورق هادئ ومحفز', vol:0.4 },
+      { id:'typing', cat:'study', name:'⌨️ نقرات لوحة مفاتيح', desc:'إيقاع كتابة ناعم ومنظم', vol:0.35 },
+      { id:'library', cat:'study', name:'🏛️ سكون قاعة المكتبة', desc:'خلفية هادئة لبيئة القراءة', vol:0.4 },
+      { id:'cave', cat:'study', name:'💧 قطرات ماء الكهف', desc:'صدى قطرات هادئة متباعدة', vol:0.35 },
+      // 4. Noise & Brainwaves (5)
+      { id:'brown', cat:'focus', name:'🛡️ ضوضاء بنية عميقة', desc:'أقوى عزل للضجيج الخارجي', vol:0.6 },
+      { id:'pink', cat:'focus', name:'🌸 ضوضاء وردية متوازنة', desc:'تردد ناعم لتهدئة التشتت', vol:0.45 },
+      { id:'green', cat:'focus', name:'🌿 ضوضاء الطبيعة الخضراء', desc:'التردد الأوسط لراحة الأذن', vol:0.5 },
+      { id:'fan', cat:'focus', name:'🌀 مروحة الغرفة الهادئة', desc:'طنين هوائي مستقر وعازل', vol:0.45 },
+      { id:'alpha', cat:'focus', name:'🧠 تردد التركيز (Alpha)', desc:'همهمة نقية لتحفيز الاستيعاب', vol:0.3 }
     ];
 
     let currentSoundCat = 'cozy';
@@ -398,7 +848,6 @@
         const isOn = !!activeNodes[s.id];
         const card = document.createElement('div');
         card.className = 'sound-card' + (isOn ? ' on' : '');
-        card.id = 'scard-' + s.id;
         card.innerHTML = `
           <div class="sound-top" onclick="toggleSound('${s.id}')">
             <span>${s.name}</span>
@@ -412,9 +861,9 @@
     }
 
     function filterSoundCat(cat, btn) {
-      haptic(12);
+      haptic(10);
       currentSoundCat = cat;
-      document.querySelectorAll('#tab-sounds .chip').forEach(c => c.classList.remove('active'));
+      btn.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
       renderSoundGrid();
     }
@@ -425,49 +874,39 @@
       const len = sr * 4;
       const buffer = audioCtx.createBuffer(1, len, sr);
       const data = buffer.getChannelData(0);
+      let lastOut = 0, b0 = 0, b1 = 0, b2 = 0, env = 0;
 
-      let lastOut = 0, b0 = 0, b1 = 0, b2 = 0;
+      for (let i = 0; i < len; i++) {
+        const t = i / sr;
+        const white = Math.random() * 2 - 1;
 
-      if (id === 'fire') {
-        // Cozy Fireplace: Warm hearth rumble + random wood crackle impulses
-        let crackleEnv = 0;
-        for (let i = 0; i < len; i++) {
-          const white = Math.random() * 2 - 1;
-          lastOut = (lastOut + 0.018 * white) / 1.018;
-          // Trigger random wood pops & crackles
-          if (Math.random() < 0.0018) crackleEnv = 0.9 + Math.random() * 0.6;
-          crackleEnv *= 0.992;
-          const crackle = (Math.random() * 2 - 1) * crackleEnv;
-          data[i] = (lastOut * 2.4) + (crackle * 0.45);
-        }
-      } else if (id === 'crickets') {
-        // Night Crickets: soft background + periodic high pulse chirps
-        for (let i = 0; i < len; i++) {
-          const t = i / sr;
-          const chirpCycle = (t % 1.2) < 0.35 ? Math.sin(2 * Math.PI * 18 * t) : 0;
-          const carrier = Math.sin(2 * Math.PI * 4100 * t);
-          const bg = (Math.random() * 2 - 1) * 0.015;
-          data[i] = bg + (carrier * Math.max(0, chirpCycle) * 0.06);
-        }
-      } else if (id === 'alpha') {
-        // Pure calming warm drone (110Hz + 118Hz gentle beating)
-        for (let i = 0; i < len; i++) {
-          const t = i / sr;
-          data[i] = (Math.sin(2 * Math.PI * 108 * t) + Math.sin(2 * Math.PI * 116 * t)) * 0.12;
-        }
-      } else {
-        // Noise bases (Brown & Pink textures)
-        for (let i = 0; i < len; i++) {
-          const white = Math.random() * 2 - 1;
-          if (id === 'brown' || id === 'ocean' || id === 'fan' || id === 'attic') {
-            lastOut = (lastOut + (0.02 * white)) / 1.02;
-            data[i] = lastOut * 3.0;
-          } else {
-            b0 = 0.99765 * b0 + white * 0.0990460;
-            b1 = 0.96300 * b1 + white * 0.2965164;
-            b2 = 0.57000 * b2 + white * 1.0526913;
-            data[i] = (b0 + b1 + b2 + white * 0.1848) * 0.065;
-          }
+        if (id === 'fire') {
+          lastOut = (lastOut + 0.02 * white) / 1.02;
+          if (Math.random() < 0.002) env = 0.95;
+          env *= 0.991;
+          data[i] = (lastOut * 2.3) + (white * env * 0.45);
+        } else if (id === 'train') {
+          lastOut = (lastOut + 0.02 * white) / 1.02;
+          const rhythm = ((t % 0.85) < 0.06 || (t % 0.85 > 0.14 && t % 0.85 < 0.20)) ? 1.8 : 0.7;
+          data[i] = lastOut * 2.2 * rhythm;
+        } else if (id === 'pencil' || id === 'pages' || id === 'typing') {
+          const rate = id === 'typing' ? 0.003 : id === 'pencil' ? 0.0012 : 0.0003;
+          if (Math.random() < rate) env = 0.7;
+          env *= id === 'pages' ? 0.9985 : 0.988;
+          data[i] = white * env * 0.35 + (white * 0.015);
+        } else if (id === 'cave') {
+          const drop = (t % 1.6) < 0.08 ? Math.sin(2 * Math.PI * 1100 * t) * Math.exp(-(t % 1.6) * 35) : 0;
+          data[i] = drop * 0.25 + (white * 0.01);
+        } else if (id === 'alpha') {
+          data[i] = (Math.sin(2 * Math.PI * 110 * t) + Math.sin(2 * Math.PI * 118 * t)) * 0.12;
+        } else if (['brown','ocean','fan','attic','carrain'].includes(id)) {
+          lastOut = (lastOut + (0.02 * white)) / 1.02;
+          data[i] = lastOut * 3.0;
+        } else {
+          b0 = 0.99765 * b0 + white * 0.0990460;
+          b1 = 0.96300 * b1 + white * 0.2965164;
+          b2 = 0.57000 * b2 + white * 1.0526913;
+          data[i] = (b0 + b1 + b2 + white * 0.1848) * 0.065;
         }
       }
 
@@ -477,48 +916,31 @@
 
       const filter = audioCtx.createBiquadFilter();
       const gainNode = audioCtx.createGain();
-      gainNode.gain.value = isMasterMuted ? 0 : initialVol;
+      gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(isMasterMuted ? 0 : initialVol, audioCtx.currentTime + 1.2);
 
       let lfo = null;
-      if (id === 'fire') {
-        filter.type = 'lowpass'; filter.frequency.value = 2400;
+      if (id === 'ocean' || id === 'blizzard' || id === 'wind') {
+        filter.type = id === 'ocean' ? 'lowpass' : 'bandpass';
+        filter.frequency.value = id === 'ocean' ? 450 : 420;
+        lfo = audioCtx.createOscillator();
+        lfo.frequency.value = id === 'ocean' ? 0.12 : 0.18;
+        const lfoG = audioCtx.createGain();
+        lfoG.gain.value = 180;
+        lfo.connect(lfoG);
+        lfoG.connect(filter.frequency);
+        lfo.start();
+        src.connect(filter);
+        filter.connect(gainNode);
+      } else if (id === 'green') {
+        filter.type = 'bandpass'; filter.frequency.value = 500; filter.Q.value = 1.2;
         src.connect(filter); filter.connect(gainNode);
-      } else if (id === 'attic') {
-        filter.type = 'bandpass'; filter.frequency.value = 650; filter.Q.value = 0.6;
-        src.connect(filter); filter.connect(gainNode);
-      } else if (id === 'fan') {
-        filter.type = 'bandpass'; filter.frequency.value = 210; filter.Q.value = 2.2;
-        src.connect(filter); filter.connect(gainNode);
-      } else if (id === 'rain') {
-        filter.type = 'bandpass'; filter.frequency.value = 1150; filter.Q.value = 0.7;
-        src.connect(filter); filter.connect(gainNode);
-      } else if (id === 'stream') {
-        filter.type = 'bandpass'; filter.frequency.value = 1600; filter.Q.value = 1.4;
-        lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.35;
-        const lfoG = audioCtx.createGain(); lfoG.gain.value = 350;
-        lfo.connect(lfoG); lfoG.connect(filter.frequency); lfo.start();
-        src.connect(filter); filter.connect(gainNode);
-      } else if (id === 'ocean') {
-        filter.type = 'lowpass'; filter.frequency.value = 460;
-        const waveGain = audioCtx.createGain(); waveGain.gain.value = 0.55;
-        lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.12;
-        const lfoG = audioCtx.createGain(); lfoG.gain.value = 0.38;
-        lfo.connect(lfoG); lfoG.connect(waveGain.gain); lfo.start();
-        src.connect(filter); filter.connect(waveGain); waveGain.connect(gainNode);
-      } else if (id === 'wind') {
-        filter.type = 'bandpass'; filter.frequency.value = 390; filter.Q.value = 3.6;
-        lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.17;
-        const lfoG = audioCtx.createGain(); lfoG.gain.value = 170;
-        lfo.connect(lfoG); lfoG.connect(filter.frequency); lfo.start();
-        src.connect(filter); filter.connect(gainNode);
-      } else if (id === 'brown') {
-        filter.type = 'lowpass'; filter.frequency.value = 330;
-        src.connect(filter); filter.connect(gainNode);
-      } else if (id === 'library') {
-        filter.type = 'lowpass'; filter.frequency.value = 520;
+      } else if (id === 'carrain' || id === 'brown') {
+        filter.type = 'lowpass'; filter.frequency.value = 340;
         src.connect(filter); filter.connect(gainNode);
       } else {
-        src.connect(gainNode);
+        filter.type = 'lowpass'; filter.frequency.value = 1800;
+        src.connect(filter); filter.connect(gainNode);
       }
 
       gainNode.connect(audioCtx.destination);
@@ -527,7 +949,7 @@
     }
 
     function toggleSound(id) {
-      haptic(15);
+      haptic(12);
       const item = SOUNDS_CATALOG.find(s => s.id === id);
       if (activeNodes[id]) {
         try { activeNodes[id].src.stop(); if (activeNodes[id].lfo) activeNodes[id].lfo.stop(); } catch(e){}
@@ -549,7 +971,7 @@
     }
 
     function toggleMasterMute() {
-      haptic(20);
+      haptic(18);
       isMasterMuted = !isMasterMuted;
       const btn = document.getElementById('muteAllBtn');
       btn.textContent = isMasterMuted ? '🔇' : '🔊';
@@ -567,13 +989,14 @@
     }
 
     function applyPreset(name) {
-      haptic(25);
+      haptic(20);
       stopAllSounds();
       let list = [];
       if (name === 'winter') list = ['fire', 'rain'];
+      else if (name === 'studywithme') list = ['pencil', 'pages', 'rain'];
       else if (name === 'deep') list = ['brown', 'fan'];
-      else if (name === 'night') list = ['ocean', 'crickets'];
-      else if (name === 'custom') list = JSON.parse(localStorage.getItem('zen_custom_preset') || '["fire"]');
+      else if (name === 'train') list = ['train', 'carrain'];
+      else if (name === 'custom') list = JSON.parse(localStorage.getItem('zen_custom_preset_v5') || '["fire","rain"]');
       list.forEach(id => {
         const item = SOUNDS_CATALOG.find(s => s.id === id);
         if (item) activeNodes[id] = createSynthesizedSound(id, item.vol);
@@ -582,30 +1005,23 @@
     }
 
     function saveCustomPreset() {
-      haptic(20);
-      const activeIds = Object.keys(activeNodes);
-      localStorage.setItem('zen_custom_preset', JSON.stringify(activeIds));
-      alert('تم حفظ خلطتك الصوتية الحالية بنجاح ⭐');
+      haptic(15);
+      localStorage.setItem('zen_custom_preset_v5', JSON.stringify(Object.keys(activeNodes)));
+      alert('⭐ تم حفظ خلطتك الصوتية المفضلة بنجاح!');
     }
 
-    /* ==========================================
-       3. CHIMES & SUBTLE TICKING
-       ========================================== */
     function playBell(type = cfg.bell) {
       initAudio();
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const g = audioCtx.createGain();
-      osc.type = 'sine';
       const freqs = { bowl: 528, chime: 659.25, bird: 880, crystal: 1046.5 };
       osc.frequency.setValueAtTime(freqs[type] || 528, now);
-      if (type === 'bird') osc.frequency.exponentialRampToValueAtTime(1174, now + 0.25);
-      g.gain.setValueAtTime(0.28, now);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+      g.gain.setValueAtTime(0.26, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 2.1);
       osc.connect(g); g.connect(audioCtx.destination);
-      osc.start(now); osc.stop(now + 2.2);
+      osc.start(now); osc.stop(now + 2.1);
     }
-    function previewBell(val) { playBell(val); }
 
     function playSubtleTick() {
       if (!cfg.tick || isMasterMuted) return;
@@ -613,16 +1029,16 @@
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const g = audioCtx.createGain();
-      osc.frequency.setValueAtTime(900, now);
-      g.gain.setValueAtTime(0.015, now);
+      osc.frequency.setValueAtTime(850, now);
+      g.gain.setValueAtTime(0.012, now);
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
       osc.connect(g); g.connect(audioCtx.destination);
       osc.start(now); osc.stop(now + 0.03);
     }
 
-    /* ==========================================
-       4. TIMER, STOPWATCH & STATE PERSISTENCE
-       ========================================== */
+    /* ========================================================
+       4. SMART TIMER (POMODORO, 52/17, 90/20, STOPWATCH, 5s BOOST)
+       ======================================================== */
     let currentMode = 'focus';
     let totalSeconds = cfg.focus * 60;
     let leftSeconds = totalSeconds;
@@ -630,12 +1046,6 @@
     let timerId = null;
     let running = false;
     const circumference = 2 * Math.PI * 105;
-
-    function syncDurationLabels() {
-      document.getElementById('lblFocus').textContent = cfg.focus;
-      document.getElementById('lblShort').textContent = cfg.short;
-      document.getElementById('lblLong').textContent = cfg.long;
-    }
 
     function renderTimer() {
       const secs = currentMode === 'stopwatch' ? elapsedStopwatch : leftSeconds;
@@ -649,44 +1059,61 @@
     }
 
     function setMode(mode) {
-      if (running && cfg.strict) return alert('وضع التركيز الصارم مفعل! أكمل الجلسة أولاً.');
+      if (running && cfg.strict) return alert('🔒 وضع التركيز الصارم مفعل! أكمل الجلسة أولاً.');
       if (running) toggleTimer();
       currentMode = mode;
       document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-      const map = { focus: 'btnFocus', short: 'btnShort', long: 'btnLong', stopwatch: 'btnWatch' };
-      document.getElementById(map[mode]).classList.add('active');
+      const map = { focus:'btnFocus', short:'btnShort', long:'btnLong', m5217:'btn5217', m9020:'btn9020', stopwatch:'btnWatch' };
+      if (document.getElementById(map[mode])) document.getElementById(map[mode]).classList.add('active');
       document.getElementById('quickAdjRow').style.visibility = mode === 'stopwatch' ? 'hidden' : 'visible';
 
-      if (mode === 'stopwatch') {
-        elapsedStopwatch = 0;
-      } else {
-        totalSeconds = cfg[mode] * 60;
-        leftSeconds = totalSeconds;
-      }
-      document.getElementById('startBtn').textContent = 'بدء الجلسة';
+      if (mode === 'stopwatch') elapsedStopwatch = 0;
+      else if (mode === 'm5217') { totalSeconds = 52 * 60; leftSeconds = totalSeconds; }
+      else if (mode === 'm9020') { totalSeconds = 90 * 60; leftSeconds = totalSeconds; }
+      else { totalSeconds = cfg[mode] * 60; leftSeconds = totalSeconds; }
+
+      const d = DICT[currentLang] || DICT.en;
+      document.getElementById('lblStart').textContent = d.start;
       renderTimer();
     }
 
     function adjustMinutes(delta) {
       if (currentMode === 'stopwatch') return;
-      haptic(12);
+      haptic(10);
       leftSeconds = Math.max(60, Math.min(180 * 60, leftSeconds + delta * 60));
       if (leftSeconds > totalSeconds) totalSeconds = leftSeconds;
       renderTimer();
     }
 
+    function triggerFiveSecRule() {
+      if (running) return;
+      haptic([30, 40, 30]);
+      let c = 5;
+      const sub = document.getElementById('realClockSub');
+      const iv = setInterval(() => {
+        sub.textContent = `🚀 انطلاق خلال ${c}...`;
+        c--;
+        if (c < 0) {
+          clearInterval(iv);
+          sub.textContent = '🔥 طاقة تركيز قصوى!';
+          toggleTimer();
+        }
+      }, 650);
+    }
+
     function toggleTimer() {
-      haptic(25);
-      const btn = document.getElementById('startBtn');
+      haptic(20);
+      const d = DICT[currentLang] || DICT.en;
+      const lbl = document.getElementById('lblStart');
       if (running) {
-        if (cfg.strict && currentMode === 'focus') return alert('وضع التركيز الصارم يمنع الإيقاف المؤقت!');
+        if (cfg.strict && ['focus','m5217','m9020'].includes(currentMode)) return alert('🔒 وضع التركيز الصارم يمنع الإيقاف!');
         clearInterval(timerId);
         running = false;
-        btn.textContent = 'متابعة';
+        lbl.textContent = d.resume;
       } else {
         initAudio();
         running = true;
-        btn.textContent = 'إيقاف مؤقت';
+        lbl.textContent = d.pause;
         timerId = setInterval(() => {
           playSubtleTick();
           if (currentMode === 'stopwatch') {
@@ -706,9 +1133,9 @@
     function completeSession() {
       clearInterval(timerId);
       running = false;
-      haptic([80, 50, 120]);
+      haptic([70, 50, 110]);
       playBell();
-      if (currentMode === 'focus') {
+      if (['focus','m5217','m9020'].includes(currentMode)) {
         recordStudyMinutes(Math.round(totalSeconds / 60), true);
         incrementActiveTaskPomo();
         setMode('short');
@@ -719,71 +1146,72 @@
     }
 
     function resetTimer() {
-      if (running && cfg.strict) return alert('وضع التركيز الصارم مفعل!');
-      haptic(18);
+      if (running && cfg.strict) return alert('🔒 وضع التركيز الصارم مفعل!');
+      haptic(15);
       if (running) toggleTimer();
-      if (currentMode === 'stopwatch') elapsedStopwatch = 0;
-      else { totalSeconds = cfg[currentMode] * 60; leftSeconds = totalSeconds; }
-      document.getElementById('startBtn').textContent = 'بدء الجلسة';
-      renderTimer();
+      setMode(currentMode);
     }
 
     function skipSession() {
-      if (cfg.strict) return alert('وضع التركيز الصارم يمنع التخطي!');
-      haptic(18);
+      if (cfg.strict) return alert('🔒 وضع التركيز الصارم يمنع التخطي!');
+      haptic(15);
       setMode(currentMode === 'focus' ? 'short' : 'focus');
     }
 
+    function startPowerNap() {
+      openTab('sounds', document.querySelector('.tab-btn'));
+      if (running) toggleTimer();
+      totalSeconds = 20 * 60;
+      leftSeconds = totalSeconds;
+      renderTimer();
+      toggleTimer();
+    }
+
     function toggleZenMode() {
-      haptic(20);
+      haptic(15);
       document.body.classList.toggle('zen-mode');
     }
 
-    /* ==========================================
-       5. TASKS WITH TAGS, ESTIMATORS & LINKING
-       ========================================== */
-    let tasks = JSON.parse(localStorage.getItem('zen_tasks_v3') || '[]');
+    /* ========================================================
+       5. TASKS & TEMPLATES
+       ======================================================== */
+    let tasks = JSON.parse(localStorage.getItem('zen_tasks_v5') || '[]');
     let activeTaskIdx = -1;
 
     function renderTasks() {
       const list = document.getElementById('taskList');
       list.innerHTML = '';
       let doneCount = 0;
-
       tasks.forEach((t, idx) => {
         if (t.done) doneCount++;
         const dots = '●'.repeat(Math.min(t.completed || 0, t.est || 1)) + '○'.repeat(Math.max(0, (t.est || 1) - (t.completed || 0)));
         const li = document.createElement('li');
-        li.className = 'task-item' + (t.done ? ' done' : '') + (idx === activeTaskIdx ? ' selected' : '');
+        li.className = 'list-item' + (t.done ? ' done' : '') + (idx === activeTaskIdx ? ' selected' : '');
         li.innerHTML = `
-          <div style="display:flex;align-items:center;gap:7px;flex:1;cursor:pointer;" onclick="selectActiveTask(${idx})">
+          <div style="display:flex;align-items:center;gap:6px;flex:1;cursor:pointer;" onclick="selectActiveTask(${idx})">
             <input type="checkbox" ${t.done ? 'checked' : ''} onclick="event.stopPropagation(); toggleTaskDone(${idx})">
-            <span class="tag-badge">${t.tag || 'عام'}</span>
+            <span class="badge">${t.tag || 'عام'}</span>
             <span class="t-title">${t.text}</span>
           </div>
-          <span class="pomo-dots">${dots}</span>
-          <button style="background:none;border:none;color:#ff6b6b;cursor:pointer;" onclick="deleteTask(${idx})">✕</button>
+          <span style="font-size:0.65rem;color:var(--primary);">${dots}</span>
+          <button style="background:none;border:none;color:var(--danger);cursor:pointer;" onclick="deleteTask(${idx})">✕</button>
         `;
         list.appendChild(li);
       });
-
       const pct = tasks.length ? Math.round((doneCount / tasks.length) * 100) : 0;
       document.getElementById('taskProgressTxt').textContent = `إنجاز المهام: ${pct}% (${doneCount}/${tasks.length})`;
       document.getElementById('taskProgFill').style.width = pct + '%';
-
       const banner = document.getElementById('activeTaskBanner');
-      if (activeTaskIdx >= 0 && tasks[activeTaskIdx]) {
-        banner.textContent = `🎯 المهمة النشطة: ${tasks[activeTaskIdx].text}`;
-      } else {
-        banner.textContent = '🎯 اختر مهمة من القائمة أو ابدأ التركيز مباشرة';
-      }
+      banner.textContent = (activeTaskIdx >= 0 && tasks[activeTaskIdx])
+        ? `🎯 المهمة النشطة: ${tasks[activeTaskIdx].text}`
+        : '🎯 اختر مهمة أو ابدأ جلستك بتفاؤل';
     }
 
     function addTask() {
       const inp = document.getElementById('taskInput');
       const text = inp.value.trim();
       if (!text) return;
-      haptic(15);
+      haptic(12);
       tasks.push({
         text,
         tag: document.getElementById('taskTag').value,
@@ -793,57 +1221,153 @@
       });
       inp.value = '';
       if (activeTaskIdx === -1) activeTaskIdx = tasks.length - 1;
-      localStorage.setItem('zen_tasks_v3', JSON.stringify(tasks));
+      localStorage.setItem('zen_tasks_v5', JSON.stringify(tasks));
       renderTasks();
     }
 
-    function selectActiveTask(idx) {
-      haptic(12);
-      activeTaskIdx = idx;
-      renderTasks();
-    }
-
-    function toggleTaskDone(idx) {
+    function loadTaskTemplate() {
       haptic(15);
-      tasks[idx].done = !tasks[idx].done;
-      localStorage.setItem('zen_tasks_v3', JSON.stringify(tasks));
+      const tpl = [
+        { text: 'مراجعة ملخص الدرس السابق (5 د)', tag: 'مراجعة', est: 1, completed: 0, done: false },
+        { text: 'دراسة وفهم الفصل الأساسي بعمق', tag: 'MIT ⭐', est: 2, completed: 0, done: false },
+        { text: 'حل تمارين وأسئلة التطبيق', tag: 'تمارين', est: 1, completed: 0, done: false }
+      ];
+      tasks = tasks.concat(tpl);
+      if (activeTaskIdx === -1) activeTaskIdx = 0;
+      localStorage.setItem('zen_tasks_v5', JSON.stringify(tasks));
       renderTasks();
     }
 
+    function selectActiveTask(idx) { activeTaskIdx = idx; renderTasks(); }
+    function toggleTaskDone(idx) { tasks[idx].done = !tasks[idx].done; localStorage.setItem('zen_tasks_v5', JSON.stringify(tasks)); renderTasks(); }
     function incrementActiveTaskPomo() {
       if (activeTaskIdx >= 0 && tasks[activeTaskIdx]) {
         tasks[activeTaskIdx].completed = (tasks[activeTaskIdx].completed || 0) + 1;
-        localStorage.setItem('zen_tasks_v3', JSON.stringify(tasks));
+        localStorage.setItem('zen_tasks_v5', JSON.stringify(tasks));
         renderTasks();
       }
     }
+    function deleteTask(idx) { tasks.splice(idx, 1); if (activeTaskIdx === idx) activeTaskIdx = -1; localStorage.setItem('zen_tasks_v5', JSON.stringify(tasks)); renderTasks(); }
+    function clearCompletedTasks() { tasks = tasks.filter(t => !t.done); activeTaskIdx = -1; localStorage.setItem('zen_tasks_v5', JSON.stringify(tasks)); renderTasks(); }
 
-    function deleteTask(idx) {
-      tasks.splice(idx, 1);
-      if (activeTaskIdx === idx) activeTaskIdx = -1;
-      localStorage.setItem('zen_tasks_v3', JSON.stringify(tasks));
-      renderTasks();
+    /* ========================================================
+       6. ACTIVE STUDY TOOLS (FLASHCARDS, READING CALC, FORMULAS)
+       ======================================================== */
+    function openStudyTool(id, btn) {
+      haptic(10);
+      btn.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('#tab-tools .sub-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('stool-' + id).classList.add('active');
     }
 
-    function clearCompletedTasks() {
-      tasks = tasks.filter(t => !t.done);
-      activeTaskIdx = -1;
-      localStorage.setItem('zen_tasks_v3', JSON.stringify(tasks));
-      renderTasks();
+    let flashcards = JSON.parse(localStorage.getItem('zen_fc_v5') || '[{"q":"ما هي قاعدة بومودورو؟","a":"25 دقيقة تركيز تام يتبعها 5 دقائق استراحة لتجديد نشاط الدماغ."}]');
+    let fcIndex = 0;
+    let fcFlipped = false;
+
+    function renderFlashcard() {
+      const cnt = document.getElementById('fcCounter');
+      const txt = document.getElementById('fcText');
+      if (!flashcards.length) {
+        cnt.textContent = '0 / 0';
+        txt.textContent = 'أضف بطاقة سؤال وجواب بالأسفل للمراجعة!';
+        return;
+      }
+      if (fcIndex >= flashcards.length) fcIndex = 0;
+      if (fcIndex < 0) fcIndex = flashcards.length - 1;
+      cnt.textContent = `${fcFlipped ? '💡 الإجابة' : '❓ السؤال'} (${fcIndex + 1}/${flashcards.length}) - اضغط للقلب`;
+      txt.textContent = fcFlipped ? flashcards[fcIndex].a : flashcards[fcIndex].q;
     }
 
-    /* ==========================================
-       6. MULTI-NOTES, PINNING, SEARCH & EXPORT
-       ========================================== */
-    let notesArr = JSON.parse(localStorage.getItem('zen_notes_v3') || '[]');
+    function flipCurrentCard() { haptic(12); fcFlipped = !fcFlipped; renderFlashcard(); }
+    function nextFlashcard(dir) { haptic(10); fcIndex += dir; fcFlipped = false; renderFlashcard(); }
+    function addFlashcard() {
+      const q = document.getElementById('fcFrontInp').value.trim();
+      const a = document.getElementById('fcBackInp').value.trim();
+      if (!q || !a) return;
+      haptic(15);
+      flashcards.push({ q, a });
+      document.getElementById('fcFrontInp').value = '';
+      document.getElementById('fcBackInp').value = '';
+      fcIndex = flashcards.length - 1;
+      fcFlipped = false;
+      localStorage.setItem('zen_fc_v5', JSON.stringify(flashcards));
+      renderFlashcard();
+    }
+    function deleteCurrentCard() {
+      if (!flashcards.length) return;
+      flashcards.splice(fcIndex, 1);
+      fcFlipped = false;
+      localStorage.setItem('zen_fc_v5', JSON.stringify(flashcards));
+      renderFlashcard();
+    }
+
+    let solvedProbs = parseInt(localStorage.getItem('zen_probs_v5') || '0');
+    function addSolvedProblem(delta) {
+      haptic(12);
+      solvedProbs = Math.max(0, solvedProbs + delta);
+      localStorage.setItem('zen_probs_v5', solvedProbs);
+      document.getElementById('probCounterTxt').textContent = `${solvedProbs} تمرين محلول`;
+    }
+    function calcReadingPlan() {
+      const p = parseInt(document.getElementById('calcPages').value) || 0;
+      const d = parseInt(document.getElementById('calcDays').value) || 0;
+      const res = document.getElementById('calcResult');
+      if (p > 0 && d > 0) {
+        const perDay = Math.ceil(p / d);
+        res.textContent = `🎯 خطتك: اقرأ ${perDay} صفحة يومياً (${Math.ceil(perDay / 2)} صفحة في كل جلسة تركيز).`;
+      } else {
+        res.textContent = 'أدخل الصفحات والأيام لمعرفة خطتك اليومية.';
+      }
+    }
+
+    let formulas = JSON.parse(localStorage.getItem('zen_formulas_v5') || '[]');
+    function renderFormulas() {
+      const ul = document.getElementById('formulaList');
+      ul.innerHTML = '';
+      formulas.forEach((f, idx) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        li.innerHTML = `<div><span class="badge">${f.type}</span> <span>${f.text}</span></div><button style="background:none;border:none;color:var(--danger);cursor:pointer;" onclick="deleteFormula(${idx})">✕</button>`;
+        ul.appendChild(li);
+      });
+    }
+    function addFormulaItem() {
+      const inp = document.getElementById('formulaInp');
+      const txt = inp.value.trim();
+      if (!txt) return;
+      formulas.unshift({ text: txt, type: document.getElementById('formulaType').value });
+      inp.value = '';
+      localStorage.setItem('zen_formulas_v5', JSON.stringify(formulas));
+      renderFormulas();
+    }
+    function deleteFormula(idx) {
+      formulas.splice(idx, 1);
+      localStorage.setItem('zen_formulas_v5', JSON.stringify(formulas));
+      renderFormulas();
+    }
+
+    /* ========================================================
+       7. SMART MULTI-NOTES (CORNELL, PIN, SEARCH, EXPORT)
+       ======================================================== */
+    let notesArr = JSON.parse(localStorage.getItem('zen_notes_v5') || '[]');
     const notesBox = document.getElementById('notesBox');
-    notesBox.value = localStorage.getItem('zen_draft_note') || '';
-
+    notesBox.value = localStorage.getItem('zen_draft_v5') || '';
     notesBox.addEventListener('input', () => {
-      localStorage.setItem('zen_draft_note', notesBox.value);
-      const words = notesBox.value.trim() ? notesBox.value.trim().split(/\s+/).length : 0;
-      document.getElementById('wordCount').textContent = `${words} كلمة`;
+      localStorage.setItem('zen_draft_v5', notesBox.value);
+      const w = notesBox.value.trim() ? notesBox.value.trim().split(/\s+/).length : 0;
+      document.getElementById('wordCount').textContent = `${w} كلمة`;
     });
+
+    function insertNoteTemplate() {
+      notesBox.value = "📌 الفكرة الرئيسية:\n- \n❓ الأسئلة المفتاحية:\n- \n💡 الملخص النهائي:\n- ";
+      localStorage.setItem('zen_draft_v5', notesBox.value);
+    }
+
+    function insertTimestamp() {
+      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      notesBox.value += ` [${now}] `;
+    }
 
     function renderNotesList() {
       const q = (document.getElementById('noteSearch').value || '').toLowerCase();
@@ -852,12 +1376,12 @@
       const sorted = [...notesArr].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
       sorted.filter(n => n.text.toLowerCase().includes(q)).forEach(n => {
         const div = document.createElement('div');
-        div.className = 'note-card' + (n.pinned ? ' pinned' : '');
+        div.className = 'list-item';
         div.innerHTML = `
-          <div style="flex:1;line-height:1.4;">${n.text}</div>
-          <div style="display:flex;gap:6px;">
+          <div style="flex:1;line-height:1.35;white-space:pre-wrap;">${n.text}</div>
+          <div style="display:flex;gap:5px;">
             <button style="background:none;border:none;cursor:pointer;" onclick="togglePinNote(${n.id})">${n.pinned ? '📌' : '📍'}</button>
-            <button style="background:none;border:none;color:#ff6b6b;cursor:pointer;" onclick="deleteNoteCard(${n.id})">✕</button>
+            <button style="background:none;border:none;color:var(--danger);cursor:pointer;" onclick="deleteNote(${n.id})">✕</button>
           </div>
         `;
         container.appendChild(div);
@@ -867,114 +1391,123 @@
     function addNoteCard() {
       const txt = notesBox.value.trim();
       if (!txt) return;
-      haptic(15);
+      haptic(12);
       notesArr.unshift({ id: Date.now(), text: txt, pinned: false });
       notesBox.value = '';
-      localStorage.setItem('zen_draft_note', '');
-      localStorage.setItem('zen_notes_v3', JSON.stringify(notesArr));
+      localStorage.setItem('zen_draft_v5', '');
+      localStorage.setItem('zen_notes_v5', JSON.stringify(notesArr));
       renderNotesList();
     }
-
     function togglePinNote(id) {
       const item = notesArr.find(n => n.id === id);
       if (item) item.pinned = !item.pinned;
-      localStorage.setItem('zen_notes_v3', JSON.stringify(notesArr));
+      localStorage.setItem('zen_notes_v5', JSON.stringify(notesArr));
       renderNotesList();
     }
-
-    function deleteNoteCard(id) {
+    function deleteNote(id) {
       notesArr = notesArr.filter(n => n.id !== id);
-      localStorage.setItem('zen_notes_v3', JSON.stringify(notesArr));
+      localStorage.setItem('zen_notes_v5', JSON.stringify(notesArr));
       renderNotesList();
     }
-
     function copyAllNotes() {
       const all = notesArr.map(n => n.text).concat(notesBox.value ? [notesBox.value] : []).join('\n---\n');
       if (navigator.clipboard) navigator.clipboard.writeText(all);
-      alert('تم نسخ جميع الملاحظات إلى الحافظة ✓');
+      alert('✓ تم نسخ جميع الملاحظات بنجاح');
     }
-
     function exportNotesTxt() {
       const all = notesArr.map(n => n.text).concat(notesBox.value ? [notesBox.value] : []).join('\n\n---\n\n');
       const blob = new Blob([all], { type: 'text/plain;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'zen-study-notes.txt';
-      a.click();
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'zen-study-notes.txt'; a.click();
     }
 
-    /* ==========================================
-       7. STATS, 7-DAY HEATMAP & BREATHING
-       ========================================== */
-    const historyStats = JSON.parse(localStorage.getItem('zen_history_v3') || '{}');
+    /* ========================================================
+       8. STATS, ZEN GARDEN, HYDRATION & BREATHING
+       ======================================================== */
+    const historyStats = JSON.parse(localStorage.getItem('zen_history_v5') || '{}');
     const todayKey = new Date().toISOString().slice(0, 10);
-    if (!historyStats[todayKey]) historyStats[todayKey] = { mins: 0, sessions: 0 };
+    if (!historyStats[todayKey]) historyStats[todayKey] = { mins: 0, sessions: 0, water: 0 };
 
     function recordStudyMinutes(mins, countSession) {
       historyStats[todayKey].mins += mins;
       if (countSession) historyStats[todayKey].sessions += 1;
-      localStorage.setItem('zen_history_v3', JSON.stringify(historyStats));
-      renderStatsAndHeatmap();
+      localStorage.setItem('zen_history_v5', JSON.stringify(historyStats));
+      renderStatsAndGarden();
     }
 
-    function renderStatsAndHeatmap() {
-      const today = historyStats[todayKey] || { mins: 0, sessions: 0 };
-      document.getElementById('statMin').textContent = `${today.mins} د اليوم`;
-      document.getElementById('statStreak').textContent = `🔥 ${today.sessions} جلسات`;
+    function renderStatsAndGarden() {
+      const today = historyStats[todayKey] || { mins: 0, sessions: 0, water: 0 };
+      document.getElementById('statMin').textContent = `${today.mins} د`;
+      document.getElementById('statStreak').textContent = `🔥 ${today.sessions}`;
       document.getElementById('goalLabel').textContent = `${today.mins} / ${cfg.goal} د`;
-      const gPct = Math.min(100, Math.round((today.mins / Math.max(1, cfg.goal)) * 100));
-      document.getElementById('goalProgFill').style.width = gPct + '%';
+      const pct = Math.min(100, Math.round((today.mins / Math.max(1, cfg.goal)) * 100));
+      document.getElementById('goalProgFill').style.width = pct + '%';
 
+      // Calculate Lifetime Minutes & Study Rank
+      const totalMinsAllTime = Object.values(historyStats).reduce((acc, d) => acc + (d.mins || 0), 0);
+      document.getElementById('lifetimeHoursLbl').textContent = `الإجمالي: ${(totalMinsAllTime / 60).toFixed(1)} ساعة`;
+
+      const treeIcon = today.sessions >= 4 ? '🌸' : today.sessions >= 2 ? '🌳' : today.sessions >= 1 ? '🌿' : '🌱';
+      document.getElementById('treeStageIcon').textContent = treeIcon;
+      document.getElementById('bigTreeIcon').textContent = treeIcon;
+
+      const rankTitle = totalMinsAllTime >= 1200 ? '🎓 الرتبة: حكيم موسوعي' : totalMinsAllTime >= 300 ? '🌳 الرتبة: باحث متألق' : totalMinsAllTime >= 60 ? '🌿 الرتبة: مثابر نشيط' : '🌱 الرتبة: متعلم طموح';
+      document.getElementById('rankTitle').textContent = rankTitle;
+
+      // 7-Day Heatmap
       const row = document.getElementById('heatmapRow');
       row.innerHTML = '';
-      const dayNames = ['أحد','إثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
       for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
+        const d = new Date(); d.setDate(d.getDate() - i);
         const k = d.toISOString().slice(0, 10);
         const m = (historyStats[k] && historyStats[k].mins) || 0;
         const col = document.createElement('div');
         col.className = 'day-col' + (m > 0 ? ' hot' : '');
-        col.innerHTML = `<div>${dayNames[d.getDay()]}</div><strong style="color:var(--primary)">${m}د</strong>`;
+        col.innerHTML = `<div>${d.toLocaleDateString(currentLang, {weekday:'short'})}</div><strong style="color:var(--primary)">${m}د</strong>`;
         row.appendChild(col);
+      }
+
+      // Water Cups (8 Cups)
+      const wRow = document.getElementById('waterRow');
+      wRow.innerHTML = '';
+      const cups = today.water || 0;
+      for (let c = 1; c <= 8; c++) {
+        const div = document.createElement('div');
+        div.className = 'water-cup' + (c <= cups ? ' filled' : '');
+        div.textContent = '💧';
+        div.onclick = () => {
+          haptic(10);
+          historyStats[todayKey].water = (historyStats[todayKey].water === c) ? c - 1 : c;
+          localStorage.setItem('zen_history_v5', JSON.stringify(historyStats));
+          renderStatsAndGarden();
+        };
+        wRow.appendChild(div);
       }
     }
 
     let breathTimer = null;
     function toggleBreathing() {
-      haptic(15);
+      haptic(12);
       const circle = document.getElementById('breathCircle');
-      const btn = document.getElementById('breathBtn');
       if (breathTimer) {
-        clearInterval(breathTimer);
-        breathTimer = null;
-        circle.className = 'breath-circle';
-        circle.textContent = 'اضغط للبدء';
-        btn.textContent = '🧘 تمرين التنفس المربع (4-4-4-4)';
+        clearInterval(breathTimer); breathTimer = null;
+        circle.className = 'breath-circle'; circle.textContent = 'ابدأ';
       } else {
-        const phases = [
-          { text: 'شهيق ببطء...', cls: 'inhale' },
-          { text: 'احبس النفس...', cls: 'inhale' },
-          { text: 'زفير هادئ...', cls: 'exhale' },
-          { text: 'استرخاء...', cls: 'exhale' }
-        ];
+        const phases = ['شهيق...', 'احبس...', 'زفير...', 'استرخِ...'];
         let step = 0;
         const run = () => {
-          circle.textContent = phases[step].text;
-          circle.className = 'breath-circle ' + phases[step].cls;
+          circle.textContent = phases[step];
+          circle.className = 'breath-circle ' + (step < 2 ? 'inhale' : 'exhale');
           step = (step + 1) % 4;
         };
-        run();
-        breathTimer = setInterval(run, 4000);
-        btn.textContent = 'إيقاف تمرين التنفس';
+        run(); breathTimer = setInterval(run, 4000);
       }
     }
 
-    /* ==========================================
-       8. TABS & SETTINGS MODAL
-       ========================================== */
+    /* ========================================================
+       9. TABS, SETTINGS & FULL JSON BACKUP / RESTORE
+       ======================================================== */
     function openTab(name, btn) {
-      haptic(12);
+      haptic(10);
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('tab-' + name).classList.add('active');
@@ -983,6 +1516,7 @@
 
     function openSettings() {
       haptic(15);
+      document.getElementById('inpLang').value = currentLang;
       document.getElementById('inpTheme').value = cfg.theme;
       document.getElementById('inpFocus').value = cfg.focus;
       document.getElementById('inpShort').value = cfg.short;
@@ -994,13 +1528,9 @@
       document.getElementById('inpStrict').checked = cfg.strict;
       document.getElementById('settingsModal').classList.add('open');
     }
-
-    function closeSettings() {
-      document.getElementById('settingsModal').classList.remove('open');
-    }
-
+    function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
     function saveSettings() {
-      haptic(20);
+      haptic(18);
       cfg.focus = Math.max(1, parseInt(document.getElementById('inpFocus').value) || 25);
       cfg.short = Math.max(1, parseInt(document.getElementById('inpShort').value) || 5);
       cfg.long  = Math.max(1, parseInt(document.getElementById('inpLong').value) || 15);
@@ -1009,19 +1539,49 @@
       cfg.autoBreak = document.getElementById('inpAutoBreak').checked;
       cfg.tick  = document.getElementById('inpTick').checked;
       cfg.strict = document.getElementById('inpStrict').checked;
-      localStorage.setItem('zen_cfg_v3', JSON.stringify(cfg));
-      syncDurationLabels();
-      renderStatsAndHeatmap();
+      localStorage.setItem('zen_cfg_v5', JSON.stringify(cfg));
+      changeLanguage(document.getElementById('inpLang').value);
+      renderStatsAndGarden();
       if (!running && currentMode !== 'stopwatch') setMode(currentMode);
       closeSettings();
     }
 
-    /* Init All */
-    syncDurationLabels();
+    function exportFullBackup() {
+      const data = {
+        cfg, tasks, flashcards, formulas, notesArr, historyStats
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'zen-study-backup.json'; a.click();
+    }
+
+    function importFullBackup(ev) {
+      const file = ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const d = JSON.parse(e.target.result);
+          if (d.tasks) { tasks = d.tasks; localStorage.setItem('zen_tasks_v5', JSON.stringify(tasks)); }
+          if (d.flashcards) { flashcards = d.flashcards; localStorage.setItem('zen_fc_v5', JSON.stringify(flashcards)); }
+          if (d.formulas) { formulas = d.formulas; localStorage.setItem('zen_formulas_v5', JSON.stringify(formulas)); }
+          if (d.notesArr) { notesArr = d.notesArr; localStorage.setItem('zen_notes_v5', JSON.stringify(notesArr)); }
+          if (d.historyStats) { Object.assign(historyStats, d.historyStats); localStorage.setItem('zen_history_v5', JSON.stringify(historyStats)); }
+          renderTasks(); renderFlashcard(); renderFormulas(); renderNotesList(); renderStatsAndGarden();
+          alert('✓ تمت استعادة جميع بياناتك بنجاح!');
+        } catch(err) { alert('ملف غير صالح'); }
+      };
+      reader.readAsText(file);
+    }
+
+    /* Initial Boot */
+    changeLanguage(currentLang);
     renderSoundGrid();
     renderTasks();
+    renderFlashcard();
+    renderFormulas();
+    document.getElementById('probCounterTxt').textContent = `${solvedProbs} تمرين محلول`;
     renderNotesList();
-    renderStatsAndHeatmap();
+    renderStatsAndGarden();
     renderTimer();
   </script>
 </body>
