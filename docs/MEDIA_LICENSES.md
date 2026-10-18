@@ -7,8 +7,8 @@ All audio shipped to Google Play must have an actual media header, an appropriat
 | `sounds/forest.ogg` | `Lelio88/dewdrop/assets/audio/forest_amb.ogg` | [Dewdrop CREDITS.md](https://github.com/Lelio88/dewdrop/blob/main/CREDITS.md), ambient CC0 / public-domain policy | Replaced invalid 404 asset, Ogg header verified |
 | `sounds/wind.ogg` | `Lelio88/dewdrop/assets/audio/fields_amb.ogg` | Dewdrop credits: field wind recording from Freesound #240914 by bdvictor, CC0 | Replaced invalid 404 asset, Ogg header verified |
 | `images/fire.svg` | In-repository SVG illustration created for this repair | Project-created graphic | Offline replacement for invalid fire.jpg |
-| `sounds/night.ogg` | Existing v21 placeholder | No valid file available | **BLOCKED** — HTML 404 |
-| `sounds/waterfall.ogg` | Existing v21 placeholder | No valid file available | **BLOCKED** — HTML 404 |
+| `sounds/night.ogg` | Former v21 placeholder | Removed invalid HTML 404; locally synthesized insect-night texture used until authentic licensed recording is sourced | **BLOCKED for real-recording release claim** |
+| `sounds/waterfall.ogg` | Former v21 placeholder | Removed invalid HTML 404; locally synthesized waterfall-like texture used until authentic licensed recording is sourced | **BLOCKED for real-recording release claim** |
 
 The rest of the pre-existing recordings have not undergone a per-file licence provenance audit yet. Do not describe them collectively as CC0 without source evidence. A complete media audit and a separate listening/looping check are release prerequisites.
 
