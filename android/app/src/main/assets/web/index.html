@@ -510,7 +510,7 @@
         <span class="eco-badge" onclick="openCloudBackupModal()">☁️ <span data-i18n="pillCloud">Google Backup</span></span>
         <span class="eco-badge" onclick="testCompletionSoundChime()">🔔 <span data-i18n="pillSound">Test Sound</span></span>
         <span class="eco-badge" onclick="shareAppWithFriends()">📤 <span data-i18n="pillShare">Share App</span></span>
-        <span class="eco-badge">🛡️ <span data-i18n="pillSecure">Anti-Mod</span></span>
+        <span class="eco-badge">🔒 <span data-i18n="pillSecure">Local Data</span></span>
       </div>
     </header>
 
@@ -738,12 +738,12 @@
           <div class="an-kpi-card" onclick="addQuickSessionRecord()">
             <div class="an-kpi-top"><span data-i18n="kpiMinutes">Active Minutes</span><span>🕒</span></div>
             <div class="an-kpi-num" id="kpiTotalMins">420</div>
-            <div class="an-kpi-trend" data-i18n="kpiTrendWeek">↑ +18% this week</div>
+            <div class="an-kpi-trend" id="kpiWeeklyTrend">Based on recorded focus sessions</div>
           </div>
           <div class="an-kpi-card" onclick="addQuickSessionRecord()">
             <div class="an-kpi-top"><span data-i18n="kpiSessions">Completed Sessions</span><span>🎯</span></div>
             <div class="an-kpi-num" id="kpiTotalSessions">18</div>
-            <div class="an-kpi-trend" data-i18n="kpiTrendGreat">↑ +12% consistency</div>
+            <div class="an-kpi-trend" id="kpiSessionTrend">Completed focus sessions only</div>
           </div>
         </div>
 
@@ -756,20 +756,18 @@
           <div class="overview-split-row">
             <div class="mini-bars-box" id="anMiniBarsBox"></div>
             <div class="donut-box">
-              <svg width="105" height="105" viewBox="0 0 100 100" style="transform:rotate(-90deg);">
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#f1f5f9" stroke-width="11"></circle>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" stroke-width="11" stroke-dasharray="238" stroke-dashoffset="76" stroke-linecap="round"></circle>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#3b82f6" stroke-width="11" stroke-dasharray="238" stroke-dashoffset="165" stroke-linecap="round"></circle>
-              </svg>
-              <div class="donut-center-txt">68%</div>
+              <div id="activityDonut" style="width:105px;height:105px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
+                <div style="width:77px;height:77px;border-radius:50%;background:white;"></div>
+              </div>
+              <div class="donut-center-txt" id="activityDonutText">—</div>
             </div>
           </div>
 
           <div class="legend-grid">
-            <div class="legend-item"><span><i class="legend-dot" style="background:#3b82f6;"></i><span data-i18n="domStudy">Study</span></span><span>38%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#10b981;"></i><span data-i18n="domSport">Workout</span></span><span>30%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#8b5cf6;"></i><span data-i18n="domRead">Reading</span></span><span>20%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#f59e0b;"></i><span data-i18n="domWork">Deep Work</span></span><span>12%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#3b82f6;"></i><span data-i18n="domStudy">Study</span></span><span id="share-study">—</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#10b981;"></i><span data-i18n="domSport">Workout</span></span><span id="share-sport">—</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#8b5cf6;"></i><span data-i18n="domRead">Reading</span></span><span id="share-read">—</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#f59e0b;"></i><span data-i18n="domWork">Deep Work</span></span><span id="share-work">—</span></div>
           </div>
         </div>
 
@@ -777,9 +775,9 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <div>
               <div style="font-size:0.74rem; opacity:0.8;" data-i18n="waveFlowTitle">Weekly Performance Index</div>
-              <div style="font-size:1.25rem; font-weight:900;">125.6K <span style="font-size:0.75rem; color:#34d399;">↑ 24%</span></div>
+              <div style="font-size:1.25rem; font-weight:700;"><span id="waveRecordedMinutes">0</span> <span style="font-size:0.75rem;opacity:.85;" id="waveUnit">min / 7 days</span></div>
             </div>
-            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;" data-i18n="peakPerfBadge">Peak Flow</span>
+            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;" id="peakPerfBadge">7 days</span>
           </div>
           <svg viewBox="0 0 320 95" style="width:100%; height:90px; overflow:visible;">
             <defs>
@@ -788,9 +786,9 @@
                 <stop offset="100%" stop-color="#6366f1" stop-opacity="0.0"/>
               </linearGradient>
             </defs>
-            <path d="M0,75 C40,45 70,80 110,50 C150,20 180,65 225,22 C260,5 290,45 320,30 L320,95 L0,95 Z" fill="url(#waveAreaGrad)"></path>
-            <path d="M0,75 C40,45 70,80 110,50 C150,20 180,65 225,22 C260,5 290,45 320,30" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"></path>
-            <circle cx="225" cy="22" r="5" fill="#10b981" stroke="#ffffff" stroke-width="2"></circle>
+            <path id="waveArea" d="M0 95 L320 95 Z" fill="url(#waveAreaGrad)"></path>
+            <path id="waveLine" d="M0 95 L320 95" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"></path>
+            <circle id="wavePeak" cx="0" cy="95" r="5" fill="#10b981" stroke="#ffffff" stroke-width="2"></circle>
           </svg>
           <div id="waveDaysRow" style="display:flex; justify-content:space-between; font-size:0.65rem; opacity:0.75; margin-top:4px;"></div>
         </div>
@@ -852,19 +850,19 @@
   <div class="modal-overlay" id="cloudBackupModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>☁️ Google Email & Drive Cloud Sync</span>
+        <span>☁️ Manual Backup & Restore</span>
         <button class="task-mini-sel" onclick="closeModal('cloudBackupModal')">✕</button>
       </div>
       <div style="background:var(--emerald-soft); color:var(--emerald); padding:10px 12px; border-radius:12px; font-size:0.74rem; font-weight:800; margin-bottom:10px;">
-        🛡️ Encrypted & Signed Backup: Save directly to your Google Email (Gmail) or Google Drive to restore on any phone without creating an internal account.
+        ⚠️ Exported backup codes contain readable personal notes and tasks. They are NOT encrypted. Share or save them privately; anyone with the code can read its contents.
       </div>
       <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
-        <button class="mbtn-pri" onclick="syncToGoogleCloudNow()">📧 Save to Gmail / Google Drive</button>
-        <button class="mbtn-sec" onclick="downloadEncryptedBackupFile()">💾 Download Backup File (.zenbackup)</button>
+        <button class="mbtn-pri" onclick="syncToGoogleCloudNow()">📤 Share Backup Code (Manual)</button>
+        <button class="mbtn-sec" onclick="downloadEncryptedBackupFile()">💾 Export Backup File (.zenbackup)</button>
       </div>
       <div style="border-top:1px solid #e2e8f0; padding-top:10px; margin-top:6px;">
         <div style="font-size:0.76rem; font-weight:800; margin-bottom:6px;">🔄 Restore Progress on New Phone:</div>
-        <textarea class="modal-inp" id="inpRestorePayload" style="height:65px; resize:none; font-size:0.72rem;" placeholder="Paste encrypted backup code from your Gmail/Drive here..."></textarea>
+        <textarea class="modal-inp" id="inpRestorePayload" style="height:65px; resize:none; font-size:0.72rem;" placeholder="Paste your backup code here (contains readable data)..."></textarea>
         <div class="modal-actions">
           <button class="mbtn-pri" style="background:var(--emerald);" onclick="restoreFromEncryptedCode()">Restore Code ✓</button>
           <button class="mbtn-sec" onclick="document.getElementById('fileRestoreInput').click()">📂 Load File</button>
