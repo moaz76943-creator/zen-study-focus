@@ -6,6 +6,10 @@ import android.net.Uri;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.app.Activity;
+import android.widget.Toast;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -19,6 +23,8 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
+    private static final int REQUEST_BACKUP_EXPORT = 7410;
+    private String backupAwaitingSave = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +119,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
+        public void exportBackupToFile(String backupCode) {
+            if (backupCode == null || !backupCode.startsWith("ZEN21::")
+                    || backupCode.length() > 14000000) return;
+            runOnUiThread(() -> {
+                backupAwaitingSave = backupCode;
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("text/plain");
+                String filename = "zen-focus-" +
+                    new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                        .format(new java.util.Date()) + ".zenbackup";
+                intent.putExtra(Intent.EXTRA_TITLE, filename);
+                try {
+                    startActivityForResult(intent, REQUEST_BACKUP_EXPORT);
+                } catch (Exception e) {
+                    backupAwaitingSave = null;
+                    Toast.makeText(MainActivity.this, "File picker unavailable; use Share Backup",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
         public void shareAppInvite(String statsSummary) {
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
@@ -131,6 +160,26 @@ public class MainActivity extends AppCompatActivity {
                 "--- COPY CODE BELOW ---\n" + encryptedBackupPayload
             );
             startActivity(Intent.createChooser(send, "Save Backup to Gmail / Google Drive"));
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQUEST_BACKUP_EXPORT) return;
+        String payload = backupAwaitingSave;
+        backupAwaitingSave = null;
+        if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null
+                || payload == null) return;
+        try (OutputStream output = getContentResolver().openOutputStream(data.getData(), "w")) {
+            if (output == null) throw new java.io.IOException("Cannot open target document");
+            output.write(payload.getBytes(StandardCharsets.UTF_8));
+            output.flush();
+            Toast.makeText(this, "Backup exported; keep the unencrypted file private",
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception error) {
+            Toast.makeText(this, "Unable to save backup; existing data unchanged",
+                    Toast.LENGTH_LONG).show();
         }
     }
 
