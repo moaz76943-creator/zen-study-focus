@@ -464,12 +464,47 @@ function verifyAndRestoreBackupCode(codeStr) {
     if (!verified) throw new Error('Invalid backup schema');
     // Validation must complete before writes. Never replace a user's work silently.
     if (!window.confirm('Restore backup? This replaces the current tasks, notes and progress. Export your current backup first.')) return false;
+    // Build and verify every storage packet before replacing any saved record.
+    // If a write fails (e.g. storage quota), roll back all six original keys.
+    const imports = [
+      ['zen_fortress_cfg_v21', verified.cfg],
+      ['zen_fortress_tasks_v21', verified.tasksList],
+      ['zen_fortress_notes_v21', verified.notesList]
+    ];
+    const updates = [];
+    for (const [key, value] of imports) {
+      const payload = JSON.stringify(value);
+      updates.push([key, JSON.stringify({payload, sig:computeHash(payload), ts:Date.now()})]);
+    }
+    const previous = new Map();
+    for (const [key] of updates) {
+      previous.set(key, localStorage.getItem(key));
+      previous.set(key + '_mirror', localStorage.getItem(key + '_mirror'));
+    }
+    try {
+      for (const [key, packet] of updates) {
+        localStorage.setItem(key, packet);
+        localStorage.setItem(key + '_mirror', packet);
+      }
+      for (const [key, packet] of updates) {
+        if (localStorage.getItem(key) !== packet || localStorage.getItem(key + '_mirror') !== packet) {
+          throw new Error('Storage verification failed');
+        }
+      }
+    } catch (storageError) {
+      for (const [key, oldValue] of previous) {
+        try {
+          if (oldValue === null) localStorage.removeItem(key);
+          else localStorage.setItem(key, oldValue);
+        } catch (rollbackError) {
+          console.error('Backup rollback failed:', key, rollbackError);
+        }
+      }
+      throw storageError;
+    }
     cfg = verified.cfg;
     tasksList = verified.tasksList;
     notesList = verified.notesList;
-    saveFortressData('zen_fortress_cfg_v21', cfg);
-    saveFortressData('zen_fortress_tasks_v21', tasksList);
-    saveFortressData('zen_fortress_notes_v21', notesList);
     syncDailyRollover();
     applyLanguage(cfg.lang);
     closeModal('cloudBackupModal');
