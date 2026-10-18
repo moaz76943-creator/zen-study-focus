@@ -42,7 +42,7 @@ const cutoff = app.indexOf('const todayISO =');
 assert.ok(cutoff > 0, 'Locale initialization not found');
 context.document = {addEventListener() {}};
 context.console = console;
-vm.runInContext(app.slice(0, cutoff) + '\\nthis._builtLanguages = DICT;', context, {filename: 'app.js:i18n-init'});
+vm.runInContext(app.slice(0, cutoff) + '\nthis._builtLanguages = DICT;', context, {filename: 'app.js:i18n-init'});
 const built = context._builtLanguages;
 assert.equal(Object.keys(built).length, 20);
 const expectedKeys = Object.keys(built.en).sort();
