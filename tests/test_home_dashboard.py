@@ -32,6 +32,17 @@ class HomeLayoutRegression(unittest.TestCase):
         self.assertIn('id="kpiTotalMins"', HTML)
         self.assertIn('id="deskClockOverlay"', HTML)
 
+    def test_activity_controls_are_accessible_buttons(self):
+        for domain in ("study", "sport", "read", "work"):
+            self.assertRegex(
+                HTML,
+                r'<button type="button" class="domain-card dom-' + domain
+                + r'[^"]*" id="domBtn-' + domain
+                + r'" onclick="switchActivityDomain\(\'' + domain
+                + r'\', this\)" aria-pressed="(?:true|false)">'
+            )
+        self.assertIn('.domain-card:focus-visible', HTML)
+
     def test_no_medical_meditation_or_language_course_added(self):
         self.assertNotIn('id="sec-meditation"', HTML)
         self.assertNotIn('id="sec-learn-languages"', HTML)
