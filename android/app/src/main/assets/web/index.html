@@ -544,7 +544,7 @@
         <div class="domain-context-bar" id="sportContextBar">
           <div>
             <div style="font-size:0.72rem; font-weight:800; color:var(--emerald);" data-i18n="sportSetsTitle">🏋️ Workout Sets & Rest</div>
-            <div style="font-size:0.84rem; font-weight:900;" id="sportSetCounterTxt">Set 1 / 4 • 12 Reps</div>
+            <div style="font-size:0.84rem; font-weight:900;" id="sportSetCounterTxt">Set 0 / 4 • 12 Reps</div>
           </div>
           <div style="display:flex; gap:5px;">
             <button class="delta-chip" onclick="logWorkoutSet()">+1 Set ✓</button>
@@ -555,7 +555,7 @@
         <div class="domain-context-bar" id="readContextBar">
           <div>
             <div style="font-size:0.72rem; font-weight:800; color:var(--violet);" data-i18n="readTrackerTitle">📖 Reading Session Progress</div>
-            <div style="font-size:0.84rem; font-weight:900;" id="readPagesCounterTxt">Pages Read Today: 24</div>
+            <div style="font-size:0.84rem; font-weight:900;" id="readPagesCounterTxt">Pages Read Today: 0</div>
           </div>
           <div style="display:flex; gap:5px;">
             <button class="delta-chip" onclick="addReadPages(5)">+5</button>
@@ -568,12 +568,12 @@
             <div>
               <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;" data-i18n="totalFocusToday">Total Active Minutes Today</div>
               <div class="balance-big-digits">
-                <span id="hdrFocusMins">120</span>
+                <span id="hdrFocusMins">0</span>
                 <span style="font-size:0.85rem; color:var(--text-muted);" data-i18n="minsUnit">mins</span>
               </div>
             </div>
             <div>
-              <span class="growth-pill-green" id="hdrStreakBadge">↑ 🔥 5 days</span>
+              <span class="growth-pill-green" id="hdrStreakBadge">↑ 🔥 0 days</span>
             </div>
           </div>
 
@@ -584,7 +584,7 @@
             </div>
             <div class="orb-item" onclick="addWaterCup()">
               <div class="orb-circle orb-blue">💧</div>
-              <span class="orb-label" id="orbWaterTxt">Water 4/8</span>
+              <span class="orb-label" id="orbWaterTxt">Water 0/8</span>
             </div>
             <div class="orb-item" onclick="openCloudBackupModal()">
               <div class="orb-circle orb-purple">☁️</div>
@@ -737,12 +737,12 @@
         <div class="analytics-kpi-grid">
           <div class="an-kpi-card" onclick="addQuickSessionRecord()">
             <div class="an-kpi-top"><span data-i18n="kpiMinutes">Active Minutes</span><span>🕒</span></div>
-            <div class="an-kpi-num" id="kpiTotalMins">420</div>
+            <div class="an-kpi-num" id="kpiTotalMins">0</div>
             <div class="an-kpi-trend" id="kpiWeeklyTrend">Based on recorded focus sessions</div>
           </div>
           <div class="an-kpi-card" onclick="addQuickSessionRecord()">
             <div class="an-kpi-top"><span data-i18n="kpiSessions">Completed Sessions</span><span>🎯</span></div>
-            <div class="an-kpi-num" id="kpiTotalSessions">18</div>
+            <div class="an-kpi-num" id="kpiTotalSessions">0</div>
             <div class="an-kpi-trend" id="kpiSessionTrend">Completed focus sessions only</div>
           </div>
         </div>
