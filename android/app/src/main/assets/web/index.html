@@ -449,10 +449,10 @@
     /* ZEN FOCUS / White 2100. Functional screen, not an image background. */
     :root { --header-grad: linear-gradient(135deg,#f9fcff 0%,#f2f8ff 65%,#fbfaff 100%); --radius-xl: 26px; }
     body { background: #fbfcff; }
-    body.timer-home .dynamic-hero-header {
+    body.timer-home:not(.deep-lockdown) .dynamic-hero-header {
       background: radial-gradient(ellipse at 78% 0%,rgba(101,118,255,.09),transparent 45%),
                   linear-gradient(135deg,#ffffff 0%,#f5fbff 100%) !important;
-      color: #18253e; padding: 14px 18px 11px;
+      color: #18253e; padding: 10px 16px 7px;
       border-bottom: 1px solid rgba(190,212,243,.6);
     }
     body.timer-home .dynamic-hero-header::before { opacity:.3; }
@@ -462,8 +462,8 @@
     body.timer-home .header-main-title { font-size:1.04rem; font-weight:750; }
     body.timer-home .header-sub-caption { font-size:.68rem; color:#64748b; margin-top:1px; }
     body.timer-home .ecosystem-strip { display:none; }
-    body.timer-home .main-white-sheet { margin-top:0; border-radius:0; box-shadow:none; padding:10px 14px 30px; }
-    body.timer-home .pure-white-card { border:1px solid #e7edfa; box-shadow:0 9px 28px -14px rgba(38,80,147,.12),0 2px 8px rgba(52,99,165,.025); }
+    body.timer-home:not(.deep-lockdown) .main-white-sheet { margin-top:0; border-radius:0; box-shadow:none; padding:8px 14px 30px; }
+    body.timer-home:not(.deep-lockdown) .pure-white-card { border:1px solid #e7edfa; box-shadow:0 9px 28px -14px rgba(38,80,147,.12),0 2px 8px rgba(52,99,165,.025); }
     .focus-hero-card { isolation:isolate; overflow:hidden; padding:13px 15px 15px; border-radius:30px; }
     .focus-hero-card::before { content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
       background:radial-gradient(ellipse 65% 48% at 50% 40%,rgba(56,189,248,.095),transparent 75%),
