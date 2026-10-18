@@ -141,6 +141,7 @@
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px;
     }
     .domain-card {
+      appearance: none; width: 100%; min-width: 0; font: inherit; text-align: center;
       background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 18px;
       padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 5px;
       cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
@@ -733,22 +734,22 @@
         </div>
         <div class="home-domains-heading"><span data-qt="chooseActivity">اختر نوع نشاطك</span><small data-qt="domainsHint">لكل نشاط جلسته المناسبة</small></div>
         <div class="domain-pedestal-grid">
-          <div class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)">
+          <button type="button" class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)" aria-pressed="true">
             <div class="domain-squircle">📚</div>
             <span class="domain-title" data-i18n="domStudy">Study</span>
-          </div>
-          <div class="domain-card dom-sport" id="domBtn-sport" onclick="switchActivityDomain('sport', this)">
+          </button>
+          <button type="button" class="domain-card dom-sport" id="domBtn-sport" onclick="switchActivityDomain('sport', this)" aria-pressed="false">
             <div class="domain-squircle">🏋️</div>
             <span class="domain-title" data-i18n="domSport">Workout</span>
-          </div>
-          <div class="domain-card dom-read" id="domBtn-read" onclick="switchActivityDomain('read', this)">
+          </button>
+          <button type="button" class="domain-card dom-read" id="domBtn-read" onclick="switchActivityDomain('read', this)" aria-pressed="false">
             <div class="domain-squircle">📖</div>
             <span class="domain-title" data-i18n="domRead">Reading</span>
-          </div>
-          <div class="domain-card dom-work" id="domBtn-work" onclick="switchActivityDomain('work', this)">
+          </button>
+          <button type="button" class="domain-card dom-work" id="domBtn-work" onclick="switchActivityDomain('work', this)" aria-pressed="false">
             <div class="domain-squircle">💻</div>
             <span class="domain-title" data-i18n="domWork">Deep Work</span>
-          </div>
+          </button>
         </div>
 
         <div class="domain-context-bar" id="sportContextBar">
