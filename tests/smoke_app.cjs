@@ -8,7 +8,7 @@ const map = new Map();
 const store = new Map();
 function node(id = '') {
   return {
-    id, value: '', textContent: '', innerHTML: '', checked: false, style: {},
+    id, value: '', textContent: '', innerHTML: '', checked: false, style: {setProperty(name,value){this[name]=value;}},
     className: '', title: '',
     classList: {add(){},remove(){},toggle(){return false;},contains(){return false;}},
     setAttribute(k,v){this[k] = v;}, getAttribute(k){return this[k];},
