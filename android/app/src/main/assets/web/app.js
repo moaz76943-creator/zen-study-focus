@@ -1195,6 +1195,8 @@ const SOUNDS_DATA = [
 
 let soundCat = 'all';
 const activePlayers = {};
+// A stale media error or delayed play promise may never restart a stopped tile.
+const soundGeneration = Object.create(null);
 let webAudioCtx = null;
 
 function createNatureSynthFallback(id, vol) {
@@ -1206,8 +1208,7 @@ function createNatureSynthFallback(id, vol) {
   const buf = webAudioCtx.createBuffer(1, len, sr);
   const samples = buf.getChannelData(0);
   let smoothed = 0, slow = 0;
-  // Offline synthesizer: a distinct fluid waterfall or insect-night texture,
-  // NEVER presented as a genuine field recording.
+  // A local synthetic fallback, never represented as a field recording.
   for (let i = 0; i < len; i++) {
     const time = i / sr, noise = Math.random() * 2 - 1;
     smoothed = smoothed * 0.92 + noise * 0.08;
@@ -1216,9 +1217,9 @@ function createNatureSynthFallback(id, vol) {
     if (id === 'night') {
       const chirp1 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 2.7 * time)), 9);
       const chirp2 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 3.5 * time + 1.4)), 11);
-      value = (Math.sin(2 * Math.PI * 3100 * time) * chirp1 * 0.09
+      value = Math.sin(2 * Math.PI * 3100 * time) * chirp1 * 0.09
             + Math.sin(2 * Math.PI * 3900 * time) * chirp2 * 0.065
-            + smoothed * 0.16);
+            + smoothed * 0.16;
     } else if (id === 'waterfall') {
       const surge = 0.65 + 0.12 * Math.sin(2 * Math.PI * 0.19 * time);
       value = (noise * 0.20 + smoothed * 1.15 + slow * 0.5) * surge;
@@ -1231,69 +1232,96 @@ function createNatureSynthFallback(id, vol) {
   source.buffer = buf;
   source.loop = true;
   const filter = webAudioCtx.createBiquadFilter();
-  filter.type = id === 'night' ? 'lowpass' : 'lowpass';
+  filter.type = 'lowpass';
   filter.frequency.value = id === 'night' ? 5500 : id === 'waterfall' ? 2600 : 650;
   const gain = webAudioCtx.createGain();
   gain.gain.value = Math.max(0, Math.min(1, vol)) * 0.55;
   source.connect(filter); filter.connect(gain); gain.connect(webAudioCtx.destination);
   source.start();
   return {
-    pause: () => { try { source.stop(); } catch (e) {} },
+    pause: () => { try { source.stop(); source.disconnect(); filter.disconnect(); gain.disconnect(); } catch (e) {} },
     setVol: v => gain.gain.setValueAtTime(Math.max(0, Math.min(1, v)) * 0.55, webAudioCtx.currentTime)
   };
+}
+
+function stopSoundTile(id) {
+  soundGeneration[id] = (soundGeneration[id] || 0) + 1;
+  const player = activePlayers[id];
+  if (player) {
+    delete activePlayers[id];
+    try { player.pause(); } catch (e) {}
+  }
 }
 
 function toggleSoundTile(id) {
   const s = SOUNDS_DATA.find(x => x.id === id);
   if (!s) return;
   const sName = L().sounds[id] || id;
-
   if (activePlayers[id]) {
-    activePlayers[id].pause();
-    delete activePlayers[id];
+    stopSoundTile(id);
     showToast(`⏹ ${sName}`);
-  } else {
-    const audio = new Audio();
-    audio.loop = true;
-    audio.volume = s.vol;
-    audio.src = s.src;
-
-    let fallbackUsed = false;
-    const activateFallback = () => {
-      if (fallbackUsed) return;
-      fallbackUsed = true;
-      try { activePlayers[id] = createNatureSynthFallback(id, s.vol); }
-      catch (err) { delete activePlayers[id]; showToast('⚠️ Audio output unavailable'); }
-      renderSoundsStudio();
-    };
-
-    // Never fetch a remote recording when offline assets are unavailable.
-    // The fallback is generated locally and is explicitly disclosed.
-    audio.onerror = () => {
-      audio.pause();
-      activateFallback();
-      showToast('⚠️ Offline recording unavailable — using synthesized ambience');
-    };
-
-    audio.play().then(() => showToast(`🔊 ${sName}`)).catch(activateFallback);
-
-    if (!fallbackUsed) {
-      activePlayers[id] = { pause: () => audio.pause(), setVol: (v) => { audio.volume = v; } };
-    }
+    renderSoundsStudio();
+    return;
   }
+  const token = (soundGeneration[id] || 0) + 1;
+  soundGeneration[id] = token;
+  const audio = new Audio();
+  audio.loop = true;
+  audio.volume = s.vol;
+  audio.src = s.src;
+  let fallbackUsed = false;
+  const player = {
+    pause() { audio.onerror = null; audio.pause(); },
+    setVol(v) { audio.volume = v; }
+  };
+  // Register synchronously before play() can reject or fire an error.
+  activePlayers[id] = player;
+  const activateFallback = () => {
+    if (fallbackUsed || soundGeneration[id] !== token || activePlayers[id] !== player) return;
+    fallbackUsed = true;
+    audio.onerror = null;
+    audio.pause();
+    try {
+      const fallback = createNatureSynthFallback(id, s.vol);
+      // Keep the same identity so late handlers can be invalidated safely.
+      player.pause = () => fallback.pause();
+      player.setVol = v => fallback.setVol(v);
+      showToast('⚠️ Local recording unavailable — synthesized ambience');
+    } catch (e) {
+      stopSoundTile(id);
+      showToast('⚠️ Audio output unavailable');
+    }
+    renderSoundsStudio();
+  };
+  audio.onerror = activateFallback;
+  try {
+    const playing = audio.play();
+    if (playing && typeof playing.then === 'function') {
+      playing.then(() => {
+        if (soundGeneration[id] === token && activePlayers[id] === player && !fallbackUsed)
+          showToast(`🔊 ${sName}`);
+      }).catch(activateFallback);
+    }
+  } catch (e) { activateFallback(); }
   renderSoundsStudio();
 }
 
 function setTileVolume(id, val) {
-  const v = parseFloat(val);
+  const v = Number(val);
+  if (!Number.isFinite(v)) return;
+  const clamped = Math.max(0, Math.min(1, v));
   const s = SOUNDS_DATA.find(x => x.id === id);
-  if (s) s.vol = v;
-  if (activePlayers[id]) activePlayers[id].setVol(v);
+  if (s) s.vol = clamped;
+  if (activePlayers[id]) activePlayers[id].setVol(clamped);
 }
 
-function playPresetRelaxMix() { stopAllAudio(); toggleSoundTile('rain'); toggleSoundTile('fire'); }
+function playPresetRelaxMix() {
+  stopAllAudio();
+  toggleSoundTile('rain');
+  toggleSoundTile('fire');
+}
 function stopAllAudio() {
-  Object.keys(activePlayers).forEach(k => { try { activePlayers[k].pause(); } catch(e){} delete activePlayers[k]; });
+  SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
   renderSoundsStudio();
 }
 
