@@ -23,7 +23,10 @@ jobs:
           distribution: temurin
           java-version: '17'
       - name: Install platform API 36 with runner SDK
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
       - name: Gradle 8.11.1
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -76,7 +79,10 @@ jobs:
           java-version: '17'
       - name: Android API 36
         if: steps.sign.outputs.ready == 'true'
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
       - uses: gradle/actions/setup-gradle@v4
         if: steps.sign.outputs.ready == 'true'
         with:
