@@ -719,7 +719,12 @@ function resetTimerNow() {
 }
 function skipTimerPhase() { if (timerRunning) toggleTimerPlay(); selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn')); }
 function addWaterCup() { cfg.water = (cfg.water + 1) % 9; saveFortressData('zen_fortress_cfg_v21', cfg); syncHeaderMetrics(); }
-function toggleDeskClock(show) { document.getElementById('deskClockOverlay').classList.toggle('active', show); }
+function toggleDeskClock(show) {
+  document.getElementById('deskClockOverlay').classList.toggle('active', show);
+  if (window.ZenNative && window.ZenNative.setDeskClockWake) {
+    try { window.ZenNative.setDeskClockWake(Boolean(show)); } catch (e) {}
+  }
+}
 
 /* ========================================================
    6. TASKS, CALENDAR & SMART NOTES
