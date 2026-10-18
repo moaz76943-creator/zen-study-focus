@@ -21,10 +21,9 @@
       --text-main: #0f172a;
       --text-muted: #64748b;
       --text-light: #94a3b8;
-      --border-subtle: #f1f5f9;
-      --border-card: rgba(226, 232, 240, 0.8);
+      --border-card: rgba(226, 232, 240, 0.85);
       --shadow-card: 0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.02);
-      --shadow-hover: 0 16px 32px -4px rgba(2, 132, 199, 0.12);
+      --shadow-ambient: 0 16px 32px -4px rgba(2, 132, 199, 0.12);
       --radius-xl: 26px;
       --radius-lg: 18px;
       --radius-pill: 9999px;
@@ -39,13 +38,12 @@
     .future-header {
       background: linear-gradient(135deg, #090e1a 0%, #111c35 60%, #172a4d 100%);
       color: #ffffff;
-      padding: 20px 20px 22px;
+      padding: 18px 20px 20px;
       border-bottom-left-radius: 28px;
       border-bottom-right-radius: 28px;
       box-shadow: 0 12px 30px rgba(9, 14, 26, 0.22);
-      position: relative;
     }
-    .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .brand-cluster { display: flex; align-items: center; gap: 10px; }
     .brand-glow-orb {
       width: 38px; height: 38px; border-radius: 12px;
@@ -66,7 +64,6 @@
     .glass-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.22); }
     .glass-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-    /* Futuristic HUD Capsule */
     .hud-capsule {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.14);
@@ -79,14 +76,14 @@
     }
     .hud-metric { display: flex; flex-direction: column; }
     .hud-label { font-size: 0.68rem; opacity: 0.75; }
-    .hud-value { font-size: 1rem; font-weight: 900; letter-spacing: -0.2px; }
+    .hud-value { font-size: 1rem; font-weight: 900; }
 
-    /* Views */
+    /* Views Container */
     .view-screen { padding: 18px 16px; flex: 1; display: none; animation: viewIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     .view-screen.active { display: block; }
     @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Pure Luminous White Cards */
+    /* Luminous White Card System */
     .future-card {
       background: var(--card-white);
       border-radius: var(--radius-xl);
@@ -102,13 +99,16 @@
     .badge-cyan { background: var(--primary-soft); color: var(--primary); }
     .badge-emerald { background: var(--success-soft); color: var(--success); }
     .badge-purple { background: var(--accent-purple-soft); color: var(--accent-purple); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber); }
 
-    /* View 1: Futuristic Timer */
+    /* ========================================================
+       VIEW 1: TIMER
+       ======================================================== */
     .mode-pills-wrap { display: flex; background: #eef2f6; padding: 4px; border-radius: var(--radius-pill); margin-bottom: 18px; gap: 4px; }
     .mode-pill { flex: 1; border: none; background: transparent; padding: 9px 0; border-radius: var(--radius-pill); font-size: 0.76rem; font-weight: 800; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
     .mode-pill.active { background: var(--card-white); color: var(--text-main); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
 
-    .chrono-display-box { display: flex; flex-direction: column; align-items: center; padding: 12px 0; }
+    .chrono-display-box { display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
     .chrono-gauge { position: relative; width: 230px; height: 230px; display: flex; align-items: center; justify-content: center; }
     .gauge-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
     .gauge-track { fill: none; stroke: #f1f5f9; stroke-width: 8; }
@@ -137,7 +137,9 @@
     .btn-micro-adj { background: #f1f5f9; border: none; padding: 5px 12px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); cursor: pointer; }
     .btn-micro-adj:active { background: var(--primary-soft); color: var(--primary); }
 
-    /* View 2: High-Fidelity Nature Sounds (Zero Music) */
+    /* ========================================================
+       VIEW 2: ACOUSTIC NATURE SOUNDS
+       ======================================================== */
     .sound-tiles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .sound-tile {
       background: var(--card-white);
@@ -148,21 +150,19 @@
       display: flex; flex-direction: column; justify-content: space-between;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .sound-tile.on { border-color: var(--primary-neon); box-shadow: var(--shadow-hover); background: #fbfdff; }
+    .sound-tile.on { border-color: var(--primary-neon); box-shadow: var(--shadow-ambient); background: #fbfdff; }
     .sound-tile-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .sound-tile-info { display: flex; align-items: center; gap: 8px; }
-    .sound-icon-box { width: 32px; height: 32px; border-radius: 10px; background: #f8fafc; display: flex; align-items: center; justify-content: center; }
-    .sound-tile.on .sound-icon-box { background: var(--primary-soft); color: var(--primary); }
-    .sound-icon-box svg { width: 18px; height: 18px; fill: currentColor; }
     .sound-name { font-size: 0.82rem; font-weight: 800; color: var(--text-main); }
     .switch-future { width: 34px; height: 20px; background: #cbd5e1; border-radius: var(--radius-pill); position: relative; cursor: pointer; transition: background 0.25s; }
     .switch-future.active { background: var(--primary); }
     .switch-future-dot { width: 14px; height: 14px; background: #ffffff; border-radius: 50%; position: absolute; top: 3px; right: 3px; transition: transform 0.25s; }
     .switch-future.active .switch-future-dot { transform: translateX(-14px); }
     .audio-slider { width: 100%; -webkit-appearance: none; background: #e2e8f0; height: 4px; border-radius: 2px; outline: none; margin-top: 10px; }
-    .audio-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
+    .audio-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); cursor: pointer; }
 
-    /* View 3: Tasks */
+    /* ========================================================
+       VIEW 3: TASKS PLANNER
+       ======================================================== */
     .task-add-bar { display: flex; gap: 8px; margin-bottom: 12px; }
     .future-input { flex: 1; background: var(--card-white); border: 1px solid var(--border-card); padding: 11px 16px; border-radius: var(--radius-lg); font-size: 0.82rem; outline: none; box-shadow: var(--shadow-card); }
     .future-input:focus { border-color: var(--primary); }
@@ -182,49 +182,114 @@
     .task-title { font-size: 0.84rem; font-weight: 800; color: var(--text-main); }
     .task-meta { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
 
-    /* View 4: Dedicated Smart Notes */
-    .filter-pills-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
-    .filter-pills-row::-webkit-scrollbar { display: none; }
-    .btn-filter-pill { background: var(--card-white); border: 1px solid var(--border-card); padding: 6px 14px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 800; color: var(--text-muted); white-space: nowrap; cursor: pointer; }
-    .btn-filter-pill.active { background: var(--text-main); color: #ffffff; border-color: var(--text-main); }
+    /* ========================================================
+       VIEW 4: FUTURISTIC DEDICATED SMART NOTES
+       ======================================================== */
+    .notes-action-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+    .templates-scroll-flow { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
+    .templates-scroll-flow::-webkit-scrollbar { display: none; }
+    .tpl-btn-chip {
+      background: var(--card-white); border: 1px solid var(--border-card);
+      padding: 7px 13px; border-radius: var(--radius-pill);
+      font-size: 0.72rem; font-weight: 800; color: var(--text-muted);
+      white-space: nowrap; cursor: pointer; box-shadow: var(--shadow-card);
+      display: flex; align-items: center; gap: 5px; transition: 0.2s;
+    }
+    .tpl-btn-chip:active { transform: scale(0.96); border-color: var(--primary); color: var(--primary); }
 
-    .templates-flow { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
-    .btn-template { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; color: var(--primary); white-space: nowrap; cursor: pointer; }
-    .btn-template:active { background: var(--primary-soft); }
+    /* Note Composer Card */
+    .composer-card {
+      background: var(--card-white);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-card);
+      margin-bottom: 16px;
+    }
+    .composer-textarea {
+      width: 100%; height: 95px; border: 1px solid var(--border-card); border-radius: 14px;
+      padding: 12px; font-size: 0.82rem; color: var(--text-main); line-height: 1.5;
+      resize: none; outline: none; background: #fafbfc; transition: border-color 0.2s;
+    }
+    .composer-textarea:focus { border-color: var(--primary-neon); background: #ffffff; }
+    
+    /* Interactive Tag Selector Chips */
+    .composer-tags-row { display: flex; gap: 6px; margin: 10px 0; overflow-x: auto; scrollbar-width: none; }
+    .tag-select-chip {
+      background: #f1f5f9; border: 1px solid transparent; padding: 5px 11px;
+      border-radius: var(--radius-pill); font-size: 0.7rem; font-weight: 800;
+      color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap;
+    }
+    .tag-select-chip.selected {
+      background: var(--primary-soft); color: var(--primary); border-color: var(--primary);
+    }
+    .composer-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
 
-    .note-compose-card { background: var(--card-white); border-radius: var(--radius-xl); padding: 16px; box-shadow: var(--shadow-card); border: 1px solid var(--border-card); margin-bottom: 14px; }
-    .note-text-area { width: 100%; height: 90px; border: 1px solid var(--border-card); border-radius: 12px; padding: 11px; font-size: 0.82rem; color: var(--text-main); line-height: 1.45; resize: none; outline: none; background: #fafbfc; }
-    .note-text-area:focus { border-color: var(--primary); background: #ffffff; }
+    /* Filter Chips Row */
+    .notes-filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
+    .btn-nfilter {
+      background: var(--card-white); border: 1px solid var(--border-card);
+      padding: 6px 14px; border-radius: var(--radius-pill);
+      font-size: 0.72rem; font-weight: 800; color: var(--text-muted);
+      white-space: nowrap; cursor: pointer;
+    }
+    .btn-nfilter.active { background: var(--text-main); color: #ffffff; border-color: var(--text-main); }
 
-    .notes-stream { display: flex; flex-direction: column; gap: 10px; }
-    .note-item-card {
+    /* Note Cards Stream */
+    .notes-stream { display: flex; flex-direction: column; gap: 12px; }
+    .note-card-futuristic {
       background: var(--card-white);
       border-radius: var(--radius-lg);
-      padding: 14px 16px;
+      padding: 16px 18px;
       border: 1px solid var(--border-card);
       box-shadow: var(--shadow-card);
-      border-right: 4px solid var(--primary);
       position: relative;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    .note-item-card.pinned { border-right-color: var(--amber); background: #fffdfa; }
-    .note-item-card.dump { border-right-color: var(--accent-purple); }
-    .note-item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .note-item-body { font-size: 0.82rem; line-height: 1.5; color: var(--text-main); white-space: pre-wrap; }
-    .note-item-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.68rem; color: var(--text-light); }
+    .note-card-futuristic.pinned {
+      border: 1.5px solid rgba(245, 158, 11, 0.4);
+      box-shadow: 0 10px 25px -4px rgba(245, 158, 11, 0.12);
+      background: #fffdfa;
+    }
+    .note-card-futuristic.dump {
+      border-right: 4px solid var(--accent-purple);
+    }
+    .note-card-futuristic.cornell {
+      border-right: 4px solid var(--primary);
+    }
+    .note-card-futuristic.exam {
+      border-right: 4px solid var(--rose);
+    }
+    
+    .note-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .note-card-actions { display: flex; gap: 8px; align-items: center; }
+    .btn-card-act { background: none; border: none; cursor: pointer; color: var(--text-light); font-size: 0.95rem; }
+    .btn-card-act:hover { color: var(--text-main); }
 
-    /* View 5: Analytics */
+    /* Structured Cornell View inside Card */
+    .cornell-box { display: flex; flex-direction: column; gap: 6px; }
+    .cornell-sec { background: #f8fafc; border-radius: 10px; padding: 8px 10px; border-left: 3px solid var(--primary); }
+    .cornell-sec-title { font-size: 0.68rem; font-weight: 800; color: var(--primary); margin-bottom: 2px; }
+    .cornell-sec-text { font-size: 0.8rem; color: var(--text-main); line-height: 1.45; }
+
+    .note-raw-body { font-size: 0.82rem; line-height: 1.5; color: var(--text-main); white-space: pre-wrap; }
+    .note-card-date { font-size: 0.68rem; color: var(--text-light); margin-top: 10px; }
+
+    /* ========================================================
+       VIEW 5: ANALYTICS
+       ======================================================== */
     .kpi-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
     .kpi-metric-card { background: var(--card-white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 15px; box-shadow: var(--shadow-card); }
     .kpi-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
     .kpi-digits { font-size: 1.4rem; font-weight: 900; color: var(--text-main); margin-top: 4px; }
 
-    /* Floating Glass Bottom Navigation (Ultra Modern SVG Tabs) */
+    /* Floating Glass Bottom Navigation */
     .future-bottom-nav {
       position: fixed;
       bottom: 12px;
       width: calc(100% - 24px);
       max-width: 416px;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(226, 232, 240, 0.85);
       border-radius: 24px;
@@ -249,7 +314,6 @@
 <body>
 
   <div class="app-viewport">
-    <!-- SVG Defs for Neon Gradients -->
     <svg style="position: absolute; width: 0; height: 0;">
       <defs>
         <linearGradient id="cyanNeonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -259,7 +323,7 @@
       </defs>
     </svg>
 
-    <!-- Sleek Futuristic Header -->
+    <!-- Header -->
     <header class="future-header">
       <div class="header-nav">
         <div class="brand-cluster">
@@ -268,11 +332,11 @@
           </div>
           <div class="brand-title-wrap">
             <h1>ZEN FOCUS</h1>
-            <p>الإنتاجية والهدوء الذكي</p>
+            <p>المذاكرة والإنتاجية الذكية</p>
           </div>
         </div>
         <div class="header-controls">
-          <button class="glass-btn" id="masterMuteToggle" onclick="toggleAudioMute()" title="كتم/تشغيل الأصوات">
+          <button class="glass-btn" id="masterMuteBtn" onclick="toggleMasterAudio()" title="كتم/تشغيل الأصوات">
             <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
           </button>
           <button class="glass-btn" onclick="exportNotesTxtFile()" title="تصدير الملاحظات">
@@ -283,16 +347,16 @@
       <div class="hud-capsule">
         <div class="hud-metric">
           <span class="hud-label">دقائق التركيز اليوم</span>
-          <span class="hud-value" id="hudFocusMin">0 دقيقة</span>
+          <span class="hud-value" id="hudMinutes">0 دقيقة</span>
         </div>
         <div class="hud-metric" style="text-align: left;">
           <span class="hud-label">سلسلة الانضباط</span>
-          <span class="hud-value" id="hudStreak">🔥 0 جلسات</span>
+          <span class="hud-value" id="hudSessions">🔥 0 جلسات</span>
         </div>
       </div>
     </header>
 
-    <!-- VIEW 1: CHRONO TIMER -->
+    <!-- VIEW 1: TIMER -->
     <main class="view-screen active" id="view-timer">
       <div class="future-card">
         <div class="mode-pills-wrap">
@@ -329,7 +393,7 @@
       </div>
     </main>
 
-    <!-- VIEW 2: ACOUSTIC NATURE SOUNDS (REAL DSP, ZERO MUSIC) -->
+    <!-- VIEW 2: ACOUSTIC NATURE SOUNDS (REAL DSP, 100% ZERO MUSIC) -->
     <main class="view-screen" id="view-sounds">
       <div class="future-card">
         <div class="card-headline">
@@ -338,8 +402,8 @@
           </div>
           <span class="badge-chip badge-emerald">معالجة صوتية حقيقية</span>
         </div>
-        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4;">
-          أصوات فيزيائية خالية تماماً من التشويش أو الموسيقى لعزل الضجيج الخارجي بنقاء تام.
+        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.45;">
+          أصوات فيزيائية مهدئة خالية تماماً من التشويش أو الموسيقى لعزل الضجيج الخارجي بنقاء تام.
         </p>
 
         <div class="sound-tiles-grid" id="soundTilesGrid"></div>
@@ -351,50 +415,58 @@
       <div class="future-card">
         <div class="card-headline">
           <div class="card-headline-title"><span>📋</span> جدول المهام الدراسية</div>
-          <span class="badge-chip badge-cyan" id="badgeTasksRatio">0 من 0 مكتمل</span>
+          <span class="badge-chip badge-cyan" id="badgeTasksCount">0 من 0 مكتمل</span>
         </div>
         <div class="task-add-bar">
-          <input type="text" class="future-input" id="inpNewTask" placeholder="أضف مهمة دراسية جديدة...">
-          <button class="btn-add-action" onclick="addNewTaskItem()">+</button>
+          <input type="text" class="future-input" id="inpTaskTitle" placeholder="أضف مهمة دراسية جديدة...">
+          <button class="btn-add-action" onclick="addTaskItem()">+</button>
         </div>
-        <div class="task-stream" id="taskStreamBox"></div>
+        <div class="task-stream" id="tasksStream"></div>
       </div>
     </main>
 
-    <!-- VIEW 4: DEDICATED SMART NOTES WORKSPACE -->
+    <!-- VIEW 4: DEDICATED SMART NOTES WORKSPACE (FUTURISTIC) -->
     <main class="view-screen" id="view-notes">
-      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-        <input type="text" class="future-input" id="inpSearchNotes" placeholder="🔍 ابحث في ملخصاتك وأفكارك..." oninput="renderNotesStream()">
+      <div class="notes-action-bar">
+        <input type="text" class="future-input" id="inpSearchNotes" placeholder="🔍 ابحث في ملخصاتك وأفكارك..." oninput="renderNotesFeed()">
         <button class="btn-future-secondary" style="padding: 10px 14px;" onclick="exportNotesTxtFile()">تصدير</button>
       </div>
 
-      <div class="templates-flow">
-        <button class="btn-template" onclick="fillTemplate('dump')">⚡ تفريغ فكرة مشتتة</button>
-        <button class="btn-template" onclick="fillTemplate('cornell')">📋 قالب كورنيل</button>
-        <button class="btn-template" onclick="fillTemplate('exam')">⭐ سؤال امتحان</button>
+      <!-- Quick Futuristic Template Chips -->
+      <div class="templates-scroll-flow">
+        <button class="tpl-btn-chip" onclick="applySmartTemplate('dump')">⚡ تفريغ فكرة مشتتة</button>
+        <button class="tpl-btn-chip" onclick="applySmartTemplate('cornell')">📋 قالب كورنيل الذكي</button>
+        <button class="tpl-btn-chip" onclick="applySmartTemplate('exam')">⭐ أسئلة الامتحان</button>
       </div>
 
-      <div class="note-compose-card">
-        <textarea class="note-text-area" id="txtNoteBody" placeholder="اكتب ملخصك أو فرغ فكرة مشتتة للعودة للتركيز..."></textarea>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-          <select class="future-input" id="selNoteTag" style="width: auto; padding: 6px 12px; font-size: 0.74rem;">
-            <option value="general">📚 عام</option>
-            <option value="dump">💭 تفريغ مشتت</option>
-            <option value="cornell">📋 كورنيل</option>
-            <option value="exam">⭐ امتحان</option>
-          </select>
-          <button class="btn-future-primary" style="padding: 9px 18px; font-size: 0.78rem;" onclick="saveNoteItem()">+ حفظ الملاحظة</button>
+      <!-- Futuristic Composer Card -->
+      <div class="composer-card">
+        <textarea class="composer-textarea" id="txtComposer" placeholder="دوّن ملخصاً أو فرّغ خاطرة مشتتة للعودة للتركيز..."></textarea>
+        
+        <!-- Interactive Tag Selector (Replaced the old Select Dropdown) -->
+        <div class="composer-tags-row">
+          <div class="tag-select-chip selected" data-tag="general" onclick="selectComposerTag('general', this)">📚 عام</div>
+          <div class="tag-select-chip" data-tag="dump" onclick="selectComposerTag('dump', this)">💭 تفريغ مشتت</div>
+          <div class="tag-select-chip" data-tag="cornell" onclick="selectComposerTag('cornell', this)">📋 قالب كورنيل</div>
+          <div class="tag-select-chip" data-tag="exam" onclick="selectComposerTag('exam', this)">⭐ سؤال امتحان</div>
+        </div>
+
+        <div class="composer-footer">
+          <span style="font-size:0.7rem; color:var(--text-light);" id="composerWordCount">0 كلمة</span>
+          <button class="btn-future-primary" style="padding: 9px 18px; font-size: 0.78rem;" onclick="saveComposerNote()">+ حفظ الملاحظة</button>
         </div>
       </div>
 
-      <div class="filter-pills-row">
-        <button class="btn-filter-pill active" onclick="setNotesFilterTag('all', this)">الكل (<span id="cntAllNotes">0</span>)</button>
-        <button class="btn-filter-pill" onclick="setNotesFilterTag('pinned', this)">📌 المثبتة (<span id="cntPinnedNotes">0</span>)</button>
-        <button class="btn-filter-pill" onclick="setNotesFilterTag('dump', this)">💭 مشتتات (<span id="cntDumpNotes">0</span>)</button>
-        <button class="btn-filter-pill" onclick="setNotesFilterTag('cornell', this)">📋 كورنيل (<span id="cntCornellNotes">0</span>)</button>
+      <!-- Filter Chips Row -->
+      <div class="notes-filter-row">
+        <button class="btn-nfilter active" onclick="setNotesFilter('all', this)">الكل (<span id="nAll">0</span>)</button>
+        <button class="btn-nfilter" onclick="setNotesFilter('pinned', this)">📌 المثبتة (<span id="nPinned">0</span>)</button>
+        <button class="btn-nfilter" onclick="setNotesFilter('dump', this)">💭 مشتتات (<span id="nDump">0</span>)</button>
+        <button class="btn-nfilter" onclick="setNotesFilter('cornell', this)">📋 كورنيل (<span id="nCornell">0</span>)</button>
       </div>
 
-      <div class="notes-stream" id="notesStreamBox"></div>
+      <!-- Notes Stream -->
+      <div class="notes-stream" id="notesStream"></div>
     </main>
 
     <!-- VIEW 5: ANALYTICS -->
@@ -402,7 +474,7 @@
       <div class="kpi-cards-grid">
         <div class="kpi-metric-card">
           <div class="kpi-title">دقائق التركيز اليوم</div>
-          <div class="kpi-digits" id="kpiTodayMinutes">0 د</div>
+          <div class="kpi-digits" id="kpiTodayMins">0 د</div>
         </div>
         <div class="kpi-metric-card">
           <div class="kpi-title">الجلسات المكتملة</div>
@@ -413,33 +485,33 @@
       <div class="future-card">
         <div class="card-headline">
           <div class="card-headline-title"><span>🌱</span> حديقة التركيز ورتبة الانضباط</div>
-          <span class="badge-chip badge-purple" id="kpiRankTitle">متعلم طموح 🌱</span>
+          <span class="badge-chip badge-purple" id="kpiRankBadge">متعلم طموح 🌱</span>
         </div>
-        <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
-          تتطور شجرتك الافتراضية كلما أتممت جلسات مذاكرة دون انقطاع. استمر في صناعة عاداتك الذهنية بنقاء.
+        <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.55;">
+          تتطور شجرتك الافتراضية كلما أتممت جلسات مذاكرة دون انقطاع. استمر في بناء عاداتك الذهنية بنقاء وهدوء.
         </p>
       </div>
     </main>
 
-    <!-- Floating Glass Bottom Navigation (Vector Duotone SVGs) -->
+    <!-- Bottom Navigation Bar (Ultra Modern Vector Duotones) -->
     <nav class="future-bottom-nav">
-      <button class="nav-future-btn active" onclick="navigateTab('view-timer', this)">
+      <button class="nav-future-btn active" onclick="switchNavTab('view-timer', this)">
         <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
         <span>المؤقت</span>
       </button>
-      <button class="nav-future-btn" onclick="navigateTab('view-tasks', this)">
+      <button class="nav-future-btn" onclick="switchNavTab('view-tasks', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
         <span>المهام</span>
       </button>
-      <button class="nav-future-btn" onclick="navigateTab('view-notes', this)">
+      <button class="nav-future-btn" onclick="switchNavTab('view-notes', this)">
         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
         <span>الملاحظات</span>
       </button>
-      <button class="nav-future-btn" onclick="navigateTab('view-sounds', this)">
+      <button class="nav-future-btn" onclick="switchNavTab('view-sounds', this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span>الأصوات</span>
       </button>
-      <button class="nav-future-btn" onclick="navigateTab('view-analytics', this)">
+      <button class="nav-future-btn" onclick="switchNavTab('view-analytics', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
         <span>التحليلات</span>
       </button>
@@ -448,9 +520,9 @@
 
   <script>
     /* ========================================================
-       1. ROUTING & TABS
+       1. NAVIGATION ROUTING
        ======================================================== */
-    function navigateTab(targetView, btn) {
+    function switchNavTab(targetView, btn) {
       document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
       document.getElementById(targetView).classList.add('active');
       if (btn) {
@@ -460,15 +532,15 @@
     }
 
     /* ========================================================
-       2. TIMER LOGIC (REAL-TIME TIMESTAMP DELTA)
+       2. TIMER LOGIC (REAL-TIME DELTA SYNC)
        ======================================================== */
     let chronoTotalSecs = 25 * 60;
     let chronoLeftSecs = chronoTotalSecs;
     let chronoActive = false;
     let chronoTimerId = null;
     let chronoTargetTimestamp = null;
-    let completedSessionsCount = parseInt(localStorage.getItem('zen_completed_sessions_v9') || '0');
-    let todayFocusMinutes = parseInt(localStorage.getItem('zen_today_minutes_v9') || '0');
+    let completedSessions = parseInt(localStorage.getItem('zen_completed_sessions_v10') || '0');
+    let totalMinsToday = parseInt(localStorage.getItem('zen_today_minutes_v10') || '0');
     const perimeter = 2 * Math.PI * 105;
 
     function renderChronoUI() {
@@ -519,10 +591,10 @@
             chronoLeftSecs = 0;
             renderChronoUI();
             btn.textContent = 'بدء الجلسة';
-            completedSessionsCount++;
-            todayFocusMinutes += Math.round(chronoTotalSecs / 60);
-            localStorage.setItem('zen_completed_sessions_v9', completedSessionsCount);
-            localStorage.setItem('zen_today_minutes_v9', todayFocusMinutes);
+            completedSessions++;
+            totalMinsToday += Math.round(chronoTotalSecs / 60);
+            localStorage.setItem('zen_completed_sessions_v10', completedSessions);
+            localStorage.setItem('zen_today_minutes_v10', totalMinsToday);
             updateAnalyticsUI();
             setChronoMode(5, 'راحة قصيرة', document.getElementById('pill-short'));
           }
@@ -538,7 +610,7 @@
     }
 
     /* ========================================================
-       3. HIGH-FIDELITY NATURE AUDIO ENGINE (100% ZERO MUSIC)
+       3. FLAWLESS ACOUSTIC DSP SOUND ENGINE (100% ZERO MUSIC)
        ======================================================== */
     const SOUNDS_CATALOG = [
       { id: 'fire', name: '🔥 نار الحطب', vol: 0.5 },
@@ -559,12 +631,11 @@
     function initAudioEngine() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        // Master Dynamics Compressor prevents any digital clipping / distortion
         masterCompressor = audioCtx.createDynamicsCompressor();
         masterCompressor.threshold.setValueAtTime(-18, audioCtx.currentTime);
-        masterCompressor.knee.setValueAtTime(10, audioCtx.currentTime);
-        masterCompressor.ratio.setValueAtTime(12, audioCtx.currentTime);
-        masterCompressor.attack.setValueAtTime(0.003, audioCtx.currentTime);
+        masterCompressor.knee.setValueAtTime(12, audioCtx.currentTime);
+        masterCompressor.ratio.setValueAtTime(10, audioCtx.currentTime);
+        masterCompressor.attack.setValueAtTime(0.005, audioCtx.currentTime);
         masterCompressor.release.setValueAtTime(0.25, audioCtx.currentTime);
         masterCompressor.connect(audioCtx.destination);
       }
@@ -574,20 +645,20 @@
     function buildAcousticSound(id, baseVol) {
       initAudioEngine();
       const sr = audioCtx.sampleRate;
-      const len = sr * 4;
+      const len = sr * 6; // 6-second non-repetitive organic buffer
       const buffer = audioCtx.createBuffer(1, len, sr);
       const data = buffer.getChannelData(0);
 
       if (id === 'brown') {
-        // Leaky integrator Brown Noise: Smooth low-end roar, zero harshness
+        // Pure Brownian Walk: Velvet deep low rumble without hiss
         let last = 0;
         for (let i = 0; i < len; i++) {
           const w = Math.random() * 2 - 1;
-          last = (last + (0.02 * w)) / 1.02;
+          last = (last + (0.015 * w)) / 1.015;
           data[i] = last * 2.2;
         }
       } else if (id === 'rain' || id === 'attic') {
-        // True Pink Noise (Paul Kellet Filter) - Removes high-pitch static hiss
+        // True Pink Noise (Kellet algorithm) - removes sharp treble clicks
         let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
         for (let i = 0; i < len; i++) {
           const w = Math.random() * 2 - 1;
@@ -601,21 +672,23 @@
           b6 = w * 0.1159;
         }
       } else if (id === 'fire') {
-        // Hearth warmth + soft random wood crackles
+        // Organic Wood Hearth: Low brown rumble + damped exponential crackle bursts
+        let last = 0;
+        let popDecay = 0;
+        for (let i = 0; i < len; i++) {
+          const w = Math.random() * 2 - 1;
+          last = (last + 0.018 * w) / 1.018;
+          if (Math.random() < 0.0008) popDecay = 0.5 + Math.random() * 0.3;
+          popDecay *= 0.992;
+          const pop = (Math.random() * 2 - 1) * popDecay;
+          data[i] = (last * 1.8) + pop;
+        }
+      } else {
+        // Gentle organic water/air base
         let last = 0;
         for (let i = 0; i < len; i++) {
           const w = Math.random() * 2 - 1;
           last = (last + 0.02 * w) / 1.02;
-          // Organic wooden crackle pop
-          const pop = Math.random() < 0.0015 ? (Math.random() * 2 - 1) * 0.6 : 0;
-          data[i] = (last * 1.8) + pop;
-        }
-      } else {
-        // Natural gentle filtered base for ocean, stream, wind, fan
-        let last = 0;
-        for (let i = 0; i < len; i++) {
-          const w = Math.random() * 2 - 1;
-          last = (last + 0.025 * w) / 1.025;
           data[i] = last * 2.0;
         }
       }
@@ -629,39 +702,44 @@
       gainNode.gain.value = isMasterMuted ? 0 : baseVol;
 
       if (id === 'ocean') {
-        // Natural Sea Wave DSP: 10-second swelling LFO modulating frequency and volume
+        // Natural 12-second wave surge modulation
         filter.type = 'lowpass';
-        filter.frequency.value = 350;
+        filter.frequency.value = 320;
+        filter.Q.value = 0.5; // No whistling
         const lfo = audioCtx.createOscillator();
-        lfo.frequency.value = 0.1; // 10s wave cycle
+        lfo.frequency.value = 0.083; // 12s wave period
         const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 180;
+        lfoGain.gain.value = 160;
         lfo.connect(lfoGain);
         lfoGain.connect(filter.frequency);
         lfo.start();
         src.connect(filter);
       } else if (id === 'stream') {
-        // Water Creek DSP: Dual asynchronous resonant bandpass
+        // Pure creek flow: wide bandpass with non-whistling Q
         filter.type = 'bandpass';
-        filter.frequency.value = 750;
-        filter.Q.value = 2.2;
+        filter.frequency.value = 650;
+        filter.Q.value = 0.8;
         src.connect(filter);
       } else if (id === 'wind') {
         filter.type = 'bandpass';
-        filter.frequency.value = 380;
-        filter.Q.value = 2.8;
+        filter.frequency.value = 350;
+        filter.Q.value = 0.9;
         src.connect(filter);
       } else if (id === 'brown') {
         filter.type = 'lowpass';
-        filter.frequency.value = 200; // Deep warm rumble
+        filter.frequency.value = 180;
         src.connect(filter);
       } else if (id === 'rain') {
         filter.type = 'lowpass';
-        filter.frequency.value = 1200; // Soothing rain
+        filter.frequency.value = 900;
+        src.connect(filter);
+      } else if (id === 'attic') {
+        filter.type = 'lowpass';
+        filter.frequency.value = 350;
         src.connect(filter);
       } else {
         filter.type = 'lowpass';
-        filter.frequency.value = 900;
+        filter.frequency.value = 750;
         src.connect(filter);
       }
 
@@ -709,7 +787,7 @@
       }
     }
 
-    function toggleAudioMute() {
+    function toggleMasterAudio() {
       isMasterMuted = !isMasterMuted;
       Object.values(activeNodes).forEach(n => {
         if (audioCtx) n.gain.gain.setValueAtTime(isMasterMuted ? 0 : n.baseVol, audioCtx.currentTime);
@@ -719,13 +797,13 @@
     /* ========================================================
        4. TASKS STREAM
        ======================================================== */
-    let tasksList = JSON.parse(localStorage.getItem('zen_tasks_v9') || JSON.stringify([
+    let tasksList = JSON.parse(localStorage.getItem('zen_tasks_v10') || JSON.stringify([
       { text: 'فهم ومراجعة النقاط الأساسية بعمق', done: false },
       { text: 'حل التمارين والمسائل التطبيقية', done: true }
     ]));
 
     function renderTasksStream() {
-      const box = document.getElementById('taskStreamBox');
+      const box = document.getElementById('tasksStream');
       box.innerHTML = '';
       let done = 0;
       tasksList.forEach((t, i) => {
@@ -744,46 +822,128 @@
         `;
         box.appendChild(card);
       });
-      document.getElementById('badgeTasksRatio').textContent = `${done} من ${tasksList.length} مكتمل`;
+      document.getElementById('badgeTasksCount').textContent = `${done} من ${tasksList.length} مكتمل`;
     }
 
-    function addNewTaskItem() {
-      const inp = document.getElementById('inpNewTask');
+    function addTaskItem() {
+      const inp = document.getElementById('inpTaskTitle');
       const val = inp.value.trim();
       if (!val) return;
       tasksList.unshift({ text: val, done: false });
       inp.value = '';
-      localStorage.setItem('zen_tasks_v9', JSON.stringify(tasksList));
+      localStorage.setItem('zen_tasks_v10', JSON.stringify(tasksList));
       renderTasksStream();
     }
-    function toggleTask(i) { tasksList[i].done = !tasksList[i].done; localStorage.setItem('zen_tasks_v9', JSON.stringify(tasksList)); renderTasksStream(); }
-    function deleteTask(i) { tasksList.splice(i, 1); localStorage.setItem('zen_tasks_v9', JSON.stringify(tasksList)); renderTasksStream(); }
+    function toggleTask(i) { tasksList[i].done = !tasksList[i].done; localStorage.setItem('zen_tasks_v10', JSON.stringify(tasksList)); renderTasksStream(); }
+    function deleteTask(i) { tasksList.splice(i, 1); localStorage.setItem('zen_tasks_v10', JSON.stringify(tasksList)); renderTasksStream(); }
 
     /* ========================================================
-       5. DEDICATED SMART NOTES
+       5. FUTURISTIC SMART NOTES WORKSPACE
        ======================================================== */
-    let notesList = JSON.parse(localStorage.getItem('zen_notes_v9') || JSON.stringify([
+    let selectedNoteTag = 'general';
+    let notesFilterTag = 'all';
+
+    let notesList = JSON.parse(localStorage.getItem('zen_notes_v10') || JSON.stringify([
       {
         id: 1,
-        text: "📌 الفكرة الرئيسية: التكرار المتباعد\n- المراجعة قبل لحظة النسيان تثبت المعلومة في الذاكرة طويلة المدى.\n💡 النتيجة: 20 دقيقة مراجعة تعادل ساعات حفظ عشوائي.",
+        title: "التكرار المتباعد (Spaced Repetition)",
+        detail: "مراجعة المعلومة قبيل لحظة نسيانها مباشرة يضاعف استقرارها في الذاكرة طويلة المدى.",
+        summary: "20 دقيقة مراجعة ذكية تعادل ساعات حفظ عشوائي.",
         tag: "cornell",
         pinned: true,
         date: "اليوم 10:30 ص"
       },
       {
         id: 2,
-        text: "تفريغ فكرة مشتتة: تذكرت شراء أقلام التحديد بعد إنهاء الجلسة.",
+        title: "",
+        detail: "تذكرت شراء أقلام التحديد بعد إنهاء الجلسة.",
+        summary: "",
         tag: "dump",
         pinned: false,
         date: "اليوم 11:15 ص"
       }
     ]));
-    let notesFilterTag = 'all';
 
-    function renderNotesStream() {
-      const box = document.getElementById('notesStreamBox');
+    const composerTextarea = document.getElementById('txtComposer');
+    composerTextarea.addEventListener('input', () => {
+      const words = composerTextarea.value.trim() ? composerTextarea.value.trim().split(/\s+/).length : 0;
+      document.getElementById('composerWordCount').textContent = `${words} كلمة`;
+    });
+
+    function selectComposerTag(tag, el) {
+      selectedNoteTag = tag;
+      document.querySelectorAll('.tag-select-chip').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function applySmartTemplate(type) {
+      if (type === 'dump') {
+        composerTextarea.value = "💭 فكرة مشتتة: ";
+        selectComposerTag('dump', document.querySelector('[data-tag="dump"]'));
+      } else if (type === 'cornell') {
+        composerTextarea.value = "📌 الفكرة الرئيسية:\n- \n\n📖 التفاصيل والشرح:\n- \n\n💡 الخلاصة والنتيجة:\n- ";
+        selectComposerTag('cornell', document.querySelector('[data-tag="cornell"]'));
+      } else if (type === 'exam') {
+        composerTextarea.value = "⭐ سؤال متوقع بالامتحان:\n- \n\n✅ الإجابة النموذجية:\n- ";
+        selectComposerTag('exam', document.querySelector('[data-tag="exam"]'));
+      }
+      composerTextarea.focus();
+    }
+
+    function saveComposerNote() {
+      const val = composerTextarea.value.trim();
+      if (!val) return;
+
+      const now = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+      notesList.unshift({
+        id: Date.now(),
+        title: selectedNoteTag === 'dump' ? 'تفريغ فكرة مشتتة' : '',
+        detail: val,
+        summary: '',
+        tag: selectedNoteTag,
+        pinned: false,
+        date: `اليوم ${now}`
+      });
+
+      composerTextarea.value = '';
+      document.getElementById('composerWordCount').textContent = '0 كلمة';
+      localStorage.setItem('zen_notes_v10', JSON.stringify(notesList));
+      renderNotesFeed();
+    }
+
+    function togglePinNote(id) {
+      const item = notesList.find(n => n.id === id);
+      if (item) item.pinned = !item.pinned;
+      localStorage.setItem('zen_notes_v10', JSON.stringify(notesList));
+      renderNotesFeed();
+    }
+
+    function deleteNoteItem(id) {
+      notesList = notesList.filter(n => n.id !== id);
+      localStorage.setItem('zen_notes_v10', JSON.stringify(notesList));
+      renderNotesFeed();
+    }
+
+    function copyNoteItem(id) {
+      const item = notesList.find(n => n.id === id);
+      if (item && navigator.clipboard) {
+        const full = item.title ? `${item.title}\n${item.detail}\n${item.summary}` : item.detail;
+        navigator.clipboard.writeText(full);
+        alert('✓ تم نسخ الملاحظة إلى الحافظة');
+      }
+    }
+
+    function setNotesFilter(tag, btn) {
+      notesFilterTag = tag;
+      document.querySelectorAll('.btn-nfilter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderNotesFeed();
+    }
+
+    function renderNotesFeed() {
+      const feed = document.getElementById('notesStream');
       const q = (document.getElementById('inpSearchNotes').value || '').toLowerCase();
-      box.innerHTML = '';
+      feed.innerHTML = '';
 
       let pCount = 0, dCount = 0, cCount = 0;
       notesList.forEach(n => {
@@ -791,13 +951,14 @@
         if (n.tag === 'dump') dCount++;
         if (n.tag === 'cornell') cCount++;
       });
-      document.getElementById('cntAllNotes').textContent = notesList.length;
-      document.getElementById('cntPinnedNotes').textContent = pCount;
-      document.getElementById('cntDumpNotes').textContent = dCount;
-      document.getElementById('cntCornellNotes').textContent = cCount;
+      document.getElementById('nAll').textContent = notesList.length;
+      document.getElementById('nPinned').textContent = pCount;
+      document.getElementById('nDump').textContent = dCount;
+      document.getElementById('nCornell').textContent = cCount;
 
       const filtered = notesList.filter(n => {
-        if (!n.text.toLowerCase().includes(q)) return false;
+        const textToSearch = `${n.title} ${n.detail} ${n.summary}`.toLowerCase();
+        if (!textToSearch.includes(q)) return false;
         if (notesFilterTag === 'pinned') return n.pinned;
         if (notesFilterTag === 'dump') return n.tag === 'dump';
         if (notesFilterTag === 'cornell') return n.tag === 'cornell';
@@ -808,76 +969,50 @@
 
       filtered.forEach(n => {
         const card = document.createElement('div');
-        card.className = `note-item-card ${n.pinned ? 'pinned' : ''} ${n.tag === 'dump' ? 'dump' : ''}`;
+        card.className = `note-card-futuristic ${n.pinned ? 'pinned' : ''} ${n.tag}`;
+        const tagBadges = {
+          cornell: '<span class="badge-chip badge-cyan">📋 قالب كورنيل</span>',
+          dump: '<span class="badge-chip badge-purple">⚡ تفريغ مشتت</span>',
+          exam: '<span class="badge-chip badge-amber">⭐ سؤال امتحان</span>',
+          general: '<span class="badge-chip badge-emerald">📚 عام</span>'
+        };
+
+        // Render structured card if cornell
+        let bodyContent = '';
+        if (n.tag === 'cornell' && n.title) {
+          bodyContent = `
+            <div class="cornell-box">
+              <div class="cornell-sec"><div class="cornell-sec-title">📌 الفكرة الرئيسية</div><div class="cornell-sec-text">${n.title}</div></div>
+              <div class="cornell-sec"><div class="cornell-sec-title">📖 التفاصيل والشرح</div><div class="cornell-sec-text">${n.detail}</div></div>
+              <div class="cornell-sec"><div class="cornell-sec-title">💡 الخلاصة والنتيجة</div><div class="cornell-sec-text">${n.summary}</div></div>
+            </div>
+          `;
+        } else {
+          bodyContent = `<div class="note-raw-body">${n.detail}</div>`;
+        }
+
         card.innerHTML = `
-          <div class="note-item-head">
-            <span class="badge-chip badge-cyan">${n.tag === 'dump' ? '💭 تفريغ مشتت' : n.tag === 'cornell' ? '📋 قالب كورنيل' : '📚 عام'}</span>
-            <div style="display:flex;gap:8px;">
-              <button style="background:none;border:none;cursor:pointer;" onclick="togglePinNote(${n.id})">${n.pinned ? '⭐' : '☆'}</button>
-              <button style="background:none;border:none;color:#cbd5e1;cursor:pointer;" onclick="deleteNote(${n.id})">✕</button>
+          <div class="note-card-header">
+            ${tagBadges[n.tag] || tagBadges.general}
+            <div class="note-card-actions">
+              <button class="btn-card-act" onclick="togglePinNote(${n.id})" title="تثبيت">${n.pinned ? '⭐' : '☆'}</button>
+              <button class="btn-card-act" onclick="copyNoteItem(${n.id})" title="نسخ">📋</button>
+              <button class="btn-card-act" style="color:var(--rose);" onclick="deleteNoteItem(${n.id})" title="حذف">✕</button>
             </div>
           </div>
-          <div class="note-item-body">${n.text}</div>
-          <div class="note-item-footer"><span>${n.date}</span></div>
+          ${bodyContent}
+          <div class="note-card-date">${n.date}</div>
         `;
-        box.appendChild(card);
+        feed.appendChild(card);
       });
     }
 
-    function fillTemplate(type) {
-      const area = document.getElementById('txtNoteBody');
-      const sel = document.getElementById('selNoteTag');
-      if (type === 'dump') {
-        area.value = "💭 فكرة مشتتة: ";
-        sel.value = 'dump';
-      } else if (type === 'cornell') {
-        area.value = "📌 الفكرة الرئيسية:\n- \n❓ الأسئلة الهامة:\n- \n💡 الملخص الختامي:\n- ";
-        sel.value = 'cornell';
-      } else if (type === 'exam') {
-        area.value = "⭐ سؤال متوقع بالامتحان:\n- \n✅ الإجابة:\n- ";
-        sel.value = 'exam';
-      }
-      area.focus();
-    }
-
-    function saveNoteItem() {
-      const area = document.getElementById('txtNoteBody');
-      const val = area.value.trim();
-      if (!val) return;
-      const tag = document.getElementById('selNoteTag').value;
-      const now = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-      notesList.unshift({ id: Date.now(), text: val, tag, pinned: false, date: `اليوم ${now}` });
-      area.value = '';
-      localStorage.setItem('zen_notes_v9', JSON.stringify(notesList));
-      renderNotesStream();
-    }
-
-    function togglePinNote(id) {
-      const n = notesList.find(item => item.id === id);
-      if (n) n.pinned = !n.pinned;
-      localStorage.setItem('zen_notes_v9', JSON.stringify(notesList));
-      renderNotesStream();
-    }
-
-    function deleteNote(id) {
-      notesList = notesList.filter(item => item.id !== id);
-      localStorage.setItem('zen_notes_v9', JSON.stringify(notesList));
-      renderNotesStream();
-    }
-
-    function setNotesFilterTag(tag, btn) {
-      notesFilterTag = tag;
-      document.querySelectorAll('.btn-filter-pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderNotesStream();
-    }
-
     function exportNotesTxtFile() {
-      const content = notesList.map(n => `[${n.date} - ${n.tag}]\n${n.text}`).join('\n\n---\n\n');
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const full = notesList.map(n => `[${n.date} - ${n.tag}]\n${n.title ? n.title + '\n' : ''}${n.detail}\n${n.summary || ''}`).join('\n\n====================\n\n');
+      const blob = new Blob([full], { type: 'text/plain;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `zen-notes-${new Date().toISOString().slice(0,10)}.txt`;
+      a.download = `zen-study-notes-${new Date().toISOString().slice(0,10)}.txt`;
       a.click();
     }
 
@@ -885,18 +1020,18 @@
        6. ANALYTICS & STATS
        ======================================================== */
     function updateAnalyticsUI() {
-      document.getElementById('hudFocusMin').textContent = `${todayFocusMinutes} دقيقة`;
-      document.getElementById('hudStreak').textContent = `🔥 ${completedSessionsCount} جلسات`;
-      document.getElementById('kpiTodayMinutes').textContent = `${todayFocusMinutes} د`;
-      document.getElementById('kpiCompletedCount').textContent = completedSessionsCount;
-      const rank = completedSessionsCount >= 4 ? 'خبير تركيز 🎓' : completedSessionsCount >= 2 ? 'مثابر نشيط 🌿' : 'متعلم طموح 🌱';
-      document.getElementById('kpiRankTitle').textContent = rank;
+      document.getElementById('hudMinutes').textContent = `${totalMinsToday} دقيقة`;
+      document.getElementById('hudSessions').textContent = `🔥 ${completedSessions} جلسات`;
+      document.getElementById('kpiTodayMins').textContent = `${totalMinsToday} د`;
+      document.getElementById('kpiCompletedCount').textContent = completedSessions;
+      const rank = completedSessions >= 4 ? 'خبير تركيز 🎓' : completedSessions >= 2 ? 'مثابر نشيط 🌿' : 'متعلم طموح 🌱';
+      document.getElementById('kpiRankBadge').textContent = rank;
     }
 
-    /* Init */
+    /* Boot Init */
     renderChronoUI();
     renderTasksStream();
-    renderNotesStream();
+    renderNotesFeed();
     renderSoundTiles();
     updateAnalyticsUI();
   </script>
