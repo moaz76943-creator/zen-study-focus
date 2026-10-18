@@ -197,6 +197,16 @@ function skipQuickTrainingStep() {
   // A skipped work step never earns focus credit.
   advanceQuickTrainingStep();
 }
+function completeQuickTraining() {
+  const domain = quickTraining?.domain || cfg.domain || 'study';
+  quickTraining = null;
+  quickInternalChange = true;
+  const defaults = {study:25,sport:30,read:20,work:50};
+  selectTimerMode(defaults[domain] || 25,'focus',document.getElementById('modeFocusBtn'));
+  quickInternalChange = false;
+  renderQuickTraining();
+  showToast(quickText('finished'));
+}
 function advanceQuickTrainingStep() {
   const q=quickTraining;
   if(!q?.active)return false;
@@ -206,16 +216,12 @@ function advanceQuickTrainingStep() {
     } else if(q.currentSet<q.sets-1) {
       q.currentSet++;q.phase='work';
     } else {
-      quickTraining=null;
-      renderQuickTraining();
-      showToast(quickText('finished'));
+      completeQuickTraining();
       return false;
     }
   } else {
     if(q.currentSet===q.sets-1){
-      quickTraining=null;
-      renderQuickTraining();
-      showToast(quickText('finished'));
+      completeQuickTraining();
       return false;
     }
     q.currentSet++;q.phase='work';
