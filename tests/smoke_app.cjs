@@ -226,4 +226,30 @@ assert.equal(evaluate('timerRunning'),false);
 assert.equal(evaluate('timerTotal'),1800,'Finishing workout restores the sport focus duration');
 // A real today-plan preview uses saved tasks, not invented percentages.
 assert.equal(evaluate('typeof renderTodayPlan'), 'function');
+// Real white-home shortcuts use the original focus engine and never lose a live session.
+evaluate("selectTimerMode(25,'focus',null); toggleTimerPlay()");
+const homeRunning = evaluate('JSON.stringify({mode:currentTimerModeKey,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})');
+let homeConfirmations = 0;
+sandbox.window.confirm = () => { homeConfirmations++; return false; };
+assert.equal(evaluate('selectHomeQuickSession(10)'),false);
+assert.equal(homeConfirmations,1);
+assert.equal(evaluate('JSON.stringify({mode:currentTimerModeKey,total:timerTotal,left:timerLeft,running:timerRunning,sessionId:timerSessionId})'),homeRunning);
+sandbox.window.confirm = () => true;
+assert.equal(evaluate('selectHomeQuickSession(10)'),true);
+assert.equal(evaluate('timerTotal'),600);
+assert.equal(evaluate('timerRunning'),false);
+assert.equal(document.getElementById('modeFocusBtn').textContent,'10m');
+assert.equal(document.getElementById('homeQuick10').getAttribute('aria-pressed'),'true');
+assert.equal(document.getElementById('homeQuick25').getAttribute('aria-pressed'),'false');
+assert.equal(evaluate('selectHomeQuickSession(9)'),false,'Unlisted shortcut is rejected');
+assert.equal(evaluate('selectHomeQuickSession(50)'),true);
+assert.equal(evaluate('timerTotal'),3000);
+assert.equal(document.getElementById('homeQuick50').getAttribute('aria-pressed'),'true');
+// Week controls open an actual date in the existing calendar, including month/year rollover.
+assert.equal(evaluate("goToHomeAgenda('2026-02-30')"),false);
+assert.equal(evaluate("goToHomeAgenda('2026-11-05')"),true);
+assert.equal(evaluate('selectedCalDate'),'2026-11-05');
+assert.equal(evaluate('calMonth'),10);
+assert.equal(evaluate('calYear'),2026);
+assert.equal(evaluate('typeof renderHomeWeekStrip'),'function');
 console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');
