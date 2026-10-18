@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (webView != null) {
-            webView.evaluateJavascript("if(window.closeAnyOpenModal && window.closeAnyOpenModal()){}else{history.back();}", null);
+            webView.evaluateJavascript("if(window.handleAndroidBack && window.handleAndroidBack()){}else{history.back();}", null);
         } else {
             super.onBackPressed();
         }

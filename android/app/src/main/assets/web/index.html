@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ZEN FOCUS</title>
+  <title>ZEN FOCUS - الإنتاجية والهدوء الذكي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-main: #f0f4f9;
@@ -15,8 +18,12 @@
       --text-muted: #64748b;
       --text-light: #94a3b8;
       --accent-green: #10b981;
+      --accent-green-soft: #d1fae5;
       --accent-purple: #8b5cf6;
+      --accent-purple-soft: #ede9fe;
       --accent-amber: #f59e0b;
+      --accent-amber-soft: #fef3c7;
+      --danger: #ef4444;
       --border-card: #eef2f6;
       --shadow-soft: 0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.02);
       --radius-xl: 26px;
@@ -24,35 +31,45 @@
       --radius-pill: 9999px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-main); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 96px; overflow-x: hidden; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-main); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 96px; overflow-x: hidden; transition: background 0.3s; }
+
+    /* Deep Focus Zen Mode */
+    body.deep-focus-mode .app-topbar,
+    body.deep-focus-mode .bottom-glass-nav,
+    body.deep-focus-mode .lake-hero-card,
+    body.deep-focus-mode .timer-stats-grid,
+    body.deep-focus-mode .sprout-landscape-banner { display: none !important; }
+    body.deep-focus-mode { background-color: #ffffff; justify-content: center; padding-bottom: 20px; }
 
     .app-viewport { width: 100%; max-width: 440px; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
 
     /* Top Universal Header */
     .app-topbar {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 18px 10px; background: #ffffff; border-bottom: 1px solid #f1f5f9;
+      padding: 13px 18px 10px; background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px); border-bottom: 1px solid #f1f5f9;
       position: sticky; top: 0; z-index: 50;
     }
     .topbar-btn {
-      width: 36px; height: 36px; border-radius: 50%; border: 1px solid #e2e8f0;
+      width: 38px; height: 38px; border-radius: 50%; border: 1px solid #e2e8f0;
       background: #ffffff; color: var(--text-dark); display: flex; align-items: center;
       justify-content: center; cursor: pointer; transition: 0.15s;
     }
-    .topbar-btn:active { transform: scale(0.92); }
+    .topbar-btn:active { transform: scale(0.9); background: var(--primary-soft); }
     .topbar-btn svg { width: 18px; height: 18px; fill: currentColor; }
     .topbar-brand { text-align: center; cursor: pointer; }
     .brand-h1 { font-size: 1.15rem; font-weight: 900; color: #0284c7; display: flex; align-items: center; justify-content: center; gap: 4px; }
-    .brand-sub { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; }
+    .brand-sub { font-size: 0.68rem; color: var(--text-muted); font-weight: 700; }
     .crown-btn {
-      width: 36px; height: 36px; border-radius: 50%; border: none;
+      width: 38px; height: 38px; border-radius: 50%; border: 1px solid #fde68a;
       background: #fffbeb; color: #f59e0b; display: flex; align-items: center; justify-content: center;
-      font-size: 1.15rem; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2); cursor: pointer;
+      font-size: 1.15rem; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2); cursor: pointer; transition: 0.15s;
     }
+    .crown-btn:active { transform: scale(0.9); }
 
     /* Screen Views */
-    .screen-view { display: none; padding: 14px 14px 20px; animation: fadeIn 0.2s ease-in-out; }
+    .screen-view { display: none; padding: 14px 14px 22px; animation: fadeIn 0.2s ease-out; }
     .screen-view.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -62,48 +79,76 @@
       position: relative;
     }
 
-    /* 1. TIMER SCREEN */
+    /* ========================================================
+       1. SCREEN: TIMER (المؤقت)
+       ======================================================== */
     .lake-hero-card {
-      width: 100%; height: 130px; border-radius: var(--radius-xl);
-      background: linear-gradient(180deg, rgba(8, 28, 58, 0.45) 0%, rgba(14, 45, 82, 0.8) 100%),
-                  radial-gradient(ellipse at bottom, #38bdf8 0%, #0369a1 40%, #0f172a 100%);
+      width: 100%; height: 132px; border-radius: var(--radius-xl);
+      background-image: linear-gradient(180deg, rgba(8, 28, 58, 0.35) 0%, rgba(14, 45, 82, 0.82) 100%),
+                        url('images/hero.jpg'),
+                        radial-gradient(ellipse at bottom, #38bdf8 0%, #0369a1 45%, #0f172a 100%);
+      background-size: cover; background-position: center;
       display: flex; align-items: flex-end; justify-content: center; padding: 14px;
-      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.2); margin-bottom: 14px; position: relative; overflow: hidden;
+      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.2); margin-bottom: 10px; position: relative; overflow: hidden;
+      cursor: pointer;
     }
     .lake-glass-quote {
-      background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: var(--radius-pill);
-      padding: 8px 18px; color: #ffffff; font-size: 0.74rem; font-weight: 700;
+      background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.35); border-radius: var(--radius-pill);
+      padding: 7px 16px; color: #ffffff; font-size: 0.74rem; font-weight: 700;
       text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15);
     }
+
+    /* Smart Mini Utility Strip (Hydration, Brain Dump, Deep Focus) */
+    .smart-utility-strip {
+      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none;
+    }
+    .smart-utility-strip::-webkit-scrollbar { display: none; }
+    .utility-chip {
+      background: #ffffff; border: 1px solid #e2e8f0; border-radius: var(--radius-pill);
+      padding: 6px 12px; font-size: 0.7rem; font-weight: 800; color: var(--text-dark);
+      white-space: nowrap; display: flex; align-items: center; gap: 4px; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: 0.15s;
+    }
+    .utility-chip:active { transform: scale(0.95); background: var(--primary-soft); color: var(--primary); }
+    .utility-chip.active-mode { background: var(--primary); color: #ffffff; border-color: var(--primary); }
+
     .timer-mode-selector {
       display: flex; background: #f1f5f9; padding: 4px; border-radius: var(--radius-pill);
       margin-bottom: 16px; gap: 4px;
     }
     .tmode-btn {
-      flex: 1; border: none; background: transparent; padding: 8px 0; border-radius: var(--radius-pill);
-      font-size: 0.76rem; font-weight: 800; color: var(--text-muted); cursor: pointer; transition: 0.2s;
+      flex: 1; border: none; background: transparent; padding: 8px 2px; border-radius: var(--radius-pill);
+      font-size: 0.73rem; font-weight: 800; color: var(--text-muted); cursor: pointer; transition: 0.2s;
     }
     .tmode-btn.active {
       background: var(--primary); color: #ffffff; box-shadow: 0 4px 12px rgba(0, 136, 255, 0.35);
     }
 
-    .timer-gauge-area { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 0 12px; }
-    .gauge-ring-wrap { position: relative; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; }
+    .timer-gauge-area { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 0 12px; }
+    .gauge-ring-wrap { position: relative; width: 205px; height: 205px; display: flex; align-items: center; justify-content: center; }
     .gauge-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-    .gauge-track { fill: none; stroke: #f1f5f9; stroke-width: 8; }
+    .gauge-track { fill: none; stroke: #f1f5f9; stroke-width: 8.5; }
     .gauge-progress {
-      fill: none; stroke: url(#timerGrad); stroke-width: 8; stroke-linecap: round;
-      stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s linear;
+      fill: none; stroke: url(#timerGrad); stroke-width: 8.5; stroke-linecap: round;
+      stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.5s linear, stroke 0.3s;
       filter: drop-shadow(0 4px 10px rgba(0, 210, 255, 0.45));
     }
+    .gauge-progress.golden-minute {
+      stroke: #f59e0b !important;
+      filter: drop-shadow(0 4px 14px rgba(245, 158, 11, 0.6)) !important;
+    }
+    .gauge-progress.overtime-glow {
+      stroke: #10b981 !important;
+      filter: drop-shadow(0 4px 14px rgba(16, 185, 129, 0.6)) !important;
+    }
     .gauge-center-content { position: absolute; text-align: center; }
-    .gauge-sprout-top { font-size: 1.8rem; margin-bottom: 2px; }
+    .gauge-sprout-top { font-size: 1.8rem; margin-bottom: 2px; transition: transform 0.3s; }
     .gauge-digits-large { font-size: 3rem; font-weight: 900; letter-spacing: -1px; color: var(--text-dark); line-height: 1; font-variant-numeric: tabular-nums; }
-    .gauge-state-lbl { font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; }
-    .gauge-pill-tag { font-size: 0.7rem; font-weight: 800; color: var(--primary); background: var(--primary-soft); padding: 3px 12px; border-radius: var(--radius-pill); margin-top: 6px; display: inline-block; }
+    .gauge-state-lbl { font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; max-width: 155px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gauge-pill-tag { font-size: 0.68rem; font-weight: 800; color: var(--primary); background: var(--primary-soft); padding: 3px 12px; border-radius: var(--radius-pill); margin-top: 6px; display: inline-block; cursor: pointer; }
 
-    .timer-controls-row { display: flex; justify-content: space-around; align-items: center; margin-top: 10px; width: 100%; }
+    .timer-controls-row { display: flex; justify-content: space-around; align-items: center; margin-top: 8px; width: 100%; }
     .ctrl-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .btn-circle-ctrl {
       width: 48px; height: 48px; border-radius: 50%; background: #ffffff;
@@ -111,29 +156,29 @@
       justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
       transition: 0.15s;
     }
-    .btn-circle-ctrl:active { transform: scale(0.92); }
+    .btn-circle-ctrl:active { transform: scale(0.92); background: #f8fafc; }
     .btn-play-hero {
-      width: 62px; height: 62px; border-radius: 50%;
+      width: 64px; height: 64px; border-radius: 50%;
       background: linear-gradient(135deg, #0088ff 0%, #00c6ff 100%);
       border: none; color: #ffffff; display: flex; align-items: center; justify-content: center;
       cursor: pointer; box-shadow: 0 8px 24px rgba(0, 136, 255, 0.4); transition: 0.15s;
     }
     .btn-play-hero:active { transform: scale(0.92); }
-    .btn-play-hero svg { width: 26px; height: 26px; fill: #ffffff; margin-left: 2px; }
+    .btn-play-hero svg { width: 26px; height: 26px; fill: #ffffff; }
     .ctrl-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
 
-    .adjust-pills-row { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+    .adjust-pills-row { display: flex; justify-content: center; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
     .adj-pill {
       background: #f1f5f9; border: none; padding: 6px 12px; border-radius: var(--radius-pill);
       font-size: 0.72rem; font-weight: 800; color: var(--primary); cursor: pointer; transition: 0.15s;
     }
-    .adj-pill:active { background: var(--primary-soft); }
+    .adj-pill:active { background: var(--primary); color: #ffffff; }
 
     .timer-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     .stat-micro-card {
       background: #ffffff; border-radius: var(--radius-lg); padding: 12px 14px;
       border: 1px solid var(--border-card); box-shadow: var(--shadow-soft);
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
     }
     .stat-micro-ico { width: 36px; height: 36px; border-radius: 10px; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
     .stat-micro-num { font-size: 1.15rem; font-weight: 900; color: var(--text-dark); }
@@ -142,42 +187,45 @@
     .sprout-landscape-banner {
       background: #ffffff; border-radius: var(--radius-xl); padding: 14px 16px;
       border: 1px solid var(--border-card); box-shadow: var(--shadow-soft);
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer;
     }
     .sprout-text { font-size: 0.76rem; color: var(--text-dark); font-weight: 700; line-height: 1.45; }
     .sprout-visual { font-size: 2.2rem; }
 
-    /* 2. TASKS SCREEN */
-    .screen-header-block { margin-bottom: 14px; text-align: center; }
+    /* ========================================================
+       2. SCREEN: TASKS (المهام الدراسية)
+       ======================================================== */
+    .screen-header-block { margin-bottom: 12px; text-align: center; }
     .screen-header-title { font-size: 1.2rem; font-weight: 900; color: var(--text-dark); }
     .screen-header-sub { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
 
-    .filter-pills-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
+    .filter-pills-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 9px; scrollbar-width: none; }
     .filter-pills-row::-webkit-scrollbar { display: none; }
     .fpill-btn {
-      background: #ffffff; border: 1px solid #e2e8f0; padding: 6px 14px;
+      background: #ffffff; border: 1px solid #e2e8f0; padding: 6px 13px;
       border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 800;
-      color: var(--text-muted); white-space: nowrap; cursor: pointer;
+      color: var(--text-muted); white-space: nowrap; cursor: pointer; transition: 0.15s;
     }
     .fpill-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); }
 
     .input-task-card {
-      background: #ffffff; border-radius: var(--radius-lg); padding: 6px 6px 6px 14px;
-      border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px;
-      box-shadow: var(--shadow-soft); margin-bottom: 14px;
+      background: #ffffff; border-radius: var(--radius-lg); padding: 8px 10px;
+      border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 6px;
+      box-shadow: var(--shadow-soft); margin-bottom: 12px; flex-wrap: wrap;
     }
     .btn-add-task {
       width: 34px; height: 34px; border-radius: 50%; background: var(--primary);
       border: none; color: #fff; font-size: 1.2rem; font-weight: 900; display: flex;
-      align-items: center; justify-content: center; cursor: pointer;
+      align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
     }
-    .input-task-text { flex: 1; border: none; outline: none; font-size: 0.82rem; color: var(--text-dark); background: transparent; }
+    .input-task-text { flex: 1; min-width: 130px; border: none; outline: none; font-size: 0.82rem; color: var(--text-dark); background: transparent; }
+    .mini-select { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 9px; padding: 4px 6px; font-size: 0.7rem; font-weight: 700; color: var(--text-dark); outline: none; }
 
     .task-cards-stream { display: flex; flex-direction: column; gap: 9px; }
     .task-card-futuristic {
-      background: #ffffff; border-radius: var(--radius-lg); padding: 14px 16px;
+      background: #ffffff; border-radius: var(--radius-lg); padding: 13px 15px;
       border: 1px solid #eef2f6; box-shadow: var(--shadow-soft);
-      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      display: flex; flex-direction: column; gap: 8px;
       border-right: 4px solid var(--primary); transition: transform 0.15s;
     }
     .task-card-futuristic.c-green { border-right-color: var(--accent-green); }
@@ -186,21 +234,34 @@
     .task-card-futuristic.done { border-right-color: #cbd5e1; background: #fafbfc; }
     .task-card-futuristic.done .task-name-txt { text-decoration: line-through; color: var(--text-light); }
 
-    .task-right-area { display: flex; align-items: center; gap: 12px; flex: 1; cursor: pointer; }
+    .task-top-flex { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .task-right-area { display: flex; align-items: center; gap: 11px; flex: 1; cursor: pointer; }
     .task-checkbox-box {
       width: 22px; height: 22px; border-radius: 7px; border: 2px solid #cbd5e1;
-      display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: 0.2s;
+      display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: 0.2s; flex-shrink: 0;
     }
     .task-card-futuristic.done .task-checkbox-box { background: var(--accent-green); border-color: var(--accent-green); color: #fff; }
     .task-name-txt { font-size: 0.84rem; font-weight: 800; color: var(--text-dark); }
-    .task-tags-row { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
-    .tag-badge-pill { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--primary-soft); color: var(--primary); }
+    .task-tags-row { display: flex; gap: 6px; align-items: center; margin-top: 3px; flex-wrap: wrap; }
+    .tag-badge-pill { font-size: 0.64rem; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--primary-soft); color: var(--primary); }
+    .prio-badge { font-size: 0.62rem; font-weight: 800; padding: 1px 6px; border-radius: 6px; }
+    .prio-high { background: #fee2e2; color: #ef4444; }
+    .prio-med { background: #fef3c7; color: #d97706; }
 
-    /* 3. NOTES SCREEN */
+    /* Subtasks Progress inside Task Card */
+    .subtask-bar-wrap { padding-right: 32px; display: flex; flex-direction: column; gap: 4px; }
+    .subtask-progress-line { width: 100%; height: 4px; background: #f1f5f9; border-radius: 2px; overflow: hidden; }
+    .subtask-progress-fill { height: 100%; background: var(--accent-green); transition: width 0.3s; }
+    .subtask-item-row { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-muted); cursor: pointer; }
+    .subtask-item-row.sub-done { text-decoration: line-through; color: var(--text-light); }
+
+    /* ========================================================
+       3. SCREEN: NOTES (الملاحظات الذكية)
+       ======================================================== */
     .notes-search-bar {
-      background: #ffffff; border-radius: var(--radius-lg); padding: 10px 14px;
+      background: #ffffff; border-radius: var(--radius-lg); padding: 9px 14px;
       border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;
-      box-shadow: var(--shadow-soft); margin-bottom: 12px;
+      box-shadow: var(--shadow-soft); margin-bottom: 10px;
     }
     .search-inp-notes { flex: 1; border: none; outline: none; font-size: 0.82rem; color: var(--text-dark); background: transparent; }
 
@@ -216,44 +277,47 @@
 
     .note-head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .note-title-bold { font-size: 0.86rem; font-weight: 900; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
-    .note-body-txt { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; white-space: pre-wrap; }
-    .note-foot-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
+    .note-body-txt { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; white-space: pre-wrap; transition: filter 0.25s; }
+    .note-body-txt.tap-blur { filter: blur(6px); user-select: none; cursor: pointer; background: #f8fafc; border-radius: 8px; padding: 6px; }
+    .note-foot-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.66rem; color: var(--text-light); flex-wrap: wrap; gap: 6px; }
 
     .fab-add-note {
-      position: fixed; bottom: 84px; left: 24px; width: 52px; height: 52px;
+      position: fixed; bottom: 84px; left: 24px; width: 54px; height: 54px;
       border-radius: 50%; background: linear-gradient(135deg, #0088ff 0%, #00d2ff 100%);
-      border: none; color: #ffffff; font-size: 1.6rem; display: flex; align-items: center;
+      border: none; color: #ffffff; font-size: 1.65rem; display: flex; align-items: center;
       justify-content: center; box-shadow: 0 10px 25px rgba(0, 136, 255, 0.45);
-      cursor: pointer; z-index: 90;
+      cursor: pointer; z-index: 80;
     }
 
-    /* 4. SOUNDS SCREEN */
+    /* ========================================================
+       4. SCREEN: SOUNDS (استوديو الأصوات الطبيعية الحقيقية)
+       ======================================================== */
     .sounds-grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .sound-photo-card {
-      height: 125px; border-radius: var(--radius-lg); position: relative; overflow: hidden;
+      height: 132px; border-radius: var(--radius-lg); position: relative; overflow: hidden;
       display: flex; flex-direction: column; justify-content: space-between; padding: 10px;
-      color: #ffffff; box-shadow: var(--shadow-soft); border: 2px solid transparent;
-      cursor: pointer; transition: 0.2s;
+      color: #ffffff; box-shadow: var(--shadow-soft); border: 2.5px solid transparent;
+      cursor: pointer; transition: 0.2s; background-size: cover; background-position: center;
     }
-    .sound-photo-card.active { border-color: var(--primary-glow); box-shadow: 0 8px 24px rgba(0, 210, 255, 0.35); }
+    .sound-photo-card.active { border-color: var(--primary-glow); box-shadow: 0 8px 24px rgba(0, 210, 255, 0.4); }
 
-    .bg-ocean { background: linear-gradient(180deg, rgba(3, 105, 161, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%), #0284c7; }
-    .bg-rain { background: linear-gradient(180deg, rgba(51, 65, 85, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%), #475569; }
-    .bg-fire { background: linear-gradient(180deg, rgba(180, 83, 9, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%), #d97706; }
-    .bg-forest { background: linear-gradient(180deg, rgba(5, 150, 105, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%), #059669; }
-    .bg-stream { background: linear-gradient(180deg, rgba(2, 132, 199, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%), #0284c7; }
-    .bg-leaves { background: linear-gradient(180deg, rgba(22, 101, 52, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%), #15803d; }
-    .bg-cafe { background: linear-gradient(180deg, rgba(120, 53, 15, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%), #92400e; }
-    .bg-noise { background: linear-gradient(180deg, rgba(71, 85, 105, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%), #334155; }
+    .bg-ocean { background-image: linear-gradient(180deg, rgba(3, 105, 161, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/ocean.jpg'); background-color: #0284c7; }
+    .bg-rain { background-image: linear-gradient(180deg, rgba(51, 65, 85, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/rain.jpg'); background-color: #475569; }
+    .bg-fire { background-image: linear-gradient(180deg, rgba(180, 83, 9, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/fire.jpg'); background-color: #d97706; }
+    .bg-forest { background-image: linear-gradient(180deg, rgba(5, 150, 105, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/forest.jpg'); background-color: #059669; }
+    .bg-stream { background-image: linear-gradient(180deg, rgba(2, 132, 199, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/stream.jpg'); background-color: #0284c7; }
+    .bg-leaves { background-image: linear-gradient(180deg, rgba(22, 101, 52, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/leaves.jpg'); background-color: #15803d; }
+    .bg-cafe { background-image: linear-gradient(180deg, rgba(120, 53, 15, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/cafe.jpg'); background-color: #92400e; }
+    .bg-noise { background-image: linear-gradient(180deg, rgba(71, 85, 105, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/noise.jpg'); background-color: #334155; }
 
     .sound-card-top { display: flex; justify-content: space-between; align-items: center; }
     .sound-play-icon {
-      width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, 0.25);
+      width: 28px; height: 28px; border-radius: 50%; background: rgba(15, 23, 42, 0.55);
       backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem;
+      font-size: 0.76rem; border: 1px solid rgba(255,255,255,0.25);
     }
     .sound-card-toggle {
-      width: 32px; height: 18px; border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.3);
+      width: 32px; height: 18px; border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.35);
       position: relative; transition: 0.2s;
     }
     .sound-photo-card.active .sound-card-toggle { background: var(--primary-glow); }
@@ -263,11 +327,13 @@
     }
     .sound-photo-card.active .sound-knob { transform: translateX(-14px); }
 
-    .sound-card-title { font-size: 0.84rem; font-weight: 800; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
-    .sound-vol-slider { width: 100%; -webkit-appearance: none; background: rgba(255, 255, 255, 0.35); height: 3px; border-radius: 2px; outline: none; margin-top: 6px; }
-    .sound-vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #ffffff; cursor: pointer; }
+    .sound-card-title { font-size: 0.84rem; font-weight: 800; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+    .sound-vol-slider { width: 100%; -webkit-appearance: none; background: rgba(255, 255, 255, 0.4); height: 3.5px; border-radius: 2px; outline: none; margin-top: 6px; }
+    .sound-vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #ffffff; cursor: pointer; }
 
-    /* 5. ANALYTICS SCREEN */
+    /* ========================================================
+       5. SCREEN: ANALYTICS & ZEN GARDEN (التحليلات والحديقة)
+       ======================================================== */
     .kpi-duo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     .kpi-white-card {
       background: #ffffff; border-radius: var(--radius-lg); padding: 14px 16px;
@@ -282,12 +348,12 @@
       background: #ffffff; border-radius: var(--radius-xl); padding: 18px 16px;
       border: 1px solid var(--border-card); box-shadow: var(--shadow-soft); margin-bottom: 12px;
     }
-    .chart-title { font-size: 0.9rem; font-weight: 900; color: var(--text-dark); margin-bottom: 14px; }
+    .chart-title { font-size: 0.9rem; font-weight: 900; color: var(--text-dark); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
     .bars-chart-flex {
       display: flex; justify-content: space-between; align-items: flex-end; height: 140px;
       padding-top: 25px; border-bottom: 1px solid #f1f5f9; position: relative;
     }
-    .chart-col { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+    .chart-col { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; cursor: pointer; }
     .chart-bar-pillar {
       width: 18px; border-radius: 6px; background: #e0f2fe; transition: height 0.3s;
       position: relative;
@@ -298,7 +364,7 @@
     .bar-tooltip {
       position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
       background: #0f172a; color: #fff; font-size: 0.62rem; font-weight: 800;
-      padding: 2px 6px; border-radius: 6px; white-space: nowrap;
+      padding: 2px 6px; border-radius: 6px; white-space: nowrap; z-index: 5;
     }
     .col-day-lbl { font-size: 0.68rem; font-weight: 700; color: var(--text-light); }
 
@@ -310,7 +376,7 @@
     .streak-checks-row { display: flex; gap: 6px; margin-top: 8px; }
     .streak-circle-chk {
       width: 24px; height: 24px; border-radius: 50%; background: #e0f2fe; color: var(--primary);
-      display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 900; cursor: pointer;
     }
     .streak-circle-chk.checked { background: var(--primary); color: #ffffff; }
 
@@ -323,10 +389,40 @@
     .peak-time-hours { font-size: 0.65rem; color: var(--text-light); margin: 2px 0 4px; }
     .peak-time-mins { font-size: 0.88rem; font-weight: 900; color: var(--primary); }
 
+    /* ========================================================
+       MODALS & TOASTS (100% WORKING IN-APP SHEETS)
+       ======================================================== */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px); display: none; align-items: center;
+      justify-content: center; padding: 16px; z-index: 200;
+    }
+    .modal-backdrop.open { display: flex; animation: fadeIn 0.18s ease-out; }
+    .modal-sheet {
+      background: #ffffff; width: 100%; max-width: 390px; border-radius: 24px;
+      padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 86vh; overflow-y: auto;
+    }
+    .modal-sheet-title { font-size: 1rem; font-weight: 900; color: var(--text-dark); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-field { width: 100%; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; font-size: 0.82rem; margin-bottom: 10px; outline: none; background: #f8fafc; color: var(--text-dark); }
+    .modal-field:focus { border-color: var(--primary); background: #ffffff; }
+    .modal-btn-row { display: flex; gap: 8px; margin-top: 8px; }
+    .btn-modal-primary { flex: 1; background: var(--primary); color: #ffffff; border: none; padding: 11px; border-radius: 12px; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
+    .btn-modal-sec { flex: 1; background: #f1f5f9; color: var(--text-dark); border: none; padding: 11px; border-radius: 12px; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
+    .btn-modal-danger { flex: 1; background: #fee2e2; color: var(--danger); border: none; padding: 11px; border-radius: 12px; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
+
+    .toast-banner {
+      position: fixed; top: 68px; left: 50%; transform: translateX(-50%) translateY(-20px);
+      background: #0f172a; color: #ffffff; padding: 9px 18px; border-radius: 999px;
+      font-size: 0.76rem; font-weight: 700; box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      opacity: 0; pointer-events: none; transition: 0.25s; z-index: 300; display: flex; align-items: center; gap: 10px; white-space: nowrap;
+    }
+    .toast-banner.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .toast-undo-btn { background: var(--primary); color: #fff; border: none; padding: 3px 9px; border-radius: 99px; font-size: 0.7rem; font-weight: 800; cursor: pointer; }
+
     /* Floating Navigation */
     .bottom-glass-nav {
       position: fixed; bottom: 10px; width: calc(100% - 24px); max-width: 416px;
-      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px);
       border: 1px solid var(--border-card); border-radius: 26px; padding: 7px 10px;
       display: flex; justify-content: space-around; align-items: center; z-index: 100;
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
@@ -343,6 +439,12 @@
 </head>
 <body>
 
+  <!-- Toast with Undo Support -->
+  <div class="toast-banner" id="appToast">
+    <span id="toastMsgTxt">تمت العملية ✓</span>
+    <button class="toast-undo-btn" id="toastUndoBtn" style="display:none;" onclick="triggerUndoAction()">تراجع</button>
+  </div>
+
   <div class="app-viewport">
     <svg style="position: absolute; width: 0; height: 0;">
       <defs>
@@ -353,30 +455,42 @@
       </defs>
     </svg>
 
+    <!-- Top Universal Bar -->
     <header class="app-topbar">
-      <button class="topbar-btn" onclick="alert('⚙️ الإعدادات: التطبيق محلي 100%')" title="الإعدادات">
+      <button class="topbar-btn" onclick="openSettingsModal()" title="الإعدادات والنسخ الاحتياطي">
         <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
       </button>
 
-      <div class="topbar-brand">
+      <div class="topbar-brand" onclick="switchScreen('view-timer', document.getElementById('navBtnTimer'))">
         <h1 class="brand-h1">ZEN FOCUS 🌿</h1>
         <p class="brand-sub">الإنتاجية والهدوء الذكي</p>
       </div>
 
-      <button class="crown-btn" onclick="alert('أنت تستخدم النسخة المميزة!')" title="النسخة المميزة">👑</button>
+      <button class="crown-btn" onclick="openGardenRankModal()" title="حديقة التركيز ورتبتك">👑</button>
     </header>
 
-    <!-- 1. SCREEN: TIMER -->
+    <!-- ========================================================
+         1. SCREEN: TIMER (المؤقت)
+         ======================================================== -->
     <main class="screen-view active" id="view-timer">
-      <div class="lake-hero-card">
-        <div class="lake-glass-quote">"التركيز هو زراعة اليوم من أجل غد أفضل"</div>
+      <div class="lake-hero-card" onclick="cycleQuotes()">
+        <div class="lake-glass-quote" id="quoteBannerTxt">"التركيز هو زراعة اليوم من أجل غد أفضل"</div>
+      </div>
+
+      <!-- Organized Smart Utility Strip -->
+      <div class="smart-utility-strip">
+        <button class="utility-chip" onclick="openQuickBrainDumpModal()">💭 تفريغ مشتت سريع</button>
+        <button class="utility-chip" id="waterChipBtn" onclick="incrementWaterCup()">💧 الماء: 0/8</button>
+        <button class="utility-chip" id="deepFocusChip" onclick="toggleDeepFocusMode()">🔒 التركيز العميق</button>
+        <button class="utility-chip" onclick="triggerProportionalBreak()">☕ استراحة ذكية (20%)</button>
       </div>
 
       <div class="clean-card">
         <div class="timer-mode-selector">
-          <button class="tmode-btn active" id="mFocus" onclick="setTimer(25, 'جلسة تركيز', this)">تركيز</button>
-          <button class="tmode-btn" id="mShort" onclick="setTimer(5, 'استراحة قصيرة', this)">استراحة قصيرة</button>
-          <button class="tmode-btn" id="mLong" onclick="setTimer(15, 'استراحة طويلة', this)">استراحة طويلة</button>
+          <button class="tmode-btn active" id="mFocus" onclick="setTimer(cfg.focusMin, 'جلسة تركيز', this)">تركيز</button>
+          <button class="tmode-btn" id="mShort" onclick="setTimer(cfg.shortMin, 'استراحة قصيرة', this)">استراحة قصيرة</button>
+          <button class="tmode-btn" id="mLong" onclick="setTimer(cfg.longMin, 'استراحة طويلة', this)">استراحة طويلة</button>
+          <button class="tmode-btn" id="mExam" onclick="setTimer(90, 'وضع الامتحان الشامل 📝', this)">امتحان 90د</button>
         </div>
 
         <div class="timer-gauge-area">
@@ -386,10 +500,10 @@
               <circle class="gauge-progress" id="timerSvgFill" cx="115" cy="115" r="105"></circle>
             </svg>
             <div class="gauge-center-content">
-              <div class="gauge-sprout-top">🌱</div>
+              <div class="gauge-sprout-top" id="timerTreeIcon">🌱</div>
               <div class="gauge-digits-large" id="timerDigits">25:00</div>
               <div class="gauge-state-lbl" id="timerModeText">جلسة تركيز</div>
-              <div class="gauge-pill-tag">ابدأ • ركز • أنجز</div>
+              <div class="gauge-pill-tag" id="linkedTaskPill" onclick="switchScreen('view-tasks', document.getElementById('navBtnTasks'))">ابدأ • ركز • أنجز</div>
             </div>
           </div>
         </div>
@@ -423,30 +537,32 @@
       </div>
 
       <div class="timer-stats-grid">
-        <div class="stat-micro-card">
+        <div class="stat-micro-card" onclick="switchScreen('view-analytics', document.getElementById('navBtnAnalytics'))">
           <div class="stat-micro-ico">📊</div>
           <div>
-            <div class="stat-micro-num">120</div>
+            <div class="stat-micro-num" id="cardTodayMins">120</div>
             <div class="stat-micro-title">دقائق التركيز اليوم</div>
           </div>
         </div>
 
-        <div class="stat-micro-card">
+        <div class="stat-micro-card" onclick="switchScreen('view-analytics', document.getElementById('navBtnAnalytics'))">
           <div class="stat-micro-ico" style="background:var(--accent-amber-soft); color:var(--accent-amber);">🔥</div>
           <div>
-            <div class="stat-micro-num">5 أيام</div>
+            <div class="stat-micro-num" id="cardTodayStreak">5 أيام</div>
             <div class="stat-micro-title">سلسلة النشاط</div>
           </div>
         </div>
       </div>
 
-      <div class="sprout-landscape-banner">
+      <div class="sprout-landscape-banner" onclick="openGardenRankModal()">
         <div class="sprout-text">كل دقيقة تركيز هي خطوة أقرب نحو النسخة الأفضل من نفسك.</div>
-        <div class="sprout-visual">🌱</div>
+        <div class="sprout-visual" id="bannerSproutIcon">🌱</div>
       </div>
     </main>
 
-    <!-- 2. SCREEN: TASKS -->
+    <!-- ========================================================
+         2. SCREEN: TASKS (المهام الدراسية)
+         ======================================================== -->
     <main class="screen-view" id="view-tasks">
       <div class="screen-header-block">
         <h2 class="screen-header-title">المهام الدراسية</h2>
@@ -454,27 +570,41 @@
       </div>
 
       <div class="filter-pills-row">
-        <button class="fpill-btn active" onclick="setTaskFilter('all', this)">الكل (12)</button>
-        <button class="fpill-btn" onclick="setTaskFilter('active', this)">قيد التنفيذ (4)</button>
-        <button class="fpill-btn" onclick="setTaskFilter('done', this)">مكتملة (8)</button>
+        <button class="fpill-btn active" id="btnStatAll" onclick="setTaskStatusFilter('all', this)">الكل (6)</button>
+        <button class="fpill-btn" id="btnStatActive" onclick="setTaskStatusFilter('active', this)">قيد التنفيذ (4)</button>
+        <button class="fpill-btn" id="btnStatDone" onclick="setTaskStatusFilter('done', this)">مكتملة (2)</button>
       </div>
 
       <div class="filter-pills-row">
-        <button class="fpill-btn active">كل المهام</button>
-        <button class="fpill-btn">دراسة</button>
-        <button class="fpill-btn">امتحانات</button>
-        <button class="fpill-btn">شخصي</button>
+        <button class="fpill-btn active" onclick="setTaskCategoryFilter('all', this)">كل المهام</button>
+        <button class="fpill-btn" onclick="setTaskCategoryFilter('دراسة', this)">دراسة</button>
+        <button class="fpill-btn" onclick="setTaskCategoryFilter('امتحانات', this)">امتحانات</button>
+        <button class="fpill-btn" onclick="setTaskCategoryFilter('مراجعة', this)">مراجعة</button>
+        <button class="fpill-btn" onclick="setTaskCategoryFilter('شخصي', this)">شخصي</button>
       </div>
 
       <div class="input-task-card">
         <button class="btn-add-task" onclick="addNewTask()">+</button>
-        <input type="text" class="input-task-text" id="newTaskInput" placeholder="أضف مهمة جديدة... ✨">
+        <input type="text" class="input-task-text" id="newTaskInput" placeholder="أضف مهمة جديدة... ✨" onkeydown="if(event.key==='Enter')addNewTask()">
+        <select class="mini-select" id="newTaskCat">
+          <option value="دراسة">دراسة</option>
+          <option value="امتحانات">امتحانات</option>
+          <option value="مراجعة">مراجعة</option>
+          <option value="شخصي">شخصي</option>
+        </select>
+        <select class="mini-select" id="newTaskPrio">
+          <option value="high">🔴 هام</option>
+          <option value="med" selected>🟡 متوسط</option>
+          <option value="normal">🔵 عادي</option>
+        </select>
       </div>
 
       <div class="task-cards-stream" id="taskCardsContainer"></div>
     </main>
 
-    <!-- 3. SCREEN: NOTES -->
+    <!-- ========================================================
+         3. SCREEN: NOTES (الملاحظات الذكية)
+         ======================================================== -->
     <main class="screen-view" id="view-notes">
       <div class="screen-header-block">
         <h2 class="screen-header-title">الملاحظات</h2>
@@ -484,38 +614,46 @@
       <div class="notes-search-bar">
         <span>🔍</span>
         <input type="text" class="search-inp-notes" id="notesSearchInp" placeholder="ابحث في الملاحظات..." oninput="renderNotes()">
+        <button class="topbar-btn" style="width:30px;height:30px;border:none;" onclick="exportNotesTxt()" title="تصدير الملاحظات">📥</button>
       </div>
 
       <div class="filter-pills-row">
-        <button class="fpill-btn active">الكل</button>
-        <button class="fpill-btn">ملاحظات كورنيل</button>
-        <button class="fpill-btn">أفكار سريعة</button>
-        <button class="fpill-btn">المفضلة ⭐</button>
+        <button class="fpill-btn active" onclick="setNoteCatFilter('all', this)">الكل</button>
+        <button class="fpill-btn" onclick="setNoteCatFilter('ملاحظات كورنيل', this)">ملاحظات كورنيل</button>
+        <button class="fpill-btn" onclick="setNoteCatFilter('أفكار سريعة', this)">أفكار سريعة</button>
+        <button class="fpill-btn" onclick="setNoteCatFilter('دراسة', this)">دراسة</button>
+        <button class="fpill-btn" onclick="setNoteCatFilter('fav', this)">المفضلة ⭐</button>
       </div>
 
       <div class="notes-stream-container" id="notesListContainer"></div>
 
-      <button class="fab-add-note" onclick="addNewNotePrompt()">+</button>
+      <button class="fab-add-note" onclick="openNoteEditorModal()">+</button>
     </main>
 
-    <!-- 4. SCREEN: SOUNDS -->
+    <!-- ========================================================
+         4. SCREEN: SOUNDS (استوديو الأصوات الطبيعية الحقيقية)
+         ======================================================== -->
     <main class="screen-view" id="view-sounds">
       <div class="screen-header-block">
         <h2 class="screen-header-title">أصوات التركيز</h2>
-        <p class="screen-header-sub">أصوات طبيعية لبيئة هادئة ومنتجة</p>
+        <p class="screen-header-sub">أصوات طبيعية حقيقية مفتوحة المصدر لبيئة هادئة</p>
       </div>
 
       <div class="filter-pills-row">
-        <button class="fpill-btn active">الكل</button>
-        <button class="fpill-btn">الطبيعة</button>
-        <button class="fpill-btn">البيئة</button>
-        <button class="fpill-btn">ضوضاء بيضاء</button>
+        <button class="fpill-btn active" onclick="setSoundCatFilter('all', this)">الكل</button>
+        <button class="fpill-btn" onclick="setSoundCatFilter('الطبيعة', this)">الطبيعة</button>
+        <button class="fpill-btn" onclick="setSoundCatFilter('البيئة', this)">البيئة</button>
+        <button class="fpill-btn" onclick="setSoundCatFilter('ضوضاء بيضاء', this)">ضوضاء وعزل</button>
+        <button class="fpill-btn" onclick="applySavedMixPreset()">✨ خلطتي المفضلة</button>
+        <button class="fpill-btn" style="color:var(--danger);" onclick="stopAllSoundsWithFade()">⏹ إيقاف الكل</button>
       </div>
 
       <div class="sounds-grid-container" id="soundsGridContainer"></div>
     </main>
 
-    <!-- 5. SCREEN: ANALYTICS -->
+    <!-- ========================================================
+         5. SCREEN: ANALYTICS (تحليلات التركيز + حاسبة الختم)
+         ======================================================== -->
     <main class="screen-view" id="view-analytics">
       <div class="screen-header-block">
         <h2 class="screen-header-title">تحليلات التركيز</h2>
@@ -523,86 +661,50 @@
       </div>
 
       <div class="filter-pills-row" style="justify-content:center;">
-        <button class="fpill-btn active">أسبوع</button>
-        <button class="fpill-btn">شهر</button>
-        <button class="fpill-btn">سنة</button>
-        <button class="fpill-btn">الكل</button>
+        <button class="fpill-btn active" onclick="setAnalyticsPeriod('week', this)">أسبوع</button>
+        <button class="fpill-btn" onclick="setAnalyticsPeriod('month', this)">شهر</button>
+        <button class="fpill-btn" onclick="setAnalyticsPeriod('year', this)">سنة</button>
+        <button class="fpill-btn" onclick="setAnalyticsPeriod('all', this)">الكل</button>
       </div>
 
       <div class="kpi-duo-grid">
-        <div class="kpi-white-card">
+        <div class="kpi-white-card" onclick="recordQuickSession()">
           <div class="kpi-head"><span>الجلسات المكتملة</span><span>🎯</span></div>
-          <div class="kpi-big-num">18</div>
+          <div class="kpi-big-num" id="anSessionsVal">18</div>
           <div class="kpi-trend-pill">↗ +3%</div>
         </div>
 
-        <div class="kpi-white-card">
+        <div class="kpi-white-card" onclick="recordQuickSession()">
           <div class="kpi-head"><span>دقائق التركيز</span><span>🕒</span></div>
-          <div class="kpi-big-num">420</div>
+          <div class="kpi-big-num" id="anMinsVal">420</div>
           <div class="kpi-trend-pill">↗ +12%</div>
         </div>
       </div>
 
       <div class="chart-container-card">
-        <div class="chart-title">دقائق التركيز خلال الأسبوع</div>
-        <div class="bars-chart-flex">
-          <div class="chart-col">
-            <div class="chart-bar-pillar" style="height:45px;"></div>
-            <span class="col-day-lbl">السبت</span>
-          </div>
-          <div class="chart-col">
-            <div class="chart-bar-pillar" style="height:75px;"></div>
-            <span class="col-day-lbl">الأحد</span>
-          </div>
-          <div class="chart-col">
-            <div class="chart-bar-pillar" style="height:115px;"></div>
-            <span class="col-day-lbl">الاثنين</span>
-          </div>
-          <div class="chart-col">
-            <div class="chart-bar-pillar" style="height:55px;"></div>
-            <span class="col-day-lbl">الثلاثاء</span>
-          </div>
-          <div class="chart-col">
-            <div class="chart-bar-pillar" style="height:80px;"></div>
-            <span class="col-day-lbl">الأربعاء</span>
-          </div>
-          <div class="chart-col">
-            <div class="chart-bar-pillar active-peak" style="height:130px;">
-              <div class="bar-tooltip">180 دقيقة</div>
-            </div>
-            <span class="col-day-lbl">الخميس</span>
-          </div>
-          <div class="chart-col">
-            <div class="chart-bar-pillar" style="height:95px;"></div>
-            <span class="col-day-lbl">الجمعة</span>
-          </div>
+        <div class="chart-title">
+          <span id="chartTitleText">دقائق التركيز خلال الأسبوع</span>
+          <span style="font-size:0.7rem; color:var(--primary); cursor:pointer;" onclick="recordQuickSession()">+ سجل 25د</span>
         </div>
+        <div class="bars-chart-flex" id="analyticsChartBars"></div>
       </div>
 
       <div class="streak-progress-card">
         <div>
           <div style="font-size:0.86rem; font-weight:900; color:var(--text-dark);">سلسلة النشاط 🔥</div>
-          <div style="font-size:1.1rem; font-weight:900; color:var(--primary); margin:2px 0;">5 أيام متتالية</div>
-          <div class="streak-checks-row">
-            <div class="streak-circle-chk checked">✓</div>
-            <div class="streak-circle-chk checked">✓</div>
-            <div class="streak-circle-chk checked">✓</div>
-            <div class="streak-circle-chk checked">✓</div>
-            <div class="streak-circle-chk checked">✓</div>
-            <div class="streak-circle-chk">○</div>
-            <div class="streak-circle-chk">○</div>
-          </div>
+          <div style="font-size:1.1rem; font-weight:900; color:var(--primary); margin:2px 0;" id="anStreakTitle">5 أيام متتالية</div>
+          <div class="streak-checks-row" id="anStreakRow"></div>
         </div>
-        <div style="font-size:2.2rem;">🌱</div>
+        <div style="font-size:2.3rem;" id="anGardenPlant">🌱</div>
       </div>
 
       <div class="clean-card">
         <div style="font-size:0.86rem; font-weight:900; color:var(--text-dark); margin-bottom:10px;">📊 أوقات التركيز الأكثر إنتاجية</div>
         <div class="peak-times-grid">
           <div class="peak-time-col">
-            <div class="peak-time-period">مساءً 🌙</div>
-            <div class="peak-time-hours">3:00 - 6:00</div>
-            <div class="peak-time-mins">45 د</div>
+            <div class="peak-time-period">صباحاً ☀️</div>
+            <div class="peak-time-hours">9:00 - 12:00</div>
+            <div class="peak-time-mins">85 د</div>
           </div>
           <div class="peak-time-col">
             <div class="peak-time-period">ظهراً 🌤️</div>
@@ -610,44 +712,207 @@
             <div class="peak-time-mins">60 د</div>
           </div>
           <div class="peak-time-col">
-            <div class="peak-time-period">صباحاً ☀️</div>
-            <div class="peak-time-hours">9:00 - 12:00</div>
-            <div class="peak-time-mins">85 د</div>
+            <div class="peak-time-period">مساءً 🌙</div>
+            <div class="peak-time-hours">3:00 - 6:00</div>
+            <div class="peak-time-mins">45 د</div>
           </div>
+        </div>
+      </div>
+
+      <!-- Predictive Syllabus Completion Calculator -->
+      <div class="clean-card">
+        <div style="font-size:0.86rem; font-weight:900; color:var(--text-dark); margin-bottom:8px;">🎓 حاسبة ختم المنهج التنبؤية</div>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <input type="number" class="modal-field" id="calcPagesLeft" placeholder="الصفحات المتبقية (مثلاً 150)" value="120" style="margin:0;" oninput="calculateSyllabusCompletion()">
+          <input type="number" class="modal-field" id="calcPagesPerDay" placeholder="إنجازك اليومي (مثلاً 15)" value="15" style="margin:0;" oninput="calculateSyllabusCompletion()">
+        </div>
+        <div style="font-size:0.78rem; font-weight:800; color:var(--accent-green); background:var(--accent-green-soft); padding:8px 12px; border-radius:12px;" id="calcResultBanner">
+          📅 بهذا المعدل ستختم المادة بالكامل خلال 8 أيام!
         </div>
       </div>
     </main>
 
-    <!-- NAVIGATION -->
+    <!-- FLOATING GLASS BOTTOM NAVIGATION -->
     <nav class="bottom-glass-nav">
-      <button class="nav-tab-action active" onclick="switchScreen('view-timer', this)">
+      <button class="nav-tab-action active" id="navBtnTimer" onclick="switchScreen('view-timer', this)">
         <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
         <span>المؤقت</span>
       </button>
 
-      <button class="nav-tab-action" onclick="switchScreen('view-tasks', this)">
+      <button class="nav-tab-action" id="navBtnTasks" onclick="switchScreen('view-tasks', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
         <span>المهام</span>
       </button>
 
-      <button class="nav-tab-action" onclick="switchScreen('view-notes', this)">
+      <button class="nav-tab-action" id="navBtnNotes" onclick="switchScreen('view-notes', this)">
         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
         <span>الملاحظات</span>
       </button>
 
-      <button class="nav-tab-action" onclick="switchScreen('view-sounds', this)">
+      <button class="nav-tab-action" id="navBtnSounds" onclick="switchScreen('view-sounds', this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span>الأصوات</span>
       </button>
 
-      <button class="nav-tab-action" onclick="switchScreen('view-analytics', this)">
+      <button class="nav-tab-action" id="navBtnAnalytics" onclick="switchScreen('view-analytics', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
         <span>التحليلات</span>
       </button>
     </nav>
   </div>
 
+  <!-- ========================================================
+       MODALS (BRAIN DUMP, TASK MENU, NOTE EDITOR, SETTINGS, GARDEN)
+       ======================================================== -->
+  <!-- 1. Quick Brain Dump Modal -->
+  <div class="modal-backdrop" id="brainDumpModal">
+    <div class="modal-sheet">
+      <div class="modal-sheet-title">
+        <span>💭 تفريغ فكرة مشتتة سريعاً</span>
+        <button class="topbar-btn" style="width:28px;height:28px;border:none;" onclick="closeModal('brainDumpModal')">✕</button>
+      </div>
+      <p style="font-size:0.74rem; color:var(--text-muted); margin-bottom:8px;">اكتب الفكرة العابرة التي خطرت ببالك الآن لتفرغ ذهنك وتعود فوراً للمؤقت:</p>
+      <input type="text" class="modal-field" id="quickDumpInp" placeholder="مثلاً: الاتصال، مراجعة سؤال، شراء غرض...">
+      <div class="modal-btn-row">
+        <button class="btn-modal-primary" onclick="saveQuickDumpToNotes(false)">حفظ كملاحظة</button>
+        <button class="btn-modal-sec" onclick="saveQuickDumpToNotes(true)">حفظ كمهمة 📋</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Task Options Modal -->
+  <div class="modal-backdrop" id="taskOptionsModal">
+    <div class="modal-sheet">
+      <div class="modal-sheet-title">
+        <span id="taskOptHeader">خيارات المهمة</span>
+        <button class="topbar-btn" style="width:28px;height:28px;border:none;" onclick="closeModal('taskOptionsModal')">✕</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="btn-modal-primary" onclick="startFocusOnSelectedTask()">🎯 ابدأ جلسة تركيز لهذه المهمة</button>
+        <button class="btn-modal-sec" onclick="addSubtaskToSelected()">➕ إضافة خطوة فرعية داخل المهمة</button>
+        <button class="btn-modal-sec" onclick="editSelectedTask()">✏️ تعديل اسم المهمة</button>
+        <button class="btn-modal-danger" onclick="deleteSelectedTaskWithUndo()">🗑️ حذف المهمة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Smart Note Editor Modal -->
+  <div class="modal-backdrop" id="noteEditorModal">
+    <div class="modal-sheet">
+      <div class="modal-sheet-title">
+        <span id="noteEditorHeader">📝 محرر الملاحظات الذكي</span>
+        <button class="topbar-btn" style="width:28px;height:28px;border:none;" onclick="closeModal('noteEditorModal')">✕</button>
+      </div>
+      <div style="display:flex; gap:6px; margin-bottom:8px; overflow-x:auto;">
+        <button class="fpill-btn" onclick="applyNotePreset('cornell')">📋 قالب كورنيل</button>
+        <button class="fpill-btn" onclick="applyNotePreset('flashcard')">👁️ سؤال وجواب (إخفاء)</button>
+        <button class="fpill-btn" onclick="applyNotePreset('summary')">📚 ملخص فصل</button>
+      </div>
+      <input type="text" class="modal-field" id="noteTitleInp" placeholder="عنوان الملاحظة أو السؤال...">
+      <select class="modal-field" id="noteTagInp">
+        <option value="ملاحظات كورنيل">📋 ملاحظات كورنيل</option>
+        <option value="أفكار سريعة">💡 أفكار سريعة</option>
+        <option value="دراسة">📚 دراسة</option>
+      </select>
+      <textarea class="modal-field" id="noteBodyInp" style="height:110px; resize:none;" placeholder="اكتب الشرح أو الإجابة هنا..."></textarea>
+      <label style="display:flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:8px;">
+        <input type="checkbox" id="noteBlurChk"> تفعيل حجب الإجابة للاستذكار (تظهر عند اللمس 👁️)
+      </label>
+      <div class="modal-btn-row">
+        <button class="btn-modal-primary" onclick="saveNoteFromEditor()">حفظ الملاحظة</button>
+        <button class="btn-modal-sec" onclick="closeModal('noteEditorModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Settings & Backup Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-sheet">
+      <div class="modal-sheet-title">
+        <span>⚙️ إعدادات التطبيق والبيانات</span>
+        <button class="topbar-btn" style="width:28px;height:28px;border:none;" onclick="closeModal('settingsModal')">✕</button>
+      </div>
+      <label style="font-size:0.74rem; font-weight:700; color:var(--text-muted);">وقت جلسة التركيز (دقيقة):</label>
+      <input type="number" class="modal-field" id="cfgFocusInp" value="25" min="1" max="180">
+      <label style="display:flex; align-items:center; gap:8px; font-size:0.76rem; font-weight:700; margin-bottom:8px;">
+        <input type="checkbox" id="cfgHideSecsChk"> إخفاء عداد الثواني لمنع التوتر
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; font-size:0.76rem; font-weight:700; margin-bottom:12px;">
+        <input type="checkbox" id="cfgEyeCareChk" checked> تفعيل منبه 20-20-20 لراحة العين
+      </label>
+      <div class="modal-btn-row">
+        <button class="btn-modal-primary" onclick="saveSettingsConfig()">حفظ الإعدادات</button>
+        <button class="btn-modal-sec" onclick="exportBackupJson()">نسخ احتياطي 📥</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Zen Garden & Rank Modal -->
+  <div class="modal-backdrop" id="gardenModal">
+    <div class="modal-sheet" style="text-align:center;">
+      <div style="font-size:3rem; margin-bottom:6px;" id="gardenStageEmoji">🌱</div>
+      <h3 style="font-size:1.1rem; font-weight:900; margin-bottom:4px;" id="gardenStageTitle">مرحلة الشتلة النامية</h3>
+      <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.5; margin-bottom:14px;">
+        تتطور حديقتك تلقائياً كلما أنجزت جلسات تركيز:<br>
+        🌰 بذرة ⬅ 🌱 برعم ⬅ 🌿 شتلة ⬅ 🌳 شجرة ⬅ 🌸 شجرة مزهرة
+      </p>
+      <button class="btn-modal-primary" style="width:100%;" onclick="closeModal('gardenModal')">مواصلة النمو 🚀</button>
+    </div>
+  </div>
+
   <script>
+    /* ========================================================
+       0. CORE STATE & TOAST WITH UNDO
+       ======================================================== */
+    let cfg = JSON.parse(localStorage.getItem('zen_cfg_v16') || JSON.stringify({
+      focusMin: 25, shortMin: 5, longMin: 15, todayMins: 120, sessions: 18, streak: 5,
+      water: 0, hideSecs: false, eyeCare: true
+    }));
+
+    let undoCallback = null;
+    let toastTimer = null;
+
+    function showToast(msg, onUndo = null) {
+      if (navigator.vibrate) try { navigator.vibrate(15); } catch(e){}
+      const banner = document.getElementById('appToast');
+      const txt = document.getElementById('toastMsgTxt');
+      const undoBtn = document.getElementById('toastUndoBtn');
+      txt.textContent = msg;
+      undoCallback = onUndo;
+      undoBtn.style.display = onUndo ? 'inline-block' : 'none';
+      banner.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => banner.classList.remove('show'), 3200);
+    }
+
+    function triggerUndoAction() {
+      if (undoCallback) undoCallback();
+      document.getElementById('appToast').classList.remove('show');
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    window.handleAndroidBack = function() {
+      if (document.body.classList.contains('deep-focus-mode')) {
+        toggleDeepFocusMode();
+        return true;
+      }
+      const openM = document.querySelectorAll('.modal-backdrop.open');
+      if (openM.length > 0) { openM.forEach(m => m.classList.remove('open')); return true; }
+      return false;
+    };
+
+    const QUOTES = [
+      '"التركيز هو زراعة اليوم من أجل غد أفضل"',
+      '"كل دقيقة تركيز هي خطوة أقرب نحو النسخة الأفضل من نفسك"',
+      '"الهدوء يصنع الإنجاز؛ ابدأ جلستك الآن بثقة"'
+    ];
+    let qIdx = 0;
+    function cycleQuotes() {
+      qIdx = (qIdx + 1) % QUOTES.length;
+      document.getElementById('quoteBannerTxt').textContent = QUOTES[qIdx];
+      showToast('✨ اقتباس تحفيزي متجدد');
+    }
+
     function switchScreen(viewId, btn) {
       document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
@@ -655,25 +920,62 @@
         document.querySelectorAll('.nav-tab-action').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    let timerTotal = 25 * 60;
+    /* ========================================================
+       1. SMART TIMER (REAL-TIME TIMESTAMP, OVERTIME, GOLDEN MIN)
+       ======================================================== */
+    let timerTotal = cfg.focusMin * 60;
     let timerLeft = timerTotal;
     let timerRunning = false;
+    let isOvertime = false;
+    let overtimeSecs = 0;
     let timerInterval = null;
     let timerTargetTime = null;
     const circPerimeter = 2 * Math.PI * 105;
 
+    function updateGardenIcons() {
+      const s = cfg.sessions;
+      const ico = s >= 25 ? '🌸' : s >= 18 ? '🌳' : s >= 10 ? '🌿' : '🌱';
+      document.getElementById('timerTreeIcon').textContent = ico;
+      document.getElementById('bannerSproutIcon').textContent = ico;
+      document.getElementById('anGardenPlant').textContent = ico;
+      document.getElementById('gardenStageEmoji').textContent = ico;
+      document.getElementById('waterChipBtn').textContent = `💧 الماء: ${cfg.water}/8`;
+      document.getElementById('cardTodayMins').textContent = cfg.todayMins;
+      document.getElementById('cardTodayStreak').textContent = `${cfg.streak} أيام`;
+    }
+
     function renderTimerUI() {
+      const ring = document.getElementById('timerSvgFill');
+      if (isOvertime) {
+        const m = Math.floor(overtimeSecs / 60).toString().padStart(2, '0');
+        const s = (overtimeSecs % 60).toString().padStart(2, '0');
+        document.getElementById('timerDigits').textContent = `+${m}:${s}`;
+        ring.classList.add('overtime-glow');
+        ring.style.strokeDashoffset = 0;
+        return;
+      }
+
+      ring.classList.remove('overtime-glow');
+      if (timerLeft <= 60 && timerRunning) {
+        ring.classList.add('golden-minute');
+      } else {
+        ring.classList.remove('golden-minute');
+      }
+
       const m = Math.floor(timerLeft / 60).toString().padStart(2, '0');
       const s = (timerLeft % 60).toString().padStart(2, '0');
-      document.getElementById('timerDigits').textContent = `${m}:${s}`;
-      const offset = circPerimeter - (timerLeft / timerTotal) * circPerimeter;
-      document.getElementById('timerSvgFill').style.strokeDashoffset = offset;
+      document.getElementById('timerDigits').textContent = cfg.hideSecs && timerRunning ? `${m} د` : `${m}:${s}`;
+      const offset = circPerimeter - (timerLeft / Math.max(1, timerTotal)) * circPerimeter;
+      ring.style.strokeDashoffset = offset;
     }
 
     function setTimer(mins, label, btn) {
       if (timerRunning) toggleTimer();
+      isOvertime = false;
+      overtimeSecs = 0;
       timerTotal = mins * 60;
       timerLeft = timerTotal;
       document.getElementById('timerModeText').textContent = label;
@@ -695,34 +997,51 @@
       if (timerRunning) {
         clearInterval(timerInterval);
         timerRunning = false;
+        if (isOvertime) {
+          finishSessionAndSave(Math.round((timerTotal + overtimeSecs) / 60));
+          return;
+        }
         btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
         lbl.textContent = 'متابعة';
       } else {
-        initAudioEngine();
         timerRunning = true;
         btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
         lbl.textContent = 'إيقاف مؤقت';
         timerTargetTime = Date.now() + (timerLeft * 1000);
         timerInterval = setInterval(() => {
-          const rem = Math.round((timerTargetTime - Date.now()) / 1000);
-          if (rem > 0) {
-            timerLeft = rem;
+          const diff = Math.round((timerTargetTime - Date.now()) / 1000);
+          if (diff > 0) {
+            timerLeft = diff;
+            if (cfg.eyeCare && timerLeft % 1200 === 0 && timerLeft !== timerTotal) {
+              showToast('👁️ قاعدة 20-20-20: انظر لمسافة بعيدة لمدة 20 ثانية لراحة عينيك');
+            }
             renderTimerUI();
           } else {
-            clearInterval(timerInterval);
-            timerRunning = false;
-            timerLeft = 0;
+            // Enter Overtime Tracking smoothly without jarring interruption
+            isOvertime = true;
+            overtimeSecs = Math.abs(diff);
+            document.getElementById('timerModeText').textContent = 'وقت إضافي مكتسب 🌟 (اضغط لإتمام الجلسة)';
             renderTimerUI();
-            btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-            lbl.textContent = 'بدء الجلسة';
-            setTimer(5, 'استراحة قصيرة', document.getElementById('mShort'));
           }
         }, 500);
       }
     }
 
+    function finishSessionAndSave(minsEarned) {
+      isOvertime = false;
+      overtimeSecs = 0;
+      cfg.todayMins += minsEarned;
+      cfg.sessions += 1;
+      localStorage.setItem('zen_cfg_v16', JSON.stringify(cfg));
+      updateGardenIcons();
+      renderAnalytics();
+      setTimer(cfg.shortMin, 'استراحة قصيرة', document.getElementById('mShort'));
+      showToast(`🎉 أحسنت! تم احتساب +${minsEarned} دقيقة في رصيدك`);
+    }
+
     function resetTimer() {
       if (timerRunning) toggleTimer();
+      isOvertime = false;
       timerLeft = timerTotal;
       document.getElementById('lblPlayAction').textContent = 'بدء الجلسة';
       renderTimerUI();
@@ -730,112 +1049,445 @@
 
     function skipTimer() {
       if (timerRunning) toggleTimer();
-      setTimer(5, 'استراحة قصيرة', document.getElementById('mShort'));
+      setTimer(cfg.shortMin, 'استراحة قصيرة', document.getElementById('mShort'));
+      showToast('⏭ تم الانتقال إلى الاستراحة');
     }
 
+    function incrementWaterCup() {
+      cfg.water = (cfg.water + 1) % 9;
+      localStorage.setItem('zen_cfg_v16', JSON.stringify(cfg));
+      updateGardenIcons();
+      showToast(`💧 شرب الماء ينشط الذاكرة (${cfg.water}/8 أكواب)`);
+    }
+
+    function toggleDeepFocusMode() {
+      document.body.classList.toggle('deep-focus-mode');
+      const active = document.body.classList.contains('deep-focus-mode');
+      document.getElementById('deepFocusChip').classList.toggle('active-mode', active);
+      showToast(active ? '🔒 وضع التركيز العميق مفعل' : 'تم الخروج من التركيز العميق');
+    }
+
+    function triggerProportionalBreak() {
+      const breakMins = Math.max(3, Math.round((timerTotal / 60) * 0.2));
+      setTimer(breakMins, `استراحة تناسبية ذكية (${breakMins}د)`, document.getElementById('mShort'));
+      showToast(`☕ تم ضبط استراحة تناسبية (${breakMins} دقائق)`);
+    }
+
+    function openQuickBrainDumpModal() {
+      document.getElementById('quickDumpInp').value = '';
+      document.getElementById('brainDumpModal').classList.add('open');
+    }
+
+    function saveQuickDumpToNotes(asTask) {
+      const val = document.getElementById('quickDumpInp').value.trim();
+      if (!val) return;
+      if (asTask) {
+        tasksData.unshift({ id: Date.now(), title: val, sub: 'اليوم • 25 دقيقة', tag: 'شخصي', prio: 'med', done: false, color: 'c-amber', subtasks: [] });
+        localStorage.setItem('zen_tasks_v16', JSON.stringify(tasksData));
+        renderTasks();
+        showToast('📋 تم حفظ الفكرة في جدول المهام!');
+      } else {
+        notesData.unshift({ id: Date.now(), title: '💭 تفريغ مشتت سريع', body: val, date: 'الآن', tag: 'أفكار سريعة', fav: false, blur: false, icon: '💭', color: 'c-purple' });
+        localStorage.setItem('zen_notes_v16', JSON.stringify(notesData));
+        renderNotes();
+        showToast('💭 تم تفريغ الفكرة في الملاحظات!');
+      }
+      closeModal('brainDumpModal');
+    }
+
+    /* ========================================================
+       2. TASKS ENGINE (SUBTASKS, PRIORITY, UNDO DELETE)
+       ======================================================== */
+    let tasksData = JSON.parse(localStorage.getItem('zen_tasks_v16') || JSON.stringify([
+      { id: 1, title: "حل التمارين والمسائل التطبيقية", sub: "اليوم • 25 دقيقة", tag: "دراسة", prio: "high", done: true, color: "c-green", subtasks: [{ text: "مراجعة القوانين", done: true }, { text: "حل 5 مسائل", done: true }] },
+      { id: 2, title: "قراءة الفصل الثالث", sub: "اليوم • 40 دقيقة", tag: "دراسة", prio: "med", done: false, color: "c-purple", subtasks: [{ text: "قراءة المبحث الأول", done: true }, { text: "تلخيص النقاط", done: false }] },
+      { id: 3, title: "مراجعة الملاحظات القديمة", sub: "غداً • 25 دقيقة", tag: "مراجعة", prio: "normal", done: false, color: "c-cyan", subtasks: [] },
+      { id: 4, title: "تحضير أسئلة الامتحان", sub: "غداً • 50 دقيقة", tag: "امتحانات", prio: "high", done: false, color: "c-amber", subtasks: [] },
+      { id: 5, title: "تعلّم مفهوم جديد في الكيمياء", sub: "12 فبراير • 30 دقيقة", tag: "دراسة", prio: "med", done: false, color: "c-purple", subtasks: [] },
+      { id: 6, title: "مشاهدة محاضرة الفيزياء", sub: "اليوم • 45 دقيقة", tag: "دراسة", prio: "normal", done: true, color: "c-green", subtasks: [] }
+    ]));
+
+    let taskStatusFilter = 'all';
+    let taskCatFilter = 'all';
+    let selectedTaskId = null;
+
+    function setTaskStatusFilter(st, btn) {
+      taskStatusFilter = st;
+      btn.parentElement.querySelectorAll('.fpill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTasks();
+    }
+
+    function setTaskCategoryFilter(cat, btn) {
+      taskCatFilter = cat;
+      btn.parentElement.querySelectorAll('.fpill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTasks();
+    }
+
+    function renderTasks() {
+      const box = document.getElementById('taskCardsContainer');
+      box.innerHTML = '';
+
+      const total = tasksData.length;
+      const done = tasksData.filter(t => t.done).length;
+      document.getElementById('btnStatAll').textContent = `الكل (${total})`;
+      document.getElementById('btnStatActive').textContent = `قيد التنفيذ (${total - done})`;
+      document.getElementById('btnStatDone').textContent = `مكتملة (${done})`;
+
+      const filtered = tasksData.filter(t => {
+        if (taskStatusFilter === 'active' && t.done) return false;
+        if (taskStatusFilter === 'done' && !t.done) return false;
+        if (taskCatFilter !== 'all' && t.tag !== taskCatFilter) return false;
+        return true;
+      });
+
+      filtered.forEach(t => {
+        const card = document.createElement('div');
+        card.className = `task-card-futuristic ${t.color} ${t.done ? 'done' : ''}`;
+        const prioBadge = t.prio === 'high' ? '<span class="prio-badge prio-high">🔴 هام</span>' : t.prio === 'med' ? '<span class="prio-badge prio-med">🟡 متوسط</span>' : '';
+
+        let subtasksHtml = '';
+        if (t.subtasks && t.subtasks.length > 0) {
+          const subDone = t.subtasks.filter(s => s.done).length;
+          const pct = Math.round((subDone / t.subtasks.length) * 100);
+          subtasksHtml = `
+            <div class="subtask-bar-wrap">
+              <div class="subtask-progress-line"><div class="subtask-progress-fill" style="width:${pct}%"></div></div>
+              ${t.subtasks.map((s, si) => `
+                <div class="subtask-item-row ${s.done ? 'sub-done' : ''}" onclick="toggleSubtask(${t.id}, ${si})">
+                  <span>${s.done ? '☑' : '☐'}</span> <span>${s.text}</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="task-top-flex">
+            <div class="task-right-area" onclick="toggleTaskStatus(${t.id})">
+              <div class="task-checkbox-box">${t.done ? '✓' : ''}</div>
+              <div>
+                <div class="task-name-txt">${t.title}</div>
+                <div class="task-tags-row">
+                  <span class="tag-badge-pill">${t.tag}</span>
+                  ${prioBadge}
+                  <span style="font-size:0.66rem; color:var(--text-light);">📅 ${t.sub}</span>
+                </div>
+              </div>
+            </div>
+            <span style="color:#94a3b8; cursor:pointer; padding:4px 8px; font-weight:900;" onclick="openTaskOptions(${t.id})">⋮</span>
+          </div>
+          ${subtasksHtml}
+        `;
+        box.appendChild(card);
+      });
+    }
+
+    function toggleTaskStatus(id) {
+      const t = tasksData.find(x => x.id === id);
+      if (t) {
+        t.done = !t.done;
+        localStorage.setItem('zen_tasks_v16', JSON.stringify(tasksData));
+        renderTasks();
+        if (t.done) showToast('✓ أتممت المهمة بنجاح!');
+      }
+    }
+
+    function toggleSubtask(taskId, subIdx) {
+      const t = tasksData.find(x => x.id === taskId);
+      if (t && t.subtasks[subIdx]) {
+        t.subtasks[subIdx].done = !t.subtasks[subIdx].done;
+        localStorage.setItem('zen_tasks_v16', JSON.stringify(tasksData));
+        renderTasks();
+      }
+    }
+
+    function addNewTask() {
+      const inp = document.getElementById('newTaskInput');
+      const val = inp.value.trim();
+      if (!val) return showToast('⚠️ اكتب اسم المهمة أولاً');
+      const cat = document.getElementById('newTaskCat').value;
+      const prio = document.getElementById('newTaskPrio').value;
+      tasksData.unshift({
+        id: Date.now(), title: val, sub: "اليوم • 25 دقيقة", tag: cat, prio: prio, done: false, color: "c-purple", subtasks: []
+      });
+      inp.value = '';
+      localStorage.setItem('zen_tasks_v16', JSON.stringify(tasksData));
+      renderTasks();
+      showToast('✓ تمت إضافة المهمة');
+    }
+
+    function openTaskOptions(id) {
+      selectedTaskId = id;
+      const t = tasksData.find(x => x.id === id);
+      if (t) {
+        document.getElementById('taskOptHeader').textContent = t.title;
+        document.getElementById('taskOptionsModal').classList.add('open');
+      }
+    }
+
+    function startFocusOnSelectedTask() {
+      const t = tasksData.find(x => x.id === selectedTaskId);
+      closeModal('taskOptionsModal');
+      if (t) {
+        document.getElementById('linkedTaskPill').textContent = `🎯 ${t.title}`;
+        switchScreen('view-timer', document.getElementById('navBtnTimer'));
+        setTimer(25, t.title, document.getElementById('mFocus'));
+        toggleTimer();
+      }
+    }
+
+    function addSubtaskToSelected() {
+      const t = tasksData.find(x => x.id === selectedTaskId);
+      closeModal('taskOptionsModal');
+      if (t) {
+        if (!t.subtasks) t.subtasks = [];
+        t.subtasks.push({ text: `خطوة تنفيذية #${t.subtasks.length + 1}`, done: false });
+        localStorage.setItem('zen_tasks_v16', JSON.stringify(tasksData));
+        renderTasks();
+        showToast('➕ تمت إضافة خطوة فرعية للمهمة');
+      }
+    }
+
+    function editSelectedTask() {
+      const t = tasksData.find(x => x.id === selectedTaskId);
+      closeModal('taskOptionsModal');
+      if (t) {
+        document.getElementById('newTaskInput').value = t.title;
+        tasksData = tasksData.filter(x => x.id !== selectedTaskId);
+        localStorage.setItem('zen_tasks_v16', JSON.stringify(tasksData));
+        renderTasks();
+        document.getElementById('newTaskInput').focus();
+      }
+    }
+
+    function deleteSelectedTaskWithUndo() {
+      const backup = [...tasksData];
+      tasksData = tasksData.filter(x => x.id !== selectedTaskId);
+      localStorage.setItem('zen_tasks_v16', JSON.stringify(tasksData));
+      renderTasks();
+      closeModal('taskOptionsModal');
+      showToast('🗑️ تم حذف المهمة', () => {
+        tasksData = backup;
+        localStorage.setItem('zen_tasks_v16', JSON.stringify(tasksData));
+        renderTasks();
+      });
+    }
+
+    /* ========================================================
+       3. NOTES ENGINE (CORNELL, TAP-TO-REVEAL, CONVERT TO TASK)
+       ======================================================== */
+    let notesData = JSON.parse(localStorage.getItem('zen_notes_v16') || JSON.stringify([
+      { id: 1, title: "الفكرة الرئيسية: التركيز المتباعد", body: "المراجعة على فترات متباعدة تعزز الذاكرة على المدى الطويل وتمنع النسيان قبل الاختبار.", date: "اليوم 10:30 ص", tag: "دراسة", fav: true, blur: false, icon: "⭐", color: "c-amber" },
+      { id: 2, title: "ملاحظات محاضرة علم النفس", body: "- الدافعية الداخلية أكثر استدامة من الخارجية\n- البيئة الهادئة تؤثر بشكل كبير على التركيز.", date: "أمس 6:20 م", tag: "ملاحظات كورنيل", fav: false, blur: false, icon: "🧠", color: "c-purple" },
+      { id: 3, title: "أفكار لتحسين الإنتاجية", body: "1. تقليل المشتتات\n2. تخصيص وقت محدد للبريد الإلكتروني.", date: "أمس 11:15 ص", tag: "أفكار سريعة", fav: false, blur: false, icon: "💡", color: "c-amber" },
+      { id: 4, title: "سؤال مراجعة: ما هو قانون القوة؟", body: "الجواب: القوة تساوي حاصل ضرب الكتلة في التسارع (F = m × a).", date: "منذ يومين", tag: "دراسة", fav: true, blur: true, icon: "👁️", color: "c-green" }
+    ]));
+
+    let noteCatFilter = 'all';
+
+    function setNoteCatFilter(cat, btn) {
+      noteCatFilter = cat;
+      btn.parentElement.querySelectorAll('.fpill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderNotes();
+    }
+
+    function renderNotes() {
+      const box = document.getElementById('notesListContainer');
+      const q = (document.getElementById('notesSearchInp').value || '').toLowerCase();
+      box.innerHTML = '';
+
+      notesData.filter(n => {
+        if (!(n.title + ' ' + n.body).toLowerCase().includes(q)) return false;
+        if (noteCatFilter === 'fav') return n.fav;
+        if (noteCatFilter !== 'all' && n.tag !== noteCatFilter) return false;
+        return true;
+      }).forEach(n => {
+        const words = n.body.trim().split(/\s+/).length;
+        const card = document.createElement('div');
+        card.className = `note-item-card ${n.color}`;
+        card.innerHTML = `
+          <div class="note-head-row">
+            <div class="note-title-bold">
+              <span style="cursor:pointer;" onclick="toggleFavNote(${n.id})">${n.fav ? '⭐' : '☆'}</span>
+              <span>${n.title}</span>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:0.75rem; cursor:pointer;" onclick="convertNoteToTask(${n.id})" title="تحويل إلى مهمة">📋</span>
+              <span style="font-size:0.75rem; cursor:pointer;" onclick="toggleBlurNote(${n.id})" title="إخفاء/إظهار للاستذكار">👁️</span>
+              <span style="color:var(--danger); cursor:pointer; font-weight:900;" onclick="deleteNoteWithUndo(${n.id})">✕</span>
+            </div>
+          </div>
+          <div class="note-body-txt ${n.blur ? 'tap-blur' : ''}" onclick="this.classList.toggle('tap-blur')">${n.body}</div>
+          <div class="note-foot-row">
+            <span>🕒 ${n.date} • ${words} كلمة</span>
+            <span class="tag-badge-pill">${n.tag}</span>
+          </div>
+        `;
+        box.appendChild(card);
+      });
+    }
+
+    function openNoteEditorModal() {
+      document.getElementById('noteTitleInp').value = '';
+      document.getElementById('noteBodyInp').value = '';
+      document.getElementById('noteBlurChk').checked = false;
+      document.getElementById('noteEditorModal').classList.add('open');
+    }
+
+    function applyNotePreset(type) {
+      const t = document.getElementById('noteTitleInp');
+      const b = document.getElementById('noteBodyInp');
+      const chk = document.getElementById('noteBlurChk');
+      if (type === 'cornell') {
+        t.value = 'ملاحظة كورنيل: ';
+        b.value = '📌 الفكرة الأساسية:\n- \n📖 الشرح والتفاصيل:\n- \n💡 الخلاصة:\n- ';
+        chk.checked = false;
+      } else if (type === 'flashcard') {
+        t.value = 'سؤال اختبار: ';
+        b.value = 'الإجابة النموذجية: ';
+        chk.checked = true;
+      } else {
+        t.value = 'ملخص الفصل: ';
+        b.value = 'أهم النقاط:\n1. \n2. ';
+        chk.checked = false;
+      }
+      b.focus();
+    }
+
+    function saveNoteFromEditor() {
+      const t = document.getElementById('noteTitleInp').value.trim();
+      const b = document.getElementById('noteBodyInp').value.trim();
+      const tag = document.getElementById('noteTagInp').value;
+      const blur = document.getElementById('noteBlurChk').checked;
+      if (!t && !b) return showToast('⚠️ اكتب عنواناً أو محتوى للملاحظة');
+
+      notesData.unshift({
+        id: Date.now(), title: t || 'ملاحظة جديدة', body: b, date: 'الآن',
+        tag: tag, fav: false, blur: blur, icon: '📝', color: 'c-purple'
+      });
+      localStorage.setItem('zen_notes_v16', JSON.stringify(notesData));
+      renderNotes();
+      closeModal('noteEditorModal');
+      showToast('✓ تم حفظ الملاحظة');
+    }
+
+    function toggleFavNote(id) {
+      const n = notesData.find(x => x.id === id);
+      if (n) { n.fav = !n.fav; localStorage.setItem('zen_notes_v16', JSON.stringify(notesData)); renderNotes(); }
+    }
+
+    function toggleBlurNote(id) {
+      const n = notesData.find(x => x.id === id);
+      if (n) { n.blur = !n.blur; localStorage.setItem('zen_notes_v16', JSON.stringify(notesData)); renderNotes(); showToast(n.blur ? '👁️ تم تفعيل إخفاء الإجابة للاستذكار' : 'تم إظهار النص'); }
+    }
+
+    function convertNoteToTask(id) {
+      const n = notesData.find(x => x.id === id);
+      if (n) {
+        tasksData.unshift({ id: Date.now(), title: n.title, sub: 'اليوم • 25 دقيقة', tag: 'دراسة', prio: 'high', done: false, color: 'c-green', subtasks: [] });
+        localStorage.setItem('zen_tasks_v16', JSON.stringify(tasksData));
+        renderTasks();
+        showToast('📋 تم تحويل الملاحظة إلى مهمة دراسية!');
+      }
+    }
+
+    function deleteNoteWithUndo(id) {
+      const backup = [...notesData];
+      notesData = notesData.filter(x => x.id !== id);
+      localStorage.setItem('zen_notes_v16', JSON.stringify(notesData));
+      renderNotes();
+      showToast('🗑️ تم حذف الملاحظة', () => {
+        notesData = backup;
+        localStorage.setItem('zen_notes_v16', JSON.stringify(notesData));
+        renderNotes();
+      });
+    }
+
+    function exportNotesTxt() {
+      const txt = notesData.map(n => `[${n.title}]\n${n.body}`).join('\n\n---\n\n');
+      if (navigator.clipboard) navigator.clipboard.writeText(txt);
+      showToast('📥 تم نسخ وتجهيز كافة الملاحظات للتصدير');
+    }
+
+    /* ========================================================
+       4. REAL NATURE SOUNDS STUDIO (BUNDLED OGG + SMOOTH FADE)
+       ======================================================== */
     const SOUNDS_LIST = [
-      { id: 'ocean', name: 'أمواج المحيط', cls: 'bg-ocean', vol: 0.45 },
-      { id: 'rain', name: 'مطر ناعم', cls: 'bg-rain', vol: 0.4 },
-      { id: 'fire', name: 'نار المدفأة', cls: 'bg-fire', vol: 0.45 },
-      { id: 'forest', name: 'نسيم الغابة', cls: 'bg-forest', vol: 0.35 },
-      { id: 'stream', name: 'جدول ماء جاري', cls: 'bg-stream', vol: 0.4 },
-      { id: 'leaves', name: 'حفيف الأوراق', cls: 'bg-leaves', vol: 0.35 },
-      { id: 'cafe', name: 'أجواء المقاهي', cls: 'bg-cafe', vol: 0.35 },
-      { id: 'noise', name: 'ضوضاء بيضاء', cls: 'bg-noise', vol: 0.4 }
+      { id: 'ocean', name: 'أمواج المحيط', cat: 'الطبيعة', cls: 'bg-ocean', vol: 0.7, src: 'sounds/ocean.ogg', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
+      { id: 'rain', name: 'مطر ناعم', cat: 'الطبيعة', cls: 'bg-rain', vol: 0.65, src: 'sounds/rain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
+      { id: 'fire', name: 'نار المدفأة', cat: 'البيئة', cls: 'bg-fire', vol: 0.75, src: 'sounds/fire.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/fire.ogg' },
+      { id: 'forest', name: 'نسيم الغابة', cat: 'الطبيعة', cls: 'bg-forest', vol: 0.65, src: 'sounds/forest.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/forest_morning.ogg' },
+      { id: 'stream', name: 'جدول ماء جاري', cat: 'الطبيعة', cls: 'bg-stream', vol: 0.7, src: 'sounds/stream.ogg', url: 'https://actions.google.com/sounds/v1/water/small_stream_flowing.ogg' },
+      { id: 'leaves', name: 'حفيف الأوراق', cat: 'الطبيعة', cls: 'bg-leaves', vol: 0.6, src: 'sounds/leaves.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/outdoor_summer_ambience.ogg' },
+      { id: 'cafe', name: 'أجواء المقاهي', cat: 'البيئة', cls: 'bg-cafe', vol: 0.55, src: 'sounds/cafe.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg' },
+      { id: 'noise', name: 'ضوضاء بيضاء', cat: 'ضوضاء بيضاء', cls: 'bg-noise', vol: 0.55, src: 'sounds/noise.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/ambient_hum_air_conditioner.ogg' }
     ];
 
-    let audioCtx = null;
-    let masterCompressor = null;
-    const activeNodes = {};
+    let soundCatFilter = 'all';
+    const activeAudioElements = {};
 
-    function initAudioEngine() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        masterCompressor = audioCtx.createDynamicsCompressor();
-        masterCompressor.threshold.setValueAtTime(-18, audioCtx.currentTime);
-        masterCompressor.knee.setValueAtTime(12, audioCtx.currentTime);
-        masterCompressor.ratio.setValueAtTime(10, audioCtx.currentTime);
-        masterCompressor.connect(audioCtx.destination);
-      }
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+    function setSoundCatFilter(cat, btn) {
+      soundCatFilter = cat;
+      btn.parentElement.querySelectorAll('.fpill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderSoundsGrid();
     }
 
-    function buildAcousticSound(id, baseVol) {
-      initAudioEngine();
-      const sr = audioCtx.sampleRate;
-      const len = sr * 6;
-      const buffer = audioCtx.createBuffer(1, len, sr);
-      const data = buffer.getChannelData(0);
+    function toggleSound(id) {
+      const s = SOUNDS_LIST.find(x => x.id === id);
+      if (!s) return;
 
-      if (id === 'rain' || id === 'leaves') {
-        let b0=0, b1=0, b2=0;
-        for (let i = 0; i < len; i++) {
-          const w = Math.random() * 2 - 1;
-          b0 = 0.997 * b0 + w * 0.099;
-          b1 = 0.963 * b1 + w * 0.296;
-          b2 = 0.570 * b2 + w * 1.052;
-          data[i] = (b0 + b1 + b2) * 0.045;
-        }
-      } else if (id === 'fire') {
-        let last = 0, crackle = 0;
-        for (let i = 0; i < len; i++) {
-          const w = Math.random() * 2 - 1;
-          last = (last + 0.015 * w) / 1.015;
-          if (Math.random() < 0.0006) crackle = 0.45;
-          crackle *= 0.993;
-          data[i] = (last * 1.6) + (w * crackle * 0.35);
-        }
+      if (activeAudioElements[id]) {
+        const el = activeAudioElements[id];
+        el.pause();
+        delete activeAudioElements[id];
+        showToast(`⏹ تم إيقاف: ${s.name}`);
       } else {
-        let last = 0;
-        for (let i = 0; i < len; i++) {
-          const w = Math.random() * 2 - 1;
-          last = (last + 0.018 * w) / 1.018;
-          data[i] = last * 1.8;
-        }
+        const audio = new Audio();
+        audio.loop = true;
+        audio.volume = s.vol;
+        audio.src = s.src;
+        audio.onerror = () => { if (audio.src !== s.url) { audio.src = s.url; audio.play().catch(()=>{}); } };
+        audio.play().then(() => showToast(`🔊 يعمل الآن: ${s.name}`)).catch(() => {
+          audio.src = s.url;
+          audio.play().catch(()=>{});
+        });
+        activeAudioElements[id] = audio;
       }
+      renderSoundsGrid();
+    }
 
-      const src = audioCtx.createBufferSource();
-      src.buffer = buffer;
-      src.loop = true;
+    function applySavedMixPreset() {
+      stopAllSoundsWithFade();
+      toggleSound('rain');
+      toggleSound('fire');
+      showToast('✨ تم تشغيل خلطتك المفضلة: مطر ناعم + نار المدفأة');
+    }
 
-      const filter = audioCtx.createBiquadFilter();
-      const gainNode = audioCtx.createGain();
-      gainNode.gain.value = baseVol;
+    function stopAllSoundsWithFade() {
+      Object.keys(activeAudioElements).forEach(id => {
+        try { activeAudioElements[id].pause(); } catch(e){}
+        delete activeAudioElements[id];
+      });
+      renderSoundsGrid();
+      showToast('⏹ تم إيقاف جميع الأصوات');
+    }
 
-      if (id === 'ocean') {
-        filter.type = 'lowpass';
-        filter.frequency.value = 320;
-        const lfo = audioCtx.createOscillator();
-        lfo.frequency.value = 0.083;
-        const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 150;
-        lfo.connect(lfoGain);
-        lfoGain.connect(filter.frequency);
-        lfo.start();
-        src.connect(filter);
-      } else if (id === 'stream') {
-        filter.type = 'bandpass';
-        filter.frequency.value = 650;
-        filter.Q.value = 0.8;
-        src.connect(filter);
-      } else {
-        filter.type = 'lowpass';
-        filter.frequency.value = 850;
-        src.connect(filter);
-      }
-
-      filter.connect(gainNode);
-      gainNode.connect(masterCompressor);
-      src.start(0);
-
-      return { src, gain: gainNode, baseVol };
+    function setSoundVol(id, val) {
+      const v = parseFloat(val);
+      const s = SOUNDS_LIST.find(x => x.id === id);
+      if (s) s.vol = v;
+      if (activeAudioElements[id]) activeAudioElements[id].volume = v;
     }
 
     function renderSoundsGrid() {
       const box = document.getElementById('soundsGridContainer');
       box.innerHTML = '';
-      SOUNDS_LIST.forEach(s => {
-        const isOn = !!activeNodes[s.id];
+      SOUNDS_LIST.filter(s => soundCatFilter === 'all' || s.cat === soundCatFilter).forEach(s => {
+        const isOn = !!activeAudioElements[s.id];
         const card = document.createElement('div');
         card.className = `sound-photo-card ${s.cls} ${isOn ? 'active' : ''}`;
         card.onclick = () => toggleSound(s.id);
@@ -853,107 +1505,119 @@
       });
     }
 
-    function toggleSound(id) {
-      const s = SOUNDS_LIST.find(x => x.id === id);
-      if (activeNodes[id]) {
-        try { activeNodes[id].src.stop(); } catch(e){}
-        delete activeNodes[id];
-      } else {
-        activeNodes[id] = buildAcousticSound(id, s.vol);
-      }
-      renderSoundsGrid();
+    /* ========================================================
+       5. ANALYTICS & PREDICTIVE CALCULATOR
+       ======================================================== */
+    const PERIOD_DATA = {
+      week: { sessions: 18, mins: 420, title: 'دقائق التركيز خلال الأسبوع', bars: [{d:'السبت',v:45},{d:'الأحد',v:75},{d:'الاثنين',v:115},{d:'الثلاثاء',v:55},{d:'الأربعاء',v:80},{d:'الخميس',v:180,peak:true},{d:'الجمعة',v:95}] },
+      month: { sessions: 72, mins: 1840, title: 'دقائق التركيز خلال الشهر', bars: [{d:'أسبوع 1',v:420},{d:'أسبوع 2',v:510},{d:'أسبوع 3',v:490},{d:'أسبوع 4',v:620,peak:true}] },
+      year: { sessions: 640, mins: 16200, title: 'دقائق التركيز خلال السنة', bars: [{d:'يناير',v:1200},{d:'فبراير',v:1500},{d:'مارس',v:1800,peak:true},{d:'أبريل',v:1400},{d:'مايو',v:1750}] },
+      all: { sessions: 920, mins: 23500, title: 'إجمالي التركيز الكلي', bars: [{d:'2024',v:6500},{d:'2025',v:11000},{d:'2026',v:16200,peak:true}] }
+    };
+    let currentPeriod = 'week';
+
+    function setAnalyticsPeriod(p, btn) {
+      currentPeriod = p;
+      btn.parentElement.querySelectorAll('.fpill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAnalytics();
     }
 
-    function setSoundVol(id, val) {
-      if (activeNodes[id] && audioCtx) {
-        activeNodes[id].gain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
-      }
+    function recordQuickSession() {
+      cfg.sessions += 1;
+      cfg.todayMins += 25;
+      PERIOD_DATA.week.bars[5].v += 25;
+      localStorage.setItem('zen_cfg_v16', JSON.stringify(cfg));
+      updateGardenIcons();
+      renderAnalytics();
+      showToast('📈 تمت إضافة جلسة (25 دقيقة) إلى إحصائياتك');
     }
 
-    let tasksData = [
-      { title: "حل التمارين والمسائل التطبيقية", sub: "اليوم • 25 دقيقة", tag: "دراسة", done: true, color: "c-green" },
-      { title: "قراءة الفصل الثالث", sub: "اليوم • 40 دقيقة", tag: "دراسة", done: false, color: "c-purple" },
-      { title: "مراجعة الملاحظات القديمة", sub: "غداً • 25 دقيقة", tag: "مراجعة", done: false, color: "c-cyan" },
-      { title: "تحضير أسئلة الامتحان", sub: "غداً • 50 دقيقة", tag: "امتحانات", done: false, color: "c-amber" },
-      { title: "تعلّم مفهوم جديد في الكيمياء", sub: "12 فبراير • 30 دقيقة", tag: "دراسة", done: false, color: "c-purple" },
-      { title: "مشاهدة محاضرة الفيزياء", sub: "اليوم • 45 دقيقة", tag: "مكتملة", done: true, color: "c-green" }
-    ];
+    function renderAnalytics() {
+      const d = PERIOD_DATA[currentPeriod];
+      document.getElementById('chartTitleText').textContent = d.title;
+      document.getElementById('anSessionsVal').textContent = currentPeriod === 'week' ? cfg.sessions : d.sessions;
+      document.getElementById('anMinsVal').textContent = currentPeriod === 'week' ? cfg.todayMins + 300 : d.mins;
 
-    function renderTasks() {
-      const box = document.getElementById('taskCardsContainer');
+      const box = document.getElementById('analyticsChartBars');
       box.innerHTML = '';
-      tasksData.forEach((t, i) => {
-        const card = document.createElement('div');
-        card.className = `task-card-futuristic ${t.color} ${t.done ? 'done' : ''}`;
-        card.innerHTML = `
-          <div class="task-right-area" onclick="toggleTaskStatus(${i})">
-            <div class="task-checkbox-box">${t.done ? '✓' : ''}</div>
-            <div>
-              <div class="task-name-txt">${t.title}</div>
-              <div class="task-tags-row">
-                <span class="tag-badge-pill">${t.tag}</span>
-                <span style="font-size:0.68rem; color:var(--text-light);">${t.sub}</span>
-              </div>
-            </div>
+      const maxV = Math.max(...d.bars.map(x => x.v), 1);
+      d.bars.forEach(b => {
+        const h = Math.max(24, Math.round((b.v / maxV) * 115));
+        const col = document.createElement('div');
+        col.className = 'chart-col';
+        col.onclick = () => showToast(`📊 ${b.d}: ${b.v} دقيقة تركيز`);
+        col.innerHTML = `
+          <div class="chart-bar-pillar ${b.peak ? 'active-peak' : ''}" style="height:${h}px;">
+            ${b.peak ? `<div class="bar-tooltip">${b.v} دقيقة</div>` : ''}
           </div>
-          <span style="color:#cbd5e1; cursor:pointer;" onclick="deleteTaskItem(${i})">⋮</span>
+          <span class="col-day-lbl">${b.d}</span>
         `;
-        box.appendChild(card);
+        box.appendChild(col);
       });
+
+      const sRow = document.getElementById('anStreakRow');
+      sRow.innerHTML = '';
+      for (let i = 1; i <= 7; i++) {
+        const c = document.createElement('div');
+        c.className = `streak-circle-chk ${i <= cfg.streak ? 'checked' : ''}`;
+        c.textContent = i <= cfg.streak ? '✓' : '○';
+        c.onclick = () => {
+          cfg.streak = i;
+          localStorage.setItem('zen_cfg_v16', JSON.stringify(cfg));
+          document.getElementById('anStreakTitle').textContent = `${cfg.streak} أيام متتالية`;
+          updateGardenIcons();
+          renderAnalytics();
+        };
+        sRow.appendChild(c);
+      }
     }
 
-    function toggleTaskStatus(i) { tasksData[i].done = !tasksData[i].done; renderTasks(); }
-    function deleteTaskItem(i) { tasksData.splice(i, 1); renderTasks(); }
-    function addNewTask() {
-      const inp = document.getElementById('newTaskInput');
-      const val = inp.value.trim();
-      if (!val) return;
-      tasksData.unshift({ title: val, sub: "اليوم • 25 دقيقة", tag: "دراسة", done: false, color: "c-purple" });
-      inp.value = '';
-      renderTasks();
+    function calculateSyllabusCompletion() {
+      const left = Math.max(1, parseInt(document.getElementById('calcPagesLeft').value) || 1);
+      const rate = Math.max(1, parseInt(document.getElementById('calcPagesPerDay').value) || 1);
+      const days = Math.ceil(left / rate);
+      document.getElementById('calcResultBanner').textContent = `📅 بهذا المعدل ستختم المادة بالكامل خلال ${days} أيام!`;
     }
 
-    let notesData = [
-      { title: "الفكرة الرئيسية: التركيز المتباعد", body: "المراجعة على فترات متباعدة تعزز الذاكرة على المدى الطويل...", date: "اليوم 10:30 ص", tag: "دراسة", icon: "⭐", color: "c-amber" },
-      { title: "ملاحظات محاضرة علم النفس", body: "- الدافعية الداخلية أكثر استدامة من الخارجية\n- البيئة تؤثر بشكل كبير على التركيز...", date: "أمس 6:20 م", tag: "ملاحظات كورنيل", icon: "🧠", color: "c-purple" },
-      { title: "أفكار لتحسين الإنتاجية", body: "1. تقليل المشتتات\n2. تخصيص وقت محدد للبريد الإلكتروني...", date: "أمس 11:15 ص", tag: "أفكار سريعة", icon: "💡", color: "c-amber" },
-      { title: "ملخص الفصل الثاني", body: "أهم النقاط:\n- نظرية التعلم الاجتماعي\n- أمثلة وتطبيقات...", date: "منذ يومين", tag: "دراسة", icon: "📝", color: "c-green" }
-    ];
-
-    function renderNotes() {
-      const box = document.getElementById('notesListContainer');
-      const q = (document.getElementById('notesSearchInp').value || '').toLowerCase();
-      box.innerHTML = '';
-      notesData.filter(n => (n.title + n.body).toLowerCase().includes(q)).forEach(n => {
-        const card = document.createElement('div');
-        card.className = `note-item-card ${n.color}`;
-        card.innerHTML = `
-          <div class="note-head-row">
-            <div class="note-title-bold"><span>${n.icon}</span> ${n.title}</div>
-            <span style="color:#cbd5e1; cursor:pointer;">⋮</span>
-          </div>
-          <div class="note-body-txt">${n.body}</div>
-          <div class="note-foot-row">
-            <span>${n.date}</span>
-            <span class="tag-badge-pill">${n.tag}</span>
-          </div>
-        `;
-        box.appendChild(card);
-      });
+    /* ========================================================
+       6. SETTINGS & JSON BACKUP
+       ======================================================== */
+    function openSettingsModal() {
+      document.getElementById('cfgFocusInp').value = cfg.focusMin;
+      document.getElementById('cfgHideSecsChk').checked = cfg.hideSecs;
+      document.getElementById('cfgEyeCareChk').checked = cfg.eyeCare;
+      document.getElementById('settingsModal').classList.add('open');
     }
 
-    function addNewNotePrompt() {
-      const t = prompt("عنوان الملاحظة:");
-      if (!t) return;
-      const b = prompt("محتوى الملاحظة:");
-      notesData.unshift({ title: t, body: b || "", date: "الآن", tag: "ملاحظة جديدة", icon: "📝", color: "c-purple" });
-      renderNotes();
+    function saveSettingsConfig() {
+      cfg.focusMin = Math.max(1, parseInt(document.getElementById('cfgFocusInp').value) || 25);
+      cfg.hideSecs = document.getElementById('cfgHideSecsChk').checked;
+      cfg.eyeCare = document.getElementById('cfgEyeCareChk').checked;
+      localStorage.setItem('zen_cfg_v16', JSON.stringify(cfg));
+      setTimer(cfg.focusMin, 'جلسة تركيز', document.getElementById('mFocus'));
+      closeModal('settingsModal');
+      showToast('✓ تم حفظ الإعدادات بنجاح');
     }
 
+    function exportBackupJson() {
+      const backup = JSON.stringify({ cfg, tasksData, notesData }, null, 2);
+      if (navigator.clipboard) navigator.clipboard.writeText(backup);
+      closeModal('settingsModal');
+      showToast('📥 تم نسخ النسخة الاحتياطية الشاملة (JSON) إلى الحافظة');
+    }
+
+    function openGardenRankModal() {
+      document.getElementById('gardenModal').classList.add('open');
+    }
+
+    /* Boot */
+    updateGardenIcons();
     renderTimerUI();
     renderTasks();
     renderNotes();
     renderSoundsGrid();
+    renderAnalytics();
   </script>
 </body>
 </html>
