@@ -528,6 +528,11 @@ window.handleAndroidBack = function() {
   if (document.getElementById('deskClockOverlay').classList.contains('active')) { toggleDeskClock(false); return true; }
   const openM = document.querySelectorAll('.modal-overlay.open');
   if (openM.length > 0) { openM.forEach(m => m.classList.remove('open')); return true; }
+  const timerTab = document.getElementById('sec-timer');
+  if (timerTab && !timerTab.classList.contains('active')) {
+    switchTab('sec-timer', document.getElementById('navTimer'));
+    return true;
+  }
   return false;
 };
 
@@ -1078,9 +1083,12 @@ function toggleSoundTile(id) {
       renderSoundsStudio();
     };
 
+    // Never fetch a remote recording when offline assets are unavailable.
+    // The fallback is generated locally and is explicitly disclosed.
     audio.onerror = () => {
-      if (audio.src !== s.url) { audio.src = s.url; audio.play().catch(activateFallback); }
-      else activateFallback();
+      audio.pause();
+      activateFallback();
+      showToast('⚠️ Offline recording unavailable — using synthesized ambience');
     };
 
     audio.play().then(() => showToast(`🔊 ${sName}`)).catch(activateFallback);
