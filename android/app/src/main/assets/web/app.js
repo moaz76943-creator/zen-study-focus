@@ -39,20 +39,23 @@ function saveFortressData(key, obj) {
 }
 
 function loadFortressData(key, defaultObj) {
-  try {
-    const tryRead = (k) => {
+  const tryRead = k => {
+    try {
       const item = localStorage.getItem(k);
-      if (!item) return null;
-      const parsed = JSON.parse(item);
-      if (parsed && parsed.payload && computeHash(parsed.payload) === parsed.sig) {
-        return JSON.parse(parsed.payload);
-      }
-      return null;
-    };
-    return tryRead(key) || tryRead(key + "_mirror") || defaultObj;
-  } catch (e) {
-    return defaultObj;
-  }
+      if (!item) return {valid:false};
+      const packet = JSON.parse(item);
+      if (!packet || typeof packet.payload !== 'string'
+          || computeHash(packet.payload) !== packet.sig) return {valid:false};
+      return {valid:true, value:JSON.parse(packet.payload)};
+    } catch (e) {
+      // A corrupt primary must not prevent recovery from its healthy mirror.
+      return {valid:false};
+    }
+  };
+  const primary = tryRead(key);
+  if (primary.valid) return primary.value;
+  const mirror = tryRead(key + '_mirror');
+  return mirror.valid ? mirror.value : defaultObj;
 }
 
 document.addEventListener('contextmenu', e => e.preventDefault());
