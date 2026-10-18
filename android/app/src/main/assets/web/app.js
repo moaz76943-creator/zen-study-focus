@@ -730,9 +730,13 @@ function testCompletionSoundChime() {
    ======================================================== */
 function renderDomainState() {
   const dom = ['study', 'sport', 'read', 'work'].includes(cfg.domain) ? cfg.domain : 'study';
-  document.querySelectorAll('.domain-card').forEach(c => c.classList.remove('active'));
-  const active = document.getElementById('domBtn-' + dom);
-  if (active) active.classList.add('active');
+  for (const key of ['study', 'sport', 'read', 'work']) {
+    const card = document.getElementById('domBtn-' + key);
+    if (!card) continue;
+    const selected = key === dom;
+    card.classList.toggle('active', selected);
+    card.setAttribute('aria-pressed', String(selected));
+  }
   const focusPreset = {study:25, sport:30, read:20, work:50};
   document.getElementById('modeFocusBtn').textContent = toWest(focusPreset[dom] + 'm');
   document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
@@ -740,11 +744,15 @@ function renderDomainState() {
 }
 
 function switchActivityDomain(dom, el) {
-  if(quickTraining?.active) {
-    if(!window.confirm(quickText('replacePrompt')))return;
-    quickTraining=null;
-    if(timerRunning)toggleTimerPlay();
+  if (!['study', 'sport', 'read', 'work'].includes(dom) || cfg.domain === dom) return;
+  // A tap on another activity must not silently erase an in-progress focus session.
+  if (quickTraining?.active) {
+    if (!window.confirm(quickText('replacePrompt'))) return;
+    quickTraining = null;
+    if (timerRunning) toggleTimerPlay();
     renderQuickTraining();
+  } else if (timerRunning || (timerSessionId !== null && timerLeft < timerTotal)) {
+    if (!window.confirm(quickText('replacePrompt'))) return;
   }
   cfg.domain = dom;
   saveFortressData('zen_fortress_cfg_v21', cfg);
