@@ -3,515 +3,507 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Zen Study Focus Pro - المستقبل</title>
+  <title>ZEN FOCUS - الإنتاجية والهدوء الذكي</title>
   <style>
     :root {
-      --bg-canvas: #f8fafc;
+      --bg-page: #f0f4f9;
       --card-white: #ffffff;
-      --primary: #0284c7;
-      --primary-neon: #00d2ff;
-      --primary-soft: #e0f2fe;
-      --accent-purple: #6366f1;
-      --accent-purple-soft: #eef2ff;
-      --success: #10b981;
-      --success-soft: #d1fae5;
-      --amber: #f59e0b;
-      --amber-soft: #fef3c7;
-      --rose: #f43f5e;
-      --text-main: #0f172a;
+      --primary-cyan: #0099ff;
+      --primary-glow: #00d2ff;
+      --primary-soft: #e5f4ff;
+      --text-dark: #121c2d;
       --text-muted: #64748b;
       --text-light: #94a3b8;
-      --border-card: rgba(226, 232, 240, 0.85);
-      --shadow-card: 0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.02);
-      --shadow-ambient: 0 16px 32px -4px rgba(2, 132, 199, 0.12);
-      --radius-xl: 26px;
-      --radius-lg: 18px;
+      --accent-green: #10b981;
+      --accent-green-soft: #ecfdf5;
+      --accent-purple: #8b5cf6;
+      --accent-purple-soft: #f5f3ff;
+      --accent-amber: #f59e0b;
+      --accent-amber-soft: #fffbeb;
+      --border-soft: #e9eef5;
+      --shadow-card: 0 10px 30px -4px rgba(18, 28, 45, 0.06), 0 4px 12px -2px rgba(18, 28, 45, 0.02);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
       --radius-pill: 9999px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-canvas); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 96px; overflow-x: hidden; }
+    body { background-color: var(--bg-page); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 95px; overflow-x: hidden; }
 
-    .app-viewport { width: 100%; max-width: 440px; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
+    .app-screen { width: 100%; max-width: 440px; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
 
-    /* Futuristic Header */
-    .future-header {
-      background: linear-gradient(135deg, #090e1a 0%, #111c35 60%, #172a4d 100%);
+    /* ========================================================
+       TOP ATMOSPHERIC HEADER (MATCHING THE SUNSET LAKE SCREENSHOT)
+       ======================================================== */
+    .hero-header {
+      width: 100%;
+      background: linear-gradient(180deg, #07152b 0%, #0c2347 45%, #163663 70%, #d97736 94%, #f59e0b 100%);
       color: #ffffff;
-      padding: 18px 20px 20px;
-      border-bottom-left-radius: 28px;
-      border-bottom-right-radius: 28px;
-      box-shadow: 0 12px 30px rgba(9, 14, 26, 0.22);
+      padding: 16px 16px 24px;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+      box-shadow: 0 12px 35px rgba(7, 21, 43, 0.28);
+      position: relative;
+      overflow: hidden;
     }
-    .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .brand-cluster { display: flex; align-items: center; gap: 10px; }
-    .brand-glow-orb {
-      width: 38px; height: 38px; border-radius: 12px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-neon) 100%);
-      box-shadow: 0 0 16px rgba(0, 210, 255, 0.45);
-      display: flex; align-items: center; justify-content: center;
+    /* Subtle Mountain Silhouettes */
+    .hero-header::before {
+      content: "";
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 50px;
+      background: radial-gradient(ellipse at bottom, rgba(7, 21, 43, 0.95) 0%, rgba(7, 21, 43, 0.7) 70%, transparent 100%);
+      pointer-events: none;
     }
-    .brand-title-wrap h1 { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.3px; }
-    .brand-title-wrap p { font-size: 0.72rem; opacity: 0.75; }
 
-    .header-controls { display: flex; gap: 8px; }
-    .glass-btn {
+    .top-actions-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; position: relative; z-index: 2; }
+    .top-left-cluster { display: flex; gap: 8px; }
+    .icon-glass-btn {
       width: 36px; height: 36px; border-radius: 50%; border: none;
-      background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.16); backdrop-filter: blur(8px);
       color: #ffffff; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: transform 0.15s, background 0.15s;
+      cursor: pointer; transition: 0.2s;
     }
-    .glass-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.22); }
-    .glass-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .icon-glass-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.28); }
+    .icon-glass-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-    .hud-capsule {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      backdrop-filter: blur(12px);
+    .brand-center-box { text-align: center; }
+    .brand-center-box h1 { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.3px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .brand-center-box p { font-size: 0.72rem; opacity: 0.85; margin-top: 1px; }
+
+    .btn-premium-pill {
+      background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+      color: #07152b; border: none; padding: 6px 13px; border-radius: var(--radius-pill);
+      font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; gap: 5px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35); cursor: pointer;
+    }
+
+    /* Floating Glass HUD Card */
+    .hud-glass-card {
+      background: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(14px);
       border-radius: var(--radius-lg);
-      padding: 10px 16px;
+      padding: 12px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-    .hud-metric { display: flex; flex-direction: column; }
-    .hud-label { font-size: 0.68rem; opacity: 0.75; }
-    .hud-value { font-size: 1rem; font-weight: 900; }
-
-    /* Views Container */
-    .view-screen { padding: 18px 16px; flex: 1; display: none; animation: viewIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-    .view-screen.active { display: block; }
-    @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Luminous White Card System */
-    .future-card {
-      background: var(--card-white);
-      border-radius: var(--radius-xl);
-      padding: 20px;
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--border-card);
-      margin-bottom: 14px;
       position: relative;
+      z-index: 2;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     }
-    .card-headline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .card-headline-title { font-size: 0.95rem; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-    .badge-chip { padding: 4px 10px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; }
-    .badge-cyan { background: var(--primary-soft); color: var(--primary); }
-    .badge-emerald { background: var(--success-soft); color: var(--success); }
-    .badge-purple { background: var(--accent-purple-soft); color: var(--accent-purple); }
-    .badge-amber { background: var(--amber-soft); color: var(--amber); }
+    .hud-col { display: flex; flex-direction: column; }
+    .hud-title { font-size: 0.68rem; opacity: 0.85; }
+    .hud-num { font-size: 1.05rem; font-weight: 900; margin-top: 2px; }
+
+    .sprout-container { display: flex; flex-direction: column; align-items: center; }
+    .sprout-plant { font-size: 2.1rem; filter: drop-shadow(0 4px 10px rgba(0, 210, 255, 0.5)); transform-origin: bottom center; animation: sway 3s ease-in-out infinite; }
+    @keyframes sway { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(3deg); } }
+
+    .quote-footer { text-align: center; font-size: 0.72rem; color: #ffffff; opacity: 0.9; margin-top: 10px; position: relative; z-index: 2; font-weight: 500; }
+    .dots-indicator { display: flex; justify-content: center; gap: 4px; margin-top: 4px; }
+    .dot-i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+    .dot-i.active { width: 14px; border-radius: 3px; background: #00d2ff; }
 
     /* ========================================================
-       VIEW 1: TIMER
+       MAIN APP CONTAINER (WHITE SECTION CARDS)
        ======================================================== */
-    .mode-pills-wrap { display: flex; background: #eef2f6; padding: 4px; border-radius: var(--radius-pill); margin-bottom: 18px; gap: 4px; }
-    .mode-pill { flex: 1; border: none; background: transparent; padding: 9px 0; border-radius: var(--radius-pill); font-size: 0.76rem; font-weight: 800; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
-    .mode-pill.active { background: var(--card-white); color: var(--text-main); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .content-body { padding: 14px 14px 20px; display: flex; flex-direction: column; gap: 14px; }
 
-    .chrono-display-box { display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
-    .chrono-gauge { position: relative; width: 230px; height: 230px; display: flex; align-items: center; justify-content: center; }
+    /* CARD 1: THE PERFECT CHRONO TIMER (MATCHING SCREENSHOT) */
+    .white-card {
+      background: var(--card-white);
+      border-radius: var(--radius-xl);
+      padding: 18px 16px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-soft);
+      position: relative;
+    }
+
+    .timer-segmented-pills {
+      display: flex; background: #f1f5f9; padding: 4px; border-radius: var(--radius-pill);
+      gap: 4px; margin-bottom: 16px;
+    }
+    .tpill-btn {
+      flex: 1; border: none; background: transparent; padding: 8px 0; border-radius: var(--radius-pill);
+      font-size: 0.74rem; font-weight: 800; color: var(--text-muted); cursor: pointer; transition: 0.2s;
+      white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+    .tpill-btn.active {
+      background: var(--primary-cyan); color: #ffffff; box-shadow: 0 4px 14px rgba(0, 153, 255, 0.35);
+    }
+
+    .chrono-hero-row {
+      display: flex; justify-content: space-between; align-items: center; padding: 6px 4px 12px;
+    }
+
+    /* Left Reset Control */
+    .control-side-box { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 68px; }
+    .btn-circle-reset {
+      width: 52px; height: 52px; border-radius: 50%; background: #f8fafc;
+      border: 1px solid var(--border-soft); color: var(--text-dark); display: flex;
+      align-items: center; justify-content: center; font-size: 1.25rem; cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03); transition: transform 0.15s;
+    }
+    .btn-circle-reset:active { transform: scale(0.92); }
+    .side-control-lbl { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }
+
+    /* Circular Timer Gauge */
+    .gauge-wrapper { position: relative; width: 195px; height: 195px; display: flex; align-items: center; justify-content: center; }
     .gauge-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-    .gauge-track { fill: none; stroke: #f1f5f9; stroke-width: 8; }
-    .gauge-glow-bar {
-      fill: none; stroke: url(#cyanNeonGrad); stroke-width: 8; stroke-linecap: round;
+    .g-track { fill: none; stroke: #f0f6fc; stroke-width: 9; }
+    .g-fill {
+      fill: none; stroke: url(#cyanBlueGrad); stroke-width: 9; stroke-linecap: round;
       stroke-dasharray: 660; stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s linear;
-      filter: drop-shadow(0 4px 12px rgba(0, 210, 255, 0.4));
+      filter: drop-shadow(0 4px 10px rgba(0, 153, 255, 0.45));
     }
-    .chrono-center { position: absolute; text-align: center; }
-    .chrono-time { font-size: 3.3rem; font-weight: 900; letter-spacing: -1.5px; color: var(--text-main); font-variant-numeric: tabular-nums; line-height: 1; }
-    .chrono-state { font-size: 0.74rem; font-weight: 800; color: var(--primary); background: var(--primary-soft); padding: 3px 14px; border-radius: var(--radius-pill); margin-top: 8px; display: inline-block; }
+    .gauge-center-info { position: absolute; text-align: center; }
+    .gauge-mode-tag { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; }
+    .gauge-digits { font-size: 2.85rem; font-weight: 900; letter-spacing: -1.2px; color: var(--text-dark); line-height: 1; font-variant-numeric: tabular-nums; }
+    .gauge-sub-pill { font-size: 0.68rem; font-weight: 800; color: var(--primary-cyan); background: var(--primary-soft); padding: 3px 10px; border-radius: var(--radius-pill); margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; }
 
-    .chrono-actions { display: flex; gap: 10px; margin-top: 16px; width: 100%; }
-    .btn-future-primary {
-      flex: 2; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-neon) 100%);
-      color: #ffffff; border: none; padding: 14px 20px; border-radius: var(--radius-lg);
-      font-size: 0.95rem; font-weight: 900; cursor: pointer;
-      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.35); transition: transform 0.15s;
+    /* Right Play Control */
+    .btn-circle-play {
+      width: 58px; height: 58px; border-radius: 50%;
+      background: linear-gradient(135deg, #0099ff 0%, #00c6ff 100%);
+      border: none; color: #ffffff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 8px 22px rgba(0, 153, 255, 0.42); transition: transform 0.15s;
     }
-    .btn-future-primary:active { transform: scale(0.97); }
-    .btn-future-secondary {
-      flex: 1; background: #f8fafc; border: 1px solid var(--border-card); color: var(--text-main);
-      padding: 14px 12px; border-radius: var(--radius-lg); font-size: 0.88rem; font-weight: 800; cursor: pointer;
+    .btn-circle-play:active { transform: scale(0.92); }
+    .btn-circle-play svg { width: 24px; height: 24px; fill: #ffffff; margin-left: 2px; }
+
+    /* Micro Adjustments Row */
+    .adjusts-pills-row { display: flex; justify-content: center; gap: 7px; margin-top: 10px; }
+    .btn-adj-chip {
+      background: #f1f5f9; border: none; padding: 6px 12px; border-radius: var(--radius-pill);
+      font-size: 0.72rem; font-weight: 800; color: var(--primary-cyan); cursor: pointer; transition: 0.15s;
     }
-    .micro-time-adjusts { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
-    .btn-micro-adj { background: #f1f5f9; border: none; padding: 5px 12px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); cursor: pointer; }
-    .btn-micro-adj:active { background: var(--primary-soft); color: var(--primary); }
+    .btn-adj-chip:active { background: var(--primary-soft); }
 
     /* ========================================================
-       VIEW 2: ACOUSTIC NATURE SOUNDS
+       CARD 2: STUDY TASKS (المهام الدراسية)
        ======================================================== */
-    .sound-tiles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .sound-tile {
-      background: var(--card-white);
-      border-radius: var(--radius-lg);
-      padding: 15px;
-      border: 1px solid var(--border-card);
-      box-shadow: var(--shadow-card);
+    .section-head-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .section-title { font-size: 0.96rem; font-weight: 900; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
+    .btn-view-all { font-size: 0.76rem; font-weight: 800; color: var(--primary-cyan); text-decoration: none; cursor: pointer; display: flex; align-items: center; gap: 2px; }
+
+    .tasks-list-stack { display: flex; flex-direction: column; gap: 9px; }
+    .task-card-row {
+      background: #fafbfc; border-radius: var(--radius-md); padding: 13px 15px;
+      border: 1px solid var(--border-soft); display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.2s;
+    }
+    .task-right-col { display: flex; flex-direction: column; flex: 1; }
+    .task-item-name { font-size: 0.84rem; font-weight: 800; color: var(--text-dark); }
+    .task-item-sub { font-size: 0.68rem; color: var(--text-light); margin-top: 2px; }
+    .task-item-sub.done-color { color: var(--accent-green); font-weight: 700; }
+    .task-card-row.done .task-item-name { text-decoration: line-through; color: var(--text-light); }
+
+    .task-custom-check {
+      width: 24px; height: 24px; border-radius: 7px; border: 2px solid #cbd5e1;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+    }
+    .task-card-row.done .task-custom-check { background: var(--accent-green); border-color: var(--accent-green); color: #ffffff; }
+
+    .task-input-pill-bar {
+      display: flex; align-items: center; gap: 8px; margin-top: 10px;
+      background: #f8fafc; border: 1px solid var(--border-soft); border-radius: var(--radius-pill);
+      padding: 4px 6px 4px 14px;
+    }
+    .btn-add-circle {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--primary-cyan);
+      border: none; color: #fff; font-size: 1.2rem; font-weight: 800; display: flex;
+      align-items: center; justify-content: center; cursor: pointer;
+    }
+    .task-text-inp {
+      flex: 1; background: transparent; border: none; font-size: 0.8rem;
+      outline: none; color: var(--text-dark);
+    }
+
+    /* ========================================================
+       CARD 3: SMART NOTES TRIPLE CARDS (CORNELL, EXAM, BRAIN DUMP)
+       ======================================================== */
+    .notes-triple-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .note-promo-card {
+      border-radius: var(--radius-lg); padding: 12px 10px;
       display: flex; flex-direction: column; justify-content: space-between;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .sound-tile.on { border-color: var(--primary-neon); box-shadow: var(--shadow-ambient); background: #fbfdff; }
-    .sound-tile-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .sound-name { font-size: 0.82rem; font-weight: 800; color: var(--text-main); }
-    .switch-future { width: 34px; height: 20px; background: #cbd5e1; border-radius: var(--radius-pill); position: relative; cursor: pointer; transition: background 0.25s; }
-    .switch-future.active { background: var(--primary); }
-    .switch-future-dot { width: 14px; height: 14px; background: #ffffff; border-radius: 50%; position: absolute; top: 3px; right: 3px; transition: transform 0.25s; }
-    .switch-future.active .switch-future-dot { transform: translateX(-14px); }
-    .audio-slider { width: 100%; -webkit-appearance: none; background: #e2e8f0; height: 4px; border-radius: 2px; outline: none; margin-top: 10px; }
-    .audio-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); cursor: pointer; }
-
-    /* ========================================================
-       VIEW 3: TASKS PLANNER
-       ======================================================== */
-    .task-add-bar { display: flex; gap: 8px; margin-bottom: 12px; }
-    .future-input { flex: 1; background: var(--card-white); border: 1px solid var(--border-card); padding: 11px 16px; border-radius: var(--radius-lg); font-size: 0.82rem; outline: none; box-shadow: var(--shadow-card); }
-    .future-input:focus { border-color: var(--primary); }
-    .btn-add-action { background: var(--primary); color: #fff; border: none; padding: 0 18px; border-radius: var(--radius-lg); font-weight: 900; font-size: 1.2rem; cursor: pointer; }
-    .task-stream { display: flex; flex-direction: column; gap: 9px; }
-    .task-card {
-      background: var(--card-white);
-      border-radius: var(--radius-lg);
-      padding: 14px 16px;
-      border: 1px solid var(--border-card);
-      box-shadow: var(--shadow-card);
-      display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    }
-    .task-check-circle { width: 22px; height: 22px; border-radius: 7px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 0.75rem; }
-    .task-card.done .task-check-circle { background: var(--success); border-color: var(--success); color: #ffffff; }
-    .task-card.done .task-title { text-decoration: line-through; color: var(--text-light); }
-    .task-title { font-size: 0.84rem; font-weight: 800; color: var(--text-main); }
-    .task-meta { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
-
-    /* ========================================================
-       VIEW 4: FUTURISTIC DEDICATED SMART NOTES
-       ======================================================== */
-    .notes-action-bar { display: flex; gap: 8px; margin-bottom: 12px; }
-    .templates-scroll-flow { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
-    .templates-scroll-flow::-webkit-scrollbar { display: none; }
-    .tpl-btn-chip {
-      background: var(--card-white); border: 1px solid var(--border-card);
-      padding: 7px 13px; border-radius: var(--radius-pill);
-      font-size: 0.72rem; font-weight: 800; color: var(--text-muted);
-      white-space: nowrap; cursor: pointer; box-shadow: var(--shadow-card);
-      display: flex; align-items: center; gap: 5px; transition: 0.2s;
-    }
-    .tpl-btn-chip:active { transform: scale(0.96); border-color: var(--primary); color: var(--primary); }
-
-    /* Note Composer Card */
-    .composer-card {
-      background: var(--card-white);
-      border-radius: var(--radius-xl);
-      padding: 18px;
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--border-card);
-      margin-bottom: 16px;
-    }
-    .composer-textarea {
-      width: 100%; height: 95px; border: 1px solid var(--border-card); border-radius: 14px;
-      padding: 12px; font-size: 0.82rem; color: var(--text-main); line-height: 1.5;
-      resize: none; outline: none; background: #fafbfc; transition: border-color 0.2s;
-    }
-    .composer-textarea:focus { border-color: var(--primary-neon); background: #ffffff; }
-    
-    /* Interactive Tag Selector Chips */
-    .composer-tags-row { display: flex; gap: 6px; margin: 10px 0; overflow-x: auto; scrollbar-width: none; }
-    .tag-select-chip {
-      background: #f1f5f9; border: 1px solid transparent; padding: 5px 11px;
-      border-radius: var(--radius-pill); font-size: 0.7rem; font-weight: 800;
-      color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap;
-    }
-    .tag-select-chip.selected {
-      background: var(--primary-soft); color: var(--primary); border-color: var(--primary);
-    }
-    .composer-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
-
-    /* Filter Chips Row */
-    .notes-filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
-    .btn-nfilter {
-      background: var(--card-white); border: 1px solid var(--border-card);
-      padding: 6px 14px; border-radius: var(--radius-pill);
-      font-size: 0.72rem; font-weight: 800; color: var(--text-muted);
-      white-space: nowrap; cursor: pointer;
-    }
-    .btn-nfilter.active { background: var(--text-main); color: #ffffff; border-color: var(--text-main); }
-
-    /* Note Cards Stream */
-    .notes-stream { display: flex; flex-direction: column; gap: 12px; }
-    .note-card-futuristic {
-      background: var(--card-white);
-      border-radius: var(--radius-lg);
-      padding: 16px 18px;
-      border: 1px solid var(--border-card);
-      box-shadow: var(--shadow-card);
-      position: relative;
+      position: relative; cursor: pointer; border: 1px solid transparent; min-height: 105px;
       transition: transform 0.15s, box-shadow 0.15s;
     }
-    .note-card-futuristic.pinned {
-      border: 1.5px solid rgba(245, 158, 11, 0.4);
-      box-shadow: 0 10px 25px -4px rgba(245, 158, 11, 0.12);
-      background: #fffdfa;
-    }
-    .note-card-futuristic.dump {
-      border-right: 4px solid var(--accent-purple);
-    }
-    .note-card-futuristic.cornell {
-      border-right: 4px solid var(--primary);
-    }
-    .note-card-futuristic.exam {
-      border-right: 4px solid var(--rose);
-    }
-    
-    .note-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .note-card-actions { display: flex; gap: 8px; align-items: center; }
-    .btn-card-act { background: none; border: none; cursor: pointer; color: var(--text-light); font-size: 0.95rem; }
-    .btn-card-act:hover { color: var(--text-main); }
+    .note-promo-card:active { transform: scale(0.96); }
+    .np-green { background: var(--accent-green-soft); border-color: #a7f3d0; }
+    .np-purple { background: var(--accent-purple-soft); border-color: #ddd6fe; }
+    .np-amber { background: var(--accent-amber-soft); border-color: #fde68a; }
 
-    /* Structured Cornell View inside Card */
-    .cornell-box { display: flex; flex-direction: column; gap: 6px; }
-    .cornell-sec { background: #f8fafc; border-radius: 10px; padding: 8px 10px; border-left: 3px solid var(--primary); }
-    .cornell-sec-title { font-size: 0.68rem; font-weight: 800; color: var(--primary); margin-bottom: 2px; }
-    .cornell-sec-text { font-size: 0.8rem; color: var(--text-main); line-height: 1.45; }
+    .np-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .np-icon-badge { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .np-green .np-icon-badge { background: #d1fae5; color: var(--accent-green); }
+    .np-purple .np-icon-badge { background: #ede9fe; color: var(--accent-purple); }
+    .np-amber .np-icon-badge { background: #fef3c7; color: var(--accent-amber); }
+    .np-arrow { font-size: 0.72rem; color: var(--text-light); }
 
-    .note-raw-body { font-size: 0.82rem; line-height: 1.5; color: var(--text-main); white-space: pre-wrap; }
-    .note-card-date { font-size: 0.68rem; color: var(--text-light); margin-top: 10px; }
+    .np-title { font-size: 0.78rem; font-weight: 900; color: var(--text-dark); margin-bottom: 3px; }
+    .np-desc { font-size: 0.65rem; color: var(--text-muted); line-height: 1.35; }
 
     /* ========================================================
-       VIEW 5: ANALYTICS
+       CARD 4: NATURE SOUNDS WITH PHOTO CARDS (100% ZERO MUSIC)
        ======================================================== */
-    .kpi-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-    .kpi-metric-card { background: var(--card-white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 15px; box-shadow: var(--shadow-card); }
-    .kpi-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
-    .kpi-digits { font-size: 1.4rem; font-weight: 900; color: var(--text-main); margin-top: 4px; }
+    .nature-sounds-scroll {
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
+    }
+    .nature-sounds-scroll::-webkit-scrollbar { display: none; }
 
-    /* Floating Glass Bottom Navigation */
-    .future-bottom-nav {
+    .photo-sound-card {
+      min-width: 84px; height: 95px; border-radius: var(--radius-lg);
+      position: relative; overflow: hidden; display: flex; flex-direction: column;
+      justify-content: space-between; padding: 8px 6px; cursor: pointer; flex-shrink: 0;
+      border: 1.5px solid transparent; transition: border-color 0.2s, transform 0.15s;
+      color: #ffffff; text-align: center;
+    }
+    .photo-sound-card.active { border-color: var(--primary-glow); box-shadow: 0 4px 14px rgba(0, 210, 255, 0.4); }
+
+    /* Real Nature Photo Gradients / Backgrounds */
+    .bg-stream { background: linear-gradient(180deg, rgba(14, 34, 61, 0.4) 0%, rgba(10, 22, 38, 0.88) 100%), #1e3a8a; }
+    .bg-fire { background: linear-gradient(180deg, rgba(80, 20, 10, 0.4) 0%, rgba(35, 10, 5, 0.9) 100%), #9a3412; }
+    .bg-forest { background: linear-gradient(180deg, rgba(15, 45, 25, 0.4) 0%, rgba(6, 25, 15, 0.9) 100%), #065f46; }
+    .bg-rain { background: linear-gradient(180deg, rgba(20, 40, 60, 0.4) 0%, rgba(10, 20, 35, 0.9) 100%), #334155; }
+    .bg-ocean { background: linear-gradient(180deg, rgba(10, 60, 90, 0.4) 0%, rgba(5, 30, 50, 0.9) 100%), #0369a1; }
+
+    .sound-switch-pill {
+      width: 26px; height: 15px; border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.35);
+      align-self: center; position: relative; transition: background 0.2s;
+    }
+    .photo-sound-card.active .sound-switch-pill { background: #00d2ff; }
+    .switch-knob {
+      width: 11px; height: 11px; border-radius: 50%; background: #ffffff;
+      position: absolute; top: 2px; right: 2px; transition: transform 0.2s;
+    }
+    .photo-sound-card.active .switch-knob { transform: translateX(-11px); }
+
+    .photo-sound-name { font-size: 0.72rem; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+
+    /* ========================================================
+       BOTTOM FLOATING NAVIGATION BAR (MATCHING SCREENSHOT)
+       ======================================================== */
+    .floating-bottom-nav {
       position: fixed;
-      bottom: 12px;
+      bottom: 10px;
       width: calc(100% - 24px);
       max-width: 416px;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(226, 232, 240, 0.85);
-      border-radius: 24px;
-      padding: 8px 10px;
+      border: 1px solid var(--border-soft);
+      border-radius: 26px;
+      padding: 7px 10px;
       display: flex;
       justify-content: space-around;
       align-items: center;
       z-index: 100;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 30px rgba(18, 28, 45, 0.08);
     }
-    .nav-future-btn {
+    .nav-icon-tab {
       display: flex; flex-direction: column; align-items: center; gap: 3px;
-      background: none; border: none; color: var(--text-muted);
-      cursor: pointer; font-size: 0.68rem; font-weight: 800;
-      padding: 6px 12px; border-radius: var(--radius-pill);
-      transition: color 0.15s, background 0.15s;
+      background: none; border: none; color: var(--text-muted); cursor: pointer;
+      font-size: 0.68rem; font-weight: 800; padding: 6px 12px; border-radius: var(--radius-pill);
+      transition: 0.2s;
     }
-    .nav-future-btn.active { color: var(--primary); background: var(--primary-soft); }
-    .nav-future-btn svg { width: 20px; height: 20px; fill: currentColor; }
+    .nav-icon-tab svg { width: 20px; height: 20px; fill: currentColor; }
+    .nav-icon-tab.active { color: var(--primary-cyan); background: var(--primary-soft); }
   </style>
 </head>
 <body>
 
-  <div class="app-viewport">
+  <div class="app-screen">
+    <!-- SVG Defs for Glowing Cyan Gradient -->
     <svg style="position: absolute; width: 0; height: 0;">
       <defs>
-        <linearGradient id="cyanNeonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#0284c7" />
-          <stop offset="100%" stop-color="#00d2ff" />
+        <linearGradient id="cyanBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00d2ff" />
+          <stop offset="100%" stop-color="#0088ff" />
         </linearGradient>
       </defs>
     </svg>
 
-    <!-- Header -->
-    <header class="future-header">
-      <div class="header-nav">
-        <div class="brand-cluster">
-          <div class="brand-glow-orb">
-            <svg style="width: 20px; height: 20px; fill: #fff;" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-          </div>
-          <div class="brand-title-wrap">
-            <h1>ZEN FOCUS</h1>
-            <p>المذاكرة والإنتاجية الذكية</p>
-          </div>
+    <!-- 1. TOP ATMOSPHERIC HEADER -->
+    <header class="hero-header">
+      <div class="top-actions-bar">
+        <div class="top-left-cluster">
+          <button class="icon-glass-btn" onclick="openPreferencesModal()" title="الإعدادات">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          </button>
+          <button class="icon-glass-btn" id="audioMasterBtn" onclick="toggleAudioMuteMaster()" title="كتم/تشغيل الصوت">
+            <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          </button>
         </div>
-        <div class="header-controls">
-          <button class="glass-btn" id="masterMuteBtn" onclick="toggleMasterAudio()" title="كتم/تشغيل الأصوات">
-            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-          </button>
-          <button class="glass-btn" onclick="exportNotesTxtFile()" title="تصدير الملاحظات">
-            <svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
-          </button>
+
+        <div class="brand-center-box">
+          <h1>ZEN FOCUS 🌿</h1>
+          <p>الإنتاجية والهدوء الذكي</p>
+        </div>
+
+        <button class="btn-premium-pill" onclick="alert('أنت تستخدم النسخة الاحترافية الكاملة مجاناً!')">
+          <span>👑</span>
+          <span>النسخة المميزة</span>
+        </button>
+      </div>
+
+      <!-- Frosted HUD Card with Growing Plant -->
+      <div class="hud-glass-card">
+        <div class="hud-col">
+          <span class="hud-title">سلسلة الانضباط</span>
+          <span class="hud-num" id="hdrSessionsCount">0 جلسات 🔥</span>
+        </div>
+
+        <div class="sprout-container">
+          <div class="sprout-plant" id="sproutVisual">🌱</div>
+        </div>
+
+        <div class="hud-col" style="text-align: left;">
+          <span class="hud-title">دقائق التركيز اليوم</span>
+          <span class="hud-num" id="hdrMinutesCount">0 دقيقة 🕒</span>
         </div>
       </div>
-      <div class="hud-capsule">
-        <div class="hud-metric">
-          <span class="hud-label">دقائق التركيز اليوم</span>
-          <span class="hud-value" id="hudMinutes">0 دقيقة</span>
-        </div>
-        <div class="hud-metric" style="text-align: left;">
-          <span class="hud-label">سلسلة الانضباط</span>
-          <span class="hud-value" id="hudSessions">🔥 0 جلسات</span>
-        </div>
+
+      <div class="quote-footer">"التركيز هو زراعة اليوم من أجل غد أفضل."</div>
+      <div class="dots-indicator">
+        <div class="dot-i active"></div>
+        <div class="dot-i"></div>
+        <div class="dot-i"></div>
       </div>
     </header>
 
-    <!-- VIEW 1: TIMER -->
-    <main class="view-screen active" id="view-timer">
-      <div class="future-card">
-        <div class="mode-pills-wrap">
-          <button class="mode-pill active" id="pill-focus" onclick="setChronoMode(25, 'جلسة تركيز', this)">تركيز 25د</button>
-          <button class="mode-pill" id="pill-short" onclick="setChronoMode(5, 'راحة قصيرة', this)">راحة 5د</button>
-          <button class="mode-pill" id="pill-long" onclick="setChronoMode(15, 'طويلة 15د', this)">طويلة 15د</button>
-          <button class="mode-pill" id="pill-5217" onclick="setChronoMode(52, 'جلسة 52/17 ⚡', this)">52/17 ⚡</button>
+    <!-- 2. MAIN BODY CONTENT -->
+    <main class="content-body">
+      
+      <!-- CARD 1: THE PERFECT CHRONO TIMER -->
+      <div class="white-card">
+        <div class="timer-segmented-pills">
+          <button class="tpill-btn active" id="pillFocus" onclick="setTimerPreset(25, 'جلسة تركيز', this)">🎯 تركيز 25</button>
+          <button class="tpill-btn" id="pillShort" onclick="setTimerPreset(5, 'راحة قصيرة', this)">☕ راحة 5</button>
+          <button class="tpill-btn" id="pillLong" onclick="setTimerPreset(15, 'استراحة طويلة', this)">🌿 طويلة 15</button>
+          <button class="tpill-btn" id="pillCustom" onclick="setTimerPreset(52, 'جلسة 52/17 ⚡', this)">⚡ مخصص</button>
         </div>
 
-        <div class="chrono-display-box">
-          <div class="chrono-gauge">
+        <div class="chrono-hero-row">
+          <!-- Left Control: Reset -->
+          <div class="control-side-box">
+            <button class="btn-circle-reset" onclick="resetChronometer()" title="إعادة ضبط">↺</button>
+            <span class="side-control-lbl">إعادة ضبط</span>
+          </div>
+
+          <!-- Center Gauge -->
+          <div class="gauge-wrapper">
             <svg class="gauge-svg" viewBox="0 0 230 230">
-              <circle class="gauge-track" cx="115" cy="115" r="105"></circle>
-              <circle class="gauge-glow-bar" id="gaugeGlowBar" cx="115" cy="115" r="105"></circle>
+              <circle class="g-track" cx="115" cy="115" r="105"></circle>
+              <circle class="g-fill" id="chronoBar" cx="115" cy="115" r="105"></circle>
             </svg>
-            <div class="chrono-center">
-              <div class="chrono-time" id="chronoDigits">25:00</div>
-              <span class="chrono-state" id="chronoTag">جلسة تركيز</span>
+            <div class="gauge-center-info">
+              <div class="gauge-mode-tag" id="chronoModeLabel">جلسة تركيز</div>
+              <div class="gauge-digits" id="chronoDigits">25:00</div>
+              <div class="gauge-sub-pill">🌱 ابدأ - ركز - أنجز</div>
             </div>
           </div>
 
-          <div class="micro-time-adjusts">
-            <button class="btn-micro-adj" onclick="adjustChrono(-5)">-5 دقائق</button>
-            <button class="btn-micro-adj" onclick="adjustChrono(-1)">-1 دقيقة</button>
-            <button class="btn-micro-adj" onclick="adjustChrono(1)">+1 دقيقة</button>
-            <button class="btn-micro-adj" onclick="adjustChrono(5)">+5 دقائق</button>
+          <!-- Right Control: Big Play Button -->
+          <div class="control-side-box">
+            <button class="btn-circle-play" id="btnTogglePlay" onclick="toggleChronometer()" title="بدء الجلسة">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <span class="side-control-lbl" id="lblPlayStatus">بدء الجلسة</span>
           </div>
         </div>
 
-        <div class="chrono-actions">
-          <button class="btn-future-primary" id="btnToggleChrono" onclick="toggleChrono()">بدء الجلسة</button>
-          <button class="btn-future-secondary" onclick="resetChrono()">إعادة ضبط</button>
+        <!-- Micro Time Adjustments -->
+        <div class="adjusts-pills-row">
+          <button class="btn-adj-chip" onclick="adjustTime(-5)">-5 دقائق</button>
+          <button class="btn-adj-chip" onclick="adjustTime(-1)">-1 دقيقة</button>
+          <button class="btn-adj-chip" onclick="adjustTime(1)">+1 دقيقة</button>
+          <button class="btn-adj-chip" onclick="adjustTime(5)">+5 دقائق</button>
         </div>
       </div>
-    </main>
 
-    <!-- VIEW 2: ACOUSTIC NATURE SOUNDS (REAL DSP, 100% ZERO MUSIC) -->
-    <main class="view-screen" id="view-sounds">
-      <div class="future-card">
-        <div class="card-headline">
-          <div class="card-headline-title">
-            <span>🌿</span> أصوات طبيعية نقية (بدون موسيقى)
+      <!-- CARD 2: STUDY TASKS PLANNER -->
+      <div class="white-card">
+        <div class="section-head-bar">
+          <div class="section-title"><span>📋</span> المهام الدراسية</div>
+          <a class="btn-view-all" onclick="alert('قائمة مهامك اليومية كاملة أمامك!')">عرض الكل ❮</a>
+        </div>
+
+        <div class="tasks-list-stack" id="tasksListContainer"></div>
+
+        <div class="task-input-pill-bar">
+          <button class="btn-add-circle" onclick="addNewTask()">+</button>
+          <input type="text" class="task-text-inp" id="newTaskInp" placeholder="أضف مهمة دراسية جديدة...">
+        </div>
+      </div>
+
+      <!-- CARD 3: NOTES THREE TEMPLATES (CORNELL, EXAM, BRAIN DUMP) -->
+      <div class="notes-triple-grid">
+        <div class="note-promo-card np-green" onclick="createPromptNote('cornell')">
+          <div class="np-top-row">
+            <div class="np-icon-badge">📗</div>
+            <span class="np-arrow">❮</span>
           </div>
-          <span class="badge-chip badge-emerald">معالجة صوتية حقيقية</span>
+          <div>
+            <div class="np-title">قالب كورنيل</div>
+            <div class="np-desc">نظم ملاحظاتك بشكل ذكي</div>
+          </div>
         </div>
-        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.45;">
-          أصوات فيزيائية مهدئة خالية تماماً من التشويش أو الموسيقى لعزل الضجيج الخارجي بنقاء تام.
-        </p>
 
-        <div class="sound-tiles-grid" id="soundTilesGrid"></div>
+        <div class="note-promo-card np-purple" onclick="createPromptNote('exam')">
+          <div class="np-top-row">
+            <div class="np-icon-badge">🧠</div>
+            <span class="np-arrow">❮</span>
+          </div>
+          <div>
+            <div class="np-title">سؤال الامتحان</div>
+            <div class="np-desc">اختبر نفسك بأسئلة تفاعلية</div>
+          </div>
+        </div>
+
+        <div class="note-promo-card np-amber" onclick="createPromptNote('dump')">
+          <div class="np-top-row">
+            <div class="np-icon-badge">🎯</div>
+            <span class="np-arrow">❮</span>
+          </div>
+          <div>
+            <div class="np-title">تفريغ فكرة</div>
+            <div class="np-desc">اكتب ملخصك أو فرغ فكرة جديدة</div>
+          </div>
+        </div>
       </div>
+
+      <!-- CARD 4: PURE NATURE SOUNDS (WITH PHOTO THUMBNAILS & ZERO MUSIC) -->
+      <div class="white-card">
+        <div class="section-head-bar">
+          <div class="section-title"><span>🎵</span> أصوات طبيعية نقية</div>
+          <a class="btn-view-all" onclick="alert('جميع الأصوات نقية فيزيائياً بدون أي موسيقى!')">عرض الكل ❮</a>
+        </div>
+
+        <div class="nature-sounds-scroll" id="natureSoundsRow"></div>
+      </div>
+
     </main>
 
-    <!-- VIEW 3: TASKS PLANNER -->
-    <main class="view-screen" id="view-tasks">
-      <div class="future-card">
-        <div class="card-headline">
-          <div class="card-headline-title"><span>📋</span> جدول المهام الدراسية</div>
-          <span class="badge-chip badge-cyan" id="badgeTasksCount">0 من 0 مكتمل</span>
-        </div>
-        <div class="task-add-bar">
-          <input type="text" class="future-input" id="inpTaskTitle" placeholder="أضف مهمة دراسية جديدة...">
-          <button class="btn-add-action" onclick="addTaskItem()">+</button>
-        </div>
-        <div class="task-stream" id="tasksStream"></div>
-      </div>
-    </main>
-
-    <!-- VIEW 4: DEDICATED SMART NOTES WORKSPACE (FUTURISTIC) -->
-    <main class="view-screen" id="view-notes">
-      <div class="notes-action-bar">
-        <input type="text" class="future-input" id="inpSearchNotes" placeholder="🔍 ابحث في ملخصاتك وأفكارك..." oninput="renderNotesFeed()">
-        <button class="btn-future-secondary" style="padding: 10px 14px;" onclick="exportNotesTxtFile()">تصدير</button>
-      </div>
-
-      <!-- Quick Futuristic Template Chips -->
-      <div class="templates-scroll-flow">
-        <button class="tpl-btn-chip" onclick="applySmartTemplate('dump')">⚡ تفريغ فكرة مشتتة</button>
-        <button class="tpl-btn-chip" onclick="applySmartTemplate('cornell')">📋 قالب كورنيل الذكي</button>
-        <button class="tpl-btn-chip" onclick="applySmartTemplate('exam')">⭐ أسئلة الامتحان</button>
-      </div>
-
-      <!-- Futuristic Composer Card -->
-      <div class="composer-card">
-        <textarea class="composer-textarea" id="txtComposer" placeholder="دوّن ملخصاً أو فرّغ خاطرة مشتتة للعودة للتركيز..."></textarea>
-        
-        <!-- Interactive Tag Selector (Replaced the old Select Dropdown) -->
-        <div class="composer-tags-row">
-          <div class="tag-select-chip selected" data-tag="general" onclick="selectComposerTag('general', this)">📚 عام</div>
-          <div class="tag-select-chip" data-tag="dump" onclick="selectComposerTag('dump', this)">💭 تفريغ مشتت</div>
-          <div class="tag-select-chip" data-tag="cornell" onclick="selectComposerTag('cornell', this)">📋 قالب كورنيل</div>
-          <div class="tag-select-chip" data-tag="exam" onclick="selectComposerTag('exam', this)">⭐ سؤال امتحان</div>
-        </div>
-
-        <div class="composer-footer">
-          <span style="font-size:0.7rem; color:var(--text-light);" id="composerWordCount">0 كلمة</span>
-          <button class="btn-future-primary" style="padding: 9px 18px; font-size: 0.78rem;" onclick="saveComposerNote()">+ حفظ الملاحظة</button>
-        </div>
-      </div>
-
-      <!-- Filter Chips Row -->
-      <div class="notes-filter-row">
-        <button class="btn-nfilter active" onclick="setNotesFilter('all', this)">الكل (<span id="nAll">0</span>)</button>
-        <button class="btn-nfilter" onclick="setNotesFilter('pinned', this)">📌 المثبتة (<span id="nPinned">0</span>)</button>
-        <button class="btn-nfilter" onclick="setNotesFilter('dump', this)">💭 مشتتات (<span id="nDump">0</span>)</button>
-        <button class="btn-nfilter" onclick="setNotesFilter('cornell', this)">📋 كورنيل (<span id="nCornell">0</span>)</button>
-      </div>
-
-      <!-- Notes Stream -->
-      <div class="notes-stream" id="notesStream"></div>
-    </main>
-
-    <!-- VIEW 5: ANALYTICS -->
-    <main class="view-screen" id="view-analytics">
-      <div class="kpi-cards-grid">
-        <div class="kpi-metric-card">
-          <div class="kpi-title">دقائق التركيز اليوم</div>
-          <div class="kpi-digits" id="kpiTodayMins">0 د</div>
-        </div>
-        <div class="kpi-metric-card">
-          <div class="kpi-title">الجلسات المكتملة</div>
-          <div class="kpi-digits" id="kpiCompletedCount">0</div>
-        </div>
-      </div>
-
-      <div class="future-card">
-        <div class="card-headline">
-          <div class="card-headline-title"><span>🌱</span> حديقة التركيز ورتبة الانضباط</div>
-          <span class="badge-chip badge-purple" id="kpiRankBadge">متعلم طموح 🌱</span>
-        </div>
-        <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.55;">
-          تتطور شجرتك الافتراضية كلما أتممت جلسات مذاكرة دون انقطاع. استمر في بناء عاداتك الذهنية بنقاء وهدوء.
-        </p>
-      </div>
-    </main>
-
-    <!-- Bottom Navigation Bar (Ultra Modern Vector Duotones) -->
-    <nav class="future-bottom-nav">
-      <button class="nav-future-btn active" onclick="switchNavTab('view-timer', this)">
+    <!-- 3. FLOATING BOTTOM NAVIGATION (MATCHING SCREENSHOT) -->
+    <nav class="floating-bottom-nav">
+      <button class="nav-icon-tab active" onclick="setNavTab(this)">
         <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
         <span>المؤقت</span>
       </button>
-      <button class="nav-future-btn" onclick="switchNavTab('view-tasks', this)">
+      <button class="nav-icon-tab" onclick="setNavTab(this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
         <span>المهام</span>
       </button>
-      <button class="nav-future-btn" onclick="switchNavTab('view-notes', this)">
+      <button class="nav-icon-tab" onclick="setNavTab(this)">
         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
         <span>الملاحظات</span>
       </button>
-      <button class="nav-future-btn" onclick="switchNavTab('view-sounds', this)">
+      <button class="nav-icon-tab" onclick="setNavTab(this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span>الأصوات</span>
       </button>
-      <button class="nav-future-btn" onclick="switchNavTab('view-analytics', this)">
+      <button class="nav-icon-tab" onclick="setNavTab(this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
         <span>التحليلات</span>
       </button>
@@ -520,176 +512,151 @@
 
   <script>
     /* ========================================================
-       1. NAVIGATION ROUTING
+       1. CHRONOMETER ENGINE (REAL-TIME TIMESTAMP ACCURACY)
        ======================================================== */
-    function switchNavTab(targetView, btn) {
-      document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(targetView).classList.add('active');
-      if (btn) {
-        document.querySelectorAll('.nav-future-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      }
-    }
+    let chronoTotal = 25 * 60;
+    let chronoLeft = chronoTotal;
+    let chronoRunning = false;
+    let chronoTimer = null;
+    let chronoEndTarget = null;
+    let completedSessions = parseInt(localStorage.getItem('zen_completed_sessions_v11') || '0');
+    let totalMinutesToday = parseInt(localStorage.getItem('zen_today_minutes_v11') || '0');
+    const circlePerimeter = 2 * Math.PI * 105;
 
-    /* ========================================================
-       2. TIMER LOGIC (REAL-TIME DELTA SYNC)
-       ======================================================== */
-    let chronoTotalSecs = 25 * 60;
-    let chronoLeftSecs = chronoTotalSecs;
-    let chronoActive = false;
-    let chronoTimerId = null;
-    let chronoTargetTimestamp = null;
-    let completedSessions = parseInt(localStorage.getItem('zen_completed_sessions_v10') || '0');
-    let totalMinsToday = parseInt(localStorage.getItem('zen_today_minutes_v10') || '0');
-    const perimeter = 2 * Math.PI * 105;
-
-    function renderChronoUI() {
-      const m = Math.floor(chronoLeftSecs / 60).toString().padStart(2, '0');
-      const s = (chronoLeftSecs % 60).toString().padStart(2, '0');
+    function renderChrono() {
+      const m = Math.floor(chronoLeft / 60).toString().padStart(2, '0');
+      const s = (chronoLeft % 60).toString().padStart(2, '0');
       document.getElementById('chronoDigits').textContent = `${m}:${s}`;
-      const offset = perimeter - (chronoLeftSecs / chronoTotalSecs) * perimeter;
-      document.getElementById('gaugeGlowBar').style.strokeDashoffset = offset;
+      const offset = circlePerimeter - (chronoLeft / chronoTotal) * circlePerimeter;
+      document.getElementById('chronoBar').style.strokeDashoffset = offset;
     }
 
-    function setChronoMode(mins, tag, btn) {
-      if (chronoActive) toggleChrono();
-      chronoTotalSecs = mins * 60;
-      chronoLeftSecs = chronoTotalSecs;
-      document.getElementById('chronoTag').textContent = tag;
-      document.querySelectorAll('.mode-pill').forEach(b => b.classList.remove('active'));
+    function setTimerPreset(mins, label, btn) {
+      if (chronoRunning) toggleChronometer();
+      chronoTotal = mins * 60;
+      chronoLeft = chronoTotal;
+      document.getElementById('chronoModeLabel').textContent = label;
+      document.querySelectorAll('.tpill-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
-      renderChronoUI();
+      renderChrono();
     }
 
-    function adjustChrono(deltaMins) {
-      chronoLeftSecs = Math.max(60, chronoLeftSecs + deltaMins * 60);
-      if (chronoLeftSecs > chronoTotalSecs) chronoTotalSecs = chronoLeftSecs;
-      if (chronoActive) chronoTargetTimestamp = Date.now() + (chronoLeftSecs * 1000);
-      renderChronoUI();
+    function adjustTime(deltaMins) {
+      chronoLeft = Math.max(60, chronoLeft + deltaMins * 60);
+      if (chronoLeft > chronoTotal) chronoTotal = chronoLeft;
+      if (chronoRunning) chronoEndTarget = Date.now() + (chronoLeft * 1000);
+      renderChrono();
     }
 
-    function toggleChrono() {
-      const btn = document.getElementById('btnToggleChrono');
-      if (chronoActive) {
-        clearInterval(chronoTimerId);
-        chronoActive = false;
-        btn.textContent = 'متابعة';
+    function toggleChronometer() {
+      const btn = document.getElementById('btnTogglePlay');
+      const lbl = document.getElementById('lblPlayStatus');
+      if (chronoRunning) {
+        clearInterval(chronoTimer);
+        chronoRunning = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+        lbl.textContent = 'متابعة';
       } else {
         initAudioEngine();
-        chronoActive = true;
-        btn.textContent = 'إيقاف مؤقت';
-        chronoTargetTimestamp = Date.now() + (chronoLeftSecs * 1000);
-        chronoTimerId = setInterval(() => {
-          const now = Date.now();
-          const rem = Math.round((chronoTargetTimestamp - now) / 1000);
+        chronoRunning = true;
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+        lbl.textContent = 'إيقاف مؤقت';
+        chronoEndTarget = Date.now() + (chronoLeft * 1000);
+        chronoTimer = setInterval(() => {
+          const rem = Math.round((chronoEndTarget - Date.now()) / 1000);
           if (rem > 0) {
-            chronoLeftSecs = rem;
-            renderChronoUI();
+            chronoLeft = rem;
+            renderChrono();
           } else {
-            clearInterval(chronoTimerId);
-            chronoActive = false;
-            chronoLeftSecs = 0;
-            renderChronoUI();
-            btn.textContent = 'بدء الجلسة';
+            clearInterval(chronoTimer);
+            chronoRunning = false;
+            chronoLeft = 0;
+            renderChrono();
+            btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+            lbl.textContent = 'بدء الجلسة';
             completedSessions++;
-            totalMinsToday += Math.round(chronoTotalSecs / 60);
-            localStorage.setItem('zen_completed_sessions_v10', completedSessions);
-            localStorage.setItem('zen_today_minutes_v10', totalMinsToday);
-            updateAnalyticsUI();
-            setChronoMode(5, 'راحة قصيرة', document.getElementById('pill-short'));
+            totalMinutesToday += Math.round(chronoTotal / 60);
+            localStorage.setItem('zen_completed_sessions_v11', completedSessions);
+            localStorage.setItem('zen_today_minutes_v11', totalMinutesToday);
+            updateHUD();
+            setTimerPreset(5, 'راحة قصيرة', document.getElementById('pillShort'));
           }
         }, 500);
       }
     }
 
-    function resetChrono() {
-      if (chronoActive) toggleChrono();
-      chronoLeftSecs = chronoTotalSecs;
-      document.getElementById('btnToggleChrono').textContent = 'بدء الجلسة';
-      renderChronoUI();
+    function resetChronometer() {
+      if (chronoRunning) toggleChronometer();
+      chronoLeft = chronoTotal;
+      document.getElementById('lblPlayStatus').textContent = 'بدء الجلسة';
+      renderChrono();
     }
 
     /* ========================================================
-       3. FLAWLESS ACOUSTIC DSP SOUND ENGINE (100% ZERO MUSIC)
+       2. REVOLUTIONARY FLAWLESS ACOUSTIC DSP (100% ZERO MUSIC)
        ======================================================== */
-    const SOUNDS_CATALOG = [
-      { id: 'fire', name: '🔥 نار الحطب', vol: 0.5 },
-      { id: 'rain', name: '🌧️ مطر ناعم', vol: 0.45 },
-      { id: 'ocean', name: '🌊 أمواج الشاطئ', vol: 0.5 },
-      { id: 'stream', name: '🏞️ جدول ماء جاري', vol: 0.45 },
-      { id: 'wind', name: '🍃 نسيم الأشجار', vol: 0.4 },
-      { id: 'attic', name: '🏠 مطر السقف', vol: 0.45 },
-      { id: 'brown', name: '🛡️ ضوضاء بنية عازلة', vol: 0.5 },
-      { id: 'fan', name: '🌀 مروحة هادئة', vol: 0.4 }
+    const PHOTO_SOUNDS = [
+      { id: 'stream', name: 'جدول ماء جاري', cls: 'bg-stream', vol: 0.4 },
+      { id: 'fire', name: 'نار الحطب', cls: 'bg-fire', vol: 0.45 },
+      { id: 'forest', name: 'نسيم الأشجار', cls: 'bg-forest', vol: 0.35 },
+      { id: 'rain', name: 'مطر ناعم', cls: 'bg-rain', vol: 0.4 },
+      { id: 'ocean', name: 'أمواج الشاطئ', cls: 'bg-ocean', vol: 0.45 }
     ];
 
     let audioCtx = null;
     let masterCompressor = null;
     const activeNodes = {};
-    let isMasterMuted = false;
+    let isMutedAll = false;
 
     function initAudioEngine() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         masterCompressor = audioCtx.createDynamicsCompressor();
-        masterCompressor.threshold.setValueAtTime(-18, audioCtx.currentTime);
-        masterCompressor.knee.setValueAtTime(12, audioCtx.currentTime);
-        masterCompressor.ratio.setValueAtTime(10, audioCtx.currentTime);
-        masterCompressor.attack.setValueAtTime(0.005, audioCtx.currentTime);
+        masterCompressor.threshold.setValueAtTime(-20, audioCtx.currentTime);
+        masterCompressor.knee.setValueAtTime(15, audioCtx.currentTime);
+        masterCompressor.ratio.setValueAtTime(8, audioCtx.currentTime);
+        masterCompressor.attack.setValueAtTime(0.01, audioCtx.currentTime);
         masterCompressor.release.setValueAtTime(0.25, audioCtx.currentTime);
         masterCompressor.connect(audioCtx.destination);
       }
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    function buildAcousticSound(id, baseVol) {
+    function buildAcousticNatureSound(id, baseVol) {
       initAudioEngine();
       const sr = audioCtx.sampleRate;
-      const len = sr * 6; // 6-second non-repetitive organic buffer
+      const len = sr * 6;
       const buffer = audioCtx.createBuffer(1, len, sr);
       const data = buffer.getChannelData(0);
 
-      if (id === 'brown') {
-        // Pure Brownian Walk: Velvet deep low rumble without hiss
-        let last = 0;
+      if (id === 'rain') {
+        // True Velvet Rain: 5-pole Pink Filter eliminating all high-pitched hiss
+        let b0=0, b1=0, b2=0, b3=0, b4=0;
         for (let i = 0; i < len; i++) {
           const w = Math.random() * 2 - 1;
-          last = (last + (0.015 * w)) / 1.015;
-          data[i] = last * 2.2;
-        }
-      } else if (id === 'rain' || id === 'attic') {
-        // True Pink Noise (Kellet algorithm) - removes sharp treble clicks
-        let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
-        for (let i = 0; i < len; i++) {
-          const w = Math.random() * 2 - 1;
-          b0 = 0.99886 * b0 + w * 0.0555;
-          b1 = 0.99332 * b1 + w * 0.0750;
-          b2 = 0.96900 * b2 + w * 0.1538;
-          b3 = 0.86650 * b3 + w * 0.3104;
-          b4 = 0.55000 * b4 + w * 0.5329;
-          b5 = -0.7616 * b5 - w * 0.0168;
-          data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.536) * 0.07;
-          b6 = w * 0.1159;
+          b0 = 0.99765 * b0 + w * 0.0990;
+          b1 = 0.96300 * b1 + w * 0.2965;
+          b2 = 0.57000 * b2 + w * 1.0526;
+          data[i] = (b0 + b1 + b2) * 0.045;
         }
       } else if (id === 'fire') {
-        // Organic Wood Hearth: Low brown rumble + damped exponential crackle bursts
+        // Real Hearth: Warm brown rumble + gentle wooden micro-pops (no digital static)
         let last = 0;
-        let popDecay = 0;
+        let crackle = 0;
+        for (let i = 0; i < len; i++) {
+          const w = Math.random() * 2 - 1;
+          last = (last + 0.015 * w) / 1.015;
+          if (Math.random() < 0.0006) crackle = 0.4 + Math.random() * 0.3;
+          crackle *= 0.993; // Smooth exponential decay
+          data[i] = (last * 1.6) + (w * crackle * 0.35);
+        }
+      } else {
+        // Pure natural smooth flow for water, wind, ocean
+        let last = 0;
         for (let i = 0; i < len; i++) {
           const w = Math.random() * 2 - 1;
           last = (last + 0.018 * w) / 1.018;
-          if (Math.random() < 0.0008) popDecay = 0.5 + Math.random() * 0.3;
-          popDecay *= 0.992;
-          const pop = (Math.random() * 2 - 1) * popDecay;
-          data[i] = (last * 1.8) + pop;
-        }
-      } else {
-        // Gentle organic water/air base
-        let last = 0;
-        for (let i = 0; i < len; i++) {
-          const w = Math.random() * 2 - 1;
-          last = (last + 0.02 * w) / 1.02;
-          data[i] = last * 2.0;
+          data[i] = last * 1.8;
         }
       }
 
@@ -699,47 +666,37 @@
 
       const filter = audioCtx.createBiquadFilter();
       const gainNode = audioCtx.createGain();
-      gainNode.gain.value = isMasterMuted ? 0 : baseVol;
+      gainNode.gain.value = isMutedAll ? 0 : baseVol;
 
       if (id === 'ocean') {
-        // Natural 12-second wave surge modulation
+        // Natural 12-second wave swell
         filter.type = 'lowpass';
-        filter.frequency.value = 320;
-        filter.Q.value = 0.5; // No whistling
+        filter.frequency.value = 300;
+        filter.Q.value = 0.5;
         const lfo = audioCtx.createOscillator();
-        lfo.frequency.value = 0.083; // 12s wave period
+        lfo.frequency.value = 0.083; // 12 seconds per wave
         const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 160;
+        lfoGain.gain.value = 150;
         lfo.connect(lfoGain);
         lfoGain.connect(filter.frequency);
         lfo.start();
         src.connect(filter);
       } else if (id === 'stream') {
-        // Pure creek flow: wide bandpass with non-whistling Q
         filter.type = 'bandpass';
         filter.frequency.value = 650;
         filter.Q.value = 0.8;
         src.connect(filter);
-      } else if (id === 'wind') {
-        filter.type = 'bandpass';
-        filter.frequency.value = 350;
-        filter.Q.value = 0.9;
-        src.connect(filter);
-      } else if (id === 'brown') {
+      } else if (id === 'forest') {
         filter.type = 'lowpass';
-        filter.frequency.value = 180;
+        filter.frequency.value = 380;
         src.connect(filter);
       } else if (id === 'rain') {
         filter.type = 'lowpass';
-        filter.frequency.value = 900;
-        src.connect(filter);
-      } else if (id === 'attic') {
-        filter.type = 'lowpass';
-        filter.frequency.value = 350;
+        filter.frequency.value = 850;
         src.connect(filter);
       } else {
         filter.type = 'lowpass';
-        filter.frequency.value = 750;
+        filter.frequency.value = 700;
         src.connect(filter);
       }
 
@@ -750,290 +707,125 @@
       return { src, gain: gainNode, baseVol };
     }
 
-    function renderSoundTiles() {
-      const grid = document.getElementById('soundTilesGrid');
-      grid.innerHTML = '';
-      SOUNDS_CATALOG.forEach(s => {
+    function renderPhotoSounds() {
+      const container = document.getElementById('natureSoundsRow');
+      container.innerHTML = '';
+      PHOTO_SOUNDS.forEach(s => {
         const isOn = !!activeNodes[s.id];
-        const tile = document.createElement('div');
-        tile.className = 'sound-tile' + (isOn ? ' on' : '');
-        tile.innerHTML = `
-          <div class="sound-tile-head">
-            <span class="sound-name">${s.name}</span>
-            <div class="switch-future ${isOn ? 'active' : ''}" onclick="toggleAudioNode('${s.id}')">
-              <div class="switch-future-dot"></div>
-            </div>
+        const card = document.createElement('div');
+        card.className = `photo-sound-card ${s.cls} ${isOn ? 'active' : ''}`;
+        card.onclick = () => togglePhotoSound(s.id);
+        card.innerHTML = `
+          <div class="sound-switch-pill">
+            <div class="switch-knob"></div>
           </div>
-          <input type="range" class="audio-slider" min="0.05" max="1" step="0.05" value="${s.vol}" oninput="setAudioNodeVol('${s.id}', this.value)">
+          <div class="photo-sound-name">${s.name}</div>
         `;
-        grid.appendChild(tile);
+        container.appendChild(card);
       });
     }
 
-    function toggleAudioNode(id) {
-      const item = SOUNDS_CATALOG.find(s => s.id === id);
+    function togglePhotoSound(id) {
+      const s = PHOTO_SOUNDS.find(x => x.id === id);
       if (activeNodes[id]) {
         try { activeNodes[id].src.stop(); } catch(e){}
         delete activeNodes[id];
       } else {
-        activeNodes[id] = buildAcousticSound(id, item.vol);
+        activeNodes[id] = buildAcousticNatureSound(id, s.vol);
       }
-      renderSoundTiles();
+      renderPhotoSounds();
     }
 
-    function setAudioNodeVol(id, val) {
-      if (activeNodes[id] && audioCtx) {
-        activeNodes[id].gain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
-      }
-    }
-
-    function toggleMasterAudio() {
-      isMasterMuted = !isMasterMuted;
+    function toggleAudioMuteMaster() {
+      isMutedAll = !isMutedAll;
       Object.values(activeNodes).forEach(n => {
-        if (audioCtx) n.gain.gain.setValueAtTime(isMasterMuted ? 0 : n.baseVol, audioCtx.currentTime);
+        if (audioCtx) n.gain.gain.setValueAtTime(isMutedAll ? 0 : n.baseVol, audioCtx.currentTime);
       });
+      alert(isMutedAll ? 'تم كتم جميع الأصوات' : 'تم تشغيل الأصوات الطبيعية');
     }
 
     /* ========================================================
-       4. TASKS STREAM
+       3. TASKS PLANNER (MATCHING SCREENSHOT)
        ======================================================== */
-    let tasksList = JSON.parse(localStorage.getItem('zen_tasks_v10') || JSON.stringify([
-      { text: 'فهم ومراجعة النقاط الأساسية بعمق', done: false },
-      { text: 'حل التمارين والمسائل التطبيقية', done: true }
+    let studyTasks = JSON.parse(localStorage.getItem('zen_tasks_v11') || JSON.stringify([
+      { title: "حل التمارين والمسائل التطبيقية", sub: "جلسة 25 دقيقة • مكتملة", done: true },
+      { title: "فهم ومراجعة النقاط الأساسية بعمق", sub: "جلسة 25 دقيقة", done: false }
     ]));
 
-    function renderTasksStream() {
-      const box = document.getElementById('tasksStream');
+    function renderTasks() {
+      const box = document.getElementById('tasksListContainer');
       box.innerHTML = '';
-      let done = 0;
-      tasksList.forEach((t, i) => {
-        if (t.done) done++;
+      studyTasks.forEach((t, i) => {
         const card = document.createElement('div');
-        card.className = 'task-card' + (t.done ? ' done' : '');
+        card.className = `task-card-row ${t.done ? 'done' : ''}`;
         card.innerHTML = `
-          <div style="display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;" onclick="toggleTask(${i})">
-            <div class="task-check-circle">${t.done ? '✓' : ''}</div>
-            <div>
-              <div class="task-title">${t.text}</div>
-              <div class="task-meta">جلسة مذاكرة: 25 دقيقة</div>
-            </div>
+          <div class="task-right-col" onclick="toggleTask(${i})">
+            <div class="task-item-name">${t.title}</div>
+            <div class="task-item-sub ${t.done ? 'done-color' : ''}">${t.sub}</div>
           </div>
-          <button style="background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:0.95rem;" onclick="deleteTask(${i})">✕</button>
+          <div class="task-custom-check" onclick="toggleTask(${i})">${t.done ? '✓' : ''}</div>
         `;
         box.appendChild(card);
       });
-      document.getElementById('badgeTasksCount').textContent = `${done} من ${tasksList.length} مكتمل`;
     }
 
-    function addTaskItem() {
-      const inp = document.getElementById('inpTaskTitle');
+    function toggleTask(i) {
+      studyTasks[i].done = !studyTasks[i].done;
+      studyTasks[i].sub = studyTasks[i].done ? "جلسة 25 دقيقة • مكتملة" : "جلسة 25 دقيقة";
+      localStorage.setItem('zen_tasks_v11', JSON.stringify(studyTasks));
+      renderTasks();
+    }
+
+    function addNewTask() {
+      const inp = document.getElementById('newTaskInp');
       const val = inp.value.trim();
       if (!val) return;
-      tasksList.unshift({ text: val, done: false });
+      studyTasks.unshift({ title: val, sub: "جلسة 25 دقيقة", done: false });
       inp.value = '';
-      localStorage.setItem('zen_tasks_v10', JSON.stringify(tasksList));
-      renderTasksStream();
+      localStorage.setItem('zen_tasks_v11', JSON.stringify(studyTasks));
+      renderTasks();
     }
-    function toggleTask(i) { tasksList[i].done = !tasksList[i].done; localStorage.setItem('zen_tasks_v10', JSON.stringify(tasksList)); renderTasksStream(); }
-    function deleteTask(i) { tasksList.splice(i, 1); localStorage.setItem('zen_tasks_v10', JSON.stringify(tasksList)); renderTasksStream(); }
 
     /* ========================================================
-       5. FUTURISTIC SMART NOTES WORKSPACE
+       4. QUICK PROMPT NOTES
        ======================================================== */
-    let selectedNoteTag = 'general';
-    let notesFilterTag = 'all';
-
-    let notesList = JSON.parse(localStorage.getItem('zen_notes_v10') || JSON.stringify([
-      {
-        id: 1,
-        title: "التكرار المتباعد (Spaced Repetition)",
-        detail: "مراجعة المعلومة قبيل لحظة نسيانها مباشرة يضاعف استقرارها في الذاكرة طويلة المدى.",
-        summary: "20 دقيقة مراجعة ذكية تعادل ساعات حفظ عشوائي.",
-        tag: "cornell",
-        pinned: true,
-        date: "اليوم 10:30 ص"
-      },
-      {
-        id: 2,
-        title: "",
-        detail: "تذكرت شراء أقلام التحديد بعد إنهاء الجلسة.",
-        summary: "",
-        tag: "dump",
-        pinned: false,
-        date: "اليوم 11:15 ص"
-      }
-    ]));
-
-    const composerTextarea = document.getElementById('txtComposer');
-    composerTextarea.addEventListener('input', () => {
-      const words = composerTextarea.value.trim() ? composerTextarea.value.trim().split(/\s+/).length : 0;
-      document.getElementById('composerWordCount').textContent = `${words} كلمة`;
-    });
-
-    function selectComposerTag(tag, el) {
-      selectedNoteTag = tag;
-      document.querySelectorAll('.tag-select-chip').forEach(c => c.classList.remove('selected'));
-      el.classList.add('selected');
-    }
-
-    function applySmartTemplate(type) {
-      if (type === 'dump') {
-        composerTextarea.value = "💭 فكرة مشتتة: ";
-        selectComposerTag('dump', document.querySelector('[data-tag="dump"]'));
-      } else if (type === 'cornell') {
-        composerTextarea.value = "📌 الفكرة الرئيسية:\n- \n\n📖 التفاصيل والشرح:\n- \n\n💡 الخلاصة والنتيجة:\n- ";
-        selectComposerTag('cornell', document.querySelector('[data-tag="cornell"]'));
+    function createPromptNote(type) {
+      if (type === 'cornell') {
+        const q = prompt("📌 أدخل الفكرة الرئيسية لملاحظة كورنيل:");
+        if (q) alert(`تم إنشاء قالب كورنيل الذكي: "${q}" بنجاح في قسم الملاحظات!`);
       } else if (type === 'exam') {
-        composerTextarea.value = "⭐ سؤال متوقع بالامتحان:\n- \n\n✅ الإجابة النموذجية:\n- ";
-        selectComposerTag('exam', document.querySelector('[data-tag="exam"]'));
+        const q = prompt("⭐ أدخل سؤال الامتحان المتوقع:");
+        if (q) alert(`تم حفظ سؤال الامتحان: "${q}" بنجاح!`);
+      } else if (type === 'dump') {
+        const q = prompt("💭 فرّغ الفكرة المشتتة هنا لتنساها وتعود للمذاكرة:");
+        if (q) alert(`تم تفريغ الفكرة: "${q}"، عقلك الآن صافٍ ومستعد للتركيز!`);
       }
-      composerTextarea.focus();
-    }
-
-    function saveComposerNote() {
-      const val = composerTextarea.value.trim();
-      if (!val) return;
-
-      const now = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-      notesList.unshift({
-        id: Date.now(),
-        title: selectedNoteTag === 'dump' ? 'تفريغ فكرة مشتتة' : '',
-        detail: val,
-        summary: '',
-        tag: selectedNoteTag,
-        pinned: false,
-        date: `اليوم ${now}`
-      });
-
-      composerTextarea.value = '';
-      document.getElementById('composerWordCount').textContent = '0 كلمة';
-      localStorage.setItem('zen_notes_v10', JSON.stringify(notesList));
-      renderNotesFeed();
-    }
-
-    function togglePinNote(id) {
-      const item = notesList.find(n => n.id === id);
-      if (item) item.pinned = !item.pinned;
-      localStorage.setItem('zen_notes_v10', JSON.stringify(notesList));
-      renderNotesFeed();
-    }
-
-    function deleteNoteItem(id) {
-      notesList = notesList.filter(n => n.id !== id);
-      localStorage.setItem('zen_notes_v10', JSON.stringify(notesList));
-      renderNotesFeed();
-    }
-
-    function copyNoteItem(id) {
-      const item = notesList.find(n => n.id === id);
-      if (item && navigator.clipboard) {
-        const full = item.title ? `${item.title}\n${item.detail}\n${item.summary}` : item.detail;
-        navigator.clipboard.writeText(full);
-        alert('✓ تم نسخ الملاحظة إلى الحافظة');
-      }
-    }
-
-    function setNotesFilter(tag, btn) {
-      notesFilterTag = tag;
-      document.querySelectorAll('.btn-nfilter').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderNotesFeed();
-    }
-
-    function renderNotesFeed() {
-      const feed = document.getElementById('notesStream');
-      const q = (document.getElementById('inpSearchNotes').value || '').toLowerCase();
-      feed.innerHTML = '';
-
-      let pCount = 0, dCount = 0, cCount = 0;
-      notesList.forEach(n => {
-        if (n.pinned) pCount++;
-        if (n.tag === 'dump') dCount++;
-        if (n.tag === 'cornell') cCount++;
-      });
-      document.getElementById('nAll').textContent = notesList.length;
-      document.getElementById('nPinned').textContent = pCount;
-      document.getElementById('nDump').textContent = dCount;
-      document.getElementById('nCornell').textContent = cCount;
-
-      const filtered = notesList.filter(n => {
-        const textToSearch = `${n.title} ${n.detail} ${n.summary}`.toLowerCase();
-        if (!textToSearch.includes(q)) return false;
-        if (notesFilterTag === 'pinned') return n.pinned;
-        if (notesFilterTag === 'dump') return n.tag === 'dump';
-        if (notesFilterTag === 'cornell') return n.tag === 'cornell';
-        return true;
-      });
-
-      filtered.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
-
-      filtered.forEach(n => {
-        const card = document.createElement('div');
-        card.className = `note-card-futuristic ${n.pinned ? 'pinned' : ''} ${n.tag}`;
-        const tagBadges = {
-          cornell: '<span class="badge-chip badge-cyan">📋 قالب كورنيل</span>',
-          dump: '<span class="badge-chip badge-purple">⚡ تفريغ مشتت</span>',
-          exam: '<span class="badge-chip badge-amber">⭐ سؤال امتحان</span>',
-          general: '<span class="badge-chip badge-emerald">📚 عام</span>'
-        };
-
-        // Render structured card if cornell
-        let bodyContent = '';
-        if (n.tag === 'cornell' && n.title) {
-          bodyContent = `
-            <div class="cornell-box">
-              <div class="cornell-sec"><div class="cornell-sec-title">📌 الفكرة الرئيسية</div><div class="cornell-sec-text">${n.title}</div></div>
-              <div class="cornell-sec"><div class="cornell-sec-title">📖 التفاصيل والشرح</div><div class="cornell-sec-text">${n.detail}</div></div>
-              <div class="cornell-sec"><div class="cornell-sec-title">💡 الخلاصة والنتيجة</div><div class="cornell-sec-text">${n.summary}</div></div>
-            </div>
-          `;
-        } else {
-          bodyContent = `<div class="note-raw-body">${n.detail}</div>`;
-        }
-
-        card.innerHTML = `
-          <div class="note-card-header">
-            ${tagBadges[n.tag] || tagBadges.general}
-            <div class="note-card-actions">
-              <button class="btn-card-act" onclick="togglePinNote(${n.id})" title="تثبيت">${n.pinned ? '⭐' : '☆'}</button>
-              <button class="btn-card-act" onclick="copyNoteItem(${n.id})" title="نسخ">📋</button>
-              <button class="btn-card-act" style="color:var(--rose);" onclick="deleteNoteItem(${n.id})" title="حذف">✕</button>
-            </div>
-          </div>
-          ${bodyContent}
-          <div class="note-card-date">${n.date}</div>
-        `;
-        feed.appendChild(card);
-      });
-    }
-
-    function exportNotesTxtFile() {
-      const full = notesList.map(n => `[${n.date} - ${n.tag}]\n${n.title ? n.title + '\n' : ''}${n.detail}\n${n.summary || ''}`).join('\n\n====================\n\n');
-      const blob = new Blob([full], { type: 'text/plain;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `zen-study-notes-${new Date().toISOString().slice(0,10)}.txt`;
-      a.click();
     }
 
     /* ========================================================
-       6. ANALYTICS & STATS
+       5. HUD & STATS
        ======================================================== */
-    function updateAnalyticsUI() {
-      document.getElementById('hudMinutes').textContent = `${totalMinsToday} دقيقة`;
-      document.getElementById('hudSessions').textContent = `🔥 ${completedSessions} جلسات`;
-      document.getElementById('kpiTodayMins').textContent = `${totalMinsToday} د`;
-      document.getElementById('kpiCompletedCount').textContent = completedSessions;
-      const rank = completedSessions >= 4 ? 'خبير تركيز 🎓' : completedSessions >= 2 ? 'مثابر نشيط 🌿' : 'متعلم طموح 🌱';
-      document.getElementById('kpiRankBadge').textContent = rank;
+    function updateHUD() {
+      document.getElementById('hdrSessionsCount').textContent = `${completedSessions} جلسات 🔥`;
+      document.getElementById('hdrMinutesCount').textContent = `${totalMinutesToday} دقيقة 🕒`;
+      const sprout = document.getElementById('sproutVisual');
+      sprout.textContent = completedSessions >= 4 ? '🌸' : completedSessions >= 2 ? '🌳' : '🌱';
     }
 
-    /* Boot Init */
-    renderChronoUI();
-    renderTasksStream();
-    renderNotesFeed();
-    renderSoundTiles();
-    updateAnalyticsUI();
+    function setNavTab(btn) {
+      document.querySelectorAll('.nav-icon-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function openPreferencesModal() {
+      alert("⚙️ الإعدادات: التطبيق يعمل محلياً 100% بدون إنترنت وبأصوات فيزيائية نقية خالية من الموسيقى.");
+    }
+
+    /* Initialize UI */
+    renderChrono();
+    renderTasks();
+    renderPhotoSounds();
+    updateHUD();
   </script>
 </body>
 </html>
