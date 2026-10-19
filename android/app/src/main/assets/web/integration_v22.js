@@ -50,6 +50,7 @@
           }
           return ok;
         },
+        canOutput:()=>document.visibilityState!=='hidden',
         onError:()=>notify('Completion audio not available')
       });
       root.DFRecoveryCompletion=alertEngine;
