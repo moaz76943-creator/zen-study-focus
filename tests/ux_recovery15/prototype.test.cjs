@@ -72,3 +72,10 @@ test('validation never consumes a task ID or partially updates a record',()=>{
  assert.throws(()=>m.updateTask(created.id,{title:'changed',due:'2030/01/01'}),/INVALID_DATE/);
  assert.equal(m.snapshot().tasks[0].title,'original');
 });
+
+test('browser entry point mounts only on the isolated UX15 document',()=>{
+ const js=read('prototype.js');
+ assert.match(js,/DOMContentLoaded/);
+ assert.match(js,/api\.attach\(document\)/);
+ assert.match(js,/body\.classList\.contains\('ux15'\)/);
+});
