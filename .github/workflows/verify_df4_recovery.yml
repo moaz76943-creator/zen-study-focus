@@ -104,6 +104,13 @@ jobs:
           mkdir -p "$RUNNER_TEMP/df4-android"
           git rev-parse HEAD > "$RUNNER_TEMP/df4-android/commit-sha.txt"
           sha256sum "$RUNNER_TEMP/df4-device-test.apk" > "$RUNNER_TEMP/df4-android/apk-sha256.txt"
+      - name: Give this disposable runner access to hardware virtualization
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+          test -r /dev/kvm
+          test -w /dev/kvm
       - name: Actual fresh Android emulator scenarios
         uses: reactivecircus/android-emulator-runner@v2
         with:

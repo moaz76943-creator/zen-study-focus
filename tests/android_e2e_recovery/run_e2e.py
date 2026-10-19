@@ -73,7 +73,7 @@ class Device:
             raise NotTested("ADB cannot execute: " + str(exc)) from exc
         if p.returncode:
             raise CheckFailed("ADB command failed (%s): %s" %
-                              (" ".join(args[:3]), (p.stderr or p.stdout)[:300]))
+                              (" ".join(args[:3]), (p.stderr.strip() or p.stdout.strip())[:300]))
         return p.stdout
 
     def shell(self, *args, timeout=30):
