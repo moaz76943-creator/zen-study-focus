@@ -4,8 +4,10 @@ const {sniff,provenance,audit,calculate}=require('./audit_candidates.cjs');
 const root=path.resolve(__dirname,'../../audio_candidates/recovery12');
 const m=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8'));
 test('nine isolated field-derived binary candidates, never Android runtime assets',()=>{
- assert.equal(m.files.length,9);
- assert.equal(new Set(m.files.map(x=>x.id)).size,9);
+ assert.equal(m.files.length,3);
+ assert.equal(m.rejected_files.length,6);
+ assert.equal(new Set(m.files.map(x=>x.id)).size,3);
+ for(const a of m.rejected_files)assert.equal(fs.existsSync(path.join(root,a.filename)),false,a.id);
  for(const a of m.files) {
   assert.equal(a.approved_for_runtime,false);
   assert.equal(a.original_sha256,null);
@@ -20,7 +22,7 @@ test('reject HTML, API errors, junk and empty Ogg impostors',()=>{
  assert.equal(sniff(Buffer.concat([Buffer.from('OggS'),Buffer.alloc(50)])),'OGG');
 });
 test('no synthetic or missing provenance claim is approved as a field original',()=>{
- const unverified=m.files.find(x=>!x.independently_verified_original_page);
+ const unverified=m.rejected_files.find(x=>!x.independently_verified_original_page);
  assert.ok(unverified);
  assert.ok(provenance(unverified).includes('LICENSE_PAGE_UNVERIFIED'));
  const confirmed=m.files.find(x=>x.independently_verified_original_page);
@@ -33,7 +35,7 @@ test('desktop evidence is not permission to activate audio',()=>{
  assert.equal(r.integrity_ok,true);
  assert.equal(r.release_ok,false);
 });
-test('all nine physical bytes match exact SHA256 and Ogg header',()=>{
+test('only license-page-verified physical candidates match exact SHA256 and Ogg header',()=>{
  for(const a of m.files){
   const b=fs.readFileSync(path.join(root,a.filename));
   assert.equal(sniff(b),'OGG',a.id);

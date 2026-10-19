@@ -1,4 +1,4 @@
-name: Recovery12 authentic nature audio forensics
+name: Recovery12 licensed-source audio forensics
 on:
   pull_request:
     branches: [integration/deep-focus-recovery-00-final-20261019]
@@ -24,9 +24,9 @@ jobs:
           fi
           ffprobe -version
           ffmpeg -version
-      - name: Test binary hashes and provenance blockers
+      - name: Test three retained binaries, rejected metadata and provenance blockers
         run: node --test tests/audio_acquisition_12/*.test.cjs
-      - name: Decode full nine clips; report measured audio properties
+      - name: Decode three retained clips; report measured audio properties
         run: node tests/audio_acquisition_12/audit_candidates.cjs --integrity > audio_candidates/recovery12/qa_ci_report.json
       - name: Summarize measured audio for review
         run: |
@@ -42,6 +42,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: recovery12-nine-oggs-forensic-qa
+          name: recovery12-licensed-source-oggs-forensic-qa
           path: audio_candidates/recovery12/qa_ci_report.json
           if-no-files-found: warn

@@ -3,7 +3,7 @@
 ## Isolation and provenance
 
 Scope: separate candidate blobs in audio_candidates/recovery12/, read-only audit/tests and independent CI workflow. No Central Player, Gemini files, Android assets, app.js, index.html, or PR #25 shared code were edited.
-Starting point: PR #25 head 0dd9239bc28978e11f41c1c0f618c9662b291fe2. All nine physical recordings are exact Git-blobs previously acquired by PR #17 from euuuuuuan/todak-public; no claim to have downloaded their original Freesound WAVs. The upstream CREDITS.md separates 13 field-derived recordings from 15 synthesised ambiences. ONLY field-derived files are quarantined here, unmodified from PR #17. These are upstream-created *30-second re-cut and EQ loops*, not unprocessed field recordings.
+Starting point: PR #25 head 0dd9239bc28978e11f41c1c0f618c9662b291fe2. The nine investigated recordings were exact Git-blobs previously acquired by PR #17 from euuuuuuan/todak-public; only the three with independently verified original license pages are physically retained here; no claim to have downloaded their original Freesound WAVs. The upstream CREDITS.md separates 13 field-derived recordings from 15 synthesised ambiences. ONLY three field-derived files with individually checked original CC0 pages are quarantined here, unmodified from PR #17; six legally unresolved binaries are not included in this PR. These are upstream-created *30-second re-cut and EQ loops*, not unprocessed field recordings.
 
 ## Per-file decision — original source rights versus derivative identity
 
@@ -75,3 +75,7 @@ Objective outcome: 9/9 hashes match, ffprobe and full ffmpeg decoding succeeded,
 Given recording category, low measured peak and no detected abrupt jumps, rain_soft is the best **candidate for human evaluation**, followed by waves_calm. Birds_dawn is a possible alternative for shorter sessions, but birds can draw attention. Defer fire_hearth, stream_brook, thunder/storm, café and crickets pending human fatigue, privacy and/or rights checks; quiet metrics alone do not certify content quality.
 
 All nine remain unapproved, no runtime integration, no APK size effect. Full report and human rights review must be completed before activation.
+
+## Final legal quarantine disposition
+
+**Physical files in this PR: 3 only**, rain_soft.ogg, fire_hearth.ogg, birds_dawn.ogg. Their original Freesound pages individually state CC0, but the Ogg derivative attribution chain and Android playback are not yet proven. **Six other clips are rejected as media for this branch** and retained as metadata in manifest.rejected_files only: night_crickets, rain_downpour, stream_brook, waves_calm, cafe and storm_far. The nine-file forensic measurements above were taken at the earlier audited SHA c4b6b2fe before removing rejected binaries; their evidence JSON is retained for decision traceability, not redistributed audio. The current branch's CI rechecks only the three retained binaries.
