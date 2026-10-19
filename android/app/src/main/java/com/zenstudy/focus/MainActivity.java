@@ -58,7 +58,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        WebView.setWebContentsDebuggingEnabled(false);
+        // The release APK must never expose its WebView DevTools endpoint.
+        // Debug-only inspection lets disposable Android emulators verify real DOM,
+        // instead of treating an empty UIAutomator tree as a proven app failure.
+        final boolean debuggableBuild =
+                (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        WebView.setWebContentsDebuggingEnabled(debuggableBuild);
         if (!"com.zenstudy.focus".equals(getPackageName())) {
             finish();
             return;
