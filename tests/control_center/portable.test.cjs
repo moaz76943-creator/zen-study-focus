@@ -39,3 +39,16 @@ test('portable CSP independently pins inline styles and permits GitHub API only'
  assert.match(html,/connect-src https:\/\/api\.github\.com https:\/\/raw\.githubusercontent\.com/);
  assert.doesNotMatch(html,/script-src[^;]+self/);
 });
+
+test('portable review file includes actual 161-item recovery ledger with explicit static provenance',()=>{
+ const html=buildPortable(root);
+ const m=html.match(/<script id="control-center-embedded-ledger" type="application\/json">([\s\S]*?)<\/script>/);
+ assert.ok(m,'missing source-ledger snapshot');
+ const ledger=JSON.parse(m[1]);
+ assert.equal(ledger.schema_version,1);
+ assert.equal(ledger.provenance,'CHECKOUT_STATIC_SOURCE');
+ assert.equal(ledger.tasks.length,161);
+ assert.equal(new Set(ledger.tasks.map(x=>x.id)).size,161);
+ assert.ok(ledger.tasks.some(x=>x.status==='BLOCKED'));
+ assert.ok(fs.readFileSync(path.join(root,'docs/control-center/control-center.js'),'utf8').includes('control-center-embedded-ledger'));
+});
