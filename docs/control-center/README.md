@@ -43,3 +43,40 @@ This dashboard does not automatically fix arbitrary bugs; it automates detection
 - GitHub Pages hosting has to be configured/verified by the repository owner if not already enabled.
 - PR #25 remains a draft until reviewed and verified.
 - Imported audit reports may describe older source SHAs; compare the imported inspected_ref with the current PR head before acting.
+
+
+## V2: Screen Studio — edit supported properties on a phone
+
+The Screen Studio maps the six actual runtime IDs: timer, tasks, calendar, notes, sounds and analytics. Each screen points to relevant app files and regression suites. From the mobile UI, the owner can edit:
+
+- General primary/cyan/background colors, card radius and font scale.
+- Per-screen accent color, card radius and spacing between supported cards.
+- A responsive, approximate visual preview (not a WebView emulator).
+
+The strict configuration lives in docs/control-center/design-config.json. Its generated offline CSS is packaged at android/app/src/main/assets/web/control_center_overrides.css. Exactly one stylesheet link was inserted in the Android index after existing styles. This **shared index edit requires conflict review with Gemini**.
+
+Commands from the repository root:
+
+    node tools/control_center/generate_style.cjs --check
+    node tools/control_center/generate_style.cjs --write
+    node --test tests/control_center/*.test.cjs
+
+The browser exposes download JSON/CSS buttons. No arbitrary JavaScript, selectors, source files, storage settings, hidden screens or unbounded numerical changes are allowed. For app behavior changes, use an agent handoff and a code PR.
+
+The "Open GitHub change request" control generates a prefilled GitHub Issue with the full validated config and latest default-branch SHA. This is a **request**, not immediate APK modification.
+
+### Owner-only draft design PR automation
+
+After the feature has been merged onto the repository's default branch, .github/workflows/control_center_design_requests.yml listens for new design issues created by the repository owner. It rejects stale SHA, invalid JSON, unsupported keys or ranges. It creates a new branch and a draft PR changing **only** the JSON and compiled CSS. It cannot merge, sign or release an app. It refuses if the source changed since the issue was composed.
+
+Until the entire recovery work lands on the default branch, the issue event workflow and GitHub Pages site may be unavailable. PR #37 currently targets the integration branch. The preview and source files can be reviewed without publishing any user-facing app update.
+
+## V2: Agent Studio and scoped QA automation
+
+Select an agent specialization (UI, Audio, Localization, Analytics, Data or QA), one screen, and a precise goal. The generated issue contains source file scope, relevant test directories, SHA and acceptance/safety requirements. Copy the request to a connected Gemini/Codex or open the prefilled issue for review. **Issue creation alone does not invoke an AI model.**
+
+The separate control_center_agents.yml workflow exposes only the allowlisted lanes ui, audio, locale, analytics, data, qa and all. Authorized users can manually run source test suites in GitHub Actions without arbitrary commands or write privileges. This is a set of **QA automation agents**, not autonomous LLM coding agents. Device QA and backups remain NOT_TESTED until completed.
+
+Testing includes studio.test.cjs (schema validation, injection attempts, scoped handoffs) and studio_integration.test.cjs (verified selectors, app CSS link, deterministic generation and workflow security checks). CI checks the JSON-to-CSS parity before recording success.
+
+Review every diff and run Android/device tests before merging changes into a production app; source test PASS is not an Android sign-off.

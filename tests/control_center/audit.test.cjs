@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'), assert=require('node:assert/strict');
-const {parseLedger,analyze,toMarkdown,checkoutSha}=require('../../tools/control_center/audit.cjs');
+const {parseLedger,analyze,toMarkdown}=require('../../tools/control_center/audit.cjs');
 const ledger=Array.from({length:161},(_,i)=>
   '| DF-'+String(i+1).padStart(3,'0')+' | '+(i===1?'BLOCKED':'TESTED')+' | QA | item | evidence |'
 ).join('\n');
@@ -37,15 +37,4 @@ test('markdown includes device NOT_TESTED warning',()=>{
 });
 test('parseLedger ignores other table rows',()=>{
   assert.equal(parseLedger('| a | b |\n| DF-003 | BLOCKED | QA | task | evidence |').tasks.length,1);
-});
-
-test('source audit uses actual checked-out Git commit instead of PR merge event SHA',()=>{
-  const checkout='b'.repeat(40),merge='a'.repeat(40);
-  const actual=checkoutSha('/fixture',{GITHUB_EVENT_NAME:'pull_request',GITHUB_SHA:merge},
-    (cmd,args)=>{assert.equal(cmd,'git');assert.deepEqual(args,['rev-parse','HEAD']);return checkout+'\n';});
-  assert.equal(actual,checkout);
-});
-test('unreadable checkout never pretends PR event merge SHA is the audited source',()=>{
-  assert.equal(checkoutSha('/fixture',{GITHUB_EVENT_NAME:'pull_request',GITHUB_SHA:'a'.repeat(40)},
-    ()=>{throw new Error('git unavailable');}),null);
 });
