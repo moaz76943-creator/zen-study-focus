@@ -147,7 +147,7 @@ body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule {
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: env(safe-area-inset-bottom, 0px);
+  bottom: 0;
   width: min(100%, 480px);
   max-width: 100%;
   display: grid;
