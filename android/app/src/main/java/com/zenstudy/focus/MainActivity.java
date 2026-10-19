@@ -23,6 +23,21 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
+    private static volatile boolean webViewVisible = false;
+    public static boolean isWebViewVisible() { return webViewVisible; }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        webViewVisible = true;
+    }
+
+    @Override
+    protected void onPause() {
+        webViewVisible = false;
+        super.onPause();
+    }
+
     private static final int REQUEST_BACKUP_EXPORT = 7410;
     private static final int REQUEST_ANALYTICS_EXPORT = 7411;
     private String analyticsAwaitingSave = null;
@@ -142,6 +157,19 @@ public class MainActivity extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
                 }
             });
+        }
+
+        // Native playback state mirrors the already-verified v21 cfg alert preferences.
+        // SharedPreferences is NOT an authoritative backup or a migration of v21 records.
+        @JavascriptInterface
+        public void configureCompletionAlert(String sound, int volume, boolean enabled) {
+            if (sound == null || !sound.matches("silent|soft-bell|wood-tap|water-drop|muted-metal|two-taps")
+                    || volume < 0 || volume > 100) return;
+            getSharedPreferences("zen_completion_playback_cache_v22", MODE_PRIVATE).edit()
+                    .putString("sound", sound)
+                    .putInt("volume", volume)
+                    .putBoolean("enabled", enabled)
+                    .apply();
         }
 
         // Analytics uses a correlated, post-write SAF acknowledgment; starting a picker is not success.
