@@ -12,7 +12,7 @@ function node(id = '') {
     className: '', title: '',
     classList: {add(){},remove(){},toggle(){return false;},contains(){return false;}},
     setAttribute(k,v){this[k] = v;}, getAttribute(k){return this[k];},
-    appendChild(child){this.children.push(child);return child;}, addEventListener(){},
+    appendChild(child){this.children.push(child);return child;}, replaceChildren(...children){this.children=[...children];}, addEventListener(){},
     parentElement:{querySelectorAll(){return [];}},
     querySelectorAll(){return [];},
     scrollIntoView(){}
@@ -21,7 +21,7 @@ function node(id = '') {
 const document = {
   body:{classList:{add(){},remove(){},toggle(){},contains(){return false;}}},
   addEventListener(){},
-  getElementById(id){if(!map.has(id))map.set(id,node(id));return map.get(id);},
+  getElementById(id){if(!map.has(id)){const el=node(id);if(id==='nsSort')el.options=[node(),node(),node()];map.set(id,el);}return map.get(id);},
   createElement(){return node();},
   querySelectorAll(){return []}
 };
@@ -277,4 +277,23 @@ assert.equal(evaluate('selectedCalDate'),'2026-11-05');
 assert.equal(evaluate('calMonth'),10);
 assert.equal(evaluate('calYear'),2026);
 assert.equal(evaluate('typeof renderHomeWeekStrip'),'function');
+
+vm.runInContext(fs.readFileSync(path.join(root,'notes_studio.js'),'utf8'),sandbox,{filename:'notes_studio.js',timeout:2000});
+assert.equal(evaluate('NS_TEMPLATES.length'),12,'Twelve usable note templates');
+const originalNotes=evaluate('notesList.length');
+evaluate("openNoteModal(); nsUseTemplate('cornell'); document.getElementById('inpNoteTitle').value='Important notes'; saveNewNote()");
+assert.equal(evaluate('notesList.length'),originalNotes+1);
+const savedNoteId=evaluate('notesList[0].id');
+evaluate("nsEdit(notesList[0].id); document.getElementById('inpNoteBody').value='Updated without losing the ID'; saveNewNote()");
+assert.equal(evaluate('notesList[0].id'),savedNoteId);
+assert.equal(evaluate('notesList[0].body'),'Updated without losing the ID');
+evaluate("nsToggleFlag(notesList[0].id,'pinned'); nsToggleFlag(notesList[0].id,'favorite')");
+assert.equal(evaluate('notesList[0].pinned && notesList[0].favorite'),true);
+evaluate('nsDuplicate(notesList[0].id)');
+assert.equal(evaluate('notesList.length'),originalNotes+2);
+assert.notEqual(evaluate('notesList[0].id'),savedNoteId);
+assert.ok(store.has('zen_fortress_notes_v21'),'Saved notes compatibility');
+assert.equal(evaluate('typeof openQuickTrainingFromNav'),'function');
+assert.equal(evaluate('SOUNDS_DATA.length'),12);
+
 console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');

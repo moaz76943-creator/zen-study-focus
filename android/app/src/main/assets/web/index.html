@@ -1052,7 +1052,7 @@
 
     </div>
 
-    <!-- 6-TAB FLOATING GLASS BOTTOM NAVIGATION -->
+    <!-- 7-TAB GLASS NAVIGATION: TIMER IN CENTRAL SLOT -->
     <nav class="bottom-nav-capsule" aria-label="Main navigation">
       <button class="bnav-btn" id="navTasks" onclick="switchTab('sec-tasks', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
@@ -1062,14 +1062,15 @@
         <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
         <span data-i18n="navCalendar">Calendar</span>
       </button>
-      <button class="bnav-btn active" id="navTimer" onclick="switchTab('sec-timer', this)">
-        <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-        <span data-i18n="navTimer">Timer</span>
-      </button>
       <button class="bnav-btn" id="navNotes" onclick="switchTab('sec-notes', this)">
         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
         <span data-i18n="navNotes">Notes</span>
       </button>
+      <button class="bnav-btn active" id="navTimer" onclick="switchTab('sec-timer', this)">
+        <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+        <span data-i18n="navTimer">Timer</span>
+      </button>
+      <button class="bnav-btn" id="navTraining" onclick="openQuickTrainingFromNav(this)" aria-label="Quick training"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9h3v6H2V9zm4-3h3v12H6V6zm9 0h3v12h-3V6zm4 3h3v6h-3V9zM10 11h4v2h-4v-2z"/></svg><span id="navTrainingText">تدريب</span></button>
       <button class="bnav-btn" id="navSounds" onclick="switchTab('sec-sounds', this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span data-i18n="navSounds">Nature</span>

@@ -425,3 +425,18 @@ body:not(.deep-lockdown) #sec-notes .ns-card{padding:15px;border:1px solid #e4ec
 .ns-card-foot{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:13px 0 9px;border-top:1px solid #edf2fa;padding-top:10px;font-size:.66rem;color:#8795ac}.ns-card-actions{display:flex;gap:4px}.ns-card-actions .ns-action{flex:1;background:#f5f8ff;border:1px solid #edf1f8}.ns-empty{text-align:center;padding:27px 13px;border:1px dashed #cbdcf6;border-radius:22px;background:white;color:#7788a5;font-size:.82rem}
 .ns-editor{max-width:465px;max-height:87dvh}.ns-editor-templates{display:flex;gap:6px;overflow:auto;margin-bottom:10px}.ns-tiny-template{white-space:nowrap;display:flex;align-items:center;gap:5px;border:1px solid #e1eaf9;border-radius:11px;background:#f7faff;padding:7px 10px;color:#3f6396;font-size:.68rem;font:inherit}.ns-editor>label,.ns-meta label{font-size:.73rem;font-weight:720;color:#476386}.ns-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px}.ns-meta .modal-inp{min-width:0}.ns-editor #inpNoteBody{min-height:190px;max-height:38vh;resize:vertical;line-height:1.7}.ns-editor #nsCounter{display:block;text-align:end;font-size:.66rem;color:#8a9eb9;margin:-6px 0 10px}.ns-options{display:flex;gap:12px;flex-wrap:wrap;font-size:.69rem;margin:8px 0}.ns-options label{display:flex;align-items:center;gap:5px}.ns-options input{accent-color:#367bf3}
 @media(max-width:350px){.ns-template{flex-basis:91px}.ns-meta{grid-template-columns:1fr}}
+
+/* Seven evenly spaced navigation slots; timer is literally slot four. */
+body:not(.deep-lockdown) .bottom-nav-capsule{left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;width:calc(100% - 18px);max-width:480px;padding:7px 5px 5px;border-radius:25px}
+body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn{min-width:0;padding:7px 1px 5px;gap:3px;border-radius:15px;font-size:clamp(.48rem,2vw,.63rem);line-height:1.1}
+body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn svg{width:19px;height:19px;flex-shrink:0}
+body:not(.deep-lockdown) .bottom-nav-capsule #navTimer{grid-column:4;background:linear-gradient(135deg,#eaf9ff,#f0eeff);color:#3174d8;border:1px solid #dbeafe;transform:translateY(-7px);box-shadow:0 8px 16px -11px #3372d3}
+body:not(.deep-lockdown) .bottom-nav-capsule #navTimer svg{width:26px;height:26px}
+body:not(.deep-lockdown) .bottom-nav-capsule #navTraining{grid-column:5}
+body:not(.deep-lockdown) #sec-tasks .showcase-task-card{border-radius:24px;background:linear-gradient(150deg,#fff,#fcfdff);padding:14px;border:1px solid #e5edfb;box-shadow:0 10px 25px -21px #4372a5}
+.sound-Rich-tile{height:151px}
+.stile-volume-label{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-top:6px;font-size:.66rem;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.78)}
+.stile-volume-label strong{font-size:.72rem;direction:ltr}
+.stile-vol{height:5px;margin-top:7px;cursor:ew-resize}
+.stile-vol::-webkit-slider-thumb{width:17px;height:17px;box-shadow:0 1px 8px #172944}
+@media(max-width:350px){body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn{font-size:.46rem;padding:7px 0 5px}body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn svg{width:17px;height:17px}}

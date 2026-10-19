@@ -496,6 +496,8 @@ function applyLanguage(code) {
   document.getElementById('currentLangLabel').textContent = `${meta.enName} • ${meta.nativeName}`;
   document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
+  const tn = document.getElementById('navTrainingText');
+  if (tn) tn.textContent = meta.code === 'ar' ? 'تدريب' : 'Training';
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
@@ -824,6 +826,17 @@ const TAB_GRADS = {
   'sec-sounds': 'linear-gradient(125deg,#ffffff 0%,#effdff 75%,#eff7ff 100%)',
   'sec-analytics': 'linear-gradient(125deg,#ffffff 0%,#f6f5ff 70%,#f1faff 100%)'
 };
+
+
+function openQuickTrainingFromNav(btn) {
+  switchTab('sec-timer', btn);
+  const details = document.getElementById('quickTrainingDetails');
+  if (details) details.open = true;
+  setTimeout(() => {
+    const card = document.getElementById('quickTrainingCard');
+    if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 120);
+}
 
 function switchTab(secId, btn) {
   syncDailyRollover();
@@ -1611,7 +1624,8 @@ function renderSoundsStudio() {
       </div>
       <div>
         <div class="stile-name">${escapeHtmlText(toWest(sName))}</div>
-        <input type="range" class="stile-vol" min="0.05" max="1" step="0.05" value="${s.vol}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value)">
+        <div class="stile-volume-label"><span>🔉 ${cfg.lang === 'ar' ? 'مستوى الصوت' : 'Volume'}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
+        <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText((cfg.lang === 'ar' ? 'مستوى صوت ' : 'Volume for ') + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
       </div>
     `;
     box.appendChild(tile);

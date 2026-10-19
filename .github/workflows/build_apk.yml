@@ -39,6 +39,7 @@ jobs:
         run: |
           node --check android/app/src/main/assets/web/app.js
           node --check android/app/src/main/assets/web/quick_training.js
+          node --check android/app/src/main/assets/web/notes_studio.js
           node --check android/app/src/main/assets/web/locale_rows.js
           node --check android/app/src/main/assets/web/locale_extras.js
           node tests/validate_locales.cjs
