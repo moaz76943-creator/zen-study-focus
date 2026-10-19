@@ -151,6 +151,12 @@
               <button type="button" class="button secondary" id="v3-redo">↷ إعادة</button>
               <button type="button" class="button secondary" id="v3-reset-screen">إعادة الشاشة المحددة</button>
             </div>
+            <div class="v3-editor-actions" role="group" aria-label="مسودة التصميم على هذا الجهاز">
+              <button class="button secondary" type="button" id="v3-draft-save">حفظ المسودة على الجهاز</button>
+              <button class="button secondary" type="button" id="v3-draft-restore">استعادة المسودة</button>
+              <button class="button secondary" type="button" id="v3-draft-clear">حذف المسودة المحلية</button>
+            </div>
+            <p id="v3-draft-status" class="v3-note" role="status" aria-live="polite">الحفظ محلي واختياري على هذا المتصفح فقط؛ لا تُحفظ رموز الدخول أو بيانات مستخدمي التطبيق.</p>
             <label for="v3-design-import">استيراد إعدادات التصميم المعتمدة (JSON)</label>
             <input id="v3-design-import" type="file" accept=".json,application/json">
             <h4>ما الذي تغيّر في التصميم؟</h4>
