@@ -23,13 +23,14 @@
     var taskTrash=null,noteTrash=null;
     function get(list,id){var value=list.find(function(x){return x.id===Number(id);});if(!value)throw Error('NOT_FOUND');return value;}
     function snapshot(){return copy({tasks:tasks,notes:notes});}
-    function addTask(title){var item={id:nextTask++,title:titleOf(title),done:false,priority:'normal',due:'',top:false,steps:[]};tasks.unshift(item);taskTrash=null;return copy(item);}
+    function addTask(title){var validatedTitle=titleOf(title);var item={id:nextTask++,title:validatedTitle,done:false,priority:'normal',due:'',top:false,steps:[]};tasks.unshift(item);taskTrash=null;return copy(item);}
     function updateTask(id,patch){
       var item=get(tasks,id),p=patch||{};
-      if(Object.prototype.hasOwnProperty.call(p,'title'))item.title=titleOf(p.title);
-      if(Object.prototype.hasOwnProperty.call(p,'due'))item.due=dateOf(p.due);
-      if(Object.prototype.hasOwnProperty.call(p,'priority')){if(!['high','normal'].includes(p.priority))throw Error('INVALID_PRIORITY');item.priority=p.priority;}
-      return copy(item);
+      var next={title:item.title,due:item.due,priority:item.priority};
+      if(Object.prototype.hasOwnProperty.call(p,'title'))next.title=titleOf(p.title);
+      if(Object.prototype.hasOwnProperty.call(p,'due'))next.due=dateOf(p.due);
+      if(Object.prototype.hasOwnProperty.call(p,'priority')){if(!['high','normal'].includes(p.priority))throw Error('INVALID_PRIORITY');next.priority=p.priority;}
+      Object.assign(item,next);return copy(item);
     }
     function toggleTask(id){var x=get(tasks,id);x.done=!x.done;if(x.done)x.top=false;return copy(x);}
     function toggleTop(id){var x=get(tasks,id);if(x.done)throw Error('COMPLETED_TOP');if(!x.top&&tasks.filter(function(t){return t.top&&!t.done;}).length>=3)throw Error('TOP_LIMIT');x.top=!x.top;return copy(x);}
