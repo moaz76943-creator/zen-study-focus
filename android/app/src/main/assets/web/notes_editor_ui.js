@@ -522,7 +522,7 @@
     if(!found.length){box.appendChild(el('div','nsux-blank',t('empty')));return true;}
     found.forEach(n=>{
       const card=el('article','nsux-card'),top=el('div','nsux-inline');
-      top.appendChild(el('span','ns-type',n.catKey||'note'));
+      top.appendChild(el('span','ns-type',typeof getNoteTagLabel==='function'?getNoteTagLabel(n.catKey):(n.catKey||'note')));
       top.appendChild(el('span','nsux-meta',n.calDate||''));
       card.appendChild(top);
       const title=el('h3','',n.title);title.dir='auto';card.appendChild(title);
