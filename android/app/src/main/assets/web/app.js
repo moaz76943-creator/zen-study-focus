@@ -534,6 +534,7 @@ function applyLanguage(code) {
   updateSyllabusCalc();
   closeModal('langModal');
   quickL10n();
+  if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
 }
 
 /* ========================================================
