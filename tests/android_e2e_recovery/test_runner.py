@@ -61,6 +61,30 @@ class ParserTests(unittest.TestCase):
         suite.test("navigation", "read")
         self.assertEqual([r["status"] for r in suite.records], ["PASS", "FAIL"])
 
+    def test_permission_prompt_requires_disposable_ack_and_app_ui_proof(self):
+        from types import SimpleNamespace
+        class Device:
+            def __init__(self): self.tapped = False; self.proved = False
+            def shell(self, *args, **kwargs): return "package:com.zenstudy.focus"
+            def launch(self): pass
+            def dump(self):
+                button = {"resource-id":"com.android.permissioncontroller:id/permission_allow_button",
+                          "bounds":"[0,0][100,100]"}
+                return [button] + [{"text":"permission context"}] * 4
+            def tap(self, *args): self.tapped = True
+            def see(self, *args):
+                self.proved = True
+                if not self.tapped: raise mod.CheckFailed("App UI is still behind permission prompt")
+        d = Device()
+        args = SimpleNamespace(ack_disposable_data=False, run_slow=True, allow_rotation=True)
+        suite = mod.Suite(d, args); suite.test("preflight", "read")
+        self.assertEqual(suite.records[0]["status"], "NOT_TESTED")
+        self.assertFalse(d.tapped)
+        args.ack_disposable_data = True
+        suite = mod.Suite(d, args); suite.test("preflight", "read")
+        self.assertEqual(suite.records[0]["status"], "PASS")
+        self.assertTrue(d.tapped and d.proved)
+
     def test_cases_are_unique_and_restricted_paths_explicit(self):
         ids=[x[0] for x in mod.CASES]
         self.assertEqual(len(ids),len(set(ids)))
