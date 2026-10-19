@@ -201,14 +201,45 @@ function audit(){
   'English-identical phrases are warnings and may be valid','User-entered records are not inspected']};
 }
 function proposals(r){
+ // Reuse only an independently existing translated label with the same English
+ // meaning. This is a suggestion with provenance, never production activation.
+ const {out}=catalogs(),normal=s=>String(s||'').normalize('NFKC')
+  .replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
+ const library={};for(const l of LANGS)library[l]=new Map();
+ for(const c of out){
+  for(const key of c.keys){
+   const en=c.localeValues.en[key];
+   if(!valid(en))continue;
+   for(const l of LANGS.filter(x=>x!=='en')){
+    const localized=(c.localeValues[l]||{})[key];
+    if(!valid(localized)||localized===en)continue;
+    const id=normal(en),list=library[l].get(id)||[];
+    list.push({text:localized,source:c.id+'.'+key});
+    library[l].set(id,list);
+   }
+  }
+ }
  const byKey={};
  for(const item of r.missing){
-  const key=item.catalog+'.'+item.key;
-  if(!byKey[key])byKey[key]={catalog:item.catalog,key:item.key,english:item.english,
+  const id=item.catalog+'.'+item.key;
+  if(!byKey[id])byKey[id]={catalog:item.catalog,key:item.key,english:item.english,
    translations:{},reviewRequired:true};
-  byKey[key].translations[item.language]={suggestion:null,status:'NEEDS_TRANSLATION'};
+  const matches=(library[item.language].get(normal(item.english))||[])
+   .filter(x=>x.source!==id);
+  const unique=new Map();for(const m of matches)if(!unique.has(m.text))unique.set(m.text,m.source);
+  if(unique.size===1){
+   const [text,source]=unique.entries().next().value;
+   byKey[id].translations[item.language]={
+    suggestion:text,status:'REUSE_CANDIDATE_NEEDS_REVIEW',provenance:source};
+  }else if(unique.size>1){
+   byKey[id].translations[item.language]={
+    suggestion:null,status:'AMBIGUOUS_REUSE_NEEDS_REVIEW',
+    alternatives:[...unique.keys()].sort()};
+  }else byKey[id].translations[item.language]={
+   suggestion:null,status:'NEEDS_TRANSLATION'};
  }
- return {schema:1,policy:'Independent suggestions only; null means incomplete',entries:Object.values(byKey)};
+ return {schema:1,policy:'Independent candidates, not applied; all suggestions require native review',
+  entries:Object.values(byKey)};
 }
 function reportMarkdown(r){
  const lines=['# RECOVERY-13 — actual language catalog audit','',
