@@ -161,3 +161,29 @@ This follow-up closes concrete gaps in v3 without merging PR #37 or modifying th
 Run node --test tests/control_center/*.test.cjs, node tools/control_center/generate_style.cjs --check and node --check docs/control-center/v3-ui.js. CI also runs the static repository audit, which does not replace on-device Android QA, media license checking or owner release approval.
 
 PR #37 is still a stacked draft on recovery PR #25. GitHub Pages hosting and default-branch issue/dispatch automation remain unconfirmed until review/merge.
+
+## Mobile portable preview: no GitHub Pages server needed
+
+Every successful Control Center Quality Audit run now generates a second artifact named **deep-focus-control-center-mobile**. The artifact contains one `deep-focus-control-center-mobile.html` file, including all five dashboard JavaScript modules, both stylesheets, the validated appearance JSON and a static snapshot of the actual 161-item recovery ledger from the workflow checkout.
+
+### Open the preview on an Android phone
+
+1. In GitHub, open PR #37 > Checks > a successful **Deep Focus Control Center Quality Audit** run.
+2. Open the Artifacts section and download **deep-focus-control-center-mobile**. Extract the ZIP on your phone.
+3. Open `deep-focus-control-center-mobile.html` in Chrome or another browser that supports local HTML files. Android file apps/browser versions vary in their support for file URLs, downloads, and localStorage; no external web hosting is required for the built-in editor.
+4. The first visible 161-task ledger is stamped **CHECKOUT_STATIC_SOURCE / stale**, not a live verification. If the browser can connect to the public GitHub API, refreshing replaces it with the current PR #25 source. If requests are denied, the static ledger remains labeled as such.
+5. For design adjustments use Screen Studio; download the resulting JSON/CSS or create a review issue. These changes are local to the preview until a reviewed PR changes the source and an APK is rebuilt.
+
+### Portable security and reproducibility
+
+- Build: `node tools/control_center/build_portable.cjs --output dist/deep-focus-control-center-mobile.html`.
+- Verify: `node tools/control_center/build_portable.cjs --check dist/deep-focus-control-center-mobile.html`.
+- The bundle is assembled from allowlisted local CSS/JS only. All executable inline scripts and styles are pinned to individual SHA-256 Content Security Policy hashes: **no unsafe-inline, unsafe-eval, remote JS, personal access tokens, or write permissions**.
+- A dedicated non-executable JSON block provides the checked-in visual baseline when `file://` prevents reading `./design-config.json`.
+- Another non-executable JSON block contains only public task ledger data and strict offline source provenance. User notes, history, private credentials, media files, and Android storage are not included.
+- The CI smoke check opens this exact file in a **real desktop headless Chrome browser** and confirms the task DOM and visual editor initialize; it reports `NOT_TESTED` when Chrome is unavailable, never a fabricated PASS. Desktop Chrome is not Android WebView, phone touch testing or a Play release sign-off.
+- GitHub Actions artifacts are temporary (14-day retention). Build is reproducible from the source files; run it again to obtain a new portable artifact.
+
+### Known limits
+
+Live GitHub API and raw files still require an internet connection and may fail due to rate limits or browser file-origin restrictions. The static bundled ledger is a snapshot, not a substitute for a current audit. A linked GitHub Issue or Actions workflow still requires authorization in GitHub; the portable dashboard does not directly execute code patches, commit code, merge PRs or ship APKs.
