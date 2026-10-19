@@ -79,3 +79,28 @@ test('P10 rejects stale cross-commit selections',()=>{
  assert.deepEqual(plan.retainSelection(['DF-014'],sha,'b'.repeat(40),tasks),[]);
  assert.deepEqual(plan.retainSelection(['DF-014'],sha,sha,[tasks[1]]),[]);
 });
+
+test('P11 reads all 161 real source tasks and composes source-scoped audio recovery plan',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const ledger=fs.readFileSync(path.resolve(__dirname,'../../docs/recovery_integration/FINAL_MATRIX_161.md'),'utf8');
+ const tasks=require('../../docs/control-center/control-center.js').parseTasks(ledger);
+ assert.equal(plan.validateTasks(tasks).length,161);
+ const selected=plan.recommendTasks(tasks,{area:'NATURE_AUDIO',limit:4});
+ assert.ok(selected.length>=1);
+ const result=plan.buildPlan(tasks,selected.map(x=>x.id),{lane:'audio',screen:'sounds',sha,stale:false});
+ assert.equal(result.verified,true);
+ for(const task of selected)assert.ok(result.markdown.includes(task.id));
+});
+test('P12 planner/browser bundle and source status controls are wired, without any app-data write',()=>{
+ const fs=require('node:fs'),path=require('node:path'),base=path.resolve(__dirname,'../../docs/control-center');
+ const html=fs.readFileSync(path.join(base,'index.html'),'utf8');
+ const ui=fs.readFileSync(path.join(base,'planner-ui.js'),'utf8');
+ const ids=['agent-planner','planner-source-status','planner-search','planner-area','planner-status-filter','planner-lane','planner-screen',
+   'planner-recommend','planner-clear','planner-count','planner-task-list','planner-show-more','planner-preview',
+   'planner-copy','planner-download','planner-issue','planner-feedback'];
+ for(const id of ids)assert.equal((html.match(new RegExp('id="'+id+'"','g'))||[]).length,1,id);
+ assert.match(ui,/df:project-refreshed/);
+ assert.match(ui,/aria-pressed/);
+ assert.match(ui,/aria-disabled/);
+ assert.doesNotMatch(ui,/innerHTML\s*=|eval\s*\(|localStorage|fetch\s*\(|ZenNative|pulls\.merge/);
+});
