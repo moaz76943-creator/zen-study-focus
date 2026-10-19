@@ -171,6 +171,7 @@
     const next=core.buildReport(provider(),{today:now,startDate:from.value,endDate:to.value,
      domain:domain.value});
     report=next;cards.replaceChildren();setStatus('');
+    exportBtn.disabled=!exporter||exporter.busy;
     addCard(tr('today'),next.dashboard.today.minutes,()=>{
      from.value=now;to.value=now;refresh();displayRows(report.sessions,tr('today'));});
     addCard(tr('last7'),next.dashboard.last7.minutes,()=>{
@@ -198,7 +199,7 @@
     const msg=tr('quality')+': '+ascii(q.excluded)+' · '+tr('conflicts')+': '+ascii(q.conflicts);
     detail.replaceChildren(el('p','',tr('detail')),el('p','',msg));
     return next;
-   }catch(e){setStatus(tr('invalid'));return null;}
+   }catch(e){exportBtn.disabled=true;setStatus(tr('invalid'));return null;}
   }
   for(const c of controls)c.addEventListener('change',refresh);
   reset.addEventListener('click',()=>{from.value=dayAt(-29);to.value=now;
