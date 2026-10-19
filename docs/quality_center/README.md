@@ -5,13 +5,13 @@ This is the **quality-data generator** for a portable dashboard, not an automati
 ## Run locally on a complete checkout
 
 ```sh
-node --test tests/quality_center/run.test.cjs
+node --test tests/quality_center/*.test.cjs
 node tools/quality_center/run.cjs --out /tmp/deep-focus-quality
 # Optional comprehensive Node test discovery (longer):
 node tools/quality_center/run.cjs --full --out /tmp/deep-focus-quality
 ```
 
-Open `/tmp/deep-focus-quality/index.html` with a browser, or inspect `report.json`. **These commands are not an Android test, APK build, or CI run.** The full mode includes all `.test.cjs` tests except the intentionally failing media provenance gate, which is always executed separately and never hidden.
+Open `/tmp/deep-focus-quality/index.html` with a browser, or inspect `report.json`. The report also validates the full, unique DF-001–161 task matrix and displays per-system status tables. **These commands are not an Android test, APK build, or CI run.** The full mode includes all `.test.cjs` tests except the intentionally failing media provenance gate, which is always executed separately and never hidden.
 
 ## Integration map
 
@@ -31,10 +31,18 @@ Open `/tmp/deep-focus-quality/index.html` with a browser, or inspect `report.jso
 - Ogg signatures **do not prove playable audio or commercial licensing**. Each track still needs source SHA, rights, codec decode on Android, normal-volume listening and loop analysis.
 - Shape-valid locale dictionaries **do not prove 20-language coverage**. PR #32 contains an independent untranslated-string audit; native-speaker and rendered-screen checks remain necessary.
 - Existing v21 backup contract and storage keys are never touched. Device backup/restore must be verified before real-data interaction QA.
-- No GitHub Actions workflow was added, triggered or modified. Do not turn on automatic builds until the project's integration owner confirms cost and exact-SHA review gates.
+- A lightweight, read-only `.github/workflows/verify_quality_center.yml` workflow now validates only this draft PR against the recovery integration branch. It generates a downloadable static HTML/JSON report without building APK/AAB or changing repository permissions; the existing signed-release workflow is untouched. The media provenance gate remains a visible RED release blocker even if source CI succeeds. See the run artifact attached to the workflow run.
 
 ## Ownership and follow-up
 
 - Follow the integration source PR #25 (`integration/deep-focus-recovery-00-final-20261019` at the inspected SHA `0dd9239bc28978e11f41c1c0f618c9662b291fe2`), but always revalidate its current HEAD before any integration.
 - PR #26 covers original audio research; PR #27 security/data QA; PR #29 performance; PR #30 Android E2E; PR #31 UX prototype; PR #32 language audit. This dashboard does not duplicate those lanes.
 - Integrate future findings as links and evidence into the official issue #13 ledger; don't mark a check TESTED unless a reproducible command, exact SHA and relevant platform evidence exist.
+
+## Source-ledger snapshot (19 Oct 2026, inspected before the quality PR)
+
+The 161-line `docs/recovery_integration/FINAL_MATRIX_161.md` lists **6 TESTED, 97 IN_PROGRESS, 58 BLOCKED** across 11 subsystems. These are declared *source-ledger* statuses, not additional live device verification. The tool detects duplicates, missing IDs, invalid statuses, and missing required evidence. The master ledger is never modified by the dashboard.
+
+## Latest workflow behavior
+
+The quality workflow runs on pull requests targeting `integration/deep-focus-recovery-00-final-20261019` (and optional manual dispatch). It deliberately does **not** run twice for both push and PR. Its contents permission is read-only, short timeout, artifacts retained seven days, and no external plugins or credentials are invoked from CI. Run the project's normal Android release jobs separately only after proven licenses, on-device QA, and owner review.
