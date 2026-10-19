@@ -64,7 +64,7 @@ assert.equal(evaluate('localDateISO(new Date(2026, 9, 18, 12))'),'2026-10-18');
 assert.equal(evaluate('cfg.sessions'),0,'New install must not have invented sessions');
 assert.equal(evaluate('cfg.todayMins'),0,'New install must not have invented time');
 // Completed focus counts once and only once.
-evaluate("selectTimerMode(1,'focus',null); toggleTimerPlay(); timerTargetTime = Date.now()-1000; runTimerTick();");
+evaluate("selectTimerMode(1,'focus',null); toggleTimerPlay(); timerActiveMs = 60000; timerTargetTime = Date.now()-1000; runTimerTick();");
 assert.equal(evaluate('cfg.sessions'),1);
 assert.equal(evaluate('cfg.todayMins'),1);
 assert.equal(evaluate('cfg.sessionHistory.length'),1);
@@ -352,5 +352,12 @@ assert.equal(evaluate("getDomainFocusMinutes('study')"),40);
 evaluate("cfg.focusCycleCount=1; selectTimerMode(1,'focus',document.getElementById('modeFocusBtn')); timerSessionId='full-cycle-test'; timerActiveMs=60000; finalizeTimerSession(false)");
 assert.equal(evaluate('currentTimerModeKey'),'long','Full focus cycle schedules long rest');
 assert.equal(evaluate('timerTotal'),1200);
+
+const beforeTinyCredit=evaluate('cfg.todayMins');
+evaluate("selectTimerMode(1,'focus',null); timerSessionId='measured-20-sec'; timerActiveMs=20000; creditCompletedSession()");
+assert.equal(evaluate('cfg.todayMins'),beforeTinyCredit,'Twenty seconds must not earn a fictional minute');
+const afterShort=evaluate('cfg.sessionHistory.length');
+evaluate("cfg.completedTimerIds=[]; creditCompletedSession()");
+assert.equal(evaluate('cfg.sessionHistory.length'),afterShort,'Full ledger blocks duplicate event after the rolling-ID cache is lost');
 
 console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');
