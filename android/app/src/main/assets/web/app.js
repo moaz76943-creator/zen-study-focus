@@ -1541,6 +1541,31 @@ const SOUNDS_DATA = [
   { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: 'sounds/earth.ogg' }
 ];
 
+
+// Explicit empty states explain approval gaps without activating unlicensed recordings.
+const NATURE_EMPTY_LABELS = Object.freeze({
+  "en": "No verified nature recordings are available in this category yet.",
+  "ar": "لا توجد تسجيلات طبيعية معتمدة في هذه الفئة حتى الآن.",
+  "es": "Todavía no hay grabaciones de naturaleza verificadas en esta categoría.",
+  "zh": "此类别暂时没有经过验证的自然录音。",
+  "hi": "इस श्रेणी में अभी कोई सत्यापित प्राकृतिक रिकॉर्डिंग उपलब्ध नहीं है।",
+  "fr": "Aucun enregistrement naturel vérifié n'est disponible dans cette catégorie.",
+  "de": "In dieser Kategorie sind noch keine geprüften Naturaufnahmen verfügbar.",
+  "ru": "В этой категории пока нет проверенных записей природы.",
+  "pt": "Ainda não há gravações da natureza verificadas nesta categoria.",
+  "ja": "このカテゴリには確認済みの自然音の録音がまだありません。",
+  "id": "Belum ada rekaman suara alam terverifikasi dalam kategori ini.",
+  "tr": "Bu kategoride henüz doğrulanmış doğa kaydı yok.",
+  "ko": "이 카테고리에는 아직 검증된 자연 녹음이 없습니다.",
+  "vi": "Chưa có bản ghi âm thiên nhiên được xác minh trong danh mục này.",
+  "it": "Non ci sono ancora registrazioni naturali verificate in questa categoria.",
+  "bn": "এই বিভাগে এখনও যাচাইকৃত প্রকৃতির রেকর্ডিং নেই।",
+  "ur": "اس زمرے میں ابھی قدرتی آوازوں کی کوئی تصدیق شدہ ریکارڈنگ دستیاب نہیں ہے۔",
+  "fa": "هنوز هیچ ضبط تأییدشده‌ای از صدای طبیعت در این دسته وجود ندارد.",
+  "pl": "W tej kategorii nie ma jeszcze zweryfikowanych nagrań przyrody.",
+  "nl": "Er zijn nog geen geverifieerde natuuropnamen in deze categorie."
+});
+
 let soundCat = 'all';
 const activePlayers = {};
 // A stale media error or delayed play promise may never restart a stopped tile.
@@ -1618,7 +1643,25 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id) && (soundCat === 'all' || s.cat === soundCat)).forEach(s => {
+  const approved = SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id));
+  const visible = approved.filter(s => soundCat === 'all' || s.cat === soundCat);
+  const filterBar = box.parentElement && typeof box.parentElement.querySelector === 'function' ? box.parentElement.querySelector('.segmented-pills-bar') : null;
+  if (filterBar) {
+    const categories = ['all','water','forest','warm'];
+    filterBar.querySelectorAll('.seg-pill').forEach((pill, index) => {
+      const cat = categories[index];
+      if (cat) pill.dataset.availableCount = String(cat === 'all' ? approved.length : approved.filter(s => s.cat === cat).length);
+    });
+  }
+  if (!visible.length) {
+    const message = document.createElement('p');
+    message.className = 'nature-empty-state';
+    message.setAttribute('role','status');
+    message.textContent = NATURE_EMPTY_LABELS[cfg.lang] || NATURE_EMPTY_LABELS.en;
+    box.appendChild(message);
+    return;
+  }
+  visible.forEach(s => {
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
     const tile = document.createElement('div');
