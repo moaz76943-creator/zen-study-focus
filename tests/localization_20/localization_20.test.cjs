@@ -69,9 +69,9 @@ test('DF-053/059: annotated generated UI only; user note/task content never rewr
       return null;
     }
     querySelectorAll(query) {
-      const match = /^\\[([^\\]]+)\\]$/.exec(query);
-      if(!match) throw new Error(query);
-      const out = []; const walk = e => { for(const c of e.children) { if(c.hasAttribute(match[1])) out.push(c); walk(c); } };
+      if(!query.startsWith('[') || !query.endsWith(']')) throw new Error(query);
+      const attribute = query.slice(1, -1);
+      const out = []; const walk = e => { for(const c of e.children) { if(c.hasAttribute(attribute)) out.push(c); walk(c); } };
       walk(this); return out;
     }
     appendChild(child){child.parentElement=this;this.children.push(child);}
