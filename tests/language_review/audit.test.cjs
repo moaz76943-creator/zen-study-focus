@@ -53,6 +53,16 @@ test('all missing keys get an independent entry; untranslated is null, never inv
  }
  assert.ok(reused>0,'safe reusable translations should be proposed with provenance');
 });
+test('all explicit HTML i18n binding keys are compared with real locale catalogs',()=>{
+ const r=A.markupReferences();
+ assert.ok(r.checked>20);
+ assert.ok(Array.isArray(r.unknown));
+ for(const issue of r.unknown){
+  assert.equal(issue.file,'index.html');
+  assert.ok(issue.line>0);
+  assert.ok(issue.attribute&&issue.key);
+ }
+});
 test('static HTML/JS candidates have attributable lines',()=>{
  const rows=A.unmarked();
  assert.ok(rows.length>0);
