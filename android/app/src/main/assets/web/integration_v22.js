@@ -62,7 +62,11 @@
     if(alertPicker)alertPicker.unmount();
     const host=document.getElementById('completionAlertPickerHost');
     if(host)alertPicker=root.DeepFocusCompletionAlerts.mountCompletionAlertPicker(host,alertEngine,{
-      translate:(_key,fallback)=>fallback
+      translate:(key,fallback)=>{
+        const translated=root.DeepFocusCompletionAlertLocales &&
+          root.DeepFocusCompletionAlertLocales.translate(cfg.lang,key);
+        return translated || fallback;
+      }
     });
   }
   function copy(value) { return JSON.parse(JSON.stringify(value)); }
@@ -212,11 +216,14 @@
   function mountAnalytics() {
     if(analyticsUi)analyticsUi.destroy();
     const host=document.getElementById('df22AnalyticsHost');
-    if(root.DeepFocusAnalyticsRecoveryUI && cfg.lang==='en') {
-      // The new studio is enabled only where its complete label set exists.
-      // Other locales retain their existing working studio until strict parity is complete.
+    const arAnalytics=cfg.lang==='ar' && root.DeepFocusAnalyticsArabic &&
+      typeof root.DeepFocusAnalyticsArabic.translate==='function';
+    if(root.DeepFocusAnalyticsRecoveryUI && (cfg.lang==='en' || arAnalytics)) {
+      // Use the complete Arabic locale for the new studio. Other locales retain
+      // the prior studio until every label is translated; never fall back to English.
       analyticsUi=root.DeepFocusAnalyticsRecoveryUI.mount(host,getSnapshot,{
         locale:cfg.lang,
+        ...(arAnalytics?{translate:root.DeepFocusAnalyticsArabic.translate}:{}),
         ...(root.ZenNative&&typeof root.ZenNative.exportAnalyticsCsvToFile==='function'?{saveCSV:saveCsvThroughAndroid}:{})
       });
     } else {
