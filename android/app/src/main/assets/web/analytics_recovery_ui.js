@@ -131,7 +131,7 @@
    for(const s of rows.slice(0,200)){
     const line=el('tr');
     const values=[s.date,s.id,tr(s.domain),s.minutes];
-    for(const v of values){const td=el('td','',ascii(v));td.style.padding='6px';line.appendChild(td);}
+    for(let i=0;i<values.length;i++){const v=values[i];const td=el('td','',i===1?String(v):ascii(v));td.style.padding='6px';line.appendChild(td);}
     const linked=el('td');
     if(s.taskId!==null&&typeof opts.onOpenTask==='function'){
      const go=el('button','',ascii(s.taskId));go.type='button';
