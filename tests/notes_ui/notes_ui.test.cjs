@@ -136,3 +136,14 @@ test('large notes preview is bounded without modifying the source',()=>{
   assert.equal(raw.split('\n').length,600);
  }finally{if(previous===undefined)delete global.document;else global.document=previous;}
 });
+
+test('already extracted checklist does not rewrite task or note storage',()=>{
+ let writes=0;
+ const core={...fakeCore,checklistCandidates(){return []}};
+ const state={notesList:copy(start),tasksList:[]};
+ const ctl=UI.createController({core,readState:()=>copy(state),nextNumericId:()=>30,now:()=>1000,
+   commitNotes(){throw Error('unrelated notes writer')},
+   commitBoth(){writes++;return true;}});
+ assert.deepEqual(ctl.extract(7).created,[]);
+ assert.equal(writes,0);
+});
