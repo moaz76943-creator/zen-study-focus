@@ -45,7 +45,7 @@ test('DF-124: only explicitly proven clock evidence may expose start/end; date i
 test('DF-125: three fixed rolling totals use actual credited dates',()=>{
  const r=run([item(1,'2026-10-19',10),item(2,'2026-10-13',20),item(3,'2026-10-12',30),
  item(4,'2026-09-20',40)],{},{startDate:'2026-09-01'});
- assert.deepEqual([r.dashboard.today.minutes,r.dashboard.last7.minutes,r.dashboard.last30.minutes],[10,30,60]);
+ assert.deepEqual([r.dashboard.today.minutes,r.dashboard.last7.minutes,r.dashboard.last30.minutes],[10,30,100]);
 });
 test('DF-126: comparison is exactly 7 vs preceding 7, baseline zero yields null percent',()=>{
  const r=run([item(1,'2026-10-18',21),item(2,'2026-10-10',14)]);
