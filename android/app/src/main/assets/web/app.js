@@ -11,6 +11,36 @@ function toWest(val) {
     .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
 }
 
+// Generated durations only; user-authored titles and bodies never pass through this formatter.
+function formatDurationUnit(value, unit, lang = cfg.lang) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || !['minute','second'].includes(unit)) return '';
+  try {
+    return toWest(new Intl.NumberFormat(lang, {
+      style:'unit', unit, unitDisplay:'long', numberingSystem:'latn', maximumFractionDigits:2
+    }).format(n));
+  } catch (_) {
+    const units = {
+      en:['minute','minutes','second','seconds'], ar:['دقيقة','دقائق','ثانية','ثوانٍ'],
+      es:['minuto','minutos','segundo','segundos'], zh:['分钟','分钟','秒','秒'],
+      hi:['मिनट','मिनट','सेकंड','सेकंड'], fr:['minute','minutes','seconde','secondes'],
+      de:['Minute','Minuten','Sekunde','Sekunden'], ru:['минута','минут','секунда','секунд'],
+      pt:['minuto','minutos','segundo','segundos'], ja:['分','分','秒','秒'],
+      id:['menit','menit','detik','detik'], tr:['dakika','dakika','saniye','saniye'],
+      ko:['분','분','초','초'], vi:['phút','phút','giây','giây'],
+      it:['minuto','minuti','secondo','secondi'], bn:['মিনিট','মিনিট','সেকেন্ড','সেকেন্ড'],
+      ur:['منٹ','منٹ','سیکنڈ','سیکنڈ'], fa:['دقیقه','دقیقه','ثانیه','ثانیه'],
+      pl:['minuta','minut','sekunda','sekund'], nl:['minuut','minuten','seconde','seconden']
+    };
+    const code = String(lang).split('-')[0], words = units[code] || units.en;
+    const offset = unit === 'minute' ? 0 : 2;
+    let label = words[offset + (Math.abs(n) === 1 ? 0 : 1)];
+    if (code === 'ar') label = n === 2 ? (unit === 'minute' ? 'دقيقتان' : 'ثانيتان')
+      : n >= 3 && n <= 10 ? words[offset+1] : words[offset];
+    return toWest(String(n)) + ' ' + label;
+  }
+}
+
 // Only explicitly marked numeric inputs are normalized. User notes/tasks are immutable text.
 document.addEventListener('input', (e) => {
   const field=e.target;
@@ -683,14 +713,28 @@ function openCloudBackupModal() {
   document.getElementById('cloudBackupModal').classList.add('open');
 }
 
+async function copyTextConfirmed(text, successMessage) {
+  if (copyTextConfirmed.pending) return false;
+  copyTextConfirmed.pending = true;
+  try {
+    if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function')
+      throw new Error('CLIPBOARD_UNAVAILABLE');
+    await navigator.clipboard.writeText(text);
+    showToast(successMessage || (cfg.lang === 'ar' ? 'تم النسخ إلى الحافظة' : 'Copied to clipboard'));
+    return true;
+  } catch (_) {
+    showToast(cfg.lang === 'ar' ? 'تعذّر النسخ. لم يتم تأكيد النسخ إلى الحافظة.' : 'Could not copy. Clipboard copy was not confirmed.');
+    return false;
+  } finally { copyTextConfirmed.pending = false; }
+}
+
 function syncToGoogleCloudNow() {
   const code = generateEncryptedBackupCode();
   if (window.ZenNative && window.ZenNative.syncBackupToGoogleEmailOrDrive) {
     window.ZenNative.syncBackupToGoogleEmailOrDrive(code);
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(code);
-    showToast("Backup copied — save privately; NOT encrypted");
-  }
+  } else return copyTextConfirmed(code, cfg.lang === 'ar'
+    ? 'نُسخت النسخة الاحتياطية. احفظها بسرية؛ فهي غير مشفّرة.'
+    : 'Backup copied — save privately; NOT encrypted');
 }
 
 function downloadEncryptedBackupFile() {
@@ -734,10 +778,7 @@ function shareAppWithFriends() {
   const msg = toWest(`🌿 Deep Focus — My Progress Today: ${cfg.todayMins} active mins (${cfg.sessions} sessions completed, 🔥 ${cfg.streak} days streak)!`);
   if (window.ZenNative && window.ZenNative.shareAppInvite) {
     window.ZenNative.shareAppInvite(msg);
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(msg);
-    showToast("📤 Copied to Clipboard!");
-  }
+  } else return copyTextConfirmed(msg);
 }
 
 /* ========================================================
@@ -780,7 +821,7 @@ function renderDomainState() {
     const duration = card.querySelector('.domain-duration');
     if (duration) duration.textContent = toWest(getDomainFocusMinutes(key) + ':00');
   }
-  document.getElementById('modeFocusBtn').textContent = toWest(getDomainFocusMinutes(dom) + 'm');
+  document.getElementById('modeFocusBtn').textContent = formatDurationUnit(getDomainFocusMinutes(dom), 'minute');
   document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
   document.getElementById('readContextBar').classList.toggle('visible', dom === 'read');
 }
@@ -808,7 +849,7 @@ function switchActivityDomain(dom, el) {
   const [icon, title] = labels[dom];
   const minutes = getDomainFocusMinutes(dom);
   selectTimerMode(minutes, 'focus', document.getElementById('modeFocusBtn'));
-  showToast(toWest(`${icon} ${title} (${minutes}m)`));
+  showToast(`${icon} ${title} (${formatDurationUnit(minutes,'minute')})`);
 }
 
 /* Home timer shortcuts share the existing engine, never reset an active session silently. */
@@ -845,7 +886,7 @@ function startQuickSportRest(secs) {
   timerResumeMs = null;
   storeTimerSession();
   updateTimerDisplay(); toggleTimerPlay();
-  showToast(toWest(`⏱️ Rest ${secs}s Started`));
+  showToast(`⏱️ ${quickText('restPhase')} ${formatDurationUnit(secs,'second')}`);
 }
 
 function addReadPages(p) {
@@ -1111,14 +1152,14 @@ function updateTimerDisplay() {
 
   const domainText = {study:d.domStudy, sport:d.domSport, read:d.domRead, work:d.domWork};
   const captions = {
-    focus: (domainText[cfg.domain] || d.domStudy) + ' ' + Math.round(timerTotal / 60) + 'm',
-    short: timerTotal < 60 ? timerTotal + 's' : d.modeShort,
+    focus: (domainText[cfg.domain] || d.domStudy) + ' ' + formatDurationUnit(Math.round(timerTotal / 60),'minute'),
+    short: timerTotal < 60 ? quickText('restPhase') + ' ' + formatDurationUnit(timerTotal,'second') : d.modeShort,
     long: d.modeLong,
     custom: customSessionLabel || d.modeCustom
   };
   document.getElementById('timerModeCaption').textContent = toWest(captions[currentTimerModeKey] || d.modeFocus);
   if (currentTimerModeKey === 'focus' && !quickTraining?.active) {
-    document.getElementById('modeFocusBtn').textContent = toWest(Math.round(timerTotal / 60) + 'm');
+    document.getElementById('modeFocusBtn').textContent = formatDurationUnit(Math.round(timerTotal / 60),'minute');
   }
   for (const duration of [10, 25, 50]) {
     const shortcut = document.getElementById('homeQuick' + duration);
@@ -1128,6 +1169,10 @@ function updateTimerDisplay() {
       ));
     }
   }
+  const restShortcut = document.getElementById('sportRest45');
+  if (restShortcut) restShortcut.textContent = quickText('restPhase') + ' ' + formatDurationUnit(45,'second');
+  const setShortcut = document.getElementById('sportLogSet');
+  if (setShortcut) setShortcut.textContent = quickText('round') + ' +1';
   updateFocusStatus();
 }
 
@@ -1163,7 +1208,7 @@ function openCustomTimerModal() { document.getElementById('customTimerModal').cl
 function setCustomPresetValues(m) { document.getElementById('inpCustomMins').value = toWest(m); }
 function applyCustomTimerNow() {
   const mins = Math.max(1, Math.min(240, parseInt(toWest(document.getElementById('inpCustomMins').value)) || 45));
-  const title = toWest(document.getElementById('inpCustomTitle').value.trim());
+  const title = document.getElementById('inpCustomTitle').value.trim();
   customSessionLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
   closeModal('customTimerModal');
   if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return;
@@ -1592,8 +1637,7 @@ function deleteNoteCard(id) {
 
 function exportAllNotes() {
   const txt = notesList.map(n => `[${n.title} - ${toWest(n.calDate)}]\n${n.body}`).join('\n\n---\n\n');
-  if (navigator.clipboard) navigator.clipboard.writeText(txt);
-  showToast('📥 TXT');
+  return copyTextConfirmed(txt);
 }
 
 function openBrainDumpModal() {

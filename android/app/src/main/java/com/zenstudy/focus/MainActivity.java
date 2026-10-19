@@ -191,6 +191,11 @@ public class MainActivity extends AppCompatActivity {
             if (backupCode == null || !backupCode.startsWith("ZEN21::")
                     || backupCode.length() > 14000000) return;
             runOnUiThread(() -> {
+                if (backupAwaitingSave != null) {
+                    Toast.makeText(MainActivity.this, "A backup save is already open",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
                 backupAwaitingSave = backupCode;
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -304,10 +309,8 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             if (payload == null) {reportAnalyticsSave(requestId, "failed"); return;}
-            try (OutputStream output = getContentResolver().openOutputStream(data.getData(), "w")) {
-                if (output == null) throw new java.io.IOException("Cannot open CSV document");
-                output.write(payload.getBytes(StandardCharsets.UTF_8));
-                output.flush();
+            try {
+                NativeDocumentWriter.writeUtf8(getContentResolver().openOutputStream(data.getData(), "w"), payload);
             } catch (Exception error) {
                 reportAnalyticsSave(requestId, "failed");
                 return;
@@ -320,16 +323,15 @@ public class MainActivity extends AppCompatActivity {
         backupAwaitingSave = null;
         if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null
                 || payload == null) return;
-        try (OutputStream output = getContentResolver().openOutputStream(data.getData(), "w")) {
-            if (output == null) throw new java.io.IOException("Cannot open target document");
-            output.write(payload.getBytes(StandardCharsets.UTF_8));
-            output.flush();
-            Toast.makeText(this, "Backup exported; keep the unencrypted file private",
-                    Toast.LENGTH_LONG).show();
+        try {
+            NativeDocumentWriter.writeUtf8(getContentResolver().openOutputStream(data.getData(), "w"), payload);
         } catch (Exception error) {
             Toast.makeText(this, "Unable to save backup; existing data unchanged",
                     Toast.LENGTH_LONG).show();
+            return;
         }
+        Toast.makeText(this, "Backup exported; keep the unencrypted file private",
+                Toast.LENGTH_LONG).show();
     }
 
     @Override
