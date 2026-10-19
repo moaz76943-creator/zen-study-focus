@@ -56,6 +56,40 @@
    '</text><text x="'+(width-8)+'" y="177" text-anchor="end" font-size="11" fill="#475569">'+
    (series.length?escape(series[series.length-1].key):'')+'</text></svg>';
  }
+
+ function renderActivitySvg(byDomain,options={}){
+  if(!byDomain||typeof byDomain!=='object')throw new TypeError('Activity data required');
+  const colors={study:'#2563eb',read:'#8b5cf6',work:'#d97706',sport:'#059669'};
+  const values=core.DOMAINS.map(d=>{
+   const x=byDomain[d];
+   if(!x||typeof x.minutes!=='number'||!Number.isFinite(x.minutes)||x.minutes<0||
+      !Number.isSafeInteger(x.sessions)||x.sessions<0)throw new TypeError('Invalid activity total');
+   return {key:d,minutes:x.minutes,sessions:x.sessions};
+  });
+  const total=values.reduce((n,x)=>n+x.minutes,0);
+  const label=escape(ascii(options.label||'Recorded time by activity'));
+  if(total===0)return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 145" role="img" aria-label="'+label+
+   '"><text x="85" y="75" text-anchor="middle" font-size="12" fill="#475569">'+
+   escape(options.empty||'No recorded minutes')+'</text></svg>';
+  const r=48,circ=2*Math.PI*r;let offset=0;
+  const arcs=values.filter(x=>x.minutes>0).map(x=>{
+   const length=circ*x.minutes/total;
+   const name=escape(options.labels&&options.labels[x.key]||x.key);
+   const tooltip=escape(ascii(name+': '+x.minutes+' min ('+
+    Math.round(x.minutes/total*10000)/100+'%)'));
+   const svg='<circle cx="85" cy="71" r="'+r+'" fill="none" stroke="'+colors[x.key]+
+    '" stroke-width="19" stroke-dasharray="'+length.toFixed(3)+' '+(circ-length).toFixed(3)+
+    '" stroke-dashoffset="'+(-offset).toFixed(3)+
+    '" transform="rotate(-90 85 71)" data-domain="'+x.key+
+    '" role="button" tabindex="0" aria-label="'+tooltip+'"><title>'+tooltip+'</title></circle>';
+   offset+=length;return svg;
+  }).join('');
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 145" width="170" role="img" aria-label="'+label+
+   '"><circle cx="85" cy="71" r="'+r+'" fill="none" stroke="#e2e8f0" stroke-width="19"/>'+
+   arcs+'<text x="85" y="74" text-anchor="middle" font-size="14" font-weight="700">'+
+   escape(ascii(Math.round(total*100)/100))+'</text><text x="85" y="89" text-anchor="middle" font-size="9">'+
+   escape(options.unit||'min')+'</text></svg>';
+ }
  function mount(target,provider,opts={}){
   if(!target||typeof target.appendChild!=='function'||typeof provider!=='function')
    throw new TypeError('Target and history snapshot provider are required');
@@ -163,6 +197,18 @@
    displayRows(rows,key+' — '+ascii(rows.length)+' '+tr('sessions'));
   }
   chart.addEventListener('click',chooseBucket);chart.addEventListener('keydown',chooseBucket);
+  function chooseActivity(event){
+   if(event.type==='keydown'&&!['Enter',' '].includes(event.key))return;
+   const node=event.target&&typeof event.target.closest==='function'?
+    event.target.closest('[data-domain]'):null;
+   if(!node||!report)return;
+   const selected=node.getAttribute('data-domain');
+   if(!core.DOMAINS.includes(selected))return;
+   if(event.type==='keydown')event.preventDefault();
+   const rows=report.sessions.filter(s=>s.domain===selected);
+   displayRows(rows,tr(selected)+' — '+ascii(rows.length)+' '+tr('sessions'));
+  }
+  split.addEventListener('click',chooseActivity);split.addEventListener('keydown',chooseActivity);
   function refresh(){
    if(disposed)return null;
    try{
@@ -183,6 +229,12 @@
     compare.textContent=tr('weekComparison')+': '+ascii(next.comparison.current.minutes)+
      ' / '+ascii(next.comparison.previous.minutes)+' ('+pct+')';
     split.replaceChildren(el('h3','',tr('split')));
+    const donut=el('div','dfar-donut');
+    donut.innerHTML=renderActivitySvg(next.byDomain,{
+     label:tr('split'),empty:tr('noData'),unit:tr('minutes'),
+     labels:Object.fromEntries(core.DOMAINS.map(d=>[d,tr(d)]))
+    });
+    split.appendChild(donut);
     for(const d of core.DOMAINS){const v=next.byDomain[d].minutes;
      split.appendChild(el('span','',tr(d)+': '+ascii(v)+' '+tr('minutes')+' · '));}
     goals.replaceChildren(el('h3','',tr('goals')));
@@ -216,5 +268,5 @@
   return Object.freeze({element:wrapper,refresh,getReport:()=>report,
    destroy:()=>{disposed=true;wrapper.remove();}});
  }
- return Object.freeze({renderBarsSvg,mount});
+ return Object.freeze({renderBarsSvg,renderActivitySvg,mount});
 });
