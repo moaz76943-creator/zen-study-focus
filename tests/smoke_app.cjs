@@ -315,6 +315,8 @@ assert.ok(store.has('zen_fortress_cfg_v21'),'Saved goals reuse the original cfg 
 
 
 vm.runInContext(fs.readFileSync(path.join(root,'notes_drafts.js'),'utf8'),sandbox,{filename:'notes_drafts.js',timeout:2000});
+// The mock classList must report that the editor is open after nsEdit.
+document.getElementById('noteModal').classList.contains = name => name === 'open';
 evaluate('nsEdit(notesList[0].id)');
 document.getElementById('inpNoteBody').value='A valuable unsaved edit';
 assert.equal(evaluate('nsFlushDraft()'),true,'Save draft before Android kills the WebView');
