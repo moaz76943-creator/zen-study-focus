@@ -68,6 +68,7 @@
     const dirty=JSON.stringify(baseline)!==JSON.stringify(current);
     notice('studio-status',dirty?'هناك تعديلات محلية لم تُطبّق على التطبيق بعد. نزّل الملفات أو افتح طلب مراجعة.':'الإعدادات مطابقة للنسخة المحمّلة. لا توجد تغييرات معلّقة.');
     updateIssueLinks();
+    document.dispatchEvent(new CustomEvent('df:studio-changed'));
   }
   function bindFields(){
     for(const [id,scope,key,numeric] of fields){
@@ -163,5 +164,21 @@
     }
     await loadRefs().catch(e=>{notice('agent-status','تعذر التحقق من GitHub: '+e.message);});
   }
+  function getState(){
+    if(!current||!baseline)return null;
+    return {current:core.validateConfig(current),baseline:core.validateConfig(baseline),screen};
+  }
+  function applyConfig(next){
+    if(!baseline)throw Error('Design editor is not ready');
+    current=core.validateConfig(next);
+    render();
+  }
+  function selectScreen(next){
+    if(!core.SCREENS[next])throw Error('Unknown screen');
+    screen=next;
+    $('studio-screen').value=next;
+    render();
+  }
+  globalThis.DeepFocusStudioUI={getState,applyConfig,selectScreen};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
