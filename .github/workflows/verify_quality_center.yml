@@ -1,14 +1,6 @@
 name: Deep Focus Quality Center (source-only)
 
 on:
-  push:
-    branches:
-      - ops/quality-center-integrations-20261019
-    paths:
-      - .github/workflows/verify_quality_center.yml
-      - tools/quality_center/**
-      - tests/quality_center/**
-      - docs/quality_center/**
   pull_request:
     branches:
       - integration/deep-focus-recovery-00-final-20261019
@@ -32,16 +24,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
+          package-manager-cache: false
       - name: Verify dashboard syntax and self-tests
         run: |
           node --check tools/quality_center/run.cjs
-          node --test tests/quality_center/run.test.cjs
+          node --test tests/quality_center/*.test.cjs
       - name: Build quality report (retain expected provenance blocker)
         shell: bash
         run: |
@@ -60,9 +53,12 @@ jobs:
           if (report.sourceSha !== process.env.GITHUB_SHA) {
             throw new Error('Report SHA must match the checked-out Actions revision');
           }
-          const required = ['SOURCE','SYNTAX','AUDIO','LOCALES','SMOKE','NODE_TESTS','MEDIA_RIGHTS','ANDROID_E2E','HUMAN_REVIEW'];
+          const required = ['SOURCE','SYNTAX','AUDIO','BACKLOG','LOCALES','SMOKE','NODE_TESTS','MEDIA_RIGHTS','ANDROID_E2E','HUMAN_REVIEW'];
           if (required.some(id => !report.checks.some(c => c.id === id))) {
             throw new Error('Quality report missing a mandatory verification lane');
+          }
+          if (!report.backlog || !report.backlog.ok || report.backlog.total !== 161) {
+            throw new Error('Official 161-task recovery matrix is missing or corrupted');
           }
           const unexpected = report.checks.filter(c => c.status === 'FAIL' && c.id !== 'MEDIA_RIGHTS');
           if (unexpected.length) {
@@ -84,7 +80,7 @@ jobs:
           fi
       - name: Upload read-only quality dashboard
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: DeepFocus-Quality-Center-${{ github.run_id }}
           path: reports/quality-center/
