@@ -30,6 +30,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Real JVM native completion policy unit test
+        run: |
+          mkdir -p "$RUNNER_TEMP/df4-native-policy"
+          javac -d "$RUNNER_TEMP/df4-native-policy" android/app/src/main/java/com/zenstudy/focus/NativeCompletionLedger.java tests/timer_native_bridge/NativeCompletionLedgerTest.java
+          java -cp "$RUNNER_TEMP/df4-native-policy" com.zenstudy.focus.NativeCompletionLedgerTest
       - name: Android API 36
         run: |
           SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
