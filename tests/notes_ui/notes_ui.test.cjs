@@ -76,3 +76,31 @@ test('HTML payloads are plain text, never an HTML sanitizer bypass',()=>{
  assert.ok(s.text.includes('<img src=x onerror=alert(1)>'));
  assert.ok(!UI.findOccurrences(s.text,'script').length);
 });
+
+test('safe preview creates only inert text nodes, even for hostile HTML',()=>{
+ const prior=global.document,created=[];
+ const node=tag=>({tag,children:[],appendChild(x){this.children.push(x);},replaceChildren(...x){this.children=x;}});
+ try{
+  global.document={createElement(tag){created.push(tag);return node(tag);},createTextNode(text){return {text};}};
+  const root=node('div');
+  UI.renderText(root,'# Heading\n☐ <img src=x onerror=alert(1)>\n<script>alert(1)</script>','img');
+  assert.equal(root.children.length,3);
+  assert.ok(created.includes('mark'));
+  assert.ok(!created.some(tag=>['img','script','iframe'].includes(tag)));
+  assert.ok(JSON.stringify(root).includes('onerror=alert(1)'));
+ }finally{if(prior===undefined)delete global.document;else global.document=prior;}
+});
+test('cross-family checklist extraction fails closed without an atomic commit',()=>{
+ const core={...fakeCore,
+  checklistCandidates(){return [{key:'checkbox-1',title:'Study'}];},
+  extractTasks(notes,tasks,id,assigned){
+   return {notes,tasks:[...tasks,{id:assigned[0].taskId,title:'Study'}],
+     created:[{id:assigned[0].taskId,title:'Study'}]};
+  }
+ };
+ const state={notesList:copy(start),tasksList:[]};
+ const ctl=UI.createController({core,readState:()=>copy(state),nextNumericId:()=>23,
+   commitNotes(){throw Error('must not write only notes')}});
+ assert.throws(()=>ctl.extract(7),/ATOMIC_TASK_COMMIT_REQUIRED/);
+ assert.equal(state.tasksList.length,0);
+});
