@@ -55,6 +55,11 @@ jobs:
           echo "QUALITY_EXIT_CODE=$?" >> "$GITHUB_ENV"
           set -e
           node tools/control_center/audit.cjs --json "$RUNNER_TEMP/df-2026-evidence/control-health.json" --markdown "$RUNNER_TEMP/df-2026-evidence/control-health.md"
+          if command -v ffprobe >/dev/null && command -v ffmpeg >/dev/null; then
+            python3 tools/recovery/media_inventory.py --out "$RUNNER_TEMP/df-2026-evidence/bundled-media-inventory.json"
+          else
+            printf '%s\n' '{"status":"NOT_TESTED","reason":"ffprobe/ffmpeg unavailable","release_approved":false}' > "$RUNNER_TEMP/df-2026-evidence/bundled-media-inventory.json"
+          fi
           node tests/audio_acquisition_12/audit_candidates.cjs > "$RUNNER_TEMP/df-2026-evidence/audio-candidate-audit.json" || true
           printf 'Android physical acceptance: NOT_TESTED\nCommercial nature-recording clearance: BLOCKED\nPlay/release approval: BLOCKED\n' > "$RUNNER_TEMP/df-2026-evidence/RELEASE_NOT_APPROVED.txt"
       - uses: actions/setup-java@v4
