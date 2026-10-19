@@ -44,11 +44,12 @@ test('DF-128: day SVG click and keyboard drill into real session records',()=>{
 });
 test('DF-127/136: range input rejects reversed dates and Reset clears all controls',()=>{
  const ui=UI.mount(documentFixture(),()=>({sessionHistory:[item(1,'2026-10-19',10)]}),
- {today:'2026-10-19'});
+ {today:'2026-10-19',saveCSV:async()=>({status:'saved'})});
  const n=nodes(ui);
  n.fields[2].value='2026-10-20';
  n.fields[2].events.change();
  assert.match(n.status.textContent,/valid date range/);
+ assert.equal(n.buttons[1].disabled,true);
  assert.equal(ui.getReport().totals.minutes,10);
  n.fields[0].value='work';n.fields[1].value='weekly';
  n.buttons[0].events.click();
@@ -56,6 +57,7 @@ test('DF-127/136: range input rejects reversed dates and Reset clears all contro
  assert.equal(n.fields[1].value,'daily');
  assert.equal(n.fields[2].value,'2026-09-20');
  assert.equal(n.status.textContent,'');
+ assert.equal(n.buttons[1].disabled,false);
 });
 test('DF-125: tapping today KPI changes range and shows actual details',()=>{
  const ui=UI.mount(documentFixture(),()=>({sessionHistory:[item(1,'2026-10-12',20),
