@@ -3,13 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src https://api.github.com https://raw.githubusercontent.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#071b38">
   <meta name="description" content="Deep Focus repository operations dashboard: QA, CI, recovery tasks, incident triage, and audit reports.">
   <title>Deep Focus | مركز قيادة التطوير</title>
   <link rel="stylesheet" href="./control-center.css">
   <script src="./control-center.js" defer></script>
+  <script src="./studio-core.js" defer></script>
+  <script src="./studio.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#overview">تجاوز إلى المحتوى الرئيسي</a>
@@ -24,7 +26,9 @@
         <a href="#overview" class="active">◈ <span>نظرة عامة</span></a>
         <a href="#risks">◇ <span>المخاطر والأعطال</span></a>
         <a href="#tasks">▤ <span>المهام الـ161</span></a>
+        <a href="#studio">▧ <span>محرر الشاشات</span></a>
         <a href="#delivery">⇄ <span>GitHub والاختبارات</span></a>
+        <a href="#agent-studio">♧ <span>الوكلاء والأتمتة</span></a>
         <a href="#automation">⚡ <span>التحكم والأتمتة</span></a>
         <a href="#reports">▣ <span>تقارير التدقيق</span></a>
       </nav>
@@ -108,11 +112,84 @@
           <div class="task-footer"><button id="show-more" type="button" class="button secondary" hidden>عرض المزيد من المهام</button></div>
         </div>
       </section>
+      <section class="section" id="studio" aria-labelledby="studio-title">
+        <div class="section-heading">
+          <div><span class="section-kicker">SCREEN &amp; DESIGN STUDIO</span><h2 id="studio-title">إدارة الشاشات والخصائص</h2></div>
+          <span class="tag">تعديلات قابلة للمراجعة</span>
+        </div>
+        <div class="panel studio-panel">
+          <p class="studio-intro">اختر الشاشة وعدّل ألوانها، الحواف، والمسافات. ستظهر معاينة فورية، ثم يمكنك تنزيل ملفات التغيير أو إنشاء طلب GitHub للمراجعة. لا تتغير نسخة المستخدم حتى اعتماد الشيفرة وبناء APK جديد.</p>
+          <div class="studio-grid">
+            <div class="studio-controls">
+              <label for="studio-screen">الشاشة المستهدفة</label>
+              <select id="studio-screen"><option value="timer">المؤقت والتركيز</option></select>
+              <div class="studio-fieldset">
+                <strong>مظهر التطبيق العام</strong>
+                <label for="theme-primary">اللون الأساسي</label><input type="color" id="theme-primary" value="#2563eb">
+                <label for="theme-cyan">اللون المساعد</label><input type="color" id="theme-cyan" value="#06b6d4">
+                <label for="theme-background">لون الخلفية</label><input type="color" id="theme-background" value="#fbfdff">
+                <label for="theme-radius">استدارة البطاقات العامة (8–44)</label><input type="range" id="theme-radius" min="8" max="44" value="24">
+                <output id="theme-radius-value" for="theme-radius">24</output>
+                <label for="theme-scale">مقياس الخط (85–120%)</label><input type="range" id="theme-scale" min="85" max="120" value="100">
+                <output id="theme-scale-value" for="theme-scale">100%</output>
+              </div>
+              <div class="studio-fieldset">
+                <strong>تخصيص الشاشة المختارة</strong>
+                <label for="screen-accent">اللون الأساسي للشاشة</label><input type="color" id="screen-accent" value="#2563eb">
+                <label for="screen-radius">استدارة بطاقاتها</label><input type="range" id="screen-radius" min="8" max="44" value="30">
+                <output id="screen-radius-value" for="screen-radius">30</output>
+                <label for="screen-spacing">المسافة بين البطاقات</label><input type="range" id="screen-spacing" min="4" max="28" value="12">
+                <output id="screen-spacing-value" for="screen-spacing">12</output>
+              </div>
+            </div>
+            <div class="studio-preview-column">
+              <div id="studio-preview" class="mock-device" aria-label="معاينة تقريبية لتصميم الشاشة">
+                <div class="mock-head"><span>DEEP FOCUS</span><span>● ● ●</span></div>
+                <div id="mock-title" class="mock-title">المؤقت والتركيز</div>
+                <div class="mock-card"><span>◉</span><strong>25:00</strong><small>واجهة تجريبية — لا تؤثر في بيانات المؤقت</small></div>
+                <div class="mock-row"><div class="mock-mini">مهمة</div><div class="mock-mini">نشاط</div></div>
+                <button type="button" class="mock-cta" disabled>معاينة فقط</button>
+              </div>
+              <p class="small-muted">هذه معاينة للألوان والمسافات وليست محاكاة وظيفية لـAndroid WebView.</p>
+              <h3>ملفات الشاشة والاختبارات</h3>
+              <div id="studio-sources" class="studio-sources"></div>
+            </div>
+          </div>
+          <div class="studio-actions">
+            <button class="button secondary" id="studio-reset" type="button">إعادة القيم الأصلية</button>
+            <button class="button secondary" id="studio-json" type="button">تنزيل JSON</button>
+            <button class="button secondary" id="studio-css" type="button">تنزيل CSS</button>
+            <a class="button primary" id="studio-review" href="#studio">فتح طلب تغيير GitHub ↗</a>
+          </div>
+          <p id="studio-status" class="small-muted" role="status" aria-live="polite">جارٍ تحميل الإعدادات المعتمدة من المستودع…</p>
+        </div>
+      </section>
       <section class="section" id="delivery" aria-labelledby="delivery-title">
         <div class="section-heading"><div><span class="section-kicker">DELIVERY PIPELINE</span><h2 id="delivery-title">طلبات الدمج والفحوصات</h2></div></div>
         <div class="two-columns">
           <article class="panel inner-panel"><h3>حالة فحوصات SHA المرجعي</h3><div id="ci-list" class="compact-list"><div class="empty">جارٍ جلب تشغيلات Actions…</div></div></article>
           <article class="panel inner-panel"><h3>طلبات الدمج المفتوحة</h3><div id="pr-list" class="compact-list"><div class="empty">جارٍ جلب الطلبات…</div></div></article>
+        </div>
+      </section>
+      <section class="section" id="agent-studio" aria-labelledby="agent-title">
+        <div class="section-heading">
+          <div><span class="section-kicker">AGENT OPERATIONS</span><h2 id="agent-title">إنشاء مهام الوكلاء ومتابعة الأتمتة</h2></div>
+          <span class="tag">لا تنفيذ غير مرخّص</span>
+        </div>
+        <div class="panel studio-panel">
+          <p class="studio-intro">أنشئ مهمة دقيقة لوكيل Gemini أو Codex أو مطور، تشمل الشاشة والملفات ذات الصلة واختبارات القبول ومرجع SHA. يصنع الزر مسودة Issue على GitHub؛ تشغيل نموذج AI يحتاج وكيلاً متصلاً بشكل مستقل.</p>
+          <div class="agent-grid">
+            <div><label for="agent-type">نوع الوكيل</label><select id="agent-type"><option value="ui">UX وإصلاح التفاعل</option></select></div>
+            <div><label for="agent-screen">الشاشة</label><select id="agent-screen"><option value="timer">المؤقت</option></select></div>
+            <div class="agent-goal"><label for="agent-goal">المهمة المطلوبة</label><textarea id="agent-goal" rows="3" maxlength="160" placeholder="مثال: أصلح أزرار تحليلات الأسبوع التي لا تستجيب للمس"></textarea></div>
+          </div>
+          <div class="studio-actions">
+            <button type="button" class="button secondary" id="agent-copy">نسخ مهمة الوكيل</button>
+            <a class="button primary" id="agent-issue" href="#agent-studio">فتح Issue جاهز في GitHub ↗</a>
+            <a class="button secondary" href="https://github.com/moaz76943-creator/zen-study-focus/actions/workflows/control_center_agents.yml" target="_blank" rel="noopener noreferrer">تشغيل وكلاء QA الآليين ↗</a>
+          </div>
+          <p id="agent-status" class="small-muted" role="status" aria-live="polite">اختر نوع الوكيل والشاشة وأدخل هدفًا واضحًا.</p>
+          <div class="agent-boundaries">عمليات QA مؤتمتة؛ أما تعديلات كود التطبيق فتُنفَّذ عبر PR مع اختبار ومراجعة بشرية. لا توجد صلاحية ذاتية لتغيير البيانات أو نشر إصدار Play.</div>
         </div>
       </section>
       <section class="section" id="automation" aria-labelledby="automation-title">
