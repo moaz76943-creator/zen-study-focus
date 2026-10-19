@@ -24,9 +24,13 @@ class ReleaseGuardTests(unittest.TestCase):
         self.assertNotIn("signingConfig signingConfigs.debug", GRADLE)
 
     def test_user_content_is_escaped(self):
+        # Escape HTML while preserving user-authored digits, including Arabic/Persian glyphs.
         self.assertIn("function escapeHtmlText(", APP)
-        self.assertIn("escapeHtmlText(toWest(t.title))", APP)
-        self.assertIn("escapeHtmlText(toWest(n.body))", APP)
+        self.assertIn("escapeHtmlText(t.title)", APP)
+        self.assertIn("escapeHtmlText(n.title)", APP)
+        self.assertIn("escapeHtmlText(n.body)", APP)
+        self.assertNotIn("escapeHtmlText(toWest(t.title))", APP)
+        self.assertNotIn("escapeHtmlText(toWest(n.body))", APP)
 
     def test_no_fake_stats_or_tap_to_fabricate_sessions(self):
         self.assertNotIn("cfg.todayMins + 300", APP)
