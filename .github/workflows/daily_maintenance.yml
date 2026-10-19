@@ -27,6 +27,7 @@ on:
       - '.github/workflows/build_apk.yml'
       - 'tools/daily_maintenance/**'
       - 'tests/daily_maintenance/**'
+      - 'docs/daily_maintenance/**'
 permissions:
   contents: read
 concurrency:
@@ -101,6 +102,7 @@ jobs:
             performance) lane=tests/performance_recovery;;
             *) echo 'Unrecognized lane';exit 2;;
           esac
+          test "$(find "$lane" -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | wc -l)" -gt 0
           find "$lane" -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' -print0 | sort -z | xargs -0 -r node --test --test-reporter=tap | tee "$RUNNER_TEMP/daily/node.tap"
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/daily/python.log"
       - name: Audits including mandatory failed media release gate
