@@ -62,7 +62,11 @@
     if(alertPicker)alertPicker.unmount();
     const host=document.getElementById('completionAlertPickerHost');
     if(host)alertPicker=root.DeepFocusCompletionAlerts.mountCompletionAlertPicker(host,alertEngine,{
-      translate:(_key,fallback)=>fallback
+      translate:(key,fallback)=>{
+        const translated=root.DeepFocusCompletionAlertLocales &&
+          root.DeepFocusCompletionAlertLocales.translate(cfg.lang,key);
+        return translated || fallback;
+      }
     });
   }
   function copy(value) { return JSON.parse(JSON.stringify(value)); }
