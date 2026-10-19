@@ -64,3 +64,11 @@ test('minimum touch size, narrow-screen and reduced-motion policy are scoped',()
  assert.match(css,/@media\(max-width:370px\)/);assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
  assert.match(css,/:focus-visible/);assert.match(css,/overflow-wrap:anywhere/);
 });
+
+test('validation never consumes a task ID or partially updates a record',()=>{
+ const m=ui.createModel({tasks:[],notes:[]});
+ assert.throws(()=>m.addTask(' '),/TITLE_REQUIRED/);
+ const created=m.addTask('original');assert.equal(created.id,1);
+ assert.throws(()=>m.updateTask(created.id,{title:'changed',due:'2030/01/01'}),/INVALID_DATE/);
+ assert.equal(m.snapshot().tasks[0].title,'original');
+});
