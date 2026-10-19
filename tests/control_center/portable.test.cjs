@@ -52,3 +52,21 @@ test('portable review file includes actual 161-item recovery ledger with explici
  assert.ok(ledger.tasks.some(x=>x.status==='BLOCKED'));
  assert.ok(fs.readFileSync(path.join(root,'docs/control-center/control-center.js'),'utf8').includes('control-center-embedded-ledger'));
 });
+
+test('static 161-item fallback rejects altered status, duplicates, and untrusted HTML',()=>{
+ const html=buildPortable(root);
+ const m=html.match(/<script id="control-center-embedded-ledger" type="application\/json">([\s\S]*?)<\/script>/);
+ const source=JSON.parse(m[1]);
+ const client=require('../../docs/control-center/control-center.js');
+ const valid=client.parseStaticLedger(JSON.stringify(source));
+ assert.equal(valid.length,161);
+ const duplicate=JSON.parse(JSON.stringify(source));
+ duplicate.tasks[1].id=duplicate.tasks[0].id;
+ assert.throws(()=>client.parseStaticLedger(JSON.stringify(duplicate)),/Invalid embedded ledger task/);
+ const altered=JSON.parse(JSON.stringify(source));
+ altered.tasks[0].status='RELEASE_APPROVED';
+ assert.throws(()=>client.parseStaticLedger(JSON.stringify(altered)),/Invalid embedded ledger task/);
+ const escaped=JSON.parse(JSON.stringify(source));
+ escaped.tasks[0].title='<img src=x onerror=alert(1)>Safe title';
+ assert.equal(client.parseStaticLedger(JSON.stringify(escaped))[0].title,'Safe title');
+});
