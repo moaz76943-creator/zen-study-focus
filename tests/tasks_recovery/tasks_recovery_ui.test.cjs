@@ -51,6 +51,7 @@ test('DF-107 complete/reopen and Undo restore the real task record',()=>{
  click(a.root,'Complete').fire('click');assert.equal(a.read().tasksList[0].done,true);
  find(a.root,'Undo').fire('click');assert.equal(a.read().tasksList[0].done,false);
  click(a.root,'Complete').fire('click');
+ click(a.root,'Completed').fire('click');
  click(a.root,'Reopen').fire('click');assert.equal(a.read().tasksList[0].done,false);
 });
 test('DF-111 user manually pins task and Undo removes its pin without removing task',()=>{
