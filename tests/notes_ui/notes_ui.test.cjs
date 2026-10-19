@@ -121,7 +121,7 @@ test('checklist toggles stay in plain text with no implicit task completion',()=
  const pending='☐ Study\n☑ Review';
  const done=UI.toggleChecklistLine(pending,2);
  assert.equal(done.changed,true);assert.equal(done.text,'☑ Study\n☑ Review');
- assert.equal(UI.toggleChecklistLine(done.text,10).text,pending);
+ assert.equal(UI.toggleChecklistLine(done.text,2).text,pending);
  assert.equal(UI.toggleChecklistLine('ordinary paragraph',2).changed,false);
 });
 test('large notes preview is bounded without modifying the source',()=>{
