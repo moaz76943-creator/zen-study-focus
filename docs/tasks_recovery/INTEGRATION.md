@@ -51,7 +51,7 @@ node --check android/app/src/main/assets/web/tasks_core_v21.js
 node --check android/app/src/main/assets/web/tasks_studio.js
 node --test tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs
 ```
-Then run the repository's full JavaScript/Android build, v21/\`ZEN21::\` backup-restore tests and on-device WebView touch/storage/keyboard/performance tests before approval.
+Then run the repository's full JavaScript/Android build, v21/`ZEN21::` backup-restore tests and on-device WebView touch/storage/keyboard/performance tests before approval.
 
 ## Integration contract for lane 00
 1. Load `tasks_core_v21.js` before `tasks_studio.js` and mount `DeepFocusTasksStudioV21.mount(root,adapter)` exactly once in an owned container. Do not mount beside an overlapping legacy task list.
