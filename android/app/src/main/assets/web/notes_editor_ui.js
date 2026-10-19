@@ -45,6 +45,37 @@
     const symbol=match[2]==='☐'?'☑':'☐';
     return {text:value.slice(0,from)+part.replace(/^(\s*)(?:☐|☑)/u,'$1'+symbol)+value.slice(stop),changed:true};
   }
+  function checklistProgress(text){
+    const lines=String(text||'').split(/\r?\n/u);
+    let total=0,done=0;
+    for(const line of lines){
+      if(/^\s*(?:☐|☑|\[([ xX])\]|[-*]\s*\[([ xX])\])(?:\s|$)/u.test(line)){
+        total++;
+        if(/^\s*(?:☑|\[[xX]\]|[-*]\s*\[[xX]\])(?:\s|$)/u.test(line))done++;
+      }
+    }
+    return {total,done};
+  }
+  function serializeNote(note,format='txt'){
+    if(!note||!validId(note.id)||typeof note.title!=='string'||typeof note.body!=='string')
+      throw new Error('INVALID_NOTE');
+    if(format!=='txt'&&format!=='md')throw new Error('INVALID_FORMAT');
+    const e=note.notesV21||{},cornell=e.cornell;
+    const safe=s=>format==='md'?String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'):String(s);
+    const head=format==='md'?'# '+safe(note.title):note.title;
+    const segments=[head,safe(note.body)];
+    if(cornell&&['cues','notes','summary'].every(k=>typeof cornell[k]==='string')){
+      for(const [key,label] of [['cues','Questions / Cues'],['notes','Main notes'],['summary','Summary']]){
+        if(cornell[key].trim())segments.push((format==='md'?'## ':'')+label+'\n'+safe(cornell[key]));
+      }
+    }
+    return segments.filter(Boolean).join('\n\n');
+  }
+  function draftVersionMatches(draft,note){
+    if(!draft||draft.baseFingerprint===undefined||draft.baseFingerprint===null)return true;
+    return typeof draft.baseFingerprint==='string' &&
+      draft.baseFingerprint===(note?JSON.stringify(note):null);
+  }
   function createController(adapter){
     if(!adapter||!adapter.core||typeof adapter.readState!=='function'||
        typeof adapter.commitNotes!=='function'||typeof adapter.nextNumericId!=='function')
@@ -105,7 +136,12 @@
           const id=adapter.nextNumericId();
           if(!validId(id))throw new Error('New note requires a numeric v21 ID');
           next=core.createNote(before.notesList,{id,...patch,isStarter:false,notesV21:ext},{now:stamp});
-        }else next=core.edit(before.notesList,d.id,patch,{now:stamp,extension:ext});
+        }else {
+          if(d.expectedSnapshot!==undefined &&
+            JSON.stringify(one(d.id,before.notesList))!==d.expectedSnapshot)
+            throw new Error('NOTE_CONFLICT_RELOAD_REQUIRED');
+          next=core.edit(before.notesList,d.id,patch,{now:stamp,extension:ext});
+        }
         return {...before,notesList:next};
       });
     }
@@ -167,8 +203,18 @@
       },'both');
     }
     function recall(id){const s=read();return core.recallCards(one(id,s.notesList));}
-    function query(options){return core.search(read().notesList,options);}
-    return Object.freeze({read,one,save,toggle,duplicate,move,purge,history,link,linkTask,extract,recall,query});
+    function backlinks(id){return core.backlinks(read().notesList,id);}
+    function query(options={}){
+      const all=read().notesList;
+      const category=options.category;
+      if(category && category!=='all'){
+        if(!['cornell','flash','quick'].includes(category))throw new Error('INVALID_CATEGORY');
+        // Filter FIRST, then let the canonical Core order and paginate.
+        return core.search(all.filter(n=>n&&n.catKey===category),options);
+      }
+      return core.search(all,options);
+    }
+    return Object.freeze({read,one,save,toggle,duplicate,move,purge,history,link,linkTask,extract,recall,backlinks,query});
   }
   function el(tag,cls,label){
     const e=document.createElement(tag);if(cls)e.className=cls;
@@ -179,22 +225,27 @@
     en:{all:'All notes',archive:'Archive',trash:'Trash',notebooks:'Notebook',tag:'Tag',allbooks:'All notebooks',
       alltags:'All tags',empty:'No notes in this view',focus:'Focus writing',normal:'Exit focus',read:'Read / Review',
       edit:'Edit',restore:'Restore',delete:'Move to trash',purge:'Delete forever',archiveIt:'Archive',
-      undo:'Undo',redo:'Redo',find:'Find in note',next:'Next',preview:'Preview',write:'Write',
+      undo:'Undo',redo:'Redo',find:'Find in note',next:'Next',preview:'Preview',write:'Write',done:'Toggle completed',
       question:'Questions / cues',explain:'Main notes',summary:'Summary',pairQ:'Recall question',
       pairA:'Answer',addPair:'Add Q&A',tags:'Tags (comma-separated)',book:'Notebook',link:'Link note',
       task:'Create tasks from unchecked items',saved:'Note saved',failed:'Could not save note',
       confirm:'Delete permanently? An exported backup is required.',review:'Tap answer to reveal',
-      draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes'},
+      draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes',
+      copied:'Copied to clipboard',copyFailed:'Clipboard unavailable; content was not copied',
+      missing:'Linked note unavailable',contents:'Contents',copyTxt:'Copy TXT',copyMd:'Copy Markdown',
+      more:'More actions',conflict:'This note changed since you opened it. Copy your edits or reopen the latest version before saving.'},
     ar:{all:'كل الملاحظات',archive:'الأرشيف',trash:'سلة المحذوفات',notebooks:'الدفتر',tag:'الوسم',allbooks:'كل الدفاتر',
       alltags:'كل الوسوم',empty:'لا توجد ملاحظات في هذا العرض',focus:'تركيز الكتابة',normal:'إنهاء التركيز',read:'قراءة ومراجعة',
       edit:'تحرير',restore:'استعادة',delete:'نقل إلى السلة',purge:'حذف نهائي',archiveIt:'أرشفة',
-      undo:'تراجع',redo:'إعادة',find:'بحث داخل الملاحظة',next:'التالي',preview:'معاينة',write:'كتابة',
+      undo:'تراجع',redo:'إعادة',find:'بحث داخل الملاحظة',next:'التالي',preview:'معاينة',write:'كتابة',done:'تبديل حالة الإنجاز',
       question:'الأسئلة والكلمات المفتاحية',explain:'الشرح والملاحظات',summary:'الملخص',pairQ:'سؤال المراجعة',
       pairA:'الإجابة',addPair:'إضافة سؤال وإجابة',tags:'الوسوم (افصل بفاصلة)',book:'الدفتر',
       link:'ربط ملاحظة',task:'إنشاء مهام من مربعات الاختيار',saved:'تم حفظ الملاحظة',
       failed:'تعذّر حفظ الملاحظة',confirm:'حذف نهائي؟ تأكد من وجود نسخة احتياطية مصدّرة.',
       review:'المس الإجابة لإظهارها',draft:'المحتوى القديم محفوظ بمعزل عن كورنيل',filter:'تصفية',
-      status:'الحالة',linked:'ملاحظات مرتبطة'}
+      status:'الحالة',linked:'ملاحظات مرتبطة',copied:'تم النسخ إلى الحافظة',
+      copyFailed:'الحافظة غير متاحة؛ لم يتم نسخ النص',missing:'الملاحظة المرتبطة غير متاحة',
+      contents:'المحتويات',copyTxt:'نسخ نص TXT',copyMd:'نسخ Markdown',more:'المزيد',conflict:'تغيرت هذه الملاحظة بعد فتحها. انسخ نصك أو حدّث الملاحظة قبل الحفظ.'}
   };
   function t(key){return languages[instance&&instance.adapter.locale&&instance.adapter.locale()==='ar'?'ar':'en'][key]||key;}
   function style(){
@@ -217,6 +268,8 @@
       '.nsux-reader p{white-space:pre-wrap;margin:7px 0}.nsux-reader h4{font-size:1.02rem;margin:12px 0 4px}.nsux-reader .nsux-check{display:flex;gap:10px;align-items:baseline}.nsux-reader .nsux-check input{pointer-events:none}',
       '.nsux-card{border:1px solid var(--df22-border,#dce5f0);border-radius:22px;background:#fff;padding:15px;box-shadow:var(--df22-shadow-low,0 2px 10px #203b5f10)}',
       '.nsux-card h3{margin:8px 0;color:#1c2e4d;overflow-wrap:anywhere}.nsux-card p{white-space:pre-wrap;overflow-wrap:anywhere;color:#50617a;font-size:.79rem;max-height:7em;overflow:hidden}',
+      '.nsux-advanced{border-top:1px solid #edf0f5;margin-top:8px}.nsux-advanced>summary{cursor:pointer;min-height:44px;padding:12px 6px;color:#1759ad;font-weight:650}.nsux-advanced>summary:focus-visible{outline:2px solid #3288eb;border-radius:9px}',
+      '.nsux-more{margin-top:8px;border-top:1px solid #edf0f5;padding-top:8px}.nsux-more>summary{cursor:pointer;display:list-item;list-style:inside;min-height:44px;padding:11px 7px;color:#1759ad;font-weight:650}.nsux-more>summary:focus-visible{outline:2px solid #3288eb;border-radius:10px}.nsux-more .nsux-actions{padding:5px 0 4px}',
       '.nsux-blank{padding:25px;text-align:center;background:#fff;border:1px dashed #bfd6f4;border-radius:18px;color:#50617a}',
       '#noteModal.nsux-focus .ns-editor{max-width:760px;width:100%;max-height:100dvh;border-radius:0}',
       '#noteModal.nsux-focus #nsEditorTemplates,#noteModal.nsux-focus .ns-meta,#noteModal.nsux-focus .ns-options{display:none}',
@@ -283,7 +336,7 @@
       body.value=pos.text;body.setSelectionRange(pos.cursorStart,pos.cursorEnd);body.focus();schedule();
       if(typeof nsUpdateCount==='function')nsUpdateCount();
     }));
-    button(toolbar,'☑ Done / تم',()=>{
+    button(toolbar,t('done'),()=>{
       const old=body.selectionStart,changed=toggleChecklistLine(body.value,old);
       if(!changed.changed)return;
       body.value=changed.text;body.focus();body.setSelectionRange(old,old);
@@ -309,7 +362,9 @@
       const a=collectPairs(true);a.push({key:'pair-'+Date.now()+'-'+c,question:'',answer:''});createPairs(instance.pairList,a);
       schedule();
     });
-    body.parentNode.insertBefore(toolbar,body);document.getElementById('nsCounter').after(extra);
+    const advanced=el('details','nsux-advanced');instance.advanced=advanced;
+    advanced.appendChild(el('summary','',t('more')));advanced.appendChild(extra);
+    body.parentNode.insertBefore(toolbar,body);document.getElementById('nsCounter').after(advanced);
     find.addEventListener('input',()=>{renderPreview();findNext(true);});
     body.addEventListener('input',()=>{renderPreview();});
     [instance.fields.cues,instance.fields.notes,instance.fields.summary,
@@ -331,6 +386,7 @@
     const kind=document.getElementById('selNoteCat').value;
     document.getElementById('nsux-cornell').hidden=kind!=='cornell';
     document.getElementById('nsux-recall').hidden=kind!=='flash';
+    if((kind==='cornell'||kind==='flash')&&instance?.advanced)instance.advanced.open=true;
   }
   function renderPreview(){
     if(!instance)return;
@@ -360,6 +416,8 @@
   function onOpen(note){
     if(!instance)return;
     const n=note||{},ext=n.notesV21||{},f=instance.fields;
+    instance.openedSnapshot=note?JSON.stringify(note):null;
+    if(instance.advanced)instance.advanced.open=false;
     f.cues.value=ext.cornell?.cues||'';f.notes.value=ext.cornell?.notes||'';
     f.summary.value=ext.cornell?.summary||'';f.tags.value=(ext.tags||[]).join(', ');
     f.notebook.value=ext.notebookId||'';createPairs(instance.pairList,ext.recallPairs||[]);
@@ -374,7 +432,8 @@
     if(!instance)return {};
     const f=instance.fields;
     return {cornell:{cues:f.cues.value,notes:f.notes.value,summary:f.summary.value},
-      notebookId:f.notebook.value,tags:f.tags.value,recallPairs:collectPairs(true)};
+      notebookId:f.notebook.value,tags:f.tags.value,recallPairs:collectPairs(true),
+      baseFingerprint:instance.openedSnapshot};
   }
   function restoreDraftFields(d){
     if(!instance||!d)return;
@@ -395,6 +454,7 @@
       catKey:cat,calDate:document.getElementById('inpNoteCalDate').value,
       pinned:document.getElementById('nsPinCheck').checked,favorite:document.getElementById('nsFavCheck').checked,
       blur:document.getElementById('chkNoteBlur').checked,notebookId:f.notebook.value,
+      expectedSnapshot:instance.openedSnapshot,
       tags:parseTags(f.tags.value),recallPairs:pairs};
     // Never guess Cornell structure for a legacy note. Only authored fields are persisted.
     if(cat==='cornell')result.cornell={cues:f.cues.value,notes:f.notes.value,summary:f.summary.value};
@@ -409,9 +469,20 @@
       if(typeof nsEditId!=='undefined')nsEditId=null;
       renderStack();instance.adapter.onRefresh?.();instance.adapter.notify?.(t('saved'));
       return true;
-    }catch(e){instance.adapter.notify?.(t('failed')+': '+e.message);return false;}
+    }catch(e){instance.adapter.notify?.(e.message==='NOTE_CONFLICT_RELOAD_REQUIRED'?t('conflict'):t('failed')+': '+e.message);return false;}
   }
   function cardAction(parent,label,fn,danger){return button(parent,label,()=>{try{fn();renderStack();}catch(e){instance.adapter.notify?.(e.message);}},danger?'danger':'');}
+  function copyExport(note,format){
+    let content;
+    try{content=serializeNote(note,format);}
+    catch(e){instance.adapter.notify?.(e.message);return;}
+    if(typeof navigator==='undefined'||!navigator.clipboard?.writeText){
+      instance.adapter.notify?.(t('copyFailed'));return;
+    }
+    Promise.resolve().then(()=>navigator.clipboard.writeText(content)).then(
+      ()=>instance.adapter.notify?.(t('copied')),
+      ()=>instance.adapter.notify?.(t('copyFailed')));
+  }
   function statusView(){
     const root=document.getElementById('nsux-filters');if(!root)return;
     const a=instance.controller.read().notesList;
@@ -436,14 +507,12 @@
       pinnedOnly:document.getElementById('nsPinnedOnly')?.getAttribute('aria-pressed')==='true'};
     const bk=document.getElementById('nsux-book-filter').value,tag=document.getElementById('nsux-tag-filter').value;
     if(bk)filters.notebookId=bk;if(tag)filters.tags=[tag];
-    if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all'&&noteTagFilter)filters.kind=undefined;
+    if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all'&&noteTagFilter)filters.category=noteTagFilter;
     const signature=JSON.stringify(filters);
     if(signature!==instance.filterSignature){instance.filterSignature=signature;instance.page=0;}
     const offset=(instance.page||0)*100;
-    let result=instance.controller.query({...filters,offset,limit:100});
-    let found=result.items;
-    if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all')
-      found=found.filter(n=>n.catKey===noteTagFilter);
+    const result=instance.controller.query({...filters,offset,limit:100});
+    const found=result.items;
     const all=instance.controller.read().notesList.filter(n=>n&&!n.isStarter&&!n.notesV21?.deletedAt);
     const total=document.getElementById('nsTotal'),pinned=document.getElementById('nsPinned'),count=document.getElementById('nsVisibleCount');
     if(total)total.textContent=String(all.length);
@@ -464,41 +533,53 @@
       }
       card.appendChild(body);
       const safeTags=Array.isArray(n.notesV21?.tags)?n.notesV21.tags:[];
-    const meta=el('div','nsux-meta',(n.notesV21?.notebookId||'')+' · '+safeTags.join(' · '));
+    const progress=checklistProgress((n.body||'')+'\n'+(n.notesV21?.cornell?.notes||''));
+    const meta=el('div','nsux-meta',(n.notesV21?.notebookId||'')+
+      (safeTags.length?' · '+safeTags.join(' · '):'')+
+      (progress.total?' · ☑ '+progress.done+'/'+progress.total:''));
       card.appendChild(meta);
       const actions=el('div','nsux-actions');
+      const secondary=el('div','nsux-actions');
       if(s==='trash'){
         cardAction(actions,t('restore'),()=>instance.controller.move(n.id,'restore'));
-        cardAction(actions,t('purge'),()=>instance.controller.purge(n.id),'danger');
+        cardAction(secondary,t('purge'),()=>instance.controller.purge(n.id),'danger');
       }else{
         cardAction(actions,t('edit'),()=>{openNoteModal(null,n.id);});
-        cardAction(actions,'★',()=>instance.controller.toggle(n.id,'favorite'));
-        cardAction(actions,'📌',()=>instance.controller.toggle(n.id,'pinned'));
         cardAction(actions,t('read'),()=>showReader(n));
-        cardAction(actions,t('undo'),()=>instance.controller.history(n.id,'undo'));
-        cardAction(actions,t('redo'),()=>instance.controller.history(n.id,'redo'));
-        cardAction(actions,s==='archived'?t('restore'):t('archiveIt'),()=>instance.controller.move(n.id,s==='archived'?'restore':'archive'));
-        cardAction(actions,t('delete'),()=>instance.controller.move(n.id,'trash'),'danger');
+        cardAction(secondary,'★',()=>instance.controller.toggle(n.id,'favorite'));
+        cardAction(secondary,'📌',()=>instance.controller.toggle(n.id,'pinned'));
+        cardAction(secondary,t('copyTxt'),()=>copyExport(n,'txt'));
+        cardAction(secondary,t('copyMd'),()=>copyExport(n,'md'));
+        cardAction(secondary,t('undo'),()=>instance.controller.history(n.id,'undo'));
+        cardAction(secondary,t('redo'),()=>instance.controller.history(n.id,'redo'));
+        cardAction(secondary,s==='archived'?t('restore'):t('archiveIt'),()=>instance.controller.move(n.id,s==='archived'?'restore':'archive'));
+        cardAction(secondary,t('delete'),()=>instance.controller.move(n.id,'trash'),'danger');
       }
       if(s!=='trash'){
-        if(instance.adapter.openCalendarForNote)cardAction(actions,'📅',()=>instance.adapter.openCalendarForNote(n.id));
-        if(instance.adapter.pickNoteLinkTarget)cardAction(actions,t('link'),()=>{
+        if(instance.adapter.openCalendarForNote)cardAction(secondary,'📅',()=>instance.adapter.openCalendarForNote(n.id));
+        if(instance.adapter.pickNoteLinkTarget)cardAction(secondary,t('link'),()=>{
           const target=instance.adapter.pickNoteLinkTarget(n.id,instance.controller.read().notesList);
           if(target!==null&&target!==undefined)instance.controller.link(n.id,target);
         });
-        if(instance.adapter.pickTaskLinkTarget)cardAction(actions,'↗ '+t('task'),()=>{
+        if(instance.adapter.pickTaskLinkTarget)cardAction(secondary,'↗ '+t('task'),()=>{
           const target=instance.adapter.pickTaskLinkTarget(n.id,instance.controller.read().tasksList);
           if(target!==null&&target!==undefined)instance.controller.linkTask(n.id,target);
         });
         if(instance.adapter.confirmTaskExtraction && instance.adapter.commitBoth)
-          cardAction(actions,t('task'),()=>{
+          cardAction(secondary,t('task'),()=>{
             const state=instance.controller.read();const c=instance.controller.one(n.id,state.notesList);
             if(instance.adapter.confirmTaskExtraction(n.id,c)===true)instance.controller.extract(n.id);
           });
       }
-      card.appendChild(actions);box.appendChild(card);
+      card.appendChild(actions);
+      if(secondary.children.length){
+        const overflow=el('details','nsux-more');
+        overflow.appendChild(el('summary','',t('more')));
+        overflow.appendChild(secondary);card.appendChild(overflow);
+      }
+      box.appendChild(card);
     });
-    if(offset+result.items.length<result.total)button(box,'More / المزيد',()=>{instance.page++;renderStack();});
+    if(offset+result.items.length<result.total)button(box,t('more'),()=>{instance.page++;renderStack();});
     return true;
   }
   function showReader(n){
@@ -508,6 +589,14 @@
     document.activeElement?.blur?.();
     preview.hidden=false;
     renderText(preview,n.body||'','');
+    const headings=[...preview.querySelectorAll('h4')];
+    if(headings.length>1){
+      const toc=el('nav','nsux-toc');
+      toc.setAttribute('aria-label',t('contents'));
+      toc.appendChild(el('strong','',t('contents')));
+      headings.forEach(h=>button(toc,h.textContent,()=>h.scrollIntoView?.({block:'nearest'})));
+      preview.prepend(toc);
+    }
     const ext=n.notesV21||{};
     if(ext.cornell){
       [['cues',t('question')],['notes',t('explain')],['summary',t('summary')]].forEach(([k,label])=>{
@@ -522,8 +611,17 @@
     const links=Array.isArray(ext.links)?ext.links:[];
     if(links.length){preview.appendChild(el('h4','',t('linked')));links.forEach(id=>{
       const target=instance.controller.read().notesList.find(x=>x?.id===id);
-      if(target)button(preview,target.title,()=>showReader(target));
+      if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
+      else preview.appendChild(el('p','nsux-meta',t('missing')+' #'+id));
     });}
+    const backlinks=instance.controller.backlinks(n.id);
+    if(backlinks.length){
+      preview.appendChild(el('h4','',t('linked')));
+      backlinks.forEach(id=>{
+        const target=instance.controller.read().notesList.find(x=>x?.id===id);
+        if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
+      });
+    }
     if(Array.isArray(ext.taskLinks))ext.taskLinks.forEach(id=>{
       const target=instance.controller.read().tasksList.find(x=>x&&x.id===id);
       if(target)preview.appendChild(el('p','',t('task')+': '+target.title));
@@ -557,6 +655,7 @@
     if(kind==='cornell'){instance.fields.cues.value='';instance.fields.notes.value='';instance.fields.summary.value='';}
     showType();
   }
-  return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,findOccurrences,renderText,
+  return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,checklistProgress,serializeNote,
+    draftVersionMatches,findOccurrences,renderText,openedFingerprint:()=>instance?.openedSnapshot??null,
     install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader});
 });
