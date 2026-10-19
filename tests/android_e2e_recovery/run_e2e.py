@@ -22,7 +22,7 @@ CASES = [
     ("dialog_back", "read"), ("touch_scroll", "read"),
     ("western_numerals", "read"), ("accessibility_smoke", "read"),
     ("notes_create_edit", "write"), ("tasks_create", "write"),
-    ("task_subtasks", "manual"), ("save_failure", "manual"),
+    ("task_subtasks", "write"), ("save_failure", "manual"),
     ("copy_export", "write"), ("language_live_change", "write"),
     ("timer_start_pause", "write"), ("completion_notification", "slow"),
     ("process_death_recovery", "write"), ("orientation_restore", "system"),
@@ -253,6 +253,23 @@ class Suite:
         self.d.input(("Add study", "Add task", "إضافة مهمة"), self.task)
         self.d.key(66)  # Enter is a documented createNewTask() shortcut
         self.d.see(self.task)
+
+    def case_task_subtasks(self):
+        if not self.task:
+            raise NotTested("Requires successful tasks_create")
+        self.d.nav("Tasks", "المهام")
+        self.d.see(self.task)
+        self.d.tap("Details", "تفاصيل")
+        self.d.tap("＋ Subtasks", "＋ Subtask", "Subtasks", "مهام فرعية")
+        child = self.marker + "Child"
+        # Native JavaScript prompt: a real Android system dialog, not a direct JS API.
+        self.d.type_ascii(child)
+        self.d.key(66)
+        self.d.see(child)
+        self.d.restart()
+        self.d.nav("Tasks", "المهام")
+        self.d.tap("Details", "تفاصيل")
+        self.d.see(child)
 
     def case_copy_export(self):
         if not self.note:
