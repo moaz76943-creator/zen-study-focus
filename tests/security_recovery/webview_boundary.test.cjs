@@ -18,9 +18,9 @@ test('WebView blocks universal/file URL access and release-build debugging',()=>
   assert.match(main,/setAllowFileAccessFromFileURLs\(false\)/);
   assert.match(main,/setAllowUniversalAccessFromFileURLs\(false\)/);
   assert.match(main,/setAllowContentAccess\(false\)/);
-  assert.match(main,/ApplicationInfo\\.FLAG_DEBUGGABLE/);
-  assert.match(main,/setWebContentsDebuggingEnabled\\(debuggableBuild\\)/);
-  assert.doesNotMatch(main,/setWebContentsDebuggingEnabled\\(true\\)/);
+  assert.ok(main.includes('ApplicationInfo.FLAG_DEBUGGABLE'), 'Release must not expose WebView DevTools');
+  assert.ok(main.includes('setWebContentsDebuggingEnabled(debuggableBuild)'), 'DevTools must require debuggable app flag');
+  assert.ok(!main.includes('setWebContentsDebuggingEnabled(true)'), 'Unconditional debugging is forbidden');
   // Only disposable DEBUG builds may expose DevTools; release flags disable it.
 
 });
