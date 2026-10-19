@@ -222,6 +222,27 @@
     if(typeof raw!=='string'||raw.length>20000)throw Error('Design JSON exceeds safe limit');
     return studio.validateConfig(JSON.parse(raw));
   }
+  function makeLocalDraft(config,baseline,at){
+    const safeConfig=studio.validateConfig(config);
+    const safeBaseline=studio.validateConfig(baseline);
+    if(typeof at!=='string'||at.length!==24||!Number.isFinite(Date.parse(at))||!at.endsWith('Z'))
+      throw Error('Timestamp must be ISO UTC');
+    const json=JSON.stringify({schema_version:1,source:'control-center-local-draft',
+      saved_at:at,baseline:safeBaseline,config:safeConfig});
+    if(json.length>20000)throw Error('Local design draft exceeds limit');
+    return json;
+  }
+  function readLocalDraft(raw,baseline){
+    if(typeof raw!=='string'||raw.length>20000)throw Error('Invalid local draft size');
+    const parsed=JSON.parse(raw);
+    if(!object(parsed)||parsed.schema_version!==1||parsed.source!=='control-center-local-draft'||
+       typeof parsed.saved_at!=='string'||!Number.isFinite(Date.parse(parsed.saved_at))||
+       parsed.saved_at.length!==24||!parsed.saved_at.endsWith('Z'))
+       throw Error('Unrecognized design draft');
+    const original=studio.validateConfig(parsed.baseline),expected=studio.validateConfig(baseline);
+    if(configDiff(original,expected).length!==0)throw Error('Baseline has changed; re-import a reviewed design instead');
+    return {config:studio.validateConfig(parsed.config),saved_at:parsed.saved_at};
+  }
   function configDiff(oldConfig,newConfig){
     const old=studio.validateConfig(oldConfig),next=studio.validateConfig(newConfig),result=[];
     for(const key of Object.keys(old.theme)){
@@ -238,5 +259,5 @@
   return {unifiedSearch,shortcut,taskView,sortTasks,tasksCSV,areaMetrics,
     releaseChecklist,ciTrend,failedRuns,stalePulls,filterPulls,filterFindings,
     auditFreshness,validateSnapshot,normalizeOfflineSnapshot,compareSnapshots,THEMES,applyThemePreset,
-    createHistory,historyPush,historyUndo,historyRedo,resetScreen,importConfig,configDiff};
+    createHistory,historyPush,historyUndo,historyRedo,resetScreen,importConfig,configDiff,makeLocalDraft,readLocalDraft};
 });
