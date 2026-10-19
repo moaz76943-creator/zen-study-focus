@@ -28,6 +28,28 @@ class ParserTests(unittest.TestCase):
         self.assertFalse(mod.BANNED_DIGITS.search("25:00 2026 100%"))
         self.assertTrue(mod.BANNED_DIGITS.search("٢٥:۰۰"))
 
+    def test_uiautomator_process_failure_is_unverified_environment_not_app_fail(self):
+        device = mod.Device("emulator-test")
+        device.shell = lambda *args, **kwargs: (_ for _ in ()).throw(
+            mod.CheckFailed("ADB command failed (shell uiautomator dump): "))
+        with self.assertRaises(mod.NotTested):
+            device.dump()
+
+    def test_hierarchy_failure_blocks_followup_without_fabricated_failures(self):
+        from types import SimpleNamespace
+        class Unavailable:
+            def shell(self, *args, **kwargs): return "package:com.zenstudy.focus"
+            def launch(self): pass
+            def dump(self): raise mod.NotTested("UIAutomator hierarchy unavailable in emulator")
+        suite = mod.Suite(Unavailable(), SimpleNamespace(
+            ack_disposable_data=True, run_slow=True, allow_rotation=True))
+        suite.test("preflight", "read")
+        suite.test("navigation", "read")
+        suite.test("notes_create_edit", "write")
+        self.assertEqual([r["status"] for r in suite.records],
+                         ["NOT_TESTED","NOT_TESTED","NOT_TESTED"])
+        self.assertTrue(all("UIAutomator" in r["detail"] for r in suite.records))
+
     def test_cases_are_unique_and_restricted_paths_explicit(self):
         ids=[x[0] for x in mod.CASES]
         self.assertEqual(len(ids),len(set(ids)))
