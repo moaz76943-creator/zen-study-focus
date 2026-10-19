@@ -148,7 +148,7 @@
     if(name)apply(s=>C.createProject(s,{name},{noteIds:adapter.noteIds?.()}));
    }),btn(l.undo,undo),btn(l.redo,redo));head.appendChild(buttons);content.appendChild(head);
    const quick=el('form','df-quick'),quickText=input('text',''),add=btn('＋ '+l.add,()=>{},'df-primary');quickText.placeholder=l.quick;quickText.maxLength=20000;quickText.setAttribute('aria-label',l.quick);add.type='submit';append(quick,quickText,add);
-    quick.addEventListener('submit',event=>{event.preventDefault();if(!quickText.value.trim())return;apply(x=>C.createTask(x,{title:quickText.value},{noteIds:adapter.noteIds?.()}));});content.appendChild(quick);
+    quick.addEventListener('submit',event=>{event.preventDefault();if(!quickText.value.trim())return;apply(x=>C.createTask(x,{title:quickText.value},{noteIds:adapter.noteIds?.(),today:currentDay()}));});content.appendChild(quick);
     if(editing!==null)content.appendChild(editor());
    const today=el('section','df-panel'),top=el('h3','',l.today);today.appendChild(top);
    const top3=C.topThree(state,currentDay());if(!top3.length)today.appendChild(el('p','df-muted',l.empty));else{const pinned=el('div','df-top-list');top3.forEach(t=>pinned.appendChild(btn('★ '+t.title,()=>{expanded.add(t.id);view='all';render();})));today.appendChild(pinned);}
