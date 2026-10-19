@@ -21,7 +21,7 @@ test('all interactive workbench controls exist with unique HTML IDs',()=>{
  const controls=['v3-workbench','v3-search','v3-search-results','v3-task-view','v3-task-sort','v3-task-export',
  'v3-task-results','v3-area-metrics','v3-ci-trend','v3-ci-failures','v3-pr-filter','v3-pr-search',
  'v3-prs','v3-release-gates','v3-risk-filter','v3-audit-freshness','v3-risks','v3-snapshot-import',
- 'v3-snapshot-result','v3-theme-preset','v3-undo','v3-redo','v3-reset-screen','v3-design-import','v3-design-diff','v3-design-status'];
+ 'v3-snapshot-result','v3-use-offline','v3-return-live','v3-offline-state','v3-theme-preset','v3-undo','v3-redo','v3-reset-screen','v3-design-import','v3-design-diff','v3-design-status','v3-draft-save','v3-draft-restore','v3-draft-clear','v3-draft-status'];
  for(const name of controls)assert.equal((html.match(new RegExp('id="'+name+'"','g'))||[]).length,1,'Control '+name);
 });
 test('script ordering ensures both existing read-only bridges before v3 boot',()=>{
@@ -45,7 +45,9 @@ test('imports are capped and require valid model before replacing design',()=>{
  assert.match(ui,/studio\.applyConfig\(next\)/);
 });
 test('all workflow-lifecycle and release-critical data actions remain outside v3',()=>{
- assert.doesNotMatch(ui,/localStorage|zen_fortress_cfg_v21|ZEN21::|signingConfig|updateRef|forcePush/);
+ assert.doesNotMatch(ui,/zen_fortress_cfg_v21|ZEN21::|signingConfig|updateRef|forcePush/);
+ assert.match(ui,/df_control_center_design_draft_v1/);
+ assert.doesNotMatch(ui,/setItem\s*\(\s*['"](?:zen_|ZEN)/);
  assert.match(html,/لا توجد خاصية هنا تُغيّر بيانات مستخدمي التطبيق/);
 });
 test('mobile controls and focus affordances retain responsive layout',()=>{
