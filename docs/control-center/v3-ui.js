@@ -168,7 +168,41 @@
     }):[text('div','لا تغييرات معلقة على الإعدادات الأساسية.')]);
     status('v3-design-status',differences.length+' خاصية معدلة (مرحلة معاينة، ليست إصدارًا منشورًا).');
   }
+  const DRAFT_KEY='df_control_center_design_draft_v1';
+  function deviceStorage(){
+    if(typeof localStorage==='undefined')throw Error('Browser storage is not available');
+    return localStorage;
+  }
+  function bindDrafts(){
+    $('v3-draft-save').addEventListener('click',()=>{
+      try{
+        const state=studio.getState();
+        if(!state)throw Error('Design editor is not ready');
+        const json=ops.makeLocalDraft(state.current,state.baseline,new Date().toISOString());
+        deviceStorage().setItem(DRAFT_KEY,json);
+        status('v3-draft-status','تم حفظ مسودة التصميم في متصفح هذا الجهاز فقط. لا تعدّل التطبيق المثبت.');
+      }catch(e){status('v3-draft-status','تعذر الحفظ المحلي: '+e.message);}
+    });
+    $('v3-draft-restore').addEventListener('click',()=>{
+      try{
+        const state=studio.getState();
+        if(!state)throw Error('Design editor is not ready');
+        const raw=deviceStorage().getItem(DRAFT_KEY);
+        if(!raw)throw Error('No draft stored on this device');
+        const result=ops.readLocalDraft(raw,state.baseline);
+        studio.applyConfig(result.config);
+        status('v3-draft-status','استُعيدت المسودة إلى المعاينة فقط؛ لم تُرسل أي بيانات إلى GitHub.');
+      }catch(e){status('v3-draft-status','تعذرت الاستعادة: '+e.message);}
+    });
+    $('v3-draft-clear').addEventListener('click',()=>{
+      try{
+        deviceStorage().removeItem(DRAFT_KEY);
+        status('v3-draft-status','حُذفت المسودة المحفوظة من المتصفح فقط. المعاينة الحالية لم تتغير.');
+      }catch(e){status('v3-draft-status','تعذر الحذف: '+e.message);}
+    });
+  }
   function bindEvents(){
+    bindDrafts();
     $('v3-search').addEventListener('input',renderSearch);
     document.addEventListener('keydown',e=>{
       const key=ops.shortcut(e);
