@@ -64,7 +64,7 @@ assert.equal(evaluate('localDateISO(new Date(2026, 9, 18, 12))'),'2026-10-18');
 assert.equal(evaluate('cfg.sessions'),0,'New install must not have invented sessions');
 assert.equal(evaluate('cfg.todayMins'),0,'New install must not have invented time');
 // Completed focus counts once and only once.
-evaluate("selectTimerMode(1,'focus',null); toggleTimerPlay(); timerTargetTime = Date.now()-1000; runTimerTick();");
+evaluate("selectTimerMode(1,'focus',null); toggleTimerPlay(); timerActiveMs = 60000; timerTargetTime = Date.now()-1000; runTimerTick();");
 assert.equal(evaluate('cfg.sessions'),1);
 assert.equal(evaluate('cfg.todayMins'),1);
 assert.equal(evaluate('cfg.sessionHistory.length'),1);
@@ -74,6 +74,11 @@ assert.equal(evaluate('cfg.sessions'),1,'Duplicate finish must not credit twice'
 evaluate("selectTimerMode(1,'short',null); toggleTimerPlay(); timerTargetTime = Date.now()-1000; runTimerTick();");
 assert.equal(evaluate('cfg.sessions'),1);
 assert.equal(evaluate('cfg.todayMins'),1);
+evaluate("selectTimerMode(1,'focus',null); timerSessionId='measured-20-sec'; timerActiveMs=20000; creditCompletedSession()");
+assert.equal(evaluate('cfg.todayMins'),1,'Twenty seconds must not earn a fictional minute');
+const afterShort=evaluate('cfg.sessionHistory.length');
+evaluate("cfg.completedTimerIds=[]; creditCompletedSession()");
+assert.equal(evaluate('cfg.sessionHistory.length'),afterShort,'Full ledger blocks duplicate event after the rolling-ID cache is lost');
 // User data containing HTML is displayed as text, not executable markup.
 assert.equal(evaluate('escapeHtmlText("<img src=x onerror=alert(1)>")'),
   '&lt;img src=x onerror=alert(1)&gt;');
