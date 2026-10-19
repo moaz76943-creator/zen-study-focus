@@ -129,3 +129,35 @@ The source-of-truth machine-readable list is feature-manifest-v3.json. Implement
 V3 tests cover all F01–F20 behavioral contracts, bound/invalid input cases, HTML contract and mobile CSS presence, plus simulated DOM interactions (NOT a physical browser/Android WebView). The existing GitHub Actions audit workflow runs these suites and publishes explicit PASS/FAIL and NOT_TESTED status. A successful source run is not proof of production device QA or user backup restoration.
 
 **Limits:** Only listed cosmetic properties can be changed through the no-code design controls. Modifying behavior of an arbitrary Android screen still requires a scoped agent request/PR and code review; arbitrary code execution from the dashboard is prohibited. The control panel is not automatically available at a web URL until GitHub Pages has been set up and source changes have been reviewed and merged into the proper branch.
+
+## Reliability and mobile-use hardening
+
+This follow-up closes concrete gaps in v3 without merging PR #37 or modifying the runtime storage model.
+
+### QA automation paths verified
+
+- The previously broken UI agent wildcard tests/design_quality/*.cjs now points to real tests/white_premium_qa/*.test.cjs, alongside tests/interaction_recovery/*.test.cjs.
+- Agent handoffs for Timer and Calendar now cite actual test suites instead of nonexistent folders.
+- qa_lane_integrity.test.cjs checks every screen file, all referenced screen test directories and every test file/wildcard used in the QA workflow. This is CI-enforced to catch future dead links before invocation.
+
+### Offline/rate-limit resilience
+
+- If public GitHub API queries fail, the dashboard retains last-known verified results for the SAME source SHA and labels them stale/partial. A newer SHA never inherits old task counts.
+- Empty recovery ledgers are not treated as a fresh zero-defect report.
+- Exported reports explicitly carry source_stale alongside SHA and partial-source errors.
+- The risk/snapshot panel now lets the user import a prior exported project JSON, view the imported tasks, PRs and CI in clearly labeled LOCAL (NOT LIVE) mode, then explicitly return to live GitHub data.
+- Imported snapshots are schema-limited, reject invalid task statuses, foreign URLs, duplicate IDs and oversized text. Bundled audit reports from such files are NOT elevated to trusted release or QA evidence.
+
+### Recover staged visual changes on the phone
+
+- Save, Restore and Delete browser draft controls are explicit opt-in, not automatic. A browser may deny local storage; the page reports that error and JSON export remains available.
+- Only the allowlisted appearance config, its baseline and a timestamp are kept under the separate developer-dashboard browser key: df_control_center_design_draft_v1.
+- The restore path checks version, size, all settings and baseline identity. When default settings change, an older draft is rejected rather than overriding upstream changes.
+- The saved draft contains no auth tokens, app notes, user tasks or Android v21 storage values.
+- Deleting a local draft does not delete application content or the currently previewed design.
+
+### Verification
+
+Run node --test tests/control_center/*.test.cjs, node tools/control_center/generate_style.cjs --check and node --check docs/control-center/v3-ui.js. CI also runs the static repository audit, which does not replace on-device Android QA, media license checking or owner release approval.
+
+PR #37 is still a stacked draft on recovery PR #25. GitHub Pages hosting and default-branch issue/dispatch automation remain unconfirmed until review/merge.
