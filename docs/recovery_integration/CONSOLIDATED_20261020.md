@@ -23,3 +23,13 @@ Authoritative source: PR #43 to recovery integration PR #25, based on PR #42. Th
 - Real phone backup/recovery, 20 rendered locales, user touch paths, notifications/DND/Bluetooth, manual audio listening and human sign-off remain required.
 
 **Do not remove the failing media gate, fabricate Android PASS, auto-release, force-push, or change v21 user storage.** Separate overlapping old drafts are retained for provenance; do not bulk merge superseded patches into the current native tree.
+
+## Additional exact-SHA QA (20 October 2026)
+- Android WebView DevTools is enabled only when `ApplicationInfo.FLAG_DEBUGGABLE` is set; release APKs keep debugging off. Security source tests were adjusted to assert this gated behavior, not globally forbid debugging in disposable test builds.
+- A read-only CDP probe checks real Android WebView DOM (timer section, visible start/pause button, JS handlers and bundled file origin). It does **not** exercise touchscreen, audio or data writes.
+- The first emulator CI attempt at `55667ac3a355f77799f5bffda9f07c644ea82e25` did **not reach the application**. Runner log: `Error on ZipFile unknown archive` during Android Emulator package preparation, followed by ADB TCP port 5554 connection refused. Classify **NOT_TESTED (emulator infrastructure)**, never app FAIL or PASS. Evidence: https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39330512276.
+- The first full source run at that SHA failed exactly one outdated `tests/security_recovery/webview_boundary.test.cjs` assertion expecting debug disabled for every build. This has been corrected to require release-only restriction; new exact-SHA CI verification is required.
+- Expensive emulator runs are now manual-only while Android SDK download/bootstrap is broken; source CI continues automatically. No sign-off on Android functionality or UI defects is implied.
+
+## Integration acceptance
+Only merge this reviewed consolidation into the **draft source branch of PR #25**, not `main`, when its exact final SHA source/Gradle CI is green. Keep PR #25 draft. Do not auto-merge any overlapping old draft PRs; legacy branches may contain superseded data and unlicensed media. Release remains blocked by media rights and real-device QA.
