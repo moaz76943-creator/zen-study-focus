@@ -116,3 +116,23 @@ test('note-to-task links use separate numeric namespaces and preserve task data'
  assert.throws(()=>ctl.linkTask(7,'7'),/INVALID_TASK_ID/);
  assert.throws(()=>ctl.linkTask(7,999),/TASK_NOT_FOUND/);
 });
+
+test('checklist toggles stay in plain text with no implicit task completion',()=>{
+ const pending='☐ Study\n☑ Review';
+ const done=UI.toggleChecklistLine(pending,2);
+ assert.equal(done.changed,true);assert.equal(done.text,'☑ Study\n☑ Review');
+ assert.equal(UI.toggleChecklistLine(done.text,10).text,pending);
+ assert.equal(UI.toggleChecklistLine('ordinary paragraph',2).changed,false);
+});
+test('large notes preview is bounded without modifying the source',()=>{
+ const previous=global.document;
+ const node=tag=>({tag,children:[],appendChild(x){this.children.push(x);},replaceChildren(...x){this.children=x;}});
+ try{
+  global.document={createElement:node,createTextNode:text=>({text})};
+  const raw=new Array(600).fill('line').join('\n');
+  const root=node('div');UI.renderText(root,raw,'');
+  assert.equal(root.children.length,401);
+  assert.ok(root.children[400].textContent.includes('400'));
+  assert.equal(raw.split('\n').length,600);
+ }finally{if(previous===undefined)delete global.document;else global.document=previous;}
+});
