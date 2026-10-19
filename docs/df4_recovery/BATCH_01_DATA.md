@@ -13,3 +13,7 @@ Results: 62/62 focused Node tests PASS; smoke PASS; syntax/diff PASS. Fault inje
 Baseline: 302/304 Node tests PASS (two pre-existing media provenance failures), 30 Python tests PASS, legacy smoke PASS. No release gate weakened.
 
 Android: NOT_TESTED (no adb/device). Remaining: native boundary, legacy restore crash handling, broader legacy/Studio writers, full-language error messages, hardware durability. No DF task closed, no production approval.
+
+## Follow-up — live backup restore journal
+
+The live legacy backup entry now calls the existing DF22Integration.write before publishing imported records, so process interruption uses the same durable journal and explicit startup recovery as the studios. Standalone legacy smoke hosts without the integration adapter retain their original verified-write fallback. New tests execute actual data_compat and integration modules plus the shipped validator/restore function: successful six-packet restore, failed mirror write rollback with unchanged memory/bytes, and duplicate rejection before any write: 3/3 PASS. Existing smoke PASS. No new backup format or schema. Physical process-kill/storage-full recovery remains NOT_TESTED.
