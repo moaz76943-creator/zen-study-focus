@@ -1141,12 +1141,27 @@ function changeTimerDelta(deltaMins) {
   if (timerLeft > timerTotal) timerTotal = timerLeft;
   if (timerRunning) {
     timerTargetTime = Date.now() + (timerLeft * 1000);
-    if (window.ZenNative && window.ZenNative.startBackgroundService) {
-      window.ZenNative.startBackgroundService(timerLeft, document.getElementById('timerModeCaption').textContent);
-    }
+    startNativeTimerForCurrentSession(timerLeft, document.getElementById('timerModeCaption').textContent);
   }
   storeTimerSession();
   updateTimerDisplay();
+}
+
+// Native service uses exactly the same existing session identity and phase as v21.
+// Retain the old two-argument bridge when an installed Android host is older.
+function startNativeTimerForCurrentSession(seconds, title) {
+  const bridge = window.ZenNative;
+  if (!bridge) return;
+  try {
+    if (typeof bridge.startBackgroundSession === 'function' && timerSessionId) {
+      bridge.startBackgroundSession(seconds, title, timerSessionId, currentTimerModeKey);
+    } else if (typeof bridge.startBackgroundService === 'function') {
+      bridge.startBackgroundService(seconds, title);
+    }
+  } catch (_) {
+    // The WebView timer remains active; Android foreground-service refusal is
+    // an explicit platform limitation, not a fabricated completion.
+  }
 }
 
 function toggleTimerPlay() {
@@ -1182,9 +1197,7 @@ function toggleTimerPlay() {
     timerTargetTime = timerResumeMs + (timerLeft * 1000);
     storeTimerSession();
 
-    if (window.ZenNative && window.ZenNative.startBackgroundService) {
-      try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch(e){}
-    }
+    startNativeTimerForCurrentSession(timerLeft, activeTitle);
 
     timerInterval = setInterval(runTimerTick, 500);
   }
