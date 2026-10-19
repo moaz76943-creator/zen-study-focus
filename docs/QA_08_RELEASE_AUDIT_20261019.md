@@ -16,7 +16,7 @@ Ownership: only tests/integration_quality/, tests/regression_v21/ and this QA do
 | PR #5 / 02 notes engine | 3ca96d32b622b1085a9809a985354dff073ed83c | Draft, not integrated |
 | PR #6 / 05 analytics | 098087e979def1e9930ba5ef69f9e3212054d2fc | Draft, not integrated |
 | 01 data contract | de74a86627ad0762d26b98752068db311afccb6c | independent branch, not integrated |
-| 03 Notes UX | 460ba40f1fa9144adec87953d1d4b30abcf52d36 | working branch; no open PR as inspected |
+| PR #7 / 03 Notes UX | 50f1a8f939df9386b03a21817ec048c0c4d11239 | Draft; newly opened while QA work proceeded, not integrated |
 
 Reviewed: PR changed-file lists; branch contracts and module tests; baseline index.html, app.js, notes_studio.js, notes_drafts.js, AndroidManifest.xml, build.gradle, build_apk.yml, smoke_app.cjs, design roadmap.
 
@@ -36,7 +36,7 @@ Reviewed: PR changed-file lists; branch contracts and module tests; baseline ind
 |---|---|---|---|---|---|
 | 01 data compat | Yes | No | Partial PASS | BLOCKED | NOT_TESTED |
 | 02 notes core | Yes | No | Partial PASS | BLOCKED, depends on 03 | NOT_TESTED |
-| 03 Notes UX | In progress | New UX not integrated | NOT_TESTED | BLOCKED | NOT_TESTED |
+| 03 Notes UX | Draft PR #7 | New UX not integrated | Isolated lane test claims, not independently accepted | BLOCKED | NOT_TESTED |
 | 04 tasks/calendar | Yes | No | Partial PASS | BLOCKED | NOT_TESTED |
 | 05 analytics | Yes | No | Partial PASS | BLOCKED | NOT_TESTED |
 | 06 focus/goals/sounds | Yes | Enhancements not integrated | Partial PASS | BLOCKED | NOT_TESTED |
@@ -71,8 +71,8 @@ After the modules are merged, run Node test runner on tests/regression_v21/*.tes
 
 ## Required lane 00 actions, prioritized
 
-1. P0 release blocker: do not integrate Notes UX until lane 03 completes and hands off; never edit lane 03 branch in QA.
-2. P0 safety blocker on integrating 01: inspect pending migration journal BEFORE app.js writes; explicitly quiesce v21 autosave/timer writers during migration; require consent and retain rollback. The current app.js performs v21 storage writes and cannot be assumed journal-aware.
+1. P0 release blocker: review PR #7 and its tests/notes_ui/INTEGRATION.md contract, but do not merge unfinished Notes UX or edit its branch in QA. Its adapter needs a verified journal-aware commitNotes and atomic commitBoth for task extraction; old saveFortressData swallows write failures and cannot acknowledge durable saves.
+2. P0 safety blocker on integrating 01: inspect pending migration journal BEFORE app.js writes; explicitly quiesce v21 autosave/timer writers during migration; require consent and retain rollback. Data contract commitPlan is for migration/restore, NOT an arbitrary note-edit transaction. All existing note writers must share a verified edit protocol before activating PR #7.
 3. P1: merge exact verified branches with file ownership. Wire JS dependencies into index.html in order, and connect real user-facing UI calls (not merely script tags). Preserve numeric note/task IDs and all v21 storage keys.
 4. P1: run QA tests at the final merged SHA and ensure the 00-owned workflow actually runs them. Current baseline workflow triggers on PRs to main and does not automatically test these draft feature PRs to recovery.
 5. P1: complete A-H UI workflows, 320/360/393/430 widths, Arabic RTL/English LTR, 20 locales, long notes, mobile keyboard, XSS, quota, TalkBack and offline WebView checks.
