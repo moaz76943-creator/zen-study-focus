@@ -87,7 +87,7 @@ test('separate locale module covers all 20 languages and all new UI labels', () 
     const row=api.translations[lang];
     assert.deepEqual(Object.keys(row).sort(), keys,lang+' keys differ');
     assert.ok(keys.every(k=>typeof row[k]==='string' && row[k].trim().length>0), lang+' has empty values');
-    assert.ok(keys.filter(k=>row[k]!==api.translations.en[k]).length>=8,lang+' has suspicious English fallback');
+    if(lang !== 'en') assert.ok(keys.filter(k=>row[k]!==api.translations.en[k]).length>=8,lang+' has suspicious English fallback');
     assert.equal(api.t(lang,'start'),row.start);
   }
   assert.equal(api.dir('ar'),'rtl');
