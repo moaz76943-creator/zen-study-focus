@@ -189,6 +189,21 @@ class Suite:
             if not self.args.ack_disposable_data:
                 raise NotTested("Notification permission prompt requires a disposable test profile")
             self.d.tap(*allow_ids)
+            nodes = self.d.dump()
+        # UIAutomator can expose a WebView container without its HTML descendants.
+        # An empty tree is insufficient evidence that a timer control is broken.
+        # Do not relabel observed failures that DO expose app accessibility content.
+        has_webview = any(n.get("class", "").endswith("WebView") for n in nodes)
+        accessible_app_text = any(
+            n.get("package") == PACKAGE and
+            ((n.get("text") or "").strip() or (n.get("content-desc") or "").strip())
+            for n in nodes
+        )
+        if has_webview and not accessible_app_text:
+            raise NotTested(
+                "WebView HTML descendants not exposed in Android UIAutomator; "
+                "timer UI is unverified, inspect screenshot or instrumented DOM"
+            )
         self.d.see("Start or pause timer")
 
     def case_navigation(self):
