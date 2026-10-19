@@ -2,11 +2,10 @@
 <html lang="en" dir="ltr" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Deep Focus - v21 Ultimate Edition</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <!-- Offline-first: system typefaces, no remote Google Fonts stylesheet/preconnect. -->
   <style>
     :root {
       --bg-sheet: #fbfdff;
@@ -37,7 +36,7 @@
 
     * {
       box-sizing: border-box; margin: 0; padding: 0;
-      font-family: 'Inter', 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Noto Sans', 'Noto Sans Arabic', sans-serif;
       font-variant-numeric: tabular-nums lining-nums;
       -webkit-tap-highlight-color: transparent;
     }
@@ -637,9 +636,10 @@
   <link rel="stylesheet" href="design_tokens_v22.css">
   <link rel="stylesheet" href="ui_components_v22.css">
   <link rel="stylesheet" href="design_recovery/white_premium_recovery10.css">
-  <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
-  <!-- Generated cosmetic settings; no app state or logic changes. -->
+  <link rel="stylesheet" href="completion_alert_settings.css">
+  <!-- Allowlisted cosmetic design overrides; no user data or app behavior changes. -->
   <link rel="stylesheet" href="control_center_overrides.css">
+  <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
 </head>
 <body>
 
@@ -984,10 +984,10 @@
         </div>
 
         <div class="segmented-pills-bar">
-          <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All (12)</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">Water & Rain 🌧️</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">Forest & Wind 🌲</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
+          <button class="seg-pill active" data-sound-category="all" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All (12)</button>
+          <button class="seg-pill" data-sound-category="water" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">Water & Rain 🌧️</button>
+          <button class="seg-pill" data-sound-category="forest" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">Forest & Wind 🌲</button>
+          <button class="seg-pill" data-sound-category="warm" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
         </div>
 
         <div class="sounds-photo-grid" id="soundsGridBox"></div>
@@ -1242,8 +1242,10 @@
   <script src="localization_20_recovery.js"></script>
   <script src="analytics_recovery_core.js"></script>
   <script src="analytics_recovery_ui.js"></script>
+  <script src="analytics_recovery_ar_locale.js"></script>
   <script src="interaction_recovery_06.js"></script>
   <script src="completion_alert_settings.js"></script>
+  <script src="completion_alert_locales.js"></script>
   <script src="locale_premium_v22.js"></script>
   <script src="goals_studio.js"></script>
   <script src="timer_settings.js"></script>

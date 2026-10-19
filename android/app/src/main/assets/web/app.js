@@ -305,6 +305,9 @@ function localDateISO(date = new Date()) {
     String(date.getDate()).padStart(2, '0')
   ].join('-');
 }
+// Display-only additions to the existing canonical dictionaries; never persisted.
+Object.entries({"en": "No reviewed recordings are available in this category yet.", "ar": "لا توجد تسجيلات مكتملة المراجعة في هذه الفئة حاليًا.", "es": "Todavía no hay grabaciones revisadas en esta categoría.", "zh": "此分类暂无审核完成的录音。", "hi": "इस श्रेणी में अभी कोई समीक्षा की गई रिकॉर्डिंग उपलब्ध नहीं है।", "fr": "Aucun enregistrement validé dans cette catégorie pour le moment.", "de": "In dieser Kategorie sind noch keine geprüften Aufnahmen verfügbar.", "ru": "В этой категории пока нет проверенных записей.", "pt": "Ainda não há gravações revisadas nesta categoria.", "ja": "このカテゴリには審査済みの録音がまだありません。", "id": "Belum ada rekaman yang telah ditinjau dalam kategori ini.", "tr": "Bu kategoride henüz incelemesi tamamlanmış kayıt yok.", "ko": "이 카테고리에는 아직 검토가 완료된 녹음이 없습니다.", "vi": "Danh mục này chưa có bản ghi âm đã được kiểm duyệt.", "it": "Non ci sono ancora registrazioni verificate in questa categoria.", "bn": "এই বিভাগে এখনো পর্যালোচিত কোনো রেকর্ডিং নেই।", "ur": "اس زمرے میں ابھی جانچ شدہ ریکارڈنگ دستیاب نہیں ہے۔", "fa": "هنوز ضبط بررسی‌شده‌ای در این دسته موجود نیست.", "pl": "W tej kategorii nie ma jeszcze sprawdzonych nagrań.", "nl": "In deze categorie zijn nog geen gecontroleerde opnamen beschikbaar."}).forEach(([locale,text]) => { DICT[locale].natureNoApproved = text; });
+
 let todayISO = localDateISO();
 function escapeHtmlText(value) {
   return String(value === null || value === undefined ? '' : value)
@@ -581,8 +584,7 @@ function validateImportedBackup(raw) {
   if (!raw.cfg || typeof raw.cfg !== 'object' || Array.isArray(raw.cfg)) return null;
   if (!Array.isArray(raw.tasksList) || !Array.isArray(raw.notesList)) return null;
   if (raw.tasksList.length > 10000 || raw.notesList.length > 10000) return null;
-  const safeRecordId = id => /^\d{1,16}$/.test(String(id))
-    && Number.isSafeInteger(Number(id));
+  const safeRecordId = id => typeof id === 'number' && Number.isSafeInteger(id) && id >= 0;
   const okTask = x => x && typeof x === 'object' && !Array.isArray(x)
     && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
@@ -592,6 +594,8 @@ function validateImportedBackup(raw) {
     && typeof x.title === 'string' && x.title.length <= 20000
     && typeof x.body === 'string' && x.body.length <= 500000;
   if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)) return null;
+  // New imports must be unambiguous; historical records are never renumbered on read.
+  if ([raw.tasksList, raw.notesList].some(rows => new Set(rows.map(row => row.id)).size !== rows.length)) return null;
   const candidateCfg = {...cfg, ...raw.cfg};
   if (!LANG_CATALOG.some(l => l.code === candidateCfg.lang)) candidateCfg.lang = 'en';
   for (const key of ['todayMins', 'sessions', 'streak', 'water']) {
@@ -618,45 +622,51 @@ function verifyAndRestoreBackupCode(codeStr) {
     if (!confirmSensitiveAction('restore')) return false;
     // Build and verify every storage packet before replacing any saved record.
     // If a write fails (e.g. storage quota), roll back all six original keys.
-    const imports = [
-      ['zen_fortress_cfg_v21', verified.cfg],
-      ['zen_fortress_tasks_v21', verified.tasksList],
-      ['zen_fortress_notes_v21', verified.notesList]
-    ];
-    const updates = [];
-    for (const [key, value] of imports) {
-      const payload = JSON.stringify(value);
-      updates.push([key, JSON.stringify({payload, sig:computeHash(payload), ts:Date.now()})]);
-    }
-    const previous = new Map();
-    for (const [key] of updates) {
-      previous.set(key, localStorage.getItem(key));
-      previous.set(key + '_mirror', localStorage.getItem(key + '_mirror'));
-    }
-    try {
-      for (const [key, packet] of updates) {
-        localStorage.setItem(key, packet);
-        localStorage.setItem(key + '_mirror', packet);
+    if (window.DF22Integration) {
+      // The live app shares the same crash-recoverable transaction as Notes/Tasks.
+      const before = window.DF22Integration.getSnapshot();
+      if (window.DF22Integration.write(before, verified) !== true) throw new Error('RESTORE_NOT_VERIFIED');
+    } else {
+      const imports = [
+        ['zen_fortress_cfg_v21', verified.cfg],
+        ['zen_fortress_tasks_v21', verified.tasksList],
+        ['zen_fortress_notes_v21', verified.notesList]
+      ];
+      const updates = [];
+      for (const [key, value] of imports) {
+        const payload = JSON.stringify(value);
+        updates.push([key, JSON.stringify({payload, sig:computeHash(payload), ts:Date.now()})]);
       }
-      for (const [key, packet] of updates) {
-        if (localStorage.getItem(key) !== packet || localStorage.getItem(key + '_mirror') !== packet) {
-          throw new Error('Storage verification failed');
+      const previous = new Map();
+      for (const [key] of updates) {
+        previous.set(key, localStorage.getItem(key));
+        previous.set(key + '_mirror', localStorage.getItem(key + '_mirror'));
+      }
+      try {
+        for (const [key, packet] of updates) {
+          localStorage.setItem(key, packet);
+          localStorage.setItem(key + '_mirror', packet);
         }
-      }
-    } catch (storageError) {
-      for (const [key, oldValue] of previous) {
-        try {
-          if (oldValue === null) localStorage.removeItem(key);
-          else localStorage.setItem(key, oldValue);
-        } catch (rollbackError) {
-          console.error('Backup rollback failed:', key, rollbackError);
+        for (const [key, packet] of updates) {
+          if (localStorage.getItem(key) !== packet || localStorage.getItem(key + '_mirror') !== packet) {
+            throw new Error('Storage verification failed');
+          }
         }
+      } catch (storageError) {
+        for (const [key, oldValue] of previous) {
+          try {
+            if (oldValue === null) localStorage.removeItem(key);
+            else localStorage.setItem(key, oldValue);
+          } catch (rollbackError) {
+            console.error('Backup rollback failed:', key, rollbackError);
+          }
+        }
+        throw storageError;
       }
-      throw storageError;
+      cfg = verified.cfg;
+      tasksList = verified.tasksList;
+      notesList = verified.notesList;
     }
-    cfg = verified.cfg;
-    tasksList = verified.tasksList;
-    notesList = verified.notesList;
     syncDailyRollover();
     applyLanguage(cfg.lang);
     closeModal('cloudBackupModal');
@@ -1131,12 +1141,27 @@ function changeTimerDelta(deltaMins) {
   if (timerLeft > timerTotal) timerTotal = timerLeft;
   if (timerRunning) {
     timerTargetTime = Date.now() + (timerLeft * 1000);
-    if (window.ZenNative && window.ZenNative.startBackgroundService) {
-      window.ZenNative.startBackgroundService(timerLeft, document.getElementById('timerModeCaption').textContent);
-    }
+    startNativeTimerForCurrentSession(timerLeft, document.getElementById('timerModeCaption').textContent);
   }
   storeTimerSession();
   updateTimerDisplay();
+}
+
+// Native service uses exactly the same existing session identity and phase as v21.
+// Retain the old two-argument bridge when an installed Android host is older.
+function startNativeTimerForCurrentSession(seconds, title) {
+  const bridge = window.ZenNative;
+  if (!bridge) return;
+  try {
+    if (typeof bridge.startBackgroundSession === 'function' && timerSessionId) {
+      bridge.startBackgroundSession(seconds, title, timerSessionId, currentTimerModeKey);
+    } else if (typeof bridge.startBackgroundService === 'function') {
+      bridge.startBackgroundService(seconds, title);
+    }
+  } catch (_) {
+    // The WebView timer remains active; Android foreground-service refusal is
+    // an explicit platform limitation, not a fabricated completion.
+  }
 }
 
 function toggleTimerPlay() {
@@ -1172,9 +1197,7 @@ function toggleTimerPlay() {
     timerTargetTime = timerResumeMs + (timerLeft * 1000);
     storeTimerSession();
 
-    if (window.ZenNative && window.ZenNative.startBackgroundService) {
-      try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch(e){}
-    }
+    startNativeTimerForCurrentSession(timerLeft, activeTitle);
 
     timerInterval = setInterval(runTimerTick, 500);
   }
@@ -1266,9 +1289,42 @@ function renderTasksList() {
   renderTodayPlan();
 }
 
+// Publish legacy edits only after durable acknowledgment. The production integration
+// uses the existing six-slot v21 recovery journal; standalone legacy hosts retain
+// verified primary/mirror writes without claiming cross-family atomicity.
+function commitLegacyRecords(field, records) {
+  try {
+    if (window.DF22Integration) {
+      const before = window.DF22Integration.getSnapshot();
+      const after = JSON.parse(JSON.stringify(before));
+      after[field] = records;
+      if (window.DF22Integration.write(before, after) !== true) throw new Error('SAVE_NOT_VERIFIED');
+    } else {
+      const key = field === 'tasksList' ? 'zen_fortress_tasks_v21' : 'zen_fortress_notes_v21';
+      if (saveFortressData(key, records) !== true) throw new Error('SAVE_NOT_VERIFIED');
+      if (field === 'tasksList') tasksList = records;
+      else notesList = records;
+    }
+    return true;
+  } catch (_) {
+    showToast(cfg.lang === 'ar' ? 'تعذر الحفظ. احتفظ بتعديلاتك وحاول مجددًا.' : 'Could not save. Keep your changes and try again.');
+    return false;
+  }
+}
+
+function legacyRecordIsUnique(records, id) {
+  const count = records.filter(record => record.id === id).length;
+  if (count > 1) showToast(cfg.lang === 'ar'
+    ? 'تعذر التعديل: توجد سجلات بالمعرف نفسه. احتفظ بنسخة احتياطية وراجع البيانات.'
+    : 'Cannot edit ambiguous record IDs. Keep a backup and review your data.');
+  return count === 1;
+}
+
 function toggleTaskDone(id) {
-  const t = tasksList.find(x => x.id === id);
-  if (t) { t.done = !t.done; saveFortressData('zen_fortress_tasks_v21', tasksList); renderTasksList(); renderCalendar(); }
+  if (!legacyRecordIsUnique(tasksList, id)) return;
+  const records = tasksList.map(x => x.id === id ? {...x, done:!x.done} : x);
+  if (!commitLegacyRecords('tasksList', records)) return;
+  renderTasksList(); renderCalendar();
 }
 
 function focusOnTask(id) {
@@ -1278,7 +1334,7 @@ function focusOnTask(id) {
       showToast('⚠️ Finish the current training before changing linked tasks');
       return;
     }
-    document.getElementById('timerLinkedTask').textContent = toWest(`🎯 ${t.title}`);
+    document.getElementById('timerLinkedTask').textContent = `🎯 ${t.title}`;
     switchTab('sec-timer', document.getElementById('navTimer'));
   }
 }
@@ -1298,25 +1354,25 @@ function nextRecordId() {
 
 function createNewTask() {
   const inp = document.getElementById('inpNewTask');
-  const val = toWest(inp.value.trim());
+  const val = inp.value.trim();
   if (!val) return;
   const catKey = document.getElementById('selTaskCat').value;
-  const dateVal = toWest(document.getElementById('inpTaskDate').value || todayISO);
+  const dateVal = toWest(document.getElementById('inpTaskDate').value || '');
   const themes = { study: 'tp-blue', exam: 'tp-amber', review: 'tp-rose', sport: 'tp-emerald' };
   const icons = { study: '📚', exam: '💻', review: '📖', sport: '🏋️' };
-  tasksList.unshift({
+  const record = {
     id: nextRecordId(), isStarter: false, title: val, time: '25m', date: dateVal,
     catKey: catKey, icon: icons[catKey] || '📚', theme: themes[catKey] || 'tp-blue', done: false
-  });
+  };
+  if (!commitLegacyRecords('tasksList', [record, ...tasksList])) return;
   inp.value = '';
-  saveFortressData('zen_fortress_tasks_v21', tasksList);
   renderTasksList(); renderCalendar(); showToast('✓');
 }
 
 function deleteTaskItem(id) {
+  if (!legacyRecordIsUnique(tasksList, id)) return;
   if (!confirmSensitiveAction('task')) return;
-  tasksList = tasksList.filter(x => x.id !== id);
-  saveFortressData('zen_fortress_tasks_v21', tasksList);
+  if (!commitLegacyRecords('tasksList', tasksList.filter(x => x.id !== id))) return;
   renderTasksList(); renderCalendar();
 }
 
@@ -1472,28 +1528,30 @@ function saveNewNote() {
   const catKey = document.getElementById('selNoteCat').value;
   const calDate = toWest(document.getElementById('inpNoteCalDate').value || todayISO);
   const blur = document.getElementById('chkNoteBlur').checked;
-  notesList.unshift({
+  const record = {
     id: nextRecordId(), isStarter: false, title: t || L().navNotes, body: b,
     catKey: catKey, calDate: calDate, blur: blur, theme: blur ? 'theme-emerald' : 'theme-violet'
-  });
-  saveFortressData('zen_fortress_notes_v21', notesList);
+  };
+  if (!commitLegacyRecords('notesList', [record, ...notesList])) return;
   renderNotesStack(); renderCalendar(); closeModal('noteModal'); showToast('✓');
 }
 
 function pinNoteToTodayCalendar(id) {
+  if (!legacyRecordIsUnique(notesList, id)) return;
   const n = notesList.find(x => x.id === id);
-  if (n) { n.calDate = selectedCalDate; saveFortressData('zen_fortress_notes_v21', notesList); renderNotesStack(); renderCalendar(); showToast(`📅 ${selectedCalDate}`); }
+  if (n && commitLegacyRecords('notesList', notesList.map(x => x.id === id ? {...x, calDate:selectedCalDate} : x))) { renderNotesStack(); renderCalendar(); showToast(`📅 ${selectedCalDate}`); }
 }
 
 function toggleNoteBlur(id) {
+  if (!legacyRecordIsUnique(notesList, id)) return;
   const n = notesList.find(x => x.id === id);
-  if (n) { n.blur = !n.blur; saveFortressData('zen_fortress_notes_v21', notesList); renderNotesStack(); }
+  if (n && commitLegacyRecords('notesList', notesList.map(x => x.id === id ? {...x, blur:!x.blur} : x))) renderNotesStack();
 }
 
 function deleteNoteCard(id) {
+  if (!legacyRecordIsUnique(notesList, id)) return;
   if (!confirmSensitiveAction('note')) return;
-  notesList = notesList.filter(x => x.id !== id);
-  saveFortressData('zen_fortress_notes_v21', notesList);
+  if (!commitLegacyRecords('notesList', notesList.filter(x => x.id !== id))) return;
   renderNotesStack(); renderCalendar();
 }
 
@@ -1512,12 +1570,10 @@ function saveQuickDump(toTasks) {
   const val = document.getElementById('inpQuickDump').value.trim();
   if (!val) return;
   if (toTasks) {
-    tasksList.unshift({ id: nextRecordId(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false });
-    saveFortressData('zen_fortress_tasks_v21', tasksList);
+    if (!commitLegacyRecords('tasksList', [{ id: nextRecordId(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false }, ...tasksList])) return;
     renderTasksList();
   } else {
-    notesList.unshift({ id: nextRecordId(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' });
-    saveFortressData('zen_fortress_notes_v21', notesList);
+    if (!commitLegacyRecords('notesList', [{ id: nextRecordId(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' }, ...notesList])) return;
     renderNotesStack();
   }
   renderCalendar(); closeModal('brainDumpModal'); showToast('✓');
@@ -1548,6 +1604,36 @@ const soundGeneration = Object.create(null);
 // Only these two files currently have individual CC0 provenance references in the v21 ledger.
 // Other catalogue items remain registered for recovery but unavailable until per-file rights and device listening are proven.
 const NATURE_APPROVED_FOR_PLAYBACK = new Set(['forest','wind']);
+const NATURE_VOLUME_LABELS = Object.freeze({
+  "en": "Volume",
+  "ar": "مستوى الصوت",
+  "es": "Volumen",
+  "zh": "音量",
+  "hi": "आवाज़ की तीव्रता",
+  "fr": "Volume",
+  "de": "Lautstärke",
+  "ru": "Громкость",
+  "pt": "Volume",
+  "ja": "音量",
+  "id": "Volume",
+  "tr": "Ses düzeyi",
+  "ko": "음량",
+  "vi": "Âm lượng",
+  "it": "Volume",
+  "bn": "শব্দের মাত্রা",
+  "ur": "آواز کی سطح",
+  "fa": "میزان صدا",
+  "pl": "Głośność",
+  "nl": "Volume"
+});
+
+function applyNatureMixVolumes() {
+  const channels = SOUNDS_DATA.filter(sound => activePlayers[sound.id]);
+  const total = channels.reduce((sum,sound) => sum + sound.vol,0);
+  // Conservative headroom even if channel peaks align; retain each requested level.
+  const gain = total > 0.85 ? 0.85 / total : 1;
+  channels.forEach(sound => activePlayers[sound.id].setVol(sound.vol * gain));
+}
 
 function stopSoundTile(id) {
   soundGeneration[id] = (soundGeneration[id] || 0) + 1;
@@ -1555,6 +1641,7 @@ function stopSoundTile(id) {
   if (player) {
     delete activePlayers[id];
     try { player.pause(); } catch (e) {}
+    applyNatureMixVolumes();
   }
 }
 
@@ -1570,9 +1657,13 @@ function toggleSoundTile(id) {
     stopSoundTile(id);showToast('⏹ '+sName);renderSoundsStudio();return;
   }
   const token=(soundGeneration[id]||0)+1;soundGeneration[id]=token;
-  const audio=new Audio();audio.loop=true;audio.preload='auto';audio.volume=s.vol;audio.src=s.src;
+  const audio=new Audio();audio.loop=s.id!=='thunder';audio.preload='auto';audio.volume=0;audio.src=s.src;
   const player={pause(){audio.onerror=null;audio.onended=null;audio.pause();audio.removeAttribute('src');audio.load();},setVol(v){audio.volume=v;}};
   activePlayers[id]=player;
+  applyNatureMixVolumes();
+  audio.onended=()=>{
+    if(soundGeneration[id]===token&&activePlayers[id]===player){stopSoundTile(id);renderSoundsStudio();}
+  };
   const failure=()=>{
     if(soundGeneration[id] !== token||activePlayers[id]!==player)return;
     stopSoundTile(id);renderSoundsStudio();showToast('Recording unavailable — playback stopped');
@@ -1593,7 +1684,7 @@ function setTileVolume(id, val) {
   const clamped = Math.max(0, Math.min(1, v));
   const s = SOUNDS_DATA.find(x => x.id === id);
   if (s) s.vol = clamped;
-  if (activePlayers[id]) activePlayers[id].setVol(clamped);
+  applyNatureMixVolumes();
 }
 
 function playPresetRelaxMix() {
@@ -1618,9 +1709,25 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id) && (soundCat === 'all' || s.cat === soundCat)).forEach(s => {
+  const available = SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id));
+  document.querySelectorAll('[data-sound-category]').forEach(button => {
+    const category = button.getAttribute('data-sound-category');
+    const key = {all:'filterAll',water:'sndCatWater',forest:'sndCatForest',warm:'sndCatWarm'}[category];
+    const count = available.filter(s => category === 'all' || s.cat === category).length;
+    const label = document.createElement('span');label.textContent = d[key];
+    const number = document.createElement('bdi');number.dir = 'ltr';number.textContent = '(' + count + ')';
+    button.replaceChildren(label,document.createTextNode(' '),number);
+  });
+  const visible = available.filter(s => soundCat === 'all' || s.cat === soundCat);
+  if (!visible.length) {
+    const empty = document.createElement('p');
+    empty.className = 'nature-empty-state';empty.setAttribute('role','status');
+    empty.textContent = d.natureNoApproved;box.appendChild(empty);
+  }
+  visible.forEach(s => {
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
+    const volumeLabel = NATURE_VOLUME_LABELS[cfg.lang] || NATURE_VOLUME_LABELS.en;
     const tile = document.createElement('div');
     tile.className = `sound-Rich-tile ${s.cls} ${isOn ? 'playing' : ''}`;
     tile.onclick = () => toggleSoundTile(s.id);
@@ -1631,8 +1738,8 @@ function renderSoundsStudio() {
       </div>
       <div>
         <div class="stile-name">${escapeHtmlText(toWest(sName))}</div>
-        <div class="stile-volume-label"><span>🔉 ${cfg.lang === 'ar' ? 'مستوى الصوت' : 'Volume'}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
-        <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText((cfg.lang === 'ar' ? 'مستوى صوت ' : 'Volume for ') + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
+        <div class="stile-volume-label"><span>🔉 ${escapeHtmlText(volumeLabel)}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
+        <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText(volumeLabel + ': ' + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
       </div>
     `;
     box.appendChild(tile);
@@ -1733,6 +1840,12 @@ function updateSyllabusCalc() {
   const rate = Math.max(1, parseInt(elRate.value) || 1);
   const days = Math.ceil(left / rate);
   document.getElementById('syllabusCalcOut').textContent = toWest(L().calcOutTpl.replace('{d}', days));
+}
+
+if (typeof window.addEventListener === 'function') {
+  window.addEventListener('pagehide', () => {
+    Object.keys(activePlayers).forEach(stopSoundTile);
+  });
 }
 
 /* Boot Init */
