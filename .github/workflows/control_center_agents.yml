@@ -1,0 +1,95 @@
+name: Deep Focus Scoped QA Agents
+
+on:
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: "Select a predefined QA lane, never arbitrary shell input"
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - ui
+          - audio
+          - locale
+          - analytics
+          - data
+          - qa
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deep-focus-scoped-qa
+  cancel-in-progress: false
+
+jobs:
+  scoped-qa:
+    name: Scoped QA evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SELECTED_LANE: ${{ inputs.lane }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Source and workflow safety
+        run: |
+          node --check docs/control-center/studio-core.js
+          node --check docs/control-center/studio.js
+          node tools/control_center/generate_style.cjs --check
+      - name: Run selected test lane
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_lane() {
+            case "$1" in
+              ui)
+                node --test tests/interaction_recovery/*.test.cjs tests/design_quality/*.cjs
+                ;;
+              audio)
+                node --test tests/nature_audio_recovery/*.test.cjs tests/completion_alerts/*.test.cjs
+                ;;
+              locale)
+                node --test tests/localization_20/*.test.cjs tests/ascii_numerals/*.test.cjs
+                ;;
+              analytics)
+                node --test tests/analytics_core/*.test.cjs tests/analytics_recovery/*.test.cjs
+                ;;
+              data)
+                node --test tests/data_contracts/*.test.cjs tests/notes_core/*.test.cjs tests/tasks_core/*.test.cjs
+                ;;
+              qa)
+                node --test tests/master_recovery_qa/source_contracts.test.cjs tests/master_recovery_qa/workflow.test.cjs tests/control_center/*.test.cjs
+                ;;
+              *)
+                echo "Unsupported lane" >&2
+                return 2
+                ;;
+            esac
+          }
+          if [[ "$SELECTED_LANE" == "all" ]]; then
+            for selected in ui audio locale analytics data qa; do
+              echo "===== $selected ====="
+              run_lane "$selected"
+            done
+          else
+            run_lane "$SELECTED_LANE"
+          fi
+      - name: Record release gates
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Scoped QA result"
+            echo "Requested lane: $SELECTED_LANE"
+            echo "Source SHA: $GITHUB_SHA"
+            echo "Source QA only; these are not Gemini/Codex AI model workers."
+            echo "Android physical-device QA: **NOT_TESTED**"
+            echo "v21 backup/restore: **NOT_TESTED**"
+            echo "Release: **NOT APPROVED**"
+          } >> "$GITHUB_STEP_SUMMARY"
