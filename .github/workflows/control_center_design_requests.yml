@@ -27,17 +27,14 @@ jobs:
             const {owner,repo}=context.repo;
             const issue=context.payload.issue;
             const raw=issue.body||'';
-            if(raw.length>18000)throw Error('Request body exceeds bound.');
-            const match=raw.match(/--- START CONFIG JSON ---\s*([\s\S]*?)\s*--- END CONFIG JSON ---/);
-            const refMatch=raw.match(/^Reference SHA: ([a-f0-9]{40})$/m);
-            if(!match||!refMatch)throw Error('Invalid control-center request format.');
             const designCore=require('./docs/control-center/studio-core.js');
-            const proposed=designCore.validateConfig(JSON.parse(match[1]));
+            const parsed=designCore.parseDesignIssue(raw);
+            const proposed=parsed.config;
             const stylesheet=designCore.renderCSS(proposed);
             const branchName=context.payload.repository.default_branch;
             const main=await github.rest.repos.getBranch({owner,repo,branch:branchName});
             const head=main.data.commit.sha;
-            if(refMatch[1]!==head)throw Error('Stale source SHA; reload dashboard and submit a new request.');
+            if(parsed.sha!==head)throw Error('Stale source SHA; reload dashboard and submit a new request.');
             const configPath='docs/control-center/design-config.json';
             const cssPath='android/app/src/main/assets/web/control_center_overrides.css';
             const [existingConfig,existingCSS]=await Promise.all([
