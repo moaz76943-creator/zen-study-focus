@@ -40,3 +40,27 @@ test('empty ledger never presents false zero-issues health as fresh',()=>{
  assert.equal(got.tasks.length,1);
  assert.match(got.errors.join(' '),/empty/i);
 });
+
+const v3=require('../../docs/control-center/v3-core.js');
+test('offline snapshot normalization is explicitly local and does not promote imported audit to trusted QA',()=>{
+ const imported={schema_version:1,inspected_ref:SHA,tasks:[{id:'DF-001',status:'BLOCKED',title:'Audio',area:'AUDIO',evidence:'none'}],
+   prs:[{number:25,title:'Recovery',html_url:'https://github.com/moaz76943-creator/zen-study-focus/pull/25',draft:true}],
+   workflows:[{id:13,name:'Build',conclusion:'failure',status:'completed',html_url:'https://github.com/moaz76943-creator/zen-study-focus/actions/runs/13'}],
+   imported_audit:{findings:[{severity:'critical',title:'Fake gate'}]}};
+ const got=v3.normalizeOfflineSnapshot(imported);
+ assert.equal(got.stale,true);
+ assert.equal(got.source,'local_import');
+ assert.equal(got.tasks.length,1);
+ assert.equal(got.runs[0].id,13);
+ assert.equal(got.audit,null);
+ assert.deepEqual(got.findings,[]);
+});
+test('offline imports reject invalid statuses, excessive text and foreign untrusted URLs',()=>{
+ const minimal={schema_version:1,inspected_ref:SHA,tasks:[{id:'DF-001',status:'PASS',title:'x'}]};
+ assert.throws(()=>v3.normalizeOfflineSnapshot(minimal));
+ const external={schema_version:1,inspected_ref:SHA,tasks:[],
+   prs:[{number:9,title:'Bad',html_url:'https://malicious.example/pr'}]};
+ assert.throws(()=>v3.normalizeOfflineSnapshot(external));
+ const huge={schema_version:1,inspected_ref:SHA,tasks:[{id:'DF-002',status:'BLOCKED',title:'z'.repeat(10000)}]};
+ assert.throws(()=>v3.normalizeOfflineSnapshot(huge));
+});
