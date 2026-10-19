@@ -1,0 +1,51 @@
+name: DF4 native completion identity regression
+on:
+  push:
+    branches:
+      - fix/df4-native-timer-session-alert-gate-20261019
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df4-native-alert-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  exact-head-test-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source identity
+        run: git rev-parse HEAD
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Timer bridge, alerts and v21 regressions
+        run: |
+          node --check android/app/src/main/assets/web/app.js
+          node --check android/app/src/main/assets/web/integration_v22.js
+          node --test tests/timer_native_bridge/native_timer_contract.test.cjs tests/focus_workflows/*.test.cjs tests/completion_alerts/*.test.cjs tests/regression_v21/*.test.cjs
+          node tests/smoke_app.cjs
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android API 36
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile Android and build unsigned debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Record exact APK checksum
+        run: sha256sum android/app/build/outputs/apk/debug/*.apk
+      - name: Upload test-only APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DF4-Native-Timer-Test-APK-${{ github.sha }}
+          if-no-files-found: error
+          path: android/app/build/outputs/apk/debug/*.apk
