@@ -1579,6 +1579,28 @@ const soundGeneration = Object.create(null);
 // Only these two files currently have individual CC0 provenance references in the v21 ledger.
 // Other catalogue items remain registered for recovery but unavailable until per-file rights and device listening are proven.
 const NATURE_APPROVED_FOR_PLAYBACK = new Set(['forest','wind']);
+const NATURE_VOLUME_LABELS = Object.freeze({
+  "en": "Volume",
+  "ar": "مستوى الصوت",
+  "es": "Volumen",
+  "zh": "音量",
+  "hi": "आवाज़ की तीव्रता",
+  "fr": "Volume",
+  "de": "Lautstärke",
+  "ru": "Громкость",
+  "pt": "Volume",
+  "ja": "音量",
+  "id": "Volume",
+  "tr": "Ses düzeyi",
+  "ko": "음량",
+  "vi": "Âm lượng",
+  "it": "Volume",
+  "bn": "শব্দের মাত্রা",
+  "ur": "آواز کی سطح",
+  "fa": "میزان صدا",
+  "pl": "Głośność",
+  "nl": "Volume"
+});
 
 function applyNatureMixVolumes() {
   const channels = SOUNDS_DATA.filter(sound => activePlayers[sound.id]);
@@ -1680,6 +1702,7 @@ function renderSoundsStudio() {
   visible.forEach(s => {
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
+    const volumeLabel = NATURE_VOLUME_LABELS[cfg.lang] || NATURE_VOLUME_LABELS.en;
     const tile = document.createElement('div');
     tile.className = `sound-Rich-tile ${s.cls} ${isOn ? 'playing' : ''}`;
     tile.onclick = () => toggleSoundTile(s.id);
@@ -1690,8 +1713,8 @@ function renderSoundsStudio() {
       </div>
       <div>
         <div class="stile-name">${escapeHtmlText(toWest(sName))}</div>
-        <div class="stile-volume-label"><span>🔉 ${cfg.lang === 'ar' ? 'مستوى الصوت' : 'Volume'}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
-        <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText((cfg.lang === 'ar' ? 'مستوى صوت ' : 'Volume for ') + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
+        <div class="stile-volume-label"><span>🔉 ${escapeHtmlText(volumeLabel)}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
+        <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText(volumeLabel + ': ' + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
       </div>
     `;
     box.appendChild(tile);
