@@ -36,6 +36,16 @@
     }
     return errors;
   }
+  function comparable(slot,records) {
+    if (slot === 'cfg' || !Array.isArray(records)) return records;
+    return records.map(row => {
+      if (!row || row.isStarter !== true) return row;
+      const value = {...row,title:'__translated-starter__'};
+      // Legacy applyLanguage renders built-in samples in memory without saving.
+      if (slot === 'notes') value.body = '__translated-starter__';
+      return value;
+    });
+  }
   function verifySource(storage,original,before) {
     for (const [slot,field] of FAMILIES) {
       const key = D.KEYS[slot];
@@ -45,7 +55,7 @@
         if (original[key] !== null || original[key + '_mirror'] !== null)
           throw new Error('Both storage copies are damaged: ' + key);
       } else {
-        if (!equal((first.ok ? first : mirror).value, before[field]))
+        if (!equal(comparable(slot,(first.ok ? first : mirror).value),comparable(slot,before[field])))
           throw new Error('Stored ' + field + ' changed; reload before saving');
       }
       // The user-visible in-memory defaults are only used if BOTH copies are absent.
