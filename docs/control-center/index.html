@@ -134,6 +134,11 @@
             <div id="v3-risks" class="v3-results"></div>
             <label for="v3-snapshot-import">مقارنة مع نسخة سابقة من تقرير المشروع (JSON)</label>
             <input type="file" id="v3-snapshot-import" accept="application/json,.json">
+            <div class="v3-editor-actions" role="group" aria-label="البيانات المستوردة">
+              <button type="button" class="button secondary" id="v3-use-offline" disabled>عرض نسخة المستودع دون اتصال</button>
+              <button type="button" class="button secondary" id="v3-return-live" disabled>العودة للبيانات الحية</button>
+            </div>
+            <p id="v3-offline-state" class="v3-note" role="status" aria-live="polite">مصدر المعلومات: GitHub، أو نسخة ملف تختار عرضها يدويًا.</p>
             <p id="v3-snapshot-result" class="v3-note">لتوليد النسخة الحالية استخدم زر «تصدير حالة المشروع» في قسم الأتمتة، ثم قارنها بتقرير أقدم.</p>
           </article>
           <article class="panel v3-panel">
