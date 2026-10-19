@@ -34,6 +34,7 @@ The adapter must supply:
 | commitBoth(before,after) | Optional; required for task extraction. Atomic durable two-family notesList/tasksList save with primary/mirror verification and rollback of original packet bytes on ANY failure. |
 | confirmTaskExtraction(noteId,note) | Optional verified user preview/confirmation; do not run without commitBoth. |
 | pickNoteLinkTarget(sourceId,notes) | Optional numeric-ID note picker; core validates link. |
+| pickTaskLinkTarget(noteId,tasks) | Optional picker returning a real numeric task ID or null; stored in notesV21.taskLinks without mutating tasks. |
 | openCalendarForNote(id) | Optional date navigation, no invented calendar IDs. |
 
 IMPORTANT: The current saveFortressData silently catches quota failures; it is NOT a valid durable commit acknowledgement. Also lane 01 commitPlan handles additive migration and explicit restore, not arbitrary note edits. Lane 00 must implement/verify a safe journal-aware edit transaction or keep the optional Notes UX disabled. The UI will not report a successful save on false/missing acknowledgement.
