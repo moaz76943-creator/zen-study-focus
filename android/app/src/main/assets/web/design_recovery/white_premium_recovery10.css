@@ -327,11 +327,10 @@ html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
 }
 
 
-/* DF4-004 / DF4-005 — actual dynamically mounted ambient and completion picker UI.
-   No changes to audio rights, data, alerts, or application behavior. */
+/* DF4-001: approved-media empty state; no rights or playback changes. */
 body.df-v22.df-recovery10 .sounds-empty-state {
   display: block;
-  width: 100%;
+  grid-column: 1 / -1;
   min-width: 0;
   margin: 12px 0;
   padding: 18px 14px;
@@ -342,121 +341,4 @@ body.df-v22.df-recovery10 .sounds-empty-state {
   text-align: start;
   line-height: 1.6;
   overflow-wrap: anywhere;
-}
-body.df-v22.df-recovery10 #completionAlertPickerHost {
-  min-width: 0;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-body.df-v22.df-recovery10 .completion-alert-picker {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
-  width: 100%;
-  min-width: 0;
-  color: #172b48;
-  text-align: start;
-}
-body.df-v22.df-recovery10 .completion-alert-picker h3 {
-  margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.4;
-}
-body.df-v22.df-recovery10 .completion-alert-picker fieldset {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 9px;
-  min-inline-size: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-body.df-v22.df-recovery10 .completion-alert-picker legend {
-  float: none;
-  display: block;
-  max-width: 100%;
-  margin: 0 0 10px;
-  padding: 0;
-  font-weight: 700;
-  line-height: 1.5;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-body.df-v22.df-recovery10 .completion-alert-picker .completion-alert-option {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  padding: 9px 10px;
-  background: #f8fbff;
-  border: 1px solid #dce6f5;
-  border-radius: 14px;
-}
-body.df-v22.df-recovery10 .completion-alert-picker .completion-alert-option label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  margin: 0;
-  line-height: 1.5;
-  text-align: start;
-  overflow-wrap: anywhere;
-  cursor: pointer;
-}
-body.df-v22.df-recovery10 .completion-alert-picker input[type="radio"],
-body.df-v22.df-recovery10 .completion-alert-picker input[type="checkbox"] {
-  inline-size: 20px;
-  block-size: 20px;
-  min-inline-size: 20px;
-  flex: 0 0 20px;
-  accent-color: #2563eb;
-}
-body.df-v22.df-recovery10 .completion-alert-picker .completion-alert-option button {
-  appearance: none;
-  min-height: 44px;
-  min-width: 44px;
-  max-width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #bcd5f7;
-  border-radius: 10px;
-  color: #1d4ed8;
-  background: #fff;
-  font: inherit;
-  font-size: .84rem;
-  font-weight: 700;
-  line-height: 1.35;
-  white-space: normal;
-  cursor: pointer;
-}
-body.df-v22.df-recovery10 .completion-alert-picker .completion-alert-option button:active {
-  background: #eaf3ff;
-}
-body.df-v22.df-recovery10 .completion-alert-picker > label {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
-  min-width: 0;
-  margin: 0;
-  line-height: 1.5;
-}
-body.df-v22.df-recovery10 .completion-alert-picker > label:has(> input[type="checkbox"]) {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-body.df-v22.df-recovery10 .completion-alert-picker input[type="range"] {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  height: 44px;
-  accent-color: #2563eb;
-}
-@media (max-width: 340px) {
-  body.df-v22.df-recovery10 .completion-alert-picker .completion-alert-option {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  body.df-v22.df-recovery10 .completion-alert-picker .completion-alert-option button {
-    justify-self: stretch;
-  }
 }
