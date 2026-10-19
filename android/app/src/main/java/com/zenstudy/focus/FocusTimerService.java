@@ -10,6 +10,10 @@ import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.content.SharedPreferences;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.Collections;
+import java.util.Iterator;
 import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Build;
@@ -26,6 +30,10 @@ public class FocusTimerService extends Service {
     private CountDownTimer countDownTimer;
     private PowerManager.WakeLock wakeLock;
     private String currentTitle = "Deep Focus";
+    private String currentSessionId = null;
+    private String currentPhase = "focus";
+    private static final int SESSION_LEDGER_LIMIT = 128;
+    private static final String SESSION_LEDGER_PREFS = "zen_native_completion_ledger_v22";
 
     @Override
     public void onCreate() {
@@ -44,17 +52,25 @@ public class FocusTimerService extends Service {
 
         if ("START".equals(action)) {
             int seconds = intent.getIntExtra("seconds", 1500);
+            if (seconds < 1 || seconds > 86400) return START_NOT_STICKY;
             currentTitle = intent.getStringExtra("title");
             if (currentTitle == null || currentTitle.isEmpty()) currentTitle = "Active Focus Session";
+            currentSessionId = safeSessionId(intent.getStringExtra("sessionId"));
+            currentPhase = safePhase(intent.getStringExtra("phase"));
             startForegroundTimer(seconds, currentTitle);
+            // A sticky restart with an empty Intent would create a foreground service
+            // without a timer, so JS v21 recovery owns restart reconciliation.
+            return START_NOT_STICKY;
         } else if ("STOP".equals(action)) {
             stopTimerAndService();
         } else if ("ALARM_NOW".equals(action)) {
             String msg = intent.getStringExtra("title");
-            triggerCompletionAlarm(msg != null ? msg : "Session Completed!");
+            triggerCompletionAlarm(msg != null ? msg : "Session Completed!",
+                    safeSessionId(intent.getStringExtra("sessionId")),
+                    safePhase(intent.getStringExtra("phase")));
             stopTimerAndService();
         }
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private void startForegroundTimer(int totalSeconds, String title) {
@@ -66,6 +82,9 @@ public class FocusTimerService extends Service {
         Notification initialNotif = buildOngoingNotification(title, formatSeconds(totalSeconds));
         startForeground(1001, initialNotif);
 
+        final String idForThisTimer = currentSessionId;
+        final String phaseForThisTimer = currentPhase;
+        final String titleForThisTimer = title;
         countDownTimer = new CountDownTimer(totalSeconds * 1000L, 1000L) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -78,7 +97,8 @@ public class FocusTimerService extends Service {
 
             @Override
             public void onFinish() {
-                triggerCompletionAlarm(currentTitle + " — Completed! 🎉");
+                triggerCompletionAlarm(titleForThisTimer + " — Completed! 🎉",
+                        idForThisTimer, phaseForThisTimer);
                 stopTimerAndService();
             }
         }.start();
@@ -113,11 +133,47 @@ public class FocusTimerService extends Service {
             .build();
     }
 
-    private void playRecordedCompletionCue() {
+    private static String safeSessionId(String id) {
+        return id != null && id.matches("[A-Za-z0-9._:-]{1,256}") ? id : null;
+    }
+
+    private static String safePhase(String phase) {
+        if ("short".equals(phase) || "long".equals(phase) ||
+                "focus".equals(phase) || "custom".equals(phase)) return phase;
+        return "focus";
+    }
+
+    private static boolean isRestPhase(String phase) {
+        return "short".equals(phase) || "long".equals(phase);
+    }
+
+    // A durable native notification/audio gate, separate from protected v21 records.
+    // Unknown legacy callers without session IDs preserve the original behavior.
+    private boolean firstCompletionForSession(String sessionId) {
+        if (sessionId == null) return true;
+        SharedPreferences prefs = getSharedPreferences(SESSION_LEDGER_PREFS, MODE_PRIVATE);
+        Set<String> old = prefs.getStringSet("completed_session_tokens",
+                Collections.<String>emptySet());
+        if (old.contains(sessionId)) return false;
+        LinkedHashSet<String> next = new LinkedHashSet<>(old);
+        next.add(sessionId);
+        while (next.size() > SESSION_LEDGER_LIMIT) {
+            Iterator<String> iterator = next.iterator();
+            if (!iterator.hasNext()) break;
+            iterator.next();
+            iterator.remove();
+        }
+        // Persist BEFORE notification/sound so duplicate callbacks cannot replay a cue.
+        // If storage fails, omit the alert rather than acknowledge an unguarded repeat.
+        return prefs.edit().putStringSet("completed_session_tokens", next).commit();
+    }
+
+    private void playRecordedCompletionCue(String phase) {
         // Avoid two sounds: WebView handles foreground playback, the service handles background.
         if (MainActivity.isWebViewVisible()) return;
         SharedPreferences settings = getSharedPreferences("zen_completion_playback_cache_v22", MODE_PRIVATE);
         if (!settings.getBoolean("enabled", true)) return;
+        if (isRestPhase(phase) && !settings.getBoolean("includeRest", false)) return;
         final int volume = settings.getInt("volume", 35);
         if (volume <= 0) return;
         final String selected = settings.getString("sound", "soft-bell");
@@ -151,8 +207,9 @@ public class FocusTimerService extends Service {
         }
     }
 
-    private void triggerCompletionAlarm(String title) {
-        playRecordedCompletionCue();
+    private void triggerCompletionAlarm(String title, String sessionId, String phase) {
+        if (!firstCompletionForSession(sessionId)) return;
+        playRecordedCompletionCue(phase);
         Intent openIntent = new Intent(this, MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this, 1, openIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
