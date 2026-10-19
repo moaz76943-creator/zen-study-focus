@@ -1,0 +1,17 @@
+/* Scoped to the dynamic picker: logical sizing works in both reading directions. */
+.completion-alert-picker { min-inline-size: 0; color: var(--df22-ink, #172d50); text-align: start; }
+.completion-alert-picker h3 { margin: 0 0 16px; font-size: 1.05rem; line-height: 1.5; }
+.completion-alert-picker .completion-alert-choices { min-inline-size: 0; margin: 0; padding: 0; border: 0; }
+.completion-alert-choices legend { float: none; inline-size: 100%; margin-block-end: 8px; padding: 0; font-size: .85rem; line-height: 1.6; color: #50617a; }
+.completion-alert-option { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding-block: 8px; border-block-end: 1px solid #edf1f7; }
+.completion-alert-option > label { display: flex; align-items: center; gap: 10px; min-inline-size: 0; min-block-size: 44px; font-size: .88rem; line-height: 1.6; cursor: pointer; }
+.completion-alert-option > label > span { min-inline-size: 0; overflow-wrap: anywhere; }
+.completion-alert-picker input[type="radio"], .completion-alert-picker input[type="checkbox"] { flex: 0 0 20px; inline-size: 20px; block-size: 20px; margin: 0; accent-color: #2563eb; }
+.completion-alert-preview { min-inline-size: 44px; min-block-size: 44px; max-inline-size: 8em; border: 1px solid #dce5f0; border-radius: 12px; padding: 8px 12px; background: #f3f7fd; color: #1759ad; font: inherit; font-size: .8rem; font-weight: 650; line-height: 1.5; overflow-wrap: anywhere; cursor: pointer; }
+.completion-alert-preview:active { background: #e5efff; }
+.completion-alert-picker :is(button,input):focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+.completion-alert-enabled { display: flex; align-items: center; gap: 10px; min-block-size: 44px; margin-block: 12px; font-size: .88rem; line-height: 1.6; }
+.completion-alert-volume { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px; font-size: .85rem; line-height: 1.6; }
+.completion-alert-volume output { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; color: #1759ad; }
+.completion-alert-volume input[type="range"] { grid-column: 1 / -1; inline-size: 100%; min-inline-size: 0; min-block-size: 44px; margin: 0; accent-color: #2563eb; direction: ltr; }
+@media (max-width: 360px) { .completion-alert-option { gap: 8px; } .completion-alert-preview { padding-inline: 8px; } }
