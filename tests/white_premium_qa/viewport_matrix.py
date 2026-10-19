@@ -69,7 +69,7 @@ def run():
                                     failures.append((width,direction,scale,"missing hero or nav"))
                                 else:
                                     btns = v["bounds"]
-                                    if any(not b["x"] or b["w"] < 40 or b["h"] < 44 for b in btns):
+                                    if any(b["x"] is None or b["w"] < 40 or b["h"] < 44 for b in btns):
                                         failures.append((width,direction,scale,"nav touch geometry too small"))
                                     timer = btns[3]
                                     center = (timer["x"] + timer["right"])/2
