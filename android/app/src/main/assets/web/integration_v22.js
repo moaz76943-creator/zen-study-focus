@@ -35,6 +35,19 @@
       catch(_){root.DFRecoveryNativeExportResult(requestId,'failed');}
     });
   }
+  // Reflect only user-approved v21 preferences into the native playback cache.
+  // Existing hosts remain compatible with the original three-argument bridge.
+  function syncNativeCompletionAlert(changed) {
+    if (!root.ZenNative || !root.DeepFocusCompletionAlerts) return;
+    const state=root.DeepFocusCompletionAlerts.readCompletionAlertSettings(changed);
+    try {
+      if (typeof root.ZenNative.configureCompletionAlertV2 === 'function') {
+        root.ZenNative.configureCompletionAlertV2(state.sound,state.volume,state.enabled,state.includeRest);
+      } else if (typeof root.ZenNative.configureCompletionAlert === 'function') {
+        root.ZenNative.configureCompletionAlert(state.sound,state.volume,state.enabled);
+      }
+    } catch (_) { /* Native permissions and audio are platform-dependent. */ }
+  }
   function mountAlertPicker() {
     if(!root.DeepFocusCompletionAlerts)return;
     if(alertConfigRef!==cfg){
@@ -44,25 +57,23 @@
       alertEngine=root.DeepFocusCompletionAlerts.createCompletionAlerts(cfg,{
         persist:changed=>{
           const ok=saveFortressData('zen_fortress_cfg_v21',changed)===true;
-          if(ok && root.ZenNative && typeof root.ZenNative.configureCompletionAlert==='function'){
-            const state=root.DeepFocusCompletionAlerts.readCompletionAlertSettings(changed);
-            try{root.ZenNative.configureCompletionAlert(state.sound,state.volume,state.enabled);}catch(_){}
-          }
+          if(ok) syncNativeCompletionAlert(changed);
           return ok;
         },
         canOutput:()=>document.visibilityState!=='hidden',
         onError:()=>notify('Completion audio not available')
       });
       root.DFRecoveryCompletion=alertEngine;
-      if(root.ZenNative && typeof root.ZenNative.configureCompletionAlert==='function'){
-        const state=alertEngine.getSettings();
-        try{root.ZenNative.configureCompletionAlert(state.sound,state.volume,state.enabled);}catch(_){}
-      }
+      syncNativeCompletionAlert(cfg);
     }
     if(alertPicker)alertPicker.unmount();
     const host=document.getElementById('completionAlertPickerHost');
     if(host)alertPicker=root.DeepFocusCompletionAlerts.mountCompletionAlertPicker(host,alertEngine,{
-      translate:(_key,fallback)=>fallback
+      translate:(key,fallback)=>{
+        const translated=root.DeepFocusCompletionAlertLocales &&
+          root.DeepFocusCompletionAlertLocales.translate(cfg.lang,key);
+        return translated || fallback;
+      }
     });
   }
   function copy(value) { return JSON.parse(JSON.stringify(value)); }
@@ -212,11 +223,14 @@
   function mountAnalytics() {
     if(analyticsUi)analyticsUi.destroy();
     const host=document.getElementById('df22AnalyticsHost');
-    if(root.DeepFocusAnalyticsRecoveryUI && cfg.lang==='en') {
-      // The new studio is enabled only where its complete label set exists.
-      // Other locales retain their existing working studio until strict parity is complete.
+    const arAnalytics=cfg.lang==='ar' && root.DeepFocusAnalyticsArabic &&
+      typeof root.DeepFocusAnalyticsArabic.translate==='function';
+    if(root.DeepFocusAnalyticsRecoveryUI && (cfg.lang==='en' || arAnalytics)) {
+      // Use the complete Arabic locale for the new studio. Other locales retain
+      // the prior studio until every label is translated; never fall back to English.
       analyticsUi=root.DeepFocusAnalyticsRecoveryUI.mount(host,getSnapshot,{
         locale:cfg.lang,
+        ...(arAnalytics?{translate:root.DeepFocusAnalyticsArabic.translate}:{}),
         ...(root.ZenNative&&typeof root.ZenNative.exportAnalyticsCsvToFile==='function'?{saveCSV:saveCsvThroughAndroid}:{})
       });
     } else {
