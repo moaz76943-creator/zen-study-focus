@@ -70,11 +70,11 @@ The preview starts with deliberately fictional sample tasks and a note. All edit
 | Search/filter | Existing Core query APIs | Preserve pagination correctness and 5,000-note scale |
 | Theme integration | Already integrated v22 token layer & design recovery 10 | Map UX15 token intent onto \`df-v22\`; **do not copy** demo root CSS into runtime or duplicate theme tokens |
 
-Do not silently activate a second Tasks Studio beside the legacy task screen or re-mount Notes UI twice. Adopt UX15 layout/patterns by **selective integration** with the real runtime components, not by mounting \`prototype.js\` into the APK. It is a UX reference implementation, NOT production application code.
+Do not silently activate a second Tasks Studio beside the legacy task screen or re-mount Notes UI twice. Adopt UX15 layout/patterns by **selective integration** with the real runtime components, not by mounting \`prototype.js\` into the APK. It is a UX reference implementation, NOT production application code. The standalone script auto-attaches only when the page has the `ux15` body class and `tasksView` element.
 
 ## Verification and gates
 
-**Executed:** 15 isolated JavaScript model/static assertions in V8; additionally reproduced two regressions (invalid title consumed task ID, invalid due date partially modified an item) before fixing both and rechecking their passing outcomes. A separate V8 syntax/model check passed after focus/accessibility updates.
+**Executed:** 15 isolated JavaScript model/static assertions in V8; additionally reproduced two regressions (invalid title consumed task ID, invalid due date partially modified an item) before fixing both and rechecking their passing outcomes. A separate V8 syntax/model check passed after focus/accessibility updates. A third failing preview wiring case was found: the browser entry point initially exported handlers without mounting the document. The source now starts only on DOMContentLoaded when the isolated UX15 root is present; its guard was checked in V8/source assertions, **not** in a live browser.
 
 **Committed but not executed in Node here:** \`tests/ux_recovery15/prototype.test.cjs\`. There is no checked-out runnable repository in this tool environment. Existing GitHub Actions workflow currently runs explicit test folder globs **excluding** \`tests/ux_recovery15\`; CI coverage remains blocked until lane 00 includes this suite. Tests of whole-file parsing, clickable browser UI, focus trap, mobile viewport rendering, 20-language screenshots, Android keyboard, real durable storage, quota, process death and physical-device E2E are **NOT TESTED**. Do not mark any as PASS based on static inspection or a V8 logic test.
 
