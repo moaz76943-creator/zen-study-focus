@@ -1,3 +1,6 @@
+if (typeof window !== "undefined" && window.DF22Preflight && !window.DF22Preflight.allowApp(localStorage, document)) {
+  throw new Error("Deep Focus startup suspended to protect v21 user data");
+}
 /* ========================================================
    0. STRICT WESTERN DIGITS ENFORCER (0123456789 ONLY)
    ======================================================== */
@@ -809,6 +812,7 @@ function startQuickSportRest(secs) {
   currentTimerModeKey = 'short';
   timerTotal = secs; timerLeft = secs;
   timerSessionId = null;
+  focusSessionTaskId = null;
   timerActiveMs = 0;
   timerResumeMs = null;
   storeTimerSession();
@@ -854,6 +858,7 @@ function switchTab(secId, btn) {
   }
   if (TAB_GRADS[secId]) document.getElementById('heroHeader').style.setProperty('--page-ambient', TAB_GRADS[secId]);
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (window.DF22Integration?.onTab) window.DF22Integration.onTab(secId);
 }
 
 let toastTimer = null;
@@ -887,6 +892,7 @@ let timerTargetTime = null;
 let currentTimerModeKey = 'focus';
 let customSessionLabel = '';
 let timerSessionId = null;
+let focusSessionTaskId = null;
 let timerActiveMs = 0;
 let timerResumeMs = null;
 function accumulateActiveTime() {
@@ -903,6 +909,7 @@ function storeTimerSession() {
     endAt: timerRunning ? timerTargetTime : null,
     mode: currentTimerModeKey, label: customSessionLabel,
     sessionId: timerSessionId,
+    taskId: focusSessionTaskId,
     activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null,
     training: quickTraining && quickTraining.active ? {...quickTraining} : null
   });
@@ -928,7 +935,12 @@ function creditCompletedSession() {
   cfg.metricsDate = localDateISO();
   cfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
   if (!Array.isArray(cfg.sessionHistory)) cfg.sessionHistory = [];
-  cfg.sessionHistory.push({id: timerSessionId, date: localDateISO(), minutes: earned, domain: cfg.domain || 'study'});
+  const credited = {id: timerSessionId, date: localDateISO(), minutes: earned,
+    domain: cfg.domain || 'study',mode:'focus',completed:true};
+  if (Number.isSafeInteger(focusSessionTaskId) && focusSessionTaskId >= 0 &&
+      typeof tasksList !== 'undefined' && tasksList.some(t => t.id === focusSessionTaskId && !t.isStarter))
+    credited.taskId = focusSessionTaskId;
+  cfg.sessionHistory.push(credited);
   if (!quickTraining?.active) {
     const rounds = Number.isInteger(cfg.roundsPerCycle) && cfg.roundsPerCycle >= 1 && cfg.roundsPerCycle <= 12 ? cfg.roundsPerCycle : 4;
     const past = Number.isInteger(cfg.focusCycleCount) && cfg.focusCycleCount >= 0 && cfg.focusCycleCount < rounds ? cfg.focusCycleCount : 0;
@@ -937,6 +949,8 @@ function creditCompletedSession() {
   cfg.streak = computeActualStreak(cfg.sessionHistory);
   saveFortressData('zen_fortress_cfg_v21', cfg);
   syncHeaderMetrics();
+  if (window.DF22Integration?.onSessionRecorded) window.DF22Integration.onSessionRecorded();
+  try { document.dispatchEvent(new CustomEvent('deep-focus:session-recorded',{detail:{schemaVersion:1,...credited}})); } catch (e) {}
 }
 function finalizeTimerSession(shouldChime) {
   if (timerInterval) clearInterval(timerInterval);
@@ -979,6 +993,7 @@ function restoreTimerSession() {
   currentTimerModeKey = ['focus','short','long','custom'].includes(snap.mode) ? snap.mode : 'focus';
   customSessionLabel = typeof snap.label === 'string' ? snap.label.slice(0, 100) : '';
   timerSessionId = typeof snap.sessionId === 'string' ? snap.sessionId : null;
+  focusSessionTaskId = Number.isSafeInteger(snap.taskId) && snap.taskId >= 0 ? snap.taskId : null;
   quickTraining = validQuickSnapshot(snap.training);
   timerActiveMs = Number.isFinite(snap.activeMs) && snap.activeMs >= 0 && snap.activeMs <= 86400000
     ? snap.activeMs : Math.max(0, (timerTotal - timerLeft) * 1000);
@@ -1052,6 +1067,13 @@ function updateTimerDisplay() {
   updateFocusStatus();
 }
 
+function selectTimerModeFromUser(mins, modeKey, btn) {
+  if ((timerRunning || timerSessionId || timerActiveMs > 0) &&
+      !window.confirm(cfg.lang === 'ar' ? 'تغيير الوضع سيلغي تقدم الجلسة الحالية. هل تريد المتابعة؟' :
+        'Changing mode will discard current session progress. Continue?')) return false;
+  selectTimerMode(mins, modeKey, btn);
+  return true;
+}
 function selectTimerMode(mins, modeKey, btn) {
   if(quickTraining?.active && !quickInternalChange) {
     if(!window.confirm(quickText('replacePrompt')))return;
@@ -1080,7 +1102,7 @@ function applyCustomTimerNow() {
   const title = toWest(document.getElementById('inpCustomTitle').value.trim());
   customSessionLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
   closeModal('customTimerModal');
-  selectTimerMode(mins, 'custom', document.getElementById('modeCustomBtn'));
+  if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return;
   showToast(`⚡ ${customSessionLabel}`);
 }
 
@@ -1118,7 +1140,12 @@ function toggleTimerPlay() {
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
     } catch(e){}
 
-    if (!timerSessionId) timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
+    if (!timerSessionId) {
+      timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
+      const linked = typeof focusWorkflowGetLinkedTask === 'function' ? focusWorkflowGetLinkedTask() : null;
+      focusSessionTaskId = quickTraining?.active && Number.isSafeInteger(quickTraining.taskId)
+        ? quickTraining.taskId : (linked?.id ?? null);
+    }
     timerRunning = true;
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     timerResumeMs = Date.now();
@@ -1141,6 +1168,7 @@ function resetTimerNow() {
   if (timerRunning) toggleTimerPlay();
   timerLeft = timerTotal;
   timerSessionId = null;
+  focusSessionTaskId = null;
   timerActiveMs = 0;
   timerResumeMs = null;
   storeTimerSession();
@@ -1225,7 +1253,14 @@ function toggleTaskDone(id) {
 
 function focusOnTask(id) {
   const t = tasksList.find(x => x.id === id);
-  if (t) { document.getElementById('timerLinkedTask').textContent = toWest(`🎯 ${t.title}`); switchTab('sec-timer', document.getElementById('navTimer')); }
+  if (t && !t.isStarter) {
+    if (typeof focusWorkflowLinkTask === 'function' && !focusWorkflowLinkTask(t.id)) {
+      showToast('⚠️ Finish the current training before changing linked tasks');
+      return;
+    }
+    document.getElementById('timerLinkedTask').textContent = toWest(`🎯 ${t.title}`);
+    switchTab('sec-timer', document.getElementById('navTimer'));
+  }
 }
 
 let lastAllocatedRecordId = 0;
