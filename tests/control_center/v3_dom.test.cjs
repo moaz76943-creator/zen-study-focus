@@ -54,7 +54,7 @@ function harness(){
   const ctx={document,globalThis:{DeepFocusV3Core:ops,DeepFocusControlCenter:{getSnapshot:()=>data},DeepFocusStudioUI:studio},URL,Date,Blob,
     setTimeout,clearTimeout};
   vm.runInNewContext(script,ctx,{timeout:3000});
-  return {document,element:id=>document.getElementById(id),getCurrent:()=>current};
+  return {document,element:id=>document.getElementById(id),getCurrent:()=>current,applyConfig:studio.applyConfig};
 }
 
 test('mounts source data, draws task/PR/CI panels and release gates',()=>{
@@ -84,8 +84,8 @@ test('presets, undo/redo, screen reset are reversible local staged changes',()=>
   h.element('v3-redo').click();
   assert.notEqual(h.getCurrent().theme.primary,baseline.theme.primary);
   const altered=studioCore.updateSetting(h.getCurrent(),'timer','spacing',25);
-  h.document.dispatchEvent({type:'df:studio-changed'});
-  assert.ok(altered.screens.timer.spacing===25);
+  h.applyConfig(altered);
+  assert.equal(h.getCurrent().screens.timer.spacing,25);
   h.element('v3-reset-screen').click();
   assert.equal(h.getCurrent().screens.timer.spacing,baseline.screens.timer.spacing);
 });
