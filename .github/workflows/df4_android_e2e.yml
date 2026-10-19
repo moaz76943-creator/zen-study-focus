@@ -58,6 +58,13 @@ jobs:
             test -s android/app/build/outputs/apk/debug/app-debug.apk
             adb -s emulator-5554 get-state
             adb -s emulator-5554 install -r android/app/build/outputs/apk/debug/app-debug.apk
+            # Explicit positive-permission case: prevent first-launch Android permission modal
+            # from hiding WebView controls; denial behavior remains a separate NOT_TESTED case.
+            adb -s emulator-5554 shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS
+            adb -s emulator-5554 shell am start -n com.zenstudy.focus/.MainActivity
+            sleep 3
+            adb -s emulator-5554 shell uiautomator dump /sdcard/df4-preflight.xml
+            adb -s emulator-5554 exec-out cat /sdcard/df4-preflight.xml > tests/android_e2e_recovery/preflight_ui.xml
             # Emulator is newly provisioned; never connect to the owner's phone/profile.
             python3 tests/android_e2e_recovery/run_e2e.py --serial emulator-5554 --ack-disposable-data --json tests/android_e2e_recovery/results.local.json
       - name: Upload exact-result Android QA JSON (including failures)
@@ -66,4 +73,6 @@ jobs:
         with:
           name: DF4-Android-E2E-Results-${{ github.sha }}
           if-no-files-found: warn
-          path: tests/android_e2e_recovery/results.local.json
+          path: |
+            tests/android_e2e_recovery/results.local.json
+            tests/android_e2e_recovery/preflight_ui.xml
