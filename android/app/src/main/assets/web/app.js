@@ -1539,9 +1539,11 @@ const SOUNDS_DATA = [
   { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg' },
   { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg' },
   { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg' },
+  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg' },
   { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg' },
   { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg' },
   { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg' },
+  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg' },
   { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg' },
 ];
 

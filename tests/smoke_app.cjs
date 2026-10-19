@@ -295,7 +295,7 @@ assert.notEqual(evaluate('notesList[0].id'),savedNoteId);
 assert.ok(store.has('zen_fortress_notes_v21'),'Saved notes compatibility');
 assert.equal(evaluate('typeof openQuickTrainingFromNav'),'function');
 // Only recordings bundled in this APK are selectable; fabricated sound tracks are excluded.
-assert.equal(evaluate('SOUNDS_DATA.length'),7,'Only the seven currently usable recording tracks are offered');
+assert.equal(evaluate('SOUNDS_DATA.length'),9,'Only the nine packaged and present audio tracks are offered');
 const audioPaths=JSON.parse(evaluate('JSON.stringify(SOUNDS_DATA.map(s => s.src))'));
 for (const audioPath of audioPaths) assert.ok(fs.existsSync(path.join(root,audioPath)),audioPath+' missing');
 
