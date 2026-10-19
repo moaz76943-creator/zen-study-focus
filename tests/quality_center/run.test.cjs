@@ -29,3 +29,16 @@ test('HTML safely escapes diagnostic output without executable markup', () => {
 test('invalid status is never accepted as green', () => {
   assert.throws(() => finding('X', 'X', 'SUCCESS', 'X'), /Unknown status/);
 });
+
+test('recovery task details render escaped in dashboard, not as injected HTML', () => {
+  const malicious = '<img src=x onerror="alert(1)">';
+  const backlog = {
+    expected: 161, total: 161, counts: {TESTED: 6, IN_PROGRESS: 97, BLOCKED: 58, TODO: 0, DEFERRED: 0},
+    systems: [{name: 'AUDIO', total: 1, statuses: {TESTED:0,IN_PROGRESS:0,BLOCKED:1}}],
+    tasks: [{id: 'DF-013', status: 'BLOCKED', system: 'AUDIO', title: malicious, evidence: malicious}]
+  };
+  const result = html(buildReport([], 'abc', '2026-10-19T10:00:00Z', backlog));
+  assert.match(result, /Recovery ledger/);
+  assert.ok(result.includes(escapeHtml(malicious)));
+  assert.ok(!result.includes(malicious));
+});
