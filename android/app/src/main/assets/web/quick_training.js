@@ -26,6 +26,29 @@ let quickInternalChange = false;
 let quickExercises = [];
 let quickPresetDomain = 'sport';
 const QUICK_CFG_KEY = 'zen_quick_training_cfg_v21';
+/* Task identity is always the original numeric v21 task ID (never a display label).
+   app.js focusOnTask will call this method through a lane-00 integration patch. */
+let focusWorkflowLinkedTaskId = null;
+function focusWorkflowGetLinkedTask(id=focusWorkflowLinkedTaskId) {
+ if(!Number.isSafeInteger(id)||id<0||typeof tasksList==='undefined'||!Array.isArray(tasksList))return null;
+ return tasksList.find(t=>t&&t.id===id&&t.isStarter!==true)||null;
+}
+function focusWorkflowLinkTask(id) {
+ if(quickTraining?.active)return false;
+ if(id===null) { focusWorkflowLinkedTaskId=null;return true; }
+ if(!focusWorkflowGetLinkedTask(id))return false;
+ focusWorkflowLinkedTaskId=id;
+ return true;
+}
+/* Events are a notification contract, NOT a second accounting ledger.
+   Only the v21 completed session record carries earned minutes. */
+function quickWorkflowEvent(kind, details={}) {
+ if(typeof CustomEvent!=='function'||typeof window.dispatchEvent!=='function')return;
+ const body={schemaVersion:1,kind,source:'quick-training',
+   ...details};
+ window.dispatchEvent(new CustomEvent('deep-focus:workflow',{detail:body}));
+}
+
 function quickText(key) {
   const values = QUICK_TRANSLATIONS[cfg.lang] || QUICK_TRANSLATIONS.en;
   const idx = QUICK_KEYS.indexOf(key);
@@ -67,6 +90,7 @@ function validQuickSnapshot(raw) {
     active:true, sets:raw.sets, workSeconds:raw.workSeconds,restSeconds:raw.restSeconds,
     currentSet:raw.currentSet,phase:raw.phase,skipLastRest:raw.skipLastRest,
     domain:raw.domain,
+    taskId:Number.isSafeInteger(raw.taskId)&&raw.taskId>=0?raw.taskId:null,
     exercises:Array.isArray(raw.exercises)?raw.exercises.filter(x=>typeof x==='string').slice(0,24).map(x=>x.slice(0,70)):[]
   };
 }
@@ -159,14 +183,15 @@ function startQuickTraining() {
   if(!Number.isInteger(sets) || sets<1 || sets>99 || workSeconds===null || restSeconds===null){
     showToast(quickText('invalidDuration'));return;
   }
-  if(timerRunning || (timerSessionId && timerLeft<timerTotal)) {
+  if(timerRunning || timerSessionId!==null) {
     if(!window.confirm(quickText('replacePrompt')))return;
   }
   if(timerRunning)toggleTimerPlay();
   quickTraining={
     active:true,sets,workSeconds,restSeconds,currentSet:0,phase:'work',
     skipLastRest:document.getElementById('qtSkipLast').checked,
-    exercises:quickExercises.slice(),domain:quickPresetDomain
+    exercises:quickExercises.slice(),domain:quickPresetDomain,
+    taskId:focusWorkflowGetLinkedTask()?.id ?? null
   };
   cfg.domain=quickPresetDomain;
   saveFortressData('zen_fortress_cfg_v21',cfg);
@@ -178,6 +203,8 @@ function startQuickTraining() {
   toggleTimerPlay();
   renderQuickTraining();
   showToast(quickText('started'));
+  quickWorkflowEvent('started',{domain:quickTraining.domain,taskId:quickTraining.taskId,
+    sets:quickTraining.sets,workSeconds:quickTraining.workSeconds,restSeconds:quickTraining.restSeconds});
 }
 function stopQuickTrainingInternal() {
   quickTraining=null;
@@ -188,8 +215,11 @@ function stopQuickTrainingInternal() {
 function cancelQuickTraining(skipPrompt=false) {
   if(!quickTraining?.active)return;
   if(!skipPrompt&&!window.confirm(quickText('cancelPrompt')))return;
+  const ended=quickTraining;
   quickTraining=null;
   stopQuickTrainingInternal();
+  quickWorkflowEvent('cancelled',{domain:ended.domain,taskId:ended.taskId??null,
+    completedSets:ended.currentSet});
 }
 function skipQuickTrainingStep() {
   if(!quickTraining?.active)return;
@@ -198,6 +228,7 @@ function skipQuickTrainingStep() {
   advanceQuickTrainingStep();
 }
 function completeQuickTraining() {
+  const finished=quickTraining;
   const domain = quickTraining?.domain || cfg.domain || 'study';
   quickTraining = null;
   quickInternalChange = true;
@@ -205,6 +236,7 @@ function completeQuickTraining() {
   quickInternalChange = false;
   renderQuickTraining();
   showToast(quickText('finished'));
+  if(finished)quickWorkflowEvent('completed',{domain,taskId:finished.taskId??null,sets:finished.sets});
 }
 function advanceQuickTrainingStep() {
   const q=quickTraining;
@@ -232,6 +264,8 @@ function advanceQuickTrainingStep() {
   quickInternalChange=false;
   toggleTimerPlay();
   renderQuickTraining();
+  quickWorkflowEvent('phase',{domain:q.domain,taskId:q.taskId??null,
+    phase:q.phase,set:q.currentSet+1,sets:q.sets});
   return true;
 }
 function updateFocusStatus() {

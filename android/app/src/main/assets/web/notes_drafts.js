@@ -6,15 +6,19 @@ let nsDraftTimer=null;
 const NS_DRAFT_LANG={
  en:{saved:'Draft saved on this device',ready:'An unfinished draft is available',restore:'Restore draft',
  discard:'Discard',tooLong:'Draft exceeds autosave limit. Save this note directly.',restored:'Draft restored',
- cleared:'Draft discarded'},
+ cleared:'Draft discarded',other:'Another unfinished note is saved. Open or export it before overwriting.'},
  ar:{saved:'تم حفظ المسودة على الجهاز',ready:'توجد مسودة غير مكتملة',restore:'استعادة المسودة',
  discard:'حذف المسودة',tooLong:'المسودة كبيرة جدًا للحفظ التلقائي. احفظ الملاحظة مباشرة.',restored:'تمت استعادة المسودة',
- cleared:'تم حذف المسودة'}
+ cleared:'تم حذف المسودة',other:'توجد مسودة لملاحظة أخرى. افتحها أو انسخها قبل الاستبدال.'}
 };
 function nsDraftLabel(k){return (cfg.lang==='ar'?NS_DRAFT_LANG.ar:NS_DRAFT_LANG.en)[k];}
 function nsGetStoredDraft(){
  const d=loadFortressData(NS_DRAFT_KEY,null);
  if(!d||typeof d!=='object'||d.v!==1||typeof d.title!=='string'||typeof d.body!=='string')return null;
+ if(d.cornell!==undefined&&(!d.cornell||['cues','notes','summary'].some(k=>typeof d.cornell[k]!=='string'||d.cornell[k].length>NS_DRAFT_LIMIT)))return null;
+ if(d.tags!==undefined&&(typeof d.tags!=='string'||d.tags.length>12000))return null;
+ if(d.notebookId!==undefined&&(typeof d.notebookId!=='string'||d.notebookId.length>120))return null;
+ if(d.recallPairs!==undefined&&(!Array.isArray(d.recallPairs)||d.recallPairs.length>200||d.recallPairs.some(p=>typeof p.question!=='string'||typeof p.answer!=='string')))return null;
  if(d.title.length>250||d.body.length>NS_DRAFT_LIMIT)return null;
  if(!Number.isFinite(d.updated)||d.updated>Date.now()+3600000||Date.now()-d.updated>30*86400000)return null;
  if(d.editId!==null&&(!Number.isSafeInteger(d.editId)||d.editId<0))return null;
@@ -34,7 +38,7 @@ function nsDraftState(status,offer){
 function nsPrepareDraft(){
  if(nsDraftTimer!==null){clearTimeout(nsDraftTimer);nsDraftTimer=null;}
  const saved=nsGetStoredDraft();
- nsDraftState(saved&&nsDraftContextMatches(saved)?'ready':null,!!(saved&&nsDraftContextMatches(saved)));
+ nsDraftState(saved?(nsDraftContextMatches(saved)?'ready':'other'):null,!!(saved&&nsDraftContextMatches(saved)));
 }
 function nsReadEditorDraft(){
  return {
@@ -44,7 +48,8 @@ function nsReadEditorDraft(){
   date:document.getElementById('inpNoteCalDate').value||localDateISO(),
   blur:document.getElementById('chkNoteBlur').checked,
   pinned:document.getElementById('nsPinCheck').checked,
-  favorite:document.getElementById('nsFavCheck').checked,updated:Date.now()
+  favorite:document.getElementById('nsFavCheck').checked,updated:Date.now(),
+  ...(window.DeepFocusNotesEditorUI?.draftFields?.()||{})
  };
 }
 function nsScheduleDraft(){
@@ -59,8 +64,16 @@ function nsFlushDraft(){
  if(!modal||!modal.classList.contains('open'))return false;
  const draft=nsReadEditorDraft();
  if(draft.title.length>250||draft.body.length>NS_DRAFT_LIMIT){nsDraftState('tooLong',false);return false;}
- if(!draft.title.trim()&&!draft.body.trim())return false;
- saveFortressData(NS_DRAFT_KEY,draft);
+ if(!draft.title.trim()&&!draft.body.trim()&&!['cues','notes','summary'].some(k=>draft.cornell?.[k]?.trim()))return false;
+ const existing=nsGetStoredDraft();
+ if(existing&&!nsDraftContextMatches(existing)){nsDraftState('other',false);return false;}
+ try {
+  const raw=JSON.stringify(draft);
+  if(raw.length>NS_DRAFT_LIMIT+6000){nsDraftState('tooLong',false);return false;}
+  saveFortressData(NS_DRAFT_KEY,draft);
+  const checked=nsGetStoredDraft();
+  if(!checked||checked.updated!==draft.updated||checked.editId!==draft.editId){nsDraftState('tooLong',false);return false;}
+ }catch(e){nsDraftState('tooLong',false);return false;}
  nsDraftState('saved',false);return true;
 }
 function nsRestoreDraft(){
@@ -73,6 +86,7 @@ function nsRestoreDraft(){
  document.getElementById('chkNoteBlur').checked=!!saved.blur;
  document.getElementById('nsPinCheck').checked=!!saved.pinned;
  document.getElementById('nsFavCheck').checked=!!saved.favorite;
+ if(window.DeepFocusNotesEditorUI?.restoreDraftFields)window.DeepFocusNotesEditorUI.restoreDraftFields(saved);
  nsUpdateCount();nsDraftState('restored',false);
  return true;
 }
