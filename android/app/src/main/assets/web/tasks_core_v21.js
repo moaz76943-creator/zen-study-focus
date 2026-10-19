@@ -59,11 +59,12 @@
   function normalizeRepeat(value) {
     if(value===null)return null;
     if(!value || typeof value!=='object' || Array.isArray(value))fail('Invalid repeat');
-    if(!['daily','weekly','monthly'].includes(value.frequency) || !Number.isInteger(value.interval) || value.interval<1 || value.interval>365)fail('Invalid repeat rule');
+    if(!['daily','weekdays','weekly','monthly'].includes(value.frequency) || !Number.isInteger(value.interval) || value.interval<1 || value.interval>365)fail('Invalid repeat rule');
+    if(value.frequency==='weekdays' && value.interval!==1)fail('Weekdays repeat interval must equal 1');
     if(value.until!==undefined && !validDate(value.until))fail('Invalid repeat limit');
     return {frequency:value.frequency,interval:value.interval,...(value.until?{until:value.until}:{})};
   }
-  const EDITABLE=new Set(['title','description','date','dueTime','catKey','priority','important','urgent','estimateMin','projectId','group','noteIds','checklist','subtasks','repeat']);
+  const EDITABLE=new Set(['title','description','date','dueTime','catKey','priority','important','urgent','estimateMin','projectId','group','noteIds','checklist','subtasks','repeat','dueAssigned']);
   function normalizePatch(state,patch) {
     if(!patch || typeof patch!=='object' || Array.isArray(patch))fail('Patch must be object');
     const out={};
@@ -72,6 +73,7 @@
       if(k==='title'){out[k]=strings(v,20000,k);if(!out[k])fail('Title required');}
       else if(k==='description')out[k]=strings(v,50000,k);
       else if(k==='date'){if(!validDate(v))fail('Invalid task date');out[k]=v;}
+       else if(k==='dueAssigned'){if(typeof v!=='boolean')fail('Invalid dueAssigned');out[k]=v;}
       else if(k==='dueTime'){if(v!==null && (typeof v!=='string'||!/^([01]\d|2[0-3]):[0-5]\d$/.test(v)))fail('Invalid due time');out[k]=v;}
       else if(k==='catKey'){if(!VALID_CATS.includes(v))fail('Invalid v21 category');out[k]=v;}
       else if(k==='priority'){if(!PRIORITIES.includes(v))fail('Invalid priority');out[k]=v;}
@@ -101,13 +103,14 @@
     if(!fields.title)fail('Title required');
     const stamp=timeStamp(opts),id=uniqueId(s,opts);
     const task={id,isStarter:false,title:fields.title,date:fields.date||stamp.slice(0,10),catKey:fields.catKey||'study',done:false,
-      time:'25m',status:'todo',createdAt:stamp,updatedAt:stamp,...fields};
+      time:'25m',status:'todo',createdAt:stamp,updatedAt:stamp,dueAssigned:own(fields,'date'),...fields};
     s.tasksList.unshift(task);
     return {state:s,task:copy(task)};
   }
   function updateTask(state,id,patch,opts={}) {
     const s=stateCopy(state),task=get(s,id,{includingTrash:false}),fields=normalizePatch(s,patch);
     Object.assign(task,fields,{updatedAt:timeStamp(opts)});
+     if(own(fields,'date')&&!own(fields,'dueAssigned'))task.dueAssigned=true;
     return {state:s,task:copy(task)};
   }
   function plusDays(date,days) {
@@ -119,6 +122,10 @@
     if(!rule||!validDate(task.date))return null;
     let next;
     if(rule.frequency==='daily')next=plusDays(task.date,rule.interval);
+    else if(rule.frequency==='weekdays'){
+      next=plusDays(task.date,1);
+      while([0,6].includes(new Date(next+'T12:00:00Z').getUTCDay()))next=plusDays(next,1);
+    }
     else if(rule.frequency==='weekly')next=plusDays(task.date,rule.interval*7);
     else {
       const anchor=task.repeatAnchorDay||Number(task.date.slice(8,10));
@@ -199,13 +206,36 @@
     return {total:rows.length,completed,percent:rows.length?Math.round(completed*100/rows.length):0};
   }
   function isOverdue(t,today) {if(!validDate(today))fail('Invalid comparison day');return !!(validDate(t.date)&&t.date<today&&!t.done&&!t.deletedAt&&statusOf(t)!=='archived');}
+  // User-curated top three, stored additively in cfg; no synthetic/automatic picks.
+  function chooseTopThree(state,today,ids) {
+    if(!validDate(today)||!Array.isArray(ids)||ids.length>3||new Set(ids).size!==ids.length)fail('Select up to three distinct task IDs');
+    const s=stateCopy(state);
+    for(const id of ids){
+      const t=get(s,id,{includingTrash:false});
+      if(t.isStarter||t.done||statusOf(t)==='archived')fail('Only active real tasks may be prioritized');
+    }
+    if(!s.cfg.taskTopThreeV21||typeof s.cfg.taskTopThreeV21!=='object'||Array.isArray(s.cfg.taskTopThreeV21))s.cfg.taskTopThreeV21={};
+    s.cfg.taskTopThreeV21[today]=ids.slice();
+    return s;
+  }
   function topThree(state,today) {
     if(!validDate(today))fail('Invalid today');
-    const priority={urgent:4,high:3,medium:2,low:1};
-    return listTasks(state).filter(t=>!t.done&&validDate(t.date)&&t.date<=today).sort((a,b)=>{
-      const rank=t=>(isOverdue(t,today)?100:0)+(t.important?30:0)+(t.urgent?20:0)+(priority[t.priority]||0);
-      return rank(b)-rank(a)||a.date.localeCompare(b.date)||a.id-b.id;
-    }).slice(0,3);
+    const ids=state.cfg?.taskTopThreeV21?.[today];
+    if(!Array.isArray(ids))return [];
+    const live=new Map(listTasks(state).filter(t=>!t.done).map(t=>[t.id,t]));
+    return [...new Set(ids)].slice(0,3).filter(id=>idOk(id)&&live.has(id)).map(id=>live.get(id));
+  }
+  function taskSections(state,today) {
+    if(!validDate(today))fail('Invalid today');
+    const groups={today:[],upcoming:[],overdue:[],completed:[]};
+    for(const t of listTasks(state)){
+      if(t.done){groups.completed.push(t);continue;}
+      if(t.dueAssigned===false||t.date===today)groups.today.push(t);
+      else if(validDate(t.date)&&t.date<today)groups.overdue.push(t);
+      else if(validDate(t.date)&&t.date>today)groups.upcoming.push(t);
+      else groups.today.push(t);
+    }
+    return groups;
   }
   function eisenhower(state) {
     const out={do:[],schedule:[],delegate:[],eliminate:[]};
@@ -261,5 +291,5 @@
   }
   return Object.freeze({validDate,statusOf,createTask,updateTask,setStatus,trashTask,restoreTask,rescheduleTask,
     addItem,setItemDone,createProject,projects,projectProgress,listTasks,isOverdue,topThree,eisenhower,
-    kanban,searchTasks,calendarTasks,sessionTotals,actualFocusMinutes,compareEstimate});
+    kanban,searchTasks,calendarTasks,sessionTotals,actualFocusMinutes,compareEstimate,chooseTopThree,taskSections});
 });
