@@ -9,9 +9,12 @@
   <meta name="description" content="Deep Focus repository operations dashboard: QA, CI, recovery tasks, incident triage, and audit reports.">
   <title>Deep Focus | مركز قيادة التطوير</title>
   <link rel="stylesheet" href="./control-center.css">
+  <link rel="stylesheet" href="./v3.css">
   <script src="./control-center.js" defer></script>
   <script src="./studio-core.js" defer></script>
   <script src="./studio.js" defer></script>
+  <script src="./v3-core.js" defer></script>
+  <script src="./v3-ui.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#overview">تجاوز إلى المحتوى الرئيسي</a>
@@ -24,6 +27,7 @@
       <div class="rail-caption">مركز التطوير</div>
       <nav class="navigation" aria-label="أقسام اللوحة">
         <a href="#overview" class="active">◈ <span>نظرة عامة</span></a>
+        <a href="#v3-workbench">⌕ <span>أدوات الإدارة السريعة</span></a>
         <a href="#risks">◇ <span>المخاطر والأعطال</span></a>
         <a href="#tasks">▤ <span>المهام الـ161</span></a>
         <a href="#studio">▧ <span>محرر الشاشات</span></a>
@@ -80,6 +84,76 @@
           <article class="metric"><span class="metric-icon mint">✓</span><span>مهام موسومة TESTED</span><strong id="stat-tested">—</strong><small>لا تعني نجاح اختبار الجهاز</small></article>
           <article class="metric"><span class="metric-icon violet">⇄</span><span>طلبات دمج مفتوحة</span><strong id="stat-prs">—</strong><small>من بيانات GitHub الحية</small></article>
         </div>
+      </section>
+      <section class="section" id="v3-workbench" aria-labelledby="v3-title">
+        <div class="section-heading">
+          <div><span class="section-kicker">CONTROL CENTER 3.0 · 20 LIVE TOOLS</span><h2 id="v3-title">مساحة إدارة المشروع</h2></div>
+          <span class="small-muted">قراءة آمنة · تغييرات تصميم قابلة للتراجع</span>
+        </div>
+        <div class="v3-toolbar panel">
+          <div class="v3-search">
+            <label for="v3-search">بحث شامل في المهام والفحوصات والطلبات والتقارير <kbd>Ctrl K</kbd></label>
+            <input type="search" id="v3-search" autocomplete="off" placeholder="ابحث عن ملف صوت، مهمة، PR، أو نتيجة اختبار…" aria-controls="v3-search-results" aria-expanded="false">
+            <div id="v3-search-results" class="v3-search-results" aria-live="polite"></div>
+          </div>
+          <span id="v3-connection" class="small-muted" role="status">تُستخدم بيانات المستودع المعروضة أعلاه، ولا تُرسل طلبات كتابة.</span>
+        </div>
+        <div class="v3-grid">
+          <article class="panel v3-panel">
+            <div class="v3-panel-heading"><span class="v3-symbol">01</span><div><h3>إدارة مهام الاستعادة</h3><small>رؤية مخصصة · ترتيب · CSV · توزيع المجالات</small></div></div>
+            <div class="v3-fields">
+              <div><label for="v3-task-view">عرض المهام</label><select id="v3-task-view">
+                <option value="blocked">المحجوبة</option><option value="active">تحتاج تنفيذًا</option><option value="done">موسومة TESTED</option><option value="all">جميع المهام</option>
+              </select></div>
+              <div><label for="v3-task-sort">الترتيب</label><select id="v3-task-sort">
+                <option value="status">الأولوية حسب الحالة</option><option value="id-asc">رقم المهمة تصاعديًا</option><option value="id-desc">رقم المهمة تنازليًا</option><option value="area">حسب القسم</option>
+              </select></div>
+            </div>
+            <div class="v3-toolbar-mini"><span id="v3-task-count" class="small-muted">بانتظار السجل…</span><button type="button" id="v3-task-export" class="button secondary">تنزيل CSV</button></div>
+            <div id="v3-task-results" class="v3-results" aria-live="polite"></div>
+            <h4>الأقسام الأكثر احتياجًا</h4><div id="v3-area-metrics" class="v3-area-metrics"></div>
+          </article>
+          <article class="panel v3-panel">
+            <div class="v3-panel-heading"><span class="v3-symbol">02</span><div><h3>الاختبارات وطلبات الدمج</h3><small>نسبة نجاح الفحوصات · الأعطال · PR المتأخر</small></div></div>
+            <div id="v3-ci-trend" class="v3-kpi-inline">لم تصل بيانات CI بعد.</div>
+            <h4>الفحوصات الفاشلة</h4><div id="v3-ci-failures" class="v3-results"></div>
+            <div class="v3-fields">
+              <div><label for="v3-pr-filter">طلبات السحب</label><select id="v3-pr-filter">
+                <option value="all">كل الطلبات</option><option value="draft">مسودة</option><option value="ready">غير مسودة</option>
+              </select></div>
+              <div><label for="v3-pr-search">ابحث في PR</label><input id="v3-pr-search" type="search" placeholder="رقم أو عنوان"></div>
+            </div>
+            <div id="v3-prs" class="v3-results"></div>
+            <h4>بوابات الإصدار الإلزامية</h4><div id="v3-release-gates" class="v3-gates"></div>
+          </article>
+          <article class="panel v3-panel">
+            <div class="v3-panel-heading"><span class="v3-symbol">03</span><div><h3>تحليل المخاطر والنسخ</h3><small>فلاتر خطورة · صلاحية SHA · مقارنة سجلات</small></div></div>
+            <label for="v3-risk-filter">مستوى الخطورة في تقرير QA المستورد</label>
+            <select id="v3-risk-filter"><option value="all">جميع المستويات</option><option value="critical">حرج</option><option value="warning">تحذير</option><option value="info">معلومات</option></select>
+            <p id="v3-audit-freshness" class="v3-note" role="status">لم يتم تحميل تقرير مثبت لـSHA المرجعي.</p>
+            <div id="v3-risks" class="v3-results"></div>
+            <label for="v3-snapshot-import">مقارنة مع نسخة سابقة من تقرير المشروع (JSON)</label>
+            <input type="file" id="v3-snapshot-import" accept="application/json,.json">
+            <p id="v3-snapshot-result" class="v3-note">لتوليد النسخة الحالية استخدم زر «تصدير حالة المشروع» في قسم الأتمتة، ثم قارنها بتقرير أقدم.</p>
+          </article>
+          <article class="panel v3-panel">
+            <div class="v3-panel-heading"><span class="v3-symbol">04</span><div><h3>أدوات تحرير التصميم</h3><small>قوالب جاهزة · تراجع وإعادة · إعادة ضبط شاشة · فرق قبل التطبيق</small></div></div>
+            <p class="v3-note">هذه الإعدادات تُحفظ في مرحلة المعاينة فقط؛ نزّل ملفات التغيير أو افتح طلب مراجعة من محرر الشاشات.</p>
+            <label for="v3-theme-preset">قالب ألوان سريع</label>
+            <select id="v3-theme-preset"><option value="">اختر قالبًا…</option><option value="ocean">Ocean Blue</option><option value="midnight">Midnight Violet</option><option value="forest">Forest Mint</option><option value="sunset">Sunset Warm</option></select>
+            <div class="v3-editor-actions">
+              <button type="button" class="button secondary" id="v3-undo">↶ تراجع</button>
+              <button type="button" class="button secondary" id="v3-redo">↷ إعادة</button>
+              <button type="button" class="button secondary" id="v3-reset-screen">إعادة الشاشة المحددة</button>
+            </div>
+            <label for="v3-design-import">استيراد إعدادات التصميم المعتمدة (JSON)</label>
+            <input id="v3-design-import" type="file" accept=".json,application/json">
+            <h4>ما الذي تغيّر في التصميم؟</h4>
+            <div id="v3-design-diff" class="v3-diff" aria-live="polite">لا توجد تغييرات أو لم يُحمّل محرر التصميم بعد.</div>
+            <p id="v3-design-status" class="v3-note" role="status"></p>
+          </article>
+        </div>
+        <p class="v3-security">لا توجد خاصية هنا تُغيّر بيانات مستخدمي التطبيق أو تدمج PR أو تُصدر APK موقّعًا. نتائج الفحص غير المكتملة تبقى «غير مختبرة» حتى توفر الأدلة.</p>
       </section>
       <section class="section" id="risks" aria-labelledby="risk-title">
         <div class="section-heading">
