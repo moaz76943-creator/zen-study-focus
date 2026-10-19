@@ -26,6 +26,7 @@ function setup(tasks=[],{failCommit=false}={}){
  return {root,controller,read:()=>db,commits:()=>commits,links,errors};
 }
 function find(root,text){const x=root.find(el=>el.textContent===text);assert.ok(x,'Cannot find '+text);return x;}
+function click(root,text){const x=root.find(el=>el.tagName==='button'&&el.textContent===text);assert.ok(x,'Cannot click '+text);return x;}
 function quickCreate(ctx,title){
  const form=ctx.root.find(el=>el.className==='df-quick');assert.ok(form);
  form.find(el=>el.tagName==='input').value=title;form.fire('submit');
@@ -47,10 +48,10 @@ test('DF-106 collapsed cards keep secondary actions hidden until expanded',()=>{
 });
 test('DF-107 complete/reopen and Undo restore the real task record',()=>{
  const a=setup([{id:9,title:'Real',date:'2026-10-19',catKey:'study',done:false,isStarter:false}]);
- find(a.root,'Complete').fire('click');assert.equal(a.read().tasksList[0].done,true);
+ click(a.root,'Complete').fire('click');assert.equal(a.read().tasksList[0].done,true);
  find(a.root,'Undo').fire('click');assert.equal(a.read().tasksList[0].done,false);
- find(a.root,'Complete').fire('click');
- find(a.root,'Reopen').fire('click');assert.equal(a.read().tasksList[0].done,false);
+ click(a.root,'Complete').fire('click');
+ click(a.root,'Reopen').fire('click');assert.equal(a.read().tasksList[0].done,false);
 });
 test('DF-111 user manually pins task and Undo removes its pin without removing task',()=>{
  const a=setup([{id:10,title:'Pin me',date:'2026-10-19',catKey:'study',done:false,isStarter:false}]);
@@ -70,7 +71,7 @@ test('DF-110 future tasks appear in upcoming rather than today',()=>{
 });
 test('DF-112/118 timer link does not fabricate focus minutes',()=>{
  const a=setup([{id:12,title:'Start focus',date:'2026-10-19',catKey:'study',done:false,isStarter:false}]);
- find(a.root,'Details').fire('click');find(a.root,'Start focus').fire('click');
+ find(a.root,'Details').fire('click');click(a.root,'Start focus').fire('click');
  assert.deepEqual(a.links,[12]);
  assert.equal(Core.actualFocusMinutes(a.read(),12),0);
  assert.equal(a.commits(),0);
