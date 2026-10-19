@@ -17,6 +17,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import java.io.ByteArrayInputStream;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -56,7 +58,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        WebView.setWebContentsDebuggingEnabled(false);
+        // The release APK must never expose its WebView DevTools endpoint.
+        // Debug-only inspection lets disposable Android emulators verify real DOM,
+        // instead of treating an empty UIAutomator tree as a proven app failure.
+        final boolean debuggableBuild =
+                (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        WebView.setWebContentsDebuggingEnabled(debuggableBuild);
         if (!"com.zenstudy.focus".equals(getPackageName())) {
             finish();
             return;
@@ -69,7 +76,10 @@ public class MainActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
-        settings.setAllowFileAccess(true);
+        // android_asset resources remain available with general filesystem access off.
+        // Keep the existing file origin: changing it would orphan v21 localStorage.
+        settings.setAllowFileAccess(false);
+        settings.setBlockNetworkLoads(true);
         settings.setAllowFileAccessFromFileURLs(false);
         settings.setAllowUniversalAccessFromFileURLs(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
@@ -83,28 +93,68 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                String address = uri != null ? uri.toString() : "";
                 // The privileged JS bridge belongs only to bundled app assets.
-                if (address.startsWith("file:///android_asset/web/")) return false;
-                if (uri != null && ("https".equalsIgnoreCase(uri.getScheme())
-                         || "http".equalsIgnoreCase(uri.getScheme()))) {
+                if (request.isForMainFrame() && isBundledAsset(uri)
+                        && "/android_asset/web/index.html".equals(uri.getPath())) return false;
+                if (request.isForMainFrame() && uri != null
+                        && "https".equalsIgnoreCase(uri.getScheme())
+                        && uri.getHost() != null && uri.getUserInfo() == null) {
                     try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); }
                     catch (Exception ignored) {}
                 }
                 return true;
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                if (isBundledAsset(request.getUrl())) return null;
+                // Navigation callbacks alone do not police scripts, images or frames.
+                return new WebResourceResponse("text/plain", "UTF-8", 403, "Blocked",
+                        java.util.Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
             }
         });
         webView.setWebChromeClient(new WebChromeClient());
         webView.loadUrl("file:///android_asset/web/index.html");
     }
 
+    private static boolean isBundledAsset(Uri uri) {
+        if (uri == null || !"file".equalsIgnoreCase(uri.getScheme())
+                || (uri.getAuthority() != null && !uri.getAuthority().isEmpty())) return false;
+        String path = uri.getPath();
+        if (path == null || !path.startsWith("/android_asset/web/")
+                || path.indexOf('\\') >= 0 || path.indexOf('%') >= 0 || path.indexOf('\0') >= 0) return false;
+        for (String part : path.split("/")) {
+            if ("..".equals(part) || ".".equals(part)) return false;
+        }
+        return true;
+    }
+
     public class ZenNativeBridge {
+        // Preserve the original two-argument JavaScript API for older callers.
         @JavascriptInterface
         public void startBackgroundService(int seconds, String title) {
+            startBackgroundTimerInternal(seconds, title, null, null);
+        }
+
+        // v22 callers supply the stable v21 session ID and exact timer phase.
+        @JavascriptInterface
+        public void startBackgroundSession(int seconds, String title, String sessionId, String phase) {
+            startBackgroundTimerInternal(seconds, title, sessionId, phase);
+        }
+
+        private void startBackgroundTimerInternal(int seconds, String title, String sessionId, String phase) {
+            if (seconds < 1 || seconds > 86400) return;
             Intent i = new Intent(MainActivity.this, FocusTimerService.class);
             i.setAction("START");
             i.putExtra("seconds", seconds);
             i.putExtra("title", title);
+            if (sessionId != null && sessionId.matches("[A-Za-z0-9._:-]{1,256}")) {
+                i.putExtra("sessionId", sessionId);
+            }
+            if ("focus".equals(phase) || "custom".equals(phase) ||
+                    "short".equals(phase) || "long".equals(phase)) {
+                i.putExtra("phase", phase);
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(i);
             } else {
@@ -163,12 +213,21 @@ public class MainActivity extends AppCompatActivity {
         // SharedPreferences is NOT an authoritative backup or a migration of v21 records.
         @JavascriptInterface
         public void configureCompletionAlert(String sound, int volume, boolean enabled) {
+            // Retain older callers and any existing rest preference.
+            boolean includeRest = getSharedPreferences("zen_completion_playback_cache_v22", MODE_PRIVATE)
+                    .getBoolean("includeRest", false);
+            configureCompletionAlertV2(sound, volume, enabled, includeRest);
+        }
+
+        @JavascriptInterface
+        public void configureCompletionAlertV2(String sound, int volume, boolean enabled, boolean includeRest) {
             if (sound == null || !sound.matches("silent|soft-bell|wood-tap|water-drop|muted-metal|two-taps")
                     || volume < 0 || volume > 100) return;
             getSharedPreferences("zen_completion_playback_cache_v22", MODE_PRIVATE).edit()
                     .putString("sound", sound)
                     .putInt("volume", volume)
                     .putBoolean("enabled", enabled)
+                    .putBoolean("includeRest", includeRest)
                     .apply();
         }
 

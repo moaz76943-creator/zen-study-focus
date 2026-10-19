@@ -44,7 +44,7 @@
       s.minutes<0||!Number.isSafeInteger(s.sessions)||s.sessions<0)
     throw new TypeError('Invalid chart bucket');
    const h=s.minutes/max*plot,x=left+i*step+step*.1,w=Math.max(.5,step*.8);
-   const name=escape(ascii(s.key+' | '+s.minutes+' min | '+s.sessions+' sessions'));
+   const name=escape(ascii(s.key+' | '+s.minutes+' '+(options.unit||'min')+' | '+s.sessions+' '+(options.sessionsLabel||'sessions')));
    return '<rect data-bucket="'+s.key+'" role="button" tabindex="0" aria-label="'+name+
     '" x="'+x.toFixed(2)+'" y="'+(bottom-h).toFixed(2)+'" width="'+w.toFixed(2)+
     '" height="'+Math.max(h,1).toFixed(2)+'" rx="2" fill="#2563eb"><title>'+name+'</title></rect>';
@@ -75,7 +75,7 @@
   const arcs=values.filter(x=>x.minutes>0).map(x=>{
    const length=circ*x.minutes/total;
    const name=escape(options.labels&&options.labels[x.key]||x.key);
-   const tooltip=escape(ascii(name+': '+x.minutes+' min ('+
+   const tooltip=escape(ascii(name+': '+x.minutes+' '+(options.unit||'min')+' ('+
     Math.round(x.minutes/total*10000)/100+'%)'));
    const svg='<circle cx="85" cy="71" r="'+r+'" fill="none" stroke="'+colors[x.key]+
     '" stroke-width="19" stroke-dasharray="'+length.toFixed(3)+' '+(circ-length).toFixed(3)+
@@ -245,7 +245,7 @@
     series=group.value==='weekly'?next.weekly:group.value==='monthly'?next.monthly:next.daily;
     // Long ranges should not flood the WebView with 3,660 keyboard-focusable rectangles.
     if(series.length>365){group.value='monthly';series=next.monthly;}
-    chart.innerHTML=next.totals.sessions?renderBarsSvg(series,{label:tr('minutes')}):'';
+    chart.innerHTML=next.totals.sessions?renderBarsSvg(series,{label:tr('minutes'),unit:tr('minutes'),sessionsLabel:tr('sessions')}):'';
     if(!next.totals.sessions)chart.textContent=tr('noData');
     const q=next.quality;
     const msg=tr('quality')+': '+ascii(q.excluded)+' · '+tr('conflicts')+': '+ascii(q.conflicts);

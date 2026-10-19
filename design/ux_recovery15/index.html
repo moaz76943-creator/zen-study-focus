@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>Deep Focus — UX Recovery 15 Prototype</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./prototype.js" defer></script>
+</head>
+<body class="ux15">
+  <div class="app-shell">
+    <header class="masthead">
+      <div class="brandline"><span class="brandmark" aria-hidden="true">◈</span><span>DEEP FOCUS <small>UX 15</small></span></div>
+      <button type="button" id="localeSwitch" class="button ghost" aria-label="Switch demo language">EN</button>
+      <h1 data-i18n="heading">مساحتك للإنجاز بهدوء</h1>
+      <p class="subtitle" data-i18n="tagline">كل ما تحتاجه اليوم، دون ازدحام.</p>
+      <p class="demo-disclosure" role="note" data-i18n="demo">نموذج تفاعلي مستقل: البيانات تجريبية وتُفقد عند تحديث الصفحة. لا يوجد حفظ في التطبيق الحقيقي.</p>
+    </header>
+
+    <nav class="switcher" aria-label="Prototype areas">
+      <button type="button" data-tab="tasks" aria-pressed="true" data-i18n="tasks">المهام</button>
+      <button type="button" data-tab="notes" aria-pressed="false" data-i18n="notes">الملاحظات</button>
+    </nav>
+
+    <main id="content">
+      <section id="tasksView" aria-labelledby="tasksHeading">
+        <div class="section-title"><div><span class="eyebrow" data-i18n="daily">مساحة اليوم</span><h2 id="tasksHeading" data-i18n="tasksTitle">أنجز ما يهم</h2></div><span class="accent-orb" aria-hidden="true"></span></div>
+        <form id="quickTaskForm" class="quick-form" novalidate>
+          <label for="quickTaskTitle" class="sr-only" data-i18n="taskTitle">عنوان المهمة</label>
+          <input id="quickTaskTitle" maxlength="250" required autocomplete="off" placeholder="ما المهمة التالية؟" data-placeholder="taskPlaceholder">
+          <button type="submit" class="button primary" data-i18n="addTask">إضافة</button>
+        </form>
+        <div class="section-subhead"><h3 data-i18n="topThree">أهم ثلاث أولويات</h3><p data-i18n="topHint">اختر من بطاقات المهام، دون تغيير وقت التركيز.</p></div>
+        <div id="topList" class="priority-strip" aria-live="polite"></div>
+        <div class="toolbar">
+          <label class="sr-only" for="taskSearch" data-i18n="searchTask">بحث المهام</label>
+          <input type="search" id="taskSearch" placeholder="ابحث في المهام" data-placeholder="searchTask">
+          <label class="sr-only" for="taskFilter" data-i18n="filterTask">تصفية المهام</label>
+          <select id="taskFilter" aria-label="Task filter"><option value="all" data-i18n="all">الكل</option><option value="today" data-i18n="today">اليوم</option><option value="upcoming" data-i18n="upcoming">القادمة</option><option value="done" data-i18n="completed">المكتملة</option></select>
+        </div>
+        <div id="taskList" class="cards" aria-live="polite"></div>
+        <div id="emptyTasks" class="empty-state" hidden><span aria-hidden="true">✦</span><h3 data-i18n="tasksEmpty">لا توجد مهام مطابقة</h3><p data-i18n="tasksEmptyHint">ابدأ بمهمة سريعة أو غيّر التصفية.</p><button type="button" id="focusQuick" class="button secondary" data-i18n="writeTask">اكتب مهمة</button></div>
+        <div id="taskUndo" class="undo-bar" hidden><span data-i18n="taskDeleted">حُذفت المهمة من النموذج</span><button type="button" id="undoTask" class="button secondary" data-i18n="undo">تراجع</button></div>
+      </section>
+
+      <section id="notesView" aria-labelledby="notesHeading" hidden>
+        <div class="section-title"><div><span class="eyebrow" data-i18n="ideas">مساحة الأفكار</span><h2 id="notesHeading" data-i18n="notesTitle">دوّن بوضوح</h2></div><button id="newNote" type="button" class="button primary" data-i18n="newNote">ملاحظة جديدة</button></div>
+        <div class="toolbar">
+          <label class="sr-only" for="noteSearch" data-i18n="searchNote">بحث الملاحظات</label>
+          <input id="noteSearch" type="search" placeholder="ابحث في ملاحظاتك" data-placeholder="searchNote">
+          <label class="sr-only" for="noteFilter" data-i18n="filterNote">نوع الملاحظة</label>
+          <select id="noteFilter" aria-label="Note type"><option value="all" data-i18n="all">الكل</option><option value="quick" data-i18n="quick">سريعة</option><option value="cornell" data-i18n="cornell">Cornell</option></select>
+        </div>
+        <div id="noteList" class="cards note-cards" aria-live="polite"></div>
+        <div id="emptyNotes" class="empty-state" hidden><span aria-hidden="true">✎</span><h3 data-i18n="notesEmpty">صفحة بيضاء لأفكارك</h3><p data-i18n="notesEmptyHint">أنشئ أول ملاحظة أو غيّر البحث.</p><button type="button" id="emptyNewNote" class="button primary" data-i18n="newNote">ملاحظة جديدة</button></div>
+        <div id="noteUndo" class="undo-bar" hidden><span data-i18n="noteDeleted">حُذفت الملاحظة من النموذج</span><button type="button" id="undoNote" class="button secondary" data-i18n="undo">تراجع</button></div>
+      </section>
+    </main>
+    <footer class="footer" data-i18n="footer">تصميم تجريبي للمراجعة — لا يتصل بمخزن v21 أو المؤقت.</footer>
+  </div>
+
+  <div id="overlay" class="overlay" hidden>
+    <div id="taskEditor" class="sheet" role="dialog" aria-modal="true" aria-labelledby="taskEditorHeading" hidden>
+      <form id="taskForm" novalidate>
+        <div class="sheet-head"><h2 id="taskEditorHeading" data-i18n="editTask">تعديل مهمة</h2><button type="button" class="button ghost" data-close aria-label="Close">×</button></div>
+        <label for="taskEditTitle" data-i18n="taskTitle">عنوان المهمة</label><input id="taskEditTitle" maxlength="250" required>
+        <details class="advanced"><summary data-i18n="taskOptions">خيارات إضافية</summary>
+          <label for="taskEditDue" data-i18n="due">موعد اختياري</label><input id="taskEditDue" type="date">
+          <label for="taskEditPriority" data-i18n="priority">الأولوية</label><select id="taskEditPriority"><option value="normal" data-i18n="normal">عادية</option><option value="high" data-i18n="high">عالية</option></select>
+        </details>
+        <div class="sheet-actions"><button type="button" class="button secondary" data-close data-i18n="cancel">إلغاء</button><button class="button primary" type="submit" data-i18n="save">حفظ</button></div>
+      </form>
+    </div>
+    <div id="noteEditor" class="sheet" role="dialog" aria-modal="true" aria-labelledby="noteEditorHeading" hidden>
+      <form id="noteForm" novalidate>
+        <div class="sheet-head"><h2 id="noteEditorHeading" data-i18n="noteEditor">محرر الملاحظة</h2><button type="button" class="button ghost" data-close aria-label="Close">×</button></div>
+        <label for="noteTitle" data-i18n="noteTitle">العنوان</label><input id="noteTitle" maxlength="250">
+        <label for="noteBody" data-i18n="body">نص الملاحظة</label><textarea id="noteBody" rows="6" maxlength="500000"></textarea>
+        <details class="advanced"><summary data-i18n="advanced">أدوات متقدمة</summary>
+          <label for="noteKind" data-i18n="noteType">النوع</label><select id="noteKind"><option value="quick" data-i18n="quick">سريعة</option><option value="cornell" data-i18n="cornell">Cornell</option></select>
+          <div id="cornellFields" hidden>
+            <label for="cornellCues" data-i18n="cues">أسئلة ومفاتيح</label><textarea id="cornellCues" rows="3"></textarea>
+            <label for="cornellNotes" data-i18n="mainNotes">الملاحظات الأساسية</label><textarea id="cornellNotes" rows="4"></textarea>
+            <label for="cornellSummary" data-i18n="summary">الخلاصة</label><textarea id="cornellSummary" rows="3"></textarea>
+          </div>
+        </details>
+        <div class="sheet-actions"><button type="button" class="button secondary" data-close data-i18n="cancel">إلغاء</button><button class="button primary" type="submit" data-i18n="save">حفظ</button></div>
+      </form>
+    </div>
+    <div id="reader" class="sheet reader" role="dialog" aria-modal="true" aria-labelledby="readerHeading" hidden>
+      <div class="sheet-head"><h2 id="readerHeading"></h2><button type="button" class="button ghost" data-close aria-label="Close">×</button></div>
+      <div id="readerText" class="reader-text" dir="auto"></div>
+      <div id="readerCornell" class="cornell-reader" hidden></div>
+      <div class="sheet-actions"><button type="button" class="button secondary" data-close data-i18n="close">إغلاق</button><button type="button" class="button primary" id="readerEdit" data-i18n="edit">تعديل</button></div>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
