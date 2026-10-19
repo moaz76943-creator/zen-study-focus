@@ -104,3 +104,8 @@ test('P12 planner/browser bundle and source status controls are wired, without a
  assert.match(ui,/aria-disabled/);
  assert.doesNotMatch(ui,/innerHTML\s*=|eval\s*\(|localStorage|fetch\s*\(|ZenNative|pulls\.merge/);
 });
+
+test('P13 rejects mixed recovery-area batches that would send one agent across unrelated screens',()=>{
+ assert.throws(()=>plan.selectTask(['DF-014'],'DF-092',tasks),/same area/i);
+ assert.throws(()=>plan.buildPlan(tasks,['DF-014','DF-092'],{lane:'qa',screen:'sounds',sha,stale:false}),/same area/i);
+});
