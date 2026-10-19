@@ -181,6 +181,15 @@ class Suite:
         nodes = self.d.dump()
         if len(nodes) < 5:
             raise NotTested("WebView hierarchy too small to verify interactions")
+        # A fresh Android 13+ install may expose the notification permission
+        # window rather than the app. Never count that system window as app UI.
+        allow_ids = ("com.android.permissioncontroller:id/permission_allow_button",
+                     "com.google.android.permissioncontroller:id/permission_allow_button")
+        if locate(nodes, allow_ids, exact=True):
+            if not self.args.ack_disposable_data:
+                raise NotTested("Notification permission prompt requires a disposable test profile")
+            self.d.tap(*allow_ids)
+        self.d.see("Start or pause timer")
 
     def case_navigation(self):
         for tab, proof in [
