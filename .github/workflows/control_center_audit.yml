@@ -76,6 +76,7 @@ jobs:
             echo "Portable file desktop Chrome DOM boot: **PASS** (not Android WebView or physical touch QA)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
+      - name: Upload single-file mobile dashboard
         uses: actions/upload-artifact@v4
         with:
           name: deep-focus-control-center-mobile
