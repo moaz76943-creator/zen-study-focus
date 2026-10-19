@@ -53,6 +53,37 @@ jobs:
             node --check "$file"
           done
 
+      - name: Bundle portable Android-phone dashboard
+        run: |
+          node tools/control_center/build_portable.cjs --output dist/deep-focus-control-center-mobile.html
+          node tools/control_center/build_portable.cjs --check dist/deep-focus-control-center-mobile.html
+
+      - name: Desktop Chrome smoke test of portable file
+        shell: bash
+        run: |
+          set -euo pipefail
+          browser="$(command -v google-chrome || command -v chromium || true)"
+          if [[ -z "$browser" ]]; then
+            echo "Portable file Chrome DOM smoke: **NOT_TESTED** (no browser installed)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            timeout 45s "$browser" \
+              --headless --no-sandbox --disable-dev-shm-usage --disable-gpu \
+              --no-first-run --disable-extensions --disable-background-networking \
+              --virtual-time-budget=4000 --dump-dom \
+              "file://${GITHUB_WORKSPACE}/dist/deep-focus-control-center-mobile.html" \
+              > dist/portable_chrome_dom.html 2> dist/portable_chrome_stderr.log
+            node tools/control_center/check_portable_dom.cjs dist/portable_chrome_dom.html
+            echo "Portable file desktop Chrome DOM boot: **PASS** (not Android WebView or physical touch QA)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload single-file mobile dashboard
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-focus-control-center-mobile
+          path: dist/deep-focus-control-center-mobile.html
+          retention-days: 14
+          if-no-files-found: error
+
       - name: Inspect static sources
         run: |
           node tools/control_center/audit.cjs \

@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "name": "Deep Focus Control Center v3",
+  "source": "docs/control-center/v3-core.js",
+  "tests": [
+    "tests/control_center/v3_features.test.cjs",
+    "tests/control_center/v3_integration.test.cjs"
+  ],
+  "features": [
+    {
+      "id": "F01",
+      "title": "بحث موحّد عبر المهام وPR وCI ونتائج التدقيق",
+      "handler": "unifiedSearch",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F02",
+      "title": "اختصار لوحة المفاتيح Ctrl/⌘+K للبحث",
+      "handler": "shortcut",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F03",
+      "title": "عروض ذكية للمهام: محجوب ونشط ومختبر والكل",
+      "handler": "taskView",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F04",
+      "title": "ترتيب المهام حسب الحالة والمعرف والقسم",
+      "handler": "sortTasks",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F05",
+      "title": "تصدير المهام المختارة CSV مع حماية المعادلات",
+      "handler": "tasksCSV",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F06",
+      "title": "قياس الأعمال المحجوبة لكل قسم",
+      "handler": "areaMetrics",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F07",
+      "title": "قائمة بوابات إصدار غير متجاوزة",
+      "handler": "releaseChecklist",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F08",
+      "title": "نسبة نجاح CI مع فصل المعلق",
+      "handler": "ciTrend",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F09",
+      "title": "عرض تشغيلات CI الفاشلة فقط",
+      "handler": "failedRuns",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F10",
+      "title": "تنبيه PR غير المحدّث منذ 14 يومًا",
+      "handler": "stalePulls",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F11",
+      "title": "تصفية PR وفق المسودة والعنوان",
+      "handler": "filterPulls",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F12",
+      "title": "تصفية نتائج التدقيق بالخطورة",
+      "handler": "filterFindings",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F13",
+      "title": "التنبيه لاختلاف SHA تقرير التدقيق",
+      "handler": "auditFreshness",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F14",
+      "title": "مقارنة حالة المهام بنسخة مشروع سابقة",
+      "handler": "compareSnapshots",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F15",
+      "title": "قوالب ألوان سريعة آمنة للتصميم",
+      "handler": "applyThemePreset",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F16",
+      "title": "التراجع عن تغييرات التصميم",
+      "handler": "historyUndo",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F17",
+      "title": "إعادة تغييرات التصميم بعد التراجع",
+      "handler": "historyRedo",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F18",
+      "title": "إعادة ضبط شاشة واحدة فقط",
+      "handler": "resetScreen",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F19",
+      "title": "استيراد JSON للتصميم ضمن مخطط صارم",
+      "handler": "importConfig",
+      "mode": "read_only_or_local_draft"
+    },
+    {
+      "id": "F20",
+      "title": "معاينة فرق إعدادات التصميم قبل طلب المراجعة",
+      "handler": "configDiff",
+      "mode": "read_only_or_local_draft"
+    }
+  ]
+}

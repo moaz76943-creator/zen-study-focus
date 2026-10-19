@@ -7,9 +7,9 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
   const REPO='moaz76943-creator/zen-study-focus';
   const SCREENS=Object.freeze({
-    timer:{label:'المؤقت والتركيز',files:['android/app/src/main/assets/web/index.html','android/app/src/main/assets/web/app.js','android/app/src/main/assets/web/timer_settings.js'],tests:['tests/focus_workflows','tests/regression_v21']},
+    timer:{label:'المؤقت والتركيز',files:['android/app/src/main/assets/web/index.html','android/app/src/main/assets/web/app.js','android/app/src/main/assets/web/timer_settings.js'],tests:['tests/interaction_recovery','tests/regression_v21']},
     tasks:{label:'المهام',files:['android/app/src/main/assets/web/tasks_studio.js','android/app/src/main/assets/web/tasks_core_v21.js'],tests:['tests/tasks_core','tests/tasks_recovery']},
-    calendar:{label:'التقويم',files:['android/app/src/main/assets/web/index.html','android/app/src/main/assets/web/goals_studio.js'],tests:['tests/design_quality']},
+    calendar:{label:'التقويم',files:['android/app/src/main/assets/web/index.html','android/app/src/main/assets/web/goals_studio.js'],tests:['tests/white_premium_qa','tests/integration_quality']},
     notes:{label:'الملاحظات',files:['android/app/src/main/assets/web/notes_studio.js','android/app/src/main/assets/web/notes_editor_ui.js','android/app/src/main/assets/web/notes_core_v21.js'],tests:['tests/notes_core','tests/notes_recovery']},
     sounds:{label:'أصوات الطبيعة',files:['android/app/src/main/assets/web/nature_audio_recovery_v1.js','android/app/src/main/assets/web/sound_mix_controls.js','docs/MEDIA_LICENSES.md'],tests:['tests/nature_audio_recovery','tests/completion_alerts']},
     analytics:{label:'التحليلات',files:['android/app/src/main/assets/web/analytics_studio.js','android/app/src/main/assets/web/analytics_recovery_ui.js','android/app/src/main/assets/web/analytics_core_v21.js'],tests:['tests/analytics_core','tests/analytics_recovery']}
