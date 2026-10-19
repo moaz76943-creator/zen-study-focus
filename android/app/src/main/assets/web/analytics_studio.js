@@ -15,7 +15,7 @@
     const max=Math.max(1,...daily.map(r=>r.minutes));
     const w=Math.max(1,width/daily.length||1),bottom=height-22,extent=height-42;
     const marks=daily.map((d,i)=>{
-      if(!core.validDay(d.key)||typeof d.minutes!=='number'||!Number.isFinite(d.minutes)||d.minutes<0)throw new TypeError('Invalid bar value');
+      if(!(core.validDay(d.key)||/^\d{4}-(?:0[1-9]|1[0-2])$/.test(d.key))||typeof d.minutes!=='number'||!Number.isFinite(d.minutes)||d.minutes<0)throw new TypeError('Invalid bar value');
       const bh=extent*d.minutes/max,x=i*w+Math.max(.5,w*.1),barW=Math.max(.5,w*.8);
       const label=esc(d.key+': '+d.minutes+' min, '+d.sessions+' sessions');
       return '<rect x="'+x.toFixed(2)+'" y="'+(bottom-bh).toFixed(2)+'" width="'+barW.toFixed(2)+'" height="'+bh.toFixed(2)+'" rx="'+Math.min(3,barW/2).toFixed(2)+'" fill="#2563eb" data-day="'+d.key+'" tabindex="0" role="button" aria-label="'+label+'"><title>'+label+'</title></rect>';
@@ -58,6 +58,8 @@
     const domain=input('select',t.activity);
     const labels={all:opts.locale==='ar'?'الكل':'All',study:opts.locale==='ar'?'دراسة':'Study',read:opts.locale==='ar'?'قراءة':'Reading',work:opts.locale==='ar'?'عمل':'Work',sport:opts.locale==='ar'?'رياضة':'Sport'};
     ['all',...core.DOMAINS].forEach(d=>{const option=mk('option',labels[d]);option.value=d;domain.appendChild(option);});
+    const grouping=input('select',opts.locale==='ar'?'التجميع':'Grouping');
+    for(const [value,ar,en] of [['daily','يومي','Daily'],['weekly','أسبوعي','Weekly'],['monthly','شهري','Monthly']]){const o=mk('option',opts.locale==='ar'?ar:en);o.value=value;grouping.appendChild(o);}
     const start=input('date',t.start),end=input('date',t.end);
     const exportBtn=mk('button',t.export);exportBtn.type='button';exportBtn.style.cssText='min-height:42px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:6px 12px';
     filters.appendChild(exportBtn);wrapper.appendChild(filters);
@@ -67,7 +69,7 @@
     const domainView=mk('div');domainView.style.cssText='display:flex;gap:12px;flex-wrap:wrap;margin:12px 0';
     const goals=mk('div'),taskBox=mk('div'),heatTitle=mk('h3',t.year),heat=mk('div');heat.style.overflowX='auto';
     [chartTitle,chart,detail,domainView,goals,taskBox,heatTitle,heat].forEach(e=>wrapper.appendChild(e));
-    let current=null,heatDays=[],destroyed=false;
+    let current=null,currentSeries=[],heatDays=[],destroyed=false;
     function refresh(){
       if(destroyed)return null;
       const snap=provider();const today=opts.today||core.localToday();
@@ -80,7 +82,8 @@
         const label=mk('div',name);label.style.fontSize='12px';const number=mk('strong',String(value));number.style.fontSize='22px';
         box.append(label,number);kpis.appendChild(box);
       }
-      chart.innerHTML=report.totals.sessions?barsSvg(report.daily):'';
+      currentSeries=grouping.value==='weekly'?report.weekly:grouping.value==='monthly'?report.monthly:report.daily;
+      chart.innerHTML=report.totals.sessions?barsSvg(currentSeries):'';
       if(!report.totals.sessions){chart.textContent=t.noData;detail.textContent=t.noData;}else detail.textContent=t.details;
       domainView.replaceChildren();
       for(const d of core.DOMAINS){const s=report.byDomain[d];const chip=mk('span',labels[d]+': '+s.minutes+' min');
@@ -89,6 +92,8 @@
       if(!report.goals.available)goals.appendChild(mk('p',t.noGoals));
       else for(const g of report.goals.byDomain){const p=mk('p',labels[g.domain]+': '+g.actualMinutes+' / '+g.targetMinutes+' min ('+g.progress+'%)');goals.appendChild(p);}
       taskBox.replaceChildren(mk('p',t.tasks+': '+report.tasks.completed+' / '+report.tasks.total));
+      for(const p of report.tasks.projects){if(p.total>0)taskBox.appendChild(mk('p',p.name+': '+p.completed+' / '+p.total));}
+      if(report.quality.excluded)taskBox.appendChild(mk('p',(opts.locale==='ar'?'جلسات مستبعدة: ':'Excluded sessions: ')+report.quality.excluded));
       // Heatmap only when the selected year contains at least one validated recorded session.
       const year=Number(end.value.slice(0,4));const days=core.yearHeatmap(snap,year,{today,domain:domain.value});
       heatDays=days;
@@ -98,14 +103,14 @@
     }
     const selectDay=(event)=>{
       const node=event.target.closest?event.target.closest('[data-day]'):null;
-      if(!node||!core.validDay(node.getAttribute('data-day')))return;
+      if(!node)return;
+      const key=node.getAttribute('data-day');if(!(core.validDay(key)||/^\d{4}-(?:0[1-9]|1[0-2])$/.test(key)))return;
       if(event.type==='keydown'&&!['Enter',' '].includes(event.key))return;
       if(event.type==='keydown')event.preventDefault();
-      const day=node.getAttribute('data-day');const rows=current&&current.daily.filter(r=>r.key===day);
-      const found=(rows&&rows[0])||heatDays.find(r=>r.key===day);detail.textContent=day+': '+(found?found.minutes:0)+' min';
+      const day=node.getAttribute('data-day');const found=currentSeries.find(r=>r.key===day)||heatDays.find(r=>r.key===day);detail.textContent=day+': '+(found?found.minutes:0)+' min';
     };
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
-    [domain,start,end].forEach(el=>el.addEventListener('change',refresh));
+    [domain,grouping,start,end].forEach(el=>el.addEventListener('change',refresh));
     exportBtn.addEventListener('click',()=>{
       const value=core.toCSV(current,'sessions');
       if(typeof opts.onExport==='function'){opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');return;}
