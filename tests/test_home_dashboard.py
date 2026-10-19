@@ -106,13 +106,17 @@ class HomeLayoutRegression(unittest.TestCase):
 
     def test_timer_navigation_is_visually_central_without_losing_tabs(self):
         nav = HTML.split('<nav class="bottom-nav-capsule" aria-label="Main navigation">', 1)[1].split('</nav>', 1)[0]
-        expected = ("navTasks", "navCalendar", "navTimer", "navNotes", "navSounds", "navAnalytics")
+        expected = ("navTasks", "navCalendar", "navNotes", "navTimer", "navTraining", "navSounds", "navAnalytics")
         positions = [nav.index('id="' + name + '"') for name in expected]
         self.assertEqual(positions, sorted(positions))
         for name in expected:
             self.assertEqual(nav.count('id="' + name + '"'), 1)
         css = (ROOT / "android/app/src/main/assets/web/white_2100.css").read_text(encoding="utf-8")
         self.assertIn('.bottom-nav-capsule #navTimer.active svg', css)
+        self.assertIn(".bottom-nav-capsule #navTimer{grid-column:4", css)
+        self.assertIn(".bottom-nav-capsule #navTraining{grid-column:5", css)
+        self.assertIn("openQuickTrainingFromNav(this)", nav)
+
 
     def test_white_visual_system_and_reduced_motion_kept(self):
         self.assertIn('background:var(--page-ambient', HTML)
