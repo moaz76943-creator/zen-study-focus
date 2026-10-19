@@ -60,6 +60,15 @@ function inventory(html, scripts = {}) {
         androidStatus:'NOT_TESTED',testIds:[]});
     }
   }
+  // Dynamic DOM factories are sites to inspect, not distinct runtime buttons.
+  for (const [file, content] of Object.entries(scripts)) {
+    const constructs = /\b(?:createElement\s*\(\s*['"](?:button|input|textarea|select)|nsElement\s*\(\s*['"]button|el\s*\(\s*['"](?:button|input|select)|btn\s*\()/g;
+    for (const m of content.matchAll(constructs)) {
+      dynamic.push({source:file,line:content.slice(0,m.index).split('\n').length,
+        event:'construct',expected:'REVIEW: dynamically-created control needs on-device hierarchy audit',
+        androidStatus:'NOT_TESTED',testIds:[]});
+    }
+  }
   return {controls,dynamic};
 }
 function readAll(root=ROOT) {
@@ -81,7 +90,8 @@ function build(root=ROOT) {
   for(const x of scan.controls)groups[x.owner]=(groups[x.owner]||0)+1;
   const report={suite:'DEEP-FOCUS-RECOVERY-14',kind:'STATIC_SOURCE_INVENTORY',
     androidE2EPassed:0,androidE2EStatus:'NOT_TESTED',sourceRoot:'android/app/src/main/assets/web',
-    totals:{staticControls:scan.controls.length,dynamicEventListeners:scan.dynamic.length,
+    totals:{staticControls:scan.controls.length,dynamicEventListeners:scan.dynamic.filter(x=>x.event!=='construct').length,
+      dynamicControlFactories:scan.dynamic.filter(x=>x.event==='construct').length,
       referencedScripts:Object.keys(src.scripts).length,missingScripts:src.missing.length},
     groups,missingScripts:src.missing,...scan};
   return report;
