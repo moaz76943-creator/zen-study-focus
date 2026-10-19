@@ -18,7 +18,7 @@ body.df-v22.df-recovery10 {
   --dfr-duration: 140ms;
   background: radial-gradient(circle at 95% 1%, #f0f8ff 0, transparent 33%), #fbfdff;
   color: var(--dfr-ink);
-  font-family: var(--df22-font, Inter, Tajawal, system-ui, sans-serif);
+  font-family: var(--df22-font, system-ui, -apple-system, "Noto Sans", "Noto Sans Arabic", sans-serif);
   line-height: 1.5;
   padding-bottom: calc(95px + env(safe-area-inset-bottom, 0px));
   overflow-x: clip;
