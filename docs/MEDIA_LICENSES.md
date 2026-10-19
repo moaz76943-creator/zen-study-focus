@@ -13,3 +13,6 @@ All audio shipped to Google Play must have an actual media header, an appropriat
 The rest of the pre-existing recordings have not undergone a per-file licence provenance audit yet. Do not describe them collectively as CC0 without source evidence. A complete media audit and a separate listening/looping check are release prerequisites.
 
 The night/crickets and waterfall recording replacements must be authentic, appropriately licensed, playable offline, and verified before merging this repair. No unrelated audio is to be relabeled to conceal missing recordings.
+
+## 2026-10-19 playback safety correction
+The app's active catalogue now only offers packaged Ogg files. Waterfall and Night do not exist in the current assets tree and are not exposed; Earth is an ambient air-conditioner hum, not a natural recording, and is also excluded. The Web Audio generated-noise fallback is removed entirely: a load/decode failure stops playback with an explicit error rather than silently playing imitation nature audio. No remote-streaming fallback or renamed placeholder was added. This change is **not** a fidelity or per-file licence attestation for the remaining recordings; conduct listening/loop/bitrate and original source licence reviews before promoting a release. User data and legacy IDs are unchanged.

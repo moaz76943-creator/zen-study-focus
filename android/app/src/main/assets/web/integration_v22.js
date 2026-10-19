@@ -160,7 +160,9 @@
     const host = document.getElementById('df22AnalyticsHost');
     analyticsUi = root.DeepFocusAnalyticsStudioV21.mount(host,getSnapshot,{
       locale:cfg.lang,goals:cfg.dailyGoalsMin||{},
-      // Download fallback is browser-driven until the Android Save-As bridge is verified.
+      ...(root.ZenNative && typeof root.ZenNative.exportAnalyticsCsvToFile === 'function' ? {
+        onExport:(csv) => { root.ZenNative.exportAnalyticsCsvToFile(csv); return true; }
+      } : {}),
     });
     document.getElementById('sec-analytics').classList.add('df22-analytics-live');
   }

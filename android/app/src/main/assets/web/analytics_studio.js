@@ -70,10 +70,18 @@
     const goals=mk('div'),taskBox=mk('div'),heatTitle=mk('h3',t.year),heat=mk('div');heat.style.overflowX='auto';
     [chartTitle,chart,detail,domainView,goals,taskBox,heatTitle,heat].forEach(e=>wrapper.appendChild(e));
     let current=null,currentSeries=[],heatDays=[],destroyed=false;
+    function normalizeDates(today) {
+      let from=core.validDay(start.value)?start.value:today;
+      let to=core.validDay(end.value)?end.value:today;
+      if(from>to) [from,to]=[to,from];
+      start.value=from;end.value=to;
+      return {startDate:from,endDate:to};
+    }
     function refresh(){
       if(destroyed)return null;
       const snap=provider();const today=opts.today||core.localToday();
-      const report=core.buildReport(snap,{today,startDate:start.value,endDate:end.value,domain:domain.value,goals:opts.goals});
+      const range=normalizeDates(today);
+      const report=core.buildReport(snap,{today,...range,domain:domain.value,goals:opts.goals});
       current=report;kpis.replaceChildren();
       for(const [name,value] of [[t.minutes,report.totals.minutes],[t.sessions,report.totals.sessions],
         [t.average,report.totals.averageMinutes===null?'—':report.totals.averageMinutes],
@@ -112,12 +120,23 @@
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
     [domain,grouping,start,end].forEach(el=>el.addEventListener('change',refresh));
     exportBtn.addEventListener('click',()=>{
-      const value=core.toCSV(current,'sessions');
-      if(typeof opts.onExport==='function'){opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');return;}
-      if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL)return;
-      const blob=new doc.defaultView.Blob(['\ufeff',value],{type:'text/csv;charset=utf-8'});
-      const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
-      wrapper.appendChild(a);try{a.click();}finally{a.remove();(doc.defaultView.setTimeout||setTimeout)(()=>doc.defaultView.URL.revokeObjectURL(url),30000);}
+      try {
+        if(!current)throw new Error('No report');
+        const value=core.toCSV(current,'sessions');
+        if(typeof opts.onExport==='function'){
+          if(opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8')===false)
+            throw new Error('Native export not available');
+          detail.textContent='Select a location to save the CSV file';
+          return;
+        }
+        if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL)
+          throw new Error('Download API unavailable');
+        const blob=new doc.defaultView.Blob(['\\ufeff',value],{type:'text/csv;charset=utf-8'});
+        const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
+        wrapper.appendChild(a);
+        try{a.click();detail.textContent='CSV download requested';}
+        finally{a.remove();(doc.defaultView.setTimeout||setTimeout)(()=>doc.defaultView.URL.revokeObjectURL(url),30000);}
+      }catch(e){detail.textContent='Export unavailable. Please retry or use Android file export.';}
     });
     const today=opts.today||core.localToday();if(!core.validDay(today))throw new RangeError('Invalid today');
     const epoch=Math.floor(Date.parse(today+'T12:00:00Z')/86400000);

@@ -88,6 +88,8 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 /* ========================================================
    2. 20 WORLD LANGUAGES COMPLETE DICTIONARY (ZERO UNTRANSLATED TEXT)
    ======================================================== */
+const UI_BLOCKED_SCRIPTS = new Set(['ar','fa','ur']);
+function visualLanguage(code) { return UI_BLOCKED_SCRIPTS.has(code) ? 'en' : code; }
 const LANG_CATALOG = [
   { code: 'en', iso: 'EN', enName: 'English', nativeName: 'English', dir: 'ltr', countries: 'usa uk united states britain canada australia ireland new zealand امريكا بريطانيا كندا استراليا' },
   { code: 'ar', iso: 'AR', enName: 'Arabic', nativeName: 'العربية', dir: 'rtl', countries: 'jordan saudi arabia egypt uae palestine syria iraq morocco algeria qatar kuwait oman yemen lebanon tunisia sudan ليبيا الاردن السعودية مصر الامارات فلسطين سوريا العراق المغرب الجزائر قطر الكويت عمان اليمن لبنان تونس السودان' },
@@ -315,6 +317,8 @@ let cfg = loadFortressData('zen_fortress_cfg_v21', {
   lang: 'en', domain: 'study', focusMin: 25, shortMin: 5, longMin: 15,
   todayMins: 0, sessions: 0, streak: 0, water: 0, sets: 0, pagesRead: 0
 });
+// Display policy only: keep old notes and tasks untouched, including their original text.
+cfg.lang = visualLanguage(cfg.lang);
 
 function computeActualStreak(history, now = new Date()) {
   const days = new Set(
@@ -485,7 +489,7 @@ function renderLanguageList() {
   const box = document.getElementById('langListScrollBox');
   box.innerHTML = '';
 
-  LANG_CATALOG.filter(l => {
+  LANG_CATALOG.filter(l => !UI_BLOCKED_SCRIPTS.has(l.code)).filter(l => {
     if (!q) return true;
     return l.enName.toLowerCase().includes(q) ||
            l.nativeName.toLowerCase().includes(q) ||
@@ -508,7 +512,7 @@ function renderLanguageList() {
 }
 
 function applyLanguage(code) {
-  const meta = LANG_CATALOG.find(x => x.code === code) || LANG_CATALOG[0];
+  const meta = LANG_CATALOG.find(x => x.code === visualLanguage(code)) || LANG_CATALOG[0];
   cfg.lang = meta.code;
   saveFortressData('zen_fortress_cfg_v21', cfg);
   const d = L();
@@ -587,6 +591,7 @@ function validateImportedBackup(raw) {
   if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)) return null;
   const candidateCfg = {...cfg, ...raw.cfg};
   if (!LANG_CATALOG.some(l => l.code === candidateCfg.lang)) candidateCfg.lang = 'en';
+  candidateCfg.lang = visualLanguage(candidateCfg.lang);
   for (const key of ['todayMins', 'sessions', 'streak', 'water']) {
     const n = Number(candidateCfg[key]);
     if (!Number.isFinite(n) || n < 0 || n > 100000000) return null;
@@ -1531,70 +1536,22 @@ function saveQuickDump(toTasks) {
    7. 12 PURE NATURE SOUNDS WITH PHOTOS & VOLUME SLIDERS
    ======================================================== */
 const SOUNDS_DATA = [
-  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
-  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
-  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/fire.ogg' },
-  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/forest_morning.ogg' },
-  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg', url: 'https://actions.google.com/sounds/v1/water/small_stream_flowing.ogg' },
-  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/outdoor_summer_ambience.ogg' },
-  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: 'sounds/waterfall.ogg', url: 'https://actions.google.com/sounds/v1/water/waterfall_medium.ogg' },
-  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: 'sounds/night.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/crickets_chirping.ogg' },
-  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg', url: 'https://actions.google.com/sounds/v1/weather/rolling_thunder.ogg' },
-  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg', url: 'https://actions.google.com/sounds/v1/weather/wind_blowing.ogg' },
-  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_on_rooftop.ogg' },
-  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: 'sounds/earth.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/ambient_hum_air_conditioner.ogg' }
+  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg' },
+  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg' },
+  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg' },
+  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg' },
+  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg' },
+  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg' },
+  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg' },
+  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg' },
+  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg' },
 ];
 
 let soundCat = 'all';
 const activePlayers = {};
 // A stale media error or delayed play promise may never restart a stopped tile.
 const soundGeneration = Object.create(null);
-let webAudioCtx = null;
-
-function createNatureSynthFallback(id, vol) {
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (!AudioCtx) throw new Error('Web Audio is unavailable');
-  if (!webAudioCtx) webAudioCtx = new AudioCtx();
-  if (webAudioCtx.state === 'suspended') webAudioCtx.resume();
-  const sr = webAudioCtx.sampleRate, len = Math.round(sr * 8);
-  const buf = webAudioCtx.createBuffer(1, len, sr);
-  const samples = buf.getChannelData(0);
-  let smoothed = 0, slow = 0;
-  // A local synthetic fallback, never represented as a field recording.
-  for (let i = 0; i < len; i++) {
-    const time = i / sr, noise = Math.random() * 2 - 1;
-    smoothed = smoothed * 0.92 + noise * 0.08;
-    slow = slow * 0.998 + noise * 0.002;
-    let value;
-    if (id === 'night') {
-      const chirp1 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 2.7 * time)), 9);
-      const chirp2 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 3.5 * time + 1.4)), 11);
-      value = Math.sin(2 * Math.PI * 3100 * time) * chirp1 * 0.09
-            + Math.sin(2 * Math.PI * 3900 * time) * chirp2 * 0.065
-            + smoothed * 0.16;
-    } else if (id === 'waterfall') {
-      const surge = 0.65 + 0.12 * Math.sin(2 * Math.PI * 0.19 * time);
-      value = (noise * 0.20 + smoothed * 1.15 + slow * 0.5) * surge;
-    } else {
-      value = smoothed * 0.85 + slow * 0.35;
-    }
-    samples[i] = Math.max(-0.8, Math.min(0.8, value));
-  }
-  const source = webAudioCtx.createBufferSource();
-  source.buffer = buf;
-  source.loop = true;
-  const filter = webAudioCtx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = id === 'night' ? 5500 : id === 'waterfall' ? 2600 : 650;
-  const gain = webAudioCtx.createGain();
-  gain.gain.value = Math.max(0, Math.min(1, vol)) * 0.55;
-  source.connect(filter); filter.connect(gain); gain.connect(webAudioCtx.destination);
-  source.start();
-  return {
-    pause: () => { try { source.stop(); source.disconnect(); filter.disconnect(); gain.disconnect(); } catch (e) {} },
-    setVol: v => gain.gain.setValueAtTime(Math.max(0, Math.min(1, v)) * 0.55, webAudioCtx.currentTime)
-  };
-}
+// Local recording only: a playback failure must never be replaced by fake nature audio.
 
 function stopSoundTile(id) {
   soundGeneration[id] = (soundGeneration[id] || 0) + 1;
@@ -1619,42 +1576,35 @@ function toggleSoundTile(id) {
   soundGeneration[id] = token;
   const audio = new Audio();
   audio.loop = true;
+  audio.preload = 'auto';
   audio.volume = s.vol;
-  audio.src = s.src;
-  let fallbackUsed = false;
+  audio.src = s.src; // Offline recording packaged with the app. No streaming or DSP replacement.
   const player = {
-    pause() { audio.onerror = null; audio.pause(); },
+    pause() {
+      audio.onerror = null;
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+    },
     setVol(v) { audio.volume = v; }
   };
-  // Register synchronously before play() can reject or fire an error.
   activePlayers[id] = player;
-  const activateFallback = () => {
-    if (fallbackUsed || soundGeneration[id] !== token || activePlayers[id] !== player) return;
-    fallbackUsed = true;
-    audio.onerror = null;
-    audio.pause();
-    try {
-      const fallback = createNatureSynthFallback(id, s.vol);
-      // Keep the same identity so late handlers can be invalidated safely.
-      player.pause = () => fallback.pause();
-      player.setVol = v => fallback.setVol(v);
-      showToast('⚠️ Local recording unavailable — synthesized ambience');
-    } catch (e) {
-      stopSoundTile(id);
-      showToast('⚠️ Audio output unavailable');
-    }
+  const unavailable = () => {
+    if (soundGeneration[id] !== token || activePlayers[id] !== player) return;
+    stopSoundTile(id);
     renderSoundsStudio();
+    showToast('Recording unavailable. No synthetic replacement was played.');
   };
-  audio.onerror = activateFallback;
+  audio.onerror = unavailable;
   try {
     const playing = audio.play();
     if (playing && typeof playing.then === 'function') {
       playing.then(() => {
-        if (soundGeneration[id] === token && activePlayers[id] === player && !fallbackUsed)
+        if (soundGeneration[id] === token && activePlayers[id] === player)
           showToast(`🔊 ${sName}`);
-      }).catch(activateFallback);
+      }).catch(unavailable);
     }
-  } catch (e) { activateFallback(); }
+  } catch (e) { unavailable(); }
   renderSoundsStudio();
 }
 
@@ -1702,8 +1652,8 @@ function renderSoundsStudio() {
       </div>
       <div>
         <div class="stile-name">${escapeHtmlText(toWest(sName))}</div>
-        <div class="stile-volume-label"><span>🔉 ${cfg.lang === 'ar' ? 'مستوى الصوت' : 'Volume'}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
-        <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText((cfg.lang === 'ar' ? 'مستوى صوت ' : 'Volume for ') + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
+        <div class="stile-volume-label"><span>🔉 ${'Volume'}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
+        <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText('Volume for ' + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
       </div>
     `;
     box.appendChild(tile);

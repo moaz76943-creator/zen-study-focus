@@ -700,8 +700,8 @@
       <main class="screen-section active" id="sec-timer">
                 <div class="pure-white-card focus-hero-card" id="focusHeroCard">
           <div class="focus-card-topline">
-            <span class="focus-card-eyebrow" data-qt="focusToday">✦ مساحة التركيز</span>
-            <span class="focus-status" id="focusStatusLabel" data-qt="ready">جاهز للإنجاز</span>
+            <span class="focus-card-eyebrow" data-qt="focusToday">✦ Focus space</span>
+            <span class="focus-status" id="focusStatusLabel" data-qt="ready">Ready to focus</span>
           </div>
           <div class="segmented-pills-bar">
             <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerModeFromUser(getDomainFocusMinutes(), 'focus', this)" data-i18n="modeFocus">25m</button>
@@ -741,7 +741,7 @@
             <button class="delta-chip" onclick="changeTimerDelta(10)">+10m</button>
           </div>
         </div>
-        <div class="home-domains-heading"><span data-qt="chooseActivity">اختر نوع نشاطك</span><small data-qt="domainsHint">لكل نشاط جلسته المناسبة</small></div>
+        <div class="home-domains-heading"><span data-qt="chooseActivity">Choose your activity</span><small data-qt="domainsHint">Set a session for each activity</small></div>
         <div class="domain-pedestal-grid">
           <button type="button" class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)" aria-pressed="true">
             <div class="domain-squircle">📚</div>
@@ -766,7 +766,7 @@
         </div>
 
         <div class="home-quick-sessions" aria-label="Focus session shortcuts">
-          <div class="home-quick-heading"><span data-qt="quickSessions">جلسات سريعة</span><button class="timer-settings-chip" type="button" onclick="openTimerSettings()" id="timerSettingsChip">⚙ تخصيص</button></div>
+          <div class="home-quick-heading"><span data-qt="quickSessions">Quick sessions</span><button class="timer-settings-chip" type="button" onclick="openTimerSettings()" id="timerSettingsChip">⚙ Customize</button></div>
           <div class="home-quick-options" role="group" aria-label="Quick focus durations">
             <button type="button" class="home-quick-chip" id="homeQuick10" aria-pressed="false" onclick="selectHomeQuickSession(10)">10:00</button>
             <button type="button" class="home-quick-chip" id="homeQuick25" aria-pressed="true" onclick="selectHomeQuickSession(25)">25:00</button>
@@ -801,47 +801,47 @@
           <details id="quickTrainingDetails">
             <summary class="training-summary">
               <span class="training-icon">⚡</span>
-              <span class="training-summary-text"><strong data-qt="trainingTitle">تدريب سريع</strong><small data-qt="trainingSubtitle">جولات عمل وراحة قابلة للتخصيص</small></span>
+              <span class="training-summary-text"><strong data-qt="trainingTitle">Quick training</strong><small data-qt="trainingSubtitle">Customizable work and rest rounds</small></span>
               <span class="training-chevron">⌄</span>
             </summary>
             <div class="training-content">
               <div class="training-fields">
-                <label><span data-qt="rounds">المجموعات</span><input id="qtSets" type="text" inputmode="numeric" value="4" maxlength="2" aria-label="Sets"></label>
-                <label><span data-qt="work">العمل (د:ث)</span><input id="qtWork" type="text" inputmode="text" value="04:00" maxlength="6" aria-label="Work minutes"></label>
-                <label><span data-qt="rest">الراحة (د:ث)</span><input id="qtRest" type="text" inputmode="text" value="00:30" maxlength="6" aria-label="Rest seconds"></label>
+                <label><span data-qt="rounds">Sets</span><input id="qtSets" type="text" inputmode="numeric" value="4" maxlength="2" aria-label="Sets"></label>
+                <label><span data-qt="work">Work (m:s)</span><input id="qtWork" type="text" inputmode="text" value="04:00" maxlength="6" aria-label="Work minutes"></label>
+                <label><span data-qt="rest">Rest (m:s)</span><input id="qtRest" type="text" inputmode="text" value="00:30" maxlength="6" aria-label="Rest seconds"></label>
               </div>
-              <label class="training-toggle"><input id="qtSkipLast" type="checkbox" checked><span data-qt="skipLastRest">تخطي الراحة الأخيرة</span></label>
+              <label class="training-toggle"><input id="qtSkipLast" type="checkbox" checked><span data-qt="skipLastRest">Skip last rest</span></label>
               <div class="training-exercises-head">
-                <strong data-qt="exercises">التمارين المتتابعة</strong>
+                <strong data-qt="exercises">Sequential exercises</strong>
                 <span id="qtExerciseCount">0</span>
               </div>
               <div class="training-add-row">
-                <input id="qtNewExercise" type="text" maxlength="70" data-qt-placeholder="exercisePlaceholder" placeholder="مثل: تمارين الإطالة أو القراءة المركزة">
-                <button type="button" onclick="addQuickExercise()" data-qt="addExercise">+ إضافة</button>
+                <input id="qtNewExercise" type="text" maxlength="70" data-qt-placeholder="exercisePlaceholder" placeholder="For example: stretching or focused reading">
+                <button type="button" onclick="addQuickExercise()" data-qt="addExercise">+ Add</button>
               </div>
               <div class="training-exercises" id="qtExerciseList"></div>
               <div class="training-presets" role="group" aria-label="Training presets">
-                <button type="button" onclick="applyQuickTrainingPreset('tabata')" data-qt="presetTabata">تدريب 20/10</button>
-                <button type="button" onclick="applyQuickTrainingPreset('workout')" data-qt="presetWorkout">رياضة 4/1</button>
-                <button type="button" onclick="applyQuickTrainingPreset('reading')" data-qt="presetReading">قراءة 20/5</button>
-                <button type="button" onclick="applyQuickTrainingPreset('work')" data-qt="presetWork">عمل 50/10</button>
+                <button type="button" onclick="applyQuickTrainingPreset('tabata')" data-qt="presetTabata">Training 20/10</button>
+                <button type="button" onclick="applyQuickTrainingPreset('workout')" data-qt="presetWorkout">Workout 4/1</button>
+                <button type="button" onclick="applyQuickTrainingPreset('reading')" data-qt="presetReading">Reading 20/5</button>
+                <button type="button" onclick="applyQuickTrainingPreset('work')" data-qt="presetWork">Work 50/10</button>
               </div>
               <div class="training-progress" id="qtProgressPanel" hidden>
                 <span id="qtProgressTitle"></span>
                 <div class="training-progress-bar"><span id="qtProgressFill"></span></div>
                 <div class="training-progress-actions">
-                  <button type="button" onclick="skipQuickTrainingStep()" data-qt="skipStep">تخطي المرحلة</button>
-                  <button type="button" onclick="cancelQuickTraining()" data-qt="stopTraining">إنهاء التدريب</button>
+                  <button type="button" onclick="skipQuickTrainingStep()" data-qt="skipStep">Skip step</button>
+                  <button type="button" onclick="cancelQuickTraining()" data-qt="stopTraining">Stop training</button>
                 </div>
               </div>
-              <button type="button" id="qtStartButton" class="training-primary" onclick="startQuickTraining()" data-qt="startTraining">▶ ابدأ التدريب</button>
+              <button type="button" id="qtStartButton" class="training-primary" onclick="startQuickTraining()" data-qt="startTraining">▶ Start training</button>
             </div>
           </details>
         </section>
         <section class="pure-white-card today-plan-card" aria-label="Today activity snapshot">
           <div class="today-plan-title">
-            <div><span class="small-kicker" data-qt="todayProgress">✧ تقدمك اليوم</span><h2 data-qt="todayPlan">خطة اليوم</h2></div>
-            <button type="button" onclick="switchTab('sec-tasks',document.getElementById('navTasks'))" data-qt="viewAll">عرض الكل ↗</button>
+            <div><span class="small-kicker" data-qt="todayProgress">✧ Today progress</span><h2 data-qt="todayPlan">Today plan</h2></div>
+            <button type="button" onclick="switchTab('sec-tasks',document.getElementById('navTasks'))" data-qt="viewAll">View all ↗</button>
           </div>
           <div class="home-week-strip" id="homeWeekStrip" aria-label="This week"></div>
           <div class="today-plan-stats"><strong id="todayPlanRatio">0/0</strong><span id="todayPlanPercent">0%</span></div>
@@ -994,12 +994,12 @@
            ====================================================== -->
       <main class="screen-section" id="sec-analytics">
         <div class="analytics-kpi-grid">
-          <div class="an-kpi-card" onclick="addQuickSessionRecord()">
+          <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiMinutes">Active Minutes</span><span>🕒</span></div>
             <div class="an-kpi-num" id="kpiTotalMins">0</div>
             <div class="an-kpi-trend" id="kpiWeeklyTrend">Based on recorded focus sessions</div>
           </div>
-          <div class="an-kpi-card" onclick="addQuickSessionRecord()">
+          <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiSessions">Completed Sessions</span><span>🎯</span></div>
             <div class="an-kpi-num" id="kpiTotalSessions">0</div>
             <div class="an-kpi-trend" id="kpiSessionTrend">Completed focus sessions only</div>
@@ -1055,7 +1055,7 @@
         <div class="pure-white-card">
           <div style="font-size:0.88rem; font-weight:900; margin-bottom:8px;" data-i18n="calcHeading">🎓 Target & Goal Completion Calculator</div>
           <div style="display:flex; gap:8px; margin-bottom:8px;">
-            <!-- Using type="text" inputmode="numeric" guarantees 0123456789 and prevents Android from rendering ١٢٠ / ١٥ -->
+            <!-- Using type="text" inputmode="numeric" guarantees 0123456789 and prevents Android from rendering 120 / 15 -->
             <input type="text" inputmode="numeric" class="modal-inp" id="inpPagesLeft" value="120" style="margin:0; direction:ltr;" oninput="updateSyllabusCalc()">
             <input type="text" inputmode="numeric" class="modal-inp" id="inpDailyRate" value="15" style="margin:0; direction:ltr;" oninput="updateSyllabusCalc()">
           </div>
@@ -1084,7 +1084,7 @@
         <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
         <span data-i18n="navTimer">Timer</span>
       </button>
-      <button class="bnav-btn" id="navTraining" onclick="openQuickTrainingFromNav(this)" aria-label="Quick training"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9h3v6H2V9zm4-3h3v12H6V6zm9 0h3v12h-3V6zm4 3h3v6h-3V9zM10 11h4v2h-4v-2z"/></svg><span id="navTrainingText">تدريب</span></button>
+      <button class="bnav-btn" id="navTraining" onclick="openQuickTrainingFromNav(this)" aria-label="Quick training"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9h3v6H2V9zm4-3h3v12H6V6zm9 0h3v12h-3V6zm4 3h3v6h-3V9zM10 11h4v2h-4v-2z"/></svg><span id="navTrainingText">Training</span></button>
       <button class="bnav-btn" id="navSounds" onclick="switchTab('sec-sounds', this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span data-i18n="navSounds">Nature</span>
@@ -1103,7 +1103,7 @@
         <span>🌐 Language & Country Search</span>
         <button class="task-mini-sel" onclick="closeModal('langModal')">✕</button>
       </div>
-      <input type="text" class="modal-inp" id="inpLangCountrySearch" placeholder="Search language or country (e.g. Jordan, Spain, USA, مصر)..." oninput="renderLanguageList()">
+      <input type="text" class="modal-inp" id="inpLangCountrySearch" placeholder="Search language or country (e.g. Jordan, Spain, USA, Egypt)..." oninput="renderLanguageList()">
       <div class="lang-list-scroll" id="langListScrollBox"></div>
     </div>
   </div>

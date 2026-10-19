@@ -24,7 +24,9 @@ import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private static final int REQUEST_BACKUP_EXPORT = 7410;
+    private static final int REQUEST_ANALYTICS_EXPORT = 7411;
     private String backupAwaitingSave = null;
+    private String analyticsAwaitingSave = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +143,28 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        // Android WebView does not reliably download Blob URLs from local file:// pages.
+        // Use the same user-controlled Storage Access Framework picker as backups.
+        @JavascriptInterface
+        public void exportAnalyticsCsvToFile(String csv) {
+            if (csv == null || csv.length() > 4000000
+                    || !csv.startsWith("\"id\",\"date\",\"domain\",\"minutes\"")) return;
+            runOnUiThread(() -> {
+                if (analyticsAwaitingSave != null) return;
+                analyticsAwaitingSave = csv;
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("text/csv");
+                intent.putExtra(Intent.EXTRA_TITLE, "deep-focus-sessions.csv");
+                try {
+                    startActivityForResult(intent, REQUEST_ANALYTICS_EXPORT);
+                } catch (Exception e) {
+                    analyticsAwaitingSave = null;
+                    Toast.makeText(MainActivity.this, "Unable to open CSV file picker", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
         @JavascriptInterface
         public void shareAppInvite(String statsSummary) {
             Intent share = new Intent(Intent.ACTION_SEND);
@@ -166,20 +190,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != REQUEST_BACKUP_EXPORT) return;
-        String payload = backupAwaitingSave;
-        backupAwaitingSave = null;
+        if (requestCode != REQUEST_BACKUP_EXPORT && requestCode != REQUEST_ANALYTICS_EXPORT) return;
+        boolean analytics = requestCode == REQUEST_ANALYTICS_EXPORT;
+        String payload = analytics ? analyticsAwaitingSave : backupAwaitingSave;
+        if (analytics) analyticsAwaitingSave = null;
+        else backupAwaitingSave = null;
         if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null
                 || payload == null) return;
         try (OutputStream output = getContentResolver().openOutputStream(data.getData(), "w")) {
             if (output == null) throw new java.io.IOException("Cannot open target document");
             output.write(payload.getBytes(StandardCharsets.UTF_8));
             output.flush();
-            Toast.makeText(this, "Backup exported; keep the unencrypted file private",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, analytics ? "Analytics CSV saved" :
+                    "Backup exported; keep the unencrypted file private", Toast.LENGTH_LONG).show();
         } catch (Exception error) {
-            Toast.makeText(this, "Unable to save backup; existing data unchanged",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, analytics ? "Unable to save analytics CSV" :
+                    "Unable to save backup; existing data unchanged", Toast.LENGTH_LONG).show();
         }
     }
 
