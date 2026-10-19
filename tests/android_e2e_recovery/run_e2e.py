@@ -208,10 +208,10 @@ class Suite:
 
     def case_navigation(self):
         for tab, proof in [
-            (("Tasks", "المهام"), ("Add study", "Advanced tasks", "إضافة مهمة")),
+            (("Tasks", "المهام"), ("Tasks Studio", "استوديو المهام")),
             (("Notes", "ملاحظات"), ("New note", "ملاحظة جديدة")),
             (("Nature", "الطبيعة", "Sounds"), ("Stop", "إيقاف")),
-            (("Analytics", "التحليلات"), ("Completed Sessions", "جلسات")),
+            (("Analytics", "التحليلات"), ("Recorded analytics", "تحليلات النشاط المسجّل")),
             (("Calendar", "التقويم"), ("Add Note to Date", "ملاحظة")),
             (("Timer", "المؤقت"), ("Start or pause timer", "25:00", "timer")),
         ]:
@@ -280,12 +280,20 @@ class Suite:
         self.d.input(("Write here", "Content", "المحتوى"), "UpdatedBody")
         self.d.tap("Save", "حفظ")
         self.d.see(self.note)
+        self.d.see("UpdatedBody")
+        self.d.restart()
+        self.d.nav("Notes", "ملاحظات")
+        self.d.see(self.note)
+        self.d.see("UpdatedBody")
 
     def case_tasks_create(self):
         self.d.nav("Tasks", "المهام")
         self.task = self.marker + "Task"
-        self.d.input(("Add study", "Add task", "إضافة مهمة"), self.task)
+        self.d.input(("Type a task", "اكتب مهمة"), self.task)
         self.d.key(66)  # Enter is a documented createNewTask() shortcut
+        self.d.see(self.task)
+        self.d.restart()
+        self.d.nav("Tasks", "المهام")
         self.d.see(self.task)
 
     def case_task_subtasks(self):
@@ -313,7 +321,7 @@ class Suite:
         self.d.tap("Copy all notes", "نسخ جميع الملاحظات")
         # Clipboard verification is performed by an actual Android paste, not toast inspection.
         self.d.nav("Tasks", "المهام")
-        self.d.tap("Add study", "Add task", "إضافة مهمة")
+        self.d.tap("Type a task", "اكتب مهمة")
         self.d.key(279)  # KEYCODE_PASTE
         self.d.see(self.note)
 
