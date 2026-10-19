@@ -24,6 +24,9 @@ import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private static final int REQUEST_BACKUP_EXPORT = 7410;
+    private static final int REQUEST_ANALYTICS_EXPORT = 7411;
+    private String analyticsAwaitingSave = null;
+    private String analyticsAwaitingRequest = null;
     private String backupAwaitingSave = null;
 
     @Override
@@ -141,6 +144,37 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        // Analytics uses a correlated, post-write SAF acknowledgment; starting a picker is not success.
+        @JavascriptInterface
+        public void exportAnalyticsCsvToFile(String csv, String requestId) {
+            if (requestId == null || !requestId.matches("df-csv-[0-9]{1,12}")) return;
+            if (csv == null || csv.length() > 4000000
+                    || !(csv.startsWith("\"id\"") || csv.startsWith("\"date\"")
+                      || csv.startsWith("\"period\""))) {
+                reportAnalyticsSave(requestId, "failed");
+                return;
+            }
+            runOnUiThread(() -> {
+                if (analyticsAwaitingSave != null) {
+                    reportAnalyticsSave(requestId, "failed");
+                    return;
+                }
+                analyticsAwaitingSave = csv;
+                analyticsAwaitingRequest = requestId;
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("text/csv");
+                intent.putExtra(Intent.EXTRA_TITLE, "deep-focus-analytics.csv");
+                try {
+                    startActivityForResult(intent, REQUEST_ANALYTICS_EXPORT);
+                } catch (Exception e) {
+                    analyticsAwaitingSave = null;
+                    analyticsAwaitingRequest = null;
+                    reportAnalyticsSave(requestId, "failed");
+                }
+            });
+        }
+
         @JavascriptInterface
         public void shareAppInvite(String statsSummary) {
             Intent share = new Intent(Intent.ACTION_SEND);
@@ -163,9 +197,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void reportAnalyticsSave(String requestId, String status) {
+        if (webView == null || requestId == null) return;
+        final String callback = "window.DFRecoveryNativeExportResult && window.DFRecoveryNativeExportResult("
+                + org.json.JSONObject.quote(requestId) + "," + org.json.JSONObject.quote(status) + ");";
+        webView.post(() -> webView.evaluateJavascript(callback, null));
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ANALYTICS_EXPORT) {
+            final String payload = analyticsAwaitingSave;
+            final String requestId = analyticsAwaitingRequest;
+            analyticsAwaitingSave = null;
+            analyticsAwaitingRequest = null;
+            if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null) {
+                reportAnalyticsSave(requestId, "cancelled");
+                return;
+            }
+            if (payload == null) {reportAnalyticsSave(requestId, "failed"); return;}
+            try (OutputStream output = getContentResolver().openOutputStream(data.getData(), "w")) {
+                if (output == null) throw new java.io.IOException("Cannot open CSV document");
+                output.write(payload.getBytes(StandardCharsets.UTF_8));
+                output.flush();
+            } catch (Exception error) {
+                reportAnalyticsSave(requestId, "failed");
+                return;
+            }
+            reportAnalyticsSave(requestId, "saved");
+            return;
+        }
         if (requestCode != REQUEST_BACKUP_EXPORT) return;
         String payload = backupAwaitingSave;
         backupAwaitingSave = null;
