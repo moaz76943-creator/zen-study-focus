@@ -325,3 +325,20 @@ html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
   }
   body.df-v22.df-recovery10 :where(button,a,input,textarea):focus-visible { outline-width: 4px !important; }
 }
+
+
+/* DF4-001: approved-media empty state; no rights or playback changes. */
+body.df-v22.df-recovery10 .sounds-empty-state {
+  display: block;
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 12px 0;
+  padding: 18px 14px;
+  border: 1px dashed #bdd1e9;
+  border-radius: 16px;
+  color: #40546f;
+  background: #f7fbff;
+  text-align: start;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
