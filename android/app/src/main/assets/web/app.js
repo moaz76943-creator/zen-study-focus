@@ -29,13 +29,13 @@ function computeHash(str) {
   return (h >>> 0).toString(16);
 }
 
-function saveFortressData(key, obj) {
-  try {
-    const raw = JSON.stringify(obj);
-    const packet = JSON.stringify({ payload: raw, sig: computeHash(raw), ts: Date.now() });
-    localStorage.setItem(key, packet);
-    localStorage.setItem(key + "_mirror", packet);
-  } catch (e) {}
+function saveFortressData(key,obj) {
+  if(window.DeepFocusV21StorageGuard)return window.DeepFocusV21StorageGuard.write(key,obj);
+  const raw=JSON.stringify(obj),packet=JSON.stringify({payload:raw,sig:computeHash(raw),ts:Date.now()});
+  localStorage.setItem(key,packet);localStorage.setItem(key+'_mirror',packet);
+  if(localStorage.getItem(key)!==packet||localStorage.getItem(key+'_mirror')!==packet)
+    throw new Error('WRITE_NOT_VERIFIED');
+  return true;
 }
 
 function loadFortressData(key, defaultObj) {
@@ -499,6 +499,8 @@ function applyLanguage(code) {
   const tn = document.getElementById('navTrainingText');
   if (tn) tn.textContent = meta.code === 'ar' ? 'تدريب' : 'Training';
   if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
+  window.DF22Locale?.apply(document,meta.code);
+  window.DFIntegrated?.switchLocale?.();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
@@ -854,6 +856,7 @@ function switchTab(secId, btn) {
   }
   if (TAB_GRADS[secId]) document.getElementById('heroHeader').style.setProperty('--page-ambient', TAB_GRADS[secId]);
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.DFIntegrated?.onTab?.(secId);
 }
 
 let toastTimer = null;
@@ -1186,6 +1189,7 @@ function getCatLabel(catKey) {
 }
 
 function renderTasksList() {
+  if(window.DFIntegrated?.tasksStudio){window.DFIntegrated.tasksStudio.refresh();renderTodayPlan();return;}
   const box = document.getElementById('tasksShowcaseBox');
   box.innerHTML = '';
 
