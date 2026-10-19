@@ -64,7 +64,7 @@ assert.equal(evaluate('localDateISO(new Date(2026, 9, 18, 12))'),'2026-10-18');
 assert.equal(evaluate('cfg.sessions'),0,'New install must not have invented sessions');
 assert.equal(evaluate('cfg.todayMins'),0,'New install must not have invented time');
 // Completed focus counts once and only once.
-evaluate("selectTimerMode(1,'focus',null); toggleTimerPlay(); timerTargetTime = Date.now()-1000; runTimerTick();");
+evaluate("selectTimerMode(1,'focus',null); toggleTimerPlay(); timerActiveMs = 60000; timerTargetTime = Date.now()-1000; runTimerTick();");
 assert.equal(evaluate('cfg.sessions'),1);
 assert.equal(evaluate('cfg.todayMins'),1);
 assert.equal(evaluate('cfg.sessionHistory.length'),1);
