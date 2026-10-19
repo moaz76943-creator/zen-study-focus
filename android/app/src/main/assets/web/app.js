@@ -581,8 +581,7 @@ function validateImportedBackup(raw) {
   if (!raw.cfg || typeof raw.cfg !== 'object' || Array.isArray(raw.cfg)) return null;
   if (!Array.isArray(raw.tasksList) || !Array.isArray(raw.notesList)) return null;
   if (raw.tasksList.length > 10000 || raw.notesList.length > 10000) return null;
-  const safeRecordId = id => /^\d{1,16}$/.test(String(id))
-    && Number.isSafeInteger(Number(id));
+  const safeRecordId = id => typeof id === 'number' && Number.isSafeInteger(id) && id >= 0;
   const okTask = x => x && typeof x === 'object' && !Array.isArray(x)
     && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
@@ -592,6 +591,8 @@ function validateImportedBackup(raw) {
     && typeof x.title === 'string' && x.title.length <= 20000
     && typeof x.body === 'string' && x.body.length <= 500000;
   if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)) return null;
+  // New imports must be unambiguous; historical records are never renumbered on read.
+  if ([raw.tasksList, raw.notesList].some(rows => new Set(rows.map(row => row.id)).size !== rows.length)) return null;
   const candidateCfg = {...cfg, ...raw.cfg};
   if (!LANG_CATALOG.some(l => l.code === candidateCfg.lang)) candidateCfg.lang = 'en';
   for (const key of ['todayMins', 'sessions', 'streak', 'water']) {
@@ -1266,9 +1267,34 @@ function renderTasksList() {
   renderTodayPlan();
 }
 
+// Publish legacy edits only after durable acknowledgment. The production integration
+// uses the existing six-slot v21 recovery journal; standalone legacy hosts retain
+// verified primary/mirror writes without claiming cross-family atomicity.
+function commitLegacyRecords(field, records) {
+  try {
+    if (window.DF22Integration) {
+      const before = window.DF22Integration.getSnapshot();
+      const after = JSON.parse(JSON.stringify(before));
+      after[field] = records;
+      if (window.DF22Integration.write(before, after) !== true) throw new Error('SAVE_NOT_VERIFIED');
+    } else {
+      const key = field === 'tasksList' ? 'zen_fortress_tasks_v21' : 'zen_fortress_notes_v21';
+      if (saveFortressData(key, records) !== true) throw new Error('SAVE_NOT_VERIFIED');
+      if (field === 'tasksList') tasksList = records;
+      else notesList = records;
+    }
+    return true;
+  } catch (_) {
+    showToast(cfg.lang === 'ar' ? 'تعذر الحفظ. احتفظ بتعديلاتك وحاول مجددًا.' : 'Could not save. Keep your changes and try again.');
+    return false;
+  }
+}
+
 function toggleTaskDone(id) {
-  const t = tasksList.find(x => x.id === id);
-  if (t) { t.done = !t.done; saveFortressData('zen_fortress_tasks_v21', tasksList); renderTasksList(); renderCalendar(); }
+  if (!tasksList.some(x => x.id === id)) return;
+  const records = tasksList.map(x => x.id === id ? {...x, done:!x.done} : x);
+  if (!commitLegacyRecords('tasksList', records)) return;
+  renderTasksList(); renderCalendar();
 }
 
 function focusOnTask(id) {
@@ -1278,7 +1304,7 @@ function focusOnTask(id) {
       showToast('⚠️ Finish the current training before changing linked tasks');
       return;
     }
-    document.getElementById('timerLinkedTask').textContent = toWest(`🎯 ${t.title}`);
+    document.getElementById('timerLinkedTask').textContent = `🎯 ${t.title}`;
     switchTab('sec-timer', document.getElementById('navTimer'));
   }
 }
@@ -1298,25 +1324,24 @@ function nextRecordId() {
 
 function createNewTask() {
   const inp = document.getElementById('inpNewTask');
-  const val = toWest(inp.value.trim());
+  const val = inp.value.trim();
   if (!val) return;
   const catKey = document.getElementById('selTaskCat').value;
-  const dateVal = toWest(document.getElementById('inpTaskDate').value || todayISO);
+  const dateVal = toWest(document.getElementById('inpTaskDate').value || '');
   const themes = { study: 'tp-blue', exam: 'tp-amber', review: 'tp-rose', sport: 'tp-emerald' };
   const icons = { study: '📚', exam: '💻', review: '📖', sport: '🏋️' };
-  tasksList.unshift({
+  const record = {
     id: nextRecordId(), isStarter: false, title: val, time: '25m', date: dateVal,
     catKey: catKey, icon: icons[catKey] || '📚', theme: themes[catKey] || 'tp-blue', done: false
-  });
+  };
+  if (!commitLegacyRecords('tasksList', [record, ...tasksList])) return;
   inp.value = '';
-  saveFortressData('zen_fortress_tasks_v21', tasksList);
   renderTasksList(); renderCalendar(); showToast('✓');
 }
 
 function deleteTaskItem(id) {
   if (!confirmSensitiveAction('task')) return;
-  tasksList = tasksList.filter(x => x.id !== id);
-  saveFortressData('zen_fortress_tasks_v21', tasksList);
+  if (!commitLegacyRecords('tasksList', tasksList.filter(x => x.id !== id))) return;
   renderTasksList(); renderCalendar();
 }
 
@@ -1472,28 +1497,27 @@ function saveNewNote() {
   const catKey = document.getElementById('selNoteCat').value;
   const calDate = toWest(document.getElementById('inpNoteCalDate').value || todayISO);
   const blur = document.getElementById('chkNoteBlur').checked;
-  notesList.unshift({
+  const record = {
     id: nextRecordId(), isStarter: false, title: t || L().navNotes, body: b,
     catKey: catKey, calDate: calDate, blur: blur, theme: blur ? 'theme-emerald' : 'theme-violet'
-  });
-  saveFortressData('zen_fortress_notes_v21', notesList);
+  };
+  if (!commitLegacyRecords('notesList', [record, ...notesList])) return;
   renderNotesStack(); renderCalendar(); closeModal('noteModal'); showToast('✓');
 }
 
 function pinNoteToTodayCalendar(id) {
   const n = notesList.find(x => x.id === id);
-  if (n) { n.calDate = selectedCalDate; saveFortressData('zen_fortress_notes_v21', notesList); renderNotesStack(); renderCalendar(); showToast(`📅 ${selectedCalDate}`); }
+  if (n && commitLegacyRecords('notesList', notesList.map(x => x.id === id ? {...x, calDate:selectedCalDate} : x))) { renderNotesStack(); renderCalendar(); showToast(`📅 ${selectedCalDate}`); }
 }
 
 function toggleNoteBlur(id) {
   const n = notesList.find(x => x.id === id);
-  if (n) { n.blur = !n.blur; saveFortressData('zen_fortress_notes_v21', notesList); renderNotesStack(); }
+  if (n && commitLegacyRecords('notesList', notesList.map(x => x.id === id ? {...x, blur:!x.blur} : x))) renderNotesStack();
 }
 
 function deleteNoteCard(id) {
   if (!confirmSensitiveAction('note')) return;
-  notesList = notesList.filter(x => x.id !== id);
-  saveFortressData('zen_fortress_notes_v21', notesList);
+  if (!commitLegacyRecords('notesList', notesList.filter(x => x.id !== id))) return;
   renderNotesStack(); renderCalendar();
 }
 
@@ -1512,12 +1536,10 @@ function saveQuickDump(toTasks) {
   const val = document.getElementById('inpQuickDump').value.trim();
   if (!val) return;
   if (toTasks) {
-    tasksList.unshift({ id: nextRecordId(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false });
-    saveFortressData('zen_fortress_tasks_v21', tasksList);
+    if (!commitLegacyRecords('tasksList', [{ id: nextRecordId(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false }, ...tasksList])) return;
     renderTasksList();
   } else {
-    notesList.unshift({ id: nextRecordId(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' });
-    saveFortressData('zen_fortress_notes_v21', notesList);
+    if (!commitLegacyRecords('notesList', [{ id: nextRecordId(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' }, ...notesList])) return;
     renderNotesStack();
   }
   renderCalendar(); closeModal('brainDumpModal'); showToast('✓');
