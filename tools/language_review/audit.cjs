@@ -71,7 +71,7 @@ function actualLocales(){
  vm.runInContext(qt.slice(0,end)+'\nthis.auditQuick={keys:QUICK_KEYS,rows:QUICK_TRANSLATIONS};',c,
   {filename:'quick_training.js:catalog',timeout:2000});
  return {dict:c.auditDict,languageCatalog:c.auditCatalog,premium:c.window.DF22Locale,
-  recovery:c.window.DeepFocusLocale20Recovery,quick:c.auditQuick};
+  recovery:c.DeepFocusLocale20Recovery||c.window.DeepFocusLocale20Recovery,quick:c.auditQuick};
 }
 function coreScreen(k){
  if(/^(mode|calc|startFocus|orbDesk)/.test(k))return 'timer';
