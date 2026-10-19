@@ -636,6 +636,7 @@
   <link rel="stylesheet" href="white_2100.css">
   <link rel="stylesheet" href="design_tokens_v22.css">
   <link rel="stylesheet" href="ui_components_v22.css">
+  <link rel="stylesheet" href="design_recovery/white_premium_recovery10.css">
   <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
 </head>
 <body>
@@ -971,6 +972,7 @@
            5. 12 PURE NATURE SOUNDS SECTION (WITH PHOTOS & SLIDERS)
            ====================================================== -->
       <main class="screen-section" id="sec-sounds">
+        <div class="pure-white-card" id="completionAlertPickerHost" aria-label="Completion alert settings"></div>
         <div class="mixer-status-bar">
           <span id="mixerStatusTxt" data-i18n="mixerReady">🎵 Pure Nature Studio Ready</span>
           <div style="display:flex; gap:6px;">
@@ -1056,8 +1058,8 @@
           <div style="font-size:0.88rem; font-weight:900; margin-bottom:8px;" data-i18n="calcHeading">🎓 Target & Goal Completion Calculator</div>
           <div style="display:flex; gap:8px; margin-bottom:8px;">
             <!-- Using type="text" inputmode="numeric" guarantees 0123456789 and prevents Android from rendering ١٢٠ / ١٥ -->
-            <input type="text" inputmode="numeric" class="modal-inp" id="inpPagesLeft" value="120" style="margin:0; direction:ltr;" oninput="updateSyllabusCalc()">
-            <input type="text" inputmode="numeric" class="modal-inp" id="inpDailyRate" value="15" style="margin:0; direction:ltr;" oninput="updateSyllabusCalc()">
+            <input type="text" inputmode="numeric" class="modal-inp" data-df-numeric-input id="inpPagesLeft" value="120" style="margin:0; direction:ltr;" oninput="updateSyllabusCalc()">
+            <input type="text" inputmode="numeric" class="modal-inp" data-df-numeric-input id="inpDailyRate" value="15" style="margin:0; direction:ltr;" oninput="updateSyllabusCalc()">
           </div>
           <div id="syllabusCalcOut" style="font-size:0.78rem; font-weight:800; color:var(--emerald); background:var(--emerald-soft); padding:9px 12px; border-radius:12px;"></div>
         </div>
@@ -1222,6 +1224,7 @@
 
   <script src="locale_rows.js"></script>
   <script src="locale_extras.js"></script>
+  <script src="numerals_ascii_v21.js"></script>
   <script src="quick_training.js"></script>
   <script src="data_compat_v21.js"></script>
   <script src="preflight_v22.js"></script>
@@ -1234,6 +1237,11 @@
   <script src="tasks_studio.js"></script>
   <script src="analytics_core_v21.js"></script>
   <script src="analytics_studio.js"></script>
+  <script src="localization_20_recovery.js"></script>
+  <script src="analytics_recovery_core.js"></script>
+  <script src="analytics_recovery_ui.js"></script>
+  <script src="interaction_recovery_06.js"></script>
+  <script src="completion_alert_settings.js"></script>
   <script src="locale_premium_v22.js"></script>
   <script src="goals_studio.js"></script>
   <script src="timer_settings.js"></script>
