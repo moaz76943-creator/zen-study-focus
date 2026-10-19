@@ -56,6 +56,21 @@
     }
     return {total,done};
   }
+  function serializeNote(note,format='txt'){
+    if(!note||!validId(note.id)||typeof note.title!=='string'||typeof note.body!=='string')
+      throw new Error('INVALID_NOTE');
+    if(format!=='txt'&&format!=='md')throw new Error('INVALID_FORMAT');
+    const e=note.notesV21||{},cornell=e.cornell;
+    const safe=s=>format==='md'?String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'):String(s);
+    const head=format==='md'?'# '+safe(note.title):note.title;
+    const segments=[head,safe(note.body)];
+    if(cornell&&['cues','notes','summary'].every(k=>typeof cornell[k]==='string')){
+      for(const [key,label] of [['cues','Questions / Cues'],['notes','Main notes'],['summary','Summary']]){
+        if(cornell[key].trim())segments.push((format==='md'?'## ':'')+label+'\n'+safe(cornell[key]));
+      }
+    }
+    return segments.filter(Boolean).join('\n\n');
+  }
   function draftVersionMatches(draft,note){
     if(!draft||draft.baseFingerprint===undefined||draft.baseFingerprint===null)return true;
     return typeof draft.baseFingerprint==='string' &&
@@ -188,6 +203,7 @@
       },'both');
     }
     function recall(id){const s=read();return core.recallCards(one(id,s.notesList));}
+    function backlinks(id){return core.backlinks(read().notesList,id);}
     function query(options={}){
       const all=read().notesList;
       const category=options.category;
@@ -198,7 +214,7 @@
       }
       return core.search(all,options);
     }
-    return Object.freeze({read,one,save,toggle,duplicate,move,purge,history,link,linkTask,extract,recall,query});
+    return Object.freeze({read,one,save,toggle,duplicate,move,purge,history,link,linkTask,extract,recall,backlinks,query});
   }
   function el(tag,cls,label){
     const e=document.createElement(tag);if(cls)e.className=cls;
@@ -215,6 +231,8 @@
       task:'Create tasks from unchecked items',saved:'Note saved',failed:'Could not save note',
       confirm:'Delete permanently? An exported backup is required.',review:'Tap answer to reveal',
       draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes',
+      copied:'Copied to clipboard',copyFailed:'Clipboard unavailable; content was not copied',
+      missing:'Linked note unavailable',contents:'Contents',copyTxt:'Copy TXT',copyMd:'Copy Markdown',
       more:'More actions',conflict:'This note changed since you opened it. Copy your edits or reopen the latest version before saving.'},
     ar:{all:'كل الملاحظات',archive:'الأرشيف',trash:'سلة المحذوفات',notebooks:'الدفتر',tag:'الوسم',allbooks:'كل الدفاتر',
       alltags:'كل الوسوم',empty:'لا توجد ملاحظات في هذا العرض',focus:'تركيز الكتابة',normal:'إنهاء التركيز',read:'قراءة ومراجعة',
@@ -225,7 +243,9 @@
       link:'ربط ملاحظة',task:'إنشاء مهام من مربعات الاختيار',saved:'تم حفظ الملاحظة',
       failed:'تعذّر حفظ الملاحظة',confirm:'حذف نهائي؟ تأكد من وجود نسخة احتياطية مصدّرة.',
       review:'المس الإجابة لإظهارها',draft:'المحتوى القديم محفوظ بمعزل عن كورنيل',filter:'تصفية',
-      status:'الحالة',linked:'ملاحظات مرتبطة',more:'المزيد',conflict:'تغيرت هذه الملاحظة بعد فتحها. انسخ نصك أو حدّث الملاحظة قبل الحفظ.'}
+      status:'الحالة',linked:'ملاحظات مرتبطة',copied:'تم النسخ إلى الحافظة',
+      copyFailed:'الحافظة غير متاحة؛ لم يتم نسخ النص',missing:'الملاحظة المرتبطة غير متاحة',
+      contents:'المحتويات',copyTxt:'نسخ نص TXT',copyMd:'نسخ Markdown',more:'المزيد',conflict:'تغيرت هذه الملاحظة بعد فتحها. انسخ نصك أو حدّث الملاحظة قبل الحفظ.'}
   };
   function t(key){return languages[instance&&instance.adapter.locale&&instance.adapter.locale()==='ar'?'ar':'en'][key]||key;}
   function style(){
@@ -452,6 +472,17 @@
     }catch(e){instance.adapter.notify?.(e.message==='NOTE_CONFLICT_RELOAD_REQUIRED'?t('conflict'):t('failed')+': '+e.message);return false;}
   }
   function cardAction(parent,label,fn,danger){return button(parent,label,()=>{try{fn();renderStack();}catch(e){instance.adapter.notify?.(e.message);}},danger?'danger':'');}
+  function copyExport(note,format){
+    let content;
+    try{content=serializeNote(note,format);}
+    catch(e){instance.adapter.notify?.(e.message);return;}
+    if(typeof navigator==='undefined'||!navigator.clipboard?.writeText){
+      instance.adapter.notify?.(t('copyFailed'));return;
+    }
+    Promise.resolve().then(()=>navigator.clipboard.writeText(content)).then(
+      ()=>instance.adapter.notify?.(t('copied')),
+      ()=>instance.adapter.notify?.(t('copyFailed')));
+  }
   function statusView(){
     const root=document.getElementById('nsux-filters');if(!root)return;
     const a=instance.controller.read().notesList;
@@ -517,6 +548,8 @@
         cardAction(actions,t('read'),()=>showReader(n));
         cardAction(secondary,'★',()=>instance.controller.toggle(n.id,'favorite'));
         cardAction(secondary,'📌',()=>instance.controller.toggle(n.id,'pinned'));
+        cardAction(secondary,t('copyTxt'),()=>copyExport(n,'txt'));
+        cardAction(secondary,t('copyMd'),()=>copyExport(n,'md'));
         cardAction(secondary,t('undo'),()=>instance.controller.history(n.id,'undo'));
         cardAction(secondary,t('redo'),()=>instance.controller.history(n.id,'redo'));
         cardAction(secondary,s==='archived'?t('restore'):t('archiveIt'),()=>instance.controller.move(n.id,s==='archived'?'restore':'archive'));
@@ -556,6 +589,14 @@
     document.activeElement?.blur?.();
     preview.hidden=false;
     renderText(preview,n.body||'','');
+    const headings=[...preview.querySelectorAll('h4')];
+    if(headings.length>1){
+      const toc=el('nav','nsux-toc');
+      toc.setAttribute('aria-label',t('contents'));
+      toc.appendChild(el('strong','',t('contents')));
+      headings.forEach(h=>button(toc,h.textContent,()=>h.scrollIntoView?.({block:'nearest'})));
+      preview.prepend(toc);
+    }
     const ext=n.notesV21||{};
     if(ext.cornell){
       [['cues',t('question')],['notes',t('explain')],['summary',t('summary')]].forEach(([k,label])=>{
@@ -570,8 +611,17 @@
     const links=Array.isArray(ext.links)?ext.links:[];
     if(links.length){preview.appendChild(el('h4','',t('linked')));links.forEach(id=>{
       const target=instance.controller.read().notesList.find(x=>x?.id===id);
-      if(target)button(preview,target.title,()=>showReader(target));
+      if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
+      else preview.appendChild(el('p','nsux-meta',t('missing')+' #'+id));
     });}
+    const backlinks=instance.controller.backlinks(n.id);
+    if(backlinks.length){
+      preview.appendChild(el('h4','',t('linked')));
+      backlinks.forEach(id=>{
+        const target=instance.controller.read().notesList.find(x=>x?.id===id);
+        if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
+      });
+    }
     if(Array.isArray(ext.taskLinks))ext.taskLinks.forEach(id=>{
       const target=instance.controller.read().tasksList.find(x=>x&&x.id===id);
       if(target)preview.appendChild(el('p','',t('task')+': '+target.title));
@@ -605,7 +655,7 @@
     if(kind==='cornell'){instance.fields.cues.value='';instance.fields.notes.value='';instance.fields.summary.value='';}
     showType();
   }
-  return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,checklistProgress,
+  return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,checklistProgress,serializeNote,
     draftVersionMatches,findOccurrences,renderText,openedFingerprint:()=>instance?.openedSnapshot??null,
     install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader});
 });
