@@ -50,6 +50,6 @@ Run from repo root:
     node --check android/app/src/main/assets/web/notes_editor_ui.js
     node --test tests/notes_ui/*.test.cjs
 
-Lane 03 evidence: 16 of 16 tests from committed editor test file executed with isolated V8 adapter; 4 additional adapter checks passed against the exact lane 02 Core source, and 3 simulated local WebView draft checks passed. Real Node suite, actual Android WebView, low-storage quota, process death, keyboard, complete backup/restore and APK build have not been run in this lane. Neither a green CI result nor production readiness is asserted.
+Lane 03 evidence: 17 of 17 tests from committed editor test file executed with isolated V8 adapter; 4 additional adapter checks passed against the exact lane 02 Core source, and 3 simulated local WebView draft checks passed. Real Node suite, actual Android WebView, low-storage quota, process death, keyboard, complete backup/restore and APK build have not been run in this lane. Neither a green CI result nor production readiness is asserted.
 
 For acceptance, lane 00 must additionally run existing smoke_app.cjs, Python guards, Android build, restoration and on-device tests; add these new tests to CI; load lane 07 white design tokens only through the coordinated CSS merge; confirm application data, notes, tasks, timer and ZEN21:: backups remain consistent.
