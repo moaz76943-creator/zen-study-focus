@@ -932,22 +932,26 @@
            4. SMART NOTES SECTION (FULL SEARCH, TAGS & BLUR RECALL)
            ====================================================== -->
       <main class="screen-section" id="sec-notes">
-        <div class="search-pill-box">
-          <span>🔍</span>
-          <input type="text" class="search-pill-inp" id="inpSearchNotes" data-i18n-placeholder="phSearchNotes" placeholder="Search notes, workouts or book summaries..." oninput="renderNotesStack()">
-          <button class="task-mini-sel" onclick="exportAllNotes()" style="cursor:pointer;">📥 TXT</button>
+        <section class="notes-studio-hero">
+          <div class="notes-studio-heading"><small id="nsEyebrow">✦ Notes Studio</small><h2 id="nsTitle">Your ideas, organized</h2><p id="nsSubtitle">Write, revisit and develop your thoughts.</p></div>
+          <div class="notes-studio-stats"><div><strong id="nsTotal">0</strong><span id="nsTotalLabel">My notes</span></div><div><strong id="nsPinned">0</strong><span id="nsPinnedLabel">Pinned</span></div></div>
+          <button type="button" id="nsNewButton" class="ns-new" onclick="openNoteModal()">＋ New note</button>
+        </section>
+        <div class="ns-section-title"><strong id="nsTemplatesTitle">Ready-to-use templates</strong><span id="nsTemplatesHint">Tap to start</span></div>
+        <div id="nsTemplates" class="ns-templates" aria-label="Note templates"></div>
+        <div class="ns-toolbar">
+          <div class="search-pill-box"><span aria-hidden="true">⌕</span><input type="search" class="search-pill-inp" id="inpSearchNotes" placeholder="Search notes..." oninput="renderNotesStack()" aria-label="Search notes"><button id="nsExport" type="button" class="ns-export" onclick="exportAllNotes()" aria-label="Copy all notes">⇩</button></div>
+          <div class="ns-controls"><button id="nsPinnedOnly" type="button" aria-pressed="false" onclick="nsTogglePinnedOnly()">♧ <span id="nsPinnedOnlyLabel">Pinned only</span></button><label><span id="nsSortLabel">Sort</span> <select id="nsSort" onchange="renderNotesStack()" aria-label="Sort notes"><option value="recent">Recent</option><option value="oldest">Oldest</option><option value="title">Title</option></select></label></div>
         </div>
-
-        <div class="segmented-pills-bar">
+        <div class="segmented-pills-bar ns-filters">
           <button class="seg-pill active" onclick="filterNotesByTag('all', this)" data-i18n="filterAll">All</button>
           <button class="seg-pill" onclick="filterNotesByTag('cornell', this)" data-i18n="tagCornell">Cornell 📋</button>
           <button class="seg-pill" onclick="filterNotesByTag('flash', this)" data-i18n="tagFlash">Recall 👁️</button>
           <button class="seg-pill" onclick="filterNotesByTag('quick', this)" data-i18n="tagQuick">Log 💡</button>
         </div>
-
-        <div class="learning-cards-stack" id="notesStackBox"></div>
-
-        <button class="floating-plus-fab" onclick="openNoteModal()">+</button>
+        <div class="ns-count" id="nsVisibleCount" aria-live="polite"></div>
+        <div class="learning-cards-stack ns-cards" id="notesStackBox"></div>
+        <button class="floating-plus-fab" onclick="openNoteModal()" aria-label="New note">+</button>
       </main>
 
       <!-- ======================================================
@@ -1138,32 +1142,23 @@
   </div>
 
   <div class="modal-overlay" id="noteModal">
-    <div class="modal-card">
-      <div class="modal-head">
-        <span data-i18n="navNotes">📝 Smart Note & Calendar</span>
-        <button class="task-mini-sel" onclick="closeModal('noteModal')">✕</button>
+    <div class="modal-card ns-editor" role="dialog" aria-modal="true" aria-labelledby="nsEditorHeading">
+      <div class="modal-head"><span id="nsEditorHeading">New note</span><button class="task-mini-sel" onclick="closeModal('noteModal')" aria-label="Close">✕</button></div>
+      <div id="nsEditorTemplates" class="ns-editor-templates"></div>
+      <label for="inpNoteTitle" id="nsTitleLabel">Title</label>
+      <input type="text" class="modal-inp" id="inpNoteTitle" maxlength="250" placeholder="Title or question" oninput="nsUpdateCount()">
+      <div class="ns-meta">
+        <label><span id="nsTypeLabel">Type</span><select class="modal-inp" id="selNoteCat"><option value="cornell" data-i18n="tagCornell">Cornell</option><option value="flash" data-i18n="tagFlash">Recall</option><option value="quick" data-i18n="tagQuick">Log</option></select></label>
+        <label><span id="nsDateLabel">Date</span><input type="date" class="modal-inp" id="inpNoteCalDate"></label>
       </div>
-      <div style="display:flex; gap:6px; margin-bottom:8px;">
-        <button class="task-mini-sel" onclick="fillNoteTpl('cornell')" data-i18n="tagCornell">📋 Cornell</button>
-        <button class="task-mini-sel" onclick="fillNoteTpl('flash')" data-i18n="tagFlash">👁️ Recall</button>
+      <label for="inpNoteBody" id="nsBodyLabel">Content</label><textarea class="modal-inp" id="inpNoteBody" maxlength="500000" rows="10" placeholder="Write here..." oninput="nsUpdateCount()"></textarea>
+      <small id="nsCounter" aria-live="polite">0 words</small>
+      <div class="ns-options">
+        <label><input id="nsPinCheck" type="checkbox"><span id="nsPinCheckLabel">Pin</span></label>
+        <label><input id="nsFavCheck" type="checkbox"><span id="nsFavCheckLabel">Favorite</span></label>
+        <label><input type="checkbox" id="chkNoteBlur"><span data-i18n="lblBlurAnswer">Hide answer</span></label>
       </div>
-      <input type="text" class="modal-inp" id="inpNoteTitle" placeholder="Title or Question...">
-      <div style="display:flex; gap:6px; margin-bottom:10px;">
-        <select class="modal-inp" id="selNoteCat" style="margin:0; flex:1;">
-          <option value="cornell" data-i18n="tagCornell">📋 Cornell</option>
-          <option value="flash" data-i18n="tagFlash">👁️ Recall</option>
-          <option value="quick" data-i18n="tagQuick">💡 Log</option>
-        </select>
-        <input type="date" class="modal-inp" id="inpNoteCalDate" style="margin:0; flex:1;">
-      </div>
-      <textarea class="modal-inp" id="inpNoteBody" style="height:105px; resize:none;" placeholder="Details..."></textarea>
-      <label style="display:flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:700; margin-bottom:8px;">
-        <input type="checkbox" id="chkNoteBlur"> <span data-i18n="lblBlurAnswer">Blur text for active recall (Tap to reveal)</span>
-      </label>
-      <div class="modal-actions">
-        <button class="mbtn-pri" onclick="saveNewNote()" data-i18n="btnSave">Save</button>
-        <button class="mbtn-sec" onclick="closeModal('noteModal')" data-i18n="btnCancel">Cancel</button>
-      </div>
+      <div class="modal-actions"><button class="mbtn-sec" onclick="closeModal('noteModal')" data-i18n="btnCancel">Cancel</button><button class="mbtn-pri" id="nsSaveButton" onclick="saveNewNote()">Save</button></div>
     </div>
   </div>
 
@@ -1185,5 +1180,6 @@
   <script src="locale_extras.js"></script>
   <script src="quick_training.js"></script>
   <script src="app.js"></script>
+  <script src="notes_studio.js"></script>
 </body>
 </html>
