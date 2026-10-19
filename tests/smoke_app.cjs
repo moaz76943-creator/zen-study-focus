@@ -15,7 +15,7 @@ function node(id = '') {
     appendChild(child){this.children.push(child);return child;}, replaceChildren(...children){this.children=[...children];}, addEventListener(){},
     parentElement:{querySelectorAll(){return [];}},
     querySelectorAll(){return [];},
-    scrollIntoView(){}
+    focus(){}, scrollIntoView(){}
   };
 }
 const document = {
