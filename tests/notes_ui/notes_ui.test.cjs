@@ -104,3 +104,15 @@ test('cross-family checklist extraction fails closed without an atomic commit',(
  assert.throws(()=>ctl.extract(7),/ATOMIC_TASK_COMMIT_REQUIRED/);
  assert.equal(state.tasksList.length,0);
 });
+
+test('note-to-task links use separate numeric namespaces and preserve task data',()=>{
+ let state={notesList:copy(start),tasksList:[{id:7,title:'Study plan',done:false,other:'original'}]};
+ const ctl=UI.createController({core:fakeCore,readState:()=>copy(state),nextNumericId:()=>8,now:()=>1000,
+   commitNotes(before,after){state=copy(after);return true;}});
+ ctl.linkTask(7,7);
+ assert.deepEqual(state.notesList[0].notesV21.taskLinks,[7]);
+ assert.equal(state.tasksList[0].other,'original');
+ assert.throws(()=>ctl.linkTask(7,7),/TASK_ALREADY_LINKED/);
+ assert.throws(()=>ctl.linkTask(7,'7'),/INVALID_TASK_ID/);
+ assert.throws(()=>ctl.linkTask(7,999),/TASK_NOT_FOUND/);
+});
