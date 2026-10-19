@@ -31,20 +31,21 @@ async function openWebSocket(url){
     ws.addEventListener('error',()=>{clearTimeout(timer);reject(Error('CDP connection error'));},{once:true});
   });
 }
-async function query(ws,expression){
+let serial=0;
+async function query(ws,expression,method="Runtime.evaluate"){
   return await new Promise((resolve,reject)=>{
-    const id=1;
-    const timer=setTimeout(()=>{ws.removeEventListener('message',message);reject(Error('CDP evaluation timed out'));},7000);
+    const id=++serial;
+    const timer=setTimeout(()=>{ws.removeEventListener('message',message);reject(Error('CDP evaluation timed out'));},30000);
     const message=e=>{
       let payload;
       try{payload=JSON.parse(e.data);}catch(_){return;}
       if(payload.id!==id)return;
       clearTimeout(timer);ws.removeEventListener('message',message);
       if(payload.error||payload.result?.exceptionDetails)return reject(Error('CDP runtime evaluation failed'));
-      resolve(payload.result?.result?.value);
+      resolve(method==='Runtime.evaluate'?payload.result?.result?.value:payload.result);
     };
     ws.addEventListener('message',message);
-    ws.send(JSON.stringify({id,method:'Runtime.evaluate',params:{expression,returnByValue:true}}));
+    ws.send(JSON.stringify({id,method,params:method==='Runtime.evaluate'?{expression,returnByValue:true}:{}}));
   });
 }
 const expression=`(() => {
@@ -76,6 +77,7 @@ async function main(){
   if(!target?.webSocketDebuggerUrl)throw Error('No loaded bundled WebView DevTools page in target list');
   const ws=await openWebSocket(target.webSocketDebuggerUrl);
   try{
+    report.protocol={runtime:await query(ws,null,'Runtime.enable')};
     const dom=await query(ws,expression);
     report.dom=dom;
     if(!dom||dom.ready!=='complete'||!dom.timerSection||!dom.playButton||
