@@ -2,7 +2,7 @@ name: Verify Android APK and Play Bundle
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, fix/v21-safe-release-recovery-20261018]
   push:
     branches: [main]
   workflow_dispatch:
@@ -47,6 +47,10 @@ jobs:
           node --check android/app/src/main/assets/web/locale_extras.js
           node tests/validate_locales.cjs
           node tests/smoke_app.cjs
+      - name: Integrated v22 module syntax and regression suites
+        run: |
+          for file in android/app/src/main/assets/web/*.js; do node --check "$file"; done
+          node --test tests/data_contracts/*.test.cjs tests/notes_core/*.test.cjs tests/notes_ui/*.test.cjs tests/tasks_core/*.test.cjs tests/analytics_core/*.test.cjs tests/focus_workflows/*.test.cjs tests/design_quality/*.test.cjs tests/regression_v21/*.test.cjs tests/integration_quality/*.test.cjs
       - name: Build test APK and unsigned Play bundle
         working-directory: android
         run: gradle assembleDebug bundleRelease --no-daemon
