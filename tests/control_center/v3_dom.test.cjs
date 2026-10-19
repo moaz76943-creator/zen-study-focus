@@ -51,10 +51,16 @@ function harness(){
       html_url:'https://github.com/moaz76943-creator/zen-study-focus/actions/runs/3'}],
     findings:[],audit:null
   };
+  const saved=new Map();
+  const localStorage={
+    setItem:(key,value)=>saved.set(key,value),
+    getItem:key=>saved.get(key)||null,
+    removeItem:key=>saved.delete(key)
+  };
   const ctx={document,globalThis:{DeepFocusV3Core:ops,DeepFocusControlCenter:{getSnapshot:()=>data},DeepFocusStudioUI:studio},URL,Date,Blob,
-    setTimeout,clearTimeout};
+    localStorage,setTimeout,clearTimeout};
   vm.runInNewContext(script,ctx,{timeout:3000});
-  return {document,element:id=>document.getElementById(id),getCurrent:()=>current,applyConfig:studio.applyConfig};
+  return {document,element:id=>document.getElementById(id),getCurrent:()=>current,applyConfig:studio.applyConfig,saved};
 }
 
 test('mounts source data, draws task/PR/CI panels and release gates',()=>{
@@ -111,4 +117,19 @@ test('offline file is explicitly opt-in, labeled stale and reversible to live vi
  h.element('v3-return-live').click();
  assert.equal(h.element('v3-task-count').textContent,originalCount);
  assert.match(h.element('v3-connection').textContent,/GitHub/);
+});
+
+test('phone design draft persists only in dedicated browser key and can be restored/deleted',()=>{
+ const h=harness();
+ const edited=studioCore.updateSetting(baseline,'notes','spacing',19);
+ h.applyConfig(edited);
+ h.element('v3-draft-save').click();
+ assert.deepEqual([...h.saved.keys()],['df_control_center_design_draft_v1']);
+ h.applyConfig(baseline);
+ h.element('v3-draft-restore').click();
+ assert.equal(h.getCurrent().screens.notes.spacing,19);
+ h.element('v3-draft-clear').click();
+ assert.equal(h.saved.size,0);
+ h.element('v3-draft-restore').click();
+ assert.match(h.element('v3-draft-status').textContent,/تعذرت الاستعادة/);
 });
