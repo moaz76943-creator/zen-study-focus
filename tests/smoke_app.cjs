@@ -296,4 +296,21 @@ assert.ok(store.has('zen_fortress_notes_v21'),'Saved notes compatibility');
 assert.equal(evaluate('typeof openQuickTrainingFromNav'),'function');
 assert.equal(evaluate('SOUNDS_DATA.length'),12);
 
+
+vm.runInContext(fs.readFileSync(path.join(root,'goals_studio.js'),'utf8'),sandbox,{filename:'goals_studio.js',timeout:2000});
+assert.equal(evaluate('gsGoal("study")'),0,'Do not invent user daily goals');
+assert.equal(evaluate('gsRecordedMinutes("study","2045-02-20")'),0,'Do not invent actual progress');
+assert.equal(evaluate('GOAL_DOMAINS.length'),4);
+evaluate('openDailyGoalsModal()');
+document.getElementById('goalInput-study').value='120';
+document.getElementById('goalInput-read').value='45';
+document.getElementById('goalInput-sport').value='30';
+document.getElementById('goalInput-work').value='60';
+assert.equal(evaluate('saveDailyGoals()'),true);
+assert.equal(evaluate('gsGoal("study")'),120);
+document.getElementById('goalInput-study').value='900';
+assert.equal(evaluate('saveDailyGoals()'),false,'Reject invalid daily goal values');
+assert.equal(evaluate('gsGoal("study")'),120);
+assert.ok(store.has('zen_fortress_cfg_v21'),'Saved goals reuse the original cfg persistence');
+
 console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');

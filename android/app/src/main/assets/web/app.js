@@ -996,6 +996,7 @@ function syncHeaderMetrics() {
   document.getElementById('ringPlantEmoji').textContent = plant;
   renderAnalyticsBars();
   renderTodayPlan();
+  if (typeof renderDailyGoals === 'function') renderDailyGoals();
 }
 
 function updateTimerDisplay() {

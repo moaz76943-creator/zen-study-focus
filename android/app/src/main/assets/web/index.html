@@ -845,6 +845,15 @@
           <div class="today-progress-track"><span id="todayPlanFill"></span></div>
           <div id="todayPlanPreview" class="today-plan-preview"></div>
         </section>
+
+        <section class="pure-white-card daily-goals-card" id="dailyGoalsCard" aria-labelledby="dailyGoalsHeading">
+          <div class="goals-header">
+            <div><span class="small-kicker" id="goalsKicker">✦ DAILY GOALS</span><h2 id="dailyGoalsHeading">Progress by activity</h2>
+            <p id="dailyGoalsDescription">Only completed focus minutes count.</p></div>
+            <button type="button" class="goals-edit" id="goalsEditButton" onclick="openDailyGoalsModal()">⚙ Goals</button>
+          </div>
+          <div class="goals-rows" id="dailyGoalsRows"></div>
+        </section>
         <div class="pure-white-card quick-orbs-card">
           <div class="hero-balance-header">
             <div>
@@ -1119,6 +1128,19 @@
     </div>
   </div>
 
+
+  <div class="modal-overlay" id="dailyGoalsModal">
+    <div class="modal-card goals-modal" role="dialog" aria-modal="true" aria-labelledby="goalsModalHeading">
+      <div class="modal-head"><span id="goalsModalHeading">Daily activity goals</span>
+        <button type="button" class="task-mini-sel" onclick="closeModal('dailyGoalsModal')" aria-label="Close">✕</button></div>
+      <p id="goalsModalHint" class="goals-hint">Set 0 to disable a goal. Saved focus sessions count toward each goal.</p>
+      <div class="goals-edit-grid" id="goalsEditGrid"></div>
+      <div class="modal-actions">
+        <button type="button" class="mbtn-sec" onclick="closeModal('dailyGoalsModal')" data-i18n="btnCancel">Cancel</button>
+        <button type="button" class="mbtn-pri" onclick="saveDailyGoals()" data-i18n="btnSave">Save</button>
+      </div>
+    </div>
+  </div>
   <div class="modal-overlay" id="customTimerModal">
     <div class="modal-card">
       <div class="modal-head">
@@ -1182,5 +1204,6 @@
   <script src="quick_training.js"></script>
   <script src="app.js"></script>
   <script src="notes_studio.js"></script>
+  <script src="goals_studio.js"></script>
 </body>
 </html>
