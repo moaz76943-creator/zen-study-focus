@@ -18,7 +18,12 @@ function assertBooted(dom){
     throw Error('Studio did not initialize from embedded local config: '+design.slice(0,180));
   if(!status||/جارٍ الاتصال/.test(status))
     throw Error('GitHub/source connection status never rendered');
-  return {taskCountText:ledger,designReady:true,statusText:status};
+  const plannerSource=content('planner-source-status');
+  const plannerCount=content('planner-count');
+  if(!/161 مهمة/.test(plannerSource)||!/0\s*\/\s*6 مهام مختارة/.test(plannerCount)||
+    !/id="planner-task-list"[^>]*>\s*<div class="planner-task/.test(dom))
+    throw Error('Agent planner task selector did not initialize from source (source='+plannerSource+', count='+plannerCount+')');
+  return {taskCountText:ledger,designReady:true,plannerReady:true,plannerSource,statusText:status};
 }
 if(require.main===module){
   try{
