@@ -30,7 +30,8 @@ jobs:
           for file in android/app/src/main/assets/web/*.js; do node --check "$file"; done
           node tests/validate_locales.cjs
           node tests/smoke_app.cjs
-          mapfile -t suites < <(rg --files tests -g '*.test.cjs' -g 'test_*.cjs' | rg -v '/media_provenance_gate.test.cjs$' | sort)
+          mapfile -t suites < <(python3 -c 'from pathlib import Path; print("\n".join(str(p) for p in sorted(Path("tests").rglob("*.cjs")) if (p.name.endswith(".test.cjs") or p.name.startswith("test_")) and p.name != "media_provenance_gate.test.cjs"))')
+          test "${#suites[@]}" -gt 0
           node --test --test-reporter=tap "${suites[@]}" | tee "$RUNNER_TEMP/df4-evidence/node.tap"
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/df4-evidence/python.log"
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/android_e2e_recovery -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/df4-evidence/android-runner-unit.log"
