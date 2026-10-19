@@ -26,7 +26,8 @@ test('DF-064 nonnumeric user text is never normalized by universal input listene
 test('DF-031 alerts are wired to real timer completion without synthesized chime',()=>{
  const app=web('app.js'),html=web('index.html');
  assert.match(html,/completion_alert_settings\.js/);
- assert.match(app,/DeepFocusCompletionAlerts/);
+ assert.match(web('integration_v22.js'),/DeepFocusCompletionAlerts/);
+ assert.match(app,/DFRecoveryCompletion/);
  assert.doesNotMatch(app,/createOscillator\s*\(/);
  assert.match(app,/timerSessionId/);
 });
