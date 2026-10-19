@@ -102,7 +102,7 @@
     const s=stateCopy(state),fields=normalizePatch(s,input);
     if(!fields.title)fail('Title required');
     const stamp=timeStamp(opts),id=uniqueId(s,opts);
-    const task={id,isStarter:false,title:fields.title,date:fields.date||stamp.slice(0,10),catKey:fields.catKey||'study',done:false,
+    const task={id,isStarter:false,title:fields.title,date:fields.date||(validDate(opts.today)?opts.today:stamp.slice(0,10)),catKey:fields.catKey||'study',done:false,
       time:'25m',status:'todo',createdAt:stamp,updatedAt:stamp,dueAssigned:own(fields,'date'),...fields};
     s.tasksList.unshift(task);
     return {state:s,task:copy(task)};
