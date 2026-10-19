@@ -20,3 +20,14 @@ test('SVG renderer rejects forged date or negative statistics',()=>{
  assert.throws(()=>S.barsSvg([{key:'2026-10-19',minutes:-5,sessions:1}]),TypeError);
  assert.throws(()=>S.heatmapSvg([]),TypeError);
 });
+test('week and month aggregation keys are valid interactive SVG categories',()=>{
+ const r=A.buildReport({sessionHistory:[
+ {id:'a',date:'2026-09-30',minutes:18,domain:'study'},
+ {id:'b',date:'2026-10-01',minutes:32,domain:'work'}]},
+ {today:'2026-10-01',startDate:'2026-09-29',endDate:'2026-10-01'});
+ const weekly=S.barsSvg(r.weekly),monthly=S.barsSvg(r.monthly);
+ assert.match(weekly,/data-day="2026-09-28"/);
+ assert.match(monthly,/data-day="2026-09"/);
+ assert.match(monthly,/data-day="2026-10"/);
+ assert.match(monthly,/32 min, 1 sessions/);
+});
