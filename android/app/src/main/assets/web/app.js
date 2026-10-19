@@ -949,6 +949,8 @@ function showToast(msg) {
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 window.handleAndroidBack = function() {
+  const chooser = document.querySelector?.('dialog[open]');
+  if (chooser) { chooser.close(); return true; }
   if (document.getElementById('deskClockOverlay').classList.contains('active')) { toggleDeskClock(false); return true; }
   const openM = document.querySelectorAll('.modal-overlay.open');
   if (openM.length > 0) {
