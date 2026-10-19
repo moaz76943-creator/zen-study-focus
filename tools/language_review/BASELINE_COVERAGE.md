@@ -43,8 +43,12 @@ Source snapshot: PR #25 / 0dd9239bc28978e11f41c1c0f618c9662b291fe2
 
 Missing explicit language/key combinations: 5110.
 Independent missing-key proposal records: 281.
+
+Translation proposals, by language/key: 565 existing-label reuse candidates with source provenance (**not verified**), 24 ambiguous candidates, 4,521 with no proposed translation. All 5,110 combinations remain open until linguistic review and UI integration.
+
+HTML translation bindings: 94 analyzed, 0 unresolved against inspected source catalogs. Static unmarked HTML/JS labels were detected and require manual screen-level review. The source audit flags English-identical labels but does not classify every identical label as an error.
 Only ar/fa/ur are RTL. Generated UI numbers must stay 0123456789; user-authored text is never normalized.
 
 The additional read-only audit CLI scans HTML/JavaScript literals, flags same-as-English strings and emits independently regenerated JSON and Markdown reports. The baseline does not certify context-appropriate translations.
 
-Human native-speaker review, RTL/LTR actual WebView behavior, and device test remain NOT_TESTED.
+9 focused source-level checks passed within an isolated mocked Node runtime. The repository's native `node --test` command was not executed in its own environment; CI, Android build, native-speaker review, RTL/LTR actual WebView behavior, and device test remain NOT_TESTED.
