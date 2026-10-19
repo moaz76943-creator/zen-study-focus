@@ -18,7 +18,6 @@ function buildPortable(root=ROOT,overrideHTML){
   const raw=overrideHTML===undefined?read(root,HTML):String(overrideHTML);
   if(raw.length<1000)throw Error('Missing dashboard HTML');
   let html=raw;
-  if(/<script\b[^>]*>(?![\s]*<\/script>)/i.test(''))throw Error('unreachable');
   const scripts=[...raw.matchAll(/<script\b[^>]*>/gi)];
   if(scripts.length!==SCRIPTS.length||/<script\b(?![^>]*\bsrc=["']\.\/[^"']+["'])/i.test(raw))
     throw Error('HTML may only reference the five known local scripts');
