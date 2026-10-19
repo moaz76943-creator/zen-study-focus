@@ -1062,6 +1062,12 @@ function updateTimerDisplay() {
   updateFocusStatus();
 }
 
+function requestTimerMode(mins,modeKey,btn){
+  if(timerSessionId&&(timerRunning||timerLeft<timerTotal)&&
+      !window.confirm(cfg.lang==='ar'?'تغيير الوضع يلغي الجلسة الجارية. متابعة؟':'Changing mode discards the current session. Continue?'))
+    return false;
+  selectTimerMode(mins,modeKey,btn);return true;
+}
 function selectTimerMode(mins, modeKey, btn) {
   if(quickTraining?.active && !quickInternalChange) {
     if(!window.confirm(quickText('replacePrompt')))return;
@@ -1077,6 +1083,7 @@ function selectTimerMode(mins, modeKey, btn) {
     btn.classList.add('active');
   }
   timerSessionId = null;
+  focusSessionTaskId = null;
   timerActiveMs = 0;
   timerResumeMs = null;
   storeTimerSession();
@@ -1090,7 +1097,7 @@ function applyCustomTimerNow() {
   const title = toWest(document.getElementById('inpCustomTitle').value.trim());
   customSessionLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
   closeModal('customTimerModal');
-  selectTimerMode(mins, 'custom', document.getElementById('modeCustomBtn'));
+  if(!requestTimerMode(mins, 'custom', document.getElementById('modeCustomBtn')))return;
   showToast(`⚡ ${customSessionLabel}`);
 }
 
@@ -1155,6 +1162,7 @@ function resetTimerNow() {
   if (timerRunning) toggleTimerPlay();
   timerLeft = timerTotal;
   timerSessionId = null;
+  focusSessionTaskId = null;
   timerActiveMs = 0;
   timerResumeMs = null;
   storeTimerSession();
@@ -1163,7 +1171,7 @@ function resetTimerNow() {
 function skipTimerPhase() {
   if(quickTraining?.active) { skipQuickTrainingStep(); return; }
   if (timerRunning) toggleTimerPlay();
-  selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
+  requestTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
 }
 function addWaterCup() { cfg.water = (cfg.water + 1) % 9; saveFortressData('zen_fortress_cfg_v21', cfg); syncHeaderMetrics(); }
 function toggleDeskClock(show) {
