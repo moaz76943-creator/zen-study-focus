@@ -22,6 +22,9 @@
   const doc=target.ownerDocument,ar=adapter.locale==='ar',l=labels[ar?'ar':'en'];
   let state=adapter.readState(),undoStack=[],redoStack=[],view='today',editing=null,category='',query='',day='',status='',projectFilter='',sort='date',expanded=new Set(),isDestroyed=false;
   const currentDay=()=>dateLocal(typeof adapter.now==='function'?adapter.now():new Date());
+   let cachedState=null,cachedFocus=new Map(),cachedPicksState=null,cachedPicksDay='',cachedPicks=[];
+   function focusFor(id){if(cachedState!==state){cachedFocus=C.sessionTotals(state);cachedState=state;}return cachedFocus.get(id)||0;}
+   function picks(){const day=currentDay();if(cachedPicksState!==state||cachedPicksDay!==day){cachedPicks=C.topThree(state,day);cachedPicksState=state;cachedPicksDay=day;}return cachedPicks;}
   const el=(tag,cls,text)=>{const x=doc.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=String(text);return x;};
   const btn=(caption,fn,kind='')=>{const b=el('button','df-btn '+kind,caption);b.type='button';b.addEventListener('click',fn);return b;};
   const append=(parent,...nodes)=>{nodes.forEach(n=>parent.appendChild(n));return parent;};
@@ -79,7 +82,7 @@
     if(t.description)more.appendChild(el('p','df-muted',t.description));
     const meta=el('div','df-meta');meta.appendChild(el('span','',l[t.catKey]||t.catKey));
     if(t.priority)meta.appendChild(el('span','',l[t.priority]||t.priority));
-    const actual=C.actualFocusMinutes(state,t.id);
+    const actual=focusFor(t.id);
     if((t.estimateMin||0)>0||actual>0)meta.appendChild(el('span','',l.estimated+': '+(t.estimateMin||0)+' · '+l.actual+': '+actual));
     more.appendChild(meta);
     for(const kind of ['checklist','subtasks']){
@@ -91,11 +94,13 @@
      }
      if(t[kind].length)more.appendChild(el('p','df-muted',l[kind==='checklist'?'check':'sub']+': '+t[kind].filter(x=>x.done).length+'/'+t[kind].length));
     }
-    const actions=el('div','df-actions'),pinned=C.topThree(state,currentDay()).some(x=>x.id===t.id);
+    const actions=el('div','df-actions'),pinned=picks().some(x=>x.id===t.id);
     append(actions,btn(l.edit,()=>{editing=t.id;render();}),btn(pinned?l.topUnpin:l.topPin,()=>{
-     const ids=C.topThree(state,currentDay()).map(x=>x.id),next=pinned?ids.filter(x=>x!==t.id):[...ids,t.id];
-     if(next.length>3){error(new Error(l.topLimit));return;}
-     apply(x=>({state:C.chooseTopThree(x,currentDay(),next)}));
+     apply(x=>{const ids=C.topThree(x,currentDay()).map(item=>item.id);
+      const next=ids.includes(t.id)?ids.filter(id=>id!==t.id):[...ids,t.id];
+      if(next.length>3)throw new Error(l.topLimit);
+      return {state:C.chooseTopThree(x,currentDay(),next)};
+     });
     }),btn(l.focus,()=>{try{if(typeof adapter.linkTaskToTimer!=='function'||adapter.linkTaskToTimer(t.id)!==true)throw new Error(l.notConnected);}catch(e){error(e);}}));
     actions.appendChild(C.statusOf(t)==='archived'?btn(l.resume,()=>apply(x=>C.setStatus(x,t.id,'todo'))):btn(l.archive,()=>apply(x=>C.setStatus(x,t.id,'archived'))));
     actions.appendChild(btn(l.remove,()=>apply(x=>C.trashTask(x,t.id)),'df-danger'));
@@ -115,7 +120,7 @@
     const hasDue=input('checkbox');hasDue.checked=t?t.dueAssigned!==false:false;hasDue.style.width='auto';
    const categoryInput=selection(['study','sport','review','exam'].map(v=>[v,l[v]]),t?.catKey||'study');
    const priority=selection(['low','medium','high','urgent'].map(v=>[v,l[v]]),t?.priority||'medium');
-   const estimate=input('number',t?.estimateMin||25);estimate.min='0';estimate.max='100000';
+   const estimate=input('number',t?.estimateMin??'');estimate.min='0';estimate.max='100000';
    const repeat=selection([['',l.never],...['daily','weekdays','weekly','monthly'].map(v=>[v,l[v]])],t?.repeat?.frequency||'');
    const group=input('text',t?.group||'');
    const project=selection([['',l.none],...C.projects(state).filter(p=>!p.deletedAt).map(p=>[p.id,p.name])],t?.projectId??'');
@@ -151,7 +156,7 @@
     quick.addEventListener('submit',event=>{event.preventDefault();if(!quickText.value.trim())return;apply(x=>C.createTask(x,{title:quickText.value},{noteIds:adapter.noteIds?.(),today:currentDay()}));});content.appendChild(quick);
     if(editing!==null)content.appendChild(editor());
    const today=el('section','df-panel'),top=el('h3','',l.today);today.appendChild(top);
-   const top3=C.topThree(state,currentDay());if(!top3.length)today.appendChild(el('p','df-muted',l.empty));else{const pinned=el('div','df-top-list');top3.forEach(t=>pinned.appendChild(btn('★ '+t.title,()=>{expanded.add(t.id);view='all';render();})));today.appendChild(pinned);}
+   const top3=picks();if(!top3.length)today.appendChild(el('p','df-muted',l.empty));else{const pinned=el('div','df-top-list');top3.forEach(t=>pinned.appendChild(btn('★ '+t.title,()=>{expanded.add(t.id);view='all';render();})));today.appendChild(pinned);}
    content.appendChild(today);
    const pr=C.projects(state).filter(x=>!x.deletedAt);if(pr.length){const list=el('div','df-grid');pr.forEach(p=>{
     const progress=C.projectProgress(state,p.id),card=el('div','df-project');append(card,el('h3','',p.name),el('p','df-muted',`${progress.completed}/${progress.total} · ${progress.percent}%`));
