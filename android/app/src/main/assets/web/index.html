@@ -634,6 +634,9 @@
     .toast-pill.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
   <link rel="stylesheet" href="white_2100.css">
+  <link rel="stylesheet" href="design_tokens_v22.css">
+  <link rel="stylesheet" href="ui_components_v22.css">
+  <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
 </head>
 <body>
 
@@ -701,7 +704,7 @@
             <span class="focus-status" id="focusStatusLabel" data-qt="ready">جاهز للإنجاز</span>
           </div>
           <div class="segmented-pills-bar">
-            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerMode(getDomainFocusMinutes(), 'focus', this)" data-i18n="modeFocus">25m</button>
+            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerModeFromUser(getDomainFocusMinutes(), 'focus', this)" data-i18n="modeFocus">25m</button>
             <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">5m</button>
             <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">15m</button>
             <button class="seg-pill" id="modeCustomBtn" onclick="openCustomTimerModal()" data-i18n="modeCustom">Custom ⚡</button>
@@ -912,6 +915,7 @@
         </div>
 
         <div class="tasks-showcase-list" id="tasksShowcaseBox"></div>
+        <div id="df22TasksHost" aria-label="Advanced tasks and calendar"></div>
       </main>
 
       <!-- ======================================================
@@ -1057,6 +1061,7 @@
           </div>
           <div id="syllabusCalcOut" style="font-size:0.78rem; font-weight:800; color:var(--emerald); background:var(--emerald-soft); padding:9px 12px; border-radius:12px;"></div>
         </div>
+        <div id="df22AnalyticsHost" aria-label="History-backed analytics"></div>
       </main>
 
     </div>
@@ -1218,10 +1223,21 @@
   <script src="locale_rows.js"></script>
   <script src="locale_extras.js"></script>
   <script src="quick_training.js"></script>
+  <script src="data_compat_v21.js"></script>
+  <script src="preflight_v22.js"></script>
   <script src="app.js"></script>
+  <script src="notes_core_v21.js"></script>
   <script src="notes_studio.js"></script>
-  <script src="goals_studio.js"></script>
+  <script src="notes_editor_ui.js"></script>
   <script src="notes_drafts.js"></script>
+  <script src="tasks_core_v21.js"></script>
+  <script src="tasks_studio.js"></script>
+  <script src="analytics_core_v21.js"></script>
+  <script src="analytics_studio.js"></script>
+  <script src="locale_premium_v22.js"></script>
+  <script src="goals_studio.js"></script>
   <script src="timer_settings.js"></script>
+  <script src="sound_mix_controls.js"></script>
+  <script src="integration_v22.js"></script>
 </body>
 </html>
