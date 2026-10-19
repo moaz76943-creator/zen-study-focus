@@ -14,11 +14,15 @@ test('manifest disables platform automatic backup and cleartext traffic',()=>{
   assert.match(manifest,/android:exported="false"[^>]*android:foregroundServiceType/s);
 });
 
-test('WebView blocks universal/file URL privilege escalation and debugging',()=>{
+test('WebView blocks universal/file URL access and release-build debugging',()=>{
   assert.match(main,/setAllowFileAccessFromFileURLs\(false\)/);
   assert.match(main,/setAllowUniversalAccessFromFileURLs\(false\)/);
   assert.match(main,/setAllowContentAccess\(false\)/);
-  assert.match(main,/setWebContentsDebuggingEnabled\(false\)/);
+  assert.match(main,/ApplicationInfo\\.FLAG_DEBUGGABLE/);
+  assert.match(main,/setWebContentsDebuggingEnabled\\(debuggableBuild\\)/);
+  assert.doesNotMatch(main,/setWebContentsDebuggingEnabled\\(true\\)/);
+  // Only disposable DEBUG builds may expose DevTools; release flags disable it.
+
 });
 
 test('SEC-P0 local-asset WebView must disable general file access',()=>{
