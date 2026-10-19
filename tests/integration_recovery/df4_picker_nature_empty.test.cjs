@@ -50,8 +50,8 @@ test('no missing or unapproved recording is silently activated',()=>{
   assert.ok(nodes.every(x=>x.className.includes('sound-Rich-tile')));
 });
 test('unapproved-category empty state spans the grid and remains readable at narrow widths',()=>{
-  assert.match(css,/\\.sounds-empty-state\\s*\\{[^}]*grid-column\\s*:\\s*1\\s*\\/\\s*-1/s);
-  assert.match(css,/\\.sounds-empty-state\\s*\\{[^}]*overflow-wrap\\s*:\\s*anywhere/s);
+  assert.match(css,/\.sounds-empty-state\s*\{[^}]*grid-column\s*:\s*1\s*\/\s*-1/s);
+  assert.match(css,/\.sounds-empty-state\s*\{[^}]*overflow-wrap\s*:\s*anywhere/s);
 });
 test('nature feedback styles are locally bundled with opt-in White Premium, no remote dependencies',()=>{
   const html=fs.readFileSync(path.join(web,'index.html'),'utf8');
