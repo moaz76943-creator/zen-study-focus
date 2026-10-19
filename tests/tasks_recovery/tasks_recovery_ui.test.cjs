@@ -56,12 +56,12 @@ test('DF-107 complete/reopen and Undo restore the real task record',()=>{
 });
 test('DF-111 user manually pins task and Undo removes its pin without removing task',()=>{
  const a=setup([{id:10,title:'Pin me',date:'2026-10-19',catKey:'study',done:false,isStarter:false}]);
- assert.deepEqual(Core.topThree(a.read(),'2026-10-19'),[]);
+ assert.equal(a.read().cfg.taskTopThreeV21,undefined);
  find(a.root,'Details').fire('click');
  find(a.root,'Top three').fire('click');
  assert.deepEqual(a.read().cfg.taskTopThreeV21['2026-10-19'],[10]);
  find(a.root,'Undo').fire('click');
- assert.deepEqual(Core.topThree(a.read(),'2026-10-19'),[]);
+ assert.equal(a.read().cfg.taskTopThreeV21,undefined);
  assert.equal(a.read().tasksList[0].id,10);
 });
 test('DF-110 future tasks appear in upcoming rather than today',()=>{
