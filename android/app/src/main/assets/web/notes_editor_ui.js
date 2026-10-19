@@ -185,6 +185,7 @@
       '.nsux-extra{display:grid;gap:9px;margin:9px 0}.nsux-extra label{display:grid;gap:5px;font-size:.75rem;color:#50617a}',
       '.nsux-area{box-sizing:border-box;width:100%;min-height:90px;resize:vertical;white-space:pre-wrap;unicode-bidi:plaintext;border:1px solid #dce5f0;border-radius:13px;background:#fff;padding:12px;color:#1c2e4d;line-height:1.65;font:inherit;font-size:16px}',
       '.nsux-inline>*{flex:1 1 120px}.nsux-meta{margin:7px 0;color:#50617a;font-size:.76rem}',
+      '.nsux-reading #nsux-fields>label,.nsux-reading #nsux-fields>#nsux-cornell,.nsux-reading #nsux-fields>#nsux-recall,.nsux-reading #nsux-fields>.nsux-btn{display:none!important}',
       '.nsux-reading #inpNoteTitle,.nsux-reading #inpNoteBody,.nsux-reading #nsBodyLabel,.nsux-reading #nsCounter,.nsux-reading #nsux-fields .nsux-meta,.nsux-reading #nsux-tools,.nsux-reading .ns-meta,.nsux-reading .ns-options,.nsux-reading .modal-actions,.nsux-reading #nsEditorTemplates{display:none!important}',
       '.nsux-reading #nsux-preview{display:block!important;max-height:65dvh}',
       '.nsux-reader{white-space:normal;overflow-wrap:anywhere;line-height:1.7;color:#1c2e4d;padding:14px;border:1px solid #dce5f0;border-radius:15px;background:white;max-height:42vh;overflow:auto}',
@@ -364,7 +365,7 @@
     return result;
   }
   function save(){
-    if(!instance)return false;
+    if(!instance){if(typeof showToast==='function')showToast('⚠️ Notes UI is not connected; nothing was saved.');return false;}
     try{
       instance.controller.save(draftToSave());
       if(typeof nsClearDraftForSavedNote==='function')nsClearDraftForSavedNote();
