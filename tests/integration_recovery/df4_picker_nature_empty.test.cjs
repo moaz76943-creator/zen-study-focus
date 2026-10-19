@@ -61,6 +61,16 @@ test('nature volume labels and slider accessibility are translated with the sele
     assert.ok(nodes[0].innerHTML.includes('aria-label="'+volumes[lang]+': Forest"'));
   }
 });
+test('all 20 registered languages have nonempty nature status and volume labels',()=>{
+  const {messages,volumes}=renderIsolated('en','warm');
+  const locales=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko','vi','it','bn','ur','fa','pl','nl'];
+  assert.equal(Object.keys(messages).length,20);
+  assert.equal(Object.keys(volumes).length,20);
+  for(const lang of locales){
+    assert.ok(typeof messages[lang]==='string' && messages[lang].length>15,lang+' empty message');
+    assert.ok(typeof volumes[lang]==='string' && volumes[lang].length>1,lang+' volume');
+  }
+});
 test('unapproved-category empty state spans the grid and remains readable at narrow widths',()=>{
   assert.match(css,/\.sounds-empty-state\s*\{[^}]*grid-column\s*:\s*1\s*\/\s*-1/s);
   assert.match(css,/\.sounds-empty-state\s*\{[^}]*overflow-wrap\s*:\s*anywhere/s);
