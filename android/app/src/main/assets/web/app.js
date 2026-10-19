@@ -1491,11 +1491,19 @@ function renderCalendar() {
     const hasTasks = tasksList.some(t => t.date === iso);
     const hasNotes = notesList.some(n => n.calDate === iso);
 
-    const cell = document.createElement('div');
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.setAttribute('aria-label',iso);
+    cell.setAttribute('aria-pressed',String(iso === selectedCalDate));
+    if(iso === todayISO) cell.setAttribute('aria-current','date');
+    cell.setAttribute('data-date',iso);
     cell.className = `cal-day-cell ${iso === todayISO ? 'today' : ''} ${iso === selectedCalDate ? 'selected' : ''}`;
-    cell.onclick = () => { selectedCalDate = iso; renderCalendar(); };
+    cell.onclick = () => {
+      selectedCalDate = iso; renderCalendar();
+      document.querySelector?.('[data-date="' + iso + '"]')?.focus();
+    };
     cell.innerHTML = `
-      <span>${toWest(day)}</span>
+      <span dir="ltr">${toWest(day)}</span>
       <div class="cal-dots-row">
         ${hasTasks ? '<span class="cal-dot dot-task"></span>' : ''}
         ${hasNotes ? '<span class="cal-dot dot-note"></span>' : ''}
