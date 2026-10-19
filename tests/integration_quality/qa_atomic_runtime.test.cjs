@@ -17,10 +17,12 @@ function storage() {
 function rig() {
   const localStorage=storage();
   const context = vm.createContext({
-    window:{localStorage},cfg:{lang:'ar',sessionHistory:[]},
+    localStorage,cfg:{lang:'ar',sessionHistory:[]},
     tasksList:[{id:1,title:'Historical task',done:false,unknown:7}],
     notesList:[{id:1,title:'ملاحظة قديمة',body:'Text',isStarter:false,extra:true}]
   });
+  // An Android WebView has globalThis === window, unlike a default Node vm context.
+  context.window = context;
   for(const file of ['data_compat_v21.js','preflight_v22.js','integration_v22.js'])
     vm.runInContext(fs.readFileSync(path.join(web,file),'utf8'),context,{filename:file,timeout:2000});
   const api=context.window.DF22Integration, D=context.window.DeepFocusDataCompatV21;
