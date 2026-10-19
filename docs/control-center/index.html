@@ -15,6 +15,8 @@
   <script src="./studio.js" defer></script>
   <script src="./v3-core.js" defer></script>
   <script src="./v3-ui.js" defer></script>
+  <script src="./planner-core.js" defer></script>
+  <script src="./planner-ui.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#overview">تجاوز إلى المحتوى الرئيسي</a>
@@ -32,6 +34,7 @@
         <a href="#tasks">▤ <span>المهام الـ161</span></a>
         <a href="#studio">▧ <span>محرر الشاشات</span></a>
         <a href="#delivery">⇄ <span>GitHub والاختبارات</span></a>
+        <a href="#agent-planner">▣ <span>خطط عمل الوكلاء</span></a>
         <a href="#agent-studio">♧ <span>الوكلاء والأتمتة</span></a>
         <a href="#automation">⚡ <span>التحكم والأتمتة</span></a>
         <a href="#reports">▣ <span>تقارير التدقيق</span></a>
@@ -254,6 +257,38 @@
         <div class="two-columns">
           <article class="panel inner-panel"><h3>حالة فحوصات SHA المرجعي</h3><div id="ci-list" class="compact-list"><div class="empty">جارٍ جلب تشغيلات Actions…</div></div></article>
           <article class="panel inner-panel"><h3>طلبات الدمج المفتوحة</h3><div id="pr-list" class="compact-list"><div class="empty">جارٍ جلب الطلبات…</div></div></article>
+        </div>
+      </section>
+      <section class="section" id="agent-planner" aria-labelledby="planner-title">
+        <div class="section-heading">
+          <div><span class="section-kicker">AGENT TASK PLANNER</span><h2 id="planner-title">تجميع مهام الإصلاح وإرسالها للوكلاء</h2></div>
+          <span class="tag">بحد أقصى 6 مهام</span>
+        </div>
+        <div class="panel v3-panel">
+          <p class="studio-intro">اختر المهام الحقيقية من سجل الاستعادة، واجمعها في تكليف واحد محدد النطاق مع اختبارات القبول. يمكنك نسخ التكليف إلى Codex أو Gemini أو تنزيله، ولا يبدأ أي وكيل بالعمل بمجرد الضغط على زر النسخ أو فتح GitHub.</p>
+          <p id="planner-source-status" class="v3-note" role="status" aria-live="polite">جارٍ جلب سجل المهام…</p>
+          <div class="v3-fields">
+            <div><label for="planner-search">ابحث برقم المهمة أو نصها</label><input id="planner-search" type="search" placeholder="DF-014 أو الملاحظات" autocomplete="off"></div>
+            <div><label for="planner-area">مجال المهام</label><select id="planner-area"><option value="ALL">جميع المجالات</option></select></div>
+            <div><label for="planner-status-filter">حالة المهمة</label><select id="planner-status-filter"><option value="actionable">تحتاج إلى العمل</option><option value="blocked">محجوبة</option><option value="all">جميع الحالات</option></select></div>
+            <div><label for="planner-lane">تخصص الوكيل</label><select id="planner-lane"><option value="qa">اختبارات ومراجعة QA</option><option value="ui">واجهات وتفاعل</option><option value="audio">أصوات وتراخيص</option><option value="locale">لغات وتعريب</option><option value="analytics">تحليلات</option><option value="data">حماية البيانات</option></select></div>
+            <div><label for="planner-screen">الشاشة المستهدفة</label><select id="planner-screen"><option value="timer">المؤقت</option><option value="tasks">المهام</option><option value="calendar">التقويم</option><option value="notes">الملاحظات</option><option value="sounds">الأصوات</option><option value="analytics">التحليلات</option></select></div>
+          </div>
+          <div class="studio-actions">
+            <button id="planner-recommend" type="button" class="button secondary">اقتراح دفعة من المهام المفتوحة</button>
+            <button id="planner-clear" type="button" class="button secondary">تفريغ الاختيار</button>
+            <span id="planner-count" class="small-muted" aria-live="polite">0 / 6 مهام مختارة</span>
+          </div>
+          <div id="planner-task-list" class="planner-list" aria-label="مهام الاستعادة القابلة للاختيار"></div>
+          <div class="studio-actions"><button id="planner-show-more" type="button" class="button secondary">عرض مزيد من المهام</button></div>
+          <label for="planner-preview" class="planner-label">معاينة تكليف الوكيل (قابل للنسخ)</label>
+          <textarea id="planner-preview" readonly rows="10" spellcheck="false" class="planner-preview" aria-label="التكليف الذي سيُرسَل إلى الوكيل"></textarea>
+          <div class="studio-actions">
+            <button id="planner-copy" type="button" class="button secondary">نسخ تكليف Codex/Gemini</button>
+            <button id="planner-download" type="button" class="button secondary">تنزيل ملف Markdown</button>
+            <a id="planner-issue" href="#agent-planner" class="button primary" aria-disabled="true">إنشاء مسودة Issue للمراجعة ↗</a>
+          </div>
+          <p id="planner-feedback" class="v3-note" role="status" aria-live="polite">اختر مهمة واحدة على الأقل. فتح Issue يتطلب حالة GitHub حيّة مؤكدة، ولا يبدأ أي وكيل تلقائيًا.</p>
         </div>
       </section>
       <section class="section" id="agent-studio" aria-labelledby="agent-title">
