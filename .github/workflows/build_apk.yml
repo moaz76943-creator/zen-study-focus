@@ -42,6 +42,7 @@ jobs:
           node --check android/app/src/main/assets/web/notes_studio.js
           node --check android/app/src/main/assets/web/goals_studio.js
           node --check android/app/src/main/assets/web/notes_drafts.js
+          node --check android/app/src/main/assets/web/timer_settings.js
           node --check android/app/src/main/assets/web/locale_rows.js
           node --check android/app/src/main/assets/web/locale_extras.js
           node tests/validate_locales.cjs

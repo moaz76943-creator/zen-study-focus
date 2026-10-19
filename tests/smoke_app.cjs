@@ -329,4 +329,24 @@ evaluate('saveNewNote()');
 assert.equal(evaluate('notesList[0].body'),'A valuable unsaved edit');
 assert.equal(store.has('deep_focus_unsaved_note_draft_v1'),false,'Saved notes clear only their matching draft');
 
+
+vm.runInContext(fs.readFileSync(path.join(root,'timer_settings.js'),'utf8'),sandbox,{filename:'timer_settings.js',timeout:2000});
+evaluate("cfg.domain='study'; openTimerSettings()");
+document.getElementById('tsetFocus').value='40';
+document.getElementById('tsetShort').value='7';
+document.getElementById('tsetLong').value='20';
+document.getElementById('tsetRounds').value='2';
+assert.equal(evaluate('saveTimerSettings()'),true,'Persist timer cycle settings');
+assert.equal(evaluate("getDomainFocusMinutes('study')"),40);
+assert.equal(evaluate('cfg.shortMin'),7);
+assert.equal(evaluate('cfg.longMin'),20);
+assert.equal(evaluate('cfg.roundsPerCycle'),2);
+evaluate('openTimerSettings()');
+document.getElementById('tsetFocus').value='999';
+assert.equal(evaluate('saveTimerSettings()'),false,'Invalid focus cannot overwrite settings');
+assert.equal(evaluate("getDomainFocusMinutes('study')"),40);
+evaluate("cfg.focusCycleCount=1; selectTimerMode(1,'focus',document.getElementById('modeFocusBtn')); timerSessionId='full-cycle-test'; timerActiveMs=60000; finalizeTimerSession(false)");
+assert.equal(evaluate('currentTimerModeKey'),'long','Full focus cycle schedules long rest');
+assert.equal(evaluate('timerTotal'),1200);
+
 console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');

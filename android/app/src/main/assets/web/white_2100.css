@@ -471,3 +471,12 @@ body:not(.deep-lockdown) .daily-goals-card{padding:16px 15px;margin-top:12px;bor
 .ns-draft-bar button{font:inherit;font-size:.65rem;font-weight:700;border-radius:10px;border:1px solid #dce7f9;background:#f4f8ff;color:#356abd;padding:6px 9px;white-space:nowrap}
 .ns-draft-bar button:last-child{color:#b14e68;background:#fff7f9;border-color:#f9dce4}
 .ns-draft-bar button[hidden]{display:none}
+
+/* Deep Focus unified white timer controls. */
+.home-quick-heading{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.timer-settings-chip{flex-shrink:0;border:1px solid #dfebfa;border-radius:13px;padding:8px 11px;background:#fff;color:#3674ba;font-size:.72rem;font-weight:720}
+.timer-settings-dialog{max-width:440px}.timer-settings-info{font-size:.73rem;color:#7182a1;line-height:1.7;margin:2px 0 15px}
+.timer-settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px}
+.timer-settings-grid label{display:flex;flex-direction:column;gap:7px;color:#3c537b;font-size:.73rem;font-weight:700}
+.timer-settings-grid input{direction:ltr;text-align:center;min-width:0;font-size:1rem;font-weight:750;margin:0}
+@media(max-width:360px){.timer-settings-chip{font-size:.66rem;padding:7px}.timer-settings-grid{gap:8px}}

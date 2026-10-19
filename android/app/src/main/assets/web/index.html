@@ -763,7 +763,7 @@
         </div>
 
         <div class="home-quick-sessions" aria-label="Focus session shortcuts">
-          <div class="home-quick-heading"><span data-qt="quickSessions">جلسات سريعة</span></div>
+          <div class="home-quick-heading"><span data-qt="quickSessions">جلسات سريعة</span><button class="timer-settings-chip" type="button" onclick="openTimerSettings()" id="timerSettingsChip">⚙ تخصيص</button></div>
           <div class="home-quick-options" role="group" aria-label="Quick focus durations">
             <button type="button" class="home-quick-chip" id="homeQuick10" aria-pressed="false" onclick="selectHomeQuickSession(10)">10:00</button>
             <button type="button" class="home-quick-chip" id="homeQuick25" aria-pressed="true" onclick="selectHomeQuickSession(25)">25:00</button>
@@ -1141,6 +1141,21 @@
       </div>
     </div>
   </div>
+
+  <div class="modal-overlay" id="timerSettingsModal">
+    <div class="modal-card timer-settings-dialog" role="dialog" aria-modal="true" aria-labelledby="tsetHeading">
+      <div class="modal-head"><span id="tsetHeading">Customize focus cycles</span><button class="task-mini-sel" type="button" onclick="closeModal('timerSettingsModal')">✕</button></div>
+      <p class="timer-settings-info" id="tsetHint">Choose your activity durations; current sessions will not be interrupted.</p>
+      <div class="timer-settings-grid">
+        <label><span id="tsetFocusLabel">Focus minutes</span><input id="tsetFocus" type="number" inputmode="numeric" class="modal-inp" min="1" max="240"></label>
+        <label><span id="tsetShortLabel">Short rest</span><input id="tsetShort" type="number" inputmode="numeric" class="modal-inp" min="1" max="60"></label>
+        <label><span id="tsetLongLabel">Long rest</span><input id="tsetLong" type="number" inputmode="numeric" class="modal-inp" min="1" max="120"></label>
+        <label><span id="tsetRoundsLabel">Focus sessions per cycle</span><input id="tsetRounds" type="number" inputmode="numeric" class="modal-inp" min="1" max="12"></label>
+      </div>
+      <div class="modal-actions"><button class="mbtn-sec" type="button" id="tsetReset" onclick="resetTimerSettingsFields()">Defaults</button><button class="mbtn-pri" type="button" id="tsetSave" onclick="saveTimerSettings()">Save</button></div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="customTimerModal">
     <div class="modal-card">
       <div class="modal-head">
@@ -1207,5 +1222,6 @@
   <script src="notes_studio.js"></script>
   <script src="goals_studio.js"></script>
   <script src="notes_drafts.js"></script>
+  <script src="timer_settings.js"></script>
 </body>
 </html>

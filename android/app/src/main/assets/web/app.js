@@ -498,6 +498,7 @@ function applyLanguage(code) {
   document.getElementById('hdrSubTitle').textContent = d.sub;
   const tn = document.getElementById('navTrainingText');
   if (tn) tn.textContent = meta.code === 'ar' ? 'تدريب' : 'Training';
+  if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
@@ -732,7 +733,9 @@ function testCompletionSoundChime() {
    ======================================================== */
 const DOMAIN_FOCUS_MINUTES = Object.freeze({study: 25, sport: 30, read: 20, work: 50});
 function getDomainFocusMinutes(domain = cfg.domain) {
-  return DOMAIN_FOCUS_MINUTES[domain] || 25;
+  const chosen = cfg.domainFocusMinutes && cfg.domainFocusMinutes[domain];
+  return Number.isInteger(chosen) && chosen >= 1 && chosen <= 240
+    ? chosen : (DOMAIN_FOCUS_MINUTES[domain] || 25);
 }
 
 function renderDomainState() {
@@ -743,6 +746,8 @@ function renderDomainState() {
     const selected = key === dom;
     card.classList.toggle('active', selected);
     card.setAttribute('aria-pressed', String(selected));
+    const duration = card.querySelector('.domain-duration');
+    if (duration) duration.textContent = toWest(getDomainFocusMinutes(key) + ':00');
   }
   document.getElementById('modeFocusBtn').textContent = toWest(getDomainFocusMinutes(dom) + 'm');
   document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
@@ -924,6 +929,11 @@ function creditCompletedSession() {
   cfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
   if (!Array.isArray(cfg.sessionHistory)) cfg.sessionHistory = [];
   cfg.sessionHistory.push({id: timerSessionId, date: localDateISO(), minutes: earned, domain: cfg.domain || 'study'});
+  if (!quickTraining?.active) {
+    const rounds = Number.isInteger(cfg.roundsPerCycle) && cfg.roundsPerCycle >= 1 && cfg.roundsPerCycle <= 12 ? cfg.roundsPerCycle : 4;
+    const past = Number.isInteger(cfg.focusCycleCount) && cfg.focusCycleCount >= 0 && cfg.focusCycleCount < rounds ? cfg.focusCycleCount : 0;
+    cfg.focusCycleCount = (past + 1) % rounds;
+  }
   cfg.streak = computeActualStreak(cfg.sessionHistory);
   saveFortressData('zen_fortress_cfg_v21', cfg);
   syncHeaderMetrics();
@@ -945,7 +955,15 @@ function finalizeTimerSession(shouldChime) {
   updateTimerDisplay();
   document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
   if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent, true);
-  selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
+  // Only real completed focus sessions advance the break cycle.
+  if (['focus','custom'].includes(currentTimerModeKey)) {
+    const longRest = cfg.focusCycleCount === 0;
+    const mode = longRest ? 'long' : 'short';
+    selectTimerMode(longRest ? cfg.longMin : cfg.shortMin, mode,
+      document.getElementById(longRest ? 'modeLongBtn' : 'modeShortBtn'));
+  } else {
+    selectTimerMode(getDomainFocusMinutes(), 'focus', document.getElementById('modeFocusBtn'));
+  }
 }
 function runTimerTick() {
   timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
