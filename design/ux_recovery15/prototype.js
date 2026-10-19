@@ -58,17 +58,18 @@
   };
   function attach(doc){
     if(!doc||!doc.getElementById('tasksView'))throw Error('UX15_ROOT_REQUIRED');
-    var model=createModel(),lang='ar',tab='tasks',editTaskId=null,editNoteId=null,readNoteId=null,priorFocus=null;
+    var model=createModel(),lang='ar',tab='tasks',editTaskId=null,editNoteId=null,readNoteId=null,priorFocus=null,toastTimer=null;
     var $=function(id){return doc.getElementById(id);};
     var tr=function(key){return translations[lang][key]||key;};
     function elem(tag,cls,text){var x=doc.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=String(text);return x;}
     function action(label,kind,id,style){var b=elem('button','button '+(style||'secondary'),label);b.type='button';b.dataset.action=kind;b.dataset.id=String(id);return b;}
-    function toast(key,isError){var x=$('toast');x.textContent=isError?(tr('saveError')+': '+(key||'')):tr(key);x.classList.add('visible');x.setAttribute('role',isError?'alert':'status');}
+    function toast(key,isError){var x=$('toast');x.textContent=isError?(tr('saveError')+': '+(key||'')):tr(key);x.classList.add('visible');x.setAttribute('role',isError?'alert':'status');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){x.classList.remove('visible');},3200);}
     function fail(e){toast(e&&e.message?e.message:String(e),true);}
     function translate(){
       doc.documentElement.lang=lang;doc.documentElement.dir=lang==='ar'?'rtl':'ltr';
       doc.querySelectorAll('[data-i18n]').forEach(function(x){x.textContent=tr(x.dataset.i18n);});
       doc.querySelectorAll('[data-placeholder]').forEach(function(x){x.placeholder=tr(x.dataset.placeholder);});
+      $('taskFilter').setAttribute('aria-label',tr('filterTask'));$('noteFilter').setAttribute('aria-label',tr('filterNote'));doc.querySelectorAll('[data-close]').forEach(function(x){x.setAttribute('aria-label',tr('close'));});
       $('localeSwitch').textContent=lang==='ar'?'EN':'عربي';
       $('localeSwitch').setAttribute('aria-label',lang==='ar'?'Switch to English':'التبديل إلى العربية');
     }
@@ -131,7 +132,7 @@
     }
     function render(){renderTasks();renderNotes();}
     function showOverlay(id,focusId){
-      priorFocus=doc.activeElement;
+      if($('overlay').hidden)priorFocus=doc.activeElement;
       $('overlay').hidden=false;
       ['taskEditor','noteEditor','reader'].forEach(function(x){$(x).hidden=x!==id;});
       doc.body.style.overflow='hidden';
@@ -190,7 +191,18 @@
     $('noteKind').addEventListener('change',function(){$('cornellFields').hidden=$('noteKind').value!=='cornell';});
     $('readerEdit').addEventListener('click',function(){openNote(readNoteId);});
     $('overlay').addEventListener('click',function(e){if(e.target===$('overlay')||e.target.closest('[data-close]'))closeOverlay();});
-    doc.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('overlay').hidden){e.preventDefault();closeOverlay();}});
+    doc.addEventListener('keydown',function(e){
+      if($('overlay').hidden)return;
+      if(e.key==='Escape'){e.preventDefault();closeOverlay();return;}
+      if(e.key!=='Tab')return;
+      var panel=['taskEditor','noteEditor','reader'].map(function(x){return $(x);}).find(function(x){return !x.hidden;});
+      if(!panel)return;
+      var controls=Array.from(panel.querySelectorAll('button,input,textarea,select,summary')).filter(function(x){return !x.disabled&&!x.closest('[hidden]')&&x.getClientRects().length>0;});
+      if(!controls.length)return;
+      var first=controls[0],last=controls[controls.length-1];
+      if(e.shiftKey&&doc.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey&&doc.activeElement===last){e.preventDefault();first.focus();}
+    });
     $('taskList').addEventListener('click',function(e){
       var b=e.target.closest('[data-action]');if(!b)return;var id=Number(b.dataset.id);
       try{
