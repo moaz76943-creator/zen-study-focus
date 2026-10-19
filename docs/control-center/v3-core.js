@@ -121,15 +121,53 @@
     if(!report||!SHA.test(report.inspected_ref||'')||!SHA.test(head||''))return 'unavailable';
     return report.inspected_ref.toLowerCase()===head.toLowerCase()?'current':'stale';
   }
+  const VALID_STATUS=new Set(['BLOCKED','IN_PROGRESS','TODO','TESTED','DEFERRED']);
+  const REPO_URL='https://github.com/moaz76943-creator/zen-study-focus/';
+  function repoURL(x){
+    if(typeof x!=='string'||x.length>900)return false;
+    try{const u=new URL(x);return u.protocol==='https:'&&u.hostname==='github.com'&&
+      u.username===''&&u.password===''&&u.pathname.startsWith('/moaz76943-creator/zen-study-focus/');}
+    catch{return false;}
+  }
   function validateSnapshot(snapshot){
-    if(!object(snapshot)||snapshot.schema_version!==1||!Array.isArray(snapshot.tasks)||snapshot.tasks.length>10000)throw Error('Invalid dashboard snapshot');
-    if(snapshot.inspected_ref!==null&&snapshot.inspected_ref!==undefined&&!SHA.test(snapshot.inspected_ref))throw Error('Invalid snapshot SHA');
+    if(!object(snapshot)||snapshot.schema_version!==1||!Array.isArray(snapshot.tasks)||snapshot.tasks.length>10000)
+      throw Error('Invalid dashboard snapshot');
+    if(snapshot.inspected_ref!==null&&snapshot.inspected_ref!==undefined&&!SHA.test(snapshot.inspected_ref))
+      throw Error('Invalid snapshot SHA');
     const seen=new Set();
     for(const task of snapshot.tasks){
-      if(!object(task)||!/^DF-\d{3}$/.test(task.id||'')||typeof task.status!=='string'||seen.has(task.id))throw Error('Invalid snapshot task');
+      if(!object(task)||!/^DF-\d{3}$/.test(task.id||'')||!VALID_STATUS.has(task.status)||seen.has(task.id))
+        throw Error('Invalid snapshot task');
+      for(const key of ['title','area','evidence']){
+        if(task[key]!==undefined&&(typeof task[key]!=='string'||task[key].length>1000))
+          throw Error('Oversized or invalid task text');
+      }
       seen.add(task.id);
     }
     return snapshot;
+  }
+  function normalizeOfflineSnapshot(source){
+    validateSnapshot(source);
+    const pulls=source.prs||[],runs=source.workflows||source.runs||[];
+    if(!Array.isArray(pulls)||pulls.length>200||!Array.isArray(runs)||runs.length>300)
+      throw Error('Oversized offline source collections');
+    for(const p of pulls){
+      if(!object(p)||!Number.isSafeInteger(p.number)||p.number<1||!repoURL(p.html_url)||
+        typeof p.title!=='string'||p.title.length>200||typeof p.draft!=='boolean')
+        throw Error('Invalid offline PR');
+    }
+    for(const run of runs){
+      if(!object(run)||!Number.isSafeInteger(run.id)||run.id<1||!repoURL(run.html_url)||
+        typeof run.name!=='string'||run.name.length>200||
+        !['success','failure','timed_out','cancelled','skipped','action_required',null].includes(run.conclusion)||
+        !['queued','in_progress','completed','waiting','requested','pending'].includes(run.status))
+        throw Error('Invalid offline workflow');
+    }
+    return {schema_version:1,source:'local_import',inspected_ref:source.inspected_ref||null,
+      tasks:source.tasks.map(t=>({id:t.id,status:t.status,area:t.area||'',title:t.title||'',evidence:t.evidence||''})),
+      prs:pulls.map(p=>({number:p.number,title:p.title,html_url:p.html_url,draft:p.draft})),
+      runs:runs.map(x=>({id:x.id,name:x.name,html_url:x.html_url,status:x.status,conclusion:x.conclusion})),
+      audit:null,findings:[],sync:null,errors:['Snapshot imported from a local file; not live GitHub evidence'],stale:true};
   }
   function compareSnapshots(before,after){
     validateSnapshot(before);validateSnapshot(after);
@@ -199,6 +237,6 @@
   }
   return {unifiedSearch,shortcut,taskView,sortTasks,tasksCSV,areaMetrics,
     releaseChecklist,ciTrend,failedRuns,stalePulls,filterPulls,filterFindings,
-    auditFreshness,validateSnapshot,compareSnapshots,THEMES,applyThemePreset,
+    auditFreshness,validateSnapshot,normalizeOfflineSnapshot,compareSnapshots,THEMES,applyThemePreset,
     createHistory,historyPush,historyUndo,historyRedo,resetScreen,importConfig,configDiff};
 });
