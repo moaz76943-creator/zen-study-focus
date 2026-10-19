@@ -209,7 +209,7 @@
     en:{all:'All notes',archive:'Archive',trash:'Trash',notebooks:'Notebook',tag:'Tag',allbooks:'All notebooks',
       alltags:'All tags',empty:'No notes in this view',focus:'Focus writing',normal:'Exit focus',read:'Read / Review',
       edit:'Edit',restore:'Restore',delete:'Move to trash',purge:'Delete forever',archiveIt:'Archive',
-      undo:'Undo',redo:'Redo',find:'Find in note',next:'Next',preview:'Preview',write:'Write',
+      undo:'Undo',redo:'Redo',find:'Find in note',next:'Next',preview:'Preview',write:'Write',done:'Toggle completed',
       question:'Questions / cues',explain:'Main notes',summary:'Summary',pairQ:'Recall question',
       pairA:'Answer',addPair:'Add Q&A',tags:'Tags (comma-separated)',book:'Notebook',link:'Link note',
       task:'Create tasks from unchecked items',saved:'Note saved',failed:'Could not save note',
@@ -219,7 +219,7 @@
     ar:{all:'كل الملاحظات',archive:'الأرشيف',trash:'سلة المحذوفات',notebooks:'الدفتر',tag:'الوسم',allbooks:'كل الدفاتر',
       alltags:'كل الوسوم',empty:'لا توجد ملاحظات في هذا العرض',focus:'تركيز الكتابة',normal:'إنهاء التركيز',read:'قراءة ومراجعة',
       edit:'تحرير',restore:'استعادة',delete:'نقل إلى السلة',purge:'حذف نهائي',archiveIt:'أرشفة',
-      undo:'تراجع',redo:'إعادة',find:'بحث داخل الملاحظة',next:'التالي',preview:'معاينة',write:'كتابة',
+      undo:'تراجع',redo:'إعادة',find:'بحث داخل الملاحظة',next:'التالي',preview:'معاينة',write:'كتابة',done:'تبديل حالة الإنجاز',
       question:'الأسئلة والكلمات المفتاحية',explain:'الشرح والملاحظات',summary:'الملخص',pairQ:'سؤال المراجعة',
       pairA:'الإجابة',addPair:'إضافة سؤال وإجابة',tags:'الوسوم (افصل بفاصلة)',book:'الدفتر',
       link:'ربط ملاحظة',task:'إنشاء مهام من مربعات الاختيار',saved:'تم حفظ الملاحظة',
@@ -248,6 +248,7 @@
       '.nsux-reader p{white-space:pre-wrap;margin:7px 0}.nsux-reader h4{font-size:1.02rem;margin:12px 0 4px}.nsux-reader .nsux-check{display:flex;gap:10px;align-items:baseline}.nsux-reader .nsux-check input{pointer-events:none}',
       '.nsux-card{border:1px solid var(--df22-border,#dce5f0);border-radius:22px;background:#fff;padding:15px;box-shadow:var(--df22-shadow-low,0 2px 10px #203b5f10)}',
       '.nsux-card h3{margin:8px 0;color:#1c2e4d;overflow-wrap:anywhere}.nsux-card p{white-space:pre-wrap;overflow-wrap:anywhere;color:#50617a;font-size:.79rem;max-height:7em;overflow:hidden}',
+      '.nsux-advanced{border-top:1px solid #edf0f5;margin-top:8px}.nsux-advanced>summary{cursor:pointer;min-height:44px;padding:12px 6px;color:#1759ad;font-weight:650}.nsux-advanced>summary:focus-visible{outline:2px solid #3288eb;border-radius:9px}',
       '.nsux-more{margin-top:8px;border-top:1px solid #edf0f5;padding-top:8px}.nsux-more>summary{cursor:pointer;display:list-item;list-style:inside;min-height:44px;padding:11px 7px;color:#1759ad;font-weight:650}.nsux-more>summary:focus-visible{outline:2px solid #3288eb;border-radius:10px}.nsux-more .nsux-actions{padding:5px 0 4px}',
       '.nsux-blank{padding:25px;text-align:center;background:#fff;border:1px dashed #bfd6f4;border-radius:18px;color:#50617a}',
       '#noteModal.nsux-focus .ns-editor{max-width:760px;width:100%;max-height:100dvh;border-radius:0}',
@@ -315,7 +316,7 @@
       body.value=pos.text;body.setSelectionRange(pos.cursorStart,pos.cursorEnd);body.focus();schedule();
       if(typeof nsUpdateCount==='function')nsUpdateCount();
     }));
-    button(toolbar,'☑ Done / تم',()=>{
+    button(toolbar,t('done'),()=>{
       const old=body.selectionStart,changed=toggleChecklistLine(body.value,old);
       if(!changed.changed)return;
       body.value=changed.text;body.focus();body.setSelectionRange(old,old);
@@ -341,7 +342,9 @@
       const a=collectPairs(true);a.push({key:'pair-'+Date.now()+'-'+c,question:'',answer:''});createPairs(instance.pairList,a);
       schedule();
     });
-    body.parentNode.insertBefore(toolbar,body);document.getElementById('nsCounter').after(extra);
+    const advanced=el('details','nsux-advanced');instance.advanced=advanced;
+    advanced.appendChild(el('summary','',t('more')));advanced.appendChild(extra);
+    body.parentNode.insertBefore(toolbar,body);document.getElementById('nsCounter').after(advanced);
     find.addEventListener('input',()=>{renderPreview();findNext(true);});
     body.addEventListener('input',()=>{renderPreview();});
     [instance.fields.cues,instance.fields.notes,instance.fields.summary,
@@ -363,6 +366,7 @@
     const kind=document.getElementById('selNoteCat').value;
     document.getElementById('nsux-cornell').hidden=kind!=='cornell';
     document.getElementById('nsux-recall').hidden=kind!=='flash';
+    if((kind==='cornell'||kind==='flash')&&instance?.advanced)instance.advanced.open=true;
   }
   function renderPreview(){
     if(!instance)return;
@@ -393,6 +397,7 @@
     if(!instance)return;
     const n=note||{},ext=n.notesV21||{},f=instance.fields;
     instance.openedSnapshot=note?JSON.stringify(note):null;
+    if(instance.advanced)instance.advanced.open=false;
     f.cues.value=ext.cornell?.cues||'';f.notes.value=ext.cornell?.notes||'';
     f.summary.value=ext.cornell?.summary||'';f.tags.value=(ext.tags||[]).join(', ');
     f.notebook.value=ext.notebookId||'';createPairs(instance.pairList,ext.recallPairs||[]);
