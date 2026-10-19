@@ -1299,8 +1299,16 @@ function commitLegacyRecords(field, records) {
   }
 }
 
+function legacyRecordIsUnique(records, id) {
+  const count = records.filter(record => record.id === id).length;
+  if (count > 1) showToast(cfg.lang === 'ar'
+    ? 'تعذر التعديل: توجد سجلات بالمعرف نفسه. احتفظ بنسخة احتياطية وراجع البيانات.'
+    : 'Cannot edit ambiguous record IDs. Keep a backup and review your data.');
+  return count === 1;
+}
+
 function toggleTaskDone(id) {
-  if (!tasksList.some(x => x.id === id)) return;
+  if (!legacyRecordIsUnique(tasksList, id)) return;
   const records = tasksList.map(x => x.id === id ? {...x, done:!x.done} : x);
   if (!commitLegacyRecords('tasksList', records)) return;
   renderTasksList(); renderCalendar();
@@ -1349,6 +1357,7 @@ function createNewTask() {
 }
 
 function deleteTaskItem(id) {
+  if (!legacyRecordIsUnique(tasksList, id)) return;
   if (!confirmSensitiveAction('task')) return;
   if (!commitLegacyRecords('tasksList', tasksList.filter(x => x.id !== id))) return;
   renderTasksList(); renderCalendar();
@@ -1515,16 +1524,19 @@ function saveNewNote() {
 }
 
 function pinNoteToTodayCalendar(id) {
+  if (!legacyRecordIsUnique(notesList, id)) return;
   const n = notesList.find(x => x.id === id);
   if (n && commitLegacyRecords('notesList', notesList.map(x => x.id === id ? {...x, calDate:selectedCalDate} : x))) { renderNotesStack(); renderCalendar(); showToast(`📅 ${selectedCalDate}`); }
 }
 
 function toggleNoteBlur(id) {
+  if (!legacyRecordIsUnique(notesList, id)) return;
   const n = notesList.find(x => x.id === id);
   if (n && commitLegacyRecords('notesList', notesList.map(x => x.id === id ? {...x, blur:!x.blur} : x))) renderNotesStack();
 }
 
 function deleteNoteCard(id) {
+  if (!legacyRecordIsUnique(notesList, id)) return;
   if (!confirmSensitiveAction('note')) return;
   if (!commitLegacyRecords('notesList', notesList.filter(x => x.id !== id))) return;
   renderNotesStack(); renderCalendar();

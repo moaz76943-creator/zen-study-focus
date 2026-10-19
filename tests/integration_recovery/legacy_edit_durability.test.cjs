@@ -19,7 +19,7 @@ function rig(integrated=true) {
   getSnapshot:()=>JSON.parse(run('JSON.stringify({cfg,tasksList,notesList})')),
   write(before,after){if(fail)throw Error('QuotaExceededError');Object.assign(c,JSON.parse(JSON.stringify(after)));return true;}
  };
- for(const name of ['toWest','commitLegacyRecords','toggleTaskDone','nextRecordId','createNewTask','deleteTaskItem','saveNewNote','pinNoteToTodayCalendar','toggleNoteBlur','deleteNoteCard','saveQuickDump']) {
+ for(const name of ['toWest','commitLegacyRecords','legacyRecordIsUnique','toggleTaskDone','nextRecordId','createNewTask','deleteTaskItem','saveNewNote','pinNoteToTodayCalendar','toggleNoteBlur','deleteNoteCard','saveQuickDump']) {
   const start=source.indexOf('function '+name+'('),end=source.indexOf('\n}',start)+2;
   assert.ok(start>=0&&end>start,name);run(source.slice(start,end));
  }
@@ -43,4 +43,13 @@ for(const integrated of [true,false])test('failed legacy edits preserve memory, 
  assert.equal(r.run('tasksList[0].date'),'');assert.equal(r.run('tasksList[1].extra'),42);
  r.run('saveNewNote()');assert.equal(r.run('notesList[0].body'),'نص ٥');
  assert.equal(r.run('notesList[1].extra'),9);assert.deepEqual(r.closed,['noteModal']);
+});
+
+test('ambiguous historical IDs block singular edit/delete actions without deleting or renumbering any record',()=>{
+ const r=rig();r.run('tasksList.push({...tasksList[0],title:"Other task"});notesList.push({...notesList[0],body:"Other note"});');
+ const before=r.run('JSON.stringify({tasksList,notesList})');
+ for(const action of ['toggleTaskDone(7)','deleteTaskItem(7)','pinNoteToTodayCalendar(8)','toggleNoteBlur(8)','deleteNoteCard(8)']){
+  r.run(action);assert.equal(r.run('JSON.stringify({tasksList,notesList})'),before,action);
+ }
+ assert.equal(r.messages.length,5);assert.ok(r.messages.every(s=>s.includes('بالمعرف نفسه')));
 });
