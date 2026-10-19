@@ -28,3 +28,8 @@ test('unknown SHA remains unknown, not fabricated',()=>{
   assert.equal(shortSHA('branch-name'),'غير متاح');
   assert.match(repairPrompt([],''),/افحصه أولًا/);
 });
+
+test('single-task repair action includes the requested non-blocked task',()=>{
+  const only=parseTasks(ledger).filter(t=>t.id==='DF-003');
+  assert.match(repairPrompt(only,'a'.repeat(40)),/DF-003/);
+});
