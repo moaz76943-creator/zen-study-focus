@@ -49,3 +49,29 @@ Not performed: actual phone listening (quality/volume/fatigue), Android WebView 
 2. Inspect CI measurement artefact; manually listen on actual Android at study levels, headphones and speaker; 30+ minute loop, 0% volume, mixed peaks, offline mode and pause/resume. Do not label a raw file 'quality approved' before these tests.
 3. Have lane 00 copy approved candidates from quarantine to authoritative Android asset path, update the authoritative licence/attribution ledger and runtime mapping in its OWN shared files only. Keep original nine candidates excluded from APK until then.
 4. Rerun existing strict tests/nature_audio_recovery/audit_media.cjs gate and exact-SHA Android debug/unsigned bundle, verify sizes and all language/runtime checks, require human PR review. No direct main merge, no Gemini changes, no release signing.
+
+## Measured CI evidence — real audio bytes, not simulated
+
+GitHub Actions run: https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39226331499
+Audited exact SHA: c4b6b2fe4d18853d7f1079cdb7a2b427f7d5747b
+Machine-readable 9-record report: docs/audio_acquisition_12/QA_EVIDENCE_20261019.json
+
+| Ogg recording (all 30 seconds / Vorbis) | Peak dBFS | RMS dBFS | Sudden PCM jumps >0.6 | Clipped samples |
+|---|---:|---:|---:|---:|
+| night_crickets | -11.85 | -27.12 | 0 | 0 |
+| rain_soft | -13.68 | -27.28 | 0 | 0 |
+| rain_downpour | -3.13 | -26.32 | 0 | 0 |
+| fire_hearth | -1.15 | -26.97 | 30 | 0 |
+| stream_brook | -1.52 | -26.97 | 69 | 0 |
+| waves_calm | -5.42 | -26.38 | 0 | 0 |
+| birds_dawn | -13.27 | -26.21 | 0 | 0 |
+| cafe | -6.64 | -26.32 | 0 | 0 |
+| storm_far | -8.78 | -26.15 | 0 | 0 |
+
+Objective outcome: 9/9 hashes match, ffprobe and full ffmpeg decoding succeeded, 0 sample clipping across all clips, no high sample-jump flags in 7 of 9. **Fire_hearth and stream_brook require targeted human listening** for transients; a distant wood crackle and splashing are plausible natural causes, not proven defects. These are sample peak measurements after mono 16 kHz downmix, not oversampled true peaks or Android/WebView decoding. A 30-second repeated loop may cause listening fatigue even if edge discontinuity is small.
+
+### Provisional long-study shortlist (not a listening verdict)
+
+Given recording category, low measured peak and no detected abrupt jumps, rain_soft is the best **candidate for human evaluation**, followed by waves_calm. Birds_dawn is a possible alternative for shorter sessions, but birds can draw attention. Defer fire_hearth, stream_brook, thunder/storm, café and crickets pending human fatigue, privacy and/or rights checks; quiet metrics alone do not certify content quality.
+
+All nine remain unapproved, no runtime integration, no APK size effect. Full report and human rights review must be completed before activation.
