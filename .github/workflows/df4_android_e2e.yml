@@ -56,11 +56,10 @@ jobs:
           script: |
             set -eu
             test -s android/app/build/outputs/apk/debug/app-debug.apk
-            serial="$(adb devices | awk '$1 ~ /^emulator-/ && $2 == "device" {print $1; exit}')"
-            test -n "$serial"
-            adb -s "$serial" install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb -s emulator-5554 get-state
+            adb -s emulator-5554 install -r android/app/build/outputs/apk/debug/app-debug.apk
             # Emulator is newly provisioned; never connect to the owner's phone/profile.
-            python3 tests/android_e2e_recovery/run_e2e.py --serial "$serial" --ack-disposable-data --json tests/android_e2e_recovery/results.local.json
+            python3 tests/android_e2e_recovery/run_e2e.py --serial emulator-5554 --ack-disposable-data --json tests/android_e2e_recovery/results.local.json
       - name: Upload exact-result Android QA JSON (including failures)
         if: always()
         uses: actions/upload-artifact@v4
