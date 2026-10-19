@@ -16,7 +16,8 @@ function load(file, extras={}) {
   const elements=new Map(), saves=[];
   const document={getElementById(id){if(!elements.has(id))elements.set(id,element());return elements.get(id);},
     createElement(){return element();},querySelectorAll(){return [];}};
-  const cfg={lang:'en',domain:'study',shortMin:5,longMin:15,sessionHistory:[],...extras.cfg};
+  const {cfg:configOverrides={},...contextOverrides}=extras;
+  const cfg={lang:'en',domain:'study',shortMin:5,longMin:15,sessionHistory:[],...configOverrides};
   const mock={
     cfg,document,window:{confirm:()=>true},
     localDateISO(d=new Date()){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());},
@@ -30,7 +31,7 @@ function load(file, extras={}) {
     currentTimerModeKey:'focus',selectCalls:0,toggleCalls:0,
     quickText:k=>k,quickInternalChange:false,quickTraining:null,
     tasksList:[{id:123,isStarter:false,title:'Write report'},{id:124,isStarter:true,title:'Example'}],
-    ...extras};
+    ...contextOverrides};
   const sandbox=vm.createContext(mock);
   vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),sandbox,{filename:file});
   return {eval:s=>vm.runInContext(s,sandbox),cfg,elements,document,saves,mock};
@@ -129,4 +130,30 @@ test('sound mixer prevalidates atomically, mixes two tracks and releases stopped
   mixer.dispose();
   assert.deepEqual(stops,['rain','fire','night']);
   assert.equal(mixer.applyMix([{id:'rain',percent:30}]),false);
+});
+
+test('restored quick snapshots keep their exact work/rest phase and reject corrupt bounds',()=>{
+  const x=load('quick_training.js');
+  const snap={active:true,sets:3,workSeconds:20,restSeconds:10,currentSet:1,
+    phase:'rest',skipLastRest:true,domain:'sport',taskId:123,exercises:['Run']};
+  const restored=x.eval('validQuickSnapshot('+JSON.stringify(snap)+')');
+  assert.equal(restored.phase,'rest');
+  assert.equal(restored.currentSet,1);
+  assert.equal(restored.workSeconds,20);
+  assert.equal(restored.taskId,123);
+  assert.equal(x.eval('validQuickSnapshot('+JSON.stringify({...snap,currentSet:3})+')'),null);
+  assert.equal(x.eval('validQuickSnapshot('+JSON.stringify({...snap,restSeconds:-1})+')'),null);
+});
+test('work interval advances to rest then the next work interval without a second ledger',()=>{
+  const x=load('quick_training.js');
+  x.eval('applyQuickTrainingPreset("tabata"); startQuickTraining()');
+  assert.equal(x.eval('quickTraining.phase'),'work');
+  x.mock.timerRunning=false; // Original timer has just completed this work segment.
+  assert.equal(x.eval('advanceQuickTrainingStep()'),true);
+  assert.equal(x.eval('quickTraining.phase'),'rest');
+  assert.equal(x.eval('quickTraining.currentSet'),0);
+  x.mock.timerRunning=false; // A completed rest does not award focus time.
+  assert.equal(x.eval('advanceQuickTrainingStep()'),true);
+  assert.equal(x.eval('quickTraining.phase'),'work');
+  assert.equal(x.eval('quickTraining.currentSet'),1);
 });
