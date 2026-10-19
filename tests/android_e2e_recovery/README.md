@@ -53,8 +53,8 @@ language change, timer start/pause, optional 1-min Android notification,
 process kill/relaunch, optional screen rotation, long text, no-data-loss
 record visibility, calendar and nature entry points.
 
-Manual NOT_TESTED until device evidence: TalkBack traversal, advanced task
-subtasks/checklists, genuine storage-write failure injection, native file
+Manual NOT_TESTED until device evidence: TalkBack traversal, subtasks/checklists
+manual verification beyond the automated subtask prompt, storage-write failure injection, native file
 picker export success and actual on-device audio listening. Reproduction
 steps are in SCENARIOS.md. Clipboard paste is not evidence of file export;
 notification presence is not evidence of audible sound.
