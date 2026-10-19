@@ -124,7 +124,7 @@
   }
   function csvCell(v) {
     let s=v===null||v===undefined?'':String(v);
-    if(/^[\s\uFEFF]*[=+@\-]/.test(s)&&!^\d{4}-\d{2}-\d{2}(?:T|$)/.test(s))s="'"+s;
+    if(/^[\s\uFEFF]*[=+@\-]/.test(s)&&!/^\d{4}-\d{2}-\d{2}(?:T|$)/.test(s))s="'"+s;
     return '"'+s.replace(/"/g,'""')+'"';
   }
   function toCSV(report,kind='sessions') {
