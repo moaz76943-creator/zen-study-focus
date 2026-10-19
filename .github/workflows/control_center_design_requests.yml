@@ -31,9 +31,9 @@ jobs:
             const match=raw.match(/--- START CONFIG JSON ---\s*([\s\S]*?)\s*--- END CONFIG JSON ---/);
             const refMatch=raw.match(/^Reference SHA: ([a-f0-9]{40})$/m);
             if(!match||!refMatch)throw Error('Invalid control-center request format.');
-            const core=require('./docs/control-center/studio-core.js');
-            const proposed=core.validateConfig(JSON.parse(match[1]));
-            const stylesheet=core.renderCSS(proposed);
+            const designCore=require('./docs/control-center/studio-core.js');
+            const proposed=designCore.validateConfig(JSON.parse(match[1]));
+            const stylesheet=designCore.renderCSS(proposed);
             const branchName=context.payload.repository.default_branch;
             const main=await github.rest.repos.getBranch({owner,repo,branch:branchName});
             const head=main.data.commit.sha;
@@ -47,7 +47,7 @@ jobs:
             if(Array.isArray(existingConfig.data)||Array.isArray(existingCSS.data))throw Error('Expected files, not directories.');
             const originalConfig=JSON.parse(Buffer.from(existingConfig.data.content,'base64').toString('utf8'));
             const originalCSS=Buffer.from(existingCSS.data.content,'base64').toString('utf8');
-            if(originalCSS!==core.renderCSS(originalConfig))throw Error('Default branch has stale generated CSS.');
+            if(originalCSS!==designCore.renderCSS(originalConfig))throw Error('Default branch has stale generated CSS.');
             const newConfig=JSON.stringify(proposed,null,2)+'\n';
             if(newConfig===JSON.stringify(originalConfig,null,2)+'\n'){
               core.info('No changes in proposed appearance values.');
