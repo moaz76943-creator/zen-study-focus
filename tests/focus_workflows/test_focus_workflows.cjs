@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '../../android/app/src/main/assets/web');
 function element() {
-  return {value:'', textContent:'', type:'', inputMode:'', style:{}, children:[],
+  return {value:'', checked:false, textContent:'', type:'', inputMode:'', style:{}, children:[],
     classList:{add(){},remove(){}}, setAttribute(){},addEventListener(){},
     appendChild(child){this.children.push(child);return child;},
     replaceChildren(...children){this.children=children;},
