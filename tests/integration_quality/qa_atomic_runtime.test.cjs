@@ -68,10 +68,10 @@ test('rejects string note IDs and stale snapshots without data mutation',()=>{
   assert.deepEqual([...x.localStorage.packets],previous);
 });
 test('language-rendered starter titles cannot break a verified user-requested save',()=>{
-  const x=rig();let a=x.edited(s=>{s.tasksList=[{id:1,title:'Starter',done:false,isStarter:true}];s.notesList=[{id:1,title:'Starter note',body:'Demo',isStarter:true}];});
+  const x=rig();let a=x.edited(s=>{s.tasksList[0].title='Starter';s.tasksList[0].isStarter=true;s.notesList[0].title='Starter note';s.notesList[0].body='Demo';s.notesList[0].isStarter=true;});
   x.api.write(a.base,a.after);
   vm.runInContext("tasksList[0].title='مثال';notesList[0].title='مثال';notesList[0].body='ترجمة';",x.context);
-  a=x.edited(s=>{s.notesList.push({id:2,title:'User',body:'Real'});});
+  a=x.edited(s=>{s.notesList.push(vm.runInContext('({id:2,title:"User",body:"Real"})',x.context));});
   assert.equal(x.api.write(a.base,a.after),true);
   assert.equal(x.D.inspectStorage(x.localStorage).snapshot.notesList[1].title,'User');
 });
