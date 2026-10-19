@@ -16,8 +16,9 @@ test('every scoped QA workflow node --test glob matches an actual suite',()=>{
  assert.ok(commands.length>=6,'expected >=6 QA test lane commands');
  for(const [,args] of commands){
   for(const glob of args.trim().split(/\s+/)){
-   assert.match(glob,/^tests\/[a-z0-9_]+\/\*\.test\.cjs$/,'unsupported wildcard: '+glob);
-   assert.ok(existsTestDir(glob.slice(0,glob.indexOf('/*'))),'missing QA glob '+glob);
+   assert.match(glob,/^tests\/[a-z0-9_]+\/(?:\*|[a-z0-9_]+)\.test\.cjs$/,'unsupported test path: '+glob);
+   if(glob.includes('*'))assert.ok(existsTestDir(glob.slice(0,glob.indexOf('/*'))),'missing QA glob '+glob);
+   else assert.ok(fs.existsSync(path.join(root,glob)),'missing QA test '+glob);
   }
  }
 });
