@@ -206,6 +206,7 @@
     byId('connection').textContent=errors.length?('بيانات جزئية · '+errors.join(' | ')):'متصل · آخر بيانات GitHub المتاحة';
     btn.disabled=false;
     fillAreas();renderMetrics();renderRisks();renderTasks();renderRuns();renderPRs();
+    document.dispatchEvent(new CustomEvent('df:project-refreshed'));
   }
   async function copyText(value) {
     try {
@@ -252,6 +253,7 @@
       });
       replace(byId('audit-findings'),children.length?children:[node('div','empty','لا توجد نتائج ضمن هذا الملف.')]);
       renderRisks();
+      document.dispatchEvent(new CustomEvent('df:project-refreshed'));
     }catch(e){byId('audit-label').textContent='تعذر فتح الملف: التقرير غير صالح أو غير متوافق.';}
   }
   function boot() {
@@ -264,5 +266,10 @@
     byId('audit-file').addEventListener('change',e=>importAudit(e.target.files[0]));
     refresh();
   }
-  return {boot,parseTasks,countTasks,filterTasks,repairPrompt,shortSHA};
+  function getSnapshot(){
+    return JSON.parse(JSON.stringify({schema_version:1,inspected_ref:state.head,tasks:state.tasks,
+      prs:state.prs||[],runs:state.runs||[],findings:state.audit?.findings||[],
+      audit:state.audit,sync:state.sync,errors:state.errors}));
+  }
+  return {boot,parseTasks,countTasks,filterTasks,repairPrompt,shortSHA,getSnapshot};
 });
