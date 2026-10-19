@@ -28,7 +28,7 @@ function load(file, extras={}) {
     getDomainFocusMinutes:()=>25,DOMAIN_FOCUS_MINUTES:{study:25,read:20,work:50,sport:30},
     timerRunning:false,timerSessionId:null,timerLeft:1500,timerTotal:1500,
     currentTimerModeKey:'focus',selectCalls:0,toggleCalls:0,
-    quickText:k=>k,quickInternalChange:false,
+    quickText:k=>k,quickInternalChange:false,quickTraining:null,
     tasksList:[{id:123,isStarter:false,title:'Write report'},{id:124,isStarter:true,title:'Example'}],
     ...extras};
   const sandbox=vm.createContext(mock);
