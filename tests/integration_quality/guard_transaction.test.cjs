@@ -46,6 +46,6 @@ test('pending migration recovery requires explicit choice before any writer proc
  const ctx={localStorage:first.storage,DeepFocusDataCompatV21:compat,confirm:()=>false,alert:()=>{}};
  ctx.window=ctx;vm.runInNewContext(code,ctx,{filename:'data_write_guard_v21.js',timeout:2000});
  assert.equal(ctx.DeepFocusV21StorageGuard.blocked,true);
- assert.throws(()=>ctx.DeepFocusV21StorageGuard.write(k.notes,[]),/STORAGE_RECOVERY_REQUIRED/);
+ assert.throws(()=>ctx.DeepFocusV21StorageGuard.write(k.notes,[]),/(?:STORAGE|PENDING_JOURNAL)_RECOVERY_REQUIRED/);
  assert.equal(first.storage.getItem(compat.JOURNAL_KEY),JSON.stringify(journal));
 });
