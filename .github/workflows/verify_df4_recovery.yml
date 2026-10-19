@@ -1,7 +1,7 @@
 name: DF4 exact-head test APK
 on:
   pull_request:
-    branches: [integration/deep-focus-recovery-00-final-20261019]
+    branches: [integration/deep-focus-recovery-00-final-20261019, fix/df4-master-recovery-20261019]
   workflow_dispatch:
 permissions:
   contents: read
@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   test-build:
-    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'fix/df4-master-recovery-20261019'
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'fix/df4-master-recovery-20261019' || github.head_ref == 'integration/df4-consolidated-qa-20261019'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -40,6 +40,7 @@ jobs:
           node tools/language_review/audit.cjs --out "$RUNNER_TEMP/df4-evidence/localization"
           node tests/performance_recovery/asset_audit.cjs > "$RUNNER_TEMP/df4-evidence/offline-assets.json"
           node tests/android_e2e_recovery/inventory.cjs > "$RUNNER_TEMP/df4-evidence/control-inventory.json"
+          node tools/control_center/audit.cjs --json "$RUNNER_TEMP/df4-evidence/control-health.json" --markdown "$RUNNER_TEMP/df4-evidence/control-health.md"
       - name: Unresolved media release gate (test APK is not release approval)
         id: media
         continue-on-error: true
