@@ -306,7 +306,11 @@ document.getElementById('goalInput-study').value='120';
 document.getElementById('goalInput-read').value='45';
 document.getElementById('goalInput-sport').value='30';
 document.getElementById('goalInput-work').value='60';
+for (const domain of ['study','read','sport','work']) {
+  document.getElementById('goalWeeklyInput-'+domain).value='240';
+}
 assert.equal(evaluate('saveDailyGoals()'),true);
+assert.equal(evaluate('gsWeeklyGoal("study")'),240,'Weekly goals persist with daily goals');
 assert.equal(evaluate('gsGoal("study")'),120);
 document.getElementById('goalInput-study').value='900';
 assert.equal(evaluate('saveDailyGoals()'),false,'Reject invalid daily goal values');
