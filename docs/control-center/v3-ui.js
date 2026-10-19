@@ -44,14 +44,24 @@
     a.download=filename;a.href=url;document.body.append(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
-  let snapshot=null, history=null, importedSnapshot=null, currentScreen='timer';
+  let snapshot=null,liveSnapshot=null,history=null,importedSnapshot=null,offlineMode=false;
+  function renderPanels(){
+    renderSearch();renderTasks();renderMetrics();renderDelivery();renderRisks();
+    const source=offlineMode?'نسخة JSON مستوردة محليًا — ليست بيانات GitHub حية':
+      snapshot?.stale?'مصدر GitHub جزئي/قديم — تحقق من حالة الاتصال أعلى اللوحة':
+      'قراءة فقط من GitHub — تحقق من SHA قبل الاعتماد';
+    status('v3-connection',source);
+    status('v3-offline-state',offlineMode?
+      'وضع عدم الاتصال نشط. الأرقام والتشغيلات مأخوذة من ملفك فقط، وليست حالة المستودع الحالية.':
+      snapshot?.stale?'البيانات المتاحة قديمة أو جزئية؛ اضغط تحديث البيانات للتحقق من GitHub.':
+      'عرض بيانات GitHub المقروءة. يمكنك استيراد نسخة سابقة ثم التبديل لعرضها دون اتصال.');
+    $('v3-use-offline').disabled=!importedSnapshot||offlineMode;
+    $('v3-return-live').disabled=!offlineMode;
+  }
   function loadSnapshot(){
-    snapshot=project.getSnapshot();
-    renderSearch();
-    renderTasks();
-    renderMetrics();
-    renderDelivery();
-    renderRisks();
+    liveSnapshot=project.getSnapshot();
+    if(!offlineMode)snapshot=liveSnapshot;
+    renderPanels();
   }
   function taskSelection(){
     const list=snapshot&&Array.isArray(snapshot.tasks)?snapshot.tasks:[];
@@ -98,7 +108,7 @@
   function renderDelivery(){
     const runs=snapshot?.runs||[],trend=ops.ciTrend(runs);
     const result=trend.successRate===null?'غير متاح':trend.successRate+'%';
-    status('v3-ci-trend','نتائج SHA المعروض: '+result+' نجاح من '+trend.totalCompleted+
+    status('v3-ci-trend',(offlineMode?'ملف محلي قديم — ':'')+'نتائج SHA المعروض: '+result+' نجاح من '+trend.totalCompleted+
       ' تشغيلات مكتملة؛ '+trend.pending+' معلقة/غير محسومة');
     const failed=ops.failedRuns(runs).slice(0,8);
     replace('v3-ci-failures',failed.length?failed.map(run=>entry(
@@ -128,7 +138,7 @@
     replace('v3-risks',findings.length?findings.slice(0,14).map(f=>entry(
       '['+f.severity+'] '+f.id+' · '+f.title,f.detail||f.remediation||'',null)):
       [empty('لا توجد نتائج في هذا المستوى؛ قد تحتاج لاستيراد تقرير health.json أولًا.')]);
-    if(importedSnapshot){
+    if(importedSnapshot&&!offlineMode){
       try{
         const change=ops.compareSnapshots(importedSnapshot,snapshot);
         status('v3-snapshot-result','مقارنة السجل السابق بالحالي: '+change.added+' مهام أضيفت، '+
@@ -180,9 +190,24 @@
       if(!file)return;
       if(file.size>2000000){status('v3-snapshot-result','الملف أكبر من 2MB؛ تم الرفض.');return;}
       try{
-        importedSnapshot=ops.validateSnapshot(JSON.parse(await file.text()));
-        renderRisks();
+        const parsed=JSON.parse(await file.text());
+        ops.normalizeOfflineSnapshot(parsed);
+        importedSnapshot=parsed;
+        renderPanels();
       }catch(err){importedSnapshot=null;status('v3-snapshot-result','تقرير غير صالح: '+err.message);}
+    });
+    $('v3-use-offline').addEventListener('click',()=>{
+      if(!importedSnapshot)return;
+      try{
+        snapshot=ops.normalizeOfflineSnapshot(importedSnapshot);
+        offlineMode=true;
+        renderPanels();
+      }catch(e){status('v3-snapshot-result','لا يمكن عرض النسخة: '+e.message);}
+    });
+    $('v3-return-live').addEventListener('click',()=>{
+      offlineMode=false;
+      snapshot=liveSnapshot||project.getSnapshot();
+      renderPanels();
     });
     $('v3-theme-preset').addEventListener('change',()=>{
       const name=$('v3-theme-preset').value;
