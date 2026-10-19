@@ -40,10 +40,18 @@ test('all missing keys get an independent entry; untranslated is null, never inv
  const r=A.audit(),p=A.proposals(r);
  assert.ok(p.entries.length>20);
  assert.equal(p.entries.reduce((n,x)=>n+Object.keys(x.translations).length,0),r.missing.length);
+ let reused=0;
  for(const row of p.entries)for(const v of Object.values(row.translations)){
-  assert.equal(v.suggestion,null);
-  assert.equal(v.status,'NEEDS_TRANSLATION');
+  if(v.suggestion===null){
+   assert.ok(['NEEDS_TRANSLATION','AMBIGUOUS_REUSE_NEEDS_REVIEW'].includes(v.status));
+  }else{
+   reused++;
+   assert.equal(v.status,'REUSE_CANDIDATE_NEEDS_REVIEW');
+   assert.equal(typeof v.provenance,'string');
+   assert.ok(v.provenance.length>0);
+  }
  }
+ assert.ok(reused>0,'safe reusable translations should be proposed with provenance');
 });
 test('static HTML/JS candidates have attributable lines',()=>{
  const rows=A.unmarked();
