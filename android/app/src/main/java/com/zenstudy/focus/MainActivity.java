@@ -125,12 +125,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class ZenNativeBridge {
+        // Preserve the original two-argument JavaScript API for older callers.
         @JavascriptInterface
         public void startBackgroundService(int seconds, String title) {
+            startBackgroundTimerInternal(seconds, title, null, null);
+        }
+
+        // v22 callers supply the stable v21 session ID and exact timer phase.
+        @JavascriptInterface
+        public void startBackgroundSession(int seconds, String title, String sessionId, String phase) {
+            startBackgroundTimerInternal(seconds, title, sessionId, phase);
+        }
+
+        private void startBackgroundTimerInternal(int seconds, String title, String sessionId, String phase) {
+            if (seconds < 1 || seconds > 86400) return;
             Intent i = new Intent(MainActivity.this, FocusTimerService.class);
             i.setAction("START");
             i.putExtra("seconds", seconds);
             i.putExtra("title", title);
+            if (sessionId != null && sessionId.matches("[A-Za-z0-9._:-]{1,256}")) {
+                i.putExtra("sessionId", sessionId);
+            }
+            if ("focus".equals(phase) || "custom".equals(phase) ||
+                    "short".equals(phase) || "long".equals(phase)) {
+                i.putExtra("phase", phase);
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(i);
             } else {
@@ -189,12 +208,21 @@ public class MainActivity extends AppCompatActivity {
         // SharedPreferences is NOT an authoritative backup or a migration of v21 records.
         @JavascriptInterface
         public void configureCompletionAlert(String sound, int volume, boolean enabled) {
+            // Retain older callers and any existing rest preference.
+            boolean includeRest = getSharedPreferences("zen_completion_playback_cache_v22", MODE_PRIVATE)
+                    .getBoolean("includeRest", false);
+            configureCompletionAlertV2(sound, volume, enabled, includeRest);
+        }
+
+        @JavascriptInterface
+        public void configureCompletionAlertV2(String sound, int volume, boolean enabled, boolean includeRest) {
             if (sound == null || !sound.matches("silent|soft-bell|wood-tap|water-drop|muted-metal|two-taps")
                     || volume < 0 || volume > 100) return;
             getSharedPreferences("zen_completion_playback_cache_v22", MODE_PRIVATE).edit()
                     .putString("sound", sound)
                     .putInt("volume", volume)
                     .putBoolean("enabled", enabled)
+                    .putBoolean("includeRest", includeRest)
                     .apply();
         }
 
