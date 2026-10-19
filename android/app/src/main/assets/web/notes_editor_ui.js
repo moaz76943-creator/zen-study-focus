@@ -131,6 +131,19 @@
     function link(id,target){
       return apply(before=>({...before,notesList:core.link(before.notesList,id,target,now())}));
     }
+    function linkTask(id,taskId){
+      if(!validId(taskId))throw new Error('INVALID_TASK_ID');
+      return apply(before=>{
+        const note=one(id,before.notesList);
+        const target=before.tasksList.filter(task=>task&&task.id===taskId);
+        if(target.length!==1)throw new Error(target.length?'DUPLICATE_TASK_ID':'TASK_NOT_FOUND');
+        const stored=note.notesV21?.taskLinks||[];
+        if(!Array.isArray(stored)||stored.some(x=>!validId(x)))throw new Error('INVALID_TASK_LINKS');
+        if(stored.includes(taskId))throw new Error('TASK_ALREADY_LINKED');
+        return {...before,notesList:core.edit(before.notesList,id,{},
+          {now:now(),extension:{taskLinks:[...stored,taskId]}})};
+      });
+    }
     function extract(id){
       if(typeof adapter.commitBoth!=='function')throw new Error('ATOMIC_TASK_COMMIT_REQUIRED');
       return apply(before=>{
@@ -143,7 +156,7 @@
     }
     function recall(id){const s=read();return core.recallCards(one(id,s.notesList));}
     function query(options){return core.search(read().notesList,options);}
-    return Object.freeze({read,one,save,toggle,duplicate,move,purge,history,link,extract,recall,query});
+    return Object.freeze({read,one,save,toggle,duplicate,move,purge,history,link,linkTask,extract,recall,query});
   }
   function el(tag,cls,label){
     const e=document.createElement(tag);if(cls)e.className=cls;
@@ -429,7 +442,8 @@
         body.addEventListener('click',reveal);body.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();reveal();}});
       }
       card.appendChild(body);
-      const meta=el('div','nsux-meta',(n.notesV21?.notebookId||'')+' · '+(n.notesV21?.tags||[]).join(' · '));
+      const safeTags=Array.isArray(n.notesV21?.tags)?n.notesV21.tags:[];
+    const meta=el('div','nsux-meta',(n.notesV21?.notebookId||'')+' · '+safeTags.join(' · '));
       card.appendChild(meta);
       const actions=el('div','nsux-actions');
       if(s==='trash'){
@@ -450,6 +464,10 @@
         if(instance.adapter.pickNoteLinkTarget)cardAction(actions,t('link'),()=>{
           const target=instance.adapter.pickNoteLinkTarget(n.id,instance.controller.read().notesList);
           if(target!==null&&target!==undefined)instance.controller.link(n.id,target);
+        });
+        if(instance.adapter.pickTaskLinkTarget)cardAction(actions,'↗ '+t('task'),()=>{
+          const target=instance.adapter.pickTaskLinkTarget(n.id,instance.controller.read().tasksList);
+          if(target!==null&&target!==undefined)instance.controller.linkTask(n.id,target);
         });
         if(instance.adapter.confirmTaskExtraction && instance.adapter.commitBoth)
           cardAction(actions,t('task'),()=>{
@@ -485,6 +503,10 @@
       const target=instance.controller.read().notesList.find(x=>x?.id===id);
       if(target)button(preview,target.title,()=>showReader(target));
     });}
+    if(Array.isArray(ext.taskLinks))ext.taskLinks.forEach(id=>{
+      const target=instance.controller.read().tasksList.find(x=>x&&x.id===id);
+      if(target)preview.appendChild(el('p','',t('task')+': '+target.title));
+    });
     button(preview,t('edit'),()=>{dlg.classList.remove('nsux-reading');document.getElementById('inpNoteBody').focus();});
     dlg.querySelector('.ns-editor').scrollTop=0;
   }
