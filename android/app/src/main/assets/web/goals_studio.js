@@ -32,7 +32,7 @@ function gsISOValid(iso) {
  return date.getFullYear()===year&&date.getMonth()===month-1&&date.getDate()===day;
 }
 function gsCleanHistory() {
- if(typeof acceptedFocusHistory==='function')return acceptedFocusHistory(cfg.sessionHistory);
+ if(typeof acceptedFocusHistory==='function')return acceptedFocusHistory(cfg.sessionHistory)||[];
  const raw=Array.isArray(cfg.sessionHistory)?cfg.sessionHistory:[];
  const seen=new Set(),entries=[];
  for(const item of raw) {
