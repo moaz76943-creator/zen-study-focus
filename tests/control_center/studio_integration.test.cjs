@@ -25,7 +25,7 @@ test('owner authorization and draft PR guard are present in issue workflow',()=>
  const workflow=read('.github/workflows/control_center_design_requests.yml');
  assert.match(workflow,/github\.event\.issue\.user\.login == github\.repository_owner/);
  assert.match(workflow,/draft:true/);
- assert.match(workflow,/core\.validateConfig|designCore\.validateConfig/);
+ assert.match(workflow,/designCore\.parseDesignIssue/);
  assert.doesNotMatch(workflow,/force: true|merge\(\s*\{|pulls\.merge/);
 });
 test('QA lanes do not run arbitrary shell command or write to the repository',()=>{
