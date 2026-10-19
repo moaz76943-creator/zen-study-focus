@@ -35,7 +35,8 @@ class HomeLayoutRegression(unittest.TestCase):
         self.assertIn('id="deskClockOverlay"', HTML)
 
     def test_focus_preset_tracks_selected_activity(self):
-        self.assertIn('selectTimerMode(getDomainFocusMinutes()', HTML)
+        self.assertIn('requestTimerMode(getDomainFocusMinutes()', HTML)
+        self.assertIn('function requestTimerMode(mins,modeKey,btn)', JS)
         self.assertIn('function getDomainFocusMinutes(', APP)
         self.assertIn('getDomainFocusMinutes(domain)', QUICK)
 
