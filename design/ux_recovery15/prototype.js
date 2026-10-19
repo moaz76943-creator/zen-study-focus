@@ -6,7 +6,7 @@
   'use strict';
   var api=factory();
   if(typeof module==='object' && module.exports) module.exports=api;
-  else root.DFUX15=api;
+  else { root.DFUX15=api; if(typeof document!=='undefined') document.addEventListener('DOMContentLoaded',function(){ if(document.getElementById('tasksView')&&document.body&&document.body.classList.contains('ux15'))api.attach(document); }); }
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
   function copy(x){return JSON.parse(JSON.stringify(x));}
