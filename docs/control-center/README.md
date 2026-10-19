@@ -193,6 +193,7 @@ Live GitHub API and raw files still require an internet connection and may fail 
 The mobile dashboard now exposes **خطط عمل الوكلاء** as a separate workspace. It is an agent task composer, NOT an autonomous agent executor.
 
 - Select tasks directly from the actual `FINAL_MATRIX_161.md` record, search by ID/area/text, filter blocked/actionable/all and restrict the maximum batch to **six tasks**.
+- For safety, each batch contains tasks from ONE recovery subsystem only; the UI disables unrelated areas and rejects mixed-area plans (even in QA mode). If no area is selected, suggestions use the first actionable area's pending tasks.
 - Use **اقتراح دفعة** to assemble up to four unfinished tasks from the selected area, or manually select up to six. Choose a specific lane (`qa`, `ui`, `audio`, `locale`, `analytics`, `data`) and target one of the six app screens.
 - Preview a deterministic Markdown handoff with exact task IDs, original quoted source wording, current/source SHA classification, reproduction and acceptance gates. It retains v21 storage and `ZEN21::` protection, 20 locales, Western generated numerals, media provenance, human PR review and accurate NOT_TESTED.
 - Copy the prompt to a connected Codex/Gemini worker, or **download Markdown**. These actions are entirely local; nothing was executed or pushed by clicking them.
