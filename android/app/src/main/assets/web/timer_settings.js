@@ -8,6 +8,7 @@ const TSET_I18N = {
      'أدخل أعدادًا صحيحة ضمن النطاقات المحددة.','تم حفظ الإعدادات']
 };
 function tsetText(i){return TSET_I18N[cfg.lang==='ar'?'ar':'en'][i];}
+let tsetEditingDomain = null;
 function tsetCount(){return Number.isInteger(cfg.roundsPerCycle)&&cfg.roundsPerCycle>=1&&cfg.roundsPerCycle<=12?cfg.roundsPerCycle:4;}
 function refreshTimerSettings(){
  const ids={timerSettingsChip:0,tsetHeading:1,tsetHint:2,tsetFocusLabel:3,tsetShortLabel:4,tsetLongLabel:5,tsetRoundsLabel:6,tsetReset:7,tsetSave:8};
@@ -18,6 +19,7 @@ function refreshTimerSettings(){
  document.getElementById('modeLongBtn').textContent=toWest(cfg.longMin+'m');
 }
 function openTimerSettings(){
+ tsetEditingDomain=cfg.domain;
  refreshTimerSettings();
  document.getElementById('tsetFocus').value=String(getDomainFocusMinutes());
  document.getElementById('tsetShort').value=String(cfg.shortMin);
@@ -37,17 +39,19 @@ function tsetNumber(id,min,max){
  const n=Number(raw);return Number.isSafeInteger(n)&&n>=min&&n<=max?n:null;
 }
 function saveTimerSettings(){
+ if(!['study','read','work','sport'].includes(tsetEditingDomain)||tsetEditingDomain!==cfg.domain) { showToast(tsetText(9));return false; }
  const focus=tsetNumber('tsetFocus',1,240),short=tsetNumber('tsetShort',1,60),
   long=tsetNumber('tsetLong',1,120),rounds=tsetNumber('tsetRounds',1,12);
  if([focus,short,long,rounds].includes(null)){showToast(tsetText(9));return false;}
- cfg.domainFocusMinutes={...(cfg.domainFocusMinutes||{}),[cfg.domain]:focus};
+ const previous=cfg.domainFocusMinutes;
+ cfg.domainFocusMinutes={...(previous&&typeof previous==='object'&&!Array.isArray(previous)?previous:{}),[tsetEditingDomain]:focus};
  cfg.shortMin=short;cfg.longMin=long;
  if(tsetCount()!==rounds)cfg.focusCycleCount=0;
  cfg.roundsPerCycle=rounds;
  saveFortressData('zen_fortress_cfg_v21',cfg);
  closeModal('timerSettingsModal');refreshTimerSettings();renderDomainState();
  // Don't replace a running, paused or quick-training session.
- const fresh=!timerRunning&&!quickTraining?.active&&(!timerSessionId||timerLeft===timerTotal);
+ const fresh=!timerRunning&&!quickTraining?.active&&timerSessionId===null&&timerLeft===timerTotal;
  if(fresh&&['focus','short','long'].includes(currentTimerModeKey)){
   const mode=currentTimerModeKey,mins=mode==='focus'?getDomainFocusMinutes():mode==='short'?cfg.shortMin:cfg.longMin;
   selectTimerMode(mins,mode,document.getElementById(mode==='focus'?'modeFocusBtn':mode==='short'?'modeShortBtn':'modeLongBtn'));

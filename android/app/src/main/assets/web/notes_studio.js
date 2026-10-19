@@ -42,7 +42,8 @@ function nsUseTemplate(code){
  const title=document.getElementById('inpNoteTitle');
  if(!title.value.trim())title.value=cfg.lang==='ar'?t[3]:t[2];
  document.getElementById('chkNoteBlur').checked=t[4]==='flash';
- nsUpdateCount();if(typeof nsScheduleDraft==='function')nsScheduleDraft();body.focus();
+ nsUpdateCount();if(window.DeepFocusNotesEditorUI?.onTemplate)window.DeepFocusNotesEditorUI.onTemplate(code);
+ if(typeof nsScheduleDraft==='function')nsScheduleDraft();body.focus();
 }
 function fillNoteTpl(type){nsUseTemplate(type==='flash'?'recall':'cornell');}
 function nsUpdateCount(){const v=document.getElementById('inpNoteBody').value;document.getElementById('nsCounter').textContent=nsWords(v)+' '+nsLabel(23)+' · '+Array.from(v).length+' '+nsLabel(24);}
@@ -58,6 +59,7 @@ function nsAction(row,emoji,title,callback,danger){
  const b=nsElement('button','ns-action'+(danger?' danger':''),emoji);b.type='button';b.setAttribute('aria-label',title);b.title=title;b.addEventListener('click',callback);row.appendChild(b);return b;
 }
 function renderNotesStack(){
+ if(window.DeepFocusNotesEditorUI?.renderStack())return;
  const box=document.getElementById('notesStackBox');if(!box)return;
  nsApplyLabels();
  const q=String(document.getElementById('inpSearchNotes').value||'').toLocaleLowerCase();
@@ -119,10 +121,12 @@ function openNoteModal(defaultDate=null,editId=null){
  document.getElementById('nsEditorHeading').textContent=nsLabel(n?16:15);
  document.getElementById('nsSaveButton').textContent=nsLabel(n?26:25);
  nsUpdateCount();nsRenderTemplates();document.getElementById('noteModal').classList.add('open');
+ if(window.DeepFocusNotesEditorUI?.onOpen)window.DeepFocusNotesEditorUI.onOpen(n);
  if(typeof nsPrepareDraft==='function')nsPrepareDraft();
 }
 function nsEdit(id){if(notesList.some(n=>Number(n.id)===nsId(id)))openNoteModal(null,id);}
 function saveNewNote(){
+ if(window.DeepFocusNotesEditorUI?.save)return window.DeepFocusNotesEditorUI.save();
  const title=toWest(document.getElementById('inpNoteTitle').value.trim()),body=toWest(document.getElementById('inpNoteBody').value.trim());
  if(!title&&!body)return;
  const cat=document.getElementById('selNoteCat').value;
