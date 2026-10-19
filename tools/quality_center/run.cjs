@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const {spawnSync} = require('node:child_process');
+const {loadBacklog} = require('./backlog.cjs');
 const root = path.resolve(__dirname, '../..');
 const WEB = 'android/app/src/main/assets/web';
 const REQUIRED = [
@@ -90,20 +91,30 @@ function checkAudio() {
   return finding('AUDIO', 'Packaged Ogg signatures', invalid.length ? 'FAIL' : 'PASS',
     invalid.length ? invalid.join('; ') : `${files.length} Ogg headers present; does NOT prove decode, recording authenticity, or licences`);
 }
-function buildReport(checks, sha = 'UNKNOWN', createdAt = new Date().toISOString()) {
+function buildReport(checks, sha = 'UNKNOWN', createdAt = new Date().toISOString(), backlog = null) {
   const counts = Object.fromEntries(STATUSES.map(s => [s, checks.filter(c => c.status === s).length]));
   return {
     schemaVersion: 1, project: 'Deep Focus', sourceSha: sha, generatedAt: createdAt,
-    checks, counts, releaseReady: false,
+    checks, counts, backlog, releaseReady: false,
     releaseGate: 'BLOCKED: on-device Android/WebView QA, verified source rights, and human release review are outstanding. A static PASS is not release approval.'
   };
+}
+function renderBacklog(backlog) {
+  if (!backlog) return '';
+  const counts = Object.entries(backlog.counts).map(([status, n]) => `<div class='metric'><strong>${n}</strong><span>${escapeHtml(status)}</span></div>`).join('');
+  const groups = backlog.systems.map(group => {
+    const taskRows = backlog.tasks.filter(task => task.system === group.name).map(task => `<tr><td>${escapeHtml(task.id)}</td><td>${escapeHtml(task.status)}</td><td>${escapeHtml(task.title)}</td><td><pre>${escapeHtml(task.evidence)}</pre></td></tr>`).join('');
+    return `<details><summary>${escapeHtml(group.name)} · ${group.total} tasks · ${group.statuses.BLOCKED} BLOCKED · ${group.statuses.IN_PROGRESS} IN_PROGRESS · ${group.statuses.TESTED} TESTED</summary><table><thead><tr><th>ID</th><th>Ledger status</th><th>Task</th><th>Evidence / remaining work</th></tr></thead><tbody>${taskRows}</tbody></table></details>`;
+  }).join('');
+  return `<section><h2>Recovery ledger · ${backlog.total}/${backlog.expected}</h2><p class='subtitle'>Recorded project state; TESTED in the ledger does not prove on-device functionality.</p><div class='metrics'>${counts}</div>${groups}</section>`;
 }
 function html(report) {
   const rows = report.checks.map(c => `<tr><td>${escapeHtml(c.id)}</td><td>${escapeHtml(c.title)}</td><td data-status="${escapeHtml(c.status)}">${escapeHtml(c.status)}</td><td><pre>${escapeHtml(c.detail)}</pre></td></tr>`).join('\n');
   const metrics = STATUSES.map(s => `<div class="metric"><strong>${report.counts[s]}</strong><span>${s}</span></div>`).join('');
+  const backlogSummary = renderBacklog(report.backlog);
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Deep Focus Quality Center</title><style>
-:root{color-scheme:light;font-family:system-ui,-apple-system,sans-serif}body{max-width:1100px;margin:auto;padding:18px;background:#f7f9fd;color:#172033}h1{font-size:1.7rem}.subtitle{color:#46526b}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{background:white;padding:16px;border-radius:12px}.metric strong{font-size:1.8rem;display:block}.metric span{font-size:.75rem}section{background:white;padding:14px;border-radius:12px;margin:16px 0;overflow:auto}table{width:100%;border-collapse:collapse;text-align:left}td,th{padding:10px;border-bottom:1px solid #e6e9f1;vertical-align:top}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;margin:0;font-size:.83rem;max-height:140px;overflow:auto}td[data-status=FAIL],td[data-status=BLOCKED]{font-weight:700;color:#a22828}td[data-status=PASS]{font-weight:700;color:#176b3f}td[data-status=NOT_TESTED]{font-weight:700;color:#775500}.gate{border-left:5px solid #a22828}@media(max-width:650px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}td,th{padding:6px;font-size:.84rem}}
-</style></head><body><h1>Deep Focus · Quality Center</h1><p class="subtitle">Source: ${escapeHtml(report.sourceSha)} · Generated: ${escapeHtml(report.generatedAt)}</p><div class="metrics">${metrics}</div><section class="gate"><strong>RELEASE: BLOCKED</strong><p>${escapeHtml(report.releaseGate)}</p></section><section><h2>Verification results</h2><table><thead><tr><th>ID</th><th>Check</th><th>Status</th><th>Evidence / limitation</th></tr></thead><tbody>${rows}</tbody></table></section><p class="subtitle">This is a local, read-only source-quality snapshot. No APK build, GitHub API modification, licence approval, or device test is performed.</p></body></html>`;
+:root{color-scheme:light;font-family:system-ui,-apple-system,sans-serif}body{max-width:1100px;margin:auto;padding:18px;background:#f7f9fd;color:#172033}h1{font-size:1.7rem}.subtitle{color:#46526b}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{background:white;padding:16px;border-radius:12px}.metric strong{font-size:1.8rem;display:block}.metric span{font-size:.75rem}section{background:white;padding:14px;border-radius:12px;margin:16px 0;overflow:auto}table{width:100%;border-collapse:collapse;text-align:left}td,th{padding:10px;border-bottom:1px solid #e6e9f1;vertical-align:top}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;margin:0;font-size:.83rem;max-height:140px;overflow:auto}td[data-status=FAIL],td[data-status=BLOCKED]{font-weight:700;color:#a22828}td[data-status=PASS]{font-weight:700;color:#176b3f}td[data-status=NOT_TESTED]{font-weight:700;color:#775500}.gate{border-left:5px solid #a22828}details{padding:13px 4px;border-bottom:1px solid #e4e9f0}summary{cursor:pointer;font-weight:600}@media(max-width:650px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}td,th{padding:6px;font-size:.84rem}}
+</style></head><body><h1>Deep Focus · Quality Center</h1><p class="subtitle">Source: ${escapeHtml(report.sourceSha)} · Generated: ${escapeHtml(report.generatedAt)}</p><div class="metrics">${metrics}</div><section class="gate"><strong>RELEASE: BLOCKED</strong><p>${escapeHtml(report.releaseGate)}</p></section>${backlogSummary}<section><h2>Verification results</h2><table><thead><tr><th>ID</th><th>Check</th><th>Status</th><th>Evidence / limitation</th></tr></thead><tbody>${rows}</tbody></table></section><p class="subtitle">This is a local, read-only source-quality snapshot. No APK build, GitHub API modification, licence approval, or device test is performed.</p></body></html>`;
 }
 function main(argv = process.argv.slice(2)) {
   const outArg = argv.indexOf('--out');
@@ -113,6 +124,9 @@ function main(argv = process.argv.slice(2)) {
   if (unknown.length) throw new Error(`Unknown argument(s): ${unknown.join(' ')}`);
   const full = argv.includes('--full');
   const checks = [checkSources(), checkSyntax(), checkAudio()];
+  const backlog = loadBacklog(path.join(root, 'docs/recovery_integration/FINAL_MATRIX_161.md'));
+  checks.push(finding('BACKLOG', 'Official DF-001–161 ledger integrity', backlog.ok ? 'PASS' : 'FAIL',
+    backlog.ok ? `Validated all ${backlog.total} unique task IDs; ledger statuses are not device evidence` : backlog.problems.slice(0, 40).join('; ')));
   checks.push(checkTest('20-language structural dictionaries', 'LOCALES', ['tests/validate_locales.cjs']));
   checks.push(checkTest('Source smoke validation', 'SMOKE', ['tests/smoke_app.cjs']));
   const files = full ? listTests() : QUICK_TESTS;
@@ -125,7 +139,7 @@ function main(argv = process.argv.slice(2)) {
   checks.push(finding('ANDROID_E2E', 'Real Android/WebView interaction and audio', 'NOT_TESTED', 'Requires APK SHA and real emulator or phone, isolated test profile, microphone/notification/audio-focus and backup checks. PR #30 contains the separate E2E suite.'));
   checks.push(finding('HUMAN_REVIEW', 'Licensing, UI, native speaker and release review', 'BLOCKED', 'Individual origin and rights, phone listening, 20-language visual checks, and owner approval required. Not bypassed by Node tests.'));
   const shaResult = spawnSync('git', ['rev-parse', 'HEAD'], {cwd:root,encoding:'utf8',timeout:3000});
-  const report = buildReport(checks, shaResult.status === 0 ? shaResult.stdout.trim() : 'UNKNOWN');
+  const report = buildReport(checks, shaResult.status === 0 ? shaResult.stdout.trim() : 'UNKNOWN', new Date().toISOString(), backlog);
   fs.mkdirSync(out, {recursive:true});
   fs.writeFileSync(path.join(out, 'report.json'), JSON.stringify(report, null, 2) + '\n');
   fs.writeFileSync(path.join(out, 'index.html'), html(report));
