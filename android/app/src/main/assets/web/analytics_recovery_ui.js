@@ -49,7 +49,7 @@
     '" x="'+x.toFixed(2)+'" y="'+(bottom-h).toFixed(2)+'" width="'+w.toFixed(2)+
     '" height="'+Math.max(h,1).toFixed(2)+'" rx="2" fill="#2563eb"><title>'+name+'</title></rect>';
   }).join('');
-  const accessible=escape(options.label||'Recorded minutes by credited period');
+  const accessible=escape(ascii(options.label||'Recorded minutes by credited period'));
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+
    '" width="100%" role="img" aria-label="'+accessible+'">'+ticks+columns+
    '<text x="'+left+'" y="177" font-size="11" fill="#475569">'+(series[0]?escape(series[0].key):'')+
@@ -109,6 +109,8 @@
   const dayAt=n=>new Date((Math.floor(Date.parse(now+'T12:00:00Z')/86400000)+n)*86400000+43200000).toISOString().slice(0,10);
   from.value=opts.startDate||dayAt(-29);to.value=opts.endDate||now;
   domain.value=opts.domain||'all';group.value=opts.group||'daily';kind.value='sessions';
+  from.lang='en-u-nu-latn';to.lang='en-u-nu-latn';
+  from.style.direction='ltr';to.style.direction='ltr';
   let report=null,disposed=false,series=[],exporter=null;
   if(typeof opts.saveCSV==='function')exporter=core.createExportController(opts.saveCSV);
   exportBtn.disabled=!exporter;
