@@ -104,3 +104,29 @@ test('quick workflow only binds real numeric task IDs and restores that link wit
   assert.equal(x.eval('validQuickSnapshot({...quickTraining,taskId:"task_123"}).taskId'),null);
   assert.equal(x.eval('parseQuickTime("03:99")'),null);
 });
+
+test('sound mixer prevalidates atomically, mixes two tracks and releases stopped resources',()=>{
+  const {createSoundMixer}=require('../../android/app/src/main/assets/web/sound_mix_controls.js');
+  const players=new Map(),starts=[],stops=[],volume=new Map();
+  const mixer=createSoundMixer({
+    catalog:[{id:'rain'},{id:'fire'},{id:'night'}],
+    isPlaying:id=>players.has(id),
+    start:id=>{starts.push(id);players.set(id,true);},
+    stop:id=>{stops.push(id);players.delete(id);},
+    setVolume:(id,v)=>volume.set(id,v)
+  });
+  assert.equal(mixer.applyMix([{id:'rain',percent:55},{id:'fire',percent:25}]),true);
+  assert.deepEqual(starts,['rain','fire']);
+  assert.equal(volume.get('rain'),.55);
+  assert.equal(mixer.applyMix([{id:'rain',percent:55},{id:'fire',percent:25}]),true);
+  assert.equal(starts.length,2,'Never start duplicate players');
+  assert.equal(mixer.setPercent('fire',200),false);
+  assert.equal(mixer.applyMix([{id:'night',percent:80},{id:'bad',percent:10}]),false);
+  assert.equal(players.size,2,'Invalid mix must not mutate audio');
+  assert.equal(mixer.applyMix([{id:'night',percent:80}]),true);
+  assert.deepEqual(stops,['rain','fire']);
+  assert.deepEqual(mixer.activeIds(),['night']);
+  mixer.dispose();
+  assert.deepEqual(stops,['rain','fire','night']);
+  assert.equal(mixer.applyMix([{id:'rain',percent:30}]),false);
+});
