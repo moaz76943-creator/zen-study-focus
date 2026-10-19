@@ -25,15 +25,15 @@
  const idKey=id=>typeof id==='string'&&id.length>0&&id.length<=256?'s:'+id:
   Number.isSafeInteger(id)&&id>=0?'n:'+id:null;
  const rejectsSample=s=>s.isStarter===true||s.isDemo===true||s.demo===true||
-  s.isTest===true||s.synthetic===true||['demo','sample','fixture','test','synthetic'].includes(s.source);
+  s.isTest===true||s.synthetic===true||['demo','sample','fixture','test','synthetic'].includes(String(s.source||'').toLowerCase());
  function notFocus(s){
-  if(s.completed===false||s.isComplete===false)return true;
+  if(s.completed===false||s.isComplete===false||s.isFocus===false||s.focus===false)return true;
   const mode=typeof s.mode==='string'?s.mode.toLowerCase():'';
   const type=typeof s.type==='string'?s.type.toLowerCase():'';
   const status=typeof s.status==='string'?s.status.toLowerCase():'';
   return ['rest','break','shortbreak','longbreak','short-rest','long-rest','pause'].includes(mode)||
    ['rest','break'].includes(type)||
-   ['cancelled','canceled','in-progress','in_progress','running','paused','failed','aborted','unfinished','rest','break'].includes(status);
+   ['cancelled','canceled','in-progress','in_progress','running','paused','failed','aborted','unfinished','active','pending','incomplete','rest','break'].includes(status);
  }
  function timestamp(v){
   if(typeof v==='number')return Number.isSafeInteger(v)&&v>=0?v:null;
