@@ -7,7 +7,7 @@ async function probe(dom,stall=false){
   constructor(){super();sockets.push(this);queueMicrotask(()=>this.dispatchEvent(new Event('open')));}
   send(raw){const request=JSON.parse(raw);messages.push(request);
    if(stall)return;
-   const result=request.method==='Runtime.evaluate'?{result:{value:dom}}:{};
+   const result=request.method==='Runtime.evaluate'?{result:{value:Array.isArray(dom)?dom.shift():dom}}:{};
    queueMicrotask(()=>{const e=new Event('message');e.data=JSON.stringify({id:request.id,result});this.dispatchEvent(e);});
   }
   close(){}
@@ -15,7 +15,7 @@ async function probe(dom,stall=false){
  const context={require:name=>name==='node:fs'?{writeFileSync(){}}:require(name),process:{argv:['node','probe'],stdout:{write:s=>output+=s},exitCode:0},
   WebSocket:Socket,URL,AbortController,Date,Promise,JSON,Error,
   fetch:async()=>({ok:true,json:async()=>[{type:'page',url:'file:///android_asset/web/index.html',webSocketDebuggerUrl:'ws://127.0.0.1:9222/devtools/page/1'}]}),
-  setTimeout:(fn)=>setTimeout(fn,stall?1:500),clearTimeout};
+  setTimeout:(fn,ms)=>setTimeout(fn,stall?1:Math.min(ms,20)),clearTimeout};
  vm.runInNewContext(source,context,{filename:'cdp_dom_smoke.cjs'});
  for(let i=0;!output&&i<100;i++)await new Promise(r=>setTimeout(r,5));
  assert.ok(output,'Probe must always report, including protocol failures');
@@ -33,4 +33,9 @@ test('observed missing application controls remains app FAIL',async()=>{
 });
 test('unresponsive renderer protocol remains NOT_TESTED and fails acceptance',async()=>{
  const r=await probe(null,true);assert.equal(r.report.status,'NOT_TESTED');assert.equal(r.exitCode,1);
+});
+
+test('cold renderer loading is observed until complete before acceptance assertions',async()=>{
+ const r=await probe([{...healthy,ready:'loading',playButton:false},healthy]);
+ assert.equal(r.report.status,'PASS');assert.equal(r.report.readiness.length,2);
 });
