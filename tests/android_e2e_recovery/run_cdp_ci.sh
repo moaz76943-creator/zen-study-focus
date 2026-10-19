@@ -21,8 +21,10 @@ adb forward tcp:9222 "localabstract:webview_devtools_remote_${pid}"
 set +e
 node tests/android_e2e_recovery/cdp_dom_smoke.cjs "$report/results.json"
 cdp_status=$?
+DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/cdp_actions.cjs "$report/dom-actions.json"
+action_status=$?
 # This profile was just created and installed above; no owner phone data is touched.
 python3 tests/android_e2e_recovery/run_e2e.py --serial emulator-5554 --ack-disposable-data --run-slow --allow-rotation --json "$report/e2e-results.json"
 e2e_status=$?
 test ! -s "$report/e2e-results.json" || cat "$report/e2e-results.json"
-if (( cdp_status != 0 || e2e_status != 0 )); then exit 1; fi
+if (( cdp_status != 0 || action_status != 0 || e2e_status != 0 )); then exit 1; fi
