@@ -26,7 +26,7 @@ function renderIsolated(lang,cat){
   const localesMatch=app.match(/const NATURE_EMPTY_MESSAGES = Object\.freeze\(([\s\S]*?)\);/);
   assert.ok(localesMatch,'real renderer must have a localized safe empty state');
   const messages=Function('return ('+localesMatch[1]+')')();
-  const volumesMatch=app.match(/const NATURE_VOLUME_LABELS = Object\\.freeze\\(([\\s\\S]*?)\\);/);
+  const volumesMatch=app.match(/const NATURE_VOLUME_LABELS = Object\.freeze\(([\s\S]*?)\);/);
   assert.ok(volumesMatch,'localized nature volume labels must exist');
   const volumes=Function('return ('+volumesMatch[1]+')')();
   const render=Function('document','SOUNDS_DATA','NATURE_APPROVED_FOR_PLAYBACK','soundCat','L','activePlayers','cfg','NATURE_EMPTY_MESSAGES','NATURE_VOLUME_LABELS',
