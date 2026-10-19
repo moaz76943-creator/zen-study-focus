@@ -33,12 +33,34 @@ function computeHash(str) {
 }
 
 function saveFortressData(key, obj) {
+  // Legacy single-family write: verify BOTH durable packet copies before acknowledging success.
+  // New multi-family Notes/Tasks edits still use DF22Integration's atomic journal.
+  const raw = JSON.stringify(obj);
+  if (typeof raw !== 'string') throw new Error('STORAGE_VALUE_NOT_SERIALIZABLE');
+  const packet = JSON.stringify({payload:raw, sig:computeHash(raw), ts:Date.now()});
+  const mirrorKey = key + '_mirror';
+  const beforePrimary = localStorage.getItem(key);
+  const beforeMirror = localStorage.getItem(mirrorKey);
   try {
-    const raw = JSON.stringify(obj);
-    const packet = JSON.stringify({ payload: raw, sig: computeHash(raw), ts: Date.now() });
     localStorage.setItem(key, packet);
-    localStorage.setItem(key + "_mirror", packet);
-  } catch (e) {}
+    localStorage.setItem(mirrorKey, packet);
+    if (localStorage.getItem(key) !== packet || localStorage.getItem(mirrorKey) !== packet)
+      throw new Error('STORAGE_WRITE_NOT_VERIFIED');
+    return true;
+  } catch (writeError) {
+    // A failed mirror write must never leave an unverified new primary as the preferred copy.
+    const rollbackErrors = [];
+    for (const [name, previous] of [[key, beforePrimary], [mirrorKey, beforeMirror]]) {
+      try {
+        if (previous === null) localStorage.removeItem(name);
+        else localStorage.setItem(name, previous);
+        if (localStorage.getItem(name) !== previous) rollbackErrors.push(name);
+      } catch (rollbackError) { rollbackErrors.push(name); }
+    }
+    if (rollbackErrors.length)
+      throw new Error('STORAGE_WRITE_FAILED_ROLLBACK_UNVERIFIED:' + rollbackErrors.join(','));
+    throw writeError;
+  }
 }
 
 function loadFortressData(key, defaultObj) {
@@ -919,7 +941,8 @@ function creditCompletedSession() {
   if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
   if (!timerSessionId) return;
   const ids = Array.isArray(cfg.completedTimerIds) ? cfg.completedTimerIds : [];
-  if (ids.includes(timerSessionId)) return;
+  if (ids.includes(timerSessionId) ||
+      (Array.isArray(cfg.sessionHistory) && cfg.sessionHistory.some(s => s && s.id === timerSessionId))) return;
   // Short intervals such as 20/10 must not credit a whole minute for 20 seconds.
   // Accumulate real seconds across work rounds; legacy timer accounting is preserved.
   let earned;
@@ -929,7 +952,7 @@ function creditCompletedSession() {
     earned = Math.floor(accumulated / 60);
     cfg.quickFocusRemainderSec = accumulated % 60;
   } else {
-    earned = Math.max(1, Math.round(timerActiveMs / 60000));
+    earned = Math.max(0, Math.floor((timerActiveMs + 500) / 60000));
   }
   cfg.todayMins = Number(cfg.todayMins || 0) + earned;
   cfg.sessions = Number(cfg.sessions || 0) + 1;
