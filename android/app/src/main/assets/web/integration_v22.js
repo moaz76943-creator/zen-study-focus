@@ -246,7 +246,7 @@
     if (cfg.lang !== lastLocale) {
       lastLocale = cfg.lang;
       mountTasks();mountAnalytics();mountAlertPicker();
-      if (root.DeepFocusNotesEditorUI) root.DeepFocusNotesEditorUI.renderStack();
+      if (root.DeepFocusNotesEditorUI) root.DeepFocusNotesEditorUI.refreshLocale();
     }
   }
   function onTab(section) {
