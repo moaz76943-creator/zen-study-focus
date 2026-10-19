@@ -49,6 +49,14 @@ function buildPortable(root=ROOT,overrideHTML){
     throw Error('Unbundled stylesheet reference');
   const design=require(path.join(root,DIR,'studio-core.js')).validateConfig(
     JSON.parse(read(root,DIR+'/design-config.json')));
+  const ledgerSource=read(root,'docs/recovery_integration/FINAL_MATRIX_161.md');
+  const ledgerTasks=require(path.join(root,DIR,'control-center.js')).parseTasks(ledgerSource);
+  if(ledgerTasks.length!==161||new Set(ledgerTasks.map(t=>t.id)).size!==161)
+    throw Error('Recovery ledger must contain exactly 161 unique tasks');
+  const staticLedger=JSON.stringify({schema_version:1,provenance:'CHECKOUT_STATIC_SOURCE',
+    message:'Static copy from this workflow checkout, NOT live GitHub data or device QA',
+    tasks:ledgerTasks}).replace(/</g,'\\u003c');
+  const ledgerTag='<script id="control-center-embedded-ledger" type="application/json">'+staticLedger+'</script>';
   const json=JSON.stringify(design);
   if(/<\/script/i.test(json))throw Error('Unsafe design JSON');
   const jsonTag='<script id="control-center-embedded-design" type="application/json">'+json+'</script>';
@@ -68,7 +76,7 @@ function buildPortable(root=ROOT,overrideHTML){
   if(!cspMeta.test(html))throw Error('Original CSP meta not found');
   html=html.replace(cspMeta,'<meta http-equiv="Content-Security-Policy" content="'+csp+'">');
   if(!html.includes('</head>')||!html.includes('</body>'))throw Error('Invalid HTML structure');
-  html=html.replace('</head>','  '+jsonTag+'\n</head>');
+  html=html.replace('</head>','  '+jsonTag+'\n  '+ledgerTag+'\n</head>');
   html=html.replace('</body>','\n  '+scriptBlocks.join('\n  ')+'\n</body>');
   return html;
 }
