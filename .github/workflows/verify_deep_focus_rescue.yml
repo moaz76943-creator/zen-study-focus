@@ -67,6 +67,8 @@ jobs:
           mkdir -p "$RUNNER_TEMP/native-ledger"
           javac -d "$RUNNER_TEMP/native-ledger" android/app/src/main/java/com/zenstudy/focus/NativeCompletionLedger.java tests/timer_native_bridge/NativeCompletionLedgerTest.java
           java -cp "$RUNNER_TEMP/native-ledger" com.zenstudy.focus.NativeCompletionLedgerTest
+          javac -d "$RUNNER_TEMP/native-ledger" android/app/src/main/java/com/zenstudy/focus/NativeDocumentWriter.java tests/timer_native_bridge/NativeDocumentWriterTest.java
+          java -cp "$RUNNER_TEMP/native-ledger" com.zenstudy.focus.NativeDocumentWriterTest
       - name: Install Android API 36
         shell: bash
         run: |
