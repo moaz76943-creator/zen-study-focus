@@ -85,7 +85,7 @@
     function save(d){
       if(!d || (d.id!==null && d.id!==undefined && !validId(d.id)))throw new Error('INVALID_NOTE_ID');
       const title=cleanText(d.title).trim(),body=cleanText(d.body);
-      if(!title&&!body&&!d.cornell?.notes?.trim())throw new Error('EMPTY_NOTE');
+      if(!title&&!body&&!['cues','notes','summary'].some(k=>d.cornell?.[k]?.trim()))throw new Error('EMPTY_NOTE');
       if(title.length>250||body.length>NOTE_LIMIT)throw new Error('NOTE_TOO_LARGE');
       const patch={title,body,catKey:['cornell','flash','quick'].includes(d.catKey)?d.catKey:'quick',
         calDate:cleanText(d.calDate),blur:!!d.blur,pinned:!!d.pinned,favorite:!!d.favorite};
@@ -244,7 +244,7 @@
   function setupEditor(){
     const modal=document.getElementById('noteModal'),card=modal&&modal.querySelector('.ns-editor');
     if(!card)return;
-    const body=document.getElementById('inpNoteBody');
+    const body=document.getElementById('inpNoteBody');body.dir='auto';document.getElementById('inpNoteTitle').dir='auto';
     const toolbar=el('div','nsux-actions'),extra=el('div','nsux-extra');
     toolbar.id='nsux-tools';extra.id='nsux-fields';
     const basic=[['heading','H1'],['bullet','• List'],['check','☐'],['number','1.'],['quote','❝']];
@@ -353,7 +353,9 @@
   }
   function draftToSave(){
     const f=instance.fields,cat=document.getElementById('selNoteCat').value;
-    const pairs=collectPairs(false);
+    const allPairs=collectPairs(true);
+    if(allPairs.some(pair=>!pair.question.trim()||!pair.answer.trim()))throw new Error('Complete each recall question and answer before saving');
+    const pairs=allPairs;
     const result={id:typeof nsEditId==='number'?nsEditId:null,
       title:document.getElementById('inpNoteTitle').value,body:document.getElementById('inpNoteBody').value,
       catKey:cat,calDate:document.getElementById('inpNoteCalDate').value,
@@ -423,7 +425,7 @@
       const title=el('h3','',n.title);title.dir='auto';card.appendChild(title);
       const body=el('p','',n.body||n.notesV21?.cornell?.summary||'');
       body.dir='auto'; if(n.blur){body.textContent=t('review');body.setAttribute('role','button');
-        body.tabIndex=0;const reveal=()=>{body.textContent=n.body||'';body.removeAttribute('role');};
+        body.tabIndex=0;const reveal=()=>{body.textContent=n.body||n.notesV21?.cornell?.summary||'';body.removeAttribute('role');};
         body.addEventListener('click',reveal);body.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();reveal();}});
       }
       card.appendChild(body);
@@ -475,8 +477,8 @@
     }
     const pairs=instance.controller.recall(n.id);
     pairs.forEach(pair=>{
-      const q=el('h4','',pair.question),answer=button(preview,t('review'),()=>{answer.textContent=pair.answer;});
-      q.dir='auto';answer.dir='auto';preview.appendChild(q);
+      const q=el('h4','',pair.question);q.dir='auto';preview.appendChild(q);
+      const answer=button(preview,t('review'),()=>{answer.textContent=pair.answer;});answer.dir='auto';
     });
     const links=Array.isArray(ext.links)?ext.links:[];
     if(links.length){preview.appendChild(el('h4','',t('linked')));links.forEach(id=>{
