@@ -131,7 +131,7 @@
         }
         if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL)
           throw new Error('Download API unavailable');
-        const blob=new doc.defaultView.Blob(['\\ufeff',value],{type:'text/csv;charset=utf-8'});
+        const blob=new doc.defaultView.Blob(['\ufeff',value],{type:'text/csv;charset=utf-8'});
         const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
         wrapper.appendChild(a);
         try{a.click();detail.textContent='CSV download requested';}

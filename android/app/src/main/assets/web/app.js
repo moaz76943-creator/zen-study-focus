@@ -129,7 +129,7 @@ const DICT = {
     catStudy: '📚 Study', catSport: '🏋️ Sport', catReview: '📖 Reading', catExam: '💻 Work',
     tagCornell: 'Cornell 📋', tagFlash: 'Recall 👁️', tagQuick: 'Log 💡',
     btnAddCalNote: '+ Add Note to Date', lblBlurAnswer: 'Blur text for active recall (Tap to reveal)',
-    mixerReady: '🎵 Pure Nature Studio Ready', btnMyMix: '✨ Mix', btnStopAll: '⏹ Stop',
+    mixerReady: '🎵 Nature recordings ready', btnMyMix: '✨ Mix', btnStopAll: '⏹ Stop',
     sndCatWater: 'Water & Rain 🌧️', sndCatForest: 'Forest & Wind 🌲', sndCatWarm: 'Fire & Earth 🔥',
     kpiMinutes: 'Active Minutes', kpiSessions: 'Completed Sessions',
     kpiTrendWeek: '↑ +18% this week', kpiTrendGreat: '↑ +12% consistency',
@@ -1533,17 +1533,15 @@ function saveQuickDump(toTasks) {
 }
 
 /* ========================================================
-   7. 12 PURE NATURE SOUNDS WITH PHOTOS & VOLUME SLIDERS
+   7. PACKAGED NATURE RECORDINGS WITH PHOTOS & VOLUME SLIDERS
    ======================================================== */
 const SOUNDS_DATA = [
   { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg' },
   { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg' },
   { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg' },
-  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg' },
   { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg' },
   { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg' },
   { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg' },
-  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg' },
   { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg' },
 ];
 
@@ -1575,7 +1573,7 @@ function toggleSoundTile(id) {
   const token = (soundGeneration[id] || 0) + 1;
   soundGeneration[id] = token;
   const audio = new Audio();
-  audio.loop = true;
+  audio.loop = id !== 'thunder'; // Short authentic thunder sound plays once, not every 8.8 seconds.
   audio.preload = 'auto';
   audio.volume = s.vol;
   audio.src = s.src; // Offline recording packaged with the app. No streaming or DSP replacement.
@@ -1589,6 +1587,11 @@ function toggleSoundTile(id) {
     setVol(v) { audio.volume = v; }
   };
   activePlayers[id] = player;
+  audio.onended = () => {
+    if (soundGeneration[id] !== token || activePlayers[id] !== player) return;
+    stopSoundTile(id);
+    renderSoundsStudio();
+  };
   const unavailable = () => {
     if (soundGeneration[id] !== token || activePlayers[id] !== player) return;
     stopSoundTile(id);
