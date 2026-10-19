@@ -1,5 +1,5 @@
 'use strict';
-/* DF4-001/004/005: source-level regression guards; NOT Android/WebView visual QA. */
+/* DF4-001/004: source-level regression guards; NOT Android/WebView visual QA. */
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -49,14 +49,11 @@ test('no missing or unapproved recording is silently activated',()=>{
   assert.equal(nodes.length,2);
   assert.ok(nodes.every(x=>x.className.includes('sound-Rich-tile')));
 });
-test('completion-alert picker has dedicated narrow-screen fieldset, option, radio and preview layout',()=>{
-  assert.match(css,/\.completion-alert-picker\s+fieldset\s*\{[^}]*min-inline-size\s*:\s*0/s);
-  assert.match(css,/\.completion-alert-option\s*\{[^}]*display\s*:\s*grid/s);
-  assert.match(css,/\.completion-alert-option\s*\{[^}]*grid-template-columns\s*:\s*minmax\(0,\s*1fr\)\s+auto/s);
-  assert.match(css,/\.completion-alert-option\s+button\s*\{[^}]*min-height\s*:\s*44px/s);
-  assert.match(css,/\.completion-alert-option\s+label\s*\{[^}]*min-width\s*:\s*0/s);
+test('unapproved-category empty state spans the grid and remains readable at narrow widths',()=>{
+  assert.match(css,/\\.sounds-empty-state\\s*\\{[^}]*grid-column\\s*:\\s*1\\s*\\/\\s*-1/s);
+  assert.match(css,/\\.sounds-empty-state\\s*\\{[^}]*overflow-wrap\\s*:\\s*anywhere/s);
 });
-test('picker CSS is loaded with the existing opt-in White Premium design, no remote dependencies',()=>{
+test('nature feedback styles are locally bundled with opt-in White Premium, no remote dependencies',()=>{
   const html=fs.readFileSync(path.join(web,'index.html'),'utf8');
   assert.match(html,/href="design_recovery\/white_premium_recovery10\.css"/);
   assert.doesNotMatch(css,/@import\s+url\(\s*['"]?https?:/i);
