@@ -151,7 +151,7 @@
     quick.addEventListener('submit',event=>{event.preventDefault();if(!quickText.value.trim())return;apply(x=>C.createTask(x,{title:quickText.value},{noteIds:adapter.noteIds?.()}));});content.appendChild(quick);
     if(editing!==null)content.appendChild(editor());
    const today=el('section','df-panel'),top=el('h3','',l.today);today.appendChild(top);
-   const top3=C.topThree(state,currentDay());if(!top3.length)today.appendChild(el('p','df-muted',l.empty));else top3.forEach(t=>today.appendChild(taskCard(t)));
+   const top3=C.topThree(state,currentDay());if(!top3.length)today.appendChild(el('p','df-muted',l.empty));else{const pinned=el('div','df-top-list');top3.forEach(t=>pinned.appendChild(btn('★ '+t.title,()=>{expanded.add(t.id);view='all';render();})));today.appendChild(pinned);}
    content.appendChild(today);
    const pr=C.projects(state).filter(x=>!x.deletedAt);if(pr.length){const list=el('div','df-grid');pr.forEach(p=>{
     const progress=C.projectProgress(state,p.id),card=el('div','df-project');append(card,el('h3','',p.name),el('p','df-muted',`${progress.completed}/${progress.total} · ${progress.percent}%`));
@@ -162,13 +162,19 @@
    });content.appendChild(tabs);
    const filters=el('div','df-grid df-section'),search=input('search',query),cats=selection([['',l.allCategories],...['study','sport','review','exam'].map(v=>[v,l[v]])],category);
    const statuses=selection([['',l.all],...['todo','doing','completed','archived'].map(v=>[v,l[v]])],status);
+    const projectPick=selection([['',l.allProjects],...C.projects(state).filter(p=>!p.deletedAt).map(p=>[p.id,p.name])],projectFilter);
+    const sorting=selection([['date',l.sortDate],['title',l.sortTitle],['priority',l.sortPriority]],sort);
    search.placeholder=l.search;search.addEventListener('input',()=>{query=search.value;renderResults();});
    cats.addEventListener('change',()=>{category=cats.value;renderResults();});statuses.addEventListener('change',()=>{status=statuses.value;renderResults();});
-   append(filters,search,cats,statuses);content.appendChild(filters);
+   projectPick.addEventListener('change',()=>{projectFilter=projectPick.value;renderResults();});sorting.addEventListener('change',()=>{sort=sorting.value;renderResults();});
+    append(filters,search,cats,projectPick,statuses,sorting);content.appendChild(filters);
    const results=el('div','df-section');results.id='df-task-results';content.appendChild(results);
    function renderResults(){
-    results.replaceChildren();const active=C.searchTasks(state,{query,catKey:category||undefined,status:status||undefined,includeArchived:true,
+    results.replaceChildren();let active=C.searchTasks(state,{query,catKey:category||undefined,status:status||undefined,projectId:projectFilter?Number(projectFilter):undefined,includeArchived:true,
      includeTrash:view==='trash'}).filter(t=>view==='trash'?!!t.deletedAt:!t.deletedAt);
+     if(['today','upcoming','overdue','completed'].includes(view))active=C.taskSections({tasksList:active,cfg:state.cfg},currentDay())[view];
+     if(sort==='title')active.sort((a,b)=>String(a.title).localeCompare(String(b.title))||a.id-b.id);
+     if(sort==='priority'){const ranks={urgent:4,high:3,medium:2,low:1};active.sort((a,b)=>(ranks[b.priority]||0)-(ranks[a.priority]||0)||a.date.localeCompare(b.date)||a.id-b.id);}
     const show=(container,rows)=>{if(!rows.length)container.appendChild(el('p','df-muted',l.empty));else rows.forEach(t=>container.appendChild(taskCard(t)));};
     if(view==='board'){
      const board=el('div','df-board');for(const k of ['todo','doing','completed','archived']){
