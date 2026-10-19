@@ -35,6 +35,8 @@ class MockAudio {
   constructor() { this.volume = 0; this.paused = false; audioInstances.push(this); }
   play() { return Promise.resolve(); }
   pause() { this.paused = true; }
+  removeAttribute(name) { if(name==='src')this.src=''; }
+  load() {}
 }
 const sandbox = {
   Audio: MockAudio,
@@ -172,16 +174,16 @@ assert.deepEqual([...store.entries()], [...savedBeforeRestore.entries()]);
 assert.equal(evaluate('cfg.sessions'), 2, 'In-memory progress survives failed restore');
 
 // A delayed media error must never restart a sound that the user already stopped.
-evaluate("toggleSoundTile('rain')");
+evaluate("toggleSoundTile('forest')");
 assert.equal(audioInstances.length, 1);
 const staleAudioError = audioInstances[0].onerror;
 evaluate('stopAllAudio()');
 staleAudioError();
-assert.equal(evaluate("Boolean(activePlayers['rain'])"), false);
-evaluate("toggleSoundTile('rain')");
-assert.equal(evaluate("Boolean(activePlayers['rain'])"), true);
+assert.equal(evaluate("Boolean(activePlayers['forest'])"), false);
+evaluate("toggleSoundTile('forest')");
+assert.equal(evaluate("Boolean(activePlayers['forest'])"), true);
 staleAudioError(); // stale error from the first instance cannot replace the new one
-assert.equal(evaluate("Boolean(activePlayers['rain'])"), true);
+assert.equal(evaluate("Boolean(activePlayers['forest'])"), true);
 evaluate('stopAllAudio()');
 assert.equal(evaluate('Object.keys(activePlayers).length'), 0);
 // Quick training must handle exact seconds, preset types, active rounds and zero-rest completion.
