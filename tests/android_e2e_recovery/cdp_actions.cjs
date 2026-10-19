@@ -33,7 +33,7 @@ const tap=selector=>touch(element(selector));
 const button=(container,text)=>`[...${element(container)}.querySelectorAll('button')].find(n=>n.textContent.trim()===${JSON.stringify(text)})`;
 async function fill(selector,text){await tap(selector);await evaluate(`${element(selector)}.value=''`);await call('Input.insertText',{text});}
 async function check(expression,message){assert.equal(await evaluate(expression),true,message);}
-async function run(id,fn){try{await fn();results.set(id,{id,status:'PASS',detail:'Executed on disposable Android WebView using CDP touch/input and observed state'});}catch(e){results.set(id,{id,status:e.message.startsWith('TRANSPORT:')?'NOT_TESTED':'FAIL',detail:e.message});}console.log(JSON.stringify(results.get(id)));}
+async function run(id,fn){try{const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using CDP touch/input and observed state'});}catch(e){results.set(id,{id,status:e.message.startsWith('TRANSPORT:')?'NOT_TESTED':'FAIL',detail:e.message});}console.log(JSON.stringify(results.get(id)));}
 async function restart(){ws.close();adb('shell','am','force-stop','com.zenstudy.focus');adb('shell','am','start','-n','com.zenstudy.focus/.MainActivity');await pause(3000);await connect();await ready();}
 async function main(){
  if(process.env.DF_ANDROID_DISPOSABLE!=='1')throw Error('TRANSPORT: fresh disposable-profile acknowledgement is required');
@@ -77,7 +77,7 @@ async function main(){
  await run('calendar_and_sounds',async()=>{
   await tap('#navCalendar');await tap('.cal-day-cell');await check("document.querySelectorAll('.cal-day-cell[aria-pressed=true]').length===1",'Actual day selection');
   await evaluate("window.fixtureMedia=[];window.fixturePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){window.fixtureMedia.push(this);return window.fixturePlay.call(this)}");
-  await tap('#navSounds');await tap('[data-sound-id=forest] .stile-play');await tap('[data-sound-id=wind] .stile-play');await pause(1000);
+  await tap('#navSounds');await tap('.sound-Rich-tile.sbg-forest .stile-play-btn');await tap('.sound-Rich-tile.sbg-wind .stile-play-btn');await pause(1000);
   await check("window.fixtureMedia.length===2 && window.fixtureMedia.every(a=>!a.paused&&!a.error&&a.readyState>=2) && Object.keys(activePlayers).length===2",'Two local decoded media channels');
   await evaluate("stopAllAudio();HTMLMediaElement.prototype.play=window.fixturePlay;delete window.fixturePlay");await check('Object.keys(activePlayers).length===0','Stop all releases tracks');
  });
@@ -88,7 +88,7 @@ async function main(){
   ws.close();await connect();await ready();await pause(1000);
   assert.equal(await evaluate('cfg.sessionHistory.length'),before+1,'One real completed work session');
   await check('cfg.sessionHistory[cfg.sessionHistory.length-1].minutes===1','One real elapsed minute');
-  results.set('completion_notification',{id:'completion_notification',status:'PASS',detail:'Actual 1-minute work session background/return credit once; notification appearance/hearing/DND remain NOT_TESTED'});
+  return 'Actual 1-minute work session background/return credit once; notification appearance/hearing/DND remain NOT_TESTED';
  });
  await run('data_integrity',async()=>{await evaluate("window.fixtureBackup=generateEncryptedBackupCode();window.fixtureConfirm=window.confirm;window.confirm=()=>true");try{await check('verifyAndRestoreBackupCode(window.fixtureBackup)===true','Real ZEN21 roundtrip');}finally{await evaluate('window.confirm=window.fixtureConfirm;delete window.fixtureBackup;delete window.fixtureConfirm');}});
  await run('process_death_recovery',async()=>{await restart();await check("notesList.some(n=>n.title==='Android fixture ٢'&&n.body==='Edited Unicode العربية ٣') && tasksList.some(t=>t.title==='Android fixture task'&&!t.done)",'Real process restart preserves note/task');});
