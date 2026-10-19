@@ -1,7 +1,6 @@
 name: Deep Focus Android WebView Real DOM (debug-only)
 on:
-  push:
-    branches: [integration/deep-focus-consolidated-repair-20261020]
+  # Optional exact-SHA QA, manually started after emulator SDK is healthy.
   workflow_dispatch:
 permissions:
   contents: read
@@ -77,6 +76,14 @@ jobs:
             test -n "$pid"
             adb forward tcp:9222 "localabstract:webview_devtools_remote_${pid}"
             node tests/android_e2e_recovery/cdp_dom_smoke.cjs "$report/results.json"
+      - name: Record unverified emulator bootstrap on infrastructure failure
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/deep-focus-android-webview"
+          if [ ! -s "$RUNNER_TEMP/deep-focus-android-webview/results.json" ]; then
+            printf '%s\n' '{"status":"NOT_TESTED","reason":"Android emulator bootstrap or CDP forwarding failed before verified app DOM evidence; inspect run logs"}' > "$RUNNER_TEMP/deep-focus-android-webview/results.json"
+          fi
       - name: Preserve real Android evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4
