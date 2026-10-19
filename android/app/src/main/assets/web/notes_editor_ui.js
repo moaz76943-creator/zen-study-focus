@@ -185,6 +185,8 @@
       '.nsux-extra{display:grid;gap:9px;margin:9px 0}.nsux-extra label{display:grid;gap:5px;font-size:.75rem;color:#50617a}',
       '.nsux-area{box-sizing:border-box;width:100%;min-height:90px;resize:vertical;white-space:pre-wrap;unicode-bidi:plaintext;border:1px solid #dce5f0;border-radius:13px;background:#fff;padding:12px;color:#1c2e4d;line-height:1.65;font:inherit;font-size:16px}',
       '.nsux-inline>*{flex:1 1 120px}.nsux-meta{margin:7px 0;color:#50617a;font-size:.76rem}',
+      '.nsux-reading #inpNoteTitle,.nsux-reading #inpNoteBody,.nsux-reading #nsBodyLabel,.nsux-reading #nsCounter,.nsux-reading #nsux-fields .nsux-meta,.nsux-reading #nsux-tools,.nsux-reading .ns-meta,.nsux-reading .ns-options,.nsux-reading .modal-actions,.nsux-reading #nsEditorTemplates{display:none!important}',
+      '.nsux-reading #nsux-preview{display:block!important;max-height:65dvh}',
       '.nsux-reader{white-space:normal;overflow-wrap:anywhere;line-height:1.7;color:#1c2e4d;padding:14px;border:1px solid #dce5f0;border-radius:15px;background:white;max-height:42vh;overflow:auto}',
       '.nsux-reader p{white-space:pre-wrap;margin:7px 0}.nsux-reader h4{font-size:1.02rem;margin:12px 0 4px}.nsux-reader .nsux-check{display:flex;gap:10px;align-items:baseline}.nsux-reader .nsux-check input{pointer-events:none}',
       '.nsux-card{border:1px solid var(--df22-border,#dce5f0);border-radius:22px;background:#fff;padding:15px;box-shadow:var(--df22-shadow-low,0 2px 10px #203b5f10)}',
@@ -329,7 +331,7 @@
     document.getElementById('nsux-preview').hidden=true;
     document.getElementById('nsux-find').value='';
     document.getElementById('nsux-search-count').textContent='';
-    document.getElementById('noteModal').classList.remove('nsux-focus');
+    document.getElementById('noteModal').classList.remove('nsux-focus','nsux-reading');
     document.getElementById('nsux-focus-toggle').textContent=t('focus');
     showType();
   }
@@ -398,7 +400,10 @@
     const bk=document.getElementById('nsux-book-filter').value,tag=document.getElementById('nsux-tag-filter').value;
     if(bk)filters.notebookId=bk;if(tag)filters.tags=[tag];
     if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all'&&noteTagFilter)filters.kind=undefined;
-    let result=instance.controller.query(filters);
+    const signature=JSON.stringify(filters);
+    if(signature!==instance.filterSignature){instance.filterSignature=signature;instance.page=0;}
+    const offset=(instance.page||0)*100;
+    let result=instance.controller.query({...filters,offset,limit:100});
     let found=result.items;
     if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all')
       found=found.filter(n=>n.catKey===noteTagFilter);
@@ -406,7 +411,7 @@
     const total=document.getElementById('nsTotal'),pinned=document.getElementById('nsPinned'),count=document.getElementById('nsVisibleCount');
     if(total)total.textContent=String(all.length);
     if(pinned)pinned.textContent=String(all.filter(n=>n.pinned).length);
-    if(count)count.textContent=String(found.length)+' / '+result.total;
+    if(count)count.textContent=String(Math.min(offset+found.length,result.total))+' / '+result.total;
     box.replaceChildren();
     if(!found.length){box.appendChild(el('div','nsux-blank',t('empty')));return true;}
     found.forEach(n=>{
@@ -437,13 +442,28 @@
         cardAction(actions,s==='archived'?t('restore'):t('archiveIt'),()=>instance.controller.move(n.id,s==='archived'?'restore':'archive'));
         cardAction(actions,t('delete'),()=>instance.controller.move(n.id,'trash'),'danger');
       }
+      if(s!=='trash'){
+        if(instance.adapter.openCalendarForNote)cardAction(actions,'📅',()=>instance.adapter.openCalendarForNote(n.id));
+        if(instance.adapter.pickNoteLinkTarget)cardAction(actions,t('link'),()=>{
+          const target=instance.adapter.pickNoteLinkTarget(n.id,instance.controller.read().notesList);
+          if(target!==null&&target!==undefined)instance.controller.link(n.id,target);
+        });
+        if(instance.adapter.confirmTaskExtraction && instance.adapter.commitBoth)
+          cardAction(actions,t('task'),()=>{
+            const state=instance.controller.read();const c=instance.controller.one(n.id,state.notesList);
+            if(instance.adapter.confirmTaskExtraction(n.id,c)===true)instance.controller.extract(n.id);
+          });
+      }
       card.appendChild(actions);box.appendChild(card);
     });
+    if(offset+result.items.length<result.total)button(box,'More / المزيد',()=>{instance.page++;renderStack();});
     return true;
   }
   function showReader(n){
     const dlg=document.getElementById('noteModal');openNoteModal(null,n.id);
     const preview=document.getElementById('nsux-preview');
+    dlg.classList.add('nsux-reading');
+    document.activeElement?.blur?.();
     preview.hidden=false;
     renderText(preview,n.body||'','');
     const ext=n.notesV21||{};
@@ -457,6 +477,12 @@
       const q=el('h4','',pair.question),answer=button(preview,t('review'),()=>{answer.textContent=pair.answer;});
       q.dir='auto';answer.dir='auto';preview.appendChild(q);
     });
+    const links=Array.isArray(ext.links)?ext.links:[];
+    if(links.length){preview.appendChild(el('h4','',t('linked')));links.forEach(id=>{
+      const target=instance.controller.read().notesList.find(x=>x?.id===id);
+      if(target)button(preview,target.title,()=>showReader(target));
+    });}
+    button(preview,t('edit'),()=>{dlg.classList.remove('nsux-reading');document.getElementById('inpNoteBody').focus();});
     dlg.querySelector('.ns-editor').scrollTop=0;
   }
   function mountFilters(){
@@ -478,7 +504,7 @@
     if(!adapter||typeof adapter.locale!=='function'||typeof adapter.notify!=='function')
       throw new Error('Notes UX requires locale and notification adapters');
     const controller=createController({...adapter,core:window.DeepFocusNotesCoreV21});
-    instance={adapter,controller};style();mountFilters();setupEditor();renderStack();return controller;
+    instance={adapter,controller,page:0,filterSignature:''};style();mountFilters();setupEditor();renderStack();return controller;
   }
   function onTemplate(kind){
     if(!instance)return;
