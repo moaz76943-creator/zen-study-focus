@@ -21,8 +21,12 @@ for(const hit of html.matchAll(tags)){
     handlers.push({line,tag:hit[1].toLowerCase(),id,event:evt[1],handler:evt[3],classification:'NEEDS_EVENT_QA'});
   }
 }
+// These legacy scripts publish function declarations globally. Other scripts are IIFEs/UMD
+// with private functions; treating their inner declarations as globals is a false collision.
+const legacyGlobalScripts=new Set(['app.js','notes_studio.js','quick_training.js','goals_studio.js','timer_settings.js','notes_drafts.js']);
 const symbols=new Map();
 for(const [file,js] of source){
+  if(!legacyGlobalScripts.has(file))continue;
   const regex=/(?:^|\n)\s*function\s+([A-Za-z_$][\w$]*)\s*\(/g;
   for(const m of js.matchAll(regex)){
     const entries=symbols.get(m[1])||[];entries.push(file);symbols.set(m[1],entries);
