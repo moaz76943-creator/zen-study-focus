@@ -36,8 +36,10 @@
     const items=validateTasks(tasks);
     if(!Number.isInteger(limit)||limit<1||limit>MAX_TASKS)throw Error('Invalid recommendation size');
     if(area!=='ALL'&&!AREAS.includes(area))throw Error('Invalid task area');
-    return items.filter(t=>(area==='ALL'||t.area===area)&&
-      ['BLOCKED','IN_PROGRESS','TODO'].includes(t.status)).slice(0,limit);
+    const actionable=items.filter(t=>(area==='ALL'||t.area===area)&&
+      ['BLOCKED','IN_PROGRESS','TODO'].includes(t.status));
+    const chosenArea=area==='ALL'?(actionable[0]?.area||'ALL'):area;
+    return actionable.filter(t=>chosenArea==='ALL'||t.area===chosenArea).slice(0,limit);
   }
   function selectTask(current,id,tasks,{max=MAX_TASKS}={}){
     const all=validateTasks(tasks);
@@ -46,6 +48,9 @@
       throw Error('Invalid selected task set');
     if(!ID.test(id)||!all.some(x=>x.id===id))throw Error('Unknown source-backed recovery task');
     if(current.includes(id))return current.filter(x=>x!==id);
+    const sourceArea=all.find(x=>x.id===id).area;
+    if(current.length&&all.find(x=>x.id===current[0])?.area!==sourceArea)
+      throw Error('Tasks in one batch must belong to the same area');
     if(current.length>=max)throw Error('Select at most '+max+' tasks per agent batch');
     return current.concat([id]);
   }
@@ -67,6 +72,8 @@
       if(!byId.has(id))throw Error('Task '+id+' is not present in the current ledger');
       return byId.get(id);
     });
+    if(new Set(selected.map(t=>t.area)).size!==1)
+      throw Error('Tasks in one batch must belong to the same area');
     const verified=SHA.test(sha||'')&&stale===false;
     const scope=verified?sha:'UNVERIFIED_OFFLINE';
     const lines=[
