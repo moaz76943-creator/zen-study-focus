@@ -187,3 +187,20 @@ Every successful Control Center Quality Audit run now generates a second artifac
 ### Known limits
 
 Live GitHub API and raw files still require an internet connection and may fail due to rate limits or browser file-origin restrictions. The static bundled ledger is a snapshot, not a substitute for a current audit. A linked GitHub Issue or Actions workflow still requires authorization in GitHub; the portable dashboard does not directly execute code patches, commit code, merge PRs or ship APKs.
+
+## V3.3 — Agent batch planner / handoff from 161 real recovery tasks
+
+The mobile dashboard now exposes **خطط عمل الوكلاء** as a separate workspace. It is an agent task composer, NOT an autonomous agent executor.
+
+- Select tasks directly from the actual `FINAL_MATRIX_161.md` record, search by ID/area/text, filter blocked/actionable/all and restrict the maximum batch to **six tasks**.
+- Use **اقتراح دفعة** to assemble up to four unfinished tasks from the selected area, or manually select up to six. Choose a specific lane (`qa`, `ui`, `audio`, `locale`, `analytics`, `data`) and target one of the six app screens.
+- Preview a deterministic Markdown handoff with exact task IDs, original quoted source wording, current/source SHA classification, reproduction and acceptance gates. It retains v21 storage and `ZEN21::` protection, 20 locales, Western generated numerals, media provenance, human PR review and accurate NOT_TESTED.
+- Copy the prompt to a connected Codex/Gemini worker, or **download Markdown**. These actions are entirely local; nothing was executed or pushed by clicking them.
+- For a fully verified live GitHub ledger, the **Issue** control opens a prefilled NEW GitHub issue page for the repository owner to review and submit. No issue is created merely by displaying the link, and opening/submitting an issue alone does not necessarily execute an AI worker.
+- For an offline embedded 161-task snapshot, partial GitHub API response, stale SHA, oversized issue URL or missing source SHA, automatic issue handoff is disabled. Copy and local Markdown download remain possible, explicitly labeled `UNVERIFIED_OFFLINE`.
+- On an actual source SHA change, the planner discards selected IDs rather than silently submitting a stale batch against a newer integration.
+- Task text is treated as **untrusted reference material**, never executable instructions. The composer quotes task titles/evidence and prevents embedded triple-backtick fences from changing document structure. Strictly defined lanes, screens, IDs and batch size cannot be replaced with arbitrary commands.
+
+Implementation: `docs/control-center/planner-core.js` (deterministic contracts), `docs/control-center/planner-ui.js` (accessible task buttons and local handoff), seven SHA256-CSP-pinned scripts in the portable HTML builder. Regression coverage: `tests/control_center/planner.test.cjs` and `tests/control_center/planner_dom.test.cjs`; CI additionally tests real desktop headless Chrome file:// DOM for the planner showing the 161-item ledger and a populated task selector.
+
+**No production Android functionality is changed by this planner.** The repository PR remains draft until reviewed; the phone artifact is a local developer tool and Chrome desktop smoke is not proof of real Android/WebView touch or full audio/data tests.
