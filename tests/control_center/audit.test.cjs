@@ -42,7 +42,7 @@ test('parseLedger ignores other table rows',()=>{
 test('source audit uses actual checked-out Git commit instead of PR merge event SHA',()=>{
   const checkout='b'.repeat(40),merge='a'.repeat(40);
   const actual=checkoutSha('/fixture',{GITHUB_EVENT_NAME:'pull_request',GITHUB_SHA:merge},
-    (cmd,args)=>{assert.equal(cmd,'git');assert.deepEqual(args,['rev-parse','HEAD']);return checkout+'\\n';});
+    (cmd,args)=>{assert.equal(cmd,'git');assert.deepEqual(args,['rev-parse','HEAD']);return checkout+'\n';});
   assert.equal(actual,checkout);
 });
 test('unreadable checkout never pretends PR event merge SHA is the audited source',()=>{
