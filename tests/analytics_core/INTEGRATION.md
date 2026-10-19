@@ -14,7 +14,7 @@ Task: `DEEP-FOCUS-05-REAL-ANALYTICS`. Base: `fix/v21-safe-release-recovery-20261
 - `yearHeatmap(snapshot,year,{domain?,today?})` -> full-year daily points (365 or 366) with zero-valued **empty dates**. Studio only visualizes after at least one validated session in that year.
 - `taskReport(tasksList,projects,today)` -> counts of non-starter unique **numeric-ID** tasks, completion, explicit dueDate-based overdue, optional grouped projects. Legacy task `date` is scheduling metadata and is **not** assumed to be a deadline. Starter examples and duplicates are excluded from dashboard counts but never deleted. Projects only exist as real objects supplied by a future tasks adapter; no guessed projects.
 - `toCSV(report,'sessions'|'daily'|'weekly'|'monthly')` -> RFC 4180 quoted values, CRLF, formula mitigation; unknown timestamps have empty cells. `onExport(csv,filename,mimeType)` hands the UTF-8 CSV to the integration layer.
-- `DeepFocusAnalyticsStudioV21.mount(element,snapshotOrProvider,opts)` -> `{refresh,getReport,destroy,element}`. Returns accessible, keyboard-selectable SVG bars + year heatmap, domain/date inputs, real KPI cards and a CSV action. Uses DOM text nodes for user-visible dynamic text. It does **not** install or replace the existing analytics section.
+- `DeepFocusAnalyticsStudioV21.mount(element,snapshotOrProvider,opts)` -> `{refresh,getReport,destroy,element}`. Returns accessible, keyboard-selectable SVG daily/weekly/monthly bars + year heatmap, aggregation/domain/date inputs, real KPI cards, project progress and a CSV action. Uses DOM text nodes for user-visible dynamic text. It does **not** install or replace the existing analytics section.
 
 ## Historical time integrity and policy
 - The original `date` is the credited local **calendar day**, never a reconstructed start time or a timestamp converted to another timezone. Multi-day real sessions remain attributed to the original credited date; no splitting is possible from legacy data.
@@ -34,7 +34,7 @@ node --test tests/analytics_core/*.test.cjs
 TZ=Asia/Amman node --test tests/analytics_core/*.test.cjs
 TZ=America/New_York node --test tests/analytics_core/*.test.cjs
 ```
-17 Node tests cover legacy sessions, invalid/missing data, typed IDs, duplicates, day/week/month aggregations, streaks, explicit goals, tasks/projects, leap-year heatmap, DST, midnight, timezone independence, safe CSV and SVG validation. Actual Android UI compatibility, availability of native CSV export, performance under large on-device history and integration with lane 00 remain separate gates; none are claimed proven by isolated Node tests.
+19 Node tests cover legacy sessions, invalid/missing data, typed IDs, duplicates, day/week/month aggregations, streaks, explicit goals, tasks/projects, leap-year heatmap, DST, midnight, timezone independence, safe CSV, SVG validation, day/week/month SVG grouping, mount, export and lifecycle. Actual Android UI compatibility, availability of native CSV export, performance under large on-device history and integration with lane 00 remain separate gates; none are claimed proven by isolated Node tests.
 
 ## Lane 00 handoff
 1. Merge after data-compat lane 01 or reconcile imports at a common baseline; modules themselves do not import it.
