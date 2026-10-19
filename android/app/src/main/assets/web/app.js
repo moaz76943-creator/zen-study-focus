@@ -1645,7 +1645,7 @@ function renderSoundsStudio() {
 
   const approved = SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id));
   const visible = approved.filter(s => soundCat === 'all' || s.cat === soundCat);
-  const filterBar = box.parentElement && box.parentElement.querySelector('.segmented-pills-bar');
+  const filterBar = box.parentElement && typeof box.parentElement.querySelector === 'function' ? box.parentElement.querySelector('.segmented-pills-bar') : null;
   if (filterBar) {
     const categories = ['all','water','forest','warm'];
     filterBar.querySelectorAll('.seg-pill').forEach((pill, index) => {
