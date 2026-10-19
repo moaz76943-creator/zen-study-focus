@@ -4,6 +4,7 @@ const NS_DRAFT_KEY='deep_focus_unsaved_note_draft_v1';
 const NS_DRAFT_LIMIT=100000; // bounded to avoid consuming all WebView storage
 let nsDraftTimer=null;
 let nsDraftDirty=false;
+let nsDraftLastState=[null,false];
 const NS_DRAFT_LANG={
  en:{saved:'Draft saved on this device',ready:'An unfinished draft is available',restore:'Restore draft',
  discard:'Discard',tooLong:'Draft exceeds autosave limit. Save this note directly.',restored:'Draft restored',
@@ -42,7 +43,9 @@ function nsDraftVersionMatches(d){
  if(!d||d.baseFingerprint===undefined||d.baseFingerprint===null)return true;
  return d.baseFingerprint===window.DeepFocusNotesEditorUI?.openedFingerprint?.();
 }
+function nsRefreshDraftLocale(){nsDraftState(...nsDraftLastState);}
 function nsDraftState(status,offer){
+ nsDraftLastState=[status,offer];
  const msg=document.getElementById('nsDraftStatus'),restore=document.getElementById('nsDraftRestore'),discard=document.getElementById('nsDraftDiscard');
  if(msg)msg.textContent=status?nsDraftLabel(status):'';
  if(restore){restore.hidden=!offer||status==='conflict';restore.textContent=nsDraftLabel('restore');}

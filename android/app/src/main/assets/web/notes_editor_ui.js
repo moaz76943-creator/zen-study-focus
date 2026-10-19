@@ -233,7 +233,7 @@
       draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes',
       copied:'Copied to clipboard',copyFailed:'Clipboard unavailable; content was not copied',
       missing:'Linked note unavailable',contents:'Contents',copyTxt:'Copy TXT',copyMd:'Copy Markdown',
-      more:'More actions',conflict:'This note changed since you opened it. Copy your edits or reopen the latest version before saving.'},
+      more:'More actions',list:'• List',conflict:'This note changed since you opened it. Copy your edits or reopen the latest version before saving.'},
     ar:{all:'كل الملاحظات',archive:'الأرشيف',trash:'سلة المحذوفات',notebooks:'الدفتر',tag:'الوسم',allbooks:'كل الدفاتر',
       alltags:'كل الوسوم',empty:'لا توجد ملاحظات في هذا العرض',focus:'تركيز الكتابة',normal:'إنهاء التركيز',read:'قراءة ومراجعة',
       edit:'تحرير',restore:'استعادة',delete:'نقل إلى السلة',purge:'حذف نهائي',archiveIt:'أرشفة',
@@ -245,7 +245,7 @@
       review:'المس الإجابة لإظهارها',draft:'المحتوى القديم محفوظ بمعزل عن كورنيل',filter:'تصفية',
       status:'الحالة',linked:'ملاحظات مرتبطة',copied:'تم النسخ إلى الحافظة',
       copyFailed:'الحافظة غير متاحة؛ لم يتم نسخ النص',missing:'الملاحظة المرتبطة غير متاحة',
-      contents:'المحتويات',copyTxt:'نسخ نص TXT',copyMd:'نسخ Markdown',more:'المزيد',conflict:'تغيرت هذه الملاحظة بعد فتحها. انسخ نصك أو حدّث الملاحظة قبل الحفظ.'}
+      contents:'المحتويات',copyTxt:'نسخ نص TXT',copyMd:'نسخ Markdown',more:'المزيد',list:'• قائمة',conflict:'تغيرت هذه الملاحظة بعد فتحها. انسخ نصك أو حدّث الملاحظة قبل الحفظ.'}
   };
   function t(key){return languages[instance&&instance.adapter.locale&&instance.adapter.locale()==='ar'?'ar':'en'][key]||key;}
   function style(){
@@ -281,12 +281,41 @@
     document.head.appendChild(s);
   }
   function field(parent,label,value,tag='input'){
-    const wrap=el('label','',label),input=el(tag,tag==='textarea'?'nsux-area':'');
+    const wrap=el('label'),caption=el('span','',label),input=el(tag,tag==='textarea'?'nsux-area':'');
+    wrap.appendChild(caption);
     if(tag==='textarea')input.rows=3;else input.type='text';
     input.value=value||'';input.dir='auto';wrap.appendChild(input);parent.appendChild(wrap);return input;
   }
   function button(parent,label,fn,extra){
     const b=el('button','nsux-btn'+(extra?' '+extra:''),label);b.type='button';b.addEventListener('click',fn);parent.appendChild(b);return b;
+  }
+  // Only explicitly owned UI labels are refreshed. Never inspect/rewrite user text.
+  function localizedElement(tag,cls,key){
+    const node=el(tag,cls,t(key));node.dataset.nsuxI18n=key;return node;
+  }
+  function localizedButton(parent,key,fn,extra){
+    const node=button(parent,t(key),fn,extra);node.dataset.nsuxI18n=key;return node;
+  }
+  function localizedField(parent,key,value,tag){
+    const input=field(parent,t(key),value,tag);
+    input.parentNode.firstChild.dataset.nsuxI18n=key;return input;
+  }
+  function refreshLocale(){
+    if(!instance)return;
+    document.querySelectorAll('[data-nsux-i18n]').forEach(node=>{node.textContent=t(node.dataset.nsuxI18n);});
+    if(typeof nsApplyLabels==='function')nsApplyLabels();
+    const modal=document.getElementById('noteModal');
+    if(modal?.classList.contains('open')){
+      document.getElementById('nsEditorHeading').textContent=nsLabel(typeof nsEditId==='number'?16:15);
+      document.getElementById('nsSaveButton').textContent=nsLabel(typeof nsEditId==='number'?26:25);
+      document.getElementById('nsux-focus-toggle').textContent=t(modal.classList.contains('nsux-focus')?'normal':'focus');
+      if(typeof nsUpdateCount==='function')nsUpdateCount();
+      if(typeof nsRefreshDraftLocale==='function')nsRefreshDraftLocale();
+    }
+    const status=document.getElementById('nsux-status');status.setAttribute('aria-label',t('status'));
+    document.getElementById('nsux-book-filter').setAttribute('aria-label',t('notebooks'));
+    document.getElementById('nsux-tag-filter').setAttribute('aria-label',t('tag'));
+    renderStack();
   }
   function renderText(container,text,query){
     container.replaceChildren();const needle=String(query||'').trim();
@@ -313,7 +342,7 @@
   function createPairs(parent,pairs){
     parent.replaceChildren();
     pairs.forEach((pair,i)=>{
-      const group=el('div','nsux-inline'),q=field(group,t('pairQ'),pair.question),a=field(group,t('pairA'),pair.answer);
+      const group=el('div','nsux-inline'),q=localizedField(group,'pairQ',pair.question),a=localizedField(group,'pairA',pair.answer);
       group.dataset.key=pair.key||'pair-'+i;
       button(group,'×',()=>{group.remove();schedule();},'danger');
       parent.appendChild(group);[q,a].forEach(input=>input.addEventListener('input',schedule));
@@ -328,42 +357,42 @@
     const body=document.getElementById('inpNoteBody');body.dir='auto';document.getElementById('inpNoteTitle').dir='auto';
     const toolbar=el('div','nsux-actions'),extra=el('div','nsux-extra');
     toolbar.id='nsux-tools';extra.id='nsux-fields';
-    const basic=[['heading','H1'],['bullet','• List'],['check','☐'],['number','1.'],['quote','❝']];
-    basic.forEach(([key,label])=>button(toolbar,label,()=>{
+    const basic=[['heading','H1'],['bullet',t('list')],['check','☐'],['number','1.'],['quote','❝']];
+    basic.forEach(([key,label])=>{const action=button(toolbar,label,()=>{
       if(document.activeElement!==body)body.focus();
       const pos=formatSelection(body.value,body.selectionStart,body.selectionEnd,key);
       if(pos.text.length>NOTE_LIMIT){instance.adapter.notify?.('Note exceeds maximum size');return;}
       body.value=pos.text;body.setSelectionRange(pos.cursorStart,pos.cursorEnd);body.focus();schedule();
       if(typeof nsUpdateCount==='function')nsUpdateCount();
-    }));
-    button(toolbar,t('done'),()=>{
+    });if(key==='bullet')action.dataset.nsuxI18n='list';});
+    localizedButton(toolbar,'done',()=>{
       const old=body.selectionStart,changed=toggleChecklistLine(body.value,old);
       if(!changed.changed)return;
       body.value=changed.text;body.focus();body.setSelectionRange(old,old);
       schedule();renderPreview();if(typeof nsUpdateCount==='function')nsUpdateCount();
     });
-    const view=button(toolbar,t('preview'),()=>togglePreview()),focus=button(toolbar,t('focus'),()=>toggleFocus());
+    const view=localizedButton(toolbar,'preview',()=>togglePreview()),focus=localizedButton(toolbar,'focus',()=>toggleFocus());
     view.id='nsux-preview-toggle';focus.id='nsux-focus-toggle';
-    const find=field(extra,t('find'),'');find.id='nsux-find';
+    const find=localizedField(extra,'find','');find.id='nsux-find';
     const status=el('div','nsux-meta');status.id='nsux-search-count';extra.appendChild(status);
-    button(extra,t('next'),()=>findNext());
+    localizedButton(extra,'next',()=>findNext());
     const preview=el('div','nsux-reader');preview.id='nsux-preview';preview.hidden=true;extra.appendChild(preview);
     const cornell=el('div','nsux-extra');cornell.id='nsux-cornell';extra.appendChild(cornell);
     instance.fields={
-      cues:field(cornell,t('question'),'', 'textarea'),
-      notes:field(cornell,t('explain'),'', 'textarea'),
-      summary:field(cornell,t('summary'),'', 'textarea'),
-      notebook:field(extra,t('book'),''),
-      tags:field(extra,t('tags'),'')
+      cues:localizedField(cornell,'question','', 'textarea'),
+      notes:localizedField(cornell,'explain','', 'textarea'),
+      summary:localizedField(cornell,'summary','', 'textarea'),
+      notebook:localizedField(extra,'book',''),
+      tags:localizedField(extra,'tags','')
     };
     const pairs=el('div','nsux-extra');pairs.id='nsux-recall';extra.appendChild(pairs);
     const pairList=el('div','nsux-extra');pairs.appendChild(pairList);instance.pairList=pairList;
-    button(pairs,t('addPair'),()=>{const c=[...instance.pairList.children].length;
+    localizedButton(pairs,'addPair',()=>{const c=[...instance.pairList.children].length;
       const a=collectPairs(true);a.push({key:'pair-'+Date.now()+'-'+c,question:'',answer:''});createPairs(instance.pairList,a);
       schedule();
     });
     const advanced=el('details','nsux-advanced');instance.advanced=advanced;
-    advanced.appendChild(el('summary','',t('more')));advanced.appendChild(extra);
+    advanced.appendChild(localizedElement('summary','','more'));advanced.appendChild(extra);
     body.parentNode.insertBefore(toolbar,body);document.getElementById('nsCounter').after(advanced);
     find.addEventListener('input',()=>{renderPreview();findNext(true);});
     body.addEventListener('input',()=>{renderPreview();});
@@ -519,7 +548,7 @@
     if(pinned)pinned.textContent=String(all.filter(n=>n.pinned).length);
     if(count)count.textContent=String(Math.min(offset+found.length,result.total))+' / '+result.total;
     box.replaceChildren();
-    if(!found.length){box.appendChild(el('div','nsux-blank',t('empty')));return true;}
+    if(!found.length){box.appendChild(localizedElement('div','nsux-blank','empty'));return true;}
     found.forEach(n=>{
       const card=el('article','nsux-card'),top=el('div','nsux-inline');
       top.appendChild(el('span','ns-type',typeof getNoteTagLabel==='function'?getNoteTagLabel(n.catKey):(n.catKey||'note')));
@@ -574,12 +603,12 @@
       card.appendChild(actions);
       if(secondary.children.length){
         const overflow=el('details','nsux-more');
-        overflow.appendChild(el('summary','',t('more')));
+        overflow.appendChild(localizedElement('summary','','more'));
         overflow.appendChild(secondary);card.appendChild(overflow);
       }
       box.appendChild(card);
     });
-    if(offset+result.items.length<result.total)button(box,t('more'),()=>{instance.page++;renderStack();});
+    if(offset+result.items.length<result.total)localizedButton(box,'more',()=>{instance.page++;renderStack();});
     return true;
   }
   function showReader(n){
@@ -593,7 +622,7 @@
     if(headings.length>1){
       const toc=el('nav','nsux-toc');
       toc.setAttribute('aria-label',t('contents'));
-      toc.appendChild(el('strong','',t('contents')));
+      toc.appendChild(localizedElement('strong','','contents'));
       headings.forEach(h=>button(toc,h.textContent,()=>h.scrollIntoView?.({block:'nearest'})));
       preview.prepend(toc);
     }
@@ -606,17 +635,17 @@
     const pairs=instance.controller.recall(n.id);
     pairs.forEach(pair=>{
       const q=el('h4','',pair.question);q.dir='auto';preview.appendChild(q);
-      const answer=button(preview,t('review'),()=>{answer.textContent=pair.answer;});answer.dir='auto';
+      const answer=localizedButton(preview,'review',()=>{answer.textContent=pair.answer;});answer.dir='auto';
     });
     const links=Array.isArray(ext.links)?ext.links:[];
-    if(links.length){preview.appendChild(el('h4','',t('linked')));links.forEach(id=>{
+    if(links.length){preview.appendChild(localizedElement('h4','','linked'));links.forEach(id=>{
       const target=instance.controller.read().notesList.find(x=>x?.id===id);
       if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
       else preview.appendChild(el('p','nsux-meta',t('missing')+' #'+id));
     });}
     const backlinks=instance.controller.backlinks(n.id);
     if(backlinks.length){
-      preview.appendChild(el('h4','',t('linked')));
+      preview.appendChild(localizedElement('h4','','linked'));
       backlinks.forEach(id=>{
         const target=instance.controller.read().notesList.find(x=>x?.id===id);
         if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
@@ -626,7 +655,7 @@
       const target=instance.controller.read().tasksList.find(x=>x&&x.id===id);
       if(target)preview.appendChild(el('p','',t('task')+': '+target.title));
     });
-    button(preview,t('edit'),()=>{dlg.classList.remove('nsux-reading');document.getElementById('inpNoteBody').focus();});
+    localizedButton(preview,'edit',()=>{dlg.classList.remove('nsux-reading');document.getElementById('inpNoteBody').focus();});
     dlg.querySelector('.ns-editor').scrollTop=0;
   }
   function mountFilters(){
@@ -634,8 +663,8 @@
     if(!notes||!box||document.getElementById('nsux-filters'))return;
     const root=el('div','nsux-controls');root.id='nsux-filters';
     const status=el('select');status.id='nsux-status';status.setAttribute('aria-label',t('status'));
-    [['active',t('all')],['archived',t('archive')],['trash',t('trash')]].forEach(([value,name])=>{
-      const op=el('option','',name);op.value=value;status.appendChild(op);
+    [['active','all'],['archived','archive'],['trash','trash']].forEach(([value,key])=>{
+      const op=localizedElement('option','',key);op.value=value;status.appendChild(op);
     });
     const book=el('select');book.id='nsux-book-filter';book.setAttribute('aria-label',t('notebooks'));
     const tag=el('select');tag.id='nsux-tag-filter';tag.setAttribute('aria-label',t('tag'));
@@ -657,5 +686,5 @@
   }
   return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,checklistProgress,serializeNote,
     draftVersionMatches,findOccurrences,renderText,openedFingerprint:()=>instance?.openedSnapshot??null,
-    install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader});
+    install,refreshLocale,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader});
 });

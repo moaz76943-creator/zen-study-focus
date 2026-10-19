@@ -526,7 +526,7 @@ function applyLanguage(code) {
   document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
   const tn = document.getElementById('navTrainingText');
-  if (tn) tn.textContent = meta.code === 'ar' ? 'تدريب' : 'Training';
+  if (tn) tn.textContent = typeof quickText === 'function' ? quickText('trainingTitle') : d.modeFocus;
   if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -903,7 +903,14 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 window.handleAndroidBack = function() {
   if (document.getElementById('deskClockOverlay').classList.contains('active')) { toggleDeskClock(false); return true; }
   const openM = document.querySelectorAll('.modal-overlay.open');
-  if (openM.length > 0) { openM.forEach(m => m.classList.remove('open')); return true; }
+  if (openM.length > 0) {
+    const top = openM[openM.length - 1];
+    if (top.id === 'noteModal' && typeof nsCloseEditor === 'function') {
+      // The native Back event is consumed even when the user keeps unsaved edits.
+      nsCloseEditor();
+    } else top.classList.remove('open');
+    return true;
+  }
   const timerTab = document.getElementById('sec-timer');
   if (timerTab && !timerTab.classList.contains('active')) {
     switchTab('sec-timer', document.getElementById('navTimer'));
@@ -911,6 +918,10 @@ window.handleAndroidBack = function() {
   }
   return false;
 };
+
+if (typeof document.addEventListener === 'function') document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && window.handleAndroidBack()) event.preventDefault();
+});
 
 let timerTotal = cfg.focusMin * 60;
 let timerLeft = timerTotal;
