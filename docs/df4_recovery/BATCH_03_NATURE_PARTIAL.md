@@ -1,0 +1,11 @@
+# Batch 3 — honest empty categories and safer live mixing (partial)
+
+Date: 2026-10-19. Base 20b1873. Existing forest/wind runtime allowlist retained; zero new recording approvals. This is not a restored rich library.
+
+Implemented: empty water/warm categories explain unavailable reviewed recordings in all 20 languages through existing DICT keys; each category shows its actual available count with LTR-isolated ASCII digits. The live mixer now applies independent requested levels through a summed gain cap of 0.85, initializes each new Audio at zero gain before setting the safe mix, releases resources on pagehide, and cleans up ended one-shots. Existing generation guards prevent stale media callbacks restarting stopped playback. No synthetic replacement, unverified asset activation, new schema or storage change.
+
+Verification: tests/integration_recovery/nature_runtime.test.cjs exercises actual live channel code with Audio mocks: independent volume, headroom, 0% mute, stop-one, stop-all, rapid toggles, page exit and blocked earth/waterfall/night. 2/2 PASS. Node smoke PASS. Updated desktop Playwright total 63 checks PASS, including all-20 empty states/counts, actual forest+wind simultaneous decode/playback, summed gain bound and stop-all. This is not 30-minute endurance, human listening, Android or Bluetooth proof.
+
+Actual FFprobe and full FFmpeg decode on 10 existing local original-catalog files: PASS; waterfall/night absent as reported. Nine alternative manifest entries absent from production packaging by design. Raw codec/sample/channel/duration/hash data: /workspace/scratch/df4-tests/nature-forensics.json. Decodable does not imply genuine nature, rights approval or listening quality. earth remains blocked (HVAC per prior evidence). Source licence/recording correspondence remains unresolved; #26 candidates stay quarantined. Existing two playable files also lack full original-to-derived hashes and Android listening approval for release.
+
+P0 blockers: rich original library, verified original acquisition/transformation chains, human listening and exact licence evidence, Android decode, long-loop quality/endurance, background/headphones/audio-focus behavior. Media release gate stays RED. No audio licence, manifest verified flag or approval rewritten.
