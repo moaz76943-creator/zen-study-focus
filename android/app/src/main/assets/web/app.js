@@ -11,11 +11,12 @@ function toWest(val) {
     .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
 }
 
+// Only explicitly marked numeric inputs are normalized. User notes/tasks are immutable text.
 document.addEventListener('input', (e) => {
-  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
-    const cleaned = toWest(e.target.value);
-    if (cleaned !== e.target.value) e.target.value = cleaned;
-  }
+  const field=e.target;
+  if (!field || field.tagName !== 'INPUT' || !field.hasAttribute('data-df-numeric-input')) return;
+  if (window.DeepFocusAsciiNumeralsV21) window.DeepFocusAsciiNumeralsV21.normalizeNumericInput(field);
+  else { const normalized=toWest(field.value); if(field.value!==normalized) field.value=normalized; }
 });
 
 /* ========================================================
@@ -726,32 +727,20 @@ function shareAppWithFriends() {
 /* ========================================================
    4. GUARANTEED COMPLETION CHIME & BACKGROUND ALARM
    ======================================================== */
-let chimeCtx = null;
-function playRichCompletionChime(titleText, skipNative = false) {
-  if (!skipNative && window.ZenNative && window.ZenNative.triggerCompletionSound) {
-    try { window.ZenNative.triggerCompletionSound(titleText || "Session Completed!"); } catch(e){}
+// The native background notification is a separate Android QA gate; avoid a second synthetic JS alarm.
+function playRichCompletionChime(_titleText, _skipNative=false, completedId=null, phase='focus') {
+  const alerts=window.DFRecoveryCompletion;
+  if (!alerts) return;
+  if (completedId !== null && completedId !== undefined) {
+    void alerts.complete({sessionId:completedId,phase:phase==='custom'?'custom':phase==='short'?'short':phase==='long'?'long':'focus'});
+  } else {
+    void alerts.preview();
   }
-  try {
-    if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (chimeCtx.state === 'suspended') chimeCtx.resume();
-    [528, 660, 792].forEach((freq, idx) => {
-      const osc = chimeCtx.createOscillator(), gain = chimeCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, chimeCtx.currentTime + idx * 0.35);
-      gain.gain.setValueAtTime(0.001, chimeCtx.currentTime + idx * 0.35);
-      gain.gain.exponentialRampToValueAtTime(0.65, chimeCtx.currentTime + idx * 0.35 + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, chimeCtx.currentTime + idx * 0.35 + 1.6);
-      osc.connect(gain); gain.connect(chimeCtx.destination);
-      osc.start(chimeCtx.currentTime + idx * 0.35);
-      osc.stop(chimeCtx.currentTime + idx * 0.35 + 1.6);
-    });
-  } catch (e) {}
-  if (navigator.vibrate) try { navigator.vibrate([300, 150, 300, 150, 500]); } catch (e) {}
 }
-
 function testCompletionSoundChime() {
-  playRichCompletionChime("Test Notification & Sound Alert 🔔");
-  showToast("🔔 Alarm & Notification Tested!");
+  const alerts=window.DFRecoveryCompletion;
+  if (alerts) { void alerts.preview(); }
+  else showToast('Completion alerts unavailable');
 }
 
 /* ========================================================
@@ -977,6 +966,7 @@ function creditCompletedSession() {
   try { document.dispatchEvent(new CustomEvent('deep-focus:session-recorded',{detail:{schemaVersion:1,...credited}})); } catch (e) {}
 }
 function finalizeTimerSession(shouldChime) {
+  const completedAlertId=timerSessionId, completedAlertPhase=currentTimerModeKey;
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = null;
   accumulateActiveTime();
@@ -985,14 +975,14 @@ function finalizeTimerSession(shouldChime) {
   creditCompletedSession();
   if(quickTraining?.active) {
     advanceQuickTrainingStep();
-    if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true);
+    if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true,completedAlertId,completedAlertPhase);
     // The next interval or a fresh focus timer was already selected.
     return;
   }
   storeTimerSession();
   updateTimerDisplay();
   document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-  if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent, true);
+  if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent, true,completedAlertId,completedAlertPhase);
   // Only real completed focus sessions advance the break cycle.
   if (['focus','custom'].includes(currentTimerModeKey)) {
     const longRest = cfg.focusCycleCount === 0;
@@ -1531,70 +1521,27 @@ function saveQuickDump(toTasks) {
    7. 12 PURE NATURE SOUNDS WITH PHOTOS & VOLUME SLIDERS
    ======================================================== */
 const SOUNDS_DATA = [
-  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
-  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
-  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/fire.ogg' },
-  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/forest_morning.ogg' },
-  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg', url: 'https://actions.google.com/sounds/v1/water/small_stream_flowing.ogg' },
-  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/outdoor_summer_ambience.ogg' },
-  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: 'sounds/waterfall.ogg', url: 'https://actions.google.com/sounds/v1/water/waterfall_medium.ogg' },
-  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: 'sounds/night.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/crickets_chirping.ogg' },
-  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg', url: 'https://actions.google.com/sounds/v1/weather/rolling_thunder.ogg' },
-  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg', url: 'https://actions.google.com/sounds/v1/weather/wind_blowing.ogg' },
-  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_on_rooftop.ogg' },
-  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: 'sounds/earth.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/ambient_hum_air_conditioner.ogg' }
+  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg' },
+  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg' },
+  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg' },
+  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg' },
+  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg' },
+  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg' },
+  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: 'sounds/waterfall.ogg' },
+  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: 'sounds/night.ogg' },
+  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg' },
+  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg' },
+  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg' },
+  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: 'sounds/earth.ogg' }
 ];
 
 let soundCat = 'all';
 const activePlayers = {};
 // A stale media error or delayed play promise may never restart a stopped tile.
 const soundGeneration = Object.create(null);
-let webAudioCtx = null;
-
-function createNatureSynthFallback(id, vol) {
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (!AudioCtx) throw new Error('Web Audio is unavailable');
-  if (!webAudioCtx) webAudioCtx = new AudioCtx();
-  if (webAudioCtx.state === 'suspended') webAudioCtx.resume();
-  const sr = webAudioCtx.sampleRate, len = Math.round(sr * 8);
-  const buf = webAudioCtx.createBuffer(1, len, sr);
-  const samples = buf.getChannelData(0);
-  let smoothed = 0, slow = 0;
-  // A local synthetic fallback, never represented as a field recording.
-  for (let i = 0; i < len; i++) {
-    const time = i / sr, noise = Math.random() * 2 - 1;
-    smoothed = smoothed * 0.92 + noise * 0.08;
-    slow = slow * 0.998 + noise * 0.002;
-    let value;
-    if (id === 'night') {
-      const chirp1 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 2.7 * time)), 9);
-      const chirp2 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 3.5 * time + 1.4)), 11);
-      value = Math.sin(2 * Math.PI * 3100 * time) * chirp1 * 0.09
-            + Math.sin(2 * Math.PI * 3900 * time) * chirp2 * 0.065
-            + smoothed * 0.16;
-    } else if (id === 'waterfall') {
-      const surge = 0.65 + 0.12 * Math.sin(2 * Math.PI * 0.19 * time);
-      value = (noise * 0.20 + smoothed * 1.15 + slow * 0.5) * surge;
-    } else {
-      value = smoothed * 0.85 + slow * 0.35;
-    }
-    samples[i] = Math.max(-0.8, Math.min(0.8, value));
-  }
-  const source = webAudioCtx.createBufferSource();
-  source.buffer = buf;
-  source.loop = true;
-  const filter = webAudioCtx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = id === 'night' ? 5500 : id === 'waterfall' ? 2600 : 650;
-  const gain = webAudioCtx.createGain();
-  gain.gain.value = Math.max(0, Math.min(1, vol)) * 0.55;
-  source.connect(filter); filter.connect(gain); gain.connect(webAudioCtx.destination);
-  source.start();
-  return {
-    pause: () => { try { source.stop(); source.disconnect(); filter.disconnect(); gain.disconnect(); } catch (e) {} },
-    setVol: v => gain.gain.setValueAtTime(Math.max(0, Math.min(1, v)) * 0.55, webAudioCtx.currentTime)
-  };
-}
+// Only these two files currently have individual CC0 provenance references in the v21 ledger.
+// Other catalogue items remain registered for recovery but unavailable until per-file rights and device listening are proven.
+const NATURE_APPROVED_FOR_PLAYBACK = new Set(['forest','wind']);
 
 function stopSoundTile(id) {
   soundGeneration[id] = (soundGeneration[id] || 0) + 1;
@@ -1606,55 +1553,31 @@ function stopSoundTile(id) {
 }
 
 function toggleSoundTile(id) {
-  const s = SOUNDS_DATA.find(x => x.id === id);
-  if (!s) return;
-  const sName = L().sounds[id] || id;
-  if (activePlayers[id]) {
-    stopSoundTile(id);
-    showToast(`⏹ ${sName}`);
-    renderSoundsStudio();
+  const s=SOUNDS_DATA.find(x=>x.id===id);
+  if(!s)return;
+  if(!NATURE_APPROVED_FOR_PLAYBACK.has(id)) {
+    showToast('Recording awaiting source and audio verification');
     return;
   }
-  const token = (soundGeneration[id] || 0) + 1;
-  soundGeneration[id] = token;
-  const audio = new Audio();
-  audio.loop = true;
-  audio.volume = s.vol;
-  audio.src = s.src;
-  let fallbackUsed = false;
-  const player = {
-    pause() { audio.onerror = null; audio.pause(); },
-    setVol(v) { audio.volume = v; }
+  const sName=L().sounds[id]||id;
+  if(activePlayers[id]){
+    stopSoundTile(id);showToast('⏹ '+sName);renderSoundsStudio();return;
+  }
+  const token=(soundGeneration[id]||0)+1;soundGeneration[id]=token;
+  const audio=new Audio();audio.loop=true;audio.preload='auto';audio.volume=s.vol;audio.src=s.src;
+  const player={pause(){audio.onerror=null;audio.onended=null;audio.pause();audio.removeAttribute('src');audio.load();},setVol(v){audio.volume=v;}};
+  activePlayers[id]=player;
+  const failure=()=>{
+    if(soundGeneration[id]!==token||activePlayers[id]!==player)return;
+    stopSoundTile(id);renderSoundsStudio();showToast('Recording unavailable — playback stopped');
   };
-  // Register synchronously before play() can reject or fire an error.
-  activePlayers[id] = player;
-  const activateFallback = () => {
-    if (fallbackUsed || soundGeneration[id] !== token || activePlayers[id] !== player) return;
-    fallbackUsed = true;
-    audio.onerror = null;
-    audio.pause();
-    try {
-      const fallback = createNatureSynthFallback(id, s.vol);
-      // Keep the same identity so late handlers can be invalidated safely.
-      player.pause = () => fallback.pause();
-      player.setVol = v => fallback.setVol(v);
-      showToast('⚠️ Local recording unavailable — synthesized ambience');
-    } catch (e) {
-      stopSoundTile(id);
-      showToast('⚠️ Audio output unavailable');
-    }
-    renderSoundsStudio();
-  };
-  audio.onerror = activateFallback;
-  try {
-    const playing = audio.play();
-    if (playing && typeof playing.then === 'function') {
-      playing.then(() => {
-        if (soundGeneration[id] === token && activePlayers[id] === player && !fallbackUsed)
-          showToast(`🔊 ${sName}`);
-      }).catch(activateFallback);
-    }
-  } catch (e) { activateFallback(); }
+  audio.onerror=failure;
+  try{
+    const result=audio.play();
+    if(result&&typeof result.then==='function')result.then(()=>{
+      if(soundGeneration[id]===token&&activePlayers[id]===player)showToast('🔊 '+sName);
+    }).catch(failure);
+  }catch(_){failure();}
   renderSoundsStudio();
 }
 
@@ -1669,8 +1592,8 @@ function setTileVolume(id, val) {
 
 function playPresetRelaxMix() {
   stopAllAudio();
-  toggleSoundTile('rain');
-  toggleSoundTile('fire');
+  toggleSoundTile('forest');
+  toggleSoundTile('wind');
 }
 function stopAllAudio() {
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
@@ -1689,7 +1612,7 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => soundCat === 'all' || s.cat === soundCat).forEach(s => {
+  SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id) && (soundCat === 'all' || s.cat === soundCat)).forEach(s => {
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
     const tile = document.createElement('div');
