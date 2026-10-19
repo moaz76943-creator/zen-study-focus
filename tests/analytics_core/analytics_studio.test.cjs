@@ -31,3 +31,25 @@ test('week and month aggregation keys are valid interactive SVG categories',()=>
  assert.match(monthly,/data-day="2026-10"/);
  assert.match(monthly,/32 min, 1 sessions/);
 });
+test('opt-in studio mounts without reading storage, changes grouping, exports and destroys',()=>{
+ const doc={createElement:tag=>{
+   const el={tagName:tag.toUpperCase(),children:[],style:{},value:'',
+     setAttribute(){},addEventListener(name,fn){(this.events||(this.events={}))[name]=fn;},
+     appendChild(child){this.children.push(child);if(this.tagName==='SELECT'&&!this.value)this.value=child.value;return child;},
+     replaceChildren(...xs){this.children=xs;},append(...xs){this.children.push(...xs);},
+     remove(){this.removed=true;}};
+   return el;
+ }};
+ const target={ownerDocument:doc,children:[],appendChild(x){this.children.push(x);}};
+ const source={cfg:{sessionHistory:[{id:'a',date:'2026-10-19',minutes:12,domain:'study'}]},tasksList:[]};
+ let exports=0;
+ const inst=S.mount(target,()=>source,{today:'2026-10-19',startDate:'2026-10-18',
+   endDate:'2026-10-19',onExport:(csv,name)=>{exports++;assert.match(csv,/2026-10-19/);assert.equal(name,'deep-focus-sessions.csv');}});
+ assert.equal(inst.getReport().totals.minutes,12);
+ const wrapper=target.children[0],filters=wrapper.children[1];
+ const selects=filters.children.filter(x=>x.tagName==='LABEL').flatMap(x=>x.children).filter(x=>x.tagName==='SELECT');
+ assert.equal(selects.length,2);selects[1].value='monthly';selects[1].events.change();
+ assert.equal(inst.getReport().monthly[0].minutes,12);
+ const exportButton=filters.children.find(x=>x.tagName==='BUTTON');exportButton.events.click();
+ assert.equal(exports,1);inst.destroy();assert.equal(wrapper.removed,true);
+});
