@@ -72,8 +72,11 @@
       body.append(el('strong',task.id),el('small',task.area+' · '+task.status),el('p',task.title));
       const button=el('button',selected.includes(task.id)?'إلغاء':'اختيار');
       button.type='button';button.setAttribute('aria-pressed',selected.includes(task.id)?'true':'false');
-      button.setAttribute('aria-label','اختيار مهمة '+task.id);
-      button.disabled=selected.length>=core.MAX_TASKS&&!selected.includes(task.id);
+      button.setAttribute('aria-label',(selected.includes(task.id)?'إلغاء اختيار':'اختيار')+' مهمة '+task.id);
+      const activeArea=tasks().find(x=>x.id===selected[0])?.area||null;
+      const otherArea=!!activeArea&&activeArea!==task.area&&!selected.includes(task.id);
+      button.disabled=otherArea||(selected.length>=core.MAX_TASKS&&!selected.includes(task.id));
+      if(otherArea)button.title='اختر مهام من المجال نفسه حتى لا تتداخل أعمال الوكلاء';
       button.addEventListener('click',()=>{
         try{
           const first=!selected.length;
