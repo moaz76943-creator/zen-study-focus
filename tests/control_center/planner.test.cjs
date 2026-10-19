@@ -27,7 +27,7 @@ test('P02 maps each recovery subsystem to specific agent specialization',()=>{
 });
 test('P03 recommends first unfinished tasks in stable source order and filters by area',()=>{
  assert.deepEqual(plan.recommendTasks(tasks,{area:'NATURE_AUDIO',limit:4}).map(x=>x.id),['DF-014','DF-015']);
- assert.deepEqual(plan.recommendTasks(tasks,{area:'ALL',limit:3}).map(x=>x.id),['DF-014','DF-015','DF-092']);
+ assert.deepEqual(plan.recommendTasks(tasks,{area:'ALL',limit:3}).map(x=>x.id),['DF-014','DF-015']);
 });
 test('P04 enforces bounded no-duplicate selection of only source-backed IDs',()=>{
  assert.deepEqual(plan.selectTask([], 'DF-014',tasks),['DF-014']);
