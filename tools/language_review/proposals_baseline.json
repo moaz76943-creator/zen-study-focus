@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "description": "Independent proposals, no automatic patch; null means not translated",
+  "policy": "Independent candidates, not applied; all suggestions require native review",
   "entries": [
     {
       "catalog": "analytics.recovery.ui",
@@ -8,80 +8,99 @@
       "english": "Recorded analytics",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تحليلات النشاط المسجّل",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Análisis registrados",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "已记录的分析",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "दर्ज किए गए आँकड़े",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Analyses enregistrées",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Erfasste Analysen",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Записанная аналитика",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Análises registradas",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "記録された分析",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Analitik tercatat",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kaydedilen analizler",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "기록된 분석",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Phân tích đã ghi nhận",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Analisi registrate",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "রেকর্ড করা বিশ্লেষণ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ریکارڈ شدہ تجزیات",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تحلیل‌های ثبت‌شده",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Zapisane statystyki",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Geregistreerde analyses",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.analyticsTitle"
         }
       },
       "reviewRequired": true
@@ -92,8 +111,9 @@
       "english": "Today",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "اليوم",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "tasks.studio.todayTab"
         },
         "es": {
           "suggestion": null,
@@ -428,80 +448,99 @@
       "english": "Sessions",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "الجلسات",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sesiones",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "会话",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "सत्र",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Séances",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sitzungen",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Сеансы",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sessões",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "セッション",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sesi",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Oturumlar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "세션",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Phiên",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sessioni",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "সেশন",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "سیشنز",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "جلسه‌ها",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sesje",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sessies",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.sessions"
         }
       },
       "reviewRequired": true
@@ -512,80 +551,99 @@
       "english": "Recorded minutes",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "الدقائق المسجّلة",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Minutos registrados",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "记录分钟数",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "दर्ज मिनट",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Minutes enregistrées",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Erfasste Minuten",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Записанные минуты",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Minutos registrados",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "記録した分数",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Menit tercatat",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kaydedilen dakika",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "기록된 분",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Số phút đã ghi",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Minuti registrati",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "রেকর্ড করা মিনিট",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ریکارڈ شدہ منٹ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "دقیقه‌های ثبت‌شده",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Zapisane minuty",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Geregistreerde minuten",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.minutes"
         }
       },
       "reviewRequired": true
@@ -1100,80 +1158,99 @@
       "english": "Activity",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "النشاط",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Actividad",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "活动",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "गतिविधि",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Activité",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Aktivität",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Активность",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Atividade",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "活動",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Aktivitas",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Etkinlik",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "활동",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Hoạt động",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Attività",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "কার্যকলাপ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "سرگرمی",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "فعالیت",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Aktywność",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Activiteit",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         }
       },
       "reviewRequired": true
@@ -1184,80 +1261,108 @@
       "english": "All",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "الكل",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Todo",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "全部",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "सभी",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "fr": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Tout",
+            "Toutes"
+          ]
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Alle",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Все",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "pt": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Todos",
+            "Tudo"
+          ]
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "すべて",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Semua",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Tümü",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "전체",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Tất cả",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "it": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Tutte",
+            "Tutti"
+          ]
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "সব",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تمام",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "همه",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Wszystkie",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Alles",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterAll"
         }
       },
       "reviewRequired": true
@@ -1269,79 +1374,116 @@
       "translations": {
         "ar": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "الدراسة",
+            "دراسة"
+          ]
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Estudio",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "学习",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "अध्ययन",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Étude",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "de": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Lernen",
+            "Studium"
+          ]
         },
         "ru": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Учеба",
+            "Учёба"
+          ]
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Estudo",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "学習",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Belajar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "tr": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Ders",
+            "Çalışma"
+          ]
         },
         "ko": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "공부",
+            "학습"
+          ]
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Học tập",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Studio",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "পড়াশোনা",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "مطالعہ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "مطالعه",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nauka",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "nl": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Studeren",
+            "Studie"
+          ]
         }
       },
       "reviewRequired": true
@@ -1353,79 +1495,110 @@
       "translations": {
         "ar": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "القراءة",
+            "قراءة"
+          ]
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lectura",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "阅读",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "hi": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "पठन",
+            "पढ़ना"
+          ]
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lecture",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lesen",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Чтение",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Leitura",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "読書",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Membaca",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Okuma",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "독서",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Đọc sách",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lettura",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "পড়া",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "ur": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "مطالعۂ کتب",
+            "پڑھائی"
+          ]
         },
         "fa": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "خواندن",
+            "کتاب‌خوانی"
+          ]
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Czytanie",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lezen",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         }
       },
       "reviewRequired": true
@@ -1437,79 +1610,101 @@
       "translations": {
         "ar": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "العمل",
+            "عمل"
+          ]
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Trabajo",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "工作",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "काम",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Travail",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Arbeit",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Работа",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Trabalho",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "仕事",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Bekerja",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "İş",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "업무",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Làm việc",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lavoro",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "কাজ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "کام",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "کار",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Praca",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Werk",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         }
       },
       "reviewRequired": true
@@ -1604,80 +1799,99 @@
       "english": "From",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "من",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Desde",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "从",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "से",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Du",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Von",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "С",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "De",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "開始",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Dari",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Başlangıç",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "시작",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Từ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Da",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "থেকে",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "سے",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "از",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Od",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Van",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.from"
         }
       },
       "reviewRequired": true
@@ -1688,80 +1902,99 @@
       "english": "To",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "إلى",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Hasta",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "至",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "तक",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Au",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Bis",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "По",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Até",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "終了",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sampai",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Bitiş",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "종료",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Đến",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "A",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "পর্যন্ত",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تک",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تا",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Do",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Tot",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.to"
         }
       },
       "reviewRequired": true
@@ -2192,80 +2425,99 @@
       "english": "Export CSV",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تصدير CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Exportar CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "导出 CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "CSV निर्यात करें",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Exporter en CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "CSV exportieren",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Экспорт CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Exportar CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "CSV を出力",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Ekspor CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "CSV dışa aktar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "CSV 내보내기",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Xuất CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Esporta CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "CSV রপ্তানি",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "CSV برآمد کریں",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "خروجی CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Eksportuj CSV",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "CSV exporteren",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.export"
         }
       },
       "reviewRequired": true
@@ -3200,80 +3452,99 @@
       "english": "Activity",
       "translations": {
         "ar": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "النشاط",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Actividad",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "活动",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "गतिविधि",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Activité",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Aktivität",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Активность",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Atividade",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "活動",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Aktivitas",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Etkinlik",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "활동",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Hoạt động",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Attività",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "কার্যকলাপ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "سرگرمی",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "فعالیت",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Aktywność",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Activiteit",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.activity"
         }
       },
       "reviewRequired": true
@@ -3868,7 +4139,7 @@
     },
     {
       "catalog": "sounds.alerts",
-      "key": ".0.label",
+      "key": "silent",
       "english": "Complete silence",
       "translations": {
         "ar": {
@@ -3952,7 +4223,7 @@
     },
     {
       "catalog": "sounds.alerts",
-      "key": ".1.label",
+      "key": "soft-bell",
       "english": "Soft single bell",
       "translations": {
         "ar": {
@@ -4036,7 +4307,7 @@
     },
     {
       "catalog": "sounds.alerts",
-      "key": ".2.label",
+      "key": "wood-tap",
       "english": "Gentle wooden tap",
       "translations": {
         "ar": {
@@ -4120,7 +4391,7 @@
     },
     {
       "catalog": "sounds.alerts",
-      "key": ".3.label",
+      "key": "water-drop",
       "english": "Water drop",
       "translations": {
         "ar": {
@@ -4204,7 +4475,7 @@
     },
     {
       "catalog": "sounds.alerts",
-      "key": ".4.label",
+      "key": "muted-metal",
       "english": "Muted metallic strike",
       "translations": {
         "ar": {
@@ -4288,7 +4559,7 @@
     },
     {
       "catalog": "sounds.alerts",
-      "key": ".5.label",
+      "key": "two-taps",
       "english": "Two soft wooden taps",
       "translations": {
         "ar": {
@@ -4696,76 +4967,94 @@
       "english": "Quick training",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Entrenamiento rápido",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "快速训练",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "त्वरित प्रशिक्षण",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Entraînement rapide",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Schnelltraining",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Быстрая тренировка",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Treino rápido",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "クイックトレーニング",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Latihan cepat",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Hızlı antrenman",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "빠른 운동",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Luyện tập nhanh",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Allenamento rapido",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "দ্রুত অনুশীলন",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "فوری تربیت",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تمرین سریع",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Szybki trening",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Snelle training",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.training.quickTraining"
         }
       },
       "reviewRequired": true
@@ -6456,76 +6745,94 @@
       "english": "Work",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Trabajo",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "工作",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "काम",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Travail",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Arbeit",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Работа",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Trabalho",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "仕事",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Bekerja",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "İş",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "업무",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Làm việc",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lavoro",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "কাজ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "کام",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "کار",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Praca",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Werk",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         }
       },
       "reviewRequired": true
@@ -6696,76 +7003,94 @@
       "english": "Completed",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Completado",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "已完成",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "पूर्ण",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Terminées",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Erledigt",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Завершено",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Concluídos",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "完了",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Selesai",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Tamamlandı",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "완료",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Đã xong",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Completati",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "সম্পন্ন",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "مکمل",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تکمیل‌شده",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Ukończone",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Voltooid",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         }
       },
       "reviewRequired": true
@@ -8456,76 +8781,94 @@
       "english": "New note",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nueva nota",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "新建笔记",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "नया नोट",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nouvelle note",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Neue Notiz",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Новая заметка",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nova nota",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "新しいノート",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Catatan baru",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Yeni not",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "새 노트",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Ghi chú mới",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nuova nota",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "নতুন নোট",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "نیا نوٹ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "یادداشت جدید",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nowa notatka",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nieuwe notitie",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.notes.newNote"
         }
       },
       "reviewRequired": true
@@ -9736,76 +10079,94 @@
       "english": "Calendar",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "日历",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "कैलेंडर",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kalender",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Календарь",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "カレンダー",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kalender",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Takvim",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "캘린더",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lịch",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ক্যালেন্ডার",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "کیلنڈر",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تقویم",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kalendarz",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         }
       },
       "reviewRequired": true
@@ -14216,76 +14577,94 @@
       "english": "New task",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nueva tarea",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "新建任务",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "नया कार्य",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nouvelle tâche",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Neue Aufgabe",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Новая задача",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nova tarefa",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "新しいタスク",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Tugas baru",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Yeni görev",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "새 할 일",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nhiệm vụ mới",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nuova attività",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "নতুন কাজ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "نیا کام",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "وظیفه جدید",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nowe zadanie",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nieuwe taak",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.tasks.newTask"
         }
       },
       "reviewRequired": true
@@ -14856,76 +15235,94 @@
       "english": "Calendar",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "日历",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "कैलेंडर",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kalender",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Календарь",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "カレンダー",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kalender",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Takvim",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "캘린더",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lịch",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ক্যালেন্ডার",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "کیلنڈر",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تقویم",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kalendarz",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Agenda",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.calendar.navCalendar"
         }
       },
       "reviewRequired": true
@@ -16136,76 +16533,94 @@
       "english": "Save",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Guardar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "保存",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "सहेजें",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Enregistrer",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Speichern",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Сохранить",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Salvar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "保存",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Simpan",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kaydet",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "저장",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lưu",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Salva",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "সংরক্ষণ করুন",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "محفوظ کریں",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ذخیره",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Zapisz",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Opslaan",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         }
       },
       "reviewRequired": true
@@ -16216,76 +16631,100 @@
       "english": "Cancel",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Cancelar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "取消",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "रद्द करें",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Annuler",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Abbrechen",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Отмена",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Cancelar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "キャンセル",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Batal",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "İptal",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "취소",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Hủy",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Annulla",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "bn": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "বাতিল",
+            "বাতিল করুন"
+          ]
         },
         "ur": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "منسوخ",
+            "منسوخ کریں"
+          ]
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "لغو",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Anuluj",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Annuleren",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.settings.btnCancel"
         }
       },
       "reviewRequired": true
@@ -17096,76 +17535,109 @@
       "english": "Study",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Estudio",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "学习",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "अध्ययन",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Étude",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "de": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Lernen",
+            "Studium"
+          ]
         },
         "ru": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Учеба",
+            "Учёба"
+          ]
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Estudo",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "学習",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Belajar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "tr": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Ders",
+            "Çalışma"
+          ]
         },
         "ko": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "공부",
+            "학습"
+          ]
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Học tập",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Studio",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "পড়াশোনা",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "مطالعہ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "مطالعه",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Nauka",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domStudy"
         },
         "nl": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "Studeren",
+            "Studie"
+          ]
         }
       },
       "reviewRequired": true
@@ -17176,76 +17648,94 @@
       "english": "Fitness",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Ejercicio",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "锻炼",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "व्यायाम",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sport",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sport",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Спорт",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Exercício",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "運動",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Olahraga",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Spor",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "운동",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Thể thao",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sport",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ব্যায়াম",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ورزش",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ورزش",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sport",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Sport",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.fitness"
         }
       },
       "reviewRequired": true
@@ -17256,76 +17746,103 @@
       "english": "Reading",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lectura",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "阅读",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "hi": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "पठन",
+            "पढ़ना"
+          ]
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lecture",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lesen",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Чтение",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Leitura",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "読書",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Membaca",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Okuma",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "독서",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Đọc sách",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lettura",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "পড়া",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "ur": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "مطالعۂ کتب",
+            "پڑھائی"
+          ]
         },
         "fa": {
           "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "status": "AMBIGUOUS_REUSE_NEEDS_REVIEW",
+          "alternatives": [
+            "خواندن",
+            "کتاب‌خوانی"
+          ]
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Czytanie",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lezen",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.goals.domRead"
         }
       },
       "reviewRequired": true
@@ -17336,76 +17853,94 @@
       "english": "Work",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Trabajo",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "工作",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "काम",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Travail",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Arbeit",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Работа",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Trabalho",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "仕事",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Bekerja",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "İş",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "업무",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Làm việc",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lavoro",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "কাজ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "کام",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "کار",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Praca",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Werk",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.work"
         }
       },
       "reviewRequired": true
@@ -18056,76 +18591,94 @@
       "english": "Daily",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Diario",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "每日",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "दैनिक",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Quotidien",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Täglich",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "По дням",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Diário",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "日別",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Harian",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Günlük",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "일별",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Hằng ngày",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Giornaliero",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "দৈনিক",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "روزانہ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "روزانه",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Dziennie",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Dagelijks",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.daily"
         }
       },
       "reviewRequired": true
@@ -18136,76 +18689,94 @@
       "english": "Weekly",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Semanal",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "每周",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "साप्ताहिक",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Hebdomadaire",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Wöchentlich",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "По неделям",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Semanal",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "週別",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Mingguan",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Haftalık",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "주별",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Hằng tuần",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Settimanale",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "সাপ্তাহিক",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ہفتہ وار",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "هفتگی",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Tygodniowo",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Wekelijks",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.weekly"
         }
       },
       "reviewRequired": true
@@ -18216,76 +18787,94 @@
       "english": "Monthly",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Mensual",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "每月",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "मासिक",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Mensuel",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Monatlich",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "По месяцам",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Mensal",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "月別",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Bulanan",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Aylık",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "월별",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Hằng tháng",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Mensile",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "মাসিক",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ماہانہ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ماهانه",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Miesięcznie",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Maandelijks",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "analytics.dictionary.monthly"
         }
       },
       "reviewRequired": true
@@ -19576,76 +20165,94 @@
       "english": "Completed",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Completado",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "已完成",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "पूर्ण",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Terminées",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Erledigt",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Завершено",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Concluídos",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "完了",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Selesai",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Tamamlandı",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "완료",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Đã xong",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Completati",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "সম্পন্ন",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "مکمل",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تکمیل‌شده",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Ukończone",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Voltooid",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         }
       },
       "reviewRequired": true
@@ -21336,76 +21943,94 @@
       "english": "completed",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Completado",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "已完成",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "पूर्ण",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Terminées",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Erledigt",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Завершено",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Concluídos",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "完了",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Selesai",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Tamamlandı",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "완료",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Đã xong",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Completati",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "সম্পন্ন",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "مکمل",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "تکمیل‌شده",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Ukończone",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Voltooid",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.tasks.filterDone"
         }
       },
       "reviewRequired": true
@@ -21496,76 +22121,94 @@
       "english": "This week",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Esta Semana",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "本周",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "इस सप्ताह",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Cette semaine",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Diese Woche",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Эта неделя",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Esta semana",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "今週",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Minggu ini",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Bu hafta",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "이번 주",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Tuần này",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Questa settimana",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "এই সপ্তাহ",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "اس ہفتے",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "این هفته",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Ten tydzień",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Deze week",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "core.analytics.badgeThisWeek"
         }
       },
       "reviewRequired": true
@@ -22376,76 +23019,94 @@
       "english": "Save",
       "translations": {
         "es": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Guardar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "zh": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "保存",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "hi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "सहेजें",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "fr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Enregistrer",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "de": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Speichern",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "ru": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Сохранить",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "pt": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Salvar",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "ja": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "保存",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "id": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Simpan",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "tr": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Kaydet",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "ko": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "저장",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "vi": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Lưu",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "it": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Salva",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "bn": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "সংরক্ষণ করুন",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "ur": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "محفوظ کریں",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "fa": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "ذخیره",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "pl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Zapisz",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         },
         "nl": {
-          "suggestion": null,
-          "status": "NEEDS_TRANSLATION"
+          "suggestion": "Opslaan",
+          "status": "REUSE_CANDIDATE_NEEDS_REVIEW",
+          "provenance": "premium.dialogs.save"
         }
       },
       "reviewRequired": true
@@ -22613,7 +23274,7 @@
     {
       "catalog": "analytics.studio",
       "key": "labels",
-      "english": "Legacy analytics studio labels",
+      "english": "English-only / Arabic-only inline analytics labels",
       "translations": {
         "es": {
           "suggestion": null,
@@ -22690,5 +23351,7 @@
       },
       "reviewRequired": true
     }
-  ]
+  ],
+  "baselineSha": "0dd9239bc28978e11f41c1c0f618c9662b291fe2",
+  "checkedGapCount": 5110
 }
