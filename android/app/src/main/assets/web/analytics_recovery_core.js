@@ -31,13 +31,13 @@
   const mode=typeof s.mode==='string'?s.mode.toLowerCase():'';
   const type=typeof s.type==='string'?s.type.toLowerCase():'';
   const status=typeof s.status==='string'?s.status.toLowerCase():'';
-  return ['rest','break','shortbreak','longbreak','short-rest','long-rest','pause'].includes(mode)||
+  return ['rest','break','shortbreak','longbreak','short_break','long_break','short-rest','long-rest','pause'].includes(mode)||
    ['rest','break'].includes(type)||
-   ['cancelled','canceled','in-progress','in_progress','running','paused','failed','aborted','unfinished','active','pending','incomplete','rest','break'].includes(status);
+   ['cancelled','canceled','in-progress','in_progress','running','paused','failed','aborted','unfinished','active','pending','incomplete','interrupted','stopped','skipped','discarded','rest','break'].includes(status);
  }
  function timestamp(v){
   if(typeof v==='number')return Number.isSafeInteger(v)&&v>=0?v:null;
-  if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(v))return null;
+  if(typeof v!=='string'||!validDay(v.slice(0,10))||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(v))return null;
   const n=Date.parse(v);return Number.isFinite(n)?n:null;
  }
  function normalizeSessions(raw){
@@ -64,11 +64,6 @@
    }
    if(!own(ALIAS,s.domain)){addReject(i,'INVALID_DOMAIN');continue;}
    const domain=ALIAS[s.domain];
-   const previously=seen.get(id);
-   if(previously){
-    const same=previously.date===s.date&&previously.minutes===s.minutes&&previously.domain===domain;
-    addReject(i,same?'DUPLICATE_ID':'CONFLICTING_DUPLICATE');continue;
-   }
    const start=timestamp(s.startedAt),end=timestamp(s.endedAt);
    const verified=s.timeEvidence==='timer-monotonic-v1'&&start!==null&&end!==null&&
     end>=start&&end-start<=86400000;
@@ -76,6 +71,12 @@
     startedAt:verified?new Date(start).toISOString():null,
     endedAt:verified?new Date(end).toISOString():null,
     timingVerified:verified,taskId:Number.isSafeInteger(s.taskId)&&s.taskId>=0?s.taskId:null};
+   const previously=seen.get(id);
+   if(previously){
+    const same=['date','minutes','domain','startedAt','endedAt','timingVerified','taskId']
+      .every(key=>previously[key]===row[key]);
+    addReject(i,same?'DUPLICATE_ID':'CONFLICTING_DUPLICATE');continue;
+   }
    sessions.push(row);seen.set(id,row);
    if(!verified)quality.legacyUnverified++;
   }
@@ -147,12 +148,13 @@
   const norm=normalizeSessions(source);
   const usable=norm.sessions.filter(s=>domain==='all'||domain===s.domain);
   const rows=usable.filter(s=>s.date>=start&&s.date<=end);
-  const linkedCounts=new Map();
+  const linkedCounts=new Map(),linkedEligible=new Set();
   for(const t of (Array.isArray(snapshot.tasksList)?snapshot.tasksList:[])){
-   if(rec(t)&&Number.isSafeInteger(t.id)&&t.id>=0&&!rejectsSample(t)&&t.archived!==true)
-    linkedCounts.set(t.id,(linkedCounts.get(t.id)||0)+1);
+   if(!rec(t)||!Number.isSafeInteger(t.id)||t.id<0)continue;
+   linkedCounts.set(t.id,(linkedCounts.get(t.id)||0)+1);
+   if(!rejectsSample(t)&&t.archived!==true)linkedEligible.add(t.id);
   }
-  const linked=new Set([...linkedCounts].filter(([,count])=>count===1).map(([id])=>id));
+  const linked=new Set([...linkedEligible].filter(id=>linkedCounts.get(id)===1));
   const sessions=rows.map(s=>({...s,taskId:s.taskId!==null&&linked.has(s.taskId)?s.taskId:null}));
   const byDay=new Map(aggregate(sessions,s=>s.date).map(v=>[v.key,v]));
   const daily=Array.from({length:days},(_,i)=>{
