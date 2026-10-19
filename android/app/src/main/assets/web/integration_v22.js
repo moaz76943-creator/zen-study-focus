@@ -145,6 +145,7 @@
       readState:() => {const x=current();return {cfg:x.cfg,tasksList:x.tasksList};},
       commit:fromTaskEdit,locale:cfg.lang,now:()=>new Date(),
       noteIds:() => notesList.map(n=>n.id),
+      requestText:label => root.prompt(label),
       linkTaskToTimer:id => {
         if (typeof focusWorkflowLinkTask !== 'function' || !focusWorkflowLinkTask(id)) return false;
         focusOnTask(id);return true;
