@@ -78,7 +78,15 @@ async function main(){
   const ws=await openWebSocket(target.webSocketDebuggerUrl);
   try{
     report.protocol={runtime:await query(ws,null,'Runtime.enable')};
-    const dom=await query(ws,expression);
+    let dom;
+    const deadline=Date.now()+45000;
+    report.readiness=[];
+    do {
+      dom=await query(ws,expression);
+      report.readiness.push({ready:dom?.ready||null,timerSection:!!dom?.timerSection,playButton:!!dom?.playButton});
+      if(dom?.ready==='complete')break;
+      await pause(1000);
+    } while(Date.now()<deadline);
     report.dom=dom;
     if(!dom||dom.ready!=='complete'||!dom.timerSection||!dom.playButton||
       !dom.playVisible||!dom.toggleAvailable||!dom.appScriptAvailable){
