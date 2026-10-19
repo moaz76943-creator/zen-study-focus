@@ -1,0 +1,70 @@
+name: DF4 Android disposable E2E
+on:
+  push:
+    branches:
+      - qa/df4-android-e2e-20261019
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: df4-android-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android-black-box:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - name: Checkout exact QA SHA
+        uses: actions/checkout@v4
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install Android SDK 36
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - name: Source-level E2E harness tests (NOT Android PASS)
+        run: |
+          node --test tests/android_e2e_recovery/inventory.test.cjs
+          python3 -m unittest discover -s tests/android_e2e_recovery -p 'test_*.py' -v
+      - name: Build disposable Debug APK at exact SHA
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Enable hardware acceleration on ephemeral hosted runner
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run Android UIAutomator cases on fresh emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            test -s android/app/build/outputs/apk/debug/app-debug.apk
+            serial="$(adb devices | awk '$1 ~ /^emulator-/ && $2 == "device" {print $1; exit}')"
+            test -n "$serial"
+            adb -s "$serial" install -r android/app/build/outputs/apk/debug/app-debug.apk
+            # Emulator is newly provisioned; never connect to the owner's phone/profile.
+            python3 tests/android_e2e_recovery/run_e2e.py --serial "$serial" --ack-disposable-data --json tests/android_e2e_recovery/results.local.json
+      - name: Upload exact-result Android QA JSON (including failures)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DF4-Android-E2E-Results-${{ github.sha }}
+          if-no-files-found: warn
+          path: tests/android_e2e_recovery/results.local.json
