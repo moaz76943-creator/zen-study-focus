@@ -101,8 +101,12 @@ test('quick workflow only binds real numeric task IDs and restores that link wit
   x.eval('applyQuickTrainingPreset("tabata")');
   x.eval('startQuickTraining()');
   assert.equal(x.eval('quickTraining.taskId'),123);
-  assert.equal(x.eval('validQuickSnapshot(quickTraining).taskId'),123);
-  assert.equal(x.eval('validQuickSnapshot({...quickTraining,taskId:"task_123"}).taskId'),null);
+  const snapshot=x.eval('validQuickSnapshot(quickTraining)');
+  assert.ok(snapshot,'Real active workout snapshot rejected: '+x.eval('JSON.stringify(quickTraining)'));
+  assert.equal(snapshot.taskId,123);
+  const forged=x.eval('validQuickSnapshot({...quickTraining,taskId:"task_123"})');
+  assert.ok(forged,'Task-link identity must be sanitized, not discard the valid interval');
+  assert.equal(forged.taskId,null);
   assert.equal(x.eval('parseQuickTime("03:99")'),null);
 });
 
