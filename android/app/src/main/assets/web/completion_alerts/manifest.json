@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "format": "wav/pcm_s16le/mono/44100",
+  "offline": true,
+  "license": "CC0-1.0",
+  "assets": [
+    {
+      "id": "soft-bell",
+      "path": "soft_bell.wav",
+      "source": "sgossner/VCSL/Idiophones/Struck Idiophones/Hand Bells, Nepalese/HB_2.wav",
+      "source_sha256": "e201ef095eac406a1bd5a9ec774229b57f40407d633e6dbeed53c67ebb973d56",
+      "sha256": "03e33e52c031b71b281f861ab0486255848b2f86a44d3be9592f8ec4fffccd6c",
+      "duration_sec": 1.269
+    },
+    {
+      "id": "wood-tap",
+      "path": "wood_tap.wav",
+      "source": "sgossner/VCSL/Idiophones/Struck Idiophones/Claves/Legacy/claves_pp1.wav",
+      "source_sha256": "0e6cd83418789c62e53520f6e569a4875ceb57d1fb1e6c87ed113619a13ed64e",
+      "sha256": "539bbd48544b5c889067d8ec3295d275cd5e7ec30c78456625650053897e67fd",
+      "duration_sec": 0.145
+    },
+    {
+      "id": "water-drop",
+      "path": "water_drop.wav",
+      "source": "Lelio88/dewdrop/android/app/src/main/res/raw/drop.wav",
+      "source_sha256": "ebaa9f0bb4b077e7d222048409b770437119e4720648cd79ccd600f125a6cbe8",
+      "sha256": "ba93ada730e9ede0bc89b4325f76a4290af400042af47c3964a9db1180cd9cfe",
+      "duration_sec": 0.451
+    },
+    {
+      "id": "muted-metal",
+      "path": "muted_metal.wav",
+      "source": "sgossner/VCSL/Idiophones/Struck Idiophones/Cowbells/Cowbell1_Muted_v2_rr1_Mid.wav",
+      "source_sha256": "efc17778d7cd4468f73b16842beef740fd64e046ce4dccf927c7c1fb230e6ef6",
+      "sha256": "2e2ed79bfe0378cc10ddb4c823cf1c4e8799ae3bf4f5cbba17281bf6a64d0963",
+      "duration_sec": 1.058
+    },
+    {
+      "id": "two-taps",
+      "path": "two_taps.wav",
+      "source": "sgossner/VCSL/Idiophones/Struck Idiophones/Claves/Legacy/claves_mf_2.wav",
+      "source_sha256": "a95a65360741f0f8a75720bc9bc83ee8281c8453193b59def2df9056b969c8ec",
+      "sha256": "0b5246fecaf2020a86ecacab8583061cbd88d47a3b7be44cde0d0d283d5e8f91",
+      "duration_sec": 1.054
+    }
+  ]
+}
