@@ -40,3 +40,19 @@ test('ambiguous imported IDs never write even a journal',()=>{
  const r=rig();r.incoming.tasksList.push({...r.incoming.tasksList[0]});
  assert.equal(r.run('verifyAndRestoreBackupCode('+JSON.stringify(r.code(r.incoming))+')'),false);assert.deepEqual(r.writes,[]);
 });
+
+test('timer credit uses actual journal and survives mirror failure with retry exactly once',()=>{
+ const r=rig(),before=[...r.packets];
+ Object.assign(r.c,{currentTimerModeKey:'focus',timerSessionId:'synthetic-completion',timerActiveMs:60000,
+   quickTraining:null,focusSessionTaskId:1,localDateISO:()=> '2026-10-20',
+   computeActualStreak:()=>1,syncHeaderMetrics(){}});
+ r.run(app.slice(app.indexOf('function creditCompletedSession('),app.indexOf('\nfunction finalizeTimerSession')));
+ let once=true;r.fail(k=>k===r.D.KEYS.cfg+'_mirror'&&once?(once=false,true):false);
+ assert.equal(r.run('creditCompletedSession()'),false);
+ assert.deepEqual([...r.packets],before);
+ assert.equal(r.run('JSON.stringify({cfg,tasksList,notesList})'),r.initial);
+ r.fail(null);assert.equal(r.run('creditCompletedSession()'),true);
+ assert.equal(r.D.inspectStorage(r.c.localStorage).snapshot.cfg.sessionHistory.length,1);
+ assert.equal(r.run('cfg.unknown'),7);assert.equal(r.run('cfg.sessions'),1);
+ assert.equal(r.run('creditCompletedSession()'),true);assert.equal(r.run('cfg.sessions'),1);
+});
