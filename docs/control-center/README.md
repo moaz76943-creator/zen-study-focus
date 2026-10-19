@@ -80,3 +80,52 @@ The separate control_center_agents.yml workflow exposes only the allowlisted lan
 Testing includes studio.test.cjs (schema validation, injection attempts, scoped handoffs) and studio_integration.test.cjs (verified selectors, app CSS link, deterministic generation and workflow security checks). CI checks the JSON-to-CSS parity before recording success.
 
 Review every diff and run Android/device tests before merging changes into a production app; source test PASS is not an Android sign-off.
+
+
+## Control Center v3 — 20 additional working tools
+
+Version 3 extends the same PR #37; it does not create a second competing dashboard.
+
+| ID | Tool | Action and limitation |
+|---|---|---|
+| F01 | Unified search | Search loaded recovery tasks, PRs, workflow runs and imported source findings. |
+| F02 | Command shortcut | Ctrl+K (or Command+K) focuses search; Escape closes results. |
+| F03 | Task quick views | Blocked, actionable, ledger-tested, or all. |
+| F04 | Task sorting | By urgency/status, ID ascending/descending, or subsystem. |
+| F05 | Tasks CSV | Download filtered tasks with spreadsheet-formula protection. |
+| F06 | Area backlog | See blockers and totals per source subsystem. |
+| F07 | Release checklist | Display five gates requiring real evidence; never auto-approve. |
+| F08 | CI trend | Show verified source-run success percentage, excluding pending from denominator. |
+| F09 | Failed-run links | Open only recorded failing GitHub Actions runs. |
+| F10 | Stale PR detection | Indicate pull requests not updated for 14 days. |
+| F11 | PR filter | Draft/ready filtering and text search. |
+| F12 | Risk severity filter | Critical, warning, info, or all from imported QA. |
+| F13 | SHA freshness | Warn when imported health.json is from a different commit than PR #25. |
+| F14 | Snapshot comparison | Compare a prior exported project JSON against current recovery task IDs/status. |
+| F15 | Theme presets | Apply one of four cosmetic palettes to the staged preview. |
+| F16 | Undo | Undo staged design changes, retaining a bounded 40-step history. |
+| F17 | Redo | Re-apply undone staged changes, with fork-safe history. |
+| F18 | Screen-only reset | Reset only the selected screen's appearance, not the whole design. |
+| F19 | Safe JSON import | Import allowlisted design-config.json; reject extraneous fields, oversized data and malformed values. |
+| F20 | Change diff | View exact theme/screen property differences from the baseline before opening a review request. |
+
+The source-of-truth machine-readable list is feature-manifest-v3.json. Implementation lives in v3-core.js (pure/testable logic) and v3-ui.js (accessible interaction); responsive layout in v3.css. V3 reads a **copy** of the existing public project state and modifies design settings **only in the local browser preview**. It never modifies Android user data, creates remote branches or merges PRs directly.
+
+### Workbench usage from Android phone
+
+1. Open the dashboard's HTTPS page after hosting is enabled, or serve docs/control-center/ over a trusted local HTTP server.
+2. Use "مساحة إدارة المشروع" for cross-repo search and filtered CSV. Click the source task/PR/run link to open evidence.
+3. Export a project state snapshot from the existing actions area, then re-import an older one for status comparisons. No upload happens.
+4. Choose a theme palette and adjust one screen at a time. Undo or redo any staged change; inspect the exact configuration diff.
+5. Export design-config.json and the generated CSS from the original screen editor or open the owner-reviewable GitHub issue. **Nothing changes in the installed APK** until a reviewed code change is built and installed.
+
+### Check, test, and security assumptions
+
+    node --test tests/control_center/*.test.cjs
+    node --check docs/control-center/v3-core.js
+    node --check docs/control-center/v3-ui.js
+    node tools/control_center/generate_style.cjs --check
+
+V3 tests cover all F01–F20 behavioral contracts, bound/invalid input cases, HTML contract and mobile CSS presence, plus simulated DOM interactions (NOT a physical browser/Android WebView). The existing GitHub Actions audit workflow runs these suites and publishes explicit PASS/FAIL and NOT_TESTED status. A successful source run is not proof of production device QA or user backup restoration.
+
+**Limits:** Only listed cosmetic properties can be changed through the no-code design controls. Modifying behavior of an arbitrary Android screen still requires a scoped agent request/PR and code review; arbitrary code execution from the dashboard is prohibited. The control panel is not automatically available at a web URL until GitHub Pages has been set up and source changes have been reviewed and merged into the proper branch.
