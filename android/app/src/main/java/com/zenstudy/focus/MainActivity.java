@@ -17,6 +17,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import java.io.ByteArrayInputStream;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -69,7 +71,10 @@ public class MainActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
-        settings.setAllowFileAccess(true);
+        // android_asset resources remain available with general filesystem access off.
+        // Keep the existing file origin: changing it would orphan v21 localStorage.
+        settings.setAllowFileAccess(false);
+        settings.setBlockNetworkLoads(true);
         settings.setAllowFileAccessFromFileURLs(false);
         settings.setAllowUniversalAccessFromFileURLs(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
@@ -83,19 +88,40 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                String address = uri != null ? uri.toString() : "";
                 // The privileged JS bridge belongs only to bundled app assets.
-                if (address.startsWith("file:///android_asset/web/")) return false;
-                if (uri != null && ("https".equalsIgnoreCase(uri.getScheme())
-                         || "http".equalsIgnoreCase(uri.getScheme()))) {
+                if (request.isForMainFrame() && isBundledAsset(uri)
+                        && "/android_asset/web/index.html".equals(uri.getPath())) return false;
+                if (request.isForMainFrame() && uri != null
+                        && "https".equalsIgnoreCase(uri.getScheme())
+                        && uri.getHost() != null && uri.getUserInfo() == null) {
                     try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); }
                     catch (Exception ignored) {}
                 }
                 return true;
             }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                if (isBundledAsset(request.getUrl())) return null;
+                // Navigation callbacks alone do not police scripts, images or frames.
+                return new WebResourceResponse("text/plain", "UTF-8", 403, "Blocked",
+                        java.util.Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
+            }
         });
         webView.setWebChromeClient(new WebChromeClient());
         webView.loadUrl("file:///android_asset/web/index.html");
+    }
+
+    private static boolean isBundledAsset(Uri uri) {
+        if (uri == null || !"file".equalsIgnoreCase(uri.getScheme())
+                || (uri.getAuthority() != null && !uri.getAuthority().isEmpty())) return false;
+        String path = uri.getPath();
+        if (path == null || !path.startsWith("/android_asset/web/")
+                || path.indexOf('\\') >= 0 || path.indexOf('%') >= 0 || path.indexOf('\0') >= 0) return false;
+        for (String part : path.split("/")) {
+            if ("..".equals(part) || ".".equals(part)) return false;
+        }
+        return true;
     }
 
     public class ZenNativeBridge {

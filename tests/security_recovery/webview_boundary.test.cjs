@@ -32,7 +32,9 @@ test('SEC-P0 privileged native-bridge WebView must not load remote subresources'
 });
 
 test('SEC-P0 bundled HTML must prohibit scripts/frames from remote or user-controlled origins',()=>{
-  const csp=html.match(/<meta\s+http-equiv=["']Content-Security-Policy["']\s+content=["']([^"']+)["']/i);
+  // The attribute uses double quotes and its directives contain single quotes.
+  // Capture using the matching delimiter; the original pattern truncated at 'none'.
+  const csp=html.match(/<meta\s+http-equiv="Content-Security-Policy"\s+content="([^"]+)"/i);
   assert.ok(csp,'Add an asset-compatible CSP; whitelist only bundled scripts, block frames and unsafe schemes');
   assert.match(csp[1],/frame-src\s+'none'/);
   assert.match(csp[1],/object-src\s+'none'/);
