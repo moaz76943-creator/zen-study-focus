@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const app=fs.readFileSync(path.resolve(__dirname,'../../android/app/src/main/assets/web/app.js'),'utf8');
-test('DF-030 missing optional analytics script never erases cached metrics or saved history at rollover',()=>{
+test('DF4-030 missing optional analytics script never erases cached metrics or saved history at rollover',()=>{
  let writes=0;
  const c=vm.createContext({window:{},cfg:{todayMins:37,sessions:3,streak:4,metricsDate:'2026-10-18',sessionHistory:[{id:'keep',date:'2026-10-18',minutes:37,domain:'study'}]},todayISO:'2026-10-18',Date,
   localDateISO:()=> '2026-10-19',document:{getElementById:()=>null},saveFortressData(){writes++;}});
