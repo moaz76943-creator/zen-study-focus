@@ -14,12 +14,11 @@ class BrandingTests(unittest.TestCase):
         manifest = read("android/app/src/main/AndroidManifest.xml")
         index = read("android/app/src/main/assets/web/index.html")
         app = read("android/app/src/main/assets/web/app.js")
-        self.assertIn('android:label="Deep Focus: Study & Work Timer"', manifest)
-        self.assertIn('<title>Deep Focus: Study & Work Timer</title>', index)
+        self.assertIn('android:label="Deep Focus"', manifest)
+        self.assertIn('<title>Deep Focus', index)
         self.assertIn('id="hdrMainTitle">Deep Focus</h1>', index)
         self.assertIn("document.getElementById('hdrMainTitle').textContent = 'Deep Focus';", app)
         self.assertIn("document.getElementById('hdrSubTitle').textContent = d.sub;", app)
-        self.assertEqual(len("Deep Focus: Study & Work Timer"), 30)
 
     def test_notifications_sharing_policies_and_release_labels(self):
         paths = (

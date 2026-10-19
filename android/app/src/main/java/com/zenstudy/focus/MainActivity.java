@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         public void shareAppInvite(String statsSummary) {
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
-            share.putExtra(Intent.EXTRA_SUBJECT, "Deep Focus: Study & Work Timer");
+            share.putExtra(Intent.EXTRA_SUBJECT, "Deep Focus — Study, Workout & Deep Work App");
             share.putExtra(Intent.EXTRA_TEXT, statsSummary);
             startActivity(Intent.createChooser(share, "Share Deep Focus via"));
         }
