@@ -1,0 +1,50 @@
+/* Deep Focus Control Center 3 — scoped, responsive and isolated from Android runtime. */
+.v3-toolbar{padding:17px;margin-bottom:13px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.v3-search{flex:1 1 300px;min-width:0}
+.v3-search label,.v3-panel label{display:block;font-size:11px;color:#3d5777;font-weight:750;margin-bottom:7px}
+.v3-search kbd{display:inline-block;direction:ltr;border:1px solid #d6e3f2;background:#f5f8fc;padding:2px 6px;border-radius:6px;color:#55718f;font-size:10px;margin-inline-start:5px}
+.v3-search input{width:100%}
+.v3-search-results{display:grid;gap:6px;margin-top:8px;max-height:290px;overflow:auto}
+.v3-search-results:empty{display:none}
+.v3-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.v3-panel{padding:19px;min-width:0}
+.v3-panel-heading{display:flex;gap:12px;align-items:center;margin-bottom:13px}
+.v3-panel-heading h3{font-size:15px;margin:0}
+.v3-panel-heading small{font-size:10px;color:#7e90a7}
+.v3-symbol{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#edf6ff,#e2efff);color:#1761be;font-weight:900;font-size:13px;direction:ltr;font-variant-numeric:tabular-nums}
+.v3-panel h4{font-size:12px;color:#25476d;margin:17px 0 7px}
+.v3-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.v3-fields>div{min-width:0}
+.v3-panel select,.v3-panel input[type=search],.v3-panel input[type=file]{width:100%;min-height:42px;font-size:11px;background:#fafcff}
+.v3-toolbar-mini{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:13px 0 9px}
+.v3-toolbar-mini button{min-height:35px;padding:6px 13px}
+.v3-results{display:grid;gap:7px;max-height:270px;overflow:auto;scrollbar-width:thin}
+.v3-item{display:flex;align-items:start;gap:9px;padding:10px 12px;border:1px solid #e9eff7;background:#f9fbff;border-radius:10px;font-size:11px;line-height:1.6;min-width:0}
+.v3-item .v3-text{flex:1;min-width:0;overflow-wrap:anywhere}
+.v3-item strong{display:block;font-size:11px;color:#26456c}
+.v3-item small{display:block;color:#7c8ea4;font-size:10px;line-height:1.6}
+.v3-item a{color:#1d6fd0;font-weight:800}
+.v3-item:hover{border-color:#bdd8f7}
+.v3-results .v3-empty{font-size:11px;color:#7a8da5;padding:12px;background:#f9fbff;border:1px dashed #dfebf7;border-radius:10px}
+.v3-area-metrics{display:grid;gap:9px}
+.v3-area{display:grid;gap:2px}
+.v3-area-head{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#59728f}
+.v3-area-track{height:7px;overflow:hidden;background:#e7eff9;border-radius:99px}
+.v3-area-fill{height:100%;background:#df7074;border-radius:99px}
+.v3-kpi-inline{border:1px solid #dae8f7;background:#f2f8ff;padding:12px;border-radius:11px;font-size:12px;font-weight:700;color:#255b98}
+.v3-gates{display:grid;gap:7px}
+.v3-gate{display:flex;align-items:center;gap:9px;font-size:11px;color:#365170;line-height:1.6}
+.v3-gate b{font-size:15px;color:#c6743d}
+.v3-gate.passed b{color:#148b71}
+.v3-note{font-size:11px;line-height:1.8;background:#f5f9ff;border:1px solid #e2edf9;border-radius:10px;padding:10px;color:#5c728d;overflow-wrap:anywhere}
+.v3-note.warning{color:#a74d31;background:#fff8f3;border-color:#f3d9c6}
+.v3-editor-actions{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.v3-editor-actions .button{flex:1 1 105px;font-size:11px;padding:7px;white-space:normal}
+.v3-editor-actions .button:disabled{opacity:.45;cursor:not-allowed}
+.v3-diff{max-height:220px;overflow:auto;display:grid;gap:6px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;direction:ltr;font-size:10px;text-align:left}
+.v3-diff>div{padding:8px 10px;background:#f4f8fc;border-radius:8px;overflow-wrap:anywhere}
+.v3-security{font-size:11px;margin:12px 2px;color:#55728d;line-height:1.8}
+@media(max-width:1200px){.v3-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.v3-toolbar{padding:13px}.v3-panel{padding:13px}.v3-fields{gap:8px}.v3-panel-heading small{line-height:1.7}}
+@media(max-width:360px){.v3-fields{grid-template-columns:1fr}.v3-editor-actions{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.v3-area-fill{transition:none}}

@@ -80,19 +80,22 @@ function mountCompletionAlertPicker(host,engine,opts={}){
  const doc=host.ownerDocument,t=typeof opts.translate==="function"?opts.translate:(key,fallback)=>fallback,settings=engine.getSettings();
  const wrap=doc.createElement("div");wrap.className="completion-alert-picker";
  const heading=doc.createElement("h3");heading.textContent=t("completionAlerts.title","Completion sound");wrap.appendChild(heading);
- const group=doc.createElement("fieldset"),legend=doc.createElement("legend");legend.textContent=t("completionAlerts.choose","Choose a sound");group.appendChild(legend);
+ const group=doc.createElement("fieldset"),legend=doc.createElement("legend");group.className="completion-alert-choices";legend.textContent=t("completionAlerts.choose","Choose a sound");group.appendChild(legend);
  const radios=[];
  for(const choice of CHOICES){
   const line=doc.createElement("div");line.className="completion-alert-option";
-  const label=doc.createElement("label"),radio=doc.createElement("input");radio.type="radio";radio.name="completion-alert-choice";radio.value=choice.id;radio.checked=choice.id===settings.sound;radio.addEventListener("change",()=>{if(radio.checked){if(!engine.update({sound:choice.id}))radio.checked=false;sync()}});label.appendChild(radio);label.appendChild(doc.createTextNode(" "+t("completionAlerts."+choice.id,choice.label)));line.appendChild(label);radios.push(radio);
-  if(choice.file){const preview=doc.createElement("button");preview.type="button";preview.textContent=t("completionAlerts.preview","Preview");preview.setAttribute("aria-label",t("completionAlerts.preview","Preview")+" "+t("completionAlerts."+choice.id,choice.label));preview.addEventListener("click",()=>{engine.preview(choice.id)});line.appendChild(preview)}
+  const label=doc.createElement("label"),radio=doc.createElement("input");radio.type="radio";radio.name="completion-alert-choice";radio.value=choice.id;radio.checked=choice.id===settings.sound;radio.addEventListener("change",()=>{if(radio.checked){if(!engine.update({sound:choice.id}))radio.checked=false;sync()}});label.appendChild(radio);const name=doc.createElement("span");name.textContent=t("completionAlerts."+choice.id,choice.label);label.appendChild(name);line.appendChild(label);radios.push(radio);
+  if(choice.file){const preview=doc.createElement("button");preview.type="button";preview.className="completion-alert-preview";preview.textContent=t("completionAlerts.preview","Preview");preview.setAttribute("aria-label",t("completionAlerts.preview","Preview")+" "+t("completionAlerts."+choice.id,choice.label));preview.addEventListener("click",()=>{engine.preview(choice.id)});line.appendChild(preview)}
   group.appendChild(line);
  }wrap.appendChild(group);
  const enabled=doc.createElement("input");enabled.type="checkbox";enabled.checked=settings.enabled;enabled.addEventListener("change",()=>{if(!engine.update({enabled:enabled.checked}))sync()});
- const enabledLabel=doc.createElement("label");enabledLabel.appendChild(enabled);enabledLabel.appendChild(doc.createTextNode(" "+t("completionAlerts.enabled","Enable completion sound")));wrap.appendChild(enabledLabel);
- const volumeLabel=doc.createElement("label");volumeLabel.textContent=t("completionAlerts.volume","Alert volume");const slider=doc.createElement("input");slider.type="range";slider.min="0";slider.max="100";slider.step="1";slider.value=String(settings.volume);slider.setAttribute("aria-label",t("completionAlerts.volume","Alert volume"));slider.addEventListener("change",()=>{if(!engine.update({volume:Number(slider.value)}))sync()});volumeLabel.appendChild(slider);wrap.appendChild(volumeLabel);
- function sync(){const p=engine.getSettings();enabled.checked=p.enabled;slider.value=String(p.volume);radios.forEach(r=>r.checked=r.value===p.sound)}
- host.replaceChildren(wrap);return Object.freeze({refresh:sync,unmount:()=>{engine.pause();if(wrap.parentNode===host)host.removeChild(wrap)}});
+ const enabledLabel=doc.createElement("label");enabledLabel.className="completion-alert-enabled";enabledLabel.appendChild(enabled);enabledLabel.appendChild(doc.createTextNode(" "+t("completionAlerts.enabled","Enable completion sound")));wrap.appendChild(enabledLabel);
+ const volumeLabel=doc.createElement("label");volumeLabel.className="completion-alert-volume";volumeLabel.textContent=t("completionAlerts.volume","Alert volume");const slider=doc.createElement("input");slider.type="range";slider.min="0";slider.max="100";slider.step="1";slider.value=String(settings.volume);slider.setAttribute("aria-label",t("completionAlerts.volume","Alert volume"));slider.addEventListener("change",()=>{if(!engine.update({volume:Number(slider.value)}))sync()});const output=doc.createElement("output");output.dir="ltr";output.textContent=String(settings.volume)+"%";
+ slider.addEventListener("input",()=>{output.textContent=String(slider.value)+"%"});
+ slider.addEventListener("change",sync);
+ volumeLabel.appendChild(output);volumeLabel.appendChild(slider);wrap.appendChild(volumeLabel);
+ function sync(){const p=engine.getSettings();enabled.checked=p.enabled;slider.value=String(p.volume);output.textContent=String(p.volume)+"%";radios.forEach(r=>r.checked=r.value===p.sound)}
+ host.setAttribute("aria-label",t("completionAlerts.title","Completion sound"));host.replaceChildren(wrap);return Object.freeze({refresh:sync,unmount:()=>{engine.pause();if(wrap.parentNode===host)host.removeChild(wrap)}});
 }
 const api=Object.freeze({CHOICES,readCompletionAlertSettings,updateCompletionAlertSettings,createCompletionAlerts,mountCompletionAlertPicker});
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
