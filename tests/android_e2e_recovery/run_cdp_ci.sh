@@ -18,4 +18,11 @@ sleep 5
 pid="$(adb shell pidof com.zenstudy.focus | tr -d '\r' | awk '{print $1}')"
 test -n "$pid"
 adb forward tcp:9222 "localabstract:webview_devtools_remote_${pid}"
+set +e
 node tests/android_e2e_recovery/cdp_dom_smoke.cjs "$report/results.json"
+cdp_status=$?
+# This profile was just created and installed above; no owner phone data is touched.
+python3 tests/android_e2e_recovery/run_e2e.py --serial emulator-5554 --ack-disposable-data --run-slow --allow-rotation --json "$report/e2e-results.json"
+e2e_status=$?
+test ! -s "$report/e2e-results.json" || cat "$report/e2e-results.json"
+if (( cdp_status != 0 || e2e_status != 0 )); then exit 1; fi

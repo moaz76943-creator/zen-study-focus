@@ -9,7 +9,7 @@ const output=process.argv[2]||null;
 const endpoint='http://127.0.0.1:9222/json/list';
 const pause=ms=>new Promise(done=>setTimeout(done,ms));
 let report={source:'real Android WebView via local ADB-forwarded CDP',status:'NOT_TESTED',
-  generated_at:new Date().toISOString(),details:null,dom:null};
+  generated_at:new Date().toISOString(),android_api:process.env?.ANDROID_TEST_API||null,details:null,dom:null};
 async function listTargets(){
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),4000);
@@ -83,6 +83,7 @@ async function main(){
     report.readiness=[];
     do {
       dom=await query(ws,expression);
+      report.dom=dom;
       report.readiness.push({ready:dom?.ready||null,timerSection:!!dom?.timerSection,playButton:!!dom?.playButton});
       if(dom?.ready==='complete')break;
       await pause(1000);
