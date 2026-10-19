@@ -492,6 +492,7 @@
   }
   function save(){
     if(!instance){if(typeof showToast==='function')showToast('⚠️ Notes UI is not connected; nothing was saved.');return false;}
+    if(!document.getElementById('noteModal')?.classList.contains('open'))return false;
     try{
       instance.controller.save(draftToSave());
       if(typeof nsClearDraftForSavedNote==='function')nsClearDraftForSavedNote();
@@ -668,6 +669,7 @@
       (kind!=='note'||record.id!==sourceId));
   }
   function chooseLinkTarget(sourceId,records,kind){
+    if(document.querySelector('dialog.nsux-link-picker[open]'))return Promise.resolve(null);
     const candidates=linkCandidates(sourceId,records,kind);
     if(!candidates.length){instance.adapter.notify(t('noTargets'));return Promise.resolve(null);}
     return new Promise(resolve=>{

@@ -19,6 +19,9 @@ const out=process.env.DF_COMPLETION_EVIDENCE||'/workspace/scratch/completion-evi
   assert.equal(await page.locator('#nsux-book-filter').getAttribute('aria-label'),'الدفتر');
   assert.deepEqual(await page.evaluate(()=>({title:document.getElementById('inpNoteTitle').value,body:document.getElementById('inpNoteBody').value,fp:DeepFocusNotesEditorUI.openedFingerprint()})),before);
   await page.locator('#nsSaveButton').click();assert.equal(await page.locator('#noteModal').evaluate(n=>n.classList.contains('open')),false);
+  const savedCount=await page.evaluate(()=>notesList.length);
+  assert.equal(await page.evaluate(()=>saveNewNote()),false);
+  assert.equal(await page.evaluate(()=>notesList.length),savedCount,'Late duplicate Save callback cannot create another note');
   await page.reload();await page.locator('#navNotes').click();
   assert.ok((await page.locator('#notesStackBox').innerText()).includes(before.title));
   const id=await page.evaluate(title=>notesList.find(n=>n.title===title).id,before.title);
