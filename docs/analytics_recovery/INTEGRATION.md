@@ -57,7 +57,7 @@ node --test tests/analytics_core/*.test.cjs
 node tests/smoke_app.cjs
 ```
 
-**Session evidence from this independent lane:** 20/20 new tests evaluated against the GitHub-hosted module sources in an isolated JavaScript V8 harness. Includes a 10,000-valid-session dataset plus duplicate, leap-year week buckets, explicit statuses, CSV safety, 7/30-day math, SVG drilldown, filter reset, export outcomes and non-English mount validation. This is NOT a claim of Node CI, Android build or physical-device test success. The test suite's actual Node execution and shared CI wiring are required before release.
+**Session evidence from this independent lane:** 26/26 new tests evaluated against the GitHub-hosted module sources in an isolated JavaScript V8 harness. Includes a 10,000-valid-session dataset, hostile source fields and ambiguous task references plus duplicate, leap-year week buckets, explicit statuses, CSV safety, 7/30-day math, SVG drilldown, filter reset, export outcomes and non-English mount validation. This is NOT a claim of Node CI, Android build or physical-device test success. The test suite's actual Node execution and shared CI wiring are required before release.
 
 ## DF-121–DF-137 status matrix
 
