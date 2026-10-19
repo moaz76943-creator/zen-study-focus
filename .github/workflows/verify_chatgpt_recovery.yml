@@ -1,9 +1,6 @@
 name: Recovery ChatGPT focused regression checks
 
 on:
-  push:
-    branches:
-      - fix/df4-alert-picker-layout-20261019
   pull_request:
     branches:
       - integration/deep-focus-recovery-00-final-20261019
