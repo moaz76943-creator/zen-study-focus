@@ -134,6 +134,27 @@ function catalogs(){
     ar:{labels:'تسميات التحليلات'}});
  return {out,runtime};
 }
+function markupReferences(runtime=actualLocales()){
+ const html=read('index.html'),validKeys={
+  'data-i18n':new Set(Object.keys(runtime.dict.en||{})),
+  'data-qt':new Set(runtime.quick.keys),
+  'data-qt-placeholder':new Set(runtime.quick.keys),
+  'data-df22-i18n':new Set(runtime.premium.keys),
+  'data-df22-placeholder':new Set(runtime.premium.keys),
+  'data-df22-aria-label':new Set(runtime.premium.keys),
+  'data-df20-i18n':new Set(runtime.recovery.KEYS),
+  'data-df20-placeholder':new Set(runtime.recovery.KEYS)
+ };
+ const re=/\b(data-(?:i18n|qt|qt-placeholder|df22-i18n|df22-placeholder|df22-aria-label|df20-i18n|df20-placeholder))=["']([^"']+)["']/g;
+ let m,checked=0;const unknown=[];
+ while((m=re.exec(html))){
+  checked++;
+  if(!validKeys[m[1]].has(m[2]))unknown.push({
+   file:'index.html',line:html.slice(0,m.index).split('\n').length,
+   attribute:m[1],key:m[2],type:'unresolved_markup_locale_key'});
+ }
+ return {checked,unknown};
+}
 function unmarked(){
  const found=[],html=read('index.html');
  function add(file,s,idx,kind){
@@ -150,8 +171,14 @@ function unmarked(){
   if(!/data-(?:i18n|qt-placeholder|df22-placeholder|df22-aria-label)/i.test(m[0]))
    add('index.html',m[2],m.index,'unmarked_html_attribute');
  for(const file of FILES.filter(f=>f.endsWith('.js')&&!/^locale_|^localization_/.test(f))){
-  const s=read(file),re=/(?:showToast|alert|confirm)\s*\(\s*(['"])(.{4,150}?)\1/g;
-  while((m=re.exec(s)))add(file,m[2],m.index,'static_js_message_candidate');
+  const s=read(file);
+  const patterns=[
+   [/(?:showToast|alert|confirm)\s*\(\s*(['"])(.{4,150}?)\1/g,'static_js_message_candidate'],
+   [/\.(?:textContent|innerText|placeholder|title)\s*=\s*(['"])(.{4,150}?)\1/g,'static_js_display_candidate'],
+   [/\.setAttribute\s*\(\s*['"](?:aria-label|title|placeholder)['"]\s*,\s*(['"])(.{4,150}?)\1/g,'static_js_accessibility_candidate']
+  ];
+  for(const [re,kind] of patterns)
+   while((m=re.exec(s)))add(file,m[2],m.index,kind);
  }
  return found;
 }
@@ -195,7 +222,7 @@ function audit(){
   languages:LANGS.map(code=>({code,dir:RTL.has(code)?'rtl':'ltr'})),
   catalogs:out.map(c=>({id:c.id,screen:c.screen,file:c.file,keys:c.keys.length,
    explicitLocales:LANGS.filter(l=>c.keys.every(k=>valid((c.localeValues[l]||{})[k])))})),
-  screens,coverage,missing,englishIdentical,eastern,staticCandidates:unmarked(),warnings,
+  screens,coverage,missing,englishIdentical,eastern,markup:markupReferences(runtime),staticCandidates:unmarked(),warnings,
   limits:['Source-level static analysis; unmarked literals need human inspection',
   'Native-speaker naturalness unverified','Actual Android WebView RTL/rendering untested',
   'English-identical phrases are warnings and may be valid','User-entered records are not inspected']};
@@ -281,4 +308,4 @@ function main(args=process.argv.slice(2)){
  return r;
 }
 if(require.main===module)main();
-module.exports={LANGS,RTL,block,bilingual,actualLocales,catalogs,unmarked,audit,proposals,reportMarkdown,main};
+module.exports={LANGS,RTL,block,bilingual,actualLocales,catalogs,markupReferences,unmarked,audit,proposals,reportMarkdown,main};
