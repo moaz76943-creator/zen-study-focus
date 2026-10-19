@@ -1,35 +1,33 @@
 'use strict';
-// DF-153: Offline-first typography regression (source-level, no device claim).
+// DF-153: Offline-first typography regression (source-level; Android device remains untested).
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const {readFileSync} = require('node:fs');
 const {join} = require('node:path');
-
 const web = join(__dirname, '../../android/app/src/main/assets/web');
 const read = name => readFileSync(join(web, name), 'utf8');
 
-test('offline entrypoint makes no third-party font requests', () => {
-  const html = read('index.html');
-  const head = html.split('</head>')[0];
-  assert.doesNotMatch(head, /<link[^>]*https?:\\/\\//i,
-    'No network preconnect or stylesheet should be needed to render offline');
-  assert.doesNotMatch(head, /@import\\s+url\\s*\\(\\s*['"]?https?:\\/\\//i);
-  assert.doesNotMatch(head, /fonts\\.(?:googleapis|gstatic)\\.com/i);
-  assert.match(head, /font-family:\\s*system-ui/);
+test('offline entrypoint never requests third-party font stylesheets', () => {
+  const head = read('index.html').split('</head>')[0];
+  assert.equal(head.includes('fonts.googleapis.com'), false);
+  assert.equal(head.includes('fonts.gstatic.com'), false);
+  assert.equal(/<link[^>]*https?:/i.test(head), false);
+  assert.equal(/@import[^;]*https?:/i.test(head), false);
+  assert.ok(head.includes('font-family: system-ui'));
 });
 
-test('white-premium theme uses locally available system font fallbacks', () => {
+test('white premium typography uses a local system font stack', () => {
   const tokens = read('design_tokens_v22.css');
   const overlay = read('design_recovery/white_premium_recovery10.css');
-  assert.match(tokens, /--df22-font:\\s*system-ui/);
-  assert.match(overlay, /font-family:\\s*var\\(--df22-font,\\s*system-ui/);
-  assert.doesNotMatch(tokens + overlay, /@import\\s+[^;]*https?:/i);
+  assert.ok(tokens.includes('--df22-font: system-ui'));
+  assert.ok(overlay.includes('font-family: var(--df22-font, system-ui'));
+  assert.equal(/@import[^;]*https?:/i.test(tokens + overlay), false);
 });
 
-test('CSS still defines a script-safe Arabic fallback without remote dependency', () => {
+test('Arabic text remains supported with offline system fallback fonts', () => {
   const html = read('index.html');
   const tokens = read('design_tokens_v22.css');
-  assert.match(html, /Noto Sans Arabic/);
-  assert.match(tokens, /Noto Sans Arabic/);
-  assert.doesNotMatch(html, /https:\\/\\/fonts\\.googleapis\\.com/i);
+  assert.ok(html.includes('Noto Sans Arabic'));
+  assert.ok(tokens.includes('Noto Sans Arabic'));
+  assert.equal(html.includes('https://fonts.googleapis.com'), false);
 });
