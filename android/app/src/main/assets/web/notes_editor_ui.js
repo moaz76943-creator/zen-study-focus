@@ -556,17 +556,17 @@
         cardAction(secondary,t('delete'),()=>instance.controller.move(n.id,'trash'),'danger');
       }
       if(s!=='trash'){
-        if(instance.adapter.openCalendarForNote)cardAction(actions,'📅',()=>instance.adapter.openCalendarForNote(n.id));
-        if(instance.adapter.pickNoteLinkTarget)cardAction(actions,t('link'),()=>{
+        if(instance.adapter.openCalendarForNote)cardAction(secondary,'📅',()=>instance.adapter.openCalendarForNote(n.id));
+        if(instance.adapter.pickNoteLinkTarget)cardAction(secondary,t('link'),()=>{
           const target=instance.adapter.pickNoteLinkTarget(n.id,instance.controller.read().notesList);
           if(target!==null&&target!==undefined)instance.controller.link(n.id,target);
         });
-        if(instance.adapter.pickTaskLinkTarget)cardAction(actions,'↗ '+t('task'),()=>{
+        if(instance.adapter.pickTaskLinkTarget)cardAction(secondary,'↗ '+t('task'),()=>{
           const target=instance.adapter.pickTaskLinkTarget(n.id,instance.controller.read().tasksList);
           if(target!==null&&target!==undefined)instance.controller.linkTask(n.id,target);
         });
         if(instance.adapter.confirmTaskExtraction && instance.adapter.commitBoth)
-          cardAction(actions,t('task'),()=>{
+          cardAction(secondary,t('task'),()=>{
             const state=instance.controller.read();const c=instance.controller.one(n.id,state.notesList);
             if(instance.adapter.confirmTaskExtraction(n.id,c)===true)instance.controller.extract(n.id);
           });
