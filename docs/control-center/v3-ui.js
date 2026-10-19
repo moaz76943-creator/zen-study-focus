@@ -44,7 +44,7 @@
     a.download=filename;a.href=url;document.body.append(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
-  let snapshot=null,liveSnapshot=null,history=null,importedSnapshot=null,offlineMode=false;
+  let snapshot=null,liveSnapshot=null,history=null,importedSnapshot=null,offlineMode=false,currentScreen='timer';
   function renderPanels(){
     renderSearch();renderTasks();renderMetrics();renderDelivery();renderRisks();
     const source=offlineMode?'نسخة JSON مستوردة محليًا — ليست بيانات GitHub حية':
