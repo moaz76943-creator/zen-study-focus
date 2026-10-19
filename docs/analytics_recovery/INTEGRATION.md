@@ -25,6 +25,7 @@
 
 `analytics_recovery_ui.js` (UMD, `window.DeepFocusAnalyticsRecoveryUI`):
 - `renderBarsSvg(series)`: bounded SVG with numeric Y-axis ticks, credited-period labels, safe escaped tooltips, keyboard focus, button semantics, real data-bucket identifiers and ASCII numerals.
+- `renderActivitySvg(byDomain)`: true proportionate 4-domain ring with explicit recorded-minute totals, safe SVG labels, and clickable domain segments linking to filtered real session rows.
 - `mount(host, () => snapshot, opts)` -> `{refresh,getReport,destroy,element}`; explicit opt-in only. Date/activity/grouping filters, reset, working daily/weekly/monthly SVG drilldown, real session table, dashboard KPI buttons that switch to real date ranges, activity split, date-snapshot goals, exclusion and conflict disclosures.
 - Export button is **disabled** until `saveCSV` is provided, and announces verified saved/cancelled/failed asynchronously. No decorative fake export. No fake psychological "focus quality".
 - For all non-English locales, `opts.translate(key,locale)` is REQUIRED and missing keys fail closed rather than silently showing English. Keys take the form `analyticsRecovery.<name>` where `<name>` comes from the module's English fallback registry. Lane 04 must supply complete 20-language strings, preserving Arabic/Persian/Urdu; data/user-generated note/task text is never translated. SVG-generated numeric ticks remain 0123456789.
@@ -57,7 +58,7 @@ node --test tests/analytics_core/*.test.cjs
 node tests/smoke_app.cjs
 ```
 
-**Session evidence from this independent lane:** 26/26 new tests evaluated against the GitHub-hosted module sources in an isolated JavaScript V8 harness. Includes a 10,000-valid-session dataset, hostile source fields and ambiguous task references plus duplicate, leap-year week buckets, explicit statuses, CSV safety, 7/30-day math, SVG drilldown, filter reset, export outcomes and non-English mount validation. This is NOT a claim of Node CI, Android build or physical-device test success. The test suite's actual Node execution and shared CI wiring are required before release.
+**Session evidence from this independent lane:** 28/28 new tests evaluated against the GitHub-hosted module sources in an isolated JavaScript V8 harness. Includes a 10,000-valid-session dataset, hostile source fields and ambiguous task references plus duplicate, leap-year week buckets, explicit statuses, CSV safety, 7/30-day math, SVG drilldown, filter reset, export outcomes and non-English mount validation. This is NOT a claim of Node CI, Android build or physical-device test success. The test suite's actual Node execution and shared CI wiring are required before release.
 
 ## DF-121–DF-137 status matrix
 
