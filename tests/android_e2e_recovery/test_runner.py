@@ -34,6 +34,7 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(len(ids),20)
         self.assertEqual(dict(mod.CASES)["talkback"],"manual")
         self.assertEqual(dict(mod.CASES)["save_failure"],"manual")
+        self.assertEqual(dict(mod.CASES)["task_subtasks"],"write")
 
 if __name__=="__main__":
     unittest.main()
