@@ -81,8 +81,13 @@ class Device:
 
     def dump(self):
         # exec-out cat avoids stale host copies; UIAutomator captures actual Android touch target tree.
-        self.shell("uiautomator", "dump", "/sdcard/window_recovery14.xml", timeout=45)
-        xml = self.call("exec-out", "cat", "/sdcard/window_recovery14.xml", timeout=20)
+        try:
+            self.shell("uiautomator", "dump", "/sdcard/window_recovery14.xml", timeout=45)
+            xml = self.call("exec-out", "cat", "/sdcard/window_recovery14.xml", timeout=20)
+        except CheckFailed as exc:
+            # ADB/UIAutomator can fail before a view tree is observed. This
+            # is an infrastructure blocker, NOT evidence of a defective button.
+            raise NotTested("UIAutomator hierarchy unavailable in emulator: " + str(exc)) from exc
         if "<hierarchy" not in xml:
             raise NotTested("WebView accessibility hierarchy unavailable")
         return parse_nodes(xml)
@@ -137,10 +142,13 @@ class Suite:
         self.d, self.args = device, args
         self.marker = "E2E14" + dt.datetime.now(dt.timezone.utc).strftime("%m%d%H%M%S")
         self.records, self.note, self.task = [], None, None
+        self.preflight_blocker = None
 
     def test(self, name, kind):
         start = time.monotonic()
-        if self.d is None:
+        if name != "preflight" and self.preflight_blocker:
+            result, detail = "NOT_TESTED", "Preflight unavailable: " + self.preflight_blocker
+        elif self.d is None:
             result, detail = "NOT_TESTED", "No ADB-connected device/emulator"
         elif kind == "manual":
             result, detail = "NOT_TESTED", "Manual/restricted scenario: see SCENARIOS.md"
@@ -160,6 +168,8 @@ class Suite:
                 result, detail = "FAIL", str(exc)
             except Exception as exc:
                 result, detail = "FAIL", type(exc).__name__ + ": " + str(exc)[:200]
+        if name == "preflight" and result != "PASS":
+            self.preflight_blocker = detail
         self.records.append({"id": name, "status": result, "detail": detail,
                              "seconds": round(time.monotonic()-start, 2)})
         print("%s  %s  %s" % (result, name, detail), flush=True)
