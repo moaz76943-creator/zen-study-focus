@@ -1,0 +1,200 @@
+name: Deep Focus Daily Recovery
+on:
+  schedule:
+    - cron: '17 2 * * *'
+    - cron: '47 1 * * 5'
+  workflow_dispatch:
+    inputs:
+      target:
+        type: choice
+        required: true
+        default: recovery
+        options: [recovery, master-draft]
+      lane:
+        type: choice
+        required: true
+        default: all
+        options: [all, ui, audio, locale, analytics, data, qa, performance]
+      mode:
+        type: choice
+        required: true
+        default: safe-fix
+        options: [audit, safe-fix, deep-qa]
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/daily_maintenance.yml'
+      - '.github/workflows/build_apk.yml'
+      - 'tools/daily_maintenance/**'
+      - 'tests/daily_maintenance/**'
+permissions:
+  contents: read
+concurrency:
+  group: deep-focus-daily-maintenance
+  cancel-in-progress: false
+jobs:
+  test-maintainer:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node --check tools/daily_maintenance/maintenance.cjs
+          node --test tests/daily_maintenance/*.test.cjs
+  daily:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    env:
+      SOURCE_REF: ${{ inputs.target == 'master-draft' && 'fix/master-completion-20261020' || 'integration/deep-focus-recovery-00-final-20261019' }}
+      SELECTED_MODE: ${{ inputs.mode || 'safe-fix' }}
+      SELECTED_LANE: ${{ inputs.lane || 'all' }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          path: automation
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_REF }}
+          path: source
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source SHA, ledger, queue and safe design generator
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/daily"
+          git -C source rev-parse HEAD | tee "$RUNNER_TEMP/daily/SOURCE_SHA"
+          node --test automation/tests/daily_maintenance/*.test.cjs
+          mode="$SELECTED_MODE"
+          if [[ "$mode" == deep-qa ]]; then mode=audit; fi
+          node automation/tools/daily_maintenance/maintenance.cjs --root source --mode "$mode" --out "$RUNNER_TEMP/daily"
+      - name: Test selected QA lane, preserve data and locale gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd source
+          node tests/validate_locales.cjs
+          node tests/smoke_app.cjs
+          node tools/control_center/generate_style.cjs --check
+          case "$SELECTED_LANE" in
+            all) lane=tests;;
+            ui) lane=tests/interaction_recovery;;
+            audio) lane=tests/nature_audio_recovery;;
+            locale) lane=tests/localization_20;;
+            analytics) lane=tests/analytics_recovery;;
+            data) lane=tests/data_contracts;;
+            qa) lane=tests/control_center;;
+            performance) lane=tests/performance_recovery;;
+            *) echo 'Unrecognized lane';exit 2;;
+          esac
+          find "$lane" -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' -print0 | sort -z | xargs -0 -r node --test --test-reporter=tap | tee "$RUNNER_TEMP/daily/node.tap"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/daily/python.log"
+      - name: Audits including mandatory failed media release gate
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/daily"
+          (cd source && node tools/language_review/audit.cjs --out "$RUNNER_TEMP/daily/locales") > "$RUNNER_TEMP/daily/language.log" 2>&1 || echo 'LANGUAGE_AUDIT_FAILED' >> "$RUNNER_TEMP/daily/blockers.txt"
+          (cd source && node tools/control_center/audit.cjs --json "$RUNNER_TEMP/daily/health.json" --markdown "$RUNNER_TEMP/daily/health.md") > "$RUNNER_TEMP/daily/health.log" 2>&1 || echo 'CONTROL_CENTER_AUDIT_FAILED' >> "$RUNNER_TEMP/daily/blockers.txt"
+          (cd source && node --test tests/master_recovery_qa/media_provenance_gate.test.cjs) > "$RUNNER_TEMP/daily/media.log" 2>&1 || echo 'MEDIA_RELEASE_GATE_BLOCKED' >> "$RUNNER_TEMP/daily/blockers.txt"
+      - name: Open PR only for deterministic generated CSS repairs
+        if: success()
+        shell: bash
+        env:
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          cd source
+          if [[ -z "$(git diff --name-only)" ]]; then echo 'No safe fix required';exit 0;fi
+          git diff --name-only | node -e 'const f=require("node:fs").readFileSync(0,"utf8").trim().split("\n");require("../automation/tools/daily_maintenance/maintenance.cjs").validateChanges(f)'
+          if [[ "$SELECTED_MODE" != safe-fix ]]; then echo 'Audit cannot write';exit 1;fi
+          git diff --check
+          original_sha="$(git rev-parse HEAD)"
+          git fetch origin "$SOURCE_REF" --quiet
+          if [[ "$(git rev-parse FETCH_HEAD)" != "$original_sha" ]]; then echo 'Source advanced; stop stale repair';exit 1;fi
+          branch="automation/daily-css-$(git rev-parse --short=12 HEAD)"
+          if [[ -n "$(git ls-remote --heads origin "refs/heads/$branch")" ]]; then echo 'Already proposed';exit 0;fi
+          git checkout -b "$branch"
+          git add -- android/app/src/main/assets/web/control_center_overrides.css
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'style(automation): regenerate safe CSS for review'
+          git push origin "HEAD:refs/heads/$branch"
+          gh pr create --repo "$GH_REPO" --base "$SOURCE_REF" --head "$branch" --draft --title '[Daily QA] Generated CSS repair' --body "SHA $original_sha. Generated CSS only. Tests passed, human review required. No app release." || echo 'PR creation restricted; branch pushed for review.'
+      - name: Update one daily blockers issue without duplicates
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          REPORT: ${{ runner.temp }}/daily/daily-health.md
+          BLOCKERS: ${{ runner.temp }}/daily/blockers.txt
+        with:
+          script: |
+            const fs=require('node:fs'),{owner,repo}=context.repo;
+            const title='[Daily QA] Deep Focus recovery status';
+            const read=p=>fs.existsSync(p)?fs.readFileSync(p,'utf8').slice(0,25000):'Unavailable. Check Actions log.';
+            const body=read(process.env.REPORT)+'\n\nAdditional gates:\n'+read(process.env.BLOCKERS)+
+             '\nRun: '+context.serverUrl+'/'+owner+'/'+repo+'/actions/runs/'+context.runId+
+             '\nSource QA only; Android, media rights and release NOT APPROVED.';
+            const issues=await github.paginate(github.rest.issues.listForRepo,{owner,repo,state:'open',per_page:100});
+            const old=issues.find(x=>!x.pull_request&&x.title===title);
+            if(old){if(old.body!==body)await github.rest.issues.update({owner,repo,issue_number:old.number,body});}
+            else await github.rest.issues.create({owner,repo,title,body});
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deep-focus-daily-audits
+          path: ${{ runner.temp }}/daily/
+          retention-days: 3
+          if-no-files-found: warn
+      - name: Truthful release status
+        if: always()
+        run: echo 'Android E2E NOT_TESTED; nature provenance BLOCKED; RELEASE NOT APPROVED.' >> "$GITHUB_STEP_SUMMARY"
+  weekly-debug:
+    if: github.event_name != 'pull_request' && (github.event.schedule == '47 1 * * 5' || inputs.mode == 'deep-qa')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      SOURCE_REF: ${{ inputs.target == 'master-draft' && 'fix/master-completion-20261020' || 'integration/deep-focus-recovery-00-final-20261019' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_REF }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Debug test APK only, no signing or publishing
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - run: |
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/SHA
+          sha256sum android/app/build/outputs/apk/debug/*.apk > evidence/sha256.txt
+          echo 'TEST ONLY, NOT FOR PRODUCTION' > evidence/RELEASE_NOT_APPROVED
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deep-focus-weekly-debug-test-apk
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            evidence/
+          retention-days: 3
+          if-no-files-found: warn
