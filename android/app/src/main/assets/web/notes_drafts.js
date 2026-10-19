@@ -64,7 +64,7 @@ function nsFlushDraft(){
  if(!modal||!modal.classList.contains('open'))return false;
  const draft=nsReadEditorDraft();
  if(draft.title.length>250||draft.body.length>NS_DRAFT_LIMIT){nsDraftState('tooLong',false);return false;}
- if(!draft.title.trim()&&!draft.body.trim()&&!draft.cornell?.notes?.trim())return false;
+ if(!draft.title.trim()&&!draft.body.trim()&&!['cues','notes','summary'].some(k=>draft.cornell?.[k]?.trim()))return false;
  const existing=nsGetStoredDraft();
  if(existing&&!nsDraftContextMatches(existing)){nsDraftState('other',false);return false;}
  try {
