@@ -6,9 +6,9 @@ test('static inventory locates at least 100 declared HTML event targets',()=>{
   assert.equal(report.handlers.length,report.inlineEventCount);
   assert.equal(new Set(report.handlers.map(h=>h.line+':'+h.event+':'+h.handler)).size,report.handlers.length);
 });
-test('static inventory identifies nonfunctional clickable KPI cards',()=>{
-  assert.equal(report.issues.filter(x=>x.type==='fake-kpi-click').length,2);
-  assert.equal(report.handlers.filter(h=>h.classification==='MISLEADING_DISPLAY').length,2);
+test('DF4-033: informational analytics KPIs cannot masquerade as quick-session actions',()=>{
+  assert.equal(report.issues.filter(x=>x.type==='fake-kpi-click').length,0);
+  assert.equal(report.handlers.filter(h=>h.classification==='MISLEADING_DISPLAY').length,0);
 });
 test('global namespace collisions are recorded, not silently assumed safe',()=>{
   for(const fn of ['filterNotesByTag','renderNotesStack','openNoteModal','fillNoteTpl','saveNewNote'])
