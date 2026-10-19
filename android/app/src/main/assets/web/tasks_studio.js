@@ -59,35 +59,56 @@
   const content=el('div');wrapper.appendChild(content);target.appendChild(wrapper);
   const message=el('div','df-error');message.setAttribute('role','status');wrapper.appendChild(message);
   function taskCard(t){
-   const box=el('article','df-task'),head=el('header');append(head,el('div','df-title',t.title),el('span','df-status',l[C.statusOf(t)]));box.appendChild(head);
-   if(t.description)box.appendChild(el('p','df-muted',t.description));
-   const meta=el('div','df-meta'),actual=C.actualFocusMinutes(state,t.id);
-   append(meta,el('span','',`📅 ${t.date||'—'}${t.dueTime?' '+t.dueTime:''}`),el('span','',l[t.catKey]||t.catKey),el('span','',l[t.priority]||''),el('span','',`${l.estimated}: ${t.estimateMin||0} · ${l.actual}: ${actual}`));
-   if(C.isOverdue(t,currentDay()))meta.appendChild(el('strong','df-overdue',l.overdue));
-   box.appendChild(meta);
-   for(const kind of ['checklist','subtasks'])if(Array.isArray(t[kind])){
-    for(const x of t[kind]){
-     const row=el('label','df-check'),tick=input('checkbox');tick.checked=!!x.done;
-     tick.addEventListener('change',()=>apply(s=>C.setItemDone(s,t.id,kind,x.id,tick.checked)));
-     append(row,tick,el('span','',x.title));box.appendChild(row);
+    const card=el('article','df-task'),head=el('header'),caption=el('div','df-task-title');
+    append(caption,el('div','df-title',t.title),el('span','df-status',l[C.statusOf(t)]));
+    head.appendChild(caption);
+    if(t.dueAssigned!==false&&C.validDate(t.date)){
+     const due=el('span','df-mini-due',t.date+(t.dueTime?' '+t.dueTime:''));
+     if(C.isOverdue(t,currentDay()))due.className+=' df-overdue';head.appendChild(due);
     }
-    if(t[kind].length)box.appendChild(el('p','df-muted',`${l[kind==='checklist'?'check':'sub']}: ${t[kind].filter(x=>x.done).length}/${t[kind].length}`));
-   }
-   const actions=el('div','df-actions');
-   if(t.deletedAt)append(actions,btn(l.restore,()=>apply(s=>C.restoreTask(s,t.id))));
-   else {
-    append(actions,btn(l.edit,()=>{editing=t.id;render();}),btn(t.done?l.resume:l.done,()=>apply(s=>C.setStatus(s,t.id,t.done?'todo':'completed'))),
-      btn(l.focus,()=>{try{if(typeof adapter.linkTaskToTimer!=='function'||adapter.linkTaskToTimer(t.id)!==true)throw new Error(l.notConnected);}catch(e){error(e);}}));
-    if(C.statusOf(t)!=='archived')actions.appendChild(btn(l.archive,()=>apply(s=>C.setStatus(s,t.id,'archived'))));
-    append(actions,btn(l.remove,()=>apply(s=>C.trashTask(s,t.id)),'df-danger'));
+    if(!t.deletedAt)head.appendChild(btn(t.done?l.resume:l.done,()=>apply(x=>C.setStatus(x,t.id,t.done?'todo':'completed')),'df-primary-action df-primary'));
+    card.appendChild(head);
+    if(t.deletedAt){card.appendChild(btn(l.restore,()=>apply(x=>C.restoreTask(x,t.id)),'df-primary'));return card;}
+    const more=el('section','df-task-more');more.hidden=!expanded.has(t.id);
+    const toggle=btn(more.hidden?l.details:l.hide,()=>{
+     if(expanded.has(t.id))expanded.delete(t.id);else expanded.add(t.id);
+     more.hidden=!expanded.has(t.id);toggle.textContent=more.hidden?l.details:l.hide;
+     toggle.setAttribute('aria-expanded',String(!more.hidden));
+    },'df-expand');
+    toggle.setAttribute('aria-expanded',String(!more.hidden));card.appendChild(toggle);
+    if(t.description)more.appendChild(el('p','df-muted',t.description));
+    const meta=el('div','df-meta');meta.appendChild(el('span','',l[t.catKey]||t.catKey));
+    if(t.priority)meta.appendChild(el('span','',l[t.priority]||t.priority));
+    const actual=C.actualFocusMinutes(state,t.id);
+    if((t.estimateMin||0)>0||actual>0)meta.appendChild(el('span','',l.estimated+': '+(t.estimateMin||0)+' · '+l.actual+': '+actual));
+    more.appendChild(meta);
+    for(const kind of ['checklist','subtasks']){
+     if(!Array.isArray(t[kind]))continue;
+     for(const item of t[kind]){
+      const row=el('label','df-check'),tick=input('checkbox');tick.checked=!!item.done;
+      tick.addEventListener('change',()=>apply(x=>C.setItemDone(x,t.id,kind,item.id,tick.checked)));
+      append(row,tick,el('span','',item.title));more.appendChild(row);
+     }
+     if(t[kind].length)more.appendChild(el('p','df-muted',l[kind==='checklist'?'check':'sub']+': '+t[kind].filter(x=>x.done).length+'/'+t[kind].length));
+    }
+    const actions=el('div','df-actions'),pinned=C.topThree(state,currentDay()).some(x=>x.id===t.id);
+    append(actions,btn(l.edit,()=>{editing=t.id;render();}),btn(pinned?l.topUnpin:l.topPin,()=>{
+     const ids=C.topThree(state,currentDay()).map(x=>x.id),next=pinned?ids.filter(x=>x!==t.id):[...ids,t.id];
+     if(next.length>3){error(new Error(l.topLimit));return;}
+     apply(x=>({state:C.chooseTopThree(x,currentDay(),next)}));
+    }),btn(l.focus,()=>{try{if(typeof adapter.linkTaskToTimer!=='function'||adapter.linkTaskToTimer(t.id)!==true)throw new Error(l.notConnected);}catch(e){error(e);}}));
+    actions.appendChild(C.statusOf(t)==='archived'?btn(l.resume,()=>apply(x=>C.setStatus(x,t.id,'todo'))):btn(l.archive,()=>apply(x=>C.setStatus(x,t.id,'archived'))));
+    actions.appendChild(btn(l.remove,()=>apply(x=>C.trashTask(x,t.id)),'df-danger'));
     for(const kind of ['checklist','subtasks'])actions.appendChild(btn('＋ '+l[kind==='checklist'?'check':'sub'],()=>{
-     const title=typeof adapter.requestText==='function'?adapter.requestText(l.addCheck):null;
-     if(title)apply(s=>C.addItem(s,t.id,kind,title));
+     const value=typeof adapter.requestText==='function'?adapter.requestText(l[kind==='checklist'?'check':'sub']):null;
+     if(value)apply(x=>C.addItem(x,t.id,kind,value));
     }));
+    more.appendChild(actions);
+    const dateRow=el('div','df-date-quick'),dateField=input('date',t.date||currentDay());
+    append(dateRow,dateField,btn(l.saveDue,()=>apply(x=>C.updateTask(x,t.id,{date:dateField.value,dueAssigned:true}))));
+    more.appendChild(dateRow);card.appendChild(more);return card;
    }
-   box.appendChild(actions);return box;
-  }
-  function editor(){
+   function editor(){
    const t=state.tasksList.find(x=>x.id===editing),panel=el('div','df-dialog'),form=el('form','df-form');
    const title=input('text',t?.title||''),description=el('textarea');description.rows=3;description.value=t?.description||'';
    const due=input('date',t?.date||currentDay()),dueTime=input('time',t?.dueTime||'');
