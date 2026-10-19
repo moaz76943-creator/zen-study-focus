@@ -1,0 +1,138 @@
+name: Deep Focus Control Center Quality Audit
+
+on:
+  pull_request:
+    branches:
+      - main
+      - fix/v21-safe-release-recovery-20261018
+      - integration/deep-focus-recovery-00-final-20261019
+    paths:
+      - ".github/workflows/control_center_audit.yml"
+      - "tools/control_center/**"
+      - "tests/control_center/**"
+      - "docs/control-center/**"
+      - "docs/recovery_integration/**"
+      - "docs/MEDIA_LICENSES.md"
+      - "android/app/src/main/assets/web/**"
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deep-focus-control-center
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    name: Source QA and report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Control Center regression tests
+        run: node --test tests/control_center/*.test.cjs
+
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in android/app/src/main/assets/web/*.js docs/control-center/*.js tools/control_center/*.cjs; do
+            node --check "$file"
+          done
+
+      - name: Inspect static sources
+        run: |
+          node tools/control_center/audit.cjs \
+            --json report/health.json \
+            --markdown report/health.md
+
+      - name: Summarize findings and release gates
+        shell: bash
+        run: |
+          {
+            echo "### Control Center — read-only quality audit"
+            echo "Source SHA: $GITHUB_SHA"
+            echo "Android physical-device QA: **NOT_TESTED**"
+            echo "Release gate: **NOT APPROVED**"
+            cat report/health.md
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-focus-control-center-health
+          path: report/
+          retention-days: 14
+          if-no-files-found: error
+
+  triage:
+    name: Create or update one reviewable issue
+    needs: inspect
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      issues: write
+    steps:
+      - name: Download inspected evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: deep-focus-control-center-health
+          path: report
+
+      - name: Upsert reviewable critical findings
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const report = JSON.parse(fs.readFileSync('report/health.json', 'utf8'));
+            const blockers = Array.isArray(report.findings)
+              ? report.findings.filter(x => x.severity === 'critical') : [];
+            if (!blockers.length) {
+              core.info('No critical finding; never auto-close a human issue.');
+              return;
+            }
+            const {owner, repo} = context.repo;
+            const title = '[Control Center] Automated source-quality blockers';
+            const text = [
+              '## Automated quality audit (review required)',
+              '',
+              'Static source findings only. No device, legal or audio listening review is claimed.',
+              'Source SHA: ' + (report.inspected_ref || 'unknown'),
+              'Device QA: NOT_TESTED. No patches, merges, signing or release.',
+              '',
+              ...blockers.slice(0, 30).flatMap(f => [
+                '### ' + f.id + ': ' + f.title,
+                f.detail,
+                '',
+                'Suggested remediation: ' + f.remediation,
+                ''
+              ]),
+              'See workflow artifacts for machine-readable evidence.',
+              'Recovery plan: https://github.com/' + owner + '/' + repo + '/issues/13'
+            ].join('\n');
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state:'open', per_page:100
+            });
+            const existing = issues.find(x => !x.pull_request && x.title === title);
+            if (existing) {
+              if (existing.body !== text) {
+                await github.rest.issues.update({owner, repo, issue_number:existing.number, body:text});
+                core.info('Updated issue #' + existing.number);
+              }
+            } else {
+              const created=await github.rest.issues.create({owner, repo, title, body:text});
+              core.info('Created issue #' + created.data.number);
+            }
