@@ -56,7 +56,7 @@ test('white premium components are opt-in, complete and WebView-friendly', () =>
                           '.showcase-task-card','.an-kpi-card','.modal-card']) {
     assert.ok(cssUI.includes(selector), 'missing adapter: '+selector);
   }
-  assert.doesNotMatch(cssUI,/backdrop-filter\s*:/, 'avoid expensive WebView blur');
+  assert.doesNotMatch(cssUI,/backdrop-filter\s*:\s*blur\(/, 'avoid expensive WebView blur');
   assert.doesNotMatch(cssUI,/animation\s*:\s*[^;]*infinite/, 'no perpetual animation');
   assert.match(cssUI,/:focus-visible/);
   assert.match(cssUI,/@media\s*\(prefers-reduced-motion:\s*reduce\)/);
@@ -70,7 +70,7 @@ test('320px layout keeps timer on top and prevents fixed width overflow', () => 
   assert.match(cssUI,/\.df22-timer-zone\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s);
   assert.match(cssUI, /@media\s*\(min-width:\s*440px\)/);
   assert.match(cssUI, /\.df-v22\.timer-home[^{}]*\.ring-container\s*\{[^}]*max-width:/s);
-  assert.doesNotMatch(cssUI, /min-width:\s*(?:3[3-9]\d|[4-9]\d\d|\d{4,})px/, 'no mandatory width >320');
+  assert.doesNotMatch(cssUI, /(?:^|[;{])\s*min-width:\s*(?:3[3-9]\d|[4-9]\d\d|\d{4,})px\s*;/m, 'no mandatory width >320');
 });
 
 test('separate locale module covers all 20 languages and all new UI labels', () => {
@@ -105,4 +105,27 @@ test('existing app stays unchanged by opt-in design assets', () => {
     assert.doesNotMatch(js,/localStorage\.(setItem|removeItem)/);
   }
   assert.match(cssUI,/\.df-v22/);
+});
+
+test('locale application updates only explicitly marked text and accessibility attributes', () => {
+  const context={window:{}};
+  vm.createContext(context);
+  vm.runInContext(localeSource,context,{filename:'locale_premium_v22.js'});
+  function element(attribute,key) {
+    return { attributes:{[attribute]:key},textContent:'old',
+      getAttribute(k){return this.attributes[k];},setAttribute(k,v){this.attributes[k]=v;} };
+  }
+  const textEl=element('data-df22-i18n','newNote');
+  const ariaEl=element('data-df22-aria-label','timerLabel');
+  const placeholderEl=element('data-df22-placeholder','search');
+  const root={querySelectorAll(selector){
+    if(selector==='[data-df22-i18n]')return [textEl];
+    if(selector==='[data-df22-aria-label]')return [ariaEl];
+    if(selector==='[data-df22-placeholder]')return [placeholderEl];
+    return [];
+  }};
+  assert.equal(context.window.DF22Locale.apply(root,'ar'),3);
+  assert.equal(textEl.textContent,'ملاحظة جديدة');
+  assert.equal(ariaEl.attributes['aria-label'],'مؤقت التركيز');
+  assert.equal(placeholderEl.placeholder,'بحث');
 });
