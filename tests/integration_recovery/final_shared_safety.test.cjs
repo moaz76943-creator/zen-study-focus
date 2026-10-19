@@ -51,3 +51,16 @@ test('DF-157 native package and v21 keys not rewritten',()=>{
  const gradle=fs.readFileSync(path.join(root,'android/app/build.gradle'),'utf8');
  assert.match(gradle,/applicationId "com\.zenstudy\.focus"/);
 });
+
+// This is a source gate, NOT evidence that Audio Focus, DND or locked-screen playback works on a device.
+test('DF-037/040 native background cue uses recorded local WAV and a silent visual channel',()=>{
+ const service=fs.readFileSync(path.join(root,'android/app/src/main/java/com/zenstudy/focus/FocusTimerService.java'),'utf8');
+ const main=java(),bridge=web('integration_v22.js');
+ assert.match(service,/zen_completion_visual_v22/);
+ assert.match(service,/getAssets\(\)\.openFd\("web\/completion_alerts\//);
+ assert.match(service,/MainActivity\.isWebViewVisible\(\)/);
+ assert.doesNotMatch(service,/RingtoneManager|ringtone\.play\(\)/);
+ assert.match(service,/setSilent\(true\)/);
+ assert.match(main,/configureCompletionAlert\(String sound, int volume, boolean enabled\)/);
+ assert.match(bridge,/configureCompletionAlert\(state\.sound,state\.volume,state\.enabled\)/);
+});
