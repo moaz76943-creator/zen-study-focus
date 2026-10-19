@@ -1,0 +1,39 @@
+name: Recovery12 authentic nature audio forensics
+on:
+  pull_request:
+    branches: [integration/deep-focus-recovery-00-final-20261019]
+    paths:
+      - 'audio_candidates/recovery12/**'
+      - 'tests/audio_acquisition_12/**'
+      - '.github/workflows/recovery12_audio_audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-quarantined-sounds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify real ffmpeg tools
+        run: |
+          ffprobe -version
+          ffmpeg -version
+      - name: Test binary hashes and provenance blockers
+        run: node --test tests/audio_acquisition_12/*.test.cjs
+      - name: Decode full nine clips; report measured audio properties
+        run: node tests/audio_acquisition_12/audit_candidates.cjs --integrity > audio_candidates/recovery12/qa_ci_report.json
+      - name: Negative release gate must fail for unapproved candidates
+        shell: bash
+        run: |
+          if node tests/audio_acquisition_12/audit_candidates.cjs --release > /dev/null; then
+            echo "::error::Unauthorized audio approval"
+            exit 1
+          fi
+          echo "Expected: runtime release blocked"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recovery12-nine-oggs-forensic-qa
+          path: audio_candidates/recovery12/qa_ci_report.json
+          if-no-files-found: warn
