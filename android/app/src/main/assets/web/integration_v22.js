@@ -42,10 +42,21 @@
       if(alertEngine)alertEngine.dispose();
       alertConfigRef=cfg;
       alertEngine=root.DeepFocusCompletionAlerts.createCompletionAlerts(cfg,{
-        persist:changed=>saveFortressData('zen_fortress_cfg_v21',changed)===true,
+        persist:changed=>{
+          const ok=saveFortressData('zen_fortress_cfg_v21',changed)===true;
+          if(ok && root.ZenNative && typeof root.ZenNative.configureCompletionAlert==='function'){
+            const state=root.DeepFocusCompletionAlerts.readCompletionAlertSettings(changed);
+            try{root.ZenNative.configureCompletionAlert(state.sound,state.volume,state.enabled);}catch(_){}
+          }
+          return ok;
+        },
         onError:()=>notify('Completion audio not available')
       });
       root.DFRecoveryCompletion=alertEngine;
+      if(root.ZenNative && typeof root.ZenNative.configureCompletionAlert==='function'){
+        const state=alertEngine.getSettings();
+        try{root.ZenNative.configureCompletionAlert(state.sound,state.volume,state.enabled);}catch(_){}
+      }
     }
     if(alertPicker)alertPicker.unmount();
     const host=document.getElementById('completionAlertPickerHost');
