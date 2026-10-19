@@ -155,6 +155,9 @@
     }
     function extract(id){
       if(typeof adapter.commitBoth!=='function')throw new Error('ATOMIC_TASK_COMMIT_REQUIRED');
+      const snapshot=read();one(id,snapshot.notesList);
+      if(!core.checklistCandidates(snapshot.notesList,snapshot.tasksList,id).length)
+        return {...snapshot,created:[]}; // idempotent no-op: do not rewrite mirrors.
       return apply(before=>{
         const candidates=core.checklistCandidates(before.notesList,before.tasksList,id);
         if(!candidates.length)return { ...before,notesList:before.notesList,created:[]};
