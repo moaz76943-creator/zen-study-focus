@@ -119,9 +119,19 @@
       'Run node --test tests/control_center/*.test.cjs and regenerate the stylesheet.',
       'Do not change storage, navigation, 20 languages, signed releases or media licensing.'].join('\n')};
   }
+  function parseDesignIssue(body){
+    if(typeof body!=='string'||body.length>18000)throw Error('Invalid issue size');
+    const starts=body.split('--- START CONFIG JSON ---');
+    const ends=body.split('--- END CONFIG JSON ---');
+    if(starts.length!==2||ends.length!==2)throw Error('Must contain one config section');
+    const match=body.match(/--- START CONFIG JSON ---\s*([\s\S]*?)\s*--- END CONFIG JSON ---/);
+    const reference=body.match(/^Reference SHA: ([a-f0-9]{40})\r?$/m);
+    if(!match||!reference)throw Error('Exact source reference required');
+    return {sha:reference[1],config:validateConfig(JSON.parse(match[1]))};
+  }
   function issueLink(request){
     if(!request||typeof request.title!=='string'||typeof request.body!=='string')throw Error('Invalid request');
     return 'https://github.com/'+REPO+'/issues/new?title='+encodeURIComponent(request.title)+'&body='+encodeURIComponent(request.body);
   }
-  return {SCREENS,AGENTS,validateConfig,updateSetting,renderCSS,makeAgentRequest,makeDesignRequest,issueLink};
+  return {SCREENS,AGENTS,validateConfig,updateSetting,renderCSS,makeAgentRequest,makeDesignRequest,parseDesignIssue,issueLink};
 });

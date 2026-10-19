@@ -66,19 +66,6 @@ function toMarkdown(report){
     finding.detail,'','Remediation: '+finding.remediation,'');
   return lines.join('\n')+'\n';
 }
-function checkoutSha(root,env={},git=undefined){
-  // GITHUB_SHA denotes a synthetic merge commit for pull_request runs.
-  // The audited source is what Git actually checked out, not the event ref.
-  const exec=git||require('node:child_process').execFileSync;
-  try {
-    const actual=String(exec('git',['rev-parse','HEAD'],
-      {cwd:root,encoding:'utf8',timeout:5000})).trim();
-    if(/^[a-f0-9]{40}$/i.test(actual))return actual;
-  } catch (_) {}
-  // Never label an unverified PR merge ref as inspected source.
-  if(env.GITHUB_EVENT_NAME==='pull_request')return null;
-  return /^[a-f0-9]{40}$/i.test(env.GITHUB_SHA||'')?env.GITHUB_SHA:null;
-}
 function scan(root,env){
   const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
   const read=file=>fs.readFileSync(path.join(root,file),'utf8');
@@ -88,7 +75,7 @@ function scan(root,env){
     return {path:p,sha256:crypto.createHash('sha256').update(fs.readFileSync(path.join(root,p))).digest('hex')};
   });
   return analyze({ledger:read('docs/recovery_integration/FINAL_MATRIX_161.md'),
-    licenseText:read('docs/MEDIA_LICENSES.md'),media,headSha:checkoutSha(root,env)});
+    licenseText:read('docs/MEDIA_LICENSES.md'),media,headSha:env.GITHUB_SHA||''});
 }
 function main(argv,env) {
   const fs=require('node:fs'),path=require('node:path');
@@ -100,7 +87,7 @@ function main(argv,env) {
   }
   process.stdout.write('Source audit: '+report.totals.tasks+' tasks; '+report.findings.length+' findings; device NOT_TESTED\n');
 }
-if(typeof module==='object')module.exports={parseLedger,analyze,toMarkdown,checkoutSha,scan};
+if(typeof module==='object')module.exports={parseLedger,analyze,toMarkdown,scan};
 if(typeof require==='function'&&require.main===module){
   try{main(process.argv.slice(2),process.env);}catch(e){console.error(e.message);process.exitCode=1;}
 }

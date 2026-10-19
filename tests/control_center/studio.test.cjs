@@ -45,3 +45,15 @@ test('refuses untrusted HTML/JS URLs and missing title',()=>{
  assert.throws(()=>core.makeAgentRequest('ui','timer','   ','a'.repeat(40)));
  assert.throws(()=>core.updateSetting(defaults,'theme','primary','javascript:alert(1)'));
 });
+
+test('parses an owner design issue with exact 40-character base SHA and validated config',()=>{
+ const issue=core.makeDesignRequest(defaults,'b'.repeat(40));
+ const parsed=core.parseDesignIssue(issue.body);
+ assert.equal(parsed.sha,'b'.repeat(40));
+ assert.deepEqual(parsed.config,defaults);
+});
+test('rejects duplicated JSON sections and stale/noncanonical issue payload',()=>{
+ const valid=core.makeDesignRequest(defaults,'b'.repeat(40)).body;
+ assert.throws(()=>core.parseDesignIssue(valid+'\n--- START CONFIG JSON ---\n{}\n--- END CONFIG JSON ---'));
+ assert.throws(()=>core.parseDesignIssue(valid.replace('Reference SHA: ','Reference SHA: invalid-')));
+});
