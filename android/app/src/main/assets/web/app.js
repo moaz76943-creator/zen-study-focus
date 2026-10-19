@@ -536,13 +536,19 @@ function applyLanguage(code) {
     if (d[k]) el.setAttribute('placeholder', toWest(d[k]));
   });
 
+  // Existing edited starter records are user data, not replaceable samples.
   tasksList.forEach((t, idx) => {
-    if (t.isStarter && d.sampleTasks[idx]) t.title = toWest(d.sampleTasks[idx]);
+    if (!t.isStarter || !d.sampleTasks[idx]) return;
+    const unchangedSample = Object.values(DICT).some(lang => lang.sampleTasks?.[idx] === t.title);
+    if (unchangedSample) t.title = d.sampleTasks[idx];
   });
   notesList.forEach((n, idx) => {
-    if (n.isStarter && d.sampleNotes[idx]) {
-      n.title = toWest(d.sampleNotes[idx].t);
-      n.body = toWest(d.sampleNotes[idx].b);
+    if (!n.isStarter || !d.sampleNotes[idx]) return;
+    const unchangedSample = Object.values(DICT).some(lang =>
+      lang.sampleNotes?.[idx]?.t === n.title && lang.sampleNotes?.[idx]?.b === n.body);
+    if (unchangedSample) {
+      n.title = d.sampleNotes[idx].t;
+      n.body = d.sampleNotes[idx].b;
     }
   });
 
@@ -1246,7 +1252,7 @@ function renderTasksList() {
       <div class="showcase-task-top">
         <div class="task-check-sq" onclick="toggleTaskDone(${id})">✓</div>
         <div class="task-center-info" onclick="focusOnTask(${id})">
-          <div class="task-main-name">${escapeHtmlText(toWest(t.title))}</div>
+          <div class="task-main-name">${escapeHtmlText(t.title)}</div>
           <div class="task-time-sub">
             <span>📅 ${escapeHtmlText(toWest(t.date || todayISO))}</span>
             <span style="color:var(--primary); font-weight:700;">• ${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>
@@ -1373,14 +1379,14 @@ function renderSelectedDateAgenda() {
   dayTasks.forEach(t => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
+    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(t.title)}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
     box.appendChild(item);
   });
 
   dayNotes.forEach(n => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#fffbeb; border-right:4px solid #f59e0b; font-size:0.8rem;';
-    item.innerHTML = `<div style="font-weight:900;">📝 ${escapeHtmlText(toWest(n.title))}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${escapeHtmlText(toWest(n.body))}</div>`;
+    item.innerHTML = `<div style="font-weight:900;">📝 ${escapeHtmlText(n.title)}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${escapeHtmlText(n.body)}</div>`;
     box.appendChild(item);
   });
 }
@@ -1423,14 +1429,14 @@ function renderNotesStack() {
     card.className = `learning-rich-card ${n.theme}`;
     card.innerHTML = `
       <div class="lcard-head">
-        <div class="lcard-title"><span>✨</span> <span>${escapeHtmlText(toWest(n.title))}</span></div>
+        <div class="lcard-title"><span>✨</span> <span>${escapeHtmlText(n.title)}</span></div>
         <div style="display:flex; gap:8px;">
           <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${id})">📅</span>
           <span style="cursor:pointer;" onclick="toggleNoteBlur(${id})">👁️</span>
           <span style="cursor:pointer; color:var(--rose);" onclick="deleteNoteCard(${id})">✕</span>
         </div>
       </div>
-      <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${escapeHtmlText(toWest(n.body))}</div>
+      <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${escapeHtmlText(n.body)}</div>
       <div class="lcard-foot">
         <span>📅 ${escapeHtmlText(toWest(n.calDate || todayISO))}</span>
         <span style="font-weight:800; color:var(--primary);">${escapeHtmlText(toWest(getNoteTagLabel(n.catKey)))}</span>
@@ -1460,8 +1466,8 @@ function fillNoteTpl(type) {
 }
 
 function saveNewNote() {
-  const t = toWest(document.getElementById('inpNoteTitle').value.trim());
-  const b = toWest(document.getElementById('inpNoteBody').value.trim());
+  const t = document.getElementById('inpNoteTitle').value.trim();
+  const b = document.getElementById('inpNoteBody').value.trim();
   if (!t && !b) return;
   const catKey = document.getElementById('selNoteCat').value;
   const calDate = toWest(document.getElementById('inpNoteCalDate').value || todayISO);
@@ -1492,7 +1498,7 @@ function deleteNoteCard(id) {
 }
 
 function exportAllNotes() {
-  const txt = notesList.map(n => `[${toWest(n.title)} - ${toWest(n.calDate)}]\n${toWest(n.body)}`).join('\n\n---\n\n');
+  const txt = notesList.map(n => `[${n.title} - ${toWest(n.calDate)}]\n${n.body}`).join('\n\n---\n\n');
   if (navigator.clipboard) navigator.clipboard.writeText(txt);
   showToast('📥 TXT');
 }
@@ -1503,7 +1509,7 @@ function openBrainDumpModal() {
 }
 
 function saveQuickDump(toTasks) {
-  const val = toWest(document.getElementById('inpQuickDump').value.trim());
+  const val = document.getElementById('inpQuickDump').value.trim();
   if (!val) return;
   if (toTasks) {
     tasksList.unshift({ id: nextRecordId(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false });
