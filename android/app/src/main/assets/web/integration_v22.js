@@ -62,6 +62,7 @@
     if(alertPicker)alertPicker.unmount();
     const host=document.getElementById('completionAlertPickerHost');
     if(host)alertPicker=root.DeepFocusCompletionAlerts.mountCompletionAlertPicker(host,alertEngine,{
+      locale:cfg.lang,
       translate:(key,fallback)=>{
         const translated=root.DeepFocusCompletionAlertLocales &&
           root.DeepFocusCompletionAlertLocales.translate(cfg.lang,key);
