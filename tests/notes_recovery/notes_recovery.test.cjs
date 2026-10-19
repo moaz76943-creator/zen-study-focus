@@ -62,3 +62,35 @@ test('DF-090: opened-note snapshot is checked before reopening a saved draft',()
   assert.equal(UI.draftVersionMatches(same,{...original,body:'newer'}),false);
   assert.equal(UI.draftVersionMatches({},original),true); // legacy v1 compatibility
 });
+
+test('DF-096: backlinks reference existing numeric ID without changing either note',()=>{
+  const r=rig([original,{id:9,title:'Ref',body:'See note',notesV21:{links:[7]},catKey:'quick'}]);
+  const before=copy(r.state);
+  assert.deepEqual(r.controller.backlinks(7),[9]);
+  assert.deepEqual(r.state,before);
+});
+test('DF-102: TXT copy source preserves original Unicode and Cornell text',()=>{
+  const input={...original,title:'German \u00fc / \u0627\u0644\u0639\u0631\u0628\u064a\u0629',
+    notesV21:{cornell:{cues:'Why?',notes:'Answer',summary:'Done'}}};
+  const result=UI.serializeNote(input,'txt');
+  assert.ok(result.includes('German \u00fc / \u0627\u0644\u0639\u0631\u0628\u064a\u0629'));
+  assert.ok(result.includes('Main notes\nAnswer'));
+  assert.deepEqual(input.notesV21.cornell,{cues:'Why?',notes:'Answer',summary:'Done'});
+});
+test('DF-100/102: Markdown export source encodes unsafe HTML and remains text',()=>{
+  const input={...original,body:'<script>alert(1)</script>\n<img src=x onerror=bad()>'};
+  const markdown=UI.serializeNote(input,'md');
+  assert.ok(markdown.includes('&lt;script&gt;'));
+  assert.ok(!markdown.includes('<script>'));
+  assert.throws(()=>UI.serializeNote(input,'pdf'),/INVALID_FORMAT/);
+});
+test('DF-103: 5,000 notes remain fully searchable with bounded pages',()=>{
+  const a=Array.from({length:5000},(_,id)=>({
+    id,title:'Lesson '+id,body:id%10===0?'keyword':'other',catKey:id%2?'quick':'cornell',isStarter:false
+  }));
+  const r=rig(a);
+  const res=r.controller.query({query:'keyword',category:'cornell',status:'active',limit:100});
+  assert.equal(res.total,500);
+  assert.equal(res.items.length,100);
+  assert.ok(res.items.every(n=>n.catKey==='cornell'));
+});
