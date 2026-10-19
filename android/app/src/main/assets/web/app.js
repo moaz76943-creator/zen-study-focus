@@ -1548,6 +1548,29 @@ const soundGeneration = Object.create(null);
 // Only these two files currently have individual CC0 provenance references in the v21 ledger.
 // Other catalogue items remain registered for recovery but unavailable until per-file rights and device listening are proven.
 const NATURE_APPROVED_FOR_PLAYBACK = new Set(['forest','wind']);
+// UI-only status: never mark unverified media as playable.
+const NATURE_EMPTY_MESSAGES = Object.freeze({
+  "en": "No approved nature recordings are available in this category yet.",
+  "ar": "لا توجد تسجيلات طبيعية معتمدة في هذه الفئة حاليًا.",
+  "es": "Todavía no hay grabaciones de la naturaleza aprobadas en esta categoría.",
+  "zh": "此类别暂时没有已审核的自然声音录音。",
+  "hi": "इस श्रेणी में अभी कोई स्वीकृत प्राकृतिक ध्वनि रिकॉर्डिंग उपलब्ध नहीं है।",
+  "fr": "Aucun enregistrement de la nature approuvé n’est disponible dans cette catégorie.",
+  "de": "Für diese Kategorie sind noch keine geprüften Naturaufnahmen verfügbar.",
+  "ru": "В этой категории пока нет одобренных записей звуков природы.",
+  "pt": "Ainda não há gravações da natureza aprovadas nesta categoria.",
+  "ja": "このカテゴリには承認済みの自然音の録音がまだありません。",
+  "id": "Belum ada rekaman suara alam yang disetujui dalam kategori ini.",
+  "tr": "Bu kategoride henüz onaylanmış doğa sesi kaydı yok.",
+  "ko": "이 카테고리에는 아직 승인된 자연 소리 녹음이 없습니다.",
+  "vi": "Danh mục này chưa có bản ghi âm thiên nhiên nào được phê duyệt.",
+  "it": "In questa categoria non sono ancora disponibili registrazioni della natura approvate.",
+  "bn": "এই বিভাগে এখনও অনুমোদিত প্রাকৃতিক শব্দের রেকর্ডিং নেই।",
+  "ur": "اس زمرے میں ابھی کوئی منظور شدہ قدرتی آواز کی ریکارڈنگ دستیاب نہیں ہے۔",
+  "fa": "هنوز هیچ صدای طبیعی تأییدشده‌ای در این دسته موجود نیست.",
+  "pl": "W tej kategorii nie ma jeszcze zatwierdzonych nagrań dźwięków natury.",
+  "nl": "Er zijn nog geen goedgekeurde natuurgeluidsopnamen in deze categorie."
+});
 
 function stopSoundTile(id) {
   soundGeneration[id] = (soundGeneration[id] || 0) + 1;
@@ -1618,7 +1641,17 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id) && (soundCat === 'all' || s.cat === soundCat)).forEach(s => {
+  const approved = SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id) &&
+    (soundCat === 'all' || s.cat === soundCat));
+  if (!approved.length) {
+    const empty = document.createElement('p');
+    empty.className = 'sounds-empty-state';
+    empty.setAttribute('role', 'status');
+    empty.textContent = NATURE_EMPTY_MESSAGES[cfg.lang] || NATURE_EMPTY_MESSAGES.en;
+    box.appendChild(empty);
+    return;
+  }
+  approved.forEach(s => {
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
     const tile = document.createElement('div');
