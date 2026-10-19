@@ -61,6 +61,29 @@ class ParserTests(unittest.TestCase):
         suite.test("navigation", "read")
         self.assertEqual([r["status"] for r in suite.records], ["PASS", "FAIL"])
 
+    def test_webview_without_descendants_is_unverified_not_a_confirmed_app_failure(self):
+        from types import SimpleNamespace
+        class WebViewOnly:
+            def shell(self, *args, **kwargs): return "package:com.zenstudy.focus"
+            def launch(self): pass
+            def dump(self):
+                return [
+                    {"class":"android.widget.FrameLayout","package":"com.zenstudy.focus"},
+                    {"class":"android.widget.LinearLayout","package":"com.zenstudy.focus"},
+                    {"class":"android.widget.FrameLayout","package":"com.zenstudy.focus"},
+                    {"class":"android.widget.FrameLayout","package":"com.zenstudy.focus"},
+                    {"class":"android.webkit.WebView","package":"com.zenstudy.focus",
+                     "bounds":"[0,0][1080,2400]","text":"","content-desc":""},
+                ]
+            def see(self, *args):
+                raise AssertionError("Cannot test invisible HTML controls with an empty accessibility tree")
+        suite = mod.Suite(WebViewOnly(), SimpleNamespace(
+            ack_disposable_data=True, run_slow=True, allow_rotation=True))
+        suite.test("preflight","read")
+        suite.test("navigation","read")
+        self.assertEqual([r["status"] for r in suite.records],["NOT_TESTED","NOT_TESTED"])
+        self.assertIn("WebView",suite.records[0]["detail"])
+
     def test_permission_prompt_requires_disposable_ack_and_app_ui_proof(self):
         from types import SimpleNamespace
         class Device:
