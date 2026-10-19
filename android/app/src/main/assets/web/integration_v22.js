@@ -11,7 +11,7 @@
   const D = root.DeepFocusDataCompatV21;
   const FAMILIES = [['cfg','cfg'],['tasks','tasksList'],['notes','notesList']];
   let tasksUi = null, analyticsUi = null, lastLocale = null, mounted = false;
-  let alertEngine = null, alertPicker = null;
+  let alertEngine = null, alertPicker = null, alertConfigRef = null;
   const pendingExports = new Map();
   let exportSerial = 0;
   root.DFRecoveryNativeExportResult = function(requestId, status) {
@@ -37,7 +37,10 @@
   }
   function mountAlertPicker() {
     if(!root.DeepFocusCompletionAlerts)return;
-    if(!alertEngine){
+    if(alertConfigRef!==cfg){
+      if(alertPicker){alertPicker.unmount();alertPicker=null;}
+      if(alertEngine)alertEngine.dispose();
+      alertConfigRef=cfg;
       alertEngine=root.DeepFocusCompletionAlerts.createCompletionAlerts(cfg,{
         persist:changed=>saveFortressData('zen_fortress_cfg_v21',changed)===true,
         onError:()=>notify('Completion audio not available')
@@ -135,6 +138,7 @@
     catch (e) { throw new Error('Commit complete, journal cleanup pending. Reload after explicit recovery: ' + e.message); }
     // Publish only after ALL six packets verify AND the journal is cleared.
     cfg = after.cfg;tasksList = after.tasksList;notesList = after.notesList;
+    if(mounted)mountAlertPicker();
     return true;
   }
   function fromNoteEdit(before,after,allowTaskChange) {
@@ -221,11 +225,13 @@
   }
   function onTab(section) {
     if (!mounted) return;
+    if(alertConfigRef!==cfg)mountAlertPicker();
     if (section === 'sec-tasks' && tasksUi) tasksUi.refresh();
     if (section === 'sec-analytics' && analyticsUi) analyticsUi.refresh();
     if (section === 'sec-notes' && root.DeepFocusNotesEditorUI) root.DeepFocusNotesEditorUI.renderStack();
   }
   function onSessionRecorded() {
+    if(alertConfigRef!==cfg)mountAlertPicker();
     if (analyticsUi) analyticsUi.refresh();
     if (tasksUi) tasksUi.refresh();
   }
