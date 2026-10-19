@@ -53,8 +53,9 @@ sandbox.window.localStorage = storage;
 sandbox.window.document = document;
 sandbox.window.navigator = sandbox.navigator;
 vm.createContext(sandbox);
-for(const file of ['locale_rows.js','locale_extras.js','quick_training.js','app.js']){
+for(const file of ['locale_rows.js','locale_extras.js','quick_training.js','analytics_recovery_core.js','app.js']){
   vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),sandbox,{filename:file,timeout:2000});
+  if(file==='analytics_recovery_core.js')sandbox.window.DeepFocusAnalyticsRecovery=sandbox.DeepFocusAnalyticsRecovery;
 }
 const evaluate=expr=>vm.runInContext(expr,sandbox,{timeout:2000});
 assert.match(document.getElementById('timerDigitsTxt').textContent,/^[0-9]{2}:[0-9]{2}$/);
