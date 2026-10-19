@@ -24,6 +24,7 @@
   const currentDay=()=>dateLocal(typeof adapter.now==='function'?adapter.now():new Date());
    let cachedState=null,cachedFocus=new Map(),cachedPicksState=null,cachedPicksDay='',cachedPicks=[];
    function focusFor(id){if(cachedState!==state){cachedFocus=C.sessionTotals(state);cachedState=state;}return cachedFocus.get(id)||0;}
+   function manualIds(snapshot){const v=snapshot.cfg?.taskTopThreeV21?.[currentDay()];return Array.isArray(v)?v:[];}
    function picks(){const day=currentDay();if(cachedPicksState!==state||cachedPicksDay!==day){cachedPicks=C.topThree(state,day);cachedPicksState=state;cachedPicksDay=day;}return cachedPicks;}
   const el=(tag,cls,text)=>{const x=doc.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=String(text);return x;};
   const btn=(caption,fn,kind='')=>{const b=el('button','df-btn '+kind,caption);b.type='button';b.addEventListener('click',fn);return b;};
@@ -94,9 +95,9 @@
      }
      if(t[kind].length)more.appendChild(el('p','df-muted',l[kind==='checklist'?'check':'sub']+': '+t[kind].filter(x=>x.done).length+'/'+t[kind].length));
     }
-    const actions=el('div','df-actions'),pinned=picks().some(x=>x.id===t.id);
+    const actions=el('div','df-actions'),pinned=manualIds(state).includes(t.id);
     append(actions,btn(l.edit,()=>{editing=t.id;render();}),btn(pinned?l.topUnpin:l.topPin,()=>{
-     apply(x=>{const ids=C.topThree(x,currentDay()).map(item=>item.id);
+     apply(x=>{const ids=manualIds(x).slice();
       const next=ids.includes(t.id)?ids.filter(id=>id!==t.id):[...ids,t.id];
       if(next.length>3)throw new Error(l.topLimit);
       return {state:C.chooseTopThree(x,currentDay(),next)};
