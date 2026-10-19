@@ -17,3 +17,7 @@ Android: NOT_TESTED (no adb/device). Remaining: native boundary, legacy restore 
 ## Follow-up — live backup restore journal
 
 The live legacy backup entry now calls the existing DF22Integration.write before publishing imported records, so process interruption uses the same durable journal and explicit startup recovery as the studios. Standalone legacy smoke hosts without the integration adapter retain their original verified-write fallback. New tests execute actual data_compat and integration modules plus the shipped validator/restore function: successful six-packet restore, failed mirror write rollback with unchanged memory/bytes, and duplicate rejection before any write: 3/3 PASS. Existing smoke PASS. No new backup format or schema. Physical process-kill/storage-full recovery remains NOT_TESTED.
+
+## Historical duplicate IDs — singular actions fail safely
+
+Final review found that a candidate built with map/filter could affect multiple historical rows sharing one numeric ID. The legacy toggle/delete/pin/blur actions now require exactly one matching record before editing. Existing duplicate bytes are retained, never silently deleted or renumbered. New regression checks all five actions against ambiguous IDs; 24 focused data tests and smoke PASS. Full updated Node suite: 364 PASS, 0 FAIL (media release gate remains separate RED).

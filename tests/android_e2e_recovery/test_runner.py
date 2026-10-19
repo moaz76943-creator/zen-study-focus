@@ -50,6 +50,17 @@ class ParserTests(unittest.TestCase):
                          ["NOT_TESTED","NOT_TESTED","NOT_TESTED"])
         self.assertTrue(all("UIAutomator" in r["detail"] for r in suite.records))
 
+    def test_observed_app_assertion_failure_remains_fail(self):
+        from types import SimpleNamespace
+        suite = mod.Suite(object(), SimpleNamespace(
+            ack_disposable_data=True, run_slow=True, allow_rotation=True))
+        suite.case_preflight = lambda: None
+        suite.case_navigation = lambda: (_ for _ in ()).throw(
+            mod.CheckFailed("Control not exposed/visible: Tasks"))
+        suite.test("preflight", "read")
+        suite.test("navigation", "read")
+        self.assertEqual([r["status"] for r in suite.records], ["PASS", "FAIL"])
+
     def test_cases_are_unique_and_restricted_paths_explicit(self):
         ids=[x[0] for x in mod.CASES]
         self.assertEqual(len(ids),len(set(ids)))

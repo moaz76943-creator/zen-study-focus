@@ -68,12 +68,19 @@ const L=require('../../android/app/src/main/assets/web/completion_alert_locales.
    assert.equal(await page.locator('#soundsGridBox [role="status"]').innerText(),await page.evaluate(()=>L().natureNoApproved));
    assert.equal(await page.locator('[data-sound-category="warm"] bdi').innerText(),'(0)');
   }
-  await page.evaluate(()=>{applyLanguage('ar');stopAllAudio();toggleSoundTile('forest');toggleSoundTile('wind');});
+  await page.evaluate(()=>applyLanguage('ar'));
+  await page.locator('[data-sound-category="all"]').click();
+  await page.locator('.sbg-forest').click();await page.locator('.sbg-wind').click();
   await page.waitForFunction(()=>window.df4Media.slice(-2).every(a=>a.readyState>=2&&!a.paused));
   assert.ok(await page.evaluate(()=>window.df4Media.slice(-2).reduce((sum,a)=>sum+a.volume,0)<=.8500001));
-  await page.evaluate(()=>stopAllAudio());assert.ok(await page.evaluate(()=>window.df4Media.every(a=>a.paused)));
+  await page.locator('.sbg-forest input[type=range]').fill('0');
+  await page.locator('.sbg-forest input[type=range]').dispatchEvent('input');
+  assert.equal(await page.evaluate(()=>window.df4Media.at(-2).volume),0);
+  await page.locator('.sbg-forest').click();assert.ok(await page.evaluate(()=>window.df4Media.at(-2).paused&&!window.df4Media.at(-1).paused));
+  await page.locator('#sec-sounds button[onclick="stopAllAudio()"]').click();assert.ok(await page.evaluate(()=>window.df4Media.every(a=>a.paused)));
+  await page.locator('[data-sound-category="warm"]').click();
   await page.locator('#soundsGridBox').scrollIntoViewIfNeeded();await page.screenshot({path:join(out,'nature-empty-ar-360.png')});
-  results.push({status:'PASS',scope:'empty category localized in 20 locales; real desktop forest/wind decode and simultaneous mix with gain cap; stop-all'});
+  results.push({status:'PASS',scope:'empty category localized in 20 locales; real desktop tile taps, independent volume, stop-one, decode and simultaneous mix with gain cap; stop-all button'});
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
   results.push({status:'PASS',scope:'bootstrap/console/local asset responses; external network denied'});
   fs.writeFileSync(join(out,'results.json'),JSON.stringify({url,environment:'Desktop Chromium, NOT Android',results,errors,failed},null,2)+'\n');
