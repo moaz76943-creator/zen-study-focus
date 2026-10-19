@@ -3,15 +3,18 @@
 const NS_DRAFT_KEY='deep_focus_unsaved_note_draft_v1';
 const NS_DRAFT_LIMIT=100000; // bounded to avoid consuming all WebView storage
 let nsDraftTimer=null;
+let nsDraftDirty=false;
 const NS_DRAFT_LANG={
  en:{saved:'Draft saved on this device',ready:'An unfinished draft is available',restore:'Restore draft',
  discard:'Discard',tooLong:'Draft exceeds autosave limit. Save this note directly.',restored:'Draft restored',
  cleared:'Draft discarded',other:'Another unfinished note is saved. Open or export it before overwriting.',
- conflict:'The saved note changed since this draft was created. Restore is blocked to prevent overwriting newer content; copy or discard the older draft.'},
+ conflict:'The saved note changed since this draft was created. Restore is blocked to prevent overwriting newer content; copy or discard the older draft.',
+ unsaved:'Your edits could not be backed up on this device. Close and risk losing these changes?'},
  ar:{saved:'تم حفظ المسودة على الجهاز',ready:'توجد مسودة غير مكتملة',restore:'استعادة المسودة',
  discard:'حذف المسودة',tooLong:'المسودة كبيرة جدًا للحفظ التلقائي. احفظ الملاحظة مباشرة.',restored:'تمت استعادة المسودة',
  cleared:'تم حذف المسودة',other:'توجد مسودة لملاحظة أخرى. افتحها أو انسخها قبل الاستبدال.',
- conflict:'تغيرت الملاحظة المحفوظة منذ إنشاء المسودة. استعادة المسودة محظورة لحماية النسخة الأحدث؛ انسخ المسودة القديمة أو احذفها.'}
+ conflict:'تغيرت الملاحظة المحفوظة منذ إنشاء المسودة. استعادة المسودة محظورة لحماية النسخة الأحدث؛ انسخ المسودة القديمة أو احذفها.',
+ unsaved:'تعذّر حفظ هذه التعديلات كمسودة. هل تريد الإغلاق مع احتمال فقدانها؟'}
 };
 function nsDraftLabel(k){return (cfg.lang==='ar'?NS_DRAFT_LANG.ar:NS_DRAFT_LANG.en)[k];}
 function nsGetStoredDraft(){
@@ -44,6 +47,7 @@ function nsDraftState(status,offer){
  if(discard){discard.hidden=!offer;discard.textContent=nsDraftLabel('discard');}
 }
 function nsPrepareDraft(){
+ nsDraftDirty=false;
  if(nsDraftTimer!==null){clearTimeout(nsDraftTimer);nsDraftTimer=null;}
  const saved=nsGetStoredDraft();
  const same=saved&&nsDraftContextMatches(saved);
@@ -98,6 +102,7 @@ function nsRestoreDraft(){
  document.getElementById('nsPinCheck').checked=!!saved.pinned;
  document.getElementById('nsFavCheck').checked=!!saved.favorite;
  if(window.DeepFocusNotesEditorUI?.restoreDraftFields)window.DeepFocusNotesEditorUI.restoreDraftFields(saved);
+ nsDraftDirty=true;
  nsUpdateCount();nsDraftState('restored',false);
  return true;
 }
@@ -114,11 +119,16 @@ function nsClearDraftForSavedNote(){
  const draft=nsGetStoredDraft();
  if(!draft||nsDraftContextMatches(draft))nsDeleteDraftKey();
 }
-function nsCloseEditor(){nsFlushDraft();closeModal('noteModal');}
+function nsCloseEditor(){
+ if(nsDraftDirty&&!nsFlushDraft()){
+  if(typeof window.confirm!=='function'||!window.confirm(nsDraftLabel('unsaved')))return false;
+ }
+ nsDraftDirty=false;closeModal('noteModal');return true;
+}
 const nsDraftDialog=document.getElementById('noteModal');
 if(nsDraftDialog){
- nsDraftDialog.addEventListener('input',nsScheduleDraft);
- nsDraftDialog.addEventListener('change',nsScheduleDraft);
+ nsDraftDialog.addEventListener('input',()=>{nsDraftDirty=true;nsScheduleDraft();});
+ nsDraftDialog.addEventListener('change',()=>{nsDraftDirty=true;nsScheduleDraft();});
 }
 if(typeof document.addEventListener==='function')
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')nsFlushDraft();});
