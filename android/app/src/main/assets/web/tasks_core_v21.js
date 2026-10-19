@@ -205,7 +205,7 @@
     const completed=rows.filter(t=>t.done).length;
     return {total:rows.length,completed,percent:rows.length?Math.round(completed*100/rows.length):0};
   }
-  function isOverdue(t,today) {if(!validDate(today))fail('Invalid comparison day');return !!(validDate(t.date)&&t.date<today&&!t.done&&!t.deletedAt&&statusOf(t)!=='archived');}
+  function isOverdue(t,today) {if(!validDate(today))fail('Invalid comparison day');return !!(t.dueAssigned!==false&&validDate(t.date)&&t.date<today&&!t.done&&!t.deletedAt&&statusOf(t)!=='archived');}
   // User-curated top three, stored additively in cfg; no synthetic/automatic picks.
   function chooseTopThree(state,today,ids) {
     if(!validDate(today)||!Array.isArray(ids)||ids.length>3||new Set(ids).size!==ids.length)fail('Select up to three distinct task IDs');
