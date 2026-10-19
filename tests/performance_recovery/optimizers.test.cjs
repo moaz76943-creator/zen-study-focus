@@ -21,7 +21,7 @@ test('latest-only scheduler coalesces typing, updates the last query and cancels
   const s = createLatestScheduler(v => ran.push(v), {schedule,cancel});
   for (const word of ['s','st','stu','study']) s.request(word);
   assert.equal(tasks.size, 1);
-  for (const fn of [...tasks.values()]) fn();
+  for (const [id, fn] of [...tasks]) { tasks.delete(id); fn(); }
   assert.deepEqual(ran, ['study']);
   s.request('new'); s.dispose();
   assert.equal(tasks.size,0);
