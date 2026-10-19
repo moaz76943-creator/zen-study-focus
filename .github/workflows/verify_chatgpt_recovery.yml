@@ -4,11 +4,13 @@ on:
   pull_request:
     branches:
       - integration/deep-focus-recovery-00-final-20261019
+      - fix/df-chatgpt-offline-fonts-20261019
     paths:
       - 'android/app/src/main/assets/web/**'
       - 'tests/integration_recovery/**'
       - 'tests/analytics_recovery/**'
       - 'tests/completion_alerts/**'
+      - 'tests/tasks_recovery/**'
       - '.github/workflows/verify_chatgpt_recovery.yml'
   workflow_dispatch:
 
@@ -31,11 +33,16 @@ jobs:
           node --check tests/integration_recovery/offline_typography.test.cjs
           node --check tests/analytics_recovery/analytics_ar.test.cjs
           node --check tests/completion_alerts/picker_locales.test.cjs
+          node --check tests/completion_alerts/mobile_picker.test.cjs
+          node --check tests/tasks_recovery/mobile_density.test.cjs
+          node --check android/app/src/main/assets/web/tasks_studio.js
+          node --check android/app/src/main/assets/web/completion_alert_settings.js
       - name: Focused recovery regressions and existing contracts
         run: |
           node --test tests/integration_recovery/*.test.cjs
           node --test tests/analytics_recovery/*.test.cjs
           node --test tests/completion_alerts/*.test.cjs
+          node --test tests/tasks_recovery/*.test.cjs
           node --test tests/localization_20/*.test.cjs
           node --test tests/master_recovery_qa/source_contracts.test.cjs
 
