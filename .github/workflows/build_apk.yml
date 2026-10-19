@@ -42,6 +42,10 @@ jobs:
           node --check android/app/src/main/assets/web/notes_studio.js
           node --check android/app/src/main/assets/web/goals_studio.js
           node --check android/app/src/main/assets/web/notes_drafts.js
+          for f in data_compat_v21.js data_write_guard_v21.js notes_core_v21.js notes_editor_ui.js tasks_core_v21.js tasks_studio.js analytics_core_v21.js analytics_studio.js sound_mix_controls.js integrated_app_v21.js locale_premium_v22.js; do
+            node --check "android/app/src/main/assets/web/$f"
+          done
+          node --test tests/data_contracts/*.test.cjs tests/notes_core/*.test.cjs tests/notes_ui/*.test.cjs tests/tasks_core/*.test.cjs tests/analytics_core/*.test.cjs tests/design_quality/*.test.cjs tests/focus_workflows/*.test.cjs tests/integration_quality/*.test.cjs tests/regression_v21/*.test.cjs
           node --check android/app/src/main/assets/web/timer_settings.js
           node --check android/app/src/main/assets/web/locale_rows.js
           node --check android/app/src/main/assets/web/locale_extras.js

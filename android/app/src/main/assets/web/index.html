@@ -634,6 +634,8 @@
     .toast-pill.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
   <link rel="stylesheet" href="white_2100.css">
+  <link rel="stylesheet" href="design_tokens_v22.css">
+  <link rel="stylesheet" href="ui_components_v22.css">
 </head>
 <body>
 
@@ -701,9 +703,9 @@
             <span class="focus-status" id="focusStatusLabel" data-qt="ready">جاهز للإنجاز</span>
           </div>
           <div class="segmented-pills-bar">
-            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerMode(getDomainFocusMinutes(), 'focus', this)" data-i18n="modeFocus">25m</button>
-            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">5m</button>
-            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">15m</button>
+            <button class="seg-pill active" id="modeFocusBtn" onclick="requestTimerMode(getDomainFocusMinutes(), 'focus', this)" data-i18n="modeFocus">25m</button>
+            <button class="seg-pill" id="modeShortBtn" onclick="requestTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">5m</button>
+            <button class="seg-pill" id="modeLongBtn" onclick="requestTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">15m</button>
             <button class="seg-pill" id="modeCustomBtn" onclick="openCustomTimerModal()" data-i18n="modeCustom">Custom ⚡</button>
           </div>
 
@@ -1217,11 +1219,22 @@
 
   <script src="locale_rows.js"></script>
   <script src="locale_extras.js"></script>
+  <script src="locale_premium_v22.js"></script>
+  <script src="data_compat_v21.js"></script>
+  <script src="data_write_guard_v21.js"></script>
   <script src="quick_training.js"></script>
   <script src="app.js"></script>
+  <script src="notes_core_v21.js"></script>
   <script src="notes_studio.js"></script>
+  <script src="notes_editor_ui.js"></script>
   <script src="goals_studio.js"></script>
   <script src="notes_drafts.js"></script>
   <script src="timer_settings.js"></script>
+  <script src="tasks_core_v21.js"></script>
+  <script src="tasks_studio.js"></script>
+  <script src="analytics_core_v21.js"></script>
+  <script src="analytics_studio.js"></script>
+  <script src="sound_mix_controls.js"></script>
+  <script src="integrated_app_v21.js"></script>
 </body>
 </html>
