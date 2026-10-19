@@ -10,7 +10,7 @@
   const ISSUE = 'https://github.com/' + REPO + '/issues/13';
   const SOURCE_FILE = '/docs/recovery_integration/FINAL_MATRIX_161.md';
   const STATUSES = ['BLOCKED','IN_PROGRESS','TODO','TESTED','DEFERRED'];
-  let state = {tasks:[], prs:[], runs:[], head:null, sync:null, audit:null, errors:[], visible:25};
+  let state = {tasks:[], prs:null, runs:null, head:null, sync:null, audit:null, errors:[], visible:25};
 
   function parseTasks(markdown) {
     const seen = new Set(), tasks = [];
@@ -42,7 +42,7 @@
   }
   function repairPrompt(tasks, sha) {
     const target = /^[0-9a-f]{40}$/i.test(sha||'')?sha:'لم يُتحقق من SHA؛ افحصه أولًا';
-    const open = filterTasks(tasks,'','BLOCKED','ALL').slice(0,12);
+    const open = tasks.length===1 ? tasks : filterTasks(tasks,'','BLOCKED','ALL').slice(0,12);
     return [
       '# DEEP FOCUS — SAFE REMEDIATION BATCH',
       'Repository: '+REPO,
@@ -182,6 +182,7 @@
   }
   async function refresh() {
     const btn=byId('refresh');btn.disabled=true;byId('connection').textContent='جاري تحديث البيانات...';
+    state.tasks=[];state.prs=null;state.runs=null;state.head=null;state.sync=null;
     const errors=[];
     try {
       const pr=await getJSON('/pulls/25');
@@ -223,8 +224,8 @@
       schema_version:1,source:'GitHub public API and PR #25 recovery ledger',
       exported_at:new Date().toISOString(),inspected_ref:state.head,
       partial_sources:state.errors,device_qa:'NOT_TESTED',
-      tasks:state.tasks, prs:state.prs.map(p=>({number:p.number,title:p.title,html_url:p.html_url,draft:p.draft})),
-      workflows:state.runs.map(r=>({id:r.id,name:r.name,status:r.status,conclusion:r.conclusion,head_sha:r.head_sha,html_url:r.html_url})),
+      tasks:state.tasks, prs:(state.prs||[]).map(p=>({number:p.number,title:p.title,html_url:p.html_url,draft:p.draft})),
+      workflows:(state.runs||[]).map(r=>({id:r.id,name:r.name,status:r.status,conclusion:r.conclusion,head_sha:r.head_sha,html_url:r.html_url})),
       imported_audit:state.audit
     };
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
