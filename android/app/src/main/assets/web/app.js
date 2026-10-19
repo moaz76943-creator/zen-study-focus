@@ -890,6 +890,7 @@ let timerTargetTime = null;
 let currentTimerModeKey = 'focus';
 let customSessionLabel = '';
 let timerSessionId = null;
+let focusSessionTaskId = null;
 let timerActiveMs = 0;
 let timerResumeMs = null;
 function accumulateActiveTime() {
@@ -906,6 +907,7 @@ function storeTimerSession() {
     endAt: timerRunning ? timerTargetTime : null,
     mode: currentTimerModeKey, label: customSessionLabel,
     sessionId: timerSessionId,
+    taskId: Number.isSafeInteger(focusSessionTaskId) ? focusSessionTaskId : null,
     activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null,
     training: quickTraining && quickTraining.active ? {...quickTraining} : null
   });
@@ -914,7 +916,7 @@ function creditCompletedSession() {
   if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
   if (!timerSessionId) return;
   const ids = Array.isArray(cfg.completedTimerIds) ? cfg.completedTimerIds : [];
-  if (ids.includes(timerSessionId)) return;
+  if(ids.includes(timerSessionId)||(Array.isArray(cfg.sessionHistory)&&cfg.sessionHistory.some(x=>x&&x.id===timerSessionId))) return;
   // Short intervals such as 20/10 must not credit a whole minute for 20 seconds.
   // Accumulate real seconds across work rounds; legacy timer accounting is preserved.
   let earned;
@@ -924,14 +926,18 @@ function creditCompletedSession() {
     earned = Math.floor(accumulated / 60);
     cfg.quickFocusRemainderSec = accumulated % 60;
   } else {
-    earned = Math.max(1, Math.round(timerActiveMs / 60000));
+    earned = Math.max(0,Math.floor((timerActiveMs+500)/60000));
   }
   cfg.todayMins = Number(cfg.todayMins || 0) + earned;
   cfg.sessions = Number(cfg.sessions || 0) + 1;
   cfg.metricsDate = localDateISO();
   cfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
   if (!Array.isArray(cfg.sessionHistory)) cfg.sessionHistory = [];
-  cfg.sessionHistory.push({id: timerSessionId, date: localDateISO(), minutes: earned, domain: cfg.domain || 'study'});
+  const event={id:timerSessionId,date:localDateISO(),minutes:earned,domain:cfg.domain||'study',
+    mode:currentTimerModeKey,completed:true};
+  if(Number.isSafeInteger(focusSessionTaskId)&&focusSessionTaskId>=0&&
+     tasksList.some(t=>t.id===focusSessionTaskId&&!t.isStarter))event.taskId=focusSessionTaskId;
+  cfg.sessionHistory.push(event);
   if (!quickTraining?.active) {
     const rounds = Number.isInteger(cfg.roundsPerCycle) && cfg.roundsPerCycle >= 1 && cfg.roundsPerCycle <= 12 ? cfg.roundsPerCycle : 4;
     const past = Number.isInteger(cfg.focusCycleCount) && cfg.focusCycleCount >= 0 && cfg.focusCycleCount < rounds ? cfg.focusCycleCount : 0;
@@ -982,6 +988,7 @@ function restoreTimerSession() {
   currentTimerModeKey = ['focus','short','long','custom'].includes(snap.mode) ? snap.mode : 'focus';
   customSessionLabel = typeof snap.label === 'string' ? snap.label.slice(0, 100) : '';
   timerSessionId = typeof snap.sessionId === 'string' ? snap.sessionId : null;
+  focusSessionTaskId=Number.isSafeInteger(snap.taskId)&&snap.taskId>=0?snap.taskId:null;
   quickTraining = validQuickSnapshot(snap.training);
   timerActiveMs = Number.isFinite(snap.activeMs) && snap.activeMs >= 0 && snap.activeMs <= 86400000
     ? snap.activeMs : Math.max(0, (timerTotal - timerLeft) * 1000);
@@ -1121,7 +1128,11 @@ function toggleTimerPlay() {
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
     } catch(e){}
 
-    if (!timerSessionId) timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
+    if (!timerSessionId) {
+      timerSessionId = String(Date.now())+'-'+String(Math.round(Math.random()*1e9));
+      const id=window.DFIntegrated?.linkedTaskId;
+      if(Number.isSafeInteger(id)&&id>=0)focusSessionTaskId=id;
+    }
     timerRunning = true;
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     timerResumeMs = Date.now();
@@ -1228,8 +1239,17 @@ function toggleTaskDone(id) {
 }
 
 function focusOnTask(id) {
-  const t = tasksList.find(x => x.id === id);
-  if (t) { document.getElementById('timerLinkedTask').textContent = toWest(`🎯 ${t.title}`); switchTab('sec-timer', document.getElementById('navTimer')); }
+  const t=tasksList.find(x=>x.id===id);
+  if(!t||t.isStarter||!Number.isSafeInteger(id)||id<0)return false;
+  if(timerSessionId&&(timerRunning||timerLeft!==timerTotal)){
+    showToast(cfg.lang==='ar'?'أنهِ الجلسة الجارية أولًا':'Finish the current session first');
+    return false;
+  }
+  focusSessionTaskId=id;
+  if(window.DFIntegrated)window.DFIntegrated.linkedTaskId=id;
+  document.getElementById('timerLinkedTask').textContent=toWest('🎯 '+t.title);
+  switchTab('sec-timer',document.getElementById('navTimer'));
+  storeTimerSession();return true;
 }
 
 let lastAllocatedRecordId = 0;
