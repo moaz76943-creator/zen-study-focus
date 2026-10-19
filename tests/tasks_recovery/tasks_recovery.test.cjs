@@ -77,3 +77,22 @@ test('DF-120 handles 1000 legacy tasks without changing input',()=>{
  assert.equal(C.taskSections(s,'2026-10-19').completed.length,500);
  assert.equal(JSON.stringify(s),before);
 });
+test('DF-105 local calendar day remains correct around UTC midnight',()=>{
+ const item=C.createTask(base(),{title:'Local day'},{now:'2026-10-18T22:10:00Z',today:'2026-10-19',idSeed:500}).task;
+ assert.equal(item.date,'2026-10-19');
+ assert.equal(item.dueAssigned,false);
+ assert.equal(C.isOverdue(item,'2026-10-20'),false);
+});
+test('DF-114 weekday recurrence is safe across DST transition dates',()=>{
+ const s={cfg:{},tasksList:[{id:1,title:'Weekday',date:'2026-03-27',done:false,isStarter:false,catKey:'study',repeat:{frequency:'weekdays',interval:1}}]};
+ const result=C.setStatus(s,1,'completed',{now:'2026-03-27T10:00:00Z',idSeed:2});
+ assert.equal(result.created.date,'2026-03-30');
+ assert.equal(s.tasksList[0].done,false);
+});
+test('DF-113 excludes conflicting duplicate session IDs in calculated focus time',()=>{
+ const s={cfg:{sessionHistory:[
+  {id:'x',completed:true,mode:'focus',taskId:8,minutes:25,date:'2026-10-19'},
+  {id:'x',completed:true,mode:'focus',taskId:8,minutes:30,date:'2026-10-19'}
+ ]},tasksList:[{id:8,title:'Real'}]};
+ assert.equal(C.actualFocusMinutes(s,8),0);
+});
