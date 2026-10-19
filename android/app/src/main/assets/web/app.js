@@ -1568,7 +1568,7 @@ function toggleSoundTile(id) {
   const player={pause(){audio.onerror=null;audio.onended=null;audio.pause();audio.removeAttribute('src');audio.load();},setVol(v){audio.volume=v;}};
   activePlayers[id]=player;
   const failure=()=>{
-    if(soundGeneration[id]!==token||activePlayers[id]!==player)return;
+    if(soundGeneration[id] !== token||activePlayers[id]!==player)return;
     stopSoundTile(id);renderSoundsStudio();showToast('Recording unavailable — playback stopped');
   };
   audio.onerror=failure;
