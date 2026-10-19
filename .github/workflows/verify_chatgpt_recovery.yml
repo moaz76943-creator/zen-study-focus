@@ -1,0 +1,40 @@
+name: Recovery ChatGPT focused regression checks
+
+on:
+  pull_request:
+    branches:
+      - integration/deep-focus-recovery-00-final-20261019
+    paths:
+      - 'android/app/src/main/assets/web/**'
+      - 'tests/integration_recovery/**'
+      - 'tests/analytics_recovery/**'
+      - 'tests/completion_alerts/**'
+      - '.github/workflows/verify_chatgpt_recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Verify modified JS syntax
+        run: |
+          node --check android/app/src/main/assets/web/analytics_recovery_ar_locale.js
+          node --check android/app/src/main/assets/web/analytics_recovery_ui.js
+          node --check android/app/src/main/assets/web/completion_alert_locales.js
+          node --check android/app/src/main/assets/web/integration_v22.js
+          node --check tests/integration_recovery/offline_typography.test.cjs
+          node --check tests/analytics_recovery/analytics_ar.test.cjs
+          node --check tests/completion_alerts/picker_locales.test.cjs
+      - name: Focused recovery regressions and existing contracts
+        run: |
+          node --test tests/integration_recovery/*.test.cjs
+          node --test tests/analytics_recovery/*.test.cjs
+          node --test tests/completion_alerts/*.test.cjs
+          node --test tests/localization_20/*.test.cjs
+          node --test tests/master_recovery_qa/source_contracts.test.cjs
