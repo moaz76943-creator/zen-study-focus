@@ -3,6 +3,7 @@
 (function (root, factory) {
   const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api;
+  if (root) root.DeepFocusControlCenter = api;
   if (typeof document !== 'undefined' && document.getElementById('overview')) api.boot();
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   const REPO = 'moaz76943-creator/zen-study-focus';
