@@ -23,7 +23,7 @@ function nodes(inst){
  const fields=filters.children.filter(x=>x.tagName==='LABEL').map(x=>x.children[1]);
  const buttons=filters.children.filter(x=>x.tagName==='BUTTON');
  return {wrapper,fields,buttons,status:wrapper.children[2],cards:wrapper.children[3],
-  chart:wrapper.children[7],detail:wrapper.children[8]};
+  split:wrapper.children[5],chart:wrapper.children[7],detail:wrapper.children[8]};
 }
 test('DF-128: day SVG click and keyboard drill into real session records',()=>{
  const target=documentFixture();
@@ -90,4 +90,36 @@ test('DF-054: non-English analytics refuses partial or missing translations',()=
  const ui=UI.mount(documentFixture(),()=>({sessionHistory:[]}),
  {locale:'de',today:'2026-10-19',translate:k=>'TRANSLATED '+k});
  assert.match(ui.element.children[0].textContent,/TRANSLATED/);
+});
+
+test('DF-129: activity ring displays only recorded ratios with keyboard drilldown',()=>{
+ const svg=UI.renderActivitySvg({
+  study:{minutes:25,sessions:1},read:{minutes:0,sessions:0},
+  work:{minutes:75,sessions:2},sport:{minutes:0,sessions:0}
+ });
+ assert.match(svg,/data-domain="study"/);
+ assert.match(svg,/data-domain="work"/);
+ assert.match(svg,/25%/);assert.match(svg,/75%/);
+ assert.doesNotMatch(svg,/[\u0660-\u0669\u06F0-\u06F9]/);
+ const target=documentFixture();
+ const ui=UI.mount(target,()=>({sessionHistory:[
+ {id:'a',date:'2026-10-19',minutes:25,domain:'study'},
+ {id:'b',date:'2026-10-19',minutes:75,domain:'work'}]}),{today:'2026-10-19'});
+ const n=nodes(ui);
+ assert.match(n.split.children[1].innerHTML,/data-domain="work"/);
+ let stopped=false;
+ n.split.events.keydown({type:'keydown',key:' ',
+  preventDefault(){stopped=true;},
+  target:{closest:()=>({getAttribute:()=> 'work'})}});
+ assert.equal(stopped,true);
+ const table=n.detail.children.find(x=>x.tagName==='TABLE');
+ assert.equal(table.children[1].children.length,1);
+ assert.equal(table.children[1].children[0].children[1].textContent,'b');
+});
+test('DF-130: empty activity ring cannot invent data',()=>{
+ const svg=UI.renderActivitySvg({
+  study:{minutes:0,sessions:0},read:{minutes:0,sessions:0},
+  work:{minutes:0,sessions:0},sport:{minutes:0,sessions:0}});
+ assert.doesNotMatch(svg,/data-domain=/);
+ assert.match(svg,/No recorded minutes/);
 });
