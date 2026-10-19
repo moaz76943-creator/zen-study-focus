@@ -42,7 +42,7 @@ test('DF-141/143: narrow 320/360/393/430 rules plus keyboard-safe dialogs', () =
 });
 test('DF-142: direction-safe spacing, safe areas and numeric isolation', () => {
   const css = theme();
-  for (const s of ['padding-inline','inset-inline','env(safe-area-inset-bottom)','html[dir="rtl"]','unicode-bidi: isolate','direction: ltr']) findRule(css,s);
+  for (const s of ['padding-inline','inset-inline','env(safe-area-inset-bottom','html[dir="rtl"]','unicode-bidi: isolate','direction: ltr']) findRule(css,s);
   assert.doesNotMatch(css, /\bdirection:\s*rtl\s*!important/);
 });
 test('DF-144/147: focus, target, TalkBack-friendly visibility and reduced motion', () => {
