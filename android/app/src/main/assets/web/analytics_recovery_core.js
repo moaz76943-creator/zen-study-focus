@@ -25,7 +25,7 @@
  const idKey=id=>typeof id==='string'&&id.length>0&&id.length<=256?'s:'+id:
   Number.isSafeInteger(id)&&id>=0?'n:'+id:null;
  const rejectsSample=s=>s.isStarter===true||s.isDemo===true||s.demo===true||
-  s.isTest===true||s.synthetic===true||['demo','sample','fixture','test','synthetic'].includes(String(s.source||'').toLowerCase());
+  s.isTest===true||s.synthetic===true||(typeof s.source==='string'&&['demo','sample','fixture','test','synthetic'].includes(s.source.toLowerCase()));
  function notFocus(s){
   if(s.completed===false||s.isComplete===false||s.isFocus===false||s.focus===false)return true;
   const mode=typeof s.mode==='string'?s.mode.toLowerCase():'';
@@ -147,9 +147,12 @@
   const norm=normalizeSessions(source);
   const usable=norm.sessions.filter(s=>domain==='all'||domain===s.domain);
   const rows=usable.filter(s=>s.date>=start&&s.date<=end);
-  const linked=new Set((Array.isArray(snapshot.tasksList)?snapshot.tasksList:[])
-   .filter(t=>rec(t)&&Number.isSafeInteger(t.id)&&t.id>=0&&!rejectsSample(t)&&t.archived!==true)
-   .map(t=>t.id));
+  const linkedCounts=new Map();
+  for(const t of (Array.isArray(snapshot.tasksList)?snapshot.tasksList:[])){
+   if(rec(t)&&Number.isSafeInteger(t.id)&&t.id>=0&&!rejectsSample(t)&&t.archived!==true)
+    linkedCounts.set(t.id,(linkedCounts.get(t.id)||0)+1);
+  }
+  const linked=new Set([...linkedCounts].filter(([,count])=>count===1).map(([id])=>id));
   const sessions=rows.map(s=>({...s,taskId:s.taskId!==null&&linked.has(s.taskId)?s.taskId:null}));
   const byDay=new Map(aggregate(sessions,s=>s.date).map(v=>[v.key,v]));
   const daily=Array.from({length:days},(_,i)=>{
