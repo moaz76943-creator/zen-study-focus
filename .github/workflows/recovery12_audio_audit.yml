@@ -28,6 +28,9 @@ jobs:
         run: node --test tests/audio_acquisition_12/*.test.cjs
       - name: Decode full nine clips; report measured audio properties
         run: node tests/audio_acquisition_12/audit_candidates.cjs --integrity > audio_candidates/recovery12/qa_ci_report.json
+      - name: Summarize measured audio for review
+        run: |
+          node -e 'const d=require("./audio_candidates/recovery12/qa_ci_report.json");for(const e of d.entries){console.log(JSON.stringify({id:e.id,bytes:e.bytes,sha256:e.sha256,codec:e.probe?.streams?.[0]?.codec_name,duration_seconds:e.probe?.format?.duration,peak_dbfs:e.signal?.peak_dbfs,rms_dbfs:e.signal?.rms_dbfs,clipped_samples:e.signal?.clipped_samples,large_jumps:e.signal?.sample_jumps_over_0_6,loop_edge_discontinuity:e.signal?.loop_edge_discontinuity,warnings:e.warnings,integrity_pass:e.integrity_pass}));}'
       - name: Negative release gate must fail for unapproved candidates
         shell: bash
         run: |
