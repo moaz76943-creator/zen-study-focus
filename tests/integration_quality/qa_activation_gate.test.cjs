@@ -32,7 +32,10 @@ test('lane 01 compatibility module must initialize before v21 application code',
 
 test('notes engine is explicitly wired to the final Notes UX (lane 03 dependency)', () => {
   ordered('notes_core_v21.js','notes_studio.js');
+  ordered('notes_studio.js','notes_editor_ui.js');
+  ordered('notes_editor_ui.js','notes_drafts.js');
   assert.ok(referencedByLiveConsumer('DeepFocusNotesCoreV21','notes_core_v21.js'), 'BLOCKED: no live Notes Core consumer');
+  assert.ok(referencedByLiveConsumer('DeepFocusNotesEditorUI.install','notes_editor_ui.js'), 'BLOCKED: editor adapter was not installed');
 });
 
 test('advanced task UI invokes the real task engine', () => {
