@@ -19,12 +19,13 @@ test('v21 runtime dictionary assembly retains the exact same top-level keys',()=
  assert.equal(Object.keys(data.premium.translations).length,20);
  assert.equal(data.recovery.audit().valid,true);
 });
-test('quick training is genuinely en/ar only, not silently marked 20/20',()=>{
+test('training audit recognizes actual explicit 20-language rows without hiding other gaps',()=>{
  const r=A.audit(),c=r.catalogs.find(x=>x.id==='quick.training');
  assert.ok(c&&c.keys>=30);
- assert.deepEqual(c.explicitLocales,['en','ar']);
- assert.ok(r.coverage.de.training.missing>0);
- assert.equal(r.coverage.en.training.missing,0);
+ assert.deepEqual(c.explicitLocales.slice().sort(),A.LANGS.slice().sort());
+ for(const lang of A.LANGS)assert.equal(r.coverage[lang].training.missing,0,lang);
+ assert.ok(r.coverage.de.notes.missing>0);
+ assert.ok(r.missing.length>0,'Full application gaps remain visible');
 });
 test('binary locale support is made visible per affected screen',()=>{
  const r=A.audit();
@@ -33,7 +34,7 @@ test('binary locale support is made visible per affected screen',()=>{
   assert.ok(c,id+' not audited');
   assert.deepEqual(c.explicitLocales,['en','ar'],id);
  }
- for(const s of ['notes','tasks','goals','settings','analytics','training'])
+ for(const s of ['notes','tasks','goals','settings','analytics'])
   assert.ok(r.coverage.fr[s].missing>0,s);
 });
 test('all missing keys get an independent entry; untranslated is null, never invented English',()=>{

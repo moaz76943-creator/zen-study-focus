@@ -350,9 +350,16 @@ let cfg = loadFortressData('zen_fortress_cfg_v21', {
   todayMins: 0, sessions: 0, streak: 0, water: 0, sets: 0, pagesRead: 0
 });
 
+function acceptedFocusHistory(history) {
+  const analytics = window.DeepFocusAnalyticsRecovery;
+  // Missing optional analytics cannot turn unvalidated records into focus minutes.
+  return analytics && typeof analytics.normalizeSessions === 'function'
+    ? analytics.normalizeSessions(history).sessions : [];
+}
+
 function computeActualStreak(history, now = new Date()) {
   const days = new Set(
-    (Array.isArray(history) ? history : [])
+    acceptedFocusHistory(history)
       .filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && Number(e.minutes) > 0)
       .map(e => e.date)
   );
@@ -381,7 +388,7 @@ function syncDailyRollover() {
     }
   }
   if (cfg.metricsDate && cfg.metricsDate !== current) {
-    const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
+    const entries = acceptedFocusHistory(cfg.sessionHistory);
     cfg.todayMins = entries
       .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
       .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
@@ -1829,7 +1836,7 @@ function renderSoundsStudio() {
    8. ANALYTICS & GOAL CALCULATOR (100% WESTERN DIGITS)
    ======================================================== */
 function renderAnalyticsBars() {
-  const hist = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
+  const hist = acceptedFocusHistory(cfg.sessionHistory);
   const recent = Array.from({length: 7}, (_, i) => {
     const date = new Date(); date.setHours(12, 0, 0, 0); date.setDate(date.getDate() - (6-i));
     const key = localDateISO(date);
