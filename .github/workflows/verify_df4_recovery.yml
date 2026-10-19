@@ -79,3 +79,49 @@ jobs:
           path: |
             android/app/build/outputs/apk/debug/*.apk
             ${{ runner.temp }}/df4-evidence/
+  android-emulator:
+    needs: test-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v4
+        with:
+          name: DeepFocus-DF4-Test-APK-and-Evidence
+          path: ${{ runner.temp }}/df4-download
+      - name: Locate exact-head debug APK
+        run: |
+          APK="$(find "$RUNNER_TEMP/df4-download" -name app-debug.apk -type f -print -quit)"
+          test -s "$APK"
+          cp "$APK" "$RUNNER_TEMP/df4-device-test.apk"
+          mkdir -p "$RUNNER_TEMP/df4-android"
+          git rev-parse HEAD > "$RUNNER_TEMP/df4-android/commit-sha.txt"
+          sha256sum "$RUNNER_TEMP/df4-device-test.apk" > "$RUNNER_TEMP/df4-android/apk-sha256.txt"
+      - name: Actual fresh Android emulator scenarios
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            serial="$(adb devices | awk '$1 ~ /^emulator-/ && $2 == "device" {print $1; exit}')"
+            test -n "$serial"
+            adb -s "$serial" install "$RUNNER_TEMP/df4-device-test.apk"
+            python3 tests/android_e2e_recovery/run_e2e.py --serial "$serial" --ack-disposable-data --json "$RUNNER_TEMP/df4-android/results.json"
+      - name: Preserve Android evidence including FAIL and NOT_TESTED
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-DF4-Android-Results
+          path: ${{ runner.temp }}/df4-android/
+          if-no-files-found: warn
