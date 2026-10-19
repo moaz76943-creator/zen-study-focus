@@ -464,3 +464,10 @@ body:not(.deep-lockdown) .daily-goals-card{padding:16px 15px;margin-top:12px;bor
 .goals-edit-label{display:flex;flex-direction:column;gap:7px;font-size:.75rem;color:#334d79;font-weight:700}
 .goals-edit-label .modal-inp{margin:0;direction:ltr;text-align:center;font-weight:700}
 @media(max-width:360px){.goals-rows{grid-template-columns:1fr}.goal-row{align-items:center}}
+
+/* One-slot editor crash-recovery affordance; stays inside the existing white modal. */
+.ns-draft-bar{display:flex;gap:7px;align-items:center;justify-content:flex-end;min-height:21px;margin:0 0 10px}
+.ns-draft-bar span{font-size:.66rem;color:#6581a5;flex:1;line-height:1.4}
+.ns-draft-bar button{font:inherit;font-size:.65rem;font-weight:700;border-radius:10px;border:1px solid #dce7f9;background:#f4f8ff;color:#356abd;padding:6px 9px;white-space:nowrap}
+.ns-draft-bar button:last-child{color:#b14e68;background:#fff7f9;border-color:#f9dce4}
+.ns-draft-bar button[hidden]{display:none}

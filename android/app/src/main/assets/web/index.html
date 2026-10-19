@@ -1166,7 +1166,7 @@
 
   <div class="modal-overlay" id="noteModal">
     <div class="modal-card ns-editor" role="dialog" aria-modal="true" aria-labelledby="nsEditorHeading">
-      <div class="modal-head"><span id="nsEditorHeading">New note</span><button class="task-mini-sel" onclick="closeModal('noteModal')" aria-label="Close">✕</button></div>
+      <div class="modal-head"><span id="nsEditorHeading">New note</span><button class="task-mini-sel" onclick="nsCloseEditor()" aria-label="Close">✕</button></div>
       <div id="nsEditorTemplates" class="ns-editor-templates"></div>
       <label for="inpNoteTitle" id="nsTitleLabel">Title</label>
       <input type="text" class="modal-inp" id="inpNoteTitle" maxlength="250" placeholder="Title or question" oninput="nsUpdateCount()">
@@ -1176,12 +1176,13 @@
       </div>
       <label for="inpNoteBody" id="nsBodyLabel">Content</label><textarea class="modal-inp" id="inpNoteBody" maxlength="500000" rows="10" placeholder="Write here..." oninput="nsUpdateCount()"></textarea>
       <small id="nsCounter" aria-live="polite">0 words</small>
+      <div class="ns-draft-bar" id="nsDraftBar"><span id="nsDraftStatus" aria-live="polite"></span><button type="button" id="nsDraftRestore" onclick="nsRestoreDraft()" hidden>Restore</button><button type="button" id="nsDraftDiscard" onclick="nsDiscardDraft()" hidden>Discard</button></div>
       <div class="ns-options">
         <label><input id="nsPinCheck" type="checkbox"><span id="nsPinCheckLabel">Pin</span></label>
         <label><input id="nsFavCheck" type="checkbox"><span id="nsFavCheckLabel">Favorite</span></label>
         <label><input type="checkbox" id="chkNoteBlur"><span data-i18n="lblBlurAnswer">Hide answer</span></label>
       </div>
-      <div class="modal-actions"><button class="mbtn-sec" onclick="closeModal('noteModal')" data-i18n="btnCancel">Cancel</button><button class="mbtn-pri" id="nsSaveButton" onclick="saveNewNote()">Save</button></div>
+      <div class="modal-actions"><button class="mbtn-sec" onclick="nsCloseEditor()" data-i18n="btnCancel">Cancel</button><button class="mbtn-pri" id="nsSaveButton" onclick="saveNewNote()">Save</button></div>
     </div>
   </div>
 
@@ -1205,5 +1206,6 @@
   <script src="app.js"></script>
   <script src="notes_studio.js"></script>
   <script src="goals_studio.js"></script>
+  <script src="notes_drafts.js"></script>
 </body>
 </html>

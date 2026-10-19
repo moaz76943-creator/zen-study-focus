@@ -42,7 +42,7 @@ function nsUseTemplate(code){
  const title=document.getElementById('inpNoteTitle');
  if(!title.value.trim())title.value=cfg.lang==='ar'?t[3]:t[2];
  document.getElementById('chkNoteBlur').checked=t[4]==='flash';
- nsUpdateCount();body.focus();
+ nsUpdateCount();if(typeof nsScheduleDraft==='function')nsScheduleDraft();body.focus();
 }
 function fillNoteTpl(type){nsUseTemplate(type==='flash'?'recall':'cornell');}
 function nsUpdateCount(){const v=document.getElementById('inpNoteBody').value;document.getElementById('nsCounter').textContent=nsWords(v)+' '+nsLabel(23)+' · '+Array.from(v).length+' '+nsLabel(24);}
@@ -119,6 +119,7 @@ function openNoteModal(defaultDate=null,editId=null){
  document.getElementById('nsEditorHeading').textContent=nsLabel(n?16:15);
  document.getElementById('nsSaveButton').textContent=nsLabel(n?26:25);
  nsUpdateCount();nsRenderTemplates();document.getElementById('noteModal').classList.add('open');
+ if(typeof nsPrepareDraft==='function')nsPrepareDraft();
 }
 function nsEdit(id){if(notesList.some(n=>Number(n.id)===nsId(id)))openNoteModal(null,id);}
 function saveNewNote(){
@@ -132,7 +133,8 @@ function saveNewNote(){
  const existing=nsEditId===null?null:notesList.find(n=>Number(n.id)===nsEditId);
  if(existing)Object.assign(existing,fields);
  else notesList.unshift({...fields,id:nextRecordId(),createdAt:Date.now()});
- nsSave();closeModal('noteModal');nsEditId=null;showToast(nsLabel(35));
+ nsSave();if(typeof nsClearDraftForSavedNote==='function')nsClearDraftForSavedNote();
+ closeModal('noteModal');nsEditId=null;showToast(nsLabel(35));
 }
 function nsToggleFlag(id,key){const n=notesList.find(x=>Number(x.id)===nsId(id));if(!n)return;n[key]=!Boolean(n[key]);nsSave();}
 function nsDuplicate(id){const n=notesList.find(x=>Number(x.id)===nsId(id));if(!n)return;notesList.unshift({...n,id:nextRecordId(),isStarter:false,pinned:false,createdAt:Date.now(),updatedAt:Date.now()});nsSave();showToast('✓');}

@@ -313,4 +313,18 @@ assert.equal(evaluate('saveDailyGoals()'),false,'Reject invalid daily goal value
 assert.equal(evaluate('gsGoal("study")'),120);
 assert.ok(store.has('zen_fortress_cfg_v21'),'Saved goals reuse the original cfg persistence');
 
+
+vm.runInContext(fs.readFileSync(path.join(root,'notes_drafts.js'),'utf8'),sandbox,{filename:'notes_drafts.js',timeout:2000});
+evaluate('nsEdit(notesList[0].id)');
+document.getElementById('inpNoteBody').value='A valuable unsaved edit';
+assert.equal(evaluate('nsFlushDraft()'),true,'Save draft before Android kills the WebView');
+assert.ok(store.has('deep_focus_unsaved_note_draft_v1'));
+evaluate('nsCloseEditor()');
+evaluate('nsEdit(notesList[0].id)');
+assert.equal(evaluate('nsRestoreDraft()'),true,'Restore the matching note draft');
+assert.equal(document.getElementById('inpNoteBody').value,'A valuable unsaved edit');
+evaluate('saveNewNote()');
+assert.equal(evaluate('notesList[0].body'),'A valuable unsaved edit');
+assert.equal(store.has('deep_focus_unsaved_note_draft_v1'),false,'Saved notes clear only their matching draft');
+
 console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');
