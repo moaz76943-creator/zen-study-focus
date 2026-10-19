@@ -30,6 +30,36 @@
       sync:hasLedger?incoming.at||null:(sameHead?previous.sync:null),
       stale,errors};
   }
+  function parseStaticLedger(raw){
+    if(typeof raw!=='string'||raw.length>110000)throw Error('Oversized static ledger');
+    const value=JSON.parse(raw);
+    if(!value||value.schema_version!==1||value.provenance!=='CHECKOUT_STATIC_SOURCE'||
+      !Array.isArray(value.tasks)||value.tasks.length!==161)
+      throw Error('Invalid embedded source snapshot');
+    const seen=new Set();
+    const tasks=value.tasks.map(item=>{
+      if(!item||!/^DF-\d{3}$/.test(item.id)||!STATUSES.includes(item.status)||
+        typeof item.title!=='string'||item.title.length>1000||
+        typeof item.area!=='string'||item.area.length>100||
+        typeof item.evidence!=='string'||item.evidence.length>1600||seen.has(item.id))
+        throw Error('Invalid embedded ledger task');
+      seen.add(item.id);
+      return {id:item.id,status:item.status,title:item.title.replace(/<[^>]*>/g,''),
+        area:item.area,evidence:item.evidence};
+    });
+    return tasks;
+  }
+  function seedStaticLedger(){
+    const source=document.getElementById('control-center-embedded-ledger');
+    if(!source)return;
+    try{
+      state.tasks=parseStaticLedger(source.textContent||'');
+      state.stale=true;
+      state.errors=['لقطة ثابتة من المستودع؛ لم يتم تأكيد البيانات الحية بعد'];
+      byId('connection').textContent='لقطة مصدر ثابتة · تحقق من GitHub للتحديث';
+      fillAreas();renderMetrics();renderRisks();renderTasks();
+    }catch(e){byId('connection').textContent='تعذر قراءة لقطة المصدر: '+e.message;}
+  }
   function parseTasks(markdown) {
     const seen = new Set(), tasks = [];
     for (const line of String(markdown || '').split(/\r?\n/)) {
@@ -281,6 +311,7 @@
   }
   function boot() {
     byId('refresh').addEventListener('click',refresh);
+    seedStaticLedger();
     for(const id of ['search','status-filter','area-filter'])byId(id).addEventListener(
       id==='search'?'input':'change',()=>{state.visible=25;renderTasks();});
     byId('show-more').addEventListener('click',()=>{state.visible+=25;renderTasks();});
@@ -294,5 +325,5 @@
       prs:state.prs||[],runs:state.runs||[],findings:state.audit?.findings||[],
       audit:state.audit,sync:state.sync,errors:state.errors,stale:state.stale}));
   }
-  return {boot,parseTasks,countTasks,filterTasks,repairPrompt,shortSHA,getSnapshot,reconcileRefresh};
+  return {boot,parseTasks,countTasks,filterTasks,repairPrompt,shortSHA,getSnapshot,reconcileRefresh,parseStaticLedger};
 });
