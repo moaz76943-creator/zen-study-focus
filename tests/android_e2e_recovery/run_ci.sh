@@ -16,4 +16,7 @@ capture() {
 }
 trap capture EXIT
 adb -s "$serial" install "$RUNNER_TEMP/df4-device-test.apk"
+# Explicit fixture for core interaction cases on this fresh CI emulator only.
+# Permission prompt/denial behavior remains NOT_TESTED, not certified by this grant.
+adb -s "$serial" shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS
 python3 tests/android_e2e_recovery/run_e2e.py --serial "$serial" --ack-disposable-data --run-slow --allow-rotation --json "$RUNNER_TEMP/df4-android/results.json"
