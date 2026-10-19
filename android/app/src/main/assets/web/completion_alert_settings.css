@@ -15,3 +15,5 @@
 .completion-alert-volume output { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; color: #1759ad; }
 .completion-alert-volume input[type="range"] { grid-column: 1 / -1; inline-size: 100%; min-inline-size: 0; min-block-size: 44px; margin: 0; accent-color: #2563eb; direction: ltr; }
 @media (max-width: 360px) { .completion-alert-option { gap: 8px; } .completion-alert-preview { padding-inline: 8px; } }
+
+.nature-empty-state { grid-column: 1 / -1; padding: 28px 16px; border: 1px dashed #bfd1e7; border-radius: 18px; background: #fff; color: #50617a; text-align: center; line-height: 1.8; }

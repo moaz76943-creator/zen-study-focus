@@ -62,6 +62,18 @@ const L=require('../../android/app/src/main/assets/web/completion_alert_locales.
   assert.equal(await picker.locator('input[type=radio]:checked').count(),1);
   await picker.scrollIntoViewIfNeeded();await page.screenshot({path:join(out,'picker-ar-360.png')});
   results.push({status:'PASS',scope:'persist selection/volume after reload; actual desktop media decode, exclusive preview, silent cancellation'});
+  await page.locator('[data-sound-category="warm"]').click();
+  for(const locale of L.languages){
+   await page.evaluate(lang=>applyLanguage(lang),locale);
+   assert.equal(await page.locator('#soundsGridBox [role="status"]').innerText(),await page.evaluate(()=>L().natureNoApproved));
+   assert.equal(await page.locator('[data-sound-category="warm"] bdi').innerText(),'(0)');
+  }
+  await page.evaluate(()=>{applyLanguage('ar');stopAllAudio();toggleSoundTile('forest');toggleSoundTile('wind');});
+  await page.waitForFunction(()=>window.df4Media.slice(-2).every(a=>a.readyState>=2&&!a.paused));
+  assert.ok(await page.evaluate(()=>window.df4Media.slice(-2).reduce((sum,a)=>sum+a.volume,0)<=.8500001));
+  await page.evaluate(()=>stopAllAudio());assert.ok(await page.evaluate(()=>window.df4Media.every(a=>a.paused)));
+  await page.locator('#soundsGridBox').scrollIntoViewIfNeeded();await page.screenshot({path:join(out,'nature-empty-ar-360.png')});
+  results.push({status:'PASS',scope:'empty category localized in 20 locales; real desktop forest/wind decode and simultaneous mix with gain cap; stop-all'});
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
   results.push({status:'PASS',scope:'bootstrap/console/local asset responses; external network denied'});
   fs.writeFileSync(join(out,'results.json'),JSON.stringify({url,environment:'Desktop Chromium, NOT Android',results,errors,failed},null,2)+'\n');

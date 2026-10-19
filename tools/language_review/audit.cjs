@@ -82,7 +82,7 @@ function coreScreen(k){
  if(/^(mode|calc|startFocus|orbDesk)/.test(k))return 'timer';
  if(/^(navTasks|filter|phAddTask|sampleTasks)/.test(k))return 'tasks';
  if(/^(navNotes|phSearchNotes|tag|lblBlur|orbDump|sampleNotes)/.test(k))return 'notes';
- if(/^(navSounds|sounds\.|sndCat|mixer|btnMyMix|btnStopAll)/.test(k))return 'sounds';
+ if(/^(navSounds|natureNoApproved|sounds\.|sndCat|mixer|btnMyMix|btnStopAll)/.test(k))return 'sounds';
  if(/^(navAnalytics|kpi|overview|badgeThis|waveFlow|peakPerf)/.test(k))return 'analytics';
  if(/^(dom|cat|sportSets|readTracker)/.test(k))return 'goals';
  if(/^(navCalendar|weekdays|months|btnAddCalNote)/.test(k))return 'calendar';

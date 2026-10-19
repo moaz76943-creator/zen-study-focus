@@ -305,6 +305,9 @@ function localDateISO(date = new Date()) {
     String(date.getDate()).padStart(2, '0')
   ].join('-');
 }
+// Display-only additions to the existing canonical dictionaries; never persisted.
+Object.entries({"en": "No reviewed recordings are available in this category yet.", "ar": "لا توجد تسجيلات مكتملة المراجعة في هذه الفئة حاليًا.", "es": "Todavía no hay grabaciones revisadas en esta categoría.", "zh": "此分类暂无审核完成的录音。", "hi": "इस श्रेणी में अभी कोई समीक्षा की गई रिकॉर्डिंग उपलब्ध नहीं है।", "fr": "Aucun enregistrement validé dans cette catégorie pour le moment.", "de": "In dieser Kategorie sind noch keine geprüften Aufnahmen verfügbar.", "ru": "В этой категории пока нет проверенных записей.", "pt": "Ainda não há gravações revisadas nesta categoria.", "ja": "このカテゴリには審査済みの録音がまだありません。", "id": "Belum ada rekaman yang telah ditinjau dalam kategori ini.", "tr": "Bu kategoride henüz incelemesi tamamlanmış kayıt yok.", "ko": "이 카테고리에는 아직 검토가 완료된 녹음이 없습니다.", "vi": "Danh mục này chưa có bản ghi âm đã được kiểm duyệt.", "it": "Non ci sono ancora registrazioni verificate in questa categoria.", "bn": "এই বিভাগে এখনো পর্যালোচিত কোনো রেকর্ডিং নেই।", "ur": "اس زمرے میں ابھی جانچ شدہ ریکارڈنگ دستیاب نہیں ہے۔", "fa": "هنوز ضبط بررسی‌شده‌ای در این دسته موجود نیست.", "pl": "W tej kategorii nie ma jeszcze sprawdzonych nagrań.", "nl": "In deze categorie zijn nog geen gecontroleerde opnamen beschikbaar."}).forEach(([locale,text]) => { DICT[locale].natureNoApproved = text; });
+
 let todayISO = localDateISO();
 function escapeHtmlText(value) {
   return String(value === null || value === undefined ? '' : value)
@@ -1577,12 +1580,21 @@ const soundGeneration = Object.create(null);
 // Other catalogue items remain registered for recovery but unavailable until per-file rights and device listening are proven.
 const NATURE_APPROVED_FOR_PLAYBACK = new Set(['forest','wind']);
 
+function applyNatureMixVolumes() {
+  const channels = SOUNDS_DATA.filter(sound => activePlayers[sound.id]);
+  const total = channels.reduce((sum,sound) => sum + sound.vol,0);
+  // Conservative headroom even if channel peaks align; retain each requested level.
+  const gain = total > 0.85 ? 0.85 / total : 1;
+  channels.forEach(sound => activePlayers[sound.id].setVol(sound.vol * gain));
+}
+
 function stopSoundTile(id) {
   soundGeneration[id] = (soundGeneration[id] || 0) + 1;
   const player = activePlayers[id];
   if (player) {
     delete activePlayers[id];
     try { player.pause(); } catch (e) {}
+    applyNatureMixVolumes();
   }
 }
 
@@ -1598,9 +1610,13 @@ function toggleSoundTile(id) {
     stopSoundTile(id);showToast('⏹ '+sName);renderSoundsStudio();return;
   }
   const token=(soundGeneration[id]||0)+1;soundGeneration[id]=token;
-  const audio=new Audio();audio.loop=true;audio.preload='auto';audio.volume=s.vol;audio.src=s.src;
+  const audio=new Audio();audio.loop=s.id!=='thunder';audio.preload='auto';audio.volume=0;audio.src=s.src;
   const player={pause(){audio.onerror=null;audio.onended=null;audio.pause();audio.removeAttribute('src');audio.load();},setVol(v){audio.volume=v;}};
   activePlayers[id]=player;
+  applyNatureMixVolumes();
+  audio.onended=()=>{
+    if(soundGeneration[id]===token&&activePlayers[id]===player){stopSoundTile(id);renderSoundsStudio();}
+  };
   const failure=()=>{
     if(soundGeneration[id] !== token||activePlayers[id]!==player)return;
     stopSoundTile(id);renderSoundsStudio();showToast('Recording unavailable — playback stopped');
@@ -1621,7 +1637,7 @@ function setTileVolume(id, val) {
   const clamped = Math.max(0, Math.min(1, v));
   const s = SOUNDS_DATA.find(x => x.id === id);
   if (s) s.vol = clamped;
-  if (activePlayers[id]) activePlayers[id].setVol(clamped);
+  applyNatureMixVolumes();
 }
 
 function playPresetRelaxMix() {
@@ -1646,7 +1662,22 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id) && (soundCat === 'all' || s.cat === soundCat)).forEach(s => {
+  const available = SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id));
+  document.querySelectorAll('[data-sound-category]').forEach(button => {
+    const category = button.getAttribute('data-sound-category');
+    const key = {all:'filterAll',water:'sndCatWater',forest:'sndCatForest',warm:'sndCatWarm'}[category];
+    const count = available.filter(s => category === 'all' || s.cat === category).length;
+    const label = document.createElement('span');label.textContent = d[key];
+    const number = document.createElement('bdi');number.dir = 'ltr';number.textContent = '(' + count + ')';
+    button.replaceChildren(label,document.createTextNode(' '),number);
+  });
+  const visible = available.filter(s => soundCat === 'all' || s.cat === soundCat);
+  if (!visible.length) {
+    const empty = document.createElement('p');
+    empty.className = 'nature-empty-state';empty.setAttribute('role','status');
+    empty.textContent = d.natureNoApproved;box.appendChild(empty);
+  }
+  visible.forEach(s => {
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
     const tile = document.createElement('div');
@@ -1761,6 +1792,12 @@ function updateSyllabusCalc() {
   const rate = Math.max(1, parseInt(elRate.value) || 1);
   const days = Math.ceil(left / rate);
   document.getElementById('syllabusCalcOut').textContent = toWest(L().calcOutTpl.replace('{d}', days));
+}
+
+if (typeof window.addEventListener === 'function') {
+  window.addEventListener('pagehide', () => {
+    Object.keys(activePlayers).forEach(stopSoundTile);
+  });
 }
 
 /* Boot Init */

@@ -982,10 +982,10 @@
         </div>
 
         <div class="segmented-pills-bar">
-          <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All (12)</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">Water & Rain 🌧️</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">Forest & Wind 🌲</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
+          <button class="seg-pill active" data-sound-category="all" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All (12)</button>
+          <button class="seg-pill" data-sound-category="water" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">Water & Rain 🌧️</button>
+          <button class="seg-pill" data-sound-category="forest" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">Forest & Wind 🌲</button>
+          <button class="seg-pill" data-sound-category="warm" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
         </div>
 
         <div class="sounds-photo-grid" id="soundsGridBox"></div>
