@@ -19,7 +19,7 @@ function harness(){
     scrollIntoView(){}
     remove(){}
     click(){for(const handler of (this.listeners.click||[]))handler({target:this,preventDefault(){}});}
-    change(value,type='change'){this.value=value;for(const handler of (this.listeners[type]||[]))handler({target:this,files:this.files||[]});}
+    change(value,type='change'){this.value=value;return Promise.all((this.listeners[type]||[]).map(handler=>handler({target:this,files:this.files||[]})));}
   }
   const elements=new Map(),handlers=new Map();
   const defaults={
@@ -88,4 +88,27 @@ test('presets, undo/redo, screen reset are reversible local staged changes',()=>
   assert.equal(h.getCurrent().screens.timer.spacing,25);
   h.element('v3-reset-screen').click();
   assert.equal(h.getCurrent().screens.timer.spacing,baseline.screens.timer.spacing);
+});
+
+test('offline file is explicitly opt-in, labeled stale and reversible to live view',async()=>{
+ const h=harness();
+ const originalCount=h.element('v3-task-count').textContent;
+ const source={
+  schema_version:1,inspected_ref:'b'.repeat(40),
+  tasks:[{id:'DF-003',title:'Imported note',area:'NOTES',status:'BLOCKED',evidence:'earlier build'}],
+  prs:[],workflows:[]
+ };
+ const upload=h.element('v3-snapshot-import');
+ upload.files=[{size:512,text:async()=>JSON.stringify(source)}];
+ await upload.change('');
+ assert.equal(h.element('v3-use-offline').disabled,false);
+ h.element('v3-use-offline').click();
+ assert.match(h.element('v3-connection').textContent,/مستوردة محليًا/);
+ assert.equal(h.element('v3-task-count').textContent,'1 مهمة في العرض المختار');
+ assert.match(h.element('v3-task-results').children[0].children[0].children[0].textContent,/DF-003/);
+ h.document.dispatchEvent({type:'df:project-refreshed'});
+ assert.match(h.element('v3-connection').textContent,/مستوردة محليًا/);
+ h.element('v3-return-live').click();
+ assert.equal(h.element('v3-task-count').textContent,originalCount);
+ assert.match(h.element('v3-connection').textContent,/GitHub/);
 });
