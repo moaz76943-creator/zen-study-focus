@@ -53,6 +53,19 @@ jobs:
             node --check "$file"
           done
 
+      - name: Bundle portable Android-phone dashboard
+        run: |
+          node tools/control_center/build_portable.cjs --output dist/deep-focus-control-center-mobile.html
+          node tools/control_center/build_portable.cjs --check dist/deep-focus-control-center-mobile.html
+
+      - name: Upload single-file mobile dashboard
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-focus-control-center-mobile
+          path: dist/deep-focus-control-center-mobile.html
+          retention-days: 14
+          if-no-files-found: error
+
       - name: Inspect static sources
         run: |
           node tools/control_center/audit.cjs \
