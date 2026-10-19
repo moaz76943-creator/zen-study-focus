@@ -35,7 +35,8 @@ test('script ordering ensures both existing read-only bridges before v3 boot',()
 test('query results use safe DOM creation not innerHTML or remote writes',()=>{
  assert.doesNotMatch(ui,/\.innerHTML\s*=|document\.write\(|\beval\s*\(|github\.rest\.issues\.create/);
  assert.match(ui,/textContent/);
- assert.match(ui,/credentials:'omit'/);
+ assert.doesNotMatch(ui,/\bfetch\s*\(/);
+ assert.match(base,/credentials:'omit'/);
  assert.match(ui,/cleanUrl/);
 });
 test('imports are capped and require valid model before replacing design',()=>{
