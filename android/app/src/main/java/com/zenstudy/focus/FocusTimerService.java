@@ -10,10 +10,8 @@ import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.content.SharedPreferences;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Collections;
-import java.util.Iterator;
 import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Build;
@@ -155,14 +153,7 @@ public class FocusTimerService extends Service {
         Set<String> old = prefs.getStringSet("completed_session_tokens",
                 Collections.<String>emptySet());
         if (old.contains(sessionId)) return false;
-        LinkedHashSet<String> next = new LinkedHashSet<>(old);
-        next.add(sessionId);
-        while (next.size() > SESSION_LEDGER_LIMIT) {
-            Iterator<String> iterator = next.iterator();
-            if (!iterator.hasNext()) break;
-            iterator.next();
-            iterator.remove();
-        }
+        Set<String> next = NativeCompletionLedger.add(old, sessionId, SESSION_LEDGER_LIMIT);
         // Persist BEFORE notification/sound so duplicate callbacks cannot replay a cue.
         // If storage fails, omit the alert rather than acknowledge an unguarded repeat.
         return prefs.edit().putStringSet("completed_session_tokens", next).commit();
