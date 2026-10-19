@@ -1,7 +1,7 @@
 name: Deep Focus 2026 Consolidated Recovery QA
 on:
   push:
-    branches: [integration/deep-focus-consolidated-repair-20261020]
+    branches: [integration/deep-focus-consolidated-repair-20261020, fix/master-completion-20261020]
   workflow_dispatch:
 permissions:
   contents: read
@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mapfile -t suites < <(find tests -type f -name '*.test.cjs' ! -name media_provenance_gate.test.cjs | sort)
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs | sort)
           test "${#suites[@]}" -gt 0
           node --test --test-reporter=tap "${suites[@]}" | tee "$RUNNER_TEMP/df-2026-evidence/node.tap"
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/df-2026-evidence/python.log"
