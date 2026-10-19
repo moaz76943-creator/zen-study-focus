@@ -7,8 +7,9 @@ const HTML = path.join(ROOT, 'index.html');
 const EVENTS = ['click','change','input','submit','keydown','touchstart','pointerdown'];
 const TAGS = /<(button|a|input|select|textarea|summary|details|div|span|article|label)\b([^>]*)>/gim;
 function attr(tag, key) {
-  const m = tag.match(new RegExp('(?:^|\\s)' + key + '\\s*=\\s*(["\\'])([\\s\\S]*?)\\1', 'i'));
-  return m ? m[2] : '';
+  const m = [...tag.matchAll(/([a-z][\w:-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/gim)]
+    .find(x => x[1].toLowerCase() === key.toLowerCase());
+  return m ? (m[2] ?? m[3] ?? '') : '';
 }
 function ownerAt(html, index) {
   const prefix = html.slice(0, index);
