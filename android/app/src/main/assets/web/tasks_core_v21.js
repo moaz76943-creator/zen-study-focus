@@ -221,9 +221,17 @@
   function topThree(state,today) {
     if(!validDate(today))fail('Invalid today');
     const ids=state.cfg?.taskTopThreeV21?.[today];
-    if(!Array.isArray(ids))return [];
-    const live=new Map(listTasks(state).filter(t=>!t.done).map(t=>[t.id,t]));
-    return [...new Set(ids)].slice(0,3).filter(id=>idOk(id)&&live.has(id)).map(id=>live.get(id));
+    const live=listTasks(state).filter(t=>!t.done);
+    if(Array.isArray(ids)){
+      const byId=new Map(live.map(t=>[t.id,t]));
+      return [...new Set(ids)].slice(0,3).filter(id=>idOk(id)&&byId.has(id)).map(id=>byId.get(id));
+    }
+    // Existing v21 automatic suggestions remain readable until user curates this day.
+    const priority={urgent:4,high:3,medium:2,low:1};
+    return live.filter(t=>validDate(t.date)&&t.date<=today).sort((a,b)=>{
+      const rank=t=>(isOverdue(t,today)?100:0)+(t.important?30:0)+(t.urgent?20:0)+(priority[t.priority]||0);
+      return rank(b)-rank(a)||a.date.localeCompare(b.date)||a.id-b.id;
+    }).slice(0,3);
   }
   function taskSections(state,today) {
     if(!validDate(today))fail('Invalid today');
