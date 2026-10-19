@@ -64,3 +64,21 @@ test('offline imports reject invalid statuses, excessive text and foreign untrus
  const huge={schema_version:1,inspected_ref:SHA,tasks:[{id:'DF-002',status:'BLOCKED',title:'z'.repeat(10000)}]};
  assert.throws(()=>v3.normalizeOfflineSnapshot(huge));
 });
+
+const design=require('../../docs/control-center/design-config.json');
+test('local design draft round-trips validated data with baseline identity',()=>{
+ const edited=require('../../docs/control-center/studio-core.js').updateSetting(design,'notes','spacing',20);
+ const draft=v3.makeLocalDraft(edited,design,'2026-10-20T01:00:00.000Z');
+ const restored=v3.readLocalDraft(draft,design);
+ assert.deepEqual(restored.config,edited);
+ assert.equal(restored.saved_at,'2026-10-20T01:00:00.000Z');
+ assert.ok(draft.length<20000);
+});
+test('local design draft refuses changed project baseline or malformed/oversized values',()=>{
+ const edited=require('../../docs/control-center/studio-core.js').updateSetting(design,'notes','spacing',20);
+ const draft=v3.makeLocalDraft(edited,design,'2026-10-20T01:00:00.000Z');
+ const incompatible=require('../../docs/control-center/studio-core.js').updateSetting(design,'theme','fontScale',110);
+ assert.throws(()=>v3.readLocalDraft(draft,incompatible));
+ assert.throws(()=>v3.readLocalDraft('x'.repeat(20001),design));
+ assert.throws(()=>v3.readLocalDraft('{"schema_version":1}',design));
+});
