@@ -36,6 +36,15 @@
     const change=output.length-chunk.length;
     return {text:updated,cursorStart:start+prefix.length,cursorEnd:end+change};
   }
+  function toggleChecklistLine(text,at){
+    const value=String(text),pos=Math.max(0,Math.min(value.length,at));
+    const from=value.lastIndexOf('\n',pos-1)+1;
+    const end=value.indexOf('\n',pos),stop=end===-1?value.length:end;
+    const part=value.slice(from,stop),match=part.match(/^(\s*)(☐|☑)/u);
+    if(!match)return {text:value,changed:false};
+    const symbol=match[2]==='☐'?'☑':'☐';
+    return {text:value.slice(0,from)+part.replace(/^(\s*)(?:☐|☑)/u,'$1'+symbol)+value.slice(stop),changed:true};
+  }
   function createController(adapter){
     if(!adapter||!adapter.core||typeof adapter.readState!=='function'||
        typeof adapter.commitNotes!=='function'||typeof adapter.nextNumericId!=='function')
@@ -225,12 +234,14 @@
   }
   function renderText(container,text,query){
     container.replaceChildren();const needle=String(query||'').trim();
-    String(text||'').split(/\r?\n/u).forEach(line=>{
+    const lines=String(text||'').split(/\r?\n/u);
+    lines.slice(0,400).forEach(line=>{
       let node,body=line;
       if(/^#{1,3}\s/.test(line)){node=el('h4');body=line.replace(/^#{1,3}\s/,'');}
-      else if(/^\s*(?:☐|\[ \]|[-*]\s*\[ \])\s*/u.test(line)){
+      else if(/^\s*(?:☐|☑|\[ \]|[-*]\s*\[ \])\s*/u.test(line)){
         node=el('div','nsux-check');const check=el('input');check.type='checkbox';check.disabled=true;
-        node.appendChild(check);body=line.replace(/^\s*(?:☐|\[ \]|[-*]\s*\[ \])\s*/u,'');
+        check.checked=/^\s*☑/u.test(line);
+        node.appendChild(check);body=line.replace(/^\s*(?:☐|☑|\[ \]|[-*]\s*\[ \])\s*/u,'');
       }else{node=el('p');if(/^\s*(?:[-*]|\d+\.)\s/.test(line))body='• '+line.replace(/^\s*(?:[-*]|\d+\.)\s/,'');}
       if(!needle){node.appendChild(document.createTextNode(body));}
       else {
@@ -241,6 +252,7 @@
       }
       container.appendChild(node);
     });
+    if(lines.length>400)container.appendChild(el('p','nsux-meta','Preview limited to 400 lines; original note is unchanged.'));
   }
   function createPairs(parent,pairs){
     parent.replaceChildren();
@@ -268,6 +280,12 @@
       body.value=pos.text;body.setSelectionRange(pos.cursorStart,pos.cursorEnd);body.focus();schedule();
       if(typeof nsUpdateCount==='function')nsUpdateCount();
     }));
+    button(toolbar,'☑ Done / تم',()=>{
+      const old=body.selectionStart,changed=toggleChecklistLine(body.value,old);
+      if(!changed.changed)return;
+      body.value=changed.text;body.focus();body.setSelectionRange(old,old);
+      schedule();renderPreview();if(typeof nsUpdateCount==='function')nsUpdateCount();
+    });
     const view=button(toolbar,t('preview'),()=>togglePreview()),focus=button(toolbar,t('focus'),()=>toggleFocus());
     view.id='nsux-preview-toggle';focus.id='nsux-focus-toggle';
     const find=field(extra,t('find'),'');find.id='nsux-find';
@@ -536,6 +554,6 @@
     if(kind==='cornell'){instance.fields.cues.value='';instance.fields.notes.value='';instance.fields.summary.value='';}
     showType();
   }
-  return Object.freeze({createController,parseTags,formatSelection,findOccurrences,renderText,
+  return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,findOccurrences,renderText,
     install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader});
 });
