@@ -3,9 +3,9 @@
 (function(){
   if(typeof document==='undefined')return;
   const ops=globalThis.DeepFocusV3Core;
-  const project=globalThis.DeepFocusControlCenter;
+  const api=globalThis.DeepFocusControlCenter;
   const studio=globalThis.DeepFocusStudioUI;
-  if(!ops||!project||!studio)return;
+  if(!ops||!api||!studio)return;
   const REPO='moaz76943-creator/zen-study-focus';
   const $=id=>document.getElementById(id);
   const text=(tag,value,cls)=>{
@@ -59,7 +59,7 @@
     $('v3-return-live').disabled=!offlineMode;
   }
   function loadSnapshot(){
-    liveSnapshot=project.getSnapshot();
+    liveSnapshot=api.getSnapshot();
     if(!offlineMode)snapshot=liveSnapshot;
     renderPanels();
   }
@@ -240,7 +240,7 @@
     });
     $('v3-return-live').addEventListener('click',()=>{
       offlineMode=false;
-      snapshot=liveSnapshot||project.getSnapshot();
+      snapshot=liveSnapshot||api.getSnapshot();
       renderPanels();
     });
     $('v3-theme-preset').addEventListener('change',()=>{
