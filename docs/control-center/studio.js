@@ -155,9 +155,14 @@
       }
     });
     try{
-      const response=await fetch('./design-config.json',{credentials:'omit',cache:'no-store'});
-      if(!response.ok)throw Error('HTTP '+response.status);
-      baseline=core.validateConfig(await response.json());
+      const embedded=document.getElementById('control-center-embedded-design');
+      if(embedded){
+        baseline=core.validateConfig(JSON.parse(embedded.textContent||''));
+      }else{
+        const response=await fetch('./design-config.json',{credentials:'omit',cache:'no-store'});
+        if(!response.ok)throw Error('HTTP '+response.status);
+        baseline=core.validateConfig(await response.json());
+      }
       current=core.validateConfig(baseline);render();
     }catch(e){
       notice('studio-status','تعذر فتح إعدادات التصميم: '+e.message+'؛ افتح اللوحة عبر خادم HTTPS.');

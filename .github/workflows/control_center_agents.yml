@@ -49,7 +49,7 @@ jobs:
           run_lane() {
             case "$1" in
               ui)
-                node --test tests/interaction_recovery/*.test.cjs tests/design_quality/*.cjs
+                node --test tests/interaction_recovery/*.test.cjs tests/white_premium_qa/*.test.cjs
                 ;;
               audio)
                 node --test tests/nature_audio_recovery/*.test.cjs tests/completion_alerts/*.test.cjs
