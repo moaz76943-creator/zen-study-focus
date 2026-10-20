@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Disposable isolated Android QA app only; never touch owner apps or user data.
 set -euo pipefail
+export AUDIO_QA_EXPECTED_TRACKS="$(python3 -c 'import json;print(sum(r["status"]=="QUARANTINED_NOT_APPROVED" for r in json.load(open("audio_candidates/commons_intake/qa_report.json"))))')"
 APK="$(find android/app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -type f -print -quit)"
 test -s "$APK"
 mkdir -p "$RUNNER_TEMP/audio20"
@@ -36,4 +37,4 @@ test -n "$pid"
 adb forward --remove tcp:9225 >/dev/null 2>&1 || true
 adb forward tcp:9225 "localabstract:webview_devtools_remote_${pid}"
 node tests/nature_library_v2/android20_runtime_probe.cjs "$RUNNER_TEMP/audio20/qa-audio20-reopen-cdp.json"
-printf 'QA_VISIBLE_WEBVIEW=PASS\nTWENTY_TRACKS=PASS\nSIX_GROUPS=PASS\nTWENTY_ORIGINALS_AND_LOOP_WRAPS=PASS\nADB_PLAY_STOP_CONTROLS=PASS\nTHIRTY_MINUTE_MUTED_DECODE_MIX=PASS\nREAL_ANDROID_OWNER_DEVICE=NOT_TESTED\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/audio20/qa-audio20-result.txt"
+printf 'QA_VISIBLE_WEBVIEW=PASS\nELIGIBLE_QA_TRACKS=PASS\nSIX_GROUPS=PASS\nELIGIBLE_ORIGINALS_AND_LOOP_WRAPS=PASS\nADB_PLAY_STOP_CONTROLS=PASS\nTHIRTY_MINUTE_MUTED_DECODE_MIX=PASS\nREAL_ANDROID_OWNER_DEVICE=NOT_TESTED\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/audio20/qa-audio20-result.txt"

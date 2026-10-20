@@ -146,6 +146,9 @@ def search_required():
         # Persist each slot so a later network failure never hides prior results.
         (directory/"proposals.json").write_text(json.dumps(reports,ensure_ascii=False,indent=2))
         print("REQUIRED_SOURCE_LOOKUP",result["slot_id"],result["status"],result.get("file",""),flush=True)
+        if result.get("file"):
+            print("REQUIRED_SOURCE_PIN_RECEIPT",json.dumps({key:result[key] for key in
+                ("slot_id","file","source_page","license","author_source","sha1","sha256","bytes","duration_seconds","slot_match")},ensure_ascii=True),flush=True)
     print("SEARCH_DOWNLOAD_BYTES",downloaded,"NO_CANONICAL_INTAKE_OR_APP_CHANGE")
 
 if __name__=="__main__":

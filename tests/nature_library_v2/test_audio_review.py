@@ -23,6 +23,15 @@ class OfflineReviewTests(unittest.TestCase):
         self.assertIn("Ocean_Waves_on_a_Tropical_Beach.ogg", html)
         self.assertNotIn("autoplay", html.lower())
 
+    def test_known_rights_conflict_has_no_audio_or_play_control(self):
+        record={"id":"ocean","file":"Ocean.ogg","author":"source author","license":"CC0-1.0",
+                "license_evidence":"https://commons.wikimedia.org/wiki/File:Ocean.ogg",
+                "review_warnings":["BLOCKED_RIGHTS: conflicting original music metadata"]}
+        text=review.render_html([record])
+        self.assertNotIn('<audio ',text)
+        self.assertNotIn('data-play>',text)
+        self.assertIn('BLOCKED_RIGHTS',text)
+
     def test_source_description_is_escaped_not_html(self):
         rows=[{"id":"rain", "file":"Rain.ogg", "author":"<script>alert(1)</script>",
                "license":"PD-author",

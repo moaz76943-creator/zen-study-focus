@@ -5,6 +5,7 @@ const fs=require('node:fs'),path=require('node:path'),{pathToFileURL}=require('n
 const assert=require('node:assert/strict');
 (async()=>{
  const html=path.resolve(process.argv[2]||'audio_candidates/commons_intake/index.html');
+ const expected=JSON.parse(fs.readFileSync(path.join(path.dirname(html),"qa_report.json"))).filter(r=>r.status==="QUARANTINED_NOT_APPROVED").length;assert.ok(expected>0&&expected<=20);
  const output=path.resolve(process.argv[3]||'/tmp/deep-focus-audio-browser');fs.mkdirSync(output,{recursive:true});
  const executable=process.env.CHROME_BIN||['/usr/bin/chromium','/usr/bin/google-chrome'].find(f=>fs.existsSync(f));
  assert.ok(executable,'PREREQUISITE_MISSING: Chromium executable');
@@ -18,13 +19,13 @@ const assert=require('node:assert/strict');
    const result=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth,
     tracks:document.querySelectorAll('audio').length,
     buttons:[...document.querySelectorAll('button')].every(b=>b.getBoundingClientRect().height>=44)}));
-   assert.equal(result.overflow,false,JSON.stringify({width,dir,size}));assert.equal(result.tracks,20);assert.ok(result.buttons);
+   assert.equal(result.overflow,false,JSON.stringify({width,dir,size}));assert.equal(result.tracks,expected);assert.ok(result.buttons);
    layouts.push({width,dir,size,...result});
   }
   await page.setViewportSize({width:360,height:850});await page.evaluate(()=>{document.documentElement.style.fontSize='16px';document.documentElement.dir='rtl';document.querySelectorAll('audio').forEach(a=>a.muted=true);});
   const files=[];
-  for(let i=0;i<20;i++){
-   const card=page.locator('.clip').nth(i);await card.locator('[data-play]').click();
+  for(let i=0;i<expected;i++){
+   const card=page.locator('.clip[data-playable]').nth(i);await card.locator('[data-play]').click();
    await page.waitForFunction(i=>{const a=document.querySelectorAll('audio')[i];return !a.paused&&a.currentTime>.2&&!a.error},i,{timeout:12000});
    files.push(await card.locator('audio').evaluate(a=>({id:a.dataset.id,src:a.currentSrc,time:a.currentTime})));
    await card.locator('[data-play]').click();assert.ok(await card.locator('audio').evaluate(a=>a.paused));
@@ -38,7 +39,7 @@ const assert=require('node:assert/strict');
   await page.locator('#master-volume').fill('0');await page.locator('#master-volume').dispatchEvent('input');
   assert.ok(await page.locator('audio').evaluateAll(all=>all.every(a=>a.volume===0)));
   await page.locator('button[onclick="stopAllAudio()"]').click();
-  assert.ok(await page.locator('audio').evaluateAll(all=>all.length===20&&all.every(a=>a.paused&&a.currentTime===0)));
+  assert.ok(await page.locator('audio').evaluateAll((all,n)=>all.length===n&&all.every(a=>a.paused&&a.currentTime===0),expected));
   // Reject play() deterministically; this is failure injection, not playback proof.
   await page.locator('audio').first().evaluate(a=>{a.play=()=>Promise.reject(new Error('Injected play rejection'));});
   await page.locator('[data-play]').first().click();

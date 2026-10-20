@@ -11,6 +11,7 @@ function getList(){
  });
 }
 async function main(){
+ const expected=Number(process.env.AUDIO_QA_EXPECTED_TRACKS);assert.ok(Number.isInteger(expected)&&expected>0&&expected<=20);
  let page;
  for(let t=0;t<30;t++){
   try{const pages=await getList();page=pages.find(p=>p.type==='page'&&p.url==='file:///android_asset/web/audio_review/index.html');if(page)break;}catch(_){}
@@ -44,12 +45,12 @@ async function main(){
  try{
   let state=null;
   const expression='(() => {const a=[...document.querySelectorAll("audio")];const names=a.map(x=>decodeURIComponent(new URL(x.currentSrc||x.src).pathname.split("/").pop()));return {ready:document.readyState,url:location.href,visible:document.visibilityState,count:a.length,groups:[...document.querySelectorAll("[data-sound-group]")].map(x=>x.getAttribute("data-sound-group")),uniqueNames:new Set(names).size,nativeBridge:typeof window.ZenNative!=="undefined"};})()';
-  for(let i=0;i<18;i++){state=await evalJs(expression);if(state.ready==='complete'&&state.count===20)break;await sleep(400);}
+  for(let i=0;i<18;i++){state=await evalJs(expression);if(state.ready==='complete'&&state.count===expected)break;await sleep(400);}
   assert.equal(state.url,'file:///android_asset/web/audio_review/index.html');
   assert.equal(state.visible,'visible');
   assert.equal(state.ready,'complete');
-  assert.equal(state.count,20);
-  assert.equal(state.uniqueNames,20);
+  assert.equal(state.count,expected);
+  assert.equal(state.uniqueNames,expected);
   assert.equal(state.groups.length,6);
   assert.equal(state.nativeBridge,false,'Privileged data bridge must not be in Audio QA');
   const traces=[];
@@ -73,9 +74,9 @@ async function main(){
   }
   await evalJs(`(()=>{window.audioQaErrors=[];document.querySelectorAll('audio').forEach(a=>{a.muted=true;a.addEventListener('error',()=>audioQaErrors.push({id:a.dataset.id,code:a.error?.code}));});})()`);
   const originals=[];
-  for(let i=0;i<20;i++){
+  for(let i=0;i<expected;i++){
     // Groups reset nth-of-type; address the actual flattened card index instead.
-    await evalJs(`document.querySelectorAll('.clip')[${i}].setAttribute('data-testing','current')`);
+    await evalJs(`document.querySelectorAll('.clip[data-playable]')[${i}].setAttribute('data-testing','current')`);
     await tap('[data-testing="current"] [data-play]');
     await sleep(1100);
     const observed=await evalJs(`(()=>{const a=document.querySelectorAll('audio')[${i}];return {id:a.dataset.id,time:a.currentTime,paused:a.paused,error:a.error?.code??null,src:a.currentSrc};})()`);
@@ -88,7 +89,7 @@ async function main(){
   }
   await evalJs(`(()=>{const select=document.getElementById('source-mode');select.value='loop';select.dispatchEvent(new Event('change'));})()`);
   const loops=[];
-  for(let i=0;i<20;i++){
+  for(let i=0;i<expected;i++){
     const decoded=await evalJs(`(async()=>{const a=document.querySelectorAll('audio')[${i}];await a.play();return {duration:a.duration,src:a.currentSrc,id:a.dataset.id};})()`);
     assert.ok(decoded.duration>10&&decoded.src.includes('/loops/'),'Prepared loop missing');
     await evalJs(`document.querySelectorAll('audio')[${i}].currentTime=${decoded.duration}-.2`);
@@ -100,7 +101,7 @@ async function main(){
   await evalJs(`(async()=>{stopAllAudio();await Promise.all([...document.querySelectorAll('audio')].map(a=>a.play()));})()`);
   await sleep(1200);
   const mix=await evalJs(`(()=>{const a=[...document.querySelectorAll('audio')];return {count:a.length,active:a.filter(x=>!x.paused&&!x.error).length,gain:a.reduce((n,x)=>n+x.volume,0)};})()`);
-  assert.equal(mix.active,20);assert.ok(mix.gain<=.800001);
+  assert.equal(mix.active,expected);assert.ok(mix.gain<=.800001);
   await evalJs(`(()=>{const master=document.getElementById('master-volume');master.value=0;master.dispatchEvent(new Event('input'));})()`);
   assert.ok(await evalJs(`[...document.querySelectorAll('audio')].every(a=>a.volume===0)`),'Master zero is not silence');
   await evalJs(`(()=>{document.getElementById('master-volume').value=60;rebalance();})()`);
@@ -113,7 +114,7 @@ async function main(){
     await sleep(Math.min(30000,enduranceSeconds*1000-(Date.now()-started)));
     const checkpoint=await evalJs(`(()=>{const a=[...document.querySelectorAll('audio')];return {active:a.filter(x=>!x.paused&&!x.error).length,tracks:a.map(x=>({id:x.dataset.id,time:x.currentTime,error:x.error?.code??null})),gain:a.reduce((n,x)=>n+x.volume,0),errors:audioQaErrors};})()`);
     checkpoint.elapsedSeconds=(Date.now()-started)/1000;
-    assert.equal(checkpoint.active,20,'A track stopped during endurance');
+    assert.equal(checkpoint.active,expected,'A track stopped during endurance');
     assert.ok(checkpoint.gain<=.800001);assert.deepEqual(checkpoint.errors,[]);
     checkpoints.push(checkpoint);
     console.log('AUDIO20_ENDURANCE_CHECK',Math.round(checkpoint.elapsedSeconds),checkpoint.active);

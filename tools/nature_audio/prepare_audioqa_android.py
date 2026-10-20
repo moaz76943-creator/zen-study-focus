@@ -44,6 +44,10 @@ def prepare(root):
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 _()'-]*\.ogg", name):
             raise ValueError("Unsafe original media path")
         expected = statuses.get(item["id"])
+        if any(str(w).startswith("BLOCKED_RIGHTS:") for w in item.get("review_warnings", [])):
+            if expected is None or expected.get("status") != "BLOCKED_RIGHTS" or (media / name).exists():
+                raise ValueError("Blocked rights file in AudioQA")
+            continue
         body = (media / name).read_bytes()
         actual_sha1 = hashlib.sha1(body).hexdigest()
         actual_sha256 = hashlib.sha256(body).hexdigest()

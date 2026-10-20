@@ -42,6 +42,10 @@ def render_html(records):
         author = html.escape(row["author"])
         licence = html.escape(row["license"])
         filename_url = urllib.parse.quote(filename, safe="_-")
+        if any(str(w).startswith("BLOCKED_RIGHTS:") for w in row.get("review_warnings", [])):
+            warnings = html.escape(" · ".join(row["review_warnings"]))
+            groups.setdefault(category, []).append('<article class="clip" data-blocked="rights"><h3>'+name_ar+' · '+name_en+'</h3><p class="flag">'+warnings+'</p><p>Not packaged / غير مضمّن</p></article>')
+            continue
         loop = row.get("loop_derivative")
         loop_attr = ""
         if loop:
@@ -51,7 +55,7 @@ def render_html(records):
         warnings = " · ".join(row.get("review_warnings", []))
         warning_html = '<p class="flag" role="note">'+html.escape(warnings)+'</p>' if warnings else ''
         groups.setdefault(category, []).append(
-            '<article class="clip"><div class="info"><h3 dir="auto">'
+            '<article class="clip" data-playable><div class="info"><h3 dir="auto">'
             + name_ar + ' <span lang="en" dir="ltr">· ' + name_en + '</span></h3>'
             '<p>Original recording by '+author+' · '+licence+'</p>'
             '<a rel="noopener noreferrer" target="_blank" href="'+html.escape(source,quote=True)+'">Original and license</a>'
@@ -151,6 +155,10 @@ def build():
     for item in candidates:
         file = OUT / item["file"]
         audited = checked.get(item["id"])
+        if any(str(w).startswith("BLOCKED_RIGHTS:") for w in item.get("review_warnings", [])):
+            if audited is None or audited.get("status") != "BLOCKED_RIGHTS" or file.exists():
+                raise ValueError("Blocked rights file cannot be packaged for listening")
+            continue
         if audited is None or not file.is_file() or not SAFE.fullmatch(item["file"]):
             raise ValueError("Candidate absent or unaudited: " + item["id"])
         blob = file.read_bytes()

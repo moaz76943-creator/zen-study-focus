@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   authentic20:
-    name: Verify exactly 20 Commons originals and offline listening sheet
+    name: Verify 20-record inventory; exclude rights-blocked audio from offline review
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -31,7 +31,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends ffmpeg
-      - name: Verify Commons rights, pinned SHA1 and SHA256 and decode all 20 originals
+      - name: Verify source metadata and decode only rights-unblocked original bytes
         run: python3 tools/nature_audio/collect_commons_audio.py
       - name: Generate offline real recording review without music or synthetic substitutions
         run: python3 tools/nature_audio/build_audio_review.py
@@ -39,7 +39,7 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/audioqa-browser" --no-save playwright@1.56.1
           NODE_PATH="$RUNNER_TEMP/audioqa-browser/node_modules" node tests/nature_library_v2/audio_review_browser.cjs audio_candidates/commons_intake/index.html audio_candidates/commons_intake/browser-evidence
-      - name: Require exactly 20 original audio sources, never auto-enable app entries
+      - name: Require honest 20-record inventory,19 QA files and no app enablement
         run: |
           python3 - <<'PY'
           import json,pathlib,hashlib
@@ -47,24 +47,26 @@ jobs:
           rows=json.loads((root/'qa_report.json').read_text())
           manifest=json.loads(pathlib.Path('tools/nature_audio/commons_intake.json').read_text())
           assert len(rows)==len(manifest['items'])==20
-          assert len({r['original_sha256'] for r in rows})==20
-          assert all(r['status']=='QUARANTINED_NOT_APPROVED' and r['codec']=='vorbis' for r in rows)
+          accepted=[r for r in rows if r['status']=='QUARANTINED_NOT_APPROVED']
+          assert len(accepted)==19 and len({r['original_sha256'] for r in accepted})==19
+          assert len([r for r in rows if r['status']=='BLOCKED_RIGHTS'])==1
+          assert all(r['status']=='QUARANTINED_NOT_APPROVED' and r['codec']=='vorbis' for r in accepted)
           assert all(e['approved_for_runtime'] is False for e in manifest['items'])
-          assert (root/'index.html').read_text().count('<audio ') == 20
-          print('TWENTY_UNIQUE_REAL_OGG_ORIGINALS_SHA_PINNED=PASS')
+          assert (root/'index.html').read_text().count('<audio ') == 19
+          print('TWENTY_RECORDS_NINETEEN_QA_FILES_ONE_RIGHTS_BLOCKED=PASS')
           print('PRODUCTION_APPROVED=NO')
           PY
-      - name: Upload all 20 offline-only genuine recordings, metadata and listening page
+      - name: Upload 19 eligible QA originals, blocked-source metadata and listening page
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DeepFocus-20-Real-Nature-Originals-Listening-Only-${{ github.sha }}
+          name: DeepFocus-Nature-Catalog20-Eligible19-Listening-Only-${{ github.sha }}
           path: audio_candidates/commons_intake/
           if-no-files-found: error
           retention-days: 7
 
   audioqa:
-    name: Build isolated 20-original Android audio QA APK
+    name: Build isolated eligible-recording Android audio QA APK
     needs: authentic20
     if: github.event_name == 'push' && contains(github.event.head_commit.message, '[audio-qa-apk]')
     runs-on: ubuntu-latest
@@ -76,19 +78,20 @@ jobs:
       - name: Read verified originals from same immutable workflow run
         uses: actions/download-artifact@v4
         with:
-          name: DeepFocus-20-Real-Nature-Originals-Listening-Only-${{ github.sha }}
+          name: DeepFocus-Nature-Catalog20-Eligible19-Listening-Only-${{ github.sha }}
           path: audio_candidates/commons_intake
-      - name: Enforce exact 20-file isolated listening artifact before APK build
+      - name: Enforce 19 QA files and one excluded rights-blocked source before APK build
         shell: bash
         run: |
           set -euo pipefail
-          find audio_candidates/commons_intake -maxdepth 1 -type f -name '*.ogg' | grep -c . | grep -x 20
+          find audio_candidates/commons_intake -maxdepth 1 -type f -name '*.ogg' | grep -c . | grep -x 19
           python3 - <<'PY'
           import json,pathlib
           rows=json.loads(pathlib.Path('audio_candidates/commons_intake/qa_report.json').read_text())
-          assert len(rows)==20 and len({x['original_sha256'] for x in rows})==20
-          assert all(x['status']=='QUARANTINED_NOT_APPROVED' for x in rows)
-          print('QA_ONLY_TWENTY_ORIGINALS_RECEIVED')
+          accepted=[r for r in rows if r['status']=='QUARANTINED_NOT_APPROVED']
+          assert len(rows)==20 and len(accepted)==19 and len({x['original_sha256'] for x in accepted})==19
+          assert all(not x.get('original_downloaded') for x in rows if x['status']=='BLOCKED_RIGHTS')
+          print('QA_ONLY_NINETEEN_ORIGINALS_ONE_RIGHTS_BLOCKED')
           PY
       - name: Prepare permission-free disposable original audio listening app
         env:
@@ -137,7 +140,7 @@ jobs:
           test -c /dev/kvm
           sudo chown "$(id -u):$(id -g)" /dev/kvm
           sudo chmod u+rw /dev/kvm
-      - name: Prove all 20 originals, loop wraps, actual ADB controls and real 30-minute mixed decode on API30
+      - name: Prove all eligible originals, loop wraps, ADB controls and real 30-minute mixed decode on API30
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
@@ -155,10 +158,10 @@ jobs:
           path: ${{ runner.temp }}/audio20/
           if-no-files-found: warn
           retention-days: 7
-      - name: Upload separate 20 original sound-listening QA only APK
+      - name: Upload separate 19-candidate sound-listening QA only APK
         uses: actions/upload-artifact@v4
         with:
-          name: DeepFocus-20-Nature-AudioQA-Isolated-Debug-${{ github.sha }}
+          name: DeepFocus-Nature-Eligible19-AudioQA-Isolated-Debug-${{ github.sha }}
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 7

@@ -42,9 +42,13 @@ def validate_license(declared_license, metadata):
     return raw
 
 
+def rights_blocked(item):
+    return any(str(warning).startswith("BLOCKED_RIGHTS:") for warning in item.get("review_warnings", []))
+
+
 def required_coverage(manifest):
     """Requested app slots and intake files are distinct; never infer readiness."""
-    sources = {item["id"] for item in manifest["items"]}
+    sources = {item["id"]: item for item in manifest["items"]}
     result, used, slots = [], set(), set()
     for slot in manifest.get("required_slots", []):
         key, candidate = slot["slot_id"], slot.get("candidate_id")
@@ -53,7 +57,7 @@ def required_coverage(manifest):
         slots.add(key)
         if candidate is not None:
             used.add(candidate)
-        result.append(dict(slot, ready=False, status="CANDIDATE" if candidate else "MISSING"))
+        result.append(dict(slot, ready=False, status=("BLOCKED" if rights_blocked(sources[candidate]) else "CANDIDATE") if candidate else "MISSING"))
     return result
 
 
@@ -210,6 +214,16 @@ def run():
         info = source_info(name, item["license"])
         if pinned is None or not SHA1.fullmatch(pinned) or pinned != info["sha1"]:
             raise ValueError("Missing or changed pinned original SHA1 for " + name)
+        if rights_blocked(item):
+            if (OUT / name).exists():
+                raise ValueError("Blocked rights file must not be present in distributable QA output: " + name)
+            reports.append({"id": item["id"], "status": "BLOCKED_RIGHTS", "ready": False,
+                            "source_page": source_url, "source_metadata": info["metadata"],
+                            "source_checked_at": info["checked_at"], "author": item["author"], "license": item["license"],
+                            "pinned_sha256": item["source_sha256"], "original_downloaded": False,
+                            "content_warnings": item["review_warnings"], "human_listening": "NOT_TESTED"})
+            print("MEDIA_SOURCE_BLOCKED_NOT_DOWNLOADED", item["id"], flush=True)
+            continue
         expected_sha256 = item.get("source_sha256")
         if not re.fullmatch(r"[a-f0-9]{64}", expected_sha256 or ""):
             raise ValueError("Missing pinned original SHA256 for " + name)
@@ -274,9 +288,9 @@ def run():
     (OUT / "qa_report.json").write_text(json.dumps(reports, indent=2), encoding="utf-8")
     (OUT / "required_coverage.json").write_text(json.dumps(coverage, ensure_ascii=False, indent=2), encoding="utf-8")
     print("REQUIRED_SLOT_COVERAGE", json.dumps({status: sum(r["status"] == status for r in coverage)
-                                              for status in ("AVAILABLE", "CANDIDATE", "MISSING")}))
+                                              for status in ("AVAILABLE", "CANDIDATE", "BLOCKED", "MISSING")}))
     print(json.dumps([{k: row[k] for k in ("id","original_sha1","original_sha256","status")}
-                      for row in reports], indent=2))
+                      for row in reports if row["status"] == "QUARANTINED_NOT_APPROVED"], indent=2))
 
 if __name__ == "__main__":
     try:
