@@ -13,106 +13,116 @@
       "license_evidence": "https://commons.wikimedia.org/wiki/File:Rain_thunder_and_birds.ogg",
       "notes": "Rain, thunder AND birds; not standalone thunder; candidate ambience",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "23694214e45be568e912d0eeff764f28c7669a12bd6c1d0c282094e39d8be3a9"
     },
     {
       "id": "ocean",
       "file": "Ocean_Waves_on_a_Tropical_Beach.ogg",
       "author": "Jarrod stanley",
       "license": "CC0-1.0",
-      "source_sha1": null,
+      "source_sha1": "22b9faaa8c718fa1596d8f41d221906623bebd5a",
       "license_evidence": "https://commons.wikimedia.org/wiki/File:Ocean_Waves_on_a_Tropical_Beach.ogg",
       "notes": "6m24s ocean beach with nearby tidal stream; close to 17MB original",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "bae2fc0a0c1d36f43494883d9455ad151fc747a0770876b25436422ea8736e55"
     },
     {
       "id": "stream_rapids",
       "file": "Sanna_river_rapids.ogg",
       "author": "Jarrod stanley",
       "license": "CC0-1.0",
-      "source_sha1": null,
+      "source_sha1": "781dbd41ee11d11adbf51ecee45250dc8f7ecaf4",
       "license_evidence": "https://commons.wikimedia.org/wiki/File:Sanna_river_rapids.ogg",
       "notes": "5-minute Austrian river rapids; strong rushing water",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "84ef7a340afa78fd4ed21d76178afc8738035dd5da7119154655f491a969bdce"
     },
     {
       "id": "rain_window",
       "file": "Rain_against_the_window.ogg",
       "author": "cori",
       "license": "PD-author",
-      "source_sha1": null,
+      "source_sha1": "9d37ead83781913c95c026559a9ea3490c765d72",
       "license_evidence": "https://commons.wikimedia.org/wiki/File:Rain_against_the_window.ogg",
       "notes": "Rain striking window, not roof",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "85be295e9936fbf003ae5dbc0e106b77e60854ea4b19bfb7b232420f291a737e"
     },
     {
       "id": "breeze_birds",
       "file": "Gentle_breeze_and_birds_singing.ogg",
       "author": "ezwa",
       "license": "PD-author",
-      "source_sha1": null,
+      "source_sha1": "8a88bdb353adb8361e04e65f4db5fec671352ccf",
       "license_evidence": "https://commons.wikimedia.org/wiki/File:Gentle_breeze_and_birds_singing.ogg",
       "notes": "33-second gentle wind in garden with distinct blackcap and chaffinch",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "399c31051dfe42f5f5af4bb2334b16aee9263ceaf594158654fa6f06d036d483"
     },
     {
       "id": "birds_garden",
       "file": "Birds_singing_in_garden.ogg",
       "author": "ezwa",
       "license": "PD-author",
-      "source_sha1": null,
+      "source_sha1": "28ad1eeb3d32bbedaa9a47175671dbc02ea87147",
       "license_evidence": "https://commons.wikimedia.org/wiki/File:Birds_singing_in_garden.ogg",
       "notes": "49-second garden bird singing on sunny afternoon, not dawn",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "c3a9cbbecb313810e6ca9a0c38743a7548749a0c18fda5659f9d5dc7060bddd8"
     },
     {
       "id": "stream",
       "file": "Hemlock_stream.ogg",
       "author": "Dirtslayer",
       "license": "PD-author",
-      "source_sha1": null,
+      "source_sha1": "547b822b715fd83544fc0f156f719ed54967c761",
       "license_evidence": "https://commons.wikimedia.org/wiki/File:Hemlock_stream.ogg",
       "notes": "19-second trickling stream; short loop needs endurance listening",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "cc1d7ea85c7494259ed79bc9ba0bb86d95109c93d74389d7b039dc987bb44733"
     },
     {
       "id": "forest_ambient",
       "file": "20090610_0_ambience.ogg",
       "author": "nille",
       "license": "PD-author",
-      "source_sha1": null,
+      "source_sha1": "981f161f9e1a5749bf5da8e37c7f37b892afe7cc",
       "license_evidence": "https://commons.wikimedia.org/wiki/File:20090610_0_ambience.ogg",
       "notes": "2-minute woodland ambience; noisy/crows in original description, candidate requires listening",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "43848c3eda5f42829f1033112c2a91ba3e5c91b79a0532fda264c9f59856d431"
     },
     {
       "id": "river_stony",
       "file": "Shallow_small_river_with_stony_riverbed.ogg",
       "author": "stephan",
       "license": "PD-author",
-      "source_sha1": null,
+      "source_sha1": "edb136ae8c31371f8923ce5ef1df8d068e816097",
       "license_evidence": "https://commons.wikimedia.org/wiki/File:Shallow_small_river_with_stony_riverbed.ogg",
       "notes": "Shallow natural river water against stony bed; investigate exact duration",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "ee414934684667f85bba98b15c20880e0a981d93cec9582f665b005a99ba49e0"
     },
     {
       "id": "storm_rain",
       "file": "Rain_and_thunder_(1).ogg",
       "author": "ezwa",
       "license": "PD-author",
-      "source_sha1": null,
+      "source_sha1": "ad98b084834bc479e118e40ce3643103f314ee84",
       "license_evidence": "https://commons.wikimedia.org/wiki/File:Rain_and_thunder_(1).ogg",
       "notes": "One minute rain with thunder (storm), not isolated thunder",
       "status": "QUARANTINED_NOT_APPROVED",
-      "approved_for_runtime": false
+      "approved_for_runtime": false,
+      "source_sha256": "28bf32d934067dd8656062bacec2a69db49f9e15fb0e63b3ffe53c51a6b8c8eb"
     }
   ]
 }
