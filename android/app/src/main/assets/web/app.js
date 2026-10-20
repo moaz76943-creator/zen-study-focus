@@ -1047,24 +1047,27 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => soundCat === 'all' || s.cat === soundCat).forEach(s => {
-    const isOn = !!activePlayers[s.id];
-    const sName = d.sounds[s.id] || s.id;
-    const tile = document.createElement('div');
-    tile.className = `sound-Rich-tile ${s.cls} ${isOn ? 'playing' : ''}`;
-    tile.onclick = () => toggleSoundTile(s.id);
-    tile.innerHTML = `
-      <div class="stile-top">
-        <div class="stile-play-btn">${isOn ? '❚❚' : '▶'}</div>
-        <div class="stile-switch"><div class="stile-knob"></div></div>
-      </div>
-      <div>
-        <div class="stile-name">${toWest(sName)}</div>
-        <input type="range" class="stile-vol" min="0.05" max="1" step="0.05" value="${s.vol}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value)">
-      </div>
-    `;
-    box.appendChild(tile);
-  });
+  for (let i = 0; i < SOUNDS_DATA.length; i++) {
+    const s = SOUNDS_DATA[i];
+    if (soundCat === 'all' || s.cat === soundCat) {
+      const isOn = !!activePlayers[s.id];
+      const sName = d.sounds[s.id] || s.id;
+      const tile = document.createElement('div');
+      tile.className = `sound-Rich-tile ${s.cls} ${isOn ? 'playing' : ''}`;
+      tile.onclick = () => toggleSoundTile(s.id);
+      tile.innerHTML = `
+        <div class="stile-top">
+          <div class="stile-play-btn">${isOn ? '❚❚' : '▶'}</div>
+          <div class="stile-switch"><div class="stile-knob"></div></div>
+        </div>
+        <div>
+          <div class="stile-name">${toWest(sName)}</div>
+          <input type="range" class="stile-vol" min="0.05" max="1" step="0.05" value="${s.vol}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value)">
+        </div>
+      `;
+      box.appendChild(tile);
+    }
+  }
 }
 
 /* ========================================================
