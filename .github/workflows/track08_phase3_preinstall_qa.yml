@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: track08-qa-\${{ github.ref }}
+  group: track08-qa-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   side-by-side:
@@ -92,6 +92,10 @@ jobs:
           content=(Path(os.environ['RUNNER_TEMP'])/'df-qa/qa-permissions.txt').read_text()
           actual=set(re.findall(r"uses-permission:\s+name='([^']+)'",content))
           allowed={'android.permission.INTERNET','android.permission.VIBRATE','android.permission.WAKE_LOCK','android.permission.POST_NOTIFICATIONS','android.permission.FOREGROUND_SERVICE','android.permission.FOREGROUND_SERVICE_SPECIAL_USE'}
+          private_receiver='com.zenstudy.focus.qa.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
+          # AndroidX may inject this exact package-scoped signature-only receiver permission.
+          # Never allow arbitrary app-owned, Android platform, network or storage permissions.
+          allowed.add(private_receiver)
           assert actual <= allowed, f'Unexpected QA permission names: {sorted(actual-allowed)}'
           PY
       - name: Prepare KVM on disposable emulator runner
@@ -140,10 +144,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DeepFocus-Phase3-QA-Isolated-\${{ github.sha }}
+          name: DeepFocus-Phase3-QA-Isolated-${{ github.sha }}
           retention-days: 7
           if-no-files-found: warn
           path: |
-            \${{ runner.temp }}/df-qa/DeepFocus-Phase3-QA-Only.apk
-            \${{ runner.temp }}/df-qa/*.txt
-            \${{ runner.temp }}/df-qa/*.diff
+            ${{ runner.temp }}/df-qa/DeepFocus-Phase3-QA-Only.apk
+            ${{ runner.temp }}/df-qa/*.txt
+            ${{ runner.temp }}/df-qa/*.diff
