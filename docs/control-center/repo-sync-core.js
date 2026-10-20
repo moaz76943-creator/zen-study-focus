@@ -21,20 +21,30 @@
     }catch{return null;}
   }
   function ciStatus(runs,sha){
-    if(!safeSha(sha))return {status:'NOT_VERIFIED',runId:null,url:null,count:0};
-    const matches=(Array.isArray(runs)?runs:[]).filter(r=>r&&r.head_sha===sha&&Number.isSafeInteger(r.id)&&r.id>0);
+    if(!safeSha(sha))return {status:'NOT_VERIFIED',runId:null,url:null,count:0,workflows:0};
+    const matches=(Array.isArray(runs)?runs:[]).filter(r=>
+      r&&r.head_sha===sha&&Number.isSafeInteger(r.id)&&r.id>0);
     const newest=[...matches].sort((a,b)=>b.id-a.id)[0];
-    const statuses=matches.map(r=>{
+    const byWorkflow=new Map();
+    for(const run of [...matches].sort((a,b)=>b.id-a.id)){
+      const identity=Number.isSafeInteger(run.workflow_id)&&run.workflow_id>0?
+        'id:'+run.workflow_id:
+        typeof run.name==='string'&&run.name.length?'name:'+run.name:'run:'+run.id;
+      if(!byWorkflow.has(identity))byWorkflow.set(identity,run);
+    }
+    const current=[...byWorkflow.values()].map(r=>{
       if(['failure','cancelled','timed_out','action_required','startup_failure'].includes(r.conclusion))return 'FAIL';
-      if(r.status==='queued'||r.status==='in_progress'||r.status==='pending'||r.status==='waiting'||r.status==='requested')return 'RUNNING';
+      if(['queued','in_progress','pending','waiting','requested'].includes(r.status))return 'RUNNING';
       if(r.conclusion==='success')return 'PASS';
       return 'NOT_VERIFIED';
     });
-    const status=statuses.includes('FAIL')?'FAIL':
-      statuses.includes('RUNNING')?'RUNNING':
-      statuses.includes('PASS')?'PASS':'NOT_VERIFIED';
+    const status=current.includes('FAIL')?'FAIL':
+      current.includes('RUNNING')?'RUNNING':
+      current.includes('NOT_VERIFIED')?(current.includes('PASS')?'PARTIAL':'NOT_VERIFIED'):
+      current.includes('PASS')?'PASS':'NOT_VERIFIED';
     return {status,runId:newest?.id||null,
-      url:trustedGitHubUrl(newest?.html_url)||null,count:matches.length};
+      url:trustedGitHubUrl(newest?.html_url)||null,count:matches.length,
+      workflows:byWorkflow.size};
   }
   function buildRepoHealth({pulls=[],runs=[],errors=[],timestamp=null}={}){
     if(!Array.isArray(pulls)||pulls.length>MAX_PRS||!Array.isArray(runs)||runs.length>MAX_RUNS)
@@ -45,14 +55,15 @@
       if(!safeSha(p.head?.sha)||!safeSha(p.base?.sha))throw Error('Invalid pull SHA');
     }
     const byNumber=new Map(cleanPulls.map(p=>[p.number,p]));
+    const verified=Boolean(byNumber.get(25)&&byNumber.get(37)&&errors.length===0);
     const toPR=n=>{
       const p=byNumber.get(n);
       return p?{number:n,sha:p.head.sha,baseSha:p.base.sha,draft:p.draft===true,
         url:trustedGitHubUrl(p.html_url)||'https://github.com/'+REPO+'/pull/'+n,
-        ci:ciStatus(runs,p.head.sha)}:null;
+        ci:verified?ciStatus(runs,p.head.sha):
+          {...ciStatus(runs,p.head.sha),status:'NOT_VERIFIED',partial:true}}:null;
     };
     const pr25=toPR(25),pr37=toPR(37);
-    const verified=Boolean(pr25&&pr37&&errors.length===0);
     const drift=verified?(pr25.sha===pr37.baseSha?'CURRENT':'BASE_MOVED'):'NOT_VERIFIED';
     const recent=runs.filter(r=>r&&Number.isSafeInteger(r.id)&&r.id>0&&
       safeSha(r.head_sha)&&trustedGitHubUrl(r.html_url))
