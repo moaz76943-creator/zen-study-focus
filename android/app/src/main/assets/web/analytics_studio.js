@@ -144,14 +144,29 @@
     };
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
     [domain,grouping,start,end].forEach(el=>el.addEventListener('change',refresh));
-    exportBtn.addEventListener('click',()=>{
+    let exporting=false;
+    exportBtn.addEventListener('click',async()=>{
+      if(exporting||destroyed)return;
       if(!rangeValid||!current){feedback.textContent=t.invalidDates;return;}
       const value=core.toCSV(current,'sessions');
-      if(typeof opts.onExport==='function'){opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');return;}
-      if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL)return;
-      const blob=new doc.defaultView.Blob(['\ufeff',value],{type:'text/csv;charset=utf-8'});
-      const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
-      wrapper.appendChild(a);try{a.click();}finally{a.remove();(doc.defaultView.setTimeout||setTimeout)(()=>doc.defaultView.URL.revokeObjectURL(url),30000);}
+      if(typeof opts.onExport==='function'){
+        exporting=true;exportBtn.disabled=true;feedback.textContent='';
+        try{
+          const response=await opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');
+          if(!destroyed)feedback.textContent=(response?.status==='saved'?'✓ ':response?.status==='cancelled'?'— ':'⚠ ')+t.export;
+        }catch(_){
+          if(!destroyed)feedback.textContent='⚠ '+t.export;
+        }finally{exporting=false;if(!destroyed)exportBtn.disabled=false;}
+        return;
+      }
+      if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL){
+        feedback.textContent='⚠ '+t.export;return;
+      }
+      try{
+        const blob=new doc.defaultView.Blob(['\ufeff',value],{type:'text/csv;charset=utf-8'});
+        const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
+        wrapper.appendChild(a);try{a.click();}finally{a.remove();(doc.defaultView.setTimeout||setTimeout)(()=>doc.defaultView.URL.revokeObjectURL(url),30000);}
+      }catch(_){feedback.textContent='⚠ '+t.export;}
     });
     const today=opts.today||core.localToday();if(!core.validDay(today))throw new RangeError('Invalid today');
     const epoch=Math.floor(Date.parse(today+'T12:00:00Z')/86400000);
