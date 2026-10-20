@@ -22,7 +22,7 @@ function load(file, extras={}) {
     cfg,document,window:{confirm:()=>true},
     localDateISO(d=new Date()){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());},
     toWest:x=>String(x), L:()=>({domStudy:'Study',domRead:'Reading',domSport:'Sport',domWork:'Work',weekdays:[]}),
-    saveFortressData:(k,v)=>saves.push([k,JSON.stringify(v)]),
+    saveFortressData:(k,v)=>{saves.push([k,JSON.stringify(v)]);return true;},
     closeModal(){},showToast(){},renderDomainState(){},renderAnalyticsBars(){},switchTab(){},renderQuickTraining(){},
     updateTimerDisplay(){},selectTimerMode(){mock.selectCalls++;},
     toggleTimerPlay(){mock.toggleCalls++;mock.timerRunning=!mock.timerRunning;},
@@ -160,4 +160,52 @@ test('work interval advances to rest then the next work interval without a secon
   assert.equal(x.eval('advanceQuickTrainingStep()'),true);
   assert.equal(x.eval('quickTraining.phase'),'work');
   assert.equal(x.eval('quickTraining.currentSet'),1);
+});
+
+test('07-05 rejected or throwing goal persistence never publishes success or changes cfg',()=>{
+  for(const failure of [()=>false,()=>{throw new Error('NATIVE_DURABLE_ACK_FAILED');}]){
+    const messages=[];let closed=0;
+    const oldDaily={study:15},oldWeekly={study:75};
+    const x=load('goals_studio.js',{
+      cfg:{dailyGoalsMin:oldDaily,weeklyGoalsMin:oldWeekly},
+      saveFortressData:failure,
+      closeModal:()=>{closed++;},
+      showToast:t=>messages.push(t)
+    });
+    x.eval('openDailyGoalsModal()');
+    x.document.getElementById('goalInput-study').value='60';
+    x.document.getElementById('goalWeeklyInput-study').value='300';
+    assert.equal(x.eval('saveDailyGoals()'),false);
+    assert.equal(x.cfg.dailyGoalsMin,oldDaily,'Unsaved daily goals must not mutate the existing reference');
+    assert.equal(x.cfg.weeklyGoalsMin,oldWeekly,'Unsaved weekly goals must not mutate the existing reference');
+    assert.equal(closed,0,'Do not close the editable modal on rejected write');
+    assert.ok(messages.some(s=>/save|حفظ/i.test(s)),'Expose a real failed-save message');
+    assert.ok(!messages.includes('Goals saved'),'Never announce an unacknowledged save');
+  }
+});
+
+test('07-02 rejected or throwing timer settings persistence does not change any active values',()=>{
+  for(const failure of [()=>false,()=>{throw new Error('NATIVE_DURABLE_ACK_FAILED');}]){
+    const messages=[];let closed=0;
+    const focusBefore={study:25,read:60};
+    const x=load('timer_settings.js',{
+      cfg:{domainFocusMinutes:focusBefore,shortMin:5,longMin:15,roundsPerCycle:4,focusCycleCount:3},
+      saveFortressData:failure,
+      closeModal:()=>{closed++;},
+      showToast:t=>messages.push(t)
+    });
+    x.eval('openTimerSettings()');
+    x.document.getElementById('tsetFocus').value='35';
+    x.document.getElementById('tsetShort').value='6';
+    x.document.getElementById('tsetLong').value='19';
+    x.document.getElementById('tsetRounds').value='5';
+    assert.equal(x.eval('saveTimerSettings()'),false);
+    assert.equal(x.cfg.domainFocusMinutes,focusBefore);
+    assert.equal(x.cfg.shortMin,5);assert.equal(x.cfg.longMin,15);
+    assert.equal(x.cfg.roundsPerCycle,4);assert.equal(x.cfg.focusCycleCount,3);
+    assert.equal(x.mock.selectCalls,0,'Timer preset must never change after failed write');
+    assert.equal(closed,0);
+    assert.ok(messages.some(s=>/save|حفظ/i.test(s)));
+    assert.ok(!messages.includes('Settings saved'));
+  }
 });
