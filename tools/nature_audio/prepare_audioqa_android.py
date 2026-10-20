@@ -111,6 +111,15 @@ def prepare(root):
 if __name__ == "__main__":
     if not (os.environ.get("GITHUB_ACTIONS") == "true"
         and os.environ.get("AUDIO_QA_BUILD") == "1"
-        and os.environ.get("GITHUB_REF_NAME") == "fix/deep-focus-nature-catalog-20-20261020"):
+        and os.environ.get("GITHUB_REF_NAME") in {
+            "fix/deep-focus-nature-catalog-20-20261020",
+            "feature/track07-04-authentic-nature-20-20261020"
+        }):
         raise SystemExit("SAFE_GUARD: Audio QA packaging is GitHub Actions branch-only")
+    # CLI requires all twenty originals, but prepare(root) remains unit-testable
+    # with small isolated fixtures and never relaxes per-file hash/rights checks.
+    if os.environ["GITHUB_REF_NAME"] == "feature/track07-04-authentic-nature-20-20261020":
+        intake=json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8"))
+        if len(intake.get("items",[])) != 20:
+            raise SystemExit("AUDIO20_QA_BLOCKED: exact twenty sources required")
     prepare(pathlib.Path(__file__).resolve().parents[2])

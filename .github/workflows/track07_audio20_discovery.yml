@@ -1,0 +1,43 @@
+name: Track07 authentic 20 originals discovery (quarantine only)
+on:
+  push:
+    branches:
+      - feature/track07-04-authentic-nature-20-20261020
+    paths:
+      - tools/nature_audio/commons_intake.json
+      - tools/nature_audio/discover20.py
+      - tests/nature_library_v2/twenty_originals_provenance.test.cjs
+      - .github/workflows/track07_audio20_discovery.yml
+permissions:
+  contents: read
+concurrency:
+  group: authentic20-discovery-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate 20 individual source descriptions and preserved 2 production voices
+        run: |
+          node --test tests/nature_library_v2/twenty_originals_provenance.test.cjs tests/nature_library_v2/intake_manifest.test.cjs tests/nature_library_v2/catalog.test.cjs
+      - name: Install audio decoder
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg
+      - name: Check 10 NEW original bytes, Commons rights metadata, SHA and full Vorbis decode
+        run: python3 tools/nature_audio/discover20.py
+      - name: Upload source-discovery evidence and unapproved originals (never into app assets)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: track07-authentic20-ten-new-discovery
+          path: audio_candidates/new20_discovery/
+          retention-days: 7
+          if-no-files-found: warn

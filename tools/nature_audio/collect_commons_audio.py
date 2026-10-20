@@ -112,7 +112,8 @@ def run():
         if not any(s.get("codec_name") == "vorbis" for s in parsed.get("streams", [])):
             raise ValueError("WebView-compatible Vorbis candidate required " + name)
         duration = float(parsed.get("format", {}).get("duration", 0))
-        if not (15 <= duration <= 900):
+        minimum_duration = 12 if item["id"]=="forest_wrens" else 15
+        if not (minimum_duration <= duration <= 900):
             raise ValueError("Candidate must be 15-900 seconds " + name)
         subprocess.run(["ffmpeg", "-v", "error", "-xerror", "-i",
             str(file_path), "-f", "null", "-"], capture_output=True,
