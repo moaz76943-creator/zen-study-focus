@@ -85,10 +85,20 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void shareAppInvite(String statsSummary) {
+            if (statsSummary == null) {
+                statsSummary = "";
+            }
+
+            // Sanitize: remove HTML tags and truncate to 1000 characters
+            String sanitizedSummary = statsSummary.replaceAll("<[^>]*>", "");
+            if (sanitizedSummary.length() > 1000) {
+                sanitizedSummary = sanitizedSummary.substring(0, 1000) + "...";
+            }
+
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
             share.putExtra(Intent.EXTRA_SUBJECT, "ZEN FOCUS — Study, Workout & Deep Work App");
-            share.putExtra(Intent.EXTRA_TEXT, statsSummary);
+            share.putExtra(Intent.EXTRA_TEXT, sanitizedSummary);
             startActivity(Intent.createChooser(share, "Share ZEN FOCUS via"));
         }
 
