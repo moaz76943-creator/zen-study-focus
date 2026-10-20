@@ -11,11 +11,12 @@ function toWest(val) {
     .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
 }
 
+// Only explicitly marked numeric inputs are normalized. User notes/tasks are immutable text.
 document.addEventListener('input', (e) => {
-  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
-    const cleaned = toWest(e.target.value);
-    if (cleaned !== e.target.value) e.target.value = cleaned;
-  }
+  const field=e.target;
+  if (!field || field.tagName !== 'INPUT' || !field.hasAttribute('data-df-numeric-input')) return;
+  if (window.DeepFocusAsciiNumeralsV21) window.DeepFocusAsciiNumeralsV21.normalizeNumericInput(field);
+  else { const normalized=toWest(field.value); if(field.value!==normalized) field.value=normalized; }
 });
 
 /* ========================================================
@@ -304,6 +305,9 @@ function localDateISO(date = new Date()) {
     String(date.getDate()).padStart(2, '0')
   ].join('-');
 }
+// Display-only additions to the existing canonical dictionaries; never persisted.
+Object.entries({"en": "No reviewed recordings are available in this category yet.", "ar": "لا توجد تسجيلات مكتملة المراجعة في هذه الفئة حاليًا.", "es": "Todavía no hay grabaciones revisadas en esta categoría.", "zh": "此分类暂无审核完成的录音。", "hi": "इस श्रेणी में अभी कोई समीक्षा की गई रिकॉर्डिंग उपलब्ध नहीं है।", "fr": "Aucun enregistrement validé dans cette catégorie pour le moment.", "de": "In dieser Kategorie sind noch keine geprüften Aufnahmen verfügbar.", "ru": "В этой категории пока нет проверенных записей.", "pt": "Ainda não há gravações revisadas nesta categoria.", "ja": "このカテゴリには審査済みの録音がまだありません。", "id": "Belum ada rekaman yang telah ditinjau dalam kategori ini.", "tr": "Bu kategoride henüz incelemesi tamamlanmış kayıt yok.", "ko": "이 카테고리에는 아직 검토가 완료된 녹음이 없습니다.", "vi": "Danh mục này chưa có bản ghi âm đã được kiểm duyệt.", "it": "Non ci sono ancora registrazioni verificate in questa categoria.", "bn": "এই বিভাগে এখনো পর্যালোচিত কোনো রেকর্ডিং নেই।", "ur": "اس زمرے میں ابھی جانچ شدہ ریکارڈنگ دستیاب نہیں ہے۔", "fa": "هنوز ضبط بررسی‌شده‌ای در این دسته موجود نیست.", "pl": "W tej kategorii nie ma jeszcze sprawdzonych nagrań.", "nl": "In deze categorie zijn nog geen gecontroleerde opnamen beschikbaar."}).forEach(([locale,text]) => { DICT[locale].natureNoApproved = text; });
+
 let todayISO = localDateISO();
 function escapeHtmlText(value) {
   return String(value === null || value === undefined ? '' : value)
@@ -535,13 +539,19 @@ function applyLanguage(code) {
     if (d[k]) el.setAttribute('placeholder', toWest(d[k]));
   });
 
+  // Existing edited starter records are user data, not replaceable samples.
   tasksList.forEach((t, idx) => {
-    if (t.isStarter && d.sampleTasks[idx]) t.title = toWest(d.sampleTasks[idx]);
+    if (!t.isStarter || !d.sampleTasks[idx]) return;
+    const unchangedSample = Object.values(DICT).some(lang => lang.sampleTasks?.[idx] === t.title);
+    if (unchangedSample) t.title = d.sampleTasks[idx];
   });
   notesList.forEach((n, idx) => {
-    if (n.isStarter && d.sampleNotes[idx]) {
-      n.title = toWest(d.sampleNotes[idx].t);
-      n.body = toWest(d.sampleNotes[idx].b);
+    if (!n.isStarter || !d.sampleNotes[idx]) return;
+    const unchangedSample = Object.values(DICT).some(lang =>
+      lang.sampleNotes?.[idx]?.t === n.title && lang.sampleNotes?.[idx]?.b === n.body);
+    if (unchangedSample) {
+      n.title = d.sampleNotes[idx].t;
+      n.body = d.sampleNotes[idx].b;
     }
   });
 
@@ -574,8 +584,7 @@ function validateImportedBackup(raw) {
   if (!raw.cfg || typeof raw.cfg !== 'object' || Array.isArray(raw.cfg)) return null;
   if (!Array.isArray(raw.tasksList) || !Array.isArray(raw.notesList)) return null;
   if (raw.tasksList.length > 10000 || raw.notesList.length > 10000) return null;
-  const safeRecordId = id => /^\d{1,16}$/.test(String(id))
-    && Number.isSafeInteger(Number(id));
+  const safeRecordId = id => typeof id === 'number' && Number.isSafeInteger(id) && id >= 0;
   const okTask = x => x && typeof x === 'object' && !Array.isArray(x)
     && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
@@ -585,6 +594,8 @@ function validateImportedBackup(raw) {
     && typeof x.title === 'string' && x.title.length <= 20000
     && typeof x.body === 'string' && x.body.length <= 500000;
   if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)) return null;
+  // New imports must be unambiguous; historical records are never renumbered on read.
+  if ([raw.tasksList, raw.notesList].some(rows => new Set(rows.map(row => row.id)).size !== rows.length)) return null;
   const candidateCfg = {...cfg, ...raw.cfg};
   if (!LANG_CATALOG.some(l => l.code === candidateCfg.lang)) candidateCfg.lang = 'en';
   for (const key of ['todayMins', 'sessions', 'streak', 'water']) {
@@ -611,45 +622,51 @@ function verifyAndRestoreBackupCode(codeStr) {
     if (!confirmSensitiveAction('restore')) return false;
     // Build and verify every storage packet before replacing any saved record.
     // If a write fails (e.g. storage quota), roll back all six original keys.
-    const imports = [
-      ['zen_fortress_cfg_v21', verified.cfg],
-      ['zen_fortress_tasks_v21', verified.tasksList],
-      ['zen_fortress_notes_v21', verified.notesList]
-    ];
-    const updates = [];
-    for (const [key, value] of imports) {
-      const payload = JSON.stringify(value);
-      updates.push([key, JSON.stringify({payload, sig:computeHash(payload), ts:Date.now()})]);
-    }
-    const previous = new Map();
-    for (const [key] of updates) {
-      previous.set(key, localStorage.getItem(key));
-      previous.set(key + '_mirror', localStorage.getItem(key + '_mirror'));
-    }
-    try {
-      for (const [key, packet] of updates) {
-        localStorage.setItem(key, packet);
-        localStorage.setItem(key + '_mirror', packet);
+    if (window.DF22Integration) {
+      // The live app shares the same crash-recoverable transaction as Notes/Tasks.
+      const before = window.DF22Integration.getSnapshot();
+      if (window.DF22Integration.write(before, verified) !== true) throw new Error('RESTORE_NOT_VERIFIED');
+    } else {
+      const imports = [
+        ['zen_fortress_cfg_v21', verified.cfg],
+        ['zen_fortress_tasks_v21', verified.tasksList],
+        ['zen_fortress_notes_v21', verified.notesList]
+      ];
+      const updates = [];
+      for (const [key, value] of imports) {
+        const payload = JSON.stringify(value);
+        updates.push([key, JSON.stringify({payload, sig:computeHash(payload), ts:Date.now()})]);
       }
-      for (const [key, packet] of updates) {
-        if (localStorage.getItem(key) !== packet || localStorage.getItem(key + '_mirror') !== packet) {
-          throw new Error('Storage verification failed');
+      const previous = new Map();
+      for (const [key] of updates) {
+        previous.set(key, localStorage.getItem(key));
+        previous.set(key + '_mirror', localStorage.getItem(key + '_mirror'));
+      }
+      try {
+        for (const [key, packet] of updates) {
+          localStorage.setItem(key, packet);
+          localStorage.setItem(key + '_mirror', packet);
         }
-      }
-    } catch (storageError) {
-      for (const [key, oldValue] of previous) {
-        try {
-          if (oldValue === null) localStorage.removeItem(key);
-          else localStorage.setItem(key, oldValue);
-        } catch (rollbackError) {
-          console.error('Backup rollback failed:', key, rollbackError);
+        for (const [key, packet] of updates) {
+          if (localStorage.getItem(key) !== packet || localStorage.getItem(key + '_mirror') !== packet) {
+            throw new Error('Storage verification failed');
+          }
         }
+      } catch (storageError) {
+        for (const [key, oldValue] of previous) {
+          try {
+            if (oldValue === null) localStorage.removeItem(key);
+            else localStorage.setItem(key, oldValue);
+          } catch (rollbackError) {
+            console.error('Backup rollback failed:', key, rollbackError);
+          }
+        }
+        throw storageError;
       }
-      throw storageError;
+      cfg = verified.cfg;
+      tasksList = verified.tasksList;
+      notesList = verified.notesList;
     }
-    cfg = verified.cfg;
-    tasksList = verified.tasksList;
-    notesList = verified.notesList;
     syncDailyRollover();
     applyLanguage(cfg.lang);
     closeModal('cloudBackupModal');
@@ -726,32 +743,20 @@ function shareAppWithFriends() {
 /* ========================================================
    4. GUARANTEED COMPLETION CHIME & BACKGROUND ALARM
    ======================================================== */
-let chimeCtx = null;
-function playRichCompletionChime(titleText, skipNative = false) {
-  if (!skipNative && window.ZenNative && window.ZenNative.triggerCompletionSound) {
-    try { window.ZenNative.triggerCompletionSound(titleText || "Session Completed!"); } catch(e){}
+// The native background notification is a separate Android QA gate; avoid a second synthetic JS alarm.
+function playRichCompletionChime(_titleText, _skipNative=false, completedId=null, phase='focus') {
+  const alerts=window.DFRecoveryCompletion;
+  if (!alerts) return;
+  if (completedId !== null && completedId !== undefined) {
+    void alerts.complete({sessionId:completedId,phase:phase==='custom'?'custom':phase==='short'?'short':phase==='long'?'long':'focus'});
+  } else {
+    void alerts.preview();
   }
-  try {
-    if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (chimeCtx.state === 'suspended') chimeCtx.resume();
-    [528, 660, 792].forEach((freq, idx) => {
-      const osc = chimeCtx.createOscillator(), gain = chimeCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, chimeCtx.currentTime + idx * 0.35);
-      gain.gain.setValueAtTime(0.001, chimeCtx.currentTime + idx * 0.35);
-      gain.gain.exponentialRampToValueAtTime(0.65, chimeCtx.currentTime + idx * 0.35 + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, chimeCtx.currentTime + idx * 0.35 + 1.6);
-      osc.connect(gain); gain.connect(chimeCtx.destination);
-      osc.start(chimeCtx.currentTime + idx * 0.35);
-      osc.stop(chimeCtx.currentTime + idx * 0.35 + 1.6);
-    });
-  } catch (e) {}
-  if (navigator.vibrate) try { navigator.vibrate([300, 150, 300, 150, 500]); } catch (e) {}
 }
-
 function testCompletionSoundChime() {
-  playRichCompletionChime("Test Notification & Sound Alert 🔔");
-  showToast("🔔 Alarm & Notification Tested!");
+  const alerts=window.DFRecoveryCompletion;
+  if (alerts) { void alerts.preview(); }
+  else showToast('Completion alerts unavailable');
 }
 
 /* ========================================================
@@ -977,6 +982,7 @@ function creditCompletedSession() {
   try { document.dispatchEvent(new CustomEvent('deep-focus:session-recorded',{detail:{schemaVersion:1,...credited}})); } catch (e) {}
 }
 function finalizeTimerSession(shouldChime) {
+  const completedAlertId=timerSessionId, completedAlertPhase=currentTimerModeKey;
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = null;
   accumulateActiveTime();
@@ -985,14 +991,14 @@ function finalizeTimerSession(shouldChime) {
   creditCompletedSession();
   if(quickTraining?.active) {
     advanceQuickTrainingStep();
-    if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true);
+    if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true,completedAlertId,completedAlertPhase);
     // The next interval or a fresh focus timer was already selected.
     return;
   }
   storeTimerSession();
   updateTimerDisplay();
   document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-  if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent, true);
+  if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent, true,completedAlertId,completedAlertPhase);
   // Only real completed focus sessions advance the break cycle.
   if (['focus','custom'].includes(currentTimerModeKey)) {
     const longRest = cfg.focusCycleCount === 0;
@@ -1135,12 +1141,27 @@ function changeTimerDelta(deltaMins) {
   if (timerLeft > timerTotal) timerTotal = timerLeft;
   if (timerRunning) {
     timerTargetTime = Date.now() + (timerLeft * 1000);
-    if (window.ZenNative && window.ZenNative.startBackgroundService) {
-      window.ZenNative.startBackgroundService(timerLeft, document.getElementById('timerModeCaption').textContent);
-    }
+    startNativeTimerForCurrentSession(timerLeft, document.getElementById('timerModeCaption').textContent);
   }
   storeTimerSession();
   updateTimerDisplay();
+}
+
+// Native service uses exactly the same existing session identity and phase as v21.
+// Retain the old two-argument bridge when an installed Android host is older.
+function startNativeTimerForCurrentSession(seconds, title) {
+  const bridge = window.ZenNative;
+  if (!bridge) return;
+  try {
+    if (typeof bridge.startBackgroundSession === 'function' && timerSessionId) {
+      bridge.startBackgroundSession(seconds, title, timerSessionId, currentTimerModeKey);
+    } else if (typeof bridge.startBackgroundService === 'function') {
+      bridge.startBackgroundService(seconds, title);
+    }
+  } catch (_) {
+    // The WebView timer remains active; Android foreground-service refusal is
+    // an explicit platform limitation, not a fabricated completion.
+  }
 }
 
 function toggleTimerPlay() {
@@ -1176,9 +1197,7 @@ function toggleTimerPlay() {
     timerTargetTime = timerResumeMs + (timerLeft * 1000);
     storeTimerSession();
 
-    if (window.ZenNative && window.ZenNative.startBackgroundService) {
-      try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch(e){}
-    }
+    startNativeTimerForCurrentSession(timerLeft, activeTitle);
 
     timerInterval = setInterval(runTimerTick, 500);
   }
@@ -1256,7 +1275,7 @@ function renderTasksList() {
       <div class="showcase-task-top">
         <div class="task-check-sq" onclick="toggleTaskDone(${id})">✓</div>
         <div class="task-center-info" onclick="focusOnTask(${id})">
-          <div class="task-main-name">${escapeHtmlText(toWest(t.title))}</div>
+          <div class="task-main-name">${escapeHtmlText(t.title)}</div>
           <div class="task-time-sub">
             <span>📅 ${escapeHtmlText(toWest(t.date || todayISO))}</span>
             <span style="color:var(--primary); font-weight:700;">• ${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>
@@ -1270,9 +1289,42 @@ function renderTasksList() {
   renderTodayPlan();
 }
 
+// Publish legacy edits only after durable acknowledgment. The production integration
+// uses the existing six-slot v21 recovery journal; standalone legacy hosts retain
+// verified primary/mirror writes without claiming cross-family atomicity.
+function commitLegacyRecords(field, records) {
+  try {
+    if (window.DF22Integration) {
+      const before = window.DF22Integration.getSnapshot();
+      const after = JSON.parse(JSON.stringify(before));
+      after[field] = records;
+      if (window.DF22Integration.write(before, after) !== true) throw new Error('SAVE_NOT_VERIFIED');
+    } else {
+      const key = field === 'tasksList' ? 'zen_fortress_tasks_v21' : 'zen_fortress_notes_v21';
+      if (saveFortressData(key, records) !== true) throw new Error('SAVE_NOT_VERIFIED');
+      if (field === 'tasksList') tasksList = records;
+      else notesList = records;
+    }
+    return true;
+  } catch (_) {
+    showToast(cfg.lang === 'ar' ? 'تعذر الحفظ. احتفظ بتعديلاتك وحاول مجددًا.' : 'Could not save. Keep your changes and try again.');
+    return false;
+  }
+}
+
+function legacyRecordIsUnique(records, id) {
+  const count = records.filter(record => record.id === id).length;
+  if (count > 1) showToast(cfg.lang === 'ar'
+    ? 'تعذر التعديل: توجد سجلات بالمعرف نفسه. احتفظ بنسخة احتياطية وراجع البيانات.'
+    : 'Cannot edit ambiguous record IDs. Keep a backup and review your data.');
+  return count === 1;
+}
+
 function toggleTaskDone(id) {
-  const t = tasksList.find(x => x.id === id);
-  if (t) { t.done = !t.done; saveFortressData('zen_fortress_tasks_v21', tasksList); renderTasksList(); renderCalendar(); }
+  if (!legacyRecordIsUnique(tasksList, id)) return;
+  const records = tasksList.map(x => x.id === id ? {...x, done:!x.done} : x);
+  if (!commitLegacyRecords('tasksList', records)) return;
+  renderTasksList(); renderCalendar();
 }
 
 function focusOnTask(id) {
@@ -1282,7 +1334,7 @@ function focusOnTask(id) {
       showToast('⚠️ Finish the current training before changing linked tasks');
       return;
     }
-    document.getElementById('timerLinkedTask').textContent = toWest(`🎯 ${t.title}`);
+    document.getElementById('timerLinkedTask').textContent = `🎯 ${t.title}`;
     switchTab('sec-timer', document.getElementById('navTimer'));
   }
 }
@@ -1302,25 +1354,25 @@ function nextRecordId() {
 
 function createNewTask() {
   const inp = document.getElementById('inpNewTask');
-  const val = toWest(inp.value.trim());
+  const val = inp.value.trim();
   if (!val) return;
   const catKey = document.getElementById('selTaskCat').value;
-  const dateVal = toWest(document.getElementById('inpTaskDate').value || todayISO);
+  const dateVal = toWest(document.getElementById('inpTaskDate').value || '');
   const themes = { study: 'tp-blue', exam: 'tp-amber', review: 'tp-rose', sport: 'tp-emerald' };
   const icons = { study: '📚', exam: '💻', review: '📖', sport: '🏋️' };
-  tasksList.unshift({
+  const record = {
     id: nextRecordId(), isStarter: false, title: val, time: '25m', date: dateVal,
     catKey: catKey, icon: icons[catKey] || '📚', theme: themes[catKey] || 'tp-blue', done: false
-  });
+  };
+  if (!commitLegacyRecords('tasksList', [record, ...tasksList])) return;
   inp.value = '';
-  saveFortressData('zen_fortress_tasks_v21', tasksList);
   renderTasksList(); renderCalendar(); showToast('✓');
 }
 
 function deleteTaskItem(id) {
+  if (!legacyRecordIsUnique(tasksList, id)) return;
   if (!confirmSensitiveAction('task')) return;
-  tasksList = tasksList.filter(x => x.id !== id);
-  saveFortressData('zen_fortress_tasks_v21', tasksList);
+  if (!commitLegacyRecords('tasksList', tasksList.filter(x => x.id !== id))) return;
   renderTasksList(); renderCalendar();
 }
 
@@ -1383,14 +1435,14 @@ function renderSelectedDateAgenda() {
   dayTasks.forEach(t => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
+    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(t.title)}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
     box.appendChild(item);
   });
 
   dayNotes.forEach(n => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#fffbeb; border-right:4px solid #f59e0b; font-size:0.8rem;';
-    item.innerHTML = `<div style="font-weight:900;">📝 ${escapeHtmlText(toWest(n.title))}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${escapeHtmlText(toWest(n.body))}</div>`;
+    item.innerHTML = `<div style="font-weight:900;">📝 ${escapeHtmlText(n.title)}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${escapeHtmlText(n.body)}</div>`;
     box.appendChild(item);
   });
 }
@@ -1433,14 +1485,14 @@ function renderNotesStack() {
     card.className = `learning-rich-card ${n.theme}`;
     card.innerHTML = `
       <div class="lcard-head">
-        <div class="lcard-title"><span>✨</span> <span>${escapeHtmlText(toWest(n.title))}</span></div>
+        <div class="lcard-title"><span>✨</span> <span>${escapeHtmlText(n.title)}</span></div>
         <div style="display:flex; gap:8px;">
           <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${id})">📅</span>
           <span style="cursor:pointer;" onclick="toggleNoteBlur(${id})">👁️</span>
           <span style="cursor:pointer; color:var(--rose);" onclick="deleteNoteCard(${id})">✕</span>
         </div>
       </div>
-      <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${escapeHtmlText(toWest(n.body))}</div>
+      <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${escapeHtmlText(n.body)}</div>
       <div class="lcard-foot">
         <span>📅 ${escapeHtmlText(toWest(n.calDate || todayISO))}</span>
         <span style="font-weight:800; color:var(--primary);">${escapeHtmlText(toWest(getNoteTagLabel(n.catKey)))}</span>
@@ -1470,39 +1522,41 @@ function fillNoteTpl(type) {
 }
 
 function saveNewNote() {
-  const t = toWest(document.getElementById('inpNoteTitle').value.trim());
-  const b = toWest(document.getElementById('inpNoteBody').value.trim());
+  const t = document.getElementById('inpNoteTitle').value.trim();
+  const b = document.getElementById('inpNoteBody').value.trim();
   if (!t && !b) return;
   const catKey = document.getElementById('selNoteCat').value;
   const calDate = toWest(document.getElementById('inpNoteCalDate').value || todayISO);
   const blur = document.getElementById('chkNoteBlur').checked;
-  notesList.unshift({
+  const record = {
     id: nextRecordId(), isStarter: false, title: t || L().navNotes, body: b,
     catKey: catKey, calDate: calDate, blur: blur, theme: blur ? 'theme-emerald' : 'theme-violet'
-  });
-  saveFortressData('zen_fortress_notes_v21', notesList);
+  };
+  if (!commitLegacyRecords('notesList', [record, ...notesList])) return;
   renderNotesStack(); renderCalendar(); closeModal('noteModal'); showToast('✓');
 }
 
 function pinNoteToTodayCalendar(id) {
+  if (!legacyRecordIsUnique(notesList, id)) return;
   const n = notesList.find(x => x.id === id);
-  if (n) { n.calDate = selectedCalDate; saveFortressData('zen_fortress_notes_v21', notesList); renderNotesStack(); renderCalendar(); showToast(`📅 ${selectedCalDate}`); }
+  if (n && commitLegacyRecords('notesList', notesList.map(x => x.id === id ? {...x, calDate:selectedCalDate} : x))) { renderNotesStack(); renderCalendar(); showToast(`📅 ${selectedCalDate}`); }
 }
 
 function toggleNoteBlur(id) {
+  if (!legacyRecordIsUnique(notesList, id)) return;
   const n = notesList.find(x => x.id === id);
-  if (n) { n.blur = !n.blur; saveFortressData('zen_fortress_notes_v21', notesList); renderNotesStack(); }
+  if (n && commitLegacyRecords('notesList', notesList.map(x => x.id === id ? {...x, blur:!x.blur} : x))) renderNotesStack();
 }
 
 function deleteNoteCard(id) {
+  if (!legacyRecordIsUnique(notesList, id)) return;
   if (!confirmSensitiveAction('note')) return;
-  notesList = notesList.filter(x => x.id !== id);
-  saveFortressData('zen_fortress_notes_v21', notesList);
+  if (!commitLegacyRecords('notesList', notesList.filter(x => x.id !== id))) return;
   renderNotesStack(); renderCalendar();
 }
 
 function exportAllNotes() {
-  const txt = notesList.map(n => `[${toWest(n.title)} - ${toWest(n.calDate)}]\n${toWest(n.body)}`).join('\n\n---\n\n');
+  const txt = notesList.map(n => `[${n.title} - ${toWest(n.calDate)}]\n${n.body}`).join('\n\n---\n\n');
   if (navigator.clipboard) navigator.clipboard.writeText(txt);
   showToast('📥 TXT');
 }
@@ -1513,15 +1567,13 @@ function openBrainDumpModal() {
 }
 
 function saveQuickDump(toTasks) {
-  const val = toWest(document.getElementById('inpQuickDump').value.trim());
+  const val = document.getElementById('inpQuickDump').value.trim();
   if (!val) return;
   if (toTasks) {
-    tasksList.unshift({ id: nextRecordId(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false });
-    saveFortressData('zen_fortress_tasks_v21', tasksList);
+    if (!commitLegacyRecords('tasksList', [{ id: nextRecordId(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false }, ...tasksList])) return;
     renderTasksList();
   } else {
-    notesList.unshift({ id: nextRecordId(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' });
-    saveFortressData('zen_fortress_notes_v21', notesList);
+    if (!commitLegacyRecords('notesList', [{ id: nextRecordId(), isStarter: false, title: '💭', body: val, catKey: 'quick', calDate: todayISO, blur: false, theme: 'theme-violet' }, ...notesList])) return;
     renderNotesStack();
   }
   renderCalendar(); closeModal('brainDumpModal'); showToast('✓');
@@ -1531,69 +1583,56 @@ function saveQuickDump(toTasks) {
    7. 12 PURE NATURE SOUNDS WITH PHOTOS & VOLUME SLIDERS
    ======================================================== */
 const SOUNDS_DATA = [
-  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
-  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
-  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/fire.ogg' },
-  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/forest_morning.ogg' },
-  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg', url: 'https://actions.google.com/sounds/v1/water/small_stream_flowing.ogg' },
-  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/outdoor_summer_ambience.ogg' },
-  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: 'sounds/waterfall.ogg', url: 'https://actions.google.com/sounds/v1/water/waterfall_medium.ogg' },
-  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: 'sounds/night.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/crickets_chirping.ogg' },
-  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg', url: 'https://actions.google.com/sounds/v1/weather/rolling_thunder.ogg' },
-  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg', url: 'https://actions.google.com/sounds/v1/weather/wind_blowing.ogg' },
-  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_on_rooftop.ogg' },
-  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: 'sounds/earth.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/ambient_hum_air_conditioner.ogg' }
+  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg' },
+  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg' },
+  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg' },
+  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg' },
+  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg' },
+  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg' },
+  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: 'sounds/waterfall.ogg' },
+  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: 'sounds/night.ogg' },
+  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg' },
+  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg' },
+  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg' },
+  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: 'sounds/earth.ogg' }
 ];
 
 let soundCat = 'all';
 const activePlayers = {};
 // A stale media error or delayed play promise may never restart a stopped tile.
 const soundGeneration = Object.create(null);
-let webAudioCtx = null;
+// Only these two files currently have individual CC0 provenance references in the v21 ledger.
+// Other catalogue items remain registered for recovery but unavailable until per-file rights and device listening are proven.
+const NATURE_APPROVED_FOR_PLAYBACK = new Set(['forest','wind']);
+const NATURE_VOLUME_LABELS = Object.freeze({
+  "en": "Volume",
+  "ar": "مستوى الصوت",
+  "es": "Volumen",
+  "zh": "音量",
+  "hi": "आवाज़ की तीव्रता",
+  "fr": "Volume",
+  "de": "Lautstärke",
+  "ru": "Громкость",
+  "pt": "Volume",
+  "ja": "音量",
+  "id": "Volume",
+  "tr": "Ses düzeyi",
+  "ko": "음량",
+  "vi": "Âm lượng",
+  "it": "Volume",
+  "bn": "শব্দের মাত্রা",
+  "ur": "آواز کی سطح",
+  "fa": "میزان صدا",
+  "pl": "Głośność",
+  "nl": "Volume"
+});
 
-function createNatureSynthFallback(id, vol) {
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (!AudioCtx) throw new Error('Web Audio is unavailable');
-  if (!webAudioCtx) webAudioCtx = new AudioCtx();
-  if (webAudioCtx.state === 'suspended') webAudioCtx.resume();
-  const sr = webAudioCtx.sampleRate, len = Math.round(sr * 8);
-  const buf = webAudioCtx.createBuffer(1, len, sr);
-  const samples = buf.getChannelData(0);
-  let smoothed = 0, slow = 0;
-  // A local synthetic fallback, never represented as a field recording.
-  for (let i = 0; i < len; i++) {
-    const time = i / sr, noise = Math.random() * 2 - 1;
-    smoothed = smoothed * 0.92 + noise * 0.08;
-    slow = slow * 0.998 + noise * 0.002;
-    let value;
-    if (id === 'night') {
-      const chirp1 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 2.7 * time)), 9);
-      const chirp2 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 3.5 * time + 1.4)), 11);
-      value = Math.sin(2 * Math.PI * 3100 * time) * chirp1 * 0.09
-            + Math.sin(2 * Math.PI * 3900 * time) * chirp2 * 0.065
-            + smoothed * 0.16;
-    } else if (id === 'waterfall') {
-      const surge = 0.65 + 0.12 * Math.sin(2 * Math.PI * 0.19 * time);
-      value = (noise * 0.20 + smoothed * 1.15 + slow * 0.5) * surge;
-    } else {
-      value = smoothed * 0.85 + slow * 0.35;
-    }
-    samples[i] = Math.max(-0.8, Math.min(0.8, value));
-  }
-  const source = webAudioCtx.createBufferSource();
-  source.buffer = buf;
-  source.loop = true;
-  const filter = webAudioCtx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = id === 'night' ? 5500 : id === 'waterfall' ? 2600 : 650;
-  const gain = webAudioCtx.createGain();
-  gain.gain.value = Math.max(0, Math.min(1, vol)) * 0.55;
-  source.connect(filter); filter.connect(gain); gain.connect(webAudioCtx.destination);
-  source.start();
-  return {
-    pause: () => { try { source.stop(); source.disconnect(); filter.disconnect(); gain.disconnect(); } catch (e) {} },
-    setVol: v => gain.gain.setValueAtTime(Math.max(0, Math.min(1, v)) * 0.55, webAudioCtx.currentTime)
-  };
+function applyNatureMixVolumes() {
+  const channels = SOUNDS_DATA.filter(sound => activePlayers[sound.id]);
+  const total = channels.reduce((sum,sound) => sum + sound.vol,0);
+  // Conservative headroom even if channel peaks align; retain each requested level.
+  const gain = total > 0.85 ? 0.85 / total : 1;
+  channels.forEach(sound => activePlayers[sound.id].setVol(sound.vol * gain));
 }
 
 function stopSoundTile(id) {
@@ -1602,59 +1641,40 @@ function stopSoundTile(id) {
   if (player) {
     delete activePlayers[id];
     try { player.pause(); } catch (e) {}
+    applyNatureMixVolumes();
   }
 }
 
 function toggleSoundTile(id) {
-  const s = SOUNDS_DATA.find(x => x.id === id);
-  if (!s) return;
-  const sName = L().sounds[id] || id;
-  if (activePlayers[id]) {
-    stopSoundTile(id);
-    showToast(`⏹ ${sName}`);
-    renderSoundsStudio();
+  const s=SOUNDS_DATA.find(x=>x.id===id);
+  if(!s)return;
+  if(!NATURE_APPROVED_FOR_PLAYBACK.has(id)) {
+    showToast('Recording awaiting source and audio verification');
     return;
   }
-  const token = (soundGeneration[id] || 0) + 1;
-  soundGeneration[id] = token;
-  const audio = new Audio();
-  audio.loop = true;
-  audio.volume = s.vol;
-  audio.src = s.src;
-  let fallbackUsed = false;
-  const player = {
-    pause() { audio.onerror = null; audio.pause(); },
-    setVol(v) { audio.volume = v; }
+  const sName=L().sounds[id]||id;
+  if(activePlayers[id]){
+    stopSoundTile(id);showToast('⏹ '+sName);renderSoundsStudio();return;
+  }
+  const token=(soundGeneration[id]||0)+1;soundGeneration[id]=token;
+  const audio=new Audio();audio.loop=s.id!=='thunder';audio.preload='auto';audio.volume=0;audio.src=s.src;
+  const player={pause(){audio.onerror=null;audio.onended=null;audio.pause();audio.removeAttribute('src');audio.load();},setVol(v){audio.volume=v;}};
+  activePlayers[id]=player;
+  applyNatureMixVolumes();
+  audio.onended=()=>{
+    if(soundGeneration[id]===token&&activePlayers[id]===player){stopSoundTile(id);renderSoundsStudio();}
   };
-  // Register synchronously before play() can reject or fire an error.
-  activePlayers[id] = player;
-  const activateFallback = () => {
-    if (fallbackUsed || soundGeneration[id] !== token || activePlayers[id] !== player) return;
-    fallbackUsed = true;
-    audio.onerror = null;
-    audio.pause();
-    try {
-      const fallback = createNatureSynthFallback(id, s.vol);
-      // Keep the same identity so late handlers can be invalidated safely.
-      player.pause = () => fallback.pause();
-      player.setVol = v => fallback.setVol(v);
-      showToast('⚠️ Local recording unavailable — synthesized ambience');
-    } catch (e) {
-      stopSoundTile(id);
-      showToast('⚠️ Audio output unavailable');
-    }
-    renderSoundsStudio();
+  const failure=()=>{
+    if(soundGeneration[id] !== token||activePlayers[id]!==player)return;
+    stopSoundTile(id);renderSoundsStudio();showToast('Recording unavailable — playback stopped');
   };
-  audio.onerror = activateFallback;
-  try {
-    const playing = audio.play();
-    if (playing && typeof playing.then === 'function') {
-      playing.then(() => {
-        if (soundGeneration[id] === token && activePlayers[id] === player && !fallbackUsed)
-          showToast(`🔊 ${sName}`);
-      }).catch(activateFallback);
-    }
-  } catch (e) { activateFallback(); }
+  audio.onerror=failure;
+  try{
+    const result=audio.play();
+    if(result&&typeof result.then==='function')result.then(()=>{
+      if(soundGeneration[id]===token&&activePlayers[id]===player)showToast('🔊 '+sName);
+    }).catch(failure);
+  }catch(_){failure();}
   renderSoundsStudio();
 }
 
@@ -1664,13 +1684,13 @@ function setTileVolume(id, val) {
   const clamped = Math.max(0, Math.min(1, v));
   const s = SOUNDS_DATA.find(x => x.id === id);
   if (s) s.vol = clamped;
-  if (activePlayers[id]) activePlayers[id].setVol(clamped);
+  applyNatureMixVolumes();
 }
 
 function playPresetRelaxMix() {
   stopAllAudio();
-  toggleSoundTile('rain');
-  toggleSoundTile('fire');
+  toggleSoundTile('forest');
+  toggleSoundTile('wind');
 }
 function stopAllAudio() {
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
@@ -1689,9 +1709,25 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => soundCat === 'all' || s.cat === soundCat).forEach(s => {
+  const available = SOUNDS_DATA.filter(s => NATURE_APPROVED_FOR_PLAYBACK.has(s.id));
+  document.querySelectorAll('[data-sound-category]').forEach(button => {
+    const category = button.getAttribute('data-sound-category');
+    const key = {all:'filterAll',water:'sndCatWater',forest:'sndCatForest',warm:'sndCatWarm'}[category];
+    const count = available.filter(s => category === 'all' || s.cat === category).length;
+    const label = document.createElement('span');label.textContent = d[key];
+    const number = document.createElement('bdi');number.dir = 'ltr';number.textContent = '(' + count + ')';
+    button.replaceChildren(label,document.createTextNode(' '),number);
+  });
+  const visible = available.filter(s => soundCat === 'all' || s.cat === soundCat);
+  if (!visible.length) {
+    const empty = document.createElement('p');
+    empty.className = 'nature-empty-state';empty.setAttribute('role','status');
+    empty.textContent = d.natureNoApproved;box.appendChild(empty);
+  }
+  visible.forEach(s => {
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
+    const volumeLabel = NATURE_VOLUME_LABELS[cfg.lang] || NATURE_VOLUME_LABELS.en;
     const tile = document.createElement('div');
     tile.className = `sound-Rich-tile ${s.cls} ${isOn ? 'playing' : ''}`;
     tile.onclick = () => toggleSoundTile(s.id);
@@ -1702,12 +1738,16 @@ function renderSoundsStudio() {
       </div>
       <div>
         <div class="stile-name">${escapeHtmlText(toWest(sName))}</div>
-        <div class="stile-volume-label"><span>🔉 ${cfg.lang === 'ar' ? 'مستوى الصوت' : 'Volume'}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
-        <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText((cfg.lang === 'ar' ? 'مستوى صوت ' : 'Volume for ') + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
+        <div class="stile-volume-label"><span>🔉 ${escapeHtmlText(volumeLabel)}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
+        <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText(volumeLabel + ': ' + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
       </div>
     `;
     box.appendChild(tile);
   });
+  // This is an honest acquisition overview. It never changes playback eligibility.
+  if (typeof DeepFocusNatureLibraryV2 !== 'undefined') {
+    DeepFocusNatureLibraryV2.render(soundCat, cfg.lang, d.sounds, NATURE_APPROVED_FOR_PLAYBACK);
+  }
 }
 
 /* ========================================================
@@ -1804,6 +1844,12 @@ function updateSyllabusCalc() {
   const rate = Math.max(1, parseInt(elRate.value) || 1);
   const days = Math.ceil(left / rate);
   document.getElementById('syllabusCalcOut').textContent = toWest(L().calcOutTpl.replace('{d}', days));
+}
+
+if (typeof window.addEventListener === 'function') {
+  window.addEventListener('pagehide', () => {
+    Object.keys(activePlayers).forEach(stopSoundTile);
+  });
 }
 
 /* Boot Init */

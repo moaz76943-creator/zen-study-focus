@@ -51,6 +51,9 @@ jobs:
         run: |
           for file in android/app/src/main/assets/web/*.js; do node --check "$file"; done
           node --test tests/data_contracts/*.test.cjs tests/notes_core/*.test.cjs tests/notes_ui/*.test.cjs tests/tasks_core/*.test.cjs tests/analytics_core/*.test.cjs tests/focus_workflows/*.test.cjs tests/design_quality/*.test.cjs tests/regression_v21/*.test.cjs tests/integration_quality/*.test.cjs
+          node --test tests/recovery_baseline/*.test.cjs tests/ascii_numerals/*.test.cjs tests/localization_20/*.test.cjs tests/interaction_recovery/*.test.cjs tests/notes_recovery/*.test.cjs tests/tasks_recovery/*.test.cjs tests/analytics_recovery/*.test.cjs tests/white_premium_qa/*.test.cjs tests/completion_alerts/*.test.cjs tests/integration_recovery/*.test.cjs
+          node --test tests/nature_audio_recovery/mixer.test.cjs tests/nature_audio_recovery/audit.test.cjs
+          node --test tests/master_recovery_qa/source_contracts.test.cjs tests/master_recovery_qa/workflow.test.cjs
       - name: Build test APK and unsigned Play bundle
         working-directory: android
         run: gradle assembleDebug bundleRelease --no-daemon

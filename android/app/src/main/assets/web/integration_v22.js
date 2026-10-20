@@ -11,6 +11,71 @@
   const D = root.DeepFocusDataCompatV21;
   const FAMILIES = [['cfg','cfg'],['tasks','tasksList'],['notes','notesList']];
   let tasksUi = null, analyticsUi = null, lastLocale = null, mounted = false;
+  let alertEngine = null, alertPicker = null, alertConfigRef = null;
+  const pendingExports = new Map();
+  let exportSerial = 0;
+  root.DFRecoveryNativeExportResult = function(requestId, status) {
+    const pending=pendingExports.get(requestId);
+    if(!pending)return;
+    pendingExports.delete(requestId);
+    pending(status==='saved'?'saved':status==='cancelled'?'cancelled':'failed');
+  };
+  function saveCsvThroughAndroid({csv}) {
+    if(!root.ZenNative || typeof root.ZenNative.exportAnalyticsCsvToFile!=='function')
+      return Promise.resolve({status:'failed'});
+    return new Promise(resolve=>{
+      const requestId='df-csv-'+(++exportSerial);
+      const expiry=root.setTimeout(()=>{
+        if(pendingExports.has(requestId)){
+          pendingExports.delete(requestId);resolve({status:'failed'});
+        }
+      },120000);
+      pendingExports.set(requestId,status=>{root.clearTimeout(expiry);resolve({status});});
+      try{root.ZenNative.exportAnalyticsCsvToFile(csv,requestId);}
+      catch(_){root.DFRecoveryNativeExportResult(requestId,'failed');}
+    });
+  }
+  // Reflect only user-approved v21 preferences into the native playback cache.
+  // Existing hosts remain compatible with the original three-argument bridge.
+  function syncNativeCompletionAlert(changed) {
+    if (!root.ZenNative || !root.DeepFocusCompletionAlerts) return;
+    const state=root.DeepFocusCompletionAlerts.readCompletionAlertSettings(changed);
+    try {
+      if (typeof root.ZenNative.configureCompletionAlertV2 === 'function') {
+        root.ZenNative.configureCompletionAlertV2(state.sound,state.volume,state.enabled,state.includeRest);
+      } else if (typeof root.ZenNative.configureCompletionAlert === 'function') {
+        root.ZenNative.configureCompletionAlert(state.sound,state.volume,state.enabled);
+      }
+    } catch (_) { /* Native permissions and audio are platform-dependent. */ }
+  }
+  function mountAlertPicker() {
+    if(!root.DeepFocusCompletionAlerts)return;
+    if(alertConfigRef!==cfg){
+      if(alertPicker){alertPicker.unmount();alertPicker=null;}
+      if(alertEngine)alertEngine.dispose();
+      alertConfigRef=cfg;
+      alertEngine=root.DeepFocusCompletionAlerts.createCompletionAlerts(cfg,{
+        persist:changed=>{
+          const ok=saveFortressData('zen_fortress_cfg_v21',changed)===true;
+          if(ok) syncNativeCompletionAlert(changed);
+          return ok;
+        },
+        canOutput:()=>document.visibilityState!=='hidden',
+        onError:()=>notify('Completion audio not available')
+      });
+      root.DFRecoveryCompletion=alertEngine;
+      syncNativeCompletionAlert(cfg);
+    }
+    if(alertPicker)alertPicker.unmount();
+    const host=document.getElementById('completionAlertPickerHost');
+    if(host)alertPicker=root.DeepFocusCompletionAlerts.mountCompletionAlertPicker(host,alertEngine,{
+      translate:(key,fallback)=>{
+        const translated=root.DeepFocusCompletionAlertLocales &&
+          root.DeepFocusCompletionAlertLocales.translate(cfg.lang,key);
+        return translated || fallback;
+      }
+    });
+  }
   function copy(value) { return JSON.parse(JSON.stringify(value)); }
   function equal(a,b) { return JSON.stringify(a) === JSON.stringify(b); }
   function current() { return copy({cfg,tasksList,notesList}); }
@@ -96,6 +161,7 @@
     catch (e) { throw new Error('Commit complete, journal cleanup pending. Reload after explicit recovery: ' + e.message); }
     // Publish only after ALL six packets verify AND the journal is cleared.
     cfg = after.cfg;tasksList = after.tasksList;notesList = after.notesList;
+    if(mounted)mountAlertPicker();
     return true;
   }
   function fromNoteEdit(before,after,allowTaskChange) {
@@ -155,13 +221,23 @@
     document.getElementById('sec-tasks').classList.add('df22-tasks-live');
   }
   function mountAnalytics() {
-    if (!root.DeepFocusAnalyticsStudioV21) throw new Error('Analytics Studio not loaded');
-    if (analyticsUi) analyticsUi.destroy();
-    const host = document.getElementById('df22AnalyticsHost');
-    analyticsUi = root.DeepFocusAnalyticsStudioV21.mount(host,getSnapshot,{
-      locale:cfg.lang,goals:cfg.dailyGoalsMin||{},
-      // Download fallback is browser-driven until the Android Save-As bridge is verified.
-    });
+    if(analyticsUi)analyticsUi.destroy();
+    const host=document.getElementById('df22AnalyticsHost');
+    const arAnalytics=cfg.lang==='ar' && root.DeepFocusAnalyticsArabic &&
+      typeof root.DeepFocusAnalyticsArabic.translate==='function';
+    if(root.DeepFocusAnalyticsRecoveryUI && (cfg.lang==='en' || arAnalytics)) {
+      // Use the complete Arabic locale for the new studio. Other locales retain
+      // the prior studio until every label is translated; never fall back to English.
+      analyticsUi=root.DeepFocusAnalyticsRecoveryUI.mount(host,getSnapshot,{
+        locale:cfg.lang,
+        ...(arAnalytics?{translate:root.DeepFocusAnalyticsArabic.translate}:{}),
+        ...(root.ZenNative&&typeof root.ZenNative.exportAnalyticsCsvToFile==='function'?{saveCSV:saveCsvThroughAndroid}:{})
+      });
+    } else {
+      analyticsUi=root.DeepFocusAnalyticsStudioV21.mount(host,getSnapshot,{
+        locale:cfg.lang,goals:cfg.dailyGoalsMin||{}
+      });
+    }
     document.getElementById('sec-analytics').classList.add('df22-analytics-live');
   }
   function refreshLocale() {
@@ -169,17 +245,19 @@
     if (root.DF22Locale) root.DF22Locale.apply(document,cfg.lang);
     if (cfg.lang !== lastLocale) {
       lastLocale = cfg.lang;
-      mountTasks();mountAnalytics();
+      mountTasks();mountAnalytics();mountAlertPicker();
       if (root.DeepFocusNotesEditorUI) root.DeepFocusNotesEditorUI.renderStack();
     }
   }
   function onTab(section) {
     if (!mounted) return;
+    if(alertConfigRef!==cfg)mountAlertPicker();
     if (section === 'sec-tasks' && tasksUi) tasksUi.refresh();
     if (section === 'sec-analytics' && analyticsUi) analyticsUi.refresh();
     if (section === 'sec-notes' && root.DeepFocusNotesEditorUI) root.DeepFocusNotesEditorUI.renderStack();
   }
   function onSessionRecorded() {
+    if(alertConfigRef!==cfg)mountAlertPicker();
     if (analyticsUi) analyticsUi.refresh();
     if (tasksUi) tasksUi.refresh();
   }
@@ -192,9 +270,11 @@
     if (!root.DF22Preflight || !root.DF22Preflight.inspect(root.localStorage).ok)
       throw new Error('Storage recovery is required before enabling v22');
     root.DeepFocusNotesEditorUI.install(notesAdapter());
-    mountTasks();mountAnalytics();
+    mountTasks();mountAnalytics();mountAlertPicker();
     mounted=true;lastLocale=cfg.lang;
-    document.body.classList.add('df-v22');
+    document.body.classList.add('df-v22','df-recovery10');
+    if(root.DFInteractionRecovery06)root.DFInteractionRecovery06.disableDeadAnalyticsCards(document);
+    if(root.DeepFocusAsciiNumeralsV21)root.DeepFocusAsciiNumeralsV21.wireNumericInputs(document);
     root.DF22Locale.apply(document,cfg.lang);
     if (root.DeepFocusSoundMixer) {
       root.focusSoundMixer = root.DeepFocusSoundMixer.createSoundMixer({

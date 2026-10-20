@@ -8,8 +8,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioAttributes;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
+import android.media.MediaPlayer;
+import android.content.SharedPreferences;
+import java.util.Set;
+import java.util.Collections;
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -21,10 +24,14 @@ import androidx.core.app.NotificationCompat;
 
 public class FocusTimerService extends Service {
     public static final String CHANNEL_ONGOING = "zen_ongoing_timer_channel";
-    public static final String CHANNEL_ALARM = "zen_completion_alarm_channel";
+    public static final String CHANNEL_ALARM = "zen_completion_visual_v22";
     private CountDownTimer countDownTimer;
     private PowerManager.WakeLock wakeLock;
     private String currentTitle = "Deep Focus";
+    private String currentSessionId = null;
+    private String currentPhase = "focus";
+    private static final int SESSION_LEDGER_LIMIT = 128;
+    private static final String SESSION_LEDGER_PREFS = "zen_native_completion_ledger_v22";
 
     @Override
     public void onCreate() {
@@ -43,17 +50,25 @@ public class FocusTimerService extends Service {
 
         if ("START".equals(action)) {
             int seconds = intent.getIntExtra("seconds", 1500);
+            if (seconds < 1 || seconds > 86400) return START_NOT_STICKY;
             currentTitle = intent.getStringExtra("title");
             if (currentTitle == null || currentTitle.isEmpty()) currentTitle = "Active Focus Session";
+            currentSessionId = safeSessionId(intent.getStringExtra("sessionId"));
+            currentPhase = safePhase(intent.getStringExtra("phase"));
             startForegroundTimer(seconds, currentTitle);
+            // A sticky restart with an empty Intent would create a foreground service
+            // without a timer, so JS v21 recovery owns restart reconciliation.
+            return START_NOT_STICKY;
         } else if ("STOP".equals(action)) {
             stopTimerAndService();
         } else if ("ALARM_NOW".equals(action)) {
             String msg = intent.getStringExtra("title");
-            triggerCompletionAlarm(msg != null ? msg : "Session Completed!");
+            triggerCompletionAlarm(msg != null ? msg : "Session Completed!",
+                    safeSessionId(intent.getStringExtra("sessionId")),
+                    safePhase(intent.getStringExtra("phase")));
             stopTimerAndService();
         }
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private void startForegroundTimer(int totalSeconds, String title) {
@@ -65,6 +80,9 @@ public class FocusTimerService extends Service {
         Notification initialNotif = buildOngoingNotification(title, formatSeconds(totalSeconds));
         startForeground(1001, initialNotif);
 
+        final String idForThisTimer = currentSessionId;
+        final String phaseForThisTimer = currentPhase;
+        final String titleForThisTimer = title;
         countDownTimer = new CountDownTimer(totalSeconds * 1000L, 1000L) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -77,7 +95,8 @@ public class FocusTimerService extends Service {
 
             @Override
             public void onFinish() {
-                triggerCompletionAlarm(currentTitle + " — Completed! 🎉");
+                triggerCompletionAlarm(titleForThisTimer + " — Completed! 🎉",
+                        idForThisTimer, phaseForThisTimer);
                 stopTimerAndService();
             }
         }.start();
@@ -112,51 +131,90 @@ public class FocusTimerService extends Service {
             .build();
     }
 
-    private void triggerCompletionAlarm(String title) {
-        try {
-            Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-            if (alarmUri == null) {
-                alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            }
-            Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), alarmUri);
-            if (ringtone != null) {
-                ringtone.play();
-                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                    try { if (ringtone.isPlaying()) ringtone.stop(); } catch (Exception ignored) {}
-                }, 4500);
-            }
-        } catch (Exception ignored) {}
+    private static String safeSessionId(String id) {
+        return id != null && id.matches("[A-Za-z0-9._:-]{1,256}") ? id : null;
+    }
 
-        try {
-            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            if (v != null) {
-                long[] pattern = {0, 400, 200, 400, 200, 600};
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    v.vibrate(VibrationEffect.createWaveform(pattern, -1));
-                } else {
-                    v.vibrate(pattern, -1);
-                }
-            }
-        } catch (Exception ignored) {}
+    private static String safePhase(String phase) {
+        if ("short".equals(phase) || "long".equals(phase) ||
+                "focus".equals(phase) || "custom".equals(phase)) return phase;
+        return "focus";
+    }
 
+    private static boolean isRestPhase(String phase) {
+        return "short".equals(phase) || "long".equals(phase);
+    }
+
+    // A durable native notification/audio gate, separate from protected v21 records.
+    // Unknown legacy callers without session IDs preserve the original behavior.
+    private boolean firstCompletionForSession(String sessionId) {
+        if (sessionId == null) return true;
+        SharedPreferences prefs = getSharedPreferences(SESSION_LEDGER_PREFS, MODE_PRIVATE);
+        Set<String> old = prefs.getStringSet("completed_session_tokens",
+                Collections.<String>emptySet());
+        if (old.contains(sessionId)) return false;
+        Set<String> next = NativeCompletionLedger.add(old, sessionId, SESSION_LEDGER_LIMIT);
+        // Persist BEFORE notification/sound so duplicate callbacks cannot replay a cue.
+        // If storage fails, omit the alert rather than acknowledge an unguarded repeat.
+        return prefs.edit().putStringSet("completed_session_tokens", next).commit();
+    }
+
+    private void playRecordedCompletionCue(String phase) {
+        // Avoid two sounds: WebView handles foreground playback, the service handles background.
+        if (MainActivity.isWebViewVisible()) return;
+        SharedPreferences settings = getSharedPreferences("zen_completion_playback_cache_v22", MODE_PRIVATE);
+        if (!settings.getBoolean("enabled", true)) return;
+        if (isRestPhase(phase) && !settings.getBoolean("includeRest", false)) return;
+        final int volume = settings.getInt("volume", 35);
+        if (volume <= 0) return;
+        final String selected = settings.getString("sound", "soft-bell");
+        if (selected == null || "silent".equals(selected)) return;
+        final String filename;
+        switch (selected) {
+            case "soft-bell": filename = "soft_bell.wav"; break;
+            case "wood-tap": filename = "wood_tap.wav"; break;
+            case "water-drop": filename = "water_drop.wav"; break;
+            case "muted-metal": filename = "muted_metal.wav"; break;
+            case "two-taps": filename = "two_taps.wav"; break;
+            default: return;
+        }
+        MediaPlayer player = null;
+        try (AssetFileDescriptor sound = getAssets().openFd("web/completion_alerts/" + filename)) {
+            player = new MediaPlayer();
+            player.setAudioAttributes(new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
+            player.setDataSource(sound.getFileDescriptor(), sound.getStartOffset(), sound.getLength());
+            player.prepare();
+            float gain = Math.min(0.65f, Math.max(0f, volume / 100f * 0.65f));
+            player.setVolume(gain, gain);
+            player.setOnCompletionListener(MediaPlayer::release);
+            player.setOnErrorListener((mp, what, extra) -> { mp.release(); return true; });
+            player.start();
+            player = null; // completion callback now owns release
+        } catch (Exception unavailable) {
+            if (player != null) player.release();
+            // No synthetic fallback and no default loud alarm on missing/undecodable media.
+        }
+    }
+
+    private void triggerCompletionAlarm(String title, String sessionId, String phase) {
+        if (!firstCompletionForSession(sessionId)) return;
+        playRecordedCompletionCue(phase);
         Intent openIntent = new Intent(this, MainActivity.class);
-        PendingIntent pi = PendingIntent.getActivity(
-            this, 1, openIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-
+        PendingIntent pi = PendingIntent.getActivity(this, 1, openIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ALARM)
             .setSmallIcon(R.drawable.ic_launcher)
-            .setContentTitle("🎉 Deep Focus — Time is Up!")
+            .setContentTitle("Deep Focus — Timer complete")
             .setContentText(title)
             .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setSilent(true)
+            .setDefaults(0)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pi);
-
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (nm != null) {
-            nm.notify(2002, builder.build());
-        }
+        if (nm != null) nm.notify(2002, builder.build());
     }
 
     private String formatSeconds(int totalSecs) {
@@ -176,17 +234,14 @@ public class FocusTimerService extends Service {
             ongoing.setDescription("Shows live countdown timer in status bar");
             nm.createNotificationChannel(ongoing);
 
-            NotificationChannel alarm = new NotificationChannel(
-                CHANNEL_ALARM, "Timer Completion Alerts", NotificationManager.IMPORTANCE_HIGH
-            );
-            alarm.setDescription("Plays sound and vibrates when session finishes");
-            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            AudioAttributes attrs = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                .build();
-            alarm.setSound(soundUri, attrs);
-            alarm.enableVibration(true);
-            nm.createNotificationChannel(alarm);
+            // New visual-only channel: old Android O+ channel sounds persist when code is updated.
+            // Per-user completion cue playback is handled above, not by a duplicate channel sound.
+            NotificationChannel visual = new NotificationChannel(
+                CHANNEL_ALARM, "Deep Focus timer result", NotificationManager.IMPORTANCE_DEFAULT);
+            visual.setDescription("Quiet timer completion status");
+            visual.setSound(null, null);
+            visual.enableVibration(false);
+            nm.createNotificationChannel(visual);
         }
     }
 
