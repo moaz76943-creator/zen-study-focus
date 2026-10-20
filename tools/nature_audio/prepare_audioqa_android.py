@@ -55,6 +55,17 @@ def prepare(root):
             raise ValueError("Source hash and QA receipt mismatch: " + item["id"])
         original_files.append(name)
 
+    loops = []
+    for item in meta["items"]:
+        loop = statuses[item["id"]].get("loop_derivative")
+        if not loop:
+            continue
+        name = loop.get("path", "")
+        if not re.fullmatch(r"loops/[a-z][a-z0-9_]*\.ogg", name):
+            raise ValueError("Unsafe loop derivative path")
+        if loop.get("input_sha256") != item["source_sha256"] or hashlib.sha256((media/name).read_bytes()).hexdigest() != loop.get("output_sha256"):
+            raise ValueError("Loop derivative lineage mismatch")
+        loops.append(name)
     gradle_source = gradle.read_text(encoding="utf-8")
     java_source = java.read_text(encoding="utf-8")
     manifest_source = manifest.read_text(encoding="utf-8")
@@ -100,6 +111,10 @@ def prepare(root):
     review.mkdir()
     for name in original_files:
         shutil.copy2(media / name, review / name)
+    if loops:
+        (review / "loops").mkdir()
+        for name in loops:
+            shutil.copy2(media / name, review / name)
     for filename in ("index.html", "qa_report.json"):
         shutil.copy2(media / filename, review / filename)
     (review / "README.txt").write_text(
@@ -113,12 +128,13 @@ if __name__ == "__main__":
         and os.environ.get("AUDIO_QA_BUILD") == "1"
         and os.environ.get("GITHUB_REF_NAME") in {
             "fix/deep-focus-nature-catalog-20-20261020",
-            "feature/track07-04-authentic-nature-20-20261020"
+            "feature/track07-04-authentic-nature-20-20261020",
+            "fix/track07-04-audio-acceptance-20261020"
         }):
         raise SystemExit("SAFE_GUARD: Audio QA packaging is GitHub Actions branch-only")
     # CLI requires all twenty originals, but prepare(root) remains unit-testable
     # with small isolated fixtures and never relaxes per-file hash/rights checks.
-    if os.environ["GITHUB_REF_NAME"] == "feature/track07-04-authentic-nature-20-20261020":
+    if os.environ["GITHUB_REF_NAME"] in {"feature/track07-04-authentic-nature-20-20261020", "fix/track07-04-audio-acceptance-20261020"}:
         intake=json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8"))
         if len(intake.get("items",[])) != 20:
             raise SystemExit("AUDIO20_QA_BLOCKED: exact twenty sources required")

@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feature/track07-04-authentic-nature-20-20261020
+      - fix/track07-04-audio-acceptance-20261020
   workflow_dispatch:
 permissions:
   contents: read
@@ -62,7 +63,7 @@ jobs:
     needs: authentic20
     if: github.event_name == 'push' && contains(github.event.head_commit.message, '[audio-qa-apk]')
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
         with:
@@ -131,7 +132,7 @@ jobs:
           test -c /dev/kvm
           sudo chown "$(id -u):$(id -g)" /dev/kvm
           sudo chmod u+rw /dev/kvm
-      - name: Prove QA APK actually renders 20 sound controls and decodes an Ogg on Android API30
+      - name: Prove all 20 originals, loop wraps, actual ADB controls and real 30-minute mixed decode on API30
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30

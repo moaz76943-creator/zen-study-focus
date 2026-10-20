@@ -38,7 +38,10 @@
       "name_en": "Tropical beach ocean waves",
       "synthetic": false,
       "contains_music": false,
-      "human_audio_review": "NOT_TESTED"
+      "human_audio_review": "NOT_TESTED",
+      "review_warnings": [
+        "BLOCKED_RIGHTS: embedded music-origin metadata conflicts require adjudication; do not promote"
+      ]
     },
     {
       "id": "stream_rapids",
@@ -245,7 +248,10 @@
       "human_audio_review": "NOT_TESTED",
       "original_bytes": 258531,
       "discovery_seconds": 17.082063,
-      "discovery_run": 39442762046
+      "discovery_run": 39442762046,
+      "review_warnings": [
+        "CONTENT: distant bell and other birds; not night crickets or music-free signoff"
+      ]
     },
     {
       "id": "frogs_night",
@@ -308,7 +314,10 @@
       "human_audio_review": "NOT_TESTED",
       "original_bytes": 511116,
       "discovery_seconds": 25.49551,
-      "discovery_run": 39442762046
+      "discovery_run": 39442762046,
+      "review_warnings": [
+        "LABEL: burning grass, not logs; cannot fulfill wood-fire slots"
+      ]
     },
     {
       "id": "veranda_storm",
@@ -395,5 +404,107 @@
       "discovery_run": 39442762046
     }
   ],
-  "sources_verified_for_distribution": false
+  "sources_verified_for_distribution": false,
+  "required_slots": [
+    {
+      "slot_id": "ocean",
+      "name_ar": "أمواج البحر",
+      "candidate_id": "ocean"
+    },
+    {
+      "slot_id": "rain",
+      "name_ar": "المطر الطبيعي",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "fire",
+      "name_ar": "طقطقة النار",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "forest",
+      "name_ar": "أجواء الغابة",
+      "candidate_id": "forest_ambient"
+    },
+    {
+      "slot_id": "stream",
+      "name_ar": "جدول الماء",
+      "candidate_id": "creek_woodland"
+    },
+    {
+      "slot_id": "leaves",
+      "name_ar": "حفيف الأشجار",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "waterfall",
+      "name_ar": "الشلال",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "night",
+      "name_ar": "أصوات الطبيعة ليلًا",
+      "candidate_id": "frogs_night"
+    },
+    {
+      "slot_id": "thunder",
+      "name_ar": "العواصف الرعدية",
+      "candidate_id": "storm_rain"
+    },
+    {
+      "slot_id": "wind",
+      "name_ar": "الرياح الطبيعية",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "winrain",
+      "name_ar": "المطر على النافذة",
+      "candidate_id": "rain_window"
+    },
+    {
+      "slot_id": "rain_soft",
+      "name_ar": "المطر الخفيف",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "rain_downpour",
+      "name_ar": "المطر الغزير",
+      "candidate_id": "rain_downpour"
+    },
+    {
+      "slot_id": "waves_calm",
+      "name_ar": "البحر الهادئ",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "birds_dawn",
+      "name_ar": "طيور الصباح",
+      "candidate_id": "birds_early"
+    },
+    {
+      "slot_id": "fire_hearth",
+      "name_ar": "نار المدفأة",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "stream_brook",
+      "name_ar": "خرير الجدول الصغير",
+      "candidate_id": "stream"
+    },
+    {
+      "slot_id": "night_crickets",
+      "name_ar": "صراصير الليل",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "meadow",
+      "name_ar": "أجواء المروج",
+      "candidate_id": null
+    },
+    {
+      "slot_id": "coastal_wind",
+      "name_ar": "الرياح الساحلية",
+      "candidate_id": null
+    }
+  ]
 }

@@ -42,13 +42,22 @@ def render_html(records):
         author = html.escape(row["author"])
         licence = html.escape(row["license"])
         filename_url = urllib.parse.quote(filename, safe="_-")
+        loop = row.get("loop_derivative")
+        loop_attr = ""
+        if loop:
+            if not re.fullmatch(r"loops/[a-z][a-z0-9_]*\.ogg", loop.get("path", "")):
+                raise ValueError("Unsafe loop derivative path")
+            loop_attr = ' data-loop-src="' + loop["path"] + '"'
+        warnings = " · ".join(row.get("review_warnings", []))
+        warning_html = '<p class="flag" role="note">'+html.escape(warnings)+'</p>' if warnings else ''
         groups.setdefault(category, []).append(
             '<article class="clip"><div class="info"><h3 dir="auto">'
             + name_ar + ' <span lang="en" dir="ltr">· ' + name_en + '</span></h3>'
             '<p>Original recording by '+author+' · '+licence+'</p>'
             '<a rel="noopener noreferrer" target="_blank" href="'+html.escape(source,quote=True)+'">Original and license</a>'
-            '</div><audio controls loop preload="none" src="'+html.escape(filename_url,quote=True)+'" '
-            'aria-label="Original '+name_en+'"></audio>'
+            + warning_html + '</div><audio controls loop preload="none" src="'+html.escape(filename_url,quote=True)+'" '
+            'data-id="'+html.escape(row['id'],quote=True)+'"'+loop_attr+' aria-label="Original '+name_en+'"></audio>'
+            '<div class="track-tools"><button type="button" data-play>Play / تشغيل</button><button type="button" data-stop>Stop / إيقاف</button><output data-track-status aria-live="polite">Stopped</output></div>'
             '<label>Mix level <input type="range" value="45" min="0" max="100" step="5" data-mix></label>'
             '</article>'
         )
@@ -71,7 +80,7 @@ h1{font-size:clamp(1.35rem,4vw,2rem);margin:12px 0}p{line-height:1.6}
 .tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:16px 0}
 button{background:#213b66;color:white;border:0;border-radius:12px;padding:12px 18px;font-weight:700;min-height:44px}
 .nature-group{display:grid;gap:10px;margin-bottom:24px}.nature-group h2{font-size:1.12rem;margin:0}.cards{display:grid;gap:12px}.clip{border:1px solid #cad3e1;border-radius:14px;background:white;padding:16px;display:grid;gap:9px}
-.clip h3{font-size:1.04rem;margin:0}.clip p{font-size:.85rem;margin:6px 0}.clip a{font-size:.8rem}
+.clip h3{font-size:1.04rem;margin:0}.clip p{font-size:.85rem;margin:6px 0}.clip a{font-size:.8rem;overflow-wrap:anywhere}.track-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tools label{display:flex;gap:8px;flex-wrap:wrap;align-items:center;max-width:100%}input[type=range],select{max-width:100%;min-width:0}
 audio{width:100%;max-width:100%;min-height:50px}.clip label{font-size:.85rem;display:flex;align-items:center;gap:10px}.clip input{flex:1;min-width:50px}
 footer{font-size:.78rem;color:#576779;padding:16px 0}
 </style></head>
@@ -81,6 +90,8 @@ footer{font-size:.78rem;color:#576779;padding:16px 0}
 Listen to loops on your Android device with headphones and speaker. Mark harsh, synthetic, vocal, clipping,
 abrupt loop edge, and distracting material as <strong>FAIL</strong>. No recording is approved for the app by this page.</p>
 <div class="tools"><button type="button" onclick="stopAllAudio()">Stop all / إيقاف الكل</button>
+<label>Master / المستوى العام <input id="master-volume" type="range" min="0" max="100" value="60"></label>
+<label>Original / Loop <select id="source-mode"><option value="original">Original / الأصل</option><option value="loop">Prepared loop (unreviewed) / حلقة للمراجعة</option></select></label>
 <span id="status" aria-live="polite">0 active · Combined output ≤ 80%</span></div></header>
 <main id="nature-groups">""" + parts + """</main>
 <footer>Local/offline file review only. Links to original licenses are informative; recordings play locally.
@@ -93,22 +104,43 @@ function rebalance(){
   const active=clips.filter(a=>!a.paused&&!a.ended);
   const levels=active.map(a=>Number(sliders[clips.indexOf(a)].value)/100);
   const total=levels.reduce((n,v)=>n+v,0);
-  const scale=total>0.8?0.8/total:1;
+  const master=Number(document.getElementById('master-volume').value)/100;
+  const scale=(total>0.8?0.8/total:1)*master;
   for(let i=0;i<clips.length;i++){
     const target=Number(sliders[i].value)/100;
     clips[i].volume=active.includes(clips[i])?target*scale:0;
   }
+  clips.forEach(a=>{
+    const card=a.closest('.clip');
+    card.querySelector('[data-play]').textContent=a.paused?'Play / تشغيل':'Pause / إيقاف مؤقت';
+    card.querySelector('[data-play]').setAttribute('aria-pressed',String(!a.paused));
+    if(!a.error)card.querySelector('[data-track-status]').textContent=a.paused?'Stopped / متوقف':'Playing / يعمل';
+  });
   document.getElementById('status').textContent=active.length+' active · Combined output ≤ 80%';
 }
 function stopAllAudio(){clips.forEach(a=>{a.pause();a.currentTime=0});rebalance();}
 for(let i=0;i<clips.length;i++){
-  clips[i].volume=0.35;
+  const a=clips[i],card=a.closest('.clip');
+  a.dataset.originalSrc=a.getAttribute('src');
+  a.volume=0;
+  card.querySelector('[data-play]').addEventListener('click',async()=>{
+    if(!a.paused){a.pause();return;}
+    try{await a.play();}catch(error){card.querySelector('[data-track-status]').textContent='Playback failed / تعذر التشغيل';}
+  });
+  card.querySelector('[data-stop]').addEventListener('click',()=>{a.pause();a.currentTime=0;rebalance();});
+  a.addEventListener('error',()=>{card.querySelector('[data-track-status]').textContent='Playback failed / تعذر التشغيل';});
   clips[i].addEventListener('play',rebalance);
   clips[i].addEventListener('pause',rebalance);
   clips[i].addEventListener('ended',rebalance);
   sliders[i].addEventListener('input',rebalance);
 }
+document.getElementById('master-volume').addEventListener('input',rebalance);
+document.getElementById('source-mode').addEventListener('change',event=>{
+  stopAllAudio();
+  clips.forEach(a=>{a.src=event.target.value==='loop'?(a.dataset.loopSrc||a.dataset.originalSrc):a.dataset.originalSrc;a.load();});
+});
 window.addEventListener('pagehide',stopAllAudio);
+rebalance();
 </script></body></html>
 """
 
@@ -128,6 +160,16 @@ def build():
            or audited.get("original_sha1") != sha1 or audited.get("original_sha256") != sha256
            or audited.get("status") != "QUARANTINED_NOT_APPROVED"):
             raise ValueError("Review page cannot accept unpinned or altered audio: " + item["id"])
+    for item in candidates:
+        audited = checked[item["id"]]
+        item["review_warnings"] = audited.get("content_warnings", item.get("review_warnings", []))
+        loop = audited.get("loop_derivative")
+        if loop:
+            if not re.fullmatch(r"loops/[a-z][a-z0-9_]*\.ogg", loop.get("path", "")):
+                raise ValueError("Unsafe loop output")
+            if loop.get("input_sha256") != item["source_sha256"] or hashlib.sha256((OUT / loop["path"]).read_bytes()).hexdigest() != loop.get("output_sha256"):
+                raise ValueError("Loop lineage or output hash mismatch")
+            item["loop_derivative"] = loop
     (OUT / "index.html").write_text(render_html(candidates), encoding="utf-8")
     print("Audio review index generated from", len(candidates), "pinned originals; no app assets touched")
 
