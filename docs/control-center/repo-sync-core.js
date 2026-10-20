@@ -40,7 +40,7 @@
     if(!Array.isArray(pulls)||pulls.length>MAX_PRS||!Array.isArray(runs)||runs.length>MAX_RUNS)
       throw Error('Repository response limit exceeded');
     if(!Array.isArray(errors)||errors.length>15)throw Error('Invalid integration errors');
-    const cleanPulls=pulls.filter(x=>x&&[25,37,70].includes(x.number));
+    const cleanPulls=pulls.filter(x=>x&&[25,37,70,72].includes(x.number));
     for(const p of cleanPulls){
       if(!safeSha(p.head?.sha)||!safeSha(p.base?.sha))throw Error('Invalid pull SHA');
     }
@@ -51,9 +51,18 @@
         url:trustedGitHubUrl(p.html_url)||'https://github.com/'+REPO+'/pull/'+n,
         ci:ciStatus(runs,p.head.sha)}:null;
     };
-    const pr25=toPR(25),pr37=toPR(37),pr70=toPR(70);
+    const pr25=toPR(25),pr37=toPR(37),pr70=toPR(70),pr72=toPR(72);
     const verified=Boolean(pr25&&pr37&&errors.length===0);
     const drift=verified?(pr25.sha===pr37.baseSha?'CURRENT':'BASE_MOVED'):'NOT_VERIFIED';
+    const dashboardDrift=pr37&&pr72&&errors.length===0?
+      (pr37.sha===pr72.baseSha?'CURRENT':'BASE_MOVED'):'NOT_VERIFIED';
+    // CI runs are not Android-on-device test case evidence. Only show the scope of Android QA workflows.
+    const androidQaRuns=runs.filter(r=>{
+      const name=String(r?.name||'');
+      return /(android|webview|emulator|adb|device|uiautomator)/i.test(name)&&
+        /(test|qa|e2e|smoke|validation|regression|acceptance|instrumented|uiautomator)/i.test(name);
+    });
+    const androidWorkflow=ciStatus(androidQaRuns,pr70?.sha);
     const recent=runs.filter(r=>r&&Number.isSafeInteger(r.id)&&r.id>0&&
       safeSha(r.head_sha)&&trustedGitHubUrl(r.html_url))
       .sort((a,b)=>b.id-a.id).slice(0,12).map(r=>({
@@ -78,7 +87,7 @@
       sourceUrl:'https://github.com/'+REPO+'/blob/'+evidenceSha+'/docs/MEDIA_LICENSES.md'};
     const security={status:'NOT_VERIFIED',tokenInPublicClient:'NOT_DETECTED_IN_REVIEW',
       httpHeaders:'REQUIRES_REVIEW'};
-    return {verified,drift,pr25,pr37,pr70,
+    return {verified,drift,dashboardDrift,pr25,pr37,pr70,pr72,androidWorkflow,
       pr70Verified:Boolean(pr70&&errors.length===0),android,locale,audio,security,
       release:'NOT_APPROVED',
       recent,errors:errors.map(x=>String(x).slice(0,180)),timestamp};
