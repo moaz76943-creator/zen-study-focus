@@ -56,6 +56,6 @@ test('reports escape untrusted PR titles and include accurate release scope',()=
  const m=r.toMarkdown(report);
  assert.match(m,/NOT APPROVED/);
  assert.doesNotMatch(m,/bad\n\|/);
- assert.match(m,/DEPENDENT_BRANCH|REVIEW_REQUIRED|REVIEW/);
+ assert.match(m,/VERIFY_CANDIDATE/);
  assert.equal(report.counts.total,1);
 });
