@@ -38,7 +38,7 @@
       div.append(node('strong','تعذر التحقق من PR'),node('small','المصدر غير متاح حاليًا'));
       return div;
     }
-    div.append(node('strong','PR #'+pr.number+(pr.number===25?' · تكامل التطبيق':' · لوحة التحكم')),
+    div.append(node('strong','PR #'+pr.number+(pr.number===25?' · تكامل التطبيق':pr.number===70?' · إصلاح Android P0':' · لوحة التحكم')),
       node('small','HEAD '+pr.sha.slice(0,12)),
       node('small','BASE '+pr.baseSha.slice(0,12)),
       node('span',label[pr.ci.status]||'NOT VERIFIED','repo-sync-chip status-'+pr.ci.status.toLowerCase()),
@@ -48,9 +48,54 @@
     if(pr.ci.url)buttons.append(link(pr.ci.url,'فحص CI ↗'));
     div.append(buttons);return div;
   }
+
+  // Track 04: distinguish live GitHub refs from dated test/audit evidence.
+  function renderTrack04(){
+    const parent=$('repo-sync-cards');
+    if(!parent)return;
+    let root=$('repo-sync-recovery');
+    if(!root){
+      root=node('div',undefined,'repo-sync-recovery');
+      root.id='repo-sync-recovery';
+      root.setAttribute('aria-label','أدلة Android واللغات والصوت والأمان');
+      parent.insertAdjacentElement('afterend',root);
+    }
+    const state=model.pr70Verified?'LIVE_GITHUB':'NOT_VERIFIED';
+    const heading=node('div',undefined,'repo-sync-toolbar');
+    heading.append(node('strong','TRACK 04 · حالة الاسترداد'),
+      node('small','GitHub: '+state+' · نتائج التدقيق: SNAPSHOT 2026-10-20'));
+    root.replaceChildren(heading);
+    const details=node('div',undefined,'repo-sync-grid');
+    const card=(title,summary,source,status)=>{
+      const el=node('article',undefined,'repo-sync-card');
+      el.append(node('strong',title),node('span',status,'repo-sync-chip'),node('p',summary));
+      if(source)el.append(link(source,'فتح الدليل ↗'));
+      return el;
+    };
+    const a=model.android, current=a.status==='SOURCE_REPORTED';
+    const aText=current?
+      'WebView/ADB: 3 PASS · 0 FAIL · 17 NOT_TESTED. UIAutomator: 20 NOT_TESTED. جهاز فعلي: NOT_TESTED. الإصدار غير معتمد.':
+      'أدلة Android المسجلة لا تطابق الرأس الحي أو تعذر التحقق منه؛ لا توجد نتيجة PASS جديدة.';
+    details.append(card('اختبارات Android',aText,a.runUrl,a.status));
+    const l=model.locale;
+    details.append(card('الترجمة · 20 لغة',
+      '4608 فجوة مصدرية في تدقيق محفوظ، وليست قياسًا حيًا جديدًا. SHA الدليل: '+l.sha.slice(0,12),
+      l.sourceUrl,l.status));
+    const audio=model.audio;
+    details.append(card('الأصوات والتراخيص',
+      'بوابة الأصوات في السجل: 1 PASS / 2 FAIL. اعتماد التسجيلات والاستماع على Android ما زالا مطلوبين.',
+      audio.sourceUrl,audio.status));
+    details.append(card('الأمان والخصوصية',
+      'وصول GitHub للقراءة فقط دون GitHub Token في كود العميل المفحوص. ترويسات HTTP والأذونات تحتاج مراجعة مستقلة؛ لا اعتماد أمني.',
+      null,'NOT_VERIFIED'));
+    root.append(details,node('p',
+      'LIVE: رؤوس PR وActions من GitHub. SNAPSHOT: الأدلة المؤرخة المرتبطة بـSHA محدد؛ تصبح STALE عند تغير PR #70. لا دمج أو تشغيل أو نشر من اللوحة.',
+      'safety-note'));
+  }
   function render(){
     if(!model)return;
-    $('repo-sync-cards').replaceChildren(tile(model.pr25),tile(model.pr37));
+    $('repo-sync-cards').replaceChildren(tile(model.pr25),tile(model.pr37),tile(model.pr70));
+    renderTrack04();
     const state=$('repo-sync-drift');
     if(!model.verified)state.textContent='تحقق جزئي: لا تعتمد حالة الدمج أو نتائج CI قبل استعادة الاتصال بالمصادر.';
     else if(model.drift==='BASE_MOVED')state.textContent='تحذير: تغير HEAD لفرع التكامل PR #25، ولم تُحدّث قاعدة PR #37 إلى نفس SHA. راجع إعادة التزامن الآمنة قبل الدمج.';
@@ -72,13 +117,13 @@
   async function refresh(){
     if(busy)return;
     busy=true;$('repo-sync-refresh').disabled=true;
-    message('جارٍ فحص رؤوس PR #25 وPR #37 وتشغيلات GitHub Actions…');
-    const paths=['/pulls/25','/pulls/37','/actions/runs?per_page=50'];
+    message('جارٍ فحص PR #25 وPR #37 وPR #70 وتشغيلات GitHub Actions…');
+    const paths=['/pulls/25','/pulls/37','/pulls/70','/actions/runs?per_page=50'];
     const first=await Promise.allSettled(paths.map(endpoint));
     const errors=[],pulls=[],runs=[];
     first.forEach((value,i)=>{
       if(value.status!=='fulfilled'){errors.push(paths[i]+': '+String(value.reason?.message||'failure'));return;}
-      if(i<2)pulls.push(value.value);
+      if(i<3)pulls.push(value.value);
       else if(Array.isArray(value.value.workflow_runs))runs.push(...value.value.workflow_runs);
       else errors.push('Recent Actions response invalid');
     });
