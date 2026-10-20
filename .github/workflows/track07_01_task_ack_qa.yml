@@ -1,0 +1,33 @@
+name: Track 07-01 task ACK QA
+on:
+  push:
+    branches:
+      - 'fix/track07-01-checklist-ui-durable-20261020'
+  pull_request:
+    paths:
+      - '.github/workflows/track07_01_task_ack_qa.yml'
+      - 'tests/track07_functional/**'
+      - 'android/app/src/main/assets/web/**'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run owned test suite
+        run: node --test tests/track07_functional/task_checklist_ack.test.cjs tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs
+      - name: Run broad non-media Node regressions
+        shell: bash
+        run: |
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs | sort)
+          test "${#suites[@]}" -gt 0
+          node --test "${suites[@]}"
+      - name: Run Python source regressions
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Check changed source syntax
+        run: node --check android/app/src/main/assets/web/tasks_studio.js
