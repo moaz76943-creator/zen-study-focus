@@ -80,6 +80,7 @@ jobs:
           test -f "$APK"
           test -x "$AAPT"
           "$AAPT" dump badging "$APK" | grep -F "package: name='com.zenstudy.focus.audioqa'"
+          "$AAPT" dump permissions "$APK"
           if "$AAPT" dump permissions "$APK" | grep -Fq "uses-permission:"; then
             echo "QA APK unexpectedly requests permissions" >&2
             exit 1
