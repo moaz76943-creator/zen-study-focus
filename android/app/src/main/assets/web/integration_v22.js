@@ -284,7 +284,12 @@
     mounted=true;lastLocale=cfg.lang;
     document.body.classList.add('df-v22','df-recovery10');
     if(root.DFInteractionRecovery06)root.DFInteractionRecovery06.disableDeadAnalyticsCards(document);
-    if(root.DeepFocusAsciiNumeralsV21)root.DeepFocusAsciiNumeralsV21.wireNumericInputs(document);
+    if(root.DeepFocusAsciiNumeralsV21){
+      root.DeepFocusAsciiNumeralsV21.wireNumericInputs(document);
+      // Keep numeric UI generated after timers, analytics and calendar redraws
+      // in Western 0–9; note/task authored content remains outside this scope.
+      root.DeepFocusAsciiNumeralsV21.wireGeneratedUi(document);
+    }
     root.DF22Locale.apply(document,cfg.lang);
     if (root.DeepFocusSoundMixer) {
       root.focusSoundMixer = root.DeepFocusSoundMixer.createSoundMixer({
