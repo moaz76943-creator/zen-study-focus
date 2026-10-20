@@ -317,7 +317,9 @@ function applyLanguage(code) {
     }
   });
 
-  document.getElementById('waveDaysRow').innerHTML = d.weekdays.map(w => `<span>${w}</span>`).join('');
+  let waveDaysHtml = '';
+  for (let i = 0; i < d.weekdays.length; i++) waveDaysHtml += `<span>${d.weekdays[i]}</span>`;
+  document.getElementById('waveDaysRow').innerHTML = waveDaysHtml;
 
   syncHeaderMetrics();
   updateTimerDisplay();
@@ -749,7 +751,9 @@ function changeCalendarMonth(delta) {
 function renderCalendar() {
   const d = L();
   document.getElementById('calMonthYearTitle').textContent = toWest(`${d.months[calMonth]} ${calYear}`);
-  document.getElementById('calWeekdaysRow').innerHTML = d.weekdays.map(w => `<div>${w}</div>`).join('');
+  let calWeekdaysHtml = '';
+  for (let i = 0; i < d.weekdays.length; i++) calWeekdaysHtml += `<div>${d.weekdays[i]}</div>`;
+  document.getElementById('calWeekdaysRow').innerHTML = calWeekdaysHtml;
 
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
