@@ -30,7 +30,7 @@ async function ready(){for(let i=0;i<30;i++){if(await evaluate("document.readySt
 async function touch(expression){
  // The Android bottom bar is horizontally scrollable in RTL/LTR. A DOM node can
  // have width/height > 0 while its center is completely off-screen or occluded.
- const r=await evaluate(`(()=>{
+ const geometry=`(()=>{
    const n=${expression};
    if(!n)return {present:false,selector:${JSON.stringify(expression)}};
    n.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});
@@ -45,8 +45,8 @@ async function touch(expression){
      viewportWidth:document.documentElement.clientWidth,
      viewportHeight:window.innerHeight,
      hitWithin:!!hit&&(n===hit||n.contains(hit)),hit:hitName};
- })()`);
- const target=validateTouchTarget(r);
+ })()`;
+ validateTouchTarget(await evaluate(geometry));
  // The API30 run proved CDP synthetic touch did not emit ANY WebView touch/click event,
  // even for a visible, unobstructed 44px target. Use Android's actual input pipeline.
  let hierarchy;
@@ -57,6 +57,8 @@ async function touch(expression){
    throw Error('TRANSPORT: Cannot read real Android WebView frame: '+String(e.message).slice(0,180));
  }
  const box=parseWebViewBounds(hierarchy);
+ // UIAutomator can outlast an IME resize; read the target/viewport AFTER that capture.
+ const r=await evaluate(geometry),target=validateTouchTarget(r);
  const physical=cssPointToAndroid({...target,viewportWidth:r.viewportWidth,viewportHeight:r.viewportHeight},box);
  try {
    adb('shell','input','tap',String(physical.x),String(physical.y));

@@ -20,6 +20,9 @@ function cssPointToAndroid(point,box) {
      !box||![box.left,box.top,box.right,box.bottom,box.width,box.height].every(Number.isFinite)||
      box.width<=0||box.height<=0)
     throw new Error('TRANSPORT: Unsafe CSS-to-Android touch geometry');
+  const scaleX=box.width/viewportWidth,scaleY=box.height/viewportHeight;
+  if(Math.abs(scaleX-scaleY)/Math.max(scaleX,scaleY)>0.025)
+    throw new Error('TRANSPORT: Android frame and CSS viewport describe different layout states');
   const px=Math.round(box.left+x*box.width/viewportWidth);
   const py=Math.round(box.top+y*box.height/viewportHeight);
   if(px<box.left||py<box.top||px>=box.right||py>=box.bottom)
