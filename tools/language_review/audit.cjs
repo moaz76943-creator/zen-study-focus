@@ -7,7 +7,7 @@ const root=path.resolve(__dirname,'../../android/app/src/main/assets/web');
 const LANGS=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko','vi','it','bn','ur','fa','pl','nl'];
 const RTL=new Set(['ar','fa','ur']);
 const FILES=['index.html','app.js','locale_rows.js','locale_extras.js','locale_premium_v22.js',
-'localization_20_recovery.js','quick_training.js','notes_studio.js','notes_editor_ui.js',
+'localization_20_recovery.js','quick_training.js','notes_studio.js','notes_drafts.js','notes_editor_ui.js',
 'tasks_studio.js','analytics_studio.js','analytics_recovery_ui.js','goals_studio.js',
 'timer_settings.js','completion_alert_settings.js','nature_audio_recovery_v1.js',
 'sound_mix_controls.js','integration_v22.js','interaction_recovery_06.js',
@@ -115,6 +115,9 @@ function catalogs(){
   add('premium.'+screen,screen,'locale_premium_v22.js',values);
  }
  add('analytics.dictionary','analytics','localization_20_recovery.js',runtime.recovery.translations);
+ // Include the on-device draft recovery and data-loss copy in actual locale coverage.
+ const drafts=block(read('notes_drafts.js'),0,'const NS_DRAFT_LANG=');
+ if(drafts)add('notes.drafts','notes','notes_drafts.js',drafts);
  const quick={};for(const lang of LANGS)quick[lang]=Object.fromEntries(runtime.quick.keys.map(
   (k,i)=>[k,(runtime.quick.rows[lang]||[])[i]]));
  add('quick.training','training','quick_training.js',quick);
