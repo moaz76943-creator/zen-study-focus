@@ -10,6 +10,14 @@ function getList(){
   req.on('error',reject);req.setTimeout(3500,()=>req.destroy(Error('DevTools timeout')));
  });
 }
+function assertProgress(before,after){
+ assert.equal(after.length,before.length,'Missing track progress evidence');
+ assert.equal(new Set(after.map(x=>x.id)).size,after.length,'Duplicate track evidence');
+ for(const old of before){const current=after.find(x=>x.id===old.id);
+  assert.ok(current&&Number.isFinite(current.progress)&&Number.isFinite(old.progress)&&current.progress-old.progress>.2,'Frozen or invalid track progress: '+old.id);
+ }
+ return true;
+}
 async function main(){
  const expected=Number(process.env.AUDIO_QA_EXPECTED_TRACKS);assert.ok(Number.isInteger(expected)&&expected>0&&expected<=20);
  let page;
@@ -109,25 +117,39 @@ async function main(){
   const enduranceSeconds=Number(process.env.AUDIO_QA_ENDURANCE_SECONDS||0);
   assert.ok([0,1800].includes(enduranceSeconds),'Unbounded endurance duration rejected');
   const checkpoints=[];
-  const started=Date.now();
-  while(Date.now()-started<enduranceSeconds*1000){
-    await sleep(Math.min(30000,enduranceSeconds*1000-(Date.now()-started)));
+  const progressExpression=`(()=>{const a=[...document.querySelectorAll('audio')];return a.map(x=>({id:x.dataset.id,progress:x._qaProgress||0}));})()`;
+  await evalJs(`(()=>{document.querySelectorAll('audio').forEach(a=>{
+    a._qaProgress=0;let previous=a.currentTime;
+    a.addEventListener('timeupdate',()=>{const current=a.currentTime;let delta=current-previous;
+      if(delta<0&&previous>a.duration-1&&current<1)delta=a.duration-previous+current;
+      if(Number.isFinite(delta)&&delta>0)a._qaProgress+=delta;previous=current;
+    });
+  });})()`);
+  let priorProgress=await evalJs(progressExpression);
+  const started=performance.now();
+  while(performance.now()-started<enduranceSeconds*1000){
+    await sleep(Math.min(30000,Math.max(0,enduranceSeconds*1000-(performance.now()-started))));
     const checkpoint=await evalJs(`(()=>{const a=[...document.querySelectorAll('audio')];return {active:a.filter(x=>!x.paused&&!x.error).length,tracks:a.map(x=>({id:x.dataset.id,time:x.currentTime,error:x.error?.code??null})),gain:a.reduce((n,x)=>n+x.volume,0),errors:audioQaErrors};})()`);
-    checkpoint.elapsedSeconds=(Date.now()-started)/1000;
+    checkpoint.elapsedSeconds=(performance.now()-started)/1000;
+    const progress=await evalJs(progressExpression);
+    assertProgress(priorProgress,progress);priorProgress=progress;
+    checkpoint.progress=progress;
     assert.equal(checkpoint.active,expected,'A track stopped during endurance');
     assert.ok(checkpoint.gain<=.800001);assert.deepEqual(checkpoint.errors,[]);
     checkpoints.push(checkpoint);
+    if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify({status:'IN_PROGRESS',state,originals,loops,mix,traces,checkpoints,approved_for_release:false},null,2));
     console.log('AUDIO20_ENDURANCE_CHECK',Math.round(checkpoint.elapsedSeconds),checkpoint.active);
   }
   await tap('button[onclick="stopAllAudio()"]');
   assert.ok(await evalJs(`[...document.querySelectorAll('audio')].every(a=>a.paused&&a.currentTime===0)`));
   assert.deepEqual(await evalJs('audioQaErrors'),[]);
   const result={status:'ANDROID_AUDIO_QA_ALL_ORIGINALS_LOOPS_CONTROLS_PASS',state,originals,loops,mix,traces,
-    endurance:{seconds:(Date.now()-started)/1000,requested:enduranceSeconds,checkpoints,status:enduranceSeconds===1800?'PASS':'NOT_TESTED'},
+    endurance:{seconds:(performance.now()-started)/1000,requested:enduranceSeconds,checkpoints,status:enduranceSeconds===1800?'PASS':'NOT_TESTED'},
     scope:'Muted decode/progression and real ADB button delivery; not human audio or seamless-listening approval',
     background:'NOT_TESTED',lockedScreen:'NOT_TESTED',bluetooth:'NOT_TESTED',physicalDevice:'DEVICE_NOT_TESTED',approved_for_release:false};
   if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(result,null,2));
   console.log(JSON.stringify({status:result.status,tracks:state.count,originals:originals.length,loops:loops.length,endurance:result.endurance.status}));
  }finally{ws.close();}
 }
-main().catch(e=>{console.error('AUDIO20_WEBVIEW_FAIL:',String(e));process.exitCode=1;});
+if(require.main===module)main().catch(e=>{console.error('AUDIO20_WEBVIEW_FAIL:',String(e));process.exitCode=1;});
+module.exports={assertProgress};

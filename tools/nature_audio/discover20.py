@@ -110,6 +110,10 @@ def search_required():
                 if not SAFE.fullmatch(name) or not page.get("imageinfo"):
                     continue
                 info=page["imageinfo"][0];metadata=info.get("extmetadata",{})
+                description=(name+" "+str(metadata.get("ImageDescription",{}).get("value",""))).casefold()
+                if re.search(r"bones.?breaking|sound.?effect|foley|synthetic|synthesiz|footsteps|thunder.steps",description):
+                    result["rejections"].append({"file":name,"reason":"Metadata describes artificial effect or nonmatching steps; not a natural-only replacement"})
+                    continue
                 declared=None
                 for license_name in ("CC0-1.0","PD-author"):
                     try:validate_license(license_name,metadata);declared=license_name;break

@@ -19,6 +19,7 @@ class OfflineReviewTests(unittest.TestCase):
         html=review.render_html(records)
         self.assertEqual(html.count("<audio "), 2)
         self.assertIn("stopAllAudio", html)
+        self.assertNotIn("<audio controls",html)
         self.assertIn("offline", html.lower())
         self.assertIn("Ocean_Waves_on_a_Tropical_Beach.ogg", html)
         self.assertNotIn("autoplay", html.lower())

@@ -285,6 +285,10 @@ def run():
             "content_warnings": item.get("review_warnings", []), "loop_derivative": loop
         })
         print("MEDIA_SOURCE_OK:", item["id"], sha1, "pinned" if pinned else "unpinned", flush=True)
+        print("MEDIA_QUALITY_RECEIPT", json.dumps({"id":item["id"],"source_sha256":expected_sha256,
+            "output_sha256":loop["output_sha256"],"sample_rate":metrics["sample_rate"],"channels":metrics["channels"],
+            "duration_seconds":duration,"original_quality":metrics,"loop_quality":loop["quality"],
+            "ready":False,"human_loop_review":"NOT_TESTED"}),flush=True)
     (OUT / "qa_report.json").write_text(json.dumps(reports, indent=2), encoding="utf-8")
     (OUT / "required_coverage.json").write_text(json.dumps(coverage, ensure_ascii=False, indent=2), encoding="utf-8")
     print("REQUIRED_SLOT_COVERAGE", json.dumps({status: sum(r["status"] == status for r in coverage)

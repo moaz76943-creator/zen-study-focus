@@ -47,11 +47,12 @@ def render_html(records):
             groups.setdefault(category, []).append('<article class="clip" data-blocked="rights"><h3>'+name_ar+' · '+name_en+'</h3><p class="flag">'+warnings+'</p><p>Not packaged / غير مضمّن</p></article>')
             continue
         loop = row.get("loop_derivative")
-        loop_attr = ""
+        loop_attr = ' data-original-peak="'+str(float(row.get('quality',{}).get('peak_linear',1)))+'"'
         if loop:
             if not re.fullmatch(r"loops/[a-z][a-z0-9_]*\.ogg", loop.get("path", "")):
                 raise ValueError("Unsafe loop derivative path")
-            loop_attr = ' data-loop-src="' + loop["path"] + '"'
+            loop_attr += ' data-loop-peak="'+str(float(loop.get('quality',{}).get('peak_linear',1)))+'"'
+            loop_attr += ' data-loop-src="' + loop["path"] + '"'
         warnings = " · ".join(row.get("review_warnings", []))
         warning_html = '<p class="flag" role="note">'+html.escape(warnings)+'</p>' if warnings else ''
         groups.setdefault(category, []).append(
@@ -59,7 +60,7 @@ def render_html(records):
             + name_ar + ' <span lang="en" dir="ltr">· ' + name_en + '</span></h3>'
             '<p>Original recording by '+author+' · '+licence+'</p>'
             '<a rel="noopener noreferrer" target="_blank" href="'+html.escape(source,quote=True)+'">Original and license</a>'
-            + warning_html + '</div><audio controls loop preload="none" src="'+html.escape(filename_url,quote=True)+'" '
+            + warning_html + '</div><audio loop preload="none" src="'+html.escape(filename_url,quote=True)+'" '
             'data-id="'+html.escape(row['id'],quote=True)+'"'+loop_attr+' aria-label="Original '+name_en+'"></audio>'
             '<div class="track-tools"><button type="button" data-play>Play / تشغيل</button><button type="button" data-stop>Stop / إيقاف</button><output data-track-status aria-live="polite">Stopped</output></div>'
             '<label>Mix level <input type="range" value="45" min="0" max="100" step="5" data-mix></label>'
@@ -79,13 +80,13 @@ def render_html(records):
 <style>
 :root{color-scheme:light;font-family:system-ui,sans-serif;background:#f4f6f9;color:#122033}
 *{box-sizing:border-box}body{margin:0;padding:20px;max-width:940px;margin-inline:auto}
-header{margin-bottom:24px}.flag{color:#9a3412;font-weight:800}
+header{margin-bottom:24px}.flag{overflow-wrap:anywhere;color:#9a3412;font-weight:800}
 h1{font-size:clamp(1.35rem,4vw,2rem);margin:12px 0}p{line-height:1.6}
 .tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:16px 0}
 button{background:#213b66;color:white;border:0;border-radius:12px;padding:12px 18px;font-weight:700;min-height:44px}
 .nature-group{display:grid;gap:10px;margin-bottom:24px}.nature-group h2{font-size:1.12rem;margin:0}.cards{display:grid;gap:12px}.clip{border:1px solid #cad3e1;border-radius:14px;background:white;padding:16px;display:grid;gap:9px}
 .clip h3{font-size:1.04rem;margin:0}.clip p{font-size:.85rem;margin:6px 0}.clip a{font-size:.8rem;overflow-wrap:anywhere}.track-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tools label{display:flex;gap:8px;flex-wrap:wrap;align-items:center;max-width:100%}input[type=range],select{max-width:100%;min-width:0}
-audio{width:100%;max-width:100%;min-height:50px}.clip label{font-size:.85rem;display:flex;align-items:center;gap:10px}.clip input{flex:1;min-width:50px}
+audio{display:none}.clip label{font-size:.85rem;display:flex;align-items:center;gap:10px}.clip input{flex:1;min-width:50px}
 footer{font-size:.78rem;color:#576779;padding:16px 0}
 </style></head>
 <body><header><div class="flag">QA ONLY / غير معتمد للإصدار</div>
@@ -96,7 +97,7 @@ abrupt loop edge, and distracting material as <strong>FAIL</strong>. No recordin
 <div class="tools"><button type="button" onclick="stopAllAudio()">Stop all / إيقاف الكل</button>
 <label>Master / المستوى العام <input id="master-volume" type="range" min="0" max="100" value="60"></label>
 <label>Original / Loop <select id="source-mode"><option value="original">Original / الأصل</option><option value="loop">Prepared loop (unreviewed) / حلقة للمراجعة</option></select></label>
-<span id="status" aria-live="polite">0 active · Combined output ≤ 80%</span></div></header>
+<span id="status" aria-live="polite">0 active · Combined gain ≤ 80%</span></div></header>
 <main id="nature-groups">""" + parts + """</main>
 <footer>Local/offline file review only. Links to original licenses are informative; recordings play locally.
 This page never reads your notes, tasks or app data. Does not change Android media certification status.</footer>
@@ -109,7 +110,11 @@ function rebalance(){
   const levels=active.map(a=>Number(sliders[clips.indexOf(a)].value)/100);
   const total=levels.reduce((n,v)=>n+v,0);
   const master=Number(document.getElementById('master-volume').value)/100;
-  const scale=(total>0.8?0.8/total:1)*master;
+  const weighted=active.reduce((sum,a,index)=>{
+    const peak=Number(document.getElementById('source-mode').value==='loop'?a.dataset.loopPeak:a.dataset.originalPeak)||1;
+    return sum+levels[index]*Math.max(1,peak);
+  },0);
+  const scale=(weighted>0.8?0.8/weighted:1)*master;
   for(let i=0;i<clips.length;i++){
     const target=Number(sliders[i].value)/100;
     clips[i].volume=active.includes(clips[i])?target*scale:0;
@@ -120,7 +125,7 @@ function rebalance(){
     card.querySelector('[data-play]').setAttribute('aria-pressed',String(!a.paused));
     if(!a.error)card.querySelector('[data-track-status]').textContent=a.paused?'Stopped / متوقف':'Playing / يعمل';
   });
-  document.getElementById('status').textContent=active.length+' active · Combined output ≤ 80%';
+  document.getElementById('status').textContent=active.length+' active · Combined gain ≤ 80%';
 }
 function stopAllAudio(){clips.forEach(a=>{a.pause();a.currentTime=0});rebalance();}
 for(let i=0;i<clips.length;i++){
@@ -178,6 +183,7 @@ def build():
             if loop.get("input_sha256") != item["source_sha256"] or hashlib.sha256((OUT / loop["path"]).read_bytes()).hexdigest() != loop.get("output_sha256"):
                 raise ValueError("Loop lineage or output hash mismatch")
             item["loop_derivative"] = loop
+        item["quality"] = audited.get("quality",{})
     (OUT / "index.html").write_text(render_html(candidates), encoding="utf-8")
     print("Audio review index generated from", len(candidates), "pinned originals; no app assets touched")
 
