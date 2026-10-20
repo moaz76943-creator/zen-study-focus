@@ -116,3 +116,13 @@ An additional real-browser journey exposed that Undo still disappeared after tab
 RED: changed the unit mock to the exact real adapter read shape; **3/10** task UI tests failed. FIX: compare the two owned snapshot fields in explicit fixed order, preserving all nested fields/data, without changing persisted schema. GREEN: **37/37** task tests; **26/26** real Chromium completion checks, now including actual task completion -> 10 tab returns -> More -> Undo, and real task journal quota failure retaining state/input. The second run is justified by this reproduced application bug, not a blind retry. This supersedes the narrower initial Undo claim. Native timer, audio and storage formats untouched.
 
 The existing canonical ledger contains the follow-up code commit. Final source/browser/Android checks must target the subsequent documentation head, not the superseded APK above. Physical device remains DEVICE_NOT_TESTED. Localization audit on 79d175c: **4608** missing catalog language/key pairs across 20 languages; the follow-up changes no locale strings. Media gate remains 1 PASS / 2 FAIL.
+
+## Continuation batch — daily rollover durability (base aee1eac)
+
+Live PR66/70 heads and ancestry were rechecked; neither advanced. Existing isolated worktree and PR70 retained, no overlapping PR created. The confirmed P0 path `syncDailyRollover` mutated cfg counters/date before calling the writer and let storage exceptions abort navigation/startup. It also rewrote unchanged config on every tab press.
+
+RED: five fault/no-op tests all failed on aee1eac. FIX: build a detached daily cfg, use the existing six-packet journal when integrated (verified primary/mirror fallback before integration), require true acknowledgement, then publish dates. Failed writes keep previous values and return false without breaking navigation. Unchanged daily snapshots do not write. Shared save-failure text was added to the existing DICT for all20 languages, without a new registry or persisted field.
+
+GREEN: six focused tests (including all20 warnings) pass. Real Chromium full completion suite now27 PASS: one cfg-mirror write fails mid-transaction, all original storage bytes are restored, date/counters remain unchanged, navigation succeeds and the next tab retries successfully. Synthetic fixture only; no owner data or hardware durability claim. Actual Android verification for this new code remains pending.
+
+Commands: `node --test tests/integration_recovery/daily_rollover_durability.test.cjs`; adjacent missing-module/journal tests; `node tests/validate_locales.cjs`; `node tests/smoke_app.cjs`; `DF_COMPLETION_URL=http://127.0.0.1:8772 node tests/df4_browser/completion.cjs`.

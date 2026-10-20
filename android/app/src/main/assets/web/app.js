@@ -338,6 +338,30 @@ function localDateISO(date = new Date()) {
 // Display-only additions to the existing canonical dictionaries; never persisted.
 Object.entries({"en": "No reviewed recordings are available in this category yet.", "ar": "لا توجد تسجيلات مكتملة المراجعة في هذه الفئة حاليًا.", "es": "Todavía no hay grabaciones revisadas en esta categoría.", "zh": "此分类暂无审核完成的录音。", "hi": "इस श्रेणी में अभी कोई समीक्षा की गई रिकॉर्डिंग उपलब्ध नहीं है।", "fr": "Aucun enregistrement validé dans cette catégorie pour le moment.", "de": "In dieser Kategorie sind noch keine geprüften Aufnahmen verfügbar.", "ru": "В этой категории пока нет проверенных записей.", "pt": "Ainda não há gravações revisadas nesta categoria.", "ja": "このカテゴリには審査済みの録音がまだありません。", "id": "Belum ada rekaman yang telah ditinjau dalam kategori ini.", "tr": "Bu kategoride henüz incelemesi tamamlanmış kayıt yok.", "ko": "이 카테고리에는 아직 검토가 완료된 녹음이 없습니다.", "vi": "Danh mục này chưa có bản ghi âm đã được kiểm duyệt.", "it": "Non ci sono ancora registrazioni verificate in questa categoria.", "bn": "এই বিভাগে এখনো পর্যালোচিত কোনো রেকর্ডিং নেই।", "ur": "اس زمرے میں ابھی جانچ شدہ ریکارڈنگ دستیاب نہیں ہے۔", "fa": "هنوز ضبط بررسی‌شده‌ای در این دسته موجود نیست.", "pl": "W tej kategorii nie ma jeszcze sprawdzonych nagrań.", "nl": "In deze categorie zijn nog geen gecontroleerde opnamen beschikbaar."}).forEach(([locale,text]) => { DICT[locale].natureNoApproved = text; });
 
+// Shared save-failure text in the existing interface dictionaries; never persisted.
+Object.entries({
+  "en": "Could not save changes. Try again.",
+  "ar": "تعذّر حفظ التغييرات. حاول مجددًا.",
+  "es": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+  "zh": "无法保存更改，请重试。",
+  "hi": "बदलाव सहेजे नहीं जा सके। फिर कोशिश करें।",
+  "fr": "Impossible d’enregistrer les modifications. Réessayez.",
+  "de": "Die Änderungen konnten nicht gespeichert werden. Bitte erneut versuchen.",
+  "ru": "Не удалось сохранить изменения. Повторите попытку.",
+  "pt": "Não foi possível salvar as alterações. Tente novamente.",
+  "ja": "変更を保存できませんでした。もう一度お試しください。",
+  "id": "Perubahan tidak dapat disimpan. Coba lagi.",
+  "tr": "Değişiklikler kaydedilemedi. Yeniden deneyin.",
+  "ko": "변경 사항을 저장하지 못했습니다. 다시 시도해 주세요.",
+  "vi": "Không thể lưu thay đổi. Vui lòng thử lại.",
+  "it": "Impossibile salvare le modifiche. Riprova.",
+  "bn": "পরিবর্তনগুলি সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।",
+  "ur": "تبدیلیاں محفوظ نہیں ہو سکیں۔ دوبارہ کوشش کریں۔",
+  "fa": "ذخیرهٔ تغییرات ممکن نشد. دوباره تلاش کنید.",
+  "pl": "Nie udało się zapisać zmian. Spróbuj ponownie.",
+  "nl": "De wijzigingen konden niet worden opgeslagen. Probeer het opnieuw."
+}).forEach(([locale,text]) => { DICT[locale].saveFailed = text; });
+
 let todayISO = localDateISO();
 function escapeHtmlText(value) {
   return String(value === null || value === undefined ? '' : value)
@@ -378,6 +402,39 @@ function computeActualStreak(history, now = new Date()) {
 
 function syncDailyRollover() {
   const current = localDateISO();
+  const entries = acceptedFocusHistory(cfg.sessionHistory);
+  // An unavailable optional analytics module must never erase cached values.
+  if (entries) {
+    const next = JSON.parse(JSON.stringify(cfg));
+    if (next.metricsDate && next.metricsDate !== current) {
+      next.todayMins = entries
+        .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
+        .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
+      next.water = 0;
+      next.sets = 0;
+      next.pagesRead = 0;
+      next.quickFocusRemainderSec = 0;
+    }
+    next.metricsDate = current;
+    next.streak = computeActualStreak(next.sessionHistory);
+    if (JSON.stringify(next) !== JSON.stringify(cfg)) {
+      try {
+        if (window.DF22Integration) {
+          const before = window.DF22Integration.getSnapshot();
+          if (window.DF22Integration.write(before, {...before,cfg:next}) !== true)
+            throw new Error('ROLLOVER_SAVE_NOT_VERIFIED');
+        } else {
+          if (saveFortressData('zen_fortress_cfg_v21', next) !== true)
+            throw new Error('ROLLOVER_SAVE_NOT_VERIFIED');
+          cfg = next;
+        }
+      } catch (_) {
+        showToast(L().saveFailed);
+        return false;
+      }
+    }
+  }
+  // Date controls advance only after the daily snapshot has been acknowledged.
   if (todayISO !== current) {
     const previousDate = todayISO;
     todayISO = current;
@@ -389,21 +446,7 @@ function syncDailyRollover() {
       calMonth = new Date().getMonth();
     }
   }
-  const entries = acceptedFocusHistory(cfg.sessionHistory);
-  // A missing optional script cannot reset persistent cached metrics to a false zero.
-  if (!entries) return;
-  if (cfg.metricsDate && cfg.metricsDate !== current) {
-    cfg.todayMins = entries
-      .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
-      .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
-    cfg.water = 0;
-    cfg.sets = 0;
-    cfg.pagesRead = 0;
-    cfg.quickFocusRemainderSec = 0;
-  }
-  cfg.metricsDate = current;
-  cfg.streak = computeActualStreak(cfg.sessionHistory);
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  return true;
 }
 
 function L() {
