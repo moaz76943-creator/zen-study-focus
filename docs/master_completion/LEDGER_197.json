@@ -1690,13 +1690,15 @@
         "android/app/src/main/assets/web/notes_studio.js",
         "android/app/src/main/java/com/zenstudy/focus/MainActivity.java",
         "android/app/src/main/java/com/zenstudy/focus/NativeDocumentWriter.java",
-        "android/app/src/main/assets/web/tasks_studio.js"
+        "android/app/src/main/assets/web/tasks_studio.js",
+        "tests/df4_browser/completion.cjs"
       ],
       "COMMIT_SHA": [
         "0b12c8ced88a53c7668ded4db7d1400f8cbca2b4",
         "ff7d7d43f874d2bdde9cfee09cece4f7d3827933",
         "9f50acf516600a644b4c918053dfd2edf3d61e51",
-        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc"
+        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
+        "824d87a0f801361761b14921f59571fbb590e4df"
       ],
       "TEST_COMMAND": [
         "node --test tests/notes_recovery/draft_guard.test.cjs tests/notes_ui/drafts.test.cjs",
@@ -1723,7 +1725,10 @@
         "command": "node --test --test-reporter=tap tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs",
         "scope": "37 task tests: false-ack rejection, retained input, unchanged-refresh Undo, external credit invalidation, 1001 rows searchable with bounded DOM",
         "android_result": "NOT_TESTED",
-        "device_result": "DEVICE_NOT_TESTED"
+        "device_result": "DEVICE_NOT_TESTED",
+        "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df",
+        "browser_result": "PASS",
+        "browser_scope": "26 Chromium checks including actual task Undo after 10 tab returns and actual journal-quota failure retaining form"
       }
     },
     {
@@ -2478,10 +2483,12 @@
       "PREVIOUS_STATUS": "IN_PROGRESS",
       "CURRENT_STATUS": "IN_PROGRESS",
       "FILES_CHANGED": [
-        "android/app/src/main/assets/web/tasks_studio.js"
+        "android/app/src/main/assets/web/tasks_studio.js",
+        "tests/df4_browser/completion.cjs"
       ],
       "COMMIT_SHA": [
-        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc"
+        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
+        "824d87a0f801361761b14921f59571fbb590e4df"
       ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
@@ -2502,7 +2509,10 @@
         "command": "node --test --test-reporter=tap tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs",
         "scope": "37 task tests: false-ack rejection, retained input, unchanged-refresh Undo, external credit invalidation, 1001 rows searchable with bounded DOM",
         "android_result": "NOT_TESTED",
-        "device_result": "DEVICE_NOT_TESTED"
+        "device_result": "DEVICE_NOT_TESTED",
+        "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df",
+        "browser_result": "PASS",
+        "browser_scope": "26 Chromium checks including actual task Undo after 10 tab returns and actual journal-quota failure retaining form"
       }
     },
     {
@@ -2788,10 +2798,12 @@
       "PREVIOUS_STATUS": "SOURCE_TESTED_PARTIAL",
       "CURRENT_STATUS": "BLOCKED",
       "FILES_CHANGED": [
-        "android/app/src/main/assets/web/tasks_studio.js"
+        "android/app/src/main/assets/web/tasks_studio.js",
+        "tests/df4_browser/completion.cjs"
       ],
       "COMMIT_SHA": [
-        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc"
+        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
+        "824d87a0f801361761b14921f59571fbb590e4df"
       ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
@@ -2812,7 +2824,10 @@
         "command": "node --test --test-reporter=tap tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs",
         "scope": "37 task tests: false-ack rejection, retained input, unchanged-refresh Undo, external credit invalidation, 1001 rows searchable with bounded DOM",
         "android_result": "NOT_TESTED",
-        "device_result": "DEVICE_NOT_TESTED"
+        "device_result": "DEVICE_NOT_TESTED",
+        "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df",
+        "browser_result": "PASS",
+        "browser_scope": "26 Chromium checks including actual task Undo after 10 tab returns and actual journal-quota failure retaining form"
       }
     },
     {
@@ -4134,10 +4149,12 @@
       "PREVIOUS_STATUS": "NOT_RECORDED_AS_A_FORMAL_DF4_STATUS",
       "CURRENT_STATUS": "IN_PROGRESS",
       "FILES_CHANGED": [
-        "android/app/src/main/assets/web/tasks_studio.js"
+        "android/app/src/main/assets/web/tasks_studio.js",
+        "tests/df4_browser/completion.cjs"
       ],
       "COMMIT_SHA": [
-        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc"
+        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
+        "824d87a0f801361761b14921f59571fbb590e4df"
       ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
@@ -4158,7 +4175,10 @@
         "command": "node --test --test-reporter=tap tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs",
         "scope": "37 task tests: false-ack rejection, retained input, unchanged-refresh Undo, external credit invalidation, 1001 rows searchable with bounded DOM",
         "android_result": "NOT_TESTED",
-        "device_result": "DEVICE_NOT_TESTED"
+        "device_result": "DEVICE_NOT_TESTED",
+        "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df",
+        "browser_result": "PASS",
+        "browser_scope": "26 Chromium checks including actual task Undo after 10 tab returns and actual journal-quota failure retaining form"
       }
     },
     {
@@ -4401,10 +4421,12 @@
       "PREVIOUS_STATUS": "NOT_RECORDED_AS_A_FORMAL_DF4_STATUS",
       "CURRENT_STATUS": "IN_PROGRESS",
       "FILES_CHANGED": [
-        "android/app/src/main/assets/web/tasks_studio.js"
+        "android/app/src/main/assets/web/tasks_studio.js",
+        "tests/df4_browser/completion.cjs"
       ],
       "COMMIT_SHA": [
-        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc"
+        "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
+        "824d87a0f801361761b14921f59571fbb590e4df"
       ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
@@ -4425,7 +4447,10 @@
         "command": "node --test --test-reporter=tap tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs",
         "scope": "37 task tests: false-ack rejection, retained input, unchanged-refresh Undo, external credit invalidation, 1001 rows searchable with bounded DOM",
         "android_result": "NOT_TESTED",
-        "device_result": "DEVICE_NOT_TESTED"
+        "device_result": "DEVICE_NOT_TESTED",
+        "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df",
+        "browser_result": "PASS",
+        "browser_scope": "26 Chromium checks including actual task Undo after 10 tab returns and actual journal-quota failure retaining form"
       }
     },
     {
@@ -4599,6 +4624,7 @@
     "device_status": "DEVICE_NOT_TESTED",
     "task_code_commit": "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
     "android_harness_commit": "4a688d58ed8e83977150cf8ad7e590bc4baf4868",
-    "note": "Historical task status and Android observations retained. Candidate API30 had 13 scoped PASS and 7 NOT_TESTED, not full Android acceptance. New repair Android results pending."
+    "note": "Earlier 79d175c APK is intentionally superseded after real browser task Undo exposed top-level snapshot key-order mismatch. New exact-head CI/Android required; historical successes do not approve this code.",
+    "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df"
   }
 }
