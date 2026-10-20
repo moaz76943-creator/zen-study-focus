@@ -92,5 +92,33 @@
       release:'NOT_APPROVED',
       recent,errors:errors.map(x=>String(x).slice(0,180)),timestamp};
   }
-  return {REPO,safeSha,trustedGitHubUrl,ciStatus,buildRepoHealth};
+  function formatHealthReport(model){
+    if(!model||typeof model!=='object')throw Error('Repository report unavailable');
+    const one=(n,p)=>'PR #'+n+': '+(p?.sha||'NOT_VERIFIED')+
+      ' | GitHub CI: '+(p?.ci?.status||'NOT_VERIFIED')+
+      ' | '+(p?.draft?'DRAFT':'NOT_VERIFIED');
+    const lines=[
+      'DEEP FOCUS CONTROL CENTER — REVIEW ONLY',
+      'Checked at: '+(model.timestamp||'NOT_VERIFIED'),
+      'LIVE GitHub source: '+(model.verified&&model.pr72Verified?'COMPLETE':'PARTIAL / NOT_VERIFIED'),
+      one(25,model.pr25),one(37,model.pr37),
+      one(70,model.pr70),one(72,model.pr72),
+      'PR #37 / PR #25 base drift: '+(model.drift||'NOT_VERIFIED'),
+      'PR #72 / PR #37 base drift: '+(model.dashboardDrift||'NOT_VERIFIED'),
+      'Android Workflow: '+(model.androidWorkflow?.status||'NOT_VERIFIED')+
+        ' (GitHub CI only, not on-device cases)',
+      'Android SNAPSHOT: '+(model.android?.status||'NOT_VERIFIED')+
+        ' | recorded HEAD '+(model.android?.sha||'NOT_VERIFIED'),
+      'Focused Android recorded: '+(model.android?.status==='SOURCE_REPORTED'?
+        '3 PASS / 0 FAIL / 17 NOT_TESTED':'STALE or NOT_VERIFIED'),
+      'Android physical device: NOT_TESTED',
+      'Localization SNAPSHOT: 4608 historic source gaps / 20 languages; NOT A LIVE SCAN',
+      'Nature audio SNAPSHOT: 1 PASS / 2 FAIL; licensing/listening still blocked',
+      'Security: NOT_VERIFIED',
+      'RELEASE: NOT_APPROVED',
+      'No auto-merge, credential sharing or production deployment.'
+    ];
+    return lines.join('\n').slice(0,9800);
+  }
+  return {REPO,safeSha,trustedGitHubUrl,ciStatus,buildRepoHealth,formatHealthReport};
 });
