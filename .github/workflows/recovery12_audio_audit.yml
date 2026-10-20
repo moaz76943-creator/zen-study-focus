@@ -1,0 +1,47 @@
+name: Recovery12 licensed-source audio forensics
+on:
+  pull_request:
+    branches: [integration/deep-focus-recovery-00-final-20261019]
+    paths:
+      - 'audio_candidates/recovery12/**'
+      - 'tests/audio_acquisition_12/**'
+      - '.github/workflows/recovery12_audio_audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-quarantined-sounds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install distro ffmpeg if runner omits it
+        shell: bash
+        run: |
+          if ! command -v ffprobe >/dev/null || ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          fi
+          ffprobe -version
+          ffmpeg -version
+      - name: Test three retained binaries, rejected metadata and provenance blockers
+        run: node --test tests/audio_acquisition_12/*.test.cjs
+      - name: Decode three retained clips; report measured audio properties
+        run: node tests/audio_acquisition_12/audit_candidates.cjs --integrity > audio_candidates/recovery12/qa_ci_report.json
+      - name: Summarize measured audio for review
+        run: |
+          node -e 'const d=require("./audio_candidates/recovery12/qa_ci_report.json");for(const e of d.entries){console.log(JSON.stringify({id:e.id,bytes:e.bytes,sha256:e.sha256,codec:e.probe?.streams?.[0]?.codec_name,duration_seconds:e.probe?.format?.duration,peak_dbfs:e.signal?.peak_dbfs,rms_dbfs:e.signal?.rms_dbfs,clipped_samples:e.signal?.clipped_samples,large_jumps:e.signal?.sample_jumps_over_0_6,loop_edge_discontinuity:e.signal?.loop_edge_discontinuity,warnings:e.warnings,integrity_pass:e.integrity_pass}));}'
+      - name: Negative release gate must fail for unapproved candidates
+        shell: bash
+        run: |
+          if node tests/audio_acquisition_12/audit_candidates.cjs --release > /dev/null; then
+            echo "::error::Unauthorized audio approval"
+            exit 1
+          fi
+          echo "Expected: runtime release blocked"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recovery12-licensed-source-oggs-forensic-qa
+          path: audio_candidates/recovery12/qa_ci_report.json
+          if-no-files-found: warn
