@@ -10,7 +10,8 @@ const app=fs.readFileSync(path.resolve(__dirname,'../../android/app/src/main/ass
 const integration=fs.readFileSync(path.resolve(__dirname,'../../android/app/src/main/assets/web/integration_v22.js'),'utf8');
 
 test('P0 WebView host replaces raw browser-native dialogs for ALL synchronous JS dialog types',()=>{
- assert.match(j,/setWebChromeClient\(new FocusAppWebChromeClient\(this\)\)/);
+ assert.match(j,/appDialogs\s*=\s*new FocusAppWebChromeClient\(this\)/);
+ assert.match(j,/setWebChromeClient\(appDialogs\)/);
  for(const method of ['onJsConfirm','onJsAlert','onJsPrompt']){
   assert.match(source,new RegExp('boolean\\s+'+method+'\\s*\\('),method);
  }
@@ -20,7 +21,7 @@ test('P0 WebView host replaces raw browser-native dialogs for ALL synchronous JS
 });
 test('native dialog host must return complete JS results, Cancel/Back is never implicit confirmation',()=>{
  assert.match(source,/result\.confirm\(\)/,'confirm/alert accepted');
- assert.match(source,/result\.confirm\(.*\.toString\(\)\)/,'prompt accepted text preserved');
+ assert.match(source,/\(\(JsPromptResult\) result\)\.confirm\(input\.getText\(\)\.toString\(\)\)/,'prompt accepted text preserved');
  assert.match(source,/result\.cancel\(\)/,'cancel/back never approves destructive operations');
  assert.match(source,/setNegativeButton\(android\.R\.string\.cancel/);
  assert.match(source,/setOnCancelListener\(/);
