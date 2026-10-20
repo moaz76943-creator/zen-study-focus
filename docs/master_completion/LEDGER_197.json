@@ -2543,7 +2543,7 @@
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
-      "NEXT_ACTION": "Integrate an acknowledged native durability/recovery path preserving existing v21 packets, IDs, unknown fields and journal semantics; verify immediate force-stop without added delays.",
+      "NEXT_ACTION": "Capture both primary/mirror packet signatures, timestamps and task states before/after immediate force-stop; distinguish stale-copy selection from lost persistence before implementing a compatible native durability/recovery path.",
       "OWNER_ROLE": "Android engineer and data-integrity architect",
       "ANDROID_DURABILITY_FAILURE": {
         "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
@@ -2832,7 +2832,7 @@
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
-      "NEXT_ACTION": "Integrate an acknowledged native durability/recovery path preserving existing v21 packets, IDs, unknown fields and journal semantics; verify immediate force-stop without added delays.",
+      "NEXT_ACTION": "Capture both primary/mirror packet signatures, timestamps and task states before/after immediate force-stop; distinguish stale-copy selection from lost persistence before implementing a compatible native durability/recovery path.",
       "OWNER_ROLE": "Android engineer and data-integrity architect",
       "PHASE1_SOURCE_EVIDENCE": {
         "base_sha": "bd6e3e4d8aef95def871c9e7f78c63807e681369",
@@ -4197,7 +4197,7 @@
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
-      "NEXT_ACTION": "Integrate an acknowledged native durability/recovery path preserving existing v21 packets, IDs, unknown fields and journal semantics; verify immediate force-stop without added delays.",
+      "NEXT_ACTION": "Capture both primary/mirror packet signatures, timestamps and task states before/after immediate force-stop; distinguish stale-copy selection from lost persistence before implementing a compatible native durability/recovery path.",
       "OWNER_ROLE": "Android engineer and data-integrity architect",
       "PHASE1_SOURCE_EVIDENCE": {
         "base_sha": "bd6e3e4d8aef95def871c9e7f78c63807e681369",
@@ -4457,7 +4457,7 @@
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
-      "NEXT_ACTION": "Integrate an acknowledged native durability/recovery path preserving existing v21 packets, IDs, unknown fields and journal semantics; verify immediate force-stop without added delays.",
+      "NEXT_ACTION": "Capture both primary/mirror packet signatures, timestamps and task states before/after immediate force-stop; distinguish stale-copy selection from lost persistence before implementing a compatible native durability/recovery path.",
       "OWNER_ROLE": "Android engineer and data-integrity architect",
       "ROLLOVER_EVIDENCE": {
         "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",

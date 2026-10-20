@@ -26,4 +26,11 @@ function classifyFailure(error){
  if(error?.code==='ERR_ASSERTION'||/^(UI_|APP_RUNTIME:)/.test(message))return 'FAIL_APP';
  return 'FAIL_TEST_INFRA';
 }
-module.exports={validateTouchTarget,missingPrerequisites,classifyFailure};
+function selectCases(value,known){
+ if(!value||!value.trim())return null;
+ const ids=value.split(',').map(x=>x.trim());
+ if(ids.some(id=>!known.includes(id)))throw new Error('Unknown Android case selection');
+ if(new Set(ids).size!==ids.length)throw new Error('Duplicate Android case selection');
+ return new Set(ids);
+}
+module.exports={validateTouchTarget,missingPrerequisites,classifyFailure,selectCases};

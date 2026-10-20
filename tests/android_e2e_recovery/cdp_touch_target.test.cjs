@@ -34,3 +34,10 @@ test('failure cause distinguishes app assertions, protocol rejection, unmet prer
  assert.equal(classifyFailure(new Error('TEST_EVALUATION: injected expression failed')),'FAIL_TEST_INFRA');
  assert.equal(classifyFailure(new Error('unclassified runner failure')),'FAIL_TEST_INFRA');
 });
+test('focused diagnostics keep the full case registry and reject unknown or duplicate selections',()=>{
+ const {selectCases}=require('./cdp_touch_target.cjs'),known=['preflight','tasks_create','task_subtasks'];
+ assert.equal(selectCases('',known),null);
+ assert.deepEqual([...selectCases('preflight, tasks_create,task_subtasks',known)],known);
+ assert.throws(()=>selectCases('not_a_case',known),/Unknown/);
+ assert.throws(()=>selectCases('preflight,preflight',known),/Duplicate/);
+});
