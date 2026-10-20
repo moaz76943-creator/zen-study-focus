@@ -1,0 +1,32 @@
+name: Track 07-05 Analytics screen independent verification
+on:
+  push:
+    branches: [fix/track07-05-analytics-screen-l10n-ux-20261020]
+permissions:
+  contents: read
+concurrency:
+  group: track07-analytics-ui-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  analytics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Analytics 20-language screen regression tests
+        run: |
+          node --test tests/track07_functional/analytics_screen_20_locales.test.cjs tests/track07_functional/analytics_date_guard.test.cjs
+      - name: All source Node regressions and syntax
+        run: |
+          node --check android/app/src/main/assets/web/analytics_studio.js
+          node --check android/app/src/main/assets/web/localization_20_recovery.js
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          node --test --test-reporter=tap "${suites[@]}"
+        shell: bash
+      - name: Python source regressions
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
