@@ -35,3 +35,9 @@ test('original seven destinations and real focus timer remain; no Meditation des
   assert.match(css(), /#navTimer[\s\S]*?grid-column:\s*4/);
   assert.match(css(), /#navTraining[\s\S]*?grid-column:\s*5/);
 });
+
+test('existing v22 integration includes the opt-in White Premium stylesheet and body class', () => {
+  const integration = fs.readFileSync(path.join(root, 'integration_v22.js'), 'utf8');
+  assert.match(integration, /classList\.add\('df-v22','df-recovery10'\)/);
+  assert.match(html(), /href="design_recovery\/white_premium_recovery10\.css"/);
+});
