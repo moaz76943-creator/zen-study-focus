@@ -22,11 +22,20 @@ test('source refs are bounded; no uncontrolled dynamic selection of older releas
 test('new agents cannot silently pass when checkout or test results fail',()=>{
  assert.match(yaml,/continue-on-error: true/);
  assert.match(yaml,/if: steps\.cohort\.outcome != 'success'/);
- assert.match(yaml,/NOT_TESTED: source checkout or audit failed/);
+ assert.match(yaml,/NOT_VERIFIED: current source\/cohort evidence failed/);
  assert.match(yaml,/deep-focus-hourly-agent-evidence/);
 });
 test('coordination uses the same concurrency lock as the deep QA runner',()=>{
  const daily=fs.readFileSync(path.join(root,'.github/workflows/daily_maintenance.yml'),'utf8');
  assert.match(yaml,/group: deep-focus-daily-maintenance/);
  assert.match(daily,/group: deep-focus-daily-maintenance/);
+});
+
+test('one GitHub issue accumulates SHA-bound hourly specialist outcomes without granting source write',()=>{
+ assert.match(yaml,/REPORT_JSON:/);
+ assert.match(yaml,/cohort_ledger\.cjs/);
+ assert.match(yaml,/parseIssueLedger\(old\?\.body\)/);
+ assert.match(yaml,/ledger\.aggregate\(previous, report\)/);
+ assert.match(yaml,/ledger\.serialize\(state\)/);
+ assert.doesNotMatch(yaml,/contents: write/);
 });
