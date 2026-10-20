@@ -6,7 +6,7 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const ROOT=path.resolve(__dirname,'../..');
 const HTML='docs/control-center/index.html';
 const DIR='docs/control-center';
-const SCRIPTS=['control-center.js','studio-core.js','studio.js','v3-core.js','v3-ui.js','planner-core.js','planner-ui.js'];
+const SCRIPTS=['control-center.js','studio-core.js','studio.js','v3-core.js','v3-ui.js','planner-core.js','planner-ui.js','repo-sync-core.js','repo-sync-ui.js'];
 const STYLES=['control-center.css','v3.css'];
 const sha=x=>"'sha256-"+crypto.createHash('sha256').update(x,'utf8').digest('base64')+"'";
 function read(root,file){
@@ -20,7 +20,7 @@ function buildPortable(root=ROOT,overrideHTML){
   let html=raw;
   const scripts=[...raw.matchAll(/<script\b[^>]*>/gi)];
   if(scripts.length!==SCRIPTS.length||/<script\b(?![^>]*\bsrc=["']\.\/[^"']+["'])/i.test(raw))
-    throw Error('HTML may only reference the seven known local scripts');
+    throw Error('HTML may only reference the nine known local scripts');
   const sheets=[...raw.matchAll(/<link\b[^>]*\brel="stylesheet"[^>]*>/gi)];
   if(sheets.length!==STYLES.length)throw Error('Unknown stylesheet added to the dashboard');
   const styleBlocks=[];
