@@ -141,23 +141,26 @@ function rebalance(){
     const card=a.closest('.clip');
     card.querySelector('[data-play]').textContent=a.paused?'Play / تشغيل':'Pause / إيقاف مؤقت';
     card.querySelector('[data-play]').setAttribute('aria-pressed',String(!a.paused));
-    if(!a.error)card.querySelector('[data-track-status]').textContent=a.paused?'Stopped / متوقف':'Playing / يعمل';
+    card.querySelector('[data-track-status]').textContent=(a._qaFailure||a.error)?'Playback failed / تعذر التشغيل':
+      a.paused?(a.currentTime>0?'Paused / إيقاف مؤقت':'Stopped / متوقف'):'Playing / يعمل';
   });
   document.getElementById('status').textContent=active.length+' active · Combined gain ≤ 80%';
 }
-function stopAllAudio(){clips.forEach(a=>{a._qaEpoch=(a._qaEpoch||0)+1;a.pause();a.currentTime=0});rebalance();}
+function stopAllAudio(){clips.forEach(a=>{a._qaEpoch=(a._qaEpoch||0)+1;a._qaFailure=false;a.pause();a.currentTime=0});rebalance();}
 for(let i=0;i<clips.length;i++){
   const a=clips[i],card=a.closest('.clip');
   a._qaEpoch=0;
+  a._qaFailure=false;
   a.dataset.originalSrc=a.getAttribute('src');
   a.volume=0;
   card.querySelector('[data-play]').addEventListener('click',async()=>{
     const epoch=++a._qaEpoch;
-    if(!a.paused){a.pause();return;}
-    try{await a.play();}catch(error){if(epoch===a._qaEpoch)card.querySelector('[data-track-status]').textContent='Playback failed / تعذر التشغيل';}
+    if(!a.paused){a.pause();rebalance();return;}
+    a._qaFailure=false;
+    try{await a.play();}catch(error){if(epoch===a._qaEpoch){a._qaFailure=true;rebalance();}}
   });
-  card.querySelector('[data-stop]').addEventListener('click',()=>{a._qaEpoch++;a.pause();a.currentTime=0;rebalance();});
-  a.addEventListener('error',()=>{card.querySelector('[data-track-status]').textContent='Playback failed / تعذر التشغيل';});
+  card.querySelector('[data-stop]').addEventListener('click',()=>{a._qaEpoch++;a._qaFailure=false;a.pause();a.currentTime=0;rebalance();});
+  a.addEventListener('error',()=>{a._qaFailure=true;rebalance();});
   clips[i].addEventListener('play',rebalance);
   clips[i].addEventListener('pause',rebalance);
   clips[i].addEventListener('ended',rebalance);

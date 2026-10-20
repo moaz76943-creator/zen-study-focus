@@ -91,6 +91,13 @@ async function main(){
     const observed=await evalJs(`(()=>{const a=document.querySelectorAll('audio')[${i}];return {id:a.dataset.id,time:a.currentTime,paused:a.paused,error:a.error?.code??null,src:a.currentSrc};})()`);
     assert.ok(!observed.paused&&observed.time>.25&&!observed.error,'Original did not decode/play: '+observed.id);
     originals.push(observed);
+    if(i===0){
+      await tap('[data-testing="current"] [data-play]');
+      assert.ok(await evalJs(`(()=>{const c=document.querySelector('[data-testing="current"]');return c.querySelector('audio').paused&&c.querySelector('[data-track-status]').textContent.includes('Paused');})()`),'Pause button state is misleading');
+      await tap('[data-testing="current"] [data-play]');
+      await sleep(300);
+      assert.ok(await evalJs(`(()=>{const c=document.querySelector('[data-testing="current"]');return !c.querySelector('audio').paused&&c.querySelector('[data-track-status]').textContent.includes('Playing');})()`),'Resume did not restore playing state');
+    }
     await tap('[data-testing="current"] [data-stop]');
     const stopped=await evalJs(`(()=>{const a=document.querySelectorAll('audio')[${i}];return a.paused&&a.currentTime===0})()`);
     assert.ok(stopped,'Stop button did not stop/reset actual track');
@@ -144,7 +151,20 @@ async function main(){
   await tap('button[onclick="stopAllAudio()"]');
   assert.ok(await evalJs(`[...document.querySelectorAll('audio')].every(a=>a.paused&&a.currentTime===0)`));
   assert.deepEqual(await evalJs('audioQaErrors'),[]);
+  // Deterministic play-promise failure injection is not real decoder-failure proof.
+  await evalJs(`(()=>{const a=document.querySelector('audio');a._qaRealPlay=a.play;a.play=()=>Promise.reject(new Error('Injected play rejection'));})()`);
+  await tap('.clip[data-playable] [data-play]');
+  assert.ok(await evalJs(`document.querySelector('[data-track-status]').textContent.includes('failed')`),'Injected failure not shown');
+  await evalJs(`(()=>{const m=document.getElementById('master-volume');m.value=40;m.dispatchEvent(new Event('input'));})()`);
+  assert.ok(await evalJs(`document.querySelector('[data-track-status]').textContent.includes('failed')`),'Master update hid unresolved playback failure');
+  await evalJs(`(()=>{const a=document.querySelector('audio');a.play=a._qaRealPlay;})()`);
+  await tap('.clip[data-playable] [data-play]');
+  await sleep(1100);
+  assert.ok(await evalJs(`(()=>{const a=document.querySelector('audio');return !a.paused&&a.currentTime>.25&&document.querySelector('[data-track-status]').textContent.includes('Playing');})()`),'Actual retry failed to recover playback state');
+  await tap('.clip[data-playable] [data-stop]');
+  assert.ok(await evalJs(`document.querySelector('[data-track-status]').textContent.includes('Stopped')`),'Stop did not reset playback state');
   const result={status:'ANDROID_AUDIO_QA_ALL_ORIGINALS_LOOPS_CONTROLS_PASS',state,originals,loops,mix,traces,
+    playbackStateControls:{pause:true,resume:true,stop:true,injectedFailureRetained:true,actualRetryRecovered:true},
     endurance:{seconds:(performance.now()-started)/1000,requested:enduranceSeconds,checkpoints,status:enduranceSeconds===1800?'PASS':'NOT_TESTED'},
     scope:'Muted decode/progression and real ADB button delivery; not human audio or seamless-listening approval',
     background:'NOT_TESTED',lockedScreen:'NOT_TESTED',bluetooth:'NOT_TESTED',physicalDevice:'DEVICE_NOT_TESTED',approved_for_release:false};

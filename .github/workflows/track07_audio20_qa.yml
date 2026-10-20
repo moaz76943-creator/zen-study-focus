@@ -71,9 +71,9 @@ jobs:
           retention-days: 7
 
   audioqa:
-    name: Build and emulator-test isolated requested20-candidate Android APK
+    name: Build and emulator-test isolated requested20-candidate Android APK (explicit scope)
     needs: authentic20
-    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[audio-qa-apk]')
+    if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[audio-qa-apk]') || contains(github.event.head_commit.message, '[audio-qa-smoke]'))
     runs-on: ubuntu-latest
     timeout-minutes: 55
     steps:
@@ -145,7 +145,9 @@ jobs:
           test -c /dev/kvm
           sudo chown "$(id -u):$(id -g)" /dev/kvm
           sudo chmod u+rw /dev/kvm
-      - name: Prove all eligible originals, loop wraps, ADB controls and real 30-minute mixed decode on API30
+      # UI-only repairs may request smoke; full audio changes retain the 1800s gate.
+      # The runtime records endurance NOT_TESTED at0; smoke cannot claim that gate.
+      - name: Prove all originals, loop wraps and ADB controls on API30 with explicit endurance scope
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
@@ -154,7 +156,7 @@ jobs:
           profile: pixel_6
           emulator-boot-timeout: 600
           disable-animations: true
-          script: bash tests/nature_library_v2/android20_emulator_qa.sh
+          script: AUDIO_QA_ENDURANCE_SECONDS=${{ contains(github.event.head_commit.message, '[audio-qa-apk]') && '1800' || '0' }} bash tests/nature_library_v2/android20_emulator_qa.sh
       - name: Upload real Android audio QA evidence
         if: always()
         uses: actions/upload-artifact@v4

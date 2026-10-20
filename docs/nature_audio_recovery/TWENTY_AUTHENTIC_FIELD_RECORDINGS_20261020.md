@@ -225,3 +225,33 @@ existing app20-language choices/dictionaries were preserved. Main-app integratio
 background/lock/Bluetooth/audio-focus/device acceptance remain open, separately
 from muted emulator decode. Physical device: DEVICE_NOT_TESTED.
 `RELEASE_APPROVED=NO`. Do not merge main or activate candidates from this document.
+
+## Follow-up: retain unresolved playback errors and distinguish pause
+
+A real-browser regression reproduced an unresolved `play()` rejection being
+replaced by `Stopped` when master volume triggered `rebalance()`. This hid the
+failure without retrying playback. Failure is now retained per media element
+through mixer updates and cleared on a new attempt; a successful retry shows
+`Playing`. Pause updates synchronously and displays `Paused`, while Stop resets
+position and displays `Stopped`. Superseded Play→Stop rejections remain ignored.
+The browser suite checks failure retention when another track plays, master
+changes, actual retry recovery, and Pause/Stop state for every original. The
+Android probe adds real ADB pause/resume and injected rejection→master change→
+real ADB retry checks. Failure injection is labelled separately from decoder proof.
+
+No audio bytes, source declarations, loop recipe, mixer gains, primary app asset,
+v21 data or ready/approval flag changed. Local RED evidence:
+`Master-volume update erased an unresolved playback failure`; subsequent real
+20-file/16-layout browser regression PASS. Audio Python25 and focused Node18 PASS.
+
+Change-impact CI: `[audio-qa-apk]` retains the full1800-second endurance path;
+`[audio-qa-smoke]` requests an explicitly scoped Android build/control/loop smoke
+for UI-only changes. Zero-duration endurance remains `NOT_TESTED`, never PASS.
+The reopened-app probe is always a smoke. The earlier exact source
+`61725a4134524010d5c0ef74a25d1fad88ae4767` completed the full20-track1800-second
+foreground muted endurance in run39467938816; that result is not relabelled as
+execution of a newer SHA. Its installed APK SHA256 is
+`5ac5a9ded4670df4b268cc571c9554f4034a2f9332eb9370efc9204d221bcc49`.
+New-head Android results must be read from its own run. Human listening,
+background/locked/Bluetooth, physical device and main-app activation remain open.
+`RELEASE_APPROVED=NO`.

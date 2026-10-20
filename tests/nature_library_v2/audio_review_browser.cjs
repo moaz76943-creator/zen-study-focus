@@ -32,7 +32,9 @@ const assert=require('node:assert/strict');
    await page.waitForFunction(i=>{const a=document.querySelectorAll('audio')[i];return !a.paused&&a.currentTime>.2&&!a.error},i,{timeout:12000});
    files.push(await card.locator('audio').evaluate(a=>({id:a.dataset.id,src:a.currentSrc,time:a.currentTime})));
    await card.locator('[data-play]').click();assert.ok(await card.locator('audio').evaluate(a=>a.paused));
+   assert.ok((await card.locator('[data-track-status]').textContent()).includes('Paused'),'Pause was mislabeled as Stop');
    await card.locator('[data-stop]').click();assert.ok(await card.locator('audio').evaluate(a=>a.paused&&a.currentTime===0));
+   assert.ok((await card.locator('[data-track-status]').textContent()).includes('Stopped'));
   }
   await page.locator('#source-mode').selectOption('loop');
   assert.ok(await page.locator('audio').evaluateAll(all=>all.every(a=>a.src.includes('/loops/')&&a.paused)));
@@ -54,9 +56,23 @@ const assert=require('node:assert/strict');
   });
   assert.ok(cancellation.paused);assert.deepEqual(cancellation.changes,[],'Intentional rapid Stop was mislabeled as play failure');
   // Reject play() deterministically; this is failure injection, not playback proof.
-  await page.locator('audio').first().evaluate(a=>{a.play=()=>Promise.reject(new Error('Injected play rejection'));});
+  await page.locator('audio').first().evaluate(a=>{a._qaRealPlay=a.play;a.play=()=>Promise.reject(new Error('Injected play rejection'));});
   await page.locator('[data-play]').first().click();
   await page.waitForFunction(()=>document.querySelector('[data-track-status]').textContent.includes('failed'));
+  // Unrelated mixer updates must not erase a real play() failure.
+  await page.locator('#master-volume').fill('40');
+  await page.locator('#master-volume').dispatchEvent('input');
+  assert.ok(await page.locator('[data-track-status]').first().textContent().then(t=>t.includes('failed')),
+   'Master-volume update erased an unresolved playback failure');
+  // Another track changing state must not hide this track's failure either.
+  await page.locator('[data-play]').nth(1).click();
+  await page.waitForFunction(()=>!document.querySelectorAll('audio')[1].paused);
+  assert.ok((await page.locator('[data-track-status]').first().textContent()).includes('failed'));
+  await page.locator('audio').first().evaluate(a=>{a.play=a._qaRealPlay;});
+  await page.locator('[data-play]').first().click();
+  await page.waitForFunction(()=>{const a=document.querySelector('audio');return !a.paused&&a.currentTime>.2});
+  assert.ok((await page.locator('[data-track-status]').first().textContent()).includes('Playing'),'Successful retry did not recover the failure state');
+  await page.locator('button[onclick="stopAllAudio()"]').click();
   await page.screenshot({path:path.join(output,'audio-360-rtl.png')});assert.deepEqual(errors,[]);
   fs.writeFileSync(path.join(output,'results.json'),JSON.stringify({status:'PASS',sha:process.env.GITHUB_SHA||null,offline:!localUrl,layouts,originalPlayback:files,mixCount:3,gain,errors,humanListening:'NOT_TESTED',releaseApproved:false},null,2));
   console.log('AUDIO_REVIEW_BROWSER_PASS',layouts.length,'layouts',files.length,'original recordings; loops/mix/master/rejection controls; not human review');
