@@ -18,7 +18,7 @@ have NOT confirmed an actual 320px clipping failure.
   to root font scaling.
 - Keep existing 7 real controls; Timer fourth, Training fifth, contained nav
   scrolling, 44px touch minimum, direction-specific centering and all handlers.
-- File remains opt-in: **do not activate styling** ahead of 07-09 central review.
+- The stylesheet is already linked by the inherited `index.html` and its `df-recovery10` class is already added by inherited `integration_v22.js` during bootstrap. This PR makes no new activation/binding change; avoid duplicating that existing integration.
 - No `app.js`, `index.html`, global production CSS, data, IDs or Meditation section.
 
 ## Tests and gates
@@ -32,7 +32,7 @@ have NOT confirmed an actual 320px clipping failure.
   Do not claim it passed without a browser execution on exact integrated SHA.
 
 ## HANDOFF_TO_07_09
-Only opt-in CSS, its regression and this report are changed. Current PR #79
+Only already-integrated opt-in CSS, its regression and this report are changed. Current PR #79
 does not claim reviewed 07-06 integration and P0 native fault tests remain open.
 Integrator must compare CSS order/specificity and real Android screen geometry,
 ensure timer visible first and nav 7 taps work, then apply only after durability
