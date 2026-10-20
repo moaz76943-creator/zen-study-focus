@@ -39,3 +39,9 @@ test('native field value is verified before confirmation, with safe cancellation
  assert.deepEqual(parseNativePromptButton(field+'<node resource-id="android:id/button2" bounds="[10,20][110,60]"/>','button2'),{x:60,y:40});
  assert.throws(()=>parseNativePromptButton(field,'arbitrary'),/Unsupported/);
 });
+test('IME-resized Android frame cannot map stale pre-keyboard CSS coordinates into a missed tap',()=>{
+ const frame={left:0,top:63,right:1080,bottom:1533,width:1080,height:1470};
+ const stale={x:348.348,y:233.6667,viewportWidth:412,viewportHeight:843};
+ assert.throws(()=>cssPointToAndroid(stale,frame),/TRANSPORT:.*layout/);
+ assert.deepEqual(cssPointToAndroid({...stale,viewportHeight:560.762},frame),{x:913,y:676});
+});
