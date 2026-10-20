@@ -127,3 +127,13 @@
   #repo-sync,#studio,#tasks,#reports{scroll-margin-top:12px}
 }
 @media(max-width:360px){.mobile-quick-nav a{font-size:10px}.mobile-quick-nav{gap:2px}}
+
+
+/* Small-screen live sync + report actions, dashboard-only. */
+.repo-sync-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.repo-sync-controls .button{min-height:44px;white-space:normal;overflow-wrap:anywhere}
+.repo-sync-controls .button:disabled{opacity:.6;cursor:wait}
+@media(max-width:760px){
+  .repo-sync-controls{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .repo-sync-controls .button{font-size:11px;padding:10px 7px}
+}
