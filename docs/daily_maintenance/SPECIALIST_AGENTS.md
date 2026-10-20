@@ -46,3 +46,6 @@ Use [GitHub Actions](https://github.com/moaz76943-creator/zen-study-focus/action
 The source checkout explicitly uses `persist-credentials: false` so unreviewed tests cannot read a cached push token; `GH_TOKEN` exists only inside the generated-CSS PR proposal step. Its `gh auth setup-git` executes **after** source verification and never during tests.
 
 A source suite only receives `SOURCE_TESTED` when its Node TAP output contains at least one real passing case, no failures, no skipped or TODO cases, and a successful child-process exit. Empty/malformed test output is `NOT_TESTED`; partial coverage is `SOURCE_PARTIAL`, which blocks safe fix proposals. This is still **not** Android E2E evidence.\n
+## No duplicated test work
+
+The scheduled main QA stage executes standalone locale/smoke/CSS and Python checks. The specialist stage runs Node suites once through the 12-agent manifest. Current known Node source folders are explicitly assigned to agents, and any newly added `.test.cjs` folder not in the manifest is reported as `unmapped_tests: NOT_TESTED` instead of silently ignored. The specific media-provenance release test is not treated as a passing unit test: the separate mandatory audit executes it and records `MEDIA_RELEASE_GATE_BLOCKED`. Future test folders need one reviewed manifest mapping; no source code of the app is rewritten automatically.

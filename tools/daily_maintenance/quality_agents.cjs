@@ -6,6 +6,9 @@ const SHA=/^[a-f0-9]{40}$/i;
 const ID=/^[a-z][a-z0-9_-]{1,39}$/;
 const DIR=/^tests\/[a-z][a-z0-9_-]*(?:\/[a-z][a-z0-9_-]*)*$/;
 const LANES=new Set(['all','ui','audio','locale','numerals','analytics','data','qa','performance','notes','tasks','security','timer']);
+// The real-media legal release gate runs separately and MUST remain BLOCKED until licensed.
+// Only this exact test is excluded from source-pass cohorts; do not use wildcards.
+const SEPARATE_RELEASE_TEST='tests/master_recovery_qa/media_provenance_gate.test.cjs';
 function validateManifest(manifest){
  if(!manifest||manifest.schema_version!==1)throw Error('Unsupported agent manifest schema');
  if(!Array.isArray(manifest.agents)||manifest.agents.length===0||manifest.agents.length>30)throw Error('Invalid agents');
@@ -20,14 +23,15 @@ function validateManifest(manifest){
  }
  return manifest.agents;
 }
-function discoverTests(root,dirs){
+function discoverTests(root,dirs,{inventory=false}={}){
  const rootTests=path.resolve(root,'tests');
  const found=new Set();
  function scan(current){
   const st=fs.lstatSync(current);
   if(st.isSymbolicLink())throw Error('Unsafe symlink in QA suite: '+current);
   if(st.isFile()){
-   if(/\.test\.cjs$/.test(current))found.add(path.relative(root,current).split(path.sep).join('/'));
+   const rel=path.relative(root,current).split(path.sep).join('/');
+   if(/\.test\.cjs$/.test(current)&&rel!==SEPARATE_RELEASE_TEST)found.add(rel);
    return;
   }
   if(!st.isDirectory())return;
@@ -38,9 +42,10 @@ function discoverTests(root,dirs){
   }
  }
  for(const dir of dirs){
-  if(!DIR.test(dir))throw Error('Unsafe test_dirs: '+dir);
+  if(!DIR.test(dir)&&!(inventory&&dir==='tests'))throw Error('Unsafe test_dirs: '+dir);
   const resolved=path.resolve(root,dir);
-  if(!resolved.startsWith(rootTests+path.sep))throw Error('Unsafe test_dirs outside tests: '+dir);
+  if(resolved!==rootTests&&!resolved.startsWith(rootTests+path.sep))
+   throw Error('Unsafe test_dirs outside tests: '+dir);
   if(!fs.existsSync(resolved))continue;
   scan(resolved);
  }
@@ -114,7 +119,21 @@ function runAgents(root,manifest,{sourceSha,lane='all',execute=cp.spawnSync}={})
   }catch(e){result.status='BLOCKED';result.reason=String(e.message).slice(0,500);}
   rows.push(result);
  }
+ let unmapped=[];
+ if(lane==='all'){
+  try{
+   const all=discoverTests(root,['tests'],{inventory:true});
+   const mapped=new Set(agents.flatMap(a=>discoverTests(root,a.test_dirs)));
+   unmapped=all.filter(file=>!mapped.has(file));
+  }catch(e){
+   rows.push({id:'suite_inventory',lane:'qa',status:'BLOCKED',tests:0,
+    reason:'Cannot inventory tests: '+String(e.message).slice(0,180)});
+  }
+  if(unmapped.length)rows.push({id:'unmapped_tests',lane:'qa',status:'NOT_TESTED',
+   tests:unmapped.length,reason:'Unassigned test files: '+unmapped.slice(0,8).join(', ')});
+ }
  return {schema_version:1,source_sha:sourceSha,verified_at:new Date().toISOString(),scope:'SOURCE_CODE_ONLY',
+  unmapped_tests:unmapped,separate_release_gate:SEPARATE_RELEASE_TEST,
   device_qa:'NOT_TESTED',production_ready:false,autofix:'DISABLED_FOR_APP_SOURCE',lane,agents:rows};
 }
 function hasHardFailure(report){return report.agents.some(a=>['BLOCKED','NOT_TESTED','SOURCE_PARTIAL'].includes(a.status));}

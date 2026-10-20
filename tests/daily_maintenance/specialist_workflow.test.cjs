@@ -32,3 +32,13 @@ test('source tests cannot read persisted checkout token and only safe repair ste
  assert.match(safe,/gh auth setup-git/);
  assert.doesNotMatch(scope.slice(0,scope.indexOf('      - name: Open PR only for deterministic')),/GH_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}/);
 });
+
+test('all Node source suites are now assigned exactly once by the specialist stage',()=>{
+ const daily=yaml.slice(yaml.indexOf('  daily:'),yaml.indexOf('  weekly-debug:'));
+ assert.match(daily,/All Node source suites run once through 12 manifest-controlled agents/);
+ assert.doesNotMatch(daily,/xargs -0 -r node --test/);
+ assert.match(daily,/quality_agents\.cjs --root source --out/);
+ assert.match(daily,/node --test tests\/master_recovery_qa\/media_provenance_gate\.test\.cjs/);
+ for(const id of ['notes_ui','integration_quality','integration_recovery','quality_center','control_center'])
+  assert.ok(manifest.agents.some(a=>a.test_dirs.includes('tests/'+id)),id);
+});
