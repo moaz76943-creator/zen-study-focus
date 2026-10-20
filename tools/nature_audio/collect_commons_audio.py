@@ -52,6 +52,16 @@ def source_info(filename, declared_license):
         raise ValueError("Original public-domain rights not confirmed by Commons API: " + raw_license)
     return {"sha1": sha1, "bytes": int(info.get("size", 0)), "api_license": raw_license}
 
+def verify_original_bytes(blob, original_sha1, original_sha256):
+    if not SHA1.fullmatch(original_sha1 or "") or not re.fullmatch(r"[a-f0-9]{64}", original_sha256 or ""):
+        raise ValueError("Original SHA1 and SHA256 must both be pinned")
+    if hashlib.sha1(blob).hexdigest() != original_sha1:
+        raise ValueError("Original SHA1 mismatch")
+    if hashlib.sha256(blob).hexdigest() != original_sha256:
+        raise ValueError("Original SHA256 mismatch")
+    return True
+
+
 def run():
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
     if data.get("status") != "RESEARCH_AND_QUARANTINE_ONLY":
@@ -72,8 +82,11 @@ def run():
         if pinned is not None and not SHA1.fullmatch(pinned):
             raise ValueError("Malformed pinned SHA1")
         info = source_info(name, item["license"])
-        if pinned is not None and pinned != info["sha1"]:
-            raise ValueError("Original upstream SHA1 changed for " + name)
+        if pinned is None or not SHA1.fullmatch(pinned) or pinned != info["sha1"]:
+            raise ValueError("Missing or changed pinned original SHA1 for " + name)
+        expected_sha256 = item.get("source_sha256")
+        if not re.fullmatch(r"[a-f0-9]{64}", expected_sha256 or ""):
+            raise ValueError("Missing pinned original SHA256 for " + name)
         url = "https://commons.wikimedia.org/wiki/Special:Redirect/file/" + urllib.parse.quote(name)
         with OPENER.open(urllib.request.Request(url, headers=HEADERS), timeout=60) as response:
             data_chunks, size = [], 0
@@ -88,9 +101,8 @@ def run():
         sound = b"".join(data_chunks)
         if size != info["bytes"] or not sound.startswith(b"OggS") or size < 10000:
             raise ValueError("Download is not original Ogg or size mismatch for " + name)
-        sha1 = hashlib.sha1(sound).hexdigest()
-        if sha1 != info["sha1"] or (pinned is not None and sha1 != pinned):
-            raise ValueError("Original Wikimedia source-byte mismatch " + name)
+        verify_original_bytes(sound, pinned, expected_sha256)
+        sha1 = pinned
         file_path = OUT / name
         file_path.write_bytes(sound)
         probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
