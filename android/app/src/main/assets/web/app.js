@@ -881,10 +881,22 @@ function selectHomeQuickSession(minutes) {
 }
 
 function logWorkoutSet() {
-  cfg.sets = (cfg.sets % 12) + 1;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  const before = cfg.sets;
+  const count = Number(before);
+  cfg.sets = ((Number.isSafeInteger(count) && count >= 0 ? count : 0) % 12) + 1;
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', cfg) !== true)
+      throw new Error('ACTIVITY_SAVE_NOT_VERIFIED');
+  } catch (_) {
+    cfg.sets = before;
+    showToast(cfg.lang === 'ar'
+      ? 'تعذر حفظ مجموعة التدريب. حاول مرة أخرى.'
+      : 'Could not save the workout set. Try again.');
+    return false;
+  }
   syncHeaderMetrics();
   showToast(toWest(`💪 ${L().domSport}: ${cfg.sets}/4`));
+  return true;
 }
 
 function startQuickSportRest(secs) {
@@ -901,10 +913,26 @@ function startQuickSportRest(secs) {
 }
 
 function addReadPages(p) {
-  cfg.pagesRead = (cfg.pagesRead || 0) + p;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  if (!Number.isSafeInteger(p) || p <= 0) return false;
+  const before = cfg.pagesRead;
+  const existing = Number(before);
+  const current = Number.isSafeInteger(existing) && existing >= 0 ? existing : 0;
+  const next = current + p;
+  if (!Number.isSafeInteger(next)) return false;
+  cfg.pagesRead = next;
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', cfg) !== true)
+      throw new Error('ACTIVITY_SAVE_NOT_VERIFIED');
+  } catch (_) {
+    cfg.pagesRead = before;
+    showToast(cfg.lang === 'ar'
+      ? 'تعذر حفظ صفحات القراءة. حاول مرة أخرى.'
+      : 'Could not save reading progress. Try again.');
+    return false;
+  }
   syncHeaderMetrics();
   showToast(toWest(`📖 ${L().domRead}: +${p}`));
+  return true;
 }
 
 const TAB_GRADS = {
