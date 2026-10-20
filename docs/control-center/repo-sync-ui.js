@@ -32,10 +32,10 @@
     }).finally(()=>clearTimeout(timeout));
   }
   function message(text){$('repo-sync-status').textContent=text;}
-  function tile(pr){
+  function tile(pr,number){
     const div=node('article',undefined,'repo-sync-card');
     if(!pr){
-      div.append(node('strong','تعذر التحقق من PR'),node('small','المصدر غير متاح حاليًا'));
+      div.append(node('strong','PR #'+number+' · NOT_VERIFIED'),node('small','تعذر جلب البيانات الحية من GitHub؛ لا يُفترض نجاح أو إمكانية دمج.'));
       return div;
     }
     div.append(node('strong','PR #'+pr.number+(pr.number===25?' · تكامل التطبيق':pr.number===70?' · إصلاح Android P0':pr.number===72?' · تحسينات اللوحة':' · لوحة التحكم')),
@@ -63,7 +63,8 @@
     }
     const state=model.pr70Verified?'LIVE_GITHUB':'NOT_VERIFIED';
     const badgeStyle={SOURCE_REPORTED:'source-reported',STALE:'stale',NOT_VERIFIED:'not-verified',
-      LIVE_GITHUB:'live-github',CURRENT:'live-github',BASE_MOVED:'stale'};
+      LIVE_GITHUB:'live-github',CURRENT:'live-github',BASE_MOVED:'stale',
+      PASS:'pass',FAIL:'fail',RUNNING:'running'};
     const tag=status=>'repo-sync-chip status-'+(badgeStyle[status]||'not-verified');
     const heading=node('div',undefined,'repo-sync-toolbar');
     heading.append(node('strong','TRACK 04 · حالة الاسترداد'),
@@ -109,7 +110,7 @@
   }
   function render(){
     if(!model)return;
-    $('repo-sync-cards').replaceChildren(tile(model.pr25),tile(model.pr37),tile(model.pr70),tile(model.pr72));
+    $('repo-sync-cards').replaceChildren(tile(model.pr25,25),tile(model.pr37,37),tile(model.pr70,70),tile(model.pr72,72));
     renderTrack04();
     const state=$('repo-sync-drift');
     if(!model.verified)state.textContent='تحقق جزئي: لا تعتمد حالة الدمج أو نتائج CI قبل استعادة الاتصال بالمصادر.';
