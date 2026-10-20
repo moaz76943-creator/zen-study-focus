@@ -110,3 +110,13 @@ test('media license gate remains excluded from source-green cohorts without losi
  fs.writeFileSync(path.join(root,'tests/master_recovery_qa/source_contracts.test.cjs'),'');
  assert.deepEqual(q.discoverTests(root,['tests/master_recovery_qa']),['tests/master_recovery_qa/source_contracts.test.cjs']);
  assert.throws(()=>q.discoverTests(root,['tests']),/Unsafe test_dirs/);}));
+
+test('suite inventory failure adds a BLOCKED agent instead of crashing',()=>fixture(root=>{
+ fs.mkdirSync(path.join(root,'tests/localization_20'),{recursive:true});
+ fs.symlinkSync(os.tmpdir(),path.join(root,'tests/escape'));
+ const report=q.runAgents(root,good,{sourceSha:'f'.repeat(40),lane:'all',execute:()=>({status:0,stdout:''})});
+ const inventory=report.agents.find(a=>a.id==='suite_inventory');
+ assert.ok(inventory);
+ assert.equal(inventory.status,'BLOCKED');
+ assert.match(inventory.reason,/Cannot inventory tests/);
+}));
