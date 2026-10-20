@@ -103,11 +103,10 @@ test('source inventory makes newly added unassigned tests an explicit NOT_TESTED
  assert.deepEqual(report.unmapped_tests,['tests/new_screen/check.test.cjs']);
  assert.equal(report.agents.find(a=>a.id==='unmapped_tests').status,'NOT_TESTED');
  assert.equal(q.hasHardFailure(report),true);
-});
+}));
 test('media license gate remains excluded from source-green cohorts without losing separate audit',()=>fixture(root=>{
  fs.mkdirSync(path.join(root,'tests/master_recovery_qa'),{recursive:true});
  fs.writeFileSync(path.join(root,'tests/master_recovery_qa/media_provenance_gate.test.cjs'),'');
  fs.writeFileSync(path.join(root,'tests/master_recovery_qa/source_contracts.test.cjs'),'');
  assert.deepEqual(q.discoverTests(root,['tests/master_recovery_qa']),['tests/master_recovery_qa/source_contracts.test.cjs']);
- assert.throws(()=>q.discoverTests(root,['tests']),/Unsafe test_dirs/);
-});
+ assert.throws(()=>q.discoverTests(root,['tests']),/Unsafe test_dirs/);}));

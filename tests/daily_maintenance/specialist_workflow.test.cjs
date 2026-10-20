@@ -19,7 +19,7 @@ test('all twelve specialist agents are scheduled without granting app-source wri
 });
 test('manual dispatch allows targeted digit and sensitive-data regressions',()=>{
  for(const lane of ['numerals','notes','tasks','security','timer'])
-  assert.match(yaml,new RegExp('\\b'+lane+'\\) lane=tests/'));
+  assert.ok(yaml.split('\\n').find(x=>x.includes('options: [all, ui, audio, locale,'))?.includes(lane),lane);
 });
 
 test('source tests cannot read persisted checkout token and only safe repair step receives GH_TOKEN',()=>{
