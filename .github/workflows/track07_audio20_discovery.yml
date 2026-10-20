@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feature/track07-04-authentic-nature-20-20261020
+      - fix/track07-04-audio-acceptance-20261020
     paths:
       - tools/nature_audio/commons_intake.json
       - tools/nature_audio/discover20.py
@@ -31,13 +32,20 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends ffmpeg
-      - name: Check 10 NEW original bytes, Commons rights metadata, SHA and full Vorbis decode
-        run: python3 tools/nature_audio/discover20.py
+      - name: Discover bounded missing-category source proposals, never approve or activate
+        run: |
+          if [[ "$GITHUB_REF_NAME" == "fix/track07-04-audio-acceptance-20261020" ]]; then
+            python3 tools/nature_audio/discover20.py --search-required
+          else
+            python3 tools/nature_audio/discover20.py
+          fi
       - name: Upload source-discovery evidence and unapproved originals (never into app assets)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: track07-authentic20-ten-new-discovery
-          path: audio_candidates/new20_discovery/
+          path: |
+            audio_candidates/new20_discovery/
+            audio_candidates/required_search/
           retention-days: 7
           if-no-files-found: warn

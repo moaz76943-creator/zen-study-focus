@@ -35,6 +35,10 @@ jobs:
         run: python3 tools/nature_audio/collect_commons_audio.py
       - name: Generate offline real recording review without music or synthetic substitutions
         run: python3 tools/nature_audio/build_audio_review.py
+      - name: Browser offline playback, actual controls and 320-430px RTL layouts
+        run: |
+          npm install --prefix "$RUNNER_TEMP/audioqa-browser" --no-save playwright@1.56.1
+          NODE_PATH="$RUNNER_TEMP/audioqa-browser/node_modules" node tests/nature_library_v2/audio_review_browser.cjs audio_candidates/commons_intake/index.html audio_candidates/commons_intake/browser-evidence
       - name: Require exactly 20 original audio sources, never auto-enable app entries
         run: |
           python3 - <<'PY'

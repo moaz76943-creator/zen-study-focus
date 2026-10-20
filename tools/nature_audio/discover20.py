@@ -81,8 +81,78 @@ def run():
     # No user data or secret values are present in this quarantine receipt.
     print("DISCOVERY_PIN_RECEIPT_JSON",json.dumps([{k:row[k] for k in ("id","file","source_sha1","source_sha256","original_bytes","duration_seconds")} for row in report],separators=(",",":")),flush=True)
     print("DISCOVERY_COUNT",len(report),"- source audit only, not eligible for production")
+def search_required():
+    """Find bounded *proposals* for missing requested environments, never approve."""
+    from collect_commons_audio import validate_license
+    manifest=json.loads(MANIFEST.read_text())
+    queries={"rain":"natural rain", "fire":"wood fire crackling", "leaves":"wind trees leaves",
+             "waterfall":"waterfall", "wind":"wind nature", "rain_soft":"light rain",
+             "waves_calm":"calm ocean waves", "fire_hearth":"fireplace wood",
+             "night_crickets":"crickets night", "meadow":"meadow ambience", "coastal_wind":"coastal wind"}
+    directory=ROOT/"audio_candidates"/"required_search"
+    directory.mkdir(parents=True,exist_ok=True)
+    used={r["source_sha1"] for r in manifest["items"]}
+    reports=[];downloaded=0
+    for slot in manifest.get("required_slots",[]):
+        if slot.get("candidate_id") or slot["slot_id"] not in queries:
+            continue
+        result={"slot_id":slot["slot_id"],"query":queries[slot["slot_id"]],
+                "status":"MISSING", "rejections":[], "ready":False}
+        try:
+            params=urllib.parse.urlencode({"action":"query","format":"json","formatversion":2,
+                "generator":"search","gsrsearch":result["query"]+" filetype:audio -music -synthesizer -soundtrack",
+                "gsrnamespace":6,"gsrlimit":12,"prop":"imageinfo","iiprop":"sha1|size|extmetadata|url"})
+            request=urllib.request.Request("https://commons.wikimedia.org/w/api.php?"+params,headers=HEADERS)
+            with OPENER.open(request,timeout=40) as response:
+                pages=json.load(response).get("query",{}).get("pages",[])
+            for page in sorted(pages,key=lambda p:p.get("index",999)):
+                name=page.get("title","").removeprefix("File:").replace(" ","_")
+                if not SAFE.fullmatch(name) or not page.get("imageinfo"):
+                    continue
+                info=page["imageinfo"][0];metadata=info.get("extmetadata",{})
+                declared=None
+                for license_name in ("CC0-1.0","PD-author"):
+                    try:validate_license(license_name,metadata);declared=license_name;break
+                    except ValueError:pass
+                if not declared or info.get("sha1") in used:
+                    continue
+                size=int(info.get("size",0))
+                if not 10000<size<=LIMIT or downloaded+size>80*1024*1024:
+                    continue
+                live=source_info(name,declared)
+                url="https://commons.wikimedia.org/wiki/Special:Redirect/file/"+urllib.parse.quote(name)
+                destination=directory/name
+                with OPENER.open(urllib.request.Request(url,headers=HEADERS),timeout=60) as response:
+                    blob=response.read(min(LIMIT,80*1024*1024-downloaded)+1)
+                downloaded+=len(blob)
+                if len(blob)!=live["bytes"] or hashlib.sha1(blob).hexdigest()!=live["sha1"]:
+                    raise ValueError("Original hash/size mismatch")
+                destination.write_bytes(blob)
+                try:duration=validate_media(destination,len(blob))
+                except Exception as error:
+                    result["rejections"].append({"file":name,"reason":str(error)[:200]})
+                    destination.unlink();continue
+                used.add(live["sha1"])
+                result.update({"status":"SOURCE_PROPOSAL_NOT_MATCH_OR_LISTENING_APPROVED", "file":name,
+                    "source_page":"https://commons.wikimedia.org/wiki/File:"+name,
+                    "license":declared,"author_source":metadata.get("Artist",{}).get("value",""),
+                    "source_metadata":live["metadata"],"checked_at":live["checked_at"],
+                    "sha1":live["sha1"],"sha256":hashlib.sha256(blob).hexdigest(),"bytes":len(blob),
+                    "duration_seconds":duration,"human_listening":"NOT_TESTED", "slot_match":"NOT_REVIEWED"})
+                break
+        except Exception as error:
+            result.update(status="LOOKUP_BLOCKED",error=str(error)[:500])
+        reports.append(result)
+        # Persist each slot so a later network failure never hides prior results.
+        (directory/"proposals.json").write_text(json.dumps(reports,ensure_ascii=False,indent=2))
+        print("REQUIRED_SOURCE_LOOKUP",result["slot_id"],result["status"],result.get("file",""),flush=True)
+    print("SEARCH_DOWNLOAD_BYTES",downloaded,"NO_CANONICAL_INTAKE_OR_APP_CHANGE")
+
 if __name__=="__main__":
-    try:run()
+    try:
+        if sys.argv[1:]==["--search-required"]:search_required()
+        elif not sys.argv[1:]:run()
+        else:raise ValueError("Unknown discovery mode")
     except Exception as exc:
         print("DISCOVERY_REJECTED",repr(exc),file=sys.stderr)
         sys.exit(1)
