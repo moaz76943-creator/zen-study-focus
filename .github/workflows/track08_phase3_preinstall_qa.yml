@@ -1,0 +1,144 @@
+name: Track 08 Analytics controls and Western 0–9 Android QA
+on:
+  push:
+    branches: [audit/track08-analytics-digits-buttons-android-20261020]
+    paths: [.github/workflows/track08_phase3_preinstall_qa.yml, tests/track08/qa_webview_startup_probe.cjs]
+permissions:
+  contents: read
+concurrency:
+  group: track08-qa-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  side-by-side:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify only QA workflow and audit document differ from integrated source
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=a717cc2412f6f133311938addae996ac03ab6175
+          git cat-file -e "$BASE^{commit}"
+          diff="$(git diff --name-only "$BASE" HEAD | sort)"
+          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs tests/track08/qa_webview_startup_probe.cjs tests/track08/qa_cdp_transport.cjs tests/track08/qa_cdp_transport.test.cjs | sort)"
+          test "$diff" = "$expected"
+          git rev-parse HEAD
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build original debug APK in disposable checkout
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Create only a DEBUG app ID suffix and QA label on ephemeral runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/df-qa"
+          mkdir -p "$E"
+          git rev-parse HEAD > "$E/SOURCE_SHA.txt"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/normal-debug.apk"
+          sha256sum "$RUNNER_TEMP/normal-debug.apk" > "$E/standard-debug.sha256.txt"
+          python3 - <<'PY'
+          from pathlib import Path
+          g=Path('android/app/build.gradle')
+          s=g.read_text()
+          needle='    buildTypes {\n'
+          assert s.count(needle)==1
+          g.write_text(s.replace(needle,needle+"        debug {\n            applicationIdSuffix '.qa'\n            versionNameSuffix '-qa'\n        }\n"))
+          m=Path('android/app/src/main/AndroidManifest.xml')
+          s=m.read_text()
+          assert s.count('android:label="Deep Focus"')==1
+          assert 'android:allowBackup="false"' in s
+          m.write_text(s.replace('android:label="Deep Focus"','android:label="Deep Focus QA"'))
+          # Only the isolated, debuggable QA package may pass the normal app guard.
+          # This remains an ephemeral runner patch; source/main and signed release remain unchanged.
+          java=Path('android/app/src/main/java/com/zenstudy/focus/MainActivity.java')
+          old=java.read_text()
+          guard='        if (!"com.zenstudy.focus".equals(getPackageName())) {\n'
+          replacement=('        if (!"com.zenstudy.focus".equals(getPackageName())\n'
+            '                && !(debuggableBuild && "com.zenstudy.focus.qa".equals(getPackageName()))) {\n')
+          assert old.count(guard)==1, 'Unsafe runtime package guard patch anchor'
+          java.write_text(old.replace(guard,replacement))
+          PY
+          diff="$(git diff --name-only | sort)"
+          expected="$(printf '%s\n' android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java | sort)"
+          test "$diff" = "$expected"
+          git diff -- android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java > "$E/ephemeral-qa-only.diff"
+      - name: Enforce exact debug-only QA startup package gate and syntax
+        run: |
+          node --check tests/track08/qa_webview_startup_probe.cjs
+          node --test tests/track08/qa_launch_contract.test.cjs tests/track08/qa_cdp_transport.test.cjs
+      - name: Build separate QA debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Verify APK ID, signature, permissions and digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/df-qa"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$E/DeepFocus-Phase3-QA-Only.apk"
+          sha256sum "$E/DeepFocus-Phase3-QA-Only.apk" > "$E/QA_APK_SHA256.txt"
+          ! cmp -s "$RUNNER_TEMP/normal-debug.apk" "$E/DeepFocus-Phase3-QA-Only.apk"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$E/DeepFocus-Phase3-QA-Only.apk" > "$E/qa-badging.txt"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump permissions "$E/DeepFocus-Phase3-QA-Only.apk" > "$E/qa-permissions.txt"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$E/DeepFocus-Phase3-QA-Only.apk" > "$E/qa-signature.txt"
+          grep -F "package: name='com.zenstudy.focus.qa'" "$E/qa-badging.txt"
+          grep -F "application-label:'Deep Focus QA'" "$E/qa-badging.txt"
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re
+          content=(Path(os.environ['RUNNER_TEMP'])/'df-qa/qa-permissions.txt').read_text()
+          actual=set(re.findall(r"uses-permission:\s+name='([^']+)'",content))
+          allowed={'android.permission.INTERNET','android.permission.VIBRATE','android.permission.WAKE_LOCK','android.permission.POST_NOTIFICATIONS','android.permission.FOREGROUND_SERVICE','android.permission.FOREGROUND_SERVICE_SPECIAL_USE'}
+          private_receiver='com.zenstudy.focus.qa.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
+          # AndroidX may inject this exact package-scoped signature-only receiver permission.
+          # Never allow arbitrary app-owned, Android platform, network or storage permissions.
+          allowed.add(private_receiver)
+          assert actual <= allowed, f'Unexpected QA permission names: {sorted(actual-allowed)}'
+          PY
+      - name: Prepare KVM on disposable emulator runner
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Prove QA app installs alongside original, preserves original sandbox and launches offline
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/track08/phase3_side_by_side_qa.sh
+      - name: Upload ONLY separate QA APK and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Phase3-QA-Isolated-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/df-qa/DeepFocus-Phase3-QA-Only.apk
+            ${{ runner.temp }}/df-qa/*.txt
+            ${{ runner.temp }}/df-qa/*.json
+            ${{ runner.temp }}/df-qa/*.png
+            ${{ runner.temp }}/df-qa/*.diff
