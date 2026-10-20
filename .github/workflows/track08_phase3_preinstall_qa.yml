@@ -1,7 +1,7 @@
-name: Track 08 phase3 isolated QA APK and emulator install
+name: Track 08 Analytics controls and Western 0–9 Android QA
 on:
   push:
-    branches: [audit/track08-analytics-screen-qa-20261020]
+    branches: [audit/track08-analytics-digits-buttons-android-20261020]
     paths: [.github/workflows/track08_phase3_preinstall_qa.yml, tests/track08/qa_webview_startup_probe.cjs]
 permissions:
   contents: read
@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BASE=1c43ea578d10a7ed15d558c38d23b3412a116277
+          BASE=a717cc2412f6f133311938addae996ac03ab6175
           git cat-file -e "$BASE^{commit}"
           diff="$(git diff --name-only "$BASE" HEAD | sort)"
           expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs tests/track08/qa_webview_startup_probe.cjs tests/track08/qa_cdp_transport.cjs tests/track08/qa_cdp_transport.test.cjs | sort)"
