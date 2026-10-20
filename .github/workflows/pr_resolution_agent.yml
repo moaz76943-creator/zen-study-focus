@@ -114,10 +114,12 @@ jobs:
             }
             // Never promote a draft or runtime/media/security fix. At most ONE docs-only PR per cycle.
             const eligible = pulls.filter(p=>p.number!==25 && p.base.ref===engine.INTEGRATION &&
-              !p.draft && p.mergeable===true &&
-              (p.labels||[]).some(x=>x.name==='agent-safe-merge'))
+              !p.draft && (p.labels||[]).some(x=>x.name==='agent-safe-merge'))
               .sort((a,b)=>a.number-b.number).slice(0,5);
-            if (live) for (const p of eligible) {
+            if (live) for (const listed of eligible) {
+              const p = (await github.rest.pulls.get({
+                owner,repo,pull_number:listed.number
+              })).data;
               const files = await github.paginate(github.rest.pulls.listFiles, {
                 owner,repo,pull_number:p.number,per_page:100
               });
