@@ -21,5 +21,13 @@ jobs:
           node-version: '22'
       - name: Run owned test suite
         run: node --test tests/track07_functional/analytics_date_guard.test.cjs tests/analytics_core/*.test.cjs tests/analytics_recovery/*.test.cjs
+      - name: Run broad non-media Node regressions
+        shell: bash
+        run: |
+          mapfile -t suites < <(find tests -type f \\( -name '*.test.cjs' -o -name 'test_*.cjs' \\) ! -name media_provenance_gate.test.cjs | sort)
+          test "${#suites[@]}" -gt 0
+          node --test "${suites[@]}"
+      - name: Run Python source regressions
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Check changed source syntax
         run: node --check android/app/src/main/assets/web/analytics_studio.js
