@@ -956,21 +956,26 @@ const SOUNDS_DATA = [
 let soundCat = 'all';
 const activePlayers = {};
 let webAudioCtx = null;
+let sharedNoiseBuffer = null;
 
 function createNatureSynthFallback(id, vol) {
   if (!webAudioCtx) webAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (webAudioCtx.state === 'suspended') webAudioCtx.resume();
-  const sr = webAudioCtx.sampleRate, len = sr * 5;
-  const buf = webAudioCtx.createBuffer(1, len, sr);
-  const data = buf.getChannelData(0);
-  let last = 0;
-  for (let i = 0; i < len; i++) {
-    const w = Math.random() * 2 - 1;
-    last = (last + 0.016 * w) / 1.016;
-    data[i] = last * 1.6;
+
+  if (!sharedNoiseBuffer) {
+    const sr = webAudioCtx.sampleRate, len = sr * 2;
+    sharedNoiseBuffer = webAudioCtx.createBuffer(1, len, sr);
+    const data = sharedNoiseBuffer.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      last = (last + 0.016 * w) / 1.016;
+      data[i] = last * 1.6;
+    }
   }
+
   const src = webAudioCtx.createBufferSource();
-  src.buffer = buf; src.loop = true;
+  src.buffer = sharedNoiseBuffer; src.loop = true;
   const filter = webAudioCtx.createBiquadFilter();
   filter.type = 'lowpass';
   const freqs = { ocean: 300, rain: 850, fire: 420, waterfall: 950, thunder: 220, earth: 180 };
