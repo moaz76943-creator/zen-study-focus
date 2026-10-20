@@ -91,3 +91,12 @@
 .repo-sync-run strong{display:block;color:#2e5075;font-size:12px;overflow-wrap:anywhere}
 .repo-sync-run small{display:block;direction:ltr;text-align:start;color:#6b8198;overflow-wrap:anywhere;font-size:11px}
 @media(max-width:740px){.repo-sync-grid{grid-template-columns:1fr}.repo-sync-run{flex-wrap:wrap}.repo-sync-card{padding:12px}}
+
+
+/* Track 04 only: date-stamped recovery gates; no application CSS changes. */
+.repo-sync-recovery{display:grid;gap:12px;padding:13px 0;min-width:0;border-top:1px solid #dfebf7}
+.repo-sync-recovery .repo-sync-card p{margin:0;font-size:12px;line-height:1.75;overflow-wrap:anywhere;color:#405c7d}
+.repo-sync-recovery .repo-sync-toolbar small{font-size:11px;color:#5f728c;direction:ltr;text-align:start;overflow-wrap:anywhere}
+.repo-sync-actions .repo-sync-link,.repo-sync-recovery .repo-sync-link{display:inline-flex;align-items:center;min-height:44px;overflow-wrap:anywhere}
+@media(max-width:740px){.repo-sync-recovery{gap:10px;padding:10px 0}.repo-sync-recovery .repo-sync-toolbar{align-items:flex-start}}
+@media(max-width:360px){.repo-sync-recovery .repo-sync-card{padding:10px}}
