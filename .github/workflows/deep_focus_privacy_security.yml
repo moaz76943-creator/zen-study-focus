@@ -22,6 +22,8 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
+      - name: Validate privacy-first contracts (no cloud credential access)
+        run: python3 tools/tool_integrations/test_privacy_contract.py
       - name: Download and SHA256-verify pinned Gitleaks CLI
         shell: bash
         run: |
