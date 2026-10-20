@@ -1,0 +1,8 @@
+# Disposable emulator only. No clearState, cloud, AI assertions or real user data.
+# This proves only native launch and one visible timer control, NOT full Android E2E.
+appId: com.zenstudy.focus
+---
+- launchApp
+- assertVisible: "Deep Focus"
+- assertVisible: "25:00"
+- tapOn: "10:00"

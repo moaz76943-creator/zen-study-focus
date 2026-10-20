@@ -1,0 +1,143 @@
+name: Deep Focus Privacy-First Browser and Android Lab
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Exact source branch to test (no user-controlled arbitrary repository URL)
+        type: choice
+        required: true
+        default: fix/master-completion-20261020
+        options:
+          - main
+          - fix/master-completion-20261020
+          - integration/deep-focus-consolidated-candidate-20261020
+      playwright:
+        description: Run real localhost Chromium smoke on a disposable browser profile
+        type: boolean
+        default: true
+        required: true
+      maestro:
+        description: Run Android emulator smoke (heavy; no physical phone or personal data)
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: deep-focus-private-lab-${{ github.ref }}-${{ inputs.source_ref }}
+  cancel-in-progress: false
+jobs:
+  chromium:
+    name: Playwright Chromium on isolated synthetic storage
+    if: inputs.playwright == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - name: Get read-only test harness from reviewed main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          path: automation
+          persist-credentials: false
+      - name: Checkout reviewed candidate without credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.source_ref }}
+          path: source
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Playwright Chromium, no extra services
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check --no-cache-dir playwright==1.64.0
+          python -m playwright install --with-deps chromium
+      - name: Privacy contract test before real browser test
+        run: python automation/tools/tool_integrations/test_privacy_contract.py
+      - name: Test real controls on loopback; deny all remote page requests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f source/android/app/src/main/assets/web/index.html
+          git -C source rev-parse HEAD
+          python automation/tools/tool_integrations/browser_smoke.py source/android/app/src/main/assets/web
+
+  android:
+    name: Maestro API30 disposable emulator (release not approved)
+    if: inputs.maestro == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      MAESTRO_CLI_NO_ANALYTICS: 'true'
+      MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED: 'true'
+      MAESTRO_DISABLE_UPDATE_CHECK: 'true'
+      MAESTRO_API_URL: 'http://127.0.0.1:9'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          path: automation
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.source_ref }}
+          path: source
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Verify input source, install compile platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C source rev-parse HEAD
+          test -f source/android/app/build.gradle
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -x "$sdkmanager"
+          "$sdkmanager" 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build debug-only APK; no release secrets
+        working-directory: source/android
+        run: gradle assembleDebug --no-daemon
+      - name: Download checksum-verified official Maestro CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --proto '=https' --tlsv1.2 -fsSL --retry 2 \
+            'https://github.com/mobile-dev-inc/Maestro/releases/download/cli-2.11.0/maestro.zip' \
+            -o "$RUNNER_TEMP/maestro.zip"
+          echo '5384593cb4e7a106489e75a821d157dd43f4e438df6bc308b72e82c685e1283a  '"$RUNNER_TEMP/maestro.zip" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/maestro"
+          unzip -q "$RUNNER_TEMP/maestro.zip" -d "$RUNNER_TEMP/maestro"
+          maestro_bin="$(find "$RUNNER_TEMP/maestro" -type f -path '*/bin/maestro' -print -quit)"
+          test -n "$maestro_bin"
+          chmod +x "$maestro_bin"
+          echo "MAESTRO_BIN=$maestro_bin" >> "$GITHUB_ENV"
+      - name: Test only on disposable emulator; deny process external egress
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-boot-timeout: 600
+          script: |
+            set -euo pipefail
+            adb install -r source/android/app/build/outputs/apk/debug/app-debug.apk
+            uid="$(id -u)"
+            command -v iptables
+            command -v ip6tables
+            sudo iptables -I OUTPUT 1 -m owner --uid-owner "$uid" ! -o lo -j REJECT
+            sudo ip6tables -I OUTPUT 1 -m owner --uid-owner "$uid" ! -o lo -j REJECT
+            trap 'sudo iptables -D OUTPUT -m owner --uid-owner "$uid" ! -o lo -j REJECT || true; sudo ip6tables -D OUTPUT -m owner --uid-owner "$uid" ! -o lo -j REJECT || true' EXIT
+            if curl --connect-timeout 2 --max-time 4 -fsS 'https://example.com' >/dev/null 2>&1; then
+              echo 'Privacy FAIL: external egress was not blocked'
+              exit 1
+            fi
+            "$MAESTRO_BIN" test automation/tools/tool_integrations/maestro_smoke.yaml
+            echo 'Maestro smoke succeeded on disposable emulator ONLY; 20 locales, lifecycle and data migration NOT VERIFIED.'
