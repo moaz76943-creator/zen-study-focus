@@ -218,3 +218,25 @@ Implementation: `docs/control-center/planner-core.js` (deterministic contracts),
 - CI: `tests/control_center/repo_sync.test.cjs` verifies exact SHA matching, branch drift, read-only URL allowlists, stale and missing-run states. Portable bundle pins all 9 dashboard JavaScript modules via SHA-256 CSP; Chrome smoke checks the new section and the offline recovery planner.
 
 **Deployment provenance:** AppDeploy app ID `deep-focus-control-center-pv5p5k`. The hosted snapshot and the GitHub draft PR are separate deployments; their revision state must be confirmed independently. The public website hosts developer-only code and the 161 public task descriptions; it does not contain app users' personal data or GitHub write credentials.
+
+## v3.5 — resilient GitHub PR review and CI retry correctness
+
+**Mobile dashboard:** https://deep-focus-control-center-pv5p5k.v2.appdeploy.ai/
+**Source branch:** `feature/control-center-ops-20261019`; **review PR:** #37 (draft).
+The hosted frontend-only AppDeploy deployment is `deep-focus-control-center-pv5p5k`. Site deployments and GitHub commits are separate, so always check both.
+
+### Source-backed review queue
+The **الربط الحي بالمستودع** section now has a searchable list of up to 15 real open GitHub PRs. Search by number, title or branch and filter all/draft/non-draft. The list uses the existing public PR response from the dashboard's main snapshot, with strict same-repository URLs, no additional per-PR network requests and `textContent` output. When the source is unavailable or stale, the list explicitly identifies the gap; an empty API response does not mean no PRs exist.
+
+### CI evidence fixes
+- Evaluate **the newest run for each distinct workflow** for an exact commit SHA. A superseded older failure no longer makes a repaired workflow look permanently failed. Conversely, a new in-progress retry cannot be marked successful from an older run.
+- Aggregate separate workflows conservatively: **FAIL**, **RUNNING**, **PARTIAL** (mixed success and skipped/unverified), **PASS** (all observed latest relevant workflows succeeded), or **NOT_VERIFIED** (missing or untrustworthy evidence). A real `skipped` APK workflow never counts as Android success.
+- Whenever any required GitHub response fails or is partial, PR headline CI badges fall back to **NOT_VERIFIED**, even if some successful runs are visible. Links to observed evidence remain available for human investigation.
+- `PASS` is limited to available GitHub workflow evidence for a particular SHA; it does not approve release, audio provenance, v21 backup/restore or physical Android testing.
+
+### Browser/API reliability
+- The detailed GitHub monitor is **lazy-loaded when the repository health section becomes visible**, or loaded by the explicit refresh button. This reduces repeated unauthenticated GitHub REST requests when opening the main mobile page. The original repository snapshot retains its own source errors and warnings.
+- New source-contract tests: `tests/control_center/repo_sync.test.cjs` and simulated interactions in `tests/control_center/repo_sync_ui.test.cjs`. The nine-module deterministic portable bundle and the Chrome source audit remain in GitHub CI.
+- Hosted dashboard has **no personal access token, no GitHub write scope, no auto-merge and no autonomous agent execution**. The user opens authenticated GitHub separately to approve/merge anything. Rate limits remain possible with public browser API requests.
+
+**Release:** Android real-device tests, audio licensing, complete 20-locale validation and backup acceptance remain separate; no release can be inferred from dashboard green checks.
