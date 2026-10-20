@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-          fetch-depth: 12
+          fetch-depth: 0
       - name: Verify only QA workflow and audit document differ from integrated source
         shell: bash
         run: |
@@ -24,7 +24,7 @@ jobs:
           BASE=f97cc7d07c66ba0c85f22402aeeb76788146cc3e
           git cat-file -e "$BASE^{commit}"
           diff="$(git diff --name-only "$BASE" HEAD | sort)"
-          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml docs/track08/PHASE3_QA_PREINSTALL_20261020.md tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs | sort)"
+          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml docs/track08/PHASE3_QA_PREINSTALL_20261020.md tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs tests/track08/qa_webview_startup_probe.cjs | sort)"
           test "$diff" = "$expected"
           git rev-parse HEAD
       - uses: actions/setup-node@v4
@@ -82,8 +82,10 @@ jobs:
           expected="$(printf '%s\n' android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java | sort)"
           test "$diff" = "$expected"
           git diff -- android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java > "$E/ephemeral-qa-only.diff"
-      - name: Enforce exact debug-only QA startup package gate
-        run: node --test tests/track08/qa_launch_contract.test.cjs
+      - name: Enforce exact debug-only QA startup package gate and syntax
+        run: |
+          node --check tests/track08/qa_webview_startup_probe.cjs
+          node --test tests/track08/qa_launch_contract.test.cjs
       - name: Build separate QA debug APK
         working-directory: android
         run: gradle assembleDebug --no-daemon
@@ -137,4 +139,6 @@ jobs:
           path: |
             ${{ runner.temp }}/df-qa/DeepFocus-Phase3-QA-Only.apk
             ${{ runner.temp }}/df-qa/*.txt
+            ${{ runner.temp }}/df-qa/*.json
+            ${{ runner.temp }}/df-qa/*.png
             ${{ runner.temp }}/df-qa/*.diff
