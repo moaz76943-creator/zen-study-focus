@@ -4,6 +4,12 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: 'Explicit human-approved GitHub Release; never publish on push or cron'
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: write
@@ -35,13 +41,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ZenStudyFocus-Pro-Builds
+          retention-days: 3
           path: |
             android/app/build/outputs/apk/release/*.apk
             android/app/build/outputs/bundle/release/*.aab
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/heads/main')
+        if: github.event_name == 'workflow_dispatch' && inputs.publish_release == true && github.ref == 'refs/heads/main'
         with:
           tag_name: v2.0.${{ github.run_number }}
           name: Zen Study Focus Pro v2.0.${{ github.run_number }}
