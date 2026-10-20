@@ -21,7 +21,8 @@ test('manual dispatch allows targeted digit and sensitive-data regressions',()=>
  for(const lane of ['numerals','notes','tasks','security','timer'])
   assert.match(yaml,new RegExp('\\b'+lane+'\\) lane=tests/'));
 });
-\ntest('source tests cannot read persisted checkout token and only safe repair step receives GH_TOKEN',()=>{
+
+test('source tests cannot read persisted checkout token and only safe repair step receives GH_TOKEN',()=>{
  const scope=yaml.slice(yaml.indexOf('  daily:'),yaml.indexOf('  weekly-debug:'));
  const globalEnv=scope.slice(scope.indexOf('    env:'),scope.indexOf('    steps:'));
  assert.doesNotMatch(globalEnv,/GH_TOKEN|GITHUB_TOKEN/);

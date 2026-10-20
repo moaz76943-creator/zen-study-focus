@@ -67,7 +67,8 @@ test('language source audit marks missing translations, unlocalized markup, and 
  assert.equal(metrics.status,'GAPS_FOUND');assert.equal(metrics.missing,1);assert.equal(metrics.unmarked,1);
  assert.equal(q.readLocaleAudit(path.join(root,'missing')).status,'NOT_TESTED');
 }));
-\ntest('TAP parser requires real counted pass/fail/skips/todo evidence',()=>{
+
+test('TAP parser requires real counted pass/fail/skips/todo evidence',()=>{
  assert.equal(q.parseNodeTap('not TAP'),null);
  assert.equal(q.parseNodeTap('TAP version 13\n1..0'),null);
  assert.equal(q.parseNodeTap('TAP version 13\n# tests 1\n# pass 2\n# fail 0\n# skipped 0\n# todo 0\n# cancelled 0'),null);
