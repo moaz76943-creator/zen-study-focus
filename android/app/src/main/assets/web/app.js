@@ -349,9 +349,9 @@ function verifyAndRestoreBackupCode(codeStr) {
       return false;
     }
     const data = JSON.parse(decoded.bundle);
-    if (data.cfg) { cfg = data.cfg; saveFortressData('zen_fortress_cfg_v21', cfg); }
-    if (data.tasksList) { tasksList = data.tasksList; saveFortressData('zen_fortress_tasks_v21', tasksList); }
-    if (data.notesList) { notesList = data.notesList; saveFortressData('zen_fortress_notes_v21', notesList); }
+    if (data.cfg && typeof data.cfg === 'object' && !Array.isArray(data.cfg)) { cfg = data.cfg; saveFortressData('zen_fortress_cfg_v21', cfg); }
+    if (data.tasksList && Array.isArray(data.tasksList)) { tasksList = data.tasksList; saveFortressData('zen_fortress_tasks_v21', tasksList); }
+    if (data.notesList && Array.isArray(data.notesList)) { notesList = data.notesList; saveFortressData('zen_fortress_notes_v21', notesList); }
     applyLanguage(cfg.lang || 'en');
     closeModal('cloudBackupModal');
     showToast("🎉 Progress Restored Successfully!");
