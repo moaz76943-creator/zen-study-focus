@@ -6,11 +6,12 @@ function rig({reject=false}={}){
  const bridge={acknowledgeDurableV21(p){if(reject)return false;checkpoint=p;return true;},readDurableV21(){return checkpoint===null?'NONE':checkpoint;}};
  function boot(){
   const memory=new Map(disk),storage={getItem:k=>memory.get(k)??null,setItem(k,v){memory.set(k,String(v));},removeItem:k=>memory.delete(k)};
-  const context=vm.createContext({localStorage:storage,ZenNative:bridge,DeepFocusDataCompatV21:D,
-   cfg:{lang:'en',sessions:0,sessionHistory:[],unknownCfg:5},
+  const context=vm.createContext({localStorage:storage,ZenNative:bridge,cfg:{lang:'en',sessions:0,sessionHistory:[],unknownCfg:5},
    tasksList:[{id:1,title:'Root',done:false,other:{x:42},checklist:[{id:11,title:'Check',done:false}]}],
    notesList:[{id:2,title:'Note',body:'Unmodified',extra:'keep'}],Date,Map,Set});
   context.window=context;
+  // Keep the contract in the SAME VM realm as application snapshots.
+  vm.runInContext(src('data_compat_v21.js'),context);
   vm.runInContext(src('preflight_v22.js'),context);
   if(!context.DF22Preflight.allowApp(storage,null))return {context,storage,started:false};
   for(const [slot,field] of [['cfg','cfg'],['tasks','tasksList'],['notes','notesList']]){
