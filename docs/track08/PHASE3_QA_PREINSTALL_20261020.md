@@ -2,7 +2,7 @@
 
 **Only a disposable Android QA build; never a release APK.**
 
-App-tree parent: PR #85 candidate SHA `f97cc7d07c66ba0c85f22402aeeb76788146cc3e`. This independent audit branch adds a QA workflow and this document ONLY; no production application assets or Android Java code modifications.
+App-tree parent: PR #85 candidate SHA `f97cc7d07c66ba0c85f22402aeeb76788146cc3e`. This independent audit branch adds a QA-only workflow, explicit Bash emulator harness and this report ONLY; no production application assets or Android Java code modifications.
 
 ## Intended source-to-install trace
 - Build the unchanged standard Debug APK on an ephemeral GitHub runner; DO NOT share that original-package artifact for user installation.
@@ -20,3 +20,34 @@ App-tree parent: PR #85 candidate SHA `f97cc7d07c66ba0c85f22402aeeb76788146cc3e`
 - Never merge to main, publish Play release, repackage an upload-signed build, migrate or overwrite user data, or claim `RELEASE_APPROVED=YES`.
 
 `RELEASE_APPROVED=NO`.
+
+## Actual executed evidence — 2026-10-20
+
+**Status: PREINSTALL_QA_EMULATOR_PASS; PRODUCTION_RELEASE_BLOCKED.**
+
+- Immutable app-tree parent PR #85: `f97cc7d07c66ba0c85f22402aeeb76788146cc3e`. Original production code is identical; checkout diff attestation proved only these three independent QA paths changed.
+- Verified QA workflow SHA: `3fd4d8e3bacd37b6d11d9f7d4af997688379ae0a`.
+- Completed GitHub Actions: https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39430677836 — **SUCCESS, all jobs and steps PASS**.
+- Artifact, from actual run: https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39430677836/artifacts/12267179669 . File `DeepFocus-Phase3-QA-Only.apk` plus `QA_APK_SHA256.txt`, QA manifest/signature and installation evidence. ZIP is time-limited by retention policy; it is **not** a Play Store release.
+- Confirmed `com.zenstudy.focus.qa`, version `21.0.0-qa`, visible label `Deep Focus QA`, Debug signature checked with apksigner, no unexpected Android platform permissions. Exactly one app-owned AndroidX internal receiver permission with scoped QA package ID was accepted; arbitrary additions remained rejected.
+- **Physical execution on disposable Android API30:** baseline Debug app installed; QA APK installed alongside it; both package IDs remained present. A synthetic private file in baseline package was retained before/after QA offline force-stop and restart. QA sandbox could not read that file. Both QA launches succeeded with no network needed. Source SHA and SHA256 metadata were uploaded with artifact.
+- This evidence supports **a personal isolated QA trial only**. It does **not** prove full Android app functionality, actual SAF save/readback/import, owner phone acceptance or release permission.
+
+## Integrated app-test evidence inherited from PR #85 (source hash distinct from docs-only PR head)
+
+- Production-code+test source SHA `c92905cf66f1a017e53b8634ae42f3d513bf571a`. Subsequent PR #85 commit updates only this integration report.
+- Node: **606 PASS / 0 FAIL**, Python **31 PASS**, native Java and original Debug APK **PASS**: https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39428400428
+- Real Chromium QA: **PASS**, 280 navigation/layout cases (320/360/393/430 px, five locales, two font scales), zero page overflow or clipped nav: https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39428400467
+- Disposable Android API30 real ADB/CDP: **16 PASS / 0 FAIL_APP / 4 NOT_TESTED**; separate v21 native fault probes **9 PASS / 0 FAIL / 1 NOT_TESTED**. Overall job **FAILURE** because legacy UIAutomator 20-case suite is NOT_TESTED and full SAF is missing: https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39428400653
+
+## Unresolved acceptance gates
+
+- Native SAF DocumentsUI actual Save/readback/import, TalkBack, Bluetooth/DND/background audio and owner physical phone: NOT_VERIFIED.
+- 20-language 4,608 key/locale gaps and human contextual translation: BLOCKED.
+- Nature recordings: 10 authentic candidates are NOT production-approved; media release gate remains 1 PASS / 2 FAIL.
+- Security PR #71 potential Gitleaks generic key match: requires confidential human review; do not disable the scanner or print the value.
+- No production signing, main merge or Play publishing was performed.
+
+**STAGED_INTEGRATION_SHA = `f97cc7d07c66ba0c85f22402aeeb76788146cc3e`.**  
+**PREINSTALL_QA_RESULT = PASS on isolated QA package.**  
+**FINAL_INTEGRATION_SHA = NOT_DELIVERED. RELEASE_APPROVED=NO.**
