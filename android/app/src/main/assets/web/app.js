@@ -1882,6 +1882,10 @@ function renderSoundsStudio() {
     `;
     box.appendChild(tile);
   });
+  // Acquisition overview only. Playback remains governed by the existing licensing gate.
+  if (typeof DeepFocusNatureLibraryV2 !== 'undefined') {
+    DeepFocusNatureLibraryV2.render(soundCat, cfg.lang, d.sounds, NATURE_APPROVED_FOR_PLAYBACK);
+  }
 }
 
 /* ========================================================
