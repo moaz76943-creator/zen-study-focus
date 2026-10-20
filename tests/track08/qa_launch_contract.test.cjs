@@ -21,7 +21,7 @@ test('QA app may open bundled WebView only for the exact QA package AND a debugg
 
 test('no arbitrary package ID is accepted by runtime identity gate', () => {
   assert.equal((guard.match(/\.equals\(getPackageName\(\)\)/g)||[]).length, 2);
-  assert.ok(guard.indexOf('finish()') < guard.indexOf('webView = new WebView'));
+  assert.ok(guard.includes('finish()') && webViewStart > guardStart + guard.length - 1);
 });
 
 test('QA identity and Debug build must remain temporary — never alter production Gradle', () => {
