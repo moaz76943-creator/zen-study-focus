@@ -1,0 +1,31 @@
+name: Track07 Analytics 20-language Accessible Charts QA
+on:
+  push:
+    branches:
+      - fix/track07-analytics-chart-accessibility-20-locales-20261020
+permissions:
+  contents: read
+concurrency:
+  group: track07-chart-locale-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 20-locales accessible graphs, controls and Western digits
+        run: |
+          node --test tests/track07_functional/analytics_charts_20_accessibility.test.cjs tests/track07_functional/analytics_controls_and_digits.test.cjs tests/track07_functional/analytics_screen_20_locales.test.cjs
+      - name: All existing source suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          node --test --test-reporter=tap "${suites[@]}"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
