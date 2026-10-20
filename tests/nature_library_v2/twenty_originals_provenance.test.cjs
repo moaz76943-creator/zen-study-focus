@@ -23,13 +23,13 @@ test('20 distinct field recordings have individual identifiers and truthful Engl
  }
 });
 
-test('all 20 original recordings are source-pinned or explicitly pending initial API discovery',()=>{
+test('all twenty downloaded original files have BOTH published digests pinned before listening preview',()=>{
  const candidates=manifest.items;
  assert.equal(candidates.length,20);
  for(const item of candidates){
-  assert.ok(item.source_sha1===null||/^[a-f0-9]{40}$/.test(item.source_sha1));
-  assert.ok(item.source_sha256===null||/^[a-f0-9]{64}$/.test(item.source_sha256));
-  assert.equal(item.source_sha1===null,item.source_sha256===null,'pin both digests atomically');
+  assert.match(item.source_sha1,/^[a-f0-9]{40}$/);
+  assert.match(item.source_sha256,/^[a-f0-9]{64}$/);
+  assert.equal(item.approved_for_runtime,false);
  }
 });
 
