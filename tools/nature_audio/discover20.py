@@ -83,7 +83,7 @@ def run():
     print("DISCOVERY_COUNT",len(report),"- source audit only, not eligible for production")
 def search_required():
     """Find bounded *proposals* for missing requested environments, never approve."""
-    from collect_commons_audio import validate_license
+    from collect_commons_audio import validate_license, required_coverage
     manifest=json.loads(MANIFEST.read_text())
     queries={"rain":"natural rain", "fire":"wood fire crackling", "leaves":"wind trees leaves",
              "waterfall":"waterfall", "wind":"wind nature", "rain_soft":"light rain",
@@ -92,9 +92,10 @@ def search_required():
     directory=ROOT/"audio_candidates"/"required_search"
     directory.mkdir(parents=True,exist_ok=True)
     used={r["source_sha1"] for r in manifest["items"]}
+    coverage={r["slot_id"]:r for r in required_coverage(manifest)}
     reports=[];downloaded=0
     for slot in manifest.get("required_slots",[]):
-        if slot.get("candidate_id") or slot["slot_id"] not in queries:
+        if coverage[slot["slot_id"]]["status"] != "MISSING" or slot["slot_id"] not in queries:
             continue
         result={"slot_id":slot["slot_id"],"query":queries[slot["slot_id"]],
                 "status":"MISSING", "rejections":[], "ready":False}
@@ -102,6 +103,11 @@ def search_required():
             params=urllib.parse.urlencode({"action":"query","format":"json","formatversion":2,
                 "generator":"search","gsrsearch":result["query"]+" filetype:audio -music -synthesizer -soundtrack",
                 "gsrnamespace":6,"gsrlimit":12,"prop":"imageinfo","iiprop":"sha1|size|extmetadata|url"})
+            if slot.get("research_file_title"):
+                title=slot["research_file_title"]
+                if not SAFE.fullmatch(title):raise ValueError("Unsafe direct source title")
+                params=urllib.parse.urlencode({"action":"query","format":"json","formatversion":2,
+                    "titles":"File:"+title,"prop":"imageinfo","iiprop":"sha1|size|extmetadata|url"})
             request=urllib.request.Request("https://commons.wikimedia.org/w/api.php?"+params,headers=HEADERS)
             with OPENER.open(request,timeout=40) as response:
                 pages=json.load(response).get("query",{}).get("pages",[])

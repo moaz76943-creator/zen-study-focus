@@ -4,6 +4,7 @@ on:
     branches:
       - feature/track07-04-authentic-nature-20-20261020
       - fix/track07-04-audio-acceptance-20261020
+      - research/track07-04-coastal-source-20261020
     paths:
       - tools/nature_audio/commons_intake.json
       - tools/nature_audio/discover20.py
@@ -34,10 +35,10 @@ jobs:
           sudo apt-get install -y -qq --no-install-recommends ffmpeg
       - name: Discover bounded missing-category source proposals, never approve or activate
         run: |
-          if [[ "$GITHUB_REF_NAME" == "fix/track07-04-audio-acceptance-20261020" ]]; then
-            python3 tools/nature_audio/discover20.py --search-required
-          else
+          if [[ "$GITHUB_REF_NAME" == "feature/track07-04-authentic-nature-20-20261020" ]]; then
             python3 tools/nature_audio/discover20.py
+          else
+            python3 tools/nature_audio/discover20.py --search-required
           fi
       - name: Upload source-discovery evidence and unapproved originals (never into app assets)
         if: always()

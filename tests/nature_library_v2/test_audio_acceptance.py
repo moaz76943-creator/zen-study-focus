@@ -49,6 +49,8 @@ class AudioAcceptanceTests(unittest.TestCase):
 
     def test_twenty_files_do_not_satisfy_twenty_different_required_slots(self):
         manifest=json.loads((ROOT/'tools/nature_audio/commons_intake.json').read_text())
+        manifest.pop('replacement_candidates',None)
+        for slot in manifest['required_slots']:slot.pop('replacement_candidate_id',None)
         coverage=mod.required_coverage(manifest)
         self.assertEqual(len(coverage),20)
         self.assertEqual(len({r['slot_id'] for r in coverage}),20)
@@ -58,9 +60,61 @@ class AudioAcceptanceTests(unittest.TestCase):
         self.assertTrue({'waterfall','coastal_wind','fire','rain_soft','night_crickets'}<=missing)
         self.assertTrue(all(r['status']!='AVAILABLE' for r in coverage))
 
+    def test_requested_cohort_is_fail_closed_until_all_twenty_have_distinct_sources(self):
+        manifest=json.loads((ROOT/'tools/nature_audio/commons_intake.json').read_text())
+        coverage=mod.required_coverage(manifest)
+        self.assertEqual(sum(r['status']=='CANDIDATE' for r in coverage),19)
+        with self.assertRaisesRegex(ValueError,'coastal_wind'):
+            mod.requested_sources(manifest)
+        self.assertTrue(all(not r['ready'] for r in coverage))
+
     def test_one_source_cannot_fill_multiple_requested_slots(self):
         manifest={'items':[{'id':'one'}], 'required_slots':[
             {'slot_id':'ocean','candidate_id':'one'}, {'slot_id':'waves_calm','candidate_id':'one'}]}
         with self.assertRaises(ValueError):mod.required_coverage(manifest)
 
 if __name__=='__main__':unittest.main()
+
+class FirstPartyRightsTests(unittest.TestCase):
+    PAGE='https://bigsoundbank.com/sea-waves-s0698.html'
+    HTML='''<link rel="canonical" href="https://bigsoundbank.com/sea-waves-s0698.html">
+    <meta name="description" content="Waves recorded at the Atlantic Ocean.">
+    <audio><source type="audio/ogg" src="/UPLOAD/ogg/698.ogg?v=d"></audio>
+    <h2>License</h2><p>CC0 (public domain): Free and royalty-free</p>
+    <h2>Technical details</h2><p><strong>Conditions</strong>: Outdoor<br>
+    <strong>Author</strong>: <a>Joseph SARDIN</a><br><strong>Sound number</strong>: 698</p>
+    <h2>Other interesting files</h2>'''
+    def test_official_page_binds_actual_author_to_exact_publisher_audio(self):
+        out=mod.parse_bigsound_page(self.HTML,self.PAGE,698)
+        self.assertEqual(out['author'],'Joseph SARDIN')
+        self.assertEqual(out['original_url'],'https://bigsoundbank.com/UPLOAD/ogg/698.ogg?v=d')
+        self.assertIn('Atlantic Ocean',out['description'])
+        self.assertEqual(out['human_listening'],'NOT_TESTED')
+        self.assertFalse(out['ready'])
+    def test_rights_in_another_section_do_not_license_this_recording(self):
+        text=self.HTML.replace('CC0 (public domain): Free and royalty-free','CC BY-NC 4.0')+'<footer>CC0 (public domain): Free and royalty-free</footer>'
+        with self.assertRaises(ValueError):mod.parse_bigsound_page(text,self.PAGE,698)
+    def test_source_redirect_or_number_mismatch_is_rejected(self):
+        for page,ident in [('https://evil.test/sea-waves-s0698.html',698),(self.PAGE,699)]:
+            with self.assertRaises(ValueError):mod.parse_bigsound_page(self.HTML,page,ident)
+    def test_a_global_site_author_is_not_the_sound_recordist(self):
+        out=mod.parse_bigsound_page('<meta name="author" content="Wrong Person">'+self.HTML,self.PAGE,698)
+        self.assertEqual(out['author'],'Joseph SARDIN')
+
+class OfficialPreviewIdentityTests(unittest.TestCase):
+    PAGE='https://freesound.org/people/Recordist/sounds/123456/'
+    HTML='''<meta property="og:url" content="https://freesound.org/people/Recordist/sounds/123456/">
+      <meta property="og:audio:artist" content="Recordist">
+      <a title="Go to the full license text" href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons0</a>
+      <div data-sound-id="123456" data-ogg="https://cdn.freesound.org/previews/123/123456_987-lq.ogg"></div>
+      <p>Recorded real light rain.</p>'''
+    def test_official_published_preview_is_not_claimed_as_raw_recording_master(self):
+        receipt=mod.parse_freesound_page(self.HTML,self.PAGE,'Recordist',123456,'Recorded real light rain.')
+        self.assertIn('PREVIEW_NOT_RECORDER_MASTER',receipt['source_variant'])
+        self.assertFalse(receipt['ready'])
+    def test_related_cc0_link_cannot_override_a_restricted_current_sound(self):
+        bad=self.HTML.replace('publicdomain/zero/1.0/','licenses/by-nc/4.0/')+'<footer><a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a></footer>'
+        with self.assertRaises(ValueError):mod.parse_freesound_page(bad,self.PAGE,'Recordist',123456,'Recorded real light rain.')
+    def test_wrong_artist_or_other_sound_preview_is_rejected(self):
+        for text in [self.HTML.replace('content="Recordist"','content="Other"'),self.HTML.replace('123456_987','123455_987')]:
+            with self.assertRaises(ValueError):mod.parse_freesound_page(text,self.PAGE,'Recordist',123456,'Recorded real light rain.')
