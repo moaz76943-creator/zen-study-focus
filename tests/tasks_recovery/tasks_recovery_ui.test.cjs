@@ -14,16 +14,16 @@ class Node{
  find(fn){if(fn(this))return this;for(const ch of this.children){const r=ch.find(fn);if(r)return r;}return null;}
  findAll(fn){return (fn(this)?[this]:[]).concat(this.children.flatMap(ch=>ch.findAll(fn)));}
 }
-function setup(tasks=[],{failCommit=false}={}){
+function setup(tasks=[],{failCommit=false,rejectCommit=false}={}){
  const doc={createElement(tag){return new Node(tag,doc);}},root=new Node('main',doc);
  let db={cfg:{sessionHistory:[]},tasksList:tasks},commits=0,links=[],errors=[];
  const controller=UI.mount(root,{
   readState:()=>JSON.parse(JSON.stringify(db)),
-  commit:(_before,after)=>{if(failCommit)throw Error('Disk quota');db=JSON.parse(JSON.stringify(after));commits++;return true;},
+  commit:(_before,after)=>{if(failCommit)throw Error('Disk quota');if(rejectCommit)return false;db=JSON.parse(JSON.stringify(after));commits++;return true;},
   now:()=>new Date('2026-10-19T21:00:00+03:00'),
   locale:'en',linkTaskToTimer:id=>{links.push(id);return true;},onError:e=>errors.push(e.message)
  });
- return {root,controller,read:()=>db,commits:()=>commits,links,errors};
+ return {root,controller,read:()=>db,commits:()=>commits,links,errors,externalChange:fn=>{db=fn(db);}};
 }
 function find(root,text){const x=root.find(el=>el.textContent===text);assert.ok(x,'Cannot find '+text);return x;}
 function click(root,text){const x=root.find(el=>el.tagName==='button'&&el.textContent===text);assert.ok(x,'Cannot click '+text);return x;}
@@ -83,4 +83,28 @@ test('DF-120 failed durable save does not claim task creation or change state',(
  assert.equal(a.read().tasksList.length,0);
  assert.equal(a.commits(),0);
  assert.deepEqual(a.errors,['Disk quota']);
+});
+
+test('DF-075 silent false commit cannot publish a task or an undo entry',()=>{
+ const a=setup([],{rejectCommit:true});quickCreate(a,'Keep safely');
+ assert.equal(a.read().tasksList.length,0);assert.equal(a.controller.getState().tasksList.length,0);
+ assert.equal(a.commits(),0);assert.match(a.errors[0],/not confirmed/);
+ const input=a.root.find(el=>el.className==='df-quick').find(el=>el.tagName==='input');
+ assert.equal(input.value,'Keep safely');
+});
+test('DF-107 returning to the same task snapshot preserves Undo; external time credit invalidates it',()=>{
+ const a=setup([{id:9,title:'Real',date:'2026-10-19',catKey:'study',done:false,isStarter:false}]);
+ click(a.root,'Complete').fire('click');a.controller.refresh();click(a.root,'Undo').fire('click');
+ assert.equal(a.read().tasksList[0].done,false);
+ click(a.root,'Complete').fire('click');
+ a.externalChange(db=>({...db,cfg:{...db.cfg,sessionHistory:[{id:'external',minutes:25,date:'2026-10-19',domain:'study'}]}}));
+ a.controller.refresh();click(a.root,'Undo').fire('click');
+ assert.equal(a.read().tasksList[0].done,true);assert.equal(a.read().cfg.sessionHistory.length,1);
+});
+test('DF-120 task pages bound DOM work and keep all matches available',()=>{
+ const rows=Array.from({length:1001},(_,i)=>({id:10000+i,title:'Item '+i,date:'2026-10-19',catKey:'study',done:false,isStarter:false}));
+ const a=setup(rows);assert.equal(a.root.findAll(el=>el.className==='df-task').length,100);
+ click(a.root,'More (100/1001)').fire('click');assert.equal(a.root.findAll(el=>el.className==='df-task').length,200);
+ const search=a.root.find(el=>el.className==='df-task-search');search.value='Item 1000';search.fire('input');
+ assert.equal(a.root.findAll(el=>el.className==='df-task').length,1);assert.equal(a.read().tasksList.length,1001);
 });
