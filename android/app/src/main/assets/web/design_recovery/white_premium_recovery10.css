@@ -276,6 +276,8 @@ html[dir="rtl"] body.df-v22.df-recovery10 :where(.df10-state,.today-plan-entry,.
   text-align: start;
 }
 html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
+  /* API30 WebView fallback: physical right anchor when logical inset is unsupported. */
+  right: 50%;
   /* grid positions remain semantic; timer always occupies logical column four. */
   inset-inline-start: 50%;
   left: auto;
