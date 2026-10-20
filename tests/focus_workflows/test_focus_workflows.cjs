@@ -173,8 +173,12 @@ test('07-05 rejected or throwing goal persistence never publishes success or cha
       showToast:t=>messages.push(t)
     });
     x.eval('openDailyGoalsModal()');
-    x.document.getElementById('goalInput-study').value='60';
-    x.document.getElementById('goalWeeklyInput-study').value='300';
+    // The lightweight DOM fixture does not bind createElement to getElementById:
+    // supply all four valid daily/weekly fields so the test reaches the save boundary.
+    for(const domain of ['study','read','sport','work']){
+      x.document.getElementById('goalInput-'+domain).value=domain==='study'?'60':'0';
+      x.document.getElementById('goalWeeklyInput-'+domain).value=domain==='study'?'300':'0';
+    }
     assert.equal(x.eval('saveDailyGoals()'),false);
     assert.equal(x.cfg.dailyGoalsMin,oldDaily,'Unsaved daily goals must not mutate the existing reference');
     assert.equal(x.cfg.weeklyGoalsMin,oldWeekly,'Unsaved weekly goals must not mutate the existing reference');
