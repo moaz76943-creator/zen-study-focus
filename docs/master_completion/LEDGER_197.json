@@ -1341,8 +1341,7 @@
         "android/app/src/main/java/com/zenstudy/focus/NativeDocumentWriter.java"
       ],
       "COMMIT_SHA": [
-        "9f50acf516600a644b4c918053dfd2edf3d61e51",
-        "20b56815143174e4d769abf30199fc8d6af9e609"
+        "9f50acf516600a644b4c918053dfd2edf3d61e51"
       ],
       "TEST_COMMAND": [
         "node --test tests/integration_recovery/clipboard_ack.test.cjs tests/ascii_numerals/duration_units.test.cjs; java -cp /workspace/scratch/completion-evidence/native-unit com.zenstudy.focus.NativeDocumentWriterTest"
@@ -1356,15 +1355,7 @@
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Enforce ASCII digits 0-9 for ALL rendered counters regardless of UI language (Arabic, Persian, Urdu included).",
-      "OWNER_ROLE": "Localization and accessibility engineer",
-      "ROLLOVER_EVIDENCE": {
-        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
-        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
-        "source_result": "PASS",
-        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
-        "android_result": "NOT_TESTED",
-        "device_result": "DEVICE_NOT_TESTED"
-      }
+      "OWNER_ROLE": "Localization and accessibility engineer"
     },
     {
       "TASK_ID": "DF-061",
@@ -2301,9 +2292,7 @@
       "FILES_CHANGED": [
         "android/app/src/main/assets/web/app.js"
       ],
-      "COMMIT_SHA": [
-        "20b56815143174e4d769abf30199fc8d6af9e609"
-      ],
+      "COMMIT_SHA": [],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
       "TEST_SCOPE": "No new complete task-specific acceptance attestation",
@@ -2314,15 +2303,7 @@
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Extract checklist tasks with confirmation, stable extraction key and dedupe.",
-      "OWNER_ROLE": "Notes / data-integrity engineer",
-      "ROLLOVER_EVIDENCE": {
-        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
-        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
-        "source_result": "PASS",
-        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
-        "android_result": "NOT_TESTED",
-        "device_result": "DEVICE_NOT_TESTED"
-      }
+      "OWNER_ROLE": "Notes / data-integrity engineer"
     },
     {
       "TASK_ID": "DF-099",
@@ -2358,8 +2339,7 @@
         "android/app/src/main/assets/web/app.js"
       ],
       "COMMIT_SHA": [
-        "ff7d7d43f874d2bdde9cfee09cece4f7d3827933",
-        "20b56815143174e4d769abf30199fc8d6af9e609"
+        "ff7d7d43f874d2bdde9cfee09cece4f7d3827933"
       ],
       "TEST_COMMAND": [
         "node --test tests/integration_recovery/notes_fallback_durability.test.cjs"
@@ -2374,15 +2354,7 @@
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Preserve all old note content and unknown fields; sanitize note Markdown and disallow JS URLs/XSS.",
-      "OWNER_ROLE": "Notes / data-integrity engineer",
-      "ROLLOVER_EVIDENCE": {
-        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
-        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
-        "source_result": "PASS",
-        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
-        "android_result": "NOT_TESTED",
-        "device_result": "DEVICE_NOT_TESTED"
-      }
+      "OWNER_ROLE": "Notes / data-integrity engineer"
     },
     {
       "TASK_ID": "DF-101",
@@ -2929,8 +2901,7 @@
       ],
       "COMMIT_SHA": [
         "d7fdc96c8eb94e6f640d0035250161057d218d6b",
-        "99a1092e90a0b6643a107a81d90c9a824ea127af",
-        "20b56815143174e4d769abf30199fc8d6af9e609"
+        "99a1092e90a0b6643a107a81d90c9a824ea127af"
       ],
       "TEST_COMMAND": [
         "node --test tests/integration_recovery/timer_credit_durability.test.cjs tests/integration_recovery/restore_journal.test.cjs",
@@ -2946,15 +2917,7 @@
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Ensure one canonical analytics source, dedupe by unique valid session ID, report conflicting duplicates.",
-      "OWNER_ROLE": "Analytics / data-integrity engineer",
-      "ROLLOVER_EVIDENCE": {
-        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
-        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
-        "source_result": "PASS",
-        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
-        "android_result": "NOT_TESTED",
-        "device_result": "DEVICE_NOT_TESTED"
-      }
+      "OWNER_ROLE": "Analytics / data-integrity engineer"
     },
     {
       "TASK_ID": "DF-123",
