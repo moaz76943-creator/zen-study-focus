@@ -72,6 +72,18 @@ jobs:
         with:
           name: DeepFocus-20-Real-Nature-Originals-Listening-Only-${{ github.sha }}
           path: audio_candidates/commons_intake
+      - name: Enforce exact 20-file isolated listening artifact before APK build
+        shell: bash
+        run: |
+          set -euo pipefail
+          find audio_candidates/commons_intake -maxdepth 1 -type f -name '*.ogg' | grep -c . | grep -x 20
+          python3 - <<'PY'
+          import json,pathlib
+          rows=json.loads(pathlib.Path('audio_candidates/commons_intake/qa_report.json').read_text())
+          assert len(rows)==20 and len({x['original_sha256'] for x in rows})==20
+          assert all(x['status']=='QUARANTINED_NOT_APPROVED' for x in rows)
+          print('QA_ONLY_TWENTY_ORIGINALS_RECEIVED')
+          PY
       - name: Prepare permission-free disposable original audio listening app
         env:
           AUDIO_QA_BUILD: '1'
