@@ -30,7 +30,7 @@ async function touch(expression){
  const r=await evaluate(`(()=>{
    const n=${expression};
    if(!n)return {present:false,selector:${JSON.stringify(expression)}};
-   n.scrollIntoView({behavior:'instant',block:'nearest',inline:'nearest'});
+   n.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});
    const bounds=n.getBoundingClientRect();
    const x=bounds.left+bounds.width/2,y=bounds.top+bounds.height/2;
    const hit=document.elementFromPoint(x,y);
@@ -119,6 +119,9 @@ async function main(){
  await run('tasks_create',async()=>{
   await tap('#navTasks');await fill('.df-quick input','Android fixture task');await tap('.df-quick button[type=submit]');
   await check("tasksList.filter(t=>t.title==='Android fixture task'&&!t.isStarter).length===1",'One real task');
+  // Undated quick-added tasks may not appear in Today. This DOM view change is
+  // fixture setup only; create/complete/reopen remain physical ADB interactions.
+  await check("(()=>{const sel=document.querySelector('.df-view-mode');if(!sel)return false;sel.value='all';sel.dispatchEvent(new Event('change',{bubbles:true}));return [...document.querySelectorAll('.df-task')].some(n=>n.querySelector('.df-title')?.textContent==='Android fixture task')})()",'Quick-added task appears in all-items view');
   const card=`[...document.querySelectorAll('.df-task')].find(n=>n.querySelector('.df-title')?.textContent==='Android fixture task')`;
   await touch(`${card}.querySelector('.df-primary-action')`);await check("tasksList.find(t=>t.title==='Android fixture task').done===true",'Complete');
   await touch(`${card}.querySelector('.df-primary-action')`);await check("tasksList.find(t=>t.title==='Android fixture task').done===false",'Reopen');
@@ -130,7 +133,7 @@ async function main(){
   await evaluate('resetTimerNow()');assert.equal(await evaluate('cfg.sessions'),count,'Reset cannot grant focus credit');
  });
  await run('save_failure',async()=>{
-  await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle','Quota fixture');await fill('#inpNoteBody','Do not lose edits');
+  await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle','Quota fixture');await fill('#inpNoteBody','Do not lose edits');await dismissNoteKeyboardForSave();
   const old=await evaluate('JSON.stringify(notesList)');
   await evaluate("window.fixtureSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException('Fixture quota','QuotaExceededError')}");
   try{await tap('#nsSaveButton');assert.equal(await evaluate('JSON.stringify(notesList)'),old);await check("document.querySelector('#noteModal').classList.contains('open')",'Failed save keeps editor');}
@@ -140,7 +143,7 @@ async function main(){
  await run('language_live_change',async()=>{
   await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle','Unsaved ٢');await evaluate("applyLanguage('ar')");
   await check("document.querySelector('#nsux-preview-toggle').textContent==='معاينة' && document.querySelector('#inpNoteTitle').value==='Unsaved ٢'",'Open-editor locale and authored text');
-  await evaluate("applyLanguage('en')");await tap('#nsSaveButton');
+  await evaluate("applyLanguage('en')");await dismissNoteKeyboardForSave();await tap('#nsSaveButton');
  });
  await run('dialog_back',async()=>{await tap('#navNotes');await tap('#nsNewButton');adb('shell','input','keyevent','4');await pause(500);await check("!document.querySelector('#noteModal').classList.contains('open')",'Android Back closes empty editor');});
  await run('western_numerals',async()=>{await evaluate("applyLanguage('ar')");await tap('#navTimer');await check("/^[0-9]{2}:[0-9]{2}$/.test(document.querySelector('#timerDigitsTxt').textContent)",'ASCII timer in RTL');await evaluate("applyLanguage('en')");});
