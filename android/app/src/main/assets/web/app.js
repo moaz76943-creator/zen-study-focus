@@ -898,18 +898,32 @@ function renderDomainState() {
 }
 
 function switchActivityDomain(dom, el) {
-  if (!['study', 'sport', 'read', 'work'].includes(dom) || cfg.domain === dom) return;
+  if (!['study', 'sport', 'read', 'work'].includes(dom) || cfg.domain === dom) return false;
   // A tap on another activity must not silently erase an in-progress focus session.
-  if (quickTraining?.active) {
-    if (!window.confirm(quickText('replacePrompt'))) return;
+  const replacingQuickTraining = !!quickTraining?.active;
+  if (replacingQuickTraining) {
+    if (!window.confirm(quickText('replacePrompt'))) return false;
+  } else if (timerRunning || (timerSessionId !== null && timerLeft < timerTotal)) {
+    if (!window.confirm(quickText('replacePrompt'))) return false;
+  }
+  // A native durable ACK can fail after WebView writes: do not change the active
+  // domain or cancel a real focus session until the new cfg is acknowledged.
+  const nextCfg = {...cfg,domain:dom};
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', nextCfg) !== true)
+      throw new Error('DOMAIN_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(cfg.lang === 'ar'
+      ? 'تعذر حفظ النشاط. حاول مرة أخرى.'
+      : 'Could not save activity. Try again.');
+    return false;
+  }
+  cfg.domain = dom;
+  if (replacingQuickTraining) {
     quickTraining = null;
     if (timerRunning) toggleTimerPlay();
     renderQuickTraining();
-  } else if (timerRunning || (timerSessionId !== null && timerLeft < timerTotal)) {
-    if (!window.confirm(quickText('replacePrompt'))) return;
   }
-  cfg.domain = dom;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
   renderDomainState();
 
   const d = L();
@@ -921,6 +935,7 @@ function switchActivityDomain(dom, el) {
   const minutes = getDomainFocusMinutes(dom);
   selectTimerMode(minutes, 'focus', document.getElementById('modeFocusBtn'));
   showToast(`${icon} ${title} (${formatDurationUnit(minutes,'minute')})`);
+  return true;
 }
 
 /* Home timer shortcuts share the existing engine, never reset an active session silently. */
