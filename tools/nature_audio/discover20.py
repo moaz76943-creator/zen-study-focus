@@ -74,6 +74,9 @@ def run():
         report.append(row)
         print("DISCOVERY_SOURCE_CHECKED",item["id"],round(duration,2),"seconds",flush=True)
     (OUT/"pin_report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2))
+    # These are PUBLIC FILE DIGESTS, not credentials: emit for explicit human pinning.
+    # No user data or secret values are present in this quarantine receipt.
+    print("DISCOVERY_PIN_RECEIPT_JSON",json.dumps([{k:row[k] for k in ("id","file","source_sha1","source_sha256","original_bytes","duration_seconds")} for row in report],separators=(",",":")),flush=True)
     print("DISCOVERY_COUNT",len(report),"- source audit only, not eligible for production")
 if __name__=="__main__":
     try:run()
