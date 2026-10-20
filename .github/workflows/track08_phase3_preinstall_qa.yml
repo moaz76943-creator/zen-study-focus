@@ -24,9 +24,12 @@ jobs:
           BASE=f97cc7d07c66ba0c85f22402aeeb76788146cc3e
           git cat-file -e "$BASE^{commit}"
           diff="$(git diff --name-only "$BASE" HEAD | sort)"
-          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml docs/track08/PHASE3_QA_PREINSTALL_20261020.md tests/track08/phase3_side_by_side_qa.sh | sort)"
+          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml docs/track08/PHASE3_QA_PREINSTALL_20261020.md tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs | sort)"
           test "$diff" = "$expected"
           git rev-parse HEAD
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -65,11 +68,22 @@ jobs:
           assert s.count('android:label="Deep Focus"')==1
           assert 'android:allowBackup="false"' in s
           m.write_text(s.replace('android:label="Deep Focus"','android:label="Deep Focus QA"'))
+          # Only the isolated, debuggable QA package may pass the normal app guard.
+          # This remains an ephemeral runner patch; source/main and signed release remain unchanged.
+          java=Path('android/app/src/main/java/com/zenstudy/focus/MainActivity.java')
+          old=java.read_text()
+          guard='        if (!"com.zenstudy.focus".equals(getPackageName())) {\n'
+          replacement=('        if (!"com.zenstudy.focus".equals(getPackageName())\n'
+            '                && !(debuggableBuild && "com.zenstudy.focus.qa".equals(getPackageName()))) {\n')
+          assert old.count(guard)==1, 'Unsafe runtime package guard patch anchor'
+          java.write_text(old.replace(guard,replacement))
           PY
           diff="$(git diff --name-only | sort)"
-          expected="$(printf '%s\n' android/app/build.gradle android/app/src/main/AndroidManifest.xml | sort)"
+          expected="$(printf '%s\n' android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java | sort)"
           test "$diff" = "$expected"
-          git diff -- android/app/build.gradle android/app/src/main/AndroidManifest.xml > "$E/ephemeral-qa-only.diff"
+          git diff -- android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java > "$E/ephemeral-qa-only.diff"
+      - name: Enforce exact debug-only QA startup package gate
+        run: node --test tests/track08/qa_launch_contract.test.cjs
       - name: Build separate QA debug APK
         working-directory: android
         run: gradle assembleDebug --no-daemon
