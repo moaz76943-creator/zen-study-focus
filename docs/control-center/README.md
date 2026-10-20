@@ -218,3 +218,54 @@ Implementation: `docs/control-center/planner-core.js` (deterministic contracts),
 - CI: `tests/control_center/repo_sync.test.cjs` verifies exact SHA matching, branch drift, read-only URL allowlists, stale and missing-run states. Portable bundle pins all 9 dashboard JavaScript modules via SHA-256 CSP; Chrome smoke checks the new section and the offline recovery planner.
 
 **Deployment provenance:** AppDeploy app ID `deep-focus-control-center-pv5p5k`. The hosted snapshot and the GitHub draft PR are separate deployments; their revision state must be confirmed independently. The public website hosts developer-only code and the 161 public task descriptions; it does not contain app users' personal data or GitHub write credentials.
+
+
+## Track 04 Control Center v3.5 — follow-up on PR #72 (review only)
+
+This builds on **existing PR #37**, not on a replacement dashboard. The public AppDeploy
+deployment has its own independent revision: editing GitHub source **does not update** the
+published website. The current deployed URL is
+https://deep-focus-control-center-pv5p5k.v2.appdeploy.ai/ .
+Do not publish, merge or label a production release approved without owner review.
+
+### New read-only capabilities
+- PR #25 (recovery), PR #37 (dashboard), PR #70 (P0 Android persistence)
+  and PR #72 (dashboard follow-up) are read from the public GitHub REST API
+  with exact SHA verification. Two drift checks compare PR #37 against #25
+  and PR #72 against #37. A missing or rate-limited API request returns
+  NOT_VERIFIED, not CURRENT.
+- Per-commit Android **workflow** status is computed only from workflow names
+  indicating Android QA/testing; Android debug builds and generic Node CI
+  do not become device-test evidence. Workflow PASS does not imply Android
+  UI acceptance.
+- The focused WebView/ADB 3 PASS / 0 FAIL / 17 NOT_TESTED counts are dated
+  PR #70 evidence at commit `3ab4ebdf6b4cded3ebaa3b0c08ff30b01e6e73e8`,
+  not an independent or complete 20/20 device certification. On a changed
+  PR #70 SHA the evidence is marked STALE; physical Android testing remains
+  NOT_TESTED. Release remains NOT_APPROVED.
+- The 4608/20-language localization gaps and nature-audio 1 PASS/2 FAIL gate
+  are **historical source findings**; never treat them as a current new scan.
+  The security card is NOT_VERIFIED pending independent checks.
+- A five-link mobile-only bottom navigation offers 44px touch targets and
+  safe-area handling. It navigates within the dashboard, without write actions.
+
+### QA commands
+From repo root:
+
+    node --test tests/control_center/*.test.cjs
+    node --check docs/control-center/repo-sync-core.js
+    node --check docs/control-center/repo-sync-ui.js
+    node tools/control_center/build_portable.cjs
+    node tools/control_center/check_portable_dom.cjs
+
+New regression suites:
+`tests/control_center/track04_v35.test.cjs` and
+`tests/control_center/track04_v35_dom.test.cjs`. These test data normalization,
+fail-closed rate limiting, GitHub read-only access, dashboard DOM wiring, and
+small-phone navigation. They are not a physical Android device run.
+
+### Security
+No GitHub credentials or personal access tokens belong in browser code.
+Public REST uses `credentials:'omit'`; no repo write/auto-merge action runs.
+Production HTTP security headers are managed by the host; a CSP meta tag is
+not a substitute for HTTP HSTS, frame protections or Referrer-Policy.
