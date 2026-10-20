@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BASE=3bbb36abc03c43e3b2e0a205bc0431a4d67aad6b
+          BASE=1cf7090d98cc06d2042ac632e306ac5b47bd471f
           git cat-file -e "$BASE^{commit}"
           diff="$(git diff --name-only "$BASE" HEAD | sort)"
           expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs tests/track08/qa_webview_startup_probe.cjs tests/track08/qa_cdp_transport.cjs tests/track08/qa_cdp_transport.test.cjs tests/track08/native_js_dialog_android_probe.cjs | sort)"
