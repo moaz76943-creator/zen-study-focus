@@ -42,8 +42,11 @@ def run():
     if len(manifest.get("items",[]))!=20 or manifest.get("status")!="RESEARCH_AND_QUARANTINE_ONLY":
         raise ValueError("Discovery intended only for exact 20-item quarantine manifest")
     new=[r for r in manifest["items"] if r.get("source_sha1") is None]
+    if len(new)==0:
+        print("DISCOVERY_ALREADY_PINNED: no new source discovery permitted; verify in strict twenty-original run")
+        return
     if len(new)!=10:
-        raise ValueError("Exactly ten newly researched recordings must require initial discovery")
+        raise ValueError("Expected either ten new candidates or the fully pinned manifest")
     OUT.mkdir(parents=True,exist_ok=True)
     report=[]
     for item in new:
