@@ -30,3 +30,21 @@ test('DF-090: locale lookup is limited to presentation and never mutates draft s
  assert.match(source,/function nsDraftLabel\(k\)/);
  assert.match(source,/function nsGetStoredDraft\(\)/);
 });
+
+test('DF-055 live locale changes select the current draft warning without modifying persisted data',()=>{
+ const start=source.indexOf('function nsDraftLabel(k)'),end=source.indexOf('\nfunction nsGetStoredDraft()',start);
+ assert.ok(start>=0&&end>start,'draft label function boundary exists');
+ const tr=dictionary();
+ const cfg={lang:'en'};
+ const sandbox=vm.createContext({cfg,NS_DRAFT_LANG:tr});
+ vm.runInContext(source.slice(start,end),sandbox);
+ for(const lang of langs){
+  cfg.lang=lang;
+  for(const key of keys){
+   assert.equal(sandbox.nsDraftLabel(key),tr[lang][key],lang+' '+key);
+  }
+ }
+ cfg.lang='unknown';
+ assert.equal(sandbox.nsDraftLabel('failed'),tr.en.failed);
+ assert.equal(sandbox.nsDraftLabel('not_a_key'),'');
+});
