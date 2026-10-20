@@ -40,7 +40,7 @@
     if(!Array.isArray(pulls)||pulls.length>MAX_PRS||!Array.isArray(runs)||runs.length>MAX_RUNS)
       throw Error('Repository response limit exceeded');
     if(!Array.isArray(errors)||errors.length>15)throw Error('Invalid integration errors');
-    const cleanPulls=pulls.filter(x=>x&&[25,37].includes(x.number));
+    const cleanPulls=pulls.filter(x=>x&&[25,37,70,72].includes(x.number));
     for(const p of cleanPulls){
       if(!safeSha(p.head?.sha)||!safeSha(p.base?.sha))throw Error('Invalid pull SHA');
     }
@@ -51,9 +51,18 @@
         url:trustedGitHubUrl(p.html_url)||'https://github.com/'+REPO+'/pull/'+n,
         ci:ciStatus(runs,p.head.sha)}:null;
     };
-    const pr25=toPR(25),pr37=toPR(37);
+    const pr25=toPR(25),pr37=toPR(37),pr70=toPR(70),pr72=toPR(72);
     const verified=Boolean(pr25&&pr37&&errors.length===0);
     const drift=verified?(pr25.sha===pr37.baseSha?'CURRENT':'BASE_MOVED'):'NOT_VERIFIED';
+    const dashboardDrift=pr37&&pr72&&errors.length===0?
+      (pr37.sha===pr72.baseSha?'CURRENT':'BASE_MOVED'):'NOT_VERIFIED';
+    // CI runs are not Android-on-device test case evidence. Only show the scope of Android QA workflows.
+    const androidQaRuns=runs.filter(r=>{
+      const name=String(r?.name||'');
+      return /(android|webview|emulator|adb|device|uiautomator)/i.test(name)&&
+        /(test|qa|e2e|smoke|validation|regression|acceptance|instrumented|uiautomator)/i.test(name);
+    });
+    const androidWorkflow=ciStatus(androidQaRuns,pr70?.sha);
     const recent=runs.filter(r=>r&&Number.isSafeInteger(r.id)&&r.id>0&&
       safeSha(r.head_sha)&&trustedGitHubUrl(r.html_url))
       .sort((a,b)=>b.id-a.id).slice(0,12).map(r=>({
@@ -62,8 +71,54 @@
         status:ciStatus([r],r.head_sha).status,
         url:trustedGitHubUrl(r.html_url)
       }));
-    return {verified,drift,pr25,pr37,release:'NOT_APPROVED',
+    const evidenceSha='3ab4ebdf6b4cded3ebaa3b0c08ff30b01e6e73e8';
+    // Historical scoped PR70 evidence. Never assume a CI success equals Android device approval.
+    const evidenceStatus=!pr70?'NOT_VERIFIED':pr70.sha===evidenceSha?'SOURCE_REPORTED':'STALE';
+    const android={status:evidenceStatus,sha:evidenceSha,
+      pass:evidenceStatus==='SOURCE_REPORTED'?3:null,
+      fail:evidenceStatus==='SOURCE_REPORTED'?0:null,
+      notTested:evidenceStatus==='SOURCE_REPORTED'?17:null,
+      uiAutomatorNotTested:20,
+      runUrl:'https://github.com/'+REPO+'/actions/runs/39376600969',
+      physicalDevice:'NOT_TESTED'};
+    const locale={status:evidenceStatus,missing:4608,languages:20,sha:evidenceSha,
+      sourceUrl:'https://github.com/'+REPO+'/pull/70'};
+    const audio={status:evidenceStatus,recordedPass:1,recordedFail:2,sha:evidenceSha,
+      sourceUrl:'https://github.com/'+REPO+'/blob/'+evidenceSha+'/docs/MEDIA_LICENSES.md'};
+    const security={status:'NOT_VERIFIED',tokenInPublicClient:'NOT_DETECTED_IN_REVIEW',
+      httpHeaders:'REQUIRES_REVIEW'};
+    return {verified,drift,dashboardDrift,pr25,pr37,pr70,pr72,androidWorkflow,
+      pr70Verified:Boolean(pr70&&errors.length===0),android,locale,audio,security,
+      release:'NOT_APPROVED',
       recent,errors:errors.map(x=>String(x).slice(0,180)),timestamp};
   }
-  return {REPO,safeSha,trustedGitHubUrl,ciStatus,buildRepoHealth};
+  function formatHealthReport(model){
+    if(!model||typeof model!=='object')throw Error('Repository report unavailable');
+    const one=(n,p)=>'PR #'+n+': '+(p?.sha||'NOT_VERIFIED')+
+      ' | GitHub CI: '+(p?.ci?.status||'NOT_VERIFIED')+
+      ' | '+(p?.draft?'DRAFT':'NOT_VERIFIED');
+    const lines=[
+      'DEEP FOCUS CONTROL CENTER — REVIEW ONLY',
+      'Checked at: '+(model.timestamp||'NOT_VERIFIED'),
+      'LIVE GitHub source: '+(model.verified&&model.pr72Verified?'COMPLETE':'PARTIAL / NOT_VERIFIED'),
+      one(25,model.pr25),one(37,model.pr37),
+      one(70,model.pr70),one(72,model.pr72),
+      'PR #37 / PR #25 base drift: '+(model.drift||'NOT_VERIFIED'),
+      'PR #72 / PR #37 base drift: '+(model.dashboardDrift||'NOT_VERIFIED'),
+      'Android Workflow: '+(model.androidWorkflow?.status||'NOT_VERIFIED')+
+        ' (GitHub CI only, not on-device cases)',
+      'Android SNAPSHOT: '+(model.android?.status||'NOT_VERIFIED')+
+        ' | recorded HEAD '+(model.android?.sha||'NOT_VERIFIED'),
+      'Focused Android recorded: '+(model.android?.status==='SOURCE_REPORTED'?
+        '3 PASS / 0 FAIL / 17 NOT_TESTED':'STALE or NOT_VERIFIED'),
+      'Android physical device: NOT_TESTED',
+      'Localization SNAPSHOT: 4608 historic source gaps / 20 languages; NOT A LIVE SCAN',
+      'Nature audio SNAPSHOT: 1 PASS / 2 FAIL; licensing/listening still blocked',
+      'Security: NOT_VERIFIED',
+      'RELEASE: NOT_APPROVED',
+      'No auto-merge, credential sharing or production deployment.'
+    ];
+    return lines.join('\n').slice(0,9800);
+  }
+  return {REPO,safeSha,trustedGitHubUrl,ciStatus,buildRepoHealth,formatHealthReport};
 });
