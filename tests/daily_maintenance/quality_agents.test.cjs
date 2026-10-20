@@ -110,3 +110,11 @@ test('media license gate remains excluded from source-green cohorts without losi
  fs.writeFileSync(path.join(root,'tests/master_recovery_qa/source_contracts.test.cjs'),'');
  assert.deepEqual(q.discoverTests(root,['tests/master_recovery_qa']),['tests/master_recovery_qa/source_contracts.test.cjs']);
  assert.throws(()=>q.discoverTests(root,['tests']),/Unsafe test_dirs/);}));
+
+test('malformed locale coverage report returns NOT_TESTED status',()=>fixture(root=>{
+ const out=path.join(root,'report');fs.mkdirSync(path.join(out,'locales'),{recursive:true});
+ fs.writeFileSync(path.join(out,'locales/coverage.json'),'not json');
+ const metrics=q.readLocaleAudit(out);
+ assert.equal(metrics.status,'NOT_TESTED');
+ assert.match(metrics.reason,/^Unable to parse locale report:/);
+}));
