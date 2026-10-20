@@ -73,7 +73,11 @@ final class FocusAppWebChromeClient extends WebChromeClient {
         }
         final AtomicBoolean settled = new AtomicBoolean(false);
         final Runnable cancel = () -> {
-            if (settled.compareAndSet(false, true)) result.cancel();
+            if (settled.compareAndSet(false, true)) {
+                activeDialog = null;
+                activeCancel = null;
+                result.cancel();
+            }
         };
         AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                 .setTitle("Deep Focus")
@@ -81,6 +85,10 @@ final class FocusAppWebChromeClient extends WebChromeClient {
                 .setOnCancelListener(dialog -> cancel.run())
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     if (!settled.compareAndSet(false, true)) return;
+                    // JS may immediately ask a SECOND confirmation (delete -> backup).
+                    // Release this dialog before unblocking JavaScript execution.
+                    activeDialog = null;
+                    activeCancel = null;
                     if (result instanceof JsPromptResult && entry instanceof LinearLayout) {
                         LinearLayout box = (LinearLayout) entry;
                         EditText input = (EditText) box.getChildAt(0);
@@ -117,8 +125,11 @@ final class FocusAppWebChromeClient extends WebChromeClient {
 
     /** Discard any unresolved confirmation when its owner Activity is destroyed. */
     void cancelPending() {
-        if (activeCancel != null) activeCancel.run();
-        if (activeDialog != null) activeDialog.dismiss();
+        // Resolve JS once and dismiss the same dialog even if cancel clears fields.
+        final AlertDialog showing = activeDialog;
+        final Runnable pendingCancel = activeCancel;
+        if (pendingCancel != null) pendingCancel.run();
+        if (showing != null) showing.dismiss();
         activeCancel = null;
         activeDialog = null;
     }
