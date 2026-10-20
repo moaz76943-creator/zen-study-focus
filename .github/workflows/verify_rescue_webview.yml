@@ -1,6 +1,8 @@
 name: Deep Focus Android WebView Real DOM (debug-only)
 on:
-  # Optional exact-SHA QA, manually started after emulator SDK is healthy.
+  # One disposable real Android run for this integration branch; production excluded.
+  push:
+    branches: [integration/deep-focus-stability-20261020]
   workflow_dispatch:
     inputs:
       api:
@@ -16,11 +18,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   android-webview-smoke:
-    name: Fresh Android API${{ inputs.api || '35' }}, local DevTools DOM, test-only
+    name: Fresh Android API${{ inputs.api || '30' }}, local DevTools DOM, test-only
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
-      ANDROID_TEST_API: ${{ inputs.api || '35' }}
+      ANDROID_TEST_API: ${{ inputs.api || '30' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,7 +62,7 @@ jobs:
       - name: Inspect actual on-emulator WebView DOM (no simulated PASS)
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ inputs.api || '35' }}
+          api-level: ${{ inputs.api || '30' }}
           target: google_apis
           arch: x86_64
           profile: pixel_6
