@@ -185,7 +185,8 @@ public class MainActivity extends AppCompatActivity {
         public String readDurableV21() {
             synchronized (durableV21Lock) {
                 AtomicFile file=new AtomicFile(new File(getFilesDir(),"v21_durable_packets_v1"));
-                if (!file.exists()) return "NONE";
+                File baseFile=file.getBaseFile();
+                if (!baseFile.exists() && !new File(baseFile.getPath()+".bak").exists()) return "NONE";
                 try {
                     byte[] bytes=file.readFully();
                     if (bytes.length>MAX_DURABLE_V21_BYTES) return "ERROR";
