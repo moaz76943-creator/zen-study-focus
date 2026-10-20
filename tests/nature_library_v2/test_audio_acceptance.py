@@ -63,10 +63,23 @@ class AudioAcceptanceTests(unittest.TestCase):
     def test_requested_cohort_is_fail_closed_until_all_twenty_have_distinct_sources(self):
         manifest=json.loads((ROOT/'tools/nature_audio/commons_intake.json').read_text())
         coverage=mod.required_coverage(manifest)
-        self.assertEqual(sum(r['status']=='CANDIDATE' for r in coverage),19)
+        self.assertEqual(sum(r['status']=='CANDIDATE' for r in coverage),20)
+        selected=mod.requested_sources(manifest)
+        self.assertEqual(len({r['source_sha256'] for r in selected}),20)
+        for slot in manifest['required_slots']:
+            if slot['slot_id']=='coastal_wind':slot.pop('replacement_candidate_id',None)
         with self.assertRaisesRegex(ValueError,'coastal_wind'):
             mod.requested_sources(manifest)
         self.assertTrue(all(not r['ready'] for r in coverage))
+
+    def test_different_identifiers_cannot_hide_reused_original_bytes(self):
+        manifest=json.loads((ROOT/'tools/nature_audio/commons_intake.json').read_text())
+        selected=mod.requested_sources(manifest)
+        first=selected[0]['id']
+        for source in manifest['replacement_candidates']+manifest['items']:
+            if source['id']==first:source['source_sha256']=selected[1]['source_sha256']
+        with self.assertRaisesRegex(ValueError,'Reused bytes'):
+            mod.requested_sources(manifest)
 
     def test_one_source_cannot_fill_multiple_requested_slots(self):
         manifest={'items':[{'id':'one'}], 'required_slots':[

@@ -52,7 +52,7 @@ async function main(){
  }
  try{
   let state=null;
-  const expression='(() => {const a=[...document.querySelectorAll("audio")];const names=a.map(x=>decodeURIComponent(new URL(x.currentSrc||x.src).pathname.split("/").pop()));return {ready:document.readyState,url:location.href,visible:document.visibilityState,count:a.length,groups:[...document.querySelectorAll("[data-sound-group]")].map(x=>x.getAttribute("data-sound-group")),uniqueNames:new Set(names).size,nativeBridge:typeof window.ZenNative!=="undefined"};})()';
+  const expression='(() => {const a=[...document.querySelectorAll("audio")];const names=a.map(x=>decodeURIComponent(new URL(x.currentSrc||x.src).pathname.split("/").pop()));return {ready:document.readyState,url:location.href,visible:document.visibilityState,count:a.length,groups:[...document.querySelectorAll("[data-sound-group]")].map(x=>x.getAttribute("data-sound-group")),uniqueNames:new Set(names).size,buildSha:document.querySelector("meta[name=deep-focus-source-sha]")?.content,nativeBridge:typeof window.ZenNative!=="undefined"};})()';
   for(let i=0;i<18;i++){state=await evalJs(expression);if(state.ready==='complete'&&state.count===expected)break;await sleep(400);}
   assert.equal(state.url,'file:///android_asset/web/audio_review/index.html');
   assert.equal(state.visible,'visible');
@@ -61,6 +61,7 @@ async function main(){
   assert.equal(state.uniqueNames,expected);
   assert.equal(state.groups.length,6);
   assert.equal(state.nativeBridge,false,'Privileged data bridge must not be in Audio QA');
+  assert.equal(state.buildSha,process.env.GITHUB_SHA,'Installed QA page is not stamped with this source SHA');
   const traces=[];
   async function tap(selector){
     await evalJs(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'center'})`);

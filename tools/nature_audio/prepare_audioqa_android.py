@@ -10,6 +10,7 @@ import os
 import pathlib
 import re
 import shutil
+import sys
 
 QA_PACKAGE = "com.zenstudy.focus.audioqa"
 PRODUCTION_PACKAGE = "com.zenstudy.focus"
@@ -25,13 +26,15 @@ def replace_exact(source, old, new, description):
         raise ValueError("Unexpected original " + description + "; abort QA build")
     return source.replace(old, new, 1)
 
-def prepare(root):
+def prepare(root, selected_items=None):
     root = pathlib.Path(root).resolve()
     web, java, manifest, gradle = (
         root / WEB, root / JAVA, root / MANIFEST, root / GRADLE
     )
     media = root / QUARANTINE
     meta = json.loads((root / SOURCE_MANIFEST).read_text(encoding="utf-8"))
+    if selected_items is not None:
+        meta["items"] = selected_items
     evidence = json.loads((media / "qa_report.json").read_text(encoding="utf-8"))
     statuses = {entry["id"]: entry for entry in evidence}
     if not (media / "index.html").is_file():
@@ -142,4 +145,12 @@ if __name__ == "__main__":
         intake=json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8"))
         if len(intake.get("items",[])) != 20:
             raise SystemExit("AUDIO20_QA_BLOCKED: exact twenty sources required")
-    prepare(pathlib.Path(__file__).resolve().parents[2])
+    if sys.argv[1:] == ["--requested"]:
+        from collect_commons_audio import requested_sources
+        QUARANTINE = pathlib.Path("audio_candidates/requested")
+        selected = requested_sources(json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8")))
+        prepare(pathlib.Path(__file__).resolve().parents[2],selected_items=selected)
+    elif not sys.argv[1:]:
+        prepare(pathlib.Path(__file__).resolve().parents[2])
+    else:
+        raise SystemExit("Unknown QA cohort")

@@ -3,8 +3,10 @@
 import hashlib
 import html
 import json
+import os
 import pathlib
 import re
+import sys
 import urllib.parse
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -22,7 +24,9 @@ GROUPS = {
     "other": ("Nature", "الطبيعة"),
 }
 
-def render_html(records):
+def render_html(records, build_sha=None):
+    if build_sha is not None and not re.fullmatch(r"[a-f0-9]{40}",build_sha):
+        raise ValueError("Invalid public build SHA")
     if not records:
         raise ValueError("No verified recordings to review")
     groups = {}
@@ -31,8 +35,16 @@ def render_html(records):
         if not SAFE.fullmatch(filename):
             raise ValueError("Unsafe candidate filename")
         source = row["license_evidence"]
+        provider = row.get("source_provider", "commons")
         expected_url = "https://commons.wikimedia.org/wiki/File:" + filename
-        if source != expected_url:
+        if provider == "bigsoundbank":
+            match = re.fullmatch(r"https://bigsoundbank\.com/[a-z0-9-]+-s([0-9]{4,})\.html", source)
+            trusted = bool(match and int(match.group(1)) == row.get("publisher_id"))
+        elif provider == "freesound":
+            trusted = source == f"https://freesound.org/people/{row['author']}/sounds/{row['publisher_id']}/" and bool(re.fullmatch(r"[A-Za-z0-9_.-]+",row['author']))
+        else:
+            trusted = provider == "commons" and source == expected_url
+        if not trusted:
             raise ValueError("Unexpected source origin")
         category = row.get("category", "other")
         if category not in GROUPS:
@@ -55,6 +67,11 @@ def render_html(records):
             loop_attr += ' data-loop-src="' + loop["path"] + '"'
         warnings = " · ".join(row.get("review_warnings", []))
         warning_html = '<p class="flag" role="note">'+html.escape(warnings)+'</p>' if warnings else ''
+        variant = row.get("source_variant", "")
+        if "NOT_RECORDER_MASTER" in variant:
+            warning_html += '<p>Published Ogg version; recorder master not obtained / نسخة Ogg منشورة، وليست ملف المسجّل الأصلي</p>'
+        if "PREVIEW" in variant:
+            warning_html += '<p class="flag">Official lower-bitrate preview; listening quality NOT_TESTED / معاينة رسمية تحتاج مراجعة الجودة</p>'
         groups.setdefault(category, []).append(
             '<article class="clip" data-playable><div class="info"><h3 dir="auto">'
             + name_ar + ' <span lang="en" dir="ltr">· ' + name_en + '</span></h3>'
@@ -73,9 +90,10 @@ def render_html(records):
         '<div class="cards">' + "\n".join(rows) + '</div></section>'
         for category, rows in groups.items()
     )
-    return """<!doctype html>
+    markup = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="deep-focus-source-sha" content="__BUILD_SHA__">
 <title>Deep Focus – original field-recording listening review</title>
 <style>
 :root{color-scheme:light;font-family:system-ui,sans-serif;background:#f4f6f9;color:#122033}
@@ -87,7 +105,7 @@ button{background:#213b66;color:white;border:0;border-radius:12px;padding:12px 1
 .nature-group{display:grid;gap:10px;margin-bottom:24px}.nature-group h2{font-size:1.12rem;margin:0}.cards{display:grid;gap:12px}.clip{border:1px solid #cad3e1;border-radius:14px;background:white;padding:16px;display:grid;gap:9px}
 .clip h3{font-size:1.04rem;margin:0}.clip p{font-size:.85rem;margin:6px 0}.clip a{font-size:.8rem;overflow-wrap:anywhere}.track-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tools label{display:flex;gap:8px;flex-wrap:wrap;align-items:center;max-width:100%}input[type=range],select{max-width:100%;min-width:0}
 audio{display:none}.clip label{font-size:.85rem;display:flex;align-items:center;gap:10px}.clip input{flex:1;min-width:50px}
-footer{font-size:.78rem;color:#576779;padding:16px 0}
+footer{overflow-wrap:anywhere;font-size:.78rem;color:#576779;padding:16px 0}
 </style></head>
 <body><header><div class="flag">QA ONLY / غير معتمد للإصدار</div>
 <h1>Deep Focus — offline nature audio listening review</h1>
@@ -99,7 +117,7 @@ abrupt loop edge, and distracting material as <strong>FAIL</strong>. No recordin
 <label>Original / Loop <select id="source-mode"><option value="original">Original / الأصل</option><option value="loop">Prepared loop (unreviewed) / حلقة للمراجعة</option></select></label>
 <span id="status" aria-live="polite">0 active · Combined gain ≤ 80%</span></div></header>
 <main id="nature-groups">""" + parts + """</main>
-<footer>Local/offline file review only. Links to original licenses are informative; recordings play locally.
+<footer><p dir="ltr">QA source: __BUILD_SHA__</p>Local/offline file review only. Links to original licenses are informative; recordings play locally.
 This page never reads your notes, tasks or app data. Does not change Android media certification status.</footer>
 <script>
 'use strict';
@@ -127,16 +145,18 @@ function rebalance(){
   });
   document.getElementById('status').textContent=active.length+' active · Combined gain ≤ 80%';
 }
-function stopAllAudio(){clips.forEach(a=>{a.pause();a.currentTime=0});rebalance();}
+function stopAllAudio(){clips.forEach(a=>{a._qaEpoch=(a._qaEpoch||0)+1;a.pause();a.currentTime=0});rebalance();}
 for(let i=0;i<clips.length;i++){
   const a=clips[i],card=a.closest('.clip');
+  a._qaEpoch=0;
   a.dataset.originalSrc=a.getAttribute('src');
   a.volume=0;
   card.querySelector('[data-play]').addEventListener('click',async()=>{
+    const epoch=++a._qaEpoch;
     if(!a.paused){a.pause();return;}
-    try{await a.play();}catch(error){card.querySelector('[data-track-status]').textContent='Playback failed / تعذر التشغيل';}
+    try{await a.play();}catch(error){if(epoch===a._qaEpoch)card.querySelector('[data-track-status]').textContent='Playback failed / تعذر التشغيل';}
   });
-  card.querySelector('[data-stop]').addEventListener('click',()=>{a.pause();a.currentTime=0;rebalance();});
+  card.querySelector('[data-stop]').addEventListener('click',()=>{a._qaEpoch++;a.pause();a.currentTime=0;rebalance();});
   a.addEventListener('error',()=>{card.querySelector('[data-track-status]').textContent='Playback failed / تعذر التشغيل';});
   clips[i].addEventListener('play',rebalance);
   clips[i].addEventListener('pause',rebalance);
@@ -152,9 +172,12 @@ window.addEventListener('pagehide',stopAllAudio);
 rebalance();
 </script></body></html>
 """
+    return markup.replace("__BUILD_SHA__",build_sha or "LOCAL_REVIEW_UNSTAMPED")
 
-def build():
-    candidates = json.loads(MANIFEST.read_text(encoding="utf-8"))["items"]
+
+def build(candidates=None):
+    if candidates is None:
+        candidates = json.loads(MANIFEST.read_text(encoding="utf-8"))["items"]
     reports = json.loads((OUT / "qa_report.json").read_text(encoding="utf-8"))
     checked = {row["id"]: row for row in reports}
     for item in candidates:
@@ -184,8 +207,15 @@ def build():
                 raise ValueError("Loop lineage or output hash mismatch")
             item["loop_derivative"] = loop
         item["quality"] = audited.get("quality",{})
-    (OUT / "index.html").write_text(render_html(candidates), encoding="utf-8")
-    print("Audio review index generated from", len(candidates), "pinned originals; no app assets touched")
+    (OUT / "index.html").write_text(render_html(candidates,os.environ.get("GITHUB_SHA")), encoding="utf-8")
+    print("Audio review index generated from", len(candidates), "source records; blocked files excluded; no app assets touched")
 
 if __name__ == "__main__":
-    build()
+    if sys.argv[1:] == ["--requested"]:
+        from collect_commons_audio import requested_sources
+        OUT = ROOT / "audio_candidates/requested"
+        build(requested_sources(json.loads(MANIFEST.read_text(encoding="utf-8"))))
+    elif not sys.argv[1:]:
+        build()
+    else:
+        raise SystemExit("Unknown listening cohort")

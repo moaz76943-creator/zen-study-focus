@@ -518,7 +518,8 @@
       "slot_id": "coastal_wind",
       "name_ar": "الرياح الساحلية",
       "candidate_id": null,
-      "research_file_title": "Vento_fisterra.ogg"
+      "research_file_title": "Vento_fisterra.ogg",
+      "replacement_candidate_id": "requested_coastal_wind"
     }
   ],
   "replacement_candidates": [
@@ -871,6 +872,31 @@
       "source_download_url": "https://cdn.freesound.org/previews/544/544342_8031303-lq.ogg",
       "source_variant": "OFFICIAL_FULL_LENGTH_OGG_PREVIEW_NOT_RECORDER_MASTER",
       "source_checked_at": "2026-10-20T17:13:17.041225+00:00"
+    },
+    {
+      "id": "requested_coastal_wind",
+      "slot_id": "coastal_wind",
+      "file": "Vento_fisterra.ogg",
+      "source_provider": "commons",
+      "author": "Escoitar.org",
+      "license": "PD-author",
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Vento_fisterra.ogg",
+      "name_ar": "رياح فيستيرا الساحلية",
+      "name_en": "Wind in coastal Fisterra",
+      "category": "sea_coast",
+      "source_sha1": "c695e8aea2244b4581bf317226652ce51d6ce36b",
+      "source_sha256": "7ea1fd527488b5cfada8545e6acaf73c22a9432a94eec94157e1c76d01e4ccdf",
+      "original_bytes": 4555849,
+      "source_checked_at": "2026-10-20T17:14:43.516589+00:00",
+      "source_description": "Gravación do vento de Fisterra.",
+      "source_variant": "COMMONS_PUBLISHED_ORIGINAL",
+      "synthetic": false,
+      "contains_music": false,
+      "status": "QUARANTINED_NOT_APPROVED",
+      "ready": false,
+      "approved_for_runtime": false,
+      "human_audio_review": "NOT_TESTED",
+      "semantic_match_review": "NOT_TESTED"
     }
   ]
 }

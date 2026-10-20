@@ -33,6 +33,13 @@ class OfflineReviewTests(unittest.TestCase):
         self.assertNotIn('data-play>',text)
         self.assertIn('BLOCKED_RIGHTS',text)
 
+    def test_public_build_stamp_rejects_markup_and_never_claims_an_unstamped_local_review_is_ci(self):
+        rows=[{"id":"rain","file":"Rain.ogg","author":"fixture","license":"PD-author",
+               "license_evidence":"https://commons.wikimedia.org/wiki/File:Rain.ogg"}]
+        self.assertIn('LOCAL_REVIEW_UNSTAMPED',review.render_html(rows))
+        self.assertIn('content="'+('a'*40)+'"',review.render_html(rows,'a'*40))
+        with self.assertRaises(ValueError):review.render_html(rows,'<script>')
+
     def test_source_description_is_escaped_not_html(self):
         rows=[{"id":"rain", "file":"Rain.ogg", "author":"<script>alert(1)</script>",
                "license":"PD-author",

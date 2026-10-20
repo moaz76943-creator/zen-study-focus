@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Disposable isolated Android QA app only; never touch owner apps or user data.
 set -euo pipefail
-export AUDIO_QA_EXPECTED_TRACKS="$(python3 -c 'import json;print(sum(r["status"]=="QUARANTINED_NOT_APPROVED" for r in json.load(open("audio_candidates/commons_intake/qa_report.json"))))')"
+export AUDIO_QA_EXPECTED_TRACKS="$(python3 -c 'import json;print(sum(r["status"]=="QUARANTINED_NOT_APPROVED" for r in json.load(open("audio_candidates/requested/qa_report.json"))))')"
 APK="$(find android/app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -type f -print -quit)"
 test -s "$APK"
 mkdir -p "$RUNNER_TEMP/audio20"

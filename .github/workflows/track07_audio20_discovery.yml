@@ -29,6 +29,8 @@ jobs:
       - name: Validate 20 individual source descriptions and preserved 2 production voices
         run: |
           node --test tests/nature_library_v2/twenty_originals_provenance.test.cjs tests/nature_library_v2/intake_manifest.test.cjs tests/nature_library_v2/catalog.test.cjs
+      - name: Verify first-party rights, author binding and requested-source failure gates
+        run: python3 -m unittest discover -s tests/nature_library_v2 -p 'test_*.py' -v
       - name: Install audio decoder
         run: |
           sudo apt-get update -qq
