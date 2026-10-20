@@ -70,6 +70,27 @@ const out=process.env.DF_COMPLETION_EVIDENCE||'/workspace/scratch/completion-evi
   assert.equal(await page.evaluate(()=>notesList.length),count+1);
   assert.equal(await page.evaluate(()=>new Set(notesList.map(n=>n.id)).size),count+1);
   results.push({scope:'real Notes overflow links another note and duplicates with unique numeric ID',status:'PASS'});
+  await page.evaluate(()=>applyLanguage('en'));await page.locator('#navTasks').click();
+  await page.locator('.df-quick input').fill('Task Arabic ٢ preserved');await page.locator('.df-quick button').click();
+  await page.locator('.df-view-mode').selectOption('all');
+  const taskCard=page.locator('.df-task').filter({hasText:'Task Arabic ٢ preserved'});
+  await taskCard.locator('.df-primary-action').click();
+  assert.equal(await page.evaluate(()=>tasksList.find(t=>t.title==='Task Arabic ٢ preserved').done),true);
+  const taskSnapshot=await page.evaluate(()=>JSON.stringify({cfg,tasksList}));
+  for(let i=0;i<10;i++){await page.locator('#navTimer').click();await page.locator('#navTasks').click();}
+  assert.equal(await page.evaluate(()=>JSON.stringify({cfg,tasksList})),taskSnapshot);
+  await page.locator('.df-task-tools summary').click();
+  await page.getByRole('button',{name:'Undo',exact:true}).click();
+  assert.equal(await page.evaluate(()=>tasksList.find(t=>t.title==='Task Arabic ٢ preserved').done),false);
+  results.push({scope:'real Task Undo survives 10 tab returns with core/adapter key order differences',status:'PASS'});
+  const taskBefore=await page.evaluate(()=>JSON.stringify({cfg,tasksList,notesList}));
+  await page.evaluate(()=>{window.fixtureSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException('Fixture quota','QuotaExceededError');};});
+  try{
+    await page.locator('.df-quick input').fill('Retain draft on quota');await page.locator('.df-quick button').click();
+    assert.equal(await page.evaluate(()=>JSON.stringify({cfg,tasksList,notesList})),taskBefore);
+    assert.equal(await page.locator('.df-quick input').inputValue(),'Retain draft on quota');
+  }finally{await page.evaluate(()=>{Storage.prototype.setItem=window.fixtureSet;delete window.fixtureSet;});}
+  results.push({scope:'real Task quota failure preserves all app state and quick-add input',status:'PASS'});
   assert.deepEqual(errors,[]);
  }catch(e){results.push({scope:'browser scenario',status:'FAIL',error:e.message});if(page)await page.screenshot({path:out+'/failure.png',fullPage:true});process.exitCode=1;}
  finally{fs.writeFileSync(out+'/results.json',JSON.stringify({environment:'desktop Chromium, disposable context, remote requests blocked',results,errors},null,2));console.log(JSON.stringify({passed:results.filter(r=>r.status==='PASS').length,failed:results.filter(r=>r.status==='FAIL'),errors},null,2));await browser.close();}
