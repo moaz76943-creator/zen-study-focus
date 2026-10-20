@@ -1,0 +1,30 @@
+name: Track07 Analytics Controls and Western Digits QA
+on:
+  push:
+    branches:
+      - fix/track07-analytics-all-controls-latin-digits-20261020
+permissions:
+  contents: read
+concurrency:
+  group: track07-controls-digits-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Focused analytics buttons and numeral policy
+        run: node --test tests/track07_functional/analytics_controls_and_digits.test.cjs tests/track07_functional/analytics_date_guard.test.cjs tests/track07_functional/analytics_screen_20_locales.test.cjs
+      - name: Full Node/Python source regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          node --test --test-reporter=tap "${suites[@]}"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
