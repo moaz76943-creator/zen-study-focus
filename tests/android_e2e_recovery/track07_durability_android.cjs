@@ -161,19 +161,25 @@ async function main(){
   const code=await evaluate('generateEncryptedBackupCode()');
   assert.ok(code.startsWith('ZEN21::'));
   await evaluate('ZenNative.exportBackupToFile('+JSON.stringify(code)+')');
-  await pause(1400);
-  const focus=adb('shell','dumpsys','window','windows').slice(0,10000);
-  const xmlpath='/sdcard/df07_saf_picker.xml';
-  try{adb('shell','uiautomator','dump',xmlpath);}catch(e){throw Error('TRANSPORT: DocumentsUI hierarchy unavailable');}
-  try{
+  try {
+   await pause(1400);
+   const focus=adb('shell','dumpsys','window','windows').slice(0,10000);
+   const xmlpath='/sdcard/df07_saf_picker.xml';
+   try{adb('shell','uiautomator','dump',xmlpath);}catch(e){throw Error('TRANSPORT: DocumentsUI hierarchy unavailable');}
    const xml=adb('shell','cat',xmlpath);
    if(!/documentsui|DocumentsUI|Save|SAVE|حفظ|Documents|Downloads/i.test(xml+focus))throw Error('TRANSPORT: SAF chooser not observable on emulator');
-   // Do not tap an unverified save destination or claim a saved file.
+   // SAF UI visibility is not export success: no Save/readback has occurred.
    throw Error('TRANSPORT: SAF picker opened, but real document Save + readback / file picker import not instrumented');
   }finally{
-   // Never contaminate the following legacy UIAutomator suite with DocumentsUI.
-   adb('shell','input','keyevent','4');
-   await pause(500);
+   // SAF filename IME may consume the first Back: close any picker and explicitly
+   // return to our app before starting independent legacy UIAutomator probes.
+   for(let n=0;n<3;n++){
+    const current=adb('shell','dumpsys','window','windows');
+    if(/mCurrentFocus[^\n]*com\.zenstudy\.focus/.test(current))break;
+    adb('shell','input','keyevent','4');await pause(350);
+   }
+   adb('shell','am','start','-n',PKG+'/.MainActivity');
+   await pause(600);
   }
  });
 }
