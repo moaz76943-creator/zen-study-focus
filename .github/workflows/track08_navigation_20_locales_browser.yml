@@ -35,6 +35,8 @@ jobs:
           python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/locale-browser-http.log" 2>&1 &
           for i in {1..30};do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1;done
           exit 1
+      - name: Check navigation acceptance test syntax
+        run: node --check tests/track07_functional/live_20_language_switch_navigation.cjs
       - name: Switch all 20 languages at 320/393/430 px, verify nav, RTL, overflow
         env:
           DF_COMPLETION_URL: http://127.0.0.1:8770
