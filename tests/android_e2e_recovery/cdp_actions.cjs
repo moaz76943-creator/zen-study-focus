@@ -251,7 +251,7 @@ async function main(){
   adb('shell','input','keyevent','4');await pause(250);
   await touch(`${card}.querySelector('.nsux-actions button')`);
   await check(`document.querySelector('#inpNoteTitle').value===${JSON.stringify(title)}&&document.querySelector('#inpNoteBody').value===${JSON.stringify(body)}`,'Reopened editor preserves exact original Markdown and Unicode');
-  await tap('#nsSaveButton');
+  await tap('#inpNoteBody');await dismissNoteKeyboardForSave();await tap('#nsSaveButton');
  });
  await run('data_integrity',async()=>{await evaluate("window.fixtureBackup=generateEncryptedBackupCode();window.fixtureConfirm=window.confirm;window.confirm=()=>true");try{await check('verifyAndRestoreBackupCode(window.fixtureBackup)===true','Real ZEN21 roundtrip');}finally{await evaluate('window.confirm=window.fixtureConfirm;delete window.fixtureBackup;delete window.fixtureConfirm');}});
  await run('process_death_recovery',async()=>{
