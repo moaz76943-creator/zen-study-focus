@@ -44,3 +44,14 @@ test('source retains original synchronous focus/task/note confirmation contracts
  assert.match(j,/zen_fortress_cfg_v21/);
  assert.match(j,/zen_fortress_notes_v21/);
 });
+
+test('successive prompts such as permanent delete then backup acknowledgement do not auto-cancel each other',()=>{
+ const click=source.slice(source.indexOf('setPositiveButton(android.R.string.ok'));
+ const resolved=click.indexOf('result.confirm()');
+ assert.ok(resolved>0,'positive resolution should invoke JavaScript');
+ const cleared=click.slice(0,resolved);
+ assert.match(cleared,/activeDialog\s*=\s*null;/,'release current native dialog before JavaScript resumes');
+ assert.match(cleared,/activeCancel\s*=\s*null;/,'release pending cancellation before chained dialog');
+ const cancel=source.slice(source.indexOf('final Runnable cancel'),source.indexOf('AlertDialog.Builder builder'));
+ assert.match(cancel,/activeDialog\s*=\s*null;/,'cancel can permit follow-up dialog instead of blocking it');
+});
