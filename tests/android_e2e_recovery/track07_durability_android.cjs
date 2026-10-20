@@ -165,10 +165,16 @@ async function main(){
   const focus=adb('shell','dumpsys','window','windows').slice(0,10000);
   const xmlpath='/sdcard/df07_saf_picker.xml';
   try{adb('shell','uiautomator','dump',xmlpath);}catch(e){throw Error('TRANSPORT: DocumentsUI hierarchy unavailable');}
-  const xml=adb('shell','cat',xmlpath);
-  if(!/documentsui|DocumentsUI|Save|SAVE|حفظ|Documents|Downloads/i.test(xml+focus))throw Error('TRANSPORT: SAF chooser not observable on emulator');
-  // Do not tap an unverified save destination or claim a saved file.
-  throw Error('TRANSPORT: SAF picker opened, but real document Save + readback / file picker import not instrumented');
+  try{
+   const xml=adb('shell','cat',xmlpath);
+   if(!/documentsui|DocumentsUI|Save|SAVE|حفظ|Documents|Downloads/i.test(xml+focus))throw Error('TRANSPORT: SAF chooser not observable on emulator');
+   // Do not tap an unverified save destination or claim a saved file.
+   throw Error('TRANSPORT: SAF picker opened, but real document Save + readback / file picker import not instrumented');
+  }finally{
+   // Never contaminate the following legacy UIAutomator suite with DocumentsUI.
+   adb('shell','input','keyevent','4');
+   await pause(500);
+  }
  });
 }
 main().catch(e=>{report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:String(e.message||e).slice(0,700)});}).finally(()=>{
