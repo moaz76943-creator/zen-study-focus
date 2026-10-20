@@ -17,6 +17,8 @@
   <script src="./v3-ui.js" defer></script>
   <script src="./planner-core.js" defer></script>
   <script src="./planner-ui.js" defer></script>
+  <script src="./repo-sync-core.js" defer></script>
+  <script src="./repo-sync-ui.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#overview">تجاوز إلى المحتوى الرئيسي</a>
@@ -33,6 +35,7 @@
         <a href="#risks">◇ <span>المخاطر والأعطال</span></a>
         <a href="#tasks">▤ <span>المهام الـ161</span></a>
         <a href="#studio">▧ <span>محرر الشاشات</span></a>
+        <a href="#repo-sync">◎ <span>الربط الحي بالمستودع</span></a>
         <a href="#delivery">⇄ <span>GitHub والاختبارات</span></a>
         <a href="#agent-planner">▣ <span>خطط عمل الوكلاء</span></a>
         <a href="#agent-studio">♧ <span>الوكلاء والأتمتة</span></a>
@@ -250,6 +253,27 @@
             <a class="button primary" id="studio-review" href="#studio">فتح طلب تغيير GitHub ↗</a>
           </div>
           <p id="studio-status" class="small-muted" role="status" aria-live="polite">جارٍ تحميل الإعدادات المعتمدة من المستودع…</p>
+        </div>
+      </section>
+      <section class="section" id="repo-sync" aria-labelledby="repo-sync-title">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">REPOSITORY LIVE HEALTH</span>
+            <h2 id="repo-sync-title">الربط الحي مع GitHub</h2>
+          </div>
+          <button type="button" class="button secondary" id="repo-sync-refresh">↻ فحص الفروع والاختبارات</button>
+        </div>
+        <div class="panel repo-sync-panel">
+          <p>متابعة مستقلة لرأس فرع التكامل، وقاعدة لوحة التحكم، وتشغيلات الاختبارات المرتبطة بنفس Commit. البيانات مقروءة من GitHub العام فقط؛ لا توجد صلاحيات كتابة أو رموز سرية في المتصفح.</p>
+          <p id="repo-sync-status" class="v3-note" role="status" aria-live="polite">لم تُفحص مراجع المستودع بعد.</p>
+          <div id="repo-sync-cards" class="repo-sync-grid" aria-label="حالة طلبات الدمج"></div>
+          <p id="repo-sync-drift" class="repo-sync-drift" role="status">لم تتوفر مقارنة بين رؤوس الفروع بعد.</p>
+          <div class="repo-sync-toolbar">
+            <strong>أحدث تشغيلات GitHub Actions</strong>
+            <a href="https://github.com/moaz76943-creator/zen-study-focus/actions" target="_blank" rel="noopener noreferrer">جميع التشغيلات ↗</a>
+          </div>
+          <div id="repo-sync-workflows" class="repo-sync-list"><p>جارٍ جلب التشغيلات…</p></div>
+          <p class="safety-note">PASS يعني نجاح تشغيل CI محدد، وليس اجتياز Android الحقيقي أو موافقة إصدار Play. لا يتم الدمج أو تشغيل الأوامر من هذه اللوحة.</p>
         </div>
       </section>
       <section class="section" id="delivery" aria-labelledby="delivery-title">
