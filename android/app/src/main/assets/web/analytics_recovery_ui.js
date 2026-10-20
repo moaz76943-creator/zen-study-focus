@@ -145,7 +145,7 @@
   domain.value=opts.domain||'all';group.value=opts.group||'daily';kind.value='sessions';
   from.lang='en-u-nu-latn';to.lang='en-u-nu-latn';
   from.style.direction='ltr';to.style.direction='ltr';
-  let report=null,disposed=false,series=[],exporter=null;
+  let report=null,disposed=false,series=[],exporter=null,rangeValid=false;
   if(typeof opts.saveCSV==='function')exporter=core.createExportController(opts.saveCSV);
   exportBtn.disabled=!exporter;
   if(!exporter)exportBtn.title=tr('unavailable');
@@ -216,7 +216,7 @@
      throw new RangeError('Invalid range');
     const next=core.buildReport(provider(),{today:now,startDate:from.value,endDate:to.value,
      domain:domain.value});
-    report=next;cards.replaceChildren();setStatus('');
+    report=next;rangeValid=true;cards.replaceChildren();setStatus('');
     exportBtn.disabled=!exporter||exporter.busy;
     addCard(tr('today'),next.dashboard.today.minutes,()=>{
      from.value=now;to.value=now;refresh();displayRows(report.sessions,tr('today'));});
@@ -251,17 +251,17 @@
     const msg=tr('quality')+': '+ascii(q.excluded)+' · '+tr('conflicts')+': '+ascii(q.conflicts);
     detail.replaceChildren(el('p','',tr('detail')),el('p','',msg));
     return next;
-   }catch(e){exportBtn.disabled=true;setStatus(tr('invalid'));return null;}
+   }catch(e){rangeValid=false;exportBtn.disabled=true;setStatus(tr('invalid'));return null;}
   }
   for(const c of controls)c.addEventListener('change',refresh);
   reset.addEventListener('click',()=>{from.value=dayAt(-29);to.value=now;
    domain.value='all';group.value='daily';refresh();});
   exportBtn.addEventListener('click',async()=>{
-   if(!exporter||!report||disposed)return;
+   if(!exporter||!report||!rangeValid||exporter.busy||disposed)return;
    exportBtn.disabled=true;setStatus('');
    const response=await exporter.submit(report,kind.value);
    if(disposed)return;
-   exportBtn.disabled=false;
+   exportBtn.disabled=!rangeValid||!exporter;
    setStatus(tr(response.status==='saved'?'saved':response.status==='cancelled'?'cancelled':'failed'));
   });
   target.appendChild(wrapper);refresh();
