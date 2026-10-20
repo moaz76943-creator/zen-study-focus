@@ -88,7 +88,21 @@ async function dismissNoteKeyboardForSave(){
 }
 
 async function check(expression,message){assert.equal(await evaluate(expression),true,message);}
-async function run(id,fn){try{const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using ADB taps, CDP text input and observed state'});}catch(e){results.set(id,{id,status:(/^(TRANSPORT:|DEPENDENCY_NOT_TESTED:)/).test(e.message)?'NOT_TESTED':'FAIL',classification:classifyFailure(e),detail:e.message});}console.log(JSON.stringify(results.get(id)));}
+async function run(id,fn){
+ try{
+  const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using ADB taps, CDP text input and observed state'});
+ }catch(e){
+  const entry={id,status:(/^(TRANSPORT:|DEPENDENCY_NOT_TESTED:)/).test(e.message)?'NOT_TESTED':'FAIL',classification:classifyFailure(e),detail:e.message};
+  try{
+   const path=require('node:path'),file=path.join(path.dirname(process.argv[2]||'android-dom-actions.json'),id+'-failure.png');
+   fs.writeFileSync(file,cp.execFileSync('adb',['-s','emulator-5554','exec-out','screencap','-p'],{timeout:10000}));entry.screenshot=path.basename(file);
+  }catch(capture){entry.captureError=String(capture.message).slice(0,200);}
+  try{entry.observed=await evaluate("({task:tasksList.find(t=>t.title==='Android fixture task'),notes:notesList.filter(n=>n.title.startsWith('Android')).map(n=>({id:n.id,title:n.title,bodyLength:n.body.length})),editorTitle:document.querySelector('#inpNoteTitle')?.value,editorBodyLength:document.querySelector('#inpNoteBody')?.value.length})");}
+  catch(observation){entry.observationError=String(observation.message).slice(0,200);}
+  results.set(id,entry);
+ }
+ console.log(JSON.stringify(results.get(id)));
+}
 async function restart(){ws.close();adb('shell','am','force-stop','com.zenstudy.focus');adb('shell','am','start','-n','com.zenstudy.focus/.MainActivity');await pause(3000);await connect();await ready();}
 async function main(){
  if(process.env.DF_ANDROID_DISPOSABLE!=='1')throw Error('TRANSPORT: fresh disposable-profile acknowledgement is required');
@@ -150,8 +164,13 @@ async function main(){
     await touch(`[...${card}.querySelectorAll('label.df-check')].find(n=>n.textContent.includes(${JSON.stringify(name)})).querySelector('input')`);
     await check(`tasksList.find(t=>t.title==='Android fixture task').${kind}.find(x=>x.title===${JSON.stringify(name)}).done===true`,'Actual child checkbox persisted');
   }
+  const before=await evaluate("tasksList.find(t=>t.title==='Android fixture task')");
+  assert.ok(before&&!before.done&&before.subtasks.some(x=>x.title==='FixtureChild'&&x.done)&&before.checklist.some(x=>x.title==='FixtureCheck'&&x.done),'Both child states must be committed before restart: '+JSON.stringify(before));
+  const packet=await evaluate("loadFortressData('zen_fortress_tasks_v21',[]).find(t=>t.title==='Android fixture task')");
+  assert.deepEqual(packet,before,'Verified storage readback before process kill must match live task');
   await restart();
-  await check("(()=>{const t=tasksList.find(t=>t.title==='Android fixture task');return t&&!t.done&&t.subtasks.some(x=>x.title==='FixtureChild'&&x.done)&&t.checklist.some(x=>x.title==='FixtureCheck'&&x.done)})()",'Process restart preserves both child collections and unchanged parent');
+  const after=await evaluate("tasksList.find(t=>t.title==='Android fixture task')");
+  assert.deepEqual(after,before,'Immediate foreground process kill must retain the exact committed child IDs and states');
  });
  await run('timer_start_pause',async()=>{
   await tap('#navTimer');await evaluate("selectTimerMode(1,'focus',null)");const count=await evaluate('cfg.sessions');
@@ -222,7 +241,8 @@ async function main(){
   }
  });
  await run('long_text',async()=>{
-  const title='Android long '+ 'عنوان ٢ '.repeat(14),body=('Long العربية ٢ Unicode **literal**\n').repeat(180);
+  // Titles have an established edge-whitespace trim policy; body stays exact.
+  const title='Android long '+Array(14).fill('عنوان ٢').join(' '),body=('Long العربية ٢ Unicode **literal**\n').repeat(180);
   await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle',title);await fill('#inpNoteBody',body);await dismissNoteKeyboardForSave();await tap('#nsSaveButton');
   const card=`[...document.querySelectorAll('.nsux-card')].find(n=>n.querySelector('h3')?.textContent===${JSON.stringify(title)})`;
   await check(`notesList.filter(n=>n.title===${JSON.stringify(title)}&&n.body===${JSON.stringify(body)}).length===1`,'Long Unicode title/body saved without truncation');

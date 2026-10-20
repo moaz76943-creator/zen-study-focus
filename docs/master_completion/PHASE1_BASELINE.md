@@ -134,3 +134,13 @@ Extend the existing ADB/CDP runner rather than create another: real native-promp
 All new Android cases are **NOT_TESTED until the new exact-head emulator run completes**. Native prompt confirmation geometry has a negative test and rejects a button without a real editable prompt. Node harness tests27 PASS; neither those tests nor syntax checking establish Android operation. Unimplemented accessibility, TalkBack, full native export and scroll scenarios remain visible.
 
 The existing run script now copies the very APK installed by ADB into its uploaded evidence, hashes that copy, and records actual WebView, API and installed-package metadata. This resolves the earlier limitation that downloadable APK and emulator-tested APK came from separate jobs. Main package/signing/permissions, source app data, media gates and strict non-PASS Android exit remain unchanged.
+
+## Actual continuation Android findings (91648a9)
+
+Run39366369036 on exact91648a9 completed with14 PASS/2 FAIL/4 NOT_TESTED; original UIAutomator0/0/20 NOT_TESTED. Rotation with an unsaved draft/running timer, task Undo after tab return and injected rollover failure/retry passed. Two failed cases are retained, not renamed green.
+
+Long-text fixture ended its title with a space; the existing editor contract trims title edges (`cleanText(d.title).trim()`). Real Chromium reproduction saved124 of125 title characters exactly equal to title.trim(), and retained all6300 body characters. New fixture avoids edge whitespace and keeps exact title/body equality assertions. No application title-normalization behavior changed to satisfy a test.
+
+Task subtask/checklist assertions before restart passed individually, but combined post-restart predicate failed. Do not yet infer which child/parent value changed or blame disk durability without the record. The same create/tick/reload journey passes in desktop Chromium with exact IDs/states. Added complete before/readback/after task comparison for the next Android run, preserving immediate force-stop (no added flush sleep/Home workaround). Failed cases now capture their screen and bounded synthetic app/editor observations immediately. The remaining data-loss hypothesis stays open pending exact Android evidence.
+
+The first tested APK is artifact12239268899, SHA256 b415454ace99449a12705a61170379f4d01a8ec625d1ef03219e368d92e44ed5. Subsequent test-only changes require their own exact-head run; this is not proof of their results.
