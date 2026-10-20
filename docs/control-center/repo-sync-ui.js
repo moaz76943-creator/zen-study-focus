@@ -162,6 +162,29 @@
     }
   }
 
+  async function copyHealthReport(){
+    const button=$('repo-sync-copy');
+    if(!model){message('لا تتوفر بيانات للمراجعة بعد. افحص GitHub أولًا.');return;}
+    button.disabled=true;
+    try{
+      const report=core.formatHealthReport(model);
+      if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){
+        await navigator.clipboard.writeText(report);
+      }else{
+        const input=document.createElement('textarea');
+        input.value=report;input.readOnly=true;
+        input.style.position='fixed';input.style.opacity='0';input.style.top='-9999px';
+        document.body.append(input);input.select();
+        const copied=typeof document.execCommand==='function'&&document.execCommand('copy');
+        input.remove();
+        if(!copied)throw Error('Copy unsupported');
+      }
+      message('تم نسخ التقرير الموثق. لا يغير هذا البيانات أو ينشرها. · RELEASE NOT_APPROVED');
+    }catch(e){
+      message('تعذر النسخ من المتصفح. تحقق من إذن الحافظة أو افتح الرابط عبر HTTPS. · RELEASE NOT_APPROVED');
+    }finally{button.disabled=false;}
+  }
+
   // Phone-first shortcuts; anchor-only navigation, no privileged controls.
   function mobileQuickNav(){
     if($('mobile-quick-nav')||!$('repo-sync'))return;
@@ -198,6 +221,8 @@
   function boot(){
     if(!$('repo-sync'))return;
     $('repo-sync-refresh').addEventListener('click',refresh);
+    const copy=$('repo-sync-copy');
+    if(copy)copy.addEventListener('click',copyHealthReport);
     mobileQuickNav();
     refresh();
   }
