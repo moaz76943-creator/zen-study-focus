@@ -276,6 +276,8 @@ html[dir="rtl"] body.df-v22.df-recovery10 :where(.df10-state,.today-plan-entry,.
   text-align: start;
 }
 html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
+  /* API30 WebView fallback: physical right anchor when logical inset is unsupported. */
+  right: 50%;
   /* grid positions remain semantic; timer always occupies logical column four. */
   inset-inline-start: 50%;
   left: auto;
@@ -324,4 +326,32 @@ html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
     border-color: #50617a;
   }
   body.df-v22.df-recovery10 :where(button,a,input,textarea):focus-visible { outline-width: 4px !important; }
+}
+
+
+/* Keep the final Note action card scrollable above the fixed seven-tab bottom bar
+   on small Android WebViews (including RTL and keyboard-dismissed editing). */
+body.df-v22.df-recovery10 #sec-notes #notesStackBox {
+  padding-bottom: calc(106px + env(safe-area-inset-bottom, 0px));
+}
+/* Android Notes viewport fix: pin Save/Cancel while lengthy content scrolls.
+   Keep the actual visualViewport keyboard height and all existing data paths. */
+body.df-v22.df-recovery10 #noteModal .ns-editor {
+  max-height: min(88dvh, calc(var(--nsux-height, 100dvh) - 16px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+body.df-v22.df-recovery10 #noteModal .ns-editor > .modal-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background: #fff;
+  padding: 11px 0 max(11px, env(safe-area-inset-bottom, 0px));
+  margin-block-start: 10px;
+  border-block-start: 1px solid #e3ecf8;
+  box-shadow: 0 -8px 16px -16px rgba(28,46,77,.35);
+}
+body.df-v22.df-recovery10 #noteModal .ns-editor > .modal-actions > button {
+  min-height: 44px;
 }
