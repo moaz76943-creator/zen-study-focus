@@ -241,7 +241,11 @@
       });
     } else {
       analyticsUi=root.DeepFocusAnalyticsStudioV21.mount(host,getSnapshot,{
-        locale:cfg.lang,goals:cfg.dailyGoalsMin||{}
+        locale:cfg.lang,goals:cfg.dailyGoalsMin||{},
+        // All 20 languages must use the real SAF save-result callback, not a
+        // silently unavailable browser Blob link in Android WebView.
+        ...(root.ZenNative&&typeof root.ZenNative.exportAnalyticsCsvToFile==='function'
+          ? {onExport:(csv)=>saveCsvThroughAndroid({csv})}:{})
       });
     }
     document.getElementById('sec-analytics').classList.add('df22-analytics-live');
