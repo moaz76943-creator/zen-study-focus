@@ -1,8 +1,8 @@
-name: Track 08 Analytics controls and Western 0–9 Android QA
+name: Track 08 P0 Branded Native Dialogs Android QA
 on:
   push:
-    branches: [audit/track08-analytics-digits-buttons-android-20261020]
-    paths: [.github/workflows/track08_phase3_preinstall_qa.yml, tests/track08/qa_webview_startup_probe.cjs]
+    branches: [audit/track08-p0-branded-dialogs-android-20261020]
+    paths: [.github/workflows/track08_phase3_preinstall_qa.yml, tests/track08/native_js_dialog_android_probe.cjs, tests/track08/phase3_side_by_side_qa.sh]
 permissions:
   contents: read
 concurrency:
@@ -21,10 +21,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BASE=a717cc2412f6f133311938addae996ac03ab6175
+          BASE=3bbb36abc03c43e3b2e0a205bc0431a4d67aad6b
           git cat-file -e "$BASE^{commit}"
           diff="$(git diff --name-only "$BASE" HEAD | sort)"
-          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs tests/track08/qa_webview_startup_probe.cjs tests/track08/qa_cdp_transport.cjs tests/track08/qa_cdp_transport.test.cjs | sort)"
+          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs tests/track08/qa_webview_startup_probe.cjs tests/track08/qa_cdp_transport.cjs tests/track08/qa_cdp_transport.test.cjs tests/track08/native_js_dialog_android_probe.cjs | sort)"
           test "$diff" = "$expected"
           git rev-parse HEAD
       - uses: actions/setup-node@v4
@@ -85,6 +85,7 @@ jobs:
       - name: Enforce exact debug-only QA startup package gate and syntax
         run: |
           node --check tests/track08/qa_webview_startup_probe.cjs
+          node --check tests/track08/native_js_dialog_android_probe.cjs
           node --test tests/track08/qa_launch_contract.test.cjs tests/track08/qa_cdp_transport.test.cjs
       - name: Build separate QA debug APK
         working-directory: android
