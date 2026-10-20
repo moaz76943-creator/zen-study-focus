@@ -60,7 +60,6 @@ jobs:
       SOURCE_REF: ${{ inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'fix/master-completion-20261020' }}
       SELECTED_MODE: ${{ inputs.mode || 'safe-fix' }}
       SELECTED_LANE: ${{ inputs.lane || 'all' }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -72,6 +71,7 @@ jobs:
           ref: ${{ env.SOURCE_REF }}
           path: source
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -93,24 +93,9 @@ jobs:
           node tests/validate_locales.cjs
           node tests/smoke_app.cjs
           node tools/control_center/generate_style.cjs --check
-          case "$SELECTED_LANE" in
-            all) lane=tests;;
-            ui) lane=tests/interaction_recovery;;
-            audio) lane=tests/nature_audio_recovery;;
-            locale) lane=tests/localization_20;;
-            numerals) lane=tests/ascii_numerals;;
-            notes) lane=tests/notes_recovery;;
-            tasks) lane=tests/tasks_recovery;;
-            security) lane=tests/security_recovery;;
-            timer) lane=tests/focus_workflows;;
-            analytics) lane=tests/analytics_recovery;;
-            data) lane=tests/data_contracts;;
-            qa) lane=tests/control_center;;
-            performance) lane=tests/performance_recovery;;
-            *) echo 'Unrecognized lane';exit 2;;
-          esac
-          test "$(find "$lane" -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | wc -l)" -gt 0
-          find "$lane" -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' -print0 | sort -z | xargs -0 -r node --test --test-reporter=tap | tee "$RUNNER_TEMP/daily/node.tap"
+          # All Node source suites run once through 12 manifest-controlled agents below.
+          # The deliberately failing media rights gate is run separately in Audits.
+          echo 'Specialist source tests are executed and classified after this baseline.'
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/daily/python.log"
       - name: Audits including mandatory failed media release gate
         if: always()
@@ -135,6 +120,7 @@ jobs:
         shell: bash
         env:
           GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           cd source
@@ -150,6 +136,7 @@ jobs:
           git checkout -b "$branch"
           git add -- android/app/src/main/assets/web/control_center_overrides.css
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'style(automation): regenerate safe CSS for review'
+          gh auth setup-git
           git push origin "HEAD:refs/heads/$branch"
           gh pr create --repo "$GH_REPO" --base "$SOURCE_REF" --head "$branch" --draft --title '[Daily QA] Generated CSS repair' --body "SHA $original_sha. Generated CSS only. Tests passed, human review required. No app release." || echo 'PR creation restricted; branch pushed for review.'
       - name: Update one daily blockers issue without duplicates
@@ -203,6 +190,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.SOURCE_REF }}
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

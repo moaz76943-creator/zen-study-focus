@@ -23,7 +23,8 @@
       "lane": "ui",
       "purpose": "Buttons, touch navigation and view-state behavior",
       "test_dirs": [
-        "tests/interaction_recovery"
+        "tests/interaction_recovery",
+        "tests/android_e2e_recovery"
       ]
     },
     {
@@ -32,7 +33,8 @@
       "purpose": "Notes preservation, editor and draft recovery",
       "test_dirs": [
         "tests/notes_core",
-        "tests/notes_recovery"
+        "tests/notes_recovery",
+        "tests/notes_ui"
       ]
     },
     {
@@ -68,7 +70,8 @@
       "purpose": "Real media loading, mixing and completion alerts",
       "test_dirs": [
         "tests/nature_audio_recovery",
-        "tests/completion_alerts"
+        "tests/completion_alerts",
+        "tests/audio_acquisition_12"
       ]
     },
     {
@@ -76,7 +79,8 @@
       "lane": "security",
       "purpose": "WebView input handling and local data safety",
       "test_dirs": [
-        "tests/security_recovery"
+        "tests/security_recovery",
+        "tests/recovery_baseline"
       ]
     },
     {
@@ -85,7 +89,8 @@
       "purpose": "v21 data compatibility, export/import and no migrations",
       "test_dirs": [
         "tests/data_contracts",
-        "tests/regression_v21"
+        "tests/regression_v21",
+        "tests/integration_quality"
       ]
     },
     {
@@ -103,7 +108,12 @@
       "test_dirs": [
         "tests/design_quality",
         "tests/white_premium_qa",
-        "tests/master_completion"
+        "tests/master_completion",
+        "tests/control_center",
+        "tests/quality_center",
+        "tests/integration_recovery",
+        "tests/master_recovery_qa",
+        "tests/ux_recovery15"
       ]
     }
   ]
