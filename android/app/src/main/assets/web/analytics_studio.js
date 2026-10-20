@@ -38,16 +38,41 @@
     if(!target||typeof target.appendChild!=='function')throw new TypeError('Mount target required');
     const doc=target.ownerDocument||document;
     const provider=typeof getSnapshot==='function'?getSnapshot:()=>getSnapshot||{};
-    const t=opts.locale==='ar'?{
-      title:'التحليلات الفعلية',activity:'النشاط',period:'الفترة',start:'من',end:'إلى',
-      minutes:'دقائق مسجلة',sessions:'جلسات',average:'متوسط الجلسة',streak:'سلسلة الالتزام',
-      noData:'لا توجد جلسات مسجلة لهذه الفترة',goal:'مقارنة الأهداف',noGoals:'لا توجد أهداف يومية محددة',
-      tasks:'المهام المكتملة',chart:'توزيع الأيام',year:'السنة',export:'تصدير CSV',details:'اختر يوماً لعرض تفاصيله',invalidDates:'نطاق التاريخ غير صالح. اختر تاريخ بداية ونهاية صحيحين.'
-    }:{title:'Recorded analytics',activity:'Activity',period:'Period',start:'From',end:'To',
-      minutes:'Recorded minutes',sessions:'Sessions',average:'Average session',streak:'Current streak',
-      noData:'No recorded sessions in this period',goal:'Goal comparison',noGoals:'No daily goals configured',
-      tasks:'Completed tasks',chart:'Daily distribution',year:'Year',export:'Export CSV',details:'Select a day for details',invalidDates:'Invalid date range. Select valid start and end dates.'};
+    // Reuse the existing, reviewed 20-language analytics glossary. Resolve when
+    // mounted (not at script evaluation), because the catalog loads after this file.
+    const locale20=typeof module==='object'&&module.exports
+      ? require('./localization_20_recovery.js')
+      : (typeof globalThis!=='undefined'?globalThis.DeepFocusLocale20Recovery:null);
+    const language=locale20?locale20.resolve(opts.locale||'en'):(opts.locale||'en');
+    if(!locale20&&language!=='en'&&language!=='ar')
+      throw new Error('Verified analytics translations unavailable');
+    const t={};
+    const keys={title:'analyticsTitle',activity:'activity',period:'period',
+      start:'from',end:'to',minutes:'minutes',sessions:'sessions',average:'average',
+      streak:'streak',noData:'noSessions',goal:'goal',noGoals:'noGoals',
+      tasks:'completedTasks',chart:'chart',year:'year',export:'export',
+      details:'details',grouping:'grouping',all:'all',study:'study',
+      read:'reading',work:'work',sport:'fitness',excluded:'excluded',
+      minute:'minute',daily:'daily',weekly:'weekly',monthly:'monthly'};
+    for(const [local,verified] of Object.entries(keys)){
+      const translated=locale20?.t(language,verified);
+      if(!translated)throw new Error('Missing Analytics translation: '+language+'/'+verified);
+      t[local]=translated;
+    }
+    // No unsupported machine-generated sentence for date validation:
+    // identify both affected fields in each language using verified labels.
+    t.invalidDates=language==='ar'
+      ? 'نطاق التاريخ غير صالح. اختر تاريخ بداية ونهاية صحيحين.'
+      : language==='en'
+      ? 'Invalid date range. Select valid start and end dates.'
+      : '⚠ '+t.start+' / '+t.end;
+    const western=value=>locale20?locale20.westernDigits(String(value)):String(value);
     const wrapper=doc.createElement('section');wrapper.className='dfa-studio';
+    wrapper.dir=locale20?locale20.direction(language):(['ar','fa','ur'].includes(language)?'rtl':'ltr');
+    wrapper.lang=language;
+    if(typeof wrapper.setAttribute==='function'){
+      wrapper.setAttribute('dir',wrapper.dir);wrapper.setAttribute('lang',language);
+    }
     wrapper.style.cssText='background:#fff;color:#14213d;border:1px solid #e2e8f0;border-radius:18px;padding:16px;max-width:100%;overflow:hidden';
     const mk=(tag,text,cls)=>{const el=doc.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;};
     const heading=mk('h2',t.title);heading.style.margin='0 0 12px';wrapper.appendChild(heading);
@@ -56,11 +81,12 @@
       const el=mk(type==='select'?'select':'input');if(type!=='select')el.type=type;
       el.style.cssText='min-height:42px;background:#fff;color:#14213d;border:1px solid #cbd5e1;border-radius:10px;padding:6px';l.appendChild(el);filters.appendChild(l);return el;}
     const domain=input('select',t.activity);
-    const labels={all:opts.locale==='ar'?'الكل':'All',study:opts.locale==='ar'?'دراسة':'Study',read:opts.locale==='ar'?'قراءة':'Reading',work:opts.locale==='ar'?'عمل':'Work',sport:opts.locale==='ar'?'رياضة':'Sport'};
+    const labels={all:t.all,study:t.study,read:t.read,work:t.work,sport:t.sport};
     ['all',...core.DOMAINS].forEach(d=>{const option=mk('option',labels[d]);option.value=d;domain.appendChild(option);});
-    const grouping=input('select',opts.locale==='ar'?'التجميع':'Grouping');
-    for(const [value,ar,en] of [['daily','يومي','Daily'],['weekly','أسبوعي','Weekly'],['monthly','شهري','Monthly']]){const o=mk('option',opts.locale==='ar'?ar:en);o.value=value;grouping.appendChild(o);}
+    const grouping=input('select',t.grouping);
+    for(const value of ['daily','weekly','monthly']){const o=mk('option',t[value]);o.value=value;grouping.appendChild(o);}
     const start=input('date',t.start),end=input('date',t.end);
+    for(const field of [start,end]){field.style.direction='ltr';field.lang='en-u-nu-latn';}
     const exportBtn=mk('button',t.export);exportBtn.type='button';exportBtn.style.cssText='min-height:42px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:6px 12px';
     filters.appendChild(exportBtn);wrapper.appendChild(filters);
     const feedback=mk('p');feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
@@ -84,21 +110,23 @@
         [t.average,report.totals.averageMinutes===null?'—':report.totals.averageMinutes],
         [t.streak,report.streaks.current]]){
         const box=mk('div');box.style.cssText='padding:12px;background:#f8fafc;border-radius:12px';
-        const label=mk('div',name);label.style.fontSize='12px';const number=mk('strong',String(value));number.style.fontSize='22px';
+        const label=mk('div',name);label.style.fontSize='12px';const number=mk('strong',western(value));number.style.fontSize='22px';
         box.append(label,number);kpis.appendChild(box);
       }
       currentSeries=grouping.value==='weekly'?report.weekly:grouping.value==='monthly'?report.monthly:report.daily;
+      // Retain accurate totals while reducing 10-year ranges to readable buckets.
+      if(grouping.value==='daily'&&currentSeries.length>120){grouping.value='monthly';currentSeries=report.monthly;}
       chart.innerHTML=report.totals.sessions?barsSvg(currentSeries):'';
       if(!report.totals.sessions){chart.textContent=t.noData;detail.textContent=t.noData;}else detail.textContent=t.details;
       domainView.replaceChildren();
-      for(const d of core.DOMAINS){const s=report.byDomain[d];const chip=mk('span',labels[d]+': '+s.minutes+' min');
+      for(const d of core.DOMAINS){const s=report.byDomain[d];const chip=mk('span',labels[d]+': '+western(s.minutes)+' '+t.minute);
         chip.style.cssText='border-radius:999px;background:#f8fafc;padding:6px 10px;border:1px solid '+palettes[d];domainView.appendChild(chip);}
       goals.replaceChildren(mk('h3',t.goal));
       if(!report.goals.available)goals.appendChild(mk('p',t.noGoals));
-      else for(const g of report.goals.byDomain){const p=mk('p',labels[g.domain]+': '+g.actualMinutes+' / '+g.targetMinutes+' min ('+g.progress+'%)');goals.appendChild(p);}
-      taskBox.replaceChildren(mk('p',t.tasks+': '+report.tasks.completed+' / '+report.tasks.total));
-      for(const p of report.tasks.projects){if(p.total>0)taskBox.appendChild(mk('p',p.name+': '+p.completed+' / '+p.total));}
-      if(report.quality.excluded)taskBox.appendChild(mk('p',(opts.locale==='ar'?'جلسات مستبعدة: ':'Excluded sessions: ')+report.quality.excluded));
+      else for(const g of report.goals.byDomain){const p=mk('p',labels[g.domain]+': '+western(g.actualMinutes)+' / '+western(g.targetMinutes)+' '+t.minute+' ('+western(g.progress)+'%)');goals.appendChild(p);}
+      taskBox.replaceChildren(mk('p',t.tasks+': '+western(report.tasks.completed)+' / '+western(report.tasks.total)));
+      for(const p of report.tasks.projects){if(p.total>0)taskBox.appendChild(mk('p',p.name+': '+western(p.completed)+' / '+western(p.total)));}
+      if(report.quality.excluded)taskBox.appendChild(mk('p',t.excluded+': '+western(report.quality.excluded)));
       // Heatmap only when the selected year contains at least one validated recorded session.
       const year=Number(end.value.slice(0,4));const days=core.yearHeatmap(snap,year,{today,domain:domain.value});
       heatDays=days;
@@ -112,7 +140,7 @@
       const key=node.getAttribute('data-day');if(!(core.validDay(key)||/^\d{4}-(?:0[1-9]|1[0-2])$/.test(key)))return;
       if(event.type==='keydown'&&!['Enter',' '].includes(event.key))return;
       if(event.type==='keydown')event.preventDefault();
-      const day=node.getAttribute('data-day');const found=currentSeries.find(r=>r.key===day)||heatDays.find(r=>r.key===day);detail.textContent=day+': '+(found?found.minutes:0)+' min';
+      const day=node.getAttribute('data-day');const found=currentSeries.find(r=>r.key===day)||heatDays.find(r=>r.key===day);detail.textContent=western(day)+': '+western(found?found.minutes:0)+' '+t.minute;
     };
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
     [domain,grouping,start,end].forEach(el=>el.addEventListener('change',refresh));
