@@ -30,3 +30,12 @@ test('native prompt confirmation requires a real editable dialog and positive bu
  assert.throws(()=>parseNativePromptButton('<node resource-id="android:id/button1" bounds="[0,0][100,100]"/>'),/TRANSPORT:/);
  assert.throws(()=>parseNativePromptButton(prompt.replace('[600,110][900,180]','[600,110][600,180]')),/TRANSPORT:/);
 });
+test('native field value is verified before confirmation, with safe cancellation and ambiguity rejection',()=>{
+ const {nativePromptText,parseNativePromptButton}=require('./android_device_touch.cjs');
+ const field='<node class="android.widget.EditText" text="Fixture&amp;Child" bounds="[0,0][100,20]"/>';
+ assert.equal(nativePromptText(field),'Fixture&Child');
+ assert.throws(()=>nativePromptText(field+field),/ambiguous/);
+ assert.throws(()=>nativePromptText('<node class="android.widget.EditText"/>'),/unavailable/);
+ assert.deepEqual(parseNativePromptButton(field+'<node resource-id="android:id/button2" bounds="[10,20][110,60]"/>','button2'),{x:60,y:40});
+ assert.throws(()=>parseNativePromptButton(field,'arbitrary'),/Unsupported/);
+});

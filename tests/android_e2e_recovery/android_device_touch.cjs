@@ -26,11 +26,12 @@ function cssPointToAndroid(point,box) {
     throw new Error('TRANSPORT: Translated touch lies outside actual WebView');
   return {x:px,y:py};
 }
-function parseNativePromptButton(xml) {
+function parseNativePromptButton(xml,which='button1') {
+  if(!['button1','button2'].includes(which))throw new Error('TRANSPORT: Unsupported native prompt action');
   const nodes=String(xml||'').match(/<node\b[^>]*>/g)||[];
   if(!nodes.some(n=>/\bclass="android\.widget\.EditText"/.test(n)))
     throw new Error('TRANSPORT: Editable native prompt is not exposed');
-  const button=nodes.find(n=>/\bresource-id="android:id\/button1"/.test(n));
+  const button=nodes.find(n=>n.includes('resource-id="android:id/'+which+'"'));
   const m=button&&/\bbounds="\[([0-9]+),([0-9]+)\]\[([0-9]+),([0-9]+)\]"/.exec(button);
   if(!m)throw new Error('TRANSPORT: Native prompt confirmation button unavailable');
   const [left,top,right,bottom]=m.slice(1).map(Number);
@@ -38,4 +39,12 @@ function parseNativePromptButton(xml) {
     throw new Error('TRANSPORT: Invalid native prompt confirmation bounds');
   return {x:Math.round((left+right)/2),y:Math.round((top+bottom)/2)};
 }
-module.exports={parseWebViewBounds,cssPointToAndroid,parseNativePromptButton};
+function nativePromptText(xml){
+ const nodes=String(xml||'').match(/<node\b[^>]*>/g)||[];
+ const fields=nodes.filter(n=>/\bclass="android\.widget\.EditText"/.test(n));
+ if(fields.length!==1)throw new Error('TRANSPORT: Native prompt input missing or ambiguous');
+ const text=/\btext="([^"]*)"/.exec(fields[0]);
+ if(!text)throw new Error('TRANSPORT: Native prompt input text unavailable');
+ return text[1].replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+}
+module.exports={parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,nativePromptText};

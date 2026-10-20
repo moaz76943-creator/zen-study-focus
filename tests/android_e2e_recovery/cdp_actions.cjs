@@ -2,7 +2,7 @@
 // Real disposable Android WebView actions. Does not claim TalkBack, hearing, DND or physical-phone acceptance.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
 const {validateTouchTarget,missingPrerequisites,classifyFailure,selectCases}=require('./cdp_touch_target.cjs');
-const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton}=require('./android_device_touch.cjs');
+const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,nativePromptText}=require('./android_device_touch.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
 const selectedCases=selectCases(process.env.DF_ANDROID_CASES||'',CASES);
 const scenarioEvidence=new Map();
@@ -160,9 +160,16 @@ async function main(){
   for(const [label,name,kind] of [['＋ Subtasks','FixtureChild','subtasks'],['＋ Checklist','FixtureCheck','checklist']]){
     await touch(`[...${card}.querySelectorAll('button')].find(n=>n.textContent===${JSON.stringify(label)})`);
     // The real native JavaScript prompt is filled through Android, never a prompt stub.
-    adb('shell','input','text',name);
+    // Separate native key batches prevent observed VM character transposition.
+    for(const char of name)adb('shell','input','text',char);
     adb('shell','uiautomator','dump','/sdcard/deep_focus_prompt.xml');
-    const point=parseNativePromptButton(adb('shell','cat','/sdcard/deep_focus_prompt.xml'));
+    const xml=adb('shell','cat','/sdcard/deep_focus_prompt.xml'),entered=nativePromptText(xml);
+    if(entered!==name){
+      const cancel=parseNativePromptButton(xml,'button2');
+      adb('shell','input','tap',String(cancel.x),String(cancel.y));
+      throw Error('TRANSPORT: Native input mismatch before submit: '+JSON.stringify({expected:name,actual:entered}));
+    }
+    const point=parseNativePromptButton(xml);
     adb('shell','input','tap',String(point.x),String(point.y));await pause(300);
     await check(`tasksList.find(t=>t.title==='Android fixture task')?.${kind}?.some(x=>x.title===${JSON.stringify(name)}&&!x.done)`,'Native prompt created '+kind);
     await touch(`[...${card}.querySelectorAll('label.df-check')].find(n=>n.textContent.includes(${JSON.stringify(name)})).querySelector('input')`);
