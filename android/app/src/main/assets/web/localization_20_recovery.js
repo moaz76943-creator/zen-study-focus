@@ -114,7 +114,9 @@
         if (disposed) return false;
         const next = resolve(code);
         if (next === active) return false;
-        if (typeof persist === 'function') persist(next);
+        // Synchronous adapters may reject with false; void-returning adapters
+        // remain supported. Never present a language change rejected by storage.
+        if (typeof persist === 'function' && persist(next) === false) return false;
         active = next;
         apply(scope, next);
         if (typeof onChange === 'function') onChange(next);

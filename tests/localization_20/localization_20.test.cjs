@@ -111,3 +111,22 @@ test('DF-045/055: state switch persists through injected v21 adapter without cop
   assert.equal(ctrl.dispose(),true);
   assert.equal(ctrl.setLanguage('fr'),false);
 });
+
+test('DF-045/055: rejected persistence leaves locale and rendering unchanged and permits retry', () => {
+  const persisted=[], rendered=[];
+  let accepted=false, queries=0;
+  const root={querySelectorAll(){queries++;return [];}};
+  const ctrl=locale.createController({root,locale:'en',
+    persist:code=>{persisted.push(code);return accepted;},
+    onChange:code=>rendered.push(code)});
+  assert.equal(ctrl.setLanguage('de'),false);
+  assert.equal(ctrl.language(),'en');
+  assert.equal(queries,0);
+  assert.deepEqual(rendered,[]);
+  accepted=true;
+  assert.equal(ctrl.setLanguage('de'),true);
+  assert.equal(ctrl.language(),'de');
+  assert.ok(queries>0);
+  assert.deepEqual(persisted,['de','de']);
+  assert.deepEqual(rendered,['de']);
+});
