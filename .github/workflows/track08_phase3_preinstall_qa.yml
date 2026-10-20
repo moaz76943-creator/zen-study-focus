@@ -34,6 +34,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Record actual 20-language source catalog gaps (not fake 100% parity)
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/locale-audit"
+          node tools/language_review/audit.cjs --out "$RUNNER_TEMP/locale-audit"
+          node -e 'const a=require(process.env.RUNNER_TEMP+"/locale-audit/coverage.json");console.log("LOCALE_AUDIT_SHA="+a.pinnedSha);console.log("LANGUAGES="+a.languages.length+"; UNTRANSLATED_LANGUAGE_KEY_PAIRS="+a.missing.length);if(a.languages.length!==20)process.exit(1)'
       - name: Install Android SDK 36
         shell: bash
         run: |
@@ -142,3 +148,5 @@ jobs:
             ${{ runner.temp }}/df-qa/*.json
             ${{ runner.temp }}/df-qa/*.png
             ${{ runner.temp }}/df-qa/*.diff
+            ${{ runner.temp }}/locale-audit/coverage.json
+            ${{ runner.temp }}/locale-audit/REPORT.md
