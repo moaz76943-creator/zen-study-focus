@@ -8,7 +8,7 @@ on:
       target:
         type: choice
         required: true
-        default: recovery
+        default: master-draft
         options: [recovery, master-draft]
       lane:
         type: choice
@@ -55,7 +55,7 @@ jobs:
       pull-requests: write
       issues: write
     env:
-      SOURCE_REF: ${{ inputs.target == 'master-draft' && 'fix/master-completion-20261020' || 'integration/deep-focus-recovery-00-final-20261019' }}
+      SOURCE_REF: ${{ inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'fix/master-completion-20261020' }}
       SELECTED_MODE: ${{ inputs.mode || 'safe-fix' }}
       SELECTED_LANE: ${{ inputs.lane || 'all' }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -170,7 +170,7 @@ jobs:
     permissions:
       contents: read
     env:
-      SOURCE_REF: ${{ inputs.target == 'master-draft' && 'fix/master-completion-20261020' || 'integration/deep-focus-recovery-00-final-20261019' }}
+      SOURCE_REF: ${{ inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'fix/master-completion-20261020' }}
     steps:
       - uses: actions/checkout@v4
         with:
