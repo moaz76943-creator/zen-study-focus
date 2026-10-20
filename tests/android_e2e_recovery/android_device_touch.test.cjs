@@ -23,3 +23,25 @@ test('invalid device points never become trusted touches',()=>{
                     {x:NaN,y:5,viewportWidth:412,viewportHeight:843}])
     assert.throws(()=>cssPointToAndroid(bad,box),/TRANSPORT:/);
 });
+test('native prompt confirmation requires a real editable dialog and positive button bounds',()=>{
+ const {parseNativePromptButton}=require('./android_device_touch.cjs');
+ const prompt='<hierarchy><node class="android.widget.EditText" bounds="[10,10][900,100]"/><node resource-id="android:id/button1" bounds="[600,110][900,180]"/></hierarchy>';
+ assert.deepEqual(parseNativePromptButton(prompt),{x:750,y:145});
+ assert.throws(()=>parseNativePromptButton('<node resource-id="android:id/button1" bounds="[0,0][100,100]"/>'),/TRANSPORT:/);
+ assert.throws(()=>parseNativePromptButton(prompt.replace('[600,110][900,180]','[600,110][600,180]')),/TRANSPORT:/);
+});
+test('native field value is verified before confirmation, with safe cancellation and ambiguity rejection',()=>{
+ const {nativePromptText,parseNativePromptButton}=require('./android_device_touch.cjs');
+ const field='<node class="android.widget.EditText" text="Fixture&amp;Child" bounds="[0,0][100,20]"/>';
+ assert.equal(nativePromptText(field),'Fixture&Child');
+ assert.throws(()=>nativePromptText(field+field),/ambiguous/);
+ assert.throws(()=>nativePromptText('<node class="android.widget.EditText"/>'),/unavailable/);
+ assert.deepEqual(parseNativePromptButton(field+'<node resource-id="android:id/button2" bounds="[10,20][110,60]"/>','button2'),{x:60,y:40});
+ assert.throws(()=>parseNativePromptButton(field,'arbitrary'),/Unsupported/);
+});
+test('IME-resized Android frame cannot map stale pre-keyboard CSS coordinates into a missed tap',()=>{
+ const frame={left:0,top:63,right:1080,bottom:1533,width:1080,height:1470};
+ const stale={x:348.348,y:233.6667,viewportWidth:412,viewportHeight:843};
+ assert.throws(()=>cssPointToAndroid(stale,frame),/TRANSPORT:.*layout/);
+ assert.deepEqual(cssPointToAndroid({...stale,viewportHeight:560.762},frame),{x:913,y:676});
+});

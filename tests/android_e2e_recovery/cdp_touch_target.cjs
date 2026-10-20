@@ -19,4 +19,18 @@ function missingPrerequisites(results,required){
  if(!(results instanceof Map)||!Array.isArray(required))throw new TypeError('Expected test results Map and required case IDs');
  return required.filter(id=>results.get(id)?.status!=='PASS');
 }
-module.exports={validateTouchTarget,missingPrerequisites};
+function classifyFailure(error){
+ const message=String(error?.message||error);
+ if(message.startsWith('DEPENDENCY_NOT_TESTED:'))return 'BLOCKED';
+ if(/^(TRANSPORT:|TEST_PROTOCOL:)/.test(message))return 'FAIL_TEST_TRANSPORT';
+ if(error?.code==='ERR_ASSERTION'||/^(UI_|APP_RUNTIME:)/.test(message))return 'FAIL_APP';
+ return 'FAIL_TEST_INFRA';
+}
+function selectCases(value,known){
+ if(!value||!value.trim())return null;
+ const ids=value.split(',').map(x=>x.trim());
+ if(ids.some(id=>!known.includes(id)))throw new Error('Unknown Android case selection');
+ if(new Set(ids).size!==ids.length)throw new Error('Duplicate Android case selection');
+ return new Set(ids);
+}
+module.exports={validateTouchTarget,missingPrerequisites,classifyFailure,selectCases};

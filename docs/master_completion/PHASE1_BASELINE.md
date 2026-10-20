@@ -1,0 +1,180 @@
+# Phase 1 canonical integration baseline and evidence
+
+Date: 2026-10-20 UTC. DF-CX-001–004. This document supplements the existing `LEDGER_197.json`; it does not replace Issue #13 or create another task ledger.
+
+## Selected source and protected work
+
+BASE_SHA: `bd6e3e4d8aef95def871c9e7f78c63807e681369` (PR #66).
+Repair branch: `fix/codex-phase1-stabilization-20261020`, isolated worktree `/workspace/deep-focus-phase1`.
+Default branch remains `main`; no production merge authorized. Original worktrees remain intact, including local unpublished `e3394e8d6c4be4e11204ea2e435e9a8f4e74dbde` and its generated untracked reports. The selected source has two parents, PR #52 `534912c` and PR #25 `be890c7`.
+
+## Live ancestry, not PR status inference
+
+| PR | State | Live head | Base | Head ancestor of candidate |
+|---|---|---|---|---|
+| #68 | open | `fa376026c8f53989f8bbced851ea6b1b5ed010d7` | integration/deep-focus-consolidated-candidate-20261020 | no (compare content) |
+| #67 | open | `e6ad2811302bea8333207b6d11dba0cb0a3cc70c` | main | no (compare content) |
+| #66 | open | `bd6e3e4d8aef95def871c9e7f78c63807e681369` | integration/deep-focus-recovery-00-final-20261019 | yes |
+| #65 | open | `9ca2fb40ae9db6bd823415dd2415f0750c779ede` | main | no (compare content) |
+| #59 | open | `5c74816692c971f6d0493475a2d856018cf72021` | integration/deep-focus-recovery-00-final-20261019 | no (compare content) |
+| #52 | open | `534912ce2d90d8988981c7d32e8bcb69671003f0` | fix/master-completion-20261020 | yes |
+| #50 | open | `639257bf3b8b392f1fdd512fc72b7656fd9ad9fa` | fix/master-completion-20261020 | no (compare content) |
+| #47 | open | `163cc0a83be8219f929f0c6907c8da85a0f33e49` | fix/master-completion-20261020 | no (compare content) |
+| #44 | open | `93aa1be5dd3fcc08027b5ffe9fd03d6b5e250b09` | integration/deep-focus-recovery-00-final-20261019 | no (compare content) |
+| #42 | closed | `aa7bd63ce45a0174c9091472d251d81cd3d30492` | integration/df4-consolidated-qa-20261019 | yes |
+| #41 | closed | `d8430d6a5bb932143cad9cb95a9b9b81f5a0a911` | fix/df4-master-recovery-20261019 | yes |
+| #39 | open | `96732c84cda2dd52f52cc6de06c22e59b1f1bd2b` | integration/deep-focus-recovery-00-final-20261019 | no (compare content) |
+| #25 | open | `be890c7487ba042af12b764a1a211fe7beed2a4e` | fix/v21-safe-release-recovery-20261018 | yes |
+
+PR #42's closed/unmerged GitHub state does not mean missing code: its head is an ancestor. Latest #44/#47 heads are not ancestors, but actual runtime source diff against #44 contains only candidate additions (Nature V2 and Notes/IME CSS). The activity-counter durability, failed-language rollback and 20-language draft warning tests/code already exist. Do not cherry-pick those merge commits. PR #52 contains existing ADB touch geometry and keyboard diagnostics; reuse them. PR #59 audio QA is separate from approved primary-package playback. #65 orchestration and #67 read-only merge probes are existing work, not missing tools to recreate.
+
+## Exact candidate baseline results
+
+- Local UNIT/INTEGRATION/static Node discovery: **561 PASS, 0 FAIL**, media release gate deliberately separate, not disabled. Command: `find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs -print0 | sort -z | xargs -0 -r node --test --test-reporter=tap`.
+- CI source + Gradle: [39360536754](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39360536754) SUCCESS on BASE_SHA.
+- BROWSER: [39360536643](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39360536643) SUCCESS on BASE_SHA.
+- ANDROID_EMULATOR API30: [39360536718](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39360536718) workflow FAILURE; CDP cases **13 PASS / 0 FAIL / 7 NOT_TESTED**; UIAutomator HTML-descendant transport **20 NOT_TESTED**. A 1-minute background work-credit assertion passed, notification appearance/hearing/DND did not run. Never call all Android acceptance passed.
+- Draft locale CI [39360589209](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39360589209): source SUCCESS, debug build **FAIL_TEST_INFRA** (`sdkmanager: command not found` before compilation). #68 fixes this exact setup failure and has source/debug SUCCESS; review its two-file patch before integration.
+- Physical installed owner APK, signing and installed source identity unavailable: **DEVICE_NOT_TESTED**. Historical checked-in APK is not evidence of this source. No owner data accessed.
+
+## Contracts and feature ownership
+
+Read `DATA_COMPAT_V21.md`, `MEDIA_LICENSES.md`, `LEDGER_197.md/.json`, `FINAL_MATRIX_161.md`, and live Issue #13 (full body captured with its updated timestamp). Historical contract text describing a standalone module is superseded by current integrated preflight/journal code: preserve actual six-slot primary/mirror envelopes and transaction verification.
+
+`cfg.sessions` remains numeric; `cfg.sessionHistory` is the history array. Numeric task/note IDs and unknown fields must survive. Keep all protected v21 keys, draft/active-timer keys, local WebView origin and `ZEN21::`. No migration, permissions, signing or package-ID change.
+
+Features retained: timer/native ledger, tasks/projects/subtasks/calendar, Notes/editor/drafts/linking, analytics/goals/CSV/backup, quick training, 20 languages, current gated nature mixer plus non-activating Nature V2 inventory. Existing adapters deliberately bridge core modules into legacy state; file-name similarity is not proof of duplicate active ownership.
+
+## Runtime script graph (actual index order)
+
+1. `webview_compat.js`
+2. `locale_rows.js`
+3. `locale_extras.js`
+4. `numerals_ascii_v21.js`
+5. `quick_training.js`
+6. `data_compat_v21.js`
+7. `preflight_v22.js`
+8. `nature_library_v2.js`
+9. `analytics_recovery_core.js`
+10. `app.js`
+11. `notes_core_v21.js`
+12. `notes_studio.js`
+13. `notes_editor_ui.js`
+14. `notes_drafts.js`
+15. `tasks_core_v21.js`
+16. `tasks_studio.js`
+17. `analytics_core_v21.js`
+18. `analytics_studio.js`
+19. `localization_20_recovery.js`
+20. `analytics_recovery_ui.js`
+21. `analytics_recovery_ar_locale.js`
+22. `interaction_recovery_06.js`
+23. `completion_alert_settings.js`
+24. `completion_alert_locales.js`
+25. `locale_premium_v22.js`
+26. `goals_studio.js`
+27. `timer_settings.js`
+28. `sound_mix_controls.js`
+29. `integration_v22.js`
+
+`webview_compat` precedes application mounts; canonical recovery analytics precedes legacy app/core; studio modules load before integration adapters. `integration_v22.js` mounts existing studios and owns journaled cross-family commits. No parallel registry is introduced.
+
+## Test inventory and remaining evidence
+
+Discovered source test files: 97. Existing browser suites live in `tests/df4_browser/`; actual emulator transport in `tests/android_e2e_recovery/`; JVM native ledger/document writer tests are distinct from Android execution. Source baseline log retained under `/workspace/scratch/phase1-evidence/baseline-node.tap`; live GitHub logs and branch/PR snapshots are in `/workspace/scratch/phase1-*`.
+
+Release remains **RELEASE_APPROVED=NO**: required Android scenarios, physical device, native notification/audio routes, complete 20-language rendered parity and recording provenance/listening clearance remain open. Existing #66 Nature V2 is inventory only; no new recording activation allowed.
+
+## Proven remaining defect selected for next patch
+
+`tasks_studio.js` accepts a synchronous `false`/undefined commit as success in `apply` and Undo/Redo, and unconditional refresh loses undo history even when external state is unchanged. Candidate has older code than the protected local task patch; re-run the negative tests against this candidate before applying only reviewed task hunks. Primary/mirror and backup implementations remain untouched.
+
+## Batch 01 — task persistence and bounded rendering
+
+Root cause: `TasksStudio.apply` and Undo/Redo accepted every synchronous result, including `false`, then published next state and cleared the editor. `refresh` also discarded Undo unconditionally. The protected local e3394e8 task-only patch was reviewed against the exact candidate (identical original task source), rather than copying old app/index files.
+
+RED: three new candidate tests failed: silent false commit published a task; unchanged refresh lost Undo; 1,001 matches created 1,001 cards. GREEN: **37/37 Tasks tests**, including strict commit acknowledgment, retained form on failure, Undo preserved on equal snapshot but invalidated by external timer credit, and 100-card initial rendering/More/search across all 1,001 preserved records. Existing test adapter now returns `true` exactly as the production journal adapter does.
+
+Cross-regression: **51/51** v21 contract, mirror/journal, backup round-trip/failure, timer durable credit and Notes draft tests passed. No storage engine, key, ID, schema, unknown field, session-credit or media policy changed. Android on this patch: **NOT_TESTED**; physical device **DEVICE_NOT_TESTED**. Source tests do not prove actual storage hardware durability.
+
+Commands: `node --test --test-reporter=tap tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs`; `node --test --test-reporter=tap tests/data_contracts/*.test.cjs tests/integration_recovery/restore_journal.test.cjs tests/integration_recovery/timer_credit_durability.test.cjs tests/notes_recovery/*.test.cjs`.
+
+## Batch 02/03 — preserve timer implementation and improve Android evidence
+
+Reviewed existing timer credit and native token ledger. Session history already checks IDs beyond the 300-ID JS cache; existing durable journal retry tests pass. Native notification dedupe remains bounded (128 tokens), so permanent historical exactly-once notification behavior, wall-clock change and hardware routes are **not claimed**. No timer coordinator/schema rewrite was made.
+
+Adopted existing #52 ADB/WebView geometry pipeline. Improved its existing result evidence: retain each actual ADB tap coordinate, selector, hit target, CSS viewport and physical WebView bounds; label ADB taps separately from CDP text injection. Previously successful navigation discarded those coordinates. Add a separate failure classification without changing legacy PASS/FAIL/NOT_TESTED counts or the strict non-PASS exit gate: assertion/visible geometry failure `FAIL_APP`, transport/protocol failure `FAIL_TEST_TRANSPORT`, unavailable prerequisites `BLOCKED`, unidentified or injected-evaluation failure `FAIL_TEST_INFRA`. An exception from a test expression alone does not prove the human flow fails.
+
+RED/GREEN: new classification test initially failed (function absent); **25/25** existing Android harness Node tests pass after the scoped change. This is UNIT evidence, not Android execution. Existing 7 unimplemented device scenarios remain NOT_TESTED. #68 SDK discovery patch retained original author as commit `fc6ef41`; its 2 source contracts pass, final combined Debug build still pending.
+
+## Follow-up root cause — production adapter snapshot order
+
+The first broader source/Gradle run on `79d175c` passed 567 tests and built APK SHA256 `77ead81d4d5c58961ccb0341c39f5587557aaaca96d40e8b4dcf8e16631a315c` (artifact 12238067319, run 39363017887). That APK is **superseded**, not the final repair binary.
+
+An additional real-browser journey exposed that Undo still disappeared after tab return. First test attempt failed because its secondary action menu was closed (test setup); after opening the actual menu, the application assertion failed: completion remained true after Undo. Repeated-navigation snapshots were byte-identical. Root cause: core `stateCopy` constructs `{tasksList,cfg}` while the real adapter reconstructs `{cfg,tasksList}`. Existing unit mocks returned core key order and hid the bug. A JSON-string comparison is order-sensitive at the top level.
+
+RED: changed the unit mock to the exact real adapter read shape; **3/10** task UI tests failed. FIX: compare the two owned snapshot fields in explicit fixed order, preserving all nested fields/data, without changing persisted schema. GREEN: **37/37** task tests; **26/26** real Chromium completion checks, now including actual task completion -> 10 tab returns -> More -> Undo, and real task journal quota failure retaining state/input. The second run is justified by this reproduced application bug, not a blind retry. This supersedes the narrower initial Undo claim. Native timer, audio and storage formats untouched.
+
+The existing canonical ledger contains the follow-up code commit. Final source/browser/Android checks must target the subsequent documentation head, not the superseded APK above. Physical device remains DEVICE_NOT_TESTED. Localization audit on 79d175c: **4608** missing catalog language/key pairs across 20 languages; the follow-up changes no locale strings. Media gate remains 1 PASS / 2 FAIL.
+
+## Continuation batch — daily rollover durability (base aee1eac)
+
+Live PR66/70 heads and ancestry were rechecked; neither advanced. Existing isolated worktree and PR70 retained, no overlapping PR created. The confirmed P0 path `syncDailyRollover` mutated cfg counters/date before calling the writer and let storage exceptions abort navigation/startup. It also rewrote unchanged config on every tab press.
+
+RED: five fault/no-op tests all failed on aee1eac. FIX: build a detached daily cfg, use the existing six-packet journal when integrated (verified primary/mirror fallback before integration), require true acknowledgement, then publish dates. Failed writes keep previous values and return false without breaking navigation. Unchanged daily snapshots do not write. Shared save-failure text was added to the existing DICT for all20 languages, without a new registry or persisted field.
+
+GREEN: six focused tests (including all20 warnings) pass. Real Chromium full completion suite now27 PASS: one cfg-mirror write fails mid-transaction, all original storage bytes are restored, date/counters remain unchanged, navigation succeeds and the next tab retries successfully. Synthetic fixture only; no owner data or hardware durability claim. Actual Android verification for this new code remains pending.
+
+Commands: `node --test tests/integration_recovery/daily_rollover_durability.test.cjs`; adjacent missing-module/journal tests; `node tests/validate_locales.cjs`; `node tests/smoke_app.cjs`; `DF_COMPLETION_URL=http://127.0.0.1:8772 node tests/df4_browser/completion.cjs`.
+
+## Continuation — Android coverage and binary identity
+
+Extend the existing ADB/CDP runner rather than create another: real native-prompt subtask/checklist creation and toggles followed by process restart; long Unicode title/body save, reader and exact editor reopen; actual landscape/portrait while a timer runs and a draft is unsaved. Existing Tasks case now checks Undo after actual tab return. Existing storage-failure case also injects one rollover mirror failure then verifies retry.
+
+All new Android cases are **NOT_TESTED until the new exact-head emulator run completes**. Native prompt confirmation geometry has a negative test and rejects a button without a real editable prompt. Node harness tests27 PASS; neither those tests nor syntax checking establish Android operation. Unimplemented accessibility, TalkBack, full native export and scroll scenarios remain visible.
+
+The existing run script now copies the very APK installed by ADB into its uploaded evidence, hashes that copy, and records actual WebView, API and installed-package metadata. This resolves the earlier limitation that downloadable APK and emulator-tested APK came from separate jobs. Main package/signing/permissions, source app data, media gates and strict non-PASS Android exit remain unchanged.
+
+## Actual continuation Android findings (91648a9)
+
+Run39366369036 on exact91648a9 completed with14 PASS/2 FAIL/4 NOT_TESTED; original UIAutomator0/0/20 NOT_TESTED. Rotation with an unsaved draft/running timer, task Undo after tab return and injected rollover failure/retry passed. Two failed cases are retained, not renamed green.
+
+Long-text fixture ended its title with a space; the existing editor contract trims title edges (`cleanText(d.title).trim()`). Real Chromium reproduction saved124 of125 title characters exactly equal to title.trim(), and retained all6300 body characters. New fixture avoids edge whitespace and keeps exact title/body equality assertions. No application title-normalization behavior changed to satisfy a test.
+
+Task subtask/checklist assertions before restart passed individually, but combined post-restart predicate failed. Do not yet infer which child/parent value changed or blame disk durability without the record. The same create/tick/reload journey passes in desktop Chromium with exact IDs/states. Added complete before/readback/after task comparison for the next Android run, preserving immediate force-stop (no added flush sleep/Home workaround). Failed cases now capture their screen and bounded synthetic app/editor observations immediately. The remaining data-loss hypothesis stays open pending exact Android evidence.
+
+The first tested APK is artifact12239268899, SHA256 b415454ace99449a12705a61170379f4d01a8ec625d1ef03219e368d92e44ed5. Subsequent test-only changes require their own exact-head run; this is not proof of their results.
+
+## Confirmed Android boundary and independent reader repair
+
+Diagnostic run39367634229 at b93bf8d:14 PASS/2 FAIL/4 NOT_TESTED. Exact before-task and verified localStorage readback agreed; after immediate foreground force-stop/restart the same checklist item2 returned done=false instead of true. Parent/first subtask and their IDs survived. This confirms loss of the last toggle at that boundary; it does not mean all Tasks data vanished. Do not claim readback guarantees disk persistence. No sleep/background workaround or new storage schema was introduced. DF108/120 and DF4-017/027 now explicitly record Android FAIL/P0 and the native-durability follow-up.
+
+Long note now saves its exact124-character title and6300-character body; its next assertion exposed a real reader visibility defect. Preview lives inside a closed `details.nsux-advanced`; `showReader` exposed only the child. Open that ancestor explicitly and hide its summary in reading mode; add vh fallback before dvh for older WebViews. No user text/storage changes. Modern Chromium can return positive reader rectangles despite the closed ancestor, so geometry alone was an insufficient reproduction. The ancestor-open contract fails against the prior JS routed read-only from b93bf8d and passes after the fix. Full Chromium completion suite28 PASS; native reader rerun pending. Reopen/edit still asserts exact Unicode and re-save uniqueness.
+
+b93bf8d actual tested binary: artifact12240193708, SHA25665ec2f7e72abe6022b4d93d94456549a3d20a767773ebbced335d3504af56699. Failure screenshots and synthetic observed records captured immediately. No data-failure result has been promoted to PASS. RELEASE_APPROVED=NO.
+
+## Copy-level diagnosis before choosing the storage fix
+
+The record-level force-stop failure is confirmed, but the primary/mirror packet state after restart is not yet isolated. Capture both validities, timestamps, signatures and task records before/after kill before deciding whether the smallest fix is stale-copy selection or native persistence. Do not introduce a new store from an incomplete hypothesis.
+
+The existing workflow gains a focused task_persistence diagnostic scope. It executes only existing preflight/tasks_create/task_subtasks cases, keeps all20 result rows and leaves unexecuted cases NOT_TESTED; the non-PASS exit gate is unchanged. Default/full behavior remains unchanged. This avoids repeatedly running unrelated real-minute/rotation/media flows for the same storage investigation. Selection whitelist test RED then GREEN; no production app change in this probe.
+
+## Focused probe input transport finding
+
+864fc5b focused run39369523923 executed existing preflight/tasks_create/task_subtasks only (2 PASS/1 FAIL/17 NOT_TESTED). It did not reach the packet comparison: the native prompt persisted `FitxureChild` rather than requested `FixtureChild`. That probe adds no new durability evidence; earlier exact-readback/restart failures remain valid. The task core trims edges but does not reorder internal characters. Native entry now submits one key batch per character, checks the real editable Android dialog value before confirmation, and cancels/labels a mismatch TRANSPORT rather than blaming app storage. No expected application string or persistence assertion was weakened. Source contracts verify native field extraction and safe cancellation. If this alternate input method also fails, stop that transport approach rather than repeatedly rerun it.
+
+## Focused probe geometry root cause (b6bbfc9)
+
+Run39370255280 did not reach packet comparison because task creation missed its submit button. Trace proves an IME transition: CSS viewport was sampled at412x843 while subsequent UIAutomator captured a1080x1470 WebView, down from1080x2211. Old mapping sent the233.7 CSS-y button to470 physical-y instead of about676. This is a test-transport failure, not evidence of a new application task-create regression. Dependency remained NOT_TESTED; earlier data failure is not cleared.
+
+The existing touch helper now re-reads target/viewport/hit geometry after native frame capture. Shared mapping rejects anisotropic/stale frame-to-viewport scales (>2.5%) instead of sending a wrong tap. Regression uses those actual observed coordinates: RED before guard, GREEN after; an actual matching keyboard viewport maps to913,676. No application source or persistence expectations changed. Native per-character text transport still requires actual verification because this run failed before reaching its prompt.
+
+## Final packet-level evidence — durability P0 remains unresolved
+
+Full Android run39368766119 at0dbf2d2: **15 PASS/1 FAIL/4 NOT_TESTED**, plus original UIAutomator20 NOT_TESTED. Reader6300-character body save/read/edit, rotation with unsaved draft/running timer, task Undo and rollover quota/retry passed. Actual installed APK artifact12241001317, SHA256427cff29c39923fcb17c644fd3fe0805b8eba003cb978d0607269444c17fd9dc.
+
+Focused run39370803476 at a8b4d4a: **2 PASS/1 FAIL/17 NOT_TESTED** (not full acceptance). Correct native field input and corrected IME geometry reached the exact packet comparison. Before kill, primary AND mirror were valid, ts1792471492061, sigf9e36d5a, checklist item2.done=true. After restart BOTH copies were valid but older, ts1792471489644, sigdabc4c79, item2.done=false. Journal absent before and after. Both copies revert together; preferring a newer mirror cannot repair this instance. Native data model, IDs, parent/previous child survived; the last write did not survive this boundary. No claim that every data family was lost.
+
+Latest probe actual installed APK artifact12241099498, SHA256b8a97a09aba0380a00548f92b3037fe7b317b2eb7c6f0620e00c4f6fafd73601. Source+Debug39370807692 succeeds with578 Node cases/31 Python; this does not clear Android failure. Browser CI39368762982 on0dbf2d2 succeeds with28 completion/63 picker/280 layout/140 nav cases; later commits changed only tests/workflows/evidence, not production assets/Java.
+
+An acknowledged native durability/recovery path is **NOT IMPLEMENTED by this batch**. It must preserve raw v21 envelopes/keys/IDs/unknown fields, handle rollback and unknown-version conflicts, and be reviewed/tested rather than introduced as a speculative new storage engine. No schema/backend migration or automatic unknown-data overwrite was added. DF108/120/DF4-017/027 retain Android FAIL/P0. RELEASE_APPROVED=NO; physical device DEVICE_NOT_TESTED. Candidate, media and language release blockers remain open. Documentation-only evidence after a8b4d4a does not turn its failed probe into a successful final-head Android test.

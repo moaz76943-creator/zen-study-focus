@@ -1,5 +1,7 @@
 # Current task evidence ledger — 161 official + 36 DF4
 
+Phase 1 candidate, ancestry and scoped follow-up: [PHASE1_BASELINE.md](PHASE1_BASELINE.md). The canonical JSON retains earlier evidence and adds task-specific Phase 1 observations; no whole-task acceptance is promoted.
+
 Full exact task definitions and required evidence fields: [LEDGER_197.json](LEDGER_197.json). Historical matrices are unchanged. No task is RELEASE_APPROVED or ANDROID_TESTED. Source/desktop/JVM PASS covers only the stated subset; Android acceptance remains separate.
 
 | Task | Previous | Current | Scoped test | Android | Follow-up owner |

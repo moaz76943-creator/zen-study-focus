@@ -23,3 +23,21 @@ test('restart check cannot claim app failure if note or task fixture was never c
  statuses.set('notes_create_edit',{status:'PASS'});statuses.set('tasks_create',{status:'PASS'});
  assert.deepEqual(missingPrerequisites(statuses,['notes_create_edit','tasks_create']),[]);
 });
+test('failure cause distinguishes app assertions, protocol rejection, unmet prerequisites and unknown infrastructure',()=>{
+ const {classifyFailure}=require('./cdp_touch_target.cjs');
+ assert.equal(classifyFailure(new assert.AssertionError({message:'Actual task not persisted'})),'FAIL_APP');
+ assert.equal(classifyFailure(new Error('UI_TARGET_OCCLUDED: #navNotes')),'FAIL_APP');
+ assert.equal(classifyFailure(new Error('TRANSPORT: Runtime.evaluate timed out')),'FAIL_TEST_TRANSPORT');
+ assert.equal(classifyFailure(new Error('TEST_PROTOCOL: unknown method')),'FAIL_TEST_TRANSPORT');
+ assert.equal(classifyFailure(new Error('APP_RUNTIME: TypeError in mounted application')),'FAIL_APP');
+ assert.equal(classifyFailure(new Error('DEPENDENCY_NOT_TESTED: task creation')),'BLOCKED');
+ assert.equal(classifyFailure(new Error('TEST_EVALUATION: injected expression failed')),'FAIL_TEST_INFRA');
+ assert.equal(classifyFailure(new Error('unclassified runner failure')),'FAIL_TEST_INFRA');
+});
+test('focused diagnostics keep the full case registry and reject unknown or duplicate selections',()=>{
+ const {selectCases}=require('./cdp_touch_target.cjs'),known=['preflight','tasks_create','task_subtasks'];
+ assert.equal(selectCases('',known),null);
+ assert.deepEqual([...selectCases('preflight, tasks_create,task_subtasks',known)],known);
+ assert.throws(()=>selectCases('not_a_case',known),/Unknown/);
+ assert.throws(()=>selectCases('preflight,preflight',known),/Duplicate/);
+});

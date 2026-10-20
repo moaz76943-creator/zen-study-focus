@@ -7,11 +7,17 @@ capture() {
   timeout 20s adb shell uiautomator dump /sdcard/rescue-webview.xml >/dev/null 2>&1 || true
   timeout 10s adb exec-out cat /sdcard/rescue-webview.xml > "$report/hierarchy.xml" || true
   timeout 20s adb logcat -d -s AndroidRuntime chromium > "$report/logcat.txt" || true
+  timeout 10s adb shell dumpsys webviewupdate > "$report/webview-version.txt" || true
+  timeout 10s adb shell getprop ro.build.version.sdk > "$report/device-api.txt" || true
+  timeout 10s adb shell pm path com.zenstudy.focus > "$report/installed-package.txt" || true
   test ! -s "$report/logcat.txt" || tail -n 80 "$report/logcat.txt"
   adb forward --remove tcp:9222 >/dev/null 2>&1 || true
 }
 trap capture EXIT
-adb install android/app/build/outputs/apk/debug/app-debug.apk
+# Keep the actual binary installed in this emulator, not another job's rebuild.
+cp android/app/build/outputs/apk/debug/app-debug.apk "$report/tested-app-debug.apk"
+sha256sum "$report/tested-app-debug.apk" | tee "$report/tested-apk.sha256"
+adb install "$report/tested-app-debug.apk"
 adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS || true
 adb shell am start -n com.zenstudy.focus/.MainActivity
 sleep 5

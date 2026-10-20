@@ -16,7 +16,7 @@ const fakeDoc={createElement(tag){return new FakeElement(this,tag);}};
 function fixture(){let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[{id:7,title:'Write',date:'2026-10-19',catKey:'study',done:false,isStarter:false}]};
  let commits=0;
  const root=new FakeElement(fakeDoc,'main'),studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,19),readState:()=>JSON.parse(JSON.stringify(state)),
-  commit(before,after){assert.deepEqual(before,state);state=JSON.parse(JSON.stringify(after));commits++;},linkTaskToTimer:()=>true});
+  commit(before,after){assert.deepEqual(before,state);state=JSON.parse(JSON.stringify(after));commits++;return true;},linkTaskToTimer:()=>true});
  return {root,studio,get:()=>state,commits:()=>commits,set:x=>{state=x;}};}
 test('UI mounts into supplied root and respects isolated style',()=>{
  const f=fixture();assert.ok(f.root.descendants.some(x=>x.tagName==='STYLE'));
