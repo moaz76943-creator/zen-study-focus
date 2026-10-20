@@ -59,7 +59,7 @@ const out=process.env.DF_ANALYTICS_EVIDENCE||'/tmp/df-analytics-controls';
        const reset=[...el.querySelectorAll('.dfar-btn')][0];
        reset.click();
        if(controls[0].value!=='all'||controls[1].value!=='daily')throw Error('reset failed');
-       const bars=el.querySelector('[data-bucket]');
+       const bars=el.querySelector('[data-bucket="2026-10-19"]');
        if(bars){bars.dispatchEvent(new MouseEvent('click',{bubbles:true}));if(!el.querySelector('.dfar-detail table'))throw Error('chart bar details failed');}
        const donut=el.querySelector('[data-domain]');
        if(donut){donut.dispatchEvent(new MouseEvent('click',{bubbles:true}));if(!el.querySelector('.dfar-detail table'))throw Error('activity details failed');}
