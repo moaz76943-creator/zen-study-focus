@@ -27,6 +27,33 @@ concurrency:
   group: deep-focus-private-lab-${{ github.ref }}-${{ inputs.source_ref }}
   cancel-in-progress: false
 jobs:
+  candidate-secret-scan:
+    name: Gitleaks on selected source SHA (redacted)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.source_ref }}
+          path: source
+          persist-credentials: false
+      - name: Install pinned, verified Gitleaks binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --proto '=https' --tlsv1.2 -fsSL --retry 2 \
+            'https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz' \
+            -o "$RUNNER_TEMP/gitleaks.tgz"
+          echo '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  '"$RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+          chmod +x "$RUNNER_TEMP/gitleaks"
+      - name: Scan source files only, no secrets in logs or artifacts
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          "$RUNNER_TEMP/gitleaks" dir --no-banner --redact --max-target-megabytes 10 --log-level error .
   chromium:
     name: Playwright Chromium on isolated synthetic storage
     if: inputs.playwright == true
@@ -134,6 +161,8 @@ jobs:
             command -v ip6tables
             sudo iptables -I OUTPUT 1 -m owner --uid-owner "$uid" ! -o lo -j REJECT
             sudo ip6tables -I OUTPUT 1 -m owner --uid-owner "$uid" ! -o lo -j REJECT
+            sudo iptables -C OUTPUT -m owner --uid-owner "$uid" ! -o lo -j REJECT
+            sudo ip6tables -C OUTPUT -m owner --uid-owner "$uid" ! -o lo -j REJECT
             trap 'sudo iptables -D OUTPUT -m owner --uid-owner "$uid" ! -o lo -j REJECT || true; sudo ip6tables -D OUTPUT -m owner --uid-owner "$uid" ! -o lo -j REJECT || true' EXIT
             if curl --connect-timeout 2 --max-time 4 -fsS 'https://example.com' >/dev/null 2>&1; then
               echo 'Privacy FAIL: external egress was not blocked'
