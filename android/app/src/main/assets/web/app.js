@@ -1744,6 +1744,10 @@ function renderSoundsStudio() {
     `;
     box.appendChild(tile);
   });
+  // This is an honest acquisition overview. It never changes playback eligibility.
+  if (typeof DeepFocusNatureLibraryV2 !== 'undefined') {
+    DeepFocusNatureLibraryV2.render(soundCat, cfg.lang, d.sounds, NATURE_APPROVED_FOR_PLAYBACK);
+  }
 }
 
 /* ========================================================
