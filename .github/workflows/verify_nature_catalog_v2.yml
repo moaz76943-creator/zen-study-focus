@@ -17,7 +17,7 @@ jobs:
           node-version: '22'
       - name: Catalog and real mixer regression
         run: |
-          node --test tests/nature_library_v2/catalog.test.cjs tests/integration_recovery/nature_runtime.test.cjs tests/integration_recovery/nature_20_language_controls.test.cjs tests/nature_audio_recovery/mixer.test.cjs
+          node --test tests/nature_library_v2/intake_manifest.test.cjs tests/nature_library_v2/catalog.test.cjs tests/integration_recovery/nature_runtime.test.cjs tests/integration_recovery/nature_20_language_controls.test.cjs tests/nature_audio_recovery/mixer.test.cjs
           node tests/smoke_app.cjs
       - name: Install audio probing tools
         run: |
