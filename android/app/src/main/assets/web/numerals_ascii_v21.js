@@ -16,7 +16,10 @@
   // task titles, note bodies, project labels or persisted user-authored text.
   const GENERATED_UI = '[data-df-generated-number],[data-df-latin-numerals],'+
     '#timerDigitsTxt,#sportSetCounterTxt,#readPagesCounterTxt,#qtExerciseCount,'+
-    '#hdrStreakBadge,#nsCounter,#nsVisibleCount,#mixerStatusTxt,#peakPerfBadge,'+
+    '#hdrStreakBadge,#hdrFocusMins,#nsCounter,#nsVisibleCount,#nsTotal,'+
+    '#todayPlanRatio,#todayPlanPercent,#kpiTotalMins,#kpiWeeklyTrend,'+
+    '#kpiTotalSessions,#kpiSessionTrend,#waveRecordedMinutes,'+
+    '#mixerStatusTxt,#peakPerfBadge,'+
     '.dfa-studio strong,.dfar-panel strong,.dfar-kpi,.dfar-comparison,'+
     '.dfa-studio [data-day],.dfar-panel [data-bucket],'+
     '.today-plan-stats strong,.goals-rows .goal-value,.training-progress [data-progress]';
