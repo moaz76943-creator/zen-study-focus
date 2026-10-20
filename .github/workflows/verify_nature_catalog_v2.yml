@@ -1,0 +1,35 @@
+name: Nature catalog & pinned media intake (quarantine)
+on:
+  push:
+    branches:
+      - fix/deep-focus-nature-catalog-20-20261020
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Catalog and real mixer regression
+        run: |
+          node --test tests/nature_library_v2/catalog.test.cjs tests/integration_recovery/nature_runtime.test.cjs tests/integration_recovery/nature_20_language_controls.test.cjs tests/nature_audio_recovery/mixer.test.cjs
+          node tests/smoke_app.cjs
+      - name: Install audio probing tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg
+      - name: Collect pinned original recording (not distributed)
+        run: python3 tools/nature_audio/collect_commons_audio.py
+      - name: Upload candidate and evidence for human review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nature-commons-quarantine
+          path: audio_candidates/commons_intake/
+          if-no-files-found: warn
+          retention-days: 7
