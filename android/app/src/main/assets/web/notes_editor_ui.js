@@ -264,7 +264,7 @@
       '.nsux-inline>*{flex:1 1 120px}.nsux-meta{margin:7px 0;color:#50617a;font-size:.76rem}',
       '.nsux-reading #nsux-fields>label,.nsux-reading #nsux-fields>#nsux-cornell,.nsux-reading #nsux-fields>#nsux-recall,.nsux-reading #nsux-fields>.nsux-btn{display:none!important}',
       '.nsux-reading #inpNoteTitle,.nsux-reading #inpNoteBody,.nsux-reading #nsBodyLabel,.nsux-reading #nsCounter,.nsux-reading #nsux-fields .nsux-meta,.nsux-reading #nsux-tools,.nsux-reading .ns-meta,.nsux-reading .ns-options,.nsux-reading .modal-actions,.nsux-reading #nsEditorTemplates{display:none!important}',
-      '.nsux-reading #nsux-preview{display:block!important;max-height:65dvh}',
+      '.nsux-reading .nsux-advanced>summary{display:none}.nsux-reading #nsux-preview{display:block!important;max-height:65vh;max-height:65dvh}',
       '.nsux-reader{white-space:normal;overflow-wrap:anywhere;line-height:1.7;color:#1c2e4d;padding:14px;border:1px solid #dce5f0;border-radius:15px;background:white;max-height:42vh;overflow:auto}',
       '.nsux-reader p{white-space:pre-wrap;margin:7px 0}.nsux-reader h4{font-size:1.02rem;margin:12px 0 4px}.nsux-reader .nsux-check{display:flex;gap:10px;align-items:baseline}.nsux-reader .nsux-check input{pointer-events:none}',
       '.nsux-card{border:1px solid var(--df22-border,#dce5f0);border-radius:22px;background:#fff;padding:15px;box-shadow:var(--df22-shadow-low,0 2px 10px #203b5f10)}',
@@ -617,6 +617,8 @@
   function showReader(n){
     const dlg=document.getElementById('noteModal');openNoteModal(null,n.id);
     const preview=document.getElementById('nsux-preview');
+    // The reader lives inside advanced details; opening the child alone stays hidden.
+    instance.advanced.open=true;
     dlg.classList.add('nsux-reading');
     document.activeElement?.blur?.();
     preview.hidden=false;

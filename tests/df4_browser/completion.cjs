@@ -112,6 +112,18 @@ const out=process.env.DF_COMPLETION_EVIDENCE||'/workspace/scratch/completion-evi
   assert.equal(await page.evaluate(()=>cfg.water),0);
   assert.equal(await page.evaluate(()=>cfg.todayMins),await page.evaluate(()=>acceptedFocusHistory(cfg.sessionHistory).filter(s=>s.date===localDateISO()).reduce((a,s)=>a+s.minutes,0)));
   results.push({scope:'daily rollover mirror failure rolls back all packets, keeps cfg/date, navigation works and retry commits',status:'PASS'});
+  await page.locator('#navNotes').click();await page.locator('#nsNewButton').click();
+  const readerTitle='Readable long Unicode',readerBody=('Long العربية ٢ Unicode **literal**\n').repeat(180);
+  await page.locator('#inpNoteTitle').fill(readerTitle);await page.locator('#inpNoteBody').fill(readerBody);await page.locator('#nsSaveButton').click();
+  const readerCard=page.locator('.nsux-card').filter({has:page.getByRole('heading',{name:readerTitle,exact:true})});
+  await readerCard.getByRole('button',{name:'Read / Review',exact:true}).click();
+  assert.equal(await page.locator('#nsux-preview').isVisible(),true);
+  assert.equal(await page.locator('#nsux-preview').evaluate(n=>n.closest('details').open&&n.clientHeight>0&&n.scrollHeight>n.clientHeight),true);
+  await page.locator('#nsux-preview').getByRole('button',{name:'Edit',exact:true}).click();
+  assert.equal(await page.locator('#inpNoteBody').inputValue(),readerBody);
+  await page.locator('#nsSaveButton').click();
+  assert.equal(await page.evaluate(title=>notesList.filter(n=>n.title===title).length,readerTitle),1);
+  results.push({scope:'long-note reader opens its advanced ancestor, scrolls and returns to exact editable Unicode content',status:'PASS'});
   assert.deepEqual(errors,[]);
  }catch(e){results.push({scope:'browser scenario',status:'FAIL',error:e.message});if(page)await page.screenshot({path:out+'/failure.png',fullPage:true});process.exitCode=1;}
  finally{fs.writeFileSync(out+'/results.json',JSON.stringify({environment:'desktop Chromium, disposable context, remote requests blocked',results,errors},null,2));console.log(JSON.stringify({passed:results.filter(r=>r.status==='PASS').length,failed:results.filter(r=>r.status==='FAIL'),errors},null,2));await browser.close();}

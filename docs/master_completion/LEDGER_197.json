@@ -2526,7 +2526,7 @@
     },
     {
       "TASK_ID": "DF-108",
-      "PRIORITY": "P1",
+      "PRIORITY": "P0",
       "TITLE": "Support subtasks and checklists with compact inline progress.",
       "AREA": "Tasks",
       "ORIGINAL_MATRIX_STATUS": "IN_PROGRESS",
@@ -2537,13 +2537,20 @@
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
       "TEST_SCOPE": "No new complete task-specific acceptance attestation",
-      "ANDROID_RESULT": "NOT_TESTED",
+      "ANDROID_RESULT": "FAIL",
       "EVIDENCE": [
-        "docs/master_completion/BATCH_07_ANALYTICS.md"
+        "docs/master_completion/BATCH_07_ANALYTICS.md",
+        "docs/master_completion/PHASE1_BASELINE.md"
       ],
-      "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
-      "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Support subtasks and checklists with compact inline progress.",
-      "OWNER_ROLE": "Tasks / data-integrity engineer"
+      "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
+      "NEXT_ACTION": "Integrate an acknowledged native durability/recovery path preserving existing v21 packets, IDs, unknown fields and journal semantics; verify immediate force-stop without added delays.",
+      "OWNER_ROLE": "Android engineer and data-integrity architect",
+      "ANDROID_DURABILITY_FAILURE": {
+        "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
+        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229",
+        "result": "FAIL_APP",
+        "scope": "Actual task checklist done=true matched verified storage readback before immediate foreground force-stop; same item/id returned done=false after restart. Parent and earlier subtask retained. No artificial pre-kill delay added."
+      }
     },
     {
       "TASK_ID": "DF-109",
@@ -2805,7 +2812,7 @@
       "AREA": "Tasks",
       "ORIGINAL_MATRIX_STATUS": "BLOCKED",
       "PREVIOUS_STATUS": "SOURCE_TESTED_PARTIAL",
-      "CURRENT_STATUS": "BLOCKED",
+      "CURRENT_STATUS": "IN_PROGRESS",
       "FILES_CHANGED": [
         "android/app/src/main/assets/web/tasks_studio.js",
         "tests/df4_browser/completion.cjs",
@@ -2819,14 +2826,14 @@
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
       "TEST_SCOPE": "No new complete task-specific acceptance attestation",
-      "ANDROID_RESULT": "NOT_TESTED",
+      "ANDROID_RESULT": "FAIL",
       "EVIDENCE": [
         "docs/master_completion/BATCH_07_ANALYTICS.md",
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
-      "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
-      "NEXT_ACTION": "Run the combined repair SHA through exact-head browser and Android workflows; complete remaining task acceptance beyond the 37 scoped unit tests.",
-      "OWNER_ROLE": "Tasks / data-integrity engineer",
+      "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
+      "NEXT_ACTION": "Integrate an acknowledged native durability/recovery path preserving existing v21 packets, IDs, unknown fields and journal semantics; verify immediate force-stop without added delays.",
+      "OWNER_ROLE": "Android engineer and data-integrity architect",
       "PHASE1_SOURCE_EVIDENCE": {
         "base_sha": "bd6e3e4d8aef95def871c9e7f78c63807e681369",
         "commit_sha": "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
@@ -2847,6 +2854,12 @@
         "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
         "android_result": "NOT_TESTED",
         "device_result": "DEVICE_NOT_TESTED"
+      },
+      "ANDROID_DURABILITY_FAILURE": {
+        "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
+        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229",
+        "result": "FAIL_APP",
+        "scope": "Actual task checklist done=true matched verified storage readback before immediate foreground force-stop; same item/id returned done=false after restart. Parent and earlier subtask retained. No artificial pre-kill delay added."
       }
     },
     {
@@ -4178,14 +4191,14 @@
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
       "TEST_SCOPE": "Only named source/desktop/JVM subset, never complete Android acceptance",
-      "ANDROID_RESULT": "NOT_TESTED",
+      "ANDROID_RESULT": "FAIL",
       "EVIDENCE": [
         "docs/master_completion/BATCH_00.md",
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
-      "BLOCKER": "Test every advanced/project/subtask/repeat/undo/restore flow and linked actual time on Android, retaining numeric IDs.",
-      "NEXT_ACTION": "Run the combined repair SHA through exact-head browser and Android workflows; complete remaining task acceptance beyond the 37 scoped unit tests.",
-      "OWNER_ROLE": "Tasks/data-integrity engineer",
+      "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
+      "NEXT_ACTION": "Integrate an acknowledged native durability/recovery path preserving existing v21 packets, IDs, unknown fields and journal semantics; verify immediate force-stop without added delays.",
+      "OWNER_ROLE": "Android engineer and data-integrity architect",
       "PHASE1_SOURCE_EVIDENCE": {
         "base_sha": "bd6e3e4d8aef95def871c9e7f78c63807e681369",
         "commit_sha": "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
@@ -4198,6 +4211,12 @@
         "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df",
         "browser_result": "PASS",
         "browser_scope": "26 Chromium checks including actual task Undo after 10 tab returns and actual journal-quota failure retaining form"
+      },
+      "ANDROID_DURABILITY_FAILURE": {
+        "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
+        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229",
+        "result": "FAIL_APP",
+        "scope": "Actual task checklist done=true matched verified storage readback before immediate foreground force-stop; same item/id returned done=false after restart. Parent and earlier subtask retained. No artificial pre-kill delay added."
       }
     },
     {
@@ -4432,14 +4451,14 @@
       ],
       "TEST_RESULT": "PASS",
       "TEST_SCOPE": "Only named source/desktop/JVM subset, never complete Android acceptance",
-      "ANDROID_RESULT": "NOT_TESTED",
+      "ANDROID_RESULT": "FAIL",
       "EVIDENCE": [
         "docs/master_completion/BATCH_01_DRAFTS.md",
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
-      "BLOCKER": "Complete interrupted journal/rollback/quota/import/corrupt copy/restart acceptance using isolated synthetic data.",
-      "NEXT_ACTION": "Complete interrupted journal/rollback/quota/import/corrupt copy/restart acceptance using isolated synthetic data.",
-      "OWNER_ROLE": "Data-integrity engineer",
+      "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
+      "NEXT_ACTION": "Integrate an acknowledged native durability/recovery path preserving existing v21 packets, IDs, unknown fields and journal semantics; verify immediate force-stop without added delays.",
+      "OWNER_ROLE": "Android engineer and data-integrity architect",
       "ROLLOVER_EVIDENCE": {
         "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
         "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
@@ -4447,6 +4466,12 @@
         "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
         "android_result": "NOT_TESTED",
         "device_result": "DEVICE_NOT_TESTED"
+      },
+      "ANDROID_DURABILITY_FAILURE": {
+        "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
+        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229",
+        "result": "FAIL_APP",
+        "scope": "Actual task checklist done=true matched verified storage readback before immediate foreground force-stop; same item/id returned done=false after restart. Parent and earlier subtask retained. No artificial pre-kill delay added."
       }
     },
     {
@@ -4668,6 +4693,13 @@
       "status": "PASS",
       "scope": "Bundled app bootstrap DOM, visible timer/play and JS handlers only; original UIAutomator scenarios NOT_TESTED 20",
       "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39336743375"
+    },
+    {
+      "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
+      "api": 30,
+      "status": "FAIL_APP",
+      "scope": "14 PASS / 2 FAIL / 4 NOT_TESTED; latest checklist toggle reverts after force-stop, long-note reader hidden in closed advanced details; original UIAutomator20 NOT_TESTED",
+      "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229"
     }
   ],
   "phase1": {
