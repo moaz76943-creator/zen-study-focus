@@ -554,8 +554,18 @@ function renderLanguageList() {
 
 function applyLanguage(code) {
   const meta = LANG_CATALOG.find(x => x.code === code) || LANG_CATALOG[0];
+  const previousLang = cfg.lang;
   cfg.lang = meta.code;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', cfg) !== true)
+      throw new Error('LANGUAGE_SAVE_NOT_VERIFIED');
+  } catch (_) {
+    cfg.lang = previousLang;
+    showToast(previousLang === 'ar'
+      ? 'تعذر حفظ اللغة. حاول مرة أخرى.'
+      : 'Could not save the language. Try again.');
+    return false;
+  }
   const d = L();
 
   const root = document.getElementById('htmlRoot');
