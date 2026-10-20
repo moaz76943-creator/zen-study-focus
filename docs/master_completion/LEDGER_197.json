@@ -1350,8 +1350,7 @@
       "TEST_SCOPE": "Only the named source/desktop regression scope; not full task acceptance",
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
-        "docs/master_completion/BATCH_06_EXPORT_AND_UNITS.md",
-        "docs/master_completion/PHASE1_BASELINE.md"
+        "docs/master_completion/BATCH_06_EXPORT_AND_UNITS.md"
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Enforce ASCII digits 0-9 for ALL rendered counters regardless of UI language (Arabic, Persian, Urdu included).",
@@ -2289,17 +2288,14 @@
       "ORIGINAL_MATRIX_STATUS": "IN_PROGRESS",
       "PREVIOUS_STATUS": "IN_PROGRESS",
       "CURRENT_STATUS": "IN_PROGRESS",
-      "FILES_CHANGED": [
-        "android/app/src/main/assets/web/app.js"
-      ],
+      "FILES_CHANGED": [],
       "COMMIT_SHA": [],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
       "TEST_SCOPE": "No new complete task-specific acceptance attestation",
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
-        "docs/master_completion/BATCH_09_NOTE_RELATIONS.md",
-        "docs/master_completion/PHASE1_BASELINE.md"
+        "docs/master_completion/BATCH_09_NOTE_RELATIONS.md"
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Extract checklist tasks with confirmation, stable extraction key and dedupe.",
@@ -2335,8 +2331,7 @@
       "PREVIOUS_STATUS": "SOURCE_TESTED_PARTIAL",
       "CURRENT_STATUS": "IN_PROGRESS",
       "FILES_CHANGED": [
-        "android/app/src/main/assets/web/notes_studio.js",
-        "android/app/src/main/assets/web/app.js"
+        "android/app/src/main/assets/web/notes_studio.js"
       ],
       "COMMIT_SHA": [
         "ff7d7d43f874d2bdde9cfee09cece4f7d3827933"
@@ -2349,8 +2344,7 @@
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
         "docs/master_completion/BATCH_09_NOTE_RELATIONS.md",
-        "docs/master_completion/BATCH_03_NOTES.md",
-        "docs/master_completion/PHASE1_BASELINE.md"
+        "docs/master_completion/BATCH_03_NOTES.md"
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Preserve all old note content and unknown fields; sanitize note Markdown and disallow JS URLs/XSS.",
@@ -2912,8 +2906,7 @@
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
         "docs/master_completion/BATCH_07_ANALYTICS.md",
-        "docs/master_completion/BATCH_02_TIMER.md",
-        "docs/master_completion/PHASE1_BASELINE.md"
+        "docs/master_completion/BATCH_02_TIMER.md"
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Ensure one canonical analytics source, dedupe by unique valid session ID, report conflicting duplicates.",
