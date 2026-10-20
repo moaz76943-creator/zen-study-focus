@@ -114,6 +114,6 @@ async function main(){
 }
 main().catch(e=>{results.set('preflight',{id:'preflight',status:classifyError(e),detail:e.message});}).finally(()=>{
  try{ws?.close();}catch(_){}for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('TRANSPORT: disposed'));}pending.clear();
- const rows=[...results.values()],report={source:'Real Android WebView CDP touch/input, fresh disposable profile',sha:process.env.GITHUB_SHA||null,api:process.env.ANDROID_TEST_API||null,results:rows,counts:Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,rows.filter(r=>r.status===s).length])),release_approved:false};
+ const rows=[...results.values()],report={source:'Real Android WebView CDP touch/input, fresh disposable profile',sha:process.env.DF_TEST_SOURCE_SHA||null,api:process.env.ANDROID_TEST_API||null,results:rows,counts:Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,rows.filter(r=>r.status===s).length])),release_approved:false};
  fs.writeFileSync(process.argv[2]||'android-dom-actions.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));if(rows.some(r=>r.status!=='PASS'))process.exitCode=1;
 });
