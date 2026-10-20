@@ -91,6 +91,27 @@ const out=process.env.DF_COMPLETION_EVIDENCE||'/workspace/scratch/completion-evi
     assert.equal(await page.locator('.df-quick input').inputValue(),'Retain draft on quota');
   }finally{await page.evaluate(()=>{Storage.prototype.setItem=window.fixtureSet;delete window.fixtureSet;});}
   results.push({scope:'real Task quota failure preserves all app state and quick-add input',status:'PASS'});
+  await page.evaluate(()=>{
+    const before=DF22Integration.getSnapshot();
+    DF22Integration.write(before,{...before,cfg:{...before.cfg,metricsDate:'2000-01-01',todayMins:99,water:4}});
+    todayISO='2000-01-01';
+    window.rolloverBefore=JSON.stringify({cfg,tasksList,notesList});
+    window.rolloverPackets=Object.fromEntries(Object.keys(localStorage).map(k=>[k,localStorage.getItem(k)]));
+    window.rolloverSet=Storage.prototype.setItem;window.rolloverFail=true;
+    Storage.prototype.setItem=function(k,v){if(k==='zen_fortress_cfg_v21_mirror'&&window.rolloverFail){window.rolloverFail=false;throw new DOMException('Fixture mirror quota','QuotaExceededError');}return window.rolloverSet.call(this,k,v);};
+  });
+  try{
+    await page.locator('#navTimer').click();
+    assert.equal(await page.evaluate(()=>JSON.stringify({cfg,tasksList,notesList})),await page.evaluate(()=>window.rolloverBefore));
+    assert.equal(await page.evaluate(()=>todayISO),'2000-01-01');
+    assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.keys(localStorage).map(k=>[k,localStorage.getItem(k)]))),await page.evaluate(()=>window.rolloverPackets));
+    assert.equal(await page.locator('#sec-timer').evaluate(n=>n.classList.contains('active')),true);
+  }finally{await page.evaluate(()=>{Storage.prototype.setItem=window.rolloverSet;delete window.rolloverSet;delete window.rolloverFail;});}
+  await page.locator('#navTasks').click();
+  assert.equal(await page.evaluate(()=>cfg.metricsDate),await page.evaluate(()=>localDateISO()));
+  assert.equal(await page.evaluate(()=>cfg.water),0);
+  assert.equal(await page.evaluate(()=>cfg.todayMins),await page.evaluate(()=>acceptedFocusHistory(cfg.sessionHistory).filter(s=>s.date===localDateISO()).reduce((a,s)=>a+s.minutes,0)));
+  results.push({scope:'daily rollover mirror failure rolls back all packets, keeps cfg/date, navigation works and retry commits',status:'PASS'});
   assert.deepEqual(errors,[]);
  }catch(e){results.push({scope:'browser scenario',status:'FAIL',error:e.message});if(page)await page.screenshot({path:out+'/failure.png',fullPage:true});process.exitCode=1;}
  finally{fs.writeFileSync(out+'/results.json',JSON.stringify({environment:'desktop Chromium, disposable context, remote requests blocked',results,errors},null,2));console.log(JSON.stringify({passed:results.filter(r=>r.status==='PASS').length,failed:results.filter(r=>r.status==='FAIL'),errors},null,2));await browser.close();}
