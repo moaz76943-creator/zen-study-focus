@@ -1,0 +1,58 @@
+name: Track08 actual 20 locale navigation RTL and layout audit
+on:
+  push:
+    branches:
+      - audit/track08-20-locale-navigation-browser-20261020
+permissions:
+  contents: read
+concurrency:
+  group: track08-nav20-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install real Chromium Playwright harness
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Serve actual app assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/locale-browser-http.log" 2>&1 &
+          for i in {1..30};do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1;done
+          exit 1
+      - name: Check navigation acceptance test syntax
+        run: node --check tests/track07_functional/live_20_language_switch_navigation.cjs
+      - name: Switch all 20 languages at 320/393/430 px, verify nav, RTL, overflow
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_LOCALE_EVIDENCE: ${{ runner.temp }}/locale-navigation
+        run: node tests/track07_functional/live_20_language_switch_navigation.cjs
+      - name: Record exact source SHA and language acceptance limitation
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/locale-navigation"
+          git rev-parse HEAD > "$RUNNER_TEMP/locale-navigation/EXACT_SHA.txt"
+          printf 'Only language switch/navigation/layout, NOT human content translation parity.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/locale-navigation/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track08-live-20-language-switch-navigation-${{ github.sha }}
+          path: ${{ runner.temp }}/locale-navigation/
+          retention-days: 7
+          if-no-files-found: warn
