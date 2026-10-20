@@ -2,6 +2,7 @@ name: Deep Focus Daily Recovery
 on:
   schedule:
     - cron: '17 2 * * *'
+    - cron: '17 14 * * *'
     - cron: '47 1 * * 5'
   workflow_dispatch:
     inputs:
@@ -14,7 +15,7 @@ on:
         type: choice
         required: true
         default: all
-        options: [all, ui, audio, locale, analytics, data, qa, performance]
+        options: [all, ui, audio, locale, numerals, analytics, data, qa, performance, notes, tasks, security, timer]
       mode:
         type: choice
         required: true
@@ -97,6 +98,11 @@ jobs:
             ui) lane=tests/interaction_recovery;;
             audio) lane=tests/nature_audio_recovery;;
             locale) lane=tests/localization_20;;
+            numerals) lane=tests/ascii_numerals;;
+            notes) lane=tests/notes_recovery;;
+            tasks) lane=tests/tasks_recovery;;
+            security) lane=tests/security_recovery;;
+            timer) lane=tests/focus_workflows;;
             analytics) lane=tests/analytics_recovery;;
             data) lane=tests/data_contracts;;
             qa) lane=tests/control_center;;
@@ -114,6 +120,16 @@ jobs:
           (cd source && node tools/language_review/audit.cjs --out "$RUNNER_TEMP/daily/locales") > "$RUNNER_TEMP/daily/language.log" 2>&1 || echo 'LANGUAGE_AUDIT_FAILED' >> "$RUNNER_TEMP/daily/blockers.txt"
           (cd source && node tools/control_center/audit.cjs --json "$RUNNER_TEMP/daily/health.json" --markdown "$RUNNER_TEMP/daily/health.md") > "$RUNNER_TEMP/daily/health.log" 2>&1 || echo 'CONTROL_CENTER_AUDIT_FAILED' >> "$RUNNER_TEMP/daily/blockers.txt"
           (cd source && node --test tests/master_recovery_qa/media_provenance_gate.test.cjs) > "$RUNNER_TEMP/daily/media.log" 2>&1 || echo 'MEDIA_RELEASE_GATE_BLOCKED' >> "$RUNNER_TEMP/daily/blockers.txt"
+      - name: Run specialist quality agents at checked-out exact source
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/daily"
+          node automation/tools/daily_maintenance/quality_agents.cjs --root source --out "$RUNNER_TEMP/daily" --lane "$SELECTED_LANE" || {
+            echo 'SPECIALIST_SOURCE_CHECKS_BLOCKED' >> "$RUNNER_TEMP/daily/blockers.txt"
+            exit 1
+          }
       - name: Open PR only for deterministic generated CSS repairs
         if: success()
         shell: bash
@@ -158,7 +174,7 @@ jobs:
               core.info('Source SHA-bound CI triage generated');
             } catch(e){core.warning('Cannot read source SHA-bound CI evidence: '+e.message);}
             const body=read(process.env.REPORT)+'\n\nAdditional gates:\n'+read(process.env.BLOCKERS)+
-             '\n\n'+ciAudit+
+             '\n\n'+read(process.env.REPORT.replace('daily-health.md','quality-agents.md'))+'\n\n'+ciAudit+
              '\nRun: '+context.serverUrl+'/'+owner+'/'+repo+'/actions/runs/'+context.runId+
              '\nSource QA only; Android, media rights and release NOT APPROVED.';
             const issues=await github.paginate(github.rest.issues.listForRepo,{owner,repo,state:'open',per_page:100});
