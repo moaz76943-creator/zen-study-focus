@@ -39,7 +39,8 @@
       return div;
     }
     div.append(node('strong','PR #'+pr.number+(pr.number===25?' · تكامل التطبيق':pr.number===70?' · إصلاح Android P0':' · لوحة التحكم')),
-      node('small','HEAD '+pr.sha.slice(0,12)),
+      node('small','HEAD '+(pr.number===70?pr.sha:pr.sha.slice(0,12))),
+      node('small','PR '+(pr.draft?'DRAFT':'READY')+' · مصدر GitHub حي'),
       node('small','BASE '+pr.baseSha.slice(0,12)),
       node('span',label[pr.ci.status]||'NOT VERIFIED','repo-sync-chip status-'+pr.ci.status.toLowerCase()),
       node('small','نتائج تشغيلات SHA الحالي: '+pr.ci.count));
