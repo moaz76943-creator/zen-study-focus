@@ -1,0 +1,114 @@
+name: Deep Focus Hourly Agent Coordination
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+    inputs:
+      target:
+        type: choice
+        required: true
+        default: integration
+        options: [integration, main]
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/hourly_agent_orchestrator.yml'
+      - 'tools/daily_maintenance/hourly_orchestrator.cjs'
+      - 'tests/daily_maintenance/hourly_*.test.cjs'
+      - '.github/agents/**'
+      - 'docs/daily_maintenance/HOURLY_COORDINATION.md'
+permissions:
+  contents: read
+concurrency:
+  group: deep-focus-daily-maintenance
+  cancel-in-progress: false
+jobs:
+  contract-tests:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test hourly coordination contracts
+        run: |
+          node --check tools/daily_maintenance/hourly_orchestrator.cjs
+          node --test tests/daily_maintenance/hourly_*.test.cjs
+  hourly-source-audit:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+      issues: write
+    env:
+      SOURCE_REF: ${{ inputs.target == 'main' && 'main' || 'fix/master-completion-20261020' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          path: automation
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_REF }}
+          path: source
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Coordinate 3 source agents on exact checked-out SHA
+        id: cohort
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/hourly"
+          git -C source rev-parse HEAD > "$RUNNER_TEMP/hourly/SOURCE_SHA"
+          node automation/tools/daily_maintenance/hourly_orchestrator.cjs --root source --out "$RUNNER_TEMP/hourly"
+      - name: Write reviewable source evidence
+        if: always()
+        shell: bash
+        run: |
+          if test -f "$RUNNER_TEMP/hourly/hourly-agents.md"; then
+            cat "$RUNNER_TEMP/hourly/hourly-agents.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Hourly source audit NOT_TESTED: checkout or execution failed; no source PASS.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Update one deduplicated coordination issue
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          REPORT: ${{ runner.temp }}/hourly/hourly-agents.md
+          CHECKED_SHA: ${{ runner.temp }}/hourly/SOURCE_SHA
+          SOURCE_REF: ${{ env.SOURCE_REF }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const {owner, repo} = context.repo;
+            const title = '[Hourly QA] Deep Focus agent coordination';
+            const read = p => fs.existsSync(p) ? fs.readFileSync(p, 'utf8').slice(0,25000) : null;
+            const sha = read(process.env.CHECKED_SHA)?.trim() || 'NOT_VERIFIED';
+            const result = read(process.env.REPORT) || 'NOT_TESTED: source checkout or audit failed; consult Actions logs.';
+            const body = result + '\n\nTracked ref: `' + process.env.SOURCE_REF + '` at `' + sha + '`' +
+              '\nRun: ' + context.serverUrl + '/' + owner + '/' + repo + '/actions/runs/' + context.runId +
+              '\nNo Android E2E evidence, automatic source modifications or release approval.';
+            const issues = await github.paginate(github.rest.issues.listForRepo, {owner, repo, state:'open', per_page:100});
+            const old = issues.find(i => !i.pull_request && i.title === title);
+            if (old) {
+              if (old.body !== body) await github.rest.issues.update({owner,repo,issue_number:old.number,body});
+            } else await github.rest.issues.create({owner,repo,title,body});
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deep-focus-hourly-agent-evidence
+          path: ${{ runner.temp }}/hourly/
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Preserve a failed verification gate
+        if: steps.cohort.outcome != 'success'
+        run: exit 1
