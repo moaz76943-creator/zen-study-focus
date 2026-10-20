@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
+    private FocusAppWebChromeClient appDialogs;
     private static volatile boolean webViewVisible = false;
     public static boolean isWebViewVisible() { return webViewVisible; }
 
@@ -116,7 +117,9 @@ public class MainActivity extends AppCompatActivity {
                         java.util.Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
             }
         });
-        webView.setWebChromeClient(new WebChromeClient());
+        // App-owned native dialogs keep file:// origins out of ALL JS buttons.
+        appDialogs = new FocusAppWebChromeClient(this);
+        webView.setWebChromeClient(appDialogs);
         webView.loadUrl("file:///android_asset/web/index.html");
     }
 
@@ -398,6 +401,12 @@ public class MainActivity extends AppCompatActivity {
         }
         Toast.makeText(this, "Backup exported; keep the unencrypted file private",
                 Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (appDialogs != null) appDialogs.cancelPending();
+        super.onDestroy();
     }
 
     @Override
