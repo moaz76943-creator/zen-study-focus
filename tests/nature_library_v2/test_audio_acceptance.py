@@ -36,6 +36,8 @@ class AudioAcceptanceTests(unittest.TestCase):
         self.assertIn('acrossfade=d=1',graph)
         self.assertIn('atrim=start=1:end=29',graph)
         self.assertIn('volume=0.7',graph)
+        self.assertIn('[0:a]asetpts=N/SR/TB,asplit',graph)
+        self.assertIn('concat=n=2:v=0:a=1,asetpts=N/SR/TB',graph)
         self.assertNotIn('sine',graph)
         for args in [(1,1,.7),(30,0,.7),(30,1,2),(float('nan'),1,.7)]:
             with self.subTest(args=args),self.assertRaises(ValueError):mod.loop_filter(*args)

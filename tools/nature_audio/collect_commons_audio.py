@@ -121,12 +121,12 @@ def loop_filter(duration, fade, gain):
         raise ValueError("Unsafe loop processing parameters")
     # Body then a linear crossfade of tail into head: the endpoint joins the
     # original body at fade seconds. No silence insertion or generated source.
-    return (f"[0:a]asplit=3[body][tail][head];"
+    return (f"[0:a]asetpts=N/SR/TB,asplit=3[body][tail][head];"
             f"[body]atrim=start={fade:g}:end={duration-fade:g},asetpts=PTS-STARTPTS[b];"
             f"[tail]atrim=start={duration-fade:g},asetpts=PTS-STARTPTS[t];"
             f"[head]atrim=end={fade:g},asetpts=PTS-STARTPTS[h];"
             f"[t][h]acrossfade=d={fade:g}:c1=tri:c2=tri[j];"
-            f"[b][j]concat=n=2:v=0:a=1,volume={gain:g}[out]")
+            f"[b][j]concat=n=2:v=0:a=1,asetpts=N/SR/TB,volume={gain:g}[out]")
 
 
 def prepare_loop(file_path, ident, duration, quality):
