@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Syntax-check generated chart code
+        run: node --check android/app/src/main/assets/web/analytics_studio.js
       - name: 20-locales accessible graphs, controls and Western digits
         run: |
           node --test tests/track07_functional/analytics_charts_20_accessibility.test.cjs tests/track07_functional/analytics_controls_and_digits.test.cjs tests/track07_functional/analytics_screen_20_locales.test.cjs
