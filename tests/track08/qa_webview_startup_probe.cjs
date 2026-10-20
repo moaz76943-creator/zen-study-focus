@@ -84,6 +84,16 @@ async function main(){
     assert.equal(state?.elements.focusHeroCard?.exists,true,'Focus hero missing');
     assert.equal(state?.elements.mainPlayBtn?.exists,true,'Main timer control missing');
     assert.equal(state?.foreground,'visible','QA WebView not foreground-visible');
+    // Native Android WebView regression for actual Analytics translations, not just PID.
+    const analytics=await evaluate("(() => {\n const supported=['fa','de','ur','bn'];const results=[];\n for(const lang of supported){\n  const box=document.createElement('section');document.body.appendChild(box);\n  let mounted=null;\n  try{\n   mounted=window.DeepFocusAnalyticsStudioV21.mount(box,()=>({\n    sessionHistory:[{id:'qa-local-1',date:'2026-10-19',domain:'study',minutes:30,completed:true}],tasksList:[],projects:[]\n   }),{locale:lang,today:'2026-10-20',startDate:'2026-10-01',endDate:'2026-10-20'});\n   const panel=mounted.element,fields=[...panel.querySelectorAll('input[type=date]')];\n   results.push({lang,heading:panel.querySelector('h2')?.textContent,\n    expected:window.DeepFocusLocale20Recovery.t(lang,'analyticsTitle'),\n    direction:panel.getAttribute('dir'),expectedDirection:window.DeepFocusLocale20Recovery.direction(lang),\n    sessionMinutes:mounted.getReport()?.totals.minutes,\n    dateDirections:fields.map(el=>getComputedStyle(el).direction)});\n  }finally{if(mounted)mounted.destroy();box.remove();}\n }\n return results;\n})()");
+    for(const row of analytics){
+      assert.equal(row.heading,row.expected,'Analytics translated title: '+row.lang);
+      assert.equal(row.direction,row.expectedDirection,'Analytics direction: '+row.lang);
+      assert.equal(row.sessionMinutes,30,'Analytics session aggregate: '+row.lang);
+      assert.deepEqual(row.dateDirections,['ltr','ltr'],'Western-digit date fields: '+row.lang);
+    }
+    console.log(JSON.stringify({probe:'ANDROID_ANALYTICS_LOCALIZED_UI',cases:analytics.length,results:analytics}));
+
     fs.writeFileSync(process.argv[2]||'qa-webview-result.json',JSON.stringify({status:'PASS',...state},null,2));
   }finally{ws.close();}
 }
