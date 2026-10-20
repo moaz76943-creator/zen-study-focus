@@ -59,3 +59,15 @@ test('reports escape untrusted PR titles and include accurate release scope',()=
  assert.match(m,/VERIFY_CANDIDATE/);
  assert.equal(report.counts.total,1);
 });
+
+test('hourly workflow never runs privileged resolver for pull_request changes',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const y=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/pr_resolution_agent.yml'),'utf8');
+ assert.match(y,/cron: '31 \* \* \* \*'/);
+ assert.match(y,/if: github\.event_name != 'pull_request'/);
+ assert.match(y,/ref: main/);
+ assert.match(y,/ref: main[\s\S]*persist-credentials: false/);
+ assert.match(y,/node --test tests\/daily_maintenance\/pr_resolution\.test\.cjs/);
+ assert.match(y,/merge_method:'squash'/);
+ assert.doesNotMatch(y,/force.push|assembleRelease|softprops\/action-gh-release/);
+});
