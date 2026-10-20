@@ -20,7 +20,7 @@ body.df-v22.df-recovery10 {
   color: var(--dfr-ink);
   font-family: var(--df22-font, system-ui, -apple-system, "Noto Sans", "Noto Sans Arabic", sans-serif);
   line-height: 1.5;
-  padding-bottom: calc(95px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(max(95px, 7rem) + env(safe-area-inset-bottom, 0px));
   overflow-x: clip;
 }
 body.df-v22.df-recovery10:not(.deep-lockdown) .app-shell {
@@ -171,7 +171,7 @@ body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
   height: auto;
   padding: 6px 1px;
   border-radius: 12px;
-  font-size: clamp(.62rem, 2.15vw, .75rem);
+  font-size: clamp(.7rem, 2.15vw, .85rem);
   line-height: 1.18;
   font-weight: 650;
   gap: 3px;
@@ -302,7 +302,7 @@ html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
   body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
     min-height: 58px;
     padding-inline: 0;
-    font-size: .6rem;
+    font-size: .7rem;
   }
   body.df-v22.df-recovery10 #sec-timer .domain-card { min-height: 100px; }
 }
