@@ -28,3 +28,48 @@ jobs:
           mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
           node --test --test-reporter=tap "${suites[@]}"
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install real isolated Chromium test runner
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Start local source-only WebView assets server
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/analytics-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Verify every Analytics control in 20 languages, native SAF adapters and protected Latin digits
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_ANALYTICS_EVIDENCE: ${{ runner.temp }}/analytics-controls
+        run: node tests/track07_functional/analytics_all_controls_browser.cjs
+      - name: Capture exact SHA
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/analytics-controls"
+          git rev-parse HEAD > "$RUNNER_TEMP/analytics-controls/SOURCE_SHA.txt"
+          printf 'Chromium only; physical Android device and real SAF picker NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/analytics-controls/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track07-analytics20-buttons-digits-${{ github.sha }}
+          path: ${{ runner.temp }}/analytics-controls/
+          retention-days: 7
+          if-no-files-found: warn
