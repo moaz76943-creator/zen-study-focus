@@ -23,3 +23,10 @@ test('nightly QA requires source SHA evidence and preserves blocked release gate
  assert.match(workflow,/MEDIA_RELEASE_GATE_BLOCKED/);
  assert.match(workflow,/RELEASE NOT APPROVED/);
 });
+
+test('weekly Android build finds executable SDK manager without assuming PATH layout',()=>{
+ assert.match(workflow,/find \/usr\/local\/lib\/android\/sdk\/cmdline-tools -type f -name sdkmanager/);
+ assert.match(workflow,/test -x "\$SDKMANAGER"/);
+ assert.match(workflow,/"\$SDKMANAGER" 'platforms;android-36' 'build-tools;36\.0\.0'/);
+ assert.doesNotMatch(workflow,/run: sdkmanager /);
+});
