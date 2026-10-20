@@ -140,7 +140,10 @@ def prepare_loop(file_path, ident, duration, quality):
     command = ["ffmpeg", "-v", "error", "-xerror", "-y", "-i", str(file_path),
                "-filter_complex", graph, "-map", "[out]", "-map_metadata", "-1",
                "-c:a", "libvorbis", "-q:a", "5", str(output)]
-    subprocess.run(command, capture_output=True, check=True, timeout=120)
+    try:
+        subprocess.run(command, capture_output=True, check=True, timeout=120)
+    except subprocess.CalledProcessError as error:
+        raise ValueError("Loop conversion failed: " + error.stderr.decode("utf-8", errors="replace")[-4000:]) from error
     measured = analyze_audio(output, quality["channels"], quality["sample_rate"])
     return {"path": "loops/" + ident + ".ogg", "input_sha256": hashlib.sha256(file_path.read_bytes()).hexdigest(),
             "output_sha256": hashlib.sha256(output.read_bytes()).hexdigest(),

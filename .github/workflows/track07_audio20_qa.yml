@@ -51,6 +51,7 @@ jobs:
           print('PRODUCTION_APPROVED=NO')
           PY
       - name: Upload all 20 offline-only genuine recordings, metadata and listening page
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: DeepFocus-20-Real-Nature-Originals-Listening-Only-${{ github.sha }}
