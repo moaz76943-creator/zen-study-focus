@@ -12,7 +12,7 @@
     if(value!==undefined)el.textContent=String(value);
     return el;
   };
-  const label={PASS:'PASS',FAIL:'FAIL',RUNNING:'RUNNING',NOT_VERIFIED:'NOT VERIFIED'};
+  const label={PASS:'PASS',FAIL:'FAIL',RUNNING:'RUNNING',PARTIAL:'PARTIAL',NOT_VERIFIED:'NOT VERIFIED'};
   let busy=false,model=null;
   function link(href,title){
     const a=node('a',title,'repo-sync-link');
@@ -42,14 +42,43 @@
       node('small','HEAD '+pr.sha.slice(0,12)),
       node('small','BASE '+pr.baseSha.slice(0,12)),
       node('span',label[pr.ci.status]||'NOT VERIFIED','repo-sync-chip status-'+pr.ci.status.toLowerCase()),
-      node('small','نتائج تشغيلات SHA الحالي: '+pr.ci.count));
+      node('small','نتائج SHA الحالي: '+pr.ci.count+' تشغيل ضمن '+(pr.ci.workflows||0)+' Workflow'));
     const buttons=node('div',undefined,'repo-sync-actions');
     buttons.append(link(pr.url,'فتح PR ↗'));
     if(pr.ci.url)buttons.append(link(pr.ci.url,'فحص CI ↗'));
     div.append(buttons);return div;
   }
+  function renderReviewQueue(){
+    const source=globalThis.DeepFocusControlCenter?.getSnapshot?.();
+    const queue=$('repo-review-queue');
+    if(!queue)return;
+    if(!source||!Array.isArray(source.prs)||!source.prs.length){
+      queue.replaceChildren(node('p','لم تُجلب طلبات السحب من GitHub بعد؛ لا يعني ذلك عدم وجود طلبات مفتوحة.'));
+      $('repo-review-state').textContent='طابور مراجعة غير متحقق؛ تحقق من الاتصال بالمستودع.';
+      return;
+    }
+    try{
+      const {total,items,drafts}=core.reviewQueue(source.prs,{
+        term:$('repo-review-search').value,
+        filter:$('repo-review-filter').value,limit:15
+      });
+      const rows=items.map(pr=>{
+        const row=node('article',undefined,'repo-review-card'),body=node('div',undefined,'repo-review-main');
+        body.append(node('strong','#'+pr.number+' · '+pr.title),
+          node('small',(pr.branch||'فرع غير متاح')+' · '+(pr.sha?.slice(0,12)||'SHA غير متاح')));
+        row.append(body,node('span',pr.draft?'DRAFT':'OPEN','repo-sync-chip'),link(pr.url,'مراجعة PR ↗'));
+        return row;
+      });
+      queue.replaceChildren(...(rows.length?rows:[node('p','لا توجد طلبات سحب مطابقة للتصفية الحالية.')]));
+      $('repo-review-state').textContent=(source.stale?'بيانات PRs محفوظة/جزئية وليست تحققًا حيًا · ':'قائمة PRs من GitHub عند آخر تحديث · ')+
+        total+' نتيجة، منها '+drafts+' مسودة · عرض '+items.length+' كحد أقصى';
+    }catch(e){
+      $('repo-review-state').textContent='تعذر تحليل طابور المراجعة: '+e.message;
+    }
+  }
   function render(){
     if(!model)return;
+    renderReviewQueue();
     $('repo-sync-cards').replaceChildren(tile(model.pr25),tile(model.pr37));
     const state=$('repo-sync-drift');
     if(!model.verified)state.textContent='تحقق جزئي: لا تعتمد حالة الدمج أو نتائج CI قبل استعادة الاتصال بالمصادر.';
@@ -103,7 +132,22 @@
   function boot(){
     if(!$('repo-sync'))return;
     $('repo-sync-refresh').addEventListener('click',refresh);
-    refresh();
+    $('repo-review-search').addEventListener('input',renderReviewQueue);
+    $('repo-review-filter').addEventListener('change',renderReviewQueue);
+    document.addEventListener('df:project-refreshed',renderReviewQueue);
+    renderReviewQueue();
+    message('افتح هذا القسم لفحص GitHub، أو اضغط زر الفحص الآن لتحديث رؤوس الفروع.');
+    if(typeof IntersectionObserver==='function'){
+      const observer=new IntersectionObserver(entries=>{
+        if(entries.some(entry=>entry.isIntersecting)){
+          observer.disconnect();
+          refresh();
+        }
+      },{rootMargin:'120px'});
+      observer.observe($('repo-sync'));
+    }else{
+      refresh();
+    }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
