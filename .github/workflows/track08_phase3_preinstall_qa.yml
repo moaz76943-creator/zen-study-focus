@@ -2,7 +2,7 @@ name: Track 08 phase3 isolated QA APK and emulator install
 on:
   push:
     branches: [audit/track08-analytics-screen-qa-20261020]
-    paths: [.github/workflows/track08_phase3_preinstall_qa.yml]
+    paths: [.github/workflows/track08_phase3_preinstall_qa.yml, tests/track08/qa_webview_startup_probe.cjs]
 permissions:
   contents: read
 concurrency:
