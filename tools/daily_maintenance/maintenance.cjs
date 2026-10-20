@@ -24,12 +24,36 @@ function assertMatrix(m){
  if(m.rows.length!==161||m.missing.length)throw Error('Expected all 161 tasks; missing: '+m.missing.join(','));
  return m;
 }
-function queue(ledger,limit=20){
- const rank={BLOCKED:0,TODO:1,IN_PROGRESS:2,IMPLEMENTED:3,SOURCE_TESTED:4,CI_TESTED:5};
- return (ledger?.tasks||[]).filter(x=>x&&!['ANDROID_TESTED','RELEASE_APPROVED','CI_TESTED','SOURCE_TESTED'].includes(x.CURRENT_STATUS))
- .slice().sort((a,b)=>(a.PRIORITY==='P0'?0:a.PRIORITY==='P1'?1:2)-(b.PRIORITY==='P0'?0:b.PRIORITY==='P1'?1:2)||
- (rank[a.CURRENT_STATUS]??9)-(rank[b.CURRENT_STATUS]??9)||String(a.TASK_ID).localeCompare(String(b.TASK_ID),'en',{numeric:true}))
- .slice(0,limit).map(x=>({TASK_ID:x.TASK_ID,PRIORITY:x.PRIORITY,CURRENT_STATUS:x.CURRENT_STATUS,ANDROID_RESULT:x.ANDROID_RESULT||'NOT_TESTED',NEXT_ACTION:String(x.NEXT_ACTION||'').slice(0,300)}));
+function queue(ledger, limit = 20) {
+  const rank = { BLOCKED: 0, TODO: 1, IN_PROGRESS: 2, IMPLEMENTED: 3, SOURCE_TESTED: 4, CI_TESTED: 5 };
+  const tasks = ledger?.tasks || [];
+  const excludedStatuses = ['ANDROID_TESTED', 'RELEASE_APPROVED', 'CI_TESTED', 'SOURCE_TESTED'];
+
+  const activeTasks = tasks.filter(x => x && !excludedStatuses.includes(x.CURRENT_STATUS));
+
+  const getPriorityScore = p => (p === 'P0' ? 0 : p === 'P1' ? 1 : 2);
+
+  const sortedTasks = activeTasks.slice().sort((a, b) => {
+    const priorityDiff = getPriorityScore(a.PRIORITY) - getPriorityScore(b.PRIORITY);
+    if (priorityDiff !== 0) return priorityDiff;
+
+    const rankA = rank[a.CURRENT_STATUS] ?? 9;
+    const rankB = rank[b.CURRENT_STATUS] ?? 9;
+    const rankDiff = rankA - rankB;
+    if (rankDiff !== 0) return rankDiff;
+
+    return String(a.TASK_ID).localeCompare(String(b.TASK_ID), 'en', { numeric: true });
+  });
+
+  const limitedTasks = sortedTasks.slice(0, limit);
+
+  return limitedTasks.map(x => ({
+    TASK_ID: x.TASK_ID,
+    PRIORITY: x.PRIORITY,
+    CURRENT_STATUS: x.CURRENT_STATUS,
+    ANDROID_RESULT: x.ANDROID_RESULT || 'NOT_TESTED',
+    NEXT_ACTION: String(x.NEXT_ACTION || '').slice(0, 300)
+  }));
 }
 function validateChanges(paths){
  if(!Array.isArray(paths))throw Error('unsafe change list');
