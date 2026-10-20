@@ -1,16 +1,118 @@
 {
-  "schema": 1,
+  "schema": 2,
   "status": "RESEARCH_AND_QUARANTINE_ONLY",
   "updated": "2026-10-20",
+  "intake_policy": "API SHA1 + original full decode; source-only staging, never auto activation",
   "items": [
     {
       "id": "thunder",
       "file": "Rain_thunder_and_birds.ogg",
-      "author": "Ezwa",
+      "author": "ezwa",
       "license": "PD-author",
-      "license_evidence": "https://commons.wikimedia.org/wiki/File:Rain_thunder_and_birds.ogg",
       "source_sha1": "3ef339971b06d7b69d8d2a44228fd1b5ade3c3c5",
-      "notes": "Actual rain, thunder AND birds; sound must be described accurately; no public-runtime approval."
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Rain_thunder_and_birds.ogg",
+      "notes": "Rain, thunder AND birds; not standalone thunder; candidate ambience",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
+    },
+    {
+      "id": "ocean",
+      "file": "Ocean_Waves_on_a_Tropical_Beach.ogg",
+      "author": "Jarrod stanley",
+      "license": "CC0-1.0",
+      "source_sha1": null,
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Ocean_Waves_on_a_Tropical_Beach.ogg",
+      "notes": "6m24s ocean beach with nearby tidal stream; close to 17MB original",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
+    },
+    {
+      "id": "stream_rapids",
+      "file": "Sanna_river_rapids.ogg",
+      "author": "Jarrod stanley",
+      "license": "CC0-1.0",
+      "source_sha1": null,
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Sanna_river_rapids.ogg",
+      "notes": "5-minute Austrian river rapids; strong rushing water",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
+    },
+    {
+      "id": "rain_window",
+      "file": "Rain_against_the_window.ogg",
+      "author": "cori",
+      "license": "PD-author",
+      "source_sha1": null,
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Rain_against_the_window.ogg",
+      "notes": "Rain striking window, not roof",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
+    },
+    {
+      "id": "breeze_birds",
+      "file": "Gentle_breeze_and_birds_singing.ogg",
+      "author": "ezwa",
+      "license": "PD-author",
+      "source_sha1": null,
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Gentle_breeze_and_birds_singing.ogg",
+      "notes": "33-second gentle wind in garden with distinct blackcap and chaffinch",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
+    },
+    {
+      "id": "birds_garden",
+      "file": "Birds_singing_in_garden.ogg",
+      "author": "ezwa",
+      "license": "PD-author",
+      "source_sha1": null,
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Birds_singing_in_garden.ogg",
+      "notes": "49-second garden bird singing on sunny afternoon, not dawn",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
+    },
+    {
+      "id": "stream",
+      "file": "Hemlock_stream.ogg",
+      "author": "Dirtslayer",
+      "license": "PD-author",
+      "source_sha1": null,
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Hemlock_stream.ogg",
+      "notes": "19-second trickling stream; short loop needs endurance listening",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
+    },
+    {
+      "id": "forest_ambient",
+      "file": "20090610_0_ambience.ogg",
+      "author": "nille",
+      "license": "PD-author",
+      "source_sha1": null,
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:20090610_0_ambience.ogg",
+      "notes": "2-minute woodland ambience; noisy/crows in original description, candidate requires listening",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
+    },
+    {
+      "id": "river_stony",
+      "file": "Shallow_small_river_with_stony_riverbed.ogg",
+      "author": "stephan",
+      "license": "PD-author",
+      "source_sha1": null,
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Shallow_small_river_with_stony_riverbed.ogg",
+      "notes": "Shallow natural river water against stony bed; investigate exact duration",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
+    },
+    {
+      "id": "storm_rain",
+      "file": "Rain_and_thunder_(1).ogg",
+      "author": "ezwa",
+      "license": "PD-author",
+      "source_sha1": null,
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Rain_and_thunder_(1).ogg",
+      "notes": "One minute rain with thunder (storm), not isolated thunder",
+      "status": "QUARANTINED_NOT_APPROVED",
+      "approved_for_runtime": false
     }
   ]
 }
