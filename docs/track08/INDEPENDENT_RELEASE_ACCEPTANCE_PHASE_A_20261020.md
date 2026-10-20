@@ -153,3 +153,12 @@ Classify any unexecuted case NOT_TESTED; use FAIL_APP only for independently obs
 - GitHub branch protection read returned 403 (`Resource not accessible by integration`): do not declare either protected or unprotected main without owner-side verification.
 - Exact-head PR #71 security workflow `39371253920`: CodeQL PASS; Gitleaks redacted local secret scan FAIL with one potential generic key match. No secret value was retrieved or reported. Confidential reviewer adjudication is required; do not disable the scanner.
 - Phase B and release acceptance remain **BLOCKED** until 07-09 supplies a finalized integrated SHA with real Android failure-injection, SAF/backup, all 20 language and sound approval, security and physical-device evidence. `RELEASE_APPROVED=NO`.
+
+## Final result of independent PR #76 Android runner (2026-10-20)
+
+- Exact run: https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39411570639 . Overall workflow **FAILURE** on HEAD `acc752a2f0f560a940d0ad2d8342d8b93571ed1d`.
+- **Real API30 ADB/CDP: 16 PASS, 0 FAIL_APP, 4 NOT_TESTED**; this is one more PASS than PR #73's 15/0/5. `task_subtasks` now PASS after real checkbox/subtask updates and immediate force-stop/reopen, with matching valid primary and mirror and empty journal; multiple repeat-kill cycles had native receipts matching the saved task.
+- Four remaining **CDP NOT_TESTED**: `touch_scroll`, `accessibility_smoke`, `copy_export`, and `talkback`. Their lack of execution is not proof of app malfunction or accessibility/SAF acceptance.
+- The legacy UIAutomator accessibility-descendant suite remains 0 PASS / 0 FAIL / 20 NOT_TESTED and can cause strict workflow FAILURE; do not conflate with the 20 CDP cases.
+- This success verifies the **PR #75 test-harness fix on descendant #76**, not PR #75's exact SHA or any future unified app SHA. The device-native failure-injection, real SAF backup/restore, physical Android, translation completion, production media, PR #71 secret triage and 07-09 final integration gates all remain unmet.
+- `RELEASE_APPROVED=NO`; no application source, main, signing, media or PR #73/#75 branches were changed.
