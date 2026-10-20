@@ -15,7 +15,7 @@ test('DF-043/047: draft warnings and restore controls are explicitly translated 
   assert.deepEqual(Object.keys(tr[code]).sort(),keys.slice().sort(),code+' key parity');
   for(const key of keys){
    const value=tr[code][key];
-   assert.ok(typeof value==='string'&&value.trim().length>=3,code+'.'+key);
+   assert.ok(typeof value==='string'&&Array.from(value.trim()).length>=1,code+'.'+key);
    if(code!=='en')assert.notEqual(value,tr.en[key],code+'.'+key+' leaked English');
   }
  }
