@@ -25,3 +25,9 @@ test('per-step navigation evidence identifies the actual failing button',()=>{
  assert.match(harness,/currentActiveSection/);
  assert.match(harness,/prerequisiteBlock\(results,\['notes_create_edit','tasks_create'\]\)/);
 });
+
+test('API30 source artifact names and CDP JSON must identify the checked out head SHA',()=>{
+ assert.match(workflow,/DF_TEST_SOURCE_SHA/);
+ assert.match(harness,/sha:process\.env\.DF_TEST_SOURCE_SHA\|\|null/);
+ assert.doesNotMatch(harness,/sha:process\.env\.GITHUB_SHA\|\|null/);
+});
