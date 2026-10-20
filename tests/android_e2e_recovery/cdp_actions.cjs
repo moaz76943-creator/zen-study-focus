@@ -68,6 +68,22 @@ const element=selector=>`document.querySelector(${JSON.stringify(selector)})`;
 const tap=selector=>touch(element(selector));
 const button=(container,text)=>`[...${element(container)}.querySelectorAll('button')].find(n=>n.textContent.trim()===${JSON.stringify(text)})`;
 async function fill(selector,text){await tap(selector);await evaluate(`${element(selector)}.value=''`);await call('Input.insertText',{text});}
+async function dismissNoteKeyboardForSave(){
+ const before=await evaluate("({open:document.getElementById('noteModal').classList.contains('open'),body:document.getElementById('inpNoteBody').value,viewport:window.innerHeight})");
+ assert.equal(before?.open,true,'Cannot dismiss keyboard when note editor is closed');
+ // Normal Android Back while IME owns focus dismisses keyboard before a visible Save tap.
+ adb('shell','input','keyevent','4');
+ let after;
+ for(let n=0;n<14;n++){
+   await pause(200);
+   after=await evaluate("({open:document.getElementById('noteModal').classList.contains('open'),body:document.getElementById('inpNoteBody').value,viewport:window.innerHeight})");
+   if(!after?.open||after?.viewport>=before.viewport+80)break;
+ }
+ assert.equal(after?.open,true,'Android Back closed the unsaved note editor instead of dismissing keyboard');
+ assert.equal(after?.body,before.body,'draft body changed when hiding keyboard');
+ return {beforeHeight:before.viewport,afterHeight:after.viewport};
+}
+
 async function check(expression,message){assert.equal(await evaluate(expression),true,message);}
 async function run(id,fn){try{const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using CDP touch/input and observed state'});}catch(e){results.set(id,{id,status:(/^(TRANSPORT:|DEPENDENCY_NOT_TESTED:)/).test(e.message)?'NOT_TESTED':'FAIL',detail:e.message});}console.log(JSON.stringify(results.get(id)));}
 async function restart(){ws.close();adb('shell','am','force-stop','com.zenstudy.focus');adb('shell','am','start','-n','com.zenstudy.focus/.MainActivity');await pause(3000);await connect();await ready();}
@@ -95,9 +111,9 @@ async function main(){
    }
  });
  await run('notes_create_edit',async()=>{
-  await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle','Android fixture ٢');await fill('#inpNoteBody','Unicode العربية ٣ — preserved');await tap('#nsSaveButton');
+  await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle','Android fixture ٢');await fill('#inpNoteBody','Unicode العربية ٣ — preserved');await dismissNoteKeyboardForSave();await tap('#nsSaveButton');
   await check("notesList.some(n=>n.title==='Android fixture ٢'&&n.body==='Unicode العربية ٣ — preserved'&&!n.isStarter)",'Created Unicode note');
-  await touch(`[...document.querySelectorAll('.nsux-card')].find(n=>n.querySelector('h3')?.textContent==='Android fixture ٢')?.querySelector('.nsux-actions button')`);await fill('#inpNoteBody','Edited Unicode العربية ٣');await tap('#nsSaveButton');
+  await touch(`[...document.querySelectorAll('.nsux-card')].find(n=>n.querySelector('h3')?.textContent==='Android fixture ٢')?.querySelector('.nsux-actions button')`);await fill('#inpNoteBody','Edited Unicode العربية ٣');await dismissNoteKeyboardForSave();await tap('#nsSaveButton');
   await check("notesList.filter(n=>n.title==='Android fixture ٢').length===1 && notesList.find(n=>n.title==='Android fixture ٢').body==='Edited Unicode العربية ٣'",'One edited record');
  });
  await run('tasks_create',async()=>{
