@@ -36,6 +36,8 @@ def prepare(root):
     statuses = {entry["id"]: entry for entry in evidence}
     if not (media / "index.html").is_file():
         raise ValueError("Offline listening page missing")
+    if os.environ.get("GITHUB_REF_NAME") == "feature/track07-04-authentic-nature-20-20261020" and len(meta.get("items", [])) != 20:
+        raise ValueError("Audio20 QA build needs exactly twenty pinned original recordings")
     if not meta.get("items") or len(meta["items"]) != len(statuses):
         raise ValueError("Original source and report counts differ")
     original_files = []
@@ -111,6 +113,9 @@ def prepare(root):
 if __name__ == "__main__":
     if not (os.environ.get("GITHUB_ACTIONS") == "true"
         and os.environ.get("AUDIO_QA_BUILD") == "1"
-        and os.environ.get("GITHUB_REF_NAME") == "fix/deep-focus-nature-catalog-20-20261020"):
+        and os.environ.get("GITHUB_REF_NAME") in {
+            "fix/deep-focus-nature-catalog-20-20261020",
+            "feature/track07-04-authentic-nature-20-20261020"
+        }):
         raise SystemExit("SAFE_GUARD: Audio QA packaging is GitHub Actions branch-only")
     prepare(pathlib.Path(__file__).resolve().parents[2])
