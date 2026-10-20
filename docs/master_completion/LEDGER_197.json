@@ -2533,7 +2533,9 @@
       "PREVIOUS_STATUS": "IN_PROGRESS",
       "CURRENT_STATUS": "IN_PROGRESS",
       "FILES_CHANGED": [],
-      "COMMIT_SHA": [],
+      "COMMIT_SHA": [
+        "a8b4d4afedb82d8c3073b388b9dd1455e26b6519"
+      ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
       "TEST_SCOPE": "No new complete task-specific acceptance attestation",
@@ -2542,14 +2544,14 @@
         "docs/master_completion/BATCH_07_ANALYTICS.md",
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
-      "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
-      "NEXT_ACTION": "Capture both primary/mirror packet signatures, timestamps and task states before/after immediate force-stop; distinguish stale-copy selection from lost persistence before implementing a compatible native durability/recovery path.",
+      "BLOCKER": "Confirmed loss of last acknowledged checkbox write after immediate foreground process kill; BOTH valid primary and mirror revert to the prior transaction and no recovery journal remains. JavaScript readback is insufficient at this boundary.",
+      "NEXT_ACTION": "Implement and independently review an acknowledged native durability/recovery path preserving exact existing v21 packets, IDs and unknown fields; test native failure/rollback and immediate force-stop without added delays or silent overwrite.",
       "OWNER_ROLE": "Android engineer and data-integrity architect",
       "ANDROID_DURABILITY_FAILURE": {
-        "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
-        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229",
+        "sha": "a8b4d4afedb82d8c3073b388b9dd1455e26b6519",
+        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39370803476",
         "result": "FAIL_APP",
-        "scope": "Actual task checklist done=true matched verified storage readback before immediate foreground force-stop; same item/id returned done=false after restart. Parent and earlier subtask retained. No artificial pre-kill delay added."
+        "scope": "Both primary/mirror were valid and matched done=true before kill (ts1792471492061,sigf9e36d5a), both reverted to valid done=false previous packets after restart (ts1792471489644,sigdabc4c79). No pending journal on either side. Stale-copy selection is ruled out in this observation."
       }
     },
     {
@@ -2821,7 +2823,8 @@
       "COMMIT_SHA": [
         "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
         "824d87a0f801361761b14921f59571fbb590e4df",
-        "20b56815143174e4d769abf30199fc8d6af9e609"
+        "20b56815143174e4d769abf30199fc8d6af9e609",
+        "a8b4d4afedb82d8c3073b388b9dd1455e26b6519"
       ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
@@ -2831,8 +2834,8 @@
         "docs/master_completion/BATCH_07_ANALYTICS.md",
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
-      "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
-      "NEXT_ACTION": "Capture both primary/mirror packet signatures, timestamps and task states before/after immediate force-stop; distinguish stale-copy selection from lost persistence before implementing a compatible native durability/recovery path.",
+      "BLOCKER": "Confirmed loss of last acknowledged checkbox write after immediate foreground process kill; BOTH valid primary and mirror revert to the prior transaction and no recovery journal remains. JavaScript readback is insufficient at this boundary.",
+      "NEXT_ACTION": "Implement and independently review an acknowledged native durability/recovery path preserving exact existing v21 packets, IDs and unknown fields; test native failure/rollback and immediate force-stop without added delays or silent overwrite.",
       "OWNER_ROLE": "Android engineer and data-integrity architect",
       "PHASE1_SOURCE_EVIDENCE": {
         "base_sha": "bd6e3e4d8aef95def871c9e7f78c63807e681369",
@@ -2856,10 +2859,10 @@
         "device_result": "DEVICE_NOT_TESTED"
       },
       "ANDROID_DURABILITY_FAILURE": {
-        "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
-        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229",
+        "sha": "a8b4d4afedb82d8c3073b388b9dd1455e26b6519",
+        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39370803476",
         "result": "FAIL_APP",
-        "scope": "Actual task checklist done=true matched verified storage readback before immediate foreground force-stop; same item/id returned done=false after restart. Parent and earlier subtask retained. No artificial pre-kill delay added."
+        "scope": "Both primary/mirror were valid and matched done=true before kill (ts1792471492061,sigf9e36d5a), both reverted to valid done=false previous packets after restart (ts1792471489644,sigdabc4c79). No pending journal on either side. Stale-copy selection is ruled out in this observation."
       }
     },
     {
@@ -4186,7 +4189,8 @@
       ],
       "COMMIT_SHA": [
         "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
-        "824d87a0f801361761b14921f59571fbb590e4df"
+        "824d87a0f801361761b14921f59571fbb590e4df",
+        "a8b4d4afedb82d8c3073b388b9dd1455e26b6519"
       ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
@@ -4196,8 +4200,8 @@
         "docs/master_completion/BATCH_00.md",
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
-      "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
-      "NEXT_ACTION": "Capture both primary/mirror packet signatures, timestamps and task states before/after immediate force-stop; distinguish stale-copy selection from lost persistence before implementing a compatible native durability/recovery path.",
+      "BLOCKER": "Confirmed loss of last acknowledged checkbox write after immediate foreground process kill; BOTH valid primary and mirror revert to the prior transaction and no recovery journal remains. JavaScript readback is insufficient at this boundary.",
+      "NEXT_ACTION": "Implement and independently review an acknowledged native durability/recovery path preserving exact existing v21 packets, IDs and unknown fields; test native failure/rollback and immediate force-stop without added delays or silent overwrite.",
       "OWNER_ROLE": "Android engineer and data-integrity architect",
       "PHASE1_SOURCE_EVIDENCE": {
         "base_sha": "bd6e3e4d8aef95def871c9e7f78c63807e681369",
@@ -4213,10 +4217,10 @@
         "browser_scope": "26 Chromium checks including actual task Undo after 10 tab returns and actual journal-quota failure retaining form"
       },
       "ANDROID_DURABILITY_FAILURE": {
-        "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
-        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229",
+        "sha": "a8b4d4afedb82d8c3073b388b9dd1455e26b6519",
+        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39370803476",
         "result": "FAIL_APP",
-        "scope": "Actual task checklist done=true matched verified storage readback before immediate foreground force-stop; same item/id returned done=false after restart. Parent and earlier subtask retained. No artificial pre-kill delay added."
+        "scope": "Both primary/mirror were valid and matched done=true before kill (ts1792471492061,sigf9e36d5a), both reverted to valid done=false previous packets after restart (ts1792471489644,sigdabc4c79). No pending journal on either side. Stale-copy selection is ruled out in this observation."
       }
     },
     {
@@ -4444,7 +4448,8 @@
       ],
       "COMMIT_SHA": [
         "0b12c8ced88a53c7668ded4db7d1400f8cbca2b4",
-        "20b56815143174e4d769abf30199fc8d6af9e609"
+        "20b56815143174e4d769abf30199fc8d6af9e609",
+        "a8b4d4afedb82d8c3073b388b9dd1455e26b6519"
       ],
       "TEST_COMMAND": [
         "node --test tests/notes_recovery/draft_guard.test.cjs"
@@ -4456,8 +4461,8 @@
         "docs/master_completion/BATCH_01_DRAFTS.md",
         "docs/master_completion/PHASE1_BASELINE.md"
       ],
-      "BLOCKER": "Confirmed last checklist toggle lost after immediate foreground process kill on API30 despite localStorage readback. Current web journal cannot claim disk durability at that boundary.",
-      "NEXT_ACTION": "Capture both primary/mirror packet signatures, timestamps and task states before/after immediate force-stop; distinguish stale-copy selection from lost persistence before implementing a compatible native durability/recovery path.",
+      "BLOCKER": "Confirmed loss of last acknowledged checkbox write after immediate foreground process kill; BOTH valid primary and mirror revert to the prior transaction and no recovery journal remains. JavaScript readback is insufficient at this boundary.",
+      "NEXT_ACTION": "Implement and independently review an acknowledged native durability/recovery path preserving exact existing v21 packets, IDs and unknown fields; test native failure/rollback and immediate force-stop without added delays or silent overwrite.",
       "OWNER_ROLE": "Android engineer and data-integrity architect",
       "ROLLOVER_EVIDENCE": {
         "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
@@ -4468,10 +4473,10 @@
         "device_result": "DEVICE_NOT_TESTED"
       },
       "ANDROID_DURABILITY_FAILURE": {
-        "sha": "b93bf8db5b862cc16d1d30bdf46ad721fb1a9911",
-        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229",
+        "sha": "a8b4d4afedb82d8c3073b388b9dd1455e26b6519",
+        "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39370803476",
         "result": "FAIL_APP",
-        "scope": "Actual task checklist done=true matched verified storage readback before immediate foreground force-stop; same item/id returned done=false after restart. Parent and earlier subtask retained. No artificial pre-kill delay added."
+        "scope": "Both primary/mirror were valid and matched done=true before kill (ts1792471492061,sigf9e36d5a), both reverted to valid done=false previous packets after restart (ts1792471489644,sigdabc4c79). No pending journal on either side. Stale-copy selection is ruled out in this observation."
       }
     },
     {
@@ -4700,6 +4705,20 @@
       "status": "FAIL_APP",
       "scope": "14 PASS / 2 FAIL / 4 NOT_TESTED; latest checklist toggle reverts after force-stop, long-note reader hidden in closed advanced details; original UIAutomator20 NOT_TESTED",
       "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39367634229"
+    },
+    {
+      "sha": "0dbf2d2bd0558dde79175b46a9ef7825f475951c",
+      "api": 30,
+      "status": "FAIL_APP",
+      "scope": "Full run15 PASS/1 FAIL/4 NOT_TESTED: long-note reader, rotation, Undo and rollover quota/retry PASS; immediate-kill checklist durability FAIL; original UIAutomator20 NOT_TESTED",
+      "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39368766119"
+    },
+    {
+      "sha": "a8b4d4afedb82d8c3073b388b9dd1455e26b6519",
+      "api": 30,
+      "status": "FAIL_APP",
+      "scope": "Focused packet probe2 PASS/1 FAIL/17 NOT_TESTED, both valid copies revert; full registry and strict acceptance gate retained",
+      "run": "https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39370803476"
     }
   ],
   "phase1": {
