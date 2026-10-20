@@ -19,6 +19,10 @@ jobs:
         run: |
           node --test tests/nature_library_v2/catalog.test.cjs tests/integration_recovery/nature_runtime.test.cjs tests/integration_recovery/nature_20_language_controls.test.cjs tests/nature_audio_recovery/mixer.test.cjs
           node tests/smoke_app.cjs
+      - name: Install audio probing tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg
       - name: Collect pinned original recording (not distributed)
         run: python3 tools/nature_audio/collect_commons_audio.py
       - name: Upload candidate and evidence for human review
