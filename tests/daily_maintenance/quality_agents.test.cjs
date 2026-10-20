@@ -68,6 +68,14 @@ test('language source audit marks missing translations, unlocalized markup, and 
  assert.equal(q.readLocaleAudit(path.join(root,'missing')).status,'NOT_TESTED');
 }));
 
+test('language source audit falls back to NOT_TESTED for invalid JSON report',()=>fixture(root=>{
+ const out=path.join(root,'report');fs.mkdirSync(path.join(out,'locales'),{recursive:true});
+ fs.writeFileSync(path.join(out,'locales/coverage.json'),'{ invalid json ');
+ const metrics=q.readLocaleAudit(out);
+ assert.equal(metrics.status,'NOT_TESTED');
+ assert.match(metrics.reason,/Unable to parse locale report/);
+}));
+
 test('TAP parser requires real counted pass/fail/skips/todo evidence',()=>{
  assert.equal(q.parseNodeTap('not TAP'),null);
  assert.equal(q.parseNodeTap('TAP version 13\n1..0'),null);
