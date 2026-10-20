@@ -51,3 +51,18 @@ App-tree parent: PR #85 candidate SHA `f97cc7d07c66ba0c85f22402aeeb76788146cc3e`
 **STAGED_INTEGRATION_SHA = `f97cc7d07c66ba0c85f22402aeeb76788146cc3e`.**  
 **PREINSTALL_QA_RESULT = PASS on isolated QA package.**  
 **FINAL_INTEGRATION_SHA = NOT_DELIVERED. RELEASE_APPROVED=NO.**
+
+
+## QA package startup regression — resolved 2026-10-20
+
+**Owner report:** earlier `Deep Focus QA` APK installed but immediately closed/failed to open.
+
+**Verified root cause:** The original `MainActivity.onCreate()` hard-stops (calls `finish()`) for every package ID other than `com.zenstudy.focus`, before constructing WebView. The original QA packaging added `applicationIdSuffix '.qa'` and therefore `com.zenstudy.focus.qa` was rejected by design. The earlier PID-only smoke did not prove actual UI launch.
+
+**Fix scoped to ephemeral CI Debug packaging:** In the temporary checkout ONLY, retain exact original-package guard and additionally accept `com.zenstudy.focus.qa` **only when** `ApplicationInfo.FLAG_DEBUGGABLE` is present. Production source `MainActivity.java`, signed release behavior and normal app package identity remain untouched. Commit includes `tests/track08/qa_launch_contract.test.cjs` (three regression checks) and `tests/track08/qa_webview_startup_probe.cjs` (live Android CDP). `tests/track08/phase3_side_by_side_qa.sh` exercises fresh start and offline force-stop/relaunch, and records screenshot, browser DOM and baseline-app sandbox isolation.
+
+**Actual GREEN run:** [GitHub Actions #39437827149](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39437827149) — SUCCESS on exact source/QA-workflow SHA `44caa55609367622a8d2d481702573f6c579f84b`. All 3 startup guard Node tests PASS; normal and isolated QA Debug builds PASS; package ID/signature/permissions PASS. Two live Android emulator CDP probes report `readyState=complete`, URL `file:///android_asset/web/index.html`, `ZenNative` and `DF22Integration` available, and visible positive-dimension `#navTimer`, `#mainPlayBtn`, `#focusHeroCard` both before and after offline relaunch. Original synthetic private-data sentinel remained intact and inaccessible from QA package. A real screenshot `QA-OPEN-SCREEN.png` is included in the artifact.
+
+**Replacement QA-only APK**: [artifact #12271688574](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39437827149/artifacts/12271688574); ZIP contains `DeepFocus-Phase3-QA-Only.apk`, `QA_APK_SHA256.txt`, startup probe JSON, screenshot and verification files. Do **not** install previous artifact #12267179669, which still has the QA package rejection. Since CI-generated Debug signing certificates can differ, the user should **uninstall only the broken Deep Focus QA** first; do not uninstall, reset, replace or clear data for their normal Deep Focus app.
+
+**Remaining evidence boundary**: This is emulator API30 startup/UI readiness, *not* proof of Android 13 physical phone acceptance, all task/timer functional flows, SAF import/export, 20-language translation completion, approved sound rights or Gitleaks resolution. `RELEASE_APPROVED=NO`.
