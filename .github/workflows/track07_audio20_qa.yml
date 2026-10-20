@@ -92,6 +92,13 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate real Android CDP sound QA probe syntax
+        run: |
+          node --check tests/nature_library_v2/android20_runtime_probe.cjs
+          bash -n tests/nature_library_v2/android20_emulator_qa.sh
       - name: Setup Android API36
         run: |
           SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
@@ -119,6 +126,29 @@ jobs:
           fi
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$APK"
           sha256sum "$APK"
+      - name: Prepare disposable emulator KVM
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Prove QA APK actually renders 20 sound controls and decodes an Ogg on Android API30
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/nature_library_v2/android20_emulator_qa.sh
+      - name: Upload real Android audio QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-20-Real-AudioQA-Android-Evidence-${{ github.sha }}
+          path: ${{ runner.temp }}/audio20/
+          if-no-files-found: warn
+          retention-days: 7
       - name: Upload separate 20 original sound-listening QA only APK
         uses: actions/upload-artifact@v4
         with:
