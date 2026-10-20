@@ -60,7 +60,6 @@ jobs:
       SOURCE_REF: ${{ inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'fix/master-completion-20261020' }}
       SELECTED_MODE: ${{ inputs.mode || 'safe-fix' }}
       SELECTED_LANE: ${{ inputs.lane || 'all' }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -72,6 +71,7 @@ jobs:
           ref: ${{ env.SOURCE_REF }}
           path: source
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -135,6 +135,7 @@ jobs:
         shell: bash
         env:
           GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           cd source
@@ -150,6 +151,7 @@ jobs:
           git checkout -b "$branch"
           git add -- android/app/src/main/assets/web/control_center_overrides.css
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'style(automation): regenerate safe CSS for review'
+          gh auth setup-git
           git push origin "HEAD:refs/heads/$branch"
           gh pr create --repo "$GH_REPO" --base "$SOURCE_REF" --head "$branch" --draft --title '[Daily QA] Generated CSS repair' --body "SHA $original_sha. Generated CSS only. Tests passed, human review required. No app release." || echo 'PR creation restricted; branch pushed for review.'
       - name: Update one daily blockers issue without duplicates
@@ -203,6 +205,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.SOURCE_REF }}
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

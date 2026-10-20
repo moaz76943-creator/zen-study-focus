@@ -41,9 +41,10 @@ test('checks are exact-SHA source-only and failed child processes never PASS',()
   fs.writeFileSync(path.join(root,dir,'check.test.cjs'),'');
  }
  const invocations=[];
+ const TAP='TAP version 13\n1..2\n# tests 2\n# pass 2\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n';
  const report=q.runAgents(root,good,{sourceSha:'b'.repeat(40),execute:(binary,args,opts)=>{
   invocations.push({binary,args,opts});
-  return {status:invocations.length===1?0:1,stdout:'safely logged',stderr:'failed check'};
+  return {status:invocations.length===1?0:1,stdout:TAP,stderr:'failed check'};
  }});
  assert.equal(report.agents[0].status,'SOURCE_TESTED');
  assert.equal(report.agents[1].status,'BLOCKED');
@@ -55,7 +56,7 @@ test('checks are exact-SHA source-only and failed child processes never PASS',()
 test('lane selection does not silently report unexecuted lanes as PASS',()=>fixture(root=>{
  fs.mkdirSync(path.join(root,'tests/ascii_numerals'),{recursive:true});
  fs.writeFileSync(path.join(root,'tests/ascii_numerals/check.test.cjs'),'');
- const report=q.runAgents(root,good,{sourceSha:'c'.repeat(40),lane:'numerals',execute:()=>({status:0,stdout:''})});
+ const report=q.runAgents(root,good,{sourceSha:'c'.repeat(40),lane:'numerals',execute:()=>({status:0,stdout:'TAP version 13\n1..1\n# tests 1\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n'})});
  assert.deepEqual(report.agents.map(a=>a.status),['NOT_RUN','SOURCE_TESTED']);
  assert.equal(q.hasHardFailure(report),false);
 }));
@@ -65,4 +66,28 @@ test('language source audit marks missing translations, unlocalized markup, and 
  const metrics=q.readLocaleAudit(out);
  assert.equal(metrics.status,'GAPS_FOUND');assert.equal(metrics.missing,1);assert.equal(metrics.unmarked,1);
  assert.equal(q.readLocaleAudit(path.join(root,'missing')).status,'NOT_TESTED');
+}));
+\ntest('TAP parser requires real counted pass/fail/skips/todo evidence',()=>{
+ assert.equal(q.parseNodeTap('not TAP'),null);
+ assert.equal(q.parseNodeTap('TAP version 13\n1..0'),null);
+ assert.equal(q.parseNodeTap('TAP version 13\n# tests 1\n# pass 2\n# fail 0\n# skipped 0\n# todo 0\n# cancelled 0'),null);
+ assert.deepEqual(q.parseNodeTap('TAP version 13\n# tests 2\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 1\n# todo 0'),{
+  tests:2,pass:1,fail:0,cancelled:0,skipped:1,todo:0
+ });
+});
+test('zero tests, skipped tests, todo, and malformed output cannot claim green source QA',()=>fixture(root=>{
+ fs.mkdirSync(path.join(root,'tests/localization_20'),{recursive:true});
+ fs.writeFileSync(path.join(root,'tests/localization_20/test.test.cjs'),'');
+ const suites=[
+  {data:'TAP version 13\n# tests 0\n# pass 0\n# fail 0\n# skipped 0\n# todo 0\n# cancelled 0',expected:'NOT_TESTED'},
+  {data:'TAP version 13\n# tests 2\n# pass 1\n# fail 0\n# skipped 1\n# todo 0\n# cancelled 0',expected:'SOURCE_PARTIAL'},
+  {data:'TAP version 13\n# tests 2\n# pass 1\n# fail 0\n# skipped 0\n# todo 1\n# cancelled 0',expected:'SOURCE_PARTIAL'},
+  {data:'source says success',expected:'NOT_TESTED'}
+ ];
+ for(const item of suites){
+  const report=q.runAgents(root,{schema_version:1,agents:[good.agents[0]]},{
+   sourceSha:'d'.repeat(40),execute:()=>({status:0,stdout:item.data})});
+  assert.equal(report.agents[0].status,item.expected,item.expected);
+  assert.equal(q.hasHardFailure(report),true);
+ }
 }));

@@ -60,6 +60,20 @@ function readLocaleAudit(output){
   return result;
  }catch(e){return {status:'NOT_TESTED',reason:'Unable to parse locale report: '+String(e.message).slice(0,140)};}
 }
+function parseNodeTap(output){
+ const data=String(output||'');
+ if(!/^TAP version [0-9]+/m.test(data))return null;
+ const summary={};
+ for(const line of data.split(/\r?\n/)){
+  const m=/^# (tests|pass|fail|skipped|todo|cancelled) ([0-9]+)$/.exec(line);
+  if(m)summary[m[1]]=Number(m[2]);
+ }
+ for(const key of ['tests','pass','fail','skipped','todo','cancelled'])
+  if(!Number.isSafeInteger(summary[key]))return null;
+ if(summary.pass+summary.fail>summary.tests||summary.skipped+summary.todo>summary.tests)
+  return null;
+ return summary;
+}
 function runAgents(root,manifest,{sourceSha,lane='all',execute=cp.spawnSync}={}){
  if(typeof sourceSha!=='string'||!SHA.test(sourceSha))throw Error('Exact source SHA required');
  if(!LANES.has(lane))throw Error('Unknown QA lane');
@@ -74,7 +88,23 @@ function runAgents(root,manifest,{sourceSha,lane='all',execute=cp.spawnSync}={})
    else {
     const proc=execute(process.execPath,['--test',...tests],
      {cwd:root,encoding:'utf8',shell:false,timeout:120000,maxBuffer:3*1024*1024});
-    if(proc.status===0&&!proc.error){result.status='SOURCE_TESTED';}
+    if(proc.status===0&&!proc.error){
+     const tap=parseNodeTap(proc.stdout);
+     result.cases=tap?.tests??0;
+     result.passed=tap?.pass??0;
+     result.skipped=tap?.skipped??0;
+     result.todo=tap?.todo??0;
+     if(!tap||tap.tests===0||tap.pass===0){
+      result.status='NOT_TESTED';
+      result.reason='No verifiable passing Node TAP test cases';
+     }else if(tap.fail>0||tap.cancelled>0){
+      result.status='BLOCKED';
+      result.reason='Node TAP reported failed or cancelled cases';
+     }else if(tap.skipped>0||tap.todo>0||tap.pass!==tap.tests){
+      result.status='SOURCE_PARTIAL';
+      result.reason='Suite includes skipped, todo or unaccounted test cases';
+     }else result.status='SOURCE_TESTED';
+    }
     else {
      result.status='BLOCKED';
      result.reason=proc.error?.code==='ETIMEDOUT'?'Finite source test timeout':
@@ -87,7 +117,7 @@ function runAgents(root,manifest,{sourceSha,lane='all',execute=cp.spawnSync}={})
  return {schema_version:1,source_sha:sourceSha,verified_at:new Date().toISOString(),scope:'SOURCE_CODE_ONLY',
   device_qa:'NOT_TESTED',production_ready:false,autofix:'DISABLED_FOR_APP_SOURCE',lane,agents:rows};
 }
-function hasHardFailure(report){return report.agents.some(a=>a.status==='BLOCKED'||a.status==='NOT_TESTED');}
+function hasHardFailure(report){return report.agents.some(a=>['BLOCKED','NOT_TESTED','SOURCE_PARTIAL'].includes(a.status));}
 function toMarkdown(report,language){
  const lines=['# Deep Focus specialist QA agents','',
   'Exact source SHA: `'+report.source_sha+'`','Selected lane: '+report.lane,
@@ -126,4 +156,4 @@ function main(argv=process.argv.slice(2)){
  if(hasHardFailure(report))process.exitCode=1;
 }
 if(require.main===module){try{main();}catch(e){console.error(e.message);process.exitCode=1;}}
-module.exports={validateManifest,discoverTests,runAgents,readLocaleAudit,hasHardFailure,toMarkdown,main};
+module.exports={validateManifest,discoverTests,parseNodeTap,runAgents,readLocaleAudit,hasHardFailure,toMarkdown,main};

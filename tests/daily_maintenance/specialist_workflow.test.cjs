@@ -21,3 +21,13 @@ test('manual dispatch allows targeted digit and sensitive-data regressions',()=>
  for(const lane of ['numerals','notes','tasks','security','timer'])
   assert.match(yaml,new RegExp('\\b'+lane+'\\) lane=tests/'));
 });
+\ntest('source tests cannot read persisted checkout token and only safe repair step receives GH_TOKEN',()=>{
+ const scope=yaml.slice(yaml.indexOf('  daily:'),yaml.indexOf('  weekly-debug:'));
+ const globalEnv=scope.slice(scope.indexOf('    env:'),scope.indexOf('    steps:'));
+ assert.doesNotMatch(globalEnv,/GH_TOKEN|GITHUB_TOKEN/);
+ assert.match(scope,/path: source\n\s+fetch-depth: 0\n\s+persist-credentials: false/);
+ const safe=scope.slice(scope.indexOf('      - name: Open PR only for deterministic'),scope.indexOf('      - name: Update one daily blockers'));
+ assert.match(safe,/GH_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}/);
+ assert.match(safe,/gh auth setup-git/);
+ assert.doesNotMatch(scope.slice(0,scope.indexOf('      - name: Open PR only for deterministic')),/GH_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}/);
+});
