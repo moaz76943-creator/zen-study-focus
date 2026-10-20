@@ -76,5 +76,26 @@
     return {verified,drift,pr25,pr37,release:'NOT_APPROVED',
       recent,errors:errors.map(x=>String(x).slice(0,180)),timestamp};
   }
-  return {REPO,safeSha,trustedGitHubUrl,ciStatus,buildRepoHealth};
+  function reviewQueue(prs,{term='',filter='all',limit=15}={}){
+    if(!Array.isArray(prs)||prs.length>MAX_PRS)throw Error('Review queue source limit exceeded');
+    if(typeof term!=='string'||term.length>120)throw Error('Invalid PR search');
+    if(!['all','draft','ready'].includes(filter))throw Error('Invalid PR filter');
+    if(!Number.isInteger(limit)||limit<1||limit>25)throw Error('Invalid PR limit');
+    const query=term.trim().toLocaleLowerCase();
+    const items=prs.filter(pr=>pr&&Number.isSafeInteger(pr.number)&&pr.number>0&&
+      trustedGitHubUrl(pr.html_url)&&
+      new URL(pr.html_url).pathname==='/'+REPO+'/pull/'+pr.number).map(pr=>({
+      number:pr.number,
+      title:String(pr.title||'Untitled PR').slice(0,240),
+      draft:pr.draft===true,
+      sha:safeSha(pr.head?.sha),
+      branch:String(pr.head?.ref||'').slice(0,140),
+      updatedAt:typeof pr.updated_at==='string'?pr.updated_at.slice(0,32):null,
+      url:trustedGitHubUrl(pr.html_url)
+    })).filter(pr=>(filter==='all'||pr.draft===(filter==='draft'))&&
+      (!query||[String(pr.number),pr.title,pr.branch].some(t=>t.toLocaleLowerCase().includes(query))));
+    items.sort((a,b)=>String(b.updatedAt||'').localeCompare(String(a.updatedAt||''))||b.number-a.number);
+    return {total:items.length,drafts:items.filter(x=>x.draft).length,items:items.slice(0,limit)};
+  }
+  return {REPO,safeSha,trustedGitHubUrl,ciStatus,buildRepoHealth,reviewQueue};
 });
