@@ -1,0 +1,84 @@
+name: Deep Focus Live Chromium QA
+on:
+  push:
+    branches: [fix/df4-language-switch-durability-20261020]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deep-focus-chromium-test
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser automation tools on ephemeral runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            chrome="$(command -v google-chrome || command -v google-chrome-stable || true)"
+            if [[ -n "$chrome" ]]; then
+              sudo ln -s "$chrome" /usr/bin/chromium
+            else
+              sudo apt-get update -qq
+              sudo apt-get install -y -qq chromium
+            fi
+          fi
+          test -x /usr/bin/chromium
+          /usr/bin/chromium --version
+      - name: Serve offline app assets through localhost
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/df4-browser"
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df4-browser/http8770.log" 2>&1 &
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/df4-browser/http8765.log" 2>&1 &
+          for i in {1..25}; do
+            if curl -fsS 'http://127.0.0.1:8770/index.html' -o /dev/null &&
+               curl -fsS 'http://127.0.0.1:8765/index.html' -o /dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo 'App assets not accessible on localhost' >&2
+          exit 1
+      - name: Exercise rendered browser UI and detect real interaction errors
+        shell: bash
+        run: |
+          set -euo pipefail
+          export DF_COMPLETION_EVIDENCE="$RUNNER_TEMP/df4-browser"
+          export DF_LAYOUT_REPORT="$RUNNER_TEMP/df4-browser/layout.json"
+          export DF4_EVIDENCE_DIR="$RUNNER_TEMP/df4-browser/picker"
+          export DF_COMPLETION_URL='http://127.0.0.1:8770'
+          export DF4_TEST_URL='http://127.0.0.1:8765/index.html'
+          export DF4_CHROMIUM='/usr/bin/chromium'
+          node tests/df4_browser/webview_compat.cjs
+          node tests/df4_browser/completion.cjs
+          node tests/df4_browser/picker.cjs
+          node tests/df4_browser/layout.cjs
+      - name: Preserve exact SHA and honest device/rights limits
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/df4-browser"
+          git rev-parse HEAD > "$RUNNER_TEMP/df4-browser/SOURCE_SHA"
+          printf '%s\n' \
+            'Desktop Chromium tests only, not physical Android or WebView.' \
+            'Media authenticity and distribution rights NOT VERIFIED.' \
+            'No v21 personal data, app signing, merges or publishing.' \
+            'Android acceptance NOT_TESTED; release NOT APPROVED.' \
+            > "$RUNNER_TEMP/df4-browser/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deep-focus-live-browser-evidence
+          path: ${{ runner.temp }}/df4-browser/
+          retention-days: 3
+          if-no-files-found: warn
