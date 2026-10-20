@@ -2,7 +2,7 @@ name: Deep Focus Android WebView Real DOM (debug-only)
 on:
   # One disposable real Android run for this integration branch; production excluded.
   push:
-    branches: [integration/deep-focus-stability-20261020, fix/df4-android-touch-evidence-20261020, fix/df4-notes-save-visible-android-20261020, integration/deep-focus-consolidated-candidate-20261020]
+    branches: [integration/deep-focus-stability-20261020, fix/df4-android-touch-evidence-20261020, fix/df4-notes-save-visible-android-20261020, integration/deep-focus-consolidated-candidate-20261020, fix/codex-phase1-stabilization-20261020]
   workflow_dispatch:
     inputs:
       api:
@@ -29,7 +29,7 @@ jobs:
     timeout-minutes: 35
     env:
       ANDROID_TEST_API: ${{ inputs.api || '30' }}
-      DF_ANDROID_CASES: ${{ inputs.scope == 'task_persistence' && 'preflight,tasks_create,task_subtasks' || '' }}
+      DF_ANDROID_CASES: ${{ (github.ref_name == 'fix/codex-phase1-stabilization-20261020' || inputs.scope == 'task_persistence') && 'preflight,tasks_create,task_subtasks' || '' }}
     steps:
       - uses: actions/checkout@v4
         with:

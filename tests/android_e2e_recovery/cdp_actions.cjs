@@ -188,6 +188,26 @@ async function main(){
   const after=await evaluate("tasksList.find(t=>t.title==='Android fixture task')");
   diagnostic.packetsAfter=await evaluate(packetExpression);
   assert.deepEqual(after,before,'Immediate foreground process kill must retain the exact committed child IDs and states');
+  // Repeat physical user toggles with no pre-kill flush delay. Every ACK must
+  // survive a new foreground process death, not merely a single lucky flush.
+  diagnostic.repeatedKills=[];
+  for(let round=0;round<4;round++){
+    await tap('#navTasks');
+    await evaluate("(()=>{const s=document.querySelector('.df-view-mode');s.value='all';s.dispatchEvent(new Event('change',{bubbles:true}))})()");
+    await touch(`${card}.querySelector('.df-expand')`);
+    await touch(`[...${card}.querySelectorAll('label.df-check')].find(n=>n.textContent.includes('FixtureCheck')).querySelector('input')`);
+    const acknowledged=await evaluate("tasksList.find(t=>t.title==='Android fixture task')");
+    const readback=await evaluate("loadFortressData('zen_fortress_tasks_v21',[]).find(t=>t.title==='Android fixture task')");
+    assert.deepEqual(readback,acknowledged,'Round '+round+' in-process packet readback');
+    const sample={round,before:acknowledged,packetsBefore:await evaluate(packetExpression),
+      nativeReceipt:await evaluate("(()=>{const r=ZenNative.readDurableV21();return r==='NONE'||r==='ERROR'?r:{size:r.length,taskMatches:JSON.parse(JSON.parse(r).packets.zen_fortress_tasks_v21).payload===JSON.stringify(tasksList)}})()")};
+    diagnostic.repeatedKills.push(sample);
+    assert.equal(sample.nativeReceipt.taskMatches,true,'Native receipt must match acknowledged task payload');
+    await restart();
+    sample.after=await evaluate("tasksList.find(t=>t.title==='Android fixture task')");
+    sample.packetsAfter=await evaluate(packetExpression);
+    assert.deepEqual(sample.after,acknowledged,'Round '+round+' lost last acknowledged checklist toggle');
+  }
  });
  await run('timer_start_pause',async()=>{
   await tap('#navTimer');await evaluate("selectTimerMode(1,'focus',null)");const count=await evaluate('cfg.sessions');
