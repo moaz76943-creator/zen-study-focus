@@ -18,7 +18,7 @@ function setup(tasks=[],{failCommit=false,rejectCommit=false}={}){
  const doc={createElement(tag){return new Node(tag,doc);}},root=new Node('main',doc);
  let db={cfg:{sessionHistory:[]},tasksList:tasks},commits=0,links=[],errors=[];
  const controller=UI.mount(root,{
-  readState:()=>JSON.parse(JSON.stringify(db)),
+  readState:()=>{const x=JSON.parse(JSON.stringify(db));return {cfg:x.cfg,tasksList:x.tasksList};},
   commit:(_before,after)=>{if(failCommit)throw Error('Disk quota');if(rejectCommit)return false;db=JSON.parse(JSON.stringify(after));commits++;return true;},
   now:()=>new Date('2026-10-19T21:00:00+03:00'),
   locale:'en',linkTaskToTimer:id=>{links.push(id);return true;},onError:e=>errors.push(e.message)

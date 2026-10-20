@@ -35,14 +35,17 @@
   const input=(type,value)=>{const n=el('input');n.type=type;n.value=value==null?'':String(value);return n;};
   const selection=(pairs,value)=>{const n=el('select');pairs.forEach(([v,name])=>{const o=el('option','',name);o.value=String(v);n.appendChild(o);});n.value=String(value??'');return n;};
   const current=()=>state;
+  // Core outputs tasksList first; the live adapter reads cfg first. Object-key
+  // insertion order is not a data revision and must not invalidate Undo.
+  const snapshotText=s=>JSON.stringify({cfg:s.cfg,tasksList:s.tasksList});
   const error=e=>{if(typeof adapter.onError==='function')adapter.onError(e);else{message.textContent=l.invalid+': '+e.message;message.className='df-error';}};
   function apply(change){
    try{
     const latest=adapter.readState();
-    if(JSON.stringify(latest)!==JSON.stringify(state)){state=latest;undoStack=[];redoStack=[];}
+    if(snapshotText(latest)!==snapshotText(state)){state=latest;undoStack=[];redoStack=[];}
     const old=state,output=change(old),next=output.state;
     if(!next||!Array.isArray(next.tasksList))throw new Error('Invalid change result');
-    if(JSON.stringify(old)===JSON.stringify(next))return;
+    if(snapshotText(old)===snapshotText(next))return;
     const committed=adapter.commit(old,next);
     if(committed!==true)throw new Error(l.saveUnconfirmed);
     undoStack.push(old);if(undoStack.length>20)undoStack.shift();redoStack=[];state=next;
@@ -53,7 +56,7 @@
   function timeTravel(from,to){
    if(!from.length)return;
    const latest=adapter.readState();
-   if(JSON.stringify(latest)!==JSON.stringify(state)){state=latest;undoStack=[];redoStack=[];render();return;}
+   if(snapshotText(latest)!==snapshotText(state)){state=latest;undoStack=[];redoStack=[];render();return;}
    const next=from[from.length-1];
    try{const r=adapter.commit(state,next);if(r!==true)throw new Error(l.saveUnconfirmed);
     from.pop();to.push(state);state=next;editing=null;if(typeof adapter.onAfterChange==='function')adapter.onAfterChange(state);render();
@@ -215,7 +218,7 @@
    renderResults();
   }
   render();
-  return Object.freeze({render,undo,redo,getState:current,refresh(){const latest=adapter.readState();if(JSON.stringify(latest)!==JSON.stringify(state)){undoStack=[];redoStack=[];}state=latest;render();},destroy(){isDestroyed=true;wrapper.remove();}});
+  return Object.freeze({render,undo,redo,getState:current,refresh(){const latest=adapter.readState();if(snapshotText(latest)!==snapshotText(state)){undoStack=[];redoStack=[];}state=latest;render();},destroy(){isDestroyed=true;wrapper.remove();}});
  }
  return Object.freeze({mount});
 });
