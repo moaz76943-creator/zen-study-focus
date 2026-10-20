@@ -54,8 +54,15 @@ const L=require('../../android/app/src/main/assets/web/completion_alert_locales.
   assert.equal(await picker.locator('input[type=range]').inputValue(),'42');
   // Observe real media objects, retaining the native play implementation.
   await page.evaluate(()=>{window.df4Media=[];const play=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){window.df4Media.push(this);return play.call(this);};});
-  await picker.locator('.completion-alert-preview').nth(0).click();await page.waitForTimeout(100);
-  await picker.locator('.completion-alert-preview').nth(1).click();await page.waitForTimeout(100);
+  await picker.locator('.completion-alert-preview').nth(0).click();
+  await page.waitForFunction(()=>window.df4Media.length===1);
+  await picker.locator('.completion-alert-preview').nth(1).click();
+  // Wait for genuine decoded media instead of guessing fixed CI timing.
+  // The real HTMLMediaElement.play() method remains in use.
+  await page.waitForFunction(()=>
+    window.df4Media.length===2 &&
+    window.df4Media[1].readyState>=2 &&
+    window.df4Media[1].error===null, null, {timeout:10000});
   const media=await page.evaluate(()=>window.df4Media.map(a=>({paused:a.paused,error:a.error?.code||null,ready:a.readyState})));
   assert.equal(media.length,2);assert.equal(media[0].paused,true);assert.equal(media[1].error,null);assert.ok(media[1].ready>=2);
   await picker.locator('input[value="silent"]').check();assert.equal(await page.evaluate(()=>window.df4Media.every(a=>a.paused)),true);
