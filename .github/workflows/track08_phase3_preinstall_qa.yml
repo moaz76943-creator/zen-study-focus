@@ -24,7 +24,7 @@ jobs:
           BASE=f97cc7d07c66ba0c85f22402aeeb76788146cc3e
           git cat-file -e "$BASE^{commit}"
           diff="$(git diff --name-only "$BASE" HEAD | sort)"
-          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml docs/track08/PHASE3_QA_PREINSTALL_20261020.md | sort)"
+          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml docs/track08/PHASE3_QA_PREINSTALL_20261020.md tests/track08/phase3_side_by_side_qa.sh | sort)"
           test "$diff" = "$expected"
           git rev-parse HEAD
       - uses: actions/setup-java@v4
@@ -112,34 +112,7 @@ jobs:
           profile: pixel_6
           emulator-boot-timeout: 600
           disable-animations: true
-          script: |
-            set -euo pipefail
-            E="$RUNNER_TEMP/df-qa"
-            adb install "$RUNNER_TEMP/normal-debug.apk"
-            test -n "$(adb shell pm path com.zenstudy.focus | tr -d '\r')"
-            adb shell "run-as com.zenstudy.focus sh -c 'mkdir -p files && echo BASELINE_ONLY > files/qa-isolation-sentinel'"
-            adb install "$E/DeepFocus-Phase3-QA-Only.apk"
-            test -n "$(adb shell pm path com.zenstudy.focus.qa | tr -d '\r')"
-            test -n "$(adb shell pm path com.zenstudy.focus | tr -d '\r')"
-            adb shell "run-as com.zenstudy.focus cat files/qa-isolation-sentinel" | grep -F BASELINE_ONLY
-            if adb shell "run-as com.zenstudy.focus.qa cat files/qa-isolation-sentinel" >/dev/null 2>&1; then
-              echo 'FAILED QA sandbox isolation' >&2
-              exit 1
-            fi
-            adb shell am start -n com.zenstudy.focus.qa/com.zenstudy.focus.MainActivity
-            sleep 8
-            test -n "$(adb shell pidof com.zenstudy.focus.qa | tr -d '\r')"
-            adb shell svc wifi disable || true
-            adb shell svc data disable || true
-            adb shell am force-stop com.zenstudy.focus.qa
-            adb shell am start -n com.zenstudy.focus.qa/com.zenstudy.focus.MainActivity
-            sleep 8
-            test -n "$(adb shell pidof com.zenstudy.focus.qa | tr -d '\r')"
-            adb shell "run-as com.zenstudy.focus cat files/qa-isolation-sentinel" | grep -F BASELINE_ONLY
-            adb shell pm list packages | grep -E '^package:com\.zenstudy\.focus(\.qa)?$' > "$E/installed-package-ids.txt"
-            test "$(wc -l < "$E/installed-package-ids.txt")" -eq 2
-            adb logcat -d -s AndroidRuntime > "$E/qa-runtime-logcat.txt" || true
-            printf 'INSTALL_OK=YES\nQA_ID=com.zenstudy.focus.qa\nBASELINE_UNTOUCHED=YES\nOFFLINE_RESTART=YES\nANDROID_FUNCTIONAL_QA=NOT_TESTED\nRELEASE_APPROVED=NO\n' > "$E/INSTALL_RESULT.txt"
+          script: bash tests/track08/phase3_side_by_side_qa.sh
       - name: Upload ONLY separate QA APK and evidence
         if: always()
         uses: actions/upload-artifact@v4
