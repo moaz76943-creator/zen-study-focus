@@ -1,7 +1,7 @@
 name: Deep Focus Live Chromium QA
 on:
   push:
-    branches: [fix/df4-language-switch-durability-20261020, integration/deep-focus-stability-20261020, fix/df4-browser-media-readiness-20261020, fix/df4-android-touch-evidence-20261020, fix/df4-notes-save-visible-android-20261020, integration/deep-focus-consolidated-candidate-20261020]
+    branches: [fix/df4-language-switch-durability-20261020, integration/deep-focus-stability-20261020, fix/df4-browser-media-readiness-20261020, fix/df4-android-touch-evidence-20261020, fix/df4-notes-save-visible-android-20261020, integration/deep-focus-consolidated-candidate-20261020, review/track06-gated-checkpoint-20261020]
   workflow_dispatch:
 permissions:
   contents: read
