@@ -30,3 +30,11 @@ No reset, force-push, main rewrite, auto-merge, release signing or publication, 
 ## Performance / billing
 
 Each hourly cohort runs up to three groups instead of replaying all twelve hourly; runs have an 18-minute upper bound and no paid external model dependency. Hours on public GitHub-hosted repositories follow GitHub's current applicable Actions billing and abuse limits, which should be checked in repository settings. Do not assume infinite free compute.
+
+## Cumulative quality evidence (hourly coordination v1.1)
+
+The single Hourly QA GitHub issue now includes a schema-validated ledger combining rolling cohorts. Results are combined **only** when both the checked-out source commit SHA and the agent-manifest SHA-256 match. Any change resets previously passing evidence, and individual results expire after six hours, so missed schedules cannot count as passing tests.
+
+Only when every registered agent has fresh SOURCE_TESTED evidence, and all ownership checks are clear, does the ledger report `FULL_SOURCE_CYCLE_PASS`. Otherwise it reports `INCOMPLETE` (missing or expired), `COVERAGE_GAP` (new or overlapping tests), `BLOCKED` (failed or partial) or `NOT_VERIFIED` (invalid current report). A green source cycle is **not** Android E2E, real sound quality, verified media licensing or production release approval.
+
+The GitHub issue contains a machine-readable state; the issue-update step is the only step requiring issue-write permission. Damaged/out-of-order reports invalidate old green evidence rather than claiming success. No app-source edits or automatic merges occur.

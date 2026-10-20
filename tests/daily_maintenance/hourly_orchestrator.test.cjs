@@ -49,3 +49,12 @@ test('markdown is a clear review artifact rather than claimed device validation'
  assert.match(agent.toMarkdown(report),/RELEASE NOT APPROVED/);
  assert.match(agent.toMarkdown(report),/source SHA/);
 });
+
+test('cohorts include full agent inventory and SHA256 manifest fingerprint for cross-hour verification',()=>{
+ const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1}),coverage:()=>({unmapped:[],duplicates:[]})});
+ assert.deepEqual(report.agent_ids,manifest.agents.map(a=>a.id));
+ assert.match(report.manifest_sha256,/^[a-f0-9]{64}$/);
+ const changed={...manifest,agents:[...manifest.agents,{id:'agent_12',lane:'qa',purpose:'future feature',test_dirs:['tests/feature']}]};
+ const changedReport=agent.runCycle(changed,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1}),coverage:()=>({unmapped:[],duplicates:[]})});
+ assert.notEqual(changedReport.manifest_sha256,report.manifest_sha256);
+});
