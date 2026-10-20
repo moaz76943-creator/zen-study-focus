@@ -30,3 +30,46 @@ jobs:
         shell: bash
       - name: Python source regressions
         run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser automation
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            command -v google-chrome >/dev/null && sudo ln -s "$(command -v google-chrome)" /usr/bin/chromium || (sudo apt-get update -qq && sudo apt-get install -y -qq chromium)
+          fi
+      - name: Start local app server
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/analytics-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Test true rendered analytics UI, 6 languages, 320/393/430 pixels
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_ANALYTICS_EVIDENCE: ${{ runner.temp }}/analytics-real-ui
+        run: node tests/track07_functional/analytics_screen_chromium.cjs
+      - name: Keep SHA, test report and actual screenshot
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/analytics-real-ui"
+          git rev-parse HEAD > "$RUNNER_TEMP/analytics-real-ui/EXACT_SOURCE_SHA.txt"
+          printf 'Chromium rendering only; physical Android and actual SAF export NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/analytics-real-ui/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track07-05-analytics-screen-chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/analytics-real-ui/
+          retention-days: 7
+          if-no-files-found: warn
