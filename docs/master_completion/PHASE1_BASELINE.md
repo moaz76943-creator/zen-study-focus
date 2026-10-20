@@ -98,3 +98,11 @@ RED: three new candidate tests failed: silent false commit published a task; unc
 Cross-regression: **51/51** v21 contract, mirror/journal, backup round-trip/failure, timer durable credit and Notes draft tests passed. No storage engine, key, ID, schema, unknown field, session-credit or media policy changed. Android on this patch: **NOT_TESTED**; physical device **DEVICE_NOT_TESTED**. Source tests do not prove actual storage hardware durability.
 
 Commands: `node --test --test-reporter=tap tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs`; `node --test --test-reporter=tap tests/data_contracts/*.test.cjs tests/integration_recovery/restore_journal.test.cjs tests/integration_recovery/timer_credit_durability.test.cjs tests/notes_recovery/*.test.cjs`.
+
+## Batch 02/03 — preserve timer implementation and improve Android evidence
+
+Reviewed existing timer credit and native token ledger. Session history already checks IDs beyond the 300-ID JS cache; existing durable journal retry tests pass. Native notification dedupe remains bounded (128 tokens), so permanent historical exactly-once notification behavior, wall-clock change and hardware routes are **not claimed**. No timer coordinator/schema rewrite was made.
+
+Adopted existing #52 ADB/WebView geometry pipeline. Improved its existing result evidence: retain each actual ADB tap coordinate, selector, hit target, CSS viewport and physical WebView bounds; label ADB taps separately from CDP text injection. Previously successful navigation discarded those coordinates. Add a separate failure classification without changing legacy PASS/FAIL/NOT_TESTED counts or the strict non-PASS exit gate: assertion/visible geometry failure `FAIL_APP`, transport/protocol failure `FAIL_TEST_TRANSPORT`, unavailable prerequisites `BLOCKED`, unidentified or injected-evaluation failure `FAIL_TEST_INFRA`. An exception from a test expression alone does not prove the human flow fails.
+
+RED/GREEN: new classification test initially failed (function absent); **25/25** existing Android harness Node tests pass after the scoped change. This is UNIT evidence, not Android execution. Existing 7 unimplemented device scenarios remain NOT_TESTED. #68 SDK discovery patch retained original author as commit `fc6ef41`; its 2 source contracts pass, final combined Debug build still pending.
