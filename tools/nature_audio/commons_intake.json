@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "status": "RESEARCH_AND_QUARANTINE_ONLY",
+  "updated": "2026-10-20",
+  "items": [
+    {
+      "id": "thunder",
+      "file": "Rain_thunder_and_birds.ogg",
+      "author": "Ezwa",
+      "license": "PD-author",
+      "license_evidence": "https://commons.wikimedia.org/wiki/File:Rain_thunder_and_birds.ogg",
+      "source_sha1": "3ef339971b06d7b69d8d2a44228fd1b5ade3c3c5",
+      "notes": "Actual rain, thunder AND birds; sound must be described accurately; no public-runtime approval."
+    }
+  ]
+}
