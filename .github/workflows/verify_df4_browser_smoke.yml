@@ -65,6 +65,7 @@ jobs:
           node tests/df4_browser/picker.cjs
           node tests/df4_browser/layout.cjs
           node tests/df4_browser/nav_reachability.cjs
+          node tests/df4_browser/note_modal_reachability.cjs
       - name: Preserve exact SHA and honest device/rights limits
         if: always()
         run: |
