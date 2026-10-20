@@ -2,6 +2,7 @@
 // Real disposable Android WebView actions. Does not claim TalkBack, hearing, DND or physical-phone acceptance.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
 const {validateTouchTarget,missingPrerequisites}=require('./cdp_touch_target.cjs');
+const {parseWebViewBounds,cssPointToAndroid}=require('./android_device_touch.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
 const results=new Map(CASES.map(id=>[id,{id,status:'NOT_TESTED',detail:'Outside this instrumented action scope; requires separate device/manual evidence'}]));
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
@@ -43,10 +44,25 @@ async function touch(expression){
      hitWithin:!!hit&&(n===hit||n.contains(hit)),hit:hitName};
  })()`);
  const target=validateTouchTarget(r);
- await call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[target]});
- await call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
- await pause(200);
- return {x:target.x,y:target.y,hit:r.hit,viewportWidth:r.viewportWidth,viewportHeight:r.viewportHeight};
+ // The API30 run proved CDP synthetic touch did not emit ANY WebView touch/click event,
+ // even for a visible, unobstructed 44px target. Use Android's actual input pipeline.
+ let hierarchy;
+ try {
+   adb('shell','uiautomator','dump','/sdcard/deep_focus_device_touch.xml');
+   hierarchy=adb('shell','cat','/sdcard/deep_focus_device_touch.xml');
+ } catch(e) {
+   throw Error('TRANSPORT: Cannot read real Android WebView frame: '+String(e.message).slice(0,180));
+ }
+ const box=parseWebViewBounds(hierarchy);
+ const physical=cssPointToAndroid({...target,viewportWidth:r.viewportWidth,viewportHeight:r.viewportHeight},box);
+ try {
+   adb('shell','input','tap',String(physical.x),String(physical.y));
+ } catch(e) {
+   throw Error('TRANSPORT: Android ADB input tap rejected: '+String(e.message).slice(0,180));
+ }
+ await pause(250);
+ return {x:target.x,y:target.y,hit:r.hit,viewportWidth:r.viewportWidth,
+   viewportHeight:r.viewportHeight,adb:physical,webViewBounds:box,source:'actual adb input tap'};
 }
 const element=selector=>`document.querySelector(${JSON.stringify(selector)})`;
 const tap=selector=>touch(element(selector));
