@@ -48,3 +48,15 @@ test('DF-055 live locale changes select the current draft warning without modify
  assert.equal(sandbox.nsDraftLabel('failed'),tr.en.failed);
  assert.equal(sandbox.nsDraftLabel('not_a_key'),'');
 });
+
+test('DF-055: global language change refreshes visible draft status without saving or mutating user text',()=>{
+ const app=fs.readFileSync(path.resolve(__dirname,'../../android/app/src/main/assets/web/app.js'),'utf8');
+ const first=app.indexOf('function applyLanguage(code) {');
+ const last=app.indexOf('\n/* ========================================================',first);
+ assert.ok(first>=0&&last>first,'live locale handler exists');
+ const handler=app.slice(first,last);
+ assert.match(handler,/cfg\.lang = meta\.code/);
+ assert.match(handler,/if \(typeof nsRefreshDraftLocale === 'function'\) nsRefreshDraftLocale\(\);/);
+ assert.ok(handler.indexOf('nsRefreshDraftLocale();')>handler.indexOf('cfg.lang = meta.code'),
+  'new locale must be selected before refreshing draft text');
+});

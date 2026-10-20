@@ -613,6 +613,9 @@ function applyLanguage(code) {
   renderTasksList();
   renderCalendar();
   renderNotesStack();
+  // Keep an open, unsaved editor's safety status translated after locale changes.
+  // Presentation only: never rewrite v21 records, drafts or the user's text.
+  if (typeof nsRefreshDraftLocale === 'function') nsRefreshDraftLocale();
   renderSoundsStudio();
   updateSyllabusCalc();
   closeModal('langModal');
