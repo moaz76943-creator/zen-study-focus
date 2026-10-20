@@ -15,6 +15,7 @@ on:
       - '.github/workflows/hourly_agent_orchestrator.yml'
       - 'tools/daily_maintenance/hourly_orchestrator.cjs'
       - 'tests/daily_maintenance/hourly_*.test.cjs'
+      - 'AGENTS.md'
       - '.github/agents/**'
       - 'docs/daily_maintenance/HOURLY_COORDINATION.md'
 permissions:
