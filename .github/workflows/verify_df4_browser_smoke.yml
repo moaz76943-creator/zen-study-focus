@@ -1,7 +1,7 @@
 name: Deep Focus Live Chromium QA
 on:
   push:
-    branches: [fix/df4-language-switch-durability-20261020, integration/deep-focus-stability-20261020, fix/df4-browser-media-readiness-20261020]
+    branches: [fix/df4-language-switch-durability-20261020, integration/deep-focus-stability-20261020, fix/df4-browser-media-readiness-20261020, fix/df4-android-touch-evidence-20261020]
   workflow_dispatch:
 permissions:
   contents: read
@@ -64,6 +64,7 @@ jobs:
           node tests/df4_browser/completion.cjs
           node tests/df4_browser/picker.cjs
           node tests/df4_browser/layout.cjs
+          node tests/df4_browser/nav_reachability.cjs
       - name: Preserve exact SHA and honest device/rights limits
         if: always()
         run: |
