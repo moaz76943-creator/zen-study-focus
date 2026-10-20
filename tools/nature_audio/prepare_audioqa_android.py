@@ -36,8 +36,6 @@ def prepare(root):
     statuses = {entry["id"]: entry for entry in evidence}
     if not (media / "index.html").is_file():
         raise ValueError("Offline listening page missing")
-    if os.environ.get("GITHUB_REF_NAME") == "feature/track07-04-authentic-nature-20-20261020" and len(meta.get("items", [])) != 20:
-        raise ValueError("Audio20 QA build needs exactly twenty pinned original recordings")
     if not meta.get("items") or len(meta["items"]) != len(statuses):
         raise ValueError("Original source and report counts differ")
     original_files = []
@@ -118,4 +116,10 @@ if __name__ == "__main__":
             "feature/track07-04-authentic-nature-20-20261020"
         }):
         raise SystemExit("SAFE_GUARD: Audio QA packaging is GitHub Actions branch-only")
+    # CLI requires all twenty originals, but prepare(root) remains unit-testable
+    # with small isolated fixtures and never relaxes per-file hash/rights checks.
+    if os.environ["GITHUB_REF_NAME"] == "feature/track07-04-authentic-nature-20-20261020":
+        intake=json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8"))
+        if len(intake.get("items",[])) != 20:
+            raise SystemExit("AUDIO20_QA_BLOCKED: exact twenty sources required")
     prepare(pathlib.Path(__file__).resolve().parents[2])
