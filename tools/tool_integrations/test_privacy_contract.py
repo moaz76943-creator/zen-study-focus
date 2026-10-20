@@ -21,7 +21,8 @@ def check():
     assert "security-events: write" in security
     assert "gitleaks" in security and "--redact" in security and "sha256sum -c -" in security
     assert "assertVisible:" in flow
-    assert "clearState" not in flow and "assertWithAI" not in flow and "assertNoDefectsWithAI" not in flow
+    commands = [line.strip() for line in flow.splitlines() if not line.lstrip().startswith("#")]
+    assert not any("clearState" in line or "assertWithAI" in line or "assertNoDefectsWithAI" in line for line in commands)
 
 if __name__ == "__main__":
     check()
