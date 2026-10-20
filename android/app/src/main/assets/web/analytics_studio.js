@@ -10,29 +10,29 @@
   if(!core)throw new Error('DeepFocusAnalyticsV21 must be loaded first');
   const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const palettes={study:'#2563eb',read:'#8b5cf6',work:'#f59e0b',sport:'#059669'};
-  function barsSvg(daily,{width=720,height=160}={}){
+  function barsSvg(daily,{width=720,height=160,label='Recorded minutes by credited day',minute='min',sessions='sessions'}={}){
     if(!Array.isArray(daily))throw new TypeError('Expected daily array');
     const max=Math.max(1,...daily.map(r=>r.minutes));
     const w=Math.max(1,width/daily.length||1),bottom=height-22,extent=height-42;
     const marks=daily.map((d,i)=>{
       if(!(core.validDay(d.key)||/^\d{4}-(?:0[1-9]|1[0-2])$/.test(d.key))||typeof d.minutes!=='number'||!Number.isFinite(d.minutes)||d.minutes<0)throw new TypeError('Invalid bar value');
       const bh=extent*d.minutes/max,x=i*w+Math.max(.5,w*.1),barW=Math.max(.5,w*.8);
-      const label=esc(d.key+': '+d.minutes+' min, '+d.sessions+' sessions');
-      return '<rect x="'+x.toFixed(2)+'" y="'+(bottom-bh).toFixed(2)+'" width="'+barW.toFixed(2)+'" height="'+bh.toFixed(2)+'" rx="'+Math.min(3,barW/2).toFixed(2)+'" fill="#2563eb" data-day="'+d.key+'" tabindex="0" role="button" aria-label="'+label+'"><title>'+label+'</title></rect>';
+      const summary=esc(d.key+': '+d.minutes+' '+minute+', '+d.sessions+' '+sessions);
+      return '<rect x="'+x.toFixed(2)+'" y="'+(bottom-bh).toFixed(2)+'" width="'+barW.toFixed(2)+'" height="'+bh.toFixed(2)+'" rx="'+Math.min(3,barW/2).toFixed(2)+'" fill="#2563eb" data-day="'+d.key+'" tabindex="0" role="button" aria-label="'+summary+'"><title>'+summary+'</title></rect>';
     }).join('');
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="Recorded minutes by credited day" class="dfa-svg"><line x1="0" x2="'+width+'" y1="'+bottom+'" y2="'+bottom+'" stroke="#cbd5e1"/>'+marks+'</svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+esc(label)+'" class="dfa-svg"><line x1="0" x2="'+width+'" y1="'+bottom+'" y2="'+bottom+'" stroke="#cbd5e1"/>'+marks+'</svg>';
   }
-  function heatmapSvg(days){
+  function heatmapSvg(days,{label='Calendar year heatmap of verified session records',minute='recorded minutes'}={}){
     if(!Array.isArray(days)||![365,366].includes(days.length)||!days.every(d=>core.validDay(d.key)))throw new TypeError('Expected validated full year');
     const offset=new Date(days[0].key+'T12:00:00Z').getUTCDay(),size=11,step=13;
     const max=Math.max(1,...days.map(d=>d.minutes)),maxWeeks=Math.ceil((days.length+offset)/7);
     const nodes=days.map((d,i)=>{
       const n=i+offset,x=7+Math.floor(n/7)*step,y=7+(n%7)*step;
       const fill=d.minutes===0?'#e8eef4':d.minutes/max<.25?'#c7d2fe':d.minutes/max<.5?'#93c5fd':d.minutes/max<.75?'#60a5fa':'#2563eb';
-      const label=esc(d.key+': '+d.minutes+' recorded minutes');
-      return '<rect x="'+x+'" y="'+y+'" width="'+size+'" height="'+size+'" rx="2" fill="'+fill+'" data-day="'+d.key+'" tabindex="0" role="button" aria-label="'+label+'"><title>'+label+'</title></rect>';
+      const summary=esc(d.key+': '+d.minutes+' '+minute);
+      return '<rect x="'+x+'" y="'+y+'" width="'+size+'" height="'+size+'" rx="2" fill="'+fill+'" data-day="'+d.key+'" tabindex="0" role="button" aria-label="'+summary+'"><title>'+summary+'</title></rect>';
     }).join('');
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+(14+maxWeeks*step)+' 110" role="img" aria-label="Calendar year heatmap of verified session records" class="dfa-svg">'+nodes+'</svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+(14+maxWeeks*step)+' 110" role="img" aria-label="'+esc(label)+'" class="dfa-svg">'+nodes+'</svg>';
   }
   function mount(target,getSnapshot,opts={}){
     if(!target||typeof target.appendChild!=='function')throw new TypeError('Mount target required');
@@ -50,7 +50,7 @@
     const keys={title:'analyticsTitle',activity:'activity',period:'period',
       start:'from',end:'to',minutes:'minutes',sessions:'sessions',average:'average',
       streak:'streak',noData:'noSessions',goal:'goal',noGoals:'noGoals',
-      tasks:'completedTasks',chart:'chart',year:'year',export:'export',
+      tasks:'completedTasks',chart:'chart',year:'year',heatmap:'heatmapYear',export:'export',
       details:'details',grouping:'grouping',all:'all',study:'study',
       read:'reading',work:'work',sport:'fitness',excluded:'excluded',
       minute:'minute',daily:'daily',weekly:'weekly',monthly:'monthly'};
@@ -116,7 +116,7 @@
       currentSeries=grouping.value==='weekly'?report.weekly:grouping.value==='monthly'?report.monthly:report.daily;
       // Retain accurate totals while reducing 10-year ranges to readable buckets.
       if(grouping.value==='daily'&&currentSeries.length>120){grouping.value='monthly';currentSeries=report.monthly;}
-      chart.innerHTML=report.totals.sessions?barsSvg(currentSeries):'';
+      chart.innerHTML=report.totals.sessions?barsSvg(currentSeries,{label:t.chart,minute:t.minute,sessions:t.sessions}):'';
       if(!report.totals.sessions){chart.textContent=t.noData;detail.textContent=t.noData;}else detail.textContent=t.details;
       domainView.replaceChildren();
       for(const d of core.DOMAINS){const s=report.byDomain[d];const chip=mk('span',labels[d]+': '+western(s.minutes)+' '+t.minute);
@@ -130,7 +130,7 @@
       // Heatmap only when the selected year contains at least one validated recorded session.
       const year=Number(end.value.slice(0,4));const days=core.yearHeatmap(snap,year,{today,domain:domain.value});
       heatDays=days;
-      heat.innerHTML=days.some(x=>x.sessions>0)?heatmapSvg(days):'';
+      heat.innerHTML=days.some(x=>x.sessions>0)?heatmapSvg(days,{label:t.heatmap,minute:t.minute}):'';
       if(!heat.innerHTML)heat.textContent=t.noData;
       return report;
     }
