@@ -1,7 +1,7 @@
 name: Track 08 phase3 isolated QA APK and emulator install
 on:
   push:
-    branches: [audit/track08-phase3-preinstall-20261020]
+    branches: [audit/track08-analytics-screen-qa-20261020]
     paths: [.github/workflows/track08_phase3_preinstall_qa.yml]
 permissions:
   contents: read
@@ -21,10 +21,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BASE=f97cc7d07c66ba0c85f22402aeeb76788146cc3e
+          BASE=1c43ea578d10a7ed15d558c38d23b3412a116277
           git cat-file -e "$BASE^{commit}"
           diff="$(git diff --name-only "$BASE" HEAD | sort)"
-          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml docs/track08/PHASE3_QA_PREINSTALL_20261020.md tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs tests/track08/qa_webview_startup_probe.cjs | sort)"
+          expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs tests/track08/qa_webview_startup_probe.cjs | sort)"
           test "$diff" = "$expected"
           git rev-parse HEAD
       - uses: actions/setup-node@v4
