@@ -1,0 +1,40 @@
+name: Track 07 Preferences Durable-Save QA (isolated)
+on:
+  push:
+    branches:
+      - fix/track07-02-05-preferences-save-ack-20261020
+permissions:
+  contents: read
+concurrency:
+  group: track07-preferences-qa-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact SHA and syntax
+        run: |
+          git rev-parse HEAD
+          node --check android/app/src/main/assets/web/goals_studio.js
+          node --check android/app/src/main/assets/web/timer_settings.js
+          node --check tests/focus_workflows/test_focus_workflows.cjs
+      - name: Focused save ACK regression and all source Node suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/focus_workflows/test_focus_workflows.cjs
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs | sort)
+          node --test --test-reporter=tap "${suites[@]}"
+      - name: Locale contract and Python regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/validate_locales.cjs
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
