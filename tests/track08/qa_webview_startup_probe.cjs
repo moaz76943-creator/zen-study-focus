@@ -4,6 +4,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const http=require('node:http');
+const {evaluateWithRetry}=require('./qa_cdp_transport.cjs');
 
 const url='http://127.0.0.1:9223/json/list';
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -38,24 +39,49 @@ async function main(){
     ws.addEventListener('error',()=>{clearTimeout(timer);reject(Error('QA CDP websocket failed'));},{once:true});
   });
   let seq=0;
-  function evaluate(js){
+  function evaluate(js,stage,timeoutMs=15000){
     return new Promise((resolve,reject)=>{
       const id=++seq;
-      const timer=setTimeout(()=>reject(Error('QA page evaluate timed out')),6000);
-      const listener=ev=>{
-        try{
-          const value=JSON.parse(ev.data);
-          if(value.id!==id)return;
-          ws.removeEventListener('message',listener);
-          clearTimeout(timer);
-          if(value.error||value.result?.exceptionDetails){reject(Error('QA page evaluation error'));return;}
-          resolve(value.result?.result?.value);
-        }catch(e){clearTimeout(timer);reject(e);}
-      };
+      let timer;
+      function cleanup(){
+        clearTimeout(timer);
+        ws.removeEventListener('message',listener);
+        ws.removeEventListener('close',closed);
+        ws.removeEventListener('error',closed);
+      }
+      function closed(){
+        cleanup();
+        const error=new Error('CDP WebSocket closed during '+stage);
+        error.code='CDP_TIMEOUT';reject(error);
+      }
+      function listener(ev){
+        let value;
+        try{value=JSON.parse(ev.data);}catch(e){cleanup();reject(e);return;}
+        if(value.id!==id)return;
+        cleanup();
+        if(value.error||value.result?.exceptionDetails){
+          reject(new Error('Real JavaScript/CDP exception at '+stage+': '+JSON.stringify(value.result?.exceptionDetails||value.error).slice(0,700)));
+          return;
+        }
+        resolve(value.result?.result?.value);
+      }
+      timer=setTimeout(()=>{
+        cleanup();
+        const error=new Error('CDP '+stage+' request timed out in '+timeoutMs+'ms');
+        error.code='CDP_TIMEOUT';reject(error);
+      },timeoutMs);
       ws.addEventListener('message',listener);
-      ws.send(JSON.stringify({id,method:'Runtime.evaluate',params:{expression:js,returnByValue:true,awaitPromise:true}}));
+      ws.addEventListener('close',closed);
+      ws.addEventListener('error',closed);
+      ws.send(JSON.stringify({id,method:'Runtime.evaluate',params:{expression:js,returnByValue:true,awaitPromise:false}}));
     });
   }
+  const retry=(js,stage)=>evaluateWithRetry(()=>evaluate(js,stage),{
+    stage,attempts:3,
+    onAttempt:({number,total})=>console.log('QA_CDP_STAGE',stage,'attempt',number,'/',total)
+  });
+  console.log('QA_CDP_TARGET_CONNECTED',JSON.stringify({id:page.id,url:page.url}));
+
   try{
     let state;
     const script=`(() => {
@@ -71,7 +97,7 @@ async function main(){
         elements,foreground:document.visibilityState};
     })()`;
     for(let n=0;n<20;n++){
-      state=await evaluate(script);
+      state=await retry(script,'startup-'+n);
       if(state?.ready==='complete'&&state.nativeBridge&&state.integration&&state.elements.navTimer?.width>0&&state.elements.focusHeroCard?.exists&&state.elements.mainPlayBtn?.exists)break;
       await sleep(600);
     }
@@ -85,7 +111,7 @@ async function main(){
     assert.equal(state?.elements.mainPlayBtn?.exists,true,'Main timer control missing');
     assert.equal(state?.foreground,'visible','QA WebView not foreground-visible');
     // Native Android WebView regression for actual Analytics translations, not just PID.
-    const analytics=await evaluate("(() => {\n const supported=['fa','de','ur','bn'];const results=[];\n for(const lang of supported){\n  const box=document.createElement('section');document.body.appendChild(box);\n  let mounted=null;\n  try{\n   mounted=window.DeepFocusAnalyticsStudioV21.mount(box,()=>({\n    sessionHistory:[{id:'qa-local-1',date:'2026-10-19',domain:'study',minutes:30,completed:true}],tasksList:[],projects:[]\n   }),{locale:lang,today:'2026-10-20',startDate:'2026-10-01',endDate:'2026-10-20'});\n   const panel=mounted.element,fields=[...panel.querySelectorAll('input[type=date]')];\n   results.push({lang,heading:panel.querySelector('h2')?.textContent,\n    expected:window.DeepFocusLocale20Recovery.t(lang,'analyticsTitle'),\n    direction:panel.getAttribute('dir'),expectedDirection:window.DeepFocusLocale20Recovery.direction(lang),\n    sessionMinutes:mounted.getReport()?.totals.minutes,\n    dateDirections:fields.map(el=>getComputedStyle(el).direction)});\n  }finally{if(mounted)mounted.destroy();box.remove();}\n }\n return results;\n})()");
+    const analytics=await retry("(() => {\n const supported=['fa','de','ur','bn'];const results=[];\n for(const lang of supported){\n  const box=document.createElement('section');document.body.appendChild(box);\n  let mounted=null;\n  try{\n   mounted=window.DeepFocusAnalyticsStudioV21.mount(box,()=>({\n    sessionHistory:[{id:'qa-local-1',date:'2026-10-19',domain:'study',minutes:30,completed:true}],tasksList:[],projects:[]\n   }),{locale:lang,today:'2026-10-20',startDate:'2026-10-01',endDate:'2026-10-20'});\n   const panel=mounted.element,fields=[...panel.querySelectorAll('input[type=date]')];\n   results.push({lang,heading:panel.querySelector('h2')?.textContent,\n    expected:window.DeepFocusLocale20Recovery.t(lang,'analyticsTitle'),\n    direction:panel.getAttribute('dir'),expectedDirection:window.DeepFocusLocale20Recovery.direction(lang),\n    sessionMinutes:mounted.getReport()?.totals.minutes,\n    dateDirections:fields.map(el=>getComputedStyle(el).direction)});\n  }finally{if(mounted)mounted.destroy();box.remove();}\n }\n return results;\n})()",'analytics-mounted-real-dom');
     for(const row of analytics){
       assert.equal(row.heading,row.expected,'Analytics translated title: '+row.lang);
       assert.equal(row.direction,row.expectedDirection,'Analytics direction: '+row.lang);
