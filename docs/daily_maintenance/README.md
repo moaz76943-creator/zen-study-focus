@@ -34,3 +34,5 @@ The workflow is extendable by adding reviewed, deterministic repairers with test
 Android phone UI touch, WebView playback, commercial recording provenance and user backup restoration **remain unverified** until tested. A green Node/Gradle build is not a production approval.
 
 Public standard GitHub-hosted runners have free execution, while storage and concurrency limits still apply. Avoid large runners or paid external model APIs in this workflow.
+
+<!-- P0 stale-source audit identified 2026-10-20; workflow changes require review. -->
