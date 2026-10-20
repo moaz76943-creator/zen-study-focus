@@ -29,14 +29,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Assert exact reviewed source and export immutable SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="${{ github.event.pull_request.head.sha || github.sha }}"
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$expected"
+          echo "DF_TEST_SOURCE_SHA=$actual" >> "$GITHUB_ENV"
       - name: Debug-only access and script safety regressions
         run: |
           node --check tests/android_e2e_recovery/cdp_dom_smoke.cjs
-          node --test tests/android_e2e_recovery/cdp_debug_gate.test.cjs
+          node --test tests/android_e2e_recovery/cdp_debug_gate.test.cjs tests/android_e2e_recovery/cdp_reliability.test.cjs
           git rev-parse HEAD
       - uses: actions/setup-java@v4
         with:
@@ -84,7 +93,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DeepFocus-Android-WebView-Real-DOM-${{ github.sha }}
+          name: DeepFocus-Android-WebView-Real-DOM-${{ github.event.pull_request.head.sha || github.sha }}
           if-no-files-found: warn
           retention-days: 7
           path: ${{ runner.temp }}/deep-focus-android-webview/
