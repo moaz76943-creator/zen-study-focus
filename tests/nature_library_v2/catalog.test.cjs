@@ -37,3 +37,13 @@ test('a blocked sound has no play action in the standalone library, and categori
  assert.equal(lib.listFor('forest',available).filter(r=>r.available).length,2);
  assert.ok(lib.listFor('water',available).every(r=>!r.available));
 });
+
+test('nature library is loaded before eager app bootstrap and host styles are present',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const html=fs.readFileSync(path.resolve(__dirname,'../../android/app/src/main/assets/web/index.html'),'utf8');
+ const library=html.indexOf('<script src="nature_library_v2.js"></script>');
+ const app=html.indexOf('<script src="app.js"></script>');
+ assert.ok(library>=0 && app>=0 && library<app,'catalog must exist before synchronous app bootstrap');
+ assert.ok(html.includes('id="natureLibraryV2"'));
+ assert.ok(html.includes('nature_library_v2.css'));
+});
