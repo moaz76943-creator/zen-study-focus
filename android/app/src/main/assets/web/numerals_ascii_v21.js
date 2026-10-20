@@ -10,12 +10,24 @@
   else root.DeepFocusAsciiNumeralsV21 = api;
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   'use strict';
-  const EASTERN = /[\u0660-\u0669\u06f0-\u06f9]/g;
-  const PROTECTED = 'input,textarea,[contenteditable],[data-df-user-content]';
+  const EASTERN = /[\u0660-\u0669\u06f0-\u06f9\u0966-\u096f\u09e6-\u09ef]/g;
+  const PROTECTED = 'input,textarea,[contenteditable],[data-df-user-content],[data-df20-user-content],.note-content,.note-body,.task-title,.task-text,.note-card,.task-card';
+  // Only generated UI counters/labels are eligible; never traverse free-form
+  // task titles, note bodies, project labels or persisted user-authored text.
+  const GENERATED_UI = '[data-df-generated-number],[data-df-latin-numerals],'+
+    '#timerDigitsTxt,#sportSetCounterTxt,#readPagesCounterTxt,#qtExerciseCount,'+
+    '#hdrStreakBadge,#hdrFocusMins,#nsCounter,#nsVisibleCount,#nsTotal,'+
+    '#todayPlanRatio,#todayPlanPercent,#kpiTotalMins,#kpiWeeklyTrend,'+
+    '#kpiTotalSessions,#kpiSessionTrend,#waveRecordedMinutes,'+
+    '#mixerStatusTxt,#peakPerfBadge,'+
+    '.dfa-studio strong,.dfar-panel strong,.dfar-kpi,.dfar-comparison,'+
+    '.dfa-studio [data-day],.dfar-panel [data-bucket],'+
+    '.today-plan-stats strong,.goals-rows .goal-value,.training-progress [data-progress]';
   function toAsciiDigits(value) {
     return String(value).replace(EASTERN, function (digit) {
       const cp = digit.charCodeAt(0);
-      return String(cp - (cp <= 0x0669 ? 0x0660 : 0x06f0));
+      const zero=cp>=0x09e6?0x09e6:cp>=0x0966?0x0966:cp>=0x06f0?0x06f0:0x0660;
+      return String(cp-zero);
     });
   }
   function finite(value) {
@@ -119,6 +131,49 @@
     }
     return touched;
   }
+  // Normalize only UI-owned leaf text nodes, never arbitrary DOM content.
+  // MutationObserver re-applies the policy after timer/analytics re-renders.
+  const observers=new WeakMap();
+  function normalizeGeneratedUi(scope) {
+    if(!scope || typeof scope.querySelectorAll!=='function')return 0;
+    const elements=[];
+    if(typeof scope.matches==='function' && scope.matches(GENERATED_UI))elements.push(scope);
+    for(const element of scope.querySelectorAll(GENERATED_UI))elements.push(element);
+    let changed=0;
+    for(const el of elements){
+      if(isProtected(el))continue;
+      const before=el.textContent;
+      if(typeof before==='string'){
+        const after=toAsciiDigits(before);
+        if(after!==before){
+          // A markup-rich element could embed user content: do not rewrite it.
+          if(el.childElementCount>0)continue;
+          el.textContent=after;changed++;
+        }
+      }
+      for(const attr of ['aria-label','title']){
+        if(typeof el.getAttribute!=='function'||typeof el.setAttribute!=='function')continue;
+        const raw=el.getAttribute(attr);
+        if(raw!==null&&raw!==undefined){
+          const ascii=toAsciiDigits(raw);
+          if(raw!==ascii){el.setAttribute(attr,ascii);changed++;}
+        }
+      }
+    }
+    return changed;
+  }
+  function wireGeneratedUi(scope){
+    if(!scope || typeof scope.querySelectorAll!=='function')return 0;
+    const count=normalizeGeneratedUi(scope);
+    if(observers.has(scope))return count;
+    const win=scope.defaultView||scope.ownerDocument?.defaultView;
+    const Observer=win?.MutationObserver;
+    if(typeof Observer!=='function')return count;
+    const observer=new Observer(()=>normalizeGeneratedUi(scope));
+    observer.observe(scope.documentElement||scope,{childList:true,characterData:true,subtree:true});
+    observers.set(scope,observer);
+    return count;
+  }
   function normalizeNumericInput(element) {
     if (!element || !/^INPUT$/i.test(element.tagName || '') ||
         typeof element.hasAttribute !== 'function' || !element.hasAttribute('data-df-numeric-input')) return false;
@@ -171,5 +226,6 @@
     return lines.join('\r\n') + '\r\n';
   }
   return Object.freeze({toAsciiDigits,formatNumber,formatPercent,formatTimer,isoDate,formatDateLabel,
-    renderNumber,refresh,normalizeNumericInput,wireNumericInputs,serializeCsv});
+    renderNumber,refresh,normalizeNumericInput,wireNumericInputs,
+    normalizeGeneratedUi,wireGeneratedUi,serializeCsv});
 });
