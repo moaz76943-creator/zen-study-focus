@@ -1,13 +1,14 @@
 'use strict';
 // Real disposable Android WebView actions. Does not claim TalkBack, hearing, DND or physical-phone acceptance.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
-const {validateTouchTarget,missingPrerequisites}=require('./cdp_touch_target.cjs');
+const {validateTouchTarget,missingPrerequisites,classifyFailure}=require('./cdp_touch_target.cjs');
 const {parseWebViewBounds,cssPointToAndroid}=require('./android_device_touch.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
 const results=new Map(CASES.map(id=>[id,{id,status:'NOT_TESTED',detail:'Outside this instrumented action scope; requires separate device/manual evidence'}]));
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const adb=(...args)=>cp.execFileSync('adb',['-s','emulator-5554',...args],{encoding:'utf8',timeout:20000});
 let ws,serial=0,pending=new Map();
+const touchTrace=[];
 async function connect(){
  const pid=adb('shell','pidof','com.zenstudy.focus').trim().split(/\s/)[0];
  assert.match(pid,/^\d+$/);adb('forward','tcp:9222','localabstract:webview_devtools_remote_'+pid);
@@ -18,7 +19,7 @@ async function connect(){
  const u=new URL(target.webSocketDebuggerUrl);assert.ok(['127.0.0.1','localhost'].includes(u.hostname)&&u.protocol==='ws:'&&u.port==='9222');
  ws=new WebSocket(u);
  await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('TRANSPORT: websocket open timeout')),10000);ws.addEventListener('open',()=>{clearTimeout(timer);resolve();},{once:true});ws.addEventListener('error',()=>{clearTimeout(timer);reject(Error('TRANSPORT: websocket error'));},{once:true});});
- ws.addEventListener('message',event=>{let data;try{data=JSON.parse(event.data);}catch(_){return;}const request=pending.get(data.id);if(!request)return;pending.delete(data.id);clearTimeout(request.timer);if(data.error||data.result?.exceptionDetails)request.reject(Error('Observed runtime/protocol error: '+JSON.stringify(data.error||data.result.exceptionDetails).slice(0,500)));else request.resolve(data.result);});
+ ws.addEventListener('message',event=>{let data;try{data=JSON.parse(event.data);}catch(_){return;}const request=pending.get(data.id);if(!request)return;pending.delete(data.id);clearTimeout(request.timer);if(data.error||data.result?.exceptionDetails)request.reject(Error((data.error?'TEST_PROTOCOL: ':'TEST_EVALUATION: ')+JSON.stringify(data.error||data.result.exceptionDetails).slice(0,500)));else request.resolve(data.result);});
  await call('Runtime.enable');
 }
 function call(method,params={}){return new Promise((resolve,reject)=>{const id=++serial;const timer=setTimeout(()=>{pending.delete(id);reject(Error('TRANSPORT: '+method+' timed out'));},20000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params}));});}
@@ -61,8 +62,10 @@ async function touch(expression){
    throw Error('TRANSPORT: Android ADB input tap rejected: '+String(e.message).slice(0,180));
  }
  await pause(250);
- return {x:target.x,y:target.y,hit:r.hit,viewportWidth:r.viewportWidth,
+ const evidence={selector:expression,x:target.x,y:target.y,hit:r.hit,viewportWidth:r.viewportWidth,
    viewportHeight:r.viewportHeight,adb:physical,webViewBounds:box,source:'actual adb input tap'};
+ touchTrace.push(evidence);
+ return evidence;
 }
 const element=selector=>`document.querySelector(${JSON.stringify(selector)})`;
 const tap=selector=>touch(element(selector));
@@ -85,7 +88,7 @@ async function dismissNoteKeyboardForSave(){
 }
 
 async function check(expression,message){assert.equal(await evaluate(expression),true,message);}
-async function run(id,fn){try{const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using CDP touch/input and observed state'});}catch(e){results.set(id,{id,status:(/^(TRANSPORT:|DEPENDENCY_NOT_TESTED:)/).test(e.message)?'NOT_TESTED':'FAIL',detail:e.message});}console.log(JSON.stringify(results.get(id)));}
+async function run(id,fn){try{const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using ADB taps, CDP text input and observed state'});}catch(e){results.set(id,{id,status:(/^(TRANSPORT:|DEPENDENCY_NOT_TESTED:)/).test(e.message)?'NOT_TESTED':'FAIL',classification:classifyFailure(e),detail:e.message});}console.log(JSON.stringify(results.get(id)));}
 async function restart(){ws.close();adb('shell','am','force-stop','com.zenstudy.focus');adb('shell','am','start','-n','com.zenstudy.focus/.MainActivity');await pause(3000);await connect();await ready();}
 async function main(){
  if(process.env.DF_ANDROID_DISPOSABLE!=='1')throw Error('TRANSPORT: fresh disposable-profile acknowledgement is required');
@@ -169,8 +172,8 @@ async function main(){
   if(missing.length)throw Error('DEPENDENCY_NOT_TESTED: saved note/task fixtures were not verified: '+missing.join(','));
   await restart();await check("notesList.some(n=>n.title==='Android fixture ٢'&&n.body==='Edited Unicode العربية ٣') && tasksList.some(t=>t.title==='Android fixture task'&&!t.done)",'Real process restart preserves note/task');});
 }
-main().catch(e=>{results.set('preflight',{id:'preflight',status:e.message.startsWith('TRANSPORT:')?'NOT_TESTED':'FAIL',detail:e.message});}).finally(()=>{
+main().catch(e=>{results.set('preflight',{id:'preflight',status:e.message.startsWith('TRANSPORT:')?'NOT_TESTED':'FAIL',classification:classifyFailure(e),detail:e.message});}).finally(()=>{
  try{ws?.close();}catch(_){}for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('TRANSPORT: disposed'));}pending.clear();
- const rows=[...results.values()],report={source:'Real Android WebView CDP touch/input, fresh disposable profile',sha:process.env.GITHUB_SHA||null,api:process.env.ANDROID_TEST_API||null,results:rows,counts:Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,rows.filter(r=>r.status===s).length])),release_approved:false};
+ const rows=[...results.values()],report={source:'Real Android WebView ADB taps with CDP inspection/text input, fresh disposable profile',sha:process.env.GITHUB_SHA||null,api:process.env.ANDROID_TEST_API||null,results:rows,touches:touchTrace,counts:Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,rows.filter(r=>r.status===s).length])),release_approved:false};
  fs.writeFileSync(process.argv[2]||'android-dom-actions.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));if(rows.some(r=>r.status!=='PASS'))process.exitCode=1;
 });
