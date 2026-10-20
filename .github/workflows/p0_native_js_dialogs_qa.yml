@@ -1,0 +1,46 @@
+name: P0 Branded JS Dialogs source regression and Android build
+on:
+  push:
+    branches:
+      - fix/p0-app-branded-js-dialogs-20261020
+permissions:
+  contents: read
+concurrency:
+  group: p0-native-dialogs-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-and-android-compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: P0 strict native-host dialog regression (RED before fix)
+        run: node --test tests/android_dialogs/native_dialog_handoff.test.cjs
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Ensure matching Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile real Android WebView host and P0 dialog class
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Ensure all JS/browser regression suites remain green
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          node --test --test-reporter=tap "${suites[@]}"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
