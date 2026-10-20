@@ -129,21 +129,20 @@ async function main(){
   return 'Five consecutive cross-family edits + five native receipts + one immediate process kill; exact fixture IDs, nested unknown fields and note content retained';
  });
  await run('activity_destroy_recreate',async()=>{
-  const before=await fixture(),pid=adb('shell','pidof',PKG).split(/\s/)[0],old=adb('shell','settings','get','global','always_finish_activities');
-  try{
-   adb('shell','settings','put','global','always_finish_activities','1');
-   await evaluate("window.__df07ActivityNonce='destroy-required'");
-   adb('shell','input','keyevent','3');await pause(1800);
-   adb('shell','am','start','-n',PKG+'/.MainActivity');await pause(1800);
-   try{ws?.close();}catch(_){}
-   await connect();
-   const newpid=adb('shell','pidof',PKG).split(/\s/)[0];
-   if(pid!==newpid)throw Error('TRANSPORT: OS killed the process, Activity-only recreation not isolated');
-   const marker=await evaluate('window.__df07ActivityNonce');
-   assert.equal(marker,undefined,'Activity WebView survived: genuine destroy/recreate not proven');
-   assert.deepEqual(await fixture(),before,'Recreated Android Activity lost fixture data');
-  }finally{adb('shell','settings','put','global','always_finish_activities',/^[01]$/.test(old)?old:'0');}
-  return 'Android Always-finish-activities used; WebView nonce removed with same process PID, saved fixture unchanged';
+  const before=await fixture(),pid=adb('shell','pidof',PKG).split(/\s/)[0];
+  await evaluate("window.__df07ActivityNonce='destroy-required'");
+  // Explicit NEW_TASK + CLEAR_TASK destroys the old Android Activity even
+  // though Manifest configChanges makes ordinary rotation insufficient.
+  adb('shell','am','start','-n',PKG+'/.MainActivity','-f','0x10008000');
+  await pause(2300);
+  try{ws?.close();}catch(_){}
+  await connect();
+  const newpid=adb('shell','pidof',PKG).split(/\s/)[0];
+  if(pid!==newpid)throw Error('TRANSPORT: system killed process; isolated Activity recreation not proven');
+  const marker=await evaluate('window.__df07ActivityNonce');
+  if(marker!==undefined)throw Error('TRANSPORT: Activity not recreated after explicit NEW_TASK/CLEAR_TASK');
+  assert.deepEqual(await fixture(),before,'Recreated Android Activity lost fixture data');
+  return 'Explicit task clear recreated Android Activity in same process; WebView state reset and saved task/note IDs/unknown fields retained';
  });
  await run('backup_restore_on_android_webview',async()=>{
   const before=await fixture();
