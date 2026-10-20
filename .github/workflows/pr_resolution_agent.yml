@@ -1,0 +1,167 @@
+name: Deep Focus PR Resolution Agent
+
+on:
+  schedule:
+    - cron: '31 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'audit scans only; merge-safe resolves exact duplicates and bounded approved docs'
+        required: true
+        type: choice
+        default: merge-safe
+        options: [audit, merge-safe]
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/pr_resolution_agent.yml'
+      - 'tools/daily_maintenance/pr_resolution.cjs'
+      - 'tests/daily_maintenance/pr_resolution.test.cjs'
+      - 'docs/daily_maintenance/PR_RESOLUTION_AGENT.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deep-focus-pr-resolution
+  cancel-in-progress: false
+
+jobs:
+  contracts:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify deterministic merge guardrails
+        run: |
+          node --check tools/daily_maintenance/pr_resolution.cjs
+          node --test tests/daily_maintenance/pr_resolution.test.cjs
+  resolve:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test safety contract before reading or mutating PRs
+        run: node --test tests/daily_maintenance/pr_resolution.test.cjs
+      - name: Resolve exact duplicates and approved docs-only changes
+        uses: actions/github-script@v7
+        env:
+          RESOLUTION_MODE: ${{ inputs.mode || 'merge-safe' }}
+        with:
+          script: |
+            const engine = require('./tools/daily_maintenance/pr_resolution.cjs');
+            const {owner, repo} = context.repo;
+            if (owner + '/' + repo !== engine.REPO) throw Error('Unexpected repository');
+            const mode = process.env.RESOLUTION_MODE;
+            if (!['audit','merge-safe'].includes(mode)) throw Error('Invalid mode');
+            const live = mode === 'merge-safe';
+            const pulls = await github.paginate(github.rest.pulls.list, {
+              owner, repo, state:'open', per_page:100
+            });
+            const anchor = (await github.rest.pulls.get({owner,repo,pull_number:25})).data;
+            if (anchor.state !== 'open' || anchor.head.ref !== engine.INTEGRATION ||
+                !/^[0-9a-f]{40}$/i.test(anchor.head.sha)) {
+              throw Error('Integration #25 no longer matches the recovery contract');
+            }
+            const contained = new Set();
+            const actions = [];
+            // Bounded ancestry inspection; no code comparison is mistaken for behavioral acceptance.
+            const order = pulls.filter(p=>p.number!==25 && p.head.repo?.full_name===engine.REPO)
+              .sort((a,b)=>a.number-b.number);
+            const slot = Math.floor(Date.now()/3600000)%Math.max(1,Math.ceil(order.length/10));
+            const batch = order.slice(slot*10,slot*10+10);
+            let closed = 0;
+            for (const p of batch) {
+              const cmp = (await github.rest.repos.compareCommits({
+                owner,repo,base:p.head.sha,head:anchor.head.sha
+              })).data;
+              if (cmp.behind_by!==0 || cmp.merge_base_commit?.sha!==p.head.sha) continue;
+              contained.add(p.number);
+              if (!live || closed>=2) continue;
+              const [latest, aLatest] = await Promise.all([
+                github.rest.pulls.get({owner,repo,pull_number:p.number}),
+                github.rest.pulls.get({owner,repo,pull_number:25})
+              ]);
+              if (latest.data.state!=='open' || latest.data.head.sha!==p.head.sha ||
+                  aLatest.data.head.sha!==anchor.head.sha) continue;
+              await github.rest.issues.createComment({
+                owner,repo,issue_number:p.number,
+                body:'Exact Git ancestry verified: this head is already included in the active recovery integration PR #25 at ' +
+                  anchor.head.sha + '. Closing duplicate request as superseded (NOT GitHub merged); code is preserved. ' +
+                  'No approval of Android, audio rights, user data migration or production release.'
+              });
+              await github.rest.pulls.update({owner,repo,pull_number:p.number,state:'closed'});
+              actions.push('Closed contained duplicate #' + p.number);
+              closed++;
+            }
+            // Never promote a draft or runtime/media/security fix. At most ONE docs-only PR per cycle.
+            const eligible = pulls.filter(p=>p.number!==25 && p.base.ref===engine.INTEGRATION &&
+              !p.draft && (p.labels||[]).some(x=>x.name==='agent-safe-merge'))
+              .sort((a,b)=>a.number-b.number).slice(0,5);
+            if (live) for (const listed of eligible) {
+              const p = (await github.rest.pulls.get({
+                owner,repo,pull_number:listed.number
+              })).data;
+              const files = await github.paginate(github.rest.pulls.listFiles, {
+                owner,repo,pull_number:p.number,per_page:100
+              });
+              const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+                owner,repo,head_sha:p.head.sha,per_page:100
+              });
+              const decision = engine.decideMerge(p,{
+                anchorSha:anchor.head.sha,files,runs
+              });
+              actions.push('#' + p.number + ': ' + decision.code);
+              if (decision.code!=='READY_DOCS_ONLY') continue;
+              const latest=(await github.rest.pulls.get({owner,repo,pull_number:p.number})).data;
+              const updated=(await github.rest.pulls.get({owner,repo,pull_number:25})).data;
+              if (latest.head.sha!==p.head.sha || updated.head.sha!==anchor.head.sha ||
+                  latest.base.sha!==anchor.head.sha || latest.draft ||
+                  !(latest.labels||[]).some(x=>x.name==='agent-safe-merge')) {
+                actions.push('#' + p.number + ': SHA or label changed; refused');
+                continue;
+              }
+              const merged=await github.rest.pulls.merge({
+                owner,repo,pull_number:p.number,sha:p.head.sha,merge_method:'squash',
+                commit_title:'docs: reviewed PR agent integration #' + p.number
+              });
+              actions.push('Docs-only integration merge #' + p.number +
+                ' commit ' + merged.data.sha);
+              break;
+            }
+            const report = engine.summarize(pulls,anchor,contained);
+            const reportText = engine.toMarkdown(report) +
+              '\n## This cycle\nMode: '+mode+'\n'+
+              (actions.length?actions.map(x=>'- '+x).join('\n'):'- No provably safe write available')+
+              '\n\nRun: '+context.serverUrl+'/'+owner+'/'+repo+'/actions/runs/'+context.runId+'\n';
+            await core.summary.addRaw(reportText).write();
+            const title='[PR Agent] Recovery merge queue';
+            const issueList=await github.paginate(github.rest.issues.listForRepo,{
+              owner,repo,state:'open',per_page:100
+            });
+            const existing=issueList.find(x=>!x.pull_request && x.title===title);
+            if(existing){
+              if(existing.body!==reportText)await github.rest.issues.update({
+                owner,repo,issue_number:existing.number,body:reportText
+              });
+            }else{
+              await github.rest.issues.create({owner,repo,title,body:reportText});
+            }
