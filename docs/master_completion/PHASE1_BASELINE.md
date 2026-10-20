@@ -88,3 +88,13 @@ Release remains **RELEASE_APPROVED=NO**: required Android scenarios, physical de
 ## Proven remaining defect selected for next patch
 
 `tasks_studio.js` accepts a synchronous `false`/undefined commit as success in `apply` and Undo/Redo, and unconditional refresh loses undo history even when external state is unchanged. Candidate has older code than the protected local task patch; re-run the negative tests against this candidate before applying only reviewed task hunks. Primary/mirror and backup implementations remain untouched.
+
+## Batch 01 — task persistence and bounded rendering
+
+Root cause: `TasksStudio.apply` and Undo/Redo accepted every synchronous result, including `false`, then published next state and cleared the editor. `refresh` also discarded Undo unconditionally. The protected local e3394e8 task-only patch was reviewed against the exact candidate (identical original task source), rather than copying old app/index files.
+
+RED: three new candidate tests failed: silent false commit published a task; unchanged refresh lost Undo; 1,001 matches created 1,001 cards. GREEN: **37/37 Tasks tests**, including strict commit acknowledgment, retained form on failure, Undo preserved on equal snapshot but invalidated by external timer credit, and 100-card initial rendering/More/search across all 1,001 preserved records. Existing test adapter now returns `true` exactly as the production journal adapter does.
+
+Cross-regression: **51/51** v21 contract, mirror/journal, backup round-trip/failure, timer durable credit and Notes draft tests passed. No storage engine, key, ID, schema, unknown field, session-credit or media policy changed. Android on this patch: **NOT_TESTED**; physical device **DEVICE_NOT_TESTED**. Source tests do not prove actual storage hardware durability.
+
+Commands: `node --test --test-reporter=tap tests/tasks_core/*.test.cjs tests/tasks_recovery/*.test.cjs`; `node --test --test-reporter=tap tests/data_contracts/*.test.cjs tests/integration_recovery/restore_journal.test.cjs tests/integration_recovery/timer_credit_durability.test.cjs tests/notes_recovery/*.test.cjs`.
