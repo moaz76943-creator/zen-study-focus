@@ -11,6 +11,36 @@ function toWest(val) {
     .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
 }
 
+// Generated durations only; user-authored titles and bodies never pass through this formatter.
+function formatDurationUnit(value, unit, lang = cfg.lang) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || !['minute','second'].includes(unit)) return '';
+  try {
+    return toWest(new Intl.NumberFormat(lang, {
+      style:'unit', unit, unitDisplay:'long', numberingSystem:'latn', maximumFractionDigits:2
+    }).format(n));
+  } catch (_) {
+    const units = {
+      en:['minute','minutes','second','seconds'], ar:['دقيقة','دقائق','ثانية','ثوانٍ'],
+      es:['minuto','minutos','segundo','segundos'], zh:['分钟','分钟','秒','秒'],
+      hi:['मिनट','मिनट','सेकंड','सेकंड'], fr:['minute','minutes','seconde','secondes'],
+      de:['Minute','Minuten','Sekunde','Sekunden'], ru:['минута','минут','секунда','секунд'],
+      pt:['minuto','minutos','segundo','segundos'], ja:['分','分','秒','秒'],
+      id:['menit','menit','detik','detik'], tr:['dakika','dakika','saniye','saniye'],
+      ko:['분','분','초','초'], vi:['phút','phút','giây','giây'],
+      it:['minuto','minuti','secondo','secondi'], bn:['মিনিট','মিনিট','সেকেন্ড','সেকেন্ড'],
+      ur:['منٹ','منٹ','سیکنڈ','سیکنڈ'], fa:['دقیقه','دقیقه','ثانیه','ثانیه'],
+      pl:['minuta','minut','sekunda','sekund'], nl:['minuut','minuten','seconde','seconden']
+    };
+    const code = String(lang).split('-')[0], words = units[code] || units.en;
+    const offset = unit === 'minute' ? 0 : 2;
+    let label = words[offset + (Math.abs(n) === 1 ? 0 : 1)];
+    if (code === 'ar') label = n === 2 ? (unit === 'minute' ? 'دقيقتان' : 'ثانيتان')
+      : n >= 3 && n <= 10 ? words[offset+1] : words[offset];
+    return toWest(String(n)) + ' ' + label;
+  }
+}
+
 // Only explicitly marked numeric inputs are normalized. User notes/tasks are immutable text.
 document.addEventListener('input', (e) => {
   const field=e.target;
@@ -320,9 +350,18 @@ let cfg = loadFortressData('zen_fortress_cfg_v21', {
   todayMins: 0, sessions: 0, streak: 0, water: 0, sets: 0, pagesRead: 0
 });
 
+function acceptedFocusHistory(history) {
+  const analytics = window.DeepFocusAnalyticsRecovery;
+  // Missing optional analytics cannot turn unvalidated records into focus minutes.
+  return analytics && typeof analytics.normalizeSessions === 'function'
+    ? analytics.normalizeSessions(history).sessions : null;
+}
+
 function computeActualStreak(history, now = new Date()) {
+  const accepted = acceptedFocusHistory(history);
+  if (!accepted) return Number.isSafeInteger(cfg.streak) && cfg.streak >= 0 ? cfg.streak : 0;
   const days = new Set(
-    (Array.isArray(history) ? history : [])
+    accepted
       .filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && Number(e.minutes) > 0)
       .map(e => e.date)
   );
@@ -350,8 +389,10 @@ function syncDailyRollover() {
       calMonth = new Date().getMonth();
     }
   }
+  const entries = acceptedFocusHistory(cfg.sessionHistory);
+  // A missing optional script cannot reset persistent cached metrics to a false zero.
+  if (!entries) return;
   if (cfg.metricsDate && cfg.metricsDate !== current) {
-    const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
     cfg.todayMins = entries
       .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
       .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
@@ -513,8 +554,18 @@ function renderLanguageList() {
 
 function applyLanguage(code) {
   const meta = LANG_CATALOG.find(x => x.code === code) || LANG_CATALOG[0];
+  const previousLang = cfg.lang;
   cfg.lang = meta.code;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', cfg) !== true)
+      throw new Error('LANGUAGE_SAVE_NOT_VERIFIED');
+  } catch (_) {
+    cfg.lang = previousLang;
+    showToast(previousLang === 'ar'
+      ? 'تعذر حفظ اللغة. حاول مرة أخرى.'
+      : 'Could not save the language. Try again.');
+    return false;
+  }
   const d = L();
 
   const root = document.getElementById('htmlRoot');
@@ -526,7 +577,7 @@ function applyLanguage(code) {
   document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
   const tn = document.getElementById('navTrainingText');
-  if (tn) tn.textContent = meta.code === 'ar' ? 'تدريب' : 'Training';
+  if (tn) tn.textContent = typeof quickText === 'function' ? quickText('trainingTitle') : d.modeFocus;
   if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -683,14 +734,28 @@ function openCloudBackupModal() {
   document.getElementById('cloudBackupModal').classList.add('open');
 }
 
+async function copyTextConfirmed(text, successMessage) {
+  if (copyTextConfirmed.pending) return false;
+  copyTextConfirmed.pending = true;
+  try {
+    if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function')
+      throw new Error('CLIPBOARD_UNAVAILABLE');
+    await navigator.clipboard.writeText(text);
+    showToast(successMessage || (cfg.lang === 'ar' ? 'تم النسخ إلى الحافظة' : 'Copied to clipboard'));
+    return true;
+  } catch (_) {
+    showToast(cfg.lang === 'ar' ? 'تعذّر النسخ. لم يتم تأكيد النسخ إلى الحافظة.' : 'Could not copy. Clipboard copy was not confirmed.');
+    return false;
+  } finally { copyTextConfirmed.pending = false; }
+}
+
 function syncToGoogleCloudNow() {
   const code = generateEncryptedBackupCode();
   if (window.ZenNative && window.ZenNative.syncBackupToGoogleEmailOrDrive) {
     window.ZenNative.syncBackupToGoogleEmailOrDrive(code);
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(code);
-    showToast("Backup copied — save privately; NOT encrypted");
-  }
+  } else return copyTextConfirmed(code, cfg.lang === 'ar'
+    ? 'نُسخت النسخة الاحتياطية. احفظها بسرية؛ فهي غير مشفّرة.'
+    : 'Backup copied — save privately; NOT encrypted');
 }
 
 function downloadEncryptedBackupFile() {
@@ -734,10 +799,7 @@ function shareAppWithFriends() {
   const msg = toWest(`🌿 Deep Focus — My Progress Today: ${cfg.todayMins} active mins (${cfg.sessions} sessions completed, 🔥 ${cfg.streak} days streak)!`);
   if (window.ZenNative && window.ZenNative.shareAppInvite) {
     window.ZenNative.shareAppInvite(msg);
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(msg);
-    showToast("📤 Copied to Clipboard!");
-  }
+  } else return copyTextConfirmed(msg);
 }
 
 /* ========================================================
@@ -780,7 +842,7 @@ function renderDomainState() {
     const duration = card.querySelector('.domain-duration');
     if (duration) duration.textContent = toWest(getDomainFocusMinutes(key) + ':00');
   }
-  document.getElementById('modeFocusBtn').textContent = toWest(getDomainFocusMinutes(dom) + 'm');
+  document.getElementById('modeFocusBtn').textContent = formatDurationUnit(getDomainFocusMinutes(dom), 'minute');
   document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
   document.getElementById('readContextBar').classList.toggle('visible', dom === 'read');
 }
@@ -808,7 +870,7 @@ function switchActivityDomain(dom, el) {
   const [icon, title] = labels[dom];
   const minutes = getDomainFocusMinutes(dom);
   selectTimerMode(minutes, 'focus', document.getElementById('modeFocusBtn'));
-  showToast(toWest(`${icon} ${title} (${minutes}m)`));
+  showToast(`${icon} ${title} (${formatDurationUnit(minutes,'minute')})`);
 }
 
 /* Home timer shortcuts share the existing engine, never reset an active session silently. */
@@ -829,10 +891,22 @@ function selectHomeQuickSession(minutes) {
 }
 
 function logWorkoutSet() {
-  cfg.sets = (cfg.sets % 12) + 1;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  const before = cfg.sets;
+  const count = Number(before);
+  cfg.sets = ((Number.isSafeInteger(count) && count >= 0 ? count : 0) % 12) + 1;
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', cfg) !== true)
+      throw new Error('ACTIVITY_SAVE_NOT_VERIFIED');
+  } catch (_) {
+    cfg.sets = before;
+    showToast(cfg.lang === 'ar'
+      ? 'تعذر حفظ مجموعة التدريب. حاول مرة أخرى.'
+      : 'Could not save the workout set. Try again.');
+    return false;
+  }
   syncHeaderMetrics();
   showToast(toWest(`💪 ${L().domSport}: ${cfg.sets}/4`));
+  return true;
 }
 
 function startQuickSportRest(secs) {
@@ -845,14 +919,30 @@ function startQuickSportRest(secs) {
   timerResumeMs = null;
   storeTimerSession();
   updateTimerDisplay(); toggleTimerPlay();
-  showToast(toWest(`⏱️ Rest ${secs}s Started`));
+  showToast(`⏱️ ${quickText('restPhase')} ${formatDurationUnit(secs,'second')}`);
 }
 
 function addReadPages(p) {
-  cfg.pagesRead = (cfg.pagesRead || 0) + p;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  if (!Number.isSafeInteger(p) || p <= 0) return false;
+  const before = cfg.pagesRead;
+  const existing = Number(before);
+  const current = Number.isSafeInteger(existing) && existing >= 0 ? existing : 0;
+  const next = current + p;
+  if (!Number.isSafeInteger(next)) return false;
+  cfg.pagesRead = next;
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', cfg) !== true)
+      throw new Error('ACTIVITY_SAVE_NOT_VERIFIED');
+  } catch (_) {
+    cfg.pagesRead = before;
+    showToast(cfg.lang === 'ar'
+      ? 'تعذر حفظ صفحات القراءة. حاول مرة أخرى.'
+      : 'Could not save reading progress. Try again.');
+    return false;
+  }
   syncHeaderMetrics();
   showToast(toWest(`📖 ${L().domRead}: +${p}`));
+  return true;
 }
 
 const TAB_GRADS = {
@@ -901,9 +991,18 @@ function showToast(msg) {
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 window.handleAndroidBack = function() {
+  const chooser = document.querySelector?.('dialog[open]');
+  if (chooser) { chooser.close(); return true; }
   if (document.getElementById('deskClockOverlay').classList.contains('active')) { toggleDeskClock(false); return true; }
   const openM = document.querySelectorAll('.modal-overlay.open');
-  if (openM.length > 0) { openM.forEach(m => m.classList.remove('open')); return true; }
+  if (openM.length > 0) {
+    const top = openM[openM.length - 1];
+    if (top.id === 'noteModal' && typeof nsCloseEditor === 'function') {
+      // The native Back event is consumed even when the user keeps unsaved edits.
+      nsCloseEditor();
+    } else top.classList.remove('open');
+    return true;
+  }
   const timerTab = document.getElementById('sec-timer');
   if (timerTab && !timerTab.classList.contains('active')) {
     switchTab('sec-timer', document.getElementById('navTimer'));
@@ -911,6 +1010,10 @@ window.handleAndroidBack = function() {
   }
   return false;
 };
+
+if (typeof document.addEventListener === 'function') document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && window.handleAndroidBack()) event.preventDefault();
+});
 
 let timerTotal = cfg.focusMin * 60;
 let timerLeft = timerTotal;
@@ -943,43 +1046,60 @@ function storeTimerSession() {
   });
 }
 function creditCompletedSession() {
-  if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
-  if (!timerSessionId) return;
+  if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return true;
+  if (!timerSessionId) return true;
   const ids = Array.isArray(cfg.completedTimerIds) ? cfg.completedTimerIds : [];
   if (ids.includes(timerSessionId) ||
-      (Array.isArray(cfg.sessionHistory) && cfg.sessionHistory.some(s => s && s.id === timerSessionId))) return;
+      (Array.isArray(cfg.sessionHistory) && cfg.sessionHistory.some(s => s && s.id === timerSessionId))) return true;
+  const nextCfg = JSON.parse(JSON.stringify(cfg));
   // Short intervals such as 20/10 must not credit a whole minute for 20 seconds.
   // Accumulate real seconds across work rounds; legacy timer accounting is preserved.
   let earned;
   if (quickTraining?.active) {
-    const accumulated = Math.max(0, Number(cfg.quickFocusRemainderSec) || 0)
+    const accumulated = Math.max(0, Number(nextCfg.quickFocusRemainderSec) || 0)
       + Math.max(0, Math.round(timerActiveMs / 1000));
     earned = Math.floor(accumulated / 60);
-    cfg.quickFocusRemainderSec = accumulated % 60;
+    nextCfg.quickFocusRemainderSec = accumulated % 60;
   } else {
     earned = Math.max(0, Math.floor((timerActiveMs + 500) / 60000));
   }
-  cfg.todayMins = Number(cfg.todayMins || 0) + earned;
-  cfg.sessions = Number(cfg.sessions || 0) + 1;
-  cfg.metricsDate = localDateISO();
-  cfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
-  if (!Array.isArray(cfg.sessionHistory)) cfg.sessionHistory = [];
+  nextCfg.todayMins = Number(nextCfg.todayMins || 0) + earned;
+  nextCfg.sessions = Number(nextCfg.sessions || 0) + 1;
+  nextCfg.metricsDate = localDateISO();
+  nextCfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
+  if (!Array.isArray(nextCfg.sessionHistory)) nextCfg.sessionHistory = [];
   const credited = {id: timerSessionId, date: localDateISO(), minutes: earned,
-    domain: cfg.domain || 'study',mode:'focus',completed:true};
+    domain: nextCfg.domain || 'study',mode:'focus',completed:true};
   if (Number.isSafeInteger(focusSessionTaskId) && focusSessionTaskId >= 0 &&
       typeof tasksList !== 'undefined' && tasksList.some(t => t.id === focusSessionTaskId && !t.isStarter))
     credited.taskId = focusSessionTaskId;
-  cfg.sessionHistory.push(credited);
+  nextCfg.sessionHistory.push(credited);
   if (!quickTraining?.active) {
-    const rounds = Number.isInteger(cfg.roundsPerCycle) && cfg.roundsPerCycle >= 1 && cfg.roundsPerCycle <= 12 ? cfg.roundsPerCycle : 4;
-    const past = Number.isInteger(cfg.focusCycleCount) && cfg.focusCycleCount >= 0 && cfg.focusCycleCount < rounds ? cfg.focusCycleCount : 0;
-    cfg.focusCycleCount = (past + 1) % rounds;
+    const rounds = Number.isInteger(nextCfg.roundsPerCycle) && nextCfg.roundsPerCycle >= 1 && nextCfg.roundsPerCycle <= 12 ? nextCfg.roundsPerCycle : 4;
+    const past = Number.isInteger(nextCfg.focusCycleCount) && nextCfg.focusCycleCount >= 0 && nextCfg.focusCycleCount < rounds ? nextCfg.focusCycleCount : 0;
+    nextCfg.focusCycleCount = (past + 1) % rounds;
   }
-  cfg.streak = computeActualStreak(cfg.sessionHistory);
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  nextCfg.streak = computeActualStreak(nextCfg.sessionHistory);
+  try {
+    if (window.DF22Integration) {
+      const before = window.DF22Integration.getSnapshot();
+      if (window.DF22Integration.write(before, {...before,cfg:nextCfg}) !== true)
+        throw new Error('SESSION_SAVE_NOT_VERIFIED');
+    } else {
+      if (saveFortressData('zen_fortress_cfg_v21', nextCfg) !== true)
+        throw new Error('SESSION_SAVE_NOT_VERIFIED');
+      cfg = nextCfg;
+    }
+  } catch (_) {
+    showToast(cfg.lang === 'ar'
+      ? 'تعذّر حفظ الجلسة. أبقِ التطبيق مفتوحًا واضغط التشغيل لإعادة المحاولة.'
+      : 'Could not save this session. Keep the app open and press Play to retry.');
+    return false;
+  }
   syncHeaderMetrics();
   if (window.DF22Integration?.onSessionRecorded) window.DF22Integration.onSessionRecorded();
   try { document.dispatchEvent(new CustomEvent('deep-focus:session-recorded',{detail:{schemaVersion:1,...credited}})); } catch (e) {}
+  return true;
 }
 function finalizeTimerSession(shouldChime) {
   const completedAlertId=timerSessionId, completedAlertPhase=currentTimerModeKey;
@@ -988,7 +1108,13 @@ function finalizeTimerSession(shouldChime) {
   accumulateActiveTime();
   timerRunning = false;
   timerLeft = 0;
-  creditCompletedSession();
+  if (creditCompletedSession() !== true) {
+    // Keep the completed ID/elapsed time and existing durable timer snapshot.
+    // No training advance, alert, or success event until retry commits the credit.
+    updateTimerDisplay();
+    document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    return false;
+  }
   if(quickTraining?.active) {
     advanceQuickTrainingStep();
     if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true,completedAlertId,completedAlertPhase);
@@ -1077,14 +1203,14 @@ function updateTimerDisplay() {
 
   const domainText = {study:d.domStudy, sport:d.domSport, read:d.domRead, work:d.domWork};
   const captions = {
-    focus: (domainText[cfg.domain] || d.domStudy) + ' ' + Math.round(timerTotal / 60) + 'm',
-    short: timerTotal < 60 ? timerTotal + 's' : d.modeShort,
+    focus: (domainText[cfg.domain] || d.domStudy) + ' ' + formatDurationUnit(Math.round(timerTotal / 60),'minute'),
+    short: timerTotal < 60 ? quickText('restPhase') + ' ' + formatDurationUnit(timerTotal,'second') : d.modeShort,
     long: d.modeLong,
     custom: customSessionLabel || d.modeCustom
   };
   document.getElementById('timerModeCaption').textContent = toWest(captions[currentTimerModeKey] || d.modeFocus);
   if (currentTimerModeKey === 'focus' && !quickTraining?.active) {
-    document.getElementById('modeFocusBtn').textContent = toWest(Math.round(timerTotal / 60) + 'm');
+    document.getElementById('modeFocusBtn').textContent = formatDurationUnit(Math.round(timerTotal / 60),'minute');
   }
   for (const duration of [10, 25, 50]) {
     const shortcut = document.getElementById('homeQuick' + duration);
@@ -1094,6 +1220,10 @@ function updateTimerDisplay() {
       ));
     }
   }
+  const restShortcut = document.getElementById('sportRest45');
+  if (restShortcut) restShortcut.textContent = quickText('restPhase') + ' ' + formatDurationUnit(45,'second');
+  const setShortcut = document.getElementById('sportLogSet');
+  if (setShortcut) setShortcut.textContent = quickText('round') + ' +1';
   updateFocusStatus();
 }
 
@@ -1129,7 +1259,7 @@ function openCustomTimerModal() { document.getElementById('customTimerModal').cl
 function setCustomPresetValues(m) { document.getElementById('inpCustomMins').value = toWest(m); }
 function applyCustomTimerNow() {
   const mins = Math.max(1, Math.min(240, parseInt(toWest(document.getElementById('inpCustomMins').value)) || 45));
-  const title = toWest(document.getElementById('inpCustomTitle').value.trim());
+  const title = document.getElementById('inpCustomTitle').value.trim();
   customSessionLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
   closeModal('customTimerModal');
   if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return;
@@ -1165,6 +1295,7 @@ function startNativeTimerForCurrentSession(seconds, title) {
 }
 
 function toggleTimerPlay() {
+  if (!timerRunning && timerSessionId && timerLeft === 0) return finalizeTimerSession(false);
   const btn = document.getElementById('mainPlayBtn');
   const activeTitle = document.getElementById('timerModeCaption').textContent;
 
@@ -1404,11 +1535,19 @@ function renderCalendar() {
     const hasTasks = tasksList.some(t => t.date === iso);
     const hasNotes = notesList.some(n => n.calDate === iso);
 
-    const cell = document.createElement('div');
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.setAttribute('aria-label',iso);
+    cell.setAttribute('aria-pressed',String(iso === selectedCalDate));
+    if(iso === todayISO) cell.setAttribute('aria-current','date');
+    cell.setAttribute('data-date',iso);
     cell.className = `cal-day-cell ${iso === todayISO ? 'today' : ''} ${iso === selectedCalDate ? 'selected' : ''}`;
-    cell.onclick = () => { selectedCalDate = iso; renderCalendar(); };
+    cell.onclick = () => {
+      selectedCalDate = iso; renderCalendar();
+      document.querySelector?.('[data-date="' + iso + '"]')?.focus();
+    };
     cell.innerHTML = `
-      <span>${toWest(day)}</span>
+      <span dir="ltr">${toWest(day)}</span>
       <div class="cal-dots-row">
         ${hasTasks ? '<span class="cal-dot dot-task"></span>' : ''}
         ${hasNotes ? '<span class="cal-dot dot-note"></span>' : ''}
@@ -1557,8 +1696,7 @@ function deleteNoteCard(id) {
 
 function exportAllNotes() {
   const txt = notesList.map(n => `[${n.title} - ${toWest(n.calDate)}]\n${n.body}`).join('\n\n---\n\n');
-  if (navigator.clipboard) navigator.clipboard.writeText(txt);
-  showToast('📥 TXT');
+  return copyTextConfirmed(txt);
 }
 
 function openBrainDumpModal() {
@@ -1744,7 +1882,7 @@ function renderSoundsStudio() {
     `;
     box.appendChild(tile);
   });
-  // This is an honest acquisition overview. It never changes playback eligibility.
+  // Acquisition overview only. Playback remains governed by the existing licensing gate.
   if (typeof DeepFocusNatureLibraryV2 !== 'undefined') {
     DeepFocusNatureLibraryV2.render(soundCat, cfg.lang, d.sounds, NATURE_APPROVED_FOR_PLAYBACK);
   }
@@ -1754,7 +1892,7 @@ function renderSoundsStudio() {
    8. ANALYTICS & GOAL CALCULATOR (100% WESTERN DIGITS)
    ======================================================== */
 function renderAnalyticsBars() {
-  const hist = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
+  const hist = acceptedFocusHistory(cfg.sessionHistory) || [];
   const recent = Array.from({length: 7}, (_, i) => {
     const date = new Date(); date.setHours(12, 0, 0, 0); date.setDate(date.getDate() - (6-i));
     const key = localDateISO(date);

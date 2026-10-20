@@ -22,7 +22,7 @@ function rig(writeOK=true){
         draftFields:()=>({baseFingerprint:base.value}),
         restoreDraftFields(){}
       }},
-    saveFortressData:(k,v)=>{if(writeOK)storage.set(k,JSON.parse(JSON.stringify(v)));},
+    saveFortressData:(k,v)=>{if(writeOK)storage.set(k,JSON.parse(JSON.stringify(v)));return writeOK;},
     loadFortressData:(k,v)=>storage.get(k)||v,
     localDateISO:()=> '2026-10-19',nsUpdateCount(){},closeModal(){closeCount++}
   };
@@ -54,4 +54,34 @@ test('DF-090 fingerprint survives encoded draft round-trip without altering lega
   const saved=h.storage.get('deep_focus_unsaved_note_draft_v1');
   assert.strictEqual(saved.editId,7);
   assert.equal(saved.baseFingerprint,'snapshot A');
+});
+
+test('DF-090 same-millisecond ignored write cannot acknowledge stale draft content',()=>{
+  const h=rig();
+  h.ctx.Date={now:()=>1792368000000};
+  assert.equal(h.run('nsFlushDraft()'),true);
+  h.el('inpNoteBody').value='New Unicode edits ١٢ فارسی';
+  h.ctx.saveFortressData=()=>false;
+  assert.equal(h.run('nsFlushDraft()'),false);
+  assert.equal(h.storage.get('deep_focus_unsaved_note_draft_v1').body,'Typed draft');
+  assert.doesNotMatch(h.el('nsDraftStatus').textContent,/Draft saved/);
+});
+test('DF-089 toolbar changes are flushed or block closing before debounce executes',()=>{
+  const h=rig(false);
+  h.run('nsScheduleDraft()');
+  assert.equal(h.run('nsCloseEditor()'),false);
+  assert.equal(h.closeCount,0);
+  assert.equal(h.confirmCount,1);
+});
+test('DF-090 corrupt null recall pair is rejected safely without replacing stored data',()=>{
+  const h=rig();h.run('nsFlushDraft()');
+  h.storage.get('deep_focus_unsaved_note_draft_v1').recallPairs=[null];
+  assert.equal(h.run('nsGetStoredDraft()'),null);
+});
+test('DF-075 draft discard cannot claim success when storage removal fails',()=>{
+  const h=rig();h.run('nsFlushDraft()');
+  h.ctx.localStorage.removeItem=()=>{throw Error('storage unavailable');};
+  assert.equal(h.run('nsDiscardDraft()'),false);
+  assert.ok(h.storage.get('deep_focus_unsaved_note_draft_v1'));
+  assert.doesNotMatch(h.el('nsDraftStatus').textContent,/discarded/);
 });
