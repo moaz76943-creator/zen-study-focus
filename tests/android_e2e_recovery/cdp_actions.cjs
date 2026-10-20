@@ -1,6 +1,7 @@
 'use strict';
 // Real disposable Android WebView actions. Does not claim TalkBack, hearing, DND or physical-phone acceptance.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
+const {classifyError,prerequisiteBlock}=require('./cdp_result_policy.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
 const results=new Map(CASES.map(id=>[id,{id,status:'NOT_TESTED',detail:'Outside this instrumented action scope; requires separate device/manual evidence'}]));
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
@@ -33,13 +34,25 @@ const tap=selector=>touch(element(selector));
 const button=(container,text)=>`[...${element(container)}.querySelectorAll('button')].find(n=>n.textContent.trim()===${JSON.stringify(text)})`;
 async function fill(selector,text){await tap(selector);await evaluate(`${element(selector)}.value=''`);await call('Input.insertText',{text});}
 async function check(expression,message){assert.equal(await evaluate(expression),true,message);}
-async function run(id,fn){try{const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using CDP touch/input and observed state'});}catch(e){results.set(id,{id,status:e.message.startsWith('TRANSPORT:')?'NOT_TESTED':'FAIL',detail:e.message});}console.log(JSON.stringify(results.get(id)));}
+async function run(id,fn){try{const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using CDP touch/input and observed state'});}catch(e){results.set(id,{id,status:classifyError(e),detail:e.message});}console.log(JSON.stringify(results.get(id)));}
 async function restart(){ws.close();adb('shell','am','force-stop','com.zenstudy.focus');adb('shell','am','start','-n','com.zenstudy.focus/.MainActivity');await pause(3000);await connect();await ready();}
 async function main(){
  if(process.env.DF_ANDROID_DISPOSABLE!=='1')throw Error('TRANSPORT: fresh disposable-profile acknowledgement is required');
  await connect();await ready();
  await run('preflight',()=>check("location.href==='file:///android_asset/web/index.html' && !!document.querySelector('#mainPlayBtn')",'Actual local app identity'));
- await run('navigation',async()=>{for(const [id,section] of [['navTasks','sec-tasks'],['navCalendar','sec-calendar'],['navNotes','sec-notes'],['navTimer','sec-timer'],['navTraining','sec-timer'],['navSounds','sec-sounds'],['navAnalytics','sec-analytics']]){await tap('#'+id);await check(`document.querySelector('#${section}').classList.contains('active') && document.querySelectorAll('.bnav-btn.active').length===1`,'Matching active section');}});
+ await run('navigation',async()=>{
+  for(const [id,section] of [['navTasks','sec-tasks'],['navCalendar','sec-calendar'],['navNotes','sec-notes'],['navTimer','sec-timer'],['navTraining','sec-timer'],['navSounds','sec-sounds'],['navAnalytics','sec-analytics']]){
+   await tap('#'+id);
+   const matched=await evaluate(`Boolean(document.querySelector('#${section}')?.classList.contains('active') && document.querySelectorAll('.bnav-btn.active').length===1)`);
+   if(!matched){
+    const snapshot=await evaluate(`({
+      currentActiveSection:[...document.querySelectorAll('.screen-section.active')].map(n=>n.id),
+      currentActiveNav:[...document.querySelectorAll('.bnav-btn.active')].map(n=>n.id)
+    })`);
+    throw Error(`Navigation failed at ${id}: expected ${section}; currentActiveSection=${JSON.stringify(snapshot?.currentActiveSection)}; currentActiveNav=${JSON.stringify(snapshot?.currentActiveNav)}`);
+   }
+  }
+ });
  await run('notes_create_edit',async()=>{
   await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle','Android fixture ٢');await fill('#inpNoteBody','Unicode العربية ٣ — preserved');await tap('#nsSaveButton');
   await check("notesList.some(n=>n.title==='Android fixture ٢'&&n.body==='Unicode العربية ٣ — preserved'&&!n.isStarter)",'Created Unicode note');
@@ -91,10 +104,16 @@ async function main(){
   return 'Actual 1-minute work session background/return credit once; notification appearance/hearing/DND remain NOT_TESTED';
  });
  await run('data_integrity',async()=>{await evaluate("window.fixtureBackup=generateEncryptedBackupCode();window.fixtureConfirm=window.confirm;window.confirm=()=>true");try{await check('verifyAndRestoreBackupCode(window.fixtureBackup)===true','Real ZEN21 roundtrip');}finally{await evaluate('window.confirm=window.fixtureConfirm;delete window.fixtureBackup;delete window.fixtureConfirm');}});
+ const blocked=prerequisiteBlock(results,['notes_create_edit','tasks_create']);
+ if(blocked){
+  results.set('process_death_recovery',{id:'process_death_recovery',...blocked});
+  console.log(JSON.stringify(results.get('process_death_recovery')));
+ }else{
  await run('process_death_recovery',async()=>{await restart();await check("notesList.some(n=>n.title==='Android fixture ٢'&&n.body==='Edited Unicode العربية ٣') && tasksList.some(t=>t.title==='Android fixture task'&&!t.done)",'Real process restart preserves note/task');});
+ }
 }
-main().catch(e=>{results.set('preflight',{id:'preflight',status:e.message.startsWith('TRANSPORT:')?'NOT_TESTED':'FAIL',detail:e.message});}).finally(()=>{
+main().catch(e=>{results.set('preflight',{id:'preflight',status:classifyError(e),detail:e.message});}).finally(()=>{
  try{ws?.close();}catch(_){}for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('TRANSPORT: disposed'));}pending.clear();
- const rows=[...results.values()],report={source:'Real Android WebView CDP touch/input, fresh disposable profile',sha:process.env.GITHUB_SHA||null,api:process.env.ANDROID_TEST_API||null,results:rows,counts:Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,rows.filter(r=>r.status===s).length])),release_approved:false};
+ const rows=[...results.values()],report={source:'Real Android WebView CDP touch/input, fresh disposable profile',sha:process.env.DF_TEST_SOURCE_SHA||null,api:process.env.ANDROID_TEST_API||null,results:rows,counts:Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,rows.filter(r=>r.status===s).length])),release_approved:false};
  fs.writeFileSync(process.argv[2]||'android-dom-actions.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));if(rows.some(r=>r.status!=='PASS'))process.exitCode=1;
 });
