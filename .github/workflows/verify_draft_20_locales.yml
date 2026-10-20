@@ -21,10 +21,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # For pull_request, never silently checkout a synthetic merge commit.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Enforce actual checked-out source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="${{ github.event.pull_request.head.sha || github.sha }}"
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$expected"
       - name: Verify exact source and 20 locale / 11 safety texts
         run: |
           mkdir -p evidence
@@ -52,6 +61,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # For pull_request, never silently checkout a synthetic merge commit.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-java@v4
         with:
@@ -60,6 +71,13 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
+      - name: Enforce actual checked-out source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="${{ github.event.pull_request.head.sha || github.sha }}"
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$expected"
       - name: Locate installed Android SDK manager and install API 36
         shell: bash
         run: |
