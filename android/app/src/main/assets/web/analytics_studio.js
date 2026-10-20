@@ -42,11 +42,11 @@
       title:'التحليلات الفعلية',activity:'النشاط',period:'الفترة',start:'من',end:'إلى',
       minutes:'دقائق مسجلة',sessions:'جلسات',average:'متوسط الجلسة',streak:'سلسلة الالتزام',
       noData:'لا توجد جلسات مسجلة لهذه الفترة',goal:'مقارنة الأهداف',noGoals:'لا توجد أهداف يومية محددة',
-      tasks:'المهام المكتملة',chart:'توزيع الأيام',year:'السنة',export:'تصدير CSV',details:'اختر يوماً لعرض تفاصيله'
+      tasks:'المهام المكتملة',chart:'توزيع الأيام',year:'السنة',export:'تصدير CSV',details:'اختر يوماً لعرض تفاصيله',invalidDates:'نطاق التاريخ غير صالح. اختر تاريخ بداية ونهاية صحيحين.'
     }:{title:'Recorded analytics',activity:'Activity',period:'Period',start:'From',end:'To',
       minutes:'Recorded minutes',sessions:'Sessions',average:'Average session',streak:'Current streak',
       noData:'No recorded sessions in this period',goal:'Goal comparison',noGoals:'No daily goals configured',
-      tasks:'Completed tasks',chart:'Daily distribution',year:'Year',export:'Export CSV',details:'Select a day for details'};
+      tasks:'Completed tasks',chart:'Daily distribution',year:'Year',export:'Export CSV',details:'Select a day for details',invalidDates:'Invalid date range. Select valid start and end dates.'};
     const wrapper=doc.createElement('section');wrapper.className='dfa-studio';
     wrapper.style.cssText='background:#fff;color:#14213d;border:1px solid #e2e8f0;border-radius:18px;padding:16px;max-width:100%;overflow:hidden';
     const mk=(tag,text,cls)=>{const el=doc.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;};
@@ -63,18 +63,23 @@
     const start=input('date',t.start),end=input('date',t.end);
     const exportBtn=mk('button',t.export);exportBtn.type='button';exportBtn.style.cssText='min-height:42px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:6px 12px';
     filters.appendChild(exportBtn);wrapper.appendChild(filters);
+    const feedback=mk('p');feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
+    feedback.style.cssText='color:#b91c1c;font-size:12px';wrapper.appendChild(feedback);
     const kpis=mk('div');kpis.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0';wrapper.appendChild(kpis);
     const detail=mk('p',t.details);detail.setAttribute('aria-live','polite');
     const chartTitle=mk('h3',t.chart), chart=mk('div');chart.style.overflowX='auto';
     const domainView=mk('div');domainView.style.cssText='display:flex;gap:12px;flex-wrap:wrap;margin:12px 0';
     const goals=mk('div'),taskBox=mk('div'),heatTitle=mk('h3',t.year),heat=mk('div');heat.style.overflowX='auto';
     [chartTitle,chart,detail,domainView,goals,taskBox,heatTitle,heat].forEach(e=>wrapper.appendChild(e));
-    let current=null,currentSeries=[],heatDays=[],destroyed=false;
+    let current=null,currentSeries=[],heatDays=[],destroyed=false,rangeValid=true;
     function refresh(){
       if(destroyed)return null;
       const snap=provider();const today=opts.today||core.localToday();
-      const report=core.buildReport(snap,{today,startDate:start.value,endDate:end.value,domain:domain.value,goals:opts.goals});
-      current=report;kpis.replaceChildren();
+      let report;
+      try{report=core.buildReport(snap,{today,startDate:start.value,endDate:end.value,domain:domain.value,goals:opts.goals});}
+      catch(error){if(!(error instanceof RangeError))throw error;
+        rangeValid=false;feedback.textContent=t.invalidDates;return current;}
+      rangeValid=true;feedback.textContent='';current=report;kpis.replaceChildren();
       for(const [name,value] of [[t.minutes,report.totals.minutes],[t.sessions,report.totals.sessions],
         [t.average,report.totals.averageMinutes===null?'—':report.totals.averageMinutes],
         [t.streak,report.streaks.current]]){
@@ -112,6 +117,7 @@
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
     [domain,grouping,start,end].forEach(el=>el.addEventListener('change',refresh));
     exportBtn.addEventListener('click',()=>{
+      if(!rangeValid||!current){feedback.textContent=t.invalidDates;return;}
       const value=core.toCSV(current,'sessions');
       if(typeof opts.onExport==='function'){opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');return;}
       if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL)return;
