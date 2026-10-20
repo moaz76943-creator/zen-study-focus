@@ -120,7 +120,12 @@ async function main(){
     }
     console.log(JSON.stringify({probe:'ANDROID_ANALYTICS_LOCALIZED_UI',cases:analytics.length,results:analytics}));
 
-    fs.writeFileSync(process.argv[2]||'qa-webview-result.json',JSON.stringify({status:'PASS',...state},null,2));
+    const numerals=await retry("(() => {\n const panels=['sec-timer','sec-calendar','sec-tasks','sec-notes','sec-analytics'];\n const samples=[];\n for(const id of panels){\n  const parent=document.getElementById(id);\n  if(!parent)throw Error('missing app screen '+id);\n  const counter=document.createElement('span');\n  counter.setAttribute('data-df-latin-numerals','');\n  counter.textContent='١٢ • ۱۲ • १२ • ১২';\n  parent.appendChild(counter);samples.push(counter);\n }\n const user=document.createElement('span');user.setAttribute('data-df-user-content','');\n user.textContent='عنوان المستخدم ١٢';document.body.appendChild(user);\n const n=DeepFocusAsciiNumeralsV21.normalizeGeneratedUi(document);\n const values=samples.map(e=>e.textContent);\n const original=user.textContent;\n samples.forEach(e=>e.remove());user.remove();\n return {count:n,values,original};\n})()",'five-screen-western-digits');
+    assert.equal(numerals.values.length,5);
+    assert.ok(numerals.values.every(t=>t==='12 • 12 • 12 • 12'),'Generated digits must be 0–9 in every sampled screen');
+    assert.equal(numerals.original,'عنوان المستخدم ١٢','User-authored text must be untouched');
+    console.log(JSON.stringify({probe:'ANDROID_FIVE_SCREEN_WESTERN_DIGITS',...numerals}));
+    fs.writeFileSync(process.argv[2]||'qa-webview-result.json',JSON.stringify({status:'PASS',...state,numerals,analytics},null,2));
   }finally{ws.close();}
 }
 main().catch(err=>{console.error('QA_WEBVIEW_STARTUP_FAIL:',String(err));process.exitCode=1;});
