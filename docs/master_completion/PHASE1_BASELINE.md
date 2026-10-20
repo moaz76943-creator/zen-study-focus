@@ -126,3 +126,11 @@ RED: five fault/no-op tests all failed on aee1eac. FIX: build a detached daily c
 GREEN: six focused tests (including all20 warnings) pass. Real Chromium full completion suite now27 PASS: one cfg-mirror write fails mid-transaction, all original storage bytes are restored, date/counters remain unchanged, navigation succeeds and the next tab retries successfully. Synthetic fixture only; no owner data or hardware durability claim. Actual Android verification for this new code remains pending.
 
 Commands: `node --test tests/integration_recovery/daily_rollover_durability.test.cjs`; adjacent missing-module/journal tests; `node tests/validate_locales.cjs`; `node tests/smoke_app.cjs`; `DF_COMPLETION_URL=http://127.0.0.1:8772 node tests/df4_browser/completion.cjs`.
+
+## Continuation — Android coverage and binary identity
+
+Extend the existing ADB/CDP runner rather than create another: real native-prompt subtask/checklist creation and toggles followed by process restart; long Unicode title/body save, reader and exact editor reopen; actual landscape/portrait while a timer runs and a draft is unsaved. Existing Tasks case now checks Undo after actual tab return. Existing storage-failure case also injects one rollover mirror failure then verifies retry.
+
+All new Android cases are **NOT_TESTED until the new exact-head emulator run completes**. Native prompt confirmation geometry has a negative test and rejects a button without a real editable prompt. Node harness tests27 PASS; neither those tests nor syntax checking establish Android operation. Unimplemented accessibility, TalkBack, full native export and scroll scenarios remain visible.
+
+The existing run script now copies the very APK installed by ADB into its uploaded evidence, hashes that copy, and records actual WebView, API and installed-package metadata. This resolves the earlier limitation that downloadable APK and emulator-tested APK came from separate jobs. Main package/signing/permissions, source app data, media gates and strict non-PASS Android exit remain unchanged.

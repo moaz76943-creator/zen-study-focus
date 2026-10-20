@@ -26,4 +26,16 @@ function cssPointToAndroid(point,box) {
     throw new Error('TRANSPORT: Translated touch lies outside actual WebView');
   return {x:px,y:py};
 }
-module.exports={parseWebViewBounds,cssPointToAndroid};
+function parseNativePromptButton(xml) {
+  const nodes=String(xml||'').match(/<node\b[^>]*>/g)||[];
+  if(!nodes.some(n=>/\bclass="android\.widget\.EditText"/.test(n)))
+    throw new Error('TRANSPORT: Editable native prompt is not exposed');
+  const button=nodes.find(n=>/\bresource-id="android:id\/button1"/.test(n));
+  const m=button&&/\bbounds="\[([0-9]+),([0-9]+)\]\[([0-9]+),([0-9]+)\]"/.exec(button);
+  if(!m)throw new Error('TRANSPORT: Native prompt confirmation button unavailable');
+  const [left,top,right,bottom]=m.slice(1).map(Number);
+  if(![left,top,right,bottom].every(Number.isSafeInteger)||right<=left||bottom<=top)
+    throw new Error('TRANSPORT: Invalid native prompt confirmation bounds');
+  return {x:Math.round((left+right)/2),y:Math.round((top+bottom)/2)};
+}
+module.exports={parseWebViewBounds,cssPointToAndroid,parseNativePromptButton};

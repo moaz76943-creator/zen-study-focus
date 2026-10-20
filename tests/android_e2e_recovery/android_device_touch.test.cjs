@@ -23,3 +23,10 @@ test('invalid device points never become trusted touches',()=>{
                     {x:NaN,y:5,viewportWidth:412,viewportHeight:843}])
     assert.throws(()=>cssPointToAndroid(bad,box),/TRANSPORT:/);
 });
+test('native prompt confirmation requires a real editable dialog and positive button bounds',()=>{
+ const {parseNativePromptButton}=require('./android_device_touch.cjs');
+ const prompt='<hierarchy><node class="android.widget.EditText" bounds="[10,10][900,100]"/><node resource-id="android:id/button1" bounds="[600,110][900,180]"/></hierarchy>';
+ assert.deepEqual(parseNativePromptButton(prompt),{x:750,y:145});
+ assert.throws(()=>parseNativePromptButton('<node resource-id="android:id/button1" bounds="[0,0][100,100]"/>'),/TRANSPORT:/);
+ assert.throws(()=>parseNativePromptButton(prompt.replace('[600,110][900,180]','[600,110][600,180]')),/TRANSPORT:/);
+});

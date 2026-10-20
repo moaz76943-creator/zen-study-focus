@@ -1341,7 +1341,8 @@
         "android/app/src/main/java/com/zenstudy/focus/NativeDocumentWriter.java"
       ],
       "COMMIT_SHA": [
-        "9f50acf516600a644b4c918053dfd2edf3d61e51"
+        "9f50acf516600a644b4c918053dfd2edf3d61e51",
+        "20b56815143174e4d769abf30199fc8d6af9e609"
       ],
       "TEST_COMMAND": [
         "node --test tests/integration_recovery/clipboard_ack.test.cjs tests/ascii_numerals/duration_units.test.cjs; java -cp /workspace/scratch/completion-evidence/native-unit com.zenstudy.focus.NativeDocumentWriterTest"
@@ -1350,11 +1351,20 @@
       "TEST_SCOPE": "Only the named source/desktop regression scope; not full task acceptance",
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
-        "docs/master_completion/BATCH_06_EXPORT_AND_UNITS.md"
+        "docs/master_completion/BATCH_06_EXPORT_AND_UNITS.md",
+        "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Enforce ASCII digits 0-9 for ALL rendered counters regardless of UI language (Arabic, Persian, Urdu included).",
-      "OWNER_ROLE": "Localization and accessibility engineer"
+      "OWNER_ROLE": "Localization and accessibility engineer",
+      "ROLLOVER_EVIDENCE": {
+        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
+        "source_result": "PASS",
+        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
+        "android_result": "NOT_TESTED",
+        "device_result": "DEVICE_NOT_TESTED"
+      }
     },
     {
       "TASK_ID": "DF-061",
@@ -1698,7 +1708,8 @@
         "ff7d7d43f874d2bdde9cfee09cece4f7d3827933",
         "9f50acf516600a644b4c918053dfd2edf3d61e51",
         "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
-        "824d87a0f801361761b14921f59571fbb590e4df"
+        "824d87a0f801361761b14921f59571fbb590e4df",
+        "20b56815143174e4d769abf30199fc8d6af9e609"
       ],
       "TEST_COMMAND": [
         "node --test tests/notes_recovery/draft_guard.test.cjs tests/notes_ui/drafts.test.cjs",
@@ -1729,6 +1740,14 @@
         "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df",
         "browser_result": "PASS",
         "browser_scope": "26 Chromium checks including actual task Undo after 10 tab returns and actual journal-quota failure retaining form"
+      },
+      "ROLLOVER_EVIDENCE": {
+        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
+        "source_result": "PASS",
+        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
+        "android_result": "NOT_TESTED",
+        "device_result": "DEVICE_NOT_TESTED"
       }
     },
     {
@@ -2279,18 +2298,31 @@
       "ORIGINAL_MATRIX_STATUS": "IN_PROGRESS",
       "PREVIOUS_STATUS": "IN_PROGRESS",
       "CURRENT_STATUS": "IN_PROGRESS",
-      "FILES_CHANGED": [],
-      "COMMIT_SHA": [],
+      "FILES_CHANGED": [
+        "android/app/src/main/assets/web/app.js"
+      ],
+      "COMMIT_SHA": [
+        "20b56815143174e4d769abf30199fc8d6af9e609"
+      ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
       "TEST_SCOPE": "No new complete task-specific acceptance attestation",
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
-        "docs/master_completion/BATCH_09_NOTE_RELATIONS.md"
+        "docs/master_completion/BATCH_09_NOTE_RELATIONS.md",
+        "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Extract checklist tasks with confirmation, stable extraction key and dedupe.",
-      "OWNER_ROLE": "Notes / data-integrity engineer"
+      "OWNER_ROLE": "Notes / data-integrity engineer",
+      "ROLLOVER_EVIDENCE": {
+        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
+        "source_result": "PASS",
+        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
+        "android_result": "NOT_TESTED",
+        "device_result": "DEVICE_NOT_TESTED"
+      }
     },
     {
       "TASK_ID": "DF-099",
@@ -2322,10 +2354,12 @@
       "PREVIOUS_STATUS": "SOURCE_TESTED_PARTIAL",
       "CURRENT_STATUS": "IN_PROGRESS",
       "FILES_CHANGED": [
-        "android/app/src/main/assets/web/notes_studio.js"
+        "android/app/src/main/assets/web/notes_studio.js",
+        "android/app/src/main/assets/web/app.js"
       ],
       "COMMIT_SHA": [
-        "ff7d7d43f874d2bdde9cfee09cece4f7d3827933"
+        "ff7d7d43f874d2bdde9cfee09cece4f7d3827933",
+        "20b56815143174e4d769abf30199fc8d6af9e609"
       ],
       "TEST_COMMAND": [
         "node --test tests/integration_recovery/notes_fallback_durability.test.cjs"
@@ -2335,11 +2369,20 @@
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
         "docs/master_completion/BATCH_09_NOTE_RELATIONS.md",
-        "docs/master_completion/BATCH_03_NOTES.md"
+        "docs/master_completion/BATCH_03_NOTES.md",
+        "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Preserve all old note content and unknown fields; sanitize note Markdown and disallow JS URLs/XSS.",
-      "OWNER_ROLE": "Notes / data-integrity engineer"
+      "OWNER_ROLE": "Notes / data-integrity engineer",
+      "ROLLOVER_EVIDENCE": {
+        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
+        "source_result": "PASS",
+        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
+        "android_result": "NOT_TESTED",
+        "device_result": "DEVICE_NOT_TESTED"
+      }
     },
     {
       "TASK_ID": "DF-101",
@@ -2799,11 +2842,13 @@
       "CURRENT_STATUS": "BLOCKED",
       "FILES_CHANGED": [
         "android/app/src/main/assets/web/tasks_studio.js",
-        "tests/df4_browser/completion.cjs"
+        "tests/df4_browser/completion.cjs",
+        "android/app/src/main/assets/web/app.js"
       ],
       "COMMIT_SHA": [
         "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
-        "824d87a0f801361761b14921f59571fbb590e4df"
+        "824d87a0f801361761b14921f59571fbb590e4df",
+        "20b56815143174e4d769abf30199fc8d6af9e609"
       ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
@@ -2828,6 +2873,14 @@
         "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df",
         "browser_result": "PASS",
         "browser_scope": "26 Chromium checks including actual task Undo after 10 tab returns and actual journal-quota failure retaining form"
+      },
+      "ROLLOVER_EVIDENCE": {
+        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
+        "source_result": "PASS",
+        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
+        "android_result": "NOT_TESTED",
+        "device_result": "DEVICE_NOT_TESTED"
       }
     },
     {
@@ -2876,7 +2929,8 @@
       ],
       "COMMIT_SHA": [
         "d7fdc96c8eb94e6f640d0035250161057d218d6b",
-        "99a1092e90a0b6643a107a81d90c9a824ea127af"
+        "99a1092e90a0b6643a107a81d90c9a824ea127af",
+        "20b56815143174e4d769abf30199fc8d6af9e609"
       ],
       "TEST_COMMAND": [
         "node --test tests/integration_recovery/timer_credit_durability.test.cjs tests/integration_recovery/restore_journal.test.cjs",
@@ -2887,11 +2941,20 @@
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
         "docs/master_completion/BATCH_07_ANALYTICS.md",
-        "docs/master_completion/BATCH_02_TIMER.md"
+        "docs/master_completion/BATCH_02_TIMER.md",
+        "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Original complete acceptance has not been executed task-by-task on the final Android build.",
       "NEXT_ACTION": "Execute the original requirement on the exact final debug APK with disposable fixtures; retain observations and failure/recovery evidence: Ensure one canonical analytics source, dedupe by unique valid session ID, report conflicting duplicates.",
-      "OWNER_ROLE": "Analytics / data-integrity engineer"
+      "OWNER_ROLE": "Analytics / data-integrity engineer",
+      "ROLLOVER_EVIDENCE": {
+        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
+        "source_result": "PASS",
+        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
+        "android_result": "NOT_TESTED",
+        "device_result": "DEVICE_NOT_TESTED"
+      }
     },
     {
       "TASK_ID": "DF-123",
@@ -4188,10 +4251,12 @@
       "PREVIOUS_STATUS": "NOT_RECORDED_AS_A_FORMAL_DF4_STATUS",
       "CURRENT_STATUS": "IN_PROGRESS",
       "FILES_CHANGED": [
-        "android/app/src/main/assets/web/analytics_recovery_core.js"
+        "android/app/src/main/assets/web/analytics_recovery_core.js",
+        "android/app/src/main/assets/web/app.js"
       ],
       "COMMIT_SHA": [
-        "99a1092e90a0b6643a107a81d90c9a824ea127af"
+        "99a1092e90a0b6643a107a81d90c9a824ea127af",
+        "20b56815143174e4d769abf30199fc8d6af9e609"
       ],
       "TEST_COMMAND": [
         "node --test tests/analytics_recovery/*.test.cjs"
@@ -4200,11 +4265,20 @@
       "TEST_SCOPE": "Only named source/desktop/JVM subset, never complete Android acceptance",
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
-        "docs/master_completion/BATCH_07_ANALYTICS.md"
+        "docs/master_completion/BATCH_07_ANALYTICS.md",
+        "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Verify every locale/path uses accepted real focus records; inspect conflicting IDs and actual task attribution without rewriting history.",
       "NEXT_ACTION": "Verify every locale/path uses accepted real focus records; inspect conflicting IDs and actual task attribution without rewriting history.",
-      "OWNER_ROLE": "Analytics engineer"
+      "OWNER_ROLE": "Analytics engineer",
+      "ROLLOVER_EVIDENCE": {
+        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
+        "source_result": "PASS",
+        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
+        "android_result": "NOT_TESTED",
+        "device_result": "DEVICE_NOT_TESTED"
+      }
     },
     {
       "TASK_ID": "DF4-019",
@@ -4275,18 +4349,31 @@
       "TITLE": "Calendar",
       "PREVIOUS_STATUS": "NOT_RECORDED_AS_A_FORMAL_DF4_STATUS",
       "CURRENT_STATUS": "IN_PROGRESS",
-      "FILES_CHANGED": [],
-      "COMMIT_SHA": [],
+      "FILES_CHANGED": [
+        "android/app/src/main/assets/web/app.js"
+      ],
+      "COMMIT_SHA": [
+        "20b56815143174e4d769abf30199fc8d6af9e609"
+      ],
       "TEST_COMMAND": [],
       "TEST_RESULT": "NOT_TESTED",
       "TEST_SCOPE": "Only named source/desktop/JVM subset, never complete Android acceptance",
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
-        "docs/master_completion/BATCH_00.md"
+        "docs/master_completion/BATCH_00.md",
+        "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Run local dates, DST/midnight, rescheduling and linked records; desktop layout/keyboard is scoped evidence.",
       "NEXT_ACTION": "Run local dates, DST/midnight, rescheduling and linked records; desktop layout/keyboard is scoped evidence.",
-      "OWNER_ROLE": "Calendar/localization engineer"
+      "OWNER_ROLE": "Calendar/localization engineer",
+      "ROLLOVER_EVIDENCE": {
+        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
+        "source_result": "PASS",
+        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
+        "android_result": "NOT_TESTED",
+        "device_result": "DEVICE_NOT_TESTED"
+      }
     },
     {
       "TASK_ID": "DF4-023",
@@ -4377,10 +4464,12 @@
       "PREVIOUS_STATUS": "NOT_RECORDED_AS_A_FORMAL_DF4_STATUS",
       "CURRENT_STATUS": "IN_PROGRESS",
       "FILES_CHANGED": [
-        "android/app/src/main/assets/web/notes_drafts.js"
+        "android/app/src/main/assets/web/notes_drafts.js",
+        "android/app/src/main/assets/web/app.js"
       ],
       "COMMIT_SHA": [
-        "0b12c8ced88a53c7668ded4db7d1400f8cbca2b4"
+        "0b12c8ced88a53c7668ded4db7d1400f8cbca2b4",
+        "20b56815143174e4d769abf30199fc8d6af9e609"
       ],
       "TEST_COMMAND": [
         "node --test tests/notes_recovery/draft_guard.test.cjs"
@@ -4389,11 +4478,20 @@
       "TEST_SCOPE": "Only named source/desktop/JVM subset, never complete Android acceptance",
       "ANDROID_RESULT": "NOT_TESTED",
       "EVIDENCE": [
-        "docs/master_completion/BATCH_01_DRAFTS.md"
+        "docs/master_completion/BATCH_01_DRAFTS.md",
+        "docs/master_completion/PHASE1_BASELINE.md"
       ],
       "BLOCKER": "Complete interrupted journal/rollback/quota/import/corrupt copy/restart acceptance using isolated synthetic data.",
       "NEXT_ACTION": "Complete interrupted journal/rollback/quota/import/corrupt copy/restart acceptance using isolated synthetic data.",
-      "OWNER_ROLE": "Data-integrity engineer"
+      "OWNER_ROLE": "Data-integrity engineer",
+      "ROLLOVER_EVIDENCE": {
+        "base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+        "code_sha": "20b56815143174e4d769abf30199fc8d6af9e609",
+        "source_result": "PASS",
+        "scope": "6 focused tests; 27 Chromium completion checks including real six-packet mirror rollback and safe retry/navigation",
+        "android_result": "NOT_TESTED",
+        "device_result": "DEVICE_NOT_TESTED"
+      }
     },
     {
       "TASK_ID": "DF4-028",
@@ -4625,6 +4723,8 @@
     "task_code_commit": "e4b2ac4857d976800cae24b9496ec0a9d97b07fc",
     "android_harness_commit": "4a688d58ed8e83977150cf8ad7e590bc4baf4868",
     "note": "Earlier 79d175c APK is intentionally superseded after real browser task Undo exposed top-level snapshot key-order mismatch. New exact-head CI/Android required; historical successes do not approve this code.",
-    "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df"
+    "key_order_fix_commit": "824d87a0f801361761b14921f59571fbb590e4df",
+    "continuation_base_sha": "aee1eacb96d383613ef38e5318186b60639aaf02",
+    "rollover_commit": "20b56815143174e4d769abf30199fc8d6af9e609"
   }
 }

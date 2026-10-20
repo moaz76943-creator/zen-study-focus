@@ -10,3 +10,10 @@ test('WebView debugging is enabled ONLY for explicitly debuggable APKs',()=>{
   assert.doesNotMatch(src,/WebView\.setWebContentsDebuggingEnabled\(true\)/);
   assert.doesNotMatch(src,/WebView\.setWebContentsDebuggingEnabled\(false\)/);
 });
+test('evidence contains the same APK passed to adb install plus actual platform metadata',()=>{
+ const script=fs.readFileSync(path.resolve(__dirname,'run_cdp_ci.sh'),'utf8');
+ assert.match(script,/cp android\/app\/build\/outputs\/apk\/debug\/app-debug\.apk "\$report\/tested-app-debug\.apk"/);
+ assert.match(script,/sha256sum "\$report\/tested-app-debug\.apk"/);
+ assert.match(script,/adb install "\$report\/tested-app-debug\.apk"/);
+ assert.match(script,/dumpsys webviewupdate/);assert.match(script,/getprop ro\.build\.version\.sdk/);
+});
