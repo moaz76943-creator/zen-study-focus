@@ -27,7 +27,13 @@ adb forward tcp:9222 "localabstract:webview_devtools_remote_${pid}"
 set +e
 node tests/android_e2e_recovery/cdp_dom_smoke.cjs "$report/results.json"
 cdp_status=$?
-DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/cdp_actions.cjs "$report/dom-actions.json"
+# PR #76 already ran the full 20-case UI suite; this new branch is a bounded
+# durability-only rerun. The 19 unexecuted UI cases stay explicitly NOT_TESTED.
+if [[ "${GITHUB_REF_NAME:-}" == "test/track07-00-durability-evidence-20261020" ]]; then
+  DF_ANDROID_CASES=preflight DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/cdp_actions.cjs "$report/dom-actions.json"
+else
+  DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/cdp_actions.cjs "$report/dom-actions.json"
+fi
 action_status=$?
 durability_status=0
 if [[ "${GITHUB_REF_NAME:-}" == "test/track07-00-durability-evidence-20261020" ]]; then
