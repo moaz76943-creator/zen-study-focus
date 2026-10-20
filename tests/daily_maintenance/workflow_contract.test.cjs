@@ -20,6 +20,6 @@ test('nightly repairs never publish; weekly job assembles Debug only',()=>{
 test('nightly QA requires source SHA evidence and preserves blocked release gates',()=>{
  assert.match(workflow,/git -C source rev-parse HEAD/);
  assert.match(workflow,/media_provenance_gate\.test\.cjs/);
- assert.match(workflow,/MEDIA_GATE_BLOCKED/);
+ assert.match(workflow,/MEDIA_RELEASE_GATE_BLOCKED/);
  assert.match(workflow,/RELEASE NOT APPROVED/);
 });
