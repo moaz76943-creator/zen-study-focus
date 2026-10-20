@@ -17,9 +17,11 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 public class FocusTimerService extends Service {
+    private static final String TAG = "FocusTimerService";
     public static final String CHANNEL_ONGOING = "zen_ongoing_timer_channel";
     public static final String CHANNEL_ALARM = "zen_completion_alarm_channel";
     private CountDownTimer countDownTimer;
@@ -122,10 +124,10 @@ public class FocusTimerService extends Service {
             if (ringtone != null) {
                 ringtone.play();
                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                    try { if (ringtone.isPlaying()) ringtone.stop(); } catch (Exception ignored) {}
+                    try { if (ringtone.isPlaying()) ringtone.stop(); } catch (Exception e) { Log.e(TAG, "Error stopping ringtone", e); }
                 }, 4500);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) { Log.e(TAG, "Error playing ringtone", e); }
 
         try {
             Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -137,7 +139,7 @@ public class FocusTimerService extends Service {
                     v.vibrate(pattern, -1);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) { Log.e(TAG, "Error playing vibration", e); }
 
         Intent openIntent = new Intent(this, MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(
