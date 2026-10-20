@@ -52,3 +52,27 @@ test('v35 makes mobile quick links and provenance panel available in dashboard s
  assert.match(css,/min-height:44px/);
  assert.doesNotMatch(ui,/Authorization\s*:|github_pat_|ghp_/i);
 });
+
+test('v35 exports a bounded read-only handoff with exact SHAs and no invented Android approval',()=>{
+ const model=core.buildRepoHealth({
+  pulls:[pr(37,B,A),pr(70,C,A),pr(72,D,B)],
+  runs:[run(41,C,'Android emulator validation','failure')],
+  timestamp:'2026-10-20T12:00:00Z'
+ });
+ const report=core.formatHealthReport(model);
+ assert.match(report,/PR #70.*cccccccccccccccccccccccccccccccccccccccc/);
+ assert.match(report,/Android Workflow: FAIL/);
+ assert.match(report,/NOT_APPROVED/);
+ assert.match(report,/SNAPSHOT/);
+ assert.match(report,/NOT_TESTED/);
+ assert.ok(report.length<10000);
+ assert.doesNotMatch(report,/Authorization|ghp_|github_pat_/i);
+});
+test('v35 source exposes an accessible copy action without privileged GitHub operation',()=>{
+ const html=fs.readFileSync(path.join(__dirname,'../../docs/control-center/index.html'),'utf8');
+ const ui=fs.readFileSync(path.join(__dirname,'../../docs/control-center/repo-sync-ui.js'),'utf8');
+ assert.match(html,/id="repo-sync-copy"/);
+ assert.match(ui,/formatHealthReport/);
+ assert.match(ui,/navigator\.clipboard/);
+ assert.doesNotMatch(ui,/fetch\s*\([^)]*POST/i);
+});
