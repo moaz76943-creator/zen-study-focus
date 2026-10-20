@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "agents": [
+    {
+      "id": "localization",
+      "lane": "locale",
+      "purpose": "20-locale key parity, RTL and language switching",
+      "test_dirs": [
+        "tests/localization_20",
+        "tests/language_review"
+      ]
+    },
+    {
+      "id": "numerals",
+      "lane": "numerals",
+      "purpose": "0-9 digits in generated numeric UI without editing personal data",
+      "test_dirs": [
+        "tests/ascii_numerals"
+      ]
+    },
+    {
+      "id": "navigation",
+      "lane": "ui",
+      "purpose": "Buttons, touch navigation and view-state behavior",
+      "test_dirs": [
+        "tests/interaction_recovery"
+      ]
+    },
+    {
+      "id": "notes",
+      "lane": "notes",
+      "purpose": "Notes preservation, editor and draft recovery",
+      "test_dirs": [
+        "tests/notes_core",
+        "tests/notes_recovery"
+      ]
+    },
+    {
+      "id": "tasks",
+      "lane": "tasks",
+      "purpose": "Task CRUD, restoration, and timers linked to tasks",
+      "test_dirs": [
+        "tests/tasks_core",
+        "tests/tasks_recovery"
+      ]
+    },
+    {
+      "id": "analytics",
+      "lane": "analytics",
+      "purpose": "Real metrics, charts, labels and navigation",
+      "test_dirs": [
+        "tests/analytics_core",
+        "tests/analytics_recovery"
+      ]
+    },
+    {
+      "id": "timer",
+      "lane": "timer",
+      "purpose": "Focus timer, interval boundaries and completion lifecycle",
+      "test_dirs": [
+        "tests/focus_workflows",
+        "tests/timer_native_bridge"
+      ]
+    },
+    {
+      "id": "nature_audio",
+      "lane": "audio",
+      "purpose": "Real media loading, mixing and completion alerts",
+      "test_dirs": [
+        "tests/nature_audio_recovery",
+        "tests/completion_alerts"
+      ]
+    },
+    {
+      "id": "privacy_security",
+      "lane": "security",
+      "purpose": "WebView input handling and local data safety",
+      "test_dirs": [
+        "tests/security_recovery"
+      ]
+    },
+    {
+      "id": "data_integrity",
+      "lane": "data",
+      "purpose": "v21 data compatibility, export/import and no migrations",
+      "test_dirs": [
+        "tests/data_contracts",
+        "tests/regression_v21"
+      ]
+    },
+    {
+      "id": "performance",
+      "lane": "performance",
+      "purpose": "Large-data, offline behavior and memory safety checks",
+      "test_dirs": [
+        "tests/performance_recovery"
+      ]
+    },
+    {
+      "id": "product_consistency",
+      "lane": "qa",
+      "purpose": "Visual layout, UI consistency and recovery regression",
+      "test_dirs": [
+        "tests/design_quality",
+        "tests/white_premium_qa",
+        "tests/master_completion"
+      ]
+    }
+  ]
+}
