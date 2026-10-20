@@ -24,7 +24,7 @@ function harness(fail72=false){
   async click(){for(const handler of this.listeners.click||[])await handler({target:this});}
  }
  for(const id of ['repo-sync','repo-sync-refresh','repo-sync-status','repo-sync-cards',
-   'repo-sync-drift','repo-sync-workflows','overview','tasks','studio','reports']){
+   'repo-sync-drift','repo-sync-workflows','repo-sync-copy','overview','tasks','studio','reports']){
   const el=new Element();el.id=id;all.set(id,el);
  }
  const document={
@@ -32,7 +32,7 @@ function harness(fail72=false){
   getElementById:id=>all.get(id)||null,
   createElement:tag=>new Element(tag)
  };
- const requests=[];
+ const requests=[],copied=[];
  const pulls={25:pr(25,A,D),37:pr(37,B,A),70:pr(70,C,A),72:pr(72,D,B)};
  const browserFetch=async(url,opts)=>{
   requests.push({url,opts});
@@ -43,10 +43,11 @@ function harness(fail72=false){
      status:'completed',conclusion:'failure',html_url:repo+'actions/runs/888'}]}};
  };
  const ctx={document,window:{addEventListener(){}},location:{hash:'#repo-sync'},
+  navigator:{clipboard:{writeText:async value=>{copied.push(value);}}},
   globalThis:{DeepFocusRepoSyncCore:core},fetch:browserFetch,
   AbortController,setTimeout,clearTimeout,URL,Date};
  vm.runInNewContext(script,ctx,{timeout:3000});
- return {element:id=>all.get(id),requests,document};
+ return {element:id=>all.get(id),requests,document,copied};
 }
 const walk=el=>!el?'':el.textContent+' '+(el.children||[]).map(walk).join(' ');
 const settle=()=>new Promise(resolve=>setTimeout(resolve,20));
@@ -65,6 +66,11 @@ test('v35 DOM renders four authentic PR cards, Android workflow evidence and pho
  assert.ok(h.requests.some(r=>r.url.includes('/pulls/72')));
  assert.ok(h.requests.every(r=>r.opts.credentials==='omit'&&!r.opts.headers.Authorization));
  assert.equal(h.element('repo-sync-refresh').disabled,false);
+ await h.element('repo-sync-copy').click();
+ assert.equal(h.copied.length,1);
+ assert.match(h.copied[0],/PR #70:/);
+ assert.match(h.copied[0],/Android Workflow: FAIL/);
+ assert.match(h.copied[0],/NOT_APPROVED/);
 });
 test('v35 DOM displays partial sources, not fake green, when PR72 is rate-limited',async()=>{
  const h=harness(true);
