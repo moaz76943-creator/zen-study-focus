@@ -12,7 +12,7 @@ import urllib.request
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "tools/nature_audio/commons_intake.json"
 OUT = ROOT / "audio_candidates/commons_intake"  # CI artifact only, never APK assets
-SAFE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 _()'-]*\\.ogg$")
+SAFE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 _()\'-]*\.ogg$")
 SHA1 = re.compile(r"^[a-f0-9]{40}$")
 
 class RestrictedRedirect(urllib.request.HTTPRedirectHandler):
