@@ -6,6 +6,9 @@ const SHA=/^[a-f0-9]{40}$/i;
 const ID=/^[a-z][a-z0-9_-]{1,39}$/;
 const DIR=/^tests\/[a-z][a-z0-9_-]*(?:\/[a-z][a-z0-9_-]*)*$/;
 const LANES=new Set(['all','ui','audio','locale','numerals','analytics','data','qa','performance','notes','tasks','security','timer']);
+// The real-media legal release gate runs separately and MUST remain BLOCKED until licensed.
+// Only this exact test is excluded from source-pass cohorts; do not use wildcards.
+const SEPARATE_RELEASE_TEST='tests/master_recovery_qa/media_provenance_gate.test.cjs';
 function validateManifest(manifest){
  if(!manifest||manifest.schema_version!==1)throw Error('Unsupported agent manifest schema');
  if(!Array.isArray(manifest.agents)||manifest.agents.length===0||manifest.agents.length>30)throw Error('Invalid agents');
@@ -20,14 +23,15 @@ function validateManifest(manifest){
  }
  return manifest.agents;
 }
-function discoverTests(root,dirs){
+function discoverTests(root,dirs,{inventory=false}={}){
  const rootTests=path.resolve(root,'tests');
  const found=new Set();
  function scan(current){
   const st=fs.lstatSync(current);
   if(st.isSymbolicLink())throw Error('Unsafe symlink in QA suite: '+current);
   if(st.isFile()){
-   if(/\.test\.cjs$/.test(current))found.add(path.relative(root,current).split(path.sep).join('/'));
+   const rel=path.relative(root,current).split(path.sep).join('/');
+   if(/\.test\.cjs$/.test(current)&&rel!==SEPARATE_RELEASE_TEST)found.add(rel);
    return;
   }
   if(!st.isDirectory())return;
@@ -38,9 +42,10 @@ function discoverTests(root,dirs){
   }
  }
  for(const dir of dirs){
-  if(!DIR.test(dir))throw Error('Unsafe test_dirs: '+dir);
+  if(!DIR.test(dir)&&!(inventory&&dir==='tests'))throw Error('Unsafe test_dirs: '+dir);
   const resolved=path.resolve(root,dir);
-  if(!resolved.startsWith(rootTests+path.sep))throw Error('Unsafe test_dirs outside tests: '+dir);
+  if(resolved!==rootTests&&!resolved.startsWith(rootTests+path.sep))
+   throw Error('Unsafe test_dirs outside tests: '+dir);
   if(!fs.existsSync(resolved))continue;
   scan(resolved);
  }
@@ -60,6 +65,20 @@ function readLocaleAudit(output){
   return result;
  }catch(e){return {status:'NOT_TESTED',reason:'Unable to parse locale report: '+String(e.message).slice(0,140)};}
 }
+function parseNodeTap(output){
+ const data=String(output||'');
+ if(!/^TAP version [0-9]+/m.test(data))return null;
+ const summary={};
+ for(const line of data.split(/\r?\n/)){
+  const m=/^# (tests|pass|fail|skipped|todo|cancelled) ([0-9]+)$/.exec(line);
+  if(m)summary[m[1]]=Number(m[2]);
+ }
+ for(const key of ['tests','pass','fail','skipped','todo','cancelled'])
+  if(!Number.isSafeInteger(summary[key]))return null;
+ if(summary.pass+summary.fail>summary.tests||summary.skipped+summary.todo>summary.tests)
+  return null;
+ return summary;
+}
 function runAgents(root,manifest,{sourceSha,lane='all',execute=cp.spawnSync}={}){
  if(typeof sourceSha!=='string'||!SHA.test(sourceSha))throw Error('Exact source SHA required');
  if(!LANES.has(lane))throw Error('Unknown QA lane');
@@ -74,7 +93,23 @@ function runAgents(root,manifest,{sourceSha,lane='all',execute=cp.spawnSync}={})
    else {
     const proc=execute(process.execPath,['--test',...tests],
      {cwd:root,encoding:'utf8',shell:false,timeout:120000,maxBuffer:3*1024*1024});
-    if(proc.status===0&&!proc.error){result.status='SOURCE_TESTED';}
+    if(proc.status===0&&!proc.error){
+     const tap=parseNodeTap(proc.stdout);
+     result.cases=tap?.tests??0;
+     result.passed=tap?.pass??0;
+     result.skipped=tap?.skipped??0;
+     result.todo=tap?.todo??0;
+     if(!tap||tap.tests===0||tap.pass===0){
+      result.status='NOT_TESTED';
+      result.reason='No verifiable passing Node TAP test cases';
+     }else if(tap.fail>0||tap.cancelled>0){
+      result.status='BLOCKED';
+      result.reason='Node TAP reported failed or cancelled cases';
+     }else if(tap.skipped>0||tap.todo>0||tap.pass!==tap.tests){
+      result.status='SOURCE_PARTIAL';
+      result.reason='Suite includes skipped, todo or unaccounted test cases';
+     }else result.status='SOURCE_TESTED';
+    }
     else {
      result.status='BLOCKED';
      result.reason=proc.error?.code==='ETIMEDOUT'?'Finite source test timeout':
@@ -84,10 +119,24 @@ function runAgents(root,manifest,{sourceSha,lane='all',execute=cp.spawnSync}={})
   }catch(e){result.status='BLOCKED';result.reason=String(e.message).slice(0,500);}
   rows.push(result);
  }
+ let unmapped=[];
+ if(lane==='all'){
+  try{
+   const all=discoverTests(root,['tests'],{inventory:true});
+   const mapped=new Set(agents.flatMap(a=>discoverTests(root,a.test_dirs)));
+   unmapped=all.filter(file=>!mapped.has(file));
+  }catch(e){
+   rows.push({id:'suite_inventory',lane:'qa',status:'BLOCKED',tests:0,
+    reason:'Cannot inventory tests: '+String(e.message).slice(0,180)});
+  }
+  if(unmapped.length)rows.push({id:'unmapped_tests',lane:'qa',status:'NOT_TESTED',
+   tests:unmapped.length,reason:'Unassigned test files: '+unmapped.slice(0,8).join(', ')});
+ }
  return {schema_version:1,source_sha:sourceSha,verified_at:new Date().toISOString(),scope:'SOURCE_CODE_ONLY',
+  unmapped_tests:unmapped,separate_release_gate:SEPARATE_RELEASE_TEST,
   device_qa:'NOT_TESTED',production_ready:false,autofix:'DISABLED_FOR_APP_SOURCE',lane,agents:rows};
 }
-function hasHardFailure(report){return report.agents.some(a=>a.status==='BLOCKED'||a.status==='NOT_TESTED');}
+function hasHardFailure(report){return report.agents.some(a=>['BLOCKED','NOT_TESTED','SOURCE_PARTIAL'].includes(a.status));}
 function toMarkdown(report,language){
  const lines=['# Deep Focus specialist QA agents','',
   'Exact source SHA: `'+report.source_sha+'`','Selected lane: '+report.lane,
@@ -126,4 +175,4 @@ function main(argv=process.argv.slice(2)){
  if(hasHardFailure(report))process.exitCode=1;
 }
 if(require.main===module){try{main();}catch(e){console.error(e.message);process.exitCode=1;}}
-module.exports={validateManifest,discoverTests,runAgents,readLocaleAudit,hasHardFailure,toMarkdown,main};
+module.exports={validateManifest,discoverTests,parseNodeTap,runAgents,readLocaleAudit,hasHardFailure,toMarkdown,main};
