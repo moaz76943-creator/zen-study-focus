@@ -2,7 +2,7 @@
 // Real disposable Android WebView actions. Does not claim TalkBack, hearing, DND or physical-phone acceptance.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
 const {validateTouchTarget,missingPrerequisites,classifyFailure}=require('./cdp_touch_target.cjs');
-const {parseWebViewBounds,cssPointToAndroid}=require('./android_device_touch.cjs');
+const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton}=require('./android_device_touch.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
 const results=new Map(CASES.map(id=>[id,{id,status:'NOT_TESTED',detail:'Outside this instrumented action scope; requires separate device/manual evidence'}]));
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
@@ -128,6 +128,30 @@ async function main(){
   const card=`[...document.querySelectorAll('.df-task')].find(n=>n.querySelector('.df-title')?.textContent==='Android fixture task')`;
   await touch(`${card}.querySelector('.df-primary-action')`);await check("tasksList.find(t=>t.title==='Android fixture task').done===true",'Complete');
   await touch(`${card}.querySelector('.df-primary-action')`);await check("tasksList.find(t=>t.title==='Android fixture task').done===false",'Reopen');
+  await touch(`${card}.querySelector('.df-primary-action')`);
+  await tap('#navTimer');await tap('#navTasks');await tap('.df-task-tools summary');
+  await touch(button('.df-task-tools','Undo'));
+  await check("tasksList.find(t=>t.title==='Android fixture task').done===false",'Actual Undo survives adapter/core key order and tab return');
+ });
+ await run('task_subtasks',async()=>{
+  if(missingPrerequisites(results,['tasks_create']).length)throw Error('DEPENDENCY_NOT_TESTED: task creation');
+  await tap('#navTasks');
+  await evaluate("(()=>{const s=document.querySelector('.df-view-mode');s.value='all';s.dispatchEvent(new Event('change',{bubbles:true}))})()");
+  const card=`[...document.querySelectorAll('.df-task')].find(n=>n.querySelector('.df-title')?.textContent==='Android fixture task')`;
+  await touch(`${card}.querySelector('.df-expand')`);
+  for(const [label,name,kind] of [['＋ Subtasks','FixtureChild','subtasks'],['＋ Checklist','FixtureCheck','checklist']]){
+    await touch(`[...${card}.querySelectorAll('button')].find(n=>n.textContent===${JSON.stringify(label)})`);
+    // The real native JavaScript prompt is filled through Android, never a prompt stub.
+    adb('shell','input','text',name);
+    adb('shell','uiautomator','dump','/sdcard/deep_focus_prompt.xml');
+    const point=parseNativePromptButton(adb('shell','cat','/sdcard/deep_focus_prompt.xml'));
+    adb('shell','input','tap',String(point.x),String(point.y));await pause(300);
+    await check(`tasksList.find(t=>t.title==='Android fixture task')?.${kind}?.some(x=>x.title===${JSON.stringify(name)}&&!x.done)`,'Native prompt created '+kind);
+    await touch(`[...${card}.querySelectorAll('label.df-check')].find(n=>n.textContent.includes(${JSON.stringify(name)})).querySelector('input')`);
+    await check(`tasksList.find(t=>t.title==='Android fixture task').${kind}.find(x=>x.title===${JSON.stringify(name)}).done===true`,'Actual child checkbox persisted');
+  }
+  await restart();
+  await check("(()=>{const t=tasksList.find(t=>t.title==='Android fixture task');return t&&!t.done&&t.subtasks.some(x=>x.title==='FixtureChild'&&x.done)&&t.checklist.some(x=>x.title==='FixtureCheck'&&x.done)})()",'Process restart preserves both child collections and unchanged parent');
  });
  await run('timer_start_pause',async()=>{
   await tap('#navTimer');await evaluate("selectTimerMode(1,'focus',null)");const count=await evaluate('cfg.sessions');
@@ -142,6 +166,11 @@ async function main(){
   try{await tap('#nsSaveButton');assert.equal(await evaluate('JSON.stringify(notesList)'),old);await check("document.querySelector('#noteModal').classList.contains('open')",'Failed save keeps editor');}
   finally{await evaluate('Storage.prototype.setItem=window.fixtureSetItem;delete window.fixtureSetItem');}
   await tap('#nsSaveButton');await check("notesList.some(n=>n.title==='Quota fixture')",'Retry committed');
+  await evaluate("(()=>{const b=DF22Integration.getSnapshot();DF22Integration.write(b,{...b,cfg:{...b.cfg,metricsDate:'2000-01-01',water:4}});todayISO='2000-01-01';window.rolloverBefore=JSON.stringify({cfg,tasksList,notesList});window.rolloverSet=Storage.prototype.setItem;window.rolloverFail=true;Storage.prototype.setItem=function(k,v){if(k==='zen_fortress_cfg_v21_mirror'&&window.rolloverFail){window.rolloverFail=false;throw new DOMException('Fixture mirror quota','QuotaExceededError');}return window.rolloverSet.call(this,k,v);}})()");
+  try{
+    await tap('#navTimer');await check("JSON.stringify({cfg,tasksList,notesList})===window.rolloverBefore&&todayISO==='2000-01-01'",'Failed rollover cannot publish daily counters/date');
+  }finally{await evaluate('Storage.prototype.setItem=window.rolloverSet;delete window.rolloverSet;delete window.rolloverFail');}
+  await tap('#navNotes');await check('cfg.metricsDate===localDateISO()&&cfg.water===0','Next tab retries durable daily rollover');
  });
  await run('language_live_change',async()=>{
   await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle','Unsaved ٢');await evaluate("applyLanguage('ar')");
@@ -165,6 +194,44 @@ async function main(){
   assert.equal(await evaluate('cfg.sessionHistory.length'),before+1,'One real completed work session');
   await check('cfg.sessionHistory[cfg.sessionHistory.length-1].minutes===1','One real elapsed minute');
   return 'Actual 1-minute work session background/return credit once; notification appearance/hearing/DND remain NOT_TESTED';
+ });
+ await run('orientation_restore',async()=>{
+  const auto=adb('shell','settings','get','system','accelerometer_rotation').trim();
+  const rotation=adb('shell','settings','get','system','user_rotation').trim();
+  const title='Android rotation draft',body='Unsaved rotation العربية ٢';
+  await tap('#navTimer');await evaluate("selectTimerMode(5,'focus',null)");await tap('#mainPlayBtn');
+  const session=await evaluate('timerSessionId'),history=await evaluate('cfg.sessionHistory?.length||0');
+  await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle',title);await fill('#inpNoteBody',body);await dismissNoteKeyboardForSave();
+  const original=await evaluate('({width:innerWidth,height:innerHeight})');
+  try{
+    adb('shell','settings','put','system','accelerometer_rotation','0');
+    for(const value of ['1','0']){
+      adb('shell','settings','put','system','user_rotation',value);
+      let dimensions;
+      for(let n=0;n<20;n++){await pause(200);dimensions=await evaluate('({width:innerWidth,height:innerHeight})');if(value==='1'?dimensions.width>dimensions.height:dimensions.width<dimensions.height)break;}
+      assert.ok(value==='1'?dimensions.width>dimensions.height:dimensions.width<dimensions.height,'Actual viewport orientation changed');
+      await check(`document.querySelector('#inpNoteTitle').value===${JSON.stringify(title)}&&document.querySelector('#inpNoteBody').value===${JSON.stringify(body)}&&timerRunning&&timerSessionId===${JSON.stringify(session)}`,'Rotation retains draft and same running session');
+      await check('document.documentElement.scrollWidth<=innerWidth+1','No horizontal overflow after rotation');
+    }
+    await tap('#nsSaveButton');await check(`notesList.filter(n=>n.title===${JSON.stringify(title)}&&n.body===${JSON.stringify(body)}).length===1`,'One saved note after both rotations');
+    await evaluate('resetTimerNow()');assert.equal(await evaluate('cfg.sessionHistory?.length||0'),history,'Cancelled rotating timer grants no credit');
+    return 'Actual landscape/portrait, unsaved Unicode draft and running timer retained; no duplicate save or focus credit';
+  }finally{
+    if(['0','1','2','3'].includes(rotation))adb('shell','settings','put','system','user_rotation',rotation);
+    if(['0','1'].includes(auto))adb('shell','settings','put','system','accelerometer_rotation',auto);
+  }
+ });
+ await run('long_text',async()=>{
+  const title='Android long '+ 'عنوان ٢ '.repeat(14),body=('Long العربية ٢ Unicode **literal**\n').repeat(180);
+  await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle',title);await fill('#inpNoteBody',body);await dismissNoteKeyboardForSave();await tap('#nsSaveButton');
+  const card=`[...document.querySelectorAll('.nsux-card')].find(n=>n.querySelector('h3')?.textContent===${JSON.stringify(title)})`;
+  await check(`notesList.filter(n=>n.title===${JSON.stringify(title)}&&n.body===${JSON.stringify(body)}).length===1`,'Long Unicode title/body saved without truncation');
+  await touch(`${card}.querySelectorAll('.nsux-actions button')[1]`);
+  await check("document.querySelector('#noteModal').classList.contains('nsux-reading')&&document.querySelector('#nsux-preview').scrollHeight>document.querySelector('#nsux-preview').clientHeight",'Real reader renders long note with scrollable content');
+  adb('shell','input','keyevent','4');await pause(250);
+  await touch(`${card}.querySelector('.nsux-actions button')`);
+  await check(`document.querySelector('#inpNoteTitle').value===${JSON.stringify(title)}&&document.querySelector('#inpNoteBody').value===${JSON.stringify(body)}`,'Reopened editor preserves exact original Markdown and Unicode');
+  await tap('#nsSaveButton');
  });
  await run('data_integrity',async()=>{await evaluate("window.fixtureBackup=generateEncryptedBackupCode();window.fixtureConfirm=window.confirm;window.confirm=()=>true");try{await check('verifyAndRestoreBackupCode(window.fixtureBackup)===true','Real ZEN21 roundtrip');}finally{await evaluate('window.confirm=window.fixtureConfirm;delete window.fixtureBackup;delete window.fixtureConfirm');}});
  await run('process_death_recovery',async()=>{
