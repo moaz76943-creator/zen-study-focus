@@ -329,6 +329,11 @@ html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
 }
 
 
+/* Keep the final Note action card scrollable above the fixed seven-tab bottom bar
+   on small Android WebViews (including RTL and keyboard-dismissed editing). */
+body.df-v22.df-recovery10 #sec-notes #notesStackBox {
+  padding-bottom: calc(106px + env(safe-area-inset-bottom, 0px));
+}
 /* Android Notes viewport fix: pin Save/Cancel while lengthy content scrolls.
    Keep the actual visualViewport keyboard height and all existing data paths. */
 body.df-v22.df-recovery10 #noteModal .ns-editor {
