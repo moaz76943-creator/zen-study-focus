@@ -5,6 +5,7 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const cp=require('node:child_process');
+const crypto=require('node:crypto');
 const SHA=/^[0-9a-f]{40}$/i;
 const UTC=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
 const GOOD='SOURCE_TESTED';
@@ -24,6 +25,7 @@ function runCycle(manifest,{sourceSha,now=new Date().toISOString(),run,coverage}
  if(!SHA.test(sourceSha||''))throw Error('Exact source SHA required');
  if(typeof run!=='function'||typeof coverage!=='function')throw Error('Runner and coverage functions required');
  const plan=planCohort(manifest,now);
+ const manifest_sha256=crypto.createHash('sha256').update(JSON.stringify(manifest)).digest('hex');
  const rows=plan.selected.map(a=>{
   try{
    const r=run(a);
@@ -37,7 +39,7 @@ function runCycle(manifest,{sourceSha,now=new Date().toISOString(),run,coverage}
   throw Error('Untrusted or incomplete coverage inventory');
  const blockers=rows.filter(x=>x.status!==GOOD);
  const status=blockers.length?'BLOCKED':gaps.unmapped.length||gaps.duplicates.length?'COVERAGE_GAP':'COHORT_PASS';
- return {schema_version:1,source_sha:sourceSha,checked_at:now,scope:'SOURCE_ONLY',status,
+ return {schema_version:1,source_sha:sourceSha,manifest_sha256,agent_ids:manifest.agents.map(a=>a.id),checked_at:now,scope:'SOURCE_ONLY',status,
   cohort:plan.slot+1,cohorts:plan.rounds,selected_agents:rows.length,total_agents:plan.agent_total,
   agents:rows,coverage:gaps,android_e2e:'NOT_TESTED',audio_provenance:'NOT_APPROVED',release_approved:false,
   auto_merge:false,app_edits:false};
