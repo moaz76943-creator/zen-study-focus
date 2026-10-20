@@ -1,7 +1,7 @@
 name: Deep Focus 2026 Consolidated Recovery QA
 on:
   push:
-    branches: [integration/deep-focus-consolidated-repair-20261020, fix/master-completion-20261020, fix/df4-activity-counters-durability-20261020, fix/df4-language-switch-durability-20261020, integration/deep-focus-stability-20261020, fix/df4-android-touch-evidence-20261020]
+    branches: [integration/deep-focus-consolidated-repair-20261020, fix/master-completion-20261020, fix/df4-activity-counters-durability-20261020, fix/df4-language-switch-durability-20261020, integration/deep-focus-stability-20261020, fix/df4-android-touch-evidence-20261020, fix/df4-notes-save-visible-android-20261020]
   workflow_dispatch:
 permissions:
   contents: read
