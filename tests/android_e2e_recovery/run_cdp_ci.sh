@@ -36,7 +36,7 @@ else
 fi
 action_status=$?
 durability_status=0
-if [[ "${GITHUB_REF_NAME:-}" == "test/track07-00-durability-evidence-20261020" ]]; then
+if [[ "${GITHUB_REF_NAME:-}" == "test/track07-00-durability-evidence-20261020" || "${GITHUB_REF_NAME:-}" == "review/track07-09-phase3-candidate-20261020" ]]; then
   # Native failure probes use only this freshly installed disposable emulator.
   DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/track07_durability_android.cjs "$report/track07-durability.json"
   durability_status=$?
