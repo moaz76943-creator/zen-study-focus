@@ -98,3 +98,16 @@ test('audit recognizes integrated picker and Arabic analytics catalogs without c
  assert.match(r.pinnedSha,/^[a-f0-9]{40}$/);
  assert.equal(typeof r.workingTreeDirty,'boolean');
 });
+
+test('DF-043/090 draft loss and conflict warnings are included in canonical 20-language coverage audits',()=>{
+ const r=A.audit();
+ const catalog=r.catalogs.find(c=>c.id==='notes.drafts');
+ assert.ok(catalog,'Draft safety warnings must appear in central language audit');
+ assert.equal(catalog.file,'notes_drafts.js');
+ assert.equal(catalog.keys,11);
+ assert.deepEqual(catalog.explicitLocales.slice().sort(),A.LANGS.slice().sort());
+ for(const lang of A.LANGS){
+  assert.ok(r.coverage[lang].notes.total>=11);
+  assert.ok(!r.missing.some(m=>m.catalog==='notes.drafts'&&m.language===lang),'missing draft warning: '+lang);
+ }
+});
