@@ -182,7 +182,13 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Discover Android SDK manager on hosted image
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
       - name: Debug test APK only, no signing or publishing
         working-directory: android
         run: gradle assembleDebug --no-daemon
