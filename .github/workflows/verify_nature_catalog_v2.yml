@@ -72,7 +72,7 @@ jobs:
       - name: Build QA-only debug APK
         working-directory: android
         run: gradle assembleDebug --no-daemon
-      - name: Enforce distinct APK package and zero app permissions
+      - name: Enforce isolated package and no platform app permissions
         run: |
           set -euo pipefail
           APK="$(find android/app/build/outputs/apk/debug -name '*.apk' -type f -print -quit)"
@@ -81,8 +81,12 @@ jobs:
           test -x "$AAPT"
           "$AAPT" dump badging "$APK" | grep -F "package: name='com.zenstudy.focus.audioqa'"
           "$AAPT" dump permissions "$APK"
-          if "$AAPT" dump permissions "$APK" | grep -Fq "uses-permission:"; then
-            echo "QA APK unexpectedly requests permissions" >&2
+          # AndroidX injects only its own signature-scoped receiver permission.
+          # Never permit an Android platform permission, network, storage or notifications.
+          PERMISSIONS="$("$AAPT" dump permissions "$APK" | grep '^uses-permission:' || true)"
+          EXPECTED="uses-permission: name='com.zenstudy.focus.audioqa.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'"
+          if [[ -n "$PERMISSIONS" && "$PERMISSIONS" != "$EXPECTED" ]]; then
+            echo "Unexpected platform or third-party permissions in QA APK: $PERMISSIONS" >&2
             exit 1
           fi
           sha256sum "$APK"
