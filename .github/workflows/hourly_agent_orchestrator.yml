@@ -84,6 +84,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           REPORT: ${{ runner.temp }}/hourly/hourly-agents.md
+          REPORT_JSON: ${{ runner.temp }}/hourly/hourly-agents.json
           CHECKED_SHA: ${{ runner.temp }}/hourly/SOURCE_SHA
           SOURCE_REF: ${{ env.SOURCE_REF }}
         with:
@@ -93,12 +94,27 @@ jobs:
             const title = '[Hourly QA] Deep Focus agent coordination';
             const read = p => fs.existsSync(p) ? fs.readFileSync(p, 'utf8').slice(0,25000) : null;
             const sha = read(process.env.CHECKED_SHA)?.trim() || 'NOT_VERIFIED';
-            const result = read(process.env.REPORT) || 'NOT_TESTED: source checkout or audit failed; consult Actions logs.';
+            // The issue-write operation reads only generated source evidence, never executes it.
+            const ledger = require('./automation/tools/daily_maintenance/cohort_ledger.cjs');
+            const issues = await github.paginate(github.rest.issues.listForRepo, {owner, repo, state:'open', per_page:100});
+            const old = issues.find(i => !i.pull_request && i.title === title);
+            const previous = ledger.parseIssueLedger(old?.body);
+            let result, state = null;
+            try {
+              const report = JSON.parse(fs.readFileSync(process.env.REPORT_JSON, 'utf8'));
+              if (report.source_sha !== sha) throw Error('Checked source SHA does not match cycle evidence');
+              state = ledger.aggregate(previous, report);
+              result = ledger.toMarkdown(state) + '\n' + ledger.serialize(state);
+            } catch (err) {
+              // Never reuse a green ledger after a missing, corrupt or out-of-order source report.
+              result = 'NOT_VERIFIED: current source/cohort evidence failed; historical PASS is invalid.\n' +
+                String(err.message).slice(0,200) + '\n' + (read(process.env.REPORT) || 'No current report.');
+            }
             const body = result + '\n\nTracked ref: `' + process.env.SOURCE_REF + '` at `' + sha + '`' +
               '\nRun: ' + context.serverUrl + '/' + owner + '/' + repo + '/actions/runs/' + context.runId +
               '\nNo Android E2E evidence, automatic source modifications or release approval.';
-            const issues = await github.paginate(github.rest.issues.listForRepo, {owner, repo, state:'open', per_page:100});
-            const old = issues.find(i => !i.pull_request && i.title === title);
+            core.summary.addRaw(state ? ledger.toMarkdown(state) : 'NOT_VERIFIED: hourly source evidence incomplete.');
+            await core.summary.write();
             if (old) {
               if (old.body !== body) await github.rest.issues.update({owner,repo,issue_number:old.number,body});
             } else await github.rest.issues.create({owner,repo,title,body});
