@@ -24,7 +24,7 @@ jobs:
       - name: Run broad non-media Node regressions
         shell: bash
         run: |
-          mapfile -t suites < <(find tests -type f \\( -name '*.test.cjs' -o -name 'test_*.cjs' \\) ! -name media_provenance_gate.test.cjs | sort)
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs | sort)
           test "${#suites[@]}" -gt 0
           node --test "${suites[@]}"
       - name: Run Python source regressions
