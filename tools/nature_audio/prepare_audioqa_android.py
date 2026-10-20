@@ -41,7 +41,7 @@ def prepare(root):
     original_files = []
     for item in meta["items"]:
         name = item["file"]
-        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 _()'-]*\\.ogg", name):
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 _()'-]*\.ogg", name):
             raise ValueError("Unsafe original media path")
         expected = statuses.get(item["id"])
         body = (media / name).read_bytes()
@@ -76,8 +76,8 @@ def prepare(root):
     )
     manifest_source = replace_exact(manifest_source, 'android:label="Deep Focus"',
         'android:label="Deep Focus Audio QA"', "app label")
-    manifest_source = re.sub(r"\\s*<uses-permission\\b[^>]*/>", "", manifest_source)
-    manifest_source = re.sub(r"\\s*<service\\b[^>]*(?:/>|>[\\s\\S]*?</service>)", "", manifest_source)
+    manifest_source = re.sub(r"\s*<uses-permission\b[^>]*/>", "", manifest_source)
+    manifest_source = re.sub(r"\s*<service\b[^>]*(?:/>|>[\s\S]*?</service>)", "", manifest_source)
     if "uses-permission" in manifest_source or "<service" in manifest_source:
         raise ValueError("QA preview manifest must have no permissions or services")
 
@@ -103,8 +103,8 @@ def prepare(root):
     for filename in ("index.html", "qa_report.json"):
         shutil.copy2(media / filename, review / filename)
     (review / "README.txt").write_text(
-        "NON-PRODUCTION AUDIO QA ONLY. Unique package com.zenstudy.focus.audioqa.\\n"
-        "No app data accessed, no release media approved.\\n", encoding="utf-8")
+        "NON-PRODUCTION AUDIO QA ONLY. Unique package com.zenstudy.focus.audioqa.\n"
+        "No app data accessed, no release media approved.\n", encoding="utf-8")
     print("Isolated QA APK prepared with", len(original_files),
           "original pinned recordings; real application assets excluded")
 
