@@ -151,7 +151,7 @@
       journal.state = 'committed';
       storage.setItem(D.JOURNAL_KEY,JSON.stringify(journal));
       // localStorage readback does not imply Android disk durability.
-      if (!root.DF22Preflight || !root.DF22Preflight.nativeAcknowledge(storage))
+      if (root.ZenNative && (!root.DF22Preflight || !root.DF22Preflight.nativeAcknowledge(storage)))
         throw new Error('NATIVE_DURABLE_ACK_FAILED');
     } catch (e) {
       const failed = rollback(storage,original);
