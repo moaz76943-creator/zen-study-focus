@@ -2,11 +2,7 @@ name: DF4 20-language Draft Safety Verification
 on:
   push:
     branches: [fix/df4-notes-draft-20-locales-20261020]
-  pull_request:
-    paths:
-      - 'android/app/src/main/assets/web/notes_drafts.js'
-      - 'tests/notes_recovery/draft_20_locales.test.cjs'
-      - '.github/workflows/verify_draft_20_locales.yml'
+  # Push-only on this dedicated branch avoids duplicate PR/push jobs.
   workflow_dispatch:
 permissions:
   contents: read
