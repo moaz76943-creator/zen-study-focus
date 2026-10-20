@@ -45,13 +45,13 @@
     if(snapshotText(latest)!==snapshotText(state)){state=latest;undoStack=[];redoStack=[];}
     const old=state,output=change(old),next=output.state;
     if(!next||!Array.isArray(next.tasksList))throw new Error('Invalid change result');
-    if(snapshotText(old)===snapshotText(next))return;
+    if(snapshotText(old)===snapshotText(next))return true;
     const committed=adapter.commit(old,next);
     if(committed!==true)throw new Error(l.saveUnconfirmed);
     undoStack.push(old);if(undoStack.length>20)undoStack.shift();redoStack=[];state=next;
     if(typeof adapter.onAfterChange==='function')adapter.onAfterChange(state);
-    editing=null;render();
-   }catch(e){error(e);}
+    editing=null;render();return true;
+   }catch(e){error(e);return false;}
   }
   function timeTravel(from,to){
    if(!from.length)return;
@@ -95,7 +95,11 @@
      if(!Array.isArray(t[kind]))continue;
      for(const item of t[kind]){
       const row=el('label','df-check'),tick=input('checkbox');tick.checked=!!item.done;
-      tick.addEventListener('change',()=>apply(x=>C.setItemDone(x,t.id,kind,item.id,tick.checked)));
+      tick.addEventListener('change',()=>{
+       const wanted=tick.checked;
+       if(apply(x=>C.setItemDone(x,t.id,kind,item.id,wanted))!==true)
+        tick.checked=!!item.done; // Reject unacknowledged visual completion; preserve editor state.
+      });
       append(row,tick,el('span','',item.title));more.appendChild(row);
      }
      if(t[kind].length)more.appendChild(el('p','df-muted',l[kind==='checklist'?'check':'sub']+': '+t[kind].filter(x=>x.done).length+'/'+t[kind].length));
