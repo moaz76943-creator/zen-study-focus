@@ -104,7 +104,7 @@
 
 /* Track 04 v3.5: independent mobile-first read-only control bar and evidence labels. */
 .repo-sync-grid .repo-sync-card{min-width:0}
-.repo-sync-recovery .repo-sync-chip.status-source-reported{background:#e5f4ee;color:#175c49}
+.repo-sync-recovery .repo-sync-chip.status-source-reported{background:#eaf2ff;color:#215a8a}
 .repo-sync-recovery .repo-sync-chip.status-stale{background:#fff1df;color:#824600}
 .repo-sync-recovery .repo-sync-chip.status-live-github{background:#e1f1ff;color:#174c80}
 .repo-sync-recovery .repo-sync-chip.status-not-verified{background:#eef0f4;color:#465569}
