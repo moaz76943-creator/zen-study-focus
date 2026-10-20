@@ -2,7 +2,7 @@ name: Deep Focus Android WebView Real DOM (debug-only)
 on:
   # One disposable real Android run for this integration branch; production excluded.
   push:
-    branches: [integration/deep-focus-stability-20261020, fix/df4-android-touch-evidence-20261020, fix/df4-notes-save-visible-android-20261020, integration/deep-focus-consolidated-candidate-20261020, fix/codex-phase1-stabilization-20261020, review/track06-gated-checkpoint-20261020, audit/track08-pr75-emulator-evidence-20261020]
+    branches: [integration/deep-focus-stability-20261020, fix/df4-android-touch-evidence-20261020, fix/df4-notes-save-visible-android-20261020, integration/deep-focus-consolidated-candidate-20261020, fix/codex-phase1-stabilization-20261020, review/track06-gated-checkpoint-20261020, audit/track08-pr75-emulator-evidence-20261020, test/track07-00-durability-evidence-20261020]
   workflow_dispatch:
     inputs:
       api:
@@ -40,6 +40,7 @@ jobs:
       - name: Debug-only access and script safety regressions
         run: |
           node --check tests/android_e2e_recovery/cdp_dom_smoke.cjs
+          node --check tests/android_e2e_recovery/track07_durability_android.cjs
           node --test tests/android_e2e_recovery/cdp_debug_gate.test.cjs tests/android_e2e_recovery/android_ui_hierarchy.test.cjs
           git rev-parse HEAD
       - uses: actions/setup-java@v4
