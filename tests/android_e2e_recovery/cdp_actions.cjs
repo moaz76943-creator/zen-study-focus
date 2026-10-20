@@ -3,6 +3,7 @@
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
 const {validateTouchTarget,missingPrerequisites,classifyFailure,selectCases}=require('./cdp_touch_target.cjs');
 const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,nativePromptText}=require('./android_device_touch.cjs');
+const {readWebViewFrame}=require('./android_ui_hierarchy.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
 const selectedCases=selectCases(process.env.DF_ANDROID_CASES||'',CASES);
 const scenarioEvidence=new Map();
@@ -49,14 +50,11 @@ async function touch(expression){
  validateTouchTarget(await evaluate(geometry));
  // The API30 run proved CDP synthetic touch did not emit ANY WebView touch/click event,
  // even for a visible, unobstructed 44px target. Use Android's actual input pipeline.
- let hierarchy;
- try {
-   adb('shell','uiautomator','dump','/sdcard/deep_focus_device_touch.xml');
-   hierarchy=adb('shell','cat','/sdcard/deep_focus_device_touch.xml');
- } catch(e) {
-   throw Error('TRANSPORT: Cannot read real Android WebView frame: '+String(e.message).slice(0,180));
- }
- const box=parseWebViewBounds(hierarchy);
+ const box=await readWebViewFrame(adb,{
+   parseBounds:parseWebViewBounds,
+   pause,
+   onRetry:(attempt,max)=>console.log('Android UI hierarchy capture retry '+attempt+'/'+max)
+ });
  // UIAutomator can outlast an IME resize; read the target/viewport AFTER that capture.
  const r=await evaluate(geometry),target=validateTouchTarget(r);
  const physical=cssPointToAndroid({...target,viewportWidth:r.viewportWidth,viewportHeight:r.viewportHeight},box);
