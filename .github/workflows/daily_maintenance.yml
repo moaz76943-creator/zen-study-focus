@@ -54,6 +54,7 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+      actions: read
     env:
       SOURCE_REF: ${{ inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'fix/master-completion-20261020' }}
       SELECTED_MODE: ${{ inputs.mode || 'safe-fix' }}
@@ -141,12 +142,23 @@ jobs:
         env:
           REPORT: ${{ runner.temp }}/daily/daily-health.md
           BLOCKERS: ${{ runner.temp }}/daily/blockers.txt
+          CHECKED_SHA: ${{ runner.temp }}/daily/SOURCE_SHA
         with:
           script: |
             const fs=require('node:fs'),{owner,repo}=context.repo;
             const title='[Daily QA] Deep Focus recovery status';
             const read=p=>fs.existsSync(p)?fs.readFileSync(p,'utf8').slice(0,25000):'Unavailable. Check Actions log.';
+            let ciAudit='CI result: NOT_TESTED (source checkout / Actions API unavailable)';
+            try {
+              const checked=fs.readFileSync(process.env.CHECKED_SHA,'utf8').trim();
+              const response=await github.rest.actions.listWorkflowRunsForRepo({
+                owner,repo,branch:process.env.SOURCE_REF,per_page:50});
+              ciAudit=require('./automation/tools/daily_maintenance/ci_triage.cjs')
+                .summarizeRuns(response.data.workflow_runs||[],checked).markdown;
+              core.info('Source SHA-bound CI triage generated');
+            } catch(e){core.warning('Cannot read source SHA-bound CI evidence: '+e.message);}
             const body=read(process.env.REPORT)+'\n\nAdditional gates:\n'+read(process.env.BLOCKERS)+
+             '\n\n'+ciAudit+
              '\nRun: '+context.serverUrl+'/'+owner+'/'+repo+'/actions/runs/'+context.runId+
              '\nSource QA only; Android, media rights and release NOT APPROVED.';
             const issues=await github.paginate(github.rest.issues.listForRepo,{owner,repo,state:'open',per_page:100});
