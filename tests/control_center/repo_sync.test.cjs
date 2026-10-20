@@ -24,7 +24,7 @@ test('sync03 queued and skipped jobs never imply production acceptance',()=>{
  assert.equal(core.ciStatus([run(9,a,'skipped')],a).status,'NOT_VERIFIED');
  assert.equal(core.ciStatus([],a).status,'NOT_VERIFIED');
  assert.equal(core.ciStatus([run(12,a,'success')],a).status,'PASS');
- assert.equal(core.ciStatus([run(12,a,'failure'),run(14,a,'success')],a).status,'FAIL');
+ assert.equal(core.ciStatus([run(12,a,'failure'),run(14,a,'success')],a).status,'PASS');
 });
 test('sync04 incomplete REST data stays PARTIAL; never show merge/release approval',()=>{
  const model=core.buildRepoHealth({pulls:[pull(25,b,a)],runs:[],errors:['GitHub HTTP 403'],timestamp:null});
@@ -45,4 +45,40 @@ test('sync06 recent workflow links retain source SHA and no fabricated run for m
  assert.equal(model.pr37.ci.runId,100);
  assert.equal(model.pr25.ci.status,'NOT_VERIFIED');
  assert.equal(model.recent.length,2);
+});
+
+test('sync07 newest run per workflow replaces an earlier failure or success',()=>{
+ const failed=run(200,a,'failure');failed.workflow_id=101;
+ const repaired=run(201,a,'success');repaired.workflow_id=101;
+ const laterPending=run(202,a,null,'in_progress');laterPending.workflow_id=101;
+ assert.equal(core.ciStatus([failed,repaired],a).status,'PASS');
+ assert.equal(core.ciStatus([failed,repaired,laterPending],a).status,'RUNNING');
+ assert.equal(core.ciStatus([laterPending,failed,repaired],a).runId,202);
+});
+test('sync08 two distinct workflows preserve mixed/skipped reality instead of false green',()=>{
+ const passed=run(210,a,'success');passed.workflow_id=11;
+ const skipped=run(211,a,'skipped');skipped.workflow_id=12;
+ const failed=run(212,a,'failure');failed.workflow_id=13;
+ assert.equal(core.ciStatus([passed,skipped],a).status,'PARTIAL');
+ assert.equal(core.ciStatus([skipped],a).status,'NOT_VERIFIED');
+ assert.equal(core.ciStatus([passed,failed,skipped],a).status,'FAIL');
+});
+test('sync09 partial network errors cannot certify exact-head workflow status',()=>{
+ const model=core.buildRepoHealth({pulls:[pull(25,b,a),pull(37,c,b)],
+   runs:[run(300,b,'success'),run(301,c,'success')],
+   errors:['/actions/runs?head_sha=...: GitHub 403'],timestamp:'2026-10-20T02:00:00Z'});
+ assert.equal(model.verified,false);
+ assert.equal(model.pr25.ci.status,'NOT_VERIFIED');
+ assert.equal(model.pr37.ci.status,'NOT_VERIFIED');
+ assert.equal(model.release,'NOT_APPROVED');
+});
+test('sync10 status breakdown keeps all distinct workflows with latest attempt only',()=>{
+ const pass=run(401,a,'success');pass.workflow_id=10;
+ const earlier=run(402,a,'failure');earlier.workflow_id=20;
+ const retry=run(403,a,'success');retry.workflow_id=20;
+ const info=core.ciStatus([pass,earlier,retry],a);
+ assert.equal(info.status,'PASS');
+ assert.equal(info.count,3);
+ assert.equal(info.workflows,2);
+ assert.equal(info.runId,403);
 });
