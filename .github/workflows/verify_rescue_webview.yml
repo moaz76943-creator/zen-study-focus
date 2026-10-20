@@ -1,8 +1,11 @@
 name: Deep Focus Android WebView Real DOM (debug-only)
 on:
   # Isolated public-runner test branch; no production release and no owner data.
-  push:
-    branches: [test/df4-android-api30-cdp-20261020]
+  pull_request:
+    branches: [fix/master-completion-20261020]
+    paths:
+      - '.github/workflows/verify_rescue_webview.yml'
+      - 'tests/android_e2e_recovery/**'
   workflow_dispatch:
     inputs:
       api:
@@ -18,11 +21,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   android-webview-smoke:
-    name: Fresh Android API${{ (github.event_name == 'push' && '30' || inputs.api || '35') }}, local DevTools DOM, test-only
+    name: Fresh Android API${{ (github.event_name != 'workflow_dispatch' && '30' || inputs.api || '35') }}, local DevTools DOM, test-only
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
-      ANDROID_TEST_API: ${{ (github.event_name == 'push' && '30' || inputs.api || '35') }}
+      ANDROID_TEST_API: ${{ (github.event_name != 'workflow_dispatch' && '30' || inputs.api || '35') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,7 +65,7 @@ jobs:
       - name: Inspect actual on-emulator WebView DOM (no simulated PASS)
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ (github.event_name == 'push' && '30' || inputs.api || '35') }}
+          api-level: ${{ (github.event_name != 'workflow_dispatch' && '30' || inputs.api || '35') }}
           target: google_apis
           arch: x86_64
           profile: pixel_6
