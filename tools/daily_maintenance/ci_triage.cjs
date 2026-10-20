@@ -21,7 +21,7 @@ function summarizeRuns(source,sourceSha){
   else not_verified.push(row);
  }
  const verification=current_failed.length?'BLOCKED':(current_success.length&&!not_verified.length?'SOURCE_TESTED_PARTIAL':'NOT_TESTED');
- const label=verification==='BLOCKED'?'BLOCKED':verification==='SOURCE_TESTED_PARTIAL'?'PARTIAL SOURCE PASS':'NOT VERIFIED';
+ const label=verification==='BLOCKED'?'BLOCKED':verification==='SOURCE_TESTED_PARTIAL'?'PARTIAL SOURCE PASS':(!seen.size?'NOT TESTED':'NOT VERIFIED');
  const lines=['## GitHub Actions — latest exact source','',
   'Source SHA: '+sourceSha,
   'SOURCE CI: '+label+' (does not establish Android or release readiness)','',
