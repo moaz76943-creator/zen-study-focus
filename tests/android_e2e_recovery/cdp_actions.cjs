@@ -46,6 +46,7 @@ async function touch(expression){
  await call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[target]});
  await call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
  await pause(200);
+ return {x:target.x,y:target.y,hit:r.hit,viewportWidth:r.viewportWidth,viewportHeight:r.viewportHeight};
 }
 const element=selector=>`document.querySelector(${JSON.stringify(selector)})`;
 const tap=selector=>touch(element(selector));
@@ -59,13 +60,19 @@ async function main(){
  await connect();await ready();
  await run('preflight',()=>check("location.href==='file:///android_asset/web/index.html' && !!document.querySelector('#mainPlayBtn')",'Actual local app identity'));
  await run('navigation',async()=>{
+   // Diagnostic-only event capture: no synthetic clicks and no PASS substitution.
+   await evaluate("window.__dfNavTrace=[];window.__dfNavErrors=[];document.querySelector('.bottom-nav-capsule').addEventListener('touchstart',e=>window.__dfNavTrace.push({kind:'touchstart',trusted:e.isTrusted}),true);document.querySelector('.bottom-nav-capsule').addEventListener('touchend',e=>window.__dfNavTrace.push({kind:'touchend',trusted:e.isTrusted}),true);document.querySelector('.bottom-nav-capsule').addEventListener('click',e=>window.__dfNavTrace.push({kind:'click',id:e.target.closest('.bnav-btn')?.id||'',trusted:e.isTrusted}),true);window.addEventListener('error',e=>window.__dfNavErrors.push(e.message),true)");
    for(const [id,section] of [['navTasks','sec-tasks'],['navCalendar','sec-calendar'],['navNotes','sec-notes'],['navTimer','sec-timer'],['navTraining','sec-timer'],['navSounds','sec-sounds'],['navAnalytics','sec-analytics']]){
-     await tap('#'+id);
+     const physical=await tap('#'+id);
      const observed=await evaluate(`(()=>{
        const target=document.querySelector('#${section}');
        return {sectionActive:!!target&&target.classList.contains('active'),
          navActive:[...document.querySelectorAll('.bnav-btn.active')].map(n=>n.id),
-         visibleTab:${JSON.stringify(id)}};
+         visibleTab:${JSON.stringify(id)},
+         physical:${JSON.stringify(physical)},
+         clickHandler:typeof document.getElementById(${JSON.stringify(id)}).onclick,
+         touchEvents:window.__dfNavTrace.slice(-6),
+         runtimeErrors:window.__dfNavErrors.slice(-3)};
      })()`);
      assert.ok(observed?.sectionActive&&observed.navActive.length===1&&observed.navActive[0]===id,
        'After actual touch of #'+id+': '+JSON.stringify(observed));
