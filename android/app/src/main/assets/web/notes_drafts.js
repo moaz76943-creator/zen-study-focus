@@ -4,16 +4,19 @@ const NS_DRAFT_KEY='deep_focus_unsaved_note_draft_v1';
 const NS_DRAFT_LIMIT=100000; // bounded to avoid consuming all WebView storage
 let nsDraftTimer=null;
 let nsDraftDirty=false;
+let nsDraftLastState=[null,false];
 const NS_DRAFT_LANG={
  en:{saved:'Draft saved on this device',ready:'An unfinished draft is available',restore:'Restore draft',
  discard:'Discard',tooLong:'Draft exceeds autosave limit. Save this note directly.',restored:'Draft restored',
  cleared:'Draft discarded',other:'Another unfinished note is saved. Open or export it before overwriting.',
  conflict:'The saved note changed since this draft was created. Restore is blocked to prevent overwriting newer content; copy or discard the older draft.',
+ failed:'Could not save the draft on this device. Keep this editor open and retry.',
  unsaved:'Your edits could not be backed up on this device. Close and risk losing these changes?'},
  ar:{saved:'تم حفظ المسودة على الجهاز',ready:'توجد مسودة غير مكتملة',restore:'استعادة المسودة',
  discard:'حذف المسودة',tooLong:'المسودة كبيرة جدًا للحفظ التلقائي. احفظ الملاحظة مباشرة.',restored:'تمت استعادة المسودة',
  cleared:'تم حذف المسودة',other:'توجد مسودة لملاحظة أخرى. افتحها أو انسخها قبل الاستبدال.',
  conflict:'تغيرت الملاحظة المحفوظة منذ إنشاء المسودة. استعادة المسودة محظورة لحماية النسخة الأحدث؛ انسخ المسودة القديمة أو احذفها.',
+ failed:'تعذّر حفظ المسودة على الجهاز. أبقِ المحرر مفتوحًا وحاول مجددًا.',
  unsaved:'تعذّر حفظ هذه التعديلات كمسودة. هل تريد الإغلاق مع احتمال فقدانها؟'}
 };
 function nsDraftLabel(k){return (cfg.lang==='ar'?NS_DRAFT_LANG.ar:NS_DRAFT_LANG.en)[k];}
@@ -23,7 +26,7 @@ function nsGetStoredDraft(){
  if(d.cornell!==undefined&&(!d.cornell||['cues','notes','summary'].some(k=>typeof d.cornell[k]!=='string'||d.cornell[k].length>NS_DRAFT_LIMIT)))return null;
  if(d.tags!==undefined&&(typeof d.tags!=='string'||d.tags.length>12000))return null;
  if(d.notebookId!==undefined&&(typeof d.notebookId!=='string'||d.notebookId.length>120))return null;
- if(d.recallPairs!==undefined&&(!Array.isArray(d.recallPairs)||d.recallPairs.length>200||d.recallPairs.some(p=>typeof p.question!=='string'||typeof p.answer!=='string')))return null;
+ if(d.recallPairs!==undefined&&(!Array.isArray(d.recallPairs)||d.recallPairs.length>200||d.recallPairs.some(p=>!p||typeof p.question!=='string'||typeof p.answer!=='string')))return null;
  if(d.baseFingerprint!==undefined&&d.baseFingerprint!==null&&
     (typeof d.baseFingerprint!=='string'||d.baseFingerprint.length>NS_DRAFT_LIMIT))return null;
  if(d.title.length>250||d.body.length>NS_DRAFT_LIMIT)return null;
@@ -40,7 +43,9 @@ function nsDraftVersionMatches(d){
  if(!d||d.baseFingerprint===undefined||d.baseFingerprint===null)return true;
  return d.baseFingerprint===window.DeepFocusNotesEditorUI?.openedFingerprint?.();
 }
+function nsRefreshDraftLocale(){nsDraftState(...nsDraftLastState);}
 function nsDraftState(status,offer){
+ nsDraftLastState=[status,offer];
  const msg=document.getElementById('nsDraftStatus'),restore=document.getElementById('nsDraftRestore'),discard=document.getElementById('nsDraftDiscard');
  if(msg)msg.textContent=status?nsDraftLabel(status):'';
  if(restore){restore.hidden=!offer||status==='conflict';restore.textContent=nsDraftLabel('restore');}
@@ -68,6 +73,7 @@ function nsReadEditorDraft(){
 function nsScheduleDraft(){
  const modal=document.getElementById('noteModal');
  if(!modal||!modal.classList.contains('open'))return;
+ nsDraftDirty=true;
  if(nsDraftTimer!==null)clearTimeout(nsDraftTimer);
  nsDraftTimer=setTimeout(nsFlushDraft,550);
 }
@@ -84,10 +90,10 @@ function nsFlushDraft(){
  try {
   const raw=JSON.stringify(draft);
   if(raw.length>NS_DRAFT_LIMIT+6000){nsDraftState('tooLong',false);return false;}
-  saveFortressData(NS_DRAFT_KEY,draft);
+  if(saveFortressData(NS_DRAFT_KEY,draft)!==true){nsDraftState('failed',false);return false;}
   const checked=nsGetStoredDraft();
-  if(!checked||checked.updated!==draft.updated||checked.editId!==draft.editId){nsDraftState('tooLong',false);return false;}
- }catch(e){nsDraftState('tooLong',false);return false;}
+  if(!checked||JSON.stringify(checked)!==raw){nsDraftState('failed',false);return false;}
+ }catch(e){nsDraftState('failed',false);return false;}
  nsDraftState('saved',false);return true;
 }
 function nsRestoreDraft(){
@@ -107,12 +113,16 @@ function nsRestoreDraft(){
  return true;
 }
 function nsDeleteDraftKey(){
- try{localStorage.removeItem(NS_DRAFT_KEY);localStorage.removeItem(NS_DRAFT_KEY+'_mirror');}catch(e){}
+ try{
+  localStorage.removeItem(NS_DRAFT_KEY);localStorage.removeItem(NS_DRAFT_KEY+'_mirror');
+  return nsGetStoredDraft()===null;
+ }catch(e){return false;}
 }
 function nsDiscardDraft(){
  const saved=nsGetStoredDraft();
  if(!nsDraftContextMatches(saved))return false;
- nsDeleteDraftKey();nsDraftState('cleared',false);return true;
+ if(!nsDeleteDraftKey()){nsDraftState('failed',true);return false;}
+ nsDraftState('cleared',false);return true;
 }
 function nsClearDraftForSavedNote(){
  if(nsDraftTimer!==null){clearTimeout(nsDraftTimer);nsDraftTimer=null;}

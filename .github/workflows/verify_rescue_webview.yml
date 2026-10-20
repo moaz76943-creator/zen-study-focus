@@ -2,6 +2,13 @@ name: Deep Focus Android WebView Real DOM (debug-only)
 on:
   # Optional exact-SHA QA, manually started after emulator SDK is healthy.
   workflow_dispatch:
+    inputs:
+      api:
+        description: Disposable Android API to verify (separate compatibility evidence)
+        required: true
+        default: '35'
+        type: choice
+        options: ['35', '30']
 permissions:
   contents: read
 concurrency:
@@ -9,9 +16,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   android-webview-smoke:
-    name: Fresh Android API35, local DevTools DOM, test-only
+    name: Fresh Android API${{ inputs.api || '35' }}, local DevTools DOM, test-only
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    env:
+      ANDROID_TEST_API: ${{ inputs.api || '35' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,31 +60,13 @@ jobs:
       - name: Inspect actual on-emulator WebView DOM (no simulated PASS)
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 35
+          api-level: ${{ inputs.api || '35' }}
           target: google_apis
           arch: x86_64
           profile: pixel_6
           emulator-boot-timeout: 600
           disable-animations: true
-          script: |
-            set -euo pipefail
-            report="$RUNNER_TEMP/deep-focus-android-webview"
-            capture() {
-              adb exec-out screencap -p > "$report/screen.png" || true
-              adb shell uiautomator dump /sdcard/rescue-webview.xml >/dev/null 2>&1 || true
-              adb exec-out cat /sdcard/rescue-webview.xml > "$report/hierarchy.xml" || true
-              adb logcat -d -s AndroidRuntime chromium > "$report/logcat.txt" || true
-              adb forward --remove tcp:9222 >/dev/null 2>&1 || true
-            }
-            trap capture EXIT
-            adb install android/app/build/outputs/apk/debug/app-debug.apk
-            adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS || true
-            adb shell am start -n com.zenstudy.focus/.MainActivity
-            sleep 5
-            pid="$(adb shell pidof com.zenstudy.focus | tr -d '\r' | awk '{print $1}')"
-            test -n "$pid"
-            adb forward tcp:9222 "localabstract:webview_devtools_remote_${pid}"
-            node tests/android_e2e_recovery/cdp_dom_smoke.cjs "$report/results.json"
+          script: bash tests/android_e2e_recovery/run_cdp_ci.sh
       - name: Record unverified emulator bootstrap on infrastructure failure
         if: failure()
         shell: bash

@@ -53,8 +53,9 @@ sandbox.window.localStorage = storage;
 sandbox.window.document = document;
 sandbox.window.navigator = sandbox.navigator;
 vm.createContext(sandbox);
-for(const file of ['locale_rows.js','locale_extras.js','quick_training.js','app.js']){
+for(const file of ['locale_rows.js','locale_extras.js','quick_training.js','analytics_recovery_core.js','app.js']){
   vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),sandbox,{filename:file,timeout:2000});
+  if(file==='analytics_recovery_core.js')sandbox.window.DeepFocusAnalyticsRecovery=sandbox.DeepFocusAnalyticsRecovery;
 }
 const evaluate=expr=>vm.runInContext(expr,sandbox,{timeout:2000});
 assert.match(document.getElementById('timerDigitsTxt').textContent,/^[0-9]{2}:[0-9]{2}$/);
@@ -101,13 +102,13 @@ evaluate("todayISO = '2000-01-01'; syncDailyRollover();");
 assert.equal(evaluate('todayISO'),evaluate('localDateISO()'));
 // A selected activity must remain visible and show its true duration.
 evaluate("cfg.domain = 'sport'; renderDomainState(); selectTimerMode(30,'focus',null); updateTimerDisplay();");
-assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30m');
-assert.equal(document.getElementById('modeFocusBtn').textContent, '30m');
+assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30 minutes');
+assert.equal(document.getElementById('modeFocusBtn').textContent, '30 minutes');
 // One domain preset determines the visible focus button and its actual selected duration.
 for (const [domain, duration] of [['study',25], ['sport',30], ['read',20], ['work',50]]) {
   evaluate('cfg.domain=' + JSON.stringify(domain) + '; renderDomainState(); selectTimerMode(getDomainFocusMinutes(),\'focus\',null)');
   assert.equal(evaluate('timerTotal'),duration*60,domain+' focus duration');
-  assert.equal(document.getElementById('modeFocusBtn').textContent,duration+'m');
+  assert.equal(document.getElementById('modeFocusBtn').textContent,duration+' minutes');
 }
 // Ending an interval training sequence restores that same domain duration.
 evaluate("cfg.domain='sport'; quickTraining={active:true}; stopQuickTrainingInternal()");
@@ -265,7 +266,7 @@ sandbox.window.confirm = () => true;
 assert.equal(evaluate('selectHomeQuickSession(10)'),true);
 assert.equal(evaluate('timerTotal'),600);
 assert.equal(evaluate('timerRunning'),false);
-assert.equal(document.getElementById('modeFocusBtn').textContent,'10m');
+assert.equal(document.getElementById('modeFocusBtn').textContent,'10 minutes');
 assert.equal(document.getElementById('homeQuick10').getAttribute('aria-pressed'),'true');
 assert.equal(document.getElementById('homeQuick25').getAttribute('aria-pressed'),'false');
 assert.equal(evaluate('selectHomeQuickSession(9)'),false,'Unlisted shortcut is rejected');

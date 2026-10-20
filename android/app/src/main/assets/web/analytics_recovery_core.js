@@ -31,7 +31,7 @@
   const mode=typeof s.mode==='string'?s.mode.toLowerCase():'';
   const type=typeof s.type==='string'?s.type.toLowerCase():'';
   const status=typeof s.status==='string'?s.status.toLowerCase():'';
-  return ['rest','break','shortbreak','longbreak','short_break','long_break','short-rest','long-rest','pause'].includes(mode)||
+  return ['short','long','rest','break','shortbreak','longbreak','short_break','long_break','short-rest','long-rest','pause'].includes(mode)||
    ['rest','break'].includes(type)||
    ['cancelled','canceled','in-progress','in_progress','running','paused','failed','aborted','unfinished','active','pending','incomplete','interrupted','stopped','skipped','discarded','rest','break'].includes(status);
  }

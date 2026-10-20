@@ -32,6 +32,7 @@ function gsISOValid(iso) {
  return date.getFullYear()===year&&date.getMonth()===month-1&&date.getDate()===day;
 }
 function gsCleanHistory() {
+ if(typeof acceptedFocusHistory==='function')return acceptedFocusHistory(cfg.sessionHistory)||[];
  const raw=Array.isArray(cfg.sessionHistory)?cfg.sessionHistory:[];
  const seen=new Set(),entries=[];
  for(const item of raw) {
@@ -39,6 +40,8 @@ function gsCleanHistory() {
      item.isStarter===true||item.isDemo===true||item.demo===true||
      item.isTest===true||item.synthetic===true||
      ['demo','sample','test','synthetic'].includes(item.source))continue;
+  if(item.completed===false||item.isFocus===false||['short','long','rest','break','short_break','long_break'].includes(item.mode)||
+     ['running','paused','unfinished','cancelled','skipped'].includes(item.status))continue;
   const id=item.id;
   if(!((typeof id==='string'&&id.length>0&&id.length<=128)||
       (typeof id==='number'&&Number.isSafeInteger(id)&&id>=0)))continue;
