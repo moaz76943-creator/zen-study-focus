@@ -10,7 +10,7 @@ import urllib.parse
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "tools/nature_audio/commons_intake.json"
 OUT = ROOT / "audio_candidates/commons_intake"
-SAFE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 _()'-]*\\.ogg$")
+SAFE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 _()\'-]*\.ogg$")
 
 def render_html(records):
     rows = []
