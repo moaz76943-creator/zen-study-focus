@@ -82,3 +82,29 @@ test('sync10 status breakdown keeps all distinct workflows with latest attempt o
  assert.equal(info.workflows,2);
  assert.equal(info.runId,403);
 });
+
+test('sync11 derives a bounded review queue using only trusted same-repository PR links',()=>{
+ const source=[
+ {number:82,title:'Nature audio proof',draft:true,updated_at:'2026-10-20T17:40:00Z',
+  html_url:'https://github.com/moaz76943-creator/zen-study-focus/pull/82',
+  head:{sha:a,ref:'review/audio'},base:{ref:'integration/recovery'}},
+ {number:81,title:'Phone Android QA',draft:false,updated_at:'2026-10-20T17:41:00Z',
+  html_url:'https://github.com/evil/test/pull/81',head:{sha:b,ref:'review/qa'}},
+ {number:80,title:'Notes regression',draft:true,updated_at:'2026-10-19T17:00:00Z',
+  html_url:'https://github.com/moaz76943-creator/zen-study-focus/pull/80',head:{sha:c,ref:'review/notes'}}
+ ];
+ const info=core.reviewQueue(source,{filter:'draft',limit:15});
+ assert.equal(info.total,2);
+ assert.equal(info.items[0].number,82);
+ assert.equal(info.items[1].number,80);
+ assert.equal(info.items[0].sha,a);
+ const query=core.reviewQueue(source,{term:'notes',limit:15});
+ assert.equal(query.total,1);
+ assert.equal(query.items[0].number,80);
+});
+test('sync12 review queue refuses unsafe search and invalid caps',()=>{
+ assert.throws(()=>core.reviewQueue([], {limit:100}),/limit/);
+ assert.throws(()=>core.reviewQueue([], {term:'z'.repeat(400)}),/search/);
+ assert.throws(()=>core.reviewQueue([], {filter:'merged'}),/filter/);
+ assert.deepEqual(core.reviewQueue([],{}),{total:0,items:[],drafts:0});
+});
