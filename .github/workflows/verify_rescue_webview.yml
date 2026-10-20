@@ -11,6 +11,12 @@ on:
         default: '35'
         type: choice
         options: ['35', '30']
+      scope:
+        description: Full acceptance or focused task durability diagnosis (unexecuted cases remain NOT_TESTED)
+        required: true
+        default: 'full'
+        type: choice
+        options: ['full', 'task_persistence']
 permissions:
   contents: read
 concurrency:
@@ -23,6 +29,7 @@ jobs:
     timeout-minutes: 35
     env:
       ANDROID_TEST_API: ${{ inputs.api || '30' }}
+      DF_ANDROID_CASES: ${{ inputs.scope == 'task_persistence' && 'preflight,tasks_create,task_subtasks' || '' }}
     steps:
       - uses: actions/checkout@v4
         with:

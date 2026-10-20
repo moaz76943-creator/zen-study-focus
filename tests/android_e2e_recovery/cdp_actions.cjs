@@ -1,9 +1,11 @@
 'use strict';
 // Real disposable Android WebView actions. Does not claim TalkBack, hearing, DND or physical-phone acceptance.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
-const {validateTouchTarget,missingPrerequisites,classifyFailure}=require('./cdp_touch_target.cjs');
+const {validateTouchTarget,missingPrerequisites,classifyFailure,selectCases}=require('./cdp_touch_target.cjs');
 const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton}=require('./android_device_touch.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
+const selectedCases=selectCases(process.env.DF_ANDROID_CASES||'',CASES);
+const scenarioEvidence=new Map();
 const results=new Map(CASES.map(id=>[id,{id,status:'NOT_TESTED',detail:'Outside this instrumented action scope; requires separate device/manual evidence'}]));
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const adb=(...args)=>cp.execFileSync('adb',['-s','emulator-5554',...args],{encoding:'utf8',timeout:20000});
@@ -89,6 +91,7 @@ async function dismissNoteKeyboardForSave(){
 
 async function check(expression,message){assert.equal(await evaluate(expression),true,message);}
 async function run(id,fn){
+ if(selectedCases&&!selectedCases.has(id))return;
  try{
   const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using ADB taps, CDP text input and observed state'});
  }catch(e){
@@ -101,6 +104,7 @@ async function run(id,fn){
   catch(observation){entry.observationError=String(observation.message).slice(0,200);}
   results.set(id,entry);
  }
+ if(scenarioEvidence.has(id))results.get(id).evidence=scenarioEvidence.get(id);
  console.log(JSON.stringify(results.get(id)));
 }
 async function restart(){ws.close();adb('shell','am','force-stop','com.zenstudy.focus');adb('shell','am','start','-n','com.zenstudy.focus/.MainActivity');await pause(3000);await connect();await ready();}
@@ -164,12 +168,16 @@ async function main(){
     await touch(`[...${card}.querySelectorAll('label.df-check')].find(n=>n.textContent.includes(${JSON.stringify(name)})).querySelector('input')`);
     await check(`tasksList.find(t=>t.title==='Android fixture task').${kind}.find(x=>x.title===${JSON.stringify(name)}).done===true`,'Actual child checkbox persisted');
   }
+  const packetExpression="(()=>{const key='zen_fortress_tasks_v21';function read(k){const raw=localStorage.getItem(k);if(raw===null)return null;try{const p=JSON.parse(raw);return {ts:p.ts,sig:p.sig,valid:DeepFocusDataCompatV21.inspectPacket(raw).ok,task:JSON.parse(p.payload).find(t=>t.title==='Android fixture task')};}catch(e){return {error:e.message};}}return {primary:read(key),mirror:read(key+'_mirror'),journalPresent:!!localStorage.getItem(DeepFocusDataCompatV21.JOURNAL_KEY)};})()";
+  const diagnostic={packetsBefore:await evaluate(packetExpression)};
+  scenarioEvidence.set('task_subtasks',diagnostic);
   const before=await evaluate("tasksList.find(t=>t.title==='Android fixture task')");
   assert.ok(before&&!before.done&&before.subtasks.some(x=>x.title==='FixtureChild'&&x.done)&&before.checklist.some(x=>x.title==='FixtureCheck'&&x.done),'Both child states must be committed before restart: '+JSON.stringify(before));
   const packet=await evaluate("loadFortressData('zen_fortress_tasks_v21',[]).find(t=>t.title==='Android fixture task')");
   assert.deepEqual(packet,before,'Verified storage readback before process kill must match live task');
   await restart();
   const after=await evaluate("tasksList.find(t=>t.title==='Android fixture task')");
+  diagnostic.packetsAfter=await evaluate(packetExpression);
   assert.deepEqual(after,before,'Immediate foreground process kill must retain the exact committed child IDs and states');
  });
  await run('timer_start_pause',async()=>{
@@ -261,6 +269,6 @@ async function main(){
 }
 main().catch(e=>{results.set('preflight',{id:'preflight',status:e.message.startsWith('TRANSPORT:')?'NOT_TESTED':'FAIL',classification:classifyFailure(e),detail:e.message});}).finally(()=>{
  try{ws?.close();}catch(_){}for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('TRANSPORT: disposed'));}pending.clear();
- const rows=[...results.values()],report={source:'Real Android WebView ADB taps with CDP inspection/text input, fresh disposable profile',sha:process.env.GITHUB_SHA||null,api:process.env.ANDROID_TEST_API||null,results:rows,touches:touchTrace,counts:Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,rows.filter(r=>r.status===s).length])),release_approved:false};
+ const rows=[...results.values()],report={source:'Real Android WebView ADB taps with CDP inspection/text input, fresh disposable profile',sha:process.env.GITHUB_SHA||null,api:process.env.ANDROID_TEST_API||null,results:rows,selectedCases:selectedCases?[...selectedCases]:null,touches:touchTrace,counts:Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,rows.filter(r=>r.status===s).length])),release_approved:false};
  fs.writeFileSync(process.argv[2]||'android-dom-actions.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));if(rows.some(r=>r.status!=='PASS'))process.exitCode=1;
 });
