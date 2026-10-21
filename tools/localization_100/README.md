@@ -6,7 +6,7 @@ The existing app has multiple distinct dictionaries (main app, premium, tasks, n
 
 ## Evidence-based translation production
 
-A real first-pass **Swahili (`sw`) draft** exists at `drafts/sw.json`. It contains 67 candidate UI strings across Analytics, navigation, tasks, notes, sounds, timer, goals, calendar and settings. It is explicitly `DRAFT_TRANSLATION_NEEDS_NATIVE_REVIEW` and has **no runtime effect**. The CLI validates provided text against the exact current source inventory, catches stale sources, missing tokens, control characters, untranslated English copies, removed action icons, removed file-type abbreviations (CSV) and non-Western numeric glyphs. It reports coverage by catalog, always with `readyForRuntime:false`.
+An unapproved first-pass **Swahili (`sw`) draft** exists at `drafts/sw.json`. It contains 88 candidate UI strings across Analytics, navigation, tasks, notes, sounds, timer, goals, calendar and settings. It is explicitly `DRAFT_TRANSLATION_NEEDS_NATIVE_REVIEW` and has **no runtime effect**. The CLI validates provided text against the exact current source inventory, catches stale sources, missing tokens, control characters, untranslated English copies, removed action icons, removed file-type abbreviations (CSV) and non-Western numeric glyphs. It reports coverage by catalog, always with `readyForRuntime:false`.
 
 For the other 79 planned locales, generate a source template using `guard.cjs --template <code>` and fill actual candidate translations only after reviewing the intended screen. The validator does **not** insert fallback English as translation, fake linguistic reviews, or modify the existing 20-language selector.
 
@@ -21,12 +21,25 @@ For the other 79 planned locales, generate a source template using `guard.cjs --
 **Inventory limits:** currently 25 explicit catalogs / 472 keys; this is not a complete native/dynamic runtime screen inventory. A prior exact-head audit found 4,626 original-20 missing language/key pairs, 20 English-identical candidates and 94 unmarked static copy candidates. Those gaps are independent blockers.
 
 **Safety:** `validateDraft(...).valid` means only the provided candidate text is structurally safe. `readyForRuntime` and `approvedForMerge` always remain `false`. `approved/` self-attested bundles are rejected by the admission guard until separately verifiable human/Android evidence exists. No new language is enabled by this PR.
+## Current candidate packs and native Android discovery
+
+- `drafts/sw.json`: 88 source-aligned Swahili web UI text candidates.
+- `drafts/ro.json`: 88 source-aligned Romanian web UI text candidates. Three correct-looking source-identical words are explicitly annotated **NEEDS_REVIEW**, never automatically approved.
+- `native_drafts/sw.json` and `native_drafts/ro.json`: 10 candidate translations per locale for discovered native Android backup toasts, timer notification text and notification channels. The product brand is left unchanged.
+- `native_copy.cjs --report` inventories untranslated Java callsite strings, including their source paths and line numbers; it does not mutate Android resources.
+- `native_drafts.cjs --report` checks native candidate key identity, source tokens, Unicode controls and Western 0–9. A successful check does not mean native UI is localized.
+- `coverage.cjs --report` emits an exact-checkout summary of all 100 registered languages, original 20 source gaps, draft candidates, untouched source keys and native text gaps. It explicitly reports **zero certified new languages**.
+
+These 196 initial web/native strings are drafts only, not native-reviewed translations. Before promotion, verify terminology and functionality in each context. The 20-language existing app remains unchanged.
 ## Commands
 
 Run at repository root:
 - `node --test tests/localization_20/locale100_gate.test.cjs tests/localization_20/locale100_drafts.test.cjs`
 - `node tools/localization_100/guard.cjs --check`
 - `node tools/localization_100/drafts.cjs --report`
+- `node tools/localization_100/native_copy.cjs --report`
+- `node tools/localization_100/native_drafts.cjs --report`
+- `node tools/localization_100/coverage.cjs --report`
 - `node tools/localization_100/drafts.cjs --worksheet sw > /tmp/sw-review-worksheet.json`
 - `node tools/localization_100/guard.cjs --template sw > /tmp/sw-draft.json`
 - `node tools/language_review/audit.cjs --out /tmp/df-locale-audit`
