@@ -205,15 +205,26 @@ function startQuickTraining() {
   if(timerRunning || timerSessionId!==null) {
     if(!window.confirm(quickText('replacePrompt')))return;
   }
+  // A native/dual-copy write can fail. Do not interrupt an existing timer or
+  // claim a training session until the new activity is durably acknowledged.
+  const nextCfg={...cfg,domain:quickPresetDomain};
+  try {
+    if(saveFortressData('zen_fortress_cfg_v21',nextCfg)!==true)
+      throw new Error('QUICK_ACTIVITY_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed || (cfg.lang==='ar'
+      ? 'تعذّر حفظ النشاط. حاول مرة أخرى.'
+      : 'Could not save activity. Try again.'));
+    return false;
+  }
   if(timerRunning)toggleTimerPlay();
+  cfg.domain=quickPresetDomain;
   quickTraining={
     active:true,sets,workSeconds,restSeconds,currentSet:0,phase:'work',
     skipLastRest:document.getElementById('qtSkipLast').checked,
     exercises:quickExercises.slice(),domain:quickPresetDomain,
     taskId:focusWorkflowGetLinkedTask()?.id ?? null
   };
-  cfg.domain=quickPresetDomain;
-  saveFortressData('zen_fortress_cfg_v21',cfg);
   renderDomainState();
   quickInternalChange=true;
   selectTimerMode(workSeconds/60,'focus',document.getElementById('modeFocusBtn'));
@@ -363,20 +374,20 @@ function renderTodayPlan() {
     check.textContent = t.done ? '✓' : '○';
     check.setAttribute('aria-pressed', String(Boolean(t.done)));
     check.setAttribute('aria-label',
-      (cfg.lang === 'ar' ? 'تغيير إنجاز المهمة: ' : 'Toggle completion: ') + toWest(t.title || ''));
+      (cfg.lang === 'ar' ? 'تغيير إنجاز المهمة: ' : 'Toggle completion: ') + (t.title || ''));
     check.onclick = () => toggleTaskDone(t.id);
 
     const focus = document.createElement('button');
     focus.type = 'button';
     focus.className = 'today-plan-link';
     focus.setAttribute('aria-label',
-      (cfg.lang === 'ar' ? 'التركيز على: ' : 'Focus on: ') + toWest(t.title || ''));
+      (cfg.lang === 'ar' ? 'التركيز على: ' : 'Focus on: ') + (t.title || ''));
     const name = document.createElement('span');
     name.className = 'today-plan-task-name';
-    name.textContent = toWest(t.title || '');
+    name.textContent = t.title || '';
     const details = document.createElement('small');
     details.className = 'today-plan-task-detail';
-    details.textContent = toWest(getCatLabel(t.catKey) + (t.time ? ' · ' + t.time : ''));
+    details.textContent = getCatLabel(t.catKey) + (t.time ? ' · ' + t.time : '');
     focus.appendChild(name);
     focus.appendChild(details);
     focus.onclick = () => focusOnTask(t.id);
