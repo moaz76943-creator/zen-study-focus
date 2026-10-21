@@ -1,0 +1,106 @@
+name: Deep Focus Batch 3 Exact-Tree Integration QA
+on:
+  push:
+    branches: [integration/batch3-source-convergence-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df-batch3-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact incoming source blobs, not inherited old PASS
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          node - <<'NODE'
+          const fs=require('node:fs'),cp=require('node:child_process');
+          const data=JSON.parse(fs.readFileSync('docs/master_completion/BATCH3_SOURCE_CONVERGENCE.json','utf8'));
+          for(const [file,sha] of Object.entries(data.path_blobs)){
+            const actual=cp.execFileSync('git',['rev-parse','HEAD:'+file],{encoding:'utf8'}).trim();
+            if(actual!==sha)throw Error(file+' blob mismatch: '+actual+' expected '+sha);
+          }
+          if(data.release_approved!==false)throw Error('Release lock must remain false');
+          console.log('PINNED_BLOBS_PASS',Object.keys(data.path_blobs).length);
+          NODE
+      - name: Verify integration source syntax and focused outcome tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in android/app/src/main/assets/web/{app,quick_training,goals_studio,analytics_studio,tasks_core_v21,tasks_studio,notes_editor_ui}.js; do node --check "$f"; done
+          node --test --test-reporter=tap tests/track05_timer/tick_lifecycle.test.cjs tests/focus_workflows/test_focus_workflows.cjs tests/track07_functional/analytics_export_range_lifecycle.test.cjs tests/tasks_core/tasks_core.test.cjs tests/tasks_core/tasks_studio.test.cjs tests/df4_browser/note_modal_style.test.cjs
+      - name: Full Node and Python regressions — separate release gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs | sort)
+          test "${#suites[@]}" -gt 0
+          node --test --test-reporter=tap "${suites[@]}" 
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
+          node tests/smoke_app.cjs
+          node tests/validate_locales.cjs
+      - name: Explicit media provenance release blocker
+        continue-on-error: true
+        run: node --test tests/master_recovery_qa/media_provenance_gate.test.cjs
+      - name: Human and installed Android release gates stay blocked
+        if: always()
+        run: |
+          echo 'RELEASE_APPROVED=NO' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Android actual SAF/ACK, IME and background sound: NOT_TESTED or BLOCKED' >> "$GITHUB_STEP_SUMMARY"
+          echo 'This is a source-integration trial, not a main merge or production approval.' >> "$GITHUB_STEP_SUMMARY"
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install headless Chromium and pinned Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then sudo apt-get update -qq && sudo apt-get install -y -qq chromium; fi
+      - name: Serve static offline assets via loopback
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd android/app/src/main/assets/web && python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/web.log" 2>&1) &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Real Chromium: goals, Analytics, legacy tasks, note viewport
+        shell: bash
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_NOTE_IME_URL: http://127.0.0.1:8770/index.html
+          DF_TRACK09_EVIDENCE: ${{ runner.temp }}/batch3/goals
+          DF_ANALYTICS_EVIDENCE: ${{ runner.temp }}/batch3/analytics
+          TRACK08_BROWSER_EVIDENCE: ${{ runner.temp }}/batch3/tasks
+          DF_NOTE_IME_EVIDENCE: ${{ runner.temp }}/batch3/notes
+        run: |
+          set -euo pipefail
+          node tests/focus_workflows/track09_chromium.cjs
+          node tests/track10/analytics_presets_browser.cjs
+          node tests/tasks_core/tasks_chromium.cjs
+          node tests/df4_browser/note_ime_viewport_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: batch3-chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/batch3/
+          if-no-files-found: warn
+          retention-days: 7
