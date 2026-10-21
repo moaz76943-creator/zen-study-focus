@@ -98,9 +98,12 @@
    panel('track15-gates','Nature audio commercial licences · NOT_APPROVED',
      'لا تُستنتج الموافقات من نجاح اختبارات Node أو وجود الملفات.',
      core.issueUrl(105));
-   panel('track15-gates','Security + v21 data integrity · NOT_TESTED',
-     'يتطلبان دليل مراجعة مستقل على HEAD مطابق، ولا تمنحهما اللوحة موافقة.',
-     core.issueUrl(64));
+   panel('track15-gates','Security / credential triage · BLOCKED',
+     'راجع Issue #107: فحص Gitleaks يحتاج تصنيفًا مثبتًا دون كشف أسرار. لا تُعد CodeQL وحدها موافقة.',
+     core.issueUrl(107));
+   panel('track15-gates','v21 Native ACK / SAF recovery · NOT_TESTED',
+     'اقرأ Issue #102: فحوص المصدر السابقة لا تثبت backup→readback→import على هاتف فعلي.',
+     core.issueUrl(102));
    panel('track15-gates','Release · NOT_APPROVED',
      'لا توقيع ولا دمج تلقائي؛ تبقى كل بوابات الإصدار مستقلة.');
    const when=new Date(fetchedAt).toLocaleString('en-GB',{timeZone:'Asia/Amman'});
