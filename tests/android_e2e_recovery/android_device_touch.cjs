@@ -50,4 +50,20 @@ function nativePromptText(xml){
  if(!text)throw new Error('TRANSPORT: Native prompt input text unavailable');
  return text[1].replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
 }
-module.exports={parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,nativePromptText};
+
+/** Confirm/Alert dialogs have NO EditText; never reuse prompt-only parsing here. */
+function parseNativeConfirmButton(xml){
+ const view=String(xml||'');
+ if(!view.includes('Deep Focus')||view.includes('file://'))
+  throw new Error('TRANSPORT: Untrusted Android confirmation title or browser-origin popup');
+ const tags=view.match(/<node\b[^>]*>/g)||[];
+ const button=tags.find(n=>n.includes('resource-id="android:id/button1"'));
+ const bounds=button&&/\bbounds="\[([0-9]+),([0-9]+)\]\[([0-9]+),([0-9]+)\]"/.exec(button);
+ if(!bounds)throw new Error('TRANSPORT: Real native positive confirmation button unavailable');
+ const [left,top,right,bottom]=bounds.slice(1).map(Number);
+ if(![left,top,right,bottom].every(Number.isSafeInteger)||right<=left||bottom<=top)
+  throw new Error('TRANSPORT: Invalid native confirmation geometry');
+ return {x:Math.round((left+right)/2),y:Math.round((top+bottom)/2)};
+}
+
+module.exports={parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,parseNativeConfirmButton,nativePromptText};
