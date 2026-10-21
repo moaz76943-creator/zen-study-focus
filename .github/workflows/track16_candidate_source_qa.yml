@@ -83,9 +83,10 @@ jobs:
         if: always()
         env:
           OUT_DIR: ${{ runner.temp }}/candidate-source
+          AUTOMATION_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           mkdir -p "$OUT_DIR"
-          node -e 'const fs=require("node:fs"),p=require("node:path");const sf=p.join(process.env.OUT_DIR,"SOURCE_SHA");const data={run_id:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,head_commit:process.env.GITHUB_SHA,source_sha:fs.existsSync(sf)?fs.readFileSync(sf,"utf8").trim():"NOT_VERIFIED",canonical_pr:138,scope:"SOURCE_ONLY",release_approved:false};fs.writeFileSync(p.join(process.env.OUT_DIR,"run-provenance.json"),JSON.stringify(data,null,2)+"\n");'
+          node -e 'const fs=require("node:fs"),p=require("node:path");const sf=p.join(process.env.OUT_DIR,"SOURCE_SHA");const data={run_id:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,automation_pr_head_sha:process.env.AUTOMATION_PR_HEAD_SHA,workflow_merge_sha:process.env.GITHUB_SHA,source_sha:fs.existsSync(sf)?fs.readFileSync(sf,"utf8").trim():"NOT_VERIFIED",canonical_pr:138,scope:"SOURCE_ONLY",release_approved:false};fs.writeFileSync(p.join(process.env.OUT_DIR,"run-provenance.json"),JSON.stringify(data,null,2)+"\n");'
       - uses: actions/upload-artifact@v4
         if: always()
         with:

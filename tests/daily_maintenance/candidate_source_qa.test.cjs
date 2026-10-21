@@ -19,6 +19,8 @@ test('candidate source QA verifies live PR138 SHA and real specialist outcomes, 
  assert.match(yaml,/actions\/upload-artifact@v4/);
  assert.match(yaml,/if: always\(\)/);
  assert.match(yaml,/run-provenance\.json/);
+ assert.match(yaml,/automation_pr_head_sha:process\.env\.AUTOMATION_PR_HEAD_SHA/);
+ assert.match(yaml,/workflow_merge_sha:process\.env\.GITHUB_SHA/);
 });
 test('candidate QA enforces minimal permissions and does not execute app production mutations',()=>{
  const yaml=fs.readFileSync(workflow,'utf8');
