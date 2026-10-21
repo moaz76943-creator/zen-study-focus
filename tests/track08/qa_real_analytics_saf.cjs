@@ -118,7 +118,7 @@ async function receiptAfter(before,expected){
   report.results.push({stage:'cancel',status:'PASS',requestId:cancelResult.id,realNativePicker:true});
   const savedBefore=await clickExport('save');
   const xml=await waitChooser('save');
-  const save=nodes(xml).find(n=>/text="(?:SAVE|Save|حفظ)"/.test(n)||/resource-id="[^"]*:id\\/action_menu_save"/.test(n));
+  const save=nodes(xml).find(n=>/text="(?:SAVE|Save|حفظ)"/.test(n)||/resource-id="[^"]*:id\/action_menu_save"/.test(n));
   if(!save){
    report.results.push({stage:'save',status:'NOT_TESTED',reason:'Native DocumentsUI Save control not exposed in current folder'});
    throw Error('Real Save control missing; no fake successful export');
