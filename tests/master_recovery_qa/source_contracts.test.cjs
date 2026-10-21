@@ -70,3 +70,19 @@ test('DF-151 switching locale updates UI attributes but leaves user-edited text 
   assert.equal(root.userText,userText,'User text must never be forcibly transliterated');
   // Numeric DOM/SVG screenshot checks and persistence across process restart remain BLOCKED.
 });
+
+test('P0 master-recovery push/PR receive fail-closed source CI with honest checkout SHA',()=>{
+  const workflow=read('.github/workflows/verify_deep_focus_rescue.yml');
+  const triggers=workflow.slice(0,workflow.indexOf('\npermissions:'));
+  assert.ok(triggers.includes('  push:') && triggers.includes('  pull_request:'));
+  const pushed=triggers.split('  push:')[1].split('  pull_request:')[0];
+  const reviewed=triggers.split('  pull_request:')[1].split('  workflow_dispatch:')[0];
+  assert.match(pushed,/integration\/master-recovery-20261021/);
+  assert.match(reviewed,/integration\/master-recovery-20261021/);
+  assert.match(workflow,/permissions:\s*\n\s*contents: read/);
+  assert.match(workflow,/persist-credentials: false/);
+  assert.match(workflow,/git rev-parse HEAD.*head-sha\.txt/);
+  assert.match(workflow,/PR_HEAD_SHA=/);
+  assert.match(workflow,/media_provenance_gate\.test\.cjs/);
+  assert.match(workflow,/RELEASE_NOT_APPROVED\.txt/);
+});
