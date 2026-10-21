@@ -1,0 +1,40 @@
+name: Deep Focus 100 Locale Admission Safety
+on:
+  pull_request:
+    paths:
+      - 'tools/localization_100/**'
+      - 'tests/localization_20/locale100_gate.test.cjs'
+      - 'android/app/src/main/assets/web/**'
+      - '.github/workflows/locale_100_admission_gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: locale-100-admission
+  cancel-in-progress: true
+jobs:
+  reviewed-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Admission safety (not language certification)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/exact-sha.txt
+          node --check tools/localization_100/guard.cjs
+          node --test tests/localization_20/locale100_gate.test.cjs | tee evidence/unit.tap
+          node tools/localization_100/guard.cjs --check | tee evidence/admission.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: locale100-admission-source
+          path: evidence/
+          retention-days: 3
