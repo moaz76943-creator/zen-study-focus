@@ -43,23 +43,61 @@ function scanJava(source,relativePath){
  }
  return items.sort((a,b)=>a.line-b.line||a.text.localeCompare(b.text));
 }
+// Native messages supplied by JavaScript/runtime values are not literal translations.
+// Record them separately so review worksheets cannot mistake absence for coverage.
+function scanDynamicJava(source,relativePath){
+ if(typeof source!=='string'||typeof relativePath!=='string'||relativePath.includes('..'))
+  throw Error('INVALID_NATIVE_SOURCE');
+ const kinds={setMessage:'dynamicDialogMessage',setContentText:'dynamicNotificationBody',
+  setContentTitle:'dynamicNotificationTitle'};
+ const rows=[],seen=new Set(),calls=/\\.(setMessage|setContentText|setContentTitle)\\s*\\(/g;
+ let match;
+ while((match=calls.exec(source))!==null){
+  let i=calls.lastIndex,depth=1,quote=null,escaped=false;
+  for(;i<source.length&&depth;i++){
+   const ch=source[i];
+   if(quote){
+    if(escaped)escaped=false;
+    else if(ch==='\\\\')escaped=true;
+    else if(ch===quote)quote=null;
+   }else if(ch==='"'||ch==="'")quote=ch;
+   else if(ch==='(')depth++;
+   else if(ch===')')depth--;
+  }
+  if(depth)throw Error('UNBALANCED_NATIVE_UI_CALL:'+relativePath+':'+match[1]);
+  const expression=source.slice(calls.lastIndex,i-1).trim();
+  if(!expression||expression.length>500)throw Error('UNREVIEWABLE_DYNAMIC_SOURCE:'+relativePath);
+  if(/^"(?:\\\\.|[^"\\\\])*"$/s.test(expression)||/^android\\.R\\.string\\.\\w+$/.test(expression))continue;
+  const line=source.slice(0,match.index).split('\\n').length,kind=kinds[match[1]];
+  const key=[relativePath,kind,expression].join('|');
+  if(seen.has(key))continue;
+  seen.add(key);
+  rows.push({path:relativePath,line,kind,expression,status:'DYNAMIC_RUNTIME_CROSS_REFERENCE_REQUIRED'});
+ }
+ return rows.sort((a,b)=>a.path.localeCompare(b.path)||a.line-b.line||a.kind.localeCompare(b.kind));
+}
+
 // Stable across file-line movement, not across changed literal, callsite type or source path.
 function inventoryHash(rows){
  const items=[...new Set(rows.map(r=>[r.path,r.kind,r.text].join('\\u0000')))].sort();
  return crypto.createHash('sha256').update(JSON.stringify(items)).digest('hex');
 }
 function report(){
- const uiStrings=[],files=listJavaFiles();
+ const uiStrings=[],dynamicUiCallsites=[],files=listJavaFiles();
  if(!files.length)throw Error('NATIVE_JAVA_DISCOVERY_EMPTY');
  for(const p of files){
   const reviewPath=p.startsWith(LEGACY_PACKAGE)?p.slice(LEGACY_PACKAGE.length):p;
-  uiStrings.push(...scanJava(fs.readFileSync(path.join(JAVA_ROOT,p),'utf8'),reviewPath));
+  const source=fs.readFileSync(path.join(JAVA_ROOT,p),'utf8');
+  uiStrings.push(...scanJava(source,reviewPath));
+  dynamicUiCallsites.push(...scanDynamicJava(source,reviewPath));
  }
  if(uiStrings.length<8)throw Error('NATIVE_UI_DISCOVERY_SUSPICIOUSLY_EMPTY');
  return {schema_version:1,source:'Exact checked-out Java source, heuristic UI callsite scanner',
   files:files.length,candidates:uiStrings.length,inventorySha256:inventoryHash(uiStrings),uiStrings,
+  dynamicCandidateCount:dynamicUiCallsites.length,dynamicUiCallsites,
+  dynamicInventorySha256:inventoryHash(dynamicUiCallsites.map(r=>({...r,text:r.expression}))),
   localizedIn100:false,reviewed:false,limitations:[
-   'This inventory is source-level and excludes JS-supplied dynamic messages',
+   'JavaScript-supplied dialog and notification strings are inventoried as unresolved dynamic callsites, not translations',
    'OS-managed android.R.string dialogs already localize separately',
    'No native UI strings were changed, translated or activated',
    'Human review and exact-head Android device tests required'
@@ -71,4 +109,4 @@ if(require.main===module){
   console.log(JSON.stringify(report(),null,2));
  }catch(e){console.error('NATIVE_COPY_DISCOVERY_FAILED:',e.message);process.exitCode=1;}
 }
-module.exports={scanJava,inventoryHash,listJavaFiles,report};
+module.exports={scanJava,scanDynamicJava,inventoryHash,listJavaFiles,report};
