@@ -11,6 +11,16 @@ mod=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
 class IsolatedAPKTests(unittest.TestCase):
+ def test_track06_branch_is_permitted_only_in_explicit_actions_quarantine_scope(self):
+  base={"GITHUB_ACTIONS":"true","AUDIO_QA_BUILD":"1","GITHUB_REF_NAME":"audit/track06-audio-acceptance-matrix-20261021"}
+  self.assertTrue(mod.audioqa_build_permitted(base))
+  for key,value in [("GITHUB_ACTIONS","false"),("AUDIO_QA_BUILD","0"),
+                    ("GITHUB_REF_NAME","main"),("GITHUB_REF_NAME","integration/master-recovery-20261021"),
+                    ("GITHUB_REF_NAME","audit/track06-audio-acceptance-matrix-20261021-evil")]:
+   with self.subTest(key=key,value=value):
+    self.assertFalse(mod.audioqa_build_permitted({**base,key:value}))
+  self.assertTrue(mod.audioqa_build_permitted({**base,"GITHUB_REF_NAME":"fix/track07-04-audio-acceptance-20261020"}))
+  self.assertIn(base["GITHUB_REF_NAME"],mod.AUDIOQA_TWENTY_ONLY_BRANCHES)
  def test_qa_build_has_different_package_and_does_not_bundle_legacy_web_assets(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=pathlib.Path(tmp)
