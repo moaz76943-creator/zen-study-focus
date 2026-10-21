@@ -1,20 +1,46 @@
-# Deep Focus 100-language request — bounded implementation status (2026-10-21)
+# Deep Focus 100-locale implementation checkpoint — 2026-10-21
 
-## Verified work before code review
-- Source baseline: PR #126, exact SHA `7c4decaf34e322e01ebab4a3cf44b62b3def4156`; do not claim main or this PR is the approved production baseline.
-- Registered language targets: 100 (the original 20 plus 80 planned). Hebrew is absent.
-- The new language targets remain deliberately **not selectable** until translation, runtime integration and native reviews are documented.
-- Existing 20 language behavior and core v21 persisted data were **not modified** by this change.
-- Scope: isolated JSON registry, fail-closed reviewer/admission validator, focused tests and source-only GitHub Actions. No automated translation or network APIs.
+## Scope and original invariants
 
-## Open quality blockers
-- All screen and dialog strings, placeholders, plurals, user-facing native Android messages, notification copy, accessibility and errors need reviewed contextual translations for each new language.
-- Actual dictionary coverage of even the earlier 20 remains incomplete per existing audit, and exact-head fresh audit/Android evidence must be recorded separately.
-- No human native-speaker review or actual Android 100-language screen matrix has happened. All 80 planned languages are **NOT_TESTED** for translation quality and **NOT_RELEASED**.
-- UI integration must be coordinated with PR #126/its successor; do not auto-merge the translation infrastructure into an app release.
-- Prior independent Android and SAF, TalkBack, audio provenance, and Gitleaks gates remain independent of this registry change.
+Review PR: #129, stacked on PR #126, no main merge.
+- 100 registered language targets: original 20 unchanged plus 80 unapproved candidates; Hebrew excluded.
+- The original app's 20 runtime choices, Android package identity, stored data v21, backup format and user-authored notes/tasks are unchanged.
+- Runtime activation of all 80 new locales is **OFF**. No renderer, timer, analytics engine or production Android Java is modified by this PR.
 
-## Admission evidence and next small safe step
-Run `node --test tests/localization_20/locale100_gate.test.cjs`, `node tools/localization_100/guard.cjs --check` at the PR **exact head** in CI, and attach the generated JSON and SHA. If CI fails, fix only the admission module; never weaken or hide failing tests. A successful source gate confirms registry structure and guarded **non-activation**, NOT 100 finished localizations.
+## Real candidate translation content produced
 
-The separate integration owner may then select one language, generate a source-inventory template, translate every contextual key with a native reviewer, add native UI and screen coverage, and only after all gates pass prepare a scoped activation PR.
+| Lane | Locale | Source keys with first-pass wording | Original keys still needing wording | Human review | Runtime |
+|---|---|---:|---:|---|---|
+| Web UI | Swahili (sw) | 88 | 384 of 472 | NOT_TESTED | DISABLED |
+| Web UI | Romanian (ro) | 88 | 384 of 472 | NOT_TESTED | DISABLED |
+| Android-native copy | sw | 10 | at least 1 brand/copy key | NOT_TESTED | DISABLED |
+| Android-native copy | ro | 10 | at least 1 brand/copy key | NOT_TESTED | DISABLED |
+
+**196 initial string candidates**, not certified translations. Additional native/dynamic keys are still outside the 472-key web source inventory, and candidate accuracy, plurals, tone and naturalness require independent contextual/native-linguist review. Romanian source-identical words are preserved with explicit human-review notes; no weaker synonym is forced to satisfy a test.
+
+## Actual source audit of pre-existing 20 languages
+
+Measured against the PR's same app tree:
+- 4,626 missing explicitly populated language/key entries, **not** all translations in the rendered UI.
+- 20 source-identical English candidates requiring triage.
+- 94 unmarked static HTML/JavaScript display-text candidates.
+- 25 source catalogs, 472 English keys in the current dictionary scanner. Native and dynamic Android/JS text inventory is **not complete**.
+- Source-level native Android scanner additionally detects user-facing toast, notification-title/body, notification-channel and dialog-title strings.
+
+## Guardrails and evidence
+
+- JSON drafts cannot activate runtime locales, and cannot self-certify; full review and release state always remains false.
+- Structural checks reject stale English inventory, missing placeholders, unsafe bidi/HTML, non-Western decimal numerals, unrecognized keys and lost action icons/CSV labels.
+- Native Android candidate validator rejects unknown Java source strings, missing format tokens, unsafe numbers and control characters.
+- Full 100-language scoreboard displays original locale gaps and missing new-language content. Unreviewed words count as **candidates**, not release-ready copy.
+- GitHub Actions runs a source contract, entire existing Node/Python regression suite and real Chromium scenarios on the exact PR head. Check latest job and artifact before reporting PASS.
+- The separate Android expanded-dialog acceptance in PR #128 previously failed (native dialog proof timeout); Android device, SAF, TalkBack, full buttons, speaker review, licensing/security and signed release remain independent gates.
+
+## Integration path
+
+1. Finish the missing translations for each locale across every screen, modal, native Android message and accessibility node.
+2. Run independent fluent-speaker contextual review, including terminology, pluralization and consent/warning text.
+3. Prove 0–9 generated counters, RTL/LTR, screen sizing, all tap outcomes, offline/restart, user-data preservation and real SAF on exact-head Android.
+4. Prepare a separate narrow activation PR; independently review and approve each locale. Do **not** activate a whole 80-language group on a source-lint PASS.
+
+**RELEASE_APPROVED=NO. MERGE_READY_AS_100_TRANSLATED_LANGUAGES=NO.**
