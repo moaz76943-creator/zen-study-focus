@@ -1,0 +1,134 @@
+name: Track08 staged exact-head source Chromium Android QA
+on:
+  push:
+    branches:
+      - integration/track08-v21-staged-qa-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track08-staged-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Record exact source and validate syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/track08-staged"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/track08-staged/SOURCE_SHA"
+          node --check android/app/src/main/assets/web/tasks_core_v21.js
+          node --check android/app/src/main/assets/web/tasks_studio.js
+          node --check tests/tasks_core/tasks_android_e2e.cjs
+          node --check tests/tasks_core/tasks_chromium.cjs
+      - name: Full source and Python regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/smoke_app.cjs
+          node tests/validate_locales.cjs
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs | sort)
+          test "${#suites[@]}" -gt 0
+          node --test --test-reporter=tap "${suites[@]}" | tee "$RUNNER_TEMP/track08-staged/node.tap"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/track08-staged/python.log"
+      - name: Set up ephemeral Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            chrome="$(command -v google-chrome || command -v google-chrome-stable || true)"
+            if [[ -n "$chrome" ]]; then sudo ln -s "$chrome" /usr/bin/chromium; else sudo apt-get update -qq && sudo apt-get install -y -qq chromium; fi
+          fi
+          test -x /usr/bin/chromium
+      - name: Real Chromium Arabic English Tasks editor tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          TRACK08_BROWSER_EVIDENCE="$RUNNER_TEMP/track08-staged/chromium" TRACK08_CHROMIUM=/usr/bin/chromium node tests/tasks_core/tasks_chromium.cjs
+      - name: Record remaining release blockers
+        if: always()
+        run: |
+          printf '%s\n' 'MEDIA_RIGHTS=BLOCKED' 'PHYSICAL_ANDROID=NOT_TESTED' 'GITLEAKS_TRIAGE=BLOCKED' 'RELEASE_APPROVED=NO' > "$RUNNER_TEMP/track08-staged/RELEASE_NOT_APPROVED.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Track08-Staged-Source-Chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/track08-staged/
+          retention-days: 5
+          if-no-files-found: warn
+  android-webview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Prepare source digest and Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/track08-android"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/track08-android/SOURCE_SHA"
+          sdkmanager="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$sdkmanager"
+          "$sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build the exact SHA debug APK (test only)
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle assembleDebug --no-daemon
+          sha256sum app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/track08-android/APK_SHA256"
+      - name: Disposable Android API30 WebView touch and force-stop readback
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            test "$(adb shell getprop ro.kernel.qemu | tr -d '\r')" = 1
+            adb install android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell svc wifi disable || true
+            adb shell svc data disable || true
+            adb shell am start -n com.zenstudy.focus/.MainActivity
+            sleep 5
+            TRACK08_DISPOSABLE=1 node tests/tasks_core/tasks_android_e2e.cjs "$RUNNER_TEMP/track08-android/android-results.json"
+      - name: Preserve device diagnostics without claiming physical acceptance
+        if: always()
+        shell: bash
+        run: |
+          adb exec-out screencap -p > "$RUNNER_TEMP/track08-android/screen.png" 2>/dev/null || true
+          adb shell dumpsys webviewupdate > "$RUNNER_TEMP/track08-android/webview-version.txt" 2>/dev/null || true
+          adb logcat -d -s AndroidRuntime > "$RUNNER_TEMP/track08-android/runtime-errors.log" 2>/dev/null || true
+          printf '%s\n' 'DISPOSABLE_ANDROID=SOURCE_TEST' 'PHYSICAL_DEVICE=NOT_TESTED' 'RELEASE_APPROVED=NO' > "$RUNNER_TEMP/track08-android/RELEASE_NOT_APPROVED.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Track08-Staged-Android-${{ github.sha }}
+          path: ${{ runner.temp }}/track08-android/
+          retention-days: 5
+          if-no-files-found: warn
