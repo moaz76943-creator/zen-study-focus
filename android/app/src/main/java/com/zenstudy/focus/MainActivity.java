@@ -45,10 +45,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static final int REQUEST_BACKUP_EXPORT = 7410;
+    private static final int REQUEST_BACKUP_IMPORT = 7412;
+    private static final int MAX_BACKUP_IMPORT_BYTES = 8 * 1024 * 1024;
     private static final int REQUEST_ANALYTICS_EXPORT = 7411;
     private String analyticsAwaitingSave = null;
     private String analyticsAwaitingRequest = null;
     private String backupAwaitingSave = null;
+    private boolean backupImportPickerOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -256,6 +259,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
+        public void importBackupFromFile() {
+            runOnUiThread(() -> {
+                if (backupImportPickerOpen) return;
+                backupImportPickerOpen = true;
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("text/plain");
+                try {
+                    startActivityForResult(intent, REQUEST_BACKUP_IMPORT);
+                } catch (Exception error) {
+                    backupImportPickerOpen = false;
+                    Toast.makeText(MainActivity.this,
+                            "Backup file picker unavailable; existing data unchanged",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
         public void exportBackupToFile(String backupCode) {
             if (backupCode == null || !backupCode.startsWith("ZEN21::")
                     || backupCode.length() > 14000000) return;
@@ -368,6 +390,39 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_BACKUP_IMPORT) {
+            backupImportPickerOpen = false;
+            if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null) return;
+            // SAF grants read access to this user-selected document only.
+            // Do not permit arbitrary content:// resources in the WebView.
+            try (java.io.InputStream source =
+                    getContentResolver().openInputStream(data.getData())) {
+                if (source == null) throw new java.io.IOException("No selected file");
+                java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+                byte[] chunk = new byte[8192];
+                int total = 0, count;
+                while ((count = source.read(chunk)) != -1) {
+                    total += count;
+                    if (total > MAX_BACKUP_IMPORT_BYTES)
+                        throw new java.io.IOException("Backup exceeds limit");
+                    bytes.write(chunk, 0, count);
+                }
+                final String backupCode =
+                        new String(bytes.toByteArray(), StandardCharsets.UTF_8);
+                if (backupCode.trim().isEmpty()) throw new java.io.IOException("Empty backup");
+                if (webView == null || isDestroyed()) return;
+                // The existing v21 verifier checks checksum, schema and user
+                // consent before ANY mutation; native must not report success.
+                final String script = "if(typeof verifyAndRestoreBackupCode==='function')"
+                        + "verifyAndRestoreBackupCode("
+                        + org.json.JSONObject.quote(backupCode) + ");";
+                webView.post(() -> webView.evaluateJavascript(script, null));
+            } catch (Exception error) {
+                Toast.makeText(this, "Unable to read backup; existing data unchanged",
+                        Toast.LENGTH_LONG).show();
+            }
+            return;
+        }
         if (requestCode == REQUEST_ANALYTICS_EXPORT) {
             final String payload = analyticsAwaitingSave;
             final String requestId = analyticsAwaitingRequest;
