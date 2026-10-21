@@ -216,8 +216,7 @@ test('Studio native CSV export supports sessions, daily, weekly and monthly opti
     kind.value=value;
     await ui.button.events.click();
     const last=outputs.at(-1);
-    assert.match(last.body,new RegExp(header.replaceAll('"','\\\\\"')),
-      'Export schema must identify report kind');
+    assert.ok(last.body.startsWith(header),'Export schema must identify report kind');
     assert.ok(last.filename.includes(value),'Filename matches selected report kind');
   }
   assert.equal(outputs.length,4);
