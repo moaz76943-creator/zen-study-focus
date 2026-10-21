@@ -1418,12 +1418,24 @@ function toggleTimerPlay() {
   const activeTitle = document.getElementById('timerModeCaption').textContent;
 
   if (timerRunning) {
+    const previousActiveMs = timerActiveMs, previousResumeMs = timerResumeMs;
+    const previousTargetTime = timerTargetTime;
     clearInterval(timerInterval);
     timerInterval = null;
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
     accumulateActiveTime();
     timerRunning = false;
-    storeTimerSession();
+    if (storeTimerSession() !== true) {
+      // Do not stop the native service or pretend Pause succeeded without ACK.
+      timerRunning = true;
+      timerActiveMs = previousActiveMs;
+      timerResumeMs = previousResumeMs;
+      timerTargetTime = previousTargetTime;
+      timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
+      timerInterval = setInterval(runTimerTick, 500);
+      updateTimerDisplay();
+      return false;
+    }
     if (window.ZenNative && window.ZenNative.stopBackgroundService) {
       try { window.ZenNative.stopBackgroundService(); } catch(e){}
     }
@@ -1434,6 +1446,8 @@ function toggleTimerPlay() {
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
     } catch(e){}
 
+    const previousId = timerSessionId, previousTaskId = focusSessionTaskId;
+    const previousResumeMs = timerResumeMs, previousTargetTime = timerTargetTime;
     if (!timerSessionId) {
       timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
       const linked = typeof focusWorkflowGetLinkedTask === 'function' ? focusWorkflowGetLinkedTask() : null;
@@ -1444,12 +1458,22 @@ function toggleTimerPlay() {
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     timerResumeMs = Date.now();
     timerTargetTime = timerResumeMs + (timerLeft * 1000);
-    storeTimerSession();
+    if (storeTimerSession() !== true) {
+      timerRunning = false;
+      timerSessionId = previousId;
+      focusSessionTaskId = previousTaskId;
+      timerResumeMs = previousResumeMs;
+      timerTargetTime = previousTargetTime;
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+      updateTimerDisplay();
+      return false;
+    }
 
     startNativeTimerForCurrentSession(timerLeft, activeTitle);
 
     timerInterval = setInterval(runTimerTick, 500);
   }
+  return true;
 }
 
 function resetTimerNow() {
