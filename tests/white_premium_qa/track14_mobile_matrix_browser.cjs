@@ -8,7 +8,6 @@ const base = process.env.DF_COMPLETION_URL || 'http://127.0.0.1:8770';
 const output = process.env.DF_TRACK14_EVIDENCE || '/tmp/deep-focus-track14';
 const ids = ['navTasks','navCalendar','navNotes','navTimer','navTraining','navSounds','navAnalytics'];
 const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
-function round(v) { return Math.round(v*100)/100; }
 
 (async()=>{
   fs.mkdirSync(output,{recursive:true});
@@ -18,7 +17,7 @@ function round(v) { return Math.round(v*100)/100; }
     const page=await browser.newPage({viewport:{width:393,height:780},reducedMotion:'reduce'});
     page.on('pageerror',error=>uncaught.push(String(error)));
     await page.goto(base+'/index.html',{waitUntil:'load'});
-    await page.waitForFunction(()=>document.body.classList.contains('df-recovery10') && !!document.getElementById('focusHeroCard'),{timeout:20000});
+    await page.waitForFunction(()=>document.body.classList.contains('df-recovery10') && !!document.getElementById('focusHeroCard'),undefined,{timeout:20000});
     for(const width of widths){
       for(const dir of dirs){
         for(const scale of scales){
