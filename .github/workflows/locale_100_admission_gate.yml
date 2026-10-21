@@ -34,6 +34,7 @@ jobs:
           node tools/localization_100/guard.cjs --check | tee evidence/admission.json
           node tools/localization_100/drafts.cjs --report | tee evidence/candidate-drafts.json
           node tools/localization_100/coverage.cjs --report > evidence/full-100-locale-coverage.json
+          node tools/localization_100/native_copy.cjs --report > evidence/native-android-strings-needing-localization.json
           node tools/localization_100/drafts.cjs --worksheet sw > evidence/sw-translator-worksheet.json
       - uses: actions/upload-artifact@v4
         if: always()
