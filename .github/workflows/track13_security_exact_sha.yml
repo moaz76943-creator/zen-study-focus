@@ -58,7 +58,7 @@ jobs:
           (directory / 'synthetic.env').write_text('service_secret = "' + fake_value + '"\n', encoding='utf-8')
           PY
           set +e
-          "$RUNNER_TEMP/gitleaks" dir --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$probe/result.json" "$probe/synthetic.env" >/dev/null 2>&1
+          "$RUNNER_TEMP/gitleaks" dir --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$probe/result.json" "$probe" >/dev/null 2>&1
           scan_status=$?
           set -e
           echo "SYNTHETIC_SCANNER_EXIT=$scan_status"
