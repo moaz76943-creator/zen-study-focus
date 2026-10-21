@@ -19,6 +19,14 @@ function resolve(value){
   const entry=index.get(base);if(!entry)return null;
   const script=segments.find(s=>/^[A-Z][a-z]{3}$/.test(s));
   if(script&&script!==entry.script)return null;
+  const region=segments.find(s=>/^(?:[A-Z]{2}|[0-9]{3})$/.test(s));
+  // A region alone can imply an incompatible writing system (zh-TW => Hant,
+  // pa-PK => Arab, sr-ME => Latn). Reject rather than showing the wrong script.
+  // Explicit script selection is intentional and takes precedence over region.
+  if(region&&!script){
+    try{if(new Intl.Locale(tag).maximize().script!==entry.script)return null;}
+    catch(_){return null;}
+  }
   return Object.freeze({...entry,selectable:entry.phase==='existing'});
 }
 function sourceShape(source){
