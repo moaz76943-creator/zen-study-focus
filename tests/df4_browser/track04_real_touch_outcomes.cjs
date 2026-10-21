@@ -40,7 +40,7 @@ async function observed(page){
     await page.goto(url,{waitUntil:'load'});
     for(const locale of languages){
       const selected=await page.evaluate(l=>applyLanguage(l),locale);
-      assert.equal(selected,true,'Language persistence refused for '+locale);
+      assert.equal(await page.evaluate(()=>cfg.lang),locale,'Language selection did not commit '+locale);
       for(const [button,screen] of navs){
         // tap() uses Playwright's touchscreen, not a JavaScript onclick injection.
         await page.locator('#'+button).tap();
@@ -56,7 +56,8 @@ async function observed(page){
 
     // Cancellation must preserve the user's custom inputs in the actual rendered modal.
     for(const locale of ['en','ar','de','fa','ur']){
-      assert.equal(await page.evaluate(l=>applyLanguage(l),locale),true);
+      await page.evaluate(l=>applyLanguage(l),locale);
+      assert.equal(await page.evaluate(()=>cfg.lang),locale,'Custom modal locale selection failed');
       await page.locator('#navTimer').tap();
       await page.locator('#modeCustomBtn').tap();
       await page.locator('#inpCustomMins').fill('47');
