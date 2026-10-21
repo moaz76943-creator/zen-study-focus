@@ -213,3 +213,61 @@ test('07-02 rejected or throwing timer settings persistence does not change any 
     assert.ok(!messages.includes('Settings saved'));
   }
 });
+
+
+
+test('TRACK09 RED: editing goals preserves unknown legacy goal keys and actual session IDs',()=>{
+  const originalHistory=[{id:'legacy-900',date:'2026-10-20',minutes:12,domain:'study'}];
+  const x=load('goals_studio.js',{cfg:{
+    dailyGoalsMin:{study:15,legacyMilestone:77},
+    weeklyGoalsMin:{study:90,legacyWeekly:333},
+    sessionHistory:originalHistory
+  }});
+  x.eval('openDailyGoalsModal()');
+  for(const domain of ['study','read','sport','work']){
+    x.document.getElementById('goalInput-'+domain).value='30';
+    x.document.getElementById('goalWeeklyInput-'+domain).value='180';
+  }
+  assert.equal(x.eval('saveDailyGoals()'),true);
+  assert.equal(x.cfg.dailyGoalsMin.study,30);
+  assert.equal(x.cfg.weeklyGoalsMin.study,180);
+  assert.equal(x.cfg.dailyGoalsMin.legacyMilestone,77,'Unknown daily goals must survive edits');
+  assert.equal(x.cfg.weeklyGoalsMin.legacyWeekly,333,'Unknown weekly goals must survive edits');
+  assert.equal(x.cfg.sessionHistory,originalHistory,'No session history replacement');
+  assert.equal(x.cfg.sessionHistory[0].id,'legacy-900');
+});
+
+test('TRACK09 RED: failed quick training domain save must not start, pause, or announce success',()=>{
+  for(const reject of [()=>false,()=>{throw new Error('NATIVE_DURABLE_ACK_FAILED');}]){
+    const messages=[];
+    const x=load('quick_training.js',{
+      saveFortressData:(key)=>key==='zen_fortress_cfg_v21'?reject():true,
+      showToast:message=>messages.push(message),
+      cfg:{domain:'study'}
+    });
+    x.eval('applyQuickTrainingPreset("work")');
+    x.eval('startQuickTraining()');
+    assert.equal(x.eval('quickTraining'),null,'Rejected save must not activate training');
+    assert.equal(x.cfg.domain,'study','Rejected save must not switch the activity');
+    assert.equal(x.mock.selectCalls,0,'Rejected save must not reset timer mode');
+    assert.equal(x.mock.toggleCalls,0,'Rejected save must not start or pause timer');
+    assert.ok(!messages.includes('started'),'Never show a started message after a failed save');
+    assert.ok(messages.length>0,'Rejected save must be visible to the user');
+  }
+});
+
+test('TRACK09 RED: home agenda displays user-authored task text without numeral rewriting',()=>{
+  const tasks=[];
+  const originalTitle='خطة ۲۰۲۶ - المرحلة ٢';
+  const originalTime='٠٩:٣٠ — ۱۱:۰۰';
+  const x=load('quick_training.js',{
+    cfg:{lang:'ar'},tasksList:tasks,getCatLabel:()=> 'دراسة'
+  });
+  tasks.push({id:801,date:x.mock.localDateISO(),title:originalTitle,time:originalTime,
+    catKey:'study',done:false,isStarter:false});
+  x.eval('renderTodayPlan()');
+  const card=x.document.getElementById('todayPlanPreview').children[0];
+  const link=card.children[1];
+  assert.equal(link.children[0].textContent,originalTitle,'Keep authored title exact');
+  assert.ok(link.children[1].textContent.includes(originalTime),'Keep authored time exact');
+});
