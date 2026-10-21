@@ -77,6 +77,38 @@ jobs:
             echo "Portable file desktop Chrome DOM boot: **PASS** (not Android WebView or physical touch QA)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
+      - name: Mobile viewport Chromium smoke (320/360/393/430)
+        shell: bash
+        run: |
+          set -euo pipefail
+          browser="$(command -v google-chrome || command -v chromium || true)"
+          if [[ -z "$browser" ]]; then
+            echo "Mobile viewport Chromium smoke: **NOT_TESTED** (no browser installed)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            mkdir -p dist/mobile_chrome_qa
+            for width in 320 360 393 430; do
+              timeout 35s "$browser" \
+                --headless --no-sandbox --disable-dev-shm-usage --disable-gpu \
+                --no-first-run --disable-extensions --disable-background-networking \
+                --force-device-scale-factor=1 --window-size="${width},760" \
+                --virtual-time-budget=4000 --dump-dom \
+                "file://${GITHUB_WORKSPACE}/dist/deep-focus-control-center-mobile.html" \
+                > "dist/mobile_chrome_qa/viewport_${width}.html" \
+                2> "dist/mobile_chrome_qa/stderr_${width}.log"
+              node tools/control_center/check_portable_dom.cjs "dist/mobile_chrome_qa/viewport_${width}.html"
+              echo "Chrome mobile-sized ${width}px DOM initialization: **PASS** (not Android touch QA)" >> "$GITHUB_STEP_SUMMARY"
+            done
+          fi
+
+      - name: Upload mobile-sized Chromium DOM evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-focus-control-center-mobile-chromium-evidence
+          path: dist/mobile_chrome_qa/
+          retention-days: 14
+          if-no-files-found: ignore
+
       - name: Upload single-file mobile dashboard
         uses: actions/upload-artifact@v4
         with:
