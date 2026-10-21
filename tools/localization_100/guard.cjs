@@ -92,6 +92,8 @@ function checkAdmission(){
   const {actualLocales}=require('../language_review/audit.cjs');
   const appLocales=actualLocales().languageCatalog.map(x=>x.code);
   if(JSON.stringify(appLocales)!==JSON.stringify(LEGACY_CODES))errors.push('UNREVIEWED_LOCALE_IN_RUNTIME_SELECTOR');
+  const draftReport=require('./drafts.cjs').reportDrafts(source);
+  for(const issue of draftReport.errors)errors.push('DRAFT:'+issue);
   const dir=path.join(__dirname,'approved');
   for(const f of fs.existsSync(dir)?fs.readdirSync(dir):[]){
     if(!f.endsWith('.json')){errors.push('INVALID_APPROVAL_FILE:'+f);continue;}
@@ -101,9 +103,14 @@ function checkAdmission(){
       const v=validatePack(pack,source);if(!v.ok)errors.push(...v.errors.map(e=>f+':'+e));
     }catch(e){errors.push('FAILED_TO_READ:'+f+':'+e.message);}
   }
+  // An approval claim inside a translation JSON file cannot authenticate its own evidence.
+  // Runtime activation is deliberately outside this review-only contract.
+  if(fs.existsSync(dir)&&fs.readdirSync(dir).length)errors.push('EXTERNAL_APPROVAL_REQUIRED_BEFORE_RUNTIME_ACTIVATION');
   return {ok:errors.length===0,errors,registered:100,existingUnchanged:20,plannedNotSelectable:80,
     catalogs:Object.keys(source).length,keys:Object.values(source).reduce((n,v)=>n+Object.keys(v).length,0),
-    sourceHash:inventoryHash(source),linguisticReview:'NOT_TESTED',android100Languages:'NOT_TESTED',releaseApproved:false};
+    sourceHash:inventoryHash(source),draftCandidates:draftReport.candidateCount,
+    candidateStrings:draftReport.translatedCandidates,missingDraftStrings:draftReport.languages.reduce((n,r)=>n+r.missing,0),
+    linguisticReview:'NOT_TESTED',android100Languages:'NOT_TESTED',releaseApproved:false};
 }
 if(require.main===module){
   try{
