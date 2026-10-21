@@ -30,3 +30,20 @@ test('source changes and unknown draft keys cannot be silently accepted into que
  const q=buildQueue({source:changed,nativeRows:native,webDrafts:{},nativeDrafts:{}});
  assert.equal(q.find(x=>x.locale==='sw').items.find(x=>x.key==='start').english,'Begin');
 });
+
+test('candidate HTML/JS literals appear as separate human-classification work, never as approved translations',()=>{
+ const staticRows=[{file:'index.html',line:117,kind:'unmarked_html_text',text:'Reset data'},
+  {file:'app.js',line:899,kind:'static_js_display_candidate',text:'Choose a day'}];
+ const q=buildQueue({source:web,nativeRows:native,webDrafts:{},nativeDrafts:{},unmarkedRows:staticRows});
+ assert.equal(q.length,80);
+ const sw=q.find(x=>x.locale==='sw');
+ assert.equal(sw.items.length,7);
+ const reset=sw.items.find(x=>x.english==='Reset data');
+ assert.equal(reset.status,'NEEDS_SOURCE_INVENTORY_CLASSIFICATION');
+ assert.equal(reset.candidate,null);
+ assert.equal(reset.critical,true);
+ assert.equal(reset.surface,'unmarked-static');
+ assert.equal(reset.sourceFile,'index.html');
+ assert.equal(reset.sourceLine,117);
+ assert.equal(sw.approvedForRuntime,false);
+});
