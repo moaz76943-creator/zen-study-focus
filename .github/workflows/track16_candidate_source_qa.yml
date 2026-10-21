@@ -56,6 +56,7 @@ jobs:
         env:
           SOURCE_SHA_FILE: ${{ runner.temp }}/candidate-source/SOURCE_SHA
           REPORT_JSON: ${{ runner.temp }}/candidate-source/quality-agents.json
+          METRICS_JSON: ${{ runner.temp }}/candidate-source/quality-metrics.json
         with:
           script: |
             const fs=require('node:fs');
@@ -67,12 +68,10 @@ jobs:
               policy.verifyCanonicalPr(data,repo,policy.CANONICAL_REF,sha);
               const report=JSON.parse(fs.readFileSync(process.env.REPORT_JSON,'utf8'));
               const manifest=JSON.parse(fs.readFileSync('./automation/tools/daily_maintenance/agents.json','utf8'));
-              if(report.source_sha!==sha||report.scope!=='SOURCE_CODE_ONLY')throw Error('Source SHA/scope mismatch');
-              if(!Array.isArray(report.agents)||report.agents.length!==manifest.agents.length)throw Error('Specialist evidence missing');
-              if(!report.agents.every(agent=>agent.status==='SOURCE_TESTED'))throw Error('One or more source specialists not SOURCE_TESTED');
-              if(!Array.isArray(report.unmapped_tests)||report.unmapped_tests.length>0)throw Error('Unowned feature source tests');
+              const metrics=require('./automation/tools/daily_maintenance/quality_evidence.cjs').measure(report,manifest,sha);
+              fs.writeFileSync(process.env.METRICS_JSON,JSON.stringify(metrics,null,2)+'\n');
               core.summary.addHeading('Canonical source-only QA: PASS');
-              core.summary.addRaw('Verified source SHA: '+sha+'; specialists: '+report.agents.length+'/'+manifest.agents.length+'. Android E2E and audio rights remain unapproved.');
+              core.summary.addRaw('Verified source SHA: '+sha+'; specialists: '+metrics.specialists_passed+'/'+metrics.specialists_total+'; executed tests: '+metrics.executed_cases+'; owned files: '+metrics.source_test_files+'. Android E2E and audio rights remain unapproved.');
               await core.summary.write();
             } catch(err) {
               core.summary.addHeading('Canonical source-only QA: BLOCKED / NOT_VERIFIED');

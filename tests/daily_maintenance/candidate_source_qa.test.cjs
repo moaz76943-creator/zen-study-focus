@@ -13,7 +13,8 @@ test('candidate source QA verifies live PR138 SHA and real specialist outcomes, 
  assert.match(yaml,/pull_number:policy\.CANONICAL_PR/);
  assert.match(yaml,/ref: \$\{\{ steps\.resolve\.outputs\.sha \}\}/);
  assert.match(yaml,/quality_agents\.cjs --root source --out/);
- assert.match(yaml,/report\.agents\.every\(agent=>agent\.status==='SOURCE_TESTED'\)/);
+ assert.match(yaml,/quality_evidence\.cjs'\)\.measure\(report,manifest,sha\)/);
+ assert.match(yaml,/quality-metrics\.json/);
  assert.match(yaml,/policy\.verifyCanonicalPr\(data,repo,policy\.CANONICAL_REF,sha\)/);
  assert.match(yaml,/actions\/upload-artifact@v4/);
  assert.match(yaml,/if: always\(\)/);
