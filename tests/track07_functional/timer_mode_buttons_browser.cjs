@@ -42,6 +42,66 @@ const out=process.env.DF_BUTTON_EVIDENCE||'/tmp/deep-focus-buttons';
   assert.equal(accepted.total,await page.evaluate(()=>cfg.longMin*60));
   assert.equal(accepted.running,false);
   results.push({control:'modeLongBtn',flow:'click -> confirm OK -> selected mode, timer stopped',status:'PASS'});
+  // Prove that *actual reset/skip buttons* never erase a running focus session
+  // when the Android-like JavaScript confirmation is declined.
+  const freshFocus=async()=>{
+    await page.evaluate(()=>{
+      if(timerRunning)toggleTimerPlay();
+      selectTimerMode(25,'focus',document.getElementById('modeFocusBtn'));
+      toggleTimerPlay();
+    });
+    const fresh=await state();
+    assert.equal(fresh.running,true,'Focus must run before each destructive action');
+    return fresh;
+  };
+  for(const [name,selector] of [
+    ['resetTimerNow','#sec-timer button[onclick="resetTimerNow()"]'],
+    ['skipTimerPhase','#sec-timer button[onclick="skipTimerPhase()"]']
+  ]){
+    const fresh=await freshFocus();
+    page.once('dialog',async d=>{dialogs.push({id:name,text:d.message()});await d.dismiss();});
+    await page.locator(selector).click();
+    const after=await state();
+    assert.equal(dialogs.filter(x=>x.id===name).length,1,name+' must ask first');
+    assert.equal(after.sessionId,fresh.sessionId,name+' must preserve session ID');
+    assert.equal(after.total,fresh.total,name+' must preserve full duration');
+    assert.equal(after.mode,fresh.mode,name+' must preserve mode');
+    assert.equal(after.running,true,name+' must preserve active timer');
+    results.push({control:name,flow:'physical button click, Cancel -> progress retained',status:'PASS'});
+  }
+  const customBefore=await freshFocus();
+  const previousLabel=await page.evaluate(()=>customSessionLabel);
+  await page.locator('#modeCustomBtn').click();
+  await page.locator('#inpCustomMins').fill('47');
+  await page.locator('#inpCustomTitle').fill('Retain entered label');
+  page.once('dialog',async d=>{dialogs.push({id:'customCancel',text:d.message()});await d.dismiss();});
+  await page.locator('#customTimerModal button[onclick="applyCustomTimerNow()"]').click();
+  assert.equal((await state()).sessionId,customBefore.sessionId);
+  assert.equal((await state()).running,true);
+  assert.equal(await page.evaluate(()=>customSessionLabel),previousLabel,'Cancel does not overwrite label');
+  assert.equal(await page.locator('#customTimerModal').evaluate(n=>n.classList.contains('open')),true);
+  assert.equal(await page.locator('#inpCustomTitle').inputValue(),'Retain entered label');
+  results.push({control:'modeCustomBtn Save',flow:'Cancel leaves editable form, label and session unchanged',status:'PASS'});
+  page.once('dialog',async d=>{dialogs.push({id:'customAccept',text:d.message()});await d.accept();});
+  await page.locator('#customTimerModal button[onclick="applyCustomTimerNow()"]').click();
+  const customAfter=await state();
+  assert.equal(customAfter.mode,'custom');
+  assert.equal(customAfter.total,47*60);
+  assert.equal(customAfter.running,false);
+  assert.equal(await page.evaluate(()=>customSessionLabel),'Retain entered label (47m)');
+  assert.equal(await page.locator('#customTimerModal').evaluate(n=>n.classList.contains('open')),false);
+  results.push({control:'modeCustomBtn Save',flow:'Confirm switches to 47m, preserves entered title',status:'PASS'});
+  // The sport-rest button must be safe even when another focus domain is active.
+  await page.evaluate(()=>{if(timerRunning)toggleTimerPlay();selectTimerMode(25,'focus',document.getElementById('modeFocusBtn'));toggleTimerPlay();});
+  const sportBefore=await state();
+  page.once('dialog',async d=>{dialogs.push({id:'sportRest45',text:d.message()});await d.dismiss();});
+  await page.locator('#sportRest45').evaluate(n=>n.click());
+  const sportAfter=await state();
+  assert.equal(dialogs.filter(x=>x.id==='sportRest45').length,1,'sport rest must ask before ending focus');
+  assert.equal(sportAfter.mode,sportBefore.mode);
+  assert.equal(sportAfter.sessionId,sportBefore.sessionId);
+  assert.equal(sportAfter.running,true);
+  results.push({control:'sportRest45',flow:'DOM click Cancel -> focus session unchanged',status:'PASS'});
 
   // These are accessible button examples across screens, with observable DOM outcomes.
   const nav=[
