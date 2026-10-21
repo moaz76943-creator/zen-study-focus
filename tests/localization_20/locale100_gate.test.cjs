@@ -55,7 +55,7 @@ test('PR admission CI watches every Java source and all locale100 regressions wi
  const fs=require('node:fs'),path=require('node:path');
  const workflow=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/locale_100_admission_gate.yml'),'utf8');
  assert.match(workflow,/^\s+- 'android\/app\/src\/main\/java\/\*\*\/\*\.java'$/m);
- assert.match(workflow,/^\s+- 'tests\/localization_20\/locale100_\*\.test\.cjs'$/m);
+ assert.match(workflow,/^\s+- 'tests\/localization_20\/locale100_\*\.cjs'$/m);
  assert.match(workflow,/group: locale-100-admission-\$\{\{ github\.event\.pull_request\.number \|\| github\.ref \}\}/);
  assert.match(workflow,/node --test tests\/localization_20\/locale100_\*\.test\.cjs/);
 });
