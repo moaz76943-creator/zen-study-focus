@@ -11,7 +11,7 @@ concurrency:
 jobs:
   screenshots:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,6 +29,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
+      - name: RED/GREEN mock broken-pipe install regression
+        run: node --test tests/white_premium_qa/track14_android_install.test.cjs
       - name: Debug-only APK (no upload signing)
         working-directory: android
         run: gradle assembleDebug --no-daemon

@@ -53,3 +53,10 @@ Revert only the scoped CSS commit after review. Do not change JS focus/session s
 - Recorder: `tests/white_premium_qa/track14_android_snapshots.sh`, captures **12** APK screenshots (320/360/393/430 physical width × system font_scale 1.0/1.5/2.0) to a SHA-tagged artifact.
 - **At authoring: NOT_TESTED** for run completion, image contents, text zoom effect on WebView, Android keyboard, TalkBack and actual device. Screenshot creation in a workflow file is not screenshot evidence itself.
 - Android screenshots can only become PASS when the artifact exists and images have been inspected. Chromium remains a separate **24-case** root-font emulation.
+
+## 2026-10-21 second execution — Android CI incident and recovery
+- Exact-head Chromium [run 39597542234](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39597542234) PASS at `1842f7a3a7fa78b7602152c845a2c9c788c1e1e4`: 14 Node cases, 24 layout screenshots, 7 clickable nav results, no geometry failures / JS exceptions.
+- Android [run 39597542273](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39597542273) **FAIL** at the same SHA. Debug APK build PASS; emulator boot succeeded, but `adb install -r` returned `Broken pipe (32)` at the emulator package service. Uploaded artifact was 400 bytes (SHA and gate files only); **0 native screenshots captured**. This is not an app UI failure or Android PASS.
+- Scoped test-harness repair: non-streaming install, at most 3 retries with timeout, independent package-path verification, fixture tests for broken-pipe recovery/permanent failure/missing APK; do not clear app data or silently accept failed installs.
+- Capture script now requires all 12 genuine PNGs, checks PNG signature and physical width, generates SHA-256 per image, returns FAIL on missing/damaged frames and restores emulator overrides even on failure.
+- Previous browser PASS must **not be inherited as current-HEAD certification** after harness commits: rerun exact-source tests on the new SHA. TalkBack, IME, Android screen-readers and real-phone touch remain NOT_TESTED.
