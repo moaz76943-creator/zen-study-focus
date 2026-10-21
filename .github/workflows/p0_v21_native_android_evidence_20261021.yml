@@ -1,0 +1,103 @@
+name: P0 v21 actual Android Native ACK and durability (disposable only)
+on:
+  push:
+    branches: [qa/p0-v21-native-android-20261021]
+    paths: [.github/workflows/p0_v21_native_android_evidence_20261021.yml]
+permissions:
+  contents: read
+concurrency:
+  group: df-p0-v21-native-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-android-durability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PINNED_APP_SOURCE: cca433108371ce8e3f656ab0689233729f372657
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prove QA-only delta and exact tested Android tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/df-p0-v21-native"
+          git cat-file -e "$PINNED_APP_SOURCE^{commit}"
+          test "$(git diff --name-only "$PINNED_APP_SOURCE" HEAD)" = '.github/workflows/p0_v21_native_android_evidence_20261021.yml'
+          test "$(git rev-parse "$PINNED_APP_SOURCE:android")" = "$(git rev-parse HEAD:android)"
+          git rev-parse HEAD > "$RUNNER_TEMP/df-p0-v21-native/QA_WORKFLOW_SHA.txt"
+          printf '%s\n' "$PINNED_APP_SOURCE" > "$RUNNER_TEMP/df-p0-v21-native/APP_SOURCE_SHA.txt"
+          git rev-parse HEAD:android > "$RUNNER_TEMP/df-p0-v21-native/ANDROID_TREE_SHA.txt"
+          printf '%s\n' 'Production and owner data not accessed; RELEASE_APPROVED=NO; SAF picker Save/readback remains NOT_TESTED unless actual evidence proves it.' > "$RUNNER_TEMP/df-p0-v21-native/LIMITATIONS.txt"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Native v21 source tests (not Android acceptance)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check android/app/src/main/assets/web/preflight_v22.js
+          node --check tests/android_e2e_recovery/track07_durability_android.cjs
+          node --test --test-reporter=tap tests/data_contracts/*.test.cjs tests/security_recovery/*.test.cjs tests/integration_recovery/native_durable_ack.test.cjs tests/integration_recovery/restore_journal.test.cjs tests/integration_quality/qa_atomic_runtime.test.cjs | tee "$RUNNER_TEMP/df-p0-v21-native/source-data.tap"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: SDK 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$sdkmanager"
+          "$sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build same-source disposable debug APK
+        working-directory: android
+        run: gradle :app:assembleDebug --no-daemon
+      - name: Check exact APK and emulator prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$RUNNER_TEMP/df-p0-v21-native"
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$report/APK_SHA256SUMS.txt"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging android/app/build/outputs/apk/debug/app-debug.apk > "$report/APK_BADGING.txt"
+          grep -F "package: name='com.zenstudy.focus'" "$report/APK_BADGING.txt"
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Fresh API30 emulator — native failure, journal and process-kill probes
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            report="$RUNNER_TEMP/df-p0-v21-native"
+            adb install android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell am start -n com.zenstudy.focus/.MainActivity
+            sleep 7
+            set +e
+            timeout 900s env DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/track07_durability_android.cjs "$report/native-durability.json" > "$report/native-durability.log" 2>&1
+            status=$?
+            timeout 15s adb logcat -d -s AndroidRuntime chromium > "$report/logcat.txt" 2>&1 || true
+            timeout 15s adb exec-out screencap -p > "$report/final-screenshot.png" 2>/dev/null || true
+            cat "$report/native-durability.log"
+            printf '%s\n' "$status" > "$report/TEST_EXIT_CODE.txt"
+            exit "$status"
+      - name: Preserve exact source, APK digest, Android JSON and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DF-P0-v21-Android-Durability-${{ github.sha }}
+          if-no-files-found: warn
+          retention-days: 7
+          path: ${{ runner.temp }}/df-p0-v21-native/
