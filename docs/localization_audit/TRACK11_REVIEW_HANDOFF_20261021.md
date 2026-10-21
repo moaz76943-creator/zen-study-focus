@@ -26,7 +26,7 @@ The read-only `track11-source-review-<SHA>` GitHub Actions artifact includes:
 - `track11-triage.json`: source-static candidates, identical-English flags, numeral literal cases and unresolved HTML binding keys.
 - `historical-auditor/coverage.json`, `proposals.json`, `REPORT.md`: canonical source analyzer evidence, not runtime translations.
 - `SOURCE_SHA.txt`, TAP results and locale lint output.
-- `track11-native.json` and `track11-native-review.csv`: exact Java source inventory for all 20 existing locales, no translations activated. Initially **12 native static text candidates × 20 locales = 240 reviewer rows**; regenerate on current HEAD.
+- `track11-native.json` and `track11-native-review.csv`: exact Java source inventory for all 20 existing locales, no translations activated. At the initial Track11 SHA, **12 native static text candidates × 20 locales = 240 reviewer rows**; newer Track12 source admission added **dynamic** Java notification/dialog callsites, which Track11 inventories separately and includes in reviewer rows after integration. Always regenerate and use exact current HEAD counts.
 
 The Chromium artifact includes exact SHA, `live-navigation-20-languages.json` (20 × **320/360/393/430px**), timer confirmation cases, Analytics interaction evidence, screenshot, and known limitations. Its browser is desktop Chromium loading packaged WebView files; it is **not** an installed Android app.
 
@@ -61,3 +61,7 @@ The original 20 languages are separate from the 80 future candidates. Draft stri
 The Android gate uses only a new disposable `com.zenstudy.focus` debug install inside a GitHub-hosted API30 emulator; it never connects to the owner's device and never logs backup payloads. Its `backup` probe replaces the browser confirmation only inside this disposable QA session to validate a synthetic checksum-valid `ZEN21::` code round-trip. The actual Android DocumentsUI SAF path is **NOT_TESTED** in Track 11 and remains owned by the data-preservation track.
 
 Exact-SHA CI, human review and owner approval are mandatory; a previous commit's green test cannot be carried to a later application-source change. `RELEASE_APPROVED=NO`.
+
+## Compatibility with newer master recovery source
+
+When the master recovery branch contains Track12's expanded Java source scanner, `track11_native_review.cjs` generates contextual review rows for both literal and dynamic Java messages. Each dynamic entry retains its expression, cannot be treated as approved translated copy, and must be assessed in the JS-to-Java calling context. Report counts can therefore increase above the original 240 rows. Both Track11 workflows run on pushes to `integration/master-recovery-20261021` so evidence must reflect the actual **post-merge SHA**. A healthy PR-head check alone does not establish integrated source fitness.
