@@ -62,7 +62,7 @@ jobs:
           set -euo pipefail
           node --check tests/track08/qa_real_analytics_saf.cjs
           node --check tests/track08/qa_webview_startup_probe.cjs
-          node --test tests/track08/qa_launch_contract.test.cjs tests/track08/qa_cdp_transport.test.cjs tests/track07_functional/analytics_export_range_lifecycle.test.cjs
+          node --test tests/track08/qa_cdp_transport.test.cjs tests/track07_functional/analytics_export_range_lifecycle.test.cjs
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
       - name: Build the actual unchanged app as debug
         working-directory: android
@@ -98,6 +98,8 @@ jobs:
           expected="$(printf '%s\n' android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java | sort)"
           test "$actual" = "$expected"
           git diff -- android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java > "$RUNNER_TEMP/track10-android/ephemeral-qa.diff"
+      - name: Check QA-only package gate after ephemeral modification, never in source
+        run: node --test tests/track08/qa_launch_contract.test.cjs
       - name: Build separate debug-only QA APK
         working-directory: android
         run: gradle assembleDebug --no-daemon
