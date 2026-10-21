@@ -88,7 +88,7 @@ const js=`(()=> {
     b.click();navigation.push({button,section,ok:s.classList.contains('active')});
   }
   if(navigation.some(x=>!x.ok))throw Error('Offline DOM navigation failure '+JSON.stringify(navigation));
-  if(!/^file:\/\/\/android_asset\/web\/index\.html/.test(location.href))throw Error('Unexpected app origin');
+  if(location.href!=='file:///android_asset/web/index.html')throw Error('Unexpected app origin');
   if(notes.length!==5000||tasks.tasksList.length!==1000||state.sessionHistory.length!==10000)
     throw Error('Fixture count mutation');
   return {source:'real emulator Android WebView / JS core, synthetic non-persisted fixtures',
