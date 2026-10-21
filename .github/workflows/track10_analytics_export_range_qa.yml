@@ -71,6 +71,7 @@ jobs:
           node tests/track07_functional/analytics_screen_chromium.cjs
           node tests/track10/analytics_presets_browser.cjs
           node tests/track07_functional/analytics_hot_language_switch_browser.cjs
+          node tests/track07_functional/analytics_10k_browser.cjs
       - name: Preserve exact SHA and scope limitations
         if: always()
         shell: bash
