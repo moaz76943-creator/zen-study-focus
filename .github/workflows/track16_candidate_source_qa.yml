@@ -8,15 +8,24 @@ on:
       - '.github/workflows/daily_maintenance.yml'
       - 'tools/daily_maintenance/**'
       - 'tests/daily_maintenance/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/track16_candidate_source_qa.yml'
+      - '.github/workflows/hourly_agent_orchestrator.yml'
+      - '.github/workflows/daily_maintenance.yml'
+      - 'tools/daily_maintenance/**'
+      - 'tests/daily_maintenance/**'
+  workflow_dispatch:
 permissions:
   contents: read
   pull-requests: read
 concurrency:
-  group: track16-candidate-${{ github.event.pull_request.number }}
+  group: track16-candidate-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   candidate-source-audit:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 32
     steps:
@@ -83,7 +92,7 @@ jobs:
         if: always()
         env:
           OUT_DIR: ${{ runner.temp }}/candidate-source
-          AUTOMATION_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          AUTOMATION_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           mkdir -p "$OUT_DIR"
           node -e 'const fs=require("node:fs"),p=require("node:path");const sf=p.join(process.env.OUT_DIR,"SOURCE_SHA");const data={run_id:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,automation_pr_head_sha:process.env.AUTOMATION_PR_HEAD_SHA,workflow_merge_sha:process.env.GITHUB_SHA,source_sha:fs.existsSync(sf)?fs.readFileSync(sf,"utf8").trim():"NOT_VERIFIED",canonical_pr:138,scope:"SOURCE_ONLY",release_approved:false};fs.writeFileSync(p.join(process.env.OUT_DIR,"run-provenance.json"),JSON.stringify(data,null,2)+"\n");'

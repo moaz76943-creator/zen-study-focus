@@ -8,7 +8,12 @@ const workflow=path.join(root,'.github/workflows/track16_candidate_source_qa.yml
 test('candidate source QA verifies live PR138 SHA and real specialist outcomes, not only infrastructure',()=>{
  const yaml=fs.readFileSync(workflow,'utf8');
  assert.match(yaml,/pull_request:/);
- assert.match(yaml,/track16-candidate-\$\{\{ github\.event\.pull_request\.number \}\}/);
+ assert.match(yaml,/push:/);
+ assert.match(yaml,/branches: \[main\]/);
+ assert.match(yaml,/workflow_dispatch:/);
+ assert.match(yaml,/track16-candidate-\$\{\{ github\.event\.pull_request\.number \|\| github\.ref \}\}/);
+ assert.match(yaml,/github\.event_name != 'pull_request' \|\| github\.event\.pull_request\.head\.repo\.full_name == github\.repository/);
+ assert.match(yaml,/github\.event\.pull_request\.head\.sha \|\| github\.sha/);
  assert.match(yaml,/cancel-in-progress: true/);
  assert.match(yaml,/pull_number:policy\.CANONICAL_PR/);
  assert.match(yaml,/ref: \$\{\{ steps\.resolve\.outputs\.sha \}\}/);

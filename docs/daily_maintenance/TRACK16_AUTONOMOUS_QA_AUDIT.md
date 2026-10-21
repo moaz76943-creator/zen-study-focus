@@ -14,12 +14,12 @@
 |---|---|---|---|
 | localization | locale | localization_20; language_review | read + bounded tests |
 | numerals | numerals | ascii_numerals | read + bounded tests |
-| navigation | ui | interaction_recovery; android_e2e_recovery | read + bounded tests, not Android E2E |
-| notes | notes | notes_core; notes_recovery; notes_ui | read + bounded tests |
+| navigation | ui | interaction_recovery; android_e2e_recovery; android_dialogs; track07_functional | read + bounded tests, not Android E2E |
+| notes | notes | notes_core; notes_recovery; notes_ui; df4_browser | read + bounded tests |
 | tasks | tasks | tasks_core; tasks_recovery | read + bounded tests |
 | analytics | analytics | analytics_core; analytics_recovery | read + bounded tests |
 | timer | timer | focus_workflows; timer_native_bridge | read + bounded tests |
-| nature_audio | audio | nature_audio_recovery; completion_alerts; audio_acquisition_12 | read + bounded tests, no assets activated |
+| nature_audio | audio | nature_audio_recovery; completion_alerts; audio_acquisition_12; nature_library_v2 | read + bounded tests, no assets activated |
 | privacy_security | security | security_recovery; recovery_baseline | read + bounded tests, no secrets |
 | data_integrity | data | data_contracts; regression_v21; integration_quality | read + bounded tests, no user data |
 | performance | performance | performance_recovery | read + bounded tests |
@@ -49,3 +49,9 @@ At source SHA `cd1713b66fdf6ec11c5808834bf30f516ee8f6c5`, the live `tests/` tree
 2. Local GREEN: 5/5 canonical-source unit cases passed under Node, prior to repository upload.
 3. GitHub Actions on exact final PR SHA: check hourly contract tests and daily-maintenance test jobs; report actual status and run IDs, never infer.
 4. Schedule activation requires manual merge onto default branch; until then Issue #69 continues to represent historical source, not #138.
+
+## PR #165 verification and activation
+- Verified on PR #138 source `cd1713b66fdf6ec11c5808834bf30f516ee8f6c5` with 12/12 source agents, 649/649 TAP cases and 120/120 eligible owned source test files. Evidence: Actions run 39600007572 (previous head, source unchanged). Android E2E, media licensing and production release remain blocked.
+- `track16_candidate_source_qa.yml` runs on scoped PR changes, scoped main pushes (including integration of this infrastructure), and manual dispatch. On pull requests from forks it does not execute source tests. It always resolves/validates the source against live PR #138 and fails closed if the candidate moved.
+- Each PR or main branch has a bounded cancellable concurrency key. Scheduled hourly (3 agents) and daily (12 agents) scans remain their own jobs and manual-only repair scope stays unchanged. The post-merge run is needed to verify default-branch behavior; a branch-only run is insufficient.
+- When PR #138 is merged/closed or replaced, the pinned canonical candidate must be changed through a reviewed QA-infrastructure PR. Never silently scan an arbitrary new branch and never mark an untested successor PASS.
