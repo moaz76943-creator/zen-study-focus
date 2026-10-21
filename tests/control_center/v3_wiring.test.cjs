@@ -9,7 +9,7 @@ const ui=fs.readFileSync(path.join(base,'v3-ui.js'),'utf8');
 
 test('Control Center V3 has no missing local JavaScript modules',()=>{
   const scripts=[...html.matchAll(/<script[^>]+src=["'](\.\/[^"']+\.js)["']/g)].map(m=>m[1]);
-  assert.equal(scripts.length,9);
+  assert.equal(scripts.length,11);
   for(const file of scripts)assert.ok(fs.existsSync(path.join(base,file)), 'Missing script: '+file);
 });
 test('Interactive V3 controls are implemented with local, bounded UI handlers',()=>{
