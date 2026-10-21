@@ -1,0 +1,41 @@
+name: Track05 Timer Lifecycle RED GREEN
+on:
+  push:
+    branches:
+      - fix/track05-timer-tick-idempotent-20261021
+permissions:
+  contents: read
+concurrency:
+  group: track05-timer-lifecycle-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  node-timer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce exact branch commit and source syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node --check android/app/src/main/assets/web/app.js
+      - name: Track05 real-function lifecycle regression and adjacent timer guards
+        run: |
+          node --test tests/track05_timer/tick_lifecycle.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/integration_quality/activity_domain_durable_ack.test.cjs
+      - name: Record exact SHA and immutable test scope
+        if: always()
+        shell: bash
+        run: |
+          printf '%s\n' "HEAD=$(git rev-parse HEAD)" "GITHUB_SHA=$GITHUB_SHA" "RELEASE_APPROVED=NO" > "$RUNNER_TEMP/track05-evidence.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track05-timer-source-${{ github.sha }}
+          path: ${{ runner.temp }}/track05-evidence.txt
+          retention-days: 7
