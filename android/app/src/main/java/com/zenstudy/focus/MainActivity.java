@@ -265,7 +265,12 @@ public class MainActivity extends AppCompatActivity {
                 backupImportPickerOpen = true;
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("text/plain");
+                // Legacy .zenbackup and JSON files can be labelled octet-stream
+                // by third-party providers. Match only supported backup MIME
+                // families; the strict v21 validator still gates all writes.
+                intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                        new String[]{"text/plain", "application/json", "application/octet-stream"});
                 try {
                     startActivityForResult(intent, REQUEST_BACKUP_IMPORT);
                 } catch (Exception error) {
