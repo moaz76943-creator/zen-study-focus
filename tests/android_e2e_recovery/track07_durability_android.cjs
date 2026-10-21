@@ -85,7 +85,20 @@ async function main(){
   return 'Initial fixture IDs '+ti+'/'+ni+', unknown fields and all six verified native receipt packets';
  });
  if(report.results.at(-1).status!=='PASS')return;
- await run('native_atomicfile_ack_io_failure',async()=>{
+   await run('signed_invalid_family_native_ack_refused',async()=>{
+    // Real disposable Android bridge; injected WebView bytes restored before restart.
+    const before=await fixture(),checkpoint=await evaluate('ZenNative.readDurableV21()');
+    const evidence=await evaluate("(()=>{const D=DeepFocusDataCompatV21,k=D.KEYS.tasks,a=localStorage.getItem(k),b=localStorage.getItem(k+'_mirror'),invalid=D.encodePacket({id:2,title:'Signed wrong-shaped tasks',done:false});try{localStorage.setItem(k,invalid);localStorage.setItem(k+'_mirror',invalid);const scan=DF22Preflight.inspect(localStorage);return {checksumValid:D.inspectPacket(invalid).ok,blocked:!scan.ok,issues:scan.issues,ack:DF22Preflight.nativeAcknowledge(localStorage),checkpoint:ZenNative.readDurableV21()};}finally{if(a===null)localStorage.removeItem(k);else localStorage.setItem(k,a);if(b===null)localStorage.removeItem(k+'_mirror');else localStorage.setItem(k,b);}})()");
+    assert.equal(evidence.checksumValid,true);
+    assert.equal(evidence.blocked,true,'Valid checksum must not override family schema');
+    assert.ok(evidence.issues.some(x=>String(x).includes('INVALID_TASKS')));
+    assert.equal(evidence.ack,false,'Native ACK must refuse signed invalid family');
+    assert.equal(evidence.checkpoint,checkpoint,'Rejected ACK advanced last-known-good');
+    assert.deepEqual(await fixture(),before);
+    await restart();assert.deepEqual(await fixture(),before);
+    return 'Signed malformed v21 tasks rejected by real Android bridge; exact fixture and native receipt retained across restart';
+  });
+  await run('native_atomicfile_ack_io_failure',async()=>{
   const before=await fixture(),disk=await receipt();
   let dir=null;
   try{
