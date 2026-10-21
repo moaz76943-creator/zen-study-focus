@@ -18,6 +18,25 @@ function assertProgress(before,after){
  }
  return true;
 }
+function assertLifecycle(phase,before,after,sample){
+ assert.ok(['background','screenOff'].includes(phase));
+ assert.ok(before.length>0,'No lifecycle tracks were observed');
+ assert.equal(sample.visibility,'hidden','App did not actually leave the foreground');
+ if(phase==='screenOff')assert.equal(sample.wakefulness,'Asleep','Display sleep was not observed');
+ assert.ok(Number.isFinite(sample.seconds)&&sample.seconds>=18,'Lifecycle observation was too short');
+ assert.equal(sample.active,before.length,'A lifecycle track stopped');
+ assert.ok(Number.isFinite(sample.gain)&&sample.gain>=0&&sample.gain<=.800001,'Unsafe mixed gain');
+ assert.deepEqual(sample.errors,[]);
+ const normalized=after.map(current=>{
+   const old=before.find(row=>row.id===current.id);
+   assert.ok(old&&Number.isFinite(old.duration)&&old.duration>sample.seconds,'Multiple loop wraps cannot be inferred');
+   assert.equal(current.duration,old.duration,'Lifecycle source changed');
+   return {...current,progress:current.progress+(current.progress<old.progress?old.duration:0)};
+ });
+ assertProgress(before,normalized);
+ for(const old of before)assert.ok(normalized.find(row=>row.id===old.id).progress-old.progress>=sample.seconds-1.5,'Playback stalled during lifecycle observation');
+ return true;
+}
 async function main(){
  const expected=Number(process.env.AUDIO_QA_EXPECTED_TRACKS);assert.ok(Number.isInteger(expected)&&expected>0&&expected<=20);
  let page;
@@ -133,21 +152,72 @@ async function main(){
       if(Number.isFinite(delta)&&delta>0)a._qaProgress+=delta;previous=current;
     });
   });})()`);
+  const lifecycle={background:{status:'NOT_TESTED'},screenOff:{status:'NOT_TESTED'}};
+  if(process.env.AUDIO_QA_LIFECYCLE==='1'){
+    // The emulator has no proven audible output/headset. Unmuting requests the
+    // normal media path; observed progress is not a human listening verdict.
+    const foreground=async()=>{
+      execFileSync('adb',['shell','input','keyevent','224']);
+      execFileSync('adb',['shell','wm','dismiss-keyguard']);
+      execFileSync('adb',['shell','am','start','-n','com.zenstudy.focus.audioqa/com.zenstudy.focus.MainActivity']);
+      await sleep(900);
+      await evalJs(`document.querySelectorAll('audio').forEach(a=>a.muted=true)`);
+    };
+    for(const phase of ['background','screenOff']){
+      let failure;
+      try{
+        await evalJs(`document.querySelectorAll('audio').forEach(a=>a.muted=false)`);
+        execFileSync('adb',['shell','input','keyevent',phase==='background'?'3':'223']);
+        await sleep(1000);
+        assert.equal(await evalJs('document.visibilityState'),'hidden','App did not enter background');
+        if(phase==='screenOff')assert.match(execFileSync('adb',['shell','dumpsys','power'],{encoding:'utf8'}),/mWakefulness=Asleep/);
+        // currentTime is sampled after entering the state. Hidden-page JS
+        // timeupdate events may be throttled and cannot be the source of truth.
+        const nativeTimes=`[...document.querySelectorAll('audio')].map(a=>({id:a.dataset.id,progress:a.currentTime,duration:a.duration}))`;
+        const before=await evalJs(nativeTimes),began=performance.now();
+        await sleep(18000);
+        const power=execFileSync('adb',['shell','dumpsys','power'],{encoding:'utf8',timeout:10000});
+        const sample=await evalJs(`(()=>{const a=[...document.querySelectorAll('audio')];return {visibility:document.visibilityState,active:a.filter(x=>!x.paused&&!x.error).length,gain:a.reduce((n,x)=>n+x.volume,0),muted:a.some(x=>x.muted),errors:audioQaErrors};})()`);
+        sample.wakefulness=power.match(/mWakefulness=(\w+)/)?.[1]||'UNKNOWN';
+        sample.seconds=(performance.now()-began)/1000;
+        const after=await evalJs(nativeTimes);
+        lifecycle[phase]={status:'IN_PROGRESS',sample,before,after,scope:'Bounded unmuted media progression on a headless emulator; audible output not verified'};
+        assert.equal(sample.muted,false,'Lifecycle media remained muted');
+        assertLifecycle(phase,before,after,sample);
+        lifecycle[phase].status='PASS';
+        console.log('AUDIO20_LIFECYCLE_PASS',phase,sample.seconds,sample.active);
+      }catch(error){
+        lifecycle[phase]={...lifecycle[phase],status:'FAIL',detail:String(error)};failure=error;
+      }finally{
+        if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify({status:failure?'FAIL':'IN_PROGRESS',state,originals,loops,mix,traces,lifecycle,endurance:{seconds:0,requested:enduranceSeconds,status:'NOT_TESTED'},approved_for_release:false},null,2));
+        try{
+          await foreground();
+          assert.equal(await evalJs('document.visibilityState'),'visible','App did not return to foreground');
+        }catch(error){
+          lifecycle[phase].recoveryFailure=String(error);failure=failure||error;
+          if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify({status:'FAIL',state,lifecycle,approved_for_release:false},null,2));
+        }
+      }
+      if(failure)throw failure;
+    }
+  }
   let priorProgress=await evalJs(progressExpression);
   const started=performance.now();
   while(performance.now()-started<enduranceSeconds*1000){
     await sleep(Math.min(30000,Math.max(0,enduranceSeconds*1000-(performance.now()-started))));
-    const checkpoint=await evalJs(`(()=>{const a=[...document.querySelectorAll('audio')];return {active:a.filter(x=>!x.paused&&!x.error).length,tracks:a.map(x=>({id:x.dataset.id,time:x.currentTime,error:x.error?.code??null})),gain:a.reduce((n,x)=>n+x.volume,0),errors:audioQaErrors};})()`);
+    const checkpoint=await evalJs(`(()=>{const a=[...document.querySelectorAll('audio')];return {visibility:document.visibilityState,active:a.filter(x=>!x.paused&&!x.error).length,tracks:a.map(x=>({id:x.dataset.id,time:x.currentTime,error:x.error?.code??null})),gain:a.reduce((n,x)=>n+x.volume,0),errors:audioQaErrors};})()`);
     checkpoint.elapsedSeconds=(performance.now()-started)/1000;
     const progress=await evalJs(progressExpression);
     assertProgress(priorProgress,progress);priorProgress=progress;
     checkpoint.progress=progress;
     assert.equal(checkpoint.active,expected,'A track stopped during endurance');
+    assert.equal(checkpoint.visibility,'visible','Foreground endurance unexpectedly left the foreground');
     assert.ok(checkpoint.gain<=.800001);assert.deepEqual(checkpoint.errors,[]);
     checkpoints.push(checkpoint);
-    if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify({status:'IN_PROGRESS',state,originals,loops,mix,traces,checkpoints,approved_for_release:false},null,2));
+    if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify({status:'IN_PROGRESS',state,originals,loops,mix,traces,lifecycle,checkpoints,approved_for_release:false},null,2));
     console.log('AUDIO20_ENDURANCE_CHECK',Math.round(checkpoint.elapsedSeconds),checkpoint.active);
   }
+  const enduranceElapsedSeconds=(performance.now()-started)/1000;
   await tap('button[onclick="stopAllAudio()"]');
   assert.ok(await evalJs(`[...document.querySelectorAll('audio')].every(a=>a.paused&&a.currentTime===0)`));
   assert.deepEqual(await evalJs('audioQaErrors'),[]);
@@ -165,9 +235,9 @@ async function main(){
   assert.ok(await evalJs(`document.querySelector('[data-track-status]').textContent.includes('Stopped')`),'Stop did not reset playback state');
   const result={status:'ANDROID_AUDIO_QA_ALL_ORIGINALS_LOOPS_CONTROLS_PASS',state,originals,loops,mix,traces,
     playbackStateControls:{pause:true,resume:true,stop:true,injectedFailureRetained:true,actualRetryRecovered:true},
-    endurance:{seconds:(performance.now()-started)/1000,requested:enduranceSeconds,checkpoints,status:enduranceSeconds===1800?'PASS':'NOT_TESTED'},
-    scope:'Muted decode/progression and real ADB button delivery; not human audio or seamless-listening approval',
-    background:'NOT_TESTED',lockedScreen:'NOT_TESTED',bluetooth:'NOT_TESTED',physicalDevice:'DEVICE_NOT_TESTED',approved_for_release:false};
+    endurance:{seconds:enduranceElapsedSeconds,requested:enduranceSeconds,checkpoints,status:enduranceSeconds===1800?'PASS':'NOT_TESTED'},
+    scope:'Foreground muted decode and ADB controls; optional bounded unmuted lifecycle progression, not audible-output or human listening approval',
+    background:lifecycle.background,screenOff:lifecycle.screenOff,lockedScreen:'NOT_TESTED_SECURE_LOCK',bluetooth:'NOT_TESTED',physicalDevice:'DEVICE_NOT_TESTED',approved_for_release:false};
   if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(result,null,2));
   console.log(JSON.stringify({status:result.status,tracks:state.count,originals:originals.length,loops:loops.length,endurance:result.endurance.status}));
  }finally{ws.close();}
@@ -179,7 +249,10 @@ function resultSummary(first,reopened){
  assert.ok(e&&[0,1800].includes(e.requested)&&Number.isFinite(e.seconds)&&e.seconds>=0,'Invalid endurance evidence');
  assert.equal(e.status,e.requested===0?'NOT_TESTED':'PASS','Contradictory endurance status');
  if(e.requested===1800)assert.ok(e.seconds>=1800,'Endurance was shorter than requested');
- return 'QA_VISIBLE_WEBVIEW=PASS\nELIGIBLE_QA_TRACKS=PASS\nSIX_GROUPS=PASS\nELIGIBLE_ORIGINALS_AND_LOOP_WRAPS=PASS\nADB_PLAY_STOP_CONTROLS=PASS\nTHIRTY_MINUTE_MUTED_DECODE_MIX='+e.status+'\nREAL_ANDROID_OWNER_DEVICE=NOT_TESTED\nRELEASE_APPROVED=NO\n';
+ const phaseStatus=key=>typeof first[key]==='object'?first[key].status:'NOT_TESTED';
+ const background=phaseStatus('background'),screenOff=phaseStatus('screenOff');
+ assert.ok([background,screenOff].every(status=>['PASS','NOT_TESTED'].includes(status)),'Contradictory lifecycle summary');
+ return 'QA_VISIBLE_WEBVIEW=PASS\nELIGIBLE_QA_TRACKS=PASS\nSIX_GROUPS=PASS\nELIGIBLE_ORIGINALS_AND_LOOP_WRAPS=PASS\nADB_PLAY_STOP_CONTROLS=PASS\nTHIRTY_MINUTE_MUTED_DECODE_MIX='+e.status+'\nBOUNDED_BACKGROUND_MEDIA_PROGRESS='+background+'\nBOUNDED_SCREEN_OFF_MEDIA_PROGRESS='+screenOff+'\nAUDIBLE_OUTPUT_AND_SECURE_LOCK=NOT_TESTED\nBLUETOOTH=NOT_TESTED\nREAL_ANDROID_OWNER_DEVICE=NOT_TESTED\nRELEASE_APPROVED=NO\n';
 }
 if(require.main===module){
  if(process.argv[2]==='--summary'){
@@ -189,4 +262,4 @@ if(require.main===module){
   fs.writeFileSync(path.join(dir,'qa-audio20-result.txt'),resultSummary(first,reopened));
  }else main().catch(e=>{console.error('AUDIO20_WEBVIEW_FAIL:',String(e));process.exitCode=1;});
 }
-module.exports={assertProgress,resultSummary};
+module.exports={assertProgress,assertLifecycle,resultSummary};

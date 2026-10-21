@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Disposable isolated Android QA app only; never touch owner apps or user data.
 set -euo pipefail
+test "${GITHUB_ACTIONS:-}" = true || { echo 'SAFE_GUARD: disposable GitHub emulator only'; exit 1; }
+test "$(adb shell getprop ro.kernel.qemu | tr -d '\r')" = 1 || { echo 'SAFE_GUARD: physical devices are excluded'; exit 1; }
 export AUDIO_QA_EXPECTED_TRACKS="$(python3 -c 'import json;print(sum(r["status"]=="QUARANTINED_NOT_APPROVED" for r in json.load(open("audio_candidates/requested/qa_report.json"))))')"
 APK="$(find android/app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -type f -print -quit)"
 test -s "$APK"
@@ -10,7 +12,17 @@ sha256sum "$RUNNER_TEMP/audio20/tested-audioqa-debug.apk" | tee "$RUNNER_TEMP/au
 git rev-parse HEAD > "$RUNNER_TEMP/audio20/source-sha.txt"
 adb shell getprop ro.build.version.sdk > "$RUNNER_TEMP/audio20/api.txt"
 adb shell dumpsys webviewupdate > "$RUNNER_TEMP/audio20/webview.txt"
-trap 'adb exec-out screencap -p > "$RUNNER_TEMP/audio20/final-screen.png"; adb logcat -d -t 400 > "$RUNNER_TEMP/audio20/logcat.txt"' EXIT
+screen_timeout="$(adb shell settings get system screen_off_timeout | tr -d '\r')"
+capture() {
+  adb exec-out screencap -p > "$RUNNER_TEMP/audio20/final-screen.png" || true
+  adb logcat -d -t 400 > "$RUNNER_TEMP/audio20/logcat.txt" || true
+  adb shell dumpsys audio > "$RUNNER_TEMP/audio20/native-audio-state.txt" || true
+  adb shell dumpsys bluetooth_manager > "$RUNNER_TEMP/audio20/bluetooth-capability.txt" || true
+  adb shell pm list features > "$RUNNER_TEMP/audio20/device-features.txt" || true
+  if [[ "$screen_timeout" =~ ^[0-9]+$ ]]; then adb shell settings put system screen_off_timeout "$screen_timeout" || true; fi
+}
+trap capture EXIT
+adb shell settings put system screen_off_timeout 2147483647
 adb install "$APK"
 adb shell svc wifi disable
 adb shell svc data disable
@@ -26,7 +38,7 @@ test -n "$pid"
 adb forward --remove tcp:9225 >/dev/null 2>&1 || true
 adb forward tcp:9225 "localabstract:webview_devtools_remote_${pid}"
 mkdir -p "$RUNNER_TEMP/audio20"
-AUDIO_QA_ENDURANCE_SECONDS="${AUDIO_QA_ENDURANCE_SECONDS:-1800}" node tests/nature_library_v2/android20_runtime_probe.cjs "$RUNNER_TEMP/audio20/qa-audio20-cdp.json"
+AUDIO_QA_LIFECYCLE=1 AUDIO_QA_ENDURANCE_SECONDS="${AUDIO_QA_ENDURANCE_SECONDS:-1800}" node tests/nature_library_v2/android20_runtime_probe.cjs "$RUNNER_TEMP/audio20/qa-audio20-cdp.json"
 adb exec-out screencap -p > "$RUNNER_TEMP/audio20/qa-audio20-screen.png"
 test -s "$RUNNER_TEMP/audio20/qa-audio20-screen.png"
 adb shell am force-stop com.zenstudy.focus.audioqa

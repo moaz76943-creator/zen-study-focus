@@ -300,3 +300,35 @@ button focus, both real decoded channels, and Arabic injected-rejection feedback
 Android acceptance is pending execution of the exact resulting head; source/
 browser PASS never substitutes for that. The complete original E2E suite remains
 unchanged in its acceptance policy:unexecuted/manual cases remain NOT_TESTED.
+
+## Lifecycle decode testing — bounded Android scenarios
+
+The existing20-recording Android probe now has opt-in first-probe lifecycle
+checks:actual Android Home, then18 seconds of per-track native currentTime
+progress with DOM visibility hidden; separately actual Sleep with observed
+mWakefulness=Asleep and18 seconds of per-track progression. Baselines are taken
+AFTER confirming the state, so prior foreground playback cannot pass the check.
+No more than one loop wrap is inferred:every duration must exceed the observation
+window, IDs/durations must remain stable, and each track must advance close to
+elapsed time. Hidden-page timeupdate handlers may be throttled; they are not used
+as the lifecycle source of truth. Frozen/stopped/missing tracks, an awake display,
+a visible app, unsafe gain or decode errors fail the check.
+
+These short lifecycle observations request normal unmuted media on a headless
+emulator. They do NOT establish audible output, secure PIN/keyguard behavior,
+Bluetooth routing, audio focus or physical-device reliability. Native audio,
+Bluetooth capabilities and device features are captured as diagnostics; presence
+of a feature never becomes a Bluetooth PASS. All approval flags remain false.
+
+The lifecycle checks run before full endurance to fail early; afterwards a fresh
+foreground baseline and monotonic clock measure the requested1800 seconds, with
+visible-state checks at every checkpoint. Lifecycle/retry/cleanup time cannot
+inflate that duration. Evidence is checkpointed on failure and during endurance.
+Wake/foreground recovery runs in finally. The shell runner now refuses physical
+hardware/non-GitHub runs, disables automatic screen timeout only on its disposable
+emulator, restores the prior setting, and preserves diagnostic artifacts.
+
+Source unit RED/GREEN covers observed states, frozen/partial/missing progress,
+loop wrap, duration changes, short runs and truthful text summaries. Actual
+Android lifecycle/endurance results remain pending until the new exact-SHA run
+executes; source tests alone do not grant an Android PASS. RELEASE_APPROVED=NO.
