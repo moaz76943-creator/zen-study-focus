@@ -1,0 +1,103 @@
+name: Track07 Complete Controls and Analytics Acceptance
+on:
+  push:
+    branches:
+      - fix/track07-all-controls-analytics-acceptance-20261021
+permissions:
+  contents: read
+concurrency:
+  group: complete-controls-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Timer destructive mode button RED/GREEN regression
+        run: node --test tests/track07_functional/timer_mode_button_safety.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs
+      - name: Existing node tests and static control inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/android_e2e_recovery/inventory.cjs > "$RUNNER_TEMP/button-inventory.json"
+          node - <<'NODE'
+          const i=require(process.env.RUNNER_TEMP+'/button-inventory.json');
+          console.log(JSON.stringify({static:i.totals.staticControls,dynamicEvents:i.totals.dynamicEventListeners,dynamicFactories:i.totals.dynamicControlFactories,missingScripts:i.totals.missingScripts}));
+          NODE
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          node --test --test-reporter=tap "${suites[@]}"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track07-controls-static-inventory-${{ github.sha }}
+          path: ${{ runner.temp }}/button-inventory.json
+          retention-days: 7
+          if-no-files-found: warn
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Setup standalone Chromium
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Start offline app asset server
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/ui-http.log" 2>&1 &
+          for i in {1..30};do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0;sleep 1;done
+          exit 1
+      - name: Click and check 20-language analytics, seven navigation tabs and timer mode protection
+        shell: bash
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_ANALYTICS_EVIDENCE: ${{ runner.temp }}/complete-ui
+          DF_LOCALE_EVIDENCE: ${{ runner.temp }}/complete-ui
+          DF_BUTTON_EVIDENCE: ${{ runner.temp }}/complete-ui
+        run: |
+          set -euo pipefail
+          node tests/track07_functional/timer_mode_buttons_browser.cjs
+          node tests/track07_functional/analytics_all_controls_browser.cjs
+          node tests/track07_functional/analytics_screen_chromium.cjs
+          node tests/track07_functional/live_20_language_switch_navigation.cjs
+          node tests/df4_browser/nav_reachability.cjs
+          # Existing deep functional real-browser tests: notes edit/save/reload,
+          # task undo and durable failure, quick training, completion picker.
+          mkdir -p "$RUNNER_TEMP/complete-ui/deep-flows"
+          DF_COMPLETION_EVIDENCE="$RUNNER_TEMP/complete-ui/deep-flows" node tests/df4_browser/completion.cjs
+          DF_COMPLETION_EVIDENCE="$RUNNER_TEMP/complete-ui/deep-flows" node tests/df4_browser/note_modal_reachability.cjs
+          DF4_TEST_URL=http://127.0.0.1:8770/index.html DF4_EVIDENCE_DIR="$RUNNER_TEMP/complete-ui/deep-flows" node tests/df4_browser/picker.cjs
+          DF_LAYOUT_REPORT="$RUNNER_TEMP/complete-ui/deep-flows/layout.json" node tests/df4_browser/layout.cjs
+      - name: Persist screenshots, trace and fixed-source SHA
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/complete-ui"
+          git rev-parse HEAD > "$RUNNER_TEMP/complete-ui/SOURCE_SHA.txt"
+          printf 'Chromium is not physical Android/SAF/native microphone/TalkBack. Untested button classes remain explicit.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/complete-ui/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track07-controls-real-chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/complete-ui/
+          retention-days: 7
+          if-no-files-found: warn

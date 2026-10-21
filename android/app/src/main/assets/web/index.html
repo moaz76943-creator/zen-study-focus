@@ -710,8 +710,8 @@
           </div>
           <div class="segmented-pills-bar">
             <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerModeFromUser(getDomainFocusMinutes(), 'focus', this)" data-i18n="modeFocus">25m</button>
-            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">5m</button>
-            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">15m</button>
+            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerModeFromUser(cfg.shortMin, 'short', this)" data-i18n="modeShort">5m</button>
+            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerModeFromUser(cfg.longMin, 'long', this)" data-i18n="modeLong">15m</button>
             <button class="seg-pill" id="modeCustomBtn" onclick="openCustomTimerModal()" data-i18n="modeCustom">Custom ⚡</button>
           </div>
 
