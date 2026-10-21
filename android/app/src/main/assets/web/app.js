@@ -1108,15 +1108,53 @@ function accumulateActiveTime() {
 }
 const TIMER_STORAGE_KEY = 'zen_fortress_active_timer_v21';
 function storeTimerSession() {
-  saveFortressData(TIMER_STORAGE_KEY, {
-    total: timerTotal, left: timerLeft, running: timerRunning,
-    endAt: timerRunning ? timerTargetTime : null,
-    mode: currentTimerModeKey, label: customSessionLabel,
-    sessionId: timerSessionId,
-    taskId: focusSessionTaskId,
-    activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null,
-    training: quickTraining && quickTraining.active ? {...quickTraining} : null
-  });
+  // Preserve the existing v21 active timer packet bytes and its mirror; unlike
+  // the six record families, this auxiliary slot previously had no native fsync.
+  let oldPrimary, oldMirror;
+  try {
+    oldPrimary = localStorage.getItem(TIMER_STORAGE_KEY);
+    oldMirror = localStorage.getItem(TIMER_STORAGE_KEY + '_mirror');
+    if (saveFortressData(TIMER_STORAGE_KEY, {
+      total: timerTotal, left: timerLeft, running: timerRunning,
+      endAt: timerRunning ? timerTargetTime : null,
+      mode: currentTimerModeKey, label: customSessionLabel,
+      sessionId: timerSessionId,
+      taskId: focusSessionTaskId,
+      activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null,
+      training: quickTraining && quickTraining.active ? {...quickTraining} : null
+    }) !== true) throw new Error('TIMER_STORAGE_WRITE_UNVERIFIED');
+    const native = window.ZenNative;
+    if (native && typeof native.acknowledgeActiveTimerSnapshot === 'function') {
+      const raw = localStorage.getItem(TIMER_STORAGE_KEY);
+      if (typeof raw !== 'string' || native.acknowledgeActiveTimerSnapshot(raw) !== true)
+        throw new Error('TIMER_NATIVE_RECEIPT_FAILED');
+    }
+    return true;
+  } catch (_) {
+    // An unacknowledged pause/start must not replace the preceding verified
+    // WebView packet. The native AtomicFile retains its previous receipt.
+    try {
+      for (const [key, previous] of [[TIMER_STORAGE_KEY, oldPrimary],
+        [TIMER_STORAGE_KEY + '_mirror', oldMirror]]) {
+        if (previous === null || previous === undefined) localStorage.removeItem(key);
+        else localStorage.setItem(key, previous);
+      }
+    } catch (_) { /* Native checkpoint remains authoritative when available. */ }
+    showToast(L().saveFailed);
+    return false;
+  }
+}
+function readNativeTimerSession() {
+  const native = window.ZenNative;
+  if (!native || typeof native.readActiveTimerSnapshot !== 'function') return null;
+  try {
+    const raw = native.readActiveTimerSnapshot();
+    if (typeof raw !== 'string' || raw === 'NONE' || raw === 'ERROR') return null;
+    const packet = JSON.parse(raw);
+    if (!packet || typeof packet.payload !== 'string' ||
+        computeHash(packet.payload) !== packet.sig) return null;
+    return JSON.parse(packet.payload);
+  } catch (_) { return null; }
 }
 function creditCompletedSession() {
   if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return true;
@@ -1209,12 +1247,14 @@ function finalizeTimerSession(shouldChime) {
   }
 }
 function runTimerTick() {
+  // An already queued callback must not complete a paused, reset or finished session.
+  if (!timerRunning) return;
   timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
   if (timerLeft <= 0) return finalizeTimerSession(true);
   updateTimerDisplay();
 }
 function restoreTimerSession() {
-  const snap = loadFortressData(TIMER_STORAGE_KEY, null);
+  const snap = readNativeTimerSession() || loadFortressData(TIMER_STORAGE_KEY, null);
   if (!snap || typeof snap !== 'object' || !Number.isFinite(snap.total) || !Number.isFinite(snap.left)) return;
   if (snap.total < 1 || snap.total > 86400 || snap.left < 0 || snap.left > 86400) return;
   timerTotal = snap.total;
@@ -1376,12 +1416,24 @@ function toggleTimerPlay() {
   const activeTitle = document.getElementById('timerModeCaption').textContent;
 
   if (timerRunning) {
+    const previousActiveMs = timerActiveMs, previousResumeMs = timerResumeMs;
+    const previousTargetTime = timerTargetTime;
     clearInterval(timerInterval);
     timerInterval = null;
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
     accumulateActiveTime();
     timerRunning = false;
-    storeTimerSession();
+    if (storeTimerSession() !== true) {
+      // Do not stop the native service or pretend Pause succeeded without ACK.
+      timerRunning = true;
+      timerActiveMs = previousActiveMs;
+      timerResumeMs = previousResumeMs;
+      timerTargetTime = previousTargetTime;
+      timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
+      timerInterval = setInterval(runTimerTick, 500);
+      updateTimerDisplay();
+      return false;
+    }
     if (window.ZenNative && window.ZenNative.stopBackgroundService) {
       try { window.ZenNative.stopBackgroundService(); } catch(e){}
     }
@@ -1392,6 +1444,8 @@ function toggleTimerPlay() {
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
     } catch(e){}
 
+    const previousId = timerSessionId, previousTaskId = focusSessionTaskId;
+    const previousResumeMs = timerResumeMs, previousTargetTime = timerTargetTime;
     if (!timerSessionId) {
       timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
       const linked = typeof focusWorkflowGetLinkedTask === 'function' ? focusWorkflowGetLinkedTask() : null;
@@ -1402,12 +1456,22 @@ function toggleTimerPlay() {
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     timerResumeMs = Date.now();
     timerTargetTime = timerResumeMs + (timerLeft * 1000);
-    storeTimerSession();
+    if (storeTimerSession() !== true) {
+      timerRunning = false;
+      timerSessionId = previousId;
+      focusSessionTaskId = previousTaskId;
+      timerResumeMs = previousResumeMs;
+      timerTargetTime = previousTargetTime;
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+      updateTimerDisplay();
+      return false;
+    }
 
     startNativeTimerForCurrentSession(timerLeft, activeTitle);
 
     timerInterval = setInterval(runTimerTick, 500);
   }
+  return true;
 }
 
 function resetTimerNow() {
