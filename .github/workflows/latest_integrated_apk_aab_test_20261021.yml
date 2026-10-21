@@ -1,0 +1,85 @@
+name: Latest Integrated Android APK and AAB Test Builds
+on:
+  push:
+    branches: [build/df-latest-integrated-apk-aab-20261021]
+permissions:
+  contents: read
+jobs:
+  verify-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check exact source base and controlled delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=baa80e1d483faf0b551fef027852d21d7a6612b1
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE" HEAD | tee /tmp/diff-list.txt
+          while IFS= read -r path; do
+            case "$path" in
+              android/app/src/main/assets/web/app.js|tests/android_dialogs/native_dialog_handoff.test.cjs|tests/track07_functional/timer_mode_20_locale_prompt.test.cjs|tests/track07_functional/timer_mode_20_locale_browser.cjs|.github/workflows/latest_integrated_apk_aab_test_20261021.yml) ;;
+              *) echo "::error::Unexpected source change $path"; exit 1 ;;
+            esac
+          done < /tmp/diff-list.txt
+          grep -F "window.confirm(quickText('replacePrompt'))" android/app/src/main/assets/web/app.js
+          test -e tools/localization_100/guard.cjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check source regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in android/app/src/main/assets/web/*.js; do node --check "$f"; done
+          node --test tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs tests/android_dialogs/native_dialog_handoff.test.cjs
+          node tools/localization_100/guard.cjs --check
+          find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' -print0 | xargs -0 node --test --test-reporter=tap > /tmp/all-node.tap
+          tail -25 /tmp/all-node.tap
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v > /tmp/all-python.log 2>&1
+          tail -15 /tmp/all-python.log
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: SDK platform 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build debug APK and unsigned release AAB
+        working-directory: android
+        run: gradle assembleDebug bundleRelease --no-daemon
+      - name: Verify outputs and provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p deliverable
+          apk="$(find android/app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -type f -print -quit)"
+          aab="$(find android/app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' -type f -print -quit)"
+          test -s "$apk" && test -s "$aab"
+          cp "$apk" deliverable/DeepFocus-LATEST-Integrated-DEBUG.apk
+          cp "$aab" deliverable/DeepFocus-LATEST-Integrated-UNSIGNED.aab
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner -print -quit)"
+          "$APKSIGNER" verify deliverable/DeepFocus-LATEST-Integrated-DEBUG.apk
+          unzip -t deliverable/DeepFocus-LATEST-Integrated-UNSIGNED.aab | tail -1
+          unzip -l deliverable/DeepFocus-LATEST-Integrated-UNSIGNED.aab | grep -F base/manifest/AndroidManifest.xml
+          git rev-parse HEAD > deliverable/BUILD_SHA.txt
+          printf '%s\n' baa80e1d483faf0b551fef027852d21d7a6612b1 > deliverable/INTEGRATION_BASE_SHA.txt
+          sha256sum deliverable/*.apk deliverable/*.aab > deliverable/SHA256SUMS.txt
+          printf '%s\n' 'TEST ONLY. Debug APK does not upgrade a differently signed installed release.' 'UNSIGNED AAB is not ready for Google Play. No release signing secrets were used.' '20 existing locales retained. 80 new review-locale candidates are not enabled.' 'Android functional/media/license/backup/security approval incomplete. RELEASE_APPROVED=NO.' > deliverable/READ_FIRST.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-LATEST-Integrated-APK-AAB-TEST
+          path: deliverable/
+          retention-days: 7
+          if-no-files-found: error
