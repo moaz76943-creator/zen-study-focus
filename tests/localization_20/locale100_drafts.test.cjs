@@ -52,3 +52,15 @@ test('the checked-in Swahili UI draft is valid structurally, remains incomplete 
  assert.equal(r.humanReview,'NOT_TESTED');
  assert.equal(guard.resolve('sw').selectable,false);
 });
+
+test('UI label icons and exported file format markers must survive draft translation',()=>{
+ const src={'core.sounds':{stop:'⏹ Stop'},'analytics.dictionary':{export:'Export CSV'}};
+ const p={schema_version:1,locale:'sw',status:draft.DRAFT_STATUS,inventorySha256:guard.inventoryHash(src),
+  strings:{'core.sounds':{stop:'Simamisha'},'analytics.dictionary':{export:'Hamisha faili'}}};
+ let r=draft.validateDraft(p,src);
+ assert.ok(r.errors.some(x=>x.includes('ICON_MISMATCH')));
+ assert.ok(r.errors.some(x=>x.includes('FORMAT_MARKER_MISMATCH')));
+ p.strings['core.sounds'].stop='⏹ Simamisha';
+ p.strings['analytics.dictionary'].export='Hamisha CSV';
+ assert.equal(draft.validateDraft(p,src).valid,true);
+});
