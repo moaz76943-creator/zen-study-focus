@@ -99,7 +99,9 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/df4-android"
           git rev-parse HEAD | tee "$RUNNER_TEMP/df4-android/commit-sha.txt"
-          test "$(cat "$RUNNER_TEMP/track09-download/track09-build/source-sha.txt")" = "$(git rev-parse HEAD)"
+          SHA_FILE="$(find "$RUNNER_TEMP/track09-download" -name source-sha.txt -type f -print -quit)"
+          test -s "$SHA_FILE"
+          test "$(cat "$SHA_FILE")" = "$(git rev-parse HEAD)"
           APK="$(find "$RUNNER_TEMP/track09-download" -name app-debug.apk -type f -print -quit)"
           test -s "$APK"
           cp "$APK" "$RUNNER_TEMP/df4-device-test.apk"
