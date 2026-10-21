@@ -128,17 +128,27 @@ async function receiptAfter(before,expected){
   const position=point(save);
   adb('shell','input','tap',String(position.x),String(position.y));
   const saved=await receiptAfter(savedBefore,'saved');
-  const check=adb('shell','sh','-c','find /sdcard/Download -maxdepth 2 -type f -iname "deep-focus-analytics*" 2>/dev/null | head -n 3').trim();
-  if(!check){
-   report.results.push({stage:'save',status:'NOT_TESTED',requestId:saved.id,reason:'Native reports saved but file bytes not inspectable in Downloads'});
-   throw Error('No independently readable exported CSV found in Downloads');
+  // adb shell sh -c can misquote argv and run bare `find .` (the observed
+  // previous test failure). Invoke find directly with structured argv.
+  const permitted=['/sdcard/Download','/sdcard/Documents'];
+  const candidates=[];
+  for(const folder of permitted){
+   let listing='';
+   try{listing=adb('shell','find',folder,'-maxdepth','2','-type','f');}
+   catch(_){continue;}
+   for(const raw of listing.split('\n')){
+    const file=raw.replaceAll('\r','').trim();
+    if(file.startsWith(folder+'/') && file.split('/').at(-1).startsWith('deep-focus-analytics'))
+     candidates.push(file);
+   }
   }
-  const first=check.split('\n')[0].replaceAll('\r','').trim();
-  // /sdcard is an alias of /storage/emulated/0 on Android; neither permits
-  // reading private app storage or any directory outside disposable Downloads.
-  const inDownloads=first.startsWith('/sdcard/Download/') ||
-    first.startsWith('/storage/emulated/0/Download/');
-  if(!inDownloads)throw Error('Exported CSV outside allowed Downloads directory: '+JSON.stringify(first.slice(0,160)));
+  if(!candidates.length){
+   report.results.push({stage:'save',status:'NOT_TESTED',requestId:saved.id,reason:'Saved callback received, but CSV not independently available in disposable Downloads/Documents'});
+   throw Error('Native SAVE acknowledged but no independently readable exported CSV was found in allowed public folders');
+  }
+  const first=candidates[0];
+  if(!permitted.some(folder=>first.startsWith(folder+'/')))
+   throw Error('Export candidate outside disposable public download folders');
   const bytes=adb('shell','cat',first);
   assert.ok(bytes.startsWith('"id"')||bytes.startsWith('"date"')||bytes.startsWith('"period"'),'Saved file missing verified Analytics CSV headers');
   assert.match(bytes,/\r?\n/,'CSV must include a header row and newline');
