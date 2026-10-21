@@ -81,7 +81,7 @@
    if(!artifactsList.length)panel('track15-artifacts','NOT_TESTED',
      'لا توجد Artifacts موثوقة من تشغيل مطابق لهذا الرأس؛ لا تخمّن APK/AAB أو بصمة.');
    for(const a of artifactsList){
-     panel('track15-artifacts',a.name+' · '+a.kind,
+     panel('track15-artifacts',a.name+' · '+a.kind+(stale?' · STALE':''),
        'Archive SHA256: '+(a.archiveSha256||'NOT_TESTED')+
        ' · APK/AAB binary SHA256: NOT_TESTED · Size: '+(a.size??'—')+' B',
        a.url);
@@ -104,6 +104,7 @@
  async function refresh(){
    if(busy)return;
    if(Date.now()<lockUntil){
+     if(previous)render(previous,'STALE');
      status('الطلبات محدودة لتجنب تجاوز GitHub API. المراجعة التالية بعد '+
        new Date(lockUntil).toLocaleTimeString('en-GB',{timeZone:'Asia/Amman'})+
        (previous?' · الأرقام السابقة STALE':''),'RATE_LIMITED');return;
