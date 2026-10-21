@@ -45,3 +45,13 @@ test('JavaScript importer delegates to the same user-confirmed v21 restore path'
  // Never put untrusted backup data into WebView URL navigation.
  assert.doesNotMatch(native,/webView\.loadUrl\([^;\n]*backupCode/);
 });
+
+test('SAF restore chooser admits legacy backup MIME types, not just text/plain',()=>{
+ assert.match(native,/Intent\\.EXTRA_MIME_TYPES/);
+ assert.match(native,/intent\\.setType\\("\\*\\/\\*"\\)/);
+ assert.match(native,/application\\/json/);
+ assert.match(native,/application\\/octet-stream/);
+ assert.match(native,/text\\/plain/);
+ assert.match(native,/MAX_BACKUP_IMPORT_BYTES/);
+ assert.match(native,/verifyAndRestoreBackupCode/);
+});
