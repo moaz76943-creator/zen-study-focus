@@ -32,6 +32,7 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
 
           // Switching RTL/LTR animates nav transform; measure after settling.
           // Screenshot with animations disabled completes finite CSS transitions.
+          const tag=width+'-'+dir+'-'+Math.round(scale*100);
           await page.screenshot({path:path.join(output,'screen-'+tag+'.png'),animations:'disabled'});
           const measured=await page.evaluate(ids=>{
             const bounds=e=>{const r=e?.getBoundingClientRect();return r&&{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
@@ -43,7 +44,6 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
             const hero=bounds(document.getElementById('focusHeroCard'));
             return {viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,buttons,nav,hero,ring,timer,chips};
           },ids);
-          const tag=width+'-'+dir+'-'+Math.round(scale*100);
           const failures=[];
           if(measured.documentWidth>width+2)failures.push('DOCUMENT_HORIZONTAL_OVERFLOW');
           if(!measured.nav||!measured.hero||!measured.ring||!measured.timer)failures.push('MISSING_NAV_OR_TIMER');
