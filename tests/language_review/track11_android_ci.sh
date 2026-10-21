@@ -30,6 +30,7 @@ connect_cdp() {
 }
 connect_cdp
 node tools/language_review/track11_android_probe.cjs switch "$report/switch-20-locales.json"
+node tools/language_review/track11_android_probe.cjs backup "$report/backup-code-restore.json"
 adb shell am force-stop com.zenstudy.focus
 adb shell am start -n com.zenstudy.focus/.MainActivity
 sleep 7
