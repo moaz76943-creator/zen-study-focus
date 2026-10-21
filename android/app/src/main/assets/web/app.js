@@ -1140,9 +1140,7 @@ function storeTimerSession() {
         else localStorage.setItem(key, previous);
       }
     } catch (_) { /* Native checkpoint remains authoritative when available. */ }
-    showToast(cfg.lang === 'ar'
-      ? 'تعذّر حفظ حالة المؤقت. حاول مرة أخرى.'
-      : 'Could not save timer state. Try again.');
+    showToast(L().saveFailed);
     return false;
   }
 }
