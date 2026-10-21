@@ -117,7 +117,9 @@ jobs:
           emulator-boot-timeout: 600
           disable-animations: true
           script: |
-            set -euo pipefail
+            # This action executes script with /usr/bin/sh; dash has no pipefail.
+            # Here the sole pipeline's result is fail-closed by its equality check.
+            set -eu
             test "$(adb shell getprop ro.kernel.qemu | tr -d '\r')" = 1
             adb install android/app/build/outputs/apk/debug/app-debug.apk
             adb shell svc wifi disable || true
