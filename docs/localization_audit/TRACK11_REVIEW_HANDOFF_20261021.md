@@ -26,6 +26,7 @@ The read-only `track11-source-review-<SHA>` GitHub Actions artifact includes:
 - `track11-triage.json`: source-static candidates, identical-English flags, numeral literal cases and unresolved HTML binding keys.
 - `historical-auditor/coverage.json`, `proposals.json`, `REPORT.md`: canonical source analyzer evidence, not runtime translations.
 - `SOURCE_SHA.txt`, TAP results and locale lint output.
+- `track11-native.json` and `track11-native-review.csv`: exact Java source inventory for all 20 existing locales, no translations activated. Initially **12 native static text candidates × 20 locales = 240 reviewer rows**; regenerate on current HEAD.
 
 The Chromium artifact includes exact SHA, `live-navigation-20-languages.json` (20 × **320/360/393/430px**), timer confirmation cases, Analytics interaction evidence, screenshot, and known limitations. Its browser is desktop Chromium loading packaged WebView files; it is **not** an installed Android app.
 
@@ -46,9 +47,17 @@ The Chromium artifact includes exact SHA, `live-navigation-20-languages.json` (2
 
 - Source: the dedicated workflow must PASS on the final candidate SHA; adding reviewed copy needs fresh regression tests.
 - Chromium: 80 language/width combinations, rendered navigation, RTL/LTR and overflow; 20 localized destructive timer cancel cases; Analytics interactions, SVG accessibility and Western-digit CSV/source regression.
-- Android **NOT_TESTED on this Track 11 SHA**: actual WebView 20-locale navigation, native dialogs/Toasts, process force-stop and reopen, restore/import and DocumentsUI data comparisons, TalkBack, text truncation at all target widths and device keyboard.
+- Android API30 emulator: the separate `track11_real_android_20261021.yml` must pass on the final SHA before claiming a live WebView locale check. It covers actual installed WebView locale switching, chart ARIA, generated timer digits, synthetic authored-text DOM preservation, force-stop/reopen and a checksum-valid **synthetic ZEN21 code restore**. This does **not** cover a physical phone, file-based SAF restore, TalkBack, native dialog translations, actual user-content retention or every width on Android.
 - Human translations **NOT_TESTED**: all Notes, Tasks, Goals, Timer, Analytics, Audio, Settings, Native alerts must be context-approved one by one.
 - User-authored Arabic/Persian/Urdu texts and their original digits are preserved. Generated UI numerals should use Latin `0–9`; never rewrite stored notes/tasks or v21 exports to enforce it.
 - Existing shared files and future-language registry are master-integration owned; do not auto-cherry-pick overlapping repairs. No auto-merge, no signing, no release.
 
 **RELEASE_APPROVED=NO** until all applicable gates pass on an approved integration build.
+
+## Integration proof gates and manual translation admission
+
+The original 20 languages are separate from the 80 future candidates. Draft strings never enter Android runtime from these reviewer artifacts. Source-language fallback in Notes Studio, Tasks Studio, Goals Studio and Timer Settings is known to use an Arabic/English branch for many labels; resolving the remaining 18-language gaps requires context-approved copy, not replacing existing UI values with guesses.
+
+The Android gate uses only a new disposable `com.zenstudy.focus` debug install inside a GitHub-hosted API30 emulator; it never connects to the owner's device and never logs backup payloads. Its `backup` probe replaces the browser confirmation only inside this disposable QA session to validate a synthetic checksum-valid `ZEN21::` code round-trip. The actual Android DocumentsUI SAF path is **NOT_TESTED** in Track 11 and remains owned by the data-preservation track.
+
+Exact-SHA CI, human review and owner approval are mandatory; a previous commit's green test cannot be carried to a later application-source change. `RELEASE_APPROVED=NO`.
