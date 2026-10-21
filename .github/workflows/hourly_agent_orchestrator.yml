@@ -14,7 +14,9 @@ on:
     paths:
       - '.github/workflows/hourly_agent_orchestrator.yml'
       - 'tools/daily_maintenance/hourly_orchestrator.cjs'
+      - 'tools/daily_maintenance/canonical_source.cjs'
       - 'tests/daily_maintenance/hourly_*.test.cjs'
+      - 'tests/daily_maintenance/canonical_source.test.cjs'
       - 'AGENTS.md'
       - '.github/agents/**'
       - 'docs/daily_maintenance/HOURLY_COORDINATION.md'
@@ -38,7 +40,7 @@ jobs:
       - name: Test hourly coordination contracts
         run: |
           node --check tools/daily_maintenance/hourly_orchestrator.cjs
-          node --test tests/daily_maintenance/hourly_*.test.cjs
+          node --test tests/daily_maintenance/hourly_*.test.cjs tests/daily_maintenance/canonical_source.test.cjs
   hourly-source-audit:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -47,16 +49,27 @@ jobs:
       contents: read
       issues: write
     env:
-      SOURCE_REF: ${{ inputs.target == 'main' && 'main' || 'fix/master-completion-20261020' }}
+      SOURCE_REF: ${{ inputs.target == 'main' && 'main' || 'integration/master-recovery-20261021' }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.repository.default_branch }}
           path: automation
           persist-credentials: false
+      - name: Pin active PR #138 source head before checkout
+        if: env.SOURCE_REF == 'integration/master-recovery-20261021'
+        id: resolve
+        uses: actions/github-script@v7
+        env:
+          SOURCE_REF: ${{ env.SOURCE_REF }}
+        with:
+          script: |
+            const policy = require('./automation/tools/daily_maintenance/canonical_source.cjs');
+            const {data} = await github.rest.pulls.get({owner:context.repo.owner,repo:context.repo.repo,pull_number:policy.CANONICAL_PR});
+            core.setOutput('sha',policy.verifyCanonicalPr(data,context.repo.owner+'/'+context.repo.repo,process.env.SOURCE_REF));
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.SOURCE_REF }}
+          ref: ${{ steps.resolve.outputs.sha || env.SOURCE_REF }}
           path: source
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -104,10 +117,16 @@ jobs:
             try {
               const report = JSON.parse(fs.readFileSync(process.env.REPORT_JSON, 'utf8'));
               if (report.source_sha !== sha) throw Error('Checked source SHA does not match cycle evidence');
+              if (process.env.SOURCE_REF === 'integration/master-recovery-20261021') {
+                const policy = require('./automation/tools/daily_maintenance/canonical_source.cjs');
+                const {data} = await github.rest.pulls.get({owner,repo,pull_number:policy.CANONICAL_PR});
+                policy.verifyCanonicalPr(data,owner+'/'+repo,process.env.SOURCE_REF,sha);
+              }
               state = ledger.aggregate(previous, report);
               result = ledger.toMarkdown(state) + '\n' + ledger.serialize(state);
             } catch (err) {
               // Never reuse a green ledger after a missing, corrupt or out-of-order source report.
+              core.setFailed('NOT_VERIFIED: '+String(err.message).slice(0,180));
               result = 'NOT_VERIFIED: current source/cohort evidence failed; historical PASS is invalid.\n' +
                 String(err.message).slice(0,200) + '\n' + (read(process.env.REPORT) || 'No current report.');
             }
