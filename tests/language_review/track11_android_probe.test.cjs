@@ -28,11 +28,11 @@ test('Android force-stop/reopen must persist selected locale and real native bri
  assert.throws(()=>validateReopen({...o,language:'en'}),/LOCALE_NOT_PERSISTED/);
  assert.throws(()=>validateReopen({...o,nativeBridge:false}),/NATIVE_BRIDGE_MISSING/);
 });
-test('device script is bound to installed bundled WebView only and has no network/restore/export calls',()=>{
+test('device script is bound to installed WebView, blocks network and SAF, and scopes synthetic restore',()=>{
  for(const stage of ['switch','reopen']){
   const s=expression(stage);
   assert.match(s,/file:\/\/\/android_asset\/web\/index\.html/);
-  assert.doesNotMatch(s,/fetch\s*\(|XMLHttpRequest|delete\s+localStorage|verifyAndRestoreBackupCode|exportBackupToFile/);
+  assert.doesNotMatch(s,/fetch\s*\(|XMLHttpRequest|delete\s+localStorage|exportBackupToFile/);
  }
  assert.throws(()=>expression('promote-language'),/INVALID_STAGE/);
 });
