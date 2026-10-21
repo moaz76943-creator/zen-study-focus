@@ -37,4 +37,4 @@ test -n "$pid"
 adb forward --remove tcp:9225 >/dev/null 2>&1 || true
 adb forward tcp:9225 "localabstract:webview_devtools_remote_${pid}"
 AUDIO_QA_ENDURANCE_SECONDS=0 node tests/nature_library_v2/android20_runtime_probe.cjs "$RUNNER_TEMP/audio20/qa-audio20-reopen-cdp.json"
-printf 'QA_VISIBLE_WEBVIEW=PASS\nELIGIBLE_QA_TRACKS=PASS\nSIX_GROUPS=PASS\nELIGIBLE_ORIGINALS_AND_LOOP_WRAPS=PASS\nADB_PLAY_STOP_CONTROLS=PASS\nTHIRTY_MINUTE_MUTED_DECODE_MIX=PASS\nREAL_ANDROID_OWNER_DEVICE=NOT_TESTED\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/audio20/qa-audio20-result.txt"
+node tests/nature_library_v2/android20_runtime_probe.cjs --summary "$RUNNER_TEMP/audio20"

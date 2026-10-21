@@ -172,5 +172,21 @@ async function main(){
   console.log(JSON.stringify({status:result.status,tracks:state.count,originals:originals.length,loops:loops.length,endurance:result.endurance.status}));
  }finally{ws.close();}
 }
-if(require.main===module)main().catch(e=>{console.error('AUDIO20_WEBVIEW_FAIL:',String(e));process.exitCode=1;});
-module.exports={assertProgress};
+function resultSummary(first,reopened){
+ assert.equal(first.status,'ANDROID_AUDIO_QA_ALL_ORIGINALS_LOOPS_CONTROLS_PASS');
+ assert.equal(reopened.status,'ANDROID_AUDIO_QA_ALL_ORIGINALS_LOOPS_CONTROLS_PASS');
+ const e=first.endurance;
+ assert.ok(e&&[0,1800].includes(e.requested)&&Number.isFinite(e.seconds)&&e.seconds>=0,'Invalid endurance evidence');
+ assert.equal(e.status,e.requested===0?'NOT_TESTED':'PASS','Contradictory endurance status');
+ if(e.requested===1800)assert.ok(e.seconds>=1800,'Endurance was shorter than requested');
+ return 'QA_VISIBLE_WEBVIEW=PASS\nELIGIBLE_QA_TRACKS=PASS\nSIX_GROUPS=PASS\nELIGIBLE_ORIGINALS_AND_LOOP_WRAPS=PASS\nADB_PLAY_STOP_CONTROLS=PASS\nTHIRTY_MINUTE_MUTED_DECODE_MIX='+e.status+'\nREAL_ANDROID_OWNER_DEVICE=NOT_TESTED\nRELEASE_APPROVED=NO\n';
+}
+if(require.main===module){
+ if(process.argv[2]==='--summary'){
+  const path=require('node:path'),dir=process.argv[3];
+  const first=JSON.parse(fs.readFileSync(path.join(dir,'qa-audio20-cdp.json')));
+  const reopened=JSON.parse(fs.readFileSync(path.join(dir,'qa-audio20-reopen-cdp.json')));
+  fs.writeFileSync(path.join(dir,'qa-audio20-result.txt'),resultSummary(first,reopened));
+ }else main().catch(e=>{console.error('AUDIO20_WEBVIEW_FAIL:',String(e));process.exitCode=1;});
+}
+module.exports={assertProgress,resultSummary};
