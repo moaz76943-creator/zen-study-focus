@@ -51,9 +51,10 @@ jobs:
           probe="$(mktemp -d "$RUNNER_TEMP/df-track13-probe.XXXXXX")"
           trap 'rm -rf "$probe"' EXIT
           python3 - "$probe" <<'PY'
-          import pathlib, secrets, sys
+          import pathlib, sys
+          from secrets import token_urlsafe
           directory = pathlib.Path(sys.argv[1])
-          fake_value = secrets.token_urlsafe(48)
+          fake_value = token_urlsafe(48)
           (directory / 'synthetic.env').write_text('api_key = "' + fake_value + '"\n', encoding='utf-8')
           PY
           set +e
