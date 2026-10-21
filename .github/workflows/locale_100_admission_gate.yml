@@ -55,6 +55,8 @@ jobs:
           mkdir -p evidence
           git rev-parse HEAD > evidence/exact-sha.txt
           node tests/validate_locales.cjs | tee evidence/legacy-20-locales.txt
+          node tools/language_review/audit.cjs --out evidence/actual-20-locale-coverage
+          node -e "const r=require('./tools/language_review/audit.cjs').audit();console.log(JSON.stringify({missingPairs:r.missing.length,englishIdenticalCandidates:r.englishIdentical.length,unmarkedStaticCandidates:r.staticCandidates.length}));" | tee evidence/translation-gaps.json
           node tests/smoke_app.cjs | tee evidence/smoke.txt
           node tests/android_e2e_recovery/inventory.cjs > evidence/control-inventory.json
           mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
