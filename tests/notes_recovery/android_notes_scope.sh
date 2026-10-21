@@ -14,6 +14,7 @@ node tests/android_e2e_recovery/cdp_actions.cjs "$folder/android-notes.json" > "
 instrumentExit=$?
 set -e
 cat "$folder/android-raw.log" | tail -n 110
+set +e
 INSTRUMENT_EXIT="$instrumentExit" node - "$folder/android-notes.json" "$folder/android-scope-summary.json" <<'NODE'
 const fs=require('fs'),assert=require('assert/strict');
 const selected=process.env.DF_ANDROID_CASES.split(',');
@@ -34,3 +35,9 @@ console.log(JSON.stringify(evidence));
 // as NOT_TESTED and exits nonzero. Only this named Notes scope is assessed.
 assert.equal(passed,cases.length,'Focused Android Notes acceptance incomplete');
 NODE
+scopeExit=$?
+node --check tests/notes_recovery/android_notes_extended.cjs
+node tests/notes_recovery/android_notes_extended.cjs "$folder/android-notes-extended.json"
+extendedExit=$?
+set -e
+if (( scopeExit != 0 || extendedExit != 0 )); then exit 1; fi

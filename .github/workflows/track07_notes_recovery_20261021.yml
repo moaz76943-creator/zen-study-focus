@@ -75,7 +75,7 @@ jobs:
     env:
       ANDROID_TEST_API: '30'
       DF_ANDROID_DISPOSABLE: '1'
-      DF_ANDROID_CASES: preflight,notes_create_edit,tasks_create,save_failure,language_live_change,dialog_back,orientation_restore,long_text,data_integrity,process_death_recovery
+      DF_ANDROID_CASES: preflight,notes_create_edit,tasks_create,save_failure,language_live_change,dialog_back,long_text,process_death_recovery
     steps:
       - uses: actions/checkout@v4
         with:
