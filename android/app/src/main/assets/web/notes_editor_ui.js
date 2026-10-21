@@ -402,8 +402,17 @@
     document.getElementById('selNoteCat').addEventListener('change',()=>{showType();schedule();});
     // visualViewport reports actual available height while the Android IME is visible.
     if(window.visualViewport){
-      const update=()=>modal.style.setProperty('--nsux-height',window.visualViewport.height+'px');
-      window.visualViewport.addEventListener('resize',update);update();instance.disposeViewport=()=>window.visualViewport.removeEventListener('resize',update);
+      const update=()=>{
+        modal.style.setProperty('--nsux-height',window.visualViewport.height+'px');
+        modal.style.setProperty('--nsux-top',window.visualViewport.offsetTop+'px');
+      };
+      window.visualViewport.addEventListener('resize',update);
+      window.visualViewport.addEventListener('scroll',update);
+      update();
+      instance.disposeViewport=()=>{
+        window.visualViewport.removeEventListener('resize',update);
+        window.visualViewport.removeEventListener('scroll',update);
+      };
     }
     showType();
   }
