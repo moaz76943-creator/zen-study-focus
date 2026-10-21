@@ -57,6 +57,16 @@ function round(v) { return Math.round(v*100)/100; }
           if(measured.chips.some(x=>x.rect&&x.rect.height<43))failures.push('DURATION_TARGET_UNDERSIZED');
           rows.push({width,dir,scale,failures,geometry:measured});
           if(failures.length)problems.push({tag,failures});
+          // Visual before/after reference at the critical 320px / 200% case.
+          // The 'legacy' image is simulated by restoring the old two CSS rules,
+          // not a screenshot taken from a previous commit or a real Android device.
+          if(width===320 && scale===2){
+            const legacy=await page.addStyleTag({content:
+              'body.df-v22.df-recovery10.timer-home #focusHeroCard .ring-time {font-size:clamp(2.55rem,11vw,3.55rem)!important;}'+
+              'body.df-v22.df-recovery10.timer-home #focusHeroCard .time-delta-row {flex-wrap:nowrap!important;}'});
+            await page.screenshot({path:path.join(output,'comparison-simulated-legacy-320-'+dir+'-200.png'),animations:'disabled'});
+            await legacy.evaluate(element=>element.remove());
+          }
           await page.screenshot({path:path.join(output,'screen-'+tag+'.png'),animations:'disabled'});
         }
       }
