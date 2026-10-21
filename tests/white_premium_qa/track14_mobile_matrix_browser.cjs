@@ -42,6 +42,15 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
             const chips=[...document.querySelectorAll('#focusHeroCard .delta-chip')].map(e=>({rect:bounds(e),minHeight:getComputedStyle(e).minHeight}));
             const buttons=ids.map(id=>({id,rect:bounds(document.getElementById(id)),visible:getComputedStyle(document.getElementById(id)).display!=='none'}));
             const hero=bounds(document.getElementById('focusHeroCard'));
+            const textBoxes=e=>{
+              if(!e) return {lines:0,text:'',whiteSpace:''};
+              const range=document.createRange();
+              range.selectNodeContents(e);
+              const lines=[...range.getClientRects()].filter(r=>r.width>0.25);
+              return {lines:lines.length,text:e.textContent.trim(),whiteSpace:getComputedStyle(e).whiteSpace};
+            };
+            const presets=[...document.querySelectorAll('#focusHeroCard .segmented-pills-bar .seg-pill')].map(textBoxes);
+            const isoBadge=textBoxes(document.getElementById('currentLangIso'));
 
             const labels=ids.map(id=>{
               const el=document.querySelector('#'+id+' span[data-i18n],#'+id+' #navTrainingText');
@@ -49,7 +58,7 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
               return {id,text:el?.textContent?.trim()||'',rect,
                 clipPath:style?.clipPath||'',lineHeight:style?parseFloat(style.lineHeight):0};
             });
-            return {viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,buttons,nav,hero,ring,timer,chips,labels};
+            return {viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,buttons,nav,hero,ring,timer,chips,labels,presets,isoBadge};
           },ids);
           const failures=[];
           if(measured.documentWidth>width+2)failures.push('DOCUMENT_HORIZONTAL_OVERFLOW');
@@ -65,6 +74,9 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
             if(Math.abs((t.left+t.right-measured.nav.left-measured.nav.right)/2)>5)failures.push('TIMER_NOT_CENTERED');
           }
           if(measured.chips.some(x=>x.rect&&x.rect.height<43))failures.push('DURATION_TARGET_UNDERSIZED');
+          if(measured.presets.length!==4||measured.presets.some(x=>x.lines>1||x.whiteSpace!=='nowrap'))
+            failures.push('TIMER_PRESET_LABEL_WRAPPED');
+          if(measured.isoBadge.lines>1)failures.push('LANGUAGE_ISO_BADGE_WRAPPED');
           const activeCaption=measured.labels.find(x=>x.id==='navTimer');
           if(!activeCaption?.text)failures.push('ACTIVE_TAB_ACCESSIBLE_LABEL_MISSING');
           if(activeCaption?.rect){
