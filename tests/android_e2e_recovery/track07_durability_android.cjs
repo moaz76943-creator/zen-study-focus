@@ -236,11 +236,11 @@ async function main(){
     }
     // Test-only observer: call through to the real validator/confirm, never
     // synthesize file contents, a confirmation or a successful restore.
-    // Prefer the left text side of the actual named file row, not the
+    // Use the real file-row icon left of its non-clickable label, not the
     // trailing DocumentsUI preview affordance. Verify picker departure.
     const m=selected.match(/bounds="([^"]+)"/),b=m?[...m[1].matchAll(/[0-9]+/g)].map(v=>Number(v[0])):[];
     assert.equal(b.length,4,'Real file target must expose Android UI bounds');
-    const yy=Math.floor((b[1]+b[3])/2),leftX=Math.min(b[2]-8,b[0]+Math.min(72,Math.floor((b[2]-b[0])/4)));
+    const yy=Math.floor((b[1]+b[3])/2),leftX=Math.max(45,b[0]-96);
     report.saf_selection={targetBounds:b,clickable:/clickable="true"/.test(selected),firstTap:[leftX,yy]};
     adb('shell','input','tap',String(leftX),String(yy));
     await pause(1400);
