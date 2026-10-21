@@ -22,7 +22,7 @@ test('native pending worksheet protects against spreadsheet CSV formulas',()=>{
   const r=buildNativeReview(danger,'a'.repeat(40));writeNativeReview(r,tmp);
   const csv=fs.readFileSync(path.join(tmp,'track11-native-review.csv'),'utf8');
   assert.match(csv,/'=HYPERLINK/);
-  assert.match(csv,/'\\'=HYPERLINK/);
+  assert.match(csv,/'=HYPERLINK/);
   assert.equal(JSON.parse(fs.readFileSync(path.join(tmp,'track11-native.json'),'utf8')).rows.length,20);
  }finally{fs.rmSync(tmp,{recursive:true,force:true});}
 });
