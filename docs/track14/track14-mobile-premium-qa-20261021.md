@@ -46,3 +46,10 @@ These 24 Chromium cells must be promoted to PASS or FAIL **only from this branch
 
 ## Rollback and independence
 Revert only the scoped CSS commit after review. Do not change JS focus/session state, v21 storage keys, application package, existing translations, assets or audio. Do not call source-only success a production approval. Preserve any in-flight changes in PR #138 until integrator resolves conflicts.
+
+
+## Native Android screenshot probe added to the branch
+- Android debug-only emulator workflow: `.github/workflows/track14_android_screenshot_qa.yml`, using API 30 and `gradle assembleDebug`. No production signing.
+- Recorder: `tests/white_premium_qa/track14_android_snapshots.sh`, captures **12** APK screenshots (320/360/393/430 physical width × system font_scale 1.0/1.5/2.0) to a SHA-tagged artifact.
+- **At authoring: NOT_TESTED** for run completion, image contents, text zoom effect on WebView, Android keyboard, TalkBack and actual device. Screenshot creation in a workflow file is not screenshot evidence itself.
+- Android screenshots can only become PASS when the artifact exists and images have been inspected. Chromium remains a separate **24-case** root-font emulation.
