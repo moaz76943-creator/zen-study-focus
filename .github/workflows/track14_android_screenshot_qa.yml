@@ -1,0 +1,71 @@
+name: Track14 Android emulator screenshot review
+on:
+  push:
+    branches:
+      - fix/track14-mobile-200pct-accessibility-20261021
+      - integration/track14-mobile-three-batches-20261021
+permissions:
+  contents: read
+concurrency:
+  group: track14-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK 36 for the project
+        shell: bash
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: RED/GREEN mock broken-pipe install regression
+        run: node --test tests/white_premium_qa/track14_android_install.test.cjs
+      - name: Debug-only APK (no upload signing)
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Permit KVM acceleration on ephemeral Ubuntu runner if supported
+        shell: bash
+        run: |
+          if [[ -e /dev/kvm ]]; then
+            sudo chmod 666 /dev/kvm
+            ls -l /dev/kvm
+          else
+            echo 'KVM device unavailable: emulator may not support real Android capture' >&2
+          fi
+      - name: Android emulator screenshot matrix — 4 widths x 3 system font scales
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          DF_TRACK14_ANDROID_EVIDENCE: ${{ runner.temp }}/track14-android
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_4
+          disable-animations: true
+          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect
+          script: bash tests/white_premium_qa/track14_android_snapshots.sh
+      - name: Pin exact source and limitations
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/track14-android"
+          git rev-parse HEAD > "$RUNNER_TEMP/track14-android/EXACT_SHA.txt"
+          printf 'Android emulator screenshots are visual artifacts, not semantic app feature, TalkBack or IME PASS.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/track14-android/GATES.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track14-android-emulator-screens-${{ github.sha }}
+          path: ${{ runner.temp }}/track14-android/
+          retention-days: 7
+          if-no-files-found: warn
