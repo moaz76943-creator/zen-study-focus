@@ -1,0 +1,47 @@
+name: Track 17 Synthetic Core Performance (non-Android)
+on:
+  pull_request:
+    paths:
+      - 'tests/performance_recovery/**'
+      - '.github/workflows/track17_synthetic_core_perf.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bounded-source-bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact candidate SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: candidate
+          persist-credentials: false
+      - name: Checkout original PR 138 HEAD as fixed comparison baseline
+        uses: actions/checkout@v4
+        with:
+          ref: cd1713b66fdf6ec11c5808834bf30f516ee8f6c5
+          path: baseline
+          persist-credentials: false
+      - name: Record source commits
+        shell: bash
+        run: |
+          mkdir -p evidence
+          printf 'baseline_sha=%s\ncandidate_sha=%s\n' "$(git -C baseline rev-parse HEAD)" "$(git -C candidate rev-parse HEAD)" | tee evidence/source_sha.txt
+      - name: Execute focused performance, scalability and offline source tests
+        working-directory: candidate
+        run: node --test tests/performance_recovery/*.test.cjs
+      - name: Run both benchmarks on the SAME runner
+        shell: bash
+        run: |
+          node candidate/tests/performance_recovery/track17_benchmark.cjs baseline 9 > evidence/baseline.json
+          node candidate/tests/performance_recovery/track17_benchmark.cjs candidate 9 > evidence/candidate.json
+          node -e "const fs=require('fs'); for(const n of ['baseline','candidate']) {const r=JSON.parse(fs.readFileSync('evidence/'+n+'.json'));if(r.results.length!==3||r.results.some(x=>x.samples!==9))process.exit(1);console.log(n,JSON.stringify(r.results.map(x=>({test:x.name,median:x.wallMs.median,p95:x.wallMs.p95,over50:x.syncTasksOver50ms}))));}"
+      - name: Upload bounded Node-only proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: track17-synthetic-source-performance
+          path: evidence/
+          retention-days: 3
