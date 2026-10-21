@@ -18,11 +18,20 @@ function readCandidates(dir){
  }
  return packs;
 }
-function important(english){
- return /\b(?:backup|export|restore|delete|reset|cancel|permission|private|security|error|failed|unable|unsaved|warning|stop|revert|overwrite|discard|privacy|confirm|save)\b/i.test(english);
+// Review triage, not machine translation or linguistic approval.
+function reviewRisk(english,context=''){
+ const normalizedContext=String(context).replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[._-]/g,' ');
+ const text=String(english??'')+' '+normalizedContext;
+ if(/\b(?:delete|erase|wipe|purge|remove|clear|reset|overwrite|discard|restore|recover|backup|archive|trash|undo|revert)\b/i.test(text))
+  return 'DATA_DELETION_OR_RECOVERY';
+ if(/\b(?:privacy|private|personal|account|permission|password|security|sensitive|share|export|import|consent|grant|revoke|encrypt|unencrypted)\b/i.test(text))
+  return 'PRIVACY_AND_DATA_TRANSFER';
+ if(/\b(?:confirm|cancel|are you sure|allow|deny|agree|reject|stop|save|unsaved|replace|failed|unable|warning|error)\b/i.test(text))
+  return 'CONFIRMATION_OR_ERROR';
+ return null;
 }
 function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().uiStrings,
- webDrafts=readCandidates('drafts'),nativeDrafts=readCandidates('native_drafts'),unmarkedRows=[]}={}){
+ nativeDynamicRows=[],webDrafts=readCandidates('drafts'),nativeDrafts=readCandidates('native_drafts'),unmarkedRows=[]}={}){
  const catalogSet=new Set(guard.REGISTRY.filter(r=>r.phase==='planned').map(r=>r.code));
  const sourcePaths=new Set(Object.entries(source).flatMap(([cid,values])=>Object.keys(values).map(k=>cid+'.'+k)));
  const nativeKeys=new Set(nativeRows.map(r=>r.text));
@@ -41,7 +50,12 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
   const validation=nativeDraftTools.validate(pack,nativeRows);
   if(!validation.valid)throw Error('INVALID_NATIVE_DRAFT:'+code+':'+validation.errors.join(','));
  }
+ for(const entry of nativeDynamicRows){
+  if(!entry||typeof entry.path!=='string'||typeof entry.kind!=='string'||typeof entry.expression!=='string'
+     ||!Number.isInteger(entry.line)||entry.line<1)throw Error('INVALID_DYNAMIC_NATIVE_SOURCE');
+ }
  const englishSha=guard.inventoryHash(source),nativeSha=native.inventoryHash(nativeRows);
+ const nativeDynamicSha=native.inventoryHash(nativeDynamicRows.map(r=>({...r,text:r.expression})));
  return guard.REGISTRY.filter(r=>r.phase==='planned').map(locale=>{
   const web=webDrafts[locale.code],nat=nativeDrafts[locale.code],items=[];
   for(const [catalog,values] of Object.entries(source)){
@@ -50,7 +64,8 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
     items.push({surface:'web',catalog,key,english,candidate,
       status:candidate===null?'NOT_TRANSLATED':'CANDIDATE_NEEDS_HUMAN_REVIEW',
       placeholders:[...english.matchAll(PLACEHOLDERS)].map(x=>x[0]),
-      critical:important(english)||/\b(?:save|cancel|delete|restore|export|backup|warning|error)\b/i.test(key),
+      critical:reviewRisk(english,catalog+'.'+key)!==null,
+      riskCategory:reviewRisk(english,catalog+'.'+key),
       humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
    }
   }
@@ -60,7 +75,18 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
     sourceFile:entry.path,sourceLine:entry.line,
     status:candidate===null?'NOT_TRANSLATED':'CANDIDATE_NEEDS_HUMAN_REVIEW',
     placeholders:[...entry.text.matchAll(PLACEHOLDERS)].map(x=>x[0]),
-    critical:important(entry.text),humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
+    critical:reviewRisk(entry.text)!==null,riskCategory:reviewRisk(entry.text),
+    humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
+  }
+  // Runtime-provided native copy (including Android dialogs populated by JavaScript)
+  // is not translated by Java literal extraction: force explicit source tracing.
+  for(const entry of nativeDynamicRows){
+   items.push({surface:'android-dynamic',catalog:entry.kind,
+    key:entry.path+':'+entry.line+':'+entry.kind,english:null,candidate:null,
+    sourceFile:entry.path,sourceLine:entry.line,sourceExpression:entry.expression,
+    status:'NEEDS_DYNAMIC_RUNTIME_CROSS_REFERENCE',placeholders:[],critical:true,
+    riskCategory:'DYNAMIC_RUNTIME_SOURCE',
+    humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
   }
   // Potential user-facing literals outside the registered dictionaries. Never auto-translate
   // or silently promote: some are code internals, requiring human classification first.
@@ -70,20 +96,23 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
    items.push({surface:'unmarked-static',catalog:row.kind||'unknown',key:row.file+':'+row.line,
     english:row.text,candidate:null,sourceFile:row.file,sourceLine:row.line,
     status:'NEEDS_SOURCE_INVENTORY_CLASSIFICATION',placeholders:[...row.text.matchAll(PLACEHOLDERS)].map(x=>x[0]),
-    critical:important(row.text),humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
+    critical:reviewRisk(row.text)!==null,riskCategory:reviewRisk(row.text),
+    humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
   }
   const candidateCount=items.filter(r=>r.candidate!==null).length;
   return {schema_version:1,locale:locale.code,englishName:locale.name,
     script:locale.script,direction:locale.direction,englishSourceSha256:englishSha,
-    nativeSourceSha256:nativeSha,total:items.length,candidateCount,untranslatedCount:items.length-candidateCount,
+    nativeSourceSha256:nativeSha,nativeDynamicSourceSha256:nativeDynamicSha,
+    dynamicNativeReviewItems:nativeDynamicRows.length,total:items.length,candidateCount,untranslatedCount:items.length-candidateCount,
     approvedForRuntime:false,humanReview:'NOT_TESTED',androidTests:'NOT_TESTED',
-    sourceScope:'Explicit 25 dictionaries plus detected Java copy; dynamic and OS UI may not be included',
+    sourceScope:'Explicit dictionaries, detected Java literals and unresolved native dynamic callsites; JS/OS UI can still require independent inspection',
     items};
  });
 }
 function writeQueue(directory){
  const unmarkedRows=require('../language_review/audit.cjs').audit().staticCandidates;
- const queue=buildQueue({unmarkedRows}),out=path.resolve(directory);
+ const nativeFound=native.report();
+ const queue=buildQueue({nativeRows:nativeFound.uiStrings,nativeDynamicRows:nativeFound.dynamicUiCallsites,unmarkedRows}),out=path.resolve(directory);
  fs.mkdirSync(out,{recursive:true});
  const list=queue.map(q=>{
   fs.writeFileSync(path.join(out,q.locale+'.json'),JSON.stringify(q,null,2)+'\n');
@@ -93,6 +122,7 @@ function writeQueue(directory){
  const overview={schema_version:1,totalLanguages:100,plannedLanguages:list.length,
   existingUntouched:20,excludedHebrew:true,certifiedNewLanguages:0,
   candidateStrings:list.reduce((sum,q)=>sum+q.candidates,0),unmarkedStaticReviewItems:unmarkedRows.length,
+  nativeDynamicReviewItems:nativeFound.dynamicCandidateCount,
   approved:false,files:list};
  fs.writeFileSync(path.join(out,'INDEX.json'),JSON.stringify(overview,null,2)+'\n');
  return overview;
@@ -103,4 +133,4 @@ if(require.main===module){
   console.log(JSON.stringify(writeQueue(process.argv[3]),null,2));
  }catch(e){console.error('LOCALE_REVIEW_QUEUE_FAILED:',e.message);process.exitCode=1;}
 }
-module.exports={readCandidates,buildQueue,writeQueue};
+module.exports={readCandidates,reviewRisk,buildQueue,writeQueue};

@@ -85,3 +85,44 @@ test('review queue rejects malformed native drafts rather than passing unsafe co
  const approved={...nativePack(),status:'APPROVED'};
  assert.throws(()=>buildQueue({source:web,nativeRows:native,webDrafts:{},nativeDrafts:{sw:approved}}),/NOT_A_NATIVE_DRAFT/);
 });
+
+test('dynamic Android confirmation/notification copy is review work, never a translated or approved string',()=>{
+ const sourceCode=[
+   'new AlertDialog.Builder(activity).setMessage(message == null ? "" : message);',
+   'notification.setContentText(title);',
+   'notification.setContentTitle("Static title");'
+ ].join('\n');
+ const dynamicRows=nativeTools.scanDynamicJava(sourceCode,'FocusAppWebChromeClient.java');
+ assert.equal(dynamicRows.length,2);
+ assert.ok(dynamicRows.some(x=>x.kind==='dynamicDialogMessage'));
+ assert.ok(dynamicRows.some(x=>x.kind==='dynamicNotificationBody'));
+ const q=buildQueue({source:web,nativeRows:native,nativeDynamicRows:dynamicRows,
+   webDrafts:{},nativeDrafts:{}}).find(x=>x.locale==='sw');
+ const pending=q.items.filter(x=>x.surface==='android-dynamic');
+ assert.equal(pending.length,2);
+ assert.ok(pending.every(x=>x.candidate===null&&x.critical&&x.status==='NEEDS_DYNAMIC_RUNTIME_CROSS_REFERENCE'));
+ assert.equal(q.approvedForRuntime,false);
+ assert.ok(q.nativeDynamicSourceSha256);
+});
+
+test('sensitive delete/restore/confirmation/transfer language requires contextual review without automatic approval',()=>{
+ const source={'notes.studio':{
+  eraseAll:'Erase every saved note?',
+  clearHistory:'Clear all history',
+  linkedAccount:'Remove linked account',
+  confirmExit:'Are you sure?',
+  personalTransfer:'Share personal information',
+  ordinary:'Open calendar'
+ }};
+ const q=buildQueue({source,nativeRows:[],nativeDynamicRows:[],webDrafts:{},nativeDrafts:{}}).find(x=>x.locale==='ro');
+ const byKey=Object.fromEntries(q.items.map(x=>[x.key,x]));
+ for(const key of ['eraseAll','clearHistory','linkedAccount','confirmExit','personalTransfer']){
+  assert.equal(byKey[key].critical,true,key);
+  assert.notEqual(byKey[key].riskCategory,null,key);
+  assert.equal(byKey[key].candidate,null,key);
+  assert.equal(byKey[key].humanReview,'NOT_TESTED',key);
+ }
+ assert.equal(byKey.ordinary.critical,false);
+ assert.equal(byKey.ordinary.riskCategory,null);
+ assert.equal(q.approvedForRuntime,false);
+});
