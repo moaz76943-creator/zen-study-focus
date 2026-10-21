@@ -23,13 +23,16 @@ test('TRACK06 selected cohort: 20 distinct pinned source recordings remain quara
     assert.ok(!hashes.has(source.source_sha256),'duplicate original bytes');
     hashes.add(source.source_sha256);
     assert.equal(source.approved_for_runtime,false,id);
-    assert.notEqual(source.ready,true,id);
+    assert.equal(source.ready,false,id);
     assert.equal(source.human_audio_review,'NOT_TESTED',id);
     assert.ok(source.license_evidence.startsWith('https://'),id);
     assert.ok(['CC0-1.0','PD-author'].includes(source.license),id);
     if(source.license==='CC0-1.0')cc0++;else pd++;
   }
   assert.equal(hashes.size,20);
+  for(const candidate of all){
+    if(candidate.approved_for_runtime===false)assert.equal(candidate.ready,false,'explicit quarantine flag missing for '+candidate.id);
+  }
   assert.deepEqual([cc0,pd],[14,6]);
   assert.equal(manifest.sources_verified_for_distribution,false);
   const rightsConflict=manifest.items.find(x=>x.id==='ocean');
