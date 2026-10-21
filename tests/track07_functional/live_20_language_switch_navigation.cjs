@@ -15,7 +15,7 @@ const languages=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko
   await page.waitForFunction(()=>typeof applyLanguage==='function'&&!!document.getElementById('navAnalytics'),{timeout:15000});
   const rows=[];
   for(const lang of languages){
-   for(const width of [320,393,430]){
+   for(const width of [320,360,393,430]){
     await page.setViewportSize({width,height:780});
     const row=await page.evaluate(({lang,width})=>{
       const problems=[];
@@ -46,7 +46,7 @@ const languages=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko
   const issues=rows.filter(x=>x.problems.length>0);
   console.log(JSON.stringify({tested:rows.length,distinctLanguages:languages.length,issues:issues.length,uncaught:errors.length,firstIssues:issues.slice(0,12)}));
   await page.screenshot({path:out+'/navigation-mobile-last-locale.png',fullPage:false});
-  assert.deepEqual(issues,[],'Every language should successfully switch, preserve nav translation and fit on 320–430px');
+  assert.deepEqual(issues,[],'Every language should successfully switch, preserve nav translation and fit on 320/360/393/430px');
   assert.deepEqual(errors,[],'No uncaught browser JavaScript errors');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
