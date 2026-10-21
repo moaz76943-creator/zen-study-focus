@@ -30,7 +30,7 @@ const base=process.env.DF_COMPLETION_URL||'http://127.0.0.1:8770';
     applyLanguage(lang);
     const entries=window.__buttonAuditListeners;
     const controls=[...document.querySelectorAll('button,input,select,textarea,[role="button"]')];
-    const counts={withInline:0,withListener:0,delegatedCandidates:0};
+    const counts={withInline:0,withProperty:0,withListener:0,delegatedCandidates:0};
     const broken=[],unassigned=[],unlabeled=[];
     const root=Object.getPrototypeOf(window);
     for(const [index,el] of controls.entries()){
@@ -47,6 +47,10 @@ const base=process.env.DF_COMPLETION_URL||'http://127.0.0.1:8770';
         if(!exists)broken.push({tag:el.tagName,id:el.id||null,handler:handler[1],attr,code:code.slice(0,100)});
        }
        snippets.push(attr+':'+code.slice(0,80));
+      }
+      // Dynamic Calendar/week buttons assign el.onclick directly rather than via addEventListener.
+      if(typeof el.onclick==='function'&&!el.getAttribute('onclick')){
+        counts.withProperty++;snippets.push('property:onclick');
       }
       const listeners=entries.get(el);
       if(listeners?.size)counts.withListener++;
