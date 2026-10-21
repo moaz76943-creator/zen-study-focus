@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "locale": "ro",
+  "status": "DRAFT_TRANSLATION_NEEDS_NATIVE_REVIEW",
+  "inventorySha256": "1aedd44aa363dedcdfeead68cd5d026710fd429b995e77141b20492b1bd9a06e",
+  "provenance": {
+    "type": "AI-assisted initial Romanian UI candidate",
+    "review": "NOT_TESTED",
+    "notes": "Initial context translations; require independent fluent-language and real WebView confirmation."
+  },
+  "strings": {
+    "analytics.dictionary": {
+      "analyticsTitle": "Statistici ale activităților înregistrate",
+      "activity": "Activitate",
+      "period": "Perioadă",
+      "from": "De la",
+      "to": "Până la",
+      "minutes": "Minute înregistrate",
+      "sessions": "Sesiuni",
+      "average": "Durata medie a sesiunii",
+      "streak": "Seria curentă",
+      "noSessions": "Nu există sesiuni înregistrate în această perioadă",
+      "goal": "Compararea obiectivelor",
+      "noGoals": "Nu există obiective zilnice configurate",
+      "completedTasks": "Sarcini finalizate",
+      "chart": "Distribuție zilnică",
+      "year": "An",
+      "export": "Exportă CSV",
+      "details": "Selectează o zi pentru detalii",
+      "grouping": "Grupare",
+      "daily": "Zilnic",
+      "weekly": "Săptămânal",
+      "monthly": "Lunar",
+      "all": "Toate",
+      "study": "Studiu",
+      "reading": "Lectură",
+      "work": "Muncă",
+      "fitness": "Exerciții fizice",
+      "excluded": "Sesiuni excluse",
+      "minute": "minute",
+      "heatmapYear": "Activitate anuală"
+    },
+    "core.navigation": {
+      "title": "Concentrare și performanță",
+      "sub": "Studiu, antrenament, lectură și muncă în profunzime",
+      "navTimer": "Temporizator",
+      "totalFocusToday": "Totalul minutelor active de astăzi",
+      "minsUnit": "min",
+      "daysUnit": "zile",
+      "waterWord": "Apă"
+    },
+    "core.tasks": {
+      "navTasks": "Sarcini",
+      "filterAll": "Toate",
+      "filterToday": "Active",
+      "filterDone": "Finalizate",
+      "phAddTask": "Adaugă un obiectiv de studiu, antrenament sau lectură..."
+    },
+    "core.notes": {
+      "navNotes": "Notițe",
+      "phSearchNotes": "Caută notițe, antrenamente sau rezumate de cărți...",
+      "orbDump": "Notiță rapidă",
+      "tagCornell": "Metoda Cornell 📋",
+      "tagFlash": "Reamintire 👁️",
+      "tagQuick": "Jurnal 💡",
+      "lblBlurAnswer": "Ascunde textul pentru exersarea reamintirii (atinge pentru a-l afișa)"
+    },
+    "core.sounds": {
+      "navSounds": "Sunete naturale",
+      "btnStopAll": "⏹ Oprește",
+      "sndCatWater": "Apă și ploaie 🌧️",
+      "sndCatForest": "Pădure și vânt 🌲",
+      "sndCatWarm": "Foc și pământ 🔥",
+      "mixerReady": "🎵 Studioul de sunete naturale este pregătit",
+      "btnMyMix": "✨ Mixul meu"
+    },
+    "core.analytics": {
+      "navAnalytics": "Statistici",
+      "kpiMinutes": "Minute active",
+      "kpiSessions": "Sesiuni finalizate",
+      "kpiTrendWeek": "↑ +18% săptămâna aceasta",
+      "kpiTrendGreat": "↑ +12% consecvență",
+      "overviewTitle": "Distribuția activităților",
+      "badgeThisWeek": "Săptămâna aceasta",
+      "waveFlowTitle": "Indicele săptămânal al performanței",
+      "peakPerfBadge": "Nivel maxim de concentrare"
+    },
+    "core.timer": {
+      "modeCustom": "Personalizat ⚡",
+      "calcHeading": "🎓 Calculator pentru realizarea obiectivelor",
+      "calcOutTpl": "📅 În acest ritm, îți vei atinge obiectivul în {d} zile!",
+      "startFocusAchieve": "Planifică • Acționează • Reușește",
+      "orbDesk": "Ceas de birou"
+    },
+    "core.goals": {
+      "domStudy": "Studiu",
+      "domSport": "Antrenament",
+      "domRead": "Lectură",
+      "domWork": "Muncă în profunzime",
+      "catStudy": "📚 Studiu",
+      "catSport": "🏋️ Sport",
+      "catReview": "📖 Lectură",
+      "catExam": "💻 Muncă",
+      "sportSetsTitle": "🏋️ Serii de exerciții și pauze",
+      "readTrackerTitle": "📖 Progresul sesiunii de lectură"
+    },
+    "core.settings": {
+      "btnSave": "Salvează și aplică",
+      "btnCancel": "Anulează",
+      "pillCloud": "Copie de rezervă manuală",
+      "pillSound": "Testează sunetul",
+      "pillShare": "Distribuie aplicația",
+      "pillSecure": "Date locale",
+      "orbCloud": "Exportă copia de rezervă"
+    },
+    "core.calendar": {
+      "navCalendar": "Calendar",
+      "btnAddCalNote": "+ Adaugă o notiță la dată"
+    }
+  },
+  "identicalSourceCandidates": {
+    "core.goals.catSport": "Sport is a Romanian noun widely used in fitness navigation; independent reviewer must confirm in context.",
+    "core.tasks.filterToday": "Active is a Romanian plural adjective for feminine tasks; reviewer must verify grammar against the actual filter.",
+    "core.calendar.navCalendar": "Calendar is the usual Romanian noun for the calendar view; native reviewer must confirm capitalization and UI context."
+  }
+}

@@ -1,0 +1,707 @@
+{
+  "schema_version": 1,
+  "target_count": 100,
+  "selection_basis": "Widely spoken written UI languages; not a verified exact demographic ranking",
+  "locales": [
+    {
+      "code": "en",
+      "name": "English",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "ar",
+      "name": "Arabic",
+      "script": "Arab",
+      "direction": "rtl",
+      "phase": "existing"
+    },
+    {
+      "code": "es",
+      "name": "Spanish",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "zh",
+      "name": "Chinese (Simplified)",
+      "script": "Hans",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "hi",
+      "name": "Hindi",
+      "script": "Deva",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "fr",
+      "name": "French",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "de",
+      "name": "German",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "ru",
+      "name": "Russian",
+      "script": "Cyrl",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "pt",
+      "name": "Portuguese",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "ja",
+      "name": "Japanese",
+      "script": "Jpan",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "id",
+      "name": "Indonesian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "tr",
+      "name": "Turkish",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "ko",
+      "name": "Korean",
+      "script": "Kore",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "vi",
+      "name": "Vietnamese",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "it",
+      "name": "Italian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "bn",
+      "name": "Bengali",
+      "script": "Beng",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "ur",
+      "name": "Urdu",
+      "script": "Arab",
+      "direction": "rtl",
+      "phase": "existing"
+    },
+    {
+      "code": "fa",
+      "name": "Persian",
+      "script": "Arab",
+      "direction": "rtl",
+      "phase": "existing"
+    },
+    {
+      "code": "pl",
+      "name": "Polish",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "nl",
+      "name": "Dutch",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "existing"
+    },
+    {
+      "code": "mr",
+      "name": "Marathi",
+      "script": "Deva",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "te",
+      "name": "Telugu",
+      "script": "Telu",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ta",
+      "name": "Tamil",
+      "script": "Taml",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "sw",
+      "name": "Swahili",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ha",
+      "name": "Hausa",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "pa",
+      "name": "Punjabi (Gurmukhi)",
+      "script": "Guru",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "fil",
+      "name": "Filipino",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "th",
+      "name": "Thai",
+      "script": "Thai",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "gu",
+      "name": "Gujarati",
+      "script": "Gujr",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "kn",
+      "name": "Kannada",
+      "script": "Knda",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ml",
+      "name": "Malayalam",
+      "script": "Mlym",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "or",
+      "name": "Odia",
+      "script": "Orya",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "my",
+      "name": "Burmese",
+      "script": "Mymr",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "uk",
+      "name": "Ukrainian",
+      "script": "Cyrl",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ps",
+      "name": "Pashto",
+      "script": "Arab",
+      "direction": "rtl",
+      "phase": "planned"
+    },
+    {
+      "code": "am",
+      "name": "Amharic",
+      "script": "Ethi",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "sd",
+      "name": "Sindhi",
+      "script": "Arab",
+      "direction": "rtl",
+      "phase": "planned"
+    },
+    {
+      "code": "ro",
+      "name": "Romanian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "yo",
+      "name": "Yoruba",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "uz",
+      "name": "Uzbek",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ig",
+      "name": "Igbo",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ne",
+      "name": "Nepali",
+      "script": "Deva",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "om",
+      "name": "Oromo",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "so",
+      "name": "Somali",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "si",
+      "name": "Sinhala",
+      "script": "Sinh",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "az",
+      "name": "Azerbaijani",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "km",
+      "name": "Khmer",
+      "script": "Khmr",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "hu",
+      "name": "Hungarian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "el",
+      "name": "Greek",
+      "script": "Grek",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "cs",
+      "name": "Czech",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "sv",
+      "name": "Swedish",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "fi",
+      "name": "Finnish",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "da",
+      "name": "Danish",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "no",
+      "name": "Norwegian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "sk",
+      "name": "Slovak",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "bg",
+      "name": "Bulgarian",
+      "script": "Cyrl",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "hr",
+      "name": "Croatian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "sr",
+      "name": "Serbian (Cyrillic)",
+      "script": "Cyrl",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "lt",
+      "name": "Lithuanian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "lv",
+      "name": "Latvian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "et",
+      "name": "Estonian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "sq",
+      "name": "Albanian",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "hy",
+      "name": "Armenian",
+      "script": "Armn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ka",
+      "name": "Georgian",
+      "script": "Geor",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "kk",
+      "name": "Kazakh",
+      "script": "Cyrl",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ky",
+      "name": "Kyrgyz",
+      "script": "Cyrl",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "tg",
+      "name": "Tajik",
+      "script": "Cyrl",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "tk",
+      "name": "Turkmen",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "mn",
+      "name": "Mongolian",
+      "script": "Cyrl",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ug",
+      "name": "Uyghur",
+      "script": "Arab",
+      "direction": "rtl",
+      "phase": "planned"
+    },
+    {
+      "code": "ku",
+      "name": "Kurdish (Kurmanji, Latin)",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ckb",
+      "name": "Kurdish (Sorani)",
+      "script": "Arab",
+      "direction": "rtl",
+      "phase": "planned"
+    },
+    {
+      "code": "ceb",
+      "name": "Cebuano",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "su",
+      "name": "Sundanese",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ms",
+      "name": "Malay",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "af",
+      "name": "Afrikaans",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "zu",
+      "name": "Zulu",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "xh",
+      "name": "Xhosa",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "rw",
+      "name": "Kinyarwanda",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "mg",
+      "name": "Malagasy",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "sn",
+      "name": "Shona",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ny",
+      "name": "Chichewa",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "st",
+      "name": "Southern Sotho",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "tn",
+      "name": "Tswana",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ht",
+      "name": "Haitian Creole",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ca",
+      "name": "Catalan",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "lo",
+      "name": "Lao",
+      "script": "Laoo",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "bho",
+      "name": "Bhojpuri",
+      "script": "Deva",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "mai",
+      "name": "Maithili",
+      "script": "Deva",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "awa",
+      "name": "Awadhi",
+      "script": "Deva",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "mag",
+      "name": "Magahi",
+      "script": "Deva",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "hne",
+      "name": "Chhattisgarhi",
+      "script": "Deva",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "yue",
+      "name": "Cantonese (Traditional)",
+      "script": "Hant",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "nan",
+      "name": "Min Nan (Traditional)",
+      "script": "Hant",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "jv",
+      "name": "Javanese",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "as",
+      "name": "Assamese",
+      "script": "Beng",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ti",
+      "name": "Tigrinya",
+      "script": "Ethi",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "wo",
+      "name": "Wolof",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ff",
+      "name": "Fulah",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    },
+    {
+      "code": "ak",
+      "name": "Akan",
+      "script": "Latn",
+      "direction": "ltr",
+      "phase": "planned"
+    }
+  ]
+}

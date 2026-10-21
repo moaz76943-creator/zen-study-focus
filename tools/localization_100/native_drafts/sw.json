@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "locale": "sw",
+  "status": "DRAFT_NATIVE_NEEDS_REVIEW",
+  "provenance": {
+    "type": "AI-assisted first-pass native Android strings",
+    "review": "NOT_TESTED",
+    "note": "Not used by app; requires fluent native-review and Android notification/SAF evidence."
+  },
+  "strings": {
+    "A backup save is already open": "Uhifadhi wa nakala rudufu tayari umefunguliwa",
+    "File picker unavailable; use Share Backup": "Kichagua faili hakipatikani; tumia Shiriki Nakala Rudufu",
+    "Unable to save backup; existing data unchanged": "Imeshindikana kuhifadhi nakala rudufu; data zilizopo hazijabadilishwa",
+    "Backup exported; keep the unencrypted file private": "Nakala rudufu imehamishwa; hifadhi faili ambalo halijasimbwa kwa usiri",
+    "Deep Focus is running in background — Tap to open": "Deep Focus inaendelea chinichini — Gusa ili kufungua",
+    "Deep Focus — Timer complete": "Deep Focus — Kipima muda kimekamilika",
+    "Active Focus Timer Bar": "Upau wa kipima muda cha umakini kinachoendelea",
+    "Shows live countdown timer in status bar": "Huonyesha muda uliobaki kwenye upau wa hali",
+    "Deep Focus timer result": "Matokeo ya kipima muda cha Deep Focus",
+    "Quiet timer completion status": "Hali ya kukamilika kwa kipima muda bila sauti"
+  },
+  "sourceSha256": "3c2a22fdbd6bf5b2fc766d83cf44173597ff7412842a88b176a380602ea490f4"
+}
