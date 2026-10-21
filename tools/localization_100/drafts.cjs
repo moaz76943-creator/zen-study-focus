@@ -64,6 +64,21 @@ function validateDraft(pack,source){
    humanReview:'NOT_TESTED',nativeAndroid:'NOT_TESTED',renderedUI:'NOT_TESTED',
    readyForRuntime:false,approvedForMerge:false});
 }
+function reviewWorksheet(pack,source){
+ const summary=validateDraft(pack,source);
+ const items=[];
+ for(const [catalog,englishKeys] of Object.entries(source)){
+   for(const [key,english] of Object.entries(englishKeys)){
+     const candidate=pack?.strings?.[catalog]?.[key];
+     items.push({catalog,key,english,candidate:typeof candidate==='string'&&candidate.trim()?candidate:null,
+       placeholders:tokens(english),humanReview:'NOT_TESTED',reviewerNotes:null,contextScreen:catalog.split('.')[0]});
+   }
+ }
+ return {locale:pack?.locale,inventorySha256:guard.inventoryHash(source),
+   total:summary.total,translated:summary.translated,untranslated:summary.missing,
+   candidateValid:summary.valid,sourceScope:'Explicit registered dictionaries; native and dynamic visible strings need separate inventory',
+   humanReview:'NOT_TESTED',approvedForRuntime:false,items};
+}
 function reportDrafts(source=guard.sourceInventory(),draftDir=path.join(__dirname,'drafts')){
  const errors=[],results=[];
  for(const name of fs.existsSync(draftDir)?fs.readdirSync(draftDir).sort():[]){
@@ -81,8 +96,18 @@ function reportDrafts(source=guard.sourceInventory(),draftDir=path.join(__dirnam
 }
 if(require.main===module){
  try{
-   if(process.argv.length!==3||process.argv[2]!=='--report')throw Error('Usage: drafts.cjs --report');
-   const result=reportDrafts();console.log(JSON.stringify(result,null,2));process.exitCode=result.valid?0:1;
+   if(process.argv.length===3&&process.argv[2]==='--report'){
+     const result=reportDrafts();console.log(JSON.stringify(result,null,2));process.exitCode=result.valid?0:1;
+   }else if(process.argv.length===4&&process.argv[2]==='--worksheet'){
+     const code=process.argv[3],row=guard.resolve(code);
+     if(!row||row.phase!=='planned'||code!==row.code)throw Error('NOT_A_PLANNED_LANGUAGE');
+     const file=path.join(__dirname,'drafts',code+'.json');
+     if(!fs.existsSync(file))throw Error('DRAFT_NOT_FOUND:'+code);
+     const pack=JSON.parse(fs.readFileSync(file,'utf8'));
+     const source=guard.sourceInventory(),validation=validateDraft(pack,source);
+     if(!validation.valid)throw Error('DRAFT_FAILED_VALIDATION:'+validation.errors.join(','));
+     console.log(JSON.stringify(reviewWorksheet(pack,source),null,2));
+   }else throw Error('Usage: drafts.cjs --report | --worksheet <planned language>');
  }catch(e){console.error('DRAFT_VALIDATION_FAILED:',e.message);process.exitCode=1;}
 }
-module.exports={DRAFT_STATUS,validateDraft,reportDrafts};
+module.exports={DRAFT_STATUS,validateDraft,reportDrafts,reviewWorksheet};
