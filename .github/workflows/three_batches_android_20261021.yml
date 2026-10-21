@@ -1,0 +1,94 @@
+name: Three Batches Native Android Locale and Restart QA
+on:
+  push:
+    branches:
+      - integration/three-batches-p0-convergence-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track11-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact source and Android probe RED/GREEN contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          node --check tools/language_review/track11_android_probe.cjs
+          bash -n tests/language_review/track11_android_ci.sh
+          node --test tests/language_review/track11_android_probe.test.cjs
+  android-api30:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install Android 36 compilation platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Build same-head disposable debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Capture source SHA and prepare KVM
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/track11-android"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/track11-android/SOURCE_SHA.txt"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/track11-android/built-apk.sha256"
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Actual installed API30 WebView 20 languages, SVG and restart
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/language_review/track11_android_ci.sh
+      - name: Report no false Android PASS after bootstrap errors
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/track11-android"
+          if [ ! -s "$RUNNER_TEMP/track11-android/switch-20-locales.json" ]; then
+            printf '%s\n' '{"status":"NOT_TESTED","reason":"Android build/emulator/CDP bootstrap stopped before exact-head 20-locale verification","releaseApproved":false}' > "$RUNNER_TEMP/track11-android/switch-20-locales.json"
+          fi
+      - name: Keep debug APK and Android evidence, including failed checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: three-batches-android-evidence-${{ github.sha }}
+          path: ${{ runner.temp }}/track11-android/
+          retention-days: 7
+          if-no-files-found: warn
