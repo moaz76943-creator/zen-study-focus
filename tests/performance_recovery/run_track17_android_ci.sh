@@ -5,7 +5,7 @@ report="${RUNNER_TEMP:?}/track17-android-${ANDROID_TEST_API:?}"
 mkdir -p "$report"
 trap 'adb logcat -d -s AndroidRuntime chromium > "$report/logcat.txt" 2>/dev/null || true; adb shell dumpsys meminfo com.zenstudy.focus > "$report/final-memory.txt" 2>/dev/null || true; adb forward --remove tcp:9222 >/dev/null 2>&1 || true' EXIT
 test -s "$RUNNER_TEMP/track17-app-debug.apk"
-test "$(adb devices | awk '\$1 ~ /^emulator-/ && \$2=="device" {n++} END {print n+0}')" -eq 1
+test "$(adb devices | awk '$1 ~ /^emulator-/ && $2=="device" {n++} END {print n+0}')" -eq 1
 git rev-parse HEAD > "$report/source_sha.txt"
 sha256sum "$RUNNER_TEMP/track17-app-debug.apk" > "$report/apk.sha256"
 adb install "$RUNNER_TEMP/track17-app-debug.apk"
