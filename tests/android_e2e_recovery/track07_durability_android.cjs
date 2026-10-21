@@ -234,8 +234,24 @@ async function main(){
       if(downloads)tapUI(downloads);
       selected=(await nativeUI('backup file selection',xml=>uiNodes(xml).find(n=>n.includes('text="'+name+'"')))).item;
     }
+    // Test-only observer: call through to the real validator/confirm, never
+    // synthesize file contents, a confirmation or a successful restore.
     tapUI(selected);
-    const confirm=await nativeUI('native restore confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)),false);
+    let confirm;
+    try {
+      confirm=await nativeUI('native restore confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)),false);
+    } catch(error){
+      // Save synthetic-only forensic evidence without exporting backup payload.
+      const xml=dumpUI(),focus=adb('shell','dumpsys','window','windows');
+      const state={pickerVisible:/documentsui/i.test(xml),nativeDialogText:/text="(?:OK|Ok|Restore|استعادة)"/.test(xml),
+        appFocused:/mCurrentFocus[^\\n]*com\\.zenstudy\\.focus/.test(focus),
+        uiPackages:[...new Set([...xml.matchAll(/package="([^"]+)"/g)].map(m=>m[1]))].slice(0,6),
+        visibleText:uiNodes(xml).map(n=>(n.match(/text="([^"]*)"/)||[])[1]).filter(Boolean).map(t=>t.slice(0,60)).slice(0,20)};
+      report.saf_import_diagnostic=state;
+      try{fs.writeFileSync((process.argv[2]||'track07-durability.json')+'.saf-diagnostic.json',JSON.stringify(state,null,2));}catch(_){}
+      try{cp.execFileSync('adb',['-s','emulator-5554','exec-out','screencap','-p'],{timeout:15000,stdio:['ignore',fs.openSync((process.argv[2]||'track07-durability.json')+'.saf-screen.png','w'),'ignore']});}catch(_){}
+      throw new Error('TRANSPORT: Restore confirm not observable; see sanitized SAF diagnostic. '+error.message);
+    }
     tapUI(confirm.item);
     let changed=false;
     for(let i=0;i<15;i++){await pause(500);if(JSON.stringify(await fixture())===JSON.stringify(before)){changed=true;break;}}
