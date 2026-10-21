@@ -27,6 +27,7 @@ Run at repository root:
 - `node --test tests/localization_20/locale100_gate.test.cjs tests/localization_20/locale100_drafts.test.cjs`
 - `node tools/localization_100/guard.cjs --check`
 - `node tools/localization_100/drafts.cjs --report`
+- `node tools/localization_100/drafts.cjs --worksheet sw > /tmp/sw-review-worksheet.json`
 - `node tools/localization_100/guard.cjs --template sw > /tmp/sw-draft.json`
 - `node tools/language_review/audit.cjs --out /tmp/df-locale-audit`
 
