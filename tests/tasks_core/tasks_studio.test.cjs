@@ -159,3 +159,23 @@ test('rejected durable ACK retains undated editor draft and does not change stor
  assert.equal(f.field('Task title').value,'Unsaved draft');
  f.studio.destroy();
 });
+
+
+test('Tasks Studio mounts a thousand undated tasks without inventing dates or overflowing its DOM',()=>{
+ let state={cfg:{sessionHistory:[],extension:{keep:'config'}},tasksList:Array.from({length:1000},(_,i)=>({
+  id:1000+i,title:'Legacy bulk task '+i,done:false,catKey:'study',extension:{order:i}
+ }))};
+ const before=JSON.stringify(state),root=new FakeElement(fakeDoc,'main');let commits=0;
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,21),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(){commits++;return true;}});
+ const titles=()=>root.descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
+ assert.equal(titles().length,100,'Large results must be DOM bounded; storage remains complete');
+ const search=root.descendants.find(x=>x.tagName==='INPUT'&&x.type==='search');
+ assert.ok(search);
+ search.value='Legacy bulk task 999';search.dispatch('input');
+ assert.deepEqual(titles(),['Legacy bulk task 999']);
+ assert.equal(state.tasksList.length,1000);
+ assert.equal(JSON.stringify(state),before);
+ assert.equal(Object.hasOwn(state.tasksList[999],'date'),false);
+ assert.equal(commits,0);studio.destroy();
+});
