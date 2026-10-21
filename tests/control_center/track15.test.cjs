@@ -115,3 +115,13 @@ test('track15-13 valid exact-SHA per-locale counts may display verified zeros in
  const duplicate={...data,languages:[...data.languages,data.languages[0]]};
  assert.ok(core.localeCounts(duplicate,HEAD).every(row=>row.status==='NOT_TESTED'));
 });
+
+test('track15-14 CI captures bounded Chromium phone viewport evidence at four widths',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const yaml=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/control_center_audit.yml'),'utf8');
+ assert.match(yaml,/Mobile viewport Chromium smoke/);
+ assert.match(yaml,/320 360 393 430/);
+ assert.match(yaml,/check_portable_dom\.cjs/);
+ assert.match(yaml,/timeout 35s/);
+ assert.match(yaml,/mobile_chrome_qa/);
+});
