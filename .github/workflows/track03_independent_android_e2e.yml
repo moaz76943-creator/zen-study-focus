@@ -1,0 +1,106 @@
+name: Track03 Independent Android E2E Exact Staged App
+on:
+  push:
+    branches: [audit/track03-staged-android-e2e-20261021]
+permissions:
+  contents: read
+concurrency:
+  group: track03-independent-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source identity and strict CDP fail-closed regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_SHA=cca433108371ce8e3f656ab0689233729f372657
+          test "$(git rev-parse "$APP_SHA:android")" = "$(git rev-parse HEAD:android)"
+          node --check tests/android_e2e_recovery/cdp_actions.cjs
+          node --test tests/android_e2e_recovery/cdp_transport_recovery.test.cjs tests/android_e2e_recovery/native_modal_cdp_handshake.test.cjs tests/android_e2e_recovery/native_confirm_button.test.cjs tests/android_e2e_recovery/cdp_touch_target.test.cjs tests/android_e2e_recovery/cdp_debug_gate.test.cjs tests/android_e2e_recovery/android_ui_hierarchy.test.cjs
+          echo "EXACT_TEST_HEAD=$(git rev-parse HEAD)"
+          echo "STAGED_APP_SHA=$APP_SHA"
+  android:
+    needs: unit
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 35]
+    name: Full 20 Android scenarios API${{ matrix.api }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      ANDROID_TEST_API: ${{ matrix.api }}
+      DF_ANDROID_CASES: ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install build SDK 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Pin staged Android tree, build isolated debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_SHA=cca433108371ce8e3f656ab0689233729f372657
+          test "$(git rev-parse "$APP_SHA:android")" = "$(git rev-parse HEAD:android)"
+          mkdir -p "$RUNNER_TEMP/deep-focus-android-webview"
+          git rev-parse HEAD > "$RUNNER_TEMP/deep-focus-android-webview/test-head-sha.txt"
+          printf '%s\n' "$APP_SHA" > "$RUNNER_TEMP/deep-focus-android-webview/app-source-sha.txt"
+          git rev-parse HEAD:android > "$RUNNER_TEMP/deep-focus-android-webview/app-tree-sha.txt"
+          (cd android && gradle assembleDebug --no-daemon)
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/deep-focus-android-webview/apk.sha256"
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Exercise actual disposable Android, ADB, WebView and UIAutomator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/android_e2e_recovery/run_cdp_ci.sh
+      - name: Preserve test infrastructure failure with no false PASS
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/deep-focus-android-webview"
+          if [ ! -s "$RUNNER_TEMP/deep-focus-android-webview/results.json" ]; then
+            printf '%s\n' '{"status":"NOT_TESTED","reason":"Android bootstrap or CDP did not produce valid evidence"}' > "$RUNNER_TEMP/deep-focus-android-webview/results.json"
+          fi
+      - name: Upload exact APK, screenshots, logcat and JSON even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Track03-API${{ matrix.api }}-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/deep-focus-android-webview/
