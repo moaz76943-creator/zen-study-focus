@@ -21,11 +21,15 @@ const fs=require('node:fs'),path=require('node:path');
     await page.locator('#nsNewButton').click();
     const title='Visual viewport Android QA '+width+' '+language;
     await page.locator('#inpNoteTitle').fill(title);
-    const before=await page.evaluate(()=>{
+    await page.evaluate(()=>{
       const modal=document.getElementById('noteModal');
       modal.style.setProperty('--nsux-height','378px');
       modal.style.setProperty('--nsux-top','0px');
-      const r=modal.getBoundingClientRect();
+    });
+    // Wait for the real modal fade-in transform to finish before testing its final bounds.
+    await page.waitForTimeout(320);
+    const before=await page.evaluate(()=>{
+      const r=document.getElementById('noteModal').getBoundingClientRect();
       return {top:r.top,bottom:r.bottom};
     });
     assert.ok(before.top>=0&&before.bottom<=379,'NOTE_OVERLAY_BELOW_IME '+JSON.stringify(before));
