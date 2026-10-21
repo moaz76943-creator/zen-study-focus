@@ -6,6 +6,7 @@ on:
       - main
       - fix/v21-safe-release-recovery-20261018
       - integration/deep-focus-recovery-00-final-20261019
+      - feature/control-center-ops-20261019
     paths:
       - ".github/workflows/control_center_audit.yml"
       - "tools/control_center/**"
@@ -75,6 +76,74 @@ jobs:
             node tools/control_center/check_portable_dom.cjs dist/portable_chrome_dom.html
             echo "Portable file desktop Chrome DOM boot: **PASS** (not Android WebView or physical touch QA)" >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Mobile viewport Chromium smoke (320/360/393/430)
+        shell: bash
+        run: |
+          set -euo pipefail
+          browser="$(command -v google-chrome || command -v chromium || true)"
+          if [[ -z "$browser" ]]; then
+            echo "Mobile viewport Chromium smoke: **NOT_TESTED** (no browser installed)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            mkdir -p dist/mobile_chrome_qa
+            for width in 320 360 393 430; do
+              timeout 35s "$browser" \
+                --headless --no-sandbox --disable-dev-shm-usage --disable-gpu \
+                --no-first-run --disable-extensions --disable-background-networking \
+                --force-device-scale-factor=1 --window-size="${width},760" \
+                --virtual-time-budget=4000 --dump-dom \
+                "file://${GITHUB_WORKSPACE}/dist/deep-focus-control-center-mobile.html" \
+                > "dist/mobile_chrome_qa/viewport_${width}.html" \
+                2> "dist/mobile_chrome_qa/stderr_${width}.log"
+              node tools/control_center/check_portable_dom.cjs "dist/mobile_chrome_qa/viewport_${width}.html"
+              echo "Chrome launch using requested ${width}px window: **PASS** (actual CSS width checked separately by CDP)" >> "$GITHUB_STEP_SUMMARY"
+            done
+          fi
+
+      - name: Real Chromium Track 15 button and navigation interaction QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          browser="$(command -v google-chrome || command -v chromium || true)"
+          if [[ -z "$browser" ]]; then
+            echo "Chrome simulated phone-click QA: **NOT_TESTED** (no browser installed)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            node tools/control_center/mobile_interaction_bundle.cjs dist/track15-interactive-qa.html
+            mkdir -p dist/mobile_chrome_qa
+            for width in 320 360 393 430; do
+              timeout 40s "$browser" \
+                --headless --no-sandbox --disable-dev-shm-usage --disable-gpu \
+                --no-first-run --disable-extensions --disable-background-networking \
+                --force-device-scale-factor=1 --window-size="${width},760" \
+                --virtual-time-budget=5000 --dump-dom \
+                "file://${GITHUB_WORKSPACE}/dist/track15-interactive-qa.html" \
+                > "dist/mobile_chrome_qa/interactions_${width}.html" \
+                2> "dist/mobile_chrome_qa/interactions_stderr_${width}.log"
+              node tools/control_center/check_mobile_interaction_dom.cjs "dist/mobile_chrome_qa/interactions_${width}.html"
+              echo "Chrome window parameter ${width}px simulated button/navigation QA: **PASS** (actual width checked separately by CDP)" >> "$GITHUB_STEP_SUMMARY"
+            done
+          fi
+
+      - name: Actual CSS mobile viewports and screenshot evidence (Chrome DevTools)
+        shell: bash
+        run: |
+          set -euo pipefail
+          browser="$(command -v google-chrome || command -v chromium || true)"
+          if [[ -z "$browser" ]]; then
+            echo "Actual 320/360/393/430 CSS viewport QA: **NOT_TESTED** (no browser)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            BROWSER_BIN="$browser" timeout 120s node tools/control_center/chrome_mobile_cdp_qa.cjs dist/deep-focus-control-center-mobile.html
+            echo "Exact CSS viewport 320/360/393/430, overflow and screenshots: **PASS** (Chrome emulation, not physical Android)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload mobile-sized Chromium DOM evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-focus-control-center-mobile-chromium-evidence
+          path: dist/mobile_chrome_qa/
+          retention-days: 14
+          if-no-files-found: ignore
 
       - name: Upload single-file mobile dashboard
         uses: actions/upload-artifact@v4

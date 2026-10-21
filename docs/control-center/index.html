@@ -19,6 +19,8 @@
   <script src="./planner-ui.js" defer></script>
   <script src="./repo-sync-core.js" defer></script>
   <script src="./repo-sync-ui.js" defer></script>
+  <script src="./track15-core.js" defer></script>
+  <script src="./track15-ui.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#overview">تجاوز إلى المحتوى الرئيسي</a>
@@ -33,9 +35,10 @@
         <a href="#overview" class="active">◈ <span>نظرة عامة</span></a>
         <a href="#v3-workbench">⌕ <span>أدوات الإدارة السريعة</span></a>
         <a href="#risks">◇ <span>المخاطر والأعطال</span></a>
-        <a href="#tasks">▤ <span>المهام الـ161</span></a>
+        <a href="#tasks">▤ <span>سجل المهام التاريخي 161</span></a>
         <a href="#studio">▧ <span>محرر الشاشات</span></a>
         <a href="#repo-sync">◎ <span>الربط الحي بالمستودع</span></a>
+        <a href="#track15">◉ <span>المراقبة الدقيقة · Track 15</span></a>
         <a href="#delivery">⇄ <span>GitHub والاختبارات</span></a>
         <a href="#agent-planner">▣ <span>خطط عمل الوكلاء</span></a>
         <a href="#agent-studio">♧ <span>الوكلاء والأتمتة</span></a>
@@ -65,14 +68,14 @@
         <div>
           <span class="eyebrow">RECOVERY INTEGRATION TRACK</span>
           <h2>سلامة الإصدار قبل السرعة</h2>
-          <p>المصدر الافتراضي: PR #25. الفحوصات المصدرية لا تعني اكتمال الاختبار على جهاز Android.</p>
+          <p>المصدر التقليدي لهذا الملخص هو PR #25 (سجل تاريخي). راجع <a href="#track15">Track 15</a> للحصول على رأس PR #138 الحالي. الفحوصات المصدرية لا تعني اختبار Android.</p>
           <div class="head-links">
             <a target="_blank" rel="noopener noreferrer" href="https://github.com/moaz76943-creator/zen-study-focus/pull/25">طلب الدمج #25 ↗</a>
             <a target="_blank" rel="noopener noreferrer" href="https://github.com/moaz76943-creator/zen-study-focus/issues/13">خطة الإصلاح #13 ↗</a>
           </div>
         </div>
         <div class="head-meta">
-          <span>SHA المرجعي</span>
+          <span>SHA سجل PR #25 التاريخي</span>
           <strong id="head-sha" dir="ltr">لم يُجلب بعد</strong>
           <span>آخر مزامنة</span>
           <strong id="last-sync">—</strong>
@@ -85,7 +88,7 @@
           <span class="small-muted">الأرقام تتحدّث فقط عند توفر المصدر</span>
         </div>
         <div class="stat-grid">
-          <article class="metric"><span class="metric-icon blue">▦</span><span>مهام الاستعادة</span><strong id="stat-total">—</strong><small>من مصفوفة المهام الرسمية</small></article>
+          <article class="metric"><span class="metric-icon blue">▦</span><span>مهام الاستعادة (سجل PR #25)</span><strong id="stat-total">—</strong><small>من مصفوفة المهام الرسمية</small></article>
           <article class="metric"><span class="metric-icon rose">!</span><span>مهام محجوبة</span><strong id="stat-blocked">—</strong><small>تحتاج معالجة أو دليل قبول</small></article>
           <article class="metric"><span class="metric-icon mint">✓</span><span>مهام موسومة TESTED</span><strong id="stat-tested">—</strong><small>لا تعني نجاح اختبار الجهاز</small></article>
           <article class="metric"><span class="metric-icon violet">⇄</span><span>طلبات دمج مفتوحة</span><strong id="stat-prs">—</strong><small>من بيانات GitHub الحية</small></article>
@@ -289,6 +292,35 @@
           </div>
           <div id="repo-sync-workflows" class="repo-sync-list"><p>جارٍ جلب التشغيلات…</p></div>
           <p class="safety-note">PASS يعني نجاح تشغيل CI محدد، وليس اجتياز Android الحقيقي أو موافقة إصدار Play. لا يتم الدمج أو تشغيل الأوامر من هذه اللوحة.</p>
+        </div>
+      </section>
+      <section class="section" id="track15" aria-labelledby="track15-title">
+        <div class="section-heading">
+          <div><span class="section-kicker">TRACK 15 · SOURCE-PINNED READ-ONLY</span>
+            <h2 id="track15-title">مراقبة مرشح التكامل الحالي</h2></div>
+          <button id="track15-refresh" type="button" class="button secondary">↻ تحديث الأدلة العامة</button>
+        </div>
+        <div class="panel track15-panel">
+          <p id="track15-status" class="v3-note" role="status" aria-live="polite">NOT_TESTED · لم يحدث اتصال بعد.</p>
+          <p class="small-muted">تعرض هذه المنطقة بيانات GitHub العامة فقط. LIVE يعني نجاح قراءة الحقول المتاحة في هذه الجلسة، ولا يعني موافقة Android أو نجاح اختبارات مفقودة. عند فشل الشبكة أو تغير SHA تظهر NOT_TESTED/STALE صراحة.</p>
+          <h3>رؤوس PR #37 ومرشح #138</h3>
+          <div id="track15-candidates" class="track15-grid" aria-label="رؤوس الطلبات"></div>
+          <h3>Issues الحالية</h3>
+          <div id="track15-issues" class="track15-grid" aria-label="تذاكر الجودة"></div>
+          <h3>GitHub CI على SHA #138</h3>
+          <div id="track15-jobs" class="track15-grid" aria-label="فحوصات Node Python Chromium Android"></div>
+          <h3>Artifacts / APK / AAB</h3>
+          <div id="track15-artifacts" class="track15-grid" aria-label="ملفات التشغيل وبصمات الأرشيف"></div>
+          <h3>وكلاء QA الإثنا عشر</h3>
+          <div id="track15-agents" class="track15-grid" aria-label="حالة الوكلاء ودليل SHA"></div>
+          <details class="track15-locales-details">
+            <summary>فجوات الترجمة حسب اللغة (20 لغة أصلية)</summary>
+            <p class="small-muted">العدد NOT_TESTED يعني عدم وجود تقرير فجوات موثق على نفس SHA؛ لا يعني صفر فجوات. الأعداد التاريخية لا تُعاد تسميتها Live.</p>
+            <div id="track15-locales" class="track15-grid" aria-label="فجوات كل لغة"></div>
+          </details>
+          <h3>بوابات الترجمة والصوت والأمان</h3>
+          <div id="track15-gates" class="track15-grid" aria-label="العناصر التي تحتاج دليلًا"></div>
+          <p class="small-muted">فلاتر المهام والبحث والفرز متوفرة في <a href="#v3-workbench">مساحة الإدارة</a>. لا أوامر دمج ولا أسرار أو Token ولا تغيير لبيانات v21.</p>
         </div>
       </section>
       <section class="section" id="delivery" aria-labelledby="delivery-title">

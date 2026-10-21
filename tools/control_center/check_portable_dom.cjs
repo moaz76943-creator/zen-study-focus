@@ -23,6 +23,9 @@ function assertBooted(dom){
   if(!/161 مهمة/.test(plannerSource)||!/0\s*\/\s*6 مهام مختارة/.test(plannerCount)||
     !/id="planner-task-list"[^>]*>\s*<div class="planner-task/.test(dom))
     throw Error('Agent planner task selector did not initialize from source (source='+plannerSource+', count='+plannerCount+')');
+  if(!dom.includes('id="track15-refresh"')||!dom.includes('id="track15-jobs"')||
+     !dom.includes('id="track15-agents"'))
+    throw Error('Missing Track 15 source-pinned observation controls');
   if(!dom.includes('id="repo-sync-refresh"')||!dom.includes('id="repo-sync-workflows"'))
     throw Error('Missing GitHub live integration controls in the actual Chrome DOM');
   return {taskCountText:ledger,designReady:true,plannerReady:true,plannerSource,repoSyncPresent:true,statusText:status};

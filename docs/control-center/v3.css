@@ -103,3 +103,25 @@
 .repo-review-main small{display:block;color:#7186a1;font-size:11px;direction:ltr;text-align:start;overflow-wrap:anywhere}
 .repo-sync-chip.status-partial{background:#fdf1d6;color:#895700}
 @media(max-width:600px){.repo-review-controls{width:100%}.repo-review-controls input{flex:1 1 115px}.repo-review-card{align-items:flex-start}}
+
+/* Track 15: narrow phone cards, no horizontal overflow or touch-overlap. */
+.track15-panel{display:grid;gap:10px;min-width:0}
+.track15-panel h3{font-size:13px;margin:12px 0 0;color:#21466c}
+.track15-panel>p{margin:0;overflow-wrap:anywhere}
+.track15-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;min-width:0}
+.track15-item{display:grid;align-content:start;gap:7px;padding:12px;border:1px solid #dce8f5;border-radius:12px;background:#fafcff;min-width:0;overflow-wrap:anywhere}
+.track15-item strong{font-size:12px;color:#1b446d}
+.track15-item small{font-size:11px;line-height:1.5;color:#4f6780;white-space:normal;overflow-wrap:anywhere}
+.track15-item a{font-size:12px;min-height:44px;display:inline-flex;align-items:center;max-width:max-content;color:#165db0;text-decoration:underline}
+#track15-status[data-quality="STALE"],#track15-status[data-quality="RATE_LIMITED"],#track15-status[data-quality="PARTIAL"]{background:#fff3e4;color:#744715}
+@media(max-width:740px){.track15-grid{grid-template-columns:1fr}.track15-item{padding:11px}}
+@media(max-width:360px){#track15-refresh{width:100%;min-height:44px}}
+
+.track15-locales-details{border:1px solid #dce8f5;border-radius:12px;padding:12px;min-width:0}
+.track15-locales-details summary{font-size:13px;font-weight:750;cursor:pointer;min-height:44px;display:list-item;list-style-position:inside;color:#1b446d}
+.track15-locales-details p{padding:5px 0}
+.track15-locales-details .track15-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1000px){.track15-locales-details .track15-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.track15-locales-details .track15-grid{grid-template-columns:1fr}}
+
+#track15-refresh{min-height:44px;min-width:44px;touch-action:manipulation}
