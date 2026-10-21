@@ -25,7 +25,9 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/df-p0-v21-native"
           git cat-file -e "$PINNED_APP_SOURCE^{commit}"
-          test "$(git diff --name-only "$PINNED_APP_SOURCE" HEAD)" = '.github/workflows/p0_v21_native_android_evidence_20261021.yml'
+          expected="$(printf '%s\\n' .github/workflows/p0_v21_native_android_evidence_20261021.yml tests/android_e2e_recovery/run_p0_v21_android_evidence.sh | sort)"
+          actual="$(git diff --name-only "$PINNED_APP_SOURCE" HEAD | sort)"
+          test "$actual" = "$expected"
           test "$(git rev-parse "$PINNED_APP_SOURCE:android")" = "$(git rev-parse HEAD:android)"
           git rev-parse HEAD > "$RUNNER_TEMP/df-p0-v21-native/QA_WORKFLOW_SHA.txt"
           printf '%s\n' "$PINNED_APP_SOURCE" > "$RUNNER_TEMP/df-p0-v21-native/APP_SOURCE_SHA.txt"
@@ -79,20 +81,7 @@ jobs:
           profile: pixel_6
           emulator-boot-timeout: 600
           disable-animations: true
-          script: |
-            set -euo pipefail
-            report="$RUNNER_TEMP/df-p0-v21-native"
-            adb install android/app/build/outputs/apk/debug/app-debug.apk
-            adb shell am start -n com.zenstudy.focus/.MainActivity
-            sleep 7
-            set +e
-            timeout 900s env DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/track07_durability_android.cjs "$report/native-durability.json" > "$report/native-durability.log" 2>&1
-            status=$?
-            timeout 15s adb logcat -d -s AndroidRuntime chromium > "$report/logcat.txt" 2>&1 || true
-            timeout 15s adb exec-out screencap -p > "$report/final-screenshot.png" 2>/dev/null || true
-            cat "$report/native-durability.log"
-            printf '%s\n' "$status" > "$report/TEST_EXIT_CODE.txt"
-            exit "$status"
+          script: bash tests/android_e2e_recovery/run_p0_v21_android_evidence.sh
       - name: Preserve exact source, APK digest, Android JSON and failures
         if: always()
         uses: actions/upload-artifact@v4
