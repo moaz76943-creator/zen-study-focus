@@ -34,7 +34,7 @@ test('narrow phone navigation keeps all seven original accessible label spans',(
 });
 
 test('large-text timer presets remain one-line and horizontally reachable', () => {
-  assert.match(css, /#focusHeroCard\\s+\\.segmented-pills-bar\\s*\\{[^}]*overflow-x:\\s*auto/s);
-  assert.match(css, /#focusHeroCard\\s+\\.segmented-pills-bar\\s+\\.seg-pill\\s*\\{[^}]*flex:\\s*0\\s+0\\s+auto/s);
-  assert.match(css, /\\.lang-switcher-pill\\s+\\.lang-iso-badge\\s*\\{[^}]*flex-shrink:\\s*0/s);
+  assert.match(css, /#focusHeroCard\s+\.segmented-pills-bar\s*\{[^}]*overflow-x:\s*auto/s);
+  assert.match(css, /#focusHeroCard\s+\.segmented-pills-bar\s+\.seg-pill\s*\{[^}]*flex:\s*0\s+0\s+auto/s);
+  assert.match(css, /\.lang-switcher-pill\s+\.lang-iso-badge\s*\{[^}]*flex-shrink:\s*0/s);
 });
