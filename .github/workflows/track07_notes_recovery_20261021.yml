@@ -55,6 +55,11 @@ jobs:
           DF_COMPLETION_URL: http://127.0.0.1:8770
           DF_COMPLETION_EVIDENCE: ${{ runner.temp }}/notes-mobile-evidence
         run: node tests/df4_browser/note_modal_reachability.cjs
+      - name: Cornell, archive/trash, revision, draft and 5k DOM browser acceptance
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_COMPLETION_EVIDENCE: ${{ runner.temp }}/notes-mobile-evidence
+        run: node tests/notes_recovery/notes_complete_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
