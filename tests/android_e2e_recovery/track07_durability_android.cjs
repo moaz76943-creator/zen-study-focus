@@ -75,6 +75,16 @@ async function injectWriteFailure(key){
 }
 
 function uiNodes(xml){return [...xml.matchAll(/<node[^>]*>/g)].map(m=>m[0]);}
+function saveSafPickerEvidence(label,xml){
+ // Never collect personal devices or files; require the disposable CI flag.
+ if(process.env.DF_ANDROID_DISPOSABLE!=='1'||!process.env.RUNNER_TEMP)return;
+ const dir=require('node:path').join(process.env.RUNNER_TEMP,'deep-focus-android-webview');
+ if(!fs.existsSync(dir))return;
+ const key=String(label).replace(/[^a-z0-9_-]/gi,'_').slice(0,60);
+ try{fs.writeFileSync(require('node:path').join(dir,'saf-'+key+'.xml'),xml||dumpUI());}catch(_){}
+ try{const shot=cp.execFileSync('adb',['-s','emulator-5554','exec-out','screencap','-p'],{timeout:20000});fs.writeFileSync(require('node:path').join(dir,'saf-'+key+'.png'),shot);}catch(_){}
+}
+
 function dumpUI(){adb('shell','uiautomator','dump','/sdcard/df02_saf.xml');return adb('shell','cat','/sdcard/df02_saf.xml');}
 function tapUI(node){
  const m=node?.match(/bounds="([^"]+)"/),v=m?[...m[1].matchAll(/[0-9]+/g)].map(x=>Number(x[0])):[];
@@ -306,11 +316,27 @@ async function main(){
       assert.equal(clicked,true,'Native import control missing');
       const picker=await nativeUI('ACTION_OPEN_DOCUMENT picker',xml=>xml);
       assert.match(picker.xml,/documentsui/i,'Native DocumentsUI must own the file-selection screen');
+      saveSafPickerEvidence('import_initial_picker',picker.xml);
       let selected=uiNodes(picker.xml).find(n=>n.includes('text="'+name+'"'));
       if(!selected){
-        const downloads=uiNodes(picker.xml).find(n=>/text="Downloads"/.test(n));
-        if(downloads)tapUI(downloads);
-        selected=(await nativeUI('prepared backup document',xml=>uiNodes(xml).find(n=>n.includes('text="'+name+'"')))).item;
+        // ACTION_OPEN_DOCUMENT may open in Recents. Select the concrete
+        // Downloads root rather than assuming a newly indexed file is recent.
+        let xml=picker.xml;
+        let downloads=uiNodes(xml).find(n=>/text="Downloads"/i.test(n));
+        if(!downloads){
+          const browse=uiNodes(xml).find(n=>/text="Browse"/i.test(n));
+          if(browse){tapUI(browse);await pause(500);xml=dumpUI();}
+          const menu=uiNodes(xml).find(n=>/content-desc="(?:Show roots|Open navigation drawer|Navigate up)"/i.test(n)||/resource-id="[^"]*:id\/(?:menu_open|drawer_button)"/i.test(n));
+          if(menu){tapUI(menu);await pause(500);xml=dumpUI();}
+          downloads=uiNodes(xml).find(n=>/text="Downloads"/i.test(n));
+        }
+        saveSafPickerEvidence('import_root_navigation',xml);
+        if(!downloads)downloads=(await nativeUI('Downloads root',xml=>uiNodes(xml).find(n=>/text="Downloads"/i.test(n)))).item;
+        tapUI(downloads);
+        let afterRoot;
+        try{afterRoot=await nativeUI('prepared backup document',xml=>uiNodes(xml).find(n=>n.includes('text="'+name+'"')));}
+        catch(error){saveSafPickerEvidence('import_file_not_visible',null);throw error;}
+        selected=afterRoot.item;
       }
       tapUI(selected);
       const confirm=await nativeUI('native backup confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)),false);
