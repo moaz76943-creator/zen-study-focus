@@ -43,6 +43,30 @@ jobs:
           echo '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  '"$RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
           tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
           chmod +x "$RUNNER_TEMP/gitleaks"
+      - name: Verify narrow allowlists still detect a synthetic unknown credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          probe="$(mktemp -d "$RUNNER_TEMP/df-track13-probe.XXXXXX")"
+          trap 'rm -rf "$probe"' EXIT
+          python3 - "$probe" <<'PY'
+          import pathlib, secrets, sys
+          directory = pathlib.Path(sys.argv[1])
+          fake_value = secrets.token_urlsafe(48)
+          (directory / 'synthetic.env').write_text('api_key = "' + fake_value + '"\n', encoding='utf-8')
+          PY
+          set +e
+          "$RUNNER_TEMP/gitleaks" dir --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$probe/result.json" "$probe/synthetic.env" >/dev/null 2>&1
+          scan_status=$?
+          set -e
+          test "$scan_status" -eq 1
+          python3 - "$probe/result.json" <<'PY'
+          import json, sys
+          with open(sys.argv[1], encoding='utf-8') as reader:
+              findings = json.load(reader)
+          assert any(row.get('RuleID') == 'generic-api-key' for row in findings), 'Scanner stopped detecting unknown synthetic credentials'
+          PY
       - name: Scan current tree AND git history without revealing secrets
         shell: bash
         run: |
