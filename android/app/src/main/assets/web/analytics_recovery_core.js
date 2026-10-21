@@ -161,10 +161,11 @@
    const key=dayAt(dayNum(start)+i);return byDay.get(key)||{key,minutes:0,sessions:0};
   });
   const byDomain=Object.fromEntries(DOMAINS.map(d=>[d,summarize(sessions.filter(s=>s.domain===d))]));
-  const through=(n)=>summarize(usable.filter(s=>s.date<=now&&s.date>=dayAt(dayNum(now)-(n-1))));
+  const through=(n)=>{const from=dayAt(dayNum(now)-(n-1));return summarize(usable.filter(s=>s.date<=now&&s.date>=from));};
   const endN=dayNum(end);
-  const current=summarize(usable.filter(s=>s.date>=dayAt(endN-6)&&s.date<=end));
-  const previous=summarize(usable.filter(s=>s.date>=dayAt(endN-13)&&s.date<dayAt(endN-6)));
+  const currentStart=dayAt(endN-6),previousStart=dayAt(endN-13);
+  const current=summarize(usable.filter(s=>s.date>=currentStart&&s.date<=end));
+  const previous=summarize(usable.filter(s=>s.date>=previousStart&&s.date<currentStart));
   const total=summarize(sessions);
   const changePercent=previous.minutes===0?null:Math.round((current.minutes-previous.minutes)/previous.minutes*10000)/100;
   const quality={...norm.quality,inRange:sessions.length,timingVerified:sessions.filter(s=>s.timingVerified).length};
