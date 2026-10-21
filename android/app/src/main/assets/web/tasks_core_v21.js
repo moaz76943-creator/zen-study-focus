@@ -259,6 +259,12 @@
     for(const t of listTasks(state,{includeArchived:true}))out[statusOf(t)].push(t);
     return out;
   }
+  // v21 allows undated legacy tasks. Sort a display key without adding or
+  // repairing dates in the stored records; valid dates retain chronological order.
+  function compareTaskDates(a,b) {
+    const left=validDate(a.date)?a.date:'',right=validDate(b.date)?b.date:'';
+    return left.localeCompare(right)||a.id-b.id;
+  }
   function searchTasks(state,filter={}) {
     const q=String(filter.query||'').trim().toLocaleLowerCase();
     return listTasks(state,{includeArchived:!!filter.includeArchived,includeTrash:!!filter.includeTrash}).filter(t=>{
@@ -267,7 +273,7 @@
       if(filter.projectId!==undefined && t.projectId!==filter.projectId)return false;
       if(filter.date && t.date!==filter.date)return false;
       return !q||[t.title,t.description,t.group,t.catKey].some(s=>String(s||'').toLocaleLowerCase().includes(q));
-    }).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+    }).sort(compareTaskDates);
   }
   function calendarTasks(state,date) {
     if(!validDate(date))fail('Invalid calendar date');return searchTasks(state,{date});
@@ -299,5 +305,5 @@
   }
   return Object.freeze({validDate,statusOf,createTask,updateTask,setStatus,trashTask,restoreTask,rescheduleTask,
     addItem,setItemDone,createProject,projects,projectProgress,listTasks,isOverdue,topThree,eisenhower,
-    kanban,searchTasks,calendarTasks,sessionTotals,actualFocusMinutes,compareEstimate,chooseTopThree,taskSections});
+    kanban,searchTasks,compareTaskDates,calendarTasks,sessionTotals,actualFocusMinutes,compareEstimate,chooseTopThree,taskSections});
 });
