@@ -133,8 +133,12 @@ async function receiptAfter(before,expected){
    report.results.push({stage:'save',status:'NOT_TESTED',requestId:saved.id,reason:'Native reports saved but file bytes not inspectable in Downloads'});
    throw Error('No independently readable exported CSV found in Downloads');
   }
-  const first=check.split('\n')[0];
-  assert.match(first,/^\/sdcard\/Download\//,'Only disposable public Downloads path may be inspected');
+  const first=check.split('\n')[0].replaceAll('\r','').trim();
+  // /sdcard is an alias of /storage/emulated/0 on Android; neither permits
+  // reading private app storage or any directory outside disposable Downloads.
+  const inDownloads=first.startsWith('/sdcard/Download/') ||
+    first.startsWith('/storage/emulated/0/Download/');
+  if(!inDownloads)throw Error('Exported CSV outside allowed Downloads directory: '+JSON.stringify(first.slice(0,160)));
   const bytes=adb('shell','cat',first);
   assert.ok(bytes.startsWith('"id"')||bytes.startsWith('"date"')||bytes.startsWith('"period"'),'Saved file missing verified Analytics CSV headers');
   assert.match(bytes,/\r?\n/,'CSV must include a header row and newline');
