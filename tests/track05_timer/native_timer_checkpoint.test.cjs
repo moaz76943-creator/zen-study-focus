@@ -29,7 +29,7 @@ function storageFixture(accept){
   focusSessionTaskId:null,timerActiveMs:1100,timerResumeMs:null,quickTraining:null,window,
   localStorage:{getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v),removeItem:k=>map.delete(k)},
   saveFortressData(k,snapshot){assert.equal(k,key);const raw=packet(snapshot);map.set(key,raw);map.set(key+'_mirror',raw);events.push(['browser',raw]);return true;},
-  showToast(){events.push(['error']);}
+  showToast(){events.push(['error']);},L:()=>({saveFailed:'Save failed'})
  };
  vm.runInNewContext(actual('storeTimerSession','creditCompletedSession'),context);
  return {context,map,events,old1,old2};
@@ -79,7 +79,7 @@ test('rejected native Pause receipt cannot stop service, lose ID or report a pau
   timerInterval:77,focusSessionTaskId:45,chimeCtx:{state:'running'},quickTraining:null,
   document:{getElementById:id=>id==='mainPlayBtn'?btn:{textContent:'Focus'}},
   window:{ZenNative:{stopBackgroundService(){stops++}}},
-  clearInterval(){},setInterval(){scheduled++;return 88;},Date,Math,Number,
+  clearInterval(){},setInterval(){scheduled++;return 88;},runTimerTick(){},Date,Math,Number,
   accumulateActiveTime(){ctx.timerActiveMs+=2000;ctx.timerResumeMs=null},
   storeTimerSession:()=>false,updateTimerDisplay(){}
  };
