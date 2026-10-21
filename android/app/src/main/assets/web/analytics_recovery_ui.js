@@ -142,7 +142,7 @@
   const now=opts.today||core.today();
   const dayAt=n=>new Date((Math.floor(Date.parse(now+'T12:00:00Z')/86400000)+n)*86400000+43200000).toISOString().slice(0,10);
   from.value=opts.startDate||dayAt(-29);to.value=opts.endDate||now;
-  domain.value=opts.domain||'all';group.value=opts.group||'daily';kind.value='sessions';
+  domain.value=opts.domain||'all';group.value=opts.group||'daily';kind.value=opts.exportKind||'sessions';
   from.lang='en-u-nu-latn';to.lang='en-u-nu-latn';
   from.style.direction='ltr';to.style.direction='ltr';
   let report=null,disposed=false,series=[],exporter=null,rangeValid=false;
@@ -266,6 +266,8 @@
   });
   target.appendChild(wrapper);refresh();
   return Object.freeze({element:wrapper,refresh,getReport:()=>report,
+   getFilters:()=>({startDate:from.value,endDate:to.value,domain:domain.value,
+     group:group.value,exportKind:kind.value}),
    destroy:()=>{disposed=true;wrapper.remove();}});
  }
  return Object.freeze({renderBarsSvg,renderActivitySvg,mount});
