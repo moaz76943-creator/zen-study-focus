@@ -32,7 +32,10 @@ function computeHash(str) {
 function saveFortressData(key, obj) {
   try {
     const raw = JSON.stringify(obj);
-    const packet = JSON.stringify({ payload: raw, sig: computeHash(raw), ts: Date.now() });
+    // Preserve the original v21 wire contract: payload remains a JSON string.
+    // Only avoid creating a temporary wrapper object for the outer serialization.
+    const packet = '{"payload":' + JSON.stringify(raw) + ',"sig":' +
+      JSON.stringify(computeHash(raw)) + ',"ts":' + Date.now() + '}';
     localStorage.setItem(key, packet);
     localStorage.setItem(key + "_mirror", packet);
   } catch (e) {}
@@ -44,7 +47,9 @@ function loadFortressData(key, defaultObj) {
       const item = localStorage.getItem(k);
       if (!item) return null;
       const parsed = JSON.parse(item);
-      if (parsed && parsed.payload && computeHash(parsed.payload) === parsed.sig) {
+      // A checksum alone must not authorize a different on-disk v21 schema.
+      if (parsed && typeof parsed.payload === 'string' && parsed.payload &&
+          computeHash(parsed.payload) === parsed.sig) {
         return JSON.parse(parsed.payload);
       }
       return null;
