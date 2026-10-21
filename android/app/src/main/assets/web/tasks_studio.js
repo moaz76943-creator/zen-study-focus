@@ -126,8 +126,9 @@
    function editor(){
    const t=state.tasksList.find(x=>x.id===editing),panel=el('div','df-dialog'),form=el('form','df-form');
    const title=input('text',t?.title||''),description=el('textarea');description.rows=3;description.value=t?.description||'';
-   const due=input('date',t?.date||currentDay()),dueTime=input('time',t?.dueTime||'');
-    const hasDue=input('checkbox');hasDue.checked=t?t.dueAssigned!==false:false;hasDue.style.width='auto';
+   const due=input('date',t?(C.validDate(t.date)?t.date:''):currentDay()),dueTime=input('time',t?.dueTime||'');
+    const hasDue=input('checkbox');hasDue.checked=!!t&&C.validDate(t.date)&&t.dueAssigned!==false;hasDue.style.width='auto';
+   due.addEventListener('change',()=>{if(due.value)hasDue.checked=true;});
    const categoryInput=selection(['study','sport','review','exam'].map(v=>[v,l[v]]),t?.catKey||'study');
    const priority=selection(['low','medium','high','urgent'].map(v=>[v,l[v]]),t?.priority||'medium');
    const estimate=input('number',t?.estimateMin??'');estimate.min='0';estimate.max='100000';
@@ -137,20 +138,45 @@
    const notes=input('text',(t?.noteIds||[]).join(','));notes.inputMode='numeric';
    const important=input('checkbox');important.checked=!!t?.important;important.style.width='auto';
    const urgent=input('checkbox');urgent.checked=!!t?.urgent;urgent.style.width='auto';
+   // Editing a legacy record must not turn display defaults into persisted fields.
+   const initial={title:title.value,description:description.value,dueTime:dueTime.value,
+    catKey:categoryInput.value,priority:priority.value,estimateMin:estimate.value,
+    repeat:repeat.value,group:group.value,projectId:project.value,noteIds:notes.value,
+    important:important.checked,urgent:urgent.checked};
    append(form,label(l.task,title),label(l.desc,description),label(l.dueOptional,hasDue));
    const grid=el('div','df-grid');append(grid,label(l.due,due),label(l.time,dueTime),label(l.cat,categoryInput),label(l.priority,priority),label(l.estimate,estimate),label(l.repeat,repeat),label(l.group,group),label(l.proj,project),label(l.notes,notes));form.appendChild(grid);
    append(form,label(l.do,important),label(l.delegate,urgent));
    const actions=el('div','df-actions');append(actions,btn(l.cancel,()=>{editing=null;render();}));
    const save=btn(l.save,()=>{} ,'df-primary');save.type='submit';actions.appendChild(save);form.appendChild(actions);
+   let submitted=false;
    form.addEventListener('submit',e=>{
     e.preventDefault();
+    if(submitted||isDestroyed)return;
     const noteTokens=notes.value.trim()?notes.value.split(',').map(x=>x.trim()):[];
-    if(noteTokens.some(x=>!/^(0|[1-9]\d*)$/.test(x))){error(new Error('Numeric note IDs required'));return;}
-    const fields={title:title.value,description:description.value,date:due.value,dueTime:dueTime.value||null,
-     catKey:categoryInput.value,priority:priority.value,estimateMin:Number(estimate.value),repeat:repeat.value?{frequency:repeat.value,interval:1}:null,
-     important:important.checked,urgent:urgent.checked,group:group.value,projectId:project.value?Number(project.value):null,
-     noteIds:noteTokens.map(Number),dueAssigned:hasDue.checked};
-    apply(s=>t?C.updateTask(s,t.id,fields,{noteIds:adapter.noteIds?.()}):C.createTask(s,fields,{noteIds:adapter.noteIds?.()}));
+    if((!t||notes.value!==initial.noteIds)&&noteTokens.some(x=>!/^(0|[1-9]\d*)$/.test(x))){error(new Error('Numeric note IDs required'));return;}
+    const fields={title:title.value,description:description.value,dueTime:dueTime.value||null,
+     catKey:categoryInput.value,priority:priority.value,estimateMin:Number(estimate.value),
+     repeat:repeat.value?{frequency:repeat.value,interval:1}:null,
+     important:important.checked,urgent:urgent.checked,group:group.value,
+     projectId:project.value?Number(project.value):null,noteIds:noteTokens.map(Number)};
+    if(t){
+     for(const [key,oldValue,newValue] of [
+      ['title',initial.title,title.value],['description',initial.description,description.value],
+      ['dueTime',initial.dueTime,dueTime.value],['catKey',initial.catKey,categoryInput.value],
+      ['priority',initial.priority,priority.value],['estimateMin',initial.estimateMin,estimate.value],
+      ['repeat',initial.repeat,repeat.value],['group',initial.group,group.value],
+      ['projectId',initial.projectId,project.value],['noteIds',initial.noteIds,notes.value],
+      ['important',initial.important,important.checked],['urgent',initial.urgent,urgent.checked]
+     ])if(oldValue===newValue)delete fields[key];
+     const wasDue=C.validDate(t.date)&&t.dueAssigned!==false;
+     if(hasDue.checked!==wasDue)fields.dueAssigned=hasDue.checked;
+     if(hasDue.checked&&(!C.validDate(t.date)||due.value!==t.date))fields.date=due.value;
+     if(!Object.keys(fields).length){submitted=true;editing=null;render();return;}
+    }else{
+     fields.dueAssigned=hasDue.checked;
+     if(hasDue.checked)fields.date=due.value;
+    }
+    if(apply(s=>t?C.updateTask(s,t.id,fields,{noteIds:adapter.noteIds?.()}):C.createTask(s,fields,{noteIds:adapter.noteIds?.()})))submitted=true;
    });
    panel.appendChild(form);return panel;
   }
