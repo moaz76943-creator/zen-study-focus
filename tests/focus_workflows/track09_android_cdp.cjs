@@ -59,7 +59,7 @@ async function main(){
   "quickTraining:typeof startQuickTraining==='function',"+
   "calendar:!!calendar,navCalendar:!!nav,modal:!!modal,"+
   "trainingPanel:!!document.getElementById('qtProgressPanel'),"+
-  "inputContainer:!!input,sessionCount:Array.isArray(cfg.sessionHistory)?cfg.sessionHistory.length:null,"+
+  "inputContainer:!!input,sessionCount:(()=>{try{return typeof cfg==='object'&&cfg!==null&&Array.isArray(cfg.sessionHistory)?cfg.sessionHistory.length:null;}catch(_){return null;}})(),"+
   "generatedNumbers:(document.getElementById('dailyGoalsRows')?.textContent||''),"+
   "packagePage:!!document.getElementById('mainPlayBtn')};"+
   "})()";
