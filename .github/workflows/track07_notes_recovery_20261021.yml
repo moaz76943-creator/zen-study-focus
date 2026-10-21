@@ -1,0 +1,64 @@
+name: Track 07 Notes Recovery — isolated source and Chromium
+on:
+  push:
+    branches:
+      - fix/track07-notes-postack-idempotence-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track07-notes-recovery-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  notes-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Notes syntax and behavioral RED/GREEN
+        run: |
+          node --check android/app/src/main/assets/web/notes_editor_ui.js
+          node --check android/app/src/main/assets/web/notes_drafts.js
+          node --test tests/notes_recovery/*.test.cjs tests/notes_ui/*.test.cjs tests/notes_core/*.test.cjs
+      - name: Adjacent v21 persistence regression
+        if: success()
+        run: |
+          node --test tests/data_contracts/*.test.cjs tests/integration_recovery/notes_fallback_durability.test.cjs tests/integration_recovery/back_draft_guard.test.cjs
+          node tests/smoke_app.cjs
+  notes-chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Chromium browser dependency
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then sudo apt-get update -qq && sudo apt-get install -y -qq chromium; fi
+      - name: Start offline-only app
+        run: |
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/notes-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Real Chromium touch, save, reload at 320 and 393px
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_COMPLETION_EVIDENCE: ${{ runner.temp }}/notes-mobile-evidence
+        run: node tests/df4_browser/note_modal_reachability.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: notes-track07-chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/notes-mobile-evidence/
+          if-no-files-found: warn
+          retention-days: 7
