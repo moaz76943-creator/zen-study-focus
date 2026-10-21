@@ -62,3 +62,98 @@ jobs:
           path: ${{ runner.temp }}/notes-mobile-evidence/
           if-no-files-found: warn
           retention-days: 7
+
+  notes-android:
+    name: Android API30 — bounded Notes real WebView taps
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ANDROID_TEST_API: '30'
+      DF_ANDROID_DISPOSABLE: '1'
+      DF_ANDROID_CASES: preflight,notes_create_edit,tasks_create,save_failure,language_live_change,long_text,process_death_recovery
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android API36 build prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile exact-head test APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Capture source SHA, binary and emulator prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/notes-android"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/notes-android/source-sha.txt"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk | tee "$RUNNER_TEMP/notes-android/installed-input-apk.sha256"
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Real Android isolated Notes/WebView acceptance
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            folder="$RUNNER_TEMP/notes-android"
+            cp android/app/build/outputs/apk/debug/app-debug.apk "$folder/installed-app-debug.apk"
+            adb install "$folder/installed-app-debug.apk"
+            adb shell am start -n com.zenstudy.focus/.MainActivity
+            sleep 5
+            pid="$(adb shell pidof com.zenstudy.focus | tr -d '\r' | awk '{print $1}')"
+            test -n "$pid"
+            adb forward tcp:9222 "localabstract:webview_devtools_remote_${pid}"
+            set +e
+            node tests/android_e2e_recovery/cdp_actions.cjs "$folder/android-notes.json" > "$folder/android-raw.log" 2>&1
+            instrumentExit=$?
+            set -e
+            cat "$folder/android-raw.log" | tail -n 110
+            INSTRUMENT_EXIT="$instrumentExit" node - "$folder/android-notes.json" "$folder/android-scope-summary.json" <<'NODE'
+            const fs=require('fs'),assert=require('assert/strict');
+            const selected=process.env.DF_ANDROID_CASES.split(',');
+            const file=process.argv[2],out=process.argv[3];
+            if(!fs.existsSync(file))throw Error('Android probe did not produce a report');
+            const report=JSON.parse(fs.readFileSync(file,'utf8'));
+            const cases=selected.map(id=>{
+              const r=report.results.find(x=>x.id===id);
+              return {id,status:r?.status||'NOT_TESTED',detail:r?.detail||'No actual observation'};
+            });
+            const passed=cases.filter(x=>x.status==='PASS').length;
+            const evidence={sha:process.env.GITHUB_SHA,api:process.env.ANDROID_TEST_API,selected:cases,
+              selectedPass:passed,selectedTotal:cases.length,fullSuiteApproved:false,
+              originalStrictExit:process.env.INSTRUMENT_EXIT,releaseApproved:false};
+            fs.writeFileSync(out,JSON.stringify(evidence,null,2));
+            console.log(JSON.stringify(evidence));
+            // The original full-suite harness intentionally reports unselected scenarios
+            // as NOT_TESTED and exits nonzero. Only this named Notes scope is assessed.
+            assert.equal(passed,cases.length,'Focused Android Notes acceptance incomplete');
+            NODE
+      - name: Persist real Android evidence (even if failed)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notes-track07-android-${{ github.sha }}
+          path: ${{ runner.temp }}/notes-android/
+          retention-days: 7
+          if-no-files-found: warn
