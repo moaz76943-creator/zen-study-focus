@@ -34,6 +34,14 @@ function validateReopen(s){
  if(s.language!=='ur'||s.dir!=='rtl')throw Error('LOCALE_NOT_PERSISTED');
  return {status:'PASS',cases:1,restarted:true};
 }
+function validateBackup(s){
+ guard(s);
+ if(s.restored!==true)throw Error('BACKUP_RESTORE_NOT_VERIFIED');
+ if(s.language!=='ur'||s.dir!=='rtl')throw Error('BACKUP_RESTORED_WRONG_LOCALE');
+ if(s.noteDataUnchanged!==true||s.taskDataUnchanged!==true)
+  throw Error('BACKUP_CHANGED_USER_TEXT');
+ return {status:'PASS',cases:1,restored:true};
+}
 function browserProbe(stage){
  const supported=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko','vi','it','bn','ur','fa','pl','nl'];
  const rtl=['ar','fa','ur'];
@@ -46,6 +54,21 @@ function browserProbe(stage){
  });
  if(stage==='reopen'){
   return {...basic(),language:cfg.lang,dir:root.dir};
+ }
+ if(stage==='backup'){
+  // A checksum-valid ZEN21 code round-trip in a freshly created emulator.
+  // Never send backup bytes to Node logs, artifacts or a remote service.
+  const originalNotes=JSON.stringify(notesList),originalTasks=JSON.stringify(tasksList);
+  const backup=generateEncryptedBackupCode();
+  const confirmOriginal=window.confirm;
+  let restored=false;
+  try{
+   window.confirm=()=>true;
+   restored=verifyAndRestoreBackupCode(backup)===true;
+  }finally{window.confirm=confirmOriginal;}
+  return {...basic(),restored,language:cfg.lang,dir:root.dir,
+   noteDataUnchanged:JSON.stringify(notesList)===originalNotes,
+   taskDataUnchanged:JSON.stringify(tasksList)===originalTasks};
  }
  if(stage!=='switch')throw Error('INVALID_STAGE');
  const rows=[];
@@ -103,7 +126,7 @@ function browserProbe(stage){
  }finally{authored.remove();}
 }
 function expression(stage){
- if(!['switch','reopen'].includes(stage))throw Error('INVALID_STAGE');
+ if(!['switch','reopen','backup'].includes(stage))throw Error('INVALID_STAGE');
  return '('+browserProbe.toString()+')('+JSON.stringify(stage)+')';
 }
 async function inspectRealAndroid(stage){
@@ -159,11 +182,11 @@ async function inspectRealAndroid(stage){
 }
 async function main(args=process.argv.slice(2)){
  const [stage,output]=args;
- if(!['switch','reopen'].includes(stage)||!output)throw Error('Usage: track11_android_probe.cjs switch|reopen OUTPUT.json');
+ if(!['switch','reopen','backup'].includes(stage)||!output)throw Error('Usage: track11_android_probe.cjs switch|backup|reopen OUTPUT.json');
  let status='NOT_TESTED',data=null,details=null;
  try{
   data=await inspectRealAndroid(stage);
-  const verified=stage==='switch'?validateSwitch(data):validateReopen(data);
+  const verified=stage==='switch'?validateSwitch(data):stage==='backup'?validateBackup(data):validateReopen(data);
   status=verified.status;
  }catch(e){
   details=String(e.message||e);
@@ -171,7 +194,7 @@ async function main(args=process.argv.slice(2)){
  }
  const report={source:'Installed disposable Android API30 WebView CDP, not desktop browser',
   sha:process.env.GITHUB_SHA||null,stage,status,details,data,
-  nativeTalkBack:'NOT_TESTED',backupRestore:'NOT_TESTED',
+  nativeTalkBack:'NOT_TESTED',backupRestore:stage==='backup'&&status==='PASS'?'PASS_SYNTHETIC_ZEN21_CODE_ROUNDTRIP':'NOT_TESTED',safRestore:'NOT_TESTED',
   handwrittenTextPersistence:'NOT_TESTED',releaseApproved:false};
  fs.mkdirSync(path.dirname(output),{recursive:true});
  fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');
@@ -181,4 +204,4 @@ async function main(args=process.argv.slice(2)){
  return report;
 }
 if(require.main===module)main().catch(e=>{console.error(e);process.exitCode=1;});
-module.exports={LANGS,validateSwitch,validateReopen,expression,main};
+module.exports={LANGS,validateSwitch,validateReopen,validateBackup,expression,main};
