@@ -4,6 +4,7 @@ const fs=require('node:fs'),cp=require('node:child_process'),assert=require('nod
 const {validateTouchTarget,missingPrerequisites,classifyFailure,selectCases}=require('./cdp_touch_target.cjs');
 const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,nativePromptText}=require('./android_device_touch.cjs');
 const {readWebViewFrame}=require('./android_ui_hierarchy.cjs');
+const {isTransportFailure,recoverTransport}=require('./cdp_transport_recovery.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
 const selectedCases=selectCases(process.env.DF_ANDROID_CASES||'',CASES);
 const scenarioEvidence=new Map();
@@ -12,6 +13,7 @@ const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const adb=(...args)=>cp.execFileSync('adb',['-s','emulator-5554',...args],{encoding:'utf8',timeout:20000});
 let ws,serial=0,pending=new Map();
 const touchTrace=[];
+let transportUnavailable=null;
 async function connect(){
  const pid=adb('shell','pidof','com.zenstudy.focus').trim().split(/\s/)[0];
  assert.match(pid,/^\d+$/);adb('forward','tcp:9222','localabstract:webview_devtools_remote_'+pid);
@@ -92,6 +94,15 @@ async function dismissNoteKeyboardForSave(){
 async function check(expression,message){assert.equal(await evaluate(expression),true,message);}
 async function run(id,fn){
  if(selectedCases&&!selectedCases.has(id))return;
+ // If a previous real Android renderer died and a single bounded restart
+ // ALSO failed, later scenarios are blocked — not misclassified as app FAIL.
+ if(transportUnavailable){
+  const entry={id,status:'NOT_TESTED',classification:'BLOCKED',
+    detail:'DEPENDENCY_NOT_TESTED: CDP reattachment failed: '+transportUnavailable};
+  results.set(id,entry);
+  console.log(JSON.stringify(entry));
+  return;
+ }
  try{
   const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using ADB taps, CDP text input and observed state'});
  }catch(e){
@@ -100,8 +111,17 @@ async function run(id,fn){
    const path=require('node:path'),file=path.join(path.dirname(process.argv[2]||'android-dom-actions.json'),id+'-failure.png');
    fs.writeFileSync(file,cp.execFileSync('adb',['-s','emulator-5554','exec-out','screencap','-p'],{timeout:10000}));entry.screenshot=path.basename(file);
   }catch(capture){entry.captureError=String(capture.message).slice(0,200);}
-  try{entry.observed=await evaluate("({task:tasksList.find(t=>t.title==='Android fixture task'),notes:notesList.filter(n=>n.title.startsWith('Android')).map(n=>({id:n.id,title:n.title,bodyLength:n.body.length})),editorTitle:document.querySelector('#inpNoteTitle')?.value,editorBodyLength:document.querySelector('#inpNoteBody')?.value.length})");}
-  catch(observation){entry.observationError=String(observation.message).slice(0,200);}
+  // A timed-out CDP evaluation must not lead to another 20-second evaluation.
+  // Capture the screenshot above, reattach at most once and preserve NOT_TESTED.
+  if(!isTransportFailure(e)){
+   try{entry.observed=await evaluate("({task:tasksList.find(t=>t.title==='Android fixture task'),notes:notesList.filter(n=>n.title.startsWith('Android')).map(n=>({id:n.id,title:n.title,bodyLength:n.body.length})),editorTitle:document.querySelector('#inpNoteTitle')?.value,editorBodyLength:document.querySelector('#inpNoteBody')?.value.length})");}
+   catch(observation){entry.observationError=String(observation.message).slice(0,200);}
+  }
+  const recovered=await recoverTransport(e,restart);
+  if(recovered.attempted){
+   entry.transportRecovery=recovered;
+   if(!recovered.recovered)transportUnavailable=recovered.reason||'unknown CDP restart error';
+  }
   results.set(id,entry);
  }
  if(scenarioEvidence.has(id))results.get(id).evidence=scenarioEvidence.get(id);
