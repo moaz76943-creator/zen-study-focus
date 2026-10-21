@@ -44,6 +44,7 @@ let quickInternalChange = false;
 let quickExercises = [];
 let quickPresetDomain = 'sport';
 const QUICK_CFG_KEY = 'zen_quick_training_cfg_v21';
+let quickLastSavedFields = null;
 /* Task identity is always the original numeric v21 task ID (never a display label).
    app.js focusOnTask will call this method through a lane-00 integration patch. */
 let focusWorkflowLinkedTaskId = null;
@@ -118,19 +119,27 @@ function quickSaveError() {
     ? 'تعذّر حفظ إعدادات التدريب. حاول مرة أخرى.'
     : 'Could not save training settings. Try again.');
 }
+function quickFormFields(){
+  return {
+    sets:document.getElementById('qtSets').value,
+    work:document.getElementById('qtWork').value,
+    rest:document.getElementById('qtRest').value,
+    skip:document.getElementById('qtSkipLast').checked
+  };
+}
 function saveQuickConfig() {
+  const fields=quickFormFields();
   try {
-    return saveFortressData(QUICK_CFG_KEY,{
+    if(saveFortressData(QUICK_CFG_KEY,{
       exercises:quickExercises.slice(0,24),
       domain:quickPresetDomain,
-      sets:document.getElementById('qtSets').value,
-      work:document.getElementById('qtWork').value,
-      rest:document.getElementById('qtRest').value,
-      skip:document.getElementById('qtSkipLast').checked
-    })===true;
+      ...fields
+    })!==true)return false;
   } catch (_) {
     return false;
   }
+  quickLastSavedFields=fields;
+  return true;
 }
 function initQuickTraining() {
   const saved=loadFortressData(QUICK_CFG_KEY,null);
@@ -144,9 +153,16 @@ function initQuickTraining() {
     }
     if(typeof saved.skip==='boolean')document.getElementById('qtSkipLast').checked=saved.skip;
   }
-  for(const id of ['qtSets','qtWork','qtRest','qtSkipLast'])
+  quickLastSavedFields=quickFormFields();
+  for(const [id,key] of [['qtSets','sets'],['qtWork','work'],['qtRest','rest'],['qtSkipLast','skip']])
     document.getElementById(id).addEventListener('change',()=>{
-      if(!saveQuickConfig())showToast(quickSaveError());
+      if(saveQuickConfig())return;
+      const el=document.getElementById(id);
+      if(quickLastSavedFields){
+        if(key==='skip')el.checked=quickLastSavedFields.skip;
+        else el.value=quickLastSavedFields[key];
+      }
+      showToast(quickSaveError());
     });
   quickL10n();
 }
