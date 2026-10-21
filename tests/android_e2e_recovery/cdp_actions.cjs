@@ -238,7 +238,18 @@ async function main(){
   await evaluate("window.fixtureMedia=[];window.fixturePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){window.fixtureMedia.push(this);return window.fixturePlay.call(this)}");
   await tap('#navSounds');await tap('.sound-Rich-tile.sbg-forest .stile-play-btn');await tap('.sound-Rich-tile.sbg-wind .stile-play-btn');await pause(1000);
   await check("window.fixtureMedia.length===2 && window.fixtureMedia.every(a=>!a.paused&&!a.error&&a.readyState>=2) && Object.keys(activePlayers).length===2",'Two local decoded media channels');
+  await check("document.querySelectorAll('#soundsGridBox button[data-sound-toggle][aria-pressed=true]').length===2",'Actual sound controls expose pressed state');
+  await evaluate("document.querySelector('[data-sound-toggle=forest]').focus()");
+  adb('shell','input','keyevent','62');await pause(350);
+  await check("!activePlayers.forest && !!activePlayers.wind && document.activeElement?.getAttribute('data-sound-toggle')==='forest'",'Android keyboard Space stops one channel and preserves focus');
+  adb('shell','input','keyevent','66');await pause(750);
+  await check("!!activePlayers.forest && document.querySelector('[data-sound-toggle=forest]').getAttribute('aria-pressed')==='true'",'Android keyboard Enter restarts the selected channel');
   await evaluate("stopAllAudio();HTMLMediaElement.prototype.play=window.fixturePlay;delete window.fixturePlay");await check('Object.keys(activePlayers).length===0','Stop all releases tracks');
+  await evaluate("applyLanguage('ar');window.natureRealPlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=()=>Promise.reject(new Error('Injected play rejection'))");
+  await tap('[data-sound-toggle=forest]');await pause(200);
+  await check("Object.keys(activePlayers).length===0 && document.querySelector('#toastText').textContent===DeepFocusNatureLibraryV2.messages.ar.unavailable",'Arabic rejection feedback and released failed channel');
+  await evaluate("HTMLMediaElement.prototype.play=window.natureRealPlay;delete window.natureRealPlay;applyLanguage('en')");
+  return 'Two real local channels, native ADB keyboard Space/Enter with retained focus, stop-all, injected rejection localized in Arabic; no human hearing or unapproved sounds claimed';
  });
  await run('completion_notification',async()=>{
   await tap('#navTimer');await evaluate("selectTimerMode(1,'focus',null)");const before=await evaluate('cfg.sessionHistory?.length||0');

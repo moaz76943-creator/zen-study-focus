@@ -167,121 +167,201 @@ const messages=Object.freeze({
     "heading": "Nature sound library",
     "pending": "Awaiting verified recording",
     "ready": "Playable now",
-    "of": "of"
+    "of": "of",
+    "play": "Play",
+    "stop": "Stop",
+    "blocked": "Recording awaiting source and audio review.",
+    "unavailable": "Unable to play this recording."
   },
   "ar": {
     "heading": "مكتبة أصوات الطبيعة",
     "pending": "بانتظار تسجيل أصلي موثّق",
     "ready": "متاح للتشغيل",
-    "of": "من"
+    "of": "من",
+    "play": "تشغيل",
+    "stop": "إيقاف",
+    "blocked": "التسجيل بانتظار مراجعة المصدر والصوت.",
+    "unavailable": "تعذر تشغيل هذا التسجيل."
   },
   "es": {
     "heading": "Biblioteca de sonidos naturales",
     "pending": "Pendiente de grabación verificada",
     "ready": "Disponible",
-    "of": "de"
+    "of": "de",
+    "play": "Reproducir",
+    "stop": "Detener",
+    "blocked": "Grabación pendiente de revisión de la fuente y del audio.",
+    "unavailable": "No se puede reproducir esta grabación."
   },
   "zh": {
     "heading": "自然声音库",
     "pending": "等待验证真实录音",
     "ready": "可播放",
-    "of": "共"
+    "of": "共",
+    "play": "播放",
+    "stop": "停止",
+    "blocked": "此录音的来源和音频尚待审核。",
+    "unavailable": "无法播放此录音。"
   },
   "hi": {
     "heading": "प्रकृति ध्वनि संग्रह",
     "pending": "सत्यापित रिकॉर्डिंग की प्रतीक्षा",
     "ready": "चलाने के लिए उपलब्ध",
-    "of": "में से"
+    "of": "में से",
+    "play": "चलाएँ",
+    "stop": "रोकें",
+    "blocked": "रिकॉर्डिंग के स्रोत और ऑडियो की समीक्षा बाकी है।",
+    "unavailable": "यह रिकॉर्डिंग नहीं चलाई जा सकी।"
   },
   "fr": {
     "heading": "Bibliothèque des sons naturels",
     "pending": "En attente d’un enregistrement vérifié",
     "ready": "Disponible",
-    "of": "sur"
+    "of": "sur",
+    "play": "Lire",
+    "stop": "Arrêter",
+    "blocked": "Cet enregistrement attend une vérification de sa source et de son contenu audio.",
+    "unavailable": "Impossible de lire cet enregistrement."
   },
   "de": {
     "heading": "Naturklang-Bibliothek",
     "pending": "Wartet auf geprüfte Originalaufnahme",
     "ready": "Abspielbar",
-    "of": "von"
+    "of": "von",
+    "play": "Abspielen",
+    "stop": "Stoppen",
+    "blocked": "Quelle und Audio dieser Aufnahme müssen noch geprüft werden.",
+    "unavailable": "Diese Aufnahme kann nicht abgespielt werden."
   },
   "ru": {
     "heading": "Библиотека звуков природы",
     "pending": "Ожидается проверенная запись",
     "ready": "Доступно",
-    "of": "из"
+    "of": "из",
+    "play": "Воспроизвести",
+    "stop": "Остановить",
+    "blocked": "Источник и звук этой записи ещё не проверены.",
+    "unavailable": "Не удалось воспроизвести эту запись."
   },
   "pt": {
     "heading": "Biblioteca de sons da natureza",
     "pending": "Aguardando gravação verificada",
     "ready": "Disponível",
-    "of": "de"
+    "of": "de",
+    "play": "Reproduzir",
+    "stop": "Parar",
+    "blocked": "Esta gravação aguarda a revisão da fonte e do áudio.",
+    "unavailable": "Não foi possível reproduzir esta gravação."
   },
   "ja": {
     "heading": "自然音ライブラリ",
     "pending": "確認済みの実録音を準備中",
     "ready": "再生可能",
-    "of": "全"
+    "of": "全",
+    "play": "再生",
+    "stop": "停止",
+    "blocked": "この録音は出典と音声の確認待ちです。",
+    "unavailable": "この録音を再生できませんでした。"
   },
   "id": {
     "heading": "Perpustakaan suara alam",
     "pending": "Menunggu rekaman terverifikasi",
     "ready": "Siap diputar",
-    "of": "dari"
+    "of": "dari",
+    "play": "Putar",
+    "stop": "Hentikan",
+    "blocked": "Rekaman menunggu peninjauan sumber dan audio.",
+    "unavailable": "Rekaman ini tidak dapat diputar."
   },
   "tr": {
     "heading": "Doğa sesleri kitaplığı",
     "pending": "Doğrulanmış kayıt bekleniyor",
     "ready": "Çalınabilir",
-    "of": "/"
+    "of": "/",
+    "play": "Oynat",
+    "stop": "Durdur",
+    "blocked": "Bu kayıt, kaynak ve ses incelemesini bekliyor.",
+    "unavailable": "Bu kayıt oynatılamadı."
   },
   "ko": {
     "heading": "자연 소리 라이브러리",
     "pending": "검증된 실제 녹음 대기 중",
     "ready": "재생 가능",
-    "of": "총"
+    "of": "총",
+    "play": "재생",
+    "stop": "정지",
+    "blocked": "이 녹음은 출처 및 오디오 검토를 기다리고 있습니다.",
+    "unavailable": "이 녹음을 재생할 수 없습니다."
   },
   "vi": {
     "heading": "Thư viện âm thanh thiên nhiên",
     "pending": "Đang chờ bản ghi được xác minh",
     "ready": "Có thể phát",
-    "of": "trên"
+    "of": "trên",
+    "play": "Phát",
+    "stop": "Dừng",
+    "blocked": "Bản ghi đang chờ kiểm tra nguồn và âm thanh.",
+    "unavailable": "Không thể phát bản ghi này."
   },
   "it": {
     "heading": "Libreria di suoni naturali",
     "pending": "In attesa di registrazione verificata",
     "ready": "Disponibile",
-    "of": "su"
+    "of": "su",
+    "play": "Riproduci",
+    "stop": "Interrompi",
+    "blocked": "Questa registrazione è in attesa di verifica della fonte e dell’audio.",
+    "unavailable": "Impossibile riprodurre questa registrazione."
   },
   "bn": {
     "heading": "প্রকৃতির শব্দসম্ভার",
     "pending": "যাচাইকৃত রেকর্ডিংয়ের অপেক্ষায়",
     "ready": "চালানো যাবে",
-    "of": "এর মধ্যে"
+    "of": "এর মধ্যে",
+    "play": "চালান",
+    "stop": "থামান",
+    "blocked": "রেকর্ডিংয়ের উৎস ও অডিও পর্যালোচনা বাকি আছে।",
+    "unavailable": "এই রেকর্ডিংটি চালানো যায়নি।"
   },
   "ur": {
     "heading": "قدرتی آوازوں کی لائبریری",
     "pending": "تصدیق شدہ ریکارڈنگ کا انتظار",
     "ready": "چلانے کے لیے دستیاب",
-    "of": "میں سے"
+    "of": "میں سے",
+    "play": "چلائیں",
+    "stop": "بند کریں",
+    "blocked": "ریکارڈنگ کے ماخذ اور آواز کا جائزہ باقی ہے۔",
+    "unavailable": "یہ ریکارڈنگ چلائی نہیں جا سکی۔"
   },
   "fa": {
     "heading": "کتابخانه صداهای طبیعت",
     "pending": "در انتظار ضبط تأییدشده",
     "ready": "قابل پخش",
-    "of": "از"
+    "of": "از",
+    "play": "پخش",
+    "stop": "توقف",
+    "blocked": "منبع و صدای این ضبط هنوز بررسی نشده است.",
+    "unavailable": "پخش این ضبط ممکن نشد."
   },
   "pl": {
     "heading": "Biblioteka dźwięków natury",
     "pending": "Oczekiwanie na zweryfikowane nagranie",
     "ready": "Dostępne",
-    "of": "z"
+    "of": "z",
+    "play": "Odtwórz",
+    "stop": "Zatrzymaj",
+    "blocked": "To nagranie oczekuje na sprawdzenie źródła i dźwięku.",
+    "unavailable": "Nie można odtworzyć tego nagrania."
   },
   "nl": {
     "heading": "Bibliotheek met natuurgeluiden",
     "pending": "Wacht op geverifieerde opname",
     "ready": "Afspeelbaar",
-    "of": "van"
+    "of": "van",
+    "play": "Afspelen",
+    "stop": "Stoppen",
+    "blocked": "De bron en audio van deze opname moeten nog worden beoordeeld.",
+    "unavailable": "Deze opname kan niet worden afgespeeld."
   }
 });
 const newLabels=Object.freeze({
