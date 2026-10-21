@@ -85,3 +85,21 @@ test('DF-075 draft discard cannot claim success when storage removal fails',()=>
   assert.ok(h.storage.get('deep_focus_unsaved_note_draft_v1'));
   assert.doesNotMatch(h.el('nsDraftStatus').textContent,/discarded/);
 });
+
+
+test('DF-090 stale open editor must refuse draft restore after a concurrent persisted note update',()=>{
+  const h=rig();
+  const prior={id:7,title:'Original',body:'before',unknown:{keep:true}};
+  h.base.value=JSON.stringify(prior);
+  h.ctx.notesList=[structuredClone(prior)];
+  assert.equal(h.run('nsFlushDraft()'),true);
+  h.ctx.notesList[0].body='newer persistent change';
+  h.el('inpNoteBody').value='new unsaved editor text';
+  const saved=JSON.stringify(h.storage.get('deep_focus_unsaved_note_draft_v1'));
+  assert.equal(h.run('nsRestoreDraft()'),false,'draft from stale source cannot replace current input');
+  assert.equal(h.el('inpNoteBody').value,'new unsaved editor text');
+  assert.equal(h.run('nsFlushDraft()'),false,'stale snapshot must not be acknowledged as current');
+  assert.equal(JSON.stringify(h.storage.get('deep_focus_unsaved_note_draft_v1')),saved);
+  assert.match(h.el('nsDraftStatus').textContent,/changed/);
+  assert.equal(h.ctx.notesList[0].body,'newer persistent change');
+});

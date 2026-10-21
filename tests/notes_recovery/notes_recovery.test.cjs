@@ -94,3 +94,27 @@ test('DF-103: 5,000 notes remain fully searchable with bounded pages',()=>{
   assert.equal(res.items.length,100);
   assert.ok(res.items.every(n=>n.catKey==='cornell'));
 });
+
+
+test('DF-087: Undo/Redo without revisions must not issue a phantom durable ACK',()=>{
+  const r=rig(); const before=copy(r.state);
+  const undo=r.controller.history(7,'undo');
+  const redo=r.controller.history(7,'redo');
+  assert.equal(r.writes,0,'no-op history must not write native storage or mirrors');
+  assert.deepEqual(r.state,before,'historical IDs and unknown fields remain unchanged');
+  assert.deepEqual(undo.notesList,before.notesList);
+  assert.deepEqual(redo.notesList,before.notesList);
+});
+test('DF-089: a throwing UI refresh after a true ACK cannot turn a saved new note into a retryable failure',()=>{
+  let state={notesList:copy([original]),tasksList:[]},writes=0;
+  const ctl=UI.createController({core:Core,readState:()=>copy(state),
+    nextNumericId:()=>101,now:()=>1792570000000,
+    commitNotes(before,after){state=copy(after);writes++;return true;},
+    onSaved(){throw Error('RENDER_FAILED_AFTER_ACK');}
+  });
+  assert.doesNotThrow(()=>ctl.save({id:null,title:'New persisted note',body:'نص أصلي 123'}));
+  assert.equal(writes,1);
+  assert.equal(state.notesList.filter(n=>n.id===101).length,1,'exactly one newly saved note');
+  assert.equal(state.notesList.find(n=>n.id===101).body,'نص أصلي 123');
+  assert.deepEqual(state.notesList.find(n=>n.id===7).unknown,{keep:true});
+});

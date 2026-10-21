@@ -60,7 +60,15 @@ function nsDraftContextMatches(d){
 }
 function nsDraftVersionMatches(d){
  if(!d||d.baseFingerprint===undefined||d.baseFingerprint===null)return true;
- return d.baseFingerprint===window.DeepFocusNotesEditorUI?.openedFingerprint?.();
+ if(d.baseFingerprint!==window.DeepFocusNotesEditorUI?.openedFingerprint?.())return false;
+ // An editor's opening fingerprint can remain unchanged after a second writer
+ // durably updates this same note. Validate against live records as well before
+ // restoring or acknowledging a draft. Never mutate historical v21 records.
+ if(d.editId!==null&&typeof notesList!=='undefined'&&Array.isArray(notesList)){
+  const current=notesList.filter(n=>n&&n.id===d.editId);
+  if(current.length!==1||JSON.stringify(current[0])!==d.baseFingerprint)return false;
+ }
+ return true;
 }
 function nsRefreshDraftLocale(){nsDraftState(...nsDraftLastState);}
 function nsDraftState(status,offer){
