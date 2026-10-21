@@ -88,27 +88,71 @@ async function nativeUI(label,match,requireDocuments=true){
  }
  throw Error('TRANSPORT: '+label+' not observable in genuine Android picker');
 }
-function findBackup(){
- // A real DocumentsUI Save can target the selected storage root as well as Downloads.
- // This is a freshly created disposable emulator only; never inspect owner storage.
- const roots=['/sdcard/Download','/sdcard/Documents','/sdcard'];
- for(const folder of roots){
-  let out='';try{out=adb('shell','find',folder,'-maxdepth','3','-type','f');}catch(_){continue;}
-  for(const row of out.split('\n')){
-   const file=row.replaceAll('\r','').trim();
-   if((file===folder||file.startsWith(folder+'/'))&&/^deep-focus-\d{4}-\d{2}-\d{2}\.zenbackup$/.test(file.split('/').at(-1)))return file;
+function savedBackupCandidates(){
+ // Android DocumentsUI may write through MediaStore instead of a shell-visible
+ // /sdcard path; text/plain may also append .txt to the suggested filename.
+ // Only inspect disposable emulator documents with the fixed QA filename shape.
+ const valid=/^deep-focus-\d{4}-\d{2}-\d{2}\.zenbackup(?:\.txt)?$/;
+ const candidates=[],seen=new Set();
+ for(const folder of ['/sdcard/Download','/sdcard/Documents','/sdcard']){
+  let output='';try{output=adb('shell','find',folder,'-maxdepth','3','-type','f');}catch(_){continue;}
+  for(const row of output.split('\n')){
+   const path=row.replaceAll('\r','').trim();
+   if(!path.startsWith(folder+'/')||!valid.test(path.split('/').at(-1))||seen.has(path))continue;
+   seen.add(path);
+   candidates.push({label:'shell-visible saved file',read:()=>cp.execFileSync('adb',['-s','emulator-5554','shell','cat',path],{timeout:20000})});
   }
  }
- throw Error('TRANSPORT: SAF export file not yet independently readable under disposable shared storage');
-}
-async function waitForSavedBackup(){
- // The ACTION_CREATE_DOCUMENT callback may complete after DocumentsUI closes.
- // Never treat a Save tap or picker dismissal as evidence of bytes on disk.
- for(let attempt=0;attempt<16;attempt++){
-  try{return findBackup();}catch(error){
-   if(attempt===15)throw error;
-   await pause(750);
+ for(const collection of ['content://media/external/downloads','content://media/external/file']){
+  let output='';
+  try{output=adb('shell','content','query','--uri',collection,'--projection','_id:_display_name','--where',"_display_name LIKE 'deep-focus-%'");}catch(_){continue;}
+  for(const line of output.split('\n')){
+   const id=line.match(/(?:^|[\s,])_id=(\d+)/),name=line.match(/(?:^|[\s,])_display_name=([^,]+)/);
+   if(!id||!name||!valid.test(name[1].trim()))continue;
+   const uri=collection+'/'+id[1];
+   if(seen.has(uri))continue;
+   seen.add(uri);
+   candidates.push({label:'MediaStore selected document',read:()=>cp.execFileSync('adb',['-s','emulator-5554','shell','content','read','--uri',uri],{timeout:20000})});
   }
+ }
+ return candidates;
+}
+async function waitForSavedBackup(expectedCode){
+ // A tapped Save is NOT success: compare exact real provider bytes with the
+ // code generated before opening the native picker, never just a file name.
+ const expected=Buffer.from(expectedCode,'utf8');
+ let readableMismatch=false;
+ for(let attempt=0;attempt<16;attempt++){
+  for(const candidate of savedBackupCandidates()){
+   let actual;try{actual=candidate.read();}catch(_){continue;}
+   if(actual.equals(expected))return candidate.label;
+   readableMismatch=true;
+  }
+  if(attempt<15)await pause(750);
+ }
+ if(readableMismatch)throw Error('SAF exported document bytes do not match the exact v21 backup');
+ throw Error('TRANSPORT: SAF Save completed without independently readable DocumentsUI/MediaStore bytes');
+}
+function stageImportFixtureInMediaStore(name,code){
+ // adb push is NOT enough on Android 11: unindexed files can be invisible in
+ // ACTION_OPEN_DOCUMENT. Use the actual scoped MediaStore Downloads provider.
+ const collection='content://media/external/downloads';
+ let uri=null;
+ try{
+  const inserted=adb('shell','content','insert','--uri',collection,
+   '--bind','_display_name:s:'+name,'--bind','mime_type:s:text/plain',
+   '--bind','relative_path:s:Download/');
+  const match=inserted.match(/content:\/\/media\/external\/downloads\/\d+/);
+  if(!match)throw Error('No MediaStore document URI returned');
+  uri=match[0];
+  cp.execFileSync('adb',['-s','emulator-5554','shell','content','write','--uri',uri],
+   {input:Buffer.from(code,'utf8'),timeout:20000,stdio:['pipe','pipe','pipe']});
+  const bytes=cp.execFileSync('adb',['-s','emulator-5554','shell','content','read','--uri',uri],{timeout:20000});
+  assert.ok(bytes.equals(Buffer.from(code,'utf8')),'Staged MediaStore fixture bytes mismatched');
+  return uri;
+ }catch(e){
+  if(uri){try{adb('shell','content','delete','--uri',uri);}catch(_){}}
+  throw Error('TRANSPORT: cannot create verified disposable MediaStore import fixture: '+String(e.message).slice(0,120));
  }
 }
 
@@ -217,11 +261,10 @@ async function main(){
    try{
     const chooser=await nativeUI('ACTION_CREATE_DOCUMENT Save',xml=>uiNodes(xml).find(n=>/text="(?:SAVE|Save|حفظ)"/.test(n)||/resource-id="[^"]*:id\/action_menu_save"/.test(n)));
     tapUI(chooser.item);
-    const filename=await waitForSavedBackup(),disk=adb('shell','cat',filename);
-    assert.equal(disk,code,'Android SAF file differs byte-for-byte from ZEN21:: backup');
+    const source=await waitForSavedBackup(code);
     assert.deepEqual(await fixture(),before,'Export unexpectedly mutated live records');
-    report.saved_saf_file=filename;
-    return 'Real native DocumentsUI Save and independent byte-for-byte readback at '+filename;
+    report.saved_saf_readback=source;
+    return 'Real native DocumentsUI Save and independently matching ZEN21:: bytes via '+source;
    }finally{
     // Close any unsuccessful picker; no staging files or user data retained.
     for(let i=0;i<3;i++){
@@ -237,14 +280,9 @@ async function main(){
     const before=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
     assert.ok(code.startsWith('ZEN21::'),'Prepared fixture is not v21');
     const name='deep-focus-qa-native-import.txt'; // DocumentsUI text/plain MIME is reliably discoverable
-    const host=require('node:os').tmpdir()+'/df-saf-import-'+process.pid+'.zenbackup';
-    const device='/sdcard/Download/'+name;
+    let stagedUri=null;
     try{
-      fs.writeFileSync(host,code,'utf8');
-      cp.execFileSync('adb',['-s','emulator-5554','push',host,device],{timeout:20000,stdio:'ignore'});
-      // ADB push bypasses MediaStore; request a scan so DocumentsUI's
-      // text/plain filter can display this fixture (real SAF selection still required).
-      try{adb('shell','am','broadcast','-a','android.intent.action.MEDIA_SCANNER_SCAN_FILE','-d','file://'+device);}catch(_){}
+      stagedUri=stageImportFixtureInMediaStore(name,code);
       await pause(1200);
       assert.equal(await write('after.notesList.find(n=>n.title==="DF07 isolated durability note").body="DF02 temporary edit before native file import";after.cfg.df07Seq=782'),true);
       assert.notDeepEqual(await fixture(),before);
@@ -267,8 +305,7 @@ async function main(){
       await restart();assert.deepEqual(await fixture(),before);
       return 'Genuine ACTION_OPEN_DOCUMENT selection of disposable fixture; user confirmation, v21 validation, native ACK and restart preserved record IDs/fields. Export Save/readback remains independently NOT_TESTED.';
     }finally{
-      try{fs.unlinkSync(host);}catch(_){}
-      try{adb('shell','rm','-f',device);}catch(_){}
+      if(stagedUri){try{adb('shell','content','delete','--uri',stagedUri);}catch(_){}}
     }
   });
   
