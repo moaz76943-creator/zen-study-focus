@@ -81,9 +81,9 @@ function tapUI(node){
  if(v.length!==4||v[2]<=v[0]||v[3]<=v[1])throw Error('TRANSPORT: Native picker control bounds missing');
  adb('shell','input','tap',String(Math.floor((v[0]+v[2])/2)),String(Math.floor((v[1]+v[3])/2)));
 }
-async function nativeUI(label,match){
+async function nativeUI(label,match,requireDocuments=true){
  for(let i=0;i<16;i++){
-  try{const xml=dumpUI();if(/documentsui/i.test(xml)){const item=match(xml);if(item)return {xml,item};}}catch(_){}
+  try{const xml=dumpUI();if(!requireDocuments||/documentsui/i.test(xml)){const item=match(xml);if(item)return {xml,item};}}catch(_){}
   await pause(550);
  }
  throw Error('TRANSPORT: '+label+' not observable in genuine Android picker');
@@ -235,7 +235,7 @@ async function main(){
       selected=(await nativeUI('backup file selection',xml=>uiNodes(xml).find(n=>n.includes('text="'+name+'"')))).item;
     }
     tapUI(selected);
-    const confirm=await nativeUI('native restore confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)));
+    const confirm=await nativeUI('native restore confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)),false);
     tapUI(confirm.item);
     let changed=false;
     for(let i=0;i<15;i++){await pause(500);if(JSON.stringify(await fixture())===JSON.stringify(before)){changed=true;break;}}
