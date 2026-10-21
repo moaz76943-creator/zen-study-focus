@@ -1,0 +1,175 @@
+name: Track07 20 original nature audio QA (quarantine only)
+on:
+  push:
+    branches:
+      - feature/track07-04-authentic-nature-20-20261020
+      - fix/track07-04-audio-acceptance-20261020
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nature20-source-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  authentic20:
+    name: Verify all20 requested source slots, hashes, local audio and measured loop derivatives
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test independent 20-source ledger and existing audio, no release enablement
+        run: |
+          node --test tests/nature_library_v2/audio_endurance.test.cjs tests/nature_library_v2/twenty_originals_provenance.test.cjs tests/nature_library_v2/intake_manifest.test.cjs tests/nature_library_v2/catalog.test.cjs tests/integration_recovery/nature_runtime.test.cjs tests/integration_recovery/nature_20_language_controls.test.cjs tests/nature_audio_recovery/mixer.test.cjs
+          python3 -m unittest discover -s tests/nature_library_v2 -p 'test_*.py' -v
+          node tests/smoke_app.cjs
+      - name: Install ffmpeg for real Vorbis decoding
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg
+      - name: Verify source metadata and decode only rights-unblocked original bytes
+        run: python3 tools/nature_audio/collect_commons_audio.py --requested
+      - name: Generate offline real recording review without music or synthetic substitutions
+        run: python3 tools/nature_audio/build_audio_review.py --requested
+      - name: Browser offline playback, actual controls and 320-430px RTL layouts
+        run: |
+          npm install --prefix "$RUNNER_TEMP/audioqa-browser" --no-save playwright@1.56.1
+          NODE_PATH="$RUNNER_TEMP/audioqa-browser/node_modules" node tests/nature_library_v2/audio_review_browser.cjs audio_candidates/requested/index.html audio_candidates/requested/browser-evidence
+          NODE_PATH="$RUNNER_TEMP/audioqa-browser/node_modules" node tests/nature_library_v2/main_controls_browser.cjs android/app/src/main/assets/web/index.html audio_candidates/requested/main-controls-evidence
+      - name: Require20 uniquely sourced requested slots; no production enablement
+        run: |
+          python3 - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('audio_candidates/requested')
+          rows=json.loads((root/'qa_report.json').read_text())
+          manifest=json.loads(pathlib.Path('tools/nature_audio/commons_intake.json').read_text())
+          assert len(rows)==len(manifest['items'])==20
+          accepted=[r for r in rows if r['status']=='QUARANTINED_NOT_APPROVED']
+          assert len(accepted)==20 and len({r['original_sha256'] for r in accepted})==20
+          assert not any(r['status']=='BLOCKED_RIGHTS' for r in rows)
+          import sys
+          sys.path.insert(0,'tools/nature_audio')
+          from collect_commons_audio import requested_sources
+          selected=requested_sources(manifest)
+          assert len(selected)==20 and {r['id'] for r in rows}=={r['id'] for r in selected}
+          assert all(r['status']=='QUARANTINED_NOT_APPROVED' and r['codec']=='vorbis' for r in accepted)
+          assert all(e['approved_for_runtime'] is False for e in manifest['items'])
+          assert (root/'index.html').read_text().count('<audio ') == 20
+          print('TWENTY_REQUESTED_SOURCE_CANDIDATES_NOT_PRODUCTION_READY=PASS')
+          print('PRODUCTION_APPROVED=NO')
+          PY
+      - name: Upload20 requested candidates, original/loop hashes and offline review (not approved)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Requested20-Candidates-Listening-Only-${{ github.sha }}
+          path: audio_candidates/requested/
+          if-no-files-found: error
+          retention-days: 7
+
+  audioqa:
+    name: Build and emulator-test isolated requested20-candidate Android APK (explicit scope)
+    needs: authentic20
+    if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[audio-qa-apk]') || contains(github.event.head_commit.message, '[audio-qa-smoke]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Read verified originals from same immutable workflow run
+        uses: actions/download-artifact@v4
+        with:
+          name: DeepFocus-Requested20-Candidates-Listening-Only-${{ github.sha }}
+          path: audio_candidates/requested
+      - name: Enforce20 requested source files; no missing slots or blocked rights in QA package
+        shell: bash
+        run: |
+          set -euo pipefail
+          find audio_candidates/requested -maxdepth 1 -type f -name '*.ogg' | grep -c . | grep -x 20
+          python3 - <<'PY'
+          import json,pathlib
+          rows=json.loads(pathlib.Path('audio_candidates/requested/qa_report.json').read_text())
+          accepted=[r for r in rows if r['status']=='QUARANTINED_NOT_APPROVED']
+          assert len(rows)==20 and len(accepted)==20 and len({x['original_sha256'] for x in accepted})==20
+          assert all(not x.get('original_downloaded') for x in rows if x['status']=='BLOCKED_RIGHTS')
+          print('QA_ONLY_TWENTY_REQUESTED_CANDIDATES')
+          PY
+      - name: Prepare permission-free disposable original audio listening app
+        env:
+          AUDIO_QA_BUILD: '1'
+        run: python3 tools/nature_audio/prepare_audioqa_android.py --requested
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate real Android CDP sound QA probe syntax
+        run: |
+          node --check tests/nature_library_v2/android20_runtime_probe.cjs
+          bash -n tests/nature_library_v2/android20_emulator_qa.sh
+      - name: Setup Android API36
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build Android debug-only listening APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Verify independent package identity and zero platform permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$(find android/app/build/outputs/apk/debug -name '*.apk' -type f -print -quit)"
+          test -f "$APK"
+          AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          "$AAPT" dump badging "$APK" | grep -F "package: name='com.zenstudy.focus.audioqa'"
+          PERMISSIONS="$("$AAPT" dump permissions "$APK" | grep '^uses-permission:' || true)"
+          EXPECTED="uses-permission: name='com.zenstudy.focus.audioqa.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'"
+          if [[ -n "$PERMISSIONS" && "$PERMISSIONS" != "$EXPECTED" ]]; then
+            echo "Unexpected platform or third-party permissions" >&2
+            exit 1
+          fi
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$APK"
+          sha256sum "$APK"
+      - name: Prepare disposable emulator KVM
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      # UI-only repairs may request smoke; full audio changes retain the 1800s gate.
+      # The runtime records endurance NOT_TESTED at0; smoke cannot claim that gate.
+      - name: Prove all originals, loop wraps and ADB controls on API30 with explicit endurance scope
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: AUDIO_QA_ENDURANCE_SECONDS=${{ contains(github.event.head_commit.message, '[audio-qa-apk]') && '1800' || '0' }} bash tests/nature_library_v2/android20_emulator_qa.sh
+      - name: Upload real Android audio QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-20-Real-AudioQA-Android-Evidence-${{ github.sha }}
+          path: ${{ runner.temp }}/audio20/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Upload separate requested20-candidate sound-listening QA APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Requested20-Candidates-AudioQA-Isolated-Debug-${{ github.sha }}
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 7

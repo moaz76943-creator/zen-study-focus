@@ -27,6 +27,7 @@ test('all 20 user-interface languages have honest availability labels',()=>{
   assert.ok(lib.messages[lang]?.pending?.trim(),lang);
   assert.ok(lib.messages[lang]?.ready?.trim(),lang);
   assert.ok(lib.messages[lang]?.of?.trim(),lang);
+  for(const key of ['play','stop','blocked','unavailable'])assert.ok(lib.messages[lang][key]?.trim(),lang+':'+key);
  }
 });
 test('a blocked sound has no play action in the standalone library, and categorization is stable',()=>{
