@@ -236,7 +236,29 @@ async function main(){
     }
     // Test-only observer: call through to the real validator/confirm, never
     // synthesize file contents, a confirmation or a successful restore.
-    tapUI(selected);
+    // Prefer the left text side of the actual named file row, not the
+    // trailing DocumentsUI preview affordance. Verify picker departure.
+    const m=selected.match(/bounds="([^"]+)"/),b=m?[...m[1].matchAll(/[0-9]+/g)].map(v=>Number(v[0])):[];
+    assert.equal(b.length,4,'Real file target must expose Android UI bounds');
+    const yy=Math.floor((b[1]+b[3])/2),leftX=Math.min(b[2]-8,b[0]+Math.min(72,Math.floor((b[2]-b[0])/4)));
+    report.saf_selection={targetBounds:b,clickable:/clickable="true"/.test(selected),firstTap:[leftX,yy]};
+    adb('shell','input','tap',String(leftX),String(yy));
+    await pause(1400);
+    let afterTap=dumpUI();
+    if(/documentsui/i.test(afterTap)){
+      // Explicit proof the first tap did not select: only one bounded
+      // alternate tap to the same verified filename's visible text center.
+      const remaining=uiNodes(afterTap).find(n=>n.includes('text="'+name+'"'));
+      if(remaining){
+        report.saf_selection.firstTapDidNotSelect=true;
+        const center=remaining.match(/bounds="([^"]+)"/),
+          c=center?[...center[1].matchAll(/[0-9]+/g)].map(v=>Number(v[0])):[];
+        if(c.length===4){
+          adb('shell','input','tap',String(Math.floor((c[0]+c[2])/2)),String(Math.floor((c[1]+c[3])/2)));
+          await pause(1500);
+        }
+      }
+    }
     let confirm;
     try {
       confirm=await nativeUI('native restore confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)),false);
