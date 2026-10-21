@@ -4,16 +4,16 @@ const path=require('node:path'),fs=require('node:fs'),crypto=require('node:crypt
 const root=path.resolve(__dirname,'../..');
 const {buildPortable}=require('../../tools/control_center/build_portable.cjs');
 const design=require('../../docs/control-center/design-config.json');
-test('builds one self-contained dashboard with exactly nine hash-pinned scripts and two styles',()=>{
+test('builds one self-contained dashboard with exactly eleven allowlisted hash-pinned scripts and two styles',()=>{
   const html=buildPortable(root);
   assert.match(html,/id="control-center-embedded-design"/);
-  assert.equal((html.match(/<script data-bundle=/g)||[]).length,9);
+  assert.equal((html.match(/<script data-bundle=/g)||[]).length,11);
   assert.equal((html.match(/<style data-bundle=/g)||[]).length,2);
   assert.doesNotMatch(html,/<script[^>]*\bsrc=|<link[^>]*rel="stylesheet"/i);
   const hashes=[...html.matchAll(/<script data-bundle="[^"]+">([\s\S]*?)<\/script>/g)]
     .map(m=>"'sha256-"+crypto.createHash('sha256').update(m[1]).digest('base64')+"'");
   for(const token of hashes)assert.ok(html.includes(token),'Missing matching CSP script hash');
-  assert.equal(hashes.length,9);
+  assert.equal(hashes.length,11);
   assert.doesNotMatch(html,/unsafe-inline|unsafe-eval|https:\/\/fonts\./);
   assert.ok(Buffer.byteLength(html,'utf8')<300000);
 });
