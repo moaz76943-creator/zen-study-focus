@@ -55,7 +55,21 @@ const L=require('../../android/app/src/main/assets/web/completion_alert_locales.
   // Observe real media objects, retaining the native play implementation.
   await page.evaluate(()=>{window.df4Media=[];const play=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){window.df4Media.push(this);return play.call(this);};});
   await picker.locator('.completion-alert-preview').nth(0).click();
-  await page.waitForFunction(()=>window.df4Media.length===1);
+  try {
+   await page.waitForFunction(()=>window.df4Media.length===1,null,{timeout:6000});
+  } catch(e) {
+   // Fail closed with real browser evidence; do not mock media.play().
+   const diagnostic=await page.evaluate(()=>({
+    capturedMedia:window.df4Media?.length??null,
+    visibility:document.visibilityState,
+    enginePresent:!!window.DFRecoveryCompletion,
+    settings:window.DFRecoveryCompletion?.getSettings?.()||null,
+    firstPreviewDisabled:document.querySelector('.completion-alert-preview')?.disabled,
+    media:window.df4Media?.map(x=>({src:x.currentSrc,readyState:x.readyState,paused:x.paused,error:x.error?.code||null}))
+   }));
+   fs.writeFileSync(join(out,'first-preview-failure.json'),JSON.stringify({stage:'actual-browser-first-preview',diagnostic},null,2)+'\n');
+   throw new Error('FIRST_COMPLETION_PREVIEW_NOT_STARTED '+JSON.stringify(diagnostic)+'; '+e.message);
+  }
   await picker.locator('.completion-alert-preview').nth(1).click();
   // Wait for genuine decoded media instead of guessing fixed CI timing.
   // The real HTMLMediaElement.play() method remains in use.
