@@ -396,6 +396,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_BACKUP_IMPORT) {
+            // Disposable debug-only trace: never log content URIs or backup bytes.
+            if (BuildConfig.DEBUG) android.util.Log.d("DF02_SAF_QA",
+                    "RESULT ok=" + (resultCode == Activity.RESULT_OK)
+                    + " uriPresent=" + (data != null && data.getData() != null));
             backupImportPickerOpen = false;
             if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null) return;
             // SAF grants read access to this user-selected document only.
@@ -415,13 +419,21 @@ public class MainActivity extends AppCompatActivity {
                 final String backupCode =
                         new String(bytes.toByteArray(), StandardCharsets.UTF_8);
                 if (backupCode.trim().isEmpty()) throw new java.io.IOException("Empty backup");
-                if (webView == null || isDestroyed()) return;
-                // The existing v21 verifier checks checksum, schema and user
-                // consent before ANY mutation; native must not report success.
-                final String script = "if(typeof verifyAndRestoreBackupCode==='function')"
-                        + "verifyAndRestoreBackupCode("
-                        + org.json.JSONObject.quote(backupCode) + ");";
-                webView.post(() -> webView.evaluateJavascript(script, null));
+                if (webView == null || isDestroyed()) {
+                    if (BuildConfig.DEBUG) android.util.Log.d("DF02_SAF_QA", "WEBVIEW_NOT_READY");
+                    return;
+                }
+                // QA-only return-value trace; preserve the same verifier, consent,
+                // checksum, atomic transaction and Native ACK behavior.
+                final String script = "(function(){"
+                        + "if(typeof verifyAndRestoreBackupCode!=='function')return 'MISSING_VERIFIER';"
+                        + "return verifyAndRestoreBackupCode("
+                        + org.json.JSONObject.quote(backupCode) + ");})()";
+                webView.post(() -> webView.evaluateJavascript(script, value -> {
+                    if (BuildConfig.DEBUG) android.util.Log.d("DF02_SAF_QA",
+                            "VERIFIER_RETURN " + String.valueOf(value).substring(0,
+                                    Math.min(40, String.valueOf(value).length())));
+                }));
             } catch (Exception error) {
                 Toast.makeText(this, "Unable to read backup; existing data unchanged",
                         Toast.LENGTH_LONG).show();
