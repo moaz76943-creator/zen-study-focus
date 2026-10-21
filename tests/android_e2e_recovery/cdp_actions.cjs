@@ -91,6 +91,31 @@ async function dismissNoteKeyboardForSave(){
  return {beforeHeight:before.viewport,afterHeight:after.viewport};
 }
 
+async function acceptNativeConfirm(expression){
+ // Runtime.evaluate remains outstanding until the branded *real* Android
+ // AlertDialog responds. Waiting on it first causes an artificial 20s timeout.
+ const outstanding=evaluate(expression);
+ outstanding.catch(()=>{}); // suppress unhandled rejection if native hierarchy is unavailable
+ await pause(450);
+ let xml=null,lastFailure=null;
+ for(let attempt=0;attempt<3;attempt++){
+  try{
+   adb('shell','uiautomator','dump','/sdcard/df-native-confirm-test.xml');
+   const observed=adb('shell','cat','/sdcard/df-native-confirm-test.xml');
+   if(observed.includes('Deep Focus') && !observed.includes('file://')){
+     xml=observed;
+     break;
+   }
+  }catch(e){lastFailure=e;}
+  await pause(450);
+ }
+ if(!xml)throw Error('TRANSPORT: Native Deep Focus confirmation unverified: '+String(lastFailure?.message||'missing dialog').slice(0,120));
+ const point=parseNativePromptButton(xml);
+ adb('shell','input','tap',String(point.x),String(point.y));
+ const accepted=await outstanding;
+ assert.equal(accepted,true,'Native confirmation OK must cause a real JS true result');
+ return accepted;
+}
 async function check(expression,message){assert.equal(await evaluate(expression),true,message);}
 async function run(id,fn){
  if(selectedCases&&!selectedCases.has(id))return;
@@ -231,7 +256,7 @@ async function main(){
   await tap('#navTimer');await evaluate("selectTimerMode(1,'focus',null)");const count=await evaluate('cfg.sessions');
   await tap('#mainPlayBtn');await pause(2200);await tap('#mainPlayBtn');const left=await evaluate('timerLeft');assert.ok(left<=59&&left>=54,'Actual elapsed seconds');
   await pause(1200);assert.equal(await evaluate('timerLeft'),left,'Paused clock stable');await tap('#mainPlayBtn');await pause(1200);await tap('#mainPlayBtn');
-  await evaluate('resetTimerNow()');assert.equal(await evaluate('cfg.sessions'),count,'Reset cannot grant focus credit');
+  await acceptNativeConfirm('resetTimerNow()');assert.equal(await evaluate('cfg.sessions'),count,'Reset cannot grant focus credit');
  });
  await run('save_failure',async()=>{
   await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle','Quota fixture');await fill('#inpNoteBody','Do not lose edits');await dismissNoteKeyboardForSave();
@@ -288,7 +313,7 @@ async function main(){
       await check('document.documentElement.scrollWidth<=innerWidth+1','No horizontal overflow after rotation');
     }
     await tap('#nsSaveButton');await check(`notesList.filter(n=>n.title===${JSON.stringify(title)}&&n.body===${JSON.stringify(body)}).length===1`,'One saved note after both rotations');
-    await evaluate('resetTimerNow()');assert.equal(await evaluate('cfg.sessionHistory?.length||0'),history,'Cancelled rotating timer grants no credit');
+    await acceptNativeConfirm('resetTimerNow()');assert.equal(await evaluate('cfg.sessionHistory?.length||0'),history,'Cancelled rotating timer grants no credit');
     return 'Actual landscape/portrait, unsaved Unicode draft and running timer retained; no duplicate save or focus credit';
   }finally{
     if(['0','1','2','3'].includes(rotation))adb('shell','settings','put','system','user_rotation',rotation);
