@@ -334,10 +334,25 @@ html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
 body.df-v22.df-recovery10 #sec-notes #notesStackBox {
   padding-bottom: calc(106px + env(safe-area-inset-bottom, 0px));
 }
+/* Android IME shrinks visualViewport, not necessarily the layout viewport.
+   Center the note dialog inside the actual visible rectangle. Otherwise its
+   text editor falls below the keyboard and subsequent navigation is occluded.
+   Keep only the active note modal in this visual viewport; other dialogs intact. */
+body.df-v22.df-recovery10 #noteModal.open {
+  top: var(--nsux-top, 0px);
+  bottom: auto;
+  height: var(--nsux-height, 100dvh);
+  max-height: var(--nsux-height, 100dvh);
+  box-sizing: border-box;
+  padding-block: 8px;
+  align-items: center;
+  overflow: hidden;
+}
 /* Android Notes viewport fix: pin Save/Cancel while lengthy content scrolls.
    Keep the actual visualViewport keyboard height and all existing data paths. */
 body.df-v22.df-recovery10 #noteModal .ns-editor {
-  max-height: min(88dvh, calc(var(--nsux-height, 100dvh) - 16px));
+  max-height: max(120px, calc(var(--nsux-height, 100dvh) - 16px));
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
