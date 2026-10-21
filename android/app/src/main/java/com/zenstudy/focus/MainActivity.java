@@ -397,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_BACKUP_IMPORT) {
             // Disposable debug-only trace: never log content URIs or backup bytes.
-            if (BuildConfig.DEBUG) android.util.Log.d("DF02_SAF_QA",
+            android.util.Log.d("DF02_SAF_QA",
                     "RESULT ok=" + (resultCode == Activity.RESULT_OK)
                     + " uriPresent=" + (data != null && data.getData() != null));
             backupImportPickerOpen = false;
@@ -420,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
                         new String(bytes.toByteArray(), StandardCharsets.UTF_8);
                 if (backupCode.trim().isEmpty()) throw new java.io.IOException("Empty backup");
                 if (webView == null || isDestroyed()) {
-                    if (BuildConfig.DEBUG) android.util.Log.d("DF02_SAF_QA", "WEBVIEW_NOT_READY");
+                    android.util.Log.d("DF02_SAF_QA", "WEBVIEW_NOT_READY");
                     return;
                 }
                 // QA-only return-value trace; preserve the same verifier, consent,
@@ -430,7 +430,7 @@ public class MainActivity extends AppCompatActivity {
                         + "return verifyAndRestoreBackupCode("
                         + org.json.JSONObject.quote(backupCode) + ");})()";
                 webView.post(() -> webView.evaluateJavascript(script, value -> {
-                    if (BuildConfig.DEBUG) android.util.Log.d("DF02_SAF_QA",
+                    android.util.Log.d("DF02_SAF_QA",
                             "VERIFIER_RETURN " + String.valueOf(value).substring(0,
                                     Math.min(40, String.valueOf(value).length())));
                 }));
