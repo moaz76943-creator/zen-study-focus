@@ -1,0 +1,68 @@
+name: P0 completion preview real browser fail-closed regression
+on:
+  push:
+    branches: [qa/completion-preview-regression-20261021]
+    paths: [.github/workflows/p0_completion_preview_repro_20261021.yml, tests/df4_browser/picker.cjs]
+permissions:
+  contents: read
+concurrency:
+  group: df-p0-preview-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  preview-real-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify original app tree, isolated test and workflow only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/df-p0-preview"
+          PIN="cca433108371ce8e3f656ab0689233729f372657"
+          git cat-file -e "$PIN^{commit}"
+          test "$(git rev-parse HEAD:android)" = "$(git rev-parse "$PIN:android")"
+          expected="$(printf '%s\n' .github/workflows/p0_completion_preview_repro_20261021.yml tests/df4_browser/picker.cjs | sort)"
+          actual="$(git diff --name-only "$PIN" HEAD | sort)"
+          test "$actual" = "$expected"
+          git rev-parse HEAD > "$RUNNER_TEMP/df-p0-preview/QA_SHA.txt"
+          git rev-parse HEAD:android > "$RUNNER_TEMP/df-p0-preview/ANDROID_TREE_SHA.txt"
+          node --check tests/df4_browser/picker.cjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare actual headless Chromium (no mocked media)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Start loopback-only offline asset server
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df-p0-preview/http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Reproduce real media preview and capture first-failure state
+        shell: bash
+        env:
+          DF4_TEST_URL: http://127.0.0.1:8770/index.html
+          DF4_CHROMIUM: /usr/bin/chromium
+          DF4_EVIDENCE_DIR: ${{ runner.temp }}/df-p0-preview
+        run: node tests/df4_browser/picker.cjs
+      - name: Preserve PASS/FAIL evidence and limitations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-P0-Preview-Browser-${{ github.sha }}
+          if-no-files-found: warn
+          retention-days: 5
+          path: ${{ runner.temp }}/df-p0-preview/
