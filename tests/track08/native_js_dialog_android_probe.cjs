@@ -125,9 +125,11 @@ async function main(){
   const active=await evaluate('(() => {applyLanguage("en");selectTimerMode(25,"focus",document.getElementById("modeFocusBtn"));if(!timerRunning)toggleTimerPlay();return {id:timerSessionId,mode:currentTimerModeKey,total:timerTotal,running:timerRunning};})()');
   const initial=active.value;
   assert.equal(initial.running,true);
+  const localizedPrompt=(await evaluate('quickText("replacePrompt")')).value;
+  assert.ok(typeof localizedPrompt==='string'&&localizedPrompt.length>10,'Expected reviewed activity-change warning is missing');
   for(const [button,key] of [['modeShortBtn','short'],['modeLongBtn','long']]){
     const p=evaluate('(() => {document.getElementById("'+button+'").click();return {id:timerSessionId,mode:currentTimerModeKey,total:timerTotal,running:timerRunning};})()');
-    const tree=await dialog('Changing mode');
+    const tree=await dialog(localizedPrompt);
     assert.ok(tree.includes('Deep Focus'),'Only app-branded Android modal accepted');
     adb('shell','input','keyevent','KEYCODE_BACK');
     const value=(await p).value;
@@ -138,7 +140,7 @@ async function main(){
     results.push({operation:'real_'+key+'_button_cancel',status:'PASS'});
   }
   const accept=evaluate('(() => {document.getElementById("modeLongBtn").click();return {mode:currentTimerModeKey,total:timerTotal,running:timerRunning};})()');
-  let modeTree=await dialog('Changing mode');
+  let modeTree=await dialog(localizedPrompt);
   const modePositive=buttons(modeTree).sort((a,b)=>b.x-a.x)[0];
   assert.ok(modePositive,'Native timer confirm lacks affirmative button');
   adb('shell','input','tap',String(modePositive.x),String(modePositive.y));
