@@ -27,7 +27,7 @@ test('keeps all seven actual destinations and v21 focus action, never Meditation
 });
 
 test('narrow phone navigation reserves one readable heading while labels stay in accessibility tree', () => {
-  assert.match(css, /bottom-nav-capsule \\.bnav-btn span\\[data-i18n\\]\\s*\\{[^}]*clip-path:\\s*inset\\(50%\\)/s);
-  assert.match(css, /\\.bnav-btn:is\\(\\.active,:focus-visible\\) span\\[data-i18n\\]/);
-  assert.doesNotMatch(css, /\\.bnav-btn span\\[data-i18n\\]\\s*\\{[^}]*display:\\s*none/s);
+  assert.match(css, /bottom-nav-capsule \.bnav-btn span\[data-i18n\]\s*\{[^}]*clip-path:\s*inset\(50%\)/s);
+  assert.match(css, /\.bnav-btn:is\(\.active,:focus-visible\) span\[data-i18n\]/);
+  assert.doesNotMatch(css, /\.bnav-btn span\[data-i18n\]\s*\{[^}]*display:\s*none/s);
 });
