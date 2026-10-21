@@ -975,6 +975,13 @@ function logWorkoutSet() {
 }
 
 function startQuickSportRest(secs) {
+  // A quick sport break must not silently replace an active focus or training session.
+  if ((quickTraining?.active || timerRunning || timerSessionId || timerActiveMs > 0) &&
+      !window.confirm(quickText('replacePrompt'))) return false;
+  if (quickTraining?.active) {
+    quickTraining = null;
+    renderQuickTraining();
+  }
   if (timerRunning) toggleTimerPlay();
   currentTimerModeKey = 'short';
   timerTotal = secs; timerLeft = secs;
@@ -985,6 +992,7 @@ function startQuickSportRest(secs) {
   storeTimerSession();
   updateTimerDisplay(); toggleTimerPlay();
   showToast(`⏱️ ${quickText('restPhase')} ${formatDurationUnit(secs,'second')}`);
+  return true;
 }
 
 function addReadPages(p) {
@@ -1325,10 +1333,14 @@ function setCustomPresetValues(m) { document.getElementById('inpCustomMins').val
 function applyCustomTimerNow() {
   const mins = Math.max(1, Math.min(240, parseInt(toWest(document.getElementById('inpCustomMins').value)) || 45));
   const title = document.getElementById('inpCustomTitle').value.trim();
-  customSessionLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
+  const nextLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
+  // Do not mutate label, close the form, or lose the user's input on Cancel.
+  if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return false;
+  customSessionLabel = nextLabel;
   closeModal('customTimerModal');
-  if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return;
+  updateTimerDisplay();
   showToast(`⚡ ${customSessionLabel}`);
+  return true;
 }
 
 function changeTimerDelta(deltaMins) {
@@ -1404,6 +1416,9 @@ function resetTimerNow() {
     cancelQuickTraining();
     return;
   }
+  // Reset discards an unfinished focus session: cancellation must be harmless.
+  if ((timerRunning || timerSessionId || timerActiveMs > 0) &&
+      !window.confirm(quickText('replacePrompt'))) return false;
   if (timerRunning) toggleTimerPlay();
   timerLeft = timerTotal;
   timerSessionId = null;
@@ -1412,11 +1427,12 @@ function resetTimerNow() {
   timerResumeMs = null;
   storeTimerSession();
   updateTimerDisplay();
+  return true;
 }
 function skipTimerPhase() {
   if(quickTraining?.active) { skipQuickTrainingStep(); return; }
-  if (timerRunning) toggleTimerPlay();
-  selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
+  // Selecting the next phase uses the same confirmation as the mode buttons.
+  return selectTimerModeFromUser(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
 }
 function addWaterCup() { cfg.water = (cfg.water + 1) % 9; saveFortressData('zen_fortress_cfg_v21', cfg); syncHeaderMetrics(); }
 function toggleDeskClock(show) {
