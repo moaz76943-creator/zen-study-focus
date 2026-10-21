@@ -167,9 +167,9 @@ async function main(){
   results.push({operation:'custom_timer_cancel',status:'PASS',userDraftPreserved:true});
   const customAccept=evaluate('(()=>{document.querySelector(\'#customTimerModal button[onclick="applyCustomTimerNow()"]\').click();return {state:'+stateExpr+',modalOpen:document.getElementById("customTimerModal").classList.contains("open")};})()');
   const acceptXml=await dialog(modeCopy);
-  const yes=buttons(acceptXml).sort((a,b)=>b.x-a.x)[0];
-  assert.ok(yes,'Missing native YES for custom timer');
-  adb('shell','input','tap',String(yes.x),String(yes.y));
+  const customYes=buttons(acceptXml).sort((a,b)=>b.x-a.x)[0];
+  assert.ok(customYes,'Missing native YES for custom timer');
+  adb('shell','input','tap',String(customYes.x),String(customYes.y));
   const afterAccept=(await customAccept).value;
   assert.equal(afterAccept.state.mode,'custom');
   assert.equal(afterAccept.state.total,47*60);
