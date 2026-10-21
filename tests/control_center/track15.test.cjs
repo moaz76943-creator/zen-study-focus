@@ -15,8 +15,8 @@ test('track15-01 previous-SHA source ledger is STALE and cannot certify master H
 });
 test('track15-02 exact-head agent results remain SOURCE_TESTED, never physical-device PASS',()=>{
  const result=core.parseAgentLedger(ledger(HEAD),HEAD);
- assert.equal(result.status,'SOURCE_TESTED');
- assert.equal(result.agents.length,3);
+ assert.equal(result.status,'NOT_TESTED'); // only 3/12 agents were supplied
+ assert.equal(result.agents.length,12);
  assert.equal(result.agents[1].status,'SOURCE_TESTED');
  assert.equal(result.android,'NOT_TESTED');
  assert.equal(core.parseAgentLedger('garbage',HEAD).status,'NOT_TESTED');
