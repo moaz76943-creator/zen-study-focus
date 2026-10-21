@@ -25,7 +25,7 @@ jobs:
           PIN=903989405c096f1bbfd414d24c2c06e988b0ec70
           git cat-file -e "$PIN^{commit}"
           test "$(git rev-parse HEAD:android)" = "$(git rev-parse "$PIN:android")"
-          printf '%s\n' .github/workflows/track04_real_touch_20261021.yml tests/df4_browser/track04_real_touch_outcomes.cjs | sort > "$RUNNER_TEMP/df-track04/expected.txt"
+          printf '%s\n' .github/workflows/track04_real_touch_20261021.yml .github/workflows/track04_android_exact_source_20261021.yml tests/df4_browser/track04_real_touch_outcomes.cjs tests/android_e2e_recovery/track04_one_shot_android.sh | sort > "$RUNNER_TEMP/df-track04/expected.txt"
           git diff --name-only "$PIN" HEAD | sort > "$RUNNER_TEMP/df-track04/actual.txt"
           diff -u "$RUNNER_TEMP/df-track04/expected.txt" "$RUNNER_TEMP/df-track04/actual.txt"
           git rev-parse HEAD > "$RUNNER_TEMP/df-track04/QA_HEAD_SHA.txt"
