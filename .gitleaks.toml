@@ -29,3 +29,11 @@ condition = "AND"
 regexTarget = "line"
 paths = ['''^docs/master_completion/LEDGER_197\.json$''']
 regexes = ['''^\s*"key_order_fix_commit"\s*:\s*"[a-f0-9]{40}"\s*,?\s*$''']
+
+[[allowlists]]
+description = "Legacy public checksum salt in historical bundled v21 HTML, not an API key"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''^android/app/src/main/assets/web/index\.html$''']
+regexes = ['''^\s*const SECRET_SALT\s*=\s*["']ZEN_FORTRESS_V19_99481["'];?\s*$''']
