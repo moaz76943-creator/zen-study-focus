@@ -99,6 +99,14 @@ jobs:
           set -euo pipefail
           gradle assembleDebug --no-daemon
           sha256sum app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/track08-android/APK_SHA256"
+      - name: Enable KVM acceleration for ephemeral Android
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
       - name: Disposable Android API30 WebView touch and force-stop readback
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -121,9 +129,9 @@ jobs:
         if: always()
         shell: bash
         run: |
-          adb exec-out screencap -p > "$RUNNER_TEMP/track08-android/screen.png" 2>/dev/null || true
-          adb shell dumpsys webviewupdate > "$RUNNER_TEMP/track08-android/webview-version.txt" 2>/dev/null || true
-          adb logcat -d -s AndroidRuntime > "$RUNNER_TEMP/track08-android/runtime-errors.log" 2>/dev/null || true
+          timeout 12s adb exec-out screencap -p > "$RUNNER_TEMP/track08-android/screen.png" 2>/dev/null || true
+          timeout 12s adb shell dumpsys webviewupdate > "$RUNNER_TEMP/track08-android/webview-version.txt" 2>/dev/null || true
+          timeout 12s adb logcat -d -s AndroidRuntime > "$RUNNER_TEMP/track08-android/runtime-errors.log" 2>/dev/null || true
           printf '%s\n' 'DISPOSABLE_ANDROID=SOURCE_TEST' 'PHYSICAL_DEVICE=NOT_TESTED' 'RELEASE_APPROVED=NO' > "$RUNNER_TEMP/track08-android/RELEASE_NOT_APPROVED.txt"
       - uses: actions/upload-artifact@v4
         if: always()
