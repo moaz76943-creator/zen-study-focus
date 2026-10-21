@@ -1,0 +1,55 @@
+name: Track 08 all-button live DOM binding audit
+on:
+  push:
+    branches:
+      - audit/track08-all-button-binding-20261021
+permissions:
+  contents: read
+concurrency:
+  group: track08-button-binding-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  binding:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser harness
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Start actual bundled app asset server
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df-buttons-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0;sleep 1;done
+          exit 1
+      - name: Test live button action function bindings and report uncovered controls across five languages
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_BUTTON_BINDING_EVIDENCE: ${{ runner.temp }}/button-bindings
+        run: node tests/track08/all_button_binding_browser.cjs
+      - name: Report evidence limits and exact app SHA
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/button-bindings"
+          git rev-parse HEAD > "$RUNNER_TEMP/button-bindings/QA_SHA.txt"
+          printf 'Static action binding is not semantic button functional approval; remaining runtime controls are NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/button-bindings/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DeepFocus-all-control-bindings-${{ github.sha }}
+          path: ${{ runner.temp }}/button-bindings/
+          if-no-files-found: warn
+          retention-days: 7
