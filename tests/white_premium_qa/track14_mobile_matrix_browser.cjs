@@ -46,8 +46,22 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
               if(!e) return {lines:0,text:'',whiteSpace:''};
               const range=document.createRange();
               range.selectNodeContents(e);
-              const lines=[...range.getClientRects()].filter(r=>r.width>0.25);
-              return {lines:lines.length,text:e.textContent.trim(),whiteSpace:getComputedStyle(e).whiteSpace};
+              // In mixed RTL/Western-digit text, one visual line can produce
+              // several Range rectangles (bidi fragments). Count actual
+              // vertically distinct line bands, not DOM text fragments.
+              const fragments=[...range.getClientRects()].filter(r=>r.width>0.25 && r.height>0.25);
+              const bands=[];
+              for(const rect of fragments){
+                const band=bands.find(b=>{
+                  const overlap=Math.min(b.bottom,rect.bottom)-Math.max(b.top,rect.top);
+                  return overlap>=0.5*Math.min(b.bottom-b.top,rect.height);
+                });
+                if(band){
+                  band.top=Math.min(band.top,rect.top);
+                  band.bottom=Math.max(band.bottom,rect.bottom);
+                }else bands.push({top:rect.top,bottom:rect.bottom});
+              }
+              return {lines:bands.length,fragments:fragments.length,text:e.textContent.trim(),whiteSpace:getComputedStyle(e).whiteSpace};
             };
             const presets=[...document.querySelectorAll('#focusHeroCard .segmented-pills-bar .seg-pill')].map(textBoxes);
             const isoBadge=textBoxes(document.getElementById('currentLangIso'));
