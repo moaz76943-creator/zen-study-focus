@@ -50,6 +50,7 @@ jobs:
           p.write_text(old.replace(a,'__TRACK10_NATIVE_DIALOG_STEP__').replace(b,a).replace('__TRACK10_NATIVE_DIALOG_STEP__',b))
           print('QA-only test ordering: real SAF first, native dialog still required and FAIL-CLOSED')
           PY
+          python3 tests/track10/qa_saf_overlay.py
           sha256sum tests/track08/* > "$RUNNER_TEMP/track10-android/qa-harness-file-hashes.txt"
           # All production source comes from THIS branch; older QA harness is test-only.
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
