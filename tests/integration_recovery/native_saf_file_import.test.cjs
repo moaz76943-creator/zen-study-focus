@@ -29,3 +29,17 @@ test('native import bounds bytes and delegates validation and consent to v21 ver
  assert.match(native,/verifyAndRestoreBackupCode/);
  assert.match(native,/existing data unchanged/);
 });
+
+
+test('native picker cancellation returns without mutating v21 records',()=>{
+ assert.match(native,/if\s*\(requestCode\s*==\s*REQUEST_BACKUP_IMPORT\)/);
+ assert.match(native,/backupImportPickerOpen\s*=\s*false;/);
+ assert.match(native,/resultCode\s*!=\s*Activity\.RESULT_OK\s*\|\|\s*data\s*==\s*null\s*\|\|\s*data\.getData\(\)\s*==\s*null\)\s*return;/);
+ assert.doesNotMatch(native,/getContentResolver\(\)\.openInputStream\([^)]*\)[\s\S]{0,40}\.toString\(\)/);
+});
+
+test('JavaScript importer delegates to the same user-confirmed v21 restore path',()=>{
+ assert.match(native,/JSONObject\.quote\(backupCode\)/);
+ assert.match(native,/verifyAndRestoreBackupCode/);
+ assert.doesNotMatch(native,/webView\.loadUrl\(\s*["']file:/);
+});
