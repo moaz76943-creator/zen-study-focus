@@ -86,7 +86,7 @@ jobs:
         run: |
           node --check tests/track08/qa_webview_startup_probe.cjs
           node --check tests/track08/native_js_dialog_android_probe.cjs
-          node --test tests/track08/qa_launch_contract.test.cjs tests/track08/qa_cdp_transport.test.cjs
+          node --test tests/track08/qa_launch_contract.test.cjs tests/track08/qa_cdp_transport.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs
       - name: Build separate QA debug APK
         working-directory: android
         run: gradle assembleDebug --no-daemon
