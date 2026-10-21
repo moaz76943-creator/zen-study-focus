@@ -15,6 +15,12 @@
   <script src="./studio.js" defer></script>
   <script src="./v3-core.js" defer></script>
   <script src="./v3-ui.js" defer></script>
+  <script src="./planner-core.js" defer></script>
+  <script src="./planner-ui.js" defer></script>
+  <script src="./repo-sync-core.js" defer></script>
+  <script src="./repo-sync-ui.js" defer></script>
+  <script src="./track15-core.js" defer></script>
+  <script src="./track15-ui.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#overview">تجاوز إلى المحتوى الرئيسي</a>
@@ -29,9 +35,12 @@
         <a href="#overview" class="active">◈ <span>نظرة عامة</span></a>
         <a href="#v3-workbench">⌕ <span>أدوات الإدارة السريعة</span></a>
         <a href="#risks">◇ <span>المخاطر والأعطال</span></a>
-        <a href="#tasks">▤ <span>المهام الـ161</span></a>
+        <a href="#tasks">▤ <span>سجل المهام التاريخي 161</span></a>
         <a href="#studio">▧ <span>محرر الشاشات</span></a>
+        <a href="#repo-sync">◎ <span>الربط الحي بالمستودع</span></a>
+        <a href="#track15">◉ <span>المراقبة الدقيقة · Track 15</span></a>
         <a href="#delivery">⇄ <span>GitHub والاختبارات</span></a>
+        <a href="#agent-planner">▣ <span>خطط عمل الوكلاء</span></a>
         <a href="#agent-studio">♧ <span>الوكلاء والأتمتة</span></a>
         <a href="#automation">⚡ <span>التحكم والأتمتة</span></a>
         <a href="#reports">▣ <span>تقارير التدقيق</span></a>
@@ -59,14 +68,14 @@
         <div>
           <span class="eyebrow">RECOVERY INTEGRATION TRACK</span>
           <h2>سلامة الإصدار قبل السرعة</h2>
-          <p>المصدر الافتراضي: PR #25. الفحوصات المصدرية لا تعني اكتمال الاختبار على جهاز Android.</p>
+          <p>المصدر التقليدي لهذا الملخص هو PR #25 (سجل تاريخي). راجع <a href="#track15">Track 15</a> للحصول على رأس PR #138 الحالي. الفحوصات المصدرية لا تعني اختبار Android.</p>
           <div class="head-links">
             <a target="_blank" rel="noopener noreferrer" href="https://github.com/moaz76943-creator/zen-study-focus/pull/25">طلب الدمج #25 ↗</a>
             <a target="_blank" rel="noopener noreferrer" href="https://github.com/moaz76943-creator/zen-study-focus/issues/13">خطة الإصلاح #13 ↗</a>
           </div>
         </div>
         <div class="head-meta">
-          <span>SHA المرجعي</span>
+          <span>SHA سجل PR #25 التاريخي</span>
           <strong id="head-sha" dir="ltr">لم يُجلب بعد</strong>
           <span>آخر مزامنة</span>
           <strong id="last-sync">—</strong>
@@ -79,7 +88,7 @@
           <span class="small-muted">الأرقام تتحدّث فقط عند توفر المصدر</span>
         </div>
         <div class="stat-grid">
-          <article class="metric"><span class="metric-icon blue">▦</span><span>مهام الاستعادة</span><strong id="stat-total">—</strong><small>من مصفوفة المهام الرسمية</small></article>
+          <article class="metric"><span class="metric-icon blue">▦</span><span>مهام الاستعادة (سجل PR #25)</span><strong id="stat-total">—</strong><small>من مصفوفة المهام الرسمية</small></article>
           <article class="metric"><span class="metric-icon rose">!</span><span>مهام محجوبة</span><strong id="stat-blocked">—</strong><small>تحتاج معالجة أو دليل قبول</small></article>
           <article class="metric"><span class="metric-icon mint">✓</span><span>مهام موسومة TESTED</span><strong id="stat-tested">—</strong><small>لا تعني نجاح اختبار الجهاز</small></article>
           <article class="metric"><span class="metric-icon violet">⇄</span><span>طلبات دمج مفتوحة</span><strong id="stat-prs">—</strong><small>من بيانات GitHub الحية</small></article>
@@ -134,6 +143,11 @@
             <div id="v3-risks" class="v3-results"></div>
             <label for="v3-snapshot-import">مقارنة مع نسخة سابقة من تقرير المشروع (JSON)</label>
             <input type="file" id="v3-snapshot-import" accept="application/json,.json">
+            <div class="v3-editor-actions" role="group" aria-label="البيانات المستوردة">
+              <button type="button" class="button secondary" id="v3-use-offline" disabled>عرض نسخة المستودع دون اتصال</button>
+              <button type="button" class="button secondary" id="v3-return-live" disabled>العودة للبيانات الحية</button>
+            </div>
+            <p id="v3-offline-state" class="v3-note" role="status" aria-live="polite">مصدر المعلومات: GitHub، أو نسخة ملف تختار عرضها يدويًا.</p>
             <p id="v3-snapshot-result" class="v3-note">لتوليد النسخة الحالية استخدم زر «تصدير حالة المشروع» في قسم الأتمتة، ثم قارنها بتقرير أقدم.</p>
           </article>
           <article class="panel v3-panel">
@@ -146,6 +160,12 @@
               <button type="button" class="button secondary" id="v3-redo">↷ إعادة</button>
               <button type="button" class="button secondary" id="v3-reset-screen">إعادة الشاشة المحددة</button>
             </div>
+            <div class="v3-editor-actions" role="group" aria-label="مسودة التصميم على هذا الجهاز">
+              <button class="button secondary" type="button" id="v3-draft-save">حفظ المسودة على الجهاز</button>
+              <button class="button secondary" type="button" id="v3-draft-restore">استعادة المسودة</button>
+              <button class="button secondary" type="button" id="v3-draft-clear">حذف المسودة المحلية</button>
+            </div>
+            <p id="v3-draft-status" class="v3-note" role="status" aria-live="polite">الحفظ محلي واختياري على هذا المتصفح فقط؛ لا تُحفظ رموز الدخول أو بيانات مستخدمي التطبيق.</p>
             <label for="v3-design-import">استيراد إعدادات التصميم المعتمدة (JSON)</label>
             <input id="v3-design-import" type="file" accept=".json,application/json">
             <h4>ما الذي تغيّر في التصميم؟</h4>
@@ -238,11 +258,108 @@
           <p id="studio-status" class="small-muted" role="status" aria-live="polite">جارٍ تحميل الإعدادات المعتمدة من المستودع…</p>
         </div>
       </section>
+      <section class="section" id="repo-sync" aria-labelledby="repo-sync-title">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">REPOSITORY LIVE HEALTH</span>
+            <h2 id="repo-sync-title">الربط الحي مع GitHub</h2>
+          </div>
+          <button type="button" class="button secondary" id="repo-sync-refresh">↻ فحص الفروع والاختبارات</button>
+        </div>
+        <div class="panel repo-sync-panel">
+          <p>متابعة مستقلة لرأس فرع التكامل، وقاعدة لوحة التحكم، وتشغيلات الاختبارات المرتبطة بنفس Commit. البيانات مقروءة من GitHub العام فقط؛ لا توجد صلاحيات كتابة أو رموز سرية في المتصفح.</p>
+          <p id="repo-sync-status" class="v3-note" role="status" aria-live="polite">لم تُفحص مراجع المستودع بعد.</p>
+          <div id="repo-sync-cards" class="repo-sync-grid" aria-label="حالة طلبات الدمج"></div>
+          <p id="repo-sync-drift" class="repo-sync-drift" role="status">لم تتوفر مقارنة بين رؤوس الفروع بعد.</p>
+          <div class="repo-sync-toolbar">
+            <strong>طابور مراجعة طلبات السحب</strong>
+            <div class="repo-review-controls">
+              <label for="repo-review-search">بحث في PRs</label>
+              <input id="repo-review-search" type="search" autocomplete="off" placeholder="رقم PR أو اسم الفرع" maxlength="120">
+              <label for="repo-review-filter">الحالة</label>
+              <select id="repo-review-filter">
+                <option value="all">الكل</option>
+                <option value="draft">المسودات</option>
+                <option value="ready">غير المسودات</option>
+              </select>
+            </div>
+          </div>
+          <p id="repo-review-state" role="status" class="v3-note">سيُعرض طابور المراجعة من بيانات GitHub العامة عند توفرها.</p>
+          <div id="repo-review-queue" class="repo-sync-list" aria-label="طلبات السحب المفتوحة والمراجعة"></div>
+          <div class="repo-sync-toolbar">
+            <strong>أحدث تشغيلات GitHub Actions</strong>
+            <a href="https://github.com/moaz76943-creator/zen-study-focus/actions" target="_blank" rel="noopener noreferrer">جميع التشغيلات ↗</a>
+          </div>
+          <div id="repo-sync-workflows" class="repo-sync-list"><p>جارٍ جلب التشغيلات…</p></div>
+          <p class="safety-note">PASS يعني نجاح تشغيل CI محدد، وليس اجتياز Android الحقيقي أو موافقة إصدار Play. لا يتم الدمج أو تشغيل الأوامر من هذه اللوحة.</p>
+        </div>
+      </section>
+      <section class="section" id="track15" aria-labelledby="track15-title">
+        <div class="section-heading">
+          <div><span class="section-kicker">TRACK 15 · SOURCE-PINNED READ-ONLY</span>
+            <h2 id="track15-title">مراقبة مرشح التكامل الحالي</h2></div>
+          <button id="track15-refresh" type="button" class="button secondary">↻ تحديث الأدلة العامة</button>
+        </div>
+        <div class="panel track15-panel">
+          <p id="track15-status" class="v3-note" role="status" aria-live="polite">NOT_TESTED · لم يحدث اتصال بعد.</p>
+          <p class="small-muted">تعرض هذه المنطقة بيانات GitHub العامة فقط. LIVE يعني نجاح قراءة الحقول المتاحة في هذه الجلسة، ولا يعني موافقة Android أو نجاح اختبارات مفقودة. عند فشل الشبكة أو تغير SHA تظهر NOT_TESTED/STALE صراحة.</p>
+          <h3>رؤوس PR #37 ومرشح #138</h3>
+          <div id="track15-candidates" class="track15-grid" aria-label="رؤوس الطلبات"></div>
+          <h3>Issues الحالية</h3>
+          <div id="track15-issues" class="track15-grid" aria-label="تذاكر الجودة"></div>
+          <h3>GitHub CI على SHA #138</h3>
+          <div id="track15-jobs" class="track15-grid" aria-label="فحوصات Node Python Chromium Android"></div>
+          <h3>Artifacts / APK / AAB</h3>
+          <div id="track15-artifacts" class="track15-grid" aria-label="ملفات التشغيل وبصمات الأرشيف"></div>
+          <h3>وكلاء QA الإثنا عشر</h3>
+          <div id="track15-agents" class="track15-grid" aria-label="حالة الوكلاء ودليل SHA"></div>
+          <details class="track15-locales-details">
+            <summary>فجوات الترجمة حسب اللغة (20 لغة أصلية)</summary>
+            <p class="small-muted">العدد NOT_TESTED يعني عدم وجود تقرير فجوات موثق على نفس SHA؛ لا يعني صفر فجوات. الأعداد التاريخية لا تُعاد تسميتها Live.</p>
+            <div id="track15-locales" class="track15-grid" aria-label="فجوات كل لغة"></div>
+          </details>
+          <h3>بوابات الترجمة والصوت والأمان</h3>
+          <div id="track15-gates" class="track15-grid" aria-label="العناصر التي تحتاج دليلًا"></div>
+          <p class="small-muted">فلاتر المهام والبحث والفرز متوفرة في <a href="#v3-workbench">مساحة الإدارة</a>. لا أوامر دمج ولا أسرار أو Token ولا تغيير لبيانات v21.</p>
+        </div>
+      </section>
       <section class="section" id="delivery" aria-labelledby="delivery-title">
         <div class="section-heading"><div><span class="section-kicker">DELIVERY PIPELINE</span><h2 id="delivery-title">طلبات الدمج والفحوصات</h2></div></div>
         <div class="two-columns">
           <article class="panel inner-panel"><h3>حالة فحوصات SHA المرجعي</h3><div id="ci-list" class="compact-list"><div class="empty">جارٍ جلب تشغيلات Actions…</div></div></article>
           <article class="panel inner-panel"><h3>طلبات الدمج المفتوحة</h3><div id="pr-list" class="compact-list"><div class="empty">جارٍ جلب الطلبات…</div></div></article>
+        </div>
+      </section>
+      <section class="section" id="agent-planner" aria-labelledby="planner-title">
+        <div class="section-heading">
+          <div><span class="section-kicker">AGENT TASK PLANNER</span><h2 id="planner-title">تجميع مهام الإصلاح وإرسالها للوكلاء</h2></div>
+          <span class="tag">بحد أقصى 6 مهام</span>
+        </div>
+        <div class="panel v3-panel">
+          <p class="studio-intro">اختر المهام الحقيقية من سجل الاستعادة، واجمعها في تكليف واحد محدد النطاق مع اختبارات القبول. يمكنك نسخ التكليف إلى Codex أو Gemini أو تنزيله، ولا يبدأ أي وكيل بالعمل بمجرد الضغط على زر النسخ أو فتح GitHub.</p>
+          <p id="planner-source-status" class="v3-note" role="status" aria-live="polite">جارٍ جلب سجل المهام…</p>
+          <div class="v3-fields">
+            <div><label for="planner-search">ابحث برقم المهمة أو نصها</label><input id="planner-search" type="search" placeholder="DF-014 أو الملاحظات" autocomplete="off"></div>
+            <div><label for="planner-area">مجال المهام</label><select id="planner-area"><option value="ALL">جميع المجالات</option></select></div>
+            <div><label for="planner-status-filter">حالة المهمة</label><select id="planner-status-filter"><option value="actionable">تحتاج إلى العمل</option><option value="blocked">محجوبة</option><option value="all">جميع الحالات</option></select></div>
+            <div><label for="planner-lane">تخصص الوكيل</label><select id="planner-lane"><option value="qa">اختبارات ومراجعة QA</option><option value="ui">واجهات وتفاعل</option><option value="audio">أصوات وتراخيص</option><option value="locale">لغات وتعريب</option><option value="analytics">تحليلات</option><option value="data">حماية البيانات</option></select></div>
+            <div><label for="planner-screen">الشاشة المستهدفة</label><select id="planner-screen"><option value="timer">المؤقت</option><option value="tasks">المهام</option><option value="calendar">التقويم</option><option value="notes">الملاحظات</option><option value="sounds">الأصوات</option><option value="analytics">التحليلات</option></select></div>
+          </div>
+          <div class="studio-actions">
+            <button id="planner-recommend" type="button" class="button secondary">اقتراح دفعة من المهام المفتوحة</button>
+            <button id="planner-clear" type="button" class="button secondary">تفريغ الاختيار</button>
+            <span id="planner-count" class="small-muted" aria-live="polite">0 / 6 مهام مختارة</span>
+          </div>
+          <div id="planner-task-list" class="planner-list" aria-label="مهام الاستعادة القابلة للاختيار"></div>
+          <div class="studio-actions"><button id="planner-show-more" type="button" class="button secondary">عرض مزيد من المهام</button></div>
+          <label for="planner-preview" class="planner-label">معاينة تكليف الوكيل (قابل للنسخ)</label>
+          <textarea id="planner-preview" readonly rows="10" spellcheck="false" class="planner-preview" aria-label="التكليف الذي سيُرسَل إلى الوكيل"></textarea>
+          <div class="studio-actions">
+            <button id="planner-copy" type="button" class="button secondary">نسخ تكليف Codex/Gemini</button>
+            <button id="planner-download" type="button" class="button secondary">تنزيل ملف Markdown</button>
+            <a id="planner-issue" href="#agent-planner" class="button primary" aria-disabled="true">إنشاء مسودة Issue للمراجعة ↗</a>
+          </div>
+          <p id="planner-feedback" class="v3-note" role="status" aria-live="polite">اختر مهمة واحدة على الأقل. فتح Issue يتطلب حالة GitHub حيّة مؤكدة، ولا يبدأ أي وكيل تلقائيًا.</p>
         </div>
       </section>
       <section class="section" id="agent-studio" aria-labelledby="agent-title">
@@ -274,6 +391,7 @@
           <a class="action-card" href="https://github.com/moaz76943-creator/zen-study-focus/issues/13" target="_blank" rel="noopener noreferrer"><span>☷</span><strong>خطة الـ161 مهمة</strong><small>مراجعة المصدر الأصلي للمهام وربط العوائق بالأدلة.</small><em>فتح Issue ↗</em></a>
           <button class="action-card" type="button" id="copy-prompt"><span>▣</span><strong>تجهيز أمر إصلاح لـGemini</strong><small>نسخ عوائق مُحددة مع SHA وقواعد حماية البيانات.</small><em>نسخ التعليمات ↗</em></button>
           <button class="action-card" type="button" id="export-data"><span>⇩</span><strong>تصدير حالة المشروع</strong><small>ملف JSON يوضح مصدر الأرقام وحالة المهام ونتائج الفحص المتاحة.</small><em>تنزيل التقرير ↗</em></button>
+          <a class="action-card" href="https://deep-focus-control-center-pv5p5k.v2.appdeploy.ai/" target="_blank" rel="noopener noreferrer"><span>▧</span><strong>فتح لوحة التحكم على الهاتف</strong><small>رابط HTTPS مباشر، بلا تنزيل ZIP. يعرض البيانات العامة من GitHub ويحافظ على سجل المهام المضمّن عند انقطاع الاتصال.</small><em>فتح لوحة التحكم ↗</em></a>
           <a class="action-card" href="https://github.com/moaz76943-creator/zen-study-focus/pull/25" target="_blank" rel="noopener noreferrer"><span>⊞</span><strong>مراجعة الدمج الآمن</strong><small>افتح PR #25، دون دمج تلقائي أو فرض تحديثات للفروع.</small><em>مراجعة GitHub ↗</em></a>
         </div>
         <p class="safety-note">لا تستخدم اللوحة رمز وصول GitHub، ولا ترسل عمليات كتابة مباشرة. إجراءات التشغيل والدمج الحساسة تتم داخل GitHub بعد المراجعة البشرية.</p>

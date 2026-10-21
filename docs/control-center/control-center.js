@@ -11,8 +11,55 @@
   const ISSUE = 'https://github.com/' + REPO + '/issues/13';
   const SOURCE_FILE = '/docs/recovery_integration/FINAL_MATRIX_161.md';
   const STATUSES = ['BLOCKED','IN_PROGRESS','TODO','TESTED','DEFERRED'];
-  let state = {tasks:[], prs:null, runs:null, head:null, sync:null, audit:null, errors:[], visible:25};
+  let state = {tasks:[], prs:null, runs:null, head:null, sync:null, audit:null, errors:[], stale:false, visible:25};
 
+  function reconcileRefresh(previous,candidate){
+    const incoming=candidate||{},errors=Array.isArray(incoming.errors)?incoming.errors.slice():[];
+    const validSha=x=>typeof x==='string'&&/^[0-9a-f]{40}$/i.test(x);
+    if(!validSha(incoming.head)){
+      return {...previous,stale:true,errors:errors.length?errors:['GitHub reference unavailable']};
+    }
+    const sameHead=previous.head===incoming.head;
+    const hasLedger=Array.isArray(incoming.tasks)&&incoming.tasks.length>0;
+    if(Array.isArray(incoming.tasks)&&incoming.tasks.length===0)errors.push('Recovery ledger is empty; source not verified');
+    const tasks=hasLedger?incoming.tasks:(sameHead?previous.tasks:[]);
+    const prs=Array.isArray(incoming.prs)?incoming.prs:previous.prs;
+    const runs=Array.isArray(incoming.runs)?incoming.runs:(sameHead?previous.runs:null);
+    const stale=!hasLedger||!Array.isArray(incoming.prs)||!Array.isArray(incoming.runs)||errors.length>0;
+    return {...previous,head:incoming.head,tasks,prs,runs,
+      sync:hasLedger?incoming.at||null:(sameHead?previous.sync:null),
+      stale,errors};
+  }
+  function parseStaticLedger(raw){
+    if(typeof raw!=='string'||raw.length>110000)throw Error('Oversized static ledger');
+    const value=JSON.parse(raw);
+    if(!value||value.schema_version!==1||value.provenance!=='CHECKOUT_STATIC_SOURCE'||
+      !Array.isArray(value.tasks)||value.tasks.length!==161)
+      throw Error('Invalid embedded source snapshot');
+    const seen=new Set();
+    const tasks=value.tasks.map(item=>{
+      if(!item||!/^DF-\d{3}$/.test(item.id)||!STATUSES.includes(item.status)||
+        typeof item.title!=='string'||item.title.length>1000||
+        typeof item.area!=='string'||item.area.length>100||
+        typeof item.evidence!=='string'||item.evidence.length>1600||seen.has(item.id))
+        throw Error('Invalid embedded ledger task');
+      seen.add(item.id);
+      return {id:item.id,status:item.status,title:item.title.replace(/<[^>]*>/g,''),
+        area:item.area,evidence:item.evidence};
+    });
+    return tasks;
+  }
+  function seedStaticLedger(){
+    const source=document.getElementById('control-center-embedded-ledger');
+    if(!source)return;
+    try{
+      state.tasks=parseStaticLedger(source.textContent||'');
+      state.stale=true;
+      state.errors=['لقطة ثابتة من المستودع؛ لم يتم تأكيد البيانات الحية بعد'];
+      byId('connection').textContent='لقطة مصدر ثابتة · تحقق من GitHub للتحديث';
+      fillAreas();renderMetrics();renderRisks();renderTasks();
+    }catch(e){byId('connection').textContent='تعذر قراءة لقطة المصدر: '+e.message;}
+  }
   function parseTasks(markdown) {
     const seen = new Set(), tasks = [];
     for (const line of String(markdown || '').split(/\r?\n/)) {
@@ -182,30 +229,35 @@
     replace(byId('pr-list'),items.length?items:[node('div','empty','لا توجد طلبات دمج مفتوحة أو تعذّر تحميل القائمة.')]);
   }
   async function refresh() {
-    const btn=byId('refresh');btn.disabled=true;byId('connection').textContent='جاري تحديث البيانات...';
-    state.tasks=[];state.prs=null;state.runs=null;state.head=null;state.sync=null;
-    const errors=[];
-    try {
+    const button=byId('refresh');
+    if(button.disabled)return;
+    button.disabled=true;
+    byId('connection').textContent='جارٍ تحديث بيانات GitHub…';
+    const candidate={head:null,tasks:null,prs:null,runs:null,errors:[],at:new Date().toISOString()};
+    try{
       const pr=await getJSON('/pulls/25');
-      const sha=pr.head&&pr.head.sha;
-      if(!/^[0-9a-f]{40}$/i.test(sha||''))throw Error('PR #25 head SHA is unavailable');
-      state.head=sha;
-      const results=await Promise.allSettled([
-        getLedger(sha),getJSON('/pulls?state=open&per_page=100'),getJSON('/actions/runs?head_sha='+sha+'&per_page=30')
+      if(!/^[0-9a-f]{40}$/i.test(pr.head?.sha||''))throw Error('PR #25 head SHA is unavailable');
+      candidate.head=pr.head.sha;
+      const outcome=await Promise.allSettled([
+        getLedger(candidate.head),getJSON('/pulls?state=open&per_page=100'),
+        getJSON('/actions/runs?head_sha='+candidate.head+'&per_page=30')
       ]);
-      const names=['Recovery ledger','Open pull requests','GitHub Actions'];
-      for(let i=0;i<results.length;i++){
-        const r=results[i];
-        if(r.status==='rejected'){errors.push(names[i]+': '+r.reason.message);continue;}
-        if(i===0)state.tasks=r.value;
-        if(i===1)state.prs=r.value;
-        if(i===2)state.runs=r.value.workflow_runs||[];
+      const labels=['Recovery ledger','Open pull requests','GitHub Actions'];
+      for(let i=0;i<outcome.length;i++){
+        const item=outcome[i];
+        if(item.status==='rejected'){
+          candidate.errors.push(labels[i]+': '+String(item.reason?.message||item.reason));continue;
+        }
+        if(i===0)candidate.tasks=item.value;
+        else if(i===1)candidate.prs=item.value;
+        else candidate.runs=item.value.workflow_runs||[];
       }
-      state.sync=new Date().toISOString();
-    } catch(e) {errors.push('PR #25: '+e.message);}
-    state.errors=errors;
-    byId('connection').textContent=errors.length?('بيانات جزئية · '+errors.join(' | ')):'متصل · آخر بيانات GitHub المتاحة';
-    btn.disabled=false;
+    }catch(e){candidate.errors.push('PR #25: '+e.message);}
+    state=reconcileRefresh(state,candidate);
+    byId('connection').textContent=state.stale?
+      ('بيانات محفوظة/جزئية — ليست بثًا حيًا · '+state.errors.join(' | ')):
+      'متصل · مصدر GitHub متحقق عند آخر مزامنة';
+    button.disabled=false;
     fillAreas();renderMetrics();renderRisks();renderTasks();renderRuns();renderPRs();
     document.dispatchEvent(new CustomEvent('df:project-refreshed'));
   }
@@ -225,7 +277,7 @@
     const data={
       schema_version:1,source:'GitHub public API and PR #25 recovery ledger',
       exported_at:new Date().toISOString(),inspected_ref:state.head,
-      partial_sources:state.errors,device_qa:'NOT_TESTED',
+      partial_sources:state.errors,source_stale:state.stale,device_qa:'NOT_TESTED',
       tasks:state.tasks, prs:(state.prs||[]).map(p=>({number:p.number,title:p.title,html_url:p.html_url,draft:p.draft})),
       workflows:(state.runs||[]).map(r=>({id:r.id,name:r.name,status:r.status,conclusion:r.conclusion,head_sha:r.head_sha,html_url:r.html_url})),
       imported_audit:state.audit
@@ -259,6 +311,7 @@
   }
   function boot() {
     byId('refresh').addEventListener('click',refresh);
+    seedStaticLedger();
     for(const id of ['search','status-filter','area-filter'])byId(id).addEventListener(
       id==='search'?'input':'change',()=>{state.visible=25;renderTasks();});
     byId('show-more').addEventListener('click',()=>{state.visible+=25;renderTasks();});
@@ -270,7 +323,7 @@
   function getSnapshot(){
     return JSON.parse(JSON.stringify({schema_version:1,inspected_ref:state.head,tasks:state.tasks,
       prs:state.prs||[],runs:state.runs||[],findings:state.audit?.findings||[],
-      audit:state.audit,sync:state.sync,errors:state.errors}));
+      audit:state.audit,sync:state.sync,errors:state.errors,stale:state.stale}));
   }
-  return {boot,parseTasks,countTasks,filterTasks,repairPrompt,shortSHA,getSnapshot};
+  return {boot,parseTasks,countTasks,filterTasks,repairPrompt,shortSHA,getSnapshot,reconcileRefresh,parseStaticLedger};
 });

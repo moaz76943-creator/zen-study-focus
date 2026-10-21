@@ -48,3 +48,80 @@
 @media(max-width:760px){.v3-toolbar{padding:13px}.v3-panel{padding:13px}.v3-fields{gap:8px}.v3-panel-heading small{line-height:1.7}}
 @media(max-width:360px){.v3-fields{grid-template-columns:1fr}.v3-editor-actions{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.v3-area-fill{transition:none}}
+
+/* Agent Planner: private local selection, source-backed task brief staging. */
+.planner-list{display:grid;gap:8px;max-height:365px;overflow:auto;padding:4px 2px;margin-top:15px;scrollbar-width:thin}
+.planner-task{display:flex;gap:10px;align-items:flex-start;border:1px solid #dce8f6;border-radius:13px;padding:11px;background:#fbfdff;min-width:0}
+.planner-task.selected{background:#eef7ff;border-color:#64a4dc}
+.planner-task-main{flex:1;min-width:0}
+.planner-task-main strong{font-size:12px;color:#244a76;direction:ltr;display:block;text-align:start}
+.planner-task-main small{display:block;color:#7089a5;font-size:10px;margin-block:4px}
+.planner-task-main p{font-size:11px;line-height:1.6;color:#395575;overflow-wrap:anywhere;margin:3px 0}
+.planner-task button{min-height:36px;flex:none;border:1px solid #b8d0eb;border-radius:9px;padding:7px 12px;background:white;color:#266cb8;font-weight:750;font-size:11px}
+.planner-task button[aria-pressed=true]{background:#2267c3;color:white;border-color:#2267c3}
+.planner-task button:disabled{opacity:.45}
+.planner-label{display:block;margin:16px 0 7px;font-size:12px;font-weight:750;color:#315271}
+.planner-preview{display:block;width:100%;box-sizing:border-box;min-height:190px;resize:vertical;border:1px solid #d8e5f4;border-radius:13px;padding:14px;font:11px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;direction:ltr;text-align:left;background:#f8fbff;color:#28466b}
+#planner-count{white-space:nowrap;font-weight:750}
+#planner-feedback{margin-top:12px}
+#planner-issue[aria-disabled=true]{opacity:.5;pointer-events:auto;cursor:not-allowed}
+#planner-search{width:100%}
+@media(max-width:760px){.planner-task{gap:7px;padding:9px}.planner-task button{padding:7px 9px}.planner-preview{font-size:10px}}
+
+/* Public GitHub exact-head diagnostics; read-only and accessible on small phones. */
+.repo-sync-panel{display:grid;gap:12px}
+.repo-sync-panel>p{margin:0;line-height:1.75}
+.repo-sync-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.repo-sync-card{background:#f7faff;border:1px solid #d7e6f8;border-radius:14px;padding:15px;display:grid;gap:8px;min-width:0}
+.repo-sync-card strong{color:#193c65;font-size:14px}
+.repo-sync-card small{font:12px/1.5 ui-monospace,monospace;color:#57718e;direction:ltr;text-align:start;overflow-wrap:anywhere}
+.repo-sync-actions{display:flex;gap:8px;flex-wrap:wrap}
+.repo-sync-link{color:#2267c3;font-weight:750;font-size:12px;text-decoration:underline;text-underline-offset:3px}
+.repo-sync-chip{display:inline-block;padding:4px 9px;width:max-content;border-radius:99px;background:#e8edf3;color:#3c5870;font-size:11px;font-weight:800;direction:ltr}
+.repo-sync-chip.status-pass{background:#e0f5e9;color:#136139}
+.repo-sync-chip.status-fail{background:#ffe5e5;color:#ac2431}
+.repo-sync-chip.status-running{background:#fff0d0;color:#835400}
+.repo-sync-drift{border-radius:12px;background:#eaf3fc;border:1px solid #bfd8f4;color:#1f507f;padding:12px;font-size:12px;font-weight:700}
+.repo-sync-drift.repo-sync-warning{background:#fff1e5;color:#8b440e;border-color:#ffd2a0}
+.repo-sync-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.repo-sync-toolbar a{font-size:12px}
+.repo-sync-list{max-height:460px;overflow:auto;display:grid;gap:7px}
+.repo-sync-run{padding:12px;border:1px solid #e0e9f5;border-radius:11px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff}
+.repo-sync-run>div{min-width:0;flex:1}
+.repo-sync-run strong{display:block;color:#2e5075;font-size:12px;overflow-wrap:anywhere}
+.repo-sync-run small{display:block;direction:ltr;text-align:start;color:#6b8198;overflow-wrap:anywhere;font-size:11px}
+@media(max-width:740px){.repo-sync-grid{grid-template-columns:1fr}.repo-sync-run{flex-wrap:wrap}.repo-sync-card{padding:12px}}
+
+/* GitHub read-only PR review queue. All remote text is inserted as textContent. */
+.repo-review-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.repo-review-controls label{margin:0;color:#516d88;font-size:11px}
+.repo-review-controls input,.repo-review-controls select{border:1px solid #cbdcf0;border-radius:9px;padding:8px;background:#fff;color:#294969;max-width:100%}
+.repo-review-controls input{max-width:190px;min-width:0}
+.repo-review-card{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;border:1px solid #dbe8f5;border-radius:11px;background:#fff;padding:12px}
+.repo-review-main{flex:1;min-width:180px}
+.repo-review-main strong{display:block;color:#244b76;font-size:12px;overflow-wrap:anywhere}
+.repo-review-main small{display:block;color:#7186a1;font-size:11px;direction:ltr;text-align:start;overflow-wrap:anywhere}
+.repo-sync-chip.status-partial{background:#fdf1d6;color:#895700}
+@media(max-width:600px){.repo-review-controls{width:100%}.repo-review-controls input{flex:1 1 115px}.repo-review-card{align-items:flex-start}}
+
+/* Track 15: narrow phone cards, no horizontal overflow or touch-overlap. */
+.track15-panel{display:grid;gap:10px;min-width:0}
+.track15-panel h3{font-size:13px;margin:12px 0 0;color:#21466c}
+.track15-panel>p{margin:0;overflow-wrap:anywhere}
+.track15-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;min-width:0}
+.track15-item{display:grid;align-content:start;gap:7px;padding:12px;border:1px solid #dce8f5;border-radius:12px;background:#fafcff;min-width:0;overflow-wrap:anywhere}
+.track15-item strong{font-size:12px;color:#1b446d}
+.track15-item small{font-size:11px;line-height:1.5;color:#4f6780;white-space:normal;overflow-wrap:anywhere}
+.track15-item a{font-size:12px;min-height:44px;display:inline-flex;align-items:center;max-width:max-content;color:#165db0;text-decoration:underline}
+#track15-status[data-quality="STALE"],#track15-status[data-quality="RATE_LIMITED"],#track15-status[data-quality="PARTIAL"]{background:#fff3e4;color:#744715}
+@media(max-width:740px){.track15-grid{grid-template-columns:1fr}.track15-item{padding:11px}}
+@media(max-width:360px){#track15-refresh{width:100%;min-height:44px}}
+
+.track15-locales-details{border:1px solid #dce8f5;border-radius:12px;padding:12px;min-width:0}
+.track15-locales-details summary{font-size:13px;font-weight:750;cursor:pointer;min-height:44px;display:list-item;list-style-position:inside;color:#1b446d}
+.track15-locales-details p{padding:5px 0}
+.track15-locales-details .track15-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1000px){.track15-locales-details .track15-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.track15-locales-details .track15-grid{grid-template-columns:1fr}}
+
+#track15-refresh{min-height:44px;min-width:44px;touch-action:manipulation}

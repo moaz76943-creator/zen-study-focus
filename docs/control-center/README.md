@@ -80,3 +80,196 @@ The separate control_center_agents.yml workflow exposes only the allowlisted lan
 Testing includes studio.test.cjs (schema validation, injection attempts, scoped handoffs) and studio_integration.test.cjs (verified selectors, app CSS link, deterministic generation and workflow security checks). CI checks the JSON-to-CSS parity before recording success.
 
 Review every diff and run Android/device tests before merging changes into a production app; source test PASS is not an Android sign-off.
+
+
+## Control Center v3 — 20 additional working tools
+
+Version 3 extends the same PR #37; it does not create a second competing dashboard.
+
+| ID | Tool | Action and limitation |
+|---|---|---|
+| F01 | Unified search | Search loaded recovery tasks, PRs, workflow runs and imported source findings. |
+| F02 | Command shortcut | Ctrl+K (or Command+K) focuses search; Escape closes results. |
+| F03 | Task quick views | Blocked, actionable, ledger-tested, or all. |
+| F04 | Task sorting | By urgency/status, ID ascending/descending, or subsystem. |
+| F05 | Tasks CSV | Download filtered tasks with spreadsheet-formula protection. |
+| F06 | Area backlog | See blockers and totals per source subsystem. |
+| F07 | Release checklist | Display five gates requiring real evidence; never auto-approve. |
+| F08 | CI trend | Show verified source-run success percentage, excluding pending from denominator. |
+| F09 | Failed-run links | Open only recorded failing GitHub Actions runs. |
+| F10 | Stale PR detection | Indicate pull requests not updated for 14 days. |
+| F11 | PR filter | Draft/ready filtering and text search. |
+| F12 | Risk severity filter | Critical, warning, info, or all from imported QA. |
+| F13 | SHA freshness | Warn when imported health.json is from a different commit than PR #25. |
+| F14 | Snapshot comparison | Compare a prior exported project JSON against current recovery task IDs/status. |
+| F15 | Theme presets | Apply one of four cosmetic palettes to the staged preview. |
+| F16 | Undo | Undo staged design changes, retaining a bounded 40-step history. |
+| F17 | Redo | Re-apply undone staged changes, with fork-safe history. |
+| F18 | Screen-only reset | Reset only the selected screen's appearance, not the whole design. |
+| F19 | Safe JSON import | Import allowlisted design-config.json; reject extraneous fields, oversized data and malformed values. |
+| F20 | Change diff | View exact theme/screen property differences from the baseline before opening a review request. |
+
+The source-of-truth machine-readable list is feature-manifest-v3.json. Implementation lives in v3-core.js (pure/testable logic) and v3-ui.js (accessible interaction); responsive layout in v3.css. V3 reads a **copy** of the existing public project state and modifies design settings **only in the local browser preview**. It never modifies Android user data, creates remote branches or merges PRs directly.
+
+### Workbench usage from Android phone
+
+1. Open the dashboard's HTTPS page after hosting is enabled, or serve docs/control-center/ over a trusted local HTTP server.
+2. Use "مساحة إدارة المشروع" for cross-repo search and filtered CSV. Click the source task/PR/run link to open evidence.
+3. Export a project state snapshot from the existing actions area, then re-import an older one for status comparisons. No upload happens.
+4. Choose a theme palette and adjust one screen at a time. Undo or redo any staged change; inspect the exact configuration diff.
+5. Export design-config.json and the generated CSS from the original screen editor or open the owner-reviewable GitHub issue. **Nothing changes in the installed APK** until a reviewed code change is built and installed.
+
+### Check, test, and security assumptions
+
+    node --test tests/control_center/*.test.cjs
+    node --check docs/control-center/v3-core.js
+    node --check docs/control-center/v3-ui.js
+    node tools/control_center/generate_style.cjs --check
+
+V3 tests cover all F01–F20 behavioral contracts, bound/invalid input cases, HTML contract and mobile CSS presence, plus simulated DOM interactions (NOT a physical browser/Android WebView). The existing GitHub Actions audit workflow runs these suites and publishes explicit PASS/FAIL and NOT_TESTED status. A successful source run is not proof of production device QA or user backup restoration.
+
+**Limits:** Only listed cosmetic properties can be changed through the no-code design controls. Modifying behavior of an arbitrary Android screen still requires a scoped agent request/PR and code review; arbitrary code execution from the dashboard is prohibited. The control panel is not automatically available at a web URL until GitHub Pages has been set up and source changes have been reviewed and merged into the proper branch.
+
+## Reliability and mobile-use hardening
+
+This follow-up closes concrete gaps in v3 without merging PR #37 or modifying the runtime storage model.
+
+### QA automation paths verified
+
+- The previously broken UI agent wildcard tests/design_quality/*.cjs now points to real tests/white_premium_qa/*.test.cjs, alongside tests/interaction_recovery/*.test.cjs.
+- Agent handoffs for Timer and Calendar now cite actual test suites instead of nonexistent folders.
+- qa_lane_integrity.test.cjs checks every screen file, all referenced screen test directories and every test file/wildcard used in the QA workflow. This is CI-enforced to catch future dead links before invocation.
+
+### Offline/rate-limit resilience
+
+- If public GitHub API queries fail, the dashboard retains last-known verified results for the SAME source SHA and labels them stale/partial. A newer SHA never inherits old task counts.
+- Empty recovery ledgers are not treated as a fresh zero-defect report.
+- Exported reports explicitly carry source_stale alongside SHA and partial-source errors.
+- The risk/snapshot panel now lets the user import a prior exported project JSON, view the imported tasks, PRs and CI in clearly labeled LOCAL (NOT LIVE) mode, then explicitly return to live GitHub data.
+- Imported snapshots are schema-limited, reject invalid task statuses, foreign URLs, duplicate IDs and oversized text. Bundled audit reports from such files are NOT elevated to trusted release or QA evidence.
+
+### Recover staged visual changes on the phone
+
+- Save, Restore and Delete browser draft controls are explicit opt-in, not automatic. A browser may deny local storage; the page reports that error and JSON export remains available.
+- Only the allowlisted appearance config, its baseline and a timestamp are kept under the separate developer-dashboard browser key: df_control_center_design_draft_v1.
+- The restore path checks version, size, all settings and baseline identity. When default settings change, an older draft is rejected rather than overriding upstream changes.
+- The saved draft contains no auth tokens, app notes, user tasks or Android v21 storage values.
+- Deleting a local draft does not delete application content or the currently previewed design.
+
+### Verification
+
+Run node --test tests/control_center/*.test.cjs, node tools/control_center/generate_style.cjs --check and node --check docs/control-center/v3-ui.js. CI also runs the static repository audit, which does not replace on-device Android QA, media license checking or owner release approval.
+
+PR #37 is still a stacked draft on recovery PR #25. GitHub Pages hosting and default-branch issue/dispatch automation remain unconfirmed until review/merge.
+
+## Mobile portable preview: no GitHub Pages server needed
+
+Every successful Control Center Quality Audit run now generates a second artifact named **deep-focus-control-center-mobile**. The artifact contains one `deep-focus-control-center-mobile.html` file, including all five dashboard JavaScript modules, both stylesheets, the validated appearance JSON and a static snapshot of the actual 161-item recovery ledger from the workflow checkout.
+
+### Open the preview on an Android phone
+
+1. In GitHub, open PR #37 > Checks > a successful **Deep Focus Control Center Quality Audit** run.
+2. Open the Artifacts section and download **deep-focus-control-center-mobile**. Extract the ZIP on your phone.
+3. Open `deep-focus-control-center-mobile.html` in Chrome or another browser that supports local HTML files. Android file apps/browser versions vary in their support for file URLs, downloads, and localStorage; no external web hosting is required for the built-in editor.
+4. The first visible 161-task ledger is stamped **CHECKOUT_STATIC_SOURCE / stale**, not a live verification. If the browser can connect to the public GitHub API, refreshing replaces it with the current PR #25 source. If requests are denied, the static ledger remains labeled as such.
+5. For design adjustments use Screen Studio; download the resulting JSON/CSS or create a review issue. These changes are local to the preview until a reviewed PR changes the source and an APK is rebuilt.
+
+### Portable security and reproducibility
+
+- Build: `node tools/control_center/build_portable.cjs --output dist/deep-focus-control-center-mobile.html`.
+- Verify: `node tools/control_center/build_portable.cjs --check dist/deep-focus-control-center-mobile.html`.
+- The bundle is assembled from allowlisted local CSS/JS only. All executable inline scripts and styles are pinned to individual SHA-256 Content Security Policy hashes: **no unsafe-inline, unsafe-eval, remote JS, personal access tokens, or write permissions**.
+- A dedicated non-executable JSON block provides the checked-in visual baseline when `file://` prevents reading `./design-config.json`.
+- Another non-executable JSON block contains only public task ledger data and strict offline source provenance. User notes, history, private credentials, media files, and Android storage are not included.
+- The CI smoke check opens this exact file in a **real desktop headless Chrome browser** and confirms the task DOM and visual editor initialize; it reports `NOT_TESTED` when Chrome is unavailable, never a fabricated PASS. Desktop Chrome is not Android WebView, phone touch testing or a Play release sign-off.
+- GitHub Actions artifacts are temporary (14-day retention). Build is reproducible from the source files; run it again to obtain a new portable artifact.
+
+### Known limits
+
+Live GitHub API and raw files still require an internet connection and may fail due to rate limits or browser file-origin restrictions. The static bundled ledger is a snapshot, not a substitute for a current audit. A linked GitHub Issue or Actions workflow still requires authorization in GitHub; the portable dashboard does not directly execute code patches, commit code, merge PRs or ship APKs.
+
+## V3.3 — Agent batch planner / handoff from 161 real recovery tasks
+
+The mobile dashboard now exposes **خطط عمل الوكلاء** as a separate workspace. It is an agent task composer, NOT an autonomous agent executor.
+
+- Select tasks directly from the actual `FINAL_MATRIX_161.md` record, search by ID/area/text, filter blocked/actionable/all and restrict the maximum batch to **six tasks**.
+- For safety, each batch contains tasks from ONE recovery subsystem only; the UI disables unrelated areas and rejects mixed-area plans (even in QA mode). If no area is selected, suggestions use the first actionable area's pending tasks.
+- Use **اقتراح دفعة** to assemble up to four unfinished tasks from the selected area, or manually select up to six. Choose a specific lane (`qa`, `ui`, `audio`, `locale`, `analytics`, `data`) and target one of the six app screens.
+- Preview a deterministic Markdown handoff with exact task IDs, original quoted source wording, current/source SHA classification, reproduction and acceptance gates. It retains v21 storage and `ZEN21::` protection, 20 locales, Western generated numerals, media provenance, human PR review and accurate NOT_TESTED.
+- Copy the prompt to a connected Codex/Gemini worker, or **download Markdown**. These actions are entirely local; nothing was executed or pushed by clicking them.
+- For a fully verified live GitHub ledger, the **Issue** control opens a prefilled NEW GitHub issue page for the repository owner to review and submit. No issue is created merely by displaying the link, and opening/submitting an issue alone does not necessarily execute an AI worker.
+- For an offline embedded 161-task snapshot, partial GitHub API response, stale SHA, oversized issue URL or missing source SHA, automatic issue handoff is disabled. Copy and local Markdown download remain possible, explicitly labeled `UNVERIFIED_OFFLINE`.
+- On an actual source SHA change, the planner discards selected IDs rather than silently submitting a stale batch against a newer integration.
+- Task text is treated as **untrusted reference material**, never executable instructions. The composer quotes task titles/evidence and prevents embedded triple-backtick fences from changing document structure. Strictly defined lanes, screens, IDs and batch size cannot be replaced with arbitrary commands.
+
+Implementation: `docs/control-center/planner-core.js` (deterministic contracts), `docs/control-center/planner-ui.js` (accessible task buttons and local handoff), seven SHA256-CSP-pinned scripts in the portable HTML builder. Regression coverage: `tests/control_center/planner.test.cjs` and `tests/control_center/planner_dom.test.cjs`; CI additionally tests real desktop headless Chrome file:// DOM for the planner showing the 161-item ledger and a populated task selector.
+
+**No production Android functionality is changed by this planner.** The repository PR remains draft until reviewed; the phone artifact is a local developer tool and Chrome desktop smoke is not proof of real Android/WebView touch or full audio/data tests.
+
+## V3.4 — live GitHub connection & directly accessible website
+
+**Hosted HTTPS dashboard:** https://deep-focus-control-center-pv5p5k.v2.appdeploy.ai/ (opens in Android Chrome directly; no ZIP extraction or file:// browser support needed). The GitHub Actions single-file artifact remains an optional portable/offline snapshot for technical inspection, not the primary entrypoint.
+
+- The **الربط الحي مع GitHub** section fetches public REST data for PR #25 (recovery integration), PR #37 (developer control center), the latest repository Actions runs and exact-head runs for both pull requests. Every status is tied to its actual commit SHA. Public data only; the website never contains or requests a GitHub personal access token, private API secret or repository write scope.
+- Labels distinguish PASS, FAIL, RUNNING and NOT VERIFIED. PASS is a GitHub Actions result, *never* a release gate / Android-device acceptance. API 403/429, missing results and partial responses are exposed as **unverified** rather than green status.
+- If PR #25 HEAD changes and PR #37's BASE has not been updated, the dashboard warns **BASE_MOVED**. This caught a real 15-commit integration divergence (nature audio recovery) and the PR #37 branch was safely caught up with a two-parent merge; no force push, no app runtime overwrite, 0 commits behind base afterward.
+- The dashboard is updated manually with the **فحص الفروع والاختبارات** button and also checks on page load. It makes read-only public API requests in the visitor's browser; GitHub rate limits, connectivity or browser permissions may prevent live checking. Embedded 161-task source fallback remains visible with the static provenance warning.
+- There is no automatic GitHub write, PR merge, asset approval, agent execution, or APK release from the hosted dashboard. The GitHub authenticated plugin available to the chat is not the hosted browser's credential. For any protected action use the official GitHub review interface or a separately designed OAuth/backend integration with narrowly scoped, approved permissions.
+- CI: `tests/control_center/repo_sync.test.cjs` verifies exact SHA matching, branch drift, read-only URL allowlists, stale and missing-run states. Portable bundle pins all 9 dashboard JavaScript modules via SHA-256 CSP; Chrome smoke checks the new section and the offline recovery planner.
+
+**Deployment provenance:** AppDeploy app ID `deep-focus-control-center-pv5p5k`. The hosted snapshot and the GitHub draft PR are separate deployments; their revision state must be confirmed independently. The public website hosts developer-only code and the 161 public task descriptions; it does not contain app users' personal data or GitHub write credentials.
+
+## v3.5 — resilient GitHub PR review and CI retry correctness
+
+**Mobile dashboard:** https://deep-focus-control-center-pv5p5k.v2.appdeploy.ai/
+**Source branch:** `feature/control-center-ops-20261019`; **review PR:** #37 (draft).
+The hosted frontend-only AppDeploy deployment is `deep-focus-control-center-pv5p5k`. Site deployments and GitHub commits are separate, so always check both.
+
+### Source-backed review queue
+The **الربط الحي بالمستودع** section now has a searchable list of up to 15 real open GitHub PRs. Search by number, title or branch and filter all/draft/non-draft. The list uses the existing public PR response from the dashboard's main snapshot, with strict same-repository URLs, no additional per-PR network requests and `textContent` output. When the source is unavailable or stale, the list explicitly identifies the gap; an empty API response does not mean no PRs exist.
+
+### CI evidence fixes
+- Evaluate **the newest run for each distinct workflow** for an exact commit SHA. A superseded older failure no longer makes a repaired workflow look permanently failed. Conversely, a new in-progress retry cannot be marked successful from an older run.
+- Aggregate separate workflows conservatively: **FAIL**, **RUNNING**, **PARTIAL** (mixed success and skipped/unverified), **PASS** (all observed latest relevant workflows succeeded), or **NOT_VERIFIED** (missing or untrustworthy evidence). A real `skipped` APK workflow never counts as Android success.
+- Whenever any required GitHub response fails or is partial, PR headline CI badges fall back to **NOT_VERIFIED**, even if some successful runs are visible. Links to observed evidence remain available for human investigation.
+- `PASS` is limited to available GitHub workflow evidence for a particular SHA; it does not approve release, audio provenance, v21 backup/restore or physical Android testing.
+
+### Browser/API reliability
+- The detailed GitHub monitor is **lazy-loaded when the repository health section becomes visible**, or loaded by the explicit refresh button. This reduces repeated unauthenticated GitHub REST requests when opening the main mobile page. The original repository snapshot retains its own source errors and warnings.
+- New source-contract tests: `tests/control_center/repo_sync.test.cjs` and simulated interactions in `tests/control_center/repo_sync_ui.test.cjs`. The nine-module deterministic portable bundle and the Chrome source audit remain in GitHub CI.
+- Hosted dashboard has **no personal access token, no GitHub write scope, no auto-merge and no autonomous agent execution**. The user opens authenticated GitHub separately to approve/merge anything. Rate limits remain possible with public browser API requests.
+
+**Release:** Android real-device tests, audio licensing, complete 20-locale validation and backup acceptance remain separate; no release can be inferred from dashboard green checks.
+
+## Track 15: exact-SHA public observation (review-only)
+
+Track 15 is additive to v3.5; it is **not** an independent replacement dashboard. 
+The new panel reads PR #37 and canonical PR #138, Issues #64/#69/#110,
+exact-#138 workflow jobs and the matching run's **artifact metadata**. A job labelled Node,
+Python, Chromium or Android-build can be PASS/FAIL only if it belongs to that exact run's
+source SHA; physical Android, SAF and TalkBack always remain NOT_TESTED without device QA.
+
+Issue #69's machine-readable agent ledger is explicitly `STALE` whenever its
+`source_sha` differs from PR #138 HEAD. Missing per-language translation counts,
+media licence proof, source checks, data-integrity proof and APK/AAB **binary** SHA256
+remain NOT_TESTED/NOT_APPROVED, never synthesized. GitHub's artifact digest, where
+available, is labelled **archive** SHA256, not the APK's digest.
+
+Public anonymous API reads use `credentials:omit`, bounded requests and a 12-minute
+client-side cooldown. On 403/429, `Retry-After`/`x-ratelimit-reset` controls retry.
+No GitHub token, workflow dispatch, merge command or device data is present.
+
+Production AppDeploy v4 / snapshot `1792512426988` was inspected, not
+republished by Track 15. The new sources require a separately reviewed deployment.
+`node --test tests/control_center/*.test.cjs` and real mobile-browser interaction
+checks should be re-run on the proposed branch after integration; real Android
+WebView acceptance remains a separate requirement.
+
+### 20-language evidence grid
+The locale list was read from the canonical #138 app source: `ar,en,es`
+and `fr,de,tr,ru,pt,zh,hi,ja,ko,id,vi,it,bn,ur,fa,pl,nl`.
+Track 15 shows **20 individual NOT_TESTED counts** unless a validated,
+same-SHA full 20-language report is supplied. No counts are guessed from
+the historical 4590/4626 totals in Issue #104. A zero can be displayed
+only when a matching source report explicitly records zero missing keys;
+zero missing keys is not proof of translation naturalness or rendered Android QA.
