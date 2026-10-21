@@ -227,6 +227,10 @@
     document.getElementById('sec-tasks').classList.add('df22-tasks-live');
   }
   function mountAnalytics() {
+    // Preserve the user's *unsaved UI filter selection*, not any historical
+    // record, when a language change swaps the 20-language screen adapters.
+    const prior=analyticsUi&&typeof analyticsUi.getFilters==='function'
+      ? analyticsUi.getFilters():null;
     if(analyticsUi)analyticsUi.destroy();
     const host=document.getElementById('df22AnalyticsHost');
     const arAnalytics=cfg.lang==='ar' && root.DeepFocusAnalyticsArabic &&
@@ -235,13 +239,13 @@
       // Use the complete Arabic locale for the new studio. Other locales retain
       // the prior studio until every label is translated; never fall back to English.
       analyticsUi=root.DeepFocusAnalyticsRecoveryUI.mount(host,getSnapshot,{
-        locale:cfg.lang,
+        locale:cfg.lang,...(prior||{}),
         ...(arAnalytics?{translate:root.DeepFocusAnalyticsArabic.translate}:{}),
         ...(root.ZenNative&&typeof root.ZenNative.exportAnalyticsCsvToFile==='function'?{saveCSV:saveCsvThroughAndroid}:{})
       });
     } else {
       analyticsUi=root.DeepFocusAnalyticsStudioV21.mount(host,getSnapshot,{
-        locale:cfg.lang,goals:cfg.dailyGoalsMin||{},
+        locale:cfg.lang,...(prior||{}),goals:cfg.dailyGoalsMin||{},
         // All 20 languages must use the real SAF save-result callback, not a
         // silently unavailable browser Blob link in Android WebView.
         ...(root.ZenNative&&typeof root.ZenNative.exportAnalyticsCsvToFile==='function'
