@@ -27,7 +27,7 @@ function mountWithPendingExport(onExport, locale = 'de') {
   const fields = filters.children.filter(x => x.tagName === 'LABEL')
     .map(label => label.children[0]);
   const button = filters.children.find(x => x.tagName === 'BUTTON');
-  return {studio, start: fields[2], end: fields[3], button};
+  return {studio, host:target.child, domain:fields[0], grouping:fields[1], start: fields[2], end: fields[3], button};
 }
 
 test('invalid date disables CSV button even before any export', () => {
@@ -127,6 +127,56 @@ test('all 20 locales use the same validated historical minutes without rewriting
     const ui = mountWithPendingExport(() => ({status: 'failed'}), code);
     assert.equal(ui.studio.getReport().totals.minutes, 25, code);
     assert.equal(ui.studio.getReport().sessions[0].id, 'real-1', code);
+    ui.studio.destroy();
+  }
+});
+
+test('Studio supplies functioning Today/7-day/30-day/custom and Reset controls in 20 locales', () => {
+  const Locale = require('../../android/app/src/main/assets/web/localization_20_recovery.js');
+  for (const language of Locale.LANGUAGES) {
+    const ui = mountWithPendingExport(() => ({status: 'cancelled'}), language);
+    const bar = ui.host.children.find(node => node.className === 'dfa-range-presets');
+    assert.ok(bar, language + ' lacks date-range shortcuts');
+    const actions = Object.fromEntries(bar.children.map(node => [
+      node.getAttribute('data-action'), node
+    ]));
+    assert.deepEqual(Object.keys(actions), ['today', 'last7', 'last30', 'custom', 'reset'],
+      language + ' must provide all five controls in a stable sequence');
+    for (const key of Object.keys(actions)) {
+      assert.ok(actions[key].textContent, language + '/' + key + ' empty untranslated label');
+      assert.equal(actions[key].type, 'button');
+      assert.equal(typeof actions[key].events.click, 'function');
+    }
+    actions.today.events.click();
+    assert.equal(ui.start.value, '2026-10-20');
+    assert.equal(ui.end.value, '2026-10-20');
+    assert.equal(ui.studio.getReport().totals.minutes, 0, language + ' Today filters real sessions');
+
+    actions.last7.events.click();
+    assert.equal(ui.start.value, '2026-10-14');
+    assert.equal(ui.end.value, '2026-10-20');
+    assert.equal(ui.studio.getReport().totals.minutes, 25, language + ' 7-day total');
+
+    actions.last30.events.click();
+    assert.equal(ui.start.value, '2026-09-21');
+    assert.equal(ui.end.value, '2026-10-20');
+    assert.equal(ui.studio.getReport().totals.minutes, 25, language + ' 30-day total');
+
+    ui.domain.value = 'read'; ui.domain.events.change();
+    assert.equal(ui.studio.getReport().totals.minutes, 0, language + ' activity filter');
+    ui.start.value = '2026-10-19'; ui.start.events.change();
+    actions.custom.events.click();
+    assert.equal(ui.start.value, '2026-10-19', language + ' Custom must preserve explicit dates');
+    assert.equal(ui.end.value, '2026-10-20');
+
+    actions.reset.events.click();
+    assert.equal(ui.domain.value, 'all', language + ' Reset clears activity');
+    assert.equal(ui.grouping.value, 'daily', language + ' Reset clears grouping');
+    assert.equal(ui.start.value, '2026-09-21', language + ' Reset restores 30-day default');
+    assert.equal(ui.end.value, '2026-10-20', language + ' Reset restores end');
+    assert.equal(ui.studio.getReport().totals.minutes, 25);
+    assert.doesNotMatch(bar.children.map(e => e.textContent).join(' '),
+      /[\u0660-\u0669\u06f0-\u06f9\u0966-\u096f\u09e6-\u09ef]/,language+' Western numerals');
     ui.studio.destroy();
   }
 });
