@@ -71,3 +71,39 @@ test('reopening uses verified fsynced native pause checkpoint, not a stale WebVi
  assert.equal(ctx.timerRunning,false);
  assert.equal(ctx.timerActiveMs,156000);
 });
+
+test('rejected native Pause receipt cannot stop service, lose ID or report a paused timer',()=>{
+ let stops=0,scheduled=0;const btn={innerHTML:''};
+ const ctx={timerRunning:true,timerSessionId:'active-id',timerLeft:120,timerTotal:1500,
+  timerTargetTime:Date.now()+120000,timerResumeMs:Date.now()-2000,timerActiveMs:0,
+  timerInterval:77,focusSessionTaskId:45,chimeCtx:{state:'running'},quickTraining:null,
+  document:{getElementById:id=>id==='mainPlayBtn'?btn:{textContent:'Focus'}},
+  window:{ZenNative:{stopBackgroundService(){stops++}}},
+  clearInterval(){},setInterval(){scheduled++;return 88;},Date,Math,Number,
+  accumulateActiveTime(){ctx.timerActiveMs+=2000;ctx.timerResumeMs=null},
+  storeTimerSession:()=>false,updateTimerDisplay(){}
+ };
+ vm.runInNewContext(actual('toggleTimerPlay','resetTimerNow'),ctx);
+ assert.equal(ctx.toggleTimerPlay(),false);
+ assert.equal(ctx.timerRunning,true);
+ assert.equal(ctx.timerSessionId,'active-id');
+ assert.equal(ctx.focusSessionTaskId,45);
+ assert.equal(stops,0,'Native running service must remain active when Pause ACK fails');
+ assert.equal(scheduled,1,'Resume one source interval after rejected Pause');
+});
+test('rejected start receipt cannot create a phantom running session or native alert',()=>{
+ let starts=0;const btn={innerHTML:''};
+ const ctx={timerRunning:false,timerSessionId:null,timerLeft:60,timerTotal:60,
+  timerTargetTime:null,timerResumeMs:null,timerActiveMs:0,timerInterval:null,
+  focusSessionTaskId:null,chimeCtx:{state:'running'},quickTraining:null,
+  window:{ZenNative:{}},document:{getElementById:id=>id==='mainPlayBtn'?btn:{textContent:'Focus'}},
+  Date,Math,Number,storeTimerSession:()=>false,updateTimerDisplay(){},
+  startNativeTimerForCurrentSession(){starts++},
+  setInterval(){throw Error('No interval may start without ACK')}
+ };
+ vm.runInNewContext(actual('toggleTimerPlay','resetTimerNow'),ctx);
+ assert.equal(ctx.toggleTimerPlay(),false);
+ assert.equal(ctx.timerRunning,false);
+ assert.equal(ctx.timerSessionId,null);
+ assert.equal(starts,0);
+});
