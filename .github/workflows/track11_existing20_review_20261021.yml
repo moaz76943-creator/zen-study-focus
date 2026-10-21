@@ -26,13 +26,14 @@ jobs:
           set -euo pipefail
           mkdir -p evidence
           git rev-parse HEAD | tee evidence/SOURCE_SHA.txt
-          node --test tests/language_review/track11_review.test.cjs tests/language_review/track11_android_probe.test.cjs 2>&1 | tee evidence/track11-tests.tap
+          node --test tests/language_review/track11_review.test.cjs tests/language_review/track11_android_probe.test.cjs tests/language_review/track11_native_review.test.cjs 2>&1 | tee evidence/track11-tests.tap
       - name: Fresh existing-20-only matrix and untranslated reviewer worksheet
         shell: bash
         run: |
           set -euo pipefail
           node tools/language_review/audit.cjs --out evidence/historical-auditor
           node tools/language_review/track11_review.cjs --out evidence
+          node tools/language_review/track11_native_review.cjs --out evidence
           node --test tests/language_review/audit.test.cjs tests/localization_20/localization_20.test.cjs tests/localization_20/western_digits_indic.test.cjs tests/ascii_numerals/ascii_numerals.test.cjs tests/ascii_numerals/duration_units.test.cjs tests/track07_functional/analytics_charts_20_accessibility.test.cjs tests/track07_functional/analytics_controls_and_digits.test.cjs tests/track07_functional/analytics_screen_20_locales.test.cjs tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/integration_recovery/language_switch_durability.test.cjs tests/integration_recovery/authored_text_safety.test.cjs tests/notes_recovery/draft_20_locales.test.cjs 2>&1 | tee evidence/existing-locale-tests.tap
           node tests/validate_locales.cjs 2>&1 | tee evidence/validate-locales.log
       - name: Preserve exact-head evidence, including failures
