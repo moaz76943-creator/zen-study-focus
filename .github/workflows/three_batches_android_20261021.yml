@@ -25,6 +25,16 @@ jobs:
         run: |
           set -euo pipefail
           git rev-parse HEAD
+          node - <<'NODE'
+          const fs=require('node:fs'), cp=require('node:child_process');
+          const manifest=JSON.parse(fs.readFileSync('docs/master_completion/BATCH3_SOURCE_CONVERGENCE.json','utf8'));
+          for (const [file,expected] of Object.entries(manifest.path_blobs)) {
+            const actual=cp.execFileSync('git',['rev-parse','HEAD:'+file],{encoding:'utf8'}).trim();
+            if(actual!==expected) throw new Error('STALE_COMPOSITE_BLOB '+file);
+          }
+          if(manifest.release_approved!==false) throw new Error('RELEASE_LOCK_REMOVED');
+          console.log('PINNED_COMPOSITE_SOURCE_PASS',Object.keys(manifest.path_blobs).length);
+          NODE
           node --check tools/language_review/track11_android_probe.cjs
           bash -n tests/language_review/track11_android_ci.sh
           node --test tests/language_review/track11_android_probe.test.cjs
