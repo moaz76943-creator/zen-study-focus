@@ -33,6 +33,7 @@ jobs:
     needs: unit
     strategy:
       fail-fast: false
+      max-parallel: 1  # preserve emulator host memory; separate per-API proof remains mandatory
       matrix:
         api: [30, 35]
     name: Full 20 Android scenarios API${{ matrix.api }}
@@ -84,8 +85,9 @@ jobs:
           api-level: ${{ matrix.api }}
           target: google_apis
           arch: x86_64
-          profile: pixel_6
-          emulator-boot-timeout: 600
+          profile: pixel_2
+          ram-size: 2048M
+          emulator-boot-timeout: 900
           disable-animations: true
           script: bash tests/android_e2e_recovery/run_cdp_ci.sh
       - name: Preserve test infrastructure failure with no false PASS
