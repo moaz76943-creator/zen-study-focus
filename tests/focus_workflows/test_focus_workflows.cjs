@@ -373,3 +373,34 @@ test('TRACK09 RED: edits after a successful save roll back to the newest accepte
   assert.equal(saved[1].sets,'5');
   assert.equal(messages.length,1);
 });
+
+
+test('TRACK09 local calendar weekly boundaries exclude adjacent Sundays at DST transitions',()=>{
+  const x=load('goals_studio.js',{cfg:{sessionHistory:[
+    {id:'spring-week-1',date:'2026-03-02',domain:'study',minutes:11},
+    {id:'spring-sunday',date:'2026-03-08',domain:'study',minutes:13},
+    {id:'spring-monday',date:'2026-03-09',domain:'study',minutes:17},
+    {id:'fall-sunday',date:'2026-11-01',domain:'study',minutes:19},
+    {id:'fall-monday',date:'2026-11-02',domain:'study',minutes:23}
+  ]}});
+  assert.equal(x.eval("gsWeeklyRecordedMinutes('study','2026-03-08')"),24,
+    'Spring-forward Sunday is in the prior week even in New York');
+  assert.equal(x.eval("gsWeeklyRecordedMinutes('study','2026-03-09')"),17,
+    'Monday must not include Sunday across the spring DST switch');
+  assert.equal(x.eval("gsWeeklyRecordedMinutes('study','2026-11-02')"),23,
+    'Monday must not double-count the DST fall-back Sunday');
+  assert.equal(x.eval("gsWeeklyRecordedMinutes('study','2026-11-01')"),19);
+});
+
+test('TRACK09 leap-day validation and weekly goal calculations use calendar dates not 24-hour shifts',()=>{
+  const x=load('goals_studio.js',{cfg:{sessionHistory:[
+    {id:'real-leap',date:'2028-02-29',domain:'read',minutes:36},
+    {id:'before-leap',date:'2028-02-28',domain:'read',minutes:12},
+    {id:'next-week',date:'2028-03-06',domain:'read',minutes:48}
+  ]}});
+  assert.equal(x.eval("gsISOValid('2028-02-29')"),true);
+  assert.equal(x.eval("gsISOValid('2026-02-29')"),false);
+  assert.equal(x.eval("gsWeeklyRecordedMinutes('read','2028-03-01')"),48);
+  assert.equal(x.eval("gsWeeklyRecordedMinutes('read','2028-03-06')"),48);
+  assert.equal(x.eval("gsWeeklyRecordedMinutes('read','2028-03-05')"),48);
+});
