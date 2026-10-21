@@ -26,6 +26,8 @@ function validateDraft(pack,source){
  if(pack?.schema_version!==1)errors.push('UNKNOWN_SCHEMA');
  if(pack?.status!==DRAFT_STATUS)errors.push('MUST_REMAIN_DRAFT');
  if(pack?.inventorySha256!==guard.inventoryHash(origin))errors.push('STALE_SOURCE_INVENTORY');
+ const notes=pack?.identicalSourceCandidates||{};
+ if(!notes||typeof notes!=='object'||Array.isArray(notes))errors.push('INVALID_IDENTICAL_CANDIDATE_NOTES');
  const strings=pack?.strings;
  if(!strings||typeof strings!=='object'||Array.isArray(strings))errors.push('INVALID_STRINGS');
  let translated=0;
@@ -42,7 +44,11 @@ function validateDraft(pack,source){
      if(/[<>]/u.test(target))errors.push('UNREVIEWED_HTML:'+label);
      if(TODO.test(target.trim()))errors.push('PLACEHOLDER_TEXT:'+label);
      if(JSON.stringify(tokens(english))!==JSON.stringify(tokens(target)))errors.push('PLACEHOLDER_MISMATCH:'+label);
-     if(target.trim()===String(english).trim())errors.push('IDENTICAL_TO_SOURCE:'+label);
+     if(target.trim()===String(english).trim()){
+       if(typeof notes[label]==='string'&&notes[label].trim().length>=15)
+         warnings.push('IDENTICAL_SOURCE_NEEDS_REVIEW:'+label);
+       else errors.push('IDENTICAL_TO_SOURCE:'+label);
+     }
      if(JSON.stringify(protectedIcons(english))!==JSON.stringify(protectedIcons(target)))
        errors.push('ICON_MISMATCH:'+label);
      if(JSON.stringify(formatMarkers(english))!==JSON.stringify(formatMarkers(target)))
@@ -55,6 +61,14 @@ function validateDraft(pack,source){
    if(!Object.hasOwn(origin,cid)){errors.push('EXTRA_CATALOG:'+cid);continue;}
    if(!values||typeof values!=='object'||Array.isArray(values)){errors.push('INVALID_CATALOG:'+cid);continue;}
    for(const key of Object.keys(values))if(!Object.hasOwn(origin[cid],key))errors.push('EXTRA_KEY:'+cid+'.'+key);
+ }
+ for(const [label,reason] of Object.entries(notes&&typeof notes==='object'&&!Array.isArray(notes)?notes:{})){
+   const dot=label.lastIndexOf('.');
+   const id=label.slice(0,dot),key=label.slice(dot+1);
+   if(dot<1||!Object.hasOwn(origin,id)||!Object.hasOwn(origin[id],key)||
+      pack?.strings?.[id]?.[key]!==origin[id][key]||
+      typeof reason!=='string'||reason.trim().length<15)
+      errors.push('INVALID_IDENTICAL_CANDIDATE:'+label);
  }
  if(translated===0)warnings.push('NO_TRANSLATION_CONTENT');
  // These flags can NEVER be granted by a draft file or by passing unit tests.
