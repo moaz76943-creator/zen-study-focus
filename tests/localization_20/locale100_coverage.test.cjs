@@ -1,0 +1,28 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const {audit}=require('../../tools/language_review/audit.cjs');
+const {report}=require('../../tools/localization_100/coverage.cjs');
+test('exact-head 100-locale report distinguishes current runtime, drafts and missing languages',()=>{
+ const result=report();
+ assert.equal(result.registered,100);
+ assert.equal(result.runtimeExisting,20);
+ assert.equal(result.newlyCertified,0);
+ assert.equal(result.planned,80);
+ assert.equal(result.languages.length,100);
+ assert.equal(result.languages.some(v=>['he','iw'].includes(v.code)),false);
+ assert.equal(result.releaseApproved,false);
+ assert.equal(result.sourceCatalogs,25);
+ assert.equal(result.sourceKeysPerLanguage,472);
+ const sw=result.languages.find(x=>x.code==='sw');
+ const ro=result.languages.find(x=>x.code==='ro');
+ const marathi=result.languages.find(x=>x.code==='mr');
+ assert.ok(sw.draftCount>=80&&sw.missingKeys>0);
+ assert.ok(ro.draftCount>=80&&ro.missingKeys>0);
+ assert.equal(marathi.draftCount,0);
+ assert.equal(marathi.missingKeys,472);
+ assert.equal(sw.selectable,false);
+ assert.equal(sw.nativeReview,'NOT_TESTED');
+ assert.equal(result.languages.find(x=>x.code==='en').runtimeAvailable,true);
+ assert.ok(result.legacyExplicitMissing>4000);
+ assert.equal(result.sourceInventoryComplete,false);
+});
