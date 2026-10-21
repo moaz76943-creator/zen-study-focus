@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - audit/track11-existing20-coverage-20261021
+      - integration/master-recovery-20261021
   workflow_dispatch:
 permissions:
   contents: read
@@ -90,7 +91,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/track11-browser"
           git rev-parse HEAD > "$RUNNER_TEMP/track11-browser/SOURCE_SHA.txt"
-          printf '%s\n' 'Android real-device and WebView: NOT_TESTED' 'Human 20-language copy review: NOT_TESTED' '80 future locales: NOT ACTIVATED' 'RELEASE_APPROVED=NO' > "$RUNNER_TEMP/track11-browser/LIMITS.txt"
+          printf '%s\n' 'Installed Android WebView runs in the separate Track11 API30 workflow; this artifact is Chromium-only' 'Human 20-language copy review: NOT_TESTED' '80 future locales: NOT ACTIVATED' 'RELEASE_APPROVED=NO' > "$RUNNER_TEMP/track11-browser/LIMITS.txt"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
