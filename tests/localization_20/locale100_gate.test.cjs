@@ -84,3 +84,15 @@ test('CI cannot miss canonical key discovery or future native Android resource a
   "'android/app/src/main/AndroidManifest.xml'"
  ])assert.ok(yaml.includes(watched),'missing path trigger: '+watched);
 });
+
+test('browser acceptance workflow reruns when its own actual browser regression files change',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const yaml=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/locale_100_admission_gate.yml'),'utf8');
+ for(const item of [
+  "'tests/df4_browser/**'",
+  "'tests/track07_functional/**'",
+  "'tests/localization_20/**'",
+  "'tests/validate_locales.cjs'",
+  "'tests/smoke_app.cjs'"
+ ])assert.ok(yaml.includes(item),'missing browser/source acceptance trigger: '+item);
+});
