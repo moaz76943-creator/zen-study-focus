@@ -102,6 +102,12 @@
     for(const value of ['daily','weekly','monthly']){const o=mk('option',t[value]);o.value=value;grouping.appendChild(o);}
     const start=input('date',t.start),end=input('date',t.end);
     for(const field of [start,end]){field.style.direction='ltr';field.lang='en-u-nu-latn';}
+    // Existing localizations already supply the four report-kind labels.
+    // Default sessions CSV remains unchanged for historical consumers.
+    const kind=input('select',t.export);
+    for(const [value,label] of [
+      ['sessions',t.sessions],['daily',t.daily],['weekly',t.weekly],['monthly',t.monthly]
+    ]){const option=mk('option',label);option.value=value;kind.appendChild(option);}
     const exportBtn=mk('button',t.export);exportBtn.type='button';exportBtn.style.cssText='min-height:42px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:6px 12px';
     filters.appendChild(exportBtn);wrapper.appendChild(filters);
     // Reuse the platform's CLDR 20-language day labels: no unreviewed
@@ -184,6 +190,9 @@
     };
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
     [domain,grouping].forEach(el=>el.addEventListener('change',refresh));
+    kind.addEventListener('change',()=>{
+      ++reportRevision;feedback.textContent='';
+    });
     [start,end].forEach(el=>el.addEventListener('change',()=>{
       periodMode='custom';refresh();
     }));
@@ -208,12 +217,12 @@
     exportBtn.addEventListener('click',async()=>{
       if(exporting||destroyed)return;
       if(!rangeValid||!current){feedback.textContent=t.invalidDates;return;}
-      const value=core.toCSV(current,'sessions');
+      const value=core.toCSV(current,kind.value);
       const exportRevision=reportRevision;
       if(typeof opts.onExport==='function'){
         exporting=true;exportBtn.disabled=true;feedback.textContent='';
         try{
-          const response=await opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');
+          const response=await opts.onExport(value,'deep-focus-'+kind.value+'.csv','text/csv;charset=utf-8');
           if(!destroyed && reportRevision===exportRevision)
             feedback.textContent=(response?.status==='saved'?'✓ ':response?.status==='cancelled'?'— ':'⚠ ')+t.export;
         }catch(_){
@@ -226,13 +235,18 @@
       }
       try{
         const blob=new doc.defaultView.Blob(['\ufeff',value],{type:'text/csv;charset=utf-8'});
-        const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
+        const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-'+kind.value+'.csv';
         wrapper.appendChild(a);try{a.click();}finally{a.remove();(doc.defaultView.setTimeout||setTimeout)(()=>doc.defaultView.URL.revokeObjectURL(url),30000);}
       }catch(_){feedback.textContent='⚠ '+t.export;}
     });
-    start.value=opts.startDate||from;end.value=opts.endDate||today;domain.value=opts.domain||'all';
+    start.value=opts.startDate||from;end.value=opts.endDate||today;
+    domain.value=opts.domain||'all';grouping.value=opts.group||'daily';
+    kind.value=opts.exportKind||'sessions';
     target.appendChild(wrapper);refresh();
-    return Object.freeze({refresh,getReport:()=>current,destroy:()=>{destroyed=true;wrapper.remove();},element:wrapper});
+    return Object.freeze({refresh,getReport:()=>current,
+      getFilters:()=>({startDate:start.value,endDate:end.value,domain:domain.value,
+        group:grouping.value,exportKind:kind.value}),
+      destroy:()=>{destroyed=true;wrapper.remove();},element:wrapper});
   }
   return Object.freeze({mount,barsSvg,heatmapSvg});
 });
