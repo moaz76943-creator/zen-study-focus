@@ -43,10 +43,15 @@
     "core.navigation": {
       "title": "Umakini na utendaji",
       "sub": "Masomo, mazoezi, usomaji na kazi inayohitaji umakini",
-      "navTimer": "Kipima muda"
+      "navTimer": "Kipima muda",
+      "totalFocusToday": "Jumla ya dakika za shughuli leo",
+      "minsUnit": "dakika",
+      "daysUnit": "siku",
+      "waterWord": "Maji"
     },
     "core.calendar": {
-      "navCalendar": "Kalenda"
+      "navCalendar": "Kalenda",
+      "btnAddCalNote": "+ Ongeza dokezo kwenye tarehe"
     },
     "core.tasks": {
       "navTasks": "Kazi",
@@ -58,20 +63,31 @@
     "core.notes": {
       "navNotes": "Madokezo",
       "phSearchNotes": "Tafuta madokezo, mazoezi au muhtasari wa vitabu...",
-      "orbDump": "Dokezo la haraka"
+      "orbDump": "Dokezo la haraka",
+      "tagCornell": "Cornell 📋",
+      "tagFlash": "Kumbuka 👁️",
+      "tagQuick": "Kumbukumbu 💡",
+      "lblBlurAnswer": "Ficha maandishi kwa mazoezi ya kukumbuka (gusa ili kufichua)"
     },
     "core.sounds": {
       "navSounds": "Sauti za asili",
       "btnStopAll": "⏹ Simamisha",
       "sndCatWater": "Maji na mvua 🌧️",
       "sndCatForest": "Msitu na upepo 🌲",
-      "sndCatWarm": "Moto na ardhi 🔥"
+      "sndCatWarm": "Moto na ardhi 🔥",
+      "mixerReady": "🎵 Studio ya sauti za asili iko tayari",
+      "btnMyMix": "✨ Mchanganyiko wangu"
     },
     "core.analytics": {
       "navAnalytics": "Takwimu",
       "kpiMinutes": "Dakika za shughuli",
       "kpiSessions": "Vipindi vilivyokamilika",
-      "overviewTitle": "Mgawanyo wa shughuli"
+      "overviewTitle": "Mgawanyo wa shughuli",
+      "kpiTrendWeek": "↑ +18% wiki hii",
+      "kpiTrendGreat": "↑ +12% uthabiti",
+      "badgeThisWeek": "Wiki hii",
+      "waveFlowTitle": "Faharasa ya utendaji wa kila wiki",
+      "peakPerfBadge": "Kiwango bora cha umakini"
     },
     "core.timer": {
       "modeCustom": "Maalum ⚡",
@@ -94,7 +110,12 @@
     },
     "core.settings": {
       "btnSave": "Hifadhi na utumie",
-      "btnCancel": "Ghairi"
+      "btnCancel": "Ghairi",
+      "pillCloud": "Nakala rudufu ya kuunda mwenyewe",
+      "pillSound": "Jaribu sauti",
+      "pillShare": "Shiriki programu",
+      "pillSecure": "Data zilizohifadhiwa kwenye kifaa",
+      "orbCloud": "Hamisha nakala rudufu"
     }
   }
 }
