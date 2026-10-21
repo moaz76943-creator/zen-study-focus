@@ -88,12 +88,12 @@ test('10,000 genuine focus IDs produce exactly 10,000 CSV rows, not duplicated o
   assert.equal(report.quality.samples, 1);
   assert.equal(snapshot.sessionHistory.length, 10002, 'Source history never rewritten');
   const csv = Core.toCSV(report, 'sessions');
-  const lines = csv.trimEnd().split('\\r\\n');
+  const lines = csv.trimEnd().split('\r\n');
   assert.equal(lines.length, 10001, 'CSV header plus exactly one row per valid unique session');
   assert.match(lines[0], /"minutes"/);
   const exported = lines.slice(1).reduce((sum, row) => sum + Number(row.split(',')[3].replaceAll('"', '')), 0);
   assert.equal(exported, report.totals.minutes, 'CSV exported duration equals dashboard');
-  assert.doesNotMatch(csv, /[\\u0660-\\u0669\\u06f0-\\u06f9]/, 'CSV numerals are always 0–9');
+  assert.doesNotMatch(csv, /[\u0660-\u0669\u06f0-\u06f9]/, 'CSV numerals are always 0–9');
 });
 
 test('credited local dates remain stable across DST boundaries and leap day', () => {
