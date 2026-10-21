@@ -1,0 +1,41 @@
+name: TRACK06 Audio safety source checks (non-activating)
+on:
+  push:
+    branches:
+      - audit/track06-audio-acceptance-matrix-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track06-source-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  audio-source:
+    name: Source-only media, alerts and lifecycle regression (not Android approval)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require source-only Track06 tests and existing checks
+        run: |
+          node --check tests/nature_library_v2/android20_runtime_probe.cjs
+          node --test tests/nature_library_v2/track06_diagnostics.test.cjs tests/nature_library_v2/audio_endurance.test.cjs tests/completion_alerts/*.test.cjs tests/nature_library_v2/intake_manifest.test.cjs tests/nature_library_v2/twenty_originals_provenance.test.cjs
+          python3 -m unittest discover -s tests/nature_library_v2 -p 'test_*.py' -v
+      - name: Persist source output only, not a device PASS
+        if: always()
+        run: |
+          echo "HEAD_SHA=${GITHUB_SHA}" > track06-source-scope.txt
+          echo "ANDROID=NOT_TESTED" >> track06-source-scope.txt
+          echo "HUMAN_LISTENING=NOT_TESTED" >> track06-source-scope.txt
+          echo "RELEASE_APPROVED=NO" >> track06-source-scope.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Track06-Source-Scope-${{ github.sha }}
+          path: track06-source-scope.txt
+          retention-days: 7
