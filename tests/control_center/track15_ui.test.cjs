@@ -59,6 +59,8 @@ test('track15-ui02 exact-run success/failure and previous-SHA agent reports reta
  assert.ok(titles.includes('Python · FAIL'));
  assert.ok(titles.includes('Android device / SAF / TalkBack · NOT_TESTED'));
  assert.ok(h.get('track15-agents').children.every(x=>x.children[0].textContent.includes('STALE')));
+ assert.equal(h.get('track15-locales').children.length,20);
+ assert.ok(h.get('track15-locales').children.every(card=>card.children[0].textContent.includes('NOT_TESTED')));
  assert.equal(h.get('track15-refresh').disabled,false);
  h.get('track15-refresh').events.click();
  await new Promise(resolve=>setImmediate(resolve));
