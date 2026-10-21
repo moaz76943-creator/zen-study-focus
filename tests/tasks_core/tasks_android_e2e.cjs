@@ -129,10 +129,14 @@ async function main(){
  if(!await run('android_touch_edit_save_no_fabricated_date',async()=>{
   const mount=await evalJS(`(()=>{const host=document.createElement('div');host.id='track08AndroidHost';
     Object.assign(host.style,{position:'fixed',top:'0',right:'0',bottom:'0',left:'0',zIndex:'2147483647',background:'#fff',overflowY:'auto',padding:'8px'});
-    document.body.append(host);window.__track08Studio=DeepFocusTasksStudioV21.mount(host,{
+    document.body.append(host);window.__track08SaveTrace=[];
+    window.__track08Studio=DeepFocusTasksStudioV21.mount(host,{
       locale:'en',now:()=>new Date(2026,9,21),
       readState:()=>JSON.parse(JSON.stringify(DF22Integration.getSnapshot())),
-      commit:(before,after)=>DF22Integration.write(before,after)
+      commit:(before,after)=>{try{const ok=DF22Integration.write(before,after);
+        window.__track08SaveTrace.push({kind:'commit',ack:ok,old:before.tasksList.find(t=>t.id===window.__track08FixtureId)?.title,
+          next:after.tasksList.find(t=>t.id===window.__track08FixtureId)?.title});return ok;
+       }catch(e){window.__track08SaveTrace.push({kind:'commit-error',message:String(e.message||e).slice(0,250)});throw e;}}
     });return {mounted:!!host.querySelector('.df-task'),count:host.querySelectorAll('.df-task').length};
   })()`);
   assert.equal(mount.mounted,true,'Tasks Studio must mount on genuine Android WebView');
@@ -151,11 +155,21 @@ async function main(){
     hasForm:!!f,date:f?.querySelector('input[type=date]')?.value,
     checked:f?.querySelector('input[type=checkbox]')?.checked};})()`);
   assert.equal(before.hasForm,true);assert.equal(before.date,'');assert.equal(before.checked,false);
+  await evalJS(`(()=>{window.__track08FixtureId=${report.fixture_id};const f=document.querySelector('#track08AndroidHost form.df-form');
+    f.addEventListener('submit',()=>window.__track08SaveTrace.push({kind:'submit'}),true);
+    f.querySelector('button[type=submit]').addEventListener('click',()=>window.__track08SaveTrace.push({kind:'click'}),true);
+    return true;})()`);
   const changed=await evalJS(`(()=>{const field=document.querySelector('#track08AndroidHost form.df-form input[type=text]');
     field.value='DF08 edited no date';field.dispatchEvent(new Event('input',{bubbles:true}));return field.value;})()`);
   assert.equal(changed,'DF08 edited no date');
   await touch("document.querySelector('#track08AndroidHost form.df-form button[type=submit]')",'Save');
   const s=await snapshot(),task=s.tasksList.find(t=>t.id===report.fixture_id);
+  const saveDiagnostics=await evalJS(`(()=>({trace:window.__track08SaveTrace,
+    errors:[...document.querySelectorAll('#track08AndroidHost [role=status],#track08AndroidHost .df-error')].map(n=>n.textContent).filter(Boolean),
+    formPresent:!!document.querySelector('#track08AndroidHost form.df-form'),
+    editorTitle:document.querySelector('#track08AndroidHost form.df-form input[type=text]')?.value||null,
+    formValid:document.querySelector('#track08AndroidHost form.df-form')?.checkValidity?.()??null}))()`);
+  console.log('TRACK08_ANDROID_SAVE_DIAGNOSTICS',JSON.stringify(saveDiagnostics));
   assert.ok(task,'fixture vanished');assert.equal(task.title,'DF08 edited no date');
   assert.equal(Object.hasOwn(task,'date'),false);assert.equal(Object.hasOwn(task,'dueAssigned'),false);
   assert.deepEqual(task.legacyUnknown,{items:[1,'العربية']});assert.equal(task.v21Future,'preserve');
