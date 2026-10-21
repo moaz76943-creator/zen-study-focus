@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {LANGS,validateSwitch,validateReopen,expression}=require('../../tools/language_review/track11_android_probe.cjs');
+const {LANGS,validateSwitch,validateReopen,validateBackup,expression}=require('../../tools/language_review/track11_android_probe.cjs');
 function sampleRows(){
  return LANGS.map(code=>({code,dir:['ar','fa','ur'].includes(code)?'rtl':'ltr',
   actualLang:code,actualDir:['ar','fa','ur'].includes(code)?'rtl':'ltr',
@@ -35,4 +35,15 @@ test('device script is bound to installed bundled WebView only and has no networ
   assert.doesNotMatch(s,/fetch\s*\(|XMLHttpRequest|delete\s+localStorage|verifyAndRestoreBackupCode|exportBackupToFile/);
  }
  assert.throws(()=>expression('promote-language'),/INVALID_STAGE/);
+});
+
+test('v21 backup verification on real WebView refuses partial restore and preserves Urdu with both data arrays',()=>{
+ const safe={origin:base.origin,appReady:true,nativeBridge:true,storedConfig:true,
+  restored:true,language:'ur',dir:'rtl',noteDataUnchanged:true,taskDataUnchanged:true};
+ assert.equal(validateBackup(safe).status,'PASS');
+ assert.throws(()=>validateBackup({...safe,restored:false}),/BACKUP_RESTORE_NOT_VERIFIED/);
+ assert.throws(()=>validateBackup({...safe,language:'en'}),/BACKUP_RESTORED_WRONG_LOCALE/);
+ assert.throws(()=>validateBackup({...safe,noteDataUnchanged:false}),/BACKUP_CHANGED_USER_TEXT/);
+ assert.throws(()=>validateBackup({...safe,taskDataUnchanged:false}),/BACKUP_CHANGED_USER_TEXT/);
+ assert.match(expression('backup'),/verifyAndRestoreBackupCode/);
 });
