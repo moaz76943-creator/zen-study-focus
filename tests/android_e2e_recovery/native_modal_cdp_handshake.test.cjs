@@ -16,7 +16,7 @@ test('CDP request is issued without awaiting before native Android acknowledgeme
  assert.match(segment,/adb\(['"]shell['"],['"]input['"],['"]tap['"]/);
  assert.match(segment,/await outstanding/);
  assert.match(segment,/Deep Focus/);
- assert.match(segment,/file:\\/\\//);
+ assert.ok(segment.includes('file://'),'Reject leaked browser-origin headers from native dialog');
 });
 test('the browser dialog is never approved by monkeypatching confirm for timer tests',()=>{
  const timer=code.slice(code.indexOf("await run('timer_start_pause'"),code.indexOf("await run('save_failure'"));
