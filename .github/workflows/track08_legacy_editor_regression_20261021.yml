@@ -40,6 +40,15 @@ jobs:
           set -euo pipefail
           node tests/smoke_app.cjs
           node tests/validate_locales.cjs
+      - name: Full Node/Python regression (media release gate separately BLOCKED)
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs | sort)
+          test "${#suites[@]}" -gt 0
+          node --test --test-reporter=tap "${suites[@]}"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Install ephemeral browser test runtime
         if: success()
         shell: bash
