@@ -103,3 +103,15 @@ test('Romanian draft is a second independent structurally safe but non-activated
  assert.deepEqual(catalog.languages.map(x=>x.locale).sort(),['ro','sw']);
  assert.equal(catalog.activationAllowed,false);
 });
+
+test('source-identical Romanian words need documented linguistic review, not an invented synonym',()=>{
+ const p=sample();
+ p.strings['core.navigation'].navTimer='Timer';
+ p.identicalSourceCandidates={'core.navigation.navTimer':'Loanword candidate; native context review required'};
+ const r=draft.validateDraft(p,source);
+ assert.equal(r.valid,true,JSON.stringify(r.errors));
+ assert.ok(r.warnings.some(x=>x.includes('IDENTICAL_SOURCE_NEEDS_REVIEW')));
+ assert.equal(r.readyForRuntime,false);
+ const unsafe=sample();unsafe.identicalSourceCandidates={'core.navigation.fake':'approved'};
+ assert.equal(draft.validateDraft(unsafe,source).valid,false);
+});
