@@ -6,6 +6,7 @@ const review=require('../language_review/audit.cjs');
 function report(){
  const source=guard.sourceInventory(),screenAudit=review.audit();
  const draftAudit=drafts.reportDrafts(source);
+ const nativeCopy=require('./native_copy.cjs').report();
  const tracked=new Map(draftAudit.languages.map(x=>[x.locale,x]));
  const missingCount=new Map();
  for(const {language} of screenAudit.missing)missingCount.set(language,(missingCount.get(language)||0)+1);
@@ -28,6 +29,7 @@ function report(){
   newlyCertified:0,sourceCatalogs:groups,sourceKeysPerLanguage:keys,
   sourceInventorySha256:guard.inventoryHash(source),
   sourceInventoryComplete:false,
+  nativeCandidateCount:nativeCopy.candidates,nativeSourceLocalized:false,
   existingMeasurement:'Explicit checked-in dictionary keys only, not rendered/native strings',
   legacyExplicitMissing:screenAudit.missing.length,
   englishIdenticalCandidates:screenAudit.englishIdentical.length,
