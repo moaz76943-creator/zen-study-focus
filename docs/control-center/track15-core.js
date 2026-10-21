@@ -48,8 +48,8 @@
    const out=Object.fromEntries(FIELDS.map(k=>[k,NONE]));
    if(!validSha(runSha)||validSha(runSha)!==validSha(expectedSha)||!Array.isArray(jobs))return out;
    const matches={
-     node:/(?:\bnode\b.*\b(?:test|regression|qa|audit|check)\b|\b(?:test|regression|qa|audit|check)\b.*\bnode\b|javascript.*(?:test|syntax)|control center regression tests|\bunit tests\b)/i,
-     python:/(?:\bpython\b.*\b(?:test|regression|qa|audit|check)\b|\b(?:test|regression|qa|audit|check)\b.*\bpython\b|\bpytest\b)/i,
+     node:/(?:\bnode\b.*\b(?:tests?|regression|qa|audit|checks?)\b|\b(?:tests?|regression|qa|audit|checks?)\b.*\bnode\b|javascript.*(?:test|syntax)|control center regression tests|\bunit tests\b)/i,
+     python:/(?:\bpython\b.*\b(?:tests?|regression|qa|audit|checks?)\b|\b(?:tests?|regression|qa|audit|checks?)\b.*\bpython\b|\bpytest\b)/i,
      chromium:/(?:\b(?:chromium|chrome|playwright)\b.*\b(?:smoke|test|qa|dom|browser)\b|\b(?:smoke|test|qa|dom|browser)\b.*\b(?:chromium|chrome|playwright)\b)/i,
      androidBuild:/(?:\bgradle\b|\bassemble\b|\bandroid\s+(?:build|compile|jvm)\b)/i
    };
