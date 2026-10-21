@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: track05-timer-lifecycle-${{ github.ref }}
+  group: track05-timer-lifecycle-bounded-qa-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   node-timer:
