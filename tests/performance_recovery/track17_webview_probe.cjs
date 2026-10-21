@@ -98,7 +98,7 @@ const js=`(()=> {
     metrics:timings,offlineDomNavigation:navigation,
     generatedNumbers:/^[0-9]{2}:[0-9]{2}$/.test(document.getElementById('timerDigitsTxt')?.textContent||'')};
 })()`;
-let record={status:'NOT_TESTED',source_sha:process.env.GITHUB_SHA||null,webview:null};
+let record={status:'NOT_TESTED',source_sha:process.env.TRACK17_SOURCE_SHA||null,webview:null};
 (async()=>{
  await attach();
  for(let i=0;i<25;i++){
@@ -108,6 +108,7 @@ let record={status:'NOT_TESTED',source_sha:process.env.GITHUB_SHA||null,webview:
    await delay(500);
  }
  record.webview=await evaluate(js);
+ assert.match(record.source_sha||'',/^[0-9a-f]{40}$/,'Provenance must be checkout HEAD SHA');
  assert.equal(record.webview.offlineDomNavigation.length,7);
  assert.ok(record.webview.generatedNumbers,'Expected Western ASCII timer digits');
  record.status='PASS';
