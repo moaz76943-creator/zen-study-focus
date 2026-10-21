@@ -90,13 +90,13 @@ async function nativeUI(label,match,requireDocuments=true){
 }
 function findBackup(){
  for(const folder of ['/sdcard/Download','/sdcard/Documents','/sdcard','/storage/emulated/0']){
-  let out='';try{out=adb('shell','find',folder,'-maxdepth','2','-type','f');}catch(_){continue;}
+  let out='';try{out=adb('shell','find',folder,'-maxdepth','5','-type','f','-name','deep-focus-*');}catch(_){continue;}
   for(const row of out.split('\n')){
    const file=row.replaceAll('\r','').trim();
-   if(file.startsWith(folder+'/')&&/^deep-focus-\d{4}-\d{2}-\d{2}(?: \(\d+\))?\.zenbackup$/.test(file.split('/').at(-1)))return file;
+   if(file.startsWith(folder+'/')&&/^deep-focus-\d{4}-\d{2}-\d{2}.*\.zenbackup(?:\.txt)?$/.test(file.split('/').at(-1)))return file;
   }
  }
- throw Error('TRANSPORT: SAF export file not independently readable in disposable Downloads/Documents');
+ throw Error('TRANSPORT: SAF Save did not yield an independently readable deep-focus backup in disposable public storage');
 }
 
 async function main(){
