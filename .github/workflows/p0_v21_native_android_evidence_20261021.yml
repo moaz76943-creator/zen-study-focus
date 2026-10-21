@@ -25,7 +25,7 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/df-p0-v21-native"
           git cat-file -e "$PINNED_APP_SOURCE^{commit}"
-          expected="$(printf '%s\\n' .github/workflows/p0_v21_native_android_evidence_20261021.yml tests/android_e2e_recovery/run_p0_v21_android_evidence.sh | sort)"
+          expected="$(printf '%s\n' .github/workflows/p0_v21_native_android_evidence_20261021.yml tests/android_e2e_recovery/run_p0_v21_android_evidence.sh | sort)"
           actual="$(git diff --name-only "$PINNED_APP_SOURCE" HEAD | sort)"
           test "$actual" = "$expected"
           test "$(git rev-parse "$PINNED_APP_SOURCE:android")" = "$(git rev-parse HEAD:android)"
