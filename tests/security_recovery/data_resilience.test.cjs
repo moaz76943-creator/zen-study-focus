@@ -130,3 +130,51 @@ test('SEC-P1 imported duplicate task IDs must not become ambiguous live records'
   assert.equal(C.inspectBackup(backup(bad)).ok,false,
     'Current validator reports DUPLICATE_ID as warning; reject ambiguous imports before activation');
 });
+
+test('checksum-valid invalid family shapes block startup without changing either packet',()=>{
+  for(const [slot,value,code] of [
+    ['cfg',[],'INVALID_CFG'],
+    ['tasks',{id:100,title:'Wrong family shape',done:false},'INVALID_TASKS'],
+    ['notes',{id:200,title:'Wrong family shape',body:'Keep bytes'},'INVALID_NOTES'],
+    ['notes',[{id:200,title:'Wrong body shape',body:[]}],'INVALID_BODY']
+  ]) {
+    const s=seeded(),packet=C.encodePacket(value);
+    s.setItem(C.KEYS[slot],packet);s.setItem(C.KEYS[slot]+'_mirror',packet);
+    s.setItem('deep_focus_unsaved_note_draft_v1',JSON.stringify({body:'Synthetic unsaved draft'}));
+    s.setItem('zen_fortress_active_timer_v21',JSON.stringify({id:'synthetic-active',remaining:125}));
+    const before=[...s.data],result=Preflight.inspect(s);
+    assert.equal(result.ok,false,slot+' must not open with checksum-valid invalid records');
+    assert.equal(result.kind,'data');
+    assert.ok(result.issues.some(item=>String(item).includes(code)));
+    assert.deepEqual([...s.data],before);
+  }
+});
+
+test('preflight keeps fresh and partially initialized installs read-only',()=>{
+  const s=storage();assert.equal(Preflight.inspect(s).ok,true);
+  assert.equal(s.data.size,0);
+  const packet=C.encodePacket({lang:'ar',sessions:4,unknownCfg:{keep:7}});
+  s.setItem(C.KEYS.cfg,packet);s.setItem(C.KEYS.cfg+'_mirror',packet);
+  const before=[...s.data];assert.equal(Preflight.inspect(s).ok,true);
+  assert.deepEqual([...s.data],before);
+});
+
+test('preflight checks the chosen family and leaves malformed primary or valid mirror intact',()=>{
+  const s=seeded();s.setItem(C.KEYS.tasks,'{malformed');
+  let before=[...s.data];assert.equal(Preflight.inspect(s).ok,true);
+  assert.deepEqual([...s.data],before);
+  // A checksum-valid but wrong-shaped primary is not silently replaced by a mirror.
+  s.setItem(C.KEYS.tasks,C.encodePacket({unexpected:'object'}));
+  before=[...s.data];assert.equal(Preflight.inspect(s).ok,false);
+  assert.deepEqual([...s.data],before);
+});
+
+test('historical duplicate numeric IDs and unknown fields remain untouched by preflight',()=>{
+  const old=fixture();old.cfg.future={keep:true};
+  old.tasksList.push({...old.tasksList[0],title:'Historical duplicate',future:{retain:3}});
+  old.notesList[0].future={retain:'Unicode العربية'};
+  const s=seeded(old),before=[...s.data];
+  assert.equal(Preflight.inspect(s).ok,true,'Duplicate warnings must not become destructive repairs');
+  assert.deepEqual([...s.data],before);
+  assert.equal(C.inspectStorage(s).snapshot.tasksList[1].id,100);
+});

@@ -71,3 +71,38 @@ test('a failed mirror write cannot advance the native checkpoint',()=>{
  assert.equal(r.checkpoint(),original);
  assert.equal(r.boot().context.tasksList[0].checklist[0].done,true);
 });
+
+test('checksum-valid malformed native family cannot overwrite healthy WebView data',()=>{
+ for(const [slot,value] of [['cfg',[]],['tasks',{id:1,title:'Invalid family',done:false}],['notes',{id:2,title:'Invalid family',body:'Text'}]]){
+  const r=rig(),a=r.boot();assert.equal(r.toggle(a.context,true),true);r.flush(a.storage);
+  const old=D.captureRaw(a.storage),bad=JSON.parse(r.checkpoint()),packet=D.encodePacket(value);
+  bad.packets[D.KEYS[slot]]=packet;bad.packets[D.KEYS[slot]+'_mirror']=packet;
+  r.bridge.readDurableV21=()=>JSON.stringify(bad);
+  const b=r.boot();assert.equal(b.started,false,slot+' receipt must be rejected before replay');
+  assert.deepEqual(D.captureRaw(b.storage),old);
+ }
+});
+
+test('native ACK refuses signed invalid records before advancing its durable receipt',()=>{
+ const r=rig(),a=r.boot();assert.equal(r.toggle(a.context,true),true);
+ const receipt=r.checkpoint(),packet=D.encodePacket([{id:'1',title:'String ID',done:false}]);
+ a.storage.setItem(D.KEYS.tasks,packet);a.storage.setItem(D.KEYS.tasks+'_mirror',packet);
+ const before=D.captureRaw(a.storage);
+ assert.equal(a.context.DF22Preflight.nativeAcknowledge(a.storage),false);
+ assert.equal(r.checkpoint(),receipt);assert.deepEqual(D.captureRaw(a.storage),before);
+});
+
+test('native receipt validation preserves absent families and historical duplicate records',()=>{
+ const r=rig(),a=r.boot();
+ const cfgPacket=D.encodePacket({lang:'en',sessions:3,unknown:{keep:4}});
+ a.storage.setItem(D.KEYS.cfg,cfgPacket);a.storage.setItem(D.KEYS.cfg+'_mirror',cfgPacket);
+ assert.equal(a.context.DF22Preflight.nativeAcknowledge(a.storage),true);
+ const partial=r.boot();assert.equal(partial.started,true);
+ assert.equal(partial.storage.getItem(D.KEYS.tasks),null);
+ const tasks=[{id:42,title:'Original',done:false,unknown:{value:7}},{id:42,title:'Historical duplicate',done:true}];
+ const packet=D.encodePacket(tasks);partial.storage.setItem(D.KEYS.tasks,packet);partial.storage.setItem(D.KEYS.tasks+'_mirror',packet);
+ assert.equal(partial.context.DF22Preflight.nativeAcknowledge(partial.storage),true);
+ const b=r.boot();assert.equal(b.started,true);assert.equal(b.context.tasksList.length,2);
+ assert.equal(b.context.tasksList[0].id,42);assert.equal(typeof b.context.tasksList[0].id,'number');
+ assert.equal(b.context.tasksList[0].unknown.value,7);assert.equal(b.context.cfg.unknown.keep,4);
+});
