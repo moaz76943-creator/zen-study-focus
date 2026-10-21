@@ -1,0 +1,130 @@
+name: Track 07 Notes Recovery — isolated source and Chromium
+on:
+  push:
+    branches:
+      - qa/track07-notes-ime-combined-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track07-notes-recovery-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  notes-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Notes syntax and behavioral RED/GREEN
+        run: |
+          node --check android/app/src/main/assets/web/notes_editor_ui.js
+          node --check android/app/src/main/assets/web/notes_drafts.js
+          node --test tests/notes_recovery/*.test.cjs tests/notes_ui/*.test.cjs tests/notes_core/*.test.cjs
+      - name: Adjacent v21 persistence regression
+        if: success()
+        run: |
+          node --test tests/data_contracts/*.test.cjs tests/integration_recovery/notes_fallback_durability.test.cjs tests/integration_recovery/back_draft_guard.test.cjs
+          node tests/smoke_app.cjs
+  notes-chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Chromium browser dependency
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then sudo apt-get update -qq && sudo apt-get install -y -qq chromium; fi
+      - name: Start offline-only app
+        run: |
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/notes-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Real Chromium touch, save, reload at 320 and 393px
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_COMPLETION_EVIDENCE: ${{ runner.temp }}/notes-mobile-evidence
+        run: node tests/df4_browser/note_modal_reachability.cjs
+      - name: Cornell, archive/trash, revision, draft and 5k DOM browser acceptance
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_COMPLETION_EVIDENCE: ${{ runner.temp }}/notes-mobile-evidence
+        run: node tests/notes_recovery/notes_complete_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: notes-track07-chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/notes-mobile-evidence/
+          if-no-files-found: warn
+          retention-days: 7
+
+  notes-android:
+    name: Android API30 — bounded Notes real WebView taps
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ANDROID_TEST_API: '30'
+      DF_ANDROID_DISPOSABLE: '1'
+      DF_ANDROID_CASES: preflight,notes_create_edit,tasks_create,save_failure,language_live_change,dialog_back,orientation_restore,long_text,data_integrity,process_death_recovery
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android API36 build prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile exact-head test APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Capture source SHA, binary and emulator prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/notes-android"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/notes-android/source-sha.txt"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk | tee "$RUNNER_TEMP/notes-android/installed-input-apk.sha256"
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Real Android isolated Notes/WebView acceptance
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/notes_recovery/android_notes_scope.sh
+      - name: Persist real Android evidence (even if failed)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notes-track07-android-${{ github.sha }}
+          path: ${{ runner.temp }}/notes-android/
+          retention-days: 7
+          if-no-files-found: warn
