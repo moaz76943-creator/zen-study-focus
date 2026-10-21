@@ -22,7 +22,7 @@ function important(english){
  return /\b(?:backup|export|restore|delete|reset|cancel|permission|private|security|error|failed|unable|unsaved|warning|stop|revert|overwrite|discard|privacy|confirm|save)\b/i.test(english);
 }
 function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().uiStrings,
- webDrafts=readCandidates('drafts'),nativeDrafts=readCandidates('native_drafts'),unmarkedRows=[]}={}){
+ nativeDynamicRows=[],webDrafts=readCandidates('drafts'),nativeDrafts=readCandidates('native_drafts'),unmarkedRows=[]}={}){
  const catalogSet=new Set(guard.REGISTRY.filter(r=>r.phase==='planned').map(r=>r.code));
  const sourcePaths=new Set(Object.entries(source).flatMap(([cid,values])=>Object.keys(values).map(k=>cid+'.'+k)));
  const nativeKeys=new Set(nativeRows.map(r=>r.text));
@@ -41,7 +41,12 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
   const validation=nativeDraftTools.validate(pack,nativeRows);
   if(!validation.valid)throw Error('INVALID_NATIVE_DRAFT:'+code+':'+validation.errors.join(','));
  }
+ for(const entry of nativeDynamicRows){
+  if(!entry||typeof entry.path!=='string'||typeof entry.kind!=='string'||typeof entry.expression!=='string'
+     ||!Number.isInteger(entry.line)||entry.line<1)throw Error('INVALID_DYNAMIC_NATIVE_SOURCE');
+ }
  const englishSha=guard.inventoryHash(source),nativeSha=native.inventoryHash(nativeRows);
+ const nativeDynamicSha=native.inventoryHash(nativeDynamicRows.map(r=>({...r,text:r.expression})));
  return guard.REGISTRY.filter(r=>r.phase==='planned').map(locale=>{
   const web=webDrafts[locale.code],nat=nativeDrafts[locale.code],items=[];
   for(const [catalog,values] of Object.entries(source)){
@@ -62,6 +67,15 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
     placeholders:[...entry.text.matchAll(PLACEHOLDERS)].map(x=>x[0]),
     critical:important(entry.text),humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
   }
+  // Runtime-provided native copy (including Android dialogs populated by JavaScript)
+  // is not translated by Java literal extraction: force explicit source tracing.
+  for(const entry of nativeDynamicRows){
+   items.push({surface:'android-dynamic',catalog:entry.kind,
+    key:entry.path+':'+entry.line+':'+entry.kind,english:null,candidate:null,
+    sourceFile:entry.path,sourceLine:entry.line,sourceExpression:entry.expression,
+    status:'NEEDS_DYNAMIC_RUNTIME_CROSS_REFERENCE',placeholders:[],critical:true,
+    humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
+  }
   // Potential user-facing literals outside the registered dictionaries. Never auto-translate
   // or silently promote: some are code internals, requiring human classification first.
   for(const row of unmarkedRows){
@@ -75,15 +89,17 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
   const candidateCount=items.filter(r=>r.candidate!==null).length;
   return {schema_version:1,locale:locale.code,englishName:locale.name,
     script:locale.script,direction:locale.direction,englishSourceSha256:englishSha,
-    nativeSourceSha256:nativeSha,total:items.length,candidateCount,untranslatedCount:items.length-candidateCount,
+    nativeSourceSha256:nativeSha,nativeDynamicSourceSha256:nativeDynamicSha,
+    dynamicNativeReviewItems:nativeDynamicRows.length,total:items.length,candidateCount,untranslatedCount:items.length-candidateCount,
     approvedForRuntime:false,humanReview:'NOT_TESTED',androidTests:'NOT_TESTED',
-    sourceScope:'Explicit 25 dictionaries plus detected Java copy; dynamic and OS UI may not be included',
+    sourceScope:'Explicit dictionaries, detected Java literals and unresolved native dynamic callsites; JS/OS UI can still require independent inspection',
     items};
  });
 }
 function writeQueue(directory){
  const unmarkedRows=require('../language_review/audit.cjs').audit().staticCandidates;
- const queue=buildQueue({unmarkedRows}),out=path.resolve(directory);
+ const nativeFound=native.report();
+ const queue=buildQueue({nativeRows:nativeFound.uiStrings,nativeDynamicRows:nativeFound.dynamicUiCallsites,unmarkedRows}),out=path.resolve(directory);
  fs.mkdirSync(out,{recursive:true});
  const list=queue.map(q=>{
   fs.writeFileSync(path.join(out,q.locale+'.json'),JSON.stringify(q,null,2)+'\n');
@@ -93,6 +109,7 @@ function writeQueue(directory){
  const overview={schema_version:1,totalLanguages:100,plannedLanguages:list.length,
   existingUntouched:20,excludedHebrew:true,certifiedNewLanguages:0,
   candidateStrings:list.reduce((sum,q)=>sum+q.candidates,0),unmarkedStaticReviewItems:unmarkedRows.length,
+  nativeDynamicReviewItems:nativeFound.dynamicCandidateCount,
   approved:false,files:list};
  fs.writeFileSync(path.join(out,'INDEX.json'),JSON.stringify(overview,null,2)+'\n');
  return overview;
