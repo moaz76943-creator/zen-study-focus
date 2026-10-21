@@ -1,0 +1,106 @@
+name: Deep Focus v22 closed-test signing (no publication)
+
+on:
+  push:
+    branches: [release/prep-play-closed-v22-20261021]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zen-v22-closed-test-signing-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  signed-aab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify source identity and app release configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          grep -Eq 'versionCode[[:space:]]+22([^0-9]|$)' android/app/build.gradle
+          grep -Eq 'debuggable[[:space:]]+false' android/app/build.gradle
+          ! grep -Eq 'signingConfig[[:space:]]+signingConfigs\.debug' android/app/build.gradle
+          node --test tests/integration_quality/release_signing_v22.test.cjs
+      - name: Check required upload credentials without exposing values
+        env:
+          ZEN_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
+          ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
+          ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
+          ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for secret in ZEN_UPLOAD_KEYSTORE_BASE64 ZEN_UPLOAD_STORE_PASSWORD ZEN_UPLOAD_KEY_ALIAS ZEN_UPLOAD_KEY_PASSWORD; do
+            if [[ -z "${!secret}" ]]; then
+              echo "::error::Missing upload signing credential: $secret"
+              exit 1
+            fi
+          done
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android API 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install temporary upload keystore on runner
+        env:
+          ZEN_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          printf '%s' "$ZEN_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/deep-focus-upload-v22.p12"
+          test -s "$RUNNER_TEMP/deep-focus-upload-v22.p12"
+          echo "ZEN_UPLOAD_KEYSTORE_PATH=$RUNNER_TEMP/deep-focus-upload-v22.p12" >> "$GITHUB_ENV"
+      - name: Compile signed non-debuggable AAB
+        working-directory: android
+        env:
+          ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
+          ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
+          ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
+        run: gradle bundleRelease --no-daemon
+      - name: Verify signed AAB, key identity and exact source SHA
+        env:
+          ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
+          ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle="android/app/build/outputs/bundle/release/app-release.aab"
+          test -s "$bundle"
+          jarsigner -verify -verbose "$bundle" > "$RUNNER_TEMP/signature-check.txt"
+          grep -q 'jar verified.' "$RUNNER_TEMP/signature-check.txt"
+          signer="$(keytool -printcert -jarfile "$bundle" | grep -m 1 'SHA256:' | tr -d '[:space:]')"
+          upload="$(keytool -list -v -keystore "$ZEN_UPLOAD_KEYSTORE_PATH" -storetype PKCS12 -storepass "$ZEN_UPLOAD_STORE_PASSWORD" -alias "$ZEN_UPLOAD_KEY_ALIAS" | grep -m 1 'SHA256:' | tr -d '[:space:]')"
+          test -n "$signer"
+          test "$signer" = "$upload"
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/SOURCE_SHA
+          sha256sum "$bundle" > evidence/APP_RELEASE_AAB_SHA256
+          printf 'CLOSED_TEST_ONLY; NOT_PRODUCTION_APPROVED; versionCode=22; debuggable=false\n' > evidence/STATUS
+          printf '%s\n' "$signer" > evidence/UPLOAD_CERT_SHA256
+      - name: Upload signed AAB and immutable evidence (never private key)
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-v22-ClosedTest-Signed-AAB
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            evidence/
