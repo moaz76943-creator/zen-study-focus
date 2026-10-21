@@ -336,10 +336,19 @@ async function main(){
         let afterRoot;
         try{afterRoot=await nativeUI('prepared backup document',xml=>uiNodes(xml).find(n=>n.includes('text="'+name+'"')));}
         catch(error){saveSafPickerEvidence('import_file_not_visible',null);throw error;}
+        saveSafPickerEvidence('import_file_visible',afterRoot.xml);
         selected=afterRoot.item;
       }
       tapUI(selected);
-      const confirm=await nativeUI('native backup confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)),false);
+      await pause(600);
+      saveSafPickerEvidence('import_after_document_selection',null);
+      let confirm;
+      try{
+        confirm=await nativeUI('native backup confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)),false);
+      }catch(error){
+        saveSafPickerEvidence('import_confirmation_missing',null);
+        throw error;
+      }
       tapUI(confirm.item);
       let changed=false;
       for(let i=0;i<15;i++){await pause(500);if(JSON.stringify(await fixture())===JSON.stringify(before)){changed=true;break;}}
