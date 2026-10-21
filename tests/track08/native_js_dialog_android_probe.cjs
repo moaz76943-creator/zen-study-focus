@@ -120,6 +120,32 @@ async function main(){
   assert.equal(cancelledPrompt.type,'object');
   assert.equal(cancelledPrompt.value,null,'Prompt cancel must be null');
   results.push({operation:'prompt_cancel',status:'PASS'});
+  // Real user's Short/Long buttons, not fabricated window.confirm calls:
+  // Active focus timer MUST survive Android Back/Cancel with identical session ID.
+  const active=await evaluate('(() => {applyLanguage("en");selectTimerMode(25,"focus",document.getElementById("modeFocusBtn"));if(!timerRunning)toggleTimerPlay();return {id:timerSessionId,mode:currentTimerModeKey,total:timerTotal,running:timerRunning};})()');
+  const initial=active.value;
+  assert.equal(initial.running,true);
+  for(const [button,key] of [['modeShortBtn','short'],['modeLongBtn','long']]){
+    const p=evaluate('(() => {document.getElementById("'+button+'").click();return {id:timerSessionId,mode:currentTimerModeKey,total:timerTotal,running:timerRunning};})()');
+    const tree=await dialog('Changing mode');
+    assert.ok(tree.includes('Deep Focus'),'Only app-branded Android modal accepted');
+    adb('shell','input','keyevent','KEYCODE_BACK');
+    const value=(await p).value;
+    assert.equal(value.mode,initial.mode,'Cancelled '+button+' changed timer mode');
+    assert.equal(value.total,initial.total,'Cancelled '+button+' reset progress');
+    assert.equal(value.id,initial.id,'Cancelled '+button+' lost live session ID');
+    assert.equal(value.running,true,'Cancelled '+button+' paused live session');
+    results.push({operation:'real_'+key+'_button_cancel',status:'PASS'});
+  }
+  const accept=evaluate('(() => {document.getElementById("modeLongBtn").click();return {mode:currentTimerModeKey,total:timerTotal,running:timerRunning};})()');
+  let modeTree=await dialog('Changing mode');
+  const modePositive=buttons(modeTree).sort((a,b)=>b.x-a.x)[0];
+  assert.ok(modePositive,'Native timer confirm lacks affirmative button');
+  adb('shell','input','tap',String(modePositive.x),String(modePositive.y));
+  const accepted=(await accept).value;
+  assert.equal(accepted.mode,'long','Accepted long button must change mode');
+  assert.equal(accepted.running,false,'Accepted mode change must stop old session');
+  results.push({operation:'real_long_button_accept',status:'PASS'});
   const summary={results,source:'real Android WebView+native UIAutomator',release_approved:false};
   fs.writeFileSync(E+'/android-native-dialog-results.json',JSON.stringify(summary,null,2));
   console.log('ANDROID_P0_ALL_JS_DIALOGS_PASS',JSON.stringify(summary));
