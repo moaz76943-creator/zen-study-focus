@@ -160,7 +160,65 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception ignored) { return false; }
     }
 
+    // Independent active-timer receipt: NEVER extend the six v21 record families.
+    // Android WebView localStorage can lose a just-acknowledged pause on process kill.
+    private final Object activeTimerCheckpointLock = new Object();
+    private static final int ACTIVE_TIMER_MAX_BYTES = 256 * 1024;
+    private boolean validActiveTimerPacket(String text) {
+        if (text == null || text.length() > ACTIVE_TIMER_MAX_BYTES) return false;
+        try {
+            org.json.JSONObject p = new org.json.JSONObject(text);
+            if (!(p.opt("payload") instanceof String) || !(p.opt("sig") instanceof String)) return false;
+            String payload = p.getString("payload");
+            if (payload.length() > ACTIVE_TIMER_MAX_BYTES) return false;
+            org.json.JSONObject state = new org.json.JSONObject(payload);
+            double total = state.getDouble("total"), left = state.getDouble("left");
+            return Double.isFinite(total) && Double.isFinite(left) &&
+                    total >= 1 && total <= 86400 && left >= 0 && left <= 86400 &&
+                    (state.opt("running") instanceof Boolean);
+        } catch (Exception ignored) { return false; }
+    }
+
     public class ZenNativeBridge {
+        // Store the exact signed WebView packet as an optional, synchronous,
+        // fsynced AtomicFile receipt. The JS reader verifies the legacy hash.
+        @JavascriptInterface
+        public boolean acknowledgeActiveTimerSnapshot(String packet) {
+            if (!validActiveTimerPacket(packet)) return false;
+            byte[] bytes = packet.getBytes(StandardCharsets.UTF_8);
+            if (bytes.length > ACTIVE_TIMER_MAX_BYTES) return false;
+            synchronized (activeTimerCheckpointLock) {
+                AtomicFile file=new AtomicFile(new File(getFilesDir(),"active_timer_checkpoint_v1"));
+                FileOutputStream stream=null;
+                try {
+                    stream=file.startWrite();
+                    stream.write(bytes);
+                    stream.getFD().sync();
+                    file.finishWrite(stream);
+                    return true;
+                } catch (Exception error) {
+                    if (stream != null) file.failWrite(stream);
+                    return false;
+                }
+            }
+        }
+
+        @JavascriptInterface
+        public String readActiveTimerSnapshot() {
+            synchronized (activeTimerCheckpointLock) {
+                AtomicFile file=new AtomicFile(new File(getFilesDir(),"active_timer_checkpoint_v1"));
+                File base=file.getBaseFile();
+                if (!base.exists() && !new File(base.getPath()+".bak").exists()) return "NONE";
+                try {
+                    byte[] bytes=file.readFully();
+                    if (bytes.length > ACTIVE_TIMER_MAX_BYTES) return "ERROR";
+                    String raw=new String(bytes,StandardCharsets.UTF_8);
+                    return validActiveTimerPacket(raw) ? raw : "ERROR";
+                } catch (Exception error) { return "ERROR"; }
+            }
+        }
+
+
         // @JavascriptInterface executes on WebView's bridge thread, off the UI thread.
         // Acknowledgement requires a private AtomicFile with explicit FD sync.
         @JavascriptInterface
