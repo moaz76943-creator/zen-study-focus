@@ -22,7 +22,7 @@ function important(english){
  return /\b(?:backup|export|restore|delete|reset|cancel|permission|private|security|error|failed|unable|unsaved|warning|stop|revert|overwrite|discard|privacy|confirm|save)\b/i.test(english);
 }
 function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().uiStrings,
- webDrafts=readCandidates('drafts'),nativeDrafts=readCandidates('native_drafts')}={}){
+ webDrafts=readCandidates('drafts'),nativeDrafts=readCandidates('native_drafts'),unmarkedRows=[]}={}){
  const catalogSet=new Set(guard.REGISTRY.filter(r=>r.phase==='planned').map(r=>r.code));
  const sourcePaths=new Set(Object.entries(source).flatMap(([cid,values])=>Object.keys(values).map(k=>cid+'.'+k)));
  const nativeKeys=new Set(nativeRows.map(r=>r.text));
@@ -56,6 +56,16 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
     placeholders:[...entry.text.matchAll(PLACEHOLDERS)].map(x=>x[0]),
     critical:important(entry.text),humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
   }
+  // Potential user-facing literals outside the registered dictionaries. Never auto-translate
+  // or silently promote: some are code internals, requiring human classification first.
+  for(const row of unmarkedRows){
+   if(!row||typeof row.text!=='string'||typeof row.file!=='string'||!Number.isInteger(row.line))
+     throw Error('INVALID_STATIC_CANDIDATE');
+   items.push({surface:'unmarked-static',catalog:row.kind||'unknown',key:row.file+':'+row.line,
+    english:row.text,candidate:null,sourceFile:row.file,sourceLine:row.line,
+    status:'NEEDS_SOURCE_INVENTORY_CLASSIFICATION',placeholders:[...row.text.matchAll(PLACEHOLDERS)].map(x=>x[0]),
+    critical:important(row.text),humanReview:'NOT_TESTED',contextScreenshots:[],reviewNotes:null});
+  }
   const candidateCount=items.filter(r=>r.candidate!==null).length;
   return {schema_version:1,locale:locale.code,englishName:locale.name,
     script:locale.script,direction:locale.direction,englishSourceSha256:englishSha,
@@ -66,7 +76,8 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
  });
 }
 function writeQueue(directory){
- const queue=buildQueue(),out=path.resolve(directory);
+ const unmarkedRows=require('../language_review/audit.cjs').audit().staticCandidates;
+ const queue=buildQueue({unmarkedRows}),out=path.resolve(directory);
  fs.mkdirSync(out,{recursive:true});
  const list=queue.map(q=>{
   fs.writeFileSync(path.join(out,q.locale+'.json'),JSON.stringify(q,null,2)+'\n');
@@ -75,7 +86,8 @@ function writeQueue(directory){
  });
  const overview={schema_version:1,totalLanguages:100,plannedLanguages:list.length,
   existingUntouched:20,excludedHebrew:true,certifiedNewLanguages:0,
-  candidateStrings:list.reduce((sum,q)=>sum+q.candidates,0),approved:false,files:list};
+  candidateStrings:list.reduce((sum,q)=>sum+q.candidates,0),unmarkedStaticReviewItems:unmarkedRows.length,
+  approved:false,files:list};
  fs.writeFileSync(path.join(out,'INDEX.json'),JSON.stringify(overview,null,2)+'\n');
  return overview;
 }
