@@ -84,7 +84,22 @@ test('admission CLI loads real partial drafts without a circular initialization 
  const stdout=execFileSync(node,['tools/localization_100/guard.cjs','--check'],{cwd:require('node:path').resolve(__dirname,'../..'),encoding:'utf8',timeout:12000});
  const report=JSON.parse(stdout);
  assert.equal(report.ok,true,JSON.stringify(report.errors));
- assert.equal(report.draftCandidates,1);
+ assert.equal(report.draftCandidates,2);
  assert.ok(report.candidateStrings>=25);
  assert.equal(report.releaseApproved,false);
+});
+
+test('Romanian draft is a second independent structurally safe but non-activated locale',()=>{
+ const ro=require('../../tools/localization_100/drafts/ro.json');
+ const real=guard.sourceInventory(),result=draft.validateDraft(ro,real);
+ assert.equal(result.valid,true,JSON.stringify(result.errors));
+ assert.equal(result.locale,'ro');
+ assert.equal(result.readyForRuntime,false);
+ assert.ok(result.translated>=70);
+ assert.ok(result.missing>0);
+ assert.equal(guard.resolve('ro-RO').selectable,false);
+ const catalog=draft.reportDrafts(real);
+ assert.equal(catalog.candidateCount,2);
+ assert.deepEqual(catalog.languages.map(x=>x.locale).sort(),['ro','sw']);
+ assert.equal(catalog.activationAllowed,false);
 });
