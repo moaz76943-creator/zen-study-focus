@@ -7,6 +7,8 @@ function report(){
  const source=guard.sourceInventory(),screenAudit=review.audit();
  const draftAudit=drafts.reportDrafts(source);
  const nativeCopy=require('./native_copy.cjs').report();
+ const nativeDrafts=require('./native_drafts.cjs').report();
+ const nativeByLocale=new Map(nativeDrafts.results.map(x=>[x.locale,x]));
  const tracked=new Map(draftAudit.languages.map(x=>[x.locale,x]));
  const missingCount=new Map();
  for(const {language} of screenAudit.missing)missingCount.set(language,(missingCount.get(language)||0)+1);
@@ -15,9 +17,11 @@ function report(){
   const exists=loc.phase==='existing', candidate=tracked.get(loc.code);
   const missingKeys=exists?(missingCount.get(loc.code)||0):candidate?candidate.missing:keys;
   const draftCount=candidate?candidate.translated:0;
+  const nativeCount=nativeByLocale.get(loc.code)?.translated||0;
   return Object.freeze({code:loc.code,name:loc.name,script:loc.script,direction:loc.direction,
    state:exists?'EXISTING_RUNTIME_UNCERTIFIED':candidate?'DRAFT_UNREVIEWED':'NOT_STARTED',
-   runtimeAvailable:exists,selectable:exists,draftCount,sourceKeyTotal:keys,
+   runtimeAvailable:exists,selectable:exists,draftCount,nativeDraftCount:nativeCount,
+   nativeTextTotal:nativeCopy.candidates,sourceKeyTotal:keys,
    explicitExistingKeys:exists?keys-missingKeys:0,missingKeys,
    nativeReview:'NOT_TESTED',androidVerified:'NOT_TESTED',screensVerified:'NOT_TESTED',
    translationApproved:false});
@@ -29,7 +33,8 @@ function report(){
   newlyCertified:0,sourceCatalogs:groups,sourceKeysPerLanguage:keys,
   sourceInventorySha256:guard.inventoryHash(source),
   sourceInventoryComplete:false,
-  nativeCandidateCount:nativeCopy.candidates,nativeSourceLocalized:false,
+  nativeCandidateCount:nativeCopy.candidates,nativeDraftStrings:nativeDrafts.candidateTexts,
+  nativeSourceLocalized:false,
   existingMeasurement:'Explicit checked-in dictionary keys only, not rendered/native strings',
   legacyExplicitMissing:screenAudit.missing.length,
   englishIdenticalCandidates:screenAudit.englishIdentical.length,
