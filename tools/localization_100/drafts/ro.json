@@ -117,5 +117,10 @@
       "navCalendar": "Calendar",
       "btnAddCalNote": "+ Adaugă o notiță la dată"
     }
+  },
+  "identicalSourceCandidates": {
+    "core.goals.catSport": "Sport is a Romanian noun widely used in fitness navigation; independent reviewer must confirm in context.",
+    "core.tasks.filterToday": "Active is a Romanian plural adjective for feminine tasks; reviewer must verify grammar against the actual filter.",
+    "core.calendar.navCalendar": "Calendar is the usual Romanian noun for the calendar view; native reviewer must confirm capitalization and UI context."
   }
 }
