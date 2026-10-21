@@ -62,11 +62,19 @@
        'لا يوجد دليل مباشر ومؤكد على أحدث SHA',
        run?core.runUrl(run.id):null);
    }
+   const agentRoles={
+     localization:'ترجمات اللغات والاتجاهات',numerals:'الأرقام الغربية 0–9',
+     navigation:'الأزرار والتنقل',notes:'الملاحظات',tasks:'المهام',
+     analytics:'الإحصاءات',timer:'المؤقت والجلسات',
+     nature_audio:'الصوت والتراخيص',privacy_security:'الأمان والخصوصية',
+     data_integrity:'سلامة v21',performance:'الأداء',
+     product_consistency:'الاتساق ومنع التراجعات'
+   };
    const agents=core.parseAgentLedger(agentLedger?.body,pull138?.sha);
    for(const row of agents.agents){
      const state=stale?'STALE':row.status;
      panel('track15-agents',row.id+' · '+state,
-       'سجل QA مصدره Issue #69'+(agents.sourceSha?' · SHA '+agents.sourceSha.slice(0,12):' · غير متاح'),
+       'المهمة: '+agentRoles[row.id]+' · سجل QA مصدره Issue #69'+(agents.sourceSha?' · SHA '+agents.sourceSha.slice(0,12):' · غير متاح'),
        core.issueUrl(69));
    }
    const artifactsList=core.listArtifacts(artifacts,run?.id,pull138?.sha);
@@ -139,7 +147,7 @@
    if(!pull138&&previous){render(previous,'STALE');}
    else{previous=snapshot;render(snapshot,quality);}
    /* Min 12 minutes between full scans: ~8 unauthenticated REST calls per scan. */
-   lockUntil=Math.max(lockUntil,Date.now()+12*60*1000);
+   lockUntil=Math.max(lockUntil,Date.now()+(quality==='LIVE'?12*60*1000:30*1000));
    } finally {
      busy=false;$('track15-refresh').disabled=false;
    }
