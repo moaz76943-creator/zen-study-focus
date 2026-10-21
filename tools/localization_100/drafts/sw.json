@@ -62,7 +62,7 @@
     },
     "core.sounds": {
       "navSounds": "Sauti za asili",
-      "btnStopAll": "Simamisha",
+      "btnStopAll": "⏹ Simamisha",
       "sndCatWater": "Maji na mvua 🌧️",
       "sndCatForest": "Msitu na upepo 🌲",
       "sndCatWarm": "Moto na ardhi 🔥"
