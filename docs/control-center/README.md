@@ -240,3 +240,27 @@ The **الربط الحي بالمستودع** section now has a searchable list
 - Hosted dashboard has **no personal access token, no GitHub write scope, no auto-merge and no autonomous agent execution**. The user opens authenticated GitHub separately to approve/merge anything. Rate limits remain possible with public browser API requests.
 
 **Release:** Android real-device tests, audio licensing, complete 20-locale validation and backup acceptance remain separate; no release can be inferred from dashboard green checks.
+
+## Track 15: exact-SHA public observation (review-only)
+
+Track 15 is additive to v3.5; it is **not** an independent replacement dashboard. 
+The new panel reads PR #37 and canonical PR #138, Issues #64/#69/#110,
+exact-#138 workflow jobs and the matching run's **artifact metadata**. A job labelled Node,
+Python, Chromium or Android-build can be PASS/FAIL only if it belongs to that exact run's
+source SHA; physical Android, SAF and TalkBack always remain NOT_TESTED without device QA.
+
+Issue #69's machine-readable agent ledger is explicitly `STALE` whenever its
+`source_sha` differs from PR #138 HEAD. Missing per-language translation counts,
+media licence proof, source checks, data-integrity proof and APK/AAB **binary** SHA256
+remain NOT_TESTED/NOT_APPROVED, never synthesized. GitHub's artifact digest, where
+available, is labelled **archive** SHA256, not the APK's digest.
+
+Public anonymous API reads use `credentials:omit`, bounded requests and a 12-minute
+client-side cooldown. On 403/429, `Retry-After`/`x-ratelimit-reset` controls retry.
+No GitHub token, workflow dispatch, merge command or device data is present.
+
+Production AppDeploy v4 / snapshot `1792512426988` was inspected, not
+republished by Track 15. The new sources require a separately reviewed deployment.
+`node --test tests/control_center/*.test.cjs` and real mobile-browser interaction
+checks should be re-run on the proposed branch after integration; real Android
+WebView acceptance remains a separate requirement.
