@@ -130,7 +130,9 @@ async function main(){
     return info;
   };
   const rejectionCopy=(await evaluate('quickText("replacePrompt")')).value;
+  const modeCopy=(await evaluate('cfg.lang === "ar" ? "تغيير الوضع سيلغي تقدم الجلسة الحالية. هل تريد المتابعة؟" : "Changing mode will discard current session progress. Continue?"')).value;
   assert.ok(rejectionCopy&&rejectionCopy.length>10,'Missing localized active-session warning');
+  assert.ok(modeCopy&&modeCopy.length>10,'Missing localized timer-mode warning');
   const guardedControls=[
     ['modeShortBtn','document.getElementById("modeShortBtn").click()'],
     ['modeLongBtn','document.getElementById("modeLongBtn").click()'],
@@ -141,7 +143,7 @@ async function main(){
   for(const [name,click] of guardedControls){
     const before=await focus();
     const result=evaluate('(()=>{'+click+';return '+stateExpr+';})()');
-    const hierarchy=await dialog(rejectionCopy);
+    const hierarchy=await dialog(['modeShortBtn','modeLongBtn'].includes(name)?modeCopy:rejectionCopy);
     assert.ok(hierarchy.includes('Deep Focus'),'Missing branded native dialog for '+name);
     adb('shell','input','keyevent','KEYCODE_BACK');
     const after=(await result).value;
@@ -154,7 +156,7 @@ async function main(){
   const customForm=(await evaluate('(()=>{document.getElementById("modeCustomBtn").click();document.getElementById("inpCustomMins").value="47";document.getElementById("inpCustomTitle").value="QA custom label";return document.getElementById("customTimerModal").classList.contains("open");})()')).value;
   assert.equal(customForm,true,'Custom Timer modal not open');
   const customCancel=evaluate('(()=>{document.querySelector(\'#customTimerModal button[onclick="applyCustomTimerNow()"]\').click();return {state:'+stateExpr+',modalOpen:document.getElementById("customTimerModal").classList.contains("open"),entered:document.getElementById("inpCustomTitle").value};})()');
-  await dialog(rejectionCopy);
+  await dialog(modeCopy);
   adb('shell','input','keyevent','KEYCODE_BACK');
   const afterCustom=(await customCancel).value;
   assert.equal(afterCustom.modalOpen,true,'Custom modal closed on cancellation');
@@ -164,7 +166,7 @@ async function main(){
   assert.equal(afterCustom.state.running,true,'Custom cancel stopped current focus');
   results.push({operation:'custom_timer_cancel',status:'PASS',userDraftPreserved:true});
   const customAccept=evaluate('(()=>{document.querySelector(\'#customTimerModal button[onclick="applyCustomTimerNow()"]\').click();return {state:'+stateExpr+',modalOpen:document.getElementById("customTimerModal").classList.contains("open")};})()');
-  const acceptXml=await dialog(rejectionCopy);
+  const acceptXml=await dialog(modeCopy);
   const yes=buttons(acceptXml).sort((a,b)=>b.x-a.x)[0];
   assert.ok(yes,'Missing native YES for custom timer');
   adb('shell','input','tap',String(yes.x),String(yes.y));
