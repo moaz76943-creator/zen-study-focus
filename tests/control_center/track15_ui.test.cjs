@@ -69,3 +69,12 @@ test('track15-ui03 scripts use textContent, omit browser credentials and mutatio
  assert.match(script,/textContent=String\(text\)/);
  assert.doesNotMatch(script,/innerHTML\s*=|Authorization:|localStorage|sessionStorage|pulls\/\d+\/merge|POST\b|DELETE\b/);
 });
+
+test('track15-ui04 portable dashboard embeds Track 15 scripts under pinned CSP',()=>{
+ const {buildPortable}=require('../../tools/control_center/build_portable.cjs');
+ const html=buildPortable();
+ assert.match(html,/data-bundle="track15-core\.js"/);
+ assert.match(html,/data-bundle="track15-ui\.js"/);
+ assert.match(html,/id="track15-refresh"/);
+ assert.doesNotMatch(html,/<script src="\.\/track15/);
+});
