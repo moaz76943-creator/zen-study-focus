@@ -35,6 +35,9 @@ jobs:
         run: |
           set -euo pipefail
           node --test --test-reporter=tap tests/focus_workflows/test_focus_workflows.cjs | tee "$RUNNER_TEMP/track09/node.tap"
+          TZ=America/New_York node --test tests/focus_workflows/test_focus_workflows.cjs
+          TZ=Asia/Amman node --test tests/focus_workflows/test_focus_workflows.cjs
+          TZ=Pacific/Auckland node --test tests/focus_workflows/test_focus_workflows.cjs
       - name: Install isolated Chromium automation
         shell: bash
         run: |
