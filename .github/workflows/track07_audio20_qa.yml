@@ -39,6 +39,7 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/audioqa-browser" --no-save playwright@1.56.1
           NODE_PATH="$RUNNER_TEMP/audioqa-browser/node_modules" node tests/nature_library_v2/audio_review_browser.cjs audio_candidates/requested/index.html audio_candidates/requested/browser-evidence
+          NODE_PATH="$RUNNER_TEMP/audioqa-browser/node_modules" node tests/nature_library_v2/main_controls_browser.cjs android/app/src/main/assets/web/index.html audio_candidates/requested/main-controls-evidence
       - name: Require20 uniquely sourced requested slots; no production enablement
         run: |
           python3 - <<'PY'

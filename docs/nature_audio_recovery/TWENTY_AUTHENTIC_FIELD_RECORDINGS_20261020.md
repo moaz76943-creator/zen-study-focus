@@ -255,3 +255,29 @@ execution of a newer SHA. Its installed APK SHA256 is
 New-head Android results must be read from its own run. Human listening,
 background/locked/Bluetooth, physical device and main-app activation remain open.
 `RELEASE_APPROVED=NO`.
+
+## Main-app control repair and evidence-summary correction
+
+The real main app used clickable sound-card divs without keyboard semantics and
+showed a Pause glyph although the action stopped/disposed the player. Replaced
+that action with a native44px-minimum Play/Stop button, explicit aria-pressed,
+localized accessible names, and keyboard focus restoration after tile rerender.
+The range remains independent and system percentages use an LTR bdi. Flexible
+card height avoids clipping under larger text. Added Play/Stop/blocked/failure
+strings to the existing20-locale nature messages; this is source/runtime coverage,
+not native-speaker approval of the whole product. No candidate playback gate changed.
+
+Real main-browser RED found0 native sound buttons; GREEN exercises actual muted
+media via Enter/Space, retained focus, independent range, blocked-source and
+injected-failure toasts in20 languages, plus160 card/control layouts at320–430px
+and100–200% root font. Local HTTP transport is labelled offline:false; CI runs
+file/offline. The same source gains and unapproved-source guards remain intact.
+
+A separate reporting defect was found in older smoke evidence: the shell text
+summary hardcoded THIRTY_MINUTE_MUTED_DECODE_MIX=PASS, while its actual JSON
+correctly said NOT_TESTED. **The f4a3adf artifact's text line is erroneous; its
+JSON is authoritative and that head did not run30-minute endurance.** No old
+artifact is rewritten. Commit4d54931 makes the summary derive from actual JSON
+and reject0-duration PASS, short1800s claims, invalid durations and failed probes.
+RED/GREEN regression covers smoke NOT_TESTED and a genuinely long PASS. The
+61725a4 full1802s run remains distinct and valid; no newer head inherits its PASS.

@@ -1635,6 +1635,13 @@ function applyNatureMixVolumes() {
   channels.forEach(sound => activePlayers[sound.id].setVol(sound.vol * gain));
 }
 
+function natureUiText(key) {
+  const lang = typeof cfg !== 'undefined' ? cfg.lang : 'en';
+  const messages = typeof DeepFocusNatureLibraryV2 !== 'undefined' ? DeepFocusNatureLibraryV2.messages : null;
+  const fallback = {play:'Play',stop:'Stop',blocked:'Recording awaiting source and audio review.',unavailable:'Unable to play this recording.'};
+  return (messages && messages[lang] && messages[lang][key]) || (messages && messages.en[key]) || fallback[key];
+}
+
 function stopSoundTile(id) {
   soundGeneration[id] = (soundGeneration[id] || 0) + 1;
   const player = activePlayers[id];
@@ -1649,7 +1656,7 @@ function toggleSoundTile(id) {
   const s=SOUNDS_DATA.find(x=>x.id===id);
   if(!s)return;
   if(!NATURE_APPROVED_FOR_PLAYBACK.has(id)) {
-    showToast('Recording awaiting source and audio verification');
+    showToast(natureUiText('blocked'));
     return;
   }
   const sName=L().sounds[id]||id;
@@ -1666,7 +1673,7 @@ function toggleSoundTile(id) {
   };
   const failure=()=>{
     if(soundGeneration[id] !== token||activePlayers[id]!==player)return;
-    stopSoundTile(id);renderSoundsStudio();showToast('Recording unavailable — playback stopped');
+    stopSoundTile(id);renderSoundsStudio();showToast(natureUiText('unavailable'));
   };
   audio.onerror=failure;
   try{
@@ -1706,6 +1713,8 @@ function filterSoundsByCat(cat, btn) {
 
 function renderSoundsStudio() {
   const box = document.getElementById('soundsGridBox');
+  const focused = document.activeElement;
+  const focusedSound = focused && focused.getAttribute && focused.getAttribute('data-sound-toggle');
   box.innerHTML = '';
   const d = L();
 
@@ -1730,15 +1739,14 @@ function renderSoundsStudio() {
     const volumeLabel = NATURE_VOLUME_LABELS[cfg.lang] || NATURE_VOLUME_LABELS.en;
     const tile = document.createElement('div');
     tile.className = `sound-Rich-tile ${s.cls} ${isOn ? 'playing' : ''}`;
-    tile.onclick = () => toggleSoundTile(s.id);
     tile.innerHTML = `
-      <div class="stile-top">
-        <div class="stile-play-btn">${isOn ? '❚❚' : '▶'}</div>
-        <div class="stile-switch"><div class="stile-knob"></div></div>
-      </div>
+      <button type="button" class="stile-top stile-toggle" data-sound-toggle="${s.id}" aria-pressed="${isOn}" aria-label="${escapeHtmlText(natureUiText(isOn ? 'stop' : 'play') + ': ' + sName)}" onclick="toggleSoundTile('${s.id}')">
+        <span class="stile-play-btn" aria-hidden="true">${isOn ? '⏹' : '▶'}</span>
+        <span class="stile-switch" aria-hidden="true"><span class="stile-knob"></span></span>
+      </button>
       <div>
         <div class="stile-name">${escapeHtmlText(toWest(sName))}</div>
-        <div class="stile-volume-label"><span>🔉 ${escapeHtmlText(volumeLabel)}</span><strong class="stile-volume-pct">${Math.round(s.vol*100)}%</strong></div>
+        <div class="stile-volume-label"><span>🔉 ${escapeHtmlText(volumeLabel)}</span><bdi dir="ltr" class="stile-volume-pct">${Math.round(s.vol*100)}%</bdi></div>
         <input type="range" class="stile-vol" min="0" max="1" step="0.05" value="${s.vol}" aria-label="${escapeHtmlText(volumeLabel + ': ' + sName)}" onclick="event.stopPropagation()" oninput="setTileVolume('${s.id}', this.value);this.parentElement.querySelector('.stile-volume-pct').textContent=Math.round(Number(this.value)*100)+'%'">
       </div>
     `;
@@ -1747,6 +1755,10 @@ function renderSoundsStudio() {
   // This is an honest acquisition overview. It never changes playback eligibility.
   if (typeof DeepFocusNatureLibraryV2 !== 'undefined') {
     DeepFocusNatureLibraryV2.render(soundCat, cfg.lang, d.sounds, NATURE_APPROVED_FOR_PLAYBACK);
+  }
+  if (focusedSound) {
+    const button = [...box.querySelectorAll('[data-sound-toggle]')].find(node => node.getAttribute('data-sound-toggle') === focusedSound);
+    if (button) button.focus({preventScroll:true});
   }
 }
 
