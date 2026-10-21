@@ -6,7 +6,7 @@ const web={'core.timer':{start:'Start',countdown:'Remaining {mins} minutes'},
   'analytics.dictionary':{export:'Export CSV',noData:'No sessions recorded'}};
 const native=[{path:'MainActivity.java',kind:'toast',line:30,text:'Unable to save backup; unchanged data',status:'UNTRANSLATED_REQUIRES_REVIEW'}];
 test('80 planned languages receive exhaustive human-review worksheets without pretending English is translated',()=>{
- const q=buildQueue({source:web,nativeRows:native,webDrafts:{sw:{
+ const q=buildQueue({source:web,nativeRows:native,webDrafts:{sw:{locale:'sw',
   strings:{'core.timer':{start:'Anza'}}}},nativeDrafts:{}});
  assert.equal(q.length,80);
  assert.equal(q.some(x=>['he','iw'].includes(x.locale)),false);
@@ -24,7 +24,7 @@ test('80 planned languages receive exhaustive human-review worksheets without pr
  assert.equal(mr.items.some(x=>x.candidate==='Start'),false);
 });
 test('source changes and unknown draft keys cannot be silently accepted into queue',()=>{
- const old={sw:{strings:{'core.timer':{start:'Anza',ghost:'This must fail'}}}};
+ const old={sw:{locale:'sw',strings:{'core.timer':{start:'Anza',ghost:'This must fail'}}}};
  assert.throws(()=>buildQueue({source:web,nativeRows:native,webDrafts:old,nativeDrafts:{}}),/UNRECOGNIZED_CANDIDATE/);
  const changed=JSON.parse(JSON.stringify(web));changed['core.timer'].start='Begin';
  const q=buildQueue({source:changed,nativeRows:native,webDrafts:{},nativeDrafts:{}});
