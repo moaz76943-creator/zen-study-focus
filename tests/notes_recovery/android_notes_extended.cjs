@@ -65,8 +65,8 @@ async function touch(selector){
  const geometry="(()=>{const n=document.querySelector("+expression+");if(!n)return {present:false};n.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});const b=n.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,h=document.elementFromPoint(x,y);return {present:true,x,y,width:b.width,height:b.height,viewportWidth:document.documentElement.clientWidth,viewportHeight:innerHeight,hitWithin:!!h&&(n===h||n.contains(h))}})()";
  validateTouchTarget(await js(geometry));
  const frame=await readWebViewFrame(adb,{parseBounds:parseWebViewBounds,pause:sleep});
- const p=validateTouchTarget(await js(geometry));
- const actual=cssPointToAndroid({x:p.x,y:p.y,viewportWidth:p.viewportWidth,viewportHeight:p.viewportHeight},frame);
+ const measured=await js(geometry),p=validateTouchTarget(measured);
+ const actual=cssPointToAndroid({...p,viewportWidth:measured.viewportWidth,viewportHeight:measured.viewportHeight},frame);
  adb('shell','input','tap',String(actual.x),String(actual.y));await sleep(300);
 }
 async function fill(selector,value){
