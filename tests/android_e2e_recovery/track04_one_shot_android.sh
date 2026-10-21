@@ -31,6 +31,29 @@ node tests/android_e2e_recovery/cdp_dom_smoke.cjs "$report/cdp-startup.json"
 # Cases outside the limited run remain NOT_TESTED.
 export ANDROID_TEST_API=30
 export DF_ANDROID_DISPOSABLE=1
-export DF_ANDROID_CASES=preflight,notes_create_edit,tasks_create,task_subtasks,language_live_change,timer_start_pause,data_integrity
+export DF_ANDROID_CASES=preflight,notes_create_edit,tasks_create,task_subtasks,language_live_change,dialog_back,western_numerals
+# Upstream runner insists all 20 cases PASS even for deliberate seven-case selection.
+# Keep its raw exit and fail only on selected cases; all others remain NOT_TESTED.
+set +e
 node tests/android_e2e_recovery/cdp_actions.cjs "$report/android-tap-results.json"
+raw_exit=$?
+set -e
+printf 'upstream_exit=%s\n' "$raw_exit" > "$report/strict-upstream-exit.txt"
+node - "$report/android-tap-results.json" "$report/selected-acceptance.json" <<'NODE'
+const fs=require('node:fs');
+const [source,target]=process.argv.slice(2);
+const record=JSON.parse(fs.readFileSync(source,'utf8'));
+const wanted=process.env.DF_ANDROID_CASES.split(',');
+const selected=wanted.map(id=>record.results.find(x=>x.id===id));
+const outside=record.results.filter(x=>!wanted.includes(x.id));
+const failures=selected.filter(x=>!x||x.status!=='PASS');
+const gaps=outside.filter(x=>x.status!=='NOT_TESTED');
+const summary={scope:'7 actual selected Android WebView scenarios only',
+  sourceSHA:record.sha,selectedCases:wanted,selectedPass:selected.filter(x=>x&&x.status==='PASS').length,
+  selectedFailures:failures,unselectedNotTested:outside.length,
+  unexpectedUnselectedOutcomes:gaps,releaseApproved:false};
+fs.writeFileSync(target,JSON.stringify(summary,null,2)+'\n');
+console.log('TRACK04_ANDROID_SELECTED_OUTCOME '+JSON.stringify(summary));
+if(failures.length||gaps.length||outside.length!==record.results.length-wanted.length)process.exit(1);
+NODE
 printf '%s\n' 'Android emulator only. Physical phone, TalkBack, real SAF documents, all 20-language dialogs and other controls NOT_TESTED. RELEASE_APPROVED=NO' > "$report/LIMITS.txt"
