@@ -1,0 +1,181 @@
+name: Track10 Current-SHA Android Real SAF Acceptance
+on:
+  push:
+    branches: [fix/track10-analytics-export-range-state-20261021]
+    paths:
+      - .github/workflows/track10_android_real_saf.yml
+      - android/app/src/main/assets/web/analytics_studio.js
+      - android/app/src/main/assets/web/analytics_recovery_ui.js
+      - android/app/src/main/assets/web/integration_v22.js
+      - tests/track10/**
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track10-real-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qa-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin proven prior SAF QA harness without restoring old app source
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA_REF=c73dcddf71726e6996a389a0915386afd3e92dad
+          git cat-file -e "${QA_REF}^{commit}" || git fetch --no-tags origin "$QA_REF"
+          git cat-file -e "${QA_REF}^{commit}"
+          git rev-parse HEAD
+          mkdir -p tests/track08 "$RUNNER_TEMP/track10-android"
+          printf '%s\n' "$QA_REF" > "$RUNNER_TEMP/track10-android/PINNED_QA_HARNESS_SHA.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/track10-android/EXACT_APP_SOURCE_SHA.txt"
+          for name in qa_launch_contract.test.cjs qa_webview_startup_probe.cjs qa_cdp_transport.cjs qa_cdp_transport.test.cjs native_js_dialog_android_probe.cjs qa_real_analytics_saf.cjs phase3_side_by_side_qa.sh; do
+            git show "$QA_REF:tests/track08/$name" > "tests/track08/$name"
+            test -s "tests/track08/$name"
+          done
+          # Preserve BOTH native scenarios: run Analytics SAF first so a separate
+          # Timer dialog regression cannot prevent gathering genuine CSV evidence.
+          # If Timer dialogs fail afterwards the overall Android job still FAILS.
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tests/track08/phase3_side_by_side_qa.sh')
+          old=p.read_text()
+          a='node tests/track08/native_js_dialog_android_probe.cjs "$E"'
+          b='node tests/track08/qa_real_analytics_saf.cjs "$E"'
+          assert old.count(a)==1 and old.count(b)==1
+          assert old.index(a)<old.index(b)
+          p.write_text(old.replace(a,'__TRACK10_NATIVE_DIALOG_STEP__').replace(b,a).replace('__TRACK10_NATIVE_DIALOG_STEP__',b))
+          print('QA-only test ordering: real SAF first, native dialog still required and FAIL-CLOSED')
+          PY
+          python3 tests/track10/qa_saf_overlay.py
+          sha256sum tests/track08/* > "$RUNNER_TEMP/track10-android/qa-harness-file-hashes.txt"
+          # All production source comes from THIS branch; older QA harness is test-only.
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Source guard and historical QA harness syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tests/track08/qa_real_analytics_saf.cjs
+          node --check tests/track08/qa_webview_startup_probe.cjs
+          node --test tests/track08/qa_cdp_transport.test.cjs tests/track07_functional/analytics_export_range_lifecycle.test.cjs
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Build the actual unchanged app as debug
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Create an isolated QA package suffix only in disposable runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/df-qa"
+          mkdir -p "$E"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/normal-debug.apk"
+          sha256sum "$RUNNER_TEMP/normal-debug.apk" > "$RUNNER_TEMP/track10-android/NORMAL_DEBUG_SHA256.txt"
+          python3 - <<'PY'
+          from pathlib import Path
+          gradle=Path('android/app/build.gradle')
+          code=gradle.read_text()
+          anchor='    buildTypes {\n'
+          assert code.count(anchor)==1
+          gradle.write_text(code.replace(anchor,anchor+"        debug {\n            applicationIdSuffix '.qa'\n            versionNameSuffix '-qa'\n        }\n"))
+          manifest=Path('android/app/src/main/AndroidManifest.xml')
+          code=manifest.read_text()
+          assert code.count('android:label="Deep Focus"')==1 and 'android:allowBackup="false"' in code
+          manifest.write_text(code.replace('android:label="Deep Focus"','android:label="Deep Focus QA"'))
+          activity=Path('android/app/src/main/java/com/zenstudy/focus/MainActivity.java')
+          code=activity.read_text()
+          old='        if (!"com.zenstudy.focus".equals(getPackageName())) {\n'
+          new=('        if (!"com.zenstudy.focus".equals(getPackageName())\n'
+               '                && !(debuggableBuild && "com.zenstudy.focus.qa".equals(getPackageName()))) {\n')
+          assert code.count(old)==1
+          activity.write_text(code.replace(old,new))
+          PY
+          actual="$(git diff --name-only | sort)"
+          expected="$(printf '%s\n' android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java | sort)"
+          test "$actual" = "$expected"
+          git diff -- android/app/build.gradle android/app/src/main/AndroidManifest.xml android/app/src/main/java/com/zenstudy/focus/MainActivity.java > "$RUNNER_TEMP/track10-android/ephemeral-qa.diff"
+      - name: Check QA-only package gate after ephemeral modification, never in source
+        run: node --test tests/track08/qa_launch_contract.test.cjs
+      - name: Build separate debug-only QA APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Verify package, signing, SHA and sensitive permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/df-qa"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$E/DeepFocus-Track10-QA-Only.apk"
+          cp "$E/DeepFocus-Track10-QA-Only.apk" "$E/DeepFocus-Phase3-QA-Only.apk"
+          sha256sum "$E/DeepFocus-Track10-QA-Only.apk" > "$RUNNER_TEMP/track10-android/QA_DEBUG_SHA256.txt"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$E/DeepFocus-Track10-QA-Only.apk" > "$E/qa-badging.txt"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump permissions "$E/DeepFocus-Track10-QA-Only.apk" > "$E/qa-permissions.txt"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$E/DeepFocus-Track10-QA-Only.apk" > "$E/qa-signature.txt"
+          grep -F "package: name='com.zenstudy.focus.qa'" "$E/qa-badging.txt"
+          grep -F "application-label:'Deep Focus QA'" "$E/qa-badging.txt"
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re
+          src=(Path(os.environ['RUNNER_TEMP'])/'df-qa/qa-permissions.txt').read_text()
+          permissions=set(re.findall(r"uses-permission:\s+name='([^']+)'",src))
+          allowed={'android.permission.INTERNET','android.permission.VIBRATE','android.permission.WAKE_LOCK','android.permission.POST_NOTIFICATIONS','android.permission.FOREGROUND_SERVICE','android.permission.FOREGROUND_SERVICE_SPECIAL_USE','com.zenstudy.focus.qa.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'}
+          assert permissions<=allowed, sorted(permissions-allowed)
+          PY
+      - name: Prepare KVM (disposable Android API30 emulator)
+        shell: bash
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Verify real DocumentsUI Cancel Save and CSV readback plus offline restart
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/track08/phase3_side_by_side_qa.sh
+      - name: Label only independently completed real native results
+        if: always()
+        shell: bash
+        run: |
+          E="$RUNNER_TEMP/track10-android"
+          if [[ -f "$RUNNER_TEMP/df-qa/native-analytics-saf-results.json" ]]; then
+            cp "$RUNNER_TEMP/df-qa/native-analytics-saf-results.json" "$E/"
+          fi
+          printf '%s\n' 'Historical PR134 native pass does not transfer. Only exact-sha completed runner logs establish PASS.' 'RELEASE_APPROVED=NO' > "$E/LIMITATIONS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DeepFocus-Track10-Android-RealSAF-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/track10-android/**
+            ${{ runner.temp }}/df-qa/*.txt
+            ${{ runner.temp }}/df-qa/*.json
+            ${{ runner.temp }}/df-qa/*.png
+            ${{ runner.temp }}/df-qa/*.xml
+            ${{ runner.temp }}/df-qa/*.diff

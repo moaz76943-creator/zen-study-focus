@@ -67,6 +67,21 @@
       ? 'Invalid date range. Select valid start and end dates.'
       : '⚠ '+t.start+' / '+t.end;
     const western=value=>locale20?locale20.westernDigits(String(value)):String(value);
+    const today=opts.today||core.localToday();
+    if(!core.validDay(today))throw new RangeError('Invalid today');
+    // Calendar arithmetic in UTC-noon preserves the user's credited local date
+    // across DST without manufacturing a timestamp for legacy sessions.
+    const dayAt=delta=>new Date(Date.parse(today+'T12:00:00Z')+delta*86400000).toISOString().slice(0,10);
+    const from=dayAt(-29);
+    const localizedDayCount=count=>{
+      try{return western(new Intl.NumberFormat(language,{style:'unit',unit:'day',unitDisplay:'long',
+        numberingSystem:'latn'}).format(count));}
+      catch(_){return western(count)+' '+t.daily;}
+    };
+    const localizedToday=()=>{
+      try{return western(new Intl.RelativeTimeFormat(language,{numeric:'auto'}).format(0,'day'));}
+      catch(_){return western(today);}
+    };
     const wrapper=doc.createElement('section');wrapper.className='dfa-studio';
     wrapper.dir=locale20?locale20.direction(language):(['ar','fa','ur'].includes(language)?'rtl':'ltr');
     wrapper.lang=language;
@@ -87,8 +102,37 @@
     for(const value of ['daily','weekly','monthly']){const o=mk('option',t[value]);o.value=value;grouping.appendChild(o);}
     const start=input('date',t.start),end=input('date',t.end);
     for(const field of [start,end]){field.style.direction='ltr';field.lang='en-u-nu-latn';}
+    // Existing localizations already supply the four report-kind labels.
+    // Default sessions CSV remains unchanged for historical consumers.
+    const kind=input('select',t.export);
+    for(const [value,label] of [
+      ['sessions',t.sessions],['daily',t.daily],['weekly',t.weekly],['monthly',t.monthly]
+    ]){const option=mk('option',label);option.value=value;kind.appendChild(option);}
     const exportBtn=mk('button',t.export);exportBtn.type='button';exportBtn.style.cssText='min-height:42px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:6px 12px';
     filters.appendChild(exportBtn);wrapper.appendChild(filters);
+    // Reuse the platform's CLDR 20-language day labels: no unreviewed
+    // hard-coded English sentences, and never change user-authored text.
+    const presets=mk('div',undefined,'dfa-range-presets');
+    presets.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin:10px 0';
+    const presetButtons=new Map();
+    const addPreset=(key,label)=>{
+      const button=mk('button',western(label));button.type='button';
+      button.setAttribute('data-action',key);
+      button.style.cssText='min-height:44px;border-radius:9px;padding:7px 11px;background:#f8fafc;color:#1e293b;border:1px solid #cbd5e1;cursor:pointer';
+      presets.appendChild(button);presetButtons.set(key,button);return button;
+    };
+    addPreset('today',localizedToday());
+    addPreset('last7',localizedDayCount(7));
+    addPreset('last30',localizedDayCount(30));
+    addPreset('custom',t.period);
+    addPreset('reset','↺ '+t.all);
+    wrapper.appendChild(presets);
+    let periodMode=(opts.startDate||opts.endDate)?'custom':'last30';
+    const activatePresets=()=>{
+      for(const [key,button] of presetButtons){
+        if(key!=='reset')button.setAttribute('aria-pressed',String(key===periodMode));
+      }
+    };
     const feedback=mk('p');feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
     feedback.style.cssText='color:#b91c1c;font-size:12px';wrapper.appendChild(feedback);
     const kpis=mk('div');kpis.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0';wrapper.appendChild(kpis);
@@ -97,15 +141,17 @@
     const domainView=mk('div');domainView.style.cssText='display:flex;gap:12px;flex-wrap:wrap;margin:12px 0';
     const goals=mk('div'),taskBox=mk('div'),heatTitle=mk('h3',t.year),heat=mk('div');heat.style.overflowX='auto';
     [chartTitle,chart,detail,domainView,goals,taskBox,heatTitle,heat].forEach(e=>wrapper.appendChild(e));
-    let current=null,currentSeries=[],heatDays=[],destroyed=false,rangeValid=true;
+    let current=null,currentSeries=[],heatDays=[],destroyed=false,rangeValid=true,reportRevision=0;
     function refresh(){
       if(destroyed)return null;
-      const snap=provider();const today=opts.today||core.localToday();
+      ++reportRevision;
+      activatePresets();
+      const snap=provider();
       let report;
       try{report=core.buildReport(snap,{today,startDate:start.value,endDate:end.value,domain:domain.value,goals:opts.goals});}
       catch(error){if(!(error instanceof RangeError))throw error;
-        rangeValid=false;feedback.textContent=t.invalidDates;return current;}
-      rangeValid=true;feedback.textContent='';current=report;kpis.replaceChildren();
+        rangeValid=false;feedback.textContent=t.invalidDates;exportBtn.disabled=true;return current;}
+      rangeValid=true;feedback.textContent='';exportBtn.disabled=exporting;current=report;kpis.replaceChildren();
       for(const [name,value] of [[t.minutes,report.totals.minutes],[t.sessions,report.totals.sessions],
         [t.average,report.totals.averageMinutes===null?'—':report.totals.averageMinutes],
         [t.streak,report.streaks.current]]){
@@ -143,20 +189,45 @@
       const day=node.getAttribute('data-day');const found=currentSeries.find(r=>r.key===day)||heatDays.find(r=>r.key===day);detail.textContent=western(day)+': '+western(found?found.minutes:0)+' '+t.minute;
     };
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
-    [domain,grouping,start,end].forEach(el=>el.addEventListener('change',refresh));
+    [domain,grouping].forEach(el=>el.addEventListener('change',refresh));
+    kind.addEventListener('change',()=>{
+      ++reportRevision;feedback.textContent='';
+    });
+    [start,end].forEach(el=>el.addEventListener('change',()=>{
+      periodMode='custom';refresh();
+    }));
+    for(const [key,button] of presetButtons){
+      button.addEventListener('click',()=>{
+        if(destroyed)return;
+        if(key==='custom'){
+          periodMode='custom';start.focus?.();activatePresets();return;
+        }
+        if(key==='reset'){
+          periodMode='last30';domain.value='all';grouping.value='daily';
+          start.value=from;end.value=today;
+        }else{
+          periodMode=key;
+          start.value=key==='today'?today:dayAt(key==='last7'?-6:-29);
+          end.value=today;
+        }
+        refresh();
+      });
+    }
     let exporting=false;
     exportBtn.addEventListener('click',async()=>{
       if(exporting||destroyed)return;
       if(!rangeValid||!current){feedback.textContent=t.invalidDates;return;}
-      const value=core.toCSV(current,'sessions');
+      const value=core.toCSV(current,kind.value);
+      const exportRevision=reportRevision;
       if(typeof opts.onExport==='function'){
         exporting=true;exportBtn.disabled=true;feedback.textContent='';
         try{
-          const response=await opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');
-          if(!destroyed)feedback.textContent=(response?.status==='saved'?'✓ ':response?.status==='cancelled'?'— ':'⚠ ')+t.export;
+          const response=await opts.onExport(value,'deep-focus-'+kind.value+'.csv','text/csv;charset=utf-8');
+          if(!destroyed && reportRevision===exportRevision)
+            feedback.textContent=(response?.status==='saved'?'✓ ':response?.status==='cancelled'?'— ':'⚠ ')+t.export;
         }catch(_){
-          if(!destroyed)feedback.textContent='⚠ '+t.export;
-        }finally{exporting=false;if(!destroyed)exportBtn.disabled=false;}
+          if(!destroyed && reportRevision===exportRevision)feedback.textContent='⚠ '+t.export;
+        }finally{exporting=false;if(!destroyed)exportBtn.disabled=!rangeValid;}
         return;
       }
       if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL){
@@ -164,16 +235,18 @@
       }
       try{
         const blob=new doc.defaultView.Blob(['\ufeff',value],{type:'text/csv;charset=utf-8'});
-        const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
+        const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-'+kind.value+'.csv';
         wrapper.appendChild(a);try{a.click();}finally{a.remove();(doc.defaultView.setTimeout||setTimeout)(()=>doc.defaultView.URL.revokeObjectURL(url),30000);}
       }catch(_){feedback.textContent='⚠ '+t.export;}
     });
-    const today=opts.today||core.localToday();if(!core.validDay(today))throw new RangeError('Invalid today');
-    const epoch=Math.floor(Date.parse(today+'T12:00:00Z')/86400000);
-    const from=new Date((epoch-29)*86400000+43200000).toISOString().slice(0,10);
-    start.value=opts.startDate||from;end.value=opts.endDate||today;domain.value=opts.domain||'all';
+    start.value=opts.startDate||from;end.value=opts.endDate||today;
+    domain.value=opts.domain||'all';grouping.value=opts.group||'daily';
+    kind.value=opts.exportKind||'sessions';
     target.appendChild(wrapper);refresh();
-    return Object.freeze({refresh,getReport:()=>current,destroy:()=>{destroyed=true;wrapper.remove();},element:wrapper});
+    return Object.freeze({refresh,getReport:()=>current,
+      getFilters:()=>({startDate:start.value,endDate:end.value,domain:domain.value,
+        group:grouping.value,exportKind:kind.value}),
+      destroy:()=>{destroyed=true;wrapper.remove();},element:wrapper});
   }
   return Object.freeze({mount,barsSvg,heatmapSvg});
 });

@@ -1,0 +1,88 @@
+name: Track10 Analytics CSV range lifecycle (isolated draft QA)
+on:
+  push:
+    branches: [fix/track10-analytics-export-range-state-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track10-analytics-range-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Record exact app-source SHA
+        run: git rev-parse HEAD
+      - name: Focused RED/GREEN export and existing guards
+        run: node --test tests/track07_functional/analytics_export_range_lifecycle.test.cjs tests/track07_functional/analytics_controls_and_digits.test.cjs tests/track07_functional/analytics_date_guard.test.cjs
+      - name: All Node regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          node --test --test-reporter=tap "${suites[@]}"
+      - name: All Python regression tests
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated Chromium browser test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Serve bundled original app without changing user data
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/analytics-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Real Chromium 20-language analytics buttons and 18 responsive cases
+        shell: bash
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_ANALYTICS_EVIDENCE: ${{ runner.temp }}/track10-chromium
+        run: |
+          set -euo pipefail
+          mkdir -p "$DF_ANALYTICS_EVIDENCE"
+          node tests/track07_functional/analytics_all_controls_browser.cjs
+          node tests/track07_functional/analytics_screen_chromium.cjs
+          node tests/track10/analytics_presets_browser.cjs
+          node tests/track07_functional/analytics_hot_language_switch_browser.cjs
+          node tests/track07_functional/analytics_10k_browser.cjs
+      - name: Preserve exact SHA and scope limitations
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/track10-chromium"
+          git rev-parse HEAD > "$RUNNER_TEMP/track10-chromium/SOURCE_SHA.txt"
+          printf 'Chromium is NOT Android DocumentsUI; no real SAF Save/Readback on this SHA.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/track10-chromium/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track10-chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/track10-chromium/
+          if-no-files-found: warn
+          retention-days: 7

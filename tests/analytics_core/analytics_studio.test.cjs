@@ -48,7 +48,11 @@ test('opt-in studio mounts without reading storage, changes grouping, exports an
  assert.equal(inst.getReport().totals.minutes,12);
  const wrapper=target.children[0],filters=wrapper.children[1];
  const selects=filters.children.filter(x=>x.tagName==='LABEL').flatMap(x=>x.children).filter(x=>x.tagName==='SELECT');
- assert.equal(selects.length,2);selects[1].value='monthly';selects[1].events.change();
+ assert.equal(selects.length,3,'Domain, graph grouping and explicit CSV report kind must be present');
+ assert.deepEqual(selects[2].children.map(option=>option.value),
+   ['sessions','daily','weekly','monthly'],'Historical default export remains and three kinds are added');
+ assert.equal(selects[2].value,'sessions');
+ selects[1].value='monthly';selects[1].events.change();
  assert.equal(inst.getReport().monthly[0].minutes,12);
  const exportButton=filters.children.find(x=>x.tagName==='BUTTON');exportButton.events.click();
  assert.equal(exports,1);inst.destroy();assert.equal(wrapper.removed,true);
