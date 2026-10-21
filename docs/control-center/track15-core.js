@@ -9,6 +9,7 @@
  const SHA=/^[a-f\d]{40}$/i;
  const NONE='NOT_TESTED';
  const FIELDS=['node','python','chromium','androidBuild','androidDevice'];
+ const LOCALES=['ar','en','es','fr','de','tr','ru','pt','zh','hi','ja','ko','id','vi','it','bn','ur','fa','pl','nl'];
  const AGENTS=['localization','numerals','navigation','notes','tasks','analytics',
    'timer','nature_audio','privacy_security','data_integrity','performance','product_consistency'];
  function validSha(value){return typeof value==='string'&&SHA.test(value)?value.toLowerCase():null;}
@@ -95,11 +96,28 @@
      return Math.max(60000,Math.min(3600000,reset*1000-nowMs));
    return 60000;
  }
+ function localeCounts(report,expectedSha){
+   const empty=state=>LOCALES.map(code=>({code,gaps:null,status:state}));
+   if(!report||typeof report!=='object')return empty(NONE);
+   const sha=validSha(report.source_sha),expected=validSha(expectedSha);
+   if(sha&&expected&&sha!==expected)return empty('STALE');
+   if(!sha||!expected||!Array.isArray(report.languages)||report.languages.length!==LOCALES.length)
+     return empty(NONE);
+   const byCode=new Map();
+   for(const entry of report.languages){
+     if(!entry||typeof entry.code!=='string'||!LOCALES.includes(entry.code)||
+       byCode.has(entry.code)||!Number.isSafeInteger(entry.missing)||
+       entry.missing<0||entry.missing>1000000)return empty(NONE);
+     byCode.set(entry.code,entry.missing);
+   }
+   if(byCode.size!==LOCALES.length)return empty(NONE);
+   return LOCALES.map(code=>({code,gaps:byCode.get(code),status:'GAPS_REPORTED'}));
+ }
  function normalizePull(pr,num){
    const sha=validSha(pr?.head?.sha);
    if(!pr||pr.number!==num||!sha)return null;
    return {number:num,sha,draft:pr.draft===true,url:pullUrl(num)};
  }
- return {REPO,AGENTS,FIELDS,validSha,issueUrl,pullUrl,runUrl,parseAgentLedger,
+ return {REPO,AGENTS,FIELDS,LOCALES,localeCounts,validSha,issueUrl,pullUrl,runUrl,parseAgentLedger,
    classifyJobs,listArtifacts,retryDelay,normalizePull};
 });
