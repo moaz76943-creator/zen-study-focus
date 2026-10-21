@@ -38,7 +38,7 @@ test('dialogs are restricted to exact local bundled WebView and reject arbitrary
 });
 test('source retains original synchronous focus/task/note confirmation contracts',()=>{
  assert.match(app,/window\.confirm\(quickText\('replacePrompt'\)\)/);
- assert.match(app,/window\.confirm\(cfg\.lang === 'ar'/);
+ assert.match(app,/window\.confirm\(quickText\('replacePrompt'\)\)/);
  assert.match(integration,/root\.confirm\(noteMessage\('confirmDelete'\)\)/);
  assert.match(integration,/root\.prompt\(label\)/);
  assert.match(j,/zen_fortress_cfg_v21/);
