@@ -59,3 +59,34 @@ test('track15-07 malformed SHA, injected body, and off-repo URLs are rejected',(
  assert.equal(core.issueUrl(69),'https://github.com/moaz76943-creator/zen-study-focus/issues/69');
  assert.equal(core.issueUrl('https://evil.invalid'),null);
 });
+
+test('track15-08 generic GitHub job proves only its actually executed named test steps',()=>{
+ const jobs=[{name:'Source QA and report',status:'completed',conclusion:'success',
+  steps:[
+   {name:'Node.js 22',status:'completed',conclusion:'success'},
+   {name:'Control Center regression tests',status:'completed',conclusion:'success'},
+   {name:'Desktop Chrome smoke test of portable file',status:'completed',conclusion:'success'},
+   {name:'Python regression suite',status:'completed',conclusion:'skipped'}
+  ]}];
+ const status=core.classifyJobs(jobs,HEAD,HEAD);
+ assert.equal(status.node,'PASS');
+ assert.equal(status.chromium,'PASS');
+ assert.equal(status.python,'NOT_TESTED');
+ assert.equal(status.androidBuild,'NOT_TESTED');
+});
+test('track15-09 a named failing step overrides a generic completed job and setup is not proof',()=>{
+ const fail=core.classifyJobs([{name:'Source QA and report',conclusion:'failure',status:'completed',
+  steps:[{name:'Node.js 22',conclusion:'success',status:'completed'},
+   {name:'Run node --test regression',conclusion:'failure',status:'completed'},
+   {name:'Desktop Chromium smoke',conclusion:'skipped',status:'completed'}]}],HEAD,HEAD);
+ assert.equal(fail.node,'FAIL');
+ assert.equal(fail.chromium,'NOT_TESTED');
+ const setup=core.classifyJobs([{name:'Setup',conclusion:'success',status:'completed',
+  steps:[{name:'Set up Node.js 22',conclusion:'success',status:'completed'}]}],HEAD,HEAD);
+ assert.equal(setup.node,'NOT_TESTED');
+});
+test('track15-10 runs with a foreign SHA never confer approval through step status',()=>{
+ const rows=[{name:'CI',conclusion:'success',status:'completed',
+ steps:[{name:'Control Center regression tests',conclusion:'success',status:'completed'}]}];
+ assert.equal(core.classifyJobs(rows,OLD,HEAD).node,'NOT_TESTED');
+});
