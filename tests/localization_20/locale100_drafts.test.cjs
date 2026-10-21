@@ -77,3 +77,14 @@ test('translator worksheet lists every key and every missing string without Engl
  assert.ok(w.items.every(x=>x.humanReview==='NOT_TESTED'));
  assert.equal(w.approvedForRuntime,false);
 });
+
+test('admission CLI loads real partial drafts without a circular initialization failure',()=>{
+ const {execFileSync}=require('node:child_process');
+ const node=process.execPath;
+ const stdout=execFileSync(node,['tools/localization_100/guard.cjs','--check'],{cwd:require('node:path').resolve(__dirname,'../..'),encoding:'utf8',timeout:12000});
+ const report=JSON.parse(stdout);
+ assert.equal(report.ok,true,JSON.stringify(report.errors));
+ assert.equal(report.draftCandidates,1);
+ assert.ok(report.candidateStrings>=25);
+ assert.equal(report.releaseApproved,false);
+});
