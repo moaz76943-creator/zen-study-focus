@@ -19,10 +19,16 @@ function report(){
   const draftCount=candidate?candidate.translated:0;
   const nativeCount=nativeByLocale.get(loc.code)?.translated||0;
   return Object.freeze({code:loc.code,name:loc.name,script:loc.script,direction:loc.direction,
+   phase:loc.phase,
    state:exists?'EXISTING_RUNTIME_UNCERTIFIED':candidate?'DRAFT_UNREVIEWED':'NOT_STARTED',
    runtimeAvailable:exists,selectable:exists,draftCount,nativeDraftCount:nativeCount,
    nativeTextTotal:nativeCopy.candidates,sourceKeyTotal:keys,
    explicitExistingKeys:exists?keys-missingKeys:0,missingKeys,
+   // Source presence and structurally safe drafts are NOT evidence of a human
+   // approved translation. The current pipeline has no independently verified
+   // key-level approval record for either existing or planned locales.
+   verifiedApprovedKeys:0,verifiedNativeApprovedStrings:0,
+   keyApprovalEvidence:'NO_INDEPENDENT_KEY_LEVEL_REVIEW',
    nativeReview:'NOT_TESTED',androidVerified:'NOT_TESTED',screensVerified:'NOT_TESTED',
    translationApproved:false});
  });
