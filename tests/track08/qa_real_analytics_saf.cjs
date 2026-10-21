@@ -59,12 +59,14 @@ function parseXml(){
  return xml;
 }
 function nodes(xml){
- return [...xml.matchAll(/<node\\b[^>]*\\/?\s*>/g)].map(m=>m[0]);
+ return [...xml.matchAll(/<node[^>]*>/g)].map(m=>m[0]);
 }
 function point(node){
- const b=node?.match(/bounds="\\[(\\d+),(\\d+)\\]\\[(\\d+),(\\d+)\\]"/);
- if(!b)throw Error('Native Save control bounds not accessible');
- return {x:Math.floor((+b[1]+ +b[3])/2),y:Math.floor((+b[2]+ +b[4])/2)};
+ const match=node?.match(/bounds="([^"]+)"/);
+ const numbers=match?[...match[1].matchAll(/[0-9]+/g)].map(m=>Number(m[0])):[];
+ if(numbers.length!==4 || numbers[2]<=numbers[0] || numbers[3]<=numbers[1])
+  throw Error('Native Save control bounds not accessible');
+ return {x:Math.floor((numbers[0]+numbers[2])/2),y:Math.floor((numbers[1]+numbers[3])/2)};
 }
 async function waitChooser(stage){
  const xml=await waitFor('Real Android ACTION_CREATE_DOCUMENT '+stage,()=>{
