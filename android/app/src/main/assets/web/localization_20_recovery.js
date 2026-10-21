@@ -44,8 +44,15 @@
     translations[code] = Object.freeze(Object.fromEntries(KEYS.map((key, index) => [key, values[index]])));
   }
   Object.freeze(translations);
-  const westernDigits = text => String(text).replace(/[\u0660-\u0669\u06f0-\u06f9]/g,
-    digit => String(digit.charCodeAt(0) - (digit.charCodeAt(0) >= 0x06f0 ? 0x06f0 : 0x0660)));
+  // UI-generated text only: user-authored task/note content is never passed here by apply().
+  const westernDigits = text => String(text).replace(
+    /[\u0660-\u0669\u06f0-\u06f9\u0966-\u096f\u09e6-\u09ef]/g,
+    digit => {
+      const point = digit.charCodeAt(0);
+      const zero = point >= 0x09e6 ? 0x09e6 :
+        point >= 0x0966 ? 0x0966 : point >= 0x06f0 ? 0x06f0 : 0x0660;
+      return String(point - zero);
+    });
   const resolve = code => {
     const base = String(code || 'en').split(/[-_]/)[0].toLowerCase();
     return Object.prototype.hasOwnProperty.call(translations, base) ? base : 'en';
@@ -114,7 +121,9 @@
         if (disposed) return false;
         const next = resolve(code);
         if (next === active) return false;
-        if (typeof persist === 'function') persist(next);
+        // Synchronous adapters may reject with false; void-returning adapters
+        // remain supported. Never present a language change rejected by storage.
+        if (typeof persist === 'function' && persist(next) === false) return false;
         active = next;
         apply(scope, next);
         if (typeof onChange === 'function') onChange(next);

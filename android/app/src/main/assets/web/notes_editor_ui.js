@@ -233,7 +233,7 @@
       draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes',
       copied:'Copied to clipboard',copyFailed:'Clipboard unavailable; content was not copied',
       missing:'Linked note unavailable',contents:'Contents',copyTxt:'Copy TXT',copyMd:'Copy Markdown',
-      more:'More actions',conflict:'This note changed since you opened it. Copy your edits or reopen the latest version before saving.'},
+      duplicate:'Duplicate',linkTask:'Link task',chooseNote:'Choose a note to link',chooseTask:'Choose a task to link',searchRecords:'Search',cancel:'Cancel',idRequired:'Choose a unique numeric ID from the available records.',noTargets:'No available records to link.',confirmDelete:'Permanently delete this note? This cannot be undone.',confirmBackup:'Have you exported a verified backup? Cancel if not.',extractConfirm:'Create tasks from unfinished checklist items in this note?',more:'More actions',list:'• List',conflict:'This note changed since you opened it. Copy your edits or reopen the latest version before saving.'},
     ar:{all:'كل الملاحظات',archive:'الأرشيف',trash:'سلة المحذوفات',notebooks:'الدفتر',tag:'الوسم',allbooks:'كل الدفاتر',
       alltags:'كل الوسوم',empty:'لا توجد ملاحظات في هذا العرض',focus:'تركيز الكتابة',normal:'إنهاء التركيز',read:'قراءة ومراجعة',
       edit:'تحرير',restore:'استعادة',delete:'نقل إلى السلة',purge:'حذف نهائي',archiveIt:'أرشفة',
@@ -245,13 +245,14 @@
       review:'المس الإجابة لإظهارها',draft:'المحتوى القديم محفوظ بمعزل عن كورنيل',filter:'تصفية',
       status:'الحالة',linked:'ملاحظات مرتبطة',copied:'تم النسخ إلى الحافظة',
       copyFailed:'الحافظة غير متاحة؛ لم يتم نسخ النص',missing:'الملاحظة المرتبطة غير متاحة',
-      contents:'المحتويات',copyTxt:'نسخ نص TXT',copyMd:'نسخ Markdown',more:'المزيد',conflict:'تغيرت هذه الملاحظة بعد فتحها. انسخ نصك أو حدّث الملاحظة قبل الحفظ.'}
+      contents:'المحتويات',copyTxt:'نسخ نص TXT',copyMd:'نسخ Markdown',duplicate:'استنساخ',linkTask:'ربط مهمة',chooseNote:'اختر ملاحظة للربط',chooseTask:'اختر مهمة للربط',searchRecords:'بحث',cancel:'إلغاء',idRequired:'اختر معرّفًا رقميًا فريدًا من السجلات المتاحة.',noTargets:'لا توجد سجلات متاحة للربط.',confirmDelete:'حذف هذه الملاحظة نهائيًا؟ لا يمكن التراجع عن ذلك.',confirmBackup:'هل صدّرت نسخة احتياطية متحققًا منها؟ اختر الإلغاء إن لم تفعل.',extractConfirm:'إنشاء مهام من عناصر قائمة التحقق غير المكتملة في هذه الملاحظة؟',more:'المزيد',list:'• قائمة',conflict:'تغيرت هذه الملاحظة بعد فتحها. انسخ نصك أو حدّث الملاحظة قبل الحفظ.'}
   };
   function t(key){return languages[instance&&instance.adapter.locale&&instance.adapter.locale()==='ar'?'ar':'en'][key]||key;}
   function style(){
     if(document.getElementById('nsux-style'))return;
     const s=el('style');s.id='nsux-style';
     s.textContent=[
+      'dialog.nsux-link-picker{box-sizing:border-box;width:min(92vw,440px);max-height:85dvh;border:1px solid #dce5f0;border-radius:20px;padding:18px;color:#1c2e4d;background:#fff}dialog.nsux-link-picker::backdrop{background:#10213d66}.nsux-link-picker label{display:grid;gap:6px}.nsux-link-picker input{min-width:0;max-width:100%;font:inherit;padding:10px}.nsux-link-list{display:grid;gap:8px;max-height:50dvh;overflow:auto;margin:12px 0}.nsux-link-list button{text-align:start;overflow-wrap:anywhere}.nsux-link-list small{display:block}',
       '.nsux-controls,.nsux-inline,.nsux-tabs,.nsux-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}',
       '.nsux-controls{margin:8px 0 16px}.nsux-controls select,.nsux-controls input,.nsux-inline input,.nsux-inline select{min-width:0;max-width:100%;padding:10px;border:1px solid var(--df22-border,#dce5f0);border-radius:12px;background:#fff;color:var(--df22-ink,#1c2e4d);font:inherit}',
       '.nsux-controls select{flex:1 1 100px}.nsux-controls input{flex:1 1 125px}',
@@ -263,7 +264,7 @@
       '.nsux-inline>*{flex:1 1 120px}.nsux-meta{margin:7px 0;color:#50617a;font-size:.76rem}',
       '.nsux-reading #nsux-fields>label,.nsux-reading #nsux-fields>#nsux-cornell,.nsux-reading #nsux-fields>#nsux-recall,.nsux-reading #nsux-fields>.nsux-btn{display:none!important}',
       '.nsux-reading #inpNoteTitle,.nsux-reading #inpNoteBody,.nsux-reading #nsBodyLabel,.nsux-reading #nsCounter,.nsux-reading #nsux-fields .nsux-meta,.nsux-reading #nsux-tools,.nsux-reading .ns-meta,.nsux-reading .ns-options,.nsux-reading .modal-actions,.nsux-reading #nsEditorTemplates{display:none!important}',
-      '.nsux-reading #nsux-preview{display:block!important;max-height:65dvh}',
+      '.nsux-reading .nsux-advanced>summary{display:none}.nsux-reading #nsux-preview{display:block!important;max-height:65vh;max-height:65dvh}',
       '.nsux-reader{white-space:normal;overflow-wrap:anywhere;line-height:1.7;color:#1c2e4d;padding:14px;border:1px solid #dce5f0;border-radius:15px;background:white;max-height:42vh;overflow:auto}',
       '.nsux-reader p{white-space:pre-wrap;margin:7px 0}.nsux-reader h4{font-size:1.02rem;margin:12px 0 4px}.nsux-reader .nsux-check{display:flex;gap:10px;align-items:baseline}.nsux-reader .nsux-check input{pointer-events:none}',
       '.nsux-card{border:1px solid var(--df22-border,#dce5f0);border-radius:22px;background:#fff;padding:15px;box-shadow:var(--df22-shadow-low,0 2px 10px #203b5f10)}',
@@ -281,12 +282,41 @@
     document.head.appendChild(s);
   }
   function field(parent,label,value,tag='input'){
-    const wrap=el('label','',label),input=el(tag,tag==='textarea'?'nsux-area':'');
+    const wrap=el('label'),caption=el('span','',label),input=el(tag,tag==='textarea'?'nsux-area':'');
+    wrap.appendChild(caption);
     if(tag==='textarea')input.rows=3;else input.type='text';
     input.value=value||'';input.dir='auto';wrap.appendChild(input);parent.appendChild(wrap);return input;
   }
   function button(parent,label,fn,extra){
     const b=el('button','nsux-btn'+(extra?' '+extra:''),label);b.type='button';b.addEventListener('click',fn);parent.appendChild(b);return b;
+  }
+  // Only explicitly owned UI labels are refreshed. Never inspect/rewrite user text.
+  function localizedElement(tag,cls,key){
+    const node=el(tag,cls,t(key));node.dataset.nsuxI18n=key;return node;
+  }
+  function localizedButton(parent,key,fn,extra){
+    const node=button(parent,t(key),fn,extra);node.dataset.nsuxI18n=key;return node;
+  }
+  function localizedField(parent,key,value,tag){
+    const input=field(parent,t(key),value,tag);
+    input.parentNode.firstChild.dataset.nsuxI18n=key;return input;
+  }
+  function refreshLocale(){
+    if(!instance)return;
+    document.querySelectorAll('[data-nsux-i18n]').forEach(node=>{node.textContent=t(node.dataset.nsuxI18n);});
+    if(typeof nsApplyLabels==='function')nsApplyLabels();
+    const modal=document.getElementById('noteModal');
+    if(modal?.classList.contains('open')){
+      document.getElementById('nsEditorHeading').textContent=nsLabel(typeof nsEditId==='number'?16:15);
+      document.getElementById('nsSaveButton').textContent=nsLabel(typeof nsEditId==='number'?26:25);
+      document.getElementById('nsux-focus-toggle').textContent=t(modal.classList.contains('nsux-focus')?'normal':'focus');
+      if(typeof nsUpdateCount==='function')nsUpdateCount();
+      if(typeof nsRefreshDraftLocale==='function')nsRefreshDraftLocale();
+    }
+    const status=document.getElementById('nsux-status');status.setAttribute('aria-label',t('status'));
+    document.getElementById('nsux-book-filter').setAttribute('aria-label',t('notebooks'));
+    document.getElementById('nsux-tag-filter').setAttribute('aria-label',t('tag'));
+    renderStack();
   }
   function renderText(container,text,query){
     container.replaceChildren();const needle=String(query||'').trim();
@@ -313,7 +343,7 @@
   function createPairs(parent,pairs){
     parent.replaceChildren();
     pairs.forEach((pair,i)=>{
-      const group=el('div','nsux-inline'),q=field(group,t('pairQ'),pair.question),a=field(group,t('pairA'),pair.answer);
+      const group=el('div','nsux-inline'),q=localizedField(group,'pairQ',pair.question),a=localizedField(group,'pairA',pair.answer);
       group.dataset.key=pair.key||'pair-'+i;
       button(group,'×',()=>{group.remove();schedule();},'danger');
       parent.appendChild(group);[q,a].forEach(input=>input.addEventListener('input',schedule));
@@ -328,42 +358,42 @@
     const body=document.getElementById('inpNoteBody');body.dir='auto';document.getElementById('inpNoteTitle').dir='auto';
     const toolbar=el('div','nsux-actions'),extra=el('div','nsux-extra');
     toolbar.id='nsux-tools';extra.id='nsux-fields';
-    const basic=[['heading','H1'],['bullet','• List'],['check','☐'],['number','1.'],['quote','❝']];
-    basic.forEach(([key,label])=>button(toolbar,label,()=>{
+    const basic=[['heading','H1'],['bullet',t('list')],['check','☐'],['number','1.'],['quote','❝']];
+    basic.forEach(([key,label])=>{const action=button(toolbar,label,()=>{
       if(document.activeElement!==body)body.focus();
       const pos=formatSelection(body.value,body.selectionStart,body.selectionEnd,key);
       if(pos.text.length>NOTE_LIMIT){instance.adapter.notify?.('Note exceeds maximum size');return;}
       body.value=pos.text;body.setSelectionRange(pos.cursorStart,pos.cursorEnd);body.focus();schedule();
       if(typeof nsUpdateCount==='function')nsUpdateCount();
-    }));
-    button(toolbar,t('done'),()=>{
+    });if(key==='bullet')action.dataset.nsuxI18n='list';});
+    localizedButton(toolbar,'done',()=>{
       const old=body.selectionStart,changed=toggleChecklistLine(body.value,old);
       if(!changed.changed)return;
       body.value=changed.text;body.focus();body.setSelectionRange(old,old);
       schedule();renderPreview();if(typeof nsUpdateCount==='function')nsUpdateCount();
     });
-    const view=button(toolbar,t('preview'),()=>togglePreview()),focus=button(toolbar,t('focus'),()=>toggleFocus());
+    const view=localizedButton(toolbar,'preview',()=>togglePreview()),focus=localizedButton(toolbar,'focus',()=>toggleFocus());
     view.id='nsux-preview-toggle';focus.id='nsux-focus-toggle';
-    const find=field(extra,t('find'),'');find.id='nsux-find';
+    const find=localizedField(extra,'find','');find.id='nsux-find';
     const status=el('div','nsux-meta');status.id='nsux-search-count';extra.appendChild(status);
-    button(extra,t('next'),()=>findNext());
+    localizedButton(extra,'next',()=>findNext());
     const preview=el('div','nsux-reader');preview.id='nsux-preview';preview.hidden=true;extra.appendChild(preview);
     const cornell=el('div','nsux-extra');cornell.id='nsux-cornell';extra.appendChild(cornell);
     instance.fields={
-      cues:field(cornell,t('question'),'', 'textarea'),
-      notes:field(cornell,t('explain'),'', 'textarea'),
-      summary:field(cornell,t('summary'),'', 'textarea'),
-      notebook:field(extra,t('book'),''),
-      tags:field(extra,t('tags'),'')
+      cues:localizedField(cornell,'question','', 'textarea'),
+      notes:localizedField(cornell,'explain','', 'textarea'),
+      summary:localizedField(cornell,'summary','', 'textarea'),
+      notebook:localizedField(extra,'book',''),
+      tags:localizedField(extra,'tags','')
     };
     const pairs=el('div','nsux-extra');pairs.id='nsux-recall';extra.appendChild(pairs);
     const pairList=el('div','nsux-extra');pairs.appendChild(pairList);instance.pairList=pairList;
-    button(pairs,t('addPair'),()=>{const c=[...instance.pairList.children].length;
+    localizedButton(pairs,'addPair',()=>{const c=[...instance.pairList.children].length;
       const a=collectPairs(true);a.push({key:'pair-'+Date.now()+'-'+c,question:'',answer:''});createPairs(instance.pairList,a);
       schedule();
     });
     const advanced=el('details','nsux-advanced');instance.advanced=advanced;
-    advanced.appendChild(el('summary','',t('more')));advanced.appendChild(extra);
+    advanced.appendChild(localizedElement('summary','','more'));advanced.appendChild(extra);
     body.parentNode.insertBefore(toolbar,body);document.getElementById('nsCounter').after(advanced);
     find.addEventListener('input',()=>{renderPreview();findNext(true);});
     body.addEventListener('input',()=>{renderPreview();});
@@ -462,6 +492,7 @@
   }
   function save(){
     if(!instance){if(typeof showToast==='function')showToast('⚠️ Notes UI is not connected; nothing was saved.');return false;}
+    if(!document.getElementById('noteModal')?.classList.contains('open'))return false;
     try{
       instance.controller.save(draftToSave());
       if(typeof nsClearDraftForSavedNote==='function')nsClearDraftForSavedNote();
@@ -471,7 +502,7 @@
       return true;
     }catch(e){instance.adapter.notify?.(e.message==='NOTE_CONFLICT_RELOAD_REQUIRED'?t('conflict'):t('failed')+': '+e.message);return false;}
   }
-  function cardAction(parent,label,fn,danger){return button(parent,label,()=>{try{fn();renderStack();}catch(e){instance.adapter.notify?.(e.message);}},danger?'danger':'');}
+  function cardAction(parent,label,fn,danger){return button(parent,label,async()=>{try{await fn();renderStack();}catch(e){instance.adapter.notify?.(e.message);}},danger?'danger':'');}
   function copyExport(note,format){
     let content;
     try{content=serializeNote(note,format);}
@@ -519,7 +550,7 @@
     if(pinned)pinned.textContent=String(all.filter(n=>n.pinned).length);
     if(count)count.textContent=String(Math.min(offset+found.length,result.total))+' / '+result.total;
     box.replaceChildren();
-    if(!found.length){box.appendChild(el('div','nsux-blank',t('empty')));return true;}
+    if(!found.length){box.appendChild(localizedElement('div','nsux-blank','empty'));return true;}
     found.forEach(n=>{
       const card=el('article','nsux-card'),top=el('div','nsux-inline');
       top.appendChild(el('span','ns-type',typeof getNoteTagLabel==='function'?getNoteTagLabel(n.catKey):(n.catKey||'note')));
@@ -546,6 +577,7 @@
       }else{
         cardAction(actions,t('edit'),()=>{openNoteModal(null,n.id);});
         cardAction(actions,t('read'),()=>showReader(n));
+        cardAction(secondary,t('duplicate'),()=>instance.controller.duplicate(n.id));
         cardAction(secondary,'★',()=>instance.controller.toggle(n.id,'favorite'));
         cardAction(secondary,'📌',()=>instance.controller.toggle(n.id,'pinned'));
         cardAction(secondary,t('copyTxt'),()=>copyExport(n,'txt'));
@@ -557,12 +589,12 @@
       }
       if(s!=='trash'){
         if(instance.adapter.openCalendarForNote)cardAction(secondary,'📅',()=>instance.adapter.openCalendarForNote(n.id));
-        if(instance.adapter.pickNoteLinkTarget)cardAction(secondary,t('link'),()=>{
-          const target=instance.adapter.pickNoteLinkTarget(n.id,instance.controller.read().notesList);
+        if(instance.adapter.pickNoteLinkTarget)cardAction(secondary,t('link'),async()=>{
+          const target=await instance.adapter.pickNoteLinkTarget(n.id,instance.controller.read().notesList);
           if(target!==null&&target!==undefined)instance.controller.link(n.id,target);
         });
-        if(instance.adapter.pickTaskLinkTarget)cardAction(secondary,'↗ '+t('task'),()=>{
-          const target=instance.adapter.pickTaskLinkTarget(n.id,instance.controller.read().tasksList);
+        if(instance.adapter.pickTaskLinkTarget)cardAction(secondary,'↗ '+t('linkTask'),async()=>{
+          const target=await instance.adapter.pickTaskLinkTarget(n.id,instance.controller.read().tasksList);
           if(target!==null&&target!==undefined)instance.controller.linkTask(n.id,target);
         });
         if(instance.adapter.confirmTaskExtraction && instance.adapter.commitBoth)
@@ -574,17 +606,19 @@
       card.appendChild(actions);
       if(secondary.children.length){
         const overflow=el('details','nsux-more');
-        overflow.appendChild(el('summary','',t('more')));
+        overflow.appendChild(localizedElement('summary','','more'));
         overflow.appendChild(secondary);card.appendChild(overflow);
       }
       box.appendChild(card);
     });
-    if(offset+result.items.length<result.total)button(box,t('more'),()=>{instance.page++;renderStack();});
+    if(offset+result.items.length<result.total)localizedButton(box,'more',()=>{instance.page++;renderStack();});
     return true;
   }
   function showReader(n){
     const dlg=document.getElementById('noteModal');openNoteModal(null,n.id);
     const preview=document.getElementById('nsux-preview');
+    // The reader lives inside advanced details; opening the child alone stays hidden.
+    instance.advanced.open=true;
     dlg.classList.add('nsux-reading');
     document.activeElement?.blur?.();
     preview.hidden=false;
@@ -593,7 +627,7 @@
     if(headings.length>1){
       const toc=el('nav','nsux-toc');
       toc.setAttribute('aria-label',t('contents'));
-      toc.appendChild(el('strong','',t('contents')));
+      toc.appendChild(localizedElement('strong','','contents'));
       headings.forEach(h=>button(toc,h.textContent,()=>h.scrollIntoView?.({block:'nearest'})));
       preview.prepend(toc);
     }
@@ -606,17 +640,17 @@
     const pairs=instance.controller.recall(n.id);
     pairs.forEach(pair=>{
       const q=el('h4','',pair.question);q.dir='auto';preview.appendChild(q);
-      const answer=button(preview,t('review'),()=>{answer.textContent=pair.answer;});answer.dir='auto';
+      const answer=localizedButton(preview,'review',()=>{answer.textContent=pair.answer;});answer.dir='auto';
     });
     const links=Array.isArray(ext.links)?ext.links:[];
-    if(links.length){preview.appendChild(el('h4','',t('linked')));links.forEach(id=>{
+    if(links.length){preview.appendChild(localizedElement('h4','','linked'));links.forEach(id=>{
       const target=instance.controller.read().notesList.find(x=>x?.id===id);
       if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
       else preview.appendChild(el('p','nsux-meta',t('missing')+' #'+id));
     });}
     const backlinks=instance.controller.backlinks(n.id);
     if(backlinks.length){
-      preview.appendChild(el('h4','',t('linked')));
+      preview.appendChild(localizedElement('h4','','linked'));
       backlinks.forEach(id=>{
         const target=instance.controller.read().notesList.find(x=>x?.id===id);
         if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
@@ -626,16 +660,54 @@
       const target=instance.controller.read().tasksList.find(x=>x&&x.id===id);
       if(target)preview.appendChild(el('p','',t('task')+': '+target.title));
     });
-    button(preview,t('edit'),()=>{dlg.classList.remove('nsux-reading');document.getElementById('inpNoteBody').focus();});
+    localizedButton(preview,'edit',()=>{dlg.classList.remove('nsux-reading');document.getElementById('inpNoteBody').focus();});
     dlg.querySelector('.ns-editor').scrollTop=0;
+  }
+  function linkCandidates(sourceId,records,kind){
+    const counts=new Map();
+    records.forEach(record=>{if(record)counts.set(record.id,(counts.get(record.id)||0)+1);});
+    return records.filter(record=>record && validId(record.id) && counts.get(record.id)===1 &&
+      !record.isStarter && !record.deletedAt && !record.notesV21?.deletedAt &&
+      (kind!=='note'||record.id!==sourceId));
+  }
+  function chooseLinkTarget(sourceId,records,kind){
+    if(document.querySelector('dialog.nsux-link-picker[open]'))return Promise.resolve(null);
+    const candidates=linkCandidates(sourceId,records,kind);
+    if(!candidates.length){instance.adapter.notify(t('noTargets'));return Promise.resolve(null);}
+    return new Promise(resolve=>{
+      const dialog=el('dialog','nsux-link-picker'),heading=localizedElement('h3','',kind==='note'?'chooseNote':'chooseTask');
+      heading.id='nsux-link-heading';dialog.setAttribute('aria-labelledby',heading.id);
+      const search=localizedField(dialog,'searchRecords','');search.type='search';search.autofocus=true;
+      dialog.prepend(heading);
+      const list=el('div','nsux-link-list');dialog.appendChild(list);
+      let selected=null,timer=null;
+      const normalize=value=>String(value||'').normalize('NFKD').replace(/[\u064b-\u065f\u0670]/g,'').toLocaleLowerCase();
+      function render(){
+        const query=normalize(search.value);
+        const matches=candidates.filter(record=>normalize(record.title+' '+(record.body||'')).includes(query));
+        list.replaceChildren();
+        matches.slice(0,100).forEach(record=>{
+          const option=button(list,record.title||t('empty'),()=>{selected=record.id;dialog.close();});
+          option.dir='auto';
+          if(record.calDate||record.date)option.appendChild(el('small','nsux-meta',record.calDate||record.date));
+        });
+        if(!matches.length)list.appendChild(localizedElement('p','', 'empty'));
+      }
+      search.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(render,150);});
+      localizedButton(dialog,'cancel',()=>dialog.close());
+      const previous=document.activeElement;
+      dialog.addEventListener('close',()=>{clearTimeout(timer);dialog.remove();previous?.focus?.();resolve(selected);},{once:true});
+      document.body.appendChild(dialog);render();
+      try{dialog.showModal();}catch(_){dialog.remove();instance.adapter.notify(t('failed'));resolve(null);}
+    });
   }
   function mountFilters(){
     const notes=document.getElementById('sec-notes'),box=document.getElementById('notesStackBox');
     if(!notes||!box||document.getElementById('nsux-filters'))return;
     const root=el('div','nsux-controls');root.id='nsux-filters';
     const status=el('select');status.id='nsux-status';status.setAttribute('aria-label',t('status'));
-    [['active',t('all')],['archived',t('archive')],['trash',t('trash')]].forEach(([value,name])=>{
-      const op=el('option','',name);op.value=value;status.appendChild(op);
+    [['active','all'],['archived','archive'],['trash','trash']].forEach(([value,key])=>{
+      const op=localizedElement('option','',key);op.value=value;status.appendChild(op);
     });
     const book=el('select');book.id='nsux-book-filter';book.setAttribute('aria-label',t('notebooks'));
     const tag=el('select');tag.id='nsux-tag-filter';tag.setAttribute('aria-label',t('tag'));
@@ -657,5 +729,5 @@
   }
   return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,checklistProgress,serializeNote,
     draftVersionMatches,findOccurrences,renderText,openedFingerprint:()=>instance?.openedSnapshot??null,
-    install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader});
+    install,refreshLocale,translate:t,linkCandidates,chooseLinkTarget,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader});
 });

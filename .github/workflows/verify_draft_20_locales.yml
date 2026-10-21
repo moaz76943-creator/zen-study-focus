@@ -1,0 +1,86 @@
+name: DF4 20-language Draft Safety Verification
+on:
+  push:
+    branches: [fix/df4-notes-draft-20-locales-20261020]
+  pull_request:
+    paths:
+      - 'android/app/src/main/assets/web/notes_drafts.js'
+      - 'tests/notes_recovery/draft_20_locales.test.cjs'
+      - '.github/workflows/verify_draft_20_locales.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df4-draft-20-locales-verify
+  cancel-in-progress: true
+jobs:
+  source-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact source and 20 locale / 11 safety texts
+        run: |
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/source-sha.txt
+          node --check android/app/src/main/assets/web/notes_drafts.js
+          node --test --test-reporter=tap tests/notes_recovery/draft_20_locales.test.cjs | tee evidence/draft-20-locales.tap
+      - name: Notes draft and full source regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/validate_locales.cjs
+          node tests/smoke_app.cjs
+          find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs -print0 | sort -z | xargs -0 -r node --test --test-reporter=tap | tee evidence/source-tests.tap
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee evidence/python-tests.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: df4-draft-20-locale-source-evidence
+          path: evidence/
+          retention-days: 3
+  debug-build:
+    needs: source-regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install Android SDK using hosted SDK path
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Build actual test APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Record binary and source hashes
+        run: |
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/source-sha.txt
+          sha256sum android/app/build/outputs/apk/debug/*.apk > evidence/apk-sha256.txt
+          printf 'Android UI E2E: NOT_TESTED\nNative speaker translation review: NOT_TESTED\nMedia license gate: BLOCKED\nRelease: NOT APPROVED\n' > evidence/release-status.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: df4-draft-20-locale-debug-apk
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            evidence/
+          retention-days: 3
+          if-no-files-found: warn

@@ -290,10 +290,11 @@
     /* Smart Calendar */
     .cal-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .cal-month-title { font-size: 1rem; font-weight: 900; color: var(--text-main); }
-    .cal-weekdays-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.68rem; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; }
-    .cal-days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+    .cal-weekdays-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-size: 0.68rem; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; }
+    .cal-weekdays-grid > * { min-width: 0; overflow-wrap: anywhere; align-self: center; }
+    .cal-days-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
     .cal-day-cell {
-      aspect-ratio: 1; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9;
+      min-width: 0; min-height: 44px; padding: 0; font-family: inherit; aspect-ratio: 1; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       font-size: 0.78rem; font-weight: 800; color: var(--text-main); cursor: pointer; position: relative; transition: 0.15s;
     }
@@ -639,8 +640,8 @@
   <link rel="stylesheet" href="completion_alert_settings.css">
   <!-- Allowlisted cosmetic design overrides; no user data or app behavior changes. -->
   <link rel="stylesheet" href="control_center_overrides.css">
-  <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
   <link rel="stylesheet" href="nature_library_v2.css">
+  <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
 </head>
 <body>
 
@@ -784,8 +785,8 @@
             <div style="font-size:0.84rem; font-weight:900;" id="sportSetCounterTxt">Set 0 / 4 • 12 Reps</div>
           </div>
           <div style="display:flex; gap:5px;">
-            <button class="delta-chip" onclick="logWorkoutSet()">+1 Set ✓</button>
-            <button class="delta-chip" style="background:var(--emerald-soft); color:var(--emerald);" onclick="startQuickSportRest(45)">Rest 45s</button>
+            <button class="delta-chip" id="sportLogSet" onclick="logWorkoutSet()">+1 Set ✓</button>
+            <button class="delta-chip" style="background:var(--emerald-soft); color:var(--emerald);" id="sportRest45" onclick="startQuickSportRest(45)">Rest 45s</button>
           </div>
         </div>
 
@@ -1226,6 +1227,7 @@
     </div>
   </div>
 
+  <script src="webview_compat.js"></script>
   <script src="locale_rows.js"></script>
   <script src="locale_extras.js"></script>
   <script src="numerals_ascii_v21.js"></script>
@@ -1233,6 +1235,7 @@
   <script src="data_compat_v21.js"></script>
   <script src="preflight_v22.js"></script>
   <script src="nature_library_v2.js"></script>
+  <script src="analytics_recovery_core.js"></script>
   <script src="app.js"></script>
   <script src="notes_core_v21.js"></script>
   <script src="notes_studio.js"></script>
@@ -1243,7 +1246,6 @@
   <script src="analytics_core_v21.js"></script>
   <script src="analytics_studio.js"></script>
   <script src="localization_20_recovery.js"></script>
-  <script src="analytics_recovery_core.js"></script>
   <script src="analytics_recovery_ui.js"></script>
   <script src="analytics_recovery_ar_locale.js"></script>
   <script src="interaction_recovery_06.js"></script>

@@ -8,6 +8,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.widget.Toast;
+import android.util.AtomicFile;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import android.view.WindowManager;
@@ -129,7 +132,70 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
+    // Exactly the existing v21 six raw packets, preserved byte-for-byte.
+    private final Object durableV21Lock = new Object();
+    private static final int MAX_DURABLE_V21_BYTES = 64 * 1024 * 1024;
+    private static final String[] DURABLE_V21_KEYS = {
+        "zen_fortress_cfg_v21", "zen_fortress_cfg_v21_mirror",
+        "zen_fortress_tasks_v21", "zen_fortress_tasks_v21_mirror",
+        "zen_fortress_notes_v21", "zen_fortress_notes_v21_mirror"
+    };
+    private boolean validV21Envelope(String text) {
+        if (text==null || text.length()>MAX_DURABLE_V21_BYTES) return false;
+        try {
+            org.json.JSONObject data = new org.json.JSONObject(text);
+            if (data.getInt("version")!=1) return false;
+            org.json.JSONObject packets = data.getJSONObject("packets");
+            if (packets.length()!=DURABLE_V21_KEYS.length) return false;
+            for (String key : DURABLE_V21_KEYS) {
+                if (!packets.has(key)) return false;
+                Object packet = packets.get(key);
+                if (packet!=org.json.JSONObject.NULL && !(packet instanceof String)) return false;
+            }
+            return true;
+        } catch (Exception ignored) { return false; }
+    }
+
     public class ZenNativeBridge {
+        // @JavascriptInterface executes on WebView's bridge thread, off the UI thread.
+        // Acknowledgement requires a private AtomicFile with explicit FD sync.
+        @JavascriptInterface
+        public boolean acknowledgeDurableV21(String json) {
+            if (!validV21Envelope(json)) return false;
+            byte[] bytes=json.getBytes(StandardCharsets.UTF_8);
+            if (bytes.length>MAX_DURABLE_V21_BYTES) return false;
+            synchronized (durableV21Lock) {
+                AtomicFile file=new AtomicFile(new File(getFilesDir(),"v21_durable_packets_v1"));
+                FileOutputStream stream=null;
+                try {
+                    stream=file.startWrite();
+                    stream.write(bytes);
+                    stream.getFD().sync();
+                    file.finishWrite(stream);
+                    return true;
+                } catch (Exception error) {
+                    if (stream!=null) file.failWrite(stream);
+                    return false;
+                }
+            }
+        }
+
+        @JavascriptInterface
+        public String readDurableV21() {
+            synchronized (durableV21Lock) {
+                AtomicFile file=new AtomicFile(new File(getFilesDir(),"v21_durable_packets_v1"));
+                File baseFile=file.getBaseFile();
+                if (!baseFile.exists() && !new File(baseFile.getPath()+".bak").exists()) return "NONE";
+                try {
+                    byte[] bytes=file.readFully();
+                    if (bytes.length>MAX_DURABLE_V21_BYTES) return "ERROR";
+                    String json=new String(bytes,StandardCharsets.UTF_8);
+                    return validV21Envelope(json)?json:"ERROR";
+                } catch (Exception error) { return "ERROR"; }
+            }
+        }
+
         // Preserve the original two-argument JavaScript API for older callers.
         @JavascriptInterface
         public void startBackgroundService(int seconds, String title) {
@@ -191,6 +257,11 @@ public class MainActivity extends AppCompatActivity {
             if (backupCode == null || !backupCode.startsWith("ZEN21::")
                     || backupCode.length() > 14000000) return;
             runOnUiThread(() -> {
+                if (backupAwaitingSave != null) {
+                    Toast.makeText(MainActivity.this, "A backup save is already open",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
                 backupAwaitingSave = backupCode;
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -304,10 +375,8 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             if (payload == null) {reportAnalyticsSave(requestId, "failed"); return;}
-            try (OutputStream output = getContentResolver().openOutputStream(data.getData(), "w")) {
-                if (output == null) throw new java.io.IOException("Cannot open CSV document");
-                output.write(payload.getBytes(StandardCharsets.UTF_8));
-                output.flush();
+            try {
+                NativeDocumentWriter.writeUtf8(getContentResolver().openOutputStream(data.getData(), "w"), payload);
             } catch (Exception error) {
                 reportAnalyticsSave(requestId, "failed");
                 return;
@@ -320,16 +389,15 @@ public class MainActivity extends AppCompatActivity {
         backupAwaitingSave = null;
         if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null
                 || payload == null) return;
-        try (OutputStream output = getContentResolver().openOutputStream(data.getData(), "w")) {
-            if (output == null) throw new java.io.IOException("Cannot open target document");
-            output.write(payload.getBytes(StandardCharsets.UTF_8));
-            output.flush();
-            Toast.makeText(this, "Backup exported; keep the unencrypted file private",
-                    Toast.LENGTH_LONG).show();
+        try {
+            NativeDocumentWriter.writeUtf8(getContentResolver().openOutputStream(data.getData(), "w"), payload);
         } catch (Exception error) {
             Toast.makeText(this, "Unable to save backup; existing data unchanged",
                     Toast.LENGTH_LONG).show();
+            return;
         }
+        Toast.makeText(this, "Backup exported; keep the unencrypted file private",
+                Toast.LENGTH_LONG).show();
     }
 
     @Override

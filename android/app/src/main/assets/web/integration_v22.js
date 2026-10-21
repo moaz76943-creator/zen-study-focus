@@ -150,6 +150,9 @@
         if (storage.getItem(key) !== value) throw new Error('Storage verification failed: ' + key);
       journal.state = 'committed';
       storage.setItem(D.JOURNAL_KEY,JSON.stringify(journal));
+      // localStorage readback does not imply Android disk durability.
+      if (root.ZenNative && (!root.DF22Preflight || !root.DF22Preflight.nativeAcknowledge(storage)))
+        throw new Error('NATIVE_DURABLE_ACK_FAILED');
     } catch (e) {
       const failed = rollback(storage,original);
       if (failed.length) throw new Error('Storage interrupted; recovery journal retained: ' + failed.join('; '));
@@ -187,6 +190,7 @@
     if (typeof renderNotesStack === 'function') renderNotesStack();
     if (analyticsUi) analyticsUi.refresh();
   }
+  function noteMessage(key) { return root.DeepFocusNotesEditorUI.translate(key); }
   function notesAdapter() {
     return {
       readState:() => { const x = current();return {notesList:x.notesList,tasksList:x.tasksList}; },
@@ -196,10 +200,12 @@
       commitBoth:(before,after) => fromNoteEdit(before,after,true),
       onSaved:onChanged,onRefresh:onChanged,
       confirmPermanentDelete:() => ({
-        confirmed:root.confirm('Permanently delete this note? This cannot be undone.'),
-        backupAcknowledged:root.confirm('Have you exported a verified backup of your notes? Choose Cancel if not.')
+        confirmed:root.confirm(noteMessage('confirmDelete')),
+        backupAcknowledged:root.confirm(noteMessage('confirmBackup'))
       }),
-      confirmTaskExtraction:(id,note) => root.confirm('Extract unfinished checklist items from "' + note.title + '" as new tasks?'),
+      confirmTaskExtraction:() => root.confirm(noteMessage('extractConfirm')),
+      pickNoteLinkTarget:(id,records) => root.DeepFocusNotesEditorUI.chooseLinkTarget(id,records,'note'),
+      pickTaskLinkTarget:(id,records) => root.DeepFocusNotesEditorUI.chooseLinkTarget(id,records,'task'),
       openCalendarForNote:() => switchTab('sec-calendar',document.getElementById('navCalendar'))
     };
   }
@@ -246,7 +252,7 @@
     if (cfg.lang !== lastLocale) {
       lastLocale = cfg.lang;
       mountTasks();mountAnalytics();mountAlertPicker();
-      if (root.DeepFocusNotesEditorUI) root.DeepFocusNotesEditorUI.renderStack();
+      if (root.DeepFocusNotesEditorUI) root.DeepFocusNotesEditorUI.refreshLocale();
     }
   }
   function onTab(section) {

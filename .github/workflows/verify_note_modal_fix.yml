@@ -1,0 +1,23 @@
+name: Deep Focus note save touch regression (source only)
+on:
+  push:
+    branches: [fix/df4-notes-save-visible-android-20261020]
+permissions:
+  contents: read
+concurrency:
+  group: deep-focus-note-save-regression
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: RED/GREEN note save action reachability
+        run: |
+          node --test tests/df4_browser/note_modal_style.test.cjs
+          node tests/validate_locales.cjs
+          node tests/smoke_app.cjs

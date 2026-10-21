@@ -5,13 +5,13 @@ const GOAL_UI={
  en:{kicker:'✦ YOUR DAILY TARGETS',heading:'A little progress, each day',
  desc:'Minutes come from your completed focus sessions.',edit:'⚙ Edit',
  modal:'Daily activity goals',hint:'Set 0 to hide a target. A session counts only after it completes.',
- save:'Goals saved',invalid:'Enter whole minutes from 0 to 720.',
+ save:'Goals saved',saveFailed:'Could not save goals. Try again.',invalid:'Enter whole minutes from 0 to 720.',
  noGoal:'Set goal',minute:'min',done:'completed',today:'today',
  week:'This week',weekTarget:'Weekly target (min)',weekInvalid:'Weekly targets must be 0–5040 minutes.'},
  ar:{kicker:'✦ أهدافك اليومية',heading:'تقدمك في كل نشاط',
  desc:'نحسب الدقائق من جلسات التركيز المكتملة فقط.',edit:'⚙ تعديل',
  modal:'تعديل الأهداف اليومية',hint:'اكتب 0 لإيقاف الهدف. تُحسب الدقائق بعد اكتمال الجلسة.',
- save:'تم حفظ الأهداف',invalid:'أدخل دقائق صحيحة من 0 إلى 720.',
+ save:'تم حفظ الأهداف',saveFailed:'تعذر حفظ الأهداف. حاول مرة أخرى.',invalid:'أدخل دقائق صحيحة من 0 إلى 720.',
  noGoal:'حدد هدفًا',minute:'دقيقة',done:'المنجز',today:'اليوم',
  week:'هذا الأسبوع',weekTarget:'الهدف الأسبوعي (دقائق)',weekInvalid:'الأهداف الأسبوعية بين 0 و5040 دقيقة.'}
 };
@@ -32,6 +32,7 @@ function gsISOValid(iso) {
  return date.getFullYear()===year&&date.getMonth()===month-1&&date.getDate()===day;
 }
 function gsCleanHistory() {
+ if(typeof acceptedFocusHistory==='function')return acceptedFocusHistory(cfg.sessionHistory)||[];
  const raw=Array.isArray(cfg.sessionHistory)?cfg.sessionHistory:[];
  const seen=new Set(),entries=[];
  for(const item of raw) {
@@ -39,6 +40,8 @@ function gsCleanHistory() {
      item.isStarter===true||item.isDemo===true||item.demo===true||
      item.isTest===true||item.synthetic===true||
      ['demo','sample','test','synthetic'].includes(item.source))continue;
+  if(item.completed===false||item.isFocus===false||['short','long','rest','break','short_break','long_break'].includes(item.mode)||
+     ['running','paused','unfinished','cancelled','skipped'].includes(item.status))continue;
   const id=item.id;
   if(!((typeof id==='string'&&id.length>0&&id.length<=128)||
       (typeof id==='number'&&Number.isSafeInteger(id)&&id>=0)))continue;
@@ -157,9 +160,18 @@ function saveDailyGoals(){
   }
   weeklyValues[domain]=Number(weekRaw);
  }
+ // Stage the new preferences: an Android native ACK can reject the write.
+ // Keep the active cfg untouched, and the modal open, until durable success.
+ const next={...cfg,weeklyGoalsMin:weeklyValues,dailyGoalsMin:values};
+ try {
+  if(saveFortressData('zen_fortress_cfg_v21',next)!==true)
+   throw new Error('GOAL_SAVE_NOT_ACKNOWLEDGED');
+ } catch (_) {
+  showToast(gsText('saveFailed'));
+  return false;
+ }
  cfg.weeklyGoalsMin=weeklyValues;
  cfg.dailyGoalsMin=values;
- saveFortressData('zen_fortress_cfg_v21',cfg);
  closeModal('dailyGoalsModal');renderDailyGoals();showToast(gsText('save'));
  return true;
 }

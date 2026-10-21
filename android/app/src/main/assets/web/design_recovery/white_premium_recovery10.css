@@ -20,7 +20,7 @@ body.df-v22.df-recovery10 {
   color: var(--dfr-ink);
   font-family: var(--df22-font, system-ui, -apple-system, "Noto Sans", "Noto Sans Arabic", sans-serif);
   line-height: 1.5;
-  padding-bottom: calc(95px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(max(95px, 7rem) + env(safe-area-inset-bottom, 0px));
   overflow-x: clip;
 }
 body.df-v22.df-recovery10:not(.deep-lockdown) .app-shell {
@@ -171,7 +171,7 @@ body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
   height: auto;
   padding: 6px 1px;
   border-radius: 12px;
-  font-size: clamp(.62rem, 2.15vw, .75rem);
+  font-size: clamp(.7rem, 2.15vw, .85rem);
   line-height: 1.18;
   font-weight: 650;
   gap: 3px;
@@ -276,6 +276,8 @@ html[dir="rtl"] body.df-v22.df-recovery10 :where(.df10-state,.today-plan-entry,.
   text-align: start;
 }
 html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
+  /* API30 WebView fallback: physical right anchor when logical inset is unsupported. */
+  right: 50%;
   /* grid positions remain semantic; timer always occupies logical column four. */
   inset-inline-start: 50%;
   left: auto;
@@ -300,7 +302,7 @@ html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
   body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
     min-height: 58px;
     padding-inline: 0;
-    font-size: .6rem;
+    font-size: .7rem;
   }
   body.df-v22.df-recovery10 #sec-timer .domain-card { min-height: 100px; }
 }
@@ -324,4 +326,32 @@ html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
     border-color: #50617a;
   }
   body.df-v22.df-recovery10 :where(button,a,input,textarea):focus-visible { outline-width: 4px !important; }
+}
+
+
+/* Keep the final Note action card scrollable above the fixed seven-tab bottom bar
+   on small Android WebViews (including RTL and keyboard-dismissed editing). */
+body.df-v22.df-recovery10 #sec-notes #notesStackBox {
+  padding-bottom: calc(106px + env(safe-area-inset-bottom, 0px));
+}
+/* Android Notes viewport fix: pin Save/Cancel while lengthy content scrolls.
+   Keep the actual visualViewport keyboard height and all existing data paths. */
+body.df-v22.df-recovery10 #noteModal .ns-editor {
+  max-height: min(88dvh, calc(var(--nsux-height, 100dvh) - 16px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+body.df-v22.df-recovery10 #noteModal .ns-editor > .modal-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background: #fff;
+  padding: 11px 0 max(11px, env(safe-area-inset-bottom, 0px));
+  margin-block-start: 10px;
+  border-block-start: 1px solid #e3ecf8;
+  box-shadow: 0 -8px 16px -16px rgba(28,46,77,.35);
+}
+body.df-v22.df-recovery10 #noteModal .ns-editor > .modal-actions > button {
+  min-height: 44px;
 }
