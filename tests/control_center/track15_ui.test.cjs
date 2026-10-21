@@ -63,6 +63,11 @@ test('track15-ui02 exact-run success/failure and previous-SHA agent reports reta
  h.get('track15-refresh').events.click();
  await new Promise(resolve=>setImmediate(resolve));
  assert.equal(h.requests(),8,'manual refresh obeys cooldown and prevents anonymous rate-limit exhaustion');
+ assert.equal(h.get('track15-status').dataset.quality,'RATE_LIMITED');
+ assert.ok(h.get('track15-candidates').children.every(card=>
+   card.children[1].textContent.includes('لا تعدّه Live')),
+   'Results must be marked STALE when a rate limit blocks refreshing');
+
 });
 test('track15-ui03 scripts use textContent, omit browser credentials and mutation endpoints',()=>{
  assert.match(script,/credentials:'omit'/);
