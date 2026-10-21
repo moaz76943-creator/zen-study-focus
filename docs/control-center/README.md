@@ -264,3 +264,12 @@ republished by Track 15. The new sources require a separately reviewed deploymen
 `node --test tests/control_center/*.test.cjs` and real mobile-browser interaction
 checks should be re-run on the proposed branch after integration; real Android
 WebView acceptance remains a separate requirement.
+
+### 20-language evidence grid
+The locale list was read from the canonical #138 app source: `ar,en,es`
+and `fr,de,tr,ru,pt,zh,hi,ja,ko,id,vi,it,bn,ur,fa,pl,nl`.
+Track 15 shows **20 individual NOT_TESTED counts** unless a validated,
+same-SHA full 20-language report is supplied. No counts are guessed from
+the historical 4590/4626 totals in Issue #104. A zero can be displayed
+only when a matching source report explicitly records zero missing keys;
+zero missing keys is not proof of translation naturalness or rendered Android QA.
