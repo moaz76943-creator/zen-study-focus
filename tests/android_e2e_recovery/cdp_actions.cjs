@@ -2,7 +2,7 @@
 // Real disposable Android WebView actions. Does not claim TalkBack, hearing, DND or physical-phone acceptance.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
 const {validateTouchTarget,missingPrerequisites,classifyFailure,selectCases}=require('./cdp_touch_target.cjs');
-const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,nativePromptText}=require('./android_device_touch.cjs');
+const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,parseNativeConfirmButton,nativePromptText}=require('./android_device_touch.cjs');
 const {readWebViewFrame}=require('./android_ui_hierarchy.cjs');
 const {isTransportFailure,recoverTransport}=require('./cdp_transport_recovery.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
@@ -110,7 +110,7 @@ async function acceptNativeConfirm(expression){
   await pause(450);
  }
  if(!xml)throw Error('TRANSPORT: Native Deep Focus confirmation unverified: '+String(lastFailure?.message||'missing dialog').slice(0,120));
- const point=parseNativePromptButton(xml);
+ const point=parseNativeConfirmButton(xml);
  adb('shell','input','tap',String(point.x),String(point.y));
  const accepted=await outstanding;
  assert.equal(accepted,true,'Native confirmation OK must cause a real JS true result');
