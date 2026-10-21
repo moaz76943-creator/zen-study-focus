@@ -1,0 +1,99 @@
+name: Deep Focus Track16 Canonical Candidate Source QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/track16_candidate_source_qa.yml'
+      - '.github/workflows/hourly_agent_orchestrator.yml'
+      - '.github/workflows/daily_maintenance.yml'
+      - 'tools/daily_maintenance/**'
+      - 'tests/daily_maintenance/**'
+permissions:
+  contents: read
+  pull-requests: read
+concurrency:
+  group: track16-candidate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  candidate-source-audit:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: automation
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve canonical PR #138 current head
+        id: resolve
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const policy = require('./automation/tools/daily_maintenance/canonical_source.cjs');
+            const repo=context.repo.owner+'/'+context.repo.repo;
+            const {data}=await github.rest.pulls.get({owner:context.repo.owner,repo:context.repo.repo,pull_number:policy.CANONICAL_PR});
+            core.setOutput('sha',policy.verifyCanonicalPr(data,repo,policy.CANONICAL_REF));
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve.outputs.sha }}
+          path: source
+          persist-credentials: false
+      - name: Run every owned source specialist, fail closed
+        id: agents
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/candidate-source"
+          git -C source rev-parse HEAD > "$RUNNER_TEMP/candidate-source/SOURCE_SHA"
+          node automation/tools/daily_maintenance/quality_agents.cjs --root source --out "$RUNNER_TEMP/candidate-source" --lane all
+      - name: Revalidate canonical SHA, inventory, and specialist results
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          SOURCE_SHA_FILE: ${{ runner.temp }}/candidate-source/SOURCE_SHA
+          REPORT_JSON: ${{ runner.temp }}/candidate-source/quality-agents.json
+        with:
+          script: |
+            const fs=require('node:fs');
+            const policy=require('./automation/tools/daily_maintenance/canonical_source.cjs');
+            const repo=context.repo.owner+'/'+context.repo.repo;
+            try {
+              const sha=fs.readFileSync(process.env.SOURCE_SHA_FILE,'utf8').trim();
+              const {data}=await github.rest.pulls.get({owner:context.repo.owner,repo:context.repo.repo,pull_number:policy.CANONICAL_PR});
+              policy.verifyCanonicalPr(data,repo,policy.CANONICAL_REF,sha);
+              const report=JSON.parse(fs.readFileSync(process.env.REPORT_JSON,'utf8'));
+              const manifest=JSON.parse(fs.readFileSync('./automation/tools/daily_maintenance/agents.json','utf8'));
+              if(report.source_sha!==sha||report.scope!=='SOURCE_CODE_ONLY')throw Error('Source SHA/scope mismatch');
+              if(!Array.isArray(report.agents)||report.agents.length!==manifest.agents.length)throw Error('Specialist evidence missing');
+              if(!report.agents.every(agent=>agent.status==='SOURCE_TESTED'))throw Error('One or more source specialists not SOURCE_TESTED');
+              if(!Array.isArray(report.unmapped_tests)||report.unmapped_tests.length>0)throw Error('Unowned feature source tests');
+              core.summary.addHeading('Canonical source-only QA: PASS');
+              core.summary.addRaw('Verified source SHA: '+sha+'; specialists: '+report.agents.length+'/'+manifest.agents.length+'. Android E2E and audio rights remain unapproved.');
+              await core.summary.write();
+            } catch(err) {
+              core.summary.addHeading('Canonical source-only QA: BLOCKED / NOT_VERIFIED');
+              core.summary.addRaw(String(err.message).slice(0,250)+'; do not reuse historical green evidence. RELEASE_APPROVED=NO.');
+              await core.summary.write();
+              core.setFailed(String(err.message).slice(0,250));
+            }
+      - name: Record sanitized run provenance
+        if: always()
+        env:
+          OUT_DIR: ${{ runner.temp }}/candidate-source
+        run: |
+          mkdir -p "$OUT_DIR"
+          node -e 'const fs=require("node:fs"),p=require("node:path");const sf=p.join(process.env.OUT_DIR,"SOURCE_SHA");const data={run_id:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,head_commit:process.env.GITHUB_SHA,source_sha:fs.existsSync(sf)?fs.readFileSync(sf,"utf8").trim():"NOT_VERIFIED",canonical_pr:138,scope:"SOURCE_ONLY",release_approved:false};fs.writeFileSync(p.join(process.env.OUT_DIR,"run-provenance.json"),JSON.stringify(data,null,2)+"\n");'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track16-canonical-source-qa
+          path: ${{ runner.temp }}/candidate-source/
+          retention-days: 3
+          if-no-files-found: warn
+      - name: Preserve source QA failure
+        if: steps.agents.outcome != 'success'
+        run: exit 1

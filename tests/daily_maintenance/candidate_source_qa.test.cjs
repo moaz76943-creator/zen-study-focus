@@ -1,0 +1,29 @@
+'use strict';
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'../..');
+const workflow=path.join(root,'.github/workflows/track16_candidate_source_qa.yml');
+test('candidate source QA verifies live PR138 SHA and real specialist outcomes, not only infrastructure',()=>{
+ const yaml=fs.readFileSync(workflow,'utf8');
+ assert.match(yaml,/pull_request:/);
+ assert.match(yaml,/track16-candidate-\$\{\{ github\.event\.pull_request\.number \}\}/);
+ assert.match(yaml,/cancel-in-progress: true/);
+ assert.match(yaml,/pull_number:policy\.CANONICAL_PR/);
+ assert.match(yaml,/ref: \$\{\{ steps\.resolve\.outputs\.sha \}\}/);
+ assert.match(yaml,/quality_agents\.cjs --root source --out/);
+ assert.match(yaml,/report\.agents\.every\(agent=>agent\.status==='SOURCE_TESTED'\)/);
+ assert.match(yaml,/policy\.verifyCanonicalPr\(data,repo,policy\.CANONICAL_REF,sha\)/);
+ assert.match(yaml,/actions\/upload-artifact@v4/);
+ assert.match(yaml,/if: always\(\)/);
+ assert.match(yaml,/run-provenance\.json/);
+});
+test('candidate QA enforces minimal permissions and does not execute app production mutations',()=>{
+ const yaml=fs.readFileSync(workflow,'utf8');
+ assert.match(yaml,/timeout-minutes: 32/);
+ assert.match(yaml,/contents: read/);
+ assert.match(yaml,/pull-requests: read/);
+ assert.match(yaml,/persist-credentials: false/g);
+ assert.doesNotMatch(yaml,/contents: write|issues: write|pull-requests: write|GH_TOKEN:|secrets\.|gh pr merge|assembleRelease|bundleRelease|release_approved:\s*true/);
+});
