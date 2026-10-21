@@ -2,8 +2,24 @@
 'use strict';
 // Native Android UI discovery only. Must NOT rewrite Java or stored content.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const ROOT=path.resolve(__dirname,'../../android/app/src/main/java/com/zenstudy/focus');
-const FILES=['MainActivity.java','FocusTimerService.java','FocusAppWebChromeClient.java'];
+const JAVA_ROOT=path.resolve(__dirname,'../../android/app/src/main/java');
+const LEGACY_PACKAGE='com/zenstudy/focus/';
+// Enumerate new Java modules as well as the original native UI classes.
+// Preserve their original review identifiers to avoid invalidating drafts for
+// unrelated, non-UI changes.
+function listJavaFiles(root=JAVA_ROOT){
+ if(!fs.existsSync(root))throw Error('NATIVE_SOURCE_ROOT_MISSING');
+ const result=[];
+ function walk(folder,relative){
+  for(const entry of fs.readdirSync(folder,{withFileTypes:true})){
+   const name=relative?relative+'/'+entry.name:entry.name;
+   if(entry.isDirectory())walk(path.join(folder,entry.name),name);
+   else if(entry.isFile()&&entry.name.endsWith('.java'))result.push(name);
+  }
+ }
+ walk(root,'');
+ return result.sort();
+}
 const PATTERNS=[
  ['toast',/Toast\.makeText\s*\(\s*[^,()\n]+\s*,\s*"((?:\\.|[^"\\])+)"/g],
  ['notificationTitle',/\.setContentTitle\s*\(\s*"((?:\\.|[^"\\])+)"/g],
@@ -33,15 +49,15 @@ function inventoryHash(rows){
  return crypto.createHash('sha256').update(JSON.stringify(items)).digest('hex');
 }
 function report(){
- const uiStrings=[];
- for(const p of FILES){
-  const file=path.join(ROOT,p);
-  if(!fs.existsSync(file))throw Error('NATIVE_FILE_MISSING:'+p);
-  uiStrings.push(...scanJava(fs.readFileSync(file,'utf8'),p));
+ const uiStrings=[],files=listJavaFiles();
+ if(!files.length)throw Error('NATIVE_JAVA_DISCOVERY_EMPTY');
+ for(const p of files){
+  const reviewPath=p.startsWith(LEGACY_PACKAGE)?p.slice(LEGACY_PACKAGE.length):p;
+  uiStrings.push(...scanJava(fs.readFileSync(path.join(JAVA_ROOT,p),'utf8'),reviewPath));
  }
  if(uiStrings.length<8)throw Error('NATIVE_UI_DISCOVERY_SUSPICIOUSLY_EMPTY');
  return {schema_version:1,source:'Exact checked-out Java source, heuristic UI callsite scanner',
-  files:FILES.length,candidates:uiStrings.length,inventorySha256:inventoryHash(uiStrings),uiStrings,
+  files:files.length,candidates:uiStrings.length,inventorySha256:inventoryHash(uiStrings),uiStrings,
   localizedIn100:false,reviewed:false,limitations:[
    'This inventory is source-level and excludes JS-supplied dynamic messages',
    'OS-managed android.R.string dialogs already localize separately',
@@ -55,4 +71,4 @@ if(require.main===module){
   console.log(JSON.stringify(report(),null,2));
  }catch(e){console.error('NATIVE_COPY_DISCOVERY_FAILED:',e.message);process.exitCode=1;}
 }
-module.exports={scanJava,inventoryHash,report};
+module.exports={scanJava,inventoryHash,listJavaFiles,report};
