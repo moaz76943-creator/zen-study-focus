@@ -1,0 +1,33 @@
+name: Track10 Analytics CSV range lifecycle (isolated draft QA)
+on:
+  push:
+    branches: [fix/track10-analytics-export-range-state-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track10-analytics-range-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Record exact app-source SHA
+        run: git rev-parse HEAD
+      - name: Focused RED/GREEN export and existing guards
+        run: node --test tests/track07_functional/analytics_export_range_lifecycle.test.cjs tests/track07_functional/analytics_controls_and_digits.test.cjs tests/track07_functional/analytics_date_guard.test.cjs
+      - name: All Node regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          node --test --test-reporter=tap "${suites[@]}"
+      - name: All Python regression tests
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
