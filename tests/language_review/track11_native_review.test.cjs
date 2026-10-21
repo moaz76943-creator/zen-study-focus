@@ -31,3 +31,32 @@ test('a stale or incomplete Android string inventory fails without producing fak
  assert.throws(()=>buildNativeReview(inventory,'bad'),/EXACT_SOURCE_SHA_REQUIRED/);
  assert.throws(()=>buildNativeReview({...inventory,candidates:3,uiStrings:[...inventory.uiStrings,{path:'../bad',kind:'toast',text:'hack'}]},'a'.repeat(40)),/UNSAFE_NATIVE_SOURCE_PATH/);
 });
+
+test('native Track 12 dynamic callsites remain distinct 20-language contextual review rows',()=>{
+ const v={...inventory,dynamicCandidateCount:2,dynamicInventorySha256:'c'.repeat(64),
+  dynamicUiCallsites:[
+   {path:'MainActivity.java',line:152,kind:'dynamicDialogMessage',expression:'state.message',status:'DYNAMIC_RUNTIME_CROSS_REFERENCE_REQUIRED'},
+   {path:'FocusTimerService.java',line:88,kind:'dynamicNotificationBody',expression:'title + " completed"',status:'DYNAMIC_RUNTIME_CROSS_REFERENCE_REQUIRED'}
+  ]};
+ const r=buildNativeReview(v,'a'.repeat(40));
+ assert.equal(r.englishSourceCandidateCount,2);
+ assert.equal(r.dynamicSourceCandidateCount,2);
+ assert.equal(r.rows.length,80);
+ assert.equal(r.rows.filter(row=>row.classification==='NATIVE_DYNAMIC_CALLEE_REQUIRES_CONTEXT').length,40);
+ assert.equal(r.rows.filter(row=>row.classification==='NATIVE_DYNAMIC_CALLEE_REQUIRES_CONTEXT').every(row=>
+  row.candidate===null&&row.rendered==='NOT_TESTED'&&row.reviewStatus==='PENDING_HUMAN'&&row.approvedForRuntime===false),true);
+ assert.ok(r.rows.some(x=>x.sourceExpression==='state.message'));
+ assert.equal(r.dynamicInventorySha256,'c'.repeat(64));
+ const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'track11-dynamic-'));
+ try{
+  writeNativeReview(r,tmp);
+  assert.match(fs.readFileSync(path.join(tmp,'track11-native-review.csv'),'utf8'),/state\.message/);
+ }finally{fs.rmSync(tmp,{recursive:true,force:true});}
+});
+test('dynamic inventory hash or counts missing cannot silently discard native review candidates',()=>{
+ const data={...inventory,dynamicCandidateCount:1,dynamicUiCallsites:[
+  {path:'MainActivity.java',line:210,kind:'dynamicDialogMessage',expression:'externalText'}
+ ]};
+ assert.throws(()=>buildNativeReview(data,'a'.repeat(40)),/DYNAMIC_INVENTORY_SHA_REQUIRED/);
+ assert.throws(()=>buildNativeReview({...data,dynamicInventorySha256:'c'.repeat(64),dynamicCandidateCount:2},'a'.repeat(40)),/DYNAMIC_CANDIDATE_COUNT_MISMATCH/);
+});
