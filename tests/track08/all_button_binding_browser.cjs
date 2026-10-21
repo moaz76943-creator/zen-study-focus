@@ -76,7 +76,7 @@ const base=process.env.DF_COMPLETION_URL||'http://127.0.0.1:8770';
     unassignedCandidates:reports[0].unassigned.length,
     unlabeledVisibleButtons:reports[0].unlabeled.length,
     pageErrors:errors.length,
-    examples:broken.slice(0,5)}));
+    examples:broken.slice(0,5),unassignedExamples:reports[0].unassigned.slice(0,45)}));
   assert.deepEqual(broken,[],'Broken static inline button handlers must not ship');
   assert.deepEqual(errors,[],'Unhandled JS errors must not ship');
  }finally{await browser.close();}
