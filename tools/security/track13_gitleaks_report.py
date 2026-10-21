@@ -33,11 +33,15 @@ def safe_summary(path: Path, sha: str, scan_exit: int) -> dict:
             line = item.get('StartLine', 0)
             if type(line) is not int or not 0 <= line <= 100000000:
                 line = 0
-            summary['evidence'].append({
+            commit = item.get('Commit', '')
+            entry = {
                 'rule': rule,
                 'path_sha256_16': hashlib.sha256(file_path.encode('utf-8')).hexdigest()[:16],
                 'line': line,
-            })
+            }
+            if isinstance(commit, str) and re.fullmatch(r'[0-9a-f]{40}', commit):
+                entry['commit'] = commit
+            summary['evidence'].append(entry)
     except (OSError, ValueError, UnicodeError, json.JSONDecodeError):
         summary['reason'] = 'REPORT_UNAVAILABLE_OR_INVALID'
         return summary
