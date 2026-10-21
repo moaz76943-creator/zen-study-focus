@@ -72,3 +72,15 @@ test('new Java files in nested packages enter native review source discovery',()
   assert.ok(native.report().files>=5,'current source includes at least five Java classes');
  }finally{fs.rmSync(temp,{recursive:true,force:true});}
 });
+
+test('CI cannot miss canonical key discovery or future native Android resource and manifest edits',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const yaml=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/locale_100_admission_gate.yml'),'utf8');
+ for(const watched of [
+  "'tools/language_review/**'",
+  "'tests/language_review/**'",
+  "'tests/localization_20/locale100_*.cjs'",
+  "'android/app/src/main/res/**'",
+  "'android/app/src/main/AndroidManifest.xml'"
+ ])assert.ok(yaml.includes(watched),'missing path trigger: '+watched);
+});
