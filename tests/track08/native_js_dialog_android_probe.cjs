@@ -120,7 +120,63 @@ async function main(){
   assert.equal(cancelledPrompt.type,'object');
   assert.equal(cancelledPrompt.value,null,'Prompt cancel must be null');
   results.push({operation:'prompt_cancel',status:'PASS'});
-  const summary={results,source:'real Android WebView+native UIAutomator',release_approved:false};
+
+  // Verify the actual app's destructive Timer buttons in the disposable QA
+  // profile. Each native BACK must keep the same in-progress focus session.
+  const stateExpr='({mode:currentTimerModeKey,total:timerTotal,session:timerSessionId,running:timerRunning,active:timerActiveMs,label:customSessionLabel})';
+  const focus=async()=>{
+    const info=(await evaluate('(()=>{if(timerRunning)toggleTimerPlay();selectTimerMode(25,"focus",document.getElementById("modeFocusBtn"));toggleTimerPlay();return '+stateExpr+';})()')).value;
+    assert.equal(info.running,true,'Synthetic focus session did not start');
+    return info;
+  };
+  const rejectionCopy=(await evaluate('quickText("replacePrompt")')).value;
+  assert.ok(rejectionCopy&&rejectionCopy.length>10,'Missing localized active-session warning');
+  const guardedControls=[
+    ['modeShortBtn','document.getElementById("modeShortBtn").click()'],
+    ['modeLongBtn','document.getElementById("modeLongBtn").click()'],
+    ['resetTimerNow','document.querySelector(\'button[onclick="resetTimerNow()"]\').click()'],
+    ['skipTimerPhase','document.querySelector(\'button[onclick="skipTimerPhase()"]\').click()'],
+    ['sportRest45','document.getElementById("sportRest45").click()']
+  ];
+  for(const [name,click] of guardedControls){
+    const before=await focus();
+    const result=evaluate('(()=>{'+click+';return '+stateExpr+';})()');
+    const hierarchy=await dialog(rejectionCopy);
+    assert.ok(hierarchy.includes('Deep Focus'),'Missing branded native dialog for '+name);
+    adb('shell','input','keyevent','KEYCODE_BACK');
+    const after=(await result).value;
+    for(const field of ['mode','total','session','running','label']){
+      assert.deepEqual(after[field],before[field],name+': Cancel changed '+field);
+    }
+    results.push({operation:name+'_cancel',status:'PASS',nativeTitle:'Deep Focus',sessionPreserved:true});
+  }
+  const customBefore=await focus();
+  const customForm=(await evaluate('(()=>{document.getElementById("modeCustomBtn").click();document.getElementById("inpCustomMins").value="47";document.getElementById("inpCustomTitle").value="QA custom label";return document.getElementById("customTimerModal").classList.contains("open");})()')).value;
+  assert.equal(customForm,true,'Custom Timer modal not open');
+  const customCancel=evaluate('(()=>{document.querySelector(\'#customTimerModal button[onclick="applyCustomTimerNow()"]\').click();return {state:'+stateExpr+',modalOpen:document.getElementById("customTimerModal").classList.contains("open"),entered:document.getElementById("inpCustomTitle").value};})()');
+  await dialog(rejectionCopy);
+  adb('shell','input','keyevent','KEYCODE_BACK');
+  const afterCustom=(await customCancel).value;
+  assert.equal(afterCustom.modalOpen,true,'Custom modal closed on cancellation');
+  assert.equal(afterCustom.entered,'QA custom label','Custom form erased on Cancel');
+  assert.equal(afterCustom.state.label,customBefore.label,'Custom label modified before acceptance');
+  assert.equal(afterCustom.state.session,customBefore.session,'Custom cancel lost current focus');
+  assert.equal(afterCustom.state.running,true,'Custom cancel stopped current focus');
+  results.push({operation:'custom_timer_cancel',status:'PASS',userDraftPreserved:true});
+  const customAccept=evaluate('(()=>{document.querySelector(\'#customTimerModal button[onclick="applyCustomTimerNow()"]\').click();return {state:'+stateExpr+',modalOpen:document.getElementById("customTimerModal").classList.contains("open")};})()');
+  const acceptXml=await dialog(rejectionCopy);
+  const yes=buttons(acceptXml).sort((a,b)=>b.x-a.x)[0];
+  assert.ok(yes,'Missing native YES for custom timer');
+  adb('shell','input','tap',String(yes.x),String(yes.y));
+  const afterAccept=(await customAccept).value;
+  assert.equal(afterAccept.state.mode,'custom');
+  assert.equal(afterAccept.state.total,47*60);
+  assert.equal(afterAccept.state.running,false);
+  assert.equal(afterAccept.state.label,'QA custom label (47m)');
+  assert.equal(afterAccept.modalOpen,false);
+  results.push({operation:'custom_timer_accept',status:'PASS',actualMinutes:47});
+
+  const summary={results,source:'real Android WebView+native UIAutomator; synthetic QA-only focus session',release_approved:false};
   fs.writeFileSync(E+'/android-native-dialog-results.json',JSON.stringify(summary,null,2));
   console.log('ANDROID_P0_ALL_JS_DIALOGS_PASS',JSON.stringify(summary));
  }finally{ws.close();}
