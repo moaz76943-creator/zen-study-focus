@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '22'
       - name: Timer destructive mode button RED/GREEN regression
-        run: node --test tests/track07_functional/timer_mode_button_safety.test.cjs
+        run: node --test tests/track07_functional/timer_mode_button_safety.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs
       - name: Existing node tests and static control inventory
         shell: bash
         run: |
