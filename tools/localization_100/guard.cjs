@@ -94,6 +94,8 @@ function checkAdmission(){
   if(JSON.stringify(appLocales)!==JSON.stringify(LEGACY_CODES))errors.push('UNREVIEWED_LOCALE_IN_RUNTIME_SELECTOR');
   const draftReport=require('./drafts.cjs').reportDrafts(source);
   for(const issue of draftReport.errors)errors.push('DRAFT:'+issue);
+  const nativeReview=require('./native_drafts.cjs').report();
+  for(const issue of nativeReview.errors)errors.push('NATIVE_DRAFT:'+issue);
   const dir=path.join(__dirname,'approved');
   for(const f of fs.existsSync(dir)?fs.readdirSync(dir):[]){
     if(!f.endsWith('.json')){errors.push('INVALID_APPROVAL_FILE:'+f);continue;}
@@ -109,6 +111,7 @@ function checkAdmission(){
   return {ok:errors.length===0,errors,registered:100,existingUnchanged:20,plannedNotSelectable:80,
     catalogs:Object.keys(source).length,keys:Object.values(source).reduce((n,v)=>n+Object.keys(v).length,0),
     sourceHash:inventoryHash(source),draftCandidates:draftReport.candidateCount,
+    nativeDraftCandidates:nativeReview.candidates,nativeCandidateStrings:nativeReview.candidateTexts,
     candidateStrings:draftReport.translatedCandidates,missingDraftStrings:draftReport.languages.reduce((n,r)=>n+r.missing,0),
     linguisticReview:'NOT_TESTED',android100Languages:'NOT_TESTED',releaseApproved:false};
 }
