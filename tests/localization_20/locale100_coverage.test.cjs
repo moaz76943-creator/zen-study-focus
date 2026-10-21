@@ -30,3 +30,16 @@ test('exact-head 100-locale report distinguishes current runtime, drafts and mis
  assert.ok(result.legacyExplicitMissing>4000);
  assert.equal(result.sourceInventoryComplete,false);
 });
+
+test('every registered language reports verified key approvals separately from present or drafted strings',()=>{
+ const result=report();
+ assert.equal(result.languages.length,100);
+ for(const locale of result.languages){
+  assert.equal(locale.verifiedApprovedKeys,0,locale.code+' cannot infer approval from source presence');
+  assert.equal(locale.verifiedNativeApprovedStrings,0,locale.code+' has no verified native approval');
+  assert.equal(locale.keyApprovalEvidence,'NO_INDEPENDENT_KEY_LEVEL_REVIEW',locale.code);
+  assert.equal(locale.translationApproved,false);
+ }
+ assert.ok(result.languages.some(x=>x.phase==='existing'&&x.explicitExistingKeys>0));
+ assert.ok(result.languages.some(x=>x.phase==='planned'&&x.draftCount>0));
+});
