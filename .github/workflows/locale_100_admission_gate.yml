@@ -3,8 +3,12 @@ on:
   pull_request:
     paths:
       - 'tools/localization_100/**'
-      - 'tests/localization_20/locale100_*.test.cjs'
+      - 'tools/language_review/**'
+      - 'tests/language_review/**'
+      - 'tests/localization_20/locale100_*.cjs'
       - 'android/app/src/main/java/**/*.java'
+      - 'android/app/src/main/res/**'
+      - 'android/app/src/main/AndroidManifest.xml'
       - 'android/app/src/main/assets/web/**'
       - '.github/workflows/locale_100_admission_gate.yml'
   workflow_dispatch:
