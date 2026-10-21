@@ -197,3 +197,29 @@ test('native saved receipt from an older date/domain filter must not claim the n
   assert.equal(ui.button.disabled,false,'Valid new range can export again');
   ui.studio.destroy();
 });
+
+test('Studio native CSV export supports sessions, daily, weekly and monthly options like Recovery without changing default schema', async () => {
+  const outputs=[];
+  const ui=mountWithPendingExport((body,filename)=>{
+    outputs.push({body,filename});return {status:'saved'};
+  },'de');
+  const filters=ui.host.children.find(x=>x.className==='dfa-filters');
+  const fields=filters.children.filter(x=>x.tagName==='LABEL').map(x=>x.children[0]);
+  const kind=fields.find(x=>x.tagName==='SELECT'&&x.children.some(n=>n.value==='sessions'));
+  assert.ok(kind,'Every language needs an explicit native CSV report-kind selector');
+  for(const [value,header] of [
+    ['sessions','"id","date","domain","minutes"'],
+    ['daily','"date","minutes","sessions"'],
+    ['weekly','"period","minutes","sessions"'],
+    ['monthly','"period","minutes","sessions"']
+  ]){
+    kind.value=value;
+    await ui.button.events.click();
+    const last=outputs.at(-1);
+    assert.match(last.body,new RegExp(header.replaceAll('"','\\\\\"')),
+      'Export schema must identify report kind');
+    assert.ok(last.filename.includes(value),'Filename matches selected report kind');
+  }
+  assert.equal(outputs.length,4);
+  ui.studio.destroy();
+});
