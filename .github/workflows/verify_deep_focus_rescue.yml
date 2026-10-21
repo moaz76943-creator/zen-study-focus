@@ -1,7 +1,10 @@
 name: Deep Focus 2026 Consolidated Recovery QA
 on:
   push:
-    branches: [integration/deep-focus-consolidated-repair-20261020, fix/master-completion-20261020, fix/df4-activity-counters-durability-20261020, fix/df4-language-switch-durability-20261020, integration/deep-focus-stability-20261020, fix/df4-android-touch-evidence-20261020, fix/df4-notes-save-visible-android-20261020, integration/deep-focus-consolidated-candidate-20261020, review/track06-gated-checkpoint-20261020, review/track07-09-staged-functional-20261020, fix/track07-09-domain-switch-durable-20261020, review/track07-09-phase3-candidate-20261020]
+    branches: [integration/deep-focus-consolidated-repair-20261020, fix/master-completion-20261020, fix/df4-activity-counters-durability-20261020, fix/df4-language-switch-durability-20261020, integration/deep-focus-stability-20261020, fix/df4-android-touch-evidence-20261020, fix/df4-notes-save-visible-android-20261020, integration/deep-focus-consolidated-candidate-20261020, review/track06-gated-checkpoint-20261020, review/track07-09-staged-functional-20261020, fix/track07-09-domain-switch-durable-20261020, review/track07-09-phase3-candidate-20261020, integration/master-recovery-20261021]
+  pull_request:
+    branches:
+      - integration/master-recovery-20261021
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,6 +28,11 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/df-2026-evidence"
           git rev-parse HEAD | tee "$RUNNER_TEMP/df-2026-evidence/head-sha.txt"
+          # pull_request checks a synthetic merge SHA; record both identities.
+          printf 'EVENT=%s\nCHECKOUT_SHA=%s\nPR_HEAD_SHA=%s\n' \
+            "$GITHUB_EVENT_NAME" "$(git rev-parse HEAD)" \
+            "${{ github.event.pull_request.head.sha || 'NOT_APPLICABLE' }}" \
+            > "$RUNNER_TEMP/df-2026-evidence/source-provenance.txt"
           for file in android/app/src/main/assets/web/*.js docs/control-center/*.js tools/quality_center/*.cjs; do
             node --check "$file"
           done
