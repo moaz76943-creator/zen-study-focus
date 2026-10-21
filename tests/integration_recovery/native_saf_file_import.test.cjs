@@ -41,5 +41,7 @@ test('native picker cancellation returns without mutating v21 records',()=>{
 test('JavaScript importer delegates to the same user-confirmed v21 restore path',()=>{
  assert.match(native,/JSONObject\.quote\(backupCode\)/);
  assert.match(native,/verifyAndRestoreBackupCode/);
- assert.doesNotMatch(native,/webView\.loadUrl\(\s*["']file:/);
+ // The bundled file:///android_asset startup page is legitimate.
+ // Never put untrusted backup data into WebView URL navigation.
+ assert.doesNotMatch(native,/webView\.loadUrl\([^;\n]*backupCode/);
 });
