@@ -1,7 +1,7 @@
-name: Track 08 P0 Branded Native Dialogs Android QA
+name: Track 08 Exact-HEAD Safe Timer Controls & Analytics Android QA
 on:
   push:
-    branches: [audit/track08-p0-branded-dialogs-android-20261020]
+    branches: [audit/track08-safe-timer-controls-android-20261021]
     paths: [.github/workflows/track08_phase3_preinstall_qa.yml, tests/track08/native_js_dialog_android_probe.cjs, tests/track08/phase3_side_by_side_qa.sh]
 permissions:
   contents: read
@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BASE=1cf7090d98cc06d2042ac632e306ac5b47bd471f
+          BASE=7c4decaf34e322e01ebab4a3cf44b62b3def4156
           git cat-file -e "$BASE^{commit}"
           diff="$(git diff --name-only "$BASE" HEAD | sort)"
           expected="$(printf '%s\n' .github/workflows/track08_phase3_preinstall_qa.yml tests/track08/phase3_side_by_side_qa.sh tests/track08/qa_launch_contract.test.cjs tests/track08/qa_webview_startup_probe.cjs tests/track08/qa_cdp_transport.cjs tests/track08/qa_cdp_transport.test.cjs tests/track08/native_js_dialog_android_probe.cjs | sort)"
