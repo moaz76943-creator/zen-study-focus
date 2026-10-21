@@ -64,6 +64,30 @@ jobs:
         run: |
           set -euo pipefail
           node tests/df4_browser/track04_real_touch_outcomes.cjs | tee "$RUNNER_TEMP/df-track04/outcome-summary.log"
+      - name: Audit every static and dynamically constructed control (NOT functional PASS)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/android_e2e_recovery/inventory.cjs > "$RUNNER_TEMP/df-track04/all-controls-source-inventory.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const report=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/df-track04/all-controls-source-inventory.json','utf8'));
+          if(report.totals.missingScripts)process.exit(1);
+          console.log(JSON.stringify({static:report.totals.staticControls,dynamicHandlers:report.totals.dynamicEventListeners,dynamicFactories:report.totals.dynamicControlFactories,status:'STATIC_INVENTORY_ONLY'}));
+          NODE
+      - name: Real Chromium destructive controls, analytics and mobile notes regression
+        shell: bash
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_BUTTON_EVIDENCE: ${{ runner.temp }}/df-track04/timer
+          DF_ANALYTICS_EVIDENCE: ${{ runner.temp }}/df-track04/analytics
+          DF_COMPLETION_EVIDENCE: ${{ runner.temp }}/df-track04/notes
+        run: |
+          set -euo pipefail
+          mkdir -p "$DF_BUTTON_EVIDENCE" "$DF_ANALYTICS_EVIDENCE" "$DF_COMPLETION_EVIDENCE"
+          node tests/track07_functional/timer_mode_buttons_browser.cjs
+          node tests/track07_functional/analytics_all_controls_browser.cjs
+          node tests/df4_browser/note_modal_reachability.cjs
       - name: Fail-closed platform limitations
         if: always()
         shell: bash
