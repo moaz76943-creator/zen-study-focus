@@ -19,5 +19,6 @@ sleep 6
 pid="$(adb shell pidof com.zenstudy.focus | tr -d '\r' | awk '{print $1}')"
 test -n "$pid"
 adb forward tcp:9222 "localabstract:webview_devtools_remote_${pid}"
-node tests/android_e2e_recovery/cdp_dom_smoke.cjs "$report/smoke.json"
+# Goals/Calendar probing must run independently of the unrelated timer CDP smoke.
+# This probe itself exits nonzero on failed or unavailable Android evidence.
 TRACK09_SOURCE_SHA="$(git rev-parse HEAD)" node tests/focus_workflows/track09_android_cdp.cjs "$report/goal-calendar-dom.json"
