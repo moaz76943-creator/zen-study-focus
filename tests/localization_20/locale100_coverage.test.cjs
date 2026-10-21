@@ -21,6 +21,10 @@ test('exact-head 100-locale report distinguishes current runtime, drafts and mis
  assert.equal(marathi.draftCount,0);
  assert.equal(marathi.missingKeys,472);
  assert.equal(sw.selectable,false);
+ assert.ok(result.nativeCandidateCount>=8);
+ assert.ok(result.nativeDraftStrings>=16);
+ assert.ok(sw.nativeDraftCount>=8);
+ assert.ok(ro.nativeDraftCount>=8);
  assert.equal(sw.nativeReview,'NOT_TESTED');
  assert.equal(result.languages.find(x=>x.code==='en').runtimeAvailable,true);
  assert.ok(result.legacyExplicitMissing>4000);
