@@ -38,7 +38,7 @@
  function render(snapshot,quality){
    const {pull37,pull138,issues,agentLedger,run,jobs,artifacts,errors,fetchedAt}=snapshot;
    ['track15-candidates','track15-issues','track15-jobs','track15-agents',
-     'track15-artifacts','track15-gates'].forEach(id=>$(id).replaceChildren());
+     'track15-artifacts','track15-gates','track15-locales'].forEach(id=>$(id).replaceChildren());
    const stale=quality!=='LIVE';
    for(const [num,p] of [[37,pull37],[138,pull138]]){
      panel('track15-candidates','PR #'+num+(num===138?' · مرشح التكامل الرئيسي':' · لوحة v3.5'),
@@ -85,6 +85,12 @@
        'Archive SHA256: '+(a.archiveSha256||'NOT_TESTED')+
        ' · APK/AAB binary SHA256: NOT_TESTED · Size: '+(a.size??'—')+' B',
        a.url);
+   }
+   for(const language of core.localeCounts(null,pull138?.sha)){
+     panel('track15-locales',language.code.toUpperCase()+' · '+language.status,
+       'فجوات المفاتيح: '+(language.gaps==null?'NOT_TESTED':language.gaps)+
+       ' · يلزم تقرير exact-HEAD قابل للتحقق قبل عرض عدد',
+       core.issueUrl(104));
    }
    panel('track15-gates','20-language gaps · NOT_TESTED',
      'لا يوجد تدقيق فجوات per-language مربوط ومتحقق على SHA #138 في هذه الاستجابة.',
