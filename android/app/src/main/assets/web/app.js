@@ -1302,8 +1302,7 @@ function updateTimerDisplay() {
 
 function selectTimerModeFromUser(mins, modeKey, btn) {
   if ((timerRunning || timerSessionId || timerActiveMs > 0) &&
-      !window.confirm(cfg.lang === 'ar' ? 'تغيير الوضع سيلغي تقدم الجلسة الحالية. هل تريد المتابعة؟' :
-        'Changing mode will discard current session progress. Continue?')) return false;
+      !window.confirm(quickText('replacePrompt'))) return false;
   selectTimerMode(mins, modeKey, btn);
   return true;
 }
