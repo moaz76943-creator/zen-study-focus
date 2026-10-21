@@ -11,6 +11,12 @@ function tokens(v){
   return [...String(v).matchAll(/\{\{\s*[-\w.]+\s*\}\}|\{[-\w.]+\}|\$\{[-\w.]+\}|%(?:\d+\$)?[sdif]/g)]
     .map(x=>x[0].replace(/\s+/g,'')).sort();
 }
+function protectedIcons(text){
+ return [...String(text).matchAll(/\p{Extended_Pictographic}\uFE0F?/gu)].map(m=>m[0].replace(/\uFE0F/g,'')).sort();
+}
+function formatMarkers(text){
+ return [...String(text).matchAll(/\b(?:CSV|PDF|JSON|APK|SAF|URL)\b/gu)].map(m=>m[0]).sort();
+}
 function validateDraft(pack,source){
  const errors=[],warnings=[],byCatalog={};
  const origin=source&&typeof source==='object'&&!Array.isArray(source)?source:{};
@@ -37,6 +43,10 @@ function validateDraft(pack,source){
      if(TODO.test(target.trim()))errors.push('PLACEHOLDER_TEXT:'+label);
      if(JSON.stringify(tokens(english))!==JSON.stringify(tokens(target)))errors.push('PLACEHOLDER_MISMATCH:'+label);
      if(target.trim()===String(english).trim())errors.push('IDENTICAL_TO_SOURCE:'+label);
+     if(JSON.stringify(protectedIcons(english))!==JSON.stringify(protectedIcons(target)))
+       errors.push('ICON_MISMATCH:'+label);
+     if(JSON.stringify(formatMarkers(english))!==JSON.stringify(formatMarkers(target)))
+       errors.push('FORMAT_MARKER_MISMATCH:'+label);
      n++;translated++;
    }
    byCatalog[cid]={total:Object.keys(row).length,translated:n,missing:Object.keys(row).length-n};
