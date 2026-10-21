@@ -47,11 +47,11 @@ test('JavaScript importer delegates to the same user-confirmed v21 restore path'
 });
 
 test('SAF restore chooser admits legacy backup MIME types, not just text/plain',()=>{
- assert.match(native,/Intent\\.EXTRA_MIME_TYPES/);
- assert.match(native,/intent\\.setType\\("\\*\\/\\*"\\)/);
- assert.match(native,/application\\/json/);
- assert.match(native,/application\\/octet-stream/);
- assert.match(native,/text\\/plain/);
- assert.match(native,/MAX_BACKUP_IMPORT_BYTES/);
- assert.match(native,/verifyAndRestoreBackupCode/);
+ assert.ok(native.includes('Intent.EXTRA_MIME_TYPES'));
+ assert.ok(native.includes('intent.setType("*/*")'));
+ assert.ok(native.includes('application/json'));
+ assert.ok(native.includes('application/octet-stream'));
+ assert.ok(native.includes('text/plain'));
+ assert.ok(native.includes('MAX_BACKUP_IMPORT_BYTES'));
+ assert.ok(native.includes('verifyAndRestoreBackupCode'));
 });
