@@ -101,6 +101,7 @@
        (previous?' · الأرقام السابقة STALE':''),'RATE_LIMITED');return;
    }
    busy=true;$('track15-refresh').disabled=true;
+   try {
    status('جارٍ قراءة PR #37 و#138 وIssues #64/#69/#110…','LOADING');
    const paths=['/pulls/37','/pulls/138','/issues/64','/issues/69','/issues/110'];
    const replies=await Promise.allSettled(paths.map(api));
@@ -139,7 +140,9 @@
    else{previous=snapshot;render(snapshot,quality);}
    /* Min 12 minutes between full scans: ~8 unauthenticated REST calls per scan. */
    lockUntil=Math.max(lockUntil,Date.now()+12*60*1000);
-   busy=false;$('track15-refresh').disabled=false;
+   } finally {
+     busy=false;$('track15-refresh').disabled=false;
+   }
  }
  function boot(){
    if(!$('track15'))return;
