@@ -25,7 +25,7 @@ test('clean Gitleaks report is a verified zero-finding PASS',()=>{
 });
 test('suspected key is BLOCKED and secret and raw path are never printed',()=>{
   const sentinel='SENSITIVE-DO-NOT-PRINT-123';
-  const r=scan([{RuleID:'generic-api-key',File:'path/'+sentinel+'.env',StartLine:18,Secret:sentinel,Match:sentinel,Description:sentinel} ],1);
+  const r=scan([{RuleID:'generic-api-key',File:'path/'+sentinel+'.env',StartLine:18,Secret:sentinel,Match:sentinel,Description:sentinel,Commit:'b'.repeat(40)} ],1);
   assert.equal(r.status,1);
   assert.ok(!r.stdout.includes(sentinel));
   assert.ok(!r.stderr.includes(sentinel));
@@ -35,6 +35,7 @@ test('suspected key is BLOCKED and secret and raw path are never printed',()=>{
   assert.equal(out.evidence[0].rule,'generic-api-key');
   assert.match(out.evidence[0].path_sha256_16,/^[a-f0-9]{16}$/);
   assert.equal(out.evidence[0].line,18);
+  assert.equal(out.evidence[0].commit,'b'.repeat(40));
 });
 test('scanner error, missing or malformed report always blocks release',()=>{
   for(const [report,status] of [[null,2],[{unexpected:true},1],[[],2]]) {
