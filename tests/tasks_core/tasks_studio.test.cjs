@@ -39,3 +39,24 @@ test('external timer state revision invalidates undo instead of erasing sessions
  assert.equal(f.get().tasksList[0].done,true);
  assert.equal(f.get().cfg.sessionHistory.length,1);
 });
+
+test('legacy undated tasks render and priority sorting remains read-only',()=>{
+ let state={cfg:{sessions:4,sessionHistory:[],unknown:{keep:'cfg'}},tasksList:[
+  {id:40,title:'Scheduled task',date:'2026-10-19',done:false,priority:'medium'},
+  {id:12,title:'مهمة قديمة ١٢',done:false,priority:'medium'},
+  {id:13,title:'Legacy null date',date:null,done:false,priority:'medium'},
+  {id:14,title:'Legacy malformed date',date:'bad-date',done:false,priority:'medium'}].map(t=>({...t,unknown:{keep:'task'}}))};
+ const before=JSON.parse(JSON.stringify(state));let commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,19),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(){commits++;return true;}});
+ const cardTitles=()=>root.descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
+ assert.deepEqual(cardTitles(),['مهمة قديمة ١٢','Legacy null date','Legacy malformed date','Scheduled task']);
+ const sort=root.descendants.find(x=>x.tagName==='SELECT'&&x.children.some(o=>o.value==='priority'));
+ assert.ok(sort);sort.value='priority';sort.dispatch('change');
+ assert.deepEqual(cardTitles(),['مهمة قديمة ١٢','Legacy null date','Legacy malformed date','Scheduled task']);
+ const search=root.descendants.find(x=>x.tagName==='INPUT'&&x.type==='search');
+ search.value='قديمة';search.dispatch('input');assert.deepEqual(cardTitles(),['مهمة قديمة ١٢']);
+ assert.equal(commits,0);assert.deepEqual(state,before);assert.equal(Object.hasOwn(state.tasksList[1],'date'),false);
+ studio.destroy();
+});
