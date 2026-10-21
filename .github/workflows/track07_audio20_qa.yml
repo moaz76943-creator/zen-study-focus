@@ -4,6 +4,7 @@ on:
     branches:
       - feature/track07-04-authentic-nature-20-20261020
       - fix/track07-04-audio-acceptance-20261020
+      - audit/track06-audio-acceptance-matrix-20261021
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,7 +25,7 @@ jobs:
           node-version: '22'
       - name: Test independent 20-source ledger and existing audio, no release enablement
         run: |
-          node --test tests/nature_library_v2/audio_endurance.test.cjs tests/nature_library_v2/twenty_originals_provenance.test.cjs tests/nature_library_v2/intake_manifest.test.cjs tests/nature_library_v2/catalog.test.cjs tests/integration_recovery/nature_runtime.test.cjs tests/integration_recovery/nature_20_language_controls.test.cjs tests/nature_audio_recovery/mixer.test.cjs
+          node --test tests/nature_library_v2/track06_diagnostics.test.cjs tests/nature_library_v2/audio_endurance.test.cjs tests/nature_library_v2/twenty_originals_provenance.test.cjs tests/nature_library_v2/intake_manifest.test.cjs tests/nature_library_v2/catalog.test.cjs tests/integration_recovery/nature_runtime.test.cjs tests/integration_recovery/nature_20_language_controls.test.cjs tests/nature_audio_recovery/mixer.test.cjs
           python3 -m unittest discover -s tests/nature_library_v2 -p 'test_*.py' -v
           node tests/smoke_app.cjs
       - name: Install ffmpeg for real Vorbis decoding
