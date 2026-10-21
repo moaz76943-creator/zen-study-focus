@@ -144,11 +144,13 @@ function stageImportFixtureInMediaStore(name,code){
   adb('shell','content','insert','--uri',collection,
    '--bind','_display_name:s:'+name,'--bind','mime_type:s:text/plain',
    '--bind','relative_path:s:Download/');
+  // adb shell strips SQL quote characters in --where on some Android
+  // builds. Query the disposable collection and match names locally.
   const rows=adb('shell','content','query','--uri',collection,
-   '--projection','_id:_display_name',
-   '--where',"_display_name='"+name+"'");
-  const match=rows.match(/(?:^|[\s,])_id=(\d+)(?:,|\s|$)/);
-  if(!match)throw Error('MediaStore query cannot resolve the inserted QA document');
+   '--projection','_id:_display_name');
+  const matches=rows.split('\n').filter(line=>line.includes('_display_name='+name));
+  const match=matches.map(line=>line.match(/(?:^|[\s,])_id=(\d+)(?:,|\s|$)/)).find(Boolean);
+  if(!match)throw Error('MediaStore query cannot resolve inserted QA document by exact name');
   uri=collection+'/'+match[1];
   cp.execFileSync('adb',['-s','emulator-5554','shell','content','write','--uri',uri],
    {input:Buffer.from(code,'utf8'),timeout:20000,stdio:['pipe','pipe','pipe']});
