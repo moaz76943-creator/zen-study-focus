@@ -135,9 +135,10 @@
     const domainView=mk('div');domainView.style.cssText='display:flex;gap:12px;flex-wrap:wrap;margin:12px 0';
     const goals=mk('div'),taskBox=mk('div'),heatTitle=mk('h3',t.year),heat=mk('div');heat.style.overflowX='auto';
     [chartTitle,chart,detail,domainView,goals,taskBox,heatTitle,heat].forEach(e=>wrapper.appendChild(e));
-    let current=null,currentSeries=[],heatDays=[],destroyed=false,rangeValid=true;
+    let current=null,currentSeries=[],heatDays=[],destroyed=false,rangeValid=true,reportRevision=0;
     function refresh(){
       if(destroyed)return null;
+      ++reportRevision;
       activatePresets();
       const snap=provider();
       let report;
@@ -208,13 +209,15 @@
       if(exporting||destroyed)return;
       if(!rangeValid||!current){feedback.textContent=t.invalidDates;return;}
       const value=core.toCSV(current,'sessions');
+      const exportRevision=reportRevision;
       if(typeof opts.onExport==='function'){
         exporting=true;exportBtn.disabled=true;feedback.textContent='';
         try{
           const response=await opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');
-          if(!destroyed)feedback.textContent=(response?.status==='saved'?'✓ ':response?.status==='cancelled'?'— ':'⚠ ')+t.export;
+          if(!destroyed && reportRevision===exportRevision)
+            feedback.textContent=(response?.status==='saved'?'✓ ':response?.status==='cancelled'?'— ':'⚠ ')+t.export;
         }catch(_){
-          if(!destroyed)feedback.textContent='⚠ '+t.export;
+          if(!destroyed && reportRevision===exportRevision)feedback.textContent='⚠ '+t.export;
         }finally{exporting=false;if(!destroyed)exportBtn.disabled=!rangeValid;}
         return;
       }
