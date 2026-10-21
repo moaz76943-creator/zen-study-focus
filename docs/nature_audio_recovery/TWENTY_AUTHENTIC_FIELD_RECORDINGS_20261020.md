@@ -281,3 +281,22 @@ artifact is rewritten. Commit4d54931 makes the summary derive from actual JSON
 and reject0-duration PASS, short1800s claims, invalid durations and failed probes.
 RED/GREEN regression covers smoke NOT_TESTED and a genuinely long PASS. The
 61725a4 full1802s run remains distinct and valid; no newer head inherits its PASS.
+
+The exact PR85 head f97cc7d07c66ba0c85f22402aeeb76788146cc3e was then merged
+into the owned audio repair branch after a clean read-only probe. No PR85/main
+branch was written. Relative to PR85, app assets differ only in the nature
+section of app.js and the existing nature_library_v2.js/.css; newer notes, timer,
+tasks, analytics and data fixes from PR85 are preserved. The real-main-browser
+20-locale/160-layout check passed again on that combined tree. Source regression
+at that checkpoint:615 Node PASS and31 root Python PASS; media release gate is
+still separately1PASS/2FAIL and must not be relabelled green.
+
+A second real-DOM RED measured volume-range hit height as5px at320px. The range
+now has44px hit height while retaining a5px visual track; the160-layout test
+checks both buttons and ranges fit their cards. Focus styles also use :focus for
+older Android WebViews without :focus-visible. Existing real Android E2E
+calendar_and_sounds case now checks actual native Space/Enter with retained
+button focus, both real decoded channels, and Arabic injected-rejection feedback.
+Android acceptance is pending execution of the exact resulting head; source/
+browser PASS never substitutes for that. The complete original E2E suite remains
+unchanged in its acceptance policy:unexecuted/manual cases remain NOT_TESTED.

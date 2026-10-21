@@ -52,7 +52,7 @@ const assert=require('node:assert/strict');
    await page.evaluate(()=>{HTMLMediaElement.prototype.play=window.natureNormalPlay;});
    for(const width of [320,360,393,430])for(const size of [16,32]){
     await page.setViewportSize({width,height:850});await page.evaluate(size=>{document.documentElement.style.fontSize=size+'px';},size);
-    const geometry=await page.locator('#soundsGridBox').evaluate(box=>[...box.querySelectorAll('button[data-sound-toggle]')].map(b=>{
+    const geometry=await page.locator('#soundsGridBox').evaluate(box=>[...box.querySelectorAll('button[data-sound-toggle],input[type=range]')].map(b=>{
      const r=b.getBoundingClientRect(),card=b.closest('.sound-Rich-tile'),c=card.getBoundingClientRect();
      return {height:r.height,width:r.width,inCard:r.left>=c.left&&r.right<=c.right&&r.bottom<=c.bottom,overflow:card.scrollWidth>card.clientWidth};
     }));

@@ -9,7 +9,8 @@
 .nature-library-state{font-size:.73rem;opacity:.8;overflow-wrap:anywhere}
 #sec-sounds .sound-Rich-tile{height:auto;min-height:151px;min-width:0;cursor:default}
 #sec-sounds .stile-toggle{width:100%;min-height:44px;min-width:44px;padding:0;border:0;border-radius:8px;background:transparent;color:inherit;font:inherit;cursor:pointer}
-#sec-sounds .stile-toggle:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#sec-sounds .stile-toggle:focus,#sec-sounds .stile-vol:focus{outline:3px solid #fff;outline-offset:3px}
+#sec-sounds .stile-vol{height:44px;min-height:44px;margin-top:0;background:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,.4)) center/100% 5px no-repeat}
 #sec-sounds .stile-volume-label{flex-wrap:wrap;line-height:1.5}
 #sec-sounds .stile-volume-pct{font-size:.72rem;font-weight:700;white-space:nowrap}
 #sec-sounds .stile-name{overflow-wrap:anywhere}
