@@ -112,15 +112,25 @@ function validQuickSnapshot(raw) {
     exercises:Array.isArray(raw.exercises)?raw.exercises.filter(x=>typeof x==='string').slice(0,24).map(x=>x.slice(0,70)):[]
   };
 }
+function quickSaveError() {
+  const message=L().saveFailed;
+  return message || (cfg.lang==='ar'
+    ? 'تعذّر حفظ إعدادات التدريب. حاول مرة أخرى.'
+    : 'Could not save training settings. Try again.');
+}
 function saveQuickConfig() {
-  saveFortressData(QUICK_CFG_KEY,{
-    exercises:quickExercises.slice(0,24),
-    domain:quickPresetDomain,
-    sets:document.getElementById('qtSets').value,
-    work:document.getElementById('qtWork').value,
-    rest:document.getElementById('qtRest').value,
-    skip:document.getElementById('qtSkipLast').checked
-  });
+  try {
+    return saveFortressData(QUICK_CFG_KEY,{
+      exercises:quickExercises.slice(0,24),
+      domain:quickPresetDomain,
+      sets:document.getElementById('qtSets').value,
+      work:document.getElementById('qtWork').value,
+      rest:document.getElementById('qtRest').value,
+      skip:document.getElementById('qtSkipLast').checked
+    })===true;
+  } catch (_) {
+    return false;
+  }
 }
 function initQuickTraining() {
   const saved=loadFortressData(QUICK_CFG_KEY,null);
@@ -135,7 +145,9 @@ function initQuickTraining() {
     if(typeof saved.skip==='boolean')document.getElementById('qtSkipLast').checked=saved.skip;
   }
   for(const id of ['qtSets','qtWork','qtRest','qtSkipLast'])
-    document.getElementById(id).addEventListener('change',saveQuickConfig);
+    document.getElementById(id).addEventListener('change',()=>{
+      if(!saveQuickConfig())showToast(quickSaveError());
+    });
   quickL10n();
 }
 function renderQuickTraining() {
@@ -171,12 +183,25 @@ function addQuickExercise() {
   const name=String(el.value||'').trim().slice(0,70);
   if(!name || quickExercises.length>=24)return;
   quickExercises.push(name);
+  if(!saveQuickConfig()){
+    quickExercises.pop();
+    showToast(quickSaveError());
+    return false;
+  }
   el.value='';
-  saveQuickConfig();
   renderQuickTraining();
+  return true;
 }
 function removeQuickExercise(index) {
-  quickExercises.splice(index,1);saveQuickConfig();renderQuickTraining();
+  if(!Number.isInteger(index)||index<0||index>=quickExercises.length)return false;
+  const removed=quickExercises.splice(index,1)[0];
+  if(!saveQuickConfig()){
+    quickExercises.splice(index,0,removed);
+    showToast(quickSaveError());
+    return false;
+  }
+  renderQuickTraining();
+  return true;
 }
 function applyQuickTrainingPreset(id) {
   if(quickTraining?.active) {
@@ -188,11 +213,21 @@ function applyQuickTrainingPreset(id) {
     reading:[3,1200,300,'read'],
     work:[2,3000,600,'work']
   };
-  const p=presets[id];if(!p)return;
+  const p=presets[id];if(!p)return false;
+  const fields=['qtSets','qtWork','qtRest'];
+  const previous=fields.map(key=>document.getElementById(key).value);
+  const previousDomain=quickPresetDomain;
   document.getElementById('qtSets').value=String(p[0]);
   document.getElementById('qtWork').value=timeString(p[1]);
   document.getElementById('qtRest').value=timeString(p[2]);
-  quickPresetDomain=p[3];saveQuickConfig();
+  quickPresetDomain=p[3];
+  if(!saveQuickConfig()){
+    fields.forEach((key,index)=>{document.getElementById(key).value=previous[index];});
+    quickPresetDomain=previousDomain;
+    showToast(quickSaveError());
+    return false;
+  }
+  return true;
 }
 function startQuickTraining() {
   if(quickTraining?.active)return;
@@ -229,10 +264,10 @@ function startQuickTraining() {
   quickInternalChange=true;
   selectTimerMode(workSeconds/60,'focus',document.getElementById('modeFocusBtn'));
   quickInternalChange=false;
-  saveQuickConfig();
+  const preferencesSaved=saveQuickConfig();
   toggleTimerPlay();
   renderQuickTraining();
-  showToast(quickText('started'));
+  showToast(preferencesSaved?quickText('started'):quickSaveError());
   quickWorkflowEvent('started',{domain:quickTraining.domain,taskId:quickTraining.taskId,
     sets:quickTraining.sets,workSeconds:quickTraining.workSeconds,restSeconds:quickTraining.restSeconds});
 }
