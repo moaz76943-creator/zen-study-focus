@@ -1108,7 +1108,7 @@ function accumulateActiveTime() {
 }
 const TIMER_STORAGE_KEY = 'zen_fortress_active_timer_v21';
 function storeTimerSession() {
-  saveFortressData(TIMER_STORAGE_KEY, {
+  return saveFortressData(TIMER_STORAGE_KEY, {
     total: timerTotal, left: timerLeft, running: timerRunning,
     endAt: timerRunning ? timerTargetTime : null,
     mode: currentTimerModeKey, label: customSessionLabel,
@@ -1376,14 +1376,40 @@ function toggleTimerPlay() {
   if (!timerRunning && timerSessionId && timerLeft === 0) return finalizeTimerSession(false);
   const btn = document.getElementById('mainPlayBtn');
   const activeTitle = document.getElementById('timerModeCaption').textContent;
+  const before = {timerRunning, timerLeft, timerTargetTime, timerSessionId,
+    focusSessionTaskId, timerActiveMs, timerResumeMs};
 
-  if (timerRunning) {
+  // Stage the transition synchronously. Do not change scheduled work, native
+  // service or the button until both timer snapshot copies are verified.
+  try {
+    if (timerRunning) {
+      timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
+      accumulateActiveTime();
+      timerRunning = false;
+    } else {
+      if (!timerSessionId) {
+        timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
+        const linked = typeof focusWorkflowGetLinkedTask === 'function' ? focusWorkflowGetLinkedTask() : null;
+        focusSessionTaskId = quickTraining?.active && Number.isSafeInteger(quickTraining.taskId)
+          ? quickTraining.taskId : (linked?.id ?? null);
+      }
+      timerRunning = true;
+      timerResumeMs = Date.now();
+      timerTargetTime = timerResumeMs + (timerLeft * 1000);
+    }
+    if (storeTimerSession() !== true) throw new Error('TIMER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (error) {
+    ({timerRunning, timerLeft, timerTargetTime, timerSessionId,
+      focusSessionTaskId, timerActiveMs, timerResumeMs} = before);
+    showToast(L().saveFailed);
+    // Preserve the existing failure contract: internal mode/training callers
+    // must abort rather than continue replacing a session after a failed pause.
+    throw error;
+  }
+
+  if (before.timerRunning) {
     clearInterval(timerInterval);
     timerInterval = null;
-    timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
-    accumulateActiveTime();
-    timerRunning = false;
-    storeTimerSession();
     if (window.ZenNative && window.ZenNative.stopBackgroundService) {
       try { window.ZenNative.stopBackgroundService(); } catch(e){}
     }
@@ -1393,21 +1419,8 @@ function toggleTimerPlay() {
       if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
     } catch(e){}
-
-    if (!timerSessionId) {
-      timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
-      const linked = typeof focusWorkflowGetLinkedTask === 'function' ? focusWorkflowGetLinkedTask() : null;
-      focusSessionTaskId = quickTraining?.active && Number.isSafeInteger(quickTraining.taskId)
-        ? quickTraining.taskId : (linked?.id ?? null);
-    }
-    timerRunning = true;
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-    timerResumeMs = Date.now();
-    timerTargetTime = timerResumeMs + (timerLeft * 1000);
-    storeTimerSession();
-
     startNativeTimerForCurrentSession(timerLeft, activeTitle);
-
     timerInterval = setInterval(runTimerTick, 500);
   }
 }

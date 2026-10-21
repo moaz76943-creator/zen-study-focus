@@ -39,3 +39,70 @@ test('rest completion is a successful no-op without focus credit or persistence'
  const h=rig(true);h.run('currentTimerModeKey="short"');
  assert.equal(h.run('creditCompletedSession()'),true);assert.equal(h.writes,0);
 });
+
+// CROSS-002 / TIMER-028: real Start/Pause functions with a rejected snapshot write.
+function toggleRig({running=false,failure='throw'}={}){
+ const state={timerRunning:running,timerLeft:90,timerTotal:120,timerInterval:running?17:null,
+  timerTargetTime:running?200000:null,timerSessionId:running?'stable-session':null,
+  focusSessionTaskId:running?7:null,timerActiveMs:30000,timerResumeMs:running?100000:null,
+  currentTimerModeKey:'focus',customSessionLabel:'Personal label ۱۲',quickTraining:null,chimeCtx:null};
+ const original=JSON.parse(JSON.stringify(state)),events=[],messages=[],button={innerHTML:running?'pause':'play'};
+ let reject=true;
+ const ctx=vm.createContext({...state,Date:{now:()=>110000},Math,String,Number,
+  TIMER_STORAGE_KEY:'zen_fortress_active_timer_v21',
+  document:{getElementById:id=>id==='mainPlayBtn'?button:{textContent:'Focus'}},
+  saveFortressData(key,snapshot){
+   events.push(['save',key,JSON.parse(JSON.stringify(snapshot))]);
+   if(reject&&failure==='throw')throw Error('QuotaExceededError');
+   return !(reject&&failure==='false');
+  },window:{confirm:()=>true,ZenNative:{stopBackgroundService(){events.push(['native-stop']);}}},
+  quickText:()=> 'Replace session?',
+  L:()=>({saveFailed:'Could not save'}),showToast:m=>messages.push(m),
+  setInterval(){events.push(['interval-start']);return 18;},clearInterval:id=>events.push(['interval-stop',id]),
+  startNativeTimerForCurrentSession:(...args)=>events.push(['native-start',...args]),
+  focusWorkflowGetLinkedTask:()=>({id:7}),runTimerTick(){},finalizeTimerSession(){throw Error('Unexpected completion');}
+ });
+ for(const [begin,finish] of [['function accumulateActiveTime()', 'const TIMER_STORAGE_KEY'],
+  ['function storeTimerSession()', 'function creditCompletedSession()'],
+  ['function toggleTimerPlay()', 'function resetTimerNow()'],
+  ['function selectTimerMode(mins,', 'function openCustomTimerModal()'],
+  ['function resetTimerNow()', 'function skipTimerPhase()']]){
+  const a=app.indexOf(begin),b=app.indexOf(finish,a);assert.ok(a>=0&&b>a);vm.runInContext(app.slice(a,b),ctx);
+ }
+ const snapshot=()=>Object.fromEntries(Object.keys(original).map(k=>[k,ctx[k]]));
+ return {ctx,original,events,messages,button,snapshot,allow(){reject=false;},run:()=>vm.runInContext('toggleTimerPlay()',ctx),call:code=>vm.runInContext(code,ctx)};
+}
+for(const running of [false,true])for(const failure of ['throw','false'])test(`CROSS-002 ${running?'Pause':'Start'} ${failure} keeps timer, identity and scheduled work unchanged`,()=>{
+ const h=toggleRig({running,failure});
+ assert.throws(h.run,/QuotaExceededError|TIMER_SAVE_NOT_ACKNOWLEDGED/);
+ assert.deepEqual(h.snapshot(),h.original);
+ assert.equal(h.button.innerHTML,running?'pause':'play');
+ assert.equal(h.events.length,1,'Only persistence attempted; no native/interval transitions');
+ assert.deepEqual(h.messages,['Could not save']);
+ h.allow();h.run();
+ assert.equal(h.ctx.timerRunning,!running);
+ assert.equal(h.ctx.focusSessionTaskId,7);
+ if(running){
+  assert.equal(h.ctx.timerSessionId,'stable-session');
+  assert.equal(h.ctx.timerActiveMs,40000,'Retry counts elapsed time once');
+  assert.equal(h.ctx.timerResumeMs,null);
+  assert.deepEqual(h.events.slice(2),[['interval-stop',17],['native-stop']]);
+ }else{
+  assert.equal(h.ctx.timerActiveMs,30000);
+  assert.equal(h.ctx.timerResumeMs,110000);
+  assert.equal(h.ctx.timerTargetTime,200000);
+  assert.deepEqual(h.events.slice(2),[['native-start',90,'Focus'],['interval-start']]);
+ }
+ const saved=h.events[1][2];
+ assert.equal(saved.running,!running);
+ assert.equal(saved.sessionId,h.ctx.timerSessionId);
+ assert.equal(saved.taskId,7);
+});
+
+for(const action of ["selectTimerMode(5,'short',null)", 'resetTimerNow()'])test('CROSS-002 failed pause aborts internal '+action,()=>{
+ const h=toggleRig({running:true});
+ assert.throws(()=>h.call(action),/QuotaExceededError/);
+ assert.deepEqual(h.snapshot(),h.original,'Caller cannot discard identity/elapsed time after rejected pause');
+ assert.equal(h.events.length,1);
+ assert.deepEqual(h.messages,['Could not save']);
+});
