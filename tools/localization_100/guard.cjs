@@ -112,6 +112,7 @@ function checkAdmission(){
     candidateStrings:draftReport.translatedCandidates,missingDraftStrings:draftReport.languages.reduce((n,r)=>n+r.missing,0),
     linguisticReview:'NOT_TESTED',android100Languages:'NOT_TESTED',releaseApproved:false};
 }
+module.exports={REGISTRY,LEGACY_CODES,normalize,resolve,validatePack,inventoryHash,sourceInventory,validateRoster,checkAdmission};
 if(require.main===module){
   try{
     const args=process.argv.slice(2);
@@ -127,4 +128,4 @@ if(require.main===module){
     }else throw Error('Usage: guard.cjs --check or guard.cjs --template <planned locale>');
   }catch(e){console.error('LOCALE_REVIEW_NOT_TESTED:',e.message);process.exitCode=1;}
 }
-module.exports={REGISTRY,LEGACY_CODES,normalize,resolve,validatePack,inventoryHash,sourceInventory,validateRoster,checkAdmission};
+
