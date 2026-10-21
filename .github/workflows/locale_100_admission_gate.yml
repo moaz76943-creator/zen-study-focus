@@ -115,6 +115,7 @@ jobs:
           node tests/track07_functional/analytics_all_controls_browser.cjs
           node tests/track07_functional/analytics_screen_chromium.cjs
           node tests/track07_functional/live_20_language_switch_navigation.cjs
+          node tests/localization_20/locale100_controls_inventory_browser.cjs
           node tests/df4_browser/nav_reachability.cjs
           mkdir -p "$RUNNER_TEMP/locale100-browser/flows"
           DF_COMPLETION_EVIDENCE="$RUNNER_TEMP/locale100-browser/flows" node tests/df4_browser/completion.cjs
