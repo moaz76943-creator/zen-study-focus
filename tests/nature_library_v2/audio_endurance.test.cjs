@@ -2,7 +2,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {assertProgress}=require('./android20_runtime_probe.cjs');
 const {resultSummary}=require('./android20_runtime_probe.cjs');
-const {assertLifecycle}=require('./android20_runtime_probe.cjs');
+const {assertLifecycle,assertRealtimeProgress}=require('./android20_runtime_probe.cjs');
 test('lifecycle evidence needs actual hidden/screen-off state and progress of every track',()=>{
  const before=[{id:'rain',progress:2,duration:40}],after=[{id:'rain',progress:21,duration:40}];
  const sample={visibility:'hidden',wakefulness:'Asleep',active:1,gain:.6,errors:[],seconds:18};
@@ -37,4 +37,13 @@ test('every original must make observed media progress across an endurance check
 test('lost, duplicated and non-finite track evidence is rejected',()=>{
  const before=[{id:'rain',progress:2},{id:'wind',progress:4}];
  for(const after of [[{id:'rain',progress:10}], [{id:'rain',progress:10},{id:'rain',progress:15}], [{id:'rain',progress:Infinity},{id:'wind',progress:6}]])assert.throws(()=>assertProgress(before,after));
+});
+
+test('unmuted timing diagnostics preserve the same real-time threshold in foreground and background',()=>{
+ const before=[{id:'ocean',progress:2,duration:40},{id:'rain',progress:4,duration:60}];
+ const sample={visibility:'visible',active:2,gain:.48,errors:[],seconds:18.051};
+ const stalled=[{id:'ocean',progress:17.302,duration:40},{id:'rain',progress:19.31,duration:60}];
+ assert.throws(()=>assertRealtimeProgress(before,stalled,sample),/stalled/);
+ assert.equal(assertRealtimeProgress(before,[{id:'ocean',progress:20,duration:40},{id:'rain',progress:22,duration:60}],sample),true);
+ assert.throws(()=>assertRealtimeProgress(before,stalled,{...sample,seconds:0}));
 });

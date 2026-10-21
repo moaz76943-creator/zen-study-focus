@@ -332,3 +332,31 @@ Source unit RED/GREEN covers observed states, frozen/partial/missing progress,
 loop wrap, duration changes, short runs and truthful text summaries. Actual
 Android lifecycle/endurance results remain pending until the new exact-SHA run
 executes; source tests alone do not grant an Android PASS. RELEASE_APPROVED=NO.
+
+### Actual lifecycle RED and bounded clock diagnosis (2026-10-21)
+
+Exact3127e8fb90c3c57ddd2c2f1b3a2111c9c5bced88 run
+[39552398767](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39552398767)
+passed24 Node,25 audio Python,20 input/full-PCM uniqueness,16 offline review
+layouts and20-language/160 main-app layouts. Independent downloaded-artifact
+verification also decoded and SHA256-checked all40 original/loop files.
+
+The Android job **FAILED** its new strict background clock observation:
+all20 tracks were active/unmuted, visibility hidden, gain0.48, no decoder errors,
+but each advanced only15.300–15.312 seconds during18.051 seconds of host wall
+time. Actual installed AudioQA APK SHA256:
+`0616efdc2af38d1b91650cecacafd95af432981d063c853c96ebeb1885273563`.
+[Immutable evidence12324732155](https://github.com/moaz76943-creator/zen-study-focus/actions/runs/39552398767/artifacts/12324732155).
+All20 originals and loop-wrap checks preceded that failure; subsequent screen-off,
+retry/reopen and this-head1800s endurance were **NOT_TESTED**. Earlier successful
+muted1800s observations belong to their earlier SHAs and cannot override this RED.
+
+This does not yet establish an app-background bug or a runner-only clock defect:
+there was no equivalent unmuted foreground baseline. The next test-only patch
+uses the **same timing threshold** for two and20 tracks, each in foreground,
+Home/background and actual Sleep. It records every bounded phase even after a
+failed measurement, captures AudioFlinger state for each, then fails the whole
+run if any phase failed. No failure is renamed PASS, no duration tolerance is
+loosened, no app/assets/v21 change is made, and no expensive30-minute retry is
+requested for that diagnostic smoke. Native/physical audible quality remains
+unverified. RELEASE_APPROVED=NO.
