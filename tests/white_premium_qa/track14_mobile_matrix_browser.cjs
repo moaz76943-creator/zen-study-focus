@@ -42,7 +42,14 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
             const chips=[...document.querySelectorAll('#focusHeroCard .delta-chip')].map(e=>({rect:bounds(e),minHeight:getComputedStyle(e).minHeight}));
             const buttons=ids.map(id=>({id,rect:bounds(document.getElementById(id)),visible:getComputedStyle(document.getElementById(id)).display!=='none'}));
             const hero=bounds(document.getElementById('focusHeroCard'));
-            return {viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,buttons,nav,hero,ring,timer,chips};
+
+            const labels=ids.map(id=>{
+              const el=document.querySelector('#'+id+' span[data-i18n]');
+              const rect=bounds(el),style=el?getComputedStyle(el):null;
+              return {id,text:el?.textContent?.trim()||'',rect,
+                clipPath:style?.clipPath||'',lineHeight:style?parseFloat(style.lineHeight):0};
+            });
+            return {viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,buttons,nav,hero,ring,timer,chips,labels};
           },ids);
           const failures=[];
           if(measured.documentWidth>width+2)failures.push('DOCUMENT_HORIZONTAL_OVERFLOW');
@@ -58,6 +65,19 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
             if(Math.abs((t.left+t.right-measured.nav.left-measured.nav.right)/2)>5)failures.push('TIMER_NOT_CENTERED');
           }
           if(measured.chips.some(x=>x.rect&&x.rect.height<43))failures.push('DURATION_TARGET_UNDERSIZED');
+          const activeCaption=measured.labels.find(x=>x.id==='navTimer');
+          if(!activeCaption?.text)failures.push('ACTIVE_TAB_ACCESSIBLE_LABEL_MISSING');
+          if(activeCaption?.rect){
+            if(activeCaption.rect.left<0||activeCaption.rect.right>width+1)failures.push('ACTIVE_TAB_CAPTION_OFFSCREEN');
+            if(activeCaption.lineHeight>0&&activeCaption.rect.height>activeCaption.lineHeight*3.2)
+              failures.push('ACTIVE_TAB_CAPTION_TOO_MANY_LINES');
+          }
+          for(const label of measured.labels){
+            if(!label.text)failures.push('NAV_ACCESSIBLE_LABEL_MISSING:'+label.id);
+            if(label.id!=='navTimer'&&label.rect?.width>2)
+              failures.push('INACTIVE_LABEL_NOT_VISUALLY_CLIPPED:'+label.id);
+          }
+
           rows.push({width,dir,scale,failures,geometry:measured});
           if(failures.length)problems.push({tag,failures});
           // Visual before/after reference at the critical 320px / 200% case.

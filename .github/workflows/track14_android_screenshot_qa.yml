@@ -34,6 +34,15 @@ jobs:
       - name: Debug-only APK (no upload signing)
         working-directory: android
         run: gradle assembleDebug --no-daemon
+      - name: Permit KVM acceleration on ephemeral Ubuntu runner if supported
+        shell: bash
+        run: |
+          if [[ -e /dev/kvm ]]; then
+            sudo chmod 666 /dev/kvm
+            ls -l /dev/kvm
+          else
+            echo 'KVM device unavailable: emulator may not support real Android capture' >&2
+          fi
       - name: Android emulator screenshot matrix — 4 widths x 3 system font scales
         uses: reactivecircus/android-emulator-runner@v2
         env:

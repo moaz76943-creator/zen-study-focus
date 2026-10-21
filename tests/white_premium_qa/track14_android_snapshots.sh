@@ -15,6 +15,21 @@ cleanup() {
 }
 trap cleanup EXIT
 apk="android/app/build/outputs/apk/debug/app-debug.apk"
+# sys.boot_completed is not sufficient when package/settings services are
+# absent (observed with unaccelerated emulator at PR #164 initial run).
+ready=0
+for i in {1..12}; do
+  if timeout 20s adb shell service check package 2>/dev/null | grep -q 'found' &&
+     timeout 20s adb shell service check settings 2>/dev/null | grep -q 'found'; then
+    ready=1; break
+  fi
+  sleep 5
+done
+if ((ready==0)); then
+  echo 'ANDROID_FRAMEWORK_NOT_READY: package/settings services missing' >&2
+  timeout 20s adb shell service list > "$out/android-services.txt" 2>&1 || true
+  exit 1
+fi
 bash tests/white_premium_qa/track14_install_apk.sh "$apk"
 timeout 40s adb shell wm density 160
 for width in 320 360 393 430; do
