@@ -1,9 +1,12 @@
 'use strict';
 // TRACK08 disposable Android WebView CDP/touch regression; no physical/user data.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
+const {readWebViewFrame}=require('../android_e2e_recovery/android_ui_hierarchy.cjs');
+const {parseWebViewBounds,cssPointToAndroid}=require('../android_e2e_recovery/android_device_touch.cjs');
+const {validateTouchTarget}=require('../android_e2e_recovery/cdp_touch_target.cjs');
 const pkg='com.zenstudy.focus',serial=process.env.ANDROID_SERIAL||'emulator-5554',delay=ms=>new Promise(r=>setTimeout(r,ms));
 const adb=(...args)=>cp.execFileSync('adb',['-s',serial,...args],{encoding:'utf8',timeout:25000}).trim();
-const report={source_sha:process.env.GITHUB_SHA||null,source:'genuine disposable Android WebView CDP touch (not manual physical device/IME)',device:null,tests:[],release_approved:false};
+const report={source_sha:process.env.GITHUB_SHA||null,source:'genuine disposable Android WebView ADB physical touch pipeline + CDP readback (not manual physical device/IME)',device:null,tests:[],release_approved:false};
 let ws,seq=0,pending=new Map();
 const output=process.argv[2]||null;
 function classify(e){return /^(TRANSPORT|INFRA):/.test(String(e.message||e))?'NOT_TESTED':'FAIL_APP';}
@@ -56,15 +59,31 @@ async function evalJS(expression){
 async function snapshot(){return evalJS('JSON.parse(JSON.stringify(DF22Integration.getSnapshot()))');}
 async function nativeReceipt(){return evalJS(`(()=>{const raw=ZenNative.readDurableV21();if(raw==='NONE'||raw==='ERROR')return {error:raw};const x=JSON.parse(raw);const p=x.packets;return {valid:Object.keys(p).length===6&&Object.entries(p).every(([k,v])=>v===localStorage.getItem(k)&&(!v||DeepFocusDataCompatV21.inspectPacket(v).ok)),keys:Object.keys(p).length};})()`);}
 async function touch(selector,caption){
- const location=await evalJS(`(()=>{const root=document.getElementById('track08AndroidHost');if(!root)return {error:'mount missing'};const el=${selector};if(!el)return {error:'target missing: ${caption}'};el.scrollIntoView({block:'center',inline:'nearest'});const r=el.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2,width:r.width,height:r.height,vw:innerWidth,vh:innerHeight};})()`);
- if(location?.error)throw Error('APP: '+location.error);
- if(!(location.width>0&&location.height>0&&location.x>=0&&location.x<=location.vw&&location.y>=0&&location.y<=location.vh))throw Error('APP: touch target outside WebView: '+caption+' '+JSON.stringify(location));
- const point={x:location.x,y:location.y};
- await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});
- await delay(85);
- await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ const geometry=`(()=>{const el=${selector};
+  if(!el)return {present:false,selector:${JSON.stringify(caption)}};
+  el.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});
+  const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+  const hit=document.elementFromPoint(x,y);
+  return {present:true,selector:${JSON.stringify(caption)},x,y,width:r.width,height:r.height,
+    viewportWidth:document.documentElement.clientWidth,viewportHeight:innerHeight,
+    hitWithin:!!hit&&(el===hit||el.contains(hit)),
+    hit:hit?.tagName||null};
+ })()`;
+ validateTouchTarget(await evalJS(geometry));
+ const frame=await readWebViewFrame(adb,{
+  parseBounds:parseWebViewBounds,pause:delay,
+  onRetry:(i,max)=>console.log('TRACK08_ANDROID_HIERARCHY_RETRY '+i+'/'+max)
+ });
+ const actual=await evalJS(geometry);
+ const target=validateTouchTarget(actual);
+ const physical=cssPointToAndroid({...target,viewportWidth:actual.viewportWidth,viewportHeight:actual.viewportHeight},frame);
+ try{adb('shell','input','tap',String(physical.x),String(physical.y));}
+ catch(e){throw Error('TRANSPORT: real ADB input tap failed '+String(e.message||e).slice(0,180));}
  await delay(350);
+ report.touch_evidence??=[];
+ report.touch_evidence.push({caption,source:'ADB physical touch pipeline',viewport:{x:target.x,y:target.y},physical,frame});
 }
+
 function buttonInCard(label){return `(()=>{const card=[...document.querySelectorAll('#track08AndroidHost .df-task')].find(c=>c.querySelector('.df-title')?.textContent==='DF08 legacy undated');return card?[...card.querySelectorAll('button')].find(b=>b.textContent.trim()===${JSON.stringify(label)}):null;})()`;}
 async function run(name,fn){
  try{const detail=await fn();report.tests.push({name,status:'PASS',detail});}
@@ -103,6 +122,10 @@ async function main(){
   })()`);
   assert.equal(mount.mounted,true,'Tasks Studio must mount on genuine Android WebView');
   await touch(buttonInCard('Details'),'Details');
+  const detailState=await evalJS(`(()=>{const card=[...document.querySelectorAll('#track08AndroidHost .df-task')].find(c=>c.querySelector('.df-title')?.textContent==='DF08 legacy undated');
+    return {expanded:card?.querySelector('.df-expand')?.getAttribute('aria-expanded'),
+      hidden:card?.querySelector('.df-task-more')?.hidden};})()`);
+  assert.deepEqual(detailState,{expanded:'true',hidden:false},'Real Android ADB tap must expand Details');
   await touch(buttonInCard('Edit'),'Edit');
   const before=await evalJS(`(()=>{const f=document.querySelector('#track08AndroidHost form.df-form');return {
     hasForm:!!f,date:f?.querySelector('input[type=date]')?.value,
@@ -117,7 +140,7 @@ async function main(){
   assert.equal(Object.hasOwn(task,'date'),false);assert.equal(Object.hasOwn(task,'dueAssigned'),false);
   assert.deepEqual(task.legacyUnknown,{items:[1,'العربية']});assert.equal(task.v21Future,'preserve');
   const receipt=await nativeReceipt();assert.equal(receipt.valid,true);
-  return {date_absent:true,unknown_retained:true,native_ack:true,interaction:'Android WebView CDP touch for Details/Edit/Save; text set through CDP (IME NOT_TESTED)'};
+  return {date_absent:true,unknown_retained:true,native_ack:true,interaction:'Android ADB physical touch for Details/Edit/Save; text set through CDP (IME NOT_TESTED)'};
  }))return;
  if(!await run('native_force_stop_reopen_readback',async()=>{
   try{ws?.close();}catch(_){}
