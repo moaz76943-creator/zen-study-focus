@@ -131,3 +131,58 @@ jobs:
           path: ${{ runner.temp }}/df4-android/
           if-no-files-found: warn
           retention-days: 5
+  android-cdp:
+    needs: debug-apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 36
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v4
+        with:
+          name: track09-debug-apk-${{ github.sha }}
+          path: ${{ runner.temp }}/track09-download
+      - name: Bind Android CDP probe to the exact downloaded APK SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/track09-android-cdp"
+          git rev-parse HEAD > "$RUNNER_TEMP/track09-android-cdp/commit-sha.txt"
+          SHA_FILE="$(find "$RUNNER_TEMP/track09-download" -name source-sha.txt -type f -print -quit)"
+          test -s "$SHA_FILE"
+          test "$(cat "$SHA_FILE")" = "$(git rev-parse HEAD)"
+          APK="$(find "$RUNNER_TEMP/track09-download" -name app-debug.apk -type f -print -quit)"
+          test -s "$APK"
+          cp "$APK" "$RUNNER_TEMP/df4-device-test.apk"
+      - name: Verify disposable Android emulator virtualization
+        shell: bash
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Inspect the actual APK WebView DOM through localhost-only CDP
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/focus_workflows/track09_android_cdp.sh
+      - name: Persist real CDP observations and unavailable transport results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: track09-android-cdp-${{ github.sha }}
+          path: ${{ runner.temp }}/track09-android-cdp/
+          retention-days: 5
+          if-no-files-found: warn
