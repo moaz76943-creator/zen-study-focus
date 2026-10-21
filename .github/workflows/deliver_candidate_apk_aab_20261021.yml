@@ -76,10 +76,10 @@ jobs:
           "$aapt" dump badging "$apk" > delivery/APK_PACKAGE_DETAILS.txt
           grep -F "package: name='com.zenstudy.focus'" delivery/APK_PACKAGE_DETAILS.txt
           grep -F "versionCode='21'" delivery/APK_PACKAGE_DETAILS.txt
-          "$apksigner" verify --print-certs "$apk" > delivery/APK_SIGNATURE.txt
+          "$apksigner" verify --print-certs "$apk" 2>&1 | tee delivery/APK_SIGNATURE.txt
           # The debug bundle is expected to have a debug signing certificate.
-          jarsigner -verify "$debug_aab" > delivery/AAB_DEBUG_SIGNATURE.txt 2>&1
-          grep -q 'jar verified' delivery/AAB_DEBUG_SIGNATURE.txt
+          jarsigner -verify "$debug_aab" 2>&1 | tee delivery/AAB_DEBUG_SIGNATURE.txt
+          grep -Fq 'jar verified' delivery/AAB_DEBUG_SIGNATURE.txt || { echo 'Debug AAB is not signed correctly' >&2; exit 1; }
           # Release candidate intentionally lacks approved production upload signing.
           unzip -t "$release_aab" > delivery/AAB_RELEASE_ARCHIVE_CHECK.txt
           cp "$apk" delivery/DeepFocus-Candidate21-Debug-Install.apk
