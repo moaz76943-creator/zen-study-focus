@@ -1,0 +1,75 @@
+name: Track 02 Native v21 SAF Android API30 (isolated)
+on:
+  push:
+    branches: [qa/track02-native-saf-android-20261021]
+permissions:
+  contents: read
+concurrency:
+  group: deep-focus-saf-qa-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android-saf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Verify native import source identity and QA script syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          PIN=a51288693b24f6942faf7d039d2038cabfd142b4
+          test "$(git rev-parse HEAD:android)" = "$(git rev-parse "$PIN:android")"
+          git rev-parse HEAD
+          node --check tests/android_e2e_recovery/track07_durability_android.cjs
+          node --test tests/integration_recovery/native_saf_file_import.test.cjs
+          node --test tests/security_recovery/data_resilience.test.cjs
+      - name: Install compile SDK 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          manager="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          "$manager" "platforms;android-36" "build-tools;36.0.0"
+      - name: Build exact-application-source debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd android && gradle assembleDebug --no-daemon)
+          mkdir -p "$RUNNER_TEMP/deep-focus-android-webview"
+          git rev-parse HEAD > "$RUNNER_TEMP/deep-focus-android-webview/QA-HEAD.txt"
+          printf '%s\n' 'a51288693b24f6942faf7d039d2038cabfd142b4' > "$RUNNER_TEMP/deep-focus-android-webview/APP-SHA.txt"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/deep-focus-android-webview/app-debug.sha256"
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Run real Android DocumentsUI import and exact v21 comparisons
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          ram-size: 2048M
+          emulator-boot-timeout: 900
+          disable-animations: true
+          script: bash tests/android_e2e_recovery/run_cdp_ci.sh
+      - name: Preserve actual PASS FAIL NOT_TESTED evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Track02-Native-SAF-${{ github.sha }}
+          path: ${{ runner.temp }}/deep-focus-android-webview/
+          retention-days: 7
+          if-no-files-found: warn

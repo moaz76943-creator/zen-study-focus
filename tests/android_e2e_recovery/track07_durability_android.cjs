@@ -73,6 +73,115 @@ async function injectWriteFailure(key){
  assert.equal(await evaluate('DeepFocusDataCompatV21.inspectPending(localStorage).pending'),false,'Journal left behind after successful rollback');
  return 'Injected Storage.setItem failure at '+key+'; rollback and unchanged native receipt confirmed';
 }
+
+function uiNodes(xml){return [...xml.matchAll(/<node[^>]*>/g)].map(m=>m[0]);}
+function saveSafPickerEvidence(label,xml){
+ // Never collect personal devices or files; require the disposable CI flag.
+ if(process.env.DF_ANDROID_DISPOSABLE!=='1'||!process.env.RUNNER_TEMP)return;
+ const dir=require('node:path').join(process.env.RUNNER_TEMP,'deep-focus-android-webview');
+ if(!fs.existsSync(dir))return;
+ const key=String(label).replace(/[^a-z0-9_-]/gi,'_').slice(0,60);
+ try{fs.writeFileSync(require('node:path').join(dir,'saf-'+key+'.xml'),xml||dumpUI());}catch(_){}
+ try{const shot=cp.execFileSync('adb',['-s','emulator-5554','exec-out','screencap','-p'],{timeout:20000});fs.writeFileSync(require('node:path').join(dir,'saf-'+key+'.png'),shot);}catch(_){}
+}
+
+function dumpUI(){adb('shell','uiautomator','dump','/sdcard/df02_saf.xml');return adb('shell','cat','/sdcard/df02_saf.xml');}
+function tapUI(node){
+ const m=node?.match(/bounds="([^"]+)"/),v=m?[...m[1].matchAll(/[0-9]+/g)].map(x=>Number(x[0])):[];
+ if(v.length!==4||v[2]<=v[0]||v[3]<=v[1])throw Error('TRANSPORT: Native picker control bounds missing');
+ adb('shell','input','tap',String(Math.floor((v[0]+v[2])/2)),String(Math.floor((v[1]+v[3])/2)));
+}
+async function nativeUI(label,match,requireDocuments=true){
+ for(let i=0;i<16;i++){
+  try{const xml=dumpUI();if(!requireDocuments||/documentsui/i.test(xml)){const item=match(xml);if(item)return {xml,item};}}catch(_){}
+  await pause(550);
+ }
+ throw Error('TRANSPORT: '+label+' not observable in genuine Android picker');
+}
+function savedBackupCandidates(){
+ // Android DocumentsUI may write through MediaStore instead of a shell-visible
+ // /sdcard path; text/plain may also append .txt to the suggested filename.
+ // Only inspect disposable emulator documents with the fixed QA filename shape.
+ const valid=/^deep-focus-\d{4}-\d{2}-\d{2}\.zenbackup(?:\.txt)?$/;
+ const candidates=[],seen=new Set();
+ for(const folder of ['/sdcard/Download','/sdcard/Documents','/sdcard']){
+  let output='';try{output=adb('shell','find',folder,'-maxdepth','3','-type','f');}catch(_){continue;}
+  for(const row of output.split('\n')){
+   const path=row.replaceAll('\r','').trim();
+   if(!path.startsWith(folder+'/')||!valid.test(path.split('/').at(-1))||seen.has(path))continue;
+   seen.add(path);
+   candidates.push({label:'shell-visible saved file',read:()=>cp.execFileSync('adb',['-s','emulator-5554','shell','cat',path],{timeout:20000})});
+  }
+ }
+ for(const collection of ['content://media/external/downloads','content://media/external/file']){
+  let output='';
+  try{output=adb('shell','content','query','--uri',collection,'--projection','_id:_display_name','--where',"_display_name LIKE 'deep-focus-%'");}catch(_){continue;}
+  for(const line of output.split('\n')){
+   const id=line.match(/(?:^|[\s,])_id=(\d+)/),name=line.match(/(?:^|[\s,])_display_name=([^,]+)/);
+   if(!id||!name||!valid.test(name[1].trim()))continue;
+   const uri=collection+'/'+id[1];
+   if(seen.has(uri))continue;
+   seen.add(uri);
+   candidates.push({label:'MediaStore selected document',read:()=>cp.execFileSync('adb',['-s','emulator-5554','shell','content','read','--uri',uri],{timeout:20000})});
+  }
+ }
+ return candidates;
+}
+async function waitForSavedBackup(expectedCode){
+ // A tapped Save is NOT success: compare exact real provider bytes with the
+ // code generated before opening the native picker, never just a file name.
+ const expected=Buffer.from(expectedCode,'utf8');
+ let readableMismatch=false;
+ for(let attempt=0;attempt<16;attempt++){
+  for(const candidate of savedBackupCandidates()){
+   let actual;try{actual=candidate.read();}catch(_){continue;}
+   if(actual.equals(expected))return candidate.label;
+   readableMismatch=true;
+  }
+  if(attempt<15)await pause(750);
+ }
+ if(readableMismatch)throw Error('SAF exported document bytes do not match the exact v21 backup');
+ throw Error('TRANSPORT: SAF Save completed without independently readable DocumentsUI/MediaStore bytes');
+}
+function stageImportFixtureInMediaStore(name,code){
+ // adb push is NOT enough on Android 11: unindexed files can be invisible in
+ // ACTION_OPEN_DOCUMENT. Use the actual scoped MediaStore Downloads provider.
+ const collection='content://media/external/downloads';
+ let uri=null;
+ try{
+  // AOSP "content insert" intentionally prints NO inserted URI. Resolve the
+  // new row via MediaStore instead; do not assume empty stdout means failure.
+  adb('shell','content','insert','--uri',collection,
+   '--bind','_display_name:s:'+name,'--bind','mime_type:s:text/plain',
+   '--bind','relative_path:s:Download/');
+  // adb shell strips SQL quote characters in --where on some Android
+  // builds. Query the disposable collection and match names locally.
+  const rows=adb('shell','content','query','--uri',collection,
+   '--projection','_id:_display_name');
+  const matches=rows.split('\n').filter(line=>line.includes('_display_name='+name));
+  const match=matches.map(line=>line.match(/(?:^|[\s,])_id=(\d+)(?:,|\s|$)/)).find(Boolean);
+  if(!match)throw Error('MediaStore query cannot resolve inserted QA document by exact name');
+  uri=collection+'/'+match[1];
+  // API30 shell ContentProvider write/read uses a mismatched provider
+  // attribution identity. The inserted MediaStore row indexes the file;
+  // write the disposable bytes through shell-visible shared storage.
+  const device='/sdcard/Download/'+name;
+  const host=require('node:os').tmpdir()+'/df02-saf-'+process.pid+'.txt';
+  try{
+   fs.writeFileSync(host,code,'utf8');
+   cp.execFileSync('adb',['-s','emulator-5554','push',host,device],{timeout:20000,stdio:'ignore'});
+   const bytes=cp.execFileSync('adb',['-s','emulator-5554','shell','cat',device],{timeout:20000});
+   assert.ok(bytes.equals(Buffer.from(code,'utf8')),'Staged indexed file bytes mismatched');
+  }finally{
+   try{fs.unlinkSync(host);}catch(_){}
+  }
+  return uri;
+ }catch(e){
+  if(uri){try{adb('shell','content','delete','--uri',uri);}catch(_){}}
+  throw Error('TRANSPORT: cannot create verified disposable MediaStore import fixture: '+String(e.message).slice(0,120));
+ }
+}
+
 async function main(){
  requireEmulator();await connect();
  await run('baseline_six_packet_ack',async()=>{
@@ -85,7 +194,20 @@ async function main(){
   return 'Initial fixture IDs '+ti+'/'+ni+', unknown fields and all six verified native receipt packets';
  });
  if(report.results.at(-1).status!=='PASS')return;
- await run('native_atomicfile_ack_io_failure',async()=>{
+   await run('signed_invalid_family_native_ack_refused',async()=>{
+    // Real disposable Android bridge; injected WebView bytes restored before restart.
+    const before=await fixture(),checkpoint=await evaluate('ZenNative.readDurableV21()');
+    const evidence=await evaluate("(()=>{const D=DeepFocusDataCompatV21,k=D.KEYS.tasks,a=localStorage.getItem(k),b=localStorage.getItem(k+'_mirror'),invalid=D.encodePacket({id:2,title:'Signed wrong-shaped tasks',done:false});try{localStorage.setItem(k,invalid);localStorage.setItem(k+'_mirror',invalid);const scan=DF22Preflight.inspect(localStorage);return {checksumValid:D.inspectPacket(invalid).ok,blocked:!scan.ok,issues:scan.issues,ack:DF22Preflight.nativeAcknowledge(localStorage),checkpoint:ZenNative.readDurableV21()};}finally{if(a===null)localStorage.removeItem(k);else localStorage.setItem(k,a);if(b===null)localStorage.removeItem(k+'_mirror');else localStorage.setItem(k+'_mirror',b);}})()");
+    assert.equal(evidence.checksumValid,true);
+    assert.equal(evidence.blocked,true,'Valid checksum must not override family schema');
+    assert.ok(evidence.issues.some(x=>String(x).includes('INVALID_TASKS')));
+    assert.equal(evidence.ack,false,'Native ACK must refuse signed invalid family');
+    assert.equal(evidence.checkpoint,checkpoint,'Rejected ACK advanced last-known-good');
+    assert.deepEqual(await fixture(),before);
+    await restart();assert.deepEqual(await fixture(),before);
+    return 'Signed malformed v21 tasks rejected by real Android bridge; exact fixture and native receipt retained across restart';
+  });
+  await run('native_atomicfile_ack_io_failure',async()=>{
   const before=await fixture(),disk=await receipt();
   let dir=null;
   try{
@@ -157,31 +279,89 @@ async function main(){
   await restart();assert.deepEqual(await fixture(),before);
   return 'Actual Android WebView backup-code restore + native ACK + process restart, exact unknown fields/IDs preserved; SAF document picker is separate NOT_TESTED';
  });
- await run('saf_document_picker_export',async()=>{
-  const code=await evaluate('generateEncryptedBackupCode()');
-  assert.ok(code.startsWith('ZEN21::'));
-  await evaluate('ZenNative.exportBackupToFile('+JSON.stringify(code)+')');
-  try {
-   await pause(1400);
-   const focus=adb('shell','dumpsys','window','windows').slice(0,10000);
-   const xmlpath='/sdcard/df07_saf_picker.xml';
-   try{adb('shell','uiautomator','dump',xmlpath);}catch(e){throw Error('TRANSPORT: DocumentsUI hierarchy unavailable');}
-   const xml=adb('shell','cat',xmlpath);
-   if(!/documentsui|DocumentsUI|Save|SAVE|حفظ|Documents|Downloads/i.test(xml+focus))throw Error('TRANSPORT: SAF chooser not observable on emulator');
-   // SAF UI visibility is not export success: no Save/readback has occurred.
-   throw Error('TRANSPORT: SAF picker opened, but real document Save + readback / file picker import not instrumented');
-  }finally{
-   // SAF filename IME may consume the first Back: close any picker and explicitly
-   // return to our app before starting independent legacy UIAutomator probes.
-   for(let n=0;n<3;n++){
-    const current=adb('shell','dumpsys','window','windows');
-    if(/mCurrentFocus[^\n]*com\.zenstudy\.focus/.test(current))break;
-    adb('shell','input','keyevent','4');await pause(350);
+ await run('saf_document_save_and_readback',async()=>{
+   const before=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
+   assert.ok(code.startsWith('ZEN21::'));
+   const clicked=await evaluate("(()=>{const b=[...document.querySelectorAll('button')].find(x=>String(x.getAttribute('onclick')||'').includes('downloadEncryptedBackupFile'));if(!b)return false;b.click();return true;})()");
+   assert.equal(clicked,true,'Actual export button not found');
+   try{
+    const chooser=await nativeUI('ACTION_CREATE_DOCUMENT Save',xml=>uiNodes(xml).find(n=>/text="(?:SAVE|Save|حفظ)"/.test(n)||/resource-id="[^"]*:id\/action_menu_save"/.test(n)));
+    tapUI(chooser.item);
+    const source=await waitForSavedBackup(code);
+    assert.deepEqual(await fixture(),before,'Export unexpectedly mutated live records');
+    report.saved_saf_readback=source;
+    return 'Real native DocumentsUI Save and independently matching ZEN21:: bytes via '+source;
+   }finally{
+    // Close any unsuccessful picker; no staging files or user data retained.
+    for(let i=0;i<3;i++){
+     const focused=adb('shell','dumpsys','window','windows');
+     if(/mCurrentFocus[^\n]*com\.zenstudy\.focus/.test(focused))break;
+     adb('shell','input','keyevent','4');await pause(300);
+    }
+    adb('shell','am','start','-n',PKG+'/.MainActivity');await pause(500);
    }
-   adb('shell','am','start','-n',PKG+'/.MainActivity');
-   await pause(600);
-  }
- });
+  });
+  await run('saf_file_picker_import_and_restore',async()=>{
+    // Independent disposable fixture, not a claimed SAF export.
+    const before=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
+    assert.ok(code.startsWith('ZEN21::'),'Prepared fixture is not v21');
+    const name='deep-focus-qa-native-import.txt'; // DocumentsUI text/plain MIME is reliably discoverable
+    let stagedUri=null;
+    try{
+      stagedUri=stageImportFixtureInMediaStore(name,code);
+      await pause(1200);
+      assert.equal(await write('after.notesList.find(n=>n.title==="DF07 isolated durability note").body="DF02 temporary edit before native file import";after.cfg.df07Seq=782'),true);
+      assert.notDeepEqual(await fixture(),before);
+      const clicked=await evaluate("(()=>{const b=[...document.querySelectorAll('button')].find(x=>String(x.getAttribute('onclick')||'').includes('importBackupFromFile'));if(!b)return false;b.click();return true;})()");
+      assert.equal(clicked,true,'Native import control missing');
+      const picker=await nativeUI('ACTION_OPEN_DOCUMENT picker',xml=>xml);
+      assert.match(picker.xml,/documentsui/i,'Native DocumentsUI must own the file-selection screen');
+      saveSafPickerEvidence('import_initial_picker',picker.xml);
+      let selected=uiNodes(picker.xml).find(n=>n.includes('text="'+name+'"'));
+      if(!selected){
+        // ACTION_OPEN_DOCUMENT may open in Recents. Select the concrete
+        // Downloads root rather than assuming a newly indexed file is recent.
+        let xml=picker.xml;
+        let downloads=uiNodes(xml).find(n=>/text="Downloads"/i.test(n));
+        if(!downloads){
+          const browse=uiNodes(xml).find(n=>/text="Browse"/i.test(n));
+          if(browse){tapUI(browse);await pause(500);xml=dumpUI();}
+          const menu=uiNodes(xml).find(n=>/content-desc="(?:Show roots|Open navigation drawer|Navigate up)"/i.test(n)||/resource-id="[^"]*:id\/(?:menu_open|drawer_button)"/i.test(n));
+          if(menu){tapUI(menu);await pause(500);xml=dumpUI();}
+          downloads=uiNodes(xml).find(n=>/text="Downloads"/i.test(n));
+        }
+        saveSafPickerEvidence('import_root_navigation',xml);
+        if(!downloads)downloads=(await nativeUI('Downloads root',xml=>uiNodes(xml).find(n=>/text="Downloads"/i.test(n)))).item;
+        tapUI(downloads);
+        let afterRoot;
+        try{afterRoot=await nativeUI('prepared backup document',xml=>uiNodes(xml).find(n=>n.includes('text="'+name+'"')));}
+        catch(error){saveSafPickerEvidence('import_file_not_visible',null);throw error;}
+        saveSafPickerEvidence('import_file_visible',afterRoot.xml);
+        selected=afterRoot.item;
+      }
+      tapUI(selected);
+      await pause(600);
+      saveSafPickerEvidence('import_after_document_selection',null);
+      let confirm;
+      try{
+        confirm=await nativeUI('native backup confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)),false);
+      }catch(error){
+        saveSafPickerEvidence('import_confirmation_missing',null);
+        throw error;
+      }
+      tapUI(confirm.item);
+      let changed=false;
+      for(let i=0;i<15;i++){await pause(500);if(JSON.stringify(await fixture())===JSON.stringify(before)){changed=true;break;}}
+      assert.equal(changed,true,'Real native file importer did not restore exact fixture');
+      assert.equal((await receipt()).valid,true,'Import did not produce a native receipt');
+      await restart();assert.deepEqual(await fixture(),before);
+      return 'Genuine ACTION_OPEN_DOCUMENT selection of disposable fixture; user confirmation, v21 validation, native ACK and restart preserved record IDs/fields. Export Save/readback remains independently NOT_TESTED.';
+    }finally{
+      if(stagedUri){try{adb('shell','content','delete','--uri',stagedUri);}catch(_){}}
+      try{adb('shell','rm','-f','/sdcard/Download/'+name);}catch(_){}
+    }
+  });
+  
 }
 main().catch(e=>{report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:String(e.message||e).slice(0,700)});}).finally(()=>{
  try{ws?.close();}catch(_){}
