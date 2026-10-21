@@ -61,27 +61,42 @@ async function nativeReceipt(){return evalJS(`(()=>{const raw=ZenNative.readDura
 async function touch(selector,caption){
  const geometry=`(()=>{const el=${selector};
   if(!el)return {present:false,selector:${JSON.stringify(caption)}};
-  el.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});
   const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
   const hit=document.elementFromPoint(x,y);
   return {present:true,selector:${JSON.stringify(caption)},x,y,width:r.width,height:r.height,
     viewportWidth:document.documentElement.clientWidth,viewportHeight:innerHeight,
-    hitWithin:!!hit&&(el===hit||el.contains(hit)),
-    hit:hit?.tagName||null};
+    hitWithin:!!hit&&(el===hit||el.contains(hit)),hit:hit?.tagName||null};
  })()`;
- validateTouchTarget(await evalJS(geometry));
- const frame=await readWebViewFrame(adb,{
+ const readFrame=()=>readWebViewFrame(adb,{
   parseBounds:parseWebViewBounds,pause:delay,
   onRetry:(i,max)=>console.log('TRACK08_ANDROID_HIERARCHY_RETRY '+i+'/'+max)
  });
- const actual=await evalJS(geometry);
- const target=validateTouchTarget(actual);
- const physical=cssPointToAndroid({...target,viewportWidth:actual.viewportWidth,viewportHeight:actual.viewportHeight},frame);
+ let frame=await readFrame(),observed=null;
+ const swipes=[];
+ for(let attempt=0;attempt<5;attempt++){
+  observed=await evalJS(geometry);
+  if(!observed?.present)throw Error('UI_TARGET_MISSING: '+caption);
+  if(!(observed.width>0&&observed.height>0))throw Error('UI_ZERO_SIZE: '+caption);
+  if(observed.y>=0&&observed.y<observed.viewportHeight&&observed.hitWithin)break;
+  if(attempt===4)throw Error('UI_SCROLL_INACCESSIBLE: '+caption+' '+JSON.stringify(observed));
+  const x=Math.round(frame.left+frame.width/2);
+  const scrollDown=observed.y>=observed.viewportHeight;
+  const yFrom=Math.round(frame.top+frame.height*(scrollDown?0.78:0.24));
+  const yTo=Math.round(frame.top+frame.height*(scrollDown?0.24:0.78));
+  try{adb('shell','input','swipe',String(x),String(yFrom),String(x),String(yTo),'340');}
+  catch(e){throw Error('TRANSPORT: Android ADB swipe failed '+String(e.message||e).slice(0,180));}
+  swipes.push({from:yFrom,to:yTo,direction:scrollDown?'up':'down'});
+  await delay(450);
+  frame=await readFrame();
+ }
+ const target=validateTouchTarget(observed);
+ const physical=cssPointToAndroid({...target,viewportWidth:observed.viewportWidth,viewportHeight:observed.viewportHeight},frame);
  try{adb('shell','input','tap',String(physical.x),String(physical.y));}
- catch(e){throw Error('TRANSPORT: real ADB input tap failed '+String(e.message||e).slice(0,180));}
+ catch(e){throw Error('TRANSPORT: real ADB tap failed '+String(e.message||e).slice(0,180));}
  await delay(350);
  report.touch_evidence??=[];
- report.touch_evidence.push({caption,source:'ADB physical touch pipeline',viewport:{x:target.x,y:target.y},physical,frame});
+ report.touch_evidence.push({caption,source:'ADB physical touch pipeline',viewport:{x:target.x,y:target.y},
+  physical,frame,swipes});
 }
 
 function buttonInCard(label){return `(()=>{const card=[...document.querySelectorAll('#track08AndroidHost .df-task')].find(c=>c.querySelector('.df-title')?.textContent==='DF08 legacy undated');return card?[...card.querySelectorAll('button')].find(b=>b.textContent.trim()===${JSON.stringify(label)}):null;})()`;}
