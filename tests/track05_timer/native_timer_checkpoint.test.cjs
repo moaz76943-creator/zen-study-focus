@@ -24,7 +24,7 @@ function storageFixture(accept){
  const map=new Map([[key,old1],[key+'_mirror',old2]]),events=[];
  const window={ZenNative:{acknowledgeActiveTimerSnapshot(raw){events.push(['native',raw]);return accept}}};
  const context={
-  TIMER_STORAGE_KEY:key,timerTotal:1500,timerLeft:1499,timerRunning:false,timerTargetTime:null,
+  TIMER_STORAGE_KEY:key,cfg:{lang:'en'},timerTotal:1500,timerLeft:1499,timerRunning:false,timerTargetTime:null,
   currentTimerModeKey:'focus',customSessionLabel:'',timerSessionId:'stable-id',
   focusSessionTaskId:null,timerActiveMs:1100,timerResumeMs:null,quickTraining:null,window,
   localStorage:{getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v),removeItem:k=>map.delete(k)},
@@ -62,7 +62,9 @@ test('reopening uses verified fsynced native pause checkpoint, not a stale WebVi
  };
  const a=app.indexOf('function restoreTimerSession() {'),b=app.indexOf('const ringCircumference',a);
  assert.ok(a>=0&&b>a);
- vm.runInNewContext(app.slice(a,b),ctx);
+ const readA=app.indexOf('function readNativeTimerSession() {'),readB=app.indexOf('function creditCompletedSession()',readA);
+ assert.ok(readA>=0&&readB>readA);
+ vm.runInNewContext(app.slice(readA,readB)+'\n'+app.slice(a,b),ctx);
  ctx.restoreTimerSession();
  assert.equal(ctx.timerSessionId,'stable-id');
  assert.equal(ctx.timerLeft,1344);
