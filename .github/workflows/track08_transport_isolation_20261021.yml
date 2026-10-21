@@ -1,0 +1,27 @@
+name: Track08 strict Android CDP transport recovery unit acceptance
+on:
+  push:
+    branches:
+      - audit/track08-full-suite-transport-isolation-20261021
+permissions:
+  contents: read
+concurrency:
+  group: track08-transport-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Strict RED/GREEN Android transport classification
+        run: node --test tests/android_e2e_recovery/cdp_transport_recovery.test.cjs tests/android_e2e_recovery/cdp_touch_target.test.cjs tests/android_e2e_recovery/cdp_protocol.test.cjs
+      - name: Check exact source and report version
+        run: |
+          node --check tests/android_e2e_recovery/cdp_actions.cjs
+          git rev-parse HEAD
