@@ -85,3 +85,17 @@ test('track15-ui04 portable dashboard embeds Track 15 scripts under pinned CSP',
  assert.match(html,/id="track15-refresh"/);
  assert.doesNotMatch(html,/<script src="\.\/track15/);
 });
+
+test('track15-ui05 disposable mobile Chrome interaction harness is CSP-pinned and never shipped',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const {buildInteractiveQA}=require('../../tools/control_center/mobile_interaction_bundle.cjs');
+ const html=buildInteractiveQA();
+ const production=require('../../tools/control_center/build_portable.cjs').buildPortable();
+ assert.match(html,/id="track15-browser-qa"/);
+ assert.match(html,/sha256-/);
+ assert.match(html,/Track15 QA browser mock/);
+ assert.doesNotMatch(production,/id="track15-browser-qa"/);
+ const workflow=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/control_center_audit.yml'),'utf8');
+ assert.match(workflow,/mobile_interaction_bundle\.cjs/);
+ assert.match(workflow,/check_mobile_interaction_dom\.cjs/);
+});
