@@ -64,3 +64,16 @@ test('UI label icons and exported file format markers must survive draft transla
  p.strings['analytics.dictionary'].export='Hamisha CSV';
  assert.equal(draft.validateDraft(p,src).valid,true);
 });
+
+test('translator worksheet lists every key and every missing string without English filler or fake approval',()=>{
+ const w=draft.reviewWorksheet(sample(),source);
+ assert.equal(w.locale,'sw');
+ assert.equal(w.total,7);
+ assert.equal(w.translated,4);
+ assert.equal(w.items.length,7);
+ assert.equal(w.items.find(x=>x.key==='avg').candidate,null);
+ assert.equal(w.items.find(x=>x.key==='dateRange').english,'From {from} to {to}');
+ assert.equal(w.items.find(x=>x.key==='dateRange').candidate,'Kuanzia {from} hadi {to}');
+ assert.ok(w.items.every(x=>x.humanReview==='NOT_TESTED'));
+ assert.equal(w.approvedForRuntime,false);
+});
