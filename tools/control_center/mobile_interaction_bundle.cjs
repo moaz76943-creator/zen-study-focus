@@ -7,6 +7,7 @@ const ROOT=path.resolve(__dirname,'../..');
 const SCRIPT=String.raw`
 (async function(){
   /* Track15 QA browser mock: only active in this disposable GitHub CI HTML. */
+  if(document.readyState==='loading')await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
   const result=document.getElementById('track15-browser-qa');
   const REPO='/repos/moaz76943-creator/zen-study-focus';
   const A='a'.repeat(40),B='b'.repeat(40);
