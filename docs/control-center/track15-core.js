@@ -46,15 +46,27 @@
  function classifyJobs(jobs,runSha,expectedSha){
    const out=Object.fromEntries(FIELDS.map(k=>[k,NONE]));
    if(!validSha(runSha)||validSha(runSha)!==validSha(expectedSha)||!Array.isArray(jobs))return out;
-   const specs={node:/\bnode\b|\bjavascript\b/i,python:/\bpython\b|\bpytest\b/i,
-     chromium:/\bchromium\b|\bchrome\b|\bplaywright\b/i,
-     androidBuild:/\bgradle\b|\bassemble\b|\bandroid\s+(build|compile|jvm)\b/i};
-   for(const [field,matcher] of Object.entries(specs)){
-     const matches=jobs.filter(x=>x&&typeof x.name==='string'&&matcher.test(x.name));
-     if(!matches.length)continue;
-     const values=matches.map(statusOf);
-     out[field]=values.includes('FAIL')?'FAIL':values.includes('RUNNING')?'RUNNING':
-       values.includes(NONE)?NONE:'PASS';
+   const matches={
+     node:/(?:\\bnode\\b.*\\b(?:test|regression|qa|audit|check)\\b|\\b(?:test|regression|qa|audit|check)\\b.*\\bnode\\b|javascript.*(?:test|syntax)|control center regression tests|\\bunit tests\\b)/i,
+     python:/(?:\\bpython\\b.*\\b(?:test|regression|qa|audit|check)\\b|\\b(?:test|regression|qa|audit|check)\\b.*\\bpython\\b|\\bpytest\\b)/i,
+     chromium:/(?:\\b(?:chromium|chrome|playwright)\\b.*\\b(?:smoke|test|qa|dom|browser)\\b|\\b(?:smoke|test|qa|dom|browser)\\b.*\\b(?:chromium|chrome|playwright)\\b)/i,
+     androidBuild:/(?:\\bgradle\\b|\\bassemble\\b|\\bandroid\\s+(?:build|compile|jvm)\\b)/i
+   };
+   for(const [field,matcher] of Object.entries(matches)){
+     const results=[];
+     for(const job of jobs){
+       if(!job||typeof job.name!=='string')continue;
+       const steps=Array.isArray(job.steps)?job.steps:[];
+       const namedSteps=steps.filter(s=>typeof s?.name==='string'&&matcher.test(s.name));
+       if(namedSteps.length){
+         for(const step of namedSteps)results.push(statusOf(step));
+       }else if(matcher.test(job.name)){
+         results.push(statusOf(job));
+       }
+     }
+     if(!results.length)continue;
+     out[field]=results.includes('FAIL')?'FAIL':results.includes('RUNNING')?'RUNNING':
+       results.includes(NONE)?NONE:'PASS';
    }
    return out;
  }
