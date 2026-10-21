@@ -29,14 +29,14 @@ node tests/android_e2e_recovery/cdp_dom_smoke.cjs "$report/results.json"
 cdp_status=$?
 # PR #76 already ran the full 20-case UI suite; this new branch is a bounded
 # durability-only rerun. The 19 unexecuted UI cases stay explicitly NOT_TESTED.
-if [[ "${GITHUB_REF_NAME:-}" == "test/track07-00-durability-evidence-20261020" ]]; then
+if [[ "${GITHUB_REF_NAME:-}" == "test/track07-00-durability-evidence-20261020" || "${GITHUB_REF_NAME:-}" == "test/track02-v21-saf-evidence-20261021" || "${GITHUB_REF_NAME:-}" == "qa/track02-native-saf-android-20261021" ]]; then
   DF_ANDROID_CASES=preflight DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/cdp_actions.cjs "$report/dom-actions.json"
 else
   DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/cdp_actions.cjs "$report/dom-actions.json"
 fi
 action_status=$?
 durability_status=0
-if [[ "${GITHUB_REF_NAME:-}" == "test/track07-00-durability-evidence-20261020" || "${GITHUB_REF_NAME:-}" == "review/track07-09-phase3-candidate-20261020" ]]; then
+if [[ "${GITHUB_REF_NAME:-}" == "test/track07-00-durability-evidence-20261020" || "${GITHUB_REF_NAME:-}" == "review/track07-09-phase3-candidate-20261020" || "${GITHUB_REF_NAME:-}" == "test/track02-v21-saf-evidence-20261021" || "${GITHUB_REF_NAME:-}" == "qa/track02-native-saf-android-20261021" ]]; then
   # Native failure probes use only this freshly installed disposable emulator.
   DF_ANDROID_DISPOSABLE=1 node tests/android_e2e_recovery/track07_durability_android.cjs "$report/track07-durability.json"
   durability_status=$?
