@@ -37,6 +37,7 @@ jobs:
           node tools/localization_100/coverage.cjs --report > evidence/full-100-locale-coverage.json
           node tools/localization_100/native_copy.cjs --report > evidence/native-android-strings-needing-localization.json
           node tools/localization_100/native_drafts.cjs --report > evidence/native-android-language-candidates.json
+          node tools/localization_100/review_queue.cjs --out evidence/80-language-review-queue > evidence/reviewer-queue-index.json
           node tools/localization_100/drafts.cjs --worksheet sw > evidence/sw-translator-worksheet.json
       - uses: actions/upload-artifact@v4
         if: always()
