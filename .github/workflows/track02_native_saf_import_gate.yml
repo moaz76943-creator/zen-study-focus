@@ -1,0 +1,29 @@
+name: Track 02 Native SAF Import RED-GREEN
+on:
+  push:
+    branches: [fix/track02-native-saf-import-20261021]
+  pull_request:
+    paths:
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'tests/integration_recovery/native_saf_file_import.test.cjs'
+      - '.github/workflows/track02_native_saf_import_gate.yml'
+permissions:
+  contents: read
+jobs:
+  saf-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Print exact tested source SHA
+        run: git rev-parse HEAD
+      - name: Android SAF file importer regression
+        run: |
+          node --check tests/integration_recovery/native_saf_file_import.test.cjs
+          node --test tests/integration_recovery/native_saf_file_import.test.cjs
