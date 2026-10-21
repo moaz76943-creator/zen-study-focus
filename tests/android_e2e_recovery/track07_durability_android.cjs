@@ -306,6 +306,10 @@ async function main(){
         uiPackages:[...new Set([...xml.matchAll(/package="([^"]+)"/g)].map(m=>m[1]))].slice(0,6),
         visibleText:uiNodes(xml).map(n=>(n.match(/text="([^"]*)"/)||[])[1]).filter(Boolean).map(t=>t.slice(0,60)).slice(0,20)};
       report.saf_import_diagnostic=state;
+      try{
+        report.saf_import_trace=adb('shell','logcat','-d','-s','DF02_SAF_QA:D','*:S')
+          .split('\\n').filter(l=>l.includes('DF02_SAF_QA')).slice(-15).map(l=>l.slice(0,240));
+      }catch(_){}
       try{fs.writeFileSync((process.argv[2]||'track07-durability.json')+'.saf-diagnostic.json',JSON.stringify(state,null,2));}catch(_){}
       try{cp.execFileSync('adb',['-s','emulator-5554','exec-out','screencap','-p'],{timeout:15000,stdio:['ignore',fs.openSync((process.argv[2]||'track07-durability.json')+'.saf-screen.png','w'),'ignore']});}catch(_){}
       throw new Error('TRANSPORT: Restore confirm not observable; see sanitized SAF diagnostic. '+error.message);
