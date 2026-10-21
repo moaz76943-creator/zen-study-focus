@@ -123,3 +123,5 @@
 .track15-locales-details .track15-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:1000px){.track15-locales-details .track15-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.track15-locales-details .track15-grid{grid-template-columns:1fr}}
+
+#track15-refresh{min-height:44px;min-width:44px;touch-action:manipulation}
