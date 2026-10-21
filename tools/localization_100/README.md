@@ -4,11 +4,29 @@ This registry contains **100 target languages in total**: the 20 existing app la
 
 The existing app has multiple distinct dictionaries (main app, premium, tasks, notes, training, analytics, sounds, dialogs, Android UI). The 20 existing languages have known untranslated content; parity of a small language table is not UI completeness. Language population ranks differ across methods; the priority set covers widely spoken written languages and is not an audited exact world rank.
 
+## Evidence-based translation production
+
+A real first-pass **Swahili (`sw`) draft** exists at `drafts/sw.json`. It contains 67 candidate UI strings across Analytics, navigation, tasks, notes, sounds, timer, goals, calendar and settings. It is explicitly `DRAFT_TRANSLATION_NEEDS_NATIVE_REVIEW` and has **no runtime effect**. The CLI validates provided text against the exact current source inventory, catches stale sources, missing tokens, control characters, untranslated English copies, removed action icons, removed file-type abbreviations (CSV) and non-Western numeric glyphs. It reports coverage by catalog, always with `readyForRuntime:false`.
+
+For the other 79 planned locales, generate a source template using `guard.cjs --template <code>` and fill actual candidate translations only after reviewing the intended screen. The validator does **not** insert fallback English as translation, fake linguistic reviews, or modify the existing 20-language selector.
+
+### Review and promotion requirements
+
+1. Rebuild the canonical English source inventory and compare its SHA256. A changed meaning invalidates dependent candidate wording for review.
+2. Translate every screen in context: buttons, cancellation and confirmation, errors, plural forms, percentage, time, accessibility labels, Android dialogs and export descriptions. Preserve action meaning, icons and interpolation variables.
+3. Have a fluent/native reviewer independently verify against real screenshots, and attach source/review commit, reviewer notes, corrections and accepted exceptions. A self-declared `PASS` in JSON is not evidence.
+4. Independently test exact-head Android/WebView and 320–430px layouts, RTL/LTR, native touch, offline, restart, stored v21 data and real backup/SAF roundtrip. Generated numbers use 0–9; user-authored task/note strings remain unchanged.
+5. Only a separately reviewed integration PR can promote fully verified locales into production dictionaries and the language selector. Passing candidate lint does NOT permit activation.
+
+**Inventory limits:** currently 25 explicit catalogs / 472 keys; this is not a complete native/dynamic runtime screen inventory. A prior exact-head audit found 4,626 original-20 missing language/key pairs, 20 English-identical candidates and 94 unmarked static copy candidates. Those gaps are independent blockers.
+
+**Safety:** `validateDraft(...).valid` means only the provided candidate text is structurally safe. `readyForRuntime` and `approvedForMerge` always remain `false`. `approved/` self-attested bundles are rejected by the admission guard until separately verifiable human/Android evidence exists. No new language is enabled by this PR.
 ## Commands
 
 Run at repository root:
-- `node --test tests/localization_20/locale100_gate.test.cjs`
+- `node --test tests/localization_20/locale100_gate.test.cjs tests/localization_20/locale100_drafts.test.cjs`
 - `node tools/localization_100/guard.cjs --check`
+- `node tools/localization_100/drafts.cjs --report`
 - `node tools/localization_100/guard.cjs --template sw > /tmp/sw-draft.json`
 - `node tools/language_review/audit.cjs --out /tmp/df-locale-audit`
 
