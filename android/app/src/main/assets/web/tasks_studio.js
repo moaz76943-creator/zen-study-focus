@@ -199,7 +199,7 @@
      includeTrash:view==='trash'}).filter(t=>view==='trash'?!!t.deletedAt:!t.deletedAt);
      if(['today','upcoming','overdue','completed'].includes(view))active=C.taskSections({tasksList:active,cfg:state.cfg},currentDay())[view];
      if(sort==='title')active.sort((a,b)=>String(a.title).localeCompare(String(b.title))||a.id-b.id);
-     if(sort==='priority'){const ranks={urgent:4,high:3,medium:2,low:1};active.sort((a,b)=>(ranks[b.priority]||0)-(ranks[a.priority]||0)||a.date.localeCompare(b.date)||a.id-b.id);}
+     if(sort==='priority'){const ranks={urgent:4,high:3,medium:2,low:1};active.sort((a,b)=>(ranks[b.priority]||0)-(ranks[a.priority]||0)||C.compareTaskDates(a,b));}
     // Bound DOM creation only; storage, searches, totals and all matches remain complete.
     const show=(container,rows)=>{if(!rows.length)container.appendChild(el('p','df-muted',state.tasksList.length?l.empty:l.emptyFirst));else {
       rows.slice(0,visibleLimit).forEach(t=>container.appendChild(taskCard(t)));
