@@ -289,6 +289,7 @@ async function main(){
       const clicked=await evaluate("(()=>{const b=[...document.querySelectorAll('button')].find(x=>String(x.getAttribute('onclick')||'').includes('importBackupFromFile'));if(!b)return false;b.click();return true;})()");
       assert.equal(clicked,true,'Native import control missing');
       const picker=await nativeUI('ACTION_OPEN_DOCUMENT picker',xml=>xml);
+      assert.match(picker.xml,/documentsui/i,'Native DocumentsUI must own the file-selection screen');
       let selected=uiNodes(picker.xml).find(n=>n.includes('text="'+name+'"'));
       if(!selected){
         const downloads=uiNodes(picker.xml).find(n=>/text="Downloads"/.test(n));
