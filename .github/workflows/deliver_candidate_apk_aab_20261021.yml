@@ -1,0 +1,126 @@
+name: Deep Focus candidate APK and AAB exact-source download
+on:
+  push:
+    branches:
+      - delivery/latest-candidate-apk-aab-20261021
+
+permissions:
+  contents: read
+concurrency:
+  group: deep-focus-candidate-apk-aab-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Produce APK and AAB files from same reviewed candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      PINNED_APP_SHA: 86aa34c1755d3f90a784a765a89f83668723a4d8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fail closed on app code changes after pinned candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$PINNED_APP_SHA^{commit}"
+          test "$(git rev-parse "$PINNED_APP_SHA:android")" = "$(git rev-parse HEAD:android)"
+          test "$(git rev-parse "$PINNED_APP_SHA:tests")" = "$(git rev-parse HEAD:tests)"
+          test "$(git rev-parse "$PINNED_APP_SHA:tools")" = "$(git rev-parse HEAD:tools)"
+          mapfile -t changed < <(git diff --name-only "$PINNED_APP_SHA" HEAD)
+          for path in "${changed[@]}"; do
+            test "$path" = '.github/workflows/deliver_candidate_apk_aab_20261021.yml' || {
+              echo "Unexpected code change after reviewed SHA: $path"; exit 1;
+            }
+          done
+          echo "APPLICATION_SOURCE_SHA=$PINNED_APP_SHA"
+          echo "DELIVERY_WORKFLOW_COMMIT=$(git rev-parse HEAD)"
+          echo "ANDROID_SOURCE_TREE=$(git rev-parse HEAD:android)"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android platform 36, build-tools 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$sdkmanager"
+          "$sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build installable debug APK, debug AAB and unsigned release AAB
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Do not inject production signing secrets into an unapproved candidate.
+          gradle :app:assembleDebug :app:bundleDebug :app:bundleRelease --no-daemon
+      - name: Verify exact package, files and signatures; create honest distribution bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p delivery
+          apk=android/app/build/outputs/apk/debug/app-debug.apk
+          debug_aab=android/app/build/outputs/bundle/debug/app-debug.aab
+          release_aab=android/app/build/outputs/bundle/release/app-release.aab
+          test -s "$apk"
+          test -s "$debug_aab"
+          test -s "$release_aab"
+          aapt="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          apksigner="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          "$aapt" dump badging "$apk" > delivery/APK_PACKAGE_DETAILS.txt
+          grep -F "package: name='com.zenstudy.focus'" delivery/APK_PACKAGE_DETAILS.txt
+          grep -F "versionCode='21'" delivery/APK_PACKAGE_DETAILS.txt
+          "$apksigner" verify --print-certs "$apk" > delivery/APK_SIGNATURE.txt
+          # The debug bundle is expected to have a debug signing certificate.
+          jarsigner -verify "$debug_aab" > delivery/AAB_DEBUG_SIGNATURE.txt 2>&1
+          grep -q 'jar verified' delivery/AAB_DEBUG_SIGNATURE.txt
+          # Release candidate intentionally lacks approved production upload signing.
+          unzip -t "$release_aab" > delivery/AAB_RELEASE_ARCHIVE_CHECK.txt
+          cp "$apk" delivery/DeepFocus-Candidate21-Debug-Install.apk
+          cp "$debug_aab" delivery/DeepFocus-Candidate21-Debug-Signed.aab
+          cp "$release_aab" delivery/DeepFocus-Candidate21-UNSIGNED-Release.aab
+          git rev-parse HEAD > delivery/DELIVERY_WORKFLOW_SHA.txt
+          printf '%s\n' "$PINNED_APP_SHA" > delivery/APPLICATION_SOURCE_SHA.txt
+          git rev-parse "$PINNED_APP_SHA:android" > delivery/ANDROID_TREE_SHA.txt
+          sha256sum delivery/*.apk delivery/*.aab > delivery/SHA256SUMS.txt
+          cat > delivery/READ_ME_FIRST.txt <<'EOF'
+          Deep Focus: EXACT application source 86aa34c1755d3f90a784a765a89f83668723a4d8
+          Android app package: com.zenstudy.focus
+          Android versionCode: 21 / versionName: 21.0.0
+          RELEASE_APPROVED=NO
+
+          APK: DeepFocus-Candidate21-Debug-Install.apk
+          An Android DEBUG build, signed with an ephemeral debug certificate.
+          Installation may be blocked if an existing com.zenstudy.focus application
+          was signed by another key. Do NOT delete an existing original app or
+          its user data just to install this build.
+
+          AAB debug: DeepFocus-Candidate21-Debug-Signed.aab
+          Debug-signed for QA only. NOT valid as the final Google Play upload.
+
+          AAB release: DeepFocus-Candidate21-UNSIGNED-Release.aab
+          Optimized RELEASE-format bundle, deliberately UNSIGNED. It is NOT
+          ready for Google Play or redistribution until re-built and signed by
+          the approved upload key after all review gates pass.
+
+          This candidate does NOT certify all 20 nature tracks or 100 languages.
+          Do not merge or publish as production; security, true device, media
+          license, offline audio, and localization acceptance gates remain.
+          Android APK and both AABs were built from ONE app tree. Verify with
+          APPLICATION_SOURCE_SHA.txt, ANDROID_TREE_SHA.txt, and SHA256SUMS.txt.
+          EOF
+          echo 'BUILD_ARTIFACTS_PRESENT_AND_VERIFIED=PASS'
+          echo 'PRODUCTION_RELEASE_APPROVED=NO'
+      - name: Upload downloadable APK, AAB and checksums to GitHub Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Latest-Candidate-APK-AAB-86aa34c-20261021
+          path: delivery/
+          if-no-files-found: error
+          retention-days: 14
