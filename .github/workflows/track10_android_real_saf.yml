@@ -5,6 +5,8 @@ on:
     paths:
       - .github/workflows/track10_android_real_saf.yml
       - android/app/src/main/assets/web/analytics_studio.js
+      - android/app/src/main/assets/web/analytics_recovery_ui.js
+      - android/app/src/main/assets/web/integration_v22.js
       - tests/track10/**
   workflow_dispatch:
 permissions:
