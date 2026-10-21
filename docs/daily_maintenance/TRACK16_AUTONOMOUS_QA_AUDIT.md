@@ -27,6 +27,9 @@
 
 Directories above are relative to `tests/`. Canonical machine-readable mapping is `tools/daily_maintenance/agents.json`. No agent is allowed to mutate application code, user content, permissions, release state, secrets or another lane. `quality_agents.cjs` now rejects overlapping directory ownership. New `.test.cjs` suites are inventoried and must have exactly one reviewed owner. The intentionally failing media-provenance release gate is evaluated separately, never counted as a PASS.
 
+## Live PR #138 test-directory reconciliation
+At source SHA `cd1713b66fdf6ec11c5808834bf30f516ee8f6c5`, the live `tests/` tree has 121 Node `*.test.cjs` files. Before this manifest patch, **15 were unowned** (0 duplicated), spanning `android_dialogs`, `df4_browser`, `nature_library_v2`, and `track07_functional`. Four reviewed directory mappings now give these 15 files a single owner: `navigation` owns cross-feature interaction regression tests; `notes` owns modal styles; `nature_audio` owns Nature V2; and `navigation` owns native dialog handoff. A contract test asserts all 15 mappings. This fixes **inventory/ownership only**; cases have not automatically passed or been run on Android. Re-inventory on future PR heads and fail closed for new directories.
+
 ## Conflict and PR status (as checked, never auto-resolve)
 - #53 closed unmerged and superseded by merged #54; #55 closed unmerged: do not cherry-pick.
 - #60 and #62 merged hourly rotation and six-hour source evidence ledger; #63 merged AGENTS.md. Do not recreate them.
