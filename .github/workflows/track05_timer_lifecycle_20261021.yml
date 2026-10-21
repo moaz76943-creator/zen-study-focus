@@ -25,6 +25,8 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           node --check android/app/src/main/assets/web/app.js
+          node --check tests/track05_timer/live_android_cdp.cjs
+          bash -n tests/track05_timer/run_android_timer_qa.sh
       - name: Track05 real-function lifecycle regression and adjacent timer guards
         run: |
           node --test tests/track05_timer/tick_lifecycle.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/integration_quality/activity_domain_durable_ack.test.cjs
@@ -96,7 +98,7 @@ jobs:
           test -c /dev/kvm
           sudo chown "$(id -u):$(id -g)" /dev/kvm
           sudo chmod u+rw /dev/kvm
-      - name: Android API30 real Start Pause Resume Force-stop smoke
+      - name: Android API30 CDP + physical ADB native timer lifecycle
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
