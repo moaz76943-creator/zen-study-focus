@@ -89,11 +89,65 @@ const base=process.env.DF_COMPLETION_URL||'http://127.0.0.1:8770';
   assert.equal(localized.dir,'rtl');
   assert.doesNotMatch(localized.numbers,/[\u0660-\u0669\u06f0-\u06f9]/);
   results.push({case:'Arabic RTL goal rendering does not generate Arabic-Indic digits',status:'PASS'});
+  // Each locale's goal controls must work; missing translated copy is recorded as
+  // an explicit admission blocker rather than counting English fallback as localized.
+  const localeCoverage=[];
+  for(const lang of 'en ar es zh hi fr de ru pt ja id tr ko vi it bn ur fa pl nl'.split(' ')){
+   const state=await page.evaluate(lang=>{
+    applyLanguage(lang);
+    renderDailyGoals();
+    openDailyGoalsModal();
+    const heading=document.getElementById('dailyGoalsHeading')?.textContent;
+    const inputs=[...document.querySelectorAll('#goalsEditGrid input')];
+    const modal=document.getElementById('dailyGoalsModal');
+    const generated=document.getElementById('dailyGoalsRows').textContent;
+    const sourceCopy=Object.prototype.hasOwnProperty.call(GOAL_UI,lang);
+    closeModal('dailyGoalsModal');
+    return {lang,heading,dir:document.documentElement.dir,inputs:inputs.length,
+      nativeGoalTranslation:sourceCopy,
+      hasNonWesternGeneratedDigits:/[\u0660-\u0669\u06f0-\u06f9]/.test(generated),
+      dialogClosed:!modal.classList.contains('open')};
+   },lang);
+   assert.equal(state.inputs,8,'Four daily and four weekly goal inputs per locale: '+lang);
+   assert.equal(state.dialogClosed,true,'Goal dialog must close on '+lang);
+   assert.equal(state.hasNonWesternGeneratedDigits,false,'Goals must use 0-9 in '+lang);
+   assert.equal(state.dir,['ar','fa','ur'].includes(lang)?'rtl':'ltr','Wrong direction: '+lang);
+   localeCoverage.push(state);
+  }
+  results.push({case:'20 locales: functional goal forms, RTL/LTR, generated 0-9',status:'PASS'});
+  // All the browser fixture data stays within a newly created, disposable context.
+  const fixtureSave=await page.evaluate(()=>{
+   applyLanguage('en');
+   const day=localDateISO();
+   const record={id:'track09-persist-001',date:day,minutes:25,domain:'study',completed:true,mode:'focus'};
+   const next={...cfg,sessionHistory:[
+     record,{...record},{id:'track09-demo',date:day,minutes:100,domain:'study',source:'sample'}
+   ],dailyGoalsMin:{...(cfg.dailyGoalsMin||{}),study:30}};
+   const acknowledged=saveFortressData('zen_fortress_cfg_v21',next);
+   if(acknowledged===true)cfg=next;
+   return {acknowledged,day};
+  });
+  assert.equal(fixtureSave.acknowledged,true,'Disposable v21 session history fixture must persist');
+  await page.reload({waitUntil:'load'});
+  const restoration=await page.evaluate(()=>({
+   ids:cfg.sessionHistory?.map(x=>x.id),
+   actualMinutes:gsRecordedMinutes('study',localDateISO()),
+   progress:document.querySelector('#dailyGoalsRows .goal-study [role="progressbar"]')?.getAttribute('aria-valuenow'),
+   historicalKey:cfg.dailyGoalsMin?.historicDaily
+  }));
+  assert.deepEqual(restoration.ids,['track09-persist-001','track09-persist-001','track09-demo']);
+  assert.equal(restoration.actualMinutes,25,'One true session, no duplicate or demo minutes');
+  assert.equal(restoration.progress,'83','25 of 30 minutes must be 83%');
+  assert.equal(restoration.historicalKey,77,'Historical goal keys must survive full page reload');
+  results.push({case:'reload: original IDs, distinct sessions and actual goal percentage persist',status:'PASS'});
+  const untranslated=localeCoverage.filter(row=>!row.nativeGoalTranslation).map(row=>row.lang);
   assert.deepEqual(errors,[],'Chromium JS errors');
   fs.mkdirSync(output,{recursive:true});
   await page.locator('#navTimer').click();
   await page.screenshot({path:output+'/track09-goals-393.png'});
   fs.writeFileSync(output+'/track09-results.json',JSON.stringify({results,errors,disposableFixture:true,
+   localeCoverage,missingGoalTranslations:untranslated,
+   localeTranslationGate:untranslated.length?'BLOCKED':'SOURCE_COVERED',
    android:'NOT_TESTED',releaseApproved:false},null,2));
   console.log(JSON.stringify({status:'PASS',cases:results.length,errors:errors.length}));
  }finally{await browser.close();}
