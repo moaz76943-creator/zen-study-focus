@@ -146,6 +146,39 @@ async function main(){
   assert.equal(accepted.mode,'long','Accepted long button must change mode');
   assert.equal(accepted.running,false,'Accepted mode change must stop old session');
   results.push({operation:'real_long_button_accept',status:'PASS'});
+  // Real UI control acceptance for the CURRENT app source, beyond old Short/Long.
+  // No original user data: this instance is a disposable, separate QA package.
+  for(const [operation,trigger] of [
+    ['reset','resetTimerNow()'],
+    ['skip','skipTimerPhase()'],
+    ['sport_rest','startQuickSportRest(45)'],
+    ['custom_save',`(() => {
+        openCustomTimerModal();
+        document.getElementById('inpCustomMins').value='47';
+        document.getElementById('inpCustomTitle').value='Persist on Cancel';
+        return applyCustomTimerNow();
+      })()`]
+  ]){
+    // Establish active session outside the tested action and retain exact identity.
+    const current=(await evaluate('(() => {if(timerRunning)toggleTimerPlay();selectTimerMode(25,"focus",document.getElementById("modeFocusBtn"));toggleTimerPlay();return {session:timerSessionId,total:timerTotal,mode:currentTimerModeKey,running:timerRunning,label:customSessionLabel};})()')).value;
+    assert.equal(current.running,true,operation+' synthetic focus not running');
+    const changing=evaluate('(() => {'+trigger+';return {session:timerSessionId,total:timerTotal,mode:currentTimerModeKey,running:timerRunning,label:customSessionLabel,dialogOpen:document.getElementById("customTimerModal").classList.contains("open")};})()');
+    const hierarchy=await dialog('Deep Focus');
+    assert.doesNotMatch(hierarchy,/file:\/\/|تعرض الصفحة في|The page at/);
+    adb('shell','input','keyevent','KEYCODE_BACK');
+    const cancelled=(await changing).value;
+    assert.equal(cancelled.session,current.session,operation+' Cancel mutated session ID');
+    assert.equal(cancelled.mode,current.mode,operation+' Cancel changed timer mode');
+    assert.equal(cancelled.total,current.total,operation+' Cancel changed timer duration');
+    assert.equal(cancelled.running,true,operation+' Cancel paused current session');
+    assert.equal(cancelled.label,current.label,operation+' Cancel changed custom label');
+    if(operation==='custom_save')assert.equal(cancelled.dialogOpen,true,'Custom editor closed despite Cancel');
+    results.push({operation:'real_'+operation+'_cancel',status:'PASS',sameSession:true});
+    if(operation==='custom_save'){
+      // Prepare for next steps without calling guarded destructive operations.
+      await evaluate('(() => {document.getElementById("customTimerModal").classList.remove("open");return true;})()');
+    }
+  }
   const summary={results,source:'real Android WebView+native UIAutomator',release_approved:false};
   fs.writeFileSync(E+'/android-native-dialog-results.json',JSON.stringify(summary,null,2));
   console.log('ANDROID_P0_ALL_JS_DIALOGS_PASS',JSON.stringify(summary));
