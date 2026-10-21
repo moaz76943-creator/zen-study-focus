@@ -9,6 +9,11 @@ test "$(adb devices | awk '$1 ~ /^emulator-/ && $2=="device" {n++} END {print n+
 git rev-parse HEAD > "$report/source_sha.txt"
 sha256sum "$RUNNER_TEMP/track17-app-debug.apk" > "$report/apk.sha256"
 adb install "$RUNNER_TEMP/track17-app-debug.apk"
+# On API33+ a runtime notification dialog otherwise steals the measured launch.
+# This grant is restricted to the fresh CI emulator, never a user's phone.
+if [ "$ANDROID_TEST_API" -ge 33 ]; then
+  adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS
+fi
 adb shell pm path com.zenstudy.focus > "$report/installed.txt"
 adb shell svc wifi disable
 adb shell svc data disable
@@ -20,4 +25,4 @@ sleep 4
 pid="$(adb shell pidof com.zenstudy.focus | tr -d '\r' | awk '{print $1}')"
 test -n "$pid"
 adb forward tcp:9222 "localabstract:webview_devtools_remote_${pid}"
-node tests/performance_recovery/track17_webview_probe.cjs "$report/real-webview.json"
+TRACK17_SOURCE_SHA="$(git rev-parse HEAD)" node tests/performance_recovery/track17_webview_probe.cjs "$report/real-webview.json"
