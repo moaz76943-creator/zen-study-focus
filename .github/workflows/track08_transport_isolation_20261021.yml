@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '22'
       - name: Strict RED/GREEN Android transport classification
-        run: node --test tests/android_e2e_recovery/cdp_transport_recovery.test.cjs tests/android_e2e_recovery/cdp_touch_target.test.cjs tests/android_e2e_recovery/cdp_protocol.test.cjs
+        run: node --test tests/android_e2e_recovery/cdp_transport_recovery.test.cjs tests/android_e2e_recovery/cdp_touch_target.test.cjs tests/android_e2e_recovery/cdp_protocol.test.cjs tests/android_e2e_recovery/native_modal_cdp_handshake.test.cjs
       - name: Check exact source and report version
         run: |
           node --check tests/android_e2e_recovery/cdp_actions.cjs
