@@ -139,12 +139,17 @@ function stageImportFixtureInMediaStore(name,code){
  const collection='content://media/external/downloads';
  let uri=null;
  try{
-  const inserted=adb('shell','content','insert','--uri',collection,
+  // AOSP "content insert" intentionally prints NO inserted URI. Resolve the
+  // new row via MediaStore instead; do not assume empty stdout means failure.
+  adb('shell','content','insert','--uri',collection,
    '--bind','_display_name:s:'+name,'--bind','mime_type:s:text/plain',
    '--bind','relative_path:s:Download/');
-  const match=inserted.match(/content:\/\/media\/external\/downloads\/\d+/);
-  if(!match)throw Error('No MediaStore document URI returned');
-  uri=match[0];
+  const rows=adb('shell','content','query','--uri',collection,
+   '--projection','_id:_display_name',
+   '--where',"_display_name='"+name+"'");
+  const match=rows.match(/(?:^|[\s,])_id=(\d+)(?:,|\s|$)/);
+  if(!match)throw Error('MediaStore query cannot resolve the inserted QA document');
+  uri=collection+'/'+match[1];
   cp.execFileSync('adb',['-s','emulator-5554','shell','content','write','--uri',uri],
    {input:Buffer.from(code,'utf8'),timeout:20000,stdio:['pipe','pipe','pipe']});
   const bytes=cp.execFileSync('adb',['-s','emulator-5554','shell','content','read','--uri',uri],{timeout:20000});
