@@ -89,14 +89,27 @@ async function nativeUI(label,match,requireDocuments=true){
  throw Error('TRANSPORT: '+label+' not observable in genuine Android picker');
 }
 function findBackup(){
- for(const folder of ['/sdcard/Download','/sdcard/Documents']){
-  let out='';try{out=adb('shell','find',folder,'-maxdepth','2','-type','f');}catch(_){continue;}
+ // A real DocumentsUI Save can target the selected storage root as well as Downloads.
+ // This is a freshly created disposable emulator only; never inspect owner storage.
+ const roots=['/sdcard/Download','/sdcard/Documents','/sdcard'];
+ for(const folder of roots){
+  let out='';try{out=adb('shell','find',folder,'-maxdepth','3','-type','f');}catch(_){continue;}
   for(const row of out.split('\n')){
    const file=row.replaceAll('\r','').trim();
-   if(file.startsWith(folder+'/')&&/^deep-focus-\d{4}-\d{2}-\d{2}\.zenbackup$/.test(file.split('/').at(-1)))return file;
+   if((file===folder||file.startsWith(folder+'/'))&&/^deep-focus-\d{4}-\d{2}-\d{2}\.zenbackup$/.test(file.split('/').at(-1)))return file;
   }
  }
- throw Error('TRANSPORT: SAF export file not independently readable in disposable Downloads/Documents');
+ throw Error('TRANSPORT: SAF export file not yet independently readable under disposable shared storage');
+}
+async function waitForSavedBackup(){
+ // The ACTION_CREATE_DOCUMENT callback may complete after DocumentsUI closes.
+ // Never treat a Save tap or picker dismissal as evidence of bytes on disk.
+ for(let attempt=0;attempt<16;attempt++){
+  try{return findBackup();}catch(error){
+   if(attempt===15)throw error;
+   await pause(750);
+  }
+ }
 }
 
 async function main(){
@@ -203,8 +216,8 @@ async function main(){
    assert.equal(clicked,true,'Actual export button not found');
    try{
     const chooser=await nativeUI('ACTION_CREATE_DOCUMENT Save',xml=>uiNodes(xml).find(n=>/text="(?:SAVE|Save|حفظ)"/.test(n)||/resource-id="[^"]*:id\/action_menu_save"/.test(n)));
-    tapUI(chooser.item);await pause(1500);
-    const filename=findBackup(),disk=adb('shell','cat',filename);
+    tapUI(chooser.item);
+    const filename=await waitForSavedBackup(),disk=adb('shell','cat',filename);
     assert.equal(disk,code,'Android SAF file differs byte-for-byte from ZEN21:: backup');
     assert.deepEqual(await fixture(),before,'Export unexpectedly mutated live records');
     report.saved_saf_file=filename;
