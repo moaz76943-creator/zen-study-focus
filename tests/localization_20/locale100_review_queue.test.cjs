@@ -104,3 +104,25 @@ test('dynamic Android confirmation/notification copy is review work, never a tra
  assert.equal(q.approvedForRuntime,false);
  assert.ok(q.nativeDynamicSourceSha256);
 });
+
+test('sensitive delete/restore/confirmation/transfer language requires contextual review without automatic approval',()=>{
+ const source={'notes.studio':{
+  eraseAll:'Erase every saved note?',
+  clearHistory:'Clear all history',
+  linkedAccount:'Remove linked account',
+  confirmExit:'Are you sure?',
+  personalTransfer:'Share personal information',
+  ordinary:'Open calendar'
+ }};
+ const q=buildQueue({source,nativeRows:[],nativeDynamicRows:[],webDrafts:{},nativeDrafts:{}}).find(x=>x.locale==='ro');
+ const byKey=Object.fromEntries(q.items.map(x=>[x.key,x]));
+ for(const key of ['eraseAll','clearHistory','linkedAccount','confirmExit','personalTransfer']){
+  assert.equal(byKey[key].critical,true,key);
+  assert.notEqual(byKey[key].riskCategory,null,key);
+  assert.equal(byKey[key].candidate,null,key);
+  assert.equal(byKey[key].humanReview,'NOT_TESTED',key);
+ }
+ assert.equal(byKey.ordinary.critical,false);
+ assert.equal(byKey.ordinary.riskCategory,null);
+ assert.equal(q.approvedForRuntime,false);
+});
