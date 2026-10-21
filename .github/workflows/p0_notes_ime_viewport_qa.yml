@@ -1,0 +1,61 @@
+name: P0 Notes Android visualViewport keyboard recovery (browser QA)
+on:
+  push:
+    branches: [fix/p0-note-editor-visual-viewport-20261021]
+permissions:
+  contents: read
+concurrency:
+  group: df-note-ime-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  note-ime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Strict regression against markup and visual-viewport listeners
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          node --check android/app/src/main/assets/web/notes_editor_ui.js
+          node --check tests/df4_browser/note_ime_viewport_browser.cjs
+          node --test tests/df4_browser/note_modal_style.test.cjs tests/android_e2e_recovery/note_keyboard_dismiss.test.cjs
+          node tests/smoke_app.cjs
+      - name: Use actual Chromium hit testing (not mocked clicks)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Start offline app assets on loopback only
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/note-http.log" 2>&1 &
+          for n in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Verify note body and Save remain actually hittable within 378px visible viewport
+        shell: bash
+        env:
+          DF_NOTE_IME_URL: http://127.0.0.1:8770/index.html
+          DF_NOTE_IME_EVIDENCE: ${{ runner.temp }}/df-note-ime
+        run: |
+          node tests/df4_browser/note_ime_viewport_browser.cjs
+      - name: Preserve FAIL or PASS evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Note-IME-${{ github.sha }}
+          path: ${{ runner.temp }}/df-note-ime/
+          retention-days: 7
+          if-no-files-found: warn

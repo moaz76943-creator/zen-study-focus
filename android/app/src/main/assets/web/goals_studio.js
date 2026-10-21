@@ -162,7 +162,13 @@ function saveDailyGoals(){
  }
  // Stage the new preferences: an Android native ACK can reject the write.
  // Keep the active cfg untouched, and the modal open, until durable success.
- const next={...cfg,weeklyGoalsMin:weeklyValues,dailyGoalsMin:values};
+ const previousDaily=cfg.dailyGoalsMin && typeof cfg.dailyGoalsMin==='object' && !Array.isArray(cfg.dailyGoalsMin)
+  ?cfg.dailyGoalsMin:{};
+ const previousWeekly=cfg.weeklyGoalsMin && typeof cfg.weeklyGoalsMin==='object' && !Array.isArray(cfg.weeklyGoalsMin)
+  ?cfg.weeklyGoalsMin:{};
+ const dailyToSave={...previousDaily,...values};
+ const weeklyToSave={...previousWeekly,...weeklyValues};
+ const next={...cfg,weeklyGoalsMin:weeklyToSave,dailyGoalsMin:dailyToSave};
  try {
   if(saveFortressData('zen_fortress_cfg_v21',next)!==true)
    throw new Error('GOAL_SAVE_NOT_ACKNOWLEDGED');
@@ -170,8 +176,8 @@ function saveDailyGoals(){
   showToast(gsText('saveFailed'));
   return false;
  }
- cfg.weeklyGoalsMin=weeklyValues;
- cfg.dailyGoalsMin=values;
+ cfg.weeklyGoalsMin=weeklyToSave;
+ cfg.dailyGoalsMin=dailyToSave;
  closeModal('dailyGoalsModal');renderDailyGoals();showToast(gsText('save'));
  return true;
 }

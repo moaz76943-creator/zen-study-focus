@@ -1,0 +1,38 @@
+{
+  "title": "Deep Focus — batch 3 isolated source-convergence manifest (NOT release approval)",
+  "date": "2026-10-21",
+  "integration_base": {
+    "pr": 161,
+    "sha": "1b50094f5c2f59787292cf7ad387da59738d2449",
+    "contains_staged_pr": 145
+  },
+  "source_commits": {
+    "153": "d69c320bf4383f977879b8a8f52f941f83fd0c29",
+    "154": "ed9497da3ff20aed2e263abc97d365ffb5745a3a",
+    "158": "38185840363d54f3a86d44cffb483c4a90c35693",
+    "160": "75bb479cfbc5f731cf32efdd5f8cefa9f32818cb"
+  },
+  "path_blobs": {
+    "android/app/src/main/assets/web/goals_studio.js": "a23c0c067b4bda9ab6d3598b3359b7bd0102fc3e",
+    "android/app/src/main/assets/web/quick_training.js": "bbd717e43df0dff8065e0c59f65fa052281e4f6e",
+    "tests/focus_workflows/test_focus_workflows.cjs": "4dfe53b119d886c87df11cfd42a83b2d3bc94741",
+    "tests/focus_workflows/track09_chromium.cjs": "af2c9445b31b54a8e7d141d1792eaedb083d8753",
+    "android/app/src/main/assets/web/analytics_studio.js": "808442a3d114870821b3f3201a55e53d1f297153",
+    "tests/track07_functional/analytics_export_range_lifecycle.test.cjs": "ebd8c696a7c0aed3636a80b51d798b82294b4f5a",
+    "tests/track10/analytics_presets_browser.cjs": "4e4889747be6348d3c22939965a981e459d884c1",
+    "android/app/src/main/assets/web/app.js": "0f4ec2ea86aa089a1645fc95f99da5e6bdd3d440",
+    "tests/track05_timer/tick_lifecycle.test.cjs": "d655bb6bc43837e133e29a76a1fa0606565aab93",
+    "android/app/src/main/assets/web/tasks_core_v21.js": "c8927ecc2ef2358eba24670b11d70f5a3b31666b",
+    "android/app/src/main/assets/web/tasks_studio.js": "4f9a630a391add039c46dba360d5f0a1e312e1dd",
+    "tests/tasks_core/tasks_core.test.cjs": "182faeaad574debbe86e67a794062b4d1393b47f",
+    "tests/tasks_core/tasks_studio.test.cjs": "2b2ee3b6ad1c3b8e7dea25fdf9c20cafca7c6003",
+    "tests/tasks_core/tasks_chromium.cjs": "82ca23e5f962796a87c5e7d394dd2936d93d869c"
+  },
+  "exclusion_notes": [
+    "PR155 notes_editor_ui.js overlaps PR161; do not overwrite, requires conflict-resolved semantic merge",
+    "PR152/159 Android SAF tests/source are not integrated or certified",
+    "PR162 localization100 overlaps PR145 review_queue; independent review needed",
+    "Real Android ACK/SAF/IME, audio rights and background playback, security scanning, full 20-locale UI and release signing are NOT_TESTED/BLOCKED"
+  ],
+  "release_approved": false
+}

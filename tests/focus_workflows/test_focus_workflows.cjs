@@ -213,3 +213,113 @@ test('07-02 rejected or throwing timer settings persistence does not change any 
     assert.ok(!messages.includes('Settings saved'));
   }
 });
+
+
+
+test('TRACK09 RED: editing goals preserves unknown legacy goal keys and actual session IDs',()=>{
+  const originalHistory=[{id:'legacy-900',date:'2026-10-20',minutes:12,domain:'study'}];
+  const x=load('goals_studio.js',{cfg:{
+    dailyGoalsMin:{study:15,legacyMilestone:77},
+    weeklyGoalsMin:{study:90,legacyWeekly:333},
+    sessionHistory:originalHistory
+  }});
+  x.eval('openDailyGoalsModal()');
+  for(const domain of ['study','read','sport','work']){
+    x.document.getElementById('goalInput-'+domain).value='30';
+    x.document.getElementById('goalWeeklyInput-'+domain).value='180';
+  }
+  assert.equal(x.eval('saveDailyGoals()'),true);
+  assert.equal(x.cfg.dailyGoalsMin.study,30);
+  assert.equal(x.cfg.weeklyGoalsMin.study,180);
+  assert.equal(x.cfg.dailyGoalsMin.legacyMilestone,77,'Unknown daily goals must survive edits');
+  assert.equal(x.cfg.weeklyGoalsMin.legacyWeekly,333,'Unknown weekly goals must survive edits');
+  assert.equal(x.cfg.sessionHistory,originalHistory,'No session history replacement');
+  assert.equal(x.cfg.sessionHistory[0].id,'legacy-900');
+});
+
+test('TRACK09 RED: failed quick training domain save must not start, pause, or announce success',()=>{
+  for(const reject of [()=>false,()=>{throw new Error('NATIVE_DURABLE_ACK_FAILED');}]){
+    const messages=[];
+    const x=load('quick_training.js',{
+      saveFortressData:(key)=>key==='zen_fortress_cfg_v21'?reject():true,
+      showToast:message=>messages.push(message),
+      cfg:{domain:'study'}
+    });
+    x.eval('applyQuickTrainingPreset("work")');
+    x.eval('startQuickTraining()');
+    assert.equal(x.eval('quickTraining'),null,'Rejected save must not activate training');
+    assert.equal(x.cfg.domain,'study','Rejected save must not switch the activity');
+    assert.equal(x.mock.selectCalls,0,'Rejected save must not reset timer mode');
+    assert.equal(x.mock.toggleCalls,0,'Rejected save must not start or pause timer');
+    assert.ok(!messages.includes('started'),'Never show a started message after a failed save');
+    assert.ok(messages.length>0,'Rejected save must be visible to the user');
+  }
+});
+
+test('TRACK09 RED: home agenda displays user-authored task text without numeral rewriting',()=>{
+  const tasks=[];
+  const originalTitle='خطة ۲۰۲۶ - المرحلة ٢';
+  const originalTime='٠٩:٣٠ — ۱۱:۰۰';
+  const x=load('quick_training.js',{
+    cfg:{lang:'ar'},tasksList:tasks,getCatLabel:()=> 'دراسة'
+  });
+  tasks.push({id:801,date:x.mock.localDateISO(),title:originalTitle,time:originalTime,
+    catKey:'study',done:false,isStarter:false});
+  x.eval('renderTodayPlan()');
+  const card=x.document.getElementById('todayPlanPreview').children[0];
+  const link=card.children[1];
+  assert.equal(link.children[0].textContent,originalTitle,'Keep authored title exact');
+  assert.ok(link.children[1].textContent.includes(originalTime),'Keep authored time exact');
+});
+
+
+test('TRACK09 RED: failed quick exercise writes retain editable input and exercise list',()=>{
+  for(const reject of [()=>false,()=>{throw new Error('quota or native refusal');}]){
+    const notifications=[];
+    const x=load('quick_training.js',{
+      saveFortressData:reject,showToast:t=>notifications.push(t)
+    });
+    x.document.getElementById('qtNewExercise').value='Stretch';
+    x.eval('addQuickExercise()');
+    assert.equal(x.eval('quickExercises.length'),0,'Unsaved exercise cannot appear committed');
+    assert.equal(x.document.getElementById('qtNewExercise').value,'Stretch','Input draft must be retained');
+    x.eval('quickExercises=["Stretch","Read"]');
+    x.eval('removeQuickExercise(0)');
+    assert.equal(x.eval('quickExercises.join(",")'),'Stretch,Read','Rejected removal must restore old list');
+    x.eval('removeQuickExercise(-1)');
+    assert.equal(x.eval('quickExercises.join(",")'),'Stretch,Read','Invalid index must never delete last element');
+    assert.ok(notifications.length>=2,'Rejected actions require visible feedback');
+  }
+});
+
+test('TRACK09 RED: failed quick preset persistence must restore visible values and domain',()=>{
+  const notices=[];
+  const x=load('quick_training.js',{
+    saveFortressData:()=>false,showToast:t=>notices.push(t)
+  });
+  x.document.getElementById('qtSets').value='3';
+  x.document.getElementById('qtWork').value='05:00';
+  x.document.getElementById('qtRest').value='01:00';
+  const previous=x.eval('quickPresetDomain');
+  x.eval('applyQuickTrainingPreset("work")');
+  assert.equal(x.eval('quickPresetDomain'),previous);
+  assert.equal(x.document.getElementById('qtSets').value,'3');
+  assert.equal(x.document.getElementById('qtWork').value,'05:00');
+  assert.equal(x.document.getElementById('qtRest').value,'01:00');
+  assert.ok(notices.length>0,'Preset failure must explain rejection');
+});
+
+test('TRACK09 RED: optional training-preset save failure cannot prevent timer startup or lie about preference save',()=>{
+  const notices=[];
+  const x=load('quick_training.js',{
+    saveFortressData:key=>key==='zen_quick_training_cfg_v21'?false:true,
+    showToast:t=>notices.push(t)
+  });
+  x.document.getElementById('qtSets').value='2';
+  x.document.getElementById('qtWork').value='00:20';
+  x.document.getElementById('qtRest').value='00:10';
+  x.eval('startQuickTraining()');
+  assert.equal(x.eval('quickTraining.active'),true);
+  assert.equal(x.mock.toggleCalls,1,'Activated training must begin even when optional preset save fails');
+  assert.ok(notices.some(t=>/save|حفظ/i.test(t)),'User must know optional preset failed');
+});
