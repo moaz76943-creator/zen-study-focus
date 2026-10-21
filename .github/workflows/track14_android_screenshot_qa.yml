@@ -42,7 +42,7 @@ jobs:
           target: google_apis
           profile: pixel_4
           disable-animations: true
-          emulator-options: -no-window -no-snapshot -noaudio -no-boot-anim -gpu swiftshader_indirect
+          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect
           script: bash tests/white_premium_qa/track14_android_snapshots.sh
       - name: Pin exact source and limitations
         if: always()
