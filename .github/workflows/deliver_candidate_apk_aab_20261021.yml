@@ -80,10 +80,20 @@ jobs:
           # AGP builds AABs unsigned by default even for debug; sign the QA
           # bundle explicitly using only this run's disposable Android Debug key.
           # NEVER use upload/production signing secrets in this delivery job.
-          test -s "$HOME/.android/debug.keystore"
-          jarsigner -keystore "$HOME/.android/debug.keystore" \
-            -storepass android -keypass android "$debug_aab" androiddebugkey \
-            > delivery/AAB_DEBUG_SIGNING.txt 2>&1
+          # Ubuntu runners do not guarantee a debug keystore in $HOME.
+          # Create a one-run QA signing key; this is NEVER a Play upload key.
+          qa_keystore="$RUNNER_TEMP/df-candidate-qa-only.jks"
+          qa_pass="$(openssl rand -hex 16)"
+          keytool -genkeypair -noprompt -storetype PKCS12 \
+            -keystore "$qa_keystore" -alias qa-only \
+            -keyalg RSA -keysize 3072 -validity 10 \
+            -storepass "$qa_pass" -keypass "$qa_pass" \
+            -dname 'CN=Deep Focus Disposable QA, O=Test, C=US' \
+            > delivery/AAB_DEBUG_KEY_GENERATION.txt 2>&1
+          jarsigner -keystore "$qa_keystore" \
+            -storepass "$qa_pass" -keypass "$qa_pass" \
+            "$debug_aab" qa-only > delivery/AAB_DEBUG_SIGNING.txt 2>&1
+          unset qa_pass
           jarsigner -verify "$debug_aab" 2>&1 | tee delivery/AAB_DEBUG_SIGNATURE.txt
           grep -Fq 'jar verified' delivery/AAB_DEBUG_SIGNATURE.txt || { echo 'Debug AAB is not signed correctly' >&2; exit 1; }
           # Release candidate intentionally lacks approved production upload signing.
