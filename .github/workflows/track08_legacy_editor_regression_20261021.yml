@@ -1,0 +1,42 @@
+name: Track 08 legacy-editor RED GREEN regression
+on:
+  push:
+    branches:
+      - fix/track08-legacy-editor-preserve-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track08-legacy-editor-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  tasks-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact SHA and task editor syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          node --check android/app/src/main/assets/web/tasks_studio.js
+          node --check android/app/src/main/assets/web/tasks_core_v21.js
+          node --check tests/tasks_core/tasks_studio.test.cjs
+      - name: Focused Tasks Studio and v21 source tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test --test-reporter=tap tests/tasks_core/*.test.cjs
+      - name: Smoke and locale safety
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/smoke_app.cjs
+          node tests/validate_locales.cjs
