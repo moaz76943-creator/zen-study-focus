@@ -117,7 +117,7 @@ jobs:
         run: |
           git rev-parse HEAD > "$RUNNER_TEMP/track05-android/source_sha.txt"
           printf '%s\n' 'RELEASE_APPROVED=NO' 'Android smoke does not certify 20-language native dialogs, DND, or SAF.' > "$RUNNER_TEMP/track05-android/limits.txt"
-          adb logcat -d -s AndroidRuntime chromium > "$RUNNER_TEMP/track05-android/logcat.txt" 2>/dev/null || true
+          timeout 15s adb logcat -d -s AndroidRuntime chromium > "$RUNNER_TEMP/track05-android/logcat.txt" 2>/dev/null || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
