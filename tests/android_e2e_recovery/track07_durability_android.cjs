@@ -236,12 +236,16 @@ async function main(){
     // Independent disposable fixture, not a claimed SAF export.
     const before=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
     assert.ok(code.startsWith('ZEN21::'),'Prepared fixture is not v21');
-    const name='deep-focus-qa-native-import.zenbackup';
+    const name='deep-focus-qa-native-import.txt'; // DocumentsUI text/plain MIME is reliably discoverable
     const host=require('node:os').tmpdir()+'/df-saf-import-'+process.pid+'.zenbackup';
     const device='/sdcard/Download/'+name;
     try{
       fs.writeFileSync(host,code,'utf8');
       cp.execFileSync('adb',['-s','emulator-5554','push',host,device],{timeout:20000,stdio:'ignore'});
+      // ADB push bypasses MediaStore; request a scan so DocumentsUI's
+      // text/plain filter can display this fixture (real SAF selection still required).
+      try{adb('shell','am','broadcast','-a','android.intent.action.MEDIA_SCANNER_SCAN_FILE','-d','file://'+device);}catch(_){}
+      await pause(1200);
       assert.equal(await write('after.notesList.find(n=>n.title==="DF07 isolated durability note").body="DF02 temporary edit before native file import";after.cfg.df07Seq=782'),true);
       assert.notDeepEqual(await fixture(),before);
       const clicked=await evaluate("(()=>{const b=[...document.querySelectorAll('button')].find(x=>String(x.getAttribute('onclick')||'').includes('importBackupFromFile'));if(!b)return false;b.click();return true;})()");
