@@ -50,7 +50,7 @@ function scanDynamicJava(source,relativePath){
   throw Error('INVALID_NATIVE_SOURCE');
  const kinds={setMessage:'dynamicDialogMessage',setContentText:'dynamicNotificationBody',
   setContentTitle:'dynamicNotificationTitle'};
- const rows=[],seen=new Set(),calls=/\\.(setMessage|setContentText|setContentTitle)\\s*\\(/g;
+ const rows=[],seen=new Set(),calls=/\.(setMessage|setContentText|setContentTitle)\s*\(/g;
  let match;
  while((match=calls.exec(source))!==null){
   let i=calls.lastIndex,depth=1,quote=null,escaped=false;
@@ -58,7 +58,7 @@ function scanDynamicJava(source,relativePath){
    const ch=source[i];
    if(quote){
     if(escaped)escaped=false;
-    else if(ch==='\\\\')escaped=true;
+    else if(ch==='\\')escaped=true;
     else if(ch===quote)quote=null;
    }else if(ch==='"'||ch==="'")quote=ch;
    else if(ch==='(')depth++;
@@ -67,8 +67,8 @@ function scanDynamicJava(source,relativePath){
   if(depth)throw Error('UNBALANCED_NATIVE_UI_CALL:'+relativePath+':'+match[1]);
   const expression=source.slice(calls.lastIndex,i-1).trim();
   if(!expression||expression.length>500)throw Error('UNREVIEWABLE_DYNAMIC_SOURCE:'+relativePath);
-  if(/^"(?:\\\\.|[^"\\\\])*"$/s.test(expression)||/^android\\.R\\.string\\.\\w+$/.test(expression))continue;
-  const line=source.slice(0,match.index).split('\\n').length,kind=kinds[match[1]];
+  if(/^"(?:\\.|[^"\\])*"$/s.test(expression)||/^android\.R\.string\.\w+$/.test(expression))continue;
+  const line=source.slice(0,match.index).split('\n').length,kind=kinds[match[1]];
   const key=[relativePath,kind,expression].join('|');
   if(seen.has(key))continue;
   seen.add(key);
