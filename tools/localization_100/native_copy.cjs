@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 // Native Android UI discovery only. Must NOT rewrite Java or stored content.
-const fs=require('node:fs'),path=require('node:path');
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const ROOT=path.resolve(__dirname,'../../android/app/src/main/java/com/zenstudy/focus');
 const FILES=['MainActivity.java','FocusTimerService.java','FocusAppWebChromeClient.java'];
 const PATTERNS=[
@@ -27,6 +27,11 @@ function scanJava(source,relativePath){
  }
  return items.sort((a,b)=>a.line-b.line||a.text.localeCompare(b.text));
 }
+// Stable across file-line movement, not across changed literal, callsite type or source path.
+function inventoryHash(rows){
+ const items=[...new Set(rows.map(r=>[r.path,r.kind,r.text].join('\\u0000')))].sort();
+ return crypto.createHash('sha256').update(JSON.stringify(items)).digest('hex');
+}
 function report(){
  const uiStrings=[];
  for(const p of FILES){
@@ -36,7 +41,7 @@ function report(){
  }
  if(uiStrings.length<8)throw Error('NATIVE_UI_DISCOVERY_SUSPICIOUSLY_EMPTY');
  return {schema_version:1,source:'Exact checked-out Java source, heuristic UI callsite scanner',
-  files:FILES.length,candidates:uiStrings.length,uiStrings,
+  files:FILES.length,candidates:uiStrings.length,inventorySha256:inventoryHash(uiStrings),uiStrings,
   localizedIn100:false,reviewed:false,limitations:[
    'This inventory is source-level and excludes JS-supplied dynamic messages',
    'OS-managed android.R.string dialogs already localize separately',
@@ -50,4 +55,4 @@ if(require.main===module){
   console.log(JSON.stringify(report(),null,2));
  }catch(e){console.error('NATIVE_COPY_DISCOVERY_FAILED:',e.message);process.exitCode=1;}
 }
-module.exports={scanJava,report};
+module.exports={scanJava,inventoryHash,report};
