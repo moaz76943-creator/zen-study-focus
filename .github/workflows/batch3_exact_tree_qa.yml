@@ -82,7 +82,7 @@ jobs:
           (cd android/app/src/main/assets/web && python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/web.log" 2>&1) &
           for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
           exit 1
-      - name: Real Chromium: goals, Analytics, legacy tasks, note viewport
+      - name: "Real Chromium: goals, Analytics, legacy tasks, note viewport"
         shell: bash
         env:
           DF_COMPLETION_URL: http://127.0.0.1:8770
