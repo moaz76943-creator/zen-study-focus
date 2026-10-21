@@ -100,6 +100,30 @@ jobs:
             done
           fi
 
+      - name: Real Chromium Track 15 button and navigation interaction QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          browser="$(command -v google-chrome || command -v chromium || true)"
+          if [[ -z "$browser" ]]; then
+            echo "Chrome simulated phone-click QA: **NOT_TESTED** (no browser installed)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            node tools/control_center/mobile_interaction_bundle.cjs dist/track15-interactive-qa.html
+            mkdir -p dist/mobile_chrome_qa
+            for width in 320 360 393 430; do
+              timeout 40s "$browser" \
+                --headless --no-sandbox --disable-dev-shm-usage --disable-gpu \
+                --no-first-run --disable-extensions --disable-background-networking \
+                --force-device-scale-factor=1 --window-size="${width},760" \
+                --virtual-time-budget=5000 --dump-dom \
+                "file://${GITHUB_WORKSPACE}/dist/track15-interactive-qa.html" \
+                > "dist/mobile_chrome_qa/interactions_${width}.html" \
+                2> "dist/mobile_chrome_qa/interactions_stderr_${width}.log"
+              node tools/control_center/check_mobile_interaction_dom.cjs "dist/mobile_chrome_qa/interactions_${width}.html"
+              echo "Chrome simulated phone-width ${width}px read-only button/navigation QA: **PASS** (not physical touch)" >> "$GITHUB_STEP_SUMMARY"
+            done
+          fi
+
       - name: Upload mobile-sized Chromium DOM evidence
         if: always()
         uses: actions/upload-artifact@v4
