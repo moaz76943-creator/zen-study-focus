@@ -6,6 +6,7 @@ on:
       - main
       - fix/v21-safe-release-recovery-20261018
       - integration/deep-focus-recovery-00-final-20261019
+      - feature/control-center-ops-20261019
     paths:
       - ".github/workflows/control_center_audit.yml"
       - "tools/control_center/**"
