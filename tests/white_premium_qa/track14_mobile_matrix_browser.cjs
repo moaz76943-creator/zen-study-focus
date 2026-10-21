@@ -44,7 +44,7 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
             const hero=bounds(document.getElementById('focusHeroCard'));
 
             const labels=ids.map(id=>{
-              const el=document.querySelector('#'+id+' span[data-i18n]');
+              const el=document.querySelector('#'+id+' span[data-i18n],#'+id+' #navTrainingText');
               const rect=bounds(el),style=el?getComputedStyle(el):null;
               return {id,text:el?.textContent?.trim()||'',rect,
                 clipPath:style?.clipPath||'',lineHeight:style?parseFloat(style.lineHeight):0};

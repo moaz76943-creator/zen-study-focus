@@ -390,10 +390,10 @@ body.df-v22.df-recovery10 #noteModal .ns-editor > .modal-actions > button {
     padding-block-start: clamp(48px, 3rem, 96px);
   }
   body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
-    position: static;
+    position: static !important;
     justify-content: center;
   }
-  body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn span[data-i18n] {
+  body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn :is(span[data-i18n],#navTrainingText) {
     position: absolute;
     inline-size: 1px;
     block-size: 1px;
@@ -404,7 +404,7 @@ body.df-v22.df-recovery10 #noteModal .ns-editor > .modal-actions > button {
     white-space: nowrap;
     clip-path: inset(50%);
   }
-  body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn:is(.active,:focus-visible) span[data-i18n] {
+  body.df-v22.df-recovery10:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn:is(.active,:focus-visible) :is(span[data-i18n],#navTrainingText) {
     inset-block-start: 6px;
     inset-inline-start: 10px;
     inset-inline-end: 10px;
