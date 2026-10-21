@@ -36,6 +36,20 @@ jobs:
             git show "$QA_REF:tests/track08/$name" > "tests/track08/$name"
             test -s "tests/track08/$name"
           done
+          # Preserve BOTH native scenarios: run Analytics SAF first so a separate
+          # Timer dialog regression cannot prevent gathering genuine CSV evidence.
+          # If Timer dialogs fail afterwards the overall Android job still FAILS.
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tests/track08/phase3_side_by_side_qa.sh')
+          old=p.read_text()
+          a='node tests/track08/native_js_dialog_android_probe.cjs "$E"'
+          b='node tests/track08/qa_real_analytics_saf.cjs "$E"'
+          assert old.count(a)==1 and old.count(b)==1
+          assert old.index(a)<old.index(b)
+          p.write_text(old.replace(a,'__TRACK10_NATIVE_DIALOG_STEP__').replace(b,a).replace('__TRACK10_NATIVE_DIALOG_STEP__',b))
+          print('QA-only test ordering: real SAF first, native dialog still required and FAIL-CLOSED')
+          PY
           sha256sum tests/track08/* > "$RUNNER_TEMP/track10-android/qa-harness-file-hashes.txt"
           # All production source comes from THIS branch; older QA harness is test-only.
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
