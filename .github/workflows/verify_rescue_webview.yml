@@ -41,7 +41,7 @@ jobs:
         run: |
           node --check tests/android_e2e_recovery/cdp_dom_smoke.cjs
           node --check tests/android_e2e_recovery/track07_durability_android.cjs
-          node --test tests/android_e2e_recovery/cdp_debug_gate.test.cjs tests/android_e2e_recovery/android_ui_hierarchy.test.cjs tests/android_e2e_recovery/cdp_transport_recovery.test.cjs tests/android_e2e_recovery/native_modal_cdp_handshake.test.cjs
+          node --test tests/android_e2e_recovery/cdp_debug_gate.test.cjs tests/android_e2e_recovery/android_ui_hierarchy.test.cjs tests/android_e2e_recovery/cdp_transport_recovery.test.cjs tests/android_e2e_recovery/native_modal_cdp_handshake.test.cjs tests/android_e2e_recovery/native_confirm_button.test.cjs
           git rev-parse HEAD
       - uses: actions/setup-java@v4
         with:
