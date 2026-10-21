@@ -12,7 +12,7 @@ test('CDP request is issued without awaiting before native Android acknowledgeme
  const segment=code.slice(code.indexOf('async function acceptNativeConfirm'),code.indexOf('async function check'));
  assert.match(segment,/const outstanding\s*=\s*evaluate\(expression\)/);
  assert.match(segment,/uiautomator/);
- assert.match(segment,/parseNativePromptButton\(xml\)/);
+ assert.match(segment,/parseNativeConfirmButton\(xml\)/);
  assert.match(segment,/adb\(['"]shell['"],['"]input['"],['"]tap['"]/);
  assert.match(segment,/await outstanding/);
  assert.match(segment,/Deep Focus/);
