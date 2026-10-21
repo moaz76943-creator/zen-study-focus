@@ -29,6 +29,10 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
             document.body.classList.remove('deep-lockdown');
             document.querySelector('#navTimer')?.click();
           },{dir,scale});
+
+          // Switching RTL/LTR animates nav transform; measure after settling.
+          // Screenshot with animations disabled completes finite CSS transitions.
+          await page.screenshot({path:path.join(output,'screen-'+tag+'.png'),animations:'disabled'});
           const measured=await page.evaluate(ids=>{
             const bounds=e=>{const r=e?.getBoundingClientRect();return r&&{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
             const nav=bounds(document.querySelector('.bottom-nav-capsule'));
@@ -66,7 +70,7 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
             await page.screenshot({path:path.join(output,'comparison-simulated-legacy-320-'+dir+'-200.png'),animations:'disabled'});
             await legacy.evaluate(element=>element.remove());
           }
-          await page.screenshot({path:path.join(output,'screen-'+tag+'.png'),animations:'disabled'});
+
         }
       }
     }
