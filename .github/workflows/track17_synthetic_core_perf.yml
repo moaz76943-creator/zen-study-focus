@@ -32,6 +32,10 @@ jobs:
       - name: Execute focused performance, scalability and offline source tests
         working-directory: candidate
         run: node --test tests/performance_recovery/*.test.cjs
+      - name: Confirm exact analytics JSON and CSV parity against pre-optimization SHA
+        shell: bash
+        run: |
+          node candidate/tests/performance_recovery/track17_analytics_parity.cjs baseline candidate | tee evidence/analytics-parity.json
       - name: Run both benchmarks on the SAME runner
         shell: bash
         run: |
