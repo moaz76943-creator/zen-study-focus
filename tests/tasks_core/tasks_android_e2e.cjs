@@ -128,7 +128,7 @@ async function main(){
  }))return;
  if(!await run('android_touch_edit_save_no_fabricated_date',async()=>{
   const mount=await evalJS(`(()=>{const host=document.createElement('div');host.id='track08AndroidHost';
-    Object.assign(host.style,{position:'fixed',inset:'0',zIndex:'2147483647',background:'#fff',overflowY:'auto',padding:'8px'});
+    Object.assign(host.style,{position:'fixed',top:'0',right:'0',bottom:'0',left:'0',zIndex:'2147483647',background:'#fff',overflowY:'auto',padding:'8px'});
     document.body.append(host);window.__track08Studio=DeepFocusTasksStudioV21.mount(host,{
       locale:'en',now:()=>new Date(2026,9,21),
       readState:()=>JSON.parse(JSON.stringify(DF22Integration.getSnapshot())),
@@ -136,6 +136,11 @@ async function main(){
     });return {mounted:!!host.querySelector('.df-task'),count:host.querySelectorAll('.df-task').length};
   })()`);
   assert.equal(mount.mounted,true,'Tasks Studio must mount on genuine Android WebView');
+  const overlay=await evalJS(`(()=>{const h=document.querySelector('#track08AndroidHost'),r=h.getBoundingClientRect();
+    return {height:r.height,viewport:innerHeight,scrollHeight:h.scrollHeight,clientHeight:h.clientHeight,
+      top:r.top,left:r.left,overflow:getComputedStyle(h).overflowY};})()`);
+  assert.ok(overlay.height>0&&overlay.height<=overlay.viewport+1&&overlay.top===0&&overlay.left===0,
+   'Android test overlay must be viewport bounded before input: '+JSON.stringify(overlay));
   await touch(buttonInCard('Details'),'Details');
   const detailState=await evalJS(`(()=>{const card=[...document.querySelectorAll('#track08AndroidHost .df-task')].find(c=>c.querySelector('.df-title')?.textContent==='DF08 legacy undated');
     return {expanded:card?.querySelector('.df-expand')?.getAttribute('aria-expanded'),
@@ -171,7 +176,7 @@ async function main(){
  }))return;
  await run('android_webview_rejected_ack_draft_retained',async()=>{
   const root=await evalJS(`(()=>{const host=document.createElement('div');host.id='track08AndroidHost';
-    Object.assign(host.style,{position:'fixed',inset:'0',zIndex:'2147483647',background:'#fff',overflowY:'auto',padding:'8px'});
+    Object.assign(host.style,{position:'fixed',top:'0',right:'0',bottom:'0',left:'0',zIndex:'2147483647',background:'#fff',overflowY:'auto',padding:'8px'});
     document.body.append(host);window.__track08Studio=DeepFocusTasksStudioV21.mount(host,{
       locale:'en',now:()=>new Date(2026,9,21),
       readState:()=>JSON.parse(JSON.stringify(DF22Integration.getSnapshot())),
