@@ -18,7 +18,9 @@ function planCohort(manifest,now=new Date().toISOString(),size=3){
  if(ids.some(x=>typeof x!=='string'||!/^[a-z][a-z0-9_-]{1,39}$/.test(x))||new Set(ids).size!==ids.length)
   throw Error('Invalid or duplicate agent ids');
  const rounds=Math.ceil(manifest.agents.length/size);
- const slot=new Date(now).getUTCHours()%rounds;
+ // Absolute UTC hours preserve full coverage across midnight for any agent count.
+ const absoluteHour=Math.floor(Date.parse(now)/3600000);
+ const slot=((absoluteHour%rounds)+rounds)%rounds;
  return {slot,rounds,size,selected:manifest.agents.slice(slot*size,slot*size+size),agent_total:manifest.agents.length};
 }
 function runCycle(manifest,{sourceSha,now=new Date().toISOString(),run,coverage}={}){

@@ -19,6 +19,17 @@ test('adding a specialist increases the rotation without dropping existing agent
  for(let hour=0;hour<5;hour++)seen.push(...agent.planCohort(expanded,'2026-10-20T'+String(hour).padStart(2,'0')+':23:00Z').selected.map(a=>a.id));
  assert.equal(new Set(seen).size,13);
 });
+test('a five-cohort manifest rotates through all 13 agents across UTC midnight',()=>{
+ const expanded={...manifest,agents:[...manifest.agents,{id:'agent_12',lane:'qa',purpose:'future feature',test_dirs:['tests/feature']}]};
+ const seen=[];
+ for(let hour=21;hour<26;hour++){
+  const when=new Date(Date.UTC(2026,9,20,hour)).toISOString();
+  const cohort=agent.planCohort(expanded,when);
+  seen.push(...cohort.selected.map(a=>a.id));
+ }
+ assert.equal(seen.length,13,'no cohort is skipped or repeated across midnight');
+ assert.equal(new Set(seen).size,13,'all specialists remain uniquely covered');
+});
 test('reports preserve source SHA and fail closed on skipped or unverified checks',()=>{
  const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T02:23:00Z',run:a=>({id:a.id,lane:a.lane,status:a.id==='agent_7'?'SOURCE_PARTIAL':'SOURCE_TESTED',tests:2}),coverage:()=>({unmapped:['tests/new_feature/flow.test.cjs'],duplicates:[]})});
  assert.equal(report.source_sha,sha);

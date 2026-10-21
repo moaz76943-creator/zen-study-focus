@@ -110,3 +110,13 @@ test('media license gate remains excluded from source-green cohorts without losi
  fs.writeFileSync(path.join(root,'tests/master_recovery_qa/source_contracts.test.cjs'),'');
  assert.deepEqual(q.discoverTests(root,['tests/master_recovery_qa']),['tests/master_recovery_qa/source_contracts.test.cjs']);
  assert.throws(()=>q.discoverTests(root,['tests']),/Unsafe test_dirs/);}));
+
+test('agent manifest rejects duplicate and ancestor directory ownership before executing',()=>{
+ for(const conflict of [['tests/localization_20','tests/localization_20'],['tests/localization_20','tests/localization_20/sub']]){
+  const m={schema_version:1,agents:[
+   {...good.agents[0],test_dirs:[conflict[0]]},
+   {...good.agents[1],test_dirs:[conflict[1]]}
+  ]};
+  assert.throws(()=>q.validateManifest(m),/Overlapping test ownership/i);
+ }
+});
