@@ -152,10 +152,19 @@ function stageImportFixtureInMediaStore(name,code){
   const match=matches.map(line=>line.match(/(?:^|[\s,])_id=(\d+)(?:,|\s|$)/)).find(Boolean);
   if(!match)throw Error('MediaStore query cannot resolve inserted QA document by exact name');
   uri=collection+'/'+match[1];
-  cp.execFileSync('adb',['-s','emulator-5554','shell','content','write','--uri',uri],
-   {input:Buffer.from(code,'utf8'),timeout:20000,stdio:['pipe','pipe','pipe']});
-  const bytes=cp.execFileSync('adb',['-s','emulator-5554','shell','content','read','--uri',uri],{timeout:20000});
-  assert.ok(bytes.equals(Buffer.from(code,'utf8')),'Staged MediaStore fixture bytes mismatched');
+  // API30 shell ContentProvider write/read uses a mismatched provider
+  // attribution identity. The inserted MediaStore row indexes the file;
+  // write the disposable bytes through shell-visible shared storage.
+  const device='/sdcard/Download/'+name;
+  const host=require('node:os').tmpdir()+'/df02-saf-'+process.pid+'.txt';
+  try{
+   fs.writeFileSync(host,code,'utf8');
+   cp.execFileSync('adb',['-s','emulator-5554','push',host,device],{timeout:20000,stdio:'ignore'});
+   const bytes=cp.execFileSync('adb',['-s','emulator-5554','shell','cat',device],{timeout:20000});
+   assert.ok(bytes.equals(Buffer.from(code,'utf8')),'Staged indexed file bytes mismatched');
+  }finally{
+   try{fs.unlinkSync(host);}catch(_){}
+  }
   return uri;
  }catch(e){
   if(uri){try{adb('shell','content','delete','--uri',uri);}catch(_){}}
@@ -314,6 +323,7 @@ async function main(){
       return 'Genuine ACTION_OPEN_DOCUMENT selection of disposable fixture; user confirmation, v21 validation, native ACK and restart preserved record IDs/fields. Export Save/readback remains independently NOT_TESTED.';
     }finally{
       if(stagedUri){try{adb('shell','content','delete','--uri',stagedUri);}catch(_){}}
+      try{adb('shell','rm','-f','/sdcard/Download/'+name);}catch(_){}
     }
   });
   
