@@ -50,3 +50,25 @@ test('region-implied scripts must never silently select the wrong Chinese, Punja
  assert.equal(x.resolve('pa-Guru-PK').script,'Guru');
  assert.equal(x.resolve('nan-Hant-CN').script,'Hant');
 });
+
+test('PR admission CI watches every Java source and all locale100 regressions without cross-PR cancellation',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const workflow=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/locale_100_admission_gate.yml'),'utf8');
+ assert.match(workflow,/^\s+- 'android\/app\/src\/main\/java\/\*\*\/\*\.java'$/m);
+ assert.match(workflow,/^\s+- 'tests\/localization_20\/locale100_\*\.test\.cjs'$/m);
+ assert.match(workflow,/group: locale-100-admission-\$\{\{ github\.event\.pull_request\.number \|\| github\.ref \}\}/);
+ assert.match(workflow,/node --test tests\/localization_20\/locale100_\*\.test\.cjs/);
+});
+test('new Java files in nested packages enter native review source discovery',()=>{
+ const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+ const native=require('../../tools/localization_100/native_copy.cjs');
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'df-locale100-java-'));
+ try{
+  fs.mkdirSync(path.join(temp,'nested'));
+  fs.writeFileSync(path.join(temp,'MainActivity.java'),'class MainActivity {}');
+  fs.writeFileSync(path.join(temp,'nested','NewUi.java'),'class NewUi {}');
+  fs.writeFileSync(path.join(temp,'nested','notes.txt'),'not Java');
+  assert.deepEqual(native.listJavaFiles(temp),['MainActivity.java','nested/NewUi.java']);
+  assert.ok(native.report().files>=5,'current source includes at least five Java classes');
+ }finally{fs.rmSync(temp,{recursive:true,force:true});}
+});
