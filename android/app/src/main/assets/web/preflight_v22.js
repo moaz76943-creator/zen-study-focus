@@ -10,6 +10,24 @@
   if (!D) throw new Error('Data compatibility contract must load before v22 preflight');
 
   const nativeKeys = Object.values(D.KEYS).flatMap(k=>[k,k+'_mirror']);
+  function inspectFamilies(packets) {
+    // Absent families use inspection-only shapes, never persisted defaults.
+    // Existing checksum-valid primary selection and historical duplicate warnings
+    // follow the v21 contract; schema failures block rather than repair records.
+    const snapshot = {cfg:{},tasksList:[],notesList:[]}, issues = [];
+    for (const [slot,key] of Object.entries(D.KEYS)) {
+      const primaryRaw=packets[key],mirrorRaw=packets[key+'_mirror'];
+      if (primaryRaw===null && mirrorRaw===null) continue;
+      const primary=D.inspectPacket(primaryRaw),mirror=D.inspectPacket(mirrorRaw);
+      if (!primary.ok && !mirror.ok) {issues.push(key+': neither copy verifies');continue;}
+      snapshot[slot==='cfg'?'cfg':slot==='tasks'?'tasksList':'notesList'] =
+        (primary.ok?primary:mirror).value;
+    }
+    for (const item of D.inspectRecords(snapshot).issues) {
+      if (item.severity==='error') issues.push(item.path+': '+item.code);
+    }
+    return {ok:!issues.length,issues};
+  }
   function validNativePackets(packets) {
     if (!packets || typeof packets !== 'object' || Array.isArray(packets) ||
         Object.keys(packets).length!==nativeKeys.length) return false;
@@ -22,7 +40,7 @@
       if ((a===null)!==(b===null)) return false;
       if (a!==null && D.inspectPacket(a).payload!==D.inspectPacket(b).payload) return false;
     }
-    return true;
+    return inspectFamilies(packets).ok;
   }
   // Android bridge returns only after AtomicFile + fsync. Browser tests use
   // their established localStorage semantics without the Android-only bridge.
@@ -71,16 +89,10 @@
   function inspect(storage) {
     const pending = D.inspectPending(storage);
     if (pending.pending) return {ok:false, kind:'journal', detail:pending};
-    const issues = [];
-    for (const key of Object.values(D.KEYS)) {
-      const primaryRaw = storage.getItem(key);
-      const mirrorRaw = storage.getItem(key + '_mirror');
-      if (primaryRaw === null && mirrorRaw === null) continue; // untouched fresh install
-      if (!D.inspectPacket(primaryRaw).ok && !D.inspectPacket(mirrorRaw).ok)
-        issues.push(key + ': neither copy verifies');
-    }
-    return {ok:!issues.length,kind:issues.length?'data':'ready',issues};
+    const report=inspectFamilies(D.captureRaw(storage));
+    return {ok:report.ok,kind:report.ok?'ready':'data',issues:report.issues};
   }
+
   function renderBlocked(document, storage, result) {
     if (!document || !document.body || document.getElementById('df22-startup-block')) return;
     const box = document.createElement('section');

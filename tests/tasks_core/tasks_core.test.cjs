@@ -88,3 +88,67 @@ test('rejects malformed dates and foreign project/note IDs',()=>{
  assert.throws(()=>C.updateTask(S(),88,{noteIds:['note_3']}));
  assert.throws(()=>C.updateTask(S(),88,{date:'bad'}));
 });
+
+test('valid v21 legacy tasks without a date remain searchable without changing data',()=>{
+ const Compat=require('../../android/app/src/main/assets/web/data_compat_v21.js');
+ const state={cfg:{sessions:7,sessionHistory:[],unknown:{keep:'yes'}},tasksList:[
+  {id:40,title:'Scheduled',date:'2026-10-21',done:false,custom:{keep:'scheduled'}},
+  {id:12,title:'مهمة قديمة ١٢',done:false,custom:{keep:'undated'}}]};
+ assert.equal(Compat.inspectRecords({...state,notesList:[]}).ok,true,'An omitted task date is valid v21');
+ const before=JSON.parse(JSON.stringify(state));
+ assert.deepEqual(C.searchTasks(state).map(t=>t.id),[12,40]);
+ assert.deepEqual(C.searchTasks(state,{query:'قديمة'}).map(t=>t.id),[12]);
+ assert.deepEqual(C.calendarTasks(state,'2026-10-21').map(t=>t.id),[40]);
+ assert.deepEqual(state,before);assert.equal(Object.hasOwn(state.tasksList[1],'date'),false);
+});
+
+test('date sorting tolerates malformed legacy display dates but never repairs stored records',()=>{
+ const state={cfg:{unknown:'keep'},tasksList:[
+  {id:30,title:'Later',date:'2026-10-22',done:false},
+  {id:31,title:'Same date second',date:'2026-10-19',done:false},
+  {id:19,title:'No date',done:false},
+  {id:18,title:'Null date',date:null,done:false},
+  {id:17,title:'Malformed date',date:'not-a-date',done:false},
+  {id:16,title:'Wrong legacy type',date:123,done:false},
+  {id:15,title:'Impossible calendar date',date:'2026-02-30',done:false},
+  {id:29,title:'Same date first',date:'2026-10-19',done:false}].map(t=>({...t,extra:{value:'preserve'}}))};
+ const before=JSON.parse(JSON.stringify(state));
+ assert.deepEqual(C.searchTasks(state).map(t=>t.id),[15,16,17,18,19,29,31,30]);
+ assert.deepEqual(C.searchTasks(state,{query:'date'}).map(t=>t.id),[15,17,18,19,29,31]);
+ assert.deepEqual(state,before);assert.equal(typeof state.tasksList.find(t=>t.id===16).date,'number');
+});
+
+
+test('one thousand real and undated legacy tasks stay searchable and sorted without mutation',()=>{
+ const state={cfg:{sessionHistory:[],unknown:{keep:'cfg'}},tasksList:Array.from({length:1000},(_,i)=>({
+  id:1000+i,title:'Task '+i,done:false,catKey:'study',extension:{index:i},
+  ...(i%3===0?{}:{date:'2026-10-'+String(1+i%28).padStart(2,'0')})
+ }))};
+ const before=JSON.stringify(state),rows=C.searchTasks(state);
+ assert.equal(rows.length,1000);
+ assert.equal(new Set(rows.map(t=>t.id)).size,1000);
+ assert.equal(C.searchTasks(state,{query:'Task 999'}).length,1);
+ assert.equal(C.searchTasks(state,{date:'2026-10-21'}).every(t=>t.date==='2026-10-21'),true);
+ assert.equal(JSON.stringify(state),before);
+ assert.equal(Object.hasOwn(state.tasksList[0],'date'),false);
+});
+
+test('daily and weekly repeat preserve civil dates over spring and autumn DST boundaries',()=>{
+ for(const [first,expected] of [
+  ['2026-03-07','2026-03-08'],['2026-10-31','2026-11-01']
+ ]){
+  let s={cfg:{sessionHistory:[]},tasksList:[{id:88,title:'Daily DST',date:first,done:false,catKey:'study',
+   repeat:{frequency:'daily',interval:1},legacy:'keep'}]};
+  s=C.setStatus(s,88,'completed',{now:first+'T16:00:00Z',idSeed:200}).state;
+  let children=s.tasksList.filter(t=>t.recurrenceRootId===88);
+  assert.equal(children.length,1);
+  assert.equal(children[0].date,expected);
+  assert.equal(children[0].legacy,'keep');
+  s=C.setStatus(s,88,'completed',{now:first+'T16:00:00Z',idSeed:200}).state;
+  assert.equal(s.tasksList.filter(t=>t.recurrenceRootId===88).length,1);
+ }
+ const weekly={cfg:{sessionHistory:[]},tasksList:[{id:88,title:'Weekly DST',date:'2026-03-07',done:false,catKey:'study',
+   repeat:{frequency:'weekly',interval:1}}]};
+ const next=C.setStatus(weekly,88,'completed',{now:'2026-03-07T12:00:00Z',idSeed:200}).state;
+ assert.equal(next.tasksList.find(t=>t.recurrenceRootId===88).date,'2026-03-14');
+});
