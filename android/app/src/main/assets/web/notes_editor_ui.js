@@ -97,12 +97,21 @@
       const before=read();
       const out=transform(before);
       if(!out||!Array.isArray(out.notesList))throw new Error('INVALID_NOTES_RESULT');
+      // Canonical Notes Core returns the input array for no-op Undo/Redo and duplicate links.
+      // Do not manufacture a native ACK, journal write or refresh for an unchanged state.
+      if(out.notesList===before.notesList&&(kind!=='both'||out.tasksList===before.tasksList))return out;
       // A synchronous adapter owns packet/mirror verification and atomicity; false/void is NOT success.
       const ack=kind==='both'
         ? (typeof adapter.commitBoth==='function'?adapter.commitBoth(before,out):null)
         :adapter.commitNotes(before,out);
       if(ack!==true)throw new Error('DURABLE_COMMIT_NOT_CONFIRMED');
-      if(typeof adapter.onSaved==='function')adapter.onSaved(out);
+      // Once a durable ACK succeeds, a UI refresh error must never masquerade as a
+      // failed Save; retrying a new note here would allocate another numeric v21 ID.
+      if(typeof adapter.onSaved==='function'){
+        try{adapter.onSaved(out);}
+        catch(_){if(typeof console!=='undefined'&&typeof console.warn==='function')
+          console.warn('NOTES_POST_COMMIT_REFRESH_FAILED');}
+      }
       return out;
     }
     function extension(d){
