@@ -48,6 +48,33 @@ const locales=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko',
    if(!['en','ar'].includes(lang))
      assert.equal(result.shortcuts,5,lang+' studio period shortcuts');
   }
+
+  // Active in-memory chart filters are view state, not persistent user records.
+  // Locale switching should not silently reset the selected range or activity.
+  const preserved=await page.evaluate(()=>{
+    const host=document.getElementById('df22AnalyticsHost');
+    const read=()=>{
+      const dates=[...host.querySelectorAll('input[type=date]')];
+      const select=host.querySelector('select');
+      return {from:dates[0]?.value,to:dates[1]?.value,domain:select?.value};
+    };
+    const change=(node,value)=>{node.value=value;node.dispatchEvent(new Event('change',{bubbles:true}));};
+    applyLanguage('de');document.getElementById('navAnalytics').click();
+    change(host.querySelector('select'),'read');
+    change(host.querySelector('input[type=date]'),'2026-10-01');
+    change(host.querySelectorAll('input[type=date]')[1],'2026-10-20');
+    const before=read();
+    applyLanguage('en');document.getElementById('navAnalytics').click();
+    const english=read();
+    applyLanguage('fr');document.getElementById('navAnalytics').click();
+    const french=read();
+    return {before,english,french};
+  });
+  assert.deepEqual(preserved.english,preserved.before,
+    'Studio→Recovery locale switch must preserve the visible date/activity selection');
+  assert.deepEqual(preserved.french,preserved.before,
+    'Recovery→Studio locale switch must preserve the visible date/activity selection');
+  cases.push({preservedFilters:preserved});
   assert.deepEqual(errors,[]);
   fs.mkdirSync(out,{recursive:true});
   fs.writeFileSync(out+'/track10-hot-switch-chromium.json',JSON.stringify({cases,errors},null,2));
