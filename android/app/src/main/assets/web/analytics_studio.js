@@ -104,8 +104,8 @@
       let report;
       try{report=core.buildReport(snap,{today,startDate:start.value,endDate:end.value,domain:domain.value,goals:opts.goals});}
       catch(error){if(!(error instanceof RangeError))throw error;
-        rangeValid=false;feedback.textContent=t.invalidDates;return current;}
-      rangeValid=true;feedback.textContent='';current=report;kpis.replaceChildren();
+        rangeValid=false;feedback.textContent=t.invalidDates;exportBtn.disabled=true;return current;}
+      rangeValid=true;feedback.textContent='';exportBtn.disabled=exporting;current=report;kpis.replaceChildren();
       for(const [name,value] of [[t.minutes,report.totals.minutes],[t.sessions,report.totals.sessions],
         [t.average,report.totals.averageMinutes===null?'—':report.totals.averageMinutes],
         [t.streak,report.streaks.current]]){
@@ -156,7 +156,7 @@
           if(!destroyed)feedback.textContent=(response?.status==='saved'?'✓ ':response?.status==='cancelled'?'— ':'⚠ ')+t.export;
         }catch(_){
           if(!destroyed)feedback.textContent='⚠ '+t.export;
-        }finally{exporting=false;if(!destroyed)exportBtn.disabled=false;}
+        }finally{exporting=false;if(!destroyed)exportBtn.disabled=!rangeValid;}
         return;
       }
       if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL){
