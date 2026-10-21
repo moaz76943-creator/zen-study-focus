@@ -12,6 +12,7 @@ function validate(pack,source=native.report().uiStrings){
  const entry=guard.resolve(pack?.locale);
  if(!entry||entry.phase!=='planned'||entry.code!==pack?.locale)errors.push('INVALID_PLANNED_LOCALE');
  if(pack?.schema_version!==1||pack?.status!==STATUS)errors.push('NOT_A_NATIVE_DRAFT');
+ if(pack?.sourceSha256!==native.inventoryHash(source))errors.push('STALE_NATIVE_SOURCE_INVENTORY');
  const available=new Set(source.map(x=>x.text)),strings=pack?.strings;
  if(!strings||typeof strings!=='object'||Array.isArray(strings))errors.push('INVALID_STRINGS');
  const values=strings&&typeof strings==='object'&&!Array.isArray(strings)?strings:{};
