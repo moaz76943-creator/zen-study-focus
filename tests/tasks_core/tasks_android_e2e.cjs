@@ -9,7 +9,7 @@ const output=process.argv[2]||null;
 function classify(e){return /^(TRANSPORT|INFRA):/.test(String(e.message||e))?'NOT_TESTED':'FAIL_APP';}
 async function connect(){
  try{ws?.close();}catch(_){}
- adb('forward','--remove','tcp:9222');
+ try{adb('forward','--remove','tcp:9222');}catch(_){}
  const pid=adb('shell','pidof',pkg).split(/\s/)[0];
  if(!/^\d+$/.test(pid))throw Error('TRANSPORT: app PID absent');
  adb('forward','tcp:9222','localabstract:webview_devtools_remote_'+pid);
