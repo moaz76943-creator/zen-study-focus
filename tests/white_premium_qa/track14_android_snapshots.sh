@@ -63,4 +63,11 @@ for width in (320,360,393,430):
 (out/'png_manifest.json').write_text(json.dumps({'screenshots':rows,'actual_count':len(rows),'visual_review':'NOT_TESTED'},indent=2))
 assert len(rows)==12
 PY
-printf 'Disposable Android emulator screenshots only. Manual layout, IME, TalkBack, real-device interactions are NOT_TESTED. RELEASE_APPROVED=NO\n' > "$out/LIMITS.txt"
+# PNG dimensions and a running app process do not prove the WebView rendered.
+# Inspect central pixels and reject blank/splash captures; keep evidence on failure.
+if ! python3 tests/white_premium_qa/track14_png_screen_guard.py "$out"/android-*.png > "$out/pixel_content_review.json"; then
+  echo 'ANDROID_WEBVIEW_RENDER_NOT_VERIFIED: screenshot pixels are blank or invalid' >&2
+  cat "$out/pixel_content_review.json" >&2
+  exit 1
+fi
+printf 'Disposable Android emulator screenshots only. Pixel-content gate is not functional, IME, TalkBack or real-device acceptance. RELEASE_APPROVED=NO\n' > "$out/LIMITS.txt"
