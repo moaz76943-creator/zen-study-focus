@@ -30,10 +30,16 @@ function buildQueue({source=guard.sourceInventory(),nativeRows=native.report().u
   if(!catalogSet.has(code)||pack.locale!==code)throw Error('INVALID_CANDIDATE_LOCALE:'+code);
   for(const [cid,row] of Object.entries(pack.strings||{}))
    for(const key of Object.keys(row))if(!sourcePaths.has(cid+'.'+key))throw Error('UNRECOGNIZED_CANDIDATE:'+cid+'.'+key);
+  // Bind the candidate text to the exact English inventory before emitting a
+  // worksheet with the current hash. Key membership alone can rebind stale copy.
+  const validation=draftTools.validateDraft(pack,source);
+  if(!validation.valid)throw Error('INVALID_WEB_DRAFT:'+code+':'+validation.errors.join(','));
  }
  for(const [code,pack] of Object.entries(nativeDrafts)){
   if(!catalogSet.has(code)||pack.locale!==code)throw Error('INVALID_NATIVE_CANDIDATE_LOCALE:'+code);
   for(const key of Object.keys(pack.strings||{}))if(!nativeKeys.has(key))throw Error('UNRECOGNIZED_NATIVE_CANDIDATE:'+key);
+  const validation=nativeDraftTools.validate(pack,nativeRows);
+  if(!validation.valid)throw Error('INVALID_NATIVE_DRAFT:'+code+':'+validation.errors.join(','));
  }
  const englishSha=guard.inventoryHash(source),nativeSha=native.inventoryHash(nativeRows);
  return guard.REGISTRY.filter(r=>r.phase==='planned').map(locale=>{
