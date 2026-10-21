@@ -37,6 +37,7 @@ function validateReopen(s){
 function browserProbe(stage){
  const supported=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko','vi','it','bn','ur','fa','pl','nl'];
  const rtl=['ar','fa','ur'];
+ if(location.href!=='file:///android_asset/web/index.html')throw Error('UNTRUSTED_WEBVIEW_ORIGIN');
  const root=document.getElementById('htmlRoot')||document.documentElement;
  const basic=()=>({
   origin:location.href,appReady:document.readyState==='complete'&&typeof applyLanguage==='function',
