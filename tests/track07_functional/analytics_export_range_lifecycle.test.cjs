@@ -180,3 +180,20 @@ test('Studio supplies functioning Today/7-day/30-day/custom and Reset controls i
     ui.studio.destroy();
   }
 });
+
+test('native saved receipt from an older date/domain filter must not claim the newer report was exported', async () => {
+  let finish;
+  const ui=mountWithPendingExport(()=>new Promise(resolve=>{finish=resolve;}),'de');
+  const status=ui.host.children.find(e=>e.attributes?.role==='status');
+  const first=ui.button.events.click();
+  assert.equal(ui.button.disabled,true);
+  ui.domain.value='read';
+  ui.domain.events.change();
+  assert.equal(ui.studio.getReport().totals.minutes,0);
+  finish({status:'saved'});
+  await first;
+  assert.doesNotMatch(status.textContent,/✓/,
+    'Historical CSV receipt must not announce success for the currently filtered report');
+  assert.equal(ui.button.disabled,false,'Valid new range can export again');
+  ui.studio.destroy();
+});
