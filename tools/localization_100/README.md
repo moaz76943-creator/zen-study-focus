@@ -40,6 +40,7 @@ Run at repository root:
 - `node tools/localization_100/native_copy.cjs --report`
 - `node tools/localization_100/native_drafts.cjs --report`
 - `node tools/localization_100/coverage.cjs --report`
+- `node tools/localization_100/review_queue.cjs --out /tmp/deep-focus-80-locale-review-queue`
 - `node tools/localization_100/drafts.cjs --worksheet sw > /tmp/sw-review-worksheet.json`
 - `node tools/localization_100/guard.cjs --template sw > /tmp/sw-draft.json`
 - `node tools/language_review/audit.cjs --out /tmp/df-locale-audit`
@@ -53,3 +54,13 @@ Source inventory is a **starting point**, not a complete runtime DOM extraction.
 Unicode locale-identification reference: https://cldr.unicode.org/index/cldr-spec/picking-the-right-language-code
 
 **Current status:** 100 registered | 20 existing unchanged | 80 planned/not selectable | 0 new certified | full Android and translation review NOT_TESTED | production release NO.
+
+## Exact-source 80-language reviewer queue and region-safe scripts
+
+`review_queue.cjs --out DIRECTORY` creates **80 review files plus an index** using each canonical English string from the current source inventory, plus discovered native Android toast/notification labels and the existing HTML/JS unmarked-text candidates. Untranslated copy is explicitly `null`. Initial translated candidates retain status `CANDIDATE_NEEDS_HUMAN_REVIEW`; unmarked source strings remain `NEEDS_SOURCE_INVENTORY_CLASSIFICATION`. The generated worksheets do **not** activate a locale, modify app assets, supply automatic English fallback as real translation, or count as native-speaker certification. Check the `locale100-admission-source` GitHub Actions artifact for the full generated review queue.
+
+`native_copy.cjs` now fingerprints actual user-facing Java source phrases (path, callsite kind and text; not unstable source line offsets). Both `native_drafts/sw.json` and `native_drafts/ro.json` are pinned to that SHA256; any changed/additional source phrase invalidates the pack until re-reviewed.
+
+BCP47 locale resolution also checks the **region-inferred writing system** when no explicit script was requested. It must reject `zh-TW` (Traditional vs this catalog's Simplified `zh`), `pa-PK` (Arabic vs Gurmukhi), `sr-ME` (Latin vs Cyrillic), `mn-CN` (Mongolian vs Cyrillic), and similar mismatches, rather than silently showing a foreign script. Explicit user-selected script variants such as `zh-Hans-TW` are honored. This is a review-tool contract; runtime selection for existing users is deliberately not altered in this PR.
+
+Browser CI also captures every currently rendered clickable control and its text in the **original 20 locales**, including a candidate list of same-English and empty accessible names. Binding/text presence does **not** establish that all button side-effects work. The independent real-Android full-suite failure at PR #132 must be resolved separately; narrow Android PASS results from PR #130 and Chromium button audits do not certify full application QA.
