@@ -33,6 +33,7 @@ jobs:
           node --test tests/localization_20/locale100_gate.test.cjs | tee evidence/unit.tap
           node tools/localization_100/guard.cjs --check | tee evidence/admission.json
           node tools/localization_100/drafts.cjs --report | tee evidence/candidate-drafts.json
+          node tools/localization_100/drafts.cjs --worksheet sw > evidence/sw-translator-worksheet.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
