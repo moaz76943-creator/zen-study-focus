@@ -259,6 +259,42 @@ async function main(){
         }
       }
     }
+    // QA-only bounded physical keyboard alternative. Do not synthesize the
+    // Android Activity result or bypass a native consent dialog.
+    let focusedXml=dumpUI();
+    if(/documentsui/i.test(focusedXml)){
+      report.saf_selection.keyboard={attempted:true,focused:false};
+      const visibleFileNames=uiNodes(focusedXml).filter(n=>/resource-id="android:id\/title"/.test(n)&&/deep-focus-/.test(n));
+      if(visibleFileNames.length===1&&visibleFileNames[0].includes('text="'+name+'"')){
+        for(let attempt=0;attempt<12;attempt++){
+          adb('shell','input','keyevent','61'); // physical TAB
+          await pause(160);
+          focusedXml=dumpUI();
+          const row=uiNodes(focusedXml).find(n=>/resource-id="[^"]*:id\/item_root"/.test(n)&&/focused="true"/.test(n));
+          if(row){
+            report.saf_selection.keyboard.focused=true;
+            report.saf_selection.keyboard.tabCount=attempt+1;
+            adb('shell','input','keyevent','66'); // physical ENTER
+            await pause(1200);
+            break;
+          }
+        }
+      }
+    }
+    // Independent evidence about the actual provider row, not backup bytes.
+    if(/documentsui/i.test(dumpUI())){
+      try{
+        const rows=adb('shell','content','query','--uri','content://media/external/file',
+          '--projection','_id:_display_name:mime_type:_size');
+        report.saf_selection.mediaMetadata=rows.split('\\n').filter(t=>t.includes('_display_name='+name))
+          .map(t=>t.replace(/_display_name=([^,]+)/,'_display_name='+name)).slice(0,2).map(t=>t.slice(0,220));
+      }catch(error){report.saf_selection.metadataUnavailable=String(error.message).slice(0,100);}
+      try{
+        const log=adb('shell','logcat','-d','-s','DocumentsUI:D','DocumentsProvider:E','MediaProvider:E','*:S');
+        report.saf_selection.providerErrors=log.split('\\n').filter(t=>/fail|cannot|denied|not enabled|not share|error/i.test(t))
+          .slice(-5).map(t=>t.slice(0,170));
+      }catch(_){}
+    }
     let confirm;
     try {
       confirm=await nativeUI('native restore confirmation',xml=>uiNodes(xml).find(n=>/text="(?:OK|Ok|Restore|استعادة)"/.test(n)),false);
