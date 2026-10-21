@@ -10,6 +10,16 @@ function getList(){
   req.on('error',reject);req.setTimeout(3500,()=>req.destroy(Error('DevTools timeout')));
  });
 }
+function lifecycleTrackSelections(expected){
+ assert.ok(Number.isInteger(expected)&&expected>=1&&expected<=20,'Invalid lifecycle track count');
+ const counts=[...new Set([1,Math.min(2,expected),expected])];
+ return counts.map(trackCount=>{
+  const indices=trackCount===expected?Array.from({length:expected},(_,i)=>i)
+   :trackCount===1?[0]:[0,Math.min(3,expected-1)];
+  assert.equal(new Set(indices).size,trackCount,'Lifecycle evidence cannot repeat one track');
+  return {trackCount,indices};
+ });
+}
 function assertProgress(before,after){
  assert.equal(after.length,before.length,'Missing track progress evidence');
  assert.equal(new Set(after.map(x=>x.id)).size,after.length,'Duplicate track evidence');
@@ -171,8 +181,17 @@ async function main(){
     // bounded phases on failure, then fail the run; never reinterpret a slow
     // unmuted sink as a passing background or endurance result.
     let firstFailure;
-    for(const trackCount of [...new Set([Math.min(2,expected),expected])]){
-      const indices=trackCount===expected?Array.from({length:expected},(_,i)=>i):[0,Math.min(3,expected-1)];
+    // Native counter snapshots come from the disposable AudioQA emulator only.
+    // They are forensic context, not proof of audible playback or root cause.
+    const captureNativeAudio=(name)=>{
+      if(!process.argv[2])return null;
+      const path=require('node:path'),crypto=require('node:crypto');
+      const filename='audioflinger-'+name+'.txt';
+      const bytes=execFileSync('adb',['shell','dumpsys','media.audio_flinger'],{encoding:'utf8',timeout:15000,maxBuffer:8*1024*1024});
+      fs.writeFileSync(path.join(path.dirname(process.argv[2]),filename),bytes);
+      return {file:filename,sha256:crypto.createHash('sha256').update(bytes).digest('hex'),capturedAt:new Date().toISOString(),bytes:Buffer.byteLength(bytes)};
+    };
+    for(const {trackCount,indices} of lifecycleTrackSelections(expected)){
       await evalJs(`(async()=>{const selected=${JSON.stringify(indices)};const a=[...document.querySelectorAll('audio')];a.forEach((x,i)=>{if(!selected.includes(i))x.pause();x.muted=false;});await Promise.all(selected.map(i=>a[i].play()));rebalance();})()`);
       for(const phase of ['foreground','background','screenOff']){
         let observation={trackCount,phase,status:'IN_PROGRESS',scope:'Bounded unmuted headless-emulator media progression; audible output not verified'};
@@ -183,12 +202,14 @@ async function main(){
           assert.equal(await evalJs('document.visibilityState'),phase==='foreground'?'visible':'hidden','Unexpected Activity visibility');
           if(phase==='screenOff')assert.match(execFileSync('adb',['shell','dumpsys','power'],{encoding:'utf8'}),/mWakefulness=Asleep/);
           const nativeTimes=`${JSON.stringify(indices)}.map(i=>{const a=document.querySelectorAll('audio')[i];return {id:a.dataset.id,progress:a.currentTime,duration:a.duration}})`;
-          const before=await evalJs(nativeTimes),began=performance.now();
+          observation.nativeAudioBefore=captureNativeAudio(trackCount+'-'+phase+'-before');
+          const before=await evalJs(nativeTimes),began=performance.now(),beganWall=Date.now();
           await sleep(18000);
           const power=execFileSync('adb',['shell','dumpsys','power'],{encoding:'utf8',timeout:10000});
           const sample=await evalJs(`(()=>{const a=[...document.querySelectorAll('audio')];return {visibility:document.visibilityState,active:a.filter(x=>!x.paused&&!x.error).length,gain:a.reduce((n,x)=>n+(x.paused?0:x.volume),0),muted:a.some(x=>!x.paused&&x.muted),errors:audioQaErrors};})()`);
           sample.wakefulness=power.match(/mWakefulness=(\w+)/)?.[1]||'UNKNOWN';
           sample.seconds=(performance.now()-began)/1000;
+          sample.wallSeconds=(Date.now()-beganWall)/1000;
           const after=await evalJs(nativeTimes);
           observation={...observation,sample,before,after};
           assert.equal(sample.muted,false,'Diagnostic media remained muted');
@@ -203,9 +224,7 @@ async function main(){
         }finally{
           if(process.argv[2]){
             try{
-              const destination=require('node:path').join(require('node:path').dirname(process.argv[2]),`audioflinger-${trackCount}-${phase}.txt`);
-              fs.writeFileSync(destination,execFileSync('adb',['shell','dumpsys','media.audio_flinger'],{encoding:'utf8',timeout:10000}));
-              observation.audioFlingerEvidence=require('node:path').basename(destination);
+              observation.nativeAudioAfter=captureNativeAudio(trackCount+'-'+phase+'-after');
             }catch(error){observation.diagnosticCaptureError=String(error);}
           }
           realtimeComparisons.push(observation);
@@ -288,4 +307,4 @@ if(require.main===module){
   fs.writeFileSync(path.join(dir,'qa-audio20-result.txt'),resultSummary(first,reopened));
  }else main().catch(e=>{console.error('AUDIO20_WEBVIEW_FAIL:',String(e));process.exitCode=1;});
 }
-module.exports={assertProgress,assertRealtimeProgress,assertLifecycle,resultSummary};
+module.exports={assertProgress,assertRealtimeProgress,assertLifecycle,resultSummary,lifecycleTrackSelections};
