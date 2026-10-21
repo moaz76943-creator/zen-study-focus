@@ -90,3 +90,28 @@ test('track15-10 runs with a foreign SHA never confer approval through step stat
  steps:[{name:'Control Center regression tests',conclusion:'success',status:'completed'}]}];
  assert.equal(core.classifyJobs(rows,OLD,HEAD).node,'NOT_TESTED');
 });
+
+test('track15-11 original supported language registry covers all 20 without unadmitted additions',()=>{
+ const expected=['ar','en','es','fr','de','tr','ru','pt','zh','hi','ja','ko',
+   'id','vi','it','bn','ur','fa','pl','nl'];
+ assert.deepEqual([...core.LOCALES].sort(),[...expected].sort());
+ assert.equal(new Set(core.LOCALES).size,20);
+ assert.equal(core.LOCALES.includes('he'),false);
+});
+test('track15-12 missing per-language evidence cannot yield fabricated gap totals',()=>{
+ const status=core.localeCounts(null,'a'.repeat(40));
+ assert.equal(status.length,20);
+ assert.ok(status.every(row=>row.gaps===null&&row.status==='NOT_TESTED'));
+ const mismatched=core.localeCounts({source_sha:OLD,languages:[{code:'ar',missing:12}]},HEAD);
+ assert.equal(mismatched.find(row=>row.code==='ar').status,'STALE');
+ assert.equal(mismatched.find(row=>row.code==='ar').gaps,null);
+});
+test('track15-13 valid exact-SHA per-locale counts may display verified zeros independently',()=>{
+ const data={source_sha:HEAD,languages:core.LOCALES.map(code=>({code,missing:code==='ar'?0:17}))};
+ const result=core.localeCounts(data,HEAD);
+ assert.equal(result.length,20);
+ assert.deepEqual(result.find(row=>row.code==='ar'),{code:'ar',gaps:0,status:'GAPS_REPORTED'});
+ assert.equal(result.find(row=>row.code==='de').gaps,17);
+ const duplicate={...data,languages:[...data.languages,data.languages[0]]};
+ assert.ok(core.localeCounts(duplicate,HEAD).every(row=>row.status==='NOT_TESTED'));
+});
