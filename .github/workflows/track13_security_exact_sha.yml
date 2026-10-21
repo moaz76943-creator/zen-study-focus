@@ -55,7 +55,7 @@ jobs:
           from secrets import token_urlsafe
           directory = pathlib.Path(sys.argv[1])
           fake_value = token_urlsafe(48)
-          (directory / 'synthetic.env').write_text('api_key = "' + fake_value + '"\n', encoding='utf-8')
+          (directory / 'synthetic.env').write_text('service_secret = "' + fake_value + '"\n', encoding='utf-8')
           PY
           set +e
           "$RUNNER_TEMP/gitleaks" dir --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$probe/result.json" "$probe/synthetic.env" >/dev/null 2>&1
