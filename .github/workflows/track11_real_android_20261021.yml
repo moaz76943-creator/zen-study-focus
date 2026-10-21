@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - audit/track11-existing20-coverage-20261021
+      - integration/master-recovery-20261021
   workflow_dispatch:
 permissions:
   contents: read
