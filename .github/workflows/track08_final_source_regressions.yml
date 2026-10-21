@@ -1,0 +1,40 @@
+name: Track08 Final Source Node Python Regression Matrix
+on:
+  push:
+    branches:
+      - audit/track08-final-full-regressions-20261021
+permissions:
+  contents: read
+concurrency:
+  group: track08-final-source-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact production app source matches PR135
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=31e239ce1bdb1d7ef1aa7cda14404d251ea377be
+          test "$(git diff --name-only "$BASE" HEAD)" = ".github/workflows/track08_final_source_regressions.yml"
+          git rev-parse HEAD
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: All applicable Node regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          test "${#suites[@]}" -gt 0
+          node --test --test-reporter=tap "${suites[@]}"
+      - name: All Python app contract tests
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Explicitly preserve release gate
+        run: echo 'RELEASE_APPROVED=NO; media provenance and real-phone acceptance remain separate'
