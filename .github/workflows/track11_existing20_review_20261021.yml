@@ -1,0 +1,101 @@
+name: Track11 Existing 20 Locale Independent Review
+on:
+  push:
+    branches:
+      - audit/track11-existing20-coverage-20261021
+      - integration/master-recovery-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track11-existing20-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Record exact checkout and run 20-locale report regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          git rev-parse HEAD | tee evidence/SOURCE_SHA.txt
+          node --test tests/language_review/track11_review.test.cjs tests/language_review/track11_android_probe.test.cjs tests/language_review/track11_native_review.test.cjs 2>&1 | tee evidence/track11-tests.tap
+      - name: Fresh existing-20-only matrix and untranslated reviewer worksheet
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/language_review/audit.cjs --out evidence/historical-auditor
+          node tools/language_review/track11_review.cjs --out evidence
+          node tools/language_review/track11_native_review.cjs --out evidence
+          node --test tests/language_review/audit.test.cjs tests/localization_20/localization_20.test.cjs tests/localization_20/western_digits_indic.test.cjs tests/ascii_numerals/ascii_numerals.test.cjs tests/ascii_numerals/duration_units.test.cjs tests/track07_functional/analytics_charts_20_accessibility.test.cjs tests/track07_functional/analytics_controls_and_digits.test.cjs tests/track07_functional/analytics_screen_20_locales.test.cjs tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/integration_recovery/language_switch_durability.test.cjs tests/integration_recovery/authored_text_safety.test.cjs tests/notes_recovery/draft_20_locales.test.cjs 2>&1 | tee evidence/existing-locale-tests.tap
+          node tests/validate_locales.cjs 2>&1 | tee evidence/validate-locales.log
+      - name: Preserve exact-head evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: track11-source-review-${{ github.sha }}
+          path: evidence/
+          retention-days: 7
+          if-no-files-found: warn
+  chromium:
+    needs: source-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Setup Chromium browser test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Serve packaged WebView assets on loopback
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/track11-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Real locale switch, RTL and viewport 320/360/393/430
+        shell: bash
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_LOCALE_EVIDENCE: ${{ runner.temp }}/track11-browser
+          DF_TIMER_LOCALE_REPORT: ${{ runner.temp }}/track11-browser/timer-mode-locale.json
+        run: |
+          set -euo pipefail
+          mkdir -p "$DF_LOCALE_EVIDENCE"
+          node tests/track07_functional/live_20_language_switch_navigation.cjs
+          node tests/track07_functional/timer_mode_20_locale_browser.cjs
+          node tests/track07_functional/analytics_all_controls_browser.cjs
+      - name: Record Chromium limitations
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/track11-browser"
+          git rev-parse HEAD > "$RUNNER_TEMP/track11-browser/SOURCE_SHA.txt"
+          printf '%s\n' 'Installed Android WebView runs in the separate Track11 API30 workflow; this artifact is Chromium-only' 'Human 20-language copy review: NOT_TESTED' '80 future locales: NOT ACTIVATED' 'RELEASE_APPROVED=NO' > "$RUNNER_TEMP/track11-browser/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track11-20-locale-chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/track11-browser/
+          retention-days: 7
+          if-no-files-found: warn
