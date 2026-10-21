@@ -329,6 +329,30 @@ html[dir="rtl"] body.df-v22.df-recovery10 .bottom-nav-capsule {
 }
 
 
+/* Track 14: bounded timer glyphs and large-font-safe time controls.
+   Avoid changing session logic, text direction, handlers, or saved records. */
+body.df-v22.df-recovery10.timer-home #focusHeroCard .ring-time {
+  font-size: clamp(1.55rem, 12vw, 3.25rem);
+  max-width: 100%;
+  white-space: nowrap;
+  letter-spacing: -.025em;
+  font-variant-numeric: tabular-nums;
+}
+body.df-v22.df-recovery10.timer-home #focusHeroCard .time-delta-row {
+  flex-wrap: wrap;
+  max-width: 100%;
+  align-items: stretch;
+}
+body.df-v22.df-recovery10.timer-home #focusHeroCard .delta-chip {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  padding-block: 10px;
+}
+
 /* Keep the final Note action card scrollable above the fixed seven-tab bottom bar
    on small Android WebViews (including RTL and keyboard-dismissed editing). */
 body.df-v22.df-recovery10 #sec-notes #notesStackBox {
