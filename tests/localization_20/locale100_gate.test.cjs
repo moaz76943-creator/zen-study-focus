@@ -39,3 +39,14 @@ test('fail closed on fabricated fallback, unsafe digits, control chars and unrev
   const missing=pack();missing.review=null;assert.equal(x.validatePack(missing,source).ok,false);
   const native=pack();native.review.androidWebView='NOT_TESTED';assert.equal(x.validatePack(native,source).ok,false);
 });
+
+test('region-implied scripts must never silently select the wrong Chinese, Punjabi, Serbian, Uzbek, Azerbaijani, Mongolian or Kurdish UI',()=>{
+ for(const tag of ['zh-TW','zh-HK','pa-PK','sr-ME','uz-AF','az-IR','mn-CN','ku-IQ','nan-CN'])
+   assert.equal(x.resolve(tag),null,tag+' must not silently resolve to wrong writing system');
+ for(const tag of ['zh-CN','pa-IN','sr-RS','uz-UZ','az-AZ','mn-MN','ku-TR','nan-TW'])
+   assert.ok(x.resolve(tag),tag+' must correctly resolve for matching region/script');
+ // Explicit script beats regional heuristics: e.g. a Traditional-region user asks for Simplified by choice.
+ assert.equal(x.resolve('zh-Hans-TW').script,'Hans');
+ assert.equal(x.resolve('pa-Guru-PK').script,'Guru');
+ assert.equal(x.resolve('nan-Hant-CN').script,'Hant');
+});
