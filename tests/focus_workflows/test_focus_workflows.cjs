@@ -323,3 +323,53 @@ test('TRACK09 RED: optional training-preset save failure cannot prevent timer st
   assert.equal(x.mock.toggleCalls,1,'Activated training must begin even when optional preset save fails');
   assert.ok(notices.some(t=>/save|حفظ/i.test(t)),'User must know optional preset failed');
 });
+
+
+test('TRACK09 RED: rejected duration and final-rest edits restore last acknowledged fields',()=>{
+  const listeners=new Map(),messages=[];
+  const x=load('quick_training.js',{
+    loadFortressData:()=>({domain:'sport',sets:'3',work:'05:00',rest:'01:00',skip:true}),
+    saveFortressData:()=>false,
+    showToast:message=>messages.push(message)
+  });
+  for(const id of ['qtSets','qtWork','qtRest','qtSkipLast']){
+    x.document.getElementById(id).addEventListener=(name,fn)=>listeners.set(id+':'+name,fn);
+  }
+  x.eval('initQuickTraining()');
+  for(const [id,mutation,previous] of [
+    ['qtSets',el=>{el.value='12'},'3'],
+    ['qtWork',el=>{el.value='10:30'},'05:00'],
+    ['qtRest',el=>{el.value='02:00'},'01:00'],
+    ['qtSkipLast',el=>{el.checked=false},true]
+  ]){
+    const el=x.document.getElementById(id);
+    mutation(el);
+    listeners.get(id+':change')();
+    assert.equal(id==='qtSkipLast'?el.checked:el.value,previous,
+      'Unsaved UI field must roll back to the last durable value: '+id);
+  }
+  assert.equal(x.eval('quickPresetDomain'),'sport');
+  assert.equal(messages.length,4,'Each rejected change must report save failure');
+});
+
+test('TRACK09 RED: edits after a successful save roll back to the newest accepted values, not initial defaults',()=>{
+  const listeners=new Map(),messages=[],saved=[];
+  let writes=0;
+  const x=load('quick_training.js',{
+    loadFortressData:()=>({domain:'sport',sets:'3',work:'05:00',rest:'01:00',skip:false}),
+    saveFortressData:(key,value)=>{writes++;saved.push(value);return writes===1;},
+    showToast:message=>messages.push(message)
+  });
+  for(const id of ['qtSets','qtWork','qtRest','qtSkipLast']){
+    x.document.getElementById(id).addEventListener=(name,fn)=>listeners.set(id+':'+name,fn);
+  }
+  x.eval('initQuickTraining()');
+  const el=x.document.getElementById('qtSets');
+  el.value='4';listeners.get('qtSets:change')();
+  assert.equal(el.value,'4');
+  el.value='5';listeners.get('qtSets:change')();
+  assert.equal(el.value,'4','The first accepted value must remain visible after the next write fails');
+  assert.equal(saved[0].sets,'4');
+  assert.equal(saved[1].sets,'5');
+  assert.equal(messages.length,1);
+});
