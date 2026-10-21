@@ -55,7 +55,7 @@ test('PR admission CI watches every Java source and all locale100 regressions wi
  const fs=require('node:fs'),path=require('node:path');
  const workflow=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/locale_100_admission_gate.yml'),'utf8');
  assert.match(workflow,/^\s+- 'android\/app\/src\/main\/java\/\*\*\/\*\.java'$/m);
- assert.match(workflow,/^\s+- 'tests\/localization_20\/locale100_\*\.cjs'$/m);
+ assert.match(workflow,/^\s+- 'tests\/localization_20\/\*\*'$/m);
  assert.match(workflow,/group: locale-100-admission-\$\{\{ github\.event\.pull_request\.number \|\| github\.ref \}\}/);
  assert.match(workflow,/node --test tests\/localization_20\/locale100_\*\.test\.cjs/);
 });
@@ -79,7 +79,7 @@ test('CI cannot miss canonical key discovery or future native Android resource a
  for(const watched of [
   "'tools/language_review/**'",
   "'tests/language_review/**'",
-  "'tests/localization_20/locale100_*.cjs'",
+  "'tests/localization_20/**'",
   "'android/app/src/main/res/**'",
   "'android/app/src/main/AndroidManifest.xml'"
  ])assert.ok(yaml.includes(watched),'missing path trigger: '+watched);
