@@ -99,3 +99,13 @@ test('track15-ui05 disposable mobile Chrome interaction harness is CSP-pinned an
  assert.match(workflow,/mobile_interaction_bundle\.cjs/);
  assert.match(workflow,/check_mobile_interaction_dom\.cjs/);
 });
+
+test('track15-ui06 true phone viewport gate uses Chrome device metrics, not --window-size guess',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const code=fs.readFileSync(path.resolve(__dirname,'../../tools/control_center/chrome_mobile_cdp_qa.cjs'),'utf8');
+ assert.match(code,/Emulation\.setDeviceMetricsOverride/);
+ assert.match(code,/window\.innerWidth/);
+ assert.match(code,/Page\.captureScreenshot/);
+ const workflow=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/control_center_audit.yml'),'utf8');
+ assert.match(workflow,/chrome_mobile_cdp_qa\.cjs/);
+});
