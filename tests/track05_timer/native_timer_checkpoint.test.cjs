@@ -60,7 +60,9 @@ test('reopening uses verified fsynced native pause checkpoint, not a stale WebVi
   updateTimerDisplay(){},document:{getElementById:()=>({innerHTML:''})},setInterval(){throw Error('Should not resume paused checkpoint')},
   Date,Math,Number,JSON
  };
- vm.runInNewContext(actual('restoreTimerSession','syncHeaderMetrics'),ctx);
+ const a=app.indexOf('function restoreTimerSession() {'),b=app.indexOf('const ringCircumference',a);
+ assert.ok(a>=0&&b>a);
+ vm.runInNewContext(app.slice(a,b),ctx);
  ctx.restoreTimerSession();
  assert.equal(ctx.timerSessionId,'stable-id');
  assert.equal(ctx.timerLeft,1344);
