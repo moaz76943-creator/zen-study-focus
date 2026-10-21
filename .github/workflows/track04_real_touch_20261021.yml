@@ -1,0 +1,106 @@
+name: TRACK 04 actual touch outcome acceptance (Chromium only)
+on:
+  push:
+    branches: [qa/track04-real-touch-outcomes-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df-track04-real-touch-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-and-touch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify immutable staged application tree and exact checkout SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/df-track04"
+          PIN=903989405c096f1bbfd414d24c2c06e988b0ec70
+          git cat-file -e "$PIN^{commit}"
+          test "$(git rev-parse HEAD:android)" = "$(git rev-parse "$PIN:android")"
+          printf '%s\n' .github/workflows/track04_real_touch_20261021.yml .github/workflows/track04_android_exact_source_20261021.yml tests/df4_browser/track04_real_touch_outcomes.cjs tests/android_e2e_recovery/track04_one_shot_android.sh | sort > "$RUNNER_TEMP/df-track04/expected.txt"
+          git diff --name-only "$PIN" HEAD | sort > "$RUNNER_TEMP/df-track04/actual.txt"
+          diff -u "$RUNNER_TEMP/df-track04/expected.txt" "$RUNNER_TEMP/df-track04/actual.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/df-track04/QA_HEAD_SHA.txt"
+          git rev-parse HEAD:android > "$RUNNER_TEMP/df-track04/APP_TREE_SHA.txt"
+          node --check tests/df4_browser/track04_real_touch_outcomes.cjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Regression on existing cancel/draft and guard tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/integration_recovery/back_draft_guard.test.cjs tests/interaction_recovery/*.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs > "$RUNNER_TEMP/df-track04/source.tap"
+      - name: Install isolated Playwright and real Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Serve only bundled offline app on loopback
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df-track04/http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Actually tap 140 localized nav states and verify critical save/cancel outcomes
+        shell: bash
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_TRACK04_EVIDENCE: ${{ runner.temp }}/df-track04
+        run: |
+          set -euo pipefail
+          node tests/df4_browser/track04_real_touch_outcomes.cjs | tee "$RUNNER_TEMP/df-track04/outcome-summary.log"
+      - name: Audit every static and dynamically constructed control (NOT functional PASS)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/android_e2e_recovery/inventory.cjs > "$RUNNER_TEMP/df-track04/all-controls-source-inventory.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const report=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/df-track04/all-controls-source-inventory.json','utf8'));
+          if(report.totals.missingScripts)process.exit(1);
+          console.log(JSON.stringify({static:report.totals.staticControls,dynamicHandlers:report.totals.dynamicEventListeners,dynamicFactories:report.totals.dynamicControlFactories,status:'STATIC_INVENTORY_ONLY'}));
+          NODE
+      - name: Real Chromium destructive controls, analytics and mobile notes regression
+        shell: bash
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_BUTTON_EVIDENCE: ${{ runner.temp }}/df-track04/timer
+          DF_ANALYTICS_EVIDENCE: ${{ runner.temp }}/df-track04/analytics
+          DF_COMPLETION_EVIDENCE: ${{ runner.temp }}/df-track04/notes
+        run: |
+          set -euo pipefail
+          mkdir -p "$DF_BUTTON_EVIDENCE" "$DF_ANALYTICS_EVIDENCE" "$DF_COMPLETION_EVIDENCE"
+          node tests/track07_functional/timer_mode_buttons_browser.cjs
+          node tests/track07_functional/analytics_all_controls_browser.cjs
+          node tests/df4_browser/note_modal_reachability.cjs
+      - name: Fail-closed platform limitations
+        if: always()
+        shell: bash
+        run: |
+          printf '%s\n' \
+            'This workflow is Chromium touchscreen emulation ONLY.' \
+            'Android API30/API35 WebView touch, native Back, actual Android dialogs, SAF, and TalkBack are NOT_TESTED here.' \
+            'No runtime application source was modified.' \
+            'RELEASE_APPROVED=NO' > "$RUNNER_TEMP/df-track04/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DF-TRACK04-TOUCH-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/df-track04/
