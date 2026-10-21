@@ -1,0 +1,83 @@
+name: Track09 Goals Activity Chromium QA
+on:
+  push:
+    branches:
+      - fix/track09-goals-activity-preservation-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track09-goals-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify source identity and JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/track09"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/track09/EXACT_SHA.txt"
+          node --check android/app/src/main/assets/web/goals_studio.js
+          node --check android/app/src/main/assets/web/quick_training.js
+          node --check tests/focus_workflows/track09_chromium.cjs
+          node --check tests/focus_workflows/test_focus_workflows.cjs
+      - name: Existing focused Node regressions, including Track09 RED-to-GREEN cases
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test --test-reporter=tap tests/focus_workflows/test_focus_workflows.cjs | tee "$RUNNER_TEMP/track09/node.tap"
+          TZ=America/New_York node --test tests/focus_workflows/test_focus_workflows.cjs
+          TZ=Asia/Amman node --test tests/focus_workflows/test_focus_workflows.cjs
+          TZ=Pacific/Auckland node --test tests/focus_workflows/test_focus_workflows.cjs
+      - name: Install isolated Chromium automation
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            if command -v google-chrome >/dev/null; then
+              sudo ln -s "$(command -v google-chrome)" /usr/bin/chromium
+            else
+              sudo apt-get update -qq
+              sudo apt-get install -y -qq chromium
+            fi
+          fi
+      - name: Serve the actual staged WebView assets locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/track09/http.log" 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8770/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Actual Chromium DOM interactions
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_TRACK09_EVIDENCE: ${{ runner.temp }}/track09
+        run: node tests/focus_workflows/track09_chromium.cjs
+      - name: Preserve explicit non-acceptance gates
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/track09"
+          git rev-parse HEAD > "$RUNNER_TEMP/track09/EXACT_SHA.txt"
+          printf '%s\n' 'Real Android, force-stop durability, physical gestures and full 20-locale screen review: NOT_TESTED' 'RELEASE_APPROVED=NO' > "$RUNNER_TEMP/track09/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track09-goals-chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/track09/
+          retention-days: 5
+          if-no-files-found: warn

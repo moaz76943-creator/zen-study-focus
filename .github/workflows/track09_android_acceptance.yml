@@ -1,0 +1,188 @@
+name: Track09 Android Lifecycle and Source QA
+on:
+  push:
+    branches:
+      - fix/track09-goals-activity-preservation-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track09-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  full-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Record exact source SHA
+        run: git rev-parse HEAD
+      - name: Comprehensive source regression, excluding intentionally blocked media release audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in android/app/src/main/assets/web/*.js; do node --check "$file"; done
+          node tests/validate_locales.cjs
+          node tests/smoke_app.cjs
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs | sort)
+          test "${#suites[@]}" -gt 0
+          node --test --test-reporter=tap "${suites[@]}"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/android_e2e_recovery -p 'test_*.py' -v
+  debug-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 38
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Record exact source SHA
+        run: |
+          mkdir -p "$RUNNER_TEMP/track09-build"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/track09-build/source-sha.txt"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android API 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile unsigned debug APK from exact staged head
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Verify and hash debug APK
+        run: |
+          set -euo pipefail
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk | tee "$RUNNER_TEMP/track09-build/apk-sha256.txt"
+      - name: Upload disposable debug APK and source identity
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: track09-debug-apk-${{ github.sha }}
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            ${{ runner.temp }}/track09-build/
+          if-no-files-found: warn
+          retention-days: 5
+  android-emulator:
+    needs: debug-apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 38
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v4
+        with:
+          name: track09-debug-apk-${{ github.sha }}
+          path: ${{ runner.temp }}/track09-download
+      - name: Bind APK to same source SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/df4-android"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/df4-android/commit-sha.txt"
+          SHA_FILE="$(find "$RUNNER_TEMP/track09-download" -name source-sha.txt -type f -print -quit)"
+          test -s "$SHA_FILE"
+          test "$(cat "$SHA_FILE")" = "$(git rev-parse HEAD)"
+          APK="$(find "$RUNNER_TEMP/track09-download" -name app-debug.apk -type f -print -quit)"
+          test -s "$APK"
+          cp "$APK" "$RUNNER_TEMP/df4-device-test.apk"
+          sha256sum "$RUNNER_TEMP/df4-device-test.apk" > "$RUNNER_TEMP/df4-android/apk-sha256.txt"
+      - name: Check disposable emulator virtualization
+        shell: bash
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
+      - name: Run actual Android UIAutomator/WebView scenarios on disposable profile
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/android_e2e_recovery/run_ci.sh
+      - name: Preserve real Android evidence, including failure and unavailable cases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: track09-android-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/df4-android/
+          if-no-files-found: warn
+          retention-days: 5
+  android-cdp:
+    needs: debug-apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 36
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v4
+        with:
+          name: track09-debug-apk-${{ github.sha }}
+          path: ${{ runner.temp }}/track09-download
+      - name: Bind Android CDP probe to the exact downloaded APK SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/track09-android-cdp"
+          git rev-parse HEAD > "$RUNNER_TEMP/track09-android-cdp/commit-sha.txt"
+          SHA_FILE="$(find "$RUNNER_TEMP/track09-download" -name source-sha.txt -type f -print -quit)"
+          test -s "$SHA_FILE"
+          test "$(cat "$SHA_FILE")" = "$(git rev-parse HEAD)"
+          APK="$(find "$RUNNER_TEMP/track09-download" -name app-debug.apk -type f -print -quit)"
+          test -s "$APK"
+          cp "$APK" "$RUNNER_TEMP/df4-device-test.apk"
+      - name: Verify disposable Android emulator virtualization
+        shell: bash
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Inspect the actual APK WebView DOM through localhost-only CDP
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/focus_workflows/track09_android_cdp.sh
+      - name: Persist real CDP observations and unavailable transport results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: track09-android-cdp-${{ github.sha }}
+          path: ${{ runner.temp }}/track09-android-cdp/
+          retention-days: 5
+          if-no-files-found: warn
