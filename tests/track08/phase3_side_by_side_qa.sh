@@ -24,6 +24,8 @@ adb forward tcp:9223 "localabstract:webview_devtools_remote_${pid}"
 node tests/track08/qa_webview_startup_probe.cjs "$E/QA_FIRST_OPEN_DOM.json"
 # Directly exercise Android AlertDialog (Confirm cancel/accept, Alert, Prompt).
 node tests/track08/native_js_dialog_android_probe.cjs "$E"
+# Real Android Storage Access Framework: interactive Analytics Export -> Cancel & Save.
+node tests/track08/qa_real_analytics_saf.cjs "$E"
 adb shell svc wifi disable || true
 adb shell svc data disable || true
 adb shell am force-stop com.zenstudy.focus.qa
