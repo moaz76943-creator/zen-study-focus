@@ -29,5 +29,5 @@ test('native pending worksheet protects against spreadsheet CSV formulas',()=>{
 test('a stale or incomplete Android string inventory fails without producing fake review approval',()=>{
  assert.throws(()=>buildNativeReview({...inventory,inventorySha256:''},'a'.repeat(40)),/INVENTORY_SHA_REQUIRED/);
  assert.throws(()=>buildNativeReview(inventory,'bad'),/EXACT_SOURCE_SHA_REQUIRED/);
- assert.throws(()=>buildNativeReview({...inventory,uiStrings:[...inventory.uiStrings,{path:'../bad',kind:'toast',text:'hack'}]},'a'.repeat(40)),/UNSAFE_NATIVE_SOURCE_PATH/);
+ assert.throws(()=>buildNativeReview({...inventory,candidates:3,uiStrings:[...inventory.uiStrings,{path:'../bad',kind:'toast',text:'hack'}]},'a'.repeat(40)),/UNSAFE_NATIVE_SOURCE_PATH/);
 });
