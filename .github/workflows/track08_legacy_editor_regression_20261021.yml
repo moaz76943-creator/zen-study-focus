@@ -1,0 +1,89 @@
+name: Track 08 legacy-editor RED GREEN regression
+on:
+  push:
+    branches:
+      - fix/track08-legacy-editor-preserve-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track08-legacy-editor-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  tasks-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact SHA and task editor syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          node --check android/app/src/main/assets/web/tasks_studio.js
+          node --check android/app/src/main/assets/web/tasks_core_v21.js
+          node --check tests/tasks_core/tasks_studio.test.cjs
+      - name: Focused Tasks Studio and v21 source tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test --test-reporter=tap tests/tasks_core/*.test.cjs
+      - name: Smoke and locale safety
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/smoke_app.cjs
+          node tests/validate_locales.cjs
+      - name: Full Node/Python regression (media release gate separately BLOCKED)
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name media_provenance_gate.test.cjs | sort)
+          test "${#suites[@]}" -gt 0
+          node --test --test-reporter=tap "${suites[@]}"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Install ephemeral browser test runtime
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            chrome="$(command -v google-chrome || command -v google-chrome-stable || true)"
+            if [[ -n "$chrome" ]]; then
+              sudo ln -s "$chrome" /usr/bin/chromium
+            else
+              sudo apt-get update -qq
+              sudo apt-get install -y -qq chromium
+            fi
+          fi
+          test -x /usr/bin/chromium
+      - name: Real Chromium editor preserve/RTL/320-430px regression
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          export TRACK08_BROWSER_EVIDENCE="$RUNNER_TEMP/track08-browser"
+          export TRACK08_CHROMIUM=/usr/bin/chromium
+          node tests/tasks_core/tasks_chromium.cjs
+      - name: Preserve actual-browser evidence and exact source
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/track08-browser"
+          git rev-parse HEAD > "$RUNNER_TEMP/track08-browser/SOURCE_SHA"
+          printf '%s\n' 'Chromium only, Android WebView and physical device NOT_TESTED; RELEASE_APPROVED=NO' > "$RUNNER_TEMP/track08-browser/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Track08-Legacy-Editor-Source-and-Chromium
+          retention-days: 5
+          path: ${{ runner.temp }}/track08-browser/
+          if-no-files-found: warn
