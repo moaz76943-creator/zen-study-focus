@@ -77,7 +77,13 @@ jobs:
           grep -F "package: name='com.zenstudy.focus'" delivery/APK_PACKAGE_DETAILS.txt
           grep -F "versionCode='21'" delivery/APK_PACKAGE_DETAILS.txt
           "$apksigner" verify --print-certs "$apk" 2>&1 | tee delivery/APK_SIGNATURE.txt
-          # The debug bundle is expected to have a debug signing certificate.
+          # AGP builds AABs unsigned by default even for debug; sign the QA
+          # bundle explicitly using only this run's disposable Android Debug key.
+          # NEVER use upload/production signing secrets in this delivery job.
+          test -s "$HOME/.android/debug.keystore"
+          jarsigner -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -keypass android "$debug_aab" androiddebugkey \
+            > delivery/AAB_DEBUG_SIGNING.txt 2>&1
           jarsigner -verify "$debug_aab" 2>&1 | tee delivery/AAB_DEBUG_SIGNATURE.txt
           grep -Fq 'jar verified' delivery/AAB_DEBUG_SIGNATURE.txt || { echo 'Debug AAB is not signed correctly' >&2; exit 1; }
           # Release candidate intentionally lacks approved production upload signing.
