@@ -96,7 +96,7 @@ jobs:
                 > "dist/mobile_chrome_qa/viewport_${width}.html" \
                 2> "dist/mobile_chrome_qa/stderr_${width}.log"
               node tools/control_center/check_portable_dom.cjs "dist/mobile_chrome_qa/viewport_${width}.html"
-              echo "Chrome mobile-sized ${width}px DOM initialization: **PASS** (not Android touch QA)" >> "$GITHUB_STEP_SUMMARY"
+              echo "Chrome launch using requested ${width}px window: **PASS** (actual CSS width checked separately by CDP)" >> "$GITHUB_STEP_SUMMARY"
             done
           fi
 
@@ -120,8 +120,20 @@ jobs:
                 > "dist/mobile_chrome_qa/interactions_${width}.html" \
                 2> "dist/mobile_chrome_qa/interactions_stderr_${width}.log"
               node tools/control_center/check_mobile_interaction_dom.cjs "dist/mobile_chrome_qa/interactions_${width}.html"
-              echo "Chrome simulated phone-width ${width}px read-only button/navigation QA: **PASS** (not physical touch)" >> "$GITHUB_STEP_SUMMARY"
+              echo "Chrome window parameter ${width}px simulated button/navigation QA: **PASS** (actual width checked separately by CDP)" >> "$GITHUB_STEP_SUMMARY"
             done
+          fi
+
+      - name: Actual CSS mobile viewports and screenshot evidence (Chrome DevTools)
+        shell: bash
+        run: |
+          set -euo pipefail
+          browser="$(command -v google-chrome || command -v chromium || true)"
+          if [[ -z "$browser" ]]; then
+            echo "Actual 320/360/393/430 CSS viewport QA: **NOT_TESTED** (no browser)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            BROWSER_BIN="$browser" timeout 120s node tools/control_center/chrome_mobile_cdp_qa.cjs dist/deep-focus-control-center-mobile.html
+            echo "Exact CSS viewport 320/360/393/430, overflow and screenshots: **PASS** (Chrome emulation, not physical Android)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload mobile-sized Chromium DOM evidence
