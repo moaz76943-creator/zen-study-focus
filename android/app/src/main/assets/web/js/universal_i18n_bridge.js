@@ -154,7 +154,14 @@
       'search.sort.newest': 'Newest First',
       'search.sort.oldest': 'Oldest First',
       'search.sort.longest': 'Longest Duration',
-      'search.empty': 'No matching sessions found'
+      'search.empty': 'No matching sessions found',
+
+      'wow.header.title': 'WEEK-OVER-WEEK PROGRESS',
+      'wow.label.current_week': 'THIS WEEK',
+      'wow.label.previous_week': 'LAST WEEK',
+      'wow.trend.growth': 'Positive Momentum',
+      'wow.trend.consistent': 'Steady Consistency',
+      'wow.trend.dip': 'Focus Dip'
     },
     'ar': {
       'common.cycle': 'دورة',
@@ -290,7 +297,14 @@
       'search.sort.newest': 'الأحدث أولاً',
       'search.sort.oldest': 'الأقدم أولاً',
       'search.sort.longest': 'الأطول مدة',
-      'search.empty': 'لا توجد جلسات مطابقة للبحث'
+      'search.empty': 'لا توجد جلسات مطابقة للبحث',
+
+      'wow.header.title': 'مقارنة الأداء الأسبوعي',
+      'wow.label.current_week': 'هذا الأسبوع',
+      'wow.label.previous_week': 'الأسبوع السابق',
+      'wow.trend.growth': 'نمو إيجابي وتصاعد',
+      'wow.trend.consistent': 'ثبات واستقرار',
+      'wow.trend.dip': 'انخفاض في التركيز'
     },
     'es': {
       'common.cycle': 'Ciclo',
@@ -326,7 +340,10 @@
       'flip.action.flip_to_pause': 'Voltear para Pausar',
       'diag.status.healthy': 'Sistema Completamente Saludable',
       'search.placeholder': 'Buscar tareas, materias o notas...',
-      'search.filter.all_tags': 'Todas las Materias'
+      'search.filter.all_tags': 'Todas las Materias',
+      'wow.header.title': 'PROGRESO SEMANA TRAS SEMANA',
+      'wow.label.current_week': 'ESTA SEMANA',
+      'wow.label.previous_week': 'SEMANA ANTERIOR'
     },
     'fr': {
       'common.cycle': 'Cycle',
