@@ -100,3 +100,22 @@ test('missing file cannot certify Android screenshot',t=>{
   assert.equal(r.status,1,r.stdout+r.stderr);
   assert.match(r.stdout,/IMAGE_INVALID/);
 });
+
+test('corrupted PNG CRC is not accepted as visual proof',t=>{
+  const d=fs.mkdtempSync(path.join(os.tmpdir(),'df14-png-'));
+  t.after(()=>fs.rmSync(d,{recursive:true,force:true}));
+  const data=Buffer.from(fixture(true)); data[data.length-1]^=1;
+  const p=path.join(d,'bad-crc.png'); fs.writeFileSync(p,data);
+  const r=check(p);
+  assert.equal(r.status,1,r.stdout+r.stderr);
+  assert.match(r.stdout,/IMAGE_INVALID/);
+});
+test('PNG missing terminal IEND cannot be accepted',t=>{
+  const d=fs.mkdtempSync(path.join(os.tmpdir(),'df14-png-'));
+  t.after(()=>fs.rmSync(d,{recursive:true,force:true}));
+  const data=fixture(true),p=path.join(d,'missing-iend.png');
+  fs.writeFileSync(p,data.subarray(0,data.length-12));
+  const r=check(p);
+  assert.equal(r.status,1,r.stdout+r.stderr);
+  assert.match(r.stdout,/IMAGE_INVALID/);
+});
