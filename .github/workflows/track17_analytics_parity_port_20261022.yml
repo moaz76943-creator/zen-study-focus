@@ -1,0 +1,49 @@
+name: Track17 bounded analytics parity on current integration
+on:
+  push:
+    branches:
+      - fix/track17-analytics-core-performance-port-20261022
+  pull_request:
+    branches:
+      - integration/master-recovery-20261021
+    paths:
+      - 'android/app/src/main/assets/web/analytics_recovery_core.js'
+      - 'tests/analytics_recovery/**'
+      - 'tests/performance_recovery/track17_analytics_parity.cjs'
+      - '.github/workflows/track17_analytics_parity_port_20261022.yml'
+permissions:
+  contents: read
+concurrency:
+  group: track17-core-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  exact-tree-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout current candidate source
+        uses: actions/checkout@v4
+        with:
+          path: candidate
+          persist-credentials: false
+      - name: Checkout immutable pre-optimization integrated source
+        uses: actions/checkout@v4
+        with:
+          ref: d41a36af1160eb5820b81b9d6fe79dd3ec5ba7df
+          path: baseline
+          persist-credentials: false
+      - name: Capture exact source commits
+        run: |
+          git -C candidate rev-parse HEAD
+          git -C baseline rev-parse HEAD
+      - name: Prove bounded repeated-date calendar work
+        working-directory: candidate
+        run: node --test tests/analytics_recovery/track17_date_cache.test.cjs
+      - name: Prove 45 analytics/CSV semantic parity cases
+        run: node candidate/tests/performance_recovery/track17_analytics_parity.cjs baseline candidate
+      - name: Run neighboring analytics and basic startup regressions
+        working-directory: candidate
+        run: |
+          node --test tests/analytics_recovery/*.test.cjs tests/analytics_core/*.test.cjs
+          node tests/smoke_app.cjs
+          node --check android/app/src/main/assets/web/analytics_recovery_core.js
