@@ -146,7 +146,15 @@
       'diag.status.degraded': 'Performance Degraded',
       'diag.status.critical': 'Critical Issues Detected',
       'diag.action.snapshot': 'Create Snapshot',
-      'diag.action.restore': 'Restore Snapshot'
+      'diag.action.restore': 'Restore Snapshot',
+
+      'search.placeholder': 'Search tasks, tags, or notes...',
+      'search.filter.all_tags': 'All Subjects',
+      'search.filter.all_modes': 'All Modes',
+      'search.sort.newest': 'Newest First',
+      'search.sort.oldest': 'Oldest First',
+      'search.sort.longest': 'Longest Duration',
+      'search.empty': 'No matching sessions found'
     },
     'ar': {
       'common.cycle': 'دورة',
@@ -165,6 +173,7 @@
       'preset.deep_noise_isolation.desc': 'مزيج هندسي محكم من الضوضاء البنية والبيضاء وأزيز مروحة هوائية لإخفاء الأصوات المشتتة المحيطة تماماً.',
       'preset.zen_sanctuary.name': 'واحة التأمل والسكينة',
       'preset.zen_sanctuary.desc': 'حفيف غابة الخيزران مع قطرات حوض الماء الياباني ورنين الأجراس الخشبية لتصفية الذهن وخفض التوتر.',
+      'midnight_study_train': 'قطار المذاكرة الليلي',
       'preset.midnight_study_train.name': 'قطار المذاكرة الليلي',
       'preset.midnight_study_train.desc': 'حركة إيقاعية رتيبة لقطار سفر عبر الليل مع أمطار غزيرة تضرب النوافذ للحفاظ على وتيرة تركيز ثابتة ومستمرة.',
       'preset.autumn_wilderness.name': 'برية الخريف الهادئة',
@@ -273,7 +282,15 @@
       'diag.status.degraded': 'انخفاض في أداء النظام',
       'diag.status.critical': 'تنبيه: تم رصد مشكلات حرجة',
       'diag.action.snapshot': 'إنشاء نقطة استعادة احتياطية',
-      'diag.action.restore': 'استعادة من النسخة الاحتياطية'
+      'diag.action.restore': 'استعادة من النسخة الاحتياطية',
+
+      'search.placeholder': 'ابحث في المهام والمواد والملاحظات...',
+      'search.filter.all_tags': 'جميع المواد',
+      'search.filter.all_modes': 'جميع الأنماط',
+      'search.sort.newest': 'الأحدث أولاً',
+      'search.sort.oldest': 'الأقدم أولاً',
+      'search.sort.longest': 'الأطول مدة',
+      'search.empty': 'لا توجد جلسات مطابقة للبحث'
     },
     'es': {
       'common.cycle': 'Ciclo',
@@ -307,7 +324,9 @@
       'stretch.neck_shoulder.name': 'Liberación de Cuello y Hombros',
       'stretch.routine.quick_2min.title': 'Reinicio de Escritorio de 2 Minutos',
       'flip.action.flip_to_pause': 'Voltear para Pausar',
-      'diag.status.healthy': 'Sistema Completamente Saludable'
+      'diag.status.healthy': 'Sistema Completamente Saludable',
+      'search.placeholder': 'Buscar tareas, materias o notas...',
+      'search.filter.all_tags': 'Todas las Materias'
     },
     'fr': {
       'common.cycle': 'Cycle',
