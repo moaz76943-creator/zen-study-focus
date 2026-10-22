@@ -37,13 +37,27 @@ for width in 320 360 393 430; do
   for scale in 1.0 1.5 2.0; do
     timeout 40s adb shell settings put system font_scale "$scale"
     timeout 30s adb shell am force-stop com.zenstudy.focus
-    timeout 100s adb shell am start -W -n com.zenstudy.focus/.MainActivity > "$out/start-${width}-${scale}.txt"
+    startup="$out/start-${width}-${scale}.txt"
+    if ! timeout 100s adb shell am start -W -n com.zenstudy.focus/.MainActivity > "$startup" 2>&1 ||
+       ! grep -Eq 'Status:[[:space:]]*ok' "$startup"; then
+      echo "ANDROID_ACTIVITY_START_FAILED: width=$width scale=$scale" >&2
+      exit 1
+    fi
     sleep 3
-    timeout 30s adb shell pidof com.zenstudy.focus > "$out/pid-${width}-${scale}.txt"
-    test -s "$out/pid-${width}-${scale}.txt"
+    if ! timeout 30s adb shell pidof com.zenstudy.focus > "$out/pid-${width}-${scale}.txt" 2>&1 ||
+       ! test -s "$out/pid-${width}-${scale}.txt"; then
+      echo "ANDROID_APP_PROCESS_NOT_RUNNING: width=$width scale=$scale" >&2
+      exit 1
+    fi
     png="$out/android-${width}-${scale}.png"
-    timeout 50s adb exec-out screencap -p > "$png"
-    test -s "$png"
+    if ! timeout 50s adb exec-out screencap -p > "$png" 2> "$out/capture-${width}-${scale}.stderr"; then
+      echo "ANDROID_CAPTURE_TOOL_FAILED: width=$width scale=$scale" >&2
+      exit 1
+    fi
+    if ! test -s "$png"; then
+      echo "ANDROID_CAPTURE_EMPTY: width=$width scale=$scale" >&2
+      exit 1
+    fi
     printf 'width=%s font_scale=%s screenshot=CAPTURED visual_review=NOT_TESTED\n' "$width" "$scale" >> "$out/geometry_status.txt"
   done
 done
@@ -66,7 +80,15 @@ PY
 # PNG dimensions and a running app process do not prove the WebView rendered.
 # Inspect central pixels and reject blank/splash captures; keep evidence on failure.
 if ! python3 tests/white_premium_qa/track14_png_screen_guard.py "$out"/android-*.png > "$out/pixel_content_review.json"; then
-  echo 'ANDROID_WEBVIEW_RENDER_NOT_VERIFIED: screenshot pixels are blank or invalid' >&2
+  # Image bytes and app PID exist, but actual WebView pixels were NOT verified.
+  # Collect bounded diagnostics to distinguish WebView startup/compositor/tool issues;
+  # do not assert a visual app defect without positive evidence.
+  timeout 20s adb shell dumpsys activity activities > "$out/activity-state.txt" 2>&1 || true
+  timeout 20s adb shell dumpsys window windows > "$out/window-state.txt" 2>&1 || true
+  timeout 20s adb shell dumpsys webviewupdate > "$out/webview-provider.txt" 2>&1 || true
+  timeout 20s adb logcat -d -t 250 > "$out/last-logcat.txt" 2>&1 || true
+  printf 'CAPTURE_TOOL=PASS\\nACTIVITY_START=PASS\\nAPP_PROCESS=PASS\\nWEBVIEW_RENDER=NOT_VERIFIED\\nCAUSE=UNDETERMINED\\nRELEASE_APPROVED=NO\\n' > "$out/triage-status.txt"
+  echo 'ANDROID_WEBVIEW_RENDER_NOT_VERIFIED: screenshot pixels are blank or invalid; CAUSE=UNDETERMINED' >&2
   cat "$out/pixel_content_review.json" >&2
   exit 1
 fi
