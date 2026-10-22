@@ -1254,6 +1254,43 @@ function runTimerTick() {
   if (timerLeft <= 0) return finalizeTimerSession(true);
   updateTimerDisplay();
 }
+function restoreTimerSession() {
+  if (!replayNativeTimerSession()) return;
+  const snap = loadFortressData(TIMER_STORAGE_KEY, null);
+  if (!snap || typeof snap !== 'object' || !Number.isFinite(snap.total) || !Number.isFinite(snap.left)) return;
+  if (snap.total < 1 || snap.total > 86400 || snap.left < 0 || snap.left > 86400) return;
+  // A repeated restore replaces its own scheduling rather than leaking intervals.
+  if (timerInterval !== null) clearInterval(timerInterval);
+  timerInterval = null;
+  timerRunning = false;
+  timerTargetTime = null;
+  timerTotal = snap.total;
+  timerLeft = snap.left;
+  currentTimerModeKey = ['focus','short','long','custom'].includes(snap.mode) ? snap.mode : 'focus';
+  customSessionLabel = typeof snap.label === 'string' ? snap.label : '';
+  timerSessionId = typeof snap.sessionId === 'string' ? snap.sessionId : null;
+  focusSessionTaskId = Number.isSafeInteger(snap.taskId) && snap.taskId >= 0 ? snap.taskId : null;
+  quickTraining = validQuickSnapshot(snap.training);
+  timerActiveMs = Number.isFinite(snap.activeMs) && snap.activeMs >= 0 && snap.activeMs <= 86400000
+    ? snap.activeMs : Math.max(0, (timerTotal - timerLeft) * 1000);
+  timerResumeMs = snap.running && Number.isFinite(snap.endAt)
+    ? (Number.isFinite(snap.resumedAt) ? snap.resumedAt : Date.now() - Math.max(0, (timerTotal - timerLeft) * 1000))
+    : null;
+  document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  if (snap.running && Number.isFinite(snap.endAt)) {
+    timerTargetTime = snap.endAt;
+    timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
+    if (timerLeft === 0) {
+      // Native foreground timer has already emitted the expiry notification.
+      finalizeTimerSession(false);
+      return;
+    }
+    timerRunning = true;
+    document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+    timerInterval = setInterval(runTimerTick, 500);
+  }
+  updateTimerDisplay();
+}
 function replayNativeTimerSession() {
   const native = typeof window !== 'undefined' ? window.ZenNative : null;
   if (!native || typeof native.readTimerV21 !== 'function') return true;
@@ -1296,43 +1333,6 @@ function replayNativeTimerSession() {
     showToast(L().saveFailed);
     return false; // No timer mutation on corrupt/failed native replay.
   }
-}
-function restoreTimerSession() {
-  if (!replayNativeTimerSession()) return;
-  const snap = loadFortressData(TIMER_STORAGE_KEY, null);
-  if (!snap || typeof snap !== 'object' || !Number.isFinite(snap.total) || !Number.isFinite(snap.left)) return;
-  if (snap.total < 1 || snap.total > 86400 || snap.left < 0 || snap.left > 86400) return;
-  // A repeated restore replaces its own scheduling rather than leaking intervals.
-  if (timerInterval !== null) clearInterval(timerInterval);
-  timerInterval = null;
-  timerRunning = false;
-  timerTargetTime = null;
-  timerTotal = snap.total;
-  timerLeft = snap.left;
-  currentTimerModeKey = ['focus','short','long','custom'].includes(snap.mode) ? snap.mode : 'focus';
-  customSessionLabel = typeof snap.label === 'string' ? snap.label : '';
-  timerSessionId = typeof snap.sessionId === 'string' ? snap.sessionId : null;
-  focusSessionTaskId = Number.isSafeInteger(snap.taskId) && snap.taskId >= 0 ? snap.taskId : null;
-  quickTraining = validQuickSnapshot(snap.training);
-  timerActiveMs = Number.isFinite(snap.activeMs) && snap.activeMs >= 0 && snap.activeMs <= 86400000
-    ? snap.activeMs : Math.max(0, (timerTotal - timerLeft) * 1000);
-  timerResumeMs = snap.running && Number.isFinite(snap.endAt)
-    ? (Number.isFinite(snap.resumedAt) ? snap.resumedAt : Date.now() - Math.max(0, (timerTotal - timerLeft) * 1000))
-    : null;
-  document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-  if (snap.running && Number.isFinite(snap.endAt)) {
-    timerTargetTime = snap.endAt;
-    timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
-    if (timerLeft === 0) {
-      // Native foreground timer has already emitted the expiry notification.
-      finalizeTimerSession(false);
-      return;
-    }
-    timerRunning = true;
-    document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-    timerInterval = setInterval(runTimerTick, 500);
-  }
-  updateTimerDisplay();
 }
 const ringCircumference = 2 * Math.PI * 105;
 
