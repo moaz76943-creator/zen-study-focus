@@ -267,12 +267,20 @@ async function timerMain(){
   const before=await snapshot(),oldTimer=await evaluate('localStorage.getItem(TIMER_STORAGE_KEY)'),ack=await receipt();
   const cwd=adb('shell','run-as',PKG,'pwd'),dir=cwd+'/files/v21_durable_packets_v1.new';
   adb('shell','run-as',PKG,'mkdir',dir);
+  assert.match(adb('shell','run-as',PKG,'ls','-ld',dir),/v21_durable_packets_v1\.new/,'Native failure fixture was not installed');
   try {
    const target=before.cfg.domain==='work'?'sport':'work';
    assert.equal((await act("return switchActivityDomain('"+target+"',null)")).value,false);
    assert.deepEqual(await snapshot(),before);assert.equal(await evaluate('localStorage.getItem(TIMER_STORAGE_KEY)'),oldTimer);
    assert.deepEqual(await receipt(),ack);
-  } finally {adb('shell','run-as',PKG,'rmdir',dir);}
+  } finally {
+   // AtomicFile.failWrite may already remove its .new obstruction.
+   // ENOENT is a fixture-cleanup outcome, not a test failure; any
+   // different cleanup failure must remain visible.
+   const cleanup=cp.spawnSync('adb',['-s','emulator-5554','shell','run-as',PKG,'rmdir',dir],{encoding:'utf8',timeout:20000});
+   if(cleanup.status!==0&&!/No such file or directory/.test(cleanup.stderr||''))
+    throw Error('Native ACK fixture cleanup failed: '+String(cleanup.stderr).slice(0,180));
+  }
  });
  await run('timer_start_pause',async()=>{
   await evaluate('transitionActivityTimer({seconds:120});true');
@@ -303,7 +311,15 @@ async function timerMain(){
   assert.equal((await act('return applyCustomTimerNow()')).value,true);
   await act("document.getElementById('mainPlayBtn').click();return true");
   const running=await state();assert.ok(running.label.length>100);
-  await restart();const restored=await state();assert.equal(restored.id,running.id);assert.equal(restored.label,running.label);assert.equal(restored.running,true);assert.equal(restored.total,2820);
+  // Check the persisted v21 active-timer packet BEFORE killing Android;
+  // distinguish an unsaved action from a packet lost across force-stop.
+  const storedBefore=await evaluate('loadFortressData(TIMER_STORAGE_KEY,null)');
+  assert.equal(storedBefore?.sessionId,running.id,'Active timer identity not saved before force-stop');
+  assert.equal(storedBefore?.running,true,'Active timer persisted packet was not running');
+  await restart();const restored=await state();
+  const storedAfter=await evaluate('loadFortressData(TIMER_STORAGE_KEY,null)');
+  assert.equal(restored.id,running.id,'Native reopen lost running timer ID: '+JSON.stringify({persistedBefore:storedBefore?.sessionId,persistedAfter:storedAfter?.sessionId,restored:restored.id}));
+  assert.equal(restored.label,running.label);assert.equal(restored.running,true);assert.equal(restored.total,2820);
   await act("document.getElementById('mainPlayBtn').click();return true");
   const paused=await state();await restart();const reopened=await state();assert.equal(reopened.target,null);delete paused.target;delete reopened.target;assert.deepEqual(reopened,paused);
  });

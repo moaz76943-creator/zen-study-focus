@@ -8,7 +8,7 @@ concurrency:
   group: p0-android-${{ github.ref }}
   cancel-in-progress: true
 env:
-  APP_SOURCE_SHA: 0b517904dec1c85be97b82a29db380e4649d9f6f
+  APP_SOURCE_SHA: b9929bc8792bd2ece92fc3d145eab37fd5d6927f
   P0_MODE: timer
 jobs:
   android-api30:

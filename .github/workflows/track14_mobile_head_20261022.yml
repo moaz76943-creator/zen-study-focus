@@ -1,0 +1,59 @@
+name: Track14 mobile exact-head Chromium QA
+on:
+  push:
+    branches:
+      - qa/track14-mobile-head-20261022
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track14-premium-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Regression tests including seven existing destinations
+        run: node --test tests/white_premium_qa/*.test.cjs
+      - name: Install isolated Chromium browser harness
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Serve real bundled app assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/track14-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0;sleep 1;done
+          exit 1
+      - name: Browser geometry and 24 snapshots (4 widths x 2 directions x 3 font scales)
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_TRACK14_EVIDENCE: ${{ runner.temp }}/track14
+        run: node tests/white_premium_qa/track14_mobile_matrix_browser.cjs
+      - name: Pin SHA and independent Android/TalkBack limits
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/track14"
+          git rev-parse HEAD > "$RUNNER_TEMP/track14/EXACT_SHA.txt"
+          printf 'Chromium screenshots only; Android WebView/IME/real-device/TalkBack NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/track14/GATES.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track14-mobile-24-screens-${{ github.sha }}
+          path: ${{ runner.temp }}/track14/
+          retention-days: 7
+          if-no-files-found: warn

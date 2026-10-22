@@ -14,3 +14,16 @@ test('P0 API30 gate pins application tree and covers required timer flows',()=>{
  assert.match(workflow,/APP_SOURCE_SHA:/);assert.match(workflow,/HEAD:android/);assert.match(workflow,/api-level: 30/);
  assert.match(src,/application_sha/);assert.match(src,/native.*receipt|receipt\(\)/);
 });
+
+test('Android API30 IO refusal probe tolerates only absent AtomicFile staging cleanup',()=>{
+ const source=fs.readFileSync(probe,'utf8');
+ assert.match(source,/Native ACK fixture cleanup failed/);
+ assert.match(source,/No such file or directory/);
+ assert.doesNotMatch(source,/finally \{adb\('shell','run-as',PKG,'rmdir',dir\);\}/);
+});
+test('Android API30 timer reopen checks stored session identity across force-stop',()=>{
+ const source=fs.readFileSync(probe,'utf8');
+ assert.match(source,/Active timer identity not saved before force-stop/);
+ assert.match(source,/Native reopen lost running timer ID/);
+ assert.match(source,/persistedAfter/);
+});
