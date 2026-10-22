@@ -42,3 +42,10 @@ test('one GitHub issue accumulates SHA-bound hourly specialist outcomes without 
  assert.match(yaml,/ledger\.serialize\(state\)/);
  assert.doesNotMatch(yaml,/contents: write/);
 });
+
+
+test('manifest and ownership changes trigger the PR gate and execute ownership tests',()=>{
+ assert.match(yaml,/^      - 'tools\/daily_maintenance\/agents\.json'$/m);
+ assert.match(yaml,/^      - 'tests\/daily_maintenance\/agent_coverage_latest\.test\.cjs'$/m);
+ assert.match(yaml,/node --test tests\/daily_maintenance\/agent_coverage_latest\.test\.cjs/);
+});
