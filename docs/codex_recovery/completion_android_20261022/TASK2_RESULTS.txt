@@ -1,0 +1,50 @@
+RED
+✖ P0 reopen running=false training=false keeps identity/time/task/rounds (24.287756ms)
+✖ P0 reopen running=false training=true keeps identity/time/task/rounds (5.624021ms)
+✖ P0 reopen running=true training=false keeps identity/time/task/rounds (9.375149ms)
+✖ P0 reopen running=true training=true keeps identity/time/task/rounds (6.285939ms)
+✔ P0 reopen expired focus retry retains task and records completion once (6.640864ms)
+✔ P0 reopen expired custom retry retains task and records completion once (6.990341ms)
+✔ P0 reopen expired short retry retains task and records completion once (5.218019ms)
+✔ P0 reopen expired long retry retains task and records completion once (8.744993ms)
+✔ P0 reopen expired training round advances once and preserves exact round/task link (7.743549ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 5
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 629.058662
+
+
+GREEN
+✔ P0 reopen running=false training=false keeps identity/time/task/rounds (14.532483ms)
+✔ P0 reopen running=false training=true keeps identity/time/task/rounds (5.156068ms)
+✔ P0 reopen running=true training=false keeps identity/time/task/rounds (7.204159ms)
+✔ P0 reopen running=true training=true keeps identity/time/task/rounds (4.79532ms)
+✔ P0 reopen expired focus retry retains task and records completion once (7.640952ms)
+✔ P0 reopen expired custom retry retains task and records completion once (6.093183ms)
+✔ P0 reopen expired short retry retains task and records completion once (6.486692ms)
+✔ P0 reopen expired long retry retains task and records completion once (6.766175ms)
+✔ P0 reopen expired training round advances once and preserves exact round/task link (7.037092ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 440.729177
+
+FOCUSED before additional paused-icon assertion
+✔ TRACK05 active timer still updates countdown from epoch timestamp (9.770205ms)
+ℹ tests 141
+ℹ suites 0
+ℹ pass 141
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 813.66695
+Smoke/syntax/diff PASS

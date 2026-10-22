@@ -1252,18 +1252,24 @@ function restoreTimerSession() {
   const snap = loadFortressData(TIMER_STORAGE_KEY, null);
   if (!snap || typeof snap !== 'object' || !Number.isFinite(snap.total) || !Number.isFinite(snap.left)) return;
   if (snap.total < 1 || snap.total > 86400 || snap.left < 0 || snap.left > 86400) return;
+  // A repeated restore replaces its own scheduling rather than leaking intervals.
+  if (timerInterval !== null) clearInterval(timerInterval);
+  timerInterval = null;
+  timerRunning = false;
+  timerTargetTime = null;
   timerTotal = snap.total;
   timerLeft = snap.left;
   currentTimerModeKey = ['focus','short','long','custom'].includes(snap.mode) ? snap.mode : 'focus';
-  customSessionLabel = typeof snap.label === 'string' ? snap.label.slice(0, 100) : '';
+  customSessionLabel = typeof snap.label === 'string' ? snap.label : '';
   timerSessionId = typeof snap.sessionId === 'string' ? snap.sessionId : null;
   focusSessionTaskId = Number.isSafeInteger(snap.taskId) && snap.taskId >= 0 ? snap.taskId : null;
   quickTraining = validQuickSnapshot(snap.training);
   timerActiveMs = Number.isFinite(snap.activeMs) && snap.activeMs >= 0 && snap.activeMs <= 86400000
     ? snap.activeMs : Math.max(0, (timerTotal - timerLeft) * 1000);
-  timerResumeMs = snap.running
+  timerResumeMs = snap.running && Number.isFinite(snap.endAt)
     ? (Number.isFinite(snap.resumedAt) ? snap.resumedAt : Date.now() - Math.max(0, (timerTotal - timerLeft) * 1000))
     : null;
+  document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
   if (snap.running && Number.isFinite(snap.endAt)) {
     timerTargetTime = snap.endAt;
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));

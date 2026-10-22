@@ -13,7 +13,7 @@ function fixture({running=true,training=true}={}){
  }
  const cfg={lang:'en',domain:'study',focusMin:25,shortMin:5,longMin:15,
   todayMins:0,sessions:3,sessionHistory:[{id:'historic',minutes:7}],unknown:{keep:'نصي ۱۲'}};
- const c=vm.createContext({cfg,Date,Math,Number,String,JSON,
+ const c=vm.createContext({cfg,Date,Math,Number,String,JSON,tasksList:[{id:7,isStarter:false,title:"Linked task"}],
   timerRunning:running,timerTotal:120,timerLeft:90,timerTargetTime:running?Date.now()+90000:null,
   timerSessionId:'stable-id',focusSessionTaskId:7,timerActiveMs:30000,timerResumeMs:running?Date.now()-10000:null,
   timerInterval:running?17:null,currentTimerModeKey:'focus',customSessionLabel:'Old title',
@@ -40,6 +40,9 @@ function fixture({running=true,training=true}={}){
  });
  function load(source,start,end){const a=source.indexOf(start),b=source.indexOf(end,a);assert.ok(a>=0&&b>a,start);vm.runInContext(source.slice(a,b),c);}
  load(app,'const SECRET_SALT =','function loadFortressData(');
+ load(app,'function loadFortressData(',"document.addEventListener('contextmenu'");
+ load(app,'function restoreTimerSession()','const ringCircumference');
+ load(quick,'function validQuickSnapshot(', 'function quickSaveError()');
  load(app,'function storeTimerSession()','function creditCompletedSession()');
  load(app,'function toggleTimerPlay()','function resetTimerNow()');
  load(app,'function creditCompletedSession()','function runTimerTick()');
