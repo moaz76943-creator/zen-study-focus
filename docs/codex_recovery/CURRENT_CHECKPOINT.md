@@ -1,3 +1,9 @@
+# TRACK A — Android API30 exact-application-tree acceptance (2026-10-22)
+
+PR185 tested head `1682d2fe72e2a90318c59ccc6200a1437602373d`, application source `51313589b5472fcc834aa5a10ccb3240c5c062bd`, Android tree `8aad19f04b1a844055ff1ddb6fccc74100f32075`. Real API30 run 39715266944: **9 PASS / 0 FAIL / 0 NOT_TESTED**; artifact 12398454503, debug APK SHA256 `f587cffdd1ad2e6c1402e46b80c45275b1606a31b71abc4f039874fab20b81f0`, identical built / installed / artifact bytes. Native cfg rejection and real force-stop timer session ID restoration PASS. RED: previous run39709802063 was 7 PASS / 2 FAIL; persisted timer ID lost. GREEN: independent fsynced native timer packet mirror and fail-closed replay on restart, separate from original six-family v21 native record. Native timers never alter existing v21 protected ACK format or package ID. Node RED/GREEN focused source suite + full consolidated and 100-locale admission gates PASS on tested head. PR184 SAF path remains independent and unmerged: 2 PASS / 0 FAIL / 4 NOT_TESTED, run39714551395. Android success is NOT a SAF approval. No release signing, main merge, physical device or production approval. **RELEASE_APPROVED=NO**.
+
+---
+
 # Current batch receipt — completion/restore and Android gates
 
 2026-10-22; RELEASE_APPROVED=NO.

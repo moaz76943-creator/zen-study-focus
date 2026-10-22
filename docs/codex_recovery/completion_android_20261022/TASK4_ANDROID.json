@@ -1,7 +1,8 @@
 {
   "source": "Android API30 real WebView + native AtomicFile; disposable emulator only",
-  "sha": "56ea654098f7647b940cf151052e630573271e2e",
-  "application_sha": "0b517904dec1c85be97b82a29db380e4649d9f6f",
+  "sha": "1682d2fe72e2a90318c59ccc6200a1437602373d",
+  "application_sha": "51313589b5472fcc834aa5a10ccb3240c5c062bd",
+  "android_tree_sha": "8aad19f04b1a844055ff1ddb6fccc74100f32075",
   "results": [
     {
       "name": "prior_user_data_seed_native_ack",
@@ -10,8 +11,8 @@
     },
     {
       "name": "native_cfg_ack_io_refusal",
-      "status": "FAIL",
-      "detail": "Command failed: adb -s emulator-5554 shell run-as com.zenstudy.focus rmdir /data/user/0/com.zenstudy.focus/files/v21_durable_packets_v1.new\nrmdir: /data/user/0/com.zenstudy.focus/files/v21_durable_packets_v1.new: No such file or directory\n"
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
     },
     {
       "name": "timer_start_pause",
@@ -25,8 +26,8 @@
     },
     {
       "name": "timer_mode_and_custom_reopen",
-      "status": "FAIL",
-      "detail": "Expected values to be strictly equal:\n+ actual - expected\n\n+ null\n- '1792635190362-56720956'\n"
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
     },
     {
       "name": "activity_and_sport_rest",
@@ -51,12 +52,21 @@
   ],
   "release_approved": false,
   "counts": {
-    "PASS": 7,
-    "FAIL": 2,
+    "PASS": 9,
+    "FAIL": 0,
     "NOT_TESTED": 0
   },
-  "run_id": 39709802063,
-  "artifact_id": 12396701686,
-  "tested_apk_sha256": "4f9a05ee95f54f437b4502cb4d9766353f70b82107d9753d44c04856fd537c05",
-  "merge_allowed": false
+  "run_id": 39715266944,
+  "artifact_id": 12398454503,
+  "tested_apk_sha256": "f587cffdd1ad2e6c1402e46b80c45275b1606a31b71abc4f039874fab20b81f0",
+  "merge_allowed": true,
+  "original_failure": {
+    "run_id": 39709802063,
+    "counts": {
+      "PASS": 7,
+      "FAIL": 2,
+      "NOT_TESTED": 0
+    }
+  },
+  "saf_independent": "NOT_TESTED"
 }
