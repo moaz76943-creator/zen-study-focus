@@ -17,3 +17,20 @@ node --check app.js; git diff --check.
 Reviewed normal finalizer only; no repeat of176–181 repairs. Rollback scoped revert.
 SOURCE_PASS; Android/SAF/device NOT_TESTED. Publish/review/integration-only merge,
 verify SHA and receipt before Task2. User explicitly authorizes sequential merges.
+
+Task1 merged PR182:8d26ea3a4b88213643951381e101b15f7d618297, receipt on GitHub
+before Task2. Task2 based exactly on that merge.
+Task2 RED4 FAIL/5 PASS -> GREEN9 PASS; focused141 PASS; smoke/syntax/diff PASS.
+restore now clears previous interval/running/target before applying valid snapshot,
+uses paused icon unless running, and retains full saved label (previously cut100).
+Real loader/writer/restore/validator/credit tests cover paused/live/expired,
+training rounds, task7 binding, idempotent credit and no repeated expiry chime.
+Initial fixture omitted actual tasksList, causing2 false task-link failures;
+added real synthetic task7, then reran baseline RED before production fix.
+No stored packet rewrite for live/paused restore. No v21 format/key change.
+New suite owns existing qa directory. Commands: node --test timer_reopen_durability
+plus Task1 focused suites; source smoke/syntax/diff. Final paused-icon assertion
+and focused reopen9 rerun after final UI change; no unrelated suite repetition.
+Reviewed restore-only source diff. Rollback scoped revert. SOURCE_PASS;
+Android/process-death/power-loss NOT_TESTED. Next publish/review/integration merge,
+verify receipt before SAF work. RELEASE_APPROVED=NO.
