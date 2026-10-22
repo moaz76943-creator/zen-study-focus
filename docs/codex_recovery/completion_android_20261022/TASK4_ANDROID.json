@@ -1,0 +1,62 @@
+{
+  "source": "Android API30 real WebView + native AtomicFile; disposable emulator only",
+  "sha": "56ea654098f7647b940cf151052e630573271e2e",
+  "application_sha": "0b517904dec1c85be97b82a29db380e4649d9f6f",
+  "results": [
+    {
+      "name": "prior_user_data_seed_native_ack",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "native_cfg_ack_io_refusal",
+      "status": "FAIL",
+      "detail": "Command failed: adb -s emulator-5554 shell run-as com.zenstudy.focus rmdir /data/user/0/com.zenstudy.focus/files/v21_durable_packets_v1.new\nrmdir: /data/user/0/com.zenstudy.focus/files/v21_durable_packets_v1.new: No such file or directory\n"
+    },
+    {
+      "name": "timer_start_pause",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "timer_reset_cancel_retry",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "timer_mode_and_custom_reopen",
+      "status": "FAIL",
+      "detail": "Expected values to be strictly equal:\n+ actual - expected\n\n+ null\n- '1792635190362-56720956'\n"
+    },
+    {
+      "name": "activity_and_sport_rest",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "quick_training_rejection_retry",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "timer_completion_credit_retry",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "prior_user_data_unchanged",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    }
+  ],
+  "release_approved": false,
+  "counts": {
+    "PASS": 7,
+    "FAIL": 2,
+    "NOT_TESTED": 0
+  },
+  "run_id": 39709802063,
+  "artifact_id": 12396701686,
+  "tested_apk_sha256": "4f9a05ee95f54f437b4502cb4d9766353f70b82107d9753d44c04856fd537c05",
+  "merge_allowed": false
+}

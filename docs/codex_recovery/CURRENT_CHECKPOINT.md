@@ -1,3 +1,19 @@
+# Current batch receipt — completion/restore and Android gates
+
+2026-10-22; RELEASE_APPROVED=NO.
+
+Integrated source fixes: PR182 merge8d26ea3a4b88213643951381e101b15f7d618297;
+PR183 merge0b517904dec1c85be97b82a29db380e4649d9f6f (current integration).
+Task3 SAF PR184 isolated: API30 run39709234659 failed, no merge.
+Task4 Android acceptance PR185 isolated: run39709802063 failed, no merge.
+Actual APK/source receipts and detailed PASS/FAIL/NOT_TESTED:
+completion_android_20261022/CHECKPOINT.md and TASK4_ANDROID.json.
+Next: reproduce native timer ID loss with raw before/after packets on disposable
+API30; fix SAF fixture selection and maxBuffer before asserting actual file restore.
+No source PASS is Android PASS; failed gates must not be admitted. main untouched.
+
+## Historical inherited checkpoint (superseded)
+
 # Current continuation — activity/training P0 batch
 
 2026-10-22. RELEASE_APPROVED=NO.

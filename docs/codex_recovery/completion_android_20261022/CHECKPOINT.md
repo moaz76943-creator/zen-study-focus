@@ -56,3 +56,31 @@ old transient target is intentionally not persisted. No unrelated test reruns.
 Await exact-head Android result; keep PR isolated on FAIL/NOT_TESTED. If SAF passes
 and is admitted later, repin/retest changed final application tree before claiming
 acceptance. No main/package/data/schema changes. RELEASE_APPROVED=NO.
+
+Task4 actual API30 run39709802063 completed FAILURE:7 PASS /2 FAIL.
+Tested QA56ea654098f7647b940cf151052e630573271e2e;
+application0b517904dec1c85be97b82a29db380e4649d9f6f;
+android treea9d8f7934d9a5852d6208938ca3fe3e655e2c03d.
+Downloaded actual APK checksum matches installed receipt:
+4f9a05ee95f54f437b4502cb4d9766353f70b82107d9753d44c04856fd537c05.
+PASS: native baselineACK, StartPause/service creation, Reset cancel/reject/retry,
+activity/sport cancel/reject/retry, training cancel/reject/retry, completion credit
+retry exactly once, prior synthetic tasks/notes/unknown fields after restart.
+FAIL1: native cfg IO test cleanup rmdir reports missing .new directory; cleanup
+masked the primary result. Cannot certify native IO refusal from this case.
+FAIL2: custom running session ID becomes null after force-stop/reopen. Actual
+reopen gate not met despite source restore tests. No unexpected startup JS error
+in captured log; the logged TIMER_SAVE_NOT_ACKNOWLEDGED came from intended fault
+injection. Evidence does NOT isolate async WebView disk flush vs startup overwrite;
+auxiliary timer remains outside six-family nativeACK. Do not speculate or extend
+native schema without a new RED proof. Next bounded diagnostic: raw timer packet
+and epoch/ID before stop, after actual reopen, and trace initial timer writes.
+Source-only readiness is not Android readiness. PR185 remains Draft/unmerged.
+
+Task3 PR184 remains unmerged with actual gate failure recorded in its own branch:
+2 PASS/1 FAIL/3 NOT_TESTED, run39709234659, artifact12395639341. No SAF change in
+final integration. Its docs-only evidence head30f07b017648bee947b2bc241e9a4cfaa84f39b8.
+Both failed gates preserved before ending batch; no indefinite rerun, no successful
+same-SHA test repetition. Final integration remains Task2 mergedSHA above.
+SOURCE_PASS for Task1/2, ANDROID_FAIL for acceptance; SAF path NOT_TESTED/FAIL.
+main/package/permissions/signing unchanged. RELEASE_APPROVED=NO.
