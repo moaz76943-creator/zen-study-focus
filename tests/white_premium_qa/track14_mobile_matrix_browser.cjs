@@ -169,6 +169,7 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
       localeChecks.push({...info,errors});
       if(errors.length)problems.push({tag:'locale-'+language+'-320-200',failures:errors});
     }
+    console.log('TRACK14_LOCALE_DIAGNOSTICS',JSON.stringify(localeChecks));
     fs.writeFileSync(path.join(output,'matrix.json'),JSON.stringify({rows,navClicks,localeChecks,uncaught,problems,
       limits:'Chromium at CSS root-font 100/150/200%, not physical Android textZoom, screen reader, native dialogs, keyboard IME or 20-locale approval. No user storage touched.'},null,2));
   }finally{await browser.close();}
