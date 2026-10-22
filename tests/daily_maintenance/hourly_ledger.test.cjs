@@ -5,7 +5,7 @@ const ledger=require('../../tools/daily_maintenance/cohort_ledger.cjs');
 const sha='a'.repeat(40),fingerprint='b'.repeat(64);
 const ids=['localization','notes','tasks','analytics'];
 function cycle({source_sha=sha,manifest_sha256=fingerprint,checked_at='2026-10-20T01:23:00.000Z',chosen=[ids[0]],statuses={},unmapped=[],duplicates=[]}={}){
- return {schema_version:1,source_sha,manifest_sha256,checked_at,agent_ids:ids,agents:chosen.map(id=>({id,status:statuses[id]||'SOURCE_TESTED',tests:2})),selected_agents:chosen.length,total_agents:ids.length,coverage:{unmapped,duplicates},status:'COHORT_PASS'};
+ return {schema_version:1,source_sha,manifest_sha256,checked_at,agent_ids:ids,agents:chosen.map(id=>({id,status:statuses[id]||'SOURCE_TESTED',tests:2})),selected_agents:chosen.length,total_agents:ids.length,coverage:{unmapped,duplicates},status:chosen.some(id=>(statuses[id]||'SOURCE_TESTED')!=='SOURCE_TESTED')?'BLOCKED':unmapped.length||duplicates.length?'COVERAGE_GAP':'COHORT_PASS'};
 }
 test('one hourly green cohort does not indicate a full green cycle',()=>{
  const s=ledger.aggregate(null,cycle());
@@ -77,5 +77,6 @@ test('zero executed cases cannot become trusted SOURCE_TESTED evidence',()=>{
 
 test('a declared passing cohort with a blocked specialist is rejected as contradictory evidence',()=>{
  const raw=cycle({statuses:{localization:'BLOCKED'}});
+ raw.status='COHORT_PASS';
  assert.throws(()=>ledger.aggregate(null,raw),/cohort|status|evidence|inconsistent/i);
 });
