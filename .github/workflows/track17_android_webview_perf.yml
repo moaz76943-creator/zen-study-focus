@@ -1,0 +1,118 @@
+name: Track 17 Offline Android WebView Perf (Disposable)
+on:
+  pull_request:
+    paths:
+      - 'tests/performance_recovery/**'
+      - '.github/workflows/track17_android_webview_perf.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track17-android-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  compile-debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify source-test tooling syntax and focused tests
+        run: |
+          node --check tests/performance_recovery/track17_webview_probe.cjs
+          node --check tests/performance_recovery/track17_benchmark.cjs
+          bash -n tests/performance_recovery/android_metrics_probe.sh
+          bash -n tests/performance_recovery/run_track17_android_ci.sh
+          node --test tests/performance_recovery/*.test.cjs
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install compile Android SDK API 36
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile unmodified app debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Record exact SHA and debug checksum
+        run: |
+          git rev-parse HEAD
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: track17-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 3
+          if-no-files-found: error
+  android-webview:
+    needs: compile-debug
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        api: ['30','35']
+    env:
+      ANDROID_TEST_API: ${{ matrix.api }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v4
+        with:
+          name: track17-debug-apk
+          path: ${{ runner.temp }}/track17-apk-download
+      - name: Isolate the APK to be installed
+        shell: bash
+        run: |
+          find "$RUNNER_TEMP/track17-apk-download" -name app-debug.apk -type f -print
+          cp "$RUNNER_TEMP/track17-apk-download/app-debug.apk" "$RUNNER_TEMP/track17-app-debug.apk"
+          test -s "$RUNNER_TEMP/track17-app-debug.apk"
+          mkdir -p "$RUNNER_TEMP/track17-android-${{ matrix.api }}"
+      - name: Enable ephemeral KVM for emulator
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Real offline Android API ${{ matrix.api }} (no user data)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/performance_recovery/run_track17_android_ci.sh
+      - name: Record non-certification limits
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/track17-android-${{ matrix.api }}"
+          printf 'APP=DEBUG_APK_WITH_TRACK17_ANALYTICS_OPTIMIZATION\nTEST_TYPE=DISPOSABLE_EMULATOR_NOT_PHYSICAL_DEVICE\nCPU_PSS=OBSERVATION_NOT_LEAK_PROOF\nACTIVITY_START=NOT_WEBVIEW_READY\nE2E_TOUCH=NOT_TESTED\nAUDIO_BACKGROUND=NOT_TESTED\nSTORAGE_QUOTA=NOT_TESTED\nV21_DATA=NOT_MUTATED_BY_SCALE_BENCHMARK\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/track17-android-${{ matrix.api }}/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track17-android-api-${{ matrix.api }}-${{ github.sha }}
+          path: ${{ runner.temp }}/track17-android-${{ matrix.api }}/
+          retention-days: 3
+          if-no-files-found: warn
