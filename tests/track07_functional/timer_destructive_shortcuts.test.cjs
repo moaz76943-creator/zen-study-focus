@@ -37,6 +37,7 @@ test('custom Save button cancellation preserves label and the open custom dialog
  const s=body('applyCustomTimerNow','changeTimerDelta');
  const choose=s.indexOf('selectTimerModeFromUser(');
  assert.ok(choose>=0);
- assert.ok(s.indexOf('customSessionLabel =')>choose,'Do not change label until after confirmation');
+ assert.match(s,/selectTimerModeFromUser\(mins, 'custom', document\.getElementById\('modeCustomBtn'\), nextLabel\)/,'Pass label into the same confirmed persisted transition');
+ assert.doesNotMatch(s,/customSessionLabel\s*=/,'Do not mutate label separately after saving');
  assert.ok(s.indexOf("closeModal('customTimerModal')")>choose,'Do not close entered form on Cancel');
 });
