@@ -93,7 +93,14 @@
       'notification.action.add_5m': '+5 Min',
       'notification.status.focusing': 'Focus in Progress',
       'notification.status.paused': 'Session Paused',
-      'notification.status.break': 'Rest & Recharge'
+      'notification.status.break': 'Rest & Recharge',
+
+      'power_saver.status.active': 'Power Saver Active',
+      'power_saver.status.charging': 'Device Charging',
+      'power_saver.status.normal': 'Standard Performance',
+      'power_saver.mode.auto': 'Auto (<= 20%)',
+      'power_saver.mode.always_on': 'Always On',
+      'power_saver.mode.always_off': 'Always Off'
     },
     'ar': {
       'common.cycle': 'دورة',
@@ -167,7 +174,14 @@
       'notification.action.add_5m': '+5 دقائق',
       'notification.status.focusing': 'جلسة تركيز جارية',
       'notification.status.paused': 'الجلسة متوقفة مؤقتاً',
-      'notification.status.break': 'وقت الاستراحة والراحة'
+      'notification.status.break': 'وقت الاستراحة والراحة',
+
+      'power_saver.status.active': 'نمط توفير الطاقة نشط',
+      'power_saver.status.charging': 'الجهاز قيد الشحن',
+      'power_saver.status.normal': 'أداء قياسي كامل',
+      'power_saver.mode.auto': 'تلقائي (<= 20%)',
+      'power_saver.mode.always_on': 'مفعّل دائماً',
+      'power_saver.mode.always_off': 'معطّل دائماً'
     },
     'es': {
       'common.cycle': 'Ciclo',
@@ -188,7 +202,10 @@
       'notification.action.pause': 'Pausa',
       'notification.action.resume': 'Continuar',
       'notification.action.finish': 'Terminar',
-      'notification.action.add_5m': '+5 min'
+      'notification.action.add_5m': '+5 min',
+      'power_saver.status.active': 'Ahorro de Batería Activo',
+      'power_saver.status.charging': 'Dispositivo Cargando',
+      'power_saver.status.normal': 'Rendimiento Estándar'
     },
     'fr': {
       'common.cycle': 'Cycle',
