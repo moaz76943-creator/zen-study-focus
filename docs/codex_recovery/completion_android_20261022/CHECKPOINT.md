@@ -34,3 +34,25 @@ and focused reopen9 rerun after final UI change; no unrelated suite repetition.
 Reviewed restore-only source diff. Rollback scoped revert. SOURCE_PASS;
 Android/process-death/power-loss NOT_TESTED. Next publish/review/integration merge,
 verify receipt before SAF work. RELEASE_APPROVED=NO.
+
+Task3 isolated PR184 commit1a9c3b8cf46afa39cb008bfb56126ee007e639e6;
+SOURCE_PASS18, actualAPI30 run39709234659 pending. Checkpoint comment6330933481
+recorded before preparing Task4; no unproven SAF merge. Old159 is not current proof.
+
+Task4 QA-only candidate on integration0b517904dec1c85be97b82a29db380e4649d9f6f.
+APP_SOURCE_SHA pin checked against HEAD:android before build, actual installed APK
+hash and QA SHA recorded separately. Reuses prior local-only CDP/native UI/ADB
+helpers, real app-owned confirmations accepted/cancelled by UIAutomator, real
+bridge/AtomicFile cfg ACK IO rejection, mocked timer save refusal, actual live
+WebView controls/functions and force-stop/reopen. Checks prior synthetic task/note
+IDs/unknown fields, same task completion exactly once, domain/sport/training,
+StartPause/Reset/mode/custom/reopen/completion. Physical handset/TalkBack/audio
+quality and power-loss not certified. Dedicated disposableAPI30 job,25min timeout,
+300s probe bound, no signing or release. No production app change in this QA branch.
+Coverage/attestation contract RED1 FAIL/1 PASS ->GREEN2 PASS; syntax/bash/diff PASS.
+Probe exits1 with bootstrap NOT_TESTED when no disposable emulator, never fakePASS.
+One paused-reopen test compares persisted fields and expects target=null: pause's
+old transient target is intentionally not persisted. No unrelated test reruns.
+Await exact-head Android result; keep PR isolated on FAIL/NOT_TESTED. If SAF passes
+and is admitted later, repin/retest changed final application tree before claiming
+acceptance. No main/package/data/schema changes. RELEASE_APPROVED=NO.
