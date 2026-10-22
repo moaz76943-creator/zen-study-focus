@@ -134,7 +134,13 @@
       'stretch.routine.screen_relief.title': 'Screen Fatigue Relief',
       'stretch.routine.screen_relief.desc': 'Focused eye rest, neck alignment, and chest opening for intense reading.',
       'stretch.badge.mobility': 'DESK MOBILITY',
-      'stretch.label.duration': 'DURATION'
+      'stretch.label.duration': 'DURATION',
+
+      'flip.action.flip_to_pause': 'Flip to Pause / Mute',
+      'flip.action.flip_to_focus': 'Flip to Focus',
+      'flip.action.disabled': 'Disabled',
+      'flip.status.face_down': 'Phone Face Down',
+      'flip.status.face_up': 'Phone Face Up'
     },
     'ar': {
       'common.cycle': 'دورة',
@@ -153,6 +159,7 @@
       'preset.deep_noise_isolation.desc': 'مزيج هندسي محكم من الضوضاء البنية والبيضاء وأزيز مروحة هوائية لإخفاء الأصوات المشتتة المحيطة تماماً.',
       'preset.zen_sanctuary.name': 'واحة التأمل والسكينة',
       'preset.zen_sanctuary.desc': 'حفيف غابة الخيزران مع قطرات حوض الماء الياباني ورنين الأجراس الخشبية لتصفية الذهن وخفض التوتر.',
+      'midnight_study_train': 'قطار المذاكرة الليلي',
       'preset.midnight_study_train.name': 'قطار المذاكرة الليلي',
       'preset.midnight_study_train.desc': 'حركة إيقاعية رتيبة لقطار سفر عبر الليل مع أمطار غزيرة تضرب النوافذ للحفاظ على وتيرة تركيز ثابتة ومستمرة.',
       'preset.autumn_wilderness.name': 'برية الخريف الهادئة',
@@ -249,7 +256,13 @@
       'stretch.routine.screen_relief.title': 'تخفيف إجهاد الشاشة والقراءة',
       'stretch.routine.screen_relief.desc': 'راحة مركزة للعين ومحاذاة الرقبة للمذاكرة الرقمية المكثفة.',
       'stretch.badge.mobility': 'حركات استراحة مكتبية',
-      'stretch.label.duration': 'المدة'
+      'stretch.label.duration': 'المدة',
+
+      'flip.action.flip_to_pause': 'قلب الهاتف للإيقاف المؤقت أو كتم الصوت',
+      'flip.action.flip_to_focus': 'قلب الهاتف لبدء جلسة التركيز',
+      'flip.action.disabled': 'معطّل',
+      'flip.status.face_down': 'الهاتف مقلوب للأسفل',
+      'flip.status.face_up': 'الهاتف موجه للأعلى'
     },
     'es': {
       'common.cycle': 'Ciclo',
@@ -281,7 +294,8 @@
       'goals.label.completed': 'HORAS COMPLETADAS',
       'goals.pace.on_track': 'Al Día',
       'stretch.neck_shoulder.name': 'Liberación de Cuello y Hombros',
-      'stretch.routine.quick_2min.title': 'Reinicio de Escritorio de 2 Minutos'
+      'stretch.routine.quick_2min.title': 'Reinicio de Escritorio de 2 Minutos',
+      'flip.action.flip_to_pause': 'Voltear para Pausar'
     },
     'fr': {
       'common.cycle': 'Cycle',
