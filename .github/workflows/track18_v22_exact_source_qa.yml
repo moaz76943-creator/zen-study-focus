@@ -1,0 +1,194 @@
+name: Track18 exact-source v22 test APK and AAB (release locked)
+
+on:
+  push:
+    branches:
+      - release/track18-exact-v22-qa-20261021
+
+permissions:
+  contents: read
+
+concurrency:
+  group: track18-v22-exact-source-qa
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      INTEGRATED_BASE_SHA: d0116e69e67667b24a1689d621823d9823df2711
+    steps:
+      - name: Checkout exact QA SHA without credentials
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fail closed on source drift, package/contract changes and unauthorized paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git cat-file -e "$INTEGRATED_BASE_SHA^{commit}"
+          git merge-base --is-ancestor "$INTEGRATED_BASE_SHA" HEAD
+          test "$(git rev-parse "$INTEGRATED_BASE_SHA:android/app/src/main")" = "$(git rev-parse HEAD:android/app/src/main)"
+          test "$(git rev-parse "$INTEGRATED_BASE_SHA:tools")" = "$(git rev-parse HEAD:tools)"
+          mapfile -t changed < <(git diff --name-only "$INTEGRATED_BASE_SHA" HEAD)
+          for file in "${changed[@]}"; do
+            case "$file" in
+              android/app/build.gradle|tests/integration_quality/track18_signing_v22.test.cjs|.github/workflows/track18_v22_exact_source_qa.yml) ;;
+              *) echo "::error::Unexpected file changed since verified integration SHA: $file"; exit 1 ;;
+            esac
+          done
+          node --test tests/integration_quality/track18_signing_v22.test.cjs
+          test "$(git hash-object android/app/build.gradle)" = 03ec653826e98bf108beeb2db1543ae2efb890a9
+          echo "INTEGRATED_APPLICATION_SOURCE=$INTEGRATED_BASE_SHA"
+          echo "TRACK18_BUILD_SOURCE=$GITHUB_SHA"
+      - name: Existing source and durability regression checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/regression_v21/*.test.cjs tests/data_contracts/*.test.cjs tests/focus_workflows/*.test.cjs tests/integration_quality/*.test.cjs
+          python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android platform 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$sdkmanager"
+          "$sdkmanager" 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build debug APK, debug AAB, unsigned release AAB from this exact SHA
+        working-directory: android
+        env:
+          ZEN_UPLOAD_KEYSTORE_PATH: ''
+          ZEN_UPLOAD_STORE_PASSWORD: ''
+          ZEN_UPLOAD_KEY_ALIAS: ''
+          ZEN_UPLOAD_KEY_PASSWORD: ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle :app:assembleDebug :app:bundleDebug :app:bundleRelease --no-daemon
+      - name: Verify content, signing classification, package and SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p delivery
+          apk=android/app/build/outputs/apk/debug/app-debug.apk
+          qa_bundle=android/app/build/outputs/bundle/debug/app-debug.aab
+          unsigned_bundle=android/app/build/outputs/bundle/release/app-release.aab
+          for file in "$apk" "$qa_bundle" "$unsigned_bundle"; do test -s "$file"; done
+          aapt="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          "$aapt" dump badging "$apk" > delivery/APK_BADGING.txt
+          "$aapt" dump permissions "$apk" > delivery/APK_PERMISSIONS.txt
+          grep -F "package: name='com.zenstudy.focus'" delivery/APK_BADGING.txt
+          grep -F "versionCode='22'" delivery/APK_BADGING.txt
+          grep -F "versionName='22.0.0'" delivery/APK_BADGING.txt
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$apk" > delivery/APK_SIGNING.txt
+          unzip -t "$qa_bundle" > delivery/DEBUG_AAB_ZIP_TEST.txt
+          unzip -t "$unsigned_bundle" > delivery/UNSIGNED_AAB_ZIP_TEST.txt
+          unzip -Z1 "$apk" > delivery/APK_ASSETS_LIST.txt
+          unzip -Z1 "$unsigned_bundle" > delivery/AAB_ASSETS_LIST.txt
+          grep -Fx 'assets/web/index.html' delivery/APK_ASSETS_LIST.txt
+          grep -Fx 'base/assets/web/index.html' delivery/AAB_ASSETS_LIST.txt
+          grep -Fx 'base/manifest/AndroidManifest.xml' delivery/AAB_ASSETS_LIST.txt
+          jarsigner -verify "$unsigned_bundle" > delivery/UNSIGNED_AAB_SIGNATURE.txt 2>&1 || true
+          if ! grep -qi 'jar is unsigned' delivery/UNSIGNED_AAB_SIGNATURE.txt; then
+            echo 'Release-format AAB is unexpectedly signed or unverifiable; refuse labeling it unsigned' >&2
+            exit 1
+          fi
+          qa_keystore="$RUNNER_TEMP/track18-disposable-qa.p12"
+          qa_pass="$(openssl rand -hex 20)"
+          keytool -genkeypair -noprompt -storetype PKCS12 -keystore "$qa_keystore" -alias qa-only -keyalg RSA -keysize 3072 -validity 2 -storepass "$qa_pass" -keypass "$qa_pass" -dname 'CN=Track18 Disposable QA, O=Test, C=US' > "$RUNNER_TEMP/track18-keygen.log" 2>&1
+          jarsigner -keystore "$qa_keystore" -storepass "$qa_pass" -keypass "$qa_pass" "$qa_bundle" qa-only > "$RUNNER_TEMP/track18-qa-sign.log" 2>&1
+          unset qa_pass
+          jarsigner -verify -verbose "$qa_bundle" > delivery/QA_AAB_SIGNATURE.txt 2>&1
+          grep -Fq 'jar verified.' delivery/QA_AAB_SIGNATURE.txt
+          cp "$apk" delivery/DeepFocus-v22-Debug.apk
+          cp "$qa_bundle" delivery/DeepFocus-v22-QA-Debug-Signed.aab
+          cp "$unsigned_bundle" delivery/DeepFocus-v22-UNSIGNED-Release.aab
+          git rev-parse HEAD > delivery/QA_BUILD_SHA.txt
+          printf '%s\n' "$INTEGRATED_BASE_SHA" > delivery/FINAL_INTEGRATION_SOURCE_SHA.txt
+          git rev-parse HEAD:android/app/src/main > delivery/ANDROID_RUNTIME_TREE_SHA.txt
+          sha256sum delivery/*.apk delivery/*.aab > delivery/SHA256SUMS.txt
+          cat delivery/SHA256SUMS.txt
+          cat > delivery/RELEASE_STATUS.txt <<'EOF'
+          TRACK18_RELEASE_APPROVED=NO
+          PACKAGE_ID=com.zenstudy.focus
+          VERSION_CODE=22
+          VERSION_NAME=22.0.0
+          APK=DEBUG_SIGNED; INSTALLABLE_ON_FRESH_QA_DEVICE_ONLY
+          DEBUG_AAB=EPHEMERAL_QA_SIGNED; NOT_PLAY_READY
+          RELEASE_AAB=UNSIGNED; NOT_PLAY_READY
+          PLAY_READY_AAB=NOT_BUILT; OWNER_UPLOAD_CREDENTIALS_AND_GATES_REQUIRED
+          RELEASE_NON_DEBUGGABLE=SOURCE_CONFIG_VERIFIED; NOT_A_PLAY_VALIDATION
+          V21_DATA_AND_EXISTING_INSTALLS=MUST_NOT_DELETE_OR_MIGRATE
+          SIGNATURE_MISMATCH=DO_NOT_UNINSTALL_EXISTING_APP
+          MEDIA_LICENSES_AND_REAL_DEVICE_ACCEPTANCE=BLOCKED
+          NO_MAIN_MERGE_NO_PLAY_UPLOAD_NO_RELEASE_PUBLISH
+          EOF
+          echo "TEST_ARTIFACTS_PACKAGED=PASS; RELEASE_APPROVED=NO"
+      - name: Upload exact-head APK AAB SHA256 and evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Track18-v22-QA-APK-AAB
+          path: delivery/
+          retention-days: 14
+          if-no-files-found: error
+
+  android-smoke:
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: DeepFocus-Track18-v22-QA-APK-AAB
+          path: delivery
+      - name: Confirm downloaded immutable source receipt and APK SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(cat delivery/QA_BUILD_SHA.txt)" = "$GITHUB_SHA"
+          sha256sum -c delivery/SHA256SUMS.txt
+          mkdir -p android-evidence
+          cp delivery/QA_BUILD_SHA.txt android-evidence/QA_BUILD_SHA.txt
+      - name: Boot Android 30 emulator, install and reopen without uninstall
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            adb install -r delivery/DeepFocus-v22-Debug.apk
+            adb shell am start -W -n com.zenstudy.focus/.MainActivity | tee android-evidence/first-start.txt
+            sleep 8
+            adb shell pidof com.zenstudy.focus | tee android-evidence/first-pid.txt
+            adb exec-out screencap -p > android-evidence/first-start.png
+            adb shell am force-stop com.zenstudy.focus
+            adb shell am start -W -n com.zenstudy.focus/.MainActivity | tee android-evidence/restart.txt
+            sleep 8
+            adb shell pidof com.zenstudy.focus | tee android-evidence/restarted-pid.txt
+            adb exec-out screencap -p > android-evidence/restart.png
+            printf 'EMULATOR_API30_DEBUG_INSTALL_LAUNCH_RESTART=PASS\nREAL_USER_DEVICE_DATA_RESTORATION=NOT_TESTED\nRELEASE_APPROVED=NO\n' > android-evidence/STATUS.txt
+      - name: Archive emulator evidence even if boot or lifecycle fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Track18-API30-Android-Smoke
+          path: android-evidence/
+          retention-days: 14
+          if-no-files-found: warn
