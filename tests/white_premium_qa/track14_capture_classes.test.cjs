@@ -22,3 +22,12 @@ test('Blank-image failure retains bounded Android startup, WebView and window di
   assert.match(src,/CAUSE=UNDETERMINED/);
   assert.match(src,/RELEASE_APPROVED=NO/);
 });
+
+test('semantic UI proof is sampled with each matching screenshot, not after the 12 frame matrix',()=>{
+  const capture=src.indexOf('adb exec-out screencap -p');
+  const semantic=src.indexOf('track14_rendered_hierarchy_guard.py');
+  const manifest=src.indexOf("python3 - \"$out\" <<'PY'");
+  assert.ok(capture>=0 && semantic>capture && manifest>semantic,
+    'semantic tree must be paired with current width/font scale before advancing');
+  assert.match(src,/rm -f "\$local_xml"/);
+});
