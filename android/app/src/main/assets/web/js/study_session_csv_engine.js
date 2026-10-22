@@ -1,43 +1,39 @@
 /**
- * DEEP FOCUS — Study Session CSV Exporter & Importer Engine (M092)
+ * DEEP FOCUS — Study Session CSV Exporter & Importer Engine (M092 Updated)
  * File: android/app/src/main/assets/web/js/study_session_csv_engine.js
- *
- * Provides RFC 4180 compliant CSV export and import for study session records
- * with full UTF-8 BOM encoding for seamless compatibility with Microsoft Excel
- * and Google Sheets in both Arabic and English.
- *
- * Core Directives & Standards:
- * - UTF-8 Byte Order Mark (\uFEFF) for zero-corruption Arabic display in Excel
- * - RFC 4180 standard escaping (double quotes for commas, quotes, and newlines)
- * - Dual-language headers (Arabic & English column recognition on import)
- * - Strict Western Arabic Digits (0123456789)
- * - Strict Hebrew Exclusion (No 'he' / 'iw' locales)
- * - v21 Data Fortress schema adherence
  */
 
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
+    var Bridge = require('./universal_i18n_bridge.js');
+    module.exports = factory(Bridge);
   } else {
-    root.StudySessionCSVEngine = factory();
+    root.StudySessionCSVEngine = factory(root.UniversalI18nBridge);
   }
-}(typeof self !== 'undefined' ? self : this, function () {
+}(typeof self !== 'undefined' ? self : this, function (I18n) {
   'use strict';
 
   var UTF8_BOM = '\uFEFF';
 
   var COLUMNS = [
-    { key: 'id', header_ar: 'المعرف', header_en: 'id' },
-    { key: 'date', header_ar: 'التاريخ', header_en: 'date' },
-    { key: 'timestamp', header_ar: 'التوقيت', header_en: 'timestamp' },
-    { key: 'duration_minutes', header_ar: 'المدة (بالدقائق)', header_en: 'duration_minutes' },
-    { key: 'tag', header_ar: 'المادة/الوسم', header_en: 'tag' },
-    { key: 'task_name', header_ar: 'اسم المهمة', header_en: 'task_name' },
-    { key: 'mode', header_ar: 'نمط الجلسة', header_en: 'mode' },
-    { key: 'interrupted', header_ar: 'هل تمت مقاطعتها', header_en: 'interrupted' },
-    { key: 'sound_environment', header_ar: 'بيئة الصوت', header_en: 'sound_environment' },
-    { key: 'reflection_notes', header_ar: 'ملاحظات التأمل', header_en: 'reflection_notes' }
+    { key: 'id', i18n_key: 'csv.col.id' },
+    { key: 'date', i18n_key: 'csv.col.date' },
+    { key: 'timestamp', i18n_key: 'csv.col.timestamp' },
+    { key: 'duration_minutes', i18n_key: 'csv.col.duration_minutes' },
+    { key: 'tag', i18n_key: 'csv.col.tag' },
+    { key: 'task_name', i18n_key: 'csv.col.task_name' },
+    { key: 'mode', i18n_key: 'csv.col.mode' },
+    { key: 'interrupted', i18n_key: 'csv.col.interrupted' },
+    { key: 'sound_environment', i18n_key: 'csv.col.sound_environment' },
+    { key: 'reflection_notes', i18n_key: 'csv.col.reflection_notes' }
   ];
+
+  function translate(key, locale) {
+    if (I18n && typeof I18n.t === 'function') {
+      return I18n.t(key, locale);
+    }
+    return key;
+  }
 
   function escapeCSVField(val) {
     if (val === null || val === undefined) {
@@ -53,13 +49,13 @@
   function exportSessionsToCSV(sessions, options) {
     var opts = options || {};
     var includeBOM = opts.includeBOM !== false;
-    var lang = (opts.lang === 'ar') ? 'ar' : 'en';
+    var locale = opts.locale || opts.lang || 'en';
     var delimiter = opts.delimiter || ',';
 
     var headerRow = [];
     for (var i = 0; i < COLUMNS.length; i++) {
       var col = COLUMNS[i];
-      var headerText = (lang === 'ar') ? col.header_ar : col.header_en;
+      var headerText = translate(col.i18n_key, locale);
       headerRow.push(escapeCSVField(headerText));
     }
 
@@ -154,17 +150,30 @@
     var headers = rows[0];
     var colMap = {};
 
+    var localesToSearch = (I18n && typeof I18n.getLoadedLocales === 'function') ?
+      I18n.getLoadedLocales() : ['en', 'ar', 'es'];
+
     for (var h = 0; h < headers.length; h++) {
       var headerClean = headers[h].trim().toLowerCase();
 
       for (var c = 0; c < COLUMNS.length; c++) {
         var col = COLUMNS[c];
-        if (headerClean === col.header_en.toLowerCase() ||
-            headerClean === col.header_ar.toLowerCase() ||
-            headerClean.indexOf(col.key) !== -1) {
+
+        if (headerClean === col.key.toLowerCase() || headerClean.indexOf(col.key) !== -1) {
           colMap[col.key] = h;
           break;
         }
+
+        var matched = false;
+        for (var l = 0; l < localesToSearch.length; l++) {
+          var translatedHeader = translate(col.i18n_key, localesToSearch[l]).toLowerCase();
+          if (headerClean === translatedHeader) {
+            colMap[col.key] = h;
+            matched = true;
+            break;
+          }
+        }
+        if (matched) break;
       }
     }
 
@@ -208,7 +217,7 @@
           tag: tagVal || 'General',
           task_name: taskVal || 'Study Task',
           mode: modeVal,
-          interrupted: interruptedVal === 'true' || interruptedVal === '1' || interruptedVal === 'نعم',
+          interrupted: interruptedVal === 'true' || interruptedVal === '1' || interruptedVal === 'نعم' || interruptedVal === 'sí',
           sound_environment: soundVal,
           reflection_notes: notesVal
         });
