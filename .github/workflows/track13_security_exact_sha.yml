@@ -57,7 +57,7 @@ jobs:
               'service_secret = "' + token_urlsafe(48) + '"\n', encoding='utf-8')
           PY
           set +e
-          "$RUNNER_TEMP/gitleaks" dir --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$probe/result.json" "$probe" >/dev/null 2>&1
+          "$RUNNER_TEMP/gitleaks" dir --no-banner --config "$PWD/.gitleaks.toml" --redact --log-level error --report-format json --report-path "$probe/result.json" "$probe" >/dev/null 2>&1
           scan_status=$?
           set -e
           # A scanner error may also exit 1. Only an actual valid finding proves detection.
@@ -88,9 +88,9 @@ jobs:
           work="$(mktemp -d "$RUNNER_TEMP/df-track13.XXXXXX")"
           trap 'rm -rf "$work"' EXIT
           set +e
-          "$RUNNER_TEMP/gitleaks" dir --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$work/tree.json" . >/dev/null 2>&1
+          "$RUNNER_TEMP/gitleaks" dir --no-banner --config "$PWD/.gitleaks.toml" --redact --log-level error --report-format json --report-path "$work/tree.json" . >/dev/null 2>&1
           tree_exit=$?
-          "$RUNNER_TEMP/gitleaks" git --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$work/history.json" . >/dev/null 2>&1
+          "$RUNNER_TEMP/gitleaks" git --no-banner --config "$PWD/.gitleaks.toml" --redact --log-level error --report-format json --report-path "$work/history.json" . >/dev/null 2>&1
           history_exit=$?
           python3 tools/security/track13_gitleaks_report.py --report "$work/tree.json" --sha "$(git rev-parse HEAD)" --scan-exit "$tree_exit" > "$work/tree-summary.json"
           tree_report_exit=$?
