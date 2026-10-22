@@ -943,16 +943,11 @@ function selectHomeQuickSession(minutes) {
   if (![10, 25, 50].includes(minutes)) return false;
   if (!quickTraining?.active && currentTimerModeKey === 'focus' &&
       timerTotal === minutes * 60) return true;
-  if (quickTraining?.active) {
-    if (!window.confirm(quickText('replacePrompt'))) return false;
-    quickTraining = null;
-    if (timerRunning) toggleTimerPlay();
-    renderQuickTraining();
-  } else if (timerRunning || (timerSessionId !== null && timerLeft < timerTotal)) {
+  if (!quickTraining?.active && (timerRunning || (timerSessionId !== null && timerLeft < timerTotal))) {
     if (!window.confirm(quickText('replacePrompt'))) return false;
   }
-  selectTimerMode(minutes, 'focus', document.getElementById('modeFocusBtn'));
-  return true;
+  // The selector owns training cancellation, save acknowledgment and UI publication.
+  return selectTimerMode(minutes, 'focus', document.getElementById('modeFocusBtn'));
 }
 
 function logWorkoutSet() {
@@ -1302,31 +1297,54 @@ function updateTimerDisplay() {
   updateFocusStatus();
 }
 
-function selectTimerModeFromUser(mins, modeKey, btn) {
+function selectTimerModeFromUser(mins, modeKey, btn, label = customSessionLabel) {
   if ((timerRunning || timerSessionId || timerActiveMs > 0) &&
       !window.confirm(quickText('replacePrompt'))) return false;
-  selectTimerMode(mins, modeKey, btn);
-  return true;
+  return selectTimerMode(mins, modeKey, btn, label);
 }
-function selectTimerMode(mins, modeKey, btn) {
-  if(quickTraining?.active && !quickInternalChange) {
-    if(!window.confirm(quickText('replacePrompt')))return;
-    quickTraining=null;
-    renderQuickTraining();
+function selectTimerMode(mins, modeKey, btn, label = customSessionLabel) {
+  const replacingQuickTraining = quickTraining?.active && !quickInternalChange;
+  if (replacingQuickTraining && !window.confirm(quickText('replacePrompt'))) return false;
+  const before = {timerRunning, timerTargetTime, currentTimerModeKey, timerTotal,
+    timerLeft, timerSessionId, focusSessionTaskId, timerActiveMs, timerResumeMs,
+    customSessionLabel, quickTraining};
+  // Mode, label and training replacement belong to the same saved transition.
+  // Do not commit a separate Pause or publish UI/native changes before it saves.
+  try {
+    if (replacingQuickTraining) quickTraining = null;
+    timerRunning = false;
+    timerTargetTime = null;
+    currentTimerModeKey = modeKey;
+    timerTotal = mins * 60;
+    timerLeft = timerTotal;
+    timerSessionId = null;
+    focusSessionTaskId = null;
+    timerActiveMs = 0;
+    timerResumeMs = null;
+    customSessionLabel = label;
+    if (storeTimerSession() !== true) throw new Error('TIMER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (error) {
+    ({timerRunning, timerTargetTime, currentTimerModeKey, timerTotal,
+      timerLeft, timerSessionId, focusSessionTaskId, timerActiveMs, timerResumeMs,
+      customSessionLabel, quickTraining} = before);
+    showToast(L().saveFailed);
+    throw error;
   }
-  if (timerRunning) toggleTimerPlay();
-  currentTimerModeKey = modeKey;
-  timerTotal = mins * 60;
-  timerLeft = timerTotal;
+  if (before.timerRunning) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    if (window.ZenNative && window.ZenNative.stopBackgroundService) {
+      try { window.ZenNative.stopBackgroundService(); } catch(e){}
+    }
+    document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  }
+  if (replacingQuickTraining) renderQuickTraining();
   if (btn) {
     btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   }
-  timerSessionId = null;
-  timerActiveMs = 0;
-  timerResumeMs = null;
-  storeTimerSession();
   updateTimerDisplay();
+  return true;
 }
 
 function openCustomTimerModal() { document.getElementById('customTimerModal').classList.add('open'); }
@@ -1336,8 +1354,7 @@ function applyCustomTimerNow() {
   const title = document.getElementById('inpCustomTitle').value.trim();
   const nextLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
   // Do not mutate label, close the form, or lose the user's input on Cancel.
-  if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return false;
-  customSessionLabel = nextLabel;
+  if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'), nextLabel)) return false;
   closeModal('customTimerModal');
   updateTimerDisplay();
   showToast(`⚡ ${customSessionLabel}`);

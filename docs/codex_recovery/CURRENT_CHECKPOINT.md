@@ -1,3 +1,21 @@
+# Current incremental recovery checkpoint — mode/custom continuation
+
+2026-10-22. RELEASE_APPROVED=NO.
+
+Current candidate: `fix/timer-mode-save-failure-20261022`, based exclusively on
+PR177 `8febb55ceca5623529060d091e506ff02bc3c799`, targeting PR177 branch.
+Mode/custom snapshot consistency and direct Home caller only. Prior Reset,
+Start/Pause, duration and water repairs remain intact.
+
+Evidence/commands/scope/rollback: [mode_save_20261022/PROGRESS.md](mode_save_20261022/PROGRESS.md).
+New cases23 PASS, neighboring suites87 PASS, startup/syntax/diff PASS.
+Android, APK/AAB and broad heavy suites NOT_TESTED; no manual Actions dispatch.
+Next action: manual review of the stacked Draft PR; no automatic merge/release.
+Published commit and PR identifiers are recorded in the PR receipt, avoiding
+self-referential commit hashes in this file.
+
+## Historical inherited checkpoint (superseded continuation instructions)
+
 # Current incremental recovery checkpoint
 
 Timestamp UTC: 2026-10-22T00:20:56Z. Tasks: CROSS-001/002, DATA-024, TIMER-028/029; related Issues102/106. RELEASE_APPROVED=NO.
