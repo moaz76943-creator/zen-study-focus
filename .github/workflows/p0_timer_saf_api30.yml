@@ -8,7 +8,7 @@ concurrency:
   group: p0-android-${{ github.ref }}
   cancel-in-progress: true
 env:
-  APP_SOURCE_SHA: b9929bc8792bd2ece92fc3d145eab37fd5d6927f
+  APP_SOURCE_SHA: 51313589b5472fcc834aa5a10ccb3240c5c062bd
   P0_MODE: timer
 jobs:
   android-api30:
@@ -40,7 +40,8 @@ jobs:
         run: |
           test "$(git rev-parse HEAD:android)" = "$(git rev-parse "$APP_SOURCE_SHA:android")"
           node --check tests/android_e2e_recovery/p0_timer_saf_android.cjs
-          node --test tests/integration_recovery/p0_api30_acceptance_contract.test.cjs
+          node --test tests/integration_recovery/p0_api30_acceptance_contract.test.cjs tests/integration_recovery/native_timer_atomic_reopen.test.cjs
+          node --check android/app/src/main/assets/web/app.js
       - name: Build same-head disposable debug APK
         working-directory: android
         run: gradle assembleDebug --no-daemon
