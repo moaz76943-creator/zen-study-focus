@@ -45,8 +45,12 @@ jobs:
           SARIF_ROOT: ${{ runner.temp }}/track13-codeql-sarif
         run: |
           set -euo pipefail
+          set +e
           python3 tools/security/track13_codeql_sarif_report.py --directory "$SARIF_ROOT" --sha "$(git rev-parse HEAD)" > "$RUNNER_TEMP/track13-codeql-summary.json"
+          report_exit=$?
+          set -e
           cat "$RUNNER_TEMP/track13-codeql-summary.json"
+          exit "$report_exit"
       - name: Final classification with no raw findings
         if: always()
         env:
