@@ -31,7 +31,13 @@ function runCycle(manifest,{sourceSha,now=new Date().toISOString(),run,coverage}
  const rows=plan.selected.map(a=>{
   try{
    const r=run(a);
-   if(!r||typeof r.status!=='string'||r.status.length>40)throw Error('Invalid agent result');
+   if(!r||!new Set(['SOURCE_TESTED','SOURCE_PARTIAL','NOT_TESTED','BLOCKED','NOT_RUN']).has(r.status)||
+      !Number.isInteger(r.tests)||r.tests<0||r.tests>350)throw Error('Invalid agent result');
+   // A green label alone is never proof: require actual, complete Node TAP counts.
+   if(r.status==='SOURCE_TESTED'&&
+      (r.tests<1||!Number.isSafeInteger(r.cases)||r.cases<1||
+       r.passed!==r.cases||r.skipped!==0||r.todo!==0))
+    throw Error('Unverified Node TAP success: missing, partial or skipped cases');
    return {...r,id:a.id,lane:a.lane,purpose:a.purpose};
   }catch(e){return {id:a.id,lane:a.lane,purpose:a.purpose,status:'BLOCKED',tests:0,reason:String(e.message).slice(0,180)};}
  });
