@@ -75,6 +75,17 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
             return {viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,buttons,nav,hero,ring,timer,chips,labels,presets,isoBadge};
           },ids);
           const failures=[];
+          // Hit-test every duration adjustment in a real Chromium layout.
+          // Playwright trial clicks perform actionability/scroll checks without
+          // mutating the actual timer duration or persisted sessions.
+          const durationButtons=page.locator('#focusHeroCard .delta-chip');
+          const durationCount=await durationButtons.count();
+          if(durationCount===0) failures.push('DURATION_CONTROLS_MISSING');
+          for(let i=0;i<durationCount;i++){
+            try{await durationButtons.nth(i).click({trial:true,timeout:3000});}
+            catch(error){failures.push('DURATION_CONTROL_NOT_REACHABLE:'+i);}
+          }
+          await page.evaluate(()=>window.scrollTo(0,0));
           if(measured.documentWidth>width+2)failures.push('DOCUMENT_HORIZONTAL_OVERFLOW');
           if(!measured.nav||!measured.hero||!measured.ring||!measured.timer)failures.push('MISSING_NAV_OR_TIMER');
           if(measured.hero&&(measured.hero.left < -1||measured.hero.right>width+1))failures.push('CLIPPED_HERO');
@@ -154,7 +165,10 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
         });
         const ring=document.querySelector('#focusHeroCard .ring-time')?.getBoundingClientRect();
         const ringBox=document.querySelector('#focusHeroCard .ring-container')?.getBoundingClientRect();
-        return {language,actualLanguage:document.documentElement.lang,
+        const generatedNumerals=[...document.querySelectorAll('#focusHeroCard .ring-time, .goal-percent, .domain-duration')]
+          .filter(el=>el.getClientRects().length>0)
+          .map(el=>el.textContent.trim());
+        return {language,generatedNumerals,actualLanguage:document.documentElement.lang,
           direction:document.documentElement.dir,
           documentWidth:document.documentElement.scrollWidth,viewport:innerWidth,
           navVisible:!!nav&&nav.left>=-2&&nav.right<=innerWidth+2,
@@ -169,6 +183,8 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
       if (info.documentWidth>320+2) errors.push('LOCALE_HORIZONTAL_OVERFLOW');
       if (!info.navVisible||!info.ringFits) errors.push('LOCALE_NAV_OR_TIMER_CLIPPED');
       if (info.labels?.some(x=>!x.text||!x.visible)) errors.push('LOCALE_DESTINATION_MISSING');
+      if (info.generatedNumerals?.some(text=>/[\u0660-\u0669\u06f0-\u06f9]/u.test(text)))
+        errors.push('GENERATED_NONWESTERN_DIGITS');
       localeChecks.push({...info,errors});
       if(errors.length)problems.push({tag:'locale-'+language+'-320-200',failures:errors});
     }
