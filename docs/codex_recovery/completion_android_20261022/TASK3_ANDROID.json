@@ -1,0 +1,46 @@
+{
+  "source": "Android API30 real WebView + native AtomicFile; disposable emulator only",
+  "sha": "1a9c3b8cf46afa39cb008bfb56126ee007e639e6",
+  "results": [
+    {
+      "name": "saf_fixture_and_native_ack",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "saf_picker_cancel",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "saf_valid_file_consent_cancel",
+      "status": "NOT_TESTED",
+      "detail": "TRANSPORT: app-owned confirmation not observable in genuine Android picker"
+    },
+    {
+      "name": "saf_corrupt_rejected",
+      "status": "FAIL",
+      "detail": "Corrupt file must reach actual JS validator\n\nfalse !== true\n"
+    },
+    {
+      "name": "saf_oversized_rejected",
+      "status": "NOT_TESTED",
+      "detail": "TRANSPORT: cannot create verified disposable MediaStore import fixture: spawnSync adb ENOBUFS"
+    },
+    {
+      "name": "saf_actual_file_restore_ack_and_reopen",
+      "status": "NOT_TESTED",
+      "detail": "TRANSPORT: app-owned confirmation not observable in genuine Android picker"
+    }
+  ],
+  "release_approved": false,
+  "counts": {
+    "PASS": 2,
+    "FAIL": 1,
+    "NOT_TESTED": 3
+  },
+  "run_id": 39709234659,
+  "artifact_id": 12395639341,
+  "tested_apk_sha256": "c4b80253b5218ed0e68862c49c5a71b2836bb92a7da5117a01c914edeb90e33c",
+  "merge_allowed": false
+}

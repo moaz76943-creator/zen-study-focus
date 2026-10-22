@@ -50,3 +50,17 @@ Script/bash syntax PASS, source18 PASS. ANDROID pending. No import merge before
 actual path proven. PR remains isolated if FAIL/NOT_TESTED. No main/package/data
 migration. User-device data never used; disposable emulator required. New scripts
 are in existing android_e2e_recovery navigation ownership, source tests qa.
+
+Task3 actual API30 run39709234659 completed FAILURE:2 PASS /1 FAIL /3 NOT_TESTED.
+Baseline six-packet nativeACK and real picker Cancel PASS. Valid file consent/
+restore NOT_TESTED: selected screenshot/XML still DocumentsUI, no confirmation.
+Corrupt case FAIL: validator signal not reached. Oversize NOT_TESTED: staging
+fixture readback exceeded execFileSync default maxBuffer (adb ENOBUFS), not proof
+of app rejection. Screenshot inspection shows actual Downloads tile still visible;
+this does NOT establish a production importer root cause. Small files appear with
+stale/zero MediaStore size; explicit picker selection/metadata investigation needed.
+Artifact12395639341 includes screenshot/XML/APK/source hashes. TASK3_ANDROID.json
+and selected XML committed as blocker evidence. No import merge; PR184 stays Draft.
+Next safe operation: fix test fixture readback maxBuffer/MediaStore metadata and
+prove actual document callback/consent on a fresh bounded run. No speculative app
+rewrite or repeated successful source tests. RELEASE_APPROVED=NO.
