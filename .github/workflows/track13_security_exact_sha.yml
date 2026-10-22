@@ -53,30 +53,32 @@ jobs:
           python3 - "$probe" <<'PY'
           import pathlib, sys
           from secrets import token_urlsafe
-          directory = pathlib.Path(sys.argv[1])
-          fake_value = token_urlsafe(48)
-          (directory / 'synthetic.env').write_text('service_secret = "' + fake_value + '"\n', encoding='utf-8')
+          (pathlib.Path(sys.argv[1]) / 'synthetic.env').write_text(
+              'service_secret = "' + token_urlsafe(48) + '"\n', encoding='utf-8')
           PY
           set +e
           "$RUNNER_TEMP/gitleaks" dir --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$probe/result.json" "$probe" >/dev/null 2>&1
           scan_status=$?
           set -e
-          echo "SYNTHETIC_SCANNER_EXIT=$scan_status"
-          if [[ -s "$probe/result.json" ]]; then
-            python3 - "$probe/result.json" <<'PY'
-          import json, sys
-          with open(sys.argv[1], encoding='utf-8') as reader:
-              evidence = json.load(reader)
-          print('SYNTHETIC_DETECTED_RULES=' + ','.join(sorted(set(str(x.get('RuleID')) for x in evidence))))
-          print('SYNTHETIC_FINDING_COUNT=' + str(len(evidence)))
-          PY
+          # A scanner error may also exit 1. Only an actual valid finding proves detection.
+          if [[ "$scan_status" -ne 1 || ! -s "$probe/result.json" ]]; then
+            echo 'SYNTHETIC_PROBE_BLOCKED'
+            exit 1
           fi
-          test "$scan_status" -eq 1
           python3 - "$probe/result.json" <<'PY'
           import json, sys
-          with open(sys.argv[1], encoding='utf-8') as reader:
-              findings = json.load(reader)
-          assert any(row.get('RuleID') == 'generic-api-key' for row in findings), 'Scanner stopped detecting unknown synthetic credentials'
+          try:
+              with open(sys.argv[1], encoding='utf-8') as reader:
+                  findings = json.load(reader)
+              if not isinstance(findings, list) or not any(
+                  isinstance(row, dict) and row.get('RuleID') == 'generic-api-key'
+                  for row in findings
+              ):
+                  raise ValueError('missing expected rule')
+          except (OSError, ValueError, UnicodeError):
+              print('SYNTHETIC_PROBE_BLOCKED')
+              raise SystemExit(1)
+          print('SYNTHETIC_DETECTION_PASS')
           PY
       - name: Scan current tree AND git history without revealing secrets
         shell: bash
@@ -86,9 +88,9 @@ jobs:
           work="$(mktemp -d "$RUNNER_TEMP/df-track13.XXXXXX")"
           trap 'rm -rf "$work"' EXIT
           set +e
-          "$RUNNER_TEMP/gitleaks" dir --no-banner --redact --log-level error --report-format json --report-path "$work/tree.json" . >/dev/null 2>&1
+          "$RUNNER_TEMP/gitleaks" dir --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$work/tree.json" . >/dev/null 2>&1
           tree_exit=$?
-          "$RUNNER_TEMP/gitleaks" git --no-banner --redact --log-level error --report-format json --report-path "$work/history.json" . >/dev/null 2>&1
+          "$RUNNER_TEMP/gitleaks" git --config "$PWD/.gitleaks.toml" --no-banner --redact --log-level error --report-format json --report-path "$work/history.json" . >/dev/null 2>&1
           history_exit=$?
           python3 tools/security/track13_gitleaks_report.py --report "$work/tree.json" --sha "$(git rev-parse HEAD)" --scan-exit "$tree_exit" > "$work/tree-summary.json"
           tree_report_exit=$?
