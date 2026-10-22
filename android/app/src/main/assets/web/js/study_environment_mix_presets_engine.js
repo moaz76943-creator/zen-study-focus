@@ -1,41 +1,27 @@
 /**
- * DEEP FOCUS — Study Environment Mix Presets Engine (M089)
+ * DEEP FOCUS — Study Environment Mix Presets Engine (M089 / M092 Updated)
  * File: android/app/src/main/assets/web/js/study_environment_mix_presets_engine.js
- *
- * Provides curated, multi-channel procedural nature mixes tailored for specific
- * study environments and cognitive focus states.
- *
- * Core Directives & Standards:
- * - 100% Pure Organic Nature & Ambient Acoustics (Zero Melodies, Zero Songs, Music-Free)
- * - 100% Royalty-Free Procedural Visuals (Zero External Bitmaps, Pure Vector SVGs)
- * - Anti-Clipping Headroom Protection (Headroom <= 0.85, Normalization Limiter)
- * - Strict Western Arabic Digits (0123456789)
- * - Strict Hebrew Exclusion (No 'he' / 'iw' locales)
  */
 
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
+    var Bridge = require('./universal_i18n_bridge.js');
+    module.exports = factory(Bridge);
   } else {
-    root.StudyEnvironmentMixPresetsEngine = factory();
+    root.StudyEnvironmentMixPresetsEngine = factory(root.UniversalI18nBridge);
   }
-}(typeof self !== 'undefined' ? self : this, function () {
+}(typeof self !== 'undefined' ? self : this, function (I18n) {
   'use strict';
 
   var VALID_SOUND_IDS = [
-    // Water (8)
     'gentle_rain', 'heavy_rain', 'rain_on_leaves', 'rain_on_window',
     'rain_on_tent', 'forest_stream', 'ocean_waves', 'waterfall_mist',
-    // Forest (6)
     'pine_breeze', 'autumn_leaves_wind', 'morning_forest_birds',
     'night_crickets', 'bamboo_grove_rustle', 'wilderness_wind',
-    // Cozy (6)
     'campfire_crackle', 'rainy_library', 'coffee_shop_murmur',
     'clock_pendulum', 'turning_book_pages', 'keyboard_mechanical_typing',
-    // White Noise (6)
     'pure_white_noise', 'soft_pink_noise', 'deep_brown_noise',
     'fan_hum', 'train_gentle_rhythm', 'airplane_cabin_hum',
-    // Zen (4)
     'zen_tibetan_bowl_drone', 'wind_chimes_breeze',
     'zen_garden_water_basin', 'deep_meditation_drone'
   ];
@@ -50,11 +36,10 @@
   var PRESETS = [
     {
       id: 'quiet_library',
-      name_ar: 'المكتبة الهادئة',
-      name_en: 'Quiet Library',
+      i18n_name: 'preset.quiet_library.name',
+      i18n_desc: 'preset.quiet_library.desc',
       category: 'academic',
-      description_ar: 'أجواء صامتة مع تقليب أوراق الكتب وبندول ساعة كلاسيكية ومطر ناعم على النوافذ لغمرك في القراءة الأكاديمية.',
-      description_en: 'Serene academic quietude with gentle page turns, soft pendulum clock ticks, and distant rain.',
+      i18n_category: 'category.academic',
       recommended_focus: 'reading_and_comprehension',
       accent_color: '#4A6FA5',
       secondary_color: '#1E293B',
@@ -67,11 +52,10 @@
     },
     {
       id: 'study_cafe',
-      name_ar: 'المقهى الدراسي الدافئ',
-      name_en: 'Cozy Study Cafe',
+      i18n_name: 'preset.study_cafe.name',
+      i18n_desc: 'preset.study_cafe.desc',
       category: 'productivity',
-      description_ar: 'همهمة حيوية لمقهى دراسي بعيد مع مطر رقيق ونقرات كتابة خفيفة لتحفيز الإنجاز السريع والكتابة.',
-      description_en: 'Warm background chatter blend with rain on glass and soft typing clicks for creative momentum.',
+      i18n_category: 'category.productivity',
       recommended_focus: 'writing_and_coding',
       accent_color: '#C084FC',
       secondary_color: '#2E1065',
@@ -84,11 +68,10 @@
     },
     {
       id: 'forest_cabin',
-      name_ar: 'كوخ الغابة والموقد',
-      name_en: 'Forest Cabin & Hearth',
+      i18n_name: 'preset.forest_cabin.name',
+      i18n_desc: 'preset.forest_cabin.desc',
       category: 'calm',
-      description_ar: 'طقطقة موقد الحطب الدافئ مع نسيم أشجار الصنوبر ومطر يلامس النوافذ لتهدئة القلق أثناء المذاكرة المسائية.',
-      description_en: 'Crackling fireside warmth wrapped in pine breezes and forest streams for soothing evening study.',
+      i18n_category: 'category.calm',
       recommended_focus: 'evening_review',
       accent_color: '#F97316',
       secondary_color: '#431407',
@@ -101,11 +84,10 @@
     },
     {
       id: 'deep_noise_isolation',
-      name_ar: 'عزل الضوضاء التام',
-      name_en: 'Deep Noise Isolation',
+      i18n_name: 'preset.deep_noise_isolation.name',
+      i18n_desc: 'preset.deep_noise_isolation.desc',
       category: 'shield',
-      description_ar: 'مزيج هندسي محكم من الضوضاء البنية والبيضاء وأزيز مروحة هوائية لإخفاء الأصوات المشتتة المحيطة تماماً.',
-      description_en: 'Dense multi-frequency acoustic barrier cutting through household chatter and loud street distractions.',
+      i18n_category: 'category.shield',
       recommended_focus: 'intense_cramming',
       accent_color: '#06B6D4',
       secondary_color: '#083344',
@@ -118,11 +100,10 @@
     },
     {
       id: 'zen_sanctuary',
-      name_ar: 'واحة التأمل والسكينة',
-      name_en: 'Zen Temple Sanctuary',
+      i18n_name: 'preset.zen_sanctuary.name',
+      i18n_desc: 'preset.zen_sanctuary.desc',
       category: 'mindfulness',
-      description_ar: 'حفيف غابة الخيزران مع قطرات حوض الماء الياباني ورنين الأجراس الخشبية لتصفية الذهن وخفض التوتر.',
-      description_en: 'Bamboo rustle, Japanese bamboo water fountain drops, and meditative drone for resetting mental fatigue.',
+      i18n_category: 'category.mindfulness',
       recommended_focus: 'mindful_breathing_reset',
       accent_color: '#10B981',
       secondary_color: '#064E3B',
@@ -135,11 +116,10 @@
     },
     {
       id: 'midnight_study_train',
-      name_ar: 'قطار المذاكرة الليلي',
-      name_en: 'Midnight Study Train',
+      i18n_name: 'preset.midnight_study_train.name',
+      i18n_desc: 'preset.midnight_study_train.desc',
       category: 'rhythm',
-      description_ar: 'حركة إيقاعية رتيبة لقطار سفر عبر الليل مع أمطار غزيرة تضرب النوافذ للحفاظ على وتيرة تركيز ثابتة ومستمرة.',
-      description_en: 'Steady rhythmic railway hum through heavy night rain, creating an uninterrupted trance of focus.',
+      i18n_category: 'category.rhythm',
       recommended_focus: 'problem_solving_sprints',
       accent_color: '#3B82F6',
       secondary_color: '#172554',
@@ -152,11 +132,10 @@
     },
     {
       id: 'autumn_wilderness',
-      name_ar: 'برية الخريف الهادئة',
-      name_en: 'Autumn Breeze Wilderness',
+      i18n_name: 'preset.autumn_wilderness.name',
+      i18n_desc: 'preset.autumn_wilderness.desc',
       category: 'fresh',
-      description_ar: 'نسيم رياح الخريف بين الأوراق مع زقزقة طيور الصباح في الغابة وجريان جدول الماء لبداية يوم دراسي نشطة.',
-      description_en: 'Crisp autumn foliage winds, morning forest birds, and clear mountain stream for fresh dawn sessions.',
+      i18n_category: 'category.fresh',
       recommended_focus: 'morning_deep_work',
       accent_color: '#EAB308',
       secondary_color: '#422006',
@@ -169,11 +148,10 @@
     },
     {
       id: 'coastal_deep_flow',
-      name_ar: 'شاطئ الأفكار والتفكير العميق',
-      name_en: 'Coastal Deep Flow',
+      i18n_name: 'preset.coastal_deep_flow.name',
+      i18n_desc: 'preset.coastal_deep_flow.desc',
       category: 'expansive',
-      description_ar: 'أمواج محيط متلاطمة بانتظام مع رذاذ الماء ورنين الوعاء التبتي لدعم التفكير التجريدي وكتابة الأبحاث.',
-      description_en: 'Rhythmic ocean surf pulses combined with water mist and soft drone for big-picture thesis writing.',
+      i18n_category: 'category.expansive',
       recommended_focus: 'conceptual_thinking',
       accent_color: '#14B8A6',
       secondary_color: '#134E4A',
@@ -186,24 +164,43 @@
     }
   ];
 
+  function translate(key, locale) {
+    if (I18n && typeof I18n.t === 'function') {
+      return I18n.t(key, locale);
+    }
+    return key;
+  }
+
   function clone(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
 
-  function getPresets() {
-    return clone(PRESETS);
+  function getPresets(locale) {
+    var list = clone(PRESETS);
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
+      p.name = translate(p.i18n_name, locale);
+      p.description = translate(p.i18n_desc, locale);
+      p.category_localized = translate(p.i18n_category, locale);
+      p.name_en = translate(p.i18n_name, 'en');
+      p.name_ar = translate(p.i18n_name, 'ar');
+      p.description_en = translate(p.i18n_desc, 'en');
+      p.description_ar = translate(p.i18n_desc, 'ar');
+    }
+    return list;
   }
 
-  function getPresetById(id) {
+  function getPresetById(id, locale) {
+    var all = getPresets(locale);
     if (!id || typeof id !== 'string') {
-      return clone(PRESETS[0]);
+      return all[0];
     }
-    for (var i = 0; i < PRESETS.length; i++) {
-      if (PRESETS[i].id === id) {
-        return clone(PRESETS[i]);
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].id === id) {
+        return all[i];
       }
     }
-    return clone(PRESETS[0]);
+    return all[0];
   }
 
   function calculateNormalizedGains(channels, masterVolume) {
@@ -272,15 +269,17 @@
     };
   }
 
-  function applyPreset(presetId, masterVolume) {
-    var preset = getPresetById(presetId);
+  function applyPreset(presetId, masterVolume, locale) {
+    var preset = getPresetById(presetId, locale);
     var calculation = calculateNormalizedGains(preset.channels, masterVolume);
 
     return {
       presetId: preset.id,
-      name_ar: preset.name_ar,
+      name: preset.name,
       name_en: preset.name_en,
+      name_ar: preset.name_ar,
       category: preset.category,
+      category_localized: preset.category_localized,
       recommended_focus: preset.recommended_focus,
       accent_color: preset.accent_color,
       masterVolume: calculation.masterVolume,
@@ -316,16 +315,19 @@
   }
 
   function renderPresetCardSVG(presetId, options) {
-    var preset = getPresetById(presetId);
-    var width = (options && options.width) || 400;
-    var height = (options && options.height) || 250;
-    var lang = (options && options.lang === 'ar') ? 'ar' : 'en';
+    var opts = options || {};
+    var locale = opts.locale || opts.lang || 'en';
+    var preset = getPresetById(presetId, locale);
+    var width = opts.width || 400;
+    var height = opts.height || 250;
 
-    var title = lang === 'ar' ? preset.name_ar : preset.name_en;
-    var desc = lang === 'ar' ? preset.description_ar : preset.description_en;
+    var title = translate(preset.i18n_name, locale);
+    var desc = translate(preset.i18n_desc, locale);
+    var catText = translate(preset.i18n_category, locale);
+    var channelsLabel = translate('common.channels', locale);
+
     var accent = preset.accent_color || '#4A6FA5';
     var bgDark = preset.secondary_color || '#0F172A';
-
     var channelCount = preset.channels.length;
     var channelItemsSvg = '';
 
@@ -356,21 +358,21 @@
         '</defs>' +
         '<rect width="' + width + '" height="' + height + '" rx="16" fill="url(#bgGrad_' + preset.id + ')" stroke="#334155" stroke-width="1.5"/>' +
         '<rect x="24" y="20" width="48" height="4" rx="2" fill="' + accent + '"/>' +
-        '<rect x="280" y="18" width="96" height="22" rx="11" fill="#1E293B" stroke="#334155" stroke-width="1"/>' +
-        '<text x="328" y="33" fill="' + accent + '" font-size="10" font-family="system-ui, sans-serif" font-weight="bold" text-anchor="middle">' +
-          preset.category.toUpperCase() +
+        '<rect x="270" y="18" width="106" height="22" rx="11" fill="#1E293B" stroke="#334155" stroke-width="1"/>' +
+        '<text x="323" y="33" fill="' + accent + '" font-size="10" font-family="system-ui, sans-serif" font-weight="bold" text-anchor="middle">' +
+          catText.toUpperCase() +
         '</text>' +
         '<text x="24" y="58" fill="#F8FAFC" font-size="20" font-family="system-ui, sans-serif" font-weight="700">' +
           title +
         '</text>' +
         '<text x="24" y="80" fill="#94A3B8" font-size="12" font-family="system-ui, sans-serif">' +
-          (lang === 'ar' ? preset.name_en : preset.name_ar) +
+          preset.id.replace(/_/g, ' ') +
         '</text>' +
         '<text x="24" y="106" fill="#CBD5E1" font-size="11" font-family="system-ui, sans-serif">' +
           desc.substring(0, 75) + '...' +
         '</text>' +
         '<text x="24" y="136" fill="' + accent + '" font-size="10" font-family="system-ui, sans-serif" font-weight="bold" letter-spacing="1">' +
-          'NATURE SOUND BLENDS (' + channelCount + ' CHANNELS)' +
+          'NATURE SOUND BLENDS (' + channelCount + ' ' + channelsLabel.toUpperCase() + ')' +
         '</text>' +
         channelItemsSvg +
       '</svg>';
@@ -385,7 +387,7 @@
     if (!preset.id || typeof preset.id !== 'string') {
       return { valid: false, error: 'Preset ID is required' };
     }
-    if (!preset.name_ar || !preset.name_en) {
+    if (!preset.i18n_name && !preset.name_en && !preset.name_ar) {
       return { valid: false, error: 'Preset localized names are required' };
     }
     if (!Array.isArray(preset.channels) || preset.channels.length === 0) {
