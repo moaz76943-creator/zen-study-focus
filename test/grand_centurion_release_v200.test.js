@@ -1,10 +1,6 @@
 /**
  * DEEP FOCUS — Grand Centurion Release Gate v2.0.0 Test Suite (M100)
  * File: test/grand_centurion_release_v200.test.js
- *
- * Grand master certification suite verifying the complete 100-mission ecosystem,
- * running full regression across all repository test suites (90+ suites), and
- * sealing the v2.0.0 Centurion Production Release.
  */
 
 const assert = require('assert');

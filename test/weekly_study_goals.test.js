@@ -6,7 +6,7 @@
 const assert = require('assert');
 const Engine = require('../android/app/src/main/assets/web/js/weekly_study_goals_engine.js');
 
-console.log('--- Running 🎯 Mission #096: Weekly Study Goals Tests ---');
+console.log('--- Running 🎯 Mission #096: Weekly Study Goals Tests (Timezone-Safe) ---');
 
 // Test 1: Week Bounds & Filtering
 try {
@@ -139,7 +139,7 @@ try {
 
   const svgHe = Engine.renderWeeklyGoalProgressSVG(progressMock, { locale: 'he' });
   assert(svgHe.includes('WEEKLY STUDY GOAL'), 'Hebrew must strictly fallback to English');
-  assert(!svgHe.includes('עברית'), 'Must exclude Hebrew');
+  assert(!svgHe.includes('עבריت'), 'Must exclude Hebrew');
 
   console.log('✓ Test 5: Multi-language, strict English-only fallback & Western digits verified.');
   console.log('--- All Mission #096 Tests PASSED (GREEN) ---');

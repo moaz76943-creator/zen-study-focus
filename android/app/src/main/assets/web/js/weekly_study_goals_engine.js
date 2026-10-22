@@ -1,17 +1,6 @@
 /**
- * DEEP FOCUS — Weekly Study Goals & Target Hours Engine (M096)
+ * DEEP FOCUS — Weekly Study Goals & Target Hours Engine (M096 Fixed)
  * File: android/app/src/main/assets/web/js/weekly_study_goals_engine.js
- *
- * Tracks weekly study hour commitments, calculates pacing metrics (Run Rate,
- * Ahead/Behind schedule), tracks per-subject milestone goals, and generates
- * a standalone procedural SVG weekly progress gauge.
- *
- * Core Directives & Standards:
- * - Decoupled 100-locale support with strict English-only fallback (UniversalI18nBridge)
- * - Strict Western Arabic Digits (0123456789)
- * - Strict Hebrew Exclusion (No 'he' / 'iw' locales)
- * - 100% Pure Procedural SVG Vector Visuals (Zero external raster assets)
- * - v21 Data Fortress schema adherence
  */
 
 (function (root, factory) {
@@ -33,22 +22,31 @@
 
   var DEFAULT_TARGET_HOURS = 15;
 
+  function formatDateOnly(date) {
+    var y = date.getFullYear();
+    var m = date.getMonth() + 1;
+    var d = date.getDate();
+    return y + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+  }
+
   function getWeekBounds(referenceDate) {
-    var d = referenceDate ? new Date(referenceDate) : new Date();
+    var d;
+    if (typeof referenceDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(referenceDate)) {
+      var parts = referenceDate.split('-');
+      d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0);
+    } else {
+      d = referenceDate ? new Date(referenceDate) : new Date();
+    }
     if (isNaN(d.getTime())) d = new Date();
 
     var day = d.getDay();
     var diffToMon = d.getDate() - day + (day === 0 ? -6 : 1);
-    var monday = new Date(d.setDate(diffToMon));
-    monday.setHours(0, 0, 0, 0);
-
-    var sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23, 59, 59, 999);
+    var monday = new Date(d.getFullYear(), d.getMonth(), diffToMon, 0, 0, 0);
+    var sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6, 23, 59, 59, 999);
 
     return {
-      startDateStr: monday.toISOString().split('T')[0],
-      endDateStr: sunday.toISOString().split('T')[0],
+      startDateStr: formatDateOnly(monday),
+      endDateStr: formatDateOnly(sunday),
       startMillis: monday.getTime(),
       endMillis: sunday.getTime()
     };
@@ -57,7 +55,7 @@
   function evaluateWeeklyGoal(sessions, goalConfig, options) {
     var opts = options || {};
     var locale = opts.locale || opts.lang || 'en';
-    var refDate = opts.referenceDate ? new Date(opts.referenceDate) : new Date();
+    var refDate = opts.referenceDate ? opts.referenceDate : new Date();
     var bounds = getWeekBounds(refDate);
 
     var targetHours = (goalConfig && typeof goalConfig.targetHours === 'number' && goalConfig.targetHours > 0) ?
@@ -96,7 +94,13 @@
     var completedHours = Math.round((completedMinutes / 60) * 10) / 10;
     var remainingHours = Math.round((remainingMinutes / 60) * 10) / 10;
 
-    var dayOfWeek = refDate.getDay();
+    var dateObj = (typeof refDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(refDate)) ?
+      (function() {
+        var p = refDate.split('-');
+        return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10), 12, 0, 0);
+      })() : (refDate ? new Date(refDate) : new Date());
+
+    var dayOfWeek = dateObj.getDay();
     var currentIsoDay = (dayOfWeek === 0) ? 7 : dayOfWeek;
     var remainingDays = Math.max(1, 7 - currentIsoDay + 1);
 
@@ -228,6 +232,7 @@
 
   return {
     DEFAULT_TARGET_HOURS: DEFAULT_TARGET_HOURS,
+    formatDateOnly: formatDateOnly,
     getWeekBounds: getWeekBounds,
     evaluateWeeklyGoal: evaluateWeeklyGoal,
     renderWeeklyGoalProgressSVG: renderWeeklyGoalProgressSVG
