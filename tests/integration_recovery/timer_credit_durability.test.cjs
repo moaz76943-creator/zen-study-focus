@@ -47,14 +47,16 @@ function toggleRig({running=false,failure='throw'}={}){
   focusSessionTaskId:running?7:null,timerActiveMs:30000,timerResumeMs:running?100000:null,
   currentTimerModeKey:'focus',customSessionLabel:'Personal label ۱۲',quickTraining:null,chimeCtx:null};
  const original=JSON.parse(JSON.stringify(state)),events=[],messages=[],button={innerHTML:running?'pause':'play'};
- let reject=true;
+ let reject=true,persisted=null;
  const ctx=vm.createContext({...state,Date:{now:()=>110000},Math,String,Number,
   TIMER_STORAGE_KEY:'zen_fortress_active_timer_v21',
   document:{getElementById:id=>id==='mainPlayBtn'?button:{textContent:'Focus'}},
   saveFortressData(key,snapshot){
    events.push(['save',key,JSON.parse(JSON.stringify(snapshot))]);
    if(reject&&failure==='throw')throw Error('QuotaExceededError');
-   return !(reject&&failure==='false');
+   if(reject&&failure==='false')return false;
+   persisted=JSON.parse(JSON.stringify(snapshot));
+   return true;
   },window:{confirm:()=>true,ZenNative:{stopBackgroundService(){events.push(['native-stop']);}}},
   quickText:()=> 'Replace session?',
   L:()=>({saveFailed:'Could not save'}),showToast:m=>messages.push(m),
@@ -72,7 +74,7 @@ function toggleRig({running=false,failure='throw'}={}){
   const a=app.indexOf(begin),b=app.indexOf(finish,a);assert.ok(a>=0&&b>a);vm.runInContext(app.slice(a,b),ctx);
  }
  const snapshot=()=>Object.fromEntries(Object.keys(original).map(k=>[k,ctx[k]]));
- return {ctx,original,events,messages,button,snapshot,allow(){reject=false;},run:()=>vm.runInContext('toggleTimerPlay()',ctx),call:code=>vm.runInContext(code,ctx)};
+ return {ctx,original,events,messages,button,snapshot,get persisted(){return persisted;},allow(){reject=false;},run:()=>vm.runInContext('toggleTimerPlay()',ctx),call:code=>vm.runInContext(code,ctx)};
 }
 for(const running of [false,true])for(const failure of ['throw','false'])test(`CROSS-002 ${running?'Pause':'Start'} ${failure} keeps timer, identity and scheduled work unchanged`,()=>{
  const h=toggleRig({running,failure});
@@ -127,4 +129,164 @@ test('CROSS-002 successful decrement preserves ten-second floor and identity',()
  assert.equal(h.ctx.timerLeft,10);assert.equal(h.ctx.timerTotal,120);
  assert.equal(h.ctx.timerSessionId,'stable-session');assert.equal(h.ctx.focusSessionTaskId,7);
  assert.deepEqual(h.events.slice(1),[['native-start',10,'Focus'],['display']]);
+});
+
+// P0 Reset: reject the reset snapshot itself, even if a preceding Pause could save.
+for(const running of [false,true])for(const failure of ['throw','false'])test(`P0 Reset ${running?'running':'paused'} ${failure} preserves session and retries atomically`,()=>{
+ const h=toggleRig({running,failure});
+ // A paused session still owns its task, elapsed time and identity.
+ if(!running){h.ctx.timerSessionId='stable-session';h.ctx.focusSessionTaskId=7;}
+ h.allow();h.call('storeTimerSession()');
+ const before=h.snapshot(),saved=h.persisted,button=h.button.innerHTML;
+ // Re-enable refusal only for the reset snapshot; old implementation saves Pause first.
+ const writer=h.ctx.saveFortressData;
+ let refuse=true;
+ h.ctx.saveFortressData=(key,next)=>{
+  if(refuse&&next.sessionId===null){
+   if(failure==='throw')throw Error('QuotaExceededError');
+   return false;
+  }
+  return writer(key,next);
+ };
+ h.events.length=0;
+ assert.throws(()=>h.call('resetTimerNow()'),/QuotaExceededError|TIMER_SAVE_NOT_ACKNOWLEDGED/);
+ assert.deepEqual(h.snapshot(),before,'Rejected Reset retains every timer/session field');
+ assert.deepEqual(h.persisted,saved,'Old durable session remains intact');
+ assert.equal(h.button.innerHTML,button,'No successful Reset shown');
+ assert.deepEqual(h.events,[],'No native stop, interval stop, display, or intermediate Pause save');
+ assert.deepEqual(h.messages,['Could not save']);
+ refuse=false;
+ assert.equal(h.call('resetTimerNow()'),true);
+ assert.equal(h.ctx.timerRunning,false);assert.equal(h.ctx.timerLeft,h.ctx.timerTotal);
+ assert.equal(h.ctx.timerSessionId,null);assert.equal(h.ctx.focusSessionTaskId,null);
+ assert.equal(h.ctx.timerActiveMs,0);assert.equal(h.ctx.timerResumeMs,null);
+ assert.equal(h.ctx.customSessionLabel,before.customSessionLabel);
+ assert.equal(h.persisted.sessionId,null);assert.equal(h.persisted.left,h.ctx.timerTotal);
+ assert.equal(h.persisted.running,false);assert.equal(h.persisted.endAt,null);
+ assert.deepEqual(h.events.map(e=>e[0]),running?['save','interval-stop','native-stop','display']:['save','display']);
+});
+test('P0 Reset cancellation and quick-training delegation preserve existing behavior',()=>{
+ const h=toggleRig({running:true});h.ctx.window.confirm=()=>false;
+ assert.equal(h.call('resetTimerNow()'),false);
+ assert.deepEqual(h.snapshot(),h.original);assert.deepEqual(h.events,[]);
+ h.ctx.quickTraining={active:true};let cancelled=0;
+ h.ctx.cancelQuickTraining=()=>cancelled++;
+ h.call('resetTimerNow()');assert.equal(cancelled,1);assert.deepEqual(h.events,[]);
+});
+
+// P0 mode/custom transition: use production selectors, snapshot writer and restore.
+function modeRig({running=false,training=false,failure='throw'}={}){
+ const h=toggleRig({running,failure});
+ const elements=new Map();
+ function element(id){
+  if(!elements.has(id)){
+   const classes=new Set(id==='modeFocusBtn'?['active']:id==='customTimerModal'?['open']:[]);
+   elements.set(id,{value:id==='inpCustomMins'?'47':id==='inpCustomTitle'?'New custom title':'',
+    textContent:'',innerHTML:'',style:{},setAttribute(){},
+    classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x),
+     toggle(x,on){if(on)classes.add(x);else classes.delete(x);}},
+    parentElement:{querySelectorAll:()=>['modeFocusBtn','modeShortBtn','modeLongBtn','modeCustomBtn'].map(element)}});
+  }
+  return elements.get(id);
+ }
+ const c=h.ctx;
+ c.document.getElementById=id=>id==='mainPlayBtn'?h.button:element(id);
+ c.cfg={domain:'study',shortMin:5,longMin:15};c.quickInternalChange=false;
+ c.customSessionLabel='Old label';c.timerSessionId='stable-session';c.focusSessionTaskId=7;
+ if(training)c.quickTraining={active:true,sets:2,workSeconds:20,restSeconds:10,currentSet:0,
+  phase:'work',skipLastRest:true,domain:'study',taskId:7,exercises:['Read']};
+ c.renderQuickTraining=()=>h.events.push(['training-render']);
+ c.closeModal=id=>{element(id).classList.remove('open');h.events.push(['close',id]);};
+ c.toWest=x=>String(x);c.L=()=>({saveFailed:'Could not save',modeCustom:'Custom',modeShort:'Short',modeLong:'Long',domStudy:'Study'});
+ c.formatDurationUnit=(n,u)=>`${n} ${u}`;c.ringCircumference=660;c.updateFocusStatus=()=>{};
+ c.loadFortressData=()=>h.persisted;
+ c.validQuickSnapshot=x=>x; // persistence shape checked by neighboring quick-training suite
+ for(const [a,b] of [['function selectTimerModeFromUser(', 'function selectTimerMode('],
+  ['function applyCustomTimerNow()', 'function changeTimerDelta('],
+  ['function restoreTimerSession()', 'const ringCircumference'],
+  ['function updateTimerDisplay()', 'function selectTimerModeFromUser('],
+  ['function selectHomeQuickSession(', 'function logWorkoutSet('],
+  ['function skipTimerPhase()', 'function addWaterCup()']]){
+  const start=app.indexOf(a),end=app.indexOf(b,start);assert.ok(start>=0&&end>start);
+  vm.runInContext(app.slice(start,end),c);
+ }
+ const state=()=>JSON.parse(JSON.stringify(h.snapshot()));
+ const ui=()=>({play:h.button.innerHTML,caption:element('timerModeCaption').textContent,
+  active:['modeFocusBtn','modeShortBtn','modeLongBtn','modeCustomBtn'].filter(id=>element(id).classList.contains('active')),
+  open:element('customTimerModal').classList.contains('open'),
+  title:element('inpCustomTitle').value,mins:element('inpCustomMins').value});
+ // Seed the old durable session, then reject only the requested replacement.
+ h.allow();h.call('storeTimerSession()');h.call('updateTimerDisplay()');
+ const writer=c.saveFortressData;let refuse=true;
+ c.saveFortressData=(key,next)=>{
+  if(refuse&&next.sessionId===null){
+   if(failure==='throw')throw Error('QuotaExceededError');return false;
+  }
+  return writer(key,next);
+ };
+ h.events.length=0;
+ return {...h,element,state,ui,get persisted(){return h.persisted;},accept(){refuse=false;}};
+}
+for(const action of ['mode','custom'])for(const running of [false,true])for(const training of [false,true])for(const failure of ['throw','false'])test(`P0 mode/custom ${action} running=${running} training=${training} ${failure}`,()=>{
+ const h=modeRig({running,training,failure}),before=h.state(),ui=h.ui(),saved=h.persisted;
+ const code=action==='custom'?'applyCustomTimerNow()':"selectTimerModeFromUser(5,'short',document.getElementById('modeShortBtn'))";
+ assert.throws(()=>h.call(code),/QuotaExceededError|TIMER_SAVE_NOT_ACKNOWLEDGED/);
+ assert.deepEqual(h.state(),before,'Failed replacement retains complete session and training');
+ assert.deepEqual(h.ui(),ui,'Failed replacement retains buttons, caption and editable modal');
+ assert.deepEqual(h.persisted,saved,'No partial Pause may replace old snapshot');
+ assert.deepEqual(h.events,[],'No native/interval/render/close work before verified save');
+ assert.deepEqual(h.messages,['Could not save']);
+ h.accept();assert.equal(h.call(code),true);
+ assert.equal(h.ctx.currentTimerModeKey,action==='custom'?'custom':'short');
+ assert.equal(h.persisted.label,action==='custom'?'New custom title (47m)':'Old label');
+ assert.equal(h.persisted.total,action==='custom'?2820:300);
+ assert.equal(h.persisted.sessionId,null);assert.equal(h.persisted.taskId,null);
+ assert.equal(h.persisted.training,null);assert.equal(h.persisted.running,false);
+ assert.equal(h.events.filter(e=>e[0]==='save').length,1,'One committed transition');
+ assert.equal(h.events[0][0],'save','Save must precede native/UI changes');
+ assert.equal(h.events.filter(e=>e[0]==='native-stop').length,running?1:0);
+ assert.deepEqual(h.ui().active,[action==='custom'?'modeCustomBtn':'modeShortBtn']);
+ // Simulate a fresh WebView's empty timer state and restore using the real body.
+ h.ctx.timerRunning=false;h.ctx.timerSessionId=null;h.ctx.customSessionLabel='';
+ h.ctx.currentTimerModeKey='focus';h.ctx.timerLeft=1;h.ctx.timerTotal=1;
+ h.call('restoreTimerSession()');
+ assert.equal(h.ctx.timerTotal,action==='custom'?2820:300);
+ assert.equal(h.element('timerModeCaption').textContent,action==='custom'?'New custom title (47m)':'Short');
+});
+for(const custom of [false,true])test(`P0 mode/custom Cancel preserves all state (custom=${custom})`,()=>{
+ const h=modeRig({running:true,training:true}),before=h.state(),ui=h.ui();
+ h.ctx.window.confirm=()=>false;
+ assert.equal(h.call(custom?'applyCustomTimerNow()':"selectTimerModeFromUser(5,'short',document.getElementById('modeShortBtn'))"),false);
+ assert.deepEqual(h.state(),before);assert.deepEqual(h.ui(),ui);assert.deepEqual(h.events,[]);
+});
+test('P0 mode/custom direct training Cancel propagates false through user wrapper',()=>{
+ const h=modeRig({training:true});h.ctx.timerSessionId=null;h.ctx.timerActiveMs=0;
+ h.ctx.window.confirm=()=>false;const before=h.state();
+ assert.equal(h.call("selectTimerModeFromUser(5,'short',null)"),false);
+ assert.deepEqual(h.state(),before);assert.deepEqual(h.events,[]);
+});
+for(const running of [false,true])test(`P0 mode/custom home shortcut rejection preserves training running=${running}`,()=>{
+ const h=modeRig({running,training:true}),before=h.state(),ui=h.ui();
+ assert.throws(()=>h.call('selectHomeQuickSession(50)'),/QuotaExceededError|TIMER_SAVE_NOT_ACKNOWLEDGED/);
+ assert.deepEqual(h.state(),before);assert.deepEqual(h.ui(),ui);assert.deepEqual(h.events,[]);
+});
+test('P0 mode/custom Skip and internal rest preserve valid training and shortcuts',()=>{
+ const h=modeRig({training:true});h.accept();h.ctx.quickInternalChange=true;
+ assert.equal(h.call("selectTimerMode(10/60,'short',document.getElementById('modeShortBtn'))"),true);
+ assert.equal(h.ctx.quickTraining.active,true);assert.equal(h.persisted.training.phase,'work');
+ assert.equal(h.ctx.timerTotal,10,'Internal training seconds must not be rounded to minutes');
+ const rest=modeRig();rest.accept();assert.equal(rest.call('skipTimerPhase()'),true);
+ assert.equal(rest.ctx.currentTimerModeKey,'short');assert.equal(rest.ctx.timerTotal,300);
+ const home=modeRig();home.accept();assert.equal(home.call('selectHomeQuickSession(50)'),true);
+ assert.equal(home.ctx.currentTimerModeKey,'focus');assert.equal(home.ctx.timerTotal,3000);
+});
+test('P0 mode/custom successful custom title survives real snapshot reload',()=>{
+ const h=modeRig();h.accept();
+ assert.equal(h.call('applyCustomTimerNow()'),true);
+ assert.equal(h.persisted.label,'New custom title (47m)','The committed snapshot must already contain the new title');
+ assert.equal(h.ui().open,false);assert.equal(h.element('timerModeCaption').textContent,'New custom title (47m)');
+ h.ctx.customSessionLabel='';h.ctx.currentTimerModeKey='focus';
+ h.call('restoreTimerSession()');
+ assert.equal(h.ctx.customSessionLabel,'New custom title (47m)');
+ assert.equal(h.element('timerModeCaption').textContent,'New custom title (47m)');
 });
