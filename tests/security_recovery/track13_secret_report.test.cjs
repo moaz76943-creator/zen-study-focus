@@ -38,7 +38,7 @@ test('suspected key is BLOCKED and secret and raw path are never printed',()=>{
   assert.equal(out.evidence[0].commit,'b'.repeat(40));
 });
 test('scanner error, missing or malformed report always blocks release',()=>{
-  for(const [report,status] of [[null,2],[{unexpected:true},1],[[],2]]) {
+  for(const [report,status] of [[null,2],[null,0],[{unexpected:true},1],[[],2],[[],1]]) {
     const r=scan(report,status);
     assert.equal(r.status,1);
     assert.equal(JSON.parse(r.stdout).status,'BLOCKED');
@@ -67,4 +67,20 @@ test('synthetic probe is fail-closed when the scanner omits its report',()=>{
   const wf=fs.readFileSync(path.join(root,'.github/workflows/track13_security_exact_sha.yml'),'utf8');
   assert.match(wf,/SYNTHETIC_PROBE_BLOCKED/);
   assert.match(wf,/track13_gitleaks_report\.py/);
+});
+
+
+test('corrupted report bytes are blocked even if the scanner claims success',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'df-track13-corrupt-'));
+  const file=path.join(dir,'private.json');
+  fs.writeFileSync(file,'{not valid JSON');
+  try {
+    const r=spawnSync('python3',[script,'--report',file,'--sha',sha,'--scan-exit','0'],{encoding:'utf8'});
+    assert.equal(r.status,1);
+    const out=JSON.parse(r.stdout);
+    assert.equal(out.status,'BLOCKED');
+    assert.equal(out.reason,'REPORT_UNAVAILABLE_OR_INVALID');
+    assert.deepEqual(out.evidence,[]);
+    assert.equal(r.stderr,'');
+  } finally {fs.rmSync(dir,{recursive:true,force:true});}
 });
