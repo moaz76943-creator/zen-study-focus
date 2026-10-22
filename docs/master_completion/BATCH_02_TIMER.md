@@ -54,3 +54,7 @@ The existing adjustment now snapshots only its three changing fields, requires a
 - Existing real Chromium button suite:19 named interaction cases PASS,0 uncaught errors, including confirmation Cancel/Accept, mode controls, sport-rest, custom editor and navigation at393px. Served over loopback HTTP with a synthetic profile; not Android or an exhaustive232-button test. Command: `DF_COMPLETION_URL=http://127.0.0.1:8774 DF_BUTTON_EVIDENCE=/workspace/scratch/timer-delta/browser timeout 65 node tests/track07_functional/timer_mode_buttons_browser.cjs`.
 - Active timer snapshot still has the existing auxiliary-storage contract; this is not new Native durable ACK or process-death proof.
 - Keep this repair on existing PR176; no duplicate issue/PR or main/staging merge. Next inspect its new exact-head CI. Android/physical device/background/DND/Bluetooth remain NOT_TESTED. RELEASE_APPROVED=NO.
+
+### Combined review candidate (2026-10-22T00:20:56Z)
+
+Existing PR175 water-counter repair was reviewed and merged without conflicts into PR176's isolated review branch, not main or PR138. Combined regression93 PASS/0 FAIL and startup smoke PASS. Current canonical session checkpoint is `docs/codex_recovery/CURRENT_CHECKPOINT.md`; prior head results above remain scoped to those heads. Final commit/CI receipt is on PR176. No Android/release promotion.

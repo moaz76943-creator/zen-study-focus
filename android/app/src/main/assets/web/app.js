@@ -1455,7 +1455,19 @@ function skipTimerPhase() {
   // Selecting the next phase uses the same confirmation as the mode buttons.
   return selectTimerModeFromUser(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
 }
-function addWaterCup() { cfg.water = (cfg.water + 1) % 9; saveFortressData('zen_fortress_cfg_v21', cfg); syncHeaderMetrics(); }
+function addWaterCup() {
+  const nextWater = (cfg.water + 1) % 9;
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', {...cfg, water:nextWater}) !== true)
+      throw new Error('WATER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed);
+    return false;
+  }
+  cfg.water = nextWater;
+  syncHeaderMetrics();
+  return true;
+}
 function toggleDeskClock(show) {
   document.getElementById('deskClockOverlay').classList.toggle('active', show);
   if (window.ZenNative && window.ZenNative.setDeskClockWake) {
