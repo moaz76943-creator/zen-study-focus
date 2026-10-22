@@ -135,13 +135,16 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
     const localeChecks=[];
     for (const language of ['ar','de','en']) {
       await page.setViewportSize({width:320,height:780});
-      const info=await page.evaluate(({language,ids})=>{
+      const info=await page.evaluate(async ({language,ids})=>{
         document.documentElement.style.fontSize='32px';
         if (typeof applyLanguage !== 'function') return {language,error:'LANGUAGE_FUNCTION_MISSING'};
         applyLanguage(language);
         document.body.classList.add('timer-home');
         document.body.classList.remove('deep-lockdown');
         document.getElementById('navTimer')?.click();
+        // CSS navigation uses a short transform transition after real locale changes.
+        // Measure settled hit areas, as in the 24-cell screenshot matrix.
+        await new Promise(resolve=>setTimeout(resolve,250));
         const nav=document.querySelector('.bottom-nav-capsule')?.getBoundingClientRect();
         const labels=ids.map(id=>{
           const btn=document.getElementById(id);
