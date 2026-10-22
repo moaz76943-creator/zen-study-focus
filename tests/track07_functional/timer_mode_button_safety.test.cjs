@@ -21,5 +21,5 @@ test('mode change cancelled by user never resets session progress',()=>{
  assert.match(method,/timerRunning\s*\|\|\s*timerSessionId\s*\|\|\s*timerActiveMs\s*>\s*0/);
  assert.match(method,/!window\.confirm/);
  assert.match(method,/return false/);
- assert.match(method,/selectTimerMode\(mins, modeKey, btn\)/);
+ assert.match(method,/return selectTimerMode\(mins, modeKey, btn, label\)/);
 });
