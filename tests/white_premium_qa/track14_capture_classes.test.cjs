@@ -8,7 +8,7 @@ const src=fs.readFileSync(path.join(__dirname,'track14_android_snapshots.sh'),'u
 test('Activity launch has an explicit nonvisual failure classification',()=>{
   assert.match(src,/ANDROID_ACTIVITY_START_FAILED/);
   assert.match(src,/ANDROID_APP_PROCESS_NOT_RUNNING/);
-  assert.match(src,/Status:\\s*ok/);
+  assert.ok(src.includes('Status:[[:space:]]*ok'), 'launch checks successful am status');
 });
 test('Screenshot transport and empty image failures are not called UI visual defects',()=>{
   assert.match(src,/ANDROID_CAPTURE_TOOL_FAILED/);
