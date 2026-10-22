@@ -140,7 +140,13 @@
       'flip.action.flip_to_focus': 'Flip to Focus',
       'flip.action.disabled': 'Disabled',
       'flip.status.face_down': 'Phone Face Down',
-      'flip.status.face_up': 'Phone Face Up'
+      'flip.status.face_up': 'Phone Face Up',
+
+      'diag.status.healthy': 'System Fully Healthy',
+      'diag.status.degraded': 'Performance Degraded',
+      'diag.status.critical': 'Critical Issues Detected',
+      'diag.action.snapshot': 'Create Snapshot',
+      'diag.action.restore': 'Restore Snapshot'
     },
     'ar': {
       'common.cycle': 'دورة',
@@ -159,7 +165,6 @@
       'preset.deep_noise_isolation.desc': 'مزيج هندسي محكم من الضوضاء البنية والبيضاء وأزيز مروحة هوائية لإخفاء الأصوات المشتتة المحيطة تماماً.',
       'preset.zen_sanctuary.name': 'واحة التأمل والسكينة',
       'preset.zen_sanctuary.desc': 'حفيف غابة الخيزران مع قطرات حوض الماء الياباني ورنين الأجراس الخشبية لتصفية الذهن وخفض التوتر.',
-      'midnight_study_train': 'قطار المذاكرة الليلي',
       'preset.midnight_study_train.name': 'قطار المذاكرة الليلي',
       'preset.midnight_study_train.desc': 'حركة إيقاعية رتيبة لقطار سفر عبر الليل مع أمطار غزيرة تضرب النوافذ للحفاظ على وتيرة تركيز ثابتة ومستمرة.',
       'preset.autumn_wilderness.name': 'برية الخريف الهادئة',
@@ -262,7 +267,13 @@
       'flip.action.flip_to_focus': 'قلب الهاتف لبدء جلسة التركيز',
       'flip.action.disabled': 'معطّل',
       'flip.status.face_down': 'الهاتف مقلوب للأسفل',
-      'flip.status.face_up': 'الهاتف موجه للأعلى'
+      'flip.status.face_up': 'الهاتف موجه للأعلى',
+
+      'diag.status.healthy': 'النظام يعمل بكفاءة وأمان تام',
+      'diag.status.degraded': 'انخفاض في أداء النظام',
+      'diag.status.critical': 'تنبيه: تم رصد مشكلات حرجة',
+      'diag.action.snapshot': 'إنشاء نقطة استعادة احتياطية',
+      'diag.action.restore': 'استعادة من النسخة الاحتياطية'
     },
     'es': {
       'common.cycle': 'Ciclo',
@@ -295,7 +306,8 @@
       'goals.pace.on_track': 'Al Día',
       'stretch.neck_shoulder.name': 'Liberación de Cuello y Hombros',
       'stretch.routine.quick_2min.title': 'Reinicio de Escritorio de 2 Minutos',
-      'flip.action.flip_to_pause': 'Voltear para Pausar'
+      'flip.action.flip_to_pause': 'Voltear para Pausar',
+      'diag.status.healthy': 'Sistema Completamente Saludable'
     },
     'fr': {
       'common.cycle': 'Cycle',
