@@ -100,7 +100,20 @@
       'power_saver.status.normal': 'Standard Performance',
       'power_saver.mode.auto': 'Auto (<= 20%)',
       'power_saver.mode.always_on': 'Always On',
-      'power_saver.mode.always_off': 'Always Off'
+      'power_saver.mode.always_off': 'Always Off',
+
+      'digest.header.title': 'DAILY FOCUS DIGEST',
+      'digest.metric.minutes': 'MINUTES OF FOCUS',
+      'digest.metric.sessions': 'SESSIONS',
+      'digest.metric.rate': 'FOCUS RATE',
+      'digest.metric.top_subject': 'TOP SUBJECT',
+
+      'goals.header.weekly': 'WEEKLY STUDY GOAL',
+      'goals.label.completed': 'HOURS COMPLETED',
+      'goals.label.run_rate': 'DAILY RUN RATE NEEDED',
+      'goals.pace.ahead': 'Ahead of Schedule',
+      'goals.pace.on_track': 'On Track',
+      'goals.pace.behind': 'Catch Up Needed'
     },
     'ar': {
       'common.cycle': 'دورة',
@@ -181,7 +194,20 @@
       'power_saver.status.normal': 'أداء قياسي كامل',
       'power_saver.mode.auto': 'تلقائي (<= 20%)',
       'power_saver.mode.always_on': 'مفعّل دائماً',
-      'power_saver.mode.always_off': 'معطّل دائماً'
+      'power_saver.mode.always_off': 'معطّل دائماً',
+
+      'digest.header.title': 'ملخص التركيز اليومي',
+      'digest.metric.minutes': 'دقائق التركيز',
+      'digest.metric.sessions': 'جلسات المذاكرة',
+      'digest.metric.rate': 'معدل الاستمرارية',
+      'digest.metric.top_subject': 'المادة الأكثر تركيزاً',
+
+      'goals.header.weekly': 'هدف المذاكرة الأسبوعي',
+      'goals.label.completed': 'ساعات منجزة',
+      'goals.label.run_rate': 'المعدل اليومي المطلوب',
+      'goals.pace.ahead': 'متقدم عن الخطة',
+      'goals.pace.on_track': 'وفق الخطة المحددة',
+      'goals.pace.behind': 'يحتاج إلى تعويض'
     },
     'es': {
       'common.cycle': 'Ciclo',
@@ -205,7 +231,13 @@
       'notification.action.add_5m': '+5 min',
       'power_saver.status.active': 'Ahorro de Batería Activo',
       'power_saver.status.charging': 'Dispositivo Cargando',
-      'power_saver.status.normal': 'Rendimiento Estándar'
+      'power_saver.status.normal': 'Rendimiento Estándar',
+      'digest.header.title': 'RESUMEN DIARIO DE ENFOQUE',
+      'digest.metric.minutes': 'MINUTOS DE ENFOQUE',
+      'digest.metric.sessions': 'SESIONES',
+      'goals.header.weekly': 'META DE ESTUDIO SEMANAL',
+      'goals.label.completed': 'HORAS COMPLETADAS',
+      'goals.pace.on_track': 'Al Día'
     },
     'fr': {
       'common.cycle': 'Cycle',
