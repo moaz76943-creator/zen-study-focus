@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'../../android/app/src/main/assets/web');
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
 const quick=fs.readFileSync(path.join(root,'quick_training.js'),'utf8');
 function fixture({running=true,training=true}={}){
- const events=[],messages=[],slots=new Map(),elements=new Map();let failure=null;
+ const events=[],messages=[],slots=new Map(),elements=new Map();let failure=null,injected=false;
  function element(id){
   if(!elements.has(id))elements.set(id,{value:({qtSets:'2',qtWork:'00:20',qtRest:'00:10'})[id]||'',checked:true,
    innerHTML:id==='mainPlayBtn'?(running?'pause':'play'):'',textContent:'Focus',style:{},
@@ -12,7 +12,7 @@ function fixture({running=true,training=true}={}){
   return elements.get(id);
  }
  const cfg={lang:'en',domain:'study',focusMin:25,shortMin:5,longMin:15,
-  sessions:3,sessionHistory:[{id:'historic',minutes:7}],unknown:{keep:'نصي ۱۲'}};
+  todayMins:0,sessions:3,sessionHistory:[{id:'historic',minutes:7}],unknown:{keep:'نصي ۱۲'}};
  const c=vm.createContext({cfg,Date,Math,Number,String,JSON,
   timerRunning:running,timerTotal:120,timerLeft:90,timerTargetTime:running?Date.now()+90000:null,
   timerSessionId:'stable-id',focusSessionTaskId:7,timerActiveMs:30000,timerResumeMs:running?Date.now()-10000:null,
@@ -21,9 +21,15 @@ function fixture({running=true,training=true}={}){
    domain:'study',taskId:7,skipLastRest:true,exercises:['Read']}:null,
   quickInternalChange:false,quickPresetDomain:'work',quickExercises:['Read'],
   TIMER_STORAGE_KEY:'zen_fortress_active_timer_v21',
-  localStorage:{getItem:k=>slots.get(k)??null,setItem:(k,v)=>slots.set(k,v),removeItem:k=>slots.delete(k)},
-  window:{confirm:()=>true,ZenNative:{stopBackgroundService:()=>events.push('native-stop')},DF22Preflight:{nativeAcknowledge:()=>true}},
-  document:{getElementById:element},L:()=>({saveFailed:'Could not save',domStudy:'Study',domSport:'Sport',domRead:'Read',domWork:'Work'}),
+  localStorage:{getItem:k=>slots.get(k)??null,setItem:(k,v)=>{
+   if(failure&&!injected&&k.includes(failure.key)){
+    if(failure.kind==='mirror'&&k.endsWith('_mirror')){injected=true;throw Error('QuotaExceededError');}
+    if(failure.kind==='readback'&&!k.endsWith('_mirror')){injected=true;slots.set(k,'broken');return;}
+   }
+   slots.set(k,v);
+  },removeItem:k=>slots.delete(k)},
+  window:{confirm:()=>true,ZenNative:{stopBackgroundService:()=>events.push('native-stop')},DF22Preflight:{nativeAcknowledge:()=>failure?.kind!=='ack'}},
+  document:{getElementById:element,dispatchEvent(){}},CustomEvent:class{},localDateISO:()=> '2026-10-22',computeActualStreak:()=>1,syncHeaderMetrics(){},playRichCompletionChime:()=>events.push('chime'),L:()=>({saveFailed:'Could not save',domStudy:'Study',domSport:'Sport',domRead:'Read',domWork:'Work'}),
   showToast:m=>messages.push(m),quickText:k=>k,formatDurationUnit:n=>n+'m',toWest:x=>String(x),
   getDomainFocusMinutes:()=>25,renderDomainState:()=>events.push('domain'),renderQuickTraining:()=>events.push('training'),
   updateTimerDisplay:()=>events.push('display'),updateFocusStatus(){},
@@ -36,6 +42,7 @@ function fixture({running=true,training=true}={}){
  load(app,'const SECRET_SALT =','function loadFortressData(');
  load(app,'function storeTimerSession()','function creditCompletedSession()');
  load(app,'function toggleTimerPlay()','function resetTimerNow()');
+ load(app,'function creditCompletedSession()','function runTimerTick()');
  load(app,'function accumulateActiveTime()','const TIMER_STORAGE_KEY');
  load(app,'function selectTimerModeFromUser(','function openCustomTimerModal()');
  if(app.includes('function transitionActivityTimer('))load(app,'function transitionActivityTimer(','function switchActivityDomain(');
@@ -58,7 +65,7 @@ function fixture({running=true,training=true}={}){
  const state=()=>JSON.parse(call('JSON.stringify({cfg,timerRunning,timerTotal,timerLeft,timerTargetTime,timerSessionId,focusSessionTaskId,timerActiveMs,timerResumeMs,timerInterval,currentTimerModeKey,customSessionLabel,quickTraining,quickInternalChange})'));
  events.length=0;
  return {c,slots,events,messages,element,call,state,
-  reject(key,kind){failure={key,kind};},accept(){failure=null;},
+  reject(key,kind){failure={key,kind};injected=false;},accept(){failure=null;},
   saved:()=>JSON.parse(JSON.parse(slots.get('zen_fortress_active_timer_v21')).payload)};
 }
 module.exports={fixture};

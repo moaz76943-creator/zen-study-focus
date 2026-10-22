@@ -1,3 +1,19 @@
+# Current continuation — activity/training P0 batch
+
+2026-10-22. RELEASE_APPROVED=NO.
+
+Task1 PR179 verified integration merge61a549f1751c2d373555476e8a4d13e828098940.
+Task2 PR180 verified integration mergecc03d65ed0004b7c256eb34605b9ae0ae042fe1d.
+Both receipts published on GitHub before starting the next task.
+Task3 candidate: fix/p0-training-transitions-20261022, based on Task2 merge.
+37 new training cases PASS; combined focused159 PASS; startup/syntax/diff PASS.
+Commands, RED/GREEN, scope and limits: activity_training_20261022/CHECKPOINT.md.
+User authorizes review and sequential integration-only merges; main untouched.
+Final Task3 commit/merge SHA will be recorded in the PR receipt after publication.
+Android/build/process-death/SAF gates remain NOT_TESTED; no release approval.
+
+## Historical earlier continuation (superseded)
+
 # Current incremental recovery checkpoint — mode/custom continuation
 
 2026-10-22. RELEASE_APPROVED=NO.

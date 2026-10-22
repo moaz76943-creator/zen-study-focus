@@ -34,6 +34,20 @@ function load(file, extras={}) {
     ...contextOverrides};
   const sandbox=vm.createContext(mock);
   vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),sandbox,{filename:file});
+  // Unit dependency for the new acknowledged transition; real timer/writer/native
+  // behavior is exercised in integration_recovery/activity_transition_durability.
+  if(file==='quick_training.js')mock.transitionActivityTimer=options=>{
+    const {seconds,mode='focus',training=null,domain=cfg.domain,running=false}=options;
+    try {
+      if(domain!==cfg.domain&&mock.saveFortressData('zen_fortress_cfg_v21',{...cfg,domain})!==true){mock.showToast('Could not save');return false;}
+    } catch (_) { mock.showToast('Could not save');return false; }
+    cfg.domain=domain;mock.timerRunning=running;mock.timerLeft=seconds;mock.timerTotal=seconds;
+    mock.currentTimerModeKey=mode;mock.selectCalls++;
+    if(running)mock.toggleCalls++;
+    sandbox.trainingCandidate=training;
+    vm.runInContext('quickTraining=trainingCandidate',sandbox);
+    return true;
+  };
   return {eval:s=>vm.runInContext(s,sandbox),cfg,elements,document,saves,mock};
 }
 test('goal totals reject invalid/demo rows and de-duplicate IDs without converting their types',()=>{
