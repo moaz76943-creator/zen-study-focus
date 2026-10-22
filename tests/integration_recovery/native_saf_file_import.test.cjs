@@ -1,0 +1,72 @@
+'use strict';
+// Track 02: Native SAF file selection must preserve WebView's blocked
+// content:// access and use the established v21 backup validator.
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const base=path.resolve(__dirname,'../..');
+const native=fs.readFileSync(path.join(base,'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'),'utf8');
+const html=fs.readFileSync(path.join(base,'android/app/src/main/assets/web/index.html'),'utf8');
+
+test('restore file button uses native SAF on Android with existing web fallback',()=>{
+ assert.match(html,/ZenNative\.importBackupFromFile\(\)/);
+ assert.match(html,/fileRestoreInput/);
+});
+
+test('native SAF selects readable document without broadening WebView content privileges',()=>{
+ assert.match(native,/public void importBackupFromFile\(\)/);
+ assert.match(native,/REQUEST_BACKUP_IMPORT/);
+ assert.match(native,/Intent\.ACTION_OPEN_DOCUMENT/);
+ assert.match(native,/getContentResolver\(\)\.openInputStream\(/);
+ assert.match(native,/setAllowContentAccess\(false\)/);
+ assert.doesNotMatch(native,/setAllowContentAccess\(true\)/);
+});
+
+test('native import bounds bytes and delegates validation and consent to v21 verifier',()=>{
+ assert.match(native,/MAX_BACKUP_IMPORT_BYTES/);
+ assert.match(native,/org\.json\.JSONObject\.quote\(/);
+ assert.match(native,/verifyAndRestoreBackupCode/);
+ assert.match(native,/existing data unchanged/);
+});
+
+
+test('native picker cancellation returns without mutating v21 records',()=>{
+ assert.match(native,/if\s*\(requestCode\s*==\s*REQUEST_BACKUP_IMPORT\)/);
+ assert.match(native,/backupImportPickerOpen\s*=\s*false;/);
+ assert.match(native,/resultCode\s*!=\s*Activity\.RESULT_OK\s*\|\|\s*data\s*==\s*null\s*\|\|\s*data\.getData\(\)\s*==\s*null\)\s*return;/);
+ assert.doesNotMatch(native,/getContentResolver\(\)\.openInputStream\([^)]*\)[\s\S]{0,40}\.toString\(\)/);
+});
+
+test('JavaScript importer delegates to the same user-confirmed v21 restore path',()=>{
+ assert.match(native,/JSONObject\.quote\(backupCode\)/);
+ assert.match(native,/verifyAndRestoreBackupCode/);
+ // The bundled file:///android_asset startup page is legitimate.
+ // Never put untrusted backup data into WebView URL navigation.
+ assert.doesNotMatch(native,/webView\.loadUrl\([^;\n]*backupCode/);
+});
+
+test('SAF restore chooser admits legacy backup MIME types, not just text/plain',()=>{
+ assert.ok(native.includes('Intent.EXTRA_MIME_TYPES'));
+ assert.ok(native.includes('intent.setType("*/*")'));
+ assert.ok(native.includes('application/json'));
+ assert.ok(native.includes('application/octet-stream'));
+ assert.ok(native.includes('text/plain'));
+ assert.ok(native.includes('MAX_BACKUP_IMPORT_BYTES'));
+ assert.ok(native.includes('verifyAndRestoreBackupCode'));
+});
+
+// Probe-contract regressions: the source validator is necessary but does not
+// substitute for a real DocumentsUI/consent acceptance on Android API30.
+test('SAF QA transport hashes full oversized fixture without execSync buffer truncation',()=>{
+ const probe=fs.readFileSync(path.join(base,'tests/android_e2e_recovery/p0_timer_saf_android.cjs'),'utf8');
+ assert.match(probe,/sha256sum/);
+ assert.match(probe,/Staged indexed file SHA256 mismatched/);
+ assert.doesNotMatch(probe,/shell','cat',device/);
+});
+test('SAF QA requires real picker exit before the user consent assertion',()=>{
+ const probe=fs.readFileSync(path.join(base,'tests/android_e2e_recovery/p0_timer_saf_android.cjs'),'utf8');
+ assert.match(probe,/actual file selection did not exit DocumentsUI/);
+ assert.match(probe,/app-owned confirmation/);
+ assert.match(probe,/saf_actual_file_restore_ack_and_reopen/);
+});
