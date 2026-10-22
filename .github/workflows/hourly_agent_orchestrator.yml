@@ -14,6 +14,8 @@ on:
     paths:
       - '.github/workflows/hourly_agent_orchestrator.yml'
       - 'tools/daily_maintenance/hourly_orchestrator.cjs'
+      - 'tools/daily_maintenance/agents.json'
+      - 'tests/daily_maintenance/agent_coverage_latest.test.cjs'
       - 'tools/daily_maintenance/canonical_source.cjs'
       - 'tests/daily_maintenance/hourly_*.test.cjs'
       - 'tests/daily_maintenance/canonical_source.test.cjs'
@@ -40,7 +42,7 @@ jobs:
       - name: Test hourly coordination contracts
         run: |
           node --check tools/daily_maintenance/hourly_orchestrator.cjs
-          node --test tests/daily_maintenance/hourly_*.test.cjs tests/daily_maintenance/canonical_source.test.cjs
+          node --test tests/daily_maintenance/hourly_*.test.cjs tests/daily_maintenance/canonical_source.test.cjs tests/daily_maintenance/agent_coverage_latest.test.cjs
   hourly-source-audit:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
