@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '22'
       - name: PNG source guard and non-streaming install unit tests only
-        run: node --test tests/white_premium_qa/track14_png_screen_guard.test.cjs tests/white_premium_qa/track14_android_install.test.cjs
+        run: node --test tests/white_premium_qa/track14_png_screen_guard.test.cjs tests/white_premium_qa/track14_android_install.test.cjs tests/white_premium_qa/track14_capture_classes.test.cjs
       - name: Shell syntax check (no Android emulator, no APK build)
         run: bash -n tests/white_premium_qa/track14_android_snapshots.sh tests/white_premium_qa/track14_install_apk.sh
       - name: Scope declaration
