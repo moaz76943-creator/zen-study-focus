@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - qa/track14-mobile-head-20261022
+      - qa/track14-c-verified-controls-20261022
   workflow_dispatch:
 permissions:
   contents: read
