@@ -55,3 +55,16 @@ test('exact SHA security workflow is present with bounded read-only scanner perm
   assert.match(wf,/track13_gitleaks_report\.py/);
   assert.doesNotMatch(wf,/upload-artifact|continue-on-error|\bsecrets\./);
 });
+
+
+test('Gitleaks configuration parses as TOML with default detection enabled',()=>{
+  const code="import sys,tomllib\nwith open(sys.argv[1],'rb') as fh: cfg=tomllib.load(fh)\nassert cfg['extend']['useDefault'] is True\n";
+  const r=spawnSync('python3',['-c',code,path.join(root,'.gitleaks.toml')],{encoding:'utf8'});
+  assert.equal(r.status,0,'Invalid Gitleaks TOML or disabled default detection');
+});
+
+test('synthetic probe is fail-closed when the scanner omits its report',()=>{
+  const wf=fs.readFileSync(path.join(root,'.github/workflows/track13_security_exact_sha.yml'),'utf8');
+  assert.match(wf,/SYNTHETIC_PROBE_BLOCKED/);
+  assert.match(wf,/track13_gitleaks_report\.py/);
+});
