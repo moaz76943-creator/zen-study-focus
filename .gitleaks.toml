@@ -1,10 +1,10 @@
-# Narrow Track 13 false positives; default detection rules remain enabled.
-# AND requires BOTH exact path and audited line content.
+# Narrow exact-content historical false positives; default rules remain active.
+# Both the reviewed file path and the precise line must match.
 [extend]
 useDefault = true
 
 [[allowlists]]
-description = "Public v21 checksum tag; client-embedded non-cryptographic integrity only"
+description = "Public v21 checksum tag; non-cryptographic client integrity only"
 targetRules = ["generic-api-key"]
 condition = "AND"
 regexTarget = "line"
@@ -19,11 +19,11 @@ regexTarget = "line"
 paths = ['''^tests/(integration_quality/activity_domain_durable_ack\.test\.cjs|integration_recovery/(daily_rollover_durability|language_switch_durability)\.test\.cjs|smoke_app\.cjs|focus_workflows/test_focus_workflows\.cjs)$''']
 regexes = [
   '''assert\.equal\(key,\s*["']zen_fortress_cfg_v21["']\)''',
-  '''^\s*const cfgKey\s*=\s*["']zen_fortress_cfg_v21["'];?\s*
+  '''^\s*const cfgKey\s*=\s*["']zen_fortress_cfg_v21["'];?\s*$'''
 ]
 
 [[allowlists]]
-description = "Recorded Git commit SHA under key_order_fix_commit, not a credential"
+description = "Recorded commit SHA under key_order_fix_commit, not a credential"
 targetRules = ["generic-api-key"]
 condition = "AND"
 regexTarget = "line"
@@ -31,26 +31,7 @@ paths = ['''^docs/master_completion/LEDGER_197\.json$''']
 regexes = ['''^\s*"key_order_fix_commit"\s*:\s*"[a-f0-9]{40}"\s*,?\s*$''']
 
 [[allowlists]]
-description = "Legacy public checksum salt in historical bundled v21 HTML, not an API key"
-targetRules = ["generic-api-key"]
-condition = "AND"
-regexTarget = "line"
-paths = ['''^android/app/src/main/assets/web/index\.html$''']
-regexes = ['''^\s*const SECRET_SALT\s*=\s*["']ZEN_FORTRESS_V19_99481["'];?\s*$''']
-'',
-  '''saveFortressData:\s*\(key\)\s*=>\s*key\s*===\s*["']zen_fortress_cfg_v21["']'''
-]
-
-[[allowlists]]
-description = "Recorded Git commit SHA under key_order_fix_commit, not a credential"
-targetRules = ["generic-api-key"]
-condition = "AND"
-regexTarget = "line"
-paths = ['''^docs/master_completion/LEDGER_197\.json$''']
-regexes = ['''^\s*"key_order_fix_commit"\s*:\s*"[a-f0-9]{40}"\s*,?\s*$''']
-
-[[allowlists]]
-description = "Legacy public checksum salt in historical bundled v21 HTML, not an API key"
+description = "Legacy public checksum salt in bundled v21 HTML"
 targetRules = ["generic-api-key"]
 condition = "AND"
 regexTarget = "line"
