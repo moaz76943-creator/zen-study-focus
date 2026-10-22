@@ -161,7 +161,20 @@
       'wow.label.previous_week': 'LAST WEEK',
       'wow.trend.growth': 'Positive Momentum',
       'wow.trend.consistent': 'Steady Consistency',
-      'wow.trend.dip': 'Focus Dip'
+      'wow.trend.dip': 'Focus Dip',
+
+      'theme.oled_pitch_black.name': 'OLED Pitch Black',
+      'theme.oled_pitch_black.desc': 'Maximum battery savings with pure black background and emerald accents.',
+      'theme.warm_sepia_eink.name': 'Warm Sepia E-Ink',
+      'theme.warm_sepia_eink.desc': 'Warm paper texture reducing glare and blue light for daylight reading.',
+      'theme.forest_pine_zen.name': 'Forest Pine Zen',
+      'theme.forest_pine_zen.desc': 'Calming deep coniferous green tones for grounded focus.',
+      'theme.midnight_navy.name': 'Midnight Navy',
+      'theme.midnight_navy.desc': 'Deep celestial navy and sky blue for evening study immersion.',
+      'theme.nordic_frost.name': 'Nordic Frost',
+      'theme.nordic_frost.desc': 'Clean slate and arctic cyan contrast for distraction-free clarity.',
+      'theme.solarized_dark.name': 'Solarized Dark',
+      'theme.solarized_dark.desc': 'Scientifically tuned low-glare palette for reduced visual fatigue.'
     },
     'ar': {
       'common.cycle': 'دورة',
@@ -304,7 +317,20 @@
       'wow.label.previous_week': 'الأسبوع السابق',
       'wow.trend.growth': 'نمو إيجابي وتصاعد',
       'wow.trend.consistent': 'ثبات واستقرار',
-      'wow.trend.dip': 'انخفاض في التركيز'
+      'wow.trend.dip': 'انخفاض في التركيز',
+
+      'theme.oled_pitch_black.name': 'أسود فاحم (OLED)',
+      'theme.oled_pitch_black.desc': 'أقصى توفير للبطارية بخلفية سوداء تماماً مع لمسات زمردية.',
+      'theme.warm_sepia_eink.name': 'ورق دافئ وحبر إلكتروني (Sepia)',
+      'theme.warm_sepia_eink.desc': 'ملمس الورق الطبيعي الدافئ لتقليل إجهاد الإبصار أثناء المذاكرة النهارية.',
+      'theme.forest_pine_zen.name': 'واحة الصنوبر والغابة (Zen)',
+      'theme.forest_pine_zen.desc': 'درجات أخضر الصنوبر الهادئة لتعزيز السكينة والتركيز العميق.',
+      'theme.midnight_navy.name': 'كحلي منتصف الليل (Navy)',
+      'theme.midnight_navy.desc': 'أزرق كحلي عميق مع لمسات سماوية لجلسات المذاكرة المسائية.',
+      'theme.nordic_frost.name': 'الصقيع الشمالي (Slate Frost)',
+      'theme.nordic_frost.desc': 'رمادي صخري مع أزرق قطبي لبيئة دراسية باردة وخالية من التشتيت.',
+      'theme.solarized_dark.name': 'سولارايزد المظلم (Solarized)',
+      'theme.solarized_dark.desc': 'لوحة ألوان محسوبة بدقة لتقليل التباين القاسي وإراحة العين.'
     },
     'es': {
       'common.cycle': 'Ciclo',
@@ -343,7 +369,9 @@
       'search.filter.all_tags': 'Todas las Materias',
       'wow.header.title': 'PROGRESO SEMANA TRAS SEMANA',
       'wow.label.current_week': 'ESTA SEMANA',
-      'wow.label.previous_week': 'SEMANA ANTERIOR'
+      'wow.label.previous_week': 'SEMANA ANTERIOR',
+      'theme.oled_pitch_black.name': 'Negro Puro OLED',
+      'theme.warm_sepia_eink.name': 'Sepia Cálido E-Ink'
     },
     'fr': {
       'common.cycle': 'Cycle',
