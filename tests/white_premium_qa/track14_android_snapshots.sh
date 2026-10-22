@@ -10,6 +10,7 @@ cleanup() {
   timeout 20s adb shell wm size reset >/dev/null 2>&1
   timeout 20s adb shell wm density reset >/dev/null 2>&1
   timeout 20s adb shell settings put system font_scale 1.0 >/dev/null 2>&1
+  rm -f "${local_xml:-}"
   printf '%s\n' "$rc" > "$out/capture-exit-code.txt"
   exit "$rc"
 }
@@ -32,6 +33,7 @@ if ((ready==0)); then
 fi
 bash tests/white_premium_qa/track14_install_apk.sh "$apk"
 timeout 40s adb shell wm density 160
+render_failed=0
 for width in 320 360 393 430; do
   timeout 40s adb shell wm size "${width}x780"
   for scale in 1.0 1.5 2.0; do
@@ -58,7 +60,33 @@ for width in 320 360 393 430; do
       echo "ANDROID_CAPTURE_EMPTY: width=$width scale=$scale" >&2
       exit 1
     fi
-    printf 'width=%s font_scale=%s screenshot=CAPTURED visual_review=NOT_TESTED\n' "$width" "$scale" >> "$out/geometry_status.txt"
+    # Per-frame content and semantic checks MUST precede the next width/scale.
+    pixel_state=CANDIDATE
+    semantic_state=CANDIDATE
+    if ! python3 tests/white_premium_qa/track14_png_screen_guard.py "$png" > "$out/pixel-${width}-${scale}.json"; then
+      pixel_state=NOT_VERIFIED
+      render_failed=1
+      echo "ANDROID_WEBVIEW_RENDER_NOT_VERIFIED: width=$width scale=$scale" >&2
+    fi
+    remote="/sdcard/track14-window-${width}-${scale}.xml"
+    local_xml="${RUNNER_TEMP:-/tmp}/track14-window-${width}-${scale}.xml"
+    timeout 15s adb shell rm -f "$remote" >/dev/null 2>&1 || true
+    if ! timeout 35s adb shell uiautomator dump "$remote" > "$out/hierarchy-capture-${width}-${scale}.txt" 2>&1 ||
+       ! timeout 15s adb exec-out cat "$remote" > "$local_xml" 2> "$out/hierarchy-capture-${width}-${scale}.stderr"; then
+      semantic_state=NOT_VERIFIED
+      render_failed=1
+      printf '{"status":"HIERARCHY_UNAVAILABLE"}\n' > "$out/hierarchy-review-${width}-${scale}.json"
+      echo "ANDROID_ACCESSIBILITY_CAPTURE_UNAVAILABLE: width=$width scale=$scale" >&2
+    elif ! python3 tests/white_premium_qa/track14_rendered_hierarchy_guard.py "$local_xml" > "$out/hierarchy-review-${width}-${scale}.json"; then
+      semantic_state=NOT_VERIFIED
+      render_failed=1
+      echo "ANDROID_WEBVIEW_DOM_NOT_VERIFIED: width=$width scale=$scale" >&2
+    fi
+    timeout 15s adb shell rm -f "$remote" >/dev/null 2>&1 || true
+    # Avoid retaining any private text from the native accessibility hierarchy.
+    rm -f "$local_xml"
+    printf 'width=%s font_scale=%s screenshot=CAPTURED pixel=%s webview_dom=%s visual_review=NOT_TESTED\n' \
+      "$width" "$scale" "$pixel_state" "$semantic_state" >> "$out/geometry_status.txt"
   done
 done
 python3 - "$out" <<'PY'
@@ -77,44 +105,39 @@ for width in (320,360,393,430):
 (out/'png_manifest.json').write_text(json.dumps({'screenshots':rows,'actual_count':len(rows),'visual_review':'NOT_TESTED'},indent=2))
 assert len(rows)==12
 PY
-# PNG dimensions and a running app process do not prove the WebView rendered.
-# Inspect central pixels and reject blank/splash captures; keep evidence on failure.
+# Final aggregate is independent of single-frame checks: all twelve PNGs
+# must still be present, CRC-valid and visually nonblank, with a matching
+# native WebView hierarchy candidate for the SAME width/font scale.
 if ! python3 tests/white_premium_qa/track14_png_screen_guard.py "$out"/android-*.png > "$out/pixel_content_review.json"; then
-  # Image bytes and app PID exist, but actual WebView pixels were NOT verified.
-  # Collect bounded diagnostics to distinguish WebView startup/compositor/tool issues;
-  # do not assert a visual app defect without positive evidence.
+  render_failed=1
+fi
+if ((render_failed != 0)); then
+  # Transport, Activity, PID, and PNG capture were checked separately above.
+  # Capture evidence for future diagnosis without calling an unknown WebView
+  # startup/compositor/accessibility failure a proven application UI defect.
   timeout 20s adb shell dumpsys activity activities > "$out/activity-state.txt" 2>&1 || true
   timeout 20s adb shell dumpsys window windows > "$out/window-state.txt" 2>&1 || true
   timeout 20s adb shell dumpsys webviewupdate > "$out/webview-provider.txt" 2>&1 || true
   timeout 20s adb logcat -d -t 250 > "$out/last-logcat.txt" 2>&1 || true
-  printf 'CAPTURE_TOOL=PASS\\nACTIVITY_START=PASS\\nAPP_PROCESS=PASS\\nWEBVIEW_RENDER=NOT_VERIFIED\\nCAUSE=UNDETERMINED\\nRELEASE_APPROVED=NO\\n' > "$out/triage-status.txt"
-  echo 'ANDROID_WEBVIEW_RENDER_NOT_VERIFIED: screenshot pixels are blank or invalid; CAUSE=UNDETERMINED' >&2
-  cat "$out/pixel_content_review.json" >&2
+  cat > "$out/triage-status.txt" <<'TRIAGE'
+CAPTURE_TOOL=PASS
+ACTIVITY_START=PASS
+APP_PROCESS=PASS
+PIXEL_VARIATION=CHECK_PER_FRAME
+WEBVIEW_DOM=CHECK_PER_FRAME
+CAUSE=UNDETERMINED
+RELEASE_APPROVED=NO
+TRIAGE
+  echo 'ANDROID_WEBVIEW_RENDER_NOT_VERIFIED: pixel/semantic checks not established; CAUSE=UNDETERMINED' >&2
   exit 1
 fi
-# Verify app-specific WebView semantics before treating any screenshot as even a
-# rendered UI candidate. A colorful boot screen/system chrome is NOT app proof.
-# UI dump may be unavailable in some WebView builds; fail closed as NOT_VERIFIED.
-for width in 320 360 393 430; do
-  for scale in 1.0 1.5 2.0; do
-    remote="/sdcard/track14-window-${width}-${scale}.xml"
-    local_xml="${RUNNER_TEMP:-/tmp}/track14-window-${width}-${scale}.xml"
-    timeout 15s adb shell rm -f "$remote" >/dev/null 2>&1 || true
-    if ! timeout 35s adb shell uiautomator dump "$remote" > "$out/hierarchy-capture-${width}-${scale}.txt" 2>&1 ||
-       ! timeout 15s adb exec-out cat "$remote" > "$local_xml" 2> "$out/hierarchy-capture-${width}-${scale}.stderr"; then
-      rm -f "$local_xml"
-      echo "ANDROID_ACCESSIBILITY_CAPTURE_UNAVAILABLE: semantic WebView unverified width=$width scale=$scale" >&2
-      exit 1
-    fi
-    timeout 15s adb shell rm -f "$remote" >/dev/null 2>&1 || true
-    if ! python3 tests/white_premium_qa/track14_rendered_hierarchy_guard.py "$local_xml" > "$out/hierarchy-review-${width}-${scale}.json"; then
-      rm -f "$local_xml"
-      echo "ANDROID_WEBVIEW_DOM_NOT_VERIFIED: semantic UI not proven width=$width scale=$scale" >&2
-      exit 1
-    fi
-    # Never upload raw hierarchy dumps (potentially containing personal text).
-    rm -f "$local_xml"
-  done
-done
-printf 'CAPTURE_TOOL=PASS\\nACTIVITY_START=PASS\\nAPP_PROCESS=PASS\\nPIXEL_VARIATION=CANDIDATE\\nWEBVIEW_DOM=CANDIDATE\\nMANUAL_VISUAL_REVIEW=NOT_TESTED\\nRELEASE_APPROVED=NO\\n' > "$out/triage-status.txt"
+cat > "$out/triage-status.txt" <<'TRIAGE'
+CAPTURE_TOOL=PASS
+ACTIVITY_START=PASS
+APP_PROCESS=PASS
+PIXEL_VARIATION=CANDIDATE
+WEBVIEW_DOM=CANDIDATE
+MANUAL_VISUAL_REVIEW=NOT_TESTED
+RELEASE_APPROVED=NO
+TRIAGE
 printf 'Disposable Android emulator screenshots only. Pixel-content gate is not functional, IME, TalkBack or real-device acceptance. RELEASE_APPROVED=NO\n' > "$out/LIMITS.txt"
