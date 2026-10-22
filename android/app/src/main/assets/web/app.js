@@ -1003,19 +1003,7 @@ function startQuickSportRest(secs) {
   // A quick sport break must not silently replace an active focus or training session.
   if ((quickTraining?.active || timerRunning || timerSessionId || timerActiveMs > 0) &&
       !window.confirm(quickText('replacePrompt'))) return false;
-  if (quickTraining?.active) {
-    quickTraining = null;
-    renderQuickTraining();
-  }
-  if (timerRunning) toggleTimerPlay();
-  currentTimerModeKey = 'short';
-  timerTotal = secs; timerLeft = secs;
-  timerSessionId = null;
-  focusSessionTaskId = null;
-  timerActiveMs = 0;
-  timerResumeMs = null;
-  storeTimerSession();
-  updateTimerDisplay(); toggleTimerPlay();
+  if (!transitionActivityTimer({seconds:secs, mode:'short', running:true})) return false;
   showToast(`⏱️ ${quickText('restPhase')} ${formatDurationUnit(secs,'second')}`);
   return true;
 }

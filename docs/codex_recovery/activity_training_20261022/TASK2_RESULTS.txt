@@ -1,0 +1,51 @@
+BASE: 61a549f1751c2d373555476e8a4d13e828098940
+RED
+✖ P0 sport rest running=false training=false throw (13.11308ms)
+✖ P0 sport rest running=false training=false false (3.74265ms)
+✖ P0 sport rest running=false training=true throw (5.575557ms)
+✖ P0 sport rest running=false training=true false (4.76897ms)
+✖ P0 sport rest running=true training=false throw (5.616597ms)
+✖ P0 sport rest running=true training=false false (5.026052ms)
+✖ P0 sport rest running=true training=true throw (5.648381ms)
+✖ P0 sport rest running=true training=true false (3.976096ms)
+✔ P0 sport rest Cancel keeps running training and packets without writes (7.494406ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 1
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 338.293883
+
+
+GREEN
+✔ P0 sport rest running=false training=false throw (14.913169ms)
+✔ P0 sport rest running=false training=false false (4.463723ms)
+✔ P0 sport rest running=false training=true throw (4.25266ms)
+✔ P0 sport rest running=false training=true false (5.594685ms)
+✔ P0 sport rest running=true training=false throw (3.741376ms)
+✔ P0 sport rest running=true training=false false (4.331005ms)
+✔ P0 sport rest running=true training=true throw (4.728411ms)
+✔ P0 sport rest running=true training=true false (4.968078ms)
+✔ P0 sport rest Cancel keeps running training and packets without writes (3.397807ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 380.589674
+
+NEIGHBORS
+✔ custom Save button cancellation preserves label and the open custom dialog (0.719122ms)
+ℹ tests 102
+ℹ suites 0
+ℹ pass 102
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 836.074316
+Smoke/syntax/diff PASS

@@ -34,3 +34,25 @@ User-authorized next: publish, review PR, merge into integration only, verify SH
 and record receipt on GitHub before Task2. Rollback: scoped commit revert.
 Android, background/process death, SAF, APK/AAB, heavy suite NOT_TESTED. Source
 checks do not establish device durability or release approval.
+
+## Task 1 integration receipt
+
+PR179 merged; integration verified `61a549f1751c2d373555476e8a4d13e828098940`.
+Receipt comment6330457741 recorded on GitHub before Task2; main untouched.
+
+## Task 2 — quick sport rest
+
+Base exactly Task1 merge. RED8 FAIL/1 PASS; GREEN9 PASS; neighboring102 PASS;
+startup/syntax/diff PASS. startQuickSportRest now uses one acknowledged transition
+including running state and new ID, never separate Pause/Reset/Start writes.
+Failed save/cancel preserves previous session/training/packets/native/UI; retry
+starts one45-second short break without focus credit. Existing cancellation guard
+retained. Static confirmation assertion now checks the actual transition boundary.
+No #176–178 body changes. Same existing test ownership, no manifest edit.
+
+Commands: new sport cases selected with `node --test --test-name-pattern='P0 sport rest' tests/integration_recovery/activity_transition_durability.test.cjs`.
+Neighbors: `timeout 45 node --test tests/integration_recovery/activity_transition_durability.test.cjs tests/integration_quality/activity_domain_durable_ack.test.cjs tests/integration_recovery/timer_credit_durability.test.cjs tests/track05_timer/*.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs tests/focus_workflows/test_focus_workflows.cjs`.
+Smoke/syntax/diff as Task1. Reviewed minimal one-caller diff and correct persisted
+mode/running/seconds/new identity. Next: publish/review/merge integration, verify
+SHA and GitHub checkpoint before Task3. Device/process-death/SAF/build/heavy gates
+remain NOT_TESTED; RELEASE_APPROVED=NO. Rollback scoped revert.
