@@ -1,5 +1,5 @@
 /**
- * DEEP FOCUS — Grand Master QA Integration Suite (64 Test Suites)
+ * DEEP FOCUS — Grand Master QA Integration Suite (72 Test Suites)
  * Automatically discovers and executes all *.test.js suites
  * certifying 100% GREEN production stability across all architectural tracks.
  */
@@ -13,7 +13,7 @@ const allFiles = fs.readdirSync(testDir)
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
 console.log("==============================================================");
-console.log(`[DEEP FOCUS] Master QA Heartbeat Certification (${allFiles.length} Test Suites)`);
+console.log(`[DEEP FOCUS] Master QA Parity Certification (${allFiles.length} Test Suites)`);
 console.log("==============================================================");
 
 let passed = 0;
@@ -40,7 +40,7 @@ console.log("==============================================================");
 console.log(`Grand Summary: Total: ${allFiles.length} | Passed: ${passed} | Failed: ${failed}`);
 console.log("==============================================================");
 
-if (failed > 0 || allFiles.length < 64) {
+if (failed > 0 || allFiles.length < 72) {
   console.error(`[-] Master QA Certification FAILED (Passed: ${passed}/${allFiles.length}).`);
   process.exit(1);
 }
