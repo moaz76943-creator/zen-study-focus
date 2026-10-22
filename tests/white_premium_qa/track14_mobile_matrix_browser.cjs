@@ -130,7 +130,46 @@ const widths = [320,360,393,430], scales = [1,1.5,2], dirs = ['ltr','rtl'];
       navClicks.push({id,selected});
       if(!selected)problems.push({tag:'navigation',failures:['CLICK_NOT_SELECTED:'+id]});
     }
-    fs.writeFileSync(path.join(output,'matrix.json'),JSON.stringify({rows,navClicks,uncaught,problems,
+    // Real locale labels on disposable browser state, not only forced RTL/LTR direction.
+    // This must not modify the application's persistence implementation or user records.
+    const localeChecks=[];
+    for (const language of ['ar','de','en']) {
+      await page.setViewportSize({width:320,height:780});
+      const info=await page.evaluate(({language,ids})=>{
+        document.documentElement.style.fontSize='32px';
+        if (typeof applyLanguage !== 'function') return {language,error:'LANGUAGE_FUNCTION_MISSING'};
+        applyLanguage(language);
+        document.body.classList.add('timer-home');
+        document.body.classList.remove('deep-lockdown');
+        document.getElementById('navTimer')?.click();
+        const nav=document.querySelector('.bottom-nav-capsule')?.getBoundingClientRect();
+        const labels=ids.map(id=>{
+          const btn=document.getElementById(id);
+          const label=btn?.querySelector('span[data-i18n],#navTrainingText');
+          const box=btn?.getBoundingClientRect();
+          return {id,text:label?.textContent?.trim()||'',visible:!!box&&box.width>=40&&box.height>=44&&box.left>=-2&&box.right<=innerWidth+2};
+        });
+        const ring=document.querySelector('#focusHeroCard .ring-time')?.getBoundingClientRect();
+        const ringBox=document.querySelector('#focusHeroCard .ring-container')?.getBoundingClientRect();
+        return {language,actualLanguage:document.documentElement.lang,
+          direction:document.documentElement.dir,
+          documentWidth:document.documentElement.scrollWidth,viewport:innerWidth,
+          navVisible:!!nav&&nav.left>=-2&&nav.right<=innerWidth+2,
+          ringFits:!!ring&&!!ringBox&&ring.left>=ringBox.left-2&&ring.right<=ringBox.right+2,
+          labels};
+      },{language,ids});
+      await page.screenshot({path:path.join(output,'locale-'+language+'-320-200.png'),animations:'disabled'});
+      const errors=[];
+      if (info.error) errors.push(info.error);
+      if (info.actualLanguage!==language) errors.push('LOCALE_NOT_APPLIED');
+      if (info.direction!==(language==='ar'?'rtl':'ltr')) errors.push('LOCALE_DIRECTION_WRONG');
+      if (info.documentWidth>320+2) errors.push('LOCALE_HORIZONTAL_OVERFLOW');
+      if (!info.navVisible||!info.ringFits) errors.push('LOCALE_NAV_OR_TIMER_CLIPPED');
+      if (info.labels?.some(x=>!x.text||!x.visible)) errors.push('LOCALE_DESTINATION_MISSING');
+      localeChecks.push({...info,errors});
+      if(errors.length)problems.push({tag:'locale-'+language+'-320-200',failures:errors});
+    }
+    fs.writeFileSync(path.join(output,'matrix.json'),JSON.stringify({rows,navClicks,localeChecks,uncaught,problems,
       limits:'Chromium at CSS root-font 100/150/200%, not physical Android textZoom, screen reader, native dialogs, keyboard IME or 20-locale approval. No user storage touched.'},null,2));
   }finally{await browser.close();}
   console.log(JSON.stringify({screenshots:rows.length,widths,scales,dirs,navigationClicks:ids.length,failures:problems.length,pageErrors:uncaught.length,first:problems.slice(0,8)}));
