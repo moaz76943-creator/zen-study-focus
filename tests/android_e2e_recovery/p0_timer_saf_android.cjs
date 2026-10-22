@@ -203,7 +203,7 @@ async function openDocument(name,code){
  // a visible filename or from a scheduled JS bridge call.
  for(let attempt=0;attempt<3;attempt++){
   xml=dumpUI();
-  if(!/package="com\\.google\\.android\\.documentsui"/.test(xml))break;
+  if(!/package="com\.google\.android\.documentsui"/.test(xml))break;
   const confirm=uiNodes(xml).find(n=>/text="OPEN"|content-desc="Open"/i.test(n)&&/clickable="true"/.test(n));
   if(confirm)tapUI(confirm);
   else {
@@ -215,7 +215,7 @@ async function openDocument(name,code){
  }
  xml=dumpUI();
  saveSafPickerEvidence(name+'_selected',xml);
- if(/package="com\\.google\\.android\\.documentsui"/.test(xml))
+ if(/package="com\.google\.android\.documentsui"/.test(xml))
   throw Error('TRANSPORT: actual file selection did not exit DocumentsUI: '+name);
 }
 async function confirmDialog(accept){
