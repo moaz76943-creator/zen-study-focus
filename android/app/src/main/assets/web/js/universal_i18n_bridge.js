@@ -1,9 +1,6 @@
 /**
  * DEEP FOCUS — Universal 100-Locale Translation Resolver & Bridge
  * File: android/app/src/main/assets/web/js/universal_i18n_bridge.js
- *
- * Provides a universal translation lookup across all 100 Google Play locales
- * with a STRICT English-only fallback rule (en is the sole canonical fallback).
  */
 
 (function (root, factory) {
@@ -88,7 +85,15 @@
       'csv.col.mode': 'mode',
       'csv.col.interrupted': 'interrupted',
       'csv.col.sound_environment': 'sound_environment',
-      'csv.col.reflection_notes': 'reflection_notes'
+      'csv.col.reflection_notes': 'reflection_notes',
+
+      'notification.action.pause': 'Pause',
+      'notification.action.resume': 'Resume',
+      'notification.action.finish': 'Finish',
+      'notification.action.add_5m': '+5 Min',
+      'notification.status.focusing': 'Focus in Progress',
+      'notification.status.paused': 'Session Paused',
+      'notification.status.break': 'Rest & Recharge'
     },
     'ar': {
       'common.cycle': 'دورة',
@@ -154,7 +159,15 @@
       'csv.col.mode': 'نمط الجلسة',
       'csv.col.interrupted': 'هل تمت مقاطعتها',
       'csv.col.sound_environment': 'بيئة الصوت',
-      'csv.col.reflection_notes': 'ملاحظات التأمل'
+      'csv.col.reflection_notes': 'ملاحظات التأمل',
+
+      'notification.action.pause': 'إيقاف مؤقت',
+      'notification.action.resume': 'استئناف',
+      'notification.action.finish': 'إنهاء',
+      'notification.action.add_5m': '+5 دقائق',
+      'notification.status.focusing': 'جلسة تركيز جارية',
+      'notification.status.paused': 'الجلسة متوقفة مؤقتاً',
+      'notification.status.break': 'وقت الاستراحة والراحة'
     },
     'es': {
       'common.cycle': 'Ciclo',
@@ -171,7 +184,11 @@
       'breath.phase.hold_out': 'Pausa y Calma',
       'csv.col.id': 'identificador',
       'csv.col.date': 'fecha',
-      'csv.col.duration_minutes': 'duracion_minutos'
+      'csv.col.duration_minutes': 'duracion_minutos',
+      'notification.action.pause': 'Pausa',
+      'notification.action.resume': 'Continuar',
+      'notification.action.finish': 'Terminar',
+      'notification.action.add_5m': '+5 min'
     },
     'fr': {
       'common.cycle': 'Cycle',
