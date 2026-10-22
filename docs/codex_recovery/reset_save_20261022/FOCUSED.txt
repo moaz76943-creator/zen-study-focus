@@ -1,0 +1,298 @@
+TAP version 13
+# Subtest: legacy save confirms both copies, preserving v21 payload and checksum packet
+ok 1 - legacy save confirms both copies, preserving v21 payload and checksum packet
+  ---
+  duration_ms: 8.666486
+  type: 'test'
+  ...
+# Subtest: legacy quota failure on mirror restores original primary+mirror byte for byte
+ok 2 - legacy quota failure on mirror restores original primary+mirror byte for byte
+  ---
+  duration_ms: 7.878075
+  type: 'test'
+  ...
+# Subtest: legacy storage silent no-op must fail instead of claiming save succeeded
+ok 3 - legacy storage silent no-op must fail instead of claiming save succeeded
+  ---
+  duration_ms: 4.296773
+  type: 'test'
+  ...
+# Subtest: newest acknowledged checklist survives a process kill even when WebView disk has older packets
+ok 4 - newest acknowledged checklist survives a process kill even when WebView disk has older packets
+  ---
+  duration_ms: 31.308111
+  type: 'test'
+  ...
+# Subtest: rapid checklist edits keep only the final acknowledged state after immediate kill
+ok 5 - rapid checklist edits keep only the final acknowledged state after immediate kill
+  ---
+  duration_ms: 20.746572
+  type: 'test'
+  ...
+# Subtest: native ACK failure blocks publish and preserves old records and journal cleanup
+ok 6 - native ACK failure blocks publish and preserves old records and journal cleanup
+  ---
+  duration_ms: 10.990457
+  type: 'test'
+  ...
+# Subtest: interrupted journal is replayed only when native checkpoint matches a journal side
+ok 7 - interrupted journal is replayed only when native checkpoint matches a journal side
+  ---
+  duration_ms: 20.472823
+  type: 'test'
+  ...
+# Subtest: corrupt native checkpoint fails closed without deleting valid local storage
+ok 8 - corrupt native checkpoint fails closed without deleting valid local storage
+  ---
+  duration_ms: 20.091921
+  type: 'test'
+  ...
+# Subtest: a failed mirror write cannot advance the native checkpoint
+ok 9 - a failed mirror write cannot advance the native checkpoint
+  ---
+  duration_ms: 15.940871
+  type: 'test'
+  ...
+# Subtest: checksum-valid malformed native family cannot overwrite healthy WebView data
+ok 10 - checksum-valid malformed native family cannot overwrite healthy WebView data
+  ---
+  duration_ms: 28.066949
+  type: 'test'
+  ...
+# Subtest: native ACK refuses signed invalid records before advancing its durable receipt
+ok 11 - native ACK refuses signed invalid records before advancing its durable receipt
+  ---
+  duration_ms: 3.504864
+  type: 'test'
+  ...
+# Subtest: native receipt validation preserves absent families and historical duplicate records
+ok 12 - native receipt validation preserves absent families and historical duplicate records
+  ---
+  duration_ms: 14.324801
+  type: 'test'
+  ...
+# Subtest: DF-112/122 failed completion retains real credit for retry (journal=true, training=true)
+ok 13 - DF-112/122 failed completion retains real credit for retry (journal=true, training=true)
+  ---
+  duration_ms: 8.757079
+  type: 'test'
+  ...
+# Subtest: DF-112/122 failed completion retains real credit for retry (journal=true, training=false)
+ok 14 - DF-112/122 failed completion retains real credit for retry (journal=true, training=false)
+  ---
+  duration_ms: 4.805608
+  type: 'test'
+  ...
+# Subtest: DF-112/122 failed completion retains real credit for retry (journal=false, training=true)
+ok 15 - DF-112/122 failed completion retains real credit for retry (journal=false, training=true)
+  ---
+  duration_ms: 5.018306
+  type: 'test'
+  ...
+# Subtest: DF-112/122 failed completion retains real credit for retry (journal=false, training=false)
+ok 16 - DF-112/122 failed completion retains real credit for retry (journal=false, training=false)
+  ---
+  duration_ms: 3.476091
+  type: 'test'
+  ...
+# Subtest: rest completion is a successful no-op without focus credit or persistence
+ok 17 - rest completion is a successful no-op without focus credit or persistence
+  ---
+  duration_ms: 6.137984
+  type: 'test'
+  ...
+# Subtest: CROSS-002 Start throw keeps timer, identity and scheduled work unchanged
+ok 18 - CROSS-002 Start throw keeps timer, identity and scheduled work unchanged
+  ---
+  duration_ms: 14.521315
+  type: 'test'
+  ...
+# Subtest: CROSS-002 Start false keeps timer, identity and scheduled work unchanged
+ok 19 - CROSS-002 Start false keeps timer, identity and scheduled work unchanged
+  ---
+  duration_ms: 9.185654
+  type: 'test'
+  ...
+# Subtest: CROSS-002 Pause throw keeps timer, identity and scheduled work unchanged
+ok 20 - CROSS-002 Pause throw keeps timer, identity and scheduled work unchanged
+  ---
+  duration_ms: 4.78037
+  type: 'test'
+  ...
+# Subtest: CROSS-002 Pause false keeps timer, identity and scheduled work unchanged
+ok 21 - CROSS-002 Pause false keeps timer, identity and scheduled work unchanged
+  ---
+  duration_ms: 6.731386
+  type: 'test'
+  ...
+# Subtest: CROSS-002 failed pause aborts internal selectTimerMode(5,'short',null)
+ok 22 - CROSS-002 failed pause aborts internal selectTimerMode(5,'short',null)
+  ---
+  duration_ms: 4.922149
+  type: 'test'
+  ...
+# Subtest: CROSS-002 failed pause aborts internal resetTimerNow()
+ok 23 - CROSS-002 failed pause aborts internal resetTimerNow()
+  ---
+  duration_ms: 4.4536
+  type: 'test'
+  ...
+# Subtest: CROSS-002 duration adjustment paused throw preserves JS/native duration until save
+ok 24 - CROSS-002 duration adjustment paused throw preserves JS/native duration until save
+  ---
+  duration_ms: 5.413732
+  type: 'test'
+  ...
+# Subtest: CROSS-002 duration adjustment paused false preserves JS/native duration until save
+ok 25 - CROSS-002 duration adjustment paused false preserves JS/native duration until save
+  ---
+  duration_ms: 4.567146
+  type: 'test'
+  ...
+# Subtest: CROSS-002 duration adjustment running throw preserves JS/native duration until save
+ok 26 - CROSS-002 duration adjustment running throw preserves JS/native duration until save
+  ---
+  duration_ms: 3.406167
+  type: 'test'
+  ...
+# Subtest: CROSS-002 duration adjustment running false preserves JS/native duration until save
+ok 27 - CROSS-002 duration adjustment running false preserves JS/native duration until save
+  ---
+  duration_ms: 3.638581
+  type: 'test'
+  ...
+# Subtest: CROSS-002 successful decrement preserves ten-second floor and identity
+ok 28 - CROSS-002 successful decrement preserves ten-second floor and identity
+  ---
+  duration_ms: 4.020319
+  type: 'test'
+  ...
+# Subtest: P0 Reset paused throw preserves session and retries atomically
+ok 29 - P0 Reset paused throw preserves session and retries atomically
+  ---
+  duration_ms: 4.481177
+  type: 'test'
+  ...
+# Subtest: P0 Reset paused false preserves session and retries atomically
+ok 30 - P0 Reset paused false preserves session and retries atomically
+  ---
+  duration_ms: 3.853689
+  type: 'test'
+  ...
+# Subtest: P0 Reset running throw preserves session and retries atomically
+ok 31 - P0 Reset running throw preserves session and retries atomically
+  ---
+  duration_ms: 4.656284
+  type: 'test'
+  ...
+# Subtest: P0 Reset running false preserves session and retries atomically
+ok 32 - P0 Reset running false preserves session and retries atomically
+  ---
+  duration_ms: 3.103881
+  type: 'test'
+  ...
+# Subtest: P0 Reset cancellation and quick-training delegation preserve existing behavior
+ok 33 - P0 Reset cancellation and quick-training delegation preserve existing behavior
+  ---
+  duration_ms: 4.134058
+  type: 'test'
+  ...
+# Subtest: v21 timer keeps its ID while sending explicit phase to the native foreground service
+ok 34 - v21 timer keeps its ID while sending explicit phase to the native foreground service
+  ---
+  duration_ms: 5.319609
+  type: 'test'
+  ...
+# Subtest: new native bridge is compatible with older two-argument caller
+ok 35 - new native bridge is compatible with older two-argument caller
+  ---
+  duration_ms: 0.769397
+  type: 'test'
+  ...
+# Subtest: native alert config includes rest preference and existing configuration ABI
+ok 36 - native alert config includes rest preference and existing configuration ABI
+  ---
+  duration_ms: 2.932002
+  type: 'test'
+  ...
+# Subtest: service persists a bounded per-session ledger before sound or notification
+ok 37 - service persists a bounded per-session ledger before sound or notification
+  ---
+  duration_ms: 1.62868
+  type: 'test'
+  ...
+# Subtest: TRACK05 a queued old tick after Pause cannot complete/credit a paused session
+ok 38 - TRACK05 a queued old tick after Pause cannot complete/credit a paused session
+  ---
+  duration_ms: 8.090018
+  type: 'test'
+  ...
+# Subtest: TRACK05 second expiry callback cannot dispatch duplicate completion for one session
+ok 39 - TRACK05 second expiry callback cannot dispatch duplicate completion for one session
+  ---
+  duration_ms: 3.021994
+  type: 'test'
+  ...
+# Subtest: TRACK05 active timer still updates countdown from epoch timestamp
+ok 40 - TRACK05 active timer still updates countdown from epoch timestamp
+  ---
+  duration_ms: 2.985486
+  type: 'test'
+  ...
+# Subtest: reset must reject cancellation BEFORE stopping or clearing focus progress
+ok 41 - reset must reject cancellation BEFORE stopping or clearing focus progress
+  ---
+  duration_ms: 4.637383
+  type: 'test'
+  ...
+# Subtest: Skip phase must confirm before pause or switch when a focus session is active
+ok 42 - Skip phase must confirm before pause or switch when a focus session is active
+  ---
+  duration_ms: 1.20905
+  type: 'test'
+  ...
+# Subtest: sports 45-second quick-rest must not discard current focus session on Cancel
+ok 43 - sports 45-second quick-rest must not discard current focus session on Cancel
+  ---
+  duration_ms: 0.517098
+  type: 'test'
+  ...
+# Subtest: custom Save button cancellation preserves label and the open custom dialog
+ok 44 - custom Save button cancellation preserves label and the open custom dialog
+  ---
+  duration_ms: 0.765379
+  type: 'test'
+  ...
+# Subtest: all user-visible Timer mode changes reuse the checked-in 20-language discard confirmation
+ok 45 - all user-visible Timer mode changes reuse the checked-in 20-language discard confirmation
+  ---
+  duration_ms: 3.413956
+  type: 'test'
+  ...
+# Subtest: existing reviewed quick-training discard prompt is populated in all original twenty locales
+ok 46 - existing reviewed quick-training discard prompt is populated in all original twenty locales
+  ---
+  duration_ms: 7.412148
+  type: 'test'
+  ...
+# Subtest: all three standard Timer buttons share destructive progress protection
+ok 47 - all three standard Timer buttons share destructive progress protection
+  ---
+  duration_ms: 2.485697
+  type: 'test'
+  ...
+# Subtest: mode change cancelled by user never resets session progress
+ok 48 - mode change cancelled by user never resets session progress
+  ---
+  duration_ms: 1.024526
+  type: 'test'
+  ...
+1..48
+# tests 48
+# suites 0
+# pass 48
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 574.249068

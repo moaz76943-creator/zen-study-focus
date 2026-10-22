@@ -1440,13 +1440,31 @@ function resetTimerNow() {
   // Reset discards an unfinished focus session: cancellation must be harmless.
   if ((timerRunning || timerSessionId || timerActiveMs > 0) &&
       !window.confirm(quickText('replacePrompt'))) return false;
-  if (timerRunning) toggleTimerPlay();
-  timerLeft = timerTotal;
-  timerSessionId = null;
-  focusSessionTaskId = null;
-  timerActiveMs = 0;
-  timerResumeMs = null;
-  storeTimerSession();
+  const before = {timerRunning, timerLeft, timerSessionId,
+    focusSessionTaskId, timerActiveMs, timerResumeMs};
+  // Persist Reset as one transition; a separate Pause would commit partial success.
+  try {
+    timerRunning = false;
+    timerLeft = timerTotal;
+    timerSessionId = null;
+    focusSessionTaskId = null;
+    timerActiveMs = 0;
+    timerResumeMs = null;
+    if (storeTimerSession() !== true) throw new Error('TIMER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (error) {
+    ({timerRunning, timerLeft, timerSessionId,
+      focusSessionTaskId, timerActiveMs, timerResumeMs} = before);
+    showToast(L().saveFailed);
+    throw error;
+  }
+  if (before.timerRunning) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    if (window.ZenNative && window.ZenNative.stopBackgroundService) {
+      try { window.ZenNative.stopBackgroundService(); } catch(e){}
+    }
+    document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  }
   updateTimerDisplay();
   return true;
 }

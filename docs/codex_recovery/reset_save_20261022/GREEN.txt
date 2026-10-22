@@ -1,0 +1,13 @@
+✔ P0 Reset paused throw preserves session and retries atomically (11.198551ms)
+✔ P0 Reset paused false preserves session and retries atomically (4.432394ms)
+✔ P0 Reset running throw preserves session and retries atomically (3.931109ms)
+✔ P0 Reset running false preserves session and retries atomically (3.870787ms)
+✔ P0 Reset cancellation and quick-training delegation preserve existing behavior (2.38281ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 340.809264

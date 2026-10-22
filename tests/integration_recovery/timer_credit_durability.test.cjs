@@ -47,14 +47,16 @@ function toggleRig({running=false,failure='throw'}={}){
   focusSessionTaskId:running?7:null,timerActiveMs:30000,timerResumeMs:running?100000:null,
   currentTimerModeKey:'focus',customSessionLabel:'Personal label ۱۲',quickTraining:null,chimeCtx:null};
  const original=JSON.parse(JSON.stringify(state)),events=[],messages=[],button={innerHTML:running?'pause':'play'};
- let reject=true;
+ let reject=true,persisted=null;
  const ctx=vm.createContext({...state,Date:{now:()=>110000},Math,String,Number,
   TIMER_STORAGE_KEY:'zen_fortress_active_timer_v21',
   document:{getElementById:id=>id==='mainPlayBtn'?button:{textContent:'Focus'}},
   saveFortressData(key,snapshot){
    events.push(['save',key,JSON.parse(JSON.stringify(snapshot))]);
    if(reject&&failure==='throw')throw Error('QuotaExceededError');
-   return !(reject&&failure==='false');
+   if(reject&&failure==='false')return false;
+   persisted=JSON.parse(JSON.stringify(snapshot));
+   return true;
   },window:{confirm:()=>true,ZenNative:{stopBackgroundService(){events.push(['native-stop']);}}},
   quickText:()=> 'Replace session?',
   L:()=>({saveFailed:'Could not save'}),showToast:m=>messages.push(m),
@@ -72,7 +74,7 @@ function toggleRig({running=false,failure='throw'}={}){
   const a=app.indexOf(begin),b=app.indexOf(finish,a);assert.ok(a>=0&&b>a);vm.runInContext(app.slice(a,b),ctx);
  }
  const snapshot=()=>Object.fromEntries(Object.keys(original).map(k=>[k,ctx[k]]));
- return {ctx,original,events,messages,button,snapshot,allow(){reject=false;},run:()=>vm.runInContext('toggleTimerPlay()',ctx),call:code=>vm.runInContext(code,ctx)};
+ return {ctx,original,events,messages,button,snapshot,get persisted(){return persisted;},allow(){reject=false;},run:()=>vm.runInContext('toggleTimerPlay()',ctx),call:code=>vm.runInContext(code,ctx)};
 }
 for(const running of [false,true])for(const failure of ['throw','false'])test(`CROSS-002 ${running?'Pause':'Start'} ${failure} keeps timer, identity and scheduled work unchanged`,()=>{
  const h=toggleRig({running,failure});
@@ -127,4 +129,47 @@ test('CROSS-002 successful decrement preserves ten-second floor and identity',()
  assert.equal(h.ctx.timerLeft,10);assert.equal(h.ctx.timerTotal,120);
  assert.equal(h.ctx.timerSessionId,'stable-session');assert.equal(h.ctx.focusSessionTaskId,7);
  assert.deepEqual(h.events.slice(1),[['native-start',10,'Focus'],['display']]);
+});
+
+// P0 Reset: reject the reset snapshot itself, even if a preceding Pause could save.
+for(const running of [false,true])for(const failure of ['throw','false'])test(`P0 Reset ${running?'running':'paused'} ${failure} preserves session and retries atomically`,()=>{
+ const h=toggleRig({running,failure});
+ // A paused session still owns its task, elapsed time and identity.
+ if(!running){h.ctx.timerSessionId='stable-session';h.ctx.focusSessionTaskId=7;}
+ h.allow();h.call('storeTimerSession()');
+ const before=h.snapshot(),saved=h.persisted,button=h.button.innerHTML;
+ // Re-enable refusal only for the reset snapshot; old implementation saves Pause first.
+ const writer=h.ctx.saveFortressData;
+ let refuse=true;
+ h.ctx.saveFortressData=(key,next)=>{
+  if(refuse&&next.sessionId===null){
+   if(failure==='throw')throw Error('QuotaExceededError');
+   return false;
+  }
+  return writer(key,next);
+ };
+ h.events.length=0;
+ assert.throws(()=>h.call('resetTimerNow()'),/QuotaExceededError|TIMER_SAVE_NOT_ACKNOWLEDGED/);
+ assert.deepEqual(h.snapshot(),before,'Rejected Reset retains every timer/session field');
+ assert.deepEqual(h.persisted,saved,'Old durable session remains intact');
+ assert.equal(h.button.innerHTML,button,'No successful Reset shown');
+ assert.deepEqual(h.events,[],'No native stop, interval stop, display, or intermediate Pause save');
+ assert.deepEqual(h.messages,['Could not save']);
+ refuse=false;
+ assert.equal(h.call('resetTimerNow()'),true);
+ assert.equal(h.ctx.timerRunning,false);assert.equal(h.ctx.timerLeft,h.ctx.timerTotal);
+ assert.equal(h.ctx.timerSessionId,null);assert.equal(h.ctx.focusSessionTaskId,null);
+ assert.equal(h.ctx.timerActiveMs,0);assert.equal(h.ctx.timerResumeMs,null);
+ assert.equal(h.ctx.customSessionLabel,before.customSessionLabel);
+ assert.equal(h.persisted.sessionId,null);assert.equal(h.persisted.left,h.ctx.timerTotal);
+ assert.equal(h.persisted.running,false);assert.equal(h.persisted.endAt,null);
+ assert.deepEqual(h.events.map(e=>e[0]),running?['save','interval-stop','native-stop','display']:['save','display']);
+});
+test('P0 Reset cancellation and quick-training delegation preserve existing behavior',()=>{
+ const h=toggleRig({running:true});h.ctx.window.confirm=()=>false;
+ assert.equal(h.call('resetTimerNow()'),false);
+ assert.deepEqual(h.snapshot(),h.original);assert.deepEqual(h.events,[]);
+ h.ctx.quickTraining={active:true};let cancelled=0;
+ h.ctx.cancelQuickTraining=()=>cancelled++;
+ h.call('resetTimerNow()');assert.equal(cancelled,1);assert.deepEqual(h.events,[]);
 });
