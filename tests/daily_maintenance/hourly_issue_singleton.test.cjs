@@ -39,3 +39,14 @@ test('fails closed for a mismatched issue or a pull request', async () => {
 test('does not accept missing GitHub API capability', async () => {
   await assert.rejects(resolveHourlyIssue({}, {owner:'o',repo:'r'}),/GitHub issues.get unavailable/);
 });
+
+const fs = require('node:fs');
+const path = require('node:path');
+test('hourly workflow uses canonical Issue #69 and cannot create duplicate ledgers', () => {
+  const workflow = fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/hourly_agent_orchestrator.yml'),'utf8');
+  assert.match(workflow,/require\(['"]\.\/automation\/tools\/daily_maintenance\/hourly_issue_target\.cjs['"]\)/);
+  assert.match(workflow,/resolveHourlyIssue\(github,\s*\{owner,repo\}\)/);
+  assert.doesNotMatch(workflow,/github\.rest\.issues\.create\(/);
+  assert.doesNotMatch(workflow,/github\.paginate\(github\.rest\.issues\.listForRepo/);
+  assert.match(workflow,/tools\/daily_maintenance\/hourly_issue_target\.cjs/);
+});
