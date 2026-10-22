@@ -22,9 +22,12 @@ function validateCycle(r){
   if(ids.has(a.id))throw Error('Duplicate selected specialist');
   ids.add(a.id);
   if(!VALID_STATUS.has(a.status)||!Number.isInteger(a.tests)||a.tests<0||a.tests>350)throw Error('Untrusted agent result');
+  if(a.status==='SOURCE_TESTED'&&a.tests===0)throw Error('Zero executed tests cannot qualify as SOURCE_TESTED evidence');
  }
  if(!r.coverage||!Array.isArray(r.coverage.unmapped)||!Array.isArray(r.coverage.duplicates)||
    ![...r.coverage.unmapped,...r.coverage.duplicates].every(x=>typeof x==='string'&&x.startsWith('tests/')&&x.length<350))throw Error('Invalid coverage inventory');
+ const expected=r.agents.some(a=>a.status!=='SOURCE_TESTED')?'BLOCKED':r.coverage.unmapped.length||r.coverage.duplicates.length?'COVERAGE_GAP':'COHORT_PASS';
+ if(r.status!==expected)throw Error('Inconsistent declared cohort status and specialist evidence');
  return r;
 }
 function validPrevious(p){
