@@ -82,6 +82,12 @@ function saveFortressData(key, obj) {
     if (['zen_fortress_cfg_v21','zen_fortress_tasks_v21','zen_fortress_notes_v21'].includes(key) &&
         (typeof window !== 'undefined' && window.ZenNative && (!window.DF22Preflight || !window.DF22Preflight.nativeAcknowledge(localStorage))))
       throw new Error('NATIVE_DURABLE_ACK_FAILED');
+    // Active timer is an auxiliary v21 family. Its own fsynced receipt covers
+    // immediate Android force-stop without changing the legacy six-packet ACK.
+    if (key === 'zen_fortress_active_timer_v21' && typeof window !== 'undefined' &&
+        window.ZenNative && typeof window.ZenNative.acknowledgeTimerV21 === 'function' &&
+        window.ZenNative.acknowledgeTimerV21(packet, packet) !== true)
+      throw new Error('TIMER_NATIVE_ACK_FAILED');
     return true;
   } catch (writeError) {
     // A failed mirror write must never leave an unverified new primary as the preferred copy.
@@ -1249,6 +1255,7 @@ function runTimerTick() {
   updateTimerDisplay();
 }
 function restoreTimerSession() {
+  if (!replayNativeTimerSession()) return;
   const snap = loadFortressData(TIMER_STORAGE_KEY, null);
   if (!snap || typeof snap !== 'object' || !Number.isFinite(snap.total) || !Number.isFinite(snap.left)) return;
   if (snap.total < 1 || snap.total > 86400 || snap.left < 0 || snap.left > 86400) return;
@@ -1283,6 +1290,49 @@ function restoreTimerSession() {
     timerInterval = setInterval(runTimerTick, 500);
   }
   updateTimerDisplay();
+}
+function replayNativeTimerSession() {
+  const native = typeof window !== 'undefined' ? window.ZenNative : null;
+  if (!native || typeof native.readTimerV21 !== 'function') return true;
+  let priorPrimary = null, priorMirror = null, rewriting = false;
+  try {
+    const receipt = native.readTimerV21();
+    if (receipt === 'NONE') return true; // Existing v21 installations have no timer receipt.
+    if (!receipt || receipt === 'ERROR') throw new Error('TIMER_NATIVE_RECEIPT_UNREADABLE');
+    const parsed = JSON.parse(receipt);
+    if (!parsed || parsed.version !== 1 || typeof parsed.primary !== 'string' ||
+        parsed.primary !== parsed.mirror) throw new Error('TIMER_NATIVE_RECEIPT_MISMATCH');
+    const packet = JSON.parse(parsed.primary);
+    if (!packet || typeof packet.payload !== 'string' ||
+        packet.sig !== computeHash(packet.payload)) throw new Error('TIMER_NATIVE_PACKET_INVALID');
+    const state = JSON.parse(packet.payload);
+    if (!state || !Number.isFinite(state.total) || !Number.isFinite(state.left) ||
+        state.total < 1 || state.total > 86400 || state.left < 0 || state.left > 86400 ||
+        !['focus','short','long','custom'].includes(state.mode) ||
+        (state.sessionId !== null && typeof state.sessionId !== 'string'))
+      throw new Error('TIMER_NATIVE_SNAPSHOT_INVALID');
+    const key = TIMER_STORAGE_KEY, mirror = key + '_mirror';
+    priorPrimary = localStorage.getItem(key);
+    priorMirror = localStorage.getItem(mirror);
+    if (priorPrimary === parsed.primary && priorMirror === parsed.mirror) return true;
+    rewriting = true;
+    localStorage.setItem(key, parsed.primary);
+    localStorage.setItem(mirror, parsed.mirror);
+    if (localStorage.getItem(key) !== parsed.primary ||
+        localStorage.getItem(mirror) !== parsed.mirror)
+      throw new Error('TIMER_NATIVE_REPLAY_NOT_VERIFIED');
+    return true;
+  } catch (error) {
+    if (rewriting) {
+      const key = TIMER_STORAGE_KEY;
+      for (const [slot,value] of [[key,priorPrimary],[key+'_mirror',priorMirror]]) {
+        try { if (value === null) localStorage.removeItem(slot);
+              else localStorage.setItem(slot,value); } catch (_) {}
+      }
+    }
+    showToast(L().saveFailed);
+    return false; // No timer mutation on corrupt/failed native replay.
+  }
 }
 const ringCircumference = 2 * Math.PI * 105;
 

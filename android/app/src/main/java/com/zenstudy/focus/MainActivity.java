@@ -199,6 +199,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // Timer receipts remain separate from the six protected v21 data packets.
+        @JavascriptInterface
+        public boolean acknowledgeTimerV21(String primary, String mirror) {
+            return NativeTimerPacketStore.acknowledge(MainActivity.this, primary, mirror);
+        }
+
+        @JavascriptInterface
+        public String readTimerV21() {
+            return NativeTimerPacketStore.read(MainActivity.this);
+        }
+
         // Preserve the original two-argument JavaScript API for older callers.
         @JavascriptInterface
         public void startBackgroundService(int seconds, String title) {

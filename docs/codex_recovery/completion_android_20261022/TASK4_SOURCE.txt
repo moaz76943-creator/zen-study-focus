@@ -1,0 +1,26 @@
+API30 coverage/attestation contract RED
+✔ P0 API30 missing emulator cannot be reported Android PASS (192.232731ms)
+✖ P0 API30 gate pins application tree and covers required timer flows (4.496116ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 641.420569
+
+
+GREEN
+✔ P0 API30 missing emulator cannot be reported Android PASS (576.230154ms)
+✔ P0 API30 gate pins application tree and covers required timer flows (3.476001ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 890.862413
+
+Script/bash syntax and diff PASS. Actual Android PENDING. RELEASE_APPROVED=NO

@@ -1,0 +1,3 @@
+1682d2fe72e2a90318c59ccc6200a1437602373d
+8aad19f04b1a844055ff1ddb6fccc74100f32075
+f587cffdd1ad2e6c1402e46b80c45275b1606a31b71abc4f039874fab20b81f0  actual Android API30 installed and built debug APK
