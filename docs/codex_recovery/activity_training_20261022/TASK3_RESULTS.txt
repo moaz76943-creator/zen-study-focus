@@ -1,0 +1,113 @@
+BASE: cc03d65ed0004b7c256eb34605b9ae0ae042fe1d
+RED
+✖ P0 training start running=false throw (21.332745ms)
+✖ P0 training start running=false false (4.818852ms)
+✖ P0 training start running=true throw (4.369869ms)
+✖ P0 training start running=true false (4.371439ms)
+✖ P0 training advance running=false throw (2.854831ms)
+✖ P0 training advance running=false false (2.146206ms)
+✖ P0 training advance running=true throw (1.46671ms)
+✖ P0 training advance running=true false (2.469287ms)
+✖ P0 training skip running=false throw (2.686531ms)
+✖ P0 training skip running=false false (2.399807ms)
+✖ P0 training skip running=true throw (2.779431ms)
+✖ P0 training skip running=true false (7.836441ms)
+✖ P0 training cancel running=false throw (7.712535ms)
+✖ P0 training cancel running=false false (4.524398ms)
+✖ P0 training cancel running=true throw (3.173827ms)
+✖ P0 training cancel running=true false (4.190534ms)
+✖ P0 training complete running=false throw (2.816864ms)
+✖ P0 training complete running=false false (3.416257ms)
+✖ P0 training complete running=true throw (2.677011ms)
+✖ P0 training complete running=true false (3.004847ms)
+✖ P0 training stop running=false throw (3.132525ms)
+✖ P0 training stop running=false false (3.244558ms)
+✖ P0 training stop running=true throw (3.321801ms)
+✖ P0 training stop running=true false (3.664296ms)
+✔ P0 training start cfg throw rolls back provisional timer (4.885864ms)
+✔ P0 training start cfg false rolls back provisional timer (3.324889ms)
+✖ P0 training Cancel prompt and completed event are non-destructive and nonduplicated (7.314826ms)
+✖ P0 training no-rest and final-rest rounds retain count and task binding (5.751554ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 2
+ℹ fail 26
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 542.678993
+
+
+COMPLETION CALLER RED
+✖ P0 training completion save rejection retries the credited ID without duplicate achievements (19.807753ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 335.776117
+
+
+FINAL GREEN
+✔ P0 training start running=false throw (20.553131ms)
+✔ P0 training start running=false false (5.789569ms)
+✔ P0 training start running=true throw (6.998632ms)
+✔ P0 training start running=true false (6.880801ms)
+✔ P0 training advance running=false throw (7.498282ms)
+✔ P0 training advance running=false false (14.572179ms)
+✔ P0 training advance running=true throw (12.664728ms)
+✔ P0 training advance running=true false (18.726941ms)
+✔ P0 training skip running=false throw (6.358437ms)
+✔ P0 training skip running=false false (6.854113ms)
+✔ P0 training skip running=true throw (5.965775ms)
+✔ P0 training skip running=true false (7.770535ms)
+✔ P0 training cancel running=false throw (7.976181ms)
+✔ P0 training cancel running=false false (3.385487ms)
+✔ P0 training cancel running=true throw (3.253129ms)
+✔ P0 training cancel running=true false (3.383951ms)
+✔ P0 training complete running=false throw (4.095542ms)
+✔ P0 training complete running=false false (3.635357ms)
+✔ P0 training complete running=true throw (4.116796ms)
+✔ P0 training complete running=true false (7.637101ms)
+✔ P0 training stop running=false throw (9.285846ms)
+✔ P0 training stop running=false false (2.898336ms)
+✔ P0 training stop running=true throw (3.305591ms)
+✔ P0 training stop running=true false (3.793098ms)
+✔ P0 training start cfg throw rolls back provisional timer (2.717818ms)
+✔ P0 training start cfg false rolls back provisional timer (10.355459ms)
+✔ P0 training Cancel prompt and completed event are non-destructive and nonduplicated (3.704385ms)
+✔ P0 training no-rest and final-rest rounds retain count and task binding (2.909401ms)
+✔ P0 training completion save rejection retries the credited ID without duplicate achievements (4.634325ms)
+✔ P0 training actual active_timer mirror rollback keeps exact packets (3.204027ms)
+✔ P0 training actual active_timer readback rollback keeps exact packets (3.409982ms)
+✔ P0 training actual cfg_v21 mirror rollback keeps exact packets (2.095961ms)
+✔ P0 training actual cfg_v21 readback rollback keeps exact packets (6.222472ms)
+✔ P0 training native cfg ACK refusal restores provisional timer and keeps old session (3.31816ms)
+✔ P0 training Start Cancel preserves existing timer without changing activity or preferences (4.672722ms)
+✔ P0 training optional preset failure cannot stop an already acknowledged running session (3.87018ms)
+✔ P0 training unavailable rollback is explicit and never publishes native or success events (6.192549ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 604.94224
+
+NEIGHBORS
+✔ mode change cancelled by user never resets session progress (0.835082ms)
+ℹ tests 159
+ℹ suites 0
+ℹ pass 159
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 858.120894
+SMOKE
+PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.
+
+app.js and quick_training.js syntax + git diff --check: PASS

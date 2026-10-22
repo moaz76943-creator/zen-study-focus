@@ -1202,10 +1202,15 @@ function finalizeTimerSession(shouldChime) {
     return false;
   }
   if(quickTraining?.active) {
-    advanceQuickTrainingStep();
+    if (advanceQuickTrainingStep() !== true) {
+      // Keep the credited completed ID and phase for an idempotent retry.
+      updateTimerDisplay();
+      document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+      return false;
+    }
     if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true,completedAlertId,completedAlertPhase);
-    // The next interval or a fresh focus timer was already selected.
-    return;
+    // The next interval or a fresh focus timer was already saved and selected.
+    return true;
   }
   storeTimerSession();
   updateTimerDisplay();
