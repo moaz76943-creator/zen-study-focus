@@ -67,3 +67,15 @@ test('an out-of-order older run never overwrites latest evidence',()=>{
  const s=ledger.aggregate(null,cycle({checked_at:'2026-10-20T04:23:00.000Z'}));
  assert.throws(()=>ledger.aggregate(s,cycle({checked_at:'2026-10-20T03:23:00.000Z'})),/out-of-order/i);
 });
+
+
+test('zero executed cases cannot become trusted SOURCE_TESTED evidence',()=>{
+ const raw=cycle();
+ raw.agents[0].tests=0;
+ assert.throws(()=>ledger.aggregate(null,raw),/zero|test|evidence|source/i);
+});
+
+test('a declared passing cohort with a blocked specialist is rejected as contradictory evidence',()=>{
+ const raw=cycle({statuses:{localization:'BLOCKED'}});
+ assert.throws(()=>ledger.aggregate(null,raw),/cohort|status|evidence|inconsistent/i);
+});
