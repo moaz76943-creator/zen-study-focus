@@ -113,7 +113,28 @@
       'goals.label.run_rate': 'DAILY RUN RATE NEEDED',
       'goals.pace.ahead': 'Ahead of Schedule',
       'goals.pace.on_track': 'On Track',
-      'goals.pace.behind': 'Catch Up Needed'
+      'goals.pace.behind': 'Catch Up Needed',
+
+      'stretch.neck_shoulder.name': 'Neck & Shoulder Release',
+      'stretch.neck_shoulder.desc': 'Gentle lateral neck flexions and backward shoulder rolls to relieve study hunching.',
+      'stretch.wrist_forearm.name': 'Wrist & Forearm Refresh',
+      'stretch.wrist_forearm.desc': 'Gentle wrist extensor flexions and finger spreads to ease writing and keyboard fatigue.',
+      'stretch.upper_back.name': 'Upper Back & Chest Opener',
+      'stretch.upper_back.desc': 'Interlacing fingers behind back with gentle chest expansion to restore upright posture.',
+      'stretch.spinal_twist.name': 'Seated Gentle Spinal Twist',
+      'stretch.spinal_twist.desc': 'Slow chair rotation to enhance thoracic spine mobility and relieve sitting pressure.',
+      'stretch.hip_flexor.name': 'Standing Hip Flexor Stretch',
+      'stretch.hip_flexor.desc': 'Standing step-back stretch to open hip flexors after prolonged sitting.',
+      'stretch.eye_palming.name': '20-20-20 Eye Palming Rest',
+      'stretch.eye_palming.desc': 'Warm palm covering over eyes while gazing into distance to relieve screen strain.',
+      'stretch.routine.quick_2min.title': 'Quick 2-Minute Desk Reset',
+      'stretch.routine.quick_2min.desc': 'Essential neck, wrist, and eye refresh between short pomodoro sprints.',
+      'stretch.routine.full_5min.title': 'Full 5-Minute Posture Reboot',
+      'stretch.routine.full_5min.desc': 'Comprehensive seated and standing mobility sequence for long study blocks.',
+      'stretch.routine.screen_relief.title': 'Screen Fatigue Relief',
+      'stretch.routine.screen_relief.desc': 'Focused eye rest, neck alignment, and chest opening for intense reading.',
+      'stretch.badge.mobility': 'DESK MOBILITY',
+      'stretch.label.duration': 'DURATION'
     },
     'ar': {
       'common.cycle': 'دورة',
@@ -207,7 +228,28 @@
       'goals.label.run_rate': 'المعدل اليومي المطلوب',
       'goals.pace.ahead': 'متقدم عن الخطة',
       'goals.pace.on_track': 'وفق الخطة المحددة',
-      'goals.pace.behind': 'يحتاج إلى تعويض'
+      'goals.pace.behind': 'يحتاج إلى تعويض',
+
+      'stretch.neck_shoulder.name': 'إرخاء الرقبة والأكتاف',
+      'stretch.neck_shoulder.desc': 'حركات جانبية خفيفة للرقبة وتدوير الأكتاف لتخفيف إجهاد انحناء المذاكرة.',
+      'stretch.wrist_forearm.name': 'تنشيط المعصم والساعد',
+      'stretch.wrist_forearm.desc': 'تمارين بسط وثني المعصم لتخفيف إجهاد الكتابة واستخدام لوحة المفاتيح.',
+      'stretch.upper_back.name': 'تمديد أعلى الظهر وفتح الصدر',
+      'stretch.upper_back.desc': 'تشبيك الأصابع خلف الظهر وفتح الصدر بلطف لاستعادة استقامة الجذع.',
+      'stretch.spinal_twist.name': 'التواء العمود الفقري الخفيف بالكرسي',
+      'stretch.spinal_twist.desc': 'دوران هادئ بالكرسي لتنشيط حركة العمود الفقري وتخفيف ضغط الجلوس.',
+      'stretch.hip_flexor.name': 'تمديد الورك والقدمين وقوفاً',
+      'stretch.hip_flexor.desc': 'خطوة إلى الخلف وقوفاً لتمديد مفصل الورك بعد ساعات الجلوس الطويلة.',
+      'stretch.eye_palming.name': 'إراحة العين بنظام 20-20 والتغطية',
+      'stretch.eye_palming.desc': 'تغطية خفيفة باليدين الدافئتين للعينين مع النظر لمدى بعيد لراحة الإبصار.',
+      'stretch.routine.quick_2min.title': 'استعادة النشاط السريعة (دقيقتان)',
+      'stretch.routine.quick_2min.desc': 'تنشيط سريع للرقبة والمعصم والعين بين جلسات المذاكرة القصيرة.',
+      'stretch.routine.full_5min.title': 'إعادة ضبط وضعية الجسم الكاملة (5 دقائق)',
+      'stretch.routine.full_5min.desc': 'سلسلة متكاملة جالساً وواقفاً لتجديد الحيوية بعد جلسات المذاكرة الطويلة.',
+      'stretch.routine.screen_relief.title': 'تخفيف إجهاد الشاشة والقراءة',
+      'stretch.routine.screen_relief.desc': 'راحة مركزة للعين ومحاذاة الرقبة للمذاكرة الرقمية المكثفة.',
+      'stretch.badge.mobility': 'حركات استراحة مكتبية',
+      'stretch.label.duration': 'المدة'
     },
     'es': {
       'common.cycle': 'Ciclo',
@@ -237,7 +279,9 @@
       'digest.metric.sessions': 'SESIONES',
       'goals.header.weekly': 'META DE ESTUDIO SEMANAL',
       'goals.label.completed': 'HORAS COMPLETADAS',
-      'goals.pace.on_track': 'Al Día'
+      'goals.pace.on_track': 'Al Día',
+      'stretch.neck_shoulder.name': 'Liberación de Cuello y Hombros',
+      'stretch.routine.quick_2min.title': 'Reinicio de Escritorio de 2 Minutos'
     },
     'fr': {
       'common.cycle': 'Cycle',
