@@ -4,6 +4,9 @@ on:
     branches: [fix/p0-saf-integrated-20261022, qa/p0-android-final-20261022]
 permissions:
   contents: read
+env:
+  APP_SOURCE_SHA: 1a9c3b8cf46afa39cb008bfb56126ee007e639e6
+  P0_MODE: saf
 concurrency:
   group: p0-android-${{ github.ref }}
   cancel-in-progress: true
@@ -15,6 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -32,6 +36,11 @@ jobs:
           SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
           test -x "$SDKMANAGER"
           "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Verify exact application tree and SAF source contracts
+        run: |
+          test "$(git rev-parse HEAD:android)" = "$(git rev-parse "$APP_SOURCE_SHA:android")"
+          node --check tests/android_e2e_recovery/p0_timer_saf_android.cjs
+          node --test tests/integration_recovery/native_saf_file_import.test.cjs
       - name: Build same-head disposable debug APK
         working-directory: android
         run: gradle assembleDebug --no-daemon

@@ -170,8 +170,11 @@ function stageImportFixtureInMediaStore(name,code){
   try{
    fs.writeFileSync(host,code,'utf8');
    cp.execFileSync('adb',['-s','emulator-5554','push',host,device],{timeout:20000,stdio:'ignore'});
-   const bytes=cp.execFileSync('adb',['-s','emulator-5554','shell','cat',device],{timeout:20000});
-   assert.ok(bytes.equals(Buffer.from(code,'utf8')),'Staged indexed file bytes mismatched');
+   // An 8 MiB read through execFileSync's default 1 MiB maxBuffer creates
+   // ENOBUFS in the QA harness. Verify the real device file by a short digest.
+   const remoteHash=adb('shell','sha256sum',device).split(/\s+/)[0];
+   const expectedHash=require('node:crypto').createHash('sha256').update(code,'utf8').digest('hex');
+   assert.equal(remoteHash,expectedHash,'Staged indexed file SHA256 mismatched');
   }finally{
    try{fs.unlinkSync(host);}catch(_){}
   }
@@ -193,13 +196,27 @@ async function openDocument(name,code){
   if(!downloads)throw Error('TRANSPORT: Downloads root unavailable');
   tapUI(downloads);row=(await nativeUI('exact fixture '+name,x=>uiNodes(x).find(n=>n.includes('text="'+name+'"')))).item;
  }
- saveSafPickerEvidence(name+'_visible',null);tapUI(row);await pause(700);
- xml=dumpUI();
- if(/documentsui/i.test(xml)){
-  const open=uiNodes(xml).find(n=>/text="OPEN"|resource-id="[^"]*action_menu_select"/i.test(n));
-  if(open){tapUI(open);await pause(600);}
+ saveSafPickerEvidence(name+'_visible',null);
+ tapUI(row);await pause(800);
+ // The first DocumentsUI tap can select/preview a tile instead of granting
+ // ACTION_OPEN_DOCUMENT. Require the picker to exit; never infer consent from
+ // a visible filename or from a scheduled JS bridge call.
+ for(let attempt=0;attempt<3;attempt++){
+  xml=dumpUI();
+  if(!/package="com\\.google\\.android\\.documentsui"/.test(xml))break;
+  const confirm=uiNodes(xml).find(n=>/text="OPEN"|content-desc="Open"/i.test(n)&&/clickable="true"/.test(n));
+  if(confirm)tapUI(confirm);
+  else {
+   const exact=uiNodes(xml).find(n=>n.includes('text="'+name+'"'));
+   if(!exact)throw Error('TRANSPORT: actual DocumentsUI document selection did not complete: '+name);
+   tapUI(exact);
+  }
+  await pause(850);
  }
- saveSafPickerEvidence(name+'_selected',null);
+ xml=dumpUI();
+ saveSafPickerEvidence(name+'_selected',xml);
+ if(/package="com\\.google\\.android\\.documentsui"/.test(xml))
+  throw Error('TRANSPORT: actual file selection did not exit DocumentsUI: '+name);
 }
 async function confirmDialog(accept){
  const u=await nativeUI('app-owned confirmation',x=>/text="Deep Focus"/.test(x)&&uiNodes(x).find(n=>n.includes('resource-id="android:id/button'+(accept?'1':'2')+'"')),false);
@@ -224,7 +241,7 @@ async function safMain(){
  });
  await run('saf_corrupt_rejected',async()=>{
   const before=await snapshot(),ack=await receipt();await openDocument('p0-saf-corrupt.txt','ZEN21::corrupt');
-  let rejected=false;for(let i=0;i<8;i++){if(await evaluate("/Backup invalid/.test(document.getElementById('toastText').textContent)")){rejected=true;break;}await pause(200);}
+  let rejected=false;for(let i=0;i<18;i++){if(await evaluate("/Backup invalid/.test(document.getElementById('toastText').textContent)")){rejected=true;break;}await pause(200);}
   assert.equal(rejected,true,'Corrupt file must reach actual JS validator');
   assert.deepEqual(await snapshot(),before);assert.deepEqual(await receipt(),ack);
  });

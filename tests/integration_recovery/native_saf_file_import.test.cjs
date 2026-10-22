@@ -55,3 +55,18 @@ test('SAF restore chooser admits legacy backup MIME types, not just text/plain',
  assert.ok(native.includes('MAX_BACKUP_IMPORT_BYTES'));
  assert.ok(native.includes('verifyAndRestoreBackupCode'));
 });
+
+// Probe-contract regressions: the source validator is necessary but does not
+// substitute for a real DocumentsUI/consent acceptance on Android API30.
+test('SAF QA transport hashes full oversized fixture without execSync buffer truncation',()=>{
+ const probe=fs.readFileSync(path.join(base,'tests/android_e2e_recovery/p0_timer_saf_android.cjs'),'utf8');
+ assert.match(probe,/sha256sum/);
+ assert.match(probe,/Staged indexed file SHA256 mismatched/);
+ assert.doesNotMatch(probe,/shell','cat',device/);
+});
+test('SAF QA requires real picker exit before the user consent assertion',()=>{
+ const probe=fs.readFileSync(path.join(base,'tests/android_e2e_recovery/p0_timer_saf_android.cjs'),'utf8');
+ assert.match(probe,/actual file selection did not exit DocumentsUI/);
+ assert.match(probe,/app-owned confirmation/);
+ assert.match(probe,/saf_actual_file_restore_ack_and_reopen/);
+});
