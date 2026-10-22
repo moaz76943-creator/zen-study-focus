@@ -5,7 +5,9 @@ const ledger=require('../../tools/daily_maintenance/cohort_ledger.cjs');
 const sha='a'.repeat(40),fingerprint='b'.repeat(64);
 const ids=['localization','notes','tasks','analytics'];
 function cycle({source_sha=sha,manifest_sha256=fingerprint,checked_at='2026-10-20T01:23:00.000Z',chosen=[ids[0]],statuses={},unmapped=[],duplicates=[]}={}){
- return {schema_version:1,source_sha,manifest_sha256,checked_at,agent_ids:ids,agents:chosen.map(id=>({id,status:statuses[id]||'SOURCE_TESTED',tests:2})),selected_agents:chosen.length,total_agents:ids.length,coverage:{unmapped,duplicates},status:'COHORT_PASS'};
+ const agents=chosen.map(id=>({id,status:statuses[id]||'SOURCE_TESTED',tests:2,cases:2,passed:2,skipped:0,todo:0}));
+ const status=agents.some(a=>a.status!=='SOURCE_TESTED')?'BLOCKED':unmapped.length||duplicates.length?'COVERAGE_GAP':'COHORT_PASS';
+ return {schema_version:1,source_sha,manifest_sha256,checked_at,agent_ids:ids,agents,selected_agents:chosen.length,total_agents:ids.length,coverage:{unmapped,duplicates},status};
 }
 test('one hourly green cohort does not indicate a full green cycle',()=>{
  const s=ledger.aggregate(null,cycle());

@@ -64,7 +64,8 @@
       "purpose": "Focus timer, interval boundaries and completion lifecycle",
       "test_dirs": [
         "tests/focus_workflows",
-        "tests/timer_native_bridge"
+        "tests/timer_native_bridge",
+        "tests/track05_timer"
       ]
     },
     {
