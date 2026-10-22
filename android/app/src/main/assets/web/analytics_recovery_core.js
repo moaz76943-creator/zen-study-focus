@@ -41,7 +41,7 @@
   const n=Date.parse(v);return Number.isFinite(n)?n:null;
  }
  function normalizeSessions(raw){
-  const sessions=[],rejects=[],seen=new Map(),quality={
+  const sessions=[],rejects=[],seen=new Map(),validatedDates=new Map(),quality={
    accepted:0,excluded:0,duplicates:0,conflicts:0,invalid:0,samples:0,nonFocus:0,legacyUnverified:0
   };
   const addReject=(index,reason)=>{rejects.push({index,reason});quality.excluded++;
@@ -58,7 +58,10 @@
    if(notFocus(s)){addReject(i,'NON_FOCUS');continue;}
    const id=idKey(s.id);
    if(id===null){addReject(i,'INVALID_ID');continue;}
-   if(!validDay(s.date)){addReject(i,'INVALID_DATE');continue;}
+   const day=s.date;
+   if(typeof day!=='string'){addReject(i,'INVALID_DATE');continue;}
+   if(!validatedDates.has(day))validatedDates.set(day,validDay(day));
+   if(!validatedDates.get(day)){addReject(i,'INVALID_DATE');continue;}
    if(typeof s.minutes!=='number'||!Number.isFinite(s.minutes)||s.minutes<0||s.minutes>1440){
     addReject(i,'INVALID_MINUTES');continue;
    }
@@ -161,15 +164,21 @@
    const key=dayAt(dayNum(start)+i);return byDay.get(key)||{key,minutes:0,sessions:0};
   });
   const byDomain=Object.fromEntries(DOMAINS.map(d=>[d,summarize(sessions.filter(s=>s.domain===d))]));
-  const through=(n)=>summarize(usable.filter(s=>s.date<=now&&s.date>=dayAt(dayNum(now)-(n-1))));
+  const through=(n)=>{const from=dayAt(dayNum(now)-(n-1));return summarize(usable.filter(s=>s.date<=now&&s.date>=from));};
   const endN=dayNum(end);
-  const current=summarize(usable.filter(s=>s.date>=dayAt(endN-6)&&s.date<=end));
-  const previous=summarize(usable.filter(s=>s.date>=dayAt(endN-13)&&s.date<dayAt(endN-6)));
+  const currentStart=dayAt(endN-6),previousStart=dayAt(endN-13);
+  const current=summarize(usable.filter(s=>s.date>=currentStart&&s.date<=end));
+  const previous=summarize(usable.filter(s=>s.date>=previousStart&&s.date<currentStart));
   const total=summarize(sessions);
   const changePercent=previous.minutes===0?null:Math.round((current.minutes-previous.minutes)/previous.minutes*10000)/100;
   const quality={...norm.quality,inRange:sessions.length,timingVerified:sessions.filter(s=>s.timingVerified).length};
+  const weekStarts=new Map();
   return {period:{startDate:start,endDate:end,domain,days},totals:total,
-   sessions,daily,weekly:aggregate(sessions,s=>calendarWeek(s.date)),
+   sessions,daily,weekly:aggregate(sessions,s=>{
+    let week=weekStarts.get(s.date);
+    if(week===undefined){week=calendarWeek(s.date);weekStarts.set(s.date,week);}
+    return week;
+   }),
    monthly:aggregate(sessions,s=>s.date.slice(0,7)),byDomain,quality,
    dashboard:{today:through(1),last7:through(7),last30:through(30)},
    comparison:{current,previous,changeMinutes:round(current.minutes-previous.minutes),changePercent,
