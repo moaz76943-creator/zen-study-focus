@@ -6,9 +6,6 @@
 (function (global) {
   'use strict';
 
-  /**
-   * Returns current local civil date formatted as YYYY-MM-DD.
-   */
   function getLocalCivilDateString(dateObj) {
     var d = dateObj instanceof Date && !isNaN(dateObj.getTime()) ? dateObj : new Date();
     var year = d.getFullYear();
@@ -17,12 +14,16 @@
     return year + '-' + month + '-' + day;
   }
 
-  /**
-   * Filters and prioritizes tasks for Today's focus.
-   * @param {Array} tasks - Array of task objects from zen_fortress_tasks_v21.
-   * @param {Object} options - { referenceDate: Date|string, includeCompleted: boolean }
-   * @returns {Array} Sorted list of tasks ready for today's focus.
-   */
+  function computeTaskPriority(task, isOverdue) {
+    var weight = 0;
+    if (isOverdue) weight += 100;
+    var p = String(task.priority || '').toLowerCase();
+    if (p === 'high' || p === 'عالية') weight += 50;
+    else if (p === 'medium' || p === 'متوسطة') weight += 20;
+    else weight += 10;
+    return weight;
+  }
+
   function filterTodayTasks(tasks, options) {
     var list = Array.isArray(tasks) ? tasks : [];
     options = options || {};
@@ -38,9 +39,7 @@
       if (!t || typeof t !== 'object') continue;
 
       var isCompleted = Boolean(t.completed);
-      if (!includeCompleted && isCompleted) {
-        continue;
-      }
+      if (!includeCompleted && isCompleted) continue;
 
       var dueDate = t.dueDate ? String(t.dueDate).split('T')[0] : null;
       var hasTodayTag = false;
@@ -51,20 +50,17 @@
       }
 
       var isDueToday = dueDate === todayStr;
-      var isOverdue = dueDate && dueDate < todayStr && !isCompleted;
+      var isOverdue = Boolean(dueDate && dueDate < todayStr && !isCompleted);
 
       if (isDueToday || isOverdue || hasTodayTag) {
         filtered.push({
           task: t,
-          isDueToday: isDueToday,
-          isOverdue: Boolean(isOverdue),
-          hasTodayTag: hasTodayTag,
+          isOverdue: isOverdue,
           priorityWeight: computeTaskPriority(t, isOverdue)
         });
       }
     }
 
-    // Sort descending by priority weight, then by creation order
     filtered.sort(function (a, b) {
       if (b.priorityWeight !== a.priorityWeight) {
         return b.priorityWeight - a.priorityWeight;
@@ -80,26 +76,8 @@
     });
   }
 
-  /**
-   * Computes priority scoring weight.
-   */
-  function computeTaskPriority(task, isOverdue) {
-    var weight = 0;
-    if (isOverdue) weight += 100; // Overdue tasks surfaced first
-    var p = String(task.priority || '').toLowerCase();
-    if (p === 'high' || p === 'عالية') weight += 50;
-    else if (p === 'medium' || p === 'متوسطة') weight += 20;
-    else weight += 10;
-    return weight;
-  }
-
-  /**
-   * Dispatches payload linking the selected today task directly to the Focus Timer.
-   */
   function createTimerLinkPayload(task, defaultMinutes) {
-    if (!task || typeof task !== 'object') {
-      return null;
-    }
+    if (!task || typeof task !== 'object') return null;
     var mins = typeof task.estimatedMinutes === 'number' && task.estimatedMinutes > 0
       ? task.estimatedMinutes
       : (typeof defaultMinutes === 'number' && defaultMinutes > 0 ? defaultMinutes : 25);
