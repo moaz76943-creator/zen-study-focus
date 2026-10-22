@@ -1,7 +1,6 @@
 name: Deep Focus Track 13 Exact-SHA Gitleaks
 on:
   pull_request:
-    branches: [integration/master-recovery-20261021]
   workflow_dispatch:
 permissions:
   contents: read
