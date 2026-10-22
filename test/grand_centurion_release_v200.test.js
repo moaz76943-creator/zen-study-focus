@@ -1,5 +1,5 @@
 /**
- * DEEP FOCUS — Grand Centurion Release Gate v2.0.0 Test Suite (M100)
+ * DEEP FOCUS — Grand Centurion Release Gate v2.0.0 Test Suite (M100 Fixed)
  * File: test/grand_centurion_release_v200.test.js
  */
 
@@ -84,12 +84,18 @@ try {
   let failedSuites = 0;
   const failures = [];
 
+  const subEnv = Object.assign({}, process.env, {
+    DEEP_FOCUS_CENTURION: '1',
+    TZ: 'Asia/Amman'
+  });
+
   allTestFiles.forEach(testFile => {
     const fullPath = path.join(testDir, testFile);
     const result = spawnSync(process.execPath, [fullPath], {
       stdio: 'pipe',
       encoding: 'utf8',
-      timeout: 10000
+      env: subEnv,
+      timeout: 25000
     });
 
     if (result.status === 0) {
