@@ -1345,13 +1345,20 @@ function applyCustomTimerNow() {
 }
 
 function changeTimerDelta(deltaMins) {
-  timerLeft = Math.max(10, timerLeft + deltaMins * 60);
-  if (timerLeft > timerTotal) timerTotal = timerLeft;
+  const before = {timerLeft, timerTotal, timerTargetTime};
+  try {
+    timerLeft = Math.max(10, timerLeft + deltaMins * 60);
+    if (timerLeft > timerTotal) timerTotal = timerLeft;
+    if (timerRunning) timerTargetTime = Date.now() + (timerLeft * 1000);
+    if (storeTimerSession() !== true) throw new Error('TIMER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (error) {
+    ({timerLeft, timerTotal, timerTargetTime} = before);
+    showToast(L().saveFailed);
+    throw error;
+  }
   if (timerRunning) {
-    timerTargetTime = Date.now() + (timerLeft * 1000);
     startNativeTimerForCurrentSession(timerLeft, document.getElementById('timerModeCaption').textContent);
   }
-  storeTimerSession();
   updateTimerDisplay();
 }
 

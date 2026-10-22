@@ -60,11 +60,13 @@ function toggleRig({running=false,failure='throw'}={}){
   L:()=>({saveFailed:'Could not save'}),showToast:m=>messages.push(m),
   setInterval(){events.push(['interval-start']);return 18;},clearInterval:id=>events.push(['interval-stop',id]),
   startNativeTimerForCurrentSession:(...args)=>events.push(['native-start',...args]),
+  updateTimerDisplay:()=>events.push(['display']),
   focusWorkflowGetLinkedTask:()=>({id:7}),runTimerTick(){},finalizeTimerSession(){throw Error('Unexpected completion');}
  });
  for(const [begin,finish] of [['function accumulateActiveTime()', 'const TIMER_STORAGE_KEY'],
   ['function storeTimerSession()', 'function creditCompletedSession()'],
   ['function toggleTimerPlay()', 'function resetTimerNow()'],
+  ['function changeTimerDelta(', 'function startNativeTimerForCurrentSession('],
   ['function selectTimerMode(mins,', 'function openCustomTimerModal()'],
   ['function resetTimerNow()', 'function skipTimerPhase()']]){
   const a=app.indexOf(begin),b=app.indexOf(finish,a);assert.ok(a>=0&&b>a);vm.runInContext(app.slice(a,b),ctx);
@@ -105,4 +107,24 @@ for(const action of ["selectTimerMode(5,'short',null)", 'resetTimerNow()'])test(
  assert.deepEqual(h.snapshot(),h.original,'Caller cannot discard identity/elapsed time after rejected pause');
  assert.equal(h.events.length,1);
  assert.deepEqual(h.messages,['Could not save']);
+});
+
+for(const running of [false,true])for(const failure of ['throw','false'])test(`CROSS-002 duration adjustment ${running?'running':'paused'} ${failure} preserves JS/native duration until save`,()=>{
+ const h=toggleRig({running,failure});
+ assert.throws(()=>h.call('changeTimerDelta(5)'),/QuotaExceededError|TIMER_SAVE_NOT_ACKNOWLEDGED/);
+ assert.deepEqual(h.snapshot(),h.original);
+ assert.equal(h.events.length,1,'Rejected write must not reschedule native timer or redraw success');
+ assert.deepEqual(h.messages,['Could not save']);
+ h.allow();h.call('changeTimerDelta(5)');
+ assert.equal(h.ctx.timerLeft,390);assert.equal(h.ctx.timerTotal,390);
+ assert.equal(h.ctx.timerSessionId,h.original.timerSessionId);
+ assert.equal(h.ctx.timerActiveMs,30000);
+ assert.equal(h.events[1][2].left,390);assert.equal(h.events[1][2].total,390);
+ assert.deepEqual(h.events.slice(2),running?[['native-start',390,'Focus'],['display']]:[['display']]);
+});
+test('CROSS-002 successful decrement preserves ten-second floor and identity',()=>{
+ const h=toggleRig({running:true});h.allow();h.call('changeTimerDelta(-5)');
+ assert.equal(h.ctx.timerLeft,10);assert.equal(h.ctx.timerTotal,120);
+ assert.equal(h.ctx.timerSessionId,'stable-session');assert.equal(h.ctx.focusSessionTaskId,7);
+ assert.deepEqual(h.events.slice(1),[['native-start',10,'Focus'],['display']]);
 });

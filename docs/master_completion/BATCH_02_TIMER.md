@@ -40,3 +40,17 @@ Evidence:
 Limits: auxiliary active-timer snapshots are outside native six-family ACK, as before. This patch does not establish force-stop durability, Android background/locked-screen behavior or all other `storeTimerSession` callers. They remain NOT_TESTED / separate follow-up. Rethrowing is intentional: the failure is visible and internal callers cannot silently proceed. No global exception suppression added. Fresh security scans, human locale review, APK/AAB and device tests NOT_TESTED. No expensive workflow dispatched manually.
 
 MERGED_INTO_STAGING=NO. MERGED_INTO_MAIN=NO. Integration owner must review shared `app.js` hunks against current PR138 and PR175; these touch separate functions. Next exact operation: inspect exact-head focused CI, then schedule synthetic Android Start/Pause write-failure tests with real taps, native/JS agreement and retry. Do not infer those results from this VM test. Preserve PR158's existing paused/duplicate tick guard.
+
+### Continuation — duration controls (2026-10-22T00:19:33Z)
+
+Same CROSS-002 / TIMER-028/029 ownership and branch. Before this continuation, exact-head CI for `9a462d23a98944aebe96af9fcb75578d07e2e8f8` finished SUCCESS: runs39694007445 (browser/source/registry) and39694007768 (verify). These results do not certify the later delta-control patch.
+
+Additional confirmed defect: `changeTimerDelta` modified live remaining/total/target time and rescheduled the native timer BEFORE saving the new duration. A rejected write left native and JS duration advanced beyond the saved snapshot. False writer results were ignored here too.
+
+The existing adjustment now snapshots only its three changing fields, requires a successful write, and only then reschedules native and refreshes the display. Failure restores those fields, shows the existing localized save error and rethrows to retain the caller-abort contract. Ten-second minimum, expansion of total duration, session/task identity and elapsed accounting remain unchanged. No native/package/schema/permission changes.
+
+- RED on prior PR176 app: final focused suite16 cases,11 PASS /5 FAIL (four rejected adjustment transitions plus the required save-before-native ordering on a valid decrement).
+- GREEN:16 PASS /0 FAIL in existing timer durability test; adjacent combined regression88 PASS /0 FAIL, with the same command above. Startup smoke and syntax/diff checks PASS.
+- Existing real Chromium button suite:19 named interaction cases PASS,0 uncaught errors, including confirmation Cancel/Accept, mode controls, sport-rest, custom editor and navigation at393px. Served over loopback HTTP with a synthetic profile; not Android or an exhaustive232-button test. Command: `DF_COMPLETION_URL=http://127.0.0.1:8774 DF_BUTTON_EVIDENCE=/workspace/scratch/timer-delta/browser timeout 65 node tests/track07_functional/timer_mode_buttons_browser.cjs`.
+- Active timer snapshot still has the existing auxiliary-storage contract; this is not new Native durable ACK or process-death proof.
+- Keep this repair on existing PR176; no duplicate issue/PR or main/staging merge. Next inspect its new exact-head CI. Android/physical device/background/DND/Bluetooth remain NOT_TESTED. RELEASE_APPROVED=NO.
