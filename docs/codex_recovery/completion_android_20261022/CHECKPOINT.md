@@ -34,3 +34,19 @@ and focused reopen9 rerun after final UI change; no unrelated suite repetition.
 Reviewed restore-only source diff. Rollback scoped revert. SOURCE_PASS;
 Android/process-death/power-loss NOT_TESTED. Next publish/review/integration merge,
 verify receipt before SAF work. RELEASE_APPROVED=NO.
+
+Task2 merged PR183:0b517904dec1c85be97b82a29db380e4649d9f6f, checkpoint on GitHub
+before Task3. Task3 isolated candidate begins at that exact merge.
+PR152042327d port: only MainActivity60lines/index2lines missing from integration,
+no locale-draft changes. Existing source tests RED6 FAIL -> source18 PASS with
+security/data resilience. Same validator/consent/nativeACK; no new import engine.
+PR159 latest39601644398 built successfully but actual import consent NOT_TESTED;
+CDP/native ACK and export passed historically, not proof for this integrated tree.
+Reusable local-only CDP/DocumentsUI/MediaStore helpers copied from159 with bounded
+new cases: real file, consent cancel, picker cancel, corrupt, >8MiB, consent accept,
+exact IDs/unknown fields/nativeACK/reopen. API30 job reuses existing build/emulator
+lane steps,25min job/300s probe bound, exact HEAD/tree/APK receipts, no signing.
+Script/bash syntax PASS, source18 PASS. ANDROID pending. No import merge before
+actual path proven. PR remains isolated if FAIL/NOT_TESTED. No main/package/data
+migration. User-device data never used; disposable emulator required. New scripts
+are in existing android_e2e_recovery navigation ownership, source tests qa.

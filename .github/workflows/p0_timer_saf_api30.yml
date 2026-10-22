@@ -1,0 +1,64 @@
+name: P0 timer restore and SAF API30 acceptance
+on:
+  push:
+    branches: [fix/p0-saf-integrated-20261022, qa/p0-android-final-20261022]
+permissions:
+  contents: read
+concurrency:
+  group: p0-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android-api30:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install Android 36 compilation platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Build same-head disposable debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Capture source SHA and prepare KVM
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/p0-android"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/p0-android/SOURCE_SHA.txt"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/p0-android/built-apk.sha256"
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: P0 exact-head Android acceptance (bounded)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/android_e2e_recovery/p0_timer_saf_ci.sh
+      - name: Preserve exact tested artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P0-Android-${{ github.sha }}
+          path: ${{ runner.temp }}/p0-android/
+          retention-days: 7

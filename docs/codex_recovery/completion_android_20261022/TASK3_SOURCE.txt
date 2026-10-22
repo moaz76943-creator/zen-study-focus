@@ -1,0 +1,46 @@
+RED missing PR152 port
+✖ restore file button uses native SAF on Android with existing web fallback (5.788182ms)
+✖ native SAF selects readable document without broadening WebView content privileges (3.976893ms)
+✖ native import bounds bytes and delegates validation and consent to v21 verifier (4.519054ms)
+✖ native picker cancellation returns without mutating v21 records (5.511369ms)
+✖ JavaScript importer delegates to the same user-confirmed v21 restore path (3.046326ms)
+✖ SAF restore chooser admits legacy backup MIME types, not just text/plain (16.89062ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 599.256451
+
+
+SOURCE_GREEN
+✔ restore file button uses native SAF on Android with existing web fallback (5.260861ms)
+✔ native SAF selects readable document without broadening WebView content privileges (3.101886ms)
+✔ native import bounds bytes and delegates validation and consent to v21 verifier (6.420499ms)
+✔ native picker cancellation returns without mutating v21 records (10.240596ms)
+✔ JavaScript importer delegates to the same user-confirmed v21 restore path (0.393826ms)
+✔ SAF restore chooser admits legacy backup MIME types, not just text/plain (2.203591ms)
+✔ malformed primary JSON recovers from verified mirror without writing to either copy (31.433232ms)
+✔ dual corruption blocks startup and never seeds defaults over saved user slots (8.208629ms)
+✔ storage quota failure rolls back exact primary and mirror bytes (12.926184ms)
+✔ crash after one primary write keeps pending journal and restores exact bytes (5.068661ms)
+✔ broken or altered backups are rejected before any storage changes (9.68157ms)
+✔ synthetic safe-integer task and note IDs survive backup round-trip unchanged (15.269794ms)
+✔ repeated focus session IDs are counted once, conflicting reused IDs are excluded (7.116046ms)
+✔ SEC-P1 imported duplicate task IDs must not become ambiguous live records (0.476161ms)
+✔ checksum-valid invalid family shapes block startup without changing either packet (5.016286ms)
+✔ preflight keeps fresh and partially initialized installs read-only (2.42008ms)
+✔ preflight checks the chosen family and leaves malformed primary or valid mirror intact (3.274024ms)
+✔ historical duplicate numeric IDs and unknown fields remain untouched by preflight (1.789713ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 723.768915
+
+ANDROID_NOT_TESTED until exact-head API30 receipt. RELEASE_APPROVED=NO
