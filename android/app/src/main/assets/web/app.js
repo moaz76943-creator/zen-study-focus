@@ -897,43 +897,73 @@ function renderDomainState() {
   document.getElementById('readContextBar').classList.toggle('visible', dom === 'read');
 }
 
-function switchActivityDomain(dom, el) {
-  if (!['study', 'sport', 'read', 'work'].includes(dom) || cfg.domain === dom) return false;
-  // A tap on another activity must not silently erase an in-progress focus session.
-  const replacingQuickTraining = !!quickTraining?.active;
-  if (replacingQuickTraining) {
-    if (!window.confirm(quickText('replacePrompt'))) return false;
-  } else if (timerRunning || (timerSessionId !== null && timerLeft < timerTotal)) {
-    if (!window.confirm(quickText('replacePrompt'))) return false;
-  }
-  // A native durable ACK can fail after WebView writes: do not change the active
-  // domain or cancel a real focus session until the new cfg is acknowledged.
-  const nextCfg = {...cfg,domain:dom};
+// Activity/training replacements save the auxiliary timer before the cfg ACK.
+// On cfg rejection restore exact timer packets; publish native/UI work only afterward.
+function transitionActivityTimer({seconds, mode='focus', training=null, domain=cfg.domain, running=false}) {
+  const before = {timerRunning, timerTotal, timerLeft, timerTargetTime, timerSessionId,
+    focusSessionTaskId, timerActiveMs, timerResumeMs, quickTraining, currentTimerModeKey};
+  let original = null;
   try {
-    if (saveFortressData('zen_fortress_cfg_v21', nextCfg) !== true)
+    original = [TIMER_STORAGE_KEY, TIMER_STORAGE_KEY + '_mirror']
+      .map(key => [key, localStorage.getItem(key)]);
+    timerRunning = running;
+    currentTimerModeKey = mode;
+    timerTotal = seconds; timerLeft = seconds;
+    timerResumeMs = running ? Date.now() : null;
+    timerTargetTime = running ? timerResumeMs + seconds * 1000 : null;
+    timerSessionId = running ? String(Date.now()) + '-' + String(Math.round(Math.random()*1e9)) : null;
+    focusSessionTaskId = running ? (training?.taskId ?? null) : null;
+    timerActiveMs = 0;
+    quickTraining = training;
+    if (storeTimerSession() !== true) throw new Error('TIMER_SAVE_NOT_ACKNOWLEDGED');
+    if (domain !== cfg.domain && saveFortressData('zen_fortress_cfg_v21', {...cfg,domain}) !== true)
       throw new Error('DOMAIN_SAVE_NOT_ACKNOWLEDGED');
-  } catch (_) {
-    showToast(cfg.lang === 'ar'
-      ? 'تعذر حفظ النشاط. حاول مرة أخرى.'
-      : 'Could not save activity. Try again.');
+  } catch (error) {
+    ({timerRunning, timerTotal, timerLeft, timerTargetTime, timerSessionId,
+      focusSessionTaskId, timerActiveMs, timerResumeMs, quickTraining, currentTimerModeKey} = before);
+    const failed = [];
+    for (const [key,value] of original || []) {
+      try {
+        if (localStorage.getItem(key) !== value) {
+          if (value === null) localStorage.removeItem(key);
+          else localStorage.setItem(key,value);
+        }
+        if (localStorage.getItem(key) !== value) failed.push(key);
+      } catch (_) { failed.push(key); }
+    }
+    showToast(L().saveFailed);
+    if (failed.length) throw new Error('TIMER_ROLLBACK_UNVERIFIED:' + failed.join(','));
     return false;
   }
-  cfg.domain = dom;
-  if (replacingQuickTraining) {
-    quickTraining = null;
-    if (timerRunning) toggleTimerPlay();
-    renderQuickTraining();
+  cfg.domain = domain;
+  if (before.timerRunning) {
+    clearInterval(timerInterval); timerInterval = null;
+    if (!running && window.ZenNative?.stopBackgroundService) {
+      try { window.ZenNative.stopBackgroundService(); } catch (_) {}
+    }
   }
-  renderDomainState();
-
-  const d = L();
-  const labels = {
-    study: ['📚', d.domStudy], sport: ['🏋️', d.domSport],
-    read: ['📖', d.domRead], work: ['💻', d.domWork]
-  };
-  const [icon, title] = labels[dom];
+  document.getElementById('mainPlayBtn').innerHTML = running
+    ? '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  const btn = document.getElementById(mode === 'short' ? 'modeShortBtn' : mode === 'long' ? 'modeLongBtn' : 'modeFocusBtn');
+  btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDomainState(); renderQuickTraining(); updateTimerDisplay();
+  if (running) {
+    startNativeTimerForCurrentSession(seconds, document.getElementById('timerModeCaption').textContent);
+    timerInterval = setInterval(runTimerTick,500);
+  }
+  return true;
+}
+function switchActivityDomain(dom, el) {
+  if (!['study', 'sport', 'read', 'work'].includes(dom) || cfg.domain === dom) return false;
+  if ((quickTraining?.active || timerRunning || (timerSessionId !== null && timerLeft < timerTotal)) &&
+      !window.confirm(quickText('replacePrompt'))) return false;
   const minutes = getDomainFocusMinutes(dom);
-  selectTimerMode(minutes, 'focus', document.getElementById('modeFocusBtn'));
+  if (!transitionActivityTimer({seconds:minutes * 60, domain:dom})) return false;
+  const d = L();
+  const labels = {study:['📚',d.domStudy],sport:['🏋️',d.domSport],read:['📖',d.domRead],work:['💻',d.domWork]};
+  const [icon,title] = labels[dom];
   showToast(`${icon} ${title} (${formatDurationUnit(minutes,'minute')})`);
   return true;
 }
