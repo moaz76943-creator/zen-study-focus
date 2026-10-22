@@ -1,0 +1,72 @@
+{
+  "source": "Android API30 real WebView + native AtomicFile; disposable emulator only",
+  "sha": "1682d2fe72e2a90318c59ccc6200a1437602373d",
+  "application_sha": "51313589b5472fcc834aa5a10ccb3240c5c062bd",
+  "android_tree_sha": "8aad19f04b1a844055ff1ddb6fccc74100f32075",
+  "results": [
+    {
+      "name": "prior_user_data_seed_native_ack",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "native_cfg_ack_io_refusal",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "timer_start_pause",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "timer_reset_cancel_retry",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "timer_mode_and_custom_reopen",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "activity_and_sport_rest",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "quick_training_rejection_retry",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "timer_completion_credit_retry",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    },
+    {
+      "name": "prior_user_data_unchanged",
+      "status": "PASS",
+      "detail": "State assertions passed on real Android emulator"
+    }
+  ],
+  "release_approved": false,
+  "counts": {
+    "PASS": 9,
+    "FAIL": 0,
+    "NOT_TESTED": 0
+  },
+  "run_id": 39715266944,
+  "artifact_id": 12398454503,
+  "tested_apk_sha256": "f587cffdd1ad2e6c1402e46b80c45275b1606a31b71abc4f039874fab20b81f0",
+  "merge_allowed": true,
+  "original_failure": {
+    "run_id": 39709802063,
+    "counts": {
+      "PASS": 7,
+      "FAIL": 2,
+      "NOT_TESTED": 0
+    }
+  },
+  "saf_independent": "NOT_TESTED"
+}

@@ -17,14 +17,18 @@ jobs:
           node-version: '22'
       - name: Catalog and real mixer regression
         run: |
-          node --test tests/nature_library_v2/catalog.test.cjs tests/integration_recovery/nature_runtime.test.cjs tests/integration_recovery/nature_20_language_controls.test.cjs tests/nature_audio_recovery/mixer.test.cjs
+          node --test tests/nature_library_v2/intake_manifest.test.cjs tests/nature_library_v2/catalog.test.cjs tests/integration_recovery/nature_runtime.test.cjs tests/integration_recovery/nature_20_language_controls.test.cjs tests/nature_audio_recovery/mixer.test.cjs
           node tests/smoke_app.cjs
+      - name: Verify original hash and offline listening sheet unit tests
+        run: python3 -m unittest discover -s tests/nature_library_v2 -p 'test_*.py' -v
       - name: Install audio probing tools
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends ffmpeg
       - name: Collect pinned original recording (not distributed)
         run: python3 tools/nature_audio/collect_commons_audio.py
+      - name: Produce offline human-listening page from verified originals
+        run: python3 tools/nature_audio/build_audio_review.py
       - name: Upload candidate and evidence for human review
         if: always()
         uses: actions/upload-artifact@v4
@@ -32,4 +36,64 @@ jobs:
           name: nature-commons-quarantine
           path: audio_candidates/commons_intake/
           if-no-files-found: warn
+          retention-days: 7
+
+  qa-audio-apk:
+    name: Disposable Android 10-original listening APK (never Play release)
+    needs: catalog
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[audio-qa-apk]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download only vetted original source artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: nature-commons-quarantine
+          path: audio_candidates/commons_intake
+      - name: Prepare independent QA application without permissions or legacy data
+        env:
+          AUDIO_QA_BUILD: '1'
+        run: python3 tools/nature_audio/prepare_audioqa_android.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android API 36
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build QA-only debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Enforce isolated package and no platform app permissions
+        run: |
+          set -euo pipefail
+          APK="$(find android/app/build/outputs/apk/debug -name '*.apk' -type f -print -quit)"
+          AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          test -f "$APK"
+          test -x "$AAPT"
+          "$AAPT" dump badging "$APK" | grep -F "package: name='com.zenstudy.focus.audioqa'"
+          "$AAPT" dump permissions "$APK"
+          # AndroidX injects only its own signature-scoped receiver permission.
+          # Never permit an Android platform permission, network, storage or notifications.
+          PERMISSIONS="$("$AAPT" dump permissions "$APK" | grep '^uses-permission:' || true)"
+          EXPECTED="uses-permission: name='com.zenstudy.focus.audioqa.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'"
+          if [[ -n "$PERMISSIONS" && "$PERMISSIONS" != "$EXPECTED" ]]; then
+            echo "Unexpected platform or third-party permissions in QA APK: $PERMISSIONS" >&2
+            exit 1
+          fi
+          sha256sum "$APK"
+      - name: Upload test-only side-by-side Android listening APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Nature-Original-AudioQA-Debug
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
           retention-days: 7

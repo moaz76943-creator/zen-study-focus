@@ -15,3 +15,14 @@ test('note dialog scales down to the actual visualViewport (keyboard) without sc
   assert.match(css,/#noteModal\s+\.ns-editor\s*\{[^}]*overflow-y\s*:\s*auto\s*;/s);
   assert.match(html,/<button[^>]*id="nsSaveButton"[^>]*onclick="saveNewNote\(\)"/);
 });
+
+test('active note modal itself stays inside the Android visual viewport, not the original layout viewport',()=>{
+  assert.match(css,/#noteModal\.open\s*\{[^}]*top\s*:\s*var\(--nsux-top,\s*0px\)/s);
+  assert.match(css,/#noteModal\.open\s*\{[^}]*height\s*:\s*var\(--nsux-height,\s*100dvh\)/s);
+  assert.match(css,/#noteModal\.open\s*\{[^}]*overflow\s*:\s*hidden/s);
+  const editor=fs.readFileSync(path.join(root,'android/app/src/main/assets/web/notes_editor_ui.js'),'utf8');
+  assert.match(editor,/window\.visualViewport\.offsetTop/);
+  assert.match(editor,/window\.visualViewport\.addEventListener\('resize',update\)/);
+  assert.match(editor,/window\.visualViewport\.addEventListener\('scroll',update\)/);
+  assert.match(editor,/window\.visualViewport\.removeEventListener\('scroll',update\)/);
+});

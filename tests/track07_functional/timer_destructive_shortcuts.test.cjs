@@ -30,13 +30,14 @@ test('Skip phase must confirm before pause or switch when a focus session is act
 test('sports 45-second quick-rest must not discard current focus session on Cancel',()=>{
  const s=body('startQuickSportRest','addReadPages');
  assert.match(s,/window\.confirm\(/,'Actual high-value confirmation must be handled');
- assert.ok(s.indexOf('window.confirm(')<s.indexOf('timerTotal = secs'),'Confirmation precedes mutation');
+ assert.ok(s.indexOf('window.confirm(')<s.indexOf('transitionActivityTimer('),'Confirmation precedes the verified replacement transition');
  assert.match(s,/return false/);
 });
 test('custom Save button cancellation preserves label and the open custom dialog',()=>{
  const s=body('applyCustomTimerNow','changeTimerDelta');
  const choose=s.indexOf('selectTimerModeFromUser(');
  assert.ok(choose>=0);
- assert.ok(s.indexOf('customSessionLabel =')>choose,'Do not change label until after confirmation');
+ assert.match(s,/selectTimerModeFromUser\(mins, 'custom', document\.getElementById\('modeCustomBtn'\), nextLabel\)/,'Pass label into the same confirmed persisted transition');
+ assert.doesNotMatch(s,/customSessionLabel\s*=/,'Do not mutate label separately after saving');
  assert.ok(s.indexOf("closeModal('customTimerModal')")>choose,'Do not close entered form on Cancel');
 });

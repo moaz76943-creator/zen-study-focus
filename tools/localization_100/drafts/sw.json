@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "locale": "sw",
+  "status": "DRAFT_TRANSLATION_NEEDS_NATIVE_REVIEW",
+  "inventorySha256": "1aedd44aa363dedcdfeead68cd5d026710fd429b995e77141b20492b1bd9a06e",
+  "provenance": {
+    "type": "AI-assisted initial Swahili wording",
+    "review": "NOT_TESTED",
+    "notes": "Candidate phrases for human linguistic and in-context review; not approved for runtime, even if lint passes."
+  },
+  "strings": {
+    "analytics.dictionary": {
+      "analyticsTitle": "Takwimu za shughuli zilizorekodiwa",
+      "activity": "Shughuli",
+      "period": "Kipindi",
+      "from": "Kuanzia",
+      "to": "Hadi",
+      "minutes": "Dakika zilizorekodiwa",
+      "sessions": "Vipindi",
+      "average": "Wastani wa kila kipindi",
+      "streak": "Mfululizo wa sasa",
+      "noSessions": "Hakuna vipindi vilivyorekodiwa katika kipindi hiki",
+      "goal": "Ulinganisho wa malengo",
+      "noGoals": "Hakuna malengo ya kila siku yaliyowekwa",
+      "completedTasks": "Kazi zilizokamilika",
+      "chart": "Mgawanyo wa kila siku",
+      "year": "Mwaka",
+      "export": "Hamisha faili ya CSV",
+      "details": "Chagua siku ili kuona maelezo",
+      "grouping": "Panga kwa makundi",
+      "daily": "Kila siku",
+      "weekly": "Kila wiki",
+      "monthly": "Kila mwezi",
+      "all": "Zote",
+      "study": "Kujifunza",
+      "reading": "Kusoma",
+      "work": "Kazi",
+      "fitness": "Mazoezi",
+      "excluded": "Vipindi vilivyoondolewa",
+      "minute": "dakika",
+      "heatmapYear": "Shughuli za mwaka"
+    },
+    "core.navigation": {
+      "title": "Umakini na utendaji",
+      "sub": "Masomo, mazoezi, usomaji na kazi inayohitaji umakini",
+      "navTimer": "Kipima muda",
+      "totalFocusToday": "Jumla ya dakika za shughuli leo",
+      "minsUnit": "dakika",
+      "daysUnit": "siku",
+      "waterWord": "Maji"
+    },
+    "core.calendar": {
+      "navCalendar": "Kalenda",
+      "btnAddCalNote": "+ Ongeza dokezo kwenye tarehe"
+    },
+    "core.tasks": {
+      "navTasks": "Kazi",
+      "filterAll": "Zote",
+      "filterToday": "Zinazoendelea",
+      "filterDone": "Zilizokamilika",
+      "phAddTask": "Ongeza lengo la masomo, mazoezi au usomaji..."
+    },
+    "core.notes": {
+      "navNotes": "Madokezo",
+      "phSearchNotes": "Tafuta madokezo, mazoezi au muhtasari wa vitabu...",
+      "orbDump": "Dokezo la haraka",
+      "tagCornell": "Mbinu ya Cornell 📋",
+      "tagFlash": "Kumbuka 👁️",
+      "tagQuick": "Kumbukumbu 💡",
+      "lblBlurAnswer": "Ficha maandishi kwa mazoezi ya kukumbuka (gusa ili kufichua)"
+    },
+    "core.sounds": {
+      "navSounds": "Sauti za asili",
+      "btnStopAll": "⏹ Simamisha",
+      "sndCatWater": "Maji na mvua 🌧️",
+      "sndCatForest": "Msitu na upepo 🌲",
+      "sndCatWarm": "Moto na ardhi 🔥",
+      "mixerReady": "🎵 Studio ya sauti za asili iko tayari",
+      "btnMyMix": "✨ Mchanganyiko wangu"
+    },
+    "core.analytics": {
+      "navAnalytics": "Takwimu",
+      "kpiMinutes": "Dakika za shughuli",
+      "kpiSessions": "Vipindi vilivyokamilika",
+      "overviewTitle": "Mgawanyo wa shughuli",
+      "kpiTrendWeek": "↑ +18% wiki hii",
+      "kpiTrendGreat": "↑ +12% uthabiti",
+      "badgeThisWeek": "Wiki hii",
+      "waveFlowTitle": "Faharasa ya utendaji wa kila wiki",
+      "peakPerfBadge": "Kiwango bora cha umakini"
+    },
+    "core.timer": {
+      "modeCustom": "Maalum ⚡",
+      "calcHeading": "🎓 Kikokotoo cha malengo na makadirio ya muda",
+      "calcOutTpl": "📅 Kwa kasi hii, utakamilisha lengo lako baada ya siku {d}!",
+      "startFocusAchieve": "Panga • Tekeleza • Fanikiwa",
+      "orbDesk": "Saa ya mezani"
+    },
+    "core.goals": {
+      "domStudy": "Masomo",
+      "domSport": "Mazoezi",
+      "domRead": "Kusoma",
+      "domWork": "Kazi inayohitaji umakini",
+      "catStudy": "📚 Masomo",
+      "catSport": "🏋️ Mazoezi",
+      "catReview": "📖 Usomaji",
+      "catExam": "💻 Kazi",
+      "sportSetsTitle": "🏋️ Seti za mazoezi na mapumziko",
+      "readTrackerTitle": "📖 Maendeleo ya kipindi cha kusoma"
+    },
+    "core.settings": {
+      "btnSave": "Hifadhi na utumie",
+      "btnCancel": "Ghairi",
+      "pillCloud": "Nakala rudufu ya kuunda mwenyewe",
+      "pillSound": "Jaribu sauti",
+      "pillShare": "Shiriki programu",
+      "pillSecure": "Data zilizohifadhiwa kwenye kifaa",
+      "orbCloud": "Hamisha nakala rudufu"
+    }
+  }
+}

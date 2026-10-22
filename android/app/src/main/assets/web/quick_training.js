@@ -112,15 +112,25 @@ function validQuickSnapshot(raw) {
     exercises:Array.isArray(raw.exercises)?raw.exercises.filter(x=>typeof x==='string').slice(0,24).map(x=>x.slice(0,70)):[]
   };
 }
+function quickSaveError() {
+  const message=L().saveFailed;
+  return message || (cfg.lang==='ar'
+    ? 'تعذّر حفظ إعدادات التدريب. حاول مرة أخرى.'
+    : 'Could not save training settings. Try again.');
+}
 function saveQuickConfig() {
-  saveFortressData(QUICK_CFG_KEY,{
-    exercises:quickExercises.slice(0,24),
-    domain:quickPresetDomain,
-    sets:document.getElementById('qtSets').value,
-    work:document.getElementById('qtWork').value,
-    rest:document.getElementById('qtRest').value,
-    skip:document.getElementById('qtSkipLast').checked
-  });
+  try {
+    return saveFortressData(QUICK_CFG_KEY,{
+      exercises:quickExercises.slice(0,24),
+      domain:quickPresetDomain,
+      sets:document.getElementById('qtSets').value,
+      work:document.getElementById('qtWork').value,
+      rest:document.getElementById('qtRest').value,
+      skip:document.getElementById('qtSkipLast').checked
+    })===true;
+  } catch (_) {
+    return false;
+  }
 }
 function initQuickTraining() {
   const saved=loadFortressData(QUICK_CFG_KEY,null);
@@ -135,7 +145,9 @@ function initQuickTraining() {
     if(typeof saved.skip==='boolean')document.getElementById('qtSkipLast').checked=saved.skip;
   }
   for(const id of ['qtSets','qtWork','qtRest','qtSkipLast'])
-    document.getElementById(id).addEventListener('change',saveQuickConfig);
+    document.getElementById(id).addEventListener('change',()=>{
+      if(!saveQuickConfig())showToast(quickSaveError());
+    });
   quickL10n();
 }
 function renderQuickTraining() {
@@ -171,12 +183,25 @@ function addQuickExercise() {
   const name=String(el.value||'').trim().slice(0,70);
   if(!name || quickExercises.length>=24)return;
   quickExercises.push(name);
+  if(!saveQuickConfig()){
+    quickExercises.pop();
+    showToast(quickSaveError());
+    return false;
+  }
   el.value='';
-  saveQuickConfig();
   renderQuickTraining();
+  return true;
 }
 function removeQuickExercise(index) {
-  quickExercises.splice(index,1);saveQuickConfig();renderQuickTraining();
+  if(!Number.isInteger(index)||index<0||index>=quickExercises.length)return false;
+  const removed=quickExercises.splice(index,1)[0];
+  if(!saveQuickConfig()){
+    quickExercises.splice(index,0,removed);
+    showToast(quickSaveError());
+    return false;
+  }
+  renderQuickTraining();
+  return true;
 }
 function applyQuickTrainingPreset(id) {
   if(quickTraining?.active) {
@@ -188,101 +213,89 @@ function applyQuickTrainingPreset(id) {
     reading:[3,1200,300,'read'],
     work:[2,3000,600,'work']
   };
-  const p=presets[id];if(!p)return;
+  const p=presets[id];if(!p)return false;
+  const fields=['qtSets','qtWork','qtRest'];
+  const previous=fields.map(key=>document.getElementById(key).value);
+  const previousDomain=quickPresetDomain;
   document.getElementById('qtSets').value=String(p[0]);
   document.getElementById('qtWork').value=timeString(p[1]);
   document.getElementById('qtRest').value=timeString(p[2]);
-  quickPresetDomain=p[3];saveQuickConfig();
+  quickPresetDomain=p[3];
+  if(!saveQuickConfig()){
+    fields.forEach((key,index)=>{document.getElementById(key).value=previous[index];});
+    quickPresetDomain=previousDomain;
+    showToast(quickSaveError());
+    return false;
+  }
+  return true;
 }
 function startQuickTraining() {
-  if(quickTraining?.active)return;
+  if(quickTraining?.active)return false;
   const sets=Number(toWest(document.getElementById('qtSets').value.trim()));
   const workSeconds=parseQuickTime(document.getElementById('qtWork').value,false,14400);
   const restSeconds=parseQuickTime(document.getElementById('qtRest').value,true,3600);
   if(!Number.isInteger(sets) || sets<1 || sets>99 || workSeconds===null || restSeconds===null){
-    showToast(quickText('invalidDuration'));return;
+    showToast(quickText('invalidDuration'));return false;
   }
   if(timerRunning || timerSessionId!==null) {
-    if(!window.confirm(quickText('replacePrompt')))return;
+    if(!window.confirm(quickText('replacePrompt')))return false;
   }
-  if(timerRunning)toggleTimerPlay();
-  quickTraining={
+  const candidate={
     active:true,sets,workSeconds,restSeconds,currentSet:0,phase:'work',
     skipLastRest:document.getElementById('qtSkipLast').checked,
     exercises:quickExercises.slice(),domain:quickPresetDomain,
     taskId:focusWorkflowGetLinkedTask()?.id ?? null
   };
-  cfg.domain=quickPresetDomain;
-  saveFortressData('zen_fortress_cfg_v21',cfg);
-  renderDomainState();
-  quickInternalChange=true;
-  selectTimerMode(workSeconds/60,'focus',document.getElementById('modeFocusBtn'));
-  quickInternalChange=false;
-  saveQuickConfig();
-  toggleTimerPlay();
-  renderQuickTraining();
-  showToast(quickText('started'));
+  if(!transitionActivityTimer({seconds:workSeconds,training:candidate,domain:quickPresetDomain,running:true}))
+    return false;
+  const preferencesSaved=saveQuickConfig();
+  showToast(preferencesSaved?quickText('started'):quickSaveError());
   quickWorkflowEvent('started',{domain:quickTraining.domain,taskId:quickTraining.taskId,
     sets:quickTraining.sets,workSeconds:quickTraining.workSeconds,restSeconds:quickTraining.restSeconds});
+  return true;
 }
 function stopQuickTrainingInternal() {
-  quickTraining=null;
-  if(timerRunning)toggleTimerPlay();
-  selectTimerMode(getDomainFocusMinutes(),'focus',document.getElementById('modeFocusBtn'));
-  renderQuickTraining();
+  return transitionActivityTimer({seconds:getDomainFocusMinutes() * 60});
 }
 function cancelQuickTraining(skipPrompt=false) {
-  if(!quickTraining?.active)return;
-  if(!skipPrompt&&!window.confirm(quickText('cancelPrompt')))return;
+  if(!quickTraining?.active)return false;
+  if(!skipPrompt&&!window.confirm(quickText('cancelPrompt')))return false;
   const ended=quickTraining;
-  quickTraining=null;
-  stopQuickTrainingInternal();
+  if(!stopQuickTrainingInternal())return false;
   quickWorkflowEvent('cancelled',{domain:ended.domain,taskId:ended.taskId??null,
     completedSets:ended.currentSet});
+  return true;
 }
 function skipQuickTrainingStep() {
-  if(!quickTraining?.active)return;
-  if(timerRunning)toggleTimerPlay();
-  // A skipped work step never earns focus credit.
-  advanceQuickTrainingStep();
+  if(!quickTraining?.active)return false;
+  // A skipped work step never earns focus credit or commits an intermediate Pause.
+  return advanceQuickTrainingStep();
 }
 function completeQuickTraining() {
   const finished=quickTraining;
-  const domain = quickTraining?.domain || cfg.domain || 'study';
-  quickTraining = null;
-  quickInternalChange = true;
-  selectTimerMode(getDomainFocusMinutes(domain),'focus',document.getElementById('modeFocusBtn'));
-  quickInternalChange = false;
-  renderQuickTraining();
+  if(!finished?.active)return false;
+  const domain=finished.domain || cfg.domain || 'study';
+  if(!transitionActivityTimer({seconds:getDomainFocusMinutes(domain) * 60}))return false;
   showToast(quickText('finished'));
-  if(finished)quickWorkflowEvent('completed',{domain,taskId:finished.taskId??null,sets:finished.sets});
+  quickWorkflowEvent('completed',{domain,taskId:finished.taskId??null,sets:finished.sets});
+  return true;
 }
 function advanceQuickTrainingStep() {
-  const q=quickTraining;
-  if(!q?.active)return false;
+  if(!quickTraining?.active)return false;
+  const q={...quickTraining};
   if(q.phase==='work') {
     if(q.restSeconds>0 && (q.currentSet<q.sets-1 || !q.skipLastRest)) {
       q.phase='rest';
     } else if(q.currentSet<q.sets-1) {
       q.currentSet++;q.phase='work';
-    } else {
-      completeQuickTraining();
-      return false;
-    }
+    } else return completeQuickTraining();
   } else {
-    if(q.currentSet===q.sets-1){
-      completeQuickTraining();
-      return false;
-    }
+    if(q.currentSet===q.sets-1)return completeQuickTraining();
     q.currentSet++;q.phase='work';
   }
-  quickInternalChange=true;
-  const phase=q.phase==='work'?'focus':'short';
-  selectTimerMode((q.phase==='work'?q.workSeconds:q.restSeconds)/60,phase,
-    document.getElementById(q.phase==='work'?'modeFocusBtn':'modeShortBtn'));
-  quickInternalChange=false;
-  toggleTimerPlay();
-  renderQuickTraining();
+  const mode=q.phase==='work'?'focus':'short';
+  const seconds=q.phase==='work'?q.workSeconds:q.restSeconds;
+  if(!transitionActivityTimer({seconds,mode,training:q,running:true}))return false;
   quickWorkflowEvent('phase',{domain:q.domain,taskId:q.taskId??null,
     phase:q.phase,set:q.currentSet+1,sets:q.sets});
   return true;
@@ -363,20 +376,20 @@ function renderTodayPlan() {
     check.textContent = t.done ? '✓' : '○';
     check.setAttribute('aria-pressed', String(Boolean(t.done)));
     check.setAttribute('aria-label',
-      (cfg.lang === 'ar' ? 'تغيير إنجاز المهمة: ' : 'Toggle completion: ') + toWest(t.title || ''));
+      (cfg.lang === 'ar' ? 'تغيير إنجاز المهمة: ' : 'Toggle completion: ') + (t.title || ''));
     check.onclick = () => toggleTaskDone(t.id);
 
     const focus = document.createElement('button');
     focus.type = 'button';
     focus.className = 'today-plan-link';
     focus.setAttribute('aria-label',
-      (cfg.lang === 'ar' ? 'التركيز على: ' : 'Focus on: ') + toWest(t.title || ''));
+      (cfg.lang === 'ar' ? 'التركيز على: ' : 'Focus on: ') + (t.title || ''));
     const name = document.createElement('span');
     name.className = 'today-plan-task-name';
-    name.textContent = toWest(t.title || '');
+    name.textContent = t.title || '';
     const details = document.createElement('small');
     details.className = 'today-plan-task-detail';
-    details.textContent = toWest(getCatLabel(t.catKey) + (t.time ? ' · ' + t.time : ''));
+    details.textContent = getCatLabel(t.catKey) + (t.time ? ' · ' + t.time : '');
     focus.appendChild(name);
     focus.appendChild(details);
     focus.onclick = () => focusOnTask(t.id);

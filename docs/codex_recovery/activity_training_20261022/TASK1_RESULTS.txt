@@ -1,0 +1,67 @@
+BASE: 9fa7a8239d19f902a2207060d15c2c2b6b54e406
+RED summary
+✖ P0 domain running=false training=false active_timer throw (16.528865ms)
+✖ P0 domain running=false training=false active_timer false (11.804263ms)
+✔ P0 domain running=false training=false cfg_v21 throw (14.198221ms)
+✔ P0 domain running=false training=false cfg_v21 false (11.365659ms)
+✖ P0 domain running=false training=true active_timer throw (20.663562ms)
+✖ P0 domain running=false training=true active_timer false (10.702705ms)
+✔ P0 domain running=false training=true cfg_v21 throw (9.906589ms)
+✔ P0 domain running=false training=true cfg_v21 false (10.376057ms)
+✖ P0 domain running=true training=false active_timer throw (11.865582ms)
+✖ P0 domain running=true training=false active_timer false (8.880884ms)
+✔ P0 domain running=true training=false cfg_v21 throw (12.694336ms)
+✔ P0 domain running=true training=false cfg_v21 false (8.50142ms)
+✖ P0 domain running=true training=true active_timer throw (9.494671ms)
+✖ P0 domain running=true training=true active_timer false (8.694427ms)
+✔ P0 domain running=true training=true cfg_v21 throw (19.325048ms)
+✔ P0 domain running=true training=true cfg_v21 false (15.116901ms)
+✔ P0 domain Cancel preserves packets, identity, training and native work (10.517544ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 9
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3735.163843
+
+
+GREEN
+✔ P0 domain running=false training=false active_timer throw (18.324106ms)
+✔ P0 domain running=false training=false active_timer false (2.776235ms)
+✔ P0 domain running=false training=false cfg_v21 throw (2.814393ms)
+✔ P0 domain running=false training=false cfg_v21 false (2.331293ms)
+✔ P0 domain running=false training=true active_timer throw (5.248933ms)
+✔ P0 domain running=false training=true active_timer false (18.853033ms)
+✔ P0 domain running=false training=true cfg_v21 throw (12.537763ms)
+✔ P0 domain running=false training=true cfg_v21 false (5.332196ms)
+✔ P0 domain running=true training=false active_timer throw (5.343539ms)
+✔ P0 domain running=true training=false active_timer false (4.301509ms)
+✔ P0 domain running=true training=false cfg_v21 throw (2.772975ms)
+✔ P0 domain running=true training=false cfg_v21 false (2.772994ms)
+✔ P0 domain running=true training=true active_timer throw (4.078401ms)
+✔ P0 domain running=true training=true active_timer false (9.577312ms)
+✔ P0 domain running=true training=true cfg_v21 throw (7.772857ms)
+✔ P0 domain running=true training=true cfg_v21 false (3.422625ms)
+✔ P0 domain Cancel preserves packets, identity, training and native work (2.902664ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 645.957923
+
+NEIGHBORS
+✔ P0 mode/custom successful custom title survives real snapshot reload (3.418553ms)
+ℹ tests 82
+ℹ suites 0
+ℹ pass 82
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 785.04992
+Smoke, app.js syntax, git diff --check: PASS

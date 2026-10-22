@@ -1,0 +1,119 @@
+BASE SHA: 8febb55ceca5623529060d091e506ff02bc3c799
+RELEASE_APPROVED=NO
+
+RED (before production edit; unmodified summary excerpt)
+✖ P0 mode/custom mode running=false training=false throw (32.42003ms)
+✖ P0 mode/custom mode running=false training=false false (7.332297ms)
+✖ P0 mode/custom mode running=false training=true throw (8.240722ms)
+✖ P0 mode/custom mode running=false training=true false (4.754ms)
+✖ P0 mode/custom mode running=true training=false throw (11.454087ms)
+✖ P0 mode/custom mode running=true training=false false (8.957445ms)
+✖ P0 mode/custom mode running=true training=true throw (7.254678ms)
+✖ P0 mode/custom mode running=true training=true false (17.145105ms)
+✖ P0 mode/custom custom running=false training=false throw (12.505712ms)
+✖ P0 mode/custom custom running=false training=false false (123.794688ms)
+✖ P0 mode/custom custom running=false training=true throw (19.70788ms)
+✖ P0 mode/custom custom running=false training=true false (5.340286ms)
+✖ P0 mode/custom custom running=true training=false throw (12.961562ms)
+✖ P0 mode/custom custom running=true training=false false (7.257527ms)
+✖ P0 mode/custom custom running=true training=true throw (5.932522ms)
+✖ P0 mode/custom custom running=true training=true false (4.12529ms)
+✔ P0 mode/custom Cancel preserves all state (custom=false) (8.652302ms)
+✔ P0 mode/custom Cancel preserves all state (custom=true) (3.506012ms)
+✖ P0 mode/custom direct training Cancel propagates false through user wrapper (5.297648ms)
+✖ P0 mode/custom home shortcut rejection preserves training running=false (4.521175ms)
+✖ P0 mode/custom home shortcut rejection preserves training running=true (9.335641ms)
+✖ P0 mode/custom Skip and internal rest preserve valid training and shortcuts (5.321086ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 2
+ℹ fail 20
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 892.182819
+
+
+LABEL RED (additional test against original PR177 source; fixed source restored afterward)
+✖ P0 mode/custom successful custom title survives real snapshot reload (12.196895ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 269.510986
+
+✖ failing tests:
+
+test at tests/integration_recovery/timer_credit_durability.test.cjs:283:1
+✖ P0 mode/custom successful custom title survives real snapshot reload (12.196895ms)
+  AssertionError [ERR_ASSERTION]: The committed snapshot must already contain the new title
+  + actual - expected
+  
+  + 'Old label'
+  - 'New custom title (47m)'
+  
+      at TestContext.<anonymous> (/workspace/scratch/d8443f1564ed/repo/tests/integration_recovery/timer_credit_durability.test.cjs:286:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Old label',
+    expected: 'New custom title (47m)',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+GREEN (final focused regression cases)
+✔ P0 mode/custom mode running=false training=false throw (25.481615ms)
+✔ P0 mode/custom mode running=false training=false false (7.233753ms)
+✔ P0 mode/custom mode running=false training=true throw (15.505974ms)
+✔ P0 mode/custom mode running=false training=true false (5.332393ms)
+✔ P0 mode/custom mode running=true training=false throw (6.782081ms)
+✔ P0 mode/custom mode running=true training=false false (6.847518ms)
+✔ P0 mode/custom mode running=true training=true throw (7.503041ms)
+✔ P0 mode/custom mode running=true training=true false (6.359696ms)
+✔ P0 mode/custom custom running=false training=false throw (6.04201ms)
+✔ P0 mode/custom custom running=false training=false false (8.105919ms)
+✔ P0 mode/custom custom running=false training=true throw (5.958958ms)
+✔ P0 mode/custom custom running=false training=true false (12.8512ms)
+✔ P0 mode/custom custom running=true training=false throw (4.588964ms)
+✔ P0 mode/custom custom running=true training=false false (6.979559ms)
+✔ P0 mode/custom custom running=true training=true throw (6.62483ms)
+✔ P0 mode/custom custom running=true training=true false (8.195663ms)
+✔ P0 mode/custom Cancel preserves all state (custom=false) (4.261701ms)
+✔ P0 mode/custom Cancel preserves all state (custom=true) (3.870583ms)
+✔ P0 mode/custom direct training Cancel propagates false through user wrapper (4.683653ms)
+✔ P0 mode/custom home shortcut rejection preserves training running=false (4.743894ms)
+✔ P0 mode/custom home shortcut rejection preserves training running=true (4.253854ms)
+✔ P0 mode/custom Skip and internal rest preserve valid training and shortcuts (12.120713ms)
+✔ P0 mode/custom successful custom title survives real snapshot reload (3.005589ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 595.976813
+
+RELATED SUITES (unmodified final TAP summary excerpt)
+  ...
+1..87
+# tests 87
+# suites 0
+# pass 87
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 561.373228
+
+STARTUP SMOKE
+PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.
+
+JS syntax: exit 0. git diff --check: exit 0.

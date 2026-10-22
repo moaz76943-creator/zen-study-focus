@@ -1,0 +1,68 @@
+RED on8b0a8ba
+✖ P0 normal completion focus terminal false (17.848888ms)
+✖ P0 normal completion focus terminal throw (5.483672ms)
+✖ P0 normal completion focus next-mode false (5.339105ms)
+✖ P0 normal completion focus next-mode throw (5.55582ms)
+✖ P0 normal completion custom terminal false (7.863845ms)
+✖ P0 normal completion custom terminal throw (6.487803ms)
+✖ P0 normal completion custom next-mode false (5.175892ms)
+✖ P0 normal completion custom next-mode throw (7.870329ms)
+✖ P0 normal completion short terminal false (4.165381ms)
+✖ P0 normal completion short terminal throw (3.91638ms)
+✖ P0 normal completion short next-mode false (5.345143ms)
+✖ P0 normal completion short next-mode throw (4.152522ms)
+✖ P0 normal completion long terminal false (3.328739ms)
+✖ P0 normal completion long terminal throw (5.459598ms)
+✖ P0 normal completion long next-mode false (4.63277ms)
+✖ P0 normal completion long next-mode throw (5.268186ms)
+✖ P0 normal completion rejects false next-mode result without success chime (7.505947ms)
+✖ P0 normal completion successful next-mode save precedes completion chime (5.453561ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 0
+ℹ fail 18
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 483.494076
+
+
+GREEN
+✔ P0 normal completion focus terminal false (19.01422ms)
+✔ P0 normal completion focus terminal throw (15.901574ms)
+✔ P0 normal completion focus next-mode false (4.711892ms)
+✔ P0 normal completion focus next-mode throw (20.340494ms)
+✔ P0 normal completion custom terminal false (154.217781ms)
+✔ P0 normal completion custom terminal throw (6.421973ms)
+✔ P0 normal completion custom next-mode false (4.987266ms)
+✔ P0 normal completion custom next-mode throw (6.68236ms)
+✔ P0 normal completion short terminal false (3.715007ms)
+✔ P0 normal completion short terminal throw (3.954537ms)
+✔ P0 normal completion short next-mode false (5.400062ms)
+✔ P0 normal completion short next-mode throw (3.735915ms)
+✔ P0 normal completion long terminal false (5.374404ms)
+✔ P0 normal completion long terminal throw (10.754865ms)
+✔ P0 normal completion long next-mode false (4.511753ms)
+✔ P0 normal completion long next-mode throw (2.892629ms)
+✔ P0 normal completion rejects false next-mode result without success chime (2.360604ms)
+✔ P0 normal completion successful next-mode save precedes completion chime (3.906843ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 621.134783
+
+FOCUSED
+✔ TRACK05 active timer still updates countdown from epoch timestamp (4.002754ms)
+ℹ tests 132
+ℹ suites 0
+ℹ pass 132
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1269.089018
+Smoke/syntax/diff PASS

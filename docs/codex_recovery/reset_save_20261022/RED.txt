@@ -1,0 +1,132 @@
+✖ P0 Reset paused throw preserves session and retries atomically (21.112423ms)
+✖ P0 Reset paused false preserves session and retries atomically (6.549508ms)
+✖ P0 Reset running throw preserves session and retries atomically (14.796152ms)
+✖ P0 Reset running false preserves session and retries atomically (4.158521ms)
+✔ P0 Reset cancellation and quick-training delegation preserve existing behavior (3.833079ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 1
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 399.489438
+
+✖ failing tests:
+
+test at tests/integration_recovery/timer_credit_durability.test.cjs:136:74
+✖ P0 Reset paused throw preserves session and retries atomically (21.112423ms)
+  AssertionError [ERR_ASSERTION]: Rejected Reset retains every timer/session field
+  + actual - expected
+  
+    {
+      chimeCtx: null,
+      currentTimerModeKey: 'focus',
+      customSessionLabel: 'Personal label ۱۲',
+  +   focusSessionTaskId: null,
+  -   focusSessionTaskId: 7,
+      quickTraining: null,
+  +   timerActiveMs: 0,
+  -   timerActiveMs: 30000,
+      timerInterval: null,
+  +   timerLeft: 120,
+  -   timerLeft: 90,
+      timerResumeMs: null,
+      timerRunning: false,
+  +   timerSessionId: null,
+  -   timerSessionId: 'stable-session',
+      timerTargetTime: null,
+      timerTotal: 120
+    }
+  
+      at TestContext.<anonymous> (/workspace/scratch/d8443f1564ed/repo/tests/integration_recovery/timer_credit_durability.test.cjs:154:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { timerRunning: false, timerLeft: 120, timerTotal: 120, timerInterval: null, timerTargetTime: null, timerSessionId: null, focusSessionTaskId: null, timerActiveMs: 0, timerResumeMs: null, currentTimerModeKey: 'focus', customSessionLabel: 'Personal label ۱۲', quickTraining: null, chimeCtx: null },
+    expected: { timerRunning: false, timerLeft: 90, timerTotal: 120, timerInterval: null, timerTargetTime: null, timerSessionId: 'stable-session', focusSessionTaskId: 7, timerActiveMs: 30000, timerResumeMs: null, currentTimerModeKey: 'focus', customSessionLabel: 'Personal label ۱۲', quickTraining: null, chimeCtx: null },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration_recovery/timer_credit_durability.test.cjs:136:74
+✖ P0 Reset paused false preserves session and retries atomically (6.549508ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (/workspace/scratch/d8443f1564ed/repo/tests/integration_recovery/timer_credit_durability.test.cjs:153:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /QuotaExceededError|TIMER_SAVE_NOT_ACKNOWLEDGED/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests/integration_recovery/timer_credit_durability.test.cjs:136:74
+✖ P0 Reset running throw preserves session and retries atomically (14.796152ms)
+  AssertionError [ERR_ASSERTION]: Rejected Reset retains every timer/session field
+  + actual - expected
+  
+    {
+      chimeCtx: null,
+      currentTimerModeKey: 'focus',
+      customSessionLabel: 'Personal label ۱۲',
+  +   focusSessionTaskId: null,
+  -   focusSessionTaskId: 7,
+      quickTraining: null,
+  +   timerActiveMs: 0,
+  +   timerInterval: null,
+  +   timerLeft: 120,
+  +   timerResumeMs: null,
+  +   timerRunning: false,
+  +   timerSessionId: null,
+  -   timerActiveMs: 30000,
+  -   timerInterval: 17,
+  -   timerLeft: 90,
+  -   timerResumeMs: 100000,
+  -   timerRunning: true,
+  -   timerSessionId: 'stable-session',
+      timerTargetTime: 200000,
+      timerTotal: 120
+    }
+  
+      at TestContext.<anonymous> (/workspace/scratch/d8443f1564ed/repo/tests/integration_recovery/timer_credit_durability.test.cjs:154:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { timerRunning: false, timerLeft: 120, timerTotal: 120, timerInterval: null, timerTargetTime: 200000, timerSessionId: null, focusSessionTaskId: null, timerActiveMs: 0, timerResumeMs: null, currentTimerModeKey: 'focus', customSessionLabel: 'Personal label ۱۲', quickTraining: null, chimeCtx: null },
+    expected: { timerRunning: true, timerLeft: 90, timerTotal: 120, timerInterval: 17, timerTargetTime: 200000, timerSessionId: 'stable-session', focusSessionTaskId: 7, timerActiveMs: 30000, timerResumeMs: 100000, currentTimerModeKey: 'focus', customSessionLabel: 'Personal label ۱۲', quickTraining: null, chimeCtx: null },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration_recovery/timer_credit_durability.test.cjs:136:74
+✖ P0 Reset running false preserves session and retries atomically (4.158521ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (/workspace/scratch/d8443f1564ed/repo/tests/integration_recovery/timer_credit_durability.test.cjs:153:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /QuotaExceededError|TIMER_SAVE_NOT_ACKNOWLEDGED/,
+    operator: 'throws',
+    diff: 'simple'
+  }

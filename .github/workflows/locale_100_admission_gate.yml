@@ -1,0 +1,149 @@
+name: Deep Focus 100 Locale Admission Safety
+on:
+  pull_request:
+    paths:
+      - 'tools/localization_100/**'
+      - 'tools/language_review/**'
+      - 'tests/language_review/**'
+      - 'tests/localization_20/**'
+      - 'tests/df4_browser/**'
+      - 'tests/track07_functional/**'
+      - 'tests/validate_locales.cjs'
+      - 'tests/smoke_app.cjs'
+      - 'android/app/src/main/java/**/*.java'
+      - 'android/app/src/main/res/**'
+      - 'android/app/src/main/AndroidManifest.xml'
+      - 'android/app/src/main/assets/web/**'
+      - '.github/workflows/locale_100_admission_gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: locale-100-admission-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  reviewed-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Admission safety (not language certification)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/exact-sha.txt
+          node --check tools/localization_100/guard.cjs
+          node -e "console.log('NATIVE_INVENTORY_SHA256='+require('./tools/localization_100/native_copy.cjs').report().inventorySha256)"
+          node --test tests/localization_20/locale100_*.test.cjs | tee evidence/unit.tap
+          node tools/localization_100/guard.cjs --check | tee evidence/admission.json
+          node tools/localization_100/drafts.cjs --report | tee evidence/candidate-drafts.json
+          node tools/localization_100/coverage.cjs --report > evidence/full-100-locale-coverage.json
+          # Key presence and review drafts never count as verified linguistic approvals.
+          node -e "const r=require('./tools/localization_100/coverage.cjs').report();console.log('locale,phase,sourceKeysPresent,webDrafts,nativeDrafts,verifiedApprovedKeys,verifiedApprovedNative,approvalEvidence');for(const x of r.languages)console.log([x.code,x.phase,x.explicitExistingKeys,x.draftCount,x.nativeDraftCount,x.verifiedApprovedKeys,x.verifiedNativeApprovedStrings,x.keyApprovalEvidence].join(','));" | tee evidence/per-language-approval-matrix.csv
+          node tools/localization_100/native_copy.cjs --report > evidence/native-android-strings-needing-localization.json
+          node tools/localization_100/native_drafts.cjs --report > evidence/native-android-language-candidates.json
+          node tools/localization_100/review_queue.cjs --out evidence/80-language-review-queue > evidence/reviewer-queue-index.json
+          node tools/localization_100/drafts.cjs --worksheet sw > evidence/sw-translator-worksheet.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: locale100-admission-source
+          path: evidence/
+          retention-days: 3
+  source-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact-head current 20-locale and existing feature regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/exact-sha.txt
+          node tests/validate_locales.cjs | tee evidence/legacy-20-locales.txt
+          node tools/language_review/audit.cjs --out evidence/actual-20-locale-coverage
+          node -e "const r=require('./tools/language_review/audit.cjs').audit();console.log(JSON.stringify({missingPairs:r.missing.length,englishIdenticalCandidates:r.englishIdentical.length,unmarkedStaticCandidates:r.staticCandidates.length}));" | tee evidence/translation-gaps.json
+          node tests/smoke_app.cjs | tee evidence/smoke.txt
+          node tests/android_e2e_recovery/inventory.cjs > evidence/control-inventory.json
+          mapfile -t suites < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          node --test --test-reporter=tap "${suites[@]}" | tee evidence/node.tap
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee evidence/python.txt
+          printf 'These source checks do not certify all 100 translations, every Android button, native SAF, TalkBack or media rights.\n' > evidence/LIMITS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: locale100-existing-app-source-regressions
+          path: evidence/
+          retention-days: 3
+  browser-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test-only Chromium runner
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Start offline asset server
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/locale100-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Actual browser analytics controls and existing 20-language UI
+        shell: bash
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_ANALYTICS_EVIDENCE: ${{ runner.temp }}/locale100-browser
+          DF_LOCALE_EVIDENCE: ${{ runner.temp }}/locale100-browser
+          DF_BUTTON_EVIDENCE: ${{ runner.temp }}/locale100-browser
+        run: |
+          set -euo pipefail
+          node tests/track07_functional/timer_mode_buttons_browser.cjs
+          node tests/track07_functional/analytics_all_controls_browser.cjs
+          node tests/track07_functional/analytics_screen_chromium.cjs
+          node tests/track07_functional/live_20_language_switch_navigation.cjs
+          node tests/localization_20/locale100_controls_inventory_browser.cjs
+          node tests/df4_browser/nav_reachability.cjs
+          mkdir -p "$RUNNER_TEMP/locale100-browser/flows"
+          DF_COMPLETION_EVIDENCE="$RUNNER_TEMP/locale100-browser/flows" node tests/df4_browser/completion.cjs
+          DF_COMPLETION_EVIDENCE="$RUNNER_TEMP/locale100-browser/flows" node tests/df4_browser/note_modal_reachability.cjs
+          DF4_TEST_URL=http://127.0.0.1:8770/index.html DF4_EVIDENCE_DIR="$RUNNER_TEMP/locale100-browser/flows" node tests/df4_browser/picker.cjs
+          DF_LAYOUT_REPORT="$RUNNER_TEMP/locale100-browser/flows/layout.json" node tests/df4_browser/layout.cjs
+      - name: Exact SHA and honest test limits
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/locale100-browser"
+          git rev-parse HEAD > "$RUNNER_TEMP/locale100-browser/SOURCE_SHA.txt"
+          printf 'Only 20 original UI locales currently selectable; 80 new languages not translated or active. Not real Android, real SAF or all 230 button semantic outcomes. RELEASE_APPROVED=NO.\n' > "$RUNNER_TEMP/locale100-browser/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: locale100-existing-app-browser-controls
+          path: ${{ runner.temp }}/locale100-browser/
+          retention-days: 3
+          if-no-files-found: warn
