@@ -1212,19 +1212,34 @@ function finalizeTimerSession(shouldChime) {
     // The next interval or a fresh focus timer was already saved and selected.
     return true;
   }
-  storeTimerSession();
+  try {
+    if (storeTimerSession() !== true) throw new Error('TIMER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed);
+    updateTimerDisplay();
+    document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    return false;
+  }
   updateTimerDisplay();
   document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-  if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent, true,completedAlertId,completedAlertPhase);
-  // Only real completed focus sessions advance the break cycle.
-  if (['focus','custom'].includes(currentTimerModeKey)) {
-    const longRest = cfg.focusCycleCount === 0;
-    const mode = longRest ? 'long' : 'short';
-    selectTimerMode(longRest ? cfg.longMin : cfg.shortMin, mode,
-      document.getElementById(longRest ? 'modeLongBtn' : 'modeShortBtn'));
-  } else {
-    selectTimerMode(getDomainFocusMinutes(), 'focus', document.getElementById('modeFocusBtn'));
+  // Retain the credited terminal ID until the next mode has actually saved.
+  try {
+    let selected;
+    if (['focus','custom'].includes(currentTimerModeKey)) {
+      const longRest = cfg.focusCycleCount === 0;
+      const mode = longRest ? 'long' : 'short';
+      selected = selectTimerMode(longRest ? cfg.longMin : cfg.shortMin, mode,
+        document.getElementById(longRest ? 'modeLongBtn' : 'modeShortBtn'));
+    } else {
+      selected = selectTimerMode(getDomainFocusMinutes(), 'focus', document.getElementById('modeFocusBtn'));
+    }
+    if (selected !== true) { showToast(L().saveFailed); return false; }
+  } catch (_) {
+    // selectTimerMode already restored the terminal session and reported save failure.
+    return false;
   }
+  if (shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent, true,completedAlertId,completedAlertPhase);
+  return true;
 }
 function runTimerTick() {
   // An already queued callback must not complete a paused, reset or finished session.
