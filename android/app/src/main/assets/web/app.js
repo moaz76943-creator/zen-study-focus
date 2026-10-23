@@ -1,3 +1,47 @@
+
+/* ========================================================
+   DEEP FOCUS — LUXURY HAPTIC & PEACEFUL CHIME ENGINE (M184)
+   ======================================================== */
+function triggerHaptic(type) {
+  if (!navigator.vibrate) return;
+  try {
+    if (type === 'click') navigator.vibrate(10);
+    else if (type === 'step') navigator.vibrate(16);
+    else if (type === 'start') navigator.vibrate(28);
+    else if (type === 'complete') navigator.vibrate([35, 60, 35, 60, 80]);
+  } catch(e) {}
+}
+
+function playPeacefulChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    // نغمة جرس التأمل الهادئة (528 Hz Harmonic)
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(528, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(264, ctx.currentTime + 3.2);
+
+    gain.gain.setValueAtTime(0.35, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 3.2);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 3.2);
+    triggerHaptic('complete');
+  } catch(e) {}
+}
+
+window.triggerHaptic = triggerHaptic;
+window.playPeacefulChime = playPeacefulChime;
+
 if (typeof window !== "undefined" && window.DF22Preflight && !window.DF22Preflight.allowApp(localStorage, document)) {
   throw new Error("Deep Focus startup suspended to protect v21 user data");
 }
@@ -2588,3 +2632,12 @@ document.body.classList.add('timer-home');
 document.getElementById('heroHeader').style.setProperty('--page-ambient', TAB_GRADS['sec-timer']);
 initQuickTraining();
 renderTodayPlan();
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('button, .btn, [role="button"], input[type="range"]').forEach(el => {
+    el.addEventListener('click', () => {
+      if (window.triggerHaptic) window.triggerHaptic('click');
+    });
+  });
+});
