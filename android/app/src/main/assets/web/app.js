@@ -1,14 +1,10 @@
 
 /* ========================================================
    DEEP FOCUS — SMOOTH ZERO-POPUP ACTIVITY SWITCHER (M190)
+   Safe non-destructive UI transitions remain unchanged.
+   Destructive changes must use the native Android/browser confirmation,
+   including its Cancel result. Never override window.confirm globally.
    ======================================================== */
-window.confirm = function(msg) {
-  // تجاوز رسائل التحذير عند تغيير النشاط أو الجلسة السريعة
-  if (msg && (msg.includes('تغيير النشاط') || msg.includes('الجلسة الحالية') || msg.includes('ending session'))) {
-    return true; // الموافقة الفورية السلسة دون إظهار نافذة المتصفح
-  }
-  return true;
-};
 
 
 /* ========================================================
