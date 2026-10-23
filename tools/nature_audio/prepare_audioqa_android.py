@@ -20,6 +20,23 @@ MANIFEST = pathlib.Path("android/app/src/main/AndroidManifest.xml")
 GRADLE = pathlib.Path("android/app/build.gradle")
 SOURCE_MANIFEST = pathlib.Path("tools/nature_audio/commons_intake.json")
 QUARANTINE = pathlib.Path("audio_candidates/commons_intake")
+# Exact, review-only branch allowlist. Never approve local/dev or release packaging.
+AUDIOQA_ALLOWED_BRANCHES = frozenset({
+    "fix/deep-focus-nature-catalog-20-20261020",
+    "feature/track07-04-authentic-nature-20-20261020",
+    "fix/track07-04-audio-acceptance-20261020",
+    "audit/track06-audio-acceptance-matrix-20261021",
+})
+AUDIOQA_TWENTY_ONLY_BRANCHES = frozenset({
+    "feature/track07-04-authentic-nature-20-20261020",
+    "fix/track07-04-audio-acceptance-20261020",
+    "audit/track06-audio-acceptance-matrix-20261021",
+})
+
+def audioqa_build_permitted(env):
+    return (env.get("GITHUB_ACTIONS") == "true"
+        and env.get("AUDIO_QA_BUILD") == "1"
+        and env.get("GITHUB_REF_NAME") in AUDIOQA_ALLOWED_BRANCHES)
 
 def replace_exact(source, old, new, description):
     if source.count(old) != 1:
@@ -131,17 +148,11 @@ def prepare(root, selected_items=None):
           "original pinned recordings; real application assets excluded")
 
 if __name__ == "__main__":
-    if not (os.environ.get("GITHUB_ACTIONS") == "true"
-        and os.environ.get("AUDIO_QA_BUILD") == "1"
-        and os.environ.get("GITHUB_REF_NAME") in {
-            "fix/deep-focus-nature-catalog-20-20261020",
-            "feature/track07-04-authentic-nature-20-20261020",
-            "fix/track07-04-audio-acceptance-20261020"
-        }):
+    if not audioqa_build_permitted(os.environ):
         raise SystemExit("SAFE_GUARD: Audio QA packaging is GitHub Actions branch-only")
     # CLI requires all twenty originals, but prepare(root) remains unit-testable
     # with small isolated fixtures and never relaxes per-file hash/rights checks.
-    if os.environ["GITHUB_REF_NAME"] in {"feature/track07-04-authentic-nature-20-20261020", "fix/track07-04-audio-acceptance-20261020"}:
+    if os.environ["GITHUB_REF_NAME"] in AUDIOQA_TWENTY_ONLY_BRANCHES:
         intake=json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8"))
         if len(intake.get("items",[])) != 20:
             raise SystemExit("AUDIO20_QA_BLOCKED: exact twenty sources required")
