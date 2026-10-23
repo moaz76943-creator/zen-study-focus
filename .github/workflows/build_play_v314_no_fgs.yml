@@ -1,7 +1,7 @@
 name: Deep Focus v3.1.4 Play No FGS Signed AAB v23
 on:
   push:
-    branches: [qa/play-no-fgs-alarm-v23-20261023]
+    branches: [integration/master-qa-verified-v21]
     paths: [.github/workflows/build_play_v314_no_fgs.yml]
   workflow_dispatch:
 permissions:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: qa/play-no-fgs-alarm-v23-20261023
+          ref: ${{ github.sha }}
           persist-credentials: false
       - name: Validate v21-safe no-FGS source tests
         shell: bash
