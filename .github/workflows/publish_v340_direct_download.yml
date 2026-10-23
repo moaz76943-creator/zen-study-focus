@@ -1,0 +1,79 @@
+name: Deep Focus v3.4.0 Direct AAB and APK Downloads
+on:
+  push:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - .github/workflows/publish_v340_direct_download.yml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: v3.4.0-complete-project-sweep-v21
+      SOURCE_SHA: c44f649caf45c1475cb80926d80318cd068af72a
+      BUILD_RUN: '39994706861'
+      EXPECTED_AAB_SHA256: 6c29d079af4e368ca80b59b78bd08899f99eabd0eaafb1246c5ff85d1905b0e8
+      EXPECTED_APK_SHA256: b3ef6ec5a7868fe2888ac7faf8745245454fa430074a23861f0e330837599f9c
+    steps:
+      - name: Checkout exact verified v3.4.0 source
+        uses: actions/checkout@v4
+        with:
+          ref: c44f649caf45c1475cb80926d80318cd068af72a
+          persist-credentials: false
+      - name: Verify immutable release source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          remote_sha="$(git ls-remote origin "refs/tags/$TAG^{}" | awk '{print $1}')"
+          test "$remote_sha" = "$SOURCE_SHA"
+          test -z "$(git status --porcelain)"
+          grep -Fq 'applicationId "com.deepfocus.study"' android/app/build.gradle
+          grep -Fq 'versionCode 23' android/app/build.gradle
+          ! grep -q 'FOREGROUND_SERVICE' android/app/src/main/AndroidManifest.xml
+      - name: Retrieve both successfully built and signed artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/v340-aab" "$RUNNER_TEMP/v340-apk"
+          gh run download "$BUILD_RUN" --repo "$GITHUB_REPOSITORY" --name 'DeepFocus-v3.4.0-TAGGED-v23-PLAY-SIGNED-AAB' --dir "$RUNNER_TEMP/v340-aab"
+          gh run download "$BUILD_RUN" --repo "$GITHUB_REPOSITORY" --name 'DeepFocus-v3.4.0-TAGGED-v23-DEBUG-APK' --dir "$RUNNER_TEMP/v340-apk"
+          aab="$(find "$RUNNER_TEMP/v340-aab" -type f -name 'app-release.aab' -print -quit)"
+          apk="$(find "$RUNNER_TEMP/v340-apk" -type f -name 'app-debug.apk' -print -quit)"
+          test -n "$aab" && test -n "$apk"
+          test -s "$aab" && test -s "$apk"
+          printf '%s  %s\n' "$EXPECTED_AAB_SHA256" "$aab" | sha256sum --check --status
+          printf '%s  %s\n' "$EXPECTED_APK_SHA256" "$apk" | sha256sum --check --status
+          unzip -tq "$aab" >/dev/null
+          unzip -tq "$apk" >/dev/null
+          cp "$aab" "$RUNNER_TEMP/DeepFocus-v3.4.0-Play-signed.aab"
+          cp "$apk" "$RUNNER_TEMP/DeepFocus-v3.4.0-Debug.apk"
+          sha256sum "$RUNNER_TEMP/DeepFocus-v3.4.0-Play-signed.aab" "$RUNNER_TEMP/DeepFocus-v3.4.0-Debug.apk"
+      - name: Publish verified files as direct GitHub Release downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease \
+              --title 'Deep Focus v3.4.0 — Play Signed AAB / Device Debug APK' \
+              --notes 'Verified direct downloads from pinned source c44f649caf45c1475cb80926d80318cd068af72a, GitHub Actions run 39994706861. The AAB is signed for Google Play upload; the APK is for device testing only. Package com.deepfocus.study, versionCode 23, versionName 3.1.4. Google Play acceptance has NOT been tested.'
+          fi
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
+            "$RUNNER_TEMP/DeepFocus-v3.4.0-Play-signed.aab" \
+            "$RUNNER_TEMP/DeepFocus-v3.4.0-Debug.apk"
+          {
+            echo '## Direct v3.4.0 downloads (no ZIP)'
+            echo "- Play AAB: https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/DeepFocus-v3.4.0-Play-signed.aab"
+            echo "- Device APK: https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/DeepFocus-v3.4.0-Debug.apk"
+            echo "- Pinned source: $SOURCE_SHA"
+            echo "- AAB SHA256: $EXPECTED_AAB_SHA256"
+            echo "- APK SHA256: $EXPECTED_APK_SHA256"
+            echo 'Play Console acceptance: NOT_TESTED; no Play Console upload is performed by this workflow.'
+          } >> "$GITHUB_STEP_SUMMARY"
