@@ -1,200 +1,57 @@
-name: Verify Android APK and Play Bundle
+# Mission #176 debug APK. Checkout is pinned to the annotated release tag's peeled commit.
+# This workflow never checks out main, legacy branches, or previous production commits.
+name: Deep Focus Mission 176 - Verified Debug APK
 
 on:
-  pull_request:
-    branches: [main, fix/v21-safe-release-recovery-20261018]
   push:
-    branches: [main, integration/master-qa-verified-v21]
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - .github/workflows/build_apk.yml
   workflow_dispatch:
-
-concurrency:
-  group: zen-focus-verify-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 permissions:
   contents: read
 
+concurrency:
+  group: deep-focus-mission176-debug-apk
+  cancel-in-progress: false
+
 jobs:
-  verify:
+  mission176-debug-apk:
+    name: Build and verify Mission 176 debug APK
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - name: Install platform API 36 with runner SDK
-        run: |
-          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
-          test -x "$SDKMANAGER"
-          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
-      - name: Gradle 8.11.1
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.11.1'
-      - name: JavaScript syntax and translations
-        run: |
-          node --check android/app/src/main/assets/web/app.js
-          node --check android/app/src/main/assets/web/quick_training.js
-          node --check android/app/src/main/assets/web/notes_studio.js
-          node --check android/app/src/main/assets/web/goals_studio.js
-          node --check android/app/src/main/assets/web/notes_drafts.js
-          node --check android/app/src/main/assets/web/timer_settings.js
-          node --check android/app/src/main/assets/web/locale_rows.js
-          node --check android/app/src/main/assets/web/locale_extras.js
-          node tests/validate_locales.cjs
-          node tests/smoke_app.cjs
-      - name: Integrated v22 module syntax and regression suites
-        run: |
-          for file in android/app/src/main/assets/web/*.js; do node --check "$file"; done
-          node --test tests/data_contracts/*.test.cjs tests/notes_core/*.test.cjs tests/notes_ui/*.test.cjs tests/tasks_core/*.test.cjs tests/analytics_core/*.test.cjs tests/focus_workflows/*.test.cjs tests/design_quality/*.test.cjs tests/regression_v21/*.test.cjs tests/integration_quality/*.test.cjs
-      - name: Build test APK and unsigned Play bundle
-        working-directory: android
-        run: gradle assembleDebug bundleRelease --no-daemon
-      - name: Source safety regression checks
-        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
-      - name: Upload test builds - not Play signed
-        uses: actions/upload-artifact@v4
-        with:
-          name: DeepFocus-Test-APK-and-Unsigned-AAB
-          if-no-files-found: error
-          path: |
-            android/app/build/outputs/apk/debug/*.apk
-            android/app/build/outputs/bundle/release/*.aab
-
-  signed-release:
-    needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    permissions:
-      contents: write
-    env:
-      KEYSTORE_B64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
-      ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
-      ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
-      ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
-      ZEN_MEDIA_LICENSES_APPROVED: ${{ vars.ZEN_MEDIA_LICENSES_APPROVED }}
-      ZEN_DEVICE_QA_APPROVED: ${{ vars.ZEN_DEVICE_QA_APPROVED }}
-      ZEN_RELEASE_APPROVED_SHA: ${{ vars.ZEN_RELEASE_APPROVED_SHA }}
-    steps:
-      - name: Verify signing requirements
-        id: sign
-        shell: bash
-        run: |
-          if [[ -n "$KEYSTORE_B64" && -n "$ZEN_UPLOAD_STORE_PASSWORD" && -n "$ZEN_UPLOAD_KEY_ALIAS" && -n "$ZEN_UPLOAD_KEY_PASSWORD" \
-             && "$ZEN_MEDIA_LICENSES_APPROVED" == "true" \
-             && "$ZEN_DEVICE_QA_APPROVED" == "true" \
-             && "$ZEN_RELEASE_APPROVED_SHA" == "$GITHUB_SHA" ]]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Play release is blocked until upload signing, explicit media/device QA approvals and reviewed HEAD SHA match."
-          fi
-      - uses: actions/checkout@v4
-        if: steps.sign.outputs.ready == 'true'
-      - uses: actions/setup-java@v4
-        if: steps.sign.outputs.ready == 'true'
-        with:
-          distribution: temurin
-          java-version: '17'
-      - name: Android API 36
-        if: steps.sign.outputs.ready == 'true'
-        run: |
-          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
-          test -x "$SDKMANAGER"
-          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
-      - uses: gradle/actions/setup-gradle@v4
-        if: steps.sign.outputs.ready == 'true'
-        with:
-          gradle-version: '8.11.1'
-      - name: Prepare upload keystore
-        if: steps.sign.outputs.ready == 'true'
-        shell: bash
-        run: |
-          umask 077
-          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/zen-upload.jks"
-          echo "ZEN_UPLOAD_KEYSTORE_PATH=$RUNNER_TEMP/zen-upload.jks" >> "$GITHUB_ENV"
-      - name: Build signed APK and Play AAB
-        if: steps.sign.outputs.ready == 'true'
-        working-directory: android
-        run: gradle assembleRelease bundleRelease --no-daemon
-      - name: Upload signed APK and AAB
-        if: steps.sign.outputs.ready == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: DeepFocus-Signed-Play-Release
-          if-no-files-found: error
-          path: |
-            android/app/build/outputs/apk/release/*.apk
-            android/app/build/outputs/bundle/release/*.aab
-      - name: Publish signed release
-        if: steps.sign.outputs.ready == 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v21.${{ github.run_number }}
-          name: Deep Focus signed release v21.${{ github.run_number }}
-          files: |
-            android/app/build/outputs/apk/release/*.apk
-            android/app/build/outputs/bundle/release/*.aab
-          generate_release_notes: true
-
-  signed-closed-test:
-    name: Signed Google Play closed-test AAB (pinned v3.0.0)
-    needs: verify
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/integration/master-qa-verified-v21'
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    permissions:
-      contents: read
-    env:
-      ZEN_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
-      ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
-      ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
-      ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
-    steps:
-      - name: Fail closed if upload-signing secrets are not configured
-        shell: bash
-        run: |
-          for key in ZEN_UPLOAD_KEYSTORE_BASE64 ZEN_UPLOAD_STORE_PASSWORD ZEN_UPLOAD_KEY_ALIAS ZEN_UPLOAD_KEY_PASSWORD; do
-            if [[ -z "${!key}" ]]; then
-              echo "::error::Missing required signing secret: $key"
-              exit 1
-            fi
-          done
-      - name: Checkout exact certified production source (not the workflow commit)
+      - name: Checkout pinned Mission 176 release commit
         uses: actions/checkout@v4
         with:
-          ref: 4b2c58531d014b7983cbcf29cfaf5048c4a5cf7e
+          ref: 26f0a1d64ad093423fffb8d47df6714bc608561f
           persist-credentials: false
-      - name: Verify source and stage Google Play build metadata
+      - name: Verify approved tag and checkout integrity
         shell: bash
         run: |
-          test "$(git rev-parse HEAD)" = "4b2c58531d014b7983cbcf29cfaf5048c4a5cf7e"
-          test -d android/app/src/main/assets/web/js
-          python3 - <<'PY'
-          from pathlib import Path
-          gradle = Path("android/app/build.gradle")
-          content = gradle.read_text()
-          for token in ['targetSdk 36', 'versionCode 21', 'versionName "21.0.0"', 'applicationId "com.zenstudy.focus"']:
-              assert token in content, "Certified base mismatch: " + token
-          content = content.replace('versionCode 21', 'versionCode 23', 1)
-          content = content.replace('versionName "21.0.0"', 'versionName "3.0.0"', 1)
-          gradle.write_text(content)
-          PY
-          grep -Eq 'versionCode[[:space:]]+23' android/app/build.gradle
-          grep -Eq 'targetSdk[[:space:]]+36' android/app/build.gradle
-      - name: Set up JDK 17
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "26f0a1d64ad093423fffb8d47df6714bc608561f"
+          TAG_TARGET="$(git ls-remote origin 'refs/tags/v3.0.1-runtime-activated-v21^{}' | awk '{print $1}')"
+          test "$TAG_TARGET" = "26f0a1d64ad093423fffb8d47df6714bc608561f" || { echo "::error::Release tag no longer points to approved Mission 176 commit"; exit 1; }
+          test -f android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
+          grep -Fq '<script src="js/deep_focus_runtime_activator.js"></script>' android/app/src/main/assets/web/index.html
+          echo "Validated tag v3.0.1-runtime-activated-v21 at commit 26f0a1d64ad093423fffb8d47df6714bc608561f"
+      - name: Validate runtime activator syntax
+        shell: bash
+        run: |
+          node --check android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
+          node --test test/runtime_activator_integration.test.js
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install Android platform API 36
+      - name: Install Android API 36
         shell: bash
         run: |
+          set -euo pipefail
           SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
           test -x "$SDKMANAGER"
           "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
@@ -202,51 +59,61 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Restore the private upload keystore (never publish this file)
-        shell: bash
-        run: |
-          umask 077
-          printf '%s' "$ZEN_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release-keystore.jks"
-          test -s "$RUNNER_TEMP/release-keystore.jks"
-          keytool -list -keystore "$RUNNER_TEMP/release-keystore.jks" -storepass "$ZEN_UPLOAD_STORE_PASSWORD" -alias "$ZEN_UPLOAD_KEY_ALIAS" >/dev/null
-          echo "ZEN_UPLOAD_KEYSTORE_PATH=$RUNNER_TEMP/release-keystore.jks" >> "$GITHUB_ENV"
-      - name: Build signed Release App Bundle
+      - name: Generate Gradle wrapper on runner (repository has none)
         working-directory: android
         shell: bash
         run: |
-          if [[ -x ./gradlew ]]; then
-            ./gradlew bundleRelease --no-daemon
-          else
-            gradle bundleRelease --no-daemon
+          set -euo pipefail
+          if [[ ! -f ./gradlew ]]; then
+            gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
           fi
-      - name: Verify signature, bundle contents and SHA256
+          chmod +x ./gradlew
+      - name: Build Mission 176 APK exactly as requested
+        working-directory: android
+        shell: bash
+        run: ./gradlew clean assembleDebug --stacktrace
+      - name: Verify debug signing, package, assets and compute SHA256
         shell: bash
         run: |
           set -euo pipefail
-          BUNDLE="android/app/build/outputs/bundle/release/app-release.aab"
-          test -s "$BUNDLE"
-          jarsigner -verify "$BUNDLE" >/dev/null
-          unzip -Z -1 "$BUNDLE" | grep -qx 'base/manifest/AndroidManifest.xml'
-          unzip -Z -1 "$BUNDLE" | grep -q '^base/assets/web/js/'
-          sha256sum "$BUNDLE" > "$RUNNER_TEMP/DeepFocus-AAB-SHA256.txt"
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          test -x "$APKSIGNER"
+          test -x "$AAPT"
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee "$RUNNER_TEMP/mission176-signature.txt"
+          "$AAPT" dump badging "$APK" | tee "$RUNNER_TEMP/mission176-badging.txt"
+          grep -Eq "package: name='com.zenstudy.focus'" "$RUNNER_TEMP/mission176-badging.txt"
+          unzip -Z -1 "$APK" | grep -Fxq 'assets/web/js/deep_focus_runtime_activator.js'
+          unzip -Z -1 "$APK" | grep -Fxq 'assets/web/index.html'
+          sha256sum "$APK" | tee "$RUNNER_TEMP/mission176-sha256.txt"
           {
-            echo "source_commit=4b2c58531d014b7983cbcf29cfaf5048c4a5cf7e"
-            echo "source_tag=v3.0.0-diamond-production-v21"
-            echo "targetSdk=36"
-            echo "versionCode=23"
-            echo "versionName=3.0.0"
-            echo "applicationId=com.zenstudy.focus"
-            echo "upload_certificate_sha256_fingerprint:"
-          } > "$RUNNER_TEMP/DeepFocus-release-metadata.txt"
-          keytool -exportcert -rfc -keystore "$ZEN_UPLOAD_KEYSTORE_PATH" -storepass "$ZEN_UPLOAD_STORE_PASSWORD" -alias "$ZEN_UPLOAD_KEY_ALIAS" |
-            openssl x509 -noout -fingerprint -sha256 >> "$RUNNER_TEMP/DeepFocus-release-metadata.txt"
-      - name: Upload signed AAB and verification receipts (exclude keystore)
+            echo "tag=v3.0.1-runtime-activated-v21"
+            echo "source_commit=26f0a1d64ad093423fffb8d47df6714bc608561f"
+            echo "build_command=./gradlew clean assembleDebug --stacktrace"
+            echo "package=com.zenstudy.focus"
+            echo "signing=Android debug signing key (not Google Play upload signing)"
+          } > "$RUNNER_TEMP/mission176-provenance.txt"
+          {
+            echo "### Mission 176 verified Debug APK"
+            echo "Source: \`v3.0.1-runtime-activated-v21\` / \`26f0a1d64ad093423fffb8d47df6714bc608561f\`"
+            echo "Package: \`com.zenstudy.focus\`"
+            echo "APK SHA256:"
+            echo '\`\`\`'
+            cat "$RUNNER_TEMP/mission176-sha256.txt"
+            echo '\`\`\`'
+            echo "This APK has the Android debug signature, not a Play release upload signature."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload verified APK, SHA256 and signing evidence
         uses: actions/upload-artifact@v4
         with:
-          name: DeepFocus-Signed-Closed-Test-v3-Code23
+          name: DeepFocus-Mission176-v3.0.1-Debug-APK
           if-no-files-found: error
           retention-days: 30
           path: |
-            android/app/build/outputs/bundle/release/app-release.aab
-            ${{ runner.temp }}/DeepFocus-AAB-SHA256.txt
-            ${{ runner.temp }}/DeepFocus-release-metadata.txt
+            android/app/build/outputs/apk/debug/app-debug.apk
+            ${{ runner.temp }}/mission176-sha256.txt
+            ${{ runner.temp }}/mission176-provenance.txt
+            ${{ runner.temp }}/mission176-signature.txt
+            ${{ runner.temp }}/mission176-badging.txt
