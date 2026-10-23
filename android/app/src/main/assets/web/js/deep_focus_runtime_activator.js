@@ -1,11 +1,11 @@
 /**
- * DEEP FOCUS — Pure Native Audio & 100-Locales Runtime Bridge (Mission #179)
- * Seamlessly manages CC0 offline audio loops with independent volume sliders.
+ * DEEP FOCUS — Master Runtime Bridge (Mission #180)
+ * Seamlessly connects NaturalSoundscapeSanctuary to existing Nature UI cards.
+ * Enforces strict Western digits (0123456789) and zero Hebrew inclusion.
  */
 (function() {
   'use strict';
 
-  // 1. تحويل قسري للأرقام الغربية
   function toWesternDigits(str) {
     if (typeof str !== 'string') return str;
     return str.replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632)
@@ -13,53 +13,43 @@
   }
 
   function sanitizeDigits() {
-    document.querySelectorAll('input[type="date"], input[type="text"], textarea').forEach(el => {
+    document.querySelectorAll('input[type="date"], input[type="text"], textarea, .date-display').forEach(el => {
       if (el.value && /[٠-٩۰-۹]/.test(el.value)) {
         el.value = toWesternDigits(el.value);
+      }
+      if (el.textContent && /[٠-٩۰-۹]/.test(el.textContent)) {
+        el.textContent = toWesternDigits(el.textContent);
       }
     });
   }
 
-  // 2. مشغل أصوات الطبيعة النقي بحلقات دائرية ناعمة (HTML5 Audio Loops)
-  const soundTracks = {};
-
-  function initNatureAudio() {
-    // ربط بطاقات الأصوات في شاشة Nature
-    const soundCards = document.querySelectorAll('.sound-card, [data-sound]');
-    soundCards.forEach(card => {
-      const soundKey = card.dataset.sound || card.querySelector('h3, .font-bold')?.textContent.trim().toLowerCase().replace(/\s+/g, '_');
-      if (!soundKey) return;
-
+  function hookNatureSounds() {
+    const cards = document.querySelectorAll('.sound-card, [class*="nature" i] [class*="card" i]');
+    cards.forEach(card => {
+      const nameEl = card.querySelector('h3, .font-bold, div:first-child');
+      const soundName = (nameEl ? nameEl.textContent : card.textContent).trim().toLowerCase();
       const toggle = card.querySelector('input[type="checkbox"], button, [role="switch"]');
       const slider = card.querySelector('input[type="range"]');
 
-      if (toggle && !toggle.dataset.audioBound) {
-        toggle.dataset.audioBound = "true";
-        
-        // تجهيز عنصر الصوت المحلي
-        if (!soundTracks[soundKey]) {
-          const audio = new Audio();
-          audio.src = `audio/${soundKey}.mp3`;
-          audio.loop = true;
-          audio.preload = 'none';
-          soundTracks[soundKey] = audio;
-        }
-
-        toggle.addEventListener('change', (e) => {
-          const audio = soundTracks[soundKey];
-          if (e.target.checked) {
-            audio.volume = slider ? parseFloat(slider.value) / 100 : 0.7;
-            audio.play().catch(err => console.log(`Audio waiting for user gesture: ${soundKey}`));
+      if (toggle && !toggle.dataset.hqAudioBound) {
+        toggle.dataset.hqAudioBound = "true";
+        toggle.addEventListener('click', () => {
+          if (!window.NaturalSoundscapeSanctuary) return;
+          const s = window.NaturalSoundscapeSanctuary;
+          if (s.activeTracks[soundName]) {
+            s.stop(soundName);
+            card.classList.remove('active-playing');
           } else {
-            audio.pause();
+            const vol = slider ? parseFloat(slider.value) / 100 : 0.7;
+            s.play(soundName, vol);
+            card.classList.add('active-playing');
           }
         });
 
         if (slider) {
           slider.addEventListener('input', (e) => {
-            const audio = soundTracks[soundKey];
-            if (audio) {
-              audio.volume = parseFloat(e.target.value) / 100;
+            if (window.NaturalSoundscapeSanctuary) {
+              window.NaturalSoundscapeSanctuary.setVolume(soundName, parseFloat(e.target.value) / 100);
             }
           });
         }
@@ -69,9 +59,8 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     sanitizeDigits();
-    initNatureAudio();
+    hookNatureSounds();
   });
-
   document.addEventListener('input', sanitizeDigits, true);
-  console.log("[DEEP FOCUS] Pure CC0 Nature Audio pipeline armed.");
+  document.addEventListener('change', sanitizeDigits, true);
 })();
