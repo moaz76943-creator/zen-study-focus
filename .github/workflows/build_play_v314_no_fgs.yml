@@ -27,6 +27,7 @@ jobs:
           node --test tests/no_fg_service_play_v23.test.cjs
           ! grep -Eq 'android.permission.(FOREGROUND_SERVICE|SCHEDULE_EXACT_ALARM|USE_EXACT_ALARM)' android/app/src/main/AndroidManifest.xml
           test ! -e android/app/src/main/java/com/zenstudy/focus/FocusTimerService.java
+          test -s android/app/src/main/java/com/zenstudy/focus/FocusAlarmReceiver.java
       - name: Require release keystore
         shell: bash
         env:
