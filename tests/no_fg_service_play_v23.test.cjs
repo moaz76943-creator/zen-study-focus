@@ -39,8 +39,8 @@ test('Alarm receiver validates current timer and schedules without exact-alarm s
 test('Release metadata matches existing Play package and increases versionCode',()=>{
  const g=read('android/app/build.gradle');
  assert.match(g,/applicationId "com\.deepfocus\.study"/);
- assert.match(g,/versionCode 23/);
- assert.match(g,/versionName "3\.1\.4"/);
+ assert.match(g,/versionCode 24/);
+ assert.match(g,/versionName "3\.4\.0"/);
  assert.match(g,/targetSdk 36/);
 });
 test('v21 app session compatibility stays intact',()=>{
