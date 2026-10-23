@@ -45,3 +45,39 @@ test('does not alter Latin digits or arbitrary user text after repeated events',
   for (let i = 0; i < 3; i++) { callbacks.input(); callbacks.change(); }
   assert.equal(task.value, 'Project 123 / ٤');
 });
+
+
+// The main app.js listener runs in addition to the Studio runtime listener.
+// Protecting only the Studio selector is insufficient if this handler rewrites user text.
+function bootAppDigitListener() {
+  const appSource = fs.readFileSync(path.join(__dirname, '../../android/app/src/main/assets/web/app.js'), 'utf8');
+  const begin = appSource.indexOf('function toWest(val) {');
+  const end = appSource.indexOf('/* ========================================================', begin + 20);
+  assert.ok(begin >= 0 && end > begin, 'app numeral handler must be located');
+  const callbacks = {};
+  vm.runInNewContext(appSource.slice(begin, end), {
+    document: { addEventListener(event, callback) { callbacks[event] = callback; } }
+  });
+  assert.equal(typeof callbacks.input, 'function');
+  return callbacks.input;
+}
+
+test('main app input handler preserves Arabic/Persian numerals in authored notes and tasks', () => {
+  const onInput = bootAppDigitListener();
+  const task = { tagName: 'INPUT', type: 'text', value: 'مهمة ٢٠٢٦' };
+  const note = { tagName: 'TEXTAREA', value: 'ملاحظة ۱۲۳ و٤٥٦' };
+  onInput({ target: task });
+  onInput({ target: note });
+  assert.equal(task.value, 'مهمة ٢٠٢٦');
+  assert.equal(note.value, 'ملاحظة ۱۲۳ و٤٥٦');
+});
+
+test('main app input handler still converts generated date and number inputs to Western digits', () => {
+  const onInput = bootAppDigitListener();
+  const date = { tagName: 'INPUT', type: 'date', value: '٢٠٢٦-١٠-٢٣' };
+  const count = { tagName: 'INPUT', type: 'number', value: '۱۲۳' };
+  onInput({ target: date });
+  onInput({ target: count });
+  assert.equal(date.value, '2026-10-23');
+  assert.equal(count.value, '123');
+});
