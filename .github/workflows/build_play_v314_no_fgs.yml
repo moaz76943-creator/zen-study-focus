@@ -1,0 +1,137 @@
+name: Deep Focus v3.1.4 Play No FGS Signed AAB v23
+on:
+  push:
+    branches: [qa/play-no-fgs-alarm-v23-20261023]
+    paths: [.github/workflows/build_play_v314_no_fgs.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
+      ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
+      ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: qa/play-no-fgs-alarm-v23-20261023
+          persist-credentials: false
+      - name: Validate v21-safe no-FGS source tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check android/app/src/main/assets/web/app.js
+          node --test tests/no_fg_service_play_v23.test.cjs
+          ! grep -Eq 'android.permission.(FOREGROUND_SERVICE|SCHEDULE_EXACT_ALARM|USE_EXACT_ALARM)' android/app/src/main/AndroidManifest.xml
+          test ! -e android/app/src/main/java/com/zenstudy/focus/FocusTimerService.java
+          test -s android/app/src/main/java/com/zenstudy/focus/FocusAlarmReceiver.java
+      - name: Require release keystore
+        shell: bash
+        env:
+          ZEN_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          test -n "$ZEN_UPLOAD_KEYSTORE_BASE64" || { echo '::error::Missing keystore secret'; exit 1; }
+          test -n "$ZEN_UPLOAD_STORE_PASSWORD"
+          test -n "$ZEN_UPLOAD_KEY_ALIAS"
+          test -n "$ZEN_UPLOAD_KEY_PASSWORD"
+          umask 077
+          STORE="$RUNNER_TEMP/v314-upload.jks"
+          printf '%s' "$ZEN_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$STORE"
+          test -s "$STORE"
+          echo "ZEN_UPLOAD_KEYSTORE_PATH=$STORE" >> "$GITHUB_ENV"
+          keytool -list -v -keystore "$STORE" -alias "$ZEN_UPLOAD_KEY_ALIAS" -storepass:env ZEN_UPLOAD_STORE_PASSWORD > "$RUNNER_TEMP/v314-key-details.txt"
+          grep -Fq 'PrivateKeyEntry' "$RUNNER_TEMP/v314-key-details.txt"
+          grep -m1 'SHA1:' "$RUNNER_TEMP/v314-key-details.txt" | sed -E 's/^.*SHA1: *//' > "$RUNNER_TEMP/v314-expected-sha1.txt"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          MANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          "$MANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Prepare Gradle wrapper
+        shell: bash
+        working-directory: android
+        run: |
+          set -euo pipefail
+          if [[ ! -f gradlew ]]; then gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon; fi
+          chmod +x gradlew
+      - name: Execute signed release AAB build
+        working-directory: android
+        run: ./gradlew clean bundleRelease --stacktrace
+      - name: Verify actual built manifest no FGS and correct Play package
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
+          test -s "$AAB"
+          unzip -tq "$AAB" > "$RUNNER_TEMP/v314-zipcheck.txt"
+          curl --fail --location --retry 3 --silent --show-error 'https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar' --output "$RUNNER_TEMP/bundletool.jar"
+          java -jar "$RUNNER_TEMP/bundletool.jar" dump manifest --bundle="$AAB" > "$RUNNER_TEMP/v314-manifest.xml"
+          python3 - <<'PY'
+          import os,xml.etree.ElementTree as ET
+          from pathlib import Path
+          tmp=Path(os.environ['RUNNER_TEMP'])
+          root=ET.fromstring((tmp/'v314-manifest.xml').read_text())
+          ns='{http://schemas.android.com/apk/res/android}'
+          pkg=root.get('package')
+          code=root.get(ns+'versionCode')
+          name=root.get(ns+'versionName')
+          sdk=root.find('uses-sdk')
+          target=sdk.get(ns+'targetSdkVersion') if sdk is not None else None
+          perms=[p.get(ns+'name','') for p in root.findall('uses-permission')]
+          forbidden=[p for p in perms if 'FOREGROUND_SERVICE' in p or 'EXACT_ALARM' in p]
+          services=root.findall('application/service')
+          receivers=root.findall('application/receiver')
+          assert pkg=='com.deepfocus.study',(pkg,code,name)
+          assert code=='23' and name=='3.1.4',(code,name)
+          assert target and int(target)>=36,target
+          assert not forbidden,forbidden
+          assert len(services)==0,'Merged manifest still has Android service'
+          assert any(r.get(ns+'name','').endswith('.FocusAlarmReceiver') for r in receivers)
+          result=f'package={pkg}\nversionCode={code}\nversionName={name}\ntargetSdk={target}\nFGS_perms=NONE\nexact_alarm_perms=NONE\nservices=0\nalarm_receiver=present\n'
+          print(result)
+          (tmp/'v314-manifest-proof.txt').write_text(result)
+          PY
+      - name: Verify Upload signing certificate and hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
+          jarsigner -verify -verbose -certs "$AAB" > "$RUNNER_TEMP/v314-signature.txt" 2>&1
+          grep -Fq 'jar verified.' "$RUNNER_TEMP/v314-signature.txt"
+          keytool -printcert -jarfile "$AAB" > "$RUNNER_TEMP/v314-cert.txt"
+          grep -m1 'SHA1:' "$RUNNER_TEMP/v314-cert.txt" | sed -E 's/^.*SHA1: *//' > "$RUNNER_TEMP/v314-sha1.txt"
+          cmp "$RUNNER_TEMP/v314-expected-sha1.txt" "$RUNNER_TEMP/v314-sha1.txt"
+          sha256sum "$AAB" | tee "$RUNNER_TEMP/v314-sha256.txt"
+          {
+            echo '### Signed Deep Focus 3.1.4 AAB without any FGS permissions'
+            echo "Source SHA $(git rev-parse HEAD)"
+            cat "$RUNNER_TEMP/v314-manifest-proof.txt"
+            echo 'SHA1:'
+            cat "$RUNNER_TEMP/v314-sha1.txt"
+            echo 'SHA256:'
+            cat "$RUNNER_TEMP/v314-sha256.txt"
+            echo 'AlarmManager inexact alerts can be delayed during Doze. Android real-device test and Google review remain pending.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-v3.1.4-v23-NoFGS-Play-SIGNED-AAB
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            ${{ runner.temp }}/v314-manifest-proof.txt
+            ${{ runner.temp }}/v314-sha1.txt
+            ${{ runner.temp }}/v314-sha256.txt
+            ${{ runner.temp }}/v314-signature.txt

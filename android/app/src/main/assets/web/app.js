@@ -2489,7 +2489,7 @@ function restoreTimerSession() {
     timerTargetTime = snap.endAt;
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
     if (timerLeft === 0) {
-      // Native foreground timer has already emitted the expiry notification.
+      // Android completion alarm may already have notified; reconcile saved deadline.
       finalizeTimerSession(false);
       return;
     }
@@ -2498,6 +2498,12 @@ function restoreTimerSession() {
     timerInterval = setInterval(runTimerTick, 500);
   }
   updateTimerDisplay();
+  // Android can discard alarms after an app is force-stopped; re-arm from
+  // the existing v21 deadline when a running session is restored on next open.
+  if (timerRunning && window.ZenNative && window.ZenNative.startBackgroundService) {
+    try { window.ZenNative.startBackgroundService(timerLeft, document.getElementById('timerModeCaption').textContent); }
+    catch (error) { console.warn('Unable to restore timer completion alert', error); }
+  }
 }
 const ringCircumference = 2 * Math.PI * 105;
 
