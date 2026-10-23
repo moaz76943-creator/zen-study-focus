@@ -1,8 +1,8 @@
 /* Deep Focus Notes Studio: UI upgrade; uses existing v21 notesList persistence. */
 const NS_TEMPLATES=[
- ['cornell','📋','Cornell notes','ملاحظات كورنيل','cornell','CUES / QUESTIONS\n• \n\nMAIN NOTES\n• \n\nSUMMARY\n','الأسئلة والكلمات المفتاحية\n• \n\nالملاحظات الأساسية\n• \n\nالملخص\n'],
- ['recall','🧠','Active recall','استذكار نشط','flash','QUESTION\n\nANSWER\n\nWHAT TO REVIEW\n','السؤال\n\nالإجابة\n\nما أحتاج إلى مراجعته\n'],
- ['reading','📚','Reading notes','ملخص قراءة','quick','BOOK / SOURCE\n\nMAIN IDEAS\n• \n\nMY TAKEAWAYS\n• \n\nNEXT STEPS\n','الكتاب أو المصدر\n\nالأفكار الرئيسية\n• \n\nما استفدته\n• \n\nالخطوة التالية\n'],
+ ['cornell','📋','Structured notes','ملاحظات كورنيل','cornell','CUES / QUESTIONS\n• \n\nMAIN NOTES\n• \n\nSUMMARY\n','الأسئلة والكلمات المفتاحية\n• \n\nالملاحظات الأساسية\n• \n\nالملخص\n'],
+ ['recall','🧠','استذكار نشط','استذكار نشط','flash','QUESTION\n\nANSWER\n\nWHAT TO REVIEW\n','السؤال\n\nالإجابة\n\nما أحتاج إلى مراجعته\n'],
+ ['reading','📚','ملخص قراءة','ملخص قراءة','quick','BOOK / SOURCE\n\nMAIN IDEAS\n• \n\nMY TAKEAWAYS\n• \n\nNEXT STEPS\n','الكتاب أو المصدر\n\nالأفكار الرئيسية\n• \n\nما استفدته\n• \n\nالخطوة التالية\n'],
  ['meeting','📅','Meeting minutes','محضر اجتماع','quick','ATTENDEES\n\nAGENDA\n\nDECISIONS\n• \n\nACTIONS / DATES\n• ','الحاضرون\n\nجدول الأعمال\n\nالقرارات\n• \n\nالمهام والمواعيد\n• '],
  ['project','🗂️','Project plan','خطة مشروع','quick','GOAL\n\nMILESTONES\n☐ \n\nBLOCKERS\n\nNEXT ACTION\n','الهدف\n\nالمراحل\n☐ \n\nالعوائق\n\nالإجراء التالي\n'],
  ['workout','🏋️','Workout log','سجل رياضي','quick','ACTIVITY\n\nSETS / REPS / TIME\n\nNOTES\n\nNEXT SESSION\n','النشاط\n\nالجولات والتكرارات والوقت\n\nملاحظات\n\nالجلسة التالية\n'],
@@ -14,7 +14,7 @@ const NS_TEMPLATES=[
  ['journal','✍️','Daily journal','يوميات','quick','TODAY\n\nHIGHLIGHTS\n• \n\nCHALLENGES\n\nTOMORROW\n','اليوم\n\nأبرز الأحداث\n• \n\nالتحديات\n\nالغد\n']
 ];
 const NS_STRINGS={
- en:['✦ NOTES STUDIO','Your ideas, organized','Write, revisit and develop your thoughts.','My notes','Pinned','＋ New note','Ready-to-use templates','Tap to start','Pinned only','Sort','Recent','Oldest','Title','results','No notes match. Use a template to begin.','New note','Edit note','Title','Type','Date','Content','Pin','Favorite','words','characters','Save note','Save changes','Replace your text with this template?','Edit','Duplicate','Copy','Calendar','Delete','Reveal answer','Could not copy.','Saved'],
+ en:['✦ NOTES STUDIO','أفكارك، منظمة بذكاء','دوّن واسترجع وطوّر أفكارك يومياً.','My notes','Pinned','＋ New note','قوالب جاهزة للكتابة','Tap to start','المثبتة فقط','الترتيب','Recent','Oldest','Title','results','No notes match. Use a template to begin.','New note','Edit note','Title','Type','Date','Content','Pin','Favorite','words','characters','Save note','Save changes','Replace your text with this template?','Edit','Duplicate','Copy','Calendar','Delete','Reveal answer','Could not copy.','Saved'],
  ar:['✦ استوديو الملاحظات','أفكارك مرتبة وواضحة','اكتب أفكارك ونظّمها وراجعها بسهولة.','ملاحظاتي','مثبتة','＋ ملاحظة جديدة','قوالب جاهزة للكتابة','اختر قالبًا للبدء','المثبتة فقط','الترتيب','الأحدث','الأقدم','العنوان','نتيجة','لا توجد ملاحظات مطابقة، جرّب أحد القوالب.','ملاحظة جديدة','تعديل الملاحظة','العنوان','النوع','التاريخ','المحتوى','تثبيت','مفضلة','كلمة','حرف','حفظ الملاحظة','حفظ التعديلات','هل تريد استبدال النص الموجود بالقالب؟','تعديل','نسخة','نسخ','التقويم','حذف','إظهار الإجابة','تعذر النسخ.','تم الحفظ']
 };
 function nsLabel(index){return NS_STRINGS[cfg.lang==='ar'?'ar':'en'][index];}
@@ -48,9 +48,9 @@ function nsUseTemplate(code){
 function fillNoteTpl(type){nsUseTemplate(type==='flash'?'recall':'cornell');}
 function nsUpdateCount(){const v=document.getElementById('inpNoteBody').value;document.getElementById('nsCounter').textContent=nsWords(v)+' '+nsLabel(23)+' · '+Array.from(v).length+' '+nsLabel(24);}
 function nsApplyLabels(){
- const values={nsEyebrow:0,nsTitle:1,nsSubtitle:2,nsTotalLabel:3,nsPinnedLabel:4,nsNewButton:5,nsTemplatesTitle:6,nsTemplatesHint:7,nsPinnedOnlyLabel:8,nsSortLabel:9,nsTitleLabel:17,nsTypeLabel:18,nsDateLabel:19,nsBodyLabel:20,nsPinCheckLabel:21,nsFavCheckLabel:22};
+ const values={nsEyebrow:0,nsTitle:1,nsSubtitle:2,nsTotalLabel:3,nsPinnedLabel:4,nsNewButton:5,nsTemplatesTitle:6,nsTemplatesHint:7,nsPinnedOnlyLabel:8,nsالترتيبLabel:9,nsTitleLabel:17,nsTypeLabel:18,nsDateLabel:19,nsBodyLabel:20,nsPinCheckLabel:21,nsFavCheckLabel:22};
  Object.keys(values).forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=nsLabel(values[id]);});
- const options=document.getElementById('nsSort').options;[10,11,12].forEach((key,i)=>options[i].textContent=nsLabel(key));
+ const options=document.getElementById('nsالترتيب').options;[10,11,12].forEach((key,i)=>options[i].textContent=nsLabel(key));
  nsRenderTemplates();
 }
 function nsTogglePinnedOnly(){nsPinnedOnly=!nsPinnedOnly;document.getElementById('nsPinnedOnly').setAttribute('aria-pressed',String(nsPinnedOnly));renderNotesStack();}
@@ -66,7 +66,7 @@ function renderNotesStack(){
  const real=notesList.filter(n=>!n.isStarter);
  document.getElementById('nsTotal').textContent=String(real.length);
  document.getElementById('nsPinned').textContent=String(real.filter(n=>n.pinned).length);
- const sort=document.getElementById('nsSort').value;
+ const sort=document.getElementById('nsالترتيب').value;
  const matches=notesList.filter(n=>{
   if(!n||nsId(n.id)===null)return false;
   if(noteTagFilter!=='all'&&n.catKey!==noteTagFilter)return false;
