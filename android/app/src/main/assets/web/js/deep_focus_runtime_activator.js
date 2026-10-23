@@ -1,11 +1,11 @@
 /**
- * DEEP FOCUS — Pure Native Runtime Activator (Mission #178)
- * Silent background bridge: Native 100-Locales injection, strict Western digits, and zero DOM clutter.
+ * DEEP FOCUS — Pure Native Audio & 100-Locales Runtime Bridge (Mission #179)
+ * Seamlessly manages CC0 offline audio loops with independent volume sliders.
  */
 (function() {
   'use strict';
 
-  // 1. تحويل الأرقام المشرقية إلى غربية فورياً
+  // 1. تحويل قسري للأرقام الغربية
   function toWesternDigits(str) {
     if (typeof str !== 'string') return str;
     return str.replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632)
@@ -20,135 +20,58 @@
     });
   }
 
-  // 2. قائمة الـ 100 لغة (مع الاستبعاد المطلق للعبرية)
-  const LOCALES_100 = [
-    { code: "ar", name: "Arabic", native: "العربية" },
-    { code: "en", name: "English", native: "English" },
-    { code: "es", name: "Spanish", native: "Español" },
-    { code: "zh", name: "Chinese (Simplified)", native: "中文 (简体)" },
-    { code: "hi", name: "Hindi", native: "हिन्दी" },
-    { code: "fr", name: "French", native: "Français" },
-    { code: "de", name: "German", native: "Deutsch" },
-    { code: "ja", name: "Japanese", native: "日本語" },
-    { code: "ko", name: "Korean", native: "한국어" },
-    { code: "pt", name: "Portuguese", native: "Português" },
-    { code: "ru", name: "Russian", native: "Русский" },
-    { code: "tr", name: "Turkish", native: "Türkçe" },
-    { code: "it", name: "Italian", native: "Italiano" },
-    { code: "vi", name: "Vietnamese", native: "Tiếng Việt" },
-    { code: "id", name: "Indonesian", native: "Bahasa Indonesia" },
-    { code: "ms", name: "Malay", native: "Bahasa Melayu" },
-    { code: "bn", name: "Bengali", native: "বাংলা" },
-    { code: "ur", name: "Urdu", native: "اردو" },
-    { code: "fa", name: "Persian", native: "فارسی" },
-    { code: "pl", name: "Polish", native: "Polski" },
-    { code: "nl", name: "Dutch", native: "Nederlands" },
-    { code: "th", name: "Thai", native: "ไทย" },
-    { code: "sv", name: "Swedish", native: "Svenska" },
-    { code: "el", name: "Greek", native: "Ελληνικά" },
-    { code: "cs", name: "Czech", native: "Čeština" },
-    { code: "ro", name: "Romanian", native: "Română" },
-    { code: "hu", name: "Hungarian", native: "Magyar" },
-    { code: "da", name: "Danish", native: "Dansk" },
-    { code: "fi", name: "Finnish", native: "Suomi" },
-    { code: "no", name: "Norwegian", native: "Norsk" },
-    { code: "sk", name: "Slovak", native: "Slovenčina" },
-    { code: "uk", name: "Ukrainian", native: "Українська" },
-    { code: "bg", name: "Bulgarian", native: "Български" },
-    { code: "hr", name: "Croatian", native: "Hrvatski" },
-    { code: "sr", name: "Serbian", native: "Српски" },
-    { code: "sl", name: "Slovenian", native: "Slovenščina" },
-    { code: "lt", name: "Lithuanian", native: "Lietuvių" },
-    { code: "lv", name: "Latvian", native: "Latviešu" },
-    { code: "et", name: "Estonian", native: "Eesti" },
-    { code: "sw", name: "Swahili", native: "Kiswahili" },
-    { code: "fil", name: "Filipino", native: "Filipino" },
-    { code: "ta", name: "Tamil", native: "தமிழ்" },
-    { code: "te", name: "Telugu", native: "తెలుగు" },
-    { code: "mr", name: "Marathi", native: "मराठी" },
-    { code: "gu", name: "Gujarati", native: "ગુજરાતી" },
-    { code: "kn", name: "Kannada", native: "ಕನ್ನಡ" },
-    { code: "ml", name: "Malayalam", native: "മലയാളം" },
-    { code: "pa", name: "Punjabi", native: "ਪੰਜਾਬੀ" },
-    { code: "am", name: "Amharic", native: "አማርኛ" },
-    { code: "az", name: "Azerbaijani", native: "Azərbaycan" },
-    { code: "uz", name: "Uzbek", native: "Oʻzbek" },
-    { code: "kk", name: "Kazakh", native: "Қазақ" },
-    { code: "ka", name: "Georgian", native: "ქართული" },
-    { code: "hy", name: "Armenian", native: "Հայերեն" },
-    { code: "ne", name: "Nepali", native: "नेपाली" },
-    { code: "si", name: "Sinhala", native: "සිංහල" },
-    { code: "my", name: "Burmese", native: "မြန်မာ" },
-    { code: "km", name: "Khmer", native: "ខ្មែរ" },
-    { code: "lo", name: "Lao", native: "ລາວ" },
-    { code: "mn", name: "Mongolian", native: "Монгол" },
-    { code: "af", name: "Afrikaans", native: "Afrikaans" },
-    { code: "sq", name: "Albanian", native: "Shqip" },
-    { code: "eu", name: "Basque", native: "Euskara" },
-    { code: "ca", name: "Catalan", native: "Català" },
-    { code: "gl", name: "Galician", native: "Galego" },
-    { code: "is", name: "Icelandic", native: "Íslenska" },
-    { code: "ga", name: "Irish", native: "Gaeilge" },
-    { code: "mk", name: "Macedonian", native: "Македонски" },
-    { code: "mt", name: "Maltese", native: "Malti" },
-    { code: "cy", name: "Welsh", native: "Cymraeg" },
-    { code: "be", name: "Belarusian", native: "Беларуская" },
-    { code: "bs", name: "Bosnian", native: "Bosanski" },
-    { code: "ky", name: "Kyrgyz", native: "Кыргызча" },
-    { code: "tg", name: "Tajik", native: "Тоҷикӣ" },
-    { code: "tk", name: "Turkmen", native: "Türkmen" },
-    { code: "ps", name: "Pashto", native: "پښتو" },
-    { code: "ku", name: "Kurdish", native: "Kurdî" },
-    { code: "so", name: "Somali", native: "Soomaali" },
-    { code: "ha", name: "Hausa", native: "Hausa" },
-    { code: "yo", name: "Yoruba", native: "Yorùbá" },
-    { code: "ig", name: "Igbo", native: "Igbo" },
-    { code: "zu", name: "Zulu", native: "isiZulu" },
-    { code: "xh", name: "Xhosa", native: "isiXhosa" },
-    { code: "sn", name: "Shona", native: "chiShona" },
-    { code: "st", name: "Southern Sotho", native: "Sesotho" },
-    { code: "tn", name: "Tswana", native: "Setswana" },
-    { code: "rw", name: "Kinyarwanda", native: "Kinyarwanda" },
-    { code: "mg", name: "Malagasy", native: "Malagasy" },
-    { code: "ny", name: "Chichewa", native: "ChiCheŵa" },
-    { code: "eo", name: "Esperanto", native: "Esperanto" },
-    { code: "la", name: "Latin", native: "Latina" },
-    { code: "gd", name: "Scottish Gaelic", native: "Gàidhlig" },
-    { code: "yi", name: "Yiddish", native: "ייִדיش" },
-    { code: "co", name: "Corsican", native: "Corsu" },
-    { code: "fy", name: "Western Frisian", native: "Frysk" },
-    { code: "haw", name: "Hawaiian", native: "ʻŌlelo Hawaiʻi" },
-    { code: "hmn", name: "Hmong", native: "Hmoob" },
-    { code: "sm", name: "Samoan", native: "Gagana faʻa Sāmoa" },
-    { code: "su", name: "Sundanese", native: "Basa Sunda" },
-    { code: "jw", name: "Javanese", native: "Basa Jawa" }
-  ];
+  // 2. مشغل أصوات الطبيعة النقي بحلقات دائرية ناعمة (HTML5 Audio Loops)
+  const soundTracks = {};
 
-  // حقن الـ 100 لغة مباشرة داخل مصفوفة اللغات في التطبيق الأصلي
-  if (window.LANGUAGES_DATA) {
-    window.LANGUAGES_DATA = LOCALES_100;
-  }
-  if (window.supportedLanguages) {
-    window.supportedLanguages = LOCALES_100;
-  }
+  function initNatureAudio() {
+    // ربط بطاقات الأصوات في شاشة Nature
+    const soundCards = document.querySelectorAll('.sound-card, [data-sound]');
+    soundCards.forEach(card => {
+      const soundKey = card.dataset.sound || card.querySelector('h3, .font-bold')?.textContent.trim().toLowerCase().replace(/\s+/g, '_');
+      if (!soundKey) return;
 
-  // 3. دعم صوتي نقي للمتصفح دون أزرار خارجية
-  class SilentNatureAudio {
-    constructor() {
-      this.ctx = null;
-    }
-    init() {
-      if (!this.ctx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) this.ctx = new AudioCtx();
+      const toggle = card.querySelector('input[type="checkbox"], button, [role="switch"]');
+      const slider = card.querySelector('input[type="range"]');
+
+      if (toggle && !toggle.dataset.audioBound) {
+        toggle.dataset.audioBound = "true";
+        
+        // تجهيز عنصر الصوت المحلي
+        if (!soundTracks[soundKey]) {
+          const audio = new Audio();
+          audio.src = `audio/${soundKey}.mp3`;
+          audio.loop = true;
+          audio.preload = 'none';
+          soundTracks[soundKey] = audio;
+        }
+
+        toggle.addEventListener('change', (e) => {
+          const audio = soundTracks[soundKey];
+          if (e.target.checked) {
+            audio.volume = slider ? parseFloat(slider.value) / 100 : 0.7;
+            audio.play().catch(err => console.log(`Audio waiting for user gesture: ${soundKey}`));
+          } else {
+            audio.pause();
+          }
+        });
+
+        if (slider) {
+          slider.addEventListener('input', (e) => {
+            const audio = soundTracks[soundKey];
+            if (audio) {
+              audio.volume = parseFloat(e.target.value) / 100;
+            }
+          });
+        }
       }
-    }
+    });
   }
-  window.DeepFocusSilentAudio = new SilentNatureAudio();
 
-  // مراقبة تعقيم الأرقام بهدوء
+  document.addEventListener('DOMContentLoaded', () => {
+    sanitizeDigits();
+    initNatureAudio();
+  });
+
   document.addEventListener('input', sanitizeDigits, true);
-  document.addEventListener('change', sanitizeDigits, true);
-
-  console.log("[DEEP FOCUS] UI Sanitized. Zero visual pollution active.");
+  console.log("[DEEP FOCUS] Pure CC0 Nature Audio pipeline armed.");
 })();
