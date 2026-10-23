@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         WebView.setWebContentsDebuggingEnabled(false);
-        if (!"com.zenstudy.focus".equals(getPackageName())) {
+        if (!"com.deepfocus.study".equals(getPackageName())) {
             finish();
             return;
         }
@@ -81,33 +81,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class ZenNativeBridge {
+        // Legacy WebView bridge names retained to preserve old v21 session behavior.
+        // No Android Service is started: user countdown end time is handled by AlarmManager.
         @JavascriptInterface
         public void startBackgroundService(int seconds, String title) {
-            Intent i = new Intent(MainActivity.this, FocusTimerService.class);
-            i.setAction("START");
-            i.putExtra("seconds", seconds);
-            i.putExtra("title", title);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(i);
-            } else {
-                startService(i);
-            }
+            FocusAlarmReceiver.schedule(MainActivity.this, seconds, title);
         }
 
         @JavascriptInterface
         public void stopBackgroundService() {
-            Intent i = new Intent(MainActivity.this, FocusTimerService.class);
-            i.setAction("STOP");
-            // stopService works even when Android disallows background service starts.
-            stopService(i);
+            FocusAlarmReceiver.cancel(MainActivity.this);
         }
 
         @JavascriptInterface
         public void triggerCompletionSound(String title) {
-            Intent i = new Intent(MainActivity.this, FocusTimerService.class);
-            i.setAction("ALARM_NOW");
-            i.putExtra("title", title);
-            startService(i);
+            FocusAlarmReceiver.completeNow(MainActivity.this, title);
         }
 
         @JavascriptInterface
