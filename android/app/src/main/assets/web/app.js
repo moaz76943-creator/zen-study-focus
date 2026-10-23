@@ -1,5 +1,109 @@
 
 /* ========================================================
+   DEEP FOCUS — ACOUSTIC COMPLETION TONES & SELECTOR (M185)
+   ======================================================== */
+const COMPLETION_TONES = {
+  zen_bell: { name: 'Zen Bell 🎐', desc: 'Gentle', freq: 587.33, decay: 2.8, level: 0.3 },
+  tibetan_bowl: { name: 'Tibetan Bowl 🧘', desc: 'Deep', freq: 432, decay: 3.5, level: 0.35 },
+  woodblock: { name: 'Woodblock 🪵', desc: 'Crisp', freq: 800, decay: 0.25, level: 0.4 },
+  crystal: { name: 'Crystal Bell 🔔', desc: 'Clear', freq: 1046.5, decay: 2.5, level: 0.35 },
+  gong: { name: 'Temple Gong ⛩️', desc: 'Loud', freq: 220, decay: 4.0, level: 0.5 },
+  vibrate: { name: 'Vibrate Only 📳', desc: 'Silent', freq: 0, decay: 0, level: 0 }
+};
+
+function playCompletionTone(toneKey) {
+  const key = toneKey || localStorage.getItem('df_end_tone') || 'zen_bell';
+  const tone = COMPLETION_TONES[key] || COMPLETION_TONES.zen_bell;
+
+  if (window.triggerHaptic) {
+    window.triggerHaptic('complete');
+  }
+
+  if (tone.freq === 0) return; // وضع الاهتزاز الصامت
+
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(tone.freq, ctx.currentTime);
+    if (key === 'gong') {
+      osc.frequency.exponentialRampToValueAtTime(tone.freq * 0.75, ctx.currentTime + tone.decay);
+    } else {
+      osc.frequency.exponentialRampToValueAtTime(tone.freq * 0.95, ctx.currentTime + tone.decay);
+    }
+
+    gain.gain.setValueAtTime(tone.level, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + tone.decay);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + tone.decay);
+  } catch(e) {}
+}
+
+window.playCompletionTone = playCompletionTone;
+
+// بناء بطاقة اختيار النغمة داخل واجهة أصوات الطبيعة
+function injectTonePickerUI() {
+  if (document.getElementById('df-tone-picker-card')) return;
+  const natureContainer = document.querySelector('#view-nature, [data-view="nature"], .nature-container') || document.querySelector('.sound-card')?.parentElement;
+  if (!natureContainer) return;
+
+  const currentTone = localStorage.getItem('df_end_tone') || 'zen_bell';
+
+  const card = document.createElement('div');
+  card.id = 'df-tone-picker-card';
+  card.className = 'p-4 bg-white/95 backdrop-blur rounded-2xl border border-slate-200/80 shadow-sm mb-4';
+  card.innerHTML = `
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🔔</span>
+        <h3 class="font-bold text-slate-800 text-sm">Focus End Chime (نغمة انتهاء الجلسة)</h3>
+      </div>
+      <span class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Zero-Music</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 text-xs">
+      ${Object.entries(COMPLETION_TONES).map(([id, t]) => `
+        <button data-tone-id="${id}" class="tone-btn flex items-center justify-between p-2.5 rounded-xl border ${id === currentTone ? 'border-blue-500 bg-blue-50/80 font-bold text-blue-900' : 'border-slate-200 bg-slate-50/60 text-slate-700'} hover:bg-slate-100 transition active:scale-98">
+          <span>${t.name}</span>
+          <span class="text-[10px] text-slate-400 font-medium">${t.desc}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+
+  card.querySelectorAll('.tone-btn').forEach(btn => {
+    btn.onclick = () => {
+      const toneId = btn.dataset.toneId;
+      localStorage.setItem('df_end_tone', toneId);
+      card.querySelectorAll('.tone-btn').forEach(b => {
+        b.className = 'tone-btn flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-700 hover:bg-slate-100 transition active:scale-98';
+      });
+      btn.className = 'tone-btn flex items-center justify-between p-2.5 rounded-xl border border-blue-500 bg-blue-50/80 font-bold text-blue-900 transition active:scale-98';
+      playCompletionTone(toneId); // سماع معاينة فورية
+    };
+  });
+
+  natureContainer.insertBefore(card, natureContainer.firstChild);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  injectTonePickerUI();
+  // إعادة المحاولة عند التبديل بين الأقسام
+  const observer = new MutationObserver(injectTonePickerUI);
+  observer.observe(document.body, { childList: true, subtree: true });
+});
+
+
+/* ========================================================
    DEEP FOCUS — LUXURY HAPTIC & PEACEFUL CHIME ENGINE (M184)
    ======================================================== */
 function triggerHaptic(type) {
