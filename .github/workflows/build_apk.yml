@@ -1,6 +1,6 @@
-# Mission #176 debug APK. Checkout is pinned to the annotated release tag's peeled commit.
+# Mission #177 debug APK. Checkout is pinned to the annotated release tag's peeled commit.
 # This workflow never checks out main, legacy branches, or previous production commits.
-name: Deep Focus Mission 176 - Verified Debug APK
+name: Deep Focus Mission 177 - Verified Debug APK
 
 on:
   push:
@@ -14,35 +14,38 @@ permissions:
   contents: read
 
 concurrency:
-  group: deep-focus-mission176-debug-apk
+  group: deep-focus-mission177-debug-apk
   cancel-in-progress: false
 
 jobs:
-  mission176-debug-apk:
-    name: Build and verify Mission 176 debug APK
+  mission177-debug-apk:
+    name: Build and verify Mission 177 debug APK
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
-      - name: Checkout pinned Mission 176 release commit
+      - name: Checkout pinned Mission 177 release commit
         uses: actions/checkout@v4
         with:
-          ref: 26f0a1d64ad093423fffb8d47df6714bc608561f
+          ref: ef6bba52b827042fe5a6c264787c865c0b84fb01
           persist-credentials: false
       - name: Verify approved tag and checkout integrity
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "26f0a1d64ad093423fffb8d47df6714bc608561f"
-          TAG_TARGET="$(git ls-remote origin 'refs/tags/v3.0.1-runtime-activated-v21^{}' | awk '{print $1}')"
-          test "$TAG_TARGET" = "26f0a1d64ad093423fffb8d47df6714bc608561f" || { echo "::error::Release tag no longer points to approved Mission 176 commit"; exit 1; }
+          test "$(git rev-parse HEAD)" = "ef6bba52b827042fe5a6c264787c865c0b84fb01"
+          TAG_TARGET="$(git ls-remote origin 'refs/tags/v3.0.2-visual-suite-v21^{}' | awk '{print $1}')"
+          test "$TAG_TARGET" = "ef6bba52b827042fe5a6c264787c865c0b84fb01" || { echo "::error::Release tag no longer points to approved Mission 177 commit"; exit 1; }
           test -f android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
+          test -f android/app/src/main/assets/web/js/deep_focus_visual_suite.js
           grep -Fq '<script src="js/deep_focus_runtime_activator.js"></script>' android/app/src/main/assets/web/index.html
-          echo "Validated tag v3.0.1-runtime-activated-v21 at commit 26f0a1d64ad093423fffb8d47df6714bc608561f"
-      - name: Validate runtime activator syntax
+          grep -Fq '<script src="js/deep_focus_visual_suite.js"></script>' android/app/src/main/assets/web/index.html
+          echo "Validated tag v3.0.2-visual-suite-v21 at commit ef6bba52b827042fe5a6c264787c865c0b84fb01"
+      - name: Validate runtime activator and visual suite
         shell: bash
         run: |
           node --check android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
-          node --test test/runtime_activator_integration.test.js
+          node --check android/app/src/main/assets/web/js/deep_focus_visual_suite.js
+          node --test test/runtime_activator_integration.test.js test/visual_suite_integration.test.js
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
@@ -68,7 +71,7 @@ jobs:
             gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
           fi
           chmod +x ./gradlew
-      - name: Build Mission 176 APK exactly as requested
+      - name: Build Mission 177 APK exactly as requested
         working-directory: android
         shell: bash
         run: ./gradlew clean assembleDebug --stacktrace
@@ -82,38 +85,39 @@ jobs:
           AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt"
           test -x "$APKSIGNER"
           test -x "$AAPT"
-          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee "$RUNNER_TEMP/mission176-signature.txt"
-          "$AAPT" dump badging "$APK" | tee "$RUNNER_TEMP/mission176-badging.txt"
-          grep -Eq "package: name='com.zenstudy.focus'" "$RUNNER_TEMP/mission176-badging.txt"
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee "$RUNNER_TEMP/mission177-signature.txt"
+          "$AAPT" dump badging "$APK" | tee "$RUNNER_TEMP/mission177-badging.txt"
+          grep -Eq "package: name='com.zenstudy.focus'" "$RUNNER_TEMP/mission177-badging.txt"
           unzip -Z -1 "$APK" | grep -Fxq 'assets/web/js/deep_focus_runtime_activator.js'
+          unzip -Z -1 "$APK" | grep -Fxq 'assets/web/js/deep_focus_visual_suite.js'
           unzip -Z -1 "$APK" | grep -Fxq 'assets/web/index.html'
-          sha256sum "$APK" | tee "$RUNNER_TEMP/mission176-sha256.txt"
+          sha256sum "$APK" | tee "$RUNNER_TEMP/mission177-sha256.txt"
           {
-            echo "tag=v3.0.1-runtime-activated-v21"
-            echo "source_commit=26f0a1d64ad093423fffb8d47df6714bc608561f"
+            echo "tag=v3.0.2-visual-suite-v21"
+            echo "source_commit=ef6bba52b827042fe5a6c264787c865c0b84fb01"
             echo "build_command=./gradlew clean assembleDebug --stacktrace"
             echo "package=com.zenstudy.focus"
             echo "signing=Android debug signing key (not Google Play upload signing)"
-          } > "$RUNNER_TEMP/mission176-provenance.txt"
+          } > "$RUNNER_TEMP/mission177-provenance.txt"
           {
-            echo "### Mission 176 verified Debug APK"
-            echo "Source: \`v3.0.1-runtime-activated-v21\` / \`26f0a1d64ad093423fffb8d47df6714bc608561f\`"
+            echo "### Mission 177 verified Debug APK"
+            echo "Source: \`v3.0.2-visual-suite-v21\` / \`ef6bba52b827042fe5a6c264787c865c0b84fb01\`"
             echo "Package: \`com.zenstudy.focus\`"
             echo "APK SHA256:"
             echo '\`\`\`'
-            cat "$RUNNER_TEMP/mission176-sha256.txt"
+            cat "$RUNNER_TEMP/mission177-sha256.txt"
             echo '\`\`\`'
             echo "This APK has the Android debug signature, not a Play release upload signature."
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload verified APK, SHA256 and signing evidence
         uses: actions/upload-artifact@v4
         with:
-          name: DeepFocus-Mission176-v3.0.1-Debug-APK
+          name: DeepFocus-Mission177-v3.0.2-Debug-APK
           if-no-files-found: error
           retention-days: 30
           path: |
             android/app/build/outputs/apk/debug/app-debug.apk
-            ${{ runner.temp }}/mission176-sha256.txt
-            ${{ runner.temp }}/mission176-provenance.txt
-            ${{ runner.temp }}/mission176-signature.txt
-            ${{ runner.temp }}/mission176-badging.txt
+            ${{ runner.temp }}/mission177-sha256.txt
+            ${{ runner.temp }}/mission177-provenance.txt
+            ${{ runner.temp }}/mission177-signature.txt
+            ${{ runner.temp }}/mission177-badging.txt
