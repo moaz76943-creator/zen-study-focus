@@ -34,7 +34,7 @@ test('Alarm receiver validates current timer and schedules without exact-alarm s
  assert.match(java,/deadline/);
  assert.match(java,/BOOT_COMPLETED/);
  assert.match(java,/POST_NOTIFICATIONS/);
- assert.doesNotMatch(java,/\\.setExact|Manifest\\.permission\\.SCHEDULE_EXACT_ALARM|\\bstartForeground\\(/);
+ assert.doesNotMatch(java,/\.setExact|Manifest\.permission\.SCHEDULE_EXACT_ALARM|\bstartForeground\(/);
 });
 test('Release metadata matches existing Play package and increases versionCode',()=>{
  const g=read('android/app/build.gradle');
