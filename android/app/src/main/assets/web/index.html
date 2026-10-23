@@ -637,6 +637,13 @@
   <link rel="stylesheet" href="design_tokens_v22.css">
   <link rel="stylesheet" href="ui_components_v22.css">
   <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
+  <style id="western-digits-enforcement-style">
+    input[type="date"], input[type="time"], .date-display, [data-date] {
+      font-variant-numeric: lining-nums !important;
+      -webkit-locale: "en-US" !important;
+      direction: ltr !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -1240,6 +1247,5 @@
   <script src="sound_mix_controls.js"></script>
   <script src="integration_v22.js"></script>
   <script src="js/deep_focus_runtime_activator.js"></script>
-  <script src="js/deep_focus_visual_suite.js"></script>
 </body>
 </html>
