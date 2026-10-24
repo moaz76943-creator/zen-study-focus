@@ -4894,3 +4894,89 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M212_VOCAB_ACCENT_VOICE_CHECKER_AND_CODE32_V1 === */
+(function() {
+  if (window.__M212_VOICE_CHECKER__) return;
+  window.__M212_VOICE_CHECKER__ = true;
+
+  window.dfTestCurrentVoicePronunciation = function() {
+    var eng = window.SpokenVocabEngine;
+    if (!eng) return;
+    var lang = (eng.config && eng.config.foreignLang) || 'de-DE';
+    var testPhrase = 'Hallo';
+    if (/^en/i.test(lang)) testPhrase = 'Hello';
+    else if (/^fr/i.test(lang)) testPhrase = 'Bonjour';
+    else if (/^es/i.test(lang)) testPhrase = 'Hola';
+    else if (/^tr/i.test(lang)) testPhrase = 'Merhaba';
+
+    if (typeof eng.speakWord === 'function') {
+      eng.speakWord(testPhrase, lang);
+    } else if (typeof window.speechSynthesis !== 'undefined') {
+      try {
+        window.speechSynthesis.cancel();
+        var u = new SpeechSynthesisUtterance(testPhrase);
+        u.lang = lang;
+        window.speechSynthesis.speak(u);
+      } catch(e) {}
+    }
+  };
+
+  function updateVoiceStatusUI() {
+    if (typeof document === 'undefined') return;
+    var badge = document.getElementById('df-vocab-voice-status-badge');
+    if (!badge) return;
+
+    var eng = window.SpokenVocabEngine;
+    var lang = (eng && eng.config && eng.config.foreignLang) || 'de-DE';
+    var hasVoices = false;
+    if (typeof window.speechSynthesis !== 'undefined') {
+      var voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      if (voices && voices.length > 0) {
+        hasVoices = voices.some(function(v) {
+          return v.lang && v.lang.toLowerCase().indexOf(lang.split('-')[0].toLowerCase()) === 0;
+        });
+      } else {
+        hasVoices = true;
+      }
+    }
+    badge.textContent = hasVoices ? '🔊 محرك النطق جاهز' : '⚠️ يُنصح بتثبيت أصوات النظام';
+    badge.style.color = hasVoices ? '#4ade80' : '#facc15';
+    badge.style.borderColor = hasVoices ? 'rgba(74,222,128,0.35)' : 'rgba(250,204,21,0.35)';
+  }
+
+  window.dfUpdateVocabVoiceStatus = updateVoiceStatusUI;
+
+  function mountVoiceStatusControls() {
+    if (typeof document === 'undefined') return;
+    var targetRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!targetRow || document.getElementById('df-vocab-voice-test-btn')) return;
+
+    var testBtn = document.createElement('button');
+    testBtn.type = 'button';
+    testBtn.id = 'df-vocab-voice-test-btn';
+    testBtn.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid rgba(56,189,248,0.35);background:rgba(56,189,248,0.12);color:#38bdf8;font-size:12px;font-weight:600;cursor:pointer;';
+    testBtn.textContent = '🗣 فحص الصوت';
+    testBtn.onclick = function() { window.dfTestCurrentVoicePronunciation(); };
+
+    var statusBadge = document.createElement('span');
+    statusBadge.id = 'df-vocab-voice-status-badge';
+    statusBadge.style.cssText = 'font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;border:1px solid rgba(74,222,128,0.35);color:#4ade80;background:rgba(15,23,42,0.6);';
+    statusBadge.textContent = '🔊 محرك النطق جاهز';
+
+    targetRow.appendChild(testBtn);
+    targetRow.appendChild(statusBadge);
+
+    updateVoiceStatusUI();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountVoiceStatusControls);
+    } else {
+      setTimeout(mountVoiceStatusControls, 350);
+    }
+    setInterval(updateVoiceStatusUI, 3000);
+  }
+})();
+
