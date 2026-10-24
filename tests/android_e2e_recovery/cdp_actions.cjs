@@ -2,8 +2,9 @@
 // Real disposable Android WebView actions. Does not claim TalkBack, hearing, DND or physical-phone acceptance.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
 const {validateTouchTarget,missingPrerequisites,classifyFailure,selectCases}=require('./cdp_touch_target.cjs');
-const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,nativePromptText}=require('./android_device_touch.cjs');
+const {parseWebViewBounds,cssPointToAndroid,parseNativePromptButton,parseNativeConfirmButton,nativePromptText}=require('./android_device_touch.cjs');
 const {readWebViewFrame}=require('./android_ui_hierarchy.cjs');
+const {isTransportFailure,recoverTransport}=require('./cdp_transport_recovery.cjs');
 const CASES=['preflight','navigation','dialog_back','touch_scroll','western_numerals','accessibility_smoke','notes_create_edit','tasks_create','task_subtasks','save_failure','copy_export','language_live_change','timer_start_pause','completion_notification','process_death_recovery','orientation_restore','long_text','talkback','data_integrity','calendar_and_sounds'];
 const selectedCases=selectCases(process.env.DF_ANDROID_CASES||'',CASES);
 const scenarioEvidence=new Map();
@@ -12,6 +13,7 @@ const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const adb=(...args)=>cp.execFileSync('adb',['-s','emulator-5554',...args],{encoding:'utf8',timeout:20000});
 let ws,serial=0,pending=new Map();
 const touchTrace=[];
+let transportUnavailable=null;
 async function connect(){
  const pid=adb('shell','pidof','com.zenstudy.focus').trim().split(/\s/)[0];
  assert.match(pid,/^\d+$/);adb('forward','tcp:9222','localabstract:webview_devtools_remote_'+pid);
@@ -89,9 +91,43 @@ async function dismissNoteKeyboardForSave(){
  return {beforeHeight:before.viewport,afterHeight:after.viewport};
 }
 
+async function acceptNativeConfirm(expression){
+ // Runtime.evaluate remains outstanding until the branded *real* Android
+ // AlertDialog responds. Waiting on it first causes an artificial 20s timeout.
+ const outstanding=evaluate(expression);
+ outstanding.catch(()=>{}); // suppress unhandled rejection if native hierarchy is unavailable
+ await pause(450);
+ let xml=null,lastFailure=null;
+ for(let attempt=0;attempt<3;attempt++){
+  try{
+   adb('shell','uiautomator','dump','/sdcard/df-native-confirm-test.xml');
+   const observed=adb('shell','cat','/sdcard/df-native-confirm-test.xml');
+   if(observed.includes('Deep Focus') && !observed.includes('file://')){
+     xml=observed;
+     break;
+   }
+  }catch(e){lastFailure=e;}
+  await pause(450);
+ }
+ if(!xml)throw Error('TRANSPORT: Native Deep Focus confirmation unverified: '+String(lastFailure?.message||'missing dialog').slice(0,120));
+ const point=parseNativeConfirmButton(xml);
+ adb('shell','input','tap',String(point.x),String(point.y));
+ const accepted=await outstanding;
+ assert.equal(accepted,true,'Native confirmation OK must cause a real JS true result');
+ return accepted;
+}
 async function check(expression,message){assert.equal(await evaluate(expression),true,message);}
 async function run(id,fn){
  if(selectedCases&&!selectedCases.has(id))return;
+ // If a previous real Android renderer died and a single bounded restart
+ // ALSO failed, later scenarios are blocked — not misclassified as app FAIL.
+ if(transportUnavailable){
+  const entry={id,status:'NOT_TESTED',classification:'BLOCKED',
+    detail:'DEPENDENCY_NOT_TESTED: CDP reattachment failed: '+transportUnavailable};
+  results.set(id,entry);
+  console.log(JSON.stringify(entry));
+  return;
+ }
  try{
   const detail=await fn();results.set(id,{id,status:'PASS',detail:typeof detail==='string'?detail:'Executed on disposable Android WebView using ADB taps, CDP text input and observed state'});
  }catch(e){
@@ -100,8 +136,17 @@ async function run(id,fn){
    const path=require('node:path'),file=path.join(path.dirname(process.argv[2]||'android-dom-actions.json'),id+'-failure.png');
    fs.writeFileSync(file,cp.execFileSync('adb',['-s','emulator-5554','exec-out','screencap','-p'],{timeout:10000}));entry.screenshot=path.basename(file);
   }catch(capture){entry.captureError=String(capture.message).slice(0,200);}
-  try{entry.observed=await evaluate("({task:tasksList.find(t=>t.title==='Android fixture task'),notes:notesList.filter(n=>n.title.startsWith('Android')).map(n=>({id:n.id,title:n.title,bodyLength:n.body.length})),editorTitle:document.querySelector('#inpNoteTitle')?.value,editorBodyLength:document.querySelector('#inpNoteBody')?.value.length})");}
-  catch(observation){entry.observationError=String(observation.message).slice(0,200);}
+  // A timed-out CDP evaluation must not lead to another 20-second evaluation.
+  // Capture the screenshot above, reattach at most once and preserve NOT_TESTED.
+  if(!isTransportFailure(e)){
+   try{entry.observed=await evaluate("({task:tasksList.find(t=>t.title==='Android fixture task'),notes:notesList.filter(n=>n.title.startsWith('Android')).map(n=>({id:n.id,title:n.title,bodyLength:n.body.length})),editorTitle:document.querySelector('#inpNoteTitle')?.value,editorBodyLength:document.querySelector('#inpNoteBody')?.value.length})");}
+   catch(observation){entry.observationError=String(observation.message).slice(0,200);}
+  }
+  const recovered=await recoverTransport(e,restart);
+  if(recovered.attempted){
+   entry.transportRecovery=recovered;
+   if(!recovered.recovered)transportUnavailable=recovered.reason||'unknown CDP restart error';
+  }
   results.set(id,entry);
  }
  if(scenarioEvidence.has(id))results.get(id).evidence=scenarioEvidence.get(id);
@@ -211,7 +256,7 @@ async function main(){
   await tap('#navTimer');await evaluate("selectTimerMode(1,'focus',null)");const count=await evaluate('cfg.sessions');
   await tap('#mainPlayBtn');await pause(2200);await tap('#mainPlayBtn');const left=await evaluate('timerLeft');assert.ok(left<=59&&left>=54,'Actual elapsed seconds');
   await pause(1200);assert.equal(await evaluate('timerLeft'),left,'Paused clock stable');await tap('#mainPlayBtn');await pause(1200);await tap('#mainPlayBtn');
-  await evaluate('resetTimerNow()');assert.equal(await evaluate('cfg.sessions'),count,'Reset cannot grant focus credit');
+  await acceptNativeConfirm('resetTimerNow()');assert.equal(await evaluate('cfg.sessions'),count,'Reset cannot grant focus credit');
  });
  await run('save_failure',async()=>{
   await tap('#navNotes');await tap('#nsNewButton');await fill('#inpNoteTitle','Quota fixture');await fill('#inpNoteBody','Do not lose edits');await dismissNoteKeyboardForSave();
@@ -279,7 +324,7 @@ async function main(){
       await check('document.documentElement.scrollWidth<=innerWidth+1','No horizontal overflow after rotation');
     }
     await tap('#nsSaveButton');await check(`notesList.filter(n=>n.title===${JSON.stringify(title)}&&n.body===${JSON.stringify(body)}).length===1`,'One saved note after both rotations');
-    await evaluate('resetTimerNow()');assert.equal(await evaluate('cfg.sessionHistory?.length||0'),history,'Cancelled rotating timer grants no credit');
+    await acceptNativeConfirm('resetTimerNow()');assert.equal(await evaluate('cfg.sessionHistory?.length||0'),history,'Cancelled rotating timer grants no credit');
     return 'Actual landscape/portrait, unsaved Unicode draft and running timer retained; no duplicate save or focus credit';
   }finally{
     if(['0','1','2','3'].includes(rotation))adb('shell','settings','put','system','user_rotation',rotation);
