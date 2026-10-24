@@ -4757,3 +4757,69 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M210_VOCAB_BULK_MASTERY_ACTION_V1 === */
+(function() {
+  if (window.__M210_VOCAB_BULK_MASTERY__) return;
+  window.__M210_VOCAB_BULK_MASTERY__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfMarkAllReviewAsMastered = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    if (!items.length) {
+      alert('لا توجد كلمات حالياً.');
+      return;
+    }
+    var count = 0;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i] && items[i].hard) {
+        items[i].hard = false;
+        count++;
+      }
+    }
+    if (count > 0 && typeof eng.saveItems === 'function') {
+      eng.saveItems(items);
+      if (typeof eng.render === 'function') eng.render();
+      if (typeof window.dfUpdateVocabStatsBadge === 'function') {
+        window.dfUpdateVocabStatsBadge();
+      }
+      alert('تم إتقان ' + toWesternDigits(count) + ' كلمة وإزالتها من قائمة المراجعة بنجاح!');
+    } else {
+      alert('جميع الكلمات متقنة بالفعل ولا توجد كلمات للمراجعة.');
+    }
+  };
+
+  function mountBulkMasteryBtn() {
+    if (typeof document === 'undefined') return;
+    var searchRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!searchRow || document.getElementById('df-vocab-mark-all-mastered-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-vocab-mark-all-mastered-btn';
+    btn.style.cssText = 'padding:8px 12px;border-radius:10px;border:1px solid rgba(74,222,128,0.35);background:rgba(74,222,128,0.12);color:#4ade80;font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = '✅ إتقان كل المراجعة';
+    btn.onclick = function() {
+      if (confirm('هل أتقنت جميع الكلمات في قائمة المراجعة وتريد إزالتها من الصعبة؟')) {
+        window.dfMarkAllReviewAsMastered();
+      }
+    };
+    searchRow.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountBulkMasteryBtn);
+    } else {
+      setTimeout(mountBulkMasteryBtn, 350);
+    }
+    setInterval(mountBulkMasteryBtn, 2000);
+  }
+})();
+
