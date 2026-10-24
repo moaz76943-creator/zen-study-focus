@@ -5211,3 +5211,89 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M216_VOCAB_SORT_ORDER_AND_CODE36_V1 === */
+(function() {
+  if (window.__M216_VOCAB_SORT_ACTIVE__) return;
+  window.__M216_VOCAB_SORT_ACTIVE__ = true;
+
+  var SORT_KEY = 'df_vocab_sort_mode';
+  var MODES = ['newest', 'alpha', 'hard_first'];
+  var LABELS = {
+    newest: '↕ الترتيب: الأحدث',
+    alpha: '🔤 الترتيب: أبجدي',
+    hard_first: '🔥 الترتيب: الصعبة أولاً'
+  };
+  var currentMode = 'newest';
+  try {
+    var saved = localStorage.getItem(SORT_KEY);
+    if (saved && LABELS[saved]) currentMode = saved;
+  } catch (e) {}
+
+  window.dfSortVocabItems = function(items, mode) {
+    var m = mode || currentMode;
+    var list = (items || []).slice();
+    if (m === 'alpha') {
+      list.sort(function(a, b) {
+        return String((a && a.word) || '').localeCompare(String((b && b.word) || ''));
+      });
+    } else if (m === 'hard_first') {
+      list.sort(function(a, b) {
+        var ah = (a && a.hard) ? 1 : 0;
+        var bh = (b && b.hard) ? 1 : 0;
+        if (bh !== ah) return bh - ah;
+        return String((a && a.word) || '').localeCompare(String((b && b.word) || ''));
+      });
+    }
+    return list;
+  };
+
+  window.dfCycleVocabSortOrder = function() {
+    var idx = MODES.indexOf(currentMode);
+    currentMode = MODES[(idx + 1) % MODES.length];
+    try {
+      localStorage.setItem(SORT_KEY, currentMode);
+    } catch (e) {}
+
+    var btn = typeof document !== 'undefined' ? document.getElementById('df-vocab-sort-mode-btn') : null;
+    if (btn) {
+      btn.textContent = LABELS[currentMode];
+    }
+
+    var eng = window.SpokenVocabEngine;
+    if (eng && typeof eng.getItems === 'function' && typeof eng.saveItems === 'function') {
+      var sorted = window.dfSortVocabItems(eng.getItems(), currentMode);
+      eng.saveItems(sorted);
+      if (typeof eng.render === 'function') eng.render();
+    }
+    return currentMode;
+  };
+
+  window.dfGetVocabSortOrder = function() {
+    return currentMode;
+  };
+
+  function mountSortModeBtn() {
+    if (typeof document === 'undefined') return;
+    var searchRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!searchRow || document.getElementById('df-vocab-sort-mode-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-vocab-sort-mode-btn';
+    btn.style.cssText = 'padding:8px 12px;border-radius:10px;border:1px solid rgba(148,163,184,0.35);background:rgba(30,41,59,0.75);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = LABELS[currentMode] || LABELS.newest;
+    btn.onclick = function() { window.dfCycleVocabSortOrder(); };
+    searchRow.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountSortModeBtn);
+    } else {
+      setTimeout(mountSortModeBtn, 350);
+    }
+    setInterval(mountSortModeBtn, 2500);
+  }
+})();
+
