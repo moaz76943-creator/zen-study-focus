@@ -4499,3 +4499,193 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M207_FLASH_QUIZ_SHUFFLE_AND_REVERSE_V1 === */
+(function() {
+  if (window.__M207_QUIZ_ENHANCED__) return;
+  window.__M207_QUIZ_ENHANCED__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  function shuffleArray(arr) {
+    var copy = (arr || []).slice();
+    for (var i = copy.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = temp;
+    }
+    return copy;
+  }
+
+  window.dfToWesternDigitsM207 = toWesternDigits;
+  window.dfShuffleVocabArrayM207 = shuffleArray;
+
+  var quizState = { isShuffled: false, isReversed: false };
+
+  window.dfToggleQuizShuffle = function() {
+    quizState.isShuffled = !quizState.isShuffled;
+    var btn = document.getElementById('df-quiz-shuffle-toggle-btn');
+    if (btn) {
+      btn.style.background = quizState.isShuffled ? 'rgba(168,85,247,0.3)' : 'rgba(255,255,255,0.06)';
+      btn.style.borderColor = quizState.isShuffled ? '#c084fc' : 'rgba(255,255,255,0.15)';
+    }
+    return quizState.isShuffled;
+  };
+
+  window.dfToggleQuizReverse = function() {
+    quizState.isReversed = !quizState.isReversed;
+    var btn = document.getElementById('df-quiz-reverse-toggle-btn');
+    if (btn) {
+      btn.textContent = quizState.isReversed ? '🔄 السؤال: المعنى ⬅ الكلمة' : '🔄 السؤال: الكلمة ⬅ المعنى';
+      btn.style.background = quizState.isReversed ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.06)';
+      btn.style.borderColor = quizState.isReversed ? '#38bdf8' : 'rgba(255,255,255,0.15)';
+    }
+    return quizState.isReversed;
+  };
+
+  window.dfGetPreparedQuizItems = function(rawItems) {
+    var items = (rawItems || []).slice();
+    if (quizState.isShuffled) items = shuffleArray(items);
+    return items.map(function(it) {
+      if (!quizState.isReversed) return it;
+      return {
+        id: it.id,
+        word: it.meaning,
+        meaning: it.word,
+        color: it.color,
+        hard: it.hard,
+        _origWord: it.word,
+        _origMeaning: it.meaning
+      };
+    });
+  };
+
+  function mountQuizControls() {
+    if (typeof document === 'undefined') return;
+    var quizHeader = document.getElementById('df-flash-quiz-header') ||
+                     document.getElementById('df-vocab-filter-bar');
+    if (!quizHeader || document.getElementById('df-quiz-extra-toolbar')) return;
+
+    var toolbar = document.createElement('div');
+    toolbar.id = 'df-quiz-extra-toolbar';
+    toolbar.style.cssText = 'display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap;';
+    toolbar.innerHTML =
+      '<button type="button" id="df-quiz-shuffle-toggle-btn" ' +
+      'style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;">' +
+      '🔀 خلط عشوائي</button>' +
+      '<button type="button" id="df-quiz-reverse-toggle-btn" ' +
+      'style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;">' +
+      '🔄 السؤال: الكلمة ⬅ المعنى</button>';
+
+    quizHeader.parentNode.insertBefore(toolbar, quizHeader.nextSibling);
+
+    var shuffleBtn = document.getElementById('df-quiz-shuffle-toggle-btn');
+    if (shuffleBtn) shuffleBtn.onclick = function() { window.dfToggleQuizShuffle(); };
+
+    var reverseBtn = document.getElementById('df-quiz-reverse-toggle-btn');
+    if (reverseBtn) reverseBtn.onclick = function() { window.dfToggleQuizReverse(); };
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountQuizControls);
+    } else {
+      setTimeout(mountQuizControls, 300);
+    }
+    setInterval(mountQuizControls, 1500);
+  }
+})();
+
+/* === M208_VOCAB_SPEED_PRESETS_AND_REPLAY_V1 === */
+(function() {
+  if (window.__M208_VOCAB_SPEED_PRESETS__) return;
+  window.__M208_VOCAB_SPEED_PRESETS__ = true;
+
+  var currentSpeed = 1.0;
+
+  window.dfSetVocabPlaybackSpeed = function(speed) {
+    currentSpeed = parseFloat(speed) || 1.0;
+    var eng = window.SpokenVocabEngine;
+    if (eng) {
+      eng.playbackSpeed = currentSpeed;
+      if (eng.config) eng.config.speed = currentSpeed;
+    }
+    updateSpeedButtonsUI();
+    return currentSpeed;
+  };
+
+  window.dfGetVocabPlaybackSpeed = function() {
+    return currentSpeed;
+  };
+
+  function updateSpeedButtonsUI() {
+    if (typeof document === 'undefined') return;
+    var speeds = [0.75, 1.0, 1.25];
+    speeds.forEach(function(s) {
+      var btn = document.getElementById('df-speed-btn-' + String(s).replace('.', '_'));
+      if (btn) {
+        var isActive = Math.abs(currentSpeed - s) < 0.05;
+        btn.style.background = isActive ? 'rgba(168,85,247,0.35)' : 'rgba(255,255,255,0.06)';
+        btn.style.borderColor = isActive ? '#c084fc' : 'rgba(255,255,255,0.15)';
+        btn.style.color = isActive ? '#ffffff' : '#94a3b8';
+      }
+    });
+  }
+
+  window.dfReplayCurrentQuizWord = function() {
+    var eng = window.SpokenVocabEngine;
+    if (!eng) return;
+    var quizWordElem = document.getElementById('df-quiz-current-word') ||
+                       document.querySelector('.df-quiz-card-word');
+    if (quizWordElem) {
+      var wordText = quizWordElem.textContent || '';
+      if (wordText && typeof eng.speakWord === 'function') {
+        eng.speakWord(wordText);
+      } else if (wordText && typeof eng.speakPair === 'function') {
+        eng.speakPair({ word: wordText, meaning: '' });
+      }
+    }
+  };
+
+  function mountSpeedControls() {
+    if (typeof document === 'undefined') return;
+    var targetRow = document.getElementById('df-quiz-extra-toolbar') ||
+                    document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!targetRow || document.getElementById('df-vocab-speed-selector-group')) return;
+
+    var speedGroup = document.createElement('div');
+    speedGroup.id = 'df-vocab-speed-selector-group';
+    speedGroup.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:rgba(15,23,42,0.6);padding:3px 6px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);';
+    speedGroup.innerHTML =
+      '<span style="font-size:11px;color:#94a3b8;font-weight:600;margin-right:2px;">سرعة النطق:</span>' +
+      '<button type="button" id="df-speed-btn-0_75" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">0.75x</button>' +
+      '<button type="button" id="df-speed-btn-1_0" style="padding:4px 8px;border-radius:6px;border:1px solid #c084fc;background:rgba(168,85,247,0.35);color:#ffffff;font-size:11px;font-weight:700;cursor:pointer;">1.0x</button>' +
+      '<button type="button" id="df-speed-btn-1_25" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">1.25x</button>';
+
+    targetRow.appendChild(speedGroup);
+
+    var b075 = document.getElementById('df-speed-btn-0_75');
+    if (b075) b075.onclick = function() { window.dfSetVocabPlaybackSpeed(0.75); };
+    var b100 = document.getElementById('df-speed-btn-1_0');
+    if (b100) b100.onclick = function() { window.dfSetVocabPlaybackSpeed(1.0); };
+    var b125 = document.getElementById('df-speed-btn-1_25');
+    if (b125) b125.onclick = function() { window.dfSetVocabPlaybackSpeed(1.25); };
+
+    updateSpeedButtonsUI();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountSpeedControls);
+    } else {
+      setTimeout(mountSpeedControls, 300);
+    }
+    setInterval(mountSpeedControls, 1500);
+  }
+})();
+
