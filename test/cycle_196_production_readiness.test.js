@@ -1,44 +1,52 @@
-const fs = require('fs');
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 
-console.log("--- Running Mission #196 Production Readiness Verification ---");
+const root = path.resolve(__dirname, '..');
+const receipt = JSON.parse(fs.readFileSync(path.join(root, 'artifacts/evidence/cycle_196_receipt.json'), 'utf8'));
+const gradle = fs.readFileSync(path.join(root, 'android/app/build.gradle'), 'utf8');
+const match = gradle.match(/\bapplicationId\s+["']([^"']+)["']/);
+const observed = match ? match[1] : 'NOT_FOUND';
+const expected = 'com.zenstudy.focus';
 
-const appJs = fs.readFileSync('android/app/src/main/assets/web/app.js', 'utf8');
-const gradle = fs.readFileSync('android/app/build.gradle', 'utf8');
+test('Cycle 196 evidence is NOT_APPROVED and tied to the examined source', () => {
+  assert.equal(receipt.cycle, 196);
+  assert.equal(receipt.source_sha, 'd2c3f9b6c2e9fa6a3b1eead93b22e27a580b9ff9');
+  assert.equal(receipt.status, 'NOT_APPROVED');
+  assert.equal(receipt.release_approved, false);
+  assert.equal(receipt.verified_tests, undefined, 'unexecuted checks cannot be called verified tests');
+});
 
-// Test 1: تأكد من خلو الكود من الشاشة السوداء العازلة
-if (appJs.includes('df-oled-desk-clock') && appJs.includes('openDeskClock')) {
-  console.error("FAIL: Blocking desk overlay still exists");
-  process.exit(1);
-}
-console.log("✓ Test 1: Zero blocking overlays confirmed (Touch fully responsive)");
+test('Cycle 196 records actual Android package mismatch without modifying the app', () => {
+  assert.equal(receipt.observed_application_id, observed);
+  assert.equal(receipt.expected_application_id, expected);
+  assert.equal(receipt.package_id_gate, observed === expected ? 'PASS' : 'FAIL');
+  if (observed !== expected) assert.equal(receipt.release_approved, false);
+});
 
-// Test 2: التحقق من اسم الحزمة ورقم الإصدار لجوجل بلاي
-if (!gradle.includes('applicationId "com.deepfocus.study"') || !gradle.includes('versionCode 23')) {
-  console.error("FAIL: Package ID or versionCode mismatch in build.gradle");
-  process.exit(1);
-}
-console.log("✓ Test 2: Package ID (com.deepfocus.study) and versionCode 23 verified");
+test('source markers and a signed build cannot certify independent release gates', () => {
+  assert.equal(receipt.gates.android_e2e, 'NOT_TESTED');
+  assert.equal(receipt.gates.touch_interaction, 'NOT_TESTED');
+  assert.equal(receipt.gates.audio_license, 'NOT_APPROVED');
+  assert.equal(receipt.gates.translation, 'NOT_VERIFIED');
+  assert.equal(receipt.gates.analytics, 'NOT_TESTED');
+  assert.equal(receipt.gates.saf_v21, 'NOT_TESTED');
+  assert.equal(receipt.gates.offline, 'NOT_TESTED');
+});
 
-// Test 3: التحقق من مصفوفة الـ 100 لغة والقواميس الشاملة
-if (!appJs.includes('LANG_CATALOG') || !appJs.includes('const DICT = {')) {
-  console.error("FAIL: Core language catalog compromised");
-  process.exit(1);
-}
-console.log("✓ Test 3: 100-Locales catalog and full dictionaries 100% intact");
+test('preserve unsupported original claims as history, not as verified facts', () => {
+  assert.equal(receipt.historical_claim.status, 'GREEN');
+  assert.equal(receipt.historical_claim.verified_tests, 5);
+  assert.equal(receipt.historical_claim.tag, 'v3.3.2-production-ready-v21');
+  assert.ok(Date.parse(receipt.historical_claim.timestamp) > Date.parse(receipt.audited_at));
+  assert.equal(receipt.historical_claim.approved, false);
+});
 
-// Test 4: التحقق من نغمات الختام واستبعاد العبرية
-if (!appJs.includes('COMPLETION_TONES') || appJs.includes('"code": "he"')) {
-  console.error("FAIL: Completion tones compromised or Hebrew detected");
-  process.exit(1);
-}
-console.log("✓ Test 4: Acoustic completion tones intact & Hebrew strictly excluded");
-
-// Test 5: التحقق من إزالة خدمة Foreground Service (عدم الحاجة لفيديو)
-const manifest = fs.readFileSync('android/app/src/main/AndroidManifest.xml', 'utf8');
-if (manifest.includes('FOREGROUND_SERVICE_SPECIAL_USE')) {
-  console.error("FAIL: FOREGROUND_SERVICE_SPECIAL_USE still declared");
-  process.exit(1);
-}
-console.log("✓ Test 5: Zero special-use foreground permissions (No video required by Google)");
-
-console.log("--- All Mission #196 Verification Tests PASSED (GREEN) ---");
+test('actual versionCode is descriptive, not proof of Play acceptance', () => {
+  const code = gradle.match(/\bversionCode\s+(\d+)/);
+  assert.ok(code, 'versionCode must be present');
+  assert.equal(receipt.observed_version_code, Number(code[1]));
+  assert.equal(receipt.gates.play_acceptance, 'NOT_TESTED');
+});
