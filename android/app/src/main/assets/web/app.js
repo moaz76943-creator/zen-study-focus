@@ -3772,8 +3772,33 @@ const VocabAudioBankEngine = (function() {
     return list;
   }
 
+  
+  function setCardReviewStatus(cardId, needsReview) {
+    const list = getVocabList().map(c => {
+      if (c.id === cardId) {
+        return {
+          ...c,
+          needsReview: needsReview,
+          reviewCount: (c.reviewCount || 0) + 1,
+          lastReviewed: new Date().toISOString().slice(0, 10)
+        };
+      }
+      return c;
+    });
+    saveVocabList(list);
+  }
+
+  function getFilteredVocab(colorFilter = 'all', sortMode = 'created_desc') {
+    let list = getSortedVocab(sortMode);
+    if (!colorFilter || colorFilter === 'all') return list;
+    if (colorFilter === 'needs_review') return list.filter(c => c.needsReview);
+    return list.filter(c => c.color === colorFilter);
+  }
+
   return {
     getVocabList,
+    setCardReviewStatus,
+    getFilteredVocab,
     saveVocabList,
     speakText,
     stopSpeech,
@@ -3828,6 +3853,17 @@ const VocabUIController = (function() {
         <button id="df-repeat-btn" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;color:#334155;">🔁 ${activeRepeats}x</button>
         <button id="df-sort-btn" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;color:#334155;">⇅ Sort</button>
         <button id="df-start-quiz-btn" style="background:#8b5cf6;color:#ffffff;border:none;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;margin-left:auto;margin-right:6px;">🧠 Start Quiz</button><button id="df-add-card-btn" style="background:#2563eb;color:#ffffff;border:none;border-radius:10px;padding:6px 14px;font-size:11px;cursor:pointer;font-weight:bold;margin-left:auto;">+ Add Word</button>
+      </div>
+
+      
+      <!-- Color & Category Filter Bar -->
+      <div id="df-vocab-filter-bar" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:8px 16px;display:flex;align-items:center;gap:6px;overflow-x:auto;">
+        <button data-filter="all" class="df-filter-chip" style="background:#2563eb;color:#ffffff;border:none;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;shrink:0;">All</button>
+        <button data-filter="purple" class="df-filter-chip" style="background:#ffffff;color:#6b21a8;border:1px solid #d8b4fe;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">🟣 Purple</button>
+        <button data-filter="blue" class="df-filter-chip" style="background:#ffffff;color:#1e40af;border:1px solid #bfdbfe;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">🔵 Blue</button>
+        <button data-filter="red" class="df-filter-chip" style="background:#ffffff;color:#991b1b;border:1px solid #fecaca;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">🔴 Red</button>
+        <button data-filter="green" class="df-filter-chip" style="background:#ffffff;color:#065f46;border:1px solid #a7f3d0;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">🟢 Green</button>
+        <button data-filter="needs_review" class="df-filter-chip" style="background:#ffffff;color:#854d0e;border:1px solid #fef08a;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">⚠️ Needs Review</button>
       </div>
 
       <!-- Word Cards List -->
@@ -4043,13 +4079,13 @@ const FlashQuizEngine = (function() {
       if (window.triggerHaptic) window.triggerHaptic('click');
     };
 
-    document.getElementById('df-quiz-hard').onclick = () => {
+    document.getElementById('df-quiz-hard').onclick = () => { if(window.VocabAudioBankEngine) window.VocabAudioBankEngine.setCardReviewStatus(card.id, true);
       currentIndex++;
       renderQuizCard();
       if (window.triggerHaptic) window.triggerHaptic('step');
     };
 
-    document.getElementById('df-quiz-easy').onclick = () => {
+    document.getElementById('df-quiz-easy').onclick = () => { if(window.VocabAudioBankEngine) window.VocabAudioBankEngine.setCardReviewStatus(card.id, false);
       correctCount++;
       currentIndex++;
       renderQuizCard();
