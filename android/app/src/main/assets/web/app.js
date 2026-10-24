@@ -4980,3 +4980,85 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M213_VOCAB_LOOP_INTERVAL_AND_CODE33_V1 === */
+(function() {
+  if (window.__M213_LOOP_INTERVAL__) return;
+  window.__M213_LOOP_INTERVAL__ = true;
+
+  var INTERVAL_KEY = 'df_vocab_loop_interval_ms';
+  var currentPauseMs = 1500;
+  try {
+    var saved = parseInt(localStorage.getItem(INTERVAL_KEY), 10);
+    if (saved && saved >= 500 && saved <= 5000) currentPauseMs = saved;
+  } catch(e) {}
+
+  window.dfSetVocabLoopInterval = function(sec) {
+    var ms = Math.round((parseFloat(sec) || 1.5) * 1000);
+    currentPauseMs = Math.max(500, Math.min(5000, ms));
+    try {
+      localStorage.setItem(INTERVAL_KEY, String(currentPauseMs));
+    } catch(e) {}
+
+    var eng = window.SpokenVocabEngine;
+    if (eng && eng.config) {
+      eng.config.pauseMs = currentPauseMs;
+    }
+    updateIntervalButtonsUI();
+    return currentPauseMs;
+  };
+
+  window.dfGetVocabLoopIntervalSec = function() {
+    return (currentPauseMs / 1000);
+  };
+
+  function updateIntervalButtonsUI() {
+    if (typeof document === 'undefined') return;
+    var presets = [1.0, 2.0, 3.0];
+    presets.forEach(function(s) {
+      var btn = document.getElementById('df-interval-btn-' + Math.round(s));
+      if (btn) {
+        var isActive = Math.abs((currentPauseMs / 1000) - s) < 0.2;
+        btn.style.background = isActive ? 'rgba(56,189,248,0.35)' : 'rgba(255,255,255,0.06)';
+        btn.style.borderColor = isActive ? '#38bdf8' : 'rgba(255,255,255,0.15)';
+        btn.style.color = isActive ? '#ffffff' : '#94a3b8';
+      }
+    });
+  }
+
+  function mountIntervalControls() {
+    if (typeof document === 'undefined') return;
+    var targetRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!targetRow || document.getElementById('df-vocab-interval-group')) return;
+
+    var group = document.createElement('div');
+    group.id = 'df-vocab-interval-group';
+    group.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:rgba(15,23,42,0.6);padding:3px 6px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);';
+    group.innerHTML =
+      '<span style="font-size:11px;color:#94a3b8;font-weight:600;margin-right:2px;">فاصل النطق:</span>' +
+      '<button type="button" id="df-interval-btn-1" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">1s</button>' +
+      '<button type="button" id="df-interval-btn-2" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">2s</button>' +
+      '<button type="button" id="df-interval-btn-3" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">3s</button>';
+
+    targetRow.appendChild(group);
+
+    var b1 = document.getElementById('df-interval-btn-1');
+    if (b1) b1.onclick = function() { window.dfSetVocabLoopInterval(1.0); };
+    var b2 = document.getElementById('df-interval-btn-2');
+    if (b2) b2.onclick = function() { window.dfSetVocabLoopInterval(2.0); };
+    var b3 = document.getElementById('df-interval-btn-3');
+    if (b3) b3.onclick = function() { window.dfSetVocabLoopInterval(3.0); };
+
+    updateIntervalButtonsUI();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountIntervalControls);
+    } else {
+      setTimeout(mountIntervalControls, 350);
+    }
+    setInterval(updateIntervalButtonsUI, 2500);
+  }
+})();
+
