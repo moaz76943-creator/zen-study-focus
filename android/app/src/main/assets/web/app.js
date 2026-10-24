@@ -4823,3 +4823,74 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M211_VOCAB_AUTO_NEXT_QUIZ_AND_CODE31_V1 === */
+(function() {
+  if (window.__M211_QUIZ_AUTO_NEXT__) return;
+  window.__M211_QUIZ_AUTO_NEXT__ = true;
+
+  var AUTO_KEY = 'df_vocab_quiz_autoadvance';
+  var autoAdvance = false;
+  try {
+    autoAdvance = localStorage.getItem(AUTO_KEY) === 'true';
+  } catch(e) {}
+
+  window.dfToggleQuizAutoAdvance = function() {
+    autoAdvance = !autoAdvance;
+    try {
+      localStorage.setItem(AUTO_KEY, autoAdvance ? 'true' : 'false');
+    } catch(e) {}
+    var btn = document.getElementById('df-quiz-autoadvance-btn');
+    if (btn) {
+      btn.style.background = autoAdvance ? 'rgba(74,222,128,0.25)' : 'rgba(255,255,255,0.06)';
+      btn.style.borderColor = autoAdvance ? '#4ade80' : 'rgba(255,255,255,0.15)';
+      btn.style.color = autoAdvance ? '#ffffff' : '#94a3b8';
+      btn.textContent = autoAdvance ? '⏭ انتقال تلقائي: مفعّل' : '⏭ انتقال تلقائي: معطّل';
+    }
+    return autoAdvance;
+  };
+
+  window.dfIsQuizAutoAdvanceEnabled = function() {
+    return autoAdvance;
+  };
+
+  window.dfTriggerQuizAutoAdvance = function(delayMs) {
+    if (!autoAdvance) return;
+    setTimeout(function() {
+      var quiz = window.FlashQuizEngine;
+      if (quiz && typeof quiz.nextCard === 'function') {
+        quiz.nextCard();
+      } else {
+        var nextBtn = document.getElementById('df-quiz-next-btn') ||
+                      document.querySelector('.df-quiz-next-button');
+        if (nextBtn) nextBtn.click();
+      }
+    }, delayMs || 500);
+  };
+
+  function mountAutoAdvanceUI() {
+    if (typeof document === 'undefined') return;
+    var toolbar = document.getElementById('df-quiz-extra-toolbar');
+    if (!toolbar || document.getElementById('df-quiz-autoadvance-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-quiz-autoadvance-btn';
+    btn.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid ' +
+      (autoAdvance ? '#4ade80' : 'rgba(255,255,255,0.15)') + ';background:' +
+      (autoAdvance ? 'rgba(74,222,128,0.25)' : 'rgba(255,255,255,0.06)') + ';color:' +
+      (autoAdvance ? '#ffffff' : '#94a3b8') + ';font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = autoAdvance ? '⏭ انتقال تلقائي: مفعّل' : '⏭ انتقال تلقائي: معطّل';
+    btn.onclick = function() { window.dfToggleQuizAutoAdvance(); };
+    toolbar.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountAutoAdvanceUI);
+    } else {
+      setTimeout(mountAutoAdvanceUI, 300);
+    }
+    setInterval(mountAutoAdvanceUI, 2000);
+  }
+})();
+
