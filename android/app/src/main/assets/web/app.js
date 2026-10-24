@@ -3795,8 +3795,30 @@ const VocabAudioBankEngine = (function() {
     return list.filter(c => c.color === colorFilter);
   }
 
+  
+  function cycleCardColor(cardId) {
+    const colors = ['purple', 'blue', 'red', 'green'];
+    const list = getVocabList().map(c => {
+      if (c.id === cardId) {
+        const nextIdx = (colors.indexOf(c.color || 'purple') + 1) % colors.length;
+        return { ...c, color: colors[nextIdx] };
+      }
+      return c;
+    });
+    saveVocabList(list);
+    return list;
+  }
+
+  function deleteCard(cardId) {
+    const list = getVocabList().filter(c => c.id !== cardId);
+    saveVocabList(list);
+    return list;
+  }
+
   return {
     getVocabList,
+    cycleCardColor,
+    deleteCard,
     setCardReviewStatus,
     getFilteredVocab,
     saveVocabList,
@@ -3842,7 +3864,7 @@ const VocabUIController = (function() {
         <button id="df-vocab-back" style="background:#f1f5f9;border:none;border-radius:12px;padding:8px 12px;font-size:14px;cursor:pointer;font-weight:bold;color:#475569;">← Back</button>
         <div style="flex:1;text-align:center;">
           <h2 style="margin:0;font-size:15px;font-weight:800;color:#0f172a;">Spoken Vocab Bank</h2>
-          <span style="font-size:11px;color:#64748b;font-weight:600;">AR > DE • ${items.length} Items</span>
+          <span id="df-vocab-count-badge" style="font-size:11px;color:#64748b;font-weight:600;font-variant-numeric:lining-nums;">AR > DE • ${items.length} Items</span>
         </div>
         <button id="df-vocab-import-btn" style="background:#eff6ff;color:#2563eb;border:1px solid #dbeafe;border-radius:12px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:bold;">📁+ Import</button>
       </div>
@@ -3869,7 +3891,7 @@ const VocabUIController = (function() {
       <!-- Word Cards List -->
       <div id="df-vocab-cards-container" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
         ${items.map(item => `
-          <div style="background:#ffffff;border-radius:18px;border:1px solid #e2e8f0;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.02);display:flex;gap:14px;align-items:flex-start;">
+          <div data-card-id="${item.id}" data-card-color="${item.color || 'purple'}" data-card-review="${item.needsReview ? 'true' : 'false'}" style="position:relative;background:#ffffff;border-radius:18px;border:1px solid #e2e8f0;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.02);display:flex;gap:14px;align-items:flex-start;">
             <!-- Foreign Word Column -->
             <div style="flex:1;">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -3881,7 +3903,7 @@ const VocabUIController = (function() {
             <!-- Translation Column -->
             <div style="flex:1;border-right:1px solid #f1f5f9;padding-right:12px;direction:rtl;text-align:right;">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <span style="width:10px;height:10px;border-radius:50%;background:${getColorHex(item.color)};display:inline-block;shrink:0;"></span>
+                <span class="df-color-dot" data-dot-card-id="${item.id}" title="Click to change color" style="width:12px;height:12px;border-radius:50%;background:${getColorHex(item.color)};display:inline-block;shrink:0;box-shadow:0 0 0 2px #ffffff, 0 0 0 3px #cbd5e1;"></span><button class="df-card-delete-btn" data-delete-card-id="${item.id}" style="background:transparent;border:none;color:#94a3b8;font-size:11px;cursor:pointer;margin-right:auto;" title="Delete Card">✕</button>
                 <div style="font-size:14px;font-weight:700;color:#1e293b;line-height:1.4;">${item.translation}</div>
                 <button data-audio-trans="${item.translation}" style="background:#f1f5f9;border:none;border-radius:8px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;margin-right:auto;" title="Listen Arabic">🔊</button>
               </div>
@@ -3896,6 +3918,72 @@ const VocabUIController = (function() {
 
     // Event Bindings
     document.getElementById('df-vocab-back').onclick = () => modal.remove();
+
+    // Filter Chips Event Binding
+    modal.querySelectorAll('.df-filter-chip').forEach(chip => {
+      chip.onclick = () => {
+        const filterVal = chip.dataset.filter;
+        modal.querySelectorAll('.df-filter-chip').forEach(c => {
+          c.style.background = '#ffffff';
+          c.style.color = '#475569';
+          c.style.fontWeight = '600';
+        });
+        chip.style.background = '#2563eb';
+        chip.style.color = '#ffffff';
+        chip.style.fontWeight = '700';
+
+        // تصفية البطاقات في الـ DOM
+        const cards = modal.querySelectorAll('[data-card-id]');
+        let visibleCount = 0;
+        cards.forEach(card => {
+          const cardColor = card.dataset.cardColor;
+          const needsRev = card.dataset.cardReview === 'true';
+          let show = false;
+
+          if (filterVal === 'all') show = true;
+          else if (filterVal === 'needs_review') show = needsRev;
+          else if (filterVal === cardColor) show = true;
+
+          card.style.display = show ? 'flex' : 'none';
+          if (show) visibleCount++;
+        });
+
+        // تحديث العداد في الرأس
+        const countBadge = modal.querySelector('#df-vocab-count-badge');
+        if (countBadge) countBadge.textContent = 'Showing ' + visibleCount + ' Items';
+        if (window.triggerHaptic) window.triggerHaptic('click');
+      };
+    });
+
+    // Card Color Dot Cycling
+    modal.querySelectorAll('.df-color-dot').forEach(dot => {
+      dot.style.cursor = 'pointer';
+      dot.onclick = (e) => {
+        e.stopPropagation();
+        const cardId = dot.dataset.dotCardId;
+        if (window.VocabAudioBankEngine) {
+          window.VocabAudioBankEngine.cycleCardColor(cardId);
+          modal.remove();
+          renderVocabView();
+        }
+      };
+    });
+
+    // Card Deletion
+    modal.querySelectorAll('.df-card-delete-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const cardId = btn.dataset.deleteCardId;
+        if (confirm('Delete this card?')) {
+          if (window.VocabAudioBankEngine) {
+            window.VocabAudioBankEngine.deleteCard(cardId);
+            modal.remove();
+            renderVocabView();
+          }
+        }
+      };
+    });
+
 
     // Speed Cycle
     document.getElementById('df-speed-btn').onclick = () => {
