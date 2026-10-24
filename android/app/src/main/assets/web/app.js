@@ -3640,3 +3640,148 @@ document.addEventListener('DOMContentLoaded', () => {
   const badOverlay = document.getElementById('df-oled-desk-clock');
   if (badOverlay) badOverlay.remove();
 });
+
+
+/* ========================================================
+   DEEP FOCUS — SPOKEN VOCABULARY BANK & DUAL AUDIO ENGINE (M200)
+   ======================================================== */
+const VocabAudioBankEngine = (function() {
+  function getSafeStorage() {
+    return typeof localStorage !== 'undefined' ? localStorage : {
+      getItem: () => null,
+      setItem: () => {}
+    };
+  }
+
+  function getVocabList() {
+    const s = getSafeStorage();
+    try {
+      const data = s.getItem('df_vocab_bank');
+      if (data) return JSON.parse(data);
+    } catch(e) {}
+    // عينات افتراضية جاهزة مطابقة لنمط التعلم
+    return [
+      { id: 'v1', term: 'Deine Hausaufgaben sind fast fertig.', translation: 'واجباتك المنزلية جاهزة تقريباً.', notes: 'die Hausaufgaben [Nom] <- deine', color: 'purple', reviews: 0, created: '2026-10-23' },
+      { id: 'v2', term: 'Sein Pinsel liegt hier.', translation: 'فرشاته موجودة هنا.', notes: 'der Pinsel [Nom] <- sein', color: 'blue', reviews: 0, created: '2026-10-23' },
+      { id: 'v3', term: 'Seine Unterkunft kostet wenig.', translation: 'مكان إقامته تكلفته قليلة.', notes: 'die Unterkunft [Nom] <- seine', color: 'red', reviews: 0, created: '2026-10-23' }
+    ];
+  }
+
+  function saveVocabList(list) {
+    const s = getSafeStorage();
+    s.setItem('df_vocab_bank', JSON.stringify(list));
+  }
+
+  // محرك النطق الصوتي مع التحكم بالسرعات والتكرار والفواصل
+  let isSpeaking = false;
+  let activeUtterance = null;
+
+  function speakText(text, langCode = 'de-DE', speed = 1.0, maxRepeats = 1, pauseSeconds = 0.5, onDone = null) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+    window.speechSynthesis.cancel();
+    isSpeaking = true;
+    let currentRepeat = 0;
+
+    function playIteration() {
+      if (!isSpeaking || currentRepeat >= maxRepeats) {
+        isSpeaking = false;
+        if (onDone) onDone();
+        return;
+      }
+
+      currentRepeat++;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = langCode;
+      u.rate = Math.max(0.5, Math.min(2.0, speed));
+      activeUtterance = u;
+
+      u.onend = function() {
+        if (currentRepeat < maxRepeats && isSpeaking) {
+          setTimeout(playIteration, pauseSeconds * 1000);
+        } else {
+          isSpeaking = false;
+          if (onDone) onDone();
+        }
+      };
+
+      u.onerror = function() {
+        isSpeaking = false;
+        if (onDone) onDone();
+      };
+
+      window.speechSynthesis.speak(u);
+    }
+
+    playIteration();
+  }
+
+  function stopSpeech() {
+    isSpeaking = false;
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
+  // استيراد سريع لملفات CSV / نصية
+  function importFromCSV(csvText) {
+    if (!csvText) return 0;
+    const lines = csvText.trim().split('\n');
+    const existing = getVocabList();
+    let addedCount = 0;
+
+    lines.forEach((line, idx) => {
+      const parts = line.split(',');
+      if (parts.length >= 2) {
+        const term = (parts[0] || '').trim();
+        const translation = (parts[1] || '').trim();
+        const notes = (parts[2] || '').trim();
+        const color = (parts[3] || 'purple').trim();
+
+        if (term && translation) {
+          existing.push({
+            id: 'v_' + Date.now() + '_' + idx,
+            term,
+            translation,
+            notes,
+            color,
+            reviews: 0,
+            created: new Date().toISOString().slice(0, 10)
+          });
+          addedCount++;
+        }
+      }
+    });
+
+    saveVocabList(existing);
+    return addedCount;
+  }
+
+  // الفرز وإعادة الترتيب الذكي
+  function getSortedVocab(sortBy = 'created_desc') {
+    const list = [...getVocabList()];
+    if (sortBy === 'alpha_asc') {
+      return list.sort((a, b) => a.term.localeCompare(b.term));
+    } else if (sortBy === 'alpha_desc') {
+      return list.sort((a, b) => b.term.localeCompare(a.term));
+    } else if (sortBy === 'created_desc') {
+      return list.sort((a, b) => (b.id > a.id ? 1 : -1));
+    } else if (sortBy === 'color') {
+      return list.sort((a, b) => a.color.localeCompare(b.color));
+    }
+    return list;
+  }
+
+  return {
+    getVocabList,
+    saveVocabList,
+    speakText,
+    stopSpeech,
+    importFromCSV,
+    getSortedVocab
+  };
+})();
+
+if (typeof window !== 'undefined') {
+  window.VocabAudioBankEngine = VocabAudioBankEngine;
+}
