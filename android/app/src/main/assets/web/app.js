@@ -5062,3 +5062,69 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M214_VOCAB_TAG_COUNT_BADGES_AND_CODE34_V1 === */
+(function() {
+  if (window.__M214_TAG_COUNTS__) return;
+  window.__M214_TAG_COUNTS__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfGetVocabCountsByFilter = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    var counts = { all: items.length, purple: 0, blue: 0, red: 0, green: 0, review: 0 };
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it) continue;
+      if (it.hard) counts.review++;
+      var c = (it.color || 'purple').toLowerCase();
+      if (counts[c] !== undefined) counts[c]++;
+    }
+    return counts;
+  };
+
+  function updateFilterChipBadges() {
+    if (typeof document === 'undefined') return;
+    var counts = window.dfGetVocabCountsByFilter();
+    var filterBar = document.getElementById('df-vocab-filter-bar');
+    if (!filterBar) return;
+
+    var chips = filterBar.querySelectorAll('button, .df-vocab-filter-chip');
+    chips.forEach(function(chip) {
+      var key = chip.getAttribute('data-filter') || '';
+      if (!key) {
+        var txt = (chip.textContent || '').toLowerCase();
+        if (txt.indexOf('كل') !== -1) key = 'all';
+        else if (txt.indexOf('بنفسج') !== -1 || txt.indexOf('purple') !== -1) key = 'purple';
+        else if (txt.indexOf('أزرق') !== -1 || txt.indexOf('blue') !== -1) key = 'blue';
+        else if (txt.indexOf('أحمر') !== -1 || txt.indexOf('red') !== -1) key = 'red';
+        else if (txt.indexOf('أخضر') !== -1 || txt.indexOf('green') !== -1) key = 'green';
+        else if (txt.indexOf('مراجعة') !== -1 || txt.indexOf('review') !== -1) key = 'review';
+      }
+      if (key && counts[key] !== undefined) {
+        var baseTxt = chip.getAttribute('data-base-label');
+        if (!baseTxt) {
+          baseTxt = (chip.textContent || '').replace(/\s*\([0-9]+\)/g, '').trim();
+          chip.setAttribute('data-base-label', baseTxt);
+        }
+        chip.textContent = baseTxt + ' (' + toWesternDigits(counts[key]) + ')';
+      }
+    });
+  }
+
+  window.dfUpdateFilterChipBadges = updateFilterChipBadges;
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateFilterChipBadges);
+    } else {
+      setTimeout(updateFilterChipBadges, 300);
+    }
+    setInterval(updateFilterChipBadges, 2500);
+  }
+})();
+
