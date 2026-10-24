@@ -3864,9 +3864,9 @@ const VocabUIController = (function() {
         <button id="df-vocab-back" style="background:#f1f5f9;border:none;border-radius:12px;padding:8px 12px;font-size:14px;cursor:pointer;font-weight:bold;color:#475569;">← Back</button>
         <div style="flex:1;text-align:center;">
           <h2 style="margin:0;font-size:15px;font-weight:800;color:#0f172a;">Spoken Vocab Bank</h2>
-          <span id="df-vocab-count-badge" style="font-size:11px;color:#64748b;font-weight:600;font-variant-numeric:lining-nums;">AR > DE • ${items.length} Items</span>
+          <span id="df-vocab-count-badge" style="font-size:11px;color:#64748b;font-weight:600;font-variant-numeric:lining-nums;"><span id="df-vocab-pair-badge" title="Tap to switch language pair">${localStorage.getItem('df_vocab_pair') || 'AR > DE'}</span> • ${items.length} Items</span>
         </div>
-        <button id="df-vocab-import-btn" style="background:#eff6ff;color:#2563eb;border:1px solid #dbeafe;border-radius:12px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:bold;">📁+ Import</button>
+        <input type="file" id="df-vocab-file-input" accept=".csv,.txt" style="display:none;"><button id="df-vocab-import-btn" style="background:#eff6ff;color:#2563eb;border:1px solid #dbeafe;border-radius:12px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:bold;">📁+ Import</button><button id="df-vocab-export-btn" style="background:#f8fafc;color:#475569;border:1px solid #e2e8f0;border-radius:12px;padding:8px 10px;font-size:12px;cursor:pointer;font-weight:bold;margin-left:4px;" title="Export CSV Backup">📤</button>
       </div>
 
       <!-- Controls & Quick Toolbar -->
@@ -3918,6 +3918,67 @@ const VocabUIController = (function() {
 
     // Event Bindings
     document.getElementById('df-vocab-back').onclick = () => modal.remove();
+
+    // Native File Picker Import
+    const fileInput = document.getElementById('df-vocab-file-input');
+    const importBtn = document.getElementById('df-vocab-import-btn');
+    if (importBtn && fileInput) {
+      importBtn.onclick = () => fileInput.click();
+      fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const text = evt.target.result;
+          if (window.VocabAudioBankEngine) {
+            const added = window.VocabAudioBankEngine.importFromCSV(text);
+            alert('Successfully imported ' + added + ' words from ' + file.name + '!');
+            modal.remove();
+            renderVocabView();
+          }
+        };
+        reader.readAsText(file);
+      };
+    }
+
+    // CSV Export Download
+    const exportBtn = document.getElementById('df-vocab-export-btn');
+    if (exportBtn) {
+      exportBtn.onclick = () => {
+        const list = window.VocabAudioBankEngine ? window.VocabAudioBankEngine.getVocabList() : [];
+        if (list.length === 0) {
+          alert('No words to export!');
+          return;
+        }
+        const csvRows = list.map(item => `"${item.term.replace(/"/g, '""')}","${item.translation.replace(/"/g, '""')}","${(item.notes || '').replace(/"/g, '""')}","${item.color || 'purple'}"`);
+        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'deep_focus_vocab_backup.csv';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        if (window.triggerHaptic) window.triggerHaptic('action');
+      };
+    }
+
+    // Language Pair Switching
+    const pairBadge = document.getElementById('df-vocab-pair-badge');
+    if (pairBadge) {
+      pairBadge.style.cursor = 'pointer';
+      pairBadge.onclick = () => {
+        const pairs = ['AR > DE', 'AR > EN', 'AR > FR', 'AR > ES', 'AR > TR'];
+        const current = localStorage.getItem('df_vocab_pair') || 'AR > DE';
+        const nextIdx = (pairs.indexOf(current) + 1) % pairs.length;
+        const nextPair = pairs[nextIdx];
+        localStorage.setItem('df_vocab_pair', nextPair);
+        pairBadge.textContent = nextPair;
+        if (window.triggerHaptic) window.triggerHaptic('step');
+      };
+    }
+
 
     // Filter Chips Event Binding
     modal.querySelectorAll('.df-filter-chip').forEach(chip => {
@@ -4039,7 +4100,7 @@ const VocabUIController = (function() {
         e.stopPropagation();
         const text = btn.dataset.audioTerm;
         if (window.VocabAudioBankEngine) {
-          window.VocabAudioBankEngine.speakText(text, 'de-DE', activeSpeed, activeRepeats, 0.5);
+          const activeP = localStorage.getItem('df_vocab_pair') || 'AR > DE'; const tLang = activeP.includes('EN') ? 'en-US' : activeP.includes('FR') ? 'fr-FR' : activeP.includes('ES') ? 'es-ES' : activeP.includes('TR') ? 'tr-TR' : 'de-DE'; window.VocabAudioBankEngine.speakText(text, tLang, activeSpeed, activeRepeats, 0.5);
         }
       };
     });
