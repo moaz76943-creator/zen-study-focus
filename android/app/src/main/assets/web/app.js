@@ -4689,3 +4689,71 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M209_VOCAB_STATS_AND_MASTERY_TRACKER_V1 === */
+(function() {
+  if (window.__M209_VOCAB_STATS_ACTIVE__) return;
+  window.__M209_VOCAB_STATS_ACTIVE__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfGetVocabMasteryStats = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    var total = items.length;
+    var needsReview = 0;
+    var mastered = 0;
+    for (var i = 0; i < total; i++) {
+      if (items[i] && items[i].hard) {
+        needsReview++;
+      } else {
+        mastered++;
+      }
+    }
+    return {
+      total: total,
+      needsReview: needsReview,
+      mastered: mastered,
+      masteryRate: total > 0 ? Math.round((mastered / total) * 100) : 0
+    };
+  };
+
+  function updateVocabStatsBadge() {
+    if (typeof document === 'undefined') return;
+    var statsElem = document.getElementById('df-vocab-mastery-summary-badge');
+    if (!statsElem) return;
+    var stats = window.dfGetVocabMasteryStats();
+    statsElem.innerHTML =
+      '<span style="color:#e2e8f0;">📊 إجمالي: <b>' + toWesternDigits(stats.total) + '</b></span>' +
+      '<span style="color:#f87171;margin:0 6px;">⚠️ للمراجعة: <b>' + toWesternDigits(stats.needsReview) + '</b></span>' +
+      '<span style="color:#4ade80;">🏆 تم إتقانها: <b>' + toWesternDigits(stats.mastered) + '</b> (' + toWesternDigits(stats.masteryRate) + '%)</span>';
+  }
+
+  window.dfUpdateVocabStatsBadge = updateVocabStatsBadge;
+
+  function mountStatsUI() {
+    if (typeof document === 'undefined') return;
+    var searchRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!searchRow || document.getElementById('df-vocab-mastery-summary-badge')) return;
+
+    var badge = document.createElement('div');
+    badge.id = 'df-vocab-mastery-summary-badge';
+    badge.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:6px 12px;border-radius:10px;background:rgba(15,23,42,0.65);border:1px solid rgba(255,255,255,0.1);font-size:12px;margin:4px 0;width:100%;box-sizing:border-box;';
+    searchRow.parentNode.insertBefore(badge, searchRow.nextSibling);
+    updateVocabStatsBadge();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountStatsUI);
+    } else {
+      setTimeout(mountStatsUI, 300);
+    }
+    setInterval(updateVocabStatsBadge, 2500);
+  }
+})();
+
