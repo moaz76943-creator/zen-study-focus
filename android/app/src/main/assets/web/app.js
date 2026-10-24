@@ -3827,7 +3827,7 @@ const VocabUIController = (function() {
         <button id="df-speed-btn" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;color:#334155;">⚡ ${activeSpeed}x</button>
         <button id="df-repeat-btn" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;color:#334155;">🔁 ${activeRepeats}x</button>
         <button id="df-sort-btn" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;color:#334155;">⇅ Sort</button>
-        <button id="df-add-card-btn" style="background:#2563eb;color:#ffffff;border:none;border-radius:10px;padding:6px 14px;font-size:11px;cursor:pointer;font-weight:bold;margin-left:auto;">+ Add Word</button>
+        <button id="df-start-quiz-btn" style="background:#8b5cf6;color:#ffffff;border:none;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;margin-left:auto;margin-right:6px;">🧠 Start Quiz</button><button id="df-add-card-btn" style="background:#2563eb;color:#ffffff;border:none;border-radius:10px;padding:6px 14px;font-size:11px;cursor:pointer;font-weight:bold;margin-left:auto;">+ Add Word</button>
       </div>
 
       <!-- Word Cards List -->
@@ -3896,7 +3896,7 @@ const VocabUIController = (function() {
     };
 
     // Add Single Word
-    document.getElementById('df-add-card-btn').onclick = () => {
+    const qBtn = document.getElementById('df-start-quiz-btn'); if(qBtn) qBtn.onclick = () => { if(window.FlashQuizEngine) window.FlashQuizEngine.startQuiz(); }; document.getElementById('df-add-card-btn').onclick = () => {
       const term = prompt('Foreign Word/Sentence:');
       if (!term) return;
       const trans = prompt('Arabic Translation:');
@@ -3955,3 +3955,132 @@ document.addEventListener('DOMContentLoaded', () => {
   const obs = new MutationObserver(VocabUIController.injectVocabEntryPill);
   obs.observe(document.body, { childList: true, subtree: true });
 });
+
+
+/* ========================================================
+   DEEP FOCUS — FLASHCARD QUIZ & SELF-TESTING ENGINE (M202)
+   ======================================================== */
+const FlashQuizEngine = (function() {
+  let currentIndex = 0;
+  let correctCount = 0;
+  let quizCards = [];
+
+  function startQuiz() {
+    quizCards = window.VocabAudioBankEngine ? window.VocabAudioBankEngine.getVocabList() : [];
+    if (!quizCards || quizCards.length === 0) {
+      alert('No vocabulary words found! Add or import words first.');
+      return;
+    }
+
+    currentIndex = 0;
+    correctCount = 0;
+    renderQuizCard();
+  }
+
+  function renderQuizCard() {
+    const existing = document.getElementById('df-flash-quiz-modal');
+    if (existing) existing.remove();
+
+    if (currentIndex >= quizCards.length) {
+      showQuizSummary();
+      return;
+    }
+
+    const card = quizCards[currentIndex];
+    const total = quizCards.length;
+    const progressNum = currentIndex + 1;
+
+    const modal = document.createElement('div');
+    modal.id = 'df-flash-quiz-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:#090d16eb;backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,sans-serif;color:#f8fafc;';
+
+    modal.innerHTML = `
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:28px;padding:24px;width:100%;max-width:380px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);text-align:center;position:relative;">
+        <!-- Top Counter & Close -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span style="font-size:12px;font-weight:700;color:#94a3b8;letter-spacing:1px;font-variant-numeric:lining-nums;">Card ${progressNum} of ${total}</span>
+          <button id="df-quiz-close" style="background:#334155;border:none;border-radius:50%;width:30px;height:30px;color:#cbd5e1;cursor:pointer;font-weight:bold;font-size:13px;">✕</button>
+        </div>
+
+        <!-- Term Box -->
+        <div style="background:#0f172a;border:1px solid #1e293b;border-radius:20px;padding:24px 16px;margin-bottom:18px;">
+          <div style="font-size:17px;font-weight:800;color:#38bdf8;line-height:1.4;margin-bottom:10px;">${card.term}</div>
+          <button id="df-quiz-listen-term" style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:6px 14px;color:#94a3b8;font-size:12px;cursor:pointer;font-weight:600;">🔊 Listen</button>
+        </div>
+
+        <!-- Answer Section (Hidden by default) -->
+        <div id="df-quiz-answer-section" style="display:none;margin-bottom:20px;">
+          <div style="background:#0284c715;border:1px solid #0284c740;border-radius:18px;padding:16px;direction:rtl;text-align:right;">
+            <div style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">${card.translation}</div>
+            ${card.notes ? `<div style="font-size:11px;color:#94a3b8;line-height:1.4;">${card.notes}</div>` : ''}
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <button id="df-quiz-reveal-btn" style="width:100%;background:#2563eb;color:#ffffff;border:none;border-radius:14px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;">Tap to Reveal Answer</button>
+
+        <div id="df-quiz-action-buttons" style="display:none;gap:10px;">
+          <button id="df-quiz-hard" style="flex:1;background:#ef444420;border:1px solid #ef444460;color:#f87171;border-radius:14px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;">❌ Hard</button>
+          <button id="df-quiz-easy" style="flex:1;background:#10b98120;border:1px solid #10b98160;color:#34d399;border-radius:14px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;">✅ Easy</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('df-quiz-close').onclick = () => modal.remove();
+
+    document.getElementById('df-quiz-listen-term').onclick = () => {
+      if (window.VocabAudioBankEngine) {
+        window.VocabAudioBankEngine.speakText(card.term, 'de-DE', 1.0, 1, 0.5);
+      }
+    };
+
+    document.getElementById('df-quiz-reveal-btn').onclick = () => {
+      document.getElementById('df-quiz-answer-section').style.display = 'block';
+      document.getElementById('df-quiz-reveal-btn').style.display = 'none';
+      document.getElementById('df-quiz-action-buttons').style.display = 'flex';
+      if (window.triggerHaptic) window.triggerHaptic('click');
+    };
+
+    document.getElementById('df-quiz-hard').onclick = () => {
+      currentIndex++;
+      renderQuizCard();
+      if (window.triggerHaptic) window.triggerHaptic('step');
+    };
+
+    document.getElementById('df-quiz-easy').onclick = () => {
+      correctCount++;
+      currentIndex++;
+      renderQuizCard();
+      if (window.triggerHaptic) window.triggerHaptic('step');
+    };
+  }
+
+  function showQuizSummary() {
+    const total = quizCards.length;
+    const percentage = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+
+    const modal = document.createElement('div');
+    modal.id = 'df-flash-quiz-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:#090d16eb;backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,sans-serif;color:#f8fafc;';
+
+    modal.innerHTML = `
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:28px;padding:28px;width:100%;max-width:340px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:12px;">🎉</div>
+        <h3 style="font-size:18px;font-weight:800;color:#f8fafc;margin:0 0 6px;">Quiz Completed!</h3>
+        <p style="font-size:13px;color:#94a3b8;margin:0 0 20px;">Mastery Rate: <strong style="color:#34d399;font-variant-numeric:lining-nums;">${percentage}%</strong> (${correctCount} / ${total})</p>
+        <button id="df-quiz-finish-btn" style="width:100%;background:#10b981;color:#ffffff;border:none;border-radius:14px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;">Great Work ✓</button>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('df-quiz-finish-btn').onclick = () => modal.remove();
+    if (window.triggerHaptic) window.triggerHaptic('complete');
+  }
+
+  return { startQuiz };
+})();
+
+window.FlashQuizEngine = FlashQuizEngine;
