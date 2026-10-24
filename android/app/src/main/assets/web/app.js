@@ -5128,3 +5128,86 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M215_VOCAB_AUTO_CLEAN_DUPLICATES_AND_CODE35_V1 === */
+(function() {
+  if (window.__M215_CLEAN_DUPLICATES__) return;
+  window.__M215_CLEAN_DUPLICATES__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfCleanDuplicateVocabWords = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    if (!items.length) {
+      alert('لا توجد كلمات في بنك الكلمات حالياً.');
+      return 0;
+    }
+
+    var seen = {};
+    var uniqueItems = [];
+    var removedCount = 0;
+
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it || !it.word) continue;
+      var norm = String(it.word).trim().toLowerCase();
+      if (seen[norm]) {
+        if (it.hard && seen[norm].item) {
+          seen[norm].item.hard = true;
+        }
+        removedCount++;
+      } else {
+        seen[norm] = { item: it };
+        uniqueItems.push(it);
+      }
+    }
+
+    if (removedCount > 0 && typeof eng.saveItems === 'function') {
+      eng.saveItems(uniqueItems);
+      if (typeof eng.render === 'function') eng.render();
+      if (typeof window.dfUpdateFilterChipBadges === 'function') {
+        window.dfUpdateFilterChipBadges();
+      }
+      if (typeof window.dfUpdateVocabStatsBadge === 'function') {
+        window.dfUpdateVocabStatsBadge();
+      }
+      alert('تم فحص الكلمات بنجاح وإزالة ' + toWesternDigits(removedCount) + ' كلمة مكررة.');
+    } else {
+      alert('ممتاز! قائمة الكلمات نقية ولا توجد أي كلمات مكررة.');
+    }
+    return removedCount;
+  };
+
+  function mountCleanDuplicatesBtn() {
+    if (typeof document === 'undefined') return;
+    var searchRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!searchRow || document.getElementById('df-vocab-clean-duplicates-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-vocab-clean-duplicates-btn';
+    btn.style.cssText = 'padding:8px 12px;border-radius:10px;border:1px solid rgba(244,63,94,0.35);background:rgba(244,63,94,0.12);color:#fb7185;font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = '🧹 تنظيف المكرر';
+    btn.onclick = function() {
+      if (confirm('هل ترغب بفحص قائمة الكلمات ودمج أي كلمات مكررة تلقائياً؟')) {
+        window.dfCleanDuplicateVocabWords();
+      }
+    };
+    searchRow.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountCleanDuplicatesBtn);
+    } else {
+      setTimeout(mountCleanDuplicatesBtn, 350);
+    }
+    setInterval(mountCleanDuplicatesBtn, 2500);
+  }
+})();
+
