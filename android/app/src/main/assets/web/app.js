@@ -405,14 +405,24 @@ if (typeof window !== "undefined" && window.DF22Preflight && !window.DF22Preflig
 /* ========================================================
    0. STRICT WESTERN DIGITS ENFORCER (0123456789 ONLY)
    ======================================================== */
+// Render system numbers as Western digits across supported writing systems.
+// This is display normalization; it does not rewrite v21 storage records.
 const ARABIC_ZERO_OFFSET = 1632;
 const PERSIAN_ZERO_OFFSET = 1776;
-
+const WESTERN_DIGIT_ZERO_POINTS = Object.freeze([
+  ARABIC_ZERO_OFFSET, PERSIAN_ZERO_OFFSET, 0x07c0, 0x0966, 0x09e6, 0x0a66, 0x0ae6,
+  0x0b66, 0x0be6, 0x0c66, 0x0ce6, 0x0d66, 0x0de6,
+  0x0e50, 0x0ed0, 0x0f20, 0x1040, 0x1090, 0x17e0, 0x1810, 0xff10
+]);
 function toWest(val) {
   if (val === null || val === undefined) return '';
-  return String(val)
-    .replace(/[٠-٩]/g, d => d.charCodeAt(0) - ARABIC_ZERO_OFFSET)
-    .replace(/[۰-۹]/g, d => d.charCodeAt(0) - PERSIAN_ZERO_OFFSET);
+  return String(val).replace(/\p{Nd}/gu, digit => {
+    const point=digit.codePointAt(0);
+    for (const zero of WESTERN_DIGIT_ZERO_POINTS) {
+      if (point>=zero && point<zero+10) return String(point-zero);
+    }
+    return digit;
+  });
 }
 
 document.addEventListener('input', (e) => {
@@ -1702,6 +1712,29 @@ function L() {
   return DICT[cfg.lang] || DICT.en;
 }
 
+// Shell-only labels. Reviewed DF99 shell packs take priority; legacy DICT and
+// these explicit defaults remain available while other languages are reviewed.
+const SHELL_LABELS = Object.freeze({
+  en: Object.freeze({
+    langSearchTitle: '🌐 Language & Country Search',
+    langSearchPlaceholder: 'Search language or country (e.g. Jordan, Spain, USA, مصر)...'
+  }),
+  ar: Object.freeze({
+    langSearchTitle: '🌐 البحث عن اللغة والبلد',
+    langSearchPlaceholder: 'ابحث عن لغة أو بلد (مثل الأردن أو إسبانيا أو مصر)...'
+  })
+});
+function shellLabel(code, key, current) {
+  const dict=DICT[code] || {};
+  const primary=typeof dict[key]==='string' && dict[key].trim() ? dict[key] : null;
+  const extra=SHELL_LABELS[code] && SHELL_LABELS[code][key];
+  const english=DICT.en[key] || (SHELL_LABELS.en && SHELL_LABELS.en[key]);
+  const fallback=primary || extra || english || current || '';
+  const reviewed=window.DF99Locale?.t(code,'shell',key,fallback);
+  const label=typeof reviewed==='string' && reviewed.trim() && reviewed!==key ? reviewed : fallback;
+  return toWest(label);
+}
+
 const CONFIRMATION_TEXT = {
   "en": [
     "Delete this task? This cannot be undone.",
@@ -1892,8 +1925,14 @@ function applyLanguage(code) {
   const normalized = typeof code === 'string' ? code.toLowerCase().trim().split(/[-_]/)[0] : 'en';
   const meta = LANG_CATALOG.find(x => x.code === normalized && x.code !== 'he' && x.code !== 'iw')
     || LANG_CATALOG.find(x => x.code === 'en');
+  const previousLang=cfg.lang;
   cfg.lang = meta.code;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  try {
+    saveFortressData('zen_fortress_cfg_v21', cfg);
+  } catch (error) {
+    cfg.lang=previousLang; // An unacknowledged write must not change the active locale.
+    throw error;
+  }
   const d = L();
 
   const root = document.getElementById('htmlRoot');
@@ -1905,18 +1944,24 @@ function applyLanguage(code) {
   document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
   const tn = document.getElementById('navTrainingText');
-  if (tn) tn.textContent = window.DF22Locale?.t(meta.code, 'quickTraining')
+  const trainingLabel = window.DF22Locale?.translations?.[meta.code]?.quickTraining
     || (typeof quickText === 'function' ? quickText('trainingTitle') : 'Quick training');
+  if (tn) tn.textContent = trainingLabel;
+  document.getElementById('navTraining')?.setAttribute('aria-label', trainingLabel);
   if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
+    // Never replace an editable value or arbitrary user-generated content.
+    if (el.isContentEditable || /^(INPUT|TEXTAREA)$/i.test(el.tagName || '')) return;
     const k = el.getAttribute('data-i18n');
-    if (d[k]) el.textContent = toWest(d[k]);
+    const value=shellLabel(meta.code,k,el.textContent);
+    if (value && value!==k && el.textContent!==value) el.textContent=value;
   });
 
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const k = el.getAttribute('data-i18n-placeholder');
-    if (d[k]) el.setAttribute('placeholder', toWest(d[k]));
+    const value=shellLabel(meta.code,k,el.getAttribute('placeholder'));
+    if (value && value!==k) el.setAttribute('placeholder',value);
   });
 
   localizeStarterPreviews(d);
@@ -1932,6 +1977,8 @@ function applyLanguage(code) {
   updateSyllabusCalc();
   closeModal('langModal');
   quickL10n();
+  // Premium labels may also be created by re-rendered screens; refresh last.
+  if (window.DF22Locale?.apply) window.DF22Locale.apply(document,meta.code);
   if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
 }
 
@@ -2731,9 +2778,14 @@ function changeCalendarMonth(delta) {
 function renderCalendar() {
   const d = L();
   document.getElementById('calMonthYearTitle').textContent = toWest(`${d.months[calMonth]} ${calYear}`);
-  let calWeekdaysHtml = '';
-  for (let i = 0; i < d.weekdays.length; i++) calWeekdaysHtml += `<div>${d.weekdays[i]}</div>`;
-  document.getElementById('calWeekdaysRow').innerHTML = calWeekdaysHtml;
+  const weekdayRow=document.getElementById('calWeekdaysRow');
+  weekdayRow.textContent = '';
+  d.weekdays.forEach(w => {
+    const label=document.createElement('div');
+    label.textContent=toWest(w);
+    weekdayRow.appendChild(label);
+  });
+
 
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();

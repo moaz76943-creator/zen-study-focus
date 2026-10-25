@@ -5,7 +5,7 @@
 (function (root) {
   'use strict';
   const allowed = Object.create(null);
-  const sections = ['timer','goals','tasks','notes','analytics','analyticsDomain'];
+  const sections = ['timer','goals','tasks','notes','analytics','analyticsDomain','shell'];
   const blocked = new Set(['he','iw','__proto__','prototype','constructor']);
   const aliases = Object.freeze({
     timer: Object.freeze({
@@ -52,20 +52,37 @@
     allowed[code][family]=pack;
     return true;
   }
-  function t(rawCode, family, rawKey, fallback) {
+  // Plain-text substitution is for textContent/labels. HTML insertion callers
+  // must use formatHtml() so user-supplied values cannot become markup.
+  function interpolate(template, parameters, html) {
+    if (typeof template !== 'string') return '';
+    if (!parameters || typeof parameters !== 'object' || Array.isArray(parameters)) return template;
+    return template.replace(/\{([A-Za-z][A-Za-z0-9_]{0,40})\}/g, (match, key) => {
+      if (!Object.prototype.hasOwnProperty.call(parameters,key)) return match;
+      const value=parameters[key];
+      if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') return match;
+      const raw=String(value).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'');
+      return html ? raw.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : raw;
+    });
+  }
+  function format(template, parameters) { return interpolate(template,parameters,false); }
+  function formatHtml(template, parameters) { return interpolate(template,parameters,true); }
+  function t(rawCode, family, rawKey, fallback, parameters) {
     const code=normalize(rawCode),key=String(rawKey);
-    if (!sections.includes(family)) return fallback;
-    if (code==='ar' || code==='en') return fallback;
+    const backup=fallback == null ? '' : fallback;
+    if (!sections.includes(family) || !/^[\w-]{1,60}$/.test(key) || blocked.has(key)) return backup;
+    if (code==='ar' || code==='en') return parameters ? format(backup,parameters) : backup;
     const supplied=allowed[code] && allowed[code][family] && allowed[code][family][key];
-    if (supplied) return supplied;
+    if (supplied) return parameters ? format(supplied,parameters) : supplied;
     const alias=aliases[family] && aliases[family][key];
-    if (!alias) return fallback;
+    if (!alias) return parameters ? format(backup,parameters) : backup;
     const [where,lookup]=alias;
     const result=where==='quick'?quick(code,lookup):where==='premium'?premium(code,lookup):core(code,lookup);
-    if (!result) return fallback;
+    if (!result) return parameters ? format(backup,parameters) : backup;
     // Timer controls display their units even when sourced from a shared label.
-    if (family==='timer' && (key==='3'||key==='4'||key==='5')) return result+' · min';
-    return result;
+    const label=family==='timer' && (key==='3'||key==='4'||key==='5') ? result+' · min' : result;
+    return parameters ? format(label,parameters) : label;
   }
   function section(family, code, fallback) {
     const result=Object.assign({},fallback);
@@ -85,5 +102,5 @@
       return {code,translated:translated.length,total:keys.length};
     });
   }
-  root.DF99Locale=Object.freeze({normalize,t,section,register,coverage,sections:Object.freeze(sections.slice())});
+  root.DF99Locale=Object.freeze({normalize,t,section,register,coverage,format,formatHtml,sections:Object.freeze(sections.slice())});
 })(typeof window!=='undefined'?window:globalThis);
