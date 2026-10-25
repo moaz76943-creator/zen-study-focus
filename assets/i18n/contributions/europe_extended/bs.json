@@ -1,0 +1,198 @@
+{
+  "language": "bs",
+  "status": "TRANSLATED",
+  "sections": {
+    "notes": {
+      "0": "✦ STUDIO BILJEŠKI",
+      "1": "Vaše ideje jasno organizovane",
+      "2": "Zapišite, organizujte i pregledajte ideje svaki dan.",
+      "3": "Moje bilješke",
+      "4": "Zakačene",
+      "5": "＋ Nova bilješka",
+      "6": "Gotovi predlošci za pisanje",
+      "7": "Dodirnite za početak",
+      "8": "Samo zakačene",
+      "9": "Sortiraj po",
+      "10": "Najnovije",
+      "11": "Najstarije",
+      "12": "Naslov",
+      "13": "rezultata",
+      "14": "Nema odgovarajućih bilješki. Počnite s predloškom.",
+      "15": "Nova bilješka",
+      "16": "Uredi bilješku",
+      "17": "Naslov",
+      "18": "Vrsta",
+      "19": "Datum",
+      "20": "Sadržaj",
+      "21": "Zakači",
+      "22": "Omiljene",
+      "23": "riječi",
+      "24": "znakova",
+      "25": "Sačuvaj bilješku",
+      "26": "Sačuvaj promjene",
+      "27": "Zamijeniti vaš tekst ovim predloškom?",
+      "28": "Uredi",
+      "29": "Dupliciraj",
+      "30": "Kopiraj",
+      "31": "Kalendar",
+      "32": "Izbriši",
+      "33": "Prikaži odgovor",
+      "34": "Kopiranje nije uspjelo.",
+      "35": "Sačuvano"
+    },
+    "tasks": {
+      "title": "Studio zadataka",
+      "subtitle": "Planirajte dan i pratite stvarni rad",
+      "add": "Novi zadatak",
+      "project": "Novi projekt",
+      "today": "Tri glavna prioriteta danas",
+      "search": "Pretraži zadatke",
+      "all": "Lista",
+      "board": "Kanban",
+      "matrix": "Prioriteti",
+      "trash": "Otpad",
+      "calendar": "Kalendar",
+      "undo": "Poništi",
+      "redo": "Ponovi",
+      "empty": "Nema odgovarajućih zadataka",
+      "task": "Naziv zadatka",
+      "desc": "Opis",
+      "due": "Datum",
+      "time": "Vrijeme",
+      "cat": "Kategorija",
+      "priority": "Prioritet",
+      "estimate": "Procijenjene minute",
+      "repeat": "Ponavljanje",
+      "group": "Grupa",
+      "notes": "Brojčani ID-ovi bilješki",
+      "proj": "Projekt",
+      "none": "Bez projekta",
+      "save": "Sačuvaj",
+      "cancel": "Otkaži",
+      "focus": "Započni fokus",
+      "edit": "Uredi",
+      "done": "Završi",
+      "resume": "Ponovo otvori",
+      "archive": "Arhiviraj",
+      "remove": "Premjesti u otpad",
+      "restore": "Vrati",
+      "addCheck": "Dodaj korak",
+      "check": "Kontrolna lista",
+      "sub": "Podzadaci",
+      "study": "Učenje",
+      "sport": "Vježbanje",
+      "review": "Čitanje",
+      "exam": "Posao",
+      "todo": "Nije započeto",
+      "doing": "U toku",
+      "completed": "Završeno",
+      "archived": "Arhivirano",
+      "low": "Nizak",
+      "medium": "Srednji",
+      "high": "Visok",
+      "urgent": "Hitno",
+      "daily": "Dnevno",
+      "weekly": "Sedmično",
+      "monthly": "Mjesečno",
+      "never": "Nikad",
+      "allCategories": "Sve kategorije",
+      "estimated": "Procjena",
+      "actual": "Stvarno",
+      "overdue": "Zakašnjelo",
+      "do": "Važno i hitno",
+      "schedule": "Važno, nije hitno",
+      "delegate": "Hitno, nije važno",
+      "eliminate": "Ni hitno ni važno",
+      "invalid": "Nije moguće sačuvati",
+      "notConnected": "Veza s tajmerom nije dostupna"
+    },
+    "goals": {
+      "kicker": "✦ DNEVNI CILJEVI",
+      "heading": "Mali napredak svakog dana",
+      "desc": "Minute računamo iz završenih sesija fokusa.",
+      "edit": "⚙ Uredi",
+      "modal": "Dnevni ciljevi aktivnosti",
+      "hint": "Unesite 0 da sakrijete cilj. Računaju se samo završene sesije.",
+      "save": "Ciljevi sačuvani",
+      "invalid": "Unesite cijeli broj minuta od 0 do 720.",
+      "noGoal": "Postavi cilj",
+      "minute": "min",
+      "done": "završeno",
+      "today": "danas",
+      "week": "Ove sedmice",
+      "weekTarget": "Sedmični cilj (min)",
+      "weekInvalid": "Sedmični ciljevi moraju biti od 0 do 5040 minuta."
+    },
+    "analytics": {
+      "title": "Analitika zabilježenih sesija",
+      "activity": "Aktivnost",
+      "period": "Period",
+      "start": "Od",
+      "end": "Do",
+      "minutes": "Zabilježene minute",
+      "sessions": "Sesije",
+      "average": "Prosjek po sesiji",
+      "streak": "Trenutni niz",
+      "noData": "Nema zabilježenih sesija u ovom periodu",
+      "goal": "Poređenje ciljeva",
+      "noGoals": "Dnevni ciljevi nisu postavljeni",
+      "tasks": "Završeni zadaci",
+      "chart": "Dnevna raspodjela",
+      "year": "Godina",
+      "export": "Izvezi CSV",
+      "details": "Odaberite dan za detalje"
+    },
+    "analyticsDomain": {
+      "study": "Učenje",
+      "read": "Čitanje",
+      "work": "Posao",
+      "sport": "Vježbanje"
+    },
+    "timer": {
+      "0": {
+        "text": "⚙ Prilagodi",
+        "status": "REVIEW_REQUIRED"
+      },
+      "1": {
+        "text": "Postavke fokusa i pauza",
+        "status": "REVIEW_REQUIRED"
+      },
+      "2": {
+        "text": "Trenutna sesija ostaje sačuvana; promjene važe samo za nove sesije.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "3": {
+        "text": "Fokus · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "4": {
+        "text": "Kratka pauza · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "5": {
+        "text": "Duga pauza · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "6": {
+        "text": "Sesije po ciklusu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "7": {
+        "text": "Zadane vrijednosti",
+        "status": "REVIEW_REQUIRED"
+      },
+      "8": {
+        "text": "Sačuvaj",
+        "status": "REVIEW_REQUIRED"
+      },
+      "9": {
+        "text": "Unesite cijele brojeve unutar prikazanih granica.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "10": {
+        "text": "Postavke su sačuvane",
+        "status": "REVIEW_REQUIRED"
+      }
+    }
+  }
+}

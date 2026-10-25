@@ -23,6 +23,7 @@ const document = {
   addEventListener(){},
   getElementById(id){if(!map.has(id)){const el=node(id);if(id==='nsSort')el.options=[node(),node(),node()];map.set(id,el);}return map.get(id);},
   createElement(){return node();},
+  querySelector(){return null;},
   querySelectorAll(){return []}
 };
 const storage = {
