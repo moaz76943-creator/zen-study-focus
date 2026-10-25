@@ -39,6 +39,8 @@ test('unsupported and excluded locales use truthful English fallback without fal
  assert.equal(bridge.localeCode('he-IL'),'en');
  assert.equal(bridge.localeCode('iw'),'en');
  assert.equal(bridge.translate('en','does.not.exist'),'');
+ assert.equal(bridge.soundName('he-IL','ocean',{locale:'he',sounds:{ocean:'גלים'}}),'Ocean Waves');
+ assert.equal(bridge.soundName('en','ocean',{locale:'iw',sounds:{ocean:'גלים'}}),'Ocean Waves');
 });
 
 test('sound IDs and file paths remain untouched; a matching legacy translation is allowed',()=>{
