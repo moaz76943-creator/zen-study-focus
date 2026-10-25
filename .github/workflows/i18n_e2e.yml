@@ -50,7 +50,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-build_apk:
+  build_apk:
     name: One fresh-HEAD APK for both Android APIs
     runs-on: ubuntu-latest
     timeout-minutes: 30
