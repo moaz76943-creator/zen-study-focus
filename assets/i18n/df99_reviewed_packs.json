@@ -3901,6 +3901,25 @@
       "33": "Hiện câu trả lời",
       "34": "Không thể sao chép.",
       "35": "Đã lưu"
+    },
+    "analytics": {
+      "activity": "Hoạt động",
+      "average": "Trung bình mỗi phiên",
+      "chart": "Phân bố theo ngày",
+      "details": "Chọn một ngày để xem chi tiết",
+      "end": "Đến",
+      "export": "Xuất CSV",
+      "goal": "So sánh mục tiêu",
+      "minutes": "Số phút đã ghi nhận",
+      "noData": "Không có phiên nào được ghi nhận trong khoảng thời gian này",
+      "noGoals": "Chưa đặt mục tiêu hằng ngày",
+      "period": "Khoảng thời gian",
+      "sessions": "Phiên",
+      "start": "Từ",
+      "streak": "Chuỗi ngày liên tiếp hiện tại",
+      "tasks": "Nhiệm vụ đã hoàn thành",
+      "title": "Thống kê hoạt động đã ghi nhận",
+      "year": "Năm"
     }
   },
   "th": {
@@ -3941,6 +3960,12 @@
       "33": "แสดงคำตอบ",
       "34": "คัดลอกไม่ได้",
       "35": "บันทึกแล้ว"
+    },
+    "analyticsDomain": {
+      "read": "Đọc sách",
+      "sport": "Thể thao",
+      "study": "Học tập",
+      "work": "Làm việc"
     }
   },
   "el": {
