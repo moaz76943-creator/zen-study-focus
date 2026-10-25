@@ -14,7 +14,8 @@ timer:Array.from({length:11},(_,i)=>String(i)),
 analytics:['title','activity','period','start','end','minutes','sessions','average','streak','noData','goal','noGoals','tasks','chart','year','export','details'],
 analyticsDomain:['study','read','work','sport'],
 goals:['kicker','heading','desc','edit','modal','hint','save','invalid','noGoal','minute','done','today','week','weekTarget','weekInvalid'],
-notes:Array.from({length:36},(_,i)=>String(i))
+notes:Array.from({length:36},(_,i)=>String(i)),
+tasks:["actual","add","addCheck","all","allCategories","archive","archived","board","calendar","cancel","cat","check","completed","daily","delegate","desc","do","doing","done","due","edit","eliminate","empty","estimate","estimated","exam","focus","group","high","invalid","low","matrix","medium","monthly","never","none","notConnected","notes","overdue","priority","proj","project","redo","remove","repeat","restore","resume","review","save","schedule","search","sport","study","sub","subtitle","task","time","title","today","todo","trash","undo","urgent","weekly"]
 };
 const scripts={
 hi:/[\u0900-\u097F]/u,bn:/[\u0980-\u09FF]/u,ur:/[\u0600-\u06FF]/u,fa:/[\u0600-\u06FF]/u,

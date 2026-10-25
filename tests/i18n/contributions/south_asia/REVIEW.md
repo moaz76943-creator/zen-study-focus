@@ -16,8 +16,8 @@ Existing reviewed packs are not replaced. Integration into the canonical pack is
 
 ## Coverage supplied
 
-- All 15 locales now cover timer (11), analytics (17), analyticsDomain (4), goals (15), and notes (36) when combined with pre-existing reviewed packs.
-- Remaining canonical tasks (64 keys) and all other modules outside these families are not yet provided by this lane.
+- All 15 locales now cover timer (11), analytics (17), analyticsDomain (4), goals (15), notes (36) and tasks (64) when combined with pre-existing reviewed packs.
+- Other modules outside these six canonical families are not yet covered by this lane.
 
 ## Verification and open items
 
@@ -26,7 +26,7 @@ Run: `node --test tests/i18n/contributions/south_asia/locale_contributions.test.
 The test suite validates the contribution contract, namespace key parity, UTF-8 when parsed by Node, NFC, bidi-control filtering, forbidden numeral scripts, and script presence. It does **not** certify native-speaker quality, font shaping, or actual Android screen layout.
 
 Still outstanding before 99-language claim:
-- Missing tasks namespaces and other app sections must be covered by the lane 01 inventory; Quick Training, templates, audio and Android-native text are not covered by this source family.
+- Missing app sections outside the canonical six namespaces must be covered by the lane 01 inventory; Quick Training, templates, audio and Android-native text are not covered by this source family.
 - Check all tooltips, save/error confirmations, dialogs, analytics SVG/ARIA and native Toasts at runtime.
 - Review long strings on 320/360/393/430 px, RTL dropdown selection, mixed Western digits, selection/caret in editable notes, and screenshots on API 30/35.
 - Never normalize or transliterate numbers in user-authored notes or backups; UI-generated counters use ASCII 0–9.
