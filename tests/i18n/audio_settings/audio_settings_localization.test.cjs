@@ -8,8 +8,11 @@ const CATALOG=bridge.SOUND_IDS.map((id,i)=>({id,cat:i<6?'water':'forest',src:'so
 function fakeStudio(){
  const tile=(isOn=false)=>{
    const name={textContent:''}, label={textContent:''}, slider={value:'0.65',ariaLabel:'',setAttribute(k,v){this[k]=v;}};
-   return {name,label,slider,attributes:{},classList:{contains(k){return isOn&&k==='playing';}},
-     querySelector(s){return s==='.stile-name'?name:s==='.stile-volume-label span'?label:s==='input.stile-vol'?slider:null;},
+   const play={attributes:{},listeners:{},clickCount:0,focusCount:0,
+     setAttribute(k,v){this.attributes[k]=v;},addEventListener(k,fn){this.listeners[k]=fn;this.listenerCount=(this.listenerCount||0)+1;},
+     click(){this.clickCount++;},focus(){this.focusCount++;}};
+   return {name,label,slider,play,attributes:{},classList:{contains(k){return isOn&&k==='playing';}},
+     querySelector(s){return s==='.stile-name'?name:s==='.stile-volume-label span'?label:s==='input.stile-vol'?slider:s==='.stile-play-btn'?play:null;},
      setAttribute(k,v){this.attributes[k]=v;}};
  };
  const tiles=CATALOG.map((s,i)=>tile(i===2));
@@ -58,7 +61,7 @@ test('studio translation preserves playback, slider values, app state and Wester
    assert.equal(result.updated,12);
    assert.equal(studio.tiles[0].slider.value,'0.65');
    assert.ok(studio.tiles[0].slider['aria-label'].includes(bridge.soundName(locale,'ocean')));
-   assert.ok(studio.tiles[2].attributes['aria-label'].includes(bridge.translate(locale,'control.pause')));
+   assert.ok(studio.tiles[2].play.attributes['aria-label'].includes(bridge.translate(locale,'control.pause')));
  }
  assert.equal(studio.filters[0].textContent,'All (12)');
  assert.equal(JSON.stringify(config),before);
@@ -101,4 +104,27 @@ test('lifecycle without background-stop remains passive; disposal removes listen
  mix.attachLifecycle(doc);events.visibilitychange();events.pagehide();
  assert.deepEqual(mix.activeIds(),['rain']);mix.dispose();
  assert.deepEqual(Object.keys(events),[]);assert.deepEqual([...on],[]);
+});
+
+
+test('play control is keyboard-operable and ARIA-pressed while keeping its volume slider independent',()=>{
+ const studio=fakeStudio();
+ assert.equal(bridge.bindSoundStudio({document:studio.doc,locale:'de',catalog:CATALOG}).status,'OK');
+ const first=studio.tiles[0],playing=studio.tiles[2],button=first.play;
+ assert.equal(first.attributes.role,'group');
+ assert.equal(button.attributes.role,'button');
+ assert.equal(button.attributes.tabindex,'0');
+ assert.equal(button.attributes['aria-pressed'],'false');
+ assert.equal(playing.play.attributes['aria-pressed'],'true');
+ assert.ok(button.attributes['aria-label'].includes('Meereswellen'));
+ const press=(key,target=button)=>{let prevented=0;button.listeners.keydown({key,target,
+   preventDefault(){prevented++;},stopPropagation(){}});return prevented;};
+ assert.equal(press('Enter'),1);assert.equal(press(' '),1);
+ assert.equal(button.clickCount,2);
+ assert.equal(press('ArrowUp'),0);
+ assert.equal(press('Enter',first.slider),0);
+ assert.equal(button.clickCount,2);
+ bridge.bindSoundStudio({document:studio.doc,locale:'ar',catalog:CATALOG});
+ assert.equal(button.listenerCount,1,'one event listener across repeated bindings');
+ assert.ok(button.attributes['aria-label'].includes('أمواج المحيط'));
 });
