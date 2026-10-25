@@ -33,15 +33,16 @@ function summarize(raw,source,sha) {
     if(counts.missing)reasons.push('SECTION_TRANSLATIONS_FALLBACK_OR_ABSENT');
     if(observed.core!==null && observed.core>0)reasons.push('CORE_EMPTY_STRINGS');
     if(observed.quick!==null && observed.quick>0)reasons.push('QUICK_EMPTY_STRINGS');
+    if(entry.code==='en'||entry.code==='ar')reasons.push('BASE_LANGUAGE_REGISTRY_BYPASS_UNVERIFIED');
     return {
-      code:entry.code,status:reasons.length?'FAIL':'PASS',core_present:entry.core,quick_present:entry.quick,
+      code:entry.code,status:reasons.length?(reasons.length===1 && reasons[0]==='BASE_LANGUAGE_REGISTRY_BYPASS_UNVERIFIED'?'NOT_TESTED':'FAIL'):'PASS',core_present:entry.core,quick_present:entry.quick,
       source_empty_strings:observed,sections,translated:counts.translated,
       total:counts.total,missing_or_fallback:counts.missing,reasons,
       android_e2e:'NOT_TESTED'
     };
   });
   return {task_id:'DF-LANE-13-REAL-END-TO-END-QA',kind:'SOURCE_DICTIONARY_AUDIT_NOT_ANDROID',
-    SOURCE_SHA:sha,catalog_count:99,summary:{PASS:langs.filter(x=>x.status==='PASS').length,FAIL:langs.filter(x=>x.status==='FAIL').length,NOT_TESTED:0},
+    SOURCE_SHA:sha,catalog_count:99,summary:{PASS:langs.filter(x=>x.status==='PASS').length,FAIL:langs.filter(x=>x.status==='FAIL').length,NOT_TESTED:langs.filter(x=>x.status==='NOT_TESTED').length},
     per_language_coverage:langs,device_matrix_status:'NOT_TESTED',
     measurement_note:'Translation strings are measured from registered dictionaries. Fallback/missing is NOT translated; Android E2E is independent.'};
 }
@@ -88,6 +89,132 @@ function missingKeysByLanguage(raw) {
       ctx.window.DF99Locale.coverage([lang.code],area,[key])[0].translated===0)])
   )]));
 }
+
+const DETAIL_FAMILIES=Object.freeze([
+ ['timer','Timer','D'],['tasks','Tasks','E'],['notes','Notes','E'],
+ ['goals','Goals','D'],['analytics','Analytics','F'],['analyticsDomain','Analytics Domain','F']
+]);
+const REVIEWED_FILE='android/app/src/main/assets/web/js/df99_reviewed_packs.js';
+function auditSection({code,section,keys,read,english={},owner='UNASSIGNED',source_file=null}) {
+ if(keys!==null&&(!Array.isArray(keys)||new Set(keys).size!==keys.length||
+    keys.some(k=>typeof k!=='string'||!k)))throw Error('Invalid source keys: '+section);
+ const baseUnverified=(code==='en'||code==='ar')&&DETAIL_FAMILIES.some(x=>x[1]===section||x[0]===section);
+ const row={language_code:code,section,owner,source_file,expected_keys:keys===null?null:keys.length,
+  present_keys:0,missing_keys:[],empty_values:[],fallback_count:0,
+  english_identical_candidates:[],duplicate_value_candidates:[],
+  unverified_keys:[],status:'NOT_TESTED',
+  evidence:baseUnverified?'BASE_LANGUAGE_COVERAGE_REGISTRY_BYPASS':'SOURCE_DICTIONARY'};
+ if(keys===null||typeof read!=='function') {
+   row.missing_keys=null;row.unverified_keys=keys===null?null:keys.slice();
+   row.evidence='NO_MEASURED_KEY_INVENTORY';return row;
+ }
+ if(baseUnverified) {
+   row.unverified_keys=keys.slice();row.fallback_count=keys.length;return row;
+ }
+ const duplicates=new Map(),common=new Set(['Start','Pause','Resume','Reset','Save','Cancel','Done','Tasks','Notes','Home','Work','Reading']);
+ for(const key of keys) {
+   const probe=read(key);
+   if(!probe||probe.proven!==true) {
+     row.missing_keys.push(key);row.fallback_count++;continue;
+   }
+   if(typeof probe.value!=='string'||!probe.value.trim()) {
+     row.empty_values.push(key);continue;
+   }
+   row.present_keys++;
+   const value=probe.value.trim().normalize('NFC');
+   const baseline=Object.prototype.hasOwnProperty.call(english,key)?english[key]:null;
+   if(code!=='en'&&((typeof baseline==='string'&&value===baseline.trim().normalize('NFC'))||
+      (baseline===null&&common.has(value))))row.english_identical_candidates.push(key);
+   const ids=duplicates.get(value)||[];ids.push(key);duplicates.set(value,ids);
+ }
+ row.duplicate_value_candidates=[...duplicates.values()].filter(x=>x.length>1);
+ row.status=(row.missing_keys.length||row.empty_values.length)?'FAIL':'PASS';
+ return row;
+}
+function makeRepairQueue(audits) {
+ const items=audits.filter(x=>(x.missing_keys?.length||0)>0||x.empty_values.length>0||
+    (x.unverified_keys?.length||0)>0||x.english_identical_candidates.length>0||
+    x.duplicate_value_candidates.length>0||x.status==='NOT_TESTED').map(x=>({
+   owner:x.owner,source_file:x.source_file,language_code:x.language_code,section:x.section,
+   status:x.status,missing_keys:x.missing_keys,empty_values:x.empty_values,
+   unverified_keys:x.unverified_keys,fallback_count:x.fallback_count,
+   english_identical_candidates:x.english_identical_candidates,
+   duplicate_value_candidates:x.duplicate_value_candidates,
+   action:x.status==='NOT_TESTED'?'VERIFY_SOURCE_INVENTORY':x.status==='FAIL'?'TRANSLATE_MISSING_OR_EMPTY':'REVIEW_CANDIDATES'
+ })).sort((a,b)=>a.owner.localeCompare(b.owner,'en')||
+    String(a.source_file).localeCompare(String(b.source_file),'en')||
+    a.language_code.localeCompare(b.language_code,'en')||a.section.localeCompare(b.section,'en'));
+ const assignments={};
+ for(const x of items) {
+   const group=assignments[x.owner]||={};
+   const file=x.source_file||'NO_VERIFIED_NATIVE_TRANSLATION_SOURCE';
+   (group[file]||=[]).push({language_code:x.language_code,section:x.section,
+     action:x.action,missing_keys:x.missing_keys,empty_values:x.empty_values,
+     unverified_keys:x.unverified_keys});
+ }
+ return {scope:'SOURCE_TRANSLATION_REPAIR_NOT_ANDROID',assignments,items};
+}
+
+function flattenSourceLeaves(input,prefix='',out={}) {
+ if(Array.isArray(input)) {
+   input.forEach((value,i)=>flattenSourceLeaves(value,prefix?prefix+'.'+i:String(i),out));
+ } else if(input!==null&&typeof input==='object') {
+   for(const key of Object.keys(input).sort())flattenSourceLeaves(input[key],prefix?prefix+'.'+key:key,out);
+ } else if(prefix)out[prefix]=input;
+ return out;
+}
+
+function detailedSourceAudit(raw) {
+ const ctx={window:{},document:{addEventListener(){}},console};
+ vm.createContext(ctx);
+ for(const file of ['locale_rows.js','locale_extras.js'])
+   vm.runInContext(read(file),ctx,{filename:file,timeout:2500});
+ const app=read('app.js'),quick=read('quick_training.js');
+ const a=app.indexOf('let todayISO ='),b=quick.indexOf('let quickTraining = null;');
+ if(a<0||b<0)throw Error('Dictionary initialization boundary changed');
+ vm.runInContext(app.slice(0,a)+'\nthis.__core=DICT;this.__catalog=LANG_CATALOG;',ctx,
+   {filename:'app:catalog',timeout:5000});
+ vm.runInContext(quick.slice(0,b)+'\nthis.__quick=QUICK_TRANSLATIONS;this.__quickKeys=QUICK_KEYS;',ctx,
+   {filename:'quick:catalog',timeout:5000});
+ for(const file of ['locale_premium_v22.js','js/df99_multiscreen_i18n.js','js/df99_reviewed_packs.js'])
+   vm.runInContext(read(file),ctx,{filename:file,timeout:5000});
+ const codes=ctx.__catalog.map(x=>x.code);
+ if(codes.length!==99||new Set(codes).size!==99||codes.some(x=>x==='he'||x==='iw')||
+   codes.some(x=>!raw.summary.some(y=>y.code===x)))throw Error('Coverage source catalog mismatch');
+ const englishCore=flattenSourceLeaves(ctx.__core.en||{});
+ const coreKeys=Object.keys(englishCore).sort(),quickKeys=Array.from(ctx.__quickKeys||[]);
+ if(!coreKeys.length||!quickKeys.length||new Set(quickKeys).size!==quickKeys.length)
+   throw Error('Cannot measure Core or Quick Training baseline');
+ const englishQuick=Object.fromEntries(quickKeys.map((k,i)=>[k,ctx.__quick.en?.[i]]));
+ const result=[];
+ for(const {code} of raw.summary) {
+   for(const [family,label,owner] of DETAIL_FAMILIES) {
+     const keys=raw.sections?.[family];
+     if(!Array.isArray(keys)||!keys.length) {
+       result.push(auditSection({code,section:label,keys:null,owner,source_file:REVIEWED_FILE}));continue;
+     }
+     result.push(auditSection({code,section:label,keys,owner,source_file:REVIEWED_FILE,
+       read:key=>{
+         const measured=ctx.window.DF99Locale.coverage([code],family,[key])[0].translated===1;
+         const value=ctx.window.DF99Locale.t(code,family,key,'__DF13_UNTRANSLATED__');
+         return {proven:measured&&value!=='__DF13_UNTRANSLATED__',value};
+       }}));
+   }
+   const core=ctx.__core[code]?flattenSourceLeaves(ctx.__core[code]):null;
+   result.push(auditSection({code,section:'Core',keys:coreKeys,owner:'F',
+     source_file:'android/app/src/main/assets/web/app.js',english:englishCore,
+     read:key=>({proven:!!core&&Object.prototype.hasOwnProperty.call(core,key),value:core?.[key]})}));
+   const q=ctx.__quick[code];
+   result.push(auditSection({code,section:'Quick Training',keys:quickKeys,owner:'F',
+     source_file:'android/app/src/main/assets/web/quick_training.js',english:englishQuick,
+     read:key=>{const i=quickKeys.indexOf(key);
+       return {proven:Array.isArray(q)&&i<q.length,value:q?.[i]};}}));
+   // No Android values/strings.xml or localized resource key baseline in this tree.
+   result.push(auditSection({code,section:'Native',keys:null,owner:'F',source_file:null}));
+ }
+ return result;
+}
+
 function staticSections() {
   const html=read('index.html');
   const rows=Object.fromEntries(SECTIONS.map(id=>[id,{
@@ -110,6 +237,23 @@ function run(outDir,strict) {
   const raw=JSON.parse(p.stdout);
   const missingKeys=missingKeysByLanguage(raw);
   const result=summarize(raw,sourceEmptyCounts(),sourceSha());
+  const detailed=detailedSourceAudit(raw);
+  const detailByLanguage=Object.fromEntries(raw.summary.map(x=>[x.code,{}]));
+  for(const row of detailed)detailByLanguage[row.language_code][row.section]=row;
+  for(const row of result.per_language_coverage) {
+    row.source_sections=detailByLanguage[row.code];
+    const failed=Object.values(row.source_sections).filter(x=>x.section!=='Native'&&x.status==='FAIL');
+    if(failed.length) {
+      row.reasons.push(...failed.map(x=>'SOURCE_SECTION_FAIL:'+x.section));
+      row.status='FAIL';
+    } else if(Object.values(row.source_sections).some(x=>x.section!=='Native'&&x.status==='NOT_TESTED') && row.status==='PASS') {
+      row.reasons.push('SOURCE_SECTION_NOT_TESTED');row.status='NOT_TESTED';
+    }
+  }
+  result.summary={PASS:result.per_language_coverage.filter(x=>x.status==='PASS').length,
+    FAIL:result.per_language_coverage.filter(x=>x.status==='FAIL').length,
+    NOT_TESTED:result.per_language_coverage.filter(x=>x.status==='NOT_TESTED').length};
+  result.native_coverage='NOT_TESTED';result.android_e2e_coverage='NOT_TESTED';
   for(const row of result.per_language_coverage)for(const area of REQUIRED_AREAS) {
     if(!row.sections[area] || row.sections[area].missing!==missingKeys[row.code][area].length)
       throw Error('Coverage count vs missing-key audit mismatch for '+row.code+' '+area);
@@ -119,9 +263,25 @@ function run(outDir,strict) {
     missing:result.per_language_coverage.reduce((n,r)=>n+r.sections[area].missing,0)
   }]));
   result.by_section=byArea;
+  const perSection={};
+  for(const row of detailed) {
+    const item=perSection[row.section]||={PASS:0,FAIL:0,NOT_TESTED:0,
+      expected_keys_per_language:row.expected_keys,missing:0,empty:0,fallback:0,english_identical_candidates:0};
+    item[row.status]++;
+    item.missing+=row.missing_keys?.length||0;
+    item.empty+=row.empty_values.length;
+    item.fallback+=row.fallback_count;
+    item.english_identical_candidates+=row.english_identical_candidates.length;
+  }
+  result.detailed_by_section=perSection;
+  const repair=makeRepairQueue(detailed);
+  fs.writeFileSync(path.join(outDir,'TRANSLATION_REPAIR_QUEUE.json'),
+    JSON.stringify({SOURCE_SHA:result.SOURCE_SHA,...repair},null,2)+'\n');
   fs.writeFileSync(path.join(outDir,'MISSING_TRANSLATION_KEYS.json'),
     JSON.stringify({SOURCE_SHA:result.SOURCE_SHA,scope:'REGISTERED_SOURCE_KEYS_ONLY',by_area:byArea,
-      missing_keys_by_language:missingKeys},null,2)+'\n');
+      missing_keys_by_language:missingKeys,
+      detailed_by_language:detailByLanguage,
+      measurement_caveat:'Native and unverified en/ar base-locale registry keys are NOT_TESTED; missing keys exclude unsupported source inventories.'},null,2)+'\n');
 
   result.static_screen_presence=staticSections();
   result.static_sections_status=Object.values(result.static_screen_presence).every(x=>x.page_present&&x.navigation_present)?'PASS':'FAIL';
@@ -137,9 +297,26 @@ function run(outDir,strict) {
     ' | '+String(x.source_empty_strings.core)+' / '+String(x.source_empty_strings.quick)+
     ' | '+x.status+' |');
   fs.writeFileSync(path.join(outDir,'PER_LANGUAGE_COVERAGE.md'),head.join('\n')+'\n');
+  const overview=['# DF13-B — measured translation coverage','','SOURCE_SHA: '+result.SOURCE_SHA,
+    '', 'Source dictionary: PASS '+result.summary.PASS+' / FAIL '+result.summary.FAIL+
+      ' / NOT_TESTED '+result.summary.NOT_TESTED,
+    '', 'Android E2E: NOT_TESTED in this lane. Native resources: NOT_TESTED (no verified string key inventory).',
+    'en/ar registered-family coverage() returns true unconditionally: this is NOT sufficient translation evidence.',
+    'English-identical strings and duplicate labels are REVIEW candidates, not automatic machine-approved translations.',
+    '', '| Section | PASS | FAIL | NOT_TESTED | Missing | Empty | Fallback | English-identical candidates |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|'];
+  for(const [section,item] of Object.entries(perSection))overview.push(
+    '| '+section+' | '+item.PASS+' | '+item.FAIL+' | '+item.NOT_TESTED+
+    ' | '+item.missing+' | '+item.empty+' | '+item.fallback+' | '+item.english_identical_candidates+' |');
+  overview.push('','## Source ownership (proposed D/E/F repair lanes)',
+    'D: Timer / Goals. E: Tasks / Notes. F: Analytics / Core / Quick Training / Native audit.',
+    'Only the validator was changed. Translate in the indicated owner files, not here.',
+    'Native source-file assignment is unavailable until an authoritative key inventory exists.',
+    '', 'Individual language and key details: PER_LANGUAGE_COVERAGE.json, MISSING_TRANSLATION_KEYS.json, TRANSLATION_REPAIR_QUEUE.json.');
+  fs.writeFileSync(path.join(outDir,'COVERAGE_SUMMARY.md'),overview.join('\n')+'\n');
   process.stdout.write(JSON.stringify({SOURCE_SHA:result.SOURCE_SHA,summary:result.summary,
     static_sections_status:result.static_sections_status,report:file})+'\n');
-  if(strict && (result.summary.FAIL>0 || result.static_sections_status!=='PASS'))process.exitCode=1;
+  if(strict && (result.summary.FAIL>0 || result.summary.NOT_TESTED>0 || result.static_sections_status!=='PASS'))process.exitCode=1;
   return result;
 }
 if(require.main===module) {
@@ -147,4 +324,4 @@ if(require.main===module) {
   const out=arg>=0&&process.argv[arg+1]?path.resolve(process.argv[arg+1]):path.join(ROOT,'artifacts/i18n-e2e');
   try{run(out,process.argv.includes('--strict'))}catch(error){console.error(error.stack||String(error));process.exitCode=2;}
 }
-module.exports={fraction,summarize,countBlankStrings,staticSections,missingKeysByLanguage,run};
+module.exports={fraction,summarize,countBlankStrings,staticSections,missingKeysByLanguage,auditSection,flattenSourceLeaves,makeRepairQueue,detailedSourceAudit,run};
