@@ -53,7 +53,7 @@ test('Changing language updates visible labels without editing user text',()=>{
  assert.equal(note.value,'نص المستخدم ٢٠٢٦');
 });
 test('Previous 75 language packs preserved, excluded codes use English',()=>{
- assert.equal(Object.keys(ctx.packs).length,80);
+ assert.ok(Object.keys(ctx.packs).length>=80,'retain all existing packs while allowing additive locale batches');
  for(const code of oldCodes){
   assert.ok(Array.isArray(ctx.packs[code]),code+' previous pack missing');
   assert.equal(ctx.packs[code].length,36,code+' previous pack incomplete');
