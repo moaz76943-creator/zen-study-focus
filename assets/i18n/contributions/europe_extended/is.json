@@ -1,0 +1,69 @@
+{
+  "language": "is",
+  "status": "REVIEW_REQUIRED",
+  "sections": {
+    "timer": {
+      "0": "⚙ Sérsníða",
+      "1": "Stillingar fyrir einbeitingu og hlé",
+      "2": "Núverandi lota helst óbreytt; breytingar gilda aðeins fyrir nýjar lotur.",
+      "3": "Einbeiting · mín",
+      "4": "Stutt hlé · mín",
+      "5": "Langt hlé · mín",
+      "6": "Lotur í umferð",
+      "7": "Sjálfgefin gildi",
+      "8": "Vista",
+      "9": "Sláðu inn heiltölur innan sýndra marka.",
+      "10": "Stillingar vistaðar"
+    },
+    "tasks": {
+      "title": "Verkefni",
+      "add": "Nýtt verkefni",
+      "search": "Leita að verkefnum",
+      "save": "Vista",
+      "cancel": "Hætta við",
+      "edit": "Breyta",
+      "done": "Ljúka",
+      "calendar": "Dagatal",
+      "priority": "Forgangur",
+      "archive": "Setja í safn"
+    },
+    "notes": {
+      "0": "✦ GLÓSUR",
+      "3": "Glósurnar mínar",
+      "5": "＋ Ný glósa",
+      "6": "Sniðmát",
+      "9": "Raða",
+      "12": "Titill",
+      "15": "Ný glósa",
+      "20": "Efni",
+      "25": "Vista glósu",
+      "32": "Eyða"
+    },
+    "goals": {
+      "heading": "Smá framfarir á hverjum degi",
+      "edit": "⚙ Breyta",
+      "minute": "mín",
+      "today": "í dag",
+      "week": "Þessa viku",
+      "noGoal": "Setja markmið"
+    },
+    "analytics": {
+      "title": "Greining á skráðri virkni",
+      "activity": "Virkni",
+      "period": "Tímabil",
+      "start": "Frá",
+      "end": "Til",
+      "minutes": "Skráðar mínútur",
+      "sessions": "Lotur",
+      "year": "Ár",
+      "export": "Flytja út CSV",
+      "noData": "Engar lotur skráðar á þessu tímabili"
+    },
+    "analyticsDomain": {
+      "study": "Nám",
+      "read": "Lestur",
+      "work": "Vinna",
+      "sport": "Íþróttir"
+    }
+  }
+}

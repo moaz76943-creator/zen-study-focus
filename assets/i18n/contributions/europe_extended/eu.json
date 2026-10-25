@@ -1,0 +1,218 @@
+{
+  "language": "eu",
+  "status": "TRANSLATED",
+  "sections": {
+    "notes": {
+      "0": "✦ OHAR ESTUDIOA",
+      "1": "Zure ideiak argi antolatuta",
+      "2": "Idatzi, antolatu eta berrikusi ideiak erraz.",
+      "3": "Nire oharrak",
+      "4": "Finkatuak",
+      "5": "＋ Ohar berria",
+      "6": "Idazteko txantiloiak",
+      "7": "Aukeratu txantiloi bat hasteko",
+      "8": "Finkatuak soilik",
+      "9": "Ordenatu",
+      "10": "Berrienak",
+      "11": "Zaharrenak",
+      "12": "Izenburua",
+      "13": "Emaitzak",
+      "14": "Ez dago bat datorren oharrik. Saiatu txantiloi batekin.",
+      "15": "Ohar berria",
+      "16": "Editatu oharra",
+      "17": "Izenburua",
+      "18": "Mota",
+      "19": "Data",
+      "20": "Edukia",
+      "21": "Finkatu",
+      "22": "Gogokoa",
+      "23": "Hitzak",
+      "24": "Karaktereak",
+      "25": "Gorde oharra",
+      "26": "Gorde aldaketak",
+      "27": "Lehendik dagoen testua txantiloiarekin ordeztu?",
+      "28": "Editatu",
+      "29": "Bikoiztu",
+      "30": "Kopiatu",
+      "31": "Egutegia",
+      "32": "Ezabatu",
+      "33": "Erakutsi erantzuna",
+      "34": "Ezin izan da kopiatu.",
+      "35": "Gordeta"
+    },
+    "timer": {
+      "0": {
+        "text": "⚙ Pertsonalizatu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "1": {
+        "text": "Fokatze- eta atseden-ezarpenak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "2": {
+        "text": "Uneko saioa mantenduko da; aldaketak saio berriei bakarrik aplikatuko zaizkie.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "3": {
+        "text": "Fokua · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "4": {
+        "text": "Atseden laburra · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "5": {
+        "text": "Atseden luzea · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "6": {
+        "text": "Zikloko saioak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "7": {
+        "text": "Balio lehenetsiak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "8": {
+        "text": "Gorde",
+        "status": "REVIEW_REQUIRED"
+      },
+      "9": {
+        "text": "Sartu zenbaki osoak adierazitako mugen barruan.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "10": {
+        "text": "Ezarpenak gordeta",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "tasks": {
+      "title": {
+        "text": "Zereginak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "add": {
+        "text": "Zeregin berria",
+        "status": "REVIEW_REQUIRED"
+      },
+      "search": {
+        "text": "Bilatu zereginak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "save": {
+        "text": "Gorde",
+        "status": "REVIEW_REQUIRED"
+      },
+      "cancel": {
+        "text": "Utzi",
+        "status": "REVIEW_REQUIRED"
+      },
+      "edit": {
+        "text": "Editatu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "done": {
+        "text": "Osatu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "calendar": {
+        "text": "Egutegia",
+        "status": "REVIEW_REQUIRED"
+      },
+      "priority": {
+        "text": "Lehentasuna",
+        "status": "REVIEW_REQUIRED"
+      },
+      "archive": {
+        "text": "Artxibatu",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "goals": {
+      "heading": {
+        "text": "Egunero aurrerapen txiki bat",
+        "status": "REVIEW_REQUIRED"
+      },
+      "edit": {
+        "text": "⚙ Editatu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "minute": {
+        "text": "min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "today": {
+        "text": "gaur",
+        "status": "REVIEW_REQUIRED"
+      },
+      "week": {
+        "text": "Aste honetan",
+        "status": "REVIEW_REQUIRED"
+      },
+      "noGoal": {
+        "text": "Ezarri helburua",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "analytics": {
+      "title": {
+        "text": "Erregistratutako jardueren analisia",
+        "status": "REVIEW_REQUIRED"
+      },
+      "activity": {
+        "text": "Jarduera",
+        "status": "REVIEW_REQUIRED"
+      },
+      "period": {
+        "text": "Aldia",
+        "status": "REVIEW_REQUIRED"
+      },
+      "start": {
+        "text": "Noiztik",
+        "status": "REVIEW_REQUIRED"
+      },
+      "end": {
+        "text": "Noiz arte",
+        "status": "REVIEW_REQUIRED"
+      },
+      "minutes": {
+        "text": "Erregistratutako minutuak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "sessions": {
+        "text": "Saioak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "year": {
+        "text": "Urtea",
+        "status": "REVIEW_REQUIRED"
+      },
+      "export": {
+        "text": "Esportatu CSV",
+        "status": "REVIEW_REQUIRED"
+      },
+      "noData": {
+        "text": "Ez dago saiorik erregistratuta aldi honetan",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "analyticsDomain": {
+      "study": {
+        "text": "Ikasketa",
+        "status": "REVIEW_REQUIRED"
+      },
+      "read": {
+        "text": "Irakurketa",
+        "status": "REVIEW_REQUIRED"
+      },
+      "work": {
+        "text": "Lana",
+        "status": "REVIEW_REQUIRED"
+      },
+      "sport": {
+        "text": "Kirola",
+        "status": "REVIEW_REQUIRED"
+      }
+    }
+  }
+}
