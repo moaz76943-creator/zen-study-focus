@@ -1,0 +1,183 @@
+# Play closed-testing AAB: pin all app source to immutable v3.0.7 commit.
+# The only build-tree delta is android/app/build.gradle versionCode 21 -> 22,
+# mirrored on integration/master-qa-verified-v21 as commit 5feaca7f.
+name: Deep Focus v3.0.7 - Play Release AAB v22 (signed only)
+
+on:
+  push:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - .github/workflows/build_play_release_v307_v22.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deep-focus-play-v307-v22-signed
+  cancel-in-progress: false
+
+jobs:
+  play-release-v307:
+    name: Validate tag, require upload keystore, build and verify signed AAB
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
+      ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
+      ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
+      ZEN_PLAY_UPLOAD_SHA1: ${{ secrets.ZEN_PLAY_UPLOAD_SHA1 }}
+
+    steps:
+      - name: Checkout exact v3.0.7 source commit (never default branch)
+        uses: actions/checkout@v4
+        with:
+          ref: 7801c563c4d5d700e3f6711be1b9c686ac9abfeb
+          persist-credentials: false
+
+      - name: Verify tag and apply sole allowed versionCode bump
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE=7801c563c4d5d700e3f6711be1b9c686ac9abfeb
+          test "$(git rev-parse HEAD)" = "$SOURCE"
+          TAG_TARGET="$(git ls-remote origin 'refs/tags/v3.0.7-lang-catalog-100-v21^{}' | awk '{print $1}')"
+          test "$TAG_TARGET" = "$SOURCE" || { echo "::error::Approved tag no longer resolves to requested source"; exit 1; }
+          test -f android/app/src/main/assets/web/app.js
+          node --check android/app/src/main/assets/web/app.js
+          test -s android/app/src/main/assets/web/index.html
+          python3 -c 'from pathlib import Path; p=Path("android/app/build.gradle"); s=p.read_text(); assert s.count("versionCode 21")==1, "expected exactly one source versionCode 21"; p.write_text(s.replace("versionCode 21","versionCode 22",1))'
+          test "$(git diff --name-only)" = 'android/app/build.gradle' || { echo "::error::Unexpected changes to pinned source"; exit 1; }
+          grep -Eq '^[[:space:]]*versionCode 22[[:space:]]*$' android/app/build.gradle
+          grep -Eq '^[[:space:]]*targetSdk 36[[:space:]]*$' android/app/build.gradle
+          grep -Fq 'applicationId "com.zenstudy.focus"' android/app/build.gradle
+          test ! -e android/app/src/main/assets/web/js/deep_focus_visual_suite.js
+          node -e 'const fs=require("fs"),assert=require("assert/strict"); const s=fs.readFileSync("android/app/src/main/assets/web/app.js","utf8");const m=s.match(/const LANG_CATALOG\s*=\s*(\[[\s\S]*?\])\s*;/);assert.ok(m);const l=JSON.parse(m[1]);assert.equal(l.length,99);assert.equal(new Set(l.map(x=>x.code)).size,99);assert.ok(l.some(x=>x.enName==="Swahili"));assert.ok(l.some(x=>x.enName==="Amharic"));assert.ok(!l.some(x=>["he","iw"].includes(x.code)));console.log("Catalog validated: 99 unique languages in immutable tagged source");'
+          echo "Pinned commit: $SOURCE"
+          echo "Build-only delta: versionCode 21 -> 22"
+          {
+            echo 'source_branch=integration/master-qa-verified-v21'
+            echo 'tag=v3.0.7-lang-catalog-100-v21'
+            echo 'tagged_source_commit=7801c563c4d5d700e3f6711be1b9c686ac9abfeb'
+            echo 'allowed_build_delta=android/app/build.gradle versionCode 21 -> 22'
+            echo 'repository_version_bump_commit=5feaca7f3eb8b36c1e5e03c7dbc37444de8fd984'
+            echo 'package=com.zenstudy.focus'
+            echo 'versionCode=22'
+            echo 'targetSdk=36'
+            echo 'build_command=./gradlew clean bundleRelease --stacktrace'
+            echo 'note=99 actual locale entries despite 100-language tag label'
+          } > "$RUNNER_TEMP/play-v307-provenance.txt"
+
+      - name: Require valid release upload keystore (fail closed, no debug fallback)
+        id: signing
+        shell: bash
+        env:
+          ZEN_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$ZEN_UPLOAD_KEYSTORE_BASE64" || -z "$ZEN_UPLOAD_STORE_PASSWORD" || -z "$ZEN_UPLOAD_KEY_ALIAS" || -z "$ZEN_UPLOAD_KEY_PASSWORD" ]]; then
+            echo "::error::Release signing NOT configured: set all four ZEN_UPLOAD_KEYSTORE_BASE64, ZEN_UPLOAD_STORE_PASSWORD, ZEN_UPLOAD_KEY_ALIAS, ZEN_UPLOAD_KEY_PASSWORD GitHub Actions secrets."
+            echo "NO RELEASE AAB: debug/unsigned files cannot be represented as Play-upload-ready."
+            exit 1
+          fi
+          umask 077
+          STORE="$RUNNER_TEMP/deep-focus-v307-release-upload.jks"
+          printf '%s' "$ZEN_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$STORE"
+          test -s "$STORE" || { echo "::error::Empty decoded release keystore"; exit 1; }
+          echo "ZEN_UPLOAD_KEYSTORE_PATH=$STORE" >> "$GITHUB_ENV"
+          keytool -list -v -keystore "$STORE" -alias "$ZEN_UPLOAD_KEY_ALIAS" -storepass:env ZEN_UPLOAD_STORE_PASSWORD > "$RUNNER_TEMP/play-v307-keystore-details.txt"
+          grep -Fq 'PrivateKeyEntry' "$RUNNER_TEMP/play-v307-keystore-details.txt" || { echo "::error::Keystore alias is not a private signing key"; exit 1; }
+          KEY_SHA1="$(grep -m1 'SHA1:' "$RUNNER_TEMP/play-v307-keystore-details.txt" | sed -E 's/^.*SHA1: *//;s/[[:space:]]+$//')"
+          [[ "$KEY_SHA1" =~ ^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){19}$ ]] || { echo "::error::Cannot derive valid upload-certificate SHA1"; exit 1; }
+          if [[ -n "$ZEN_PLAY_UPLOAD_SHA1" ]]; then
+            test "${KEY_SHA1^^}" = "${ZEN_PLAY_UPLOAD_SHA1^^}" || { echo "::error::Keystore fingerprint does not match configured Play upload certificate"; exit 1; }
+            echo 'play_certificate_match=configured-fingerprint-matched' >> "$RUNNER_TEMP/play-v307-provenance.txt"
+          else
+            echo 'play_certificate_match=NOT_TESTED_no_expected_Play_fingerprint_configured' >> "$RUNNER_TEMP/play-v307-provenance.txt"
+          fi
+          echo "$KEY_SHA1" > "$RUNNER_TEMP/play-v307-keystore-sha1.txt"
+          echo 'signing_mode=release_upload_private_key' >> "$RUNNER_TEMP/play-v307-provenance.txt"
+          echo "Release private key and SHA1 certificate successfully validated; no secrets printed."
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android API 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Prepare Gradle wrapper if absent
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -f ./gradlew ]]; then
+            gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
+          fi
+          chmod +x ./gradlew
+
+      - name: Build Play Release AAB (requested command)
+        working-directory: android
+        run: ./gradlew clean bundleRelease --stacktrace
+
+      - name: Verify AAB structure, exact source assets, release signature, SHA1 and SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
+          test -s "$AAB"
+          unzip -tq "$AAB" > "$RUNNER_TEMP/play-v307-zip-integrity.txt"
+          unzip -Z -1 "$AAB" > "$RUNNER_TEMP/play-v307-entries.txt"
+          grep -Fxq 'base/manifest/AndroidManifest.xml' "$RUNNER_TEMP/play-v307-entries.txt"
+          grep -Fxq 'base/assets/web/app.js' "$RUNNER_TEMP/play-v307-entries.txt"
+          grep -Fxq 'base/assets/web/index.html' "$RUNNER_TEMP/play-v307-entries.txt"
+          grep -Eq '^META-INF/.*\.(RSA|DSA|EC)$' "$RUNNER_TEMP/play-v307-entries.txt" || { echo "::error::Missing AAB release signing block"; exit 1; }
+          jarsigner -verify -verbose -certs "$AAB" > "$RUNNER_TEMP/play-v307-jarsigner-verification.txt" 2>&1
+          grep -Fq 'jar verified.' "$RUNNER_TEMP/play-v307-jarsigner-verification.txt" || { echo "::error::AAB signature could not be verified"; exit 1; }
+          keytool -printcert -jarfile "$AAB" > "$RUNNER_TEMP/play-v307-aab-cert-details.txt"
+          AAB_SHA1="$(grep -m1 'SHA1:' "$RUNNER_TEMP/play-v307-aab-cert-details.txt" | sed -E 's/^.*SHA1: *//;s/[[:space:]]+$//')"
+          UPLOAD_SHA1="$(cat "$RUNNER_TEMP/play-v307-keystore-sha1.txt")"
+          test "${AAB_SHA1^^}" = "${UPLOAD_SHA1^^}" || { echo "::error::Signed AAB fingerprint does not match configured upload keystore"; exit 1; }
+          sha256sum "$AAB" | tee "$RUNNER_TEMP/play-v307-aab-sha256.txt"
+          {
+            echo "aab_signature_verification=PASS"
+            echo "aab_certificate_sha1=$AAB_SHA1"
+            echo "play_console_upload_acceptance=NOT_TESTED"
+          } >> "$RUNNER_TEMP/play-v307-provenance.txt"
+          {
+            echo '### v3.0.7 Core Language Catalog — signed Release AAB (versionCode 22)'
+            echo 'Source pinned: 7801c563c4d5d700e3f6711be1b9c686ac9abfeb'
+            echo 'Build-only source delta: versionCode 21 -> 22'
+            echo 'Package com.zenstudy.focus, targetSdk 36'
+            echo "Release upload key certificate SHA1: $AAB_SHA1"
+            echo 'AAB SHA256:'
+            cat "$RUNNER_TEMP/play-v307-aab-sha256.txt"
+            echo 'Signature verified; Google Play Console upload acceptance and 14-day testing remain NOT_TESTED.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload signed AAB with provenance and checksum
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-v3.0.7-v22-Play-Release-SIGNED-AAB
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            ${{ runner.temp }}/play-v307-aab-sha256.txt
+            ${{ runner.temp }}/play-v307-keystore-sha1.txt
+            ${{ runner.temp }}/play-v307-provenance.txt
+            ${{ runner.temp }}/play-v307-jarsigner-verification.txt
+            ${{ runner.temp }}/play-v307-zip-integrity.txt
