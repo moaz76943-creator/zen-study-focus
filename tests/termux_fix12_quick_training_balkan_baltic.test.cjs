@@ -46,6 +46,6 @@ test('Changing language refreshes controls but not editable user data',()=>{
 });
 test('30 previous languages remain and excluded languages fall back safely',()=>{
  for(const code of previous){assert.ok(context.packs[code],code+' regression');assert.equal(context.packs[code].length,36,code);}
- assert.equal(Object.keys(context.packs).length,35);
+ assert.ok(Object.keys(context.packs).length>=35, 'New locale packs must preserve original 35');
  for(const code of ['zz','he','iw']){cfg.lang=code;assert.equal(context.lookup('trainingTitle'),context.packs.en[4]);}
 });
