@@ -1,0 +1,52 @@
+name: P0 native SAF import source QA (non-release)
+on:
+  push:
+    branches: [fix/p0-native-saf-current-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'tests/integration_recovery/native_saf_import_forwardport.test.cjs'
+      - '.github/workflows/saf_native_import_current_qa.yml'
+permissions:
+  contents: read
+concurrency:
+  group: saf-native-import-current-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source regression for bounded native file import and user consent
+        run: node --test tests/integration_recovery/native_saf_import_forwardport.test.cjs
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Locate hosted Android SDK and install Android 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Compile non-release Android debug APK
+        run: gradle -p android :app:assembleDebug --no-daemon
+      - name: Check isolated build result
+        shell: bash
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          echo 'RELEASE_APPROVED=NO'
