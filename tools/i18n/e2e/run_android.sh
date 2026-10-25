@@ -67,7 +67,7 @@ timeout 120s adb install -r "$APK" | tee "$OUT/ADB_INSTALL.txt"
 test -n "$(adb shell pm path com.zenstudy.focus | grep '^package:')"
 RUNNER_STARTED=1
 set +e
-timeout --signal=TERM --kill-after=15s 22m python3 -u tools/i18n/e2e/android_device.py \
+DF13_EVIDENCE_DIR="$OUT" timeout --signal=TERM --kill-after=15s 22m python3 -u tools/i18n/e2e/android_device.py \
   --output "$OUT" --sha "$(git rev-parse HEAD)" --api "$API" \
   2>&1 | tee "$OUT/PYTHON_E2E.log"
 RESULT=${PIPESTATUS[0]}
