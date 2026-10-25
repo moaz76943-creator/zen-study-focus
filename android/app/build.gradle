@@ -1,22 +1,41 @@
 plugins {
     id 'com.android.application'
 }
+
+def uploadKeyStorePath = System.getenv('ZEN_UPLOAD_KEYSTORE_PATH')
+def uploadKeyStorePassword = System.getenv('ZEN_UPLOAD_STORE_PASSWORD')
+def uploadKeyAlias = System.getenv('ZEN_UPLOAD_KEY_ALIAS')
+def uploadKeyPassword = System.getenv('ZEN_UPLOAD_KEY_PASSWORD')
+def hasUploadSigning = [uploadKeyStorePath, uploadKeyStorePassword, uploadKeyAlias, uploadKeyPassword]
+        .every { it != null && !it.trim().isEmpty() }
+
 android {
     namespace 'com.zenstudy.focus'
-    compileSdk 34
+    compileSdk 36
     defaultConfig {
-        applicationId "com.zenstudy.focus"
+        applicationId "com.deepfocus.study"
         minSdk 24
-        targetSdk 34
-        versionCode 21
-        versionName "21.0.0"
+        targetSdk 36
+        versionCode 37
+        versionName "3.5.17"
+    }
+    signingConfigs {
+        if (hasUploadSigning) {
+            upload {
+                storeFile file(uploadKeyStorePath)
+                storePassword uploadKeyStorePassword
+                keyAlias uploadKeyAlias
+                keyPassword uploadKeyPassword
+            }
+        }
     }
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            // Never sign a Play Store release with Android's debug key.
+            if (hasUploadSigning) signingConfig signingConfigs.upload
         }
     }
 }

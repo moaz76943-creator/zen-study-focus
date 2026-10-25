@@ -1,0 +1,63 @@
+[
+  {
+    "timestamp": "2026-10-22T10:58:20Z",
+    "headSha": "9c14b96a39",
+    "status": "ALL_INVARIANTS_HEALTHY",
+    "activeSuitesCount": 57,
+    "maintenance_cycle": "CYCLE-063"
+  },
+  {
+    "timestamp": "2026-10-22T11:05:14.332Z",
+    "cycle": "CYCLE-067",
+    "headSha": "a4ce34c58f",
+    "status": "ALL_INVARIANTS_HEALTHY",
+    "activeSuitesCount": 62,
+    "hebrewBlocked": true,
+    "healthScore": 100
+  },
+  {
+    "timestamp": "2026-10-22T11:06:27.397Z",
+    "cycle": "CYCLE-068",
+    "headSha": "16b2265a44",
+    "status": "ALL_INVARIANTS_HEALTHY",
+    "activeSuitesCount": 63,
+    "hebrewBlocked": true,
+    "healthScore": 100
+  },
+  {
+    "timestamp": "2026-10-22T11:07:57.918Z",
+    "cycle": "CYCLE-069",
+    "headSha": "307f19807e",
+    "status": "ALL_INVARIANTS_HEALTHY",
+    "activeSuitesCount": 64,
+    "hebrewBlocked": true,
+    "healthScore": 100
+  },
+  {
+    "timestamp": "2026-10-22T11:09:30.898Z",
+    "cycle": "CYCLE-070",
+    "headSha": "95c71834e3",
+    "status": "ALL_INVARIANTS_HEALTHY",
+    "activeSuitesCount": 64,
+    "hebrewBlocked": true,
+    "healthScore": 100
+  },
+  {
+    "timestamp": "2026-10-22T11:28:07.219Z",
+    "cycle": "CYCLE-075",
+    "headSha": "a8ed7b6083",
+    "status": "ALL_INVARIANTS_HEALTHY",
+    "activeSuitesCount": 68,
+    "hebrewBlocked": true,
+    "healthScore": 100
+  },
+  {
+    "timestamp": "2026-10-22T11:35:44.174Z",
+    "cycle": "CYCLE-077",
+    "headSha": "5a87ff9cc8",
+    "status": "ALL_INVARIANTS_HEALTHY",
+    "activeSuitesCount": 68,
+    "hebrewBlocked": true,
+    "healthScore": 100
+  }
+]
