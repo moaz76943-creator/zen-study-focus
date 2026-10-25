@@ -22,7 +22,7 @@ function gsText(k){const base=(cfg.lang==='ar'?GOAL_UI.ar:GOAL_UI.en)[k]||k;retu
    These UI-only flags do not change persisted goals or user-authored titles. */
 function gsDirection(lang){
  const code=String(lang||'en').toLowerCase().split(/[-_]/)[0];
- return ['ar','fa','ur','ps','ku','yi','sd','ug'].includes(code)?'rtl':'ltr';
+ return ['ar','fa','ur','ps','yi','sd','ug'].includes(code)?'rtl':'ltr';
 }
 function gsGoal(domain){
  const raw=cfg.dailyGoalsMin;
