@@ -192,10 +192,32 @@ def run(out, source_sha, api):
         shell("am", "force-stop", PACKAGE)
         setup["apk_info"] = adb("shell", "dumpsys", "package", PACKAGE)[-2500:]
         nodes=restart()
+        # An installed APK and a running process do not alone prove a visible app.
+        # Confirm the foreground MainActivity and capture a screenshot separately
+        # from UIAutomator's ability to expose WebView text.
+        activities = adb("shell", "dumpsys", "activity", "activities", timeout=35)
+        resumed = [line for line in activities.splitlines()
+                   if ("topResumedActivity" in line or "mResumedActivity" in line)
+                   and PACKAGE in line and "MainActivity" in line]
+        if not resumed:
+            raise AssertionError("MainActivity is not the foreground resumed activity")
+        shot = screenshot(out, "boot_api"+str(api))
+        (out/"BOOT_UI_TREE.json").write_text(json.dumps({
+            "node_count":len(nodes),
+            "class_counts":{cl:sum(n.get("class") == cl for n in nodes)
+                            for cl in sorted(set(n.get("class","") for n in nodes))},
+            "nodes_with_text":sum(bool(n.get("text")) for n in nodes),
+            "nodes_with_content_desc":sum(bool(n.get("content-desc")) for n in nodes),
+            "heading_accessible":bool(visible(nodes,"Deep Focus")),
+            "screenshot":shot
+        }, indent=2)+"\n")
+        results["native_foreground_boot"]={"status":"PASS","detail":"Resumed MainActivity; screenshot captured; not proof of interactive WebView"}
         if not visible(nodes, "Deep Focus"):
-            raise AssertionError("Deep Focus heading not exposed or app failed to boot")
-        screenshot(out, "boot_api"+str(api))
-        results["offline_fresh_boot"]={"status":"PASS"}
+            results["offline_fresh_boot"]={"status":"FAIL",
+                "error":"Native app in foreground and screenshot captured, but WebView title not exposed to UIAutomator"}
+        else:
+            results["offline_fresh_boot"]={"status":"PASS",
+                "detail":"Offline foreground activity and accessible Deep Focus heading"}
         checkpoint()
     except Exception as error:
         results["offline_fresh_boot"]={"status":"FAIL","error":str(error)}
