@@ -7,7 +7,7 @@ const source=JSON.parse(fs.readFileSync(path.join(root,'assets/i18n/df99_reviewe
 const langs=["zh","ja","id","ko","vi","th","fil","my","km","lo","mn"];
 const patterns={zh:/[\u3400-\u9FFF]/u,ja:/[\u3040-\u30FF\u3400-\u9FFF]/u,id:/[A-Za-z]/,ko:/[\uAC00-\uD7AF]/u,vi:/[A-Za-z]/,th:/[\u0E00-\u0E7F]/u,my:/[\u1000-\u109F]/u,km:/[\u1780-\u17FF]/u,lo:/[\u0E80-\u0EFF]/u,mn:/[\u0400-\u04FF]/u,fil:/[A-Za-z]/};
 function tokens(s){return [...s.matchAll(/\$\{[\w.]+\}|\{[\w.]+\}|%[0-9]*[sdif]/g)].map(m=>m[0]).sort();}
-function read(code){return JSON.parse(fs.readFileSync(path.join(root,'assets/i18n/contributions/east_asia',code+'.json'),'utf8'));}
+function read(code){const pack=JSON.parse(fs.readFileSync(path.join(root,'assets/i18n/contributions/east_asia',code+'.json'),'utf8'));assert.equal(pack.language,code);assert.equal(pack.status,'REVIEW_REQUIRED');return pack.sections;}
 test('lane19: all 11 contribution files decode as UTF-8 and use supported namespace keys',()=>{
  for(const code of langs){
   const d=read(code);
