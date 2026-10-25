@@ -141,3 +141,77 @@ test('native button controls rely on browser Enter/Space activation without dupl
  assert.equal(control.listeners.keydown,undefined);
  assert.equal(control.clickCount,0);
 });
+
+
+function fakeBackupModal() {
+ const node=(text='')=>({textContent:text,attributes:{},setAttribute(key,value){this.attributes[key]=value;}});
+ const fields={
+  title:node('☁️ Manual Backup & Restore'), close:node('✕'),
+  warning:node('Exported backup codes are NOT encrypted'),
+  share:node('Share Backup Code'), exportFile:node('Export Backup File'),
+  restoreTitle:node('Restore Progress on New Phone'),
+  payload:{value:'ZEN21::private-backup-payload',placeholder:'Paste your backup code here'},
+  restoreCode:node('Restore Code ✓'), loadFile:node('Load File'),
+  file:{value:'private-file.zenbackup'}
+ };
+ fields.restoreCode.onclick=()=>true;
+ const head={querySelector(s){return s==='span'?fields.title:s==='button'?fields.close:null;}};
+ const warning=fields.warning;
+ const exportActions={querySelectorAll(s){return s==='button'?[fields.share,fields.exportFile]:[];}};
+ const restoreActions={
+  querySelector(s){return s==='div'?fields.restoreTitle:s==='textarea#inpRestorePayload'?fields.payload:null;},
+  querySelectorAll(s){return s==='.modal-actions button'?[fields.restoreCode,fields.loadFile]:[];}
+ };
+ const card={children:[head,warning,exportActions,restoreActions]};
+ const modal={querySelector(s){return s==='.modal-card'?card:null;}};
+ return {fields,card,doc:{getElementById(id){return id==='cloudBackupModal'?modal:null;}}};
+}
+
+test('backup dialog keys exist in every reviewed locale and explicitly preserve unencrypted-code warning',()=>{
+ const codes=['en','ar','de','es','fr'];
+ const keys=['backup.modalTitle','backup.unencryptedWarning','backup.shareCode',
+   'backup.exportFile','backup.restoreHeading','backup.pasteCode',
+   'backup.restoreCode','backup.loadFile','backup.close'];
+ for(const locale of codes) for(const key of keys) {
+  assert.ok(bridge.translate(locale,key).trim(),locale+':'+key);
+ }
+ assert.ok(bridge.translate('en','backup.unencryptedWarning').includes('NOT encrypted'));
+});
+
+test('backup dialog switching is display-only; it never reads or replaces user backup codes',()=>{
+ const x=fakeBackupModal();
+ const savedClick=x.fields.restoreCode.onclick;
+ const keys=['title','warning','share','exportFile','restoreTitle','restoreCode','loadFile'];
+ const initial=x.fields.payload.value;
+ for(const locale of ['de','ar','fr','es','en','lo','he']) {
+  const result=bridge.bindBackupDialog({document:x.doc,locale});
+  assert.equal(result.status,'OK');
+  for(const key of keys) assert.ok(x.fields[key].textContent.trim(),key);
+  assert.equal(x.fields.payload.value,initial);
+  assert.equal(x.fields.file.value,'private-file.zenbackup');
+  assert.equal(x.fields.restoreCode.onclick,savedClick);
+  assert.equal(x.fields.payload.placeholder,bridge.translate(locale,'backup.pasteCode'));
+  assert.equal(x.fields.close.attributes['aria-label'],bridge.translate(locale,'backup.close'));
+ }
+ assert.equal(x.fields.title.textContent,bridge.translate('en','backup.modalTitle'));
+});
+
+test('backup dialog rejects incomplete markup atomically and handles absent modal',()=>{
+ const x=fakeBackupModal();
+ const before=x.fields.title.textContent;
+ x.card.children[2].querySelectorAll=()=>[];
+ assert.equal(bridge.bindBackupDialog({document:x.doc,locale:'fr'}).status,'INCOMPLETE');
+ assert.equal(x.fields.title.textContent,before);
+ assert.equal(bridge.bindBackupDialog({document:{getElementById(){return null;}},locale:'fr'}).status,'SKIPPED');
+});
+
+
+test('excluded locales report explicit fallback rather than full English coverage',()=>{
+ for(const language of ['he','iw','he-IL','iw_IL']) {
+  const status=bridge.metadata(language);
+  assert.equal(status.used,'en');
+  assert.equal(status.complete,false);
+  assert.equal(status.fallback,true);
+ }
+ assert.equal(bridge.metadata('en').complete,true);
+});
