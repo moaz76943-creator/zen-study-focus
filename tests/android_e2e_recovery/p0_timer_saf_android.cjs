@@ -78,7 +78,7 @@ function uiNodes(xml){return [...xml.matchAll(/<node[^>]*>/g)].map(m=>m[0]);}
 function saveSafPickerEvidence(label,xml){
  // Never collect personal devices or files; require the disposable CI flag.
  if(process.env.DF_ANDROID_DISPOSABLE!=='1'||!process.env.RUNNER_TEMP)return;
- const dir=require('node:path').join(process.env.RUNNER_TEMP,'p0-android');
+ const dir=require('node:path').join(process.env.RUNNER_TEMP,'df-pr01-android');
  if(!fs.existsSync(dir))return;
  const key=String(label).replace(/[^a-z0-9_-]/gi,'_').slice(0,60);
  try{fs.writeFileSync(require('node:path').join(dir,'saf-'+key+'.xml'),xml||dumpUI());}catch(_){}
@@ -144,47 +144,22 @@ async function waitForSavedBackup(expectedCode){
  throw Error('TRANSPORT: SAF Save completed without independently readable DocumentsUI/MediaStore bytes');
 }
 function stageImportFixtureInMediaStore(name,code){
- // adb push is NOT enough on Android 11: unindexed files can be invisible in
- // ACTION_OPEN_DOCUMENT. Use the actual scoped MediaStore Downloads provider.
- const collection='content://media/external/downloads';
- let uri=null;
- try{
-  // AOSP "content insert" intentionally prints NO inserted URI. Resolve the
-  // new row via MediaStore instead; do not assume empty stdout means failure.
-  adb('shell','content','insert','--uri',collection,
-   '--bind','_display_name:s:'+name,'--bind','mime_type:s:text/plain',
-   '--bind','relative_path:s:Download/');
-  // adb shell strips SQL quote characters in --where on some Android
-  // builds. Query the disposable collection and match names locally.
-  const rows=adb('shell','content','query','--uri',collection,
-   '--projection','_id:_display_name');
-  const matches=rows.split('\n').filter(line=>line.includes('_display_name='+name));
-  const match=matches.map(line=>line.match(/(?:^|[\s,])_id=(\d+)(?:,|\s|$)/)).find(Boolean);
-  if(!match)throw Error('MediaStore query cannot resolve inserted QA document by exact name');
-  uri=collection+'/'+match[1];
-  // API30 shell ContentProvider write/read uses a mismatched provider
-  // attribution identity. The inserted MediaStore row indexes the file;
-  // write the disposable bytes through shell-visible shared storage.
-  const device='/sdcard/Download/'+name;
-  const host=require('node:os').tmpdir()+'/df02-saf-'+process.pid+'.txt';
-  try{
-   fs.writeFileSync(host,code,'utf8');
-   cp.execFileSync('adb',['-s','emulator-5554','push',host,device],{timeout:20000,stdio:'ignore'});
-   // An 8 MiB read through execFileSync's default 1 MiB maxBuffer creates
-   // ENOBUFS in the QA harness. Verify the real device file by a short digest.
-   const remoteHash=adb('shell','sha256sum',device).split(/\s+/)[0];
-   const expectedHash=require('node:crypto').createHash('sha256').update(code,'utf8').digest('hex');
-   assert.equal(remoteHash,expectedHash,'Staged indexed file SHA256 mismatched');
-  }finally{
-   try{fs.unlinkSync(host);}catch(_){}
-  }
-  return uri;
- }catch(e){
-  if(uri){try{adb('shell','content','delete','--uri',uri);}catch(_){}}
-  throw Error('TRANSPORT: cannot create verified disposable MediaStore import fixture: '+String(e.message).slice(0,120));
- }
+ // Stage bytes in disposable external storage, then ask Android MediaScanner
+ // to index the *actual* file. A blank shell content insert is not a file.
+ if(!/^p0-saf-[a-z-]+\\.txt$/.test(name))throw Error('TRANSPORT: fixture filename rejected');
+ const device='/sdcard/Download/'+name;
+ const host=require('node:os').tmpdir()+'/df-pr01-saf-'+process.pid+'.txt';
+ try {
+  fs.writeFileSync(host,code,'utf8');
+  cp.execFileSync('adb',['-s','emulator-5554','push',host,device],{timeout:25000,stdio:'ignore'});
+  const remoteHash=adb('shell','sha256sum',device).split(/\\s+/)[0];
+  const expectedHash=require('node:crypto').createHash('sha256').update(code,'utf8').digest('hex');
+  assert.equal(remoteHash,expectedHash,'Actual disposable on-device backup fixture bytes differ');
+  try{adb('shell','am','broadcast','-a','android.intent.action.MEDIA_SCANNER_SCAN_FILE','-d','file://'+device);}catch(_){}
+  return device;
+ }catch(e){throw Error('TRANSPORT: cannot create verified disposable import fixture: '+String(e.message).slice(0,170));}
+ finally{try{fs.unlinkSync(host);}catch(_){}}
 }
-
 async function openDocument(name,code){
  stageImportFixtureInMediaStore(name,code);await pause(900);
  await evaluate("setTimeout(()=>ZenNative.importBackupFromFile(),0);true");
@@ -204,12 +179,18 @@ async function openDocument(name,code){
  for(let attempt=0;attempt<3;attempt++){
   xml=dumpUI();
   if(!/package="com\.google\.android\.documentsui"/.test(xml))break;
-  const confirm=uiNodes(xml).find(n=>/text="OPEN"|content-desc="Open"/i.test(n)&&/clickable="true"/.test(n));
+  // DocumentsUI labels differ by API/vendor; require an actual enabled native button.
+  const confirm=uiNodes(xml).find(n=>
+   /(text|content-desc)=\"(?:Open|Select|Choose|Use this file|OK)\"/i.test(n)&&
+   /clickable=\"true\"/.test(n) && !/enabled=\"false\"/.test(n));
   if(confirm)tapUI(confirm);
   else {
    const exact=uiNodes(xml).find(n=>n.includes('text="'+name+'"'));
    if(!exact)throw Error('TRANSPORT: actual DocumentsUI document selection did not complete: '+name);
    tapUI(exact);
+   // Enter is a real keyboard confirmation of the selected UI element, never
+   // a synthetic bridge call or assumed consent.
+   adb('shell','input','keyevent','66');
   }
   await pause(850);
  }
