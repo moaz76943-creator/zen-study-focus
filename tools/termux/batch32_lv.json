@@ -1,0 +1,57 @@
+{
+  "timer": [
+    "⚙ Pielāgot",
+    "Fokusa un atpūtas iestatījumi",
+    "Pašreizējā sesija tiek saglabāta; izmaiņas attieksies tikai uz jaunām sesijām.",
+    "Fokuss · min",
+    "Īss pārtraukums · min",
+    "Garš pārtraukums · min",
+    "Sesijas vienā ciklā",
+    "Noklusējuma vērtības",
+    "Saglabāt",
+    "Ievadiet veselus skaitļus norādītajās robežās.",
+    "Iestatījumi saglabāti"
+  ],
+  "goals": [
+    "✦ DIENAS MĒRĶI",
+    "Neliels progress katru dienu",
+    "Minūtes tiek skaitītas no pabeigtajām fokusa sesijām.",
+    "⚙ Rediģēt",
+    "Dienas mērķi pa aktivitātēm",
+    "Ievadiet 0, lai paslēptu mērķi. Tiek skaitītas tikai pabeigtās sesijas.",
+    "Mērķi saglabāti",
+    "Ievadiet veselu minūšu skaitu no 0 līdz 720.",
+    "Iestatīt mērķi",
+    "min",
+    "pabeigts",
+    "šodien",
+    "Šonedēļ",
+    "Nedēļas mērķis (min)",
+    "Nedēļas mērķiem jābūt no 0 līdz 5040 minūtēm."
+  ],
+  "analytics": [
+    "Reģistrēto aktivitāšu analīze",
+    "Aktivitāte",
+    "Periods",
+    "No",
+    "Līdz",
+    "Reģistrētās minūtes",
+    "Sesijas",
+    "Vidēji vienā sesijā",
+    "Pašreizējā sērija",
+    "Šajā periodā nav reģistrētu sesiju",
+    "Mērķu salīdzinājums",
+    "Nav iestatītu dienas mērķu",
+    "Pabeigtie uzdevumi",
+    "Dienu sadalījums",
+    "Gads",
+    "Eksportēt CSV",
+    "Izvēlieties dienu, lai skatītu informāciju"
+  ],
+  "analyticsDomain": [
+    "Mācības",
+    "Lasīšana",
+    "Darbs",
+    "Sports"
+  ]
+}
