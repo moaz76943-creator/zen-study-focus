@@ -3082,7 +3082,8 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => soundCat === 'all' || s.cat === soundCat).forEach(s => {
+  for (const s of SOUNDS_DATA) {
+    if (soundCat !== 'all' && s.cat !== soundCat) continue;
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
     const tile = document.createElement('div');
@@ -3100,7 +3101,7 @@ function renderSoundsStudio() {
       </div>
     `;
     box.appendChild(tile);
-  });
+  }
 }
 
 /* ========================================================
