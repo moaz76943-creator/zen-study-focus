@@ -1,0 +1,57 @@
+{
+  "timer": [
+    "⚙ Tùy chỉnh",
+    "Cài đặt tập trung và nghỉ ngơi",
+    "Phiên hiện tại được giữ nguyên; thay đổi chỉ áp dụng cho phiên mới.",
+    "Tập trung · phút",
+    "Nghỉ ngắn · phút",
+    "Nghỉ dài · phút",
+    "Số phiên mỗi chu kỳ",
+    "Giá trị mặc định",
+    "Lưu",
+    "Nhập số nguyên trong phạm vi hiển thị.",
+    "Đã lưu cài đặt"
+  ],
+  "goals": [
+    "✦ MỤC TIÊU HẰNG NGÀY",
+    "Tiến bộ từng chút mỗi ngày",
+    "Số phút được tính từ các phiên tập trung đã hoàn thành.",
+    "⚙ Chỉnh sửa",
+    "Mục tiêu hằng ngày theo hoạt động",
+    "Nhập 0 để ẩn mục tiêu. Chỉ tính các phiên đã hoàn thành.",
+    "Đã lưu mục tiêu",
+    "Nhập số phút nguyên từ 0 đến 720.",
+    "Đặt mục tiêu",
+    "phút",
+    "đã hoàn thành",
+    "hôm nay",
+    "Tuần này",
+    "Mục tiêu hằng tuần (phút)",
+    "Mục tiêu hằng tuần phải từ 0 đến 5040 phút."
+  ],
+  "analytics": [
+    "Phân tích hoạt động đã ghi nhận",
+    "Hoạt động",
+    "Khoảng thời gian",
+    "Từ",
+    "Đến",
+    "Số phút đã ghi nhận",
+    "Phiên",
+    "Trung bình mỗi phiên",
+    "Chuỗi ngày hiện tại",
+    "Không có phiên nào được ghi nhận trong khoảng thời gian này",
+    "So sánh mục tiêu",
+    "Chưa đặt mục tiêu hằng ngày",
+    "Nhiệm vụ đã hoàn thành",
+    "Phân bố theo ngày",
+    "Năm",
+    "Xuất CSV",
+    "Chọn một ngày để xem chi tiết"
+  ],
+  "analyticsDomain": [
+    "Học tập",
+    "Đọc sách",
+    "Làm việc",
+    "Tập thể dục"
+  ]
+}
