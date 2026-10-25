@@ -1,0 +1,79 @@
+/**
+ * DEEP FOCUS — Mobile Viewport & Accessibility Guard v21
+ * Ensures 100% usability on 320px - 430px viewports & Android Safe Areas.
+ * Strictly adheres to White Premium design identity.
+ */
+
+:root {
+    --zen-safe-bottom: env(safe-area-inset-bottom, 16px);
+    --zen-safe-top: env(safe-area-inset-top, 0px);
+}
+
+/* Fluid responsive timer display: Never wraps or clips */
+.timer-display,
+#timer-display,
+.timer-digits {
+    font-size: clamp(2.4rem, 11vw, 4.8rem) !important;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    max-width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* Duration preset buttons: Adaptive touch targets */
+.duration-presets,
+.timer-presets,
+#duration-presets {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    margin-inline: auto !important;
+}
+
+.duration-presets button,
+.timer-presets button {
+    flex: 1 1 calc(25% - 8px);
+    min-width: 64px;
+    min-height: 44px; /* Android touch target accessibility guideline */
+    padding: 8px 12px;
+    font-size: 0.95rem;
+}
+
+/* Bottom Navigation Bar Safe Area protection */
+.bottom-nav,
+nav.bottom-navigation,
+#main-bottom-nav {
+    padding-bottom: calc(var(--zen-safe-bottom) + 8px) !important;
+    min-height: calc(56px + var(--zen-safe-bottom));
+}
+
+/* Small Viewport Specific overrides (320px - 360px) */
+@media screen and (max-width: 360px) {
+    .container,
+    .main-content,
+    .card {
+        padding-inline: 10px !important;
+    }
+    
+    .timer-controls {
+        gap: 12px !important;
+    }
+    
+    .timer-controls button {
+        min-width: 52px;
+        min-height: 52px;
+    }
+
+    /* Prevent text cutoff on modal dialogs */
+    .modal-content,
+    .dialog-box {
+        max-width: 95vw !important;
+        margin: auto !important;
+        padding: 14px !important;
+    }
+}

@@ -1,0 +1,78 @@
+"""Pre-release regression gates for the Deep Focus Android WebView app."""
+from pathlib import Path
+import re
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+WEB = ROOT / "android/app/src/main/assets/web"
+APP = (WEB / "app.js").read_text(encoding="utf-8")
+INDEX = (WEB / "index.html").read_text(encoding="utf-8")
+GRADLE = (ROOT / "android/app/build.gradle").read_text(encoding="utf-8")
+
+
+class ReleaseGuardTests(unittest.TestCase):
+    def test_production_publish_requires_explicit_approval(self):
+        workflow = (ROOT / ".github/workflows/build_apk.yml").read_text(encoding="utf-8")
+        for gate in ("ZEN_RELEASE_APPROVED_SHA", "ZEN_DEVICE_QA_APPROVED",
+                     "ZEN_MEDIA_LICENSES_APPROVED", "ZEN_UPLOAD_KEYSTORE_BASE64"):
+            self.assertIn(gate, workflow)
+        self.assertIn('"$ZEN_RELEASE_APPROVED_SHA" == "$GITHUB_SHA"', workflow)
+
+    def test_android_target_sdk(self):
+        self.assertRegex(GRADLE, r"targetSdk\s+36")
+        self.assertRegex(GRADLE, r"compileSdk\s+36")
+        self.assertNotIn("signingConfig signingConfigs.debug", GRADLE)
+
+    def test_user_content_is_escaped(self):
+        self.assertIn("function escapeHtmlText(", APP)
+        self.assertIn("escapeHtmlText(toWest(t.title))", APP)
+        self.assertIn("escapeHtmlText(toWest(n.body))", APP)
+
+    def test_no_fake_stats_or_tap_to_fabricate_sessions(self):
+        self.assertNotIn("cfg.todayMins + 300", APP)
+        self.assertNotIn("125.6K", INDEX)
+        self.assertNotIn("↑ +18% this week", INDEX)
+        self.assertIn("completedTimerIds", APP)
+        self.assertIn("sessionHistory", APP)
+        self.assertIn("restoreTimerSession();", APP)
+
+    def test_export_disclosure(self):
+        self.assertIn("They are NOT encrypted", INDEX)
+
+    def test_all_twenty_languages_have_full_localization(self):
+        # The current v21 OTHER_LANGS pack spreads English/Arabic into 17 locales.
+        # This must not be advertised as complete until native strings exist.
+        self.assertNotIn("...base,", APP, "Incomplete fallback translations for 17 languages")
+
+    def test_nature_audio_files_are_not_html_error_pages(self):
+        invalid = []
+        for sound in sorted((WEB / "sounds").glob("*.ogg")):
+            with sound.open("rb") as fh:
+                if fh.read(4) != b"OggS":
+                    invalid.append(sound.name)
+        self.assertEqual([], invalid, "Invalid OGG assets (often HTML 404): " + ", ".join(invalid))
+
+    def test_native_backup_uses_system_document_picker(self):
+        native = (ROOT / "android/app/src/main/java/com/zenstudy/focus/MainActivity.java").read_text(encoding="utf-8")
+        self.assertIn("Intent.ACTION_CREATE_DOCUMENT", native)
+        self.assertIn("getContentResolver().openOutputStream", native)
+        self.assertIn("backupAwaitingSave = null", native)
+        self.assertNotIn("WRITE_EXTERNAL_STORAGE", native)
+        self.assertIn("ZenNative.exportBackupToFile(code)", APP)
+
+    def test_audio_stale_callback_guard(self):
+        self.assertIn("soundGeneration", APP)
+        self.assertIn("soundGeneration[id] !== token", APP)
+        self.assertIn("stopSoundTile(id)", APP)
+
+    def test_photo_assets_are_real_images(self):
+        invalid = []
+        for photo in sorted((WEB / "images").glob("*.jpg")):
+            with photo.open("rb") as fh:
+                if fh.read(3) != bytes.fromhex("ffd8ff"):
+                    invalid.append(photo.name)
+        self.assertEqual([], invalid, "Invalid JPEG assets: " + ", ".join(invalid))
+
+
+if __name__ == "__main__":
+    unittest.main()
