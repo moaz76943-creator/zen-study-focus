@@ -2,6 +2,8 @@ name: Lane11 RTL and Western numeral exact-head QA
 on:
   push:
     branches: [df/lane11-rtl-typography-numerals-20261025]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
 permissions:
   contents: read
 jobs:
