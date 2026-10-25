@@ -57,6 +57,7 @@
       el.style.cssText='min-height:42px;background:#fff;color:#14213d;border:1px solid #cbd5e1;border-radius:10px;padding:6px';l.appendChild(el);filters.appendChild(l);return el;}
     const domain=input('select',t.activity);
     const labels={all:opts.locale==='ar'?'الكل':'All',study:opts.locale==='ar'?'دراسة':'Study',read:opts.locale==='ar'?'قراءة':'Reading',work:opts.locale==='ar'?'عمل':'Work',sport:opts.locale==='ar'?'رياضة':'Sport'};
+    for(const d of core.DOMAINS){labels[d]=globalThis.DF99Locale?.t(opts.locale,'analyticsDomain',d,labels[d]) ?? labels[d];}
     ['all',...core.DOMAINS].forEach(d=>{const option=mk('option',labels[d]);option.value=d;domain.appendChild(option);});
     const grouping=input('select',opts.locale==='ar'?'التجميع':'Grouping');
     for(const [value,ar,en] of [['daily','يومي','Daily'],['weekly','أسبوعي','Weekly'],['monthly','شهري','Monthly']]){const o=mk('option',opts.locale==='ar'?ar:en);o.value=value;grouping.appendChild(o);}

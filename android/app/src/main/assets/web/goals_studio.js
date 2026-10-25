@@ -15,7 +15,7 @@ const GOAL_UI={
  noGoal:'حدد هدفًا',minute:'دقيقة',done:'المنجز',today:'اليوم',
  week:'هذا الأسبوع',weekTarget:'الهدف الأسبوعي (دقائق)',weekInvalid:'الأهداف الأسبوعية بين 0 و5040 دقيقة.'}
 };
-function gsText(k){return (cfg.lang==='ar'?GOAL_UI.ar:GOAL_UI.en)[k]||k;}
+function gsText(k){const base=(cfg.lang==='ar'?GOAL_UI.ar:GOAL_UI.en)[k]||k;return globalThis.DF99Locale?.t(cfg.lang,'goals',k,base) ?? base;}
 function gsGoal(domain){
  const raw=cfg.dailyGoalsMin;
  if(!raw||typeof raw!=='object'||Array.isArray(raw))return 0;
