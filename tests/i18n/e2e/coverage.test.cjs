@@ -51,3 +51,53 @@ test('a missing measured family fails instead of silently passing',()=>{
   assert.ok(result.per_language_coverage[0].reasons.includes('SECTION_NOT_MEASURED:goals'));
   assert.equal(result.per_language_coverage[1].status,'PASS');
 });
+
+
+const {auditSection,makeRepairQueue}=require('../../../tools/i18n/e2e/coverage.cjs');
+
+test('en/ar cannot get automatic translated PASS from registry bypass',()=>{
+  for(const code of ['en','ar']){
+    const row=auditSection({code,section:'timer',keys:['start','pause'],read:()=>({proven:true,value:'Start'}),owner:'D',source_file:'registered'});
+    assert.equal(row.status,'NOT_TESTED');
+    assert.deepEqual(row.unverified_keys,['start','pause']);
+    assert.equal(row.present_keys,0);
+  }
+});
+test('unmeasured Native keys must not be counted as zero-gap PASS',()=>{
+  const row=auditSection({code:'de',section:'Native',keys:null,owner:'F',source_file:null});
+  assert.equal(row.status,'NOT_TESTED');
+  assert.equal(row.expected_keys,null);
+  assert.equal(row.missing_keys,null);
+});
+test('missing fallback and empty values are not translated; duplicates are review candidates',()=>{
+  const rows={a:{proven:true,value:'  '},b:{proven:false,value:'English'},c:{proven:true,value:'Save'},d:{proven:true,value:'Save'}};
+  const row=auditSection({code:'de',section:'tasks',keys:['a','b','c','d'],read:key=>rows[key],
+    english:{c:'Save',d:'Save'},owner:'E',source_file:'sample'});
+  assert.equal(row.status,'FAIL');
+  assert.equal(row.expected_keys,4);
+  assert.equal(row.present_keys,2);
+  assert.deepEqual(row.missing_keys,['b']);
+  assert.deepEqual(row.empty_values,['a']);
+  assert.equal(row.fallback_count,1);
+  assert.deepEqual(row.english_identical_candidates,['c','d']);
+  assert.deepEqual(row.duplicate_value_candidates,[['c','d']]);
+});
+test('non-string, missing, or mismatched keys cannot pass as localized values',()=>{
+  assert.throws(()=>auditSection({code:'de',section:'timer',keys:['a','a'],read:()=>({proven:true,value:'ok'})}));
+  const row=auditSection({code:'de',section:'timer',keys:['ok','bad'],read:key=>({proven:true,value:key==='ok'?'Ja':123})});
+  assert.deepEqual(row.empty_values,['bad']);
+  assert.equal(row.present_keys,1);
+  assert.equal(row.status,'FAIL');
+});
+test('repair queues are grouped deterministically by lane, exact file, and code',()=>{
+  const a=auditSection({code:'de',section:'timer',keys:['x'],read:()=>({proven:false}),owner:'D',
+    source_file:'android/app/src/main/assets/web/js/df99_reviewed_packs.js'});
+  const b=auditSection({code:'fr',section:'Quick Training',keys:['go'],read:()=>({proven:false}),owner:'F',
+    source_file:'android/app/src/main/assets/web/quick_training.js'});
+  const first=makeRepairQueue([b,a]);
+  assert.equal(JSON.stringify(first),JSON.stringify(makeRepairQueue([a,b])));
+  assert.equal(first.items.length,2);
+  assert.equal(first.items[0].owner,'D');
+  assert.equal(first.items[0].language_code,'de');
+  assert.deepEqual(first.items[0].missing_keys,['x']);
+});
