@@ -119,6 +119,15 @@ test('media license gate remains excluded from source-green cohorts without losi
  assert.deepEqual(q.discoverTests(root,['tests/master_recovery_qa']),['tests/master_recovery_qa/source_contracts.test.cjs']);
  assert.throws(()=>q.discoverTests(root,['tests']),/Unsafe test_dirs/);}));
 
+test('suite inventory failure adds a BLOCKED agent instead of crashing',()=>fixture(root=>{
+ fs.mkdirSync(path.join(root,'tests/localization_20'),{recursive:true});
+ fs.symlinkSync(os.tmpdir(),path.join(root,'tests/escape'));
+ const report=q.runAgents(root,good,{sourceSha:'f'.repeat(40),lane:'all',execute:()=>({status:0,stdout:''})});
+ const inventory=report.agents.find(a=>a.id==='suite_inventory');
+ assert.ok(inventory);
+ assert.equal(inventory.status,'BLOCKED');
+ assert.match(inventory.reason,/Cannot inventory tests/);
+}));
 test('agent manifest rejects duplicate and ancestor directory ownership before executing',()=>{
  for(const conflict of [['tests/localization_20','tests/localization_20'],['tests/localization_20','tests/localization_20/sub']]){
   const m={schema_version:1,agents:[
