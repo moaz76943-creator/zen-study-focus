@@ -30,3 +30,12 @@ Do not edit `app.js`, `index.html` or `js/global_i18n_registry.js` from this lan
 - Excluded Hebrew legacy labels are rejected even if legacy locale normalization would otherwise alias them to English.
 - 'Ready' wording was replaced by neutral 'Nature sound controls' because two recordings are absent and not commercially approved.
 - Repo Actions and Android WebView were not executed for this head; do not infer them from local Node verification.
+
+## DF-LANE-10 incremental checkpoint — WebView backup locale and excluded-locale truth
+- Added 9 reviewed backup modal strings to each of the 5 already-authored language packs: en/ar/de/es/fr. All preserve the crucial security warning: exported **backup codes contain readable private notes/tasks and are NOT encrypted**. No claims about `.zenbackup` encryption were changed.
+- New **opt-in, display-only** `DeepFocusAudioSettingsLocale.bindBackupDialog({document,locale:cfg.lang})` targets existing WebView `#cloudBackupModal` structure. It validates required nodes before any change, then modifies only seven static labels, one textarea **placeholder** (never the value), and the close button ARIA label.
+- No script injection, timer/audio changes, storage writes, data migration, backup export/restore behavior, or native Android strings. Incomplete DOM safely skips without partial translation.
+- `metadata('he'/'iw')` now returns **fallback=true, complete=false** to avoid counting excluded codes as translated.
+- Test-first validation: 9 baseline V8 cases pass, then 3 expected RED tests (missing 9 keys, missing binder) and 1 additional RED test (excluded locale metadata); after implementation **13/13 V8-executed tests PASS** on the exact remote source blobs.
+- Direct Node CLI, full repository test matrix, Android WebView/TalkBack, and physical backup/restore verification are **NOT_TESTED**. Do not present V8 as Node/Android certification.
+- Lane 03 must load the bridge script from local assets and call `bindBackupDialog` on first showing the backup modal and on language changes, **without** altering any existing confirmation, file chooser, or restore flow. Android-native dialogs belong to Lane 12.
