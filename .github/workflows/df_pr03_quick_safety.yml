@@ -1,0 +1,30 @@
+name: DF PR03 Quick Training ACK regression
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/quick_training.js'
+      - 'tests/df_pr03/**'
+      - '.github/workflows/df_pr03_quick_safety.yml'
+  push:
+    branches: [fix/df-pr03-quick-config-ack-20261026]
+permissions:
+  contents: read
+jobs:
+  real-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact head and source syntax
+        run: |
+          git rev-parse HEAD
+          node --check android/app/src/main/assets/web/quick_training.js
+          node --check tests/df_pr03/quick_config_ack.test.cjs
+      - name: Execute production quick-training functions against refused writes
+        run: node --test tests/df_pr03/quick_config_ack.test.cjs
