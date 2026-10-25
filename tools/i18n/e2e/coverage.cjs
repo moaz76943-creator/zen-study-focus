@@ -33,15 +33,16 @@ function summarize(raw,source,sha) {
     if(counts.missing)reasons.push('SECTION_TRANSLATIONS_FALLBACK_OR_ABSENT');
     if(observed.core!==null && observed.core>0)reasons.push('CORE_EMPTY_STRINGS');
     if(observed.quick!==null && observed.quick>0)reasons.push('QUICK_EMPTY_STRINGS');
+    if(entry.code==='en'||entry.code==='ar')reasons.push('BASE_LANGUAGE_REGISTRY_BYPASS_UNVERIFIED');
     return {
-      code:entry.code,status:reasons.length?'FAIL':'PASS',core_present:entry.core,quick_present:entry.quick,
+      code:entry.code,status:reasons.length?(reasons.length===1 && reasons[0]==='BASE_LANGUAGE_REGISTRY_BYPASS_UNVERIFIED'?'NOT_TESTED':'FAIL'):'PASS',core_present:entry.core,quick_present:entry.quick,
       source_empty_strings:observed,sections,translated:counts.translated,
       total:counts.total,missing_or_fallback:counts.missing,reasons,
       android_e2e:'NOT_TESTED'
     };
   });
   return {task_id:'DF-LANE-13-REAL-END-TO-END-QA',kind:'SOURCE_DICTIONARY_AUDIT_NOT_ANDROID',
-    SOURCE_SHA:sha,catalog_count:99,summary:{PASS:langs.filter(x=>x.status==='PASS').length,FAIL:langs.filter(x=>x.status==='FAIL').length,NOT_TESTED:0},
+    SOURCE_SHA:sha,catalog_count:99,summary:{PASS:langs.filter(x=>x.status==='PASS').length,FAIL:langs.filter(x=>x.status==='FAIL').length,NOT_TESTED:langs.filter(x=>x.status==='NOT_TESTED').length},
     per_language_coverage:langs,device_matrix_status:'NOT_TESTED',
     measurement_note:'Translation strings are measured from registered dictionaries. Fallback/missing is NOT translated; Android E2E is independent.'};
 }
@@ -226,6 +227,23 @@ function run(outDir,strict) {
   const raw=JSON.parse(p.stdout);
   const missingKeys=missingKeysByLanguage(raw);
   const result=summarize(raw,sourceEmptyCounts(),sourceSha());
+  const detailed=detailedSourceAudit(raw);
+  const detailByLanguage=Object.fromEntries(raw.summary.map(x=>[x.code,{}]));
+  for(const row of detailed)detailByLanguage[row.language_code][row.section]=row;
+  for(const row of result.per_language_coverage) {
+    row.source_sections=detailByLanguage[row.code];
+    const failed=Object.values(row.source_sections).filter(x=>x.section!=='Native'&&x.status==='FAIL');
+    if(failed.length) {
+      row.reasons.push(...failed.map(x=>'SOURCE_SECTION_FAIL:'+x.section));
+      row.status='FAIL';
+    } else if(Object.values(row.source_sections).some(x=>x.section!=='Native'&&x.status==='NOT_TESTED') && row.status==='PASS') {
+      row.reasons.push('SOURCE_SECTION_NOT_TESTED');row.status='NOT_TESTED';
+    }
+  }
+  result.summary={PASS:result.per_language_coverage.filter(x=>x.status==='PASS').length,
+    FAIL:result.per_language_coverage.filter(x=>x.status==='FAIL').length,
+    NOT_TESTED:result.per_language_coverage.filter(x=>x.status==='NOT_TESTED').length};
+  result.native_coverage='NOT_TESTED';result.android_e2e_coverage='NOT_TESTED';
   for(const row of result.per_language_coverage)for(const area of REQUIRED_AREAS) {
     if(!row.sections[area] || row.sections[area].missing!==missingKeys[row.code][area].length)
       throw Error('Coverage count vs missing-key audit mismatch for '+row.code+' '+area);
@@ -235,9 +253,25 @@ function run(outDir,strict) {
     missing:result.per_language_coverage.reduce((n,r)=>n+r.sections[area].missing,0)
   }]));
   result.by_section=byArea;
+  const perSection={};
+  for(const row of detailed) {
+    const item=perSection[row.section]||={PASS:0,FAIL:0,NOT_TESTED:0,
+      expected_keys_per_language:row.expected_keys,missing:0,empty:0,fallback:0,english_identical_candidates:0};
+    item[row.status]++;
+    item.missing+=row.missing_keys?.length||0;
+    item.empty+=row.empty_values.length;
+    item.fallback+=row.fallback_count;
+    item.english_identical_candidates+=row.english_identical_candidates.length;
+  }
+  result.detailed_by_section=perSection;
+  const repair=makeRepairQueue(detailed);
+  fs.writeFileSync(path.join(outDir,'TRANSLATION_REPAIR_QUEUE.json'),
+    JSON.stringify({SOURCE_SHA:result.SOURCE_SHA,...repair},null,2)+'\n');
   fs.writeFileSync(path.join(outDir,'MISSING_TRANSLATION_KEYS.json'),
     JSON.stringify({SOURCE_SHA:result.SOURCE_SHA,scope:'REGISTERED_SOURCE_KEYS_ONLY',by_area:byArea,
-      missing_keys_by_language:missingKeys},null,2)+'\n');
+      missing_keys_by_language:missingKeys,
+      detailed_by_language:detailByLanguage,
+      measurement_caveat:'Native and unverified en/ar base-locale registry keys are NOT_TESTED; missing keys exclude unsupported source inventories.'},null,2)+'\n');
 
   result.static_screen_presence=staticSections();
   result.static_sections_status=Object.values(result.static_screen_presence).every(x=>x.page_present&&x.navigation_present)?'PASS':'FAIL';
@@ -253,9 +287,26 @@ function run(outDir,strict) {
     ' | '+String(x.source_empty_strings.core)+' / '+String(x.source_empty_strings.quick)+
     ' | '+x.status+' |');
   fs.writeFileSync(path.join(outDir,'PER_LANGUAGE_COVERAGE.md'),head.join('\n')+'\n');
+  const overview=['# DF13-B — measured translation coverage','','SOURCE_SHA: '+result.SOURCE_SHA,
+    '', 'Source dictionary: PASS '+result.summary.PASS+' / FAIL '+result.summary.FAIL+
+      ' / NOT_TESTED '+result.summary.NOT_TESTED,
+    '', 'Android E2E: NOT_TESTED in this lane. Native resources: NOT_TESTED (no verified string key inventory).',
+    'en/ar registered-family coverage() returns true unconditionally: this is NOT sufficient translation evidence.',
+    'English-identical strings and duplicate labels are REVIEW candidates, not automatic machine-approved translations.',
+    '', '| Section | PASS | FAIL | NOT_TESTED | Missing | Empty | Fallback | English-identical candidates |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|'];
+  for(const [section,item] of Object.entries(perSection))overview.push(
+    '| '+section+' | '+item.PASS+' | '+item.FAIL+' | '+item.NOT_TESTED+
+    ' | '+item.missing+' | '+item.empty+' | '+item.fallback+' | '+item.english_identical_candidates+' |');
+  overview.push('','## Source ownership (proposed D/E/F repair lanes)',
+    'D: Timer / Goals. E: Tasks / Notes. F: Analytics / Core / Quick Training / Native audit.',
+    'Only the validator was changed. Translate in the indicated owner files, not here.',
+    'Native source-file assignment is unavailable until an authoritative key inventory exists.',
+    '', 'Individual language and key details: PER_LANGUAGE_COVERAGE.json, MISSING_TRANSLATION_KEYS.json, TRANSLATION_REPAIR_QUEUE.json.');
+  fs.writeFileSync(path.join(outDir,'COVERAGE_SUMMARY.md'),overview.join('\n')+'\n');
   process.stdout.write(JSON.stringify({SOURCE_SHA:result.SOURCE_SHA,summary:result.summary,
     static_sections_status:result.static_sections_status,report:file})+'\n');
-  if(strict && (result.summary.FAIL>0 || result.static_sections_status!=='PASS'))process.exitCode=1;
+  if(strict && (result.summary.FAIL>0 || result.summary.NOT_TESTED>0 || result.static_sections_status!=='PASS'))process.exitCode=1;
   return result;
 }
 if(require.main===module) {
@@ -263,4 +314,4 @@ if(require.main===module) {
   const out=arg>=0&&process.argv[arg+1]?path.resolve(process.argv[arg+1]):path.join(ROOT,'artifacts/i18n-e2e');
   try{run(out,process.argv.includes('--strict'))}catch(error){console.error(error.stack||String(error));process.exitCode=2;}
 }
-module.exports={fraction,summarize,countBlankStrings,staticSections,missingKeysByLanguage,run};
+module.exports={fraction,summarize,countBlankStrings,staticSections,missingKeysByLanguage,auditSection,makeRepairQueue,detailedSourceAudit,run};
