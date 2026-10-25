@@ -37,6 +37,7 @@ jobs:
           node --check tools/i18n/e2e/coverage.cjs
           node --test tests/i18n/e2e/*.test.cjs
           python3 -m unittest discover -s tests/i18n/e2e -p '*_test.py' -v
+          python3 -m unittest discover -s tests/i18n/e2e/scenarios -p '*_test.py' -v
       - name: Generate complete per-language coverage (fail on gaps)
         shell: bash
         run: |
