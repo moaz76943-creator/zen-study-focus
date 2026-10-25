@@ -1,0 +1,102 @@
+{
+  "cfg": {
+    "lang": "ar",
+    "domain": "study",
+    "todayMins": 999,
+    "sessions": 999,
+    "sessionHistory": [
+      {
+        "id": "focus_001",
+        "date": "2026-10-17",
+        "minutes": 25,
+        "domain": "study"
+      },
+      {
+        "id": "focus_002",
+        "date": "2026-10-18",
+        "minutes": 20,
+        "domain": "review"
+      },
+      {
+        "id": "focus_003",
+        "date": "2026-10-18",
+        "minutes": 40,
+        "domain": "exam"
+      },
+      {
+        "id": "focus_004",
+        "date": "2026-10-19",
+        "minutes": 30,
+        "domain": "sport"
+      },
+      {
+        "id": "focus_003",
+        "date": "2026-10-18",
+        "minutes": 40,
+        "domain": "exam"
+      },
+      {
+        "id": "synthetic",
+        "date": "2026-10-19",
+        "minutes": 60,
+        "domain": "study",
+        "isDemo": true
+      },
+      {
+        "id": "invalid",
+        "date": "2026-02-30",
+        "minutes": 60,
+        "domain": "study"
+      },
+      {
+        "id": "corrupt",
+        "date": "2026-10-19",
+        "minutes": -10,
+        "domain": "work"
+      }
+    ]
+  },
+  "tasksList": [
+    {
+      "id": 1,
+      "isStarter": true,
+      "title": "starter example",
+      "done": true,
+      "catKey": "study"
+    },
+    {
+      "id": 12,
+      "title": "Study",
+      "done": true,
+      "catKey": "study",
+      "projectId": 80
+    },
+    {
+      "id": 13,
+      "title": "Read",
+      "done": false,
+      "catKey": "review",
+      "projectId": 80,
+      "dueDate": "2026-10-18"
+    },
+    {
+      "id": 13,
+      "title": "Duplicate",
+      "done": true,
+      "catKey": "review",
+      "projectId": 80
+    },
+    {
+      "id": 14,
+      "title": "Archived",
+      "done": true,
+      "status": "archived"
+    }
+  ],
+  "projects": [
+    {
+      "id": 80,
+      "name": "October sprint"
+    }
+  ]
+}
