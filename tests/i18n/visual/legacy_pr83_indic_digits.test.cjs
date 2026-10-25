@@ -2,7 +2,7 @@
 // Legacy PR #83 RED-first regression. Generated UI only, not user-authored text.
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const n=require('../../android/app/src/main/assets/web/js/numeral_invariant_guard.js');
+const n=require('../../../android/app/src/main/assets/web/js/numeral_invariant_guard.js');
 
 test('generated Devanagari and Bengali numerals normalize to Latin 0-9',()=>{
  const generated='समय ०१२३४५६७८९, সময় ০১২৩৪৫৬৭৮৯';
