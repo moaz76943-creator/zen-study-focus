@@ -2437,15 +2437,16 @@ function updateTimerDisplay() {
 }
 
 function selectTimerModeFromUser(mins, modeKey, btn) {
-  if ((timerRunning || timerSessionId || timerActiveMs > 0) &&
+  // Quick-training confirmation is handled by selectTimerMode itself.
+  // Otherwise ask exactly once before replacing an active or paused session.
+  if (!quickTraining?.active && (timerRunning || timerSessionId || timerActiveMs > 0) &&
       !window.confirm(cfg.lang === 'ar' ? 'تغيير الوضع سيلغي تقدم الجلسة الحالية. هل تريد المتابعة؟' :
         'Changing mode will discard current session progress. Continue?')) return false;
-  selectTimerMode(mins, modeKey, btn);
-  return true;
+  return selectTimerMode(mins, modeKey, btn) !== false;
 }
 function selectTimerMode(mins, modeKey, btn) {
   if(quickTraining?.active && !quickInternalChange) {
-    if(!window.confirm(quickText('replacePrompt')))return;
+    if(!window.confirm(quickText('replacePrompt')))return false;
     quickTraining=null;
     renderQuickTraining();
   }
@@ -2462,6 +2463,7 @@ function selectTimerMode(mins, modeKey, btn) {
   timerResumeMs = null;
   storeTimerSession();
   updateTimerDisplay();
+  return true;
 }
 
 function openCustomTimerModal() { document.getElementById('customTimerModal').classList.add('open'); }
@@ -2469,10 +2471,15 @@ function setCustomPresetValues(m) { document.getElementById('inpCustomMins').val
 function applyCustomTimerNow() {
   const mins = Math.max(1, Math.min(240, parseInt(toWest(document.getElementById('inpCustomMins').value)) || 45));
   const title = toWest(document.getElementById('inpCustomTitle').value.trim());
-  customSessionLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
+  const nextLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
+  if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return false;
+  // Commit the new title only after user consent; persist the final snapshot.
+  customSessionLabel = nextLabel;
+  updateTimerDisplay();
+  storeTimerSession();
   closeModal('customTimerModal');
-  if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return;
   showToast(`⚡ ${customSessionLabel}`);
+  return true;
 }
 
 function changeTimerDelta(deltaMins) {
