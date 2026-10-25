@@ -25,7 +25,7 @@ si:/[\u0D80-\u0DFF]/u,ps:/[\u0600-\u06FF]/u,ku:/[A-Za-zÇÊÎÛŞçêîûş]/u
 };
 const westernOnly=/[\u0660-\u0669\u06F0-\u06F9\u0966-\u096F\u09E6-\u09EF\u0A66-\u0A6F\u0AE6-\u0AEF\u0BE6-\u0BEF\u0C66-\u0C6F\u0CE6-\u0CEF\u0D66-\u0D6F\u0DE6-\u0DEF]/u;
 const dangerousControls=/[\u202A-\u202E\u2066-\u2069\u200E\u200F]/u;
-function read(code){return JSON.parse(fs.readFileSync(path.join(dir,code+'.json'),'utf8'));}
+function read(code){const pack=JSON.parse(fs.readFileSync(path.join(dir,code+'.json'),'utf8'));assert.equal(pack.language,code);assert.equal(pack.status,'REVIEW_REQUIRED');return pack.sections;}
 test('exactly 15 independent lane files; no excluded Hebrew codes',()=>{
  assert.deepEqual(fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort(),langs.map(x=>x+'.json').sort());
  assert.equal(langs.length,15);

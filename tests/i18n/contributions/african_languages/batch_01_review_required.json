@@ -1,0 +1,20 @@
+{
+  "sw": {
+    "status": "CANDIDATE_NATIVE_QA",
+    "review_required": {},
+    "prior_reviewed_keys": 136,
+    "new_candidate_keys": 11
+  },
+  "af": {
+    "status": "CANDIDATE_NATIVE_QA",
+    "review_required": {},
+    "prior_reviewed_keys": 100,
+    "new_candidate_keys": 47
+  },
+  "ha": {
+    "status": "CANDIDATE_NATIVE_QA",
+    "review_required": {},
+    "prior_reviewed_keys": 36,
+    "new_candidate_keys": 111
+  }
+}
