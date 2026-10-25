@@ -52,7 +52,7 @@ test('53 reviewed analytics packs resolve at runtime through DF99Locale, not a J
  assert.equal(x.wrapper.children[1].children[1].textContent,packs.de.analytics.period);
  assert.equal(x.button.textContent,packs.de.analytics.export);
  assert.equal(x.wrapper.children[2].children[0].children[0].textContent,packs.de.analytics.minutes);
- assert.equal(x.wrapper.children[3].textContent,undefined); // chart is title at index 3
+ assert.equal(x.wrapper.children[4].textContent,packs.de.analytics.chart); // translated chart heading
 });
 
 test('German, French, Arabic and Persian keep locale direction, translated visible state and Latin digits',()=>{
