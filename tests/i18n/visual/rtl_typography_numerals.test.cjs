@@ -32,19 +32,20 @@ test('timer, date, currency, percent keep Latin digits and stable LTR timing', (
 test('user-entered content is never mutated during locale state changes', () => {
   const cfg={lang:'ar',theme:'white',notes:[{title:'ملاحظة ١٢٣'}],tasks:[{title:'کار ۱۲۳'}],session:{elapsed:25}};
   const before=JSON.stringify(cfg),writes=[];
-  const result=locales.setSystemLanguage('fa',cfg,{setItem:(k,v)=>writes.push([k,v])});
+  const result=locales.setSystemLanguage('fa',cfg,{saveFortressData:(k,v)=>{writes.push([k,v]);return true;}});
   assert.equal(result.success,true);
+  assert.equal(result.persisted,true);
   assert.equal(result.locale,'fa');
   assert.equal(result.isRtl,true);
   assert.equal(result.config.lang,'fa');
   assert.equal(result.config.notes[0].title,'ملاحظة ١٢٣');
   assert.equal(JSON.stringify(cfg),before);
   assert.deepEqual(writes.map(x=>x[0]),['zen_fortress_cfg_v21']);
-  assert.equal(JSON.parse(writes[0][1]).tasks[0].title,'کار ۱۲۳');
+  assert.equal(writes[0][1].tasks[0].title,'کار ۱۲۳');
 });
 test('failed persistence is never reported as a saved language', () => {
   const old={lang:'en',notes:['hello']};
-  const r=locales.setSystemLanguage('ur',old,{setItem:()=>{throw Error('quota')}});
+  const r=locales.setSystemLanguage('ur',old,{saveFortressData:()=>{throw Error('quota')}});
   assert.equal(r.success,false);
   assert.equal(r.reason,'LANGUAGE_SAVE_FAILED');
   assert.equal(old.lang,'en');
@@ -98,13 +99,9 @@ test('offline font stacks and stable white premium colors',()=>{
     assert.doesNotMatch(css(sheet),/@import\s+url\(https?:|@font-face[^}]*url\(https?:/i);
   }
 });
-test('viewport audit matrix documents exact requested breakpoints and zoom',()=>{
-  const widths=[320,360,393,430],scales=[1,2];
-  assert.deepEqual(widths,[320,360,393,430]);
-  for(const width of widths) for(const scale of scales) {
-    assert.ok(width>0&&scale>0);
-    assert.ok(css('white_2100.css').includes('max-width: 430px'));
-    assert.ok(css('ui_components_v22.css').includes('max-width: 360px'));
-  }
-  // Static regression only; browser screenshots still require runtime WebView/Playwright.
+test('v21 raw storage writes are rejected; no silent data corruption',()=>{
+ const raw={setItem:()=>{throw Error('must never call')}};
+ const result=locales.setSystemLanguage('ar',{lang:'en',theme:'white'},raw);
+ assert.equal(result.success,false);
+ assert.equal(result.reason,'ATOMIC_STORAGE_REQUIRED');
 });

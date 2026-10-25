@@ -53,16 +53,27 @@
       updatedConfig.lang = code;
     }
     if (Object.prototype.hasOwnProperty.call(cfg, 'locale')) updatedConfig.locale = code;
-    if (storageBackend && typeof storageBackend.setItem === 'function') {
+    // Never write raw JSON to the v21 fortress key: the app uses a durable envelope.
+    // Lane 03 must inject its existing acknowledged/atomic saveFortressData adapter.
+    let persisted = false;
+    if (storageBackend) {
+      if (typeof storageBackend.saveFortressData !== 'function') {
+        return { success: false, reason: 'ATOMIC_STORAGE_REQUIRED',
+          locale: cfg.lang || cfg.locale || 'en' };
+      }
       try {
-        storageBackend.setItem('zen_fortress_cfg_v21', JSON.stringify(updatedConfig));
+        if (storageBackend.saveFortressData('zen_fortress_cfg_v21', updatedConfig) !== true) {
+          return { success: false, reason: 'LANGUAGE_SAVE_FAILED',
+            locale: cfg.lang || cfg.locale || 'en' };
+        }
+        persisted = true;
       } catch (_) {
         return { success: false, reason: 'LANGUAGE_SAVE_FAILED',
           locale: cfg.lang || cfg.locale || 'en' };
       }
     }
-    return { success: true, status: 'LOCALE_UPDATED', locale: code,
-      isRtl: isRtlLocale(code), config: updatedConfig };
+    return { success: true, status: persisted ? 'LOCALE_SAVED' : 'LOCALE_PREVIEW',
+      locale: code, isRtl: isRtlLocale(code), config: updatedConfig, persisted };
   }
 
   const api = { resolveTranslation, setSystemLanguage, isLocaleAllowed,
