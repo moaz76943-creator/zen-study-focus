@@ -17,7 +17,7 @@ function notesHarness(){
  const translations={de:{tpl_cornell_title:'Cornell-Notizen',tpl_cornell_description:'Strukturierte Mitschrift',
  tpl_cornell_body:'FRAGEN\n\nNOTIZEN\n\nZUSAMMENFASSUNG'}};
  const context={cfg,notesList:records,noteTagFilter:'all',selectedCalDate:'2026-10-25',todayISO:'2026-10-25',
-  document:{getElementById:get,createElement(tag){return {tag,type:'',title:'',textContent:'',appendChild(){},
+  document:{getElementById:get,querySelector:()=>null,createElement(tag){return {tag,type:'',title:'',textContent:'',appendChild(){},
    setAttribute(){},addEventListener(){},dataset:{}}},querySelectorAll:()=>[]},
   window:{DeepFocusNotesEditorUI:{renderStack:()=>true,onTemplate(){}}},
   DF99Locale:{t:(lang,family,key,fallback)=>translations[lang]?.[key]??fallback},
