@@ -130,3 +130,14 @@ test('play control is keyboard-operable and ARIA-pressed while keeping its volum
  assert.equal(button.listenerCount,1,'one event listener across repeated bindings');
  assert.ok(button.attributes['aria-label'].includes('أمواج المحيط'));
 });
+
+
+test('native button controls rely on browser Enter/Space activation without duplicate synthetic clicks',()=>{
+ const studio=fakeStudio(),control=studio.tiles[0].play;
+ control.tagName='BUTTON';
+ const result=bridge.bindSoundStudio({document:studio.doc,locale:'ar',catalog:CATALOG});
+ assert.equal(result.status,'OK');
+ assert.equal(control.attributes['aria-pressed'],'false');
+ assert.equal(control.listeners.keydown,undefined);
+ assert.equal(control.clickCount,0);
+});
