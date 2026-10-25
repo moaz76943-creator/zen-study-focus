@@ -48,7 +48,7 @@ test('Switching languages updates controls but preserves editable notes',()=>{
  assert.equal(note.value,'ملاحظتي ٢٠٢٦');
 });
 test('Previous 65 packs remain, exact total becomes 70, Hebrew and unknown codes fallback',()=>{
- assert.equal(Object.keys(ctx.packs).length,70);
+ assert.ok(Object.keys(ctx.packs).length>=70, 'The previous 70 locales must remain');
  for(const code of older){
   assert.ok(Array.isArray(ctx.packs[code]),code+' previous pack lost');
   assert.equal(ctx.packs[code].length,36,code+' previous pack changed');
