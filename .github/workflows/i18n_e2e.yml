@@ -88,7 +88,7 @@ build_apk:
           ./gradlew :app:assembleDebug --no-daemon --stacktrace
           APK=app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
-          PKG="$("${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools/36.0.0/aapt" dump badging "$APK" | sed -n "s/^package: name='$([^']*$)'.*/$1/p")"
+          PKG="$("${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools/36.0.0/aapt" dump badging "$APK" | grep '^package:' | cut -d "'" -f2)"
           test "$PKG" = com.zenstudy.focus
           cp "$APK" ../artifacts/i18n-e2e/build/app-debug.apk
           printf '%s\n' "$PKG" > ../artifacts/i18n-e2e/build/PACKAGE_ID.txt
