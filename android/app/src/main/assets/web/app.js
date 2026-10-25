@@ -2022,8 +2022,7 @@ function validateImportedBackup(raw) {
   if (!raw.cfg || typeof raw.cfg !== 'object' || Array.isArray(raw.cfg)) return null;
   if (!Array.isArray(raw.tasksList) || !Array.isArray(raw.notesList)) return null;
   if (raw.tasksList.length > 10000 || raw.notesList.length > 10000) return null;
-  const safeRecordId = id => /^\d{1,16}$/.test(String(id))
-    && Number.isSafeInteger(Number(id));
+  const safeRecordId = id => typeof id === 'number' && Number.isSafeInteger(id) && id >= 0;
   const okTask = x => x && typeof x === 'object' && !Array.isArray(x)
     && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
@@ -2033,6 +2032,8 @@ function validateImportedBackup(raw) {
     && typeof x.title === 'string' && x.title.length <= 20000
     && typeof x.body === 'string' && x.body.length <= 500000;
   if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)) return null;
+  // Never import ambiguous IDs or coerce a legacy string to an editable numeric ID.
+  if ([raw.tasksList, raw.notesList].some(rows => new Set(rows.map(row => row.id)).size !== rows.length)) return null;
   const candidateCfg = {...cfg, ...raw.cfg};
   if (!LANG_CATALOG.some(l => l.code === candidateCfg.lang)) candidateCfg.lang = 'en';
   for (const key of ['todayMins', 'sessions', 'streak', 'water']) {
