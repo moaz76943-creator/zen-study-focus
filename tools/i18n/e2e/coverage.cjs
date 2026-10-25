@@ -154,6 +154,16 @@ function makeRepairQueue(audits) {
  }
  return {scope:'SOURCE_TRANSLATION_REPAIR_NOT_ANDROID',assignments,items};
 }
+
+function flattenSourceLeaves(input,prefix='',out={}) {
+ if(Array.isArray(input)) {
+   input.forEach((value,i)=>flattenSourceLeaves(value,prefix?prefix+'.'+i:String(i),out));
+ } else if(input!==null&&typeof input==='object') {
+   for(const key of Object.keys(input).sort())flattenSourceLeaves(input[key],prefix?prefix+'.'+key:key,out);
+ } else if(prefix)out[prefix]=input;
+ return out;
+}
+
 function detailedSourceAudit(raw) {
  const ctx={window:{},document:{addEventListener(){}},console};
  vm.createContext(ctx);
@@ -171,10 +181,10 @@ function detailedSourceAudit(raw) {
  const codes=ctx.__catalog.map(x=>x.code);
  if(codes.length!==99||new Set(codes).size!==99||codes.some(x=>x==='he'||x==='iw')||
    codes.some(x=>!raw.summary.some(y=>y.code===x)))throw Error('Coverage source catalog mismatch');
- const coreKeys=Object.keys(ctx.__core.en||{}).sort(),quickKeys=Array.from(ctx.__quickKeys||[]);
+ const englishCore=flattenSourceLeaves(ctx.__core.en||{});
+ const coreKeys=Object.keys(englishCore).sort(),quickKeys=Array.from(ctx.__quickKeys||[]);
  if(!coreKeys.length||!quickKeys.length||new Set(quickKeys).size!==quickKeys.length)
    throw Error('Cannot measure Core or Quick Training baseline');
- const englishCore=ctx.__core.en;
  const englishQuick=Object.fromEntries(quickKeys.map((k,i)=>[k,ctx.__quick.en?.[i]]));
  const result=[];
  for(const {code} of raw.summary) {
@@ -190,7 +200,7 @@ function detailedSourceAudit(raw) {
          return {proven:measured&&value!=='__DF13_UNTRANSLATED__',value};
        }}));
    }
-   const core=ctx.__core[code];
+   const core=ctx.__core[code]?flattenSourceLeaves(ctx.__core[code]):null;
    result.push(auditSection({code,section:'Core',keys:coreKeys,owner:'F',
      source_file:'android/app/src/main/assets/web/app.js',english:englishCore,
      read:key=>({proven:!!core&&Object.prototype.hasOwnProperty.call(core,key),value:core?.[key]})}));
@@ -314,4 +324,4 @@ if(require.main===module) {
   const out=arg>=0&&process.argv[arg+1]?path.resolve(process.argv[arg+1]):path.join(ROOT,'artifacts/i18n-e2e');
   try{run(out,process.argv.includes('--strict'))}catch(error){console.error(error.stack||String(error));process.exitCode=2;}
 }
-module.exports={fraction,summarize,countBlankStrings,staticSections,missingKeysByLanguage,auditSection,makeRepairQueue,detailedSourceAudit,run};
+module.exports={fraction,summarize,countBlankStrings,staticSections,missingKeysByLanguage,auditSection,flattenSourceLeaves,makeRepairQueue,detailedSourceAudit,run};
