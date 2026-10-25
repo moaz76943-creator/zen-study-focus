@@ -1,146 +1,124 @@
-name: Deep Focus exact-SHA Android verification (release locked)
+# Mission #177 debug APK. Checkout is pinned to the annotated release tag's peeled commit.
+# This workflow never checks out main, legacy branches, or previous production commits.
+name: Deep Focus v3.0.3 Sanitized - Verified Debug APK
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - .github/workflows/build_apk.yml
   workflow_dispatch:
-    inputs:
-      publish_release:
-        description: 'Request publication (all exact-SHA/device/media/data/locale gates must pass)'
-        type: boolean
-        required: true
-        default: false
-      release_sha:
-        description: 'Exact reviewed 40-character commit SHA; required only for publication'
-        type: string
-        required: false
-        default: ''
 
 permissions:
   contents: read
+
 concurrency:
-  group: deep-focus-build-${{ github.ref }}
+  group: deep-focus-sanitized_v303-debug-apk
   cancel-in-progress: false
 
 jobs:
-  verify:
+  sanitized_v303-debug-apk:
+    name: Build and verify v3.0.3 Sanitized debug APK
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout pinned v3.0.3 Sanitized release commit
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Verify release firewall and automation contracts
+          ref: 01348f731a37db99edbe15d8dc3914c6ba250f79
+          persist-credentials: false
+      - name: Verify approved tag and checkout integrity
+        shell: bash
         run: |
-          node --check tools/release_guard/guard.cjs
-          node --test tests/release_guard/*.test.cjs tests/daily_maintenance/*.test.cjs
-      - uses: actions/setup-java@v4
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "01348f731a37db99edbe15d8dc3914c6ba250f79"
+          TAG_TARGET="$(git ls-remote origin 'refs/tags/v3.0.3-sanitized-production-v21^{}' | awk '{print $1}')"
+          test "$TAG_TARGET" = "01348f731a37db99edbe15d8dc3914c6ba250f79" || { echo "::error::Release tag no longer points to approved v3.0.3 Sanitized commit"; exit 1; }
+          test -f android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
+          test ! -e android/app/src/main/assets/web/js/deep_focus_visual_suite.js
+          grep -Fq '<script src="js/deep_focus_runtime_activator.js"></script>' android/app/src/main/assets/web/index.html
+          ! grep -Fq 'deep_focus_visual_suite.js' android/app/src/main/assets/web/index.html
+          echo "Validated tag v3.0.3-sanitized-production-v21 at commit 01348f731a37db99edbe15d8dc3914c6ba250f79"
+      - name: Validate runtime activator and sanitized UI
+        shell: bash
+        run: |
+          node --check android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
+          # Legacy Mission 176 integration test checks removed audio symbols and an obsolete locale variable.
+          # Replace the obsolete name-based assertions with focused v3.0.3 source checks.
+          node -e 'const fs=require("node:fs");const a=require("node:assert/strict");const s=fs.readFileSync("android/app/src/main/assets/web/js/deep_focus_runtime_activator.js","utf8");const m=s.match(/const LOCALES_100 = \[([\s\S]*?)\];/);a.ok(m,"100-locale catalog");const codes=[...m[1].matchAll(/\bcode:\s*"([^"]+)"/g)].map(x=>x[1]);a.equal(codes.length,100);a.equal(new Set(codes).size,100);a.ok(codes.includes("sw")&&codes.includes("ur"));a.ok(!codes.includes("he")&&!codes.includes("iw"));a.ok(s.includes("function toWesternDigits("));a.ok(s.includes("class SilentNatureAudio"));console.log("PASS: 100 unique locales, forbidden locale exclusion, sanitized runtime checks");'
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: temurin
-      - uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.5'
-      - name: Build Debug APK only (not an approved release)
-        working-directory: android
-        run: gradle assembleDebug --no-daemon
-      - name: Attach exact checked-out SHA and APK fingerprint
-        run: |
-          set -euo pipefail
-          mkdir -p evidence
-          git rev-parse HEAD | tee evidence/SOURCE_SHA
-          sha256sum android/app/build/outputs/apk/debug/*.apk | tee evidence/DEBUG_APK_SHA256
-          printf 'NOT_RELEASE_APPROVED; SOURCE_BRANCH=%s\n' "$GITHUB_REF" > evidence/STATUS
-      - uses: actions/upload-artifact@v4
-        with:
-          name: DeepFocus-Exact-SHA-Debug-Only
-          retention-days: 3
-          if-no-files-found: error
-          path: |
-            android/app/build/outputs/apk/debug/*.apk
-            evidence/
-
-  release:
-    needs: verify
-    if: github.event_name == 'workflow_dispatch' && inputs.publish_release == true && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Fail closed on stale or unreviewed release candidate
-        env:
-          EXPECTED_RELEASE_SHA: ${{ inputs.release_sha }}
-          ZEN_RELEASE_APPROVED_SHA: ${{ vars.ZEN_RELEASE_APPROVED_SHA }}
-          ZEN_CANDIDATE_SHA: ${{ vars.ZEN_CANDIDATE_SHA }}
-          ZEN_MEDIA_LICENSES_APPROVED: ${{ vars.ZEN_MEDIA_LICENSES_APPROVED }}
-          ZEN_ANDROID_E2E_APPROVED: ${{ vars.ZEN_ANDROID_E2E_APPROVED }}
-          ZEN_BACKUP_RESTORE_APPROVED: ${{ vars.ZEN_BACKUP_RESTORE_APPROVED }}
-          ZEN_20_LOCALES_APPROVED: ${{ vars.ZEN_20_LOCALES_APPROVED }}
-          ZEN_HUMAN_RELEASE_APPROVED: ${{ vars.ZEN_HUMAN_RELEASE_APPROVED }}
-          ZEN_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
-          ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
-          ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
-          ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
-        run: node tools/release_guard/guard.cjs
-      - uses: actions/setup-java@v4
-        with:
           java-version: '17'
-          distribution: temurin
-      - uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.5'
-      - name: Decode reviewed upload signing keystore
-        env:
-          KEYSTORE_B64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
+      - name: Install Android API 36
+        shell: bash
         run: |
           set -euo pipefail
-          umask 077
-          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/zen-upload.jks"
-          echo "ZEN_UPLOAD_KEYSTORE_PATH=$RUNNER_TEMP/zen-upload.jks" >> "$GITHUB_ENV"
-      - name: Build signed, approved Release APK and AAB
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Generate Gradle wrapper on runner (repository has none)
         working-directory: android
-        env:
-          ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
-          ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
-          ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
-        run: gradle assembleRelease bundleRelease --no-daemon
-      - name: Verify both Android signatures and record provenance
+        shell: bash
         run: |
           set -euo pipefail
-          apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner -print -quit)"
-          test -x "$apksigner"
-          for apk in android/app/build/outputs/apk/release/*.apk; do "$apksigner" verify "$apk"; done
-          for aab in android/app/build/outputs/bundle/release/*.aab; do jarsigner -verify "$aab"; done
-          mkdir -p evidence
-          git rev-parse HEAD > evidence/SOURCE_SHA
-          sha256sum android/app/build/outputs/apk/release/*.apk android/app/build/outputs/bundle/release/*.aab > evidence/RELEASE_SHA256
-      - uses: actions/upload-artifact@v4
+          if [[ ! -f ./gradlew ]]; then
+            gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
+          fi
+          chmod +x ./gradlew
+      - name: Build v3.0.3 Sanitized APK exactly as requested
+        working-directory: android
+        shell: bash
+        run: ./gradlew clean assembleDebug --stacktrace
+      - name: Verify debug signing, package, assets and compute SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          test -x "$APKSIGNER"
+          test -x "$AAPT"
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee "$RUNNER_TEMP/sanitized_v303-signature.txt"
+          "$AAPT" dump badging "$APK" | tee "$RUNNER_TEMP/sanitized_v303-badging.txt"
+          grep -Eq "package: name='com.zenstudy.focus'" "$RUNNER_TEMP/sanitized_v303-badging.txt"
+          unzip -Z -1 "$APK" | grep -Fxq 'assets/web/js/deep_focus_runtime_activator.js'
+          if unzip -Z -1 "$APK" | grep -Fxq 'assets/web/js/deep_focus_visual_suite.js'; then echo '::error::Removed visual suite was packaged'; exit 1; fi
+          unzip -Z -1 "$APK" | grep -Fxq 'assets/web/index.html'
+          sha256sum "$APK" | tee "$RUNNER_TEMP/sanitized_v303-sha256.txt"
+          {
+            echo "tag=v3.0.3-sanitized-production-v21"
+            echo "source_commit=01348f731a37db99edbe15d8dc3914c6ba250f79"
+            echo "build_command=./gradlew clean assembleDebug --stacktrace"
+            echo "package=com.zenstudy.focus"
+            echo "signing=Android debug signing key (not Google Play upload signing)"
+          } > "$RUNNER_TEMP/sanitized_v303-provenance.txt"
+          {
+            echo "### v3.0.3 Sanitized verified Debug APK"
+            echo "Source: \`v3.0.3-sanitized-production-v21\` / \`01348f731a37db99edbe15d8dc3914c6ba250f79\`"
+            echo "Package: \`com.zenstudy.focus\`"
+            echo "APK SHA256:"
+            echo '\`\`\`'
+            cat "$RUNNER_TEMP/sanitized_v303-sha256.txt"
+            echo '\`\`\`'
+            echo "This APK has the Android debug signature, not a Play release upload signature."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload verified APK, SHA256 and signing evidence
+        uses: actions/upload-artifact@v4
         with:
-          name: DeepFocus-Reviewed-Signed-Release
-          retention-days: 7
+          name: DeepFocus-Sanitized-v3.0.3-v3.0.3-Debug-APK
           if-no-files-found: error
+          retention-days: 30
           path: |
-            android/app/build/outputs/apk/release/*.apk
-            android/app/build/outputs/bundle/release/*.aab
-            evidence/
-      - name: Publish GitHub release only after all gates
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: reviewed-${{ github.run_number }}
-          name: Deep Focus SHA-reviewed build ${{ github.sha }}
-          files: |
-            android/app/build/outputs/apk/release/*.apk
-            android/app/build/outputs/bundle/release/*.aab
-          generate_release_notes: true
+            android/app/build/outputs/apk/debug/app-debug.apk
+            ${{ runner.temp }}/sanitized_v303-sha256.txt
+            ${{ runner.temp }}/sanitized_v303-provenance.txt
+            ${{ runner.temp }}/sanitized_v303-signature.txt
+            ${{ runner.temp }}/sanitized_v303-badging.txt

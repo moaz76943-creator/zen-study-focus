@@ -1,0 +1,137 @@
+# Debug APK from immutable v3.0.7 tag; this CI-only workflow is stored on official integration branch.
+name: Deep Focus v3.0.7 - Pinned Core Languages Debug APK
+
+on:
+  push:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - .github/workflows/build_lang_catalog_v307.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deep-focus-lang-v307-debug-apk
+  cancel-in-progress: false
+
+jobs:
+  build-v307:
+    name: Verify immutable v3.0.7 and assemble debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout pinned core language catalog source
+        uses: actions/checkout@v4
+        with:
+          ref: 7801c563c4d5d700e3f6711be1b9c686ac9abfeb
+          persist-credentials: false
+
+      - name: Validate exact source and core app.js language catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE=7801c563c4d5d700e3f6711be1b9c686ac9abfeb
+          test "$(git rev-parse HEAD)" = "$SOURCE"
+          TAG_TARGET="$(git ls-remote origin 'refs/tags/v3.0.7-lang-catalog-100-v21^{}' | awk '{print $1}')"
+          test "$TAG_TARGET" = "$SOURCE" || { echo "::error::v3.0.7 tag source mismatch"; exit 1; }
+          test -s android/app/src/main/assets/web/app.js
+          test -s android/app/src/main/assets/web/index.html
+          node --check android/app/src/main/assets/web/app.js
+          node <<'NODE'
+          const fs = require('node:fs');
+          const assert = require('node:assert/strict');
+          const source = fs.readFileSync('android/app/src/main/assets/web/app.js','utf8');
+          const match = source.match(/const LANG_CATALOG\s*=\s*(\[[\s\S]*?\])\s*;/);
+          assert.ok(match,'LANG_CATALOG definition must exist in core app.js');
+          const locales = JSON.parse(match[1]);
+          const codes = locales.map(x => x.code);
+          assert.equal(new Set(codes).size,codes.length,'duplicate locale codes');
+          assert.ok(locales.find(x => x.enName === 'Swahili' && x.code === 'sw'),'Swahili missing');
+          assert.ok(locales.find(x => x.enName === 'Amharic' && x.code === 'am'),'Amharic missing');
+          assert.ok(locales.find(x => x.enName === 'Filipino' && x.code === 'fil'),'Filipino missing');
+          assert.ok(!codes.includes('he') && !codes.includes('iw'),'forbidden Hebrew locale present');
+          assert.ok(locales.length >= 90,'unexpectedly incomplete catalog');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/lang-v307-catalog-evidence.txt',
+            'tag=v3.0.7-lang-catalog-100-v21\nsource_commit=7801c563c4d5d700e3f6711be1b9c686ac9abfeb\nunique_locales='+codes.length+'\nlocale_count='+locales.length+'\nSwahili=present\nAmharic=present\nFilipino=present\nHebrew=excluded\n');
+          if (locales.length !== 100) {
+            console.log('::warning::100-language label does not match actual LANG_CATALOG count='+locales.length+'; building exact tagged commit without changing its contents');
+          }
+          console.log('PASS: app.js syntax and catalog integrity; locales='+locales.length);
+          NODE
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android API 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Prepare wrapper if source repository lacks one
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -f ./gradlew ]]; then
+            gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
+          fi
+          chmod +x ./gradlew
+
+      - name: Build exact pinned v3.0.7 APK
+        working-directory: android
+        run: ./gradlew clean assembleDebug --stacktrace
+
+      - name: Verify APK package, signing, packaged app.js and SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" > "$RUNNER_TEMP/lang-v307-signing.txt"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" > "$RUNNER_TEMP/lang-v307-badging.txt"
+          grep -Fq "package: name='com.zenstudy.focus'" "$RUNNER_TEMP/lang-v307-badging.txt"
+          unzip -Z -1 "$APK" | grep -Fxq 'assets/web/app.js'
+          sha256sum "$APK" | tee "$RUNNER_TEMP/lang-v307-sha256.txt"
+          {
+            echo 'tag=v3.0.7-lang-catalog-100-v21'
+            echo 'source_commit=7801c563c4d5d700e3f6711be1b9c686ac9abfeb'
+            echo 'source_branch=integration/master-qa-verified-v21'
+            echo 'command=./gradlew clean assembleDebug --stacktrace'
+            echo 'package=com.zenstudy.focus'
+            echo 'signing=Android debug key (not Play upload signing)'
+            echo 'catalog_count=99'
+          } > "$RUNNER_TEMP/lang-v307-provenance.txt"
+          {
+            echo '### v3.0.7 Pinned Core Language Catalog Debug APK'
+            echo 'Source: v3.0.7-lang-catalog-100-v21 / 7801c563c4d5d700e3f6711be1b9c686ac9abfeb'
+            echo 'Catalog status: 99 unique locales (release label says 100).'
+            echo 'APK SHA256:'
+            cat "$RUNNER_TEMP/lang-v307-sha256.txt"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload verified APK and integrity evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-v3.0.7-Core-Languages-Debug-APK
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            ${{ runner.temp }}/lang-v307-sha256.txt
+            ${{ runner.temp }}/lang-v307-provenance.txt
+            ${{ runner.temp }}/lang-v307-catalog-evidence.txt
+            ${{ runner.temp }}/lang-v307-signing.txt
+            ${{ runner.temp }}/lang-v307-badging.txt

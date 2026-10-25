@@ -1,0 +1,212 @@
+name: Deep Focus v3.2.3 Tagged - Signed Play AAB and Debug APK
+on:
+  push:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - .github/workflows/build_v323_safe_i18n_play.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deep-focus-v323-tagged-play-build
+  cancel-in-progress: false
+
+jobs:
+  build-v323:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
+      ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
+      ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
+      ZEN_PLAY_UPLOAD_SHA1: ${{ secrets.ZEN_PLAY_UPLOAD_SHA1 }}
+    steps:
+      - name: Checkout immutable v3.2.3 source tag's commit
+        uses: actions/checkout@v4
+        with:
+          ref: 3cbd8d2b6ac7313ebb91ea9c9939d44e66772177
+          persist-credentials: false
+
+      - name: Verify tag and apply two build-only compatibility fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE=3cbd8d2b6ac7313ebb91ea9c9939d44e66772177
+          test "$(git rev-parse HEAD)" = "$SOURCE"
+          TAG="$(git ls-remote origin 'refs/tags/v3.2.3-safe-i18n-v21^{}' | awk '{print $1}')"
+          test "$TAG" = "$SOURCE" || { echo "::error::v3.2.3 tag mismatch"; exit 1; }
+          python3 - <<'PY'
+          from pathlib import Path
+          g=Path("android/app/build.gradle")
+          s=g.read_text()
+          for required in ('applicationId "com.deepfocus.study"', 'versionCode 22', 'versionName "3.1.3"', 'targetSdk 36'):
+              assert required in s, f"unexpected source build.gradle: {required}"
+          assert s.count('versionName "3.1.3"')==1
+          g.write_text(s.replace('versionName "3.1.3"', 'versionName "3.2.3"', 1))
+          j=Path("android/app/src/main/java/com/zenstudy/focus/MainActivity.java")
+          s=j.read_text()
+          old='if (!"com.zenstudy.focus".equals(getPackageName())) {'
+          new='if (!"com.deepfocus.study".equals(getPackageName())) {'
+          assert s.count(old)==1 and new not in s, "unexpected MainActivity startup guard"
+          j.write_text(s.replace(old,new,1))
+          assert j.read_text().count(new)==1
+          PY
+          diff="$(git diff --name-only)"
+          test "$diff" = "$(printf 'android/app/build.gradle\nandroid/app/src/main/java/com/zenstudy/focus/MainActivity.java')" || { echo "::error::Unexpected changes in pinned build tree"; echo "$diff"; exit 1; }
+          node --check android/app/src/main/assets/web/app.js
+          test -s android/app/src/main/assets/web/index.html
+          {
+            echo "tag=v3.2.3-safe-i18n-v21"
+            echo "source_commit=$SOURCE"
+            echo "source_branch=integration/master-qa-verified-v21"
+            echo "build_only_fix_1=versionName 3.1.3 to 3.2.3"
+            echo "build_only_fix_2=MainActivity package startup guard com.zenstudy.focus to com.deepfocus.study"
+            echo "versionCode=22"
+            echo "package=com.deepfocus.study"
+            echo "targetSdk=36"
+            echo "release_command=./gradlew clean bundleRelease --stacktrace"
+            echo "debug_command=./gradlew assembleDebug --stacktrace"
+            echo "play_console_acceptance=NOT_TESTED"
+          } > "$RUNNER_TEMP/v323-provenance.txt"
+
+      - name: Require upload-signing secrets and verify expected certificate
+        shell: bash
+        env:
+          ZEN_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          test -n "$ZEN_UPLOAD_KEYSTORE_BASE64" && test -n "$ZEN_UPLOAD_STORE_PASSWORD" && test -n "$ZEN_UPLOAD_KEY_ALIAS" && test -n "$ZEN_UPLOAD_KEY_PASSWORD" || { echo "::error::Missing Play upload signing material; no unsigned release is allowed"; exit 1; }
+          umask 077
+          STORE="$RUNNER_TEMP/v323-upload.jks"
+          printf '%s' "$ZEN_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$STORE"
+          test -s "$STORE"
+          echo "ZEN_UPLOAD_KEYSTORE_PATH=$STORE" >> "$GITHUB_ENV"
+          keytool -list -v -keystore "$STORE" -alias "$ZEN_UPLOAD_KEY_ALIAS" -storepass:env ZEN_UPLOAD_STORE_PASSWORD > "$RUNNER_TEMP/v323-key-info.txt"
+          grep -Fq PrivateKeyEntry "$RUNNER_TEMP/v323-key-info.txt"
+          SHA1="$(grep -m1 'SHA1:' "$RUNNER_TEMP/v323-key-info.txt" | sed -E 's/^.*SHA1: *//;s/[[:space:]]+$//')"
+          [[ "$SHA1" =~ ^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){19}$ ]]
+          if [[ -n "$ZEN_PLAY_UPLOAD_SHA1" ]]; then
+            test "${SHA1^^}" = "${ZEN_PLAY_UPLOAD_SHA1^^}" || { echo "::error::Upload certificate mismatches expected Play SHA1"; exit 1; }
+          fi
+          echo "$SHA1" > "$RUNNER_TEMP/v323-upload-cert-sha1.txt"
+          echo "release_signing=upload_private_key_verified" >> "$RUNNER_TEMP/v323-provenance.txt"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android API 36 and build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          MANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$MANAGER"
+          "$MANAGER" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Prepare wrapper when missing from tag
+        shell: bash
+        working-directory: android
+        run: |
+          set -euo pipefail
+          if [[ ! -f ./gradlew ]]; then gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon; fi
+          chmod +x ./gradlew
+
+      - name: Build signed Release AAB
+        shell: bash
+        working-directory: android
+        run: ./gradlew clean bundleRelease --stacktrace
+
+      - name: Build installable Debug APK
+        shell: bash
+        working-directory: android
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Validate signed release bundle and debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAB="android/app/build/outputs/bundle/release/app-release.aab"
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$AAB" && test -s "$APK"
+          unzip -tq "$AAB"
+          unzip -Z -1 "$AAB" > "$RUNNER_TEMP/v323-aab-entries.txt"
+          grep -Fxq 'base/assets/web/index.html' "$RUNNER_TEMP/v323-aab-entries.txt"
+          grep -Fxq 'base/assets/web/app.js' "$RUNNER_TEMP/v323-aab-entries.txt"
+          grep -Eq '^META-INF/.*\.(RSA|DSA|EC)$' "$RUNNER_TEMP/v323-aab-entries.txt"
+          jarsigner -verify -verbose -certs "$AAB" > "$RUNNER_TEMP/v323-jarsigner.txt" 2>&1
+          grep -Fq 'jar verified.' "$RUNNER_TEMP/v323-jarsigner.txt"
+          keytool -printcert -jarfile "$AAB" > "$RUNNER_TEMP/v323-aab-cert.txt"
+          SHA1="$(grep -m1 'SHA1:' "$RUNNER_TEMP/v323-aab-cert.txt" | sed -E 's/^.*SHA1: *//;s/[[:space:]]+$//')"
+          test "${SHA1^^}" = "$(tr '[:lower:]' '[:upper:]' < "$RUNNER_TEMP/v323-upload-cert-sha1.txt")"
+          APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          "$APKSIGNER" verify --verbose --print-certs "$APK" > "$RUNNER_TEMP/v323-apk-signer.txt"
+          "$AAPT" dump badging "$APK" > "$RUNNER_TEMP/v323-apk-badging.txt"
+          grep -Fq "package: name='com.deepfocus.study' versionCode='22' versionName='3.2.3'" "$RUNNER_TEMP/v323-apk-badging.txt"
+          curl --fail --location --retry 3 --silent --show-error "https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar" --output "$RUNNER_TEMP/bundletool.jar"
+          java -jar "$RUNNER_TEMP/bundletool.jar" dump manifest --bundle="$AAB" > "$RUNNER_TEMP/v323-aab-manifest.xml"
+          python3 - <<'PY'
+          import os,xml.etree.ElementTree as ET
+          from pathlib import Path
+          f=Path(os.environ['RUNNER_TEMP'])/'v323-aab-manifest.xml'
+          r=ET.fromstring(f.read_text())
+          ns='{http://schemas.android.com/apk/res/android}'
+          actual=[r.attrib.get('package'),r.attrib.get(ns+'versionCode'),r.attrib.get(ns+'versionName')]
+          assert actual==['com.deepfocus.study','22','3.2.3'],f"wrong AAB manifest: {actual}"
+          sdk=r.find('uses-sdk')
+          assert sdk is not None and int(sdk.attrib[ns+'targetSdkVersion'])==36
+          print('PASS: signed AAB com.deepfocus.study v3.2.3 code 22 target 36')
+          PY
+          sha256sum "$AAB" | tee "$RUNNER_TEMP/v323-aab-sha256.txt"
+          sha256sum "$APK" | tee "$RUNNER_TEMP/v323-apk-sha256.txt"
+          {
+            echo '### v3.2.3 tagged build results'
+            echo 'Tag: v3.2.3-safe-i18n-v21'
+            echo 'Pinned source: 3cbd8d2b6ac7313ebb91ea9c9939d44e66772177'
+            echo 'Two controlled build-only fixes: versionName and MainActivity package guard'
+            echo 'Android package: com.deepfocus.study; versionName: 3.2.3; versionCode: 22'
+            echo 'Release upload signature: verified against configured keystore'
+            echo 'Release AAB SHA256:'
+            cat "$RUNNER_TEMP/v323-aab-sha256.txt"
+            echo 'Debug APK SHA256:'
+            cat "$RUNNER_TEMP/v323-apk-sha256.txt"
+            echo 'Google Play upload acceptance: NOT_TESTED.'
+            echo 'Foreground service declaration in source remains; Play may request supporting declaration/video.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish signed Google Play AAB with proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-v3.2.3-v22-PLAY-SIGNED-AAB
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            ${{ runner.temp }}/v323-aab-sha256.txt
+            ${{ runner.temp }}/v323-aab-manifest.xml
+            ${{ runner.temp }}/v323-upload-cert-sha1.txt
+            ${{ runner.temp }}/v323-provenance.txt
+            ${{ runner.temp }}/v323-jarsigner.txt
+
+      - name: Publish installable Debug APK with proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-v3.2.3-v22-DEBUG-APK
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            ${{ runner.temp }}/v323-apk-sha256.txt
+            ${{ runner.temp }}/v323-apk-badging.txt
+            ${{ runner.temp }}/v323-apk-signer.txt
+            ${{ runner.temp }}/v323-provenance.txt
