@@ -150,6 +150,15 @@ class Android:
         return any(label.casefold() in description(n).casefold() for n in self.nodes()
                    if n.get("bounds"))
 
+    def has_exact_record(self, name):
+        """Match a displayed record, excluding editable search fields and prefix collisions."""
+        return any(
+            n.get("bounds") and "EditText" not in n.get("class", "") and
+            (n.get("text", "").strip() == name or
+             n.get("content-desc", "").strip().endswith(": " + name))
+            for n in self.nodes()
+        )
+
     def clock(self):
         values = [n.get("text", "").strip() for n in self.nodes()
                   if n.get("bounds") and CLOCK.fullmatch(n.get("text", "").strip())]
@@ -272,11 +281,11 @@ def tasks_edit(a, token):
     a.tap_scoped(original, "Edit")
     a.replace_text(original, updated)
     a.tap("Save", exact=True)
-    if not a.has(updated) or a.has(original):
+    if not a.has(updated) or a.has_exact_record(original):
         raise AssertionError("task edit was not committed to visible state")
     a.restart()
     a.tap("Tasks")
-    if not a.has(updated) or a.has(original):
+    if not a.has(updated) or a.has_exact_record(original):
         raise AssertionError("edited task title did not persist on restart")
     return {"record": updated, "assertions": ["saved_record_scoped_edit", "old_title_absent",
                                              "new_title_present_after_relaunch"]}
@@ -313,11 +322,11 @@ def notes_edit(a, token):
     a.replace_text(original, title)
     a.replace_text("DF13C_BODY_" + token, body)
     a.tap("Save", exact=True)
-    if not a.has(title) or not a.has(body) or a.has(original):
+    if not a.has(title) or not a.has(body) or a.has_exact_record(original):
         raise AssertionError("note edit not observable in the rendered record")
     a.restart()
     a.tap("Notes")
-    if not a.has(title) or not a.has(body) or a.has(original):
+    if not a.has(title) or not a.has(body) or a.has_exact_record(original):
         raise AssertionError("note edit was not persisted across relaunch")
     return {"record": title, "assertions": ["scoped_title_body_edit",
                                           "old_title_absent", "edit_survived_relaunch"]}
