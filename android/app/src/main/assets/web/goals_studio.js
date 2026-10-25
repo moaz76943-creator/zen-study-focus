@@ -7,15 +7,23 @@ const GOAL_UI={
  modal:'Daily activity goals',hint:'Set 0 to hide a target. A session counts only after it completes.',
  save:'Goals saved',invalid:'Enter whole minutes from 0 to 720.',
  noGoal:'Set goal',minute:'min',done:'completed',today:'today',
- week:'This week',weekTarget:'Weekly target (min)',weekInvalid:'Weekly targets must be 0–5040 minutes.'},
+ week:'This week',weekTarget:'Weekly target (min)',weekInvalid:'Weekly targets must be 0–5040 minutes.',
+ start:'Start',close:'Close',saveFailed:'Could not save goals. Try again.'},
  ar:{kicker:'✦ أهدافك اليومية',heading:'تقدمك في كل نشاط',
  desc:'نحسب الدقائق من جلسات التركيز المكتملة فقط.',edit:'⚙ تعديل',
  modal:'تعديل الأهداف اليومية',hint:'اكتب 0 لإيقاف الهدف. تُحسب الدقائق بعد اكتمال الجلسة.',
  save:'تم حفظ الأهداف',invalid:'أدخل دقائق صحيحة من 0 إلى 720.',
  noGoal:'حدد هدفًا',minute:'دقيقة',done:'المنجز',today:'اليوم',
- week:'هذا الأسبوع',weekTarget:'الهدف الأسبوعي (دقائق)',weekInvalid:'الأهداف الأسبوعية بين 0 و5040 دقيقة.'}
+ week:'هذا الأسبوع',weekTarget:'الهدف الأسبوعي (دقائق)',weekInvalid:'الأهداف الأسبوعية بين 0 و5040 دقيقة.',
+ start:'بدء',close:'إغلاق',saveFailed:'تعذّر حفظ الأهداف. حاول مرة أخرى.'}
 };
 function gsText(k){const base=(cfg.lang==='ar'?GOAL_UI.ar:GOAL_UI.en)[k]||k;return globalThis.DF99Locale?.t(cfg.lang,'goals',k,base) ?? base;}
+/* Follow the selected script direction, not the current text fallback.
+   These UI-only flags do not change persisted goals or user-authored titles. */
+function gsDirection(lang){
+ const code=String(lang||'en').toLowerCase().split(/[-_]/)[0];
+ return ['ar','fa','ur','ps','yi','sd','ug'].includes(code)?'rtl':'ltr';
+}
 function gsGoal(domain){
  const raw=cfg.dailyGoalsMin;
  if(!raw||typeof raw!=='object'||Array.isArray(raw))return 0;
@@ -38,6 +46,9 @@ function gsCleanHistory() {
   if(!item||typeof item!=='object'||Array.isArray(item)||
      item.isStarter===true||item.isDemo===true||item.demo===true||
      item.isTest===true||item.synthetic===true||
+     item.completed===false||item.isComplete===false||
+     (typeof item.status==='string'&&
+      ['active','running','paused','started','pending','in_progress','cancelled','canceled','aborted','interrupted'].includes(item.status.toLowerCase()))||
      ['demo','sample','test','synthetic'].includes(item.source))continue;
   const id=item.id;
   if(!((typeof id==='string'&&id.length>0&&id.length<=128)||
@@ -76,7 +87,16 @@ function gsWeeklyRecordedMinutes(domain,until=localDateISO()) {
 }
 function gsLabels(){
  const d=L();
- return {study:[d.domStudy,'📚'],read:[d.domRead,'📖'],sport:[d.domSport,'🏋️'],work:[d.domWork,'💻']};
+ const fallback={study:[d.domStudy,'📚'],read:[d.domRead,'📖'],
+  sport:[d.domSport,'🏋️'],work:[d.domWork,'💻']};
+ const names={};
+ for(const domain of GOAL_DOMAINS){
+  // Verified activity-domain packs are also used in Goals; do not translate
+  // user-supplied goal titles or change their persisted values.
+  const translated=globalThis.DF99Locale?.t(cfg.lang,'analyticsDomain',domain,fallback[domain][0]);
+  names[domain]=[translated||fallback[domain][0],fallback[domain][1]];
+ }
+ return names;
 }
 function gsNode(tag,cls,value){
  const el=document.createElement(tag);
@@ -87,6 +107,7 @@ function gsNode(tag,cls,value){
 function renderDailyGoals(){
  const rows=document.getElementById('dailyGoalsRows');
  if(!rows)return;
+ rows.setAttribute('dir',gsDirection(cfg.lang));
  const ids={goalsKicker:'kicker',dailyGoalsHeading:'heading',dailyGoalsDescription:'desc',goalsEditButton:'edit'};
  for(const [id,key] of Object.entries(ids)){const el=document.getElementById(id);if(el)el.textContent=gsText(key);}
  rows.replaceChildren();
@@ -97,12 +118,14 @@ function renderDailyGoals(){
   const icon=gsNode('span','goal-symbol',names[domain][1]);
   const main=gsNode('div','goal-main');
   const title=gsNode('div','goal-name',names[domain][0]);
-  const details=gsNode('div','goal-details',goal?minutes+' / '+goal+' '+gsText('minute'):gsText('noGoal'));
+  const details=gsNode('div','goal-details',goal?
+   gsText('today')+': '+minutes+' / '+goal+' '+gsText('minute'):gsText('noGoal'));
   const rail=gsNode('div','goal-progress');rail.setAttribute('role','progressbar');
   rail.setAttribute('aria-label',names[domain][0]);
   rail.setAttribute('aria-valuemin','0');rail.setAttribute('aria-valuemax','100');rail.setAttribute('aria-valuenow',String(percent));
   const fill=gsNode('span','goal-fill');fill.style.width=percent+'%';rail.appendChild(fill);
   main.appendChild(title);main.appendChild(details);main.appendChild(rail);
+  if(goal>0&&minutes>=goal)main.appendChild(gsNode('span','goal-complete',gsText('done')));
   const weekGoal=gsWeeklyGoal(domain),weekMinutes=gsWeeklyRecordedMinutes(domain);
   if(weekGoal) {
    const weekPercent=Math.min(100,Math.round(weekMinutes/weekGoal*100));
@@ -112,7 +135,7 @@ function renderDailyGoals(){
   const trailing=gsNode('div','goal-trailing');
   trailing.appendChild(gsNode('strong','goal-percent',goal?percent+'%':'—'));
   const go=gsNode('button','goal-go','▶');go.type='button';
-  go.setAttribute('aria-label',(cfg.lang==='ar'?'بدء ': 'Start ')+names[domain][0]);
+  go.setAttribute('aria-label',gsText('start')+' '+names[domain][0]);
   go.addEventListener('click',()=>startGoalActivity(domain));
   trailing.appendChild(go);
   row.appendChild(icon);row.appendChild(main);row.appendChild(trailing);
@@ -121,6 +144,7 @@ function renderDailyGoals(){
 }
 function openDailyGoalsModal(){
  const grid=document.getElementById('goalsEditGrid');if(!grid)return;
+ grid.setAttribute('dir',gsDirection(cfg.lang));
  const heading=document.getElementById('goalsModalHeading');
  const hint=document.getElementById('goalsModalHint');
  heading.textContent=gsText('modal');hint.textContent=gsText('hint');
@@ -130,18 +154,28 @@ function openDailyGoalsModal(){
   const label=gsNode('label','goals-edit-label');
   label.appendChild(gsNode('span','',names[domain][1]+' '+names[domain][0]));
   const input=gsNode('input','modal-inp');input.type='number';input.inputMode='numeric';
-  input.min='0';input.max='720';input.step='5';input.value=String(gsGoal(domain));input.id='goalInput-'+domain;
+  input.min='0';input.max='720';input.step='1';input.value=String(gsGoal(domain));input.id='goalInput-'+domain;
   input.setAttribute('aria-label',names[domain][0]+' ('+gsText('minute')+')');
   label.appendChild(input);grid.appendChild(label);
   const weekLabel=gsNode('label','goals-edit-label');
   weekLabel.appendChild(gsNode('span','',names[domain][1]+' '+gsText('weekTarget')));
   const weekly=gsNode('input','modal-inp');weekly.type='number';weekly.inputMode='numeric';
-  weekly.min='0';weekly.max='5040';weekly.step='5';
+  weekly.min='0';weekly.max='5040';weekly.step='1';
   weekly.value=String(gsWeeklyGoal(domain));weekly.id='goalWeeklyInput-'+domain;
   weekly.setAttribute('aria-label',names[domain][0]+' '+gsText('weekTarget'));
   weekLabel.appendChild(weekly);grid.appendChild(weekLabel);
  }
- document.getElementById('dailyGoalsModal').classList.add('open');
+ const modal=document.getElementById('dailyGoalsModal');
+ // Buttons are defined in the shared HTML; update their visible copy only.
+ // Preserve existing click and Cancel behavior.
+ const cancel=modal?.querySelector?.('[data-i18n="btnCancel"]');
+ const save=modal?.querySelector?.('[data-i18n="btnSave"]');
+ const close=modal?.querySelector?.('[aria-label="Close"]');
+ const d=L();
+ if(cancel)cancel.textContent=globalThis.DF99Locale?.t(cfg.lang,'tasks','cancel',d.btnCancel||'Cancel')||d.btnCancel||'Cancel';
+ if(save)save.textContent=globalThis.DF99Locale?.t(cfg.lang,'tasks','save',d.btnSave||'Save')||d.btnSave||'Save';
+ if(close)close.setAttribute('aria-label',gsText('close'));
+ modal.classList.add('open');
 }
 function saveDailyGoals(){
  const values={},weeklyValues={};
@@ -157,9 +191,21 @@ function saveDailyGoals(){
   }
   weeklyValues[domain]=Number(weekRaw);
  }
- cfg.weeklyGoalsMin=weeklyValues;
- cfg.dailyGoalsMin=values;
- saveFortressData('zen_fortress_cfg_v21',cfg);
+ // Never overwrite unknown historic keys or publish unacknowledged edits.
+ const existingDaily=cfg.dailyGoalsMin&&typeof cfg.dailyGoalsMin==='object'&&!Array.isArray(cfg.dailyGoalsMin)?cfg.dailyGoalsMin:{};
+ const existingWeekly=cfg.weeklyGoalsMin&&typeof cfg.weeklyGoalsMin==='object'&&!Array.isArray(cfg.weeklyGoalsMin)?cfg.weeklyGoalsMin:{};
+ const nextDaily={...existingDaily,...values};
+ const nextWeekly={...existingWeekly,...weeklyValues};
+ const nextCfg={...cfg,dailyGoalsMin:nextDaily,weeklyGoalsMin:nextWeekly};
+ try {
+  if(!saveFortressData('zen_fortress_cfg_v21',nextCfg)){
+   showToast(gsText('saveFailed'));return false;
+  }
+ } catch (_) {
+  showToast(gsText('saveFailed'));return false;
+ }
+ cfg.dailyGoalsMin=nextDaily;
+ cfg.weeklyGoalsMin=nextWeekly;
  closeModal('dailyGoalsModal');renderDailyGoals();showToast(gsText('save'));
  return true;
 }
