@@ -46,3 +46,26 @@ test('never accept candidate or approval SHA missing or malformed', () => {
   assert.equal(guard.evaluate({...approved(),candidateSha:'latest'}).allowed,false);
   assert.equal(guard.evaluate({...approved(), approvedSha:''}).allowed,false);
 });
+test('main execution handles gitText error correctly via mock git', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const cp = require('node:child_process');
+  const os = require('node:os');
+
+  const mockDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mockgit-'));
+  const mockGit = path.join(mockDir, 'git');
+
+  fs.writeFileSync(mockGit, '#!/usr/bin/env node\nconsole.error("fatal git error");\nprocess.exit(1);\n');
+  fs.chmodSync(mockGit, 0o755);
+
+  const env = { ...process.env, PATH: mockDir + path.delimiter + process.env.PATH };
+  const guardPath = path.resolve(__dirname, '../../tools/release_guard/guard.cjs');
+
+  const result = cp.spawnSync(process.execPath, [guardPath], { env, encoding: 'utf8' });
+
+  fs.rmSync(mockDir, { recursive: true, force: true });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /RELEASE BLOCKED: Cannot obtain exact Git evidence:/);
+  assert.match(result.stderr, /fatal git error/);
+});

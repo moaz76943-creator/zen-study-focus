@@ -48,3 +48,10 @@ test('invalid SHA or execution modes are rejected',()=>{
  assert.throws(()=>m.buildReport('.', {sourceSha:'HEAD'}),/SHA/i);
  assert.throws(()=>m.parseArgs(['--root','.','--mode','danger','--out','/tmp/a']),/mode/i);
 });
+test('readOverlay throws on malformed JSON',()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'df-maint-overlay-'));
+ fs.mkdirSync(path.join(dir,'docs/master_completion'),{recursive:true});
+ fs.writeFileSync(path.join(dir,'docs/master_completion/LEDGER_197.json'),'{malformed: json}');
+ assert.throws(()=>m.readOverlay(dir),SyntaxError);
+ fs.rmSync(dir,{recursive:true,force:true});
+});
