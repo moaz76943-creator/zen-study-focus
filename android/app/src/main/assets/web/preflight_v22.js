@@ -8,18 +8,32 @@
 })(typeof window !== 'undefined' ? window : globalThis, function (D) {
   'use strict';
   if (!D) throw new Error('Data compatibility contract must load before v22 preflight');
+  // A matching packet checksum does not prove that the decoded v21 data has
+  // the right shape. Read primary/mirror without altering either copy.
   function inspect(storage) {
     const pending = D.inspectPending(storage);
     if (pending.pending) return {ok:false, kind:'journal', detail:pending};
+    const snapshot = {cfg:{}, tasksList:[], notesList:[]};
     const issues = [];
-    for (const key of Object.values(D.KEYS)) {
+    for (const [slot, key] of Object.entries(D.KEYS)) {
       const primaryRaw = storage.getItem(key);
       const mirrorRaw = storage.getItem(key + '_mirror');
-      if (primaryRaw === null && mirrorRaw === null) continue; // untouched fresh install
-      if (!D.inspectPacket(primaryRaw).ok && !D.inspectPacket(mirrorRaw).ok)
+      if (primaryRaw === null && mirrorRaw === null) continue; // untouched install
+      const primary = D.inspectPacket(primaryRaw);
+      const mirror = D.inspectPacket(mirrorRaw);
+      if (!primary.ok && !mirror.ok) {
         issues.push(key + ': neither copy verifies');
+        continue;
+      }
+      const target = slot === 'cfg' ? 'cfg' : slot === 'tasks' ? 'tasksList' : 'notesList';
+      snapshot[target] = (primary.ok ? primary : mirror).value;
     }
-    return {ok:!issues.length,kind:issues.length?'data':'ready',issues};
+    // Preserve historical nonfatal warnings and unknown fields; refuse only
+    // schema errors, so malformed signed data cannot reach startup code.
+    for (const finding of D.inspectRecords(snapshot).issues) {
+      if (finding.severity === 'error') issues.push(finding.path + ': ' + finding.code);
+    }
+    return {ok:issues.length === 0, kind:issues.length ? 'data' : 'ready', issues};
   }
   function renderBlocked(document, storage, result) {
     if (!document || !document.body || document.getElementById('df22-startup-block')) return;
