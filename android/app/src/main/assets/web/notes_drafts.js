@@ -11,7 +11,21 @@ const NS_DRAFT_LANG={
  discard:'حذف المسودة',tooLong:'المسودة كبيرة جدًا للحفظ التلقائي. احفظ الملاحظة مباشرة.',restored:'تمت استعادة المسودة',
  cleared:'تم حذف المسودة',other:'توجد مسودة لملاحظة أخرى. افتحها أو انسخها قبل الاستبدال.'}
 };
-function nsDraftLabel(k){return (cfg.lang==='ar'?NS_DRAFT_LANG.ar:NS_DRAFT_LANG.en)[k];}
+function nsDraftLabel(k){
+ const lang=typeof cfg==='object'&&typeof cfg.lang==='string'?cfg.lang:'en';
+ const base=NS_DRAFT_LANG[lang.split(/[-_]/)[0]==='ar'?'ar':'en'][k]||NS_DRAFT_LANG.en[k]||k;
+ // New keys belong to Lane 01 registry; Lane 02 imports approved notes translations.
+ return globalThis.DF99Locale?.t(lang,'notes','draft_'+k,base)??base;
+}
+function nsRefreshDraftLabels(){
+ // Read-only UI update: never clear or rewrite unsaved draft data during locale switches.
+ const msg=document.getElementById('nsDraftStatus');
+ const status=msg?.dataset?.nsDraftStatus;
+ if(msg&&status)msg.textContent=nsDraftLabel(status);
+ const restore=document.getElementById('nsDraftRestore'),discard=document.getElementById('nsDraftDiscard');
+ if(restore)restore.textContent=nsDraftLabel('restore');
+ if(discard)discard.textContent=nsDraftLabel('discard');
+}
 function nsGetStoredDraft(){
  const d=loadFortressData(NS_DRAFT_KEY,null);
  if(!d||typeof d!=='object'||d.v!==1||typeof d.title!=='string'||typeof d.body!=='string')return null;
@@ -31,7 +45,7 @@ function nsDraftContextMatches(d){
 }
 function nsDraftState(status,offer){
  const msg=document.getElementById('nsDraftStatus'),restore=document.getElementById('nsDraftRestore'),discard=document.getElementById('nsDraftDiscard');
- if(msg)msg.textContent=status?nsDraftLabel(status):'';
+ if(msg){if(msg.dataset)msg.dataset.nsDraftStatus=status||'';msg.textContent=status?nsDraftLabel(status):'';}
  if(restore){restore.hidden=!offer;restore.textContent=nsDraftLabel('restore');}
  if(discard){discard.hidden=!offer;discard.textContent=nsDraftLabel('discard');}
 }
