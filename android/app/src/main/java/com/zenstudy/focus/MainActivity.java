@@ -210,6 +210,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 101 && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // A running countdown may have started before POST_NOTIFICATIONS was granted.
+            // Refresh its notification without touching its deadline or session state.
+            FocusAlarmReceiver.refreshLocale(this);
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         if (webView != null) {
             webView.evaluateJavascript("Boolean(window.handleAndroidBack && window.handleAndroidBack())", result -> { if (!"true".equals(result)) finish(); });
