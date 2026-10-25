@@ -79,7 +79,8 @@
     const marks=daily.map((d,i)=>{
       if(!(core.validDay(d.key)||/^\d{4}-(?:0[1-9]|1[0-2])$/.test(d.key))||typeof d.minutes!=='number'||!Number.isFinite(d.minutes)||d.minutes<0)throw new TypeError('Invalid bar value');
       const bh=extent*d.minutes/max,x=i*w+Math.max(.5,w*.1),barW=Math.max(.5,w*.8);
-      const label=esc(d.key+': '+d.minutes+' '+t.minuteUnit+', '+d.sessions+' '+t.sessions);
+      const sessionUnit=t.sessions===EN.sessions?'sessions':t.sessions;
+      const label=esc(d.key+': '+d.minutes+' '+t.minuteUnit+', '+d.sessions+' '+sessionUnit);
       return '<rect x="'+x.toFixed(2)+'" y="'+(bottom-bh).toFixed(2)+'" width="'+barW.toFixed(2)+'" height="'+bh.toFixed(2)+'" rx="'+Math.min(3,barW/2).toFixed(2)+'" fill="#2563eb" data-day="'+d.key+'" tabindex="0" role="button" aria-label="'+label+'"><title>'+label+'</title></rect>';
     }).join('');
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+esc(t.barAria)+'" class="dfa-svg"><line x1="0" x2="'+width+'" y1="'+bottom+'" y2="'+bottom+'" stroke="#cbd5e1"/>'+marks+'</svg>';
