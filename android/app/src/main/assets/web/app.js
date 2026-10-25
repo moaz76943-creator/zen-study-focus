@@ -2,13 +2,7 @@
 /* ========================================================
    DEEP FOCUS — SMOOTH ZERO-POPUP ACTIVITY SWITCHER (M190)
    ======================================================== */
-window.confirm = function(msg) {
-  // تجاوز رسائل التحذير عند تغيير النشاط أو الجلسة السريعة
-  if (msg && (msg.includes('تغيير النشاط') || msg.includes('الجلسة الحالية') || msg.includes('ending session'))) {
-    return true; // الموافقة الفورية السلسة دون إظهار نافذة المتصفح
-  }
-  return true;
-};
+// Use the native WebView confirmation result. Never auto-accept Cancel. Patient data and running sessions depend on this.
 
 
 /* ========================================================
@@ -99,12 +93,10 @@ const HabitFocusEngine = (function() {
     document.body.appendChild(modal);
 
     modal.querySelector('#df-extend-25m').onclick = () => {
+      // Reuse the existing session engine, including its Cancel logic.
+      if (!selectHomeQuickSession(25)) return;
       modal.remove();
-      // تشغيل وضع الـ 25 دقيقة مباشرة
-      const btn25 = document.querySelector('button:has-text("25m"), [data-mode="25"], [class*="pill"]:contains("25")') || Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('25m'));
-      if (btn25) btn25.click();
-      const playBtn = document.querySelector('.play-btn, #playBtn, [class*="play" i]');
-      if (playBtn) playBtn.click();
+      if (!timerRunning) toggleTimerPlay();
       if (window.triggerHaptic) window.triggerHaptic('start');
     };
 
