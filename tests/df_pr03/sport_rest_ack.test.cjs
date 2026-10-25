@@ -29,7 +29,7 @@ function fixture({running=true,training=true,consent=true,write='true'}={}){
     storeTimerSession(){events.push('unchecked-save');},renderQuickTraining(){events.push('render')},
     updateTimerDisplay(){events.push('display');},showToast:text=>toasts.push(String(text)),
     quickText:()=> 'Replacing the running timer discards progress. Continue?',
-    toWest:x=>String(x),cfg:{lang:'en'}
+    toWest:x=>String(x),L:()=>({saveFailed:'Save failed'}),cfg:{lang:'en'}
   };
   vm.createContext(context);vm.runInContext(actual,context);
   const state=()=>JSON.stringify({
