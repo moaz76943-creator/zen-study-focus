@@ -5297,3 +5297,73 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M217_VOCAB_QUIZ_STREAK_COUNTER_AND_CODE37_V1 === */
+(function() {
+  if (window.__M217_QUIZ_STREAK__) return;
+  window.__M217_QUIZ_STREAK__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  var currentStreak = 0;
+  var bestStreak = 0;
+  var STREAK_KEY = 'df_vocab_quiz_best_streak';
+  try {
+    bestStreak = parseInt(localStorage.getItem(STREAK_KEY), 10) || 0;
+  } catch(e) {}
+
+  window.dfRecordQuizAnswerStreak = function(isEasy) {
+    if (isEasy) {
+      currentStreak++;
+      if (currentStreak > bestStreak) {
+        bestStreak = currentStreak;
+        try {
+          localStorage.setItem(STREAK_KEY, String(bestStreak));
+        } catch(e) {}
+      }
+    } else {
+      currentStreak = 0;
+    }
+    updateStreakUI();
+    return { current: currentStreak, best: bestStreak };
+  };
+
+  window.dfGetQuizStreakData = function() {
+    return { current: currentStreak, best: bestStreak };
+  };
+
+  function updateStreakUI() {
+    if (typeof document === 'undefined') return;
+    var badge = document.getElementById('df-quiz-streak-badge');
+    if (!badge) return;
+    badge.innerHTML =
+      '<span style="color:#f59e0b;font-weight:700;">🔥 تتابع: <b>' + toWesternDigits(currentStreak) + '</b></span>' +
+      (bestStreak > 1 ? '<span style="color:#94a3b8;margin-right:6px;font-size:11px;">(أفضل: ' + toWesternDigits(bestStreak) + ')</span>' : '');
+  }
+
+  function mountStreakUI() {
+    if (typeof document === 'undefined') return;
+    var toolbar = document.getElementById('df-quiz-extra-toolbar') ||
+                  document.getElementById('df-flash-quiz-header');
+    if (!toolbar || document.getElementById('df-quiz-streak-badge')) return;
+
+    var badge = document.createElement('span');
+    badge.id = 'df-quiz-streak-badge';
+    badge.style.cssText = 'display:inline-flex;align-items:center;padding:4px 8px;border-radius:8px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);font-size:12px;margin:2px 4px;';
+    toolbar.appendChild(badge);
+    updateStreakUI();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountStreakUI);
+    } else {
+      setTimeout(mountStreakUI, 350);
+    }
+    setInterval(mountStreakUI, 2500);
+  }
+})();
+
