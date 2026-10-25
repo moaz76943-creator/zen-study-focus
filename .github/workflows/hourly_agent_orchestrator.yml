@@ -17,6 +17,8 @@ on:
       - 'tools/daily_maintenance/canonical_source.cjs'
       - 'tests/daily_maintenance/hourly_*.test.cjs'
       - 'tests/daily_maintenance/canonical_source.test.cjs'
+      - 'tests/daily_maintenance/official_source_guard.test.cjs'
+      - 'tools/daily_maintenance/official_source_guard.cjs'
       - 'AGENTS.md'
       - '.github/agents/**'
       - 'docs/daily_maintenance/HOURLY_COORDINATION.md'
@@ -39,8 +41,9 @@ jobs:
           node-version: '22'
       - name: Test hourly coordination contracts
         run: |
+          node --check tools/daily_maintenance/official_source_guard.cjs
           node --check tools/daily_maintenance/hourly_orchestrator.cjs
-          node --test tests/daily_maintenance/hourly_*.test.cjs tests/daily_maintenance/canonical_source.test.cjs
+          node --test tests/daily_maintenance/hourly_*.test.cjs tests/daily_maintenance/canonical_source.test.cjs tests/daily_maintenance/official_source_guard.test.cjs
   hourly-source-audit:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -49,32 +52,40 @@ jobs:
       contents: read
       issues: write
     env:
-      SOURCE_REF: ${{ inputs.target == 'main' && 'main' || 'integration/master-recovery-20261021' }}
+      SOURCE_REF: ${{ inputs.target == 'main' && 'main' || 'integration/master-qa-verified-v21' }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.repository.default_branch }}
           path: automation
           persist-credentials: false
-      - name: Pin active PR #138 source head before checkout
-        if: env.SOURCE_REF == 'integration/master-recovery-20261021'
+      - name: Resolve and pin official source HEAD
         id: resolve
         uses: actions/github-script@v7
         env:
           SOURCE_REF: ${{ env.SOURCE_REF }}
         with:
           script: |
-            const policy = require('./automation/tools/daily_maintenance/canonical_source.cjs');
-            const {data} = await github.rest.pulls.get({owner:context.repo.owner,repo:context.repo.repo,pull_number:policy.CANONICAL_PR});
-            core.setOutput('sha',policy.verifyCanonicalPr(data,context.repo.owner+'/'+context.repo.repo,process.env.SOURCE_REF));
+            const {data}=await github.rest.git.getRef({owner:context.repo.owner,repo:context.repo.repo,ref:'heads/'+process.env.SOURCE_REF});
+            if(!/^[a-f0-9]{40}$/i.test(data?.object?.sha||''))throw Error('Source ref cannot be resolved');
+            core.setOutput('sha',data.object.sha);
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.resolve.outputs.sha || env.SOURCE_REF }}
+          ref: ${{ steps.resolve.outputs.sha }}
           path: source
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify checked-out SHA against latest source HEAD
+        id: source_guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/hourly"
+          checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
+          live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
+          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/hourly"
       - name: Coordinate 3 source agents on exact checked-out SHA
         id: cohort
         continue-on-error: true
@@ -84,6 +95,16 @@ jobs:
           mkdir -p "$RUNNER_TEMP/hourly"
           git -C source rev-parse HEAD > "$RUNNER_TEMP/hourly/SOURCE_SHA"
           node automation/tools/daily_maintenance/hourly_orchestrator.cjs --root source --out "$RUNNER_TEMP/hourly"
+      - name: Recheck checked-out SHA against latest source HEAD
+        id: source_recheck
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/hourly"
+          checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
+          live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
+          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/hourly"
       - name: Write reviewable source evidence
         if: always()
         shell: bash
@@ -101,6 +122,7 @@ jobs:
           REPORT_JSON: ${{ runner.temp }}/hourly/hourly-agents.json
           CHECKED_SHA: ${{ runner.temp }}/hourly/SOURCE_SHA
           SOURCE_REF: ${{ env.SOURCE_REF }}
+          SOURCE_RECHECK: ${{ steps.source_recheck.outcome }}
         with:
           script: |
             const fs = require('node:fs');
@@ -110,18 +132,14 @@ jobs:
             const sha = read(process.env.CHECKED_SHA)?.trim() || 'NOT_VERIFIED';
             // The issue-write operation reads only generated source evidence, never executes it.
             const ledger = require('./automation/tools/daily_maintenance/cohort_ledger.cjs');
-            const issues = await github.paginate(github.rest.issues.listForRepo, {owner, repo, state:'open', per_page:100});
-            const old = issues.find(i => !i.pull_request && i.title === title);
+            const {data:old}=await github.rest.issues.get({owner,repo,issue_number:69});
+            if(old.number!==69||old.title!==title||old.state!=='open'||old.pull_request)throw Error('Canonical Issue #69 invalid; no duplicate may be created');
             const previous = ledger.parseIssueLedger(old?.body);
             let result, state = null;
             try {
               const report = JSON.parse(fs.readFileSync(process.env.REPORT_JSON, 'utf8'));
+              if (process.env.SOURCE_RECHECK !== 'success') throw Error('Live official HEAD verification failed');
               if (report.source_sha !== sha) throw Error('Checked source SHA does not match cycle evidence');
-              if (process.env.SOURCE_REF === 'integration/master-recovery-20261021') {
-                const policy = require('./automation/tools/daily_maintenance/canonical_source.cjs');
-                const {data} = await github.rest.pulls.get({owner,repo,pull_number:policy.CANONICAL_PR});
-                policy.verifyCanonicalPr(data,owner+'/'+repo,process.env.SOURCE_REF,sha);
-              }
               state = ledger.aggregate(previous, report);
               result = ledger.toMarkdown(state) + '\n' + ledger.serialize(state);
             } catch (err) {
@@ -135,9 +153,7 @@ jobs:
               '\nNo Android E2E evidence, automatic source modifications or release approval.';
             core.summary.addRaw(state ? ledger.toMarkdown(state) : 'NOT_VERIFIED: hourly source evidence incomplete.');
             await core.summary.write();
-            if (old) {
-              if (old.body !== body) await github.rest.issues.update({owner,repo,issue_number:old.number,body});
-            } else await github.rest.issues.create({owner,repo,title,body});
+            if (old.body !== body) await github.rest.issues.update({owner,repo,issue_number:old.number,body});
       - uses: actions/upload-artifact@v4
         if: always()
         with:
