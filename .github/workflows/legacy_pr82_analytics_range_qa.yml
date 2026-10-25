@@ -1,0 +1,27 @@
+name: Legacy PR82 analytics date and CSV safety (QA-only)
+on:
+  push:
+    branches:
+      - integration/legacy-pr82-range-20261026
+  pull_request:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - 'android/app/src/main/assets/web/analytics_studio.js'
+      - 'tests/analytics_core/**'
+      - '.github/workflows/legacy_pr82_analytics_range_qa.yml'
+permissions:
+  contents: read
+jobs:
+  analytics-invalid-range:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test legacy PR82 invalid-range safety and current analytics studio
+        run: node --test tests/analytics_core/*.test.cjs
+      - name: Source syntax
+        run: node --check android/app/src/main/assets/web/analytics_studio.js
