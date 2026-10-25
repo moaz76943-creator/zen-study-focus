@@ -16,37 +16,17 @@ const HabitFocusEngine = (function() {
     };
   }
 
+  // One source of truth: cfg.streak is calculated from real v21 sessionHistory.
   function getStreakData() {
-    const s = getSafeStorage();
-    const count = parseInt(s.getItem('df_streak_count') || '1', 10);
-    const lastDate = s.getItem('df_streak_last_date') || new Date().toISOString().slice(0, 10);
-    return { count, lastDate };
+    const count = typeof cfg === 'object' && Number.isFinite(cfg.streak)
+      ? Math.max(0, Math.floor(cfg.streak)) : 0;
+    return { count, lastDate: typeof localDateISO === 'function' ? localDateISO() : '' };
   }
 
+  // Compatibility API: never manufacture a second, unrelated streak counter.
   function recordSessionForStreak() {
-    const s = getSafeStorage();
-    const today = new Date().toISOString().slice(0, 10);
-    const current = getStreakData();
-
-    if (current.lastDate === today) {
-      return current.count;
-    }
-
-    const last = new Date(current.lastDate);
-    const now = new Date(today);
-    const diffDays = Math.ceil(Math.abs(now - last) / (1000 * 60 * 60 * 24));
-
-    let newCount = current.count;
-    if (diffDays === 1) {
-      newCount += 1;
-    } else if (diffDays > 1) {
-      newCount = 1;
-    }
-
-    s.setItem('df_streak_count', newCount.toString());
-    s.setItem('df_streak_last_date', today);
     updateStreakUI();
-    return newCount;
+    return getStreakData().count;
   }
 
   function updateStreakUI() {
@@ -68,7 +48,7 @@ const HabitFocusEngine = (function() {
     badge.innerHTML = `
       <span class="text-sm">🔥</span>
       <span id="df-streak-badge-count" style="font-variant-numeric: lining-nums;">${streak}</span>
-      <span class="text-amber-700 font-semibold">Days Streak</span>
+      <span id="df-streak-label" class="text-amber-700 font-semibold">${L().daysUnit}</span>
     `;
 
     header.insertBefore(badge, header.firstChild);
@@ -117,7 +97,11 @@ window.HabitFocusEngine = HabitFocusEngine;
 
 document.addEventListener('DOMContentLoaded', () => {
   HabitFocusEngine.injectStreakBadge();
-  const obs = new MutationObserver(HabitFocusEngine.injectStreakBadge);
+  if (document.getElementById('df-streak-badge')) return;
+  const obs = new MutationObserver(() => {
+    HabitFocusEngine.injectStreakBadge();
+    if (document.getElementById('df-streak-badge')) obs.disconnect();
+  });
   obs.observe(document.body, { childList: true, subtree: true });
 });
 
@@ -2401,6 +2385,10 @@ function syncHeaderMetrics() {
   const d = L();
   document.getElementById('hdrFocusMins').textContent = toWest(cfg.todayMins);
   document.getElementById('hdrStreakBadge').textContent = toWest(`↑ 🔥 ${cfg.streak} ${d.daysUnit}`);
+  const streakCounter = document.getElementById('df-streak-badge-count');
+  if (streakCounter) streakCounter.textContent = toWest(cfg.streak);
+  const streakLabel = document.getElementById('df-streak-label');
+  if (streakLabel) streakLabel.textContent = d.daysUnit;
   document.getElementById('orbWaterTxt').textContent = toWest(`${d.waterWord} ${cfg.water}/8`);
   document.getElementById('sportSetCounterTxt').textContent = toWest(`🏋️ ${d.domSport} ${cfg.sets || 0}/4 • 12×`);
   document.getElementById('readPagesCounterTxt').textContent = toWest(`📖 ${d.domRead} ${cfg.pagesRead || 0}`);
