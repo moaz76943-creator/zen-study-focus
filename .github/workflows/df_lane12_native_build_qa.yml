@@ -1,0 +1,44 @@
+name: DF-LANE-12 Native Android i18n source and build QA
+on:
+  push:
+    branches: [lane12/native-android-i18n-20261025]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+permissions:
+  contents: read
+jobs:
+  native-i18n:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Validate localized resources and native consent source
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests/i18n/native_android -p 'test_*.py' -v
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install SDK platform and build tools for compileSdk 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Compile non-release Android debug APK at exact checked-out source
+        working-directory: android
+        run: gradle :app:assembleDebug --no-daemon
+      - name: Verify built artifact exists, no production signing
+        run: |
+          set -euo pipefail
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
+          echo 'ANDROID_RUNTIME_NOT_TESTED'
+          echo 'RELEASE_APPROVED=NO'
