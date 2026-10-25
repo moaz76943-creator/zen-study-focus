@@ -68,6 +68,14 @@ test('language source audit marks missing translations, unlocalized markup, and 
  assert.equal(q.readLocaleAudit(path.join(root,'missing')).status,'NOT_TESTED');
 }));
 
+test('language source audit falls back to NOT_TESTED for invalid JSON report',()=>fixture(root=>{
+ const out=path.join(root,'report');fs.mkdirSync(path.join(out,'locales'),{recursive:true});
+ fs.writeFileSync(path.join(out,'locales/coverage.json'),'{ invalid json ');
+ const metrics=q.readLocaleAudit(out);
+ assert.equal(metrics.status,'NOT_TESTED');
+ assert.match(metrics.reason,/Unable to parse locale report/);
+}));
+
 test('TAP parser requires real counted pass/fail/skips/todo evidence',()=>{
  assert.equal(q.parseNodeTap('not TAP'),null);
  assert.equal(q.parseNodeTap('TAP version 13\n1..0'),null);
@@ -111,6 +119,15 @@ test('media license gate remains excluded from source-green cohorts without losi
  assert.deepEqual(q.discoverTests(root,['tests/master_recovery_qa']),['tests/master_recovery_qa/source_contracts.test.cjs']);
  assert.throws(()=>q.discoverTests(root,['tests']),/Unsafe test_dirs/);}));
 
+test('suite inventory failure adds a BLOCKED agent instead of crashing',()=>fixture(root=>{
+ fs.mkdirSync(path.join(root,'tests/localization_20'),{recursive:true});
+ fs.symlinkSync(os.tmpdir(),path.join(root,'tests/escape'));
+ const report=q.runAgents(root,good,{sourceSha:'f'.repeat(40),lane:'all',execute:()=>({status:0,stdout:''})});
+ const inventory=report.agents.find(a=>a.id==='suite_inventory');
+ assert.ok(inventory);
+ assert.equal(inventory.status,'BLOCKED');
+ assert.match(inventory.reason,/Cannot inventory tests/);
+}));
 test('agent manifest rejects duplicate and ancestor directory ownership before executing',()=>{
  for(const conflict of [['tests/localization_20','tests/localization_20'],['tests/localization_20','tests/localization_20/sub']]){
   const m={schema_version:1,agents:[

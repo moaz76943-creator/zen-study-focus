@@ -10,17 +10,23 @@ on:
         default: integration
         options: [integration, main]
   pull_request:
-    branches: [main]
+    branches: [main, 'qa/hourly-agent-recovery-20261022']
     paths:
       - '.github/workflows/hourly_agent_orchestrator.yml'
       - 'tools/daily_maintenance/hourly_orchestrator.cjs'
+      - 'tools/daily_maintenance/cohort_ledger.cjs'
+      - 'tools/daily_maintenance/agents.json'
+      - 'tools/daily_maintenance/quality_agents.cjs'
       - 'tools/daily_maintenance/canonical_source.cjs'
-      - 'tests/daily_maintenance/hourly_*.test.cjs'
-      - 'tests/daily_maintenance/canonical_source.test.cjs'
-      - 'tests/daily_maintenance/official_source_guard.test.cjs'
+      - 'tools/daily_maintenance/hourly_issue_target.cjs'
       - 'tools/daily_maintenance/official_source_guard.cjs'
       - 'tools/daily_maintenance/hourly_audit_cache.cjs'
+      - 'tests/daily_maintenance/official_source_guard.test.cjs'
       - 'tests/daily_maintenance/hourly_audit_cache.test.cjs'
+      - 'tests/daily_maintenance/hourly_*.test.cjs'
+      - 'tests/daily_maintenance/hourly_evidence_integrity.test.cjs'
+      - 'tests/daily_maintenance/agent_coverage_latest.test.cjs'
+      - 'tests/daily_maintenance/canonical_source.test.cjs'
       - 'AGENTS.md'
       - '.github/agents/**'
       - 'docs/daily_maintenance/HOURLY_COORDINATION.md'
@@ -46,7 +52,8 @@ jobs:
           node --check tools/daily_maintenance/official_source_guard.cjs
           node --check tools/daily_maintenance/hourly_audit_cache.cjs
           node --check tools/daily_maintenance/hourly_orchestrator.cjs
-          node --test tests/daily_maintenance/hourly_*.test.cjs tests/daily_maintenance/canonical_source.test.cjs tests/daily_maintenance/official_source_guard.test.cjs tests/daily_maintenance/hourly_audit_cache.test.cjs
+          node --check tools/daily_maintenance/cohort_ledger.cjs
+          node --test tests/daily_maintenance/hourly_*.test.cjs tests/daily_maintenance/canonical_source.test.cjs tests/daily_maintenance/agent_coverage_latest.test.cjs tests/daily_maintenance/official_source_guard.test.cjs tests/daily_maintenance/hourly_audit_cache.test.cjs
   hourly-source-audit:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -62,7 +69,7 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
           path: automation
           persist-credentials: false
-      - name: Resolve and pin official source HEAD
+      - name: Resolve and pin exact requested source HEAD
         id: resolve
         uses: actions/github-script@v7
         env:
@@ -82,7 +89,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify checked-out SHA against latest source HEAD
+      - name: Verify exact hourly source SHA
         id: source_guard
         shell: bash
         run: |
@@ -90,8 +97,10 @@ jobs:
           mkdir -p "$RUNNER_TEMP/hourly"
           checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
           live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
-          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/hourly"
-      - name: Avoid repeating recent known failed QA on unchanged exact SHA
+          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/hourly" || {
+            exit 1
+          }
+      - name: Avoid repeating recent blocked SHA audits
         if: github.event_name == 'schedule'
         id: cachecheck
         uses: actions/github-script@v7
@@ -111,7 +120,7 @@ jobs:
             const plan=planKnownFailureSkip(previous,process.env.PINNED_SHA,fingerprint);
             if(plan.skip){
               core.setOutput('skip','true');
-              core.summary.addRaw('KNOWN_FAILURE_UNCHANGED_SOURCE — SHA '+plan.source_sha+' still '+plan.previous_status+'; no new PASS; details in Issue #69.');
+              core.summary.addRaw('KNOWN_FAILURE_UNCHANGED_SOURCE — SHA '+plan.source_sha+' remains '+plan.previous_status+'; no new PASS.');
               await core.summary.write();
             }
       - name: Coordinate 3 source agents on exact checked-out SHA
@@ -124,7 +133,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/hourly"
           git -C source rev-parse HEAD > "$RUNNER_TEMP/hourly/SOURCE_SHA"
           node automation/tools/daily_maintenance/hourly_orchestrator.cjs --root source --out "$RUNNER_TEMP/hourly"
-      - name: Recheck checked-out SHA against latest source HEAD
+      - name: Recheck exact hourly source SHA
         id: source_recheck
         if: always()
         shell: bash
@@ -133,7 +142,9 @@ jobs:
           mkdir -p "$RUNNER_TEMP/hourly"
           checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
           live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
-          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/hourly"
+          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/hourly" || {
+            exit 1
+          }
       - name: Write reviewable source evidence
         if: always()
         shell: bash
@@ -141,7 +152,7 @@ jobs:
           if test -f "$RUNNER_TEMP/hourly/hourly-agents.md"; then
             cat "$RUNNER_TEMP/hourly/hourly-agents.md" >> "$GITHUB_STEP_SUMMARY"
           elif [[ '${{ steps.cachecheck.outputs.skip }}' == 'true' ]]; then
-            echo 'KNOWN_FAILURE_UNCHANGED_SOURCE: source still blocked according to Issue #69; no new PASS or expensive repeat.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'KNOWN_FAILURE_UNCHANGED_SOURCE: no new PASS; see Issue #69' >> "$GITHUB_STEP_SUMMARY"
           else
             echo 'Hourly source audit NOT_TESTED: checkout or execution failed; no source PASS.' >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -163,13 +174,13 @@ jobs:
             const sha = read(process.env.CHECKED_SHA)?.trim() || 'NOT_VERIFIED';
             // The issue-write operation reads only generated source evidence, never executes it.
             const ledger = require('./automation/tools/daily_maintenance/cohort_ledger.cjs');
-            const {data:old}=await github.rest.issues.get({owner,repo,issue_number:69});
-            if(old.number!==69||old.title!==title||old.state!=='open'||old.pull_request)throw Error('Canonical Issue #69 invalid; no duplicate may be created');
+            const {resolveHourlyIssue} = require('./automation/tools/daily_maintenance/hourly_issue_target.cjs');
+            const old = await resolveHourlyIssue(github, {owner,repo});
             const previous = ledger.parseIssueLedger(old?.body);
             let result, state = null;
             try {
               const report = JSON.parse(fs.readFileSync(process.env.REPORT_JSON, 'utf8'));
-              if (process.env.SOURCE_RECHECK !== 'success') throw Error('Live official HEAD verification failed');
+              if (process.env.SOURCE_RECHECK !== 'success') throw Error('Official HEAD SHA check did not pass');
               if (report.source_sha !== sha) throw Error('Checked source SHA does not match cycle evidence');
               state = ledger.aggregate(previous, report);
               result = ledger.toMarkdown(state) + '\n' + ledger.serialize(state);

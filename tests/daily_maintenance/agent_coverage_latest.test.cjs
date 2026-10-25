@@ -71,3 +71,10 @@ test('12 agents retain a unique owner and reviewed scope for new PR #138 suites'
   assert.deepEqual(holders,[owner],'exactly one reviewed source test owner for '+file);
  }
 });
+
+// Regression for the live PR #138 hourly-agent ledger COVERAGE_GAP (Issue #69).
+test('TRACK16 staged timer tick lifecycle suite has one timer specialist owner',()=>{
+ const file='tests/track05_timer/tick_lifecycle.test.cjs';
+ const owners=manifest.agents.filter(a=>a.test_dirs.some(d=>file.startsWith(d+'/'))).map(a=>a.id);
+ assert.deepEqual(owners,['timer'],'a staged timer regression must not be unmapped or double-owned');
+});
