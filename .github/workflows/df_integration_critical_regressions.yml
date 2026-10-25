@@ -1,0 +1,51 @@
+name: Deep Focus critical integration source regressions
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/quick_training.js'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/preflight_v22.js'
+      - 'android/app/src/main/assets/web/data_compat_v21.js'
+      - 'android/app/build.gradle'
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'tests/i18n/quick_training/**'
+      - 'tests/i18n/timer/**'
+      - 'tests/integration_quality/immutable_package_id.test.cjs'
+      - '.github/workflows/df_integration_critical_regressions.yml'
+  push:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/quick_training.js'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/preflight_v22.js'
+      - 'android/app/src/main/assets/web/data_compat_v21.js'
+      - 'android/app/build.gradle'
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'tests/i18n/quick_training/**'
+      - '.github/workflows/df_integration_critical_regressions.yml'
+permissions:
+  contents: read
+jobs:
+  source-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source integrity
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node --check android/app/src/main/assets/web/app.js
+          node --check android/app/src/main/assets/web/quick_training.js
+      - name: Actual 99 Quick Training packs and transition regression
+        run: node --test tests/i18n/quick_training/*.test.cjs
+      - name: Actual timer consent and stale tick regression
+        run: node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/track05_timer/tick_lifecycle.test.cjs
+      - name: Application identity and read-only v21 startup guard
+        run: node --test tests/integration_quality/immutable_package_id.test.cjs tests/security_recovery/legacy_preflight_schema.test.cjs
