@@ -407,8 +407,10 @@ if (typeof window !== "undefined" && window.DF22Preflight && !window.DF22Preflig
    ======================================================== */
 // Render system numbers as Western digits across supported writing systems.
 // This is display normalization; it does not rewrite v21 storage records.
+const ARABIC_ZERO_OFFSET = 1632;
+const PERSIAN_ZERO_OFFSET = 1776;
 const WESTERN_DIGIT_ZERO_POINTS = Object.freeze([
-  0x0660, 0x06f0, 0x07c0, 0x0966, 0x09e6, 0x0a66, 0x0ae6,
+  ARABIC_ZERO_OFFSET, PERSIAN_ZERO_OFFSET, 0x07c0, 0x0966, 0x09e6, 0x0a66, 0x0ae6,
   0x0b66, 0x0be6, 0x0c66, 0x0ce6, 0x0d66, 0x0de6,
   0x0e50, 0x0ed0, 0x0f20, 0x1040, 0x1090, 0x17e0, 0x1810, 0xff10
 ]);
@@ -2825,7 +2827,7 @@ function renderSelectedDateAgenda() {
   dayTasks.forEach(t => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
+    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>`;
     box.appendChild(item);
   });
 
@@ -3131,7 +3133,8 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => soundCat === 'all' || s.cat === soundCat).forEach(s => {
+  for (const s of SOUNDS_DATA) {
+    if (soundCat !== 'all' && s.cat !== soundCat) continue;
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
     const tile = document.createElement('div');
@@ -3149,7 +3152,7 @@ function renderSoundsStudio() {
       </div>
     `;
     box.appendChild(tile);
-  });
+  }
 }
 
 /* ========================================================
