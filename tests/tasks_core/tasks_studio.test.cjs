@@ -58,3 +58,56 @@ test('legacy undated tasks render and search remains read-only',()=>{
  assert.equal(commits,0);assert.deepEqual(state,before);assert.equal(Object.hasOwn(state.tasksList[1],'date'),false);
  studio.destroy();
 });
+
+
+test('PR160: failed durable task ACK preserves the editor draft and retries without double commit', () => {
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[
+  {id:91,title:'Stored title',date:'2026-10-19',catKey:'study',done:false,custom:{keep:1}}
+ ]};
+ const before=JSON.parse(JSON.stringify(state));
+ let attempts=0,commits=0,acknowledged=false,changed=0;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,19),
+  readState:()=>JSON.parse(JSON.stringify(state)),
+  commit(old,next){
+   attempts++;
+   assert.deepEqual(old,state);
+   if(!acknowledged)return false;
+   state=JSON.parse(JSON.stringify(next));commits++;return true;
+  },
+  onAfterChange(){changed++;}
+ });
+ const edit=root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Edit');
+ assert.ok(edit);edit.dispatch('click');
+ const form=root.descendants.find(x=>x.tagName==='FORM'&&x.className==='df-form');
+ assert.ok(form);
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ assert.ok(title);title.value='Uncommitted draft';
+ form.dispatch('submit');
+ assert.equal(attempts,1);assert.equal(commits,0);assert.equal(changed,0);
+ assert.deepEqual(state,before);
+ assert.equal(title.value,'Uncommitted draft');
+ assert.ok(root.descendants.includes(form),'failed ACK must not destroy editor');
+ acknowledged=true;
+ form.dispatch('submit');
+ assert.equal(commits,1);assert.equal(changed,1);
+ assert.equal(state.tasksList[0].title,'Uncommitted draft');
+ assert.deepEqual(state.tasksList[0].custom,{keep:1});
+ form.dispatch('submit'); // Detached form must not commit twice.
+ assert.equal(attempts,2);assert.equal(commits,1);
+ studio.destroy();
+});
+
+test('PR160: successful synchronous legacy adapter with undefined return commits once', () => {
+ const f=fixture();
+ const edit=f.root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Edit');
+ assert.ok(edit);edit.dispatch('click');
+ const form=f.root.descendants.find(x=>x.tagName==='FORM'&&x.className==='df-form');
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ title.value='Edited once';
+ form.dispatch('submit');
+ form.dispatch('submit');
+ assert.equal(f.commits(),1);
+ assert.equal(f.get().tasksList[0].title,'Edited once');
+ f.studio.destroy();
+});

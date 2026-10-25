@@ -61,17 +61,19 @@
     if(JSON.stringify(old)===JSON.stringify(next))return;
     const committed=adapter.commit(old,next);
     if(committed && typeof committed.then==='function')throw new Error('Only synchronous commit supported');
+    if(committed === false)throw new Error('Task change was not durably acknowledged');
     undoStack.push(old);if(undoStack.length>20)undoStack.shift();redoStack=[];state=next;
     if(typeof adapter.onAfterChange==='function')adapter.onAfterChange(state);
     editing=null;render();
-   }catch(e){error(e);}
+    return true;
+   }catch(e){error(e);return false;}
   }
   function timeTravel(from,to){
    if(!from.length)return;
    const latest=adapter.readState();
    if(JSON.stringify(latest)!==JSON.stringify(state)){state=latest;undoStack=[];redoStack=[];render();return;}
    const next=from[from.length-1];
-   try{const r=adapter.commit(state,next);if(r&&typeof r.then==='function')throw new Error('Only synchronous commit supported');
+   try{const r=adapter.commit(state,next);if(r&&typeof r.then==='function')throw new Error('Only synchronous commit supported');if(r===false)throw new Error('Task undo/redo not acknowledged');
     from.pop();to.push(state);state=next;editing=null;if(typeof adapter.onAfterChange==='function')adapter.onAfterChange(state);render();
    }catch(e){error(e);}
   }
@@ -136,8 +138,10 @@
    append(form,label(l.do,important),label(l.delegate,urgent));
    const actions=el('div','df-actions');append(actions,btn(l.cancel,()=>{editing=null;render();}));
    const save=btn(l.save,()=>{} ,'df-primary');save.type='submit';actions.appendChild(save);form.appendChild(actions);
+   let submitted=false;
    form.addEventListener('submit',e=>{
     e.preventDefault();
+    if(submitted||isDestroyed)return;
     const noteTokens=notes.value.trim()?notes.value.split(',').map(x=>x.trim()):[];
     if(noteTokens.some(x=>!/^(0|[1-9]\d*)$/.test(x))){error(new Error('Numeric note IDs required'));return;}
     const fields={title:title.value,description:description.value,date:due.value,dueTime:dueTime.value||null,
@@ -158,9 +162,9 @@
       if(k==='date'&&!due.value)continue; // Core v21 cannot clear a date.
       patch[k]=fields[k];
      }
-     if(!Object.keys(patch).length){editing=null;render();return;}
-     apply(s=>C.updateTask(s,t.id,patch,{noteIds:adapter.noteIds?.()}));
-    }else apply(s=>C.createTask(s,fields,{noteIds:adapter.noteIds?.()}));
+     if(!Object.keys(patch).length){submitted=true;editing=null;render();return;}
+     if(apply(s=>C.updateTask(s,t.id,patch,{noteIds:adapter.noteIds?.()})))submitted=true;
+    }else if(apply(s=>C.createTask(s,fields,{noteIds:adapter.noteIds?.()})))submitted=true;
    });
    panel.appendChild(form);return panel;
   }
