@@ -2784,6 +2784,7 @@ function renderCalendar() {
     weekdayRow.appendChild(label);
   });
 
+
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
   const grid = document.getElementById('calDaysGrid');
