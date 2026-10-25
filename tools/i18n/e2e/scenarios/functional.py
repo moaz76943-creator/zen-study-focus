@@ -14,7 +14,7 @@ import time
 import unicodedata
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import android_device as device  # runtime primitives owned by lane A; never modified here
 
@@ -159,19 +159,19 @@ def timer_start_pause_resume(a, token):
 
 
 def timer_reset_consent(a, token):
-    a.ensure_timer()
+    initial = a.ensure_timer()
     a.tap("Start or pause timer")
     time.sleep(2)
     active = a.clock()
     a.tap("↺", exact=True)
     a.choose_confirm(False)
     after_cancel = a.clock()
-    if after_cancel > active or after_cancel == 25 * 60:
+    if after_cancel > active or (active < initial and after_cancel == initial):
         raise AssertionError("Cancel reset unexpectedly rewound the timer")
     a.tap("↺", exact=True)
     a.choose_confirm(True)
     after_reset = a.clock()
-    if after_reset <= active:
+    if abs(after_reset - initial) > 1 or after_reset <= active:
         raise AssertionError("Confirmed reset did not restore initial duration")
     time.sleep(2)
     assert_stable(after_reset, a.clock())
@@ -202,7 +202,7 @@ def notes_create_search_relaunch(a, token):
     a.tap("Notes")
     if a.has(title):
         raise AssertionError("test note already exists; isolation failed")
-    a.tap("New note", exact=True)
+    a.tap("＋ New note", exact=True)
     a.field("Title or question", title)
     a.field("Write here", body)
     a.tap("Save", exact=True)
