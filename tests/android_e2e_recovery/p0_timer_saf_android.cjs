@@ -146,13 +146,13 @@ async function waitForSavedBackup(expectedCode){
 function stageImportFixtureInMediaStore(name,code){
  // Stage bytes in disposable external storage, then ask Android MediaScanner
  // to index the *actual* file. A blank shell content insert is not a file.
- if(!/^p0-saf-[a-z-]+\\.txt$/.test(name))throw Error('TRANSPORT: fixture filename rejected');
+ if(!/^p0-saf-[a-z-]+\.txt$/.test(name))throw Error('TRANSPORT: fixture filename rejected');
  const device='/sdcard/Download/'+name;
  const host=require('node:os').tmpdir()+'/df-pr01-saf-'+process.pid+'.txt';
  try {
   fs.writeFileSync(host,code,'utf8');
   cp.execFileSync('adb',['-s','emulator-5554','push',host,device],{timeout:25000,stdio:'ignore'});
-  const remoteHash=adb('shell','sha256sum',device).split(/\\s+/)[0];
+  const remoteHash=adb('shell','sha256sum',device).split(/\s+/)[0];
   const expectedHash=require('node:crypto').createHash('sha256').update(code,'utf8').digest('hex');
   assert.equal(remoteHash,expectedHash,'Actual disposable on-device backup fixture bytes differ');
   try{adb('shell','am','broadcast','-a','android.intent.action.MEDIA_SCANNER_SCAN_FILE','-d','file://'+device);}catch(_){}
