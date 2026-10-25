@@ -7,7 +7,7 @@ const TSET_I18N = {
      'التركيز · دقائق','الراحة القصيرة · دقائق','الراحة الطويلة · دقائق','جلسات كل دورة','الافتراضي','حفظ',
      'أدخل أعدادًا صحيحة ضمن النطاقات المحددة.','تم حفظ الإعدادات']
 };
-function tsetText(i){return TSET_I18N[cfg.lang==='ar'?'ar':'en'][i];}
+function tsetText(i){const base=TSET_I18N[cfg.lang==='ar'?'ar':'en'][i];return globalThis.DF99Locale?.t(cfg.lang,'timer',String(i),base) ?? base;}
 let tsetEditingDomain = null;
 function tsetCount(){return Number.isInteger(cfg.roundsPerCycle)&&cfg.roundsPerCycle>=1&&cfg.roundsPerCycle<=12?cfg.roundsPerCycle:4;}
 function refreshTimerSettings(){

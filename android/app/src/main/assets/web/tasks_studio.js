@@ -19,7 +19,7 @@
   if(!C)throw new Error('tasks_core_v21.js must be loaded first');
   if(!target||typeof target.appendChild!=='function')throw new TypeError('DOM target required');
   if(!adapter||typeof adapter.readState!=='function'||typeof adapter.commit!=='function')throw new TypeError('readState/commit adapter required');
-  const doc=target.ownerDocument,ar=adapter.locale==='ar',l=labels[ar?'ar':'en'];
+  const doc=target.ownerDocument,ar=adapter.locale==='ar',l=globalThis.DF99Locale?.section('tasks',adapter.locale,labels[ar?'ar':'en']) || labels[ar?'ar':'en'];
   let state=adapter.readState(),undoStack=[],redoStack=[],view='all',editing=null,category='',query='',day='',status='',isDestroyed=false;
   const currentDay=()=>dateLocal(typeof adapter.now==='function'?adapter.now():new Date());
   const el=(tag,cls,text)=>{const x=doc.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=String(text);return x;};
