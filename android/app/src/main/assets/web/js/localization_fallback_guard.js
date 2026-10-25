@@ -1,13 +1,13 @@
 /**
  * DEEP FOCUS — locale fallback, direction and safe language-state boundary.
- * Catalog synced with global_i18n_registry.js (100 entries excluding Hebrew).
+ * Catalog aligned with the authoritative 99-entry app.js LANG_CATALOG (not legacy registry).
  * This guard never traverses text nodes or rewrites content entered by a user.
  */
 (function (global) {
   'use strict';
-  const SUPPORTED_LOCALES = Object.freeze(["ar","en","es","fr","de","it","pt","ru","zh","ja","ko","tr","fa","ur","hi","id","ms","bn","pl","sv","nl","el","cs","da","fi","no","hu","ro","uk","vi","th","sw","af","am","az","bg","ca","hr","et","fil","ka","gu","is","kn","kk","km","lo","lv","lt","mk","ml","mr","mn","my","ne","pa","si","sk","sl","ta","te","uz","zu","eu","gl","hy","sq","bs","sr","be","cy","ga","gd","lb","mt","so","yo","ig","ha","xh","st","tn","sn","rw","mg","kmr","ckb","ps","sd","ug","tg","ky","tk","tt","ba","cv","ceb","jv","su","eo"]);
+  const SUPPORTED_LOCALES = Object.freeze(["ar","en","es","zh","hi","fr","de","ru","pt","ja","id","tr","ko","vi","it","bn","ur","fa","pl","nl","th","sv","el","cs","ro","hu","da","fi","no","sk","uk","bg","hr","sr","sl","lt","lv","et","sw","fil","ta","te","mr","gu","kn","ml","pa","am","az","uz","kk","ka","hy","ne","si","my","km","lo","mn","af","sq","eu","ca","gl","is","ga","mk","mt","cy","be","bs","ky","tg","tk","ps","ku","so","ha","yo","ig","zu","xh","sn","st","tn","rw","mg","ny","eo","la","gd","yi","co","fy","haw","hmn","sm","su","jw"]);
   const SUPPORTED = new Set(SUPPORTED_LOCALES);
-  const RTL_LOCALES = Object.freeze(['ar', 'fa', 'ur', 'ckb', 'ps', 'sd', 'ug']);
+  const RTL_LOCALES = Object.freeze(["ar","ur","fa","ps","yi"]);
   const RTL = new Set(RTL_LOCALES);
   const EXCLUDED_LOCALES = Object.freeze(['he', 'iw']);
   const EXCLUDED = new Set(EXCLUDED_LOCALES);

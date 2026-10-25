@@ -6,7 +6,12 @@ const path = require('node:path');
 const base = path.resolve(__dirname,'../../../android/app/src/main/assets/web');
 const numerals = require(path.join(base,'js/numeral_invariant_guard.js'));
 const locales = require(path.join(base,'js/localization_fallback_guard.js'));
-const registry = require(path.join(base,'js/global_i18n_registry.js'));
+const vm = require('node:vm');
+const appSource = fs.readFileSync(path.join(base,'app.js'),'utf8');
+const catalogStart = appSource.indexOf('const LANG_CATALOG = [');
+const catalogEnd = appSource.indexOf('const DICT = {',catalogStart);
+assert.ok(catalogStart>=0&&catalogEnd>catalogStart);
+const officialCatalog = Array.from(vm.runInNewContext(appSource.slice(catalogStart,catalogEnd)+';LANG_CATALOG'));
 const css = name => fs.readFileSync(path.join(base,name),'utf8');
 
 test('generated numeric checks are deterministic over repeated Eastern/Western digits', () => {
@@ -50,18 +55,24 @@ test('failed persistence is never reported as a saved language', () => {
   assert.equal(r.reason,'LANGUAGE_SAVE_FAILED');
   assert.equal(old.lang,'en');
 });
-test('locale guard matches registry and excludes Hebrew and aliases', () => {
-  const expected=registry.SUPPORTED_LOCALES.map(item=>item.code);
+test('locale guard matches official app runtime 99-code catalog, never legacy 100-code registry', () => {
+  const expected=officialCatalog.map(item=>item.code);
+  assert.equal(expected.length,99);
+  assert.equal(new Set(expected).size,99);
   assert.deepEqual(locales.SUPPORTED_LOCALES,expected);
   for(const code of expected) assert.equal(locales.isLocaleAllowed(code),true,code);
-  for(const code of ['he','iw','he-IL','iw_IL','xyz']) assert.equal(locales.isLocaleAllowed(code),false,code);
+  for(const code of ['he','iw','he-IL','iw_IL','xyz','ms','lb','ckb','sd','ug','tt','ba','cv','ceb','jv'])
+    assert.equal(locales.isLocaleAllowed(code),false,code);
   assert.equal(locales.isLocaleAllowed('BN-BD'),true);
+  assert.equal(locales.isLocaleAllowed('jw'),true);
 });
-test('RTL direction matches every registry script, including Sorani and Pashto', () => {
-  for(const entry of registry.SUPPORTED_LOCALES) {
-    assert.equal(locales.isRtlLocale(entry.code),entry.isRtl,entry.code);
+test('direction matches every official runtime script; Latin Kurmanji is LTR', () => {
+  for(const entry of officialCatalog) {
+    assert.equal(locales.isRtlLocale(entry.code),entry.dir==='rtl',entry.code);
   }
   assert.equal(locales.isRtlLocale('UR-PK'),true);
+  assert.equal(locales.isRtlLocale('ku'),false);
+  assert.equal(locales.isRtlLocale('yi'),true);
   assert.equal(locales.isRtlLocale('bn'),false);
 });
 test('missing translations fall back only to English without changing stored notes', () => {
