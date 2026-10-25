@@ -1,0 +1,57 @@
+{
+  "timer": {
+    "0": "⚙ Tùy chỉnh",
+    "1": "Cài đặt tập trung và nghỉ ngơi",
+    "2": "Phiên hiện tại được giữ nguyên; thay đổi áp dụng cho phiên mới.",
+    "3": "Tập trung · phút",
+    "4": "Nghỉ ngắn · phút",
+    "5": "Nghỉ dài · phút",
+    "6": "Số phiên mỗi chu kỳ",
+    "7": "Khôi phục mặc định",
+    "8": "Lưu",
+    "9": "Nhập số nguyên trong phạm vi cho phép.",
+    "10": "Đã lưu cài đặt"
+  },
+  "goals": {
+    "desc": "Chỉ tính số phút từ các phiên tập trung đã hoàn thành.",
+    "done": "Đã xong",
+    "edit": "⚙ Chỉnh sửa",
+    "heading": "Tiến bộ từng chút mỗi ngày",
+    "hint": "Đặt 0 để ẩn mục tiêu. Chỉ phiên đã hoàn thành mới được tính.",
+    "invalid": "Nhập số phút nguyên từ 0 đến 720.",
+    "kicker": "✦ MỤC TIÊU HẰNG NGÀY",
+    "minute": "phút",
+    "modal": "Mục tiêu hoạt động hằng ngày",
+    "noGoal": "Đặt mục tiêu",
+    "save": "Đã lưu mục tiêu",
+    "today": "Hôm nay",
+    "week": "Tuần này",
+    "weekInvalid": "Mục tiêu tuần phải từ 0 đến 5040 phút.",
+    "weekTarget": "Mục tiêu tuần (phút)"
+  },
+  "analytics": {
+    "activity": "Hoạt động",
+    "average": "Trung bình mỗi phiên",
+    "chart": "Phân bố theo ngày",
+    "details": "Chọn ngày để xem chi tiết",
+    "end": "Đến",
+    "export": "Xuất CSV",
+    "goal": "So sánh mục tiêu",
+    "minutes": "Số phút đã ghi nhận",
+    "noData": "Không có phiên nào được ghi nhận trong khoảng thời gian này",
+    "noGoals": "Chưa đặt mục tiêu hằng ngày",
+    "period": "Khoảng thời gian",
+    "sessions": "Số phiên",
+    "start": "Từ",
+    "streak": "Chuỗi ngày hiện tại",
+    "tasks": "Nhiệm vụ đã hoàn thành",
+    "title": "Thống kê hoạt động đã ghi nhận",
+    "year": "Năm"
+  },
+  "analyticsDomain": {
+    "read": "Đọc sách",
+    "sport": "Thể thao",
+    "study": "Học tập",
+    "work": "Làm việc"
+  }
+}
