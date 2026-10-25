@@ -2,11 +2,8 @@
 <html lang="en" dir="ltr" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deep Focus - v21 Ultimate Edition</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-sheet: #fbfdff;
@@ -37,12 +34,12 @@
 
     * {
       box-sizing: border-box; margin: 0; padding: 0;
-      font-family: 'Inter', 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Noto Sans Arabic', sans-serif;
       font-variant-numeric: tabular-nums lining-nums;
       -webkit-tap-highlight-color: transparent;
     }
     body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 104px; overflow-x: hidden; user-select: none; }
-    input, textarea { user-select: text; direction: ltr; text-align: start; }
+    input, textarea { user-select: text; text-align: start; }
 
     body.deep-lockdown .dynamic-hero-header,
     body.deep-lockdown .bottom-nav-capsule,
@@ -978,7 +975,7 @@
         </div>
         <div class="segmented-pills-bar ns-filters">
           <button class="seg-pill active" onclick="filterNotesByTag('all', this)" data-i18n="filterAll">All</button>
-          <button class="seg-pill" onclick="filterNotesByTag('cornell', this)" data-i18n="tagCornell">Cornell 📋</button>
+          <button class="seg-pill" onclick="filterNotesByTag('cornell', this)" data-i18n="tagCornell">Structured Notes 📋</button>
           <button class="seg-pill" onclick="filterNotesByTag('flash', this)" data-i18n="tagFlash">Recall 👁️</button>
           <button class="seg-pill" onclick="filterNotesByTag('quick', this)" data-i18n="tagQuick">Log 💡</button>
         </div>
@@ -1209,12 +1206,12 @@
       <div class="modal-head"><span id="nsEditorHeading">New note</span><button class="task-mini-sel" onclick="nsCloseEditor()" aria-label="Close">✕</button></div>
       <div id="nsEditorTemplates" class="ns-editor-templates"></div>
       <label for="inpNoteTitle" id="nsTitleLabel">Title</label>
-      <input type="text" class="modal-inp" id="inpNoteTitle" maxlength="250" placeholder="Title or question" oninput="nsUpdateCount()">
+      <input type="text" class="modal-inp" id="inpNoteTitle" dir="auto" maxlength="250" placeholder="Title or question" oninput="nsUpdateCount()">
       <div class="ns-meta">
         <label><span id="nsTypeLabel">Type</span><select class="modal-inp" id="selNoteCat"><option value="cornell" data-i18n="tagCornell">Cornell</option><option value="flash" data-i18n="tagFlash">Recall</option><option value="quick" data-i18n="tagQuick">Log</option></select></label>
         <label><span id="nsDateLabel">Date</span><input type="date" class="modal-inp" id="inpNoteCalDate"></label>
       </div>
-      <label for="inpNoteBody" id="nsBodyLabel">Content</label><textarea class="modal-inp" id="inpNoteBody" maxlength="500000" rows="10" placeholder="Write here..." oninput="nsUpdateCount()"></textarea>
+      <label for="inpNoteBody" id="nsBodyLabel">Content</label><textarea class="modal-inp" id="inpNoteBody" dir="auto" maxlength="500000" rows="10" placeholder="Write here..." oninput="nsUpdateCount()"></textarea>
       <small id="nsCounter" aria-live="polite">0 words</small>
       <div class="ns-draft-bar" id="nsDraftBar"><span id="nsDraftStatus" aria-live="polite"></span><button type="button" id="nsDraftRestore" onclick="nsRestoreDraft()" hidden>Restore</button><button type="button" id="nsDraftDiscard" onclick="nsDiscardDraft()" hidden>Discard</button></div>
       <div class="ns-options">
@@ -1242,6 +1239,7 @@
 
   <script src="locale_rows.js"></script>
   <script src="locale_extras.js"></script>
+  <script src="js/df99_multiscreen_i18n.js"></script>
   <script src="quick_training.js"></script>
   <script src="data_compat_v21.js"></script>
   <script src="preflight_v22.js"></script>
@@ -1255,6 +1253,7 @@
   <script src="analytics_core_v21.js"></script>
   <script src="analytics_studio.js"></script>
   <script src="locale_premium_v22.js"></script>
+  <script src="js/df99_reviewed_packs.js"></script>
   <script src="goals_studio.js"></script>
   <script src="timer_settings.js"></script>
   <script src="sound_mix_controls.js"></script>

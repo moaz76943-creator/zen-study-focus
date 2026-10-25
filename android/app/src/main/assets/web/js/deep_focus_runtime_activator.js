@@ -12,7 +12,7 @@
   }
 
   function sanitizeDigits() {
-    document.querySelectorAll('input[type="date"], input[type="text"], textarea, .date-display').forEach(el => {
+    document.querySelectorAll('input[type="date"], .date-display').forEach(el => {
       if (el.value && /[٠-٩۰-۹]/.test(el.value)) el.value = toWesternDigits(el.value);
       if (el.textContent && /[٠-٩۰-۹]/.test(el.textContent)) el.textContent = toWesternDigits(el.textContent);
     });

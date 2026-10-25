@@ -128,7 +128,7 @@
     return copy(definition);
   }
   const BUILTIN_TEMPLATES = Object.freeze([
-    {id:'cornell',name:'Cornell',kind:'cornell',body:'',cornell:{cues:'',notes:'',summary:''}},
+    {id:'cornell',name:'Structured notes',kind:'cornell',body:'',cornell:{cues:'',notes:'',summary:''}},
     {id:'recall',name:'Active Recall',kind:'recall',body:''},
     {id:'checklist',name:'Checklist',kind:'checklist',body:'☐ '},
     {id:'reading',name:'Reading',kind:'reading',body:''},
