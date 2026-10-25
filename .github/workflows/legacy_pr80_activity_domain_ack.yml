@@ -1,0 +1,35 @@
+name: Legacy PR80 Durable Domain Switch QA
+on:
+  push:
+    branches:
+      - fix/legacy-pr80-activity-domain-ack-20261026
+      - integration/master-qa-verified-v21
+    paths:
+      - android/app/src/main/assets/web/app.js
+      - tests/track07_functional/activity_domain_durable_ack.test.cjs
+      - .github/workflows/legacy_pr80_activity_domain_ack.yml
+  pull_request:
+    paths:
+      - android/app/src/main/assets/web/app.js
+      - tests/track07_functional/activity_domain_durable_ack.test.cjs
+      - .github/workflows/legacy_pr80_activity_domain_ack.yml
+permissions:
+  contents: read
+jobs:
+  exact-source-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source identity and parsing
+        run: |
+          git rev-parse HEAD
+          node --check android/app/src/main/assets/web/app.js
+          node --check tests/track07_functional/activity_domain_durable_ack.test.cjs
+      - name: Native ACK false/throw/cancel/retry behavior
+        run: node --test tests/track07_functional/activity_domain_durable_ack.test.cjs
