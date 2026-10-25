@@ -119,6 +119,9 @@
     const grouping=input('select',t.period);
     for(const value of ['daily','weekly','monthly']){const o=mk('option',t[value]);o.value=value;grouping.appendChild(o);}
     const start=input('date',t.start),end=input('date',t.end);
+    const exportKind=input('select',t.export);
+    for(const value of ['sessions','daily','weekly','monthly']){const option=mk('option',t[value]);option.value=value;exportKind.appendChild(option);}
+    exportKind.value='sessions';
     const exportBtn=mk('button',t.export);exportBtn.type='button';exportBtn.style.cssText='min-height:42px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:6px 12px';
     filters.appendChild(exportBtn);wrapper.appendChild(filters);
     const kpis=mk('div');kpis.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0';wrapper.appendChild(kpis);
@@ -154,7 +157,10 @@
         const label=mk('div',name);label.style.fontSize='12px';const number=mk('strong',String(value));number.style.fontSize='22px';
         box.append(label,number);kpis.appendChild(box);
       }
-      currentSeries=grouping.value==='weekly'?report.weekly:grouping.value==='monthly'?report.monthly:report.daily;
+      // Dense daily timelines become monthly bars, without altering report totals or exported rows.
+      const shownGroup=grouping.value==='daily'&&report.period.days>120?'monthly':grouping.value;
+      currentSeries=shownGroup==='weekly'?report.weekly:shownGroup==='monthly'?report.monthly:report.daily;
+      chartTitle.textContent=shownGroup==='monthly'&&grouping.value==='daily'?t.chart+' ('+t.monthly+')':t.chart;
       chart.innerHTML=report.totals.sessions?barsSvg(currentSeries,{strings:t}):'';
       if(!report.totals.sessions){chart.textContent=t.noData;detail.textContent=t.noData;}else detail.textContent=t.details;
       domainView.replaceChildren();
@@ -182,20 +188,21 @@
       const day=node.getAttribute('data-day');const found=currentSeries.find(r=>r.key===day)||heatDays.find(r=>r.key===day);detail.textContent=day+': '+(found?found.minutes:0)+' '+t.minuteUnit;
     };
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
-    [domain,grouping,start,end].forEach(el=>el.addEventListener('change',refresh));
+    [domain,grouping,start,end,exportKind].forEach(el=>el.addEventListener('change',refresh));
     exportBtn.addEventListener('click',async()=>{
       if(!current||exportBtn.disabled||destroyed||exporting)return;
-      const value=core.toCSV(current,'sessions');
+      const selectedKind=exportKind.value||'sessions';
+      const value=core.toCSV(current,selectedKind);
       if(typeof opts.onExport==='function'){
         exporting=true;exportBtn.disabled=true;
-        try{await opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');}
+        try{await opts.onExport(value,'deep-focus-'+selectedKind+'.csv','text/csv;charset=utf-8');}
         catch(_){if(!destroyed&&current){error.hidden=false;error.textContent='⚠ '+t.export;}}
         finally{exporting=false;if(!destroyed)exportBtn.disabled=!current;}
         return;
       }
       if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL)return;
       const blob=new doc.defaultView.Blob(['\ufeff',value],{type:'text/csv;charset=utf-8'});
-      const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
+      const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-'+selectedKind+'.csv';
       wrapper.appendChild(a);try{a.click();}finally{a.remove();(doc.defaultView.setTimeout||setTimeout)(()=>doc.defaultView.URL.revokeObjectURL(url),30000);}
     });
     const today=opts.today||core.localToday();if(!core.validDay(today))throw new RangeError('Invalid today');
