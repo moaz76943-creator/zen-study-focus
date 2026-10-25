@@ -147,11 +147,13 @@
     e.preventDefault();
     if(submitted||isDestroyed)return;
     const noteTokens=notes.value.trim()?notes.value.split(',').map(x=>x.trim()):[];
-    if(noteTokens.some(x=>!/^(0|[1-9]\d*)$/.test(x))){error(new Error('Numeric note IDs required'));return;}
+    const noteIdsChanged=!t || notes.value!==originalEditorValues.noteIds;
+    // Do not reinterpret or reject legacy note refs when the user did not edit them.
+    if(noteIdsChanged&&noteTokens.some(x=>!/^(0|[1-9]\d*)$/.test(x))){error(new Error('Numeric note IDs required'));return;}
     const fields={title:title.value,description:description.value,date:due.value,dueTime:dueTime.value||null,
      catKey:categoryInput.value,priority:priority.value,estimateMin:Number(estimate.value),repeat:repeat.value?{frequency:repeat.value,interval:1}:null,
      important:important.checked,urgent:urgent.checked,group:group.value,projectId:project.value?Number(project.value):null,
-     noteIds:noteTokens.map(Number)};
+     noteIds:noteIdsChanged?noteTokens.map(Number):t.noteIds};
     if(t){
      // Compare displayed values to original editor values, not missing/defaulted v21 fields.
      const previous=originalEditorValues;

@@ -111,3 +111,50 @@ test('PR160: successful synchronous legacy adapter with undefined return commits
  assert.equal(f.get().tasksList[0].title,'Edited once');
  f.studio.destroy();
 });
+
+test('PR160 legacy unchanged invalid note IDs do not block title edit or modify v21 data',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[],unknownV21:{keep:1}},tasksList:[
+  {id:93,title:'Old imported task',catKey:'study',noteIds:['legacy_note_alpha'],otherLegacy:'keep'}
+ ]};
+ const before=JSON.parse(JSON.stringify(state));let commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,19),
+  readState:()=>JSON.parse(JSON.stringify(state)),
+  commit(old,next){assert.deepEqual(old,state);state=JSON.parse(JSON.stringify(next));commits++;return true;}
+ });
+ const edit=root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Edit');
+ assert.ok(edit);edit.dispatch('click');
+ const form=root.descendants.find(x=>x.tagName==='FORM'&&x.className==='df-form');
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ const notes=form.descendants.find(x=>x.tagName==='INPUT'&&x.value==='legacy_note_alpha');
+ assert.ok(notes);assert.equal(notes.value,'legacy_note_alpha');
+ title.value='Edited imported task';
+ form.dispatch('submit');
+ assert.equal(commits,1,'Unchanged legacy note references must not block safe title change');
+ assert.equal(state.tasksList[0].title,'Edited imported task');
+ assert.deepEqual(state.tasksList[0].noteIds,before.tasksList[0].noteIds);
+ assert.equal(Object.hasOwn(state.tasksList[0],'date'),false);
+ assert.equal(state.tasksList[0].otherLegacy,'keep');
+ assert.deepEqual(state.cfg,before.cfg);
+ studio.destroy();
+});
+
+test('PR160 an edited invalid note ID remains rejected without a write',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[
+  {id:94,title:'Original task',catKey:'study',noteIds:['legacy_note_alpha']}
+ ]};
+ const original=JSON.parse(JSON.stringify(state));let commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,19),
+  readState:()=>JSON.parse(JSON.stringify(state)),
+  commit(){commits++;return true;}
+ });
+ root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Edit').dispatch('click');
+ const form=root.descendants.find(x=>x.tagName==='FORM'&&x.className==='df-form');
+ const notes=form.descendants.find(x=>x.tagName==='INPUT'&&x.value==='legacy_note_alpha');
+ assert.ok(notes);notes.value='bad_new_note';
+ form.dispatch('submit');
+ assert.equal(commits,0);
+ assert.deepEqual(state,original);
+ studio.destroy();
+});
