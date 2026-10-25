@@ -1,0 +1,116 @@
+name: DF-LANE-13 Real Android E2E and 99-language source audit
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/i18n/e2e/**'
+      - 'tools/i18n/e2e/**'
+      - '.github/workflows/i18n_e2e.yml'
+  push:
+    branches: [qa/df-lane-13-real-e2e-20261026]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: df13-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dictionary:
+    name: 99-locale inventory (NO Android build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact source and focused test suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/i18n-e2e/source
+          git rev-parse HEAD | tee artifacts/i18n-e2e/source/SOURCE_SHA.txt
+          node --check tools/i18n/e2e/coverage.cjs
+          node --test tests/i18n/e2e/*.test.cjs
+      - name: Generate complete per-language coverage (fail on gaps)
+        shell: bash
+        run: |
+          node tools/i18n/e2e/coverage.cjs --strict --output artifacts/i18n-e2e/source
+      - name: Upload source audit including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: df13-99-language-source-coverage
+          path: artifacts/i18n-e2e/source/
+          if-no-files-found: warn
+          retention-days: 14
+
+  android:
+    name: Android WebView API ${{ matrix.api }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 35]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Source provenance
+        shell: bash
+        run: |
+          mkdir -p artifacts/i18n-e2e/api${{ matrix.api }}
+          git rev-parse HEAD | tee artifacts/i18n-e2e/api${{ matrix.api }}/SOURCE_SHA.txt
+          python3 -m py_compile tools/i18n/e2e/android_device.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install Android 36 compile SDK and Gradle wrapper
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+          gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
+          chmod +x gradlew
+      - name: Build APK from checked-out HEAD exactly once
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace
+          test -s app/build/outputs/apk/debug/app-debug.apk
+          sha256sum app/build/outputs/apk/debug/app-debug.apk | tee ../artifacts/i18n-e2e/api${{ matrix.api }}/APK_SHA256.txt
+      - name: Execute real Android E2E on freshly installed APK
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          target: google_apis
+          profile: pixel_3a
+          disable-animations: true
+          emulator-boot-timeout: 600
+          script: |
+            set -euo pipefail
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            python3 tools/i18n/e2e/android_device.py --output artifacts/i18n-e2e/api${{ matrix.api }} --sha "$(git rev-parse HEAD)" --api ${{ matrix.api }}
+      - name: Upload actual test results and screenshots even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: df13-android-api${{ matrix.api }}-device-evidence
+          path: artifacts/i18n-e2e/api${{ matrix.api }}/
+          if-no-files-found: warn
+          retention-days: 14
