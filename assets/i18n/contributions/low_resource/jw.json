@@ -1,0 +1,12 @@
+{
+  "language": "jw",
+  "status": "REVIEW_REQUIRED",
+  "sections": {
+    "timer": {
+      "8": "Simpen"
+    },
+    "tasks": {
+      "save": "Simpen"
+    }
+  }
+}
