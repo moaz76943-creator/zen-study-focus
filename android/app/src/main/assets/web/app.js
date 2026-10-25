@@ -405,11 +405,14 @@ if (typeof window !== "undefined" && window.DF22Preflight && !window.DF22Preflig
 /* ========================================================
    0. STRICT WESTERN DIGITS ENFORCER (0123456789 ONLY)
    ======================================================== */
+const ARABIC_ZERO_OFFSET = 1632;
+const PERSIAN_ZERO_OFFSET = 1776;
+
 function toWest(val) {
   if (val === null || val === undefined) return '';
   return String(val)
-    .replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632)
-    .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
+    .replace(/[٠-٩]/g, d => d.charCodeAt(0) - ARABIC_ZERO_OFFSET)
+    .replace(/[۰-۹]/g, d => d.charCodeAt(0) - PERSIAN_ZERO_OFFSET);
 }
 
 document.addEventListener('input', (e) => {
@@ -2728,7 +2731,9 @@ function changeCalendarMonth(delta) {
 function renderCalendar() {
   const d = L();
   document.getElementById('calMonthYearTitle').textContent = toWest(`${d.months[calMonth]} ${calYear}`);
-  document.getElementById('calWeekdaysRow').innerHTML = d.weekdays.map(w => `<div>${w}</div>`).join('');
+  let calWeekdaysHtml = '';
+  for (let i = 0; i < d.weekdays.length; i++) calWeekdaysHtml += `<div>${d.weekdays[i]}</div>`;
+  document.getElementById('calWeekdaysRow').innerHTML = calWeekdaysHtml;
 
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
@@ -2773,7 +2778,7 @@ function renderSelectedDateAgenda() {
   dayTasks.forEach(t => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
+    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>`;
     box.appendChild(item);
   });
 
@@ -3079,7 +3084,8 @@ function renderSoundsStudio() {
   box.innerHTML = '';
   const d = L();
 
-  SOUNDS_DATA.filter(s => soundCat === 'all' || s.cat === soundCat).forEach(s => {
+  for (const s of SOUNDS_DATA) {
+    if (soundCat !== 'all' && s.cat !== soundCat) continue;
     const isOn = !!activePlayers[s.id];
     const sName = d.sounds[s.id] || s.id;
     const tile = document.createElement('div');
@@ -3097,7 +3103,7 @@ function renderSoundsStudio() {
       </div>
     `;
     box.appendChild(tile);
-  });
+  }
 }
 
 /* ========================================================
