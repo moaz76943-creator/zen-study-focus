@@ -61,7 +61,7 @@
     if(JSON.stringify(old)===JSON.stringify(next))return true;
     const committed=adapter.commit(old,next);
     if(committed && typeof committed.then==='function')throw new Error('Only synchronous commit supported');
-    if(committed !== true)throw new Error('Task change was not durably acknowledged');
+    if(committed === false)throw new Error('Task change was not durably acknowledged');
     undoStack.push(old);if(undoStack.length>20)undoStack.shift();redoStack=[];state=next;
     if(typeof adapter.onAfterChange==='function')adapter.onAfterChange(state);
     editing=null;render();
