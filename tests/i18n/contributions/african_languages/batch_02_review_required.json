@@ -1,0 +1,230 @@
+{
+  "am": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "1",
+        "2",
+        "7",
+        "8",
+        "13",
+        "14",
+        "27",
+        "29",
+        "34"
+      ],
+      "tasks": [
+        "actual",
+        "addCheck",
+        "allCategories",
+        "archived",
+        "board",
+        "check",
+        "delegate",
+        "do",
+        "eliminate",
+        "empty",
+        "estimate",
+        "estimated",
+        "invalid",
+        "matrix",
+        "notConnected",
+        "schedule",
+        "sub",
+        "subtitle",
+        "today"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 112,
+    "native_review_pending": true
+  },
+  "so": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "2",
+        "7",
+        "8",
+        "14",
+        "27",
+        "34"
+      ],
+      "tasks": [
+        "addCheck",
+        "delegate",
+        "do",
+        "eliminate",
+        "estimated",
+        "invalid",
+        "notConnected",
+        "schedule",
+        "subtitle"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 125,
+    "native_review_pending": true
+  },
+  "yo": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "chart",
+        "details",
+        "goal",
+        "noGoals",
+        "streak"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "modal",
+        "weekInvalid",
+        "weekTarget"
+      ],
+      "notes": [
+        "1",
+        "2",
+        "4",
+        "6",
+        "7",
+        "8",
+        "13",
+        "14",
+        "21",
+        "22",
+        "27",
+        "29",
+        "34"
+      ],
+      "tasks": [
+        "actual",
+        "addCheck",
+        "allCategories",
+        "archive",
+        "archived",
+        "board",
+        "check",
+        "delegate",
+        "do",
+        "eliminate",
+        "empty",
+        "estimate",
+        "estimated",
+        "invalid",
+        "matrix",
+        "never",
+        "none",
+        "notConnected",
+        "overdue",
+        "proj",
+        "schedule",
+        "sub",
+        "subtitle",
+        "today"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 97,
+    "native_review_pending": true
+  },
+  "ig": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "chart",
+        "details",
+        "goal",
+        "noGoals",
+        "streak"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "modal",
+        "weekInvalid",
+        "weekTarget"
+      ],
+      "notes": [
+        "1",
+        "2",
+        "4",
+        "7",
+        "8",
+        "13",
+        "14",
+        "21",
+        "22",
+        "27",
+        "29",
+        "34"
+      ],
+      "tasks": [
+        "actual",
+        "addCheck",
+        "allCategories",
+        "archive",
+        "archived",
+        "board",
+        "check",
+        "delegate",
+        "do",
+        "eliminate",
+        "empty",
+        "estimate",
+        "estimated",
+        "invalid",
+        "matrix",
+        "none",
+        "notConnected",
+        "overdue",
+        "proj",
+        "remove",
+        "schedule",
+        "sub",
+        "subtitle",
+        "today"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 98,
+    "native_review_pending": true
+  }
+}
