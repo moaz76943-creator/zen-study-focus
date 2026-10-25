@@ -181,6 +181,7 @@ jobs:
           REPORT: ${{ runner.temp }}/daily/daily-health.md
           BLOCKERS: ${{ runner.temp }}/daily/blockers.txt
           CHECKED_SHA: ${{ runner.temp }}/daily/SOURCE_SHA
+          SOURCE_GATE: ${{ steps.final_guard.outcome }}
         with:
           script: |
             const fs=require('node:fs'),{owner,repo}=context.repo;
@@ -195,19 +196,8 @@ jobs:
                 .summarizeRuns(response.data.workflow_runs||[],checked).markdown;
               core.info('Source SHA-bound CI triage generated');
             } catch(e){core.warning('Cannot read source SHA-bound CI evidence: '+e.message);}
-            let canonicalGate='';
-            if (process.env.SOURCE_REF === 'integration/master-qa-verified-v21') {
-              try {
-                const policy=require('./automation/tools/daily_maintenance/canonical_source.cjs');
-                const {data}=await github.rest.pulls.get({owner,repo,pull_number:policy.CANONICAL_PR});
-                const checked=fs.readFileSync(process.env.CHECKED_SHA,'utf8').trim();
-                policy.verifyCanonicalPr(data,owner+'/'+repo,process.env.SOURCE_REF,checked);
-                canonicalGate='Canonical PR #138 exact-head check: PASS';
-              } catch(e) {
-                canonicalGate='NOT_VERIFIED: canonical PR #138 source advanced or could not be read; '+String(e.message).slice(0,200);
-                core.setFailed(canonicalGate);
-              }
-            }
+            const canonicalGate='Official source attestation: '+(process.env.SOURCE_GATE==='success'?'source SHA verified':'OFFICIAL_SOURCE_NOT_VERIFIED');
+            if(process.env.SOURCE_GATE!=='success')core.setFailed('Daily official source check incomplete or stale');
             const body=canonicalGate+'\n\n'+read(process.env.REPORT)+'\n\nAdditional gates:\n'+read(process.env.BLOCKERS)+
              '\n\n'+read(process.env.REPORT.replace('daily-health.md','quality-agents.md'))+'\n\n'+ciAudit+
              '\nRun: '+context.serverUrl+'/'+owner+'/'+repo+'/actions/runs/'+context.runId+
