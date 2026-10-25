@@ -5,7 +5,7 @@ const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../../../..');
 const source=JSON.parse(fs.readFileSync(path.join(root,'assets/i18n/df99_reviewed_packs.json'),'utf8'));
 const langs=["zh","ja","id","ko","vi","th","fil","my","km","lo","mn"];
-const patterns={zh:/[\u3400-\u9FFF]/u,ja:/[\u3040-\u30FF]/u,id:/[A-Za-z]/,ko:/[\uAC00-\uD7AF]/u,vi:/[A-Za-z]/,th:/[\u0E00-\u0E7F]/u,my:/[\u1000-\u109F]/u,km:/[\u1780-\u17FF]/u,lo:/[\u0E80-\u0EFF]/u,mn:/[\u0400-\u04FF]/u,fil:/[A-Za-z]/};
+const patterns={zh:/[\u3400-\u9FFF]/u,ja:/[\u3040-\u30FF\u3400-\u9FFF]/u,id:/[A-Za-z]/,ko:/[\uAC00-\uD7AF]/u,vi:/[A-Za-z]/,th:/[\u0E00-\u0E7F]/u,my:/[\u1000-\u109F]/u,km:/[\u1780-\u17FF]/u,lo:/[\u0E80-\u0EFF]/u,mn:/[\u0400-\u04FF]/u,fil:/[A-Za-z]/};
 const keyRegex=/^(?:\{[\w.]+\}|\$\{[\w.]+\}|%[0-9]*[sdif]|\{[0-9]+\})/g;
 function tokens(s){return [...s.matchAll(/\$\{[\w.]+\}|\{[\w.]+\}|%[0-9]*[sdif]/g)].map(m=>m[0]).sort();}
 function read(code){return JSON.parse(fs.readFileSync(path.join(root,'assets/i18n/contributions/east_asia',code+'.json'),'utf8'));}
