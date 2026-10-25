@@ -2,6 +2,8 @@ name: Lane08 99 locale exact-head source QA
 on:
   push:
     branches: [lane08/quick-training-99-consolidated-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
 permissions:
   contents: read
 jobs:
