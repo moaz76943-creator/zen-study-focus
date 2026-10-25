@@ -11,6 +11,14 @@ class Element {
   this.ownerDocument=doc;this.tagName=tag.toUpperCase();this.children=[];this.events={};
   this.attributes={};this.style={};this.textContent='';this.value='';this.checked=false;
  }
+ get value(){return this._value||'';}
+ set value(raw){
+  const v=String(raw??'');
+  if(this.tagName==='SELECT'&&this.children.length&&!this.children.some(o=>o.value===v))this._value='';
+  else if(this.tagName==='INPUT'&&this.type==='number'&&v&&!/^-?\d+(\.\d+)?$/.test(v))this._value='';
+  else if(this.tagName==='INPUT'&&this.type==='time'&&v&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(v))this._value='';
+  else this._value=v;
+ }
  appendChild(n){this.children.push(n);n.parent=this;return n;}
  replaceChildren(...xs){this.children=[];xs.forEach(x=>this.appendChild(x));}
  setAttribute(k,v){this.attributes[k]=String(v);}
@@ -162,4 +170,24 @@ test('empty new task title reports a localized validation reason without a commi
   assert.equal(f.all().find(e=>e.attributes.role==='status').textContent,expected);
   assert.equal(f.commits(),0);
  }
+});
+
+test('legacy invalid optional values survive browser input normalization on title-only edit',()=>{
+ const legacy={id:72,title:'Keep odd fields',catKey:'study',done:false,isStarter:false,
+  dueTime:'99:99',estimateMin:'legacy estimate',repeat:{frequency:'weekdays',interval:1},
+  proprietary:{value:'do not touch'}};
+ const f=fixture([legacy]);
+ f.button('Edit').dispatch('click');
+ assert.equal(f.byLabel('Time').value,'');
+ assert.equal(f.byLabel('Estimated minutes').value,'');
+ assert.equal(f.byLabel('Repeat').value,'');
+ f.byLabel('Task title').value='Rename only';
+ f.editor().dispatch('submit');
+ assert.equal(f.commits(),1);
+ const result=f.get().tasksList[0];
+ assert.equal(result.title,'Rename only');
+ assert.equal(result.dueTime,'99:99');
+ assert.equal(result.estimateMin,'legacy estimate');
+ assert.deepEqual(result.repeat,{frequency:'weekdays',interval:1});
+ assert.deepEqual(result.proprietary,{value:'do not touch'});
 });
