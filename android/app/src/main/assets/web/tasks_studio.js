@@ -124,6 +124,13 @@
    const notes=input('text',(t?.noteIds||[]).join(','));notes.inputMode='numeric';
    const important=input('checkbox');important.checked=!!t?.important;important.style.width='auto';
    const urgent=input('checkbox');urgent.checked=!!t?.urgent;urgent.style.width='auto';
+   // Capture native-normalized values: legacy optional values may not be valid controls.
+   const originalEditorValues={
+    title:title.value,description:description.value,date:due.value,dueTime:dueTime.value,
+    catKey:categoryInput.value,priority:priority.value,estimateMin:estimate.value,
+    repeat:repeat.value,important:important.checked,urgent:urgent.checked,
+    group:group.value,projectId:project.value,noteIds:notes.value
+   };
    append(form,label(l.task,title),label(l.desc,description));
    const grid=el('div','df-grid');append(grid,label(l.due,due),label(l.time,dueTime),label(l.cat,categoryInput),label(l.priority,priority),label(l.estimate,estimate),label(l.repeat,repeat),label(l.group,group),label(l.proj,project),label(l.notes,notes));form.appendChild(grid);
    append(form,label(l.do,important),label(l.delegate,urgent));
@@ -139,12 +146,7 @@
      noteIds:noteTokens.map(Number)};
     if(t){
      // Compare displayed values to original editor values, not missing/defaulted v21 fields.
-     const previous={
-      title:t.title||'',description:t.description||'',date:initialDue,dueTime:t.dueTime||'',
-      catKey:t.catKey||'study',priority:t.priority||'medium',estimateMin:String(t.estimateMin??25),
-      repeat:t.repeat?.frequency||'',important:!!t.important,urgent:!!t.urgent,
-      group:t.group||'',projectId:String(t.projectId??''),noteIds:(t.noteIds||[]).join(',')
-     };
+     const previous=originalEditorValues;
      const displayed={
       title:title.value,description:description.value,date:due.value,dueTime:dueTime.value,
       catKey:categoryInput.value,priority:priority.value,estimateMin:estimate.value,
