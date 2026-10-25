@@ -85,6 +85,134 @@
         "text": "Ezarpenak gordeta",
         "status": "REVIEW_REQUIRED"
       }
+    },
+    "tasks": {
+      "title": {
+        "text": "Zereginak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "add": {
+        "text": "Zeregin berria",
+        "status": "REVIEW_REQUIRED"
+      },
+      "search": {
+        "text": "Bilatu zereginak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "save": {
+        "text": "Gorde",
+        "status": "REVIEW_REQUIRED"
+      },
+      "cancel": {
+        "text": "Utzi",
+        "status": "REVIEW_REQUIRED"
+      },
+      "edit": {
+        "text": "Editatu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "done": {
+        "text": "Osatu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "calendar": {
+        "text": "Egutegia",
+        "status": "REVIEW_REQUIRED"
+      },
+      "priority": {
+        "text": "Lehentasuna",
+        "status": "REVIEW_REQUIRED"
+      },
+      "archive": {
+        "text": "Artxibatu",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "goals": {
+      "heading": {
+        "text": "Egunero aurrerapen txiki bat",
+        "status": "REVIEW_REQUIRED"
+      },
+      "edit": {
+        "text": "⚙ Editatu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "minute": {
+        "text": "min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "today": {
+        "text": "gaur",
+        "status": "REVIEW_REQUIRED"
+      },
+      "week": {
+        "text": "Aste honetan",
+        "status": "REVIEW_REQUIRED"
+      },
+      "noGoal": {
+        "text": "Ezarri helburua",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "analytics": {
+      "title": {
+        "text": "Erregistratutako jardueren analisia",
+        "status": "REVIEW_REQUIRED"
+      },
+      "activity": {
+        "text": "Jarduera",
+        "status": "REVIEW_REQUIRED"
+      },
+      "period": {
+        "text": "Aldia",
+        "status": "REVIEW_REQUIRED"
+      },
+      "start": {
+        "text": "Noiztik",
+        "status": "REVIEW_REQUIRED"
+      },
+      "end": {
+        "text": "Noiz arte",
+        "status": "REVIEW_REQUIRED"
+      },
+      "minutes": {
+        "text": "Erregistratutako minutuak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "sessions": {
+        "text": "Saioak",
+        "status": "REVIEW_REQUIRED"
+      },
+      "year": {
+        "text": "Urtea",
+        "status": "REVIEW_REQUIRED"
+      },
+      "export": {
+        "text": "Esportatu CSV",
+        "status": "REVIEW_REQUIRED"
+      },
+      "noData": {
+        "text": "Ez dago saiorik erregistratuta aldi honetan",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "analyticsDomain": {
+      "study": {
+        "text": "Ikasketa",
+        "status": "REVIEW_REQUIRED"
+      },
+      "read": {
+        "text": "Irakurketa",
+        "status": "REVIEW_REQUIRED"
+      },
+      "work": {
+        "text": "Lana",
+        "status": "REVIEW_REQUIRED"
+      },
+      "sport": {
+        "text": "Kirola",
+        "status": "REVIEW_REQUIRED"
+      }
     }
   }
 }
