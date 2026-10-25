@@ -1,0 +1,69 @@
+name: DF PR04 Android API30 and API35 smoke (non-release)
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/java/**'
+      - 'android/app/src/main/res/**'
+      - 'android/app/src/main/assets/web/app.js'
+      - '.github/workflows/df_pr04_api30_api35_smoke.yml'
+permissions:
+  contents: read
+jobs:
+  android-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 35]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Install Android platform 36
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Compile exact source
+        run: gradle -p android :app:assembleDebug --no-daemon
+      - name: Launch and restart on API ${{ matrix.api }}
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          ram-size: 2048M
+          heap-size: 512M
+          emulator-boot-timeout: 900
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            adb wait-for-device
+            test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = 1
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell pm list packages | grep -Fx 'package:com.zenstudy.focus'
+            adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
+            sleep 6
+            adb shell pidof com.zenstudy.focus
+            adb shell input keyevent KEYCODE_HOME
+            adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
+            adb shell pidof com.zenstudy.focus
+            adb shell am force-stop com.zenstudy.focus
+            adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
+            sleep 4
+            adb shell pidof com.zenstudy.focus
+            echo "API_RUNTIME_SMOKE=PASS"
+            echo "SAF_USER_CONSENT_DEVICE_QA=NOT_TESTED"
+            echo "NOTIFICATION_GRANT_DENY_QA=NOT_TESTED"
+            echo "RELEASE_APPROVED=NO"

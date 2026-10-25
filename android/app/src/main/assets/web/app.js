@@ -1980,6 +1980,11 @@ function applyLanguage(code) {
   // Premium labels may also be created by re-rendered screens; refresh last.
   if (window.DF22Locale?.apply) window.DF22Locale.apply(document,meta.code);
   if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
+  // Native UI follows the persisted v21 locale; never modify editable text.
+  try {
+    if (window.ZenNative && typeof window.ZenNative.setNativeLocale === 'function')
+      window.ZenNative.setNativeLocale(meta.code);
+  } catch (_) { /* Web previews have no native bridge. */ }
 }
 
 /* ========================================================
