@@ -85,6 +85,9 @@
         if (storage.getItem(key) !== value) throw new Error('Storage verification failed: ' + key);
       journal.state = 'committed';
       storage.setItem(D.JOURNAL_KEY,JSON.stringify(journal));
+      // The WebView readback is not a disk durability boundary on Android.
+      if (root.ZenNative && (!root.DF22Preflight || !root.DF22Preflight.nativeAcknowledge(storage)))
+        throw new Error('NATIVE_DURABLE_ACK_FAILED');
     } catch (e) {
       const failed = rollback(storage,original);
       if (failed.length) throw new Error('Storage interrupted; recovery journal retained: ' + failed.join('; '));
