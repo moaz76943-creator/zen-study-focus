@@ -1,0 +1,19 @@
+{
+  "language": "sk",
+  "status": "TRANSLATED",
+  "sections": {
+    "timer": {
+      "0": "⚙ Prispôsobiť",
+      "1": "Nastavenia sústredenia a prestávok",
+      "2": "Aktuálna relácia zostane zachovaná; zmeny sa použijú až pri nových reláciách.",
+      "3": "Sústredenie · min",
+      "4": "Krátka prestávka · min",
+      "5": "Dlhá prestávka · min",
+      "6": "Relácií v cykle",
+      "7": "Predvolené hodnoty",
+      "8": "Uložiť",
+      "9": "Použite celé čísla v zobrazenom rozsahu.",
+      "10": "Nastavenia uložené"
+    }
+  }
+}
