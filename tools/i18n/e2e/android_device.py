@@ -33,11 +33,47 @@ def shell(*args):
     return adb("shell", *args)
 
 def dump():
-    adb("shell", "uiautomator", "dump", "/sdcard/df13-ui.xml", timeout=45)
-    xml = adb("exec-out", "cat", "/sdcard/df13-ui.xml")
-    if not xml.lstrip().startswith("<?xml"):
-        raise AssertionError("UIAutomator dump missing XML; Android view not inspected")
-    return list(ET.fromstring(xml).iter("node"))
+    """Read real Android accessibility XML, retrying transient null roots.
+
+    UIAutomator may emit 'null root node returned' immediately after WebView
+    activity startup despite a successful adb install and activity launch.
+    Never convert missing XML into a successful UI assertion.
+    """
+    diagnostics = []
+    for attempt in range(1, 5):
+        exported = subprocess.run(
+            ["adb", "shell", "uiautomator", "dump", "/sdcard/df13-ui.xml"],
+            capture_output=True, text=True, timeout=55)
+        fetched = subprocess.run(
+            ["adb", "exec-out", "cat", "/sdcard/df13-ui.xml"],
+            capture_output=True, text=True, timeout=35)
+        raw = fetched.stdout.lstrip("\ufeff\r\n ")
+        start = raw.find("<?xml")
+        if start == -1:
+            start = raw.find("<hierarchy")
+        end = raw.rfind("</hierarchy>")
+        if exported.returncode == 0 and fetched.returncode == 0 and start >= 0 and end >= start:
+            try:
+                root = ET.fromstring(raw[start:end + len("</hierarchy>")])
+                return list(root.iter("node"))
+            except ET.ParseError as exc:
+                reason = "invalid_xml:" + str(exc)
+        else:
+            reason = "no_complete_hierarchy_xml"
+        diagnostics.append({
+            "attempt": attempt, "dump_exit": exported.returncode,
+            "read_exit": fetched.returncode,
+            "xml_length": len(raw), "reason": reason,
+            "uiautomator_message": (exported.stdout + exported.stderr).strip()[:220]
+        })
+        time.sleep(attempt + 1)
+    dest = os.getenv("DF13_EVIDENCE_DIR")
+    if dest:
+        Path(dest).mkdir(parents=True, exist_ok=True)
+        (Path(dest) / "UIAUTOMATOR_PROBE.json").write_text(
+            json.dumps(diagnostics, ensure_ascii=False, indent=2) + "\n")
+    raise AssertionError("UIAutomator did not expose a complete accessibility hierarchy "
+                         "after four attempts; probe evidence captured")
 
 def value(node):
     return " ".join(node.get(k, "") for k in ("text", "content-desc", "hint", "resource-id"))
@@ -163,6 +199,10 @@ def run(out, source_sha, api):
         checkpoint()
     except Exception as error:
         results["offline_fresh_boot"]={"status":"FAIL","error":str(error)}
+        try:
+            screenshot(out, "boot_failure_api" + str(api))
+        except Exception:
+            pass  # Never mask the original boot/accessibility failure.
         for k in ("navigation","timer_start_pause","task_create","note_create_restore",
                   "language_change","language_after_restart","offline_resume","quick_training",
                   "sounds","goals_analytics","cancel_confirm"):
