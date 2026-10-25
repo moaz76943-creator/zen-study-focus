@@ -21,12 +21,15 @@ test('missing or unexpected PR is fail-closed',()=>{
  assert.throws(()=>verifyCanonicalPr(null,repo,ref),/canonical|PR/i);
  assert.throws(()=>verifyCanonicalPr({...pr,number:137},repo,ref),/canonical|PR/i);
 });
-test('scheduled QA flows pin and re-validate the canonical head',()=>{
+test('scheduled QA flows pin and re-validate official integration HEAD without relying on PR #138',()=>{
  const root=path.resolve(__dirname,'../..');
  for(const filename of ['.github/workflows/hourly_agent_orchestrator.yml','.github/workflows/daily_maintenance.yml']){
   const workflow=fs.readFileSync(path.join(root,filename),'utf8');
-  assert.match(workflow,/integration\/master-recovery-20261021/);
-  assert.match(workflow,/steps\.resolve\.outputs\.sha \|\| env\.SOURCE_REF/);
-  assert.match(workflow,/policy\.verifyCanonicalPr\(data,owner\+'\/'\+repo,process\.env\.SOURCE_REF,sha\)|policy\.verifyCanonicalPr\(data,owner\+'\/'\+repo,process\.env\.SOURCE_REF,checked\)/);
+  assert.match(workflow,/integration\/master-qa-verified-v21/);
+  assert.match(workflow,/steps\.resolve\.outputs\.sha/);
+  assert.match(workflow,/official_source_guard\.cjs/);
+  assert.doesNotMatch(workflow,/integration\/master-recovery-20261021/);
+  assert.doesNotMatch(workflow,/pull_number:policy\.CANONICAL_PR/);
+  assert.doesNotMatch(workflow,/steps\.resolve\.outputs\.sha \|\| env\.SOURCE_REF/);
  }
 });
