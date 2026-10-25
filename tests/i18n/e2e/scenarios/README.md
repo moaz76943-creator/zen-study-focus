@@ -32,8 +32,9 @@ python3 tools/i18n/e2e/scenarios/functional.py \
 | locale.switch_while_timer_running | Timer progresses before/after Arabic switch and process relaunch; AR locale persists | NOT_TESTED |
 | quick_training.work_rest_stop | Work Round 1/8 => Rest Round 1/8 after real Tabata 20/10; confirmed stop hides phase | NOT_TESTED |
 | digits.visible_labels | Enumerate Android-visible numeric labels, reject non-ASCII decimal digits | NOT_TESTED |
-| tasks.edit / tasks.restore | Requires scoped editor and real SAF DocumentsUI state/consent adapter | NOT_TESTED |
-| notes.edit | Requires accessible saved-note editor and body read-back | NOT_TESTED |
+| tasks.edit | Locate Edit under the exact saved task's Android accessibility subtree; replace title; persist across restart | NOT_TESTED |
+| tasks.restore | Move edited task to the in-app Trash and restore it; assert live and post-restart identity; this is **not SAF backup/restore** | NOT_TESTED |
+| notes.edit | Locate Edit under exact saved note's subtree, replace title and body and verify after restart | NOT_TESTED |
 | goals.real_analytics | Requires completed actual session plus real v21 goal/analytics read-back | NOT_TESTED |
 | audio.controls_settings | Requires actual playback signal, volume/state and persisted settings | NOT_TESTED |
 | security.html_injection | Requires payload entry plus real DOM execution/text-content assertions | NOT_TESTED |
@@ -54,7 +55,7 @@ This emits bounded deterministic JSONL files: 1,000 tasks, 5,000 notes and 10,00
 
 ## REQUIRED_RUNTIME_HOOKS / blockers for lane A
 
-1. Stable accessible record-scoped edit selectors and read-back for existing tasks/notes (legacy task list has done/delete but no proven Edit affordance).
+1. Confirm that the actual Android UIAutomator hierarchy exposes record-scoped Tasks/Notes Studio Edit/Trash/Restore actions; source UI supports them, but device affordances remain unverified.
 2. Native WebChromeClient JavaScript confirm buttons and outcome observable by UIAutomator for reset/cancel/stop. Without these, cases remain NOT_TESTED.
 3. SAF DocumentsUI consent, cancel/restore, corruption rollback with v21 checksum, source identity and post-relaunch checks; test-only data.
 4. Real session completion/goal credit/analytics history probe; real sound playback/volume and settings persistence probe.
