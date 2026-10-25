@@ -36,5 +36,22 @@
     "year": "Sal",
     "export": "CSV derxe",
     "details": "Ji bo hûrguliyan rojekê hilbijêre"
+  },
+  "goals": {
+    "kicker": "✦ Armancên te yên rojane",
+    "heading": "Her roj hinek pêşveçûn",
+    "desc": "Tenê xulekên danişînên baldarî yên qediyayî tên hejmartin.",
+    "edit": "⚙ Biguherîne",
+    "modal": "Armancên rojane yên çalakiyan",
+    "hint": "Ji bo veşartina armancê 0 binivîse. Tenê danişînên qediyayî tên hejmartin.",
+    "save": "Armanc hatin tomarkirin",
+    "invalid": "Ji 0 heta 720 xulek wek hejmarên tam binivîse.",
+    "noGoal": "Armancê diyar bike",
+    "minute": "xulek",
+    "done": "qediya",
+    "today": "îro",
+    "week": "vê hefteyê",
+    "weekTarget": "Armanca heftane (xulek)",
+    "weekInvalid": "Armanca heftane divê di nav 0 û 5040 xulekan de be."
   }
 }
