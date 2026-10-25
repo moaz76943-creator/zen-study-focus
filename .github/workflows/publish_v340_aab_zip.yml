@@ -1,0 +1,40 @@
+name: Deep Focus v3.4.0 AAB ZIP Download Fallback
+on:
+  push:
+    branches: [integration/master-qa-verified-v21]
+    paths: [.github/workflows/publish_v340_aab_zip.yml]
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: v3.4.0-complete-project-sweep-v21
+      COMMIT_SHA: c44f649caf45c1475cb80926d80318cd068af72a
+      EXPECTED_SHA256: 6c29d079af4e368ca80b59b78bd08899f99eabd0eaafb1246c5ff85d1905b0e8
+    steps:
+      - name: Check original release identity
+        uses: actions/checkout@v4
+        with:
+          ref: c44f649caf45c1475cb80926d80318cd068af72a
+          persist-credentials: false
+      - name: Download signed AAB and package mobile-friendly ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$COMMIT_SHA"
+          test "$(git ls-remote origin "refs/tags/$TAG^{}" | awk '{print $1}')" = "$COMMIT_SHA"
+          mkdir -p "$RUNNER_TEMP/aab-package"
+          cd "$RUNNER_TEMP/aab-package"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern 'DeepFocus-v3.4.0-Play-signed.aab'
+          test -s DeepFocus-v3.4.0-Play-signed.aab
+          printf '%s  %s\n' "$EXPECTED_SHA256" DeepFocus-v3.4.0-Play-signed.aab | sha256sum -c -
+          unzip -tq DeepFocus-v3.4.0-Play-signed.aab >/dev/null
+          printf '%s  %s\n' "$EXPECTED_SHA256" DeepFocus-v3.4.0-Play-signed.aab > SHA256.txt
+          printf 'Google Play requires the .aab file INSIDE this ZIP. Extract it first, then upload the .aab in Play Console. The .aab cannot be installed/opened like an APK. Source: %s\n' "$COMMIT_SHA" > README.txt
+          zip -0 DeepFocus-v3.4.0-Play-AAB-for-Android-download.zip DeepFocus-v3.4.0-Play-signed.aab SHA256.txt README.txt
+          unzip -tq DeepFocus-v3.4.0-Play-AAB-for-Android-download.zip
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber DeepFocus-v3.4.0-Play-AAB-for-Android-download.zip
+          echo "ZIP direct link: https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/DeepFocus-v3.4.0-Play-AAB-for-Android-download.zip" >> "$GITHUB_STEP_SUMMARY"

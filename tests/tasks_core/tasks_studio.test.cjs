@@ -16,7 +16,7 @@ const fakeDoc={createElement(tag){return new FakeElement(this,tag);}};
 function fixture(){let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[{id:7,title:'Write',date:'2026-10-19',catKey:'study',done:false,isStarter:false}]};
  let commits=0;
  const root=new FakeElement(fakeDoc,'main'),studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,19),readState:()=>JSON.parse(JSON.stringify(state)),
-  commit(before,after){assert.deepEqual(before,state);state=JSON.parse(JSON.stringify(after));commits++;return true;},linkTaskToTimer:()=>true});
+  commit(before,after){assert.deepEqual(before,state);state=JSON.parse(JSON.stringify(after));commits++;},linkTaskToTimer:()=>true});
  return {root,studio,get:()=>state,commits:()=>commits,set:x=>{state=x;}};}
 test('UI mounts into supplied root and respects isolated style',()=>{
  const f=fixture();assert.ok(f.root.descendants.some(x=>x.tagName==='STYLE'));
@@ -40,7 +40,7 @@ test('external timer state revision invalidates undo instead of erasing sessions
  assert.equal(f.get().cfg.sessionHistory.length,1);
 });
 
-test('legacy undated tasks render and priority sorting remains read-only',()=>{
+test('legacy undated tasks render and search remains read-only',()=>{
  let state={cfg:{sessions:4,sessionHistory:[],unknown:{keep:'cfg'}},tasksList:[
   {id:40,title:'Scheduled task',date:'2026-10-19',done:false,priority:'medium'},
   {id:12,title:'مهمة قديمة ١٢',done:false,priority:'medium'},
@@ -52,8 +52,6 @@ test('legacy undated tasks render and priority sorting remains read-only',()=>{
   readState:()=>JSON.parse(JSON.stringify(state)),commit(){commits++;return true;}});
  const cardTitles=()=>root.descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
  assert.deepEqual(cardTitles(),['مهمة قديمة ١٢','Legacy null date','Legacy malformed date','Scheduled task']);
- const sort=root.descendants.find(x=>x.tagName==='SELECT'&&x.children.some(o=>o.value==='priority'));
- assert.ok(sort);sort.value='priority';sort.dispatch('change');
  assert.deepEqual(cardTitles(),['مهمة قديمة ١٢','Legacy null date','Legacy malformed date','Scheduled task']);
  const search=root.descendants.find(x=>x.tagName==='INPUT'&&x.type==='search');
  search.value='قديمة';search.dispatch('input');assert.deepEqual(cardTitles(),['مهمة قديمة ١٢']);

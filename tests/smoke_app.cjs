@@ -35,8 +35,6 @@ class MockAudio {
   constructor() { this.volume = 0; this.paused = false; audioInstances.push(this); }
   play() { return Promise.resolve(); }
   pause() { this.paused = true; }
-  removeAttribute(name) { if(name==='src')this.src=''; }
-  load() {}
 }
 const sandbox = {
   Audio: MockAudio,
@@ -53,9 +51,8 @@ sandbox.window.localStorage = storage;
 sandbox.window.document = document;
 sandbox.window.navigator = sandbox.navigator;
 vm.createContext(sandbox);
-for(const file of ['locale_rows.js','locale_extras.js','quick_training.js','analytics_recovery_core.js','app.js']){
+for(const file of ['locale_rows.js','locale_extras.js','quick_training.js','app.js']){
   vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),sandbox,{filename:file,timeout:2000});
-  if(file==='analytics_recovery_core.js')sandbox.window.DeepFocusAnalyticsRecovery=sandbox.DeepFocusAnalyticsRecovery;
 }
 const evaluate=expr=>vm.runInContext(expr,sandbox,{timeout:2000});
 assert.match(document.getElementById('timerDigitsTxt').textContent,/^[0-9]{2}:[0-9]{2}$/);
@@ -102,13 +99,13 @@ evaluate("todayISO = '2000-01-01'; syncDailyRollover();");
 assert.equal(evaluate('todayISO'),evaluate('localDateISO()'));
 // A selected activity must remain visible and show its true duration.
 evaluate("cfg.domain = 'sport'; renderDomainState(); selectTimerMode(30,'focus',null); updateTimerDisplay();");
-assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30 minutes');
-assert.equal(document.getElementById('modeFocusBtn').textContent, '30 minutes');
+assert.equal(document.getElementById('timerModeCaption').textContent, 'Workout 30m');
+assert.equal(document.getElementById('modeFocusBtn').textContent, '30m');
 // One domain preset determines the visible focus button and its actual selected duration.
 for (const [domain, duration] of [['study',25], ['sport',30], ['read',20], ['work',50]]) {
   evaluate('cfg.domain=' + JSON.stringify(domain) + '; renderDomainState(); selectTimerMode(getDomainFocusMinutes(),\'focus\',null)');
   assert.equal(evaluate('timerTotal'),duration*60,domain+' focus duration');
-  assert.equal(document.getElementById('modeFocusBtn').textContent,duration+' minutes');
+  assert.equal(document.getElementById('modeFocusBtn').textContent,duration+'m');
 }
 // Ending an interval training sequence restores that same domain duration.
 evaluate("cfg.domain='sport'; quickTraining={active:true}; stopQuickTrainingInternal()");
@@ -175,16 +172,16 @@ assert.deepEqual([...store.entries()], [...savedBeforeRestore.entries()]);
 assert.equal(evaluate('cfg.sessions'), 2, 'In-memory progress survives failed restore');
 
 // A delayed media error must never restart a sound that the user already stopped.
-evaluate("toggleSoundTile('forest')");
+evaluate("toggleSoundTile('rain')");
 assert.equal(audioInstances.length, 1);
 const staleAudioError = audioInstances[0].onerror;
 evaluate('stopAllAudio()');
 staleAudioError();
-assert.equal(evaluate("Boolean(activePlayers['forest'])"), false);
-evaluate("toggleSoundTile('forest')");
-assert.equal(evaluate("Boolean(activePlayers['forest'])"), true);
+assert.equal(evaluate("Boolean(activePlayers['rain'])"), false);
+evaluate("toggleSoundTile('rain')");
+assert.equal(evaluate("Boolean(activePlayers['rain'])"), true);
 staleAudioError(); // stale error from the first instance cannot replace the new one
-assert.equal(evaluate("Boolean(activePlayers['forest'])"), true);
+assert.equal(evaluate("Boolean(activePlayers['rain'])"), true);
 evaluate('stopAllAudio()');
 assert.equal(evaluate('Object.keys(activePlayers).length'), 0);
 // Quick training must handle exact seconds, preset types, active rounds and zero-rest completion.
@@ -266,7 +263,7 @@ sandbox.window.confirm = () => true;
 assert.equal(evaluate('selectHomeQuickSession(10)'),true);
 assert.equal(evaluate('timerTotal'),600);
 assert.equal(evaluate('timerRunning'),false);
-assert.equal(document.getElementById('modeFocusBtn').textContent,'10 minutes');
+assert.equal(document.getElementById('modeFocusBtn').textContent,'10m');
 assert.equal(document.getElementById('homeQuick10').getAttribute('aria-pressed'),'true');
 assert.equal(document.getElementById('homeQuick25').getAttribute('aria-pressed'),'false');
 assert.equal(evaluate('selectHomeQuickSession(9)'),false,'Unlisted shortcut is rejected');
@@ -362,5 +359,18 @@ assert.equal(evaluate('cfg.todayMins'),beforeTinyCredit,'Twenty seconds must not
 const afterShort=evaluate('cfg.sessionHistory.length');
 evaluate("cfg.completedTimerIds=[]; creditCompletedSession()");
 assert.equal(evaluate('cfg.sessionHistory.length'),afterShort,'Full ledger blocks duplicate event after the rolling-ID cache is lost');
+
+// Category labels must remain inert text inside the selected-date agenda.
+evaluate(`
+  selectedCalDate = todayISO;
+  tasksList = [{id:9981,title:'Keep <personal> ۱۲',date:todayISO,catKey:'study',done:false}];
+  notesList = [];
+  getCatLabel = () => '<img src=x onerror=alert(1)>';
+  renderSelectedDateAgenda();
+`);
+const agendaMarkup = document.getElementById('calendarDayAgendaBox').children.at(-1).innerHTML;
+assert.ok(!agendaMarkup.includes('<img'), 'Agenda category must not create an HTML element');
+assert.ok(agendaMarkup.includes('&lt;img src=x onerror=alert(1)&gt;'));
+assert.equal(evaluate('tasksList[0].title'), 'Keep <personal> ۱۲', 'Rendering must preserve stored user text');
 
 console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');

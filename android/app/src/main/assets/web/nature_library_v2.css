@@ -1,9 +1,0 @@
-/* Read-only 20-lane acquisition inventory. Real playable tiles remain above. */
-#natureLibraryV2{margin-top:20px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 16px}
-.nature-library-heading{font-size:1rem;font-weight:750;margin:0}
-.nature-library-count{font-size:.85rem;opacity:.72;white-space:nowrap}
-.nature-library-list{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px}
-.nature-library-row{min-height:58px;min-width:0;padding:10px 12px;border-radius:12px;border:1px solid var(--border,rgba(127,127,127,.2));display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface,#fff)}
-.nature-library-row.is-pending{opacity:.72}
-.nature-library-name{font-size:.9rem;font-weight:650;overflow-wrap:anywhere}
-.nature-library-state{font-size:.73rem;opacity:.8;overflow-wrap:anywhere}
