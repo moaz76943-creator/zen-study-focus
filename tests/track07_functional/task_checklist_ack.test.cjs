@@ -20,8 +20,8 @@ function fixture(mode){
  const adapter={locale:'en',now:()=>new Date(2026,9,19),readState:()=>JSON.parse(JSON.stringify(state)),
   commit(before,after){if(mode.value==='false')return false;if(mode.value==='throw')throw Error('Disk full');
     state=JSON.parse(JSON.stringify(after));return true;},onError:error=>errors.push(error.message)};
- const studio=UI.mount(root,adapter),details=root.find(el=>el.tagName==='button'&&el.textContent==='Details');
- assert.ok(details);details.fire('click');
+ const studio=UI.mount(root,adapter);
+ // The current Tasks Studio renders checklist/subtask inputs directly on each card.
  return {root,studio,errors,read:()=>state};
 }
 function checkbox(root,label){
