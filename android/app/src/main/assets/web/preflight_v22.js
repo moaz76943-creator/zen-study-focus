@@ -11,14 +11,26 @@
   function inspect(storage) {
     const pending = D.inspectPending(storage);
     if (pending.pending) return {ok:false, kind:'journal', detail:pending};
-    const issues = [];
-    for (const key of Object.values(D.KEYS)) {
+    // Validate the chosen v21 family, not just its checksum. Read-only:
+    // leave every primary, mirror, journal and unrelated key untouched.
+    const snapshot = {cfg:{},tasksList:[],notesList:[]}, issues = [];
+    for (const [slot,key] of Object.entries(D.KEYS)) {
       const primaryRaw = storage.getItem(key);
       const mirrorRaw = storage.getItem(key + '_mirror');
-      if (primaryRaw === null && mirrorRaw === null) continue; // untouched fresh install
-      if (!D.inspectPacket(primaryRaw).ok && !D.inspectPacket(mirrorRaw).ok)
+      if (primaryRaw === null && mirrorRaw === null) continue; // fresh/partial v21
+      const primary = D.inspectPacket(primaryRaw);
+      const mirror = D.inspectPacket(mirrorRaw);
+      if (!primary.ok && !mirror.ok) {
         issues.push(key + ': neither copy verifies');
+        continue;
+      }
+      // Preserve historical primary selection; do not silently replace an
+      // invalid-shape primary with a checksum-valid mirror.
+      snapshot[slot === 'cfg' ? 'cfg' : slot === 'tasks' ? 'tasksList' : 'notesList'] =
+        (primary.ok ? primary : mirror).value;
     }
+    for (const issue of D.inspectRecords(snapshot).issues)
+      if (issue.severity === 'error') issues.push(issue.path + ': ' + issue.code);
     return {ok:!issues.length,kind:issues.length?'data':'ready',issues};
   }
   function renderBlocked(document, storage, result) {
