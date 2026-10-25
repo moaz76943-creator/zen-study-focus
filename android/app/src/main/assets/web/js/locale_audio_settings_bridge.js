@@ -194,9 +194,12 @@
     return ALIASES[base] || base || 'en';
   }
   function metadata(locale) {
+    const raw = String(locale || 'en').trim().toLowerCase().replace('_', '-').split('-')[0];
+    const excluded = raw === 'he' || raw === 'iw';
     const requested = localeCode(locale);
     const used = Object.prototype.hasOwnProperty.call(PACKS, requested) ? requested : 'en';
-    return Object.freeze({ requested, used, complete: used === requested, fallback: used !== requested });
+    const fallback = excluded || used !== requested;
+    return Object.freeze({ requested, used, complete: !fallback, fallback });
   }
   function translate(locale, key, vars) {
     if (!Object.prototype.hasOwnProperty.call(PACKS.en, key)) return '';
