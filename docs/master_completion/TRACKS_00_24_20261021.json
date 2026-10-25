@@ -1,0 +1,475 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-10-21",
+  "snapshot_only": true,
+  "source_repo": "moaz76943-creator/zen-study-focus",
+  "main_sha": "13c97a790b1206cd2573c38ff8bc243ef192a444",
+  "master_base_sha": "cd1713b66fdf6ec11c5808834bf30f516ee8f6c5",
+  "main_untouched": true,
+  "release_approved": false,
+  "explicit_test_rule": "PASS requires exact-SHA independent artifacts; PR creation or source-only PASS never establishes Android PASS.",
+  "canonical_task_ledger": "docs/master_completion/LEDGER_197.json",
+  "canonical_master_issue": "https://github.com/moaz76943-creator/zen-study-focus/issues/13",
+  "source_artifact": {
+    "run_id": 39571802262,
+    "application_sha": "86aa34c1755d3f90a784a765a89f83668723a4d8",
+    "note": "Historical v21 candidate only; not the latest master application."
+  },
+  "tracks": [
+    {
+      "track": "00",
+      "name": "Baseline and current source",
+      "priority": "P0",
+      "owner": "integration",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/138",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/143"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/13",
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/103"
+      ],
+      "next_gate": "Exact current source and PR ancestry",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "01",
+      "name": "v21 durability",
+      "priority": "P0",
+      "owner": "data_security",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/141",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/77",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/70"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/102"
+      ],
+      "next_gate": "Native ACK/SAF real Android",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "02",
+      "name": "PR reconciliation and integration",
+      "priority": "P0",
+      "owner": "integration",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/138",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/140",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/141",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/142",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/143"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/103"
+      ],
+      "next_gate": "Independent review and exact integrated HEAD",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "03",
+      "name": "Android test infrastructure",
+      "priority": "P0",
+      "owner": "android_qa",
+      "status": "NOT_TESTED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/136",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/133",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/134"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/102",
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/103"
+      ],
+      "next_gate": "Emulator test on master integration HEAD",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "04",
+      "name": "All buttons, dialogs and routing",
+      "priority": "P0",
+      "owner": "functional",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/126",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/118"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/103"
+      ],
+      "next_gate": "100 actual control outcomes on Android",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "05",
+      "name": "Timer lifecycle and session safety",
+      "priority": "P0",
+      "owner": "timer",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/135",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/126"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/106"
+      ],
+      "next_gate": "Native dialog, background and exact session persistence",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "06",
+      "name": "Completion alerts",
+      "priority": "P0",
+      "owner": "audio_alerts",
+      "status": "NOT_TESTED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/24"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/106"
+      ],
+      "next_gate": "Android physical sound/background/DND",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "07",
+      "name": "Notes Studio",
+      "priority": "P1",
+      "owner": "notes",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/70",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/78"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/108"
+      ],
+      "next_gate": "Drafts, real Save and process-kill E2E",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "08",
+      "name": "Tasks Studio",
+      "priority": "P1",
+      "owner": "tasks",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/142",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/81"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/108"
+      ],
+      "next_gate": "Undated legacy Save regression and Android touch",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "09",
+      "name": "Goals, achievements and calendar",
+      "priority": "P1",
+      "owner": "product",
+      "status": "NOT_TESTED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/80"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/103"
+      ],
+      "next_gate": "Real session-to-goal attribution and timezone E2E",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "10",
+      "name": "Analytics end-to-end",
+      "priority": "P0",
+      "owner": "analytics",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/134",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/126",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/91"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/109"
+      ],
+      "next_gate": "True SAF CSV readback on final SHA",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "11",
+      "name": "Original 20 UI languages",
+      "priority": "P0",
+      "owner": "localization",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/140",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/135"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/104"
+      ],
+      "next_gate": "4626 explicit key gaps; human contextual review",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "12",
+      "name": "100-language review pipeline",
+      "priority": "P1",
+      "owner": "localization",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/129",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/140"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/104"
+      ],
+      "next_gate": "80 planned inactive; language-specific approval",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "13",
+      "name": "Global Western digits 0-9",
+      "priority": "P0",
+      "owner": "localization_numerals",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/126",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/91"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/104"
+      ],
+      "next_gate": "Android SVG/CSV/native verification",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "14",
+      "name": "20 original nature recordings",
+      "priority": "P0",
+      "owner": "audio_provenance",
+      "status": "BLOCKED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/90"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/105"
+      ],
+      "next_gate": "Licensing, background underrun, human listening",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "15",
+      "name": "Security and privacy",
+      "priority": "P0",
+      "owner": "security",
+      "status": "BLOCKED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/71",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/141"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/107"
+      ],
+      "next_gate": "Gitleaks classification and exact-SHA audit",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "16",
+      "name": "White Premium UI/mobile accessibility",
+      "priority": "P1",
+      "owner": "ui_accessibility",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/84",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/95"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/110"
+      ],
+      "next_gate": "320px/200% font/TalkBack Android acceptance",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "17",
+      "name": "Control Center",
+      "priority": "P1",
+      "owner": "control_center",
+      "status": "BLOCKED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/37"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/110"
+      ],
+      "next_gate": "Phone link/real data verified from deployed UI",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "18",
+      "name": "12 agents and hourly orchestration",
+      "priority": "P1",
+      "owner": "automation",
+      "status": "BLOCKED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/53",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/54",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/60",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/65"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/69"
+      ],
+      "next_gate": "9/12 prior-SHA source evidence; 3 missing/stale",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "19",
+      "name": "Performance and offline",
+      "priority": "P1",
+      "owner": "performance",
+      "status": "NOT_TESTED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/29"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/103"
+      ],
+      "next_gate": "10k sessions, offline Android, low-memory",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "20",
+      "name": "Source, security, Android CI",
+      "priority": "P0",
+      "owner": "qa",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/143"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/103"
+      ],
+      "next_gate": "PR143 CI complete on its own SHA",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "21",
+      "name": "Integrated real-user journeys",
+      "priority": "P0",
+      "owner": "independent_qa",
+      "status": "NOT_TESTED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/136",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/134"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/102",
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/109"
+      ],
+      "next_gate": "Final integrated APK real E2E including SAF",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "22",
+      "name": "Fresh-source APK/AAB",
+      "priority": "P0",
+      "owner": "release_build",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/137",
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/139"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/103"
+      ],
+      "next_gate": "No old v21 artifact as final; sign after owner approval",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "23",
+      "name": "Independent release acceptance",
+      "priority": "P0",
+      "owner": "release_auditor",
+      "status": "BLOCKED",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/138"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/103",
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/107"
+      ],
+      "next_gate": "All gates pass + explicit owner approval",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    },
+    {
+      "track": "24",
+      "name": "DF-001..161 and 197-task closure",
+      "priority": "P1",
+      "owner": "tracker",
+      "status": "IN_PROGRESS",
+      "prs": [
+        "https://github.com/moaz76943-creator/zen-study-focus/pull/138"
+      ],
+      "issues": [
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/13",
+        "https://github.com/moaz76943-creator/zen-study-focus/issues/64"
+      ],
+      "next_gate": "Reconcile 161 official + 36 DF4 per exact SHA",
+      "android_final_sha": "NOT_TESTED",
+      "ready_for_integration": false,
+      "release_approved": false
+    }
+  ]
+}
