@@ -1872,7 +1872,8 @@ function applyLanguage(code) {
   document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
   const tn = document.getElementById('navTrainingText');
-  if (tn) tn.textContent = meta.code === 'ar' ? 'تدريب' : 'Training';
+  if (tn) tn.textContent = window.DF22Locale?.t(meta.code, 'quickTraining')
+    || (typeof quickText === 'function' ? quickText('trainingTitle') : 'Quick training');
   if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
