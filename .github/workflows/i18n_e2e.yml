@@ -159,6 +159,13 @@ jobs:
           [[ "$EXPECTED" =~ ^[a-f0-9]{64}$ ]]
           test "$(sha256sum "$BUILD/app-debug.apk" | awk '{print $1}')" = "$EXPECTED"
           cp "$BUILD/APK_SHA256.txt" "artifacts/i18n-e2e/api${DF13_API}/APK_SHA256.txt"
+      - name: Enable KVM acceleration before emulator boot
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chmod 0666 /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
       - name: Execute real Android E2E via explicit Bash
         uses: reactivecircus/android-emulator-runner@v2
         with:
