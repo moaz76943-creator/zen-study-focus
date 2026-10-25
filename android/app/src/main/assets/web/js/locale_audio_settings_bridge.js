@@ -19,7 +19,7 @@
     en: {
       'control.play':'Play', 'control.pause':'Pause', 'control.stopAll':'Stop all',
       'control.volume':'Volume', 'control.volumeFor':'Volume for {sound}',
-      'mix.ready':'Nature sounds ready', 'mix.preset':'Nature mix',
+      'mix.ready':'Nature sound controls', 'mix.preset':'Nature mix',
       'category.all':'All (12)', 'category.water':'Water & Rain',
       'category.forest':'Forest & Wind', 'category.warm':'Fire & Earth',
       'status.recordingUnavailable':'Local recording unavailable — synthesized ambience',
@@ -44,7 +44,7 @@
     ar: {
       'control.play':'تشغيل', 'control.pause':'إيقاف مؤقت', 'control.stopAll':'إيقاف الكل',
       'control.volume':'مستوى الصوت', 'control.volumeFor':'مستوى صوت {sound}',
-      'mix.ready':'أصوات الطبيعة جاهزة', 'mix.preset':'مزيج الطبيعة',
+      'mix.ready':'عناصر التحكم بأصوات الطبيعة', 'mix.preset':'مزيج الطبيعة',
       'category.all':'الكل (12)', 'category.water':'المياه والأمطار',
       'category.forest':'الغابة والرياح', 'category.warm':'النار والأرض',
       'status.recordingUnavailable':'التسجيل المحلي غير متاح — تُستخدم مؤثرات طبيعية اصطناعية',
@@ -69,7 +69,7 @@
     de: {
       'control.play':'Abspielen', 'control.pause':'Pausieren', 'control.stopAll':'Alle stoppen',
       'control.volume':'Lautstärke', 'control.volumeFor':'Lautstärke für {sound}',
-      'mix.ready':'Naturgeräusche bereit', 'mix.preset':'Naturklang-Mix',
+      'mix.ready':'Naturgeräusche steuern', 'mix.preset':'Naturklang-Mix',
       'category.all':'Alle (12)', 'category.water':'Wasser und Regen',
       'category.forest':'Wald und Wind', 'category.warm':'Feuer und Erde',
       'status.recordingUnavailable':'Lokale Aufnahme nicht verfügbar – synthetische Naturklänge',
@@ -94,7 +94,7 @@
     es: {
       'control.play':'Reproducir', 'control.pause':'Pausar', 'control.stopAll':'Detener todo',
       'control.volume':'Volumen', 'control.volumeFor':'Volumen de {sound}',
-      'mix.ready':'Sonidos de la naturaleza listos', 'mix.preset':'Mezcla natural',
+      'mix.ready':'Controles de sonidos naturales', 'mix.preset':'Mezcla natural',
       'category.all':'Todos (12)', 'category.water':'Agua y lluvia',
       'category.forest':'Bosque y viento', 'category.warm':'Fuego y tierra',
       'status.recordingUnavailable':'Grabación local no disponible — ambiente sintetizado',
@@ -119,7 +119,7 @@
     fr: {
       'control.play':'Lire', 'control.pause':'Pause', 'control.stopAll':'Tout arrêter',
       'control.volume':'Volume', 'control.volumeFor':'Volume de {sound}',
-      'mix.ready':'Sons de la nature prêts', 'mix.preset':'Mix nature',
+      'mix.ready':'Commandes des sons de la nature', 'mix.preset':'Mix nature',
       'category.all':'Tous (12)', 'category.water':'Eau et pluie',
       'category.forest':'Forêt et vent', 'category.warm':'Feu et terre',
       'status.recordingUnavailable':'Enregistrement local indisponible — ambiance synthétisée',
@@ -164,7 +164,9 @@
     if (!SOUND_SET.has(id)) return '';
     const oldName = legacy && legacy.sounds && legacy.sounds[id];
     // A legacy catalog applies only when its locale is explicitly known to match.
-    if (typeof oldName === 'string' && oldName.trim() &&
+    const legacyBase = String(legacy && legacy.locale || '').trim().toLowerCase().replace('_', '-').split('-')[0];
+    if (legacyBase !== 'he' && legacyBase !== 'iw' &&
+        typeof oldName === 'string' && oldName.trim() &&
         localeCode(legacy.locale) === localeCode(locale)) return oldName;
     return translate(locale, 'sound.' + id);
   }
