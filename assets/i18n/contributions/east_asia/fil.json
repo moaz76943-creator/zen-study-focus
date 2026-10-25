@@ -1,0 +1,19 @@
+{
+  "language": "fil",
+  "status": "REVIEW_REQUIRED",
+  "sections": {
+    "timer": {
+      "0": "⚙ I-customize",
+      "1": "Mga setting sa pokus at pahinga",
+      "2": "Mananatili ang kasalukuyang sesyon; sa mga bagong sesyon ilalapat ang pagbabago.",
+      "3": "Pokus · minuto",
+      "4": "Maikling pahinga · minuto",
+      "5": "Mahabang pahinga · minuto",
+      "6": "Mga sesyon bawat siklo",
+      "7": "Ibalik ang default",
+      "8": "I-save",
+      "9": "Gumamit ng buong bilang sa itinakdang saklaw.",
+      "10": "Na-save ang mga setting"
+    }
+  }
+}
