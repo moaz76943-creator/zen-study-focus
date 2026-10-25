@@ -91,3 +91,17 @@ test('absence of runtime modification preserves existing fallback and v21 user s
  assert.equal(canonical.he,undefined);
  assert.equal(canonical.iw,undefined);
 });
+
+test('Quick Training already has all 36 visible labels for each target language',()=>{
+ const source=fs.readFileSync(path.join(root,'android/app/src/main/assets/web/quick_training.js'),'utf8');
+ const boundary=source.indexOf('let quickTraining = null;');
+ assert.ok(boundary>0,'Quick Training dictionary boundary missing');
+ const dictionary=source.slice(0,boundary);
+ for(const code of target){
+  const match=dictionary.match(new RegExp('"'+code+'"\\s*:\\s*(\\[[\\s\\S]*?\\])\\s*[,}]'));
+  assert.ok(match,code+' missing Quick Training locale');
+  const values=JSON.parse(match[1]);
+  assert.equal(values.length,36,code+' Quick Training size');
+  assert.ok(values.every(s=>typeof s==='string'&&s.trim()),code+' blank Quick Training text');
+ }
+});
