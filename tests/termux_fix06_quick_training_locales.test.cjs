@@ -60,7 +60,7 @@ test('language switching updates visible quick training text and placeholder',()
 });
 
 test('missing language falls back to English without writing user content',()=>{
-  cfg.lang='it';
+  cfg.lang='zz';
   assert.equal(context.lookup('trainingTitle'),'Quick training');
   assert.equal(context.lookup('unknownKey'),'unknownKey');
   assert.equal(context.lookup('trainingSubtitle'),'Custom work-and-rest intervals');
