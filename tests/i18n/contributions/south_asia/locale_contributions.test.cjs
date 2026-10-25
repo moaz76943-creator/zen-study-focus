@@ -13,7 +13,8 @@ const namespaceKeys={
 timer:Array.from({length:11},(_,i)=>String(i)),
 analytics:['title','activity','period','start','end','minutes','sessions','average','streak','noData','goal','noGoals','tasks','chart','year','export','details'],
 analyticsDomain:['study','read','work','sport'],
-goals:['kicker','heading','desc','edit','modal','hint','save','invalid','noGoal','minute','done','today','week','weekTarget','weekInvalid']
+goals:['kicker','heading','desc','edit','modal','hint','save','invalid','noGoal','minute','done','today','week','weekTarget','weekInvalid'],
+notes:Array.from({length:36},(_,i)=>String(i))
 };
 const scripts={
 hi:/[\u0900-\u097F]/u,bn:/[\u0980-\u09FF]/u,ur:/[\u0600-\u06FF]/u,fa:/[\u0600-\u06FF]/u,
