@@ -1686,6 +1686,39 @@ function computeActualStreak(history, now = new Date()) {
 
 function syncDailyRollover() {
   const current = localDateISO();
+  const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : null;
+  // An unavailable optional analytics module must never erase cached values.
+  if (entries) {
+    const next = JSON.parse(JSON.stringify(cfg));
+    if (next.metricsDate && next.metricsDate !== current) {
+      next.todayMins = entries
+        .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
+        .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
+      next.water = 0;
+      next.sets = 0;
+      next.pagesRead = 0;
+      next.quickFocusRemainderSec = 0;
+    }
+    next.metricsDate = current;
+    next.streak = computeActualStreak(next.sessionHistory);
+    if (JSON.stringify(next) !== JSON.stringify(cfg)) {
+      try {
+        if (window.DF22Integration) {
+          const before = window.DF22Integration.getSnapshot();
+          if (window.DF22Integration.write(before, {...before,cfg:next}) !== true)
+            throw new Error('ROLLOVER_SAVE_NOT_VERIFIED');
+        } else {
+          if (saveFortressData('zen_fortress_cfg_v21', next) !== true)
+            throw new Error('ROLLOVER_SAVE_NOT_VERIFIED');
+          cfg = next;
+        }
+      } catch (_) {
+        showToast((typeof L === 'function' && L().saveFailed) || 'Could not save daily progress. Retry.');
+        return false;
+      }
+    }
+  }
+  // Date controls advance only after the daily snapshot has been acknowledged.
   if (todayISO !== current) {
     const previousDate = todayISO;
     todayISO = current;
@@ -1697,19 +1730,7 @@ function syncDailyRollover() {
       calMonth = new Date().getMonth();
     }
   }
-  if (cfg.metricsDate && cfg.metricsDate !== current) {
-    const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
-    cfg.todayMins = entries
-      .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
-      .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
-    cfg.water = 0;
-    cfg.sets = 0;
-    cfg.pagesRead = 0;
-    cfg.quickFocusRemainderSec = 0;
-  }
-  cfg.metricsDate = current;
-  cfg.streak = computeActualStreak(cfg.sessionHistory);
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  return true;
 }
 
 function L() {
@@ -2038,48 +2059,53 @@ function verifyAndRestoreBackupCode(codeStr) {
     if (!confirmSensitiveAction('restore')) return false;
     // Build and verify every storage packet before replacing any saved record.
     // If a write fails (e.g. storage quota), roll back all six original keys.
-    const imports = [
-      ['zen_fortress_cfg_v21', verified.cfg],
-      ['zen_fortress_tasks_v21', verified.tasksList],
-      ['zen_fortress_notes_v21', verified.notesList]
-    ];
-    const updates = [];
-    for (const [key, value] of imports) {
-      const payload = JSON.stringify(value);
-      updates.push([key, JSON.stringify({payload, sig:computeHash(payload), ts:Date.now()})]);
-    }
-    const previous = new Map();
-    for (const [key] of updates) {
-      previous.set(key, localStorage.getItem(key));
-      previous.set(key + '_mirror', localStorage.getItem(key + '_mirror'));
-    }
-    try {
-      for (const [key, packet] of updates) {
-        localStorage.setItem(key, packet);
-        localStorage.setItem(key + '_mirror', packet);
+    if (window.DF22Integration) {
+      // The live app shares the same crash-recoverable transaction as Notes/Tasks.
+      const before = window.DF22Integration.getSnapshot();
+      if (window.DF22Integration.write(before, verified) !== true) throw new Error('RESTORE_NOT_VERIFIED');
+    } else {
+      const imports = [
+        ['zen_fortress_cfg_v21', verified.cfg],
+        ['zen_fortress_tasks_v21', verified.tasksList],
+        ['zen_fortress_notes_v21', verified.notesList]
+      ];
+      const updates = [];
+      for (const [key, value] of imports) {
+        const payload = JSON.stringify(value);
+        updates.push([key, JSON.stringify({payload, sig:computeHash(payload), ts:Date.now()})]);
       }
-      for (const [key, packet] of updates) {
-        if (localStorage.getItem(key) !== packet || localStorage.getItem(key + '_mirror') !== packet) {
-          throw new Error('Storage verification failed');
+      const previous = new Map();
+      for (const [key] of updates) {
+        previous.set(key, localStorage.getItem(key));
+        previous.set(key + '_mirror', localStorage.getItem(key + '_mirror'));
+      }
+      try {
+        for (const [key, packet] of updates) {
+          localStorage.setItem(key, packet);
+          localStorage.setItem(key + '_mirror', packet);
         }
-      }
-      // Do not advertise a successful restore until all six v21 packets are fsynced.
-      if (window.ZenNative && (!window.DF22Preflight || !window.DF22Preflight.nativeAcknowledge(localStorage)))
-        throw new Error('NATIVE_DURABLE_ACK_FAILED');
-    } catch (storageError) {
-      for (const [key, oldValue] of previous) {
-        try {
-          if (oldValue === null) localStorage.removeItem(key);
-          else localStorage.setItem(key, oldValue);
-        } catch (rollbackError) {
-          console.error('Backup rollback failed:', key, rollbackError);
+        for (const [key, packet] of updates) {
+          if (localStorage.getItem(key) !== packet || localStorage.getItem(key + '_mirror') !== packet) {
+            throw new Error('Storage verification failed');
+          }
         }
+        if (typeof window !== 'undefined' && window.ZenNative && (!window.DF22Preflight || !window.DF22Preflight.nativeAcknowledge(localStorage)))
+          throw new Error('NATIVE_DURABLE_ACK_FAILED');
+      } catch (storageError) {
+        for (const [key, oldValue] of previous) {
+          try {
+            if (oldValue === null) localStorage.removeItem(key);
+            else localStorage.setItem(key, oldValue);
+          } catch (rollbackError) {
+            console.error('Backup rollback failed:', key, rollbackError);
+          }
+        }
+        throw storageError;
       }
-      throw storageError;
+      cfg = verified.cfg;
+      tasksList = verified.tasksList;
+      notesList = verified.notesList;
     }
-    cfg = verified.cfg;
-    tasksList = verified.tasksList;
-    notesList = verified.notesList;
     syncDailyRollover();
     applyLanguage(cfg.lang);
     closeModal('cloudBackupModal');
@@ -2381,51 +2407,74 @@ function storeTimerSession() {
   });
 }
 function creditCompletedSession() {
-  if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
-  if (!timerSessionId) return;
+  if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return true;
+  if (!timerSessionId) return true;
   const ids = Array.isArray(cfg.completedTimerIds) ? cfg.completedTimerIds : [];
   if (ids.includes(timerSessionId) ||
-      (Array.isArray(cfg.sessionHistory) && cfg.sessionHistory.some(s => s && s.id === timerSessionId))) return;
+      (Array.isArray(cfg.sessionHistory) && cfg.sessionHistory.some(s => s && s.id === timerSessionId))) return true;
+  const nextCfg = JSON.parse(JSON.stringify(cfg));
   // Short intervals such as 20/10 must not credit a whole minute for 20 seconds.
   // Accumulate real seconds across work rounds; legacy timer accounting is preserved.
   let earned;
   if (quickTraining?.active) {
-    const accumulated = Math.max(0, Number(cfg.quickFocusRemainderSec) || 0)
+    const accumulated = Math.max(0, Number(nextCfg.quickFocusRemainderSec) || 0)
       + Math.max(0, Math.round(timerActiveMs / 1000));
     earned = Math.floor(accumulated / 60);
-    cfg.quickFocusRemainderSec = accumulated % 60;
+    nextCfg.quickFocusRemainderSec = accumulated % 60;
   } else {
     earned = Math.max(0, Math.floor((timerActiveMs + 500) / 60000));
   }
-  cfg.todayMins = Number(cfg.todayMins || 0) + earned;
-  cfg.sessions = Number(cfg.sessions || 0) + 1;
-  cfg.metricsDate = localDateISO();
-  cfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
-  if (!Array.isArray(cfg.sessionHistory)) cfg.sessionHistory = [];
+  nextCfg.todayMins = Number(nextCfg.todayMins || 0) + earned;
+  nextCfg.sessions = Number(nextCfg.sessions || 0) + 1;
+  nextCfg.metricsDate = localDateISO();
+  nextCfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
+  if (!Array.isArray(nextCfg.sessionHistory)) nextCfg.sessionHistory = [];
   const credited = {id: timerSessionId, date: localDateISO(), minutes: earned,
-    domain: cfg.domain || 'study',mode:'focus',completed:true};
+    domain: nextCfg.domain || 'study',mode:'focus',completed:true};
   if (Number.isSafeInteger(focusSessionTaskId) && focusSessionTaskId >= 0 &&
       typeof tasksList !== 'undefined' && tasksList.some(t => t.id === focusSessionTaskId && !t.isStarter))
     credited.taskId = focusSessionTaskId;
-  cfg.sessionHistory.push(credited);
+  nextCfg.sessionHistory.push(credited);
   if (!quickTraining?.active) {
-    const rounds = Number.isInteger(cfg.roundsPerCycle) && cfg.roundsPerCycle >= 1 && cfg.roundsPerCycle <= 12 ? cfg.roundsPerCycle : 4;
-    const past = Number.isInteger(cfg.focusCycleCount) && cfg.focusCycleCount >= 0 && cfg.focusCycleCount < rounds ? cfg.focusCycleCount : 0;
-    cfg.focusCycleCount = (past + 1) % rounds;
+    const rounds = Number.isInteger(nextCfg.roundsPerCycle) && nextCfg.roundsPerCycle >= 1 && nextCfg.roundsPerCycle <= 12 ? nextCfg.roundsPerCycle : 4;
+    const past = Number.isInteger(nextCfg.focusCycleCount) && nextCfg.focusCycleCount >= 0 && nextCfg.focusCycleCount < rounds ? nextCfg.focusCycleCount : 0;
+    nextCfg.focusCycleCount = (past + 1) % rounds;
   }
-  cfg.streak = computeActualStreak(cfg.sessionHistory);
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  nextCfg.streak = computeActualStreak(nextCfg.sessionHistory);
+  try {
+    if (window.DF22Integration) {
+      const before = window.DF22Integration.getSnapshot();
+      if (window.DF22Integration.write(before, {...before,cfg:nextCfg}) !== true)
+        throw new Error('SESSION_SAVE_NOT_VERIFIED');
+    } else {
+      if (saveFortressData('zen_fortress_cfg_v21', nextCfg) !== true)
+        throw new Error('SESSION_SAVE_NOT_VERIFIED');
+      cfg = nextCfg;
+    }
+  } catch (_) {
+    showToast(cfg.lang === 'ar'
+      ? 'تعذّر حفظ الجلسة. أبقِ التطبيق مفتوحًا واضغط التشغيل لإعادة المحاولة.'
+      : 'Could not save this session. Keep the app open and press Play to retry.');
+    return false;
+  }
   syncHeaderMetrics();
   if (window.DF22Integration?.onSessionRecorded) window.DF22Integration.onSessionRecorded();
   try { document.dispatchEvent(new CustomEvent('deep-focus:session-recorded',{detail:{schemaVersion:1,...credited}})); } catch (e) {}
+  return true;
 }
 function finalizeTimerSession(shouldChime) {
+  const completedAlertId=timerSessionId, completedAlertPhase=currentTimerModeKey;
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = null;
   accumulateActiveTime();
   timerRunning = false;
   timerLeft = 0;
-  creditCompletedSession();
+  if (creditCompletedSession() !== true) {
+    // Keep the persisted timer snapshot and completion ID for an explicit retry.
+    updateTimerDisplay();
+    document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    return false;
+  }
   if(quickTraining?.active) {
     advanceQuickTrainingStep();
     if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true);
