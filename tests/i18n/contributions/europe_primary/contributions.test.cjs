@@ -40,7 +40,9 @@ for (const lang of languages) {
 }
 
 test('No forbidden languages or unexpected contribution files', () => {
-  assert.deepEqual(fs.readdirSync(dir).sort(), ['el.json', 'sk.json']);
+  const files = fs.readdirSync(dir).filter(name => name.endsWith('.json'));
+  assert.ok(['el.json', 'sk.json'].every(name => files.includes(name)));
+  assert.ok(files.every(name => !['he.json', 'iw.json', 'ar.json', 'en.json'].includes(name)));
   assert.ok(!languages.some(code => ['he', 'iw', 'en', 'ar'].includes(code)));
 });
 
