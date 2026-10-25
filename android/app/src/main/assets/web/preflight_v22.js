@@ -11,13 +11,26 @@
   function inspect(storage) {
     const pending = D.inspectPending(storage);
     if (pending.pending) return {ok:false, kind:'journal', detail:pending};
-    const issues = [];
-    for (const key of Object.values(D.KEYS)) {
+    // Decode verified packets without modifying primary, mirror, or missing families.
+    const issues = [], snapshot = {cfg:{}, tasksList:[], notesList:[]};
+    for (const [slot,key] of Object.entries(D.KEYS)) {
       const primaryRaw = storage.getItem(key);
       const mirrorRaw = storage.getItem(key + '_mirror');
       if (primaryRaw === null && mirrorRaw === null) continue; // untouched fresh install
-      if (!D.inspectPacket(primaryRaw).ok && !D.inspectPacket(mirrorRaw).ok)
+      const primary = D.inspectPacket(primaryRaw), mirror = D.inspectPacket(mirrorRaw);
+      if (!primary.ok && !mirror.ok) {
         issues.push(key + ': neither copy verifies');
+        continue;
+      }
+      const name = slot === 'cfg' ? 'cfg' : slot === 'tasks' ? 'tasksList' : 'notesList';
+      snapshot[name] = (primary.ok ? primary : mirror).value;
+    }
+    // A valid checksum does not imply a valid v21 record family.
+    if (!issues.length) {
+      const report = D.inspectRecords(snapshot);
+      for (const item of report.issues) {
+        if (item.severity === 'error') issues.push(item.path + ': ' + item.code);
+      }
     }
     return {ok:!issues.length,kind:issues.length?'data':'ready',issues};
   }
