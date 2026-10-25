@@ -16,10 +16,11 @@ if(quickEnd<0)throw Error('Quick dictionary boundary changed');
 vm.runInContext(quick.slice(0,quickEnd)+'\nthis.quick=QUICK_TRANSLATIONS;',cx);
 vm.runInContext(read('locale_premium_v22.js'),cx);
 vm.runInContext(read('js/df99_multiscreen_i18n.js'),cx);
+vm.runInContext(read('js/df99_reviewed_packs.js'),cx);
 const codes=cx.catalog.map(x=>x.code);
 if(codes.length!==99||new Set(codes).size!==99||codes.some(x=>x==='he'||x==='iw'))throw Error('99-language catalog invalid');
 const keyCount={
-  timer:11,goals:15,tasks:58,notes:36,analytics:17,analyticsDomain:4
+  timer:11,goals:15,tasks:64,notes:36,analytics:17,analyticsDomain:4
 };
 const expected=Object.fromEntries(Object.entries(keyCount).map(([family,n])=>{
   if(family==='timer'||family==='notes')return [family,Array.from({length:n},(_,i)=>String(i))];
