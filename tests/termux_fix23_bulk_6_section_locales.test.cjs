@@ -52,9 +52,19 @@ test('Runtime bridge resolves translated terms across six families',()=>{
   ];
   for(const [lang,area,key,value] of cases) assert.equal(t(lang,area,key,'fallback'),value,lang+'/'+area+'/'+key);
 });
-test('No false translations: existing English fallback is preserved for absent sections',()=>{
+test('Native task translations override fallback; truly missing strings still use English',()=>{
   const cx=context();const t=cx.window.DF99Locale.t;
-  for(const code of ['it','pt','tr','ru'])assert.equal(t(code,'tasks','title','Tasks Studio'),'Tasks Studio');
+  // Batch 25 added real task dictionaries to these languages.
+  for(const code of ['it','pt','tr','ru']){
+    assert.ok(source[code]?.tasks?.title,code+'/tasks/title must exist');
+    assert.notEqual(source[code].tasks.title,'Tasks Studio',code+'/tasks/title must be translated');
+    assert.equal(t(code,'tasks','title','Tasks Studio'),source[code].tasks.title);
+  }
+  // Czech and Hungarian have no task pack: English fallback remains correct.
+  for(const code of ['cs','hu']){
+    assert.equal(source[code]?.tasks,undefined,code+' unexpectedly acquired a task pack');
+    assert.equal(t(code,'tasks','title','Tasks Studio'),'Tasks Studio');
+  }
   for(const code of ['he','iw','zz'])assert.equal(t(code,'timer','0','⚙ Customize'),'⚙ Customize');
   assert.equal(t('es','tasks','not_in_the_app','missing'),'missing');
 });
