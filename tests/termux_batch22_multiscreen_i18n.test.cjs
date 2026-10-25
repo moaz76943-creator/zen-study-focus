@@ -56,7 +56,7 @@ test('Five existing UI areas are wired into bridge and no v21 persistence keys a
  const pages={
   'timer_settings.js':'DF99Locale?.t(cfg.lang',
   'goals_studio.js':'DF99Locale?.t(cfg.lang',
-  'notes_studio.js':'DF99Locale?.t(cfg.lang',
+  'notes_studio.js':"api.t(nsLanguage(),'notes'",
   'tasks_studio.js':"DF99Locale?.section('tasks'",
   'analytics_studio.js':"dict.t(code,'analyticsDomain'"
  };

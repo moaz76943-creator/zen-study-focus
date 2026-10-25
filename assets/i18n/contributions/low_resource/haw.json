@@ -1,0 +1,12 @@
+{
+  "language": "haw",
+  "status": "REVIEW_REQUIRED",
+  "sections": {
+    "timer": {
+      "8": "Mālama"
+    },
+    "tasks": {
+      "save": "Mālama"
+    }
+  }
+}
