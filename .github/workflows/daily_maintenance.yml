@@ -261,6 +261,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ steps.resolve.outputs.sha }}
+          path: source
           persist-credentials: false
       - uses: actions/setup-java@v4
         with:
@@ -282,13 +283,13 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/weekly"
-          checked="$(git -C . rev-parse HEAD 2>/dev/null || true)"
+          checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
           live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
           node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/weekly" || {
             exit 1
           }
       - name: Debug test APK only, no signing or publishing
-        working-directory: android
+        working-directory: source/android
         run: gradle assembleDebug --no-daemon
       - name: Recheck exact weekly source SHA
         id: weekly_recheck
@@ -297,22 +298,22 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/weekly"
-          checked="$(git -C . rev-parse HEAD 2>/dev/null || true)"
+          checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
           live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
           node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/weekly" || {
             exit 1
           }
       - run: |
           mkdir -p evidence
-          git rev-parse HEAD > evidence/SHA
-          sha256sum android/app/build/outputs/apk/debug/*.apk > evidence/sha256.txt
+          git -C source rev-parse HEAD > evidence/SHA
+          sha256sum source/android/app/build/outputs/apk/debug/*.apk > evidence/sha256.txt
           echo 'TEST ONLY, NOT FOR PRODUCTION' > evidence/RELEASE_NOT_APPROVED
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: deep-focus-weekly-debug-test-apk
           path: |
-            android/app/build/outputs/apk/debug/*.apk
+            source/android/app/build/outputs/apk/debug/*.apk
             evidence/
           retention-days: 3
           if-no-files-found: warn
