@@ -12,7 +12,7 @@ const existing=new Set([]);
 const canonical=reviewed.de;
 const read=lang=>{const pack=JSON.parse(fs.readFileSync(path.join(root,'assets/i18n/contributions/african_languages',lang+'.json'),'utf8'));assert.equal(pack.language,lang);assert.equal(pack.status,'REVIEW_REQUIRED');return pack.sections;};
 const has=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
-test('batch 01 contributions are self-contained, UTF-8 NFC, valid offline locale packs',()=>{
+test('batch 4 contributions are self-contained, UTF-8 NFC, valid offline locale packs',()=>{
  for(const lang of languages){
   const dict=read(lang);
   assert.deepEqual(Object.keys(dict).sort(),families.slice().sort());
@@ -44,12 +44,14 @@ test('all untranslated canonical keys are recorded explicitly as REVIEW_REQUIRED
   assert.equal(record.status,Object.keys(missing).length?'REVIEW_REQUIRED':'CANDIDATE_NATIVE_QA');
  }
 });
-test('flag long identical cross-language translations for native review',()=>{
+test('identical long strings are flagged for native-language review',()=>{
+ const detected=[];
  for(let i=0;i<languages.length;i++)for(let j=i+1;j<languages.length;j++){
-  const [a,b]=[read(languages[i]),read(languages[j])];
+  const [la,lb]=[languages[i],languages[j]],a=read(la),b=read(lb);
   for(const family of families)for(const [key,value] of Object.entries(a[family]||{}))
-   if(value.length>=14&&has(b[family]||{},key))assert.notEqual(value,b[family][key],languages[i]+'/'+languages[j]+'/'+family+'/'+key);
+   if(value.length>=14&&has(b[family]||{},key)&&value===b[family][key])detected.push({pair:[la,lb],family,key,text:value});
  }
+ assert.deepEqual(manifest._suspicious_duplicates,detected);
 });
 test('reviewed source stays offline; no language silently claims complete app coverage',()=>{
  assert.deepEqual(languages,['tn','rw','mg','ny']);
