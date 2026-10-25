@@ -14,6 +14,7 @@
     'waterfall', 'night', 'thunder', 'wind', 'winrain', 'earth'
   ]);
   const SOUND_SET = new Set(SOUND_IDS);
+  const keyboardBound = new WeakSet();
   const PACKS = Object.freeze({
     en: {
       'control.play':'Play', 'control.pause':'Pause', 'control.stopAll':'Stop all',
@@ -184,17 +185,36 @@
     const tiles = [...section.querySelectorAll('.sound-Rich-tile')];
     if (tiles.length !== visible.length) return {status:'MISMATCH', updated:0};
     // Validate all DOM targets before performing any changes.
-    const refs = tiles.map(tile => ({tile, name:tile.querySelector('.stile-name'),
+    const refs = tiles.map(tile => ({tile, play:tile.querySelector('.stile-play-btn'), name:tile.querySelector('.stile-name'),
       label:tile.querySelector('.stile-volume-label span'),
       slider:tile.querySelector('input.stile-vol')}));
-    if (refs.some(x => !x.name || !x.label || !x.slider)) return {status:'INCOMPLETE', updated:0};
+    if (refs.some(x => !x.play || !x.name || !x.label || !x.slider)) return {status:'INCOMPLETE', updated:0};
     refs.forEach((ref,i) => {
       const labels = audioLabels(locale, visible[i].id, legacy);
       ref.name.textContent = labels.name;
       ref.label.textContent = '🔉 ' + labels.volume;
       ref.slider.setAttribute('aria-label', labels.volumeAria);
       const isOn = ref.tile.classList && ref.tile.classList.contains('playing');
-      ref.tile.setAttribute('aria-label', (isOn ? labels.pause : labels.play) + ': ' + labels.name);
+      ref.tile.setAttribute('role', 'group');
+      ref.tile.setAttribute('aria-label', labels.name);
+      ref.play.setAttribute('role', 'button');
+      ref.play.setAttribute('tabindex', '0');
+      ref.play.setAttribute('aria-pressed', String(!!isOn));
+      ref.play.setAttribute('aria-label', (isOn ? labels.pause : labels.play) + ': ' + labels.name);
+      if (!keyboardBound.has(ref.play) && typeof ref.play.addEventListener === 'function') {
+        keyboardBound.add(ref.play);
+        ref.play.addEventListener('keydown', function (event) {
+          if (!event || event.target !== ref.play || (event.key !== 'Enter' && event.key !== ' ')) return;
+          event.preventDefault();
+          if (typeof event.stopPropagation === 'function') event.stopPropagation();
+          if (typeof ref.play.click === 'function') ref.play.click();
+          // app.js synchronously recreates the tiles when toggling playback.
+          // Restore focus to the corresponding new control, when it exists.
+          const replacements = section.querySelectorAll('.sound-Rich-tile');
+          const replacement = replacements[i] && replacements[i].querySelector('.stile-play-btn');
+          if (replacement && typeof replacement.focus === 'function') replacement.focus();
+        });
+      }
     });
     const header = section.querySelector('#mixerStatusTxt');
     if (header) header.textContent = translate(locale, 'mix.ready');
