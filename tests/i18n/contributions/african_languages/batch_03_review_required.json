@@ -1,0 +1,154 @@
+{
+  "zu": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "2",
+        "8",
+        "14",
+        "27",
+        "34"
+      ],
+      "tasks": [
+        "addCheck",
+        "delegate",
+        "do",
+        "eliminate",
+        "notConnected",
+        "schedule"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 129,
+    "native_review_pending": true
+  },
+  "xh": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "2",
+        "8",
+        "14",
+        "27",
+        "34"
+      ],
+      "tasks": [
+        "addCheck",
+        "delegate",
+        "do",
+        "eliminate",
+        "notConnected",
+        "schedule"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 129,
+    "native_review_pending": true
+  },
+  "sn": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "1",
+        "2",
+        "7",
+        "8",
+        "14",
+        "27",
+        "34"
+      ],
+      "tasks": [
+        "addCheck",
+        "delegate",
+        "do",
+        "eliminate",
+        "estimated",
+        "invalid",
+        "notConnected",
+        "schedule"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 125,
+    "native_review_pending": true
+  },
+  "st": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "1",
+        "2",
+        "7",
+        "8",
+        "14",
+        "27",
+        "34"
+      ],
+      "tasks": [
+        "addCheck",
+        "delegate",
+        "do",
+        "eliminate",
+        "estimated",
+        "invalid",
+        "notConnected",
+        "schedule"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 125,
+    "native_review_pending": true
+  }
+}
