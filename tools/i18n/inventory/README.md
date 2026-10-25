@@ -9,7 +9,7 @@ From the repository root:
     node tools/i18n/inventory/index.cjs . tools/i18n/inventory/reports
     node --test tests/i18n/inventory/inventory.test.cjs
 
-Outputs:
+Outputs (generated locally; never treat an older snapshot as current):
 
 - reports/inventory.json — machine-readable keys, source file references and lines, per-language and per-screen coverage, hardcoded candidates, fallback exposure, unused candidates, parse/runtime-analysis limitations.
 - reports/inventory.md — human-readable summaries and file/line samples.
@@ -28,8 +28,8 @@ Scans HTML/JS/CJS/JSON and Android XML/Java/Kotlin under the web and native sour
 - **NATIVE_ANDROID_GAPS** covers missing default Android resources and detected native UI literal candidates, not actual accessibility coverage proof.
 - **UNRESOLVED_DYNAMIC_REFERENCES** and parse issues are blockers to declaring 100% coverage. Manual and instrumented runtime accessibility/UX localization QA remains required.
 
-The checked-in source snapshot covers 173 eligible files, uses a deterministic ordered key inventory and includes all 100 detected catalog locales (Hebrew codes he/iw excluded). No dictionary or UI string is rewritten.
+The authoritative runtime language list is `LANG_CATALOG` in `app.js` (99 unique supported codes). The separate legacy `SUPPORTED_LOCALES` registry has 100 entries, including codes not offered by the runtime: the scanner reports that drift as a parse issue. Generated reports are intentionally not checked in: the historical 100-locale report was stale after later merges. Run the commands above on current HEAD to obtain accurate snapshot metrics. No dictionary or UI string is rewritten.
 
 ## Handoff to lane 00
 
-Source-only audit. Review changes restricted to tools/i18n/inventory/ and tests/i18n/inventory/. No production code, permissions, v21 keys, or existing translation packs are changed. Run tests before merging. For a subsequent source revision, regenerate both reports and reconcile the locked baseline explicitly.
+Source-only audit. Review changes restricted to tools/i18n/inventory/ and tests/i18n/inventory/. No production code, permissions, v21 keys, or existing translation packs are changed. Run tests before merging. For each updated source revision regenerate both local reports and reconcile the locked baseline explicitly.
