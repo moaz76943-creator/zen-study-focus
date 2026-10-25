@@ -207,6 +207,25 @@ def run(out, source_sha, api):
             return "No Wi-Fi or mobile-data services during fresh restart"
         record(results,"offline_resume",offline_resume)
 
+        # One freshly cleared emulator data store per locale. Localized UI is checked
+        # on Android, not inferred from dictionary coverage. Each entry reports itself.
+        for code, english_name in LOCALES:
+            def verify_locale(code=code, english_name=english_name):
+                shell("pm", "clear", PACKAGE)  # isolated test data only
+                if api >= 33:
+                    shell("pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS")
+                initial = restart()
+                if not visible(initial, "English"):
+                    raise AssertionError("English locale chooser not visible on fresh app")
+                if code != "en":
+                    language(english_name, code)
+                after = restart()
+                if not visible(after, code.upper()):
+                    raise AssertionError(code + " did not persist on Android restart")
+                screenshot(out, "locale_" + code + "_api" + str(api))
+                return code + " selected and persisted through native process restart"
+            record(results, "locale_" + code, verify_locale)
+
         # Native UIAutomator cannot expose HTML direction/layout CSS; record screenshots,
         # leave visual layout acceptance as NOT_TESTED until an image/layout comparator exists.
         for w in WIDTHS:
@@ -239,7 +258,7 @@ def run(out, source_sha, api):
     report={"TASK_ID":"DF-LANE-13-REAL-END-TO-END-QA","SOURCE_SHA":source_sha,
             "API":api,"test_results":results,"device_matrix":matrix,
             "representative_locales_planned":[code for code,_ in LOCALES],
-            "representative_locales_android_verified":["ar"] if results.get("language_change",{}).get("status")=="PASS" else [],
+            "representative_locales_android_verified":[code for code,_ in LOCALES if results.get("locale_"+code,{}).get("status")=="PASS"],
             "note":"UIAutomator assertions reflect actual installed Android WebView, not Node or simulated DOM.",
             "CI_RUN_URL":os.getenv("GITHUB_SERVER_URL","https://github.com")+"/"+os.getenv("GITHUB_REPOSITORY","moaz76943-creator/zen-study-focus")+"/actions/runs/"+os.getenv("GITHUB_RUN_ID","UNKNOWN")}
     report["BLOCKERS"]=[key+": "+str(x.get("error",x.get("reason",""))) for key,x in results.items() if x["status"]!="PASS"]
