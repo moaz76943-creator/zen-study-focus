@@ -118,3 +118,11 @@ test('generated JS escapes script closers without damaging Unicode',()=>{
   assert.ok(!render(obj).includes('</script>'));
   assert.deepEqual(parseGenerated(render(obj)),obj);
 });
+
+test('regular import repairs corrupt generated JS from the intact canonical source',t=>{
+  const f=fixture(t);run(f.opts);
+  fs.writeFileSync(path.join(f.root,f.js),'BROKEN');
+  assert.throws(()=>run({...f.opts,check:true}),/Generated JS/);
+  assert.equal(run(f.opts).changed,true);
+  assert.deepEqual(parseGenerated(file(f,f.js)),JSON.parse(file(f,f.source)));
+});
