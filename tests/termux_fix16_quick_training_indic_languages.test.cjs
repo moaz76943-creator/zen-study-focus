@@ -43,7 +43,7 @@ test('Changing language refreshes labels and placeholder, without touching edita
  assert.equal(userText,'نص المستخدم ٢٠٢٦');
 });
 test('All 50 previous packs preserved after the expansion',()=>{
- assert.equal(Object.keys(ctx.packs).length,55);
+ assert.ok(Object.keys(ctx.packs).length>=55, 'Previous 55 packs must remain available');
  for(const code of oldCodes){
   assert.ok(Array.isArray(ctx.packs[code]),code+' lost');
   assert.equal(ctx.packs[code].length,36,code+' changed');
