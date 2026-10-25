@@ -10,8 +10,6 @@ on:
       - 'tests/integration_recovery/native_durable_ack.test.cjs'
       - 'tests/integration_recovery/df_pr01_native_ack_contract.test.cjs'
       - '.github/workflows/df_pr01_v21_native_ack_qa.yml'
-  push:
-    branches: [fix/df-pr01-native-ack-recovery-20261026]
 permissions:
   contents: read
 jobs:
@@ -22,12 +20,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Assert exact source HEAD
         run: |
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
           echo "HEAD=$(git rev-parse HEAD)"
       - name: Check edited JavaScript syntax
         run: |
