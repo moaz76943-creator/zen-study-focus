@@ -5,7 +5,7 @@ const {fraction,summarize,countBlankStrings,staticSections}=require('../../../to
 const locales=Array.from({length:99},(_,i)=>'x'+String(i).padStart(2,'0'));
 function inventory(){
   return {target:99,summary:locales.map(code=>({
-    code,core:true,quick:true,areas:{timer:'2/2',tasks:'3/3',notes:'1/1'}
+    code,core:true,quick:true,areas:{timer:'2/2',goals:'1/1',tasks:'3/3',notes:'1/1',analytics:'2/2',analyticsDomain:'4/4'}
   }))};
 }
 test('fractions reject corrupt or impossible results',()=>{
@@ -41,4 +41,13 @@ test('baseline declares all 6 screens and their navigation',()=>{
     assert.ok(state.page_present,screen+' missing page');
     assert.ok(state.navigation_present,screen+' missing navigation');
   }
+});
+
+test('a missing measured family fails instead of silently passing',()=>{
+  const sample=inventory();
+  delete sample.summary[0].areas.goals;
+  const result=summarize(sample,{},'abc123');
+  assert.equal(result.summary.FAIL,1);
+  assert.ok(result.per_language_coverage[0].reasons.includes('SECTION_NOT_MEASURED:goals'));
+  assert.equal(result.per_language_coverage[1].status,'PASS');
 });

@@ -9,6 +9,7 @@ const ROOT=path.resolve(__dirname,'../../..');
 const WEB=path.join(ROOT,'android/app/src/main/assets/web');
 const read=name=>fs.readFileSync(path.join(WEB,name),'utf8');
 const SECTIONS=['sec-timer','sec-tasks','sec-calendar','sec-notes','sec-sounds','sec-analytics'];
+const REQUIRED_AREAS=Object.freeze(['timer','goals','tasks','notes','analytics','analyticsDomain']);
 function fraction(value) {
   const m=/^(\d+)\/(\d+)$/.exec(value||'');
   if(!m)throw Error('Malformed translated/total: '+value);
@@ -22,9 +23,11 @@ function summarize(raw,source,sha) {
   if(raw.summary.some(x=>x.code==='he'||x.code==='iw'))throw Error('Excluded language detected');
   const langs=raw.summary.map(entry=>{
     const sections=Object.fromEntries(Object.entries(entry.areas||{}).map(([name,value])=>[name,fraction(value)]));
+    const unmeasured=REQUIRED_AREAS.filter(area=>!Object.hasOwn(sections,area));
     const counts=Object.values(sections).reduce((n,v)=>({translated:n.translated+v.translated,total:n.total+v.total,missing:n.missing+v.missing}),{translated:0,total:0,missing:0});
     const observed=source[entry.code]||{core:null,quick:null};
     const reasons=[];
+    for(const area of unmeasured)reasons.push('SECTION_NOT_MEASURED:'+area);
     if(!entry.core)reasons.push('CORE_DICTIONARY_MISSING');
     if(!entry.quick)reasons.push('QUICK_DICTIONARY_MISSING');
     if(counts.missing)reasons.push('SECTION_TRANSLATIONS_FALLBACK_OR_ABSENT');
@@ -64,6 +67,27 @@ function sourceEmptyCounts() {
   };
   return source;
 }
+// Independently enumerate absent section keys for translation lane handoff.
+function missingKeysByLanguage(raw) {
+  const ctx={window:{},document:{addEventListener(){}},console};
+  vm.createContext(ctx);
+  for(const file of ['locale_rows.js','locale_extras.js'])vm.runInContext(read(file),ctx,{filename:file,timeout:2500});
+  const app=read('app.js'),quick=read('quick_training.js');
+  const a=app.indexOf('let todayISO ='),b=quick.indexOf('let quickTraining = null;');
+  if(a<0||b<0)throw Error('Dictionary initialization moved');
+  vm.runInContext(app.slice(0,a),ctx,{filename:'app:catalog',timeout:5000});
+  vm.runInContext(quick.slice(0,b),ctx,{filename:'quick:catalog',timeout:5000});
+  for(const file of ['locale_premium_v22.js','js/df99_multiscreen_i18n.js','js/df99_reviewed_packs.js'])
+    vm.runInContext(read(file),ctx,{filename:file,timeout:5000});
+  if(!ctx.window.DF99Locale?.coverage)throw Error('Runtime i18n coverage registry not present');
+  const keys=raw.sections;
+  for(const area of REQUIRED_AREAS)
+    if(!Array.isArray(keys?.[area])||keys[area].length===0)throw Error('Missing source key inventory: '+area);
+  return Object.fromEntries(raw.summary.map(lang=>[lang.code,Object.fromEntries(
+    REQUIRED_AREAS.map(area=>[area,keys[area].filter(key=>
+      ctx.window.DF99Locale.coverage([lang.code],area,[key])[0].translated===0)])
+  )]));
+}
 function staticSections() {
   const html=read('index.html');
   const rows=Object.fromEntries(SECTIONS.map(id=>[id,{
@@ -83,7 +107,22 @@ function run(outDir,strict) {
   const p=cp.spawnSync(process.execPath,[path.join(ROOT,'tools/df99_full_app_coverage.cjs'),'--json'],{
     cwd:ROOT,encoding:'utf8',maxBuffer:16*1024*1024});
   if(p.status!==0)throw Error('Authoritative coverage probe failed: '+p.stderr);
-  const result=summarize(JSON.parse(p.stdout),sourceEmptyCounts(),sourceSha());
+  const raw=JSON.parse(p.stdout);
+  const missingKeys=missingKeysByLanguage(raw);
+  const result=summarize(raw,sourceEmptyCounts(),sourceSha());
+  for(const row of result.per_language_coverage)for(const area of REQUIRED_AREAS) {
+    if(!row.sections[area] || row.sections[area].missing!==missingKeys[row.code][area].length)
+      throw Error('Coverage count vs missing-key audit mismatch for '+row.code+' '+area);
+  }
+  const byArea=Object.fromEntries(REQUIRED_AREAS.map(area=>[area,{
+    translated:result.per_language_coverage.reduce((n,r)=>n+r.sections[area].translated,0),
+    missing:result.per_language_coverage.reduce((n,r)=>n+r.sections[area].missing,0)
+  }]));
+  result.by_section=byArea;
+  fs.writeFileSync(path.join(outDir,'MISSING_TRANSLATION_KEYS.json'),
+    JSON.stringify({SOURCE_SHA:result.SOURCE_SHA,scope:'REGISTERED_SOURCE_KEYS_ONLY',by_area:byArea,
+      missing_keys_by_language:missingKeys},null,2)+'\n');
+
   result.static_screen_presence=staticSections();
   result.static_sections_status=Object.values(result.static_screen_presence).every(x=>x.page_present&&x.navigation_present)?'PASS':'FAIL';
   const file=path.join(outDir,'PER_LANGUAGE_COVERAGE.json');
@@ -108,4 +147,4 @@ if(require.main===module) {
   const out=arg>=0&&process.argv[arg+1]?path.resolve(process.argv[arg+1]):path.join(ROOT,'artifacts/i18n-e2e');
   try{run(out,process.argv.includes('--strict'))}catch(error){console.error(error.stack||String(error));process.exitCode=2;}
 }
-module.exports={fraction,summarize,countBlankStrings,staticSections,run};
+module.exports={fraction,summarize,countBlankStrings,staticSections,missingKeysByLanguage,run};
