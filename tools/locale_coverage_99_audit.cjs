@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+'use strict';
+const fs=require('node:fs');
+const vm=require('node:vm');
+const path=require('node:path');
+const root=path.resolve(__dirname,'../android/app/src/main/assets/web');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const app=read('app.js');
+const quick=read('quick_training.js');
+const ctx={window:{},document:{addEventListener(){}},console};
+vm.createContext(ctx);
+vm.runInContext(read('locale_rows.js'),ctx);
+vm.runInContext(read('locale_extras.js'),ctx);
+const cutoff=app.indexOf('let todayISO =');
+if(cutoff<0)throw Error('App locale initialization moved');
+vm.runInContext(app.slice(0,cutoff)+'\nthis.catalog=LANG_CATALOG;this.coreDict=DICT;',ctx);
+const pre=quick.indexOf('let quickTraining = null;');
+if(pre<0)throw Error('Quick locale init moved');
+vm.runInContext(quick.slice(0,pre)+'\nthis.quickDict=QUICK_TRANSLATIONS;',ctx);
+const codes=ctx.catalog.map(x=>x.code);
+const core=Object.keys(ctx.coreDict);
+const quickCodes=Object.keys(ctx.quickDict);
+if(codes.length!==99 || new Set(codes).size!==99)throw Error('Catalog is not 99 unique locales');
+if(codes.includes('he')||codes.includes('iw'))throw Error('Excluded Hebrew locale in catalog');
+const missingCore=codes.filter(x=>!core.includes(x));
+const missingQuick=codes.filter(x=>!quickCodes.includes(x));
+const invalidQuick=quickCodes.filter(x=>!Array.isArray(ctx.quickDict[x])||ctx.quickDict[x].length!==36);
+if(invalidQuick.length)throw Error('Quick pack invalid: '+invalidQuick.join(','));
+const registry=read('js/global_i18n_registry.js');
+const r=registry.match(/var SUPPORTED_LOCALES\s*=\s*\[([\s\S]*?)\];/);
+if(!r)throw Error('Legacy registry shape changed');
+const legacy=[...r[1].matchAll(/\bcode:\s*"([^"]+)"/g)].map(x=>x[1]);
+const out={catalogLanguages:codes.length,coreDictionaryLanguages:core.length,quickTrainingLanguages:quickCodes.length,missingCore,missingQuick,legacyRegistryLanguages:legacy.length,legacyOnly:legacy.filter(x=>!codes.includes(x)),catalogOnly:codes.filter(x=>!legacy.includes(x)),excludedHebrew:!codes.includes('he')&&!codes.includes('iw'),meaning:'Counts represent actual loaded dictionaries, not a claim of full app translation'};
+if(process.argv.includes('--json'))console.log(JSON.stringify(out,null,2));
+else {
+ console.log(`CATALOG=${out.catalogLanguages} CORE=${out.coreDictionaryLanguages} QUICK=${out.quickTrainingLanguages}`);
+ console.log(`QUICK_MISSING=${missingQuick.length} CORE_MISSING=${missingCore.length}`);
+ console.log(`LEGACY_REGISTRY=${legacy.length} LEGACY_ONLY=${out.legacyOnly.join(',')} CATALOG_ONLY=${out.catalogOnly.join(',')}`);
+ console.log('NOTE: 99 listed languages does not mean 99 complete translations.');
+}

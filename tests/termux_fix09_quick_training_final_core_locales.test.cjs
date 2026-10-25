@@ -25,12 +25,14 @@ vm.createContext(ctx);
 vm.runInContext(source.slice(0,early)+'\n'+source.slice(start,end)+
  '\nthis.keys=QUICK_KEYS; this.packs=QUICK_TRANSLATIONS; this.lookup=quickText; this.refresh=quickL10n;',ctx);
 
-test('20 existing app interface languages have complete 36-key quick-training packs',()=>{
+test('20 core app interface languages remain complete when new locale packs are added',()=>{
  const langs=['en','ar','de','es','fr','pt','it','nl','tr','ru',
   'zh','hi','ja','ko','id','vi','pl','bn','ur','fa'];
  assert.equal(ctx.keys.length,36);
  assert.equal(new Set(ctx.keys).size,36);
- assert.equal(Object.keys(ctx.packs).length,20);
+ // Keep validating the ORIGINAL 20 packs even after later batches expand them.
+ assert.equal(langs.filter(code => Object.prototype.hasOwnProperty.call(ctx.packs, code)).length, langs.length);
+ assert.ok(Object.keys(ctx.packs).length >= 20, 'New locales must not remove core packs');
  for(const lang of langs){
   const pack=ctx.packs[lang];
   assert.ok(Array.isArray(pack),lang+' pack missing');
