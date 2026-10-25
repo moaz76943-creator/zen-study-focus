@@ -101,3 +101,17 @@ test('repair queues are grouped deterministically by lane, exact file, and code'
   assert.equal(first.items[0].language_code,'de');
   assert.deepEqual(first.items[0].missing_keys,['x']);
 });
+
+
+test('nested Core arrays and strings are measured at leaf paths, not flagged as empty objects',()=>{
+ const {flattenSourceLeaves}=require('../../../tools/i18n/e2e/coverage.cjs');
+ const en=flattenSourceLeaves({title:'Title',weekdays:['Sun','Mon'],sounds:{rain:'Rain'},sampleNotes:[{t:'Title',b:'Text'}]});
+ const translated=flattenSourceLeaves({title:'Titel',weekdays:['So','Mo'],sounds:{rain:'Regen'},sampleNotes:[{t:'Titel',b:'Text'}]});
+ assert.deepEqual(Object.keys(en).sort(),['sampleNotes.0.b','sampleNotes.0.t','sounds.rain','title','weekdays.0','weekdays.1']);
+ const result=auditSection({code:'de',section:'Core',keys:Object.keys(en).sort(),
+   english:en,read:key=>({proven:Object.hasOwn(translated,key),value:translated[key]})});
+ assert.equal(result.present_keys,6);
+ assert.equal(result.empty_values.length,0);
+ assert.deepEqual(result.english_identical_candidates,['sampleNotes.0.b']);
+ assert.equal(result.status,'PASS');
+});
