@@ -277,14 +277,19 @@ function runLocked({root,check,expectedCatalogSize,onStage}) {
   assertRegular(dest);
   const existingJSON=readText(source),existingJS=fs.existsSync(dest)?readText(dest):null;
   const centralUnchanged=same(JSON.parse(existingJSON),packs);
+  let jsMatches=false;
+  if(existingJS!==null){
+    try{jsMatches=same(parseGenerated(existingJS),packs);}
+    catch(error){if(check)throw error;}
+  }
   if(check){
     if(!centralUnchanged)fail('CHECK_FAILED: contributions have pending canonical additions ('+added+')');
     if(existingJS===null)fail('Generated JS file missing');
-    if(!same(parseGenerated(existingJS),packs))fail('Generated JS differs from canonical JSON');
+    if(!jsMatches)fail('Generated JS differs from canonical JSON');
     return {added:0,identical,changed:false,statuses,skipped};
   }
   let changed=false;
-  if(!centralUnchanged||existingJS===null||!same(parseGenerated(existingJS),packs)){
+  if(!centralUnchanged||!jsMatches){
     // Never rewrite canonical formatting when only the compiled JS needs regeneration.
     atomicPair(root,centralUnchanged?existingJSON:expectedJSON,expectedJS,onStage);
     changed=true;
