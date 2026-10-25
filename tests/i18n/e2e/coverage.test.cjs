@@ -115,3 +115,14 @@ test('nested Core arrays and strings are measured at leaf paths, not flagged as 
  assert.deepEqual(result.english_identical_candidates,['sampleNotes.0.b']);
  assert.equal(result.status,'PASS');
 });
+
+
+test('Core English object-reference fallback cannot count as a localized dictionary',()=>{
+ const {eligibleCoreDictionary}=require('../../../tools/i18n/e2e/coverage.cjs');
+ const english={title:'Start',nested:{label:'Save'}};
+ const native={title:'Los'};
+ assert.equal(eligibleCoreDictionary('de',{en:english,de:english}),null);
+ assert.equal(eligibleCoreDictionary('de',{en:english,de:native}),native);
+ assert.equal(eligibleCoreDictionary('en',{en:english}),english);
+ assert.equal(eligibleCoreDictionary('de',{en:english}),null);
+});
