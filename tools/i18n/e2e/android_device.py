@@ -15,7 +15,7 @@ import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-PACKAGE = "com.deepfocus.study"
+PACKAGE = "com.zenstudy.focus"
 ACTIVITY = PACKAGE + "/com.zenstudy.focus.MainActivity"
 WIDTHS = (320, 360, 393, 430)
 LOCALES = (("en", "English"), ("ar", "Arabic"), ("de", "German"),
