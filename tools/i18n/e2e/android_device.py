@@ -46,6 +46,10 @@ def visible(nodes, needle):
     return next((n for n in nodes if needle.casefold() in value(n).casefold()
                  and n.get("bounds")), None)
 
+def iso_badge(nodes, code):
+    return next((n for n in nodes if n.get("text", "").strip().upper() == code.upper()
+                 and n.get("bounds")), None)
+
 def tap_node(node):
     if node is None:
         raise AssertionError("Visible actionable element not found")
@@ -90,13 +94,15 @@ def screenshot(out, name):
 def language(name, iso):
     click("English" if iso != "en" else "English")
     text_input(0, name)
-    target = visible(dump(), name)
-    if target is None:
-        raise AssertionError(name + " not found in filtered Language Catalog")
-    tap_node(target)
+    matches = [n for n in dump() if name.casefold() in value(n).casefold()
+               and "EditText" not in n.get("class", "")
+               and n.get("clickable") == "true"]
+    if not matches:
+        raise AssertionError(name + " not exposed as a clickable Catalog row")
+    tap_node(matches[-1])
     nodes = dump()
-    if not visible(nodes, iso.upper()):
-        raise AssertionError("Language selected but ISO label not visible: "+iso)
+    if not iso_badge(nodes, iso):
+        raise AssertionError("Language selected but exact ISO badge not visible: "+iso)
     return True
 
 def record(results, name, fn):
@@ -195,7 +201,7 @@ def run(out, source_sha, api):
 
         def lang_restart():
             nodes=restart()
-            if not visible(nodes,"AR"):
+            if not iso_badge(nodes,"AR"):
                 raise AssertionError("Arabic locale did not persist after restart")
             return "Arabic ISO label survived process restart"
         record(results,"language_after_restart",lang_restart)
@@ -220,7 +226,7 @@ def run(out, source_sha, api):
                 if code != "en":
                     language(english_name, code)
                 after = restart()
-                if not visible(after, code.upper()):
+                if not iso_badge(after, code):
                     raise AssertionError(code + " did not persist on Android restart")
                 screenshot(out, "locale_" + code + "_api" + str(api))
                 return code + " selected and persisted through native process restart"
