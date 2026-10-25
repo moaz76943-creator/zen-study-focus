@@ -1,0 +1,198 @@
+{
+  "language": "gl",
+  "status": "TRANSLATED",
+  "sections": {
+    "notes": {
+      "0": "✦ ESTUDIO DE NOTAS",
+      "1": "As túas ideas, ben organizadas",
+      "2": "Escribe, organiza e revisa as túas ideas cada día.",
+      "3": "As miñas notas",
+      "4": "Fixadas",
+      "5": "＋ Nota nova",
+      "6": "Modelos de escritura preparados",
+      "7": "Toca para comezar",
+      "8": "Só fixadas",
+      "9": "Ordenar por",
+      "10": "Máis recentes",
+      "11": "Máis antigas",
+      "12": "Título",
+      "13": "resultados",
+      "14": "Non se atoparon notas. Comeza cun modelo.",
+      "15": "Nota nova",
+      "16": "Editar nota",
+      "17": "Título",
+      "18": "Tipo",
+      "19": "Data",
+      "20": "Contido",
+      "21": "Fixar",
+      "22": "Favoritas",
+      "23": "palabras",
+      "24": "caracteres",
+      "25": "Gardar nota",
+      "26": "Gardar cambios",
+      "27": "Queres substituír o teu texto por este modelo?",
+      "28": "Editar",
+      "29": "Duplicar",
+      "30": "Copiar",
+      "31": "Calendario",
+      "32": "Eliminar",
+      "33": "Mostrar resposta",
+      "34": "Non se puido copiar.",
+      "35": "Gardado"
+    },
+    "tasks": {
+      "title": "Estudio de tarefas",
+      "subtitle": "Planifica o día e segue o traballo real",
+      "add": "Nova tarefa",
+      "project": "Novo proxecto",
+      "today": "As tres prioridades de hoxe",
+      "search": "Buscar tarefas",
+      "all": "Lista",
+      "board": "Kanban",
+      "matrix": "Prioridades",
+      "trash": "Papeleira",
+      "calendar": "Calendario",
+      "undo": "Desfacer",
+      "redo": "Refacer",
+      "empty": "Non hai tarefas coincidentes",
+      "task": "Título da tarefa",
+      "desc": "Descrición",
+      "due": "Data",
+      "time": "Hora",
+      "cat": "Categoría",
+      "priority": "Prioridade",
+      "estimate": "Minutos estimados",
+      "repeat": "Repetir",
+      "group": "Grupo",
+      "notes": "IDs numéricos de notas",
+      "proj": "Proxecto",
+      "none": "Sen proxecto",
+      "save": "Gardar",
+      "cancel": "Cancelar",
+      "focus": "Comezar a concentrarse",
+      "edit": "Editar",
+      "done": "Completar",
+      "resume": "Reabrir",
+      "archive": "Arquivar",
+      "remove": "Enviar á papeleira",
+      "restore": "Restaurar",
+      "addCheck": "Engadir paso",
+      "check": "Lista de verificación",
+      "sub": "Subtarefas",
+      "study": "Estudo",
+      "sport": "Exercicio",
+      "review": "Lectura",
+      "exam": "Traballo",
+      "todo": "Sen comezar",
+      "doing": "En curso",
+      "completed": "Completada",
+      "archived": "Arquivada",
+      "low": "Baixa",
+      "medium": "Media",
+      "high": "Alta",
+      "urgent": "Urxente",
+      "daily": "Diariamente",
+      "weekly": "Semanalmente",
+      "monthly": "Mensualmente",
+      "never": "Nunca",
+      "allCategories": "Todas as categorías",
+      "estimated": "Estimado",
+      "actual": "Real",
+      "overdue": "Atrasada",
+      "do": "Importante e urxente",
+      "schedule": "Importante, non urxente",
+      "delegate": "Urxente, non importante",
+      "eliminate": "Nin urxente nin importante",
+      "invalid": "Non se puido gardar",
+      "notConnected": "Temporizador non conectado"
+    },
+    "goals": {
+      "kicker": "✦ OBXECTIVOS DIARIOS",
+      "heading": "Un pouco de progreso cada día",
+      "desc": "Os minutos proceden das sesións de concentración completadas.",
+      "edit": "⚙ Editar",
+      "modal": "Obxectivos diarios por actividade",
+      "hint": "Indica 0 para ocultar un obxectivo. Só contan as sesións completadas.",
+      "save": "Obxectivos gardados",
+      "invalid": "Introduce minutos enteiros de 0 a 720.",
+      "noGoal": "Definir obxectivo",
+      "minute": "min",
+      "done": "completado",
+      "today": "hoxe",
+      "week": "Esta semana",
+      "weekTarget": "Obxectivo semanal (min)",
+      "weekInvalid": "Os obxectivos semanais deben estar entre 0 e 5040 minutos."
+    },
+    "analytics": {
+      "title": "Análise da actividade rexistrada",
+      "activity": "Actividade",
+      "period": "Período",
+      "start": "Desde",
+      "end": "Ata",
+      "minutes": "Minutos rexistrados",
+      "sessions": "Sesións",
+      "average": "Media por sesión",
+      "streak": "Racha actual",
+      "noData": "Non hai sesións rexistradas neste período",
+      "goal": "Comparación de obxectivos",
+      "noGoals": "Non hai obxectivos diarios configurados",
+      "tasks": "Tarefas completadas",
+      "chart": "Distribución diaria",
+      "year": "Ano",
+      "export": "Exportar CSV",
+      "details": "Selecciona un día para ver os detalles"
+    },
+    "analyticsDomain": {
+      "study": "Estudo",
+      "read": "Lectura",
+      "work": "Traballo",
+      "sport": "Exercicio"
+    },
+    "timer": {
+      "0": {
+        "text": "⚙ Personalizar",
+        "status": "REVIEW_REQUIRED"
+      },
+      "1": {
+        "text": "Axustes de concentración e descansos",
+        "status": "REVIEW_REQUIRED"
+      },
+      "2": {
+        "text": "A sesión actual mantense; os cambios aplícanse só ás novas sesións.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "3": {
+        "text": "Concentración · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "4": {
+        "text": "Descanso curto · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "5": {
+        "text": "Descanso longo · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "6": {
+        "text": "Sesións por ciclo",
+        "status": "REVIEW_REQUIRED"
+      },
+      "7": {
+        "text": "Valores predeterminados",
+        "status": "REVIEW_REQUIRED"
+      },
+      "8": {
+        "text": "Gardar",
+        "status": "REVIEW_REQUIRED"
+      },
+      "9": {
+        "text": "Introduce números enteiros dentro dos límites indicados.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "10": {
+        "text": "Axustes gardados",
+        "status": "REVIEW_REQUIRED"
+      }
+    }
+  }
+}
