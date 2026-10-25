@@ -1,0 +1,12 @@
+{
+  "language": "hmn",
+  "status": "REVIEW_REQUIRED",
+  "sections": {
+    "timer": {
+      "8": "Txuag"
+    },
+    "tasks": {
+      "save": "Txuag"
+    }
+  }
+}
