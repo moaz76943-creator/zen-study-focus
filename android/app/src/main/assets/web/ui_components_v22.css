@@ -460,3 +460,10 @@ html:lang(sr) .df-v22 { font-family: "Noto Sans", system-ui, sans-serif; }
   .df-v22 .df22-modal { padding: 12px; }
   .df-v22 .df22-modal-actions > * { flex-basis: 100%; }
 }
+
+
+/* Locale-specific glyph priority: JP/KR forms must not resolve through SC first. */
+html:lang(zh) .df-v22 { font-family: "Noto Sans CJK SC", system-ui, sans-serif; }
+html:lang(ja) .df-v22 { font-family: "Noto Sans CJK JP", system-ui, sans-serif; }
+html:lang(ko) .df-v22 { font-family: "Noto Sans CJK KR", system-ui, sans-serif; }
+html:lang(ur) .df-v22 { font-family: "Noto Nastaliq Urdu", "Noto Naskh Arabic", system-ui, sans-serif; line-height: 1.65; }

@@ -89,6 +89,11 @@ test('RTL, wrapping, button focus and narrow devices have specific CSS guards',(
   assert.match(ui,/html:lang\(bn\)/);
   assert.match(ui,/html:lang\(ru\)/);
   assert.match(ui,/html:lang\(ckb\)/);
+  for(const [code,font] of [['zh','SC'],['ja','JP'],['ko','KR']]) {
+    assert.ok(ui.includes('html:lang('+code+') .df-v22 { font-family: "Noto Sans CJK '+font+'"'),
+      'incorrect '+code+' CJK glyph priority');
+  }
+  assert.match(ui,/html:lang\(ur\) \.df-v22 \{ font-family: "Noto Nastaliq Urdu"/);
 });
 test('offline font stacks and stable white premium colors',()=>{
   const tokens=css('design_tokens_v22.css');
