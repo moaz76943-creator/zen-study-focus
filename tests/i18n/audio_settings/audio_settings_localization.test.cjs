@@ -204,3 +204,14 @@ test('backup dialog rejects incomplete markup atomically and handles absent moda
  assert.equal(x.fields.title.textContent,before);
  assert.equal(bridge.bindBackupDialog({document:{getElementById(){return null;}},locale:'fr'}).status,'SKIPPED');
 });
+
+
+test('excluded locales report explicit fallback rather than full English coverage',()=>{
+ for(const language of ['he','iw','he-IL','iw_IL']) {
+  const status=bridge.metadata(language);
+  assert.equal(status.used,'en');
+  assert.equal(status.complete,false);
+  assert.equal(status.fallback,true);
+ }
+ assert.equal(bridge.metadata('en').complete,true);
+});
