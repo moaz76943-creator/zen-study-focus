@@ -49,6 +49,20 @@
       const value=typeof dict?.t==='function'?dict.t(code,'analytics',key,fallback):fallback;
       translated[key]=typeof value==='string'&&value.trim()?value:fallback;
     }
+    // Reuse already reviewed analytics labels for accessibility when the
+    // optional, more specific SVG keys have not yet been translated.
+    if(code!=='en'&&code!=='ar'){
+      if(translated.barAria===EN.barAria && translated.minutes!==EN.minutes)
+        translated.barAria=translated.minutes+' — '+translated.chart;
+      if(translated.heatAria===EN.heatAria && translated.year!==EN.year)
+        translated.heatAria=translated.year+' — '+translated.chart;
+      if(translated.heatMinutes===EN.heatMinutes && translated.minutes!==EN.minutes)
+        translated.heatMinutes=translated.minutes;
+      if(translated.minuteUnit===EN.minuteUnit && typeof dict?.t==='function'){
+        const unit=dict.t(code,'goals','minute',EN.minuteUnit);
+        if(typeof unit==='string'&&unit.trim())translated.minuteUnit=unit;
+      }
+    }
     return translated;
   }
   function domainText(locale,domain,fallback){
