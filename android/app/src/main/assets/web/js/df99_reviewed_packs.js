@@ -1,0 +1,2 @@
+/* Generated from reviewed offline locale packs, no network calls. */
+(function(root){"use strict";const packs={};const api=root.DF99Locale;if(!api)throw new Error("Full app locale bridge missing");for(const [lang,sections] of Object.entries(packs)){for(const [family,dict] of Object.entries(sections)){if(!api.register(lang,family,dict))throw new Error("Rejected locale pack: "+lang+"/"+family);}}})(typeof window!=="undefined"?window:globalThis);
