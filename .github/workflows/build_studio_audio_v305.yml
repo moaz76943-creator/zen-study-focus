@@ -1,0 +1,144 @@
+# v3.0.5 studio-audio debug APK: source is immutable tag commit, not the workflow branch.
+name: Deep Focus v3.0.5 Studio Audio - Pinned Debug APK
+
+on:
+  push:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - .github/workflows/build_studio_audio_v305.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deep-focus-studio-audio-v305-apk
+  cancel-in-progress: false
+
+jobs:
+  build-v305:
+    name: Verify pinned studio-audio tag and build APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact approved v3.0.5 studio-audio commit
+        uses: actions/checkout@v4
+        with:
+          ref: 515f6b012a02b58b04af6f993a63aa4234bded46
+          persist-credentials: false
+
+      - name: Verify source tag and inventory offline MP3 files
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE=515f6b012a02b58b04af6f993a63aa4234bded46
+          test "$(git rev-parse HEAD)" = "$SOURCE"
+          TAG_TARGET="$(git ls-remote origin 'refs/tags/v3.0.5-studio-audio-v21^{}' | awk '{print $1}')"
+          test "$TAG_TARGET" = "$SOURCE" || { echo "::error::v3.0.5 release tag does not point to required commit"; exit 1; }
+          test -f android/app/src/main/assets/web/index.html
+          test -f android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
+          grep -Fq 'js/deep_focus_runtime_activator.js' android/app/src/main/assets/web/index.html
+          test ! -e android/app/src/main/assets/web/js/deep_focus_visual_suite.js
+          node --check android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
+          test -d android/app/src/main/assets/web/audio
+          shopt -s nullglob
+          audio=(android/app/src/main/assets/web/audio/*.mp3)
+          test "${#audio[@]}" -ge 10 || { echo "::error::Expected at least 10 MP3 paths"; exit 1; }
+          good=0
+          bad=0
+          : > "$RUNNER_TEMP/studio-v305-audio-inventory.txt"
+          for f in "${audio[@]}"; do
+            size="$(stat -c '%s' "$f")"
+            if (( size < 1024 )); then
+              echo "INVALID_OR_PLACEHOLDER $size $f" | tee -a "$RUNNER_TEMP/studio-v305-audio-inventory.txt"
+              echo "::warning::$f is only $size bytes; not a valid studio recording"
+              bad=$((bad+1))
+            else
+              echo "PRESENT_UNVALIDATED $size $f" | tee -a "$RUNNER_TEMP/studio-v305-audio-inventory.txt"
+              good=$((good+1))
+            fi
+          done
+          echo "MP3 inventory: $good nontrivial files, $bad invalid-size files"
+          test "$good" -ge 6 || { echo "::error::Too few nontrivial MP3 files"; exit 1; }
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android API 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Prepare Gradle wrapper if missing from source
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -f ./gradlew ]]; then
+            gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
+          fi
+          chmod +x ./gradlew
+
+      - name: Build debug APK using exact requested command
+        working-directory: android
+        run: ./gradlew clean assembleDebug --stacktrace
+
+      - name: Verify APK, packaged studio audio, signing, provenance and SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" > "$RUNNER_TEMP/studio-v305-signing.txt"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" > "$RUNNER_TEMP/studio-v305-badging.txt"
+          grep -Fq "package: name='com.zenstudy.focus'" "$RUNNER_TEMP/studio-v305-badging.txt"
+          unzip -Z -1 "$APK" > "$RUNNER_TEMP/studio-v305-apk-entry-list.txt"
+          for f in android/app/src/main/assets/web/audio/*.mp3; do
+            grep -Fxq "assets/web/audio/$(basename "$f")" "$RUNNER_TEMP/studio-v305-apk-entry-list.txt"
+          done
+          grep -Fxq 'assets/web/js/deep_focus_runtime_activator.js' "$RUNNER_TEMP/studio-v305-apk-entry-list.txt"
+          ! grep -Fxq 'assets/web/js/deep_focus_visual_suite.js' "$RUNNER_TEMP/studio-v305-apk-entry-list.txt"
+          sha256sum "$APK" | tee "$RUNNER_TEMP/studio-v305-sha256.txt"
+          {
+            echo 'tag=v3.0.5-studio-audio-v21'
+            echo 'source_commit=515f6b012a02b58b04af6f993a63aa4234bded46'
+            echo 'source_branch=integration/master-qa-verified-v21'
+            echo 'command=./gradlew clean assembleDebug --stacktrace'
+            echo 'package=com.zenstudy.focus'
+            echo 'signature=Android debug key, not Google Play upload key'
+            echo 'audio_status=Some tagged MP3 paths are placeholders; see audio inventory'
+          } > "$RUNNER_TEMP/studio-v305-provenance.txt"
+          {
+            echo '### Studio Audio v3.0.5 pinned-source Debug APK'
+            echo 'Source: v3.0.5-studio-audio-v21 / 515f6b012a02b58b04af6f993a63aa4234bded46'
+            echo 'Android debug-signed APK; not Google Play release ready.'
+            echo 'Audio inventory contains invalid-size placeholder MP3s; see artifact report.'
+            echo 'APK SHA256:'
+            cat "$RUNNER_TEMP/studio-v305-sha256.txt"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload APK with source, audio inventory, signing and SHA256 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Studio-Audio-v3.0.5-Debug-APK
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            ${{ runner.temp }}/studio-v305-audio-inventory.txt
+            ${{ runner.temp }}/studio-v305-sha256.txt
+            ${{ runner.temp }}/studio-v305-provenance.txt
+            ${{ runner.temp }}/studio-v305-signing.txt
+            ${{ runner.temp }}/studio-v305-badging.txt
