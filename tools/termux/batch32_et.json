@@ -1,0 +1,57 @@
+{
+  "timer": [
+    "⚙ Kohanda",
+    "Keskendumise ja puhkuse seaded",
+    "Praegune seanss säilib; muudatused kehtivad ainult uutele seanssidele.",
+    "Keskendumine · min",
+    "Lühike paus · min",
+    "Pikk paus · min",
+    "Seansse tsüklis",
+    "Vaikeväärtused",
+    "Salvesta",
+    "Sisesta täisarvud näidatud vahemikes.",
+    "Seaded salvestatud"
+  ],
+  "goals": [
+    "✦ PÄEVAEESMÄRGID",
+    "Iga päev väike edusamm",
+    "Minutid arvestatakse lõpetatud keskendumisseanssidest.",
+    "⚙ Muuda",
+    "Päevaeesmärgid tegevuste kaupa",
+    "Sisesta 0, et eesmärk peita. Arvesse lähevad ainult lõpetatud seansid.",
+    "Eesmärgid salvestatud",
+    "Sisesta täisarvuline minutite arv vahemikus 0 kuni 720.",
+    "Sea eesmärk",
+    "min",
+    "lõpetatud",
+    "täna",
+    "Sel nädalal",
+    "Nädalaeesmärk (min)",
+    "Nädalaeesmärgid peavad olema vahemikus 0 kuni 5040 minutit."
+  ],
+  "analytics": [
+    "Salvestatud tegevuste analüüs",
+    "Tegevus",
+    "Periood",
+    "Alates",
+    "Kuni",
+    "Salvestatud minutid",
+    "Seansid",
+    "Keskmine seansi kohta",
+    "Praegune järjestikune periood",
+    "Sellel perioodil pole salvestatud seansse",
+    "Eesmärkide võrdlus",
+    "Päevaeesmärke pole määratud",
+    "Lõpetatud ülesanded",
+    "Päevane jaotus",
+    "Aasta",
+    "Ekspordi CSV",
+    "Üksikasjade nägemiseks vali päev"
+  ],
+  "analyticsDomain": [
+    "Õppimine",
+    "Lugemine",
+    "Töö",
+    "Sport"
+  ]
+}
