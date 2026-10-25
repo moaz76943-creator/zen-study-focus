@@ -44,9 +44,12 @@ test('preserve unsupported original claims as history, not as verified facts', (
   assert.equal(receipt.historical_claim.approved, false);
 });
 
-test('actual versionCode is descriptive, not proof of Play acceptance', () => {
+test('historical versionCode cannot certify the current release', () => {
   const code = gradle.match(/\bversionCode\s+(\d+)/);
-  assert.ok(code, 'versionCode must be present');
-  assert.equal(receipt.observed_version_code, Number(code[1]));
+  assert.ok(code, 'current versionCode must be present');
+  assert.ok(Number(code[1]) >= 1);
+  // The receipt is pinned to source d2c3f9b, where versionCode was 23.
+  // Do not equate it with later integration versions (currently 37).
+  assert.equal(receipt.observed_version_code, 23);
   assert.equal(receipt.gates.play_acceptance, 'NOT_TESTED');
 });
