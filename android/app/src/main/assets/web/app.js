@@ -1699,6 +1699,29 @@ function L() {
   return DICT[cfg.lang] || DICT.en;
 }
 
+// Shell-only labels. Reviewed DF99 shell packs take priority; legacy DICT and
+// these explicit defaults remain available while other languages are reviewed.
+const SHELL_LABELS = Object.freeze({
+  en: Object.freeze({
+    langSearchTitle: '🌐 Language & Country Search',
+    langSearchPlaceholder: 'Search language or country (e.g. Jordan, Spain, USA, مصر)...'
+  }),
+  ar: Object.freeze({
+    langSearchTitle: '🌐 البحث عن اللغة والبلد',
+    langSearchPlaceholder: 'ابحث عن لغة أو بلد (مثل الأردن أو إسبانيا أو مصر)...'
+  })
+});
+function shellLabel(code, key, current) {
+  const dict=DICT[code] || {};
+  const primary=typeof dict[key]==='string' && dict[key].trim() ? dict[key] : null;
+  const extra=SHELL_LABELS[code] && SHELL_LABELS[code][key];
+  const english=DICT.en[key] || (SHELL_LABELS.en && SHELL_LABELS.en[key]);
+  const fallback=primary || extra || english || current || '';
+  const reviewed=window.DF99Locale?.t(code,'shell',key,fallback);
+  const label=typeof reviewed==='string' && reviewed.trim() && reviewed!==key ? reviewed : fallback;
+  return toWest(label);
+}
+
 const CONFIRMATION_TEXT = {
   "en": [
     "Delete this task? This cannot be undone.",
@@ -1889,8 +1912,14 @@ function applyLanguage(code) {
   const normalized = typeof code === 'string' ? code.toLowerCase().trim().split(/[-_]/)[0] : 'en';
   const meta = LANG_CATALOG.find(x => x.code === normalized && x.code !== 'he' && x.code !== 'iw')
     || LANG_CATALOG.find(x => x.code === 'en');
+  const previousLang=cfg.lang;
   cfg.lang = meta.code;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  try {
+    saveFortressData('zen_fortress_cfg_v21', cfg);
+  } catch (error) {
+    cfg.lang=previousLang; // An unacknowledged write must not change the active locale.
+    throw error;
+  }
   const d = L();
 
   const root = document.getElementById('htmlRoot');
@@ -1907,13 +1936,17 @@ function applyLanguage(code) {
   if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
+    // Never replace an editable value or arbitrary user-generated content.
+    if (el.isContentEditable || /^(INPUT|TEXTAREA)$/i.test(el.tagName || '')) return;
     const k = el.getAttribute('data-i18n');
-    if (d[k]) el.textContent = toWest(d[k]);
+    const value=shellLabel(meta.code,k,el.textContent);
+    if (value && value!==k && el.textContent!==value) el.textContent=value;
   });
 
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const k = el.getAttribute('data-i18n-placeholder');
-    if (d[k]) el.setAttribute('placeholder', toWest(d[k]));
+    const value=shellLabel(meta.code,k,el.getAttribute('placeholder'));
+    if (value && value!==k) el.setAttribute('placeholder',value);
   });
 
   localizeStarterPreviews(d);
@@ -1929,6 +1962,8 @@ function applyLanguage(code) {
   updateSyllabusCalc();
   closeModal('langModal');
   quickL10n();
+  // Premium labels may also be created by re-rendered screens; refresh last.
+  if (window.DF22Locale?.apply) window.DF22Locale.apply(document,meta.code);
   if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
 }
 
@@ -2728,7 +2763,13 @@ function changeCalendarMonth(delta) {
 function renderCalendar() {
   const d = L();
   document.getElementById('calMonthYearTitle').textContent = toWest(`${d.months[calMonth]} ${calYear}`);
-  document.getElementById('calWeekdaysRow').innerHTML = d.weekdays.map(w => `<div>${w}</div>`).join('');
+  const weekdayRow=document.getElementById('calWeekdaysRow');
+  weekdayRow.replaceChildren();
+  d.weekdays.forEach(w => {
+    const label=document.createElement('div');
+    label.textContent=toWest(w);
+    weekdayRow.appendChild(label);
+  });
 
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
