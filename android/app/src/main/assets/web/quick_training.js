@@ -4109,20 +4109,20 @@ function renderTodayPlan() {
     check.textContent = t.done ? '✓' : '○';
     check.setAttribute('aria-pressed', String(Boolean(t.done)));
     check.setAttribute('aria-label',
-      (cfg.lang === 'ar' ? 'تغيير إنجاز المهمة: ' : 'Toggle completion: ') + toWest(t.title || ''));
+      (cfg.lang === 'ar' ? 'تغيير إنجاز المهمة: ' : 'Toggle completion: ') + String(t.title || ''));
     check.onclick = () => toggleTaskDone(t.id);
 
     const focus = document.createElement('button');
     focus.type = 'button';
     focus.className = 'today-plan-link';
     focus.setAttribute('aria-label',
-      (cfg.lang === 'ar' ? 'التركيز على: ' : 'Focus on: ') + toWest(t.title || ''));
+      (cfg.lang === 'ar' ? 'التركيز على: ' : 'Focus on: ') + String(t.title || ''));
     const name = document.createElement('span');
     name.className = 'today-plan-task-name';
-    name.textContent = toWest(t.title || '');
+    name.textContent = String(t.title || '');
     const details = document.createElement('small');
     details.className = 'today-plan-task-detail';
-    details.textContent = toWest(getCatLabel(t.catKey) + (t.time ? ' · ' + t.time : ''));
+    details.textContent = toWest(getCatLabel(t.catKey)) + (t.time ? ' · ' + String(t.time) : '');
     focus.appendChild(name);
     focus.appendChild(details);
     focus.onclick = () => focusOnTask(t.id);
