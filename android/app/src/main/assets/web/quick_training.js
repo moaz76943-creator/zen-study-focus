@@ -3034,6 +3034,87 @@ Object.assign(QUICK_TRANSLATIONS, {
     "Iiseshoni ezimfutshane"
   ]
 });
+/* DF_LANE_08_BATCH_01: Corsican and Western Frisian.
+   Linguistic approval: REVIEW_REQUIRED for both; count as present, not certified. */
+Object.assign(QUICK_TRANSLATIONS, {
+  "co": [
+    "✦ Spaziu di cuncentrazione",
+    "Prontu à cuncentrassi",
+    "In corsu",
+    "In pausa",
+    "Allenamentu rapidu",
+    "Intervalli persunalizati di travagliu è riposu",
+    "Serie",
+    "Travagliu (MM:SS)",
+    "Riposu (MM:SS)",
+    "Saltà l'ultimu riposu",
+    "Sequenza d'esercizii",
+    "per esempiu, stiramenti o lettura cuncentrata",
+    "+ Aghjunghje",
+    "Intervalli 20/10",
+    "Allenamentu 4/1",
+    "Lettura 20/5",
+    "Travagliu prufondu 50/10",
+    "Saltà a fase",
+    "Finisce l'allenamentu",
+    "▶ Cumincià l'allenamentu",
+    "✧ I to prugressi",
+    "Pianu d'oghje",
+    "Vede tuttu ↗",
+    "Sceglie l'attività",
+    "Una sessione adattata à ogni scopu",
+    "Nisun compitu per oghje",
+    "Travagliu",
+    "Riposu",
+    "Giru",
+    "Finitu",
+    "Finisce l'allenamentu attuale?",
+    "Cambià attività o modu finisce a sessione attuale. Cuntinuà?",
+    "Inserite durate valide in furmatu MM:SS",
+    "Allenamentu principiatu",
+    "Allenamentu compiu!",
+    "Sessioni rapide"
+  ],
+  "fy": [
+    "✦ Fokusromte",
+    "Klear om te fokusjen",
+    "Dwaande",
+    "Pauzearre",
+    "Flugge training",
+    "Oanpasbere wurk- en rêstyntervallen",
+    "Rûnten",
+    "Wurk (MM:SS)",
+    "Rêst (MM:SS)",
+    "Lêste rêst oerslaan",
+    "Folchoarder fan oefeningen",
+    "bygelyks rekken of konsintrearre lêzen",
+    "+ Tafoegje",
+    "Yntervallen 20/10",
+    "Training 4/1",
+    "Lêze 20/5",
+    "Djip wurk 50/10",
+    "Faze oerslaan",
+    "Training beëinigje",
+    "▶ Training begjinne",
+    "✧ Dyn foarútgong",
+    "Plan foar hjoed",
+    "Alles besjen ↗",
+    "Kies dyn aktiviteit",
+    "In sesje foar elk doel",
+    "Noch gjin taken foar hjoed",
+    "Wurk",
+    "Rêst",
+    "Rûnte",
+    "Klear",
+    "De aktuele training beëinigje?",
+    "As jo fan aktiviteit of modus feroarje, einiget de hjoeddeiske sesje. Trochgean?",
+    "Fier jildige tiden yn as MM:SS",
+    "Training begûn",
+    "Training foltôge!",
+    "Koarte sesjes"
+  ]
+});
+
 let quickTraining = null;
 let quickInternalChange = false;
 let quickExercises = [];
