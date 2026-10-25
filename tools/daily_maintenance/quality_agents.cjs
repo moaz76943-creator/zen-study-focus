@@ -12,7 +12,7 @@ const SEPARATE_RELEASE_TEST='tests/master_recovery_qa/media_provenance_gate.test
 function validateManifest(manifest){
  if(!manifest||manifest.schema_version!==1)throw Error('Unsupported agent manifest schema');
  if(!Array.isArray(manifest.agents)||manifest.agents.length===0||manifest.agents.length>30)throw Error('Invalid agents');
- const seen=new Set();
+ const seen=new Set(),ownedDirs=[];
  for(const a of manifest.agents){
   if(!a||typeof a.id!=='string'||!ID.test(a.id)||!LANES.has(a.lane)||typeof a.purpose!=='string'||!a.purpose.trim()||a.purpose.length>160)
    throw Error('Invalid agent id, lane or purpose');
@@ -20,6 +20,12 @@ function validateManifest(manifest){
   seen.add(a.id);
   if(!Array.isArray(a.test_dirs)||a.test_dirs.length<1||a.test_dirs.length>8||!a.test_dirs.every(d=>typeof d==='string'&&DIR.test(d)))
    throw Error('Unsafe test_dirs for '+a.id);
+  for(const d of a.test_dirs){
+   for(const previous of ownedDirs)
+    if(d===previous.dir||d.startsWith(previous.dir+'/')||previous.dir.startsWith(d+'/'))
+     throw Error('Overlapping test ownership: '+previous.agent+' and '+a.id+' claim '+d);
+   ownedDirs.push({dir:d,agent:a.id});
+  }
  }
  return manifest.agents;
 }

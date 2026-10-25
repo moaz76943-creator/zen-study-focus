@@ -16,7 +16,10 @@ test('the hourly audit never gets a persisted checkout token or write access to 
 });
 test('source refs are bounded; no uncontrolled dynamic selection of older releases',()=>{
  assert.match(yaml,/options: \[integration, main\]/);
- assert.match(yaml,/fix\/master-completion-20261020/);
+ assert.match(yaml,/integration\/master-recovery-20261021/);
+ assert.doesNotMatch(yaml,/fix\/master-completion-20261020/);
+ assert.match(yaml,/pull_number:policy\.CANONICAL_PR/);
+ assert.match(yaml,/policy\.verifyCanonicalPr\(data,owner\+'\/'\+repo,process\.env\.SOURCE_REF,sha\)/);
  assert.doesNotMatch(yaml,/inputs\.arbitrary_ref/);
 });
 test('new agents cannot silently pass when checkout or test results fail',()=>{

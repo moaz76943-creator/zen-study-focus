@@ -24,7 +24,9 @@
       "purpose": "Buttons, touch navigation and view-state behavior",
       "test_dirs": [
         "tests/interaction_recovery",
-        "tests/android_e2e_recovery"
+        "tests/android_e2e_recovery",
+        "tests/android_dialogs",
+        "tests/track07_functional"
       ]
     },
     {
@@ -34,7 +36,8 @@
       "test_dirs": [
         "tests/notes_core",
         "tests/notes_recovery",
-        "tests/notes_ui"
+        "tests/notes_ui",
+        "tests/df4_browser"
       ]
     },
     {
@@ -71,7 +74,8 @@
       "test_dirs": [
         "tests/nature_audio_recovery",
         "tests/completion_alerts",
-        "tests/audio_acquisition_12"
+        "tests/audio_acquisition_12",
+        "tests/nature_library_v2"
       ]
     },
     {
