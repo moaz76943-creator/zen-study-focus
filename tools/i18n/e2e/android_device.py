@@ -105,12 +105,17 @@ def language(name, iso):
         raise AssertionError("Language selected but exact ISO badge not visible: "+iso)
     return True
 
-def record(results, name, fn):
+def record(results, name, fn, checkpoint=None):
+    started = time.monotonic()
     try:
         detail = fn()
         results[name] = {"status":"PASS", "detail":detail}
     except Exception as error:
         results[name] = {"status":"FAIL", "error":str(error)}
+    results[name]["duration_ms"] = int((time.monotonic() - started) * 1000)
+    print("DF13_CASE", name, results[name]["status"], flush=True)
+    if checkpoint is not None:
+        checkpoint()
     return results[name]["status"] == "PASS"
 
 def untested(results, name, reason):
@@ -121,6 +126,26 @@ def run(out, source_sha, api):
     results={}
     matrix=[]
     setup={}
+    # Save partial evidence after every assertion and device case.
+    def checkpoint():
+        report = {
+            "TASK_ID":"DF-LANE-13-REAL-END-TO-END-QA",
+            "SOURCE_SHA":source_sha, "API":api, "test_results":results, "device_matrix":matrix,
+            "summary":{status:sum(x["status"]==status for x in results.values())
+                       for status in ("PASS","FAIL","NOT_TESTED")},
+            "representative_locales_planned":[code for code,_ in LOCALES],
+            "representative_locales_android_verified":[code for code,_ in LOCALES
+                if results.get("locale_"+code,{}).get("status")=="PASS"],
+            "CI_RUN_URL":os.getenv("GITHUB_SERVER_URL","https://github.com")+"/"+os.getenv("GITHUB_REPOSITORY","moaz76943-creator/zen-study-focus")+"/actions/runs/"+os.getenv("GITHUB_RUN_ID","UNKNOWN"),
+            "note":"WebView assertions performed on Android. Boot screenshots do not prove RTL/visual correctness."
+        }
+        report["BLOCKERS"]=[key+": "+str(result.get("error",result.get("reason","")))
+            for key,result in results.items() if result["status"]!="PASS"]
+        tmp=out/"DEVICE_MATRIX.json.tmp"
+        tmp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+        os.replace(tmp,out/"DEVICE_MATRIX.json")
+        return report
+    checkpoint()
     try:
         shell("pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS") if api>=33 else None
         shell("wm", "density", "160")
@@ -135,6 +160,7 @@ def run(out, source_sha, api):
             raise AssertionError("Deep Focus heading not exposed or app failed to boot")
         screenshot(out, "boot_api"+str(api))
         results["offline_fresh_boot"]={"status":"PASS"}
+        checkpoint()
     except Exception as error:
         results["offline_fresh_boot"]={"status":"FAIL","error":str(error)}
         for k in ("navigation","timer_start_pause","task_create","note_create_restore",
@@ -143,15 +169,26 @@ def run(out, source_sha, api):
             untested(results,k,"Blocked by Android boot/accessibility failure")
         for w in WIDTHS:
             matrix.append({"api":api,"width_px":w,"font_scale":1,"status":"NOT_TESTED"})
+        checkpoint()
     else:
         def nav():
-            for name in ("Tasks", "Calendar", "Notes", "Timer", "Nature", "Analytics"):
+            # A navigation label is permanently visible; assert unique active-page content.
+            cases=(
+                ("Tasks",("Add study, workout or reading goal","Add study")),
+                ("Calendar",("Add Note to Date",)),
+                ("Notes",("New note",)),
+                ("Timer",("Start or pause timer",)),
+                ("Nature",("Pure Nature Studio Ready","Water & Rain")),
+                ("Analytics",("Active Minutes",)),
+            )
+            for name, markers in cases:
                 click(name)
-                if not visible(dump(),name):
-                    raise AssertionError("Navigation label disappeared: "+name)
+                nodes=dump()
+                if not any(visible(nodes,marker) for marker in markers):
+                    raise AssertionError("Tapped "+name+" but target page content was not exposed: "+str(markers))
             click("Timer")
-            return "6 real Android bottom-navigation taps"
-        record(results,"navigation",nav)
+            return "Six Android taps plus unique visible content checks for each active section"
+        record(results,"navigation",nav,checkpoint)
 
         def timer():
             before=dump()
@@ -166,7 +203,7 @@ def run(out, source_sha, api):
                 raise AssertionError("Countdown state change not observable after Start")
             tap_node(visible(after,"Start or pause timer"))
             return "Countdown changed and Pause button tapped; Reset/confirmation separately gated"
-        record(results,"timer_start_pause",timer)
+        record(results,"timer_start_pause",timer,checkpoint)
 
         def task():
             click("Tasks")
@@ -176,7 +213,7 @@ def run(out, source_sha, api):
             if not visible(dump(),"DF13_TASK_123"):
                 raise AssertionError("New task absent after Enter/save")
             return "Saved task displayed in original Android WebView"
-        record(results,"task_create",task)
+        record(results,"task_create",task,checkpoint)
 
         def note():
             click("Notes")
@@ -191,27 +228,27 @@ def run(out, source_sha, api):
             if not visible(dump(),"DF13_NOTE_123"):
                 raise AssertionError("Saved note disappeared on restart")
             return "Note persisted through process restart"
-        record(results,"note_create_restore",note)
+        record(results,"note_create_restore",note,checkpoint)
 
         def switch():
             click("Timer")
             language("Arabic","ar")
             return "Arabic picker item selected; native-visible ISO AR"
-        record(results,"language_change",switch)
+        record(results,"language_change",switch,checkpoint)
 
         def lang_restart():
             nodes=restart()
             if not iso_badge(nodes,"AR"):
                 raise AssertionError("Arabic locale did not persist after restart")
             return "Arabic ISO label survived process restart"
-        record(results,"language_after_restart",lang_restart)
+        record(results,"language_after_restart",lang_restart,checkpoint)
 
         def offline_resume():
             nodes=restart()
             if not visible(nodes,"Deep Focus"):
                 raise AssertionError("App unavailable offline after fresh start")
             return "No Wi-Fi or mobile-data services during fresh restart"
-        record(results,"offline_resume",offline_resume)
+        record(results,"offline_resume",offline_resume,checkpoint)
 
         # One freshly cleared emulator data store per locale. Localized UI is checked
         # on Android, not inferred from dictionary coverage. Each entry reports itself.
@@ -230,7 +267,7 @@ def run(out, source_sha, api):
                     raise AssertionError(code + " did not persist on Android restart")
                 screenshot(out, "locale_" + code + "_api" + str(api))
                 return code + " selected and persisted through native process restart"
-            record(results, "locale_" + code, verify_locale)
+            record(results, "locale_" + code, verify_locale, checkpoint)
 
         # Native UIAutomator cannot expose HTML direction/layout CSS; record screenshots,
         # leave visual layout acceptance as NOT_TESTED until an image/layout comparator exists.
@@ -248,6 +285,7 @@ def run(out, source_sha, api):
                 except Exception as error:
                     item.update({"status":"FAIL","error":str(error)})
                 matrix.append(item)
+                checkpoint()
         untested(results,"rtl_ltr_visual","Screenshots attached; no automated pixel/layout-direction assertion")
         untested(results,"quick_training","Requires per-state work/rest and cancel semantics assertions")
         untested(results,"sounds","Requires audio output/volume assertions, not just controls")
@@ -260,19 +298,11 @@ def run(out, source_sha, api):
         untested(results,"timer_reset","Requires destructive-confirmation consent outcome assertion")
         untested(results,"network_loss_recovery","Offline boot tested; live connection transitions not exercised")
 
-    # Each Android axis builds one new APK. 'matrix PASS' means title visible only.
-    report={"TASK_ID":"DF-LANE-13-REAL-END-TO-END-QA","SOURCE_SHA":source_sha,
-            "API":api,"test_results":results,"device_matrix":matrix,
-            "representative_locales_planned":[code for code,_ in LOCALES],
-            "representative_locales_android_verified":[code for code,_ in LOCALES if results.get("locale_"+code,{}).get("status")=="PASS"],
-            "note":"UIAutomator assertions reflect actual installed Android WebView, not Node or simulated DOM.",
-            "CI_RUN_URL":os.getenv("GITHUB_SERVER_URL","https://github.com")+"/"+os.getenv("GITHUB_REPOSITORY","moaz76943-creator/zen-study-focus")+"/actions/runs/"+os.getenv("GITHUB_RUN_ID","UNKNOWN")}
-    report["BLOCKERS"]=[key+": "+str(x.get("error",x.get("reason",""))) for key,x in results.items() if x["status"]!="PASS"]
-    (out/"DEVICE_MATRIX.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-    print(json.dumps({"API":api,"SOURCE_SHA":source_sha,"summary":{
-        status:sum(x["status"]==status for x in results.values())
-        for status in ("PASS","FAIL","NOT_TESTED")},"report":str(out/"DEVICE_MATRIX.json")}))
-    return 1 if any(x["status"]=="FAIL" for x in results.values()) or any(x["status"]=="FAIL" for x in matrix) else 0
+    report=checkpoint()
+    print(json.dumps({"API":api,"SOURCE_SHA":source_sha,"summary":report["summary"],
+                      "report":str(out/"DEVICE_MATRIX.json")}),flush=True)
+    return int(any(x["status"]=="FAIL" for x in results.values()) or
+               any(x["status"]=="FAIL" for x in matrix))
 
 def main():
     p=argparse.ArgumentParser()
