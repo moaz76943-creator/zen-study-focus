@@ -19,3 +19,29 @@ node --test tests/termux_fix04_custom_timer_consent.test.cjs
 node tests/smoke_app.cjs
 ```
 Test on Android after integration: start → pause → force-stop → reopen → resume → complete; reset with Cancel; change language mid-session; short/long breaks; completion before and after reboot. Verify Western digits, task/title preservation and single `sessionHistory` entry. Tests from the current lane are deterministic Node VM tests, not Android runtime evidence.
+
+## P0 source patch required in LANE-03 (do not write these files from LANE-07)
+Current integration source audit on 2026-10-25:
+- `index.html`: `modeShortBtn` and `modeLongBtn` use `selectTimerMode(...)` directly; this bypasses the `selectTimerModeFromUser` active/paused-session confirmation.
+- `index.html`: Reset and Skip call `resetTimerNow()` / `skipTimerPhase()` directly.
+- `app.js`: `resetTimerNow` immediately clears `timerSessionId` and `timerActiveMs`; `skipTimerPhase` directly calls `selectTimerMode`. Both can discard progress without the user's approval. This is a current-source observation, not fixed by PR #225.
+
+### Suggested owner patch (validate against newest HEAD first)
+```diff
+--- a/android/app/src/main/assets/web/index.html
++++ b/android/app/src/main/assets/web/index.html
+@@
+- onclick="selectTimerMode(cfg.shortMin, 'short', this)"
++ onclick="selectTimerModeFromUser(cfg.shortMin, 'short', this)"
+- onclick="selectTimerMode(cfg.longMin, 'long', this)"
++ onclick="selectTimerModeFromUser(cfg.longMin, 'long', this)"
+```
+
+In `app.js`, gate `resetTimerNow()` before ANY state mutation, but only for an active/paused session:
+```js
+if (!quickTraining?.active && (timerRunning || timerSessionId || timerActiveMs > 0) &&
+    !window.confirm(cfg.lang === 'ar'
+      ? 'إعادة الضبط ستلغي تقدم الجلسة الحالية. هل تريد المتابعة؟'
+      : 'Reset will discard the current session progress. Continue?')) return false;
+```
+In `skipTimerPhase()`, keep the existing quick-training path; otherwise delegate the mode change to `selectTimerModeFromUser(cfg.shortMin, 'short', ...)` and return its boolean result. Avoid a second confirm. Review behavior for pause/resume, session ID, title, and native alarm cancellation. Add real-app regression proving Cancel preserves byte-equivalent v21 timer snapshot and zero credits; Accept makes exactly one transition.
