@@ -2,10 +2,12 @@
 const TSET_I18N = {
  en:['⚙ Customize','Focus and break settings','Your current session is preserved; changes apply to new sessions.',
      'Focus · min','Short rest · min','Long rest · min','Sessions per cycle','Defaults','Save',
-     'Use whole numbers within the displayed ranges.','Settings saved'],
+     'Use whole numbers within the displayed ranges.','Settings saved',
+     'Could not save settings. No changes were applied.','Activity changed. Reopen settings to try again.'],
  ar:['⚙ تخصيص','إعدادات التركيز والراحة','الجلسة الحالية لن تتوقف؛ التعديل يطبق على الجلسات الجديدة.',
      'التركيز · دقائق','الراحة القصيرة · دقائق','الراحة الطويلة · دقائق','جلسات كل دورة','الافتراضي','حفظ',
-     'أدخل أعدادًا صحيحة ضمن النطاقات المحددة.','تم حفظ الإعدادات']
+     'أدخل أعدادًا صحيحة ضمن النطاقات المحددة.','تم حفظ الإعدادات',
+     'تعذر حفظ الإعدادات. لم تُطبّق أي تغييرات.','تغيّر النشاط. افتح الإعدادات من جديد.']
 };
 function tsetText(i){const base=TSET_I18N[cfg.lang==='ar'?'ar':'en'][i];return globalThis.DF99Locale?.t(cfg.lang,'timer',String(i),base) ?? base;}
 let tsetEditingDomain = null;
@@ -39,16 +41,26 @@ function tsetNumber(id,min,max){
  const n=Number(raw);return Number.isSafeInteger(n)&&n>=min&&n<=max?n:null;
 }
 function saveTimerSettings(){
- if(!['study','read','work','sport'].includes(tsetEditingDomain)||tsetEditingDomain!==cfg.domain) { showToast(tsetText(9));return false; }
+ if(!['study','read','work','sport'].includes(tsetEditingDomain)||tsetEditingDomain!==cfg.domain) { showToast(tsetText(12));return false; }
  const focus=tsetNumber('tsetFocus',1,240),short=tsetNumber('tsetShort',1,60),
   long=tsetNumber('tsetLong',1,120),rounds=tsetNumber('tsetRounds',1,12);
  if([focus,short,long,rounds].includes(null)){showToast(tsetText(9));return false;}
+ // Prepare the complete new config without touching the live session or cfg.
+ // saveFortressData verifies both durable v21 copies and acknowledges success.
  const previous=cfg.domainFocusMinutes;
- cfg.domainFocusMinutes={...(previous&&typeof previous==='object'&&!Array.isArray(previous)?previous:{}),[tsetEditingDomain]:focus};
- cfg.shortMin=short;cfg.longMin=long;
- if(tsetCount()!==rounds)cfg.focusCycleCount=0;
- cfg.roundsPerCycle=rounds;
- saveFortressData('zen_fortress_cfg_v21',cfg);
+ const nextCfg={...cfg,
+  domainFocusMinutes:{...(previous&&typeof previous==='object'&&!Array.isArray(previous)?previous:{}),[tsetEditingDomain]:focus},
+  shortMin:short,longMin:long,roundsPerCycle:rounds,
+  focusCycleCount:tsetCount()===rounds?cfg.focusCycleCount:0
+ };
+ try {
+  if(!saveFortressData('zen_fortress_cfg_v21',nextCfg))throw new Error('STORAGE_NOT_ACKNOWLEDGED');
+ } catch(error) {
+  // The modal and all in-memory settings remain unchanged on any write failure.
+  showToast(tsetText(11));
+  return false;
+ }
+ Object.assign(cfg,nextCfg);
  closeModal('timerSettingsModal');refreshTimerSettings();renderDomainState();
  // Don't replace a running, paused or quick-training session.
  const fresh=!timerRunning&&!quickTraining?.active&&timerSessionId===null&&timerLeft===timerTotal;
