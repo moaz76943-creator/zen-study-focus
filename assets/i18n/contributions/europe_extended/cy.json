@@ -1,0 +1,214 @@
+{
+  "language": "cy",
+  "status": "TRANSLATED",
+  "sections": {
+    "notes": {
+      "0": "✦ STIWDIO NODIADAU",
+      "1": "Eich syniadau wedi eu trefnu’n glir",
+      "2": "Ysgrifennwch, trefnwch ac adolygwch eich syniadau’n hawdd.",
+      "3": "Fy nodiadau",
+      "4": "Wedi pinio",
+      "5": "＋ Nodyn newydd",
+      "6": "Templedi ysgrifennu",
+      "7": "Dewiswch dempled i ddechrau",
+      "8": "Wedi pinio yn unig",
+      "9": "Trefnu",
+      "10": "Diweddaraf",
+      "11": "Hynaf",
+      "12": "Teitl",
+      "13": "Canlyniadau",
+      "14": "Dim nodiadau cyfatebol. Rhowch gynnig ar dempled.",
+      "15": "Nodyn newydd",
+      "16": "Golygu nodyn",
+      "17": "Teitl",
+      "18": "Math",
+      "19": "Dyddiad",
+      "20": "Cynnwys",
+      "21": "Pinio",
+      "22": "Ffefryn",
+      "23": "Geiriau",
+      "24": "Nodau",
+      "25": "Cadw nodyn",
+      "26": "Cadw newidiadau",
+      "27": "Disodli’r testun presennol gyda’r templed?",
+      "28": "Golygu",
+      "29": "Dyblygu",
+      "30": "Copïo",
+      "31": "Calendr",
+      "32": "Dileu",
+      "33": "Dangos ateb",
+      "34": "Methu copïo.",
+      "35": "Wedi cadw"
+    },
+    "timer": {
+      "0": {
+        "text": "⚙ Addasu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "1": {
+        "text": "Gosodiadau ffocws a seibiant",
+        "status": "REVIEW_REQUIRED"
+      },
+      "2": {
+        "text": "Cedwir y sesiwn bresennol; dim ond i sesiynau newydd y bydd newidiadau’n berthnasol.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "3": {
+        "text": "Ffocws · mun",
+        "status": "REVIEW_REQUIRED"
+      },
+      "4": {
+        "text": "Seibiant byr · mun",
+        "status": "REVIEW_REQUIRED"
+      },
+      "5": {
+        "text": "Seibiant hir · mun",
+        "status": "REVIEW_REQUIRED"
+      },
+      "6": {
+        "text": "Sesiynau fesul cylch",
+        "status": "REVIEW_REQUIRED"
+      },
+      "7": {
+        "text": "Rhagosodiadau",
+        "status": "REVIEW_REQUIRED"
+      },
+      "8": {
+        "text": "Cadw",
+        "status": "REVIEW_REQUIRED"
+      },
+      "9": {
+        "text": "Rhowch rifau cyfan o fewn yr ystod a ddangosir.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "10": {
+        "text": "Gosodiadau wedi’u cadw",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "analyticsDomain": {
+      "study": {
+        "text": "Astudio",
+        "status": "REVIEW_REQUIRED"
+      },
+      "read": {
+        "text": "Darllen",
+        "status": "REVIEW_REQUIRED"
+      },
+      "work": {
+        "text": "Gwaith",
+        "status": "REVIEW_REQUIRED"
+      },
+      "sport": {
+        "text": "Chwaraeon",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "tasks": {
+      "title": {
+        "text": "Tasgau",
+        "status": "REVIEW_REQUIRED"
+      },
+      "add": {
+        "text": "Tasg newydd",
+        "status": "REVIEW_REQUIRED"
+      },
+      "search": {
+        "text": "Chwilio tasgau",
+        "status": "REVIEW_REQUIRED"
+      },
+      "save": {
+        "text": "Cadw",
+        "status": "REVIEW_REQUIRED"
+      },
+      "cancel": {
+        "text": "Canslo",
+        "status": "REVIEW_REQUIRED"
+      },
+      "edit": {
+        "text": "Golygu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "done": {
+        "text": "Cwblhau",
+        "status": "REVIEW_REQUIRED"
+      },
+      "calendar": {
+        "text": "Calendr",
+        "status": "REVIEW_REQUIRED"
+      },
+      "priority": {
+        "text": "Blaenoriaeth",
+        "status": "REVIEW_REQUIRED"
+      },
+      "archive": {
+        "text": "Archifo",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "goals": {
+      "heading": {
+        "text": "Cynnydd bob dydd",
+        "status": "REVIEW_REQUIRED"
+      },
+      "edit": {
+        "text": "⚙ Golygu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "minute": {
+        "text": "mun",
+        "status": "REVIEW_REQUIRED"
+      },
+      "today": {
+        "text": "heddiw",
+        "status": "REVIEW_REQUIRED"
+      },
+      "week": {
+        "text": "Yr wythnos hon",
+        "status": "REVIEW_REQUIRED"
+      },
+      "noGoal": {
+        "text": "Gosod nod",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "analytics": {
+      "title": {
+        "text": "Dadansoddiad gweithgarwch",
+        "status": "REVIEW_REQUIRED"
+      },
+      "activity": {
+        "text": "Gweithgarwch",
+        "status": "REVIEW_REQUIRED"
+      },
+      "period": {
+        "text": "Cyfnod",
+        "status": "REVIEW_REQUIRED"
+      },
+      "start": {
+        "text": "O",
+        "status": "REVIEW_REQUIRED"
+      },
+      "end": {
+        "text": "Hyd at",
+        "status": "REVIEW_REQUIRED"
+      },
+      "minutes": {
+        "text": "Munudau a gofnodwyd",
+        "status": "REVIEW_REQUIRED"
+      },
+      "sessions": {
+        "text": "Sesiynau",
+        "status": "REVIEW_REQUIRED"
+      },
+      "year": {
+        "text": "Blwyddyn",
+        "status": "REVIEW_REQUIRED"
+      },
+      "export": {
+        "text": "Allforio CSV",
+        "status": "REVIEW_REQUIRED"
+      }
+    }
+  }
+}
