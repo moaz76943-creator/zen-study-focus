@@ -81,3 +81,24 @@ test('draft messages use approved translations; draft storage key and payload sc
  assert.match(src,/deep_focus_unsaved_note_draft_v1/);
  assert.match(src,/v:1,editId:/);
 });
+
+
+test('template confirmation also protects unsaved structured Cornell fields',()=>{
+ const h=notesHarness();
+ let accepted=false;
+ h.context.window.DeepFocusNotesEditorUI.draftFields=()=>({
+  cornell:{cues:'Private question',notes:'Private notes',summary:'Private summary'}});
+ h.context.window.DeepFocusNotesEditorUI.onTemplate=()=>{accepted=true;};
+ h.context.confirm=()=>false;
+ h.run("nsUseTemplate('cornell')");
+ assert.equal(h.get('inpNoteBody').value,'');
+ assert.equal(accepted,false);
+});
+test('editor modal heading and save action retranslate without closing an open draft',()=>{
+ const h=notesHarness();
+ h.get('inpNoteBody').value='Unfinished draft';
+ h.context.cfg.lang='ar';h.run('nsApplyLabels()');
+ assert.equal(h.get('nsEditorHeading').textContent,'ملاحظة جديدة');
+ assert.equal(h.get('nsSaveButton').textContent,'حفظ الملاحظة');
+ assert.equal(h.get('inpNoteBody').value,'Unfinished draft');
+});
