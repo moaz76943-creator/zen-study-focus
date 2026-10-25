@@ -42,3 +42,27 @@ jobs:
           sha256sum android/app/build/outputs/apk/debug/app-debug.apk
           echo 'ANDROID_RUNTIME_NOT_TESTED'
           echo 'RELEASE_APPROVED=NO'
+      - name: Android API30 install, launch and restart smoke (PR integration tree)
+        if: github.event_name == 'pull_request'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell pm list packages | grep -Fx 'package:com.zenstudy.focus'
+            adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
+            sleep 4
+            adb shell pidof com.zenstudy.focus
+            adb shell am force-stop com.zenstudy.focus
+            adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
+            sleep 3
+            adb shell pidof com.zenstudy.focus
+            echo 'PASS: package identity, launch and restart on Android API30'
+            echo 'SAF, notifications, talkback and API35: NOT_TESTED'
+
