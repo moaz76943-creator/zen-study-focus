@@ -1,0 +1,57 @@
+{
+  "timer": [
+    "⚙ Prilagodi",
+    "Postavke fokusa i odmora",
+    "Trenutačna sesija ostaje sačuvana; promjene vrijede samo za nove sesije.",
+    "Fokus · min",
+    "Kratka pauza · min",
+    "Duga pauza · min",
+    "Sesije po ciklusu",
+    "Zadane vrijednosti",
+    "Spremi",
+    "Unesite cijele brojeve unutar prikazanih raspona.",
+    "Postavke su spremljene"
+  ],
+  "goals": [
+    "✦ DNEVNI CILJEVI",
+    "Mali napredak svakoga dana",
+    "Minute se računaju iz dovršenih sesija fokusa.",
+    "⚙ Uredi",
+    "Dnevni ciljevi prema aktivnosti",
+    "Unesite 0 da biste sakrili cilj. Broje se samo dovršene sesije.",
+    "Ciljevi su spremljeni",
+    "Unesite cijeli broj minuta od 0 do 720.",
+    "Postavi cilj",
+    "min",
+    "dovršeno",
+    "danas",
+    "Ovaj tjedan",
+    "Tjedni cilj (min)",
+    "Tjedni ciljevi moraju biti između 0 i 5040 minuta."
+  ],
+  "analytics": [
+    "Analitika zabilježenih aktivnosti",
+    "Aktivnost",
+    "Razdoblje",
+    "Od",
+    "Do",
+    "Zabilježene minute",
+    "Sesije",
+    "Prosjek po sesiji",
+    "Trenutačni niz",
+    "Nema zabilježenih sesija u ovom razdoblju",
+    "Usporedba ciljeva",
+    "Nisu postavljeni dnevni ciljevi",
+    "Dovršeni zadaci",
+    "Dnevna raspodjela",
+    "Godina",
+    "Izvezi CSV",
+    "Odaberite dan za pojedinosti"
+  ],
+  "analyticsDomain": [
+    "Učenje",
+    "Čitanje",
+    "Posao",
+    "Sport"
+  ]
+}
