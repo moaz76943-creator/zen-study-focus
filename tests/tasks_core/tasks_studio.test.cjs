@@ -50,7 +50,7 @@ test('legacy undated tasks render and search remains read-only',()=>{
  const root=new FakeElement(fakeDoc,'main');
  const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,19),
   readState:()=>JSON.parse(JSON.stringify(state)),commit(){commits++;return true;}});
- const cardTitles=()=>root.descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
+ const cardTitles=()=>root.descendants.find(x=>x.id==='df-task-results').descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
  assert.deepEqual(cardTitles(),['مهمة قديمة ١٢','Legacy null date','Legacy malformed date','Scheduled task']);
  assert.deepEqual(cardTitles(),['مهمة قديمة ١٢','Legacy null date','Legacy malformed date','Scheduled task']);
  const search=root.descendants.find(x=>x.tagName==='INPUT'&&x.type==='search');
