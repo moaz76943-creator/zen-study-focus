@@ -413,7 +413,7 @@ function toWest(val) {
 }
 
 document.addEventListener('input', (e) => {
-  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+  if (e.target && e.target.tagName === 'INPUT' && (e.target.type === 'date' || e.target.type === 'number')) {
     const cleaned = toWest(e.target.value);
     if (cleaned !== e.target.value) e.target.value = cleaned;
   }
