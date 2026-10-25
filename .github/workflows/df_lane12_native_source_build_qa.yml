@@ -22,13 +22,16 @@ jobs:
       - name: Checkout exact tested source
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - name: Fail if code differs from reviewed lane12 head
         shell: bash
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
           git diff --quiet c14e2496aada4e51d0eddbadc4f0310b14729fdf HEAD -- android/app/src/main/java android/app/src/main/res tests/i18n/native_android
           echo "LANE12_SOURCE_SAME_AS_REVIEWED_HEAD=YES"
       - name: Native resource and Java structural regressions
