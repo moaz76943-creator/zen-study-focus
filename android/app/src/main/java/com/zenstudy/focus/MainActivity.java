@@ -44,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        WebView.setWebContentsDebuggingEnabled(false);
+        // Android emulator QA needs CDP, but production must never expose WebView DevTools.
+        final boolean debuggableBuild =
+                (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        WebView.setWebContentsDebuggingEnabled(debuggableBuild);
         if (!"com.zenstudy.focus".equals(getPackageName())) {
             finish();
             return;
