@@ -62,7 +62,7 @@ test('reviewed Tasks Studio packs resolve on live DOM without rewriting task tit
 test('locale refresh updates labels, RTL, blocked Hebrew and preserves v21 state',()=>{
  const f=fixture();
  const initial=JSON.stringify(f.get());
- for(const [code,dir] of [['ar','rtl'],['fa','rtl'],['ur','rtl'],['ps','rtl'],['de','ltr'],['he','ltr'],['iw','ltr']]){
+ for(const [code,dir] of [['ar','rtl'],['fa','rtl'],['ur','rtl'],['ps','rtl'],['ku','ltr'],['de','ltr'],['he','ltr'],['iw','ltr']]){
   f.adapter.locale=code;f.studio.render();
   assert.equal(f.target.children[0].attributes.dir,dir,code);
   if(code==='he'||code==='iw')assert.equal(f.target.children[0].attributes.lang,'en');
