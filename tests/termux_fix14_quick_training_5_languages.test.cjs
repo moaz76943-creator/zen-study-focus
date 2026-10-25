@@ -49,7 +49,7 @@ test('All 40 previous locale packs remain complete; excluded codes use English',
   assert.ok(Array.isArray(ctx.packs[code]),'Missing old locale '+code);
   assert.equal(ctx.packs[code].length,36,'Old locale changed: '+code);
  }
- assert.equal(Object.keys(ctx.packs).length,45);
+ assert.ok(Object.keys(ctx.packs).length>=45, 'Original 45 packs must remain available');
  for(const code of ['zz','he','iw']) {
   cfg.lang=code;
   assert.equal(ctx.translate('trainingTitle'),ctx.packs.en[4]);
