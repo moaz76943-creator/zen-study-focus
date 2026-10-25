@@ -32,10 +32,11 @@ test('Quick training follows existing translations',()=>{
 
   for(const locale of Object.keys(win.DF22Locale.translations)){
     const el={textContent:'OLD'};
+    const button={attrs:{},setAttribute(k,v){this.attrs[k]=v;}};
     const document={
       getElementById(id){
-        assert.equal(id,'navTrainingText');
-        return el;
+        assert.ok(['navTrainingText','navTraining'].includes(id));
+        return id==='navTrainingText'?el:button;
       }
     };
 
@@ -49,6 +50,7 @@ test('Quick training follows existing translations',()=>{
       win.DF22Locale.t(locale,'quickTraining'),
       locale
     );
+    assert.equal(button.attrs['aria-label'],el.textContent,locale+' accessible training label');
   }
 });
 

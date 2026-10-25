@@ -1101,7 +1101,7 @@
         <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
         <span data-i18n="navTimer">Timer</span>
       </button>
-      <button class="bnav-btn" id="navTraining" onclick="openQuickTrainingFromNav(this)" aria-label="Quick training"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9h3v6H2V9zm4-3h3v12H6V6zm9 0h3v12h-3V6zm4 3h3v6h-3V9zM10 11h4v2h-4v-2z"/></svg><span id="navTrainingText">تدريب</span></button>
+      <button class="bnav-btn" id="navTraining" onclick="openQuickTrainingFromNav(this)" aria-label="Quick training"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9h3v6H2V9zm4-3h3v12H6V6zm9 0h3v12h-3V6zm4 3h3v6h-3V9zM10 11h4v2h-4v-2z"/></svg><span id="navTrainingText">Training</span></button>
       <button class="bnav-btn" id="navSounds" onclick="switchTab('sec-sounds', this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span data-i18n="navSounds">Nature</span>
@@ -1117,10 +1117,10 @@
   <div class="modal-overlay" id="langModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>🌐 Language & Country Search</span>
+        <span data-i18n="langSearchTitle">🌐 Language & Country Search</span>
         <button class="task-mini-sel" onclick="closeModal('langModal')">✕</button>
       </div>
-      <input type="text" class="modal-inp" id="inpLangCountrySearch" placeholder="Search language or country (e.g. Jordan, Spain, USA, مصر)..." oninput="renderLanguageList()">
+      <input type="text" class="modal-inp" id="inpLangCountrySearch" data-i18n-placeholder="langSearchPlaceholder" placeholder="Search language or country (e.g. Jordan, Spain, USA, مصر)..." oninput="renderLanguageList()">
       <div class="lang-list-scroll" id="langListScrollBox"></div>
     </div>
   </div>
@@ -1241,6 +1241,9 @@
   <script src="locale_extras.js"></script>
   <script src="js/df99_multiscreen_i18n.js"></script>
   <script src="quick_training.js"></script>
+  <!-- Localization sources must be ready before app.js applies the persisted language. -->
+  <script src="locale_premium_v22.js"></script>
+  <script src="js/df99_reviewed_packs.js"></script>
   <script src="data_compat_v21.js"></script>
   <script src="preflight_v22.js"></script>
   <script src="app.js"></script>
@@ -1252,8 +1255,6 @@
   <script src="tasks_studio.js"></script>
   <script src="analytics_core_v21.js"></script>
   <script src="analytics_studio.js"></script>
-  <script src="locale_premium_v22.js"></script>
-  <script src="js/df99_reviewed_packs.js"></script>
   <script src="goals_studio.js"></script>
   <script src="timer_settings.js"></script>
   <script src="sound_mix_controls.js"></script>
