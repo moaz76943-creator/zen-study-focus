@@ -10,7 +10,7 @@ const languages=["sw","af","ha"];
 const families=['timer','tasks','notes','goals','analytics','analyticsDomain'];
 const existing=new Set(['sw','af','ha']);
 const canonical=reviewed.de;
-const read=lang=>JSON.parse(fs.readFileSync(path.join(root,'assets/i18n/contributions/african_languages',lang+'.json'),'utf8'));
+const read=lang=>{const pack=JSON.parse(fs.readFileSync(path.join(root,'assets/i18n/contributions/african_languages',lang+'.json'),'utf8'));assert.equal(pack.language,lang);assert.equal(pack.status,'REVIEW_REQUIRED');return pack.sections;};
 const has=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
 test('batch 01 contributions are self-contained, UTF-8 NFC, valid offline locale packs',()=>{
  for(const lang of languages){
