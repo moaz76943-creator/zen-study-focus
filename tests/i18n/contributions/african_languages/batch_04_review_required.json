@@ -37,7 +37,9 @@
     },
     "prior_reviewed_keys": 0,
     "new_candidate_keys": 125,
-    "native_review_pending": true
+    "native_review_pending": true,
+    "font_device_qa": "REVIEW_REQUIRED",
+    "runtime_no_silent_fallback_qa": "NOT_TESTED"
   },
   "rw": {
     "status": "REVIEW_REQUIRED",
@@ -77,7 +79,9 @@
     },
     "prior_reviewed_keys": 0,
     "new_candidate_keys": 125,
-    "native_review_pending": true
+    "native_review_pending": true,
+    "font_device_qa": "REVIEW_REQUIRED",
+    "runtime_no_silent_fallback_qa": "NOT_TESTED"
   },
   "mg": {
     "status": "REVIEW_REQUIRED",
@@ -117,7 +121,9 @@
     },
     "prior_reviewed_keys": 0,
     "new_candidate_keys": 125,
-    "native_review_pending": true
+    "native_review_pending": true,
+    "font_device_qa": "REVIEW_REQUIRED",
+    "runtime_no_silent_fallback_qa": "NOT_TESTED"
   },
   "ny": {
     "status": "REVIEW_REQUIRED",
@@ -157,6 +163,9 @@
     },
     "prior_reviewed_keys": 0,
     "new_candidate_keys": 125,
-    "native_review_pending": true
-  }
+    "native_review_pending": true,
+    "font_device_qa": "REVIEW_REQUIRED",
+    "runtime_no_silent_fallback_qa": "NOT_TESTED"
+  },
+  "_suspicious_duplicates": []
 }
