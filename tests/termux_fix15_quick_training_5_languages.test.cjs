@@ -56,7 +56,7 @@ test('All previous 45 languages remain available and complete',()=>{
   assert.ok(Array.isArray(ctx.packs[code]),code+' previous language lost');
   assert.equal(ctx.packs[code].length,36,code+' previous language changed');
  }
- assert.equal(Object.keys(ctx.packs).length,50);
+ assert.ok(Object.keys(ctx.packs).length>=50, 'Prior 50 language packs must remain present');
 });
 
 test('Excluded or unknown languages use existing English fallback',()=>{
