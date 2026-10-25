@@ -120,7 +120,10 @@ class Android:
             raise RequiresHook("record anchor not exposed to UIAutomator: " + record)
         for anchor in matches:
             parent = anchor
-            while parent is not None:
+            depth = 0
+            # Never allow a search to reach the whole page and tap another record.
+            while parent is not None and parent is not root and depth < 6:
+                depth += 1
                 actions = [n for n in parent.iter("node") if n.get("bounds") and
                            (n.get("text", "").strip().casefold() == action.casefold() or
                             n.get("content-desc", "").strip().casefold() == action.casefold())]
