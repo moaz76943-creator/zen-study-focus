@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deep Focus</string>
+    <string name="native_focus_session">Session de concentration</string>
+    <string name="native_channel_active_name">Minuteur de concentration actif</string>
+    <string name="native_channel_active_description">Affiche le compte à rebours pendant une session de concentration</string>
+    <string name="native_channel_done_name">Fin du minuteur de concentration</string>
+    <string name="native_channel_done_description">Alerte à la fin du compte à rebours de travail ou étude</string>
+    <string name="native_notification_active">Session de concentration en cours</string>
+    <string name="native_notification_time_up">Temps écoulé</string>
+    <string name="native_notification_title">Deep Focus — %1$s</string>
+    <string name="native_backup_picker_unavailable">Sélecteur de fichiers indisponible ; utilisez le partage de sauvegarde</string>
+    <string name="native_backup_exported">Sauvegarde exportée ; gardez le fichier non chiffré privé</string>
+    <string name="native_backup_save_failed">Impossible de sauvegarder ; les données existantes sont inchangées</string>
+    <string name="native_share_subject">Deep Focus — application pour étudier, bouger et travailler avec concentration</string>
+    <string name="native_share_chooser">Partager Deep Focus avec</string>
+    <string name="native_backup_share_subject">Sauvegarde manuelle Deep Focus (NON CHIFFRÉE) (%1$s)</string>
+    <string name="native_backup_share_chooser">Enregistrer la sauvegarde avec</string>
+    <string name="native_backup_privacy_warning">Ce code contient des notes et tâches lisibles. Gardez-le privé : il ne sera PAS chiffré.\n\n</string>
+    <string name="native_backup_copy_heading">--- COPIER LE CODE CI-DESSOUS ---\n</string>
+    <string name="native_share_unavailable">Aucune application compatible pour le partage</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deep Focus</string>
+    <string name="native_focus_session">Fokussitzung</string>
+    <string name="native_channel_active_name">Aktiver Fokustimer</string>
+    <string name="native_channel_active_description">Zeigt den Countdown während einer Fokussitzung</string>
+    <string name="native_channel_done_name">Fokustimer abgeschlossen</string>
+    <string name="native_channel_done_description">Benachrichtigung nach Ende des Lern- oder Arbeitscountdowns</string>
+    <string name="native_notification_active">Fokussitzung läuft</string>
+    <string name="native_notification_time_up">Zeit abgelaufen</string>
+    <string name="native_notification_title">Deep Focus — %1$s</string>
+    <string name="native_backup_picker_unavailable">Dateiauswahl nicht verfügbar; Backup teilen verwenden</string>
+    <string name="native_backup_exported">Backup exportiert; unverschlüsselte Datei privat aufbewahren</string>
+    <string name="native_backup_save_failed">Backup konnte nicht gespeichert werden; vorhandene Daten unverändert</string>
+    <string name="native_share_subject">Deep Focus — App für Lernen, Training und konzentriertes Arbeiten</string>
+    <string name="native_share_chooser">Deep Focus teilen mit</string>
+    <string name="native_backup_share_subject">Manuelles Deep-Focus-Backup (UNVERSCHLÜSSELT) (%1$s)</string>
+    <string name="native_backup_share_chooser">Backup speichern mit</string>
+    <string name="native_backup_privacy_warning">Dieser Code enthält lesbare Notizen und Aufgaben. Privat aufbewahren: Er ist NICHT verschlüsselt.\n\n</string>
+    <string name="native_backup_copy_heading">--- CODE UNTEN KOPIEREN ---\n</string>
+    <string name="native_share_unavailable">Keine passende App zum Teilen verfügbar</string>
+</resources>
