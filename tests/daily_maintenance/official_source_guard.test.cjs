@@ -33,3 +33,13 @@ test('daily scheduler and weekly debug pin official source without PR #138',()=>
  assert.match(yml,/steps\.resolve\.outputs\.sha/);
  assert.match(yml,/OFFICIAL_SOURCE_NOT_VERIFIED/);
 });
+
+test('weekly source checkout preserves automation guards and fingerprints the compiled source',()=>{
+ const yml=fs.readFileSync(path.join(__dirname,'../../.github/workflows/daily_maintenance.yml'),'utf8');
+ const weekly=yml.slice(yml.indexOf('  weekly-debug:'));
+ assert.match(weekly,/ref: \$\{\{ steps\.resolve\.outputs\.sha \}\}\s+path: source/);
+ assert.match(weekly,/working-directory: source\/android/);
+ assert.equal((weekly.match(/git -C source rev-parse HEAD/g)||[]).length,3);
+ assert.match(weekly,/sha256sum source\/android\/app\/build\/outputs\/apk\/debug/);
+ assert.match(weekly,/gradle-version: '8\.11\.1'/);
+});
