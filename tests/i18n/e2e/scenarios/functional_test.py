@@ -3,7 +3,7 @@ import sys
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[5]
+ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(ROOT / "tools" / "i18n" / "e2e" / "scenarios"))
 
 from fixtures import records, fixture_summary
