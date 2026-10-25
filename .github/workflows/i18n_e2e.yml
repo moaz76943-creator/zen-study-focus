@@ -50,39 +50,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-  android:
-    name: Android WebView API ${{ matrix.api }}
+build_apk:
+    name: One fresh-HEAD APK for both Android APIs
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        api: [30, 35]
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
-      - name: Source provenance
-        shell: bash
-        env:
-          DF13_API: ${{ matrix.api }}
-        run: |
-          mkdir -p artifacts/i18n-e2e/api${{ matrix.api }}
-          git rev-parse HEAD | tee artifacts/i18n-e2e/api${{ matrix.api }}/SOURCE_SHA.txt
-          python3 - <<'PY'
-          import json, os
-          from pathlib import Path
-          api = os.environ['DF13_API']
-          root = Path('artifacts/i18n-e2e/api'+api)
-          root.joinpath('DEVICE_MATRIX.json').write_text(json.dumps({
-            'TASK_ID':'DF-LANE-13-REAL-END-TO-END-QA',
-            'SOURCE_SHA':Path(root/'SOURCE_SHA.txt').read_text().strip(),
-            'API':int(api),'status':'NOT_TESTED',
-            'BLOCKERS':['Android test has not run or failed before producing device evidence'],
-            'device_matrix':[]}, indent=2) + '\\n')
-          PY
-          python3 -m py_compile tools/i18n/e2e/android_device.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -90,7 +66,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Install Android 36 compile SDK and Gradle wrapper
+      - name: Install Android 36 build dependencies
         working-directory: android
         shell: bash
         run: |
@@ -100,15 +76,90 @@ jobs:
           "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
           gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
           chmod +x gradlew
-      - name: Build APK from checked-out HEAD exactly once
-        working-directory: android
+      - name: Build and attest one APK from immutable checkout
         shell: bash
         run: |
           set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
+          mkdir -p artifacts/i18n-e2e/build
+          git rev-parse HEAD > artifacts/i18n-e2e/build/SOURCE_SHA.txt
+          rm -f android/app/build/outputs/apk/debug/app-debug.apk
+          cd android
           ./gradlew :app:assembleDebug --no-daemon --stacktrace
-          test -s app/build/outputs/apk/debug/app-debug.apk
-          sha256sum app/build/outputs/apk/debug/app-debug.apk | tee ../artifacts/i18n-e2e/api${{ matrix.api }}/APK_SHA256.txt
-      - name: Execute real Android E2E on freshly installed APK
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          PKG="$("${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools/36.0.0/aapt" dump badging "$APK" | sed -n "s/^package: name='$([^']*$)'.*/$1/p")"
+          test "$PKG" = com.zenstudy.focus
+          cp "$APK" ../artifacts/i18n-e2e/build/app-debug.apk
+          printf '%s\n' "$PKG" > ../artifacts/i18n-e2e/build/PACKAGE_ID.txt
+          sha256sum ../artifacts/i18n-e2e/build/app-debug.apk | awk '{print $1}' > ../artifacts/i18n-e2e/build/APK_SHA256.txt
+          test "$(wc -c < ../artifacts/i18n-e2e/build/APK_SHA256.txt)" -eq 65
+      - name: Upload one APK with provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: df13-fresh-head-apk
+          path: artifacts/i18n-e2e/build/
+          if-no-files-found: error
+          retention-days: 14
+
+  android:
+    name: Android WebView API ${{ matrix.api }}
+    needs: build_apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 35]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Check out expected source and initialize NOT_TESTED evidence
+        shell: bash
+        env:
+          DF13_API: ${{ matrix.api }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
+          mkdir -p "artifacts/i18n-e2e/api${DF13_API}"
+          git rev-parse HEAD > "artifacts/i18n-e2e/api${DF13_API}/SOURCE_SHA.txt"
+          python3 -m py_compile tools/i18n/e2e/android_device.py
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path('artifacts/i18n-e2e/api' + os.environ['DF13_API'])
+          root.joinpath('DEVICE_MATRIX.json').write_text(json.dumps({
+            'TASK_ID': 'DF13-A-ANDROID-CI-RECOVERY',
+            'SOURCE_SHA': (root/'SOURCE_SHA.txt').read_text().strip(),
+            'API': int(os.environ['DF13_API']),
+            'status': 'NOT_TESTED',
+            'test_results': {},
+            'device_matrix': [],
+            'BLOCKERS': ['Emulator/UIAutomator has not completed; no Android PASS is established']
+          }, indent=2) + '\n')
+          PY
+      - name: Download the exact single APK built by this workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: df13-fresh-head-apk
+          path: artifacts/i18n-e2e/build/
+      - name: Verify source and APK identity before emulator starts
+        shell: bash
+        env:
+          DF13_API: ${{ matrix.api }}
+        run: |
+          set -euo pipefail
+          BUILD=artifacts/i18n-e2e/build
+          test -s "$BUILD/app-debug.apk"
+          test "$(cat "$BUILD/SOURCE_SHA.txt")" = "$(git rev-parse HEAD)"
+          test "$(cat "$BUILD/PACKAGE_ID.txt")" = com.zenstudy.focus
+          EXPECTED="$(cat "$BUILD/APK_SHA256.txt")"
+          [[ "$EXPECTED" =~ ^[a-f0-9]{64}$ ]]
+          test "$(sha256sum "$BUILD/app-debug.apk" | awk '{print $1}')" = "$EXPECTED"
+          cp "$BUILD/APK_SHA256.txt" "artifacts/i18n-e2e/api${DF13_API}/APK_SHA256.txt"
+      - name: Execute real Android E2E via explicit Bash
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api }}
@@ -117,11 +168,8 @@ jobs:
           profile: pixel_3a
           disable-animations: true
           emulator-boot-timeout: 600
-          script: |
-            set -euo pipefail
-            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-            timeout --signal=TERM --kill-after=20s 20m python3 -u tools/i18n/e2e/android_device.py --output artifacts/i18n-e2e/api${{ matrix.api }} --sha "$(git rev-parse HEAD)" --api ${{ matrix.api }}
-      - name: Upload actual test results and screenshots even on failure
+          script: bash tools/i18n/e2e/run_android.sh ${{ matrix.api }}
+      - name: Upload per-device JSON screenshots and limited logs even on failure
         if: always()
         uses: actions/upload-artifact@v4
         with:
