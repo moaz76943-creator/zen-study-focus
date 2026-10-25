@@ -1,0 +1,69 @@
+{
+  "language": "la",
+  "status": "REVIEW_REQUIRED",
+  "sections": {
+    "timer": {
+      "0": "⚙ Accommoda",
+      "1": "Optiones attentionis et quietis",
+      "2": "Sessio praesens servatur; mutationes tantum ad sessiones novas pertinent.",
+      "3": "Intentio · min",
+      "4": "Quies brevis · min",
+      "5": "Quies longa · min",
+      "6": "Sessiones per cyclum",
+      "7": "Valores pristini",
+      "8": "Serva",
+      "9": "Numeros integros intra fines indicatos inscribe.",
+      "10": "Optiones servatae sunt"
+    },
+    "tasks": {
+      "title": "Munera",
+      "add": "Munus novum",
+      "search": "Quaere munera",
+      "save": "Serva",
+      "cancel": "Abroga",
+      "edit": "Emenda",
+      "done": "Perfice",
+      "calendar": "Calendarium",
+      "priority": "Prioritas",
+      "archive": "In archivum mitte"
+    },
+    "notes": {
+      "0": "✦ NOTAE",
+      "3": "Notae meae",
+      "5": "＋ Nota nova",
+      "6": "Exemplaria",
+      "9": "Ordina",
+      "12": "Titulus",
+      "15": "Nota nova",
+      "20": "Textus",
+      "25": "Serva notam",
+      "32": "Dele"
+    },
+    "goals": {
+      "heading": "Cotidie paulum profice",
+      "edit": "⚙ Emenda",
+      "minute": "min",
+      "today": "hodie",
+      "week": "Hac hebdomade",
+      "noGoal": "Constitue propositum"
+    },
+    "analytics": {
+      "title": "Analysis actionum descriptarum",
+      "activity": "Actio",
+      "period": "Tempus",
+      "start": "Ab",
+      "end": "Usque ad",
+      "minutes": "Minuta descripta",
+      "sessions": "Sessiones",
+      "year": "Annus",
+      "export": "Exporta CSV",
+      "noData": "Nullae sessiones hoc tempore descriptae"
+    },
+    "analyticsDomain": {
+      "study": "Studium",
+      "read": "Lectio",
+      "work": "Opus",
+      "sport": "Ludus"
+    }
+  }
+}
