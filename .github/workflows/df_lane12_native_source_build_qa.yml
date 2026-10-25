@@ -1,0 +1,57 @@
+name: DF Lane12 Native exact-source build QA (non-release)
+on:
+  push:
+    branches: [qa/df-lane12-native-source-build-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/java/**'
+      - 'android/app/src/main/res/**'
+      - 'tests/i18n/native_android/**'
+      - '.github/workflows/df_lane12_native_source_build_qa.yml'
+permissions:
+  contents: read
+concurrency:
+  group: df-lane12-native-build-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact tested source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fail if code differs from reviewed lane12 head
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --quiet c14e2496aada4e51d0eddbadc4f0310b14729fdf HEAD -- android/app/src/main/java android/app/src/main/res tests/i18n/native_android
+          echo "LANE12_SOURCE_SAME_AS_REVIEWED_HEAD=YES"
+      - name: Native resource and Java structural regressions
+        run: python3 -m unittest discover -s tests/i18n/native_android -p 'test_*.py' -v
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android 36 SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager --install "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Compile native app from exact code
+        run: gradle -p android :app:assembleDebug --no-daemon
+      - name: Verify debug APK exists; do not publish or sign a release
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          echo "BUILD_DEBUG_APK=PASS"
+          echo "RELEASE_APPROVED=NO"
