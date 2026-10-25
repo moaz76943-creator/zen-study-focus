@@ -405,11 +405,14 @@ if (typeof window !== "undefined" && window.DF22Preflight && !window.DF22Preflig
 /* ========================================================
    0. STRICT WESTERN DIGITS ENFORCER (0123456789 ONLY)
    ======================================================== */
+const ARABIC_ZERO_OFFSET = 1632;
+const PERSIAN_ZERO_OFFSET = 1776;
+
 function toWest(val) {
   if (val === null || val === undefined) return '';
   return String(val)
-    .replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632)
-    .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
+    .replace(/[٠-٩]/g, d => d.charCodeAt(0) - ARABIC_ZERO_OFFSET)
+    .replace(/[۰-۹]/g, d => d.charCodeAt(0) - PERSIAN_ZERO_OFFSET);
 }
 
 document.addEventListener('input', (e) => {
