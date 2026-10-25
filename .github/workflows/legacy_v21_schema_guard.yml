@@ -1,0 +1,25 @@
+name: Legacy P0 v21 preflight schema guard
+on:
+  push:
+    branches: [fix/legacy-p0-v21-preflight-schema-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+permissions:
+  contents: read
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify production syntax
+        run: |
+          node --check android/app/src/main/assets/web/preflight_v22.js
+          node --check tests/security_recovery/legacy_preflight_schema.test.cjs
+      - name: Prove read-only startup family schema validation
+        run: node --test tests/security_recovery/legacy_preflight_schema.test.cjs
