@@ -40,7 +40,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
+      - name: Verify hosted Android SDK tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v sdkmanager
+          test -d "${ANDROID_HOME:?}"
       - name: Install Android 36 SDK
         shell: bash
         run: |
