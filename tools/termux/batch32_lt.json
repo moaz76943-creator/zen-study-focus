@@ -1,0 +1,57 @@
+{
+  "timer": [
+    "⚙ Tinkinti",
+    "Susikaupimo ir poilsio nustatymai",
+    "Dabartinė sesija išsaugoma; pakeitimai taikomi tik naujoms sesijoms.",
+    "Susikaupimas · min",
+    "Trumpa pertrauka · min",
+    "Ilga pertrauka · min",
+    "Sesijos per ciklą",
+    "Numatytosios reikšmės",
+    "Išsaugoti",
+    "Įveskite sveikuosius skaičius nurodytuose intervaluose.",
+    "Nustatymai išsaugoti"
+  ],
+  "goals": [
+    "✦ DIENOS TIKSLAI",
+    "Kasdien po truputį į priekį",
+    "Minutės skaičiuojamos iš užbaigtų susikaupimo sesijų.",
+    "⚙ Redaguoti",
+    "Dienos tikslai pagal veiklą",
+    "Įveskite 0, kad paslėptumėte tikslą. Skaičiuojamos tik užbaigtos sesijos.",
+    "Tikslai išsaugoti",
+    "Įveskite sveiką minučių skaičių nuo 0 iki 720.",
+    "Nustatyti tikslą",
+    "min",
+    "užbaigta",
+    "šiandien",
+    "Šią savaitę",
+    "Savaitės tikslas (min)",
+    "Savaitės tikslai turi būti nuo 0 iki 5040 minučių."
+  ],
+  "analytics": [
+    "Užregistruotų veiklų analizė",
+    "Veikla",
+    "Laikotarpis",
+    "Nuo",
+    "Iki",
+    "Užregistruotos minutės",
+    "Sesijos",
+    "Vidutiniškai per sesiją",
+    "Dabartinė seka",
+    "Šiuo laikotarpiu nėra užregistruotų sesijų",
+    "Tikslų palyginimas",
+    "Nenustatyta dienos tikslų",
+    "Užbaigtos užduotys",
+    "Pasiskirstymas pagal dienas",
+    "Metai",
+    "Eksportuoti CSV",
+    "Pasirinkite dieną, kad matytumėte išsamią informaciją"
+  ],
+  "analyticsDomain": [
+    "Mokymasis",
+    "Skaitymas",
+    "Darbas",
+    "Sportas"
+  ]
+}
