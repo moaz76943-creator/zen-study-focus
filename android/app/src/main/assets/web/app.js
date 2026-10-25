@@ -1817,7 +1817,7 @@ function openLanguageModal() {
 function renderLanguageList() {
   const q = (document.getElementById('inpLangCountrySearch').value || '').toLowerCase().trim();
   const box = document.getElementById('langListScrollBox');
-  box.innerHTML = '';
+  box.replaceChildren();
 
   LANG_CATALOG.filter(l => {
     if (!q) return true;
@@ -1826,23 +1826,69 @@ function renderLanguageList() {
            l.iso.toLowerCase().includes(q) ||
            l.countries.toLowerCase().includes(q);
   }).forEach(l => {
-    const row = document.createElement('div');
+    const row = document.createElement('button');
+    row.type = 'button';
     row.className = `lang-row-btn ${cfg.lang === l.code ? 'active' : ''}`;
+    row.setAttribute('aria-pressed', String(cfg.lang === l.code));
     row.onclick = () => applyLanguage(l.code);
-    row.innerHTML = `
-      <div class="lang-code-monogram">${l.iso}</div>
-      <div class="lang-names-col">
-        <div class="lang-en-title">${l.enName}</div>
-        <div class="lang-native-sub">${l.nativeName}</div>
-      </div>
-      <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">${cfg.lang === l.code ? '✓' : ''}</span>
-    `;
+    const icon = document.createElement('div');
+    icon.className = 'lang-code-monogram';
+    icon.textContent = l.iso;
+    const names = document.createElement('div');
+    names.className = 'lang-names-col';
+    const english = document.createElement('div');
+    english.className = 'lang-en-title';
+    english.textContent = l.enName;
+    const native = document.createElement('div');
+    native.className = 'lang-native-sub';
+    native.textContent = l.nativeName;
+    names.appendChild(english);
+    names.appendChild(native);
+    const mark = document.createElement('span');
+    mark.style.cssText = 'font-size:0.75rem;font-weight:900;color:var(--primary);';
+    mark.textContent = cfg.lang === l.code ? '✓' : '';
+    row.appendChild(icon);
+    row.appendChild(names);
+    row.appendChild(mark);
     box.appendChild(row);
   });
 }
 
+function localizeStarterPreviews(target) {
+  // IDs 1..4 and 1..3 are the stable v21 demonstration records.
+  // A user-edited demonstration record is no longer replaced by translation.
+  const packs = Object.values(DICT);
+  if (Array.isArray(target.sampleTasks)) {
+    tasksList.forEach(record => {
+      if (!record || record.isStarter !== true || !Number.isSafeInteger(record.id)) return;
+      const index = record.id - 1;
+      if (index < 0 || index >= target.sampleTasks.length) return;
+      const unchanged = packs.some(pack => Array.isArray(pack.sampleTasks) &&
+        typeof pack.sampleTasks[index] === 'string' && record.title === toWest(pack.sampleTasks[index]));
+      if (unchanged) record.title = toWest(target.sampleTasks[index]);
+    });
+  }
+  if (Array.isArray(target.sampleNotes)) {
+    notesList.forEach(record => {
+      if (!record || record.isStarter !== true || !Number.isSafeInteger(record.id)) return;
+      const index = record.id - 1;
+      if (index < 0 || index >= target.sampleNotes.length) return;
+      const unchanged = packs.some(pack => {
+        const sample = Array.isArray(pack.sampleNotes) && pack.sampleNotes[index];
+        return sample && record.title === toWest(sample.t) && record.body === toWest(sample.b);
+      });
+      if (unchanged) {
+        record.title = toWest(target.sampleNotes[index].t);
+        record.body = toWest(target.sampleNotes[index].b);
+      }
+    });
+  }
+}
+
 function applyLanguage(code) {
-  const meta = LANG_CATALOG.find(x => x.code === code) || LANG_CATALOG[0];
+  const normalized = typeof code === 'string' ? code.toLowerCase().trim().split(/[-_]/)[0] : 'en';
+  const meta = LANG_CATALOG.find(x => x.code === normalized && x.code !== 'he' && x.code !== 'iw')
+    || LANG_CATALOG.find(x => x.code === 'en');
   cfg.lang = meta.code;
   saveFortressData('zen_fortress_cfg_v21', cfg);
   const d = L();
@@ -1870,15 +1916,7 @@ function applyLanguage(code) {
     if (d[k]) el.setAttribute('placeholder', toWest(d[k]));
   });
 
-  tasksList.forEach((t, idx) => {
-    if (t.isStarter && d.sampleTasks[idx]) t.title = toWest(d.sampleTasks[idx]);
-  });
-  notesList.forEach((n, idx) => {
-    if (n.isStarter && d.sampleNotes[idx]) {
-      n.title = toWest(d.sampleNotes[idx].t);
-      n.body = toWest(d.sampleNotes[idx].b);
-    }
-  });
+  localizeStarterPreviews(d);
 
   renderAnalyticsBars();
 
