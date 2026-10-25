@@ -2778,7 +2778,7 @@ function renderSelectedDateAgenda() {
   dayTasks.forEach(t => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${toWest(getCatLabel(t.catKey))}</span>`;
+    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>`;
     box.appendChild(item);
   });
 
