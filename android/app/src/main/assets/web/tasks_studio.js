@@ -27,7 +27,7 @@
    const code=globalThis.DF99Locale?.normalize?.(raw) || (/^[a-z]{2,3}$/.test(candidate)&&!['he','iw'].includes(candidate)?candidate:'en');
    const fallback=labels[code==='ar'?'ar':'en'];
    l=globalThis.DF99Locale?.section('tasks',code,fallback) || fallback;
-   wrapper.setAttribute('dir',['ar','fa','ur','ps','ku','yi'].includes(code)?'rtl':'ltr');
+   wrapper.setAttribute('dir',['ar','fa','ur','ps','yi'].includes(code)?'rtl':'ltr');
    wrapper.setAttribute('lang',code);
   }
   let state=adapter.readState(),undoStack=[],redoStack=[],view='all',editing=null,category='',query='',day='',status='',sortKey='',isDestroyed=false;
