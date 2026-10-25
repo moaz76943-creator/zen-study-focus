@@ -19,6 +19,8 @@ on:
       - 'tests/daily_maintenance/canonical_source.test.cjs'
       - 'tests/daily_maintenance/official_source_guard.test.cjs'
       - 'tools/daily_maintenance/official_source_guard.cjs'
+      - 'tools/daily_maintenance/hourly_audit_cache.cjs'
+      - 'tests/daily_maintenance/hourly_audit_cache.test.cjs'
       - 'AGENTS.md'
       - '.github/agents/**'
       - 'docs/daily_maintenance/HOURLY_COORDINATION.md'
@@ -42,8 +44,9 @@ jobs:
       - name: Test hourly coordination contracts
         run: |
           node --check tools/daily_maintenance/official_source_guard.cjs
+          node --check tools/daily_maintenance/hourly_audit_cache.cjs
           node --check tools/daily_maintenance/hourly_orchestrator.cjs
-          node --test tests/daily_maintenance/hourly_*.test.cjs tests/daily_maintenance/canonical_source.test.cjs tests/daily_maintenance/official_source_guard.test.cjs
+          node --test tests/daily_maintenance/hourly_*.test.cjs tests/daily_maintenance/canonical_source.test.cjs tests/daily_maintenance/official_source_guard.test.cjs tests/daily_maintenance/hourly_audit_cache.test.cjs
   hourly-source-audit:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -65,6 +68,8 @@ jobs:
         env:
           SOURCE_REF: ${{ env.SOURCE_REF }}
         with:
+          retries: 2
+          retry-exempt-status-codes: 400,401,403,404,422
           script: |
             const {data}=await github.rest.git.getRef({owner:context.repo.owner,repo:context.repo.repo,ref:'heads/'+process.env.SOURCE_REF});
             if(!/^[a-f0-9]{40}$/i.test(data?.object?.sha||''))throw Error('Source ref cannot be resolved');
@@ -86,7 +91,31 @@ jobs:
           checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
           live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
           node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/hourly"
+      - name: Avoid repeating recent known failed QA on unchanged exact SHA
+        if: github.event_name == 'schedule'
+        id: cachecheck
+        uses: actions/github-script@v7
+        env:
+          PINNED_SHA: ${{ steps.resolve.outputs.sha }}
+        with:
+          retries: 2
+          retry-exempt-status-codes: 400,401,403,404,422
+          script: |
+            const fs=require('node:fs'),crypto=require('node:crypto');
+            const ledger=require('./automation/tools/daily_maintenance/cohort_ledger.cjs');
+            const {planKnownFailureSkip}=require('./automation/tools/daily_maintenance/hourly_audit_cache.cjs');
+            const manifest=JSON.parse(fs.readFileSync('./automation/tools/daily_maintenance/agents.json','utf8'));
+            const fingerprint=crypto.createHash('sha256').update(JSON.stringify(manifest)).digest('hex');
+            const {data}=await github.rest.issues.get({owner:context.repo.owner,repo:context.repo.repo,issue_number:69});
+            const previous=ledger.parseIssueLedger(data.body);
+            const plan=planKnownFailureSkip(previous,process.env.PINNED_SHA,fingerprint);
+            if(plan.skip){
+              core.setOutput('skip','true');
+              core.summary.addRaw('KNOWN_FAILURE_UNCHANGED_SOURCE — SHA '+plan.source_sha+' still '+plan.previous_status+'; no new PASS; details in Issue #69.');
+              await core.summary.write();
+            }
       - name: Coordinate 3 source agents on exact checked-out SHA
+        if: steps.cachecheck.outputs.skip != 'true'
         id: cohort
         continue-on-error: true
         shell: bash
@@ -111,11 +140,13 @@ jobs:
         run: |
           if test -f "$RUNNER_TEMP/hourly/hourly-agents.md"; then
             cat "$RUNNER_TEMP/hourly/hourly-agents.md" >> "$GITHUB_STEP_SUMMARY"
+          elif [[ '${{ steps.cachecheck.outputs.skip }}' == 'true' ]]; then
+            echo 'KNOWN_FAILURE_UNCHANGED_SOURCE: source still blocked according to Issue #69; no new PASS or expensive repeat.' >> "$GITHUB_STEP_SUMMARY"
           else
             echo 'Hourly source audit NOT_TESTED: checkout or execution failed; no source PASS.' >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Update one deduplicated coordination issue
-        if: always()
+        if: always() && steps.cachecheck.outputs.skip != 'true'
         uses: actions/github-script@v7
         env:
           REPORT: ${{ runner.temp }}/hourly/hourly-agents.md
