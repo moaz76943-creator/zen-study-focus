@@ -460,6 +460,10 @@ function saveFortressData(key, obj) {
     localStorage.setItem(mirrorKey, packet);
     if (localStorage.getItem(key) !== packet || localStorage.getItem(mirrorKey) !== packet)
       throw new Error('STORAGE_WRITE_NOT_VERIFIED');
+    // ACK only the three v21 record families; active-timer is a separate legacy key.
+    if (['zen_fortress_cfg_v21','zen_fortress_tasks_v21','zen_fortress_notes_v21'].includes(key)
+        && window.ZenNative && (!window.DF22Preflight || !window.DF22Preflight.nativeAcknowledge(localStorage)))
+      throw new Error('NATIVE_DURABLE_ACK_FAILED');
     return true;
   } catch (writeError) {
     // A failed mirror write must never leave an unverified new primary as the preferred copy.
@@ -2059,6 +2063,9 @@ function verifyAndRestoreBackupCode(codeStr) {
           throw new Error('Storage verification failed');
         }
       }
+      // Do not advertise a successful restore until all six v21 packets are fsynced.
+      if (window.ZenNative && (!window.DF22Preflight || !window.DF22Preflight.nativeAcknowledge(localStorage)))
+        throw new Error('NATIVE_DURABLE_ACK_FAILED');
     } catch (storageError) {
       for (const [key, oldValue] of previous) {
         try {
