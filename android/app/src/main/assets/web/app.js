@@ -405,11 +405,22 @@ if (typeof window !== "undefined" && window.DF22Preflight && !window.DF22Preflig
 /* ========================================================
    0. STRICT WESTERN DIGITS ENFORCER (0123456789 ONLY)
    ======================================================== */
+// Render system numbers as Western digits across supported writing systems.
+// This is display normalization; it does not rewrite v21 storage records.
+const WESTERN_DIGIT_ZERO_POINTS = Object.freeze([
+  0x0660, 0x06f0, 0x07c0, 0x0966, 0x09e6, 0x0a66, 0x0ae6,
+  0x0b66, 0x0be6, 0x0c66, 0x0ce6, 0x0d66, 0x0de6,
+  0x0e50, 0x0ed0, 0x0f20, 0x1040, 0x1090, 0x17e0, 0x1810, 0xff10
+]);
 function toWest(val) {
   if (val === null || val === undefined) return '';
-  return String(val)
-    .replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632)
-    .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
+  return String(val).replace(/\p{Nd}/gu, digit => {
+    const point=digit.codePointAt(0);
+    for (const zero of WESTERN_DIGIT_ZERO_POINTS) {
+      if (point>=zero && point<zero+10) return String(point-zero);
+    }
+    return digit;
+  });
 }
 
 document.addEventListener('input', (e) => {
