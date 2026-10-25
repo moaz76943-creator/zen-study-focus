@@ -1,0 +1,32 @@
+name: Quick Training 99 locale admission (non-release)
+on:
+  push:
+    branches:
+      - integration/qt99-admission-20261026
+  pull_request:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - 'android/app/src/main/assets/web/quick_training.js'
+      - 'tests/i18n/quick_training/**'
+      - '.github/workflows/qt99_locale_admission.yml'
+permissions:
+  contents: read
+jobs:
+  structural-locale-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source syntax
+        run: node --check android/app/src/main/assets/web/quick_training.js
+      - name: Quick Training locale admission cases
+        run: node --test tests/i18n/quick_training/*.test.cjs
+      - name: Confirm no manifest/data/release mutation
+        shell: bash
+        run: |
+          test -f android/app/src/main/assets/web/quick_training.js
+          test -f tests/i18n/quick_training/qt99_consolidated_inventory.test.cjs

@@ -19,7 +19,7 @@ function fixture(mode){
    checklist:[{id:31,title:'Read chapter',done:false}],subtasks:[{id:32,title:'Summarize',done:false}]}]};
  const adapter={locale:'en',now:()=>new Date(2026,9,19),readState:()=>JSON.parse(JSON.stringify(state)),
   commit(before,after){if(mode.value==='false')return false;if(mode.value==='throw')throw Error('Disk full');
-    state=JSON.parse(JSON.stringify(after));return true;},onError:error=>errors.push(error.message)};
+    state=JSON.parse(JSON.stringify(after));return mode.value === 'undefined' ? undefined : true;},onError:error=>errors.push(error.message)};
  const studio=UI.mount(root,adapter);
  // The current Tasks Studio renders checklist/subtask inputs directly on each card.
  return {root,studio,errors,read:()=>state};
@@ -45,3 +45,12 @@ for(const rejection of ['false','throw']){
   assert.equal(checkbox(ctx.root,'Read chapter').checked,true);
  });
 }
+
+test('07-01 historical acknowledged adapter without return value updates checkbox once',()=>{
+ const mode={value:'undefined'},ctx=fixture(mode);
+ const tick=checkbox(ctx.root,'Read chapter');
+ tick.checked=true;tick.fire('change');
+ assert.equal(ctx.read().tasksList[0].checklist[0].done,true);
+ assert.equal(checkbox(ctx.root,'Read chapter').checked,true);
+ assert.deepEqual(ctx.errors,[]);
+});

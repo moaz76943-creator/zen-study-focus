@@ -17,6 +17,15 @@
   const keyboardBound = new WeakSet();
   const PACKS = Object.freeze({
     en: {
+      "backup.modalTitle": "☁️ Manual Backup & Restore",
+      "backup.unencryptedWarning": "⚠️ Exported backup codes contain readable personal notes and tasks. They are NOT encrypted. Keep the code private: anyone who has it can read your data.",
+      "backup.shareCode": "📤 Share Backup Code (Manual)",
+      "backup.exportFile": "💾 Export Backup File (.zenbackup)",
+      "backup.restoreHeading": "🔄 Restore Progress on New Phone:",
+      "backup.pasteCode": "Paste your backup code here (contains readable data)...",
+      "backup.restoreCode": "Restore Code ✓",
+      "backup.loadFile": "📂 Load File",
+      "backup.close": "Close",
       'control.play':'Play', 'control.pause':'Pause', 'control.stopAll':'Stop all',
       'control.volume':'Volume', 'control.volumeFor':'Volume for {sound}',
       'mix.ready':'Nature sound controls', 'mix.preset':'Nature mix',
@@ -42,6 +51,15 @@
       'sound.winrain':'Rain on Window', 'sound.earth':'Deep Earth Rumble'
     },
     ar: {
+      "backup.modalTitle": "☁️ النسخ الاحتياطي والاستعادة اليدوية",
+      "backup.unencryptedWarning": "⚠️ رموز النسخ الاحتياطي المُصدَّرة تحتوي على ملاحظات ومهام شخصية قابلة للقراءة، وهي غير مشفّرة. احتفظ بالرمز سرًا؛ يستطيع أي شخص يملكه قراءة بياناتك.",
+      "backup.shareCode": "📤 مشاركة رمز النسخة الاحتياطية (يدويًا)",
+      "backup.exportFile": "💾 تصدير ملف نسخة احتياطية (.zenbackup)",
+      "backup.restoreHeading": "🔄 استعادة بياناتك على هاتف جديد:",
+      "backup.pasteCode": "الصق رمز النسخة الاحتياطية هنا (يحتوي على بيانات قابلة للقراءة)...",
+      "backup.restoreCode": "استعادة الرمز ✓",
+      "backup.loadFile": "📂 تحميل ملف",
+      "backup.close": "إغلاق",
       'control.play':'تشغيل', 'control.pause':'إيقاف مؤقت', 'control.stopAll':'إيقاف الكل',
       'control.volume':'مستوى الصوت', 'control.volumeFor':'مستوى صوت {sound}',
       'mix.ready':'عناصر التحكم بأصوات الطبيعة', 'mix.preset':'مزيج الطبيعة',
@@ -67,6 +85,15 @@
       'sound.winrain':'مطر على النافذة', 'sound.earth':'هدير الأرض'
     },
     de: {
+      "backup.modalTitle": "☁️ Manuelle Sicherung und Wiederherstellung",
+      "backup.unencryptedWarning": "⚠️ Exportierte Sicherungscodes enthalten lesbare persönliche Notizen und Aufgaben. Sie sind NICHT verschlüsselt. Bewahren Sie den Code vertraulich auf: Jeder mit diesem Code kann Ihre Daten lesen.",
+      "backup.shareCode": "📤 Sicherungscode teilen (manuell)",
+      "backup.exportFile": "💾 Sicherungsdatei exportieren (.zenbackup)",
+      "backup.restoreHeading": "🔄 Fortschritt auf einem neuen Handy wiederherstellen:",
+      "backup.pasteCode": "Sicherungscode hier einfügen (enthält lesbare Daten)...",
+      "backup.restoreCode": "Code wiederherstellen ✓",
+      "backup.loadFile": "📂 Datei laden",
+      "backup.close": "Schließen",
       'control.play':'Abspielen', 'control.pause':'Pausieren', 'control.stopAll':'Alle stoppen',
       'control.volume':'Lautstärke', 'control.volumeFor':'Lautstärke für {sound}',
       'mix.ready':'Naturgeräusche steuern', 'mix.preset':'Naturklang-Mix',
@@ -92,6 +119,15 @@
       'sound.winrain':'Regen am Fenster', 'sound.earth':'Tiefes Erdrauschen'
     },
     es: {
+      "backup.modalTitle": "☁️ Copia de seguridad y restauración manual",
+      "backup.unencryptedWarning": "⚠️ Los códigos de copia exportados contienen notas y tareas personales legibles. NO están cifrados. Guarda el código en privado: cualquiera que lo tenga puede leer tus datos.",
+      "backup.shareCode": "📤 Compartir código de copia (manual)",
+      "backup.exportFile": "💾 Exportar archivo de copia (.zenbackup)",
+      "backup.restoreHeading": "🔄 Restaurar el progreso en otro teléfono:",
+      "backup.pasteCode": "Pega aquí el código de copia (contiene datos legibles)...",
+      "backup.restoreCode": "Restaurar código ✓",
+      "backup.loadFile": "📂 Cargar archivo",
+      "backup.close": "Cerrar",
       'control.play':'Reproducir', 'control.pause':'Pausar', 'control.stopAll':'Detener todo',
       'control.volume':'Volumen', 'control.volumeFor':'Volumen de {sound}',
       'mix.ready':'Controles de sonidos naturales', 'mix.preset':'Mezcla natural',
@@ -117,6 +153,15 @@
       'sound.winrain':'Lluvia en la ventana', 'sound.earth':'Rumor profundo de la tierra'
     },
     fr: {
+      "backup.modalTitle": "☁️ Sauvegarde et restauration manuelles",
+      "backup.unencryptedWarning": "⚠️ Les codes de sauvegarde exportés contiennent des notes et tâches personnelles lisibles. Ils ne sont PAS chiffrés. Gardez le code privé : toute personne qui le possède peut lire vos données.",
+      "backup.shareCode": "📤 Partager le code de sauvegarde (manuel)",
+      "backup.exportFile": "💾 Exporter le fichier de sauvegarde (.zenbackup)",
+      "backup.restoreHeading": "🔄 Restaurer la progression sur un nouveau téléphone :",
+      "backup.pasteCode": "Collez ici votre code de sauvegarde (contient des données lisibles)...",
+      "backup.restoreCode": "Restaurer le code ✓",
+      "backup.loadFile": "📂 Charger un fichier",
+      "backup.close": "Fermer",
       'control.play':'Lire', 'control.pause':'Pause', 'control.stopAll':'Tout arrêter',
       'control.volume':'Volume', 'control.volumeFor':'Volume de {sound}',
       'mix.ready':'Commandes des sons de la nature', 'mix.preset':'Mix nature',
@@ -149,9 +194,12 @@
     return ALIASES[base] || base || 'en';
   }
   function metadata(locale) {
+    const raw = String(locale || 'en').trim().toLowerCase().replace('_', '-').split('-')[0];
+    const excluded = raw === 'he' || raw === 'iw';
     const requested = localeCode(locale);
     const used = Object.prototype.hasOwnProperty.call(PACKS, requested) ? requested : 'en';
-    return Object.freeze({ requested, used, complete: used === requested, fallback: used !== requested });
+    const fallback = excluded || used !== requested;
+    return Object.freeze({ requested, used, complete: !fallback, fallback });
   }
   function translate(locale, key, vars) {
     if (!Object.prototype.hasOwnProperty.call(PACKS.en, key)) return '';
@@ -233,6 +281,49 @@
     });
     return {status:'OK', updated:refs.length, ...metadata(locale)};
   }
+
+  // WebView backup dialog only. Native Android dialogs are owned by Lane 12.
+  // Never read or mutate textarea.value, file inputs, click handlers, or storage.
+  function bindBackupDialog({ document: doc, locale } = {}) {
+    const modal = doc && typeof doc.getElementById === 'function' &&
+      doc.getElementById('cloudBackupModal');
+    const card = modal && typeof modal.querySelector === 'function' &&
+      modal.querySelector('.modal-card');
+    const blocks = card && card.children && Array.from(card.children);
+    if (!blocks || blocks.length !== 4) return {status:'SKIPPED', updated:0};
+    const [head, warning, exportsGroup, restoreGroup] = blocks;
+    if (!head || !warning || !exportsGroup || !restoreGroup ||
+        typeof head.querySelector !== 'function' ||
+        typeof exportsGroup.querySelectorAll !== 'function' ||
+        typeof restoreGroup.querySelector !== 'function' ||
+        typeof restoreGroup.querySelectorAll !== 'function')
+      return {status:'INCOMPLETE', updated:0};
+    const title = head.querySelector('span');
+    const close = head.querySelector('button');
+    const exportButtons = Array.from(exportsGroup.querySelectorAll('button'));
+    const restoreTitle = restoreGroup.querySelector('div');
+    const payload = restoreGroup.querySelector('textarea#inpRestorePayload');
+    const restoreButtons = Array.from(restoreGroup.querySelectorAll('.modal-actions button'));
+    const labels = [title, warning, exportButtons[0], exportButtons[1],
+      restoreTitle, restoreButtons[0], restoreButtons[1]];
+    if (exportButtons.length !== 2 || restoreButtons.length !== 2 ||
+        labels.some(n => !n || typeof n.textContent !== 'string') ||
+        !payload || typeof payload.placeholder !== 'string' ||
+        !close || typeof close.setAttribute !== 'function')
+      return {status:'INCOMPLETE', updated:0};
+    const keys = ['backup.modalTitle','backup.unencryptedWarning','backup.shareCode',
+      'backup.exportFile','backup.restoreHeading','backup.restoreCode','backup.loadFile'];
+    const translated = keys.map(key => translate(locale, key));
+    const placeholder = translate(locale, 'backup.pasteCode');
+    const closeText = translate(locale, 'backup.close');
+    if (translated.some(s => !s) || !placeholder || !closeText)
+      return {status:'MISSING_TRANSLATION',updated:0};
+    labels.forEach((node,i) => {node.textContent = translated[i];});
+    payload.placeholder = placeholder;
+    close.setAttribute('aria-label', closeText);
+    return {status:'OK',updated:9,...metadata(locale)};
+  }
+
   return Object.freeze({SOUND_IDS, KEYS, PACKS, localeCode, metadata, translate,
-    soundName, audioLabels, bindSoundStudio});
+    soundName, audioLabels, bindSoundStudio, bindBackupDialog});
 });

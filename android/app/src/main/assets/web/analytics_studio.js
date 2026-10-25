@@ -128,7 +128,7 @@
     const domainView=mk('div');domainView.style.cssText='display:flex;gap:12px;flex-wrap:wrap;margin:12px 0';
     const goals=mk('div'),taskBox=mk('div'),heatTitle=mk('h3',t.year),heat=mk('div');heat.style.overflowX='auto';
     [error,chartTitle,chart,detail,domainView,goals,taskBox,heatTitle,heat].forEach(e=>wrapper.appendChild(e));
-    let current=null,currentSeries=[],heatDays=[],destroyed=false;
+    let current=null,currentSeries=[],heatDays=[],destroyed=false,exporting=false;
     function refresh(){
       if(destroyed)return null;
       const from=start.value,to=end.value;
@@ -136,7 +136,7 @@
         (Date.parse(to+'T12:00:00Z')-Date.parse(from+'T12:00:00Z'))/86400000<3660;
       start.setAttribute('aria-invalid',!valid?'true':'false');
       end.setAttribute('aria-invalid',!valid?'true':'false');
-      exportBtn.disabled=!valid;error.hidden=valid;error.textContent=valid?'':t.invalidRange;
+      exportBtn.disabled=!valid||exporting;error.hidden=valid;error.textContent=valid?'':t.invalidRange;
       if(!valid){
         current=null;currentSeries=[];heatDays=[];kpis.replaceChildren();
         chart.replaceChildren();chart.textContent='';heat.replaceChildren();heat.textContent='';
@@ -183,10 +183,16 @@
     };
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
     [domain,grouping,start,end].forEach(el=>el.addEventListener('change',refresh));
-    exportBtn.addEventListener('click',()=>{
-      if(!current||exportBtn.disabled)return;
+    exportBtn.addEventListener('click',async()=>{
+      if(!current||exportBtn.disabled||destroyed||exporting)return;
       const value=core.toCSV(current,'sessions');
-      if(typeof opts.onExport==='function'){opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');return;}
+      if(typeof opts.onExport==='function'){
+        exporting=true;exportBtn.disabled=true;
+        try{await opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');}
+        catch(_){if(!destroyed&&current){error.hidden=false;error.textContent='⚠ '+t.export;}}
+        finally{exporting=false;if(!destroyed)exportBtn.disabled=!current;}
+        return;
+      }
       if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL)return;
       const blob=new doc.defaultView.Blob(['\ufeff',value],{type:'text/csv;charset=utf-8'});
       const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
