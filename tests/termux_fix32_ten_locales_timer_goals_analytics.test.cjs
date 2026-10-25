@@ -29,7 +29,7 @@ test('32: 470 new strings resolve to translated values through actual offline ru
 });
 test('32: previous 5860 texts and existing tasks/notes packs remain intact',()=>{
  const count=Object.values(packs).reduce((n,sec)=>n+Object.values(sec).reduce((sum,d)=>sum+Object.keys(d).length,0),0);
- assert.equal(count,6330);
+ assert.ok(count>=6330,`Batch32 baseline must remain at least 6330 strings, got ${count}`);
  for(const lang of LANGS){
   assert.equal(Object.keys(packs[lang].notes).length,36,'older notes lost '+lang);
   assert.equal(Object.keys(packs[lang].tasks).length,64,'older tasks lost '+lang);

@@ -4059,6 +4059,19 @@
       "week": "Αυτή την εβδομάδα",
       "weekTarget": "Εβδομαδιαίος στόχος (λεπτά)",
       "weekInvalid": "Οι εβδομαδιαίοι στόχοι πρέπει να είναι 0–5040 λεπτά."
+    },
+    "timer": {
+      "0": "⚙ Προσαρμογή",
+      "1": "Ρυθμίσεις συγκέντρωσης και διαλειμμάτων",
+      "10": "Οι ρυθμίσεις αποθηκεύτηκαν",
+      "2": "Η τρέχουσα συνεδρία διατηρείται· οι αλλαγές ισχύουν για νέες συνεδρίες.",
+      "3": "Συγκέντρωση · λεπτά",
+      "4": "Σύντομο διάλειμμα · λεπτά",
+      "5": "Μεγάλο διάλειμμα · λεπτά",
+      "6": "Συνεδρίες ανά κύκλο",
+      "7": "Προεπιλεγμένες τιμές",
+      "8": "Αποθήκευση",
+      "9": "Εισαγάγετε ακέραιους αριθμούς εντός των εμφανιζόμενων ορίων."
     }
   },
   "sk": {
@@ -4207,6 +4220,19 @@
       "week": "Tento týždeň",
       "weekTarget": "Týždenný cieľ (min)",
       "weekInvalid": "Týždenné ciele musia byť 0–5040 minút."
+    },
+    "timer": {
+      "0": "⚙ Prispôsobiť",
+      "1": "Nastavenia sústredenia a prestávok",
+      "10": "Nastavenia uložené",
+      "2": "Aktuálna relácia zostane zachovaná; zmeny sa použijú pre nové relácie.",
+      "3": "Sústredenie · min",
+      "4": "Krátka prestávka · min",
+      "5": "Dlhá prestávka · min",
+      "6": "Relácie v cykle",
+      "7": "Predvolené hodnoty",
+      "8": "Uložiť",
+      "9": "Zadajte celé čísla v zobrazených rozsahoch."
     }
   },
   "ca": {
