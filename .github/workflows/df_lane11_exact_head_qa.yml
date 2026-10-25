@@ -1,0 +1,27 @@
+name: Lane11 RTL and Western numeral exact-head QA
+on:
+  push:
+    branches: [df/lane11-rtl-typography-numerals-20261025]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact checkout
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Run source syntax and focused regressions
+        run: |
+          set -euo pipefail
+          node --check android/app/src/main/assets/web/js/numeral_invariant_guard.js
+          node --check android/app/src/main/assets/web/js/localization_fallback_guard.js
+          node --test tests/i18n/visual/rtl_typography_numerals.test.cjs
