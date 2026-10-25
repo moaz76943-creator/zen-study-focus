@@ -13,7 +13,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: df-pr01-device-${{ github.event.pull_request.number }}-${{ matrix.api-level }}
+  group: df-pr01-device-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 jobs:
   android-device:
