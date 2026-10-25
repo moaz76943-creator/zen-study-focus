@@ -1,0 +1,27 @@
+name: Legacy PR83 Indic numeral display safety (non-release)
+on:
+  push:
+    branches:
+      - integration/legacy-pr83-indic-digits-20261026
+  pull_request:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - 'android/app/src/main/assets/web/js/numeral_invariant_guard.js'
+      - 'tests/i18n/visual/**'
+      - '.github/workflows/legacy_pr83_indic_digits_qa.yml'
+permissions:
+  contents: read
+jobs:
+  generated-digits:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test legacy PR83 generated Indic numerals and visual guards
+        run: node --test tests/i18n/visual/*.test.cjs
+      - name: Generated numeral helper syntax
+        run: node --check android/app/src/main/assets/web/js/numeral_invariant_guard.js
