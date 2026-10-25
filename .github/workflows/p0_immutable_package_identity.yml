@@ -1,0 +1,26 @@
+name: P0 immutable Android package identity
+on:
+  push:
+    branches: [fix/p0-immutable-package-id-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+permissions:
+  contents: read
+jobs:
+  identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify current checkout SHA
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Regressions for immutable app identity and v21 data
+        run: |
+          node --check tests/integration_quality/immutable_package_id.test.cjs
+          node --test tests/integration_quality/immutable_package_id.test.cjs
+          node --test tests/security_recovery/legacy_preflight_schema.test.cjs
