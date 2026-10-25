@@ -14,11 +14,12 @@
     'waterfall', 'night', 'thunder', 'wind', 'winrain', 'earth'
   ]);
   const SOUND_SET = new Set(SOUND_IDS);
+  const keyboardBound = new WeakSet();
   const PACKS = Object.freeze({
     en: {
       'control.play':'Play', 'control.pause':'Pause', 'control.stopAll':'Stop all',
       'control.volume':'Volume', 'control.volumeFor':'Volume for {sound}',
-      'mix.ready':'Nature sounds ready', 'mix.preset':'Nature mix',
+      'mix.ready':'Nature sound controls', 'mix.preset':'Nature mix',
       'category.all':'All (12)', 'category.water':'Water & Rain',
       'category.forest':'Forest & Wind', 'category.warm':'Fire & Earth',
       'status.recordingUnavailable':'Local recording unavailable — synthesized ambience',
@@ -43,7 +44,7 @@
     ar: {
       'control.play':'تشغيل', 'control.pause':'إيقاف مؤقت', 'control.stopAll':'إيقاف الكل',
       'control.volume':'مستوى الصوت', 'control.volumeFor':'مستوى صوت {sound}',
-      'mix.ready':'أصوات الطبيعة جاهزة', 'mix.preset':'مزيج الطبيعة',
+      'mix.ready':'عناصر التحكم بأصوات الطبيعة', 'mix.preset':'مزيج الطبيعة',
       'category.all':'الكل (12)', 'category.water':'المياه والأمطار',
       'category.forest':'الغابة والرياح', 'category.warm':'النار والأرض',
       'status.recordingUnavailable':'التسجيل المحلي غير متاح — تُستخدم مؤثرات طبيعية اصطناعية',
@@ -68,7 +69,7 @@
     de: {
       'control.play':'Abspielen', 'control.pause':'Pausieren', 'control.stopAll':'Alle stoppen',
       'control.volume':'Lautstärke', 'control.volumeFor':'Lautstärke für {sound}',
-      'mix.ready':'Naturgeräusche bereit', 'mix.preset':'Naturklang-Mix',
+      'mix.ready':'Naturgeräusche steuern', 'mix.preset':'Naturklang-Mix',
       'category.all':'Alle (12)', 'category.water':'Wasser und Regen',
       'category.forest':'Wald und Wind', 'category.warm':'Feuer und Erde',
       'status.recordingUnavailable':'Lokale Aufnahme nicht verfügbar – synthetische Naturklänge',
@@ -93,7 +94,7 @@
     es: {
       'control.play':'Reproducir', 'control.pause':'Pausar', 'control.stopAll':'Detener todo',
       'control.volume':'Volumen', 'control.volumeFor':'Volumen de {sound}',
-      'mix.ready':'Sonidos de la naturaleza listos', 'mix.preset':'Mezcla natural',
+      'mix.ready':'Controles de sonidos naturales', 'mix.preset':'Mezcla natural',
       'category.all':'Todos (12)', 'category.water':'Agua y lluvia',
       'category.forest':'Bosque y viento', 'category.warm':'Fuego y tierra',
       'status.recordingUnavailable':'Grabación local no disponible — ambiente sintetizado',
@@ -118,7 +119,7 @@
     fr: {
       'control.play':'Lire', 'control.pause':'Pause', 'control.stopAll':'Tout arrêter',
       'control.volume':'Volume', 'control.volumeFor':'Volume de {sound}',
-      'mix.ready':'Sons de la nature prêts', 'mix.preset':'Mix nature',
+      'mix.ready':'Commandes des sons de la nature', 'mix.preset':'Mix nature',
       'category.all':'Tous (12)', 'category.water':'Eau et pluie',
       'category.forest':'Forêt et vent', 'category.warm':'Feu et terre',
       'status.recordingUnavailable':'Enregistrement local indisponible — ambiance synthétisée',
@@ -163,7 +164,9 @@
     if (!SOUND_SET.has(id)) return '';
     const oldName = legacy && legacy.sounds && legacy.sounds[id];
     // A legacy catalog applies only when its locale is explicitly known to match.
-    if (typeof oldName === 'string' && oldName.trim() &&
+    const legacyBase = String(legacy && legacy.locale || '').trim().toLowerCase().replace('_', '-').split('-')[0];
+    if (legacyBase !== 'he' && legacyBase !== 'iw' &&
+        typeof oldName === 'string' && oldName.trim() &&
         localeCode(legacy.locale) === localeCode(locale)) return oldName;
     return translate(locale, 'sound.' + id);
   }
@@ -184,17 +187,38 @@
     const tiles = [...section.querySelectorAll('.sound-Rich-tile')];
     if (tiles.length !== visible.length) return {status:'MISMATCH', updated:0};
     // Validate all DOM targets before performing any changes.
-    const refs = tiles.map(tile => ({tile, name:tile.querySelector('.stile-name'),
+    const refs = tiles.map(tile => ({tile, play:tile.querySelector('.stile-play-btn'), name:tile.querySelector('.stile-name'),
       label:tile.querySelector('.stile-volume-label span'),
       slider:tile.querySelector('input.stile-vol')}));
-    if (refs.some(x => !x.name || !x.label || !x.slider)) return {status:'INCOMPLETE', updated:0};
+    if (refs.some(x => !x.play || !x.name || !x.label || !x.slider)) return {status:'INCOMPLETE', updated:0};
     refs.forEach((ref,i) => {
       const labels = audioLabels(locale, visible[i].id, legacy);
       ref.name.textContent = labels.name;
       ref.label.textContent = '🔉 ' + labels.volume;
       ref.slider.setAttribute('aria-label', labels.volumeAria);
       const isOn = ref.tile.classList && ref.tile.classList.contains('playing');
-      ref.tile.setAttribute('aria-label', (isOn ? labels.pause : labels.play) + ': ' + labels.name);
+      ref.tile.setAttribute('role', 'group');
+      ref.tile.setAttribute('aria-label', labels.name);
+      ref.play.setAttribute('role', 'button');
+      ref.play.setAttribute('tabindex', '0');
+      ref.play.setAttribute('aria-pressed', String(!!isOn));
+      ref.play.setAttribute('aria-label', (isOn ? labels.pause : labels.play) + ': ' + labels.name);
+      const tag = String(ref.play.tagName || '').toUpperCase();
+      const nativeButton = tag === 'BUTTON' || (tag === 'INPUT' && /^(button|submit|reset)$/i.test(ref.play.type || ''));
+      if (!nativeButton && !keyboardBound.has(ref.play) && typeof ref.play.addEventListener === 'function') {
+        keyboardBound.add(ref.play);
+        ref.play.addEventListener('keydown', function (event) {
+          if (!event || event.target !== ref.play || (event.key !== 'Enter' && event.key !== ' ')) return;
+          event.preventDefault();
+          if (typeof event.stopPropagation === 'function') event.stopPropagation();
+          if (typeof ref.play.click === 'function') ref.play.click();
+          // app.js synchronously recreates the tiles when toggling playback.
+          // Restore focus to the corresponding new control, when it exists.
+          const replacements = section.querySelectorAll('.sound-Rich-tile');
+          const replacement = replacements[i] && replacements[i].querySelector('.stile-play-btn');
+          if (replacement && typeof replacement.focus === 'function') replacement.focus();
+        });
+      }
     });
     const header = section.querySelector('#mixerStatusTxt');
     if (header) header.textContent = translate(locale, 'mix.ready');
