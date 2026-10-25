@@ -1108,7 +1108,7 @@ const LANG_CATALOG = [
     "iso": "KU",
     "enName": "Kurdish",
     "nativeName": "Kurdî",
-    "dir": "rtl",
+    "dir": "ltr",
     "countries": "iraq turkey syria iran"
   },
   {
