@@ -18,7 +18,7 @@ test('hourly schedule may reuse only a blocked source on schedule, never assert 
  const fs=require('node:fs'),path=require('node:path');
  const yml=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/hourly_agent_orchestrator.yml'),'utf8');
  assert.match(yml,/hourly_audit_cache\.cjs/);
- assert.match(yml,/github\.event_name === 'schedule'/);
+ assert.match(yml,/github\.event_name == 'schedule'/);
  assert.match(yml,/steps\.cachecheck\.outputs\.skip != 'true'/);
  assert.match(yml,/KNOWN_FAILURE_UNCHANGED_SOURCE/);
 });
