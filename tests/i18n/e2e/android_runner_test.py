@@ -3,7 +3,7 @@ import sys
 import unittest
 from pathlib import Path
 
-sys.path.insert(0,str(Path(__file__).resolve().parents[2]/"tools"/"i18n"/"e2e"))
+sys.path.insert(0,str(Path(__file__).resolve().parents[3]/"tools"/"i18n"/"e2e"))
 from android_device import record, visible
 
 class AndroidReportingTest(unittest.TestCase):
