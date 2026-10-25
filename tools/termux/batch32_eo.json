@@ -1,0 +1,57 @@
+{
+  "timer": [
+    "⚙ Agordi",
+    "Agordoj pri fokuso kaj ripozo",
+    "La nuna sesio konserviĝas; ŝanĝoj validas nur por novaj sesioj.",
+    "Fokuso · min",
+    "Mallonga paŭzo · min",
+    "Longa paŭzo · min",
+    "Sesioj en ciklo",
+    "Defaŭltaj valoroj",
+    "Konservi",
+    "Enigu entjerojn ene de la montritaj intervaloj.",
+    "Agordoj konservitaj"
+  ],
+  "goals": [
+    "✦ ĈIUTAGAJ CELOJ",
+    "Iom da progreso ĉiutage",
+    "Minutoj venas el finitaj fokusaj sesioj.",
+    "⚙ Redakti",
+    "Ĉiutagaj celoj laŭ agado",
+    "Enigu 0 por kaŝi celon. Nur finitaj sesioj kalkuliĝas.",
+    "Celoj konservitaj",
+    "Enigu entjeran nombron da minutoj de 0 ĝis 720.",
+    "Agordi celon",
+    "min",
+    "finita",
+    "hodiaŭ",
+    "Ĉi-semajne",
+    "Semajna celo (min)",
+    "Semajnaj celoj devas esti inter 0 kaj 5040 minutoj."
+  ],
+  "analytics": [
+    "Analizo de registritaj agadoj",
+    "Agado",
+    "Periodo",
+    "De",
+    "Ĝis",
+    "Registritaj minutoj",
+    "Sesioj",
+    "Mezumo por sesio",
+    "Nuna sinsekvo",
+    "Neniuj sesioj registritaj dum ĉi tiu periodo",
+    "Komparo de celoj",
+    "Neniuj ĉiutagaj celoj agorditaj",
+    "Finitaj taskoj",
+    "Ĉiutaga distribuo",
+    "Jaro",
+    "Eksporti CSV",
+    "Elektu tagon por detaloj"
+  ],
+  "analyticsDomain": [
+    "Studado",
+    "Legado",
+    "Laboro",
+    "Sporto"
+  ]
+}
