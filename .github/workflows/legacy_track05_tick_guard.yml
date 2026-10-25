@@ -1,0 +1,26 @@
+name: Legacy Track05 timer callback safety
+on:
+  push:
+    branches: [fix/legacy-track05-tick-guard-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+permissions:
+  contents: read
+jobs:
+  timer-callbacks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact head and syntax
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA" || test "$GITHUB_EVENT_NAME" = pull_request
+          node --check android/app/src/main/assets/web/app.js
+      - name: Test real timer callback and destructive consent guards
+        run: |
+          node --test tests/track05_timer/tick_lifecycle.test.cjs tests/i18n/timer/timer_destructive_consent.test.cjs
