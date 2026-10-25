@@ -1,0 +1,42 @@
+name: Deep Focus read-only integration conflict map
+on:
+  push:
+    branches: [audit/deep-focus-integration-conflicts-20261020]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source regression tests
+        run: node --test tests/recovery_branch_guard/*.test.cjs
+      - name: Fetch exact current integration heads read-only
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin \
+            'refs/heads/integration/deep-focus-recovery-00-final-20261019:refs/remotes/origin/df-original-integration' \
+            'refs/heads/fix/df4-notes-save-visible-android-20261020:refs/remotes/origin/df-device-integration'
+      - name: Probe branch ancestry and 3-way auto-merge without any worktree updates
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/merge-report
+          a="$(git rev-parse refs/remotes/origin/df-original-integration)"
+          b="$(git rev-parse refs/remotes/origin/df-device-integration)"
+          node tools/recovery_branch_guard/merge_probe.cjs "$a" "$b" artifacts/merge-report
+          cat artifacts/merge-report/report.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DeepFocus-Original-vs-Android-Integration-ReadOnly
+          path: artifacts/merge-report/
+          retention-days: 7
+          if-no-files-found: warn

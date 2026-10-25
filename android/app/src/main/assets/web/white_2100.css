@@ -480,3 +480,122 @@ body:not(.deep-lockdown) .daily-goals-card{padding:16px 15px;margin-top:12px;bor
 .timer-settings-grid label{display:flex;flex-direction:column;gap:7px;color:#3c537b;font-size:.73rem;font-weight:700}
 .timer-settings-grid input{direction:ltr;text-align:center;min-width:0;font-size:1rem;font-weight:750;margin:0}
 @media(max-width:360px){.timer-settings-chip{font-size:.66rem;padding:7px}.timer-settings-grid{gap:8px}}
+
+
+/* DF-LANE-11: small-screen, RTL and 200% text-zoom safety. White theme unchanged. */
+body:not(.deep-lockdown) :where(.app-shell,.main-white-sheet,.screen-section,.pure-white-card,.focus-hero-card,.dynamic-hero-header) {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+body:not(.deep-lockdown) .dynamic-hero-header .header-top-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-inline-size: 0;
+}
+body:not(.deep-lockdown) .dynamic-hero-header .header-titles-center {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}
+body:not(.deep-lockdown) .dynamic-hero-header .lang-switcher-pill {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  white-space: normal;
+}
+body:not(.deep-lockdown) .dynamic-hero-header #currentLangLabel {
+  white-space: normal !important;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+body:not(.deep-lockdown) :where(.header-main-title,.header-sub-caption,.domain-title,.training-summary-text,.today-plan-title,.modal-head,.modal-actions,.goal-row,.ns-card,.task-card,.note-card) {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+body:not(.deep-lockdown) :where(.segmented-pills-bar,.timer-settings-grid,.home-quick-options,.domain-pedestal-grid) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+body.timer-home:not(.deep-lockdown) .focus-hero-card .seg-pill,
+body:not(.deep-lockdown) .screen-section:not(#sec-timer) .seg-pill {
+  white-space: normal !important;
+  text-overflow: clip !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  height: auto;
+  line-height: 1.35;
+}
+body:not(.deep-lockdown) :where(.home-quick-chip,.domain-card,.timer-settings-chip,.mbtn-pri,.mbtn-sec,.ns-action,.task-mini-sel) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+body:not(.deep-lockdown) :where(.modal-card,.ns-editor,.timer-settings-dialog) {
+  box-sizing: border-box;
+  max-inline-size: calc(100vw - 16px);
+  max-block-size: calc(100vh - 24px);
+  overflow-y: auto;
+}
+body:not(.deep-lockdown) :where(.modal-actions,.ns-card-actions,.ns-draft-bar) {
+  flex-wrap: wrap;
+  min-inline-size: 0;
+}
+body:not(.deep-lockdown) :where(.modal-actions > button,.ns-card-actions > button,.ns-draft-bar > button) {
+  min-block-size: 44px;
+  min-inline-size: 0;
+  flex: 1 1 108px;
+}
+body:not(.deep-lockdown) :where(.ring-time,.timer-display,.timer-digits,.domain-duration,.an-kpi-num,.date-display,[data-system-number]) {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+body:not(.deep-lockdown) .focus-hero-card .ring-time {
+  max-inline-size: 100%;
+  font-size: clamp(1.4rem, 8vw, 3.25rem);
+  white-space: nowrap;
+  letter-spacing: -0.04em;
+}
+body:not(.deep-lockdown) :where(input[type="text"],textarea,[contenteditable="true"]) {
+  unicode-bidi: plaintext;
+  max-inline-size: 100%;
+}
+body:not(.deep-lockdown) :where(button,a,input,select,textarea,[tabindex]):focus-visible {
+  outline: 3px solid #1759ad;
+  outline-offset: 3px;
+}
+html[dir="rtl"] body:not(.deep-lockdown) :where(.main-white-sheet,.dynamic-hero-header,.modal-card,.ns-editor) {
+  text-align: start;
+}
+html[dir="rtl"] body:not(.deep-lockdown) :where(.modal-head,.modal-actions,.training-summary-text) {
+  direction: rtl;
+}
+body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
+  min-inline-size: 0;
+  min-block-size: 44px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 1.25;
+}
+@media (max-width: 430px) {
+  body:not(.deep-lockdown) .dynamic-hero-header { padding-inline: 10px; }
+  body:not(.deep-lockdown) :where(.modal-card,.ns-editor,.timer-settings-dialog) {
+    max-inline-size: calc(100vw - 16px);
+  }
+}
+@media (max-width: 360px) {
+  body:not(.deep-lockdown) .timer-settings-grid,
+  body:not(.deep-lockdown) .ns-meta { grid-template-columns: minmax(0, 1fr); }
+  body:not(.deep-lockdown) .focus-hero-card .ring-container {
+    max-inline-size: min(63vw, 200px);
+    max-block-size: min(63vw, 200px);
+  }
+}

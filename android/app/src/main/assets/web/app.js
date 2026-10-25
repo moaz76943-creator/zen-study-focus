@@ -1108,7 +1108,7 @@ const LANG_CATALOG = [
     "iso": "KU",
     "enName": "Kurdish",
     "nativeName": "Kurdî",
-    "dir": "rtl",
+    "dir": "ltr",
     "countries": "iraq turkey syria iran"
   },
   {
@@ -2427,6 +2427,8 @@ function finalizeTimerSession(shouldChime) {
   }
 }
 function runTimerTick() {
+  // Ignore queued callbacks after pause or after the first completion.
+  if (!timerRunning) return;
   timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
   if (timerLeft <= 0) return finalizeTimerSession(true);
   updateTimerDisplay();
@@ -2528,8 +2530,9 @@ function selectTimerModeFromUser(mins, modeKey, btn) {
   // Quick-training confirmation is handled by selectTimerMode itself.
   // Otherwise ask exactly once before replacing an active or paused session.
   if (!quickTraining?.active && (timerRunning || timerSessionId || timerActiveMs > 0) &&
-      !window.confirm(cfg.lang === 'ar' ? 'تغيير الوضع سيلغي تقدم الجلسة الحالية. هل تريد المتابعة؟' :
-        'Changing mode will discard current session progress. Continue?')) return false;
+      !window.confirm(typeof quickText === 'function' ? quickText('replacePrompt') :
+        (cfg.lang === 'ar' ? 'تغيير الوضع سيلغي تقدم الجلسة الحالية. هل تريد المتابعة؟' :
+          'Changing mode will discard current session progress. Continue?'))) return false;
   return selectTimerMode(mins, modeKey, btn) !== false;
 }
 function selectTimerMode(mins, modeKey, btn) {
@@ -2626,9 +2629,14 @@ function toggleTimerPlay() {
 
 function resetTimerNow() {
   if(quickTraining?.active) {
-    cancelQuickTraining();
+    cancelQuickTraining(); // Preserve Quick Training's own confirmation flow.
     return;
   }
+  // Neither pausing nor clearing a session may occur before the user's answer.
+  if ((timerRunning || timerSessionId || timerActiveMs > 0) &&
+      !window.confirm(cfg.lang === 'ar'
+        ? 'إعادة الضبط ستلغي تقدم الجلسة الحالية. هل تريد المتابعة؟'
+        : 'Reset will discard the current session progress. Continue?')) return false;
   if (timerRunning) toggleTimerPlay();
   timerLeft = timerTotal;
   timerSessionId = null;
@@ -2637,11 +2645,12 @@ function resetTimerNow() {
   timerResumeMs = null;
   storeTimerSession();
   updateTimerDisplay();
+  return true;
 }
 function skipTimerPhase() {
-  if(quickTraining?.active) { skipQuickTrainingStep(); return; }
-  if (timerRunning) toggleTimerPlay();
-  selectTimerMode(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
+  if(quickTraining?.active) { skipQuickTrainingStep(); return true; }
+  // The wrapper requests consent before it mutates active/paused sessions.
+  return selectTimerModeFromUser(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
 }
 function addWaterCup() { cfg.water = (cfg.water + 1) % 9; saveFortressData('zen_fortress_cfg_v21', cfg); syncHeaderMetrics(); }
 function toggleDeskClock(show) {
