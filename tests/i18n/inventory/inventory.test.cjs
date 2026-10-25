@@ -31,3 +31,13 @@ test('checked-in baseline keys cannot silently disappear',()=>{
  const lost=JSON.parse(fs.readFileSync(baseline,'utf8')).filter(k=>!current.has(k));
  assert.deepEqual(lost,[], 'removed localization keys: '+lost.join(', '));
 });
+
+test('official 99-language app catalog takes precedence over the legacy 100-language registry',()=>{
+ const mock={...files,
+  [W+'app.js']:'const LANG_CATALOG = [{code:"en"},{code:"ar"},{code:"de"}]; const DICT = {};',
+  [W+'js/global_i18n_registry.js']:'var SUPPORTED_LOCALES=[{code:"en"},{code:"ar"},{code:"de"},{code:"ms"}]; var MASTER_EN={nav_timer:"Timer"}; var MASTER_AR={nav_timer:"المؤقت"};'
+ };
+ const scanned=scan(mock);
+ assert.deepEqual(scanned.META.locales,['ar','de','en']);
+ assert.equal(scanned.META.locales.includes('ms'),false);
+});
