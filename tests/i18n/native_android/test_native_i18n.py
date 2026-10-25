@@ -87,6 +87,12 @@ class NativeAndroidI18nTests(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertNotIn('"' + phrase + '"', joined)
 
+    def test_webview_file_access_remains_disabled(self):
+        # Lane 00 disabled raw file access; do not regress this on rebasing.
+        self.assertIn("settings.setAllowFileAccess(false);", self.activity)
+        self.assertIn("settings.setAllowFileAccessFromFileURLs(false);", self.activity)
+        self.assertIn("settings.setAllowUniversalAccessFromFileURLs(false);", self.activity)
+
     def test_notification_permission_is_not_requested_on_launch(self):
         startup = self.activity.split("protected void onCreate", 1)[1].split("private void requestNotificationPermissionForTimer", 1)[0]
         self.assertNotIn("requestPermissions(", startup)
