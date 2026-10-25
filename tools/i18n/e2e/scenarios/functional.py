@@ -12,6 +12,7 @@ import re
 import sys
 import time
 import unicodedata
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -100,6 +101,50 @@ class Android:
         device.tap_node(node)
         device.shell("input", "text", text)
         time.sleep(0.4)
+
+    def tap_scoped(self, record, action):
+        """Find the action inside the *same* accessibility subtree as the saved record.
+
+        UIAutomator XML comes from the actual Android WebView, not an injected DOM.
+        Ambiguity must be surfaced rather than tapping another person's record.
+        """
+        self.nodes()  # refresh the real-device dump
+        xml = device.adb("exec-out", "cat", "/sdcard/df13-ui.xml")
+        root = ET.fromstring(xml)
+        parents = {child: parent for parent in root.iter()
+                   for child in parent if child.tag == "node"}
+        matches = [n for n in root.iter("node") if n.get("bounds") and (
+            n.get("text", "").strip() == record or
+            record in n.get("content-desc", ""))]
+        if not matches:
+            raise RequiresHook("record anchor not exposed to UIAutomator: " + record)
+        for anchor in matches:
+            parent = anchor
+            while parent is not None:
+                actions = [n for n in parent.iter("node") if n.get("bounds") and
+                           (n.get("text", "").strip().casefold() == action.casefold() or
+                            n.get("content-desc", "").strip().casefold() == action.casefold())]
+                if len(actions) == 1:
+                    device.tap_node(actions[0].attrib)
+                    return
+                parent = parents.get(parent)
+        raise RequiresHook("record-scoped " + action + " action ambiguous/inaccessible")
+
+    def replace_text(self, before, after):
+        """Only replace a currently exposed editable field with known previous data."""
+        if not re.fullmatch(r"[A-Za-z0-9_]+", before + after):
+            raise RequiresHook("safe ASCII token field replacement required")
+        field = self.find(before, editable=True, exact=True)
+        if field.get("text", "") != before:
+            raise AssertionError("editor field did not expose exact original value")
+        device.tap_node(field)
+        device.shell("input", "keyevent", "KEYCODE_MOVE_END")
+        # Batch key events; no clipboard, direct WebView JS or app-store writes.
+        device.shell("input", "keyevent", *(["KEYCODE_DEL"] * len(before)))
+        device.shell("input", "text", after)
+        time.sleep(0.4)
+        if not self.find(after, exact=True, editable=True):
+            raise AssertionError("editor field did not receive replacement text")
 
     def has(self, label):
         return any(label.casefold() in description(n).casefold() for n in self.nodes()
@@ -219,6 +264,65 @@ def notes_create_search_relaunch(a, token):
                                            "title_body_after_restart", "search_finds_saved_note"]}
 
 
+def tasks_edit(a, token):
+    original, updated = "DF13C_TASK_" + token, "DF13C_TASK_" + token + "_EDIT"
+    a.tap("Tasks")
+    if not a.has(original):
+        raise RequiresHook("create_save_relaunch dependency did not create test task")
+    a.tap_scoped(original, "Edit")
+    a.replace_text(original, updated)
+    a.tap("Save", exact=True)
+    if not a.has(updated) or a.has(original):
+        raise AssertionError("task edit was not committed to visible state")
+    a.restart()
+    a.tap("Tasks")
+    if not a.has(updated) or a.has(original):
+        raise AssertionError("edited task title did not persist on restart")
+    return {"record": updated, "assertions": ["saved_record_scoped_edit", "old_title_absent",
+                                             "new_title_present_after_relaunch"]}
+
+
+def tasks_trash_restore(a, token):
+    name = "DF13C_TASK_" + token + "_EDIT"
+    a.tap("Tasks")
+    if not a.has(name):
+        raise RequiresHook("tasks.edit dependency did not produce edited test task")
+    a.tap_scoped(name, "Trash")
+    a.tap("Trash", exact=True)
+    if not a.has(name):
+        raise AssertionError("trashed task not present in in-app Trash")
+    a.tap_scoped(name, "Restore")
+    a.tap("List", exact=True)
+    if not a.has(name):
+        raise AssertionError("restored task not present in live task list")
+    a.restart()
+    a.tap("Tasks")
+    if not a.has(name):
+        raise AssertionError("restored task absent after relaunch")
+    return {"record": name, "assertions": ["moved_to_trash", "restored",
+                                          "restored_survived_relaunch"]}
+
+
+def notes_edit(a, token):
+    original = "DF13C_NOTE_" + token
+    title, body = original + "_EDIT", "DF13C_BODY_" + token + "_EDIT"
+    a.tap("Notes")
+    if not a.has(original):
+        raise RequiresHook("notes.create_search_relaunch dependency not observed")
+    a.tap_scoped(original, "Edit")
+    a.replace_text(original, title)
+    a.replace_text("DF13C_BODY_" + token, body)
+    a.tap("Save", exact=True)
+    if not a.has(title) or not a.has(body) or a.has(original):
+        raise AssertionError("note edit not observable in the rendered record")
+    a.restart()
+    a.tap("Notes")
+    if not a.has(title) or not a.has(body) or a.has(original):
+        raise AssertionError("note edit was not persisted across relaunch")
+    return {"record": title, "assertions": ["scoped_title_body_edit",
+                                          "old_title_absent", "edit_survived_relaunch"]}
+
+
 def offline_relaunch_foreground(a, token):
     device.shell("svc", "wifi", "disable")
     device.shell("svc", "data", "disable")
@@ -299,10 +403,10 @@ SCENARIOS = {
     "timer.start_pause_resume": timer_start_pause_resume,
     "timer.reset_cancel_confirm": timer_reset_consent,
     "tasks.create_save_relaunch": tasks_create_save_relaunch,
-    "tasks.edit": needs_hook("Task edit affordance scoped to saved record and read-back"),
-    "tasks.restore": needs_hook("DocumentsUI SAF backup/restore consent and exact task identity"),
+    "tasks.edit": tasks_edit,
+    "tasks.restore": tasks_trash_restore,
     "notes.create_search_relaunch": notes_create_search_relaunch,
-    "notes.edit": needs_hook("Note editor action scoped to saved record and body read-back"),
+    "notes.edit": notes_edit,
     "offline.relaunch_foreground": offline_relaunch_foreground,
     "locale.switch_while_timer_running": language_running,
     "quick_training.work_rest_stop": quick_training_work_rest_stop,
@@ -319,7 +423,7 @@ SCENARIOS = {
     "accessibility.rtl_visual": needs_hook("RTL screenshot/layout comparator with recorded acceptance"),
 }
 RUNNABLE = [k for k in SCENARIOS if k not in (
-    "tasks.edit", "tasks.restore", "notes.edit", "goals.real_analytics", "audio.controls_settings",
+    "goals.real_analytics", "audio.controls_settings",
     "security.html_injection", "validation.inputs", "validation.destructive_consent",
     "performance.tasks_1000", "performance.notes_5000", "performance.sessions_10000",
     "accessibility.talkback", "accessibility.rtl_visual")]
