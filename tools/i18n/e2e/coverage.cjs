@@ -55,10 +55,10 @@ function sourceEmptyCounts() {
   const ctx={window:{},document:{addEventListener(){}},console};
   vm.createContext(ctx);
   for(const f of ['locale_rows.js','locale_extras.js'])vm.runInContext(read(f),ctx,{filename:f,timeout:2500});
-  vm.runInContext(app.slice(0,a)+'\nthis.__core=DICT;',ctx,{filename:'app:catalog',timeout:5000});
+  vm.runInContext(app.slice(0,a)+'\nthis.__core=DICT;this.__catalog=LANG_CATALOG;',ctx,{filename:'app:catalog',timeout:5000});
   vm.runInContext(quick.slice(0,b)+'\nthis.__quick=QUICK_TRANSLATIONS;',ctx,{filename:'quick:catalog',timeout:5000});
   const source={};
-  for(const {code} of ctx.LANG_CATALOG||[])source[code]={
+  for(const {code} of ctx.__catalog||[])source[code]={
     core:Object.hasOwn(ctx.__core,code)?countBlankStrings(ctx.__core[code]):null,
     quick:Object.hasOwn(ctx.__quick,code)?countBlankStrings(ctx.__quick[code]):null
   };
