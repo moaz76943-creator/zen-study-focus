@@ -71,7 +71,9 @@ function nsRenderTemplates(){
 function nsUseTemplate(code){
  const t=NS_TEMPLATES.find(x=>x[0]===code);if(!t)return;
  const body=document.getElementById('inpNoteBody');
- if(body.value.trim()&&!confirm(nsLabel(27)))return;
+ const draft=window.DeepFocusNotesEditorUI?.draftFields?.();
+ const authoredCornell=t[0]==='cornell'&&['cues','notes','summary'].some(k=>draft?.cornell?.[k]?.trim());
+ if((body.value.trim()||authoredCornell)&&!confirm(nsLabel(27)))return;
  body.value=nsTemplateText(t[0],'body');
  document.getElementById('selNoteCat').value=t[4];
  const title=document.getElementById('inpNoteTitle');
@@ -85,6 +87,9 @@ function nsUpdateCount(){const v=document.getElementById('inpNoteBody').value;do
 function nsApplyLabels(){
  const values={nsEyebrow:0,nsTitle:1,nsSubtitle:2,nsTotalLabel:3,nsPinnedLabel:4,nsNewButton:5,nsTemplatesTitle:6,nsTemplatesHint:7,nsPinnedOnlyLabel:8,nsSortLabel:9,nsTitleLabel:17,nsTypeLabel:18,nsDateLabel:19,nsBodyLabel:20,nsPinCheckLabel:21,nsFavCheckLabel:22};
  Object.keys(values).forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=nsLabel(values[id]);});
+ const heading=document.getElementById('nsEditorHeading'),save=document.getElementById('nsSaveButton');
+ if(heading)heading.textContent=nsLabel(nsEditId===null?15:16);
+ if(save)save.textContent=nsLabel(nsEditId===null?25:26);
  const sort=document.getElementById('nsSort');
  if(sort){[10,11,12].forEach((key,i)=>{if(sort.options[i])sort.options[i].textContent=nsLabel(key);});sort.setAttribute('aria-label',nsText('sortAria'));}
  const ui={inpSearchNotes:['search','placeholder'],nsExport:['exportAll','aria-label'],
