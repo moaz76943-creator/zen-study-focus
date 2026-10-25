@@ -1,0 +1,32 @@
+name: DF13-D Core Locale Source
+
+on:
+  push:
+    branches:
+      - qa/df13-d-core-locale-repair-20261026
+  pull_request:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - android/app/src/main/assets/web/locale_rows.js
+      - android/app/src/main/assets/web/locale_extras.js
+      - android/app/src/main/assets/web/locale_premium_v22.js
+      - tests/i18n/core_locale_consistency.test.cjs
+      - .github/workflows/df13_d_core_locale_source.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core-locale-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log exact source commit
+        run: |
+          git rev-parse HEAD
+          node --version
+      - name: Verify real Core/Extras/v22 source dictionaries
+        run: node --test tests/i18n/core_locale_consistency.test.cjs
