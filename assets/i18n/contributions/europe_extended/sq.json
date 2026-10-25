@@ -1,0 +1,198 @@
+{
+  "language": "sq",
+  "status": "TRANSLATED",
+  "sections": {
+    "notes": {
+      "0": "✦ STUDIO E SHËNIMEVE",
+      "1": "Idetë tuaja të organizuara qartë",
+      "2": "Shkruani, organizoni dhe rishikoni idetë çdo ditë.",
+      "3": "Shënimet e mia",
+      "4": "Të ngulitura",
+      "5": "＋ Shënim i ri",
+      "6": "Modele të gatshme për shkrim",
+      "7": "Prekni për të filluar",
+      "8": "Vetëm të ngulitura",
+      "9": "Rendit sipas",
+      "10": "Më të rejat",
+      "11": "Më të vjetrat",
+      "12": "Titulli",
+      "13": "rezultate",
+      "14": "Nuk u gjetën shënime. Filloni me një model.",
+      "15": "Shënim i ri",
+      "16": "Ndrysho shënimin",
+      "17": "Titulli",
+      "18": "Lloji",
+      "19": "Data",
+      "20": "Përmbajtja",
+      "21": "Ngulit",
+      "22": "Të preferuarat",
+      "23": "fjalë",
+      "24": "karaktere",
+      "25": "Ruaj shënimin",
+      "26": "Ruaj ndryshimet",
+      "27": "Të zëvendësohet teksti juaj me këtë model?",
+      "28": "Ndrysho",
+      "29": "Dyfisho",
+      "30": "Kopjo",
+      "31": "Kalendari",
+      "32": "Fshi",
+      "33": "Shfaq përgjigjen",
+      "34": "Kopjimi dështoi.",
+      "35": "U ruajt"
+    },
+    "tasks": {
+      "title": "Studio e detyrave",
+      "subtitle": "Planifiko ditën dhe ndiq punën reale",
+      "add": "Detyrë e re",
+      "project": "Projekt i ri",
+      "today": "Tre përparësitë e sotme",
+      "search": "Kërko detyra",
+      "all": "Listë",
+      "board": "Kanban",
+      "matrix": "Përparësitë",
+      "trash": "Koshi",
+      "calendar": "Kalendari",
+      "undo": "Zhbëj",
+      "redo": "Ribëj",
+      "empty": "Nuk ka detyra që përputhen",
+      "task": "Titulli i detyrës",
+      "desc": "Përshkrimi",
+      "due": "Data",
+      "time": "Ora",
+      "cat": "Kategoria",
+      "priority": "Përparësia",
+      "estimate": "Minutat e vlerësuara",
+      "repeat": "Përsërit",
+      "group": "Grupi",
+      "notes": "ID numerike të shënimeve",
+      "proj": "Projekti",
+      "none": "Pa projekt",
+      "save": "Ruaj",
+      "cancel": "Anulo",
+      "focus": "Fillo përqendrimin",
+      "edit": "Ndrysho",
+      "done": "Përfundo",
+      "resume": "Rihap",
+      "archive": "Arkivo",
+      "remove": "Ço në kosh",
+      "restore": "Rikthe",
+      "addCheck": "Shto hap",
+      "check": "Lista e kontrollit",
+      "sub": "Nëndetyra",
+      "study": "Studim",
+      "sport": "Ushtrime",
+      "review": "Lexim",
+      "exam": "Punë",
+      "todo": "Pa filluar",
+      "doing": "Në proces",
+      "completed": "Përfunduar",
+      "archived": "Arkivuar",
+      "low": "E ulët",
+      "medium": "Mesatare",
+      "high": "E lartë",
+      "urgent": "Urgjente",
+      "daily": "Çdo ditë",
+      "weekly": "Çdo javë",
+      "monthly": "Çdo muaj",
+      "never": "Asnjëherë",
+      "allCategories": "Të gjitha kategoritë",
+      "estimated": "Vlerësimi",
+      "actual": "Reale",
+      "overdue": "Me vonesë",
+      "do": "E rëndësishme dhe urgjente",
+      "schedule": "E rëndësishme, jo urgjente",
+      "delegate": "Urgjente, jo e rëndësishme",
+      "eliminate": "As urgjente, as e rëndësishme",
+      "invalid": "Nuk u ruajt",
+      "notConnected": "Lidhja me kohëmatësin nuk është e disponueshme"
+    },
+    "goals": {
+      "kicker": "✦ OBJEKTIVAT DITORE",
+      "heading": "Pak përparim çdo ditë",
+      "desc": "Minutat vijnë nga seancat e përfunduara të përqendrimit.",
+      "edit": "⚙ Ndrysho",
+      "modal": "Objektivat ditore sipas aktivitetit",
+      "hint": "Vendos 0 për të fshehur objektivin. Numërohen vetëm seancat e përfunduara.",
+      "save": "Objektivat u ruajtën",
+      "invalid": "Shkruaj minuta të plota nga 0 deri në 720.",
+      "noGoal": "Vendos objektiv",
+      "minute": "min",
+      "done": "përfunduar",
+      "today": "sot",
+      "week": "Këtë javë",
+      "weekTarget": "Objektivi javor (min)",
+      "weekInvalid": "Objektivat javore duhet të jenë nga 0 deri në 5040 minuta."
+    },
+    "analytics": {
+      "title": "Analitika e seancave të regjistruara",
+      "activity": "Aktiviteti",
+      "period": "Periudha",
+      "start": "Nga",
+      "end": "Deri",
+      "minutes": "Minutat e regjistruara",
+      "sessions": "Seancat",
+      "average": "Mesatarja për seancë",
+      "streak": "Vargu aktual",
+      "noData": "Nuk ka seanca të regjistruara në këtë periudhë",
+      "goal": "Krahasimi i objektivave",
+      "noGoals": "Nuk ka objektiva ditore të caktuara",
+      "tasks": "Detyrat e përfunduara",
+      "chart": "Shpërndarja ditore",
+      "year": "Viti",
+      "export": "Eksporto CSV",
+      "details": "Zgjidh një ditë për hollësi"
+    },
+    "analyticsDomain": {
+      "study": "Studim",
+      "read": "Lexim",
+      "work": "Punë",
+      "sport": "Ushtrime"
+    },
+    "timer": {
+      "0": {
+        "text": "⚙ Përshtat",
+        "status": "REVIEW_REQUIRED"
+      },
+      "1": {
+        "text": "Cilësimet e përqendrimit dhe pushimeve",
+        "status": "REVIEW_REQUIRED"
+      },
+      "2": {
+        "text": "Seanca aktuale ruhet; ndryshimet vlejnë vetëm për seancat e reja.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "3": {
+        "text": "Përqendrim · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "4": {
+        "text": "Pushim i shkurtër · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "5": {
+        "text": "Pushim i gjatë · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "6": {
+        "text": "Seanca për cikël",
+        "status": "REVIEW_REQUIRED"
+      },
+      "7": {
+        "text": "Vlerat e parazgjedhura",
+        "status": "REVIEW_REQUIRED"
+      },
+      "8": {
+        "text": "Ruaj",
+        "status": "REVIEW_REQUIRED"
+      },
+      "9": {
+        "text": "Jepni numra të plotë brenda kufijve të treguar.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "10": {
+        "text": "Cilësimet u ruajtën",
+        "status": "REVIEW_REQUIRED"
+      }
+    }
+  }
+}

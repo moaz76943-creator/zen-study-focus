@@ -1,0 +1,198 @@
+{
+  "language": "mt",
+  "status": "TRANSLATED",
+  "sections": {
+    "notes": {
+      "0": "✦ STUDJO TAN-NOTI",
+      "1": "L-ideat tiegħek organizzati b’mod ċar",
+      "2": "Ikteb, organizza u irrevedi l-ideat tiegħek faċilment.",
+      "3": "In-noti tiegħi",
+      "4": "Imwaħħlin",
+      "5": "＋ Nota ġdida",
+      "6": "Mudelli għall-kitba",
+      "7": "Agħżel mudell biex tibda",
+      "8": "Imwaħħlin biss",
+      "9": "Issortja",
+      "10": "L-aktar riċenti",
+      "11": "L-eqdem",
+      "12": "Titlu",
+      "13": "Riżultati",
+      "14": "Ma nstabet l-ebda nota. Ipprova mudell.",
+      "15": "Nota ġdida",
+      "16": "Editja nota",
+      "17": "Titlu",
+      "18": "Tip",
+      "19": "Data",
+      "20": "Kontenut",
+      "21": "Waħħal",
+      "22": "Favorit",
+      "23": "Kliem",
+      "24": "Karattri",
+      "25": "Issejvja n-nota",
+      "26": "Issejvja l-bidliet",
+      "27": "Tissostitwixxi t-test eżistenti bil-mudell?",
+      "28": "Editja",
+      "29": "Idduplika",
+      "30": "Ikkopja",
+      "31": "Kalendarju",
+      "32": "Ħassar",
+      "33": "Uri t-tweġiba",
+      "34": "Ma setax jiġi kkupjat.",
+      "35": "Issejvjat"
+    },
+    "tasks": {
+      "title": "Studio tal-kompiti",
+      "subtitle": "Ippjana l-ġurnata u segwi x-xogħol li sar",
+      "add": "Kompitu ġdid",
+      "project": "Proġett ġdid",
+      "today": "L-aqwa tliet prijoritajiet tal-lum",
+      "search": "Fittex kompiti",
+      "all": "Lista",
+      "board": "Kanban",
+      "matrix": "Prijoritajiet",
+      "trash": "Trash",
+      "calendar": "Kalendarju",
+      "undo": "Ħassar l-aħħar bidla",
+      "redo": "Erġa' agħmel",
+      "empty": "L-ebda kompitu li jaqbel",
+      "task": "Titlu tal-kompitu",
+      "desc": "Deskrizzjoni",
+      "due": "Data",
+      "time": "Ħin",
+      "cat": "Kategorija",
+      "priority": "Prijorità",
+      "estimate": "Minuti stmati",
+      "repeat": "Irrepeti",
+      "group": "Grupp",
+      "notes": "IDs numeriċi tan-noti",
+      "proj": "Proġett",
+      "none": "Bla proġett",
+      "save": "Issejvja",
+      "cancel": "Ikkanċella",
+      "focus": "Ibda ffoka",
+      "edit": "Editja",
+      "done": "Imla",
+      "resume": "Erġa' iftaħ",
+      "archive": "Arkivja",
+      "remove": "Itfa' fit-trash",
+      "restore": "Irrestawra",
+      "addCheck": "Żid pass",
+      "check": "Lista ta' kontroll",
+      "sub": "Sottokompiti",
+      "study": "Studju",
+      "sport": "Eżerċizzju",
+      "review": "Qari",
+      "exam": "Xogħol",
+      "todo": "Għadu ma bediex",
+      "doing": "Għaddej",
+      "completed": "Lest",
+      "archived": "Arkivjat",
+      "low": "Baxxa",
+      "medium": "Medja",
+      "high": "Għolja",
+      "urgent": "Urġenti",
+      "daily": "Kuljum",
+      "weekly": "Kull ġimgħa",
+      "monthly": "Kull xahar",
+      "never": "Qatt",
+      "allCategories": "Il-kategoriji kollha",
+      "estimated": "Stima",
+      "actual": "Attwali",
+      "overdue": "Skadut",
+      "do": "Importanti u urġenti",
+      "schedule": "Importanti, mhux urġenti",
+      "delegate": "Urġenti, mhux importanti",
+      "eliminate": "La urġenti u lanqas importanti",
+      "invalid": "Ma setax jiġi ssejvjat",
+      "notConnected": "Il-konnessjoni mat-tajmer mhix disponibbli"
+    },
+    "goals": {
+      "kicker": "✦ GĦANIJIET TA' KULJUM",
+      "heading": "Ftit progress kuljum",
+      "desc": "Il-minuti jiġu mis-sessjonijiet ta' fokus li tlestew.",
+      "edit": "⚙ Editja",
+      "modal": "Għanijiet ta' kuljum skont l-attività",
+      "hint": "Daħħal 0 biex taħbi għan. Jingħaddu biss sessjonijiet kompluti.",
+      "save": "L-għanijiet ġew issejvjati",
+      "invalid": "Daħħal minuti sħaħ minn 0 sa 720.",
+      "noGoal": "Issettja għan",
+      "minute": "min",
+      "done": "lest",
+      "today": "illum",
+      "week": "Din il-ġimgħa",
+      "weekTarget": "Għan ta' kull ġimgħa (min)",
+      "weekInvalid": "L-għanijiet ta' kull ġimgħa għandhom ikunu bejn 0 u 5040 minuta."
+    },
+    "analytics": {
+      "title": "Analitika tas-sessjonijiet irreġistrati",
+      "activity": "Attività",
+      "period": "Perjodu",
+      "start": "Minn",
+      "end": "Sa",
+      "minutes": "Minuti rreġistrati",
+      "sessions": "Sessjonijiet",
+      "average": "Medja għal kull sessjoni",
+      "streak": "Serje attwali",
+      "noData": "M'hemmx sessjonijiet irreġistrati f'dan il-perjodu",
+      "goal": "Tqabbil tal-għanijiet",
+      "noGoals": "Ebda għan ta' kuljum issettjat",
+      "tasks": "Kompiti kompluti",
+      "chart": "Distribuzzjoni ta' kuljum",
+      "year": "Sena",
+      "export": "Esporta CSV",
+      "details": "Agħżel ġurnata għad-dettalji"
+    },
+    "analyticsDomain": {
+      "study": "Studju",
+      "read": "Qari",
+      "work": "Xogħol",
+      "sport": "Eżerċizzju"
+    },
+    "timer": {
+      "0": {
+        "text": "⚙ Ippersonalizza",
+        "status": "REVIEW_REQUIRED"
+      },
+      "1": {
+        "text": "Issettjar tal-konċentrazzjoni u l-pawżi",
+        "status": "REVIEW_REQUIRED"
+      },
+      "2": {
+        "text": "Is-sessjoni attwali tinżamm; il-bidliet japplikaw biss għal sessjonijiet ġodda.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "3": {
+        "text": "Konċentrazzjoni · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "4": {
+        "text": "Pawża qasira · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "5": {
+        "text": "Pawża twila · min",
+        "status": "REVIEW_REQUIRED"
+      },
+      "6": {
+        "text": "Sessjonijiet f'ċiklu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "7": {
+        "text": "Valuri predefiniti",
+        "status": "REVIEW_REQUIRED"
+      },
+      "8": {
+        "text": "Issejvja",
+        "status": "REVIEW_REQUIRED"
+      },
+      "9": {
+        "text": "Daħħal numri sħaħ fil-limiti murija.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "10": {
+        "text": "Is-settings ġew issejvjati",
+        "status": "REVIEW_REQUIRED"
+      }
+    }
+  }
+}

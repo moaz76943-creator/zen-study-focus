@@ -1,0 +1,69 @@
+{
+  "language": "fy",
+  "status": "REVIEW_REQUIRED",
+  "sections": {
+    "timer": {
+      "0": "⚙ Oanpasse",
+      "1": "Ynstellings foar fokus en skoft",
+      "2": "De hjoeddeiske sesje bliuwt bewarre; feroarings jilde allinnich foar nije sesjes.",
+      "3": "Fokus · min",
+      "4": "Koart skoft · min",
+      "5": "Lang skoft · min",
+      "6": "Sesjes per syklus",
+      "7": "Standertwearden",
+      "8": "Bewarje",
+      "9": "Fier hiele getallen yn binnen de oanjûne grinzen.",
+      "10": "Ynstellings bewarre"
+    },
+    "tasks": {
+      "title": "Taken",
+      "add": "Nije taak",
+      "search": "Sykje taken",
+      "save": "Bewarje",
+      "cancel": "Annulearje",
+      "edit": "Bewurkje",
+      "done": "Foltôgje",
+      "calendar": "Kalinder",
+      "priority": "Prioriteit",
+      "archive": "Argivearje"
+    },
+    "notes": {
+      "0": "✦ NOTYSJES",
+      "3": "Myn notysjes",
+      "5": "＋ Nije notysje",
+      "6": "Sjabloanen",
+      "9": "Sortearje",
+      "12": "Titel",
+      "15": "Nije notysje",
+      "20": "Ynhâld",
+      "25": "Notysje bewarje",
+      "32": "Wiskje"
+    },
+    "goals": {
+      "heading": "Alle dagen in bytsje foarútgong",
+      "edit": "⚙ Bewurkje",
+      "minute": "min",
+      "today": "hjoed",
+      "week": "Dizze wike",
+      "noGoal": "Stel in doel yn"
+    },
+    "analytics": {
+      "title": "Analyze fan registrearre aktiviteit",
+      "activity": "Aktiviteit",
+      "period": "Perioade",
+      "start": "Fan",
+      "end": "Oant",
+      "minutes": "Registrearre minuten",
+      "sessions": "Sesjes",
+      "year": "Jier",
+      "export": "Eksportearje CSV",
+      "noData": "Gjin registrearre sesjes yn dizze perioade"
+    },
+    "analyticsDomain": {
+      "study": "Stúdzje",
+      "read": "Lêzen",
+      "work": "Wurk",
+      "sport": "Sport"
+    }
+  }
+}
