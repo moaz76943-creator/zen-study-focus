@@ -32,7 +32,7 @@ jobs:
           node --check tools/df99_bulk_import.cjs
           node --check android/app/src/main/assets/web/js/df99_reviewed_packs.js
       - name: Verify new Greek/Slovak texts and generator parity
-        run: node --test tests/i18n/functional_locale_repair/batch01_el_sk_timer.test.cjs
+        run: node --test tests/i18n/functional_locale_repair/*.test.cjs
       - name: Protect previous translated batches
         run: |
           set -euo pipefail
