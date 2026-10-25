@@ -21,7 +21,7 @@ esac
 
 git fetch origin "$BR" "$DATA_REF"
 [ "$(git rev-parse "refs/remotes/origin/$BR")" = "$BASE" ] || { echo 'STOP: official branch advanced'; exit 1; }
-[ "$(git rev-parse "refs/remotes/origin/$DATA_REF")" = "$DATA_SHA" ] || { echo 'STOP: data source changed'; exit 1; }
+git merge-base --is-ancestor "$DATA_SHA" "refs/remotes/origin/$DATA_REF" || { echo 'STOP: trusted data revision not present'; exit 1; }
 [ ! -e "$TEST" ] || { echo 'STOP: test file already exists'; exit 1; }
 
 cat > "$TEST" <<'JSTEST'
