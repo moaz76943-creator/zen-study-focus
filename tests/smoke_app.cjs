@@ -360,4 +360,17 @@ const afterShort=evaluate('cfg.sessionHistory.length');
 evaluate("cfg.completedTimerIds=[]; creditCompletedSession()");
 assert.equal(evaluate('cfg.sessionHistory.length'),afterShort,'Full ledger blocks duplicate event after the rolling-ID cache is lost');
 
+// Category labels must remain inert text inside the selected-date agenda.
+evaluate(`
+  selectedCalDate = todayISO;
+  tasksList = [{id:9981,title:'Keep <personal> ۱۲',date:todayISO,catKey:'study',done:false}];
+  notesList = [];
+  getCatLabel = () => '<img src=x onerror=alert(1)>';
+  renderSelectedDateAgenda();
+`);
+const agendaMarkup = document.getElementById('calendarDayAgendaBox').children.at(-1).innerHTML;
+assert.ok(!agendaMarkup.includes('<img'), 'Agenda category must not create an HTML element');
+assert.ok(agendaMarkup.includes('&lt;img src=x onerror=alert(1)&gt;'));
+assert.equal(evaluate('tasksList[0].title'), 'Keep <personal> ۱۲', 'Rendering must preserve stored user text');
+
 console.log('PASS: startup, 20 languages, real focus metrics, interval rounds, rest and skip, backup, XSS, audio.');
