@@ -17,5 +17,24 @@
     "read": "Xwendina pirtûkan",
     "work": "Kar",
     "sport": "Werzîş"
+  },
+  "analytics": {
+    "title": "Analîza çalakiyên tomarkirî",
+    "activity": "Çalakî",
+    "period": "Heyam",
+    "start": "Destpêk",
+    "end": "Dawî",
+    "minutes": "Xulekên tomarkirî",
+    "sessions": "Danişîn",
+    "average": "Navînîya her danişînê",
+    "streak": "Rêza niha",
+    "noData": "Di vî heyamî de danişînek nehatiye tomarkirin",
+    "goal": "Berawirdkirina armancan",
+    "noGoals": "Armanca rojane nehatiye danîn",
+    "tasks": "Karên qediyayî",
+    "chart": "Dabeşkirina rojane",
+    "year": "Sal",
+    "export": "CSV derxe",
+    "details": "Ji bo hûrguliyan rojekê hilbijêre"
   }
 }
