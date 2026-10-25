@@ -58,13 +58,14 @@
     if(JSON.stringify(latest)!==JSON.stringify(state)){state=latest;undoStack=[];redoStack=[];}
     const old=state,output=change(old),next=output.state;
     if(!next||!Array.isArray(next.tasksList))throw new Error('Invalid change result');
-    if(JSON.stringify(old)===JSON.stringify(next))return;
+    if(JSON.stringify(old)===JSON.stringify(next))return true;
     const committed=adapter.commit(old,next);
     if(committed && typeof committed.then==='function')throw new Error('Only synchronous commit supported');
+    if(committed!==true)throw new Error(l.saveUnconfirmed);
     undoStack.push(old);if(undoStack.length>20)undoStack.shift();redoStack=[];state=next;
     if(typeof adapter.onAfterChange==='function')adapter.onAfterChange(state);
-    editing=null;render();
-   }catch(e){error(e);}
+    editing=null;render();return true;
+   }catch(e){error(e);return false;}
   }
   function timeTravel(from,to){
    if(!from.length)return;
@@ -91,7 +92,11 @@
    for(const kind of ['checklist','subtasks'])if(Array.isArray(t[kind])){
     for(const x of t[kind]){
      const row=el('label','df-check'),tick=input('checkbox');tick.checked=!!x.done;
-     tick.addEventListener('change',()=>apply(s=>C.setItemDone(s,t.id,kind,x.id,tick.checked)));
+     tick.addEventListener('change',()=>{
+      const wanted=tick.checked;
+      if(apply(s=>C.setItemDone(s,t.id,kind,x.id,wanted))!==true)
+       tick.checked=!!x.done; // Never display an unacknowledged completion.
+     });
      append(row,tick,el('span','',x.title));box.appendChild(row);
     }
     if(t[kind].length)box.appendChild(el('p','df-muted',`${l[kind==='checklist'?'check':'sub']}: ${t[kind].filter(x=>x.done).length}/${t[kind].length}`));
