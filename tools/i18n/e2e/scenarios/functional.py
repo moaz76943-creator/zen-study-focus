@@ -256,8 +256,8 @@ def language_running(a, token):
 
 def quick_training_work_rest_stop(a, token):
     a.tap("Timer")
-    a.tap("Quick training")
-    a.tap("20/10")
+    a.tap("Custom work-and-rest intervals")
+    a.tap("Intervals 20/10")
     a.tap("Start training")
     if not a.has("Work · Round 1/8"):
         raise AssertionError("Quick Training did not expose Work phase 1/8")
