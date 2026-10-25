@@ -31,7 +31,7 @@ test('a five-cohort manifest rotates through all 13 agents across UTC midnight',
  assert.equal(new Set(seen).size,13,'all specialists remain uniquely covered');
 });
 test('reports preserve source SHA and fail closed on skipped or unverified checks',()=>{
- const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T02:23:00Z',run:a=>({id:a.id,lane:a.lane,status:a.id==='agent_7'?'SOURCE_PARTIAL':'SOURCE_TESTED',tests:2}),coverage:()=>({unmapped:['tests/new_feature/flow.test.cjs'],duplicates:[]})});
+ const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T02:23:00Z',run:a=>({id:a.id,lane:a.lane,status:a.id==='agent_7'?'SOURCE_PARTIAL':'SOURCE_TESTED',tests:2,cases:2,passed:2,skipped:0,todo:0}),coverage:()=>({unmapped:['tests/new_feature/flow.test.cjs'],duplicates:[]})});
  assert.equal(report.source_sha,sha);
  assert.equal(report.status,'BLOCKED');
  assert.equal(report.agents.length,3);
@@ -40,7 +40,7 @@ test('reports preserve source SHA and fail closed on skipped or unverified check
  assert.equal(report.android_e2e,'NOT_TESTED');
 });
 test('fresh source commits are never labelled covered if tests are unmapped',()=>{
- const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1}),coverage:()=>({unmapped:['tests/new/one.test.cjs'],duplicates:[]})});
+ const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1,cases:1,passed:1,skipped:0,todo:0}),coverage:()=>({unmapped:['tests/new/one.test.cjs'],duplicates:[]})});
  assert.equal(report.status,'COVERAGE_GAP');
 });
 test('unexpected runner exceptions and missing checks are not green',()=>{
@@ -55,17 +55,17 @@ test('bad SHA, bad timestamp, invalid manifest or untrusted coverage are rejecte
  assert.throws(()=>agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:()=>({status:'SOURCE_TESTED'}),coverage:()=>({unmapped:null,duplicates:[]})}),/coverage/);
 });
 test('markdown is a clear review artifact rather than claimed device validation',()=>{
- const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1}),coverage:()=>({unmapped:[],duplicates:[]})});
+ const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1,cases:1,passed:1,skipped:0,todo:0}),coverage:()=>({unmapped:[],duplicates:[]})});
  assert.match(agent.toMarkdown(report),/Android E2E: NOT_TESTED/);
  assert.match(agent.toMarkdown(report),/RELEASE NOT APPROVED/);
  assert.match(agent.toMarkdown(report),/source SHA/);
 });
 
 test('cohorts include full agent inventory and SHA256 manifest fingerprint for cross-hour verification',()=>{
- const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1}),coverage:()=>({unmapped:[],duplicates:[]})});
+ const report=agent.runCycle(manifest,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1,cases:1,passed:1,skipped:0,todo:0}),coverage:()=>({unmapped:[],duplicates:[]})});
  assert.deepEqual(report.agent_ids,manifest.agents.map(a=>a.id));
  assert.match(report.manifest_sha256,/^[a-f0-9]{64}$/);
  const changed={...manifest,agents:[...manifest.agents,{id:'agent_12',lane:'qa',purpose:'future feature',test_dirs:['tests/feature']}]};
- const changedReport=agent.runCycle(changed,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1}),coverage:()=>({unmapped:[],duplicates:[]})});
+ const changedReport=agent.runCycle(changed,{sourceSha:sha,now:'2026-10-20T00:23:00Z',run:a=>({id:a.id,status:'SOURCE_TESTED',tests:1,cases:1,passed:1,skipped:0,todo:0}),coverage:()=>({unmapped:[],duplicates:[]})});
  assert.notEqual(changedReport.manifest_sha256,report.manifest_sha256);
 });
