@@ -54,12 +54,14 @@ test('lane19: all 11 locales cover every current canonical key when combined wit
   }
  }
 });
-test('lane19: exactly 925 newly contributed labels with no ambiguous double registrations',()=>{
+test('lane19: exactly 925 contributed labels and idempotent central import',()=>{
  let total=0;
  for(const code of langs)for(const [family,entries] of Object.entries(read(code))){
   total+=Object.keys(entries).length;
-  assert.ok(Object.keys(entries).every(k=>!Object.hasOwn(source[code]?.[family]||{},k)),
-    code+'/'+family+' overwrites an existing reviewed translation');
+  for(const [key,value] of Object.entries(entries)){
+   const reviewed=source[code]?.[family]?.[key];
+   if(reviewed!==undefined)assert.equal(reviewed,value,'conflicting import '+code+'/'+family+'/'+key);
+  }
  }
  assert.equal(total,925);
 });
