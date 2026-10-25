@@ -11,13 +11,24 @@
   function inspect(storage) {
     const pending = D.inspectPending(storage);
     if (pending.pending) return {ok:false, kind:'journal', detail:pending};
+    // Read-only validation of each selected checksum-verified v21 family.
+    // Invalid but correctly signed records must not reach app startup.
+    const packets = D.captureRaw(storage);
+    const snapshot = {cfg:{},tasksList:[],notesList:[]};
     const issues = [];
-    for (const key of Object.values(D.KEYS)) {
-      const primaryRaw = storage.getItem(key);
-      const mirrorRaw = storage.getItem(key + '_mirror');
-      if (primaryRaw === null && mirrorRaw === null) continue; // untouched fresh install
-      if (!D.inspectPacket(primaryRaw).ok && !D.inspectPacket(mirrorRaw).ok)
+    for (const [slot,key] of Object.entries(D.KEYS)) {
+      const primaryRaw = packets[key], mirrorRaw = packets[key+'_mirror'];
+      if (primaryRaw === null && mirrorRaw === null) continue;
+      const primary = D.inspectPacket(primaryRaw), mirror = D.inspectPacket(mirrorRaw);
+      if (!primary.ok && !mirror.ok) {
         issues.push(key + ': neither copy verifies');
+        continue;
+      }
+      snapshot[slot === 'cfg' ? 'cfg' : slot === 'tasks' ? 'tasksList' : 'notesList'] =
+        (primary.ok ? primary : mirror).value;
+    }
+    for (const item of D.inspectRecords(snapshot).issues) {
+      if (item.severity === 'error') issues.push(item.path + ': ' + item.code);
     }
     return {ok:!issues.length,kind:issues.length?'data':'ready',issues};
   }
