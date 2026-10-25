@@ -36,9 +36,9 @@
   --df22-space-5: 20px;
   --df22-space-6: 24px;
   --df22-touch: 44px;
-  --df22-font: Inter, Tajawal, "Noto Sans Arabic", system-ui, sans-serif;
+  --df22-font: system-ui, Roboto, "Noto Sans", "Noto Sans Arabic", "Noto Sans Devanagari", "Noto Sans Bengali", sans-serif;
   --df22-leading: 1.5;
-  --df22-body-size: 16px;
+  --df22-body-size: 1rem; /* respects user font scaling */
   --df22-title-size: clamp(1.16rem, 4.7vw, 1.48rem);
   --df22-number-size: clamp(2.6rem, 10vw, 3.45rem);
   --df22-ease: 150ms ease-out;
