@@ -61,13 +61,13 @@ class NativeAndroidI18nTests(unittest.TestCase):
             for key, default in self.main_values.items():
                 with self.subTest(language=language, key=key):
                     self.assertTrue(values[key].strip())
-                    self.assertEqual(re.findall(r"%\\d+\\$s", default),
-                                     re.findall(r"%\\d+\\$s", values[key]))
+                    self.assertEqual(re.findall(r"%\d+\$s", default),
+                                     re.findall(r"%\d+\$s", values[key]))
 
     def test_every_java_string_resource_exists(self):
         for filename in ("MainActivity.java", "FocusAlarmReceiver.java"):
             source = (JAVA / filename).read_text(encoding="utf-8")
-            for key in set(re.findall(r"R\\.string\\.(\\w+)", source)):
+            for key in set(re.findall(r"R\.string\.(\w+)", source)):
                 with self.subTest(filename=filename, key=key):
                     self.assertIn(key, self.main_values)
 
@@ -88,13 +88,15 @@ class NativeAndroidI18nTests(unittest.TestCase):
                 self.assertNotIn('"' + phrase + '"', joined)
 
     def test_notification_permission_is_not_requested_on_launch(self):
-        startup = self.activity.split("public class ZenNativeBridge", 1)[0]
+        startup = self.activity.split("protected void onCreate", 1)[1].split("private void requestNotificationPermissionForTimer", 1)[0]
         self.assertNotIn("requestPermissions(", startup)
         self.assertIn("Manifest.permission.POST_NOTIFICATIONS", self.activity)
         self.assertIn("requestPermissions(", self.activity)
+        self.assertIn("onRequestPermissionsResult", self.activity)
+        self.assertIn("FocusAlarmReceiver.refreshLocale(this)", self.activity)
 
     def test_native_language_bridge_and_hebrew_guard(self):
-        self.assertRegex(self.activity, r"@JavascriptInterface\\s+public void setNativeLocale")
+        self.assertRegex(self.activity, r"@JavascriptInterface\s+public void setNativeLocale")
         self.assertIn("zen_native_locale_i18n_v1", self.locale)
         self.assertIn('"he"', self.locale)
         self.assertIn('"iw"', self.locale)
