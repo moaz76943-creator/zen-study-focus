@@ -1,10 +1,8 @@
 
 /* ========================================================
    DEEP FOCUS — SMOOTH ZERO-POPUP ACTIVITY SWITCHER (M190)
-   Safe non-destructive UI transitions remain unchanged.
-   Destructive changes must use the native Android/browser confirmation,
-   including its Cancel result. Never override window.confirm globally.
    ======================================================== */
+// Use the native WebView confirmation result. Never auto-accept Cancel. Patient data and running sessions depend on this.
 
 
 /* ========================================================
@@ -18,37 +16,17 @@ const HabitFocusEngine = (function() {
     };
   }
 
+  // One source of truth: cfg.streak is calculated from real v21 sessionHistory.
   function getStreakData() {
-    const s = getSafeStorage();
-    const count = parseInt(s.getItem('df_streak_count') || '1', 10);
-    const lastDate = s.getItem('df_streak_last_date') || new Date().toISOString().slice(0, 10);
-    return { count, lastDate };
+    const count = typeof cfg === 'object' && Number.isFinite(cfg.streak)
+      ? Math.max(0, Math.floor(cfg.streak)) : 0;
+    return { count, lastDate: typeof localDateISO === 'function' ? localDateISO() : '' };
   }
 
+  // Compatibility API: never manufacture a second, unrelated streak counter.
   function recordSessionForStreak() {
-    const s = getSafeStorage();
-    const today = new Date().toISOString().slice(0, 10);
-    const current = getStreakData();
-
-    if (current.lastDate === today) {
-      return current.count;
-    }
-
-    const last = new Date(current.lastDate);
-    const now = new Date(today);
-    const diffDays = Math.ceil(Math.abs(now - last) / (1000 * 60 * 60 * 24));
-
-    let newCount = current.count;
-    if (diffDays === 1) {
-      newCount += 1;
-    } else if (diffDays > 1) {
-      newCount = 1;
-    }
-
-    s.setItem('df_streak_count', newCount.toString());
-    s.setItem('df_streak_last_date', today);
     updateStreakUI();
-    return newCount;
+    return getStreakData().count;
   }
 
   function updateStreakUI() {
@@ -70,7 +48,7 @@ const HabitFocusEngine = (function() {
     badge.innerHTML = `
       <span class="text-sm">🔥</span>
       <span id="df-streak-badge-count" style="font-variant-numeric: lining-nums;">${streak}</span>
-      <span class="text-amber-700 font-semibold">Days Streak</span>
+      <span id="df-streak-label" class="text-amber-700 font-semibold">${L().daysUnit}</span>
     `;
 
     header.insertBefore(badge, header.firstChild);
@@ -95,12 +73,10 @@ const HabitFocusEngine = (function() {
     document.body.appendChild(modal);
 
     modal.querySelector('#df-extend-25m').onclick = () => {
+      // Reuse the existing session engine, including its Cancel logic.
+      if (!selectHomeQuickSession(25)) return;
       modal.remove();
-      // تشغيل وضع الـ 25 دقيقة مباشرة
-      const btn25 = document.querySelector('button:has-text("25m"), [data-mode="25"], [class*="pill"]:contains("25")') || Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('25m'));
-      if (btn25) btn25.click();
-      const playBtn = document.querySelector('.play-btn, #playBtn, [class*="play" i]');
-      if (playBtn) playBtn.click();
+      if (!timerRunning) toggleTimerPlay();
       if (window.triggerHaptic) window.triggerHaptic('start');
     };
 
@@ -121,115 +97,16 @@ window.HabitFocusEngine = HabitFocusEngine;
 
 document.addEventListener('DOMContentLoaded', () => {
   HabitFocusEngine.injectStreakBadge();
-  const obs = new MutationObserver(HabitFocusEngine.injectStreakBadge);
+  if (document.getElementById('df-streak-badge')) return;
+  const obs = new MutationObserver(() => {
+    HabitFocusEngine.injectStreakBadge();
+    if (document.getElementById('df-streak-badge')) obs.disconnect();
+  });
   obs.observe(document.body, { childList: true, subtree: true });
 });
 
 
-/* ========================================================
-   DEEP FOCUS — MINIMALIST OLED DESK CLOCK ENGINE (M187)
-   ======================================================== */
-const DeskClockEngine = (function() {
-  let deskTimerId = null;
-  let isOpen = false;
-
-  function toWestern(str) {
-    if (typeof str !== 'string') return str;
-    return str.replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632)
-              .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
-  }
-
-  function getTimerText() {
-    const el = document.querySelector('.timer-val, #timerVal, [class*="timer" i] [class*="time" i], .text-6xl, .text-5xl');
-    if (el && el.textContent) {
-      return toWestern(el.textContent.trim());
-    }
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    const s = String(now.getSeconds()).padStart(2, '0');
-    return `${h}:${m}:${s}`;
-  }
-
-  function getTaskName() {
-    const storage = typeof localStorage !== 'undefined' ? localStorage : null;
-    if (storage) {
-      const task = storage.getItem('df_focused_task_text');
-      if (task) return task;
-    }
-    return 'DEEP FOCUS • ULTRA IMMERSION';
-  }
-
-  function openDeskClock() {
-    if (isOpen || document.getElementById('df-oled-desk-clock')) return;
-    isOpen = true;
-
-    const overlay = document.createElement('div');
-    overlay.id = 'df-oled-desk-clock';
-    overlay.style.cssText = 'position:fixed;inset:0;background:#000000;color:#ffffff;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;user-select:none;font-family:monospace;padding:24px;transition:opacity 0.3s;';
-    
-    overlay.innerHTML = `
-      <button id="df-desk-close" style="position:absolute;top:24px;right:24px;background:#1e293b;color:#cbd5e1;border:1px solid #334155;padding:8px 18px;border-radius:14px;font-size:13px;cursor:pointer;font-weight:bold;letter-spacing:1px;">✕ Exit</button>
-      <div id="df-desk-timer-val" style="font-size:clamp(60px, 16vw, 120px);font-weight:900;letter-spacing:6px;color:#10b981;line-height:1;font-variant-numeric:lining-nums;">${getTimerText()}</div>
-      <div id="df-desk-task-name" style="margin-top:20px;font-size:clamp(12px, 3.5vw, 18px);color:#94a3b8;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-align:center;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${getTaskName()}</div>
-      <div style="margin-top:24px;font-size:11px;color:#475569;letter-spacing:3px;text-transform:uppercase;">OLED BATTERY SAVER • 0123456789</div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    document.getElementById('df-desk-close').onclick = closeDeskClock;
-
-    deskTimerId = setInterval(() => {
-      const valEl = document.getElementById('df-desk-timer-val');
-      if (valEl) valEl.textContent = getTimerText();
-    }, 1000);
-
-    if (window.triggerHaptic) window.triggerHaptic('action');
-  }
-
-  function closeDeskClock() {
-    const el = document.getElementById('df-oled-desk-clock');
-    if (el) el.remove();
-    if (deskTimerId) clearInterval(deskTimerId);
-    deskTimerId = null;
-    isOpen = false;
-    if (window.triggerHaptic) window.triggerHaptic('click');
-  }
-
-  function bindTriggers() {
-    // 1. ربط زر Desk Clock الأصلي في أعلى الواجهة
-    document.querySelectorAll('[class*="orb" i], button, .pill, div').forEach(el => {
-      if (el.textContent && el.textContent.includes('Desk Clock') && !el.dataset.deskBound) {
-        el.dataset.deskBound = "true";
-        el.style.cursor = 'pointer';
-        el.addEventListener('click', (e) => {
-          e.preventDefault();
-          openDeskClock();
-        });
-      }
-    });
-
-    // 2. التحول التلقائي عند تدوير الهاتف أفقياً
-    if (window.matchMedia && !window.__dfOrientationBound) {
-      window.__dfOrientationBound = true;
-      const mql = window.matchMedia('(orientation: landscape)');
-      mql.addEventListener('change', (e) => {
-        if (e.matches) openDeskClock();
-        else closeDeskClock();
-      });
-    }
-  }
-
-  return { openDeskClock, closeDeskClock, bindTriggers };
-})();
-
-window.DeskClockEngine = DeskClockEngine;
-
-document.addEventListener('DOMContentLoaded', () => {
-  DeskClockEngine.bindTriggers();
-  const obs = new MutationObserver(DeskClockEngine.bindTriggers);
-  obs.observe(document.body, { childList: true, subtree: true });
-});
+/* Desk clock overlay purged to restore touch events */
 
 
 /* ========================================================
@@ -536,7 +413,7 @@ function toWest(val) {
 }
 
 document.addEventListener('input', (e) => {
-  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+  if (e.target && e.target.tagName === 'INPUT' && (e.target.type === 'date' || e.target.type === 'number')) {
     const cleaned = toWest(e.target.value);
     if (cleaned !== e.target.value) e.target.value = cleaned;
   }
@@ -1408,6 +1285,167 @@ const LANG_CATALOG = [
 ];
 
 const DICT = {
+  es: {
+    "title": "Enfoque y Rendimiento",
+    "sub": "Estudio, Entrenamiento y Trabajo Profundo",
+    "navTimer": "Temporizador",
+    "navTasks": "Tareas",
+    "navCalendar": "Calendario",
+    "navNotes": "Notas",
+    "navSounds": "Naturaleza",
+    "navAnalytics": "Estadísticas",
+    "domStudy": "Estudio",
+    "domSport": "Entrenamiento",
+    "domRead": "Lectura",
+    "domWork": "Trabajo Profundo",
+    "tagCornell": "Resumen Estructurado 📋",
+    "tabKanban": "Tablero de Etapas",
+    "tagFlash": "Recuerdo Activo 🧠",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m"
+},
+  fr: {
+    "title": "Focus et Performance",
+    "sub": "Étude, Entraînement et Travail Profond",
+    "navTimer": "Minuteur",
+    "navTasks": "Tâches",
+    "navCalendar": "Calendrier",
+    "navNotes": "Notes",
+    "navSounds": "Nature",
+    "navAnalytics": "Analytique",
+    "domStudy": "Étude",
+    "domSport": "Entraînement",
+    "domRead": "Lecture",
+    "domWork": "Travail Profond",
+    "tagCornell": "Résumé Structuré 📋",
+    "tabKanban": "Tableau des Étapes",
+    "tagFlash": "Rappel Actif 🧠",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m"
+},
+  de: {
+    "title": "Fokus & Leistung",
+    "sub": "Lernen, Training & Deep Work",
+    "navTimer": "Timer",
+    "navTasks": "Aufgaben",
+    "navCalendar": "Kalender",
+    "navNotes": "Notizen",
+    "navSounds": "Natur",
+    "navAnalytics": "Statistiken",
+    "domStudy": "Lernen",
+    "domSport": "Training",
+    "domRead": "Lesen",
+    "domWork": "Deep Work",
+    "tagCornell": "Strukturierte Notizen 📋",
+    "tabKanban": "Aufgaben-Board",
+    "tagFlash": "Aktives Erinnern 🧠",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m"
+},
+  tr: {
+    "title": "Derin Odak & Performans",
+    "sub": "Çalışma, Antrenman ve Derin Çalışma",
+    "navTimer": "Zamanlayıcı",
+    "navTasks": "Görevler",
+    "navCalendar": "Takvim",
+    "navNotes": "Notlar",
+    "navSounds": "Doğa",
+    "navAnalytics": "Analitik",
+    "domStudy": "Ders",
+    "domSport": "Antrenman",
+    "domRead": "Okuma",
+    "domWork": "Derin Çalışma",
+    "tagCornell": "Yapılandırılmış Özet 📋",
+    "tabKanban": "Aşama Panosu",
+    "tagFlash": "Aktif Hatırlama 🧠",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m"
+},
+  id: {
+    "title": "Fokus Mendalam & Kinerja",
+    "sub": "Belajar, Latihan & Kerja Mendalam",
+    "navTimer": "Pengatur Waktu",
+    "navTasks": "Tugas",
+    "navCalendar": "Kalender",
+    "navNotes": "Catatan",
+    "navSounds": "Alam",
+    "navAnalytics": "Statistik",
+    "domStudy": "Belajar",
+    "domSport": "Latihan",
+    "domRead": "Membaca",
+    "domWork": "Kerja Mendalam",
+    "tagCornell": "Ringkasan Terstruktur 📋",
+    "tabKanban": "Papan Tahapan",
+    "tagFlash": "Ingatan Aktif 🧠",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m"
+},
+  pt: {
+    "title": "Foco Profundo & Desempenho",
+    "sub": "Estudo, Treino & Trabalho Focado",
+    "navTimer": "Temporizador",
+    "navTasks": "Tarefas",
+    "navCalendar": "Calendário",
+    "navNotes": "Notas",
+    "navSounds": "Natureza",
+    "navAnalytics": "Estatísticas",
+    "domStudy": "Estudo",
+    "domSport": "Treino",
+    "domRead": "Leitura",
+    "domWork": "Trabalho Focado",
+    "tagCornell": "Resumo Estruturado 📋",
+    "tabKanban": "Quadro de Etapas",
+    "tagFlash": "Evocação Ativa 🧠",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m"
+},
+  ru: {
+    "title": "Глубокий Фокус и Продуктивность",
+    "sub": "Учеба, Тренировки и Глубокая Работа",
+    "navTimer": "Таймер",
+    "navTasks": "Задачи",
+    "navCalendar": "Календарь",
+    "navNotes": "Заметки",
+    "navSounds": "Природа",
+    "navAnalytics": "Аналитика",
+    "domStudy": "Учеба",
+    "domSport": "Тренировка",
+    "domRead": "Чтение",
+    "domWork": "Глубокая Работа",
+    "tagCornell": "Структурированные Заметки 📋",
+    "tabKanban": "Доска Этапов",
+    "tagFlash": "Активное Вспоминание 🧠",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m"
+},
+  it: {
+    "title": "Focus Profondo & Prestazioni",
+    "sub": "Studio, Allenamento & Lavoro Profondo",
+    "navTimer": "Timer",
+    "navTasks": "Attività",
+    "navCalendar": "Calendario",
+    "navNotes": "Note",
+    "navSounds": "Natura",
+    "navAnalytics": "Statistiche",
+    "domStudy": "Studio",
+    "domSport": "Allenamento",
+    "domRead": "Lettura",
+    "domWork": "Lavoro Profondo",
+    "tagCornell": "Appunti Strutturati 📋",
+    "tabKanban": "Bacheca Fasi",
+    "tagFlash": "Richiamo Attivo 🧠",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m"
+},
+
   en: {
     title: 'Focus & Performance', sub: 'Study, Workout, Reading & Deep Work',
     pillCloud: 'Manual Backup', pillSound: 'Test Sound', pillShare: 'Share App', pillSecure: 'Local Data',
@@ -1421,7 +1459,7 @@ const DICT = {
     filterAll: 'All', filterToday: 'Active', filterDone: 'Completed',
     phAddTask: 'Add study, workout or reading goal...', phSearchNotes: 'Search notes, workouts or book summaries...',
     catStudy: '📚 Study', catSport: '🏋️ Sport', catReview: '📖 Reading', catExam: '💻 Work',
-    tagCornell: 'Cornell 📋', tagFlash: 'Recall 👁️', tagQuick: 'Log 💡',
+    tagCornell: 'Structured Notes 📋', tagFlash: 'Recall 👁️', tagQuick: 'Log 💡',
     btnAddCalNote: '+ Add Note to Date', lblBlurAnswer: 'Blur text for active recall (Tap to reveal)',
     mixerReady: '🎵 Pure Nature Studio Ready', btnMyMix: '✨ Mix', btnStopAll: '⏹ Stop',
     sndCatWater: 'Water & Rain 🌧️', sndCatForest: 'Forest & Wind 🌲', sndCatWarm: 'Fire & Earth 🔥',
@@ -1501,7 +1539,7 @@ const DICT = {
     filterAll: 'Todo', filterToday: 'Activo', filterDone: 'Completado',
     phAddTask: 'Añadir meta de estudio, deporte o lectura...', phSearchNotes: 'Buscar notas, entrenamientos o resúmenes...',
     catStudy: '📚 Estudio', catSport: '🏋️ Deporte', catReview: '📖 Lectura', catExam: '💻 Trabajo',
-    tagCornell: 'Cornell 📋', tagFlash: 'Memoria 👁️', tagQuick: 'Registro 💡',
+    tagCornell: 'Structured Notes 📋', tagFlash: 'Memoria 👁️', tagQuick: 'Registro 💡',
     btnAddCalNote: '+ Añadir Nota al Día', lblBlurAnswer: 'Ocultar respuesta para repaso activo (Tocar para ver)',
     mixerReady: '🎵 Estudio Natural Puro Listo', btnMyMix: '✨ Mezcla', btnStopAll: '⏹ Parar',
     sndCatWater: 'Agua y Lluvia 🌧️', sndCatForest: 'Bosque y Viento 🌲', sndCatWarm: 'Fuego y Tierra 🔥',
@@ -1779,7 +1817,7 @@ function openLanguageModal() {
 function renderLanguageList() {
   const q = (document.getElementById('inpLangCountrySearch').value || '').toLowerCase().trim();
   const box = document.getElementById('langListScrollBox');
-  box.innerHTML = '';
+  box.replaceChildren();
 
   LANG_CATALOG.filter(l => {
     if (!q) return true;
@@ -1788,23 +1826,69 @@ function renderLanguageList() {
            l.iso.toLowerCase().includes(q) ||
            l.countries.toLowerCase().includes(q);
   }).forEach(l => {
-    const row = document.createElement('div');
+    const row = document.createElement('button');
+    row.type = 'button';
     row.className = `lang-row-btn ${cfg.lang === l.code ? 'active' : ''}`;
+    row.setAttribute('aria-pressed', String(cfg.lang === l.code));
     row.onclick = () => applyLanguage(l.code);
-    row.innerHTML = `
-      <div class="lang-code-monogram">${l.iso}</div>
-      <div class="lang-names-col">
-        <div class="lang-en-title">${l.enName}</div>
-        <div class="lang-native-sub">${l.nativeName}</div>
-      </div>
-      <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">${cfg.lang === l.code ? '✓' : ''}</span>
-    `;
+    const icon = document.createElement('div');
+    icon.className = 'lang-code-monogram';
+    icon.textContent = l.iso;
+    const names = document.createElement('div');
+    names.className = 'lang-names-col';
+    const english = document.createElement('div');
+    english.className = 'lang-en-title';
+    english.textContent = l.enName;
+    const native = document.createElement('div');
+    native.className = 'lang-native-sub';
+    native.textContent = l.nativeName;
+    names.appendChild(english);
+    names.appendChild(native);
+    const mark = document.createElement('span');
+    mark.style.cssText = 'font-size:0.75rem;font-weight:900;color:var(--primary);';
+    mark.textContent = cfg.lang === l.code ? '✓' : '';
+    row.appendChild(icon);
+    row.appendChild(names);
+    row.appendChild(mark);
     box.appendChild(row);
   });
 }
 
+function localizeStarterPreviews(target) {
+  // IDs 1..4 and 1..3 are the stable v21 demonstration records.
+  // A user-edited demonstration record is no longer replaced by translation.
+  const packs = Object.values(DICT);
+  if (Array.isArray(target.sampleTasks)) {
+    tasksList.forEach(record => {
+      if (!record || record.isStarter !== true || !Number.isSafeInteger(record.id)) return;
+      const index = record.id - 1;
+      if (index < 0 || index >= target.sampleTasks.length) return;
+      const unchanged = packs.some(pack => Array.isArray(pack.sampleTasks) &&
+        typeof pack.sampleTasks[index] === 'string' && record.title === toWest(pack.sampleTasks[index]));
+      if (unchanged) record.title = toWest(target.sampleTasks[index]);
+    });
+  }
+  if (Array.isArray(target.sampleNotes)) {
+    notesList.forEach(record => {
+      if (!record || record.isStarter !== true || !Number.isSafeInteger(record.id)) return;
+      const index = record.id - 1;
+      if (index < 0 || index >= target.sampleNotes.length) return;
+      const unchanged = packs.some(pack => {
+        const sample = Array.isArray(pack.sampleNotes) && pack.sampleNotes[index];
+        return sample && record.title === toWest(sample.t) && record.body === toWest(sample.b);
+      });
+      if (unchanged) {
+        record.title = toWest(target.sampleNotes[index].t);
+        record.body = toWest(target.sampleNotes[index].b);
+      }
+    });
+  }
+}
+
 function applyLanguage(code) {
-  const meta = LANG_CATALOG.find(x => x.code === code) || LANG_CATALOG[0];
+  const normalized = typeof code === 'string' ? code.toLowerCase().trim().split(/[-_]/)[0] : 'en';
+  const meta = LANG_CATALOG.find(x => x.code === normalized && x.code !== 'he' && x.code !== 'iw')
+    || LANG_CATALOG.find(x => x.code === 'en');
   cfg.lang = meta.code;
   saveFortressData('zen_fortress_cfg_v21', cfg);
   const d = L();
@@ -1818,7 +1902,8 @@ function applyLanguage(code) {
   document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
   const tn = document.getElementById('navTrainingText');
-  if (tn) tn.textContent = meta.code === 'ar' ? 'تدريب' : 'Training';
+  if (tn) tn.textContent = window.DF22Locale?.t(meta.code, 'quickTraining')
+    || (typeof quickText === 'function' ? quickText('trainingTitle') : 'Quick training');
   if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1831,15 +1916,7 @@ function applyLanguage(code) {
     if (d[k]) el.setAttribute('placeholder', toWest(d[k]));
   });
 
-  tasksList.forEach((t, idx) => {
-    if (t.isStarter && d.sampleTasks[idx]) t.title = toWest(d.sampleTasks[idx]);
-  });
-  notesList.forEach((n, idx) => {
-    if (n.isStarter && d.sampleNotes[idx]) {
-      n.title = toWest(d.sampleNotes[idx].t);
-      n.body = toWest(d.sampleNotes[idx].b);
-    }
-  });
+  localizeStarterPreviews(d);
 
   renderAnalyticsBars();
 
@@ -2324,7 +2401,7 @@ function restoreTimerSession() {
     timerTargetTime = snap.endAt;
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
     if (timerLeft === 0) {
-      // Native foreground timer has already emitted the expiry notification.
+      // Android completion alarm may already have notified; reconcile saved deadline.
       finalizeTimerSession(false);
       return;
     }
@@ -2333,6 +2410,12 @@ function restoreTimerSession() {
     timerInterval = setInterval(runTimerTick, 500);
   }
   updateTimerDisplay();
+  // Android can discard alarms after an app is force-stopped; re-arm from
+  // the existing v21 deadline when a running session is restored on next open.
+  if (timerRunning && window.ZenNative && window.ZenNative.startBackgroundService) {
+    try { window.ZenNative.startBackgroundService(timerLeft, document.getElementById('timerModeCaption').textContent); }
+    catch (error) { console.warn('Unable to restore timer completion alert', error); }
+  }
 }
 const ringCircumference = 2 * Math.PI * 105;
 
@@ -2340,6 +2423,10 @@ function syncHeaderMetrics() {
   const d = L();
   document.getElementById('hdrFocusMins').textContent = toWest(cfg.todayMins);
   document.getElementById('hdrStreakBadge').textContent = toWest(`↑ 🔥 ${cfg.streak} ${d.daysUnit}`);
+  const streakCounter = document.getElementById('df-streak-badge-count');
+  if (streakCounter) streakCounter.textContent = toWest(cfg.streak);
+  const streakLabel = document.getElementById('df-streak-label');
+  if (streakLabel) streakLabel.textContent = d.daysUnit;
   document.getElementById('orbWaterTxt').textContent = toWest(`${d.waterWord} ${cfg.water}/8`);
   document.getElementById('sportSetCounterTxt').textContent = toWest(`🏋️ ${d.domSport} ${cfg.sets || 0}/4 • 12×`);
   document.getElementById('readPagesCounterTxt').textContent = toWest(`📖 ${d.domRead} ${cfg.pagesRead || 0}`);
@@ -2388,15 +2475,16 @@ function updateTimerDisplay() {
 }
 
 function selectTimerModeFromUser(mins, modeKey, btn) {
-  if ((timerRunning || timerSessionId || timerActiveMs > 0) &&
+  // Quick-training confirmation is handled by selectTimerMode itself.
+  // Otherwise ask exactly once before replacing an active or paused session.
+  if (!quickTraining?.active && (timerRunning || timerSessionId || timerActiveMs > 0) &&
       !window.confirm(cfg.lang === 'ar' ? 'تغيير الوضع سيلغي تقدم الجلسة الحالية. هل تريد المتابعة؟' :
         'Changing mode will discard current session progress. Continue?')) return false;
-  selectTimerMode(mins, modeKey, btn);
-  return true;
+  return selectTimerMode(mins, modeKey, btn) !== false;
 }
 function selectTimerMode(mins, modeKey, btn) {
   if(quickTraining?.active && !quickInternalChange) {
-    if(!window.confirm(quickText('replacePrompt')))return;
+    if(!window.confirm(quickText('replacePrompt')))return false;
     quickTraining=null;
     renderQuickTraining();
   }
@@ -2413,6 +2501,7 @@ function selectTimerMode(mins, modeKey, btn) {
   timerResumeMs = null;
   storeTimerSession();
   updateTimerDisplay();
+  return true;
 }
 
 function openCustomTimerModal() { document.getElementById('customTimerModal').classList.add('open'); }
@@ -2420,10 +2509,15 @@ function setCustomPresetValues(m) { document.getElementById('inpCustomMins').val
 function applyCustomTimerNow() {
   const mins = Math.max(1, Math.min(240, parseInt(toWest(document.getElementById('inpCustomMins').value)) || 45));
   const title = toWest(document.getElementById('inpCustomTitle').value.trim());
-  customSessionLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
+  const nextLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
+  if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return false;
+  // Commit the new title only after user consent; persist the final snapshot.
+  customSessionLabel = nextLabel;
+  updateTimerDisplay();
+  storeTimerSession();
   closeModal('customTimerModal');
-  if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return;
   showToast(`⚡ ${customSessionLabel}`);
+  return true;
 }
 
 function changeTimerDelta(deltaMins) {
@@ -3167,3 +3261,2135 @@ document.addEventListener('DOMContentLoaded', () => {
   const observer = new MutationObserver(applyPristineUIElevations);
   observer.observe(document.body, { childList: true, subtree: true });
 });
+
+// Safe Fusion of Comprehensive Dictionaries
+if (typeof DICT !== 'undefined') {
+  Object.assign(DICT, {
+  "es": {
+    "title": "Enfoque y Rendimiento",
+    "sub": "Estudio, Entrenamiento y Trabajo Profundo",
+    "pillCloud": "Copia Manual",
+    "pillSound": "Probar Sonido",
+    "pillShare": "Compartir",
+    "pillSecure": "Datos Locales",
+    "domStudy": "Estudio",
+    "domSport": "Entrenamiento",
+    "domRead": "Lectura",
+    "domWork": "Trabajo Profundo",
+    "navTimer": "Temporizador",
+    "navTasks": "Tareas",
+    "navCalendar": "Calendario",
+    "navNotes": "Notas",
+    "navSounds": "Naturaleza",
+    "navAnalytics": "Estadísticas",
+    "totalFocusToday": "Minutos Activos Hoy",
+    "minsUnit": "min",
+    "daysUnit": "días",
+    "waterWord": "Agua",
+    "orbDump": "Nota Rápida",
+    "orbCloud": "Exportar Copia",
+    "orbDesk": "Reloj de Mesa",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m",
+    "modeCustom": "Personalizado ⚡",
+    "startFocusAchieve": "Planificar • Ejecutar • Lograr",
+    "filterAll": "Todo",
+    "filterToday": "Activo",
+    "filterDone": "Completado",
+    "phAddTask": "Añadir objetivo de estudio o tarea...",
+    "phSearchNotes": "Buscar notas y resúmenes...",
+    "catStudy": "📚 Estudio",
+    "catSport": "🏋 Deporte",
+    "catReview": "📖 Lectura",
+    "catExam": "💻 Trabajo",
+    "tagCornell": "Resumen Estructurado 📋",
+    "tagFlash": "Recuerdo Activo 🧠",
+    "tagQuick": "Registro 💡",
+    "btnAddCalNote": "+ Añadir Nota a la Fecha",
+    "lblBlurAnswer": "Toca para revelar respuesta",
+    "mixerReady": "🎵 Sonidos Naturales Listos",
+    "btnMyMix": "✨ Mezcla",
+    "btnStopAll": "⏹ Detener",
+    "sndCatWater": "Agua y Lluvia 🌧️",
+    "sndCatForest": "Bosque y Viento 🌲",
+    "sndCatWarm": "Fuego y Tierra 🔥",
+    "kpiMinutes": "Minutos Activos",
+    "kpiSessions": "Sesiones Completadas",
+    "btnSave": "Guardar",
+    "btnCancel": "Cancelar",
+    "weekdays": [
+      "Dom",
+      "Lun",
+      "Mar",
+      "Mié",
+      "Jue",
+      "Vie",
+      "Sáb"
+    ],
+    "months": [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
+    "sounds": {
+      "ocean": "Olas del Océano",
+      "rain": "Lluvia Suave de Bosque",
+      "fire": "Fuego de Campamento",
+      "forest": "Brisa de Pinos",
+      "stream": "Arroyo de Montaña",
+      "leaves": "Hojas Crujientes",
+      "waterfall": "Cascada",
+      "night": "Grillos Nocturnos",
+      "thunder": "Truenos Lejanos",
+      "wind": "Viento Fuerte",
+      "winrain": "Lluvia en Ventana",
+      "earth": "Susurro Profundo"
+    }
+  },
+  "fr": {
+    "title": "Focus et Performance",
+    "sub": "Étude, Entraînement et Travail Profond",
+    "pillCloud": "Sauvegarde Manuelle",
+    "pillSound": "Tester le Son",
+    "pillShare": "Partager",
+    "pillSecure": "Données Locales",
+    "domStudy": "Étude",
+    "domSport": "Entraînement",
+    "domRead": "Lecture",
+    "domWork": "Travail Profond",
+    "navTimer": "Minuteur",
+    "navTasks": "Tâches",
+    "navCalendar": "Calendrier",
+    "navNotes": "Notes",
+    "navSounds": "Nature",
+    "navAnalytics": "Analytique",
+    "totalFocusToday": "Minutes Actives Aujourd’hui",
+    "minsUnit": "min",
+    "daysUnit": "jours",
+    "waterWord": "Eau",
+    "orbDump": "Note Rapide",
+    "orbCloud": "Exporter",
+    "orbDesk": "Horloge Bureau",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m",
+    "modeCustom": "Personnalisé ⚡",
+    "startFocusAchieve": "Planifier • Exécuter • Réussir",
+    "filterAll": "Tout",
+    "filterToday": "Actif",
+    "filterDone": "Terminé",
+    "phAddTask": "Ajouter un objectif d’étude...",
+    "phSearchNotes": "Rechercher des notes...",
+    "catStudy": "📚 Étude",
+    "catSport": "🏋 Sport",
+    "catReview": "📖 Lecture",
+    "catExam": "💻 Travail",
+    "tagCornell": "Résumé Structuré 📋",
+    "tagFlash": "Rappel Actif 🧠",
+    "tagQuick": "Journal 💡",
+    "btnAddCalNote": "+ Ajouter une Note",
+    "lblBlurAnswer": "Appuyez pour révéler la réponse",
+    "mixerReady": "🎵 Sons Naturels Prêts",
+    "btnMyMix": "✨ Mix",
+    "btnStopAll": "⏹ Arrêter",
+    "sndCatWater": "Eau et Pluie 🌧️",
+    "sndCatForest": "Forêt et Vent 🌲",
+    "sndCatWarm": "Feu et Terre 🔥",
+    "kpiMinutes": "Minutes Actives",
+    "kpiSessions": "Sessions Terminées",
+    "btnSave": "Enregistrer",
+    "btnCancel": "Annuler",
+    "weekdays": [
+      "Dim",
+      "Lun",
+      "Mar",
+      "Mer",
+      "Jeu",
+      "Ven",
+      "Sam"
+    ],
+    "months": [
+      "Janvier",
+      "Février",
+      "Mars",
+      "Avril",
+      "Mai",
+      "Juin",
+      "Juillet",
+      "Août",
+      "Septembre",
+      "Octobre",
+      "Novembre",
+      "Décembre"
+    ],
+    "sounds": {
+      "ocean": "Vagues de l’Océan",
+      "rain": "Pluie Douce en Forêt",
+      "fire": "Feu de Camp",
+      "forest": "Brise de Pins",
+      "stream": "Ruisseau de Montagne",
+      "leaves": "Feuilles Mortes",
+      "waterfall": "Cascade",
+      "night": "Grillons de Nuit",
+      "thunder": "Tonnerre Lointain",
+      "wind": "Vent d’Altitude",
+      "winrain": "Pluie sur la Fenêtre",
+      "earth": "Gronderie Terrestre"
+    }
+  },
+  "tr": {
+    "title": "Derin Odak & Performans",
+    "sub": "Ders, Antrenman ve Derin Çalışma",
+    "pillCloud": "Manuel Yedekleme",
+    "pillSound": "Sesi Test Et",
+    "pillShare": "Paylaş",
+    "pillSecure": "Yerel Veriler",
+    "domStudy": "Ders",
+    "domSport": "Antrenman",
+    "domRead": "Okuma",
+    "domWork": "Derin Çalışma",
+    "navTimer": "Zamanlayıcı",
+    "navTasks": "Görevler",
+    "navCalendar": "Takvim",
+    "navNotes": "Notlar",
+    "navSounds": "Doğa",
+    "navAnalytics": "Analitik",
+    "totalFocusToday": "Bugünkü Aktif Dakikalar",
+    "minsUnit": "dk",
+    "daysUnit": "gün",
+    "waterWord": "Su",
+    "orbDump": "Hızlı Not",
+    "orbCloud": "Yedeği Dışa Aktar",
+    "orbDesk": "Masa Saati",
+    "modeFocus": "25m",
+    "modeShort": "5m",
+    "modeLong": "15m",
+    "modeCustom": "Özel ⚡",
+    "startFocusAchieve": "Planla • Uygula • Başar",
+    "filterAll": "Tümü",
+    "filterToday": "Aktif",
+    "filterDone": "Tamamlandı",
+    "phAddTask": "Çalışma hedefi ekle...",
+    "phSearchNotes": "Notları ve özetleri ara...",
+    "catStudy": "📚 Ders",
+    "catSport": "🏋 Spor",
+    "catReview": "📖 Okuma",
+    "catExam": "💻 İş",
+    "tagCornell": "Yapılandırılmış Özet 📋",
+    "tagFlash": "Aktif Hatırlama 🧠",
+    "tagQuick": "Günlük 💡",
+    "btnAddCalNote": "+ Tarihe Not Ekle",
+    "lblBlurAnswer": "Cevabı görmek için dokun",
+    "mixerReady": "🎵 Doğa Sesleri Hazır",
+    "btnMyMix": "✨ Karışım",
+    "btnStopAll": "⏹ Durdur",
+    "sndCatWater": "Su ve Yağmur 🌧️",
+    "sndCatForest": "Orman ve Rüzgar 🌲",
+    "sndCatWarm": "Ateş ve Toprak 🔥",
+    "kpiMinutes": "Aktif Dakika",
+    "kpiSessions": "Tamamlanan Oturum",
+    "btnSave": "Kaydet",
+    "btnCancel": "İptal",
+    "weekdays": [
+      "Paz",
+      "Pzt",
+      "Sal",
+      "Çar",
+      "Per",
+      "Cum",
+      "Cmt"
+    ],
+    "months": [
+      "Ocak",
+      "Şubat",
+      "Mart",
+      "Nisan",
+      "Mayıs",
+      "Haziran",
+      "Temmuz",
+      "Ağustos",
+      "Eylül",
+      "Ekim",
+      "Kasım",
+      "Aralık"
+    ],
+    "sounds": {
+      "ocean": "Okyanus Dalgaları",
+      "rain": "Yumuşak Orman Yağmuru",
+      "fire": "Kamp Ateşi",
+      "forest": "Çam Esintisi",
+      "stream": "Dağ Deresi",
+      "leaves": "Hışırdayan Yapraklar",
+      "waterfall": "Şelale",
+      "night": "Gece Cırcır Böcekleri",
+      "thunder": "Uzak Gök Gürültüsü",
+      "wind": "Yayla Rüzgarı",
+      "winrain": "Cama Vuran Yağmur",
+      "earth": "Derin Toprak Uğultusu"
+    }
+  }
+});
+}
+
+
+/* ========================================================
+   DEEP FOCUS — SHAREABLE FOCUS CARD & SOCIAL PROOF (M193)
+   ======================================================== */
+const ShareCardEngine = (function() {
+  function getSafeData() {
+    const s = typeof localStorage !== 'undefined' ? localStorage : null;
+    const streak = s ? (s.getItem('df_streak_count') || '1') : '1';
+    const mins = document.querySelector('[class*="recorded-minutes"], .text-5xl, .stat-mins')?.textContent?.trim() || '25';
+    const sessions = document.querySelector('[class*="sessions-count"], .stat-sessions')?.textContent?.trim() || '1';
+    const task = s ? (s.getItem('df_focused_task_text') || 'Core Study Milestone') : 'Core Study Milestone';
+    const today = new Date().toISOString().slice(0, 10);
+    return { streak, mins, sessions, task, today };
+  }
+
+  function showShareCardModal() {
+    if (document.getElementById('df-share-card-modal')) return;
+    const data = getSafeData();
+
+    const modal = document.createElement('div');
+    modal.id = 'df-share-card-modal';
+    modal.className = 'fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 select-none';
+    modal.innerHTML = `
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-white shadow-2xl relative animate-in fade-in">
+        <button id="df-share-close" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm font-bold">✕</button>
+        
+        <!-- Header -->
+        <div class="flex items-center gap-2 mb-4 text-emerald-400 font-mono text-xs font-bold tracking-widest uppercase">
+          <span>⚡ DEEP FOCUS</span>
+          <span class="text-slate-600">•</span>
+          <span>DAILY PROOF</span>
+        </div>
+
+        <!-- Date & Flame -->
+        <div class="flex items-center justify-between mb-5">
+          <div class="text-sm font-bold text-slate-300 font-mono" style="font-variant-numeric: lining-nums;">${data.today}</div>
+          <div class="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full text-xs font-bold flex items-center gap-1.5 font-mono">
+            <span>🔥</span>
+            <span>${data.streak} Days Streak</span>
+          </div>
+        </div>
+
+        <!-- Core Metric Box -->
+        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 mb-4 text-center">
+          <div class="text-4xl font-black text-emerald-400 font-mono tracking-tight" style="font-variant-numeric: lining-nums;">${data.mins} <span class="text-xs text-slate-400 font-normal">MINS</span></div>
+          <div class="text-xs text-slate-400 mt-1">Deep Work Immersion Today</div>
+        </div>
+
+        <!-- Target Milestone -->
+        <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-800 text-xs text-slate-300 mb-5 flex items-center gap-2">
+          <span>🎯</span>
+          <span class="truncate font-semibold">${data.task}</span>
+        </div>
+
+        <!-- Share Actions -->
+        <div class="flex gap-2">
+          <button id="df-native-share-btn" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-900/40">
+            <span>📲 Share to WhatsApp</span>
+          </button>
+          <button id="df-copy-summary-btn" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 active:scale-98 text-slate-300 rounded-xl text-xs font-bold transition">
+            Copy
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector('#df-share-close').onclick = () => modal.remove();
+
+    const sharePayload = {
+      title: 'Deep Focus Daily Progress',
+      text: `⚡ DEEP FOCUS DAILY RECORD\n📅 Date: ${data.today}\n🔥 Streak: ${data.streak} Days\n⏱ Focused: ${data.mins} mins\n🎯 Goal: ${data.task}\n#DeepFocus #StudyWithMe`,
+      url: 'https://github.com/moaz76943-creator/zen-study-focus'
+    };
+
+    modal.querySelector('#df-native-share-btn').onclick = async () => {
+      if (window.triggerHaptic) window.triggerHaptic('action');
+      if (navigator.share) {
+        try {
+          await navigator.share(sharePayload);
+        } catch(e) {}
+      } else {
+        navigator.clipboard.writeText(sharePayload.text);
+        alert('Progress copied to clipboard! Paste it into WhatsApp or Stories.');
+      }
+    };
+
+    modal.querySelector('#df-copy-summary-btn').onclick = () => {
+      if (window.triggerHaptic) window.triggerHaptic('click');
+      navigator.clipboard.writeText(sharePayload.text);
+      alert('Copied to clipboard!');
+    };
+  }
+
+  function injectShareButtonInAnalytics() {
+    if (document.getElementById('df-analytics-share-btn')) return;
+    const targetContainer = document.querySelector('#view-analytics, [data-view="analytics"], .analytics-container, .recorded-analytics')?.parentElement || document.querySelector('.analytics-header');
+    if (!targetContainer) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'df-analytics-share-btn';
+    btn.className = 'w-full max-w-sm mx-auto mb-4 p-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-98 cursor-pointer';
+    btn.innerHTML = '<span>📸 Share Focus Card (مشاركة إنجاز اليوم)</span>';
+    btn.onclick = showShareCardModal;
+
+    targetContainer.insertBefore(btn, targetContainer.firstChild);
+  }
+
+  return { showShareCardModal, injectShareButtonInAnalytics };
+})();
+
+window.ShareCardEngine = ShareCardEngine;
+
+document.addEventListener('DOMContentLoaded', () => {
+  ShareCardEngine.injectShareButtonInAnalytics();
+  const obs = new MutationObserver(ShareCardEngine.injectShareButtonInAnalytics);
+  obs.observe(document.body, { childList: true, subtree: true });
+});
+
+// Touch & UI Unblocker: Ensure no residual overlays block clicks
+document.addEventListener('DOMContentLoaded', () => {
+  const badOverlay = document.getElementById('df-oled-desk-clock');
+  if (badOverlay) badOverlay.remove();
+});
+
+
+/* ========================================================
+   DEEP FOCUS — SPOKEN VOCABULARY BANK & DUAL AUDIO ENGINE (M200)
+   ======================================================== */
+const VocabAudioBankEngine = (function() {
+  function getSafeStorage() {
+    return typeof localStorage !== 'undefined' ? localStorage : {
+      getItem: () => null,
+      setItem: () => {}
+    };
+  }
+
+  function getVocabList() {
+    const s = getSafeStorage();
+    try {
+      const data = s.getItem('df_vocab_bank');
+      if (data) return JSON.parse(data);
+    } catch(e) {}
+    // عينات افتراضية جاهزة مطابقة لنمط التعلم
+    return [
+      { id: 'v1', term: 'Deine Hausaufgaben sind fast fertig.', translation: 'واجباتك المنزلية جاهزة تقريباً.', notes: 'die Hausaufgaben [Nom] <- deine', color: 'purple', reviews: 0, created: '2026-10-23' },
+      { id: 'v2', term: 'Sein Pinsel liegt hier.', translation: 'فرشاته موجودة هنا.', notes: 'der Pinsel [Nom] <- sein', color: 'blue', reviews: 0, created: '2026-10-23' },
+      { id: 'v3', term: 'Seine Unterkunft kostet wenig.', translation: 'مكان إقامته تكلفته قليلة.', notes: 'die Unterkunft [Nom] <- seine', color: 'red', reviews: 0, created: '2026-10-23' }
+    ];
+  }
+
+  function saveVocabList(list) {
+    const s = getSafeStorage();
+    s.setItem('df_vocab_bank', JSON.stringify(list));
+  }
+
+  // محرك النطق الصوتي مع التحكم بالسرعات والتكرار والفواصل
+  let isSpeaking = false;
+  let activeUtterance = null;
+
+  function speakText(text, langCode = 'de-DE', speed = 1.0, maxRepeats = 1, pauseSeconds = 0.5, onDone = null) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+    window.speechSynthesis.cancel();
+    isSpeaking = true;
+    let currentRepeat = 0;
+
+    function playIteration() {
+      if (!isSpeaking || currentRepeat >= maxRepeats) {
+        isSpeaking = false;
+        if (onDone) onDone();
+        return;
+      }
+
+      currentRepeat++;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = langCode;
+      u.rate = Math.max(0.5, Math.min(2.0, speed));
+      activeUtterance = u;
+
+      u.onend = function() {
+        if (currentRepeat < maxRepeats && isSpeaking) {
+          setTimeout(playIteration, pauseSeconds * 1000);
+        } else {
+          isSpeaking = false;
+          if (onDone) onDone();
+        }
+      };
+
+      u.onerror = function() {
+        isSpeaking = false;
+        if (onDone) onDone();
+      };
+
+      window.speechSynthesis.speak(u);
+    }
+
+    playIteration();
+  }
+
+  function stopSpeech() {
+    isSpeaking = false;
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
+  // استيراد سريع لملفات CSV / نصية
+  function importFromCSV(csvText) {
+    if (!csvText) return 0;
+    const lines = csvText.trim().split('\n');
+    const existing = getVocabList();
+    let addedCount = 0;
+
+    lines.forEach((line, idx) => {
+      const parts = line.split(',');
+      if (parts.length >= 2) {
+        const term = (parts[0] || '').trim();
+        const translation = (parts[1] || '').trim();
+        const notes = (parts[2] || '').trim();
+        const color = (parts[3] || 'purple').trim();
+
+        if (term && translation) {
+          existing.push({
+            id: 'v_' + Date.now() + '_' + idx,
+            term,
+            translation,
+            notes,
+            color,
+            reviews: 0,
+            created: new Date().toISOString().slice(0, 10)
+          });
+          addedCount++;
+        }
+      }
+    });
+
+    saveVocabList(existing);
+    return addedCount;
+  }
+
+  // الفرز وإعادة الترتيب الذكي
+  function getSortedVocab(sortBy = 'created_desc') {
+    const list = [...getVocabList()];
+    if (sortBy === 'alpha_asc') {
+      return list.sort((a, b) => a.term.localeCompare(b.term));
+    } else if (sortBy === 'alpha_desc') {
+      return list.sort((a, b) => b.term.localeCompare(a.term));
+    } else if (sortBy === 'created_desc') {
+      return list.sort((a, b) => (b.id > a.id ? 1 : -1));
+    } else if (sortBy === 'color') {
+      return list.sort((a, b) => a.color.localeCompare(b.color));
+    }
+    return list;
+  }
+
+  
+  function setCardReviewStatus(cardId, needsReview) {
+    const list = getVocabList().map(c => {
+      if (c.id === cardId) {
+        return {
+          ...c,
+          needsReview: needsReview,
+          reviewCount: (c.reviewCount || 0) + 1,
+          lastReviewed: new Date().toISOString().slice(0, 10)
+        };
+      }
+      return c;
+    });
+    saveVocabList(list);
+  }
+
+  function getFilteredVocab(colorFilter = 'all', sortMode = 'created_desc') {
+    let list = getSortedVocab(sortMode);
+    if (!colorFilter || colorFilter === 'all') return list;
+    if (colorFilter === 'needs_review') return list.filter(c => c.needsReview);
+    return list.filter(c => c.color === colorFilter);
+  }
+
+  
+  function cycleCardColor(cardId) {
+    const colors = ['purple', 'blue', 'red', 'green'];
+    const list = getVocabList().map(c => {
+      if (c.id === cardId) {
+        const nextIdx = (colors.indexOf(c.color || 'purple') + 1) % colors.length;
+        return { ...c, color: colors[nextIdx] };
+      }
+      return c;
+    });
+    saveVocabList(list);
+    return list;
+  }
+
+  function deleteCard(cardId) {
+    const list = getVocabList().filter(c => c.id !== cardId);
+    saveVocabList(list);
+    return list;
+  }
+
+  return {
+    getVocabList,
+    cycleCardColor,
+    deleteCard,
+    setCardReviewStatus,
+    getFilteredVocab,
+    saveVocabList,
+    speakText,
+    stopSpeech,
+    importFromCSV,
+    getSortedVocab
+  };
+})();
+
+if (typeof window !== 'undefined') {
+  window.VocabAudioBankEngine = VocabAudioBankEngine;
+}
+
+
+/* ========================================================
+   DEEP FOCUS — SPOKEN VOCABULARY STUDIO UI COMPONENT (M201)
+   ======================================================== */
+const VocabUIController = (function() {
+  let activeSpeed = 1.0;
+  let activeRepeats = 1;
+  let activeSort = 'created_desc';
+
+  function getColorHex(color) {
+    if (color === 'blue') return '#3b82f6';
+    if (color === 'red') return '#ef4444';
+    if (color === 'green') return '#10b981';
+    return '#8b5cf6'; // purple default
+  }
+
+  function renderVocabView() {
+    if (document.getElementById('df-vocab-studio-view')) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'df-vocab-studio-view';
+    modal.style.cssText = 'position:fixed;inset:0;background:#f8fafc;z-index:9999;display:flex;flex-direction:column;font-family:system-ui,-apple-system,sans-serif;color:#0f172a;overflow:hidden;';
+
+    const items = window.VocabAudioBankEngine ? window.VocabAudioBankEngine.getSortedVocab(activeSort) : [];
+
+    modal.innerHTML = `
+      <!-- Header Bar -->
+      <div style="background:#ffffff;border-bottom:1px solid #e2e8f0;padding:14px 16px;display:flex;align-items:center;justify-content:between;gap:12px;box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+        <button id="df-vocab-back" style="background:#f1f5f9;border:none;border-radius:12px;padding:8px 12px;font-size:14px;cursor:pointer;font-weight:bold;color:#475569;">← Back</button>
+        <div style="flex:1;text-align:center;">
+          <h2 style="margin:0;font-size:15px;font-weight:800;color:#0f172a;">Spoken Vocab Bank</h2>
+          <span id="df-vocab-count-badge" style="font-size:11px;color:#64748b;font-weight:600;font-variant-numeric:lining-nums;"><span id="df-vocab-pair-badge" title="Tap to switch language pair">${localStorage.getItem('df_vocab_pair') || 'AR > DE'}</span> • ${items.length} Items</span>
+        </div>
+        <input type="file" id="df-vocab-file-input" accept=".csv,.txt" style="display:none;"><button id="df-vocab-import-btn" style="background:#eff6ff;color:#2563eb;border:1px solid #dbeafe;border-radius:12px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:bold;">📁+ Import</button><button id="df-vocab-export-btn" style="background:#f8fafc;color:#475569;border:1px solid #e2e8f0;border-radius:12px;padding:8px 10px;font-size:12px;cursor:pointer;font-weight:bold;margin-left:4px;" title="Export CSV Backup">📤</button>
+      </div>
+
+      <!-- Controls & Quick Toolbar -->
+      <div style="background:#ffffff;border-bottom:1px solid #f1f5f9;padding:10px 16px;display:flex;align-items:center;gap:8px;overflow-x:auto;">
+        <button id="df-speed-btn" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;color:#334155;">⚡ ${activeSpeed}x</button>
+        <button id="df-repeat-btn" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;color:#334155;">🔁 ${activeRepeats}x</button>
+        <button id="df-sort-btn" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;color:#334155;">⇅ Sort</button>
+        <button id="df-start-quiz-btn" style="background:#8b5cf6;color:#ffffff;border:none;border-radius:10px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:bold;margin-left:auto;margin-right:6px;">🧠 Start Quiz</button><button id="df-add-card-btn" style="background:#2563eb;color:#ffffff;border:none;border-radius:10px;padding:6px 14px;font-size:11px;cursor:pointer;font-weight:bold;margin-left:auto;">+ Add Word</button>
+      </div>
+
+      
+      <!-- Color & Category Filter Bar -->
+      <div id="df-vocab-filter-bar" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:8px 16px;display:flex;align-items:center;gap:6px;overflow-x:auto;">
+        <button data-filter="all" class="df-filter-chip" style="background:#2563eb;color:#ffffff;border:none;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;shrink:0;">All</button>
+        <button data-filter="purple" class="df-filter-chip" style="background:#ffffff;color:#6b21a8;border:1px solid #d8b4fe;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">🟣 Purple</button>
+        <button data-filter="blue" class="df-filter-chip" style="background:#ffffff;color:#1e40af;border:1px solid #bfdbfe;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">🔵 Blue</button>
+        <button data-filter="red" class="df-filter-chip" style="background:#ffffff;color:#991b1b;border:1px solid #fecaca;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">🔴 Red</button>
+        <button data-filter="green" class="df-filter-chip" style="background:#ffffff;color:#065f46;border:1px solid #a7f3d0;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">🟢 Green</button>
+        <button data-filter="needs_review" class="df-filter-chip" style="background:#ffffff;color:#854d0e;border:1px solid #fef08a;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;shrink:0;">⚠️ Needs Review</button>
+      </div>
+
+      <!-- Word Cards List -->
+      <div id="df-vocab-cards-container" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
+        ${items.map(item => `
+          <div data-card-id="${item.id}" data-card-color="${item.color || 'purple'}" data-card-review="${item.needsReview ? 'true' : 'false'}" style="position:relative;background:#ffffff;border-radius:18px;border:1px solid #e2e8f0;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.02);display:flex;gap:14px;align-items:flex-start;">
+            <!-- Foreign Word Column -->
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <button data-audio-term="${item.term}" style="background:#f1f5f9;border:none;border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;" title="Listen Foreign">🔊</button>
+                <div style="font-size:14px;font-weight:700;color:#0f172a;line-height:1.4;">${item.term}</div>
+              </div>
+            </div>
+
+            <!-- Translation Column -->
+            <div style="flex:1;border-right:1px solid #f1f5f9;padding-right:12px;direction:rtl;text-align:right;">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <span class="df-color-dot" data-dot-card-id="${item.id}" title="Click to change color" style="width:12px;height:12px;border-radius:50%;background:${getColorHex(item.color)};display:inline-block;shrink:0;box-shadow:0 0 0 2px #ffffff, 0 0 0 3px #cbd5e1;"></span><button class="df-card-delete-btn" data-delete-card-id="${item.id}" style="background:transparent;border:none;color:#94a3b8;font-size:11px;cursor:pointer;margin-right:auto;" title="Delete Card">✕</button>
+                <div style="font-size:14px;font-weight:700;color:#1e293b;line-height:1.4;">${item.translation}</div>
+                <button data-audio-trans="${item.translation}" style="background:#f1f5f9;border:none;border-radius:8px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;margin-right:auto;" title="Listen Arabic">🔊</button>
+              </div>
+              ${item.notes ? `<div style="font-size:11px;color:#64748b;margin-top:4px;line-height:1.4;background:#f8fafc;padding:6px 8px;border-radius:8px;">${item.notes}</div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Event Bindings
+    document.getElementById('df-vocab-back').onclick = () => modal.remove();
+
+    // Native File Picker Import
+    const fileInput = document.getElementById('df-vocab-file-input');
+    const importBtn = document.getElementById('df-vocab-import-btn');
+    if (importBtn && fileInput) {
+      importBtn.onclick = () => fileInput.click();
+      fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const text = evt.target.result;
+          if (window.VocabAudioBankEngine) {
+            const added = window.VocabAudioBankEngine.importFromCSV(text);
+            alert('Successfully imported ' + added + ' words from ' + file.name + '!');
+            modal.remove();
+            renderVocabView();
+          }
+        };
+        reader.readAsText(file);
+      };
+    }
+
+    // CSV Export Download
+    const exportBtn = document.getElementById('df-vocab-export-btn');
+    if (exportBtn) {
+      exportBtn.onclick = () => {
+        const list = window.VocabAudioBankEngine ? window.VocabAudioBankEngine.getVocabList() : [];
+        if (list.length === 0) {
+          alert('No words to export!');
+          return;
+        }
+        const csvRows = list.map(item => `"${item.term.replace(/"/g, '""')}","${item.translation.replace(/"/g, '""')}","${(item.notes || '').replace(/"/g, '""')}","${item.color || 'purple'}"`);
+        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'deep_focus_vocab_backup.csv';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        if (window.triggerHaptic) window.triggerHaptic('action');
+      };
+    }
+
+    // Language Pair Switching
+    const pairBadge = document.getElementById('df-vocab-pair-badge');
+    if (pairBadge) {
+      pairBadge.style.cursor = 'pointer';
+      pairBadge.onclick = () => {
+        const pairs = ['AR > DE', 'AR > EN', 'AR > FR', 'AR > ES', 'AR > TR'];
+        const current = localStorage.getItem('df_vocab_pair') || 'AR > DE';
+        const nextIdx = (pairs.indexOf(current) + 1) % pairs.length;
+        const nextPair = pairs[nextIdx];
+        localStorage.setItem('df_vocab_pair', nextPair);
+        pairBadge.textContent = nextPair;
+        if (window.triggerHaptic) window.triggerHaptic('step');
+      };
+    }
+
+
+    // Filter Chips Event Binding
+    modal.querySelectorAll('.df-filter-chip').forEach(chip => {
+      chip.onclick = () => {
+        const filterVal = chip.dataset.filter;
+        modal.querySelectorAll('.df-filter-chip').forEach(c => {
+          c.style.background = '#ffffff';
+          c.style.color = '#475569';
+          c.style.fontWeight = '600';
+        });
+        chip.style.background = '#2563eb';
+        chip.style.color = '#ffffff';
+        chip.style.fontWeight = '700';
+
+        // تصفية البطاقات في الـ DOM
+        const cards = modal.querySelectorAll('[data-card-id]');
+        let visibleCount = 0;
+        cards.forEach(card => {
+          const cardColor = card.dataset.cardColor;
+          const needsRev = card.dataset.cardReview === 'true';
+          let show = false;
+
+          if (filterVal === 'all') show = true;
+          else if (filterVal === 'needs_review') show = needsRev;
+          else if (filterVal === cardColor) show = true;
+
+          card.style.display = show ? 'flex' : 'none';
+          if (show) visibleCount++;
+        });
+
+        // تحديث العداد في الرأس
+        const countBadge = modal.querySelector('#df-vocab-count-badge');
+        if (countBadge) countBadge.textContent = 'Showing ' + visibleCount + ' Items';
+        if (window.triggerHaptic) window.triggerHaptic('click');
+      };
+    });
+
+    // Card Color Dot Cycling
+    modal.querySelectorAll('.df-color-dot').forEach(dot => {
+      dot.style.cursor = 'pointer';
+      dot.onclick = (e) => {
+        e.stopPropagation();
+        const cardId = dot.dataset.dotCardId;
+        if (window.VocabAudioBankEngine) {
+          window.VocabAudioBankEngine.cycleCardColor(cardId);
+          modal.remove();
+          renderVocabView();
+        }
+      };
+    });
+
+    // Card Deletion
+    modal.querySelectorAll('.df-card-delete-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const cardId = btn.dataset.deleteCardId;
+        if (confirm('Delete this card?')) {
+          if (window.VocabAudioBankEngine) {
+            window.VocabAudioBankEngine.deleteCard(cardId);
+            modal.remove();
+            renderVocabView();
+          }
+        }
+      };
+    });
+
+
+    // Speed Cycle
+    document.getElementById('df-speed-btn').onclick = () => {
+      const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+      const nextIdx = (speeds.indexOf(activeSpeed) + 1) % speeds.length;
+      activeSpeed = speeds[nextIdx];
+      document.getElementById('df-speed-btn').textContent = '⚡ ' + activeSpeed + 'x';
+    };
+
+    // Repeat Cycle
+    document.getElementById('df-repeat-btn').onclick = () => {
+      const repeats = [1, 3, 5, 10];
+      const nextIdx = (repeats.indexOf(activeRepeats) + 1) % repeats.length;
+      activeRepeats = repeats[nextIdx];
+      document.getElementById('df-repeat-btn').textContent = '🔁 ' + activeRepeats + 'x';
+    };
+
+    // Sort Toggle
+    document.getElementById('df-sort-btn').onclick = () => {
+      activeSort = activeSort === 'alpha_asc' ? 'created_desc' : 'alpha_asc';
+      modal.remove();
+      renderVocabView();
+    };
+
+    // CSV Import Button
+    document.getElementById('df-vocab-import-btn').onclick = () => {
+      const sample = prompt('Paste your CSV list here (Word, Translation, Notes, Color):', 'Hallo, مرحباً, Greeting, blue');
+      if (sample && window.VocabAudioBankEngine) {
+        const added = window.VocabAudioBankEngine.importFromCSV(sample);
+        alert('Added ' + added + ' words successfully!');
+        modal.remove();
+        renderVocabView();
+      }
+    };
+
+    // Add Single Word
+    const qBtn = document.getElementById('df-start-quiz-btn'); if(qBtn) qBtn.onclick = () => { if(window.FlashQuizEngine) window.FlashQuizEngine.startQuiz(); }; document.getElementById('df-add-card-btn').onclick = () => {
+      const term = prompt('Foreign Word/Sentence:');
+      if (!term) return;
+      const trans = prompt('Arabic Translation:');
+      if (!trans) return;
+      const notes = prompt('Grammar Notes/Rule (optional):', '');
+      if (window.VocabAudioBankEngine) {
+        window.VocabAudioBankEngine.importFromCSV(term + ',' + trans + ',' + (notes || '') + ',purple');
+        modal.remove();
+        renderVocabView();
+      }
+    };
+
+    // Audio Playback Triggers
+    modal.querySelectorAll('[data-audio-term]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const text = btn.dataset.audioTerm;
+        if (window.VocabAudioBankEngine) {
+          const activeP = localStorage.getItem('df_vocab_pair') || 'AR > DE'; const tLang = activeP.includes('EN') ? 'en-US' : activeP.includes('FR') ? 'fr-FR' : activeP.includes('ES') ? 'es-ES' : activeP.includes('TR') ? 'tr-TR' : 'de-DE'; window.VocabAudioBankEngine.speakText(text, tLang, activeSpeed, activeRepeats, 0.5);
+        }
+      };
+    });
+
+    modal.querySelectorAll('[data-audio-trans]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const text = btn.dataset.audioTrans;
+        if (window.VocabAudioBankEngine) {
+          window.VocabAudioBankEngine.speakText(text, 'ar-SA', activeSpeed, 1, 0.5);
+        }
+      };
+    });
+  }
+
+  function injectVocabEntryPill() {
+    if (document.getElementById('df-vocab-bank-pill')) return;
+    const targetHeader = document.querySelector('.notes-header, #view-notes .header, [data-view="notes"] .header, .notes-container');
+    if (!targetHeader) return;
+
+    const pill = document.createElement('button');
+    pill.id = 'df-vocab-bank-pill';
+    pill.style.cssText = 'background:linear-gradient(135deg, #3b82f6, #6366f1);color:#ffffff;border:none;border-radius:14px;padding:10px 16px;font-size:12px;font-weight:bold;display:flex;align-items:center;gap:8px;box-shadow:0 2px 4px rgba(59,130,246,0.25);margin-bottom:12px;cursor:pointer;';
+    pill.innerHTML = '<span>📚 Spoken Vocab Bank (بنك الكلمات الصوتي)</span>';
+    pill.onclick = renderVocabView;
+
+    targetHeader.insertBefore(pill, targetHeader.firstChild);
+  }
+
+  return { renderVocabView, injectVocabEntryPill };
+})();
+
+window.VocabUIController = VocabUIController;
+
+document.addEventListener('DOMContentLoaded', () => {
+  VocabUIController.injectVocabEntryPill();
+  const obs = new MutationObserver(VocabUIController.injectVocabEntryPill);
+  obs.observe(document.body, { childList: true, subtree: true });
+});
+
+
+/* ========================================================
+   DEEP FOCUS — FLASHCARD QUIZ & SELF-TESTING ENGINE (M202)
+   ======================================================== */
+const FlashQuizEngine = (function() {
+  let currentIndex = 0;
+  let correctCount = 0;
+  let quizCards = [];
+
+  function startQuiz() {
+    quizCards = window.VocabAudioBankEngine ? window.VocabAudioBankEngine.getVocabList() : [];
+    if (!quizCards || quizCards.length === 0) {
+      alert('No vocabulary words found! Add or import words first.');
+      return;
+    }
+
+    currentIndex = 0;
+    correctCount = 0;
+    renderQuizCard();
+  }
+
+  function renderQuizCard() {
+    const existing = document.getElementById('df-flash-quiz-modal');
+    if (existing) existing.remove();
+
+    if (currentIndex >= quizCards.length) {
+      showQuizSummary();
+      return;
+    }
+
+    const card = quizCards[currentIndex];
+    const total = quizCards.length;
+    const progressNum = currentIndex + 1;
+
+    const modal = document.createElement('div');
+    modal.id = 'df-flash-quiz-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:#090d16eb;backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,sans-serif;color:#f8fafc;';
+
+    modal.innerHTML = `
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:28px;padding:24px;width:100%;max-width:380px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);text-align:center;position:relative;">
+        <!-- Top Counter & Close -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span style="font-size:12px;font-weight:700;color:#94a3b8;letter-spacing:1px;font-variant-numeric:lining-nums;">Card ${progressNum} of ${total}</span>
+          <button id="df-quiz-close" style="background:#334155;border:none;border-radius:50%;width:30px;height:30px;color:#cbd5e1;cursor:pointer;font-weight:bold;font-size:13px;">✕</button>
+        </div>
+
+        <!-- Term Box -->
+        <div style="background:#0f172a;border:1px solid #1e293b;border-radius:20px;padding:24px 16px;margin-bottom:18px;">
+          <div style="font-size:17px;font-weight:800;color:#38bdf8;line-height:1.4;margin-bottom:10px;">${card.term}</div>
+          <button id="df-quiz-listen-term" style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:6px 14px;color:#94a3b8;font-size:12px;cursor:pointer;font-weight:600;">🔊 Listen</button>
+        </div>
+
+        <!-- Answer Section (Hidden by default) -->
+        <div id="df-quiz-answer-section" style="display:none;margin-bottom:20px;">
+          <div style="background:#0284c715;border:1px solid #0284c740;border-radius:18px;padding:16px;direction:rtl;text-align:right;">
+            <div style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">${card.translation}</div>
+            ${card.notes ? `<div style="font-size:11px;color:#94a3b8;line-height:1.4;">${card.notes}</div>` : ''}
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <button id="df-quiz-reveal-btn" style="width:100%;background:#2563eb;color:#ffffff;border:none;border-radius:14px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;">Tap to Reveal Answer</button>
+
+        <div id="df-quiz-action-buttons" style="display:none;gap:10px;">
+          <button id="df-quiz-hard" style="flex:1;background:#ef444420;border:1px solid #ef444460;color:#f87171;border-radius:14px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;">❌ Hard</button>
+          <button id="df-quiz-easy" style="flex:1;background:#10b98120;border:1px solid #10b98160;color:#34d399;border-radius:14px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;">✅ Easy</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('df-quiz-close').onclick = () => modal.remove();
+
+    document.getElementById('df-quiz-listen-term').onclick = () => {
+      if (window.VocabAudioBankEngine) {
+        window.VocabAudioBankEngine.speakText(card.term, 'de-DE', 1.0, 1, 0.5);
+      }
+    };
+
+    document.getElementById('df-quiz-reveal-btn').onclick = () => {
+      document.getElementById('df-quiz-answer-section').style.display = 'block';
+      document.getElementById('df-quiz-reveal-btn').style.display = 'none';
+      document.getElementById('df-quiz-action-buttons').style.display = 'flex';
+      if (window.triggerHaptic) window.triggerHaptic('click');
+    };
+
+    document.getElementById('df-quiz-hard').onclick = () => { if(window.VocabAudioBankEngine) window.VocabAudioBankEngine.setCardReviewStatus(card.id, true);
+      currentIndex++;
+      renderQuizCard();
+      if (window.triggerHaptic) window.triggerHaptic('step');
+    };
+
+    document.getElementById('df-quiz-easy').onclick = () => { if(window.VocabAudioBankEngine) window.VocabAudioBankEngine.setCardReviewStatus(card.id, false);
+      correctCount++;
+      currentIndex++;
+      renderQuizCard();
+      if (window.triggerHaptic) window.triggerHaptic('step');
+    };
+  }
+
+  function showQuizSummary() {
+    const total = quizCards.length;
+    const percentage = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+
+    const modal = document.createElement('div');
+    modal.id = 'df-flash-quiz-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:#090d16eb;backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,sans-serif;color:#f8fafc;';
+
+    modal.innerHTML = `
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:28px;padding:28px;width:100%;max-width:340px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:12px;">🎉</div>
+        <h3 style="font-size:18px;font-weight:800;color:#f8fafc;margin:0 0 6px;">Quiz Completed!</h3>
+        <p style="font-size:13px;color:#94a3b8;margin:0 0 20px;">Mastery Rate: <strong style="color:#34d399;font-variant-numeric:lining-nums;">${percentage}%</strong> (${correctCount} / ${total})</p>
+        <button id="df-quiz-finish-btn" style="width:100%;background:#10b981;color:#ffffff;border:none;border-radius:14px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;">Great Work ✓</button>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('df-quiz-finish-btn').onclick = () => modal.remove();
+    if (window.triggerHaptic) window.triggerHaptic('complete');
+  }
+
+  return { startQuiz };
+})();
+
+window.FlashQuizEngine = FlashQuizEngine;
+
+/* === M206_VOCAB_WEBVIEW_TOOLKIT_V1 === */
+(function() {
+  if (window.__M206_VOCAB_TOOLKIT_ACTIVE__) return;
+  window.__M206_VOCAB_TOOLKIT_ACTIVE__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  function buildCsvText(items) {
+    var lines = ['word,meaning,color,hard'];
+    (items || []).forEach(function(it) {
+      var w = String(it.word || '').replace(/"/g, '""');
+      var m = String(it.meaning || '').replace(/"/g, '""');
+      var c = String(it.color || 'purple');
+      var h = it.hard ? '1' : '0';
+      lines.push('"' + w + '","' + m + '",' + c + ',' + h);
+    });
+    return lines.join('\n');
+  }
+
+  function parseBulkLines(rawText, defaultColor) {
+    var parsed = [];
+    String(rawText || '').split(/\r?\n/).forEach(function(line) {
+      var clean = line.trim();
+      if (!clean || /^word\s*[,;\t-]/i.test(clean)) return;
+      var parts = clean.split(/\s*(?:,|;|\t|\s-\s|:|\|)\s*/);
+      if (parts.length >= 2 && parts[0] && parts[1]) {
+        parsed.push({
+          id: 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          word: parts[0].replace(/^"|"$/g, '').trim(),
+          meaning: parts.slice(1).join(' - ').replace(/^"|"$/g, '').trim(),
+          color: defaultColor || 'purple',
+          hard: false
+        });
+      }
+    });
+    return parsed;
+  }
+
+  window.dfToWesternDigitsM206 = toWesternDigits;
+  window.dfBuildVocabCsvM206 = buildCsvText;
+  window.dfBulkParseVocabLinesM206 = parseBulkLines;
+
+  window.dfShareOrCopyVocabCsv = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? eng.getItems() : [];
+    if (!items || !items.length) {
+      alert('لا توجد كلمات لتصديرها حالياً.');
+      return;
+    }
+    var csvText = buildCsvText(items);
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator.share({
+        title: 'Deep Focus Vocabulary (' + toWesternDigits(items.length) + ')',
+        text: csvText
+      }).catch(function() {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(csvText);
+          alert('تم نسخ ' + toWesternDigits(items.length) + ' كلمة بصيغة CSV إلى الحافظة.');
+        }
+      });
+      return;
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(csvText).then(function() {
+        alert('تم نسخ ' + toWesternDigits(items.length) + ' كلمة بصيغة CSV إلى الحافظة.');
+      }).catch(function() {});
+    }
+  };
+
+  window.dfOpenQuickPasteVocabModal = function() {
+    if (typeof document === 'undefined') return;
+    var existing = document.getElementById('df-vocab-paste-modal');
+    if (existing) existing.remove();
+
+    var modal = document.createElement('div');
+    modal.id = 'df-vocab-paste-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,23,0.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+    modal.innerHTML =
+      '<div style="background:#0f172a;border:1px solid rgba(168,85,247,0.35);border-radius:16px;max-width:460px;width:100%;padding:16px;color:#f8fafc;box-shadow:0 20px 50px rgba(0,0,0,0.5);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+          '<strong style="font-size:15px;color:#e2e8f0;">📝 لصق واستيراد دفعة كلمات (CSV / نص)</strong>' +
+          '<button type="button" id="df-vocab-paste-close" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;">✕</button>' +
+        '</div>' +
+        '<p style="font-size:12px;color:#94a3b8;margin:0 0 8px 0;line-height:1.5;">الصق قائمة الكلمات هنا (كل سطر: <code>الكلمة, المعنى</code> أو <code>الكلمة - المعنى</code>):</p>' +
+        '<textarea id="df-vocab-paste-area" rows="6" placeholder="Schmetterling, فراشة\nBuch - كتاب\nWasser; ماء" ' +
+          'style="width:100%;box-sizing:border-box;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:#1e293b;color:#f8fafc;font-size:13px;margin-bottom:12px;outline:none;"></textarea>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end;">' +
+          '<button type="button" id="df-vocab-paste-cancel" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#cbd5e1;font-size:13px;cursor:pointer;">إلغاء</button>' +
+          '<button type="button" id="df-vocab-paste-confirm" style="padding:8px 16px;border-radius:10px;border:none;background:#9333ea;color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;">📥 استيراد الآن</button>' +
+        '</div>' +
+      '</div>';
+
+    document.body.appendChild(modal);
+
+    var closeFn = function() { modal.remove(); };
+    document.getElementById('df-vocab-paste-close').onclick = closeFn;
+    document.getElementById('df-vocab-paste-cancel').onclick = closeFn;
+
+    document.getElementById('df-vocab-paste-confirm').onclick = function() {
+      var raw = (document.getElementById('df-vocab-paste-area').value || '').trim();
+      if (!raw) {
+        alert('يرجى لصق سطر واحد على الأقل.');
+        return;
+      }
+      var eng = window.SpokenVocabEngine;
+      var added = 0;
+      if (eng && typeof eng.importRawText === 'function') {
+        added = eng.importRawText(raw, 'purple');
+      } else if (eng && typeof eng.getItems === 'function' && typeof eng.saveItems === 'function') {
+        var items = eng.getItems() || [];
+        var newEntries = parseBulkLines(raw, 'purple');
+        for (var i = newEntries.length - 1; i >= 0; i--) {
+          items.unshift(newEntries[i]);
+          added++;
+        }
+        if (added > 0) {
+          eng.saveItems(items);
+          if (typeof eng.render === 'function') eng.render();
+        }
+      }
+      modal.remove();
+      alert('تم استيراد ' + toWesternDigits(added) + ' كلمة بنجاح.');
+    };
+  };
+
+  function highlightActiveVocabCard(itemId, idx, total) {
+    if (typeof document === 'undefined') return;
+    var allCards = document.querySelectorAll('[data-vocab-card-id], .df-vocab-card, .vocab-item-card');
+    allCards.forEach(function(c) {
+      c.style.boxShadow = '';
+      c.style.transform = '';
+    });
+    var badge = document.getElementById('df-vocab-live-speak-badge');
+    if (!itemId) {
+      if (badge) badge.style.display = 'none';
+      return;
+    }
+    var target = document.querySelector('[data-vocab-card-id="' + itemId + '"]') ||
+                 document.querySelector('[data-id="' + itemId + '"]');
+    if (target) {
+      target.style.boxShadow = '0 0 0 2px #a855f7, 0 8px 24px rgba(168,85,247,0.35)';
+      target.style.transform = 'scale(1.01)';
+      try {
+        target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (e) {}
+    }
+    if (badge && total > 0) {
+      badge.style.display = 'inline-flex';
+      badge.textContent = '🔊 ' + toWesternDigits(idx) + ' / ' + toWesternDigits(total);
+    }
+  }
+
+  function mountToolkitUI() {
+    if (typeof document === 'undefined') return;
+    var filterBar = document.getElementById('df-vocab-filter-bar');
+    if (filterBar && !document.getElementById('df-vocab-search-row')) {
+      var searchRow = document.createElement('div');
+      searchRow.id = 'df-vocab-search-row';
+      searchRow.style.cssText = 'display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap;';
+      searchRow.innerHTML =
+        '<input type="search" id="df-vocab-live-search" placeholder="🔍 ابحث في كلماتك أو معانيها..." ' +
+        'style="flex:1;min-width:160px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);background:rgba(15,23,42,0.75);color:#f8fafc;font-size:13px;outline:none;" />' +
+        '<button type="button" id="df-vocab-quick-paste-btn" ' +
+        'style="padding:8px 12px;border-radius:10px;border:1px solid rgba(168,85,247,0.4);background:rgba(168,85,247,0.16);color:#d8b4fe;font-size:12px;font-weight:600;cursor:pointer;">' +
+        '📝 لصق قائمة كلمات</button>' +
+        '<button type="button" id="df-vocab-copy-share-btn" ' +
+        'style="padding:8px 12px;border-radius:10px;border:1px solid rgba(56,189,248,0.35);background:rgba(56,189,248,0.14);color:#38bdf8;font-size:12px;font-weight:600;cursor:pointer;">' +
+        '📋 نسخ / مشاركة الكل</button>' +
+        '<span id="df-vocab-live-speak-badge" style="display:none;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(168,85,247,0.2);border:1px solid rgba(168,85,247,0.45);color:#e9d5ff;font-size:12px;font-weight:700;"></span>';
+
+      filterBar.parentNode.insertBefore(searchRow, filterBar.nextSibling);
+
+      var searchInput = document.getElementById('df-vocab-live-search');
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          var q = toWesternDigits(searchInput.value || '').trim().toLowerCase();
+          var cards = document.querySelectorAll('[data-vocab-card-id], .df-vocab-card, .vocab-item-card');
+          cards.forEach(function(card) {
+            var txt = (card.textContent || '').toLowerCase();
+            card.style.display = (!q || txt.indexOf(q) !== -1) ? '' : 'none';
+          });
+        });
+      }
+
+      var pasteBtn = document.getElementById('df-vocab-quick-paste-btn');
+      if (pasteBtn) pasteBtn.onclick = function() { window.dfOpenQuickPasteVocabModal(); };
+
+      var shareBtn = document.getElementById('df-vocab-copy-share-btn');
+      if (shareBtn) shareBtn.onclick = function() { window.dfShareOrCopyVocabCsv(); };
+    }
+
+    var eng = window.SpokenVocabEngine;
+    if (eng && !eng.__m206SpeakWrapped && typeof eng.speakPair === 'function') {
+      eng.__m206SpeakWrapped = true;
+      var origSpeak = eng.speakPair.bind(eng);
+      eng.speakPair = function(item, onDone) {
+        var items = (typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+        var idx = 1;
+        if (item && item.id) {
+          for (var i = 0; i < items.length; i++) {
+            if (items[i] && items[i].id === item.id) {
+              idx = i + 1;
+              break;
+            }
+          }
+          highlightActiveVocabCard(item.id, idx, items.length || 1);
+        }
+        return origSpeak(item, function() {
+          highlightActiveVocabCard(null, 0, 0);
+          if (typeof onDone === 'function') onDone();
+        });
+      };
+    }
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountToolkitUI);
+    } else {
+      setTimeout(mountToolkitUI, 250);
+    }
+    setInterval(mountToolkitUI, 1500);
+  }
+})();
+
+/* === M207_FLASH_QUIZ_SHUFFLE_AND_REVERSE_V1 === */
+(function() {
+  if (window.__M207_QUIZ_ENHANCED__) return;
+  window.__M207_QUIZ_ENHANCED__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  function shuffleArray(arr) {
+    var copy = (arr || []).slice();
+    for (var i = copy.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = temp;
+    }
+    return copy;
+  }
+
+  window.dfToWesternDigitsM207 = toWesternDigits;
+  window.dfShuffleVocabArrayM207 = shuffleArray;
+
+  var quizState = { isShuffled: false, isReversed: false };
+
+  window.dfToggleQuizShuffle = function() {
+    quizState.isShuffled = !quizState.isShuffled;
+    var btn = document.getElementById('df-quiz-shuffle-toggle-btn');
+    if (btn) {
+      btn.style.background = quizState.isShuffled ? 'rgba(168,85,247,0.3)' : 'rgba(255,255,255,0.06)';
+      btn.style.borderColor = quizState.isShuffled ? '#c084fc' : 'rgba(255,255,255,0.15)';
+    }
+    return quizState.isShuffled;
+  };
+
+  window.dfToggleQuizReverse = function() {
+    quizState.isReversed = !quizState.isReversed;
+    var btn = document.getElementById('df-quiz-reverse-toggle-btn');
+    if (btn) {
+      btn.textContent = quizState.isReversed ? '🔄 السؤال: المعنى ⬅ الكلمة' : '🔄 السؤال: الكلمة ⬅ المعنى';
+      btn.style.background = quizState.isReversed ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.06)';
+      btn.style.borderColor = quizState.isReversed ? '#38bdf8' : 'rgba(255,255,255,0.15)';
+    }
+    return quizState.isReversed;
+  };
+
+  window.dfGetPreparedQuizItems = function(rawItems) {
+    var items = (rawItems || []).slice();
+    if (quizState.isShuffled) items = shuffleArray(items);
+    return items.map(function(it) {
+      if (!quizState.isReversed) return it;
+      return {
+        id: it.id,
+        word: it.meaning,
+        meaning: it.word,
+        color: it.color,
+        hard: it.hard,
+        _origWord: it.word,
+        _origMeaning: it.meaning
+      };
+    });
+  };
+
+  function mountQuizControls() {
+    if (typeof document === 'undefined') return;
+    var quizHeader = document.getElementById('df-flash-quiz-header') ||
+                     document.getElementById('df-vocab-filter-bar');
+    if (!quizHeader || document.getElementById('df-quiz-extra-toolbar')) return;
+
+    var toolbar = document.createElement('div');
+    toolbar.id = 'df-quiz-extra-toolbar';
+    toolbar.style.cssText = 'display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap;';
+    toolbar.innerHTML =
+      '<button type="button" id="df-quiz-shuffle-toggle-btn" ' +
+      'style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;">' +
+      '🔀 خلط عشوائي</button>' +
+      '<button type="button" id="df-quiz-reverse-toggle-btn" ' +
+      'style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;">' +
+      '🔄 السؤال: الكلمة ⬅ المعنى</button>';
+
+    quizHeader.parentNode.insertBefore(toolbar, quizHeader.nextSibling);
+
+    var shuffleBtn = document.getElementById('df-quiz-shuffle-toggle-btn');
+    if (shuffleBtn) shuffleBtn.onclick = function() { window.dfToggleQuizShuffle(); };
+
+    var reverseBtn = document.getElementById('df-quiz-reverse-toggle-btn');
+    if (reverseBtn) reverseBtn.onclick = function() { window.dfToggleQuizReverse(); };
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountQuizControls);
+    } else {
+      setTimeout(mountQuizControls, 300);
+    }
+    setInterval(mountQuizControls, 1500);
+  }
+})();
+
+/* === M208_VOCAB_SPEED_PRESETS_AND_REPLAY_V1 === */
+(function() {
+  if (window.__M208_VOCAB_SPEED_PRESETS__) return;
+  window.__M208_VOCAB_SPEED_PRESETS__ = true;
+
+  var currentSpeed = 1.0;
+
+  window.dfSetVocabPlaybackSpeed = function(speed) {
+    currentSpeed = parseFloat(speed) || 1.0;
+    var eng = window.SpokenVocabEngine;
+    if (eng) {
+      eng.playbackSpeed = currentSpeed;
+      if (eng.config) eng.config.speed = currentSpeed;
+    }
+    updateSpeedButtonsUI();
+    return currentSpeed;
+  };
+
+  window.dfGetVocabPlaybackSpeed = function() {
+    return currentSpeed;
+  };
+
+  function updateSpeedButtonsUI() {
+    if (typeof document === 'undefined') return;
+    var speeds = [0.75, 1.0, 1.25];
+    speeds.forEach(function(s) {
+      var btn = document.getElementById('df-speed-btn-' + String(s).replace('.', '_'));
+      if (btn) {
+        var isActive = Math.abs(currentSpeed - s) < 0.05;
+        btn.style.background = isActive ? 'rgba(168,85,247,0.35)' : 'rgba(255,255,255,0.06)';
+        btn.style.borderColor = isActive ? '#c084fc' : 'rgba(255,255,255,0.15)';
+        btn.style.color = isActive ? '#ffffff' : '#94a3b8';
+      }
+    });
+  }
+
+  window.dfReplayCurrentQuizWord = function() {
+    var eng = window.SpokenVocabEngine;
+    if (!eng) return;
+    var quizWordElem = document.getElementById('df-quiz-current-word') ||
+                       document.querySelector('.df-quiz-card-word');
+    if (quizWordElem) {
+      var wordText = quizWordElem.textContent || '';
+      if (wordText && typeof eng.speakWord === 'function') {
+        eng.speakWord(wordText);
+      } else if (wordText && typeof eng.speakPair === 'function') {
+        eng.speakPair({ word: wordText, meaning: '' });
+      }
+    }
+  };
+
+  function mountSpeedControls() {
+    if (typeof document === 'undefined') return;
+    var targetRow = document.getElementById('df-quiz-extra-toolbar') ||
+                    document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!targetRow || document.getElementById('df-vocab-speed-selector-group')) return;
+
+    var speedGroup = document.createElement('div');
+    speedGroup.id = 'df-vocab-speed-selector-group';
+    speedGroup.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:rgba(15,23,42,0.6);padding:3px 6px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);';
+    speedGroup.innerHTML =
+      '<span style="font-size:11px;color:#94a3b8;font-weight:600;margin-right:2px;">سرعة النطق:</span>' +
+      '<button type="button" id="df-speed-btn-0_75" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">0.75x</button>' +
+      '<button type="button" id="df-speed-btn-1_0" style="padding:4px 8px;border-radius:6px;border:1px solid #c084fc;background:rgba(168,85,247,0.35);color:#ffffff;font-size:11px;font-weight:700;cursor:pointer;">1.0x</button>' +
+      '<button type="button" id="df-speed-btn-1_25" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">1.25x</button>';
+
+    targetRow.appendChild(speedGroup);
+
+    var b075 = document.getElementById('df-speed-btn-0_75');
+    if (b075) b075.onclick = function() { window.dfSetVocabPlaybackSpeed(0.75); };
+    var b100 = document.getElementById('df-speed-btn-1_0');
+    if (b100) b100.onclick = function() { window.dfSetVocabPlaybackSpeed(1.0); };
+    var b125 = document.getElementById('df-speed-btn-1_25');
+    if (b125) b125.onclick = function() { window.dfSetVocabPlaybackSpeed(1.25); };
+
+    updateSpeedButtonsUI();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountSpeedControls);
+    } else {
+      setTimeout(mountSpeedControls, 300);
+    }
+    setInterval(mountSpeedControls, 1500);
+  }
+})();
+
+/* === M209_VOCAB_STATS_AND_MASTERY_TRACKER_V1 === */
+(function() {
+  if (window.__M209_VOCAB_STATS_ACTIVE__) return;
+  window.__M209_VOCAB_STATS_ACTIVE__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfGetVocabMasteryStats = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    var total = items.length;
+    var needsReview = 0;
+    var mastered = 0;
+    for (var i = 0; i < total; i++) {
+      if (items[i] && items[i].hard) {
+        needsReview++;
+      } else {
+        mastered++;
+      }
+    }
+    return {
+      total: total,
+      needsReview: needsReview,
+      mastered: mastered,
+      masteryRate: total > 0 ? Math.round((mastered / total) * 100) : 0
+    };
+  };
+
+  function updateVocabStatsBadge() {
+    if (typeof document === 'undefined') return;
+    var statsElem = document.getElementById('df-vocab-mastery-summary-badge');
+    if (!statsElem) return;
+    var stats = window.dfGetVocabMasteryStats();
+    statsElem.innerHTML =
+      '<span style="color:#e2e8f0;">📊 إجمالي: <b>' + toWesternDigits(stats.total) + '</b></span>' +
+      '<span style="color:#f87171;margin:0 6px;">⚠️ للمراجعة: <b>' + toWesternDigits(stats.needsReview) + '</b></span>' +
+      '<span style="color:#4ade80;">🏆 تم إتقانها: <b>' + toWesternDigits(stats.mastered) + '</b> (' + toWesternDigits(stats.masteryRate) + '%)</span>';
+  }
+
+  window.dfUpdateVocabStatsBadge = updateVocabStatsBadge;
+
+  function mountStatsUI() {
+    if (typeof document === 'undefined') return;
+    var searchRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!searchRow || document.getElementById('df-vocab-mastery-summary-badge')) return;
+
+    var badge = document.createElement('div');
+    badge.id = 'df-vocab-mastery-summary-badge';
+    badge.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:6px 12px;border-radius:10px;background:rgba(15,23,42,0.65);border:1px solid rgba(255,255,255,0.1);font-size:12px;margin:4px 0;width:100%;box-sizing:border-box;';
+    searchRow.parentNode.insertBefore(badge, searchRow.nextSibling);
+    updateVocabStatsBadge();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountStatsUI);
+    } else {
+      setTimeout(mountStatsUI, 300);
+    }
+    setInterval(updateVocabStatsBadge, 2500);
+  }
+})();
+
+/* === M210_VOCAB_BULK_MASTERY_ACTION_V1 === */
+(function() {
+  if (window.__M210_VOCAB_BULK_MASTERY__) return;
+  window.__M210_VOCAB_BULK_MASTERY__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfMarkAllReviewAsMastered = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    if (!items.length) {
+      alert('لا توجد كلمات حالياً.');
+      return;
+    }
+    var count = 0;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i] && items[i].hard) {
+        items[i].hard = false;
+        count++;
+      }
+    }
+    if (count > 0 && typeof eng.saveItems === 'function') {
+      eng.saveItems(items);
+      if (typeof eng.render === 'function') eng.render();
+      if (typeof window.dfUpdateVocabStatsBadge === 'function') {
+        window.dfUpdateVocabStatsBadge();
+      }
+      alert('تم إتقان ' + toWesternDigits(count) + ' كلمة وإزالتها من قائمة المراجعة بنجاح!');
+    } else {
+      alert('جميع الكلمات متقنة بالفعل ولا توجد كلمات للمراجعة.');
+    }
+  };
+
+  function mountBulkMasteryBtn() {
+    if (typeof document === 'undefined') return;
+    var searchRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!searchRow || document.getElementById('df-vocab-mark-all-mastered-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-vocab-mark-all-mastered-btn';
+    btn.style.cssText = 'padding:8px 12px;border-radius:10px;border:1px solid rgba(74,222,128,0.35);background:rgba(74,222,128,0.12);color:#4ade80;font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = '✅ إتقان كل المراجعة';
+    btn.onclick = function() {
+      if (confirm('هل أتقنت جميع الكلمات في قائمة المراجعة وتريد إزالتها من الصعبة؟')) {
+        window.dfMarkAllReviewAsMastered();
+      }
+    };
+    searchRow.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountBulkMasteryBtn);
+    } else {
+      setTimeout(mountBulkMasteryBtn, 350);
+    }
+    setInterval(mountBulkMasteryBtn, 2000);
+  }
+})();
+
+/* === M211_VOCAB_AUTO_NEXT_QUIZ_AND_CODE31_V1 === */
+(function() {
+  if (window.__M211_QUIZ_AUTO_NEXT__) return;
+  window.__M211_QUIZ_AUTO_NEXT__ = true;
+
+  var AUTO_KEY = 'df_vocab_quiz_autoadvance';
+  var autoAdvance = false;
+  try {
+    autoAdvance = localStorage.getItem(AUTO_KEY) === 'true';
+  } catch(e) {}
+
+  window.dfToggleQuizAutoAdvance = function() {
+    autoAdvance = !autoAdvance;
+    try {
+      localStorage.setItem(AUTO_KEY, autoAdvance ? 'true' : 'false');
+    } catch(e) {}
+    var btn = document.getElementById('df-quiz-autoadvance-btn');
+    if (btn) {
+      btn.style.background = autoAdvance ? 'rgba(74,222,128,0.25)' : 'rgba(255,255,255,0.06)';
+      btn.style.borderColor = autoAdvance ? '#4ade80' : 'rgba(255,255,255,0.15)';
+      btn.style.color = autoAdvance ? '#ffffff' : '#94a3b8';
+      btn.textContent = autoAdvance ? '⏭ انتقال تلقائي: مفعّل' : '⏭ انتقال تلقائي: معطّل';
+    }
+    return autoAdvance;
+  };
+
+  window.dfIsQuizAutoAdvanceEnabled = function() {
+    return autoAdvance;
+  };
+
+  window.dfTriggerQuizAutoAdvance = function(delayMs) {
+    if (!autoAdvance) return;
+    setTimeout(function() {
+      var quiz = window.FlashQuizEngine;
+      if (quiz && typeof quiz.nextCard === 'function') {
+        quiz.nextCard();
+      } else {
+        var nextBtn = document.getElementById('df-quiz-next-btn') ||
+                      document.querySelector('.df-quiz-next-button');
+        if (nextBtn) nextBtn.click();
+      }
+    }, delayMs || 500);
+  };
+
+  function mountAutoAdvanceUI() {
+    if (typeof document === 'undefined') return;
+    var toolbar = document.getElementById('df-quiz-extra-toolbar');
+    if (!toolbar || document.getElementById('df-quiz-autoadvance-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-quiz-autoadvance-btn';
+    btn.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid ' +
+      (autoAdvance ? '#4ade80' : 'rgba(255,255,255,0.15)') + ';background:' +
+      (autoAdvance ? 'rgba(74,222,128,0.25)' : 'rgba(255,255,255,0.06)') + ';color:' +
+      (autoAdvance ? '#ffffff' : '#94a3b8') + ';font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = autoAdvance ? '⏭ انتقال تلقائي: مفعّل' : '⏭ انتقال تلقائي: معطّل';
+    btn.onclick = function() { window.dfToggleQuizAutoAdvance(); };
+    toolbar.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountAutoAdvanceUI);
+    } else {
+      setTimeout(mountAutoAdvanceUI, 300);
+    }
+    setInterval(mountAutoAdvanceUI, 2000);
+  }
+})();
+
+/* === M212_VOCAB_ACCENT_VOICE_CHECKER_AND_CODE32_V1 === */
+(function() {
+  if (window.__M212_VOICE_CHECKER__) return;
+  window.__M212_VOICE_CHECKER__ = true;
+
+  window.dfTestCurrentVoicePronunciation = function() {
+    var eng = window.SpokenVocabEngine;
+    if (!eng) return;
+    var lang = (eng.config && eng.config.foreignLang) || 'de-DE';
+    var testPhrase = 'Hallo';
+    if (/^en/i.test(lang)) testPhrase = 'Hello';
+    else if (/^fr/i.test(lang)) testPhrase = 'Bonjour';
+    else if (/^es/i.test(lang)) testPhrase = 'Hola';
+    else if (/^tr/i.test(lang)) testPhrase = 'Merhaba';
+
+    if (typeof eng.speakWord === 'function') {
+      eng.speakWord(testPhrase, lang);
+    } else if (typeof window.speechSynthesis !== 'undefined') {
+      try {
+        window.speechSynthesis.cancel();
+        var u = new SpeechSynthesisUtterance(testPhrase);
+        u.lang = lang;
+        window.speechSynthesis.speak(u);
+      } catch(e) {}
+    }
+  };
+
+  function updateVoiceStatusUI() {
+    if (typeof document === 'undefined') return;
+    var badge = document.getElementById('df-vocab-voice-status-badge');
+    if (!badge) return;
+
+    var eng = window.SpokenVocabEngine;
+    var lang = (eng && eng.config && eng.config.foreignLang) || 'de-DE';
+    var hasVoices = false;
+    if (typeof window.speechSynthesis !== 'undefined') {
+      var voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      if (voices && voices.length > 0) {
+        hasVoices = voices.some(function(v) {
+          return v.lang && v.lang.toLowerCase().indexOf(lang.split('-')[0].toLowerCase()) === 0;
+        });
+      } else {
+        hasVoices = true;
+      }
+    }
+    badge.textContent = hasVoices ? '🔊 محرك النطق جاهز' : '⚠️ يُنصح بتثبيت أصوات النظام';
+    badge.style.color = hasVoices ? '#4ade80' : '#facc15';
+    badge.style.borderColor = hasVoices ? 'rgba(74,222,128,0.35)' : 'rgba(250,204,21,0.35)';
+  }
+
+  window.dfUpdateVocabVoiceStatus = updateVoiceStatusUI;
+
+  function mountVoiceStatusControls() {
+    if (typeof document === 'undefined') return;
+    var targetRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!targetRow || document.getElementById('df-vocab-voice-test-btn')) return;
+
+    var testBtn = document.createElement('button');
+    testBtn.type = 'button';
+    testBtn.id = 'df-vocab-voice-test-btn';
+    testBtn.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid rgba(56,189,248,0.35);background:rgba(56,189,248,0.12);color:#38bdf8;font-size:12px;font-weight:600;cursor:pointer;';
+    testBtn.textContent = '🗣 فحص الصوت';
+    testBtn.onclick = function() { window.dfTestCurrentVoicePronunciation(); };
+
+    var statusBadge = document.createElement('span');
+    statusBadge.id = 'df-vocab-voice-status-badge';
+    statusBadge.style.cssText = 'font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;border:1px solid rgba(74,222,128,0.35);color:#4ade80;background:rgba(15,23,42,0.6);';
+    statusBadge.textContent = '🔊 محرك النطق جاهز';
+
+    targetRow.appendChild(testBtn);
+    targetRow.appendChild(statusBadge);
+
+    updateVoiceStatusUI();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountVoiceStatusControls);
+    } else {
+      setTimeout(mountVoiceStatusControls, 350);
+    }
+    setInterval(updateVoiceStatusUI, 3000);
+  }
+})();
+
+/* === M213_VOCAB_LOOP_INTERVAL_AND_CODE33_V1 === */
+(function() {
+  if (window.__M213_LOOP_INTERVAL__) return;
+  window.__M213_LOOP_INTERVAL__ = true;
+
+  var INTERVAL_KEY = 'df_vocab_loop_interval_ms';
+  var currentPauseMs = 1500;
+  try {
+    var saved = parseInt(localStorage.getItem(INTERVAL_KEY), 10);
+    if (saved && saved >= 500 && saved <= 5000) currentPauseMs = saved;
+  } catch(e) {}
+
+  window.dfSetVocabLoopInterval = function(sec) {
+    var ms = Math.round((parseFloat(sec) || 1.5) * 1000);
+    currentPauseMs = Math.max(500, Math.min(5000, ms));
+    try {
+      localStorage.setItem(INTERVAL_KEY, String(currentPauseMs));
+    } catch(e) {}
+
+    var eng = window.SpokenVocabEngine;
+    if (eng && eng.config) {
+      eng.config.pauseMs = currentPauseMs;
+    }
+    updateIntervalButtonsUI();
+    return currentPauseMs;
+  };
+
+  window.dfGetVocabLoopIntervalSec = function() {
+    return (currentPauseMs / 1000);
+  };
+
+  function updateIntervalButtonsUI() {
+    if (typeof document === 'undefined') return;
+    var presets = [1.0, 2.0, 3.0];
+    presets.forEach(function(s) {
+      var btn = document.getElementById('df-interval-btn-' + Math.round(s));
+      if (btn) {
+        var isActive = Math.abs((currentPauseMs / 1000) - s) < 0.2;
+        btn.style.background = isActive ? 'rgba(56,189,248,0.35)' : 'rgba(255,255,255,0.06)';
+        btn.style.borderColor = isActive ? '#38bdf8' : 'rgba(255,255,255,0.15)';
+        btn.style.color = isActive ? '#ffffff' : '#94a3b8';
+      }
+    });
+  }
+
+  function mountIntervalControls() {
+    if (typeof document === 'undefined') return;
+    var targetRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!targetRow || document.getElementById('df-vocab-interval-group')) return;
+
+    var group = document.createElement('div');
+    group.id = 'df-vocab-interval-group';
+    group.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:rgba(15,23,42,0.6);padding:3px 6px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);';
+    group.innerHTML =
+      '<span style="font-size:11px;color:#94a3b8;font-weight:600;margin-right:2px;">فاصل النطق:</span>' +
+      '<button type="button" id="df-interval-btn-1" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">1s</button>' +
+      '<button type="button" id="df-interval-btn-2" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">2s</button>' +
+      '<button type="button" id="df-interval-btn-3" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">3s</button>';
+
+    targetRow.appendChild(group);
+
+    var b1 = document.getElementById('df-interval-btn-1');
+    if (b1) b1.onclick = function() { window.dfSetVocabLoopInterval(1.0); };
+    var b2 = document.getElementById('df-interval-btn-2');
+    if (b2) b2.onclick = function() { window.dfSetVocabLoopInterval(2.0); };
+    var b3 = document.getElementById('df-interval-btn-3');
+    if (b3) b3.onclick = function() { window.dfSetVocabLoopInterval(3.0); };
+
+    updateIntervalButtonsUI();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountIntervalControls);
+    } else {
+      setTimeout(mountIntervalControls, 350);
+    }
+    setInterval(updateIntervalButtonsUI, 2500);
+  }
+})();
+
+/* === M214_VOCAB_TAG_COUNT_BADGES_AND_CODE34_V1 === */
+(function() {
+  if (window.__M214_TAG_COUNTS__) return;
+  window.__M214_TAG_COUNTS__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfGetVocabCountsByFilter = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    var counts = { all: items.length, purple: 0, blue: 0, red: 0, green: 0, review: 0 };
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it) continue;
+      if (it.hard) counts.review++;
+      var c = (it.color || 'purple').toLowerCase();
+      if (counts[c] !== undefined) counts[c]++;
+    }
+    return counts;
+  };
+
+  function updateFilterChipBadges() {
+    if (typeof document === 'undefined') return;
+    var counts = window.dfGetVocabCountsByFilter();
+    var filterBar = document.getElementById('df-vocab-filter-bar');
+    if (!filterBar) return;
+
+    var chips = filterBar.querySelectorAll('button, .df-vocab-filter-chip');
+    chips.forEach(function(chip) {
+      var key = chip.getAttribute('data-filter') || '';
+      if (!key) {
+        var txt = (chip.textContent || '').toLowerCase();
+        if (txt.indexOf('كل') !== -1) key = 'all';
+        else if (txt.indexOf('بنفسج') !== -1 || txt.indexOf('purple') !== -1) key = 'purple';
+        else if (txt.indexOf('أزرق') !== -1 || txt.indexOf('blue') !== -1) key = 'blue';
+        else if (txt.indexOf('أحمر') !== -1 || txt.indexOf('red') !== -1) key = 'red';
+        else if (txt.indexOf('أخضر') !== -1 || txt.indexOf('green') !== -1) key = 'green';
+        else if (txt.indexOf('مراجعة') !== -1 || txt.indexOf('review') !== -1) key = 'review';
+      }
+      if (key && counts[key] !== undefined) {
+        var baseTxt = chip.getAttribute('data-base-label');
+        if (!baseTxt) {
+          baseTxt = (chip.textContent || '').replace(/\s*\([0-9]+\)/g, '').trim();
+          chip.setAttribute('data-base-label', baseTxt);
+        }
+        chip.textContent = baseTxt + ' (' + toWesternDigits(counts[key]) + ')';
+      }
+    });
+  }
+
+  window.dfUpdateFilterChipBadges = updateFilterChipBadges;
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateFilterChipBadges);
+    } else {
+      setTimeout(updateFilterChipBadges, 300);
+    }
+    setInterval(updateFilterChipBadges, 2500);
+  }
+})();
+
+/* === M215_VOCAB_AUTO_CLEAN_DUPLICATES_AND_CODE35_V1 === */
+(function() {
+  if (window.__M215_CLEAN_DUPLICATES__) return;
+  window.__M215_CLEAN_DUPLICATES__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfCleanDuplicateVocabWords = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    if (!items.length) {
+      alert('لا توجد كلمات في بنك الكلمات حالياً.');
+      return 0;
+    }
+
+    var seen = {};
+    var uniqueItems = [];
+    var removedCount = 0;
+
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it || !it.word) continue;
+      var norm = String(it.word).trim().toLowerCase();
+      if (seen[norm]) {
+        if (it.hard && seen[norm].item) {
+          seen[norm].item.hard = true;
+        }
+        removedCount++;
+      } else {
+        seen[norm] = { item: it };
+        uniqueItems.push(it);
+      }
+    }
+
+    if (removedCount > 0 && typeof eng.saveItems === 'function') {
+      eng.saveItems(uniqueItems);
+      if (typeof eng.render === 'function') eng.render();
+      if (typeof window.dfUpdateFilterChipBadges === 'function') {
+        window.dfUpdateFilterChipBadges();
+      }
+      if (typeof window.dfUpdateVocabStatsBadge === 'function') {
+        window.dfUpdateVocabStatsBadge();
+      }
+      alert('تم فحص الكلمات بنجاح وإزالة ' + toWesternDigits(removedCount) + ' كلمة مكررة.');
+    } else {
+      alert('ممتاز! قائمة الكلمات نقية ولا توجد أي كلمات مكررة.');
+    }
+    return removedCount;
+  };
+
+  function mountCleanDuplicatesBtn() {
+    if (typeof document === 'undefined') return;
+    var searchRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!searchRow || document.getElementById('df-vocab-clean-duplicates-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-vocab-clean-duplicates-btn';
+    btn.style.cssText = 'padding:8px 12px;border-radius:10px;border:1px solid rgba(244,63,94,0.35);background:rgba(244,63,94,0.12);color:#fb7185;font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = '🧹 تنظيف المكرر';
+    btn.onclick = function() {
+      if (confirm('هل ترغب بفحص قائمة الكلمات ودمج أي كلمات مكررة تلقائياً؟')) {
+        window.dfCleanDuplicateVocabWords();
+      }
+    };
+    searchRow.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountCleanDuplicatesBtn);
+    } else {
+      setTimeout(mountCleanDuplicatesBtn, 350);
+    }
+    setInterval(mountCleanDuplicatesBtn, 2500);
+  }
+})();
+
+/* === M216_VOCAB_SORT_ORDER_AND_CODE36_V1 === */
+(function() {
+  if (window.__M216_VOCAB_SORT_ACTIVE__) return;
+  window.__M216_VOCAB_SORT_ACTIVE__ = true;
+
+  var SORT_KEY = 'df_vocab_sort_mode';
+  var MODES = ['newest', 'alpha', 'hard_first'];
+  var LABELS = {
+    newest: '↕ الترتيب: الأحدث',
+    alpha: '🔤 الترتيب: أبجدي',
+    hard_first: '🔥 الترتيب: الصعبة أولاً'
+  };
+  var currentMode = 'newest';
+  try {
+    var saved = localStorage.getItem(SORT_KEY);
+    if (saved && LABELS[saved]) currentMode = saved;
+  } catch (e) {}
+
+  window.dfSortVocabItems = function(items, mode) {
+    var m = mode || currentMode;
+    var list = (items || []).slice();
+    if (m === 'alpha') {
+      list.sort(function(a, b) {
+        return String((a && a.word) || '').localeCompare(String((b && b.word) || ''));
+      });
+    } else if (m === 'hard_first') {
+      list.sort(function(a, b) {
+        var ah = (a && a.hard) ? 1 : 0;
+        var bh = (b && b.hard) ? 1 : 0;
+        if (bh !== ah) return bh - ah;
+        return String((a && a.word) || '').localeCompare(String((b && b.word) || ''));
+      });
+    }
+    return list;
+  };
+
+  window.dfCycleVocabSortOrder = function() {
+    var idx = MODES.indexOf(currentMode);
+    currentMode = MODES[(idx + 1) % MODES.length];
+    try {
+      localStorage.setItem(SORT_KEY, currentMode);
+    } catch (e) {}
+
+    var btn = typeof document !== 'undefined' ? document.getElementById('df-vocab-sort-mode-btn') : null;
+    if (btn) {
+      btn.textContent = LABELS[currentMode];
+    }
+
+    var eng = window.SpokenVocabEngine;
+    if (eng && typeof eng.getItems === 'function' && typeof eng.saveItems === 'function') {
+      var sorted = window.dfSortVocabItems(eng.getItems(), currentMode);
+      eng.saveItems(sorted);
+      if (typeof eng.render === 'function') eng.render();
+    }
+    return currentMode;
+  };
+
+  window.dfGetVocabSortOrder = function() {
+    return currentMode;
+  };
+
+  function mountSortModeBtn() {
+    if (typeof document === 'undefined') return;
+    var searchRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!searchRow || document.getElementById('df-vocab-sort-mode-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-vocab-sort-mode-btn';
+    btn.style.cssText = 'padding:8px 12px;border-radius:10px;border:1px solid rgba(148,163,184,0.35);background:rgba(30,41,59,0.75);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = LABELS[currentMode] || LABELS.newest;
+    btn.onclick = function() { window.dfCycleVocabSortOrder(); };
+    searchRow.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountSortModeBtn);
+    } else {
+      setTimeout(mountSortModeBtn, 350);
+    }
+    setInterval(mountSortModeBtn, 2500);
+  }
+})();
+
+/* === M217_VOCAB_QUIZ_STREAK_COUNTER_AND_CODE37_V1 === */
+(function() {
+  if (window.__M217_QUIZ_STREAK__) return;
+  window.__M217_QUIZ_STREAK__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  var currentStreak = 0;
+  var bestStreak = 0;
+  var STREAK_KEY = 'df_vocab_quiz_best_streak';
+  try {
+    bestStreak = parseInt(localStorage.getItem(STREAK_KEY), 10) || 0;
+  } catch(e) {}
+
+  window.dfRecordQuizAnswerStreak = function(isEasy) {
+    if (isEasy) {
+      currentStreak++;
+      if (currentStreak > bestStreak) {
+        bestStreak = currentStreak;
+        try {
+          localStorage.setItem(STREAK_KEY, String(bestStreak));
+        } catch(e) {}
+      }
+    } else {
+      currentStreak = 0;
+    }
+    updateStreakUI();
+    return { current: currentStreak, best: bestStreak };
+  };
+
+  window.dfGetQuizStreakData = function() {
+    return { current: currentStreak, best: bestStreak };
+  };
+
+  function updateStreakUI() {
+    if (typeof document === 'undefined') return;
+    var badge = document.getElementById('df-quiz-streak-badge');
+    if (!badge) return;
+    badge.innerHTML =
+      '<span style="color:#f59e0b;font-weight:700;">🔥 تتابع: <b>' + toWesternDigits(currentStreak) + '</b></span>' +
+      (bestStreak > 1 ? '<span style="color:#94a3b8;margin-right:6px;font-size:11px;">(أفضل: ' + toWesternDigits(bestStreak) + ')</span>' : '');
+  }
+
+  function mountStreakUI() {
+    if (typeof document === 'undefined') return;
+    var toolbar = document.getElementById('df-quiz-extra-toolbar') ||
+                  document.getElementById('df-flash-quiz-header');
+    if (!toolbar || document.getElementById('df-quiz-streak-badge')) return;
+
+    var badge = document.createElement('span');
+    badge.id = 'df-quiz-streak-badge';
+    badge.style.cssText = 'display:inline-flex;align-items:center;padding:4px 8px;border-radius:8px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);font-size:12px;margin:2px 4px;';
+    toolbar.appendChild(badge);
+    updateStreakUI();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountStreakUI);
+    } else {
+      setTimeout(mountStreakUI, 350);
+    }
+    setInterval(mountStreakUI, 2500);
+  }
+})();
+
