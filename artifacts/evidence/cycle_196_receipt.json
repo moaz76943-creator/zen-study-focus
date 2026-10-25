@@ -1,10 +1,34 @@
 {
   "cycle": 196,
   "mission": "Production Readiness Certification & Clean Touch Verification",
-  "status": "GREEN",
-  "timestamp": "2026-10-25T06:00:00Z",
+  "status": "NOT_APPROVED",
+  "release_approved": false,
+  "audited_at": "2026-10-23T16:39:57Z",
+  "source_sha": "d2c3f9b6c2e9fa6a3b1eead93b22e27a580b9ff9",
   "branch": "integration/master-qa-verified-v21",
-  "verified_tests": 5,
-  "scope": "Certified package ID com.deepfocus.study with versionCode 23, confirmed touch responsiveness with zero overlays, validated AlarmManager with no video requirements, and certified 100 locales and acoustic suite",
-  "tag": "v3.3.2-production-ready-v21"
+  "expected_application_id": "com.zenstudy.focus",
+  "observed_application_id": "com.deepfocus.study",
+  "package_id_gate": "FAIL",
+  "observed_version_code": 23,
+  "gates": {
+    "android_e2e": "NOT_TESTED",
+    "touch_interaction": "NOT_TESTED",
+    "audio_license": "NOT_APPROVED",
+    "translation": "NOT_VERIFIED",
+    "analytics": "NOT_TESTED",
+    "saf_v21": "NOT_TESTED",
+    "offline": "NOT_TESTED",
+    "western_digits": "NOT_VERIFIED",
+    "timer_alerts": "NOT_TESTED",
+    "play_acceptance": "NOT_TESTED"
+  },
+  "historical_claim": {
+    "status": "GREEN",
+    "timestamp": "2026-10-25T06:00:00Z",
+    "verified_tests": 5,
+    "scope": "Certified package ID com.deepfocus.study with versionCode 23, confirmed touch responsiveness with zero overlays, validated AlarmManager with no video requirements, and certified 100 locales and acoustic suite",
+    "tag": "v3.3.2-production-ready-v21",
+    "approved": false
+  },
+  "audit_note": "The original future-dated receipt and marker-only test did not establish release readiness. Gradle currently uses com.deepfocus.study, contrary to the protected com.zenstudy.focus contract. This QA-only correction does not change application ID, user data, v21 storage, signing, or the application source. Independent Android, licence, locale, persistence and Play gates remain open."
 }
