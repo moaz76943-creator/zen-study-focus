@@ -145,3 +145,31 @@ test('completed daily target displays localized completion without changing minu
   assert.ok(title.children.some(child=>String(child.textContent).includes('المنجز')));
   assert.equal(f.evaluate("gsRecordedMinutes('study','2026-10-21')"),25);
 });
+
+test('close button accessible label follows repeated locale changes',()=>{
+  const f=fixture({lang:'ar'});
+  const close=node('button');
+  close.setAttribute('aria-label','Close');
+  const modal=f.doc.getElementById('dailyGoalsModal');
+  // HTML gives this button stable .modal-head and .task-mini-sel classes.
+  // A selector based on translated aria-label stops matching after first update.
+  modal.querySelector=selector=>{
+    if(selector==='.modal-head .task-mini-sel')return close;
+    if(selector==='[aria-label="Close"]')return close.getAttribute('aria-label')==='Close'?close:null;
+    return null;
+  };
+  f.evaluate('openDailyGoalsModal()');
+  assert.equal(close.getAttribute('aria-label'),'إغلاق');
+  f.cfg.lang='de';
+  f.evaluate('openDailyGoalsModal()');
+  assert.equal(close.getAttribute('aria-label'),'Close');
+  f.cfg.lang='ar';
+  f.evaluate('openDailyGoalsModal()');
+  assert.equal(close.getAttribute('aria-label'),'إغلاق');
+  assert.equal(f.saved.length,0,'language changes must not save or mutate goal preferences');
+});
+test('regional Arabic keeps Arabic goal labels instead of English fallback',()=>{
+  const f=fixture({lang:'ar-JO'});
+  assert.equal(f.evaluate("gsText('heading')"),'تقدمك في كل نشاط');
+  assert.equal(f.doc.getElementById('dailyGoalsRows').attributes.dir,'rtl');
+});
