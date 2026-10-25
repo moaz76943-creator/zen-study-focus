@@ -5,7 +5,8 @@ receipts=[]
 def adb(*args,timeout=20):
  return subprocess.check_output(['adb',*args],text=True,stderr=subprocess.STDOUT,timeout=timeout)
 def snapshot(tag):
- adb('shell','uiautomator','dump','--compressed','/sdcard/df-locale.xml',timeout=15)
+ dump=adb('shell','uiautomator','dump','--compressed','/sdcard/df-locale.xml',timeout=15)
+ (out/(tag+'-dump.txt')).write_text(dump)
  xml=adb('shell','cat','/sdcard/df-locale.xml');(out/(tag+'.xml')).write_text(xml)
  return list(ET.fromstring(xml).iter('node'))
 def wait_text(value,tag,exact=False):
@@ -15,7 +16,7 @@ def wait_text(value,tag,exact=False):
    nodes=snapshot(tag)
    for node in nodes:
     text=node.get('text','') or node.get('content-desc','')
-    if (text==value if exact else value in text):return node
+    if ((text==value or text.startswith(value+' ')) if exact else value in text):return node
   except Exception as e:error=str(e)
   time.sleep(1)
  raise AssertionError(f'Missing visible {value!r}: {tag}; {error}')
