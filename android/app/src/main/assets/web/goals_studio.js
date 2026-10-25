@@ -17,7 +17,11 @@ const GOAL_UI={
  week:'هذا الأسبوع',weekTarget:'الهدف الأسبوعي (دقائق)',weekInvalid:'الأهداف الأسبوعية بين 0 و5040 دقيقة.',
  start:'بدء',close:'إغلاق',saveFailed:'تعذّر حفظ الأهداف. حاول مرة أخرى.'}
 };
-function gsText(k){const base=(cfg.lang==='ar'?GOAL_UI.ar:GOAL_UI.en)[k]||k;return globalThis.DF99Locale?.t(cfg.lang,'goals',k,base) ?? base;}
+function gsText(k){
+ const code=String(cfg.lang||'en').toLowerCase().split(/[-_]/)[0];
+ const base=(code==='ar'?GOAL_UI.ar:GOAL_UI.en)[k]||k;
+ return globalThis.DF99Locale?.t(cfg.lang,'goals',k,base) ?? base;
+}
 /* Follow the selected script direction, not the current text fallback.
    These UI-only flags do not change persisted goals or user-authored titles. */
 function gsDirection(lang){
@@ -170,7 +174,8 @@ function openDailyGoalsModal(){
  // Preserve existing click and Cancel behavior.
  const cancel=modal?.querySelector?.('[data-i18n="btnCancel"]');
  const save=modal?.querySelector?.('[data-i18n="btnSave"]');
- const close=modal?.querySelector?.('[aria-label="Close"]');
+ // Use the button's stable HTML classes, not its language-dependent ARIA label.
+ const close=modal?.querySelector?.('.modal-head .task-mini-sel');
  const d=L();
  if(cancel)cancel.textContent=globalThis.DF99Locale?.t(cfg.lang,'tasks','cancel',d.btnCancel||'Cancel')||d.btnCancel||'Cancel';
  if(save)save.textContent=globalThis.DF99Locale?.t(cfg.lang,'tasks','save',d.btnSave||'Save')||d.btnSave||'Save';
