@@ -259,14 +259,17 @@ def quick_training_work_rest_stop(a, token):
     a.tap("Quick training")
     a.tap("20/10")
     a.tap("Start training")
-    work = [description(n) for n in a.nodes()]
-    time.sleep(23)
-    rest = [description(n) for n in a.nodes()]
-    assert_changed(work, rest, "Quick Training work-to-rest")
+    if not a.has("Work · Round 1/8"):
+        raise AssertionError("Quick Training did not expose Work phase 1/8")
+    deadline = time.monotonic() + 35
+    while time.monotonic() < deadline and not a.has("Rest · Round 1/8"):
+        time.sleep(0.7)
+    if not a.has("Rest · Round 1/8"):
+        raise AssertionError("Quick Training did not enter Rest after actual Work countdown")
     a.tap("End training")
     a.choose_confirm(True)
-    stopped = [description(n) for n in a.nodes()]
-    assert_changed(rest, stopped, "Quick Training Stop")
+    if a.has("Rest · Round 1/8"):
+        raise AssertionError("Quick Training still active after Stop confirmation")
     return {"assertions": ["started_work", "work_to_rest_changed", "stop_confirm_changed"]}
 
 
