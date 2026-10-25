@@ -112,9 +112,18 @@ function collectDictionaries(files) {
     const qualifier=/\/values-([^/]+)\//.exec(file)?.[1]||'en';let lc=qualifier.replace(/^b\+/, '').split(/[-+]/)[0];
     for(const m of text.matchAll(/<string\s+name=["']([^"']+)["'][^>]*>([\s\S]*?)<\/string>/g))add('native',lc,m[1],m[2].replace(/<[^>]+>/g,'').trim(),file);
   }
-  const locales=get(registry,/var SUPPORTED_LOCALES\s*=\s*/);
-  const catalog=Array.isArray(locales)?locales.map(x=>x.code).filter(lc=>typeof lc==='string'&&!['he','iw'].includes(lc)):[];
-  return {dict,issues,catalog:[...new Set(['en','ar',...catalog,...Object.values(dict).flatMap(e=>Object.keys(e.values))])].sort()};
+  // The app's runtime catalog is authoritative. A separate legacy registry has
+  // 100 codes and differs from the 99 languages actually offered by app.js.
+  const official=get(WEB+'app.js',/const LANG_CATALOG\s*=\s*/);
+  const legacy=get(registry,/var SUPPORTED_LOCALES\s*=\s*/);
+  const list=Array.isArray(official)?official:Array.isArray(legacy)?legacy:[];
+  const catalog=[...new Set(list.map(x=>x.code).filter(lc=>typeof lc==='string'&&!['he','iw'].includes(lc)))].sort();
+  if(Array.isArray(official)&&Array.isArray(legacy)){
+    const runtime=new Set(catalog);
+    const legacyExtras=legacy.map(x=>x.code).filter(lc=>!runtime.has(lc)&&lc!=='he'&&lc!=='iw');
+    if(legacyExtras.length)issues.push({file:registry,error:'Legacy registry codes not in runtime catalog: '+legacyExtras.join(', ')});
+  }
+  return {dict,issues,catalog};
 }
 function scan(files) {
   const {dict,issues,catalog}=collectDictionaries(files);
