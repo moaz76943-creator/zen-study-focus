@@ -155,6 +155,12 @@ function makeRepairQueue(audits) {
  return {scope:'SOURCE_TRANSLATION_REPAIR_NOT_ANDROID',assignments,items};
 }
 
+
+function eligibleCoreDictionary(code, dictionaries) {
+ const value=dictionaries&&dictionaries[code];
+ return value&&((code==='en') || value!==dictionaries.en)?value:null;
+}
+
 function flattenSourceLeaves(input,prefix='',out={}) {
  if(Array.isArray(input)) {
    input.forEach((value,i)=>flattenSourceLeaves(value,prefix?prefix+'.'+i:String(i),out));
@@ -200,7 +206,8 @@ function detailedSourceAudit(raw) {
          return {proven:measured&&value!=='__DF13_UNTRANSLATED__',value};
        }}));
    }
-   const core=ctx.__core[code]?flattenSourceLeaves(ctx.__core[code]):null;
+   const eligible=eligibleCoreDictionary(code,ctx.__core);
+   const core=eligible?flattenSourceLeaves(eligible):null;
    result.push(auditSection({code,section:'Core',keys:coreKeys,owner:'F',
      source_file:'android/app/src/main/assets/web/app.js',english:englishCore,
      read:key=>({proven:!!core&&Object.prototype.hasOwnProperty.call(core,key),value:core?.[key]})}));
@@ -324,4 +331,4 @@ if(require.main===module) {
   const out=arg>=0&&process.argv[arg+1]?path.resolve(process.argv[arg+1]):path.join(ROOT,'artifacts/i18n-e2e');
   try{run(out,process.argv.includes('--strict'))}catch(error){console.error(error.stack||String(error));process.exitCode=2;}
 }
-module.exports={fraction,summarize,countBlankStrings,staticSections,missingKeysByLanguage,auditSection,flattenSourceLeaves,makeRepairQueue,detailedSourceAudit,run};
+module.exports={fraction,summarize,countBlankStrings,staticSections,missingKeysByLanguage,auditSection,eligibleCoreDictionary,flattenSourceLeaves,makeRepairQueue,detailedSourceAudit,run};
