@@ -86,6 +86,16 @@ def iso_badge(nodes, code):
     return next((n for n in nodes if n.get("text", "").strip().upper() == code.upper()
                  and n.get("bounds")), None)
 
+def has_visible(nodes, needle):
+    """Explicit presence: an ElementTree leaf is false-y despite being present."""
+    return visible(nodes, needle) is not None
+
+
+def has_iso_badge(nodes, code):
+    """Do not coerce an empty native accessibility XML node to bool."""
+    return iso_badge(nodes, code) is not None
+
+
 def tap_node(node):
     if node is None:
         raise AssertionError("Visible actionable element not found")
@@ -137,7 +147,7 @@ def language(name, iso):
         raise AssertionError(name + " not exposed as a clickable Catalog row")
     tap_node(matches[-1])
     nodes = dump()
-    if not iso_badge(nodes, iso):
+    if not has_iso_badge(nodes, iso):
         raise AssertionError("Language selected but exact ISO badge not visible: "+iso)
     return True
 
@@ -208,11 +218,11 @@ def run(out, source_sha, api):
                             for cl in sorted(set(n.get("class","") for n in nodes))},
             "nodes_with_text":sum(bool(n.get("text")) for n in nodes),
             "nodes_with_content_desc":sum(bool(n.get("content-desc")) for n in nodes),
-            "heading_accessible":bool(visible(nodes,"Deep Focus")),
+            "heading_accessible":has_visible(nodes,"Deep Focus"),
             "screenshot":shot
         }, indent=2)+"\n")
         results["native_foreground_boot"]={"status":"PASS","detail":"Resumed MainActivity; screenshot captured; not proof of interactive WebView"}
-        if not visible(nodes, "Deep Focus"):
+        if not has_visible(nodes, "Deep Focus"):
             results["offline_fresh_boot"]={"status":"FAIL",
                 "error":"Native app in foreground and screenshot captured, but WebView title not exposed to UIAutomator"}
         else:
@@ -246,7 +256,7 @@ def run(out, source_sha, api):
             for name, markers in cases:
                 click(name)
                 nodes=dump()
-                if not any(visible(nodes,marker) for marker in markers):
+                if not any(has_visible(nodes,marker) for marker in markers):
                     raise AssertionError("Tapped "+name+" but target page content was not exposed: "+str(markers))
             click("Timer")
             return "Six Android taps plus unique visible content checks for each active section"
@@ -272,7 +282,7 @@ def run(out, source_sha, api):
             text_input(0,"DF13_TASK_123")
             shell("input","keyevent","66") # Enter calls the original createNewTask handler
             time.sleep(1)
-            if not visible(dump(),"DF13_TASK_123"):
+            if not has_visible(dump(),"DF13_TASK_123"):
                 raise AssertionError("New task absent after Enter/save")
             return "Saved task displayed in original Android WebView"
         record(results,"task_create",task,checkpoint)
@@ -283,11 +293,11 @@ def run(out, source_sha, api):
             text_input(0,"DF13_NOTE_123")
             text_input(1,"DF13_BODY_123")
             click("Save")
-            if not visible(dump(),"DF13_NOTE_123"):
+            if not has_visible(dump(),"DF13_NOTE_123"):
                 raise AssertionError("Saved note not present")
             restart()
             click("Notes")
-            if not visible(dump(),"DF13_NOTE_123"):
+            if not has_visible(dump(),"DF13_NOTE_123"):
                 raise AssertionError("Saved note disappeared on restart")
             return "Note persisted through process restart"
         record(results,"note_create_restore",note,checkpoint)
@@ -300,14 +310,14 @@ def run(out, source_sha, api):
 
         def lang_restart():
             nodes=restart()
-            if not iso_badge(nodes,"AR"):
+            if not has_iso_badge(nodes,"AR"):
                 raise AssertionError("Arabic locale did not persist after restart")
             return "Arabic ISO label survived process restart"
         record(results,"language_after_restart",lang_restart,checkpoint)
 
         def offline_resume():
             nodes=restart()
-            if not visible(nodes,"Deep Focus"):
+            if not has_visible(nodes,"Deep Focus"):
                 raise AssertionError("App unavailable offline after fresh start")
             return "No Wi-Fi or mobile-data services during fresh restart"
         record(results,"offline_resume",offline_resume,checkpoint)
@@ -320,12 +330,12 @@ def run(out, source_sha, api):
                 if api >= 33:
                     shell("pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS")
                 initial = restart()
-                if not visible(initial, "English"):
+                if not has_visible(initial, "English"):
                     raise AssertionError("English locale chooser not visible on fresh app")
                 if code != "en":
                     language(english_name, code)
                 after = restart()
-                if not iso_badge(after, code):
+                if not has_iso_badge(after, code):
                     raise AssertionError(code + " did not persist on Android restart")
                 screenshot(out, "locale_" + code + "_api" + str(api))
                 return code + " selected and persisted through native process restart"
@@ -340,7 +350,7 @@ def run(out, source_sha, api):
                     shell("wm","size",f"{w}x800")
                     shell("settings","put","system","font_scale",str(scale))
                     nodes=restart()
-                    if not visible(nodes,"Deep Focus"):
+                    if not has_visible(nodes,"Deep Focus"):
                         raise AssertionError("App no longer exposes title")
                     item.update({"status":"PASS","meaning":"boot/visible title only",
                                  "screenshot":screenshot(out,f"api{api}_w{w}_font{scale}")})
