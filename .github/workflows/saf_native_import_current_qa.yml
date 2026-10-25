@@ -1,7 +1,12 @@
 name: P0 native SAF import source QA (non-release)
 on:
   push:
-    branches: [fix/p0-native-saf-current-20261026]
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'tests/integration_recovery/native_saf_import_forwardport.test.cjs'
+      - '.github/workflows/saf_native_import_current_qa.yml'
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
