@@ -3831,6 +3831,36 @@
       "read": "Membaca",
       "work": "Kerja",
       "sport": "Olahraga"
+    },
+    "goals": {
+      "desc": "Menit dihitung dari sesi fokus yang telah diselesaikan.",
+      "done": "selesai",
+      "edit": "⚙ Ubah",
+      "heading": "Kemajuan kecil setiap hari",
+      "hint": "Atur ke 0 untuk menyembunyikan target. Sesi hanya dihitung setelah selesai.",
+      "invalid": "Masukkan jumlah menit bulat dari 0 hingga 720.",
+      "kicker": "✦ TARGET HARIAN ANDA",
+      "minute": "menit",
+      "modal": "Target aktivitas harian",
+      "noGoal": "Tetapkan target",
+      "save": "Target disimpan",
+      "today": "hari ini",
+      "week": "Minggu ini",
+      "weekInvalid": "Target mingguan harus antara 0 hingga 5040 menit.",
+      "weekTarget": "Target mingguan (menit)"
+    },
+    "timer": {
+      "0": "⚙ Sesuaikan",
+      "1": "Pengaturan fokus dan istirahat",
+      "10": "Pengaturan disimpan",
+      "2": "Sesi saat ini tidak berubah; perubahan berlaku untuk sesi baru.",
+      "3": "Fokus · menit",
+      "4": "Istirahat singkat · menit",
+      "5": "Istirahat panjang · menit",
+      "6": "Sesi per siklus",
+      "7": "Nilai bawaan",
+      "8": "Simpan",
+      "9": "Masukkan bilangan bulat dalam rentang yang ditampilkan."
     }
   },
   "vi": {
