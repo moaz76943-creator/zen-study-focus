@@ -1,4 +1,118 @@
 {
+  "cs": {
+    "analytics": {
+      "activity": "Aktivita",
+      "average": "Průměrná relace",
+      "chart": "Denní rozložení",
+      "details": "Vyberte den pro podrobnosti",
+      "end": "Do",
+      "export": "Exportovat CSV",
+      "goal": "Porovnání cílů",
+      "minutes": "Zaznamenané minuty",
+      "noData": "Za toto období nejsou zaznamenány žádné relace",
+      "noGoals": "Nejsou nastaveny denní cíle",
+      "period": "Období",
+      "sessions": "Relace",
+      "start": "Od",
+      "streak": "Aktuální série",
+      "tasks": "Dokončené úkoly",
+      "title": "Zaznamenané statistiky",
+      "year": "Rok"
+    },
+    "analyticsDomain": {
+      "read": "Čtení",
+      "sport": "Sport",
+      "study": "Studium",
+      "work": "Práce"
+    },
+    "goals": {
+      "desc": "Minuty se počítají z dokončených relací soustředění.",
+      "done": "dokončeno",
+      "edit": "⚙ Upravit",
+      "heading": "Každý den malý pokrok",
+      "hint": "Nastavte 0 pro skrytí cíle. Relace se započítá až po dokončení.",
+      "invalid": "Zadejte celé minuty od 0 do 720.",
+      "kicker": "✦ TVÉ DENNÍ CÍLE",
+      "minute": "min",
+      "modal": "Denní cíle aktivit",
+      "noGoal": "Nastavit cíl",
+      "save": "Cíle uloženy",
+      "today": "dnes",
+      "week": "Tento týden",
+      "weekInvalid": "Týdenní cíle musí být v rozsahu 0 až 5040 minut.",
+      "weekTarget": "Týdenní cíl (min)"
+    },
+    "timer": {
+      "0": "⚙ Přizpůsobit",
+      "1": "Nastavení soustředění a přestávek",
+      "10": "Nastavení uloženo",
+      "2": "Aktuální relace zůstane zachována; změny platí pro nové relace.",
+      "3": "Soustředění · min",
+      "4": "Krátká přestávka · min",
+      "5": "Dlouhá přestávka · min",
+      "6": "Relací v cyklu",
+      "7": "Výchozí hodnoty",
+      "8": "Uložit",
+      "9": "Používejte celá čísla v uvedených mezích."
+    }
+  },
+  "da": {
+    "analytics": {
+      "activity": "Aktivitet",
+      "average": "Gennemsnitlig session",
+      "chart": "Daglig fordeling",
+      "details": "Vælg en dag for detaljer",
+      "end": "Til",
+      "export": "Eksportér CSV",
+      "goal": "Sammenligning af mål",
+      "minutes": "Registrerede minutter",
+      "noData": "Ingen registrerede sessioner i perioden",
+      "noGoals": "Ingen daglige mål angivet",
+      "period": "Periode",
+      "sessions": "Sessioner",
+      "start": "Fra",
+      "streak": "Nuværende række",
+      "tasks": "Gennemførte opgaver",
+      "title": "Registreret statistik",
+      "year": "År"
+    },
+    "analyticsDomain": {
+      "read": "Læsning",
+      "sport": "Træning",
+      "study": "Studier",
+      "work": "Arbejde"
+    },
+    "goals": {
+      "desc": "Minutter tælles fra dine gennemførte fokussessioner.",
+      "done": "gennemført",
+      "edit": "⚙ Rediger",
+      "heading": "Lidt fremgang hver dag",
+      "hint": "Sæt 0 for at skjule et mål. En session tæller først, når den er gennemført.",
+      "invalid": "Indtast hele minutter fra 0 til 720.",
+      "kicker": "✦ DINE DAGLIGE MÅL",
+      "minute": "min",
+      "modal": "Daglige aktivitetsmål",
+      "noGoal": "Angiv mål",
+      "save": "Mål gemt",
+      "today": "i dag",
+      "week": "Denne uge",
+      "weekInvalid": "Ugentlige mål skal være mellem 0 og 5040 minutter.",
+      "weekTarget": "Ugentligt mål (min)"
+    },
+    "timer": {
+      "0": "⚙ Tilpas",
+      "1": "Indstillinger for fokus og pauser",
+      "10": "Indstillinger gemt",
+      "2": "Din nuværende session bevares; ændringer gælder for nye sessioner.",
+      "3": "Fokus · min",
+      "4": "Kort pause · min",
+      "5": "Lang pause · min",
+      "6": "Sessioner pr. cyklus",
+      "7": "Standardværdier",
+      "8": "Gem",
+      "9": "Brug hele tal inden for de viste intervaller."
+    }
+  },
   "de": {
     "analytics": {
       "activity": "Aktivität",
@@ -321,6 +435,63 @@
       "9": "Introduce números enteros dentro de los límites indicados."
     }
   },
+  "fi": {
+    "analytics": {
+      "activity": "Toiminta",
+      "average": "Istunnon keskiarvo",
+      "chart": "Päiväkohtainen jakauma",
+      "details": "Valitse päivä nähdäksesi tiedot",
+      "end": "Päättyen",
+      "export": "Vie CSV",
+      "goal": "Tavoitteiden vertailu",
+      "minutes": "Tallennetut minuutit",
+      "noData": "Ei tallennettuja istuntoja tältä ajalta",
+      "noGoals": "Päivittäisiä tavoitteita ei ole asetettu",
+      "period": "Jakso",
+      "sessions": "Istunnot",
+      "start": "Alkaen",
+      "streak": "Nykyinen putki",
+      "tasks": "Valmiit tehtävät",
+      "title": "Tallennetut tilastot",
+      "year": "Vuosi"
+    },
+    "analyticsDomain": {
+      "read": "Lukeminen",
+      "sport": "Liikunta",
+      "study": "Opiskelu",
+      "work": "Työ"
+    },
+    "goals": {
+      "desc": "Minuutit lasketaan päättyneistä keskittymisistunnoista.",
+      "done": "valmis",
+      "edit": "⚙ Muokkaa",
+      "heading": "Hieman edistystä joka päivä",
+      "hint": "Piilota tavoite asettamalla 0. Istunto lasketaan vasta sen päätyttyä.",
+      "invalid": "Anna kokonaisluku väliltä 0–720 minuuttia.",
+      "kicker": "✦ PÄIVITTÄISET TAVOITTEESI",
+      "minute": "min",
+      "modal": "Päivittäiset toimintatavoitteet",
+      "noGoal": "Aseta tavoite",
+      "save": "Tavoitteet tallennettu",
+      "today": "tänään",
+      "week": "Tällä viikolla",
+      "weekInvalid": "Viikkotavoitteiden on oltava 0–5040 minuuttia.",
+      "weekTarget": "Viikkotavoite (min)"
+    },
+    "timer": {
+      "0": "⚙ Mukauta",
+      "1": "Keskittymis- ja taukoasetukset",
+      "10": "Asetukset tallennettu",
+      "2": "Nykyinen istunto säilyy; muutokset koskevat uusia istuntoja.",
+      "3": "Keskittyminen · min",
+      "4": "Lyhyt tauko · min",
+      "5": "Pitkä tauko · min",
+      "6": "Istuntoja kierroksessa",
+      "7": "Oletukset",
+      "8": "Tallenna",
+      "9": "Käytä kokonaislukuja annetuissa rajoissa."
+    }
+  },
   "fr": {
     "analytics": {
       "activity": "Activité",
@@ -482,6 +653,63 @@
       "9": "Saisissez des nombres entiers dans les limites affichées."
     }
   },
+  "hu": {
+    "analytics": {
+      "activity": "Tevékenység",
+      "average": "Átlagos munkamenet",
+      "chart": "Napi eloszlás",
+      "details": "Válassz egy napot a részletekhez",
+      "end": "Eddig",
+      "export": "CSV exportálása",
+      "goal": "Célok összehasonlítása",
+      "minutes": "Rögzített percek",
+      "noData": "Ebben az időszakban nincs rögzített munkamenet",
+      "noGoals": "Nincsenek beállított napi célok",
+      "period": "Időszak",
+      "sessions": "Munkamenetek",
+      "start": "Ettől",
+      "streak": "Jelenlegi sorozat",
+      "tasks": "Befejezett feladatok",
+      "title": "Rögzített statisztikák",
+      "year": "Év"
+    },
+    "analyticsDomain": {
+      "read": "Olvasás",
+      "sport": "Sport",
+      "study": "Tanulás",
+      "work": "Munka"
+    },
+    "goals": {
+      "desc": "A percek a befejezett fókuszmunkamenetekből származnak.",
+      "done": "teljesítve",
+      "edit": "⚙ Szerkesztés",
+      "heading": "Minden nap egy kis haladás",
+      "hint": "A cél elrejtéséhez állíts be 0-t. A munkamenet csak a befejezése után számít.",
+      "invalid": "Adj meg egész perceket 0 és 720 között.",
+      "kicker": "✦ NAPI CÉLJAID",
+      "minute": "perc",
+      "modal": "Napi tevékenységcélok",
+      "noGoal": "Cél beállítása",
+      "save": "Célok mentve",
+      "today": "ma",
+      "week": "Ezen a héten",
+      "weekInvalid": "A heti céloknak 0 és 5040 perc között kell lenniük.",
+      "weekTarget": "Heti cél (perc)"
+    },
+    "timer": {
+      "0": "⚙ Testreszabás",
+      "1": "Fókusz- és szünetbeállítások",
+      "10": "Beállítások mentve",
+      "2": "A jelenlegi munkamenet megmarad; a módosítások az új munkamenetekre érvényesek.",
+      "3": "Fókusz · perc",
+      "4": "Rövid szünet · perc",
+      "5": "Hosszú szünet · perc",
+      "6": "Munkamenetek ciklusonként",
+      "7": "Alapértékek",
+      "8": "Mentés",
+      "9": "A megadott tartományokon belüli egész számokat használj."
+    }
+  },
   "it": {
     "analytics": {
       "activity": "Attività",
@@ -537,6 +765,177 @@
       "7": "Predefiniti",
       "8": "Salva",
       "9": "Inserisci numeri interi entro gli intervalli indicati."
+    }
+  },
+  "nl": {
+    "analytics": {
+      "activity": "Activiteit",
+      "average": "Gemiddelde sessie",
+      "chart": "Verdeling per dag",
+      "details": "Kies een dag voor details",
+      "end": "Tot",
+      "export": "CSV exporteren",
+      "goal": "Doelen vergelijken",
+      "minutes": "Geregistreerde minuten",
+      "noData": "Geen geregistreerde sessies in deze periode",
+      "noGoals": "Geen dagelijkse doelen ingesteld",
+      "period": "Periode",
+      "sessions": "Sessies",
+      "start": "Van",
+      "streak": "Huidige reeks",
+      "tasks": "Voltooide taken",
+      "title": "Geregistreerde statistieken",
+      "year": "Jaar"
+    },
+    "analyticsDomain": {
+      "read": "Lezen",
+      "sport": "Sport",
+      "study": "Studie",
+      "work": "Werk"
+    },
+    "goals": {
+      "desc": "Minuten worden berekend op basis van voltooide focussessies.",
+      "done": "voltooid",
+      "edit": "⚙ Bewerken",
+      "heading": "Elke dag een beetje vooruitgang",
+      "hint": "Stel 0 in om een doel te verbergen. Een sessie telt pas na voltooiing.",
+      "invalid": "Voer een geheel aantal minuten in van 0 tot 720.",
+      "kicker": "✦ JE DAGELIJKSE DOELEN",
+      "minute": "min",
+      "modal": "Dagelijkse activiteitsdoelen",
+      "noGoal": "Doel instellen",
+      "save": "Doelen opgeslagen",
+      "today": "vandaag",
+      "week": "Deze week",
+      "weekInvalid": "Weekdoelen moeten tussen 0 en 5040 minuten liggen.",
+      "weekTarget": "Weekdoel (min)"
+    },
+    "timer": {
+      "0": "⚙ Aanpassen",
+      "1": "Instellingen voor focus en pauzes",
+      "10": "Instellingen opgeslagen",
+      "2": "Je huidige sessie blijft behouden; wijzigingen gelden voor nieuwe sessies.",
+      "3": "Focus · min",
+      "4": "Korte pauze · min",
+      "5": "Lange pauze · min",
+      "6": "Sessies per cyclus",
+      "7": "Standaardwaarden",
+      "8": "Opslaan",
+      "9": "Gebruik hele getallen binnen de aangegeven grenzen."
+    }
+  },
+  "no": {
+    "analytics": {
+      "activity": "Aktivitet",
+      "average": "Gjennomsnittlig økt",
+      "chart": "Fordeling per dag",
+      "details": "Velg en dag for detaljer",
+      "end": "Til",
+      "export": "Eksporter CSV",
+      "goal": "Sammenlign mål",
+      "minutes": "Registrerte minutter",
+      "noData": "Ingen registrerte økter i denne perioden",
+      "noGoals": "Ingen daglige mål er angitt",
+      "period": "Periode",
+      "sessions": "Økter",
+      "start": "Fra",
+      "streak": "Nåværende rekke",
+      "tasks": "Fullførte oppgaver",
+      "title": "Registrert statistikk",
+      "year": "År"
+    },
+    "analyticsDomain": {
+      "read": "Lesing",
+      "sport": "Trening",
+      "study": "Studier",
+      "work": "Arbeid"
+    },
+    "goals": {
+      "desc": "Minutter regnes fra fullførte fokusøkter.",
+      "done": "fullført",
+      "edit": "⚙ Rediger",
+      "heading": "Litt fremgang hver dag",
+      "hint": "Sett 0 for å skjule et mål. En økt teller først når den er fullført.",
+      "invalid": "Skriv inn hele minutter fra 0 til 720.",
+      "kicker": "✦ DINE DAGLIGE MÅL",
+      "minute": "min",
+      "modal": "Daglige aktivitetsmål",
+      "noGoal": "Angi mål",
+      "save": "Målene er lagret",
+      "today": "i dag",
+      "week": "Denne uken",
+      "weekInvalid": "Ukemål må være mellom 0 og 5040 minutter.",
+      "weekTarget": "Ukemål (min)"
+    },
+    "timer": {
+      "0": "⚙ Tilpass",
+      "1": "Innstillinger for fokus og pauser",
+      "10": "Innstillingene er lagret",
+      "2": "Den pågående økten beholdes; endringer gjelder nye økter.",
+      "3": "Fokus · min",
+      "4": "Kort pause · min",
+      "5": "Lang pause · min",
+      "6": "Økter per syklus",
+      "7": "Standardverdier",
+      "8": "Lagre",
+      "9": "Bruk heltall innenfor de viste grensene."
+    }
+  },
+  "pl": {
+    "analytics": {
+      "activity": "Aktywność",
+      "average": "Średnia sesja",
+      "chart": "Rozkład dzienny",
+      "details": "Wybierz dzień, aby zobaczyć szczegóły",
+      "end": "Do",
+      "export": "Eksportuj CSV",
+      "goal": "Porównanie celów",
+      "minutes": "Zapisane minuty",
+      "noData": "Brak zapisanych sesji w tym okresie",
+      "noGoals": "Nie ustawiono celów dziennych",
+      "period": "Okres",
+      "sessions": "Sesje",
+      "start": "Od",
+      "streak": "Obecna seria",
+      "tasks": "Ukończone zadania",
+      "title": "Zapisane statystyki",
+      "year": "Rok"
+    },
+    "analyticsDomain": {
+      "read": "Czytanie",
+      "sport": "Ćwiczenia",
+      "study": "Nauka",
+      "work": "Praca"
+    },
+    "goals": {
+      "desc": "Minuty są liczone z ukończonych sesji skupienia.",
+      "done": "ukończono",
+      "edit": "⚙ Edytuj",
+      "heading": "Mały postęp każdego dnia",
+      "hint": "Ustaw 0, aby ukryć cel. Sesja liczy się dopiero po ukończeniu.",
+      "invalid": "Wpisz całkowitą liczbę minut od 0 do 720.",
+      "kicker": "✦ TWOJE CELE DZIENNE",
+      "minute": "min",
+      "modal": "Dzienne cele aktywności",
+      "noGoal": "Ustaw cel",
+      "save": "Cele zapisane",
+      "today": "dzisiaj",
+      "week": "W tym tygodniu",
+      "weekInvalid": "Cele tygodniowe muszą wynosić od 0 do 5040 minut.",
+      "weekTarget": "Cel tygodniowy (min)"
+    },
+    "timer": {
+      "0": "⚙ Dostosuj",
+      "1": "Ustawienia skupienia i przerw",
+      "10": "Ustawienia zapisane",
+      "2": "Bieżąca sesja zostanie zachowana; zmiany dotyczą nowych sesji.",
+      "3": "Skupienie · min",
+      "4": "Krótka przerwa · min",
+      "5": "Długa przerwa · min",
+      "6": "Sesje w cyklu",
+      "7": "Domyślne",
+      "8": "Zapisz",
+      "9": "Używaj liczb całkowitych w podanych zakresach."
     }
   },
   "pt": {
@@ -596,6 +995,63 @@
       "9": "Introduza números inteiros dentro dos intervalos apresentados."
     }
   },
+  "ro": {
+    "analytics": {
+      "activity": "Activitate",
+      "average": "Sesiune medie",
+      "chart": "Distribuție zilnică",
+      "details": "Selectează o zi pentru detalii",
+      "end": "Până la",
+      "export": "Exportă CSV",
+      "goal": "Compararea obiectivelor",
+      "minutes": "Minute înregistrate",
+      "noData": "Nu există sesiuni înregistrate în această perioadă",
+      "noGoals": "Nu sunt configurate obiective zilnice",
+      "period": "Perioadă",
+      "sessions": "Sesiuni",
+      "start": "De la",
+      "streak": "Serie curentă",
+      "tasks": "Sarcini finalizate",
+      "title": "Statistici înregistrate",
+      "year": "An"
+    },
+    "analyticsDomain": {
+      "read": "Citit",
+      "sport": "Sport",
+      "study": "Studiu",
+      "work": "Muncă"
+    },
+    "goals": {
+      "desc": "Minutele provin din sesiunile de concentrare finalizate.",
+      "done": "finalizat",
+      "edit": "⚙ Editează",
+      "heading": "Puțin progres în fiecare zi",
+      "hint": "Setează 0 pentru a ascunde un obiectiv. O sesiune contează doar după finalizare.",
+      "invalid": "Introdu minute întregi între 0 și 720.",
+      "kicker": "✦ OBIECTIVELE TALE ZILNICE",
+      "minute": "min",
+      "modal": "Obiective zilnice de activitate",
+      "noGoal": "Setează obiectiv",
+      "save": "Obiective salvate",
+      "today": "astăzi",
+      "week": "Săptămâna aceasta",
+      "weekInvalid": "Obiectivele săptămânale trebuie să fie între 0 și 5040 de minute.",
+      "weekTarget": "Obiectiv săptămânal (min)"
+    },
+    "timer": {
+      "0": "⚙ Personalizează",
+      "1": "Setări pentru concentrare și pauze",
+      "10": "Setări salvate",
+      "2": "Sesiunea curentă se păstrează; modificările se aplică sesiunilor noi.",
+      "3": "Concentrare · min",
+      "4": "Pauză scurtă · min",
+      "5": "Pauză lungă · min",
+      "6": "Sesiuni pe ciclu",
+      "7": "Valori implicite",
+      "8": "Salvează",
+      "9": "Folosește numere întregi în intervalele afișate."
+    }
+  },
   "ru": {
     "analytics": {
       "activity": "Занятие",
@@ -653,6 +1109,63 @@
       "9": "Введите целые числа в указанных диапазонах."
     }
   },
+  "sv": {
+    "analytics": {
+      "activity": "Aktivitet",
+      "average": "Genomsnittlig session",
+      "chart": "Fördelning per dag",
+      "details": "Välj en dag för detaljer",
+      "end": "Till",
+      "export": "Exportera CSV",
+      "goal": "Jämför mål",
+      "minutes": "Registrerade minuter",
+      "noData": "Inga registrerade sessioner under perioden",
+      "noGoals": "Inga dagliga mål inställda",
+      "period": "Period",
+      "sessions": "Sessioner",
+      "start": "Från",
+      "streak": "Aktuell svit",
+      "tasks": "Slutförda uppgifter",
+      "title": "Registrerad statistik",
+      "year": "År"
+    },
+    "analyticsDomain": {
+      "read": "Läsning",
+      "sport": "Träning",
+      "study": "Studier",
+      "work": "Arbete"
+    },
+    "goals": {
+      "desc": "Minuter räknas från dina slutförda fokussessioner.",
+      "done": "slutfört",
+      "edit": "⚙ Redigera",
+      "heading": "Lite framsteg varje dag",
+      "hint": "Ange 0 för att dölja ett mål. En session räknas först när den slutförts.",
+      "invalid": "Ange ett helt antal minuter från 0 till 720.",
+      "kicker": "✦ DINA DAGLIGA MÅL",
+      "minute": "min",
+      "modal": "Dagliga aktivitetsmål",
+      "noGoal": "Ange mål",
+      "save": "Målen har sparats",
+      "today": "idag",
+      "week": "Den här veckan",
+      "weekInvalid": "Veckomål måste vara mellan 0 och 5040 minuter.",
+      "weekTarget": "Veckomål (min)"
+    },
+    "timer": {
+      "0": "⚙ Anpassa",
+      "1": "Inställningar för fokus och pauser",
+      "10": "Inställningarna har sparats",
+      "2": "Din pågående session bevaras; ändringar gäller nya sessioner.",
+      "3": "Fokus · min",
+      "4": "Kort paus · min",
+      "5": "Lång paus · min",
+      "6": "Sessioner per cykel",
+      "7": "Standardvärden",
+      "8": "Spara",
+      "9": "Använd heltal inom de angivna intervallen."
+    }
+  },
   "tr": {
     "analytics": {
       "activity": "Etkinlik",
@@ -708,6 +1221,63 @@
       "7": "Varsayılanlar",
       "8": "Kaydet",
       "9": "Gösterilen aralıklarda tam sayı girin."
+    }
+  },
+  "uk": {
+    "analytics": {
+      "activity": "Активність",
+      "average": "Середній сеанс",
+      "chart": "Розподіл за днями",
+      "details": "Оберіть день для деталей",
+      "end": "До",
+      "export": "Експортувати CSV",
+      "goal": "Порівняння цілей",
+      "minutes": "Зараховані хвилини",
+      "noData": "За цей період немає записаних сеансів",
+      "noGoals": "Щоденні цілі не встановлено",
+      "period": "Період",
+      "sessions": "Сеанси",
+      "start": "Від",
+      "streak": "Поточна серія",
+      "tasks": "Виконані завдання",
+      "title": "Збережена статистика",
+      "year": "Рік"
+    },
+    "analyticsDomain": {
+      "read": "Читання",
+      "sport": "Спорт",
+      "study": "Навчання",
+      "work": "Робота"
+    },
+    "goals": {
+      "desc": "Хвилини враховуються із завершених сеансів зосередження.",
+      "done": "виконано",
+      "edit": "⚙ Змінити",
+      "heading": "Трохи прогресу щодня",
+      "hint": "Вкажіть 0, щоб приховати ціль. Сеанс зараховується лише після завершення.",
+      "invalid": "Введіть ціле число хвилин від 0 до 720.",
+      "kicker": "✦ ВАШІ ЩОДЕННІ ЦІЛІ",
+      "minute": "хв",
+      "modal": "Щоденні цілі активності",
+      "noGoal": "Встановити ціль",
+      "save": "Цілі збережено",
+      "today": "сьогодні",
+      "week": "Цього тижня",
+      "weekInvalid": "Тижневі цілі мають становити від 0 до 5040 хвилин.",
+      "weekTarget": "Тижнева ціль (хв)"
+    },
+    "timer": {
+      "0": "⚙ Налаштувати",
+      "1": "Налаштування зосередження та перерв",
+      "10": "Налаштування збережено",
+      "2": "Поточний сеанс буде збережено; зміни діятимуть для нових сеансів.",
+      "3": "Зосередження · хв",
+      "4": "Коротка перерва · хв",
+      "5": "Довга перерва · хв",
+      "6": "Сеансів у циклі",
+      "7": "Типові значення",
+      "8": "Зберегти",
+      "9": "Використовуйте цілі числа в указаних межах."
     }
   }
 }
