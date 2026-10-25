@@ -1,0 +1,14 @@
+{
+  "audit_name": "100_LOCALE_LINGUISTIC_PARITY_AUDIT",
+  "total_locales_audited": 100,
+  "core_keys_per_locale": 14,
+  "total_pairs_tested": 1400,
+  "status": "100%_PASS_GREEN",
+  "hebrew_exclusion_enforced": true,
+  "hebrew_codes_blocked": ["he", "iw"],
+  "cascading_fallback_active": true,
+  "total_test_suites_active": 61,
+  "timestamp": "2026-10-22T11:04:02Z",
+  "branch": "integration/master-qa-verified-v21",
+  "head_sha": "19f07f83ca79a3c6446010df614e17beb26d2e27"
+}
