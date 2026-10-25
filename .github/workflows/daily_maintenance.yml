@@ -72,6 +72,8 @@ jobs:
         env:
           SOURCE_REF: ${{ env.SOURCE_REF }}
         with:
+          retries: 2
+          retry-exempt-status-codes: 400,401,403,404,422
           script: |
             const {data}=await github.rest.git.getRef({owner:context.repo.owner,repo:context.repo.repo,ref:'heads/'+process.env.SOURCE_REF});
             if(!/^[a-f0-9]{40}$/i.test(data?.object?.sha||''))throw Error('Unable to pin source SHA');
@@ -236,6 +238,8 @@ jobs:
         env:
           SOURCE_REF: ${{ env.SOURCE_REF }}
         with:
+          retries: 2
+          retry-exempt-status-codes: 400,401,403,404,422
           script: |
             const {data}=await github.rest.git.getRef({owner:context.repo.owner,repo:context.repo.repo,ref:'heads/'+process.env.SOURCE_REF});
             if(!/^[a-f0-9]{40}$/i.test(data?.object?.sha||''))throw Error('Unable to pin source SHA');
