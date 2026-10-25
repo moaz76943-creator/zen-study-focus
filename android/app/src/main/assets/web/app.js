@@ -2427,6 +2427,8 @@ function finalizeTimerSession(shouldChime) {
   }
 }
 function runTimerTick() {
+  // Ignore queued callbacks after pause or after the first completion.
+  if (!timerRunning) return;
   timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
   if (timerLeft <= 0) return finalizeTimerSession(true);
   updateTimerDisplay();
