@@ -1,0 +1,26 @@
+name: Legacy135 timer consent locale gate
+on:
+  push:
+    branches:
+      - fix/legacy135-timer-consent-l10n-20261026
+permissions:
+  contents: read
+jobs:
+  scoped-node:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Record immutable source and run P0 consent regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          node --check android/app/src/main/assets/web/app.js
+          node --test tests/i18n/timer/timer_legacy135_localized_consent.test.cjs
+          node --test tests/i18n/timer/timer_destructive_consent.test.cjs
