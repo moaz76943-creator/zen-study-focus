@@ -51,7 +51,7 @@ test('does not alter Latin digits or arbitrary user text after repeated events',
 // Protecting only the Studio selector is insufficient if this handler rewrites user text.
 function bootAppDigitListener() {
   const appSource = fs.readFileSync(path.join(__dirname, '../../android/app/src/main/assets/web/app.js'), 'utf8');
-  const begin = appSource.indexOf('function toWest(val) {');
+  const begin = appSource.indexOf('const ARABIC_ZERO_OFFSET =');
   const end = appSource.indexOf('/* ========================================================', begin + 20);
   assert.ok(begin >= 0 && end > begin, 'app numeral handler must be located');
   const callbacks = {};

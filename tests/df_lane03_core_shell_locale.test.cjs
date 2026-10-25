@@ -51,7 +51,7 @@ function setup(initialLanguage='en') {
     return app.slice(a,b);
   };
   const sources=[
-    index('const WESTERN_DIGIT_ZERO_POINTS = ',"document.addEventListener('input'"),
+    index('const ARABIC_ZERO_OFFSET = ',"document.addEventListener('input'"),
     index('const SHELL_LABELS = ','const CONFIRMATION_TEXT = '),
     index('function localizeStarterPreviews(target) {','/* ========================================================\n   3. CLOUD BACKUP')
   ].join('\n');
@@ -180,4 +180,17 @@ test('Localized system numerals use Latin 0-9 for Arabic, Persian, Indic and ful
   const d=setup();
   assert.equal(vm.runInContext("toWest('١٢٣ ۱۲۳ १२३ ১২৩ ๑๒๓ １２３')",d.ctx),
     '123 123 123 123 123 123');
+});
+
+
+test('premium English fallback never masks real Ukrainian Quick Training translation',()=>{
+ const d=setup();
+ d.ctx.LANG_CATALOG.push({code:'uk',iso:'UK',dir:'ltr',enName:'Ukrainian',nativeName:'Українська'});
+ const quick=read('quick_training.js');
+ vm.runInContext(quick.slice(0,quick.indexOf('let quickTraining = null;')),d.ctx);
+ vm.runInContext(quick.slice(quick.indexOf('function quickText(key) {'),quick.indexOf('function quickL10n() {')),d.ctx);
+ vm.runInContext(read('locale_premium_v22.js'),d.ctx);
+ vm.runInContext("applyLanguage('uk')",d.ctx);
+ assert.equal(d.training.textContent,'Швидке тренування');
+ assert.equal(d.ctx.cfg.lang,'uk');
 });
