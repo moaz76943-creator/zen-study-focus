@@ -140,3 +140,26 @@ test('legacy Arabic/Persian/Devanagari numerals render as Western digits without
  assert.ok(meta.children[0].textContent.includes('12:30'));
  assert.equal(JSON.stringify(f.get()),raw);
 });
+
+test('timer linking failure is displayed in selected language rather than generic save error',()=>{
+ for(const [locale,caption,expected] of [
+  ['en','Start focus','Timer link not connected'],
+  ['ar','ابدأ التركيز','ربط المؤقت غير متاح بعد']
+ ]){
+  const f=fixture(undefined,locale);f.adapter.linkTaskToTimer=()=>false;
+  f.button(caption).dispatch('click');
+  assert.equal(f.all().find(e=>e.attributes.role==='status').textContent,expected);
+  assert.equal(f.commits(),0);
+ }
+});
+test('empty new task title reports a localized validation reason without a commit',()=>{
+ for(const [locale,caption,expected] of [
+  ['en','＋ New task','Task title is required'],
+  ['ar','＋ إضافة مهمة','عنوان المهمة مطلوب']
+ ]){
+  const f=fixture([],locale);f.button(caption).dispatch('click');
+  f.editor().dispatch('submit');
+  assert.equal(f.all().find(e=>e.attributes.role==='status').textContent,expected);
+  assert.equal(f.commits(),0);
+ }
+});
