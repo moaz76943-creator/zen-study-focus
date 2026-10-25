@@ -1,0 +1,57 @@
+{
+  "timer": [
+    "⚙ Personalitza",
+    "Configuració de concentració i descans",
+    "La sessió actual es conserva; els canvis només s'apliquen a sessions noves.",
+    "Concentració · min",
+    "Pausa curta · min",
+    "Pausa llarga · min",
+    "Sessions per cicle",
+    "Valors predeterminats",
+    "Desa",
+    "Introdueix nombres enters dins dels intervals indicats.",
+    "Configuració desada"
+  ],
+  "goals": [
+    "✦ OBJECTIUS DIARIS",
+    "Una mica de progrés cada dia",
+    "Els minuts provenen de les sessions de concentració completades.",
+    "⚙ Edita",
+    "Objectius diaris per activitat",
+    "Introdueix 0 per amagar un objectiu. Només compten les sessions completades.",
+    "Objectius desats",
+    "Introdueix un nombre enter de minuts entre 0 i 720.",
+    "Defineix un objectiu",
+    "min",
+    "completat",
+    "avui",
+    "Aquesta setmana",
+    "Objectiu setmanal (min)",
+    "Els objectius setmanals han d'estar entre 0 i 5040 minuts."
+  ],
+  "analytics": [
+    "Anàlisi de les activitats registrades",
+    "Activitat",
+    "Període",
+    "Des de",
+    "Fins a",
+    "Minuts registrats",
+    "Sessions",
+    "Mitjana per sessió",
+    "Ratxa actual",
+    "No hi ha sessions registrades en aquest període",
+    "Comparació d'objectius",
+    "No hi ha objectius diaris establerts",
+    "Tasques completades",
+    "Distribució diària",
+    "Any",
+    "Exporta CSV",
+    "Selecciona un dia per veure'n els detalls"
+  ],
+  "analyticsDomain": [
+    "Estudi",
+    "Lectura",
+    "Feina",
+    "Esport"
+  ]
+}
