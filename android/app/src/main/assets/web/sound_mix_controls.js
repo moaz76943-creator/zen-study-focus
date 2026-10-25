@@ -1,5 +1,6 @@
-/* Optional v21 nature mixer controller. The existing app.js owns audio generation and
-   playback; this module only coordinates its public callbacks. */
+/* Optional v21 nature mixer controller. app.js owns audio playback; this file
+ * coordinates only its public callbacks and explicit lifecycle cleanup.
+ */
 (function(root) {
  'use strict';
  function createSoundMixer({catalog,isPlaying,start,stop,setVolume}) {
@@ -8,6 +9,7 @@
   const ids=new Set(catalog.map(s=>s&&s.id).filter(id=>typeof id==='string'));
   if(ids.size!==catalog.length)throw new TypeError('Duplicate sound ID');
   let disposed=false;
+  const subscriptions=new Set();
   function percentage(value) {
    if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>100)return null;
    return Math.round(value)/100;
@@ -34,11 +36,32 @@
    return true;
   }
   function stopAll() {
+   if(disposed)return;
    for(const id of ids)if(isPlaying(id))stop(id);
   }
-  function activeIds() {return [...ids].filter(id=>isPlaying(id));}
-  function dispose() {if(disposed)return;stopAll();disposed=true;}
-  return Object.freeze({applyMix,setPercent,stopAll,activeIds,dispose});
+  function activeIds() {return disposed?[]:[...ids].filter(id=>isPlaying(id));}
+  // Optional opt-in: the host decides whether audio continues in background.
+  // In particular, changing locale must never invoke stopAll or playback.
+  function attachLifecycle(doc,{stopOnBackground=false}={}) {
+   if(disposed||!doc||typeof doc.addEventListener!=='function'||
+       typeof doc.removeEventListener!=='function')return () => {};
+   function hidden() {if(stopOnBackground&&doc.visibilityState==='hidden')stopAll();}
+   function leave() {if(stopOnBackground)stopAll();}
+   doc.addEventListener('visibilitychange',hidden);
+   doc.addEventListener('pagehide',leave);
+   let active=true;
+   function detach() {
+    if(!active)return;
+    active=false;
+    doc.removeEventListener('visibilitychange',hidden);
+    doc.removeEventListener('pagehide',leave);
+    subscriptions.delete(detach);
+   }
+   subscriptions.add(detach);
+   return detach;
+  }
+  function dispose() {if(disposed)return;stopAll();for(const detach of [...subscriptions])detach();disposed=true;}
+  return Object.freeze({applyMix,setPercent,stopAll,activeIds,attachLifecycle,dispose});
  }
  const api=Object.freeze({createSoundMixer});
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
