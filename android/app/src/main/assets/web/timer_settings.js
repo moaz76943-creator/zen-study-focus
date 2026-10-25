@@ -2,12 +2,12 @@
 const TSET_I18N = {
  en:['⚙ Customize','Focus and break settings','Your current session is preserved; changes apply to new sessions.',
      'Focus · min','Short rest · min','Long rest · min','Sessions per cycle','Defaults','Save',
-     'Use whole numbers within the displayed ranges.','Settings saved','Could not save timer settings. Try again.'],
+     'Use whole numbers within the displayed ranges.','Settings saved'],
  ar:['⚙ تخصيص','إعدادات التركيز والراحة','الجلسة الحالية لن تتوقف؛ التعديل يطبق على الجلسات الجديدة.',
      'التركيز · دقائق','الراحة القصيرة · دقائق','الراحة الطويلة · دقائق','جلسات كل دورة','الافتراضي','حفظ',
-     'أدخل أعدادًا صحيحة ضمن النطاقات المحددة.','تم حفظ الإعدادات','تعذر حفظ إعدادات المؤقت. حاول مرة أخرى.']
+     'أدخل أعدادًا صحيحة ضمن النطاقات المحددة.','تم حفظ الإعدادات']
 };
-function tsetText(i){return TSET_I18N[cfg.lang==='ar'?'ar':'en'][i];}
+function tsetText(i){const base=TSET_I18N[cfg.lang==='ar'?'ar':'en'][i];return globalThis.DF99Locale?.t(cfg.lang,'timer',String(i),base) ?? base;}
 let tsetEditingDomain = null;
 function tsetCount(){return Number.isInteger(cfg.roundsPerCycle)&&cfg.roundsPerCycle>=1&&cfg.roundsPerCycle<=12?cfg.roundsPerCycle:4;}
 function refreshTimerSettings(){
@@ -43,23 +43,12 @@ function saveTimerSettings(){
  const focus=tsetNumber('tsetFocus',1,240),short=tsetNumber('tsetShort',1,60),
   long=tsetNumber('tsetLong',1,120),rounds=tsetNumber('tsetRounds',1,12);
  if([focus,short,long,rounds].includes(null)){showToast(tsetText(9));return false;}
- // Stage the updated settings and only expose them after v21 confirms persistence.
- // The current focus session and cycle counters must survive a rejected native ACK.
  const previous=cfg.domainFocusMinutes;
- const domainFocusMinutes={...(previous&&typeof previous==='object'&&!Array.isArray(previous)?previous:{}),[tsetEditingDomain]:focus};
- const next={...cfg,domainFocusMinutes,shortMin:short,longMin:long,roundsPerCycle:rounds};
- if(tsetCount()!==rounds)next.focusCycleCount=0;
- try {
-  if(saveFortressData('zen_fortress_cfg_v21',next)!==true)
-   throw new Error('TIMER_SETTINGS_NOT_ACKNOWLEDGED');
- } catch (_) {
-  showToast(tsetText(11));
-  return false;
- }
- cfg.domainFocusMinutes=domainFocusMinutes;
+ cfg.domainFocusMinutes={...(previous&&typeof previous==='object'&&!Array.isArray(previous)?previous:{}),[tsetEditingDomain]:focus};
  cfg.shortMin=short;cfg.longMin=long;
  if(tsetCount()!==rounds)cfg.focusCycleCount=0;
  cfg.roundsPerCycle=rounds;
+ saveFortressData('zen_fortress_cfg_v21',cfg);
  closeModal('timerSettingsModal');refreshTimerSettings();renderDomainState();
  // Don't replace a running, paused or quick-training session.
  const fresh=!timerRunning&&!quickTraining?.active&&timerSessionId===null&&timerLeft===timerTotal;

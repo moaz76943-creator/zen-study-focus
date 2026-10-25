@@ -45,37 +45,6 @@
     const symbol=match[2]==='☐'?'☑':'☐';
     return {text:value.slice(0,from)+part.replace(/^(\s*)(?:☐|☑)/u,'$1'+symbol)+value.slice(stop),changed:true};
   }
-  function checklistProgress(text){
-    const lines=String(text||'').split(/\r?\n/u);
-    let total=0,done=0;
-    for(const line of lines){
-      if(/^\s*(?:☐|☑|\[([ xX])\]|[-*]\s*\[([ xX])\])(?:\s|$)/u.test(line)){
-        total++;
-        if(/^\s*(?:☑|\[[xX]\]|[-*]\s*\[[xX]\])(?:\s|$)/u.test(line))done++;
-      }
-    }
-    return {total,done};
-  }
-  function serializeNote(note,format='txt'){
-    if(!note||!validId(note.id)||typeof note.title!=='string'||typeof note.body!=='string')
-      throw new Error('INVALID_NOTE');
-    if(format!=='txt'&&format!=='md')throw new Error('INVALID_FORMAT');
-    const e=note.notesV21||{},cornell=e.cornell;
-    const safe=s=>format==='md'?String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'):String(s);
-    const head=format==='md'?'# '+safe(note.title):note.title;
-    const segments=[head,safe(note.body)];
-    if(cornell&&['cues','notes','summary'].every(k=>typeof cornell[k]==='string')){
-      for(const [key,label] of [['cues','Questions / Cues'],['notes','Main notes'],['summary','Summary']]){
-        if(cornell[key].trim())segments.push((format==='md'?'## ':'')+label+'\n'+safe(cornell[key]));
-      }
-    }
-    return segments.filter(Boolean).join('\n\n');
-  }
-  function draftVersionMatches(draft,note){
-    if(!draft||draft.baseFingerprint===undefined||draft.baseFingerprint===null)return true;
-    return typeof draft.baseFingerprint==='string' &&
-      draft.baseFingerprint===(note?JSON.stringify(note):null);
-  }
   function createController(adapter){
     if(!adapter||!adapter.core||typeof adapter.readState!=='function'||
        typeof adapter.commitNotes!=='function'||typeof adapter.nextNumericId!=='function')
@@ -136,12 +105,7 @@
           const id=adapter.nextNumericId();
           if(!validId(id))throw new Error('New note requires a numeric v21 ID');
           next=core.createNote(before.notesList,{id,...patch,isStarter:false,notesV21:ext},{now:stamp});
-        }else {
-          if(d.expectedSnapshot!==undefined &&
-            JSON.stringify(one(d.id,before.notesList))!==d.expectedSnapshot)
-            throw new Error('NOTE_CONFLICT_RELOAD_REQUIRED');
-          next=core.edit(before.notesList,d.id,patch,{now:stamp,extension:ext});
-        }
+        }else next=core.edit(before.notesList,d.id,patch,{now:stamp,extension:ext});
         return {...before,notesList:next};
       });
     }
@@ -203,18 +167,8 @@
       },'both');
     }
     function recall(id){const s=read();return core.recallCards(one(id,s.notesList));}
-    function backlinks(id){return core.backlinks(read().notesList,id);}
-    function query(options={}){
-      const all=read().notesList;
-      const category=options.category;
-      if(category && category!=='all'){
-        if(!['cornell','flash','quick'].includes(category))throw new Error('INVALID_CATEGORY');
-        // Filter FIRST, then let the canonical Core order and paginate.
-        return core.search(all.filter(n=>n&&n.catKey===category),options);
-      }
-      return core.search(all,options);
-    }
-    return Object.freeze({read,one,save,toggle,duplicate,move,purge,history,link,linkTask,extract,recall,backlinks,query});
+    function query(options){return core.search(read().notesList,options);}
+    return Object.freeze({read,one,save,toggle,duplicate,move,purge,history,link,linkTask,extract,recall,query});
   }
   function el(tag,cls,label){
     const e=document.createElement(tag);if(cls)e.className=cls;
@@ -225,34 +179,28 @@
     en:{all:'All notes',archive:'Archive',trash:'Trash',notebooks:'Notebook',tag:'Tag',allbooks:'All notebooks',
       alltags:'All tags',empty:'No notes in this view',focus:'Focus writing',normal:'Exit focus',read:'Read / Review',
       edit:'Edit',restore:'Restore',delete:'Move to trash',purge:'Delete forever',archiveIt:'Archive',
-      undo:'Undo',redo:'Redo',find:'Find in note',next:'Next',preview:'Preview',write:'Write',done:'Toggle completed',
+      undo:'Undo',redo:'Redo',find:'Find in note',next:'Next',preview:'Preview',write:'Write',
       question:'Questions / cues',explain:'Main notes',summary:'Summary',pairQ:'Recall question',
       pairA:'Answer',addPair:'Add Q&A',tags:'Tags (comma-separated)',book:'Notebook',link:'Link note',
       task:'Create tasks from unchecked items',saved:'Note saved',failed:'Could not save note',
       confirm:'Delete permanently? An exported backup is required.',review:'Tap answer to reveal',
-      draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes',
-      copied:'Copied to clipboard',copyFailed:'Clipboard unavailable; content was not copied',
-      missing:'Linked note unavailable',contents:'Contents',copyTxt:'Copy TXT',copyMd:'Copy Markdown',
-      duplicate:'Duplicate',linkTask:'Link task',chooseNote:'Choose a note to link',chooseTask:'Choose a task to link',searchRecords:'Search',cancel:'Cancel',idRequired:'Choose a unique numeric ID from the available records.',noTargets:'No available records to link.',confirmDelete:'Permanently delete this note? This cannot be undone.',confirmBackup:'Have you exported a verified backup? Cancel if not.',extractConfirm:'Create tasks from unfinished checklist items in this note?',more:'More actions',list:'• List',conflict:'This note changed since you opened it. Copy your edits or reopen the latest version before saving.'},
+      draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes'},
     ar:{all:'كل الملاحظات',archive:'الأرشيف',trash:'سلة المحذوفات',notebooks:'الدفتر',tag:'الوسم',allbooks:'كل الدفاتر',
       alltags:'كل الوسوم',empty:'لا توجد ملاحظات في هذا العرض',focus:'تركيز الكتابة',normal:'إنهاء التركيز',read:'قراءة ومراجعة',
       edit:'تحرير',restore:'استعادة',delete:'نقل إلى السلة',purge:'حذف نهائي',archiveIt:'أرشفة',
-      undo:'تراجع',redo:'إعادة',find:'بحث داخل الملاحظة',next:'التالي',preview:'معاينة',write:'كتابة',done:'تبديل حالة الإنجاز',
+      undo:'تراجع',redo:'إعادة',find:'بحث داخل الملاحظة',next:'التالي',preview:'معاينة',write:'كتابة',
       question:'الأسئلة والكلمات المفتاحية',explain:'الشرح والملاحظات',summary:'الملخص',pairQ:'سؤال المراجعة',
       pairA:'الإجابة',addPair:'إضافة سؤال وإجابة',tags:'الوسوم (افصل بفاصلة)',book:'الدفتر',
       link:'ربط ملاحظة',task:'إنشاء مهام من مربعات الاختيار',saved:'تم حفظ الملاحظة',
       failed:'تعذّر حفظ الملاحظة',confirm:'حذف نهائي؟ تأكد من وجود نسخة احتياطية مصدّرة.',
       review:'المس الإجابة لإظهارها',draft:'المحتوى القديم محفوظ بمعزل عن كورنيل',filter:'تصفية',
-      status:'الحالة',linked:'ملاحظات مرتبطة',copied:'تم النسخ إلى الحافظة',
-      copyFailed:'الحافظة غير متاحة؛ لم يتم نسخ النص',missing:'الملاحظة المرتبطة غير متاحة',
-      contents:'المحتويات',copyTxt:'نسخ نص TXT',copyMd:'نسخ Markdown',duplicate:'استنساخ',linkTask:'ربط مهمة',chooseNote:'اختر ملاحظة للربط',chooseTask:'اختر مهمة للربط',searchRecords:'بحث',cancel:'إلغاء',idRequired:'اختر معرّفًا رقميًا فريدًا من السجلات المتاحة.',noTargets:'لا توجد سجلات متاحة للربط.',confirmDelete:'حذف هذه الملاحظة نهائيًا؟ لا يمكن التراجع عن ذلك.',confirmBackup:'هل صدّرت نسخة احتياطية متحققًا منها؟ اختر الإلغاء إن لم تفعل.',extractConfirm:'إنشاء مهام من عناصر قائمة التحقق غير المكتملة في هذه الملاحظة؟',more:'المزيد',list:'• قائمة',conflict:'تغيرت هذه الملاحظة بعد فتحها. انسخ نصك أو حدّث الملاحظة قبل الحفظ.'}
+      status:'الحالة',linked:'ملاحظات مرتبطة'}
   };
   function t(key){return languages[instance&&instance.adapter.locale&&instance.adapter.locale()==='ar'?'ar':'en'][key]||key;}
   function style(){
     if(document.getElementById('nsux-style'))return;
     const s=el('style');s.id='nsux-style';
     s.textContent=[
-      'dialog.nsux-link-picker{box-sizing:border-box;width:min(92vw,440px);max-height:85dvh;border:1px solid #dce5f0;border-radius:20px;padding:18px;color:#1c2e4d;background:#fff}dialog.nsux-link-picker::backdrop{background:#10213d66}.nsux-link-picker label{display:grid;gap:6px}.nsux-link-picker input{min-width:0;max-width:100%;font:inherit;padding:10px}.nsux-link-list{display:grid;gap:8px;max-height:50dvh;overflow:auto;margin:12px 0}.nsux-link-list button{text-align:start;overflow-wrap:anywhere}.nsux-link-list small{display:block}',
       '.nsux-controls,.nsux-inline,.nsux-tabs,.nsux-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}',
       '.nsux-controls{margin:8px 0 16px}.nsux-controls select,.nsux-controls input,.nsux-inline input,.nsux-inline select{min-width:0;max-width:100%;padding:10px;border:1px solid var(--df22-border,#dce5f0);border-radius:12px;background:#fff;color:var(--df22-ink,#1c2e4d);font:inherit}',
       '.nsux-controls select{flex:1 1 100px}.nsux-controls input{flex:1 1 125px}',
@@ -264,13 +212,11 @@
       '.nsux-inline>*{flex:1 1 120px}.nsux-meta{margin:7px 0;color:#50617a;font-size:.76rem}',
       '.nsux-reading #nsux-fields>label,.nsux-reading #nsux-fields>#nsux-cornell,.nsux-reading #nsux-fields>#nsux-recall,.nsux-reading #nsux-fields>.nsux-btn{display:none!important}',
       '.nsux-reading #inpNoteTitle,.nsux-reading #inpNoteBody,.nsux-reading #nsBodyLabel,.nsux-reading #nsCounter,.nsux-reading #nsux-fields .nsux-meta,.nsux-reading #nsux-tools,.nsux-reading .ns-meta,.nsux-reading .ns-options,.nsux-reading .modal-actions,.nsux-reading #nsEditorTemplates{display:none!important}',
-      '.nsux-reading .nsux-advanced>summary{display:none}.nsux-reading #nsux-preview{display:block!important;max-height:65vh;max-height:65dvh}',
+      '.nsux-reading #nsux-preview{display:block!important;max-height:65dvh}',
       '.nsux-reader{white-space:normal;overflow-wrap:anywhere;line-height:1.7;color:#1c2e4d;padding:14px;border:1px solid #dce5f0;border-radius:15px;background:white;max-height:42vh;overflow:auto}',
       '.nsux-reader p{white-space:pre-wrap;margin:7px 0}.nsux-reader h4{font-size:1.02rem;margin:12px 0 4px}.nsux-reader .nsux-check{display:flex;gap:10px;align-items:baseline}.nsux-reader .nsux-check input{pointer-events:none}',
       '.nsux-card{border:1px solid var(--df22-border,#dce5f0);border-radius:22px;background:#fff;padding:15px;box-shadow:var(--df22-shadow-low,0 2px 10px #203b5f10)}',
       '.nsux-card h3{margin:8px 0;color:#1c2e4d;overflow-wrap:anywhere}.nsux-card p{white-space:pre-wrap;overflow-wrap:anywhere;color:#50617a;font-size:.79rem;max-height:7em;overflow:hidden}',
-      '.nsux-advanced{border-top:1px solid #edf0f5;margin-top:8px}.nsux-advanced>summary{cursor:pointer;min-height:44px;padding:12px 6px;color:#1759ad;font-weight:650}.nsux-advanced>summary:focus-visible{outline:2px solid #3288eb;border-radius:9px}',
-      '.nsux-more{margin-top:8px;border-top:1px solid #edf0f5;padding-top:8px}.nsux-more>summary{cursor:pointer;display:list-item;list-style:inside;min-height:44px;padding:11px 7px;color:#1759ad;font-weight:650}.nsux-more>summary:focus-visible{outline:2px solid #3288eb;border-radius:10px}.nsux-more .nsux-actions{padding:5px 0 4px}',
       '.nsux-blank{padding:25px;text-align:center;background:#fff;border:1px dashed #bfd6f4;border-radius:18px;color:#50617a}',
       '#noteModal.nsux-focus .ns-editor{max-width:760px;width:100%;max-height:100dvh;border-radius:0}',
       '#noteModal.nsux-focus #nsEditorTemplates,#noteModal.nsux-focus .ns-meta,#noteModal.nsux-focus .ns-options{display:none}',
@@ -282,41 +228,12 @@
     document.head.appendChild(s);
   }
   function field(parent,label,value,tag='input'){
-    const wrap=el('label'),caption=el('span','',label),input=el(tag,tag==='textarea'?'nsux-area':'');
-    wrap.appendChild(caption);
+    const wrap=el('label','',label),input=el(tag,tag==='textarea'?'nsux-area':'');
     if(tag==='textarea')input.rows=3;else input.type='text';
     input.value=value||'';input.dir='auto';wrap.appendChild(input);parent.appendChild(wrap);return input;
   }
   function button(parent,label,fn,extra){
     const b=el('button','nsux-btn'+(extra?' '+extra:''),label);b.type='button';b.addEventListener('click',fn);parent.appendChild(b);return b;
-  }
-  // Only explicitly owned UI labels are refreshed. Never inspect/rewrite user text.
-  function localizedElement(tag,cls,key){
-    const node=el(tag,cls,t(key));node.dataset.nsuxI18n=key;return node;
-  }
-  function localizedButton(parent,key,fn,extra){
-    const node=button(parent,t(key),fn,extra);node.dataset.nsuxI18n=key;return node;
-  }
-  function localizedField(parent,key,value,tag){
-    const input=field(parent,t(key),value,tag);
-    input.parentNode.firstChild.dataset.nsuxI18n=key;return input;
-  }
-  function refreshLocale(){
-    if(!instance)return;
-    document.querySelectorAll('[data-nsux-i18n]').forEach(node=>{node.textContent=t(node.dataset.nsuxI18n);});
-    if(typeof nsApplyLabels==='function')nsApplyLabels();
-    const modal=document.getElementById('noteModal');
-    if(modal?.classList.contains('open')){
-      document.getElementById('nsEditorHeading').textContent=nsLabel(typeof nsEditId==='number'?16:15);
-      document.getElementById('nsSaveButton').textContent=nsLabel(typeof nsEditId==='number'?26:25);
-      document.getElementById('nsux-focus-toggle').textContent=t(modal.classList.contains('nsux-focus')?'normal':'focus');
-      if(typeof nsUpdateCount==='function')nsUpdateCount();
-      if(typeof nsRefreshDraftLocale==='function')nsRefreshDraftLocale();
-    }
-    const status=document.getElementById('nsux-status');status.setAttribute('aria-label',t('status'));
-    document.getElementById('nsux-book-filter').setAttribute('aria-label',t('notebooks'));
-    document.getElementById('nsux-tag-filter').setAttribute('aria-label',t('tag'));
-    renderStack();
   }
   function renderText(container,text,query){
     container.replaceChildren();const needle=String(query||'').trim();
@@ -343,7 +260,7 @@
   function createPairs(parent,pairs){
     parent.replaceChildren();
     pairs.forEach((pair,i)=>{
-      const group=el('div','nsux-inline'),q=localizedField(group,'pairQ',pair.question),a=localizedField(group,'pairA',pair.answer);
+      const group=el('div','nsux-inline'),q=field(group,t('pairQ'),pair.question),a=field(group,t('pairA'),pair.answer);
       group.dataset.key=pair.key||'pair-'+i;
       button(group,'×',()=>{group.remove();schedule();},'danger');
       parent.appendChild(group);[q,a].forEach(input=>input.addEventListener('input',schedule));
@@ -358,43 +275,41 @@
     const body=document.getElementById('inpNoteBody');body.dir='auto';document.getElementById('inpNoteTitle').dir='auto';
     const toolbar=el('div','nsux-actions'),extra=el('div','nsux-extra');
     toolbar.id='nsux-tools';extra.id='nsux-fields';
-    const basic=[['heading','H1'],['bullet',t('list')],['check','☐'],['number','1.'],['quote','❝']];
-    basic.forEach(([key,label])=>{const action=button(toolbar,label,()=>{
+    const basic=[['heading','H1'],['bullet','• List'],['check','☐'],['number','1.'],['quote','❝']];
+    basic.forEach(([key,label])=>button(toolbar,label,()=>{
       if(document.activeElement!==body)body.focus();
       const pos=formatSelection(body.value,body.selectionStart,body.selectionEnd,key);
       if(pos.text.length>NOTE_LIMIT){instance.adapter.notify?.('Note exceeds maximum size');return;}
       body.value=pos.text;body.setSelectionRange(pos.cursorStart,pos.cursorEnd);body.focus();schedule();
       if(typeof nsUpdateCount==='function')nsUpdateCount();
-    });if(key==='bullet')action.dataset.nsuxI18n='list';});
-    localizedButton(toolbar,'done',()=>{
+    }));
+    button(toolbar,'☑ Done / تم',()=>{
       const old=body.selectionStart,changed=toggleChecklistLine(body.value,old);
       if(!changed.changed)return;
       body.value=changed.text;body.focus();body.setSelectionRange(old,old);
       schedule();renderPreview();if(typeof nsUpdateCount==='function')nsUpdateCount();
     });
-    const view=localizedButton(toolbar,'preview',()=>togglePreview()),focus=localizedButton(toolbar,'focus',()=>toggleFocus());
+    const view=button(toolbar,t('preview'),()=>togglePreview()),focus=button(toolbar,t('focus'),()=>toggleFocus());
     view.id='nsux-preview-toggle';focus.id='nsux-focus-toggle';
-    const find=localizedField(extra,'find','');find.id='nsux-find';
+    const find=field(extra,t('find'),'');find.id='nsux-find';
     const status=el('div','nsux-meta');status.id='nsux-search-count';extra.appendChild(status);
-    localizedButton(extra,'next',()=>findNext());
+    button(extra,t('next'),()=>findNext());
     const preview=el('div','nsux-reader');preview.id='nsux-preview';preview.hidden=true;extra.appendChild(preview);
     const cornell=el('div','nsux-extra');cornell.id='nsux-cornell';extra.appendChild(cornell);
     instance.fields={
-      cues:localizedField(cornell,'question','', 'textarea'),
-      notes:localizedField(cornell,'explain','', 'textarea'),
-      summary:localizedField(cornell,'summary','', 'textarea'),
-      notebook:localizedField(extra,'book',''),
-      tags:localizedField(extra,'tags','')
+      cues:field(cornell,t('question'),'', 'textarea'),
+      notes:field(cornell,t('explain'),'', 'textarea'),
+      summary:field(cornell,t('summary'),'', 'textarea'),
+      notebook:field(extra,t('book'),''),
+      tags:field(extra,t('tags'),'')
     };
     const pairs=el('div','nsux-extra');pairs.id='nsux-recall';extra.appendChild(pairs);
     const pairList=el('div','nsux-extra');pairs.appendChild(pairList);instance.pairList=pairList;
-    localizedButton(pairs,'addPair',()=>{const c=[...instance.pairList.children].length;
+    button(pairs,t('addPair'),()=>{const c=[...instance.pairList.children].length;
       const a=collectPairs(true);a.push({key:'pair-'+Date.now()+'-'+c,question:'',answer:''});createPairs(instance.pairList,a);
       schedule();
     });
-    const advanced=el('details','nsux-advanced');instance.advanced=advanced;
-    advanced.appendChild(localizedElement('summary','','more'));advanced.appendChild(extra);
-    body.parentNode.insertBefore(toolbar,body);document.getElementById('nsCounter').after(advanced);
+    body.parentNode.insertBefore(toolbar,body);document.getElementById('nsCounter').after(extra);
     find.addEventListener('input',()=>{renderPreview();findNext(true);});
     body.addEventListener('input',()=>{renderPreview();});
     [instance.fields.cues,instance.fields.notes,instance.fields.summary,
@@ -416,7 +331,6 @@
     const kind=document.getElementById('selNoteCat').value;
     document.getElementById('nsux-cornell').hidden=kind!=='cornell';
     document.getElementById('nsux-recall').hidden=kind!=='flash';
-    if((kind==='cornell'||kind==='flash')&&instance?.advanced)instance.advanced.open=true;
   }
   function renderPreview(){
     if(!instance)return;
@@ -446,8 +360,6 @@
   function onOpen(note){
     if(!instance)return;
     const n=note||{},ext=n.notesV21||{},f=instance.fields;
-    instance.openedSnapshot=note?JSON.stringify(note):null;
-    if(instance.advanced)instance.advanced.open=false;
     f.cues.value=ext.cornell?.cues||'';f.notes.value=ext.cornell?.notes||'';
     f.summary.value=ext.cornell?.summary||'';f.tags.value=(ext.tags||[]).join(', ');
     f.notebook.value=ext.notebookId||'';createPairs(instance.pairList,ext.recallPairs||[]);
@@ -462,8 +374,7 @@
     if(!instance)return {};
     const f=instance.fields;
     return {cornell:{cues:f.cues.value,notes:f.notes.value,summary:f.summary.value},
-      notebookId:f.notebook.value,tags:f.tags.value,recallPairs:collectPairs(true),
-      baseFingerprint:instance.openedSnapshot};
+      notebookId:f.notebook.value,tags:f.tags.value,recallPairs:collectPairs(true)};
   }
   function restoreDraftFields(d){
     if(!instance||!d)return;
@@ -484,7 +395,6 @@
       catKey:cat,calDate:document.getElementById('inpNoteCalDate').value,
       pinned:document.getElementById('nsPinCheck').checked,favorite:document.getElementById('nsFavCheck').checked,
       blur:document.getElementById('chkNoteBlur').checked,notebookId:f.notebook.value,
-      expectedSnapshot:instance.openedSnapshot,
       tags:parseTags(f.tags.value),recallPairs:pairs};
     // Never guess Cornell structure for a legacy note. Only authored fields are persisted.
     if(cat==='cornell')result.cornell={cues:f.cues.value,notes:f.notes.value,summary:f.summary.value};
@@ -492,7 +402,6 @@
   }
   function save(){
     if(!instance){if(typeof showToast==='function')showToast('⚠️ Notes UI is not connected; nothing was saved.');return false;}
-    if(!document.getElementById('noteModal')?.classList.contains('open'))return false;
     try{
       instance.controller.save(draftToSave());
       if(typeof nsClearDraftForSavedNote==='function')nsClearDraftForSavedNote();
@@ -500,20 +409,9 @@
       if(typeof nsEditId!=='undefined')nsEditId=null;
       renderStack();instance.adapter.onRefresh?.();instance.adapter.notify?.(t('saved'));
       return true;
-    }catch(e){instance.adapter.notify?.(e.message==='NOTE_CONFLICT_RELOAD_REQUIRED'?t('conflict'):t('failed')+': '+e.message);return false;}
+    }catch(e){instance.adapter.notify?.(t('failed')+': '+e.message);return false;}
   }
-  function cardAction(parent,label,fn,danger){return button(parent,label,async()=>{try{await fn();renderStack();}catch(e){instance.adapter.notify?.(e.message);}},danger?'danger':'');}
-  function copyExport(note,format){
-    let content;
-    try{content=serializeNote(note,format);}
-    catch(e){instance.adapter.notify?.(e.message);return;}
-    if(typeof navigator==='undefined'||!navigator.clipboard?.writeText){
-      instance.adapter.notify?.(t('copyFailed'));return;
-    }
-    Promise.resolve().then(()=>navigator.clipboard.writeText(content)).then(
-      ()=>instance.adapter.notify?.(t('copied')),
-      ()=>instance.adapter.notify?.(t('copyFailed')));
-  }
+  function cardAction(parent,label,fn,danger){return button(parent,label,()=>{try{fn();renderStack();}catch(e){instance.adapter.notify?.(e.message);}},danger?'danger':'');}
   function statusView(){
     const root=document.getElementById('nsux-filters');if(!root)return;
     const a=instance.controller.read().notesList;
@@ -538,22 +436,24 @@
       pinnedOnly:document.getElementById('nsPinnedOnly')?.getAttribute('aria-pressed')==='true'};
     const bk=document.getElementById('nsux-book-filter').value,tag=document.getElementById('nsux-tag-filter').value;
     if(bk)filters.notebookId=bk;if(tag)filters.tags=[tag];
-    if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all'&&noteTagFilter)filters.category=noteTagFilter;
+    if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all'&&noteTagFilter)filters.kind=undefined;
     const signature=JSON.stringify(filters);
     if(signature!==instance.filterSignature){instance.filterSignature=signature;instance.page=0;}
     const offset=(instance.page||0)*100;
-    const result=instance.controller.query({...filters,offset,limit:100});
-    const found=result.items;
+    let result=instance.controller.query({...filters,offset,limit:100});
+    let found=result.items;
+    if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all')
+      found=found.filter(n=>n.catKey===noteTagFilter);
     const all=instance.controller.read().notesList.filter(n=>n&&!n.isStarter&&!n.notesV21?.deletedAt);
     const total=document.getElementById('nsTotal'),pinned=document.getElementById('nsPinned'),count=document.getElementById('nsVisibleCount');
     if(total)total.textContent=String(all.length);
     if(pinned)pinned.textContent=String(all.filter(n=>n.pinned).length);
     if(count)count.textContent=String(Math.min(offset+found.length,result.total))+' / '+result.total;
     box.replaceChildren();
-    if(!found.length){box.appendChild(localizedElement('div','nsux-blank','empty'));return true;}
+    if(!found.length){box.appendChild(el('div','nsux-blank',t('empty')));return true;}
     found.forEach(n=>{
       const card=el('article','nsux-card'),top=el('div','nsux-inline');
-      top.appendChild(el('span','ns-type',typeof getNoteTagLabel==='function'?getNoteTagLabel(n.catKey):(n.catKey||'note')));
+      top.appendChild(el('span','ns-type',n.catKey||'note'));
       top.appendChild(el('span','nsux-meta',n.calDate||''));
       card.appendChild(top);
       const title=el('h3','',n.title);title.dir='auto';card.appendChild(title);
@@ -564,73 +464,50 @@
       }
       card.appendChild(body);
       const safeTags=Array.isArray(n.notesV21?.tags)?n.notesV21.tags:[];
-    const progress=checklistProgress((n.body||'')+'\n'+(n.notesV21?.cornell?.notes||''));
-    const meta=el('div','nsux-meta',(n.notesV21?.notebookId||'')+
-      (safeTags.length?' · '+safeTags.join(' · '):'')+
-      (progress.total?' · ☑ '+progress.done+'/'+progress.total:''));
+    const meta=el('div','nsux-meta',(n.notesV21?.notebookId||'')+' · '+safeTags.join(' · '));
       card.appendChild(meta);
       const actions=el('div','nsux-actions');
-      const secondary=el('div','nsux-actions');
       if(s==='trash'){
         cardAction(actions,t('restore'),()=>instance.controller.move(n.id,'restore'));
-        cardAction(secondary,t('purge'),()=>instance.controller.purge(n.id),'danger');
+        cardAction(actions,t('purge'),()=>instance.controller.purge(n.id),'danger');
       }else{
         cardAction(actions,t('edit'),()=>{openNoteModal(null,n.id);});
+        cardAction(actions,'★',()=>instance.controller.toggle(n.id,'favorite'));
+        cardAction(actions,'📌',()=>instance.controller.toggle(n.id,'pinned'));
         cardAction(actions,t('read'),()=>showReader(n));
-        cardAction(secondary,t('duplicate'),()=>instance.controller.duplicate(n.id));
-        cardAction(secondary,'★',()=>instance.controller.toggle(n.id,'favorite'));
-        cardAction(secondary,'📌',()=>instance.controller.toggle(n.id,'pinned'));
-        cardAction(secondary,t('copyTxt'),()=>copyExport(n,'txt'));
-        cardAction(secondary,t('copyMd'),()=>copyExport(n,'md'));
-        cardAction(secondary,t('undo'),()=>instance.controller.history(n.id,'undo'));
-        cardAction(secondary,t('redo'),()=>instance.controller.history(n.id,'redo'));
-        cardAction(secondary,s==='archived'?t('restore'):t('archiveIt'),()=>instance.controller.move(n.id,s==='archived'?'restore':'archive'));
-        cardAction(secondary,t('delete'),()=>instance.controller.move(n.id,'trash'),'danger');
+        cardAction(actions,t('undo'),()=>instance.controller.history(n.id,'undo'));
+        cardAction(actions,t('redo'),()=>instance.controller.history(n.id,'redo'));
+        cardAction(actions,s==='archived'?t('restore'):t('archiveIt'),()=>instance.controller.move(n.id,s==='archived'?'restore':'archive'));
+        cardAction(actions,t('delete'),()=>instance.controller.move(n.id,'trash'),'danger');
       }
       if(s!=='trash'){
-        if(instance.adapter.openCalendarForNote)cardAction(secondary,'📅',()=>instance.adapter.openCalendarForNote(n.id));
-        if(instance.adapter.pickNoteLinkTarget)cardAction(secondary,t('link'),async()=>{
-          const target=await instance.adapter.pickNoteLinkTarget(n.id,instance.controller.read().notesList);
+        if(instance.adapter.openCalendarForNote)cardAction(actions,'📅',()=>instance.adapter.openCalendarForNote(n.id));
+        if(instance.adapter.pickNoteLinkTarget)cardAction(actions,t('link'),()=>{
+          const target=instance.adapter.pickNoteLinkTarget(n.id,instance.controller.read().notesList);
           if(target!==null&&target!==undefined)instance.controller.link(n.id,target);
         });
-        if(instance.adapter.pickTaskLinkTarget)cardAction(secondary,'↗ '+t('linkTask'),async()=>{
-          const target=await instance.adapter.pickTaskLinkTarget(n.id,instance.controller.read().tasksList);
+        if(instance.adapter.pickTaskLinkTarget)cardAction(actions,'↗ '+t('task'),()=>{
+          const target=instance.adapter.pickTaskLinkTarget(n.id,instance.controller.read().tasksList);
           if(target!==null&&target!==undefined)instance.controller.linkTask(n.id,target);
         });
         if(instance.adapter.confirmTaskExtraction && instance.adapter.commitBoth)
-          cardAction(secondary,t('task'),()=>{
+          cardAction(actions,t('task'),()=>{
             const state=instance.controller.read();const c=instance.controller.one(n.id,state.notesList);
             if(instance.adapter.confirmTaskExtraction(n.id,c)===true)instance.controller.extract(n.id);
           });
       }
-      card.appendChild(actions);
-      if(secondary.children.length){
-        const overflow=el('details','nsux-more');
-        overflow.appendChild(localizedElement('summary','','more'));
-        overflow.appendChild(secondary);card.appendChild(overflow);
-      }
-      box.appendChild(card);
+      card.appendChild(actions);box.appendChild(card);
     });
-    if(offset+result.items.length<result.total)localizedButton(box,'more',()=>{instance.page++;renderStack();});
+    if(offset+result.items.length<result.total)button(box,'More / المزيد',()=>{instance.page++;renderStack();});
     return true;
   }
   function showReader(n){
     const dlg=document.getElementById('noteModal');openNoteModal(null,n.id);
     const preview=document.getElementById('nsux-preview');
-    // The reader lives inside advanced details; opening the child alone stays hidden.
-    instance.advanced.open=true;
     dlg.classList.add('nsux-reading');
     document.activeElement?.blur?.();
     preview.hidden=false;
     renderText(preview,n.body||'','');
-    const headings=[...preview.querySelectorAll('h4')];
-    if(headings.length>1){
-      const toc=el('nav','nsux-toc');
-      toc.setAttribute('aria-label',t('contents'));
-      toc.appendChild(localizedElement('strong','','contents'));
-      headings.forEach(h=>button(toc,h.textContent,()=>h.scrollIntoView?.({block:'nearest'})));
-      preview.prepend(toc);
-    }
     const ext=n.notesV21||{};
     if(ext.cornell){
       [['cues',t('question')],['notes',t('explain')],['summary',t('summary')]].forEach(([k,label])=>{
@@ -640,74 +517,27 @@
     const pairs=instance.controller.recall(n.id);
     pairs.forEach(pair=>{
       const q=el('h4','',pair.question);q.dir='auto';preview.appendChild(q);
-      const answer=localizedButton(preview,'review',()=>{answer.textContent=pair.answer;});answer.dir='auto';
+      const answer=button(preview,t('review'),()=>{answer.textContent=pair.answer;});answer.dir='auto';
     });
     const links=Array.isArray(ext.links)?ext.links:[];
-    if(links.length){preview.appendChild(localizedElement('h4','','linked'));links.forEach(id=>{
+    if(links.length){preview.appendChild(el('h4','',t('linked')));links.forEach(id=>{
       const target=instance.controller.read().notesList.find(x=>x?.id===id);
-      if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
-      else preview.appendChild(el('p','nsux-meta',t('missing')+' #'+id));
+      if(target)button(preview,target.title,()=>showReader(target));
     });}
-    const backlinks=instance.controller.backlinks(n.id);
-    if(backlinks.length){
-      preview.appendChild(localizedElement('h4','','linked'));
-      backlinks.forEach(id=>{
-        const target=instance.controller.read().notesList.find(x=>x?.id===id);
-        if(target&&!target.notesV21?.deletedAt)button(preview,target.title,()=>showReader(target));
-      });
-    }
     if(Array.isArray(ext.taskLinks))ext.taskLinks.forEach(id=>{
       const target=instance.controller.read().tasksList.find(x=>x&&x.id===id);
       if(target)preview.appendChild(el('p','',t('task')+': '+target.title));
     });
-    localizedButton(preview,'edit',()=>{dlg.classList.remove('nsux-reading');document.getElementById('inpNoteBody').focus();});
+    button(preview,t('edit'),()=>{dlg.classList.remove('nsux-reading');document.getElementById('inpNoteBody').focus();});
     dlg.querySelector('.ns-editor').scrollTop=0;
-  }
-  function linkCandidates(sourceId,records,kind){
-    const counts=new Map();
-    records.forEach(record=>{if(record)counts.set(record.id,(counts.get(record.id)||0)+1);});
-    return records.filter(record=>record && validId(record.id) && counts.get(record.id)===1 &&
-      !record.isStarter && !record.deletedAt && !record.notesV21?.deletedAt &&
-      (kind!=='note'||record.id!==sourceId));
-  }
-  function chooseLinkTarget(sourceId,records,kind){
-    if(document.querySelector('dialog.nsux-link-picker[open]'))return Promise.resolve(null);
-    const candidates=linkCandidates(sourceId,records,kind);
-    if(!candidates.length){instance.adapter.notify(t('noTargets'));return Promise.resolve(null);}
-    return new Promise(resolve=>{
-      const dialog=el('dialog','nsux-link-picker'),heading=localizedElement('h3','',kind==='note'?'chooseNote':'chooseTask');
-      heading.id='nsux-link-heading';dialog.setAttribute('aria-labelledby',heading.id);
-      const search=localizedField(dialog,'searchRecords','');search.type='search';search.autofocus=true;
-      dialog.prepend(heading);
-      const list=el('div','nsux-link-list');dialog.appendChild(list);
-      let selected=null,timer=null;
-      const normalize=value=>String(value||'').normalize('NFKD').replace(/[\u064b-\u065f\u0670]/g,'').toLocaleLowerCase();
-      function render(){
-        const query=normalize(search.value);
-        const matches=candidates.filter(record=>normalize(record.title+' '+(record.body||'')).includes(query));
-        list.replaceChildren();
-        matches.slice(0,100).forEach(record=>{
-          const option=button(list,record.title||t('empty'),()=>{selected=record.id;dialog.close();});
-          option.dir='auto';
-          if(record.calDate||record.date)option.appendChild(el('small','nsux-meta',record.calDate||record.date));
-        });
-        if(!matches.length)list.appendChild(localizedElement('p','', 'empty'));
-      }
-      search.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(render,150);});
-      localizedButton(dialog,'cancel',()=>dialog.close());
-      const previous=document.activeElement;
-      dialog.addEventListener('close',()=>{clearTimeout(timer);dialog.remove();previous?.focus?.();resolve(selected);},{once:true});
-      document.body.appendChild(dialog);render();
-      try{dialog.showModal();}catch(_){dialog.remove();instance.adapter.notify(t('failed'));resolve(null);}
-    });
   }
   function mountFilters(){
     const notes=document.getElementById('sec-notes'),box=document.getElementById('notesStackBox');
     if(!notes||!box||document.getElementById('nsux-filters'))return;
     const root=el('div','nsux-controls');root.id='nsux-filters';
     const status=el('select');status.id='nsux-status';status.setAttribute('aria-label',t('status'));
-    [['active','all'],['archived','archive'],['trash','trash']].forEach(([value,key])=>{
-      const op=localizedElement('option','',key);op.value=value;status.appendChild(op);
+    [['active',t('all')],['archived',t('archive')],['trash',t('trash')]].forEach(([value,name])=>{
+      const op=el('option','',name);op.value=value;status.appendChild(op);
     });
     const book=el('select');book.id='nsux-book-filter';book.setAttribute('aria-label',t('notebooks'));
     const tag=el('select');tag.id='nsux-tag-filter';tag.setAttribute('aria-label',t('tag'));
@@ -727,7 +557,6 @@
     if(kind==='cornell'){instance.fields.cues.value='';instance.fields.notes.value='';instance.fields.summary.value='';}
     showType();
   }
-  return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,checklistProgress,serializeNote,
-    draftVersionMatches,findOccurrences,renderText,openedFingerprint:()=>instance?.openedSnapshot??null,
-    install,refreshLocale,translate:t,linkCandidates,chooseLinkTarget,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader});
+  return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,findOccurrences,renderText,
+    install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader});
 });

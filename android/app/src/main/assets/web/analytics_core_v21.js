@@ -1,12 +1,10 @@
 /* Deep Focus v21 analytics: pure, read-only, no timer/storage side effects. */
 (function (root, factory) {
   'use strict';
-  const canonical = typeof module === 'object' && module.exports
-    ? require('./analytics_recovery_core.js') : root.DeepFocusAnalyticsRecovery;
-  const api = factory(canonical);
+  const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.DeepFocusAnalyticsV21 = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function (canonical) {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
   const DOMAINS = Object.freeze(['study', 'read', 'work', 'sport']);
   const aliases = Object.freeze({study:'study', read:'read', review:'read', work:'work', exam:'work', sport:'sport'});
@@ -35,20 +33,12 @@
     const ms=Date.parse(v);return Number.isFinite(ms) ? ms : null;
   }
   function normalizeSessions(history) {
-    if (canonical && typeof canonical.normalizeSessions === 'function') {
-      const result=canonical.normalizeSessions(history), q=result.quality;
-      return {sessions:result.sessions.map(({id,date,minutes,domain,startedAt,endedAt,timingVerified})=>
-        ({id,date,minutes,domain,startedAt,endedAt,timingVerified})),
-        rejects:result.rejects,duplicates:q.duplicates,invalid:q.invalid+q.nonFocus,samples:q.samples};
-    }
     const sessions=[], rejects=[], seen=new Set();
     (Array.isArray(history) ? history : []).forEach((s,index)=>{
       let reason;
       const id=isRecord(s) ? idKey(s.id) : null;
       if (!isRecord(s)) reason='INVALID_RECORD';
       else if (s.isStarter === true || s.isDemo === true || s.synthetic === true || ['demo','sample','fixture'].includes(s.source)) reason='SAMPLE';
-      else if (s.completed===false || s.isFocus===false || ['short','long','rest','break'].includes(s.mode) ||
-        ['paused','running','cancelled','unfinished','skipped'].includes(s.status)) reason='NON_FOCUS';
       else if (!id) reason='INVALID_ID';
       else if (!validDay(s.date)) reason='INVALID_DATE';
       else if (typeof s.minutes !== 'number' || !Number.isFinite(s.minutes) || s.minutes < 0 || s.minutes > 1440) reason='INVALID_MINUTES';

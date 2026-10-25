@@ -20,7 +20,7 @@ function harness(allowWrite=true){
      draftFields:()=>({cornell:{cues:'Question',notes:'Explanation',summary:'Summary'},tags:'study, work',notebookId:'A1',
        recallPairs:[{key:'q-1',question:'Q?',answer:'A!'}]}),
      restoreDraftFields:d=>{restored=d;}} },
-   saveFortressData:(k,v)=>{if(allowWrite)storage.set(k,JSON.parse(JSON.stringify(v)));return allowWrite;},
+   saveFortressData:(k,v)=>{if(allowWrite)storage.set(k,JSON.parse(JSON.stringify(v)));},
    loadFortressData:(k,fallback)=>storage.get(k)||fallback,
    nsUpdateCount:()=>{},closeModal:()=>{}};
  vm.createContext(context);vm.runInContext(script,context,{filename:'notes_drafts.js',timeout:1000});

@@ -1,8 +1,8 @@
 /* Deep Focus Notes Studio: UI upgrade; uses existing v21 notesList persistence. */
 const NS_TEMPLATES=[
- ['cornell','📋','Cornell notes','ملاحظات كورنيل','cornell','CUES / QUESTIONS\n• \n\nMAIN NOTES\n• \n\nSUMMARY\n','الأسئلة والكلمات المفتاحية\n• \n\nالملاحظات الأساسية\n• \n\nالملخص\n'],
- ['recall','🧠','Active recall','استذكار نشط','flash','QUESTION\n\nANSWER\n\nWHAT TO REVIEW\n','السؤال\n\nالإجابة\n\nما أحتاج إلى مراجعته\n'],
- ['reading','📚','Reading notes','ملخص قراءة','quick','BOOK / SOURCE\n\nMAIN IDEAS\n• \n\nMY TAKEAWAYS\n• \n\nNEXT STEPS\n','الكتاب أو المصدر\n\nالأفكار الرئيسية\n• \n\nما استفدته\n• \n\nالخطوة التالية\n'],
+ ['cornell','📋','Structured notes','ملاحظات كورنيل','cornell','CUES / QUESTIONS\n• \n\nMAIN NOTES\n• \n\nSUMMARY\n','الأسئلة والكلمات المفتاحية\n• \n\nالملاحظات الأساسية\n• \n\nالملخص\n'],
+ ['recall','🧠','استذكار نشط','استذكار نشط','flash','QUESTION\n\nANSWER\n\nWHAT TO REVIEW\n','السؤال\n\nالإجابة\n\nما أحتاج إلى مراجعته\n'],
+ ['reading','📚','ملخص قراءة','ملخص قراءة','quick','BOOK / SOURCE\n\nMAIN IDEAS\n• \n\nMY TAKEAWAYS\n• \n\nNEXT STEPS\n','الكتاب أو المصدر\n\nالأفكار الرئيسية\n• \n\nما استفدته\n• \n\nالخطوة التالية\n'],
  ['meeting','📅','Meeting minutes','محضر اجتماع','quick','ATTENDEES\n\nAGENDA\n\nDECISIONS\n• \n\nACTIONS / DATES\n• ','الحاضرون\n\nجدول الأعمال\n\nالقرارات\n• \n\nالمهام والمواعيد\n• '],
  ['project','🗂️','Project plan','خطة مشروع','quick','GOAL\n\nMILESTONES\n☐ \n\nBLOCKERS\n\nNEXT ACTION\n','الهدف\n\nالمراحل\n☐ \n\nالعوائق\n\nالإجراء التالي\n'],
  ['workout','🏋️','Workout log','سجل رياضي','quick','ACTIVITY\n\nSETS / REPS / TIME\n\nNOTES\n\nNEXT SESSION\n','النشاط\n\nالجولات والتكرارات والوقت\n\nملاحظات\n\nالجلسة التالية\n'],
@@ -14,18 +14,15 @@ const NS_TEMPLATES=[
  ['journal','✍️','Daily journal','يوميات','quick','TODAY\n\nHIGHLIGHTS\n• \n\nCHALLENGES\n\nTOMORROW\n','اليوم\n\nأبرز الأحداث\n• \n\nالتحديات\n\nالغد\n']
 ];
 const NS_STRINGS={
- en:['✦ NOTES STUDIO','Your ideas, organized','Write, revisit and develop your thoughts.','My notes','Pinned','＋ New note','Ready-to-use templates','Tap to start','Pinned only','Sort','Recent','Oldest','Title','results','No notes match. Use a template to begin.','New note','Edit note','Title','Type','Date','Content','Pin','Favorite','words','characters','Save note','Save changes','Replace your text with this template?','Edit','Duplicate','Copy','Calendar','Delete','Reveal answer','Could not copy.','Saved'],
+ en:['✦ NOTES STUDIO','أفكارك، منظمة بذكاء','دوّن واسترجع وطوّر أفكارك يومياً.','My notes','Pinned','＋ New note','قوالب جاهزة للكتابة','Tap to start','المثبتة فقط','الترتيب','Recent','Oldest','Title','results','No notes match. Use a template to begin.','New note','Edit note','Title','Type','Date','Content','Pin','Favorite','words','characters','Save note','Save changes','Replace your text with this template?','Edit','Duplicate','Copy','Calendar','Delete','Reveal answer','Could not copy.','Saved'],
  ar:['✦ استوديو الملاحظات','أفكارك مرتبة وواضحة','اكتب أفكارك ونظّمها وراجعها بسهولة.','ملاحظاتي','مثبتة','＋ ملاحظة جديدة','قوالب جاهزة للكتابة','اختر قالبًا للبدء','المثبتة فقط','الترتيب','الأحدث','الأقدم','العنوان','نتيجة','لا توجد ملاحظات مطابقة، جرّب أحد القوالب.','ملاحظة جديدة','تعديل الملاحظة','العنوان','النوع','التاريخ','المحتوى','تثبيت','مفضلة','كلمة','حرف','حفظ الملاحظة','حفظ التعديلات','هل تريد استبدال النص الموجود بالقالب؟','تعديل','نسخة','نسخ','التقويم','حذف','إظهار الإجابة','تعذر النسخ.','تم الحفظ']
 };
-function nsLabel(index){return NS_STRINGS[cfg.lang==='ar'?'ar':'en'][index];}
+function nsLabel(index){const base=NS_STRINGS[cfg.lang==='ar'?'ar':'en'][index];return globalThis.DF99Locale?.t(cfg.lang,'notes',String(index),base) ?? base;}
 function nsElement(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
-let nsEditId=null,nsPinnedOnly=false,nsOpenedSnapshot=null;
+let nsEditId=null,nsPinnedOnly=false;
 function nsId(id){const n=Number(id);return Number.isSafeInteger(n)&&n>=0?n:null;}
 function nsWords(body){return String(body||'').trim().split(/\s+/).filter(Boolean).length;}
-function nsSave(records){
- if(!commitLegacyRecords('notesList',records))return false;
- renderNotesStack();renderCalendar();return true;
-}
+function nsSave(){saveFortressData('zen_fortress_notes_v21',notesList);renderNotesStack();renderCalendar();}
 function nsTemplateButton(t,editor){
  const b=nsElement('button',editor?'ns-tiny-template':'ns-template');
  b.type='button';b.appendChild(nsElement('span','',t[1]));b.appendChild(nsElement('strong','',cfg.lang==='ar'?t[3]:t[2]));
@@ -93,8 +90,8 @@ function renderNotesStack(){
   nsAction(topActions,n.pinned?'📌':'♧',nsLabel(21),()=>nsToggleFlag(id,'pinned'));
   nsAction(topActions,n.favorite?'★':'☆',nsLabel(22),()=>nsToggleFlag(id,'favorite'));
   topline.appendChild(topActions);card.appendChild(topline);
-  card.appendChild(nsElement('h3','ns-card-title',String(n.title||'')));
-  const desc=nsElement('div','lcard-body ns-desc'+(n.blur?' blurred-secret':''),String(n.body||''));
+  card.appendChild(nsElement('h3','ns-card-title',toWest(n.title||'')));
+  const desc=nsElement('div','lcard-body ns-desc'+(n.blur?' blurred-secret':''),toWest(n.body||''));
   if(n.blur){desc.setAttribute('role','button');desc.setAttribute('tabindex','0');desc.setAttribute('aria-label',nsLabel(33));
    const toggle=()=>desc.classList.toggle('blurred-secret');desc.addEventListener('click',toggle);desc.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});}
   card.appendChild(desc);
@@ -113,9 +110,7 @@ function renderNotesStack(){
 }
 function openNoteModal(defaultDate=null,editId=null){
  nsEditId=editId===null?null:nsId(editId);
- if(nsEditId!==null&&!legacyRecordIsUnique(notesList,nsEditId))return;
- const n=nsEditId===null?null:notesList.find(x=>x.id===nsEditId);
- nsOpenedSnapshot=n?JSON.stringify(n):null;
+ const n=nsEditId===null?null:notesList.find(x=>Number(x.id)===nsEditId);
  document.getElementById('inpNoteTitle').value=n?.title||'';
  document.getElementById('inpNoteBody').value=n?.body||'';
  document.getElementById('selNoteCat').value=n?.catKey||'quick';
@@ -132,36 +127,20 @@ function openNoteModal(defaultDate=null,editId=null){
 function nsEdit(id){if(notesList.some(n=>Number(n.id)===nsId(id)))openNoteModal(null,id);}
 function saveNewNote(){
  if(window.DeepFocusNotesEditorUI?.save)return window.DeepFocusNotesEditorUI.save();
- const title=document.getElementById('inpNoteTitle').value.trim(),body=document.getElementById('inpNoteBody').value;
+ const title=toWest(document.getElementById('inpNoteTitle').value.trim()),body=toWest(document.getElementById('inpNoteBody').value.trim());
  if(!title&&!body)return;
  const cat=document.getElementById('selNoteCat').value;
  const fields={title:title||L().navNotes,body,catKey:['cornell','flash','quick'].includes(cat)?cat:'quick',
   calDate:toWest(document.getElementById('inpNoteCalDate').value||todayISO),
   blur:document.getElementById('chkNoteBlur').checked,pinned:document.getElementById('nsPinCheck').checked,
   favorite:document.getElementById('nsFavCheck').checked,isStarter:false,updatedAt:Date.now()};
- const existing=nsEditId===null?null:notesList.find(n=>n.id===nsEditId);
- if(nsEditId!==null){
-  if(!legacyRecordIsUnique(notesList,nsEditId))return false;
-  if(JSON.stringify(existing)!==nsOpenedSnapshot){
-   showToast(cfg.lang==='ar'?'تغيرت الملاحظة. احتفظ بتعديلاتك وافتح أحدث نسخة.':'This note changed. Keep your edits and reopen the latest version.');return false;
-  }
- }
- const records=existing?notesList.map(n=>n.id===nsEditId?{...n,...fields}:n)
-  :[{...fields,id:nextRecordId(),createdAt:Date.now()},...notesList];
- if(!nsSave(records))return false;
- if(typeof nsClearDraftForSavedNote==='function')nsClearDraftForSavedNote();
- closeModal('noteModal');nsEditId=null;showToast(nsLabel(35));return true;
+ const existing=nsEditId===null?null:notesList.find(n=>Number(n.id)===nsEditId);
+ if(existing)Object.assign(existing,fields);
+ else notesList.unshift({...fields,id:nextRecordId(),createdAt:Date.now()});
+ nsSave();if(typeof nsClearDraftForSavedNote==='function')nsClearDraftForSavedNote();
+ closeModal('noteModal');nsEditId=null;showToast(nsLabel(35));
 }
-function nsToggleFlag(id,key){
- if(!['pinned','favorite'].includes(key)||!legacyRecordIsUnique(notesList,nsId(id)))return false;
- return nsSave(notesList.map(n=>n.id===nsId(id)?{...n,[key]:!Boolean(n[key])}:n));
-}
-function nsDuplicate(id){
- if(!legacyRecordIsUnique(notesList,nsId(id)))return false;
- const n=notesList.find(x=>x.id===nsId(id));
- const copy={...n,id:nextRecordId(),isStarter:false,pinned:false,createdAt:Date.now(),updatedAt:Date.now()};
- if(!nsSave([copy,...notesList]))return false;
- showToast('✓');return true;
-}
+function nsToggleFlag(id,key){const n=notesList.find(x=>Number(x.id)===nsId(id));if(!n)return;n[key]=!Boolean(n[key]);nsSave();}
+function nsDuplicate(id){const n=notesList.find(x=>Number(x.id)===nsId(id));if(!n)return;notesList.unshift({...n,id:nextRecordId(),isStarter:false,pinned:false,createdAt:Date.now(),updatedAt:Date.now()});nsSave();showToast('✓');}
 function nsCopy(id){const n=notesList.find(x=>Number(x.id)===nsId(id));if(!n)return;const text=String(n.title||'')+'\n\n'+String(n.body||'');if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>showToast('✓')).catch(()=>showToast(nsLabel(34)));else showToast(nsLabel(34));}
 renderNotesStack();

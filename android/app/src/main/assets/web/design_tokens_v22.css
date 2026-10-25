@@ -36,7 +36,7 @@
   --df22-space-5: 20px;
   --df22-space-6: 24px;
   --df22-touch: 44px;
-  --df22-font: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans", "Noto Sans Arabic", sans-serif;
+  --df22-font: Inter, Tajawal, "Noto Sans Arabic", system-ui, sans-serif;
   --df22-leading: 1.5;
   --df22-body-size: 16px;
   --df22-title-size: clamp(1.16rem, 4.7vw, 1.48rem);

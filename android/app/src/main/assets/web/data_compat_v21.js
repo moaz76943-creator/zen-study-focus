@@ -163,12 +163,7 @@
       if (!plain(bundle) || bundle.v !== 21) throw new Error('Unsupported backup version');
       const snapshot = {cfg:bundle.cfg, tasksList:bundle.tasksList, notesList:bundle.notesList};
       const report = inspectRecords(snapshot);
-      // Inspection of existing storage remains permissive and read-only. A new
-      // backup import must not introduce ambiguous note/task identifiers.
-      const issues = report.issues.map(item => item.code === 'DUPLICATE_ID'
-        ? {...item, severity:'error'} : item);
-      const ok = noErrors(issues);
-      return {ok, snapshot:ok ? jsonCopy(snapshot) : null, issues};
+      return {ok:report.ok, snapshot:report.ok ? jsonCopy(snapshot) : null, issues:report.issues};
     } catch (e) {return {ok:false,snapshot:null,issues:[issue('error','INVALID_BACKUP','backup',e.message)]};}
   }
 
