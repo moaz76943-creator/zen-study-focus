@@ -108,6 +108,7 @@ function setup(initialLanguage='en') {
       {code:'de',iso:'DE',dir:'ltr',enName:'German',nativeName:'Deutsch'}
     ],
     DICT,cfg,tasksList,notesList,
+    L(){return DICT[cfg.lang]||DICT.en;},
     saveFortressData(key,data){saved.push({key,lang:data.lang});if(ctx.rejectSave)throw Error('STORAGE_REJECTED');return true;},
     renderAnalyticsBars(){events.push('analytics');},syncHeaderMetrics(){},updateTimerDisplay(){},
     renderTasksList(){},renderCalendar(){events.push('calendar');},renderNotesStack(){},
