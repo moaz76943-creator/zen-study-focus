@@ -203,7 +203,9 @@
       ref.play.setAttribute('tabindex', '0');
       ref.play.setAttribute('aria-pressed', String(!!isOn));
       ref.play.setAttribute('aria-label', (isOn ? labels.pause : labels.play) + ': ' + labels.name);
-      if (!keyboardBound.has(ref.play) && typeof ref.play.addEventListener === 'function') {
+      const tag = String(ref.play.tagName || '').toUpperCase();
+      const nativeButton = tag === 'BUTTON' || (tag === 'INPUT' && /^(button|submit|reset)$/i.test(ref.play.type || ''));
+      if (!nativeButton && !keyboardBound.has(ref.play) && typeof ref.play.addEventListener === 'function') {
         keyboardBound.add(ref.play);
         ref.play.addEventListener('keydown', function (event) {
           if (!event || event.target !== ref.play || (event.key !== 'Enter' && event.key !== ' ')) return;
