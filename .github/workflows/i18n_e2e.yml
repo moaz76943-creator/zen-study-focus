@@ -6,8 +6,6 @@ on:
       - 'tests/i18n/e2e/**'
       - 'tools/i18n/e2e/**'
       - '.github/workflows/i18n_e2e.yml'
-  push:
-    branches: [qa/df-lane-13-real-e2e-20261026]
   workflow_dispatch:
 
 permissions:
@@ -66,9 +64,23 @@ jobs:
           persist-credentials: false
       - name: Source provenance
         shell: bash
+        env:
+          DF13_API: ${{ matrix.api }}
         run: |
           mkdir -p artifacts/i18n-e2e/api${{ matrix.api }}
           git rev-parse HEAD | tee artifacts/i18n-e2e/api${{ matrix.api }}/SOURCE_SHA.txt
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          api = os.environ['DF13_API']
+          root = Path('artifacts/i18n-e2e/api'+api)
+          root.joinpath('DEVICE_MATRIX.json').write_text(json.dumps({
+            'TASK_ID':'DF-LANE-13-REAL-END-TO-END-QA',
+            'SOURCE_SHA':Path(root/'SOURCE_SHA.txt').read_text().strip(),
+            'API':int(api),'status':'NOT_TESTED',
+            'BLOCKERS':['Android test has not run or failed before producing device evidence'],
+            'device_matrix':[]}, indent=2) + '\\n')
+          PY
           python3 -m py_compile tools/i18n/e2e/android_device.py
       - uses: actions/setup-java@v4
         with:
