@@ -70,6 +70,9 @@ test('workflow QA contract gate includes manifest ledger and integrity tests, pr
  assert.match(workflow,/tools\/daily_maintenance\/cohort_ledger\.cjs/);
  assert.match(workflow,/tests\/daily_maintenance\/hourly_evidence_integrity\.test\.cjs/);
  assert.match(workflow,/report\.source_sha !== sha/);
- assert.match(workflow,/policy\.verifyCanonicalPr\(data,owner\+'\/'\+repo,process\.env\.SOURCE_REF,sha\)/);
+ assert.match(workflow,/official_source_guard\.cjs/);
+ assert.match(workflow,/source_recheck\.outcome/);
+ assert.match(workflow,/integration\/master-qa-verified-v21/);
+ assert.doesNotMatch(workflow,/pull_number:policy\.CANONICAL_PR/);
  assert.match(workflow,/NOT_VERIFIED/);
 });

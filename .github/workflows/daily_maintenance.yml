@@ -57,7 +57,7 @@ jobs:
       issues: write
       actions: read
     env:
-      SOURCE_REF: ${{ inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'integration/master-recovery-20261021' }}
+      SOURCE_REF: ${{ inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'integration/master-qa-verified-v21' }}
       SELECTED_MODE: ${{ inputs.mode || 'audit' }}
       SELECTED_LANE: ${{ inputs.lane || 'all' }}
     steps:
@@ -66,26 +66,39 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
           path: automation
           persist-credentials: false
-      - name: Pin active PR #138 source head before checkout
-        if: env.SOURCE_REF == 'integration/master-recovery-20261021'
+      - name: Resolve and pin exact requested source HEAD
         id: resolve
         uses: actions/github-script@v7
         env:
           SOURCE_REF: ${{ env.SOURCE_REF }}
         with:
+          retries: 2
+          retry-exempt-status-codes: 400,401,403,404,422
           script: |
-            const policy = require('./automation/tools/daily_maintenance/canonical_source.cjs');
-            const {data} = await github.rest.pulls.get({owner:context.repo.owner,repo:context.repo.repo,pull_number:policy.CANONICAL_PR});
-            core.setOutput('sha',policy.verifyCanonicalPr(data,context.repo.owner+'/'+context.repo.repo,process.env.SOURCE_REF));
+            const {data}=await github.rest.git.getRef({owner:context.repo.owner,repo:context.repo.repo,ref:'heads/'+process.env.SOURCE_REF});
+            if(!/^[a-f0-9]{40}$/i.test(data?.object?.sha||''))throw Error('Source ref cannot be resolved');
+            core.setOutput('sha',data.object.sha);
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.resolve.outputs.sha || env.SOURCE_REF }}
+          ref: ${{ steps.resolve.outputs.sha }}
           path: source
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify exact daily source SHA
+        id: initial_guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/daily"
+          checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
+          live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
+          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/daily" || {
+            echo 'OFFICIAL_SOURCE_NOT_VERIFIED' >> "$RUNNER_TEMP/daily/blockers.txt"
+            exit 1
+          }
       - name: Source SHA, ledger, queue and safe design generator
         shell: bash
         run: |
@@ -140,6 +153,19 @@ jobs:
             echo 'SPECIALIST_SOURCE_CHECKS_BLOCKED' >> "$RUNNER_TEMP/daily/blockers.txt"
             exit 1
           }
+      - name: Recheck exact daily source SHA
+        id: final_guard
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/daily"
+          checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
+          live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
+          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/daily" || {
+            echo 'OFFICIAL_SOURCE_NOT_VERIFIED' >> "$RUNNER_TEMP/daily/blockers.txt"
+            exit 1
+          }
       - name: Open PR only for deterministic generated CSS repairs
         if: success()
         shell: bash
@@ -171,6 +197,7 @@ jobs:
           REPORT: ${{ runner.temp }}/daily/daily-health.md
           BLOCKERS: ${{ runner.temp }}/daily/blockers.txt
           CHECKED_SHA: ${{ runner.temp }}/daily/SOURCE_SHA
+          SOURCE_GATE: ${{ steps.final_guard.outcome }}
         with:
           script: |
             const fs=require('node:fs'),{owner,repo}=context.repo;
@@ -185,19 +212,8 @@ jobs:
                 .summarizeRuns(response.data.workflow_runs||[],checked).markdown;
               core.info('Source SHA-bound CI triage generated');
             } catch(e){core.warning('Cannot read source SHA-bound CI evidence: '+e.message);}
-            let canonicalGate='';
-            if (process.env.SOURCE_REF === 'integration/master-recovery-20261021') {
-              try {
-                const policy=require('./automation/tools/daily_maintenance/canonical_source.cjs');
-                const {data}=await github.rest.pulls.get({owner,repo,pull_number:policy.CANONICAL_PR});
-                const checked=fs.readFileSync(process.env.CHECKED_SHA,'utf8').trim();
-                policy.verifyCanonicalPr(data,owner+'/'+repo,process.env.SOURCE_REF,checked);
-                canonicalGate='Canonical PR #138 exact-head check: PASS';
-              } catch(e) {
-                canonicalGate='NOT_VERIFIED: canonical PR #138 source advanced or could not be read; '+String(e.message).slice(0,200);
-                core.setFailed(canonicalGate);
-              }
-            }
+            const canonicalGate='Official source attestation: '+(process.env.SOURCE_GATE==='success'?'source SHA verified':'OFFICIAL_SOURCE_NOT_VERIFIED');
+            if(process.env.SOURCE_GATE!=='success')core.setFailed('Official source SHA verification missing or stale');
             const body=canonicalGate+'\n\n'+read(process.env.REPORT)+'\n\nAdditional gates:\n'+read(process.env.BLOCKERS)+
              '\n\n'+read(process.env.REPORT.replace('daily-health.md','quality-agents.md'))+'\n\n'+ciAudit+
              '\nRun: '+context.serverUrl+'/'+owner+'/'+repo+'/actions/runs/'+context.runId+
@@ -223,27 +239,29 @@ jobs:
     permissions:
       contents: read
     env:
-      SOURCE_REF: ${{ inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'integration/master-recovery-20261021' }}
+      SOURCE_REF: ${{ inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'integration/master-qa-verified-v21' }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.repository.default_branch }}
           path: automation
           persist-credentials: false
-      - name: Resolve canonical debug-only source
-        if: env.SOURCE_REF == 'integration/master-recovery-20261021'
+      - name: Resolve and pin exact requested source HEAD
         id: resolve
         uses: actions/github-script@v7
         env:
           SOURCE_REF: ${{ env.SOURCE_REF }}
         with:
+          retries: 2
+          retry-exempt-status-codes: 400,401,403,404,422
           script: |
-            const policy = require('./automation/tools/daily_maintenance/canonical_source.cjs');
-            const {data} = await github.rest.pulls.get({owner:context.repo.owner,repo:context.repo.repo,pull_number:policy.CANONICAL_PR});
-            core.setOutput('sha',policy.verifyCanonicalPr(data,context.repo.owner+'/'+context.repo.repo,process.env.SOURCE_REF));
+            const {data}=await github.rest.git.getRef({owner:context.repo.owner,repo:context.repo.repo,ref:'heads/'+process.env.SOURCE_REF});
+            if(!/^[a-f0-9]{40}$/i.test(data?.object?.sha||''))throw Error('Source ref cannot be resolved');
+            core.setOutput('sha',data.object.sha);
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.resolve.outputs.sha || env.SOURCE_REF }}
+          ref: ${{ steps.resolve.outputs.sha }}
+          path: source
           persist-credentials: false
       - uses: actions/setup-java@v4
         with:
@@ -259,20 +277,43 @@ jobs:
           SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
           test -x "$SDKMANAGER"
           "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Verify exact weekly source SHA
+        id: weekly_guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/weekly"
+          checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
+          live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
+          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/weekly" || {
+            exit 1
+          }
       - name: Debug test APK only, no signing or publishing
-        working-directory: android
+        working-directory: source/android
         run: gradle assembleDebug --no-daemon
+      - name: Recheck exact weekly source SHA
+        id: weekly_recheck
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/weekly"
+          checked="$(git -C source rev-parse HEAD 2>/dev/null || true)"
+          live="$(git -C automation ls-remote origin "refs/heads/$SOURCE_REF" 2>/dev/null | awk 'NR==1{print $1}' || true)"
+          node automation/tools/daily_maintenance/official_source_guard.cjs "$checked" "${{ steps.resolve.outputs.sha }}" "$live" "$SOURCE_REF" "$RUNNER_TEMP/weekly" || {
+            exit 1
+          }
       - run: |
           mkdir -p evidence
-          git rev-parse HEAD > evidence/SHA
-          sha256sum android/app/build/outputs/apk/debug/*.apk > evidence/sha256.txt
+          git -C source rev-parse HEAD > evidence/SHA
+          sha256sum source/android/app/build/outputs/apk/debug/*.apk > evidence/sha256.txt
           echo 'TEST ONLY, NOT FOR PRODUCTION' > evidence/RELEASE_NOT_APPROVED
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: deep-focus-weekly-debug-test-apk
           path: |
-            android/app/build/outputs/apk/debug/*.apk
+            source/android/app/build/outputs/apk/debug/*.apk
             evidence/
           retention-days: 3
           if-no-files-found: warn

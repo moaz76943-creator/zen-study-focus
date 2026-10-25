@@ -3,12 +3,14 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const root=path.resolve(__dirname,'../..');
 const workflow=fs.readFileSync(path.join(root,'.github/workflows/daily_maintenance.yml'),'utf8');
 const build=fs.readFileSync(path.join(root,'.github/workflows/build_apk.yml'),'utf8');
-test('daily and weekly scheduled scans resolve current canonical PR #138 source, not stale recovery',()=>{
+test('daily and weekly scheduled scans resolve exact official integration branch SHA, not stale PR #138',()=>{
  assert.match(workflow,/default:\s*master-draft/);
- const expected="inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'integration/master-recovery-20261021'";
- assert.equal(workflow.split(expected).length,3,'both source and debug-build jobs must select the canonical source on schedule');
- assert.match(workflow,/steps\.resolve\.outputs\.sha \|\| env\.SOURCE_REF/);
- assert.match(workflow,/policy\.verifyCanonicalPr\(data,owner\+'\/'\+repo,process\.env\.SOURCE_REF,checked\)/);
+ const expected="inputs.target == 'recovery' && 'integration/deep-focus-recovery-00-final-20261019' || 'integration/master-qa-verified-v21'";
+ assert.equal(workflow.split(expected).length,3,'both source and debug-build jobs must select official integration on schedule');
+ assert.match(workflow,/ref: \$\{\{ steps\.resolve\.outputs\.sha \}\}/);
+ assert.match(workflow,/official_source_guard\.cjs/);
+ assert.match(workflow,/OFFICIAL_SOURCE_NOT_VERIFIED/);
+ assert.doesNotMatch(workflow,/integration\/master-recovery-20261021|pull_number:policy\.CANONICAL_PR/);
  assert.match(workflow,/cron: '17 2 \* \* \*'/);
  assert.match(workflow,/cron: '47 1 \* \* 5'/);
 });
