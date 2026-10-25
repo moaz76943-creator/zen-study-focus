@@ -2427,6 +2427,8 @@ function finalizeTimerSession(shouldChime) {
   }
 }
 function runTimerTick() {
+  // Ignore queued callbacks after pause or after the first completion.
+  if (!timerRunning) return;
   timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
   if (timerLeft <= 0) return finalizeTimerSession(true);
   updateTimerDisplay();
@@ -2528,8 +2530,9 @@ function selectTimerModeFromUser(mins, modeKey, btn) {
   // Quick-training confirmation is handled by selectTimerMode itself.
   // Otherwise ask exactly once before replacing an active or paused session.
   if (!quickTraining?.active && (timerRunning || timerSessionId || timerActiveMs > 0) &&
-      !window.confirm(cfg.lang === 'ar' ? 'تغيير الوضع سيلغي تقدم الجلسة الحالية. هل تريد المتابعة؟' :
-        'Changing mode will discard current session progress. Continue?')) return false;
+      !window.confirm(typeof quickText === 'function' ? quickText('replacePrompt') :
+        (cfg.lang === 'ar' ? 'تغيير الوضع سيلغي تقدم الجلسة الحالية. هل تريد المتابعة؟' :
+          'Changing mode will discard current session progress. Continue?'))) return false;
   return selectTimerMode(mins, modeKey, btn) !== false;
 }
 function selectTimerMode(mins, modeKey, btn) {
