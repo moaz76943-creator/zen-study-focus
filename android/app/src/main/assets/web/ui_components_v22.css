@@ -410,3 +410,53 @@ body.df-v22:not(.deep-lockdown) .df22-chart [role="img"] { color: var(--df22-ink
   .df-v22 :where(.df22-card,.df22-input,.df22-modal) { border-color: var(--df22-ink); }
   .df-v22 :where(.df22-button,.df22-icon-button):focus-visible { outline-width: 4px !important; }
 }
+
+
+/* DF-LANE-11: preserve v22 premium palette; allow long localized labels and text zoom. */
+.df-v22 :where(.df22-card,.df22-modal,.df22-toolbar,.df22-stack,.df22-form-field,.df22-bottom-nav,.df22-timer-zone) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.df-v22 :where(.df22-button,.df22-card-title,.df22-card-subtitle,.df22-modal-heading,.df22-chart-title,.df22-bottom-nav > button) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.45;
+}
+.df-v22 .df22-button { flex-shrink: 1; }
+.df-v22 .df22-modal { max-inline-size: calc(100vw - 16px); }
+.df-v22 .df22-modal-actions { flex-wrap: wrap; }
+.df-v22 .df22-modal-actions > * { flex: 1 1 110px; min-inline-size: 0; }
+.df-v22 .df22-bottom-nav { grid-template-columns: repeat(7,minmax(44px,1fr)); }
+.df-v22 .df22-bottom-nav > button { min-block-size: 44px; }
+.df-v22 :where(.df22-number,.df22-chart-value,.df22-timer-zone .ring-time) {
+  direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums;
+}
+.df-v22 :where(button,a,input,textarea,select,[role="button"],[tabindex]):focus-visible {
+  outline: 3px solid var(--df22-focus) !important;
+  outline-offset: 3px;
+}
+html[dir="rtl"] .df-v22 :where(.df22-toolbar,.df22-modal-actions) { direction: rtl; }
+html[dir="rtl"] .df-v22 :where(.df22-card-title,.df22-card-subtitle,.df22-form-field,.df22-modal-heading) { text-align: start; }
+html:lang(ar) .df-v22,html:lang(fa) .df-v22,html:lang(ur) .df-v22,
+html:lang(ps) .df-v22,html:lang(ckb) .df-v22,html:lang(sd) .df-v22,html:lang(ug) .df-v22 {
+  font-family: "Noto Sans Arabic", "Noto Naskh Arabic", "Noto Nastaliq Urdu", system-ui, sans-serif;
+}
+html:lang(zh) .df-v22,html:lang(ja) .df-v22,html:lang(ko) .df-v22 {
+  font-family: "Noto Sans CJK SC", "Noto Sans CJK JP", "Noto Sans CJK KR", system-ui, sans-serif;
+}
+html:lang(hi) .df-v22,html:lang(mr) .df-v22,html:lang(ne) .df-v22 {
+  font-family: "Noto Sans Devanagari", system-ui, sans-serif;
+}
+html:lang(bn) .df-v22 { font-family: "Noto Sans Bengali", system-ui, sans-serif; }
+html:lang(ru) .df-v22,html:lang(uk) .df-v22,html:lang(bg) .df-v22,
+html:lang(sr) .df-v22 { font-family: "Noto Sans", system-ui, sans-serif; }
+@media (max-width: 430px) {
+  .df-v22 .df22-toolbar { flex-wrap: wrap; }
+  .df-v22 .df22-toolbar > button { flex: 1 1 100px; }
+  .df-v22 :where(.df22-bottom-nav,.df22-modal) { max-inline-size: 100%; }
+}
+@media (max-width: 360px) {
+  .df-v22 .df22-modal { padding: 12px; }
+  .df-v22 .df22-modal-actions > * { flex-basis: 100%; }
+}

@@ -1,98 +1,73 @@
 /**
- * DEEP FOCUS — 20-Locale Parity & Fallback Safety Guard v21
- * Enforces:
- * 1. 3-Tier Fallback: Target Locale -> Base 'en' -> Humanized String (No crashes).
- * 2. 20-Locale Roster: Strictly active 20 languages (Excludes he/iw per policy).
- * 3. Zero User Text Mutation: User notes/tasks remain untouched across language switches.
+ * DEEP FOCUS — locale fallback, direction and safe language-state boundary.
+ * Catalog synced with global_i18n_registry.js (100 entries excluding Hebrew).
+ * This guard never traverses text nodes or rewrites content entered by a user.
  */
-(function(global) {
+(function (global) {
+  'use strict';
+  const SUPPORTED_LOCALES = Object.freeze(["ar","en","es","fr","de","it","pt","ru","zh","ja","ko","tr","fa","ur","hi","id","ms","bn","pl","sv","nl","el","cs","da","fi","no","hu","ro","uk","vi","th","sw","af","am","az","bg","ca","hr","et","fil","ka","gu","is","kn","kk","km","lo","lv","lt","mk","ml","mr","mn","my","ne","pa","si","sk","sl","ta","te","uz","zu","eu","gl","hy","sq","bs","sr","be","cy","ga","gd","lb","mt","so","yo","ig","ha","xh","st","tn","sn","rw","mg","kmr","ckb","ps","sd","ug","tg","ky","tk","tt","ba","cv","ceb","jv","su","eo"]);
+  const SUPPORTED = new Set(SUPPORTED_LOCALES);
+  const RTL_LOCALES = Object.freeze(['ar', 'fa', 'ur', 'ckb', 'ps', 'sd', 'ug']);
+  const RTL = new Set(RTL_LOCALES);
+  const EXCLUDED_LOCALES = Object.freeze(['he', 'iw']);
+  const EXCLUDED = new Set(EXCLUDED_LOCALES);
 
-    // Verified 20 Supported Locales
-    const ACTIVE_20_LOCALES = [
-        "ar", "en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja",
-        "ko", "hi", "fa", "ur", "tr", "id", "vi", "pl", "nl", "sv"
-    ];
+  function normalizeLocale(locale) {
+    if (typeof locale !== 'string') return '';
+    return locale.trim().toLowerCase().split(/[-_]/, 1)[0];
+  }
 
-    const EXCLUDED_LOCALES = ["he", "iw"];
+  function isLocaleAllowed(locale) {
+    const code = normalizeLocale(locale);
+    return !!code && !EXCLUDED.has(code) && SUPPORTED.has(code);
+  }
 
-    function isLocaleAllowed(localeCode) {
-        if (!localeCode || typeof localeCode !== 'string') return false;
-        const code = localeCode.toLowerCase().trim();
-        if (EXCLUDED_LOCALES.includes(code)) return false;
-        return ACTIVE_20_LOCALES.includes(code);
+  function isRtlLocale(locale) {
+    const code = normalizeLocale(locale);
+    return isLocaleAllowed(code) && RTL.has(code);
+  }
+
+  function resolveTranslation(key, locale, dictionaries) {
+    if (!key || typeof key !== 'string') return '';
+    const catalog = dictionaries && typeof dictionaries === 'object' ? dictionaries : {};
+    const code = isLocaleAllowed(locale) ? normalizeLocale(locale) : 'en';
+    const own = catalog[code] || {};
+    const english = catalog.en || {};
+    if (typeof own[key] === 'string' && own[key] !== '') return own[key];
+    if (typeof english[key] === 'string' && english[key] !== '') return english[key];
+    return key.toLowerCase().split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  }
+
+  // Returns proposed config but never mutates original config, notes or tasks.
+  // The production app is responsible for its own v21 atomic save protocol.
+  function setSystemLanguage(newLocale, currentConfig, storageBackend) {
+    const cfg = currentConfig && typeof currentConfig === 'object' ? currentConfig : {};
+    const code = normalizeLocale(newLocale);
+    if (!isLocaleAllowed(code)) {
+      return { success: false, reason: 'LOCALE_NOT_IN_CATALOG_OR_RESTRICTED',
+        locale: cfg.lang || cfg.locale || 'en' };
     }
-
-    // Safe Translation Resolver with Zero Raw Key Leakage
-    function resolveTranslation(key, currentLocale, translationsCatalog = {}) {
-        if (!key || typeof key !== 'string') return "";
-
-        const lang = (currentLocale || "en").toLowerCase();
-        const baseCatalog = translationsCatalog["en"] || {};
-        const targetCatalog = translationsCatalog[lang] || {};
-
-        // Tier 1: Target Locale Match
-        if (targetCatalog[key] !== undefined && targetCatalog[key] !== "") {
-            return targetCatalog[key];
-        }
-
-        // Tier 2: Base English Fallback
-        if (baseCatalog[key] !== undefined && baseCatalog[key] !== "") {
-            return baseCatalog[key];
-        }
-
-        // Tier 3: Humanized Formatter (Converts 'TIMER_START_BUTTON' -> 'Timer Start Button')
-        return key
-            .toLowerCase()
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+    const updatedConfig = Object.assign({}, cfg);
+    // app.js stores 'lang'; retain legacy 'locale' only when already used.
+    if (Object.prototype.hasOwnProperty.call(cfg, 'lang') || !Object.prototype.hasOwnProperty.call(cfg, 'locale')) {
+      updatedConfig.lang = code;
     }
-
-    // Switch Language without mutating user data
-    function setSystemLanguage(newLocale, currentConfig, storageBackend) {
-        if (!isLocaleAllowed(newLocale)) {
-            return {
-                success: false,
-                reason: "LOCALE_NOT_IN_ACTIVE_20_CATALOG_OR_RESTRICTED",
-                locale: currentConfig.locale || "en"
-            };
-        }
-
-        const updatedConfig = {
-            ...currentConfig,
-            locale: newLocale,
-            updatedAt: Date.now()
-        };
-
-        if (storageBackend && typeof storageBackend.setItem === 'function') {
-            try {
-                storageBackend.setItem("zen_fortress_cfg_v21", JSON.stringify(updatedConfig));
-            } catch (e) {}
-        }
-
-        return {
-            success: true,
-            status: "LOCALE_UPDATED",
-            locale: newLocale,
-            isRtl: ["ar", "fa", "ur"].includes(newLocale)
-        };
+    if (Object.prototype.hasOwnProperty.call(cfg, 'locale')) updatedConfig.locale = code;
+    if (storageBackend && typeof storageBackend.setItem === 'function') {
+      try {
+        storageBackend.setItem('zen_fortress_cfg_v21', JSON.stringify(updatedConfig));
+      } catch (_) {
+        return { success: false, reason: 'LANGUAGE_SAVE_FAILED',
+          locale: cfg.lang || cfg.locale || 'en' };
+      }
     }
+    return { success: true, status: 'LOCALE_UPDATED', locale: code,
+      isRtl: isRtlLocale(code), config: updatedConfig };
+  }
 
-    if (typeof module !== 'undefined' && module.exports) {
-        module.exports = {
-            resolveTranslation,
-            setSystemLanguage,
-            isLocaleAllowed,
-            ACTIVE_20_LOCALES,
-            EXCLUDED_LOCALES
-        };
-    } else {
-        global.ZenLocalization = {
-            resolveTranslation,
-            setSystemLanguage,
-            isLocaleAllowed,
-            ACTIVE_20_LOCALES,
-            EXCLUDED_LOCALES
-        };
-    }
+  const api = { resolveTranslation, setSystemLanguage, isLocaleAllowed,
+    isRtlLocale, normalizeLocale, SUPPORTED_LOCALES, RTL_LOCALES, EXCLUDED_LOCALES,
+    ACTIVE_20_LOCALES: Object.freeze(['ar','en','es','fr','de','it','pt','ru','zh','ja','ko','hi','fa','ur','tr','id','vi','pl','nl','sv']) };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else global.ZenLocalization = api;
 })(typeof window !== 'undefined' ? window : globalThis);
