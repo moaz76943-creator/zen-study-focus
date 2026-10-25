@@ -1143,7 +1143,7 @@
         <textarea class="modal-inp" id="inpRestorePayload" style="height:65px; resize:none; font-size:0.72rem;" placeholder="Paste your backup code here (contains readable data)..."></textarea>
         <div class="modal-actions">
           <button class="mbtn-pri" style="background:var(--emerald);" onclick="restoreFromEncryptedCode()">Restore Code ✓</button>
-          <button class="mbtn-sec" onclick="document.getElementById('fileRestoreInput').click()">📂 Load File</button>
+          <button class="mbtn-sec" onclick="window.ZenNative && typeof ZenNative.importBackupFromFile==='function' ? ZenNative.importBackupFromFile() : document.getElementById('fileRestoreInput').click()">📂 Load File</button>
           <input type="file" id="fileRestoreInput" style="display:none;" accept=".zenbackup,.json,.txt" onchange="restoreFromFileInput(event)">
         </div>
       </div>

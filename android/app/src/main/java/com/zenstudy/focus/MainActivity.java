@@ -24,6 +24,9 @@ import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private static final int REQUEST_BACKUP_EXPORT = 7410;
+    private static final int REQUEST_BACKUP_IMPORT = 7412;
+    private static final int MAX_BACKUP_IMPORT_BYTES = 8 * 1024 * 1024;
+    private boolean backupImportPickerOpen = false;
     private String backupAwaitingSave = null;
 
     @Override
@@ -107,6 +110,27 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
+        public void importBackupFromFile() {
+            runOnUiThread(() -> {
+                if (backupImportPickerOpen) return;
+                backupImportPickerOpen = true;
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                        new String[]{"text/plain", "application/json", "application/octet-stream"});
+                try {
+                    startActivityForResult(intent, REQUEST_BACKUP_IMPORT);
+                } catch (Exception error) {
+                    backupImportPickerOpen = false;
+                    Toast.makeText(MainActivity.this,
+                            "Backup picker unavailable; existing data unchanged",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
         public void exportBackupToFile(String backupCode) {
             if (backupCode == null || !backupCode.startsWith("ZEN21::")
                     || backupCode.length() > 14000000) return;
@@ -154,6 +178,40 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_BACKUP_IMPORT) {
+            backupImportPickerOpen = false;
+            if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null) return;
+            try (java.io.InputStream source =
+                    getContentResolver().openInputStream(data.getData())) {
+                if (source == null) throw new java.io.IOException("No selected document");
+                java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+                byte[] chunk = new byte[8192];
+                int total = 0, count;
+                while ((count = source.read(chunk)) != -1) {
+                    total += count;
+                    if (total > MAX_BACKUP_IMPORT_BYTES)
+                        throw new java.io.IOException("Backup exceeds size limit");
+                    bytes.write(chunk, 0, count);
+                }
+                final String backupCode =
+                        new String(bytes.toByteArray(), StandardCharsets.UTF_8);
+                if (backupCode.trim().isEmpty()) throw new java.io.IOException("Empty backup");
+                if (webView == null || isDestroyed()) return;
+                // Native only transports user-picked text. Existing v21 code owns
+                // checksum/schema verification, explicit consent and atomic commit.
+                final String script = "if(typeof verifyAndRestoreBackupCode==='function')"
+                        + "verifyAndRestoreBackupCode("
+                        + org.json.JSONObject.quote(backupCode) + ");";
+                webView.post(() -> {
+                    if (webView != null && !isDestroyed())
+                        webView.evaluateJavascript(script, null);
+                });
+            } catch (Exception error) {
+                Toast.makeText(this, "Unable to read backup; data unchanged",
+                        Toast.LENGTH_LONG).show();
+            }
+            return;
+        }
         if (requestCode != REQUEST_BACKUP_EXPORT) return;
         String payload = backupAwaitingSave;
         backupAwaitingSave = null;
