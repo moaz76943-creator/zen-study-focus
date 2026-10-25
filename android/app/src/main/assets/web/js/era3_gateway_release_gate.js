@@ -65,19 +65,19 @@
       gate_status_certified: "Grand Centurion Era 3 Gateway v2.2.0 Certified (100% GREEN).",
       gate_status_pending: "Gateway verification pending.",
       manifest_title: "Deep Focus v2.2.0 Grand Gateway Production Manifest",
-      pillars_label: "Certified Architectural Pillars",
+      pillars_label: "Architectural Pillars",
       modules_label: "Gateway Core Engines",
-      security_offline_label: "100% Offline Data Fortress v21 Compliance Verified",
-      zero_medical_label: "Zero Medical Claims Policy Verified"
+      security_offline_label: "Offline Data Fortress v21 Compliance",
+      zero_medical_label: "Zero Medical Claims Policy"
     },
     ar: {
       gate_status_certified: "تم اعتماد بوابة القرن الثالث الكبرى ديب فوكس v2.2.0 بنجاح تام (100% GREEN).",
       gate_status_pending: "فحص اعتماد البوابة قيد المعالجة.",
       manifest_title: "البيان الإنتاجي الشامل لبوابة القرن الثالث ديب فوكس v2.2.0",
-      pillars_label: "الأركان المعمارية الأربعة المعتمدة",
-      modules_label: "محركات بوابة الإصدار المعتمدة",
-      security_offline_label: "التحقق من الامتثال التام لحصن بيانات v21 والعمل دون اتصال 100%",
-      zero_medical_label: "التحقق من خلو التطبيق من أي ادعاءات طبية أو علاجية"
+      pillars_label: "الأركان المعمارية الأربعة",
+      modules_label: "محركات بوابة الإصدار",
+      security_offline_label: "امتثال حصن بيانات v21 والعمل دون اتصال",
+      zero_medical_label: "سياسة خلو التطبيق من الادعاءات الطبية أو العلاجية"
     }
   };
 
@@ -121,11 +121,11 @@
       name: m.name,
       file: m.file,
       priority: m.priority,
-      status: 'VERIFIED'
+      status: 'NOT_VERIFIED'
     }));
 
     return {
-      certified: true,
+      certified: false,
       totalModules: total,
       totalFormatted: toWesternDigits(total),
       modules: checks,
@@ -145,7 +145,7 @@
     md += `**Release Tag:** \`${info.tag}\`  \n`;
     md += `**Schema Architecture:** \`${info.schemaVersion}\`  \n`;
     md += `**Total Cumulative Missions:** \`${toWesternDigits(info.totalCumulativeMissions)}\`  \n`;
-    md += `**Audit Status:** **${t('gate_status_certified')}**\n\n`;
+    md += `**Audit Status:** **${t(audit.certified ? 'gate_status_certified' : 'gate_status_pending')}**\n\n`;
     md += `---\n\n`;
 
     md += `### 🏛️ ${t('pillars_label')}\n\n`;
@@ -155,18 +155,18 @@
     md += `\n`;
 
     md += `### ✅ Compliance & Safety Checklist\n\n`;
-    md += `- [x] **${t('security_offline_label')}**\n`;
-    md += `- [x] **${t('zero_medical_label')}**\n`;
-    md += `- [x] **Strict Western Digits Enforced:** \`0123456789\`\n`;
-    md += `- [x] **100-Locale Google Play Readiness:** Strict English fallback & zero Hebrew\n`;
-    md += `- [x] **Branch Safety:** Committed exclusively to \`integration/master-qa-verified-v21\` (Zero force-pushes to \`main\`)\n\n`;
+    md += `- [ ] **${t('security_offline_label')}** — NOT_VERIFIED\n`;
+    md += `- [ ] **${t('zero_medical_label')}** — NOT_VERIFIED\n`;
+    md += `- [ ] **Strict Western Digits (pending verification):** \`0123456789\`\n`;
+    md += `- [ ] **100-Locale Google Play Readiness (pending verification):** Strict English fallback & zero Hebrew\n`;
+    md += `- [ ] **Branch Safety (pending verification):** Committed exclusively to \`integration/master-qa-verified-v21\` (Zero force-pushes to \`main\`)\n\n`;
 
     md += `### 📦 ${t('modules_label')} (${toWesternDigits(audit.totalModules)})\n\n`;
     md += `| Mission | Engine Name | Source File | Priority | Status |\n`;
     md += `| :---: | :--- | :--- | :---: | :---: |\n`;
 
     audit.modules.forEach(m => {
-      md += `| \`${m.id}\` | **${m.name}** | \`${m.file}\` | \`${m.priority}\` | \`100% GREEN\` |\n`;
+      md += `| \`${m.id}\` | **${m.name}** | \`${m.file}\` | \`${m.priority}\` | \`${m.status}\` |\n`;
     });
 
     return md;
