@@ -105,7 +105,7 @@ test('verified multilingual domains take precedence over an English core fallbac
   assert.match(rows.children[0].children[2].children[1].attributes['aria-label'],/Studium/);
 });
 test('RTL and LTR rendering retains Latin generated digits and scoped direction',()=>{
-  for(const [lang,dir] of [['ar','rtl'],['fa','rtl'],['de','ltr']]){
+  for(const [lang,dir] of [['ar','rtl'],['fa','rtl'],['ku','ltr'],['de','ltr']]){
     const f=fixture({lang,cfg:{sessionHistory:[
       {id:'ok',date:'2026-10-21',domain:'study',minutes:25}]}});
     const rows=f.doc.getElementById('dailyGoalsRows');
