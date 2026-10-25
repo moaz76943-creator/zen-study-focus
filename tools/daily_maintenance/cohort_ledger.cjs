@@ -9,6 +9,10 @@ const VALID_STATUS=new Set(['SOURCE_TESTED','SOURCE_PARTIAL','NOT_TESTED','BLOCK
 const TTL_MS=6*60*60*1000;
 const OPEN='<!-- DF_AGENT_LEDGER_V1\n',CLOSE='\nEND_DF_AGENT_LEDGER_V1 -->';
 function validDate(s){return typeof s==='string'&&UTC.test(s)&&Number.isFinite(Date.parse(s));}
+function verifiedTap(a){
+ return a.tests>0&&Number.isSafeInteger(a.cases)&&a.cases>0&&
+  a.passed===a.cases&&a.skipped===0&&a.todo===0;
+}
 function validateCycle(r){
  if(!r||r.schema_version!==1||!SHA.test(r.source_sha||''))throw Error('Invalid source SHA or schema');
  if(!HASH.test(r.manifest_sha256||''))throw Error('Invalid manifest checksum');
@@ -22,16 +26,22 @@ function validateCycle(r){
   if(ids.has(a.id))throw Error('Duplicate selected specialist');
   ids.add(a.id);
   if(!VALID_STATUS.has(a.status)||!Number.isInteger(a.tests)||a.tests<0||a.tests>350)throw Error('Untrusted agent result');
+  if(a.status==='SOURCE_TESTED'&&!verifiedTap(a))
+   throw Error('SOURCE_TESTED requires complete passing Node TAP evidence');
  }
  if(!r.coverage||!Array.isArray(r.coverage.unmapped)||!Array.isArray(r.coverage.duplicates)||
    ![...r.coverage.unmapped,...r.coverage.duplicates].every(x=>typeof x==='string'&&x.startsWith('tests/')&&x.length<350))throw Error('Invalid coverage inventory');
+ const expected=r.agents.some(a=>a.status!=='SOURCE_TESTED')?'BLOCKED':
+  r.coverage.unmapped.length||r.coverage.duplicates.length?'COVERAGE_GAP':'COHORT_PASS';
+ if(r.status!==expected)throw Error('Inconsistent cohort status: source evidence cannot be promoted to PASS');
+ if(Date.parse(r.checked_at)>Date.now()+5*60*1000)throw Error('Future evidence timestamp');
  return r;
 }
 function validPrevious(p){
  if(!p||p.schema_version!==1||!SHA.test(p.source_sha||'')||!HASH.test(p.manifest_sha256||'')||!validDate(p.checked_at)||
    !Array.isArray(p.agent_ids)||p.agent_ids.length<1||p.agent_ids.length>30||new Set(p.agent_ids).size!==p.agent_ids.length||
    p.agent_ids.some(x=>typeof x!=='string'||!ID.test(x))||!p.records||typeof p.records!=='object'||Array.isArray(p.records))return false;
- for(const [key,v] of Object.entries(p.records))if(!p.agent_ids.includes(key)||!v||!VALID_STATUS.has(v.status)||!validDate(v.checked_at)||!Number.isInteger(v.tests)||v.tests<0)return false;
+ for(const [key,v] of Object.entries(p.records))if(!p.agent_ids.includes(key)||!v||!VALID_STATUS.has(v.status)||!validDate(v.checked_at)||!Number.isInteger(v.tests)||v.tests<0||(v.status==='SOURCE_TESTED'&&!verifiedTap(v)))return false;
  return true;
 }
 function aggregate(previous,raw,{ttlMs=TTL_MS}={}){
@@ -43,9 +53,9 @@ function aggregate(previous,raw,{ttlMs=TTL_MS}={}){
  if(compatible)for(const id of r.agent_ids){
   const saved=previous.records[id];
   if(saved&&now>=Date.parse(saved.checked_at)&&now-Date.parse(saved.checked_at)<=ttlMs)
-   records[id]={status:saved.status,tests:saved.tests,checked_at:saved.checked_at};
+   records[id]={status:saved.status,tests:saved.tests,cases:saved.cases,passed:saved.passed,skipped:saved.skipped,todo:saved.todo,checked_at:saved.checked_at};
  }
- for(const a of r.agents)records[a.id]={status:a.status,tests:a.tests,checked_at:r.checked_at};
+ for(const a of r.agents)records[a.id]={status:a.status,tests:a.tests,cases:a.cases,passed:a.passed,skipped:a.skipped,todo:a.todo,checked_at:r.checked_at};
  const missing=r.agent_ids.filter(id=>!records[id]);
  const blocked=r.agent_ids.filter(id=>records[id]&&records[id].status!=='SOURCE_TESTED');
  const coverage={unmapped:[...new Set(r.coverage.unmapped)].sort(),duplicates:[...new Set(r.coverage.duplicates)].sort()};
