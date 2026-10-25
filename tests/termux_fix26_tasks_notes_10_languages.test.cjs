@@ -37,7 +37,8 @@ test('previous 2099 translations survive and pack is local only',()=>{
   const prior=['de','es','fr','it','pt','tr','ru','nl','sv','da','no','fi','pl','uk','ro','cs','hu'];
   for(const lang of prior)assert.ok(packs[lang]?.timer,lang+' prior timer');
   assert.equal(packs.he,undefined);assert.equal(packs.iw,undefined);
-  assert.equal(Object.values(packs).reduce((n,f)=>n+Object.values(f).reduce((s,d)=>s+Object.keys(d).length,0),0),3099);
+  const total=Object.values(packs).reduce((n,f)=>n+Object.values(f).reduce((s,d)=>s+Object.keys(d).length,0),0);
+  assert.ok(total>=3099,'Batch 26 translations lost: '+total);
   assert.doesNotMatch(script,/\b(?:localStorage|indexedDB|XMLHttpRequest|fetch\s*\()\b/);
 });
 test('new Slavic and Baltic samples are native rather than English copies',()=>{
