@@ -1,0 +1,57 @@
+{
+  "timer": [
+    "⚙ Prilagodi",
+    "Nastavitve osredotočenosti in odmora",
+    "Trenutna seja ostane shranjena; spremembe veljajo le za nove seje.",
+    "Osredotočenost · min",
+    "Kratek odmor · min",
+    "Dolg odmor · min",
+    "Seje na cikel",
+    "Privzete vrednosti",
+    "Shrani",
+    "Vnesite cela števila znotraj prikazanih razponov.",
+    "Nastavitve so shranjene"
+  ],
+  "goals": [
+    "✦ DNEVNI CILJI",
+    "Vsak dan nekaj napredka",
+    "Minute se štejejo iz zaključenih sej osredotočenosti.",
+    "⚙ Uredi",
+    "Dnevni cilji po dejavnostih",
+    "Vnesite 0, da skrijete cilj. Štejejo le zaključene seje.",
+    "Cilji so shranjeni",
+    "Vnesite celo število minut od 0 do 720.",
+    "Nastavi cilj",
+    "min",
+    "zaključeno",
+    "danes",
+    "Ta teden",
+    "Tedenski cilj (min)",
+    "Tedenski cilji morajo biti med 0 in 5040 minutami."
+  ],
+  "analytics": [
+    "Analitika zabeleženih dejavnosti",
+    "Dejavnost",
+    "Obdobje",
+    "Od",
+    "Do",
+    "Zabeležene minute",
+    "Seje",
+    "Povprečje na sejo",
+    "Trenutni niz",
+    "V tem obdobju ni zabeleženih sej",
+    "Primerjava ciljev",
+    "Dnevni cilji niso nastavljeni",
+    "Dokončane naloge",
+    "Dnevna porazdelitev",
+    "Leto",
+    "Izvozi CSV",
+    "Izberite dan za podrobnosti"
+  ],
+  "analyticsDomain": [
+    "Učenje",
+    "Branje",
+    "Delo",
+    "Šport"
+  ]
+}
