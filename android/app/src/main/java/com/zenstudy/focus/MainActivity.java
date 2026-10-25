@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         WebView.setWebContentsDebuggingEnabled(false);
-        if (!"com.deepfocus.study".equals(getPackageName())) {
+        if (!"com.zenstudy.focus".equals(getPackageName())) {
             finish();
             return;
         }

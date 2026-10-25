@@ -28,3 +28,10 @@ test('P0: v21 family keys remain byte-for-byte compatible', () => {
   });
   assert.equal(D.JOURNAL_KEY, 'deep_focus_data_compat_v21_journal_v1');
 });
+
+test('P0: MainActivity must keep launch enabled for the original installed package', () => {
+  const check = native.match(/if\s*\(!"([^"]+)"\.equals\(getPackageName\(\)\)\)\s*\{\s*finish\(\)/);
+  assert.ok(check, 'Find explicit native installation identity guard');
+  assert.equal(check[1], 'com.zenstudy.focus',
+    'Native onCreate must not finish() after Gradle restores the original app identity');
+});
