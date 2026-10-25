@@ -1,0 +1,32 @@
+{
+  "timer": [
+    "⚙ Sesuaikan",
+    "Pengaturan fokus dan istirahat",
+    "Sesi saat ini tetap tersimpan; perubahan hanya berlaku untuk sesi baru.",
+    "Fokus · mnt",
+    "Istirahat singkat · mnt",
+    "Istirahat panjang · mnt",
+    "Sesi per siklus",
+    "Pengaturan awal",
+    "Simpan",
+    "Masukkan bilangan bulat dalam rentang yang ditampilkan.",
+    "Pengaturan tersimpan"
+  ],
+  "goals": [
+    "✦ TARGET HARIAN",
+    "Kemajuan kecil setiap hari",
+    "Menit dihitung dari sesi fokus yang sudah selesai.",
+    "⚙ Ubah",
+    "Target harian menurut aktivitas",
+    "Masukkan 0 untuk menyembunyikan target. Hanya sesi yang selesai yang dihitung.",
+    "Target tersimpan",
+    "Masukkan jumlah menit bulat dari 0 hingga 720.",
+    "Tetapkan target",
+    "mnt",
+    "selesai",
+    "hari ini",
+    "Minggu ini",
+    "Target mingguan (mnt)",
+    "Target mingguan harus antara 0 dan 5040 menit."
+  ]
+}
