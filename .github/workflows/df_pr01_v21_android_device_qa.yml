@@ -1,0 +1,81 @@
+name: DF-PR-01 v21 real Android SAF and process-kill QA (non-release)
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/preflight_v22.js'
+      - 'android/app/src/main/assets/web/integration_v22.js'
+      - 'tests/android_e2e_recovery/p0_timer_saf_android.cjs'
+      - 'tests/android_e2e_recovery/p0_timer_saf_ci.sh'
+      - '.github/workflows/df_pr01_v21_android_device_qa.yml'
+permissions:
+  contents: read
+concurrency:
+  group: df-pr01-device-${{ github.event.pull_request.number }}-${{ matrix.api-level }}
+  cancel-in-progress: true
+jobs:
+  android-device:
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [30, 35]
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Assert exact PR head and build source
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          node --check tests/android_e2e_recovery/p0_timer_saf_android.cjs
+          node --test tests/integration_recovery/native_saf_import_forwardport.test.cjs
+      - name: Ensure Android compile SDK 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          "$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-36" "build-tools;36.0.0"
+      - name: Compile disposable non-release APK
+        run: gradle -p android :app:assembleDebug --no-daemon
+      - name: Capture exact SHA and prepare emulator
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/df-pr01-android"
+          git rev-parse HEAD HEAD:android > "$RUNNER_TEMP/df-pr01-android/source-shas.txt"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/df-pr01-android/built-apk.sha256"
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Execute real DocumentsUI, native ACK and force-stop probes
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 900
+          disable-animations: true
+          script: bash tests/android_e2e_recovery/p0_timer_saf_ci.sh
+      - name: Preserve real PASS FAIL NOT_TESTED results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DF-PR-01-Android-${{ matrix.api-level }}-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/df-pr01-android/
+          retention-days: 7
+          if-no-files-found: warn
