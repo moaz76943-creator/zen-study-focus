@@ -58,7 +58,7 @@ test('Five existing UI areas are wired into bridge and no v21 persistence keys a
   'goals_studio.js':'DF99Locale?.t(cfg.lang',
   'notes_studio.js':'DF99Locale?.t(cfg.lang',
   'tasks_studio.js':"DF99Locale?.section('tasks'",
-  'analytics_studio.js':"DF99Locale?.t(opts.locale,'analyticsDomain'"
+  'analytics_studio.js':"dict.t(code,'analyticsDomain'"
  };
  for(const [filename,marker] of Object.entries(pages))assert.ok(read(filename).includes(marker),filename);
  const html=read('index.html');
