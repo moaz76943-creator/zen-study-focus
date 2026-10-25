@@ -1944,8 +1944,10 @@ function applyLanguage(code) {
   document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
   const tn = document.getElementById('navTrainingText');
-  if (tn) tn.textContent = window.DF22Locale?.translations?.[meta.code]?.quickTraining
+  const trainingLabel = window.DF22Locale?.translations?.[meta.code]?.quickTraining
     || (typeof quickText === 'function' ? quickText('trainingTitle') : 'Quick training');
+  if (tn) tn.textContent = trainingLabel;
+  document.getElementById('navTraining')?.setAttribute('aria-label', trainingLabel);
   if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -2777,7 +2779,7 @@ function renderCalendar() {
   const d = L();
   document.getElementById('calMonthYearTitle').textContent = toWest(`${d.months[calMonth]} ${calYear}`);
   const weekdayRow=document.getElementById('calWeekdaysRow');
-  weekdayRow.replaceChildren();
+  weekdayRow.textContent = '';
   d.weekdays.forEach(w => {
     const label=document.createElement('div');
     label.textContent=toWest(w);

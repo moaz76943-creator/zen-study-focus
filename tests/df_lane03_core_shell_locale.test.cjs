@@ -192,5 +192,14 @@ test('premium English fallback never masks real Ukrainian Quick Training transla
  vm.runInContext(read('locale_premium_v22.js'),d.ctx);
  vm.runInContext("applyLanguage('uk')",d.ctx);
  assert.equal(d.training.textContent,'Швидке тренування');
+ assert.equal(d.ctx.document.getElementById('navTraining').attrs['aria-label'],'Швидке тренування');
  assert.equal(d.ctx.cfg.lang,'uk');
+});
+
+test('core weekday rendering avoids unsupported replaceChildren on older Android WebViews',()=>{
+ const start=app.indexOf('function renderCalendar() {');
+ const end=app.indexOf('function renderSelectedDateAgenda()',start);
+ assert.ok(start>=0&&end>start);
+ assert.doesNotMatch(app.slice(start,end),/weekdayRow\.replaceChildren\(/);
+ assert.match(app.slice(start,end),/weekdayRow\.textContent\s*=\s*''/);
 });
