@@ -52,10 +52,23 @@ def dump():
         if start == -1:
             start = raw.find("<hierarchy")
         end = raw.rfind("</hierarchy>")
-        if exported.returncode == 0 and fetched.returncode == 0 and start >= 0 and end >= start:
+        if (exported.returncode == 0 and fetched.returncode == 0
+                and "ERROR:" not in exported.stdout + exported.stderr
+                and start >= 0 and end >= start):
             try:
                 root = ET.fromstring(raw[start:end + len("</hierarchy>")])
-                return list(root.iter("node"))
+                nodes = list(root.iter("node"))
+                # A native WebView container can precede its virtual children.
+                # Returning that first tree makes every following locator race
+                # WebView accessibility initialization on a cold launch.
+                if any(is_visible_node(n) and (n.get("text") or n.get("content-desc"))
+                       for n in nodes):
+                    dest = os.getenv("DF13_EVIDENCE_DIR")
+                    if dest:
+                        Path(dest).mkdir(parents=True, exist_ok=True)
+                        (Path(dest) / "LAST_UI.xml").write_text(ET.tostring(root, encoding="unicode"))
+                    return nodes
+                reason = "no_visible_accessibility_content"
             except ET.ParseError as exc:
                 reason = "invalid_xml:" + str(exc)
         else:
@@ -78,13 +91,20 @@ def dump():
 def value(node):
     return " ".join(node.get(k, "") for k in ("text", "content-desc", "hint", "resource-id"))
 
+def is_visible_node(node):
+    match = BOUNDS.fullmatch(node.get("bounds", ""))
+    if not match:
+        return False
+    x1, y1, x2, y2 = map(int, match.groups())
+    return x2 > x1 and y2 > y1
+
 def visible(nodes, needle):
     return next((n for n in nodes if needle.casefold() in value(n).casefold()
-                 and n.get("bounds")), None)
+                 and is_visible_node(n)), None)
 
 def iso_badge(nodes, code):
     return next((n for n in nodes if n.get("text", "").strip().upper() == code.upper()
-                 and n.get("bounds")), None)
+                 and is_visible_node(n)), None)
 
 def has_visible(nodes, needle):
     """Explicit presence: an ElementTree leaf is false-y despite being present."""
@@ -112,7 +132,7 @@ def click(label):
     tap_node(visible(dump(), label))
 
 def node_class_contains(n, name):
-    return name in n.get("class", "") and n.get("bounds")
+    return name in n.get("class", "") and is_visible_node(n)
 
 def text_input(index, value):
     nodes = dump()
@@ -158,6 +178,16 @@ def record(results, name, fn, checkpoint=None):
         results[name] = {"status":"PASS", "detail":detail}
     except Exception as error:
         results[name] = {"status":"FAIL", "error":str(error)}
+        dest = os.getenv("DF13_EVIDENCE_DIR")
+        if dest:
+            try:
+                screenshot(Path(dest), "failure_" + name)
+                # Preserve the tree preceding the failing action, not a later case.
+                last = Path(dest) / "LAST_UI.xml"
+                if last.exists():
+                    (Path(dest) / ("failure_" + name + ".xml")).write_bytes(last.read_bytes())
+            except Exception:
+                pass
     results[name]["duration_ms"] = int((time.monotonic() - started) * 1000)
     print("DF13_CASE", name, results[name]["status"], flush=True)
     if checkpoint is not None:
