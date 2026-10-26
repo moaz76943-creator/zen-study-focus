@@ -255,3 +255,35 @@ test('DF-PARALLEL-05: Quick Add cannot erase unsaved edits in an opened full tas
  assert.equal(f.commits(),0,'Cancelling an unsaved edit must never publish it');
  f.studio.destroy();
 });
+
+
+test('DF05 daily priority pin/unpin is durable, limited to three and rolls back failed ACK',()=>{
+ let state={cfg:{taskProjectsV21:[],sessionHistory:[],unknown:{keep:'v21'}},tasksList:[
+  {id:1,title:'One',done:false,catKey:'study'},
+  {id:2,title:'Two',done:false,catKey:'study'},
+  {id:3,title:'Three',done:false,catKey:'study'},
+  {id:4,title:'Four',done:false,catKey:'study'}
+ ]}, writes=0, failAck=false;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),
+  commit(before,after){assert.deepEqual(before,state);if(failAck)return false;
+   writes++;state=JSON.parse(JSON.stringify(after));return true;}});
+ const cardFor=title=>root.descendants.find(x=>x.tagName==='ARTICLE'&&x.descendants.some(n=>n.className==='df-title'&&n.textContent===title));
+ const action=(name,caption)=>{
+  const card=cardFor(name);assert.ok(card,'card '+name);
+  const b=card.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent===caption);
+  assert.ok(b,caption+' for '+name);b.dispatch('click');
+ };
+ action('One','Top three');action('Two','Top three');action('Three','Top three');
+ assert.equal(writes,3);
+ assert.deepEqual(state.cfg.taskTopThreeV21['2026-10-26'],[1,2,3]);
+ action('Four','Top three');assert.equal(writes,3,'fourth pin must not write');
+ failAck=true;action('One','Unpin');
+ assert.deepEqual(state.cfg.taskTopThreeV21['2026-10-26'],[1,2,3]);
+ failAck=false;action('One','Unpin');
+ assert.deepEqual(state.cfg.taskTopThreeV21['2026-10-26'],[2,3]);
+ assert.deepEqual(state.cfg.unknown,{keep:'v21'});
+ assert.ok(state.tasksList.every(x=>!Object.hasOwn(x,'manuallyPinned')),'only existing cfg persisted');
+ studio.destroy();
+});
