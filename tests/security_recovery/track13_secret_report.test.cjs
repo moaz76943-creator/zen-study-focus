@@ -85,6 +85,23 @@ test('summarizes rule counts across all private Gitleaks findings, beyond bounde
   assert.equal(r.output.evidence.length,25);
   assert.ok(!(r.stdout+r.stderr).includes(sentinel));
 });
+test('report distinct source files and historical commits without exposing raw identifiers',()=>{
+  const secret='SYNTHETIC-SENSITIVE-IDENTIFIER';
+  const reports=[
+    {RuleID:'generic-api-key',File:'private/'+secret+'/a',Commit:'b'.repeat(40),StartLine:3,Secret:secret},
+    {RuleID:'generic-api-key',File:'private/'+secret+'/a',Commit:'b'.repeat(40),StartLine:3,Secret:secret},
+    {RuleID:'generic-api-key',File:'private/'+secret+'/a',Commit:'c'.repeat(40),StartLine:3,Secret:secret},
+    {RuleID:'generic-api-key',File:'private/'+secret+'/b',Commit:'c'.repeat(40),StartLine:8,Secret:secret}
+  ];
+  const r=run(reports,1);
+  assert.equal(r.status,1);
+  assert.equal(r.output.status,'FAIL');
+  assert.equal(r.output.findings,4);
+  assert.equal(r.output.distinct_source_files,2);
+  assert.equal(r.output.distinct_history_commits,2);
+  assert.ok(!(r.stdout+r.stderr).includes(secret));
+  assert.ok(!(r.stdout+r.stderr).includes('private/'));
+});
 test('workflow scans exact source, history and tree; does not upload raw findings or permit bypass', () => {
   const wf = fs.readFileSync(path.join(root, '.github/workflows/track13_security_exact_sha.yml'), 'utf8');
   assert.match(wf, /pull_request:/);
