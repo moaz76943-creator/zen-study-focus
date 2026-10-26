@@ -308,11 +308,21 @@ def restart():
     shell("am", "force-stop", PACKAGE)
     shell("am", "start", "-n", ACTIVITY)
     time.sleep(5)
-    nodes = dump()
-    errors = current_console_evidence()
-    if errors:
-        raise AppRuntimeError(errors)
-    return nodes
+    deadline = time.monotonic() + 45
+    while True:
+        nodes = dump()
+        errors = current_console_evidence()
+        if errors:
+            raise AppRuntimeError(errors)
+        # index.html already contains "EN English" and "Deep Focus" before
+        # app.js runs. applyLanguage publishes the ISO + bilingual label only
+        # after loading and saving the selected config. Wait for that evidence.
+        if any(is_visible_node(n) and n.get("clickable") == "true"
+               and re.match(r"^[A-Z]{2,3}\s.+•", accessible_name(n)) for n in nodes):
+            return nodes
+        if time.monotonic() >= deadline:
+            raise AssertionError("Static HTML visible but initialized locale control absent after cold-launch wait")
+        time.sleep(0.5)
 
 def screenshot(out, name):
     path = out / (name + ".png")
