@@ -3416,6 +3416,27 @@ function renderSoundsStudio() {
    ======================================================== */
 function renderAnalyticsBars() {
   const hist = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
+  // The label says "verified sessions", so apply the same verified-ledger rule
+  // as analytics_core_v21: genuine v21 records only, never interrupted,
+  // rest/break, starter or demo/sample entries. No user data is modified.
+  const isVerifiedSession = entry => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false;
+    if (entry.isStarter === true || entry.isDemo === true || entry.demo === true || entry.synthetic === true) return false;
+    if (typeof entry.source === 'string' &&
+        ['demo', 'sample', 'test', 'fixture'].includes(entry.source.trim().toLowerCase())) return false;
+    if (entry.completed === false || entry.isComplete === false ||
+        entry.isFocus === false || entry.focus === false) return false;
+    const status = typeof entry.status === 'string' ? entry.status.toLowerCase().replace(/-/g, '_') : '';
+    if (['active', 'running', 'paused', 'started', 'pending', 'in_progress',
+        'cancelled', 'canceled', 'aborted', 'interrupted', 'failed', 'incomplete',
+        'stopped', 'skipped', 'discarded', 'rest', 'break'].includes(status)) return false;
+    for (const key of ['mode', 'phase', 'type']) {
+      const value = typeof entry[key] === 'string' ? entry[key].toLowerCase().replace(/-/g, '_') : '';
+      if (['rest', 'break', 'short', 'long', 'short_break', 'long_break',
+          'short_rest', 'long_rest'].includes(value)) return false;
+    }
+    return true;
+  };
   const recent = Array.from({length: 7}, (_, i) => {
     const date = new Date(); date.setHours(12, 0, 0, 0); date.setDate(date.getDate() - (6-i));
     const key = localDateISO(date);
@@ -3423,7 +3444,8 @@ function renderAnalyticsBars() {
   });
   const domains = {study: 0, sport: 0, read: 0, work: 0};
   for (const entry of hist) {
-    if (!entry || typeof entry.date !== 'string') continue;
+    if (!isVerifiedSession(entry)) continue;
+    if (typeof entry.date !== 'string') continue;
     const minute = Number(entry.minutes);
     if (!Number.isFinite(minute) || minute < 0 || minute > 1440) continue;
     const day = recent.find(d => d.key === entry.date);
@@ -3453,7 +3475,7 @@ function renderAnalyticsBars() {
   const trend = document.getElementById('kpiWeeklyTrend');
   if (trend) trend.textContent = total + ' recorded minutes / 7 days';
   const sessionsTrend = document.getElementById('kpiSessionTrend');
-  if (sessionsTrend) sessionsTrend.textContent = hist.filter(h => recent.some(d => d.key === h.date)).length + ' verified sessions / 7 days';
+  if (sessionsTrend) sessionsTrend.textContent = hist.filter(h => isVerifiedSession(h) && recent.some(d => d.key === h.date)).length + ' verified sessions / 7 days';
   const minsLabel = document.getElementById('waveRecordedMinutes');
   if (minsLabel) minsLabel.textContent = String(total);
   const barBox = document.getElementById('anMiniBarsBox');
