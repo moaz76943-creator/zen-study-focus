@@ -1,0 +1,42 @@
+name: DF08 completion alert media audit
+on:
+  pull_request:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - 'android/app/src/main/assets/web/completion_alert_settings.js'
+      - 'android/app/src/main/assets/web/completion_alerts/**'
+      - 'tests/completion_alerts/**'
+      - '.github/workflows/df08_completion_alert_media.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scoped-audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run isolated alert behavior and SHA256/PCM gates
+        run: |
+          node --check android/app/src/main/assets/web/completion_alert_settings.js
+          node --test tests/completion_alerts/*.test.cjs
+      - name: Decode each actual WAV with FFmpeg tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          root=android/app/src/main/assets/web/completion_alerts
+          for src in "$root"/*.wav; do
+            codec=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of default=nw=1:nk=1 "$src")
+            rate=$(ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=nw=1:nk=1 "$src")
+            channels=$(ffprobe -v error -select_streams a:0 -show_entries stream=channels -of default=nw=1:nk=1 "$src")
+            test "$codec" = pcm_s16le
+            test "$rate" = 44100
+            test "$channels" = 1
+            ffmpeg -v error -xerror -i "$src" -f null -
+          done
