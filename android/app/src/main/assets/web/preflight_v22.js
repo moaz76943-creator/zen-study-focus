@@ -21,7 +21,15 @@
       if ((a===null)!==(b===null)) return false;
       if (a!==null && D.inspectPacket(a).payload!==D.inspectPacket(b).payload) return false;
     }
-    return true;
+    // A valid packet checksum is not proof of a valid v21 data family.
+    // Reject signed, wrong-shaped tasks/notes/cfg before native fsync publication.
+    const records={cfg:{},tasksList:[],notesList:[]};
+    for (const [slot,key] of Object.entries(D.KEYS)) {
+      if (packets[key]===null) continue;
+      records[slot==='cfg'?'cfg':slot==='tasks'?'tasksList':'notesList']=
+        D.inspectPacket(packets[key]).value;
+    }
+    return D.inspectRecords(records).ok;
   }
   // Android bridge returns only after AtomicFile + fsync. Browser tests use
   // their established localStorage semantics without the Android-only bridge.
