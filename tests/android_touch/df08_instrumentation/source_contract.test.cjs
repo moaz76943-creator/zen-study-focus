@@ -30,3 +30,9 @@ test('build setup touches Gradle only in disposable checkout and preserves nativ
   assert.match(shell,/df08_status=PASS/);
   assert.match(shell,/RELEASE_APPROVED=NO/);
 });
+
+test('Android failure reports matching mobile rule and loaded stylesheet before any PASS',()=>{
+  assert.match(java,/cssMatchedSelector:/);
+  assert.match(java,/cssMobileMedia:/);
+  assert.match(java,/cssLoadedStyles:/);
+});
