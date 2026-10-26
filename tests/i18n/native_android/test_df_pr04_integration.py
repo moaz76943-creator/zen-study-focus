@@ -37,3 +37,12 @@ class PR04NativeSafety(unittest.TestCase):
   self.assertIn('zen_native_timer_alarm_v21',receiver)
   self.assertIn('lastNotified',receiver)
   self.assertIn('refreshLocale(Context context)',receiver)
+
+ def test_api30_smoke_avoids_nonessential_adb_settings_failure(self):
+  workflow=(R/'.github/workflows/df_pr04_api30_api35_smoke.yml').read_text()
+  # Regression: run 40246699557 reached API30 boot but the emulator-runner
+  # died setting window_animation_scale (ADB Broken pipe) before app launch.
+  self.assertIn('disable-animations: false',workflow)
+  self.assertNotIn('disable-animations: true',workflow)
+  self.assertIn('set -eu',workflow)
+  self.assertIn('adb shell pidof com.zenstudy.focus',workflow)

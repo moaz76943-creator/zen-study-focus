@@ -46,7 +46,10 @@ jobs:
           ram-size: 2048M
           heap-size: 512M
           emulator-boot-timeout: 900
-          disable-animations: true
+          # Android 11 emulator sometimes boots slowly; runner animation settings
+          # fail with ADB Broken pipe before our script can verify app startup.
+          # Skip that optional settings call; app smoke remains strict below.
+          disable-animations: false
           script: |
             # android-emulator-runner executes script through /usr/bin/sh, not bash.
             set -eu
