@@ -113,7 +113,8 @@ test('nested Core arrays and strings are measured at leaf paths, not flagged as 
  assert.equal(result.present_keys,6);
  assert.equal(result.empty_values.length,0);
  assert.deepEqual(result.english_identical_candidates,['sampleNotes.0.b']);
- assert.equal(result.status,'PASS');
+ assert.equal(result.status,'NOT_TESTED');
+ assert.deepEqual(result.unverified_keys,['sampleNotes.0.b']);
 });
 
 

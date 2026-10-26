@@ -128,7 +128,14 @@ function auditSection({code,section,keys,read,english={},owner='UNASSIGNED',sour
    const ids=duplicates.get(value)||[];ids.push(key);duplicates.set(value,ids);
  }
  row.duplicate_value_candidates=[...duplicates.values()].filter(x=>x.length>1);
- row.status=(row.missing_keys.length||row.empty_values.length)?'FAIL':'PASS';
+ if(row.missing_keys.length||row.empty_values.length)row.status='FAIL';
+ else if(row.english_identical_candidates.length) {
+   // Matching English may be legitimate, but source text alone cannot prove it.
+   // Keep the entry present, and withhold translated acceptance until reviewed.
+   row.status='NOT_TESTED';
+   row.unverified_keys=row.english_identical_candidates.slice();
+   row.evidence='ENGLISH_IDENTICAL_REQUIRES_REVIEW';
+ } else row.status='PASS';
  return row;
 }
 function makeRepairQueue(audits) {
@@ -140,7 +147,8 @@ function makeRepairQueue(audits) {
    unverified_keys:x.unverified_keys,fallback_count:x.fallback_count,
    english_identical_candidates:x.english_identical_candidates,
    duplicate_value_candidates:x.duplicate_value_candidates,
-   action:x.status==='NOT_TESTED'?'VERIFY_SOURCE_INVENTORY':x.status==='FAIL'?'TRANSLATE_MISSING_OR_EMPTY':'REVIEW_CANDIDATES'
+   action:x.status==='NOT_TESTED'&&x.english_identical_candidates.length?'REVIEW_ENGLISH_IDENTICAL':
+     x.status==='NOT_TESTED'?'VERIFY_SOURCE_INVENTORY':x.status==='FAIL'?'TRANSLATE_MISSING_OR_EMPTY':'REVIEW_CANDIDATES'
  })).sort((a,b)=>a.owner.localeCompare(b.owner,'en')||
     String(a.source_file).localeCompare(String(b.source_file),'en')||
     a.language_code.localeCompare(b.language_code,'en')||a.section.localeCompare(b.section,'en'));
