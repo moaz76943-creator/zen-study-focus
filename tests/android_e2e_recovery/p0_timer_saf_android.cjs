@@ -76,6 +76,31 @@ async function injectWriteFailure(key){
  return 'Injected Storage.setItem failure at '+key+'; rollback and unchanged native receipt confirmed';
 }
 
+
+async function nativeIoFailureRollback(){
+ if(process.env.DF_ANDROID_DISPOSABLE!=='1')throw Error('TRANSPORT: native I/O fault requires disposable emulator');
+ const before=await fixture(),ack=await receipt();
+ // API30/35 AtomicFile stages at .new. An empty directory there forces an
+ // actual native FileOutputStream failure; never replace any existing file.
+ const path='files/v21_durable_packets_v1.new';
+ try{adb('shell','run-as',PKG,'mkdir',path);}
+ catch(_){throw Error('TRANSPORT: cannot stage isolated native write failure');}
+ try{
+  const result=await evaluate("(()=>{const before=DF22Integration.getSnapshot(),after=JSON.parse(JSON.stringify(before));after.cfg.df07Seq=(after.cfg.df07Seq||0)+3339;try{DF22Integration.write(before,after);return 'UNEXPECTED_SUCCESS';}catch(error){return String(error.message);}})()");
+  assert.match(result,/NATIVE_DURABLE_ACK_FAILED/,'Native file fault must reject ACK before publish');
+  assert.deepEqual(await fixture(),before,'Native I/O failure published new application records');
+  assert.equal(await evaluate('DeepFocusDataCompatV21.inspectPending(localStorage).pending'),false);
+ }finally{
+  // Remove only the empty directory created by this case; no recursive delete.
+  adb('shell','run-as',PKG,'rmdir',path);
+ }
+ assert.deepEqual(await receipt(),ack,'Native I/O failure advanced the durable receipt');
+ await restart();
+ assert.deepEqual(await fixture(),before,'Failed native save changed records after process restart');
+ assert.deepEqual(await receipt(),ack);
+ return 'Real native AtomicFile open failure; unchanged records/native receipt verified after force-stop/relaunch';
+}
+
 function uiNodes(xml){return [...xml.matchAll(/<node[^>]*>/g)].map(m=>m[0]);}
 function saveSafPickerEvidence(label,xml){
  // Never collect personal devices or files; require the disposable CI flag.
@@ -285,6 +310,7 @@ async function safMain(){
  for(const key of primaryKeys.flatMap(key=>[key,key+'_mirror'])){
   await run('failed_save_rollback_'+key,()=>injectWriteFailure(key));
  }
+ await run('native_ack_io_failure_rollback_restart',nativeIoFailureRollback);
  const baseline=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
  await run('saf_picker_cancel',async()=>{
   const before=await snapshot(),ack=await receipt();await evaluate('setTimeout(()=>ZenNative.importBackupFromFile(),0);true');
