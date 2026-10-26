@@ -66,6 +66,11 @@ public final class TouchInstrumentation extends Instrumentation {
                 SystemClock.sleep(400);
             }
             assertTrue(ready, "WebView app bootstrap NOT verified");
+            JSONObject viewport=js("({cssWidth:visualViewport.width,dpr:devicePixelRatio})");
+            AtomicReference<Integer> nativeWidth=new AtomicReference<>(0);
+            runOnMainSync(() -> nativeWidth.set(view.getWidth()));
+            assertTrue(Math.abs(viewport.optDouble("cssWidth")-nativeWidth.get())<=2.5,
+                "Requested CSS width not actually tested: native="+nativeWidth.get()+" "+viewport);
             String[][] tabs = {
                 {"navTasks","sec-tasks"}, {"navCalendar","sec-calendar"},
                 {"navNotes","sec-notes"}, {"navTimer","sec-timer"},
