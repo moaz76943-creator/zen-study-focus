@@ -189,6 +189,14 @@
   });
   const KEYS = Object.freeze(Object.keys(PACKS.en));
   const ALIASES = Object.freeze({ 'he':'en', 'iw':'en', 'jw':'jv' });
+  // Scoped volume labels from historic #35. These do not constitute complete
+  // language packs: metadata(...).complete remains false for fallback locales.
+  const PARTIAL_VOLUME_LABELS = Object.freeze({
+    zh:'音量', hi:'आवाज़ की तीव्रता', ru:'Громкость', pt:'Volume', ja:'音量',
+    id:'Volume', tr:'Ses düzeyi', ko:'음량', vi:'Âm lượng', it:'Volume',
+    bn:'শব্দের মাত্রা', ur:'آواز کی سطح', fa:'میزان صدا', pl:'Głośność', nl:'Volume'
+  });
+
   function localeCode(input) {
     const base = String(input || 'en').trim().toLowerCase().replace('_', '-').split('-')[0];
     return ALIASES[base] || base || 'en';
@@ -223,8 +231,10 @@
     if (!name) return null;
     return Object.freeze({
       name, play: translate(locale, 'control.play'), pause: translate(locale, 'control.pause'),
-      volume: translate(locale, 'control.volume'),
-      volumeAria: translate(locale, 'control.volumeFor', {sound:name})
+      volume: PARTIAL_VOLUME_LABELS[localeCode(locale)] || translate(locale, 'control.volume'),
+      volumeAria: metadata(locale).fallback && PARTIAL_VOLUME_LABELS[localeCode(locale)]
+        ? PARTIAL_VOLUME_LABELS[localeCode(locale)] + ': ' + name
+        : translate(locale, 'control.volumeFor', {sound:name})
     });
   }
   function bindSoundStudio({ document: doc, locale, catalog, category = 'all', legacy } = {}) {
