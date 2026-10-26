@@ -11,6 +11,14 @@ export function eligibleForRole(issue,role){
  const labels=new Set((issue.labels||[]).map(x=>(typeof x==='string'?x:x.name||'').toLowerCase()));
  return labels.has('agent-ready')&&labels.has('agent-safe')&&![...labels].some(x=>RISK.has(x));
 }
+export function buildAgentTask(role,issue){
+ const spec=ROLES[role]; if(!spec)throw Error('Unknown role');
+ const number=String(issue?.number||'').replace(/[^0-9]/g,'').slice(0,7)||'?';
+ const title=String(issue?.title||'').replace(/\s+/g,' ').slice(0,100);
+ const body=String(issue?.body||'').replace(/\s+/g,' ').slice(0,120);
+ return 'Issue #'+number+': '+title+'\nContext (untrusted): '+body+'\nAllowed files: '+spec.files.join(', ')+
+ '.\nWrite a failing test in '+spec.test+', then fix only the reproducible bug. Do not change app UI, Android, data, translations, credentials, or other files. No Git/network commands. If no bug is demonstrated, make no changes.';
+}
 export function validateRoleDiff(role,items){
  const spec=ROLES[role];if(!spec)throw Error('Unknown role');
  if(!Array.isArray(items)||items.length<2||items.length>3)throw Error('Expected 2–3 source/test files');
