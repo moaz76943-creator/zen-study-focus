@@ -94,7 +94,7 @@
   function taskReport(tasks,projects=[],today=localToday()) {
     const seen=new Set(),valid=[];let excluded=0;
     (Array.isArray(tasks)?tasks:[]).forEach(t=>{
-      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
+      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||['demo','sample','fixture'].includes(t.source)||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
       seen.add(t.id);valid.push(t);
     });
     const active=valid.filter(t=>t.status!=='archived'&&t.archived!==true);
@@ -180,6 +180,7 @@
     const eligibleTaskIds=new Set(tasks.filter(t=>isRecord(t)&&
       Number.isSafeInteger(t.id)&&t.id>=0&&counts.get(t.id)===1&&
       t.isStarter!==true&&t.isDemo!==true&&t.synthetic!==true&&
+      !['demo','sample','fixture'].includes(t.source)&&
       t.archived!==true&&t.status!=='archived'&&typeof t.title==='string'&&
       typeof t.done==='boolean').map(t=>t.id));
     const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&
