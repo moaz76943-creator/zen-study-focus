@@ -171,7 +171,11 @@ public final class TouchInstrumentation extends Instrumentation {
             "if(!n)return {exists:false};n.scrollIntoView({block:'center',inline:'nearest'});" +
             "const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;" +
             "const hit=document.elementFromPoint(x,y);" +
+            "const vv=window.visualViewport;" +
             "return {exists:true,x,y,width:r.width,height:r.height,vw:innerWidth,vh:innerHeight," +
+            "visX:vv?vv.offsetLeft:0,visY:vv?vv.offsetTop:0," +
+            "visWidth:vv?vv.width:innerWidth,visHeight:vv?vv.height:innerHeight," +
+            "scale:vv?vv.scale:1,dpr:devicePixelRatio," +
             "hit:!!hit&&(hit===n||n.contains(hit))};})()";
         js("(()=>{if(window.__df08Events)return {installed:true};window.__df08Events=[];" +
             "for(const kind of ['touchstart','touchend','click','pointerdown','pointerup']){" +
@@ -185,7 +189,11 @@ public final class TouchInstrumentation extends Instrumentation {
         JSONObject p=js(expression);
         assertTrue(p.optBoolean("exists") && p.optDouble("width")>0 && p.optDouble("height")>=40 &&
             p.optDouble("x")>=0 && p.optDouble("y")>=0 &&
-            p.optDouble("x")<p.optDouble("vw") && p.optDouble("y")<p.optDouble("vh") &&
+            p.optDouble("x")>=p.optDouble("visX") &&
+            p.optDouble("x")<p.optDouble("visX")+p.optDouble("visWidth") &&
+            p.optDouble("y")>=p.optDouble("visY") &&
+            p.optDouble("y")<p.optDouble("visY")+p.optDouble("visHeight") &&
+            p.optDouble("visWidth")>0 && p.optDouble("visHeight")>0 &&
             p.optBoolean("hit"),"Physical touch target invalid/occluded "+id+": "+p);
         int[] screen=new int[2];
         AtomicReference<int[]> frame=new AtomicReference<>();
@@ -194,8 +202,12 @@ public final class TouchInstrumentation extends Instrumentation {
             frame.set(new int[]{screen[0],screen[1],view.getWidth(),view.getHeight()});
         });
         int[] box=frame.get();
-        int x=(int)Math.round(box[0]+p.getDouble("x")*box[2]/p.getDouble("vw"));
-        int y=(int)Math.round(box[1]+p.getDouble("y")*box[3]/p.getDouble("vh"));
+        // Visual viewport may pan independently of window.innerWidth/innerHeight.
+        // API30 evidence: layout viewport 174 CSS px, actual visible width 122,
+        // visualViewport.offsetTop nonzero after scrollIntoView. Use the visible
+        // viewport in both axes; do NOT scale using the layout viewport.
+        int x=(int)Math.round(box[0]+(p.getDouble("x")-p.getDouble("visX"))*box[2]/p.getDouble("visWidth"));
+        int y=(int)Math.round(box[1]+(p.getDouble("y")-p.getDouble("visY"))*box[3]/p.getDouble("visHeight"));
         assertTrue(x>=box[0]&&x<box[0]+box[2]&&y>=box[1]&&y<box[1]+box[3],
             "WebView mapped touch outside physical bounds "+id);
         long down=SystemClock.uptimeMillis();
