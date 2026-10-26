@@ -36,3 +36,9 @@ test('Android failure reports matching mobile rule and loaded stylesheet before 
   assert.match(java,/cssMobileMedia:/);
   assert.match(java,/cssLoadedStyles:/);
 });
+
+test('Android records exact Notes footer DOM ancestry and real rule match',()=>{
+  assert.match(java,/cssFooterMatched:/);
+  assert.match(java,/footerAncestor:/);
+  assert.match(java,/editorAncestor:/);
+});
