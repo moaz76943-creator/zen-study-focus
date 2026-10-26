@@ -119,7 +119,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [30, 35]
+        include:
+          - api: 30
+            gpu: swiftshader_indirect
+          - api: 35
+            gpu: swiftshader
     steps:
       - uses: actions/checkout@v4
         with:
@@ -149,6 +153,7 @@ jobs:
             'BLOCKERS': ['Emulator/UIAutomator has not completed; no Android PASS is established']
           }, indent=2) + '\n')
           PY
+          python3 tools/i18n/e2e/emulator_crash.py /tmp/android-runner > "artifacts/i18n-e2e/api${DF13_API}/EMULATOR_BASELINE.json"
       - name: Download the exact single APK built by this workflow
         uses: actions/download-artifact@v4
         with:
@@ -177,6 +182,8 @@ jobs:
           test -r /dev/kvm && test -w /dev/kvm
       - name: Execute real Android E2E via explicit Bash
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          DF13_GPU: ${{ matrix.gpu }}
         with:
           api-level: ${{ matrix.api }}
           # Official Emulator archive: 36.4.10 Stable (2026-03-12).
@@ -187,7 +194,7 @@ jobs:
           profile: pixel_3a
           # Keep headless rendering on software GLES; the emulator logs show
           # graphics-context failures around display resizing. No host Vulkan.
-          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -feature -Vulkan -noaudio -no-boot-anim -camera-back none -memory 2048 -cores 2
+          emulator-options: -no-window -no-snapshot -gpu ${{ matrix.gpu }} -feature -Vulkan -noaudio -no-boot-anim -camera-back none -memory 2048 -cores 2
           disable-animations: true
           emulator-boot-timeout: 600
           script: bash tools/i18n/e2e/run_android.sh ${{ matrix.api }}

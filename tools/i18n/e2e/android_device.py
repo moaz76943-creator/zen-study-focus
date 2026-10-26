@@ -346,6 +346,7 @@ def run(out, source_sha, api):
             "TASK_ID":"DF-LANE-13-REAL-END-TO-END-QA",
             "SOURCE_SHA":source_sha, "API":api, "test_results":results, "device_matrix":matrix,
             "ANDROID_TREE":os.getenv("DF13_ANDROID_TREE", "UNKNOWN"),
+            "requested_emulator_gpu":os.getenv("DF13_GPU", "UNKNOWN"),
             "locale_dataset":"One disposable dataset retained across locale switches; process restart between cases; no pm clear",
             "summary":{status:sum(x["status"]==status for x in results.values())
                        for status in ("PASS","FAIL","NOT_TESTED")},

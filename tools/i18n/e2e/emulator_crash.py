@@ -58,6 +58,34 @@ def summarize(path):
         return result
 
 
+def cgroup_snapshot(path):
+    result = {}
+    for name in ('memory.max', 'memory.current', 'memory.peak', 'memory.events', 'memory.events.local'):
+        try:
+            value = (path / name).read_text()[:1024].strip()
+            if name.startswith('memory.events'):
+                result[name] = {key: int(count) for key, count in (line.split() for line in value.splitlines())}
+            else:
+                result[name] = 'max' if value == 'max' else int(value)
+        except (OSError, ValueError):
+            result[name] = 'UNAVAILABLE'
+    return result
+
+
+def memory_limits():
+    root = Path('/sys/fs/cgroup')
+    result = {'root': cgroup_snapshot(root)}
+    try:
+        for line in Path('/proc/self/cgroup').read_text().splitlines():
+            if line.startswith('0::'):
+                current = (root / line[3:].lstrip('/')).resolve()
+                if current != root and current.is_relative_to(root) and current.is_dir():
+                    result['current_process'] = cgroup_snapshot(current)
+    except OSError:
+        pass
+    return result
+
+
 def collect(root):
     root = Path(root).resolve()
     records = []
@@ -70,7 +98,8 @@ def collect(root):
             records.append(summarize(path))
         except (OSError, ValueError, struct.error, UnicodeError):
             records.append({'parsed': False, 'reason': 'INVALID_OR_INCOMPLETE_METADATA'})
-    return {'diagnostic': 'EMULATOR_CRASHPAD_METADATA_ONLY', 'crashes': records}
+    return {'diagnostic': 'EMULATOR_CRASHPAD_METADATA_ONLY', 'crashes': records,
+            'cgroup_memory': memory_limits()}
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'tools/i18n/e2e'))
-from emulator_crash import summarize, collect
+from emulator_crash import summarize, collect, cgroup_snapshot
 
 class CrashMetadataTest(unittest.TestCase):
     def test_classifies_faulting_graphics_module_without_publishing_paths_or_memory(self):
@@ -31,6 +31,18 @@ class CrashMetadataTest(unittest.TestCase):
         self.assertNotIn('NEVER_PRINT_THIS',str(result))
         self.assertNotIn('UNRELATED_DUMP_BYTES',str(result))
         self.assertNotIn('libvulkan',str(result))
+
+    def test_cgroup_limits_and_oom_events_are_numeric_metadata_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            (root/'memory.max').write_text('4294967296')
+            (root/'memory.events').write_text('oom 2\noom_kill 1\n')
+            (root/'memory.current').write_text('DO_NOT_PRINT_THIS')
+            result=cgroup_snapshot(root)
+        self.assertEqual(result['memory.max'],4294967296)
+        self.assertEqual(result['memory.events']['oom_kill'],1)
+        self.assertEqual(result['memory.current'],'UNAVAILABLE')
+        self.assertNotIn('DO_NOT_PRINT_THIS',str(result))
 
     def test_truncated_dump_is_a_diagnostic_failure_not_a_pass(self):
         with tempfile.TemporaryDirectory() as directory:
