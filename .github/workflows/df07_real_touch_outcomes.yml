@@ -1,0 +1,68 @@
+name: DF07 actual mobile touch postconditions
+on:
+  push:
+    branches: [qa/df-parallel-07-touch-outcomes-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/df4_browser/track04_real_touch_outcomes.cjs'
+      - '.github/workflows/df07_real_touch_outcomes.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df07-real-touch-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  touch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify script source and existing timer cancellation guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tests/df4_browser/track04_real_touch_outcomes.cjs
+          node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs tests/df07/custom_timer_escape.test.cjs tests/i18n/timer/timer_safety.test.cjs
+      - name: Install real Chromium test runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Serve shipped application locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df07-touch-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Real touchscreen browser postconditions
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_TRACK04_EVIDENCE: ${{ runner.temp }}/df07-touch
+        run: node tests/df4_browser/track04_real_touch_outcomes.cjs
+      - name: Record exact head and platform limitations
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/df07-touch"
+          git rev-parse HEAD > "$RUNNER_TEMP/df07-touch/QA_SHA.txt"
+          printf 'Chromium mobile touch only. Android, native dialogs, SAF and TalkBack NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df07-touch/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DF07-touch-${{ github.sha }}
+          path: ${{ runner.temp }}/df07-touch/
+          retention-days: 7
+          if-no-files-found: warn
