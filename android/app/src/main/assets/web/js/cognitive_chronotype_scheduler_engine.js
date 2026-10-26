@@ -106,7 +106,8 @@
 
     var aligned = 0;
     sessions.forEach(function (ses) {
-      var hour = parseInt(ses.startHour, 10) || 10;
+      var parsedHour = parseInt(ses.startHour, 10);
+      var hour = isNaN(parsedHour) ? 10 : parsedHour;
       var band = resolveEnergyBand(hour, chronotype);
       var taskType = ses.taskType || 'analytical';
 
