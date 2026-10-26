@@ -3986,6 +3986,36 @@
       "undo": "Hoàn tác",
       "urgent": "Khẩn cấp",
       "weekly": "Hằng tuần"
+    },
+    "timer": {
+      "0": "⚙ Tùy chỉnh",
+      "1": "Cài đặt tập trung và nghỉ ngơi",
+      "2": "Giữ nguyên phiên hiện tại; thay đổi áp dụng cho các phiên mới.",
+      "3": "Tập trung · phút",
+      "4": "Nghỉ ngắn · phút",
+      "5": "Nghỉ dài · phút",
+      "6": "Số phiên mỗi chu kỳ",
+      "7": "Mặc định",
+      "8": "Lưu",
+      "9": "Nhập số nguyên trong phạm vi được hiển thị.",
+      "10": "Đã lưu cài đặt"
+    },
+    "goals": {
+      "kicker": "✦ MỤC TIÊU HẰNG NGÀY CỦA BẠN",
+      "heading": "Tiến bộ từng chút mỗi ngày",
+      "desc": "Số phút được tính từ các phiên tập trung đã hoàn thành.",
+      "edit": "⚙ Chỉnh sửa",
+      "modal": "Mục tiêu hoạt động hằng ngày",
+      "hint": "Đặt 0 để ẩn mục tiêu. Phiên chỉ được tính sau khi hoàn thành.",
+      "save": "Đã lưu mục tiêu",
+      "invalid": "Nhập số phút nguyên từ 0 đến 720.",
+      "noGoal": "Đặt mục tiêu",
+      "minute": "phút",
+      "done": "hoàn thành",
+      "today": "hôm nay",
+      "week": "Tuần này",
+      "weekTarget": "Mục tiêu hằng tuần (phút)",
+      "weekInvalid": "Mục tiêu hằng tuần phải từ 0 đến 5040 phút."
     }
   },
   "th": {
