@@ -1,0 +1,59 @@
+name: DF07 20-locale live Timer consent
+on:
+  push:
+    branches: [qa/df07-timer-20-locale-confirm-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/df07/timer_20_locale_confirm_browser.cjs'
+      - '.github/workflows/df07_timer_20_locale_confirm.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df07-timer20-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  timer-20:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify existing cancel guards
+        run: node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs tests/df07/timer_start_pause_resume.test.cjs
+      - name: Install isolated Chromium and Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then sudo apt-get update -qq; sudo apt-get install -y -qq chromium; fi
+      - name: Serve current offline bundled WebView asset tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df07-timer20-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Twenty locale confirmations and immutable active session on Cancel
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF07_LOCALE_TIMER_EVIDENCE: ${{ runner.temp }}/df07-timer20
+        run: node tests/df07/timer_20_locale_confirm_browser.cjs
+      - name: Record exact SHA and strict platform limits
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/df07-timer20"
+          git rev-parse HEAD > "$RUNNER_TEMP/df07-timer20/QA_SHA.txt"
+          printf 'Desktop Chromium only; Android native branded dialog, physical Back/Cancel and SAF NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df07-timer20/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DF07-timer20-${{ github.sha }}
+          path: ${{ runner.temp }}/df07-timer20/
+          retention-days: 7

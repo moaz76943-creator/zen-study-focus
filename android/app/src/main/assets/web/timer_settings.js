@@ -71,3 +71,17 @@ function saveTimerSettings(){
  showToast(tsetText(10));return true;
 }
 refreshTimerSettings();
+
+/* Custom Timer Escape matches Cancel: close only the foremost active modal,
+ * without applying fields, clearing the current session, or writing storage. */
+if (typeof document.addEventListener === 'function') {
+ document.addEventListener('keydown', function(event) {
+  if (event.key !== 'Escape' || event.defaultPrevented) return;
+  const modal = document.getElementById('customTimerModal');
+  if (!modal || !modal.classList.contains('open')) return;
+  const open = document.querySelectorAll('.modal-overlay.open');
+  if (open.length === 0 || open[open.length - 1] !== modal) return;
+  event.preventDefault();
+  closeModal('customTimerModal');
+ });
+}

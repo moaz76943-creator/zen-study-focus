@@ -156,10 +156,24 @@
   }
   function mountAnalytics() {
     if (!root.DeepFocusAnalyticsStudioV21) throw new Error('Analytics Studio not loaded');
+    // Preserve unsaved viewing preferences during an in-app language switch.
+    // This does not change any v21 data or native file-export contract.
+    const filters=analyticsUi?.getFilters?.()||{};
     if (analyticsUi) analyticsUi.destroy();
     const host = document.getElementById('df22AnalyticsHost');
     analyticsUi = root.DeepFocusAnalyticsStudioV21.mount(host,getSnapshot,{
-      locale:cfg.lang,goals:cfg.dailyGoalsMin||{},
+      ...filters,locale:cfg.lang,goals:cfg.dailyGoalsMin||{},
+      onOpenTask:id=>{
+        if(!Number.isSafeInteger(id)||id<0)return false;
+        const snapshot=getSnapshot();
+        const rows=Array.isArray(snapshot.tasksList)?snapshot.tasksList:[];
+        const matches=rows.filter(t=>t&&t.id===id);
+        if(matches.length!==1||matches[0].archived===true||
+           matches[0].status==='archived'||matches[0].isStarter===true||
+           matches[0].isDemo===true||matches[0].synthetic===true)return false;
+        switchTab('sec-tasks',document.getElementById('navTasks'));
+        return true;
+      },
       // Download fallback is browser-driven until the Android Save-As bridge is verified.
     });
     document.getElementById('sec-analytics').classList.add('df22-analytics-live');

@@ -117,3 +117,57 @@ test('date sorting tolerates malformed legacy display dates but never repairs st
  assert.deepEqual(C.searchTasks(state,{query:'date'}).map(t=>t.id),[15,17,18,19,29,31]);
  assert.deepEqual(state,before);assert.equal(typeof state.tasksList.find(t=>t.id===16).date,'number');
 });
+
+
+test('DF05 manual daily top-three survives reload without changing task records or legacy cfg',()=>{
+ const snapshot={cfg:{taskProjectsV21:[],unknown:{preserve:'مصدر ٣'}},tasksList:[
+  {id:1,title:'A',date:'2026-10-25',done:false,catKey:'study',opaque:{keep:1}},
+  {id:2,title:'B',done:false,catKey:'sport',unknown:'x'},
+  {id:3,title:'C',date:'2026-11-20',done:false},
+  {id:4,title:'D',done:false}
+ ]};
+ const baseline=JSON.parse(JSON.stringify(snapshot));
+ const selected=C.chooseTopThree(snapshot,'2026-10-26',[2,1,3]);
+ assert.deepEqual(C.topThree(JSON.parse(JSON.stringify(selected)),'2026-10-26').map(x=>x.id),[2,1,3]);
+ assert.deepEqual(snapshot,baseline,'never write on read or mutate source');
+ assert.deepEqual(selected.tasksList,baseline.tasksList);
+ assert.deepEqual(selected.cfg.unknown,baseline.cfg.unknown);
+ assert.equal(selected.cfg.taskTopThreeV21['2026-10-27'],undefined);
+ assert.deepEqual(C.topThree(selected,'2026-10-27').map(x=>x.id),C.topThree(snapshot,'2026-10-27').map(x=>x.id));
+ assert.deepEqual(C.topThree(C.chooseTopThree(selected,'2026-10-26',[]),'2026-10-26'),[]);
+});
+test('DF05 rejects duplicate, fourth, deleted, completed and malformed top-three without writes',()=>{
+ const state={cfg:{keep:123},tasksList:[
+  {id:1,title:'Active',done:false},{id:2,title:'Done',done:true},
+  {id:3,title:'Trash',done:false,deletedAt:'2026-10-24'},
+  {id:4,title:'Archived',done:false,status:'archived'}
+ ]};
+ const before=JSON.stringify(state);
+ for(const ids of [[1,1],[1,2],[3],[4],[1,2,3,4],['1'],[-1]]){
+  assert.throws(()=>C.chooseTopThree(state,'2026-10-26',ids));
+ }
+ assert.throws(()=>C.chooseTopThree(state,'2026-02-30',[1]));
+ assert.equal(JSON.stringify(state),before);
+ const chosen=C.chooseTopThree(state,'2026-10-26',[1]);
+ chosen.tasksList[0].done=true;
+ assert.deepEqual(C.topThree(chosen,'2026-10-26'),[],'completed task is hidden without rewriting historic picks');
+});
+
+
+test('DF05: Today/Upcoming/Overdue/Completed groups preserve undated/optional v21 tasks without writes',()=>{
+ const state={cfg:{legacy:'keep'},tasksList:[
+  {id:1,title:'Undated legacy',done:false},
+  {id:2,title:'Optional old date',date:'2026-10-01',dueAssigned:false,done:false},
+  {id:3,title:'Overdue',date:'2026-10-24',done:false},
+  {id:4,title:'Upcoming',date:'2026-10-30',done:false},
+  {id:5,title:'Completed',date:'2026-10-21',done:true},
+  {id:6,title:'Archived',date:'2026-10-21',done:false,status:'archived'}
+ ]};
+ const before=JSON.stringify(state),sections=C.taskSections(state,'2026-10-26');
+ assert.deepEqual(sections.today.map(t=>t.id),[1,2]);
+ assert.deepEqual(sections.upcoming.map(t=>t.id),[4]);
+ assert.deepEqual(sections.overdue.map(t=>t.id),[3]);
+ assert.deepEqual(sections.completed.map(t=>t.id),[5]);
+ assert.equal(JSON.stringify(state),before);
+ assert.throws(()=>C.taskSections(state,'2026-02-30'),/Invalid/);
+});

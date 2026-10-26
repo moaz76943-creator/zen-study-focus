@@ -200,3 +200,135 @@ test('DF-PR-01 unrelated title edit never assigns a date to an imported undated 
  assert.equal(Object.hasOwn(state.tasksList[0],'dueAssigned'),false);
  assert.deepEqual(state.tasksList[0].other,{keep:42});
 });
+
+test('DF-PARALLEL-05: one-field Quick Add retries failed ACK and never creates a deadline or duplicate',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[],legacyOpaque:{preserve:true}},tasksList:[]};
+ let attempts=0,commits=0,allow=false;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+   readState:()=>JSON.parse(JSON.stringify(state)),
+   commit(before,after){
+     attempts++;
+     assert.deepEqual(before,state);
+     if(!allow)return false;
+     state=JSON.parse(JSON.stringify(after));commits++;return true;
+   }});
+ const form=root.descendants.find(x=>x.tagName==='FORM'&&x.className?.includes('df-quick-add'));
+ assert.ok(form,'One-field Quick Add must be available without opening the full editor');
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ assert.ok(title);
+ title.value='  ';
+ form.dispatch('submit');
+ assert.equal(attempts,0);
+ title.value='Study German';
+ form.dispatch('submit');
+ assert.equal(attempts,1);assert.equal(commits,0);assert.equal(title.value,'Study German');
+ assert.equal(state.tasksList.length,0);
+ allow=true;
+ form.dispatch('submit');
+ assert.equal(attempts,2);assert.equal(commits,1);
+ assert.equal(state.tasksList.length,1);
+ assert.equal(state.tasksList[0].title,'Study German');
+ assert.equal(state.tasksList[0].dueAssigned,false);
+ assert.equal(C.isOverdue(state.tasksList[0],'2026-11-15'),false);
+ assert.deepEqual(state.cfg.legacyOpaque,{preserve:true});
+ form.dispatch('submit');
+ assert.equal(commits,1,'Detached Quick Add may not write twice');
+ studio.destroy();
+});
+
+test('DF-PARALLEL-05: Quick Add cannot erase unsaved edits in an opened full task editor',()=>{
+ const f=fixture(),quick=()=>f.root.descendants.some(x=>x.tagName==='FORM'&&x.className?.includes('df-quick-add'));
+ assert.equal(quick(),true);
+ const edit=f.root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Edit');
+ assert.ok(edit);edit.dispatch('click');
+ const full=f.root.descendants.find(x=>x.tagName==='FORM'&&x.className==='df-form');
+ assert.ok(full);
+ const title=full.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ title.value='Unsaved draft title';
+ assert.equal(quick(),false,'Quick Add must not be available to redraw an unsaved full editor');
+ assert.equal(title.value,'Unsaved draft title');
+ assert.equal(f.commits(),0);
+ const cancel=full.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Cancel');
+ assert.ok(cancel);cancel.dispatch('click');
+ assert.equal(quick(),true);
+ assert.equal(f.commits(),0,'Cancelling an unsaved edit must never publish it');
+ f.studio.destroy();
+});
+
+
+test('DF05 daily priority pin/unpin is durable, limited to three and rolls back failed ACK',()=>{
+ let state={cfg:{taskProjectsV21:[],sessionHistory:[],unknown:{keep:'v21'}},tasksList:[
+  {id:1,title:'One',done:false,catKey:'study'},
+  {id:2,title:'Two',done:false,catKey:'study'},
+  {id:3,title:'Three',done:false,catKey:'study'},
+  {id:4,title:'Four',done:false,catKey:'study'}
+ ]}, writes=0, failAck=false;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),
+  commit(before,after){assert.deepEqual(before,state);if(failAck)return false;
+   writes++;state=JSON.parse(JSON.stringify(after));return true;}});
+ const cardFor=title=>root.descendants.find(x=>x.tagName==='ARTICLE'&&x.descendants.some(n=>n.className==='df-title'&&n.textContent===title));
+ const action=(name,caption)=>{
+  const card=cardFor(name);assert.ok(card,'card '+name);
+  const b=card.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent===caption);
+  assert.ok(b,caption+' for '+name);b.dispatch('click');
+ };
+ action('One','Top three');action('Two','Top three');action('Three','Top three');
+ assert.equal(writes,3);
+ assert.deepEqual(state.cfg.taskTopThreeV21['2026-10-26'],[1,2,3]);
+ action('Four','Top three');assert.equal(writes,3,'fourth pin must not write');
+ failAck=true;action('One','Unpin');
+ assert.deepEqual(state.cfg.taskTopThreeV21['2026-10-26'],[1,2,3]);
+ failAck=false;action('One','Unpin');
+ assert.deepEqual(state.cfg.taskTopThreeV21['2026-10-26'],[2,3]);
+ assert.deepEqual(state.cfg.unknown,{keep:'v21'});
+ assert.ok(state.tasksList.every(x=>!Object.hasOwn(x,'manuallyPinned')),'only existing cfg persisted');
+ studio.destroy();
+});
+
+
+test('DF05: Tasks Today/Upcoming/Overdue/Completed tabs and project filter are read-only',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[{id:2,name:'Work'}],opaque:{keep:true}},tasksList:[
+  {id:1,title:'No due',catKey:'study',done:false,projectId:2},
+  {id:2,title:'Future',date:'2026-10-30',catKey:'study',done:false,projectId:2},
+  {id:3,title:'Late',date:'2026-10-20',catKey:'study',done:false},
+  {id:4,title:'Finished',date:'2026-10-25',catKey:'study',done:true}
+ ]},commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(){commits++;return true;}});
+ const tab=caption=>{const b=root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent===caption);
+  assert.ok(b,'missing tab '+caption);b.dispatch('click');};
+ const shown=()=>root.descendants.find(x=>x.id==='df-task-results').descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
+ tab('Today');assert.ok(shown().includes('No due'));assert.ok(!shown().includes('Late'));
+ tab('Upcoming');assert.deepEqual(shown(),['Future']);
+ tab('Overdue');assert.deepEqual(shown(),['Late']);
+ tab('Completed');assert.deepEqual(shown(),['Finished']);
+ tab('List');
+ const projects=root.descendants.find(x=>x.tagName==='SELECT'&&x.attributes['aria-label']==='Filter by project');
+ assert.ok(projects);
+ projects.value='2';projects.dispatch('change');
+ assert.deepEqual(shown(),['No due','Future']);
+ assert.equal(commits,0);assert.deepEqual(state.cfg.opaque,{keep:true});
+ studio.destroy();
+});
+test('DF05: deliberate task reschedule is persisted, while invalid input never writes',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[
+  {id:10,title:'Plan',catKey:'study',done:false,unknown:{keep:1}}
+ ]},commits=0,answer='bad-date';
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),
+  commit(before,after){assert.deepEqual(before,state);state=JSON.parse(JSON.stringify(after));commits++;return true;},
+  requestText:()=>answer});
+ const press=()=>{const btn=root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Reschedule');
+  assert.ok(btn);btn.dispatch('click');};
+ press();assert.equal(commits,0);
+ answer='2026-10-31';press();assert.equal(commits,1);
+ assert.equal(state.tasksList[0].date,'2026-10-31');
+ assert.equal(state.tasksList[0].dueAssigned,true);
+ assert.deepEqual(state.tasksList[0].unknown,{keep:1});
+ studio.destroy();
+});
