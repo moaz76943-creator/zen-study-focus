@@ -33,7 +33,7 @@ function rig() {
  const heat=host.child.children.find(el=>el.style?.overflowX==='auto'&&el.innerHTML.includes('data-day="2026-01-10"'));
  const rows=()=>detail.children.find(el=>el.tagName==='TABLE')?.children.find(el=>el.tagName==='TBODY')?.children||[];
  const click=(day)=>heat.events.click({
-  type:'click',target:{closest(){return {getAttribute(k){return k==='data-day'?day:null;}};}}
+  type:'click',currentTarget:heat,target:{closest(){return {getAttribute(k){return k==='data-day'?day:null;}};}}
  });
  return {data,ui,detail,heat,rows,click,opened};
 }
