@@ -111,7 +111,7 @@ test('bootstrap failure leaves every unattempted durability case explicitly NOT_
  const ctx=context();
  vm.runInContext(`report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:'transport blocked'});fillUnattempted();`,ctx);
  const results=vm.runInContext('report.results',ctx);
- assert.equal(results.length,15);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
+ assert.equal(results.length,25);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
  assert.ok(results.some(r=>r.name==='saf_actual_file_restore_ack_and_reopen'));
  assert.ok(results.some(r=>r.name==='native_ack_io_failure_rollback_restart'));
 });

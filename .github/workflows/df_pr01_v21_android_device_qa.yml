@@ -11,6 +11,8 @@ on:
       - 'tests/android_e2e_recovery/p0_timer_saf_ci.sh'
       - 'tests/android_e2e_recovery/picker_transport.test.cjs'
       - 'tests/android_e2e_recovery/native_ui_dump.py'
+      - 'tests/android_e2e_recovery/native_faults.cjs'
+      - 'tests/android_e2e_recovery/native_faults.test.cjs'
       - '.github/workflows/df_pr01_v21_android_device_qa.yml'
 permissions:
   contents: read
@@ -51,7 +53,7 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
           node --check tests/android_e2e_recovery/p0_timer_saf_android.cjs
-          node --test tests/android_e2e_recovery/picker_transport.test.cjs
+          node --test tests/android_e2e_recovery/picker_transport.test.cjs tests/android_e2e_recovery/native_faults.test.cjs
           node --test tests/integration_recovery/native_saf_import_forwardport.test.cjs
       - name: Ensure Android compile SDK 36
         shell: bash

@@ -320,6 +320,7 @@ async function safMain(){
   await run('failed_save_rollback_'+key,()=>injectWriteFailure(key));
  }
  await run('native_ack_io_failure_rollback_restart',nativeIoFailureRollback);
+ for(const [name,fn] of Object.entries(require('./native_faults.cjs').createNativeFaultCases({evaluate,snapshot,receipt,fixture,restart,adb,nativeUI,tapUI})))await run(name,fn);
  const baseline=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
  await run('saf_picker_cancel',async()=>{
   const before=await snapshot(),ack=await receipt();await evaluate('setTimeout(()=>ZenNative.importBackupFromFile(),0);true');
@@ -366,7 +367,7 @@ function fillUnattempted(){
  const keys=Object.values(require('../../android/app/src/main/assets/web/data_compat_v21.js').KEYS);
  const planned=['saf_fixture_and_native_ack','locale_native_ack_process_restart',
   ...keys.flatMap(key=>['failed_save_rollback_'+key,'failed_save_rollback_'+key+'_mirror']),
-  'native_ack_io_failure_rollback_restart','saf_picker_cancel','saf_valid_file_consent_cancel',
+  'native_ack_io_failure_rollback_restart',...require('./native_faults.cjs').CASE_NAMES,'saf_picker_cancel','saf_valid_file_consent_cancel',
   'saf_corrupt_rejected','saf_oversized_rejected','saf_actual_file_restore_ack_and_reopen'];
  for(const name of planned)if(!report.results.some(row=>row.name===name))
   report.results.push({name,status:'NOT_TESTED',detail:'Not executed; blocked by prior Android/native transport failure'});

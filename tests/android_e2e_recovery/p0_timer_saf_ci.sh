@@ -54,4 +54,4 @@ else:
 READY
 adb shell am start -n com.zenstudy.focus/.MainActivity
 sleep 5
-DF_ANDROID_DISPOSABLE=1 timeout 300 node tests/android_e2e_recovery/p0_timer_saf_android.cjs "$report/results.json"
+DF_ANDROID_DISPOSABLE=1 timeout 600 node tests/android_e2e_recovery/p0_timer_saf_android.cjs "$report/results.json"
