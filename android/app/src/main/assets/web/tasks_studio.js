@@ -190,6 +190,21 @@
     const name=typeof adapter.requestText==='function'?adapter.requestText(l.project):null;
     if(name)apply(s=>C.createProject(s,{name},{noteIds:adapter.noteIds?.()}));
    }),btn(l.undo,undo),btn(l.redo,redo));head.appendChild(buttons);content.appendChild(head);
+   // Keep Quick Add separate from the full editor, using the same durable v21 adapter.
+   // A failed ACK must leave the typed title in place for a deliberate retry.
+   const quickForm=el('form','df-toolbar df-quick-add'),quickTitle=input('text','');
+   quickTitle.placeholder=l.add;quickTitle.setAttribute('aria-label',l.add);
+   const quickSave=el('button','df-btn df-primary',l.save);quickSave.type='submit';
+   append(quickForm,quickTitle,quickSave);
+   let quickSubmitted=false;
+   quickForm.addEventListener('submit',e=>{
+    e.preventDefault();
+    if(quickSubmitted||isDestroyed)return;
+    const title=quickTitle.value.trim();
+    if(!title)return;
+    if(apply(s=>C.createTask(s,{title},{noteIds:adapter.noteIds?.()})))quickSubmitted=true;
+   });
+   content.appendChild(quickForm);
    if(editing!==null)content.appendChild(editor());
    const today=el('section','df-panel'),top=el('h3','',l.today);today.appendChild(top);
    const top3=C.topThree(state,currentDay());if(!top3.length)today.appendChild(el('p','df-muted',l.empty));else top3.forEach(t=>today.appendChild(taskCard(t)));
