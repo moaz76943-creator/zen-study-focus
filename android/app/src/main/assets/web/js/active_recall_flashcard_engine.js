@@ -100,8 +100,10 @@
   function reviewCard(cardInput, rating, reviewTimestampMs) {
     const card = Object.assign({}, cardInput);
     const now = reviewTimestampMs ? new Date(reviewTimestampMs) : new Date();
-    const q = parseInt(rating, 10);
-    const validRating = (q >= 0 && q <= 3) ? q : RATINGS.GOOD;
+    const isNumericRating = typeof rating === 'number' ||
+      (typeof rating === 'string' && rating.trim() !== '');
+    const q = isNumericRating ? Number(rating) : NaN;
+    const validRating = (Number.isInteger(q) && q >= 0 && q <= 3) ? q : RATINGS.GOOD;
 
     let repetitions = card.repetitions || 0;
     let interval = card.intervalDays || 0;
