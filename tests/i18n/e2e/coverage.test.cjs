@@ -136,3 +136,22 @@ test('deep copies of English Core and Quick Training never count as localized va
  assert.equal(eligibleCoreDictionary('fr',{en:quick,fr:[...quick]}),null);
  assert.deepEqual(eligibleCoreDictionary('fr',{en:quick,fr:['Démarrer','Pause','Save']}),['Démarrer','Pause','Save']);
 });
+
+test('English-identical registered strings are unverified, not certified translations',()=>{
+ const row=auditSection({
+   code:'de',section:'Core',keys:['start','cancel'],
+   english:{start:'Start',cancel:'Cancel'},owner:'F',source_file:'fixture',
+   read:key=>({proven:true,value:key==='start'?'Start':'Abbrechen'})
+ });
+ assert.equal(row.present_keys,2);
+ assert.deepEqual(row.english_identical_candidates,['start']);
+ assert.equal(row.status,'NOT_TESTED');
+ assert.deepEqual(row.unverified_keys,['start']);
+ assert.equal(makeRepairQueue([row]).items[0].action,'REVIEW_ENGLISH_IDENTICAL');
+ const translated=auditSection({
+   code:'de',section:'Core',keys:['start'],
+   english:{start:'Start'},
+   read:()=>({proven:true,value:'Beginnen'})
+ });
+ assert.equal(translated.status,'PASS');
+});
