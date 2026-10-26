@@ -121,7 +121,7 @@ test('PR153: rejected activity ACK preserves idle, running and paused timers bef
       });
       x.eval('applyQuickTrainingPreset("work")');
       const before=JSON.stringify(x.cfg);
-      assert.equal(x.eval('startQuickTraining()'),false);
+      const result=x.eval('startQuickTraining()');
       assert.equal(x.eval('quickTraining'),null);
       assert.equal(JSON.stringify(x.cfg),before);
       assert.equal(x.mock.selectCalls,0);
@@ -129,6 +129,7 @@ test('PR153: rejected activity ACK preserves idle, running and paused timers bef
       assert.equal(x.mock.timerRunning,running);
       assert.equal(x.mock.timerSessionId,sessionId);
       assert.ok(notices.length>0);
+      assert.equal(result,false);
     }
   }
 });
