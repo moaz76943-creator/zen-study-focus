@@ -3,6 +3,7 @@
 This is a source contract only; the actual Android test must still run.
 """
 import pathlib
+import subprocess
 import unittest
 
 SCRIPT = (pathlib.Path(__file__).resolve().parents[3]
@@ -14,6 +15,10 @@ class AccessibilityTransportStrategyTest(unittest.TestCase):
         self.assertIn('if [[ "$API" == 35 ]]; then\n  unset DF13_UI_PORT', SCRIPT)
         self.assertIn('PROBE_MODE.txt', SCRIPT)
         self.assertIn('API35_ADB_UIAUTOMATOR', SCRIPT)
+
+    def test_runner_is_valid_bash_with_nested_python_heredoc(self):
+        script = pathlib.Path(__file__).resolve().parents[3] / 'tools/i18n/e2e/run_android.sh'
+        subprocess.run(['bash', '-n', str(script)], check=True, capture_output=True, text=True)
 
     def test_api30_keeps_persistent_probe_and_its_handshake(self):
         self.assertIn('adb shell am instrument -w com.zenstudy.focus.e2e/.AccessibilityProbe', SCRIPT)
