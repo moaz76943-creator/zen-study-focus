@@ -26,7 +26,7 @@ fi
 # Retry only the install; do not mark a failed or incomplete install as PASS.
 installed=0
 for attempt in 1 2 3; do
-  if adb install -r "$apk" && adb shell pm path com.zenstudy.focus | grep -q '^package:'; then
+  if adb install --no-streaming -r "$apk" && adb shell pm path com.zenstudy.focus | grep -q '^package:'; then
     installed=1
     break
   fi
