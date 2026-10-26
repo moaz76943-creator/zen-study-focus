@@ -81,3 +81,19 @@ test('rollback injection targets canonical keys from the live compatibility engi
   assert.ok(names.includes('failed_save_rollback_'+key+'_mirror'));
  }
 });
+test('SAF consent matches actual app-owned restore message despite default WebView dialog title',async()=>{
+ const ctx=context();
+ ctx.dialog=`<hierarchy><node class="android.widget.FrameLayout" package="com.zenstudy.focus"><node text='The page at "file://" says:' resource-id="android:id/alertTitle"/><node class="android.widget.TextView" package="com.zenstudy.focus" resource-id="android:id/message" text="Restore this backup? Current tasks, notes and progress will be replaced. Export them first."/><node class="android.widget.Button" package="com.zenstudy.focus" resource-id="android:id/button2" text="CANCEL" clickable="true" enabled="true" bounds="[608,1244][810,1386]"/><node class="android.widget.Button" package="com.zenstudy.focus" resource-id="android:id/button1" text="OK" clickable="true" enabled="true" bounds="[810,1244][978,1386]"/></node></hierarchy>`;
+ vm.runInContext(`
+ const tapped=[];
+ nativeUI=async(label,match)=>{const item=match(dialog);if(!item)throw Error('consent not matched');return {xml:dialog,item};};
+ tapUI=node=>tapped.push(node);saveSafPickerEvidence=()=>{};
+ `,ctx);
+ await vm.runInContext('confirmDialog(false)',ctx);
+ assert.match(vm.runInContext('tapped[0]',ctx),/button2/);
+ await vm.runInContext('confirmDialog(true)',ctx);
+ assert.match(vm.runInContext('tapped[1]',ctx),/button1/);
+ ctx.dialog=ctx.dialog.replace('Restore this backup?','Delete all data?');
+ await assert.rejects(vm.runInContext('confirmDialog(true)',ctx),/consent not matched/);
+ assert.equal(vm.runInContext('tapped.length',ctx),2);
+});

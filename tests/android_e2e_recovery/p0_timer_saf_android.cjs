@@ -246,7 +246,17 @@ async function openDocument(name,code){
  }
 }
 async function confirmDialog(accept){
- const u=await nativeUI('app-owned confirmation',x=>/text="Deep Focus"/.test(x)&&uiNodes(x).find(n=>n.includes('resource-id="android:id/button'+(accept?'1':'2')+'"')),false);
+ const message='Restore this backup? Current tasks, notes and progress will be replaced. Export them first.';
+ const u=await nativeUI('app-owned restore confirmation',xml=>{
+  const nodes=uiNodes(xml);
+  // Default WebView dialog title is `The page at "file://" says:` on API30.
+  // Require the actual app-owned restore warning, then the explicit button ID.
+  const owned=node=>node.includes('package="'+PKG+'"');
+  if(!nodes.some(node=>owned(node)&&node.includes('resource-id="android:id/message"')&&node.includes('text="'+message+'"')))return false;
+  return nodes.find(node=>owned(node)&&node.includes('class="android.widget.Button"')&&
+   node.includes('resource-id="android:id/button'+(accept?'1':'2')+'"')&&
+   node.includes('clickable="true"')&&node.includes('enabled="true"'));
+ },false);
  saveSafPickerEvidence(accept?'consent_accept':'consent_cancel',u.xml);tapUI(u.item);await pause(500);
 }
 async function safMain(){
