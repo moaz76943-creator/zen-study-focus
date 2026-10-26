@@ -23,9 +23,9 @@ else
   npm install --quiet --global @qwen-code/qwen-code
   mkdir -p "$HOME/.qwen"
   cat > "$HOME/.qwen/settings.json" <<'JSON'
-{"modelProviders":{"openai":[{"id":"openai/gpt-oss-120b","envKey":"GROQ_API_KEY","baseUrl":"https://api.groq.com/openai/v1"}]},"security":{"auth":{"selectedType":"openai"}},"model":{"name":"openai/gpt-oss-120b"}}
+{"modelProviders":{"openai":[{"id":"openai/gpt-oss-120b","envKey":"GROQ_API_KEY","baseUrl":"https://api.groq.com/openai/v1"}]},"security":{"auth":{"selectedType":"openai"}},"model":{"name":"openai/gpt-oss-120b"},"tools":{"eager":[]}}
 JSON
   timeout 7m qwen --prompt "$(cat "$RUNNER_TEMP/df-oss-task.txt")" \
     --model openai/gpt-oss-120b --approval-mode auto-edit \
-    --max-tool-calls 30 --max-wall-time 6m --output-format text
+    --max-tool-calls 24 --max-session-turns 16 --max-wall-time 6m --output-format text
 fi
