@@ -41,7 +41,15 @@
       var mins = Math.max(0, Number(s.durationMinutes) || 0);
       totalMinutes += mins;
 
-      var dateKey = s.date || (s.timestamp ? new Date(s.timestamp).toISOString().split('T')[0] : 'Unknown');
+      var dateKey = s.date;
+      if (!dateKey) {
+        if (s.timestamp) {
+          var parsedDate = new Date(s.timestamp);
+          dateKey = isNaN(parsedDate.getTime()) ? 'Unknown' : parsedDate.toISOString().split('T')[0];
+        } else {
+          dateKey = 'Unknown';
+        }
+      }
       dayDistribution[dateKey] = (dayDistribution[dateKey] || 0) + mins;
 
       var cat = s.category || 'عام';
