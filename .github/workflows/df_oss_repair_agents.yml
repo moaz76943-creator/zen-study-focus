@@ -1,0 +1,167 @@
+name: Deep Focus Open-Source Coding Agents (Aider and Qwen)
+on:
+  schedule:
+    - cron: '37 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      agent:
+        type: choice
+        options: [all, aider, qwen]
+        default: all
+        required: true
+      dry_run:
+        type: boolean
+        default: true
+        required: true
+      issue_number:
+        type: string
+        required: false
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/df_oss_repair_agents.yml'
+      - 'tools/ai_agents/oss_policy.mjs'
+      - 'tools/ai_agents/oss_select.mjs'
+      - 'tools/ai_agents/oss_run.sh'
+      - 'tests/ai_agents/oss_policy.test.mjs'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/df_oss_repair_agents.yml'
+      - 'tools/ai_agents/oss_policy.mjs'
+      - 'tools/ai_agents/oss_select.mjs'
+      - 'tools/ai_agents/oss_run.sh'
+      - 'tests/ai_agents/oss_policy.test.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: df-oss-agents-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  contract:
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact role scopes and syntax
+        run: |
+          node --test tests/ai_agents/oss_policy.test.mjs
+          node --check tools/ai_agents/oss_select.mjs
+          bash -n tools/ai_agents/oss_run.sh
+  repair:
+    if: github.event_name != 'pull_request' && vars.DF_OSS_ENABLED != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    strategy:
+      fail-fast: false
+      matrix:
+        role: [aider, qwen]
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: automation
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify role scopes before agent execution
+        run: node --test automation/tests/ai_agents/oss_policy.test.mjs
+      - name: Choose one eligible issue for this agent
+        id: select
+        if: github.event_name != 'workflow_dispatch' || inputs.agent == 'all' || inputs.agent == matrix.role
+        env:
+          AGENT_ROLE: ${{ matrix.role }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REQUESTED_ISSUE: ${{ inputs.issue_number }}
+        run: node automation/tools/ai_agents/oss_select.mjs
+      - name: Check Groq credential without disclosing it
+        id: key
+        if: steps.select.outputs.ready == 'true'
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        shell: bash
+        run: |
+          if [ -n "$GROQ_API_KEY" ]; then
+            echo 'available=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            echo 'Missing GROQ_API_KEY: no model invoked' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Checkout canonical source
+        if: steps.select.outputs.ready == 'true' && steps.key.outputs.available == 'true' && (github.event_name != 'workflow_dispatch' || inputs.dry_run == false)
+        uses: actions/checkout@v4
+        with:
+          ref: integration/master-qa-verified-v21
+          path: source
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Apply one bounded source repair using ${{ matrix.role }}
+        if: steps.select.outputs.ready == 'true' && steps.key.outputs.available == 'true' && (github.event_name != 'workflow_dispatch' || inputs.dry_run == false)
+        env:
+          AGENT_ROLE: ${{ matrix.role }}
+          REPAIR_BRANCH: ${{ steps.select.outputs.branch }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd source
+          git switch -c "$REPAIR_BRANCH"
+          bash ../automation/tools/ai_agents/oss_run.sh
+      - name: Confirm allowed diff and run focused tests
+        id: verify
+        if: steps.select.outputs.ready == 'true' && steps.key.outputs.available == 'true' && (github.event_name != 'workflow_dispatch' || inputs.dry_run == false)
+        env:
+          AGENT_ROLE: ${{ matrix.role }}
+          FOCUSED_TEST: ${{ steps.select.outputs.test }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd source
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No reproducible defect: no PR created' >> "$GITHUB_STEP_SUMMARY"
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          node ../automation/tools/ai_agents/oss_policy.mjs "$AGENT_ROLE"
+          git diff --cached --check
+          node --test "$FOCUSED_TEST"
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Open draft PR against exact canonical HEAD
+        if: steps.verify.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.select.outputs.number }}
+          REPAIR_BRANCH: ${{ steps.select.outputs.branch }}
+          AGENT_ROLE: ${{ matrix.role }}
+          TARGET: integration/master-qa-verified-v21
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd source
+          sha="$(git rev-parse HEAD)"
+          git fetch --depth=1 origin "$TARGET"
+          test "$(git rev-parse FETCH_HEAD)" = "$sha" || { echo 'Canonical moved: refusing stale PR' >&2; exit 1; }
+          git config user.name 'deep-focus-oss-agents[bot]'
+          git config user.email 'deep-focus-oss-agents[bot]@users.noreply.github.com'
+          git commit -m "fix(oss-$AGENT_ROLE): source issue #$ISSUE_NUMBER"
+          header="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $header" push origin "HEAD:refs/heads/$REPAIR_BRANCH"
+          gh pr create --base "$TARGET" --head "$REPAIR_BRANCH" --draft \
+            --title "[OSS $AGENT_ROLE / review] Source fix for #$ISSUE_NUMBER" \
+            --body "Fixes #$ISSUE_NUMBER. Narrow diff + focused Node regression PASS. Android NOT_TESTED. No auto-merge or release."
+          echo "Draft PR opened by $AGENT_ROLE for issue #$ISSUE_NUMBER" >> "$GITHUB_STEP_SUMMARY"
+      - name: Report idle or dry-run safely
+        if: steps.select.outputs.ready != 'true' || steps.key.outputs.available != 'true' || (github.event_name == 'workflow_dispatch' && inputs.dry_run == true)
+        run: echo 'NO_MODEL_CALL (idle, no key, or dry-run)' >> "$GITHUB_STEP_SUMMARY"
