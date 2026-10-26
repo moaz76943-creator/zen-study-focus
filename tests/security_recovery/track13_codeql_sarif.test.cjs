@@ -86,6 +86,17 @@ test('uncategorized CodeQL rule reports bounded reason buckets without exposing 
   });
   assert.ok(!(r.stdout+r.stderr).includes(sentinel));
 });
+test('CodeQL unknown js rule syntax is diagnosed only by bounded structural categories',()=>{
+  const odd=['js/a_b','js/a.b','js/a/b','js/'+('a'.repeat(65)),'js/a+weird'];
+  const r=run(sarif(odd.map(ruleId=>({ruleId,message:{text:'PRIVATE-MESSAGE-SENTINEL'}}))));
+  assert.equal(r.status,1);
+  assert.equal(r.out.status,'FAIL');
+  assert.equal(r.out.findings,5);
+  assert.deepEqual(r.out.unclassified_structure,{
+    HAS_UNDERSCORE:1,HAS_DOT:1,HAS_NESTED_SEPARATOR:1,TOO_LONG:1,OTHER_SYNTAX:1
+  });
+  assert.ok(!(r.stdout+r.stderr).includes('PRIVATE-MESSAGE-SENTINEL'));
+});
 test('missing, corrupt, structurally invalid or tool-mismatched SARIF blocks',()=>{
   for(const data of [null,'invalid',{}, {runs:[]}, {runs:[{tool:{driver:{name:'NotCodeQL'}},results:[]}]}, {runs:[{tool:{driver:{name:'CodeQL'}}}]}]){
     const r=run(data);assert.equal(r.status,1);assert.equal(r.out.status,'BLOCKED');
