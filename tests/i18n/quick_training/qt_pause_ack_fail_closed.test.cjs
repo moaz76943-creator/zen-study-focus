@@ -9,9 +9,17 @@ const source=fs.readFileSync(path.resolve(__dirname,'../../../android/app/src/ma
 
 function fixture({pauseAcknowledged=false,confirmCancel=true,running=true}={}) {
   const calls={pause:0,mode:0,confirm:0,event:0,render:0,toasts:[]};
+  const nodes=new Map();
+  const element=(id='')=>({
+    id,style:{},textContent:'',children:[],hidden:false,disabled:false,
+    appendChild(child){this.children.push(child);return child;}
+  });
   const context=vm.createContext({
     cfg:{lang:'en',domain:'sport'},timerRunning:running,timerSessionId:'live-session',
-    document:{getElementById(id){return {id};}},
+    document:{
+      getElementById(id){if(!nodes.has(id))nodes.set(id,element(id));return nodes.get(id);},
+      createElement(){return element();}
+    },
     window:{
       confirm(){calls.confirm++;return confirmCancel;},
       dispatchEvent(){calls.event++;}
