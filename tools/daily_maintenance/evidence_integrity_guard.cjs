@@ -4,7 +4,7 @@
  */
 
 function validateEvidence(evidence, currentHeadSha) {
-    if (!evidence || typeof evidence !== 'object') {
+    if (!evidence || typeof evidence !== 'object' || Array.isArray(evidence)) {
         return { status: "BLOCKED_MALFORMED", valid: false, reason: "Evidence object missing or not an object" };
     }
 
