@@ -10,7 +10,7 @@ if len(sys.argv) > 2:
     node = ET.fromstring(sys.argv[2])
     selector = {key: node.get(key, "") for key in
                 ("class", "resource-id", "text", "content-desc", "hint")}
-    request = "CLICK " + json.dumps(selector, ensure_ascii=False)
+    request = ("TOUCH_FILE " if len(sys.argv)>3 and sys.argv[3]=="--finger" else "CLICK ") + json.dumps(selector, ensure_ascii=False)
 
 with socket.create_connection(("127.0.0.1", int(sys.argv[1])), timeout=15) as connection:
     connection.sendall((request + "\n").encode("utf-8"))

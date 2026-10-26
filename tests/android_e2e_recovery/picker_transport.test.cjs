@@ -58,3 +58,26 @@ test('clickable native picker controls use revalidated accessibility actions wit
  assert.throws(()=>vm.runInContext(`tapUI('<node class="android.widget.TextView" content-desc="List view" clickable="true" bounds="[890,499][1017,625]"/>')`,ctx),/TRANSPORT:/);
  assert.deepEqual(calls,['python3']);
 });
+test('DocumentsUI fixture titles request a genuine finger gesture instead of UNKNOWN shell input',()=>{
+ const ctx=context();ctx.process.env.DF13_UI_PORT='38383';
+ const calls=[];ctx.probeExec=(cmd,args)=>{calls.push([cmd,args]);return '{"touched":true}';};
+ vm.runInContext('cp.execFileSync=probeExec',ctx);
+ vm.runInContext(`tapUI('<node class="android.widget.TextView" resource-id="android:id/title" text="p0-saf-consent.txt" clickable="false" bounds="[189,559][531,616]"/>')`,ctx);
+ assert.equal(calls.length,1);assert.equal(calls[0][0],'python3');assert.equal(calls[0][1].at(-1),'--finger');
+});
+test('rollback injection targets canonical keys from the live compatibility engine',async()=>{
+ const ctx=context();
+ ctx.canonical=['zen_fortress_cfg_v21','zen_fortress_tasks_v21','zen_fortress_notes_v21'];
+ vm.runInContext(`
+ const names=[];
+ requireEmulator=()=>{};connect=async()=>{};fixture=async()=>({});
+ evaluate=async expr=>expr==='Object.values(DeepFocusDataCompatV21.KEYS)'?canonical:'unused';
+ run=async(name,fn)=>{names.push(name);report.results.push({status:'PASS'});};
+ `,ctx);
+ await vm.runInContext('safMain()',ctx);
+ const names=vm.runInContext('names',ctx);
+ for(const key of ctx.canonical){
+  assert.ok(names.includes('failed_save_rollback_'+key));
+  assert.ok(names.includes('failed_save_rollback_'+key+'_mirror'));
+ }
+});

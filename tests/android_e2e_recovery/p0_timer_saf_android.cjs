@@ -67,8 +67,8 @@ async function run(name,fn){
 }
 async function injectWriteFailure(key){
  const before=await fixture(),disk=await receipt();
- const result=await evaluate("(()=>{const before=DF22Integration.getSnapshot(),after=JSON.parse(JSON.stringify(before));after.cfg.df07Seq=(after.cfg.df07Seq||0)+300;const orig=Storage.prototype.setItem;let threw=false;Storage.prototype.setItem=function(k,v){if(k==="+JSON.stringify(key)+"&&!threw){threw=true;throw new DOMException('DF07 fault','QuotaExceededError');}return orig.call(this,k,v);};try{DF22Integration.write(before,after);return {error:'UNEXPECTED_SUCCESS',threw};}catch(e){return {error:String(e.message),threw};}finally{Storage.prototype.setItem=orig;}})()");
- assert.equal(result.threw,true,'Exact '+key+' fault not reached');
+ const result=await evaluate("(()=>{const before=DF22Integration.getSnapshot(),after=JSON.parse(JSON.stringify(before));after.cfg.df07Seq=(after.cfg.df07Seq||0)+300;const orig=Storage.prototype.setItem;let threw=false;const attempted=[];Storage.prototype.setItem=function(k,v){attempted.push(String(k));if(k==="+JSON.stringify(key)+"&&!threw){threw=true;throw new DOMException('DF07 fault','QuotaExceededError');}return orig.call(this,k,v);};try{DF22Integration.write(before,after);return {error:'UNEXPECTED_SUCCESS',threw,attempted};}catch(e){return {error:String(e.message),threw,attempted};}finally{Storage.prototype.setItem=orig;}})()");
+ assert.equal(result.threw,true,'Exact '+key+' fault not reached; '+JSON.stringify({path:result.error,attempted:result.attempted}));
  assert.notEqual(result.error,'UNEXPECTED_SUCCESS','Write must not be published');
  assert.deepEqual(await fixture(),before,'Injected WebView write failure mutated user-visible state');
  assert.deepEqual(await receipt(),disk,'Injected WebView failure advanced native checkpoint');
@@ -100,13 +100,16 @@ function dumpUI(){
  adb('shell','uiautomator','dump','/sdcard/df02_saf.xml');return adb('shell','cat','/sdcard/df02_saf.xml');
 }
 function tapUI(node){
- if(process.env.DF13_UI_PORT&&/clickable="true"/.test(node||'')){
+ const fixture=/text="p0-saf-[a-z-]+\.txt"/.test(node||'')&&/resource-id="android:id\/title"/.test(node||'');
+ if(process.env.DF13_UI_PORT&&(fixture||/clickable="true"/.test(node||''))){
   try{
    const port=Number(process.env.DF13_UI_PORT);
    if(!Number.isInteger(port)||port<1024||port>65535)throw Error('invalid local port');
    const xml=node.endsWith('/>')?node:node.slice(0,-1)+'/>';
-   const response=JSON.parse(cp.execFileSync('python3',['tests/android_e2e_recovery/native_ui_dump.py',String(port),xml],{encoding:'utf8',timeout:20000}));
-   if(response.clicked!==true||response.error)throw Error('native action rejected');
+   const args=['tests/android_e2e_recovery/native_ui_dump.py',String(port),xml];
+   if(fixture)args.push('--finger');
+   const response=JSON.parse(cp.execFileSync('python3',args,{encoding:'utf8',timeout:20000}));
+   if((fixture?response.touched:response.clicked)!==true||response.error)throw Error('native action rejected');
    return;
   }catch(_){throw Error('TRANSPORT: native picker accessibility action not acknowledged');}
  }
@@ -205,7 +208,9 @@ async function openDocument(name,code){
  // The first DocumentsUI tap can select/preview a tile instead of granting
  // ACTION_OPEN_DOCUMENT. Require the picker to exit; never infer consent from
  // a visible filename or from a scheduled JS bridge call.
- for(let attempt=0;attempt<3;attempt++){
+ // With the persistent probe, one verified finger gesture is sufficient.
+ // Never replay it or send a blind Enter into a possible consent transition.
+ for(let attempt=0;attempt<(process.env.DF13_UI_PORT?0:3);attempt++){
   xml=dumpUI();
   if(!/package="com\.google\.android\.documentsui"/.test(xml))break;
   // DocumentsUI labels differ by API/vendor; require an actual enabled native button.
@@ -265,7 +270,9 @@ async function safMain(){
   assert.equal((await receipt()).valid,true);
   return 'Actual applyLanguage path, matching six-packet native ACK, force-stop/relaunch and exact locale/records verified';
  });
- for(const key of ['zen_fortress_cfg_v21','zen_fortress_cfg_v21_mirror','tasks_v21','tasks_v21_mirror','notes_v21','notes_v21_mirror']){
+ const primaryKeys=await evaluate('Object.values(DeepFocusDataCompatV21.KEYS)');
+ assert.ok(Array.isArray(primaryKeys)&&primaryKeys.length===3&&new Set(primaryKeys).size===3,'Canonical v21 family keys unavailable');
+ for(const key of primaryKeys.flatMap(key=>[key,key+'_mirror'])){
   await run('failed_save_rollback_'+key,()=>injectWriteFailure(key));
  }
  const baseline=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
