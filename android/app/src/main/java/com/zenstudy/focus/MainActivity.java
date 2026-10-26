@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -23,6 +22,7 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
+    private FocusAppWebChromeClient appDialogs;
     private static final int REQUEST_BACKUP_EXPORT = 7410;
     private static final int REQUEST_BACKUP_IMPORT = 7412;
     private static final int MAX_BACKUP_IMPORT_BYTES = 8 * 1024 * 1024;
@@ -72,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        webView.setWebChromeClient(new WebChromeClient());
+        appDialogs = new FocusAppWebChromeClient(this);
+        webView.setWebChromeClient(appDialogs);
         webView.loadUrl("file:///android_asset/web/index.html");
     }
 
@@ -253,6 +254,12 @@ public class MainActivity extends AppCompatActivity {
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             FocusAlarmReceiver.refreshLocale(this);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (appDialogs != null) appDialogs.cancelPending();
+        super.onDestroy();
     }
 
     @Override
