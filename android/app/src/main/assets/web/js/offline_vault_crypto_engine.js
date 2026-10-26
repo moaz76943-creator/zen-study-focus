@@ -1,11 +1,13 @@
 /**
- * DEEP FOCUS — Offline Cryptographic Vault Key Derivation & Pacer Engine (Mission #151)
+ * DEEP FOCUS — Offline Vault Integrity Envelope & Pacer Engine (Mission #151)
  * Architecture: Standalone dynamic JS module. Zero index.html overwrites.
- * Guarantees:
- * - Client-side zero-knowledge cryptographic key derivation & vault sealing.
- * - PBKDF2 / Argon2 memory-cost calibration (~200ms mobile budget).
- * - AES-GCM 256-bit envelope format with SHA-256 integrity watermark.
- * - Zero music policy: silent mathematical cryptographic operations.
+ * Guarantees (corrected by security review 2026-10-26):
+ * - Local integrity-only envelope: Base64 payload encoding + additive checksum watermark.
+ * - NO encryption, NO authenticity, NO key derivation is performed by this module.
+ *   Payloads remain readable by anyone; do not store secrets with this engine.
+ * - PBKDF2/Argon2 iteration-budget calibration HELPER only (~200ms mobile budget);
+ *   it computes recommended parameters and performs no derivation itself.
+ * - Zero music policy: silent mathematical operations.
  * - Strict Western digits (0123456789).
  * - 100 Google Play locales support with English ('en') fallback.
  * - Absolute Hebrew ('he', 'iw') exclusion -> redirects to 'en'.
@@ -34,18 +36,18 @@
 
   var STRINGS = {
     en: {
-      vault_sealed: 'Cryptographic Fortress Vault Sealed (AES-GCM-256)',
-      vault_unlocked: 'Zero-Knowledge Vault Decrypted Locally',
+      vault_sealed: 'Vault Snapshot Encoded For Local Integrity (Not Encrypted)',
+      vault_unlocked: 'Vault Payload Integrity-Checked Locally',
       pacing_calibrated: 'Optimal Mobile Derivation Budget Calibrated (~200ms)',
-      integrity_valid: 'Cryptographic HMAC Watermark Verified',
+      integrity_valid: 'Integrity Checksum Watermark Verified (Not Authenticated)',
       integrity_tampered: 'Integrity Violation Detected in Vault Archive'
     },
     ar: {
-      vault_sealed: 'تم تشفير خزانة البيانات المحلية وإحكام قفلها (AES-GCM-256)',
-      vault_unlocked: 'تم فك تشفير الخزانة محلياً بمعرفة صفرية',
+      vault_sealed: 'تم ترميز لقطة الخزنة محلياً للتحقق من السلامة (بدون تشفير)',
+      vault_unlocked: 'تم فحص سلامة بيانات الخزنة محلياً',
       pacing_calibrated: 'معايرة مثالية لزمن اشتقاق المفاتيح للأجهزة المحمولة (~200ms)',
-      integrity_valid: 'تم التحقق من سلامة البصمة المشفرة ومطابقتها',
-      integrity_tampered: 'تحذير: اكتشاف تلاعب أو عدم تطابق في بصمة الخزانة'
+      integrity_valid: 'تم التحقق من بصمة سلامة الخزنة (تكامل فقط، دون مصادقة)',
+      integrity_tampered: 'تحذير: اكتشاف تلاعب أو عدم تطابق في بصمة الخزنة'
     }
   };
 
@@ -102,14 +104,14 @@
 
     return {
       version: 'v21-fortress-aes256',
-      algorithm: 'AES-GCM-256',
+      algorithm: 'NONE-BASE64-INTEGRITY-ONLY',
       saltHex: salt,
       ivHex: iv,
       cipherPayload: mockCipher,
       watermarkChecksum: toWesternDigits(String(checksum)),
       sealedAt: toWesternDigits(new Date().toISOString()),
       zeroMusicCertified: true,
-      status: 'sealed'
+      status: 'encoded-integrity-only'
     };
   }
 
