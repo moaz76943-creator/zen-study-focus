@@ -1,0 +1,62 @@
+name: DF-PR-01 v21 native durable ACK source QA
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/preflight_v22.js'
+      - 'android/app/src/main/assets/web/integration_v22.js'
+      - 'tests/integration_recovery/native_durable_ack.test.cjs'
+      - 'tests/integration_recovery/restore_journal.test.cjs'
+      - 'tests/integration_recovery/daily_rollover_durability.test.cjs'
+      - 'tests/integration_recovery/df_pr01_native_ack_contract.test.cjs'
+      - 'tests/integration_recovery/native_atomic_ack_test.py'
+      - 'tests/integration_recovery/new_duplicate_ids.test.cjs'
+      - '.github/workflows/df_pr01_v21_native_ack_qa.yml'
+permissions:
+  contents: read
+jobs:
+  node-regression-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Assert exact source HEAD
+        run: |
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          echo "HEAD=$(git rev-parse HEAD)"
+      - name: Check edited JavaScript syntax
+        run: |
+          node --check android/app/src/main/assets/web/app.js
+          node --check android/app/src/main/assets/web/preflight_v22.js
+          node --check android/app/src/main/assets/web/integration_v22.js
+      - name: Execute v21 native durable regression suite
+        run: |
+          node --test tests/integration_recovery/new_duplicate_ids.test.cjs tests/integration_recovery/native_durable_ack.test.cjs tests/integration_recovery/df_pr01_native_ack_contract.test.cjs tests/integration_recovery/native_saf_import_forwardport.test.cjs tests/integration_recovery/restore_journal.test.cjs tests/integration_recovery/daily_rollover_durability.test.cjs
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Execute Java AtomicFile publication fault model (not device QA)
+        run: python3 -m unittest discover -s tests/integration_recovery -p 'native_atomic_ack_test.py' -v
+      - name: Install Android 36 SDK
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          "$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Debug compile only (not a device E2E test)
+        run: gradle -p android :app:assembleDebug --no-daemon
+      - name: Retain non-release status
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          echo "RELEASE_APPROVED=NO"
