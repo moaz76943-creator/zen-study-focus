@@ -35,16 +35,23 @@ def safe_summary(path: Path, source_sha: str, scan_exit: int) -> dict:
             return summary
         summary["findings"] = len(report)
         summary["rule_counts"] = {}
+        source_fingerprints = set()
+        history_commits = set()
         for index, item in enumerate(report):
             rule_id = item.get("RuleID")
             if not isinstance(rule_id, str) or rule_id not in SAFE_RULES:
                 rule_id = "unknown"
             summary["rule_counts"][rule_id] = summary["rule_counts"].get(rule_id, 0) + 1
+            raw_path = item.get("File")
+            raw_path = raw_path if isinstance(raw_path, str) else ""
+            if raw_path:
+                source_fingerprints.add(hashlib.sha256(raw_path.encode("utf-8")).digest())
+            commit = item.get("Commit")
+            if isinstance(commit, str) and SHA.fullmatch(commit):
+                history_commits.add(commit)
             # Keep per-finding evidence bounded, but account for ALL detections.
             if index >= 25:
                 continue
-            raw_path = item.get("File")
-            raw_path = raw_path if isinstance(raw_path, str) else ""
             line = item.get("StartLine")
             line = line if type(line) is int and 0 <= line <= 100000000 else 0
             entry = {
@@ -52,10 +59,11 @@ def safe_summary(path: Path, source_sha: str, scan_exit: int) -> dict:
                 "path_sha256_16": hashlib.sha256(raw_path.encode("utf-8")).hexdigest()[:16],
                 "line": line,
             }
-            commit = item.get("Commit")
             if isinstance(commit, str) and SHA.fullmatch(commit):
                 entry["commit_sha256_16"] = hashlib.sha256(commit.encode("ascii")).hexdigest()[:16]
             summary["evidence"].append(entry)
+        summary["distinct_source_files"] = len(source_fingerprints)
+        summary["distinct_history_commits"] = len(history_commits)
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError, RecursionError):
         summary["reason"] = "REPORT_INVALID"
         return summary
