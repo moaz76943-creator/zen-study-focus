@@ -37,3 +37,17 @@ test('missing fields and inconsistent counters must fail closed', () => {
   assert.equal(run({assertionsCount:3, failuresCount:4}).status,'BLOCKED_MALFORMED');
   assert.equal(run({assertionsCount:3, skippedCount:4}).status,'BLOCKED_MALFORMED');
 });
+
+test('rejects array‑shaped evidence even when it carries the correct properties', () => {
+  // Create an array and attach the required properties
+  const arrayEvidence = [];
+  arrayEvidence.sha = sha;
+  arrayEvidence.assertionsCount = 5;
+  arrayEvidence.failuresCount = 0;
+  arrayEvidence.skippedCount = 0;
+
+  const result = validateEvidence(arrayEvidence, sha);
+  // The guard should treat this as malformed rather than PASS
+  assert.equal(result.status, 'BLOCKED_MALFORMED');
+  assert.equal(result.valid, false);
+});

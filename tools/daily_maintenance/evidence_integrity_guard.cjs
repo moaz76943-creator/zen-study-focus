@@ -4,8 +4,13 @@
  */
 
 function validateEvidence(evidence, currentHeadSha) {
-    if (!evidence || typeof evidence !== 'object') {
-        return { status: "BLOCKED_MALFORMED", valid: false, reason: "Evidence object missing or not an object" };
+    // Reject missing, non‑object, or array‑shaped evidence early
+    if (!evidence || typeof evidence !== 'object' || Array.isArray(evidence)) {
+        return {
+            status: "BLOCKED_MALFORMED",
+            valid: false,
+            reason: "Evidence object missing, not an object, or is an array"
+        };
     }
 
     // 1. Exact SHA Matching (No stale inheritance)
@@ -21,15 +26,21 @@ function validateEvidence(evidence, currentHeadSha) {
     // Do not coerce strings/NaN/Infinity/missing fields into valid counters.
     const counts = ['assertionsCount', 'failuresCount', 'skippedCount'];
     if (counts.some(key => !Number.isSafeInteger(evidence[key]) || evidence[key] < 0)) {
-        return { status: "BLOCKED_MALFORMED", valid: false,
-            reason: "Evidence counters must be present as nonnegative safe integers" };
+        return {
+            status: "BLOCKED_MALFORMED",
+            valid: false,
+            reason: "Evidence counters must be present as nonnegative safe integers"
+        };
     }
     const assertions = evidence.assertionsCount;
     const failures = evidence.failuresCount;
     const skipped = evidence.skippedCount;
     if (failures > assertions || skipped > assertions || failures + skipped > assertions) {
-        return { status: "BLOCKED_MALFORMED", valid: false,
-            reason: "Evidence failure/skip totals exceed assertions" };
+        return {
+            status: "BLOCKED_MALFORMED",
+            valid: false,
+            reason: "Evidence failure/skip totals exceed assertions"
+        };
     }
     if (assertions <= 0) {
         return {
