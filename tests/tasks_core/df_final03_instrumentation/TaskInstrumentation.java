@@ -157,8 +157,13 @@ public final class TaskInstrumentation extends Instrumentation {
             "Editing legacy undated task fabricated date "+draft);
         tap("df03Save");
         JSONObject saved=readFixture();
-        assertOk(saved.optInt("count")==1&&SAVED.equals(saved.optString("title")),
-            "Real Android Save did not persist single edit "+saved);
+        if(saved.optInt("count")!=1||!SAVED.equals(saved.optString("title"))){
+            JSONObject diag=js("({events:window.__df03RealClicks||[],form:!!document.querySelector('#df03TaskHost form.df-form')," +
+                "title:document.querySelector('#df03TaskHost form.df-form input[type=text]')?.value||''," +
+                "error:document.querySelector('#df03TaskHost .df-error')?.textContent||''," +
+                "save:!!document.getElementById('df03Save')})");
+            throw new AssertionError("Real Android Save did not persist single edit "+saved+" physicalEvents="+diag);
+        }
         assertOk(!saved.optBoolean("date")&&!saved.optBoolean("due"),
             "Real Android Save invented date or due "+saved);
         assertOk(receipt().optBoolean("ok"),"Native v21 ACK missing after Save");
