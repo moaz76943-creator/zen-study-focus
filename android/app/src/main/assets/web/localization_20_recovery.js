@@ -63,12 +63,17 @@
     } catch (_) { return westernDigits(String(value)); }
   }
   function formatDate(value, code, options) {
+    // YYYY-MM-DD is a calendar day, not an instant at local midnight.
+    // Date.parse interprets it as UTC, which otherwise shows yesterday
+    // in time zones west of Greenwich.
+    const calendarDay = typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
     const date = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(date.getTime())) return '';
+    if (Number.isNaN(date.getTime()) ||
+        (calendarDay && date.toISOString().slice(0,10) !== value)) return '';
     try {
-      return westernDigits(new Intl.DateTimeFormat(resolve(code), {
-        calendar:'gregory', ...(options || {}), numberingSystem:'latn'
-      }).format(date));
+      const formatOptions = {calendar:'gregory', ...(options || {}), numberingSystem:'latn'};
+      if (calendarDay) formatOptions.timeZone = 'UTC';
+      return westernDigits(new Intl.DateTimeFormat(resolve(code), formatOptions).format(date));
     } catch (_) { return westernDigits(date.toISOString().slice(0,10)); }
   }
   function isUserContent(node) {
