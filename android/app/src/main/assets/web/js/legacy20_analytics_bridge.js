@@ -24,6 +24,12 @@
     daily:'daily',weekly:'weekly',monthly:'monthly',minuteUnit:'minute',
     heatMinutes:'minutes',excluded:'excluded'
   });
+  // The reviewed UI also uses post-legacy keys. register() replaces a section,
+  // so retain these exact existing labels when extending the older dictionary.
+  const retainedUiKeys=Object.freeze([
+    'today','last7','last30','currentWeek','priorWeek','activitySplit',
+    'historicalGoals','noHistoricalGoals','exportUnavailable'
+  ]);
   const MISS='__DF09_UNSET_VALUE_DO_NOT_TRANSLATE__';
   function apply(){
     const live=root.DF99Locale,old=root.DeepFocusLocale20Recovery;
@@ -44,6 +50,12 @@
         const value=old.t(locale,keyOld),english=old.t('en',keyOld);
         if(typeof value==='string'&&value.trim()&&value!==english) {
           pack[key]=value;added++;
+        }
+      }
+      for(const key of retainedUiKeys){
+        const existing=live.t(locale,'analytics',key,MISS);
+        if(typeof existing==='string'&&existing!==MISS&&existing.trim()){
+          pack[key]=existing;retained++;
         }
       }
       const registered=Object.keys(pack).length>0&&live.register(locale,'analytics',pack);
