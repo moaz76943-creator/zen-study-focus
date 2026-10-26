@@ -84,10 +84,26 @@ cp "$BUILD/APK_SHA256.txt" "$OUT/APK_SHA256.txt"
 timeout 30s adb wait-for-device
 test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = 1
 timeout 120s adb install -r "$APK" | tee "$OUT/ADB_INSTALL.txt"
-test -n "$(adb shell pm path com.zenstudy.focus | grep '^package:')"
-INSTALLED_PATH="$(adb shell pm path com.zenstudy.focus | tr -d '\r' | sed -n 's/^package://p')"
+# API35 evidence shows an alive VM and ample host memory, but adbd goes
+# offline immediately after a successful install. Recover only transport/read
+# operations here; never replay a UI tap, consent action, or application write.
+INSTALLED_PATH=""
+for attempt in {1..6}; do
+  if PACKAGE_PATHS="$(timeout 15s adb shell pm path com.zenstudy.focus 2> "$OUT/PACKAGE_PATH_TRANSPORT.txt")"; then
+    INSTALLED_PATH="$(printf '%s' "$PACKAGE_PATHS" | tr -d '\r' | sed -n 's/^package://p')"
+    if [[ -n "$INSTALLED_PATH" ]]; then break; fi
+  fi
+  timeout 10s adb reconnect offline >/dev/null 2>&1 || true
+  timeout 30s adb wait-for-device || true
+done
 test -n "$INSTALLED_PATH"
-timeout 60s adb pull "$INSTALLED_PATH" "$OUT/installed-base.apk"
+PULLED=0
+for attempt in {1..3}; do
+  if timeout 60s adb pull "$INSTALLED_PATH" "$OUT/installed-base.apk"; then PULLED=1; break; fi
+  timeout 10s adb reconnect offline >/dev/null 2>&1 || true
+  timeout 30s adb wait-for-device || true
+done
+test "$PULLED" = 1
 sha256sum "$OUT/installed-base.apk" | awk '{print $1}' > "$OUT/INSTALLED_APK_SHA256.txt"
 rm "$OUT/installed-base.apk"
 test "$(cat "$OUT/INSTALLED_APK_SHA256.txt")" = "$EXPECTED"
