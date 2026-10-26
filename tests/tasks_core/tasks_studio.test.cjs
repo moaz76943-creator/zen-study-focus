@@ -2,6 +2,7 @@
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const Studio=require('../../android/app/src/main/assets/web/tasks_studio.js');
+const C=require('../../android/app/src/main/assets/web/tasks_core_v21.js');
 class FakeElement {
  constructor(doc,tag){this.ownerDocument=doc;this.tagName=tag.toUpperCase();this.children=[];this.listeners={};this.attributes={};this.value='';this.textContent='';this.checked=false;this.style={};}
  appendChild(n){this.children.push(n);n.parent=this;return n;}
@@ -157,4 +158,45 @@ test('PR160 an edited invalid note ID remains rejected without a write',()=>{
  assert.equal(commits,0);
  assert.deepEqual(state,original);
  studio.destroy();
+});
+
+
+test('DF-PR-01 new Tasks Studio task defaults to optional deadline and is not overdue',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[]},commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(before,after){assert.deepEqual(before,state);state=JSON.parse(JSON.stringify(after));commits++;return true;}});
+ const findButton=label=>root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent.includes(label));
+ findButton('New task').dispatch('click');
+ const form=root.descendants.find(x=>x.tagName==='FORM');
+ assert.ok(form);
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ const due=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='date');
+ const assign=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='checkbox');
+ assert.equal(assign.checked,false);
+ assert.ok(due.value);
+ title.value='Task with no deadline';
+ form.dispatch('submit');
+ assert.equal(commits,1);
+ assert.equal(state.tasksList[0].dueAssigned,false);
+ assert.equal(state.tasksList[0].title,'Task with no deadline');
+ assert.equal(C.isOverdue(state.tasksList[0],'2026-11-01'),false);
+});
+
+test('DF-PR-01 unrelated title edit never assigns a date to an imported undated v21 task',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[{id:107,title:'Imported undated',done:false,other:{keep:42}}]},commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(before,after){state=JSON.parse(JSON.stringify(after));commits++;return true;}});
+ root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Edit').dispatch('click');
+ const form=root.descendants.find(x=>x.tagName==='FORM');
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ const hasDue=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='checkbox');
+ assert.equal(hasDue.checked,false);
+ title.value='Renamed undated';
+ form.dispatch('submit');
+ assert.equal(commits,1);
+ assert.equal(Object.hasOwn(state.tasksList[0],'date'),false);
+ assert.equal(Object.hasOwn(state.tasksList[0],'dueAssigned'),false);
+ assert.deepEqual(state.tasksList[0].other,{keep:42});
 });

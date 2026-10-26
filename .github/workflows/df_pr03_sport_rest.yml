@@ -1,0 +1,24 @@
+name: DF PR03 Sport Rest Transaction Safety
+on:
+  push:
+    branches: [fix/df-pr03-sport-rest-atomic-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths: [android/app/src/main/assets/web/app.js, tests/df_pr03/**, .github/workflows/df_pr03_sport_rest.yml]
+permissions:
+  contents: read
+jobs:
+  sport-rest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          git rev-parse HEAD
+          node --check android/app/src/main/assets/web/app.js
+          node --test tests/df_pr03/sport_rest_ack.test.cjs tests/track05_timer/tick_lifecycle.test.cjs tests/i18n/timer/timer_destructive_consent.test.cjs

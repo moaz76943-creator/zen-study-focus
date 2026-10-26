@@ -2301,16 +2301,51 @@ function logWorkoutSet() {
 }
 
 function startQuickSportRest(secs) {
-  if (timerRunning) toggleTimerPlay();
-  currentTimerModeKey = 'short';
-  timerTotal = secs; timerLeft = secs;
-  timerSessionId = null;
-  focusSessionTaskId = null;
-  timerActiveMs = 0;
-  timerResumeMs = null;
-  storeTimerSession();
-  updateTimerDisplay(); toggleTimerPlay();
-  showToast(toWest(`⏱️ Rest ${secs}s Started`));
+  // Reject invalid values before prompting, storing, or changing a live session.
+  const seconds=Number(secs);
+  if(!Number.isInteger(seconds)||seconds<1||seconds>86400)return false;
+  if((quickTraining?.active||timerRunning||timerSessionId||timerActiveMs>0) &&
+      !window.confirm(quickText('replacePrompt')))return false;
+
+  // One confirmed durable transition. Do not Pause/Reset/save intermediate
+  // states: those could irrevocably discard focus time on failed storage.
+  const startedAt=Date.now();
+  const nextId=String(startedAt)+'-'+String(Math.round(Math.random()*1e9));
+  const next={
+    total:seconds,left:seconds,running:true,endAt:startedAt+seconds*1000,
+    mode:'short',label:'',sessionId:nextId,taskId:null,
+    activeMs:0,resumedAt:startedAt,training:null
+  };
+  try {
+    if(saveFortressData(TIMER_STORAGE_KEY,next)!==true)
+      throw new Error('SPORT_REST_WRITE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed || (cfg.lang==='ar'
+      ? 'تعذّر حفظ جلسة الاستراحة. حاول مرة أخرى.'
+      : 'Could not save rest timer. Try again.'));
+    return false;
+  }
+
+  // The old timer and native service remain untouched until the durable ACK.
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=null;
+  if(quickTraining?.active){quickTraining=null;renderQuickTraining();}
+  currentTimerModeKey='short';customSessionLabel='';
+  timerTotal=seconds;timerLeft=seconds;timerRunning=true;
+  timerTargetTime=next.endAt;timerSessionId=nextId;
+  focusSessionTaskId=null;timerActiveMs=0;timerResumeMs=startedAt;
+  document.getElementById('mainPlayBtn').innerHTML =
+    '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+  updateTimerDisplay();
+  if(window.ZenNative&&window.ZenNative.startBackgroundService){
+    try{
+      window.ZenNative.startBackgroundService(seconds,
+        document.getElementById('timerModeCaption').textContent);
+    }catch(error){console.warn('Rest notification unavailable',error);}
+  }
+  timerInterval=setInterval(runTimerTick,500);
+  showToast(toWest(`⏱️ Rest ${seconds}s Started`));
+  return true;
 }
 
 function addReadPages(p) {
