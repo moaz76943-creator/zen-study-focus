@@ -58,16 +58,17 @@ async function dialog(expected){
  let last='';
  for(let n=0;n<6;n++){
   const candidates=[];
+  // Prefer UiAutomator's complete EditText attributes when available.
+  // Its API35 null-root failure is recovered using existing Accessibility.
+  try{
+   adb('shell','uiautomator','dump','/sdcard/df-p0-dialog.xml');
+   candidates.push(adb('shell','cat','/sdcard/df-p0-dialog.xml'));
+  }catch(e){last=String(e);}
   try{candidates.push(await nativeHierarchy());}catch(e){last=String(e);}
-  if(!candidates.length || n%2===1){
-   try{
-    adb('shell','uiautomator','dump','/sdcard/df-p0-dialog.xml');
-    candidates.push(adb('shell','cat','/sdcard/df-p0-dialog.xml'));
-   }catch(e){last=String(e);}
-  }
   for(const xml of candidates){
    if(xml.includes('package="com.zenstudy.focus"')&&
-      xml.includes('Deep Focus')&&xml.includes(expected)){
+      xml.includes('Deep Focus')&&xml.includes(expected)&&
+      (!expected.startsWith('DF Prompt CHECK')||xml.includes('نص للاختبار'))){
     assert.doesNotMatch(xml,/file:\/\/|تعرض الصفحة في|The page at/,'Browser-origin dialog leaked');
     return xml;
    }
