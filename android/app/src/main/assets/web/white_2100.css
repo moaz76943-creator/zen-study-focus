@@ -662,7 +662,7 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
 }
 /* Long timer strings remain legible at 320px with 200% root text scaling. */
 body.timer-home:not(.deep-lockdown) .focus-hero-card .ring-time {
-  font-size: clamp(1.05rem, 9vw, 3rem);
+  font-size: clamp(1.05rem, 9vw, 3rem) !important;
   max-inline-size: 100%;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -673,9 +673,9 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .time-delta-row {
   align-items: stretch;
 }
 body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
-  flex: 1 1 62px;
+  flex: 1 1 62px !important;
   min-inline-size: 0;
-  min-block-size: 44px;
+  min-block-size: 44px !important;
   max-inline-size: 100%;
   white-space: normal;
   overflow-wrap: anywhere;
