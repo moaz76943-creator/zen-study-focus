@@ -49,6 +49,11 @@ async function tap(selector){
  const frame=await readWebViewFrame(adb,{parseBounds:parseWebViewBounds,pause});
  const p=cssPointToAndroid(geo,frame);adb('shell','input','tap',String(p.x),String(p.y));await pause(350);
 }
+async function verifiedNativeTimerSnapshot(){
+ const v=await evalJs("(()=>{const raw=window.ZenNative?.readActiveTimerSnapshot?.();if(!raw||raw==='ERROR'||raw==='NONE')return {ok:false,reason:String(raw)};try{const p=JSON.parse(raw),valid=computeHash(p.payload)===p.sig,s=JSON.parse(p.payload);return {ok:valid,id:s.sessionId,left:s.left,running:s.running,activeMs:s.activeMs};}catch(e){return {ok:false,reason:'packet_invalid'};}})()");
+ assert.equal(v.ok,true,'Actual Android native AtomicFile readback must verify');
+ return v;
+}
 async function state(){return evalJs("({id:timerSessionId,mode:currentTimerModeKey,total:timerTotal,left:timerLeft,running:timerRunning,activeMs:timerActiveMs,history:cfg.sessionHistory?.length||0,sessions:cfg.sessions})")}
 async function nativeXml(){
  for(let i=0;i<4;i++){
@@ -103,7 +108,13 @@ async function main(){
  await test('pause-force-stop-reopen',async()=>{
   if(!(await state()).running)throw Error('DEPENDENCY_NOT_TESTED: no active focus session');
   await tap('#mainPlayBtn');const before=await state();
+  const nativeBefore=await verifiedNativeTimerSnapshot();
+  assert.equal(nativeBefore.id,before.id);
+  assert.equal(nativeBefore.running,false);
+  assert.equal(nativeBefore.left,before.left);
   await restart();const after=await state();
+  const nativeAfter=await verifiedNativeTimerSnapshot();
+  assert.deepEqual(nativeAfter,nativeBefore,'Native pause snapshot changed across force-stop');
   assert.equal(after.id,before.id);assert.equal(after.left,before.left);
   assert.equal(after.activeMs,before.activeMs);assert.equal(after.running,false);
   return {id:after.id,seconds:after.left};
