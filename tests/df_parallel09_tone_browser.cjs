@@ -20,6 +20,8 @@ const {pathToFileURL}=require('node:url');
           document.documentElement.lang=locale;
           document.documentElement.dir=locale==='ar'?'rtl':'ltr';
           document.documentElement.style.fontSize=zoom+'%';
+          if(typeof switchTab==='function') switchTab('sec-sounds',document.getElementById('navSounds'));
+          else document.getElementById('sec-sounds').classList.add('active');
         },{locale,zoom});
         await page.waitForFunction(()=>document.querySelectorAll('#completionAlertPickerHost .completion-alert-option').length===6);
         const row=await page.evaluate(()=>{
