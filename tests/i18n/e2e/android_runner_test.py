@@ -17,6 +17,14 @@ class AndroidReportingTest(unittest.TestCase):
         self.assertIn("sample failure",results["note_persistence"]["error"])
         self.assertEqual(checkpoints[0]["note_persistence"]["status"],"FAIL")
 
+    def test_transport_timeout_is_separate_from_app_assertions(self):
+        results={}
+        def timeout():
+            raise TimeoutError('device connection timed out')
+        self.assertFalse(record(results,'android_transport',timeout))
+        self.assertEqual(results['android_transport']['failure_kind'],'INFRASTRUCTURE')
+        self.assertEqual(results['android_transport']['status'],'FAIL')
+
     def test_valid_success_records_evidence_and_timing(self):
         results={}
         self.assertTrue(record(results,"screen_marker",lambda:"genuine marker"))

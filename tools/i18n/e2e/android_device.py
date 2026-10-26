@@ -218,13 +218,22 @@ def language(name, iso):
         time.sleep(0.3)
     raise AssertionError("Selected ISO badge and closed picker not observed: "+iso)
 
+def failure_kind(error):
+    if isinstance(error, (OSError, subprocess.TimeoutExpired, json.JSONDecodeError)):
+        return "INFRASTRUCTURE"
+    if isinstance(error, RuntimeError) and str(error).startswith("adb "):
+        return "INFRASTRUCTURE"
+    # A missing locator can be a runner defect or an application problem.
+    # Do not claim that an unclassified assertion proves an app regression.
+    return "ASSERTION_REQUIRES_TRIAGE"
+
 def record(results, name, fn, checkpoint=None):
     started = time.monotonic()
     try:
         detail = fn()
         results[name] = {"status":"PASS", "detail":detail}
     except Exception as error:
-        results[name] = {"status":"FAIL", "error":str(error)}
+        results[name] = {"status":"FAIL", "error":str(error), "failure_kind":failure_kind(error)}
         dest = os.getenv("DF13_EVIDENCE_DIR")
         if dest:
             try:
@@ -326,7 +335,7 @@ def run(out, source_sha, api):
             return "No uncaught startup errors in actual app PID's Chromium console; separate from feature acceptance"
         record(results, "webview_startup_js", startup_js, checkpoint)
     except Exception as error:
-        results["offline_fresh_boot"]={"status":"FAIL","error":str(error)}
+        results["offline_fresh_boot"]={"status":"FAIL","error":str(error),"failure_kind":failure_kind(error)}
         try:
             screenshot(out, "boot_failure_api" + str(api))
         except Exception:
@@ -457,7 +466,7 @@ def run(out, source_sha, api):
                     item.update({"status":"PASS","meaning":"boot/visible title only",
                                  "screenshot":screenshot(out,f"api{api}_w{w}_font{scale}")})
                 except Exception as error:
-                    item.update({"status":"FAIL","error":str(error)})
+                    item.update({"status":"FAIL","error":str(error),"failure_kind":failure_kind(error)})
                 matrix.append(item)
                 checkpoint()
         untested(results,"rtl_ltr_visual","Screenshots attached; no automated pixel/layout-direction assertion")
