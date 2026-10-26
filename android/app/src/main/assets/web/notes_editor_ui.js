@@ -255,6 +255,9 @@
     const locale=instance.adapter.locale();
     if(instance.lastLocale===locale)return;
     instance.lastLocale=locale;
+    // The current integration calls renderStack on language switch; update the
+    // in-flight draft status without touching its stored payload or editor inputs.
+    if(typeof nsRefreshDraftLabels==='function')nsRefreshDraftLabels();
     const status=document.getElementById('nsux-status');
     if(status){
       [['all','all'],['archived','archive'],['trash','trash']].forEach(([value,key])=>{
