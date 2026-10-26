@@ -19,6 +19,17 @@ finalize() {
   local code=$?
   trap - EXIT
   printf '%s\n' "$code" > "$OUT/RUNNER_EXIT_CODE.txt"
+  {
+    date -u
+    free -m
+    ps -eo pid,rss,vsz,stat,comm | awk 'NR == 1 || $5 ~ /(qemu|emulator)/'
+    timeout 10s adb devices -l || true
+  } > "$OUT/EMULATOR_HOST_STATE.txt" 2>&1
+  # Distinguish host OOM/VM crashes from assertion failures; no command lines
+  # or unrestricted device logs are collected.
+  timeout 10s sudo -n dmesg 2>/dev/null |
+    grep -Ei 'Out of memory|Killed process|qemu.*segfault|segfault.*qemu' \
+    > "$OUT/EMULATOR_HOST_FAILURES.txt" || true
   if [[ -n "$PROBE_PID" ]]; then
     timeout 10s adb shell am force-stop com.zenstudy.focus.e2e || true
     kill "$PROBE_PID" 2>/dev/null || true

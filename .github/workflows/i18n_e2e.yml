@@ -18,7 +18,7 @@ concurrency:
 jobs:
   dictionary:
     name: 99-locale inventory (NO Android build)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -53,7 +53,7 @@ jobs:
 
   build_apk:
     name: One fresh-HEAD APK for both Android APIs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -114,7 +114,7 @@ jobs:
   android:
     name: Android WebView API ${{ matrix.api }}
     needs: build_apk
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 50
     strategy:
       fail-fast: false
@@ -179,6 +179,9 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api }}
+          # Official Emulator archive: 36.4.10 Stable (2026-03-12).
+          # Avoid the observed 37.2.12 disconnects and implicit SDK drift.
+          emulator-build: 15004761
           arch: x86_64
           target: google_apis
           profile: pixel_3a
