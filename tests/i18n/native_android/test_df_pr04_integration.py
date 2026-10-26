@@ -50,6 +50,7 @@ class PR04NativeSafety(unittest.TestCase):
   source=script.read_text()
   self.assertIn('set -euo pipefail',source)
   self.assertIn('for attempt in 1 2 3; do',source)
+  self.assertIn('adb install --no-streaming -r',source)
   self.assertIn('timeout 40 adb wait-for-device',source)
   self.assertIn('test "$installed" -eq 1',source)
   self.assertIn('adb shell pm list packages',source)
