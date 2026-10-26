@@ -1,0 +1,61 @@
+name: DF07 live Timer destructive button interaction QA
+on:
+  push:
+    branches: [qa/df07-real-timer-buttons-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/track07_functional/timer_mode_buttons_browser.cjs'
+      - '.github/workflows/df07_timer_real_buttons.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df07-timer-real-buttons-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  live-buttons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source timer consent and session tests
+        run: node --test tests/df07/timer_start_pause_resume.test.cjs tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs tests/termux_fix04_custom_timer_consent.test.cjs
+      - name: Install Chromium and isolated browser harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then sudo apt-get update -qq; sudo apt-get install -y -qq chromium; fi
+      - name: Serve app asset code on local-only loopback
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df07-live-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Real click, confirm Cancel Accept and observable session outcomes
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_BUTTON_EVIDENCE: ${{ runner.temp }}/df07-live-buttons
+        run: |
+          mkdir -p "$DF_BUTTON_EVIDENCE"
+          node tests/track07_functional/timer_mode_buttons_browser.cjs
+      - name: Record evidence and Android limitations
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/df07-live-buttons"
+          git rev-parse HEAD > "$RUNNER_TEMP/df07-live-buttons/QA_SHA.txt"
+          printf 'Actual desktop Chromium button clicks; Android native dialog and SAF NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df07-live-buttons/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DF07-real-timer-buttons-${{ github.sha }}
+          path: ${{ runner.temp }}/df07-live-buttons/
+          retention-days: 7
