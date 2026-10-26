@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Summarize CodeQL SARIF without disclosing paths, messages, snippets or findings."""
 import argparse
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -9,6 +10,7 @@ SHA = re.compile(r"[a-f0-9]{40}\Z")
 MAX_BYTES = 32 * 1024 * 1024
 SAFE_CODEQL_RULE = re.compile(r"js/[a-z0-9-]{1,64}\Z")
 MAX_RULE_GROUPS = 24
+MAX_EVIDENCE = 16
 
 
 def summarize(directory: Path, sha: str) -> dict:
@@ -22,6 +24,7 @@ def summarize(directory: Path, sha: str) -> dict:
             return output
         count = 0
         rule_counts = {}
+        evidence = []
         for path in paths:
             if path.stat().st_size > MAX_BYTES:
                 output["reason"] = "SARIF_INVALID"
@@ -48,10 +51,24 @@ def summarize(directory: Path, sha: str) -> dict:
                     if rule not in rule_counts and len(rule_counts) >= MAX_RULE_GROUPS:
                         rule = "unknown"
                     rule_counts[rule] = rule_counts.get(rule, 0) + 1
+                    if len(evidence) < MAX_EVIDENCE:
+                        locations = item.get("locations")
+                        location = locations[0] if isinstance(locations, list) and locations and isinstance(locations[0], dict) else {}
+                        physical = location.get("physicalLocation")
+                        physical = physical if isinstance(physical, dict) else {}
+                        artifact = physical.get("artifactLocation")
+                        artifact = artifact if isinstance(artifact, dict) else {}
+                        uri = artifact.get("uri")
+                        uri = uri if isinstance(uri, str) and len(uri) <= 8192 else ""
+                        region = physical.get("region")
+                        region = region if isinstance(region, dict) else {}
+                        line = region.get("startLine")
+                        line = line if type(line) is int and 0 <= line <= 100000000 else 0
+                        evidence.append({"rule": rule, "path_sha256_16": hashlib.sha256(uri.encode("utf-8")).hexdigest()[:16] if uri else "", "line": line})
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError, RecursionError):
         output["reason"] = "SARIF_INVALID"
         return output
-    output.update(findings=count, status="PASS" if count == 0 else "FAIL", reason="ZERO_FINDINGS" if count == 0 else "CODEQL_FINDINGS", rule_counts=dict(sorted(rule_counts.items())))
+    output.update(findings=count, status="PASS" if count == 0 else "FAIL", reason="ZERO_FINDINGS" if count == 0 else "CODEQL_FINDINGS", rule_counts=dict(sorted(rule_counts.items())), evidence=evidence)
     return output
 
 
