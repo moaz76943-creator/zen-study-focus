@@ -107,3 +107,86 @@ test('offline scripts reinitialize Bengali Analytics on a fresh reopen without u
       {year:'numeric',month:'numeric',day:'numeric'}),/[\u0660-\u0669\u06f0-\u06f9]/u);
   }
 });
+
+test('source inventory counts live 99-locale Analytics labels separately from fallback',()=>{
+  const audit=require('../tools/localization_100/analytics_live_99_report.cjs').report();
+  assert.equal(audit.scope,'source-only-analytics');
+  assert.equal(audit.registered,99);
+  assert.ok(audit.keys>=35);
+  assert.equal(audit.releaseApproved,false);
+  assert.equal(audit.certifiedLanguages,0);
+  assert.ok(!audit.languages.some(x=>['he','iw'].includes(x.code)));
+  const bn=audit.languages.find(x=>x.code==='bn');
+  const sw=audit.languages.find(x=>x.code==='sw');
+  assert.ok(bn.explicitSourceKeys>=20);
+  assert.ok(sw.explicitSourceKeys>0);
+  assert.equal(bn.englishFallbackKeys+bn.explicitSourceKeys,bn.totalKeys);
+  assert.equal(sw.englishFallbackKeys+sw.explicitSourceKeys,sw.totalKeys);
+  assert.equal(audit.languages.find(x=>x.code==='en').uiInlineSource,'EN');
+  assert.equal(audit.languages.find(x=>x.code==='ar').uiInlineSource,'AR');
+  assert.ok(audit.languages.every(x=>x.androidVerified===false));
+});
+
+test('actual app language switch keeps v21 values and reopens saved offline locale',()=>{
+  const vm=require('node:vm');
+  const app=fs.readFileSync(path.join(web,'app.js'),'utf8');
+  const start=app.indexOf('function applyLanguage(code) {');
+  const end=app.indexOf('\n/* =====',start);
+  assert.ok(start>=0&&end>start);
+  const realFn=app.slice(start,end);
+  const catalog=[
+    {code:'en',dir:'ltr',iso:'EN',enName:'English',nativeName:'English'},
+    {code:'bn',dir:'ltr',iso:'BN',enName:'Bengali',nativeName:'বাংলা'},
+    {code:'fa',dir:'rtl',iso:'FA',enName:'Persian',nativeName:'فارسی'},
+    {code:'ur',dir:'rtl',iso:'UR',enName:'Urdu',nativeName:'اردو'}
+  ];
+  const initial={lang:'en',sessionHistory:[{id:'record',minutes:15}],
+    taskUserText:'DO NOT TRANSLATE',focusMin:25};
+  let saved=structuredClone(initial),writes=0;
+  function boot(){
+    const nodes=new Map();
+    const makeNode=()=>({textContent:'',attributes:{},
+      parentElement:{setAttribute(){}},
+      setAttribute(name,value){this.attributes[name]=value;}});
+    const document={
+      getElementById(name){if(!nodes.has(name))nodes.set(name,makeNode());return nodes.get(name);},
+      querySelectorAll(){return [];}
+    };
+    const cfg=structuredClone(saved);
+    const noop=()=>{};
+    const sandbox={document,cfg,LANG_CATALOG:catalog,
+      window:{DF22Locale:{translations:{},apply:noop},DF22Integration:{refreshLocale:noop}},
+      saveFortressData(key,value){
+        assert.equal(key,'zen_fortress_cfg_v21');
+        saved=structuredClone(value);writes++;return true;
+      },
+      L:()=>({sub:'Focus'}),renderAnalyticsBars:noop,localizeStarterPreviews:noop,
+      syncHeaderMetrics:noop,updateTimerDisplay:noop,renderTasksList:noop,
+      renderCalendar:noop,renderNotesStack:noop,renderSoundsStudio:noop,
+      updateSyllabusCalc:noop,closeModal:noop,quickL10n:noop
+    };
+    vm.createContext(sandbox);
+    vm.runInContext(realFn+'\nthis.applyLanguage=applyLanguage;',sandbox);
+    return {sandbox,nodes};
+  }
+  const first=boot();
+  first.sandbox.applyLanguage('bn');
+  assert.equal(saved.lang,'bn');
+  assert.equal(first.nodes.get('htmlRoot').attributes.lang,'bn');
+  assert.equal(first.nodes.get('htmlRoot').attributes.dir,'ltr');
+  assert.equal(saved.taskUserText,initial.taskUserText);
+  assert.deepEqual(saved.sessionHistory,initial.sessionHistory);
+  const reopened=boot();
+  reopened.sandbox.applyLanguage(reopened.sandbox.cfg.lang);
+  assert.equal(reopened.nodes.get('htmlRoot').attributes.lang,'bn');
+  reopened.sandbox.applyLanguage('fa');
+  assert.equal(saved.lang,'fa');
+  assert.equal(reopened.nodes.get('htmlRoot').attributes.dir,'rtl');
+  const next=boot();
+  next.sandbox.applyLanguage('he');
+  assert.equal(saved.lang,'en');
+  next.sandbox.applyLanguage('iw');
+  assert.equal(saved.lang,'en');
+  assert.equal(saved.focusMin,25);
+  assert.ok(writes>=5);
+});
