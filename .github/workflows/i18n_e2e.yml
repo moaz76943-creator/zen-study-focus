@@ -125,7 +125,10 @@ jobs:
             profile: pixel_3a
             heap: 256M
           - api: 35
-            gpu: swiftshader_indirect
+            # Exact-HEAD API35 emulator on swiftshader_indirect crashed with
+            # SIGSEGV (not OOM). Disable virtual GPU only for this API.
+            # This is an infrastructure experiment, never device PASS.
+            gpu: off
             profile: pixel_2
             heap: 512M
     steps:
