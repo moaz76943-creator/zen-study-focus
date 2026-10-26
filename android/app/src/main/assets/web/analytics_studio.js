@@ -242,7 +242,7 @@
               if(matches.length!==1||matches[0].archived===true||
                  matches[0].status==='archived'||matches[0].isStarter===true||
                  matches[0].isDemo===true||matches[0].synthetic===true||
-                  ['demo','sample','fixture'].includes(matches[0].source))return;
+                  core.isSyntheticSource(matches[0].source))return;
               opts.onOpenTask(item.taskId);
             });
             cell.appendChild(button);
