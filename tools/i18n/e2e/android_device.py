@@ -210,6 +210,18 @@ def text_input(index, value):
     if isinstance(index, str):
         target = visible(items, index)
         if target is None:
+            hints = {"inpNoteTitle":("Title or question", "Title"),
+                     "inpNoteBody":("Write here", "Content"),
+                     "inpLangCountrySearch":("Search language or country",)}
+            for hint in hints.get(index, ()):
+                target = visible(items, hint)
+                if target is not None:
+                    break
+        # A freshly restarted Timer page has no text inputs. With the language
+        # dialog open its one editable field is the actual localized search.
+        if target is None and index == "inpLangCountrySearch" and len(items) == 1:
+            target = items[0]
+        if target is None:
             raise AssertionError("Editable field not exposed: " + index)
     elif index >= len(items):
         raise AssertionError("Editable field #%d not exposed in accessibility tree" % index)
@@ -233,7 +245,12 @@ def screenshot(out, name):
     return str(path.name)
 
 def language(name, iso, require_header=True):
-    click("English" if iso != "en" else "English")
+    header = next((n for n in dump() if is_visible_node(n)
+                   and n.get("clickable") == "true"
+                   and re.match(r"^[A-Z]{2,3}\s.+•", n.get("text", ""))), None)
+    if header is None:
+        raise AssertionError("Current language header button not exposed")
+    tap_node(header)
     text_input("inpLangCountrySearch", name)
     matches = [n for n in dump() if name.casefold() in value(n).casefold()
                and "EditText" not in n.get("class", "")
@@ -295,6 +312,7 @@ def run(out, source_sha, api):
             "TASK_ID":"DF-LANE-13-REAL-END-TO-END-QA",
             "SOURCE_SHA":source_sha, "API":api, "test_results":results, "device_matrix":matrix,
             "ANDROID_TREE":os.getenv("DF13_ANDROID_TREE", "UNKNOWN"),
+            "locale_dataset":"One disposable dataset retained across locale switches; process restart between cases; no pm clear",
             "summary":{status:sum(x["status"]==status for x in results.values())
                        for status in ("PASS","FAIL","NOT_TESTED")},
             "representative_locales_planned":[code for code,_ in LOCALES],
@@ -391,8 +409,12 @@ def run(out, source_sha, api):
             )
             for name, markers in cases:
                 click(name)
-                nodes=dump()
-                if not any(has_visible(nodes,marker) for marker in markers):
+                for _ in range(8):
+                    nodes=dump()
+                    if any(has_visible(nodes,marker) for marker in markers):
+                        break
+                    time.sleep(0.3)
+                else:
                     raise AssertionError("Tapped "+name+" but target page content was not exposed: "+str(markers))
             click("Timer")
             return "Six Android taps plus unique visible content checks for each active section"
@@ -462,17 +484,13 @@ def run(out, source_sha, api):
             return "No Wi-Fi or mobile-data services during fresh restart"
         record(results,"offline_resume",offline_resume,checkpoint)
 
-        # One freshly cleared emulator data store per locale. Localized UI is checked
-        # on Android, not inferred from dictionary coverage. Each entry reports itself.
+        # Retain the disposable task/note dataset and use real locale switching.
+        # pm clear is not a user flow and API35 evidence shows VM loss there.
+        # Every locale still requires its exact ISO after a genuine process restart.
         for code, english_name in LOCALES:
             def verify_locale(code=code, english_name=english_name):
-                shell("pm", "clear", PACKAGE)  # isolated test data only
-                if api >= 33:
-                    shell("pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS")
                 initial = restart()
-                if not has_visible(initial, "English"):
-                    raise AssertionError("English locale chooser not visible on fresh app")
-                if code != "en":
+                if not has_iso_badge(initial, code):
                     # Immediate accessible-header freshness is independently
                     # tested by language_change. Here persistence is proved by
                     # the fresh process's exact ISO header after real selection.

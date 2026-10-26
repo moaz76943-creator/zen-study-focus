@@ -45,6 +45,13 @@ class DeviceReadinessTest(unittest.TestCase):
             device.click('Calendar')
         tap.assert_called_once_with(nav)
 
+    def test_api35_field_hint_works_when_dom_resource_id_is_not_exposed(self):
+        from unittest.mock import patch
+        field = {'text': '', 'class': 'android.widget.EditText', 'hint': 'Title', 'bounds': '[37,172][356,219]'}
+        with patch.object(device,'dump',return_value=[field]), patch.object(device,'tap_node') as tap, patch.object(device,'shell'), patch.object(device.time,'sleep'):
+            device.text_input('inpNoteTitle','DF13_NOTE_123')
+        tap.assert_called_once_with(field)
+
     def test_empty_iso_badge_is_not_visible(self):
         self.assertFalse(device.has_iso_badge([{'text': 'AR', 'bounds': '[0,0][0,0]'}], 'ar'))
 
