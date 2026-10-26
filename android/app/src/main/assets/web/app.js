@@ -2613,12 +2613,14 @@ function selectTimerModeFromUser(mins, modeKey, btn) {
   return selectTimerMode(mins, modeKey, btn) !== false;
 }
 function selectTimerMode(mins, modeKey, btn) {
-  if(quickTraining?.active && !quickInternalChange) {
-    if(!window.confirm(quickText('replacePrompt')))return false;
-    quickTraining=null;
+  const endingQuickTraining = quickTraining?.active && !quickInternalChange;
+  if (endingQuickTraining && !window.confirm(quickText('replacePrompt'))) return false;
+  // A rejected Pause must leave the mode and any active Quick Training intact.
+  if (timerRunning && toggleTimerPlay() !== true) return false;
+  if (endingQuickTraining) {
+    quickTraining = null;
     renderQuickTraining();
   }
-  if (timerRunning) toggleTimerPlay();
   currentTimerModeKey = modeKey;
   timerTotal = mins * 60;
   timerLeft = timerTotal;
@@ -2737,7 +2739,7 @@ function resetTimerNow() {
       !window.confirm(cfg.lang === 'ar'
         ? 'إعادة الضبط ستلغي تقدم الجلسة الحالية. هل تريد المتابعة؟'
         : 'Reset will discard the current session progress. Continue?')) return false;
-  if (timerRunning) toggleTimerPlay();
+  if (timerRunning && toggleTimerPlay() !== true) return false;
   timerLeft = timerTotal;
   timerSessionId = null;
   focusSessionTaskId = null;
