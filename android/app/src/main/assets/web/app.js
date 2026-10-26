@@ -2348,6 +2348,9 @@ function startQuickSportRest(secs) {
         document.getElementById('timerModeCaption').textContent);
     }catch(error){console.warn('Rest notification unavailable',error);}
   }
+  if(window.ZenNative && typeof window.ZenNative.requestTimerNotificationPermission==='function'){
+    try{window.ZenNative.requestTimerNotificationPermission();}catch(e){}
+  }
   timerInterval=setInterval(runTimerTick,500);
   showToast(toWest(`⏱️ Rest ${seconds}s Started`));
   return true;
@@ -2731,6 +2734,9 @@ function toggleTimerPlay() {
 
     if (window.ZenNative && window.ZenNative.startBackgroundService) {
       try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch(e){}
+    }
+    if (window.ZenNative && typeof window.ZenNative.requestTimerNotificationPermission==='function') {
+      try { window.ZenNative.requestTimerNotificationPermission(); } catch(e){}
     }
 
     timerInterval = setInterval(runTimerTick, 500);

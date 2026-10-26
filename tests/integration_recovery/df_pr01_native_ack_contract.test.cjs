@@ -54,5 +54,13 @@ test('API33+ notifications request only follows an explicit timer start, never a
   assert.match(java,/private void requestNotificationPermissionForTimer\(\)/);
   assert.match(java,/Build.VERSION.SDK_INT >= 33/);
   const timer=section(java,'public void startBackgroundService(int seconds, String title)','public void stopBackgroundService()');
-  assert.match(timer,/runOnUiThread\(\(\) -> requestNotificationPermissionForTimer\(\)\)/);
+  assert.doesNotMatch(timer,/requestNotificationPermissionForTimer\(/,'Restored timers only rearm their alarm without prompting');
+  const explicit=section(java,'public void requestTimerNotificationPermission()','public void stopBackgroundService()');
+  assert.match(explicit,/runOnUiThread\(\(\) -> requestNotificationPermissionForTimer\(\)\)/);
+  const restored=section(app,'function restoreTimerSession()','const ringCircumference');
+  assert.doesNotMatch(restored,/requestTimerNotificationPermission\(/);
+  const start=section(app,'function toggleTimerPlay()','function resetTimerNow()');
+  assert.match(start,/requestTimerNotificationPermission\(/);
+  const rest=section(app,'function startSportRest(','function addReadPages(');
+  assert.match(rest,/requestTimerNotificationPermission\(/);
 });

@@ -164,6 +164,12 @@ public class MainActivity extends AppCompatActivity {
         public void startBackgroundService(int seconds, String title) {
             if (seconds < 1 || seconds > 86400) return;
             FocusAlarmReceiver.schedule(MainActivity.this, seconds, title);
+        }
+
+        // Explicit foreground user action only. Restoring a saved countdown must
+        // never present a permission dialog over startup WebView recovery.
+        @JavascriptInterface
+        public void requestTimerNotificationPermission() {
             runOnUiThread(() -> requestNotificationPermissionForTimer());
         }
 
