@@ -30,7 +30,26 @@ for attempt in 1 2 3; do
     installed=1
     break
   fi
-  if [ "$attempt" -lt 3 ]; then
+  if [ "$attempt" -eq 2 ]; then
+    # On API30 hosted AVD the package service can disappear after boot.
+    # Reboot once before the last attempt; never classify an unstable AVD as PASS.
+    echo 'Android package service unavailable after installation attempts; one recovery reboot' >&2
+    timeout 30 adb reboot || { echo 'Android emulator reboot command failed; NOT_TESTED' >&2; exit 1; }
+    timeout 180 adb wait-for-device || { echo 'Android emulator did not return; NOT_TESTED' >&2; exit 1; }
+    service_back=0
+    for retry in $(seq 1 36); do
+      if [ "$(timeout 8 adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\\r')" = 1 ] &&
+         timeout 8 adb shell service check package 2>/dev/null | grep -q 'Service package: found'; then
+        service_back=1
+        break
+      fi
+      sleep 5
+    done
+    if [ "$service_back" -ne 1 ]; then
+      echo 'Android PackageManager failed to recover; runtime NOT_TESTED' >&2
+      exit 1
+    fi
+  elif [ "$attempt" -lt 3 ]; then
     sleep 12
     timeout 40 adb wait-for-device
   fi
