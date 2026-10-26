@@ -55,9 +55,22 @@ JSON
       git restore -- "$@"
       python3 -m pip install --quiet --user aider-chat
       export PATH="$HOME/.local/bin:$PATH"
+      # Aider can emit Groq RateLimitError while exiting 0. Do not claim success.
+      set +e
       timeout 7m aider --yes --no-pretty --no-auto-commits --no-dirty-commits \
         --model groq/openai/gpt-oss-120b --map-tokens 0 \
-        --message-file "$RUNNER_TEMP/df-oss-task.txt" "$@"
+        --message-file "$RUNNER_TEMP/df-oss-task.txt" "$@" \
+        > "$RUNNER_TEMP/df-aider-fallback.log" 2>&1
+      aider_status=$?
+      set -e
+      if grep -Eq 'litellm\.RateLimitError|rate_limit_exceeded' "$RUNNER_TEMP/df-aider-fallback.log"; then
+        echo 'QUOTA_BLOCKED: Aider fallback exhausted Groq quota; no source repair proven' >&2
+        exit 75
+      fi
+      if [ "$aider_status" -ne 0 ]; then
+        echo 'Fallback Aider failed; no source repair proven' >&2
+        exit "$aider_status"
+      fi
     else
       echo 'Qwen failed for a reason other than Groq 413; refusing automatic retry' >&2
       exit "$qwen_status"

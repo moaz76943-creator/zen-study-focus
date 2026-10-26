@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 
 const runner=fileURLToPath(new URL('../../tools/ai_agents/oss_run.sh',import.meta.url));
-function exercise(qwenOutput){
+function exercise(qwenOutput,{quotaBlockedAider=false}={}){
  const root=mkdtempSync(join(tmpdir(),'df-qwen-fallback-'));
  const bin=join(root,'bin'),home=join(root,'home'),run=join(root,'runner');
  mkdirSync(bin);mkdirSync(home);mkdirSync(run);
@@ -20,7 +20,7 @@ function exercise(qwenOutput){
  program('python3','exit 0');
  program('timeout','shift; "$@"');
  program('qwen','printf "%s" "${QWEN_CODE_MAX_OUTPUT_TOKENS:-}" > "$RUNNER_TEMP/qwen-output-budget"; echo '+JSON.stringify(qwenOutput)+' >&2; exit 1');
- program('aider','printf "used" > "$RUNNER_TEMP/fallback-ran"; exit 0');
+ program('aider',quotaBlockedAider ? 'echo "litellm.RateLimitError: rate_limit_exceeded" >&2; exit 0' : 'printf "used" > "$RUNNER_TEMP/fallback-ran"; exit 0');
  const init=spawnSync('git',['init','-q'],{cwd:root,encoding:'utf8'});
  assert.equal(init.status,0,init.stderr);
  const add=spawnSync('git',['add','tools/i18n/inventory/index.cjs','tests/i18n/inventory/inventory.test.cjs'],{cwd:root,encoding:'utf8'});
@@ -49,5 +49,14 @@ test('Qwen explicitly limits output budget below Groq Free 8000 TPM',()=>{
  const x=exercise('unrelated model error');
  try{
   assert.equal(readFileSync(join(x.run,'qwen-output-budget'),'utf8'),'1024');
+ }finally{rmSync(x.root,{recursive:true,force:true});}
+});
+
+test('fallback Aider cannot mark task successful when model quota was exhausted',()=>{
+ const x=exercise('Responses API error 413',{quotaBlockedAider:true});
+ try{
+  assert.notEqual(x.result.status,0,'quota-blocked fallback must not become green');
+  assert.match(x.result.stderr,/QUOTA_BLOCKED/);
+  assert.equal(existsSync(join(x.run,'fallback-ran')),false);
  }finally{rmSync(x.root,{recursive:true,force:true});}
 });
