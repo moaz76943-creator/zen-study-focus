@@ -118,11 +118,12 @@
       completionRate:active.length?Math.round(done/active.length*10000)/100:null,excluded,
       projects:[...projectsMap.values()]};
   }
-  function dailyGoalReport(rows, goals, startDate,endDate) {
+  function dailyGoalReport(rows, goals, startDate,endDate,selectedDomain='all') {
     // Goals must be explicitly supplied as minutes per day, never inferred from focus presets.
     if(!isRecord(goals))return {available:false,byDomain:[],days:0};
     const days=dayNumber(endDate)-dayNumber(startDate)+1,out=[];
-    for(const domain of DOMAINS){const n=goals[domain];if(typeof n!=='number'||!Number.isFinite(n)||n<=0||n>1440)continue;
+    for(const domain of DOMAINS){if(selectedDomain!=='all'&&domain!==selectedDomain)continue;
+      const n=goals[domain];if(typeof n!=='number'||!Number.isFinite(n)||n<=0||n>1440)continue;
       const actual=summarize(rows.filter(s=>s.domain===domain)).minutes,target=n*days;
       out.push({domain,actualMinutes:actual,targetMinutes:target,progress:Math.round(actual/target*10000)/100});}
     return {available:out.length>0,days,byDomain:out};
@@ -207,7 +208,7 @@
         if(!weekStartCache.has(s.date))weekStartCache.set(s.date,weekKey(s.date));
         return weekStartCache.get(s.date);
       }),monthly:bucket(rows,s=>s.date.slice(0,7)),byDomain,
-      streaks:streaks(normalized.sessions,today),goals:dailyGoalReport(rows,opts.goals,startDate,endDate),
+      streaks:streaks(normalized.sessions,today),goals:dailyGoalReport(rows,opts.goals,startDate,endDate,domain),
       dashboard,comparison,
       historicalGoals:historicalGoalReport(opts.goalSnapshots ?? snapshot.goalSnapshots ??
         (isRecord(snapshot.cfg)?snapshot.cfg.goalSnapshots:null),rows,startDate,endDate,domain),
