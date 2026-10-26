@@ -10,70 +10,74 @@
     const alertedSessions = new Set();
     const ALLOWED_CALM_SOUNDS = ["bell", "wood_chime", "water_drop", "soft_gong", "gentle_tap", "silent"];
 
+    const inFlightSessions = new Set();
+
     function triggerCompletionAlert(sessionContext, alertSettings, audioDriver) {
         if (!sessionContext || !sessionContext.sessionId) {
             return { played: false, reason: "INVALID_SESSION_CONTEXT" };
         }
 
         const sid = sessionContext.sessionId;
-
-        // 1. Idempotency Check: Never alert twice for the same session
-        if (alertedSessions.has(sid)) {
-            return {
-                played: false,
-                status: "DUPLICATE_ALERT_SUPPRESSED",
-                sessionId: sid,
-                reason: "Alert already delivered for this session ID."
-            };
+        if (alertedSessions.has(sid) || inFlightSessions.has(sid)) {
+            return { played: false, status: "DUPLICATE_ALERT_SUPPRESSED", sessionId: sid };
         }
 
-        // 2. Respect Silence & DND Settings
-        const soundChoice = (alertSettings.soundName || "bell").toLowerCase();
-        if (soundChoice === "silent" || alertSettings.mute === true) {
+        const settings = alertSettings && typeof alertSettings === "object" ? alertSettings : {};
+        const soundChoice = typeof settings.soundName === "string"
+            ? settings.soundName.toLowerCase() : "bell";
+
+        if (soundChoice === "silent" || settings.mute === true) {
             alertedSessions.add(sid);
             return { played: false, status: "SILENT_HONORED", sessionId: sid };
         }
-
-        if (Number(alertSettings.volume) === 0) {
-            alertedSessions.add(sid);
-            return { played: false, status: "VOLUME_ZERO_HONORED", sessionId: sid };
-        }
-
-        if (alertSettings.dndActive === true) {
+        if (settings.dndActive === true) {
             alertedSessions.add(sid);
             return { played: false, status: "DND_HONORED", sessionId: sid };
         }
 
-        // 3. Calm Sounds Catalog Validation
+        const volume = settings.volume === undefined ? 1 : Number(settings.volume);
+        if (!Number.isFinite(volume) || volume < 0 || volume > 1) {
+            return { played: false, status: "INVALID_ALERT_VOLUME", sessionId: sid };
+        }
+        if (volume === 0) {
+            alertedSessions.add(sid);
+            return { played: false, status: "VOLUME_ZERO_HONORED", sessionId: sid };
+        }
+        if (!audioDriver || typeof audioDriver.playAlert !== "function") {
+            return { played: false, status: "AUDIO_DRIVER_UNAVAILABLE", sessionId: sid };
+        }
+
         const resolvedSound = ALLOWED_CALM_SOUNDS.includes(soundChoice) ? soundChoice : "bell";
-
-        // 4. Safe Audio Dispatch with Exception Isolation
-        try {
-            if (audioDriver && typeof audioDriver.playAlert === 'function') {
-                audioDriver.playAlert(resolvedSound, alertSettings.volume || 1.0);
-            }
+        const success = () => {
+            inFlightSessions.delete(sid);
             alertedSessions.add(sid);
-
-            return {
-                played: true,
-                status: "ALERT_PLAYED",
-                sound: resolvedSound,
-                sessionId: sid
-            };
-        } catch (audioErr) {
-            // Audio error must NEVER disrupt session completion
-            alertedSessions.add(sid);
+            return { played: true, status: "ALERT_PLAYED", sound: resolvedSound, sessionId: sid };
+        };
+        const failure = (error) => {
+            inFlightSessions.delete(sid);
             return {
                 played: false,
                 status: "AUDIO_FAILED_SAFELY_FALLBACK_VISUAL",
-                error: audioErr.message,
+                error: String(error && error.message || error),
                 sessionId: sid
             };
+        };
+
+        try {
+            const dispatched = audioDriver.playAlert(resolvedSound, volume);
+            if (dispatched && typeof dispatched.then === "function") {
+                inFlightSessions.add(sid);
+                return Promise.resolve(dispatched).then(success, failure);
+            }
+            return success();
+        } catch (error) {
+            return failure(error);
         }
     }
 
     function resetAlertCache() {
         alertedSessions.clear();
+        inFlightSessions.clear();
     }
 
     if (typeof module !== 'undefined' && module.exports) {
