@@ -54,3 +54,14 @@ class PR04NativeSafety(unittest.TestCase):
   self.assertIn('test "$installed" -eq 1',source)
   self.assertIn('adb shell pm list packages',source)
   self.assertIn('adb shell pidof com.zenstudy.focus',source)
+
+ def test_package_service_is_ready_before_attempting_to_install(self):
+  # API30 run 40297710521 had sys.boot_completed=1 but no 'package'
+  # Android service; three installation retries alone cannot fix that state.
+  source=(R/'tests/i18n/native_android/df_pr04_smoke.sh').read_text()
+  self.assertIn('adb shell service check package',source)
+  self.assertIn('Service package: found',source)
+  self.assertIn('test',source)
+  self.assertIn('if [ "$ready" -ne 1 ]; then',source)
+  self.assertLess(source.index('Service package: found'),source.index('if adb install -r'))
+  self.assertIn("runtime NOT_TESTED",source)

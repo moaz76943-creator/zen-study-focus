@@ -7,6 +7,21 @@ adb wait-for-device
 boot="$(adb shell getprop sys.boot_completed | tr -d '\r')"
 test "$boot" = 1
 
+# sys.boot_completed can report 1 while PackageManager is still absent.
+# Do not attempt installation until Android publishes its real package service.
+ready=0
+for probe in $(seq 1 36); do
+  if timeout 12 adb shell service check package 2>/dev/null | grep -q 'Service package: found'; then
+    ready=1
+    break
+  fi
+  sleep 5
+done
+if [ "$ready" -ne 1 ]; then
+  echo 'Android PackageManager never became available; runtime NOT_TESTED' >&2
+  exit 1
+fi
+
 # GitHub-hosted API30 emulator can temporarily lose PackageManager after boot.
 # Retry only the install; do not mark a failed or incomplete install as PASS.
 installed=0

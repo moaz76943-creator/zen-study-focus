@@ -44,7 +44,7 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_2
-          ram-size: 2048M
+          ram-size: 3072M
           heap-size: 512M
           emulator-boot-timeout: 900
           # Android 11 emulator sometimes boots slowly; runner animation settings
