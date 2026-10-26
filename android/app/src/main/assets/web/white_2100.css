@@ -706,6 +706,7 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
+    padding-block-end: 112px;
     margin-inline: auto;
     background: #fff;
   }
@@ -715,14 +716,21 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
     box-sizing: border-box;
   }
   body.df-v22:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions {
-    position: sticky;
-    bottom: 0;
-    z-index: 3;
+    /* The last action lives below a very long editor. Sticky bottom:0 does
+       not pull it into view from below; anchor it within the modal overlay. */
+    position: fixed;
+    left: 20px;
+    right: 20px;
+    bottom: max(14px, env(safe-area-inset-bottom, 0px));
+    z-index: 260;
+    display: flex;
+    max-inline-size: calc(100vw - 40px);
+    margin: 0 auto;
     background: #fff;
-    padding: 12px 0 max(12px, env(safe-area-inset-bottom, 0px));
-    border-block-start: 1px solid #e3ecf8;
-    margin-block-start: 10px;
-    box-shadow: 0 -8px 16px -16px rgba(28, 46, 77, .35);
+    padding: 10px 12px;
+    border: 1px solid #e3ecf8;
+    border-radius: 16px;
+    box-shadow: 0 -8px 25px -14px rgba(28, 46, 77, .35);
   }
   body.df-v22:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions > button {
     min-block-size: 44px;
