@@ -128,12 +128,21 @@ def is_visible_node(node):
     return x2 > x1 and y2 > y1
 
 def visible(nodes, needle):
-    return next((n for n in nodes if needle.casefold() in value(n).casefold()
-                 and is_visible_node(n)), None)
+    candidates = [n for n in nodes if is_visible_node(n)]
+    exact = next((n for n in candidates if any(n.get(k, "").strip().casefold() == needle.casefold()
+                 for k in ("text", "content-desc", "hint", "resource-id"))), None)
+    return exact if exact is not None else next((n for n in candidates
+                 if needle.casefold() in value(n).casefold()), None)
 
 def iso_badge(nodes, code):
-    return next((n for n in nodes if n.get("text", "").strip().upper() == code.upper()
+    return next((n for n in nodes if re.match(r"^" + re.escape(code.upper()) + r"(?:\s|$)", n.get("text", "").strip().upper())
                  and is_visible_node(n)), None)
+
+def has_record(nodes, title):
+    return any(is_visible_node(n) and "EditText" not in n.get("class", "")
+               and "AutoCompleteTextView" not in n.get("class", "")
+               and (n.get("text", "").strip() == title
+                    or n.get("content-desc", "").strip().endswith(": " + title)) for n in nodes)
 
 def has_visible(nodes, needle):
     """Explicit presence: an ElementTree leaf is false-y despite being present."""
@@ -167,9 +176,15 @@ def text_input(index, value):
     nodes = dump()
     items = [n for n in nodes if node_class_contains(n, "EditText")
              or node_class_contains(n, "AutoCompleteTextView")]
-    if index >= len(items):
+    if isinstance(index, str):
+        target = visible(items, index)
+        if target is None:
+            raise AssertionError("Editable field not exposed: " + index)
+    elif index >= len(items):
         raise AssertionError("Editable field #%d not exposed in accessibility tree" % index)
-    tap_node(items[index])
+    else:
+        target = items[index]
+    tap_node(target)
     shell("input", "text", value)
     time.sleep(0.5)
 
@@ -188,17 +203,20 @@ def screenshot(out, name):
 
 def language(name, iso):
     click("English" if iso != "en" else "English")
-    text_input(0, name)
+    text_input("inpLangCountrySearch", name)
     matches = [n for n in dump() if name.casefold() in value(n).casefold()
                and "EditText" not in n.get("class", "")
-               and n.get("clickable") == "true"]
+               and n.get("clickable") == "true" and is_visible_node(n)
+               and re.match(r"^" + re.escape(iso) + r"\s", n.get("text", ""), re.I)]
     if not matches:
         raise AssertionError(name + " not exposed as a clickable Catalog row")
     tap_node(matches[-1])
-    nodes = dump()
-    if not has_iso_badge(nodes, iso):
-        raise AssertionError("Language selected but exact ISO badge not visible: "+iso)
-    return True
+    for _ in range(8):
+        nodes = dump()
+        if has_iso_badge(nodes, iso) and not has_visible(nodes, "inpLangCountrySearch"):
+            return True
+        time.sleep(0.3)
+    raise AssertionError("Selected ISO badge and closed picker not observed: "+iso)
 
 def record(results, name, fn, checkpoint=None):
     started = time.monotonic()
@@ -305,7 +323,7 @@ def run(out, source_sha, api):
         def nav():
             # A navigation label is permanently visible; assert unique active-page content.
             cases=(
-                ("Tasks",("Add study, workout or reading goal","Add study")),
+                ("Tasks",("Tasks Studio","Add study, workout or reading goal","Add study")),
                 ("Calendar",("Add Note to Date",)),
                 ("Notes",("New note",)),
                 ("Timer",("Start or pause timer",)),
@@ -322,6 +340,7 @@ def run(out, source_sha, api):
         record(results,"navigation",nav,checkpoint)
 
         def timer():
+            click("Timer")
             before=dump()
             if visible(before,"Start or pause timer") is None:
                 raise AssertionError("Timer button not accessible")
@@ -338,19 +357,24 @@ def run(out, source_sha, api):
 
         def task():
             click("Tasks")
+            click("New task")
             text_input(0,"DF13_TASK_123")
-            shell("input","keyevent","66") # Enter calls the original createNewTask handler
+            shell("input","keyevent","66") # Real form submission, never a search-field match.
             time.sleep(1)
-            if not has_visible(dump(),"DF13_TASK_123"):
-                raise AssertionError("New task absent after Enter/save")
-            return "Saved task displayed in original Android WebView"
+            if not has_record(dump(),"DF13_TASK_123"):
+                raise AssertionError("New task record absent after form submission")
+            restart()
+            click("Tasks")
+            if not has_record(dump(),"DF13_TASK_123"):
+                raise AssertionError("Saved task record absent after process restart")
+            return "Non-editable saved task record survived process restart"
         record(results,"task_create",task,checkpoint)
 
         def note():
             click("Notes")
             click("New note")
-            text_input(0,"DF13_NOTE_123")
-            text_input(1,"DF13_BODY_123")
+            text_input("inpNoteTitle","DF13_NOTE_123")
+            text_input("inpNoteBody","DF13_BODY_123")
             click("Save")
             if not has_visible(dump(),"DF13_NOTE_123"):
                 raise AssertionError("Saved note not present")

@@ -60,10 +60,17 @@ public final class AccessibilityProbe extends Instrumentation {
     }
 
     private String hierarchy(UiAutomation automation) throws Exception {
+        // Refresh the framework accessibility cache after WebView DOM changes.
+        // A retained automation connection must not return a previous locale or
+        // a previous screen's virtual nodes after a successful physical tap.
+        automation.setServiceInfo(automation.getServiceInfo());
+        try { automation.waitForIdle(100, 2000); }
+        catch (java.util.concurrent.TimeoutException activeTimer) { /* query live UI */ }
         AccessibilityNodeInfo root = null;
         long deadline = SystemClock.uptimeMillis() + 15000;
         while (root == null && SystemClock.uptimeMillis() < deadline) {
             root = automation.getRootInActiveWindow();
+            if (root != null && !root.refresh()) { root.recycle(); root = null; }
             if (root == null) SystemClock.sleep(250);
         }
         if (root == null) throw new IllegalStateException("null root after 15 seconds");

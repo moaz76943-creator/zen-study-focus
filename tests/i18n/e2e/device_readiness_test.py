@@ -16,6 +16,22 @@ class DeviceReadinessTest(unittest.TestCase):
         self.assertIs(device.visible([hidden, shown], 'Tasks'), shown)
         self.assertFalse(device.has_visible([hidden], 'Tasks'))
 
+    def test_exact_navigation_wins_over_section_heading(self):
+        heading = {'text': 'Tasks Studio', 'bounds': '[10,100][200,150]'}
+        navigation = {'text': 'Tasks', 'bounds': '[10,720][60,780]'}
+        self.assertIs(device.visible([heading, navigation], 'Tasks'), navigation)
+
+    def test_combined_webview_language_button_exposes_iso(self):
+        header = {'text': 'AR Arabic • العربية', 'bounds': '[10,10][180,45]'}
+        self.assertTrue(device.has_iso_badge([header], 'ar'))
+        self.assertFalse(device.has_iso_badge([header], 'fr'))
+
+    def test_search_input_cannot_prove_a_saved_task(self):
+        field = {'text': 'DF13_TASK_123', 'class': 'android.widget.EditText', 'bounds': '[10,100][200,150]'}
+        self.assertFalse(device.has_record([field], 'DF13_TASK_123'))
+        record = {'text': 'DF13_TASK_123', 'class': 'android.view.View', 'bounds': '[10,200][200,250]'}
+        self.assertTrue(device.has_record([field, record], 'DF13_TASK_123'))
+
     def test_empty_iso_badge_is_not_visible(self):
         self.assertFalse(device.has_iso_badge([{'text': 'AR', 'bounds': '[0,0][0,0]'}], 'ar'))
 
