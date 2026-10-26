@@ -73,8 +73,9 @@ test('incomplete or compressed LevelDB evidence stays unverified',()=>{
 });
 
 test('real process recovery remains provable when Chromium WAL marker is not observable',async()=>{
- const previous=process.env.DF_ANDROID_DISPOSABLE;
+ const previous=process.env.DF_ANDROID_DISPOSABLE,previousRunnerTemp=process.env.RUNNER_TEMP;
  process.env.DF_ANDROID_DISPOSABLE='1';
+ delete process.env.RUNNER_TEMP; // No artifact filesystem should be touched by this isolated source test.
  let restarted=0,postRestartRead=0;
  const baseline={task:{id:71001},note:{id:71002},seq:4};
  const ack={valid:true,bytes:12345};
@@ -99,5 +100,7 @@ test('real process recovery remains provable when Chromium WAL marker is not obs
  }finally{
   if(previous===undefined)delete process.env.DF_ANDROID_DISPOSABLE;
   else process.env.DF_ANDROID_DISPOSABLE=previous;
+  if(previousRunnerTemp===undefined)delete process.env.RUNNER_TEMP;
+  else process.env.RUNNER_TEMP=previousRunnerTemp;
  }
 });
