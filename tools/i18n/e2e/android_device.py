@@ -31,6 +31,31 @@ NAVIGATION_CASES = (
     ("Analytics", ("Recorded analytics", "Recorded minutes")),
 )
 
+class AppRuntimeError(AssertionError):
+    def __init__(self, evidence):
+        self.evidence = evidence
+        super().__init__("Real WebView exceptions: " + json.dumps(evidence, ensure_ascii=False))
+
+def console_evidence(log):
+    evidence = []
+    for line in log.splitlines():
+        if "CONSOLE" not in line or not re.search(r"Uncaught|TypeError:|ReferenceError:|SyntaxError:", line):
+            continue
+        asset = re.search(r"file:///android_asset/web/[A-Za-z0-9_./-]+", line)
+        location = re.search(r"CONSOLE\((\d+)\)", line)
+        kind = re.search(r"\b(TypeError|ReferenceError|SyntaxError|RangeError)\b", line)
+        evidence.append({"asset": asset.group(0) if asset else "unknown",
+                         "line": int(location.group(1)) if location else None,
+                         "kind": kind.group(0) if kind else "Uncaught",
+                         "missing_replaceChildren": "replaceChildren is not a function" in line})
+    return evidence
+
+def current_console_evidence():
+    pid = shell("pidof", PACKAGE).strip().split()[0]
+    if not pid.isdigit():
+        raise RuntimeError("App PID unavailable for WebView console verification")
+    return console_evidence(adb("logcat", "-d", "--pid=" + pid, "-s", "chromium:I", "*:S"))
+
 def adb(*args, timeout=45, check=True, binary=False):
     p = subprocess.run(["adb", *map(str, args)], capture_output=True,
                        text=not binary, timeout=timeout)
@@ -283,7 +308,11 @@ def restart():
     shell("am", "force-stop", PACKAGE)
     shell("am", "start", "-n", ACTIVITY)
     time.sleep(5)
-    return dump()
+    nodes = dump()
+    errors = current_console_evidence()
+    if errors:
+        raise AppRuntimeError(errors)
+    return nodes
 
 def screenshot(out, name):
     path = out / (name + ".png")
@@ -315,6 +344,8 @@ def language(name, iso, require_header=True):
     raise AssertionError("Selected ISO badge and closed picker not observed: "+iso)
 
 def failure_kind(error):
+    if isinstance(error, AppRuntimeError):
+        return "APP_RUNTIME"
     if isinstance(error, (OSError, subprocess.TimeoutExpired, json.JSONDecodeError)):
         return "INFRASTRUCTURE"
     if isinstance(error, RuntimeError) and str(error).startswith("adb "):
@@ -330,6 +361,8 @@ def record(results, name, fn, checkpoint=None):
         results[name] = {"status":"PASS", "detail":detail}
     except Exception as error:
         results[name] = {"status":"FAIL", "error":str(error), "failure_kind":failure_kind(error)}
+        if isinstance(error, AppRuntimeError):
+            results[name]["runtime_errors"] = error.evidence
         dest = os.getenv("DF13_EVIDENCE_DIR")
         if dest:
             try:
@@ -415,21 +448,11 @@ def run(out, source_sha, api):
                 "detail":"Offline foreground activity and accessible Deep Focus heading"}
         checkpoint()
         def startup_js():
-            pid = shell("pidof", PACKAGE).strip().split()[0]
-            if not pid.isdigit():
-                raise AssertionError("App PID unavailable for WebView console verification")
-            log = adb("logcat", "-d", "--pid=" + pid, "-s", "chromium:I", "*:S")
-            errors = [line for line in log.splitlines() if "CONSOLE" in line
-                      and re.search(r"Uncaught|TypeError:|ReferenceError:|SyntaxError:", line)]
-            # Retain only the category and bundled asset name, never console text.
-            evidence = [{"asset": (re.search(r"file:///android_asset/web/[A-Za-z0-9_./-]+", line).group(0)
-                        if re.search(r"file:///android_asset/web/[A-Za-z0-9_./-]+", line) else "unknown"),
-                         "missing_replaceChildren": "replaceChildren is not a function" in line}
-                        for line in errors]
+            evidence = current_console_evidence()
             (out/"WEBVIEW_STARTUP_ERRORS.json").write_text(json.dumps(evidence, indent=2) + "\n")
             (out/"WEBVIEW_PROVIDER.txt").write_text(shell("dumpsys", "webviewupdate"))
-            if errors:
-                raise AssertionError(str(len(errors)) + " real WebView startup exceptions; asset evidence captured")
+            if evidence:
+                raise AppRuntimeError(evidence)
             return "No uncaught startup errors in actual app PID's Chromium console; separate from feature acceptance"
         record(results, "webview_startup_js", startup_js, checkpoint)
     except Exception as error:
