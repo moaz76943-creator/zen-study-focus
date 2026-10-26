@@ -266,3 +266,21 @@ test('native invalid-family probe rejects a signed-invalid ACK, rather than acce
  `,ctx);
  await assert.rejects(vm.runInContext('rejectSignedInvalidFamilyOnAndroid()',ctx),/Signed malformed family must be blocked/);
 });
+
+test('Activity recreation is NOT a PASS when the same WebView global survives',async()=>{
+ const ctx=context();
+ vm.runInContext(`
+  adb=(...args)=>args.includes('pidof')?'123':'';
+  fixture=async()=>({task:{id:71001},note:{id:71002}});
+  evaluate=async expr=>expr.includes('=')?true:'unchanged-global';
+  connect=async()=>{};
+  ws={close(){}};
+ `,ctx);
+ await assert.rejects(vm.runInContext('activityDestroyRecreateOnDevice()',ctx),/Activity not recreated/);
+});
+
+test('Activity recreate is listed as NOT_TESTED unless real same-process proof runs',()=>{
+ const ctx=context();
+ vm.runInContext("report.results.push({name:'bootstrap',status:'NOT_TESTED'});fillUnattempted()",ctx);
+ assert.equal(vm.runInContext("report.results.find(r=>r.name==='activity_destroy_recreate').status",ctx),'NOT_TESTED');
+});
