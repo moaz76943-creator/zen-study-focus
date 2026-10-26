@@ -1,7 +1,5 @@
 name: DF09 Android real WebView Analytics
 on:
-  push:
-    branches: [qa/df-final09-native-analytics-a11y-20261026]
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
@@ -20,6 +18,7 @@ jobs:
     timeout-minutes: 55
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         api: [30, 35]
     env:
