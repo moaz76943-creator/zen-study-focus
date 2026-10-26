@@ -44,8 +44,9 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_2
-          ram-size: 3072M
-          heap-size: 512M
+          # Lower the API30 hosted-emulator memory pressure; retain proven API35 settings.
+          ram-size: ${{ matrix.api == 30 && '2048M' || '3072M' }}
+          heap-size: ${{ matrix.api == 30 && '256M' || '512M' }}
           emulator-boot-timeout: 900
           # Android 11 emulator sometimes boots slowly; runner animation settings
           # fail with ADB Broken pipe before our script can verify app startup.
