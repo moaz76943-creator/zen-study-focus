@@ -10,7 +10,7 @@ import re
 import subprocess
 from pathlib import Path
 
-SHA = re.compile(r"[a-f0-9]{40}\\Z")
+SHA = re.compile(r"[a-f0-9]{40}\Z")
 MAX_BYTES = 8 * 1024 * 1024
 CATEGORIES = (
     "compatibility_salt_candidate",
