@@ -4035,19 +4035,30 @@ function stopQuickTrainingInternal() {
   renderQuickTraining();
 }
 function cancelQuickTraining(skipPrompt=false) {
-  if(!quickTraining?.active)return;
-  if(!skipPrompt&&!window.confirm(quickText('cancelPrompt')))return;
+  if(!quickTraining?.active)return false;
+  if(!skipPrompt&&!window.confirm(quickText('cancelPrompt')))return false;
+  // A rejected Pause ACK must not discard the work/rest state or live timer.
+  if(timerRunning && toggleTimerPlay() !== true) {
+    showToast(quickSaveError());
+    return false;
+  }
   const ended=quickTraining;
   quickTraining=null;
   stopQuickTrainingInternal();
   quickWorkflowEvent('cancelled',{domain:ended.domain,taskId:ended.taskId??null,
     completedSets:ended.currentSet});
+  return true;
 }
 function skipQuickTrainingStep() {
-  if(!quickTraining?.active)return;
-  if(timerRunning)toggleTimerPlay();
+  if(!quickTraining?.active)return false;
+  // Do not advance a round while the original active timer is still running.
+  if(timerRunning && toggleTimerPlay() !== true) {
+    showToast(quickSaveError());
+    return false;
+  }
   // A skipped work step never earns focus credit.
   advanceQuickTrainingStep();
+  return true;
 }
 function completeQuickTraining() {
   const finished=quickTraining;
