@@ -39,6 +39,20 @@ function requireEmulator(){
  report.api=Number(adb('shell','getprop','ro.build.version.sdk'));
  if(![30,35].includes(report.api))throw Error('TRANSPORT: expected API30 or API35');
 }
+async function connectWhenReady() {
+ let lastError;
+ for(let attempt=1;attempt<=3;attempt++){
+  try { await connect(); return; }
+  catch(error) {
+   if(!String(error?.message||error).startsWith('TRANSPORT:'))throw error;
+   lastError=error;
+   // CDP handshake/DOM readiness is observational. Never retry a write.
+   try { ws?.close(); } catch (_) {}
+   if(attempt<3) await pause(1800);
+  }
+ }
+ throw Error('TRANSPORT: CDP startup unreachable after three read-only attempts: '+String(lastError?.message||lastError));
+}
 async function connect(){
  const pid=adb('shell','pidof',PKG).split(/\s/)[0];
  if(!/^\d+$/.test(pid))throw Error('TRANSPORT: application PID missing');
@@ -85,7 +99,7 @@ async function write(body){return evaluate('(()=>{const before=DF22Integration.g
 async function restart(){
  try{ws?.close();}catch(_){}
  adb('shell','am','force-stop',PKG);adb('shell','am','start','-n',PKG+'/.MainActivity');
- await pause(2200);await connect();
+ await pause(2200);await connectWhenReady();
 }
 async function run(name,fn){
  try{const detail=await fn();report.results.push({name,status:'PASS',detail:detail||'State assertions passed on real Android emulator'});}
@@ -378,7 +392,7 @@ async function activityDestroyRecreateOnDevice(){
  adb('shell','am','start','-n',PKG+'/.MainActivity','-f','0x10008000');
  await pause(700);
  try{ws?.close();}catch(_){}
- await connect();
+ await connectWhenReady();
  const next=adb('shell','pidof',PKG).split(/\s/)[0];
  if(next!==pid)throw Error('TRANSPORT: process restarted; same-process Activity recreation not established');
  const marker=await evaluate('window.__df02ActivityNonce');
@@ -446,7 +460,7 @@ async function safExportAndReadback(){
 }
 
 async function safMain(){
- requireEmulator();await connect();
+ requireEmulator();await connectWhenReady();
  await run('saf_fixture_and_native_ack',async()=>{
   assert.equal(await write('after.cfg.lang="en";after.cfg.df07Unknown={keep:["legacy",7]};after.cfg.df07Seq=0;after.tasksList.push({id:71001,title:"DF07 isolated durability task",done:false,unknownTask:{keep:"عربي ۱۲"}});after.notesList.push({id:71002,title:"DF07 isolated durability note",body:"Exact Unicode ٣",unknownNote:{keep:42}})'),true);
   assert.equal((await receipt()).valid,true);
