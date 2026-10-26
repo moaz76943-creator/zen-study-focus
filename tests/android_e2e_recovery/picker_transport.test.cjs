@@ -297,3 +297,32 @@ test('emulator bootstrap reconnects only for read-only installed APK identity ch
  assert.match(shell,/sha256sum "\$report\/installed-base\.apk"/);
  assert.match(shell,/sha256sum "\$report\/tested-debug\.apk"/);
 });
+
+test('cold WebView CDP timeout retries only readiness observations, without replaying app mutations',async()=>{
+ const ctx=context();
+ vm.runInContext(`
+ let coldAttempts=0, mutations=0;
+ connect=async()=>{coldAttempts++;if(coldAttempts<3)throw Error('TRANSPORT: CDP Runtime.evaluate timeout');};
+ `,ctx);
+ await vm.runInContext('connectWhenReady()',ctx);
+ assert.equal(vm.runInContext('coldAttempts',ctx),3);
+ assert.equal(vm.runInContext('mutations',ctx),0);
+});
+test('persistent CDP readiness failure stays NOT_TESTED after bounded retries',async()=>{
+ const ctx=context();
+ vm.runInContext(`
+ let coldAttempts=0;
+ connect=async()=>{coldAttempts++;throw Error('TRANSPORT: emulator device offline');};
+ `,ctx);
+ await assert.rejects(vm.runInContext('connectWhenReady()',ctx),/TRANSPORT: CDP startup unreachable after three read-only attempts/);
+ assert.equal(vm.runInContext('coldAttempts',ctx),3);
+});
+test('real app evaluation exception is not retried as a transport fault',async()=>{
+ const ctx=context();
+ vm.runInContext(`
+ let coldAttempts=0;
+ connect=async()=>{coldAttempts++;throw Error('APP_EVALUATION: broken app logic');};
+ `,ctx);
+ await assert.rejects(vm.runInContext('connectWhenReady()',ctx),/APP_EVALUATION:/);
+ assert.equal(vm.runInContext('coldAttempts',ctx),1);
+});
