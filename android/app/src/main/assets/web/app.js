@@ -2267,16 +2267,51 @@ function logWorkoutSet() {
 }
 
 function startQuickSportRest(secs) {
-  if (timerRunning) toggleTimerPlay();
-  currentTimerModeKey = 'short';
-  timerTotal = secs; timerLeft = secs;
-  timerSessionId = null;
-  focusSessionTaskId = null;
-  timerActiveMs = 0;
-  timerResumeMs = null;
-  storeTimerSession();
-  updateTimerDisplay(); toggleTimerPlay();
-  showToast(toWest(`⏱️ Rest ${secs}s Started`));
+  // Reject invalid values before prompting, storing, or changing a live session.
+  const seconds=Number(secs);
+  if(!Number.isInteger(seconds)||seconds<1||seconds>86400)return false;
+  if((quickTraining?.active||timerRunning||timerSessionId||timerActiveMs>0) &&
+      !window.confirm(quickText('replacePrompt')))return false;
+
+  // One confirmed durable transition. Do not Pause/Reset/save intermediate
+  // states: those could irrevocably discard focus time on failed storage.
+  const startedAt=Date.now();
+  const nextId=String(startedAt)+'-'+String(Math.round(Math.random()*1e9));
+  const next={
+    total:seconds,left:seconds,running:true,endAt:startedAt+seconds*1000,
+    mode:'short',label:'',sessionId:nextId,taskId:null,
+    activeMs:0,resumedAt:startedAt,training:null
+  };
+  try {
+    if(saveFortressData(TIMER_STORAGE_KEY,next)!==true)
+      throw new Error('SPORT_REST_WRITE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed || (cfg.lang==='ar'
+      ? 'تعذّر حفظ جلسة الاستراحة. حاول مرة أخرى.'
+      : 'Could not save rest timer. Try again.'));
+    return false;
+  }
+
+  // The old timer and native service remain untouched until the durable ACK.
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=null;
+  if(quickTraining?.active){quickTraining=null;renderQuickTraining();}
+  currentTimerModeKey='short';customSessionLabel='';
+  timerTotal=seconds;timerLeft=seconds;timerRunning=true;
+  timerTargetTime=next.endAt;timerSessionId=nextId;
+  focusSessionTaskId=null;timerActiveMs=0;timerResumeMs=startedAt;
+  document.getElementById('mainPlayBtn').innerHTML =
+    '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+  updateTimerDisplay();
+  if(window.ZenNative&&window.ZenNative.startBackgroundService){
+    try{
+      window.ZenNative.startBackgroundService(seconds,
+        document.getElementById('timerModeCaption').textContent);
+    }catch(error){console.warn('Rest notification unavailable',error);}
+  }
+  timerInterval=setInterval(runTimerTick,500);
+  showToast(toWest(`⏱️ Rest ${seconds}s Started`));
+  return true;
 }
 
 function addReadPages(p) {
@@ -2574,7 +2609,7 @@ function openCustomTimerModal() { document.getElementById('customTimerModal').cl
 function setCustomPresetValues(m) { document.getElementById('inpCustomMins').value = toWest(m); }
 function applyCustomTimerNow() {
   const mins = Math.max(1, Math.min(240, parseInt(toWest(document.getElementById('inpCustomMins').value)) || 45));
-  const title = toWest(document.getElementById('inpCustomTitle').value.trim());
+  const title = document.getElementById('inpCustomTitle').value.trim();
   const nextLabel = title ? `${title} (${mins}m)` : `${L().modeCustom} (${mins}m)`;
   if (!selectTimerModeFromUser(mins, 'custom', document.getElementById('modeCustomBtn'))) return false;
   // Commit the new title only after user consent; persist the final snapshot.
@@ -2718,7 +2753,7 @@ function renderTasksList() {
       <div class="showcase-task-top">
         <div class="task-check-sq" onclick="toggleTaskDone(${id})">✓</div>
         <div class="task-center-info" onclick="focusOnTask(${id})">
-          <div class="task-main-name">${escapeHtmlText(toWest(t.title))}</div>
+          <div class="task-main-name">${escapeHtmlText(String(t.title || ''))}</div>
           <div class="task-time-sub">
             <span>📅 ${escapeHtmlText(toWest(t.date || todayISO))}</span>
             <span style="color:var(--primary); font-weight:700;">• ${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>
@@ -2744,7 +2779,7 @@ function focusOnTask(id) {
       showToast('⚠️ Finish the current training before changing linked tasks');
       return;
     }
-    document.getElementById('timerLinkedTask').textContent = toWest(`🎯 ${t.title}`);
+    document.getElementById('timerLinkedTask').textContent = `🎯 ${String(t.title || '')}`;
     switchTab('sec-timer', document.getElementById('navTimer'));
   }
 }
@@ -2764,7 +2799,7 @@ function nextRecordId() {
 
 function createNewTask() {
   const inp = document.getElementById('inpNewTask');
-  const val = toWest(inp.value.trim());
+  const val = inp.value.trim();
   if (!val) return;
   const catKey = document.getElementById('selTaskCat').value;
   const dateVal = toWest(document.getElementById('inpTaskDate').value || todayISO);
@@ -2852,14 +2887,14 @@ function renderSelectedDateAgenda() {
   dayTasks.forEach(t => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(toWest(t.title))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>`;
+    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(String(t.title || ''))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>`;
     box.appendChild(item);
   });
 
   dayNotes.forEach(n => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#fffbeb; border-right:4px solid #f59e0b; font-size:0.8rem;';
-    item.innerHTML = `<div style="font-weight:900;">📝 ${escapeHtmlText(toWest(n.title))}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${escapeHtmlText(toWest(n.body))}</div>`;
+    item.innerHTML = `<div style="font-weight:900;">📝 ${escapeHtmlText(String(n.title || ''))}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${escapeHtmlText(String(n.body || ''))}</div>`;
     box.appendChild(item);
   });
 }
@@ -2902,14 +2937,14 @@ function renderNotesStack() {
     card.className = `learning-rich-card ${n.theme}`;
     card.innerHTML = `
       <div class="lcard-head">
-        <div class="lcard-title"><span>✨</span> <span>${escapeHtmlText(toWest(n.title))}</span></div>
+        <div class="lcard-title"><span>✨</span> <span>${escapeHtmlText(String(n.title || ''))}</span></div>
         <div style="display:flex; gap:8px;">
           <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${id})">📅</span>
           <span style="cursor:pointer;" onclick="toggleNoteBlur(${id})">👁️</span>
           <span style="cursor:pointer; color:var(--rose);" onclick="deleteNoteCard(${id})">✕</span>
         </div>
       </div>
-      <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${escapeHtmlText(toWest(n.body))}</div>
+      <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${escapeHtmlText(String(n.body || ''))}</div>
       <div class="lcard-foot">
         <span>📅 ${escapeHtmlText(toWest(n.calDate || todayISO))}</span>
         <span style="font-weight:800; color:var(--primary);">${escapeHtmlText(toWest(getNoteTagLabel(n.catKey)))}</span>
@@ -2939,8 +2974,8 @@ function fillNoteTpl(type) {
 }
 
 function saveNewNote() {
-  const t = toWest(document.getElementById('inpNoteTitle').value.trim());
-  const b = toWest(document.getElementById('inpNoteBody').value.trim());
+  const t = document.getElementById('inpNoteTitle').value.trim();
+  const b = document.getElementById('inpNoteBody').value.trim();
   if (!t && !b) return;
   const catKey = document.getElementById('selNoteCat').value;
   const calDate = toWest(document.getElementById('inpNoteCalDate').value || todayISO);
@@ -2971,7 +3006,7 @@ function deleteNoteCard(id) {
 }
 
 function exportAllNotes() {
-  const txt = notesList.map(n => `[${toWest(n.title)} - ${toWest(n.calDate)}]\n${toWest(n.body)}`).join('\n\n---\n\n');
+  const txt = notesList.map(n => `[${String(n.title || '')} - ${toWest(n.calDate)}]\n${String(n.body || '')}`).join('\n\n---\n\n');
   if (navigator.clipboard) navigator.clipboard.writeText(txt);
   showToast('📥 TXT');
 }
@@ -2982,7 +3017,7 @@ function openBrainDumpModal() {
 }
 
 function saveQuickDump(toTasks) {
-  const val = toWest(document.getElementById('inpQuickDump').value.trim());
+  const val = document.getElementById('inpQuickDump').value.trim();
   if (!val) return;
   if (toTasks) {
     tasksList.unshift({ id: nextRecordId(), isStarter: false, title: val, time: '25m', date: todayISO, catKey: 'study', icon: '🎯', theme: 'tp-amber', done: false });

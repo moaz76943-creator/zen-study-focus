@@ -1,0 +1,45 @@
+name: DF13-E functional locale batch source gate
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'assets/i18n/df99_reviewed_packs.json'
+      - 'android/app/src/main/assets/web/js/df99_reviewed_packs.js'
+      - 'tests/i18n/functional_locale_repair/**'
+      - 'tests/termux_fix32_ten_locales_timer_goals_analytics.test.cjs'
+      - '.github/workflows/df13_e_functional_locale.yml'
+permissions:
+  contents: read
+jobs:
+  source-and-runtime-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact PR source
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+      - name: Validate generated runtime syntax
+        run: |
+          set -euo pipefail
+          node --check tools/df99_bulk_import.cjs
+          node --check android/app/src/main/assets/web/js/df99_reviewed_packs.js
+      - name: Verify new Greek/Slovak texts and generator parity
+        run: node --test tests/i18n/functional_locale_repair/*.test.cjs
+      - name: Protect previous translated batches
+        run: |
+          set -euo pipefail
+          node --test tests/termux_fix32_ten_locales_timer_goals_analytics.test.cjs
+          node --test tests/termux_fix28_mass_notes_tasks_10_locales.test.cjs
+      - name: Report source coverage (not Android acceptance)
+        run: |
+          set -euo pipefail
+          node tools/df99_full_app_coverage.cjs --json > "$RUNNER_TEMP/df99_coverage.json"
+          node -e 'const fs=require("node:fs");const d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+"/df99_coverage.json"));for(const code of ["el","sk"]){const r=d.summary.find(x=>x.code===code);if(!r||r.areas.timer!=="11/11")throw Error(code+" timer source coverage incomplete");console.log(code+" TIMER_SOURCE="+r.areas.timer)}'
