@@ -12,7 +12,9 @@ import android.util.Xml;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityEvent;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.xmlpull.v1.XmlSerializer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -24,6 +26,7 @@ import java.util.List;
 
 /** Test-only, separate package. Reads real accessibility nodes; never app data or JS. */
 public final class AccessibilityProbe extends Instrumentation {
+    private final List<JSONObject> toastEvents = new ArrayList<>();
     @Override public void onCreate(Bundle args) {
         super.onCreate(args);
         start();
@@ -34,6 +37,25 @@ public final class AccessibilityProbe extends Instrumentation {
         AccessibilityServiceInfo info = automation.getServiceInfo();
         info.flags |= AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;
         automation.setServiceInfo(info);
+        automation.setOnAccessibilityEventListener(new UiAutomation.OnAccessibilityEventListener() {
+            @Override public void onAccessibilityEvent(AccessibilityEvent event) {
+            if (event.getEventType() != AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED
+                    || !"com.zenstudy.focus".equals(string(event.getPackageName()))) return;
+            for (CharSequence text : event.getText()) {
+                // Never retain arbitrary notification/Toast text or user data.
+                if (!"Unable to read backup; data unchanged".equals(string(text))) continue;
+                synchronized (toastEvents) {
+                    try {
+                        JSONObject record = new JSONObject();
+                        record.put("kind", "backup_read_rejected");
+                        record.put("event_time_ms", event.getEventTime());
+                        if (toastEvents.size() >= 8) toastEvents.remove(0);
+                        toastEvents.add(record);
+                    } catch (org.json.JSONException ignored) { /* no raw event logging */ }
+                }
+            }
+            }
+        });
         try (LocalServerSocket server = new LocalServerSocket("df13-accessibility")) {
             while (true) {
                 try (LocalSocket client = server.accept()) {
@@ -49,7 +71,12 @@ public final class AccessibilityProbe extends Instrumentation {
                             response.put("clicked", click(automation, new JSONObject(command.substring(6))));
                         else if (command != null && command.startsWith("TOUCH_FILE "))
                             response.put("touched", touchFixture(automation, new JSONObject(command.substring(11))));
-                        else throw new IllegalArgumentException("Unknown probe command");
+                        else if ("EVENTS".equals(command)) {
+                            synchronized (toastEvents) { response.put("events", new JSONArray(toastEvents)); }
+                        } else if ("EVENTS_CLEAR".equals(command)) {
+                            synchronized (toastEvents) { toastEvents.clear(); }
+                            response.put("cleared", true);
+                        } else throw new IllegalArgumentException("Unknown probe command");
                     } catch (Exception error) {
                         response.put("error", error.getClass().getSimpleName() + ": " + error.getMessage());
                     }
