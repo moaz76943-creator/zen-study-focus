@@ -19,7 +19,7 @@ function exercise(qwenOutput){
  program('npm','exit 0');
  program('python3','exit 0');
  program('timeout','shift; "$@"');
- program('qwen','echo '+JSON.stringify(qwenOutput)+' >&2; exit 1');
+ program('qwen','printf "%s" "${QWEN_CODE_MAX_OUTPUT_TOKENS:-}" > "$RUNNER_TEMP/qwen-output-budget"; echo '+JSON.stringify(qwenOutput)+' >&2; exit 1');
  program('aider','printf "used" > "$RUNNER_TEMP/fallback-ran"; exit 0');
  const init=spawnSync('git',['init','-q'],{cwd:root,encoding:'utf8'});
  assert.equal(init.status,0,init.stderr);
@@ -42,5 +42,12 @@ test('non-413 Qwen failures must not fall back or fabricate success',()=>{
  try{
   assert.notEqual(x.result.status,0);
   assert.equal(existsSync(join(x.run,'fallback-ran')),false);
+ }finally{rmSync(x.root,{recursive:true,force:true});}
+});
+
+test('Qwen explicitly limits output budget below Groq Free 8000 TPM',()=>{
+ const x=exercise('unrelated model error');
+ try{
+  assert.equal(readFileSync(join(x.run,'qwen-output-budget'),'utf8'),'1024');
  }finally{rmSync(x.root,{recursive:true,force:true});}
 });
