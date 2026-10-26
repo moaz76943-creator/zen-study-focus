@@ -33,7 +33,7 @@ function rig(){
     },
     setInterval(){calls.intervals++;return ++handle},
     clearInterval(){calls.clears++},
-    storeTimerSession(){calls.saves.push(JSON.parse(vm.runInContext('JSON.stringify({timerRunning,timerSessionId,timerLeft,timerTotal,timerResumeMs,timerActiveMs})',c)))},
+    storeTimerSession(){calls.saves.push(JSON.parse(vm.runInContext('JSON.stringify({timerRunning,timerSessionId,timerLeft,timerTotal,timerResumeMs,timerActiveMs})',c)));return true;},
     updateTimerDisplay(){},
     finalizeTimerSession(){calls.completions++}
   };
