@@ -26,6 +26,6 @@ if(!chosen){
 }else{
  const task=buildAgentTask(role,chosen);
  writeFileSync(process.env.RUNNER_TEMP+'/df-oss-task.txt',task,{mode:0o600});
- appendFileSync(process.env.GITHUB_OUTPUT,'ready=true\nnumber='+chosen.number+'\nbranch='+branch+'\ntest='+spec.test+'\n');
+ appendFileSync(process.env.GITHUB_OUTPUT,'ready=true\nnumber='+chosen.number+'\nbranch='+branch+'\ntest='+ROLES[role].test+'\n');
  console.log(role+': selected issue #'+chosen.number+' target '+TARGET);
 }
