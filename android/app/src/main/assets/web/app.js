@@ -3331,7 +3331,15 @@ function updateSyllabusCalc() {
   const left = Math.max(1, parseInt(elLeft.value) || 1);
   const rate = Math.max(1, parseInt(elRate.value) || 1);
   const days = Math.ceil(left / rate);
-  document.getElementById('syllabusCalcOut').textContent = toWest(L().calcOutTpl.replace('{d}', days));
+  // A missing locale string remains a translation gap; render safely instead of
+  // crashing the language picker. Source coverage must NOT count this as translated.
+  const localizedTemplate = L().calcOutTpl;
+  const fallbackTemplate = DICT.en && DICT.en.calcOutTpl;
+  const template = typeof localizedTemplate === 'string' && localizedTemplate.includes('{d}')
+    ? localizedTemplate
+    : (typeof fallbackTemplate === 'string' && fallbackTemplate.includes('{d}')
+        ? fallbackTemplate : '{d} days');
+  document.getElementById('syllabusCalcOut').textContent = toWest(template.replace('{d}', days));
 }
 
 /* Boot Init */
