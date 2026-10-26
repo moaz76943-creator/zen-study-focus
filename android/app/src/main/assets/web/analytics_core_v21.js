@@ -10,6 +10,8 @@
   const aliases = Object.freeze({study:'study', read:'read', review:'read', work:'work', exam:'work', sport:'sport'});
   const own = (o,k) => Object.prototype.hasOwnProperty.call(o,k);
   const isRecord = v => v !== null && typeof v === 'object' && !Array.isArray(v);
+  const isSyntheticSource = value => typeof value === 'string' &&
+    ['demo','sample','fixture'].includes(value.trim().toLowerCase());
   function validDay(s) {
     if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
     const d = new Date(s+'T12:00:00Z');
@@ -58,7 +60,7 @@
       let reason;
       const id=isRecord(s) ? idKey(s.id) : null;
       if (!isRecord(s)) reason='INVALID_RECORD';
-      else if (s.isStarter === true || s.isDemo === true || s.synthetic === true || ['demo','sample','fixture'].includes(s.source)) reason='SAMPLE';
+      else if (s.isStarter === true || s.isDemo === true || s.synthetic === true || isSyntheticSource(s.source)) reason='SAMPLE';
       else if (nonFocusRecord(s)) reason='NON_FOCUS';
       else if (!id) reason='INVALID_ID';
       else if (!cachedValidDay(s.date)) reason='INVALID_DATE';
@@ -94,7 +96,7 @@
   function taskReport(tasks,projects=[],today=localToday()) {
     const seen=new Set(),valid=[];let excluded=0;
     (Array.isArray(tasks)?tasks:[]).forEach(t=>{
-      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||['demo','sample','fixture'].includes(t.source)||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
+      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||isSyntheticSource(t.source)||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
       seen.add(t.id);valid.push(t);
     });
     const active=valid.filter(t=>t.status!=='archived'&&t.archived!==true);
@@ -102,7 +104,7 @@
     const projectsMap=new Map(),ambiguousProjects=new Set();
     (Array.isArray(projects)?projects:[]).forEach(p=>{
       if(!isRecord(p)||p.isStarter===true||p.isDemo===true||p.synthetic===true||
-         ['demo','sample','fixture'].includes(p.source))return;
+         isSyntheticSource(p.source))return;
       const key=idKey(p.id);
       if(key===null||ambiguousProjects.has(key))return;
       if(projectsMap.has(key)){
@@ -192,7 +194,7 @@
     const eligibleTaskIds=new Set(tasks.filter(t=>isRecord(t)&&
       Number.isSafeInteger(t.id)&&t.id>=0&&counts.get(t.id)===1&&
       t.isStarter!==true&&t.isDemo!==true&&t.synthetic!==true&&
-      !['demo','sample','fixture'].includes(t.source)&&
+      !isSyntheticSource(t.source)&&
       t.archived!==true&&t.status!=='archived'&&typeof t.title==='string'&&
       typeof t.done==='boolean').map(t=>t.id));
     const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&
@@ -236,6 +238,6 @@
     else throw new RangeError('Unknown export kind');
     return [headers,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n')+'\r\n';
   }
-  return Object.freeze({DOMAINS,validDay,localToday,normalizeSessions,summarize,streaks,
+  return Object.freeze({DOMAINS,validDay,localToday,isSyntheticSource,normalizeSessions,summarize,streaks,
     buildReport,yearHeatmap,taskReport,toCSV});
 });
