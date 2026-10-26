@@ -61,6 +61,6 @@ test('API33+ notifications request only follows an explicit timer start, never a
   assert.doesNotMatch(restored,/requestTimerNotificationPermission\(/);
   const start=section(app,'function toggleTimerPlay()','function resetTimerNow()');
   assert.match(start,/requestTimerNotificationPermission\(/);
-  const rest=section(app,'function startSportRest(','function addReadPages(');
+  const rest=section(app,'function startQuickSportRest(','function addReadPages(');
   assert.match(rest,/requestTimerNotificationPermission\(/);
 });
