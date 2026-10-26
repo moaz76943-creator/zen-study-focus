@@ -98,12 +98,21 @@ test('unresolved findings retain bounded hashed evidence without exposing source
   assert.equal(r.output.categories.unresolved,1);
   assert.equal(r.output.unresolved_evidence.length,1);
   assert.deepEqual(Object.keys(r.output.unresolved_evidence[0]).sort(),
-    ['commit_sha256_16','line','path_sha256_16']);
+    ['commit_sha256_16','has_source_context','line','path_sha256_16']);
+  assert.equal(r.output.unresolved_evidence[0].has_source_context,false);
   assert.match(r.output.unresolved_evidence[0].path_sha256_16,/^[a-f0-9]{16}$/);
   assert.match(r.output.unresolved_evidence[0].commit_sha256_16,/^[a-f0-9]{16}$/);
   assert.equal(r.output.unresolved_evidence[0].line,41);
   assert.ok(!(r.stdout+r.stderr).includes(marker));
   assert.ok(!(r.stdout+r.stderr).includes('private/'));
+});
+test('unknown rule with existing source retains availability bit, not source text',()=>{
+  const r=run([{RuleID:'github-pat',Secret:'SYNTHETIC-PRIVATE-DO-NOT-PRINT',
+    File:'tests/config.cjs',StartLine:1}]);
+  assert.equal(r.status,1);
+  assert.equal(r.output.categories.unresolved,1);
+  assert.equal(r.output.unresolved_evidence[0].has_source_context,true);
+  assert.ok(!r.stdout.includes('SYNTHETIC-PRIVATE-DO-NOT-PRINT'));
 });
 test('unknown rules and token-like strings never enter safe candidate categories',()=>{
   const sentinel='VERY-PRIVATE-SYNTHETIC-ACCESS-TOKEN';
