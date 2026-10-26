@@ -90,7 +90,7 @@ public final class TouchInstrumentation extends Instrumentation {
                     Log.i(TAG, "NAV_PASS locale="+selected+" tab="+item[0]);
                 }
             }
-            js("(()=>{applyLanguage('en');return true;})()");
+            js("(()=>{applyLanguage('en');return {lang:cfg.lang};})()");
             tap("navNotes");
             tap("nsNewButton");
             JSONObject opened = js("({open:document.getElementById('noteModal').classList.contains('open')})");
@@ -226,8 +226,29 @@ public final class TouchInstrumentation extends Instrumentation {
             "nav:[...document.querySelectorAll('.bnav-btn.active')].map(n=>n.id)," +
             "sections:[...document.querySelectorAll('.screen-section.active')].map(n=>n.id)," +
             "innerWidth,innerHeight,scrollX,scrollY})");
+        AtomicReference<String> insetsDiag=new AtomicReference<>("missing");
+        runOnMainSync(() -> {
+            WindowInsets inset=view.getRootWindowInsets();
+            android.graphics.Insets bars=inset==null?android.graphics.Insets.NONE:
+                inset.getInsets(WindowInsets.Type.systemBars());
+            insetsDiag.set("systemBarInsets="+bars+" decorHeight="+
+                activity.getWindow().getDecorView().getHeight()+
+                " rootHeight="+view.getRootView().getHeight());
+        });
+        String activeWindow="unknown";
+        try {
+            android.view.accessibility.AccessibilityNodeInfo root=
+                getUiAutomation().getRootInActiveWindow();
+            if(root!=null) {
+                android.graphics.Rect bounds=new android.graphics.Rect();
+                root.getBoundsInScreen(bounds);
+                activeWindow="pkg="+root.getPackageName()+" class="+root.getClassName()+" bounds="+bounds;
+                root.recycle();
+            }
+        } catch(Throwable ignored) { activeWindow="unavailable"; }
         lastTapDiagnostics="id="+id+" css="+p+" screen="+x+","+y+
-            " webview="+java.util.Arrays.toString(box)+" observed="+after;
+            " webview="+java.util.Arrays.toString(box)+
+            " native="+insetsDiag.get()+" activeWindow="+activeWindow+" observed="+after;
         Log.i(TAG,"TAP_DIAGNOSTICS "+lastTapDiagnostics);
     }
 
