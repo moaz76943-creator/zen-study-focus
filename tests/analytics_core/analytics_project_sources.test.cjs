@@ -29,7 +29,7 @@ test('Demo, sample and synthetic projects cannot appear as real Analytics projec
  assert.deepEqual(r.tasks.projects,[{id:16,name:'genuine user project',total:1,completed:1}]);
  assert.deepEqual(r.totals,{minutes:15,sessions:1,averageMinutes:15});
  assert.equal(JSON.stringify(data),frozen,'Analytics must not mutate stored v21 data');
- assert.equal(A.toCSV(r).split('\\r\\n')[0],'"id","date","domain","minutes","startedAt","endedAt","timingVerified"');
+ assert.equal(A.toCSV(r).split(String.fromCharCode(13,10))[0],'"id","date","domain","minutes","startedAt","endedAt","timingVerified"');
 });
 
 test('Projects using source=demo are excluded even without legacy isDemo flag',()=>{
