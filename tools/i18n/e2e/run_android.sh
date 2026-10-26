@@ -71,6 +71,13 @@ timeout 30s adb wait-for-device
 test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = 1
 timeout 120s adb install -r "$APK" | tee "$OUT/ADB_INSTALL.txt"
 test -n "$(adb shell pm path com.zenstudy.focus | grep '^package:')"
+INSTALLED_PATH="$(adb shell pm path com.zenstudy.focus | tr -d '\r' | sed -n 's/^package://p')"
+test -n "$INSTALLED_PATH"
+timeout 60s adb pull "$INSTALLED_PATH" "$OUT/installed-base.apk"
+sha256sum "$OUT/installed-base.apk" | awk '{print $1}' > "$OUT/INSTALLED_APK_SHA256.txt"
+rm "$OUT/installed-base.apk"
+test "$(cat "$OUT/INSTALLED_APK_SHA256.txt")" = "$EXPECTED"
+cp "$BUILD/PACKAGE_ID.txt" "$OUT/PACKAGE_ID.txt"
 # Keep UIAutomation connected across reads and taps. One-shot `uiautomator
 # dump` tears down accessibility and repeatedly loses WebView virtual children.
 test "$(sha256sum "$BUILD/accessibility-probe.apk" | awk '{print $1}')" = "$(cat "$BUILD/PROBE_SHA256.txt")"

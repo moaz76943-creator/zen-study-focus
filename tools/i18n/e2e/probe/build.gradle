@@ -1,4 +1,5 @@
 plugins { id 'com.android.application' version '8.10.1' }
+repositories { google(); mavenCentral() }
 android {
     namespace 'com.zenstudy.focus.e2e'
     compileSdk 36
