@@ -7,6 +7,8 @@ from pathlib import Path
 
 SHA = re.compile(r"[a-f0-9]{40}\Z")
 MAX_BYTES = 32 * 1024 * 1024
+SAFE_CODEQL_RULE = re.compile(r"js/[a-z0-9-]{1,64}\Z")
+MAX_RULE_GROUPS = 24
 
 
 def summarize(directory: Path, sha: str) -> dict:
@@ -19,6 +21,7 @@ def summarize(directory: Path, sha: str) -> dict:
         if not paths:
             return output
         count = 0
+        rule_counts = {}
         for path in paths:
             if path.stat().st_size > MAX_BYTES:
                 output["reason"] = "SARIF_INVALID"
@@ -39,10 +42,16 @@ def summarize(directory: Path, sha: str) -> dict:
                     output["reason"] = "SARIF_INVALID"
                     return output
                 count += len(run["results"])
+                for item in run["results"]:
+                    raw_rule = item.get("ruleId")
+                    rule = raw_rule if isinstance(raw_rule, str) and SAFE_CODEQL_RULE.fullmatch(raw_rule) else "unknown"
+                    if rule not in rule_counts and len(rule_counts) >= MAX_RULE_GROUPS:
+                        rule = "unknown"
+                    rule_counts[rule] = rule_counts.get(rule, 0) + 1
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError, RecursionError):
         output["reason"] = "SARIF_INVALID"
         return output
-    output.update(findings=count, status="PASS" if count == 0 else "FAIL", reason="ZERO_FINDINGS" if count == 0 else "CODEQL_FINDINGS")
+    output.update(findings=count, status="PASS" if count == 0 else "FAIL", reason="ZERO_FINDINGS" if count == 0 else "CODEQL_FINDINGS", rule_counts=dict(sorted(rule_counts.items())))
     return output
 
 

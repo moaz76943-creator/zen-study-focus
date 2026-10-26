@@ -16,13 +16,28 @@ function run(sarif, sourceSha = SHA) {
 }
 const sarif = findings => ({version:'2.1.0',runs:[{tool:{driver:{name:'CodeQL'}},results:findings}]});
 test('clean CodeQL SARIF yields exact SHA and PASS',()=>{
-  const r=run(sarif([]));assert.equal(r.status,0);assert.deepEqual([r.out.status,r.out.findings,r.out.sha],['PASS',0,SHA]);
+  const r=run(sarif([]));assert.equal(r.status,0);assert.deepEqual([r.out.status,r.out.findings,r.out.sha],['PASS',0,SHA]);assert.deepEqual(r.out.rule_counts,{});
 });
 test('a CodeQL result makes security FAIL without printing snippet, path or message',()=>{
   const secret='ULTRA-SENSITIVE-SYNTHETIC-VALUE';
   const r=run(sarif([{ruleId:secret,message:{text:secret},locations:[{physicalLocation:{artifactLocation:{uri:secret}}}]}]));
   assert.equal(r.status,1);assert.equal(r.out.status,'FAIL');assert.equal(r.out.findings,1);
   assert.ok(!(r.stdout+r.stderr).includes(secret));
+});
+test('CodeQL safe rule identifiers are grouped without exposing secret fields',()=>{
+  const secret='UNTRUSTED-SYNTHETIC-VALUE';
+  const finding=(ruleId)=>({ruleId,message:{text:secret},locations:[{physicalLocation:{artifactLocation:{uri:secret}}}]});
+  const r=run(sarif([finding('js/sql-injection'),finding('js/sql-injection'),finding(secret),finding('js/command-line-injection')]));
+  assert.equal(r.status,1);assert.equal(r.out.status,'FAIL');assert.equal(r.out.findings,4);
+  assert.deepEqual(r.out.rule_counts,{'js/command-line-injection':1,'js/sql-injection':2,unknown:1});
+  assert.ok(!(r.stdout+r.stderr).includes(secret));
+});
+test('bounded CodeQL rule groups resist huge untrusted rule identifier sets',()=>{
+  const results=Array.from({length:40},(_,i)=>({ruleId:'js/finding-'+i}));
+  const r=run(sarif(results));
+  assert.equal(r.status,1);assert.equal(r.out.findings,40);
+  assert.ok(Object.keys(r.out.rule_counts).length<=25);
+  assert.equal(Object.values(r.out.rule_counts).reduce((a,b)=>a+b,0),40);
 });
 test('missing, corrupt, structurally invalid or tool-mismatched SARIF blocks',()=>{
   for(const data of [null,'invalid',{}, {runs:[]}, {runs:[{tool:{driver:{name:'NotCodeQL'}},results:[]}]}, {runs:[{tool:{driver:{name:'CodeQL'}}}]}]){
