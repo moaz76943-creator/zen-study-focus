@@ -158,7 +158,17 @@ function makeRepairQueue(audits) {
 
 function eligibleCoreDictionary(code, dictionaries) {
  const value=dictionaries&&dictionaries[code];
- return value&&((code==='en') || value!==dictionaries.en)?value:null;
+ if(!value)return null;
+ if(code==='en')return value;
+ const english=dictionaries.en;
+ if(!english||value===english)return null;
+ // A copied English object/array is still fallback even without identity.
+ const candidate=flattenSourceLeaves(value), baseline=flattenSourceLeaves(english);
+ const keys=Object.keys(baseline);
+ if(keys.length===Object.keys(candidate).length &&
+   keys.every(key=>Object.hasOwn(candidate,key)&&Object.is(candidate[key],baseline[key])))
+   return null;
+ return value;
 }
 
 function flattenSourceLeaves(input,prefix='',out={}) {
@@ -211,7 +221,7 @@ function detailedSourceAudit(raw) {
    result.push(auditSection({code,section:'Core',keys:coreKeys,owner:'F',
      source_file:'android/app/src/main/assets/web/app.js',english:englishCore,
      read:key=>({proven:!!core&&Object.prototype.hasOwnProperty.call(core,key),value:core?.[key]})}));
-   const q=ctx.__quick[code];
+   const q=eligibleCoreDictionary(code,ctx.__quick);
    result.push(auditSection({code,section:'Quick Training',keys:quickKeys,owner:'F',
      source_file:'android/app/src/main/assets/web/quick_training.js',english:englishQuick,
      read:key=>{const i=quickKeys.indexOf(key);

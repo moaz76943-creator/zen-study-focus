@@ -126,3 +126,13 @@ test('Core English object-reference fallback cannot count as a localized diction
  assert.equal(eligibleCoreDictionary('en',{en:english}),english);
  assert.equal(eligibleCoreDictionary('de',{en:english}),null);
 });
+
+test('deep copies of English Core and Quick Training never count as localized values',()=>{
+ const {eligibleCoreDictionary}=require('../../../tools/i18n/e2e/coverage.cjs');
+ const english={title:'Start',nested:{save:'Save',weekdays:['Mon','Tue']}};
+ const cloned={nested:{weekdays:['Mon','Tue'],save:'Save'},title:'Start'};
+ assert.equal(eligibleCoreDictionary('fr',{en:english,fr:cloned}),null);
+ const quick=['Start','Pause','Save'];
+ assert.equal(eligibleCoreDictionary('fr',{en:quick,fr:[...quick]}),null);
+ assert.deepEqual(eligibleCoreDictionary('fr',{en:quick,fr:['Démarrer','Pause','Save']}),['Démarrer','Pause','Save']);
+});
