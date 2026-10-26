@@ -50,7 +50,7 @@
     if (!topicItem || typeof topicItem !== 'object') return null;
     var item = Object.assign({}, topicItem);
     var rating = String(recallRating || 'easy').toLowerCase();
-    var now = reviewDate instanceof Date ? reviewDate : new Date();
+    var now = reviewDate instanceof Date && !isNaN(reviewDate.getTime()) ? reviewDate : new Date();
 
     item.reviewCount = (item.reviewCount || 0) + 1;
     item.lastReviewedAt = now.toISOString();
