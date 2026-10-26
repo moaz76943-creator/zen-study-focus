@@ -9,6 +9,8 @@ import android.net.LocalSocket;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Xml;
+import android.view.InputDevice;
+import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlSerializer;
@@ -45,6 +47,8 @@ public final class AccessibilityProbe extends Instrumentation {
                         if ("DUMP".equals(command)) response.put("xml", hierarchy(automation));
                         else if (command != null && command.startsWith("CLICK "))
                             response.put("clicked", click(automation, new JSONObject(command.substring(6))));
+                        else if (command != null && command.startsWith("TOUCH_FILE "))
+                            response.put("touched", touchFixture(automation, new JSONObject(command.substring(11))));
                         else throw new IllegalArgumentException("Unknown probe command");
                     } catch (Exception error) {
                         response.put("error", error.getClass().getSimpleName() + ": " + error.getMessage());
@@ -110,6 +114,71 @@ public final class AccessibilityProbe extends Instrumentation {
             for (AccessibilityNodeInfo match : matches) match.recycle();
             for (AccessibilityNodeInfo dialog : dialogs) dialog.recycle();
             root.recycle();
+        }
+    }
+
+    /** Genuine finger input for DocumentsUI's RecyclerView gesture handler.
+     * Android 11 shell input tap uses UNKNOWN tool type, which that handler
+     * excludes. Match the actual visible fixture first; never touch app consent.
+     */
+    private boolean touchFixture(UiAutomation automation, JSONObject selector) throws Exception {
+        String name = selector.optString("text");
+        if (!name.matches("p0-saf-[a-z-]+\\.txt")
+                || !"android.widget.TextView".equals(selector.optString("class"))
+                || !"android:id/title".equals(selector.optString("resource-id")))
+            throw new IllegalArgumentException("Only an exact disposable SAF fixture title is allowed");
+        AccessibilityNodeInfo root = activeRoot(automation);
+        List<AccessibilityNodeInfo> matches = new ArrayList<>();
+        try {
+            if (!"com.google.android.documentsui".equals(string(root.getPackageName())))
+                throw new IllegalStateException("DocumentsUI is not the active window");
+            matchingFixture(root, name, matches, 0);
+            if (matches.size() != 1)
+                throw new IllegalStateException("Fixture requires one visible exact DocumentsUI title");
+            Rect bounds = new Rect();
+            matches.get(0).getBoundsInScreen(bounds);
+            if (bounds.left < 0 || bounds.top < 0 || bounds.width() <= 0 || bounds.height() <= 0)
+                throw new IllegalStateException("Fixture bounds are not fully on screen");
+            MotionEvent.PointerProperties pointer = new MotionEvent.PointerProperties();
+            pointer.id = 0;
+            pointer.toolType = MotionEvent.TOOL_TYPE_FINGER;
+            MotionEvent.PointerCoords coords = new MotionEvent.PointerCoords();
+            coords.x = bounds.exactCenterX(); coords.y = bounds.exactCenterY();
+            coords.pressure = 1; coords.size = 1;
+            long downTime = SystemClock.uptimeMillis();
+            MotionEvent down = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, 1,
+                    new MotionEvent.PointerProperties[]{pointer}, new MotionEvent.PointerCoords[]{coords},
+                    0, 0, 1, 1, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0);
+            try {
+                if (!automation.injectInputEvent(down, true)) return false;
+            } finally { down.recycle(); }
+            SystemClock.sleep(100);
+            coords.pressure = 0;
+            MotionEvent up = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 1,
+                    new MotionEvent.PointerProperties[]{pointer}, new MotionEvent.PointerCoords[]{coords},
+                    0, 0, 1, 1, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0);
+            try { return automation.injectInputEvent(up, true); }
+            finally { up.recycle(); }
+        } finally {
+            for (AccessibilityNodeInfo match : matches) match.recycle();
+            root.recycle();
+        }
+    }
+
+    private void matchingFixture(AccessibilityNodeInfo node, String name,
+                                  List<AccessibilityNodeInfo> result, int depth) {
+        if (depth > 100) throw new IllegalStateException("Accessibility depth limit exceeded");
+        if (node.isVisibleToUser() && node.isEnabled()
+                && "com.google.android.documentsui".equals(string(node.getPackageName()))
+                && "android.widget.TextView".equals(string(node.getClassName()))
+                && "android:id/title".equals(string(node.getViewIdResourceName()))
+                && name.equals(string(node.getText())))
+            result.add(AccessibilityNodeInfo.obtain(node));
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            if (child != null) {
+                try { matchingFixture(child, name, result, depth + 1); } finally { child.recycle(); }
+            }
         }
     }
 
