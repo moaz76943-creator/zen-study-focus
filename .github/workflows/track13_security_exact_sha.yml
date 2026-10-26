@@ -28,7 +28,7 @@ jobs:
           echo "SECURITY_SOURCE_SHA=$EXPECTED_SHA"
       - name: Run report regressions
         run: |
-          node --test tests/security_recovery/track13_secret_report.test.cjs
+          node --test tests/security_recovery/track13_secret_report.test.cjs tests/security_recovery/track13_private_triage.test.cjs
           node --test tests/security/*.test.cjs tests/security_recovery/webview*.test.cjs tests/security_recovery/df_pr02_bridge_xss.test.cjs
       - name: Install checksum-verified scanner
         shell: bash
