@@ -26,7 +26,8 @@
     exportSaved:'CSV file saved',exportCancelled:'CSV save cancelled',exportFailed:'Could not save CSV',
     today:'Today',last7:'Last 7 days',last30:'Last 30 days',currentWeek:'Last 7 days',
     priorWeek:'Previous 7 days',activitySplit:'Time by activity',
-    historicalGoals:'Original dated goal targets',noHistoricalGoals:'No dated goal snapshots recorded'
+    historicalGoals:'Original dated goal targets',noHistoricalGoals:'No dated goal snapshots recorded',
+    exportUnavailable:'CSV export is unavailable on this Android version until native Save As is supported'
   });
   const AR=Object.freeze({
     title:'التحليلات الفعلية',activity:'النشاط',period:'الفترة',start:'من',end:'إلى',
@@ -41,7 +42,8 @@
     exportSaved:'تم حفظ ملف CSV',exportCancelled:'تم إلغاء حفظ CSV',exportFailed:'تعذّر حفظ ملف CSV',
     today:'اليوم',last7:'آخر 7 أيام',last30:'آخر 30 يومًا',currentWeek:'آخر 7 أيام',
     priorWeek:'الأيام السبعة السابقة',activitySplit:'الوقت حسب النشاط',
-    historicalGoals:'الأهداف الأصلية المؤرخة',noHistoricalGoals:'لا توجد أهداف تاريخية مسجلة بالتواريخ'
+    historicalGoals:'الأهداف الأصلية المؤرخة',noHistoricalGoals:'لا توجد أهداف تاريخية مسجلة بالتواريخ',
+    exportUnavailable:'تصدير CSV غير متاح على أندرويد حتى دعم الحفظ الأصلي'
   });
   const RTL=new Set(['ar','fa','ur','ps','ckb','ug','sd']);
   function normalizedLocale(locale){
@@ -150,6 +152,9 @@
     const exportKind=input('select',t.export);
     for(const value of ['sessions','daily','weekly','monthly']){const option=mk('option',t[value]);option.value=value;exportKind.appendChild(option);}
     exportKind.value=opts.exportKind||'sessions';
+    // The backup-only ZenNative bridge is NOT an Analytics CSV Save callback.
+    // Android WebView must not simulate an OS document save with a Blob URL.
+    const nativeCsvUnavailable=Boolean(doc.defaultView?.ZenNative)&&typeof opts.onExport!=='function';
     const exportBtn=mk('button',t.export);exportBtn.type='button';exportBtn.style.cssText='min-height:42px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:6px 12px';
     filters.appendChild(exportBtn);
     const periodPresets=mk('div',undefined,'dfa-range-presets');
@@ -236,13 +241,13 @@
     let current=null,currentSeries=[],heatDays=[],destroyed=false,exporting=false,reportRevision=0;
     function refresh(){
       if(destroyed)return null;
-      ++reportRevision;exportStatus.textContent='';
+      ++reportRevision;exportStatus.textContent=nativeCsvUnavailable?t.exportUnavailable:'';
       const from=start.value,to=end.value;
       const valid=core.validDay(from)&&core.validDay(to)&&from<=to&&
         (Date.parse(to+'T12:00:00Z')-Date.parse(from+'T12:00:00Z'))/86400000<3660;
       start.setAttribute('aria-invalid',!valid?'true':'false');
       end.setAttribute('aria-invalid',!valid?'true':'false');
-      exportBtn.disabled=!valid||exporting;error.hidden=valid;error.textContent=valid?'':t.invalidRange;
+      exportBtn.disabled=!valid||exporting||nativeCsvUnavailable;error.hidden=valid;error.textContent=valid?'':t.invalidRange;
       if(!valid){
         current=null;currentSeries=[];heatDays=[];kpis.replaceChildren();
         chart.replaceChildren();chart.textContent='';heat.replaceChildren();heat.textContent='';
@@ -315,7 +320,7 @@
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
     [domain,grouping,start,end,exportKind].forEach(el=>el.addEventListener('change',refresh));
     exportBtn.addEventListener('click',async()=>{
-      if(!current||exportBtn.disabled||destroyed||exporting)return;
+      if(!current||exportBtn.disabled||destroyed||exporting||nativeCsvUnavailable)return;
       const selectedKind=exportKind.value||'sessions';
       const value=core.toCSV(current,selectedKind);
       if(typeof opts.onExport==='function'){
