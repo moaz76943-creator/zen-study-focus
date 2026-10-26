@@ -140,6 +140,7 @@ public final class TaskInstrumentation extends Instrumentation {
         assertOk(found.optBoolean("found")&&found.optBoolean("button"),"Tasks Editor not visible "+found);
         assertOk(("ar".equals(locale)?"rtl":"ltr").equals(found.optString("dir")),"Wrong RTL/LTR direction "+found);
         tap("df03Edit");
+        exposeEditor("df03TaskHost");
         JSONObject draft=js("(()=>{const f=document.querySelector('#df03TaskHost form.df-form');" +
             "if(!f)return {form:false};const title=f.querySelector('input[type=text]'),save=f.querySelector('button[type=submit]');" +
             "title.value="+JSONObject.quote(SAVED)+";title.dispatchEvent(new Event('input',{bubbles:true}));" +
@@ -162,6 +163,7 @@ public final class TaskInstrumentation extends Instrumentation {
             "if(b)b.id='df03RejectEdit';return {found:!!b};})()");
         assertOk(edit.optBoolean("found"),"ACK rejection fixture Edit missing");
         tap("df03RejectEdit");
+        exposeEditor("df03RejectHost");
         js("(()=>{const f=document.querySelector('#df03RejectHost form.df-form');" +
             "const title=f.querySelector('input[type=text]');title.value='DF03 rejected write';" +
             "f.querySelector('button[type=submit]').id='df03RejectSave';return {ready:true};})()");
@@ -173,6 +175,20 @@ public final class TaskInstrumentation extends Instrumentation {
         assertOk(receipt().optBoolean("ok"),"v21 packet changed on injected rejected ACK");
         assertOk(realTaps==4,"Expected four genuine Android physical tap events, got "+realTaps);
     }
+    private void exposeEditor(String hostId)throws Exception{
+        // Isolate the real Tasks editor within the limited emulator visual viewport.
+        // This is test-only layout preparation; Edit/Save still receive OS pointer taps.
+        JSONObject state=js("(()=>{const host=document.getElementById("+JSONObject.quote(hostId)+");" +
+            "const section=host?.querySelector('.df-tasks'),content=section?.children[1];" +
+            "const form=host?.querySelector('form.df-form'),panel=form?.closest('.df-dialog');" +
+            "if(!content||!panel)return {ok:false,form:!!form};" +
+            "for(const child of content.children)child.style.display=child===panel?'':'none';" +
+            "const keep=form.querySelector('label');" +
+            "for(const child of form.children)if(child!==keep&&!child.classList.contains('df-actions'))" +
+            "child.style.display='none';" +
+            "return {ok:true,form:true,visible:panel.getBoundingClientRect().height};})()");
+        assertOk(state.optBoolean("ok"),"Tasks editor not activated by genuine Android tap: "+state);
+    }
     private void mount(String id,String locale,boolean reject)throws Exception{
         String script="(()=>{const host=document.createElement('div');host.id="+JSONObject.quote(id)+";" +
             "Object.assign(host.style,{position:'fixed',inset:'0',zIndex:'2147483647',background:'#fff'," +
@@ -180,7 +196,10 @@ public final class TaskInstrumentation extends Instrumentation {
             "window.DeepFocusTasksStudioV21.mount(host,{locale:"+JSONObject.quote(locale)+
             ",now:()=>new Date(2026,9,26),readState:()=>JSON.parse(JSON.stringify(DF22Integration.getSnapshot()))," +
             "commit:(before,after)=>"+(reject?"false":"DF22Integration.write(before,after)")+"});" +
-            "return {mounted:!!host.querySelector('.df-tasks'),count:host.querySelectorAll('.df-task').length};})()";
+            "const section=host.querySelector('.df-tasks'),content=section?.children[1]," +
+            "results=content?.querySelector('#df-task-results');" +
+            "if(content&&results){for(const child of content.children)child.style.display=child===results?'':'none';}" +
+            "return {mounted:!!section&&!!content&&!!results,count:host.querySelectorAll('#df-task-results .df-task').length};})()";
         JSONObject mounted=js(script);
         assertOk(mounted.optBoolean("mounted")&&mounted.optInt("count")>0,"Real WebView Tasks UI not mounted "+mounted);
     }
