@@ -37,3 +37,10 @@ test('missing fields and inconsistent counters must fail closed', () => {
   assert.equal(run({assertionsCount:3, failuresCount:4}).status,'BLOCKED_MALFORMED');
   assert.equal(run({assertionsCount:3, skippedCount:4}).status,'BLOCKED_MALFORMED');
 });
+
+test('reject array-shaped evidence with valid-looking own fields', () => {
+  const array = [];
+  Object.assign(array, {sha, assertionsCount: 5, failuresCount: 0, skippedCount: 0});
+  assert.deepEqual(validateEvidence(array, sha).status, 'BLOCKED_MALFORMED');
+  assert.equal(validateEvidence(array, sha).valid, false);
+});
