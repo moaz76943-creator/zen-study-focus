@@ -33,24 +33,40 @@ const out=process.env.DF07_LOCALE_TIMER_EVIDENCE||'/tmp/df07-timer20';
    assert.ok(typeof expected.message==='string'&&expected.message.trim().length>=10,lang+' missing confirmation text');
    // Classify English fallback as a real coverage gap, never proof of translation.
    const fallback=lang!=='en'&&expected.message===expected.english;
-   let observedDialog=null;
-   page.once('dialog',async dialog=>{
-    observedDialog={type:dialog.type(),message:dialog.message()};
-    await dialog.dismiss();
-   });
-   await page.locator('#modeShortBtn').click();
-   assert.ok(observedDialog,'No user-facing confirmation for '+lang);
-   assert.equal(observedDialog.type,'confirm',lang+' should request consent');
-   assert.equal(observedDialog.message,expected.message,lang+' wrong dialog copy');
-   const after=await page.evaluate(()=>({id:timerSessionId,mode:currentTimerModeKey,total:timerTotal,running:timerRunning,label:customSessionLabel}));
-   assert.deepEqual(after,original,lang+' Cancel altered active session');
-   results.push({locale:lang,status:'PASS',messageMatched:true,cancelPreserved:true,englishFallback:fallback});
+   // Actual touchscreen gestures for each destructive control; no stubbed confirm.
+   // Reset currently has an Arabic/English message only: report that language gap.
+   const resetMessage=lang==='ar'
+    ? 'إعادة الضبط ستلغي تقدم الجلسة الحالية. هل تريد المتابعة؟'
+    : 'Reset will discard the current session progress. Continue?';
+   const controls=[
+    {name:'Short',selector:'#modeShortBtn',message:expected.message},
+    {name:'Reset',selector:'#sec-timer button[onclick="resetTimerNow()"]',message:resetMessage},
+    {name:'Skip',selector:'#sec-timer button[onclick="skipTimerPhase()"]',message:expected.message}
+   ];
+   for(const control of controls){
+    let observedDialog=null;
+    page.once('dialog',async dialog=>{
+     observedDialog={type:dialog.type(),message:dialog.message()};
+     await dialog.dismiss();
+    });
+    await page.locator(control.selector).tap();
+    assert.ok(observedDialog,lang+' '+control.name+' did not request real consent');
+    assert.equal(observedDialog.type,'confirm',lang+' '+control.name+' must show confirm');
+    assert.equal(observedDialog.message,control.message,lang+' '+control.name+' incorrect dialog text');
+    const after=await page.evaluate(()=>({id:timerSessionId,mode:currentTimerModeKey,total:timerTotal,running:timerRunning,label:customSessionLabel}));
+    assert.deepEqual(after,original,lang+' '+control.name+' Cancel altered active session');
+    results.push({
+     locale:lang,control:control.name,status:'PASS',messageMatched:true,cancelPreserved:true,
+     englishFallback:control.name==='Reset' ? !['en','ar'].includes(lang) : fallback
+    });
+   }
   }
-  assert.equal(results.length,20);
+  assert.equal(results.length,60,'20 locales x 3 real UI Cancel paths');
   assert.deepEqual(pageErrors,[],'Unhandled browser JS exceptions');
-  const gaps=results.filter(r=>r.englishFallback).map(r=>r.locale);
-  fs.writeFileSync(path.join(out,'timer-20-locale-confirm.json'),JSON.stringify({source:'current checkout',environment:'desktop Chromium mobile emulation only',results,englishFallbackGaps:gaps,nativeAndroid:'NOT_TESTED',saf:'NOT_TESTED',releaseApproved:false},null,2)+'\n');
-  console.log(JSON.stringify({localeCancelPass:results.length,untranslatedEnglishFallback:gaps,jsErrors:pageErrors.length,android:'NOT_TESTED'}));
+  const gaps=[...new Set(results.filter(r=>r.englishFallback&&r.control!=='Reset').map(r=>r.locale))];
+  const resetEnglishFallbackLocales=codes.filter(lang=>!['en','ar'].includes(lang));
+  fs.writeFileSync(path.join(out,'timer-20-locale-confirm.json'),JSON.stringify({source:'current checkout',environment:'desktop Chromium mobile emulation only',results,englishFallbackGaps:gaps,resetEnglishFallbackLocales,nativeAndroid:'NOT_TESTED',saf:'NOT_TESTED',releaseApproved:false},null,2)+'\n');
+  console.log(JSON.stringify({localeCancelPass:results.length,controls:['Short','Reset','Skip'],untranslatedEnglishFallback:gaps,resetEnglishFallbackLocales,jsErrors:pageErrors.length,android:'NOT_TESTED'}));
  } catch(error){
   fs.writeFileSync(path.join(out,'FAILED.txt'),String(error.stack||error));
   throw error;
