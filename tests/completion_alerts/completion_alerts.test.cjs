@@ -12,3 +12,60 @@ test('a failed ledger write prevents an alert or partial user-data mutation',asy
 test('missing audio, DND focus gate, background dispose, invalid IDs fail safely',async()=>{MockAudio.instances=[];const cfg={};const a=lib.createCompletionAlerts(cfg,{persist:()=>true,AudioCtor:MockAudio,canOutput:()=>false});assert.equal(await a.preview('water-drop'),false);assert.equal(await a.complete({sessionId:'x',phase:'focus'}),false);assert.equal(MockAudio.instances.length,0);assert.equal(await a.complete({sessionId:null,phase:'focus'}),false);a.dispose()});
 test('audio play rejection is handled without replay or stuck player',async()=>{let errors=0;const cfg={};class RejectAudio extends MockAudio{play(){return Promise.reject(Error('codec failure'))}};const a=lib.createCompletionAlerts(cfg,{persist:()=>true,AudioCtor:RejectAudio,onError:()=>errors++});assert.equal(await a.complete({sessionId:'z',phase:'focus'}),false);assert.equal(await a.complete({sessionId:'z',phase:'focus'}),false);assert.equal(errors,1);a.dispose()});
 test('numeric/string opaque session IDs are distinct',async()=>{const cfg={},a=lib.createCompletionAlerts(cfg,{persist:()=>true,AudioCtor:MockAudio});assert.equal(await a.complete({sessionId:1,phase:'focus'}),true);assert.equal(await a.complete({sessionId:'1',phase:'focus'}),true);assert.deepEqual(cfg.completionAlertPlayedIds,['number:1','string:1']);a.dispose()});
+
+test('audio callback exceptions never escape completion, release reserved audio focus',async()=>{
+ let focusReleases=0;
+ class BadDecoder { constructor(){throw Error('broken WAV decoder')} }
+ const engine=lib.createCompletionAlerts({},{
+  AudioCtor:BadDecoder,persist:()=>true,requestFocus:()=>true,
+  releaseFocus:()=>{focusReleases++},
+  onError:()=>{throw Error('host UI logger failed')}
+ });
+ assert.equal(await engine.complete({sessionId:'bad-wav',phase:'focus'}),false);
+ assert.equal(focusReleases,1,'Reserved audio focus must be released after decoder failure');
+ engine.dispose();
+ const badPersist=lib.createCompletionAlerts({},{
+  AudioCtor:MockAudio,persist:()=>false,
+  onError:()=>{throw Error('host error reporter failed')}
+ });
+ assert.equal(await badPersist.complete({sessionId:'write-failed',phase:'focus'}),false,
+  'Audio error reporting must never break timer completion');
+ badPersist.dispose();
+ let requestErrors=0;
+ const badFocus=lib.createCompletionAlerts({},{
+  AudioCtor:MockAudio,persist:()=>true,
+  requestFocus:()=>{throw Error('audio focus denied')},
+  onError:()=>{requestErrors++;throw Error('host observer failed')}
+ });
+ assert.equal(await badFocus.preview('soft-bell'),false);
+ assert.equal(requestErrors,1);
+ badFocus.dispose();
+ const badCleanup=lib.createCompletionAlerts({},{
+  AudioCtor:MockAudio,persist:()=>true,requestFocus:()=>true,
+  releaseFocus:()=>{throw Error('audio focus release denied')}
+ });
+ assert.equal(await badCleanup.preview('soft-bell'),true);
+ assert.doesNotThrow(()=>badCleanup.pause(),'Host cleanup failures must not escape into timer');
+ badCleanup.dispose();
+});
+
+test('real preview volume is capped, update stops playback and silence never plays',async()=>{
+ MockAudio.instances=[];
+ const cfg={completionAlertSettings:{sound:'soft-bell',volume:100}};
+ const a=lib.createCompletionAlerts(cfg,{persist:()=>true,AudioCtor:MockAudio});
+ assert.equal(await a.preview('soft-bell'),true);
+ const first=MockAudio.instances.at(-1);
+ assert.equal(first.volume,0.65,'100% setting must remain below the safe output cap');
+ assert.equal(a.update({volume:10}),true);
+ assert.equal(first.paused,true,'Changing gain stops the old preview');
+ assert.equal(await a.preview('wood-tap'),true);
+ const next=MockAudio.instances.at(-1);
+ assert.ok(Math.abs(next.volume-0.065)<1e-9,'10% volume maps to safe output gain');
+ assert.equal(a.update({sound:'silent'}),true);
+ assert.equal(next.paused,true);
+ assert.equal(await a.preview('silent'),false);
+ const before=MockAudio.instances.length;
+ assert.equal(await a.complete({sessionId:'silent-session',phase:'focus'}),false);
+ assert.equal(MockAudio.instances.length,before,'Mute must create no media instance');
+ a.dispose();
+});
