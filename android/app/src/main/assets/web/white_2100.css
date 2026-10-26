@@ -701,6 +701,10 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
     inline-size: calc(100vw - 16px);
     min-inline-size: 0;
     max-inline-size: calc(100vw - 16px);
+    /* visualViewport JS publishes --nsux-height in px, even on older WebViews.
+       A height/max-height fallback prevents a 1,675px editor on a 748px screen. */
+    height: calc(var(--nsux-height, 80vh) - 16px) !important;
+    max-height: calc(var(--nsux-height, 80vh) - 16px) !important;
     block-size: min(88dvh, calc(var(--nsux-height, 100dvh) - 16px));
     max-block-size: min(88dvh, calc(var(--nsux-height, 100dvh) - 16px));
     overflow-y: auto;
@@ -718,10 +722,12 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
   body:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions {
     /* The last action lives below a very long editor. Sticky bottom:0 does
        not pull it into view from below; anchor it within the modal overlay. */
-    position: fixed;
+    position: fixed !important;
     left: 20px;
     right: 20px;
-    bottom: max(14px, env(safe-area-inset-bottom, 0px));
+    /* Simple fallback for older Android WebView; keep safe-area enhancement. */
+    bottom: 14px !important;
+    bottom: max(14px, env(safe-area-inset-bottom, 0px)) !important;
     z-index: 260;
     display: flex;
     max-inline-size: calc(100vw - 40px);
