@@ -32,6 +32,22 @@
     if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(v)) return null;
     const ms=Date.parse(v);return Number.isFinite(ms) ? ms : null;
   }
+  // V21 legacy focus history may lack explicit completion metadata; keep it.
+  // Only explicit evidence of an unfinished or non-focus interval excludes credit.
+  function nonFocusRecord(s) {
+    if (s.completed === false || s.isComplete === false ||
+        s.isFocus === false || s.focus === false) return true;
+    const status = typeof s.status === 'string' ? s.status.toLowerCase().replace(/-/g,'_') : '';
+    if (['active','running','paused','started','pending','in_progress',
+      'cancelled','canceled','aborted','interrupted','failed','incomplete',
+      'stopped','skipped','discarded','rest','break'].includes(status)) return true;
+    for (const key of ['mode','phase','type']) {
+      const value = typeof s[key] === 'string' ? s[key].toLowerCase().replace(/-/g,'_') : '';
+      if (['rest','break','short','long','short_break','long_break','short_rest','long_rest'].includes(value))
+        return true;
+    }
+    return false;
+  }
   function normalizeSessions(history) {
     const sessions=[], rejects=[], seen=new Set();
     (Array.isArray(history) ? history : []).forEach((s,index)=>{
@@ -39,6 +55,7 @@
       const id=isRecord(s) ? idKey(s.id) : null;
       if (!isRecord(s)) reason='INVALID_RECORD';
       else if (s.isStarter === true || s.isDemo === true || s.synthetic === true || ['demo','sample','fixture'].includes(s.source)) reason='SAMPLE';
+      else if (nonFocusRecord(s)) reason='NON_FOCUS';
       else if (!id) reason='INVALID_ID';
       else if (!validDay(s.date)) reason='INVALID_DATE';
       else if (typeof s.minutes !== 'number' || !Number.isFinite(s.minutes) || s.minutes < 0 || s.minutes > 1440) reason='INVALID_MINUTES';
