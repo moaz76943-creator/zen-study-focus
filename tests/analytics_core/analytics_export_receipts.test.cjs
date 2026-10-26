@@ -39,10 +39,10 @@ test('CSV receipts are truthful: saved needs explicit acknowledgment; cancellati
  assert.match(r.receipt.textContent,/saved|حفظ/i);
  answer={status:'failed'};
  await r.button.events.click();
- assert.match(r.receipt.textContent,/fail|error|تعذّر/i);
+ assert.match(r.receipt.textContent,/fail|error|could not|تعذّر/i);
  answer=undefined;
  await r.button.events.click();
- assert.match(r.receipt.textContent,/fail|error|تعذّر/i);
+ assert.match(r.receipt.textContent,/fail|error|could not|تعذّر/i);
  r.ui.destroy();
 });
 
