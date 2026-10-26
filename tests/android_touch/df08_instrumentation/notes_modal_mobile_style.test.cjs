@@ -15,7 +15,7 @@ test('compact Note editor stays confined to visual viewport without horizontal o
 });
 test('Save and Cancel stay real touch buttons at keyboard dismissal',()=>{
   assert.match(guard,/\.ns-editor\s*>\s*\.modal-actions\s*\{/);
-  assert.match(guard,/position:\s*sticky/);
+  assert.match(guard,/position:\s*fixed/);
   assert.match(guard,/bottom:\s*0/);
   assert.match(guard,/\.modal-actions\s*>\s*button/);
   assert.match(guard,/min-block-size:\s*44px/);
