@@ -12,7 +12,9 @@ SCRIPT = (pathlib.Path(__file__).resolve().parents[3]
 
 class AccessibilityTransportStrategyTest(unittest.TestCase):
     def test_api35_uses_adb_uiautomator_without_instrumentation(self):
-        self.assertIn('if [[ "$API" == 35 ]]; then\n  unset DF13_UI_PORT', SCRIPT)
+        branch = SCRIPT.split('if [[ "$API" == 35 ]]; then\n  # API35 host crash evidence', 1)[1].split('\nelse\n', 1)[0]
+        self.assertIn('unset DF13_UI_PORT', branch)
+        self.assertNotIn('am instrument', branch)
         self.assertIn('PROBE_MODE.txt', SCRIPT)
         self.assertIn('API35_ADB_UIAUTOMATOR', SCRIPT)
 
