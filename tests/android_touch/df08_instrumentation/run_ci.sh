@@ -27,6 +27,7 @@ for width in 320 360 393 430; do
   adb shell settings put system font_scale 1.0
   adb shell am force-stop com.zenstudy.focus || true
   adb shell pm clear com.zenstudy.focus >/dev/null
+  adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
   output="$out/actual-touch-${width}.txt"
   timeout 160s adb shell am instrument -w -r \
     com.zenstudy.focus.test/com.zenstudy.focus.df08.TouchInstrumentation \
