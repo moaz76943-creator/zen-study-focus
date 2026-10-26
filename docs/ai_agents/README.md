@@ -6,6 +6,22 @@ The workflow is installed on default branch main (required for GitHub schedules)
 It checks out live integration/master-qa-verified-v21 source, refuses stale heads,
 and creates draft PRs only. It cannot merge or approve releases.
 
+## Android Termux guided setup
+
+On the owner's Android phone, in Termux:
+
+```bash
+pkg update -y && pkg install -y gh curl
+curl -fsSLo "$HOME/df-ai-setup.sh" \
+  https://raw.githubusercontent.com/moaz76943-creator/zen-study-focus/main/tools/ai_agents/setup_termux.sh
+bash "$HOME/df-ai-setup.sh"
+```
+
+The script checks the GitHub account, securely accepts a Groq API key,
+saves it as an Actions secret, sets DF_AI_ENABLED=false and sends only
+a manual dry-run dispatch. It does not grant broad GitHub approval rights,
+start billable activity, label issues, or install third-party GitHub Apps.
+
 ## Owner activation steps
 
 1. Obtain a Groq free-tier API key: https://console.groq.com/keys .
