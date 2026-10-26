@@ -204,3 +204,44 @@ test('five ACK / force-stop remains explicitly NOT_TESTED on device bootstrap fa
  const row=vm.runInContext("report.results.find(x=>x.name==='five_acks_one_immediate_kill')",ctx);
  assert.equal(row.status,'NOT_TESTED');
 });
+
+test('only read-only ADB operations retry after a bounded offline reconnect',()=>{
+ const ctx=context();
+ vm.runInContext(`
+   const adbCommands=[];let reads=0;
+   cp.execFileSync=(cmd,args)=>{
+     if(cmd!=='adb')throw Error('unexpected command');
+     adbCommands.push(args.join(' '));
+     if(args[0]==='reconnect')return '';
+     if(reads++===0)throw Object.assign(Error('temporary ADB offline'),{code:'ETIMEDOUT'});
+     return '1';
+   };
+ `,ctx);
+ assert.equal(vm.runInContext("adb('shell','getprop','ro.kernel.qemu')",ctx),'1');
+ assert.equal(vm.runInContext('adbCommands.length',ctx),3);
+ assert.match(vm.runInContext('adbCommands[1]',ctx),/^reconnect offline$/);
+ assert.match(vm.runInContext('adbCommands[2]',ctx),/shell getprop ro.kernel.qemu/);
+});
+
+test('ADB transport must never retry an input tap or a save/force-stop mutation',()=>{
+ const ctx=context();
+ vm.runInContext(`
+   const adbCommands=[];
+   cp.execFileSync=(cmd,args)=>{adbCommands.push(args.join(' '));throw Object.assign(Error('ADB offline'),{code:'ETIMEDOUT'});};
+ `,ctx);
+ assert.throws(()=>vm.runInContext("adb('shell','input','tap','15','25')",ctx),/TRANSPORT: Android ADB/);
+ assert.equal(vm.runInContext('adbCommands.length',ctx),1);
+ assert.throws(()=>vm.runInContext("adb('shell','am','force-stop','com.zenstudy.focus')",ctx),/TRANSPORT: Android ADB/);
+ assert.equal(vm.runInContext('adbCommands.length',ctx),2);
+});
+
+test('permanent read-only ADB loss stays NOT_TESTED without infinite retries',()=>{
+ const ctx=context();
+ vm.runInContext(`
+   const adbCommands=[];
+   cp.execFileSync=(cmd,args)=>{adbCommands.push(args.join(' '));throw Object.assign(Error('device disappeared'),{code:'ETIMEDOUT'});};
+ `,ctx);
+ assert.throws(()=>vm.runInContext("adb('shell','getprop','sys.boot_completed')",ctx),/TRANSPORT: Android ADB/);
+ assert.equal(vm.runInContext('adbCommands.filter(x=>x.includes("shell getprop")).length',ctx),3);
+ assert.equal(vm.runInContext('adbCommands.filter(x=>x==="reconnect offline").length',ctx),2);
+});
