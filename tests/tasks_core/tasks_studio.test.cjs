@@ -332,3 +332,25 @@ test('DF05: deliberate task reschedule is persisted, while invalid input never w
  assert.deepEqual(state.tasksList[0].unknown,{keep:1});
  studio.destroy();
 });
+
+
+test('DF-FINAL-03: 1000 legacy tasks render in bounded, expandable result pages without writes',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[],unknownV21:{keep:true}},tasksList:
+  Array.from({length:1000},(_,i)=>({id:1000+i,title:'Legacy bulk '+i,done:false,catKey:'study',extension:{index:i}}))};
+ const before=JSON.stringify(state),root=new FakeElement(fakeDoc,'main');let commits=0;
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(){commits++;return true;}});
+ const results=()=>root.descendants.find(x=>x.id==='df-task-results');
+ const titles=()=>results().descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
+ assert.equal(titles().length,100,'initial DOM must be bounded');
+ const more=results().descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Show more tasks');
+ assert.ok(more,'all 1000 tasks must remain accessible');
+ more.dispatch('click');
+ assert.equal(titles().length,200,'explicit page expansion should expose more real tasks');
+ const search=root.descendants.find(x=>x.tagName==='INPUT'&&x.type==='search');
+ search.value='Legacy bulk 999';search.dispatch('input');
+ assert.deepEqual(titles(),['Legacy bulk 999'],'filter must search all 1000, not just visible items');
+ assert.equal(JSON.stringify(state),before,'rendering and search cannot modify v21 records');
+ assert.equal(commits,0);
+ studio.destroy();
+});
