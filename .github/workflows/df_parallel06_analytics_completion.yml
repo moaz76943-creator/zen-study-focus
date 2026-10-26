@@ -1,0 +1,21 @@
+name: DF-PARALLEL06 Analytics completion truth
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/analytics_core_v21.js'
+      - 'tests/analytics_core/**'
+      - '.github/workflows/df_parallel06_analytics_completion.yml'
+  push:
+    branches: [fix/df-parallel06-analytics-completion-20261026]
+jobs:
+  analytics-truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Focused Analytics truth and CSV tests
+        run: node --test tests/analytics_core/*.test.cjs
