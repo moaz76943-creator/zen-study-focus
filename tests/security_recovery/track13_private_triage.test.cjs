@@ -89,6 +89,21 @@ test('scanner-redacted findings are context candidates only, never silently appr
   assert.ok(!r.stdout.includes('PUBLIC_COMPAT_TEST_FIXTURE_42'));
   assert.ok(!r.stdout.includes('zen_fortress_cfg_v21'));
 });
+test('unresolved findings retain bounded hashed evidence without exposing source paths or values',()=>{
+  const marker='SUPERPRIVATE-SYNTHETIC-CREDENTIAL';
+  const r=run([{RuleID:'generic-api-key',Secret:marker,File:'private/'+marker+'.env',
+    StartLine:41,Commit:'c'.repeat(40)}]);
+  assert.equal(r.status,1);
+  assert.equal(r.output.categories.unresolved,1);
+  assert.equal(r.output.unresolved_evidence.length,1);
+  assert.deepEqual(Object.keys(r.output.unresolved_evidence[0]).sort(),
+    ['commit_sha256_16','line','path_sha256_16']);
+  assert.match(r.output.unresolved_evidence[0].path_sha256_16,/^[a-f0-9]{16}$/);
+  assert.match(r.output.unresolved_evidence[0].commit_sha256_16,/^[a-f0-9]{16}$/);
+  assert.equal(r.output.unresolved_evidence[0].line,41);
+  assert.ok(!(r.stdout+r.stderr).includes(marker));
+  assert.ok(!(r.stdout+r.stderr).includes('private/'));
+});
 test('unknown rules and token-like strings never enter safe candidate categories',()=>{
   const sentinel='VERY-PRIVATE-SYNTHETIC-ACCESS-TOKEN';
   const r=run([{RuleID:'github-pat',Secret:sentinel},{RuleID:'generic-api-key',Secret:'not-a-real-commit-reference'}]);
