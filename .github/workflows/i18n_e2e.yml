@@ -102,23 +102,37 @@ jobs:
   android:
     name: Android WebView API ${{ matrix.api }}
     needs: build_apk
-    runs-on: ubuntu-24.04
-    timeout-minutes: 50
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: ${{ matrix.job_timeout }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - api: 30
+            runner: ubuntu-24.04
+            job_timeout: 50
             gpu: swiftshader_indirect
             profile: pixel_3a
             heap: 256M
+            ram: 2048M
+            emulator_build: 15004761
+            boot_timeout: 600
+            animations: true
+            emulator_options: '-no-window -no-snapshot -gpu swiftshader_indirect -feature -Vulkan -noaudio -no-boot-anim -camera-back none -memory 2048 -cores 2'
           - api: 35
-            # Exact-HEAD API35 emulator on swiftshader_indirect crashed with
-            # SIGSEGV (not OOM). Disable virtual GPU only for this API.
-            # This is an infrastructure experiment, never device PASS.
-            gpu: off
+            # A/B test against PR #287's *real launch smoke* environment, not
+            # an inferred WebView E2E PASS: ubuntu-26.04 + emulator 37.2.12.
+            # Previous 36.4.10/off/no-probe variant died by host SIGSEGV.
+            runner: ubuntu-26.04
+            job_timeout: 65
+            gpu: swiftshader_indirect
             profile: pixel_2
             heap: 512M
+            ram: 3072M
+            emulator_build: 16428233
+            boot_timeout: 1200
+            animations: false
+            emulator_options: '-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -188,20 +202,17 @@ jobs:
           DF13_GPU: ${{ matrix.gpu }}
         with:
           api-level: ${{ matrix.api }}
-          # Official Emulator archive: 36.4.10 Stable (2026-03-12).
-          # Avoid the observed 37.2.12 disconnects and implicit SDK drift.
-          emulator-build: 15004761
+          # Pin each emulator image to the *actual build ID* under test.\n          emulator-build: ${{ matrix.emulator_build }}
           arch: x86_64
           target: google_apis
           # API35 uses the Pixel 2 / 512M heap profile that completed #287's
           # process-launch smoke; full UI acceptance remains independently gated.
           profile: ${{ matrix.profile }}
           heap-size: ${{ matrix.heap }}
-          # Keep headless rendering on software GLES; the emulator logs show
-          # graphics-context failures around display resizing. No host Vulkan.
-          emulator-options: -no-window -no-snapshot -gpu ${{ matrix.gpu }} -feature -Vulkan -noaudio -no-boot-anim -camera-back none -memory 2048 -cores 2
-          disable-animations: true
-          emulator-boot-timeout: 600
+          ram-size: ${{ matrix.ram }}
+          emulator-options: ${{ matrix.emulator_options }}
+          disable-animations: ${{ matrix.animations }}
+          emulator-boot-timeout: ${{ matrix.boot_timeout }}
           script: bash tools/i18n/e2e/run_android.sh ${{ matrix.api }}
       - name: Upload per-device JSON screenshots and limited logs even on failure
         if: always()
