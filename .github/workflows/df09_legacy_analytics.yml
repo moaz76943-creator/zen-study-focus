@@ -1,0 +1,20 @@
+name: DF09 legacy20 analytics bridge
+on:
+  pull_request:
+    paths:
+      - 'android/app/src/main/assets/web/localization_20_recovery.js'
+      - 'android/app/src/main/assets/web/js/legacy20_analytics_bridge.js'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'tests/df09_legacy_analytics.test.cjs'
+permissions:
+  contents: read
+jobs:
+  analytics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Exact-source existing and new analytics translations
+        run: node --test tests/df09_legacy_analytics.test.cjs tests/analytics_core/analytics_core_v21.test.cjs
