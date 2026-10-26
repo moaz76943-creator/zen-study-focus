@@ -37,6 +37,14 @@ jobs:
           "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
       - name: Compile exact source
         run: gradle -p android :app:assembleDebug --no-daemon
+      - name: Give emulator runner KVM access
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
       - name: Launch and restart on API ${{ matrix.api }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
