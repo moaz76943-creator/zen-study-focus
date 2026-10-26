@@ -52,6 +52,11 @@ class DeviceReadinessTest(unittest.TestCase):
             device.text_input('inpNoteTitle','DF13_NOTE_123')
         tap.assert_called_once_with(field)
 
+    def test_explicit_accessible_name_overrides_stale_grouped_text(self):
+        header={'text':'EN English • English','content-desc':'AR Arabic • العربية','bounds':'[10,10][180,45]'}
+        self.assertTrue(device.has_iso_badge([header],'ar'))
+        self.assertFalse(device.has_iso_badge([header],'en'))
+
     def test_empty_iso_badge_is_not_visible(self):
         self.assertFalse(device.has_iso_badge([{'text': 'AR', 'bounds': '[0,0][0,0]'}], 'ar'))
 

@@ -143,8 +143,13 @@ def visible(nodes, needle):
                  if needle.casefold() in value(n).casefold()), None)
 
 def iso_badge(nodes, code):
-    return next((n for n in nodes if re.match(r"^" + re.escape(code.upper()) + r"(?:\s|$)", n.get("text", "").strip().upper())
+    return next((n for n in nodes if re.match(r"^" + re.escape(code.upper()) + r"(?:\s|$)", accessible_name(n).strip().upper())
                  and is_visible_node(n)), None)
+
+def accessible_name(node):
+    # An explicit Android content description is the accessible label even if
+    # an older WebView still caches the group's original child text.
+    return node.get("content-desc") or node.get("text", "")
 
 def has_record(nodes, title):
     return any(is_visible_node(n) and "EditText" not in n.get("class", "")
@@ -259,7 +264,7 @@ def screenshot(out, name):
 def language(name, iso, require_header=True):
     header = next((n for n in dump() if is_visible_node(n)
                    and n.get("clickable") == "true"
-                   and re.match(r"^[A-Z]{2,3}\s.+•", n.get("text", ""))), None)
+                   and re.match(r"^[A-Z]{2,3}\s.+•", accessible_name(n))), None)
     if header is None:
         raise AssertionError("Current language header button not exposed")
     tap_node(header)
