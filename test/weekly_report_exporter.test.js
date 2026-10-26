@@ -33,8 +33,8 @@ console.log("--- Running 🎯 Mission #043: Weekly Report Exporter Tests ---");
 
 // Security regression: preserve user backslashes before escaping Markdown table pipes.
 {
-  const input = String.raw`part\\|second`;
-  const wanted = String.raw`part\\\\\\|second`;
+  const input = String.raw`part\|second`;
+  const wanted = String.raw`part\\\|second`;
   assert.strictEqual(Exporter.escapeMarkdownCell(input),wanted,
     'Existing slash plus table pipe must not bypass Markdown delimiter escaping');
   assert.strictEqual(Exporter.escapeMarkdownCell('one\\rtwo\\nthree\\u2028four'),
