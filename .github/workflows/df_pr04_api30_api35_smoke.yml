@@ -6,6 +6,7 @@ on:
       - 'android/app/src/main/java/**'
       - 'android/app/src/main/res/**'
       - 'android/app/src/main/assets/web/app.js'
+      - 'tests/i18n/native_android/df_pr04_smoke.sh'
       - '.github/workflows/df_pr04_api30_api35_smoke.yml'
 permissions:
   contents: read
@@ -50,37 +51,4 @@ jobs:
           # fail with ADB Broken pipe before our script can verify app startup.
           # Skip that optional settings call; app smoke remains strict below.
           disable-animations: false
-          script: |
-            # android-emulator-runner executes script through /usr/bin/sh, not bash.
-            set -eu
-            adb wait-for-device
-            test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = 1
-            # API30 can temporarily lose PackageManager after boot (ADB Broken pipe).
-            # Make three bounded attempts; never report PASS without an installed APK.
-            installed=0
-            for attempt in 1 2 3; do
-              if adb install -r android/app/build/outputs/apk/debug/app-debug.apk; then
-                installed=1
-                break
-              fi
-              if [ "$attempt" -lt 3 ]; then
-                sleep 12
-                timeout 40 adb wait-for-device
-              fi
-            done
-            test "$installed" -eq 1
-            adb shell pm list packages | grep -Fx 'package:com.zenstudy.focus'
-            adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
-            sleep 6
-            adb shell pidof com.zenstudy.focus
-            adb shell input keyevent KEYCODE_HOME
-            adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
-            adb shell pidof com.zenstudy.focus
-            adb shell am force-stop com.zenstudy.focus
-            adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
-            sleep 4
-            adb shell pidof com.zenstudy.focus
-            echo "API_RUNTIME_SMOKE=PASS"
-            echo "SAF_USER_CONSENT_DEVICE_QA=NOT_TESTED"
-            echo "NOTIFICATION_GRANT_DENY_QA=NOT_TESTED"
-            echo "RELEASE_APPROVED=NO"
+          script: bash tests/i18n/native_android/df_pr04_smoke.sh

@@ -38,19 +38,19 @@ class PR04NativeSafety(unittest.TestCase):
   self.assertIn('lastNotified',receiver)
   self.assertIn('refreshLocale(Context context)',receiver)
 
- def test_api30_smoke_avoids_nonessential_adb_settings_failure(self):
+ def test_api30_smoke_runs_real_bash_file_and_avoids_unstable_animation_settings(self):
   workflow=(R/'.github/workflows/df_pr04_api30_api35_smoke.yml').read_text()
-  # Regression: run 40246699557 reached API30 boot but the emulator-runner
-  # died setting window_animation_scale (ADB Broken pipe) before app launch.
+  from subprocess import run
+  script=R/'tests/i18n/native_android/df_pr04_smoke.sh'
   self.assertIn('disable-animations: false',workflow)
   self.assertNotIn('disable-animations: true',workflow)
-  self.assertIn('set -eu',workflow)
-  self.assertIn('adb shell pidof com.zenstudy.focus',workflow)
-
- def test_api30_package_manager_transient_failure_retries_then_fails_closed(self):
-  workflow=(R/'.github/workflows/df_pr04_api30_api35_smoke.yml').read_text()
-  # Real API30 job 40294077475 returned ADB PackageManager Broken pipe.
-  self.assertIn('for attempt in 1 2 3',workflow)
-  self.assertIn('timeout 40 adb wait-for-device',workflow)
-  self.assertIn('test "$installed" -eq 1',workflow)
-  self.assertIn('adb shell pm list packages',workflow)
+  self.assertIn('script: bash tests/i18n/native_android/df_pr04_smoke.sh',workflow)
+  self.assertNotIn('script: |',workflow)
+  self.assertEqual(run(['bash','-n',str(script)],capture_output=True,text=True).returncode,0)
+  source=script.read_text()
+  self.assertIn('set -euo pipefail',source)
+  self.assertIn('for attempt in 1 2 3; do',source)
+  self.assertIn('timeout 40 adb wait-for-device',source)
+  self.assertIn('test "$installed" -eq 1',source)
+  self.assertIn('adb shell pm list packages',source)
+  self.assertIn('adb shell pidof com.zenstudy.focus',source)
