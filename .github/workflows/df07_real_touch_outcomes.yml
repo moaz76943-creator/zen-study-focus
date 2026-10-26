@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check tests/df4_browser/track04_real_touch_outcomes.cjs
-          node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs
+          node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs tests/df07/custom_timer_escape.test.cjs tests/i18n/timer/timer_safety.test.cjs
       - name: Install real Chromium test runtime
         shell: bash
         run: |
