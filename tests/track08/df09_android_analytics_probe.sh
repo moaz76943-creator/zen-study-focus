@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-E="$RUNNER_TEMP/df09-android-api${DF09_ANDROID_API}"
+E="$DF09_NATIVE_EVIDENCE"
 mkdir -p "$E"
 test -s "$E/DeepFocus-DF09-QA-only.apk"
 adb install -r "$E/DeepFocus-DF09-QA-only.apk"
