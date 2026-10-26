@@ -7,11 +7,13 @@ const FAMILIES={cfg:'cfg',tasks:'tasksList',notes:'notesList'};
 const CASE_NAMES=[...Object.keys(FAMILIES).map(k=>'mirror_recovery_'+k),
  ...['tasksList','notesList'].flatMap(k=>['duplicate','corrupt'].map(kind=>'reject_'+kind+'_'+k)),
  'native_atomicfile_partial_stage_restart_recovery','interrupted_journal_disk_and_process_recovery','real_timer_failed_credit_retry_exactly_once'];
-function walProof(adb,read,marker){
- const files=adb('shell','run-as',PKG,'find',"'app_webview/Default/Local Storage/leveldb'",'-maxdepth','1','-type','f','-name',"'*.log'")
-  .split('\n').map(s=>s.trim()).filter(s=>/^app_webview\/Default\/Local Storage\/leveldb\/[0-9]+\.log$/.test(s)).sort().slice(-8);
+function walProof(adb,read,marker,diagnostic={}){
+ const listed=adb('shell','run-as',PKG,'find','app_webview','-maxdepth','8','-type','f','-name',"'*.log'").split('\n').map(s=>s.trim());
+ const files=listed.filter(s=>/^app_webview\/(?:Default\/|Profile [0-9]+\/)?Local Storage\/leveldb\/[0-9]+\.log$/.test(s)).sort().slice(-8);
+ diagnostic.listed_log_count=listed.filter(Boolean).length;diagnostic.accepted_logs=files.length;diagnostic.files=[];
  for(const file of files){
-  let bytes;try{bytes=read(file);}catch(_){continue;} // LevelDB can rotate a WAL between listing and reading.
+  let bytes;try{bytes=read(file);}catch(_){diagnostic.files.push({file:path.basename(file),read:false});continue;} // LevelDB can rotate a WAL between listing and reading.
+  diagnostic.files.push({file:path.basename(file),bytes:bytes.length,read:true});
   for(const encoding of ['utf8','utf16le'])if(bytes.includes(Buffer.from(marker,encoding)))
    return {file:path.basename(file),sha256:crypto.createHash('sha256').update(bytes).digest('hex'),encoding,journal_marker_observed:true};
  }
@@ -96,11 +98,16 @@ function createNativeFaultCases(driver){
      nativeUnchanged:Object.keys(original).every(key=>native[key]===original[key])};
    });
    assert.equal(prepared.pending,true);assert.equal(prepared.changed,true);assert.equal(prepared.nativeUnchanged,true);
-   let proof=null;
+   // Real Android lifecycle transition requests browser storage flushing;
+   // the disk marker must still be independently observed before force-stop.
+   adb('shell','input','keyevent','KEYCODE_HOME');await pause(500);
+   let trimRequested=true;try{adb('shell','am','send-trim-memory',PKG,'HIDDEN');}catch(_){trimRequested=false;}
+   let proof=null,diagnostic={trim_requested:trimRequested};
    const read=file=>cp.execFileSync('adb',['-s','emulator-5554','exec-out','run-as',PKG,'cat',"'"+file+"'"],{timeout:20000,maxBuffer:16*1024*1024});
-   for(let i=0;i<12;i++){
-    try{proof=walProof(adb,read,prepared.marker);}catch(_){}if(proof)break;await pause(500);
+   for(let i=0;i<24;i++){
+    try{proof=walProof(adb,read,prepared.marker,diagnostic);}catch(_){diagnostic.list_failed=true;}if(proof)break;await pause(500);
    }
+   saveProof('interrupted-journal-probe-metadata',diagnostic);
    if(!proof)throw Error('TRANSPORT: pending journal not independently observed in Android LevelDB WAL');
    saveProof('interrupted-journal-disk-proof',proof); // Hash/metadata only; never upload WAL bytes.
    await restart();

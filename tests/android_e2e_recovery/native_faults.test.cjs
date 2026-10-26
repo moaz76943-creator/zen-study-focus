@@ -25,3 +25,7 @@ test('rotated WAL files cannot hide a marker in the current log',()=>{
  },'DF07_PENDING_456');
  assert.equal(proof.file,'000002.log');
 });
+test('legacy Chromium storage directories without Default are independently observable',()=>{
+ const proof=walProof(()=> 'app_webview/Local Storage/leveldb/000123.log',()=>Buffer.from('DF07_PENDING_789'),'DF07_PENDING_789');
+ assert.equal(proof?.journal_marker_observed,true);
+});

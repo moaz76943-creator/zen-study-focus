@@ -115,3 +115,15 @@ test('bootstrap failure leaves every unattempted durability case explicitly NOT_
  assert.ok(results.some(r=>r.name==='saf_actual_file_restore_ack_and_reopen'));
  assert.ok(results.some(r=>r.name==='native_ack_io_failure_rollback_restart'));
 });
+test('each completed Android case checkpoints a full report without advancing unattempted cases',async()=>{
+ const os=require('node:os'),path=require('node:path');
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'df-native-checkpoint-')),file=path.join(directory,'results.json');
+ try{
+  const ctx=context();ctx.process.argv=['node','qa',file];ctx.console={log(){}};
+  await vm.runInContext("run('saf_fixture_and_native_ack',async()=> 'source checkpoint fixture')",ctx);
+  const data=JSON.parse(fs.readFileSync(file,'utf8'));
+  assert.equal(data.results.find(row=>row.name==='saf_fixture_and_native_ack').status,'PASS');
+  assert.equal(data.results.length,24);assert.equal(data.counts.NOT_TESTED,23);
+  assert.equal(vm.runInContext('report.results.length',ctx),1);
+ }finally{if(fs.existsSync(file))fs.unlinkSync(file);if(fs.existsSync(file+'.tmp'))fs.unlinkSync(file+'.tmp');fs.rmdirSync(directory);}
+});

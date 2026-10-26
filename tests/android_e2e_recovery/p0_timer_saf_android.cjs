@@ -63,7 +63,7 @@ async function restart(){
 async function run(name,fn){
  try{const detail=await fn();report.results.push({name,status:'PASS',detail:detail||'State assertions passed on real Android emulator'});}
  catch(e){const message=String(e.message||e).slice(0,700);report.results.push({name,status:message.startsWith('TRANSPORT:')?'NOT_TESTED':'FAIL',detail:message});}
- console.log(JSON.stringify(report.results[report.results.length-1]));
+ console.log(JSON.stringify(report.results[report.results.length-1]));checkpointReport();
 }
 async function injectWriteFailure(key){
  const before=await fixture(),disk=await receipt();
@@ -362,21 +362,27 @@ async function safMain(){
   await restart();assert.deepEqual(await fixture(),baseline);assert.equal((await receipt()).valid,true);
  });
 }
-function fillUnattempted(){
+function fillUnattempted(target=report){
  // Source inventory only; assertions/fault targets still use the actual device.
  const keys=Object.values(require('../../android/app/src/main/assets/web/data_compat_v21.js').KEYS);
  const planned=['saf_fixture_and_native_ack','locale_native_ack_process_restart',
   ...keys.flatMap(key=>['failed_save_rollback_'+key,'failed_save_rollback_'+key+'_mirror']),
   'native_ack_io_failure_rollback_restart',...require('./native_faults.cjs').CASE_NAMES,'saf_picker_cancel','saf_valid_file_consent_cancel',
   'saf_corrupt_rejected','saf_oversized_rejected','saf_actual_file_restore_ack_and_reopen'];
- for(const name of planned)if(!report.results.some(row=>row.name===name))
-  report.results.push({name,status:'NOT_TESTED',detail:'Not executed; blocked by prior Android/native transport failure'});
+ for(const name of planned)if(!target.results.some(row=>row.name===name))
+  target.results.push({name,status:'NOT_TESTED',detail:'Not executed; blocked by prior Android/native transport failure'});
+}
+function checkpointReport(){
+ const data={...report,results:report.results.slice()};
+ fillUnattempted(data);
+ data.counts=Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(status=>[status,data.results.filter(row=>row.status===status).length]));
+ const file=process.argv[2]||'p0-android.json',temp=file+'.tmp';
+ fs.writeFileSync(temp,JSON.stringify(data,null,2));fs.renameSync(temp,file);
+ return data;
 }
 async function main(){await safMain();}
 main().catch(e=>report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:String(e.message||e).slice(0,700)})).finally(()=>{
  try{ws?.close();}catch(_){}for(const p of pending.values())clearTimeout(p.timer);
- fillUnattempted();
- report.counts=Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,report.results.filter(x=>x.status===s).length]));
- fs.writeFileSync(process.argv[2]||'p0-android.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
- if(!report.results.length||report.results.some(x=>x.status!=='PASS'))process.exitCode=1;
+ const complete=checkpointReport();console.log(JSON.stringify(complete,null,2));
+ if(!complete.results.length||complete.results.some(row=>row.status!=='PASS'))process.exitCode=1;
 });
