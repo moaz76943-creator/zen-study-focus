@@ -161,6 +161,7 @@ public final class TaskInstrumentation extends Instrumentation {
             JSONObject diag=js("({events:window.__df03RealClicks||[],form:!!document.querySelector('#df03TaskHost form.df-form')," +
                 "title:document.querySelector('#df03TaskHost form.df-form input[type=text]')?.value||''," +
                 "error:document.querySelector('#df03TaskHost .df-error')?.textContent||''," +
+                "hostError:document.getElementById('df03TaskHost')?.dataset.df03Error||''," +
                 "save:!!document.getElementById('df03Save')})");
             throw new AssertionError("Real Android Save did not persist single edit "+saved+" physicalEvents="+diag);
         }
@@ -211,7 +212,8 @@ public final class TaskInstrumentation extends Instrumentation {
             "overflowY:'auto',padding:'8px'});document.body.appendChild(host);" +
             "window.DeepFocusTasksStudioV21.mount(host,{locale:"+JSONObject.quote(locale)+
             ",now:()=>new Date(2026,9,26),readState:()=>JSON.parse(JSON.stringify(DF22Integration.getSnapshot()))," +
-            "commit:(before,after)=>"+(reject?"false":"DF22Integration.write(before,after)")+"});" +
+            "commit:(before,after)=>"+(reject?"false":"DF22Integration.write(before,after)")+"," +
+            "onError:(e)=>{host.dataset.df03Error=String(e?.message||e);}});" +
             "const section=host.querySelector('.df-tasks'),content=section?.children[1]," +
             "results=content?.querySelector('#df-task-results');" +
             "if(content&&results){for(const child of content.children)child.style.display=child===results?'':'none';}" +
