@@ -30,3 +30,20 @@ test('DocumentsUI grid selection uses visible List view before opening the exact
  await vm.runInContext("openDocument('p0-saf-restore.txt','ZEN21::test')",ctx);
  assert.equal(vm.runInContext('state',ctx),'app');
 });
+test('configured persistent probe supplies native XML without one-shot UiAutomation',()=>{
+ const ctx=context();
+ ctx.process.env.DF13_UI_PORT='38383';
+ const calls=[];
+ ctx.probeExec=(cmd,args)=>{calls.push([cmd,args]);return JSON.stringify({xml:'<hierarchy><node package="com.google.android.documentsui"/></hierarchy>'});};
+ vm.runInContext('cp.execFileSync=probeExec',ctx);
+ assert.match(vm.runInContext('dumpUI()',ctx),/documentsui/);
+ assert.equal(calls.length,1);
+ assert.equal(calls[0][0],'python3');
+});
+test('broken configured probe fails closed without a one-shot fallback',()=>{
+ const ctx=context();ctx.process.env.DF13_UI_PORT='38383';
+ const calls=[];ctx.probeExec=(cmd)=>{calls.push(cmd);return '{"error":"root unavailable"}';};
+ vm.runInContext('cp.execFileSync=probeExec',ctx);
+ assert.throws(()=>vm.runInContext('dumpUI()',ctx),/TRANSPORT:/);
+ assert.deepEqual(calls,['python3']);
+});

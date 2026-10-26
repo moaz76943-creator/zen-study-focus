@@ -87,7 +87,18 @@ function saveSafPickerEvidence(label,xml){
  try{const shot=cp.execFileSync('adb',['-s','emulator-5554','exec-out','screencap','-p'],{timeout:20000});fs.writeFileSync(require('node:path').join(dir,'saf-'+key+'.png'),shot);}catch(_){}
 }
 
-function dumpUI(){adb('shell','uiautomator','dump','/sdcard/df02_saf.xml');return adb('shell','cat','/sdcard/df02_saf.xml');}
+function dumpUI(){
+ if(process.env.DF13_UI_PORT){
+  try{
+   const port=Number(process.env.DF13_UI_PORT);
+   if(!Number.isInteger(port)||port<1024||port>65535)throw Error('invalid local probe port');
+   const response=JSON.parse(cp.execFileSync('python3',['tests/android_e2e_recovery/native_ui_dump.py',String(port)],{encoding:'utf8',timeout:20000}));
+   if(typeof response.xml!=='string'||!response.xml.includes('<hierarchy'))throw Error('native hierarchy unavailable');
+   return response.xml;
+  }catch(_){throw Error('TRANSPORT: persistent native accessibility probe unavailable');}
+ }
+ adb('shell','uiautomator','dump','/sdcard/df02_saf.xml');return adb('shell','cat','/sdcard/df02_saf.xml');
+}
 function tapUI(node){
  const m=node?.match(/bounds="([^"]+)"/),v=m?[...m[1].matchAll(/[0-9]+/g)].map(x=>Number(x[0])):[];
  if(v.length!==4||v[2]<=v[0]||v[3]<=v[1])throw Error('TRANSPORT: Native picker control bounds missing');
