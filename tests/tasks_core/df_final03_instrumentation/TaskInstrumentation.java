@@ -211,8 +211,12 @@ public final class TaskInstrumentation extends Instrumentation {
             "Object.assign(host.style,{position:'fixed',inset:'0',zIndex:'2147483647',background:'#fff'," +
             "overflowY:'auto',padding:'8px'});document.body.appendChild(host);" +
             "window.DeepFocusTasksStudioV21.mount(host,{locale:"+JSONObject.quote(locale)+
-            ",now:()=>new Date(2026,9,26),readState:()=>JSON.parse(JSON.stringify(DF22Integration.getSnapshot()))," +
-            "commit:(before,after)=>"+(reject?"false":"DF22Integration.write(before,after)")+"," +
+            ",now:()=>new Date(2026,9,26),readState:()=>{const s=DF22Integration.getSnapshot();return {cfg:s.cfg,tasksList:s.tasksList};}," +
+            "commit:(before,after)=>"+(reject?"false":"(()=>{const active=DF22Integration.getSnapshot();" +
+                "if(JSON.stringify(before.cfg)!==JSON.stringify(active.cfg)||" +
+                "JSON.stringify(before.tasksList)!==JSON.stringify(active.tasksList))" +
+                "throw new Error('Timer or tasks changed while task editor was open');" +
+                "return DF22Integration.write(active,{...active,cfg:after.cfg,tasksList:after.tasksList});})()")+"," +
             "onError:(e)=>{host.dataset.df03Error=String(e?.message||e);}});" +
             "const section=host.querySelector('.df-tasks'),content=section?.children[1]," +
             "results=content?.querySelector('#df-task-results');" +
