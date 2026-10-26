@@ -49,3 +49,13 @@ test('native dialog QA reuses pre-existing persistent Accessibility probe; no JS
  assert.match(source,/REAL_NATIVE_DIALOG_NOT_PROVEN/);
  assert.doesNotMatch(source,/window\.(confirm|alert|prompt)\s*=/);
 });
+
+test('actual Accessibility XML numeric entities decode to exact Arabic prompt text before validation',()=>{
+ const vm=require('node:vm');
+ const src=fs.readFileSync(path.join(__dirname,'native_js_dialog_android_probe.cjs'),'utf8');
+ const a=src.indexOf('function decodeNativeXmlEntities('),b=src.indexOf('async function nativeHierarchy()',a);
+ assert.ok(a>=0&&b>a);
+ const actual=vm.runInNewContext(src.slice(a,b)+'\ndecodeNativeXmlEntities("&#1606;&#1589;");');
+ assert.equal(actual,'نص');
+ assert.match(src,/xml\.includes\('نص للاختبار'\)/);
+});
