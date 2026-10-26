@@ -43,8 +43,7 @@ readonly_adb_installed_path(){
 readonly_adb_pull_installed_apk(){
   local attempt
   for attempt in 1 2 3; do
-    if timeout 60s adb pull "$installed_path" "$report/installed-base.apk" >&2; then
-      test -s "$report/installed-base.apk"
+    if timeout 60s adb pull "$installed_path" "$report/installed-base.apk" >&2 && test -s "$report/installed-base.apk"; then
       return 0
     fi
     rm -f "$report/installed-base.apk"
