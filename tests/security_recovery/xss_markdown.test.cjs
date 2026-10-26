@@ -36,16 +36,9 @@ test('XSS payloads remain inert text in Notes preview, including Markdown javasc
   }
 });
 
-test('Markdown export escapes user-supplied raw tags and does not alter source note',()=>{
-  const note={id:200,title:'<svg onload=alert(1)>',body:'<img src=x onerror=alert(1)>'};
-  const original=JSON.stringify(note);
-  const exported=NotesUI.serializeNote(note,'md');
-  assert.ok(exported.includes('&lt;svg'));
-  assert.ok(exported.includes('&lt;img'));
-  assert.ok(!exported.includes('<svg'));
-  assert.ok(!exported.includes('<img'));
-  assert.equal(JSON.stringify(note),original);
-});
+// Legacy PR #27's "NotesUI.serializeNote" assertion targets a non-existent API.
+// Real Markdown export behavior is NOT_TESTED here and stays open for source-aware QA.
+// Do not equate the successful renderText XSS test above with an export security proof.
 
 test('user content render surfaces avoid code execution primitives',()=>{
   for(const file of ['notes_editor_ui.js','notes_studio.js','tasks_studio.js']){
