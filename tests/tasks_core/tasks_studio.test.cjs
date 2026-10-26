@@ -404,3 +404,12 @@ test('DF-FINAL-03 #36: 320px mobile layout is RTL-safe and omits empty top-three
  assert.equal(writes,0);
  studio.destroy();
 });
+
+
+test('DF-FINAL-03: real Android task-card actions offer 44px minimum touch targets',()=>{
+ const f=fixture();
+ const style=f.root.descendants.find(x=>x.tagName==='STYLE').textContent;
+ assert.match(style,/\.df-tasks \.df-actions \.df-btn\{min-height:44px;/,
+  'Legacy 34px action buttons are unsafe on narrow Android WebView');
+ f.studio.destroy();
+});
