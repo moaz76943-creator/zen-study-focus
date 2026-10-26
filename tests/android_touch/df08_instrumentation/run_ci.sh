@@ -33,7 +33,7 @@ for width in 320 360 393 430; do
   adb shell pm clear com.zenstudy.focus >/dev/null
   adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
   output="$out/actual-touch-${width}.txt"
-  timeout 160s adb shell am instrument -w -r \
+  timeout 160s adb shell am instrument -w -r -e stage save -e width "$width" \
     com.zenstudy.focus.test/com.zenstudy.focus.df08.TouchInstrumentation \
     > "$output" 2>&1 || {
       echo "ANDROID_INSTRUMENTATION_COMMAND_FAIL width=$width"; cat "$output"; exit 1;
@@ -49,7 +49,19 @@ for width in 320 360 393 430; do
     cat "$output"
     exit 1
   fi
+  # New process and real app force-stop: verify both v21 Notes copies.
+  adb shell am force-stop com.zenstudy.focus
+  reopen="$out/reopen-${width}.txt"
+  timeout 160s adb shell am instrument -w -r -e stage verify -e width "$width" \
+    com.zenstudy.focus.test/com.zenstudy.focus.df08.TouchInstrumentation \
+    > "$reopen" 2>&1 || {
+      echo "ANDROID_NOTES_REOPEN_COMMAND_FAIL api=$api width=$width"; cat "$reopen"; exit 1;
+    }
+  if ! grep -q 'INSTRUMENTATION_RESULT: df08_status=PASS' "$reopen" ||
+     ! grep -q 'INSTRUMENTATION_RESULT: df08_reopen=PASS' "$reopen"; then
+    echo "ANDROID_NOTES_REOPEN_NOT_PASS api=$api width=$width"; cat "$reopen"; exit 1
+  fi
   timeout 40s adb exec-out screencap -p > "$out/after-${width}.png" || true
   echo "ANDROID_REAL_TOUCH_PASS api=$api width=$width"
 done
-printf 'PASSED actual instrumented WebView navigation, IME, Notes Save at four widths; API=%s\n' "$api" > "$out/summary.txt"
+printf 'PASSED actual instrumented WebView navigation, IME, Notes Save plus force-stop/reopen at four widths; API=%s\n' "$api" > "$out/summary.txt"
