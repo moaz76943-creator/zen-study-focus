@@ -6,7 +6,7 @@ const Locales=require('../../android/app/src/main/assets/web/completion_alert_lo
 class Element{
  constructor(doc,tag){this.ownerDocument=doc;this.tagName=tag.toUpperCase();this.className='';this.children=[];this.attributes={};this.listeners={};this.value='';this.checked=false;this.style={};this.textContent='';this.parentNode=null;}
  appendChild(x){this.children.push(x);x.parentNode=this;return x;}
- replaceChildren(...xs){this.children=[];xs.forEach(x=>this.appendChild(x));}
+ replaceChildren(...xs){for(const old of this.children)old.parentNode=null;this.children=[];xs.forEach(x=>this.appendChild(x));}
  setAttribute(k,v){this.attributes[k]=String(v);}
  addEventListener(k,fn){(this.listeners[k]||=[]).push(fn);}
  fire(k){for(const fn of this.listeners[k]||[])fn({target:this,preventDefault(){}});}
@@ -27,7 +27,7 @@ function mount(locale='ar',willSave=true){
  };
  const ui=Alerts.mountCompletionAlertPicker(host,engine,{locale,
   translate:(key,fallback)=>Locales.translate(locale,key)||fallback});
- return {host,ui,get:()=>({...settings}),saves:()=>saves,previews,pauses:()=>pauses};
+ return {host,ui,engine,get:()=>({...settings}),saves:()=>saves,previews,pauses:()=>pauses};
 }
 const cls=(n,s)=>n.className.split(/\s+/).includes(s);
 test('Arabic completion picker is RTL, styled, with 5 independent preview controls',()=>{
@@ -77,4 +77,16 @@ test('LTR picker uses localized English without moving radio/preview off-screen 
  const a=mount('en');
  assert.equal(a.host.find(n=>cls(n,'completion-alert-picker')).attributes.dir,'ltr');
  assert.ok(a.host.find(n=>n.tagName==='H3'&&n.textContent==='Completion sound'));
+});
+
+
+test('stale picker unmount must not silence a newer picker after a re-render',()=>{
+ const a=mount('en');
+ const newer=Alerts.mountCompletionAlertPicker(a.host,a.engine,{locale:'en'});
+ a.ui.unmount();
+ assert.equal(a.pauses(),0,'Obsolete unmount must not pause audio belonging to the new picker');
+ assert.ok(a.host.find(n=>cls(n,'completion-alert-picker')),'Current picker must remain mounted');
+ newer.unmount();
+ assert.equal(a.pauses(),1,'Un-mounting current picker must still stop its preview');
+ assert.equal(a.host.children.length,0);
 });
