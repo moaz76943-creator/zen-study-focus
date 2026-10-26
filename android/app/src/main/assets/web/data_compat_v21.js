@@ -163,7 +163,14 @@
       if (!plain(bundle) || bundle.v !== 21) throw new Error('Unsupported backup version');
       const snapshot = {cfg:bundle.cfg, tasksList:bundle.tasksList, notesList:bundle.notesList};
       const report = inspectRecords(snapshot);
-      return {ok:report.ok, snapshot:report.ok ? jsonCopy(snapshot) : null, issues:report.issues};
+      // Reading existing v21 data preserves duplicate IDs as warnings.
+      // Importing a new external backup must reject ambiguous IDs before activation.
+      const importErrors = report.issues
+        .filter(x => x.code === 'DUPLICATE_ID')
+        .map(x => issue('error', 'DUPLICATE_IMPORT_ID', x.path, 'Ambiguous imported record ID'));
+      const accepted = report.ok && importErrors.length === 0;
+      return {ok:accepted, snapshot:accepted ? jsonCopy(snapshot) : null,
+        issues:[...report.issues, ...importErrors]};
     } catch (e) {return {ok:false,snapshot:null,issues:[issue('error','INVALID_BACKUP','backup',e.message)]};}
   }
 
