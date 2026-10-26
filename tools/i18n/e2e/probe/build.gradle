@@ -1,0 +1,12 @@
+plugins { id 'com.android.application' version '8.10.1' }
+android {
+    namespace 'com.zenstudy.focus.e2e'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'com.zenstudy.focus.e2e'
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName '1'
+    }
+}

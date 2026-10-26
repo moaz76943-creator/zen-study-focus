@@ -13,11 +13,17 @@ APK="$BUILD/app-debug.apk"
 mkdir -p "$OUT"
 printf '%s\n' "$(git rev-parse HEAD)" > "$OUT/SOURCE_SHA.txt"
 RUNNER_STARTED=0
+PROBE_PID=""
 
 finalize() {
   local code=$?
   trap - EXIT
   printf '%s\n' "$code" > "$OUT/RUNNER_EXIT_CODE.txt"
+  if [[ -n "$PROBE_PID" ]]; then
+    timeout 10s adb shell am force-stop com.zenstudy.focus.e2e || true
+    kill "$PROBE_PID" 2>/dev/null || true
+    adb forward --remove tcp:38383 || true
+  fi
   # Only AndroidRuntime errors: avoid uploading full device logs or potentially sensitive data.
   timeout 20s adb logcat -d -t 250 'AndroidRuntime:E' '*:S' 2>/dev/null |
     sed -E 's/(token|password|authorization|secret)=[^ ]+/\1=[REDACTED]/Ig' \
@@ -65,6 +71,31 @@ timeout 30s adb wait-for-device
 test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = 1
 timeout 120s adb install -r "$APK" | tee "$OUT/ADB_INSTALL.txt"
 test -n "$(adb shell pm path com.zenstudy.focus | grep '^package:')"
+# Keep UIAutomation connected across reads and taps. One-shot `uiautomator
+# dump` tears down accessibility and repeatedly loses WebView virtual children.
+test "$(sha256sum "$BUILD/accessibility-probe.apk" | awk '{print $1}')" = "$(cat "$BUILD/PROBE_SHA256.txt")"
+cp "$BUILD/PROBE_SHA256.txt" "$OUT/PROBE_SHA256.txt"
+timeout 60s adb install -r -t "$BUILD/accessibility-probe.apk"
+adb forward tcp:38383 localabstract:df13-accessibility
+adb shell am instrument -w com.zenstudy.focus.e2e/.AccessibilityProbe > "$OUT/PROBE_INSTRUMENTATION.txt" 2>&1 &
+PROBE_PID=$!
+export DF13_UI_PORT=38383
+python3 - <<'PY'
+import socket, time
+for attempt in range(60):
+    try:
+        with socket.create_connection(('127.0.0.1', 38383), timeout=2) as connection:
+            # A forwarded TCP connection can open before the device socket is
+            # listening. Require a real reply from instrumentation, not connect.
+            connection.sendall(b'PING\n')
+            if connection.recv(1024):
+                break
+    except OSError:
+        pass
+    time.sleep(1)
+else:
+    raise SystemExit('Persistent accessibility instrumentation failed to start')
+PY
 RUNNER_STARTED=1
 set +e
 DF13_EVIDENCE_DIR="$OUT" timeout --signal=TERM --kill-after=15s 22m python3 -u tools/i18n/e2e/android_device.py \

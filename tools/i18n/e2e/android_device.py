@@ -9,6 +9,7 @@ import argparse
 import json
 import os
 import re
+import socket
 import subprocess
 import sys
 import time
@@ -39,6 +40,8 @@ def dump():
     activity startup despite a successful adb install and activity launch.
     Never convert missing XML into a successful UI assertion.
     """
+    if os.getenv("DF13_UI_PORT"):
+        return persistent_dump()
     diagnostics = []
     for attempt in range(1, 5):
         exported = subprocess.run(
@@ -87,6 +90,32 @@ def dump():
             json.dumps(diagnostics, ensure_ascii=False, indent=2) + "\n")
     raise AssertionError("UIAutomator did not expose a complete accessibility hierarchy "
                          "after four attempts; probe evidence captured")
+
+def persistent_dump():
+    """Use the test-only instrumentation's long-lived real UIAutomation session."""
+    diagnostics = []
+    for attempt in range(4):
+        with socket.create_connection(("127.0.0.1", int(os.environ["DF13_UI_PORT"])), timeout=45) as connection:
+            connection.sendall(b"DUMP\n")
+            with connection.makefile("rb") as stream:
+                line = stream.readline(8 * 1024 * 1024)
+        response = json.loads(line)
+        if response.get("error"):
+            raise AssertionError("Persistent UIAutomation: " + response["error"])
+        raw = response["xml"]
+        root = ET.fromstring(raw)
+        dest = os.getenv("DF13_EVIDENCE_DIR")
+        if dest:
+            Path(dest).mkdir(parents=True, exist_ok=True)
+            (Path(dest) / "LAST_UI.xml").write_text(raw)
+        nodes = list(root.iter("node"))
+        if any(is_visible_node(n) and (n.get("text") or n.get("content-desc")) for n in nodes):
+            return nodes
+        diagnostics.append({"attempt": attempt + 1, "node_count": len(nodes)})
+        time.sleep(1)
+    if dest:
+        (Path(dest) / "UIAUTOMATOR_PROBE.json").write_text(json.dumps(diagnostics, indent=2) + "\n")
+    raise AssertionError("Persistent UIAutomation exposed no visible content after four attempts")
 
 def value(node):
     return " ".join(node.get(k, "") for k in ("text", "content-desc", "hint", "resource-id"))

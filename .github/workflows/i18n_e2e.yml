@@ -95,6 +95,13 @@ jobs:
           printf '%s\n' "$PKG" > ../artifacts/i18n-e2e/build/PACKAGE_ID.txt
           sha256sum ../artifacts/i18n-e2e/build/app-debug.apk | awk '{print $1}' > ../artifacts/i18n-e2e/build/APK_SHA256.txt
           test "$(wc -c < ../artifacts/i18n-e2e/build/APK_SHA256.txt)" -eq 65
+      - name: Build separate test-only persistent accessibility probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle -p tools/i18n/e2e/probe assembleDebug --no-daemon --stacktrace
+          cp tools/i18n/e2e/probe/build/outputs/apk/debug/*-debug.apk artifacts/i18n-e2e/build/accessibility-probe.apk
+          sha256sum artifacts/i18n-e2e/build/accessibility-probe.apk | awk '{print $1}' > artifacts/i18n-e2e/build/PROBE_SHA256.txt
       - name: Upload one APK with provenance
         uses: actions/upload-artifact@v4
         with:
