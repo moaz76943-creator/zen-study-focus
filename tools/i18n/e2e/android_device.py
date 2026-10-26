@@ -229,6 +229,7 @@ def text_input(index, value):
         if target is None:
             hints = {"inpNoteTitle":("Title or question", "Title"),
                      "inpNoteBody":("Write here", "Content"),
+                     "inpSearchNotes":("Search notes",),
                      "inpLangCountrySearch":("Search language or country",)}
             for hint in hints.get(index, ()):
                 target = visible(items, hint)
@@ -465,13 +466,14 @@ def run(out, source_sha, api):
             text_input("inpNoteTitle","DF13_NOTE_123")
             text_input("inpNoteBody","DF13_BODY_123")
             click("Save", scroll=True)
-            if not has_visible(dump(),"DF13_NOTE_123"):
-                raise AssertionError("Saved note not present")
+            reveal(lambda nodes: has_record(nodes,"DF13_NOTE_123")
+                   and has_record(nodes,"DF13_BODY_123"))
             restart()
             click("Notes")
-            if not has_visible(dump(),"DF13_NOTE_123"):
-                raise AssertionError("Saved note disappeared on restart")
-            return "Note persisted through process restart"
+            text_input("inpSearchNotes","DF13_NOTE_123")
+            reveal(lambda nodes: has_record(nodes,"DF13_NOTE_123")
+                   and has_record(nodes,"DF13_BODY_123"))
+            return "Non-editable note title/body persisted through restart and actual search"
         record(results,"note_create_restore",note,checkpoint)
 
         def switch():
