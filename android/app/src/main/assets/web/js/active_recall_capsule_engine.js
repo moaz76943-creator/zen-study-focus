@@ -72,7 +72,8 @@
     }) : [];
 
     var count = points.length;
-    var durationSec = Math.max(1, Math.min(60, parseInt(responseSeconds, 10) || 60));
+    var parsedSeconds = parseInt(responseSeconds, 10);
+    var durationSec = isNaN(parsedSeconds) ? 60 : Math.max(1, Math.min(60, parsedSeconds));
 
     var level = 'fluency_effortful';
     var flagForReview = true;
