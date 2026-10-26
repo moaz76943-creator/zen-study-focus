@@ -13,7 +13,9 @@ permissions:
 
 concurrency:
   group: df13-e2e-${{ github.ref }}
-  cancel-in-progress: true
+  # Finish the currently running immutable-SHA Android job; queue the latest PR update.
+  # Avoid cancelling every API30/API35 run during concurrent lane updates.
+  cancel-in-progress: false
 
 jobs:
   harness:

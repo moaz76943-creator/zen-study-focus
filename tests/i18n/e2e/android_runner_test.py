@@ -36,5 +36,11 @@ class AndroidReportingTest(unittest.TestCase):
         self.assertIsNotNone(visible(nodes,"Tasks"))
         self.assertIsNone(visible(nodes,"Add study, workout"))
 
+    def test_concurrent_push_does_not_cancel_android_runtime(self):
+        workflow = (Path(__file__).resolve().parents[3] / ".github/workflows/i18n_e2e.yml").read_text()
+        self.assertIn("group: df13-e2e-${{ github.ref }}", workflow)
+        self.assertIn("cancel-in-progress: false", workflow)
+        self.assertNotIn("cancel-in-progress: true", workflow)
+
 if __name__=="__main__":
     unittest.main()
