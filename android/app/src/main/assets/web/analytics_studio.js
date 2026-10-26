@@ -201,6 +201,14 @@
     const historicalGoals=mk('section',undefined,'dfa-historical-goals');
     [insightKpis,comparison,activityRing,historicalGoals].forEach(e=>wrapper.appendChild(e));
     function displayRows(rows,label){
+      // Render user-authored task titles as text only, without changing digits
+      // or injecting their HTML into the analytics document.
+      const live=provider();
+      const taskTitles=new Map();
+      for(const task of (Array.isArray(live?.tasksList)?live.tasksList:[])){
+        if(!task||!Number.isSafeInteger(task.id)||task.id<0)continue;
+        taskTitles.set(task.id,taskTitles.has(task.id)?null:task.title);
+      }
       detail.replaceChildren(mk('h3',label));
       if(!rows.length){detail.appendChild(mk('p',t.noData));return;}
       const table=mk('table');table.style.cssText='width:100%;border-collapse:collapse';
@@ -216,7 +224,9 @@
         const cell=mk('td');
         if(Number.isSafeInteger(item.taskId)&&item.taskId>=0){
           if(typeof opts.onOpenTask==='function'){
-            const button=mk('button',String(item.taskId));button.type='button';
+            const title=taskTitles.get(item.taskId);
+            const button=mk('button',typeof title==='string'&&title.trim()?title:String(item.taskId));
+            button.type='button';
             button.setAttribute('data-task-id',String(item.taskId));
             button.addEventListener('click',()=>{
               const snapshot=provider();
