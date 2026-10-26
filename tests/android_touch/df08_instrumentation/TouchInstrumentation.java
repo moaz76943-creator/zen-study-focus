@@ -30,9 +30,11 @@ public final class TouchInstrumentation extends Instrumentation {
     private WebView view;
     private int actualTaps = 0;
     private String lastTapDiagnostics = "none";
+    private Bundle testArguments;
 
     @Override public void onCreate(Bundle arguments) {
         super.onCreate(arguments);
+        testArguments = arguments;
         start();
     }
 
@@ -66,6 +68,40 @@ public final class TouchInstrumentation extends Instrumentation {
                 SystemClock.sleep(400);
             }
             assertTrue(ready, "WebView app bootstrap NOT verified");
+            // Reopen in a new Android instrumentation process after real am force-stop.
+            // The scenario's title depends on a controlled viewport, not wall-clock time.
+            final String width = testArguments == null ? "unknown" : testArguments.getString("width", "unknown");
+            final String noteTitle = "DF08 Instrumented " + width;
+            final String stage = testArguments == null ? "save" : testArguments.getString("stage", "save");
+            if ("verify".equals(stage)) {
+                JSONObject restored = null;
+                boolean found = false;
+                for (int attempt = 0; attempt < 24; attempt++) {
+                    restored = js("(()=>{const D=window.DeepFocusDataCompatV21,k=D?.KEYS?.notes;" +
+                        "const p=k?localStorage.getItem(k):null,m=k?localStorage.getItem(k+'_mirror'):null;" +
+                        "const packet=p&&D?D.inspectPacket(p):{ok:false};" +
+                        "const live=(typeof notesList==='undefined'?[]:notesList).filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
+                        "const stored=(packet.ok&&Array.isArray(packet.value)?packet.value:[]).filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
+                        "return {matches:live.length,liveBody:live[0]?.body||'',storedMatches:stored.length," +
+                        "storedBody:stored[0]?.body||'',mirrorOk:!!p&&p===m&&packet.ok};})()");
+                    found = restored.optInt("matches") == 1 &&
+                        restored.optInt("storedMatches") == 1 &&
+                        restored.optBoolean("mirrorOk") &&
+                        "Persisted note 2026".equals(restored.optString("liveBody")) &&
+                        "Persisted note 2026".equals(restored.optString("storedBody"));
+                    if (found) break;
+                    SystemClock.sleep(250);
+                }
+                assertTrue(found, "Force-stop/relaunch Notes mirror and rendered state FAILED: " + restored);
+                result.putString("df08_status", "PASS");
+                result.putString("df08_reopen", "PASS");
+                result.putString("df08_stage", "verify");
+                Log.i(TAG, "DF08_NOTES_REOPEN_PASS width=" + width);
+                finish(Activity.RESULT_OK, result);
+                return;
+            }
+            assertTrue("save".equals(stage), "Unknown isolated test stage " + stage);
+
             JSONObject viewport=js("({cssWidth:visualViewport.width,dpr:devicePixelRatio})");
             AtomicReference<Integer> nativeWidth=new AtomicReference<>(0);
             runOnMainSync(() -> nativeWidth.set(view.getWidth()));
@@ -112,7 +148,7 @@ public final class TouchInstrumentation extends Instrumentation {
                 SystemClock.sleep(250);
             }
             assertTrue(imeShown, "Actual Android soft keyboard NOT visible after body tap");
-            String noteTitle = "DF08 Instrumented "+System.currentTimeMillis();
+            // Stable note title allows a separate process to verify this exact saved record.
             JSONObject draft = js("(()=>{" +
                 "const t=document.getElementById('inpNoteTitle'),b=document.getElementById('inpNoteBody');" +
                 "t.value="+JSONObject.quote(noteTitle)+";b.value='Persisted note 2026';" +
