@@ -105,7 +105,14 @@
           const id=adapter.nextNumericId();
           if(!validId(id))throw new Error('New note requires a numeric v21 ID');
           next=core.createNote(before.notesList,{id,...patch,isStarter:false,notesV21:ext},{now:stamp});
-        }else next=core.edit(before.notesList,d.id,patch,{now:stamp,extension:ext});
+        }else {
+          // The comparison occurs INSIDE the durable commit's fresh read/transform.
+          // Reject external edits to any field, even when updatedAt is unchanged.
+          if(d.expectedSnapshot!==undefined &&
+             JSON.stringify(one(d.id,before.notesList))!==d.expectedSnapshot)
+            throw new Error('NOTE_CONFLICT_RELOAD_REQUIRED');
+          next=core.edit(before.notesList,d.id,patch,{now:stamp,extension:ext});
+        }
         return {...before,notesList:next};
       });
     }
@@ -167,7 +174,15 @@
       },'both');
     }
     function recall(id){const s=read();return core.recallCards(one(id,s.notesList));}
-    function query(options){return core.search(read().notesList,options);}
+    function query(options={}){
+      const notes=read().notesList;
+      if(options.category && options.category!=='all'){
+        if(!['cornell','flash','quick'].includes(options.category))
+          throw new Error('INVALID_CATEGORY');
+        return core.search(notes.filter(n=>n&&n.catKey===options.category),options);
+      }
+      return core.search(notes,options);
+    }
     return Object.freeze({read,one,save,toggle,duplicate,move,purge,history,link,linkTask,extract,recall,query});
   }
   function el(tag,cls,label){
@@ -410,6 +425,8 @@
     if(!instance)return;
     refreshLocalization();
     const n=note||{},ext=n.notesV21||{},f=instance.fields;
+    // Track the entire opened record, not just updatedAt or visible inputs.
+    instance.openedSnapshot=note?JSON.stringify(note):null;
     f.cues.value=ext.cornell?.cues||'';f.notes.value=ext.cornell?.notes||'';
     f.summary.value=ext.cornell?.summary||'';f.tags.value=(ext.tags||[]).join(', ');
     f.notebook.value=ext.notebookId||'';createPairs(instance.pairList,ext.recallPairs||[]);
@@ -424,7 +441,8 @@
     if(!instance)return {};
     const f=instance.fields;
     return {cornell:{cues:f.cues.value,notes:f.notes.value,summary:f.summary.value},
-      notebookId:f.notebook.value,tags:f.tags.value,recallPairs:collectPairs(true)};
+      notebookId:f.notebook.value,tags:f.tags.value,recallPairs:collectPairs(true),
+      baseFingerprint:instance.openedSnapshot};
   }
   function restoreDraftFields(d){
     if(!instance||!d)return;
@@ -445,6 +463,7 @@
       catKey:cat,calDate:document.getElementById('inpNoteCalDate').value,
       pinned:document.getElementById('nsPinCheck').checked,favorite:document.getElementById('nsFavCheck').checked,
       blur:document.getElementById('chkNoteBlur').checked,notebookId:f.notebook.value,
+      expectedSnapshot:instance.openedSnapshot,
       tags:parseTags(f.tags.value),recallPairs:pairs};
     // Never guess Cornell structure for a legacy note. Only authored fields are persisted.
     if(cat==='cornell')result.cornell={cues:f.cues.value,notes:f.notes.value,summary:f.summary.value};
@@ -487,14 +506,12 @@
       pinnedOnly:document.getElementById('nsPinnedOnly')?.getAttribute('aria-pressed')==='true'};
     const bk=document.getElementById('nsux-book-filter').value,tag=document.getElementById('nsux-tag-filter').value;
     if(bk)filters.notebookId=bk;if(tag)filters.tags=[tag];
-    if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all'&&noteTagFilter)filters.kind=undefined;
+    if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all'&&noteTagFilter)filters.category=noteTagFilter;
     const signature=JSON.stringify(filters);
     if(signature!==instance.filterSignature){instance.filterSignature=signature;instance.page=0;}
     const offset=(instance.page||0)*100;
-    let result=instance.controller.query({...filters,offset,limit:100});
-    let found=result.items;
-    if(typeof noteTagFilter!=='undefined'&&noteTagFilter!=='all')
-      found=found.filter(n=>n.catKey===noteTagFilter);
+    const result=instance.controller.query({...filters,offset,limit:100});
+    const found=result.items;
     const all=instance.controller.read().notesList.filter(n=>n&&!n.isStarter&&!n.notesV21?.deletedAt);
     const total=document.getElementById('nsTotal'),pinned=document.getElementById('nsPinned'),count=document.getElementById('nsVisibleCount');
     if(total)total.textContent=String(all.length);
@@ -619,5 +636,6 @@
     showType();
   }
   return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,findOccurrences,renderText,
-    install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader,translate});
+    install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader,translate,
+    openedFingerprint:()=>instance?.openedSnapshot??null});
 });

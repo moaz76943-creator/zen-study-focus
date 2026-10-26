@@ -381,7 +381,7 @@
     .analytics-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     .an-kpi-card {
       background: var(--card-pure); border-radius: 20px; padding: 14px 16px;
-      box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8); cursor: pointer;
+      box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8);
     }
     .an-kpi-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.73rem; font-weight: 700; color: var(--text-muted); }
     .an-kpi-num { font-size: 1.55rem; font-weight: 600; color: var(--text-main); margin: 4px 0; }
@@ -1011,12 +1011,12 @@
            ====================================================== -->
       <main class="screen-section" id="sec-analytics">
         <div class="analytics-kpi-grid">
-          <div class="an-kpi-card" onclick="addQuickSessionRecord()">
+          <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiMinutes">Active Minutes</span><span>🕒</span></div>
             <div class="an-kpi-num" id="kpiTotalMins">0</div>
             <div class="an-kpi-trend" id="kpiWeeklyTrend">Based on recorded focus sessions</div>
           </div>
-          <div class="an-kpi-card" onclick="addQuickSessionRecord()">
+          <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiSessions">Completed Sessions</span><span>🎯</span></div>
             <div class="an-kpi-num" id="kpiTotalSessions">0</div>
             <div class="an-kpi-trend" id="kpiSessionTrend">Completed focus sessions only</div>

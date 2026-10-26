@@ -2002,8 +2002,16 @@ function validateImportedBackup(raw) {
   if (!raw.cfg || typeof raw.cfg !== 'object' || Array.isArray(raw.cfg)) return null;
   if (!Array.isArray(raw.tasksList) || !Array.isArray(raw.notesList)) return null;
   if (raw.tasksList.length > 10000 || raw.notesList.length > 10000) return null;
-  const safeRecordId = id => /^\d{1,16}$/.test(String(id))
-    && Number.isSafeInteger(Number(id));
+  // New imports must use the original numeric v21 ID type, never string coercion.
+  const safeRecordId = id => typeof id === 'number' && Number.isSafeInteger(id) && id >= 0;
+  const uniqueRecordIds = records => {
+    const seen = new Set();
+    return records.every(record => {
+      if (seen.has(record.id)) return false;
+      seen.add(record.id);
+      return true;
+    });
+  };
   const okTask = x => x && typeof x === 'object' && !Array.isArray(x)
     && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
@@ -2012,7 +2020,8 @@ function validateImportedBackup(raw) {
     && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
     && typeof x.body === 'string' && x.body.length <= 500000;
-  if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)) return null;
+  if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)
+      || !uniqueRecordIds(raw.tasksList) || !uniqueRecordIds(raw.notesList)) return null;
   const candidateCfg = {...cfg, ...raw.cfg};
   if (!LANG_CATALOG.some(l => l.code === candidateCfg.lang)) candidateCfg.lang = 'en';
   for (const key of ['todayMins', 'sessions', 'streak', 'water']) {
@@ -3331,7 +3340,15 @@ function updateSyllabusCalc() {
   const left = Math.max(1, parseInt(elLeft.value) || 1);
   const rate = Math.max(1, parseInt(elRate.value) || 1);
   const days = Math.ceil(left / rate);
-  document.getElementById('syllabusCalcOut').textContent = toWest(L().calcOutTpl.replace('{d}', days));
+  // A missing locale string remains a translation gap; render safely instead of
+  // crashing the language picker. Source coverage must NOT count this as translated.
+  const localizedTemplate = L().calcOutTpl;
+  const fallbackTemplate = DICT.en && DICT.en.calcOutTpl;
+  const template = typeof localizedTemplate === 'string' && localizedTemplate.includes('{d}')
+    ? localizedTemplate
+    : (typeof fallbackTemplate === 'string' && fallbackTemplate.includes('{d}')
+        ? fallbackTemplate : '{d} days');
+  document.getElementById('syllabusCalcOut').textContent = toWest(template.replace('{d}', days));
 }
 
 /* Boot Init */
