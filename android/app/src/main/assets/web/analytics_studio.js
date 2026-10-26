@@ -121,9 +121,34 @@
     const start=input('date',t.start),end=input('date',t.end);
     const exportKind=input('select',t.export);
     for(const value of ['sessions','daily','weekly','monthly']){const option=mk('option',t[value]);option.value=value;exportKind.appendChild(option);}
-    exportKind.value='sessions';
+    exportKind.value=opts.exportKind||'sessions';
     const exportBtn=mk('button',t.export);exportBtn.type='button';exportBtn.style.cssText='min-height:42px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:6px 12px';
-    filters.appendChild(exportBtn);wrapper.appendChild(filters);
+    filters.appendChild(exportBtn);
+    const periodPresets=mk('div',undefined,'dfa-range-presets');
+    periodPresets.style.cssText='display:flex;flex-wrap:wrap;gap:6px;align-items:center';
+    filters.appendChild(periodPresets);wrapper.appendChild(filters);
+    // Calendar-day offsets use UTC noon keys, not variable-length DST hours.
+    const today=opts.today||core.localToday();
+    if(!core.validDay(today))throw new RangeError('Invalid today');
+    const epoch=Math.floor(Date.parse(today+'T12:00:00Z')/86400000);
+    const previousDay=(offset)=>new Date((epoch-offset)*86400000+43200000).toISOString().slice(0,10);
+    function presetText(days){
+      if(days===1){
+        try{return new Intl.RelativeTimeFormat(locale,{numeric:'auto'}).format(0,'day');}
+        catch(_){return locale==='ar'?'اليوم':'Today';}
+      }
+      try{
+        return t.period+': '+new Intl.NumberFormat(locale+'-u-nu-latn',
+          {style:'unit',unit:'day',unitDisplay:'long',useGrouping:false}).format(days);
+      }catch(_){return t.period+': '+days+' days';}
+    }
+    for(const days of [1,7,30]){
+      const button=mk('button',presetText(days));button.type='button';
+      button.setAttribute('data-range-days',String(days));
+      button.style.cssText='min-height:42px;background:#f8fafc;color:#14213d;border:1px solid #cbd5e1;border-radius:10px;padding:6px 10px';
+      button.addEventListener('click',()=>{start.value=previousDay(days-1);end.value=today;refresh();});
+      periodPresets.appendChild(button);
+    }
     const kpis=mk('div');kpis.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0';wrapper.appendChild(kpis);
     const detail=mk('p',t.details);detail.setAttribute('aria-live','polite');
     const error=mk('p','');error.setAttribute('role','alert');error.style.cssText='color:#991b1b';error.hidden=true;
@@ -205,12 +230,12 @@
       const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-'+selectedKind+'.csv';
       wrapper.appendChild(a);try{a.click();}finally{a.remove();(doc.defaultView.setTimeout||setTimeout)(()=>doc.defaultView.URL.revokeObjectURL(url),30000);}
     });
-    const today=opts.today||core.localToday();if(!core.validDay(today))throw new RangeError('Invalid today');
-    const epoch=Math.floor(Date.parse(today+'T12:00:00Z')/86400000);
-    const from=new Date((epoch-29)*86400000+43200000).toISOString().slice(0,10);
-    start.value=opts.startDate||from;end.value=opts.endDate||today;domain.value=opts.domain||'all';
+    start.value=opts.startDate||previousDay(29);end.value=opts.endDate||today;
+    domain.value=opts.domain||'all';grouping.value=opts.grouping||'daily';
     target.appendChild(wrapper);refresh();
-    return Object.freeze({refresh,getReport:()=>current,destroy:()=>{destroyed=true;wrapper.remove();},element:wrapper});
+    return Object.freeze({refresh,getReport:()=>current,
+      getFilters:()=>Object.freeze({startDate:start.value,endDate:end.value,domain:domain.value,grouping:grouping.value,exportKind:exportKind.value}),
+      destroy:()=>{destroyed=true;wrapper.remove();},element:wrapper});
   }
   return Object.freeze({mount,barsSvg,heatmapSvg});
 });
