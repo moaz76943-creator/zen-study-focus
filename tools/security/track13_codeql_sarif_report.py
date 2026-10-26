@@ -44,9 +44,29 @@ def summarize(directory: Path, sha: str) -> dict:
                 if any(not isinstance(item, dict) for item in run["results"]):
                     output["reason"] = "SARIF_INVALID"
                     return output
+                descriptors = run["tool"]["driver"].get("rules", [])
+                if not isinstance(descriptors, list):
+                    output["reason"] = "SARIF_INVALID"
+                    return output
                 count += len(run["results"])
                 for item in run["results"]:
                     raw_rule = item.get("ruleId")
+                    # SARIF permits ruleIndex without ruleId. Check descriptor consistency,
+                    # never infer a clean result from missing or conflicting metadata.
+                    if "ruleIndex" in item:
+                        index = item["ruleIndex"]
+                        if type(index) is not int or index < 0 or index >= len(descriptors):
+                            output["reason"] = "SARIF_INVALID"
+                            return output
+                        descriptor = descriptors[index]
+                        if not isinstance(descriptor, dict) or not isinstance(descriptor.get("id"), str):
+                            output["reason"] = "SARIF_INVALID"
+                            return output
+                        descriptor_id = descriptor["id"]
+                        if raw_rule is not None and raw_rule != descriptor_id:
+                            output["reason"] = "SARIF_INVALID"
+                            return output
+                        raw_rule = descriptor_id
                     rule = raw_rule if isinstance(raw_rule, str) and SAFE_CODEQL_RULE.fullmatch(raw_rule) else "unknown"
                     if rule not in rule_counts and len(rule_counts) >= MAX_RULE_GROUPS:
                         rule = "unknown"
