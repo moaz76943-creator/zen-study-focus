@@ -57,6 +57,23 @@ test('bounded CodeQL rule groups resist huge untrusted rule identifier sets',()=
   assert.ok(Object.keys(r.out.rule_counts).length<=25);
   assert.equal(Object.values(r.out.rule_counts).reduce((a,b)=>a+b,0),40);
 });
+test('SARIF ruleIndex-only finding resolves to its CodeQL rule descriptor, never PASS',()=>{
+  const data={version:'2.1.0',runs:[{tool:{driver:{name:'CodeQL',rules:[{id:'js/sql-injection'}]}},results:[{ruleIndex:0,message:{text:'DO-NOT-REVEAL'}}]}]};
+  const r=run(data);
+  assert.equal(r.status,1);
+  assert.equal(r.out.status,'FAIL');
+  assert.deepEqual(r.out.rule_counts,{'js/sql-injection':1});
+  assert.ok(!(r.stdout+r.stderr).includes('DO-NOT-REVEAL'));
+});
+test('SARIF rejects invalid, out-of-range, bool and mismatched ruleIndex instead of misclassifying results',()=>{
+  for(const entry of [{ruleIndex:1},{ruleIndex:true},{ruleIndex:-1},{ruleIndex:0,ruleId:'js/code-injection'}]){
+    const data={version:'2.1.0',runs:[{tool:{driver:{name:'CodeQL',rules:[{id:'js/sql-injection'}]}},results:[entry]}]};
+    const r=run(data);
+    assert.equal(r.status,1);
+    assert.equal(r.out.status,'BLOCKED');
+    assert.equal(r.out.reason,'SARIF_INVALID');
+  }
+});
 test('missing, corrupt, structurally invalid or tool-mismatched SARIF blocks',()=>{
   for(const data of [null,'invalid',{}, {runs:[]}, {runs:[{tool:{driver:{name:'NotCodeQL'}},results:[]}]}, {runs:[{tool:{driver:{name:'CodeQL'}}}]}]){
     const r=run(data);assert.equal(r.status,1);assert.equal(r.out.status,'BLOCKED');
