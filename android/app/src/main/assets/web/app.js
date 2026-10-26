@@ -2421,7 +2421,8 @@ function accumulateActiveTime() {
 }
 const TIMER_STORAGE_KEY = 'zen_fortress_active_timer_v21';
 function storeTimerSession() {
-  saveFortressData(TIMER_STORAGE_KEY, {
+  try {
+    return saveFortressData(TIMER_STORAGE_KEY, {
     total: timerTotal, left: timerLeft, running: timerRunning,
     endAt: timerRunning ? timerTargetTime : null,
     mode: currentTimerModeKey, label: customSessionLabel,
@@ -2430,6 +2431,11 @@ function storeTimerSession() {
     activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null,
     training: quickTraining && quickTraining.active ? {...quickTraining} : null
   });
+  } catch (error) {
+    // A failed v21 packet write cannot be reported as a successful timer transition.
+    try { showToast(L().saveFailed); } catch (_) {}
+    return false;
+  }
 }
 function creditCompletedSession() {
   if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
@@ -2607,12 +2613,14 @@ function selectTimerModeFromUser(mins, modeKey, btn) {
   return selectTimerMode(mins, modeKey, btn) !== false;
 }
 function selectTimerMode(mins, modeKey, btn) {
-  if(quickTraining?.active && !quickInternalChange) {
-    if(!window.confirm(quickText('replacePrompt')))return false;
-    quickTraining=null;
+  const endingQuickTraining = quickTraining?.active && !quickInternalChange;
+  if (endingQuickTraining && !window.confirm(quickText('replacePrompt'))) return false;
+  // A rejected Pause must leave the mode and any active Quick Training intact.
+  if (timerRunning && toggleTimerPlay() !== true) return false;
+  if (endingQuickTraining) {
+    quickTraining = null;
     renderQuickTraining();
   }
-  if (timerRunning) toggleTimerPlay();
   currentTimerModeKey = modeKey;
   timerTotal = mins * 60;
   timerLeft = timerTotal;
@@ -2662,12 +2670,24 @@ function toggleTimerPlay() {
   const activeTitle = document.getElementById('timerModeCaption').textContent;
 
   if (timerRunning) {
+    const oldActiveMs = timerActiveMs, oldResumeMs = timerResumeMs;
+    const oldTargetTime = timerTargetTime;
     clearInterval(timerInterval);
     timerInterval = null;
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
     accumulateActiveTime();
     timerRunning = false;
-    storeTimerSession();
+    if (storeTimerSession() !== true) {
+      // A failed Pause must not stop the native alarm or strand an active session.
+      timerRunning = true;
+      timerActiveMs = oldActiveMs;
+      timerResumeMs = oldResumeMs;
+      timerTargetTime = oldTargetTime;
+      timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
+      timerInterval = setInterval(runTimerTick, 500);
+      updateTimerDisplay();
+      return false;
+    }
     if (window.ZenNative && window.ZenNative.stopBackgroundService) {
       try { window.ZenNative.stopBackgroundService(); } catch(e){}
     }
@@ -2678,6 +2698,8 @@ function toggleTimerPlay() {
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
     } catch(e){}
 
+    const oldSessionId = timerSessionId, oldTaskId = focusSessionTaskId;
+    const oldResumeMs = timerResumeMs, oldTargetTime = timerTargetTime;
     if (!timerSessionId) {
       timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
       const linked = typeof focusWorkflowGetLinkedTask === 'function' ? focusWorkflowGetLinkedTask() : null;
@@ -2688,14 +2710,23 @@ function toggleTimerPlay() {
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     timerResumeMs = Date.now();
     timerTargetTime = timerResumeMs + (timerLeft * 1000);
-    storeTimerSession();
-
+    if (storeTimerSession() !== true) {
+      // No phantom running session, timer ID change or native alarm on denied save.
+      timerRunning = false;
+      timerSessionId = oldSessionId;
+      focusSessionTaskId = oldTaskId;
+      timerResumeMs = oldResumeMs;
+      timerTargetTime = oldTargetTime;
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+      updateTimerDisplay();
+      return false;
+    }
     if (window.ZenNative && window.ZenNative.startBackgroundService) {
       try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch(e){}
     }
-
     timerInterval = setInterval(runTimerTick, 500);
   }
+  return true;
 }
 
 function resetTimerNow() {
@@ -2708,7 +2739,7 @@ function resetTimerNow() {
       !window.confirm(cfg.lang === 'ar'
         ? 'إعادة الضبط ستلغي تقدم الجلسة الحالية. هل تريد المتابعة؟'
         : 'Reset will discard the current session progress. Continue?')) return false;
-  if (timerRunning) toggleTimerPlay();
+  if (timerRunning && toggleTimerPlay() !== true) return false;
   timerLeft = timerTotal;
   timerSessionId = null;
   focusSessionTaskId = null;
