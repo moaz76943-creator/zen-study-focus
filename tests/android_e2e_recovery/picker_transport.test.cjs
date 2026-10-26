@@ -150,7 +150,7 @@ test('SAF export remains NOT_TESTED unless real provider bytes match the generat
      return true;
    };
    nativeUI=async(label,match)=>{
-     const xml='<node package="com.google.android.documentsui" class="android.widget.Button" text="SAVE" resource-id="com.google.android.documentsui:id/action_menu_save" bounds="[1,1][10,10]"/>';
+     const xml='<node package="com.google.android.documentsui" class="android.widget.Button" enabled="true" text="SAVE" resource-id="com.google.android.documentsui:id/action_menu_save" bounds="[1,1][10,10]"/>';
      const item=match(xml);if(!item)throw Error('native Save control not observed');
      return {xml,item};
    };
