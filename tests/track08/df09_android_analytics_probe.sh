@@ -9,6 +9,19 @@ adb shell am force-stop com.zenstudy.focus.qa || true
 adb shell svc wifi disable || true
 adb shell svc data disable || true
 adb shell am start -W -n com.zenstudy.focus.qa/com.zenstudy.focus.MainActivity
+# Android 13+ may open a genuine notification permission dialog above the app.
+# Dismiss with a real hardware Back event; do not stub permission APIs.
+for i in $(seq 1 8); do
+  focus="$(adb shell dumpsys window windows 2>/dev/null | grep -E 'mCurrentFocus=' | tail -1 || true)"
+  if printf '%s' "$focus" | grep -q 'GrantPermissionsActivity'; then
+    printf '%s\n' "$focus" > "$E/REAL_PERMISSION_DIALOG_BEFORE_BACK.txt"
+    adb shell input keyevent KEYCODE_BACK
+    printf '%s\n' 'Physical Android Back declined permission dialog; no automatic approval.' > "$E/PERMISSION_BACK.txt"
+    break
+  fi
+  sleep 1
+done
+sleep 3
 for i in $(seq 1 30); do
   if adb shell pidof com.zenstudy.focus.qa | grep -Eq '[0-9]'; then break; fi
   sleep 2
