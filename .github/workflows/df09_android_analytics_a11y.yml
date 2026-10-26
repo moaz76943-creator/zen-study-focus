@@ -24,7 +24,7 @@ jobs:
         api: [30, 35]
     env:
       DF09_ANDROID_API: ${{ matrix.api }}
-      DF09_NATIVE_EVIDENCE: ${{ runner.temp }}/df09-android-api${{ matrix.api }}
+      DF09_NATIVE_EVIDENCE: /tmp/df09-android-api${{ matrix.api }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -106,5 +106,5 @@ jobs:
         if: always()
         with:
           name: DF09-Android-API${{ matrix.api }}-${{ github.sha }}
-          path: ${{ runner.temp }}/df09-android-api${{ matrix.api }}/
+          path: /tmp/df09-android-api${{ matrix.api }}/
           retention-days: 7
