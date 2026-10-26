@@ -70,6 +70,22 @@ class DeviceReadinessTest(unittest.TestCase):
         self.assertEqual(run.call_count, 4)
         self.assertTrue(device.has_visible(nodes, 'Deep Focus'))
 
+    def test_four_missing_adb_devices_are_infrastructure_not_app_failures(self):
+        missing = SimpleNamespace(returncode=1, stdout='', stderr="adb: device 'emulator-5554' not found")
+        with patch.object(device.subprocess, 'run', side_effect=[missing] * 8), patch.object(device.time, 'sleep'):
+            with self.assertRaises(ConnectionError) as failure:
+                device.dump()
+        self.assertIn("ADB emulator transport", str(failure.exception))
+        self.assertEqual(device.failure_kind(failure.exception), "INFRASTRUCTURE")
+
+    def test_null_root_on_live_device_remains_assertion_failure(self):
+        null_root = SimpleNamespace(returncode=0, stdout="ERROR: null root node returned", stderr="")
+        absent_xml = SimpleNamespace(returncode=0, stdout="", stderr="")
+        with patch.object(device.subprocess, 'run', side_effect=[null_root, absent_xml] * 4), patch.object(device.time, 'sleep'):
+            with self.assertRaises(AssertionError) as failure:
+                device.dump()
+        self.assertEqual(device.failure_kind(failure.exception), "ASSERTION_REQUIRES_TRIAGE")
+
     def test_dump_rejects_empty_hierarchy(self):
         responses = [SimpleNamespace(returncode=0, stdout=s, stderr='')
                      for _ in range(4) for s in ('dumped', '<hierarchy/>')]

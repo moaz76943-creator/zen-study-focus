@@ -105,6 +105,7 @@ def dump():
     if os.getenv("DF13_UI_PORT"):
         return persistent_dump()
     diagnostics = []
+    lost_transport_attempts = 0
     for attempt in range(1, 5):
         exported = subprocess.run(
             ["adb", "shell", "uiautomator", "dump", "/sdcard/df13-ui.xml"],
@@ -138,10 +139,21 @@ def dump():
                 reason = "invalid_xml:" + str(exc)
         else:
             reason = "no_complete_hierarchy_xml"
+        # An ADB daemon losing emulator-5554 is not an app accessibility
+        # assertion. Require BOTH commands to fail with a device-transport
+        # signature; a null WebView root on a live device is different.
+        transport_text = (exported.stderr + " " + fetched.stderr
+                          + " " + exported.stdout).lower()
+        lost_transport = (exported.returncode != 0 and fetched.returncode != 0
+                          and bool(re.search(
+                              r"device[^\\n]*(?:not found|offline)|no devices/emulators found|connection refused",
+                              transport_text)))
+        lost_transport_attempts += int(lost_transport)
         diagnostics.append({
             "attempt": attempt, "dump_exit": exported.returncode,
             "read_exit": fetched.returncode,
             "xml_length": len(raw), "reason": reason,
+            "adb_transport_lost": lost_transport,
             "uiautomator_message": (exported.stdout + exported.stderr).strip()[:220]
         })
         time.sleep(attempt + 1)
@@ -150,6 +162,9 @@ def dump():
         Path(dest).mkdir(parents=True, exist_ok=True)
         (Path(dest) / "UIAUTOMATOR_PROBE.json").write_text(
             json.dumps(diagnostics, ensure_ascii=False, indent=2) + "\n")
+    if lost_transport_attempts == len(diagnostics):
+        raise ConnectionError("ADB emulator transport was lost on all four hierarchy attempts; "
+                              "probe evidence captured")
     raise AssertionError("UIAutomator did not expose a complete accessibility hierarchy "
                          "after four attempts; probe evidence captured")
 
