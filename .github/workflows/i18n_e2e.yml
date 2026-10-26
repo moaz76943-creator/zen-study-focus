@@ -16,6 +16,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  harness:
+    name: E2E transport and source contract tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate exact-head harness without emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n tools/i18n/e2e/run_android.sh
+          node --test tests/i18n/e2e/*.test.cjs
+          python3 -m unittest discover -s tests/i18n/e2e -p '*_test.py' -v
+          python3 -m unittest discover -s tests/i18n/e2e/scenarios -p '*_test.py' -v
+
   build_apk:
     name: One fresh-HEAD APK for both Android APIs
     runs-on: ubuntu-24.04
