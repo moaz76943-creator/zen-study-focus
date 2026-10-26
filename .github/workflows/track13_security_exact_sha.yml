@@ -87,10 +87,22 @@ jobs:
           python3 tools/security/track13_gitleaks_report.py --report "$work/history.json" --sha "$(git rev-parse HEAD)" --scan-exit "$history_exit" > "$work/history-summary.json"
           history_summary_exit=$?
           set -e
+          # Both raw Gitleaks reports stay in a 0700 runner-local temporary directory.
+          # Triage is advisory: even fully recognized candidates do NOT alter scanner FAIL.
+          set +e
+          python3 tools/security/track13_gitleaks_private_triage.py --report "$work/tree.json" --repo . --sha "$(git rev-parse HEAD)" > "$work/tree-triage.json"
+          tree_triage_exit=$?
+          python3 tools/security/track13_gitleaks_private_triage.py --report "$work/history.json" --repo . --sha "$(git rev-parse HEAD)" > "$work/history-triage.json"
+          history_triage_exit=$?
+          set -e
           echo 'GITLEAKS_TREE:'
           cat "$work/tree-summary.json"
           echo 'GITLEAKS_HISTORY:'
           cat "$work/history-summary.json"
+          echo 'GITLEAKS_TREE_TRIAGE_CANDIDATES_NOT_CLEARED:'
+          cat "$work/tree-triage.json"
+          echo 'GITLEAKS_HISTORY_TRIAGE_CANDIDATES_NOT_CLEARED:'
+          cat "$work/history-triage.json"
           {
             echo '### Track 13 Gitleaks'
             echo 'Raw reports and scanner diagnostics are never uploaded. PASS = clean, FAIL = potential finding, BLOCKED = invalid evidence.'
@@ -99,4 +111,6 @@ jobs:
             echo 'History:'
             cat "$work/history-summary.json"
           } >> "$GITHUB_STEP_SUMMARY"
+          # A blocked triage is never reported as success, and no finding is suppressed.
+          if [[ "$tree_triage_exit" -gt 1 || "$history_triage_exit" -gt 1 ]]; then exit 1; fi
           if [[ "$tree_summary_exit" -ne 0 || "$history_summary_exit" -ne 0 ]]; then exit 1; fi
