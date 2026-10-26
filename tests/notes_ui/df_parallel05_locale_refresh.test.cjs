@@ -5,7 +5,8 @@ const web=path.resolve(__dirname,'../../android/app/src/main/assets/web');
 const read=filename=>fs.readFileSync(path.join(web,filename),'utf8');
 test('DF05: language switch reaches draft alert refresh through existing integration without app.js edits',()=>{
  const app=read('app.js'),integration=read('integration_v22.js'),notes=read('notes_editor_ui.js');
- assert.match(app,/DF22Integration\?\.refreshLocale\(\)/);
+ assert.match(app,/DF22Integration\?\.refreshLocale/);
+ assert.match(app,/DF22Integration\.refreshLocale\(\)/);
  assert.match(integration,/DeepFocusNotesEditorUI\.renderStack\(\)/);
  assert.match(notes,/if\s*\(typeof nsRefreshDraftLabels==='function'\)\s*nsRefreshDraftLabels\(\)/);
 });
