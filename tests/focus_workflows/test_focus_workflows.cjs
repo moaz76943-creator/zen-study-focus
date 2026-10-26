@@ -22,7 +22,7 @@ function load(file, extras={}) {
     cfg,document,window:{confirm:()=>true},
     localDateISO(d=new Date()){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());},
     toWest:x=>String(x), L:()=>({domStudy:'Study',domRead:'Reading',domSport:'Sport',domWork:'Work',weekdays:[]}),
-    saveFortressData:(k,v)=>saves.push([k,JSON.stringify(v)]),
+    saveFortressData:(k,v)=>{saves.push([k,JSON.stringify(v)]);return true;},
     closeModal(){},showToast(){},renderDomainState(){},renderAnalyticsBars(){},switchTab(){},renderQuickTraining(){},
     updateTimerDisplay(){},selectTimerMode(){mock.selectCalls++;},
     toggleTimerPlay(){mock.toggleCalls++;mock.timerRunning=!mock.timerRunning;},
@@ -108,6 +108,60 @@ test('quick workflow only binds real numeric task IDs and restores that link wit
   assert.ok(forged,'Task-link identity must be sanitized, not discard the valid interval');
   assert.equal(forged.taskId,null);
   assert.equal(x.eval('parseQuickTime("03:99")'),null);
+});
+
+test('PR153: rejected activity ACK preserves idle, running and paused timers before training starts',()=>{
+  for(const running of [false,true])for(const sessionId of [null,'existing-session']){
+    for(const reject of [()=>false,()=>undefined,()=>{throw Error('ACK_FAILED');}]){
+      const notices=[];
+      const x=load('quick_training.js',{
+        timerRunning:running,timerSessionId:sessionId,cfg:{domain:'study'},
+        saveFortressData:key=>key==='zen_fortress_cfg_v21'?reject():true,
+        showToast:message=>notices.push(message)
+      });
+      x.eval('applyQuickTrainingPreset("work")');
+      const before=JSON.stringify(x.cfg);
+      assert.equal(x.eval('startQuickTraining()'),false);
+      assert.equal(x.eval('quickTraining'),null);
+      assert.equal(JSON.stringify(x.cfg),before);
+      assert.equal(x.mock.selectCalls,0);
+      assert.equal(x.mock.toggleCalls,0);
+      assert.equal(x.mock.timerRunning,running);
+      assert.equal(x.mock.timerSessionId,sessionId);
+      assert.ok(notices.length>0);
+    }
+  }
+});
+
+test('PR153: Cancel preserves the active timer without attempting a config write',()=>{
+  let writes=0;
+  const x=load('quick_training.js',{
+    timerRunning:true,timerSessionId:'existing-session',window:{confirm:()=>false},
+    saveFortressData:()=>{writes++;return true;}
+  });
+  x.document.getElementById('qtSets').value='2';
+  x.document.getElementById('qtWork').value='00:20';
+  x.document.getElementById('qtRest').value='00:10';
+  x.eval('startQuickTraining()');
+  assert.equal(writes,0);
+  assert.equal(x.eval('quickTraining'),null);
+  assert.equal(x.mock.toggleCalls,0);
+  assert.equal(x.mock.selectCalls,0);
+});
+
+test('PR153: optional preference refusal keeps acknowledged training active and reports save failure',()=>{
+  const notices=[];
+  const x=load('quick_training.js',{
+    saveFortressData:key=>key!=='zen_quick_training_cfg_v21',
+    showToast:message=>notices.push(message)
+  });
+  x.document.getElementById('qtSets').value='2';
+  x.document.getElementById('qtWork').value='00:20';
+  x.document.getElementById('qtRest').value='00:10';
+  x.eval('startQuickTraining()');
+  assert.equal(x.eval('quickTraining.active'),true);
+  assert.equal(x.mock.toggleCalls,1);
+  assert.ok(notices.some(message=>/save|حفظ/i.test(message)));
 });
 
 test('sound mixer prevalidates atomically, mixes two tracks and releases stopped resources',()=>{
