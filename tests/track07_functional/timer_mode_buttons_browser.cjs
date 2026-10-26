@@ -95,7 +95,7 @@ const out=process.env.DF_BUTTON_EVIDENCE||'/tmp/deep-focus-buttons';
   await page.evaluate(()=>{if(timerRunning)toggleTimerPlay();selectTimerMode(25,'focus',document.getElementById('modeFocusBtn'));toggleTimerPlay();});
   const sportBefore=await state();
   page.once('dialog',async d=>{dialogs.push({id:'sportRest45',text:d.message()});await d.dismiss();});
-  await page.locator('#sportRest45').evaluate(n=>n.click());
+  await page.locator('#sec-timer button[onclick="startQuickSportRest(45)"]').evaluate(n=>n.click());
   const sportAfter=await state();
   assert.equal(dialogs.filter(x=>x.id==='sportRest45').length,1,'sport rest must ask before ending focus');
   assert.equal(sportAfter.mode,sportBefore.mode);
