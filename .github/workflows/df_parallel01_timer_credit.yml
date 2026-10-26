@@ -1,0 +1,25 @@
+name: DF Parallel01 timer completion ACK rollback
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/app.js'
+      - 'tests/integration_recovery/timer_credit_ack_regression.test.cjs'
+      - '.github/workflows/df_parallel01_timer_credit.yml'
+permissions:
+  contents: read
+jobs:
+  timer-credit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          set -euo pipefail
+          node --check android/app/src/main/assets/web/app.js
+          node --test tests/integration_recovery/timer_credit_ack_regression.test.cjs tests/track05_timer/tick_lifecycle.test.cjs tests/track05_timer/pause_ack_rollback.test.cjs

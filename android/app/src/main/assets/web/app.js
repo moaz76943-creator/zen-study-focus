@@ -2543,43 +2543,60 @@ function readNativeTimerSession() {
   } catch (_) { throw new Error('TIMER_NATIVE_CHECKPOINT_INVALID'); }
 }
 function creditCompletedSession() {
-  if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
-  if (!timerSessionId) return;
+  if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return true;
+  if (!timerSessionId) return true;
   const ids = Array.isArray(cfg.completedTimerIds) ? cfg.completedTimerIds : [];
   if (ids.includes(timerSessionId) ||
-      (Array.isArray(cfg.sessionHistory) && cfg.sessionHistory.some(s => s && s.id === timerSessionId))) return;
+      (Array.isArray(cfg.sessionHistory) && cfg.sessionHistory.some(s => s && s.id === timerSessionId))) return true;
+  const nextCfg = JSON.parse(JSON.stringify(cfg));
   // Short intervals such as 20/10 must not credit a whole minute for 20 seconds.
   // Accumulate real seconds across work rounds; legacy timer accounting is preserved.
   let earned;
   if (quickTraining?.active) {
-    const accumulated = Math.max(0, Number(cfg.quickFocusRemainderSec) || 0)
+    const accumulated = Math.max(0, Number(nextCfg.quickFocusRemainderSec) || 0)
       + Math.max(0, Math.round(timerActiveMs / 1000));
     earned = Math.floor(accumulated / 60);
-    cfg.quickFocusRemainderSec = accumulated % 60;
+    nextCfg.quickFocusRemainderSec = accumulated % 60;
   } else {
     earned = Math.max(0, Math.floor((timerActiveMs + 500) / 60000));
   }
-  cfg.todayMins = Number(cfg.todayMins || 0) + earned;
-  cfg.sessions = Number(cfg.sessions || 0) + 1;
-  cfg.metricsDate = localDateISO();
-  cfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
-  if (!Array.isArray(cfg.sessionHistory)) cfg.sessionHistory = [];
+  nextCfg.todayMins = Number(nextCfg.todayMins || 0) + earned;
+  nextCfg.sessions = Number(nextCfg.sessions || 0) + 1;
+  nextCfg.metricsDate = localDateISO();
+  nextCfg.completedTimerIds = [...ids, timerSessionId].slice(-300);
+  if (!Array.isArray(nextCfg.sessionHistory)) nextCfg.sessionHistory = [];
   const credited = {id: timerSessionId, date: localDateISO(), minutes: earned,
-    domain: cfg.domain || 'study',mode:'focus',completed:true};
+    domain: nextCfg.domain || 'study',mode:'focus',completed:true};
   if (Number.isSafeInteger(focusSessionTaskId) && focusSessionTaskId >= 0 &&
       typeof tasksList !== 'undefined' && tasksList.some(t => t.id === focusSessionTaskId && !t.isStarter))
     credited.taskId = focusSessionTaskId;
-  cfg.sessionHistory.push(credited);
+  nextCfg.sessionHistory.push(credited);
   if (!quickTraining?.active) {
-    const rounds = Number.isInteger(cfg.roundsPerCycle) && cfg.roundsPerCycle >= 1 && cfg.roundsPerCycle <= 12 ? cfg.roundsPerCycle : 4;
-    const past = Number.isInteger(cfg.focusCycleCount) && cfg.focusCycleCount >= 0 && cfg.focusCycleCount < rounds ? cfg.focusCycleCount : 0;
-    cfg.focusCycleCount = (past + 1) % rounds;
+    const rounds = Number.isInteger(nextCfg.roundsPerCycle) && nextCfg.roundsPerCycle >= 1 && nextCfg.roundsPerCycle <= 12 ? nextCfg.roundsPerCycle : 4;
+    const past = Number.isInteger(nextCfg.focusCycleCount) && nextCfg.focusCycleCount >= 0 && nextCfg.focusCycleCount < rounds ? nextCfg.focusCycleCount : 0;
+    nextCfg.focusCycleCount = (past + 1) % rounds;
   }
-  cfg.streak = computeActualStreak(cfg.sessionHistory);
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  nextCfg.streak = computeActualStreak(nextCfg.sessionHistory);
+  try {
+    if (window.DF22Integration) {
+      const before = window.DF22Integration.getSnapshot();
+      if (window.DF22Integration.write(before, {...before,cfg:nextCfg}) !== true)
+        throw new Error('SESSION_SAVE_NOT_VERIFIED');
+    } else {
+      if (saveFortressData('zen_fortress_cfg_v21', nextCfg) !== true)
+        throw new Error('SESSION_SAVE_NOT_VERIFIED');
+      cfg = nextCfg;
+    }
+  } catch (_) {
+    showToast(cfg.lang === 'ar'
+      ? 'تعذّر حفظ الجلسة. أبقِ التطبيق مفتوحًا واضغط التشغيل لإعادة المحاولة.'
+      : 'Could not save this session. Keep the app open and press Play to retry.');
+    return false;
+  }
   syncHeaderMetrics();
   if (window.DF22Integration?.onSessionRecorded) window.DF22Integration.onSessionRecorded();
   try { document.dispatchEvent(new CustomEvent('deep-focus:session-recorded',{detail:{schemaVersion:1,...credited}})); } catch (e) {}
+  return true;
 }
 function finalizeTimerSession(shouldChime) {
   if (timerInterval) clearInterval(timerInterval);
@@ -2587,7 +2604,13 @@ function finalizeTimerSession(shouldChime) {
   accumulateActiveTime();
   timerRunning = false;
   timerLeft = 0;
-  creditCompletedSession();
+  if (creditCompletedSession() !== true) {
+    // Keep the completed timer ID and pending credit for an explicit retry.
+    // No success chime, break-mode transition or quick-training advance.
+    updateTimerDisplay();
+    document.getElementById('mainPlayBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    return false;
+  }
   if(quickTraining?.active) {
     advanceQuickTrainingStep();
     if(shouldChime) playRichCompletionChime(document.getElementById('timerModeCaption').textContent,true);
