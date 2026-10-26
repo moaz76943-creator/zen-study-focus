@@ -122,8 +122,12 @@ jobs:
         include:
           - api: 30
             gpu: swiftshader_indirect
+            profile: pixel_3a
+            heap: 256M
           - api: 35
-            gpu: swiftshader
+            gpu: swiftshader_indirect
+            profile: pixel_2
+            heap: 512M
     steps:
       - uses: actions/checkout@v4
         with:
@@ -191,7 +195,10 @@ jobs:
           emulator-build: 15004761
           arch: x86_64
           target: google_apis
-          profile: pixel_3a
+          # API35 uses the Pixel 2 / 512M heap profile that completed #287's
+          # process-launch smoke; full UI acceptance remains independently gated.
+          profile: ${{ matrix.profile }}
+          heap-size: ${{ matrix.heap }}
           # Keep headless rendering on software GLES; the emulator logs show
           # graphics-context failures around display resizing. No host Vulkan.
           emulator-options: -no-window -no-snapshot -gpu ${{ matrix.gpu }} -feature -Vulkan -noaudio -no-boot-anim -camera-back none -memory 2048 -cores 2
