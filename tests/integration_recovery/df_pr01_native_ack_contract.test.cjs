@@ -47,3 +47,12 @@ test('unchanged v21 identity and scoped SAF picker are maintained',()=>{
   assert.match(java,/REQUEST_BACKUP_IMPORT\s*=\s*7412/);
   assert.match(java,/setAllowContentAccess\(false\)/);
 });
+
+test('API33+ notifications request only follows an explicit timer start, never app launch',()=>{
+  const onCreate=java.split('protected void onCreate(',2)[1].split('private void requestNotificationPermissionForTimer()',1)[0];
+  assert.doesNotMatch(onCreate,/requestPermissions\(/,'Android notification consent must not interrupt WebView startup');
+  assert.match(java,/private void requestNotificationPermissionForTimer\(\)/);
+  assert.match(java,/Build.VERSION.SDK_INT >= 33/);
+  const timer=section(java,'public void startBackgroundService(int seconds, String title)','public void stopBackgroundService()');
+  assert.match(timer,/runOnUiThread\(\(\) -> requestNotificationPermissionForTimer\(\)\)/);
+});
