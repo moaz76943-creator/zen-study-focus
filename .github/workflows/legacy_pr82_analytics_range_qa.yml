@@ -7,6 +7,7 @@ on:
     branches:
       - integration/master-qa-verified-v21
     paths:
+      - 'android/app/src/main/assets/web/analytics_core_v21.js'
       - 'android/app/src/main/assets/web/analytics_studio.js'
       - 'tests/analytics_core/**'
       - '.github/workflows/legacy_pr82_analytics_range_qa.yml'
@@ -24,4 +25,6 @@ jobs:
       - name: Test legacy PR82 invalid-range safety and current analytics studio
         run: node --test tests/analytics_core/*.test.cjs
       - name: Source syntax
-        run: node --check android/app/src/main/assets/web/analytics_studio.js
+        run: |
+          node --check android/app/src/main/assets/web/analytics_core_v21.js
+          node --check android/app/src/main/assets/web/analytics_studio.js
