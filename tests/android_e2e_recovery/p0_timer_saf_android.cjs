@@ -3,7 +3,34 @@
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
 const PKG='com.zenstudy.focus',PREFIX='DF07 isolated durability ';
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
-const adb=(...args)=>cp.execFileSync('adb',['-s','emulator-5554',...args],{encoding:'utf8',timeout:20000}).trim();
+// Retry only observational ADB commands; never replay taps, consent,
+// native mutations, force-stop, install, or anything that changes app state.
+function isSafeAdbObservation(args){
+ if(args[0]==='shell'){
+  if(['getprop','pidof','dumpsys','cat','find'].includes(args[1]))return true;
+  if(args[1]==='pm'&&args[2]==='path')return true;
+  if(args[1]==='content'&&['query','read'].includes(args[2]))return true;
+  return false;
+ }
+ return args[0]==='devices'||(args[0]==='exec-out'&&args[1]==='cat');
+}
+function adb(...args){
+ const attempts=isSafeAdbObservation(args)?3:1;
+ let last=null;
+ for(let attempt=0;attempt<attempts;attempt++){
+  try{return cp.execFileSync('adb',['-s','emulator-5554',...args],{encoding:'utf8',timeout:20000}).trim();}
+  catch(error){
+   last=error;
+   if(attempt+1<attempts){
+    // Host transport only; do not relaunch app or repeat a state-changing command.
+    try{cp.execFileSync('adb',['reconnect','offline'],{encoding:'utf8',timeout:10000});}catch(_){}
+   }
+  }
+ }
+ const operation=args.slice(0,3).join(' ').replace(/[^a-zA-Z0-9 ._-]/g,'').slice(0,70);
+ const detail=String(last?.code||last?.message||'unknown').replace(/[\r\n]+/g,' ').slice(0,110);
+ throw Error('TRANSPORT: Android ADB '+operation+' unavailable after '+attempts+' attempt(s): '+detail);
+}
 const report={source:'Android real WebView + native AtomicFile; disposable emulator only',sha:cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),api:null,results:[],release_approved:false};
 let ws,id=0,pending=new Map();
 function requireEmulator(){
