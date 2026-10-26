@@ -18,7 +18,7 @@
     var cleanText = sanitizeText(rawText);
     if (!cleanText) return list;
 
-    if (list.length >= MAX_BUFFER_ITEMS) {
+    while (list.length >= MAX_BUFFER_ITEMS) {
       list.shift(); // Drop oldest to prevent memory overflow
     }
 
