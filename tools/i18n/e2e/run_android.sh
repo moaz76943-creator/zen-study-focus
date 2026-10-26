@@ -137,30 +137,30 @@ if [[ "$API" == 35 ]]; then
   # bounded ADB UIAutomator path rather than starting the instrumentation APK.
   # A null/empty root remains FAIL, never a fabricated application PASS.
   unset DF13_UI_PORT
-  printf '%s\\n' 'API35_ADB_UIAUTOMATOR' > "$OUT/PROBE_MODE.txt"
+  printf '%s\n' 'API35_ADB_UIAUTOMATOR' > "$OUT/PROBE_MODE.txt"
 else
-  printf '%s\\n' 'API30_PERSISTENT_INSTRUMENTATION' > "$OUT/PROBE_MODE.txt"
+  printf '%s\n' 'API30_PERSISTENT_INSTRUMENTATION' > "$OUT/PROBE_MODE.txt"
   timeout 60s adb install -r -t "$BUILD/accessibility-probe.apk"
   adb forward tcp:38383 localabstract:df13-accessibility
   adb shell am instrument -w com.zenstudy.focus.e2e/.AccessibilityProbe > "$OUT/PROBE_INSTRUMENTATION.txt" 2>&1 &
   PROBE_PID=$!
   export DF13_UI_PORT=38383
   python3 - <<'PY'
-  import socket, time
-  for attempt in range(60):
-      try:
-          with socket.create_connection(('127.0.0.1', 38383), timeout=2) as connection:
-              # A forwarded TCP connection can open before the device socket is
-              # listening. Require a real reply from instrumentation, not connect.
-              connection.sendall(b'PING\n')
-              if connection.recv(1024):
-                  break
-      except OSError:
-          pass
-      time.sleep(1)
-  else:
-      raise SystemExit('Persistent accessibility instrumentation failed to start')
-  PY
+import socket, time
+for attempt in range(60):
+    try:
+        with socket.create_connection(('127.0.0.1', 38383), timeout=2) as connection:
+            # A forwarded TCP connection can open before the device socket is
+            # listening. Require a real reply from instrumentation, not connect.
+            connection.sendall(b'PING\n')
+            if connection.recv(1024):
+                break
+    except OSError:
+        pass
+    time.sleep(1)
+else:
+    raise SystemExit('Persistent accessibility instrumentation failed to start')
+PY
 fi
 RUNNER_STARTED=1
 set +e
