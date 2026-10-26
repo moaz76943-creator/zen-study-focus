@@ -12,6 +12,7 @@ on:
       - 'tests/i18n/quick_training/**'
       - 'tests/i18n/timer/**'
       - 'tests/integration_quality/immutable_package_id.test.cjs'
+      - 'tests/performance_recovery/**'
       - '.github/workflows/df_integration_critical_regressions.yml'
   push:
     branches: [integration/master-qa-verified-v21]
@@ -49,5 +50,7 @@ jobs:
         run: node --test tests/i18n/quick_training/*.test.cjs
       - name: Actual timer consent and stale tick regression
         run: node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/track05_timer/tick_lifecycle.test.cjs
+      - name: Offline app startup critical assets (source-only)
+        run: node --test tests/performance_recovery/startup_assets.test.cjs
       - name: Application identity and read-only v21 startup guard
         run: node --test tests/integration_quality/immutable_package_id.test.cjs tests/security_recovery/legacy_preflight_schema.test.cjs
