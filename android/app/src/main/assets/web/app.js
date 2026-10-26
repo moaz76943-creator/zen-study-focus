@@ -2097,13 +2097,19 @@ function openCloudBackupModal() {
   window.DeepFocusAudioSettingsLocale?.bindBackupDialog({document, locale: cfg.lang});
 }
 
-function syncToGoogleCloudNow() {
+async function syncToGoogleCloudNow() {
   const code = generateEncryptedBackupCode();
-  if (window.ZenNative && window.ZenNative.syncBackupToGoogleEmailOrDrive) {
+  if (window.ZenNative && typeof window.ZenNative.syncBackupToGoogleEmailOrDrive === 'function') {
     window.ZenNative.syncBackupToGoogleEmailOrDrive(code);
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(code);
-    showToast("Backup copied — save privately; NOT encrypted");
+  } else if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("Backup copied — save privately; NOT encrypted");
+    } catch (_) {
+      showToast("⚠️ Backup copy failed — use Export Backup File");
+    }
+  } else {
+    showToast("⚠️ Clipboard unavailable — use Export Backup File");
   }
 }
 
