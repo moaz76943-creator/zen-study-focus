@@ -541,6 +541,9 @@ def run(out, source_sha, api):
         record(results,"note_create_restore",note,checkpoint)
 
         def switch():
+            # Isolate locale acceptance from a failed Notes modal/native popup.
+            # The Notes failure remains recorded; no data store is cleared.
+            restart()
             click("Timer")
             language("Arabic","ar")
             return "Arabic picker item selected; native-visible ISO AR"
