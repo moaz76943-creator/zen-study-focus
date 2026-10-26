@@ -1,0 +1,69 @@
+name: DF07 timer and control-binding acceptance
+on:
+  push:
+    branches:
+      - qa/df-parallel-07-button-bindings-20261026
+  pull_request:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - 'tests/track08/all_button_binding_browser.cjs'
+      - '.github/workflows/df07_timer_control_bindings.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df07-control-bindings-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify preexisting live timer guards without changing application
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/i18n/timer/timer_safety.test.cjs tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs tests/termux_fix04_custom_timer_consent.test.cjs
+      - name: Install isolated Chromium harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: Serve current bundled application without external assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df07-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Audit live five-locale control bindings
+        env:
+          DF_COMPLETION_URL: http://127.0.0.1:8770
+          DF_BUTTON_BINDING_EVIDENCE: ${{ runner.temp }}/df07-button-bindings
+        run: node tests/track08/all_button_binding_browser.cjs
+      - name: Record exact evidence boundary
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/df07-button-bindings"
+          git rev-parse HEAD > "$RUNNER_TEMP/df07-button-bindings/QA_SHA.txt"
+          printf 'Live desktop Chromium binding tests; NOT semantic acceptance for every button, Android native dialogs, or SAF.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df07-button-bindings/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DF07-control-bindings-${{ github.sha }}
+          path: ${{ runner.temp }}/df07-button-bindings/
+          if-no-files-found: warn
+          retention-days: 7
