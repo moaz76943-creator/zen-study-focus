@@ -250,7 +250,7 @@ def tap_node(node):
     shell("input", "tap", (x1+x2)//2, (y1+y2)//2)
     time.sleep(0.65)
 
-def reveal(predicate, swipes=8, gutter=True):
+def reveal(predicate, swipes=8, gutter=True, toward_top=False):
     """Scroll actual Android content until the required visible evidence exists."""
     for attempt in range(swipes + 1):
         nodes = dump()
@@ -266,8 +266,9 @@ def reveal(predicate, swipes=8, gutter=True):
         # the swipe can scroll. Record lists have a safe outer page gutter.
         # Modal scrolling instead stays within the dialog's content area.
         x = max(2, width // 50) if gutter else width // 2
-        shell("input", "swipe", x, height * 7 // 10,
-              x, height * 3 // 10, 350)
+        start, end = (3, 7) if toward_top else (7, 3)
+        shell("input", "swipe", x, height * start // 10,
+              x, height * end // 10, 350)
         time.sleep(0.4)
     raise AssertionError("Required content not visible after bounded Android scrolling")
 
@@ -559,8 +560,10 @@ def run(out, source_sha, api):
             text_input("inpNoteTitle","DF13_NOTE_123")
             text_input("inpNoteBody","DF13_BODY_123")
             click("Save", scroll=True)
+            # Closing the editor retains its scroll offset; the new card is
+            # inserted before existing notes, above that position (real API30 XML).
             reveal(lambda nodes: has_record(nodes,"DF13_NOTE_123")
-                   and has_record(nodes,"DF13_BODY_123"))
+                   and has_record(nodes,"DF13_BODY_123"), toward_top=True)
             restart()
             click("Notes")
             text_input("inpSearchNotes","DF13_NOTE_123")

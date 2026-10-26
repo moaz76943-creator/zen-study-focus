@@ -28,6 +28,16 @@ class NavigationScrollTest(unittest.TestCase):
             device.reveal(lambda nodes: device.dump.call_count == 2, gutter=False)
         self.assertEqual(shell.call_args.args[2], 393 // 2)
 
+    def test_saved_note_above_retained_editor_scroll_is_revealed_upwards(self):
+        frame = {'bounds': '[0,0][393,800]'}
+        above = {'text':'DF13_NOTE_123','class':'android.view.View','bounds':'[30,24][363,-733]'}
+        visible = {**above,'bounds':'[30,250][363,280]'}
+        with patch.object(device,'dump',side_effect=[[frame,above],[frame,visible]]), \
+             patch.object(device,'shell') as shell,patch.object(device.time,'sleep'):
+            device.reveal(lambda nodes: device.has_record(nodes,'DF13_NOTE_123'),toward_top=True)
+        args=shell.call_args.args
+        self.assertLess(args[3],args[5], 'finger must move down to reveal the earlier note card')
+
     def test_analytics_markers_match_the_actual_english_studio(self):
         source = (ROOT / 'android/app/src/main/assets/web/analytics_studio.js').read_text()
         english = source.split('const EN=Object.freeze({',1)[1].split('});',1)[0]
