@@ -1682,6 +1682,39 @@ function computeActualStreak(history, now = new Date()) {
 
 function syncDailyRollover() {
   const current = localDateISO();
+  const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : null;
+  // An unavailable optional analytics module must never erase cached values.
+  if (entries) {
+    const next = JSON.parse(JSON.stringify(cfg));
+    if (next.metricsDate && next.metricsDate !== current) {
+      next.todayMins = entries
+        .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
+        .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
+      next.water = 0;
+      next.sets = 0;
+      next.pagesRead = 0;
+      next.quickFocusRemainderSec = 0;
+    }
+    next.metricsDate = current;
+    next.streak = computeActualStreak(next.sessionHistory);
+    if (JSON.stringify(next) !== JSON.stringify(cfg)) {
+      try {
+        if (window.DF22Integration) {
+          const before = window.DF22Integration.getSnapshot();
+          if (window.DF22Integration.write(before, {...before,cfg:next}) !== true)
+            throw new Error('ROLLOVER_SAVE_NOT_VERIFIED');
+        } else {
+          if (saveFortressData('zen_fortress_cfg_v21', next) !== true)
+            throw new Error('ROLLOVER_SAVE_NOT_VERIFIED');
+          cfg = next;
+        }
+      } catch (_) {
+        showToast((typeof L === 'function' && L().saveFailed) || 'Could not save daily progress. Retry.');
+        return false;
+      }
+    }
+  }
+  // Date controls advance only after the daily snapshot has been acknowledged.
   if (todayISO !== current) {
     const previousDate = todayISO;
     todayISO = current;
@@ -1693,19 +1726,7 @@ function syncDailyRollover() {
       calMonth = new Date().getMonth();
     }
   }
-  if (cfg.metricsDate && cfg.metricsDate !== current) {
-    const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
-    cfg.todayMins = entries
-      .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
-      .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
-    cfg.water = 0;
-    cfg.sets = 0;
-    cfg.pagesRead = 0;
-    cfg.quickFocusRemainderSec = 0;
-  }
-  cfg.metricsDate = current;
-  cfg.streak = computeActualStreak(cfg.sessionHistory);
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  return true;
 }
 
 function L() {
@@ -2287,10 +2308,20 @@ function selectHomeQuickSession(minutes) {
 }
 
 function logWorkoutSet() {
-  cfg.sets = (cfg.sets % 12) + 1;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  const previous = Number(cfg.sets || 0);
+  if (!Number.isSafeInteger(previous) || previous < 0) return false;
+  const next = {...cfg, sets:(previous % 12) + 1};
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', next) !== true)
+      throw new Error('WORKOUT_COUNTER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed || 'Could not save progress. Retry.');
+    return false;
+  }
+  cfg = next;
   syncHeaderMetrics();
   showToast(toWest(`💪 ${L().domSport}: ${cfg.sets}/4`));
+  return true;
 }
 
 function startQuickSportRest(secs) {
@@ -2362,10 +2393,22 @@ function startQuickSportRest(secs) {
 }
 
 function addReadPages(p) {
-  cfg.pagesRead = (cfg.pagesRead || 0) + p;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  const previous = Number(cfg.pagesRead || 0), delta = Number(p);
+  if (!Number.isSafeInteger(previous) || previous < 0 ||
+      !Number.isSafeInteger(delta) || delta <= 0 ||
+      !Number.isSafeInteger(previous + delta)) return false;
+  const next = {...cfg, pagesRead:previous + delta};
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', next) !== true)
+      throw new Error('READING_COUNTER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed || 'Could not save progress. Retry.');
+    return false;
+  }
+  cfg = next;
   syncHeaderMetrics();
-  showToast(toWest(`📖 ${L().domRead}: +${p}`));
+  showToast(toWest(`📖 ${L().domRead}: +${delta}`));
+  return true;
 }
 
 const TAB_GRADS = {
