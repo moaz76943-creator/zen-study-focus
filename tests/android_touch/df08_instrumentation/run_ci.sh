@@ -19,6 +19,9 @@ cleanup() {
 trap cleanup EXIT
 bash tests/white_premium_qa/track14_install_apk.sh "$apk"
 timeout 180s adb install --no-streaming -r "$testapk" > "$out/test-apk-install.txt" 2>&1
+# Remove the Android 13+ runtime notification prompt from this disposable test
+# profile, so it cannot cover the WebView and intercept all pointer events.
+adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
 for width in 320 360 393 430; do
   adb shell wm size "${width}x820"
   adb shell settings put system font_scale 1.0
