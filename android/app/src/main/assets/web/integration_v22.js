@@ -165,7 +165,8 @@
       ...filters,locale:cfg.lang,goals:cfg.dailyGoalsMin||{},
       onOpenTask:id=>{
         if(!Number.isSafeInteger(id)||id<0)return false;
-        const rows=Array.isArray(getSnapshot().tasksList)?getSnapshot().tasksList:[];
+        const snapshot=getSnapshot();
+        const rows=Array.isArray(snapshot.tasksList)?snapshot.tasksList:[];
         const matches=rows.filter(t=>t&&t.id===id);
         if(matches.length!==1||matches[0].archived===true||
            matches[0].status==='archived'||matches[0].isStarter===true||
