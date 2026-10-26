@@ -10,6 +10,9 @@ import android.app.Activity;
 import android.widget.Toast;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.FileOutputStream;
+import android.util.AtomicFile;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
@@ -86,7 +89,71 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Separate, optional active-timer receipt: never alter the six v21 storage keys.
+    private final Object activeTimerCheckpointLock = new Object();
+    private static final int ACTIVE_TIMER_MAX_BYTES = 256 * 1024;
+    private boolean validActiveTimerPacket(String raw) {
+        if (raw == null || raw.getBytes(StandardCharsets.UTF_8).length > ACTIVE_TIMER_MAX_BYTES) return false;
+        try {
+            org.json.JSONObject packet = new org.json.JSONObject(raw);
+            String payload = packet.getString("payload");
+            String sig = packet.getString("sig");
+            int hash = (int)2166136261L;
+            for (char c : (payload + "ZEN_FORTRESS_V21_99812").toCharArray()) {
+                hash ^= c; hash *= 16777619;
+            }
+            if (!Long.toHexString(hash & 0xffffffffL).equals(sig)) return false;
+            org.json.JSONObject state = new org.json.JSONObject(payload);
+            double total = state.getDouble("total"), left = state.getDouble("left");
+            if (!Double.isFinite(total) || !Double.isFinite(left) ||
+                total < 1 || total > 86400 || left < 0 || left > 86400 ||
+                !(state.opt("running") instanceof Boolean)) return false;
+            if (state.getBoolean("running")) {
+                double endAt = state.getDouble("endAt");
+                if (!Double.isFinite(endAt) || endAt <= 0) return false;
+            }
+            return true;
+        } catch (Exception ignored) { return false; }
+    }
+
     public class ZenNativeBridge {
+        // Atomic pause/start checkpoint independent from six-family v21 ACK.
+        @JavascriptInterface
+        public boolean acknowledgeActiveTimerSnapshot(String packet) {
+            if (!validActiveTimerPacket(packet)) return false;
+            final byte[] bytes = packet.getBytes(StandardCharsets.UTF_8);
+            synchronized (activeTimerCheckpointLock) {
+                AtomicFile file = new AtomicFile(new File(getFilesDir(), "active_timer_checkpoint_v1"));
+                FileOutputStream stream = null;
+                try {
+                    stream = file.startWrite();
+                    stream.write(bytes);
+                    stream.getFD().sync();
+                    file.finishWrite(stream);
+                    return java.util.Arrays.equals(bytes, file.readFully());
+                } catch (Exception error) {
+                    if (stream != null) file.failWrite(stream);
+                    return false;
+                }
+            }
+        }
+
+        @JavascriptInterface
+        public String readActiveTimerSnapshot() {
+            synchronized (activeTimerCheckpointLock) {
+                AtomicFile file = new AtomicFile(new File(getFilesDir(), "active_timer_checkpoint_v1"));
+                File base = file.getBaseFile();
+                if (!base.exists() && !new File(base.getPath() + ".bak").exists()) return "NONE";
+                try {
+                    byte[] bytes = file.readFully();
+                    if (bytes.length > ACTIVE_TIMER_MAX_BYTES) return "ERROR";
+                    String raw = new String(bytes, StandardCharsets.UTF_8);
+                    return validActiveTimerPacket(raw) ? raw : "ERROR";
+                } catch (Exception error) { return "ERROR"; }
+            }
+        }
+
+
         // Legacy WebView bridge names retained to preserve old v21 session behavior.
         // No Android Service is started: user countdown end time is handled by AlarmManager.
         @JavascriptInterface
