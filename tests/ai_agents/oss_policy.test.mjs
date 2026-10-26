@@ -10,7 +10,7 @@ test('select only own role and eligible safe open issues',()=>{
  }
 });
 test('allow narrow source+test only, no external files, raw assets, Android or workflow',()=>{
- const a=[{status:'M',path:'tools/i18n/integrator/index.cjs',added:12,deleted:7},{status:'M',path:'tests/i18n/integrator/integrator.test.cjs',added:25,deleted:0}];
+ const a=[{status:'M',path:'tools/daily_maintenance/evidence_integrity_guard.cjs',added:12,deleted:7},{status:'M',path:'tests/integration_quality/evidence_integrity_guard.test.cjs',added:25,deleted:0}];
  assert.deepEqual(validateRoleDiff('aider',a),{files:2,lines:44});
  for(const path of ['android/app/src/main/assets/web/app.js','.github/workflows/ci.yml','tools/i18n/integrator/review_approvals.json','tools/i18n/integrator/../inventory/index.cjs']){
   assert.throws(()=>validateRoleDiff('aider',[a[1],{...a[0],path}]),/Outside/);
@@ -24,5 +24,5 @@ test('Qwen role independent from Aider files',()=>{
  {status:'M',path:'tools/i18n/inventory/index.cjs',added:2,deleted:3},
  {status:'M',path:'tests/i18n/inventory/inventory.test.cjs',added:8,deleted:0}
  ]),{files:2,lines:13});
- assert.throws(()=>validateRoleDiff('qwen',[{status:'M',path:'tools/i18n/integrator/index.cjs',added:1,deleted:0},{status:'M',path:ROLES.qwen.test,added:1,deleted:0}]),/Outside/);
+ assert.throws(()=>validateRoleDiff('qwen',[{status:'M',path:'tools/daily_maintenance/evidence_integrity_guard.cjs',added:1,deleted:0},{status:'M',path:ROLES.qwen.test,added:1,deleted:0}]),/Outside/);
 });
