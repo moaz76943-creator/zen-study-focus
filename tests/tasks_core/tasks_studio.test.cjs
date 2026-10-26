@@ -404,3 +404,11 @@ test('DF-FINAL-03 #36: 320px mobile layout is RTL-safe and omits empty top-three
  assert.equal(writes,0);
  studio.destroy();
 });
+
+test('DF-PARALLEL-02: compact task Edit and action buttons retain a 44px touch target',()=>{
+ const f=fixture();
+ const style=f.root.descendants.find(x=>x.tagName==='STYLE').textContent;
+ assert.match(style,/\.df-tasks \.df-actions \.df-btn\{min-height:44px;/,
+  '34px action buttons cannot be relied on at 320 CSS px');
+ f.studio.destroy();
+});
