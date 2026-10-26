@@ -75,3 +75,36 @@ test('failed Start save cannot start alarm or fabricate running timer', () => {
   assert.ok(!events.includes('START'),'No background service before durable save');
   assert.ok(!events.includes('TICK'),'No running timer interval after rejected Start');
 });
+
+test('reset stops before discarding the current session if Pause could not save', () => {
+  const ctx={
+    quickTraining:null,timerRunning:true,timerSessionId:'original',
+    timerActiveMs:76543,timerLeft:347,timerTotal:1500,
+    cfg:{lang:'en'},window:{confirm:()=>true},
+    toggleTimerPlay:()=>false,storeTimerSession:()=>{throw Error('Reset must not save')},
+    updateTimerDisplay:()=>{throw Error('Reset must not redraw')}
+  };
+  vm.runInNewContext(production('resetTimerNow','skipTimerPhase'),ctx);
+  assert.equal(ctx.resetTimerNow(),false);
+  assert.equal(ctx.timerSessionId,'original');
+  assert.equal(ctx.timerLeft,347);
+  assert.equal(ctx.timerActiveMs,76543);
+});
+
+test('mode switch cannot discard running focus when Pause write fails', () => {
+  const ctx={
+    quickTraining:null,quickInternalChange:false,timerRunning:true,
+    currentTimerModeKey:'focus',timerTotal:1500,timerLeft:478,
+    timerSessionId:'stable',timerActiveMs:51000,timerResumeMs:8888,
+    toggleTimerPlay:()=>false,
+    window:{confirm:()=>true},
+    storeTimerSession:()=>{throw Error('Mode must not save')},
+    updateTimerDisplay:()=>{throw Error('Mode must not redraw')}
+  };
+  vm.runInNewContext(production('selectTimerMode','openCustomTimerModal'),ctx);
+  assert.equal(ctx.selectTimerMode(5,'short',null),false);
+  assert.equal(ctx.currentTimerModeKey,'focus');
+  assert.equal(ctx.timerTotal,1500);
+  assert.equal(ctx.timerLeft,478);
+  assert.equal(ctx.timerSessionId,'stable');
+});
