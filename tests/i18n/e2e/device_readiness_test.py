@@ -78,5 +78,19 @@ class DeviceReadinessTest(unittest.TestCase):
                 device.dump()
 
 
+    def test_api35_avoids_display_resize_before_first_accessibility_read(self):
+        with patch.object(device, 'shell') as shell:
+            device.configure_initial_display(35)
+        shell.assert_called_once_with("settings", "put", "system", "font_scale", "1.0")
+
+    def test_api30_retains_proven_display_configuration(self):
+        with patch.object(device, 'shell') as shell:
+            device.configure_initial_display(30)
+        self.assertEqual([c.args for c in shell.call_args_list], [
+            ("wm", "density", "160"),
+            ("wm", "size", "393x800"),
+            ("settings", "put", "system", "font_scale", "1.0")
+        ])
+
 if __name__ == '__main__':
     unittest.main()

@@ -361,6 +361,18 @@ def text_input(index, value):
         shell("input", "keyevent", "KEYCODE_BACK")
         time.sleep(0.3)
 
+def configure_initial_display(api):
+    """Keep API35 default display until the first real accessibility read.
+
+    Hosted API35 emulator crashes after virtual-display changes on some GPU
+    backends. This is an A/B transport experiment, not a device PASS. API30
+    preserves its previously verified 393px/160dpi startup configuration.
+    """
+    if api != 35:
+        shell("wm", "density", "160")
+        shell("wm", "size", "393x800")
+    shell("settings", "put", "system", "font_scale", "1.0")
+
 def restart():
     shell("am", "force-stop", PACKAGE)
     shell("am", "start", "-n", ACTIVITY)
@@ -479,9 +491,7 @@ def run(out, source_sha, api):
     checkpoint()
     try:
         shell("pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS") if api>=33 else None
-        shell("wm", "density", "160")
-        shell("wm", "size", "393x800")
-        shell("settings", "put", "system", "font_scale", "1.0")
+        configure_initial_display(api)
         shell("svc", "wifi", "disable")
         shell("svc", "data", "disable")
         shell("am", "force-stop", PACKAGE)
