@@ -284,3 +284,15 @@ test('Activity recreate is listed as NOT_TESTED unless real same-process proof r
  vm.runInContext("report.results.push({name:'bootstrap',status:'NOT_TESTED'});fillUnattempted()",ctx);
  assert.equal(vm.runInContext("report.results.find(r=>r.name==='activity_destroy_recreate').status",ctx),'NOT_TESTED');
 });
+
+test('emulator bootstrap reconnects only for read-only installed APK identity checks',()=>{
+ const shell=fs.readFileSync('tests/android_e2e_recovery/p0_timer_saf_ci.sh','utf8');
+ assert.match(shell,/readonly_adb_installed_path\(\)/);
+ assert.match(shell,/readonly_adb_pull_installed_apk\(\)/);
+ assert.match(shell,/adb reconnect offline/);
+ assert.match(shell,/readonly_adb_installed_path/);
+ assert.match(shell,/readonly_adb_pull_installed_apk/);
+ assert.equal((shell.match(/^adb install /gm)||[]).length,2,'Never retry a state-changing APK install');
+ assert.match(shell,/sha256sum "\$report\/installed-base\.apk"/);
+ assert.match(shell,/sha256sum "\$report\/tested-debug\.apk"/);
+});
