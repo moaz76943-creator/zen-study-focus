@@ -136,7 +136,8 @@
     if(!Array.isArray(snapshots))return {available:false,byDomain:[],snapshotDays:0};
     const unique=new Map();
     for(const g of snapshots){
-      if(!isRecord(g)||!validDay(g.date)||g.date<start||g.date>end||
+      if(!isRecord(g)||g.isStarter===true||g.isDemo===true||g.synthetic===true||
+         isSyntheticSource(g.source)||!validDay(g.date)||g.date<start||g.date>end||
          !DOMAINS.includes(g.domain)||(selectedDomain!=='all'&&selectedDomain!==g.domain)||
          typeof g.targetMinutes!=='number'||!Number.isFinite(g.targetMinutes)||
          g.targetMinutes<=0||g.targetMinutes>1440)continue;
