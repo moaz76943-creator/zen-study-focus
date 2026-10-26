@@ -32,6 +32,24 @@ test('CodeQL safe rule identifiers are grouped without exposing secret fields',(
   assert.deepEqual(r.out.rule_counts,{'js/command-line-injection':1,'js/sql-injection':2,unknown:1});
   assert.ok(!(r.stdout+r.stderr).includes(secret));
 });
+test('CodeQL finding evidence exposes only safe rule, path fingerprint and bounded line',()=>{
+  const secret='ULTRA-SENSITIVE-SARIF-FILE-NAME';
+  const finding={ruleId:'js/incomplete-sanitization',message:{text:secret},
+    locations:[{physicalLocation:{artifactLocation:{uri:'src/'+secret+'.js'},region:{startLine:35}}}]};
+  const r=run(sarif([finding]));
+  assert.equal(r.status,1);assert.equal(r.out.findings,1);
+  assert.deepEqual(Object.keys(r.out.evidence[0]).sort(),['line','path_sha256_16','rule']);
+  assert.match(r.out.evidence[0].path_sha256_16,/^[a-f0-9]{16}$/);
+  assert.equal(r.out.evidence[0].line,35);
+  assert.ok(!(r.stdout+r.stderr).includes(secret));
+});
+test('CodeQL report evidence is bounded despite many results and unknown locations',()=>{
+  const r=run(sarif(Array.from({length:50},()=>({ruleId:'js/useless-regexp-character-escape'}))));
+  assert.equal(r.status,1);assert.equal(r.out.findings,50);
+  assert.ok(r.out.evidence.length<=16);
+  assert.equal(r.out.evidence[0].line,0);
+  assert.equal(r.out.evidence[0].path_sha256_16,'');
+});
 test('bounded CodeQL rule groups resist huge untrusted rule identifier sets',()=>{
   const results=Array.from({length:40},(_,i)=>({ruleId:'js/finding-'+i}));
   const r=run(sarif(results));
