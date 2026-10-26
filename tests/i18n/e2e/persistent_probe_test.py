@@ -32,5 +32,34 @@ class PersistentProbeTest(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, 'null root'):
                 device.dump()
 
+
+    def test_empty_transport_reply_retries_dump_without_replaying_ui_actions(self):
+        xml = '<hierarchy><node text="Deep Focus" bounds="[0,1][200,60]"/></hierarchy>'
+        first, second = MagicMock(), MagicMock()
+        first.makefile.return_value.__enter__.return_value = io.BytesIO(b'')
+        second.makefile.return_value.__enter__.return_value = io.BytesIO(
+            (json.dumps({'xml': xml})+'\n').encode())
+        with patch.dict(os.environ, {'DF13_UI_PORT': '38383'}), \
+             patch('socket.create_connection', side_effect=[first, second]) as connect, \
+             patch.object(device.time, 'sleep'):
+            nodes = device.dump()
+        self.assertTrue(device.has_visible(nodes, 'Deep Focus'))
+        self.assertEqual(connect.call_count, 2)
+        first.sendall.assert_called_once_with(b'DUMP\n')
+        second.sendall.assert_called_once_with(b'DUMP\n')
+
+    def test_all_empty_transport_replies_fail_closed(self):
+        replies = []
+        for _ in range(4):
+            connection = MagicMock()
+            connection.makefile.return_value.__enter__.return_value = io.BytesIO(b'')
+            replies.append(connection)
+        with patch.dict(os.environ, {'DF13_UI_PORT': '38383'}), \
+             patch('socket.create_connection', side_effect=replies) as connect, \
+             patch.object(device.time, 'sleep'):
+            with self.assertRaisesRegex(ConnectionError, 'probe reply'):
+                device.dump()
+        self.assertEqual(connect.call_count, 4)
+
 if __name__ == '__main__':
     unittest.main()
