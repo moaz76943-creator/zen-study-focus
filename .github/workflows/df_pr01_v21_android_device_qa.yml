@@ -1,5 +1,7 @@
 name: DF-PR-01 v21 real Android SAF and process-kill QA (non-release)
 on:
+  push:
+    branches: [fix/df-pr01-native-ack-recovery-20261026]
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
@@ -30,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - name: Checkout pinned test-only native accessibility probe
         uses: actions/checkout@v4
@@ -51,7 +53,7 @@ jobs:
       - name: Assert exact PR head and build source
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
           node --check tests/android_e2e_recovery/p0_timer_saf_android.cjs
           node --test tests/android_e2e_recovery/picker_transport.test.cjs tests/android_e2e_recovery/native_faults.test.cjs
           node --test tests/integration_recovery/native_saf_import_forwardport.test.cjs
@@ -94,7 +96,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DF-PR-01-Android-${{ matrix.api-level }}-${{ github.event.pull_request.head.sha }}
+          name: DF-PR-01-Android-${{ matrix.api-level }}-${{ github.event.pull_request.head.sha || github.sha }}
           path: ${{ runner.temp }}/df-pr01-android/
           retention-days: 7
           if-no-files-found: warn
