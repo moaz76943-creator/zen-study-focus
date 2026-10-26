@@ -5,6 +5,8 @@ on:
     paths:
       - 'android/app/src/main/assets/web/quick_training.js'
       - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/js/weekly_report_exporter.js'
+      - 'test/weekly_report_exporter.test.js'
       - 'android/app/src/main/assets/web/preflight_v22.js'
       - 'android/app/src/main/assets/web/data_compat_v21.js'
       - 'android/app/build.gradle'
@@ -45,6 +47,7 @@ jobs:
           node --check android/app/src/main/assets/web/app.js
           node --check android/app/src/main/assets/web/quick_training.js
           node --test tests/integration_quality/backup_clipboard_ack.test.cjs
+          node test/weekly_report_exporter.test.js
           node --test tests/i18n/audio_settings/audio_bridge_activation.test.cjs tests/i18n/audio_settings/audio_settings_localization.test.cjs
       - name: Actual 99 Quick Training packs and transition regression
         run: node --test tests/i18n/quick_training/*.test.cjs
