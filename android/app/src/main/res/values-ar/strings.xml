@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deep Focus</string>
+    <string name="native_focus_session">جلسة تركيز</string>
+    <string name="native_channel_active_name">مؤقت التركيز النشط</string>
+    <string name="native_channel_active_description">يعرض العد التنازلي أثناء جلسة التركيز</string>
+    <string name="native_channel_done_name">اكتمال مؤقت التركيز</string>
+    <string name="native_channel_done_description">تنبيه عند انتهاء العد التنازلي للدراسة أو العمل</string>
+    <string name="native_notification_active">جلسة التركيز قيد التشغيل</string>
+    <string name="native_notification_time_up">انتهى الوقت</string>
+    <string name="native_notification_title">Deep Focus — %1$s</string>
+    <string name="native_backup_picker_unavailable">متعذر فتح منتقي الملفات؛ استخدم مشاركة النسخة الاحتياطية</string>
+    <string name="native_backup_exported">تم تصدير النسخة الاحتياطية؛ احتفظ بالملف غير المشفر بشكل خاص</string>
+    <string name="native_backup_save_failed">تعذر حفظ النسخة الاحتياطية؛ لم تتغير بياناتك الحالية</string>
+    <string name="native_share_subject">Deep Focus — تطبيق للدراسة والتمارين والعمل بتركيز</string>
+    <string name="native_share_chooser">مشاركة Deep Focus باستخدام</string>
+    <string name="native_backup_share_subject">نسخة احتياطية يدوية من Deep Focus (غير مشفرة) (%1$s)</string>
+    <string name="native_backup_share_chooser">حفظ النسخة الاحتياطية باستخدام</string>
+    <string name="native_backup_privacy_warning">يحتوي هذا الرمز على ملاحظات ومهام قابلة للقراءة. احتفظ به بشكل خاص؛ فهو غير مشفر.\n\n</string>
+    <string name="native_backup_copy_heading">--- انسخ الرمز أدناه ---\n</string>
+    <string name="native_share_unavailable">لا يتوفر تطبيق متوافق للمشاركة</string>
+    <string name="native_backup_import_picker_unavailable">متعذر فتح منتقي النسخة الاحتياطية؛ لم تتغير البيانات الحالية</string>
+    <string name="native_backup_import_failed">تعذرت قراءة النسخة الاحتياطية؛ لم تتغير البيانات الحالية</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deep Focus</string>
+    <string name="native_focus_session">توجہ کا سیشن</string>
+    <string name="native_channel_active_name">فعال توجہ ٹائمر</string>
+    <string name="native_channel_active_description">توجہ کے سیشن میں الٹی گنتی دکھاتا ہے</string>
+    <string name="native_channel_done_name">توجہ ٹائمر کی تکمیل</string>
+    <string name="native_channel_done_description">مطالعے یا کام کی الٹی گنتی ختم ہونے پر اطلاع</string>
+    <string name="native_notification_active">توجہ کا سیشن جاری ہے</string>
+    <string name="native_notification_time_up">وقت ختم ہو گیا</string>
+    <string name="native_notification_title">Deep Focus — %1$s</string>
+    <string name="native_backup_picker_unavailable">فائل منتخب کرنے کی سہولت دستیاب نہیں؛ بیک اپ شیئر کریں</string>
+    <string name="native_backup_exported">بیک اپ محفوظ کر دیا گیا؛ غیر خفیہ فائل کو نجی رکھیں</string>
+    <string name="native_backup_save_failed">بیک اپ محفوظ نہیں ہو سکا؛ موجودہ ڈیٹا تبدیل نہیں ہوا</string>
+    <string name="native_share_subject">Deep Focus — مطالعے، ورزش اور گہرے کام کی ایپ</string>
+    <string name="native_share_chooser">Deep Focus کو شیئر کریں</string>
+    <string name="native_backup_share_subject">Deep Focus کا دستی بیک اپ (غیر خفیہ) (%1$s)</string>
+    <string name="native_backup_share_chooser">بیک اپ محفوظ کرنے کے لیے</string>
+    <string name="native_backup_privacy_warning">اس کوڈ میں قابل مطالعہ نوٹس اور کام شامل ہیں۔ اسے نجی رکھیں؛ یہ خفیہ نہیں ہے۔\n\n</string>
+    <string name="native_backup_copy_heading">--- نیچے دیا گیا کوڈ کاپی کریں ---\n</string>
+    <string name="native_share_unavailable">شیئر کرنے کے لیے کوئی موزوں ایپ دستیاب نہیں</string>
+    <string name="native_backup_import_picker_unavailable">بیک اپ فائل منتخب کرنا ممکن نہیں؛ موجودہ ڈیٹا تبدیل نہیں ہوا</string>
+    <string name="native_backup_import_failed">بیک اپ پڑھا نہیں جا سکا؛ موجودہ ڈیٹا تبدیل نہیں ہوا</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deep Focus</string>
+    <string name="native_focus_session">جلسه تمرکز</string>
+    <string name="native_channel_active_name">زمان‌سنج فعال تمرکز</string>
+    <string name="native_channel_active_description">نمایش شمارش معکوس هنگام جلسه تمرکز</string>
+    <string name="native_channel_done_name">پایان زمان‌سنج تمرکز</string>
+    <string name="native_channel_done_description">هشدار پس از پایان شمارش معکوس مطالعه یا کار</string>
+    <string name="native_notification_active">جلسه تمرکز در حال اجراست</string>
+    <string name="native_notification_time_up">زمان تمام شد</string>
+    <string name="native_notification_title">Deep Focus — %1$s</string>
+    <string name="native_backup_picker_unavailable">انتخابگر فایل در دسترس نیست؛ از اشتراک‌گذاری پشتیبان استفاده کنید</string>
+    <string name="native_backup_exported">فایل پشتیبان صادر شد؛ فایل رمزنگاری‌نشده را خصوصی نگه دارید</string>
+    <string name="native_backup_save_failed">ذخیره پشتیبان ممکن نشد؛ داده‌های فعلی تغییر نکردند</string>
+    <string name="native_share_subject">Deep Focus — برنامه مطالعه، ورزش و کار عمیق</string>
+    <string name="native_share_chooser">اشتراک‌گذاری Deep Focus با</string>
+    <string name="native_backup_share_subject">پشتیبان دستی Deep Focus (رمزنگاری‌نشده) (%1$s)</string>
+    <string name="native_backup_share_chooser">ذخیره پشتیبان با</string>
+    <string name="native_backup_privacy_warning">این کد شامل یادداشت‌ها و کارهای خواندنی است. آن را خصوصی نگه دارید؛ رمزنگاری نشده است.\n\n</string>
+    <string name="native_backup_copy_heading">--- کد زیر را کپی کنید ---\n</string>
+    <string name="native_share_unavailable">برنامه سازگاری برای اشتراک‌گذاری در دسترس نیست</string>
+    <string name="native_backup_import_picker_unavailable">انتخاب فایل پشتیبان در دسترس نیست؛ داده‌ها تغییر نکردند</string>
+    <string name="native_backup_import_failed">خواندن پشتیبان ممکن نشد؛ داده‌های فعلی تغییر نکردند</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deep Focus</string>
+    <string name="native_focus_session">Sesión de concentración</string>
+    <string name="native_channel_active_name">Temporizador de concentración activo</string>
+    <string name="native_channel_active_description">Muestra la cuenta atrás durante la sesión de concentración</string>
+    <string name="native_channel_done_name">Fin del temporizador de concentración</string>
+    <string name="native_channel_done_description">Aviso al terminar la cuenta atrás de estudio o trabajo</string>
+    <string name="native_notification_active">Sesión de concentración en curso</string>
+    <string name="native_notification_time_up">Se acabó el tiempo</string>
+    <string name="native_notification_title">Deep Focus — %1$s</string>
+    <string name="native_backup_picker_unavailable">Selector de archivos no disponible; comparte la copia de seguridad</string>
+    <string name="native_backup_exported">Copia de seguridad exportada; guarda el archivo sin cifrar en privado</string>
+    <string name="native_backup_save_failed">No se pudo guardar la copia; los datos existentes no cambiaron</string>
+    <string name="native_share_subject">Deep Focus — aplicación para estudiar, entrenar y trabajar con atención</string>
+    <string name="native_share_chooser">Compartir Deep Focus con</string>
+    <string name="native_backup_share_subject">Copia manual de Deep Focus (SIN CIFRAR) (%1$s)</string>
+    <string name="native_backup_share_chooser">Guardar copia de seguridad con</string>
+    <string name="native_backup_privacy_warning">Este código contiene notas y tareas legibles. Guárdalo en privado: NO está cifrado.\n\n</string>
+    <string name="native_backup_copy_heading">--- COPIA EL CÓDIGO SIGUIENTE ---\n</string>
+    <string name="native_share_unavailable">No hay ninguna aplicación compatible para compartir</string>
+    <string name="native_backup_import_picker_unavailable">Selector de copia no disponible; datos sin cambios</string>
+    <string name="native_backup_import_failed">No se pudo leer la copia; los datos no cambiaron</string>
+</resources>

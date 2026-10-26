@@ -34,13 +34,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // Display stays awake only in user-selected Desk Clock mode.
 
-        if (Build.VERSION.SDK_INT >= 33) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
-            }
-        }
-
         WebView.setWebContentsDebuggingEnabled(false);
         if (!"com.zenstudy.focus".equals(getPackageName())) {
             finish();
@@ -83,12 +76,35 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl("file:///android_asset/web/index.html");
     }
 
+    private void requestNotificationPermissionForTimer() {
+        if (Build.VERSION.SDK_INT >= 33
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+        }
+    }
+
     public class ZenNativeBridge {
         // Legacy WebView bridge names retained to preserve old v21 session behavior.
         // No Android Service is started: user countdown end time is handled by AlarmManager.
         @JavascriptInterface
         public void startBackgroundService(int seconds, String title) {
+            if (seconds < 1 || seconds > 86400) return;
             FocusAlarmReceiver.schedule(MainActivity.this, seconds, title);
+        }
+
+        @JavascriptInterface
+        public void setNativeLocale(String languageTag) {
+            if (NativeLocaleStrings.select(MainActivity.this, languageTag)) {
+                FocusAlarmReceiver.refreshLocale(MainActivity.this);
+            }
+        }
+
+        // Consent belongs to an explicit user Start, never restored countdowns.
+        @JavascriptInterface
+        public void requestTimerNotificationPermission() {
+            runOnUiThread(() -> requestNotificationPermissionForTimer());
         }
 
         @JavascriptInterface
@@ -124,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception error) {
                     backupImportPickerOpen = false;
                     Toast.makeText(MainActivity.this,
-                            "Backup picker unavailable; existing data unchanged",
+                            NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_import_picker_unavailable),
                             Toast.LENGTH_LONG).show();
                 }
             });
@@ -147,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivityForResult(intent, REQUEST_BACKUP_EXPORT);
                 } catch (Exception e) {
                     backupAwaitingSave = null;
-                    Toast.makeText(MainActivity.this, "File picker unavailable; use Share Backup",
+                    Toast.makeText(MainActivity.this, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_picker_unavailable),
                             Toast.LENGTH_LONG).show();
                 }
             });
@@ -157,21 +173,22 @@ public class MainActivity extends AppCompatActivity {
         public void shareAppInvite(String statsSummary) {
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
-            share.putExtra(Intent.EXTRA_SUBJECT, "Deep Focus — Study, Workout & Deep Work App");
+            share.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_subject));
             share.putExtra(Intent.EXTRA_TEXT, statsSummary);
-            startActivity(Intent.createChooser(share, "Share Deep Focus via"));
+            startActivity(Intent.createChooser(share, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_chooser)));
         }
 
         @JavascriptInterface
         public void syncBackupToGoogleEmailOrDrive(String encryptedBackupPayload) {
             Intent send = new Intent(Intent.ACTION_SEND);
             send.setType("text/plain");
-            send.putExtra(Intent.EXTRA_SUBJECT, "Deep Focus Manual Backup (UNENCRYPTED) (" + new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date()) + ")");
+            send.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.format(MainActivity.this, R.string.native_backup_share_subject,
+                    new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date())));
             send.putExtra(Intent.EXTRA_TEXT,
-                "This code contains readable notes and tasks. Save it privately: it is NOT encrypted.\n\n" +
-                "--- COPY CODE BELOW ---\n" + encryptedBackupPayload
+                NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_privacy_warning) +
+                NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_copy_heading) + encryptedBackupPayload
             );
-            startActivity(Intent.createChooser(send, "Save Backup to Gmail / Google Drive"));
+            startActivity(Intent.createChooser(send, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_share_chooser)));
         }
     }
 
@@ -207,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                         webView.evaluateJavascript(script, null);
                 });
             } catch (Exception error) {
-                Toast.makeText(this, "Unable to read backup; data unchanged",
+                Toast.makeText(this, NativeLocaleStrings.get(this, R.string.native_backup_import_failed),
                         Toast.LENGTH_LONG).show();
             }
             return;
@@ -221,11 +238,20 @@ public class MainActivity extends AppCompatActivity {
             if (output == null) throw new java.io.IOException("Cannot open target document");
             output.write(payload.getBytes(StandardCharsets.UTF_8));
             output.flush();
-            Toast.makeText(this, "Backup exported; keep the unencrypted file private",
+            Toast.makeText(this, NativeLocaleStrings.get(this, R.string.native_backup_exported),
                     Toast.LENGTH_LONG).show();
         } catch (Exception error) {
-            Toast.makeText(this, "Unable to save backup; existing data unchanged",
+            Toast.makeText(this, NativeLocaleStrings.get(this, R.string.native_backup_save_failed),
                     Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 101 && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            FocusAlarmReceiver.refreshLocale(this);
         }
     }
 

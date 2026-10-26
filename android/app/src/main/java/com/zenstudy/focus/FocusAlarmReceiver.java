@@ -54,10 +54,11 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
-    private static String cleanTitle(String text) {
-        if (text == null) return "Active Focus Session";
+    private static String cleanTitle(Context context, String text) {
+        String fallback = NativeLocaleStrings.get(context, R.string.native_focus_session);
+        if (text == null) return fallback;
         String clean = text.replaceAll("[\\p{Cntrl}]", " ").trim();
-        return clean.isEmpty() ? "Active Focus Session" : clean.substring(0, Math.min(clean.length(), 100));
+        return clean.isEmpty() ? fallback : clean.substring(0, Math.min(clean.length(), 100));
     }
 
     private static PendingIntent pending(Context context, long token) {
@@ -82,13 +83,19 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         if (manager == null) return;
 
         NotificationChannel active = new NotificationChannel(
-                CHANNEL_ACTIVE, "Active Focus Timer", NotificationManager.IMPORTANCE_LOW);
-        active.setDescription("Countdown shown while a focus session is active");
+                CHANNEL_ACTIVE,
+                NativeLocaleStrings.get(context, R.string.native_channel_active_name),
+                NotificationManager.IMPORTANCE_LOW);
+        active.setDescription(NativeLocaleStrings.get(context,
+                R.string.native_channel_active_description));
         manager.createNotificationChannel(active);
 
         NotificationChannel done = new NotificationChannel(
-                CHANNEL_DONE, "Focus Timer Completion", NotificationManager.IMPORTANCE_HIGH);
-        done.setDescription("Alert when a study or work countdown finishes");
+                CHANNEL_DONE,
+                NativeLocaleStrings.get(context, R.string.native_channel_done_name),
+                NotificationManager.IMPORTANCE_HIGH);
+        done.setDescription(NativeLocaleStrings.get(context,
+                R.string.native_channel_done_description));
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         done.setSound(sound, new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
@@ -111,8 +118,9 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         try {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ACTIVE)
                     .setSmallIcon(R.drawable.ic_launcher)
-                    .setContentTitle("Deep Focus — " + cleanTitle(title))
-                    .setContentText("Focus session in progress")
+                    .setContentTitle(NativeLocaleStrings.format(context,
+                            R.string.native_notification_title, cleanTitle(context, title)))
+                    .setContentText(NativeLocaleStrings.get(context, R.string.native_notification_active))
                     .setWhen(deadline)
                     .setShowWhen(true)
                     .setUsesChronometer(true)
@@ -136,8 +144,9 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         try {
             manager.notify(DONE_NOTIFICATION, new NotificationCompat.Builder(context, CHANNEL_DONE)
                     .setSmallIcon(R.drawable.ic_launcher)
-                    .setContentTitle("Deep Focus — Time is up")
-                    .setContentText(cleanTitle(title))
+                    .setContentTitle(NativeLocaleStrings.format(context, R.string.native_notification_title,
+                            NativeLocaleStrings.get(context, R.string.native_notification_time_up)))
+                    .setContentText(cleanTitle(context, title))
                     .setContentIntent(openApp(context))
                     .setAutoCancel(true)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -155,6 +164,19 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, deadline, pending(context, token));
     }
 
+    /**
+     * Re-render native notification strings after an explicit WebView locale change.
+     * Never schedules an alarm or changes the v21 session / native timer state.
+     */
+    public static synchronized void refreshLocale(Context context) {
+        createChannels(context);
+        SharedPreferences p = prefs(context);
+        if (p.getBoolean("active", false)) {
+            showActive(context, p.getLong("deadline", 0),
+                    p.getString("title", null));
+        }
+    }
+
     /** Called when the user starts, resumes or adjusts their countdown. */
     public static synchronized void schedule(Context context, int seconds, String title) {
         if (seconds < 1 || seconds > MAX_SECONDS) return;
@@ -163,7 +185,7 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         SharedPreferences p = prefs(context);
         long token = p.getLong("token", 0) + 1;
         clearSystemAlarm(context);
-        String safeTitle = cleanTitle(title);
+        String safeTitle = cleanTitle(context, title);
         if (!p.edit().putBoolean("active", true).putLong("token", token)
                 .putLong("deadline", deadline).putString("title", safeTitle)
                 .putLong("lastNotified", 0).commit()) return;
@@ -186,7 +208,7 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         // Prevent duplicate alert if AlarmManager has already posted completion.
         if (!p.getBoolean("active", false) && now - p.getLong("lastNotified", 0) < 120000) return;
         clearSystemAlarm(context);
-        String safeTitle = cleanTitle(title);
+        String safeTitle = cleanTitle(context, title);
         if (p.edit().putBoolean("active", false).putLong("lastNotified", now).commit()) {
             showDone(context, safeTitle);
         }
@@ -199,7 +221,8 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         if (!p.getBoolean("active", false)) return;
         long token = p.getLong("token", -1);
         long deadline = p.getLong("deadline", 0);
-        String title = p.getString("title", "Focus Session");
+        String title = p.getString("title",
+                NativeLocaleStrings.get(context, R.string.native_focus_session));
         long now = System.currentTimeMillis();
         String action = intent.getAction();
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {

@@ -1,0 +1,41 @@
+name: DF PR04 safe native i18n source and debug build
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/java/**'
+      - 'android/app/src/main/res/**'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'tests/i18n/native_android/**'
+      - '.github/workflows/df_pr04_native_reconciliation.yml'
+permissions:
+  contents: read
+jobs:
+  android-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Native source and translation regressions
+        run: python3 -m unittest discover -s tests/i18n/native_android -p 'test_*.py' -v
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Android SDK 36
+        run: |
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Gradle assembleDebug
+        run: gradle -p android :app:assembleDebug --no-daemon
+      - name: Check debug APK
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          echo 'API30_API35_RUNTIME=NOT_TESTED'
+          echo 'RELEASE_APPROVED=NO'
