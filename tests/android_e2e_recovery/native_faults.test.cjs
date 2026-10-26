@@ -71,3 +71,33 @@ test('incomplete or compressed LevelDB evidence stays unverified',()=>{
  assert.equal(proof,null);
  assert.equal(diag.files[0].read,true);
 });
+
+test('real process recovery remains provable when Chromium WAL marker is not observable',async()=>{
+ const previous=process.env.DF_ANDROID_DISPOSABLE;
+ process.env.DF_ANDROID_DISPOSABLE='1';
+ let restarted=0,postRestartRead=0;
+ const baseline={task:{id:71001},note:{id:71002},seq:4};
+ const ack={valid:true,bytes:12345};
+ const driver={
+   pause:async()=>{},
+   evaluate:async expression=>{
+     if(expression.startsWith('(function('))return {marker:'DF07_PENDING_UNOBSERVED',pending:true,changed:true,nativeUnchanged:true};
+     if(expression==='DeepFocusDataCompatV21.inspectPending(localStorage).pending'){postRestartRead++;return false;}
+     throw Error('unexpected evaluation');
+   },
+   fixture:async()=>baseline,
+   receipt:async()=>ack,
+   restart:async()=>{restarted++;},
+   adb:(...args)=>args.includes('find')?'app_webview/Local Storage/leveldb/LOCK':'',
+ };
+ try {
+  const result=await createNativeFaultCases(driver).interrupted_journal_disk_and_process_recovery();
+  assert.match(result,/force-stop recovered/);
+  assert.match(result,/WAL marker NOT_OBSERVED/);
+  assert.equal(restarted,1,'Real restart must occur even when WAL is unobservable');
+  assert.equal(postRestartRead,1);
+ }finally{
+  if(previous===undefined)delete process.env.DF_ANDROID_DISPOSABLE;
+  else process.env.DF_ANDROID_DISPOSABLE=previous;
+ }
+});
