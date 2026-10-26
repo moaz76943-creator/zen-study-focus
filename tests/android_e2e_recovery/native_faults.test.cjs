@@ -48,3 +48,26 @@ test('failed journal cleanup does not pretend the device returned to an observab
  );
  assert.equal(replayCalled,false);
 });
+
+test('LevelDB compacted tables can prove the real pending marker with hashes, not raw bytes',()=>{
+ const root='app_webview/Default/Local Storage/leveldb/';
+ const marker='DF07_PENDING_123456';
+ const calls=[];
+ const diag={};
+ const proof=walProof(()=>[root+'CURRENT',root+'000003.log',root+'000004.ldb',root+'000005.sst',root+'../private.txt'].join('\n'),
+  file=>{calls.push(file);return file.endsWith('.ldb')?Buffer.from('journal before '+marker):Buffer.from('unrelated');},
+  marker,diag);
+ assert.equal(proof?.file,'000004.ldb');
+ assert.equal(proof?.journal_marker_observed,true);
+ assert.equal(proof?.sha256.length,64);
+ assert.equal(diag.accepted_files,3);
+ assert.ok(calls.every(file=>/\.(?:log|ldb|sst)$/.test(file)));
+ assert.doesNotMatch(JSON.stringify(proof),/DF07_PENDING|journal before/);
+});
+test('incomplete or compressed LevelDB evidence stays unverified',()=>{
+ const dir='app_webview/Local Storage/leveldb/';
+ const diag={};
+ const proof=walProof(()=>dir+'000009.ldb',()=>Buffer.from('no readable pending marker'),'DF07_PENDING_123456',diag);
+ assert.equal(proof,null);
+ assert.equal(diag.files[0].read,true);
+});

@@ -8,9 +8,12 @@ const CASE_NAMES=[...Object.keys(FAMILIES).map(k=>'mirror_recovery_'+k),
  ...['tasksList','notesList'].flatMap(k=>['duplicate','corrupt'].map(kind=>'reject_'+kind+'_'+k)),
  'native_atomicfile_partial_stage_restart_recovery','interrupted_journal_disk_and_process_recovery','real_timer_failed_credit_retry_exactly_once'];
 function walProof(adb,read,marker,diagnostic={}){
- const listed=adb('shell','run-as',PKG,'find','app_webview','-maxdepth','8','-type','f','-name',"'*.log'").split('\n').map(s=>s.trim());
- const files=listed.filter(s=>/^app_webview\/(?:Default\/|Profile [0-9]+\/)?Local Storage\/leveldb\/[0-9]+\.log$/.test(s)).sort().slice(-8);
- diagnostic.listed_log_count=listed.filter(Boolean).length;diagnostic.accepted_logs=files.length;diagnostic.files=[];
+ // Chromium may compact a pending localStorage journal from .log WAL to an
+ // .ldb/.sst table before the device probe reads it. Inspect only known
+ // LevelDB data-file paths; never read unrelated files or upload raw bytes.
+ const listed=adb('shell','run-as',PKG,'find','app_webview','-maxdepth','8','-type','f').split('\n').map(s=>s.trim());
+ const files=listed.filter(s=>/^app_webview\/(?:Default\/|Profile [0-9]+\/)?Local Storage\/leveldb\/[0-9]+\.(?:log|ldb|sst)$/.test(s)).sort().slice(-16);
+ diagnostic.listed_file_count=listed.filter(Boolean).length;diagnostic.accepted_files=files.length;diagnostic.files=[];
  for(const file of files){
   let bytes;try{bytes=read(file);}catch(_){diagnostic.files.push({file:path.basename(file),read:false});continue;} // LevelDB can rotate a WAL between listing and reading.
   diagnostic.files.push({file:path.basename(file),bytes:bytes.length,read:true});
