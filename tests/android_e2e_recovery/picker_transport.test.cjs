@@ -245,3 +245,24 @@ test('permanent read-only ADB loss stays NOT_TESTED without infinite retries',()
  assert.equal(vm.runInContext('adbCommands.filter(x=>x.includes("shell getprop")).length',ctx),3);
  assert.equal(vm.runInContext('adbCommands.filter(x=>x==="reconnect offline").length',ctx),2);
 });
+
+test('legacy invalid-family and double-corruption cases remain NOT_TESTED until real Android evidence',()=>{
+ const ctx=context();
+ vm.runInContext("report.results.push({name:'bootstrap',status:'NOT_TESTED'});fillUnattempted()",ctx);
+ for(const name of ['signed_invalid_family_native_ack_refused','both_webview_copies_corrupt_native_replay']){
+  assert.equal(vm.runInContext("report.results.find(r=>r.name==="+JSON.stringify(name)+").status",ctx),'NOT_TESTED');
+ }
+});
+
+test('native invalid-family probe rejects a signed-invalid ACK, rather than accepting a checksum',async()=>{
+ const ctx=context();
+ vm.runInContext(`
+   fixture=async()=>({task:{id:71001}});
+   restart=async()=>{};
+   evaluate=async expr=>{
+     if(expr==='ZenNative.readDurableV21()')return 'durable-original';
+     return {checksumValid:true,blocked:false,issues:[],ack:true,checkpoint:'durable-original'};
+   };
+ `,ctx);
+ await assert.rejects(vm.runInContext('rejectSignedInvalidFamilyOnAndroid()',ctx),/Signed malformed family must be blocked/);
+});
