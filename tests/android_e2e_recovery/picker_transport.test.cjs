@@ -111,7 +111,7 @@ test('bootstrap failure leaves every unattempted durability case explicitly NOT_
  const ctx=context();
  vm.runInContext(`report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:'transport blocked'});fillUnattempted();`,ctx);
  const results=vm.runInContext('report.results',ctx);
- assert.equal(results.length,29);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
+ assert.equal(results.length,30);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
  assert.ok(results.some(r=>r.name==='saf_actual_file_restore_ack_and_reopen'));
  assert.ok(results.some(r=>r.name==='native_ack_io_failure_rollback_restart'));
 });
@@ -123,7 +123,7 @@ test('each completed Android case checkpoints a full report without advancing un
   await vm.runInContext("run('saf_fixture_and_native_ack',async()=> 'source checkpoint fixture')",ctx);
   const data=JSON.parse(fs.readFileSync(file,'utf8'));
   assert.equal(data.results.find(row=>row.name==='saf_fixture_and_native_ack').status,'PASS');
-  assert.equal(data.results.length,28);assert.equal(data.counts.NOT_TESTED,27);
+  assert.equal(data.results.length,29);assert.equal(data.counts.NOT_TESTED,28);
   assert.equal(vm.runInContext('report.results.length',ctx),1);
  }finally{if(fs.existsSync(file))fs.unlinkSync(file);if(fs.existsSync(file+'.tmp'))fs.unlinkSync(file+'.tmp');fs.rmdirSync(directory);}
 });
@@ -265,4 +265,22 @@ test('native invalid-family probe rejects a signed-invalid ACK, rather than acce
    };
  `,ctx);
  await assert.rejects(vm.runInContext('rejectSignedInvalidFamilyOnAndroid()',ctx),/Signed malformed family must be blocked/);
+});
+
+test('Activity recreation is NOT a PASS when the same WebView global survives',async()=>{
+ const ctx=context();
+ vm.runInContext(`
+  adb=(...args)=>args.includes('pidof')?'123':'';
+  fixture=async()=>({task:{id:71001},note:{id:71002}});
+  evaluate=async expr=>expr.includes('=')?true:'unchanged-global';
+  connect=async()=>{};
+  ws={close(){}};
+ `,ctx);
+ await assert.rejects(vm.runInContext('activityDestroyRecreateOnDevice()',ctx),/Activity not recreated/);
+});
+
+test('Activity recreate is listed as NOT_TESTED unless real same-process proof runs',()=>{
+ const ctx=context();
+ vm.runInContext("report.results.push({name:'bootstrap',status:'NOT_TESTED'});fillUnattempted()",ctx);
+ assert.equal(vm.runInContext("report.results.find(r=>r.name==='activity_destroy_recreate').status",ctx),'NOT_TESTED');
 });
