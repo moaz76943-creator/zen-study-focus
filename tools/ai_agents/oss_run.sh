@@ -33,6 +33,10 @@ else
   cat > "$HOME/.qwen/settings.json" <<'JSON'
 {"modelProviders":{"openai":[{"id":"openai/gpt-oss-120b","wireApi":"responses","envKey":"GROQ_API_KEY","baseUrl":"https://api.groq.com/openai/v1"}]},"security":{"auth":{"selectedType":"openai"}},"model":{"name":"openai/gpt-oss-120b"},"tools":{"eager":[]}}
 JSON
+  # Explicitly cap Qwen's output reservation. Otherwise a later Responses request
+  # can reserve more than Groq Free's 8K tokens/minute even with a small prompt.
+  # Supported Qwen Code environment override; also disables auto output escalation.
+  export QWEN_CODE_MAX_OUTPUT_TOKENS=1024
   # Qwen full default system prompt exceeds Groq Free 8K TPM even with deferred tools.
   # Override it with a short, concrete editing contract; post-run diff guard is authoritative.
   # Qwen Code may grow beyond Groq Free 8k TPM on a later tool turn.
@@ -40,7 +44,7 @@ JSON
   set +e
   timeout 7m qwen --system-prompt 'Edit only task-allowed source and test files. No shell, network, secrets, Git commands, or untested claims. Preserve v21 and translations.' --prompt "$(cat "$RUNNER_TEMP/df-oss-task.txt")" \
     --model openai/gpt-oss-120b --approval-mode auto-edit \
-    --max-tool-calls 24 --max-session-turns 16 --max-wall-time 6m --output-format text \
+    --max-tool-calls 12 --max-session-turns 6 --max-wall-time 6m --output-format text \
     > "$RUNNER_TEMP/df-qwen-output.log" 2>&1
   qwen_status=$?
   set -e
