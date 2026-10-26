@@ -121,7 +121,11 @@ cp "$BUILD/PROBE_SHA256.txt" "$OUT/PROBE_SHA256.txt"
 # Trace only the host VM's main-thread exit/syscall status and fatal signals.
 # No guest memory, command arguments, file activity or app data are captured.
 # Main-thread-only attachment avoids tracing every KVM worker syscall.
-if [[ "$API" == 35 ]] && command -v strace >/dev/null; then
+# Do not attach ptrace to the emulator during acceptance runs: every
+# traced API35 variant so far died with SIGSEGV while independent smoke boots
+# without tracer. Keep crashpad, ADB and cgroup evidence in finalize().
+# An explicit DF13_ATTACH_STRACE=1 is for isolated diagnostics only.
+if [[ "$API" == 35 && "${DF13_ATTACH_STRACE:-0}" == 1 ]] && command -v strace >/dev/null; then
   mapfile -t VM_PIDS < <(pgrep -f '/emulator/qemu/.*/qemu-system-x86_64' || true)
   if (( ${#VM_PIDS[@]} == 1 )); then
     timeout --kill-after=5s 25m sudo -n strace -e trace=exit,exit_group \
@@ -130,6 +134,8 @@ if [[ "$API" == 35 ]] && command -v strace >/dev/null; then
       2> "$OUT/EMULATOR_TRACE_SETUP.txt" &
     TRACER_PID=$!
   fi
+else
+  printf '%s\n' 'PTRACE_NOT_ATTACHED: crashpad, ADB and cgroup checks remain active' > "$OUT/EMULATOR_TRACE_SETUP.txt"
 fi
 if [[ "$API" == 35 ]]; then
   # API35 host crash evidence: SIGSEGV after persistent accessibility probe

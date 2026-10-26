@@ -185,13 +185,6 @@ jobs:
           [[ "$EXPECTED" =~ ^[a-f0-9]{64}$ ]]
           test "$(sha256sum "$BUILD/app-debug.apk" | awk '{print $1}')" = "$EXPECTED"
           cp "$BUILD/APK_SHA256.txt" "artifacts/i18n-e2e/api${DF13_API}/APK_SHA256.txt"
-      - name: Install bounded API35 host-exit diagnostics
-        if: matrix.api == 35
-        shell: bash
-        run: |
-          set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends strace
       - name: Enable KVM acceleration before emulator boot
         shell: bash
         run: |

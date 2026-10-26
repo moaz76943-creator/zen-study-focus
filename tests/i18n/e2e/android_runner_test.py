@@ -42,6 +42,15 @@ class AndroidReportingTest(unittest.TestCase):
         self.assertIn("cancel-in-progress: false", workflow)
         self.assertNotIn("cancel-in-progress: true", workflow)
 
+    def test_emulator_tracing_is_opt_in_not_an_uncontrolled_test_dependency(self):
+        runner = (Path(__file__).resolve().parents[3] / "tools/i18n/e2e/run_android.sh").read_text()
+        workflow = (Path(__file__).resolve().parents[3] / ".github/workflows/i18n_e2e.yml").read_text()
+        self.assertIn('"${DF13_ATTACH_STRACE:-0}" == 1', runner)
+        self.assertIn("PTRACE_NOT_ATTACHED", runner)
+        self.assertIn("EMULATOR_CRASH_METADATA.json", runner)
+        self.assertIn("EMULATOR_HOST_FAILURES.txt", runner)
+        self.assertNotIn("sudo apt-get install -y --no-install-recommends strace", workflow)
+
     def test_api35_alternate_emulator_profile_is_isolated_from_api30(self):
         workflow = (Path(__file__).resolve().parents[3] / ".github/workflows/i18n_e2e.yml").read_text()
         matrix = workflow.split("      matrix:", 1)[1].split("    steps:", 1)[0]
