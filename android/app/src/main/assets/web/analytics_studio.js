@@ -201,6 +201,14 @@
     const historicalGoals=mk('section',undefined,'dfa-historical-goals');
     [insightKpis,comparison,activityRing,historicalGoals].forEach(e=>wrapper.appendChild(e));
     function displayRows(rows,label){
+      // Render user-authored task titles as text only, without changing digits
+      // or injecting their HTML into the analytics document.
+      const live=provider();
+      const taskTitles=new Map();
+      for(const task of (Array.isArray(live?.tasksList)?live.tasksList:[])){
+        if(!task||!Number.isSafeInteger(task.id)||task.id<0)continue;
+        taskTitles.set(task.id,taskTitles.has(task.id)?null:task.title);
+      }
       detail.replaceChildren(mk('h3',label));
       if(!rows.length){detail.appendChild(mk('p',t.noData));return;}
       const table=mk('table');table.style.cssText='width:100%;border-collapse:collapse';
@@ -208,15 +216,24 @@
       for(const title of [t.start,t.sessions,t.activity,t.minutes,t.tasks])
         headers.appendChild(mk('th',title));
       head.appendChild(headers);table.appendChild(head);
-      const body=mk('tbody');
-      for(const item of rows.slice(0,200)){
+      const body=mk('tbody'),more=mk('button');
+      more.type='button';
+      more.setAttribute('data-drilldown-more','true');
+      more.style.cssText='min-height:42px;background:#f8fafc;color:#14213d;border:1px solid #cbd5e1;border-radius:10px;padding:8px 12px;margin-top:8px';
+      let shown=0;
+      function appendPage(){
+        if(destroyed)return;
+        const next=Math.min(rows.length,shown+200);
+        for(const item of rows.slice(shown,next)){
         const tr=mk('tr');
         for(const value of [item.date,item.id,labels[item.domain],item.minutes])
           tr.appendChild(mk('td',String(value)));
         const cell=mk('td');
         if(Number.isSafeInteger(item.taskId)&&item.taskId>=0){
           if(typeof opts.onOpenTask==='function'){
-            const button=mk('button',String(item.taskId));button.type='button';
+            const title=taskTitles.get(item.taskId);
+            const button=mk('button',typeof title==='string'&&title.trim()?title:String(item.taskId));
+            button.type='button';
             button.setAttribute('data-task-id',String(item.taskId));
             button.addEventListener('click',()=>{
               const snapshot=provider();
@@ -224,7 +241,8 @@
                 .filter(task=>task&&task.id===item.taskId);
               if(matches.length!==1||matches[0].archived===true||
                  matches[0].status==='archived'||matches[0].isStarter===true||
-                 matches[0].isDemo===true||matches[0].synthetic===true)return;
+                 matches[0].isDemo===true||matches[0].synthetic===true||
+                  ['demo','sample','fixture'].includes(matches[0].source))return;
               opts.onOpenTask(item.taskId);
             });
             cell.appendChild(button);
@@ -232,8 +250,14 @@
         }
         tr.appendChild(cell);body.appendChild(tr);
       }
+        shown=next;
+        if(shown<rows.length)more.textContent='+ '+t.sessions+': '+shown+' / '+rows.length;
+        else more.remove();
+      }
+      more.addEventListener('click',appendPage);
       table.appendChild(body);detail.appendChild(table);
-      if(rows.length>200)detail.appendChild(mk('p','200 / '+rows.length));
+      if(rows.length>200)detail.appendChild(more);
+      appendPage();
     }
     for(const [days,key] of [[1,'today'],[7,'last7'],[30,'last30']]){
       const button=mk('button',t[key]);button.type='button';

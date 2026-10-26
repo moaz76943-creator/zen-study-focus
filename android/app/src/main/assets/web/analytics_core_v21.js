@@ -94,13 +94,24 @@
   function taskReport(tasks,projects=[],today=localToday()) {
     const seen=new Set(),valid=[];let excluded=0;
     (Array.isArray(tasks)?tasks:[]).forEach(t=>{
-      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
+      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||['demo','sample','fixture'].includes(t.source)||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
       seen.add(t.id);valid.push(t);
     });
     const active=valid.filter(t=>t.status!=='archived'&&t.archived!==true);
     const done=active.filter(t=>t.done || t.status==='completed').length;
-    const projectsMap=new Map();
-    (Array.isArray(projects)?projects:[]).forEach(p=>{if(isRecord(p)&&!p.isStarter&&idKey(p.id)!==null&&!projectsMap.has(idKey(p.id)))projectsMap.set(idKey(p.id),{id:p.id,name:typeof p.name==='string'?p.name:'',total:0,completed:0});});
+    const projectsMap=new Map(),ambiguousProjects=new Set();
+    (Array.isArray(projects)?projects:[]).forEach(p=>{
+      if(!isRecord(p)||p.isStarter===true||p.isDemo===true||p.synthetic===true||
+         ['demo','sample','fixture'].includes(p.source))return;
+      const key=idKey(p.id);
+      if(key===null||ambiguousProjects.has(key))return;
+      if(projectsMap.has(key)){
+        projectsMap.delete(key);
+        ambiguousProjects.add(key);
+        return;
+      }
+      projectsMap.set(key,{id:p.id,name:typeof p.name==='string'?p.name:'',total:0,completed:0});
+    });
     for(const t of active){const key=idKey(t.projectId);if(key && projectsMap.has(key)){const p=projectsMap.get(key);p.total++;if(t.done||t.status==='completed')p.completed++;}}
     return {total:active.length,completed:done,remaining:active.length-done,archived:valid.length-active.length,
       overdue:active.filter(t=>!t.done&&t.status!=='completed'&&validDay(t.dueDate)&&t.dueDate<today).length,
@@ -180,6 +191,7 @@
     const eligibleTaskIds=new Set(tasks.filter(t=>isRecord(t)&&
       Number.isSafeInteger(t.id)&&t.id>=0&&counts.get(t.id)===1&&
       t.isStarter!==true&&t.isDemo!==true&&t.synthetic!==true&&
+      !['demo','sample','fixture'].includes(t.source)&&
       t.archived!==true&&t.status!=='archived'&&typeof t.title==='string'&&
       typeof t.done==='boolean').map(t=>t.id));
     const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&

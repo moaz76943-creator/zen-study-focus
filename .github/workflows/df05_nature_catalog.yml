@@ -1,0 +1,25 @@
+name: DF05 isolated nature catalog regression
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/nature_library_v2.js'
+      - 'android/app/src/main/assets/web/nature_library_v2.css'
+      - 'tests/nature_library_v2/catalog_port.test.cjs'
+      - '.github/workflows/df05_nature_catalog.yml'
+permissions:
+  contents: read
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node --check android/app/src/main/assets/web/nature_library_v2.js
+          node --test tests/nature_library_v2/catalog_port.test.cjs

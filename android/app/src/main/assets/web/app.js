@@ -1985,6 +1985,10 @@ function applyLanguage(code) {
   // Premium labels may also be created by re-rendered screens; refresh last.
   if (window.DF22Locale?.apply) window.DF22Locale.apply(document,meta.code);
   if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
+  try {
+    if (window.ZenNative && typeof window.ZenNative.setNativeLocale === 'function')
+      window.ZenNative.setNativeLocale(meta.code);
+  } catch (_) { /* Web preview has no native bridge. */ }
 }
 
 /* ========================================================
@@ -2331,6 +2335,9 @@ function startQuickSportRest(secs) {
       window.ZenNative.startBackgroundService(seconds,
         document.getElementById('timerModeCaption').textContent);
     }catch(error){console.warn('Rest notification unavailable',error);}
+  }
+  if(window.ZenNative && typeof window.ZenNative.requestTimerNotificationPermission==='function'){
+    try{window.ZenNative.requestTimerNotificationPermission();}catch(e){}
   }
   timerInterval=setInterval(runTimerTick,500);
   showToast(toWest(`⏱️ Rest ${seconds}s Started`));
@@ -2723,6 +2730,9 @@ function toggleTimerPlay() {
     }
     if (window.ZenNative && window.ZenNative.startBackgroundService) {
       try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch(e){}
+    }
+    if (window.ZenNative && typeof window.ZenNative.requestTimerNotificationPermission==='function') {
+      try { window.ZenNative.requestTimerNotificationPermission(); } catch(e){}
     }
     timerInterval = setInterval(runTimerTick, 500);
   }
