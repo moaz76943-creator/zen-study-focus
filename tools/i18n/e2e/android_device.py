@@ -254,6 +254,7 @@ def run(out, source_sha, api):
         report = {
             "TASK_ID":"DF-LANE-13-REAL-END-TO-END-QA",
             "SOURCE_SHA":source_sha, "API":api, "test_results":results, "device_matrix":matrix,
+            "ANDROID_TREE":os.getenv("DF13_ANDROID_TREE", "UNKNOWN"),
             "summary":{status:sum(x["status"]==status for x in results.values())
                        for status in ("PASS","FAIL","NOT_TESTED")},
             "representative_locales_planned":[code for code,_ in LOCALES],
@@ -306,6 +307,24 @@ def run(out, source_sha, api):
             results["offline_fresh_boot"]={"status":"PASS",
                 "detail":"Offline foreground activity and accessible Deep Focus heading"}
         checkpoint()
+        def startup_js():
+            pid = shell("pidof", PACKAGE).strip().split()[0]
+            if not pid.isdigit():
+                raise AssertionError("App PID unavailable for WebView console verification")
+            log = adb("logcat", "-d", "--pid=" + pid, "-s", "chromium:I", "*:S")
+            errors = [line for line in log.splitlines() if "CONSOLE" in line
+                      and re.search(r"Uncaught|TypeError:|ReferenceError:|SyntaxError:", line)]
+            # Retain only the category and bundled asset name, never console text.
+            evidence = [{"asset": (re.search(r"file:///android_asset/web/[A-Za-z0-9_./-]+", line).group(0)
+                        if re.search(r"file:///android_asset/web/[A-Za-z0-9_./-]+", line) else "unknown"),
+                         "missing_replaceChildren": "replaceChildren is not a function" in line}
+                        for line in errors]
+            (out/"WEBVIEW_STARTUP_ERRORS.json").write_text(json.dumps(evidence, indent=2) + "\n")
+            (out/"WEBVIEW_PROVIDER.txt").write_text(shell("dumpsys", "webviewupdate"))
+            if errors:
+                raise AssertionError(str(len(errors)) + " real WebView startup exceptions; asset evidence captured")
+            return "No uncaught startup errors in actual app PID's Chromium console; separate from feature acceptance"
+        record(results, "webview_startup_js", startup_js, checkpoint)
     except Exception as error:
         results["offline_fresh_boot"]={"status":"FAIL","error":str(error)}
         try:

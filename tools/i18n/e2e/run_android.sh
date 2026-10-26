@@ -59,6 +59,9 @@ PY
 trap finalize EXIT
 
 test "$(cat "$BUILD/SOURCE_SHA.txt")" = "$(git rev-parse HEAD)"
+test "$(cat "$BUILD/ANDROID_TREE.txt")" = "$(git rev-parse HEAD:android)"
+cp "$BUILD/ANDROID_TREE.txt" "$OUT/ANDROID_TREE.txt"
+export DF13_ANDROID_TREE="$(cat "$BUILD/ANDROID_TREE.txt")"
 test "$(cat "$BUILD/PACKAGE_ID.txt")" = com.zenstudy.focus
 EXPECTED="$(cat "$BUILD/APK_SHA256.txt")"
 [[ "$EXPECTED" =~ ^[a-f0-9]{64}$ ]]

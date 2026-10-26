@@ -84,6 +84,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
           mkdir -p artifacts/i18n-e2e/build
           git rev-parse HEAD > artifacts/i18n-e2e/build/SOURCE_SHA.txt
+          git rev-parse HEAD:android > artifacts/i18n-e2e/build/ANDROID_TREE.txt
           rm -f android/app/build/outputs/apk/debug/app-debug.apk
           cd android
           ./gradlew :app:assembleDebug --no-daemon --stacktrace
