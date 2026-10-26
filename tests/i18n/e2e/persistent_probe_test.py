@@ -36,6 +36,8 @@ class PersistentProbeTest(unittest.TestCase):
     def test_empty_transport_reply_retries_dump_without_replaying_ui_actions(self):
         xml = '<hierarchy><node text="Deep Focus" bounds="[0,1][200,60]"/></hierarchy>'
         first, second = MagicMock(), MagicMock()
+        first.__enter__.return_value = first
+        second.__enter__.return_value = second
         first.makefile.return_value.__enter__.return_value = io.BytesIO(b'')
         second.makefile.return_value.__enter__.return_value = io.BytesIO(
             (json.dumps({'xml': xml})+'\n').encode())
@@ -52,6 +54,7 @@ class PersistentProbeTest(unittest.TestCase):
         replies = []
         for _ in range(4):
             connection = MagicMock()
+            connection.__enter__.return_value = connection
             connection.makefile.return_value.__enter__.return_value = io.BytesIO(b'')
             replies.append(connection)
         with patch.dict(os.environ, {'DF13_UI_PORT': '38383'}), \
