@@ -100,6 +100,16 @@ function dumpUI(){
  adb('shell','uiautomator','dump','/sdcard/df02_saf.xml');return adb('shell','cat','/sdcard/df02_saf.xml');
 }
 function tapUI(node){
+ if(process.env.DF13_UI_PORT&&/clickable="true"/.test(node||'')){
+  try{
+   const port=Number(process.env.DF13_UI_PORT);
+   if(!Number.isInteger(port)||port<1024||port>65535)throw Error('invalid local port');
+   const xml=node.endsWith('/>')?node:node.slice(0,-1)+'/>';
+   const response=JSON.parse(cp.execFileSync('python3',['tests/android_e2e_recovery/native_ui_dump.py',String(port),xml],{encoding:'utf8',timeout:20000}));
+   if(response.clicked!==true||response.error)throw Error('native action rejected');
+   return;
+  }catch(_){throw Error('TRANSPORT: native picker accessibility action not acknowledged');}
+ }
  const m=node?.match(/bounds="([^"]+)"/),v=m?[...m[1].matchAll(/[0-9]+/g)].map(x=>Number(x[0])):[];
  if(v.length!==4||v[2]<=v[0]||v[3]<=v[1])throw Error('TRANSPORT: Native picker control bounds missing');
  adb('shell','input','tap',String(Math.floor((v[0]+v[2])/2)),String(Math.floor((v[1]+v[3])/2)));

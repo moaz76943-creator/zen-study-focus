@@ -47,3 +47,13 @@ test('broken configured probe fails closed without a one-shot fallback',()=>{
  assert.throws(()=>vm.runInContext('dumpUI()',ctx),/TRANSPORT:/);
  assert.deepEqual(calls,['python3']);
 });
+test('clickable native picker controls use revalidated accessibility actions without coordinate replay',()=>{
+ const ctx=context();ctx.process.env.DF13_UI_PORT='38383';
+ const calls=[];ctx.probeExec=(cmd,args)=>{calls.push([cmd,args]);return '{"clicked":true}';};
+ vm.runInContext('cp.execFileSync=probeExec',ctx);
+ vm.runInContext(`tapUI('<node class="android.widget.TextView" content-desc="List view" clickable="true" bounds="[890,499][1017,625]"/>')`,ctx);
+ assert.equal(calls.length,1);assert.equal(calls[0][0],'python3');
+ calls.length=0;ctx.probeExec=cmd=>{calls.push(cmd);return '{"clicked":false}';};
+ assert.throws(()=>vm.runInContext(`tapUI('<node class="android.widget.TextView" content-desc="List view" clickable="true" bounds="[890,499][1017,625]"/>')`,ctx),/TRANSPORT:/);
+ assert.deepEqual(calls,['python3']);
+});
