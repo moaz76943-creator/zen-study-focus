@@ -293,6 +293,29 @@ async function confirmDialog(accept){
  },false);
  saveSafPickerEvidence(accept?'consent_accept':'consent_cancel',u.xml);tapUI(u.item);await pause(500);
 }
+async function fiveRapidAcksThenKill(){
+ // Historical #159 continuity: each mutation must commit a matching native
+ // six-packet receipt before a single immediate force-stop and relaunch.
+ const initial=await fixture();
+ for(let i=1;i<=5;i++){
+  const body='after.cfg.df07Seq='+i+
+   ';after.tasksList.find(t=>t.id===71001).done='+Boolean(i%2)+
+   ';after.notesList.find(n=>n.id===71002).body+="|'+i+'"';
+  assert.equal(await write(body),true,'Edit '+i+' must commit');
+  assert.equal((await receipt()).valid,true,'ACK every edit '+i);
+ }
+ const before=await fixture();
+ assert.equal(before.seq,5,'Five edits must be reflected in the v21 checkpoint');
+ assert.equal(before.task.id,initial.task.id);
+ assert.equal(before.note.id,initial.note.id);
+ assert.deepEqual(before.task.unknownTask,initial.task.unknownTask);
+ assert.deepEqual(before.note.unknownNote,initial.note.unknownNote);
+ await restart();
+ assert.deepEqual(await fixture(),before,'Five accepted edits lost after force-stop/reopen');
+ assert.equal((await receipt()).valid,true,'Final native receipt lost after restart');
+ return 'Five consecutive cross-family edits and five real native ACKs survived one process kill';
+}
+
 async function safExportAndReadback(){
  // WebView export action must invoke genuine native ACTION_CREATE_DOCUMENT.
  // Only independently recovered provider bytes can prove Save succeeded.
@@ -355,6 +378,7 @@ async function safMain(){
  }
  await run('native_ack_io_failure_rollback_restart',nativeIoFailureRollback);
  for(const [name,fn] of Object.entries(require('./native_faults.cjs').createNativeFaultCases({evaluate,snapshot,receipt,fixture,restart,adb,nativeUI,tapUI})))await run(name,fn);
+ await run('five_acks_one_immediate_kill',fiveRapidAcksThenKill);
  await run('saf_document_save_and_readback',safExportAndReadback);
  const baseline=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
  await run('saf_picker_cancel',async()=>{
@@ -403,7 +427,7 @@ function fillUnattempted(target=report){
  const planned=['saf_fixture_and_native_ack','locale_native_ack_process_restart',
   ...keys.flatMap(key=>['failed_save_rollback_'+key,'failed_save_rollback_'+key+'_mirror']),
   'native_ack_io_failure_rollback_restart',...require('./native_faults.cjs').CASE_NAMES,
-   'saf_document_save_and_readback','saf_picker_cancel','saf_valid_file_consent_cancel',
+   'five_acks_one_immediate_kill','saf_document_save_and_readback','saf_picker_cancel','saf_valid_file_consent_cancel',
   'saf_corrupt_rejected','saf_oversized_rejected','saf_actual_file_restore_ack_and_reopen'];
  for(const name of planned)if(!target.results.some(row=>row.name===name))
   target.results.push({name,status:'NOT_TESTED',detail:'Not executed; blocked by prior Android/native transport failure'});

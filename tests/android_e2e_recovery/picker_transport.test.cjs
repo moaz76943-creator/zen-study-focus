@@ -111,7 +111,7 @@ test('bootstrap failure leaves every unattempted durability case explicitly NOT_
  const ctx=context();
  vm.runInContext(`report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:'transport blocked'});fillUnattempted();`,ctx);
  const results=vm.runInContext('report.results',ctx);
- assert.equal(results.length,26);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
+ assert.equal(results.length,27);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
  assert.ok(results.some(r=>r.name==='saf_actual_file_restore_ack_and_reopen'));
  assert.ok(results.some(r=>r.name==='native_ack_io_failure_rollback_restart'));
 });
@@ -123,7 +123,7 @@ test('each completed Android case checkpoints a full report without advancing un
   await vm.runInContext("run('saf_fixture_and_native_ack',async()=> 'source checkpoint fixture')",ctx);
   const data=JSON.parse(fs.readFileSync(file,'utf8'));
   assert.equal(data.results.find(row=>row.name==='saf_fixture_and_native_ack').status,'PASS');
-  assert.equal(data.results.length,25);assert.equal(data.counts.NOT_TESTED,24);
+  assert.equal(data.results.length,26);assert.equal(data.counts.NOT_TESTED,25);
   assert.equal(vm.runInContext('report.results.length',ctx),1);
  }finally{if(fs.existsSync(file))fs.unlinkSync(file);if(fs.existsSync(file+'.tmp'))fs.unlinkSync(file+'.tmp');fs.rmdirSync(directory);}
 });
@@ -173,5 +173,34 @@ test('SAF export is scheduled as real Android evidence, never inferred from pick
  const ctx=context();
  vm.runInContext("report.results.push({name:'bootstrap',status:'NOT_TESTED'});fillUnattempted();",ctx);
  const row=vm.runInContext("report.results.find(x=>x.name==='saf_document_save_and_readback')",ctx);
+ assert.equal(row.status,'NOT_TESTED');
+});
+
+test('five v21 edits require five real ACK receipts before one process kill',async()=>{
+ const ctx=context();
+ vm.runInContext(`
+   let seq=0, restartCount=0, rejectOn=3;
+   write=async expression=>{
+     const match=expression.match(/after\\.cfg\\.df07Seq=(\\d+)/);
+     if(!match)throw Error('missing sequence write');
+     seq=Number(match[1]);return true;
+   };
+   receipt=async()=>({valid:seq!==rejectOn});
+   fixture=async()=>({seq,task:{id:71001},note:{id:71002}});
+   restart=async()=>{restartCount++;};
+ `,ctx);
+ await assert.rejects(vm.runInContext('fiveRapidAcksThenKill()',ctx),/ACK every edit 3/);
+ assert.equal(vm.runInContext('restartCount',ctx),0,'Never kill process after a failed ACK');
+ vm.runInContext('seq=0;rejectOn=0',ctx);
+ const detail=await vm.runInContext('fiveRapidAcksThenKill()',ctx);
+ assert.match(detail,/Five consecutive/);
+ assert.equal(vm.runInContext('seq',ctx),5);
+ assert.equal(vm.runInContext('restartCount',ctx),1);
+});
+
+test('five ACK / force-stop remains explicitly NOT_TESTED on device bootstrap failure',()=>{
+ const ctx=context();
+ vm.runInContext("report.results.push({name:'bootstrap',status:'NOT_TESTED'});fillUnattempted();",ctx);
+ const row=vm.runInContext("report.results.find(x=>x.name==='five_acks_one_immediate_kill')",ctx);
  assert.equal(row.status,'NOT_TESTED');
 });
