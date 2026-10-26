@@ -12,12 +12,15 @@ test -s "$apk" && test -s "$testapk"
 sha256sum "$apk" "$testapk" > "$out/APK_SHA256.txt"
 cleanup(){
  adb shell wm size reset >/dev/null 2>&1 || true
+ adb shell wm density reset >/dev/null 2>&1 || true
  adb logcat -d -s DF03_TASKS_ANDROID AndroidRuntime > "$out/logcat.txt" 2>&1 || true
 }
 trap cleanup EXIT
 bash tests/white_premium_qa/track14_install_apk.sh "$apk"
 timeout 180s adb install --no-streaming -r "$testapk" > "$out/test-apk-install.txt" 2>&1
 adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
+# Report 320/360/393/430 CSS pixels, not Pixel_6 density-scaled 122px.
+adb shell wm density 160
 for width in 320 360 393 430; do
  adb shell wm size "${width}x820"
  adb shell pm clear com.zenstudy.focus >/dev/null
@@ -25,7 +28,7 @@ for width in 320 360 393 430; do
  locale=en
  if [[ "$width" == "320" || "$width" == "393" ]]; then locale=ar; fi
  edit="$out/edit-${width}-${locale}.txt"
- timeout 170s adb shell am instrument -w -r -e stage edit -e locale "$locale" \
+ timeout 170s adb shell am instrument -w -r -e stage edit -e locale "$locale" -e width "$width" \
    com.zenstudy.focus.test/com.zenstudy.focus.df03.TaskInstrumentation > "$edit" 2>&1 || {
    echo "TASKS_EDIT_INSTRUMENTATION_COMMAND_FAILED api=$api width=$width"; cat "$edit"; exit 1;
  }
@@ -36,7 +39,7 @@ for width in 320 360 393 430; do
  # Force-kill the REAL target app between test processes.
  adb shell am force-stop com.zenstudy.focus
  verify="$out/reopen-${width}-${locale}.txt"
- timeout 150s adb shell am instrument -w -r -e stage verify -e locale "$locale" \
+ timeout 150s adb shell am instrument -w -r -e stage verify -e locale "$locale" -e width "$width" \
    com.zenstudy.focus.test/com.zenstudy.focus.df03.TaskInstrumentation > "$verify" 2>&1 || {
    echo "TASKS_REOPEN_INSTRUMENTATION_COMMAND_FAILED api=$api width=$width"; cat "$verify"; exit 1;
  }
