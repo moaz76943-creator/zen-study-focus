@@ -6,6 +6,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const http=require('node:http');
+const net=require('node:net');
 const {execFileSync}=require('node:child_process');
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const E=process.argv[2]||'/tmp/df-p0-dialogs';
@@ -27,18 +28,52 @@ function buttons(xml){
     y:Math.floor((+bounds[2]+ +bounds[4])/2)};
  }).filter(Boolean);
 }
+async function nativeHierarchy(){
+ const port=Number(process.env.DF_DIALOG_NATIVE_PORT);
+ if(port!==38384)throw Error('TRANSPORT: native accessibility port not configured');
+ return new Promise((resolve,reject)=>{
+  const socket=net.createConnection({host:'127.0.0.1',port});
+  let bytes=0,received='',settled=false;
+  const fail=e=>{if(!settled){settled=true;socket.destroy();reject(e);}};
+  socket.setTimeout(12000,()=>fail(Error('TRANSPORT: native hierarchy timeout')));
+  socket.on('error',fail);
+  socket.on('connect',()=>socket.write('DUMP\n'));
+  socket.on('data',chunk=>{
+   if(settled)return;
+   bytes+=chunk.length;
+   if(bytes>8*1024*1024){fail(Error('TRANSPORT: native hierarchy oversized'));return;}
+   received+=chunk.toString('utf8');
+   const end=received.indexOf('\n');
+   if(end<0)return;
+   try{
+    const msg=JSON.parse(received.slice(0,end));
+    if(typeof msg.xml!=='string'||!msg.xml.includes('<hierarchy'))throw Error('TRANSPORT: native hierarchy missing');
+    settled=true;socket.end();resolve(msg.xml);
+   }catch(err){fail(err);}
+  });
+  socket.on('end',()=>{if(!settled)fail(Error('TRANSPORT: native hierarchy disconnected'));});
+ });
+}
 async function dialog(expected){
  let last='';
- for(let n=0;n<4;n++){
-  try{
-   adb('shell','uiautomator','dump','/sdcard/df-p0-dialog.xml');
-   last=adb('shell','cat','/sdcard/df-p0-dialog.xml');
-   if(last.includes('Deep Focus')&&last.includes(expected)){
-    assert.doesNotMatch(last,/file:\/\/|تعرض الصفحة في|The page at/,'Browser-origin dialog leaked');
-    return last;
+ for(let n=0;n<6;n++){
+  const candidates=[];
+  try{candidates.push(await nativeHierarchy());}catch(e){last=String(e);}
+  if(!candidates.length || n%2===1){
+   try{
+    adb('shell','uiautomator','dump','/sdcard/df-p0-dialog.xml');
+    candidates.push(adb('shell','cat','/sdcard/df-p0-dialog.xml'));
+   }catch(e){last=String(e);}
+  }
+  for(const xml of candidates){
+   if(xml.includes('package="com.zenstudy.focus"')&&
+      xml.includes('Deep Focus')&&xml.includes(expected)){
+    assert.doesNotMatch(xml,/file:\/\/|تعرض الصفحة في|The page at/,'Browser-origin dialog leaked');
+    return xml;
    }
-  }catch(e){last=String(e);}
-  await sleep(750);
+   last='Trusted package, title or expected message absent from real native hierarchy';
+  }
+  await sleep(650);
  }
  throw Error('REAL_NATIVE_DIALOG_NOT_PROVEN '+expected+' '+last.slice(0,350));
 }

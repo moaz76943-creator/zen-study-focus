@@ -54,6 +54,30 @@ if [ "$installed" -ne 1 ]; then
   echo 'ANDROID_DIALOG_QA=NOT_TESTED (APK not installed)' >&2
   exit 1
 fi
+# Reuse the existing separate test-only Android accessibility probe.
+adb install -r -t qa-probe/tools/i18n/e2e/probe/build/outputs/apk/debug/*-debug.apk
+adb forward --remove tcp:38384 >/dev/null 2>&1 || :
+adb forward tcp:38384 localabstract:df13-accessibility
+adb shell am instrument -w com.zenstudy.focus.e2e/.AccessibilityProbe > "$E/native-probe-log.txt" 2>&1 &
+PROBE_PID=$!
+cleanup_probe(){
+  adb shell am force-stop com.zenstudy.focus.e2e >/dev/null 2>&1 || :
+  kill "$PROBE_PID" 2>/dev/null || :
+  adb forward --remove tcp:38384 >/dev/null 2>&1 || :
+}
+trap cleanup_probe EXIT
+export DF_DIALOG_NATIVE_PORT=38384
+python3 - <<'READY'
+import socket, time
+for _ in range(45):
+    try:
+        with socket.create_connection(('127.0.0.1', 38384), timeout=2) as s:
+            s.sendall(b'PING\n')
+            if s.recv(1024): break
+    except OSError: pass
+    time.sleep(1)
+else: raise SystemExit('NOT_TESTED: persistent Android accessibility probe unavailable')
+READY
 adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
 sleep 6
 PID="$(adb shell pidof com.zenstudy.focus | tr -d '\r' | awk '{print $1}')"

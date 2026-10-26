@@ -36,3 +36,16 @@ test('consecutive synchronous confirmations and Activity teardown release the ac
   assert.match(host, /protected void onDestroy\(\)/);
   assert.match(host, /appDialogs\.cancelPending\(\)/);
 });
+
+test('native dialog QA reuses pre-existing persistent Accessibility probe; no JS fake dialogs',()=>{
+ const runner=fs.readFileSync(path.join(__dirname,'run_native_dialog_device.sh'),'utf8');
+ const source=fs.readFileSync(path.join(__dirname,'native_js_dialog_android_probe.cjs'),'utf8');
+ const workflow=fs.readFileSync(path.resolve(__dirname,'../../.github/workflows/df_parallel01_native_dialog_android.yml'),'utf8');
+ assert.match(workflow,/qa-probe\/tools\/i18n\/e2e\/probe assembleDebug/);
+ assert.match(runner,/am instrument -w com\.zenstudy\.focus\.e2e\/\.AccessibilityProbe/);
+ assert.match(source,/nativeHierarchy\(\)/);
+ assert.match(source,/msg\.xml/);
+ assert.match(source,/package="com\.zenstudy\.focus"/);
+ assert.match(source,/REAL_NATIVE_DIALOG_NOT_PROVEN/);
+ assert.doesNotMatch(source,/window\.(confirm|alert|prompt)\s*=/);
+});
