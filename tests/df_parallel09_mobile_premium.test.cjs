@@ -24,6 +24,7 @@ test('320–430px narrow navigation shows only active/focused caption but retain
   assert.match(scoped, /\.bnav-btn:is\(\.active,:focus-visible\)/);
   assert.doesNotMatch(scoped, /display:\s*none|aria-hidden/i);
   assert.match(scoped, /min-block-size:\s*44px/);
+  assert.match(scoped, /#navTimer\s*\{[^}]*transform:\s*none\s*!important/, 'timer transform must not capture absolutely-positioned caption');
 });
 
 test('200% text zoom keeps timer and duration controls inside the hero without clipping text', () => {
