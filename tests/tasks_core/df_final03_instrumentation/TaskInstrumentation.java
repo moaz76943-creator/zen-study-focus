@@ -24,9 +24,11 @@ public final class TaskInstrumentation extends Instrumentation {
     private Activity activity;
     private WebView view;
     private int realTaps=0;
+    private Bundle instrumentationArgs;
 
     @Override public void onCreate(Bundle arguments) {
         super.onCreate(arguments);
+        instrumentationArgs=arguments;
         start();
     }
 
@@ -34,7 +36,7 @@ public final class TaskInstrumentation extends Instrumentation {
         super.onStart();
         Bundle report=new Bundle();
         try {
-            Bundle args=getArguments();
+            Bundle args=instrumentationArgs;
             String stage=args==null?"edit":args.getString("stage","edit");
             String locale=args==null?"en":args.getString("locale","en");
             Intent launch=new Intent();
