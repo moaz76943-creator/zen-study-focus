@@ -68,6 +68,14 @@ jobs:
           mkdir -p "$RUNNER_TEMP/df-dialog-evidence"
           sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/df-dialog-evidence/apk.sha256"
           git rev-parse HEAD > "$RUNNER_TEMP/df-dialog-evidence/source-head.txt"
+      - name: Give emulator runner KVM access
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
       - name: Real on-device Dialog Cancel Back Confirm Alert Prompt API ${{ matrix.api }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
