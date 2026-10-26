@@ -71,3 +71,12 @@ test('a failed mirror write cannot advance the native checkpoint',()=>{
  assert.equal(r.checkpoint(),original);
  assert.equal(r.boot().context.tasksList[0].checklist[0].done,true);
 });
+
+test('checksum-valid but wrong-shaped task family cannot reach native durable ACK',()=>{
+ const r=rig(),a=r.boot(),raw=D.encodePacket({id:71001,title:'signed but not a tasks array',done:false});
+ a.storage.setItem(D.KEYS.tasks,raw);
+ a.storage.setItem(D.KEYS.tasks+'_mirror',raw);
+ const before=r.checkpoint();
+ assert.equal(vm.runInContext('DF22Preflight.nativeAcknowledge(localStorage)',a.context),false);
+ assert.equal(r.checkpoint(),before,'Invalid records must not advance native durable receipt');
+});
