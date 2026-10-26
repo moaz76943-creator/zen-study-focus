@@ -37,6 +37,10 @@ for width in 320 360 393 430; do
   if ! grep -q 'INSTRUMENTATION_RESULT: df08_status=PASS' "$output" ||
       ! grep -q 'INSTRUMENTATION_RESULT: df08_physical_taps=' "$output"; then
     echo "ANDROID_TOUCH_NOT_PASS width=$width"
+    timeout 30s adb exec-out screencap -p > "$out/failure-$width.png" 2>/dev/null || true
+    timeout 35s adb shell uiautomator dump /sdcard/df08_hierarchy.xml >/dev/null 2>&1 || true
+    timeout 15s adb exec-out cat /sdcard/df08_hierarchy.xml > "$out/failure-$width.xml" 2>/dev/null || true
+    timeout 15s adb shell dumpsys window > "$out/window-$width.txt" 2>&1 || true
     cat "$output"
     exit 1
   fi
