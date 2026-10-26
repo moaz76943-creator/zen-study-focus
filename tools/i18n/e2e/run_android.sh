@@ -14,10 +14,12 @@ mkdir -p "$OUT"
 printf '%s\n' "$(git rev-parse HEAD)" > "$OUT/SOURCE_SHA.txt"
 RUNNER_STARTED=0
 PROBE_PID=""
+TRACER_PID=""
 
 finalize() {
   local code=$?
   trap - EXIT
+  if [[ -n "$TRACER_PID" ]]; then kill "$TRACER_PID" 2>/dev/null || true; fi
   printf '%s\n' "$code" > "$OUT/RUNNER_EXIT_CODE.txt"
   {
     date -u
@@ -116,6 +118,19 @@ cp "$BUILD/PACKAGE_ID.txt" "$OUT/PACKAGE_ID.txt"
 # dump` tears down accessibility and repeatedly loses WebView virtual children.
 test "$(sha256sum "$BUILD/accessibility-probe.apk" | awk '{print $1}')" = "$(cat "$BUILD/PROBE_SHA256.txt")"
 cp "$BUILD/PROBE_SHA256.txt" "$OUT/PROBE_SHA256.txt"
+# Trace only the host VM's main-thread exit/syscall status and fatal signals.
+# No guest memory, command arguments, file activity or app data are captured.
+# Main-thread-only attachment avoids tracing every KVM worker syscall.
+if [[ "$API" == 35 ]] && command -v strace >/dev/null; then
+  mapfile -t VM_PIDS < <(pgrep -f '/emulator/qemu/.*/qemu-system-x86_64' || true)
+  if (( ${#VM_PIDS[@]} == 1 )); then
+    timeout --kill-after=5s 25m sudo -n strace -e trace=exit,exit_group \
+      -e signal=SIGSEGV,SIGABRT,SIGBUS,SIGILL,SIGKILL,SIGTERM,SIGHUP,SIGPIPE,SIGSYS \
+      -p "${VM_PIDS[0]}" -o "$OUT/EMULATOR_EXIT_TRACE.txt" \
+      2> "$OUT/EMULATOR_TRACE_SETUP.txt" &
+    TRACER_PID=$!
+  fi
+fi
 timeout 60s adb install -r -t "$BUILD/accessibility-probe.apk"
 adb forward tcp:38383 localabstract:df13-accessibility
 adb shell am instrument -w com.zenstudy.focus.e2e/.AccessibilityProbe > "$OUT/PROBE_INSTRUMENTATION.txt" 2>&1 &
