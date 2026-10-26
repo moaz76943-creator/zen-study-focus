@@ -177,6 +177,22 @@ def tap_node(node):
     x1, y1 = max(0, x1), max(0, y1)
     if x2 <= x1 or y2 <= y1:
         raise AssertionError("Empty bounds")
+    if os.getenv("DF13_UI_PORT") and node.get("clickable") == "true":
+        # Native accessibility activation avoids stale fixed-position bounds
+        # in older WebViews after document scrolling. The probe revalidates a
+        # unique current node and excludes content behind an active dialog.
+        selector = {key: node.get(key, "") for key in
+                    ("class", "resource-id", "text", "content-desc", "hint")}
+        command = ("CLICK " + json.dumps(selector, ensure_ascii=False) + "\n").encode()
+        with socket.create_connection(("127.0.0.1", int(os.environ["DF13_UI_PORT"])), timeout=45) as connection:
+            connection.sendall(command)
+            with connection.makefile("rb") as stream:
+                response = json.loads(stream.readline(1024 * 1024))
+        if response.get("error") or response.get("clicked") is not True:
+            # Never replay an ambiguous/failed action as a coordinate tap.
+            raise AssertionError("Native accessibility action: " + response.get("error", "not acknowledged"))
+        time.sleep(0.65)
+        return
     shell("input", "tap", (x1+x2)//2, (y1+y2)//2)
     time.sleep(0.65)
 

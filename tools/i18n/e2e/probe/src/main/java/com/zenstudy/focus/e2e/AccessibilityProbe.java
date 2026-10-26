@@ -17,6 +17,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Test-only, separate package. Reads real accessibility nodes; never app data or JS. */
 public final class AccessibilityProbe extends Instrumentation {
@@ -40,8 +42,10 @@ public final class AccessibilityProbe extends Instrumentation {
                     if ("QUIT".equals(command)) break;
                     JSONObject response = new JSONObject();
                     try {
-                        if (!"DUMP".equals(command)) throw new IllegalArgumentException("Unknown probe command");
-                        response.put("xml", hierarchy(automation));
+                        if ("DUMP".equals(command)) response.put("xml", hierarchy(automation));
+                        else if (command != null && command.startsWith("CLICK "))
+                            response.put("clicked", click(automation, new JSONObject(command.substring(6))));
+                        else throw new IllegalArgumentException("Unknown probe command");
                     } catch (Exception error) {
                         response.put("error", error.getClass().getSimpleName() + ": " + error.getMessage());
                     }
@@ -59,7 +63,7 @@ public final class AccessibilityProbe extends Instrumentation {
         }
     }
 
-    private String hierarchy(UiAutomation automation) throws Exception {
+    private AccessibilityNodeInfo activeRoot(UiAutomation automation) throws Exception {
         // Refresh the framework accessibility cache after WebView DOM changes.
         // A retained automation connection must not return a previous locale or
         // a previous screen's virtual nodes after a successful physical tap.
@@ -74,6 +78,11 @@ public final class AccessibilityProbe extends Instrumentation {
             if (root == null) SystemClock.sleep(250);
         }
         if (root == null) throw new IllegalStateException("null root after 15 seconds");
+        return root;
+    }
+
+    private String hierarchy(UiAutomation automation) throws Exception {
+        AccessibilityNodeInfo root = activeRoot(automation);
         StringWriter text = new StringWriter();
         XmlSerializer xml = Xml.newSerializer();
         xml.setOutput(text);
@@ -83,6 +92,58 @@ public final class AccessibilityProbe extends Instrumentation {
         xml.endDocument();
         return text.toString();
     }
+
+    private boolean click(UiAutomation automation, JSONObject selector) throws Exception {
+        if (selector.optString("class").isEmpty())
+            throw new IllegalArgumentException("Action requires an exact node class");
+        AccessibilityNodeInfo root = activeRoot(automation);
+        List<AccessibilityNodeInfo> dialogs = new ArrayList<>();
+        List<AccessibilityNodeInfo> matches = new ArrayList<>();
+        try {
+            visibleDialogs(root, dialogs, 0);
+            AccessibilityNodeInfo scope = dialogs.isEmpty() ? root : dialogs.get(dialogs.size() - 1);
+            matchingNodes(scope, selector, matches, 0);
+            if (matches.size() != 1)
+                throw new IllegalStateException("Action requires one visible target in the active dialog/window; got " + matches.size());
+            return matches.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        } finally {
+            for (AccessibilityNodeInfo match : matches) match.recycle();
+            for (AccessibilityNodeInfo dialog : dialogs) dialog.recycle();
+            root.recycle();
+        }
+    }
+
+    private void visibleDialogs(AccessibilityNodeInfo node, List<AccessibilityNodeInfo> result, int depth) {
+        if (depth > 100) throw new IllegalStateException("Accessibility depth limit exceeded");
+        if (node.isVisibleToUser() && "android.app.Dialog".contentEquals(string(node.getClassName())))
+            result.add(AccessibilityNodeInfo.obtain(node));
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            if (child != null) {
+                try { visibleDialogs(child, result, depth + 1); } finally { child.recycle(); }
+            }
+        }
+    }
+
+    private void matchingNodes(AccessibilityNodeInfo node, JSONObject selector,
+                               List<AccessibilityNodeInfo> result, int depth) {
+        if (depth > 100) throw new IllegalStateException("Accessibility depth limit exceeded");
+        if (node.isVisibleToUser() && node.isEnabled() && node.isClickable()
+                && selector.optString("class").equals(string(node.getClassName()))
+                && selector.optString("resource-id").equals(string(node.getViewIdResourceName()))
+                && selector.optString("text").equals(string(node.getText()))
+                && selector.optString("content-desc").equals(string(node.getContentDescription()))
+                && selector.optString("hint").equals(string(node.getHintText())))
+            result.add(AccessibilityNodeInfo.obtain(node));
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            if (child != null) {
+                try { matchingNodes(child, selector, result, depth + 1); } finally { child.recycle(); }
+            }
+        }
+    }
+
+    private String string(CharSequence value) { return value == null ? "" : value.toString(); }
 
     private void node(XmlSerializer xml, AccessibilityNodeInfo node, int depth) throws Exception {
         if (depth > 100) throw new IllegalStateException("Accessibility depth limit exceeded");
