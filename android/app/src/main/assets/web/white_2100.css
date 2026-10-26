@@ -692,11 +692,11 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
    app data or handlers change. API30 reproduced Save below the visible area
    after IME Back on a 320 CSS-pixel viewport. */
 @media (max-width: 430px) {
-  body.df-v22:not(.deep-lockdown) #noteModal.open {
+  body:not(.deep-lockdown) #noteModal.open {
     padding: 8px;
     overflow: hidden;
   }
-  body.df-v22:not(.deep-lockdown) #noteModal .ns-editor {
+  body:not(.deep-lockdown) #noteModal .ns-editor {
     box-sizing: border-box;
     inline-size: calc(100vw - 16px);
     min-inline-size: 0;
@@ -710,12 +710,12 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
     margin-inline: auto;
     background: #fff;
   }
-  body.df-v22:not(.deep-lockdown) #noteModal .ns-editor > * {
+  body:not(.deep-lockdown) #noteModal .ns-editor > * {
     min-inline-size: 0;
     max-inline-size: 100%;
     box-sizing: border-box;
   }
-  body.df-v22:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions {
+  body:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions {
     /* The last action lives below a very long editor. Sticky bottom:0 does
        not pull it into view from below; anchor it within the modal overlay. */
     position: fixed;
@@ -732,7 +732,7 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
     border-radius: 16px;
     box-shadow: 0 -8px 25px -14px rgba(28, 46, 77, .35);
   }
-  body.df-v22:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions > button {
+  body:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions > button {
     min-block-size: 44px;
     flex: 1 1 110px;
   }
