@@ -1940,7 +1940,12 @@ function applyLanguage(code) {
   root.setAttribute('dir', meta.dir);
 
   document.getElementById('currentLangIso').textContent = meta.iso;
-  document.getElementById('currentLangLabel').textContent = `${meta.enName} • ${meta.nativeName}`;
+  const languageLabel = document.getElementById('currentLangLabel');
+  languageLabel.textContent = `${meta.enName} • ${meta.nativeName}`;
+  // Older WebViews can retain the button's initial computed accessible name
+  // when only its child spans change. Publish the current name explicitly.
+  languageLabel.parentElement?.setAttribute('aria-label',
+    `${meta.iso} ${meta.enName} • ${meta.nativeName}`);
   document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
   const tn = document.getElementById('navTrainingText');
@@ -1980,11 +1985,10 @@ function applyLanguage(code) {
   // Premium labels may also be created by re-rendered screens; refresh last.
   if (window.DF22Locale?.apply) window.DF22Locale.apply(document,meta.code);
   if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
-  // Native UI follows the persisted v21 locale; never modify editable text.
   try {
     if (window.ZenNative && typeof window.ZenNative.setNativeLocale === 'function')
       window.ZenNative.setNativeLocale(meta.code);
-  } catch (_) { /* Web previews have no native bridge. */ }
+  } catch (_) { /* Web preview has no native bridge. */ }
 }
 
 /* ========================================================
@@ -2002,8 +2006,16 @@ function validateImportedBackup(raw) {
   if (!raw.cfg || typeof raw.cfg !== 'object' || Array.isArray(raw.cfg)) return null;
   if (!Array.isArray(raw.tasksList) || !Array.isArray(raw.notesList)) return null;
   if (raw.tasksList.length > 10000 || raw.notesList.length > 10000) return null;
-  const safeRecordId = id => /^\d{1,16}$/.test(String(id))
-    && Number.isSafeInteger(Number(id));
+  // New imports must use the original numeric v21 ID type, never string coercion.
+  const safeRecordId = id => typeof id === 'number' && Number.isSafeInteger(id) && id >= 0;
+  const uniqueRecordIds = records => {
+    const seen = new Set();
+    return records.every(record => {
+      if (seen.has(record.id)) return false;
+      seen.add(record.id);
+      return true;
+    });
+  };
   const okTask = x => x && typeof x === 'object' && !Array.isArray(x)
     && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
@@ -2012,7 +2024,8 @@ function validateImportedBackup(raw) {
     && safeRecordId(x.id)
     && typeof x.title === 'string' && x.title.length <= 20000
     && typeof x.body === 'string' && x.body.length <= 500000;
-  if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)) return null;
+  if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)
+      || !uniqueRecordIds(raw.tasksList) || !uniqueRecordIds(raw.notesList)) return null;
   const candidateCfg = {...cfg, ...raw.cfg};
   if (!LANG_CATALOG.some(l => l.code === candidateCfg.lang)) candidateCfg.lang = 'en';
   for (const key of ['todayMins', 'sessions', 'streak', 'water']) {
@@ -2092,15 +2105,24 @@ function verifyAndRestoreBackupCode(codeStr) {
 function openCloudBackupModal() {
   document.getElementById('inpRestorePayload').value = '';
   document.getElementById('cloudBackupModal').classList.add('open');
+  // Update display-only backup labels after the modal exists and before user action.
+  // Never alter backup payload, consent, restore callbacks or storage here.
+  window.DeepFocusAudioSettingsLocale?.bindBackupDialog({document, locale: cfg.lang});
 }
 
-function syncToGoogleCloudNow() {
+async function syncToGoogleCloudNow() {
   const code = generateEncryptedBackupCode();
-  if (window.ZenNative && window.ZenNative.syncBackupToGoogleEmailOrDrive) {
+  if (window.ZenNative && typeof window.ZenNative.syncBackupToGoogleEmailOrDrive === 'function') {
     window.ZenNative.syncBackupToGoogleEmailOrDrive(code);
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(code);
-    showToast("Backup copied — save privately; NOT encrypted");
+  } else if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("Backup copied — save privately; NOT encrypted");
+    } catch (_) {
+      showToast("⚠️ Backup copy failed — use Export Backup File");
+    }
+  } else {
+    showToast("⚠️ Clipboard unavailable — use Export Backup File");
   }
 }
 
@@ -2314,6 +2336,9 @@ function startQuickSportRest(secs) {
         document.getElementById('timerModeCaption').textContent);
     }catch(error){console.warn('Rest notification unavailable',error);}
   }
+  if(window.ZenNative && typeof window.ZenNative.requestTimerNotificationPermission==='function'){
+    try{window.ZenNative.requestTimerNotificationPermission();}catch(e){}
+  }
   timerInterval=setInterval(runTimerTick,500);
   showToast(toWest(`⏱️ Rest ${seconds}s Started`));
   return true;
@@ -2403,7 +2428,8 @@ function accumulateActiveTime() {
 }
 const TIMER_STORAGE_KEY = 'zen_fortress_active_timer_v21';
 function storeTimerSession() {
-  saveFortressData(TIMER_STORAGE_KEY, {
+  try {
+    return saveFortressData(TIMER_STORAGE_KEY, {
     total: timerTotal, left: timerLeft, running: timerRunning,
     endAt: timerRunning ? timerTargetTime : null,
     mode: currentTimerModeKey, label: customSessionLabel,
@@ -2412,6 +2438,11 @@ function storeTimerSession() {
     activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null,
     training: quickTraining && quickTraining.active ? {...quickTraining} : null
   });
+  } catch (error) {
+    // A failed v21 packet write cannot be reported as a successful timer transition.
+    try { showToast(L().saveFailed); } catch (_) {}
+    return false;
+  }
 }
 function creditCompletedSession() {
   if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
@@ -2589,12 +2620,14 @@ function selectTimerModeFromUser(mins, modeKey, btn) {
   return selectTimerMode(mins, modeKey, btn) !== false;
 }
 function selectTimerMode(mins, modeKey, btn) {
-  if(quickTraining?.active && !quickInternalChange) {
-    if(!window.confirm(quickText('replacePrompt')))return false;
-    quickTraining=null;
+  const endingQuickTraining = quickTraining?.active && !quickInternalChange;
+  if (endingQuickTraining && !window.confirm(quickText('replacePrompt'))) return false;
+  // A rejected Pause must leave the mode and any active Quick Training intact.
+  if (timerRunning && toggleTimerPlay() !== true) return false;
+  if (endingQuickTraining) {
+    quickTraining = null;
     renderQuickTraining();
   }
-  if (timerRunning) toggleTimerPlay();
   currentTimerModeKey = modeKey;
   timerTotal = mins * 60;
   timerLeft = timerTotal;
@@ -2644,12 +2677,24 @@ function toggleTimerPlay() {
   const activeTitle = document.getElementById('timerModeCaption').textContent;
 
   if (timerRunning) {
+    const oldActiveMs = timerActiveMs, oldResumeMs = timerResumeMs;
+    const oldTargetTime = timerTargetTime;
     clearInterval(timerInterval);
     timerInterval = null;
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
     accumulateActiveTime();
     timerRunning = false;
-    storeTimerSession();
+    if (storeTimerSession() !== true) {
+      // A failed Pause must not stop the native alarm or strand an active session.
+      timerRunning = true;
+      timerActiveMs = oldActiveMs;
+      timerResumeMs = oldResumeMs;
+      timerTargetTime = oldTargetTime;
+      timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
+      timerInterval = setInterval(runTimerTick, 500);
+      updateTimerDisplay();
+      return false;
+    }
     if (window.ZenNative && window.ZenNative.stopBackgroundService) {
       try { window.ZenNative.stopBackgroundService(); } catch(e){}
     }
@@ -2660,6 +2705,8 @@ function toggleTimerPlay() {
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
     } catch(e){}
 
+    const oldSessionId = timerSessionId, oldTaskId = focusSessionTaskId;
+    const oldResumeMs = timerResumeMs, oldTargetTime = timerTargetTime;
     if (!timerSessionId) {
       timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
       const linked = typeof focusWorkflowGetLinkedTask === 'function' ? focusWorkflowGetLinkedTask() : null;
@@ -2670,14 +2717,26 @@ function toggleTimerPlay() {
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     timerResumeMs = Date.now();
     timerTargetTime = timerResumeMs + (timerLeft * 1000);
-    storeTimerSession();
-
+    if (storeTimerSession() !== true) {
+      // No phantom running session, timer ID change or native alarm on denied save.
+      timerRunning = false;
+      timerSessionId = oldSessionId;
+      focusSessionTaskId = oldTaskId;
+      timerResumeMs = oldResumeMs;
+      timerTargetTime = oldTargetTime;
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+      updateTimerDisplay();
+      return false;
+    }
     if (window.ZenNative && window.ZenNative.startBackgroundService) {
       try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch(e){}
     }
-
+    if (window.ZenNative && typeof window.ZenNative.requestTimerNotificationPermission==='function') {
+      try { window.ZenNative.requestTimerNotificationPermission(); } catch(e){}
+    }
     timerInterval = setInterval(runTimerTick, 500);
   }
+  return true;
 }
 
 function resetTimerNow() {
@@ -2690,7 +2749,7 @@ function resetTimerNow() {
       !window.confirm(cfg.lang === 'ar'
         ? 'إعادة الضبط ستلغي تقدم الجلسة الحالية. هل تريد المتابعة؟'
         : 'Reset will discard the current session progress. Continue?')) return false;
-  if (timerRunning) toggleTimerPlay();
+  if (timerRunning && toggleTimerPlay() !== true) return false;
   timerLeft = timerTotal;
   timerSessionId = null;
   focusSessionTaskId = null;
@@ -3218,6 +3277,15 @@ function renderSoundsStudio() {
     `;
     box.appendChild(tile);
   }
+  // Bind reviewed Audio/Settings strings only after creating the visible tiles.
+  // This adapter is display-only; playback and v21 storage stay unchanged.
+  window.DeepFocusAudioSettingsLocale?.bindSoundStudio({
+    document,
+    locale: cfg.lang,
+    catalog: SOUNDS_DATA,
+    category: soundCat,
+    legacy: { locale: cfg.lang, sounds: d.sounds }
+  });
 }
 
 /* ========================================================
@@ -3313,7 +3381,15 @@ function updateSyllabusCalc() {
   const left = Math.max(1, parseInt(elLeft.value) || 1);
   const rate = Math.max(1, parseInt(elRate.value) || 1);
   const days = Math.ceil(left / rate);
-  document.getElementById('syllabusCalcOut').textContent = toWest(L().calcOutTpl.replace('{d}', days));
+  // A missing locale string remains a translation gap; render safely instead of
+  // crashing the language picker. Source coverage must NOT count this as translated.
+  const localizedTemplate = L().calcOutTpl;
+  const fallbackTemplate = DICT.en && DICT.en.calcOutTpl;
+  const template = typeof localizedTemplate === 'string' && localizedTemplate.includes('{d}')
+    ? localizedTemplate
+    : (typeof fallbackTemplate === 'string' && fallbackTemplate.includes('{d}')
+        ? fallbackTemplate : '{d} days');
+  document.getElementById('syllabusCalcOut').textContent = toWest(template.replace('{d}', days));
 }
 
 /* Boot Init */

@@ -5,6 +5,8 @@ on:
     paths:
       - 'android/app/src/main/assets/web/quick_training.js'
       - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/js/weekly_report_exporter.js'
+      - 'test/weekly_report_exporter.test.js'
       - 'android/app/src/main/assets/web/preflight_v22.js'
       - 'android/app/src/main/assets/web/data_compat_v21.js'
       - 'android/app/build.gradle'
@@ -12,6 +14,7 @@ on:
       - 'tests/i18n/quick_training/**'
       - 'tests/i18n/timer/**'
       - 'tests/integration_quality/immutable_package_id.test.cjs'
+      - 'tests/performance_recovery/**'
       - '.github/workflows/df_integration_critical_regressions.yml'
   push:
     branches: [integration/master-qa-verified-v21]
@@ -43,9 +46,15 @@ jobs:
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           node --check android/app/src/main/assets/web/app.js
           node --check android/app/src/main/assets/web/quick_training.js
+          node --test tests/integration_quality/backup_clipboard_ack.test.cjs
+          node test/weekly_report_exporter.test.js
+          node --test tests/i18n/audio_settings/audio_bridge_activation.test.cjs tests/i18n/audio_settings/audio_settings_localization.test.cjs
       - name: Actual 99 Quick Training packs and transition regression
         run: node --test tests/i18n/quick_training/*.test.cjs
       - name: Actual timer consent and stale tick regression
-        run: node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/track05_timer/tick_lifecycle.test.cjs
+        run: node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/track05_timer/tick_lifecycle.test.cjs tests/track05_timer/pause_ack_rollback.test.cjs
+      - name: Offline app startup critical assets (source-only)
+        run: node --test tests/performance_recovery/startup_assets.test.cjs
       - name: Application identity and read-only v21 startup guard
         run: node --test tests/integration_quality/immutable_package_id.test.cjs tests/security_recovery/legacy_preflight_schema.test.cjs
+          node --test tests/security_recovery/legacy_import_contract.test.cjs tests/security_recovery/import_duplicate_rejection.test.cjs

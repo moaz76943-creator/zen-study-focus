@@ -21,7 +21,10 @@ const verifiedSound = {
     title: "Gentle Rain",
     license: "CC0",
     sourceUrl: "https://freesound.org/sample/12345/",
-    localPath: "audio/gentle_rain.ogg"
+    localPath: "audio/gentle_rain.ogg",
+    approved_for_runtime: true,
+    sha256: "b".repeat(64),
+    licenseEvidenceUrl: "https://creativecommons.org/publicdomain/zero/1.0/"
 };
 
 let audioStarted = false;

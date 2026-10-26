@@ -20,6 +20,16 @@ class PR04NativeSafety(unittest.TestCase):
   self.assertLess(body.index("saveFortressData('zen_fortress_cfg_v21', cfg)"),body.index('window.ZenNative.setNativeLocale(meta.code)'))
   self.assertIn('cfg.lang=previousLang',body)
   self.assertIn('if (el.isContentEditable',body)
+ def test_restore_rearm_never_reprompts_native_permission(self):
+  src=(J/'MainActivity.java').read_text()
+  schedule=src.split('public void startBackgroundService(int seconds, String title)',1)[1].split('public void requestTimerNotificationPermission()',1)[0]
+  self.assertNotIn('requestNotificationPermissionForTimer()',schedule)
+  self.assertIn('public void requestTimerNotificationPermission()',src)
+  app=(R/'android/app/src/main/assets/web/app.js').read_text()
+  restored=app.split('function restoreTimerSession()',1)[1].split('const ringCircumference',1)[0]
+  self.assertNotIn('requestTimerNotificationPermission()',restored)
+  for start,end in [('function toggleTimerPlay()','function resetTimerNow()'),('function startQuickSportRest(','function addReadPages(')]:
+   self.assertIn('requestTimerNotificationPermission()',app.split(start,1)[1].split(end,1)[0])
  def test_native_resources_and_hebrew_excluded(self):
   x=[]
   for l in ('','-ar','-fa','-ur','-de','-es','-fr'):

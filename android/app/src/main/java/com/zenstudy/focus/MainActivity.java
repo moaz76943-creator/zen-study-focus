@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
         public void startBackgroundService(int seconds, String title) {
             if (seconds < 1 || seconds > 86400) return;
             FocusAlarmReceiver.schedule(MainActivity.this, seconds, title);
-            runOnUiThread(() -> requestNotificationPermissionForTimer());
         }
 
         @JavascriptInterface
@@ -100,6 +99,12 @@ public class MainActivity extends AppCompatActivity {
             if (NativeLocaleStrings.select(MainActivity.this, languageTag)) {
                 FocusAlarmReceiver.refreshLocale(MainActivity.this);
             }
+        }
+
+        // Consent belongs to an explicit user Start, never restored countdowns.
+        @JavascriptInterface
+        public void requestTimerNotificationPermission() {
+            runOnUiThread(() -> requestNotificationPermissionForTimer());
         }
 
         @JavascriptInterface

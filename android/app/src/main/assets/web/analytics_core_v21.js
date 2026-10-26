@@ -32,15 +32,36 @@
     if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(v)) return null;
     const ms=Date.parse(v);return Number.isFinite(ms) ? ms : null;
   }
+  // V21 legacy focus history may lack explicit completion metadata; keep it.
+  // Only explicit evidence of an unfinished or non-focus interval excludes credit.
+  function nonFocusRecord(s) {
+    if (s.completed === false || s.isComplete === false ||
+        s.isFocus === false || s.focus === false) return true;
+    const status = typeof s.status === 'string' ? s.status.toLowerCase().replace(/-/g,'_') : '';
+    if (['active','running','paused','started','pending','in_progress',
+      'cancelled','canceled','aborted','interrupted','failed','incomplete',
+      'stopped','skipped','discarded','rest','break'].includes(status)) return true;
+    for (const key of ['mode','phase','type']) {
+      const value = typeof s[key] === 'string' ? s[key].toLowerCase().replace(/-/g,'_') : '';
+      if (['rest','break','short','long','short_break','long_break','short_rest','long_rest'].includes(value))
+        return true;
+    }
+    return false;
+  }
   function normalizeSessions(history) {
-    const sessions=[], rejects=[], seen=new Set();
+    const sessions=[], rejects=[], seen=new Set(), dayValidityCache=new Map();
+    const cachedValidDay=day=>{
+      if(!dayValidityCache.has(day))dayValidityCache.set(day,validDay(day));
+      return dayValidityCache.get(day);
+    };
     (Array.isArray(history) ? history : []).forEach((s,index)=>{
       let reason;
       const id=isRecord(s) ? idKey(s.id) : null;
       if (!isRecord(s)) reason='INVALID_RECORD';
       else if (s.isStarter === true || s.isDemo === true || s.synthetic === true || ['demo','sample','fixture'].includes(s.source)) reason='SAMPLE';
+      else if (nonFocusRecord(s)) reason='NON_FOCUS';
       else if (!id) reason='INVALID_ID';
-      else if (!validDay(s.date)) reason='INVALID_DATE';
+      else if (!cachedValidDay(s.date)) reason='INVALID_DATE';
       else if (typeof s.minutes !== 'number' || !Number.isFinite(s.minutes) || s.minutes < 0 || s.minutes > 1440) reason='INVALID_MINUTES';
       else if (!own(aliases,s.domain)) reason='INVALID_DOMAIN';
       else if (seen.has(id)) reason='DUPLICATE_ID';
@@ -50,7 +71,8 @@
       const timed=s.timeEvidence==='timer-monotonic-v1' && start!==null && end!==null && end>=start && end-start<=86400000;
       sessions.push({id:s.id,date:s.date,minutes:s.minutes,domain:aliases[s.domain],
         startedAt:timed?new Date(start).toISOString():null,endedAt:timed?new Date(end).toISOString():null,
-        timingVerified:timed});
+        timingVerified:timed,
+        taskId:Number.isSafeInteger(s.taskId)&&s.taskId>=0?s.taskId:null});
     });
     return {sessions,rejects,duplicates:rejects.filter(x=>x.reason==='DUPLICATE_ID').length,
       invalid:rejects.filter(x=>x.reason!=='DUPLICATE_ID'&&x.reason!=='SAMPLE').length,
@@ -72,13 +94,24 @@
   function taskReport(tasks,projects=[],today=localToday()) {
     const seen=new Set(),valid=[];let excluded=0;
     (Array.isArray(tasks)?tasks:[]).forEach(t=>{
-      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
+      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||['demo','sample','fixture'].includes(t.source)||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
       seen.add(t.id);valid.push(t);
     });
     const active=valid.filter(t=>t.status!=='archived'&&t.archived!==true);
     const done=active.filter(t=>t.done || t.status==='completed').length;
-    const projectsMap=new Map();
-    (Array.isArray(projects)?projects:[]).forEach(p=>{if(isRecord(p)&&!p.isStarter&&idKey(p.id)!==null&&!projectsMap.has(idKey(p.id)))projectsMap.set(idKey(p.id),{id:p.id,name:typeof p.name==='string'?p.name:'',total:0,completed:0});});
+    const projectsMap=new Map(),ambiguousProjects=new Set();
+    (Array.isArray(projects)?projects:[]).forEach(p=>{
+      if(!isRecord(p)||p.isStarter===true||p.isDemo===true||p.synthetic===true||
+         ['demo','sample','fixture'].includes(p.source))return;
+      const key=idKey(p.id);
+      if(key===null||ambiguousProjects.has(key))return;
+      if(projectsMap.has(key)){
+        projectsMap.delete(key);
+        ambiguousProjects.add(key);
+        return;
+      }
+      projectsMap.set(key,{id:p.id,name:typeof p.name==='string'?p.name:'',total:0,completed:0});
+    });
     for(const t of active){const key=idKey(t.projectId);if(key && projectsMap.has(key)){const p=projectsMap.get(key);p.total++;if(t.done||t.status==='completed')p.completed++;}}
     return {total:active.length,completed:done,remaining:active.length-done,archived:valid.length-active.length,
       overdue:active.filter(t=>!t.done&&t.status!=='completed'&&validDay(t.dueDate)&&t.dueDate<today).length,
@@ -94,6 +127,32 @@
       out.push({domain,actualMinutes:actual,targetMinutes:target,progress:Math.round(actual/target*10000)/100});}
     return {available:out.length>0,days,byDomain:out};
   }
+  // Historical goal comparisons require original dated snapshots. Current
+  // mutable goals are not evidence of past targets and must not be backfilled.
+  function historicalGoalReport(snapshots,rows,start,end,selectedDomain) {
+    if(!Array.isArray(snapshots))return {available:false,byDomain:[],snapshotDays:0};
+    const unique=new Map();
+    for(const g of snapshots){
+      if(!isRecord(g)||!validDay(g.date)||g.date<start||g.date>end||
+         !DOMAINS.includes(g.domain)||(selectedDomain!=='all'&&selectedDomain!==g.domain)||
+         typeof g.targetMinutes!=='number'||!Number.isFinite(g.targetMinutes)||
+         g.targetMinutes<=0||g.targetMinutes>1440)continue;
+      const key=g.date+'|'+g.domain;
+      if(!unique.has(key))unique.set(key,{date:g.date,domain:g.domain,targetMinutes:g.targetMinutes});
+    }
+    const byDomain=[];
+    for(const domain of DOMAINS){
+      const dated=[...unique.values()].filter(g=>g.domain===domain);
+      if(!dated.length)continue;
+      const coveredDays=new Set(dated.map(g=>g.date));
+      const actualMinutes=summarize(rows.filter(r=>r.domain===domain&&coveredDays.has(r.date))).minutes;
+      const targetMinutes=summarize(dated.map(g=>({minutes:g.targetMinutes}))).minutes;
+      byDomain.push({domain,actualMinutes,targetMinutes,coverageDays:coveredDays.size,
+        progress:Math.round(actualMinutes/targetMinutes*10000)/100});
+    }
+    return {available:byDomain.length>0,byDomain,
+      snapshotDays:new Set([...unique.values()].map(g=>g.date)).size};
+  }
   function buildReport(snapshot={},opts={}) {
     const today=opts.today===undefined?localToday():opts.today;
     if(!validDay(today))throw new RangeError('Invalid today');
@@ -105,13 +164,53 @@
     const domain=opts.domain||'all';if(domain!=='all'&&!DOMAINS.includes(domain))throw new RangeError('Invalid domain');
     const source=Array.isArray(snapshot.sessionHistory)?snapshot.sessionHistory:(isRecord(snapshot.cfg)?snapshot.cfg.sessionHistory:[]);
     const normalized=normalizeSessions(source);
-    const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&(domain==='all'||s.domain===domain));
+    // Normalize once; all KPI cards and comparisons use the same verified ledger.
+    const usable=normalized.sessions.filter(s=>domain==='all'||s.domain===domain);
+    const nowNumber=dayNumber(today),endNumber=dayNumber(endDate);
+    // Compute calendar boundaries once; calling Date constructors per record
+    // regresses the verified 10k-history performance bound.
+    const trailing=(n)=>{
+      const begin=fromDayNumber(nowNumber-n+1);
+      return summarize(usable.filter(s=>s.date>=begin&&s.date<=today));
+    };
+    const currentStart=fromDayNumber(endNumber-6),priorStart=fromDayNumber(endNumber-13);
+    const currentWeek=summarize(usable.filter(s=>s.date>=currentStart&&s.date<=endDate));
+    const priorWeek=summarize(usable.filter(s=>s.date>=priorStart&&s.date<currentStart));
+    const changeMinutes=Math.round((currentWeek.minutes-priorWeek.minutes)*1000)/1000;
+    const comparison={current:currentWeek,previous:priorWeek,changeMinutes,
+      changePercent:priorWeek.minutes===0?null:Math.round(changeMinutes/priorWeek.minutes*10000)/100,
+      rule:'Rolling seven credited local dates compared with the preceding seven dates'};
+    const dashboard={today:trailing(1),last7:trailing(7),last30:trailing(30)};
+    // Task linkage is presentation-only; reject missing, ambiguous, archived
+    // or sample task IDs. Never modify original session history or task lists.
+    const tasks=Array.isArray(snapshot.tasksList)?snapshot.tasksList:[];
+    const counts=new Map();
+    for(const t of tasks)
+      if(isRecord(t)&&Number.isSafeInteger(t.id)&&t.id>=0)
+        counts.set(t.id,(counts.get(t.id)||0)+1);
+    const eligibleTaskIds=new Set(tasks.filter(t=>isRecord(t)&&
+      Number.isSafeInteger(t.id)&&t.id>=0&&counts.get(t.id)===1&&
+      t.isStarter!==true&&t.isDemo!==true&&t.synthetic!==true&&
+      !['demo','sample','fixture'].includes(t.source)&&
+      t.archived!==true&&t.status!=='archived'&&typeof t.title==='string'&&
+      typeof t.done==='boolean').map(t=>t.id));
+    const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&
+      (domain==='all'||s.domain===domain)).map(s=>({...s,
+        taskId:eligibleTaskIds.has(s.taskId)?s.taskId:null}));
     const grouped=bucket(rows,s=>s.date),dayMap=new Map(grouped.map(x=>[x.key,x]));
-    const daily=Array.from({length:span},(_,i)=>{const key=fromDayNumber(dayNumber(startDate)+i);return dayMap.get(key)||{key,minutes:0,sessions:0};});
+    const startNumber=dayNumber(startDate);
+    const daily=Array.from({length:span},(_,i)=>{const key=fromDayNumber(startNumber+i);return dayMap.get(key)||{key,minutes:0,sessions:0};});
     const byDomain=Object.fromEntries(DOMAINS.map(k=>[k,summarize(rows.filter(r=>r.domain===k))]));
+    const weekStartCache=new Map();
     return {period:{startDate,endDate,domain,days:span},totals:summarize(rows),daily,
-      weekly:bucket(rows,s=>weekKey(s.date)),monthly:bucket(rows,s=>s.date.slice(0,7)),byDomain,
+      weekly:bucket(rows,s=>{
+        if(!weekStartCache.has(s.date))weekStartCache.set(s.date,weekKey(s.date));
+        return weekStartCache.get(s.date);
+      }),monthly:bucket(rows,s=>s.date.slice(0,7)),byDomain,
       streaks:streaks(normalized.sessions,today),goals:dailyGoalReport(rows,opts.goals,startDate,endDate),
+      dashboard,comparison,
+      historicalGoals:historicalGoalReport(opts.goalSnapshots ?? snapshot.goalSnapshots ??
+        (isRecord(snapshot.cfg)?snapshot.cfg.goalSnapshots:null),rows,startDate,endDate,domain),
       tasks:taskReport(snapshot.tasksList,snapshot.projects,today),
       quality:{accepted:normalized.sessions.length,inRange:rows.length,excluded:normalized.rejects.length,
         duplicates:normalized.duplicates,invalid:normalized.invalid,samples:normalized.samples,
