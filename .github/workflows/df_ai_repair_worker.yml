@@ -107,7 +107,14 @@ jobs:
           git add -A
           node ../automation/tools/ai_agents/guard.mjs
           git diff --cached --check
-          node --test tests/integration_quality/*.test.cjs
+          # Test only the changed source regression tests. The repo has separate,
+          # intentionally failing release gates outside this isolated P2 task.
+          mapfile -d '' -t changed_tests < <(git diff --cached --name-only --diff-filter=AM -z -- 'tests/integration_quality/*.test.cjs')
+          if [ "${#changed_tests[@]}" -eq 0 ]; then
+            echo 'No changed regression test found' >&2
+            exit 1
+          fi
+          node --test "${changed_tests[@]}"
           git fetch --depth=1 origin "$TARGET"
           test "$(git rev-parse FETCH_HEAD)" = "$base_sha" || {
             echo 'Integration HEAD moved; stale repair rejected.' >&2

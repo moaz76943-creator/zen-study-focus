@@ -53,3 +53,26 @@ duplicate PRs. Existing integration branch checks and human review remain mandat
 
 Groq quotas are NOT unlimited; credentials belong in GitHub Secrets only.
 The private deutsch-build repo is excluded. No GitHub Models dependency.
+
+## Phase 2: owner-controlled first real trial (issue #307)
+
+Before hourly model use, run this from Termux (existing `gh` login and
+`GROQ_API_KEY` secret are reused; no key pasted twice):
+
+```bash
+curl -fsSLo "$HOME/df-ai-activate.sh" \
+  https://raw.githubusercontent.com/moaz76943-creator/zen-study-focus/main/tools/ai_agents/activate_termux.sh
+bash "$HOME/df-ai-activate.sh"
+```
+
+This runs an issue-specific dry-run, checks permissions, turns on the
+variable, and watches the real run. It *only* keeps hourly AI enabled if a
+real model call finished and an open **draft** PR for issue #307 exists.
+All failures automatically attempt to reset `DF_AI_ENABLED=false`.
+Task #307 is source-only and the worker cannot merge anything.
+If the GitHub account's Actions permission policy prevents creating PRs,
+the helper requests the necessary repo-level change, without changing the
+default read-only token permission. This GitHub setting technically also
+allows Actions to approve PRs, but the worker does not implement approval.
+
+Groq free-tier rate limits still apply. The helper will not enable payments.
