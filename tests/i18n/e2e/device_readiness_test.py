@@ -32,6 +32,19 @@ class DeviceReadinessTest(unittest.TestCase):
         record = {'text': 'DF13_TASK_123', 'class': 'android.view.View', 'bounds': '[10,200][200,250]'}
         self.assertTrue(device.has_record([field, record], 'DF13_TASK_123'))
 
+    def test_partly_clipped_editor_field_keeps_a_tappable_area(self):
+        field = {'text': '', 'resource-id': 'inpNoteTitle', 'bounds': '[-15,174][408,211]'}
+        self.assertTrue(device.is_visible_node(field))
+        self.assertIs(device.visible([field], 'inpNoteTitle'), field)
+
+    def test_navigation_uses_native_resource_id_before_duplicate_calendar_tab(self):
+        from unittest.mock import patch
+        tab = {'text': 'Calendar', 'bounds': '[10,300][100,350]'}
+        nav = {'text': 'Calendar', 'resource-id': 'navCalendar', 'bounds': '[60,700][120,750]'}
+        with patch.object(device, 'dump', return_value=[tab,nav]), patch.object(device, 'tap_node') as tap:
+            device.click('Calendar')
+        tap.assert_called_once_with(nav)
+
     def test_empty_iso_badge_is_not_visible(self):
         self.assertFalse(device.has_iso_badge([{'text': 'AR', 'bounds': '[0,0][0,0]'}], 'ar'))
 

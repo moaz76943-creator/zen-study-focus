@@ -21,7 +21,7 @@ ACTIVITY = PACKAGE + "/com.zenstudy.focus.MainActivity"
 WIDTHS = (320, 360, 393, 430)
 LOCALES = (("en", "English"), ("ar", "Arabic"), ("de", "German"),
            ("hi", "Hindi"), ("ja", "Japanese"), ("fa", "Persian"), ("ur", "Urdu"))
-BOUNDS = re.compile(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]")
+BOUNDS = re.compile(r"\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]")
 
 def adb(*args, timeout=45, check=True, binary=False):
     p = subprocess.run(["adb", *map(str, args)], capture_output=True,
@@ -125,7 +125,7 @@ def is_visible_node(node):
     if not match:
         return False
     x1, y1, x2, y2 = map(int, match.groups())
-    return x2 > x1 and y2 > y1
+    return x2 > max(0, x1) and y2 > max(0, y1)
 
 def visible(nodes, needle):
     candidates = [n for n in nodes if is_visible_node(n)]
@@ -161,13 +161,44 @@ def tap_node(node):
     if not m:
         raise AssertionError("UI node has no tap bounds")
     x1, y1, x2, y2 = map(int, m.groups())
+    x1, y1 = max(0, x1), max(0, y1)
     if x2 <= x1 or y2 <= y1:
         raise AssertionError("Empty bounds")
     shell("input", "tap", (x1+x2)//2, (y1+y2)//2)
     time.sleep(0.65)
 
-def click(label):
-    tap_node(visible(dump(), label))
+def reveal(predicate, swipes=8):
+    """Scroll actual Android content until the required visible evidence exists."""
+    for attempt in range(swipes + 1):
+        nodes = dump()
+        if predicate(nodes):
+            return nodes
+        if attempt == swipes:
+            break
+        bounds = BOUNDS.fullmatch(nodes[0].get("bounds", "")) if nodes else None
+        if bounds is None:
+            raise AssertionError("Viewport unavailable for real scrolling")
+        _, _, width, height = map(int, bounds.groups())
+        shell("input", "swipe", width // 2, height * 7 // 10,
+              width // 2, height * 3 // 10, 350)
+        time.sleep(0.4)
+    raise AssertionError("Required content not visible after bounded Android scrolling")
+
+def click(label, scroll=False):
+    ids = {"Tasks":"navTasks", "Calendar":"navCalendar", "Notes":"navNotes",
+           "Timer":"navTimer", "Nature":"navSounds", "Analytics":"navAnalytics",
+           "Quick training":"navTraining", "New note":"nsNewButton", "Save":"nsSaveButton"}
+    def target(nodes):
+        known = visible(nodes, ids[label]) if label in ids else None
+        if known is not None:
+            return known
+        actionable = [n for n in nodes if n.get("clickable") == "true"]
+        match = visible(actionable, label)
+        return match if match is not None else visible(nodes, label)
+    nodes = dump()
+    if scroll and target(nodes) is None:
+        nodes = reveal(lambda items: target(items) is not None)
+    tap_node(target(nodes))
 
 def node_class_contains(n, name):
     return name in n.get("class", "") and is_visible_node(n)
@@ -201,7 +232,7 @@ def screenshot(out, name):
         raise AssertionError("Screenshot too small")
     return str(path.name)
 
-def language(name, iso):
+def language(name, iso, require_header=True):
     click("English" if iso != "en" else "English")
     text_input("inpLangCountrySearch", name)
     matches = [n for n in dump() if name.casefold() in value(n).casefold()
@@ -213,7 +244,7 @@ def language(name, iso):
     tap_node(matches[-1])
     for _ in range(8):
         nodes = dump()
-        if has_iso_badge(nodes, iso) and not has_visible(nodes, "inpLangCountrySearch"):
+        if not has_visible(nodes, "inpLangCountrySearch") and (not require_header or has_iso_badge(nodes, iso)):
             return True
         time.sleep(0.3)
     raise AssertionError("Selected ISO badge and closed picker not observed: "+iso)
@@ -389,12 +420,10 @@ def run(out, source_sha, api):
             text_input(0,"DF13_TASK_123")
             shell("input","keyevent","66") # Real form submission, never a search-field match.
             time.sleep(1)
-            if not has_record(dump(),"DF13_TASK_123"):
-                raise AssertionError("New task record absent after form submission")
+            reveal(lambda nodes: has_record(nodes, "DF13_TASK_123"))
             restart()
             click("Tasks")
-            if not has_record(dump(),"DF13_TASK_123"):
-                raise AssertionError("Saved task record absent after process restart")
+            reveal(lambda nodes: has_record(nodes, "DF13_TASK_123"))
             return "Non-editable saved task record survived process restart"
         record(results,"task_create",task,checkpoint)
 
@@ -403,7 +432,7 @@ def run(out, source_sha, api):
             click("New note")
             text_input("inpNoteTitle","DF13_NOTE_123")
             text_input("inpNoteBody","DF13_BODY_123")
-            click("Save")
+            click("Save", scroll=True)
             if not has_visible(dump(),"DF13_NOTE_123"):
                 raise AssertionError("Saved note not present")
             restart()
@@ -444,7 +473,10 @@ def run(out, source_sha, api):
                 if not has_visible(initial, "English"):
                     raise AssertionError("English locale chooser not visible on fresh app")
                 if code != "en":
-                    language(english_name, code)
+                    # Immediate accessible-header freshness is independently
+                    # tested by language_change. Here persistence is proved by
+                    # the fresh process's exact ISO header after real selection.
+                    language(english_name, code, require_header=False)
                 after = restart()
                 if not has_iso_badge(after, code):
                     raise AssertionError(code + " did not persist on Android restart")
