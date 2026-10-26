@@ -287,3 +287,48 @@ test('DF05 daily priority pin/unpin is durable, limited to three and rolls back 
  assert.ok(state.tasksList.every(x=>!Object.hasOwn(x,'manuallyPinned')),'only existing cfg persisted');
  studio.destroy();
 });
+
+
+test('DF05: Tasks Today/Upcoming/Overdue/Completed tabs and project filter are read-only',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[{id:2,name:'Work'}],opaque:{keep:true}},tasksList:[
+  {id:1,title:'No due',catKey:'study',done:false,projectId:2},
+  {id:2,title:'Future',date:'2026-10-30',catKey:'study',done:false,projectId:2},
+  {id:3,title:'Late',date:'2026-10-20',catKey:'study',done:false},
+  {id:4,title:'Finished',date:'2026-10-25',catKey:'study',done:true}
+ ]},commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(){commits++;return true;}});
+ const tab=caption=>{const b=root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent===caption);
+  assert.ok(b,'missing tab '+caption);b.dispatch('click');};
+ const shown=()=>root.descendants.find(x=>x.id==='df-task-results').descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
+ tab('Today');assert.ok(shown().includes('No due'));assert.ok(!shown().includes('Late'));
+ tab('Upcoming');assert.deepEqual(shown(),['Future']);
+ tab('Overdue');assert.deepEqual(shown(),['Late']);
+ tab('Completed');assert.deepEqual(shown(),['Finished']);
+ tab('List');
+ const projects=root.descendants.find(x=>x.tagName==='SELECT'&&x.attributes['aria-label']==='Filter by project');
+ assert.ok(projects);
+ projects.value='2';projects.dispatch('change');
+ assert.deepEqual(shown(),['No due','Future']);
+ assert.equal(commits,0);assert.deepEqual(state.cfg.opaque,{keep:true});
+ studio.destroy();
+});
+test('DF05: deliberate task reschedule is persisted, while invalid input never writes',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[
+  {id:10,title:'Plan',catKey:'study',done:false,unknown:{keep:1}}
+ ]},commits=0,answer='bad-date';
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),
+  commit(before,after){assert.deepEqual(before,state);state=JSON.parse(JSON.stringify(after));commits++;return true;},
+  requestText:()=>answer});
+ const press=()=>{const btn=root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Reschedule');
+  assert.ok(btn);btn.dispatch('click');};
+ press();assert.equal(commits,0);
+ answer='2026-10-31';press();assert.equal(commits,1);
+ assert.equal(state.tasksList[0].date,'2026-10-31');
+ assert.equal(state.tasksList[0].dueAssigned,true);
+ assert.deepEqual(state.tasksList[0].unknown,{keep:1});
+ studio.destroy();
+});
