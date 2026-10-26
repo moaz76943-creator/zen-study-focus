@@ -70,7 +70,7 @@ jobs:
         run: |
           test -c /dev/kvm
           sudo chmod 666 /dev/kvm
-      - name: Actual WebView pointer edit and native v21 readback after force stop
+      - name: Actual WebView pointer edit and six-packet v21 WebView readback after force stop
         uses: reactivecircus/android-emulator-runner@v2
         env:
           DF03_EVIDENCE: ${{ runner.temp }}/df03-api-${{ matrix.api }}
