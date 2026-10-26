@@ -369,6 +369,25 @@ async function replayBothCorruptCopiesFromNative(){
  return 'Both invalid WebView copies replayed from verified native checkpoint on Android';
 }
 
+async function activityDestroyRecreateOnDevice(){
+ const before=await fixture(),pid=adb('shell','pidof',PKG).split(/\s/)[0];
+ if(!/^\d+$/.test(pid))throw Error('TRANSPORT: current Android process unavailable');
+ await evaluate("window.__df02ActivityNonce='must-reset'");
+ // CLEAR_TASK | NEW_TASK should replace Activity without killing the process.
+ // This is a disposable emulator only. Never retry the state-changing intent.
+ adb('shell','am','start','-n',PKG+'/.MainActivity','-f','0x10008000');
+ await pause(700);
+ try{ws?.close();}catch(_){}
+ await connect();
+ const next=adb('shell','pidof',PKG).split(/\s/)[0];
+ if(next!==pid)throw Error('TRANSPORT: process restarted; same-process Activity recreation not established');
+ const marker=await evaluate('window.__df02ActivityNonce');
+ if(marker!==undefined)throw Error('TRANSPORT: Activity not recreated after CLEAR_TASK; WebView nonce persisted');
+ assert.deepEqual(await fixture(),before,'Activity recreation lost IDs or unknown fields');
+ assert.equal((await receipt()).valid,true,'Activity recreation lost acknowledged v21 packets');
+ return 'Actual Android Activity recreated in same PID, fresh WebView and all v21 data preserved';
+}
+
 async function fiveRapidAcksThenKill(){
  // Historical #159 continuity: each mutation must commit a matching native
  // six-packet receipt before a single immediate force-stop and relaunch.
@@ -457,6 +476,7 @@ async function safMain(){
  await run('signed_invalid_family_native_ack_refused',rejectSignedInvalidFamilyOnAndroid);
  await run('both_webview_copies_corrupt_native_replay',replayBothCorruptCopiesFromNative);
  await run('five_acks_one_immediate_kill',fiveRapidAcksThenKill);
+ await run('activity_destroy_recreate',activityDestroyRecreateOnDevice);
  await run('saf_document_save_and_readback',safExportAndReadback);
  const baseline=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
  await run('saf_picker_cancel',async()=>{
@@ -506,7 +526,7 @@ function fillUnattempted(target=report){
   ...keys.flatMap(key=>['failed_save_rollback_'+key,'failed_save_rollback_'+key+'_mirror']),
   'native_ack_io_failure_rollback_restart',...require('./native_faults.cjs').CASE_NAMES,
    'signed_invalid_family_native_ack_refused','both_webview_copies_corrupt_native_replay',
-   'five_acks_one_immediate_kill','saf_document_save_and_readback','saf_picker_cancel','saf_valid_file_consent_cancel',
+   'five_acks_one_immediate_kill','activity_destroy_recreate','saf_document_save_and_readback','saf_picker_cancel','saf_valid_file_consent_cancel',
   'saf_corrupt_rejected','saf_oversized_rejected','saf_actual_file_restore_ack_and_reopen'];
  for(const name of planned)if(!target.results.some(row=>row.name===name))
   target.results.push({name,status:'NOT_TESTED',detail:'Not executed; blocked by prior Android/native transport failure'});
