@@ -37,13 +37,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // Display stays awake only in user-selected Desk Clock mode.
 
-        if (Build.VERSION.SDK_INT >= 33) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
-            }
-        }
-
         // Android emulator QA needs CDP, but production must never expose WebView DevTools.
         final boolean debuggableBuild =
                 (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0;
@@ -114,6 +107,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void requestNotificationPermissionForTimer() {
+        if (Build.VERSION.SDK_INT >= 33
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+        }
+    }
+
     public class ZenNativeBridge {
         // @JavascriptInterface executes on WebView's bridge thread, off the UI thread.
         // Acknowledgement requires a private AtomicFile with explicit FD sync.
@@ -160,7 +162,9 @@ public class MainActivity extends AppCompatActivity {
         // No Android Service is started: user countdown end time is handled by AlarmManager.
         @JavascriptInterface
         public void startBackgroundService(int seconds, String title) {
+            if (seconds < 1 || seconds > 86400) return;
             FocusAlarmReceiver.schedule(MainActivity.this, seconds, title);
+            runOnUiThread(() -> requestNotificationPermissionForTimer());
         }
 
         @JavascriptInterface
