@@ -619,7 +619,7 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
     min-block-size: 44px;
     justify-content: center;
     padding-inline: 0;
-    position: static;
+    position: static !important;
   }
   body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn > :is(span[data-i18n],#navTrainingText) {
     position: absolute;
@@ -638,12 +638,12 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
     inset-inline-end: 6px;
     inline-size: auto;
     block-size: auto;
-    margin: 0;
+    margin: 0 !important;
     overflow: visible;
     white-space: normal;
     overflow-wrap: anywhere;
     clip-path: none;
-    font-size: clamp(.7rem, 2vw, .85rem);
+    font-size: clamp(.7rem, 2vw, .85rem) !important;
     line-height: 1.2;
     text-align: center;
     color: #1759ad;
