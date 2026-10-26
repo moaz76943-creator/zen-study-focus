@@ -84,3 +84,18 @@ class LiveAccessibilityContract(unittest.TestCase):
             report=scenario.run(Path(directory)/'result.json','a'*40,30,selected=[])
         self.assertEqual(set(report['CASES']),set(scenario.SCENARIOS))
         self.assertTrue(all(c['status']=='NOT_TESTED' for c in report['CASES'].values()))
+
+class ScenarioGateContract(unittest.TestCase):
+    def test_navigation_uses_verified_native_id_route_despite_duplicate_labels(self):
+        from unittest.mock import patch
+        import functional as scenario
+        with patch.object(scenario.device,'click') as click, patch.object(scenario.Android,'find',side_effect=scenario.RequiresHook('duplicate labels')):
+            scenario.Android().tap('Timer')
+        click.assert_called_once_with('Timer')
+
+    def test_required_not_tested_case_cannot_produce_success_exit(self):
+        import functional as scenario
+        report={'CASES':{'timer':{'status':'PASS'},'digits':{'status':'NOT_TESTED'},'other':{'status':'NOT_TESTED'}}}
+        self.assertEqual(scenario.exit_code(report,['timer','digits']),1)
+        self.assertEqual(scenario.exit_code(report,['timer']),0)
+        self.assertEqual(scenario.exit_code(report),1)

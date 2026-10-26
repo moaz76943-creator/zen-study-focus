@@ -90,6 +90,9 @@ class Android:
         return found[0]
 
     def tap(self, label, *, exact=False):
+        if label in {"Tasks", "Calendar", "Notes", "Timer", "Nature", "Analytics", "Quick training"}:
+            device.click(label)
+            return
         device.tap_node(self.find(label, exact=exact))
 
     def field(self, hint, text):
@@ -480,6 +483,11 @@ def run(output, sha, api, selected=None):
     return report
 
 
+def exit_code(report, selected=None):
+    required = list(report["CASES"]) if selected is None else selected
+    return int(any(report["CASES"][key]["status"] != "PASS" for key in required))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
@@ -489,7 +497,7 @@ def main():
     args = parser.parse_args()
     report = run(args.output, args.sha, args.api, args.scenario)
     print(json.dumps(report["SUMMARY"]))
-    return int(report["SUMMARY"]["FAIL"] > 0)
+    return exit_code(report, args.scenario)
 
 
 if __name__ == "__main__":
