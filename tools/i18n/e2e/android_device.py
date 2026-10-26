@@ -154,19 +154,43 @@ def dump():
                          "after four attempts; probe evidence captured")
 
 def persistent_dump():
-    """Use the test-only instrumentation's long-lived real UIAutomation session."""
+    """Read-only, bounded retries for a long-lived real UIAutomation session.
+
+    Only DUMP is retried; taps and other user actions are never replayed.
+    A missing transport response must not become a successful UI assertion.
+    """
     diagnostics = []
+    dest = os.getenv("DF13_EVIDENCE_DIR")
+    transport_failures = 0
     for attempt in range(4):
-        with socket.create_connection(("127.0.0.1", int(os.environ["DF13_UI_PORT"])), timeout=45) as connection:
-            connection.sendall(b"DUMP\n")
-            with connection.makefile("rb") as stream:
-                line = stream.readline(8 * 1024 * 1024)
-        response = json.loads(line)
+        try:
+            with socket.create_connection(("127.0.0.1", int(os.environ["DF13_UI_PORT"])), timeout=45) as connection:
+                connection.sendall(b"DUMP\n")
+                with connection.makefile("rb") as stream:
+                    line = stream.readline(8 * 1024 * 1024)
+            response = json.loads(line)
+            if not isinstance(response, dict):
+                raise ValueError("Malformed UIAutomation probe envelope")
+        except (OSError, ValueError) as error:
+            transport_failures += 1
+            diagnostics.append({"attempt": attempt + 1, "transport": type(error).__name__})
+            time.sleep(1)
+            continue
         if response.get("error"):
-            raise AssertionError("Persistent UIAutomation: " + response["error"])
-        raw = response["xml"]
-        root = ET.fromstring(raw)
-        dest = os.getenv("DF13_EVIDENCE_DIR")
+            raise AssertionError("Persistent UIAutomation: " + str(response["error"]))
+        raw = response.get("xml")
+        if not isinstance(raw, str) or not raw.strip():
+            transport_failures += 1
+            diagnostics.append({"attempt": attempt + 1, "transport": "EmptyXml"})
+            time.sleep(1)
+            continue
+        try:
+            root = ET.fromstring(raw)
+        except ET.ParseError:
+            transport_failures += 1
+            diagnostics.append({"attempt": attempt + 1, "transport": "MalformedXml"})
+            time.sleep(1)
+            continue
         if dest:
             Path(dest).mkdir(parents=True, exist_ok=True)
             (Path(dest) / "LAST_UI.xml").write_text(raw)
@@ -176,7 +200,10 @@ def persistent_dump():
         diagnostics.append({"attempt": attempt + 1, "node_count": len(nodes)})
         time.sleep(1)
     if dest:
+        Path(dest).mkdir(parents=True, exist_ok=True)
         (Path(dest) / "UIAUTOMATOR_PROBE.json").write_text(json.dumps(diagnostics, indent=2) + "\n")
+    if transport_failures == 4:
+        raise ConnectionError("Persistent UIAutomation probe reply unavailable after four attempts")
     raise AssertionError("Persistent UIAutomation exposed no visible content after four attempts")
 
 def value(node):
