@@ -198,6 +198,9 @@ public final class TouchInstrumentation extends Instrumentation {
             "noteModalScroll:document.getElementById('noteModal')?.scrollTop," +
             "editorScroll:document.querySelector('#noteModal .ns-editor')?.scrollTop," +
             "editorMaxHeight:getComputedStyle(document.querySelector('#noteModal .ns-editor')).maxHeight," +
+            "cssMobileMedia:matchMedia('(max-width: 430px)').matches," +
+            "cssMatchedSelector:n.matches('body:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions')," +
+            "cssLoadedStyles:Array.from(document.styleSheets).map(s=>({href:s.href||'inline',disabled:s.disabled}))," +
             "hitNode:hit?.id||hit?.className||hit?.tagName||'none'," +
             "altHitNode:alt?.id||alt?.className||alt?.tagName||'none'," +
             "altHit:!!alt&&(alt===n||n.contains(alt))," +
