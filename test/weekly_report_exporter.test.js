@@ -37,7 +37,7 @@ console.log("--- Running 🎯 Mission #043: Weekly Report Exporter Tests ---");
   const wanted = String.raw`part\\\|second`;
   assert.strictEqual(Exporter.escapeMarkdownCell(input),wanted,
     'Existing slash plus table pipe must not bypass Markdown delimiter escaping');
-  assert.strictEqual(Exporter.escapeMarkdownCell('one\\rtwo\\nthree\\u2028four'),
+  assert.strictEqual(Exporter.escapeMarkdownCell('one\rtwo\nthree\u2028four'),
     'one two three four','All newline forms must stay within one Markdown cell');
 }
 
