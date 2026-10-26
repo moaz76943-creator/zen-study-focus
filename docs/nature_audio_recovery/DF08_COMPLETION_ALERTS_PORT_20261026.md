@@ -8,7 +8,7 @@ https://versilian-studios.com/vcsl/ .
 The water-drop cue derives from `Lelio88/dewdrop`'s CC0 Freesound #166325 recording. Project credits:
 https://github.com/Lelio88/dewdrop/blob/main/CREDITS.md .
 
-The per-clip original SHA256, packaged SHA256 and origin paths are retained in `docs/ALERT_AUDIO_LICENSES.md` and `completion_alerts/manifest.json`. A dedicated GitHub workflow checks actual bytes against the manifest and decodes each packaged WAV using FFmpeg. Merely having a hash or a URL does not replace a sound audition on devices.
+The per-clip original SHA256, packaged SHA256 and origin paths are retained in `docs/ALERT_AUDIO_LICENSES.md` and `completion_alerts/manifest.json`. A dedicated GitHub workflow checks actual bytes against the manifest and reads every PCM frame using Python's standard wave decoder (no FFmpeg binary needed). Merely having a hash or a URL does not replace a sound audition on devices.
 
 ## Deliberate integration boundary
 
