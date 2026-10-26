@@ -144,6 +144,14 @@ public final class TouchInstrumentation extends Instrumentation {
         } catch (Throwable failure) {
             result.putString("df08_status","FAIL");
             result.putString("df08_error",String.valueOf(failure));
+            // Capture before finishing instrumentation, while the target Activity
+            // is still foregrounded; post-finish screenshots show Launcher instead.
+            try {
+                android.os.ParcelFileDescriptor shot=getUiAutomation()
+                    .executeShellCommand("screencap -p /sdcard/df08_live_failure.png");
+                if(shot!=null)shot.close();
+                SystemClock.sleep(700);
+            } catch(Throwable ignored) {}
             Log.e(TAG,"DF08_ANDROID_FAIL after taps="+actualTaps,failure);
             finish(Activity.RESULT_CANCELED,result);
         }
@@ -172,10 +180,14 @@ public final class TouchInstrumentation extends Instrumentation {
             "const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;" +
             "const hit=document.elementFromPoint(x,y);" +
             "const vv=window.visualViewport;" +
+            "const alt=document.elementFromPoint(x-(vv?.offsetLeft||0),y-(vv?.offsetTop||0));" +
             "return {exists:true,x,y,width:r.width,height:r.height,vw:innerWidth,vh:innerHeight," +
             "visX:vv?vv.offsetLeft:0,visY:vv?vv.offsetTop:0," +
             "visWidth:vv?vv.width:innerWidth,visHeight:vv?vv.height:innerHeight," +
             "scale:vv?vv.scale:1,dpr:devicePixelRatio," +
+            "hitNode:hit?.id||hit?.className||hit?.tagName||'none'," +
+            "altHitNode:alt?.id||alt?.className||alt?.tagName||'none'," +
+            "altHit:!!alt&&(alt===n||n.contains(alt))," +
             "hit:!!hit&&(hit===n||n.contains(hit))};})()";
         js("(()=>{if(window.__df08Events)return {installed:true};window.__df08Events=[];" +
             "for(const kind of ['touchstart','touchend','click','pointerdown','pointerup']){" +
