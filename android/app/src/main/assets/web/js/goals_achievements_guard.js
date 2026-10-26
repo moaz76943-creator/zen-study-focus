@@ -17,7 +17,11 @@
             };
         }
 
-        if (!sessionRecord || !sessionRecord.durationMinutes) {
+        const sessionDate = sessionRecord && sessionRecord.dateStr; // "YYYY-MM-DD"
+        const sessionDateVerified = typeof sessionDate === "string"
+            && /^\d{4}-\d{2}-\d{2}$/.test(sessionDate)
+            && !isNaN(new Date(sessionDate + "T00:00:00Z").getTime());
+        if (!sessionRecord || !sessionRecord.durationMinutes || !sessionDateVerified) {
             return { updated: false, reason: "INVALID_SESSION_RECORD", progress: currentGoalProgress };
         }
 
@@ -31,7 +35,6 @@
         };
 
         // Streak Transition Check
-        const sessionDate = sessionRecord.dateStr; // "YYYY-MM-DD"
         if (progress.todayMinutes >= progress.dailyTargetMinutes) {
             if (progress.lastActiveDate !== sessionDate) {
                 if (progress.lastActiveDate) {
