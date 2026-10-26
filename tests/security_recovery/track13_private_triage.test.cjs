@@ -14,6 +14,9 @@ function run(rows,sourceSha=SHA){
     fs.mkdirSync(app,{recursive:true});
     fs.writeFileSync(path.join(app,'app.js'),"const SECRET_SALT = 'PUBLIC_COMPAT_TEST_FIXTURE_42';\n",{mode:0o600});
     fs.writeFileSync(path.join(app,'data_compat_v21.js'),"const SECRET_SALT = 'PUBLIC_COMPAT_TEST_FIXTURE_42';\n",{mode:0o600});
+    const tests=path.join(dir,'tests');
+    fs.mkdirSync(tests,{recursive:true});
+    fs.writeFileSync(path.join(tests,'config.cjs'),"assert.equal(key,'zen_fortress_cfg_v21');\n",{mode:0o600});
     const report=path.join(dir,'private-report.json');
     if(rows!==null)fs.writeFileSync(report,typeof rows==='string'?rows:JSON.stringify(rows),{mode:0o600});
     const init=spawnSync('git',['init','-q',dir],{encoding:'utf8'});assert.equal(init.status,0);
@@ -68,6 +71,23 @@ test('malformed report, invalid SHA and missing report fail closed with no untru
     assert.equal(r.output.status,'BLOCKED');
     assert.ok(!r.stdout.includes('PRIVATE_INVALID_SOURCE_SHA'));
   }
+});
+test('scanner-redacted findings are context candidates only, never silently approved',()=>{
+  const report=[
+    {RuleID:'generic-api-key',Secret:'REDACTED',File:'android/app/src/main/assets/web/app.js',StartLine:1},
+    {RuleID:'generic-api-key',Secret:'REDACTED',File:'tests/config.cjs',StartLine:1},
+    {RuleID:'generic-api-key',Secret:'REDACTED',File:'../outside.env',StartLine:1}
+  ];
+  const r=run(report);
+  assert.equal(r.status,1);
+  assert.equal(r.output.status,'REVIEW_REQUIRED');
+  assert.deepEqual(r.output.categories,{
+    compatibility_salt_candidate:1,storage_key_candidate:1,
+    git_commit_reference_candidate:0,unresolved:1
+  });
+  assert.equal(r.output.findings,3);
+  assert.ok(!r.stdout.includes('PUBLIC_COMPAT_TEST_FIXTURE_42'));
+  assert.ok(!r.stdout.includes('zen_fortress_cfg_v21'));
 });
 test('unknown rules and token-like strings never enter safe candidate categories',()=>{
   const sentinel='VERY-PRIVATE-SYNTHETIC-ACCESS-TOKEN';
