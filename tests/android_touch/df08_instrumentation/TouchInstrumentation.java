@@ -190,6 +190,14 @@ public final class TouchInstrumentation extends Instrumentation {
             "visX:vv?vv.offsetLeft:0,visY:vv?vv.offsetTop:0," +
             "visWidth:vv?vv.width:innerWidth,visHeight:vv?vv.height:innerHeight," +
             "scale:vv?vv.scale:1,dpr:devicePixelRatio," +
+            "bodyClass:document.body.className," +
+            "stylePosition:getComputedStyle(n).position," +
+            "styleBottom:getComputedStyle(n).bottom," +
+            "noteModalRect:document.getElementById('noteModal')?.getBoundingClientRect().toJSON()," +
+            "editorRect:document.querySelector('#noteModal .ns-editor')?.getBoundingClientRect().toJSON()," +
+            "noteModalScroll:document.getElementById('noteModal')?.scrollTop," +
+            "editorScroll:document.querySelector('#noteModal .ns-editor')?.scrollTop," +
+            "editorMaxHeight:getComputedStyle(document.querySelector('#noteModal .ns-editor')).maxHeight," +
             "hitNode:hit?.id||hit?.className||hit?.tagName||'none'," +
             "altHitNode:alt?.id||alt?.className||alt?.tagName||'none'," +
             "altHit:!!alt&&(alt===n||n.contains(alt))," +
