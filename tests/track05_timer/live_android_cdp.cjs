@@ -161,7 +161,7 @@ async function main(){
   await tap('#navTimer');
   await evalJs("document.getElementById('quickTrainingDetails').open=true;true");
   await tap("button[data-qt='presetWork']");
-  await evalJs("document.getElementById('qtSets').value='2';document.getElementById('qtWork').value='00:20';document.getElementById('qtRest').value='00:10';true");
+  await evalJs("document.getElementById('qtSets').value='2';document.getElementById('qtWork').value='04:00';document.getElementById('qtRest').value='04:00';true");
   const initial=await state();
   await tap('#qtStartButton');
   const first=await state();
@@ -180,7 +180,7 @@ async function main(){
   assert.equal(localized.id,resting.id);
   await restart(); // real process kill and restore during Rest
   const restored=await state();
-  assert.ok(restored.training?.phase==='rest'&&restored.running,'Work/Rest was lost on relaunch');
+  assert.ok(restored.training?.phase==='rest'&&restored.running,'Work/Rest was lost on relaunch '+JSON.stringify({resting,localized,restored}));
   assert.equal(restored.id,resting.id,'Rest session ID changed on process restart');
   await tap("#qtProgressPanel button[data-qt='skipStep']");
   const second=await state();
