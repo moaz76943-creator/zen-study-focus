@@ -131,27 +131,37 @@ if [[ "$API" == 35 ]] && command -v strace >/dev/null; then
     TRACER_PID=$!
   fi
 fi
-timeout 60s adb install -r -t "$BUILD/accessibility-probe.apk"
-adb forward tcp:38383 localabstract:df13-accessibility
-adb shell am instrument -w com.zenstudy.focus.e2e/.AccessibilityProbe > "$OUT/PROBE_INSTRUMENTATION.txt" 2>&1 &
-PROBE_PID=$!
-export DF13_UI_PORT=38383
-python3 - <<'PY'
-import socket, time
-for attempt in range(60):
-    try:
-        with socket.create_connection(('127.0.0.1', 38383), timeout=2) as connection:
-            # A forwarded TCP connection can open before the device socket is
-            # listening. Require a real reply from instrumentation, not connect.
-            connection.sendall(b'PING\n')
-            if connection.recv(1024):
-                break
-    except OSError:
-        pass
-    time.sleep(1)
-else:
-    raise SystemExit('Persistent accessibility instrumentation failed to start')
-PY
+if [[ "$API" == 35 ]]; then
+  # API35 host crash evidence: SIGSEGV after persistent accessibility probe
+  # initialization despite successful app install and no OOM. Use the
+  # bounded ADB UIAutomator path rather than starting the instrumentation APK.
+  # A null/empty root remains FAIL, never a fabricated application PASS.
+  unset DF13_UI_PORT
+  printf '%s\\n' 'API35_ADB_UIAUTOMATOR' > "$OUT/PROBE_MODE.txt"
+else
+  printf '%s\\n' 'API30_PERSISTENT_INSTRUMENTATION' > "$OUT/PROBE_MODE.txt"
+  timeout 60s adb install -r -t "$BUILD/accessibility-probe.apk"
+  adb forward tcp:38383 localabstract:df13-accessibility
+  adb shell am instrument -w com.zenstudy.focus.e2e/.AccessibilityProbe > "$OUT/PROBE_INSTRUMENTATION.txt" 2>&1 &
+  PROBE_PID=$!
+  export DF13_UI_PORT=38383
+  python3 - <<'PY'
+  import socket, time
+  for attempt in range(60):
+      try:
+          with socket.create_connection(('127.0.0.1', 38383), timeout=2) as connection:
+              # A forwarded TCP connection can open before the device socket is
+              # listening. Require a real reply from instrumentation, not connect.
+              connection.sendall(b'PING\n')
+              if connection.recv(1024):
+                  break
+      except OSError:
+          pass
+      time.sleep(1)
+  else:
+      raise SystemExit('Persistent accessibility instrumentation failed to start')
+  PY
+fi
 RUNNER_STARTED=1
 set +e
 DF13_EVIDENCE_DIR="$OUT" timeout --signal=TERM --kill-after=15s 22m python3 -u tools/i18n/e2e/android_device.py \
