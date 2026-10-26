@@ -109,8 +109,8 @@ public final class TaskInstrumentation extends Instrumentation {
     }
     private JSONObject readFixture()throws Exception{
         return js("(()=>{const s=DF22Integration.getSnapshot(),a=s.tasksList.filter(x=>x.id==="+FIXTURE_ID+");" +
-          "const t=a[0]||{};return {count:a.length,title:t.title||'',date:Object.hasOwn(t,'date')," +
-          "due:Object.hasOwn(t,'dueAssigned'),legacy:JSON.stringify(t.df03Legacy||null)};})()");
+          "const t=a[0]||{};return {count:a.length,title:t.title||'',date:Object.prototype.hasOwnProperty.call(t,'date')," +
+          "due:Object.prototype.hasOwnProperty.call(t,'dueAssigned'),legacy:JSON.stringify(t.df03Legacy||null)};})()");
     }
     private void verifySaved()throws Exception{
         JSONObject item=readFixture();
@@ -187,7 +187,11 @@ public final class TaskInstrumentation extends Instrumentation {
             "for(const child of form.children)if(child!==keep&&!child.classList.contains('df-actions'))" +
             "child.style.display='none';" +
             "return {ok:true,form:true,visible:panel.getBoundingClientRect().height};})()");
-        assertOk(state.optBoolean("ok"),"Tasks editor not activated by genuine Android tap: "+state);
+        if(!state.optBoolean("ok")){
+            JSONObject diagnostics=js("({events:window.__df03RealClicks||[],active:document.activeElement?.id||''," +
+                "hostChildren:document.getElementById("+JSONObject.quote(hostId)+")?.querySelector('.df-tasks')?.children.length||0})");
+            throw new AssertionError("Tasks editor not activated by genuine Android tap: "+state+" actualEvents="+diagnostics);
+        }
     }
     private void mount(String id,String locale,boolean reject)throws Exception{
         String script="(()=>{const host=document.createElement('div');host.id="+JSONObject.quote(id)+";" +
@@ -220,6 +224,11 @@ public final class TaskInstrumentation extends Instrumentation {
             "return {present:true,x,y,width:r.width,height:r.height,visX:v?v.offsetLeft:0," +
             "visY:v?v.offsetTop:0,visWidth:v?v.width:innerWidth,visHeight:v?v.height:innerHeight," +
             "scrolls,hostTop:host?.scrollTop||0,hit:!!hit&&(hit===el||el.contains(hit))};})()";
+        js("(()=>{if(window.__df03RealClicks)return {ready:true};window.__df03RealClicks=[];" +
+            "for(const k of ['pointerdown','touchend','click'])document.addEventListener(k,e=>{" +
+            "window.__df03RealClicks.push({type:k,target:e.target?.id||e.target?.tagName," +
+            "trusted:e.isTrusted});if(window.__df03RealClicks.length>12)window.__df03RealClicks.shift();" +
+            "},true);return {ready:true};})()");
         js(source);SystemClock.sleep(170);
         JSONObject point=js(source);
         assertOk(point.optBoolean("present")&&point.optBoolean("hit")&&point.optDouble("width")>=20 &&
@@ -248,6 +257,8 @@ public final class TaskInstrumentation extends Instrumentation {
             assertOk(getUiAutomation().injectInputEvent(up,true),"Android physical UP rejected "+id);
         }finally{down.recycle();up.recycle();}
         realTaps++;SystemClock.sleep(350);
-        Log.i(TAG,"REAL_TOUCH id="+id+" x="+sx+" y="+sy);
+        JSONObject observed=js("({events:window.__df03RealClicks||[],form:!!document.querySelector('#df03TaskHost form.df-form')," +
+            "edited:!!document.querySelector('#df03RejectHost form.df-form')})");
+        Log.i(TAG,"REAL_TOUCH id="+id+" x="+sx+" y="+sy+" geometry="+point+" observed="+observed);
     }
 }
