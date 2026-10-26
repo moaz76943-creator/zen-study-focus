@@ -90,21 +90,8 @@ async function main(){
   return {sessionId:a.id,start:a.left,paused:b.left,resumed:c.left};
  });
  if(cases.at(-1).status!=='PASS')return;
- await test('20-locales-native-back-preserves-session',async()=>{
-  const locales=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko','vi','it','bn','ur','fa','pl','nl'];
-  for(const lang of locales){
-   await evalJs('applyLanguage('+JSON.stringify(lang)+')');
-   const before=await state();await tap('#modeShortBtn');await nativeXml();
-   adb('shell','input','keyevent','4');await pause(400);
-   const after=await state();
-   assert.equal(after.id,before.id,lang+' session identity');
-   assert.equal(after.total,before.total,lang+' duration');
-   assert.equal(after.mode,before.mode,lang+' mode');
-   assert.equal(after.running,true,lang+' running');
-   assert.equal(after.sessions,before.sessions,lang+' completion count');
-  }
-  return {locales,tested:locales.length,realNativeCancel:true};
- });
+ // Native 20-language dialog acceptance belongs to DF-FINAL-01 #322, not the
+ // independent active-timer process-kill checkpoint acceptance in #402.
  await test('pause-force-stop-reopen',async()=>{
   if(!(await state()).running)throw Error('DEPENDENCY_NOT_TESTED: no active focus session');
   await tap('#mainPlayBtn');const before=await state();
@@ -125,13 +112,8 @@ async function main(){
   const after=await state();assert.equal(after.id,start.id);assert.equal(after.running,true);assert.ok(after.left<start.left);
   return {id:after.id,seconds:after.left};
  });
- await test('native-accept-short-long',async()=>{
-  await tap('#modeShortBtn');await approve();const a=await state();assert.equal(a.mode,'short');assert.equal(a.id,null);
-  await tap('#mainPlayBtn');await pause(900);await tap('#mainPlayBtn');
-  assert.equal((await state()).sessions,a.sessions,'Rest must not credit Focus');
-  await tap('#modeLongBtn');await approve();const b=await state();assert.equal(b.mode,'long');assert.equal(b.id,null);
-  return {shortSec:a.total,longSec:b.total,restCredited:false};
- });
+ // Branded native confirm controls are validated by #322's dedicated on-device suite.
+
 }
 main().catch(e=>record('bootstrap','NOT_TESTED',String(e.message||e).slice(0,250))).finally(()=>{
  const out={headSha:process.env.GITHUB_SHA||null,source:'actual disposable Android emulator + CDP + ADB',cases,summary:{pass:cases.filter(x=>x.status==='PASS').length,fail:cases.filter(x=>x.status==='FAIL').length,notTested:cases.filter(x=>x.status==='NOT_TESTED').length},releaseApproved:false};
