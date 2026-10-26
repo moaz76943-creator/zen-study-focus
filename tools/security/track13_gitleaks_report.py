@@ -34,10 +34,15 @@ def safe_summary(path: Path, source_sha: str, scan_exit: int) -> dict:
             summary["reason"] = "REPORT_INVALID"
             return summary
         summary["findings"] = len(report)
-        for item in report[:25]:
+        summary["rule_counts"] = {}
+        for index, item in enumerate(report):
             rule_id = item.get("RuleID")
             if not isinstance(rule_id, str) or rule_id not in SAFE_RULES:
                 rule_id = "unknown"
+            summary["rule_counts"][rule_id] = summary["rule_counts"].get(rule_id, 0) + 1
+            # Keep per-finding evidence bounded, but account for ALL detections.
+            if index >= 25:
+                continue
             raw_path = item.get("File")
             raw_path = raw_path if isinstance(raw_path, str) else ""
             line = item.get("StartLine")
