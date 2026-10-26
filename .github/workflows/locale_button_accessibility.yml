@@ -1,0 +1,22 @@
+name: Locale button accessibility regression
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/app.js'
+      - 'tests/accessibility/locale_button_name.test.cjs'
+      - '.github/workflows/locale_button_accessibility.yml'
+permissions:
+  contents: read
+jobs:
+  locale-accessible-name:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/accessibility/locale_button_name.test.cjs tests/i18n/core_authored_digit_integrity.test.cjs tests/i18n/core_locale_consistency.test.cjs

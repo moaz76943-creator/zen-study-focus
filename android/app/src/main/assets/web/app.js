@@ -1940,7 +1940,12 @@ function applyLanguage(code) {
   root.setAttribute('dir', meta.dir);
 
   document.getElementById('currentLangIso').textContent = meta.iso;
-  document.getElementById('currentLangLabel').textContent = `${meta.enName} • ${meta.nativeName}`;
+  const languageLabel = document.getElementById('currentLangLabel');
+  languageLabel.textContent = `${meta.enName} • ${meta.nativeName}`;
+  // Older WebViews can retain the button's initial computed accessible name
+  // when only its child spans change. Publish the current name explicitly.
+  languageLabel.parentElement?.setAttribute('aria-label',
+    `${meta.iso} ${meta.enName} • ${meta.nativeName}`);
   document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
   document.getElementById('hdrSubTitle').textContent = d.sub;
   const tn = document.getElementById('navTrainingText');
