@@ -448,7 +448,22 @@ def failure_kind(error):
     # Do not claim that an unclassified assertion proves an app regression.
     return "ASSERTION_REQUIRES_TRIAGE"
 
+def device_transport_lost(results):
+    """A dead ADB emulator blocks later checks; it is not an app locale failure."""
+    return any(
+        row.get("failure_kind") == "INFRASTRUCTURE"
+        and "ADB emulator transport was lost on all four hierarchy attempts" in row.get("error", "")
+        for row in results.values()
+    )
+
 def record(results, name, fn, checkpoint=None):
+    if device_transport_lost(results):
+        results[name] = {"status":"NOT_TESTED",
+                         "reason":"Blocked: emulator ADB transport lost during an earlier real UIAutomator probe"}
+        print("DF13_CASE", name, "NOT_TESTED", flush=True)
+        if checkpoint is not None:
+            checkpoint()
+        return False
     started = time.monotonic()
     try:
         detail = fn()
@@ -670,6 +685,12 @@ def run(out, source_sha, api):
         for w in WIDTHS:
             for scale in (1.0,2.0):
                 item={"api":api,"width_px":w,"font_scale":scale}
+                if device_transport_lost(results):
+                    item.update({"status":"NOT_TESTED",
+                                 "reason":"Blocked: emulator ADB transport lost before layout inspection"})
+                    matrix.append(item)
+                    checkpoint()
+                    continue
                 try:
                     shell("wm","size",f"{w}x800")
                     shell("settings","put","system","font_scale",str(scale))

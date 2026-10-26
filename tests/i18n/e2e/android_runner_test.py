@@ -31,6 +31,27 @@ class AndroidReportingTest(unittest.TestCase):
         self.assertEqual(results["screen_marker"]["detail"],"genuine marker")
         self.assertGreaterEqual(results["screen_marker"]["duration_ms"],0)
 
+    def test_dead_emulator_cannot_create_cascading_locale_failures(self):
+        results = {"navigation": {
+            "status":"FAIL", "failure_kind":"INFRASTRUCTURE",
+            "error":"ADB emulator transport was lost on all four hierarchy attempts; probe evidence captured"}}
+        executed, snapshots = [], []
+        self.assertFalse(record(results, "locale_ar",
+                                lambda: executed.append("should_not_run"),
+                                lambda: snapshots.append(dict(results))))
+        self.assertEqual(executed, [])
+        self.assertEqual(results["navigation"]["status"], "FAIL")
+        self.assertEqual(results["locale_ar"]["status"], "NOT_TESTED")
+        self.assertIn("ADB transport lost", results["locale_ar"]["reason"])
+        self.assertEqual(snapshots[0]["locale_ar"]["status"], "NOT_TESTED")
+
+    def test_accessibility_assertion_on_connected_device_does_not_hide_later_tests(self):
+        results = {"navigation": {
+            "status":"FAIL", "failure_kind":"ASSERTION_REQUIRES_TRIAGE",
+            "error":"WebView did not expose a complete accessibility hierarchy"}}
+        self.assertTrue(record(results, "locale_en", lambda:"Independent real result"))
+        self.assertEqual(results["locale_en"]["status"], "PASS")
+
     def test_nav_label_does_not_prove_section_content(self):
         nodes=[{"text":"Tasks","content-desc":"","hint":"","resource-id":"","bounds":"[0,1][5,5]"}]
         self.assertIsNotNone(visible(nodes,"Tasks"))
