@@ -146,7 +146,7 @@ function mountCompletionAlertPicker(host,engine,opts={}){
  volumeHeader.appendChild(volumeText);volumeHeader.appendChild(output);volumeWrap.appendChild(volumeHeader);volumeWrap.appendChild(slider);wrap.appendChild(volumeWrap);
  function sync(){const p=engine.getSettings();enabled.checked=p.enabled;slider.value=String(p.volume);output.textContent=String(p.volume)+"%";radios.forEach(r=>r.checked=r.value===p.sound)}
  host.replaceChildren(wrap);
- return Object.freeze({refresh:sync,unmount:()=>{engine.pause();if(wrap.parentNode===host)host.removeChild(wrap)}});
+ return Object.freeze({refresh:sync,unmount:()=>{if(wrap.parentNode===host){engine.pause();host.removeChild(wrap)}}});
 }
 const api=Object.freeze({CHOICES,readCompletionAlertSettings,updateCompletionAlertSettings,createCompletionAlerts,mountCompletionAlertPicker});
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
