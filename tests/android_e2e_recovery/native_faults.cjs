@@ -119,6 +119,7 @@ function createNativeFaultCases(driver){
     try{proof=walProof(adb,read,prepared.marker,diagnostic);}catch(_){diagnostic.list_failed=true;}if(proof)break;await pause(500);
    }
    saveProof('interrupted-journal-probe-metadata',diagnostic);
+   console.log('DF07_WAL_DIAGNOSTIC '+JSON.stringify({accepted_files:diagnostic.accepted_files, listed_file_count:diagnostic.listed_file_count, files:diagnostic.files, trim_requested:diagnostic.trim_requested, list_failed:!!diagnostic.list_failed}));
    if(!proof)throw Error('TRANSPORT: pending journal not independently observed in Android LevelDB WAL');
    saveProof('interrupted-journal-disk-proof',proof); // Hash/metadata only; never upload WAL bytes.
    await restart();
