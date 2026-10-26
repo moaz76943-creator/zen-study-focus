@@ -155,11 +155,15 @@
     // Normalize once; all KPI cards and comparisons use the same verified ledger.
     const usable=normalized.sessions.filter(s=>domain==='all'||s.domain===domain);
     const nowNumber=dayNumber(today),endNumber=dayNumber(endDate);
-    const trailing=(n)=>summarize(usable.filter(s=>s.date>=fromDayNumber(nowNumber-n+1)&&s.date<=today));
-    const currentWeek=summarize(usable.filter(s=>
-      s.date>=fromDayNumber(endNumber-6)&&s.date<=endDate));
-    const priorWeek=summarize(usable.filter(s=>
-      s.date>=fromDayNumber(endNumber-13)&&s.date<fromDayNumber(endNumber-6)));
+    // Compute calendar boundaries once; calling Date constructors per record
+    // regresses the verified 10k-history performance bound.
+    const trailing=(n)=>{
+      const begin=fromDayNumber(nowNumber-n+1);
+      return summarize(usable.filter(s=>s.date>=begin&&s.date<=today));
+    };
+    const currentStart=fromDayNumber(endNumber-6),priorStart=fromDayNumber(endNumber-13);
+    const currentWeek=summarize(usable.filter(s=>s.date>=currentStart&&s.date<=endDate));
+    const priorWeek=summarize(usable.filter(s=>s.date>=priorStart&&s.date<currentStart));
     const changeMinutes=Math.round((currentWeek.minutes-priorWeek.minutes)*1000)/1000;
     const comparison={current:currentWeek,previous:priorWeek,changeMinutes,
       changePercent:priorWeek.minutes===0?null:Math.round(changeMinutes/priorWeek.minutes*10000)/100,
