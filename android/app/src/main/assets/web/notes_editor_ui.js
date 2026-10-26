@@ -23,6 +23,15 @@
     let i=0; while((i=a.indexOf(b,i))!==-1 && out.length<1000){out.push(i);i+=Math.max(1,b.length);}
     return out;
   }
+  function headingOutline(text){
+    const out=[];
+    String(text||'').split(/\r?\n/u).slice(0,400).forEach((line,index)=>{
+      if(out.length>=40)return;
+      const match=line.match(/^#{1,3}\s+(.+)/u);
+      if(match)out.push({line:index,title:match[1]});
+    });
+    return out;
+  }
   function formatSelection(text,start,end,kind){
     const s=String(text);start=Math.max(0,Math.min(s.length,start));end=Math.max(start,Math.min(s.length,end));
     const prefix={heading:'# ',bullet:'- ',check:'☐ ',number:'1. ',quote:'> '}[kind];
@@ -225,7 +234,7 @@
       task:'Create tasks from unchecked items',saved:'Note saved',failed:'Could not save note',
       confirm:'Delete permanently? An exported backup is required.',review:'Tap answer to reveal',
       draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes',backlinks:'Referenced by',missingLink:'Unavailable linked note',more:'More',copy:'Copy',copyMd:'Copy Markdown',
-      copied:'Copied',copyFailed:'Could not copy note',duplicate:'Duplicate',previewLimit:'Preview limited to 400 lines; original note is unchanged.',
+      copied:'Copied',copyFailed:'Could not copy note',conflict:'This note changed after you opened it. Copy your unsaved edits or reopen the latest version.',contents:'Contents',duplicate:'Duplicate',previewLimit:'Preview limited to 400 lines; original note is unchanged.',
       completePairs:'Complete each recall question and answer before saving',large:'Note exceeds maximum size',
       done:'Mark complete',heading:'Heading',bullet:'Bulleted list',check:'Checklist',number:'Numbered list',
       quote:'Quote',typeCornell:'Structured notes',typeFlash:'Recall',typeQuick:'Quick notes'},
@@ -239,7 +248,7 @@
       failed:'تعذّر حفظ الملاحظة',confirm:'حذف نهائي؟ تأكد من وجود نسخة احتياطية مصدّرة.',
       review:'المس الإجابة لإظهارها',draft:'المحتوى القديم محفوظ بمعزل عن كورنيل',filter:'تصفية',
       status:'الحالة',linked:'ملاحظات مرتبطة',backlinks:'ملاحظات تشير إليها',missingLink:'الملاحظة المرتبطة غير متاحة',more:'المزيد',copy:'نسخ',copyMd:'نسخ Markdown',
-      copied:'تم النسخ',copyFailed:'تعذّر نسخ الملاحظة',duplicate:'إنشاء نسخة',previewLimit:'المعاينة تعرض أول 400 سطر فقط؛ الملاحظة الأصلية محفوظة دون تغيير.',
+      copied:'تم النسخ',copyFailed:'تعذّر نسخ الملاحظة',conflict:'تغيرت الملاحظة بعد فتحها. انسخ تعديلاتك غير المحفوظة أو افتح أحدث نسخة.',contents:'العناوين',duplicate:'إنشاء نسخة',previewLimit:'المعاينة تعرض أول 400 سطر فقط؛ الملاحظة الأصلية محفوظة دون تغيير.',
       completePairs:'أكمل سؤال المراجعة وإجابته قبل الحفظ',large:'تجاوزت الملاحظة الحجم المسموح',
       done:'وضع علامة مكتمل',heading:'عنوان',bullet:'قائمة نقطية',check:'قائمة تحقق',number:'قائمة مرقمة',
       quote:'اقتباس',typeCornell:'ملاحظات منظمة',typeFlash:'استذكار',typeQuick:'ملاحظات سريعة'}
@@ -506,7 +515,7 @@
       if(typeof nsEditId!=='undefined')nsEditId=null;
       renderStack();instance.adapter.onRefresh?.();instance.adapter.notify?.(t('saved'));
       return true;
-    }catch(e){instance.adapter.notify?.(t('failed')+': '+e.message);return false;}
+    }catch(e){instance.adapter.notify?.(e.message==='NOTE_CONFLICT_RELOAD_REQUIRED'?t('conflict'):t('failed')+': '+e.message);return false;}
   }
   function cardAction(parent,label,fn,danger){return button(parent,label,()=>{try{fn();renderStack();}catch(e){instance.adapter.notify?.(e.message);}},danger?'danger':'');}
   function statusView(){
@@ -619,6 +628,17 @@
     document.activeElement?.blur?.();
     preview.hidden=false;
     renderText(preview,n.body||'','');
+    const headings=headingOutline(n.body||'');
+    if(headings.length){
+      // Preview caps authored text at 400 lines; the outline is also capped.
+      const targets=[...preview.querySelectorAll('h4')];
+      const nav=el('nav','nsux-outline');nav.setAttribute('aria-label',t('contents'));
+      nav.appendChild(el('h4','',t('contents')));
+      headings.forEach((item,i)=>{const target=targets[i];
+        if(target)button(nav,item.title,()=>target.scrollIntoView?.({block:'nearest'}));
+      });
+      preview.insertBefore(nav,preview.firstChild);
+    }
     const ext=n.notesV21||{};
     if(ext.cornell){
       [['cues',t('question')],['notes',t('explain')],['summary',t('summary')]].forEach(([k,label])=>{
@@ -678,7 +698,7 @@
     if(kind==='cornell'){instance.fields.cues.value='';instance.fields.notes.value='';instance.fields.summary.value='';}
     showType();
   }
-  return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,checklistProgress,
+  return Object.freeze({createController,parseTags,formatSelection,headingOutline,toggleChecklistLine,checklistProgress,
     serializeNote,findOccurrences,renderText,
     install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader,translate,
     openedFingerprint:()=>instance?.openedSnapshot??null});

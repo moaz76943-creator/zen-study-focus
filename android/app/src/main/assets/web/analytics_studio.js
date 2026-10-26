@@ -242,7 +242,7 @@
               if(matches.length!==1||matches[0].archived===true||
                  matches[0].status==='archived'||matches[0].isStarter===true||
                  matches[0].isDemo===true||matches[0].synthetic===true||
-                  ['demo','sample','fixture'].includes(matches[0].source))return;
+                  core.isSyntheticSource(matches[0].source))return;
               opts.onOpenTask(item.taskId);
             });
             cell.appendChild(button);
@@ -348,6 +348,17 @@
       if(event.type==='keydown')event.preventDefault();
       if(!current)return;
       const day=node.getAttribute('data-day');
+      // The year heatmap covers dates beyond the currently selected report.
+      // Fetch just the clicked credited day without changing KPIs or CSV filters.
+      if(event.currentTarget===heat&&core.validDay(day)&&
+         (day<current.period.startDate||day>current.period.endDate)){
+        const dayReport=core.buildReport(provider(),{
+          today:opts.today||core.localToday(),
+          startDate:day,endDate:day,domain:domain.value
+        });
+        displayRows(dayReport.sessions,day);
+        return;
+      }
       const group=currentSeries.find(r=>r.key===day);
       const isMonth=/^\d{4}-\d{2}$/.test(day);
       let matching;
