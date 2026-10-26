@@ -93,8 +93,11 @@ test('CodeQL unknown js rule syntax is diagnosed only by bounded structural cate
   assert.equal(r.out.status,'FAIL');
   assert.equal(r.out.findings,5);
   assert.deepEqual(r.out.unclassified_structure,{
-    HAS_UNDERSCORE:1,HAS_DOT:1,HAS_NESTED_SEPARATOR:1,TOO_LONG:1,OTHER_SYNTAX:1
+    HAS_UNDERSCORE:1,HAS_DOT:1,TOO_LONG:1,OTHER_SYNTAX:1
   });
+  // A hierarchical identifier is valid CodeQL syntax, not a suspicious ID.
+  assert.equal(r.out.rule_counts['js/a/b'],1);
+  assert.equal(r.out.rule_counts.unknown,4);
   assert.ok(!(r.stdout+r.stderr).includes('PRIVATE-MESSAGE-SENTINEL'));
 });
 test('missing, corrupt, structurally invalid or tool-mismatched SARIF blocks',()=>{
