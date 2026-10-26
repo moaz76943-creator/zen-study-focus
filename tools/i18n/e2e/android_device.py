@@ -236,6 +236,15 @@ def click(label, scroll=False):
 def node_class_contains(n, name):
     return name in n.get("class", "") and is_visible_node(n)
 
+def keyboard_shown(state):
+    if not isinstance(state, str):
+        return None
+    for key in ("mInputShown", "mIsInputViewShown", "isInputViewShown"):
+        match = re.search(r"\b" + key + r"=(true|false)\b", state)
+        if match:
+            return match.group(1) == "true"
+    return None
+
 def text_input(index, value):
     nodes = dump()
     items = [n for n in nodes if node_class_contains(n, "EditText")
@@ -264,6 +273,11 @@ def text_input(index, value):
     tap_node(target)
     shell("input", "text", value)
     time.sleep(0.5)
+    # Native accessibility activation can open the IME. A later swipe must not
+    # type keyboard gestures into the note body. Only Back a confirmed IME.
+    if keyboard_shown(shell("dumpsys", "input_method")) is True:
+        shell("input", "keyevent", "KEYCODE_BACK")
+        time.sleep(0.3)
 
 def restart():
     shell("am", "force-stop", PACKAGE)
