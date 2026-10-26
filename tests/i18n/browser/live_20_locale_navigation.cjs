@@ -7,12 +7,13 @@ const dest=process.env.DF_LOCALE_REPORT||'/tmp/df03-browser-locale.json';
 const codes=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko','vi','it','bn','ur','fa','pl','nl'];
 (async()=>{
  const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
- const rows=[],errors=[];
+ const rows=[],errors=[]; let activeLocale='bootstrap';
  try{
   const page=await browser.newPage({viewport:{width:393,height:820}});
-  page.on('pageerror',error=>errors.push(String(error).slice(0,200)));
+  page.on('pageerror',error=>errors.push({locale:activeLocale,stack:String(error.stack||error).slice(0,1200)}));
   await page.goto(url,{waitUntil:'load'});
   for(const code of codes){
+   activeLocale=code;
    const problems=[];
    try{
     const meta=await page.evaluate(code=>LANG_CATALOG.find(x=>x.code===code),code);
