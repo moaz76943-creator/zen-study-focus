@@ -186,16 +186,28 @@ public final class TaskInstrumentation extends Instrumentation {
     }
     private void tap(String id)throws Exception{
         String source="(()=>{const el=document.getElementById("+JSONObject.quote(id)+");" +
-            "if(!el)return {present:false};el.scrollIntoView({block:'center',inline:'nearest'});" +
+            "if(!el)return {present:false};" +
+            "el.scrollIntoView({block:'start',inline:'nearest'});" +
+            "const host=el.closest('#df03TaskHost,#df03RejectHost');let scrolls=0;" +
+            "for(let i=0;i<6;i++){const rect=el.getBoundingClientRect(),v=window.visualViewport;" +
+            "const top=v?v.offsetTop:0,height=v?v.height:innerHeight,y=rect.top+rect.height/2;" +
+            "if(y>=top+18&&y<top+height-18)break;" +
+            "const delta=y-(top+Math.min(height*.38,85));" +
+            "if(host){const old=host.scrollTop;host.scrollTop+=delta;" +
+            "if(host.scrollTop===old)window.scrollBy(0,delta);}else window.scrollBy(0,delta);" +
+            "scrolls++;}" +
             "const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;" +
             "const hit=document.elementFromPoint(x,y),v=window.visualViewport;" +
             "return {present:true,x,y,width:r.width,height:r.height,visX:v?v.offsetLeft:0," +
             "visY:v?v.offsetTop:0,visWidth:v?v.width:innerWidth,visHeight:v?v.height:innerHeight," +
-            "hit:!!hit&&(hit===el||el.contains(hit))};})()";
+            "scrolls,hostTop:host?.scrollTop||0,hit:!!hit&&(hit===el||el.contains(hit))};})()";
         js(source);SystemClock.sleep(170);
         JSONObject point=js(source);
         assertOk(point.optBoolean("present")&&point.optBoolean("hit")&&point.optDouble("width")>=20 &&
-            point.optDouble("height")>=28,"Touch target absent/occluded "+id+": "+point);
+            point.optDouble("height")>=43.5&&
+            point.optDouble("y")>=point.optDouble("visY")&&
+            point.optDouble("y")<point.optDouble("visY")+point.optDouble("visHeight"),
+            "Touch target absent/occluded after WebView scroll "+id+": "+point);
         int[] pos=new int[2];AtomicReference<int[]> bounds=new AtomicReference<>();
         runOnMainSync(()->{
             view.getLocationOnScreen(pos);
