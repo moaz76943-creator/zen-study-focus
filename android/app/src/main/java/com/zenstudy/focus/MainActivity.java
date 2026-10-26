@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        // Preserve JS confirmation semantics without showing the file:// browser origin.
         appDialogs = new FocusAppWebChromeClient(this);
         webView.setWebChromeClient(appDialogs);
         webView.loadUrl("file:///android_asset/web/index.html");

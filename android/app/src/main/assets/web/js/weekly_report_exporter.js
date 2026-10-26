@@ -11,7 +11,7 @@
    */
   function escapeMarkdownCell(text) {
     if (typeof text !== 'string') return '';
-    return text.replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').trim();
+    return text.replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/[\r\n\u2028\u2029]+/g, ' ').trim();
   }
 
   /**

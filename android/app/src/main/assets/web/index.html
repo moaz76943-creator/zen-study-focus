@@ -381,7 +381,7 @@
     .analytics-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     .an-kpi-card {
       background: var(--card-pure); border-radius: 20px; padding: 14px 16px;
-      box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8); cursor: pointer;
+      box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8);
     }
     .an-kpi-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.73rem; font-weight: 700; color: var(--text-muted); }
     .an-kpi-num { font-size: 1.55rem; font-weight: 600; color: var(--text-main); margin: 4px 0; }
@@ -633,6 +633,7 @@
   <link rel="stylesheet" href="white_2100.css">
   <link rel="stylesheet" href="design_tokens_v22.css">
   <link rel="stylesheet" href="ui_components_v22.css">
+  <link rel="stylesheet" href="completion_alert_picker.css">
   <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
   <style id="western-digits-enforcement-style">
     input[type="date"], input[type="time"], .date-display, [data-date] {
@@ -1003,6 +1004,7 @@
           <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
         </div>
 
+        <section id="df-tone-picker-card" aria-label="Completion sound"><div id="completionAlertPickerHost"></div></section>
         <div class="sounds-photo-grid" id="soundsGridBox"></div>
       </main>
 
@@ -1011,12 +1013,12 @@
            ====================================================== -->
       <main class="screen-section" id="sec-analytics">
         <div class="analytics-kpi-grid">
-          <div class="an-kpi-card" onclick="addQuickSessionRecord()">
+          <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiMinutes">Active Minutes</span><span>🕒</span></div>
             <div class="an-kpi-num" id="kpiTotalMins">0</div>
             <div class="an-kpi-trend" id="kpiWeeklyTrend">Based on recorded focus sessions</div>
           </div>
-          <div class="an-kpi-card" onclick="addQuickSessionRecord()">
+          <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiSessions">Completed Sessions</span><span>🎯</span></div>
             <div class="an-kpi-num" id="kpiTotalSessions">0</div>
             <div class="an-kpi-trend" id="kpiSessionTrend">Completed focus sessions only</div>
@@ -1245,6 +1247,8 @@
   <!-- Localization sources must be ready before app.js applies the persisted language. -->
   <script src="locale_premium_v22.js"></script>
   <script src="js/df99_reviewed_packs.js"></script>
+  <script src="localization_20_recovery.js"></script>
+  <script src="js/legacy20_analytics_bridge.js"></script>
   <script src="data_compat_v21.js"></script>
   <script src="preflight_v22.js"></script>
   <script src="app.js"></script>
@@ -1261,6 +1265,8 @@
   <script src="sound_mix_controls.js"></script>
   <script src="js/locale_audio_settings_bridge.js"></script>
   <script src="integration_v22.js"></script>
+  <script src="completion_alert_locales.js"></script>
+  <script src="js/completion_tone_picker.js"></script>
   <script src="js/deep_focus_runtime_activator.js"></script>
 </body>
 </html>

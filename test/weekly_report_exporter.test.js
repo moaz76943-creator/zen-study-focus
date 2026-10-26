@@ -31,6 +31,16 @@ console.log("--- Running 🎯 Mission #043: Weekly Report Exporter Tests ---");
   console.log("✓ Test 2: Markdown table pipe escaping verified.");
 }
 
+// Security regression: preserve user backslashes before escaping Markdown table pipes.
+{
+  const input = String.raw`part\|second`;
+  const wanted = String.raw`part\\\|second`;
+  assert.strictEqual(Exporter.escapeMarkdownCell(input),wanted,
+    'Existing slash plus table pipe must not bypass Markdown delimiter escaping');
+  assert.strictEqual(Exporter.escapeMarkdownCell('one\rtwo\nthree\u2028four'),
+    'one two three four','All newline forms must stay within one Markdown cell');
+}
+
 // Test 3: Structured JSON export with ZEN21::REPORT envelope
 {
   const jsonReport = Exporter.exportToJson([{ durationMinutes: 45 }], [{ completed: true }]);

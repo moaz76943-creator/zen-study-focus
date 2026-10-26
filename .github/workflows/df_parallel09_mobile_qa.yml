@@ -1,0 +1,51 @@
+name: DF09 Premium Mobile 24-case QA
+on:
+  pull_request:
+    paths:
+      - 'android/app/src/main/assets/web/white_2100.css'
+      - 'tests/df_parallel09*'
+      - '.github/workflows/df_parallel09_mobile_qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  premium-mobile-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: RED/GREEN source regressions
+        run: node --test tests/df_parallel09_mobile_premium.test.cjs
+      - name: Install Chromium runner
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if ! command -v chromium >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: 320/360/393/430 RTL/LTR 100/150/200% matrix
+        shell: bash
+        env:
+          DF_CHROMIUM_BIN: /usr/bin/chromium
+          DF09_EVIDENCE: ${{ runner.temp }}/df09
+        run: node tests/df_parallel09_browser_matrix.cjs
+      - name: Stamp exact SHA and QA scope
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "${{ runner.temp }}/df09"
+          git rev-parse HEAD > "${{ runner.temp }}/df09/SOURCE_SHA.txt"
+          printf 'Chromium CSS font emulation is not Android system font scaling, WebView or TalkBack proof. RELEASE_APPROVED=NO.\n' > "${{ runner.temp }}/df09/SCOPE.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: df09-premium-mobile-${{ github.sha }}
+          path: ${{ runner.temp }}/df09/
+          if-no-files-found: warn
+          retention-days: 5
