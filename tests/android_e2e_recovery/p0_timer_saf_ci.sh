@@ -11,9 +11,14 @@ capture(){
 }
 trap capture EXIT
 cp android/app/build/outputs/apk/debug/app-debug.apk "$report/tested-debug.apk"
-sha256sum "$report/tested-debug.apk" > "$report/installed-apk.sha256"
 git rev-parse HEAD HEAD:android > "$report/source-sha-and-android-tree.txt"
 adb install "$report/tested-debug.apk"
+installed_path="$(adb shell pm path com.zenstudy.focus | tr -d '\r' | sed -n 's/^package://p')"
+test -n "$installed_path"
+adb pull "$installed_path" "$report/installed-base.apk"
+sha256sum "$report/installed-base.apk" > "$report/installed-apk.sha256"
+test "$(sha256sum "$report/installed-base.apk" | cut -d ' ' -f1)" = "$(sha256sum "$report/tested-debug.apk" | cut -d ' ' -f1)"
+rm "$report/installed-base.apk"
 adb shell am start -n com.zenstudy.focus/.MainActivity
 sleep 5
 DF_ANDROID_DISPOSABLE=1 timeout 300 node tests/android_e2e_recovery/p0_timer_saf_android.cjs "$report/results.json"

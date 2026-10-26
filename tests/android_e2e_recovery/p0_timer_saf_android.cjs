@@ -4,11 +4,13 @@ const fs=require('node:fs'),cp=require('node:child_process'),assert=require('nod
 const PKG='com.zenstudy.focus',PREFIX='DF07 isolated durability ';
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const adb=(...args)=>cp.execFileSync('adb',['-s','emulator-5554',...args],{encoding:'utf8',timeout:20000}).trim();
-const report={source:'Android API30 real WebView + native AtomicFile; disposable emulator only',sha:process.env.GITHUB_SHA||null,results:[],release_approved:false};
+const report={source:'Android real WebView + native AtomicFile; disposable emulator only',sha:cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),api:null,results:[],release_approved:false};
 let ws,id=0,pending=new Map();
 function requireEmulator(){
  if(process.env.DF_ANDROID_DISPOSABLE!=='1'||adb('shell','getprop','ro.kernel.qemu')!=='1')throw Error('TRANSPORT: disposable emulator attestation missing');
  if(!adb('shell','pm','path',PKG).includes(PKG))throw Error('TRANSPORT: debug package not installed');
+ report.api=Number(adb('shell','getprop','ro.build.version.sdk'));
+ if(![30,35].includes(report.api))throw Error('TRANSPORT: expected API30 or API35');
 }
 async function connect(){
  const pid=adb('shell','pidof',PKG).split(/\s/)[0];
@@ -164,6 +166,12 @@ async function openDocument(name,code){
  stageImportFixtureInMediaStore(name,code);await pause(900);
  await evaluate("setTimeout(()=>ZenNative.importBackupFromFile(),0);true");
  let xml=(await nativeUI('real DocumentsUI',x=>x)).xml;
+ // Grid tiles can retain focus without opening on the captured API30 picker.
+ // Select the genuine native list affordance, then locate the exact filename
+ // again in the new hierarchy. Never use a preview icon or stale tile bounds.
+ const listView=uiNodes(xml).find(n=>/content-desc="List view"/i.test(n)&&
+  /clickable="true"/.test(n)&&! /enabled="false"/.test(n));
+ if(listView){tapUI(listView);await pause(500);xml=dumpUI();}
  let row=uiNodes(xml).find(n=>n.includes('text="'+name+'"'));
  if(!row){
   let downloads=uiNodes(xml).find(n=>/text="Downloads"/i.test(n));

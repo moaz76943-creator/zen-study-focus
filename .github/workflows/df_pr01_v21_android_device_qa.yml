@@ -9,6 +9,7 @@ on:
       - 'android/app/src/main/assets/web/integration_v22.js'
       - 'tests/android_e2e_recovery/p0_timer_saf_android.cjs'
       - 'tests/android_e2e_recovery/p0_timer_saf_ci.sh'
+      - 'tests/android_e2e_recovery/picker_transport.test.cjs'
       - '.github/workflows/df_pr01_v21_android_device_qa.yml'
 permissions:
   contents: read
@@ -43,6 +44,7 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
           node --check tests/android_e2e_recovery/p0_timer_saf_android.cjs
+          node --test tests/android_e2e_recovery/picker_transport.test.cjs
           node --test tests/integration_recovery/native_saf_import_forwardport.test.cjs
       - name: Ensure Android compile SDK 36
         shell: bash
