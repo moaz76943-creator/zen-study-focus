@@ -1,0 +1,100 @@
+name: DF-FINAL-03 real Android Tasks WebView persistence
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/tasks_core/df_final03_instrumentation/**'
+      - '.github/workflows/df_final03_tasks_real_android.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df-final03-tasks-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    name: Tasks instrumentation source preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source tests, shell scripts and invariant checks
+        run: |
+          set -euo pipefail
+          bash -n tests/tasks_core/df_final03_instrumentation/prepare_test_build.sh
+          bash -n tests/tasks_core/df_final03_instrumentation/run_ci.sh
+          node --test tests/tasks_core/tasks_core.test.cjs tests/tasks_core/tasks_studio.test.cjs
+          grep -q 'getUiAutomation().injectInputEvent' tests/tasks_core/df_final03_instrumentation/TaskInstrumentation.java
+          grep -q 'setWebContentsDebuggingEnabled(false)' android/app/src/main/java/com/zenstudy/focus/MainActivity.java
+  android:
+    name: Android API${{ matrix.api }} Tasks 320-430px real WebView
+    needs: source
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30,35]
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android 36 compile SDK
+        shell: bash
+        run: |
+          sdkmanager_bin="$(find /usr/local/lib/android/sdk/cmdline-tools -name sdkmanager -type f -print -quit)"
+          test -x "$sdkmanager_bin"
+          "$sdkmanager_bin" 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Wire instrumentation in temporary CI checkout only
+        run: |
+          bash tests/tasks_core/df_final03_instrumentation/prepare_test_build.sh
+          test "$(git diff --name-only)" = 'android/app/build.gradle'
+      - name: Build exact source debug app and isolated Android test APK
+        working-directory: android
+        run: gradle assembleDebug assembleDebugAndroidTest --no-daemon
+      - name: Emulator KVM
+        run: |
+          test -c /dev/kvm
+          sudo chmod 666 /dev/kvm
+      - name: Actual WebView pointer edit and native v21 readback after force stop
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          DF03_EVIDENCE: ${{ runner.temp }}/df03-api-${{ matrix.api }}
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect
+          script: bash tests/tasks_core/df_final03_instrumentation/run_ci.sh
+      - name: Final source and platform limits
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/df03-api-${{ matrix.api }}"
+          git rev-parse HEAD > "$RUNNER_TEMP/df03-api-${{ matrix.api }}/EXACT_SOURCE_SHA.txt"
+          printf 'API${{ matrix.api }} disposable emulator only. PHYSICAL_HANDSET=NOT_TESTED; IME=NOT_TESTED; SAF=NOT_TESTED; RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df03-api-${{ matrix.api }}/LIMITS.txt"
+          test "$(git diff --name-only)" = 'android/app/build.gradle'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DF03-Tasks-real-Android-API${{ matrix.api }}-${{ github.sha }}
+          path: ${{ runner.temp }}/df03-api-${{ matrix.api }}
+          retention-days: 7
+          if-no-files-found: warn
