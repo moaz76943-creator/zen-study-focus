@@ -65,3 +65,8 @@ class PR04NativeSafety(unittest.TestCase):
   self.assertIn('if [ "$ready" -ne 1 ]; then',source)
   self.assertLess(source.index('Service package: found'),source.index('if adb install -r'))
   self.assertIn("runtime NOT_TESTED",source)
+  # A package service that dies *after* boot must have one bounded recovery.
+  self.assertIn('timeout 30 adb reboot',source)
+  self.assertIn('timeout 180 adb wait-for-device',source)
+  self.assertIn('Android PackageManager failed to recover',source)
+  self.assertIn("'2048M' || '3072M'",(R/'.github/workflows/df_pr04_api30_api35_smoke.yml').read_text())
