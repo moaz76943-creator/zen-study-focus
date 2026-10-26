@@ -38,7 +38,7 @@ for attempt in 1 2 3; do
     timeout 180 adb wait-for-device || { echo 'Android emulator did not return; NOT_TESTED' >&2; exit 1; }
     service_back=0
     for retry in $(seq 1 36); do
-      if [ "$(timeout 8 adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\\r')" = 1 ] &&
+      if [ "$(timeout 8 adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ] &&
          timeout 8 adb shell service check package 2>/dev/null | grep -q 'Service package: found'; then
         service_back=1
         break
