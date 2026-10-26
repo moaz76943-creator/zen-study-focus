@@ -63,7 +63,7 @@ async function nativeHierarchy(){
  });
 }
 async function dialog(expected){
- let last='';
+ let last='',lastXml='';
  for(let n=0;n<6;n++){
   const candidates=[];
   // Prefer UiAutomator's complete EditText attributes when available.
@@ -75,6 +75,7 @@ async function dialog(expected){
   try{candidates.push(await nativeHierarchy());}catch(e){last=String(e);}
   for(const rawXml of candidates){
    const xml=decodeNativeXmlEntities(rawXml);
+   lastXml=xml;
    if(xml.includes('package="com.zenstudy.focus"')&&
       xml.includes('Deep Focus')&&xml.includes(expected)&&
       (!expected.startsWith('DF Prompt CHECK')||xml.includes('نص للاختبار'))){
@@ -85,6 +86,11 @@ async function dialog(expected){
   }
   await sleep(650);
  }
+ try{
+  const safe=expected.replace(/[^a-zA-Z0-9_-]/g,'-').slice(0,48);
+  fs.writeFileSync(E+'/not-proven-'+safe+'.xml',lastXml);
+  fs.writeFileSync(E+'/not-proven-'+safe+'.png',execFileSync('adb',['exec-out','screencap','-p'],{timeout:15000,maxBuffer:9*1024*1024}));
+ }catch(_){}
  throw Error('REAL_NATIVE_DIALOG_NOT_PROVEN '+expected+' '+last.slice(0,350));
 }
 async function main(){
@@ -121,6 +127,15 @@ async function main(){
    ws.send(JSON.stringify({id,method:'Runtime.evaluate',params:{expression:expr,returnByValue:true,awaitPromise:false}}));
   });
  };
+ let ready=false;
+ for(let i=0;i<35;i++){
+  const r=await evaluate("({ready:document.readyState,href:location.href,bridge:typeof window.ZenNative})");
+  if(r.value?.ready==='complete'&&r.value?.href==='file:///android_asset/web/index.html'&&r.value?.bridge==='object'){
+   ready=true;break;
+  }
+  await sleep(500);
+ }
+ assert.ok(ready,'TRANSPORT: actual bundled WebView not ready for native dialog verification');
  const results=[];
  try{
   // Actual modal Cancel must return JS false; never replace user's timer session.
