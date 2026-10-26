@@ -2092,6 +2092,9 @@ function verifyAndRestoreBackupCode(codeStr) {
 function openCloudBackupModal() {
   document.getElementById('inpRestorePayload').value = '';
   document.getElementById('cloudBackupModal').classList.add('open');
+  // Update display-only backup labels after the modal exists and before user action.
+  // Never alter backup payload, consent, restore callbacks or storage here.
+  window.DeepFocusAudioSettingsLocale?.bindBackupDialog({document, locale: cfg.lang});
 }
 
 function syncToGoogleCloudNow() {
