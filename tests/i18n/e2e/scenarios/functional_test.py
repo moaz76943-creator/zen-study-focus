@@ -63,3 +63,24 @@ class AssertionContract(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class LiveAccessibilityContract(unittest.TestCase):
+    def test_hidden_clock_and_navigation_cannot_shadow_visible_controls(self):
+        from unittest.mock import patch
+        import functional as scenario
+        nodes=[{'text':'25:00','bounds':'[0,0][0,0]'},
+               {'text':'24:57','bounds':'[30,100][200,150]'},
+               {'text':'Timer','bounds':'[0,0][0,0]'},
+               {'text':'Timer','bounds':'[100,700][150,750]'}]
+        android=scenario.Android()
+        with patch.object(android,'nodes',return_value=nodes):
+            self.assertEqual(android.clock(),1497)
+            self.assertEqual(android.find('Timer',exact=True)['bounds'],'[100,700][150,750]')
+
+    def test_selected_runs_keep_unexecuted_cases_explicitly_not_tested(self):
+        import functional as scenario
+        import tempfile
+        with tempfile.TemporaryDirectory() as directory:
+            report=scenario.run(Path(directory)/'result.json','a'*40,30,selected=[])
+        self.assertEqual(set(report['CASES']),set(scenario.SCENARIOS))
+        self.assertTrue(all(c['status']=='NOT_TESTED' for c in report['CASES'].values()))

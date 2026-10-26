@@ -143,5 +143,13 @@ DF13_EVIDENCE_DIR="$OUT" timeout --signal=TERM --kill-after=15s 22m python3 -u t
   --output "$OUT" --sha "$(git rev-parse HEAD)" --api "$API" \
   2>&1 | tee "$OUT/PYTHON_E2E.log"
 RESULT=${PIPESTATUS[0]}
+# Invoke the first independently observable #290 scenarios on the same APK.
+# Keep the primary failure code and explicit NOT_TESTED rows for uninvoked cases.
+DF13_EVIDENCE_DIR="$OUT" timeout --signal=TERM --kill-after=10s 3m python3 -u tools/i18n/e2e/scenarios/functional.py \
+  --output "$OUT/SCENARIO_MATRIX.json" --sha "$(git rev-parse HEAD)" --api "$API" \
+  --scenario timer.start_pause_resume --scenario digits.visible_labels \
+  > "$OUT/FUNCTIONAL_E2E.log" 2>&1
+FUNCTIONAL_RESULT=$?
 set -e
-exit "$RESULT"
+if (( RESULT != 0 )); then exit "$RESULT"; fi
+exit "$FUNCTIONAL_RESULT"

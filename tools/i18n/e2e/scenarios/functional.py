@@ -68,7 +68,7 @@ class Android:
     def find(self, needle, *, exact=False, editable=False):
         found = []
         for node in self.nodes():
-            if not node.get("bounds"):
+            if not device.is_visible_node(node):
                 continue
             if editable and not ("EditText" in node.get("class", "") or
                                  "AutoCompleteTextView" in node.get("class", "")):
@@ -164,7 +164,7 @@ class Android:
 
     def clock(self):
         values = [n.get("text", "").strip() for n in self.nodes()
-                  if n.get("bounds") and CLOCK.fullmatch(n.get("text", "").strip())]
+                  if device.is_visible_node(n) and CLOCK.fullmatch(n.get("text", "").strip())]
         if len(values) != 1:
             raise RequiresHook("timer numeric node missing/ambiguous: " + repr(values))
         return normalize_clock(values[0])
@@ -393,7 +393,7 @@ def digits_visible(a, token):
     a.tap("Timer")
     nodes = a.nodes()
     numeric = [n.get("text", "") for n in nodes if any(ch.isdigit()
-               for ch in n.get("text", "")) and n.get("bounds")]
+               for ch in n.get("text", "")) and device.is_visible_node(n)]
     if not numeric:
         raise AssertionError("no visible numeric nodes were inspected")
     violations = {s: west_digits(s) for s in numeric if west_digits(s)}
@@ -453,7 +453,7 @@ def run(output, sha, api, selected=None):
     report = {"TASK_ID": "DF13-C-FUNCTIONAL-E2E-SCENARIOS", "SOURCE_SHA": sha,
               "API": api, "EVIDENCE": "ADB_UIAUTOMATOR_REAL_ANDROID_ONLY",
               "CASES": {key: {"status": NOT_TESTED, "reason": "Not yet executed"}
-                        for key in chosen}}
+                        for key in SCENARIOS}}
     def save():
         report["SUMMARY"] = {s: sum(v["status"] == s for v in report["CASES"].values())
                              for s in ("PASS", "FAIL", NOT_TESTED)}
