@@ -29,6 +29,7 @@ public final class TouchInstrumentation extends Instrumentation {
     private Activity activity;
     private WebView view;
     private int actualTaps = 0;
+    private String lastTapDiagnostics = "none";
 
     @Override public void onCreate(Bundle arguments) {
         super.onCreate(arguments);
@@ -85,7 +86,7 @@ public final class TouchInstrumentation extends Instrumentation {
                         state.getJSONArray("screen").length() == 1 &&
                         item[1].equals(state.getJSONArray("screen").getString(0)) &&
                         selected.equals(state.optString("lang")),
-                        "Actual Android tap did not navigate "+selected+" "+item[0]+": "+state);
+                        "Actual Android tap did not navigate "+selected+" "+item[0]+": "+state+" lastTap="+lastTapDiagnostics);
                     Log.i(TAG, "NAV_PASS locale="+selected+" tab="+item[0]);
                 }
             }
@@ -172,6 +173,13 @@ public final class TouchInstrumentation extends Instrumentation {
             "const hit=document.elementFromPoint(x,y);" +
             "return {exists:true,x,y,width:r.width,height:r.height,vw:innerWidth,vh:innerHeight," +
             "hit:!!hit&&(hit===n||n.contains(hit))};})()";
+        js("(()=>{if(window.__df08Events)return {installed:true};window.__df08Events=[];" +
+            "for(const kind of ['touchstart','touchend','click','pointerdown','pointerup']){" +
+            "document.addEventListener(kind,e=>{const p=e.changedTouches?.[0]||e;" +
+            "window.__df08Events.push({kind,clientX:p.clientX,clientY:p.clientY," +
+            "target:e.target?.id||e.target?.closest('.bnav-btn')?.id||e.target?.tagName," +
+            "trusted:e.isTrusted});if(window.__df08Events.length>16)window.__df08Events.shift();},true)}" +
+            "return {installed:true};})()");
         js(expression);
         SystemClock.sleep(140);
         JSONObject p=js(expression);
@@ -201,7 +209,14 @@ public final class TouchInstrumentation extends Instrumentation {
             assertTrue(getUiAutomation().injectInputEvent(release,true),"Android rejected touchEnd "+id);
         } finally {press.recycle();release.recycle();}
         actualTaps++;
-        SystemClock.sleep(300);
+        SystemClock.sleep(400);
+        JSONObject after=js("({events:window.__df08Events?.slice(-8)||[]," +
+            "nav:[...document.querySelectorAll('.bnav-btn.active')].map(n=>n.id)," +
+            "sections:[...document.querySelectorAll('.screen-section.active')].map(n=>n.id)," +
+            "innerWidth,innerHeight,scrollX,scrollY})");
+        lastTapDiagnostics="id="+id+" css="+p+" screen="+x+","+y+
+            " webview="+java.util.Arrays.toString(box)+" observed="+after;
+        Log.i(TAG,"TAP_DIAGNOSTICS "+lastTapDiagnostics);
     }
 
     private void key(int code) {
