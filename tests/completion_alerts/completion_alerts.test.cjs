@@ -48,3 +48,24 @@ test('audio callback exceptions never escape completion, release reserved audio 
  assert.doesNotThrow(()=>badCleanup.pause(),'Host cleanup failures must not escape into timer');
  badCleanup.dispose();
 });
+
+test('real preview volume is capped, update stops playback and silence never plays',async()=>{
+ MockAudio.instances=[];
+ const cfg={completionAlertSettings:{sound:'soft-bell',volume:100}};
+ const a=lib.createCompletionAlerts(cfg,{persist:()=>true,AudioCtor:MockAudio});
+ assert.equal(await a.preview('soft-bell'),true);
+ const first=MockAudio.instances.at(-1);
+ assert.equal(first.volume,0.65,'100% setting must remain below the safe output cap');
+ assert.equal(a.update({volume:10}),true);
+ assert.equal(first.paused,true,'Changing gain stops the old preview');
+ assert.equal(await a.preview('wood-tap'),true);
+ const next=MockAudio.instances.at(-1);
+ assert.ok(Math.abs(next.volume-0.065)<1e-9,'10% volume maps to safe output gain');
+ assert.equal(a.update({sound:'silent'}),true);
+ assert.equal(next.paused,true);
+ assert.equal(await a.preview('silent'),false);
+ const before=MockAudio.instances.length;
+ assert.equal(await a.complete({sessionId:'silent-session',phase:'focus'}),false);
+ assert.equal(MockAudio.instances.length,before,'Mute must create no media instance');
+ a.dispose();
+});
