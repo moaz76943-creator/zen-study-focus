@@ -1,5 +1,7 @@
 name: DF09 Android real WebView Analytics
 on:
+  push:
+    branches: [qa/df-final09-native-analytics-a11y-20261026]
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
