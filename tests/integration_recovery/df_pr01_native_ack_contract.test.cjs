@@ -53,7 +53,7 @@ test('API33+ notifications request only follows an explicit timer start, never a
   assert.doesNotMatch(onCreate,/requestPermissions\(/,'Android notification consent must not interrupt WebView startup');
   assert.match(java,/private void requestNotificationPermissionForTimer\(\)/);
   assert.match(java,/Build.VERSION.SDK_INT >= 33/);
-  const timer=section(java,'public void startBackgroundService(int seconds, String title)','public void stopBackgroundService()');
+  const timer=section(java,'public void startBackgroundService(int seconds, String title)','public void requestTimerNotificationPermission()');
   assert.doesNotMatch(timer,/requestNotificationPermissionForTimer\(/,'Restored timers only rearm their alarm without prompting');
   const explicit=section(java,'public void requestTimerNotificationPermission()','public void stopBackgroundService()');
   assert.match(explicit,/runOnUiThread\(\(\) -> requestNotificationPermissionForTimer\(\)\)/);
