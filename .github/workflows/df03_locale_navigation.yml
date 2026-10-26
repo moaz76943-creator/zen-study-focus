@@ -1,0 +1,54 @@
+name: DF03 20-language browser picker/navigation audit
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths: ['tests/i18n/browser/**', '.github/workflows/df03_locale_navigation.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install real Chromium driver
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          test -x /usr/bin/chromium || { sudo apt-get update -qq; sudo apt-get install -y chromium; }
+          node --check tests/i18n/browser/live_20_locale_navigation.cjs
+      - name: Host bundled web assets
+        shell: bash
+        run: |
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df03-http.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Run real browser picker and mobile checks
+        env:
+          DF_LOCALE_REPORT: ${{ runner.temp }}/df03-locale-report.json
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node tests/i18n/browser/live_20_locale_navigation.cjs
+      - name: Preserve report even on failure
+        if: always()
+        shell: bash
+        run: |
+          git rev-parse HEAD > "$RUNNER_TEMP/DF03_SHA.txt"
+          printf 'Chromium only, not Android; translation completeness NOT_TESTED; release NO\n' > "$RUNNER_TEMP/DF03_LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: df03-browser-navigation-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/df03-locale-report.json
+            ${{ runner.temp }}/DF03_SHA.txt
+            ${{ runner.temp }}/DF03_LIMITS.txt
+          if-no-files-found: warn
+          retention-days: 7
