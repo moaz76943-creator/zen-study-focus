@@ -69,12 +69,14 @@ test('preserves separately reviewed Analytics labels when bridging an old locale
   assert.equal(saved.get('exportUnavailable'),'Export nicht verfügbar');
 });
 test('distinguishes real Bengali labels from English fallback in coverage',()=>{
-  const coverage=globalThis.DF99Locale.coverage(['bn','sw'],'analytics',
+  const coverage=globalThis.DF99Locale.coverage(['bn','sw','zz'],'analytics',
     ['title','noData','invalidRange']);
   assert.equal(coverage[0].code,'bn');
   assert.equal(coverage[0].translated,2);
   assert.equal(coverage[1].code,'sw');
-  assert.equal(coverage[1].translated,0);
+  assert.equal(coverage[1].translated,2); // Current reviewed Swahili labels, not fallback.
+  assert.equal(coverage[2].code,'zz');
+  assert.equal(coverage[2].translated,0); // No pack: English fallback is not translation.
   assert.equal(coverage[0].total,3);
 });
 test('offline scripts reinitialize Bengali Analytics on a fresh reopen without user state',()=>{
@@ -92,6 +94,8 @@ test('offline scripts reinitialize Bengali Analytics on a fresh reopen without u
     assert.equal(sandbox.DF99Locale.t('bn','analytics','title','Recorded analytics'),
       old.t('bn','analyticsTitle'));
     assert.equal(sandbox.DF99Locale.t('sw','analytics','title','Recorded analytics'),
+      'Takwimu zilizorekodiwa');
+    assert.equal(sandbox.DF99Locale.t('zz','analytics','title','Recorded analytics'),
       'Recorded analytics');
     assert.equal(sandbox.DeepFocusLocale20Recovery.direction('fa'),'rtl');
     assert.equal(sandbox.DeepFocusLocale20Recovery.direction('ur'),'rtl');
