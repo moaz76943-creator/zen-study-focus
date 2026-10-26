@@ -14,8 +14,9 @@ test('activation helper is valid Bash and locked to pilot repo/issue',()=>{
 test('activation refuses to enable until auth, labels, secret and PR permissions are checked',()=>{
   for(const mark of ['gh auth status','agent-ready','agent-safe','GROQ_API_KEY','can_approve_pull_request_reviews'])
     assert.ok(shell.includes(mark),'Missing: '+mark);
-  assert.match(shell,/gh workflow run.*dry_run=true/);
-  assert.match(shell,/gh workflow run.*dry_run=false/);
+  assert.match(shell,/gh workflow run "\$WORKFLOW".*dry_run="\$dry"/);
+  assert.match(shell,/dispatch_and_wait true/);
+  assert.match(shell,/dispatch_and_wait false/);
 });
 test('activation fails closed and never merges automatically',()=>{
   assert.match(shell,/trap .*EXIT/);
