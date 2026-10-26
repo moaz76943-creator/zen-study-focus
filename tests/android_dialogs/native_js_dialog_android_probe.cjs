@@ -28,6 +28,14 @@ function buttons(xml){
     y:Math.floor((+bounds[2]+ +bounds[4])/2)};
  }).filter(Boolean);
 }
+function decodeNativeXmlEntities(xml){
+ // Android accessibility serializes some RTL input as decimal XML entities.
+ return xml.replace(/&#(x[0-9a-fA-F]+|[0-9]+);/g,(_,v)=>{
+  const code=v[0].toLowerCase()==='x'?parseInt(v.slice(1),16):parseInt(v,10);
+  return code>=0&&code<=0x10ffff&&!(code>=0xd800&&code<=0xdfff)
+    ?String.fromCodePoint(code):'';
+ });
+}
 async function nativeHierarchy(){
  const port=Number(process.env.DF_DIALOG_NATIVE_PORT);
  if(port!==38384)throw Error('TRANSPORT: native accessibility port not configured');
@@ -65,7 +73,8 @@ async function dialog(expected){
    candidates.push(adb('shell','cat','/sdcard/df-p0-dialog.xml'));
   }catch(e){last=String(e);}
   try{candidates.push(await nativeHierarchy());}catch(e){last=String(e);}
-  for(const xml of candidates){
+  for(const rawXml of candidates){
+   const xml=decodeNativeXmlEntities(rawXml);
    if(xml.includes('package="com.zenstudy.focus"')&&
       xml.includes('Deep Focus')&&xml.includes(expected)&&
       (!expected.startsWith('DF Prompt CHECK')||xml.includes('نص للاختبار'))){
