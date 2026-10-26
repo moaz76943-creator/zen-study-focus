@@ -25,6 +25,20 @@ test('deterministic inventory, no fallback counted as translated',()=>{
  assert.equal(a.COVERAGE_BY_SCREEN.ar.timer.translated,0);
  assert.equal(a.COVERAGE_BY_SCREEN.fr.quick_training.translated,2);
 });
+test('english fallback (including Latin digit strings) is flagged and excluded from translated',()=>{
+ const mock={...files,
+  [W+'quick_training.js']:'const QUICK_KEYS=["work","rest","timerTag"];const QUICK_TRANSLATIONS={en:["Work","Rest","Intervals 20/10"],fr:["Travail","Reste","Intervals 20/10"],de:["Arbeit","Pause","Intervalle 20/10"]};'
+ };
+ const r=scan(mock);
+ assert.ok(r.ENGLISH_IDENTICAL_CANDIDATES.fr.includes('quick:timerTag'));
+ assert.equal(r.COVERAGE_BY_SCREEN.fr.quick_training.translated,2,
+   'english-identical Latin digit fallback must not count as a translation');
+ assert.equal(r.COVERAGE_BY_SCREEN.fr.quick_training.english_identical,1);
+ assert.equal(r.COVERAGE_BY_SCREEN.fr.quick_training.total,3);
+ assert.ok(!r.MISSING_KEYS_BY_LANGUAGE.fr.includes('quick:timerTag'),
+   'identical stays flagged as review candidate, not silently missing');
+ assert.equal(r.COVERAGE_BY_SCREEN.fr.quick_training.missing,0);
+});
 test('checked-in baseline keys cannot silently disappear',()=>{
  const baseline=path.resolve(__dirname,'baseline_keys.json');if(!fs.existsSync(baseline))return;
  const repo=path.resolve(__dirname,'../../..');const current=new Set(scan(sourceFiles(repo)).KEYS);
