@@ -293,6 +293,40 @@ async function confirmDialog(accept){
  },false);
  saveSafPickerEvidence(accept?'consent_accept':'consent_cancel',u.xml);tapUI(u.item);await pause(500);
 }
+async function safExportAndReadback(){
+ // WebView export action must invoke genuine native ACTION_CREATE_DOCUMENT.
+ // Only independently recovered provider bytes can prove Save succeeded.
+ const before=await snapshot(),ack=await receipt();
+ const code=await evaluate('generateEncryptedBackupCode()');
+ assert.equal(typeof code,'string');
+ assert.ok(code.startsWith('ZEN21::'),'Current v21 backup is required for SAF export');
+ const started=await evaluate(`(()=>{
+  const button=[...document.querySelectorAll('button')].find(b=>
+   String(b.getAttribute('onclick')||'').includes('downloadEncryptedBackupFile'));
+  if(!button||typeof ZenNative?.exportBackupToFile!=='function')return false;
+  setTimeout(()=>button.click(),0);
+  return true;
+ })()`);
+ assert.equal(started,true,'Real WebView export action and native file bridge must exist');
+ try{
+  const chooser=await nativeUI('ACTION_CREATE_DOCUMENT Save',xml=>
+   uiNodes(xml).find(node=>node.includes('enabled="true"')&&
+    (/text="(?:SAVE|Save|Save as|حفظ)"/.test(node)||
+     /resource-id="[^"]*:id\/action_menu_save"/.test(node))));
+  saveSafPickerEvidence('export_native_save',chooser.xml);
+  tapUI(chooser.item);
+  const source=await waitForSavedBackup(code);
+  assert.deepEqual(await snapshot(),before,'SAF export mutated application state');
+  assert.deepEqual(await receipt(),ack,'SAF export altered durable v21 receipt');
+  return 'Real DocumentsUI Save with independently matching ZEN21:: provider bytes via '+source;
+ }finally{
+  // A failed Save never becomes PASS. Dismiss only an observed native picker.
+  try{
+   if(/documentsui/i.test(dumpUI()))adb('shell','input','keyevent','4');
+  }catch(_){}
+ }
+}
+
 async function safMain(){
  requireEmulator();await connect();
  await run('saf_fixture_and_native_ack',async()=>{
@@ -321,6 +355,7 @@ async function safMain(){
  }
  await run('native_ack_io_failure_rollback_restart',nativeIoFailureRollback);
  for(const [name,fn] of Object.entries(require('./native_faults.cjs').createNativeFaultCases({evaluate,snapshot,receipt,fixture,restart,adb,nativeUI,tapUI})))await run(name,fn);
+ await run('saf_document_save_and_readback',safExportAndReadback);
  const baseline=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
  await run('saf_picker_cancel',async()=>{
   const before=await snapshot(),ack=await receipt();await evaluate('setTimeout(()=>ZenNative.importBackupFromFile(),0);true');
@@ -367,7 +402,8 @@ function fillUnattempted(target=report){
  const keys=Object.values(require('../../android/app/src/main/assets/web/data_compat_v21.js').KEYS);
  const planned=['saf_fixture_and_native_ack','locale_native_ack_process_restart',
   ...keys.flatMap(key=>['failed_save_rollback_'+key,'failed_save_rollback_'+key+'_mirror']),
-  'native_ack_io_failure_rollback_restart',...require('./native_faults.cjs').CASE_NAMES,'saf_picker_cancel','saf_valid_file_consent_cancel',
+  'native_ack_io_failure_rollback_restart',...require('./native_faults.cjs').CASE_NAMES,
+   'saf_document_save_and_readback','saf_picker_cancel','saf_valid_file_consent_cancel',
   'saf_corrupt_rejected','saf_oversized_rejected','saf_actual_file_restore_ack_and_reopen'];
  for(const name of planned)if(!target.results.some(row=>row.name===name))
   target.results.push({name,status:'NOT_TESTED',detail:'Not executed; blocked by prior Android/native transport failure'});

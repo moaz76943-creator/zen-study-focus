@@ -111,7 +111,7 @@ test('bootstrap failure leaves every unattempted durability case explicitly NOT_
  const ctx=context();
  vm.runInContext(`report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:'transport blocked'});fillUnattempted();`,ctx);
  const results=vm.runInContext('report.results',ctx);
- assert.equal(results.length,25);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
+ assert.equal(results.length,26);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
  assert.ok(results.some(r=>r.name==='saf_actual_file_restore_ack_and_reopen'));
  assert.ok(results.some(r=>r.name==='native_ack_io_failure_rollback_restart'));
 });
@@ -123,7 +123,7 @@ test('each completed Android case checkpoints a full report without advancing un
   await vm.runInContext("run('saf_fixture_and_native_ack',async()=> 'source checkpoint fixture')",ctx);
   const data=JSON.parse(fs.readFileSync(file,'utf8'));
   assert.equal(data.results.find(row=>row.name==='saf_fixture_and_native_ack').status,'PASS');
-  assert.equal(data.results.length,24);assert.equal(data.counts.NOT_TESTED,23);
+  assert.equal(data.results.length,25);assert.equal(data.counts.NOT_TESTED,24);
   assert.equal(vm.runInContext('report.results.length',ctx),1);
  }finally{if(fs.existsSync(file))fs.unlinkSync(file);if(fs.existsSync(file+'.tmp'))fs.unlinkSync(file+'.tmp');fs.rmdirSync(directory);}
 });
@@ -135,4 +135,43 @@ test('emulator optional animation settings do not abort v21 SAF device acceptanc
  assert.match(workflow,/disable-animations: false/);
  assert.doesNotMatch(workflow,/disable-animations: true/);
  assert.match(workflow,/script: bash tests\/android_e2e_recovery\/p0_timer_saf_ci\.sh/);
+});
+
+test('SAF export remains NOT_TESTED unless real provider bytes match the generated v21 code', async()=>{
+ const ctx=context();
+ vm.runInContext(`
+   const evidence=[];
+   let matchBytes=false;
+   snapshot=async()=>({task:{id:71001}});
+   receipt=async()=>({valid:true,bytes:500});
+   evaluate=async expr=>{
+     if(expr==='generateEncryptedBackupCode()')return 'ZEN21::signed-original';
+     if(expr.includes('downloadEncryptedBackupFile'))return true;
+     return true;
+   };
+   nativeUI=async(label,match)=>{
+     const xml='<node package="com.google.android.documentsui" class="android.widget.Button" enabled="true" text="SAVE" resource-id="com.google.android.documentsui:id/action_menu_save" bounds="[1,1][10,10]"/>';
+     const item=match(xml);if(!item)throw Error('native Save control not observed');
+     return {xml,item};
+   };
+   tapUI=node=>evidence.push('native-save-tapped');
+   waitForSavedBackup=async code=>{
+     evidence.push('read-provider-bytes:'+code);
+     if(!matchBytes)throw Error('TRANSPORT: no matching actual provider bytes');
+     return 'MediaStore selected document';
+   };
+   dumpUI=()=>'<node package="com.zenstudy.focus"/>';
+ `,ctx);
+ await assert.rejects(vm.runInContext('safExportAndReadback()',ctx),/TRANSPORT: no matching actual provider bytes/);
+ assert.deepEqual(Array.from(vm.runInContext('evidence',ctx)),['native-save-tapped','read-provider-bytes:ZEN21::signed-original']);
+ vm.runInContext('matchBytes=true',ctx);
+ const result=await vm.runInContext('safExportAndReadback()',ctx);
+ assert.match(result,/independently matching ZEN21/);
+});
+
+test('SAF export is scheduled as real Android evidence, never inferred from picker visibility',()=>{
+ const ctx=context();
+ vm.runInContext("report.results.push({name:'bootstrap',status:'NOT_TESTED'});fillUnattempted();",ctx);
+ const row=vm.runInContext("report.results.find(x=>x.name==='saf_document_save_and_readback')",ctx);
+ assert.equal(row.status,'NOT_TESTED');
 });
