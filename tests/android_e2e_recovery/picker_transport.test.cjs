@@ -111,7 +111,7 @@ test('bootstrap failure leaves every unattempted durability case explicitly NOT_
  const ctx=context();
  vm.runInContext(`report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:'transport blocked'});fillUnattempted();`,ctx);
  const results=vm.runInContext('report.results',ctx);
- assert.equal(results.length,27);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
+ assert.equal(results.length,29);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
  assert.ok(results.some(r=>r.name==='saf_actual_file_restore_ack_and_reopen'));
  assert.ok(results.some(r=>r.name==='native_ack_io_failure_rollback_restart'));
 });
@@ -123,7 +123,7 @@ test('each completed Android case checkpoints a full report without advancing un
   await vm.runInContext("run('saf_fixture_and_native_ack',async()=> 'source checkpoint fixture')",ctx);
   const data=JSON.parse(fs.readFileSync(file,'utf8'));
   assert.equal(data.results.find(row=>row.name==='saf_fixture_and_native_ack').status,'PASS');
-  assert.equal(data.results.length,26);assert.equal(data.counts.NOT_TESTED,25);
+  assert.equal(data.results.length,28);assert.equal(data.counts.NOT_TESTED,27);
   assert.equal(vm.runInContext('report.results.length',ctx),1);
  }finally{if(fs.existsSync(file))fs.unlinkSync(file);if(fs.existsSync(file+'.tmp'))fs.unlinkSync(file+'.tmp');fs.rmdirSync(directory);}
 });
@@ -244,4 +244,25 @@ test('permanent read-only ADB loss stays NOT_TESTED without infinite retries',()
  assert.throws(()=>vm.runInContext("adb('shell','getprop','sys.boot_completed')",ctx),/TRANSPORT: Android ADB/);
  assert.equal(vm.runInContext('adbCommands.filter(x=>x.includes("shell getprop")).length',ctx),3);
  assert.equal(vm.runInContext('adbCommands.filter(x=>x==="reconnect offline").length',ctx),2);
+});
+
+test('legacy invalid-family and double-corruption cases remain NOT_TESTED until real Android evidence',()=>{
+ const ctx=context();
+ vm.runInContext("report.results.push({name:'bootstrap',status:'NOT_TESTED'});fillUnattempted()",ctx);
+ for(const name of ['signed_invalid_family_native_ack_refused','both_webview_copies_corrupt_native_replay']){
+  assert.equal(vm.runInContext("report.results.find(r=>r.name==="+JSON.stringify(name)+").status",ctx),'NOT_TESTED');
+ }
+});
+
+test('native invalid-family probe rejects a signed-invalid ACK, rather than accepting a checksum',async()=>{
+ const ctx=context();
+ vm.runInContext(`
+   fixture=async()=>({task:{id:71001}});
+   restart=async()=>{};
+   evaluate=async expr=>{
+     if(expr==='ZenNative.readDurableV21()')return 'durable-original';
+     return {checksumValid:true,blocked:false,issues:[],ack:true,checkpoint:'durable-original'};
+   };
+ `,ctx);
+ await assert.rejects(vm.runInContext('rejectSignedInvalidFamilyOnAndroid()',ctx),/Signed malformed family must be blocked/);
 });

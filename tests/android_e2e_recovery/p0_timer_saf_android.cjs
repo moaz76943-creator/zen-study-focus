@@ -320,6 +320,55 @@ async function confirmDialog(accept){
  },false);
  saveSafPickerEvidence(accept?'consent_accept':'consent_cancel',u.xml);tapUI(u.item);await pause(500);
 }
+async function rejectSignedInvalidFamilyOnAndroid(){
+ const before=await fixture(),lastGood=await evaluate('ZenNative.readDurableV21()');
+ const evidence=await evaluate(`(()=>{
+  const D=DeepFocusDataCompatV21,key=D.KEYS.tasks;
+  const primary=localStorage.getItem(key),mirror=localStorage.getItem(key+'_mirror');
+  const invalid=D.encodePacket({id:71001,title:'signed but not a tasks array',done:false});
+  try{
+   localStorage.setItem(key,invalid);localStorage.setItem(key+'_mirror',invalid);
+   const scan=DF22Preflight.inspect(localStorage);
+   return {checksumValid:D.inspectPacket(invalid).ok,blocked:!scan.ok,
+    issues:scan.issues,ack:DF22Preflight.nativeAcknowledge(localStorage),
+    checkpoint:ZenNative.readDurableV21()};
+  }finally{
+   if(primary===null)localStorage.removeItem(key);else localStorage.setItem(key,primary);
+   if(mirror===null)localStorage.removeItem(key+'_mirror');else localStorage.setItem(key+'_mirror',mirror);
+  }
+ })()`);
+ assert.equal(evidence.checksumValid,true);
+ assert.equal(evidence.blocked,true,'Signed malformed family must be blocked');
+ assert.ok(Array.isArray(evidence.issues)&&evidence.issues.length>0);
+ assert.equal(evidence.ack,false,'Native ACK must reject invalid family records');
+ assert.equal(evidence.checkpoint,lastGood,'Invalid-family rejection advanced native receipt');
+ assert.deepEqual(await fixture(),before);
+ await restart();assert.deepEqual(await fixture(),before);
+ return 'Checksum-valid wrong-shaped tasks rejected on Android; native receipt unchanged after restart';
+}
+async function replayBothCorruptCopiesFromNative(){
+ const before=await fixture();
+ const evidence=await evaluate(`(()=>{
+  const D=DeepFocusDataCompatV21,key=D.KEYS.tasks;
+  const primary=localStorage.getItem(key),mirror=localStorage.getItem(key+'_mirror');
+  try{
+   localStorage.setItem(key,'DF02_BAD_PRIMARY');localStorage.setItem(key+'_mirror','DF02_BAD_MIRROR');
+   const corrupted=!D.inspectPacket(localStorage.getItem(key)).ok&&!D.inspectPacket(localStorage.getItem(key+'_mirror')).ok;
+   DF22Preflight.replayNative(localStorage);
+   return {corrupted,primaryValid:D.inspectPacket(localStorage.getItem(key)).ok,
+    mirrorValid:D.inspectPacket(localStorage.getItem(key+'_mirror')).ok};
+  }finally{
+   if(primary===null)localStorage.removeItem(key);else localStorage.setItem(key,primary);
+   if(mirror===null)localStorage.removeItem(key+'_mirror');else localStorage.setItem(key+'_mirror',mirror);
+  }
+ })()`);
+ assert.deepEqual(evidence,{corrupted:true,primaryValid:true,mirrorValid:true});
+ assert.deepEqual(await fixture(),before);
+ assert.equal((await receipt()).valid,true,'Native replay must restore all six packets');
+ await restart();assert.deepEqual(await fixture(),before);
+ return 'Both invalid WebView copies replayed from verified native checkpoint on Android';
+}
+
 async function fiveRapidAcksThenKill(){
  // Historical #159 continuity: each mutation must commit a matching native
  // six-packet receipt before a single immediate force-stop and relaunch.
@@ -405,6 +454,8 @@ async function safMain(){
  }
  await run('native_ack_io_failure_rollback_restart',nativeIoFailureRollback);
  for(const [name,fn] of Object.entries(require('./native_faults.cjs').createNativeFaultCases({evaluate,snapshot,receipt,fixture,restart,adb,nativeUI,tapUI})))await run(name,fn);
+ await run('signed_invalid_family_native_ack_refused',rejectSignedInvalidFamilyOnAndroid);
+ await run('both_webview_copies_corrupt_native_replay',replayBothCorruptCopiesFromNative);
  await run('five_acks_one_immediate_kill',fiveRapidAcksThenKill);
  await run('saf_document_save_and_readback',safExportAndReadback);
  const baseline=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
@@ -454,6 +505,7 @@ function fillUnattempted(target=report){
  const planned=['saf_fixture_and_native_ack','locale_native_ack_process_restart',
   ...keys.flatMap(key=>['failed_save_rollback_'+key,'failed_save_rollback_'+key+'_mirror']),
   'native_ack_io_failure_rollback_restart',...require('./native_faults.cjs').CASE_NAMES,
+   'signed_invalid_family_native_ack_refused','both_webview_copies_corrupt_native_replay',
    'five_acks_one_immediate_kill','saf_document_save_and_readback','saf_picker_cancel','saf_valid_file_consent_cancel',
   'saf_corrupt_rejected','saf_oversized_rejected','saf_actual_file_restore_ack_and_reopen'];
  for(const name of planned)if(!target.results.some(row=>row.name===name))
