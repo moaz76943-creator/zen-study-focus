@@ -155,6 +155,7 @@ def triage(report_path: Path, repo: Path, sha: str) -> dict:
                     "path_sha256_16": hashlib.sha256(raw_path.encode("utf-8")).hexdigest()[:16] if raw_path else "",
                     "commit_sha256_16": hashlib.sha256(commit.encode("ascii")).hexdigest()[:16] if commit else "",
                     "line": line,
+                    "has_source_context": bool(source_context(repo, row)),
                 })
         return {"sha": sha, "status": "REVIEW_REQUIRED" if rows else "NO_FINDINGS",
                 "findings": len(rows), "categories": counts,
