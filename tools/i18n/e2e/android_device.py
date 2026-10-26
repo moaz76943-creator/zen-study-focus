@@ -56,9 +56,38 @@ def current_console_evidence():
         raise RuntimeError("App PID unavailable for WebView console verification")
     return console_evidence(adb("logcat", "-d", "--pid=" + pid, "-s", "chromium:I", "*:S"))
 
+def trace_adb(args, event, returncode=None):
+    directory = os.getenv("DF13_EVIDENCE_DIR")
+    if not directory:
+        return
+    # Only fixed command categories; never argv, typed content, stdout/stderr,
+    # package dumps or exception messages. Flush each line before dispatch.
+    head = str(args[0]) if args else ""
+    allowed = {"shell", "exec-out", "logcat", "forward", "devices", "wait-for-device"}
+    operation = head if head in allowed else "other"
+    if head == "shell" and len(args) > 1:
+        sub = str(args[1])
+        if sub in {"pm", "wm", "settings", "svc", "am", "dumpsys", "input", "pidof", "getprop"}:
+            operation += " " + sub
+    record = {"monotonic": round(time.monotonic(), 3), "operation": operation, "event": event}
+    if returncode is not None:
+        record["returncode"] = returncode
+    try:
+        Path(directory).mkdir(parents=True, exist_ok=True)
+        with (Path(directory) / "ADB_OPERATIONS.jsonl").open("a") as output:
+            output.write(json.dumps(record) + "\n")
+    except OSError:
+        pass  # Diagnostics must not alter an action's outcome or replay it.
+
 def adb(*args, timeout=45, check=True, binary=False):
-    p = subprocess.run(["adb", *map(str, args)], capture_output=True,
-                       text=not binary, timeout=timeout)
+    trace_adb(args, "start")
+    try:
+        p = subprocess.run(["adb", *map(str, args)], capture_output=True,
+                           text=not binary, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        trace_adb(args, "timeout")
+        raise
+    trace_adb(args, "end", p.returncode)
     if check and p.returncode:
         raise RuntimeError("adb %s: %s" % (" ".join(args), p.stderr))
     return p.stdout
