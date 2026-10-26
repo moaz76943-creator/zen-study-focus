@@ -64,6 +64,13 @@ public final class TaskInstrumentation extends Instrumentation {
                 SystemClock.sleep(350);
             }
             assertOk(ready,"Bundled application/bootstrap not ready");
+            String cssTarget=args==null?"":args.getString("width","");
+            if(!cssTarget.isEmpty()){
+                double expected=Double.parseDouble(cssTarget);
+                JSONObject cssWidth=js("({visible:visualViewport.width,layout:innerWidth,dpr:devicePixelRatio})");
+                assertOk(Math.abs(cssWidth.optDouble("visible")-expected)<3,
+                    "Requested CSS width not achieved by Android emulator: expected="+expected+" actual="+cssWidth);
+            }
             if("verify".equals(stage)) {
                 verifySaved();
             } else if("edit".equals(stage)){
