@@ -35,7 +35,30 @@ else
 JSON
   # Qwen full default system prompt exceeds Groq Free 8K TPM even with deferred tools.
   # Override it with a short, concrete editing contract; post-run diff guard is authoritative.
+  # Qwen Code may grow beyond Groq Free 8k TPM on a later tool turn.
+  # Preserve the task and strict staged-diff policy; retry only a confirmed 413.
+  set +e
   timeout 7m qwen --system-prompt 'Edit only task-allowed source and test files. No shell, network, secrets, Git commands, or untested claims. Preserve v21 and translations.' --prompt "$(cat "$RUNNER_TEMP/df-oss-task.txt")" \
     --model openai/gpt-oss-120b --approval-mode auto-edit \
-    --max-tool-calls 24 --max-session-turns 16 --max-wall-time 6m --output-format text
+    --max-tool-calls 24 --max-session-turns 16 --max-wall-time 6m --output-format text \
+    > "$RUNNER_TEMP/df-qwen-output.log" 2>&1
+  qwen_status=$?
+  set -e
+  if [ "$qwen_status" -ne 0 ]; then
+    if grep -Fq 'Responses API error 413' "$RUNNER_TEMP/df-qwen-output.log"; then
+      echo 'Qwen exceeded Groq free TPM; retrying the same scoped task with Aider'
+      # These are ONLY the two agent-owned files in a clean temporary checkout.
+      git restore -- "$@"
+      python3 -m pip install --quiet --user aider-chat
+      export PATH="$HOME/.local/bin:$PATH"
+      timeout 7m aider --yes --no-pretty --no-auto-commits --no-dirty-commits \
+        --model groq/openai/gpt-oss-120b --map-tokens 0 \
+        --message-file "$RUNNER_TEMP/df-oss-task.txt" "$@"
+    else
+      echo 'Qwen failed for a reason other than Groq 413; refusing automatic retry' >&2
+      exit "$qwen_status"
+    fi
+  else
+    echo 'Qwen task execution completed; scoped diff and regression tests run next'
+  fi
 fi
