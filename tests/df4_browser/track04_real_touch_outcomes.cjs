@@ -78,8 +78,8 @@ async function observed(page){
     await page.evaluate(()=>applyLanguage('en'));
     await page.locator('#navTasks').tap();
     const taskTitle='Track04 tap saved task ٢';
-    await page.locator('#inpNewTask').fill(taskTitle);
-    await page.locator('button[onclick="createNewTask()"]' ).tap();
+    await page.locator('#df22TasksHost .df-quick-add input[type="text"]').fill(taskTitle);
+    await page.locator('#df22TasksHost .df-quick-add button[type="submit"]').tap();
     assert.equal(await page.evaluate(t=>tasksList.filter(x=>x.title===t).length,taskTitle),1);
     record('Task quick-add touch creates exactly one record','en',{title:taskTitle});
     await page.locator('#navNotes').tap();
