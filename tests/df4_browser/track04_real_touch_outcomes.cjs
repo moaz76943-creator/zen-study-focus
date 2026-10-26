@@ -54,6 +54,53 @@ async function observed(page){
     }
     assert.equal(results.length,140,'At least 100 real touch outcomes must be checked');
 
+    // DF-FINAL-08: the 24-case geometry matrix does not exercise buttons.
+    // Exercise real Playwright touchscreen taps at every requested compact width,
+    // then save a note after reducing viewport height to model limited IME space.
+    // This is a Chromium viewport simulation, NOT actual Android keyboard proof.
+    for (const width of [320,360,393,430]) {
+      for (const locale of ['en','ar']) {
+        await page.setViewportSize({width,height:800});
+        await page.evaluate(l=>applyLanguage(l),locale);
+        for (const [button,screen] of navs) {
+          await page.locator('#'+button).tap();
+          const state=await observed(page);
+          assert.deepEqual(state.nav,[button],width+'px '+locale+' '+button+' active nav');
+          assert.deepEqual(state.screens,[screen],width+'px '+locale+' '+button+' screen');
+          const geometry=await page.locator('#'+button).evaluate(n=>{
+            const r=n.getBoundingClientRect();
+            const x=r.left+r.width/2,y=r.top+r.height/2;
+            const hit=document.elementFromPoint(x,y);
+            return {width:r.width,height:r.height,x,y,
+              viewportWidth:innerWidth,viewportHeight:innerHeight,
+              unobstructed:!!hit&&(n===hit||n.contains(hit))};
+          });
+          assert.ok(geometry.width>=40&&geometry.height>=44,
+            width+'px '+locale+' '+button+' touch target too small: '+JSON.stringify(geometry));
+          assert.ok(geometry.x>=0&&geometry.y>=0&&
+            geometry.x<geometry.viewportWidth&&geometry.y<geometry.viewportHeight&&
+            geometry.unobstructed,
+            width+'px '+locale+' '+button+' touch target unreachable: '+JSON.stringify(geometry));
+          record('compact physical touchscreen '+button,locale,{width,screen});
+        }
+        await page.locator('#navNotes').tap();
+        await page.locator('#nsNewButton').tap();
+        const noteTitle='DF08 compact note '+width+' '+locale;
+        await page.locator('#inpNoteTitle').fill(noteTitle);
+        await page.locator('#inpNoteBody').fill('Draft ٢ محفوظ — edit without loss');
+        await page.setViewportSize({width,height:440});
+        await page.locator('#nsSaveButton').tap();
+        assert.equal(await page.evaluate(t=>notesList.filter(n=>
+          n.title===t&&n.body==='Draft ٢ محفوظ — edit without loss').length,noteTitle),1,
+          width+'px '+locale+' note Save tap must persist exactly once');
+        assert.equal(await page.locator('#noteModal').evaluate(n=>n.classList.contains('open')),false,
+          width+'px '+locale+' note modal should close after Save');
+        record('compact notes save after reduced available viewport',locale,{width,height:440});
+      }
+    }
+    await page.setViewportSize({width:393,height:830});
+
+
     // Cancellation must preserve the user's custom inputs in the actual rendered modal.
     for(const locale of ['en','ar','de','fa','ur']){
       await page.evaluate(l=>applyLanguage(l),locale);

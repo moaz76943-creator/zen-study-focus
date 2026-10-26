@@ -28,25 +28,36 @@ function createCompletionAlerts(cfg,options={}){
  const persist=options.persist,AudioType=options.AudioCtor||(typeof Audio!=="undefined"?Audio:null);
  const canOutput=typeof options.canOutput==="function"?options.canOutput:()=>true;
  const onError=typeof options.onError==="function"?options.onError:()=>{};
- let disposed=false,active=null,generation=0;
+ // Host callbacks must not abort timer finalization or leave audio focus reserved.
+ const reportError=(error)=>{try{onError(error)}catch(_){/* best-effort error reporting */}};
+ let disposed=false,active=null,generation=0,focusReserved=false;
  const seen=new Set();
- function stop(){generation++;if(active){const a=active;active=null;try{a.onended=null;a.onerror=null;a.pause();a.currentTime=0;}catch(_){}if(typeof options.releaseFocus==="function")options.releaseFocus();}}
+ function stop(){
+  generation++;
+  const a=active;active=null;
+  if(a){try{a.onended=null;a.onerror=null;a.pause();a.currentTime=0;}catch(_){}}
+  // release even if Audio construction failed after requestFocus succeeded.
+  if(a||focusReserved){focusReserved=false;try{if(typeof options.releaseFocus==="function")options.releaseFocus();}catch(_){}}
+ }
  function start(id,volume){
   stop();
   const choice=CHOICES.find(s=>s.id===id);
   if(disposed||!choice||!choice.file||!AudioType||volume<=0)return Promise.resolve(false);
-  try{if(!canOutput())return Promise.resolve(false);}catch(e){onError(e);return Promise.resolve(false);}
-  try{if(typeof options.requestFocus==="function"&&options.requestFocus()!==true)return Promise.resolve(false);}catch(e){onError(e);return Promise.resolve(false);}
+  try{if(!canOutput())return Promise.resolve(false);}catch(e){reportError(e);return Promise.resolve(false);}
+  try{if(typeof options.requestFocus==="function"){
+   if(options.requestFocus()!==true)return Promise.resolve(false);
+   focusReserved=true;
+  }}catch(e){reportError(e);return Promise.resolve(false);}
   let audio;
   try{
    audio=new AudioType("completion_alerts/"+choice.file);
    audio.preload="auto";audio.loop=false;audio.volume=Math.min(.65,Math.max(0,volume/100*.65));
    const ticket=++generation;active=audio;
    audio.onended=()=>{if(active===audio&&ticket===generation)stop()};
-   audio.onerror=()=>{if(active===audio&&ticket===generation){onError(new Error("ALERT_ASSET_UNAVAILABLE:"+id));stop();}};
+   audio.onerror=()=>{if(active===audio&&ticket===generation){reportError(new Error("ALERT_ASSET_UNAVAILABLE:"+id));stop();}};
    const result=audio.play();
-   return Promise.resolve(result).then(()=>active===audio&&ticket===generation,err=>{if(active===audio&&ticket===generation){onError(err);stop();}return false});
-  }catch(e){onError(e);stop();return Promise.resolve(false)}
+   return Promise.resolve(result).then(()=>active===audio&&ticket===generation,err=>{if(active===audio&&ticket===generation){reportError(err);stop();}return false});
+  }catch(e){reportError(e);stop();return Promise.resolve(false)}
  }
  function preview(id){
   if(disposed)return Promise.resolve(false);
@@ -61,11 +72,11 @@ function createCompletionAlerts(cfg,options={}){
   const key=typeof id+":"+String(id);
   const old=Array.isArray(cfg.completionAlertPlayedIds)?cfg.completionAlertPlayedIds:[];
   if(seen.has(key)||old.includes(key))return Promise.resolve(false);
-  if(typeof persist!=="function"){onError(new Error("ALERT_PERSISTENCE_REQUIRED"));return Promise.resolve(false)}
+  if(typeof persist!=="function"){reportError(new Error("ALERT_PERSISTENCE_REQUIRED"));return Promise.resolve(false)}
   const previous=cfg.completionAlertPlayedIds;
   cfg.completionAlertPlayedIds=[...old.filter(x=>typeof x==="string"&&x!==key),key].slice(-512);
   try{if(persist(cfg)!==true)throw new Error("ALERT_LEDGER_WRITE_NOT_VERIFIED");}
-  catch(e){if(previous===undefined)delete cfg.completionAlertPlayedIds;else cfg.completionAlertPlayedIds=previous;onError(e);return Promise.resolve(false)}
+  catch(e){if(previous===undefined)delete cfg.completionAlertPlayedIds;else cfg.completionAlertPlayedIds=previous;reportError(e);return Promise.resolve(false)}
   seen.add(key);
   const prefs=readCompletionAlertSettings(cfg);
   if(!prefs.enabled||prefs.sound==="silent"||prefs.volume===0||(!prefs.includeRest&&["short","long"].includes(event.phase))){stop();return Promise.resolve(false)}

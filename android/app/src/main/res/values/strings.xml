@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deep Focus</string>
+    <string name="native_focus_session">Focus session</string>
+    <string name="native_channel_active_name">Active Focus Timer</string>
+    <string name="native_channel_active_description">Countdown shown while a focus session is active</string>
+    <string name="native_channel_done_name">Focus Timer Completion</string>
+    <string name="native_channel_done_description">Alert when a study or work countdown finishes</string>
+    <string name="native_notification_active">Focus session in progress</string>
+    <string name="native_notification_time_up">Time is up</string>
+    <string name="native_notification_title">Deep Focus — %1$s</string>
+    <string name="native_backup_picker_unavailable">File picker unavailable; use Share Backup</string>
+    <string name="native_backup_exported">Backup exported; keep the unencrypted file private</string>
+    <string name="native_backup_save_failed">Unable to save backup; existing data unchanged</string>
+    <string name="native_share_subject">Deep Focus — Study, Workout and Deep Work App</string>
+    <string name="native_share_chooser">Share Deep Focus using</string>
+    <string name="native_backup_share_subject">Deep Focus manual backup (UNENCRYPTED) (%1$s)</string>
+    <string name="native_backup_share_chooser">Save backup using</string>
+    <string name="native_backup_privacy_warning">This code contains readable notes and tasks. Keep it private: it is NOT encrypted.\n\n</string>
+    <string name="native_backup_copy_heading">--- COPY CODE BELOW ---\n</string>
+    <string name="native_share_unavailable">No compatible sharing app is available</string>
+    <string name="native_backup_import_picker_unavailable">Backup file picker unavailable; existing data unchanged</string>
+    <string name="native_backup_import_failed">Unable to read backup; existing data unchanged</string>
+</resources>
