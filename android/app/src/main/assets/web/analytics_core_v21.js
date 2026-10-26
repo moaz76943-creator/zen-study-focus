@@ -32,15 +32,36 @@
     if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(v)) return null;
     const ms=Date.parse(v);return Number.isFinite(ms) ? ms : null;
   }
+  // V21 legacy focus history may lack explicit completion metadata; keep it.
+  // Only explicit evidence of an unfinished or non-focus interval excludes credit.
+  function nonFocusRecord(s) {
+    if (s.completed === false || s.isComplete === false ||
+        s.isFocus === false || s.focus === false) return true;
+    const status = typeof s.status === 'string' ? s.status.toLowerCase().replace(/-/g,'_') : '';
+    if (['active','running','paused','started','pending','in_progress',
+      'cancelled','canceled','aborted','interrupted','failed','incomplete',
+      'stopped','skipped','discarded','rest','break'].includes(status)) return true;
+    for (const key of ['mode','phase','type']) {
+      const value = typeof s[key] === 'string' ? s[key].toLowerCase().replace(/-/g,'_') : '';
+      if (['rest','break','short','long','short_break','long_break','short_rest','long_rest'].includes(value))
+        return true;
+    }
+    return false;
+  }
   function normalizeSessions(history) {
-    const sessions=[], rejects=[], seen=new Set();
+    const sessions=[], rejects=[], seen=new Set(), dayValidityCache=new Map();
+    const cachedValidDay=day=>{
+      if(!dayValidityCache.has(day))dayValidityCache.set(day,validDay(day));
+      return dayValidityCache.get(day);
+    };
     (Array.isArray(history) ? history : []).forEach((s,index)=>{
       let reason;
       const id=isRecord(s) ? idKey(s.id) : null;
       if (!isRecord(s)) reason='INVALID_RECORD';
       else if (s.isStarter === true || s.isDemo === true || s.synthetic === true || ['demo','sample','fixture'].includes(s.source)) reason='SAMPLE';
+      else if (nonFocusRecord(s)) reason='NON_FOCUS';
       else if (!id) reason='INVALID_ID';
-      else if (!validDay(s.date)) reason='INVALID_DATE';
+      else if (!cachedValidDay(s.date)) reason='INVALID_DATE';
       else if (typeof s.minutes !== 'number' || !Number.isFinite(s.minutes) || s.minutes < 0 || s.minutes > 1440) reason='INVALID_MINUTES';
       else if (!own(aliases,s.domain)) reason='INVALID_DOMAIN';
       else if (seen.has(id)) reason='DUPLICATE_ID';
@@ -107,10 +128,15 @@
     const normalized=normalizeSessions(source);
     const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&(domain==='all'||s.domain===domain));
     const grouped=bucket(rows,s=>s.date),dayMap=new Map(grouped.map(x=>[x.key,x]));
-    const daily=Array.from({length:span},(_,i)=>{const key=fromDayNumber(dayNumber(startDate)+i);return dayMap.get(key)||{key,minutes:0,sessions:0};});
+    const startNumber=dayNumber(startDate);
+    const daily=Array.from({length:span},(_,i)=>{const key=fromDayNumber(startNumber+i);return dayMap.get(key)||{key,minutes:0,sessions:0};});
     const byDomain=Object.fromEntries(DOMAINS.map(k=>[k,summarize(rows.filter(r=>r.domain===k))]));
+    const weekStartCache=new Map();
     return {period:{startDate,endDate,domain,days:span},totals:summarize(rows),daily,
-      weekly:bucket(rows,s=>weekKey(s.date)),monthly:bucket(rows,s=>s.date.slice(0,7)),byDomain,
+      weekly:bucket(rows,s=>{
+        if(!weekStartCache.has(s.date))weekStartCache.set(s.date,weekKey(s.date));
+        return weekStartCache.get(s.date);
+      }),monthly:bucket(rows,s=>s.date.slice(0,7)),byDomain,
       streaks:streaks(normalized.sessions,today),goals:dailyGoalReport(rows,opts.goals,startDate,endDate),
       tasks:taskReport(snapshot.tasksList,snapshot.projects,today),
       quality:{accepted:normalized.sessions.length,inRange:rows.length,excluded:normalized.rejects.length,

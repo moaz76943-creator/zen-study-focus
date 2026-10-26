@@ -1,0 +1,51 @@
+name: DF03 99-locale source audit (informational, not translation acceptance)
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tools/i18n/e2e/coverage.cjs'
+      - 'tests/i18n/e2e/coverage.test.cjs'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/quick_training.js'
+      - 'android/app/src/main/assets/web/js/df99_**'
+      - '.github/workflows/df03_source_coverage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-inventory:
+    name: Measure source coverage (gaps remain FAIL in JSON)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test missing/fallback counting and forbidden locales
+        run: |
+          node --check tools/i18n/e2e/coverage.cjs
+          node --test tests/i18n/e2e/coverage.test.cjs
+      - name: Emit exact-sha per-language inventory (NOT a release acceptance)
+        shell: bash
+        run: |
+          mkdir -p artifacts/df03-source
+          git rev-parse HEAD > artifacts/df03-source/SOURCE_SHA.txt
+          node tools/i18n/e2e/coverage.cjs --output artifacts/df03-source
+          node - <<'NODE'
+          const r=require('./artifacts/df03-source/PER_LANGUAGE_COVERAGE.json');
+          if(r.catalog_count!==99 || r.summary.PASS+r.summary.FAIL+r.summary.NOT_TESTED!==99)
+            throw Error('Invalid 99-language inventory');
+          console.log('SOURCE ONLY; translated=',r.summary.PASS,'missing=',r.summary.FAIL,
+            'not tested=',r.summary.NOT_TESTED,'; English fallback remains untranslated');
+          NODE
+      - name: Preserve all uncovered keys, not just success lines
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: df03-99-language-source-gap-report
+          path: artifacts/df03-source/
+          if-no-files-found: warn
+          retention-days: 14

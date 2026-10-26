@@ -1,0 +1,35 @@
+name: DF-PR00 v21 baseline parity
+on:
+  pull_request:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - 'tests/recovery_baseline/**'
+      - '.github/workflows/df_pr00_v21_baseline.yml'
+      - 'android/app/src/main/assets/web/data_compat_v21.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v21-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check exact source and isolated v21 cases
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          node --check android/app/src/main/assets/web/data_compat_v21.js
+          node --test tests/recovery_baseline/v21_safety.test.cjs
+      - name: Python wrapper on same source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests.recovery_baseline.test_v21_safety -v

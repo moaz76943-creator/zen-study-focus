@@ -3791,6 +3791,7 @@ let quickInternalChange = false;
 let quickExercises = [];
 let quickPresetDomain = 'sport';
 const QUICK_CFG_KEY = 'zen_quick_training_cfg_v21';
+let quickLastSavedFields = null;
 /* Task identity is always the original numeric v21 task ID (never a display label).
    app.js focusOnTask will call this method through a lane-00 integration patch. */
 let focusWorkflowLinkedTaskId = null;
@@ -3859,15 +3860,30 @@ function validQuickSnapshot(raw) {
     exercises:Array.isArray(raw.exercises)?raw.exercises.filter(x=>typeof x==='string').slice(0,24).map(x=>x.slice(0,70)):[]
   };
 }
-function saveQuickConfig() {
-  saveFortressData(QUICK_CFG_KEY,{
-    exercises:quickExercises.slice(0,24),
-    domain:quickPresetDomain,
+function quickSaveError() {
+  return L().saveFailed || (cfg.lang === 'ar'
+    ? 'تعذّر حفظ إعدادات التدريب. حاول مرة أخرى.'
+    : 'Could not save training settings. Try again.');
+}
+function quickFormFields() {
+  return {
     sets:document.getElementById('qtSets').value,
     work:document.getElementById('qtWork').value,
     rest:document.getElementById('qtRest').value,
     skip:document.getElementById('qtSkipLast').checked
-  });
+  };
+}
+function saveQuickConfig() {
+  const fields=quickFormFields();
+  try {
+    if(saveFortressData(QUICK_CFG_KEY,{
+      exercises:quickExercises.slice(0,24),
+      domain:quickPresetDomain,
+      ...fields
+    })!==true) return false;
+  } catch (_) { return false; }
+  quickLastSavedFields={...fields};
+  return true;
 }
 function initQuickTraining() {
   const saved=loadFortressData(QUICK_CFG_KEY,null);
@@ -3881,8 +3897,17 @@ function initQuickTraining() {
     }
     if(typeof saved.skip==='boolean')document.getElementById('qtSkipLast').checked=saved.skip;
   }
-  for(const id of ['qtSets','qtWork','qtRest','qtSkipLast'])
-    document.getElementById(id).addEventListener('change',saveQuickConfig);
+  quickLastSavedFields=quickFormFields();
+  for(const [id,key] of [['qtSets','sets'],['qtWork','work'],['qtRest','rest'],['qtSkipLast','skip']])
+    document.getElementById(id).addEventListener('change',()=>{
+      if(saveQuickConfig())return;
+      const input=document.getElementById(id);
+      if(quickLastSavedFields){
+        if(key==='skip')input.checked=quickLastSavedFields.skip;
+        else input.value=quickLastSavedFields[key];
+      }
+      showToast(quickSaveError());
+    });
   quickL10n();
 }
 function renderQuickTraining() {
@@ -3915,14 +3940,27 @@ function renderQuickTraining() {
 function addQuickExercise() {
   const el=document.getElementById('qtNewExercise');
   const name=String(el.value||'').trim().slice(0,70);
-  if(!name || quickExercises.length>=24)return;
+  if(!name || quickExercises.length>=24)return false;
   quickExercises.push(name);
+  if(!saveQuickConfig()){
+    quickExercises.pop();
+    showToast(quickSaveError());
+    return false;
+  }
   el.value='';
-  saveQuickConfig();
   renderQuickTraining();
+  return true;
 }
 function removeQuickExercise(index) {
-  quickExercises.splice(index,1);saveQuickConfig();renderQuickTraining();
+  if(!Number.isInteger(index)||index<0||index>=quickExercises.length)return false;
+  const removed=quickExercises.splice(index,1)[0];
+  if(!saveQuickConfig()){
+    quickExercises.splice(index,0,removed);
+    showToast(quickSaveError());
+    return false;
+  }
+  renderQuickTraining();
+  return true;
 }
 function applyQuickTrainingPreset(id) {
   if(quickTraining?.active) {
@@ -3934,11 +3972,21 @@ function applyQuickTrainingPreset(id) {
     reading:[3,1200,300,'read'],
     work:[2,3000,600,'work']
   };
-  const p=presets[id];if(!p)return;
+  const p=presets[id];if(!p)return false;
+  const keys=['qtSets','qtWork','qtRest'];
+  const previous=keys.map(key=>document.getElementById(key).value);
+  const previousDomain=quickPresetDomain;
   document.getElementById('qtSets').value=String(p[0]);
   document.getElementById('qtWork').value=timeString(p[1]);
   document.getElementById('qtRest').value=timeString(p[2]);
-  quickPresetDomain=p[3];saveQuickConfig();
+  quickPresetDomain=p[3];
+  if(!saveQuickConfig()){
+    keys.forEach((key,index)=>{document.getElementById(key).value=previous[index];});
+    quickPresetDomain=previousDomain;
+    showToast(quickSaveError());
+    return false;
+  }
+  return true;
 }
 function startQuickTraining() {
   if(quickTraining?.active)return;
@@ -3951,23 +3999,32 @@ function startQuickTraining() {
   if(timerRunning || timerSessionId!==null) {
     if(!window.confirm(quickText('replacePrompt')))return;
   }
+  // Publish the new activity only after its existing v21 write is acknowledged.
+  // Refusal must leave even a running or paused session untouched.
+  const nextCfg={...cfg,domain:quickPresetDomain};
+  try {
+    if(saveFortressData('zen_fortress_cfg_v21',nextCfg)!==true)
+      throw new Error('QUICK_ACTIVITY_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(quickSaveError());
+    return false;
+  }
   if(timerRunning)toggleTimerPlay();
+  cfg.domain=quickPresetDomain;
   quickTraining={
     active:true,sets,workSeconds,restSeconds,currentSet:0,phase:'work',
     skipLastRest:document.getElementById('qtSkipLast').checked,
     exercises:quickExercises.slice(),domain:quickPresetDomain,
     taskId:focusWorkflowGetLinkedTask()?.id ?? null
   };
-  cfg.domain=quickPresetDomain;
-  saveFortressData('zen_fortress_cfg_v21',cfg);
   renderDomainState();
   quickInternalChange=true;
   selectTimerMode(workSeconds/60,'focus',document.getElementById('modeFocusBtn'));
   quickInternalChange=false;
-  saveQuickConfig();
+  const preferencesSaved=saveQuickConfig();
   toggleTimerPlay();
   renderQuickTraining();
-  showToast(quickText('started'));
+  showToast(preferencesSaved?quickText('started'):quickSaveError());
   quickWorkflowEvent('started',{domain:quickTraining.domain,taskId:quickTraining.taskId,
     sets:quickTraining.sets,workSeconds:quickTraining.workSeconds,restSeconds:quickTraining.restSeconds});
 }

@@ -1,0 +1,41 @@
+name: DF07 Start Pause Resume and CDP safety
+on:
+  push:
+    branches: [qa/df-parallel-07-timer-cdp-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/df07/**'
+      - 'tests/track08/qa_cdp_transport*'
+      - '.github/workflows/df07_timer_cdp_safety.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  timer-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run actual timer state, cancel, dedup and transport test suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/df07/timer_start_pause_resume.test.cjs tests/track08/qa_cdp_transport.test.cjs tests/track05_timer/tick_lifecycle.test.cjs tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_safety.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs tests/termux_fix04_custom_timer_consent.test.cjs
+      - name: Record SHA and Android limitation
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/df07-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/df07-evidence/QA_SHA.txt"
+          printf 'JS VM/source and CDP timeout unit tests only; actual native Android dialog and ADB reconnect NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df07-evidence/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DF07-timer-cdp-${{ github.sha }}
+          path: ${{ runner.temp }}/df07-evidence/
+          retention-days: 7

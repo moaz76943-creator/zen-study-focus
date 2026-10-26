@@ -2,6 +2,7 @@
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const Studio=require('../../android/app/src/main/assets/web/tasks_studio.js');
+const C=require('../../android/app/src/main/assets/web/tasks_core_v21.js');
 class FakeElement {
  constructor(doc,tag){this.ownerDocument=doc;this.tagName=tag.toUpperCase();this.children=[];this.listeners={};this.attributes={};this.value='';this.textContent='';this.checked=false;this.style={};}
  appendChild(n){this.children.push(n);n.parent=this;return n;}
@@ -156,5 +157,133 @@ test('PR160 an edited invalid note ID remains rejected without a write',()=>{
  form.dispatch('submit');
  assert.equal(commits,0);
  assert.deepEqual(state,original);
+ studio.destroy();
+});
+
+
+test('DF-PR-01 new Tasks Studio task defaults to optional deadline and is not overdue',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[]},commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(before,after){assert.deepEqual(before,state);state=JSON.parse(JSON.stringify(after));commits++;return true;}});
+ const findButton=label=>root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent.includes(label));
+ findButton('New task').dispatch('click');
+ const form=root.descendants.find(x=>x.tagName==='FORM');
+ assert.ok(form);
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ const due=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='date');
+ const assign=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='checkbox');
+ assert.equal(assign.checked,false);
+ assert.ok(due.value);
+ title.value='Task with no deadline';
+ form.dispatch('submit');
+ assert.equal(commits,1);
+ assert.equal(state.tasksList[0].dueAssigned,false);
+ assert.equal(state.tasksList[0].title,'Task with no deadline');
+ assert.equal(C.isOverdue(state.tasksList[0],'2026-11-01'),false);
+});
+
+test('DF-PR-01 unrelated title edit never assigns a date to an imported undated v21 task',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[{id:107,title:'Imported undated',done:false,other:{keep:42}}]},commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(before,after){state=JSON.parse(JSON.stringify(after));commits++;return true;}});
+ root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Edit').dispatch('click');
+ const form=root.descendants.find(x=>x.tagName==='FORM');
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ const hasDue=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='checkbox');
+ assert.equal(hasDue.checked,false);
+ title.value='Renamed undated';
+ form.dispatch('submit');
+ assert.equal(commits,1);
+ assert.equal(Object.hasOwn(state.tasksList[0],'date'),false);
+ assert.equal(Object.hasOwn(state.tasksList[0],'dueAssigned'),false);
+ assert.deepEqual(state.tasksList[0].other,{keep:42});
+});
+
+test('DF-PARALLEL-05: one-field Quick Add retries failed ACK and never creates a deadline or duplicate',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[],legacyOpaque:{preserve:true}},tasksList:[]};
+ let attempts=0,commits=0,allow=false;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+   readState:()=>JSON.parse(JSON.stringify(state)),
+   commit(before,after){
+     attempts++;
+     assert.deepEqual(before,state);
+     if(!allow)return false;
+     state=JSON.parse(JSON.stringify(after));commits++;return true;
+   }});
+ const form=root.descendants.find(x=>x.tagName==='FORM'&&x.className?.includes('df-quick-add'));
+ assert.ok(form,'One-field Quick Add must be available without opening the full editor');
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ assert.ok(title);
+ title.value='  ';
+ form.dispatch('submit');
+ assert.equal(attempts,0);
+ title.value='Study German';
+ form.dispatch('submit');
+ assert.equal(attempts,1);assert.equal(commits,0);assert.equal(title.value,'Study German');
+ assert.equal(state.tasksList.length,0);
+ allow=true;
+ form.dispatch('submit');
+ assert.equal(attempts,2);assert.equal(commits,1);
+ assert.equal(state.tasksList.length,1);
+ assert.equal(state.tasksList[0].title,'Study German');
+ assert.equal(state.tasksList[0].dueAssigned,false);
+ assert.equal(C.isOverdue(state.tasksList[0],'2026-11-15'),false);
+ assert.deepEqual(state.cfg.legacyOpaque,{preserve:true});
+ form.dispatch('submit');
+ assert.equal(commits,1,'Detached Quick Add may not write twice');
+ studio.destroy();
+});
+
+test('DF-PARALLEL-05: Quick Add cannot erase unsaved edits in an opened full task editor',()=>{
+ const f=fixture(),quick=()=>f.root.descendants.some(x=>x.tagName==='FORM'&&x.className?.includes('df-quick-add'));
+ assert.equal(quick(),true);
+ const edit=f.root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Edit');
+ assert.ok(edit);edit.dispatch('click');
+ const full=f.root.descendants.find(x=>x.tagName==='FORM'&&x.className==='df-form');
+ assert.ok(full);
+ const title=full.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ title.value='Unsaved draft title';
+ assert.equal(quick(),false,'Quick Add must not be available to redraw an unsaved full editor');
+ assert.equal(title.value,'Unsaved draft title');
+ assert.equal(f.commits(),0);
+ const cancel=full.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Cancel');
+ assert.ok(cancel);cancel.dispatch('click');
+ assert.equal(quick(),true);
+ assert.equal(f.commits(),0,'Cancelling an unsaved edit must never publish it');
+ f.studio.destroy();
+});
+
+
+test('DF05 daily priority pin/unpin is durable, limited to three and rolls back failed ACK',()=>{
+ let state={cfg:{taskProjectsV21:[],sessionHistory:[],unknown:{keep:'v21'}},tasksList:[
+  {id:1,title:'One',done:false,catKey:'study'},
+  {id:2,title:'Two',done:false,catKey:'study'},
+  {id:3,title:'Three',done:false,catKey:'study'},
+  {id:4,title:'Four',done:false,catKey:'study'}
+ ]}, writes=0, failAck=false;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),
+  commit(before,after){assert.deepEqual(before,state);if(failAck)return false;
+   writes++;state=JSON.parse(JSON.stringify(after));return true;}});
+ const cardFor=title=>root.descendants.find(x=>x.tagName==='ARTICLE'&&x.descendants.some(n=>n.className==='df-title'&&n.textContent===title));
+ const action=(name,caption)=>{
+  const card=cardFor(name);assert.ok(card,'card '+name);
+  const b=card.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent===caption);
+  assert.ok(b,caption+' for '+name);b.dispatch('click');
+ };
+ action('One','Top three');action('Two','Top three');action('Three','Top three');
+ assert.equal(writes,3);
+ assert.deepEqual(state.cfg.taskTopThreeV21['2026-10-26'],[1,2,3]);
+ action('Four','Top three');assert.equal(writes,3,'fourth pin must not write');
+ failAck=true;action('One','Unpin');
+ assert.deepEqual(state.cfg.taskTopThreeV21['2026-10-26'],[1,2,3]);
+ failAck=false;action('One','Unpin');
+ assert.deepEqual(state.cfg.taskTopThreeV21['2026-10-26'],[2,3]);
+ assert.deepEqual(state.cfg.unknown,{keep:'v21'});
+ assert.ok(state.tasksList.every(x=>!Object.hasOwn(x,'manuallyPinned')),'only existing cfg persisted');
  studio.destroy();
 });

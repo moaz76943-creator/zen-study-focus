@@ -22,7 +22,8 @@
     minuteUnit:'min',heatMinutes:'recorded minutes',excluded:'Excluded sessions',
     invalidRange:'Choose valid start and end dates (maximum 3660 days)',
     barAria:'Recorded minutes by credited day',
-    heatAria:'Calendar year heatmap of verified session records'
+    heatAria:'Calendar year heatmap of verified session records',
+    exportSaved:'CSV file saved',exportCancelled:'CSV save cancelled',exportFailed:'Could not save CSV'
   });
   const AR=Object.freeze({
     title:'التحليلات الفعلية',activity:'النشاط',period:'الفترة',start:'من',end:'إلى',
@@ -33,7 +34,8 @@
     minuteUnit:'دقيقة',heatMinutes:'دقائق مسجلة',excluded:'جلسات مستبعدة',
     invalidRange:'اختر تاريخ بداية ونهاية صالحين (بحد أقصى 3660 يوماً)',
     barAria:'الدقائق المسجلة حسب اليوم',
-    heatAria:'خريطة الجلسات المسجلة خلال السنة'
+    heatAria:'خريطة الجلسات المسجلة خلال السنة',
+    exportSaved:'تم حفظ ملف CSV',exportCancelled:'تم إلغاء حفظ CSV',exportFailed:'تعذّر حفظ ملف CSV'
   });
   const RTL=new Set(['ar','fa','ur','ps','ckb','ug','sd']);
   function normalizedLocale(locale){
@@ -119,8 +121,40 @@
     const grouping=input('select',t.period);
     for(const value of ['daily','weekly','monthly']){const o=mk('option',t[value]);o.value=value;grouping.appendChild(o);}
     const start=input('date',t.start),end=input('date',t.end);
+    const exportKind=input('select',t.export);
+    for(const value of ['sessions','daily','weekly','monthly']){const option=mk('option',t[value]);option.value=value;exportKind.appendChild(option);}
+    exportKind.value=opts.exportKind||'sessions';
     const exportBtn=mk('button',t.export);exportBtn.type='button';exportBtn.style.cssText='min-height:42px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:6px 12px';
-    filters.appendChild(exportBtn);wrapper.appendChild(filters);
+    filters.appendChild(exportBtn);
+    const periodPresets=mk('div',undefined,'dfa-range-presets');
+    periodPresets.style.cssText='display:flex;flex-wrap:wrap;gap:6px;align-items:center';
+    filters.appendChild(periodPresets);
+    const exportStatus=mk('p','', 'dfa-export-status');
+    exportStatus.setAttribute('role','status');exportStatus.setAttribute('aria-live','polite');
+    exportStatus.style.cssText='width:100%;margin:0;font-size:12px';
+    filters.appendChild(exportStatus);wrapper.appendChild(filters);
+    // Calendar-day offsets use UTC noon keys, not variable-length DST hours.
+    const today=opts.today||core.localToday();
+    if(!core.validDay(today))throw new RangeError('Invalid today');
+    const epoch=Math.floor(Date.parse(today+'T12:00:00Z')/86400000);
+    const previousDay=(offset)=>new Date((epoch-offset)*86400000+43200000).toISOString().slice(0,10);
+    function presetText(days){
+      if(days===1){
+        try{return new Intl.RelativeTimeFormat(locale,{numeric:'auto'}).format(0,'day');}
+        catch(_){return locale==='ar'?'اليوم':'Today';}
+      }
+      try{
+        return t.period+': '+new Intl.NumberFormat(locale+'-u-nu-latn',
+          {style:'unit',unit:'day',unitDisplay:'long',useGrouping:false}).format(days);
+      }catch(_){return t.period+': '+days+' days';}
+    }
+    for(const days of [1,7,30]){
+      const button=mk('button',presetText(days));button.type='button';
+      button.setAttribute('data-range-days',String(days));
+      button.style.cssText='min-height:42px;background:#f8fafc;color:#14213d;border:1px solid #cbd5e1;border-radius:10px;padding:6px 10px';
+      button.addEventListener('click',()=>{start.value=previousDay(days-1);end.value=today;refresh();});
+      periodPresets.appendChild(button);
+    }
     const kpis=mk('div');kpis.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0';wrapper.appendChild(kpis);
     const detail=mk('p',t.details);detail.setAttribute('aria-live','polite');
     const error=mk('p','');error.setAttribute('role','alert');error.style.cssText='color:#991b1b';error.hidden=true;
@@ -128,9 +162,10 @@
     const domainView=mk('div');domainView.style.cssText='display:flex;gap:12px;flex-wrap:wrap;margin:12px 0';
     const goals=mk('div'),taskBox=mk('div'),heatTitle=mk('h3',t.year),heat=mk('div');heat.style.overflowX='auto';
     [error,chartTitle,chart,detail,domainView,goals,taskBox,heatTitle,heat].forEach(e=>wrapper.appendChild(e));
-    let current=null,currentSeries=[],heatDays=[],destroyed=false,exporting=false;
+    let current=null,currentSeries=[],heatDays=[],destroyed=false,exporting=false,reportRevision=0;
     function refresh(){
       if(destroyed)return null;
+      ++reportRevision;exportStatus.textContent='';
       const from=start.value,to=end.value;
       const valid=core.validDay(from)&&core.validDay(to)&&from<=to&&
         (Date.parse(to+'T12:00:00Z')-Date.parse(from+'T12:00:00Z'))/86400000<3660;
@@ -154,7 +189,10 @@
         const label=mk('div',name);label.style.fontSize='12px';const number=mk('strong',String(value));number.style.fontSize='22px';
         box.append(label,number);kpis.appendChild(box);
       }
-      currentSeries=grouping.value==='weekly'?report.weekly:grouping.value==='monthly'?report.monthly:report.daily;
+      // Dense daily timelines become monthly bars, without altering report totals or exported rows.
+      const shownGroup=grouping.value==='daily'&&report.period.days>120?'monthly':grouping.value;
+      currentSeries=shownGroup==='weekly'?report.weekly:shownGroup==='monthly'?report.monthly:report.daily;
+      chartTitle.textContent=shownGroup==='monthly'&&grouping.value==='daily'?t.chart+' ('+t.monthly+')':t.chart;
       chart.innerHTML=report.totals.sessions?barsSvg(currentSeries,{strings:t}):'';
       if(!report.totals.sessions){chart.textContent=t.noData;detail.textContent=t.noData;}else detail.textContent=t.details;
       domainView.replaceChildren();
@@ -182,28 +220,40 @@
       const day=node.getAttribute('data-day');const found=currentSeries.find(r=>r.key===day)||heatDays.find(r=>r.key===day);detail.textContent=day+': '+(found?found.minutes:0)+' '+t.minuteUnit;
     };
     [chart,heat].forEach(el=>{el.addEventListener('click',selectDay);el.addEventListener('keydown',selectDay);});
-    [domain,grouping,start,end].forEach(el=>el.addEventListener('change',refresh));
+    [domain,grouping,start,end,exportKind].forEach(el=>el.addEventListener('change',refresh));
     exportBtn.addEventListener('click',async()=>{
       if(!current||exportBtn.disabled||destroyed||exporting)return;
-      const value=core.toCSV(current,'sessions');
+      const selectedKind=exportKind.value||'sessions';
+      const value=core.toCSV(current,selectedKind);
       if(typeof opts.onExport==='function'){
-        exporting=true;exportBtn.disabled=true;
-        try{await opts.onExport(value,'deep-focus-sessions.csv','text/csv;charset=utf-8');}
-        catch(_){if(!destroyed&&current){error.hidden=false;error.textContent='⚠ '+t.export;}}
-        finally{exporting=false;if(!destroyed)exportBtn.disabled=!current;}
+        exporting=true;exportBtn.disabled=true;exportStatus.textContent='';
+        const revision=reportRevision;
+        try{
+          const receipt=await opts.onExport(value,'deep-focus-'+selectedKind+'.csv','text/csv;charset=utf-8');
+          if(!destroyed&&current&&revision===reportRevision){
+            exportStatus.textContent=receipt?.status==='saved'?t.exportSaved:
+              receipt?.status==='cancelled'?t.exportCancelled:t.exportFailed;
+          }
+        }catch(_){
+          if(!destroyed&&current&&revision===reportRevision)
+            exportStatus.textContent=t.exportFailed;
+        }finally{
+          exporting=false;
+          if(!destroyed)exportBtn.disabled=!current;
+        }
         return;
       }
       if(!doc.defaultView||!doc.defaultView.Blob||!doc.defaultView.URL?.createObjectURL)return;
       const blob=new doc.defaultView.Blob(['\ufeff',value],{type:'text/csv;charset=utf-8'});
-      const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-sessions.csv';
+      const url=doc.defaultView.URL.createObjectURL(blob),a=mk('a');a.href=url;a.download='deep-focus-'+selectedKind+'.csv';
       wrapper.appendChild(a);try{a.click();}finally{a.remove();(doc.defaultView.setTimeout||setTimeout)(()=>doc.defaultView.URL.revokeObjectURL(url),30000);}
     });
-    const today=opts.today||core.localToday();if(!core.validDay(today))throw new RangeError('Invalid today');
-    const epoch=Math.floor(Date.parse(today+'T12:00:00Z')/86400000);
-    const from=new Date((epoch-29)*86400000+43200000).toISOString().slice(0,10);
-    start.value=opts.startDate||from;end.value=opts.endDate||today;domain.value=opts.domain||'all';
+    start.value=opts.startDate||previousDay(29);end.value=opts.endDate||today;
+    domain.value=opts.domain||'all';grouping.value=opts.grouping||'daily';
     target.appendChild(wrapper);refresh();
-    return Object.freeze({refresh,getReport:()=>current,destroy:()=>{destroyed=true;wrapper.remove();},element:wrapper});
+    return Object.freeze({refresh,getReport:()=>current,
+      getFilters:()=>Object.freeze({startDate:start.value,endDate:end.value,domain:domain.value,grouping:grouping.value,exportKind:exportKind.value}),
+      destroy:()=>{destroyed=true;wrapper.remove();},element:wrapper});
   }
   return Object.freeze({mount,barsSvg,heatmapSvg});
 });

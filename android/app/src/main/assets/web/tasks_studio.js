@@ -10,8 +10,8 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(C){
  'use strict';
  const labels={
-  ar:{title:'استوديو المهام',subtitle:'خطّط ليومك وتتبع إنجازك الحقيقي',add:'إضافة مهمة',project:'مشروع جديد',today:'أهم ثلاث أولويات اليوم',search:'بحث في المهام',all:'القائمة',board:'لوحة المراحل',matrix:'الأولويات',trash:'سلة المحذوفات',calendar:'التقويم',undo:'تراجع',redo:'إعادة',empty:'لا توجد مهام',task:'عنوان المهمة',desc:'الوصف',due:'الموعد',time:'الوقت',cat:'القسم',priority:'الأولوية',estimate:'الدقائق المتوقعة',repeat:'التكرار',group:'المجموعة',notes:'أرقام الملاحظات',proj:'المشروع',none:'بدون مشروع',save:'حفظ',cancel:'إلغاء',focus:'ابدأ التركيز',edit:'تعديل',done:'إنجاز',resume:'إعادة فتح',archive:'أرشفة',remove:'حذف',restore:'استعادة',addCheck:'إضافة خطوة',check:'قائمة تحقق',sub:'مهام فرعية',study:'دراسة',sport:'رياضة',review:'قراءة',exam:'عمل',todo:'لم تبدأ',doing:'قيد التنفيذ',completed:'مكتملة',archived:'مؤرشفة',low:'منخفضة',medium:'متوسطة',high:'عالية',urgent:'عاجلة',daily:'يومي',weekly:'أسبوعي',monthly:'شهري',never:'بدون',allCategories:'كل الأقسام',estimated:'متوقع',actual:'فعلي',overdue:'متأخرة',do:'مهم وعاجل',schedule:'مهم وغير عاجل',delegate:'عاجل وغير مهم',eliminate:'غير مهم وغير عاجل',invalid:'لم يتم الحفظ',notConnected:'ربط المؤقت غير متاح بعد',invalidNoteIds:'يجب إدخال أرقام الملاحظات بالأرقام الغربية 0–9',sortLabel:'ترتيب المهام',sortDefault:'الترتيب الأصلي',sortDue:'حسب الموعد',sortPriority:'حسب الأولوية',sortTitle:'حسب العنوان',filterCategory:'تصفية حسب القسم',filterStatus:'تصفية حسب الحالة',allStatuses:'كل الحالات',titleRequired:'عنوان المهمة مطلوب',invalidDate:'تاريخ المهمة غير صالح',invalidEstimate:'عدد الدقائق غير صالح',invalidProject:'المشروع المحدد غير صالح'},
-  en:{title:'Tasks Studio',subtitle:'Plan today and track real work',add:'New task',project:'New project',today:'Today’s top three',search:'Search tasks',all:'List',board:'Kanban',matrix:'Priorities',trash:'Trash',calendar:'Calendar',undo:'Undo',redo:'Redo',empty:'No matching tasks',task:'Task title',desc:'Description',due:'Date',time:'Time',cat:'Category',priority:'Priority',estimate:'Estimated minutes',repeat:'Repeat',group:'Group',notes:'Numeric note IDs',proj:'Project',none:'No project',save:'Save',cancel:'Cancel',focus:'Start focus',edit:'Edit',done:'Complete',resume:'Reopen',archive:'Archive',remove:'Trash',restore:'Restore',addCheck:'Add step',check:'Checklist',sub:'Subtasks',study:'Study',sport:'Fitness',review:'Reading',exam:'Work',todo:'Not started',doing:'In progress',completed:'Complete',archived:'Archived',low:'Low',medium:'Medium',high:'High',urgent:'Urgent',daily:'Daily',weekly:'Weekly',monthly:'Monthly',never:'None',allCategories:'All categories',estimated:'Estimate',actual:'Actual',overdue:'Overdue',do:'Important + urgent',schedule:'Important, not urgent',delegate:'Urgent, not important',eliminate:'Neither urgent nor important',invalid:'Could not save',notConnected:'Timer link not connected',invalidNoteIds:'Note IDs must use Western digits 0–9',sortLabel:'Sort tasks',sortDefault:'Original order',sortDue:'Due date',sortPriority:'Priority',sortTitle:'Title',filterCategory:'Filter by category',filterStatus:'Filter by status',allStatuses:'All statuses',titleRequired:'Task title is required',invalidDate:'Invalid task date',invalidEstimate:'Invalid estimated minutes',invalidProject:'Invalid project selection'}
+  ar:{title:'استوديو المهام',subtitle:'خطّط ليومك وتتبع إنجازك الحقيقي',add:'إضافة مهمة',project:'مشروع جديد',today:'أهم ثلاث أولويات اليوم',search:'بحث في المهام',all:'القائمة',board:'لوحة المراحل',matrix:'الأولويات',trash:'سلة المحذوفات',calendar:'التقويم',undo:'تراجع',redo:'إعادة',empty:'لا توجد مهام',task:'عنوان المهمة',desc:'الوصف',due:'الموعد',dueOptional:'تعيين موعد نهائي',weekdays:'أيام العمل',time:'الوقت',cat:'القسم',priority:'الأولوية',estimate:'الدقائق المتوقعة',repeat:'التكرار',group:'المجموعة',notes:'أرقام الملاحظات',proj:'المشروع',none:'بدون مشروع',save:'حفظ',cancel:'إلغاء',focus:'ابدأ التركيز',edit:'تعديل',done:'إنجاز',resume:'إعادة فتح',archive:'أرشفة',remove:'حذف',restore:'استعادة',addCheck:'إضافة خطوة',check:'قائمة تحقق',sub:'مهام فرعية',study:'دراسة',sport:'رياضة',review:'قراءة',exam:'عمل',todo:'لم تبدأ',doing:'قيد التنفيذ',completed:'مكتملة',archived:'مؤرشفة',low:'منخفضة',medium:'متوسطة',high:'عالية',urgent:'عاجلة',daily:'يومي',weekly:'أسبوعي',monthly:'شهري',never:'بدون',allCategories:'كل الأقسام',estimated:'متوقع',actual:'فعلي',overdue:'متأخرة',do:'مهم وعاجل',schedule:'مهم وغير عاجل',delegate:'عاجل وغير مهم',eliminate:'غير مهم وغير عاجل',invalid:'لم يتم الحفظ',notConnected:'ربط المؤقت غير متاح بعد',invalidNoteIds:'يجب إدخال أرقام الملاحظات بالأرقام الغربية 0–9',sortLabel:'ترتيب المهام',sortDefault:'الترتيب الأصلي',sortDue:'حسب الموعد',sortPriority:'حسب الأولوية',sortTitle:'حسب العنوان',filterCategory:'تصفية حسب القسم',filterStatus:'تصفية حسب الحالة',allStatuses:'كل الحالات',titleRequired:'عنوان المهمة مطلوب',invalidDate:'تاريخ المهمة غير صالح',invalidEstimate:'عدد الدقائق غير صالح',invalidProject:'المشروع المحدد غير صالح',topPin:'إضافة إلى أهم ثلاث',topUnpin:'إزالة من أهم ثلاث',topLimit:'يمكن اختيار ثلاث مهام فقط'},
+  en:{title:'Tasks Studio',subtitle:'Plan today and track real work',add:'New task',project:'New project',today:'Today’s top three',search:'Search tasks',all:'List',board:'Kanban',matrix:'Priorities',trash:'Trash',calendar:'Calendar',undo:'Undo',redo:'Redo',empty:'No matching tasks',task:'Task title',desc:'Description',due:'Date',dueOptional:'Assign due date',weekdays:'Weekdays',time:'Time',cat:'Category',priority:'Priority',estimate:'Estimated minutes',repeat:'Repeat',group:'Group',notes:'Numeric note IDs',proj:'Project',none:'No project',save:'Save',cancel:'Cancel',focus:'Start focus',edit:'Edit',done:'Complete',resume:'Reopen',archive:'Archive',remove:'Trash',restore:'Restore',addCheck:'Add step',check:'Checklist',sub:'Subtasks',study:'Study',sport:'Fitness',review:'Reading',exam:'Work',todo:'Not started',doing:'In progress',completed:'Complete',archived:'Archived',low:'Low',medium:'Medium',high:'High',urgent:'Urgent',daily:'Daily',weekly:'Weekly',monthly:'Monthly',never:'None',allCategories:'All categories',estimated:'Estimate',actual:'Actual',overdue:'Overdue',do:'Important + urgent',schedule:'Important, not urgent',delegate:'Urgent, not important',eliminate:'Neither urgent nor important',invalid:'Could not save',notConnected:'Timer link not connected',invalidNoteIds:'Note IDs must use Western digits 0–9',sortLabel:'Sort tasks',sortDefault:'Original order',sortDue:'Due date',sortPriority:'Priority',sortTitle:'Title',filterCategory:'Filter by category',filterStatus:'Filter by status',allStatuses:'All statuses',titleRequired:'Task title is required',invalidDate:'Invalid task date',invalidEstimate:'Invalid estimated minutes',invalidProject:'Invalid project selection',topPin:'Top three',topUnpin:'Unpin',topLimit:'Only three tasks can be selected'}
  };
  const CSS=`.df-tasks{--ink:#182c52;--blue:#3c81ee;--soft:#f3f7ff;--border:#e1eafa;color:var(--ink);font:inherit;max-width:100%;box-sizing:border-box}.df-tasks *{box-sizing:border-box}.df-tasks button,.df-tasks input,.df-tasks select,.df-tasks textarea{font:inherit}.df-tasks button{cursor:pointer;min-height:40px}.df-tasks input,.df-tasks select,.df-tasks textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:13px;color:var(--ink);background:white}.df-tasks label{font-size:.82rem;font-weight:700;display:grid;gap:5px}.df-tasks .df-head,.df-tasks .df-toolbar,.df-tasks .df-actions,.df-tasks .df-tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.df-tasks .df-head{justify-content:space-between;margin:6px 0 20px}.df-tasks h2,.df-tasks h3,.df-tasks p{margin:0}.df-tasks h2{font-size:1.35rem;font-weight:850}.df-tasks h3{font-size:.97rem}.df-tasks .df-muted{color:#6d7f9f;font-size:.8rem}.df-tasks .df-panel,.df-tasks .df-task,.df-tasks .df-project{background:linear-gradient(140deg,#fff,#f8faff);box-shadow:0 5px 26px #315aa20b;border:1px solid var(--border);border-radius:20px;padding:14px;margin:10px 0}.df-tasks .df-section{margin-top:22px}.df-tasks .df-btn{border:1px solid var(--border);border-radius:12px;padding:9px 11px;background:#fff;color:var(--ink);font-weight:750}.df-tasks .df-btn[aria-pressed=true],.df-tasks .df-primary{background:linear-gradient(125deg,#397eea,#7568e9);color:#fff;border:0}.df-tasks .df-danger{color:#b72a51}.df-tasks .df-cards{display:grid;gap:10px}.df-tasks .df-task header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.df-tasks .df-title{font-weight:800;overflow-wrap:anywhere}.df-tasks .df-status{font-size:.7rem;border-radius:9px;background:#eef3fc;padding:5px 8px;white-space:nowrap}.df-tasks .df-meta{display:flex;gap:8px;flex-wrap:wrap;color:#566d91;font-size:.76rem;margin:8px 0}.df-tasks .df-overdue{color:#c12b55}.df-tasks .df-actions{margin-top:10px}.df-tasks .df-actions .df-btn{min-height:34px;padding:5px 9px;font-size:.77rem}.df-tasks .df-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px}.df-tasks .df-form{display:grid;gap:11px;padding-top:8px}.df-tasks .df-dialog{border:1px solid var(--border);border-radius:20px;background:#fbfdff;padding:14px;margin-top:10px}.df-tasks .df-dialog[hidden]{display:none}.df-tasks .df-check{display:flex;align-items:center;gap:9px;margin-top:8px}.df-tasks .df-check input{width:18px;height:18px;flex:none}.df-tasks .df-project progress{width:100%;accent-color:#5085e8}.df-tasks .df-board{display:flex;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory}.df-tasks .df-lane{flex:0 0 min(78vw,300px);scroll-snap-align:start;background:var(--soft);border-radius:18px;padding:10px;min-height:110px}.df-tasks .df-week{display:flex;gap:8px;overflow-x:auto}.df-tasks .df-week button{min-width:84px}.df-tasks .df-error{color:#a21d47}.df-tasks :focus-visible{outline:3px solid #589bff;outline-offset:2px}@media(min-width:650px){.df-tasks .df-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible}.df-tasks .df-lane{min-width:0}.df-tasks .df-actions .df-btn{font-size:.83rem}}@media(prefers-reduced-motion:reduce){.df-tasks *{scroll-behavior:auto!important}}`;
  function dateLocal(now){const d=new Date(now);return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
@@ -45,6 +45,7 @@
     const reason=e?.message;
     message.textContent=reason===l.notConnected?l.notConnected:
      reason==='Numeric note IDs required'?l.invalidNoteIds:
+     reason==='Top three limit'?(l.topLimit||labels.en.topLimit):
      reason==='Title required'?l.titleRequired:
      reason==='Invalid task date'?l.invalidDate:
      reason==='Invalid estimate'?l.invalidEstimate:
@@ -87,7 +88,7 @@
    if(t.description)box.appendChild(el('p','df-muted',t.description));
    const meta=el('div','df-meta'),actual=C.actualFocusMinutes(state,t.id);
    const ascii=v=>String(v).replace(/[٠-٩۰-۹०-९]/g,d=>String(d.charCodeAt(0)-(d<='٩'?1632:d<='۹'?1776:2406)));
-   append(meta,el('span','',`📅 ${ascii(t.date||'—')}${t.dueTime?' '+ascii(t.dueTime):''}`),el('span','',l[t.catKey]||t.catKey),el('span','',l[t.priority]||''),el('span','',`${l.estimated}: ${t.estimateMin||0} · ${l.actual}: ${actual}`));
+   append(meta,el('span','',`📅 ${ascii(t.dueAssigned===false?'—':t.date||'—')}${t.dueAssigned!==false&&t.dueTime?' '+ascii(t.dueTime):''}`),el('span','',l[t.catKey]||t.catKey),el('span','',l[t.priority]||''),el('span','',`${l.estimated}: ${t.estimateMin||0} · ${l.actual}: ${actual}`));
    if(C.isOverdue(t,currentDay()))meta.appendChild(el('strong','df-overdue',l.overdue));
    box.appendChild(meta);
    for(const kind of ['checklist','subtasks'])if(Array.isArray(t[kind])){
@@ -107,6 +108,18 @@
    else {
     append(actions,btn(l.edit,()=>{editing=t.id;render();}),btn(t.done?l.resume:l.done,()=>apply(s=>C.setStatus(s,t.id,t.done?'todo':'completed'))),
       btn(l.focus,()=>{try{if(typeof adapter.linkTaskToTimer!=='function'||adapter.linkTaskToTimer(t.id)!==true)throw new Error(l.notConnected);}catch(e){error(e);}}));
+    if(editing===null&&!t.done&&C.statusOf(t)!=='archived'){
+     const selected=state.cfg?.taskTopThreeV21?.[currentDay()];
+     const manual=Array.isArray(selected)?selected:[];
+     const pinned=manual.includes(t.id);
+     actions.appendChild(btn(pinned?(l.topUnpin||labels.en.topUnpin):(l.topPin||labels.en.topPin),()=>{
+      const nowSelected=state.cfg?.taskTopThreeV21?.[currentDay()];
+      const ids=Array.isArray(nowSelected)?nowSelected:[];
+      if(!ids.includes(t.id)&&ids.length>=3){error(new Error('Top three limit'));return;}
+      const nextIds=ids.includes(t.id)?ids.filter(x=>x!==t.id):[...ids,t.id];
+      apply(snapshot=>({state:C.chooseTopThree(snapshot,currentDay(),nextIds)}));
+     }));
+    }
     if(C.statusOf(t)!=='archived')actions.appendChild(btn(l.archive,()=>apply(s=>C.setStatus(s,t.id,'archived'))));
     append(actions,btn(l.remove,()=>apply(s=>C.trashTask(s,t.id)),'df-danger'));
     for(const kind of ['checklist','subtasks'])actions.appendChild(btn('＋ '+l[kind==='checklist'?'check':'sub'],()=>{
@@ -121,10 +134,13 @@
    const title=input('text',t?.title||''),description=el('textarea');description.rows=3;description.value=t?.description||'';
    const initialDue=t?(typeof t.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(t.date)?t.date:''):currentDay();
    const due=input('date',initialDue),dueTime=input('time',t?.dueTime||'');
+   const hasDue=input('checkbox');hasDue.checked=!!t&&C.validDate(t.date)&&t.dueAssigned!==false;
+   hasDue.style.width='auto';
+   due.addEventListener('change',()=>{if(due.value)hasDue.checked=true;});
    const categoryInput=selection(['study','sport','review','exam'].map(v=>[v,l[v]]),t?.catKey||'study');
    const priority=selection(['low','medium','high','urgent'].map(v=>[v,l[v]]),t?.priority||'medium');
    const estimate=input('number',t?.estimateMin??25);estimate.min='0';estimate.max='100000';
-   const repeat=selection([['',l.never],...['daily','weekly','monthly'].map(v=>[v,l[v]])],t?.repeat?.frequency||'');
+   const repeat=selection([['',l.never],...['daily','weekdays','weekly','monthly'].map(v=>[v,l[v]])],t?.repeat?.frequency||'');
    const group=input('text',t?.group||'');
    const project=selection([['',l.none],...C.projects(state).filter(p=>!p.deletedAt).map(p=>[p.id,p.name])],t?.projectId??'');
    const notes=input('text',(t?.noteIds||[]).join(','));notes.inputMode='numeric';
@@ -132,12 +148,12 @@
    const urgent=input('checkbox');urgent.checked=!!t?.urgent;urgent.style.width='auto';
    // Capture native-normalized values: legacy optional values may not be valid controls.
    const originalEditorValues={
-    title:title.value,description:description.value,date:due.value,dueTime:dueTime.value,
+    title:title.value,description:description.value,date:due.value,dueAssigned:hasDue.checked,dueTime:dueTime.value,
     catKey:categoryInput.value,priority:priority.value,estimateMin:estimate.value,
     repeat:repeat.value,important:important.checked,urgent:urgent.checked,
     group:group.value,projectId:project.value,noteIds:notes.value
    };
-   append(form,label(l.task,title),label(l.desc,description));
+   append(form,label(l.task,title),label(l.desc,description),label(l.dueOptional,hasDue));
    const grid=el('div','df-grid');append(grid,label(l.due,due),label(l.time,dueTime),label(l.cat,categoryInput),label(l.priority,priority),label(l.estimate,estimate),label(l.repeat,repeat),label(l.group,group),label(l.proj,project),label(l.notes,notes));form.appendChild(grid);
    append(form,label(l.do,important),label(l.delegate,urgent));
    const actions=el('div','df-actions');append(actions,btn(l.cancel,()=>{editing=null;render();}));
@@ -150,7 +166,8 @@
     const noteIdsChanged=!t || notes.value!==originalEditorValues.noteIds;
     // Do not reinterpret or reject legacy note refs when the user did not edit them.
     if(noteIdsChanged&&noteTokens.some(x=>!/^(0|[1-9]\d*)$/.test(x))){error(new Error('Numeric note IDs required'));return;}
-    const fields={title:title.value,description:description.value,date:due.value,dueTime:dueTime.value||null,
+    if(hasDue.checked&&!C.validDate(due.value)){error(new Error(l.invalidDate));return;}
+    const fields={title:title.value,description:description.value,date:due.value,dueAssigned:hasDue.checked,dueTime:dueTime.value||null,
      catKey:categoryInput.value,priority:priority.value,estimateMin:Number(estimate.value),repeat:repeat.value?{frequency:repeat.value,interval:1}:null,
      important:important.checked,urgent:urgent.checked,group:group.value,projectId:project.value?Number(project.value):null,
      noteIds:noteIdsChanged?noteTokens.map(Number):t.noteIds};
@@ -158,19 +175,22 @@
      // Compare displayed values to original editor values, not missing/defaulted v21 fields.
      const previous=originalEditorValues;
      const displayed={
-      title:title.value,description:description.value,date:due.value,dueTime:dueTime.value,
+      title:title.value,description:description.value,date:due.value,dueAssigned:hasDue.checked,dueTime:dueTime.value,
       catKey:categoryInput.value,priority:priority.value,estimateMin:estimate.value,
       repeat:repeat.value,important:important.checked,urgent:urgent.checked,
       group:group.value,projectId:project.value,noteIds:notes.value
      };
      const patch={};
      for(const k of Object.keys(fields))if(displayed[k]!==previous[k]){
-      if(k==='date'&&!due.value)continue; // Core v21 cannot clear a date.
+      if(k==='date'&&!hasDue.checked)continue; // Date remains untouched when an optional deadline is disabled.
       patch[k]=fields[k];
      }
      if(!Object.keys(patch).length){submitted=true;editing=null;render();return;}
      if(apply(s=>C.updateTask(s,t.id,patch,{noteIds:adapter.noteIds?.()})))submitted=true;
-    }else if(apply(s=>C.createTask(s,fields,{noteIds:adapter.noteIds?.()})))submitted=true;
+    }else{
+     if(!hasDue.checked)delete fields.date;
+     if(apply(s=>C.createTask(s,fields,{noteIds:adapter.noteIds?.()})))submitted=true;
+    }
    });
    panel.appendChild(form);return panel;
   }
@@ -183,7 +203,22 @@
     const name=typeof adapter.requestText==='function'?adapter.requestText(l.project):null;
     if(name)apply(s=>C.createProject(s,{name},{noteIds:adapter.noteIds?.()}));
    }),btn(l.undo,undo),btn(l.redo,redo));head.appendChild(buttons);content.appendChild(head);
+   // Keep Quick Add separate from the full editor, using the same durable v21 adapter.
+   // A failed ACK must leave the typed title in place for a deliberate retry.
+   const quickForm=el('form','df-toolbar df-quick-add'),quickTitle=input('text','');
+   quickTitle.placeholder=l.add;quickTitle.setAttribute('aria-label',l.add);
+   const quickSave=el('button','df-btn df-primary',l.save);quickSave.type='submit';
+   append(quickForm,quickTitle,quickSave);
+   let quickSubmitted=false;
+   quickForm.addEventListener('submit',e=>{
+    e.preventDefault();
+    if(quickSubmitted||isDestroyed)return;
+    const title=quickTitle.value.trim();
+    if(!title)return;
+    if(apply(s=>C.createTask(s,{title},{noteIds:adapter.noteIds?.()})))quickSubmitted=true;
+   });
    if(editing!==null)content.appendChild(editor());
+   else content.appendChild(quickForm);
    const today=el('section','df-panel'),top=el('h3','',l.today);today.appendChild(top);
    const top3=C.topThree(state,currentDay());if(!top3.length)today.appendChild(el('p','df-muted',l.empty));else top3.forEach(t=>today.appendChild(taskCard(t)));
    content.appendChild(today);
