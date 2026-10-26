@@ -205,3 +205,33 @@ test('date-only Analytics calendar labels never shift a day in western time zone
     assert.equal(result.stdout,'10/19/2026',zone+': calendar day drift');
   }
 });
+
+test('coverage separates missing fallback, English-identical source, and non-English source',()=>{
+  const {classifySourceLabels}=require('../tools/localization_100/analytics_live_99_report.cjs');
+  const original={title:'Recorded analytics',year:'Year',export:'Export CSV',sessions:'Sessions'};
+  const active={title:'Statistiques',year:'Year',export:'Export CSV'};
+  const classified=classifySourceLabels(Object.keys(original),original,key=>
+    Object.prototype.hasOwnProperty.call(active,key)?active[key]:null);
+  assert.equal(classified.explicitSourceKeys,3);
+  assert.equal(classified.nonEnglishSourceKeys,1);
+  assert.equal(classified.englishIdenticalCandidates,2);
+  assert.deepEqual(classified.identicalKeys,['year','export']);
+  assert.equal(classified.englishFallbackKeys,1);
+  assert.deepEqual(classified.missingKeys,['sessions']);
+  assert.equal(classified.explicitSourceKeys,
+    classified.nonEnglishSourceKeys+classified.englishIdenticalCandidates);
+});
+test('live Analytics inventory never certifies source-identical English candidates',()=>{
+  const audit=require('../tools/localization_100/analytics_live_99_report.cjs').report();
+  assert.equal(audit.registered,99);
+  for(const entry of audit.languages.filter(x=>!['en','ar'].includes(x.code))){
+    assert.equal(entry.explicitSourceKeys,
+      entry.nonEnglishSourceKeys+entry.englishIdenticalCandidates,entry.code);
+    assert.equal(entry.explicitSourceKeys+entry.englishFallbackKeys,entry.totalKeys,entry.code);
+    assert.equal(entry.translationFullyReviewed,false);
+    assert.equal(entry.androidVerified,false);
+    assert.ok(Array.isArray(entry.identicalKeys));
+  }
+  assert.equal(audit.certifiedLanguages,0);
+  assert.equal(audit.releaseApproved,false);
+});

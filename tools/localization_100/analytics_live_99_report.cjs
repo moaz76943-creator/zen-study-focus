@@ -8,6 +8,26 @@ const path=require('node:path');
 const vm=require('node:vm');
 const web=path.resolve(__dirname,'../../android/app/src/main/assets/web');
 const read=name=>fs.readFileSync(path.join(web,name),'utf8');
+// English-identical labels are source-backed, but need a linguistic review:
+// they may be valid loans/proper names or untranslated English copy.
+function classifySourceLabels(keys,english,read){
+  const identicalKeys=[],missingKeys=[];
+  let nonEnglishSourceKeys=0;
+  for(const key of keys){
+    const value=read(key);
+    if(typeof value!=='string'||!value.trim()){missingKeys.push(key);continue;}
+    if(value.trim()===String(english[key]).trim())identicalKeys.push(key);
+    else nonEnglishSourceKeys++;
+  }
+  return {
+    explicitSourceKeys:nonEnglishSourceKeys+identicalKeys.length,
+    nonEnglishSourceKeys,
+    englishIdenticalCandidates:identicalKeys.length,
+    identicalKeys,
+    englishFallbackKeys:missingKeys.length,
+    missingKeys
+  };
+}
 function report(){
   const app=read('app.js'),cut=app.indexOf('let todayISO =');
   if(cut<0)throw Error('LANGUAGE_CATALOG_BOUNDARY_CHANGED');
@@ -32,14 +52,18 @@ function report(){
     throw Error('EXPECTED_99_LOCALES_WITHOUT_HEBREW');
   const MISSING='__DF09_SOURCE_MISSING_REPORT__';
   const languages=codes.map(code=>{
-    const translated=code==='en'||code==='ar'?[]:keys.filter(key=>{
-      const value=c.DF99Locale.t(code,'analytics',key,MISSING);
-      return typeof value==='string'&&value!==MISSING&&value.trim();
-    });
-    return {code,explicitSourceKeys:translated.length,totalKeys:keys.length,
-      englishFallbackKeys:code==='en'||code==='ar'?0:keys.length-translated.length,
+    // EN and AR come from explicit UI fallbacks; do not double count as packs.
+    const direct=code==='en'||code==='ar';
+    const classification=direct
+      ? {explicitSourceKeys:0,nonEnglishSourceKeys:0,englishIdenticalCandidates:0,
+          identicalKeys:[],englishFallbackKeys:0,missingKeys:[]}
+      : classifySourceLabels(keys,english,key=>{
+          const value=c.DF99Locale.t(code,'analytics',key,MISSING);
+          return value===MISSING?null:value;
+        });
+    return {code,...classification,totalKeys:keys.length,
       uiInlineSource:code==='en'?'EN':code==='ar'?'AR':null,
-      sourcePresentNotDeviceVerified:translated.length>0,
+      sourcePresentNotDeviceVerified:classification.explicitSourceKeys>0,
       androidVerified:false,translationFullyReviewed:false};
   });
   return {scope:'source-only-analytics',registered:codes.length,keys:keys.length,
@@ -51,4 +75,4 @@ if(require.main===module){
   try{console.log(JSON.stringify(report(),null,2));}
   catch(e){console.error('DF09_COVERAGE_FAILED',e.message);process.exitCode=1;}
 }
-module.exports={report};
+module.exports={report,classifySourceLabels};
