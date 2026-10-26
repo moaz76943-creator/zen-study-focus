@@ -171,3 +171,39 @@ test('DF05: Today/Upcoming/Overdue/Completed groups preserve undated/optional v2
  assert.equal(JSON.stringify(state),before);
  assert.throws(()=>C.taskSections(state,'2026-02-30'),/Invalid/);
 });
+
+
+
+test('one thousand real and undated legacy tasks stay searchable and sorted without mutation',()=>{
+ const state={cfg:{sessionHistory:[],unknown:{keep:'cfg'}},tasksList:Array.from({length:1000},(_,i)=>({
+  id:1000+i,title:'Task '+i,done:false,catKey:'study',extension:{index:i},
+  ...(i%3===0?{}:{date:'2026-10-'+String(1+i%28).padStart(2,'0')})
+ }))};
+ const before=JSON.stringify(state),rows=C.searchTasks(state);
+ assert.equal(rows.length,1000);
+ assert.equal(new Set(rows.map(t=>t.id)).size,1000);
+ assert.equal(C.searchTasks(state,{query:'Task 999'}).length,1);
+ assert.equal(C.searchTasks(state,{date:'2026-10-21'}).every(t=>t.date==='2026-10-21'),true);
+ assert.equal(JSON.stringify(state),before);
+ assert.equal(Object.hasOwn(state.tasksList[0],'date'),false);
+});
+
+test('daily and weekly repeat preserve civil dates over spring and autumn DST boundaries',()=>{
+ for(const [first,expected] of [
+  ['2026-03-07','2026-03-08'],['2026-10-31','2026-11-01']
+ ]){
+  let s={cfg:{sessionHistory:[]},tasksList:[{id:88,title:'Daily DST',date:first,done:false,catKey:'study',
+   repeat:{frequency:'daily',interval:1},legacy:'keep'}]};
+  s=C.setStatus(s,88,'completed',{now:first+'T16:00:00Z',idSeed:200}).state;
+  let children=s.tasksList.filter(t=>t.recurrenceRootId===88);
+  assert.equal(children.length,1);
+  assert.equal(children[0].date,expected);
+  assert.equal(children[0].legacy,'keep');
+  s=C.setStatus(s,88,'completed',{now:first+'T16:00:00Z',idSeed:200}).state;
+  assert.equal(s.tasksList.filter(t=>t.recurrenceRootId===88).length,1);
+ }
+ const weekly={cfg:{sessionHistory:[]},tasksList:[{id:88,title:'Weekly DST',date:'2026-03-07',done:false,catKey:'study',
+   repeat:{frequency:'weekly',interval:1}}]};
+ const next=C.setStatus(weekly,88,'completed',{now:'2026-03-07T12:00:00Z',idSeed:200}).state;
+ assert.equal(next.tasksList.find(t=>t.recurrenceRootId===88).date,'2026-03-14');
+});
