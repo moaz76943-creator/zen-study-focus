@@ -685,3 +685,61 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
   overflow-wrap: anywhere;
   padding-block: 10px;
 }
+
+
+/* DF08 actual Android Notes modal: viewport and sticky Save */
+/* Keep the established White Premium surfaces and native keyboard viewport; no
+   app data or handlers change. API30 reproduced Save below the visible area
+   after IME Back on a 320 CSS-pixel viewport. */
+@media (max-width: 430px) {
+  body:not(.deep-lockdown) #noteModal.open {
+    padding: 8px;
+    overflow: hidden;
+  }
+  body:not(.deep-lockdown) #noteModal .ns-editor {
+    box-sizing: border-box;
+    inline-size: calc(100vw - 16px);
+    min-inline-size: 0;
+    max-inline-size: calc(100vw - 16px);
+    /* visualViewport JS publishes --nsux-height in px, even on older WebViews.
+       A height/max-height fallback prevents a 1,675px editor on a 748px screen. */
+    height: calc(var(--nsux-height, 80vh) - 16px) !important;
+    max-height: calc(var(--nsux-height, 80vh) - 16px) !important;
+    block-size: min(88dvh, calc(var(--nsux-height, 100dvh) - 16px));
+    max-block-size: min(88dvh, calc(var(--nsux-height, 100dvh) - 16px));
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    padding-block-end: 112px;
+    margin-inline: auto;
+    background: #fff;
+  }
+  body:not(.deep-lockdown) #noteModal .ns-editor > * {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    box-sizing: border-box;
+  }
+  body:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions {
+    /* The last action lives below a very long editor. Sticky bottom:0 does
+       not pull it into view from below; anchor it within the modal overlay. */
+    position: fixed !important;
+    left: 20px;
+    right: 20px;
+    /* Simple fallback for older Android WebView; keep safe-area enhancement. */
+    bottom: 14px !important;
+    bottom: max(14px, env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 260;
+    display: flex;
+    max-inline-size: calc(100vw - 40px);
+    margin: 0 auto;
+    background: #fff;
+    padding: 10px 12px;
+    border: 1px solid #e3ecf8;
+    border-radius: 16px;
+    box-shadow: 0 -8px 25px -14px rgba(28, 46, 77, .35);
+  }
+  body:not(.deep-lockdown) #noteModal .ns-editor > .modal-actions > button {
+    min-block-size: 44px;
+    flex: 1 1 110px;
+  }
+}
