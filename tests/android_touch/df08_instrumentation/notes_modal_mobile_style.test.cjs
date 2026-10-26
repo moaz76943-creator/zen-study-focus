@@ -21,3 +21,10 @@ test('Save and Cancel stay real touch buttons at keyboard dismissal',()=>{
   assert.match(guard,/min-block-size:\s*44px/);
   assert.doesNotMatch(guard,/display:\s*none|pointer-events:\s*none/);
 });
+
+test('real Notes Save controls remain visible before DF22Integration mounts the body class',()=>{
+  // Android API30 at 320 CSS px: Save was at y=1644 despite a 748px visual viewport.
+  // The legacy editor can be opened before the df-v22 mount class is applied.
+  assert.match(guard,/body:not\(\.deep-lockdown\)\s+#noteModal\s+\.ns-editor\s*>\s*\.modal-actions\s*\{/);
+  assert.doesNotMatch(guard,/body\.df-v22:not\(\.deep-lockdown\)\s+#noteModal/);
+});
