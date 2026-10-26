@@ -238,6 +238,17 @@
       return rank(b)-rank(a)||a.date.localeCompare(b.date)||a.id-b.id;
     }).slice(0,3);
   }
+  function taskSections(state,today){
+    if(!validDate(today))fail('Invalid today');
+    const sections={today:[],upcoming:[],overdue:[],completed:[]};
+    for(const t of listTasks(state)){
+      if(t.done){sections.completed.push(t);continue;}
+      if(t.dueAssigned===false||!validDate(t.date)||t.date===today)sections.today.push(t);
+      else if(t.date<today)sections.overdue.push(t);
+      else sections.upcoming.push(t);
+    }
+    return sections;
+  }
   function eisenhower(state) {
     const out={do:[],schedule:[],delegate:[],eliminate:[]};
     for(const t of listTasks(state).filter(t=>!t.done)){
@@ -297,5 +308,5 @@
   }
   return Object.freeze({validDate,statusOf,createTask,updateTask,setStatus,trashTask,restoreTask,rescheduleTask,
     addItem,setItemDone,createProject,projects,projectProgress,listTasks,isOverdue,topThree,chooseTopThree,eisenhower,
-    kanban,searchTasks,compareTaskDates,calendarTasks,sessionTotals,actualFocusMinutes,compareEstimate});
+    kanban,searchTasks,compareTaskDates,calendarTasks,taskSections,sessionTotals,actualFocusMinutes,compareEstimate});
 });
