@@ -13,7 +13,7 @@ const packet=snap=>JSON.stringify({payload:JSON.stringify(snap),sig:'valid',ts:1
 test('native checkpoint is a separate fsynced AtomicFile, not another v21 six-family key',()=>{
  assert.match(java,/public boolean acknowledgeActiveTimerSnapshot\(String packet\)/);
  assert.match(java,/public String readActiveTimerSnapshot\(\)/);
- assert.match(java,/new AtomicFile\(new File\(getFilesDir\(\),"active_timer_checkpoint_v1"\)\)/);
+ assert.match(java,/new AtomicFile\(new File\(getFilesDir\(\),\s*"active_timer_checkpoint_v1"\)\)/);
  assert.match(java,/\.getFD\(\)\.sync\(\)/);
  assert.match(java,/file\.failWrite\(stream\)/);
  assert.doesNotMatch(java,/"zen_fortress_active_timer_v21"/,'Do not add auxiliary timer to native six-family records');
