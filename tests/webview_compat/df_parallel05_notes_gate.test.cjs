@@ -9,3 +9,5 @@ require('../notes_ui/df_parallel05_draft_locales.test.cjs');
 require('../notes_ui/df_parallel05_reader.test.cjs');
 
 require('../notes_ui/df_parallel05_locale_refresh.test.cjs');
+
+require('../notes_ui/df_parallel05_outline_conflict.test.cjs');
