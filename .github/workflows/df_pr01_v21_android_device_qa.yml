@@ -86,7 +86,9 @@ jobs:
           arch: x86_64
           profile: pixel_6
           emulator-boot-timeout: 900
-          disable-animations: true
+          # Android emulator ADB may not accept animation settings immediately after boot;
+          # don't abort the real device test before our own readiness checks.
+          disable-animations: false
           script: bash tests/android_e2e_recovery/p0_timer_saf_ci.sh
       - name: Preserve real PASS FAIL NOT_TESTED results
         if: always()

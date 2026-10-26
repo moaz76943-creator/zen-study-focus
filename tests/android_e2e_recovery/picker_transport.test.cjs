@@ -127,3 +127,12 @@ test('each completed Android case checkpoints a full report without advancing un
   assert.equal(vm.runInContext('report.results.length',ctx),1);
  }finally{if(fs.existsSync(file))fs.unlinkSync(file);if(fs.existsSync(file+'.tmp'))fs.unlinkSync(file+'.tmp');fs.rmdirSync(directory);}
 });
+
+test('emulator optional animation settings do not abort v21 SAF device acceptance',()=>{
+ const workflow=fs.readFileSync('.github/workflows/df_pr01_v21_android_device_qa.yml','utf8');
+ // The emulator runner executes animation setting shell commands before our tests.
+ // On unstable API30/35 ADB, that auxiliary command can fail before the app launches.
+ assert.match(workflow,/disable-animations: false/);
+ assert.doesNotMatch(workflow,/disable-animations: true/);
+ assert.match(workflow,/script: bash tests\/android_e2e_recovery\/p0_timer_saf_ci\.sh/);
+});
