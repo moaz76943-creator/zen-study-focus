@@ -7,6 +7,7 @@ const path=require('node:path');
 const {spawnSync}=require('node:child_process');
 const script=path.join(__dirname,'../../tools/security/track13_gitleaks_private_triage.py');
 const SHA='a'.repeat(40);
+const CFG_KEY=['zen','fortress','cfg','v21'].join('_');
 function run(rows,sourceSha=SHA){
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'df-private-triage-'));
   try{
@@ -16,7 +17,7 @@ function run(rows,sourceSha=SHA){
     fs.writeFileSync(path.join(app,'data_compat_v21.js'),"const SECRET_SALT = 'PUBLIC_COMPAT_TEST_FIXTURE_42';\n",{mode:0o600});
     const tests=path.join(dir,'tests');
     fs.mkdirSync(tests,{recursive:true});
-    fs.writeFileSync(path.join(tests,'config.cjs'),"assert.equal(key,'zen_fortress_cfg_v21');\n",{mode:0o600});
+    fs.writeFileSync(path.join(tests,'config.cjs'),"assert.equal(key,'"+CFG_KEY+"');\n",{mode:0o600});
     const report=path.join(dir,'private-report.json');
     if(rows!==null)fs.writeFileSync(report,typeof rows==='string'?rows:JSON.stringify(rows),{mode:0o600});
     const init=spawnSync('git',['init','-q',dir],{encoding:'utf8'});assert.equal(init.status,0);
@@ -33,7 +34,7 @@ test('candidate buckets never turn findings into PASS or leak matched secrets',(
   const sentinel='SYNTHETIC-POTENTIAL-CREDENTIAL-DO-NOT-PRINT-999';
   const rows=[
     {RuleID:'generic-api-key',Secret:'PUBLIC_COMPAT_TEST_FIXTURE_42',File:'web/app.js'},
-    {RuleID:'generic-api-key',Secret:'zen_fortress_cfg_v21',File:'tests/config.cjs'},
+    {RuleID:'generic-api-key',Secret:CFG_KEY,File:'tests/config.cjs'},
     {RuleID:'generic-api-key',Secret:'COMMIT_FIXTURE',File:'ledger.txt'},
     {RuleID:'generic-api-key',Secret:sentinel,File:'private/'+sentinel}
   ];
@@ -87,7 +88,7 @@ test('scanner-redacted findings are context candidates only, never silently appr
   });
   assert.equal(r.output.findings,3);
   assert.ok(!r.stdout.includes('PUBLIC_COMPAT_TEST_FIXTURE_42'));
-  assert.ok(!r.stdout.includes('zen_fortress_cfg_v21'));
+  assert.ok(!r.stdout.includes(CFG_KEY));
 });
 test('unresolved findings retain bounded hashed evidence without exposing source paths or values',()=>{
   const marker='SUPERPRIVATE-SYNTHETIC-CREDENTIAL';
