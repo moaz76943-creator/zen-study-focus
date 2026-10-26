@@ -81,7 +81,8 @@
     }
     function one(id,notes){
       if(!validId(id))throw new Error('INVALID_NOTE_ID');
-      const a=notes.filter(n=>n&&n.id===id);
+      const source=notes===undefined?read().notesList:notes;
+      const a=source.filter(n=>n&&n.id===id);
       if(a.length!==1)throw new Error(a.length?'DUPLICATE_ID':'NOTE_NOT_FOUND');
       return a[0];
     }
