@@ -1,0 +1,48 @@
+name: DF Parallel01 current HEAD native durability source QA
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/integration_v22.js'
+      - 'android/app/src/main/assets/web/preflight_v22.js'
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'tests/integration_recovery/**'
+      - '.github/workflows/df_parallel01_native_forwardport.yml'
+permissions:
+  contents: read
+jobs:
+  exact-native-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: v21 source and focused native ACK/rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check android/app/src/main/assets/web/app.js
+          node --check android/app/src/main/assets/web/preflight_v22.js
+          node --check android/app/src/main/assets/web/integration_v22.js
+          node --test tests/integration_recovery/native_durable_ack.test.cjs tests/integration_recovery/df_pr01_native_ack_contract.test.cjs tests/integration_recovery/new_duplicate_ids.test.cjs tests/integration_recovery/restore_journal.test.cjs tests/integration_recovery/timer_credit_ack_regression.test.cjs tests/integration_recovery/counter_ack_rollback.test.cjs tests/integration_recovery/daily_rollover_durability.test.cjs
+          python3 tests/integration_recovery/native_atomic_ack_test.py
+      - name: Compile SDK 36 debug APK from exact head (no signing)
+        shell: bash
+        run: |
+          set -euo pipefail
+          "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-36" "build-tools;36.0.0"
+          gradle -p android :app:assembleDebug --no-daemon
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
