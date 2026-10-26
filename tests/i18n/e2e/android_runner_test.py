@@ -55,7 +55,11 @@ class AndroidReportingTest(unittest.TestCase):
         self.assertIn("gpu: swiftshader", api35)
         self.assertIn("-gpu swiftshader -feature -Vulkan", api35)
         # Match executable matrix settings, not comments documenting failed trials.
-        self.assertNotRegex(api35, r"(?m)^\\s*(?:gpu|emulator_options):[^\\n]*swiftshader_indirect")
+        active_api35 = "\n".join(
+            row.strip() for row in api35.splitlines()
+            if row.strip().startswith(("gpu:", "emulator_options:"))
+        )
+        self.assertNotIn("swiftshader_indirect", active_api35)
         self.assertIn("gpu: swiftshader_indirect", api30)
         self.assertIn("boot_timeout: 1200", api35)
         self.assertIn("emulator-build: ${{ matrix.emulator_build }}", workflow)
