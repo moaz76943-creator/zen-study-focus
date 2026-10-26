@@ -287,3 +287,120 @@ test('DF05 daily priority pin/unpin is durable, limited to three and rolls back 
  assert.ok(state.tasksList.every(x=>!Object.hasOwn(x,'manuallyPinned')),'only existing cfg persisted');
  studio.destroy();
 });
+
+
+test('DF05: Tasks Today/Upcoming/Overdue/Completed tabs and project filter are read-only',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[{id:2,name:'Work'}],opaque:{keep:true}},tasksList:[
+  {id:1,title:'No due',catKey:'study',done:false,projectId:2},
+  {id:2,title:'Future',date:'2026-10-30',catKey:'study',done:false,projectId:2},
+  {id:3,title:'Late',date:'2026-10-20',catKey:'study',done:false},
+  {id:4,title:'Finished',date:'2026-10-25',catKey:'study',done:true}
+ ]},commits=0;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(){commits++;return true;}});
+ const tab=caption=>{const b=root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent===caption);
+  assert.ok(b,'missing tab '+caption);b.dispatch('click');};
+ const shown=()=>root.descendants.find(x=>x.id==='df-task-results').descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
+ tab('Today');assert.ok(shown().includes('No due'));assert.ok(!shown().includes('Late'));
+ tab('Upcoming');assert.deepEqual(shown(),['Future']);
+ tab('Overdue');assert.deepEqual(shown(),['Late']);
+ tab('Completed');assert.deepEqual(shown(),['Finished']);
+ const modes=root.descendants.find(x=>x.className==='df-view-mode');
+ assert.ok(modes,'List view is retained in the secondary selector');
+ modes.value='all';modes.dispatch('change');
+ const projects=root.descendants.find(x=>x.tagName==='SELECT'&&x.attributes['aria-label']==='Filter by project');
+ assert.ok(projects);
+ projects.value='2';projects.dispatch('change');
+ assert.deepEqual(shown(),['No due','Future']);
+ assert.equal(commits,0);assert.deepEqual(state.cfg.opaque,{keep:true});
+ studio.destroy();
+});
+test('DF05: deliberate task reschedule is persisted, while invalid input never writes',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[
+  {id:10,title:'Plan',catKey:'study',done:false,unknown:{keep:1}}
+ ]},commits=0,answer='bad-date';
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),
+  commit(before,after){assert.deepEqual(before,state);state=JSON.parse(JSON.stringify(after));commits++;return true;},
+  requestText:()=>answer});
+ const press=()=>{const btn=root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Reschedule');
+  assert.ok(btn);btn.dispatch('click');};
+ press();assert.equal(commits,0);
+ answer='2026-10-31';press();assert.equal(commits,1);
+ assert.equal(state.tasksList[0].date,'2026-10-31');
+ assert.equal(state.tasksList[0].dueAssigned,true);
+ assert.deepEqual(state.tasksList[0].unknown,{keep:1});
+ studio.destroy();
+});
+
+
+test('DF-FINAL-03: 1000 legacy tasks render in bounded, expandable result pages without writes',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[],unknownV21:{keep:true}},tasksList:
+  Array.from({length:1000},(_,i)=>({id:1000+i,title:'Legacy bulk '+i,done:false,catKey:'study',extension:{index:i}}))};
+ const before=JSON.stringify(state),root=new FakeElement(fakeDoc,'main');let commits=0;
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(){commits++;return true;}});
+ const results=()=>root.descendants.find(x=>x.id==='df-task-results');
+ const titles=()=>results().descendants.filter(x=>x.className==='df-title').map(x=>x.textContent);
+ assert.equal(titles().length,100,'initial DOM must be bounded');
+ const more=results().descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Show more tasks');
+ assert.ok(more,'all 1000 tasks must remain accessible');
+ more.dispatch('click');
+ assert.equal(titles().length,200,'explicit page expansion should expose more real tasks');
+ const search=root.descendants.find(x=>x.tagName==='INPUT'&&x.type==='search');
+ search.value='Legacy bulk 999';search.dispatch('input');
+ assert.deepEqual(titles(),['Legacy bulk 999'],'filter must search all 1000, not just visible items');
+ assert.equal(JSON.stringify(state),before,'rendering and search cannot modify v21 records');
+ assert.equal(commits,0);
+ studio.destroy();
+});
+
+
+test('DF-FINAL-03 #36: compact primary mobile tabs expose all secondary views without losing Tasks data',()=>{
+ const f=fixture(),desc=()=>f.root.descendants;
+ const primary=desc().find(x=>x.className==='df-tabs df-section');
+ assert.ok(primary,'Primary navigation must exist');
+ const captions=primary.descendants.filter(x=>x.tagName==='BUTTON').map(x=>x.textContent);
+ assert.deepEqual(captions,['Today','Upcoming','Overdue','Completed']);
+ const secondary=desc().find(x=>x.className==='df-view-mode');
+ assert.ok(secondary,'All secondary modes must remain accessible');
+ assert.deepEqual(secondary.descendants.filter(x=>x.tagName==='OPTION').map(x=>x.value),
+  ['','all','board','matrix','calendar','trash']);
+ secondary.value='board';secondary.dispatch('change');
+ assert.ok(desc().some(x=>x.className==='df-board'),'Board remains functional after selection');
+ assert.equal(f.commits(),0,'Navigation never mutates v21 storage');
+ f.studio.destroy();
+});
+
+test('DF-FINAL-03 #36: compact task tools and filters retain edit, undo and query controls',()=>{
+ const f=fixture(),desc=()=>f.root.descendants;
+ const tools=desc().find(x=>x.className==='df-task-tools');
+ assert.ok(tools&&tools.tagName==='DETAILS');
+ assert.ok(tools.descendants.some(x=>x.tagName==='SUMMARY'));
+ assert.ok(tools.descendants.some(x=>x.tagName==='BUTTON'&&x.textContent==='Undo'));
+ const filters=desc().find(x=>x.className==='df-filter-tools df-section');
+ assert.ok(filters&&filters.tagName==='DETAILS');
+ assert.ok(filters.descendants.some(x=>x.tagName==='INPUT'&&x.type==='search'));
+ assert.equal(filters.descendants.filter(x=>x.tagName==='SELECT').length,4);
+ assert.equal(f.commits(),0);
+ f.studio.destroy();
+});
+
+test('DF-FINAL-03 #36: 320px mobile layout is RTL-safe and omits empty top-three panel',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[]},writes=0;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'ar',now:()=>new Date(2026,9,26),
+  readState:()=>JSON.parse(JSON.stringify(state)),commit(){writes++;return true;}});
+ const all=root.descendants;
+ const section=all.find(x=>x.className==='df-tasks');
+ assert.equal(section.attributes.dir,'rtl');
+ assert.equal(all.filter(x=>x.className==='df-tabs df-section')[0].descendants.filter(x=>x.tagName==='BUTTON').length,4);
+ assert.ok(!all.some(x=>x.className==='df-panel'),'No empty top-three card should consume vertical space');
+ const style=all.find(x=>x.tagName==='STYLE').textContent;
+ assert.ok(style.includes('overflow-x:auto'),'Tabs scroll horizontally rather than squeeze at 320px');
+ assert.ok(style.includes('min-height:44px'),'Touch controls retain 44px targets');
+ assert.equal(writes,0);
+ studio.destroy();
+});

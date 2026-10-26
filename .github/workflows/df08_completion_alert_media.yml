@@ -1,0 +1,55 @@
+name: DF08 completion alert media audit
+on:
+  pull_request:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - 'android/app/src/main/assets/web/completion_alert_settings.js'
+      - 'android/app/src/main/assets/web/completion_alerts/**'
+      - 'tests/completion_alerts/**'
+      - '.github/workflows/df08_completion_alert_media.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scoped-audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run isolated alert behavior and SHA256/PCM gates
+        run: |
+          node --check android/app/src/main/assets/web/completion_alert_settings.js
+          node --test tests/completion_alerts/*.test.cjs
+      - name: Decode every PCM frame without external dependencies
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import pathlib
+          import wave
+
+          root = pathlib.Path("android/app/src/main/assets/web/completion_alerts")
+          manifest = json.loads((root / "manifest.json").read_text())
+          assert len(manifest["assets"]) == 5
+          for entry in manifest["assets"]:
+              path = root / entry["path"]
+              assert path.is_file(), path
+              with wave.open(str(path), "rb") as sample:
+                  assert sample.getcomptype() == "NONE", path
+                  assert sample.getnchannels() == 1, path
+                  assert sample.getsampwidth() == 2, path
+                  assert sample.getframerate() == 44100, path
+                  count = sample.getnframes()
+                  assert count > 0, path
+                  data = sample.readframes(count)
+                  assert len(data) == count * 2, f"Truncated WAV: {path}"
+                  assert abs(count / 44100 - entry["duration_sec"]) < 0.025, path
+                  assert any(data), f"All-zero audio: {path}"
+                  print(f"{path.name}: {count} frames decoded, PCM16/44.1kHz mono")
+          PY

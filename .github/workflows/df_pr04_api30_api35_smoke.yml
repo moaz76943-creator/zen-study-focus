@@ -1,0 +1,63 @@
+name: DF PR04 Android API30 and API35 smoke (non-release)
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/java/**'
+      - 'android/app/src/main/res/**'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'tests/i18n/native_android/df_pr04_smoke.sh'
+      - '.github/workflows/df_pr04_api30_api35_smoke.yml'
+permissions:
+  contents: read
+jobs:
+  android-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 35]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Install Android platform 36
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Compile exact source
+        run: gradle -p android :app:assembleDebug --no-daemon
+      - name: Give emulator runner KVM access
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
+      - name: Launch and restart on API ${{ matrix.api }}
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          # Lower the API30 hosted-emulator memory pressure; retain proven API35 settings.
+          ram-size: ${{ matrix.api == 30 && '2048M' || '3072M' }}
+          heap-size: ${{ matrix.api == 30 && '256M' || '512M' }}
+          emulator-boot-timeout: 900
+          # Android 11 emulator sometimes boots slowly; runner animation settings
+          # fail with ADB Broken pipe before our script can verify app startup.
+          # Skip that optional settings call; app smoke remains strict below.
+          disable-animations: false
+          script: bash tests/i18n/native_android/df_pr04_smoke.sh
