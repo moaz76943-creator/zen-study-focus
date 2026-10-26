@@ -205,10 +205,35 @@
     return {total:rows.length,completed,percent:rows.length?Math.round(completed*100/rows.length):0};
   }
   function isOverdue(t,today) {if(!validDate(today))fail('Invalid comparison day');return !!(t.dueAssigned!==false&&validDate(t.date)&&t.date<today&&!t.done&&!t.deletedAt&&statusOf(t)!=='archived');}
+  // Optional day-specific selection is nested inside the existing v21 cfg packet.
+  // It never migrates or rewrites task records or changes the fortress storage keys.
+  function chooseTopThree(state,today,ids){
+    if(!validDate(today)||!Array.isArray(ids)||ids.length>3||
+       ids.some(id=>!idOk(id))||new Set(ids).size!==ids.length)
+      fail('Select up to three distinct numeric task IDs');
+    const s=stateCopy(state);
+    for(const id of ids){
+      const task=get(s,id,{includingTrash:false});
+      if(task.isStarter||task.done||statusOf(task)==='archived')
+        fail('Only active real tasks may be prioritized');
+    }
+    const selected=s.cfg.taskTopThreeV21;
+    if(selected!==undefined && (selected===null||typeof selected!=='object'||Array.isArray(selected)))
+      fail('Invalid manual priorities');
+    s.cfg.taskTopThreeV21={...(selected||{}),[today]:[...ids]};
+    return s;
+  }
   function topThree(state,today) {
     if(!validDate(today))fail('Invalid today');
+    const ids=state.cfg?.taskTopThreeV21?.[today];
+    const available=listTasks(state).filter(t=>!t.done);
+    if(Array.isArray(ids)){
+      const byId=new Map(available.map(t=>[t.id,t]));
+      return [...new Set(ids)].filter(id=>idOk(id)&&byId.has(id)).slice(0,3).map(id=>byId.get(id));
+    }
+    // Preserve existing automatic v21 recommendations on days not manually curated.
     const priority={urgent:4,high:3,medium:2,low:1};
-    return listTasks(state).filter(t=>!t.done&&t.dueAssigned!==false&&validDate(t.date)&&t.date<=today).sort((a,b)=>{
+    return available.filter(t=>t.dueAssigned!==false&&validDate(t.date)&&t.date<=today).sort((a,b)=>{
       const rank=t=>(isOverdue(t,today)?100:0)+(t.important?30:0)+(t.urgent?20:0)+(priority[t.priority]||0);
       return rank(b)-rank(a)||a.date.localeCompare(b.date)||a.id-b.id;
     }).slice(0,3);
@@ -271,6 +296,6 @@
     return {estimateMin,actualMin,deltaMin:actualMin-estimateMin};
   }
   return Object.freeze({validDate,statusOf,createTask,updateTask,setStatus,trashTask,restoreTask,rescheduleTask,
-    addItem,setItemDone,createProject,projects,projectProgress,listTasks,isOverdue,topThree,eisenhower,
+    addItem,setItemDone,createProject,projects,projectProgress,listTasks,isOverdue,topThree,chooseTopThree,eisenhower,
     kanban,searchTasks,compareTaskDates,calendarTasks,sessionTotals,actualFocusMinutes,compareEstimate});
 });
