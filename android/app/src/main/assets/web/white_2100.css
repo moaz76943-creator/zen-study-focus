@@ -621,6 +621,10 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
     padding-inline: 0;
     position: static !important;
   }
+  /* The raised timer button was a transformed containing block, capturing the caption. */
+  body:not(.deep-lockdown) .bottom-nav-capsule #navTimer {
+    transform: none !important;
+  }
   body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn > :is(span[data-i18n],#navTrainingText) {
     position: absolute;
     inline-size: 1px;
