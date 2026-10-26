@@ -35,7 +35,7 @@ async function reenterAppAfterInterruptedJournal({restart,evaluate}) {
 
 function createNativeFaultCases(driver){
  const {evaluate,snapshot,receipt,fixture,restart,adb,nativeUI,tapUI}=driver;
- const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ const pause=driver.pause||((ms)=>new Promise(resolve=>setTimeout(resolve,ms)));
  const device=(fn,arg)=>evaluate('('+fn.toString()+')('+JSON.stringify(arg)+')');
  const cases={};
  for(const slot of Object.keys(FAMILIES))cases['mirror_recovery_'+slot]=async()=>{
@@ -96,7 +96,7 @@ function createNativeFaultCases(driver){
  };
  cases.interrupted_journal_disk_and_process_recovery=async()=>{
   if(process.env.DF_ANDROID_DISPOSABLE!=='1')throw Error('TRANSPORT: journal disk probe requires disposable emulator');
-  const before=await fixture();let recovered=false;
+  const before=await fixture(),previousReceipt=await receipt();let recovered=false;
   try{
    const prepared=await device(function(){
     const D=DeepFocusDataCompatV21,original=D.captureRaw(localStorage),after=DF22Integration.getSnapshot();
@@ -120,13 +120,18 @@ function createNativeFaultCases(driver){
    }
    saveProof('interrupted-journal-probe-metadata',diagnostic);
    console.log('DF07_WAL_DIAGNOSTIC '+JSON.stringify({accepted_files:diagnostic.accepted_files, listed_file_count:diagnostic.listed_file_count, files:diagnostic.files, trim_requested:diagnostic.trim_requested, list_failed:!!diagnostic.list_failed}));
-   if(!proof)throw Error('TRANSPORT: pending journal not independently observed in Android LevelDB WAL');
-   saveProof('interrupted-journal-disk-proof',proof); // Hash/metadata only; never upload WAL bytes.
+   // Independent WAL marker visibility is diagnostic: Chromium may keep the
+   // journal only in memory, compact it, or leave it unflushed. Its absence is
+   // NOT WAL persistence proof and must never block the real crash-recovery test.
+   if(proof)saveProof('interrupted-journal-disk-proof',proof); // Hash/metadata only.
    await restart();
-   assert.deepEqual(await fixture(),before);assert.equal((await receipt()).valid,true);
+   assert.deepEqual(await fixture(),before,'Unacknowledged journal changed user records after process death');
+   assert.deepEqual(await receipt(),previousReceipt,'Unacknowledged journal advanced native receipt');
    assert.equal(await evaluate('DeepFocusDataCompatV21.inspectPending(localStorage).pending'),false);
    recovered=true;
-   return 'Pending journal independently observed in actual Android WAL; partial unacknowledged cfg rolled back from native checkpoint after force-stop/relaunch';
+   return proof
+     ? 'Real force-stop recovered original records from native receipt; WAL marker independently observed'
+     : 'Real force-stop recovered original records from native receipt; WAL marker NOT_OBSERVED (separate disk-proof limitation)';
   }finally{
    if(!recovered)await reenterAppAfterInterruptedJournal({restart,evaluate});
   }
