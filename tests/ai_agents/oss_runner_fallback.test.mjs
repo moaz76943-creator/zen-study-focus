@@ -20,7 +20,7 @@ function exercise(qwenOutput,{quotaBlockedAider=false}={}){
  program('python3','exit 0');
  program('timeout','shift; "$@"');
  program('qwen','printf "%s" "${QWEN_CODE_MAX_OUTPUT_TOKENS:-}" > "$RUNNER_TEMP/qwen-output-budget"; echo '+JSON.stringify(qwenOutput)+' >&2; exit 1');
- program('aider',quotaBlockedAider ? 'echo "litellm.RateLimitError: rate_limit_exceeded" >&2; exit 0' : 'printf "used" > "$RUNNER_TEMP/fallback-ran"; exit 0');
+ program('aider',quotaBlockedAider ? 'echo "litellm.RateLimitError: rate_limit_exceeded" >&2; exit 0' : 'printf "used" > "$RUNNER_TEMP/fallback-ran"; printf "%s" "$*" > "$RUNNER_TEMP/fallback-args"; exit 0');
  const init=spawnSync('git',['init','-q'],{cwd:root,encoding:'utf8'});
  assert.equal(init.status,0,init.stderr);
  const add=spawnSync('git',['add','tools/i18n/inventory/index.cjs','tests/i18n/inventory/inventory.test.cjs'],{cwd:root,encoding:'utf8'});
@@ -58,5 +58,13 @@ test('fallback Aider cannot mark task successful when model quota was exhausted'
   assert.notEqual(x.result.status,0,'quota-blocked fallback must not become green');
   assert.match(x.result.stderr,/QUOTA_BLOCKED/);
   assert.equal(existsSync(join(x.run,'fallback-ran')),false);
+ }finally{rmSync(x.root,{recursive:true,force:true});}
+});
+
+test('Qwen 8K TPM fallback selects the independent 12K Groq Llama model',()=>{
+ const x=exercise('Responses API error 413');
+ try{
+  assert.equal(x.result.status,0,x.result.stderr);
+  assert.match(readFileSync(join(x.run,'fallback-args'),'utf8'),/groq\/llama-3\.3-70b-versatile/);
  }finally{rmSync(x.root,{recursive:true,force:true});}
 });

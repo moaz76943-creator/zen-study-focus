@@ -58,7 +58,7 @@ JSON
       # Aider can emit Groq RateLimitError while exiting 0. Do not claim success.
       set +e
       timeout 7m aider --yes --no-pretty --no-auto-commits --no-dirty-commits \
-        --model groq/openai/gpt-oss-120b --map-tokens 0 \
+        --model groq/llama-3.3-70b-versatile --map-tokens 0 \
         --message-file "$RUNNER_TEMP/df-oss-task.txt" "$@" \
         > "$RUNNER_TEMP/df-aider-fallback.log" 2>&1
       aider_status=$?
