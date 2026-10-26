@@ -9,7 +9,7 @@ const start=app.indexOf('function selectTimerModeFromUser(');
 const stop=app.indexOf('\nfunction changeTimerDelta(',start);
 assert.ok(start>=0 && stop>start, 'Expected complete custom timer source section');
 const section=app.slice(start,stop);
-function setup({quick=false,allow=false,running=true}={}) {
+function setup({quick=false,allow=false,running=true,pauseAck=true}={}) {
   let prompts=0,closes=0,toasts=0,rendered=0,stops=0;
   const saves=[];
   const fields={
@@ -28,7 +28,7 @@ function setup({quick=false,allow=false,running=true}={}) {
     renderQuickTraining(){rendered++;},
     L(){return {modeCustom:'Custom'}},toWest(x){return x},
     document:{getElementById(id){assert.ok(fields[id],`missing ${id}`);return fields[id]}},
-    toggleTimerPlay(){stops++;sandbox.timerRunning=false},
+    toggleTimerPlay(){stops++;if(pauseAck!==true)return false;sandbox.timerRunning=false;return true},
     storeTimerSession(){saves.push({label:sandbox.customSessionLabel,mode:sandbox.currentTimerModeKey,total:sandbox.timerTotal})},
     updateTimerDisplay(){},
     closeModal(id){assert.equal(id,'customTimerModal');closes++;},
@@ -77,4 +77,18 @@ test('Replacing quick training asks once and respects Cancel',()=>{
   assert.equal(accept.sandbox.customSessionLabel,'New project (40m)');
   assert.equal(accept.saves.at(-1).label,'New project (40m)');
   assert.deepEqual(accept.metrics(),{prompts:1,closes:1,toasts:1,rendered:1,stops:1});
+});
+
+test('Accepted Custom switch aborts when durable Pause is rejected, retaining current session and draft',()=>{
+ const t=setup({allow:true,pauseAck:false});
+ const previous=t.sandbox.customSessionLabel;
+ assert.equal(t.apply(),false);
+ assert.equal(t.sandbox.timerRunning,true);
+ assert.equal(t.sandbox.timerSessionId,'original-session');
+ assert.equal(t.sandbox.currentTimerModeKey,'focus');
+ assert.equal(t.sandbox.customSessionLabel,previous);
+ assert.equal(t.sandbox.timerTotal,1500);
+ assert.equal(t.saves.length,0);
+ assert.equal(t.metrics().closes,0);
+ assert.equal(t.metrics().stops,1);
 });
