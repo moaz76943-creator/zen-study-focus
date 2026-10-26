@@ -125,14 +125,17 @@ jobs:
             # Previous 36.4.10/off/no-probe variant died by host SIGSEGV.
             runner: ubuntu-26.04
             job_timeout: 65
-            gpu: swiftshader_indirect
+            # Emulator 37 deprecated swiftshader_indirect. Use the supported
+            # software renderer and disable Vulkan on this API35 trial only.
+            # Documentation: developer.android.com/studio/run/emulator-troubleshooting
+            gpu: swiftshader
             profile: pixel_2
             heap: 512M
             ram: 3072M
             emulator_build: 16428233
             boot_timeout: 1200
             animations: false
-            emulator_options: '-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim'
+            emulator_options: '-no-window -gpu swiftshader -feature -Vulkan -no-snapshot -noaudio -no-boot-anim'
     steps:
       - uses: actions/checkout@v4
         with:
