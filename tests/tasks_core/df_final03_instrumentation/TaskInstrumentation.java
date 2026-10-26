@@ -97,10 +97,15 @@ public final class TaskInstrumentation extends Instrumentation {
         return new JSONObject(raw);
     }
     private JSONObject receipt()throws Exception{
-        return js("(()=>{const raw=ZenNative.readDurableV21();" +
-          "if(!raw||raw==='NONE'||raw==='ERROR')return {ok:false,raw};" +
-          "const p=JSON.parse(raw).packets,keys=Object.keys(p||{});" +
-          "return {ok:keys.length===6&&keys.every(k=>p[k]===localStorage.getItem(k)&&(!p[k]||DeepFocusDataCompatV21.inspectPacket(p[k]).ok)),count:keys.length};})()");
+        // The production ZenNative bridge has no readDurableV21() method. Verify
+        // the actual six v21 WebView packets plus the in-memory snapshot instead.
+        return js("(()=>{const D=DeepFocusDataCompatV21,s=DF22Integration.getSnapshot();" +
+          "const families=[['cfg','cfg'],['tasks','tasksList'],['notes','notesList']];" +
+          "const checks=families.map(([slot,field])=>{const key=D.KEYS[slot]," +
+          "a=localStorage.getItem(key),b=localStorage.getItem(key+'_mirror');" +
+          "const x=D.inspectPacket(a),y=D.inspectPacket(b);" +
+          "return {slot,ok:!!a&&a===b&&x.ok&&y.ok&&JSON.stringify(x.value)===JSON.stringify(s[field])};});" +
+          "return {ok:checks.length===3&&checks.every(c=>c.ok),count:6,checks};})()");
     }
     private JSONObject readFixture()throws Exception{
         return js("(()=>{const s=DF22Integration.getSnapshot(),a=s.tasksList.filter(x=>x.id==="+FIXTURE_ID+");" +
@@ -113,7 +118,7 @@ public final class TaskInstrumentation extends Instrumentation {
         assertOk(!item.optBoolean("date")&&!item.optBoolean("due"),"Legacy due fields fabricated after restart: "+item);
         assertOk("{\"keep\":\"العربية\"}".equals(item.optString("legacy")),"Unknown legacy data lost: "+item);
         JSONObject nativeAck=receipt();
-        assertOk(nativeAck.optBoolean("ok"),"Native v21 packet readback failed after process kill: "+nativeAck);
+        assertOk(nativeAck.optBoolean("ok"),"v21 WebView six-packet readback failed after process kill: "+nativeAck);
     }
     private void doEdit(String locale)throws Exception{
         assertOk("en".equals(locale)||"ar".equals(locale),"Unsupported test locale");
@@ -124,7 +129,7 @@ public final class TaskInstrumentation extends Instrumentation {
             "const ok=DF22Integration.write(before,after);return {ok,id:"+FIXTURE_ID+"};})()");
         assertOk(seed.optBoolean("ok"),"Fixture durable v21 write not acknowledged "+seed);
         JSONObject ack=receipt();
-        assertOk(ack.optBoolean("ok"),"Native ACK missing before touch "+ack);
+        assertOk(ack.optBoolean("ok"),"v21 packet ACK missing before touch "+ack);
         String target="df03TaskHost";
         mount(target,locale,false);
         JSONObject found=js("(()=>{const card=[...document.querySelectorAll('#df03TaskHost #df-task-results .df-task')]" +
@@ -165,7 +170,7 @@ public final class TaskInstrumentation extends Instrumentation {
             "stored:DF22Integration.getSnapshot().tasksList.find(t=>t.id==="+FIXTURE_ID+")?.title||''}))()");
         assertOk("DF03 rejected write".equals(refused.optString("draft")) &&
             SAVED.equals(refused.optString("stored")),"Rejected ACK overwrote task or lost editor draft "+refused);
-        assertOk(receipt().optBoolean("ok"),"Native packet changed on injected rejected ACK");
+        assertOk(receipt().optBoolean("ok"),"v21 packet changed on injected rejected ACK");
         assertOk(realTaps==4,"Expected four genuine Android physical tap events, got "+realTaps);
     }
     private void mount(String id,String locale,boolean reject)throws Exception{
