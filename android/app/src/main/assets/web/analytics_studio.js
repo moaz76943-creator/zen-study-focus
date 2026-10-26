@@ -242,7 +242,9 @@
               if(matches.length!==1||matches[0].archived===true||
                  matches[0].status==='archived'||matches[0].isStarter===true||
                  matches[0].isDemo===true||matches[0].synthetic===true||
-                  core.isSyntheticSource(matches[0].source))return;
+                  core.isSyntheticSource(matches[0].source)||
+                  typeof matches[0].title!=='string'||
+                  typeof matches[0].done!=='boolean')return;
               opts.onOpenTask(item.taskId);
             });
             cell.appendChild(button);

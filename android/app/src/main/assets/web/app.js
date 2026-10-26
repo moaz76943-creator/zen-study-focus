@@ -1682,6 +1682,39 @@ function computeActualStreak(history, now = new Date()) {
 
 function syncDailyRollover() {
   const current = localDateISO();
+  const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : null;
+  // An unavailable optional analytics module must never erase cached values.
+  if (entries) {
+    const next = JSON.parse(JSON.stringify(cfg));
+    if (next.metricsDate && next.metricsDate !== current) {
+      next.todayMins = entries
+        .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
+        .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
+      next.water = 0;
+      next.sets = 0;
+      next.pagesRead = 0;
+      next.quickFocusRemainderSec = 0;
+    }
+    next.metricsDate = current;
+    next.streak = computeActualStreak(next.sessionHistory);
+    if (JSON.stringify(next) !== JSON.stringify(cfg)) {
+      try {
+        if (window.DF22Integration) {
+          const before = window.DF22Integration.getSnapshot();
+          if (window.DF22Integration.write(before, {...before,cfg:next}) !== true)
+            throw new Error('ROLLOVER_SAVE_NOT_VERIFIED');
+        } else {
+          if (saveFortressData('zen_fortress_cfg_v21', next) !== true)
+            throw new Error('ROLLOVER_SAVE_NOT_VERIFIED');
+          cfg = next;
+        }
+      } catch (_) {
+        showToast((typeof L === 'function' && L().saveFailed) || 'Could not save daily progress. Retry.');
+        return false;
+      }
+    }
+  }
+  // Date controls advance only after the daily snapshot has been acknowledged.
   if (todayISO !== current) {
     const previousDate = todayISO;
     todayISO = current;
@@ -1693,19 +1726,7 @@ function syncDailyRollover() {
       calMonth = new Date().getMonth();
     }
   }
-  if (cfg.metricsDate && cfg.metricsDate !== current) {
-    const entries = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
-    cfg.todayMins = entries
-      .filter(e => e && e.date === current && Number.isFinite(Number(e.minutes)))
-      .reduce((total, e) => total + Math.max(0, Number(e.minutes)), 0);
-    cfg.water = 0;
-    cfg.sets = 0;
-    cfg.pagesRead = 0;
-    cfg.quickFocusRemainderSec = 0;
-  }
-  cfg.metricsDate = current;
-  cfg.streak = computeActualStreak(cfg.sessionHistory);
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  return true;
 }
 
 function L() {
@@ -2287,10 +2308,20 @@ function selectHomeQuickSession(minutes) {
 }
 
 function logWorkoutSet() {
-  cfg.sets = (cfg.sets % 12) + 1;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  const previous = Number(cfg.sets || 0);
+  if (!Number.isSafeInteger(previous) || previous < 0) return false;
+  const next = {...cfg, sets:(previous % 12) + 1};
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', next) !== true)
+      throw new Error('WORKOUT_COUNTER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed || 'Could not save progress. Retry.');
+    return false;
+  }
+  cfg = next;
   syncHeaderMetrics();
   showToast(toWest(`💪 ${L().domSport}: ${cfg.sets}/4`));
+  return true;
 }
 
 function startQuickSportRest(secs) {
@@ -2309,10 +2340,27 @@ function startQuickSportRest(secs) {
     mode:'short',label:'',sessionId:nextId,taskId:null,
     activeMs:0,resumedAt:startedAt,training:null
   };
+  // Publish exactly one timer packet before interrupting previous native work.
+  const storage = typeof localStorage === 'undefined' ? null : localStorage;
+  const oldPrimary = storage ? storage.getItem(TIMER_STORAGE_KEY) : null;
+  const oldMirror = storage ? storage.getItem(TIMER_STORAGE_KEY + '_mirror') : null;
   try {
     if(saveFortressData(TIMER_STORAGE_KEY,next)!==true)
       throw new Error('SPORT_REST_WRITE_NOT_ACKNOWLEDGED');
+    if (window.ZenNative && typeof window.ZenNative.acknowledgeActiveTimerSnapshot === 'function') {
+      const raw = storage && storage.getItem(TIMER_STORAGE_KEY);
+      if (typeof raw !== 'string' || window.ZenNative.acknowledgeActiveTimerSnapshot(raw) !== true)
+        throw new Error('SPORT_REST_NATIVE_ACK_FAILED');
+    }
   } catch (_) {
+    if (storage) {
+      try {
+        for (const [key,old] of [[TIMER_STORAGE_KEY,oldPrimary],
+          [TIMER_STORAGE_KEY+'_mirror',oldMirror]]) {
+          if (old===null) storage.removeItem(key); else storage.setItem(key,old);
+        }
+      } catch (_) {}
+    }
     showToast(L().saveFailed || (cfg.lang==='ar'
       ? 'تعذّر حفظ جلسة الاستراحة. حاول مرة أخرى.'
       : 'Could not save rest timer. Try again.'));
@@ -2345,10 +2393,22 @@ function startQuickSportRest(secs) {
 }
 
 function addReadPages(p) {
-  cfg.pagesRead = (cfg.pagesRead || 0) + p;
-  saveFortressData('zen_fortress_cfg_v21', cfg);
+  const previous = Number(cfg.pagesRead || 0), delta = Number(p);
+  if (!Number.isSafeInteger(previous) || previous < 0 ||
+      !Number.isSafeInteger(delta) || delta <= 0 ||
+      !Number.isSafeInteger(previous + delta)) return false;
+  const next = {...cfg, pagesRead:previous + delta};
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', next) !== true)
+      throw new Error('READING_COUNTER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed || 'Could not save progress. Retry.');
+    return false;
+  }
+  cfg = next;
   syncHeaderMetrics();
-  showToast(toWest(`📖 ${L().domRead}: +${p}`));
+  showToast(toWest(`📖 ${L().domRead}: +${delta}`));
+  return true;
 }
 
 const TAB_GRADS = {
@@ -2428,21 +2488,59 @@ function accumulateActiveTime() {
 }
 const TIMER_STORAGE_KEY = 'zen_fortress_active_timer_v21';
 function storeTimerSession() {
-  try {
-    return saveFortressData(TIMER_STORAGE_KEY, {
+  return persistActiveTimerSnapshot({
     total: timerTotal, left: timerLeft, running: timerRunning,
     endAt: timerRunning ? timerTargetTime : null,
     mode: currentTimerModeKey, label: customSessionLabel,
-    sessionId: timerSessionId,
-    taskId: focusSessionTaskId,
+    sessionId: timerSessionId, taskId: focusSessionTaskId,
     activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null,
     training: quickTraining && quickTraining.active ? {...quickTraining} : null
   });
-  } catch (error) {
-    // A failed v21 packet write cannot be reported as a successful timer transition.
+}
+function persistActiveTimerSnapshot(snapshot) {
+  const storage = typeof localStorage === 'undefined' ? null : localStorage;
+  let oldPrimary, oldMirror;
+  try {
+    if (storage) {
+      oldPrimary = storage.getItem(TIMER_STORAGE_KEY);
+      oldMirror = storage.getItem(TIMER_STORAGE_KEY + '_mirror');
+    }
+    if (saveFortressData(TIMER_STORAGE_KEY, snapshot) !== true)
+      throw new Error('TIMER_STORAGE_WRITE_UNVERIFIED');
+    const native = window.ZenNative;
+    if (native && typeof native.acknowledgeActiveTimerSnapshot === 'function') {
+      const raw = storage && storage.getItem(TIMER_STORAGE_KEY);
+      if (typeof raw !== 'string' || native.acknowledgeActiveTimerSnapshot(raw) !== true)
+        throw new Error('TIMER_NATIVE_RECEIPT_FAILED');
+    }
+    return true;
+  } catch (_) {
+    if (storage) {
+      try {
+        for (const [key, previous] of [[TIMER_STORAGE_KEY, oldPrimary],
+          [TIMER_STORAGE_KEY + '_mirror', oldMirror]]) {
+          if (previous === null || previous === undefined) storage.removeItem(key);
+          else storage.setItem(key, previous);
+        }
+      } catch (_) { /* Existing native checkpoint remains authoritative. */ }
+    }
     try { showToast(L().saveFailed); } catch (_) {}
     return false;
   }
+}
+function readNativeTimerSession() {
+  const native = window.ZenNative;
+  if (!native || typeof native.readActiveTimerSnapshot !== 'function') return null;
+  const raw = native.readActiveTimerSnapshot();
+  if (raw === 'NONE') return null; // Existing v21 installations retain WebView data.
+  if (typeof raw !== 'string' || raw === 'ERROR') throw new Error('TIMER_NATIVE_CHECKPOINT_UNREADABLE');
+  try {
+    const packet = JSON.parse(raw);
+    if (!packet || typeof packet.payload !== 'string' ||
+        computeHash(packet.payload) !== packet.sig)
+      throw new Error('TIMER_NATIVE_CHECKPOINT_INVALID');
+    return JSON.parse(packet.payload);
+  } catch (_) { throw new Error('TIMER_NATIVE_CHECKPOINT_INVALID'); }
 }
 function creditCompletedSession() {
   if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
@@ -2518,7 +2616,9 @@ function runTimerTick() {
   updateTimerDisplay();
 }
 function restoreTimerSession() {
-  const snap = loadFortressData(TIMER_STORAGE_KEY, null);
+  let snap;
+  try { snap = readNativeTimerSession() || loadFortressData(TIMER_STORAGE_KEY, null); }
+  catch (_) { try { showToast(L().saveFailed); } catch (_) {} return; }
   if (!snap || typeof snap !== 'object' || !Number.isFinite(snap.total) || !Number.isFinite(snap.left)) return;
   if (snap.total < 1 || snap.total > 86400 || snap.left < 0 || snap.left > 86400) return;
   timerTotal = snap.total;

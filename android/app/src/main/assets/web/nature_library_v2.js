@@ -591,7 +591,8 @@ function listFor(category,approved){const allow=availableIds(approved);return en
 function render(category,lang,legacyLabels,approved){
  if(typeof document==='undefined')return;
  const host=document.getElementById('natureLibraryV2');if(!host)return;
- const language=messages[lang]?lang:'en', m=messages[language];
+ const normalized=String(lang||'en').split(/[-_]/)[0].toLowerCase();
+ const language=Object.prototype.hasOwnProperty.call(messages,normalized)?normalized:'en', m=messages[language];
  const rows=listFor(category,approved||new Set());const live=rows.filter(e=>e.available).length;
  host.replaceChildren();
  const heading=document.createElement('h3');heading.className='nature-library-heading';heading.textContent=m.heading;
