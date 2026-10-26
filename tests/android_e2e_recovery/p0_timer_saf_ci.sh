@@ -21,10 +21,50 @@ capture(){
 trap capture EXIT
 cp android/app/build/outputs/apk/debug/app-debug.apk "$report/tested-debug.apk"
 git rev-parse HEAD HEAD:android > "$report/source-sha-and-android-tree.txt"
+# ADB can temporarily disconnect after a successful APK install.
+# Reconnect/retry only observations; never replay install, intent, consent or write.
+readonly_adb_installed_path(){
+  local response path attempt
+  for attempt in 1 2 3; do
+    if response="$(timeout 15s adb shell pm path com.zenstudy.focus 2>/dev/null)"; then
+      path="$(printf '%s\n' "$response" | tr -d '\r' | sed -n 's/^package://p' | head -n 1)"
+      if [[ "$path" == /data/* ]]; then
+        printf '%s\n' "$path"
+        return 0
+      fi
+    fi
+    if (( attempt < 3 )); then
+      timeout 10s adb reconnect offline >/dev/null 2>&1 || true
+      timeout 30s adb wait-for-device >/dev/null 2>&1 || true
+    fi
+  done
+  return 1
+}
+readonly_adb_pull_installed_apk(){
+  local attempt
+  for attempt in 1 2 3; do
+    if timeout 60s adb pull "$installed_path" "$report/installed-base.apk" >&2; then
+      test -s "$report/installed-base.apk"
+      return 0
+    fi
+    rm -f "$report/installed-base.apk"
+    if (( attempt < 3 )); then
+      timeout 10s adb reconnect offline >/dev/null 2>&1 || true
+      timeout 30s adb wait-for-device >/dev/null 2>&1 || true
+    fi
+  done
+  return 1
+}
+timeout 30s adb wait-for-device
 adb install "$report/tested-debug.apk"
-installed_path="$(adb shell pm path com.zenstudy.focus | tr -d '\r' | sed -n 's/^package://p')"
-test -n "$installed_path"
-adb pull "$installed_path" "$report/installed-base.apk"
+installed_path="$(readonly_adb_installed_path)" || {
+  printf '%s\n' 'NOT_TESTED: installed Android APK path unavailable after bounded read-only reconnect' >&2
+  exit 1
+}
+readonly_adb_pull_installed_apk || {
+  printf '%s\n' 'NOT_TESTED: installed Android APK bytes unavailable after bounded read-only reconnect' >&2
+  exit 1
+}
 sha256sum "$report/installed-base.apk" > "$report/installed-apk.sha256"
 test "$(sha256sum "$report/installed-base.apk" | cut -d ' ' -f1)" = "$(sha256sum "$report/tested-debug.apk" | cut -d ' ' -f1)"
 rm "$report/installed-base.apk"
