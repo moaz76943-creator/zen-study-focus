@@ -223,7 +223,7 @@
       pairA:'Answer',addPair:'Add Q&A',tags:'Tags (comma-separated)',book:'Notebook',link:'Link note',
       task:'Create tasks from unchecked items',saved:'Note saved',failed:'Could not save note',
       confirm:'Delete permanently? An exported backup is required.',review:'Tap answer to reveal',
-      draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes',more:'More',copy:'Copy',
+      draft:'Draft and legacy body are kept separately',filter:'Filter',status:'Status',linked:'Linked notes',backlinks:'Referenced by',missingLink:'Unavailable linked note',more:'More',copy:'Copy',copyMd:'Copy Markdown',
       copied:'Copied',copyFailed:'Could not copy note',duplicate:'Duplicate',previewLimit:'Preview limited to 400 lines; original note is unchanged.',
       completePairs:'Complete each recall question and answer before saving',large:'Note exceeds maximum size',
       done:'Mark complete',heading:'Heading',bullet:'Bulleted list',check:'Checklist',number:'Numbered list',
@@ -237,7 +237,7 @@
       link:'ربط ملاحظة',task:'إنشاء مهام من مربعات الاختيار',saved:'تم حفظ الملاحظة',
       failed:'تعذّر حفظ الملاحظة',confirm:'حذف نهائي؟ تأكد من وجود نسخة احتياطية مصدّرة.',
       review:'المس الإجابة لإظهارها',draft:'المحتوى القديم محفوظ بمعزل عن كورنيل',filter:'تصفية',
-      status:'الحالة',linked:'ملاحظات مرتبطة',more:'المزيد',copy:'نسخ',
+      status:'الحالة',linked:'ملاحظات مرتبطة',backlinks:'ملاحظات تشير إليها',missingLink:'الملاحظة المرتبطة غير متاحة',more:'المزيد',copy:'نسخ',copyMd:'نسخ Markdown',
       copied:'تم النسخ',copyFailed:'تعذّر نسخ الملاحظة',duplicate:'إنشاء نسخة',previewLimit:'المعاينة تعرض أول 400 سطر فقط؛ الملاحظة الأصلية محفوظة دون تغيير.',
       completePairs:'أكمل سؤال المراجعة وإجابته قبل الحفظ',large:'تجاوزت الملاحظة الحجم المسموح',
       done:'وضع علامة مكتمل',heading:'عنوان',bullet:'قائمة نقطية',check:'قائمة تحقق',number:'قائمة مرقمة',
@@ -630,7 +630,17 @@
     if(links.length){preview.appendChild(el('h4','',t('linked')));links.forEach(id=>{
       const target=instance.controller.read().notesList.find(x=>x?.id===id);
       if(target)button(preview,target.title,()=>showReader(target));
+      else preview.appendChild(el('p','nsux-meta',t('missingLink')));
     });}
+    const incoming=instance.controller.backlinks(n.id);
+    if(incoming.length){
+      preview.appendChild(el('h4','',t('backlinks')));
+      const all=instance.controller.read().notesList;
+      incoming.forEach(id=>{
+        const source=all.find(x=>x?.id===id);
+        if(source)button(preview,source.title,()=>showReader(source));
+      });
+    }
     if(Array.isArray(ext.taskLinks))ext.taskLinks.forEach(id=>{
       const target=instance.controller.read().tasksList.find(x=>x&&x.id===id);
       if(target)preview.appendChild(el('p','',t('task')+': '+target.title));
