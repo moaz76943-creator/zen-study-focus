@@ -136,3 +136,42 @@ test('emulator optional animation settings do not abort v21 SAF device acceptanc
  assert.doesNotMatch(workflow,/disable-animations: true/);
  assert.match(workflow,/script: bash tests\/android_e2e_recovery\/p0_timer_saf_ci\.sh/);
 });
+
+test('SAF export remains NOT_TESTED unless real provider bytes match the generated v21 code', async()=>{
+ const ctx=context();
+ vm.runInContext(`
+   const evidence=[];
+   let matchBytes=false;
+   snapshot=async()=>({task:{id:71001}});
+   receipt=async()=>({valid:true,bytes:500});
+   evaluate=async expr=>{
+     if(expr==='generateEncryptedBackupCode()')return 'ZEN21::signed-original';
+     if(expr.includes('downloadEncryptedBackupFile'))return true;
+     return true;
+   };
+   nativeUI=async(label,match)=>{
+     const xml='<node package="com.google.android.documentsui" class="android.widget.Button" text="SAVE" resource-id="com.google.android.documentsui:id/action_menu_save" bounds="[1,1][10,10]"/>';
+     const item=match(xml);if(!item)throw Error('native Save control not observed');
+     return {xml,item};
+   };
+   tapUI=node=>evidence.push('native-save-tapped');
+   waitForSavedBackup=async code=>{
+     evidence.push('read-provider-bytes:'+code);
+     if(!matchBytes)throw Error('TRANSPORT: no matching actual provider bytes');
+     return 'MediaStore selected document';
+   };
+   dumpUI=()=>'<node package="com.zenstudy.focus"/>';
+ `,ctx);
+ await assert.rejects(vm.runInContext('safExportAndReadback()',ctx),/TRANSPORT: no matching actual provider bytes/);
+ assert.deepEqual(Array.from(vm.runInContext('evidence',ctx)),['native-save-tapped','read-provider-bytes:ZEN21::signed-original']);
+ vm.runInContext('matchBytes=true',ctx);
+ const result=await vm.runInContext('safExportAndReadback()',ctx);
+ assert.match(result,/independently matching ZEN21/);
+});
+
+test('SAF export is scheduled as real Android evidence, never inferred from picker visibility',()=>{
+ const ctx=context();
+ vm.runInContext("report.results.push({name:'bootstrap',status:'NOT_TESTED'});fillUnattempted();",ctx);
+ const row=vm.runInContext("report.results.find(x=>x.name==='saf_document_save_and_readback')",ctx);
+ assert.equal(row.status,'NOT_TESTED');
+});
