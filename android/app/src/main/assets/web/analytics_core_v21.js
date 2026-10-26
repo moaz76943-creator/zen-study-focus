@@ -71,7 +71,8 @@
       const timed=s.timeEvidence==='timer-monotonic-v1' && start!==null && end!==null && end>=start && end-start<=86400000;
       sessions.push({id:s.id,date:s.date,minutes:s.minutes,domain:aliases[s.domain],
         startedAt:timed?new Date(start).toISOString():null,endedAt:timed?new Date(end).toISOString():null,
-        timingVerified:timed});
+        timingVerified:timed,
+        taskId:Number.isSafeInteger(s.taskId)&&s.taskId>=0?s.taskId:null});
     });
     return {sessions,rejects,duplicates:rejects.filter(x=>x.reason==='DUPLICATE_ID').length,
       invalid:rejects.filter(x=>x.reason!=='DUPLICATE_ID'&&x.reason!=='SAMPLE').length,
@@ -169,7 +170,21 @@
       changePercent:priorWeek.minutes===0?null:Math.round(changeMinutes/priorWeek.minutes*10000)/100,
       rule:'Rolling seven credited local dates compared with the preceding seven dates'};
     const dashboard={today:trailing(1),last7:trailing(7),last30:trailing(30)};
-    const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&(domain==='all'||s.domain===domain));
+    // Task linkage is presentation-only; reject missing, ambiguous, archived
+    // or sample task IDs. Never modify original session history or task lists.
+    const tasks=Array.isArray(snapshot.tasksList)?snapshot.tasksList:[];
+    const counts=new Map();
+    for(const t of tasks)
+      if(isRecord(t)&&Number.isSafeInteger(t.id)&&t.id>=0)
+        counts.set(t.id,(counts.get(t.id)||0)+1);
+    const eligibleTaskIds=new Set(tasks.filter(t=>isRecord(t)&&
+      Number.isSafeInteger(t.id)&&t.id>=0&&counts.get(t.id)===1&&
+      t.isStarter!==true&&t.isDemo!==true&&t.synthetic!==true&&
+      t.archived!==true&&t.status!=='archived'&&typeof t.title==='string'&&
+      typeof t.done==='boolean').map(t=>t.id));
+    const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&
+      (domain==='all'||s.domain===domain)).map(s=>({...s,
+        taskId:eligibleTaskIds.has(s.taskId)?s.taskId:null}));
     const grouped=bucket(rows,s=>s.date),dayMap=new Map(grouped.map(x=>[x.key,x]));
     const startNumber=dayNumber(startDate);
     const daily=Array.from({length:span},(_,i)=>{const key=fromDayNumber(startNumber+i);return dayMap.get(key)||{key,minutes:0,sessions:0};});
