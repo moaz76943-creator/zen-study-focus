@@ -236,3 +236,22 @@ test('DF-PARALLEL-05: one-field Quick Add retries failed ACK and never creates a
  assert.equal(commits,1,'Detached Quick Add may not write twice');
  studio.destroy();
 });
+
+test('DF-PARALLEL-05: Quick Add cannot erase unsaved edits in an opened full task editor',()=>{
+ const f=fixture(),quick=()=>f.root.descendants.some(x=>x.tagName==='FORM'&&x.className?.includes('df-quick-add'));
+ assert.equal(quick(),true);
+ const edit=f.root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Edit');
+ assert.ok(edit);edit.dispatch('click');
+ const full=f.root.descendants.find(x=>x.tagName==='FORM'&&x.className==='df-form');
+ assert.ok(full);
+ const title=full.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ title.value='Unsaved draft title';
+ assert.equal(quick(),false,'Quick Add must not be available to redraw an unsaved full editor');
+ assert.equal(title.value,'Unsaved draft title');
+ assert.equal(f.commits(),0);
+ const cancel=full.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent==='Cancel');
+ assert.ok(cancel);cancel.dispatch('click');
+ assert.equal(quick(),true);
+ assert.equal(f.commits(),0,'Cancelling an unsaved edit must never publish it');
+ f.studio.destroy();
+});
