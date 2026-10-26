@@ -22,6 +22,14 @@
   }
 
   /**
+   * Returns true only for a parseable civil date string (YYYY-MM-DD).
+   */
+  function hasValidCivilDate(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return false;
+    return !isNaN(new Date(dateStr.split('T')[0] + 'T00:00:00Z').getTime());
+  }
+
+  /**
    * Computes the exact integer days remaining between two civil dates (YYYY-MM-DD).
    */
   function calculateDaysRemaining(targetDateStr, referenceDateStr) {
@@ -59,9 +67,10 @@
     if (!examGoal || typeof examGoal !== 'object') return null;
 
     var title = sanitizeTitle(examGoal.title) || "امتحان قادم";
+    var hasDeadline = hasValidCivilDate(examGoal.targetDateStr);
     var days = calculateDaysRemaining(examGoal.targetDateStr, referenceDateStr);
-    var isToday = days === 0;
-    var isPassed = days < 0;
+    var isToday = hasDeadline && days === 0;
+    var isPassed = hasDeadline && days < 0;
 
     var loggedMins = typeof examGoal.loggedMinutes === 'number' && examGoal.loggedMinutes > 0 ? examGoal.loggedMinutes : 0;
     var loggedHours = Math.round((loggedMins / 60) * 10) / 10;
@@ -71,8 +80,8 @@
     var tier = getReadinessTier(days);
 
     var daysDigits = '\u200E' + Math.abs(days);
-    var badgeTextAr = isToday ? "موعد الامتحان اليوم!" : (isPassed ? "انتهى الموعد" : ("باقي " + daysDigits + " يوماً"));
-    var badgeTextEn = isToday ? "Exam is Today!" : (isPassed ? "Deadline Passed" : (daysDigits + " days remaining"));
+    var badgeTextAr = !hasDeadline ? "لم يُحدَّد الموعد" : (isToday ? "موعد الامتحان اليوم!" : (isPassed ? "انتهى الموعد" : ("باقي " + daysDigits + " يوماً")));
+    var badgeTextEn = !hasDeadline ? "No deadline set" : (isToday ? "Exam is Today!" : (isPassed ? "Deadline Passed" : (daysDigits + " days remaining")));
 
     return {
       id: examGoal.id || ('exam_' + Date.now()),
