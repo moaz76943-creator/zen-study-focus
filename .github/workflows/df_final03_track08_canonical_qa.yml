@@ -1,0 +1,61 @@
+name: DF-FINAL-03 Tasks canonical Chromium acceptance
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/tasks_core/df_final03_chromium.cjs'
+      - 'tests/tasks_core/df_final03_android_e2e.cjs'
+      - '.github/workflows/df_final03_track08_canonical_qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Record exact source and syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/df-final03"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/df-final03/SOURCE_SHA"
+          node --check android/app/src/main/assets/web/tasks_core_v21.js
+          node --check android/app/src/main/assets/web/tasks_studio.js
+          node --check tests/tasks_core/df_final03_chromium.cjs
+          node --test tests/tasks_core/tasks_core.test.cjs tests/tasks_core/tasks_studio.test.cjs
+      - name: Install Chromium automation without project dependency change
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if [[ ! -x /usr/bin/chromium ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+          test -x /usr/bin/chromium
+      - name: Actual Chromium 8-case EN AR 320 360 393 430 Tasks regression
+        shell: bash
+        env:
+          TRACK08_CHROMIUM: /usr/bin/chromium
+          TRACK08_BROWSER_EVIDENCE: ${{ runner.temp }}/df-final03/chromium
+        run: node tests/tasks_core/df_final03_chromium.cjs
+      - name: Declare platform limits
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/df-final03"
+          printf 'CHROMIUM_SOURCE=REAL\nANDROID_EMULATOR=NOT_TESTED_IN_THIS_JOB\nPHYSICAL_ANDROID=NOT_TESTED\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df-final03/LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DF-FINAL03-Tasks-Chromium-${{ github.sha }}
+          path: ${{ runner.temp }}/df-final03
+          retention-days: 7
+          if-no-files-found: warn
