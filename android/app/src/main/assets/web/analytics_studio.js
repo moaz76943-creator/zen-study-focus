@@ -205,7 +205,7 @@
       if(!rows.length){detail.appendChild(mk('p',t.noData));return;}
       const table=mk('table');table.style.cssText='width:100%;border-collapse:collapse';
       const head=mk('thead'),headers=mk('tr');
-      for(const title of [t.start,t.sessions,t.activity,t.minutes])
+      for(const title of [t.start,t.sessions,t.activity,t.minutes,t.tasks])
         headers.appendChild(mk('th',title));
       head.appendChild(headers);table.appendChild(head);
       const body=mk('tbody');
@@ -213,7 +213,24 @@
         const tr=mk('tr');
         for(const value of [item.date,item.id,labels[item.domain],item.minutes])
           tr.appendChild(mk('td',String(value)));
-        body.appendChild(tr);
+        const cell=mk('td');
+        if(Number.isSafeInteger(item.taskId)&&item.taskId>=0){
+          if(typeof opts.onOpenTask==='function'){
+            const button=mk('button',String(item.taskId));button.type='button';
+            button.setAttribute('data-task-id',String(item.taskId));
+            button.addEventListener('click',()=>{
+              const snapshot=provider();
+              const matches=(Array.isArray(snapshot.tasksList)?snapshot.tasksList:[])
+                .filter(task=>task&&task.id===item.taskId);
+              if(matches.length!==1||matches[0].archived===true||
+                 matches[0].status==='archived'||matches[0].isStarter===true||
+                 matches[0].isDemo===true||matches[0].synthetic===true)return;
+              opts.onOpenTask(item.taskId);
+            });
+            cell.appendChild(button);
+          }else cell.textContent=String(item.taskId);
+        }
+        tr.appendChild(cell);body.appendChild(tr);
       }
       table.appendChild(body);detail.appendChild(table);
       if(rows.length>200)detail.appendChild(mk('p','200 / '+rows.length));
