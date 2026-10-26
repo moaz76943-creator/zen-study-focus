@@ -30,6 +30,10 @@ finalize() {
   timeout 10s sudo -n dmesg 2>/dev/null |
     grep -Ei 'Out of memory|Killed process|qemu.*segfault|segfault.*qemu' \
     > "$OUT/EMULATOR_HOST_FAILURES.txt" || true
+  # Decode bounded exception/module metadata locally. Raw minidumps can contain
+  # process memory and are deliberately never copied into uploaded artifacts.
+  python3 tools/i18n/e2e/emulator_crash.py /tmp/android-runner \
+    > "$OUT/EMULATOR_CRASH_METADATA.json" 2>/dev/null || true
   if [[ -n "$PROBE_PID" ]]; then
     timeout 10s adb shell am force-stop com.zenstudy.focus.e2e || true
     kill "$PROBE_PID" 2>/dev/null || true
