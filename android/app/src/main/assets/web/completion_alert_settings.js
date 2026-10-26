@@ -88,22 +88,65 @@ function createCompletionAlerts(cfg,options={}){
 }
 function mountCompletionAlertPicker(host,engine,opts={}){
  if(!host||!host.ownerDocument||!engine||typeof engine.update!=="function")throw new TypeError("host and engine required");
- const doc=host.ownerDocument,t=typeof opts.translate==="function"?opts.translate:(key,fallback)=>fallback,settings=engine.getSettings();
- const wrap=doc.createElement("div");wrap.className="completion-alert-picker";
+ const doc=host.ownerDocument,t=typeof opts.translate==="function"?opts.translate:(_key,fallback)=>fallback;
+ const settings=engine.getSettings(),locale=String(opts.locale||(doc.documentElement&&doc.documentElement.lang)||(doc.documentElement&&doc.documentElement.dir==='rtl'?'ar':'en')).split(/[-_]/)[0].toLowerCase();
+ const wrap=doc.createElement("section");wrap.className="completion-alert-picker";wrap.setAttribute("dir",['ar','fa','ur'].includes(locale)?'rtl':'ltr');
+ const css=[
+ ".completion-alert-picker{width:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:clamp(12px,3vw,18px);background:#fff;border:1px solid #dbe5f1;border-radius:20px;color:#19324f;font-size:14px;line-height:1.45}",
+ ".completion-alert-picker *{box-sizing:border-box;min-width:0}",
+ ".completion-alert-picker h3{margin:0 0 12px;font-size:clamp(18px,4.5vw,22px);font-weight:800;text-align:start;line-height:1.3}",
+ ".completion-alert-picker fieldset{min-width:0;max-width:100%;margin:0;padding:0;border:0}",
+ ".completion-alert-picker legend{padding:0;margin:0 0 6px;font-size:13px;font-weight:750;color:#546983}",
+ ".completion-alert-picker .completion-alert-option{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border-bottom:1px solid #eaf0f7;padding-block:9px;min-height:52px}",
+ ".completion-alert-picker .cap-option-label{display:flex;gap:10px;align-items:center;font-size:14px;line-height:1.4;font-weight:600;cursor:pointer;min-height:44px;overflow-wrap:anywhere}",
+ ".completion-alert-picker .cap-option-name{min-width:0;flex:1;overflow-wrap:anywhere}",
+ ".completion-alert-picker .cap-option-label input[type=radio]{flex:0 0 20px;width:20px!important;min-width:20px!important;height:20px;margin:0;accent-color:#3b82f6}",
+ ".completion-alert-picker .cap-preview{min-height:44px;min-width:72px;max-width:110px;padding:8px;border-radius:12px;border:1px solid #ccdaea;background:#f2f7ff;color:#25538b;font:inherit;font-size:12px;font-weight:750;cursor:pointer;overflow-wrap:anywhere}",
+ ".completion-alert-picker .cap-preview:focus-visible,.completion-alert-picker input:focus-visible{outline:3px solid #1762d0;outline-offset:2px}",
+ ".completion-alert-picker .cap-setting{display:flex;align-items:center;gap:10px;margin-block:12px;font-size:14px;min-height:44px;cursor:pointer;font-weight:650}",
+ ".completion-alert-picker .cap-setting input[type=checkbox]{flex:0 0 21px;width:21px!important;height:21px;margin:0;accent-color:#3b82f6}",
+ ".completion-alert-picker .cap-volume-header{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700}",
+ ".completion-alert-picker .cap-volume-output{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums;white-space:nowrap}",
+ ".completion-alert-picker .cap-volume{padding-block:6px 3px}",
+ ".completion-alert-picker .cap-volume input[type=range]{display:block;max-width:100%;width:100%;min-height:36px;margin:3px 0;accent-color:#3b82f6}",
+ "@media(max-width:340px){.completion-alert-picker{padding:10px}.completion-alert-picker .completion-alert-option{gap:5px}.completion-alert-picker .cap-preview{min-width:64px;max-width:78px;padding:5px;font-size:11px}}"
+ ].join("");
+ const style=doc.createElement("style");style.textContent=css;wrap.appendChild(style);
  const heading=doc.createElement("h3");heading.textContent=t("completionAlerts.title","Completion sound");wrap.appendChild(heading);
  const group=doc.createElement("fieldset"),legend=doc.createElement("legend");legend.textContent=t("completionAlerts.choose","Choose a sound");group.appendChild(legend);
  const radios=[];
  for(const choice of CHOICES){
   const line=doc.createElement("div");line.className="completion-alert-option";
-  const label=doc.createElement("label"),radio=doc.createElement("input");radio.type="radio";radio.name="completion-alert-choice";radio.value=choice.id;radio.checked=choice.id===settings.sound;radio.addEventListener("change",()=>{if(radio.checked){if(!engine.update({sound:choice.id}))radio.checked=false;sync()}});label.appendChild(radio);label.appendChild(doc.createTextNode(" "+t("completionAlerts."+choice.id,choice.label)));line.appendChild(label);radios.push(radio);
-  if(choice.file){const preview=doc.createElement("button");preview.type="button";preview.textContent=t("completionAlerts.preview","Preview");preview.setAttribute("aria-label",t("completionAlerts.preview","Preview")+" "+t("completionAlerts."+choice.id,choice.label));preview.addEventListener("click",()=>{engine.preview(choice.id)});line.appendChild(preview)}
+  const label=doc.createElement("label");label.className="cap-option-label";
+  const radio=doc.createElement("input");radio.type="radio";radio.name="completion-alert-choice";radio.value=choice.id;radio.checked=choice.id===settings.sound;
+  radio.addEventListener("change",()=>{if(radio.checked){engine.update({sound:choice.id});sync()}});
+  const caption=doc.createElement("span");caption.className="cap-option-name";caption.textContent=t("completionAlerts."+choice.id,choice.label);
+  label.appendChild(radio);label.appendChild(caption);line.appendChild(label);radios.push(radio);
+  if(choice.file){
+   const preview=doc.createElement("button");preview.type="button";preview.className="cap-preview";
+   preview.textContent=t("completionAlerts.preview","Preview");
+   preview.setAttribute("aria-label",t("completionAlerts.preview","Preview")+" "+caption.textContent);
+   preview.addEventListener("click",()=>{engine.preview(choice.id)});line.appendChild(preview);
+  }
   group.appendChild(line);
- }wrap.appendChild(group);
- const enabled=doc.createElement("input");enabled.type="checkbox";enabled.checked=settings.enabled;enabled.addEventListener("change",()=>{if(!engine.update({enabled:enabled.checked}))sync()});
- const enabledLabel=doc.createElement("label");enabledLabel.appendChild(enabled);enabledLabel.appendChild(doc.createTextNode(" "+t("completionAlerts.enabled","Enable completion sound")));wrap.appendChild(enabledLabel);
- const volumeLabel=doc.createElement("label");volumeLabel.textContent=t("completionAlerts.volume","Alert volume");const slider=doc.createElement("input");slider.type="range";slider.min="0";slider.max="100";slider.step="1";slider.value=String(settings.volume);slider.setAttribute("aria-label",t("completionAlerts.volume","Alert volume"));slider.addEventListener("change",()=>{if(!engine.update({volume:Number(slider.value)}))sync()});volumeLabel.appendChild(slider);wrap.appendChild(volumeLabel);
- function sync(){const p=engine.getSettings();enabled.checked=p.enabled;slider.value=String(p.volume);radios.forEach(r=>r.checked=r.value===p.sound)}
- host.replaceChildren(wrap);return Object.freeze({refresh:sync,unmount:()=>{engine.pause();if(wrap.parentNode===host)host.removeChild(wrap)}});
+ }
+ wrap.appendChild(group);
+ const enabledLabel=doc.createElement("label");enabledLabel.className="cap-setting";
+ const enabled=doc.createElement("input");enabled.type="checkbox";enabled.checked=settings.enabled;
+ enabled.addEventListener("change",()=>{engine.update({enabled:enabled.checked});sync()});
+ const enabledText=doc.createElement("span");enabledText.textContent=t("completionAlerts.enabled","Enable completion sound");
+ enabledLabel.appendChild(enabled);enabledLabel.appendChild(enabledText);wrap.appendChild(enabledLabel);
+ const volumeWrap=doc.createElement("div");volumeWrap.className="cap-volume";
+ const volumeHeader=doc.createElement("div");volumeHeader.className="cap-volume-header";
+ const volumeText=doc.createElement("label");volumeText.textContent=t("completionAlerts.volume","Alert volume");
+ const slider=doc.createElement("input");slider.type="range";slider.min="0";slider.max="100";slider.step="1";slider.value=String(settings.volume);slider.setAttribute("aria-label",volumeText.textContent);
+ const output=doc.createElement("output");output.className="cap-volume-output";output.textContent=String(settings.volume)+"%";
+ slider.addEventListener("input",()=>{output.textContent=String(slider.value)+"%"});
+ slider.addEventListener("change",()=>{engine.update({volume:Number(slider.value)});sync()});
+ volumeHeader.appendChild(volumeText);volumeHeader.appendChild(output);volumeWrap.appendChild(volumeHeader);volumeWrap.appendChild(slider);wrap.appendChild(volumeWrap);
+ function sync(){const p=engine.getSettings();enabled.checked=p.enabled;slider.value=String(p.volume);output.textContent=String(p.volume)+"%";radios.forEach(r=>r.checked=r.value===p.sound)}
+ host.replaceChildren(wrap);
+ return Object.freeze({refresh:sync,unmount:()=>{engine.pause();if(wrap.parentNode===host)host.removeChild(wrap)}});
 }
 const api=Object.freeze({CHOICES,readCompletionAlertSettings,updateCompletionAlertSettings,createCompletionAlerts,mountCompletionAlertPicker});
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
