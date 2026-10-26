@@ -5,6 +5,7 @@ Raw reports may contain credentials. Only fixed aggregate labels are printed.
 Every detection still requires review and the primary scanner remains fail-closed.
 """
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -128,6 +129,7 @@ def triage(report_path: Path, repo: Path, sha: str) -> dict:
         if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
             return blocked
         counts = {key: 0 for key in CATEGORIES}
+        unresolved_evidence = []
         public_constants = compatibility_constants(repo)
         for row in rows:
             secret = row.get("Secret")
@@ -142,8 +144,21 @@ def triage(report_path: Path, repo: Path, sha: str) -> dict:
             else:
                 category = source_context_candidate(repo, row) if row.get("RuleID") == "generic-api-key" else "unresolved"
             counts[category] += 1
+            if category == "unresolved" and len(unresolved_evidence) < 8:
+                raw_path = row.get("File")
+                raw_path = raw_path if isinstance(raw_path, str) and len(raw_path) <= 8192 else ""
+                commit = row.get("Commit")
+                commit = commit if isinstance(commit, str) and SHA.fullmatch(commit) else ""
+                line = row.get("StartLine")
+                line = line if type(line) is int and 0 <= line <= 100000000 else 0
+                unresolved_evidence.append({
+                    "path_sha256_16": hashlib.sha256(raw_path.encode("utf-8")).hexdigest()[:16] if raw_path else "",
+                    "commit_sha256_16": hashlib.sha256(commit.encode("ascii")).hexdigest()[:16] if commit else "",
+                    "line": line,
+                })
         return {"sha": sha, "status": "REVIEW_REQUIRED" if rows else "NO_FINDINGS",
-                "findings": len(rows), "categories": counts}
+                "findings": len(rows), "categories": counts,
+                "unresolved_evidence": unresolved_evidence}
     except (OSError, UnicodeError, ValueError, RecursionError):
         return blocked
 
