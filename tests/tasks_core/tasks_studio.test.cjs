@@ -306,7 +306,9 @@ test('DF05: Tasks Today/Upcoming/Overdue/Completed tabs and project filter are r
  tab('Upcoming');assert.deepEqual(shown(),['Future']);
  tab('Overdue');assert.deepEqual(shown(),['Late']);
  tab('Completed');assert.deepEqual(shown(),['Finished']);
- tab('List');
+ const modes=root.descendants.find(x=>x.className==='df-view-mode');
+ assert.ok(modes,'List view is retained in the secondary selector');
+ modes.value='all';modes.dispatch('change');
  const projects=root.descendants.find(x=>x.tagName==='SELECT'&&x.attributes['aria-label']==='Filter by project');
  assert.ok(projects);
  projects.value='2';projects.dispatch('change');
