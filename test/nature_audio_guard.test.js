@@ -101,6 +101,12 @@ assert.strictEqual(pauseCalls, 1, "HTMLAudioElement must be paused, not only sto
 assert.strictEqual(htmlAudio.currentTime, 0, "HTMLAudioElement playback position must reset");
 assert.strictEqual(activeChannels.size, 0);
 
+const badPlayerResult = playSoundChannel(
+  {...verifiedSound,id:"broken-player"}, () => undefined, mockTimer);
+assert.strictEqual(badPlayerResult.status, "AUDIO_FAILED_SAFELY_ISOLATED");
+assert.strictEqual(activeChannels.has("broken-player"), false,
+  "Factory returning undefined must not leave a ghost entry");
+
 const volumeAudio = {play(){},pause(){},volume:1};
 playSoundChannel({...verifiedSound,id:"volume-audio"},()=>volumeAudio,mockTimer);
 assert.strictEqual(setSoundChannelVolume("volume-audio",0.3).status,"VOLUME_UPDATED");
