@@ -62,3 +62,26 @@ test('render is inert without a host element and uses western count and inert la
   assert.doesNotThrow(()=>lib.render('all','en',{},new Set()));
  }finally{if(original===undefined)delete global.document;else global.document=original}
 });
+
+test('regional locale codes keep nature-library translations and RTL content',()=>{
+ const previous=global.document;
+ const make=tag=>({
+  tagName:tag,children:[],className:'',textContent:'',dir:'',attributes:{},
+  append(...xs){this.children.push(...xs)},
+  replaceChildren(...xs){this.children=[...xs]},
+  setAttribute(key,value){this.attributes[key]=value}
+ });
+ const host=make('div');
+ global.document={getElementById:id=>id==='natureLibraryV2'?host:null,createElement:make};
+ try {
+  lib.render('all','ar-JO',{},new Set());
+  assert.equal(host.children[0].textContent,lib.messages.ar.heading,
+   'Arabic regional language must not silently fall back to English');
+  assert.equal(host.children[2].children[0].children[1].textContent,lib.messages.ar.pending);
+  lib.render('all','de_DE',{},new Set());
+  assert.equal(host.children[0].textContent,lib.messages.de.heading);
+  lib.render('all','__proto__',{},new Set());
+  assert.equal(host.children[0].textContent,lib.messages.en.heading,
+   'unknown/prototype keys must not be mistaken for translations');
+ } finally {if(previous===undefined)delete global.document;else global.document=previous;}
+});
