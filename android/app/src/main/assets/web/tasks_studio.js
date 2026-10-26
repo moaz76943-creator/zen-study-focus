@@ -205,7 +205,7 @@
     if(apply(s=>C.createTask(s,{title},{noteIds:adapter.noteIds?.()})))quickSubmitted=true;
    });
    if(editing!==null)content.appendChild(editor());
-   content.appendChild(quickForm);
+   else content.appendChild(quickForm);
    const today=el('section','df-panel'),top=el('h3','',l.today);today.appendChild(top);
    const top3=C.topThree(state,currentDay());if(!top3.length)today.appendChild(el('p','df-muted',l.empty));else top3.forEach(t=>today.appendChild(taskCard(t)));
    content.appendChild(today);
