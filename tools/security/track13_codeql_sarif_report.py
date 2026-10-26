@@ -8,7 +8,7 @@ from pathlib import Path
 
 SHA = re.compile(r"[a-f0-9]{40}\Z")
 MAX_BYTES = 32 * 1024 * 1024
-SAFE_CODEQL_RULE = re.compile(r"js/[a-z0-9-]{1,64}\Z")
+SAFE_CODEQL_RULE = re.compile(r"js/[a-z0-9-]{1,64}(?:/[a-z0-9-]{1,64}){0,3}\Z")
 MAX_RULE_GROUPS = 24
 MAX_EVIDENCE = 16
 
@@ -25,6 +25,7 @@ def summarize(directory: Path, sha: str) -> dict:
         count = 0
         rule_counts = {}
         unclassified_reasons = {}
+        unclassified_structure = {}
         evidence = []
         for path in paths:
             if path.stat().st_size > MAX_BYTES:
@@ -68,7 +69,7 @@ def summarize(directory: Path, sha: str) -> dict:
                             output["reason"] = "SARIF_INVALID"
                             return output
                         raw_rule = descriptor_id
-                    rule = raw_rule if isinstance(raw_rule, str) and SAFE_CODEQL_RULE.fullmatch(raw_rule) else "unknown"
+                    rule = raw_rule if isinstance(raw_rule, str) and len(raw_rule) <= 128 and SAFE_CODEQL_RULE.fullmatch(raw_rule) else "unknown"
                     if rule == "unknown":
                         if raw_rule is None:
                             reason = "MISSING_RULE_ID"
@@ -76,6 +77,18 @@ def summarize(directory: Path, sha: str) -> dict:
                             reason = "INVALID_RULE_ID_TYPE"
                         elif raw_rule.startswith("js/"):
                             reason = "UNSUPPORTED_JS_RULE_ID"
+                            suffix = raw_rule[3:]
+                            if len(raw_rule) > 128 or any(len(part) > 64 for part in suffix.split("/")):
+                                shape = "TOO_LONG"
+                            elif "_" in suffix:
+                                shape = "HAS_UNDERSCORE"
+                            elif "." in suffix:
+                                shape = "HAS_DOT"
+                            elif "/" in suffix:
+                                shape = "HAS_NESTED_SEPARATOR"
+                            else:
+                                shape = "OTHER_SYNTAX"
+                            unclassified_structure[shape] = unclassified_structure.get(shape, 0) + 1
                         elif re.fullmatch(r"[a-z][a-z0-9-]*/[a-z0-9-]+", raw_rule):
                             reason = "OTHER_LANGUAGE_RULE_ID"
                         else:
@@ -101,7 +114,7 @@ def summarize(directory: Path, sha: str) -> dict:
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError, RecursionError):
         output["reason"] = "SARIF_INVALID"
         return output
-    output.update(findings=count, status="PASS" if count == 0 else "FAIL", reason="ZERO_FINDINGS" if count == 0 else "CODEQL_FINDINGS", rule_counts=dict(sorted(rule_counts.items())), unclassified_reasons=dict(sorted(unclassified_reasons.items())), evidence=evidence)
+    output.update(findings=count, status="PASS" if count == 0 else "FAIL", reason="ZERO_FINDINGS" if count == 0 else "CODEQL_FINDINGS", rule_counts=dict(sorted(rule_counts.items())), unclassified_reasons=dict(sorted(unclassified_reasons.items())), unclassified_structure=dict(sorted(unclassified_structure.items())), evidence=evidence)
     return output
 
 
