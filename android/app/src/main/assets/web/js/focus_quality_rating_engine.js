@@ -75,7 +75,7 @@
 
   function toWesternDigits(num) {
     const val = Number(num);
-    if (isNaN(val)) return '0';
+    if (!Number.isFinite(val)) return '0';
     return Math.round(val).toString();
   }
 
