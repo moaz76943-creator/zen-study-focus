@@ -441,7 +441,8 @@
     if(!instance)return {};
     const f=instance.fields;
     return {cornell:{cues:f.cues.value,notes:f.notes.value,summary:f.summary.value},
-      notebookId:f.notebook.value,tags:f.tags.value,recallPairs:collectPairs(true)};
+      notebookId:f.notebook.value,tags:f.tags.value,recallPairs:collectPairs(true),
+      baseFingerprint:instance.openedSnapshot};
   }
   function restoreDraftFields(d){
     if(!instance||!d)return;
@@ -635,5 +636,6 @@
     showType();
   }
   return Object.freeze({createController,parseTags,formatSelection,toggleChecklistLine,findOccurrences,renderText,
-    install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader,translate});
+    install,renderStack,onOpen,onTemplate,draftFields,restoreDraftFields,save,showReader,translate,
+    openedFingerprint:()=>instance?.openedSnapshot??null});
 });
