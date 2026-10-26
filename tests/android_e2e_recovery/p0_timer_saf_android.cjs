@@ -225,8 +225,20 @@ async function openDocument(name,code){
  }
  xml=dumpUI();
  saveSafPickerEvidence(name+'_selected',xml);
- if(/package="com\.google\.android\.documentsui"/.test(xml))
+ if(/package="com\.google\.android\.documentsui"/.test(xml)){
+  if(process.env.DF_ANDROID_DISPOSABLE==='1'&&process.env.RUNNER_TEMP){
+   try{
+    const activity=adb('shell','dumpsys','activity','activities');
+    const lines=activity.split('\n').filter(line=>/topResumedActivity|mResumedActivity|mFocusedApp/.test(line));
+    const events=adb('logcat','-d','-t','150','PickActivity:W','Documents:W','DirectoryFragment:W','*:S');
+    const counts={};
+    for(const word of ['SecurityException','Permission Denial','not allowed','cannot be shared','No Document','not enabled'])
+     counts[word]=events.split(word).length-1;
+    fs.writeFileSync(require('node:path').join(process.env.RUNNER_TEMP,'df-pr01-android','picker-activation-metadata.json'),JSON.stringify({foreground:lines,diagnostic_counts:counts}));
+   }catch(_){}
+  }
   throw Error('TRANSPORT: actual file selection did not exit DocumentsUI: '+name);
+ }
 }
 async function confirmDialog(accept){
  const u=await nativeUI('app-owned confirmation',x=>/text="Deep Focus"/.test(x)&&uiNodes(x).find(n=>n.includes('resource-id="android:id/button'+(accept?'1':'2')+'"')),false);
@@ -239,6 +251,23 @@ async function safMain(){
   assert.equal((await receipt()).valid,true);
  });
  if(report.results.at(-1).status!=='PASS')return;
+ await run('locale_native_ack_process_restart',async()=>{
+  const records=await fixture();
+  await evaluate("applyLanguage('ar');true");
+  assert.equal((await snapshot()).cfg.lang,'ar');
+  assert.equal((await receipt()).valid,true,'Locale must have a matching native receipt before kill');
+  await restart();
+  assert.equal((await snapshot()).cfg.lang,'ar','Acknowledged locale lost after process kill');
+  assert.equal(await evaluate("document.documentElement.lang"),'ar');
+  assert.deepEqual(await fixture(),records,'Locale restart changed Tasks/Notes or unknown fields');
+  assert.equal((await receipt()).valid,true);
+  await evaluate("applyLanguage('en');true");
+  assert.equal((await receipt()).valid,true);
+  return 'Actual applyLanguage path, matching six-packet native ACK, force-stop/relaunch and exact locale/records verified';
+ });
+ for(const key of ['zen_fortress_cfg_v21','zen_fortress_cfg_v21_mirror','tasks_v21','tasks_v21_mirror','notes_v21','notes_v21_mirror']){
+  await run('failed_save_rollback_'+key,()=>injectWriteFailure(key));
+ }
  const baseline=await fixture(),code=await evaluate('generateEncryptedBackupCode()');
  await run('saf_picker_cancel',async()=>{
   const before=await snapshot(),ack=await receipt();await evaluate('setTimeout(()=>ZenNative.importBackupFromFile(),0);true');
