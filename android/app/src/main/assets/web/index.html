@@ -633,6 +633,7 @@
   <link rel="stylesheet" href="white_2100.css">
   <link rel="stylesheet" href="design_tokens_v22.css">
   <link rel="stylesheet" href="ui_components_v22.css">
+  <link rel="stylesheet" href="completion_alert_picker.css">
   <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
   <style id="western-digits-enforcement-style">
     input[type="date"], input[type="time"], .date-display, [data-date] {
@@ -1003,6 +1004,7 @@
           <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
         </div>
 
+        <section id="df-tone-picker-card" aria-label="Completion sound"><div id="completionAlertPickerHost"></div></section>
         <div class="sounds-photo-grid" id="soundsGridBox"></div>
       </main>
 
@@ -1261,6 +1263,8 @@
   <script src="sound_mix_controls.js"></script>
   <script src="js/locale_audio_settings_bridge.js"></script>
   <script src="integration_v22.js"></script>
+  <script src="completion_alert_locales.js"></script>
+  <script src="js/completion_tone_picker.js"></script>
   <script src="js/deep_focus_runtime_activator.js"></script>
 </body>
 </html>
