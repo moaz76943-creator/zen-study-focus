@@ -190,3 +190,48 @@ test('actual app language switch keeps v21 values and reopens saved offline loca
   assert.equal(saved.focusMin,25);
   assert.ok(writes>=5);
 });
+
+test('date-only Analytics calendar labels never shift a day in western time zones',()=>{
+  const {spawnSync}=require('node:child_process');
+  const localeModule=path.join(web,'localization_20_recovery.js');
+  const program='const l=require('+JSON.stringify(localeModule)+');'+
+    'process.stdout.write(l.formatDate("2026-10-19","en",'+
+    '{year:"numeric",month:"2-digit",day:"2-digit"}));';
+  for(const zone of ['America/Los_Angeles','Pacific/Honolulu','Asia/Amman']){
+    const result=spawnSync(process.execPath,['-e',program],{
+      env:{...process.env,TZ:zone},encoding:'utf8',timeout:15000
+    });
+    assert.equal(result.status,0,zone+': '+result.stderr);
+    assert.equal(result.stdout,'10/19/2026',zone+': calendar day drift');
+  }
+});
+
+test('coverage separates missing fallback, English-identical source, and non-English source',()=>{
+  const {classifySourceLabels}=require('../tools/localization_100/analytics_live_99_report.cjs');
+  const original={title:'Recorded analytics',year:'Year',export:'Export CSV',sessions:'Sessions'};
+  const active={title:'Statistiques',year:'Year',export:'Export CSV'};
+  const classified=classifySourceLabels(Object.keys(original),original,key=>
+    Object.prototype.hasOwnProperty.call(active,key)?active[key]:null);
+  assert.equal(classified.explicitSourceKeys,3);
+  assert.equal(classified.nonEnglishSourceKeys,1);
+  assert.equal(classified.englishIdenticalCandidates,2);
+  assert.deepEqual(classified.identicalKeys,['year','export']);
+  assert.equal(classified.englishFallbackKeys,1);
+  assert.deepEqual(classified.missingKeys,['sessions']);
+  assert.equal(classified.explicitSourceKeys,
+    classified.nonEnglishSourceKeys+classified.englishIdenticalCandidates);
+});
+test('live Analytics inventory never certifies source-identical English candidates',()=>{
+  const audit=require('../tools/localization_100/analytics_live_99_report.cjs').report();
+  assert.equal(audit.registered,99);
+  for(const entry of audit.languages.filter(x=>!['en','ar'].includes(x.code))){
+    assert.equal(entry.explicitSourceKeys,
+      entry.nonEnglishSourceKeys+entry.englishIdenticalCandidates,entry.code);
+    assert.equal(entry.explicitSourceKeys+entry.englishFallbackKeys,entry.totalKeys,entry.code);
+    assert.equal(entry.translationFullyReviewed,false);
+    assert.equal(entry.androidVerified,false);
+    assert.ok(Array.isArray(entry.identicalKeys));
+  }
+  assert.equal(audit.certifiedLanguages,0);
+  assert.equal(audit.releaseApproved,false);
+});

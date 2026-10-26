@@ -195,7 +195,7 @@
     if(!host)return false;
     const code=normalize(doc.documentElement.lang||'en');
     const raw=(()=>{try{return root.localStorage?.getItem('df_end_tone');}catch(_){return null;}})();
-    const current=CHOICES.includes(raw)?raw:'zen_bell';
+    let current=CHOICES.includes(raw)?raw:'zen_bell';
     const el=(type,cls)=>{const n=doc.createElement(type);if(cls)n.className=cls;return n;};
     const card=el('div','completion-alert-picker');
     const h=el('h3');h.textContent=localize(code,'title');card.appendChild(h);
@@ -210,6 +210,7 @@
         if(!radio.checked)return;
         try {
           root.localStorage.setItem('df_end_tone',id);
+          current=id;
           for(const input of host.querySelectorAll('input[name="df-completion-tone-choice"]')) input.checked=(input.value===id);
         } catch(_) {
           radio.checked=false;

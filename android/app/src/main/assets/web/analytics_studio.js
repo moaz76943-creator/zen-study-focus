@@ -216,8 +216,15 @@
       for(const title of [t.start,t.sessions,t.activity,t.minutes,t.tasks])
         headers.appendChild(mk('th',title));
       head.appendChild(headers);table.appendChild(head);
-      const body=mk('tbody');
-      for(const item of rows.slice(0,200)){
+      const body=mk('tbody'),more=mk('button');
+      more.type='button';
+      more.setAttribute('data-drilldown-more','true');
+      more.style.cssText='min-height:42px;background:#f8fafc;color:#14213d;border:1px solid #cbd5e1;border-radius:10px;padding:8px 12px;margin-top:8px';
+      let shown=0;
+      function appendPage(){
+        if(destroyed)return;
+        const next=Math.min(rows.length,shown+200);
+        for(const item of rows.slice(shown,next)){
         const tr=mk('tr');
         for(const value of [item.date,item.id,labels[item.domain],item.minutes])
           tr.appendChild(mk('td',String(value)));
@@ -235,7 +242,9 @@
               if(matches.length!==1||matches[0].archived===true||
                  matches[0].status==='archived'||matches[0].isStarter===true||
                  matches[0].isDemo===true||matches[0].synthetic===true||
-                  ['demo','sample','fixture'].includes(matches[0].source))return;
+                  core.isSyntheticSource(matches[0].source)||
+                  typeof matches[0].title!=='string'||
+                  typeof matches[0].done!=='boolean')return;
               opts.onOpenTask(item.taskId);
             });
             cell.appendChild(button);
@@ -243,8 +252,14 @@
         }
         tr.appendChild(cell);body.appendChild(tr);
       }
+        shown=next;
+        if(shown<rows.length)more.textContent='+ '+t.sessions+': '+shown+' / '+rows.length;
+        else more.remove();
+      }
+      more.addEventListener('click',appendPage);
       table.appendChild(body);detail.appendChild(table);
-      if(rows.length>200)detail.appendChild(mk('p','200 / '+rows.length));
+      if(rows.length>200)detail.appendChild(more);
+      appendPage();
     }
     for(const [days,key] of [[1,'today'],[7,'last7'],[30,'last30']]){
       const button=mk('button',t[key]);button.type='button';
@@ -335,6 +350,17 @@
       if(event.type==='keydown')event.preventDefault();
       if(!current)return;
       const day=node.getAttribute('data-day');
+      // The year heatmap covers dates beyond the currently selected report.
+      // Fetch just the clicked credited day without changing KPIs or CSV filters.
+      if(event.currentTarget===heat&&core.validDay(day)&&
+         (day<current.period.startDate||day>current.period.endDate)){
+        const dayReport=core.buildReport(provider(),{
+          today:opts.today||core.localToday(),
+          startDate:day,endDate:day,domain:domain.value
+        });
+        displayRows(dayReport.sessions,day);
+        return;
+      }
       const group=currentSeries.find(r=>r.key===day);
       const isMonth=/^\d{4}-\d{2}$/.test(day);
       let matching;

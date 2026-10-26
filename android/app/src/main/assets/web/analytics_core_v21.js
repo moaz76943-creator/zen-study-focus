@@ -10,6 +10,8 @@
   const aliases = Object.freeze({study:'study', read:'read', review:'read', work:'work', exam:'work', sport:'sport'});
   const own = (o,k) => Object.prototype.hasOwnProperty.call(o,k);
   const isRecord = v => v !== null && typeof v === 'object' && !Array.isArray(v);
+  const isSyntheticSource = value => typeof value === 'string' &&
+    ['demo','sample','fixture'].includes(value.trim().toLowerCase());
   function validDay(s) {
     if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
     const d = new Date(s+'T12:00:00Z');
@@ -58,7 +60,7 @@
       let reason;
       const id=isRecord(s) ? idKey(s.id) : null;
       if (!isRecord(s)) reason='INVALID_RECORD';
-      else if (s.isStarter === true || s.isDemo === true || s.synthetic === true || ['demo','sample','fixture'].includes(s.source)) reason='SAMPLE';
+      else if (s.isStarter === true || s.isDemo === true || s.synthetic === true || isSyntheticSource(s.source)) reason='SAMPLE';
       else if (nonFocusRecord(s)) reason='NON_FOCUS';
       else if (!id) reason='INVALID_ID';
       else if (!cachedValidDay(s.date)) reason='INVALID_DATE';
@@ -94,25 +96,36 @@
   function taskReport(tasks,projects=[],today=localToday()) {
     const seen=new Set(),valid=[];let excluded=0;
     (Array.isArray(tasks)?tasks:[]).forEach(t=>{
-      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||['demo','sample','fixture'].includes(t.source)||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
+      if(!isRecord(t)||t.isStarter===true||t.isDemo===true||t.synthetic===true||isSyntheticSource(t.source)||!Number.isSafeInteger(t.id)||t.id<0||seen.has(t.id)||typeof t.title!=='string'||typeof t.done!=='boolean'){excluded++;return;}
       seen.add(t.id);valid.push(t);
     });
     const active=valid.filter(t=>t.status!=='archived'&&t.archived!==true);
     const done=active.filter(t=>t.done || t.status==='completed').length;
-    const projectsMap=new Map();
-    (Array.isArray(projects)?projects:[]).forEach(p=>{if(isRecord(p)&&p.isStarter!==true&&p.isDemo!==true&&p.synthetic!==true&&
-      !['demo','sample','fixture'].includes(p.source)&&idKey(p.id)!==null&&!projectsMap.has(idKey(p.id)))projectsMap.set(idKey(p.id),{id:p.id,name:typeof p.name==='string'?p.name:'',total:0,completed:0});});
+    const projectsMap=new Map(),ambiguousProjects=new Set();
+    (Array.isArray(projects)?projects:[]).forEach(p=>{
+      if(!isRecord(p)||p.isStarter===true||p.isDemo===true||p.synthetic===true||
+         isSyntheticSource(p.source))return;
+      const key=idKey(p.id);
+      if(key===null||ambiguousProjects.has(key))return;
+      if(projectsMap.has(key)){
+        projectsMap.delete(key);
+        ambiguousProjects.add(key);
+        return;
+      }
+      projectsMap.set(key,{id:p.id,name:typeof p.name==='string'?p.name:'',total:0,completed:0});
+    });
     for(const t of active){const key=idKey(t.projectId);if(key && projectsMap.has(key)){const p=projectsMap.get(key);p.total++;if(t.done||t.status==='completed')p.completed++;}}
     return {total:active.length,completed:done,remaining:active.length-done,archived:valid.length-active.length,
       overdue:active.filter(t=>!t.done&&t.status!=='completed'&&validDay(t.dueDate)&&t.dueDate<today).length,
       completionRate:active.length?Math.round(done/active.length*10000)/100:null,excluded,
       projects:[...projectsMap.values()]};
   }
-  function dailyGoalReport(rows, goals, startDate,endDate) {
+  function dailyGoalReport(rows, goals, startDate,endDate,selectedDomain='all') {
     // Goals must be explicitly supplied as minutes per day, never inferred from focus presets.
     if(!isRecord(goals))return {available:false,byDomain:[],days:0};
     const days=dayNumber(endDate)-dayNumber(startDate)+1,out=[];
-    for(const domain of DOMAINS){const n=goals[domain];if(typeof n!=='number'||!Number.isFinite(n)||n<=0||n>1440)continue;
+    for(const domain of DOMAINS){if(selectedDomain!=='all'&&domain!==selectedDomain)continue;
+      const n=goals[domain];if(typeof n!=='number'||!Number.isFinite(n)||n<=0||n>1440)continue;
       const actual=summarize(rows.filter(s=>s.domain===domain)).minutes,target=n*days;
       out.push({domain,actualMinutes:actual,targetMinutes:target,progress:Math.round(actual/target*10000)/100});}
     return {available:out.length>0,days,byDomain:out};
@@ -181,7 +194,7 @@
     const eligibleTaskIds=new Set(tasks.filter(t=>isRecord(t)&&
       Number.isSafeInteger(t.id)&&t.id>=0&&counts.get(t.id)===1&&
       t.isStarter!==true&&t.isDemo!==true&&t.synthetic!==true&&
-      !['demo','sample','fixture'].includes(t.source)&&
+      !isSyntheticSource(t.source)&&
       t.archived!==true&&t.status!=='archived'&&typeof t.title==='string'&&
       typeof t.done==='boolean').map(t=>t.id));
     const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&
@@ -197,7 +210,7 @@
         if(!weekStartCache.has(s.date))weekStartCache.set(s.date,weekKey(s.date));
         return weekStartCache.get(s.date);
       }),monthly:bucket(rows,s=>s.date.slice(0,7)),byDomain,
-      streaks:streaks(normalized.sessions,today),goals:dailyGoalReport(rows,opts.goals,startDate,endDate),
+      streaks:streaks(normalized.sessions,today),goals:dailyGoalReport(rows,opts.goals,startDate,endDate,domain),
       dashboard,comparison,
       historicalGoals:historicalGoalReport(opts.goalSnapshots ?? snapshot.goalSnapshots ??
         (isRecord(snapshot.cfg)?snapshot.cfg.goalSnapshots:null),rows,startDate,endDate,domain),
@@ -225,6 +238,6 @@
     else throw new RangeError('Unknown export kind');
     return [headers,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n')+'\r\n';
   }
-  return Object.freeze({DOMAINS,validDay,localToday,normalizeSessions,summarize,streaks,
+  return Object.freeze({DOMAINS,validDay,localToday,isSyntheticSource,normalizeSessions,summarize,streaks,
     buildReport,yearHeatmap,taskReport,toCSV});
 });

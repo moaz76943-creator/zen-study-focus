@@ -10,9 +10,11 @@ import android.app.Activity;
 import android.widget.Toast;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.FileOutputStream;
+import android.util.AtomicFile;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -23,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
+    private FocusAppWebChromeClient appDialogs;
     private static final int REQUEST_BACKUP_EXPORT = 7410;
     private static final int REQUEST_BACKUP_IMPORT = 7412;
     private static final int MAX_BACKUP_IMPORT_BYTES = 8 * 1024 * 1024;
@@ -33,13 +36,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Display stays awake only in user-selected Desk Clock mode.
-
-        if (Build.VERSION.SDK_INT >= 33) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
-            }
-        }
 
         WebView.setWebContentsDebuggingEnabled(false);
         if (!"com.zenstudy.focus".equals(getPackageName())) {
@@ -79,16 +75,104 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        webView.setWebChromeClient(new WebChromeClient());
+        appDialogs = new FocusAppWebChromeClient(this);
+        webView.setWebChromeClient(appDialogs);
         webView.loadUrl("file:///android_asset/web/index.html");
     }
 
+    private void requestNotificationPermissionForTimer() {
+        if (Build.VERSION.SDK_INT >= 33
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+        }
+    }
+
+    // Separate, optional active-timer receipt: never alter the six v21 storage keys.
+    private final Object activeTimerCheckpointLock = new Object();
+    private static final int ACTIVE_TIMER_MAX_BYTES = 256 * 1024;
+    private boolean validActiveTimerPacket(String raw) {
+        if (raw == null || raw.getBytes(StandardCharsets.UTF_8).length > ACTIVE_TIMER_MAX_BYTES) return false;
+        try {
+            org.json.JSONObject packet = new org.json.JSONObject(raw);
+            String payload = packet.getString("payload");
+            String sig = packet.getString("sig");
+            int hash = (int)2166136261L;
+            for (char c : (payload + "ZEN_FORTRESS_V21_99812").toCharArray()) {
+                hash ^= c; hash *= 16777619;
+            }
+            if (!Long.toHexString(hash & 0xffffffffL).equals(sig)) return false;
+            org.json.JSONObject state = new org.json.JSONObject(payload);
+            double total = state.getDouble("total"), left = state.getDouble("left");
+            if (!Double.isFinite(total) || !Double.isFinite(left) ||
+                total < 1 || total > 86400 || left < 0 || left > 86400 ||
+                !(state.opt("running") instanceof Boolean)) return false;
+            if (state.getBoolean("running")) {
+                double endAt = state.getDouble("endAt");
+                if (!Double.isFinite(endAt) || endAt <= 0) return false;
+            }
+            return true;
+        } catch (Exception ignored) { return false; }
+    }
+
     public class ZenNativeBridge {
+        // Atomic pause/start checkpoint independent from six-family v21 ACK.
+        @JavascriptInterface
+        public boolean acknowledgeActiveTimerSnapshot(String packet) {
+            if (!validActiveTimerPacket(packet)) return false;
+            final byte[] bytes = packet.getBytes(StandardCharsets.UTF_8);
+            synchronized (activeTimerCheckpointLock) {
+                AtomicFile file = new AtomicFile(new File(getFilesDir(), "active_timer_checkpoint_v1"));
+                FileOutputStream stream = null;
+                try {
+                    stream = file.startWrite();
+                    stream.write(bytes);
+                    stream.getFD().sync();
+                    file.finishWrite(stream);
+                    return java.util.Arrays.equals(bytes, file.readFully());
+                } catch (Exception error) {
+                    if (stream != null) file.failWrite(stream);
+                    return false;
+                }
+            }
+        }
+
+        @JavascriptInterface
+        public String readActiveTimerSnapshot() {
+            synchronized (activeTimerCheckpointLock) {
+                AtomicFile file = new AtomicFile(new File(getFilesDir(), "active_timer_checkpoint_v1"));
+                File base = file.getBaseFile();
+                if (!base.exists() && !new File(base.getPath() + ".bak").exists()) return "NONE";
+                try {
+                    byte[] bytes = file.readFully();
+                    if (bytes.length > ACTIVE_TIMER_MAX_BYTES) return "ERROR";
+                    String raw = new String(bytes, StandardCharsets.UTF_8);
+                    return validActiveTimerPacket(raw) ? raw : "ERROR";
+                } catch (Exception error) { return "ERROR"; }
+            }
+        }
+
+
         // Legacy WebView bridge names retained to preserve old v21 session behavior.
         // No Android Service is started: user countdown end time is handled by AlarmManager.
         @JavascriptInterface
         public void startBackgroundService(int seconds, String title) {
+            if (seconds < 1 || seconds > 86400) return;
             FocusAlarmReceiver.schedule(MainActivity.this, seconds, title);
+        }
+
+        @JavascriptInterface
+        public void setNativeLocale(String languageTag) {
+            if (NativeLocaleStrings.select(MainActivity.this, languageTag)) {
+                FocusAlarmReceiver.refreshLocale(MainActivity.this);
+            }
+        }
+
+        // Consent belongs to an explicit user Start, never restored countdowns.
+        @JavascriptInterface
+        public void requestTimerNotificationPermission() {
+            runOnUiThread(() -> requestNotificationPermissionForTimer());
         }
 
         @JavascriptInterface
@@ -124,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception error) {
                     backupImportPickerOpen = false;
                     Toast.makeText(MainActivity.this,
-                            "Backup picker unavailable; existing data unchanged",
+                            NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_import_picker_unavailable),
                             Toast.LENGTH_LONG).show();
                 }
             });
@@ -147,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivityForResult(intent, REQUEST_BACKUP_EXPORT);
                 } catch (Exception e) {
                     backupAwaitingSave = null;
-                    Toast.makeText(MainActivity.this, "File picker unavailable; use Share Backup",
+                    Toast.makeText(MainActivity.this, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_picker_unavailable),
                             Toast.LENGTH_LONG).show();
                 }
             });
@@ -157,21 +241,22 @@ public class MainActivity extends AppCompatActivity {
         public void shareAppInvite(String statsSummary) {
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
-            share.putExtra(Intent.EXTRA_SUBJECT, "Deep Focus — Study, Workout & Deep Work App");
+            share.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_subject));
             share.putExtra(Intent.EXTRA_TEXT, statsSummary);
-            startActivity(Intent.createChooser(share, "Share Deep Focus via"));
+            startActivity(Intent.createChooser(share, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_chooser)));
         }
 
         @JavascriptInterface
         public void syncBackupToGoogleEmailOrDrive(String encryptedBackupPayload) {
             Intent send = new Intent(Intent.ACTION_SEND);
             send.setType("text/plain");
-            send.putExtra(Intent.EXTRA_SUBJECT, "Deep Focus Manual Backup (UNENCRYPTED) (" + new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date()) + ")");
+            send.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.format(MainActivity.this, R.string.native_backup_share_subject,
+                    new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date())));
             send.putExtra(Intent.EXTRA_TEXT,
-                "This code contains readable notes and tasks. Save it privately: it is NOT encrypted.\n\n" +
-                "--- COPY CODE BELOW ---\n" + encryptedBackupPayload
+                NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_privacy_warning) +
+                NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_copy_heading) + encryptedBackupPayload
             );
-            startActivity(Intent.createChooser(send, "Save Backup to Gmail / Google Drive"));
+            startActivity(Intent.createChooser(send, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_share_chooser)));
         }
     }
 
@@ -207,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
                         webView.evaluateJavascript(script, null);
                 });
             } catch (Exception error) {
-                Toast.makeText(this, "Unable to read backup; data unchanged",
+                Toast.makeText(this, NativeLocaleStrings.get(this, R.string.native_backup_import_failed),
                         Toast.LENGTH_LONG).show();
             }
             return;
@@ -221,12 +306,27 @@ public class MainActivity extends AppCompatActivity {
             if (output == null) throw new java.io.IOException("Cannot open target document");
             output.write(payload.getBytes(StandardCharsets.UTF_8));
             output.flush();
-            Toast.makeText(this, "Backup exported; keep the unencrypted file private",
+            Toast.makeText(this, NativeLocaleStrings.get(this, R.string.native_backup_exported),
                     Toast.LENGTH_LONG).show();
         } catch (Exception error) {
-            Toast.makeText(this, "Unable to save backup; existing data unchanged",
+            Toast.makeText(this, NativeLocaleStrings.get(this, R.string.native_backup_save_failed),
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 101 && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            FocusAlarmReceiver.refreshLocale(this);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (appDialogs != null) appDialogs.cancelPending();
+        super.onDestroy();
     }
 
     @Override
