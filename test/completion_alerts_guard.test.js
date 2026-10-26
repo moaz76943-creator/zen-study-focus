@@ -61,3 +61,33 @@ assert.strictEqual(resError.status, "AUDIO_FAILED_SAFELY_FALLBACK_VISUAL");
 console.log("✔ Test 5: Audio failure safely caught without breaking session flow.");
 
 console.log("--- All Mission #017 Completion Alerts Tests PASSED (GREEN) ---");
+
+
+const noDriverSession={sessionId:"driver-missing"};
+const noDriver=triggerCompletionAlert(noDriverSession,{soundName:"bell",volume:0.5});
+assert.strictEqual(noDriver.played,false,"Missing audio driver must not claim playback");
+assert.strictEqual(noDriver.status,"AUDIO_DRIVER_UNAVAILABLE");
+const recovered=triggerCompletionAlert(noDriverSession,{soundName:"bell",volume:0.5},mockAudioDriver);
+assert.strictEqual(recovered.played,true,"Driver failure must permit retry");
+
+const noSettings=triggerCompletionAlert({sessionId:"settings-missing"},undefined,mockAudioDriver);
+assert.strictEqual(noSettings.status,"ALERT_PLAYED","Missing optional settings must not throw");
+
+const invalidVol=triggerCompletionAlert({sessionId:"negative-volume"},{volume:-4,soundName:"bell"},mockAudioDriver);
+assert.strictEqual(invalidVol.played,false);
+assert.strictEqual(invalidVol.status,"INVALID_ALERT_VOLUME");
+
+(async()=>{
+  const asyncFailure={sessionId:"async-failure"};
+  const rejected=await triggerCompletionAlert(asyncFailure,{soundName:"bell",volume:0.4},
+    {playAlert(){return Promise.reject(new Error("autoplay blocked"));}});
+  assert.strictEqual(rejected.played,false);
+  assert.strictEqual(rejected.status,"AUDIO_FAILED_SAFELY_FALLBACK_VISUAL");
+  const retry=triggerCompletionAlert(asyncFailure,{soundName:"bell",volume:0.4},mockAudioDriver);
+  assert.strictEqual(retry.played,true,"Rejected async player must allow retry");
+
+  const asyncSuccess=await triggerCompletionAlert({sessionId:"async-success"}, {soundName:"bell",volume:0.3},
+     {playAlert(){return Promise.resolve();}});
+  assert.strictEqual(asyncSuccess.played,true);
+  console.log("--- Completion alert async and driver safety cases PASSED ---");
+})().catch(error=>{console.error(error);process.exitCode=1});
