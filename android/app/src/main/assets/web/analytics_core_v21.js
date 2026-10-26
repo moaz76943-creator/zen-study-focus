@@ -33,14 +33,18 @@
     const ms=Date.parse(v);return Number.isFinite(ms) ? ms : null;
   }
   function normalizeSessions(history) {
-    const sessions=[], rejects=[], seen=new Set();
+    const sessions=[], rejects=[], seen=new Set(), dayValidityCache=new Map();
+    const cachedValidDay=day=>{
+      if(!dayValidityCache.has(day))dayValidityCache.set(day,validDay(day));
+      return dayValidityCache.get(day);
+    };
     (Array.isArray(history) ? history : []).forEach((s,index)=>{
       let reason;
       const id=isRecord(s) ? idKey(s.id) : null;
       if (!isRecord(s)) reason='INVALID_RECORD';
       else if (s.isStarter === true || s.isDemo === true || s.synthetic === true || ['demo','sample','fixture'].includes(s.source)) reason='SAMPLE';
       else if (!id) reason='INVALID_ID';
-      else if (!validDay(s.date)) reason='INVALID_DATE';
+      else if (!cachedValidDay(s.date)) reason='INVALID_DATE';
       else if (typeof s.minutes !== 'number' || !Number.isFinite(s.minutes) || s.minutes < 0 || s.minutes > 1440) reason='INVALID_MINUTES';
       else if (!own(aliases,s.domain)) reason='INVALID_DOMAIN';
       else if (seen.has(id)) reason='DUPLICATE_ID';
@@ -107,10 +111,15 @@
     const normalized=normalizeSessions(source);
     const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&(domain==='all'||s.domain===domain));
     const grouped=bucket(rows,s=>s.date),dayMap=new Map(grouped.map(x=>[x.key,x]));
-    const daily=Array.from({length:span},(_,i)=>{const key=fromDayNumber(dayNumber(startDate)+i);return dayMap.get(key)||{key,minutes:0,sessions:0};});
+    const startNumber=dayNumber(startDate);
+    const daily=Array.from({length:span},(_,i)=>{const key=fromDayNumber(startNumber+i);return dayMap.get(key)||{key,minutes:0,sessions:0};});
     const byDomain=Object.fromEntries(DOMAINS.map(k=>[k,summarize(rows.filter(r=>r.domain===k))]));
+    const weekStartCache=new Map();
     return {period:{startDate,endDate,domain,days:span},totals:summarize(rows),daily,
-      weekly:bucket(rows,s=>weekKey(s.date)),monthly:bucket(rows,s=>s.date.slice(0,7)),byDomain,
+      weekly:bucket(rows,s=>{
+        if(!weekStartCache.has(s.date))weekStartCache.set(s.date,weekKey(s.date));
+        return weekStartCache.get(s.date);
+      }),monthly:bucket(rows,s=>s.date.slice(0,7)),byDomain,
       streaks:streaks(normalized.sessions,today),goals:dailyGoalReport(rows,opts.goals,startDate,endDate),
       tasks:taskReport(snapshot.tasksList,snapshot.projects,today),
       quality:{accepted:normalized.sessions.length,inRange:rows.length,excluded:normalized.rejects.length,
