@@ -20,7 +20,7 @@ function setup({running=false,paused=false,allow=false,training=false}={}){
   timerRunning:running,timerSessionId:session?'live-session':null,timerActiveMs:session?100000:0,
   timerResumeMs:session?777:null,timerLeft:850,timerTotal:1500,focusSessionTaskId:session?41:null,
   document:{getElementById(id){assert.equal(id,'modeShortBtn');return {id};}},
-  toggleTimerPlay(){calls.stops++;c.timerRunning=false;},
+  toggleTimerPlay(){calls.stops++;c.timerRunning=false;return true;},
   storeTimerSession(){calls.saves++;},updateTimerDisplay(){calls.updates++;},
   cancelQuickTraining(){calls.trainingCancel++;},skipQuickTrainingStep(){calls.trainingSkip++;},
   selectTimerModeFromUser(mins,mode,btn){calls.selected.push({mins,mode,id:btn.id});return allow;}
