@@ -99,9 +99,19 @@
     });
     const active=valid.filter(t=>t.status!=='archived'&&t.archived!==true);
     const done=active.filter(t=>t.done || t.status==='completed').length;
-    const projectsMap=new Map();
-    (Array.isArray(projects)?projects:[]).forEach(p=>{if(isRecord(p)&&p.isStarter!==true&&p.isDemo!==true&&p.synthetic!==true&&
-      !['demo','sample','fixture'].includes(p.source)&&idKey(p.id)!==null&&!projectsMap.has(idKey(p.id)))projectsMap.set(idKey(p.id),{id:p.id,name:typeof p.name==='string'?p.name:'',total:0,completed:0});});
+    const projectsMap=new Map(),ambiguousProjects=new Set();
+    (Array.isArray(projects)?projects:[]).forEach(p=>{
+      if(!isRecord(p)||p.isStarter===true||p.isDemo===true||p.synthetic===true||
+         ['demo','sample','fixture'].includes(p.source))return;
+      const key=idKey(p.id);
+      if(key===null||ambiguousProjects.has(key))return;
+      if(projectsMap.has(key)){
+        projectsMap.delete(key);
+        ambiguousProjects.add(key);
+        return;
+      }
+      projectsMap.set(key,{id:p.id,name:typeof p.name==='string'?p.name:'',total:0,completed:0});
+    });
     for(const t of active){const key=idKey(t.projectId);if(key && projectsMap.has(key)){const p=projectsMap.get(key);p.total++;if(t.done||t.status==='completed')p.completed++;}}
     return {total:active.length,completed:done,remaining:active.length-done,archived:valid.length-active.length,
       overdue:active.filter(t=>!t.done&&t.status!=='completed'&&validDay(t.dueDate)&&t.dueDate<today).length,
