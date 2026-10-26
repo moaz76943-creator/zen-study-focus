@@ -3218,6 +3218,15 @@ function renderSoundsStudio() {
     `;
     box.appendChild(tile);
   }
+  // Bind reviewed Audio/Settings strings only after creating the visible tiles.
+  // This adapter is display-only; playback and v21 storage stay unchanged.
+  window.DeepFocusAudioSettingsLocale?.bindSoundStudio({
+    document,
+    locale: cfg.lang,
+    catalog: SOUNDS_DATA,
+    category: soundCat,
+    legacy: { locale: cfg.lang, sounds: d.sounds }
+  });
 }
 
 /* ========================================================
