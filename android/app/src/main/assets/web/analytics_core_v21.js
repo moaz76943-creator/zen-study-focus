@@ -115,6 +115,32 @@
       out.push({domain,actualMinutes:actual,targetMinutes:target,progress:Math.round(actual/target*10000)/100});}
     return {available:out.length>0,days,byDomain:out};
   }
+  // Historical goal comparisons require original dated snapshots. Current
+  // mutable goals are not evidence of past targets and must not be backfilled.
+  function historicalGoalReport(snapshots,rows,start,end,selectedDomain) {
+    if(!Array.isArray(snapshots))return {available:false,byDomain:[],snapshotDays:0};
+    const unique=new Map();
+    for(const g of snapshots){
+      if(!isRecord(g)||!validDay(g.date)||g.date<start||g.date>end||
+         !DOMAINS.includes(g.domain)||(selectedDomain!=='all'&&selectedDomain!==g.domain)||
+         typeof g.targetMinutes!=='number'||!Number.isFinite(g.targetMinutes)||
+         g.targetMinutes<=0||g.targetMinutes>1440)continue;
+      const key=g.date+'|'+g.domain;
+      if(!unique.has(key))unique.set(key,{date:g.date,domain:g.domain,targetMinutes:g.targetMinutes});
+    }
+    const byDomain=[];
+    for(const domain of DOMAINS){
+      const dated=[...unique.values()].filter(g=>g.domain===domain);
+      if(!dated.length)continue;
+      const coveredDays=new Set(dated.map(g=>g.date));
+      const actualMinutes=summarize(rows.filter(r=>r.domain===domain&&coveredDays.has(r.date))).minutes;
+      const targetMinutes=summarize(dated.map(g=>({minutes:g.targetMinutes}))).minutes;
+      byDomain.push({domain,actualMinutes,targetMinutes,coverageDays:coveredDays.size,
+        progress:Math.round(actualMinutes/targetMinutes*10000)/100});
+    }
+    return {available:byDomain.length>0,byDomain,
+      snapshotDays:new Set([...unique.values()].map(g=>g.date)).size};
+  }
   function buildReport(snapshot={},opts={}) {
     const today=opts.today===undefined?localToday():opts.today;
     if(!validDay(today))throw new RangeError('Invalid today');
@@ -126,6 +152,23 @@
     const domain=opts.domain||'all';if(domain!=='all'&&!DOMAINS.includes(domain))throw new RangeError('Invalid domain');
     const source=Array.isArray(snapshot.sessionHistory)?snapshot.sessionHistory:(isRecord(snapshot.cfg)?snapshot.cfg.sessionHistory:[]);
     const normalized=normalizeSessions(source);
+    // Normalize once; all KPI cards and comparisons use the same verified ledger.
+    const usable=normalized.sessions.filter(s=>domain==='all'||s.domain===domain);
+    const nowNumber=dayNumber(today),endNumber=dayNumber(endDate);
+    // Compute calendar boundaries once; calling Date constructors per record
+    // regresses the verified 10k-history performance bound.
+    const trailing=(n)=>{
+      const begin=fromDayNumber(nowNumber-n+1);
+      return summarize(usable.filter(s=>s.date>=begin&&s.date<=today));
+    };
+    const currentStart=fromDayNumber(endNumber-6),priorStart=fromDayNumber(endNumber-13);
+    const currentWeek=summarize(usable.filter(s=>s.date>=currentStart&&s.date<=endDate));
+    const priorWeek=summarize(usable.filter(s=>s.date>=priorStart&&s.date<currentStart));
+    const changeMinutes=Math.round((currentWeek.minutes-priorWeek.minutes)*1000)/1000;
+    const comparison={current:currentWeek,previous:priorWeek,changeMinutes,
+      changePercent:priorWeek.minutes===0?null:Math.round(changeMinutes/priorWeek.minutes*10000)/100,
+      rule:'Rolling seven credited local dates compared with the preceding seven dates'};
+    const dashboard={today:trailing(1),last7:trailing(7),last30:trailing(30)};
     const rows=normalized.sessions.filter(s=>s.date>=startDate&&s.date<=endDate&&(domain==='all'||s.domain===domain));
     const grouped=bucket(rows,s=>s.date),dayMap=new Map(grouped.map(x=>[x.key,x]));
     const startNumber=dayNumber(startDate);
@@ -138,6 +181,9 @@
         return weekStartCache.get(s.date);
       }),monthly:bucket(rows,s=>s.date.slice(0,7)),byDomain,
       streaks:streaks(normalized.sessions,today),goals:dailyGoalReport(rows,opts.goals,startDate,endDate),
+      dashboard,comparison,
+      historicalGoals:historicalGoalReport(opts.goalSnapshots ?? snapshot.goalSnapshots ??
+        (isRecord(snapshot.cfg)?snapshot.cfg.goalSnapshots:null),rows,startDate,endDate,domain),
       tasks:taskReport(snapshot.tasksList,snapshot.projects,today),
       quality:{accepted:normalized.sessions.length,inRange:rows.length,excluded:normalized.rejects.length,
         duplicates:normalized.duplicates,invalid:normalized.invalid,samples:normalized.samples,
