@@ -3,7 +3,9 @@ const {
     validateSoundMetadata,
     playSoundChannel,
     stopAllSoundChannels,
-    activeChannels
+    activeChannels,
+    stopSoundChannel,
+    setSoundChannelVolume
 } = require('../android/app/src/main/assets/web/js/nature_audio_guard.js');
 
 console.log("--- Running 🎯 Mission #008: Nature Audio Guard Tests ---");
@@ -39,11 +41,14 @@ const verifiedSound = {
     title: "Gentle Rain",
     license: "CC0",
     sourceUrl: "https://freesound.org/people/sample/sounds/12345/",
-    localPath: "audio/gentle_rain.ogg"
+    localPath: "audio/gentle_rain.ogg",
+    approved_for_runtime: true,
+    sha256: "a".repeat(64),
+    licenseEvidenceUrl: "https://creativecommons.org/publicdomain/zero/1.0/"
 };
 const resOk = validateSoundMetadata(verifiedSound);
 assert.strictEqual(resOk.valid, true);
-console.log("✔ Test 3: Verified CC0 sound certified.");
+console.log("✔ Test 3: Explicitly approved metadata accepted (not proof of media licence).");
 
 // Test 4: Audio Exception Isolation (Timer must NOT crash when audio fails)
 const failingFactory = () => {
@@ -78,4 +83,39 @@ stopAllSoundChannels();
 assert.strictEqual(activeChannels.size, 0);
 console.log("✔ Test 6: Stop all channels cleaned active resources completely.");
 
-console.log("--- All Mission #008 Nature Audio Tests PASSED (GREEN) ---");
+
+const unapproved = validateSoundMetadata({...verifiedSound, id: "quarantine", approved_for_runtime: false});
+assert.strictEqual(unapproved.valid, false, "Quarantined recordings must never play");
+const unspecifiedApproval = validateSoundMetadata({...verifiedSound, id: "unspecified", approved_for_runtime: undefined});
+assert.strictEqual(unspecifiedApproval.valid, false, "Unreviewed metadata must fail closed");
+const invalidDigest = validateSoundMetadata({...verifiedSound, sha256: "not-a-sha"});
+assert.strictEqual(invalidDigest.valid, false, "A pinned 64-character SHA256 is required");
+const invalidRights = validateSoundMetadata({...verifiedSound, licenseEvidenceUrl: undefined});
+assert.strictEqual(invalidRights.valid, false, "A licence evidence URL is required");
+
+let pauseCalls = 0;
+const htmlAudio = {currentTime: 12, pause(){pauseCalls++}, play(){}};
+playSoundChannel({...verifiedSound,id:"native-html-audio"},()=>htmlAudio, mockTimer);
+assert.strictEqual(stopSoundChannel("native-html-audio").status, "STOPPED");
+assert.strictEqual(pauseCalls, 1, "HTMLAudioElement must be paused, not only stopped");
+assert.strictEqual(htmlAudio.currentTime, 0, "HTMLAudioElement playback position must reset");
+assert.strictEqual(activeChannels.size, 0);
+
+const volumeAudio = {play(){},pause(){},volume:1};
+playSoundChannel({...verifiedSound,id:"volume-audio"},()=>volumeAudio,mockTimer);
+assert.strictEqual(setSoundChannelVolume("volume-audio",0.3).status,"VOLUME_UPDATED");
+assert.strictEqual(volumeAudio.volume,0.3);
+assert.strictEqual(setSoundChannelVolume("volume-audio",5).status,"INVALID_VOLUME");
+assert.strictEqual(volumeAudio.volume,0.3);
+stopAllSoundChannels();
+
+(async () => {
+  const rejectedAudio = { play(){return Promise.reject(new Error("Autoplay denied"));}, pause(){}, currentTime:0 };
+  playSoundChannel({...verifiedSound,id:"rejected-audio"},()=>rejectedAudio,mockTimer);
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.strictEqual(activeChannels.has("rejected-audio"),false,
+    "Async rejected playback must not leave a ghost channel");
+  console.log("--- All Mission #008 Nature Audio Tests PASSED (GREEN) ---");
+})().catch(error=>{console.error(error);process.exitCode=1});
+
