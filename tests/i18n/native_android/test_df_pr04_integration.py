@@ -64,7 +64,7 @@ class PR04NativeSafety(unittest.TestCase):
   self.assertIn('Service package: found',source)
   self.assertIn('test',source)
   self.assertIn('if [ "$ready" -ne 1 ]; then',source)
-  self.assertLess(source.index('Service package: found'),source.index('if adb install -r'))
+  self.assertLess(source.index('Service package: found'),source.index('if adb install --no-streaming -r'))
   self.assertIn("runtime NOT_TESTED",source)
   # A package service that dies *after* boot must have one bounded recovery.
   self.assertIn('timeout 30 adb reboot',source)
