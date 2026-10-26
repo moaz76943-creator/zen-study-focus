@@ -3999,23 +3999,32 @@ function startQuickTraining() {
   if(timerRunning || timerSessionId!==null) {
     if(!window.confirm(quickText('replacePrompt')))return;
   }
+  // Publish the new activity only after its existing v21 write is acknowledged.
+  // Refusal must leave even a running or paused session untouched.
+  const nextCfg={...cfg,domain:quickPresetDomain};
+  try {
+    if(saveFortressData('zen_fortress_cfg_v21',nextCfg)!==true)
+      throw new Error('QUICK_ACTIVITY_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(quickSaveError());
+    return false;
+  }
   if(timerRunning)toggleTimerPlay();
+  cfg.domain=quickPresetDomain;
   quickTraining={
     active:true,sets,workSeconds,restSeconds,currentSet:0,phase:'work',
     skipLastRest:document.getElementById('qtSkipLast').checked,
     exercises:quickExercises.slice(),domain:quickPresetDomain,
     taskId:focusWorkflowGetLinkedTask()?.id ?? null
   };
-  cfg.domain=quickPresetDomain;
-  saveFortressData('zen_fortress_cfg_v21',cfg);
   renderDomainState();
   quickInternalChange=true;
   selectTimerMode(workSeconds/60,'focus',document.getElementById('modeFocusBtn'));
   quickInternalChange=false;
-  saveQuickConfig();
+  const preferencesSaved=saveQuickConfig();
   toggleTimerPlay();
   renderQuickTraining();
-  showToast(quickText('started'));
+  showToast(preferencesSaved?quickText('started'):quickSaveError());
   quickWorkflowEvent('started',{domain:quickTraining.domain,taskId:quickTraining.taskId,
     sets:quickTraining.sets,workSeconds:quickTraining.workSeconds,restSeconds:quickTraining.restSeconds});
 }
