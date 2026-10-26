@@ -44,27 +44,27 @@ for width in 320 360 393 430; do
     png="$out/android-${width}-${scale}.png"
     timeout 50s adb exec-out screencap -p > "$png"
     test -s "$png"
-    # Fail early when a live APK renders an all-white WebView. An installed PID
-    # and structurally valid PNG do not prove visible UI; keep native diagnostics.
-    if [[ "$width" == "320" && "$scale" == "1.0" ]]; then
-      rendered=0
-      for attempt in 1 2 3; do
-        if python3 tests/white_premium_qa/track14_png_screen_guard.py "$png" > "$out/first-frame-pixel-review.json"; then
-          rendered=1; break
-        fi
-        if ((attempt<3)); then
-          sleep 5
-          timeout 50s adb exec-out screencap -p > "$png"
-        fi
-      done
-      if ((rendered==0)); then
-        echo 'ANDROID_WEBVIEW_BLANK_FIRST_FRAME: 3 genuine captures, no visible rendered content' >&2
-        timeout 30s adb logcat -d -t 800 > "$out/first-frame-logcat.txt" 2>&1 || true
-        timeout 30s adb shell dumpsys activity top > "$out/first-frame-activity.txt" 2>&1 || true
-        timeout 30s adb shell dumpsys window windows > "$out/first-frame-window.txt" 2>&1 || true
-        cat "$out/first-frame-pixel-review.json" >&2
-        exit 1
+    # Wait for visible WebView pixels after each font-scale relaunch, not just
+    # a PID or blank PNG. Bounded retries never turn a blank frame into PASS.
+    rendered=0
+    for attempt in 1 2 3 4; do
+      if python3 tests/white_premium_qa/track14_png_screen_guard.py "$png" > "$out/frame-review-${width}-${scale}.json"; then
+        rendered=1
+        printf 'ANDROID_FRAME_RENDERED width=%s scale=%s attempt=%s\n' "$width" "$scale" "$attempt"
+        break
       fi
+      if ((attempt<4)); then
+        sleep 5
+        timeout 50s adb exec-out screencap -p > "$png"
+      fi
+    done
+    if ((rendered==0)); then
+      echo "ANDROID_WEBVIEW_BLANK_AFTER_RETRIES width=$width scale=$scale" >&2
+      timeout 30s adb logcat -d -t 800 > "$out/frame-failure-logcat.txt" 2>&1 || true
+      timeout 30s adb shell dumpsys activity top > "$out/frame-failure-activity.txt" 2>&1 || true
+      timeout 30s adb shell dumpsys window windows > "$out/frame-failure-window.txt" 2>&1 || true
+      cat "$out/frame-review-${width}-${scale}.json" >&2
+      exit 1
     fi
     printf 'width=%s font_scale=%s screenshot=CAPTURED visual_review=NOT_TESTED\n' "$width" "$scale" >> "$out/geometry_status.txt"
   done
