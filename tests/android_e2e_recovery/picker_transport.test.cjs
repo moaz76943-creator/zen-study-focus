@@ -292,6 +292,7 @@ test('emulator bootstrap reconnects only for read-only installed APK identity ch
  assert.match(shell,/adb reconnect offline/);
  assert.match(shell,/readonly_adb_installed_path/);
  assert.match(shell,/readonly_adb_pull_installed_apk/);
+ assert.match(shell,/if timeout 60s adb pull [^\n]+ && test -s [^\n]+; then/,'An empty or truncated adb pull must never be accepted');
  assert.equal((shell.match(/^adb install /gm)||[]).length,2,'Never retry a state-changing APK install');
  assert.match(shell,/sha256sum "\$report\/installed-base\.apk"/);
  assert.match(shell,/sha256sum "\$report\/tested-debug\.apk"/);
