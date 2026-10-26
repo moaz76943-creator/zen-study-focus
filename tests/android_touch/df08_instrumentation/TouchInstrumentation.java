@@ -83,7 +83,9 @@ public final class TouchInstrumentation extends Instrumentation {
                         "const live=(typeof notesList==='undefined'?[]:notesList).filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
                         "const stored=(packet.ok&&Array.isArray(packet.value)?packet.value:[]).filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
                         "return {matches:live.length,liveBody:live[0]?.body||'',storedMatches:stored.length," +
-                        "storedBody:stored[0]?.body||'',mirrorOk:!!p&&p===m&&packet.ok};})()");
+                        "storedBody:stored[0]?.body||'',mirrorOk:!!p&&p===m&&packet.ok," +
+                        "primaryPresent:!!p,mirrorPresent:!!m,advancedUi:document.body.classList.contains('df-v22')," +
+                        "storageFamilies:Object.keys(localStorage).filter(k=>k.startsWith('zen_fortress_')).length};})()");
                     found = restored.optInt("matches") == 1 &&
                         restored.optInt("storedMatches") == 1 &&
                         restored.optBoolean("mirrorOk") &&
@@ -177,6 +179,18 @@ public final class TouchInstrumentation extends Instrumentation {
             assertTrue(saved.optInt("matches") == 1 &&
                 "Persisted note 2026".equals(saved.optString("body")) && !saved.optBoolean("open"),
                 "Physical Save did not persist note exactly once: "+saved);
+            // A successful in-memory Save must also be a verified v21 disk write.
+            // Otherwise the following force-stop would only expose an already false PASS.
+            JSONObject beforeStop = js("(()=>{const D=window.DeepFocusDataCompatV21,k=D?.KEYS?.notes;" +
+                "const p=k?localStorage.getItem(k):null,m=k?localStorage.getItem(k+'_mirror'):null;" +
+                "const packet=p&&D?D.inspectPacket(p):{ok:false};" +
+                "const stored=packet.ok&&Array.isArray(packet.value)?packet.value:[];" +
+                "return {primaryPresent:!!p,mirrorPresent:!!m,mirrorOk:!!p&&p===m&&packet.ok," +
+                "notesOnDisk:stored.filter(n=>n.title==="+JSONObject.quote(noteTitle)+").length," +
+                "advancedUi:document.body.classList.contains('df-v22')," +
+                "integrationAvailable:!!window.DF22Integration};})()");
+            assertTrue(beforeStop.optBoolean("mirrorOk") && beforeStop.optInt("notesOnDisk") == 1,
+                "Visible Notes Save lacked v21 packet ACK before process death: "+beforeStop);
             result.putString("df08_status","PASS");
             result.putInt("df08_physical_taps",actualTaps);
             result.putString("df08_platform","Android UIAutomation touch / actual IME / native WebView evaluateJavascript");
