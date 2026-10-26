@@ -13,12 +13,16 @@ test -s "$apk" && test -s "$testapk"
 sha256sum "$apk" "$testapk" > "$out/APK_SHA256.txt"
 cleanup() {
   adb shell wm size reset >/dev/null 2>&1 || true
+  adb shell wm density reset >/dev/null 2>&1 || true
   adb shell settings put system font_scale 1.0 >/dev/null 2>&1 || true
   adb logcat -d -s DF08_REAL_ANDROID AndroidRuntime > "$out/logcat.txt" 2>&1 || true
 }
 trap cleanup EXIT
 bash tests/white_premium_qa/track14_install_apk.sh "$apk"
 timeout 180s adb install --no-streaming -r "$testapk" > "$out/test-apk-install.txt" 2>&1
+# Force 1 physical pixel per CSS pixel for the requested 320/360/393/430px
+# visual-viewport tests (default Pixel_6 density is ~2.625x and gave 122 CSS px).
+adb shell wm density 160
 # Remove the Android 13+ runtime notification prompt from this disposable test
 # profile, so it cannot cover the WebView and intercept all pointer events.
 adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
