@@ -1,7 +1,7 @@
 import {stagedChanges} from './guard.mjs';
 export const TARGET='integration/master-qa-verified-v21';
 export const ROLES=Object.freeze({
- aider:{prefix:'[DF-AIDER]',files:['tools/i18n/integrator/index.cjs','tools/i18n/integrator/cli.cjs','tests/i18n/integrator/integrator.test.cjs'],test:'tests/i18n/integrator/integrator.test.cjs'},
+ aider:{prefix:'[DF-AIDER]',files:['tools/daily_maintenance/evidence_integrity_guard.cjs','tests/integration_quality/evidence_integrity_guard.test.cjs'],test:'tests/integration_quality/evidence_integrity_guard.test.cjs'},
  qwen:{prefix:'[DF-QWEN]',files:['tools/i18n/inventory/index.cjs','tests/i18n/inventory/inventory.test.cjs'],test:'tests/i18n/inventory/inventory.test.cjs'}
 });
 const RISK=new Set(['p0','security','release','privacy','data-loss','native-android','saf','blocked']);

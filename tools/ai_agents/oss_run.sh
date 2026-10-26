@@ -3,7 +3,7 @@ set -euo pipefail
 # Called from the clean integration checkout; GH_TOKEN is not in the model environment.
 case "$AGENT_ROLE" in
   aider)
-    set -- tools/i18n/integrator/index.cjs tools/i18n/integrator/cli.cjs tests/i18n/integrator/integrator.test.cjs
+    set -- tools/daily_maintenance/evidence_integrity_guard.cjs tests/integration_quality/evidence_integrity_guard.test.cjs
     ;;
   qwen)
     set -- tools/i18n/inventory/index.cjs tests/i18n/inventory/inventory.test.cjs
@@ -17,13 +17,13 @@ if [ "$AGENT_ROLE" = aider ]; then
   python3 -m pip install --quiet --user aider-chat
   export PATH="$HOME/.local/bin:$PATH"
   timeout 7m aider --yes --no-pretty --no-auto-commits --no-dirty-commits \
-    --model groq/openai/gpt-oss-120b \
+    --model groq/openai/gpt-oss-120b --map-tokens 0 \
     --message-file "$RUNNER_TEMP/df-oss-task.txt" "$@"
 else
   npm install --quiet --global @qwen-code/qwen-code
   mkdir -p "$HOME/.qwen"
   cat > "$HOME/.qwen/settings.json" <<'JSON'
-{"modelProviders":{"openai":[{"id":"openai/gpt-oss-120b","envKey":"GROQ_API_KEY","baseUrl":"https://api.groq.com/openai/v1"}]},"security":{"auth":{"selectedType":"openai"}},"model":{"name":"openai/gpt-oss-120b"},"tools":{"eager":[]}}
+{"modelProviders":{"openai":[{"id":"openai/gpt-oss-120b","wireApi":"responses","envKey":"GROQ_API_KEY","baseUrl":"https://api.groq.com/openai/v1"}]},"security":{"auth":{"selectedType":"openai"}},"model":{"name":"openai/gpt-oss-120b"},"tools":{"eager":[]}}
 JSON
   # Qwen full default system prompt exceeds Groq Free 8K TPM even with deferred tools.
   # Override it with a short, concrete editing contract; post-run diff guard is authoritative.
