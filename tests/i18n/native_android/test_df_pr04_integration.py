@@ -46,3 +46,11 @@ class PR04NativeSafety(unittest.TestCase):
   self.assertNotIn('disable-animations: true',workflow)
   self.assertIn('set -eu',workflow)
   self.assertIn('adb shell pidof com.zenstudy.focus',workflow)
+
+ def test_api30_package_manager_transient_failure_retries_then_fails_closed(self):
+  workflow=(R/'.github/workflows/df_pr04_api30_api35_smoke.yml').read_text()
+  # Real API30 job 40294077475 returned ADB PackageManager Broken pipe.
+  self.assertIn('for attempt in 1 2 3',workflow)
+  self.assertIn('timeout 40 adb wait-for-device',workflow)
+  self.assertIn('test "$installed" -eq 1',workflow)
+  self.assertIn('adb shell pm list packages',workflow)

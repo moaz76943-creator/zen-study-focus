@@ -55,7 +55,20 @@ jobs:
             set -eu
             adb wait-for-device
             test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = 1
-            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            # API30 can temporarily lose PackageManager after boot (ADB Broken pipe).
+            # Make three bounded attempts; never report PASS without an installed APK.
+            installed=0
+            for attempt in 1 2 3; do
+              if adb install -r android/app/build/outputs/apk/debug/app-debug.apk; then
+                installed=1
+                break
+              fi
+              if [ "$attempt" -lt 3 ]; then
+                sleep 12
+                timeout 40 adb wait-for-device
+              fi
+            done
+            test "$installed" -eq 1
             adb shell pm list packages | grep -Fx 'package:com.zenstudy.focus'
             adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
             sleep 6
