@@ -22,6 +22,14 @@ function walProof(adb,read,marker,diagnostic={}){
 function saveProof(name,value){
  if(process.env.RUNNER_TEMP)fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'df-pr01-android',name+'.json'),JSON.stringify(value,null,2));
 }
+// A failed disk-evidence probe leaves Android on HOME. Return to a running,
+// connected WebView before any later genuine picker/timer test is attempted.
+// This is cleanup only: missing WAL evidence stays NOT_TESTED.
+async function reenterAppAfterInterruptedJournal({restart,evaluate}) {
+ await restart();
+ await evaluate('DF22Preflight.replayNative(localStorage);true');
+}
+
 function createNativeFaultCases(driver){
  const {evaluate,snapshot,receipt,fixture,restart,adb,nativeUI,tapUI}=driver;
  const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -116,7 +124,7 @@ function createNativeFaultCases(driver){
    recovered=true;
    return 'Pending journal independently observed in actual Android WAL; partial unacknowledged cfg rolled back from native checkpoint after force-stop/relaunch';
   }finally{
-   if(!recovered)try{await evaluate('DF22Preflight.replayNative(localStorage);true');}catch(_){}
+   if(!recovered)await reenterAppAfterInterruptedJournal({restart,evaluate});
   }
  };
  cases.real_timer_failed_credit_retry_exactly_once=async()=>{
@@ -181,4 +189,4 @@ function createNativeFaultCases(driver){
  };
  return cases;
 }
-module.exports={CASE_NAMES,createNativeFaultCases,walProof};
+module.exports={CASE_NAMES,createNativeFaultCases,walProof,reenterAppAfterInterruptedJournal};

@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {CASE_NAMES,createNativeFaultCases,walProof}=require('./native_faults.cjs');
+const {CASE_NAMES,createNativeFaultCases,walProof,reenterAppAfterInterruptedJournal}=require('./native_faults.cjs');
 test('all required runtime fault cases remain in the explicit inventory',()=>{
  assert.deepEqual(Object.keys(createNativeFaultCases({})).sort(),[...CASE_NAMES].sort());
  assert.equal(new Set(CASE_NAMES).size,10);
@@ -28,4 +28,23 @@ test('rotated WAL files cannot hide a marker in the current log',()=>{
 test('legacy Chromium storage directories without Default are independently observable',()=>{
  const proof=walProof(()=> 'app_webview/Local Storage/leveldb/000123.log',()=>Buffer.from('DF07_PENDING_789'),'DF07_PENDING_789');
  assert.equal(proof?.journal_marker_observed,true);
+});
+
+test('aborted WAL inspection reconnects WebView before replay, avoiding cascading picker failures',async()=>{
+ const calls=[];
+ await reenterAppAfterInterruptedJournal({
+  restart:async()=>{calls.push('restart');},
+  evaluate:async(expr)=>{calls.push(expr);}
+ });
+ assert.deepEqual(calls,['restart','DF22Preflight.replayNative(localStorage);true']);
+});
+test('failed journal cleanup does not pretend the device returned to an observable state',async()=>{
+ let replayCalled=false;
+ await assert.rejects(
+  reenterAppAfterInterruptedJournal({
+   restart:async()=>{throw Error('emulator transport offline');},
+   evaluate:async()=>{replayCalled=true;}
+  }),/emulator transport offline/
+ );
+ assert.equal(replayCalled,false);
 });
