@@ -17,8 +17,20 @@ function validateEvidence(evidence, currentHeadSha) {
         };
     }
 
-    // 2. Truthful assertion execution (No fake exit 0 passes)
-    const assertions = Number(evidence.assertionsCount) || 0;
+    // 2. Fail closed on malformed or inconsistent measurements before any PASS.
+    // Do not coerce strings/NaN/Infinity/missing fields into valid counters.
+    const counts = ['assertionsCount', 'failuresCount', 'skippedCount'];
+    if (counts.some(key => !Number.isSafeInteger(evidence[key]) || evidence[key] < 0)) {
+        return { status: "BLOCKED_MALFORMED", valid: false,
+            reason: "Evidence counters must be present as nonnegative safe integers" };
+    }
+    const assertions = evidence.assertionsCount;
+    const failures = evidence.failuresCount;
+    const skipped = evidence.skippedCount;
+    if (failures > assertions || skipped > assertions || failures + skipped > assertions) {
+        return { status: "BLOCKED_MALFORMED", valid: false,
+            reason: "Evidence failure/skip totals exceed assertions" };
+    }
     if (assertions <= 0) {
         return {
             status: "ZERO_ASSERTIONS_REJECTED",
@@ -28,7 +40,6 @@ function validateEvidence(evidence, currentHeadSha) {
     }
 
     // 3. Failure check
-    const failures = Number(evidence.failuresCount) || 0;
     if (failures > 0) {
         return {
             status: "FAIL",
@@ -38,7 +49,6 @@ function validateEvidence(evidence, currentHeadSha) {
     }
 
     // 4. Skipped threshold (Cannot be 100% skipped)
-    const skipped = Number(evidence.skippedCount) || 0;
     if (skipped >= assertions) {
         return {
             status: "ALL_SKIPPED_REJECTED",
