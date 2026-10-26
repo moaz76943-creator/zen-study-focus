@@ -1,0 +1,23 @@
+name: Older Android WebView DOM compatibility
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/js/dom_compat.js'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'tests/webview_compat/**'
+      - '.github/workflows/webview_dom_compat.yml'
+permissions:
+  contents: read
+jobs:
+  source-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/webview_compat/*.test.cjs tests/i18n/notes/*.test.cjs tests/i18n/goals/*.test.cjs tests/notes_ui/*.test.cjs
