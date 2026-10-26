@@ -24,6 +24,7 @@ def summarize(directory: Path, sha: str) -> dict:
             return output
         count = 0
         rule_counts = {}
+        unclassified_reasons = {}
         evidence = []
         for path in paths:
             if path.stat().st_size > MAX_BYTES:
@@ -68,6 +69,18 @@ def summarize(directory: Path, sha: str) -> dict:
                             return output
                         raw_rule = descriptor_id
                     rule = raw_rule if isinstance(raw_rule, str) and SAFE_CODEQL_RULE.fullmatch(raw_rule) else "unknown"
+                    if rule == "unknown":
+                        if raw_rule is None:
+                            reason = "MISSING_RULE_ID"
+                        elif not isinstance(raw_rule, str):
+                            reason = "INVALID_RULE_ID_TYPE"
+                        elif raw_rule.startswith("js/"):
+                            reason = "UNSUPPORTED_JS_RULE_ID"
+                        elif re.fullmatch(r"[a-z][a-z0-9-]*/[a-z0-9-]+", raw_rule):
+                            reason = "OTHER_LANGUAGE_RULE_ID"
+                        else:
+                            reason = "UNSAFE_RULE_ID"
+                        unclassified_reasons[reason] = unclassified_reasons.get(reason, 0) + 1
                     if rule not in rule_counts and len(rule_counts) >= MAX_RULE_GROUPS:
                         rule = "unknown"
                     rule_counts[rule] = rule_counts.get(rule, 0) + 1
@@ -88,7 +101,7 @@ def summarize(directory: Path, sha: str) -> dict:
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError, RecursionError):
         output["reason"] = "SARIF_INVALID"
         return output
-    output.update(findings=count, status="PASS" if count == 0 else "FAIL", reason="ZERO_FINDINGS" if count == 0 else "CODEQL_FINDINGS", rule_counts=dict(sorted(rule_counts.items())), evidence=evidence)
+    output.update(findings=count, status="PASS" if count == 0 else "FAIL", reason="ZERO_FINDINGS" if count == 0 else "CODEQL_FINDINGS", rule_counts=dict(sorted(rule_counts.items())), unclassified_reasons=dict(sorted(unclassified_reasons.items())), evidence=evidence)
     return output
 
 
