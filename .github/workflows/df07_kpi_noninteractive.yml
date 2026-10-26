@@ -1,0 +1,26 @@
+name: DF07 KPI interaction regression
+on:
+  push:
+    branches: [fix/df07-kpi-noninteractive-20261026]
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/df07/noninteractive_analytics_kpi.test.cjs'
+      - 'android/app/src/main/assets/web/index.html'
+      - '.github/workflows/df07_kpi_noninteractive.yml'
+permissions:
+  contents: read
+jobs:
+  kpi-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source repro and previously verified timer regression
+        run: |
+          node --test tests/df07/noninteractive_analytics_kpi.test.cjs tests/df07/timer_start_pause_resume.test.cjs tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_safety.test.cjs
