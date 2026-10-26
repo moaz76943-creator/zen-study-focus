@@ -27,3 +27,16 @@ test('sound render binds translated UI after tiles exist, preserving legacy cata
   assert.ok(render.includes(s),s);
  assert.ok(!/saveFortressData|setItem\(|activePlayers\[.*\]\s*=/.test(render.slice(bridge)));
 });
+
+test('opening backup dialog localizes only its rendered labels, after opening',()=>{
+ const start=app.indexOf('function openCloudBackupModal()');
+ const end=app.indexOf('function syncToGoogleCloudNow()',start);
+ assert.ok(start>=0&&end>start);
+ const fn=app.slice(start,end);
+ const opened=fn.indexOf("classList.add('open')");
+ const localized=fn.indexOf('DeepFocusAudioSettingsLocale?.bindBackupDialog(');
+ assert.ok(localized>opened,'bind only after modal opens');
+ assert.ok(fn.includes('document, locale: cfg.lang'));
+ assert.equal((fn.match(/inpRestorePayload/g)||[]).length,1,'do not reassign user data in bridge');
+ assert.ok(!/saveFortressData|localStorage|verifyAndRestoreBackupCode/.test(fn));
+});
