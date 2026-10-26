@@ -22,6 +22,14 @@ WIDTHS = (320, 360, 393, 430)
 LOCALES = (("en", "English"), ("ar", "Arabic"), ("de", "German"),
            ("hi", "Hindi"), ("ja", "Japanese"), ("fa", "Persian"), ("ur", "Urdu"))
 BOUNDS = re.compile(r"\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]")
+NAVIGATION_CASES = (
+    ("Tasks", ("Tasks Studio", "Add study, workout or reading goal", "Add study")),
+    ("Calendar", ("Add Note to Date",)),
+    ("Notes", ("New note",)),
+    ("Timer", ("Start or pause timer",)),
+    ("Nature", ("Pure Nature Studio Ready", "Water & Rain")),
+    ("Analytics", ("Recorded analytics", "Recorded minutes")),
+)
 
 def adb(*args, timeout=45, check=True, binary=False):
     p = subprocess.run(["adb", *map(str, args)], capture_output=True,
@@ -167,7 +175,7 @@ def tap_node(node):
     shell("input", "tap", (x1+x2)//2, (y1+y2)//2)
     time.sleep(0.65)
 
-def reveal(predicate, swipes=8):
+def reveal(predicate, swipes=8, gutter=True):
     """Scroll actual Android content until the required visible evidence exists."""
     for attempt in range(swipes + 1):
         nodes = dump()
@@ -179,8 +187,12 @@ def reveal(predicate, swipes=8):
         if bounds is None:
             raise AssertionError("Viewport unavailable for real scrolling")
         _, _, width, height = map(int, bounds.groups())
-        shell("input", "swipe", width // 2, height * 7 // 10,
-              width // 2, height * 3 // 10, 350)
+        # A touch-down on an HTML select opens Android's native popup before
+        # the swipe can scroll. Record lists have a safe outer page gutter.
+        # Modal scrolling instead stays within the dialog's content area.
+        x = max(2, width // 50) if gutter else width // 2
+        shell("input", "swipe", x, height * 7 // 10,
+              x, height * 3 // 10, 350)
         time.sleep(0.4)
     raise AssertionError("Required content not visible after bounded Android scrolling")
 
@@ -197,7 +209,7 @@ def click(label, scroll=False):
         return match if match is not None else visible(nodes, label)
     nodes = dump()
     if scroll and target(nodes) is None:
-        nodes = reveal(lambda items: target(items) is not None)
+        nodes = reveal(lambda items: target(items) is not None, gutter=False)
     tap_node(target(nodes))
 
 def node_class_contains(n, name):
@@ -399,19 +411,12 @@ def run(out, source_sha, api):
     else:
         def nav():
             # A navigation label is permanently visible; assert unique active-page content.
-            cases=(
-                ("Tasks",("Tasks Studio","Add study, workout or reading goal","Add study")),
-                ("Calendar",("Add Note to Date",)),
-                ("Notes",("New note",)),
-                ("Timer",("Start or pause timer",)),
-                ("Nature",("Pure Nature Studio Ready","Water & Rain")),
-                ("Analytics",("Active Minutes",)),
-            )
-            for name, markers in cases:
+            for name, markers in NAVIGATION_CASES:
                 click(name)
                 for _ in range(8):
                     nodes=dump()
-                    if any(has_visible(nodes,marker) for marker in markers):
+                    matches = [has_visible(nodes, marker) for marker in markers]
+                    if (all(matches) if name == "Analytics" else any(matches)):
                         break
                     time.sleep(0.3)
                 else:
