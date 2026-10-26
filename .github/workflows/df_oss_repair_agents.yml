@@ -131,7 +131,12 @@ jobs:
         run: |
           set -euo pipefail
           cd source
-          git add -A
+          # Aider may adjust .gitignore for its own cache; never stage incidental files.
+          case "$AGENT_ROLE" in
+            aider) git add -- tools/daily_maintenance/evidence_integrity_guard.cjs tests/integration_quality/evidence_integrity_guard.test.cjs;;
+            qwen) git add -- tools/i18n/inventory/index.cjs tests/i18n/inventory/inventory.test.cjs;;
+            *) exit 1;;
+          esac
           if git diff --cached --quiet; then
             echo 'No reproducible defect: no PR created' >> "$GITHUB_STEP_SUMMARY"
             echo 'changed=false' >> "$GITHUB_OUTPUT"

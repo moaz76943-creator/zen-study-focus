@@ -19,6 +19,14 @@ if [ "$AGENT_ROLE" = aider ]; then
   timeout 7m aider --yes --no-pretty --no-auto-commits --no-dirty-commits \
     --model groq/openai/gpt-oss-120b --map-tokens 0 \
     --message-file "$RUNNER_TEMP/df-oss-task.txt" "$@"
+  # Aider one-shot sometimes writes the RED test but stops before fixing the
+  # source. Give exactly one bounded follow-up; no unbounded retries.
+  if git diff --quiet -- tools/daily_maintenance/evidence_integrity_guard.cjs &&
+     ! git diff --quiet -- tests/integration_quality/evidence_integrity_guard.test.cjs; then
+    timeout 4m aider --yes --no-pretty --no-auto-commits --no-dirty-commits \
+      --model groq/openai/gpt-oss-120b --map-tokens 0 \
+      --message 'The new failing test is written. NOW implement the minimal source fix to make it pass, editing only tools/daily_maintenance/evidence_integrity_guard.cjs. Do not edit unrelated files.' "$@"
+  fi
 else
   npm install --quiet --global @qwen-code/qwen-code
   mkdir -p "$HOME/.qwen"
@@ -27,7 +35,7 @@ else
 JSON
   # Qwen full default system prompt exceeds Groq Free 8K TPM even with deferred tools.
   # Override it with a short, concrete editing contract; post-run diff guard is authoritative.
-  timeout 7m qwen --system-prompt 'You are a precise source repair tool in ephemeral CI. Read the user task, inspect only necessary repository files and edit only explicitly allowed source and focused test files. Do not call shell tools, browse the web, access credentials, create branches, commit or push. Reproduce one bug with a test before applying a minimal fix; otherwise make no changes. Preserve behavior, offline assets, reviewed translations and all v21 data. Do not claim test results; independent CI runs them.' --prompt "$(cat "$RUNNER_TEMP/df-oss-task.txt")" \
+  timeout 7m qwen --system-prompt 'Edit only task-allowed source and test files. No shell, network, secrets, Git commands, or untested claims. Preserve v21 and translations.' --prompt "$(cat "$RUNNER_TEMP/df-oss-task.txt")" \
     --model openai/gpt-oss-120b --approval-mode auto-edit \
     --max-tool-calls 24 --max-session-turns 16 --max-wall-time 6m --output-format text
 fi
