@@ -61,6 +61,60 @@ def is_existing_commit(repo: Path, value: str) -> bool:
         return False
 
 
+def source_context(repo: Path, row: dict) -> str:
+    """Read a bounded source line from the current tree or the scan's own commit.
+
+    File and commit are untrusted report metadata. Never print them or pass
+    arbitrary paths to a shell. A source match is only a review candidate.
+    """
+    raw_path = row.get("File")
+    line = row.get("StartLine")
+    if not isinstance(raw_path, str) or type(line) is not int or not (1 <= line <= 1000000):
+        return ""
+    relative = raw_path.removeprefix("./")
+    parts = relative.split("/")
+    if (not relative or relative.startswith("/") or "\\" in relative or
+            "\x00" in relative or any(part in ("", ".", "..") for part in parts)):
+        return ""
+    try:
+        commit = row.get("Commit")
+        if isinstance(commit, str) and SHA.fullmatch(commit):
+            target = f"{commit}:{relative}"
+            result = subprocess.run(
+                ["git", "-C", str(repo), "show", target],
+                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL, timeout=5, check=False,
+            )
+            if result.returncode != 0 or len(result.stdout) > 5 * 1024 * 1024:
+                return ""
+            content = result.stdout.decode("utf-8")
+        else:
+            root = repo.resolve()
+            path = (root / relative).resolve()
+            if not path.is_relative_to(root) or not path.is_file() or path.stat().st_size > 5 * 1024 * 1024:
+                return ""
+            content = path.read_text(encoding="utf-8")
+        lines = content.splitlines()
+        return lines[line - 1] if line <= len(lines) and len(lines[line - 1]) <= 2048 else ""
+    except (OSError, UnicodeError, ValueError, subprocess.TimeoutExpired):
+        return ""
+
+
+def source_context_candidate(repo: Path, row: dict) -> str:
+    line = source_context(repo, row)
+    if not line:
+        return "unresolved"
+    if SALT_DECLARATION.fullmatch(line):
+        return "compatibility_salt_candidate"
+    for name in STORAGE_IDENTIFIERS:
+        if ("'" + name + "'" in line) or ('"' + name + '"' in line):
+            return "storage_key_candidate"
+    for value in re.findall(r"(?<![0-9a-f])[a-f0-9]{40}(?![0-9a-f])", line):
+        if is_existing_commit(repo, value):
+            return "git_commit_reference_candidate"
+    return "unresolved"
+
+
 def triage(report_path: Path, repo: Path, sha: str) -> dict:
     blocked = {"sha": sha if SHA.fullmatch(sha) else "",
                "status": "BLOCKED", "findings": None,
@@ -86,7 +140,7 @@ def triage(report_path: Path, repo: Path, sha: str) -> dict:
             elif is_existing_commit(repo, secret):
                 category = "git_commit_reference_candidate"
             else:
-                category = "unresolved"
+                category = source_context_candidate(repo, row) if row.get("RuleID") == "generic-api-key" else "unresolved"
             counts[category] += 1
         return {"sha": sha, "status": "REVIEW_REQUIRED" if rows else "NO_FINDINGS",
                 "findings": len(rows), "categories": counts}
