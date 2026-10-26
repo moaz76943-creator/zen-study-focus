@@ -74,6 +74,18 @@ test('SARIF rejects invalid, out-of-range, bool and mismatched ruleIndex instead
     assert.equal(r.out.reason,'SARIF_INVALID');
   }
 });
+test('uncategorized CodeQL rule reports bounded reason buckets without exposing IDs',()=>{
+  const sentinel='SECRET-SYNTHETIC-UNTRUSTED-RULE-ID';
+  const data=sarif([{},{ruleId:42},{ruleId:'js/unusual.rule'},{ruleId:'py/valid-rule'},{ruleId:sentinel}]);
+  const r=run(data);
+  assert.equal(r.status,1);
+  assert.equal(r.out.status,'FAIL');
+  assert.equal(r.out.findings,5);
+  assert.deepEqual(r.out.unclassified_reasons,{
+    MISSING_RULE_ID:1,INVALID_RULE_ID_TYPE:1,UNSUPPORTED_JS_RULE_ID:1,OTHER_LANGUAGE_RULE_ID:1,UNSAFE_RULE_ID:1
+  });
+  assert.ok(!(r.stdout+r.stderr).includes(sentinel));
+});
 test('missing, corrupt, structurally invalid or tool-mismatched SARIF blocks',()=>{
   for(const data of [null,'invalid',{}, {runs:[]}, {runs:[{tool:{driver:{name:'NotCodeQL'}},results:[]}]}, {runs:[{tool:{driver:{name:'CodeQL'}}}]}]){
     const r=run(data);assert.equal(r.status,1);assert.equal(r.out.status,'BLOCKED');
