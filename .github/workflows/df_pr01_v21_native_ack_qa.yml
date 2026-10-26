@@ -12,6 +12,7 @@ on:
       - 'tests/integration_recovery/daily_rollover_durability.test.cjs'
       - 'tests/integration_recovery/df_pr01_native_ack_contract.test.cjs'
       - 'tests/integration_recovery/native_atomic_ack_test.py'
+      - 'tests/integration_recovery/new_duplicate_ids.test.cjs'
       - '.github/workflows/df_pr01_v21_native_ack_qa.yml'
 permissions:
   contents: read
@@ -38,7 +39,7 @@ jobs:
           node --check android/app/src/main/assets/web/integration_v22.js
       - name: Execute v21 native durable regression suite
         run: |
-          node --test tests/integration_recovery/native_durable_ack.test.cjs tests/integration_recovery/df_pr01_native_ack_contract.test.cjs tests/integration_recovery/native_saf_import_forwardport.test.cjs tests/integration_recovery/restore_journal.test.cjs tests/integration_recovery/daily_rollover_durability.test.cjs
+          node --test tests/integration_recovery/new_duplicate_ids.test.cjs tests/integration_recovery/native_durable_ack.test.cjs tests/integration_recovery/df_pr01_native_ack_contract.test.cjs tests/integration_recovery/native_saf_import_forwardport.test.cjs tests/integration_recovery/restore_journal.test.cjs tests/integration_recovery/daily_rollover_durability.test.cjs
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

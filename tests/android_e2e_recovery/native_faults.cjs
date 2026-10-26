@@ -51,6 +51,9 @@ function createNativeFaultCases(driver){
    try{DF22Integration.write(before,after);return {rejected:false};}
    catch(error){return {rejected:true,error:String(error.message)};}
   },{field,kind});
+  if(!result.rejected)await device(function(original){
+   return DF22Integration.write(DF22Integration.getSnapshot(),original);
+  },before); // Restore only our disposable fixture if a regression published it.
   assert.equal(result.rejected,true);assert.match(result.error,/Record validation failed:/);
   assert.deepEqual(await snapshot(),before);assert.deepEqual(await receipt(),ack);
   return 'Actual Android validator rejected '+kind+' '+field+' IDs before journal/native publication';
