@@ -11,6 +11,7 @@ on:
       - 'tests/integration_recovery/restore_journal.test.cjs'
       - 'tests/integration_recovery/daily_rollover_durability.test.cjs'
       - 'tests/integration_recovery/df_pr01_native_ack_contract.test.cjs'
+      - 'tests/integration_recovery/native_atomic_ack_test.py'
       - '.github/workflows/df_pr01_v21_native_ack_qa.yml'
 permissions:
   contents: read
@@ -42,6 +43,8 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Execute Java AtomicFile publication fault model (not device QA)
+        run: python3 -m unittest discover -s tests/integration_recovery -p 'native_atomic_ack_test.py' -v
       - name: Install Android 36 SDK
         run: |
           set -euo pipefail

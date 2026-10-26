@@ -130,7 +130,9 @@ public class MainActivity extends AppCompatActivity {
                     stream.write(bytes);
                     stream.getFD().sync();
                     file.finishWrite(stream);
-                    return true;
+                    // AtomicFile logs some publication failures without throwing.
+                    // ACK only the exact bytes readable from the published base.
+                    return java.util.Arrays.equals(bytes, file.readFully());
                 } catch (Exception error) {
                     if (stream!=null) file.failWrite(stream);
                     return false;
