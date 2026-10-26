@@ -31,7 +31,11 @@ console.log("--- Running 🎯 Mission #088: 30 Nature Sounds Sanctuary Tests ---
   for (let s of catalog) {
     const combined = (s.id + " " + s.nameAr + " " + s.nameEn).toLowerCase();
     for (let k of musicalKeywords) {
-      const regex = new RegExp('(?:^|\\s|[^\w\u0621-\u064A])' + k + '(?=[^\w\u0621-\u064A]|\\s|$)', 'i');
+      const regex = new RegExp('(?:^|\\s|[^\\w\u0621-\u064A])' + k + '(?=[^\\w\u0621-\u064A]|\\s|$)', 'i');
+      if (k === "song") {
+        assert.strictEqual(regex.test("songbird"), false, "Do not match a word within another word");
+        assert.strictEqual(regex.test("song"), true, "Still match standalone music words");
+      }
       if (regex.test(combined)) violations++;
     }
   }

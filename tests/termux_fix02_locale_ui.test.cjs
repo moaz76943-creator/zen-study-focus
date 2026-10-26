@@ -55,9 +55,17 @@ test('Quick training follows existing translations',()=>{
 });
 
 test('No external Google Fonts dependency',()=>{
-  assert.doesNotMatch(
-    html,/https:\/\/fonts\.(?:googleapis|gstatic)\.com/
-  );
+  const usesGoogleFonts=(source)=>['fonts.googleapis.com','fonts.gstatic.com']
+    .some(host=>source.toLowerCase().includes(host));
+  for(const url of [
+    'https://fonts.googleapis.com/css2',
+    'http://fonts.gstatic.com/example.woff2',
+    '//fonts.googleapis.com/css2',
+    'HTTPS://FONTS.GSTATIC.COM/example.woff2'
+  ]){
+    assert.equal(usesGoogleFonts(url),true,'Detect Google Fonts in any URL form');
+  }
+  assert.equal(usesGoogleFonts(html),false,'Bundled HTML must not depend on Google Fonts');
   assert.match(html,/font-family:\s*system-ui/);
 });
 
