@@ -97,3 +97,21 @@ test('SAF consent matches actual app-owned restore message despite default WebVi
  await assert.rejects(vm.runInContext('confirmDialog(true)',ctx),/consent not matched/);
  assert.equal(vm.runInContext('tapped.length',ctx),2);
 });
+test('native rejection evidence requires a confirmed event-buffer reset and a framed event reply',()=>{
+ const ctx=context();ctx.process.env.DF13_UI_PORT='38383';
+ const calls=[];ctx.probeExec=(cmd,args)=>{calls.push(args.at(-1));return args.at(-1)==='--events-clear'?'{"cleared":true}':'{"events":[{"kind":"backup_read_rejected","event_time_ms":1234}]}';};
+ vm.runInContext('cp.execFileSync=probeExec',ctx);
+ vm.runInContext('readNativeEvents(true)',ctx);
+ assert.equal(vm.runInContext('readNativeEvents()[0].kind',ctx),'backup_read_rejected');
+ assert.deepEqual(calls,['--events-clear','--events']);
+ ctx.probeExec=()=>'{"error":"not supported"}';vm.runInContext('cp.execFileSync=probeExec',ctx);
+ assert.throws(()=>vm.runInContext('readNativeEvents()',ctx),/TRANSPORT:/);
+});
+test('bootstrap failure leaves every unattempted durability case explicitly NOT_TESTED',()=>{
+ const ctx=context();
+ vm.runInContext(`report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:'transport blocked'});fillUnattempted();`,ctx);
+ const results=vm.runInContext('report.results',ctx);
+ assert.equal(results.length,15);assert.ok(results.every(r=>r.status==='NOT_TESTED'));
+ assert.ok(results.some(r=>r.name==='saf_actual_file_restore_ack_and_reopen'));
+ assert.ok(results.some(r=>r.name==='native_ack_io_failure_rollback_restart'));
+});

@@ -5,7 +5,9 @@ import xml.etree.ElementTree as ET
 import sys
 
 request = "DUMP"
-if len(sys.argv) > 2:
+if len(sys.argv) > 2 and sys.argv[2] in ("--events", "--events-clear"):
+    request = "EVENTS_CLEAR" if sys.argv[2] == "--events-clear" else "EVENTS"
+elif len(sys.argv) > 2:
     # Parse real XML attributes, including entities, before exact native match.
     node = ET.fromstring(sys.argv[2])
     selector = {key: node.get(key, "") for key in

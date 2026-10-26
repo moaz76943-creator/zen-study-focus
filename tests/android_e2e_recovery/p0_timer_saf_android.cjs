@@ -124,6 +124,15 @@ function dumpUI(){
  }
  adb('shell','uiautomator','dump','/sdcard/df02_saf.xml');return adb('shell','cat','/sdcard/df02_saf.xml');
 }
+function readNativeEvents(clear=false){
+ try{
+  const port=Number(process.env.DF13_UI_PORT);
+  if(!Number.isInteger(port)||port<1024||port>65535)throw Error('missing local probe');
+  const value=JSON.parse(cp.execFileSync('python3',['tests/android_e2e_recovery/native_ui_dump.py',String(port),clear?'--events-clear':'--events'],{encoding:'utf8',timeout:20000}));
+  if(value.error||(clear?value.cleared!==true:!Array.isArray(value.events)))throw Error('event protocol unavailable');
+  return clear?[]:value.events;
+ }catch(_){throw Error('TRANSPORT: native accessibility event evidence unavailable');}
+}
 function tapUI(node){
  const fixture=/text="p0-saf-[a-z-]+\.txt"/.test(node||'')&&/resource-id="android:id\/title"/.test(node||'');
  if(process.env.DF13_UI_PORT&&(fixture||/clickable="true"/.test(node||''))){
@@ -328,9 +337,20 @@ async function safMain(){
   assert.deepEqual(await snapshot(),before);assert.deepEqual(await receipt(),ack);
  });
  await run('saf_oversized_rejected',async()=>{
-  const before=await snapshot(),ack=await receipt();await openDocument('p0-saf-oversized.txt','x'.repeat(8*1024*1024+1));
-  const xml=(await nativeUI('native oversize rejection toast',x=>x.includes('Unable to read backup')&&x,false)).xml;
-  saveSafPickerEvidence('oversized_rejected',xml);assert.deepEqual(await snapshot(),before);assert.deepEqual(await receipt(),ack);
+  const before=await snapshot(),ack=await receipt();
+  readNativeEvents(true); // Drop earlier events before selecting this exact oversized file.
+  await openDocument('p0-saf-oversized.txt','x'.repeat(8*1024*1024+1));
+  let evidence=[];
+  for(let i=0;i<12;i++){
+   evidence=readNativeEvents().filter(event=>event.kind==='backup_read_rejected');
+   if(evidence.length)break;
+   await pause(200);
+  }
+  if(!evidence.length)throw Error('TRANSPORT: native oversized-file rejection event not observed');
+  if(process.env.RUNNER_TEMP)fs.writeFileSync(require('node:path').join(process.env.RUNNER_TEMP,'df-pr01-android','oversized-native-events.json'),JSON.stringify(evidence));
+  saveSafPickerEvidence('oversized_rejected',null);
+  assert.deepEqual(await snapshot(),before);assert.deepEqual(await receipt(),ack);
+  return 'Genuine app-owned Android rejection event after exact 8 MiB + 1 byte SAF selection; records and native ACK unchanged';
  });
  await run('saf_actual_file_restore_ack_and_reopen',async()=>{
   assert.equal(await write('after.notesList.find(n=>n.id===71002).body="Temporary modified";after.cfg.df07Seq=42'),true);
@@ -341,9 +361,20 @@ async function safMain(){
   await restart();assert.deepEqual(await fixture(),baseline);assert.equal((await receipt()).valid,true);
  });
 }
+function fillUnattempted(){
+ // Source inventory only; assertions/fault targets still use the actual device.
+ const keys=Object.values(require('../../android/app/src/main/assets/web/data_compat_v21.js').KEYS);
+ const planned=['saf_fixture_and_native_ack','locale_native_ack_process_restart',
+  ...keys.flatMap(key=>['failed_save_rollback_'+key,'failed_save_rollback_'+key+'_mirror']),
+  'native_ack_io_failure_rollback_restart','saf_picker_cancel','saf_valid_file_consent_cancel',
+  'saf_corrupt_rejected','saf_oversized_rejected','saf_actual_file_restore_ack_and_reopen'];
+ for(const name of planned)if(!report.results.some(row=>row.name===name))
+  report.results.push({name,status:'NOT_TESTED',detail:'Not executed; blocked by prior Android/native transport failure'});
+}
 async function main(){await safMain();}
 main().catch(e=>report.results.push({name:'bootstrap',status:'NOT_TESTED',detail:String(e.message||e).slice(0,700)})).finally(()=>{
  try{ws?.close();}catch(_){}for(const p of pending.values())clearTimeout(p.timer);
+ fillUnattempted();
  report.counts=Object.fromEntries(['PASS','FAIL','NOT_TESTED'].map(s=>[s,report.results.filter(x=>x.status===s).length]));
  fs.writeFileSync(process.argv[2]||'p0-android.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
  if(!report.results.length||report.results.some(x=>x.status!=='PASS'))process.exitCode=1;

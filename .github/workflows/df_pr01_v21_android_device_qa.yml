@@ -33,7 +33,7 @@ jobs:
       - name: Checkout pinned test-only native accessibility probe
         uses: actions/checkout@v4
         with:
-          ref: f7c49bab6e9936a6fc35cb02fe4394c2a9e51fa5
+          ref: f20e3056c6c5e367b393331033967c7cf99e5412
           path: qa-probe
           persist-credentials: false
       - uses: actions/setup-node@v4
