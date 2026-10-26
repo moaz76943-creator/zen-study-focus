@@ -2310,7 +2310,7 @@ function startQuickSportRest(secs) {
     activeMs:0,resumedAt:startedAt,training:null
   };
   try {
-    if(saveFortressData(TIMER_STORAGE_KEY,next)!==true)
+    if(persistActiveTimerSnapshot(next)!==true)
       throw new Error('SPORT_REST_WRITE_NOT_ACKNOWLEDGED');
   } catch (_) {
     showToast(L().saveFailed || (cfg.lang==='ar'
@@ -2428,21 +2428,54 @@ function accumulateActiveTime() {
 }
 const TIMER_STORAGE_KEY = 'zen_fortress_active_timer_v21';
 function storeTimerSession() {
-  try {
-    return saveFortressData(TIMER_STORAGE_KEY, {
+  return persistActiveTimerSnapshot({
     total: timerTotal, left: timerLeft, running: timerRunning,
     endAt: timerRunning ? timerTargetTime : null,
     mode: currentTimerModeKey, label: customSessionLabel,
-    sessionId: timerSessionId,
-    taskId: focusSessionTaskId,
+    sessionId: timerSessionId, taskId: focusSessionTaskId,
     activeMs: timerActiveMs, resumedAt: timerRunning ? timerResumeMs : null,
     training: quickTraining && quickTraining.active ? {...quickTraining} : null
   });
-  } catch (error) {
-    // A failed v21 packet write cannot be reported as a successful timer transition.
+}
+function persistActiveTimerSnapshot(snapshot) {
+  let oldPrimary, oldMirror;
+  try {
+    oldPrimary = localStorage.getItem(TIMER_STORAGE_KEY);
+    oldMirror = localStorage.getItem(TIMER_STORAGE_KEY + '_mirror');
+    if (saveFortressData(TIMER_STORAGE_KEY, snapshot) !== true)
+      throw new Error('TIMER_STORAGE_WRITE_UNVERIFIED');
+    const native = window.ZenNative;
+    if (native && typeof native.acknowledgeActiveTimerSnapshot === 'function') {
+      const raw = localStorage.getItem(TIMER_STORAGE_KEY);
+      if (typeof raw !== 'string' || native.acknowledgeActiveTimerSnapshot(raw) !== true)
+        throw new Error('TIMER_NATIVE_RECEIPT_FAILED');
+    }
+    return true;
+  } catch (_) {
+    try {
+      for (const [key, previous] of [[TIMER_STORAGE_KEY, oldPrimary],
+        [TIMER_STORAGE_KEY + '_mirror', oldMirror]]) {
+        if (previous === null || previous === undefined) localStorage.removeItem(key);
+        else localStorage.setItem(key, previous);
+      }
+    } catch (_) { /* Existing native checkpoint remains authoritative. */ }
     try { showToast(L().saveFailed); } catch (_) {}
     return false;
   }
+}
+function readNativeTimerSession() {
+  const native = window.ZenNative;
+  if (!native || typeof native.readActiveTimerSnapshot !== 'function') return null;
+  const raw = native.readActiveTimerSnapshot();
+  if (raw === 'NONE') return null; // Existing v21 installations retain WebView data.
+  if (typeof raw !== 'string' || raw === 'ERROR') throw new Error('TIMER_NATIVE_CHECKPOINT_UNREADABLE');
+  try {
+    const packet = JSON.parse(raw);
+    if (!packet || typeof packet.payload !== 'string' ||
+        computeHash(packet.payload) !== packet.sig)
+      throw new Error('TIMER_NATIVE_CHECKPOINT_INVALID');
+    return JSON.parse(packet.payload);
+  } catch (_) { throw new Error('TIMER_NATIVE_CHECKPOINT_INVALID'); }
 }
 function creditCompletedSession() {
   if (currentTimerModeKey !== 'focus' && currentTimerModeKey !== 'custom') return;
@@ -2518,7 +2551,9 @@ function runTimerTick() {
   updateTimerDisplay();
 }
 function restoreTimerSession() {
-  const snap = loadFortressData(TIMER_STORAGE_KEY, null);
+  let snap;
+  try { snap = readNativeTimerSession() || loadFortressData(TIMER_STORAGE_KEY, null); }
+  catch (_) { try { showToast(L().saveFailed); } catch (_) {} return; }
   if (!snap || typeof snap !== 'object' || !Number.isFinite(snap.total) || !Number.isFinite(snap.left)) return;
   if (snap.total < 1 || snap.total > 86400 || snap.left < 0 || snap.left > 86400) return;
   timerTotal = snap.total;

@@ -1,0 +1,127 @@
+name: Track05 Timer Lifecycle RED GREEN
+on:
+  push:
+    branches:
+      - fix/df-final01-track05-native-active-timer-20261026
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+permissions:
+  contents: read
+concurrency:
+  group: track05-timer-lifecycle-bounded-qa-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  node-timer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce exact branch commit and source syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node --check android/app/src/main/assets/web/app.js
+          node --check tests/track05_timer/live_android_cdp.cjs
+          bash -n tests/track05_timer/run_android_timer_qa.sh
+      - name: Native active timer checkpoint and lifecycle regression
+        run: node --test tests/track05_timer/native_timer_checkpoint.test.cjs
+      - name: Track05 real-function lifecycle regression and adjacent timer guards
+        run: |
+          node --test tests/track05_timer/tick_lifecycle.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/integration_quality/activity_domain_durable_ack.test.cjs
+      - name: Record exact SHA and immutable test scope
+        if: always()
+        shell: bash
+        run: |
+          printf '%s\n' "HEAD=$(git rev-parse HEAD)" "GITHUB_SHA=$GITHUB_SHA" "RELEASE_APPROVED=NO" > "$RUNNER_TEMP/track05-evidence.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track05-timer-source-${{ github.sha }}
+          path: ${{ runner.temp }}/track05-evidence.txt
+          retention-days: 7
+  full-source-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Full source Node regression without skipping existing cases
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          mapfile -t tests < <(find tests -type f \( -name '*.test.cjs' -o -name 'test_*.cjs' \) ! -name 'media_provenance_gate.test.cjs' | sort)
+          node --test --test-reporter=tap "${tests[@]}"
+      - name: Python source regression
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py' -v
+  android-timer-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install matching Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$sdkmanager"
+          "$sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Exact source debug APK (not production signed)
+        working-directory: android
+        run: gradle :app:assembleDebug --no-daemon
+      - name: Check Android APK source and reserve isolated evidence folder
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          mkdir -p "$RUNNER_TEMP/track05-android"
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/track05-android/apk.sha256"
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod u+rw /dev/kvm
+      - name: Android API30 CDP + physical ADB native timer lifecycle
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: bash tests/track05_timer/run_android_timer_qa.sh
+      - name: Preserve Android actual outcomes, logcat and source SHA
+        if: always()
+        shell: bash
+        run: |
+          git rev-parse HEAD > "$RUNNER_TEMP/track05-android/source_sha.txt"
+          printf '%s\n' 'RELEASE_APPROVED=NO' 'Android smoke does not certify 20-language native dialogs, DND, or SAF.' > "$RUNNER_TEMP/track05-android/limits.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track05-android-api30-${{ github.sha }}
+          path: ${{ runner.temp }}/track05-android/
+          if-no-files-found: warn
+          retention-days: 7
