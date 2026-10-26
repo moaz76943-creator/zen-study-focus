@@ -74,6 +74,17 @@ test('untrusted finding fields are never printed, even if they resemble structur
   assert.ok(!(r.stdout + r.stderr).includes(sentinel));
   assert.equal(r.output.evidence[0].rule, 'unknown');
 });
+test('summarizes rule counts across all private Gitleaks findings, beyond bounded evidence', () => {
+  const sentinel='SYNTHETIC-CONFIDENTIAL-FINDING';
+  const findings=Array.from({length:35},(_,i)=>({RuleID:i%2===0?'generic-api-key':sentinel,File:'private/'+sentinel,Secret:sentinel}));
+  const r=run(findings,1);
+  assert.equal(r.status,1);
+  assert.equal(r.output.status,'FAIL');
+  assert.equal(r.output.findings,35);
+  assert.deepEqual(r.output.rule_counts,{'generic-api-key':18,unknown:17});
+  assert.equal(r.output.evidence.length,25);
+  assert.ok(!(r.stdout+r.stderr).includes(sentinel));
+});
 test('workflow scans exact source, history and tree; does not upload raw findings or permit bypass', () => {
   const wf = fs.readFileSync(path.join(root, '.github/workflows/track13_security_exact_sha.yml'), 'utf8');
   assert.match(wf, /pull_request:/);
