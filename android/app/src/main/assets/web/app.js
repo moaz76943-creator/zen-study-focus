@@ -264,6 +264,8 @@ const COMPLETION_TONES = {
   vibrate: { name: 'Vibrate Only 📳', desc: 'Silent', freq: 0, decay: 0, level: 0 }
 };
 
+let toneCtx = null;
+
 function playCompletionTone(toneKey) {
   const key = toneKey || localStorage.getItem('df_end_tone') || 'zen_bell';
   const tone = COMPLETION_TONES[key] || COMPLETION_TONES.zen_bell;
@@ -277,8 +279,9 @@ function playCompletionTone(toneKey) {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    if (ctx.state === 'suspended') ctx.resume();
+    if (!toneCtx) toneCtx = new AudioCtx();
+    if (toneCtx.state === 'suspended') toneCtx.resume();
+    const ctx = toneCtx;
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
