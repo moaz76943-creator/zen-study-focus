@@ -200,3 +200,39 @@ test('DF-PR-01 unrelated title edit never assigns a date to an imported undated 
  assert.equal(Object.hasOwn(state.tasksList[0],'dueAssigned'),false);
  assert.deepEqual(state.tasksList[0].other,{keep:42});
 });
+
+test('DF-PARALLEL-05: one-field Quick Add retries failed ACK and never creates a deadline or duplicate',()=>{
+ let state={cfg:{sessionHistory:[],taskProjectsV21:[],legacyOpaque:{preserve:true}},tasksList:[]};
+ let attempts=0,commits=0,allow=false;
+ const root=new FakeElement(fakeDoc,'main');
+ const studio=Studio.mount(root,{locale:'en',now:()=>new Date(2026,9,26),
+   readState:()=>JSON.parse(JSON.stringify(state)),
+   commit(before,after){
+     attempts++;
+     assert.deepEqual(before,state);
+     if(!allow)return false;
+     state=JSON.parse(JSON.stringify(after));commits++;return true;
+   }});
+ const form=root.descendants.find(x=>x.tagName==='FORM'&&x.className?.includes('df-quick-add'));
+ assert.ok(form,'One-field Quick Add must be available without opening the full editor');
+ const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+ assert.ok(title);
+ title.value='  ';
+ form.dispatch('submit');
+ assert.equal(attempts,0);
+ title.value='Study German';
+ form.dispatch('submit');
+ assert.equal(attempts,1);assert.equal(commits,0);assert.equal(title.value,'Study German');
+ assert.equal(state.tasksList.length,0);
+ allow=true;
+ form.dispatch('submit');
+ assert.equal(attempts,2);assert.equal(commits,1);
+ assert.equal(state.tasksList.length,1);
+ assert.equal(state.tasksList[0].title,'Study German');
+ assert.equal(state.tasksList[0].dueAssigned,false);
+ assert.equal(C.isOverdue(state.tasksList[0],'2026-11-15'),false);
+ assert.deepEqual(state.cfg.legacyOpaque,{preserve:true});
+ form.dispatch('submit');
+ assert.equal(commits,1,'Detached Quick Add may not write twice');
+ studio.destroy();
+});
