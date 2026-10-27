@@ -43,11 +43,11 @@ function tagAttrs() {
   return out;
 }
 
-function scriptTags() {
+function scriptTags(source = html) {
   const out = [];
-  const pattern = /<script\b([^>]*)>([\s\S]*?)<\/script>/g;
+  const pattern = /<script((?:\s[^>]*)?)>([\s\S]*?)<\/script\s*>/gi;
   let m;
-  while ((m = pattern.exec(html)) !== null) {
+  while ((m = pattern.exec(source)) !== null) {
     const srcMatch = /src\s*=\s*"([^"]*)"/.exec(m[1]);
     out.push({ src: srcMatch ? srcMatch[1] : null, body: m[2] });
   }
@@ -360,4 +360,11 @@ test('U01 renders untrusted text through textContent only and networks nowhere',
   byId('study-plan-apply').fire('click');
   const summary = byId('study-plan-summary').textContent;
   assert.ok(summary.startsWith('<img src=x onerror=alert(1)> ('), 'untrusted input must stay raw text');
+});
+
+
+test('script fixture reader rejects custom tag names and accepts case-insensitive script tags', () => {
+  assert.deepEqual(scriptTags('<script-extra>throw new Error("not executable");</script>'), []);
+  assert.deepEqual(scriptTags('<script:extra>throw new Error("not executable");</script>'), []);
+  assert.deepEqual(scriptTags('<SCRIPT type="text/javascript">true;</SCRIPT  >'), [{src: null, body: 'true;'}]);
 });

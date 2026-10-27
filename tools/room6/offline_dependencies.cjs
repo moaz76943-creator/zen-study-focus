@@ -228,7 +228,7 @@ function scanJs(text, filePath, results) {
         message: 'Tracking or telemetry API referenced in shipped source'
       }));
     }
-    const sinkMatch = line.match(/(?:\.|\b)(?:src|href)\s*=\s*["'`]?(https?:\/\/[^\s"'`]+)/i);
+    const sinkMatch = !/^["'`]/.test(trimmed) && line.match(/(?:\.|\b)(?:src|href)\s*=\s*["'`]?(https?:\/\/[^\s"'`]+)/i);
     let sinkHandled = false;
     if (sinkMatch) {
       const host = urlHost(sinkMatch[1]);
@@ -327,7 +327,7 @@ function scanText(text, extension, filePath) {
     scanHtml(text, filePath, results);
     scanCss(text, filePath, results);
     const scriptParts = [];
-    for (const block of text.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    for (const block of text.matchAll(/<script((?:\s[^>]*)?)>([\s\S]*?)<\/script\s*>/gi)) {
       if (attributeValue(block[1] || '', 'src')) continue;
       const pad = '\n'.repeat(text.slice(0, block.index).split('\n').length - 1);
       scriptParts.push(pad + block[2]);
@@ -386,6 +386,38 @@ function listCorpusFiles(root) {
     }
   };
   walk(webRootAbsolute, '');
+  // Follow locally loaded assets, including filenames outside the Room6 naming
+  // convention. Resolve within the web root; do not follow symlinks or escapes.
+  const known = new Set(corpus.map(entry => entry.path));
+  for (let i = 0; i < corpus.length; i += 1) {
+    const entry = corpus[i];
+    let text;
+    try { text = fs.readFileSync(entry.absolutePath, 'utf8'); } catch { continue; }
+    const refs = [];
+    if (/\.html?$/i.test(entry.path)) {
+      for (const tag of text.matchAll(/<(script|link)\s([^>]*)>/gi)) {
+        const ref = attributeValue(tag[2], tag[1].toLowerCase() === 'script' ? 'src' : 'href');
+        if (ref) refs.push(ref);
+      }
+    }
+    if (/\.(?:html?|css)$/i.test(entry.path)) {
+      for (const match of text.matchAll(/@import\s+(?:url\(\s*["']?([^"')]+)["']?\s*\)|["']([^"']+)["'])/gi)) {
+        refs.push(match[1] || match[2]);
+      }
+    }
+    for (const ref of refs) {
+      if (/^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(ref)) continue;
+      const absolutePath = path.resolve(path.dirname(entry.absolutePath), ref.split(/[?#]/)[0]);
+      if (!absolutePath.startsWith(webRootAbsolute + path.sep)) continue;
+      const relativePath = path.relative(path.resolve(root), absolutePath).split(path.sep).join('/');
+      if (known.has(relativePath) || !/\.(?:js|mjs|cjs|css)$/i.test(absolutePath)) continue;
+      try {
+        if (!fs.lstatSync(absolutePath).isFile() || !fs.realpathSync(absolutePath).startsWith(fs.realpathSync(webRootAbsolute) + path.sep)) continue;
+      } catch { continue; }
+      known.add(relativePath);
+      corpus.push({ path: relativePath, absolutePath, role: 'local-dependency', focusLab: false });
+    }
+  }
   const packageJson = 'package.json';
   if (fs.existsSync(path.resolve(root, packageJson))) {
     corpus.push({ path: packageJson, absolutePath: path.resolve(root, packageJson), role: 'dependency-manifest', focusLab: false });
