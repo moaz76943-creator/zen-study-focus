@@ -11,6 +11,27 @@
   const D = root.DeepFocusDataCompatV21;
   const FAMILIES = [['cfg','cfg'],['tasks','tasksList'],['notes','notesList']];
   let tasksUi = null, analyticsUi = null, lastLocale = null, mounted = false;
+  const pendingExports = new Map();
+  let exportSerial = Date.now();
+  root.DFRecoveryNativeExportResult = function(requestId,status) {
+    const pending=pendingExports.get(requestId);
+    if(!pending)return;
+    pendingExports.delete(requestId);
+    pending(status==='saved'?'saved':status==='cancelled'?'cancelled':'failed');
+  };
+  function saveCsvThroughAndroid(csv) {
+    if(typeof root.ZenNative?.exportAnalyticsCsvToFile!=='function')
+      return Promise.resolve({status:'failed'});
+    return new Promise(resolve=>{
+      const requestId='df-csv-'+(++exportSerial);
+      const expiry=root.setTimeout(()=>{
+        if(pendingExports.delete(requestId))resolve({status:'failed'});
+      },120000);
+      pendingExports.set(requestId,status=>{root.clearTimeout(expiry);resolve({status});});
+      try{root.ZenNative.exportAnalyticsCsvToFile(csv,requestId);}
+      catch(_){root.DFRecoveryNativeExportResult(requestId,'failed');}
+    });
+  }
   function copy(value) { return JSON.parse(JSON.stringify(value)); }
   function equal(a,b) { return JSON.stringify(a) === JSON.stringify(b); }
   function current() { return copy({cfg,tasksList,notesList}); }
@@ -174,7 +195,8 @@
         switchTab('sec-tasks',document.getElementById('navTasks'));
         return true;
       },
-      // Download fallback is browser-driven until the Android Save-As bridge is verified.
+      ...(typeof root.ZenNative?.exportAnalyticsCsvToFile==='function'
+        ? {onExport:saveCsvThroughAndroid}:{}),
     });
     document.getElementById('sec-analytics').classList.add('df22-analytics-live');
   }
@@ -226,5 +248,5 @@
       try {notify('⚠️ Advanced features unavailable: ' + e.message);} catch (_) {}
     }
   }
-  return Object.freeze({install,write,getSnapshot,onTab,onSessionRecorded,refreshLocale});
+  return Object.freeze({install,write,getSnapshot,onTab,onSessionRecorded,refreshLocale,saveCsvThroughAndroid});
 });
