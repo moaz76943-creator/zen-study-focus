@@ -108,6 +108,22 @@ let snapshot;
   assert.equal(await evaluate('window.ZenNative.acknowledgeDurableV21("{\\"version\\":1,\\"packets\\":{}}")'),false);
   assert.equal(await evaluate('window.ZenNative.readDurableV21()'),snapshot);
   record('malformed-envelope-does-not-overwrite','PASS','Rejected invalid receipt preserves disk');
+  for(const suffix of ['', '_mirror']){
+    const result=await evaluate(`(()=>{
+      const before=window.DF22Integration.getSnapshot(),after=JSON.parse(JSON.stringify(before));
+      after.tasksList[0].title='REJECTED write';
+      const raw=JSON.stringify(window.DeepFocusDataCompatV21.captureRaw(localStorage));
+      const proto=Object.getPrototypeOf(localStorage),set=proto.setItem;
+      let injected=false,error='';
+      proto.setItem=function(k,v){if(!injected&&k===${JSON.stringify(D.KEYS.tasks+suffix)}){injected=true;throw Error('N01InjectedWrite');}return set.call(this,k,v);};
+      try{window.DF22Integration.write(before,after);}catch(e){error=String(e.message);}finally{proto.setItem=set;}
+      return {injected,error,unchanged:JSON.stringify(before)===JSON.stringify(window.DF22Integration.getSnapshot()),rawUnchanged:raw===JSON.stringify(window.DeepFocusDataCompatV21.captureRaw(localStorage))};
+    })()`);
+    assert.equal(result.injected,true);assert.match(result.error,/N01InjectedWrite/);
+    assert.equal(result.unchanged,true);assert.equal(result.rawUnchanged,true);
+    assert.equal(await evaluate('window.ZenNative.readDurableV21()'),snapshot);
+    record(suffix?'mirror-write-refused':'primary-write-refused','PASS','Real WebView storage failure rolls back all records without advancing native receipt');
+  }
   await restart();
   const reopened=await evaluate('window.ZenNative.readDurableV21()');
   assertFixture(reopened);
@@ -130,6 +146,11 @@ let snapshot;
   record('force-stop-durable-native-ack','PASS','Signed six-family native payloads survive Android process death');
   adb('shell','run-as',PKG,'touch',marker);
   assert.equal(await evaluate('window.ZenNative.readDurableV21()'),'ERROR','Pending marker must block replay');
+  const refusedEdit=await evaluate(`(()=>{
+    const before=window.DF22Integration.getSnapshot(),after=JSON.parse(JSON.stringify(before));after.notesList[0].body='REJECTED native edit';
+    try{window.DF22Integration.write(before,after);return {accepted:true};}catch(e){return {accepted:false,error:String(e.message),unchanged:JSON.stringify(before)===JSON.stringify(window.DF22Integration.getSnapshot())};}
+  })()`);
+  assert.equal(refusedEdit.accepted,false);assert.match(refusedEdit.error,/NATIVE_DURABLE_ACK_FAILED/);assert.equal(refusedEdit.unchanged,true);
   const refused=await evaluate("(()=>{const old=JSON.parse(window.ZenNative.readDurableV21()==='ERROR'?"+JSON.stringify(snapshot)+":window.ZenNative.readDurableV21());old.packets[Object.keys(old.packets)[0]]='disposable-rejected';return window.ZenNative.acknowledgeDurableV21(JSON.stringify(old));})()");
   assert.equal(refused,false,'Write accepted with pending marker');
   assert.equal(disk(),snapshot,'Rejected publication overwrote previous private file');
@@ -153,6 +174,30 @@ let snapshot;
     }
   }
   record('explicit-test-fixture-recovery','PASS','Signed prior records recovered after removing disposable fault marker');
+  // Real native I/O fault: AtomicFile cannot open its .new path as a file.
+  // Keep the old bytes, require rejection, and remove only this disposable fault.
+  const staged='files/v21_durable_packets_v1.new';
+  adb('shell','run-as',PKG,'mkdir',staged);
+  try{
+    assert.equal(await evaluate('window.DF22Preflight.nativeAcknowledge(localStorage)'),false,'AtomicFile I/O failure must refuse ACK');
+    assert.equal(disk(),recovered,'AtomicFile failure overwrote last valid receipt');
+    record('atomicfile-startwrite-failure','PASS','Real Android file/directory conflict refuses publication and preserves prior bytes');
+  }finally{
+    adb('shell','run-as',PKG,'rmdir',staged);
+    adb('shell','run-as',PKG,'rm','-f',marker);
+  }
+  // Corrupt only the disposable native fixture; never delete a user database.
+  const backup='files/n01_disposable_receipt_backup';
+  adb('shell','run-as',PKG,'cp','files/v21_durable_packets_v1',backup);
+  try{
+    adb('shell','run-as',PKG,'truncate','-s','1','files/v21_durable_packets_v1');
+    assert.equal(await evaluate('window.ZenNative.readDurableV21()'),'ERROR','Corrupt native JSON must not be replayed');
+    await restart();
+    assert.equal(await evaluate('!!document.getElementById("df22-startup-block")'),true,'Corrupt native checkpoint must block startup');
+    record('corrupt-native-receipt-blocks-startup','PASS','Actual corrupted private file is refused on read and reopening');
+  }finally{adb('shell','run-as',PKG,'cp',backup,'files/v21_durable_packets_v1');adb('shell','run-as',PKG,'rm',backup);}
+  await restart();
+  assertFixture(await evaluate('window.ZenNative.readDurableV21()'));
  }finally{try{adb('shell','run-as',PKG,'rm','-f',marker);}catch(_){}await disconnect();}
 })().catch(e=>{record('native-ack-probe',status(e),String(e.message||e).slice(0,350));process.exitCode=status(e)==='FAIL'?1:2;}).finally(()=>{
  if(cases.some(c=>c.status!=='PASS'))process.exitCode=cases.some(c=>c.status==='FAIL')?1:2;

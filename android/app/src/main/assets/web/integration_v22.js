@@ -115,6 +115,7 @@
     // Same wire format and recovery semantics as lane 01's inspected v21 journal.
     const journal = {version:1,state:'pending',original,expected};
     storage.setItem(D.JOURNAL_KEY,JSON.stringify(journal));
+    let nativeCommitted = false;
     try {
       for (const [key,value] of Object.entries(expected)) storage.setItem(key,value);
       for (const [key,value] of Object.entries(expected))
@@ -124,6 +125,7 @@
       // Browser readback is not fsync. Require the native six-packet receipt.
       if (root.ZenNative && (!root.DF22Preflight || !root.DF22Preflight.nativeAcknowledge(storage)))
         throw new Error('NATIVE_DURABLE_ACK_FAILED');
+      nativeCommitted = !!root.ZenNative;
     } catch (e) {
       const failed = rollback(storage,original);
       if (failed.length) throw new Error('Storage interrupted; recovery journal retained: ' + failed.join('; '));
@@ -131,9 +133,16 @@
       catch (cleanup) { throw new Error('Rollback succeeded but recovery journal remains: ' + cleanup.message); }
       throw e;
     }
-    try { storage.removeItem(D.JOURNAL_KEY); }
-    catch (e) { throw new Error('Commit complete, journal cleanup pending. Reload after explicit recovery: ' + e.message); }
-    // Publish only after ALL six packets verify AND the journal is cleared.
+    try {
+      storage.removeItem(D.JOURNAL_KEY);
+      if (storage.getItem(D.JOURNAL_KEY)!==null) throw new Error('Journal cleanup not verified');
+    } catch (e) {
+      if (!nativeCommitted) throw new Error('Commit complete, journal cleanup pending. Reload after explicit recovery: ' + e.message);
+      // Native ACK is irrevocably committed. Reporting rejection here would
+      // resurrect a supposedly refused edit at startup. Publish success and
+      // retain the journal for verified native replay/cleanup on reopening.
+    }
+    // Publish after verified packets and either journal cleanup or native ACK.
     cfg = after.cfg;tasksList = after.tasksList;notesList = after.notesList;
     return true;
   }

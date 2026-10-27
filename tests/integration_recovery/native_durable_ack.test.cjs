@@ -132,3 +132,15 @@ test('unacknowledged newer journal never replaces the last native receipt',()=>{
  assert.equal(b.context.tasksList[0].checklist[0].done,true);
  assert.equal(b.storage.getItem(D.JOURNAL_KEY),null);
 });
+
+test('native ACK is the commit point even when post-commit journal cleanup is unavailable',()=>{
+ const r=rig(),a=r.boot(),remove=a.storage.removeItem.bind(a.storage);
+ a.storage.removeItem=k=>{if(k===D.JOURNAL_KEY)throw Error('InjectedCleanup');remove(k);};
+ assert.equal(r.toggle(a.context,true),true,'A durable accepted edit must report saved');
+ assert.equal(a.context.tasksList[0].checklist[0].done,true);
+ assert.notEqual(a.storage.getItem(D.JOURNAL_KEY),null,'Keep recovery evidence until cleanup is available');
+ r.flush(a.storage);
+ const b=r.boot();assert.equal(b.started,true);
+ assert.equal(b.context.tasksList[0].checklist[0].done,true);
+ assert.equal(b.storage.getItem(D.JOURNAL_KEY),null);
+});
