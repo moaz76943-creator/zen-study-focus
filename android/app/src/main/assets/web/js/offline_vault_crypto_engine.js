@@ -90,12 +90,31 @@
     };
   }
 
+  // Keep the historical Base64 UTF-8 wire format in Node and offline WebViews.
+  function encodePayload(value) {
+    if (typeof Buffer !== 'undefined') return Buffer.from(value, 'utf8').toString('base64');
+    return btoa(unescape(encodeURIComponent(value)));
+  }
+
+  function decodePayload(value) {
+    if (typeof value !== 'string' ||
+        !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value)) {
+      throw new Error('INVALID_BASE64');
+    }
+    var decoded = typeof Buffer !== 'undefined'
+      ? Buffer.from(value, 'base64').toString('utf8')
+      : decodeURIComponent(escape(atob(value)));
+    // Reject invalid UTF-8 and noncanonical padding rather than silently repairing data.
+    if (encodePayload(decoded) !== value) throw new Error('INVALID_PAYLOAD_ENCODING');
+    return decoded;
+  }
+
   function createVaultEnvelope(payloadObj, saltHex) {
-    var payloadStr = typeof payloadObj === 'object' ? JSON.stringify(payloadObj) : String(payloadObj || '');
+    var payloadStr = typeof payloadObj === 'object' ? JSON.stringify(payloadObj) : String(payloadObj === undefined ? '' : payloadObj);
     var salt = saltHex || generateCryptographicSalt(16);
 
     var iv = generateCryptographicSalt(6);
-    var mockCipher = Buffer.from(payloadStr).toString('base64');
+    var encodedPayload = encodePayload(payloadStr);
 
     var checksum = 0;
     for (var i = 0; i < payloadStr.length; i++) {
@@ -107,7 +126,7 @@
       algorithm: 'NONE-BASE64-INTEGRITY-ONLY',
       saltHex: salt,
       ivHex: iv,
-      cipherPayload: mockCipher,
+      cipherPayload: encodedPayload,
       watermarkChecksum: toWesternDigits(String(checksum)),
       sealedAt: toWesternDigits(new Date().toISOString()),
       zeroMusicCertified: true,
@@ -116,13 +135,14 @@
   }
 
   function verifyVaultIntegrity(envelope) {
-    if (!envelope || !envelope.cipherPayload || !envelope.watermarkChecksum) {
+    if (!envelope || typeof envelope.cipherPayload !== 'string' ||
+        !/^(?:0|[1-9][0-9]{0,5})$/.test(String(envelope.watermarkChecksum))) {
       return { valid: false, statusKey: 'integrity_tampered' };
     }
 
     var decoded = '';
     try {
-      decoded = Buffer.from(envelope.cipherPayload, 'base64').toString('utf8');
+      decoded = decodePayload(envelope.cipherPayload);
     } catch (e) {
       return { valid: false, statusKey: 'integrity_tampered' };
     }
@@ -147,6 +167,7 @@
     var dict = STRINGS[loc] || STRINGS.en;
 
     var integrity = verifyVaultIntegrity(envelope);
+    envelope = envelope && typeof envelope === 'object' ? envelope : {};
     var pacing = calibrateDerivationPacing(100);
 
     return {
