@@ -7,7 +7,8 @@ const path=require('node:path');
 const source=fs.readFileSync(path.resolve(__dirname,'../../android/app/src/main/assets/web/app.js'),'utf8');
 
 function run(name,ctx,endName){
- const start=source.indexOf('function '+name+'(');
+ const match=source.match(new RegExp('(?:async )?function '+name+'\\('));
+ const start=match?match.index:-1;
  const end=source.indexOf('\nfunction '+endName+'(',start);
  assert.ok(start>=0&&end>start,'missing isolated '+name+' function');
  vm.runInNewContext(source.slice(start,end)+'\n'+name+'();',ctx);
