@@ -73,3 +73,16 @@ test('N02 production Java receiver: lifecycle, duplicate/stale delivery, failed 
   assert.match(output,/assertions PASS/);
  } finally {fs.rmSync(dir,{recursive:true,force:true});}
 });
+
+// These parsers consume actual Android receipts; warnings and absent fields
+// cannot silently become positive lifecycle evidence.
+test('N02 Android receipt parsers separate actual native state and package notification IDs', () => {
+ const {parseAlarmPrefs, notificationKeys}=require('./n02_android_probe.cjs');
+ assert.deepEqual(parseAlarmPrefs('<map><boolean name="active" value="false" /><long name="token" value="7" /><long name="deadline" value="1790000000000" /><long name="lastNotified" value="1790000000030" /></map>'),{active:false,token:7,deadline:1790000000000,lastNotified:1790000000030});
+ assert.throws(()=>parseAlarmPrefs('<map><boolean name="active" value="true" /></map>'),/Missing native preference/);
+ assert.throws(()=>parseAlarmPrefs('run-as: package unavailable'),/XML unavailable/);
+ assert.throws(()=>parseAlarmPrefs('<map><boolean name="active" value="true" /><long name="token" value="NaN" /><long name="deadline" value="0" /><long name="lastNotified" value="0" /></map>'),/Invalid native preference/);
+ const receipt='0|android|2002|null|1000\n0|com.zenstudy.focus|1001|null|10177\n0|com.zenstudy.focus|2002|null|10177\n';
+ assert.deepEqual(notificationKeys(receipt,2002),['0|com.zenstudy.focus|2002|null|10177']);
+ assert.deepEqual(notificationKeys(receipt,1001),['0|com.zenstudy.focus|1001|null|10177']);
+});

@@ -38,4 +38,12 @@ if [[ "$launched" != 1 ]]; then
   echo 'QA INFRA BLOCKER: Android app process not launched' >&2
   exit 2
 fi
-DF_TRACK05_SERIAL="$serial" DF_TRACK05_DISPOSABLE=1 node tests/track05_timer/live_android_cdp.cjs "$report/cdp-results.json"
+# Execute the focused real AlarmManager test independently; preserve both reports
+# even when one harness hits a real app failure or unavailable device transport.
+alarm_status=0
+DF_TRACK05_SERIAL="$serial" DF_TRACK05_DISPOSABLE=1 node tests/critical_room7/n02_android_probe.cjs "$report/n02-alarm-results.json" || alarm_status=$?
+lifecycle_status=0
+DF_TRACK05_SERIAL="$serial" DF_TRACK05_DISPOSABLE=1 node tests/track05_timer/live_android_cdp.cjs "$report/cdp-results.json" || lifecycle_status=$?
+if [[ "$alarm_status" == 1 || "$lifecycle_status" == 1 ]]; then exit 1; fi
+if [[ "$alarm_status" != 0 ]]; then exit "$alarm_status"; fi
+exit "$lifecycle_status"
