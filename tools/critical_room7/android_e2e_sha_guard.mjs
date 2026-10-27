@@ -18,7 +18,8 @@ export const REASONS = Object.freeze({
   PATH_ESCAPES_BASE: 'PATH_ESCAPES_BASE',
   RECORDED_PATH_MISMATCH: 'RECORDED_PATH_MISMATCH',
   SOURCE_SHA_NOT_FOUND: 'SOURCE_SHA_NOT_FOUND',
-  SOURCE_SHA_MALFORMED: 'SOURCE_SHA_MALFORMED'
+  SOURCE_SHA_MALFORMED: 'SOURCE_SHA_MALFORMED',
+  SOURCE_SHA_MISMATCH: 'SOURCE_SHA_MISMATCH'
 });
 
 const SHA_LINE_PATTERN = /^([0-9a-fA-F]{64}) ([ *])(.*)$/;
@@ -306,6 +307,12 @@ export async function verifyApkSha(options = {}) {
 
 export async function verifySourceToApk(options = {}) {
   const report = emptyReport();
+  const expectedSourceSha = options.expectedSourceSha;
+  if (expectedSourceSha !== undefined &&
+      (typeof expectedSourceSha !== 'string' || !SOURCE_SHA_PATTERN.test(expectedSourceSha))) {
+    addReason(report, REASONS.INVALID_ARGUMENT);
+    return report;
+  }
   const bundleDir = firstString(options.bundleDir) ? path.resolve(options.bundleDir) : undefined;
   const shaFile = firstString(options.shaFile);
   if (!bundleDir && !shaFile) {
@@ -335,6 +342,9 @@ export async function verifySourceToApk(options = {}) {
       if (SOURCE_SHA_PATTERN.test(trimmed)) {
         report.source.present = true;
         report.source.sha = trimmed.toLowerCase();
+        if (expectedSourceSha !== undefined && report.source.sha !== expectedSourceSha.toLowerCase()) {
+          addReason(report, REASONS.SOURCE_SHA_MISMATCH);
+        }
       } else {
         addReason(report, REASONS.SOURCE_SHA_MALFORMED);
       }
@@ -361,6 +371,7 @@ const VALUE_FLAGS = new Map([
   ['--bundle-dir', 'bundleDir'],
   ['--base-dir', 'baseDir'],
   ['--source-file', 'sourceFile'],
+  ['--expected-source-sha', 'expectedSourceSha'],
   ['--sidecar-name', 'sidecarName'],
   ['--source-name', 'sourceName']
 ]);
@@ -369,8 +380,8 @@ function usageText() {
   return [
     'Usage: node android_e2e_sha_guard.mjs --bundle-dir <dir> [--base-dir <d>] [--json]',
     '       node android_e2e_sha_guard.mjs --sha-file <file> [--apk <file>] [--base-dir <d>] [--json]',
-    'Flags: --source-file <p> --sidecar-name <n> --source-name <n> --json',
-    'Verifies an Android E2E CI sha256sum sidecar and source SHA against real APK bytes.',
+    'Flags: --source-file <p> --expected-source-sha <sha> --sidecar-name <n> --source-name <n> --json',
+    'Verifies APK bytes against a sha256sum sidecar; use --expected-source-sha to reject stale source receipts.',
     'Read-only inputs, no network. Exits 0 on PASS, 1 on FAIL, 2 on invalid usage.'
   ].join('\n');
 }
@@ -416,7 +427,7 @@ export async function main(argv) {
   }
   let report;
   try {
-    report = parsedCli.options.bundleDir
+    report = (parsedCli.options.bundleDir || parsedCli.options.sourceFile || parsedCli.options.expectedSourceSha)
       ? await verifySourceToApk(parsedCli.options)
       : await verifyApkSha(parsedCli.options);
   } catch (error) {

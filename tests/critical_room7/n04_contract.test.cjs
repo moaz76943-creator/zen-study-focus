@@ -53,6 +53,38 @@ function sidecarLine(apkPath, recordedName, mode) {
 
 const load = () => import(MODULE);
 
+test('N04 rejects stale source receipts even when the APK checksum is valid', async () => {
+  const guard = await load();
+  await fixture(async (dir) => {
+    const apkPath = makeApk(dir, 'app-debug.apk', 37);
+    const shaFile = path.join(dir, 'apk.sha256');
+    const sourceFile = path.join(dir, 'source_sha.txt');
+    fs.writeFileSync(shaFile, sidecarLine(apkPath, 'app-debug.apk') + '\n');
+    fs.writeFileSync(sourceFile, 'a'.repeat(40) + '\n');
+    const options = { bundleDir: dir, expectedSourceSha: 'b'.repeat(40) };
+    const stale = await guard.verifySourceToApk(options);
+    assert.equal(stale.status, 'FAIL');
+    assert.deepEqual(stale.reasons, ['SOURCE_SHA_MISMATCH']);
+    assert.equal(stale.entries[0].ok, true);
+    const current = await guard.verifySourceToApk({ ...options, expectedSourceSha: 'A'.repeat(40) });
+    assert.equal(current.status, 'PASS');
+    for (const expectedSourceSha of ['', 'bad-sha', null, 42]) {
+      const invalid = await guard.verifySourceToApk({ ...options, expectedSourceSha });
+      assert.equal(invalid.status, 'FAIL');
+      assert.deepEqual(invalid.reasons, ['INVALID_ARGUMENT']);
+    }
+    const cli = cp.spawnSync(process.execPath, [SOURCE, '--sha-file', shaFile, '--base-dir', dir,
+      '--source-file', sourceFile, '--expected-source-sha', 'b'.repeat(40), '--json'], { encoding: 'utf8' });
+    assert.equal(cli.status, 1, cli.stderr);
+    assert.deepEqual(JSON.parse(cli.stdout).reasons, ['SOURCE_SHA_MISMATCH']);
+    fs.unlinkSync(sourceFile);
+    const missing = cp.spawnSync(process.execPath, [SOURCE, '--sha-file', shaFile, '--base-dir', dir,
+      '--source-file', sourceFile, '--json'], { encoding: 'utf8' });
+    assert.equal(missing.status, 1, missing.stderr);
+    assert.ok(JSON.parse(missing.stdout).reasons.includes('SOURCE_SHA_NOT_FOUND'));
+  });
+});
+
 test('N04 guard module exists and exports the E2E CI SHA contract', async () => {
   const guard = await load();
 
