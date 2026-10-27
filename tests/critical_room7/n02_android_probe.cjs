@@ -27,7 +27,18 @@ function notificationKeys(output, id) {
     return parts.length >= 5 && parts[1] === PKG && parts[2] === String(id);
   });
 }
-module.exports = {parseAlarmPrefs, notificationKeys};
+// CDP evaluation crosses asynchronous Android/WebView boundaries. A live
+// countdown can tick before the second read; compare against real elapsed time.
+function liveTimerStarted(value, requestedSeconds, elapsedMs) {
+  if (!Number.isSafeInteger(requestedSeconds) || requestedSeconds < 1 ||
+      !Number.isFinite(elapsedMs) || elapsedMs < 0) return false;
+  const drift = Math.min(requestedSeconds - 1, Math.ceil(elapsedMs / 1000) + 1);
+  return Boolean(value && value.running && value.id &&
+    Number.isSafeInteger(value.left) &&
+    value.left <= requestedSeconds &&
+    value.left >= Math.max(1, requestedSeconds - drift));
+}
+module.exports = {parseAlarmPrefs, notificationKeys, liveTimerStarted};
 
 async function main() {
   const file = process.argv[2];
@@ -106,9 +117,11 @@ async function main() {
   }
   async function startLive(seconds) {
     assert.equal(await evaluate(`changeTimerDelta((${seconds}-timerLeft)/60)`),true,'Real timer shortening refused');
+    const startAt=Date.now();
     assert.equal(await evaluate('toggleTimerPlay()'),true,'Real Start refused');
     const value=await evaluate('({id:timerSessionId,running:timerRunning,left:timerLeft})');
-    assert.ok(value.running&&value.id&&value.left===seconds,'Live timer did not start');
+    assert.ok(liveTimerStarted(value,seconds,Date.now()-startAt),
+      'Live timer did not start or elapsed unexpectedly: '+JSON.stringify({value,seconds}));
     const state=prefs();assert.equal(state.active,true);return {...state,id:value.id};
   }
   async function noCompletionThrough(deadline) {
