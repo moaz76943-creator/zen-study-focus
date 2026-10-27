@@ -11,8 +11,9 @@ if [[ ! -s "$ROOT/tasks.json" ]]; then
   exit 1
 fi
 mkdir -p "$ROOT"
-tmp="$(mktemp "$ROOT/.repair-download.XXXXXX")"
-trap 'rm -f "$tmp"' EXIT
+tmpdir="$(mktemp -d "$ROOT/.repair-verify.XXXXXX")"
+tmp="$tmpdir/repair.mjs"
+trap 'rm -f "$tmp"; rmdir "$tmpdir" 2>/dev/null || true' EXIT
 curl --retry 3 --retry-delay 2 -fsSL "$BASE/repair_v1.mjs.gz.b64" | base64 -d | gzip -d > "$tmp"
 printf '%s  %s\n' \
   '91d35d05822e2723ef0c94dbb5ea5fde7355ac7042239c122397c47be506c871' "$tmp" | sha256sum -c -
@@ -20,6 +21,7 @@ node --check "$tmp"
 # Do not overwrite existing rescue scripts unless the newly downloaded one passes its manifest contract.
 node "$tmp" selftest
 mv "$tmp" "$ROOT/repair.mjs"
+rmdir "$tmpdir"
 trap - EXIT
 node "$ROOT/repair.mjs" start
 node "$ROOT/repair.mjs" status
