@@ -117,6 +117,9 @@ jobs:
           ram-size: ${{ matrix.api == 30 && '2048M' || '3072M' }}
           heap-size: ${{ matrix.api == 30 && '256M' || '512M' }}
           emulator-boot-timeout: 900
+          # Controlled transport retry without optional SwiftShader Vulkan.
+          # Real WebView/native assertions stay intact; results decide acceptance.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
           disable-animations: false
           script: |
             bash tests/android_dialogs/run_native_dialog_device.sh
