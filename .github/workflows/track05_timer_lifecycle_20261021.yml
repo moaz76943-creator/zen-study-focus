@@ -51,7 +51,7 @@ jobs:
           node --check tests/track05_timer/live_android_cdp.cjs
           bash -n tests/track05_timer/run_android_timer_qa.sh
       - name: Native active timer checkpoint and lifecycle regression
-        run: node --test tests/track05_timer/native_timer_checkpoint.test.cjs tests/track05_timer/mode_snapshot_ack.test.cjs tests/track05_timer/delta_snapshot_ack.test.cjs
+        run: node --test tests/track05_timer/native_timer_checkpoint.test.cjs tests/track05_timer/mode_snapshot_ack.test.cjs tests/track05_timer/delta_snapshot_ack.test.cjs tests/track05_timer/adb_timeout.test.cjs tests/track05_timer/adb_classification.test.cjs
       - name: Track05 real-function lifecycle regression and adjacent timer guards
         run: |
           node --test tests/track05_timer/tick_lifecycle.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/integration_quality/activity_domain_durable_ack.test.cjs
