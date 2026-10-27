@@ -76,6 +76,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/df-dialog-evidence"
           sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/df-dialog-evidence/apk.sha256"
           git rev-parse HEAD > "$RUNNER_TEMP/df-dialog-evidence/source-head.txt"
+          node tools/critical_room7/android_e2e_sha_guard.mjs \
+            --bundle-dir "$RUNNER_TEMP/df-dialog-evidence" \
+            --base-dir "$PWD" \
+            --source-name source-head.txt \
+            --expected-source-sha "$(git rev-parse HEAD)" --json \
+            > "$RUNNER_TEMP/df-dialog-evidence/apk-source-verification.json"
       - name: Give emulator runner KVM access
         shell: bash
         run: |
