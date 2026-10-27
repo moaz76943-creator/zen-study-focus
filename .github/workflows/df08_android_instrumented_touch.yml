@@ -77,12 +77,12 @@ jobs:
           api-level: ${{ matrix.api }}
           arch: x86_64
           target: google_apis
-          profile: pixel_6
-          ram-size: ${{ matrix.api == 35 && '2048M' || '' }}
-          heap-size: ${{ matrix.api == 35 && '256M' || '' }}
-          emulator-boot-timeout: 600
+          profile: ${{ matrix.api == 35 && 'pixel_2' || 'pixel_6' }}
+          ram-size: ${{ matrix.api == 35 && '3072M' || '' }}
+          heap-size: ${{ matrix.api == 35 && '512M' || '' }}
+          emulator-boot-timeout: 900
           disable-animations: true
-          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect' }}
+          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect
           script: bash tests/android_touch/df08_instrumentation/run_ci.sh
       - name: Record exact head, no production changes and limits
         if: always()
