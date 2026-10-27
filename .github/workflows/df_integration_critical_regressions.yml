@@ -3,6 +3,13 @@ on:
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
+      - 'tests/critical_room7/**'
+      - 'tools/critical_room7/**'
+      - 'tests/integration_recovery/**'
+      - 'android/app/src/main/assets/web/js/offline_vault_crypto_engine.js'
+      - 'android/app/src/main/assets/web/tasks_studio.js'
+      - 'android/app/src/main/java/com/zenstudy/focus/FocusAlarmReceiver.java'
+      - 'android/app/src/main/java/com/zenstudy/focus/FocusAppWebChromeClient.java'
       - 'android/app/src/main/assets/web/quick_training.js'
       - 'android/app/src/main/assets/web/app.js'
       - 'android/app/src/main/assets/web/js/weekly_report_exporter.js'
@@ -20,6 +27,13 @@ on:
   push:
     branches: [integration/master-qa-verified-v21]
     paths:
+      - 'tests/critical_room7/**'
+      - 'tools/critical_room7/**'
+      - 'tests/integration_recovery/**'
+      - 'android/app/src/main/assets/web/js/offline_vault_crypto_engine.js'
+      - 'android/app/src/main/assets/web/tasks_studio.js'
+      - 'android/app/src/main/java/com/zenstudy/focus/FocusAlarmReceiver.java'
+      - 'android/app/src/main/java/com/zenstudy/focus/FocusAppWebChromeClient.java'
       - 'android/app/src/main/assets/web/quick_training.js'
       - 'android/app/src/main/assets/web/app.js'
       - 'android/app/src/main/assets/web/preflight_v22.js'
@@ -50,6 +64,14 @@ jobs:
           node --test tests/integration_quality/backup_clipboard_ack.test.cjs
           node test/weekly_report_exporter.test.js
           node --test tests/i18n/audio_settings/audio_bridge_activation.test.cjs tests/i18n/audio_settings/audio_settings_localization.test.cjs
+      - name: Recovered Room7 contracts and native publication fault regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/critical_room7/*.test.cjs
+          if [[ -f tests/integration_recovery/native_atomic_ack_test.py ]]; then
+            python3 -m unittest tests.integration_recovery.native_atomic_ack_test -v
+          fi
       - name: Actual 99 Quick Training packs and transition regression
         run: node --test tests/i18n/quick_training/*.test.cjs
       - name: Actual timer consent and stale tick regression
