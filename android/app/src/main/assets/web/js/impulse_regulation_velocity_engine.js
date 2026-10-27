@@ -80,11 +80,15 @@
       });
     }
 
+    var validImpulses = 0;
     timestamps.forEach(function (ts) {
-      var min = Number(ts) || 0;
+      if (typeof ts !== 'number' && typeof ts !== 'string') return;
+      var min = Number(ts);
+      if (!isFinite(min) || min < 0 || min >= totalMins) return;
       var bIdx = Math.floor(min / 5);
       if (bIdx >= 0 && bIdx < buckets.length) {
         buckets[bIdx].impulseCount++;
+        validImpulses++;
       }
     });
 
@@ -106,13 +110,13 @@
     var overallState = 'impulse_stable';
     if (maxImpulsesInBucket >= 3) {
       overallState = 'impulse_clustered';
-    } else if (timestamps.length >= 2) {
+    } else if (validImpulses >= 2) {
       overallState = 'impulse_moderate';
     }
 
     return {
       totalSessionMinutes: totalMins,
-      totalImpulses: timestamps.length,
+      totalImpulses: validImpulses,
       buckets: buckets,
       overallStateKey: overallState,
       peakVulnerabilityWindow: clusterIndex !== -1 ? toWesternDigits(buckets[clusterIndex].intervalStartMin + '-' + buckets[clusterIndex].intervalEndMin + 'm') : 'None'

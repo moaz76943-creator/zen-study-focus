@@ -25,7 +25,14 @@
    */
   function sanitizeTakeaway(text) {
     if (typeof text !== 'string') return '';
-    return text.trim().substring(0, 200).replace(/[<>]/g, '');
+    var trimmed = text.trim();
+    if (trimmed.length > 200) {
+      trimmed = trimmed.substring(0, 200);
+      if (/[\uD800-\uDBFF]$/.test(trimmed)) {
+        trimmed = trimmed.slice(0, -1);
+      }
+    }
+    return trimmed.replace(/[<>]/g, '');
   }
 
   /**
