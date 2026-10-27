@@ -27,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private FocusAppWebChromeClient appDialogs;
     private static final int REQUEST_BACKUP_EXPORT = 7410;
+    private static final int REQUEST_ANALYTICS_EXPORT = 7413;
+    private String analyticsAwaitingSave = null;
+    private String analyticsAwaitingRequest = null;
     private static final int REQUEST_BACKUP_IMPORT = 7412;
     private static final int MAX_BACKUP_IMPORT_BYTES = 8 * 1024 * 1024;
     private boolean backupImportPickerOpen = false;
@@ -237,6 +240,36 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        // A correlated receipt follows closed-stream write and byte-for-byte readback.
+        @JavascriptInterface
+        public void exportAnalyticsCsvToFile(String csv, String requestId) {
+            if (requestId == null || !requestId.matches("df-csv-[0-9]{1,16}")) return;
+            if (csv == null || csv.getBytes(StandardCharsets.UTF_8).length > NativeCsvWriter.MAX_BYTES
+                    || !(csv.startsWith("\"id\"") || csv.startsWith("\"date\"")
+                        || csv.startsWith("\"period\""))) {
+                reportAnalyticsSave(requestId, "failed");
+                return;
+            }
+            runOnUiThread(() -> {
+                if (analyticsAwaitingRequest != null || isDestroyed()) {
+                    reportAnalyticsSave(requestId, "failed");
+                    return;
+                }
+                analyticsAwaitingSave = csv;
+                analyticsAwaitingRequest = requestId;
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("text/csv");
+                intent.putExtra(Intent.EXTRA_TITLE, "deep-focus-analytics.csv");
+                try { startActivityForResult(intent, REQUEST_ANALYTICS_EXPORT); }
+                catch (Exception error) {
+                    analyticsAwaitingSave = null;
+                    analyticsAwaitingRequest = null;
+                    reportAnalyticsSave(requestId, "failed");
+                }
+            });
+        }
+
         @JavascriptInterface
         public void shareAppInvite(String statsSummary) {
             Intent share = new Intent(Intent.ACTION_SEND);
@@ -260,9 +293,54 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void reportAnalyticsSave(String requestId, String status) {
+        if (webView == null || requestId == null || isDestroyed()) return;
+        final String callback = "window.DFRecoveryNativeExportResult && window.DFRecoveryNativeExportResult("
+                + org.json.JSONObject.quote(requestId) + "," + org.json.JSONObject.quote(status) + ");";
+        webView.post(() -> {
+            if (webView != null && !isDestroyed()) webView.evaluateJavascript(callback, null);
+        });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ANALYTICS_EXPORT) {
+            final String payload = analyticsAwaitingSave, requestId = analyticsAwaitingRequest;
+            analyticsAwaitingSave = null;
+            analyticsAwaitingRequest = null;
+            if (resultCode != Activity.RESULT_OK) {
+                reportAnalyticsSave(requestId, "cancelled");
+                return;
+            }
+            if (payload == null || data == null || data.getData() == null) {
+                reportAnalyticsSave(requestId, "failed");
+                return;
+            }
+            final Uri target = data.getData();
+            // Keep the UI responsive while a user-selected document provider performs IO.
+            analyticsAwaitingRequest = requestId;
+            new Thread(() -> {
+                String status;
+                try {
+                    NativeCsvWriter.writeAndVerify(new NativeCsvWriter.Document() {
+                        public OutputStream openOutput() throws java.io.IOException {
+                            return getContentResolver().openOutputStream(target, "wt");
+                        }
+                        public java.io.InputStream openInput() throws java.io.IOException {
+                            return getContentResolver().openInputStream(target);
+                        }
+                    }, payload);
+                    status = "saved";
+                } catch (Exception error) { status = "failed"; }
+                final String receipt = status;
+                runOnUiThread(() -> {
+                    analyticsAwaitingRequest = null;
+                    reportAnalyticsSave(requestId, receipt);
+                });
+            }, "df-csv-export").start();
+            return;
+        }
         if (requestCode == REQUEST_BACKUP_IMPORT) {
             backupImportPickerOpen = false;
             if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null) return;
