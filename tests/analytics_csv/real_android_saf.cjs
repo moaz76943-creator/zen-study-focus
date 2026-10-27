@@ -114,6 +114,9 @@ async function receiptAfter(before,expected){
 (async()=>{
  try{
   await connect();
+  await waitFor('Bundled app fully loaded and canonical integration installed',async()=>evaluate(
+    "document.readyState==='complete' && typeof cfg!=='undefined' && typeof DF22Integration!=='undefined' && document.body.classList.contains('df-v22') && !!document.querySelector('#navAnalytics')"
+  ),60);
   const initial=await evaluate("({url:location.href,installed:!!window.DF22Integration,normal:document.querySelector('#navAnalytics')!==null})");
   assert.equal(initial?.url,'file:///android_asset/web/index.html');
   assert.equal(initial.normal,true);
