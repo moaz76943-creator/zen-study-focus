@@ -12,9 +12,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
 
 
-def ack_method():
+def java_method(signature):
     source = SOURCE.read_text()
-    start = source.index('public boolean acknowledgeDurableV21(String json)')
+    start = source.index(signature)
     opening = source.index('{', start)
     depth = 1
     end = opening + 1
@@ -36,6 +36,7 @@ public class NativeAckFaultHarness {
     File getFilesDir() { return directory; }
     boolean validV21Envelope(String json) { return true; } // Validation is a separate contract.
     ACK_METHOD
+    READ_METHOD
     public static void main(String[] args) throws Exception {
         File directory = new File(args[1]);
         File base = new File(directory, "v21_durable_packets_v1");
@@ -45,6 +46,8 @@ public class NativeAckFaultHarness {
         boolean ack = new NativeAckFaultHarness(directory).acknowledgeDurableV21("new receipt");
         System.out.println(ack);
         System.out.println(base.exists() ? new String(Files.readAllBytes(base.toPath()),StandardCharsets.UTF_8) : "ABSENT");
+        if (args[0].equals("readback-rollback-failure"))
+            System.out.println(new NativeAckFaultHarness(directory).readDurableV21());
     }
 }
 // AtomicFile.finishWrite logs rename/sync failure without throwing. Model that
@@ -53,7 +56,11 @@ class AtomicFile {
     static String mode;
     final File base, staged;
     AtomicFile(File base) { this.base = base; this.staged = new File(base.getPath()+".new"); }
+    File getBaseFile() { return base; }
+    void delete() { base.delete(); staged.delete(); }
+    boolean published = false;
     FileOutputStream startWrite() throws IOException {
+        if (mode.equals("rollback-failure")) throw new IOException("cannot restore receipt");
         if (mode.equals("interrupted")) throw new IOException("fault before publication");
         return new FileOutputStream(staged);
     }
@@ -61,8 +68,16 @@ class AtomicFile {
         output.close();
         if (mode.startsWith("silent")) return;
         Files.move(staged.toPath(),base.toPath(),StandardCopyOption.REPLACE_EXISTING);
+        published = true;
     }
-    byte[] readFully() throws IOException { return Files.readAllBytes(base.toPath()); }
+    byte[] readFully() throws IOException {
+        if (mode.equals("initial-read-failure")) throw new IOException("prior receipt unreadable");
+        if (published && mode.startsWith("readback-")) {
+            mode=mode.equals("readback-rollback-failure")?"rollback-failure":"publish";
+            throw new IOException("injected readback error after publication");
+        }
+        return Files.readAllBytes(base.toPath());
+    }
     void failWrite(FileOutputStream output) {
         try { output.close(); } catch (IOException ignored) {}
         staged.delete();
@@ -75,7 +90,7 @@ class NativeAtomicAckTest(unittest.TestCase):
     def execute(self, mode):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / 'NativeAckFaultHarness.java'
-            source.write_text(HARNESS.replace('ACK_METHOD', ack_method()))
+            source.write_text(HARNESS.replace('ACK_METHOD', java_method('public boolean acknowledgeDurableV21(String json)')).replace('READ_METHOD',java_method('public String readDurableV21()')))
             result = subprocess.run(['java',str(source),mode,directory],text=True,
                                     capture_output=True,check=True,timeout=30)
             return result.stdout.strip().splitlines()
@@ -85,6 +100,15 @@ class NativeAtomicAckTest(unittest.TestCase):
 
     def test_silent_first_publish_failure_cannot_acknowledge_missing_receipt(self):
         self.assertEqual(self.execute('silent-first'),['false','ABSENT'])
+
+    def test_readback_failure_after_publication_restores_previous_receipt(self):
+        self.assertEqual(self.execute('readback-failure'),['false','previous'])
+
+    def test_initial_read_failure_never_deletes_previous_receipt(self):
+        self.assertEqual(self.execute('initial-read-failure'),['false','previous'])
+
+    def test_failed_rollback_blocks_replay_of_rejected_edit(self):
+        self.assertEqual(self.execute('readback-rollback-failure'),['false','new receipt','ERROR'])
 
     def test_success_acknowledges_exact_published_bytes(self):
         self.assertEqual(self.execute('publish'),['true','new receipt'])
