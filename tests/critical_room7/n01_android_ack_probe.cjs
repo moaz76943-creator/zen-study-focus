@@ -13,6 +13,25 @@ function adb(...args){
  catch(e){throw Error('TRANSPORT: '+args.slice(0,3).join(' ')+' failed: '+String(e.stderr||e.message).slice(0,180));}
 }
 const sha=s=>crypto.createHash('sha256').update(s,'utf8').digest('hex');
+const D=require('../../android/app/src/main/assets/web/data_compat_v21.js');
+function assertFixture(receipt){
+ const packets=JSON.parse(receipt).packets;
+ for(const [slot,key] of Object.entries(D.KEYS)){
+  const raw=packets[key],mirror=packets[key+'_mirror'];
+  assert.equal(D.inspectPacket(raw).ok,true,'Invalid checksum/payload: '+key);
+  assert.equal(D.inspectPacket(mirror).ok,true,'Invalid mirror checksum/payload: '+key);
+  assert.equal(JSON.parse(raw).payload,JSON.parse(mirror).payload,'Divergent native family: '+key);
+  const value=D.inspectPacket(raw).value;
+  if(slot==='tasks')assert.deepEqual(value.find(x=>x.id===81001),{id:81001,title:'N01 task مهمة',done:false,extra:{preserved:'task-extra'},checklist:[{id:81002,title:'child',done:true}]});
+  if(slot==='notes')assert.deepEqual(value.find(x=>x.id===82001),{id:82001,title:'N01 note ملاحظة',body:'Durable body\nسطر محفوظ',extra:{preserved:'note-extra'}});
+  if(slot==='cfg'){
+   assert.equal(value.n01Extra.preserved,'cfg-extra');
+   assert.equal(value.sessionHistory.filter(x=>x.id==='n01-disposable-session').length,1,'Lost or duplicated session');
+   assert.equal(value.sessionHistory.find(x=>x.id==='n01-disposable-session').minutes,5);
+   assert.equal(value.completedTimerIds.filter(x=>x==='n01-disposable-session').length,1,'Lost or duplicated credit ID');
+  }
+ }
+}
 const cases=[];let ws,next=0;const pending=new Map();
 function record(name,status,reason,evidence={}){cases.push({name,status,reason,evidence});fs.writeFileSync(file,JSON.stringify({
  headSha:process.env.DF_N01_SOURCE_SHA||null,api,source:'installed debug Android WebView/ZenNative + private AtomicFile readback',
@@ -71,16 +90,27 @@ let snapshot;
  assert.match(adb('shell','pm','clear',PKG),/Success/);
  await start();
  try {
+  assert.equal(await evaluate(`(()=>{
+   const before=window.DF22Integration.getSnapshot(),after=JSON.parse(JSON.stringify(before));
+   after.tasksList=[{id:81001,title:'N01 task مهمة',done:false,extra:{preserved:'task-extra'},checklist:[{id:81002,title:'child',done:true}]}];
+   after.notesList=[{id:82001,title:'N01 note ملاحظة',body:'Durable body\\nسطر محفوظ',extra:{preserved:'note-extra'}}];
+   after.cfg.n01Extra={preserved:'cfg-extra'};
+   after.cfg.sessionHistory=[{id:'n01-disposable-session',date:localDateISO(),minutes:5,domain:'study',mode:'focus',completed:true}];
+   after.cfg.completedTimerIds=['n01-disposable-session'];
+   return window.DF22Integration.write(before,after);
+  })()`),true,'Could not save disposable records through real integration/ACK');
   assert.equal(await evaluate('window.DF22Preflight.nativeAcknowledge(localStorage)'),true,'Native ACK rejected valid current six packets');
   snapshot=await evaluate('window.ZenNative.readDurableV21()');
   assert.equal(typeof snapshot,'string');assert.ok(snapshot.startsWith('{"version":1,'));
   assert.deepEqual(JSON.parse(disk()),JSON.parse(snapshot),'Private native AtomicFile bytes differ from returned verified receipt');
+  assertFixture(snapshot);
   record('real-native-ack-readback','PASS','Exact six-packet receipt matches Android private AtomicFile',{sha256:sha(snapshot)});
   assert.equal(await evaluate('window.ZenNative.acknowledgeDurableV21("{\\"version\\":1,\\"packets\\":{}}")'),false);
   assert.equal(await evaluate('window.ZenNative.readDurableV21()'),snapshot);
   record('malformed-envelope-does-not-overwrite','PASS','Rejected invalid receipt preserves disk');
   await restart();
   const reopened=await evaluate('window.ZenNative.readDurableV21()');
+  assertFixture(reopened);
   assert.ok(reopened!=='ERROR'&&reopened!=='NONE','Native receipt unreadable after force-stop');
   assert.equal(disk(),reopened,'Private native bytes disagree with post-restart readback');
   // Startup may legitimately re-stamp packet metadata. Compare signed payloads
@@ -110,6 +140,7 @@ let snapshot;
   adb('shell','run-as',PKG,'rm',marker);
   await restart();
   const recovered=await evaluate('window.ZenNative.readDurableV21()');
+  assertFixture(recovered);
   assert.ok(recovered!=='NONE'&&recovered!=='ERROR','Known prior native receipt was not readable after clearing disposable marker');
   assert.equal(disk(),recovered,'Android private AtomicFile does not match recovered readback');
   const beforeRecovery=JSON.parse(snapshot).packets,afterRecovery=JSON.parse(recovered).packets;
