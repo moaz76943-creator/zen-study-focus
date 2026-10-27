@@ -109,8 +109,19 @@ let snapshot;
   record('pending-marker-rejection-restart','PASS','Interrupted-publication marker refuses ACK and survives restart',{priorSha256:sha(snapshot)});
   adb('shell','run-as',PKG,'rm',marker);
   await restart();
-  assert.equal(await evaluate('window.ZenNative.readDurableV21()'),snapshot,'Known previous receipt did not recover');
-  record('explicit-test-fixture-recovery','PASS','Previous receipt recovered after removing disposable fault marker');
+  const recovered=await evaluate('window.ZenNative.readDurableV21()');
+  assert.ok(recovered!=='NONE'&&recovered!=='ERROR','Known prior native receipt was not readable after clearing disposable marker');
+  assert.equal(disk(),recovered,'Android private AtomicFile does not match recovered readback');
+  const beforeRecovery=JSON.parse(snapshot).packets,afterRecovery=JSON.parse(recovered).packets;
+  assert.deepEqual(Object.keys(afterRecovery).sort(),Object.keys(beforeRecovery).sort());
+  for(const k of Object.keys(beforeRecovery)){
+    assert.equal(afterRecovery[k]===null,beforeRecovery[k]===null,'Native record disappeared after marker removal: '+k);
+    if(beforeRecovery[k]!==null){
+      assert.equal(JSON.parse(afterRecovery[k]).payload,JSON.parse(beforeRecovery[k]).payload,'Recovered user data differs: '+k);
+      assert.equal(JSON.parse(afterRecovery[k]).sig,JSON.parse(beforeRecovery[k]).sig,'Recovered signature differs: '+k);
+    }
+  }
+  record('explicit-test-fixture-recovery','PASS','Signed prior records recovered after removing disposable fault marker');
  }finally{try{adb('shell','run-as',PKG,'rm','-f',marker);}catch(_){}await disconnect();}
 })().catch(e=>{record('native-ack-probe',status(e),String(e.message||e).slice(0,350));process.exitCode=status(e)==='FAIL'?1:2;}).finally(()=>{
  if(cases.some(c=>c.status!=='PASS'))process.exitCode=cases.some(c=>c.status==='FAIL')?1:2;
