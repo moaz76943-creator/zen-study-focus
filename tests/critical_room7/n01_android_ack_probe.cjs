@@ -29,6 +29,8 @@ function assertFixture(receipt){
    assert.equal(value.sessionHistory.filter(x=>x.id==='n01-disposable-session').length,1,'Lost or duplicated session');
    assert.equal(value.sessionHistory.find(x=>x.id==='n01-disposable-session').minutes,5);
    assert.equal(value.completedTimerIds.filter(x=>x==='n01-disposable-session').length,1,'Lost or duplicated credit ID');
+   assert.equal(value.sessions,1,'Session counter changed');
+   assert.equal(value.todayMins,5,'Focus minutes changed');
   }
  }
 }
@@ -98,6 +100,11 @@ let snapshot;
    after.cfg.n01Extra={preserved:'cfg-extra'};
    after.cfg.sessionHistory=[{id:'n01-disposable-session',date:localDateISO(),minutes:5,domain:'study',mode:'focus',completed:true}];
    after.cfg.completedTimerIds=['n01-disposable-session'];
+   // Seed the same consistent derived counters as a real completed session.
+   // Startup correctly recalculates streak; an inconsistent synthetic cfg
+   // would change legitimately and invalidate exact signed-payload comparison.
+   after.cfg.sessions=1;after.cfg.todayMins=5;after.cfg.metricsDate=localDateISO();
+   after.cfg.streak=computeActualStreak(after.cfg.sessionHistory);
    return window.DF22Integration.write(before,after);
   })()`),true,'Could not save disposable records through real integration/ACK');
   assert.equal(await evaluate('window.DF22Preflight.nativeAcknowledge(localStorage)'),true,'Native ACK rejected valid current six packets');
