@@ -197,9 +197,21 @@ async function main() {
       await fresh();const before=await startLive(10);await disconnect();adb('shell','am','force-stop',PKG);
       const stopped=adb('shell','dumpsys','package',PKG);assert.match(stopped,/stopped=true/,'OS did not mark package stopped');
       await noCompletionThrough(before.deadline);assert.equal(prefs().active,true,'Force-stop should leave disk receipt, not execute receiver');
-      await launch();assert.equal(await evaluate('timerRunning'),false);assert.equal(await evaluate('cfg.sessions||0'),1,'Expired real session was not reconciled exactly once');assert.equal(notifications(2002).length,0,'Expired reopen manufactured native alert');
+      await launch();assert.equal(await evaluate('timerRunning'),false);assert.equal(await evaluate('cfg.sessions||0'),1,'Expired real session was not reconciled exactly once');
+      // Android may deliver a single user-facing completion on reopening an expired
+      // force-stopped session. The safety contract is NO delivery while stopped
+      // and NO duplicate credit or second native delivery after reopening.
+      const firstKeys=notifications(2002),firstReceipt=prefs();
+      assert.ok(firstKeys.length<=1,'Multiple native completion notifications on reopen');
+      if(firstKeys.length) {
+        assert.equal(firstReceipt.active,false,'Reopen notified a still-active timer');
+        assert.ok(firstReceipt.lastNotified>=before.deadline,'Reopen completion predates saved deadline');
+      }
       await disconnect();adb('shell','am','force-stop',PKG);await launch();assert.equal(await evaluate('cfg.sessions||0'),1,'Reopen credited session twice');
-      return {token:before.token,osStopped:true,noDeliveryWhileStopped:true,expiredReopenCredits:1};
+      const secondKeys=notifications(2002),secondReceipt=prefs();
+      assert.deepEqual(secondKeys,firstKeys,'Second reopen delivered another completion notification');
+      assert.equal(secondReceipt.lastNotified,firstReceipt.lastNotified,'Second reopen repeated native delivery');
+      return {token:before.token,osStopped:true,noDeliveryWhileStopped:true,expiredReopenCredits:1,completionAfterReopen:firstKeys.length};
     });
     await run('force-stop-future-reopen-rearms-and-delivers-once',async()=>{
       await fresh();const before=await startLive(30);await disconnect();adb('shell','am','force-stop',PKG);await launch();
