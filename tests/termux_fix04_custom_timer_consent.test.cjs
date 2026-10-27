@@ -9,9 +9,9 @@ const start=app.indexOf('function selectTimerModeFromUser(');
 const stop=app.indexOf('\nfunction changeTimerDelta(',start);
 assert.ok(start>=0 && stop>start, 'Expected complete custom timer source section');
 const section=app.slice(start,stop);
-function setup({quick=false,allow=false,running=true,pauseAck=true}={}) {
+function setup({quick=false,allow=false,running=true,pauseAck=true,modeAck=true}={}) {
   let prompts=0,closes=0,toasts=0,rendered=0,stops=0;
-  const saves=[];
+  const saves=[],acknowledgements=[];
   const fields={
     inpCustomMins:{value:'40'},
     inpCustomTitle:{value:'New project'},
@@ -29,7 +29,8 @@ function setup({quick=false,allow=false,running=true,pauseAck=true}={}) {
     L(){return {modeCustom:'Custom'}},toWest(x){return x},
     document:{getElementById(id){assert.ok(fields[id],`missing ${id}`);return fields[id]}},
     toggleTimerPlay(){stops++;if(pauseAck!==true)return false;sandbox.timerRunning=false;return true},
-    storeTimerSession(){saves.push({label:sandbox.customSessionLabel,mode:sandbox.currentTimerModeKey,total:sandbox.timerTotal})},
+    persistActiveTimerSnapshot(snapshot){acknowledgements.push(snapshot);return modeAck},
+    storeTimerSession(){saves.push({label:sandbox.customSessionLabel,mode:sandbox.currentTimerModeKey,total:sandbox.timerTotal});return true},
     updateTimerDisplay(){},
     closeModal(id){assert.equal(id,'customTimerModal');closes++;},
     showToast(){toasts++;}
@@ -37,7 +38,7 @@ function setup({quick=false,allow=false,running=true,pauseAck=true}={}) {
   vm.createContext(sandbox);
   vm.runInContext(section,sandbox);
   const apply=()=>vm.runInContext('applyCustomTimerNow()',sandbox);
-  return {sandbox,apply,saves,metrics:()=>({prompts,closes,toasts,rendered,stops})};
+  return {sandbox,apply,saves,acknowledgements,metrics:()=>({prompts,closes,toasts,rendered,stops})};
 }
 
 test('Declining a custom timer change preserves title, time, running session, and open dialog',()=>{
@@ -91,4 +92,21 @@ test('Accepted Custom switch aborts when durable Pause is rejected, retaining cu
  assert.equal(t.saves.length,0);
  assert.equal(t.metrics().closes,0);
  assert.equal(t.metrics().stops,1);
+});
+
+test('Rejected custom-mode checkpoint preserves paused progress and open editor',()=>{
+ const t=setup({allow:true,running:false,modeAck:false});
+ assert.equal(t.apply(),false);
+ assert.equal(t.sandbox.timerSessionId,'original-session');
+ assert.equal(t.sandbox.timerActiveMs,120000);
+ assert.equal(t.sandbox.timerLeft,900);
+ assert.equal(t.sandbox.timerTotal,1500);
+ assert.equal(t.sandbox.customSessionLabel,'Existing title (25m)');
+ assert.equal(t.sandbox.currentTimerModeKey,'focus');
+ assert.equal(t.acknowledgements.length,1);
+ assert.equal(t.acknowledgements[0].mode,'custom');
+ assert.equal(t.acknowledgements[0].total,2400);
+ assert.equal(t.saves.length,0);
+ assert.equal(t.metrics().closes,0);
+ assert.equal(t.metrics().toasts,0);
 });
