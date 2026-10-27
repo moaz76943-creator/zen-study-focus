@@ -15,13 +15,14 @@ function section(start,end) {
 const routine=section('function addWaterCup() {','\nfunction toggleDeskClock(');
 function harness(mode='ok',initialWater=2) {
   const state={cfg:{lang:'en',water:initialWater,unknown:{legacy:'keep'}},renders:0,toasts:[],writes:0,acked:null};
+  if(initialWater==='missing')delete state.cfg.water;
   const c=vm.createContext({
     cfg:state.cfg, window:{},
     saveFortressData:(key,next)=>{
       state.writes++;
       assert.equal(key,'zen_fortress_cfg_v21','Water counter lives in the existing cfg v21 family');
       assert.equal(c.cfg,state.cfg,'Do not publish new values before persistence ACK');
-      assert.equal(state.cfg.water,initialWater,'Water counter unchanged before ACK');
+      assert.equal(state.cfg.water,initialWater==='missing'?undefined:initialWater,'Water counter unchanged before ACK');
       if(mode==='throw')throw Error('QuotaExceededError');
       const ok=mode!=='false';
       if(ok)state.acked=next;
@@ -56,7 +57,7 @@ test('water cup commits exactly once after acknowledgement, wrapping 8 back to 0
   assert.equal(h.c.cfg,h.state.acked,'Publish reuses the exact acknowledged packet object');
 });
 test('legacy cfg without a water counter resolves to 1 instead of serializing NaN',()=>{
-  const h=harness('ok',0);
+  const h=harness('ok','missing');
   assert.equal(h.run('addWaterCup()'),true);
   assert.equal(h.c.cfg.water,1);
   assert.equal(h.state.writes,1);
