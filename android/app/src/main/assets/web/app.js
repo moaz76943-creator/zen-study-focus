@@ -2747,6 +2747,14 @@ function selectTimerMode(mins, modeKey, btn) {
   if (endingQuickTraining && !window.confirm(quickText('replacePrompt'))) return false;
   // A rejected Pause must leave the mode and any active Quick Training intact.
   if (timerRunning && toggleTimerPlay() !== true) return false;
+  // A mode change discards the paused session only after its replacement is
+  // durably acknowledged. Never publish a rejected idle snapshot to the UI.
+  if (!persistActiveTimerSnapshot({
+    total:mins*60,left:mins*60,running:false,endAt:null,
+    mode:modeKey,label:customSessionLabel,sessionId:null,taskId:focusSessionTaskId,
+    activeMs:0,resumedAt:null,
+    training:!endingQuickTraining && quickTraining?.active ? {...quickTraining} : null
+  })) return false;
   if (endingQuickTraining) {
     quickTraining = null;
     renderQuickTraining();
@@ -2761,7 +2769,6 @@ function selectTimerMode(mins, modeKey, btn) {
   timerSessionId = null;
   timerActiveMs = 0;
   timerResumeMs = null;
-  storeTimerSession();
   updateTimerDisplay();
   return true;
 }
