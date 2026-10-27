@@ -1,12 +1,11 @@
 'use strict';
+const {createEvidenceDirectory}=require('../android_e2e_recovery/private_evidence.cjs');
 // TRACK 04 / DF-070..084: genuine Chromium touchscreen taps and state outcomes.
 // Desktop Chromium is NOT evidence of Android WebView, native dialogs or SAF.
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 const {chromium} = require('playwright');
 
-const out = process.env.DF_TRACK04_EVIDENCE || '/tmp/df-track04';
+const evidence=createEvidenceDirectory(process.env.DF_TRACK04_EVIDENCE,'df-track04-');
 const url = process.env.DF_COMPLETION_URL || 'http://127.0.0.1:8770';
 const languages = 'en ar es zh hi fr de ru pt ja id tr ko vi it bn ur fa pl nl'.split(' ');
 const navs = [
@@ -28,7 +27,6 @@ async function observed(page){
   });
 }
 (async()=>{
-  fs.mkdirSync(out,{recursive:true});
   const browser=await chromium.launch({executablePath:process.env.DF4_CHROMIUM||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
   let page;
   try {
@@ -145,11 +143,11 @@ async function observed(page){
   }catch(e){
     results.push({name:'unexpected outcome',status:'FAIL',error:String(e.message||e).slice(0,1000)});
     process.exitCode=1;
-    if(page)await page.screenshot({path:path.join(out,'failed-mobile.png'),fullPage:true}).catch(()=>{});
+    if(page)await page.screenshot({fullPage:true}).then(bytes=>evidence.write('failed-mobile.png',bytes)).catch(()=>{});
   }finally{
     const summary={source:'current checked-out Git tree',environment:'real desktop Chromium touchscreen emulation (not Android)',realTouchOutcomes:results.filter(x=>x.status==='PASS').length,
       failed:results.filter(x=>x.status==='FAIL'),pageErrors,android:'NOT_TESTED',nativeDialog:'NOT_TESTED',saf:'NOT_TESTED',talkback:'NOT_TESTED',releaseApproved:false};
-    fs.writeFileSync(path.join(out,'touch-outcomes.json'),JSON.stringify({summary,results},null,2)+'\n');
+    evidence.write('touch-outcomes.json',JSON.stringify({summary,results},null,2)+'\n');
     console.log(JSON.stringify(summary));
     await browser.close();
   }
