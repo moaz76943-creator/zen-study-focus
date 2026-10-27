@@ -58,7 +58,7 @@ function nsGetStoredDraft(){
  if(d.cornell!==undefined&&(!d.cornell||['cues','notes','summary'].some(k=>typeof d.cornell[k]!=='string'||d.cornell[k].length>NS_DRAFT_LIMIT)))return null;
  if(d.tags!==undefined&&(typeof d.tags!=='string'||d.tags.length>12000))return null;
  if(d.notebookId!==undefined&&(typeof d.notebookId!=='string'||d.notebookId.length>120))return null;
- if(d.recallPairs!==undefined&&(!Array.isArray(d.recallPairs)||d.recallPairs.length>200||d.recallPairs.some(p=>typeof p.question!=='string'||typeof p.answer!=='string')))return null;
+  if(d.recallPairs!==undefined&&(!Array.isArray(d.recallPairs)||d.recallPairs.length>200||d.recallPairs.some(p=>!p||typeof p.question!=='string'||typeof p.answer!=='string')))return null;
  if(d.baseFingerprint!==undefined&&d.baseFingerprint!==null&&
     (typeof d.baseFingerprint!=='string'||d.baseFingerprint.length>NS_DRAFT_LIMIT))return null;
  if(d.title.length>250||d.body.length>NS_DRAFT_LIMIT)return null;
