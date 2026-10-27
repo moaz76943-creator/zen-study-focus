@@ -11,13 +11,19 @@ apk="android/app/build/outputs/apk/debug/app-debug.apk"
 testapk="android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
 test -s "$apk" && test -s "$testapk"
 sha256sum "$apk" "$testapk" > "$out/APK_SHA256.txt"
+source tests/android_touch/df08_instrumentation/failure_evidence.sh
+logcat_pid=
 cleanup() {
+  if [[ -n "${logcat_pid:-}" ]]; then kill "$logcat_pid" 2>/dev/null || true; fi
   timeout 10s adb shell wm size reset >/dev/null 2>&1 || true
   timeout 10s adb shell wm density reset >/dev/null 2>&1 || true
   timeout 10s adb shell settings put system font_scale 1.0 >/dev/null 2>&1 || true
   timeout 10s adb logcat -d -s DF08_REAL_ANDROID AndroidRuntime > "$out/logcat.txt" 2>&1 || true
 }
 trap cleanup EXIT
+# Stream to the host before testing: a dead emulator cannot supply post-failure logcat.
+adb logcat -v threadtime -s DF08_REAL_ANDROID AndroidRuntime > "$out/live-logcat.txt" 2>&1 &
+logcat_pid=$!
 bash tests/white_premium_qa/track14_install_apk.sh "$apk"
 timeout 180s adb install --no-streaming -r "$testapk" > "$out/test-apk-install.txt" 2>&1
 # Force 1 physical pixel per CSS pixel for the requested 320/360/393/430px
@@ -36,11 +42,14 @@ for width in 320 360 393 430; do
   timeout 160s adb shell am instrument -w -r -e stage save -e width "$width" \
     com.zenstudy.focus.test/com.zenstudy.focus.df08.TouchInstrumentation \
     > "$output" 2>&1 || {
+      command_status=$?
+      df08_record_failure save "$width" "$output" "$command_status"
       echo "ANDROID_INSTRUMENTATION_COMMAND_FAIL width=$width"; cat "$output"; exit 1;
     }
   if ! grep -q 'INSTRUMENTATION_RESULT: df08_status=PASS' "$output" ||
       ! grep -q 'INSTRUMENTATION_RESULT: df08_water_ack=PASS' "$output" ||
       ! grep -q 'INSTRUMENTATION_RESULT: df08_physical_taps=' "$output"; then
+    df08_record_failure save "$width" "$output" 0
     echo "ANDROID_TOUCH_NOT_PASS width=$width"
     timeout 15s adb exec-out cat /sdcard/df08_live_failure.png > "$out/foreground-failure-$width.png" 2>/dev/null || true
         timeout 30s adb exec-out screencap -p > "$out/failure-$width.png" 2>/dev/null || true
@@ -56,10 +65,13 @@ for width in 320 360 393 430; do
   timeout 160s adb shell am instrument -w -r -e stage verify -e width "$width" \
     com.zenstudy.focus.test/com.zenstudy.focus.df08.TouchInstrumentation \
     > "$reopen" 2>&1 || {
+      command_status=$?
+      df08_record_failure verify "$width" "$reopen" "$command_status"
       echo "ANDROID_NOTES_REOPEN_COMMAND_FAIL api=$api width=$width"; cat "$reopen"; exit 1;
     }
   if ! grep -q 'INSTRUMENTATION_RESULT: df08_status=PASS' "$reopen" ||
      ! grep -q 'INSTRUMENTATION_RESULT: df08_reopen=PASS' "$reopen"; then
+    df08_record_failure verify "$width" "$reopen" 0
     echo "ANDROID_NOTES_REOPEN_NOT_PASS api=$api width=$width"; cat "$reopen"; exit 1
   fi
   timeout 40s adb exec-out screencap -p > "$out/after-${width}.png" || true
