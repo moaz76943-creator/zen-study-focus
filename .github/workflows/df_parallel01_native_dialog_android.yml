@@ -7,6 +7,13 @@ on:
     paths:
       - 'android/app/src/main/java/com/zenstudy/focus/**'
       - 'tests/android_dialogs/**'
+      - 'tests/critical_room7/n01_android_ack_probe.cjs'
+      - 'tests/integration_recovery/native_durable_ack.test.cjs'
+      - 'android/app/src/main/assets/web/preflight_v22.js'
+      - 'tests/critical_room7/n02_contract.test.cjs'
+      - 'tests/critical_room7/n03_contract.test.cjs'
+      - 'tests/critical_room7/n04_contract.test.cjs'
+      - 'tools/critical_room7/android_e2e_sha_guard.mjs'
       - '.github/workflows/df_parallel01_native_dialog_android.yml'
 permissions:
   contents: read
@@ -39,6 +46,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
+      - name: Native lifecycle and APK guard regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/critical_room7/n04_contract.test.cjs
+          node --test tests/integration_recovery/native_durable_ack.test.cjs
+          for contract in tests/critical_room7/n02_contract.test.cjs tests/critical_room7/n03_contract.test.cjs; do
+            if [[ -f "$contract" ]]; then node --test "$contract"; fi
+          done
       - name: Verify exact source and source-only contract
         shell: bash
         run: |
@@ -46,6 +62,7 @@ jobs:
           test "$(git rev-parse HEAD)" = '${{ github.event.pull_request.head.sha || github.sha }}'
           node --test tests/android_dialogs/current_native_dialog_handoff.test.cjs
           node --check tests/android_dialogs/native_js_dialog_android_probe.cjs
+          node --check tests/critical_room7/n01_android_ack_probe.cjs
           bash -n tests/android_dialogs/run_native_dialog_device.sh
       - name: Enable CDP for disposable DEBUG APK in runner workspace ONLY
         shell: bash
@@ -76,6 +93,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/df-dialog-evidence"
           sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/df-dialog-evidence/apk.sha256"
           git rev-parse HEAD > "$RUNNER_TEMP/df-dialog-evidence/source-head.txt"
+          node tools/critical_room7/android_e2e_sha_guard.mjs \
+            --bundle-dir "$RUNNER_TEMP/df-dialog-evidence" \
+            --base-dir "$PWD" \
+            --source-name source-head.txt \
+            --expected-source-sha "$(git rev-parse HEAD)" --json \
+            > "$RUNNER_TEMP/df-dialog-evidence/apk-source-verification.json"
       - name: Give emulator runner KVM access
         shell: bash
         run: |
@@ -94,8 +117,13 @@ jobs:
           ram-size: ${{ matrix.api == 30 && '2048M' || '3072M' }}
           heap-size: ${{ matrix.api == 30 && '256M' || '512M' }}
           emulator-boot-timeout: 900
+          # Controlled transport retry without optional SwiftShader Vulkan.
+          # Real WebView/native assertions stay intact; results decide acceptance.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
           disable-animations: false
-          script: bash tests/android_dialogs/run_native_dialog_device.sh
+          script: |
+            bash tests/android_dialogs/run_native_dialog_device.sh
+            DF_N01_SERIAL=emulator-5554 DF_N01_DISPOSABLE=1 DF_N01_SOURCE_SHA="$(git rev-parse HEAD)" node tests/critical_room7/n01_android_ack_probe.cjs "$RUNNER_TEMP/df-dialog-evidence/n01-native-ack-results.json"
       - name: Keep evidence without claiming release approval
         if: always()
         uses: actions/upload-artifact@v4

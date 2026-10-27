@@ -48,7 +48,7 @@ test('native ACK failure blocks publish and preserves old records and journal cl
  assert.equal(a.storage.getItem(D.KEYS.tasks),null);
  assert.equal(a.storage.getItem(D.JOURNAL_KEY),null);
 });
-test('interrupted journal is replayed only when native checkpoint matches a journal side',()=>{
+test('native checkpoint replays over a matching interrupted journal',()=>{
  const r=rig(),a=r.boot();assert.equal(r.toggle(a.context,true),true);
  const expected=JSON.parse(r.checkpoint()).packets;
  const original=Object.fromEntries(Object.values(D.KEYS).flatMap(k=>[[k,null],[k+'_mirror',null]]));
@@ -79,4 +79,68 @@ test('checksum-valid but wrong-shaped task family cannot reach native durable AC
  const before=r.checkpoint();
  assert.equal(vm.runInContext('DF22Preflight.nativeAcknowledge(localStorage)',a.context),false);
  assert.equal(r.checkpoint(),before,'Invalid records must not advance native durable receipt');
+});
+
+test('first native receipt preserves loader-selected records when one companion is damaged, absent or divergent',()=>{
+ for(const companion of ['damaged',null,D.encodePacket([{id:99,title:'stale',done:false}])]){
+  for(const useMirror of [false,true]){
+   const r=rig(),a=r.boot();
+   const good=D.encodePacket([{id:81,title:'Recovered task',done:false,extra:{keep:'original'}}]);
+   a.storage.setItem(D.KEYS.tasks+(useMirror?'_mirror':''),good);
+   const other=D.KEYS.tasks+(useMirror?'':'_mirror');
+   // A valid primary remains authoritative if both copies verify.
+   if(useMirror&&companion!==null&&D.inspectPacket(companion).ok)continue;
+   if(companion!==null)a.storage.setItem(other,companion);
+   assert.equal(a.context.DF22Preflight.allowApp(a.storage,null),true);
+   assert.equal(a.context.DF22Preflight.nativeAcknowledge(a.storage),true);
+   const packets=JSON.parse(r.checkpoint()).packets;
+   assert.equal(packets[D.KEYS.tasks],good);
+   assert.equal(packets[D.KEYS.tasks+'_mirror'],good);
+   assert.equal(r.boot().context.tasksList[0].extra.keep,'original');
+  }
+ }
+});
+
+test('newer acknowledged native receipt supersedes an older valid browser journal',()=>{
+ const r=rig(),a=r.boot();assert.equal(r.toggle(a.context,true),true);
+ const first=JSON.parse(r.checkpoint()).packets;
+ const absent=Object.fromEntries(Object.keys(first).map(k=>[k,null]));
+ assert.equal(r.toggle(a.context,false),true);
+ const newest=r.checkpoint();
+ // WebView persisted only the first transaction; the native file has the second.
+ for(const [k,v] of Object.entries(first))a.storage.setItem(k,v);
+ a.storage.setItem(D.JOURNAL_KEY,JSON.stringify({version:1,state:'committed',original:absent,expected:first}));
+ r.flush(a.storage);
+ const b=r.boot();assert.equal(b.started,true);
+ assert.equal(b.context.tasksList[0].checklist[0].done,false);
+ assert.equal(b.context.tasksList[0].other.x,42);
+ assert.equal(b.storage.getItem(D.JOURNAL_KEY),null);
+ assert.equal(r.checkpoint(),newest);
+});
+
+test('unacknowledged newer journal never replaces the last native receipt',()=>{
+ const r=rig(),a=r.boot();assert.equal(r.toggle(a.context,true),true);
+ const original=JSON.parse(r.checkpoint()).packets;
+ const expected={...original};
+ const edited=D.inspectPacket(expected[D.KEYS.tasks]).value;
+ edited[0].checklist[0].done=false;
+ expected[D.KEYS.tasks]=expected[D.KEYS.tasks+'_mirror']=D.encodePacket(edited);
+ for(const [k,v] of Object.entries(expected))a.storage.setItem(k,v);
+ a.storage.setItem(D.JOURNAL_KEY,JSON.stringify({version:1,state:'committed',original,expected}));
+ r.flush(a.storage);
+ const b=r.boot();assert.equal(b.started,true);
+ assert.equal(b.context.tasksList[0].checklist[0].done,true);
+ assert.equal(b.storage.getItem(D.JOURNAL_KEY),null);
+});
+
+test('native ACK is the commit point even when post-commit journal cleanup is unavailable',()=>{
+ const r=rig(),a=r.boot(),remove=a.storage.removeItem.bind(a.storage);
+ a.storage.removeItem=k=>{if(k===D.JOURNAL_KEY)throw Error('InjectedCleanup');remove(k);};
+ assert.equal(r.toggle(a.context,true),true,'A durable accepted edit must report saved');
+ assert.equal(a.context.tasksList[0].checklist[0].done,true);
+ assert.notEqual(a.storage.getItem(D.JOURNAL_KEY),null,'Keep recovery evidence until cleanup is available');
+ r.flush(a.storage);
+ const b=r.boot();assert.equal(b.started,true);
+ assert.equal(b.context.tasksList[0].checklist[0].done,true);
+ assert.equal(b.storage.getItem(D.JOURNAL_KEY),null);
 });

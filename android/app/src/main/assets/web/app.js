@@ -2203,13 +2203,20 @@ function restoreFromFileInput(ev) {
   reader.readAsText(file);
 }
 
-function shareAppWithFriends() {
+async function shareAppWithFriends() {
   const msg = toWest(`🌿 Deep Focus — My Progress Today: ${cfg.todayMins} active mins (${cfg.sessions} sessions completed, 🔥 ${cfg.streak} days streak)!`);
   if (window.ZenNative && window.ZenNative.shareAppInvite) {
     window.ZenNative.shareAppInvite(msg);
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(msg);
-    showToast("📤 Copied to Clipboard!");
+  } else {
+    try {
+      if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') throw Error('CLIPBOARD_UNAVAILABLE');
+      await navigator.clipboard.writeText(msg);
+      showToast("📤 Copied to Clipboard!");
+      return true;
+    } catch (_) {
+      showToast(typeof nsLabel === 'function' ? nsLabel(34) : '⚠️');
+      return false;
+    }
   }
 }
 
@@ -3258,10 +3265,17 @@ function deleteNoteCard(id) {
   renderNotesStack(); renderCalendar();
 }
 
-function exportAllNotes() {
+async function exportAllNotes() {
   const txt = notesList.map(n => `[${String(n.title || '')} - ${toWest(n.calDate)}]\n${String(n.body || '')}`).join('\n\n---\n\n');
-  if (navigator.clipboard) navigator.clipboard.writeText(txt);
-  showToast('📥 TXT');
+  try {
+    if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') throw Error('CLIPBOARD_UNAVAILABLE');
+    await navigator.clipboard.writeText(txt);
+    showToast('📥 TXT');
+    return true;
+  } catch (_) {
+    showToast(typeof nsLabel === 'function' ? nsLabel(34) : '⚠️');
+    return false;
+  }
 }
 
 function openBrainDumpModal() {
