@@ -39,7 +39,7 @@ function record(name,status,reason,evidence={}){cases.push({name,status,reason,e
  limits:['Injected pending marker models interrupted publication; physical power-cut fsync and SAF DocumentsUI remain NOT_TESTED'],
  releaseApproved:false},null,2)+'\n');console.log(JSON.stringify(cases.at(-1)));}
 function status(err){return /^TRANSPORT:/.test(String(err.message||err))?'NOT_TESTED':'FAIL';}
-const api=Number(adb('shell','getprop','ro.build.version.sdk'));
+let api=null;
 async function disconnect(){
  try{ws?.close();}catch(_){}
  ws=undefined;try{adb('forward','--remove','tcp:9224');}catch(_){}
@@ -86,10 +86,11 @@ const disk=()=>adb('shell','run-as',PKG,'cat','files/v21_durable_packets_v1');
 const marker='files/v21_durable_packets_v1.pending';
 let snapshot;
 (async()=>{
+ api=Number(adb('shell','getprop','ro.build.version.sdk'));
  assert.equal(adb('shell','getprop','ro.kernel.qemu'),'1','Real user devices forbidden');
  assert.match(adb('shell','pm','clear',PKG),/Success/);
- await start();
  try {
+  await start();
   assert.equal(await evaluate(`(()=>{
    const before=window.DF22Integration.getSnapshot(),after=JSON.parse(JSON.stringify(before));
    after.tasksList=[{id:81001,title:'N01 task مهمة',done:false,extra:{preserved:'task-extra'},checklist:[{id:81002,title:'child',done:true}]}];
