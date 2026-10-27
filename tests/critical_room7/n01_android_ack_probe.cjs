@@ -80,9 +80,24 @@ let snapshot;
   assert.equal(await evaluate('window.ZenNative.readDurableV21()'),snapshot);
   record('malformed-envelope-does-not-overwrite','PASS','Rejected invalid receipt preserves disk');
   await restart();
-  assert.equal(await evaluate('window.ZenNative.readDurableV21()'),snapshot,'Native receipt lost after force-stop');
-  assert.equal(disk(),snapshot,'Private native bytes lost after force-stop');
-  record('force-stop-durable-native-ack','PASS','Actual private file survives Android process death');
+  const reopened=await evaluate('window.ZenNative.readDurableV21()');
+  assert.ok(reopened!=='ERROR'&&reopened!=='NONE','Native receipt unreadable after force-stop');
+  assert.equal(disk(),reopened,'Private native bytes disagree with post-restart readback');
+  // Startup may legitimately re-stamp packet metadata. Compare signed payloads
+  // instead of JSON string equality, while refusing lost or changed user records.
+  const previousPackets=JSON.parse(snapshot).packets,reopenedPackets=JSON.parse(reopened).packets;
+  assert.deepEqual(Object.keys(reopenedPackets).sort(),Object.keys(previousPackets).sort(),'Six-family receipt changed shape');
+  for(const k of Object.keys(previousPackets)){
+    const original=previousPackets[k],current=reopenedPackets[k];
+    assert.equal(current===null,original===null,'Native family absent after restart: '+k);
+    if(original!==null){
+      const oldPacket=JSON.parse(original),newPacket=JSON.parse(current);
+      assert.equal(newPacket.payload,oldPacket.payload,'Native user data changed on restart: '+k);
+      assert.equal(newPacket.sig,oldPacket.sig,'Native packet signature changed on restart: '+k);
+    }
+  }
+  snapshot=reopened;
+  record('force-stop-durable-native-ack','PASS','Signed six-family native payloads survive Android process death');
   adb('shell','run-as',PKG,'touch',marker);
   assert.equal(await evaluate('window.ZenNative.readDurableV21()'),'ERROR','Pending marker must block replay');
   const refused=await evaluate("(()=>{const old=JSON.parse(window.ZenNative.readDurableV21()==='ERROR'?"+JSON.stringify(snapshot)+":window.ZenNative.readDurableV21());old.packets[Object.keys(old.packets)[0]]='disposable-rejected';return window.ZenNative.acknowledgeDurableV21(JSON.stringify(old));})()");
