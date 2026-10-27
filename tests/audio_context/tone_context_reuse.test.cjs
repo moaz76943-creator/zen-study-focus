@@ -19,7 +19,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 
-const appPath=path.resolve(__dirname,'../android/app/src/main/assets/web/app.js');
+const appPath=path.resolve(__dirname,'../../android/app/src/main/assets/web/app.js');
 const source=fs.readFileSync(appPath,'utf8');
 function block(start,end){
   const a=source.indexOf(start);
@@ -42,7 +42,7 @@ function makeNode(){
   };
 }
 
-function rigTile(){
+function rigTile(playPromises=[]){
   const audioInstances=[];
   const toasts=[];
   let acCount=0;
@@ -56,7 +56,7 @@ function rigTile(){
     Audio:class MockAudio{
       constructor(){this.volume=1;this.loop=false;this.src='';this.paused=true;audioInstances.push(this);}
       pause(){this.paused=true;}
-      play(){this.paused=false;return Promise.resolve();}
+      play(){this.paused=false;return playPromises[audioInstances.indexOf(this)]||Promise.resolve();}
     },
     AudioContext:class MockAC{
       constructor(){acCount++;this.sampleRate=8000;this.state='running';this.currentTime=0;this.destination={};}
@@ -83,7 +83,8 @@ function rigTile(){
 }
 
 function rigTone(){
-  const counts={contexts:0,resumes:0,oscillators:0,started:0,scheduled:[]};
+  const counts={contexts:0,resumes:0,oscillators:0,started:0,scheduled:[],disconnected:0};
+  const oscillators=[];
   const haptics=[];
   const sandbox={
     localStorage:{getItem:k=>k==='df_end_tone'?'crystal':null},
@@ -92,10 +93,10 @@ function rigTone(){
   class MockAudioContext{
     constructor(){counts.contexts++;this.state='suspended';this.currentTime=0;this.destination={};}
     resume(){counts.resumes++;this.state='running';return Promise.resolve();}
-    createOscillator(){counts.oscillators++;return{
+    createOscillator(){counts.oscillators++;const osc={
       type:'',frequency:{setValueAtTime(f){counts.scheduled.push(f);},exponentialRampToValueAtTime(){}},
-      connect(){},start(){counts.started++;},stop(){}};}
-    createGain(){return{connect(){},gain:{setValueAtTime(){},exponentialRampToValueAtTime(){}}};}
+      connect(){},disconnect(){counts.disconnected++;},start(){counts.started++;},stop(){}};oscillators.push(osc);return osc;}
+    createGain(){return{connect(){},disconnect(){counts.disconnected++;},gain:{setValueAtTime(){},exponentialRampToValueAtTime(){}}};}
   }
   sandbox.window.AudioContext=MockAudioContext;
   sandbox.window.webkitAudioContext=MockAudioContext;
@@ -103,7 +104,7 @@ function rigTone(){
   vm.runInContext(toneCode,sandbox,{filename:'tone-segment'});
   return {
     call:key=>vm.runInContext(`playCompletionTone(${key===undefined?'':JSON.stringify(key)})`,sandbox),
-    counts,haptics,ctx:()=>vm.runInContext('toneCtx || null',sandbox)
+    counts,haptics,oscillators,ctx:()=>vm.runInContext('toneCtx || null',sandbox)
   };
 }
 
@@ -113,7 +114,6 @@ test('tile Play/Pause/Stop All register and release players without leaving chan
   const t=rigTile();
   t.sandbox.toggleSoundTile('forest');
   assert.equal(t.playing('forest'),true,'play registers the tile channel');
-  assert.ok(t.toasts.some(x=>String(x).includes('Pine Breeze'))===true||true);
   await flush();
   t.sandbox.toggleSoundTile('forest');
   assert.equal(t.playing('forest'),false,'pause releases the tile channel');
@@ -142,12 +142,14 @@ test('tile volume updates the live player and survives stop and later restart',(
 });
 
 test('a stopped tile cannot be revived by its stale pending play rejection',async()=>{
-  const t=rigTile();
-  t.sandbox.toggleSoundTile('rain'); // play: registers before the promise settles
+  let rejectOld;
+  const pending=new Promise((_,reject)=>{rejectOld=reject;});
+  const t=rigTile([pending]);
+  t.sandbox.toggleSoundTile('rain'); // the original play promise is still pending
   const first=t.audioInstances[0];
   t.sandbox.toggleSoundTile('rain'); // stop while play() already resolved
   t.sandbox.toggleSoundTile('rain'); // immediate new player
-  first.play=()=>Promise.reject(new Error('stale')); // late rejection from the old instance
+  rejectOld(new Error('stale')); // reject the actual promise returned by the old play
   await flush();
   assert.equal(t.evaluate("Object.keys(activePlayers).join(',')"),'rain',
     'the fresh player must stay registered');
@@ -171,6 +173,8 @@ test('completion tone preview reuses ONE WebAudio context and resumes it when su
   assert.equal(t.counts.contexts,1,'no replacement context after suspension');
   assert.equal(t.counts.resumes,2,'shared context resumes again on next play');
   assert.equal(t.counts.started,6);
+  for(const osc of t.oscillators)osc.onended();
+  assert.equal(t.counts.disconnected,12,'Every finished oscillator and gain disconnects');
 });
 
 test('tone selection and silent vibration choice keep their existing behavior',()=>{

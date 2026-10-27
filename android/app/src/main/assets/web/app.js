@@ -299,6 +299,10 @@ function playCompletionTone(toneKey) {
 
     osc.connect(gain);
     gain.connect(ctx.destination);
+    osc.onended = () => {
+      try { osc.disconnect(); } catch (_) {}
+      try { gain.disconnect(); } catch (_) {}
+    };
 
     osc.start();
     osc.stop(ctx.currentTime + tone.decay);
