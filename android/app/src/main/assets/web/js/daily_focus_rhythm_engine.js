@@ -30,7 +30,7 @@
    * Formats hour to Western digits 24h format with LTR isolation (e.g. \u200E14:00).
    */
   function formatHourWestern(hour24) {
-    var h = typeof hour24 === 'number' && !isNaN(hour24) ? Math.floor(hour24) % 24 : 0;
+    var h = typeof hour24 === 'number' && isFinite(hour24) ? Math.floor(hour24) % 24 : 0;
     if (h < 0) h += 24;
     var str = String(h).padStart(2, '0') + ':00';
     return '\u200E' + str;
