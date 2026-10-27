@@ -61,3 +61,14 @@ test('actual scanner keeps changed public-looking values detectable',{skip:!SCAN
  assert.equal(result.exit,1);
  assert.ok(result.count>0,'exception must match the entire reviewed public value');
 });
+
+test('actual scanner clears the reviewed Work/Rest storage-key rejection fixture only',{skip:!SCANNER},()=>{
+ const reviewed='tests/critical_room7/w05_contract.test.cjs';
+ const line="x.reject(key=>key==='"+['zen','fortress','cfg','v21'].join('_')+"');\n";
+ assert.ok(scan({[reviewed]:line},false).count>0,'default scanner must reproduce the fixture detection');
+ assert.deepEqual(scan({[reviewed]:line}),{exit:0,count:0});
+ assert.ok(scan({'unreviewed.test.cjs':line}).count>0,'same identifier outside reviewed paths remains detected');
+ const token=crypto.randomBytes(36).toString('base64url');
+ assert.ok(scan({[reviewed]:'const service_secret = "'+token+'";\n'}).count>0,
+  'reviewing one public fixture value must not hide a credential in that file');
+});
