@@ -3415,7 +3415,9 @@ function renderSoundsStudio() {
    8. ANALYTICS & GOAL CALCULATOR (100% WESTERN DIGITS)
    ======================================================== */
 function renderAnalyticsBars() {
-  const hist = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
+  // Share the read-only v21 ledger's validation and ID deduplication with Analytics.
+  // The core loads after app.js; defer reporting until it is available.
+  const hist = window.DeepFocusAnalyticsV21?.normalizeSessions?.(cfg.sessionHistory)?.sessions || [];
   const recent = Array.from({length: 7}, (_, i) => {
     const date = new Date(); date.setHours(12, 0, 0, 0); date.setDate(date.getDate() - (6-i));
     const key = localDateISO(date);
@@ -3423,7 +3425,7 @@ function renderAnalyticsBars() {
   });
   const domains = {study: 0, sport: 0, read: 0, work: 0};
   for (const entry of hist) {
-    if (!entry || typeof entry.date !== 'string') continue;
+    if (typeof entry.date !== 'string') continue;
     const minute = Number(entry.minutes);
     if (!Number.isFinite(minute) || minute < 0 || minute > 1440) continue;
     const day = recent.find(d => d.key === entry.date);
