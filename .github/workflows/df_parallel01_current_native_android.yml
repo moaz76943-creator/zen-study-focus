@@ -1,7 +1,5 @@
 name: DF Parallel01 current-head real Android ACK/SAF QA
 on:
-  push:
-    branches: [fix/df-parallel01-v21-ack-current-head-20261026]
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
@@ -15,7 +13,8 @@ on:
       - 'tests/android_e2e_recovery/native_ui_dump.py'
       - 'tests/android_e2e_recovery/native_faults.cjs'
       - 'tests/android_e2e_recovery/native_faults.test.cjs'
-      - '.github/workflows/df_pr01_v21_android_device_qa.yml'
+      - 'tests/android_e2e_recovery/prepare_native_probe*.py'
+      - '.github/workflows/df_parallel01_current_native_android.yml'
 permissions:
   contents: read
 concurrency:
@@ -57,6 +56,7 @@ jobs:
           node --check tests/android_e2e_recovery/p0_timer_saf_android.cjs
           node --test tests/android_e2e_recovery/picker_transport.test.cjs tests/android_e2e_recovery/native_faults.test.cjs
           node --test tests/integration_recovery/native_saf_import_forwardport.test.cjs
+          python3 tests/android_e2e_recovery/prepare_native_probe_test.py
       - name: Ensure Android compile SDK 36
         shell: bash
         run: |
@@ -80,9 +80,13 @@ jobs:
         run: gradle -p android :app:assembleDebug --no-daemon
       - name: Compile separate test-only accessibility APK
         run: |
+          python3 tests/android_e2e_recovery/prepare_native_probe.py \
+            qa-probe/tools/i18n/e2e/probe/src/main/java/com/zenstudy/focus/e2e/AccessibilityProbe.java \
+            android/app/src/main/res/values/strings.xml
           gradle -p qa-probe/tools/i18n/e2e/probe assembleDebug --no-daemon
           mkdir -p "$RUNNER_TEMP/df-pr01-android"
           git -C qa-probe rev-parse HEAD > "$RUNNER_TEMP/df-pr01-android/probe-source-sha.txt"
+          sha256sum qa-probe/tools/i18n/e2e/probe/src/main/java/com/zenstudy/focus/e2e/AccessibilityProbe.java > "$RUNNER_TEMP/df-pr01-android/probe-source.sha256"
           sha256sum qa-probe/tools/i18n/e2e/probe/build/outputs/apk/debug/*.apk > "$RUNNER_TEMP/df-pr01-android/probe-apk.sha256"
       - name: Capture exact SHA and prepare emulator
         run: |
@@ -100,6 +104,8 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_6
+          ram-size: 2048M
+          heap-size: 256M
           emulator-boot-timeout: 900
           # Android emulator ADB may not accept animation settings immediately after boot;
           # don't abort the real device test before our own readiness checks.
