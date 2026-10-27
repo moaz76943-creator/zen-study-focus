@@ -2,6 +2,9 @@ name: Deep Focus Track 13 Exact-SHA CodeQL
 on:
   pull_request:
     branches: [integration/master-qa-verified-v21]
+  push:
+    branches: [integration/master-qa-verified-v21]
+    paths: ['android/**', 'tools/**', 'tests/**', '.github/workflows/**']
   workflow_dispatch:
 permissions:
   contents: read
