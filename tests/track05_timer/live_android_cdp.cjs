@@ -4,6 +4,7 @@
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
 const {parseWebViewBounds,cssPointToAndroid}=require('../android_e2e_recovery/android_device_touch.cjs');
 const {readWebViewFrame}=require('../android_e2e_recovery/android_ui_hierarchy.cjs');
+const {completionReceipt}=require('./completion_receipts.cjs');
 const serial=process.env.DF_TRACK05_SERIAL||'emulator-5554',file=process.argv[2];
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const adb=(...args)=>{
@@ -52,6 +53,10 @@ async function cleanQAProfile(){
  assert.equal(adb('shell','getprop','ro.kernel.qemu'),'1');
  ws.close();try{adb('forward','--remove','tcp:9222')}catch(_){}
  assert.match(adb('shell','pm','clear','com.zenstudy.focus'),/Success/);
+ // This suite measures timer behavior with notification permission granted.
+ // Clearing the disposable profile also revokes it on API33+.
+ if(Number(adb('shell','getprop','ro.build.version.sdk'))>=33)
+  adb('shell','pm','grant','com.zenstudy.focus','android.permission.POST_NOTIFICATIONS');
  adb('shell','am','start','-n','com.zenstudy.focus/.MainActivity');
  await pause(3500);await connect();await ready();
 }
@@ -67,6 +72,22 @@ async function verifiedNativeTimerSnapshot(){
  return v;
 }
 async function state(){return evalJs("({id:timerSessionId,mode:currentTimerModeKey,total:timerTotal,left:timerLeft,running:timerRunning,activeMs:timerActiveMs,history:cfg.sessionHistory?.length||0,sessions:cfg.sessions||0,lang:cfg.lang,domain:cfg.domain,training:quickTraining?.active?{sets:quickTraining.sets,set:quickTraining.currentSet,phase:quickTraining.phase,domain:quickTraining.domain,taskId:quickTraining.taskId}:null})")}
+async function completedReceipts(ids,minutes,remainderSec=0){
+ const values=await evalJs("({live:cfg,stored:loadFortressData('zen_fortress_cfg_v21',null)})");
+ const live=completionReceipt(values.live,ids,minutes,remainderSec);
+ const stored=completionReceipt(values.stored,ids,minutes,remainderSec);
+ assert.deepEqual(stored,live,'Stored completion differs from actual live ledger');
+ return stored;
+}
+async function waitForActualState(predicate,description,timeoutMs){
+ const deadline=Date.now()+timeoutMs;
+ while(Date.now()<deadline){
+  const current=await state();
+  if(predicate(current))return current;
+  await pause(400);
+ }
+ throw Error('APP_STATE: actual timer did not '+description+' within '+timeoutMs+'ms');
+}
 async function nativeXml(){
  for(let i=0;i<4;i++){
   adb('shell','uiautomator','dump','/sdcard/track05-native.xml');
@@ -223,6 +244,69 @@ async function main(){
   const after=await state();
   for(const key of ['id','mode','total','left','running','activeMs','history','sessions'])assert.equal(after[key],before[key],key+' changed after rejected mode / restart');
   return {id:before.id,modePreserved:true,nativeReceiptPreserved:true,reopen:true};
+ });
+ await test('custom-one-minute-natural-completion-persisted-once',async()=>{
+  await cleanQAProfile();await tap('#navTimer');await tap('#modeCustomBtn');
+  // One minute is the product's supported minimum. Never replace Date/timers,
+  // call finalizeTimerSession, or fabricate the active snapshot for this test.
+  await evalJs("document.getElementById('inpCustomMins').value='1';document.getElementById('inpCustomTitle').value='N02 actual custom';true");
+  await tap('#customTimerModal .mbtn-pri');
+  const saved=await state();
+  assert.equal(saved.mode,'custom');assert.equal(saved.total,60);assert.equal(saved.running,false);
+  assert.match(await evalJs('customSessionLabel'),/N02 actual custom/);
+  await tap('#mainPlayBtn');
+  const started=await state();
+  assert.equal(started.mode,'custom');assert.equal(started.total,60);
+  assert.ok(started.running&&started.id&&started.left>0&&started.left<=60);
+  const native=await verifiedNativeTimerSnapshot();
+  assert.equal(native.id,started.id);assert.equal(native.running,true);
+  const began=Date.now();
+  const finished=await waitForActualState(s=>!s.running&&s.sessions===1,'naturally complete custom minute',90000);
+  assert.equal(finished.history,1);
+  const first=await completedReceipts([started.id],[1]);
+  await pause(8000);
+  assert.deepEqual(await completedReceipts([started.id],[1]),first,'Completion callback duplicated credit');
+  await restart();
+  assert.deepEqual(await completedReceipts([started.id],[1]),first,'Reopen duplicated or lost custom completion');
+  return {sessionId:started.id,requestedSeconds:60,naturalWaitMs:Date.now()-began,minutes:1,storedHistoryCount:1,reopened:true,duplicateObservationMs:8000};
+ });
+ await test('quick-20-10-natural-work-rest-completes-without-rest-credit',async()=>{
+  await cleanQAProfile();await tap('#navTimer');
+  await evalJs("document.getElementById('quickTrainingDetails').open=true;true");
+  // Check the real 4/1 preset without claiming a five-minute natural run.
+  await tap("button[data-qt='presetWorkout']");
+  assert.deepEqual(await evalJs("({work:document.getElementById('qtWork').value,rest:document.getElementById('qtRest').value})"),{work:'04:00',rest:'01:00'});
+  await tap("button[data-qt='presetTabata']");
+  assert.deepEqual(await evalJs("({work:document.getElementById('qtWork').value,rest:document.getElementById('qtRest').value})"),{work:'00:20',rest:'00:10'});
+  await evalJs("document.getElementById('qtSets').value='2';document.getElementById('qtSkipLast').checked=false;true");
+  await tap('#qtStartButton');
+  const first=await state();
+  assert.ok(first.running&&first.id&&first.training?.phase==='work');
+  assert.equal(first.training.set,0);assert.equal(first.training.sets,2);
+  assert.equal(first.total,20);assert.equal(first.domain,'sport');
+  const startedAt=Date.now(),phases=['work:0'],workIds=[first.id],restIds=[];
+  const rest1=await waitForActualState(s=>s.training?.phase==='rest'&&s.training.set===0,'enter first natural rest',40000);
+  assert.equal(rest1.total,10);assert.equal(rest1.sessions,1);assert.equal(rest1.history,1);
+  restIds.push(rest1.id);phases.push('rest:0');
+  const firstWork=await completedReceipts(workIds,[0],20);
+  assert.equal(firstWork.history[0].domain,'sport');
+  const work2=await waitForActualState(s=>s.training?.phase==='work'&&s.training.set===1,'finish first natural rest',25000);
+  assert.equal(work2.total,20);assert.equal(work2.sessions,1);assert.equal(work2.history,1);
+  assert.notEqual(work2.id,first.id);workIds.push(work2.id);phases.push('work:1');
+  // Rest produced neither a record nor extra seconds in the work remainder.
+  assert.deepEqual(await completedReceipts([first.id],[0],20),firstWork);
+  const rest2=await waitForActualState(s=>s.training?.phase==='rest'&&s.training.set===1,'enter second natural rest',40000);
+  assert.equal(rest2.total,10);assert.equal(rest2.sessions,2);assert.equal(rest2.history,2);
+  restIds.push(rest2.id);phases.push('rest:1');
+  const secondWork=await completedReceipts(workIds,[0,0],40);
+  assert.ok(secondWork.history.every(row=>row.domain==='sport'));
+  const done=await waitForActualState(s=>!s.training&&!s.running,'naturally finish two work/rest rounds',25000);
+  assert.equal(done.sessions,2);assert.equal(done.history,2);phases.push('completed');
+  assert.ok(restIds.every(id=>!workIds.includes(id)),'Rest reused a credited work ID');
+  assert.deepEqual(await completedReceipts(workIds,[0,0],40),secondWork,'Final rest credited minutes or changed ledger');
+  await pause(8000);await restart();
+  assert.deepEqual(await completedReceipts(workIds,[0,0],40),secondWork,'Reopen duplicated or lost training credit');
+  return {requestedWorkSeconds:20,requestedRestSeconds:10,sets:2,phases,workIds,restIds,minutes:0,workRemainderSeconds:40,naturalWaitMs:Date.now()-startedAt,reopened:true,workoutPresetVerifiedOnly:true};
  });
 }
 main().catch(e=>record('bootstrap','NOT_TESTED',String(e.message||e).slice(0,250))).finally(()=>{

@@ -58,7 +58,7 @@ jobs:
           node --check android/app/src/main/assets/web/app.js
           node --check tests/track05_timer/live_android_cdp.cjs
           node --check tests/critical_room7/n02_android_probe.cjs
-          node --test tests/track05_timer/workflow_test_paths.test.cjs tests/critical_room7/n02_contract.test.cjs
+          node --test tests/track05_timer/workflow_test_paths.test.cjs tests/track05_timer/completion_receipts.test.cjs tests/critical_room7/n02_contract.test.cjs
           bash -n tests/track05_timer/run_android_timer_qa.sh
       - name: Native active timer checkpoint and lifecycle regression
         run: node --test tests/track05_timer/native_timer_checkpoint.test.cjs tests/track05_timer/mode_snapshot_ack.test.cjs tests/track05_timer/delta_snapshot_ack.test.cjs tests/track05_timer/adb_timeout.test.cjs tests/track05_timer/adb_classification.test.cjs tests/android_e2e_recovery/private_evidence.test.cjs
