@@ -83,7 +83,9 @@ test('actual scanner reviews historical identifiers without exempting historical
   ['android/app/src/main/assets/web/index.html','const SECRET_SALT = "'+checksum+'";\n'],
   ['docs/master_completion/LEDGER_197.json','{"key_order_fix_commit":"'+commit+'"}\n'],
   ...['tests/integration_quality/activity_domain_durable_ack.test.cjs',
-   'tests/integration_recovery/language_switch_durability.test.cjs'].map(file=>
+   'tests/integration_recovery/language_switch_durability.test.cjs',
+   'tests/focus_workflows/track09_chromium.cjs',
+   'tests/security_recovery/track13_private_triage.test.cjs'].map(file=>
    [file,"x.reject(key=>key==='"+['zen','fortress','cfg','v21'].join('_')+"');\n"])
  ];
  for(const [file,line] of cases){

@@ -22,11 +22,13 @@ regexes = ['''^zen_fortress_(?:cfg|tasks|notes)_v21(?:_mirror)?$''']
 paths = [
   '''^tests/critical_room7/w05_contract\.test\.cjs$''',
   '''^tests/focus_workflows/test_focus_workflows\.cjs$''',
+  '''^tests/focus_workflows/track09_chromium\.cjs$''',
   '''^tests/i18n/goals/goals_studio_i18n\.test\.cjs$''',
   '''^tests/df09_legacy_analytics\.test\.cjs$''',
   '''^tests/integration_recovery/(?:counter_ack_rollback|daily_rollover_durability|water_counter_ack_rollback|timer_credit_ack_regression)\.test\.cjs$''',
   '''^tests/integration_quality/activity_domain_durable_ack\.test\.cjs$''',
   '''^tests/integration_recovery/language_switch_durability\.test\.cjs$''',
+  '''^tests/security_recovery/track13_private_triage\.test\.cjs$''',
   '''^tests/smoke_app\.cjs$''',
   '''^tests/track07_functional/activity_domain_durable_ack\.test\.cjs$''',
   '''^tests/track05_timer/qt_transition_probe\.cjs$'''
