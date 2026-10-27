@@ -20,6 +20,7 @@ condition = "AND"
 regexTarget = "secret"
 regexes = ['''^zen_fortress_(?:cfg|tasks|notes)_v21(?:_mirror)?$''']
 paths = [
+  '''^tests/critical_room7/w05_contract\.test\.cjs$''',
   '''^tests/focus_workflows/test_focus_workflows\.cjs$''',
   '''^tests/i18n/goals/goals_studio_i18n\.test\.cjs$''',
   '''^tests/df09_legacy_analytics\.test\.cjs$''',
