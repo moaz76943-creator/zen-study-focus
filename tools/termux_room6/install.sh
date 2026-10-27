@@ -18,6 +18,18 @@ printf '%s  %s\n' \
 'e9ceb0f7f716160e17a0f25c937e4e32e29e4fa788e1b2bf4a7a148e54229730' "$TMP/runner.mjs" \
 '1eebfc4c9a214ea98201b25f4307f4c3737ac8cb4e106b63864d45ca6548a443' "$TMP/tasks.json" \
   | sha256sum -c -
+node - "$TMP/runner.mjs" <<'NODE'
+const fs=require('node:fs');
+const name=process.argv[2];let source=fs.readFileSync(name,'utf8');
+function patch(before,after){
+  if(!source.includes(before))throw Error('Unexpected runner version; refusing unsafe patch');
+  source=source.replace(before,after);
+}
+patch("  const a=run('node',['--check',task.source],{cwd:work,timeout:30000,logfile:log,quiet:true});", "  // Only JavaScript is valid input to node --check; HTML/CSS have focused content tests instead.\n  const a=/\\.(?:mjs|cjs|js)$/.test(task.source) ? run('node',['--check',task.source],{cwd:work,timeout:30000,logfile:log,quiet:true}) : {ok:true};");
+patch('    const cmd=`node ${JSON.stringify(me)} run ${lane}`;', '    const cmd=`node ${JSON.stringify(me)} run ${lane} >> ${JSON.stringify(path.join(folders.logs,`lane-${lane}.log`))} 2>&1`;');
+fs.writeFileSync(name,source);
+NODE
+printf '%s  %s\n' '366acd94b41eb918a18f4b7b062c3464032d9791c76ae9248f9b5c3ef90a5143' "$TMP/runner.mjs" | sha256sum -c -
 node --check "$TMP/runner.mjs"
 # Runner reads manifest beside its script; verify both together before replacement.
 (cd "$TMP" && node ./runner.mjs selftest)
