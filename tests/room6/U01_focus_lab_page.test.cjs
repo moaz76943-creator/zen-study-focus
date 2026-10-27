@@ -44,14 +44,10 @@ function tagAttrs() {
 }
 
 function scriptTags(source = html) {
-  const out = [];
-  const pattern = /<script((?:\s[^>]*)?)>([\s\S]*?)<\/script\s*>/gi;
-  let m;
-  while ((m = pattern.exec(source)) !== null) {
-    const srcMatch = /src\s*=\s*"([^"]*)"/.exec(m[1]);
-    out.push({ src: srcMatch ? srcMatch[1] : null, body: m[2] });
-  }
-  return out;
+  const { extractScriptBlocks, attributeValue } = require('../../tools/room6/offline_dependencies.cjs');
+  return extractScriptBlocks(source).map(block => ({
+    src: attributeValue(block.attributes, 'src'), body: block.body
+  }));
 }
 
 function makeNode(id) {

@@ -320,6 +320,58 @@ function scanPackageJson(text, filePath, results) {
   return results;
 }
 
+// Tokenize tag names rather than matching a literal tag prefix. Attribute
+// values may contain >, and raw-text end tags may contain whitespace/attributes.
+function readTag(text, start) {
+  let cursor = start + 1;
+  const closing = text[cursor] === '/';
+  if (closing) cursor += 1;
+  const nameStart = cursor;
+  if (!/[A-Za-z]/.test(text[cursor] || '')) return null;
+  while (cursor < text.length && !/[\t\n\f\r />]/.test(text[cursor])) cursor += 1;
+  const name = text.slice(nameStart, cursor).toLowerCase();
+  const attributeStart = cursor;
+  let quote = null;
+  for (; cursor < text.length; cursor += 1) {
+    const char = text[cursor];
+    if (quote) { if (char === quote) quote = null; }
+    else if (char === '"' || char === "'") quote = char;
+    else if (char === '>') return { name, closing, attributes: text.slice(attributeStart, cursor), end: cursor + 1 };
+  }
+  return null;
+}
+
+function extractScriptBlocks(text) {
+  const blocks = [];
+  let cursor = 0;
+  while (cursor < text.length) {
+    const start = text.indexOf('<', cursor);
+    if (start < 0) break;
+    if (text.startsWith('<!--', start)) {
+      const end = text.indexOf('-->', start + 4);
+      cursor = end < 0 ? text.length : end + 3;
+      continue;
+    }
+    const tag = readTag(text, start);
+    if (!tag) { cursor = start + 1; continue; }
+    cursor = tag.end;
+    if (tag.closing || (tag.name !== 'script' && tag.name !== 'style')) continue;
+    let end = text.length;
+    let after = text.length;
+    let candidate = tag.end;
+    while ((candidate = text.indexOf('</', candidate)) !== -1) {
+      const closing = readTag(text, candidate);
+      if (closing && closing.closing && closing.name === tag.name) {
+        end = candidate; after = closing.end; break;
+      }
+      candidate += 2;
+    }
+    if (tag.name === 'script') blocks.push({ index: start, attributes: tag.attributes, body: text.slice(tag.end, end) });
+    cursor = after;
+  }
+  return blocks;
+}
+
 function scanText(text, extension, filePath) {
   const normalized = String(extension || '').replace(/^\./, '').toLowerCase();
   const results = [];
@@ -327,10 +379,10 @@ function scanText(text, extension, filePath) {
     scanHtml(text, filePath, results);
     scanCss(text, filePath, results);
     const scriptParts = [];
-    for (const block of text.matchAll(/<script((?:\s[^>]*)?)>([\s\S]*?)<\/script\s*>/gi)) {
-      if (attributeValue(block[1] || '', 'src')) continue;
+    for (const block of extractScriptBlocks(text)) {
+      if (attributeValue(block.attributes, 'src')) continue;
       const pad = '\n'.repeat(text.slice(0, block.index).split('\n').length - 1);
-      scriptParts.push(pad + block[2]);
+      scriptParts.push(pad + block.body);
     }
     if (scriptParts.length) scanJs(scriptParts.join('\n'), filePath, results);
   } else if (normalized === 'css') {
@@ -481,6 +533,7 @@ module.exports = {
   urlHost,
   attributeValue,
   analyzeCdnUrl,
+  extractScriptBlocks,
   scanText,
   listCorpusFiles,
   auditRepository
