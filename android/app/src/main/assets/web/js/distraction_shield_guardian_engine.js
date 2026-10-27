@@ -109,7 +109,9 @@
         ratioPercentage: 100.0,
         formattedRatio: '100.0%',
         tierKey: 'resistance_high',
-        totalEncounters: 0
+        totalEncounters: 0,
+        resistedCount: resisted,
+        exitsCount: exits
       };
     }
 

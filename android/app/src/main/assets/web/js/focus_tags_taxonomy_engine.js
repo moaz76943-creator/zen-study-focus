@@ -24,7 +24,7 @@
 
   function aggregateTimeByTag(sessions) {
     var list = Array.isArray(sessions) ? sessions : [];
-    var tagTotals = {};
+    var tagTotals = Object.create(null);
 
     for (var i = 0; i < list.length; i++) {
       var s = list[i];

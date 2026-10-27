@@ -404,3 +404,47 @@ test('DF-FINAL-03 #36: 320px mobile layout is RTL-safe and omits empty top-three
  assert.equal(writes,0);
  studio.destroy();
 });
+
+test('DF-PARALLEL-02: compact task Edit and action buttons retain a 44px touch target',()=>{
+ const f=fixture();
+ const style=f.root.descendants.find(x=>x.tagName==='STYLE').textContent;
+ assert.match(style,/\.df-tasks \.df-actions \.df-btn\{min-height:44px;/,
+  '34px action buttons cannot be relied on at 320 CSS px');
+ f.studio.destroy();
+});
+
+
+test('TRACK08 replacement: unrelated Edit preserves null/malformed v21 dates and recurring extension',()=>{
+ for(const [index,date] of [null,'legacy-not-a-date'].entries()){
+  let state={cfg:{sessionHistory:[],taskProjectsV21:[]},tasksList:[{
+   id:760+index,title:'Legacy date preserved',date,done:false,catKey:'study',
+   repeat:{frequency:'weekly',interval:3,until:'2026-12-30'},
+   legacyOpaque:{keep:date}
+  }]};
+  let commits=0;
+  const root=new FakeElement(fakeDoc,'main');
+  const studio=Studio.mount(root,{locale:index?'ar':'en',now:()=>new Date(2026,9,26),
+   readState:()=>JSON.parse(JSON.stringify(state)),commit(before,after){
+    assert.deepEqual(before,state);
+    state=JSON.parse(JSON.stringify(after));commits++;return true;
+   }});
+  const edit=root.descendants.find(x=>x.tagName==='BUTTON'&&x.textContent===(index?'تعديل':'Edit'));
+  assert.ok(edit);edit.dispatch('click');
+  const form=root.descendants.find(x=>x.tagName==='FORM'&&x.className==='df-form');
+  assert.ok(form);
+  const title=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='text');
+  const dateInput=form.descendants.find(x=>x.tagName==='INPUT'&&x.type==='date');
+  assert.equal(dateInput.value,'');
+  title.value='Only title changed';
+  form.dispatch('submit');
+  assert.equal(commits,1);
+  const task=state.tasksList[0];
+  assert.equal(task.title,'Only title changed');
+  assert.equal(task.id,760+index);
+  assert.equal(task.date,date);
+  assert.equal(Object.hasOwn(task,'dueAssigned'),false);
+  assert.deepEqual(task.repeat,{frequency:'weekly',interval:3,until:'2026-12-30'});
+  assert.deepEqual(task.legacyOpaque,{keep:date});
+  studio.destroy();
+ }
+});
