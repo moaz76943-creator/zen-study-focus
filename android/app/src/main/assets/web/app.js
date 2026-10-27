@@ -264,6 +264,8 @@ const COMPLETION_TONES = {
   vibrate: { name: 'Vibrate Only 📳', desc: 'Silent', freq: 0, decay: 0, level: 0 }
 };
 
+let toneCtx = null;
+
 function playCompletionTone(toneKey) {
   const key = toneKey || localStorage.getItem('df_end_tone') || 'zen_bell';
   const tone = COMPLETION_TONES[key] || COMPLETION_TONES.zen_bell;
@@ -277,8 +279,9 @@ function playCompletionTone(toneKey) {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    if (ctx.state === 'suspended') ctx.resume();
+    if (!toneCtx) toneCtx = new AudioCtx();
+    if (toneCtx.state === 'suspended') toneCtx.resume();
+    const ctx = toneCtx;
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -296,6 +299,10 @@ function playCompletionTone(toneKey) {
 
     osc.connect(gain);
     gain.connect(ctx.destination);
+    osc.onended = () => {
+      try { osc.disconnect(); } catch (_) {}
+      try { gain.disconnect(); } catch (_) {}
+    };
 
     osc.start();
     osc.stop(ctx.currentTime + tone.decay);
@@ -2747,6 +2754,14 @@ function selectTimerMode(mins, modeKey, btn) {
   if (endingQuickTraining && !window.confirm(quickText('replacePrompt'))) return false;
   // A rejected Pause must leave the mode and any active Quick Training intact.
   if (timerRunning && toggleTimerPlay() !== true) return false;
+  // A mode change discards the paused session only after its replacement is
+  // durably acknowledged. Never publish a rejected idle snapshot to the UI.
+  if (!persistActiveTimerSnapshot({
+    total:mins*60,left:mins*60,running:false,endAt:null,
+    mode:modeKey,label:customSessionLabel,sessionId:null,taskId:focusSessionTaskId,
+    activeMs:0,resumedAt:null,
+    training:!endingQuickTraining && quickTraining?.active ? {...quickTraining} : null
+  })) return false;
   if (endingQuickTraining) {
     quickTraining = null;
     renderQuickTraining();
@@ -2761,7 +2776,6 @@ function selectTimerMode(mins, modeKey, btn) {
   timerSessionId = null;
   timerActiveMs = 0;
   timerResumeMs = null;
-  storeTimerSession();
   updateTimerDisplay();
   return true;
 }
@@ -3415,7 +3429,9 @@ function renderSoundsStudio() {
    8. ANALYTICS & GOAL CALCULATOR (100% WESTERN DIGITS)
    ======================================================== */
 function renderAnalyticsBars() {
-  const hist = Array.isArray(cfg.sessionHistory) ? cfg.sessionHistory : [];
+  // Share the read-only v21 ledger's validation and ID deduplication with Analytics.
+  // The core loads after app.js; defer reporting until it is available.
+  const hist = window.DeepFocusAnalyticsV21?.normalizeSessions?.(cfg.sessionHistory)?.sessions || [];
   const recent = Array.from({length: 7}, (_, i) => {
     const date = new Date(); date.setHours(12, 0, 0, 0); date.setDate(date.getDate() - (6-i));
     const key = localDateISO(date);
@@ -3423,7 +3439,7 @@ function renderAnalyticsBars() {
   });
   const domains = {study: 0, sport: 0, read: 0, work: 0};
   for (const entry of hist) {
-    if (!entry || typeof entry.date !== 'string') continue;
+    if (typeof entry.date !== 'string') continue;
     const minute = Number(entry.minutes);
     if (!Number.isFinite(minute) || minute < 0 || minute > 1440) continue;
     const day = recent.find(d => d.key === entry.date);
