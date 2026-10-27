@@ -7,6 +7,10 @@ on:
     paths:
       - 'android/app/src/main/java/com/zenstudy/focus/**'
       - 'tests/android_dialogs/**'
+      - 'tests/critical_room7/n02_contract.test.cjs'
+      - 'tests/critical_room7/n03_contract.test.cjs'
+      - 'tests/critical_room7/n04_contract.test.cjs'
+      - 'tools/critical_room7/android_e2e_sha_guard.mjs'
       - '.github/workflows/df_parallel01_native_dialog_android.yml'
 permissions:
   contents: read
@@ -39,6 +43,14 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
+      - name: Native lifecycle and APK guard regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/critical_room7/n04_contract.test.cjs
+          for contract in tests/critical_room7/n02_contract.test.cjs tests/critical_room7/n03_contract.test.cjs; do
+            if [[ -f "$contract" ]]; then node --test "$contract"; fi
+          done
       - name: Verify exact source and source-only contract
         shell: bash
         run: |
@@ -76,6 +88,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/df-dialog-evidence"
           sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/df-dialog-evidence/apk.sha256"
           git rev-parse HEAD > "$RUNNER_TEMP/df-dialog-evidence/source-head.txt"
+          node tools/critical_room7/android_e2e_sha_guard.mjs \
+            --bundle-dir "$RUNNER_TEMP/df-dialog-evidence" \
+            --base-dir "$PWD" \
+            --source-name source-head.txt \
+            --expected-source-sha "$(git rev-parse HEAD)" --json \
+            > "$RUNNER_TEMP/df-dialog-evidence/apk-source-verification.json"
       - name: Give emulator runner KVM access
         shell: bash
         run: |
