@@ -1,12 +1,11 @@
 'use strict';
+const {createEvidenceDirectory}=require('../android_e2e_recovery/private_evidence.cjs');
 // Genuine Chromium rendering regression for Track 08; no user/device data.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
-const fs=require('node:fs');
 const path=require('node:path');
 (async()=>{
- const out=process.env.TRACK08_BROWSER_EVIDENCE||'/tmp/track08-canonical-browser';
- fs.mkdirSync(out,{recursive:true});
+ const evidence=createEvidenceDirectory(process.env.TRACK08_BROWSER_EVIDENCE,'track08-canonical-browser-');
  const browser=await chromium.launch({executablePath:process.env.TRACK08_CHROMIUM||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
  const report=[];
  try{
@@ -58,11 +57,11 @@ const path=require('node:path');
    assert.equal(state.dir,locale==='ar'?'rtl':'ltr');
    assert.equal(state.overflow,false,'Horizontal page overflow at '+width+'px');
    assert.deepEqual(errors,[]);
-   await page.screenshot({path:path.join(out,locale+'-'+width+'.png'),fullPage:true});
+   evidence.write(locale+'-'+width+'.png',await page.screenshot({fullPage:true}));
    report.push({locale,width,source:'actual canonical Chromium DOM',passed:true,commits:1,noDateMutation:true,overflow:false,jsErrors:0});
    await page.close();
   }
-  fs.writeFileSync(path.join(out,'results.json'),JSON.stringify({status:'PASS',cases:report},null,2));
+  evidence.write('results.json',JSON.stringify({status:'PASS',cases:report},null,2));
   console.log('TRACK08_BROWSER_PASS',JSON.stringify(report));
  }finally{await browser.close();}
 })().catch(e=>{console.error('TRACK08_BROWSER_FAIL',e);process.exitCode=1;});

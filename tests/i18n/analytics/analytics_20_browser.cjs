@@ -1,9 +1,10 @@
 'use strict';
+const {createEvidenceReport}=require('../../android_e2e_recovery/private_evidence.cjs');
 // Real Chromium DOM probe of the installed-app web assets, NOT Android WebView.
-const fs=require('node:fs'),assert=require('node:assert/strict');
+const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const codes='en ar es zh hi fr de ru pt ja id tr ko vi it bn ur fa pl nl'.split(' ');
-const out=process.env.DF03_ANALYTICS_REPORT||'/tmp/df03-analytics-20.json';
+const evidence=createEvidenceReport(process.env.DF03_ANALYTICS_REPORT,'df03-analytics-20.json','df03-analytics-');
 const base=process.env.DF03_SITE_URL||'http://127.0.0.1:8770';
 async function main(){
  const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,
@@ -63,7 +64,7 @@ async function main(){
   total:results.length,pass:results.filter(x=>x.status==='PASS').length,
   fail:results.filter(x=>x.status==='FAIL').length,results,errors,
   translationCompleteness:'NOT_TESTED',android:'NOT_TESTED',releaseApproved:false};
- fs.writeFileSync(out,JSON.stringify(report,null,2)+'\n');
+ evidence.write(JSON.stringify(report,null,2)+'\n');
  console.log(JSON.stringify({total:report.total,pass:report.pass,fail:report.fail,
   errors:errors.length,firstFailures:results.filter(x=>x.status==='FAIL').slice(0,6)}));
  assert.equal(report.total,20);

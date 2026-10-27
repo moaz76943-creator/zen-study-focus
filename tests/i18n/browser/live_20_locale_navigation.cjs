@@ -1,9 +1,9 @@
 'use strict';
+const {createEvidenceReport}=require('../../android_e2e_recovery/private_evidence.cjs');
 const {chromium}=require('playwright');
-const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const url=process.env.DF_LOCALE_URL||'http://127.0.0.1:8770/index.html';
-const dest=process.env.DF_LOCALE_REPORT||'/tmp/df03-browser-locale.json';
+const evidence=createEvidenceReport(process.env.DF_LOCALE_REPORT,'df03-browser-locale.json','df03-browser-locale-');
 const codes=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko','vi','it','bn','ur','fa','pl','nl'];
 (async()=>{
  const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
@@ -50,7 +50,7 @@ const codes=['en','ar','es','zh','hi','fr','de','ru','pt','ja','id','tr','ko','v
  }finally{await browser.close();}
  const report={source_sha:process.env.GITHUB_SHA||'LOCAL',kind:'REAL_CHROMIUM_NOT_ANDROID',
   cases:rows,errors,android:'NOT_TESTED',translation_parity:'NOT_TESTED',release_approved:false};
- fs.writeFileSync(dest,JSON.stringify(report,null,2));
+ evidence.write(JSON.stringify(report,null,2));
  console.log(JSON.stringify({pass:rows.filter(x=>x.status==='PASS').length,
   fail:rows.filter(x=>x.status==='FAIL').length,errors:errors.length,examples:rows.filter(x=>x.problems.length).slice(0,5)}));
  assert.equal(rows.filter(x=>x.status==='FAIL').length,0,'Real picker + RTL + reload must pass');

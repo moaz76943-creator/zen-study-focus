@@ -1,12 +1,12 @@
 'use strict';
+const {createEvidenceDirectory}=require('../android_e2e_recovery/private_evidence.cjs');
 /* Real Chromium synthetic profile only: all real Timer mode buttons, navigation,
  * modal open/close and cancel/accept behavior; don't conflate static inventory
  * with functional success of every button.
  */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const out=process.env.DF_BUTTON_EVIDENCE||'/tmp/deep-focus-buttons';
+const evidence=createEvidenceDirectory(process.env.DF_BUTTON_EVIDENCE,'deep-focus-buttons-');
 (async()=>{
  const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
  const results=[],errors=[],dialogs=[];
@@ -143,10 +143,10 @@ const out=process.env.DF_BUTTON_EVIDENCE||'/tmp/deep-focus-buttons';
      withInlineClick:buttons.filter(el=>el.getAttribute('onclick')).length,
      displayedIds:visible.map(b=>b.id).filter(Boolean)};
   });
-  fs.mkdirSync(out,{recursive:true});
+
   await page.locator('#navAnalytics').click();
-  await page.screenshot({path:out+'/analytics-main-screen-393.png',fullPage:false});
-  fs.writeFileSync(out+'/button-interaction-ledger.json',JSON.stringify({
+  evidence.write('analytics-main-screen-393.png',await page.screenshot({fullPage:false}));
+  evidence.write('button-interaction-ledger.json',JSON.stringify({
    results,dialogs,discovered,uncaughtErrors:errors,
    note:'This is a named interaction subset. Other static/dynamic buttons are NOT_TESTED by this suite.',
    release_approved:false
