@@ -2,12 +2,79 @@
 (function (root, factory) {
   'use strict';
   const api = factory(typeof module === 'object' && module.exports
-    ? require('./data_compat_v21.js') : root.DeepFocusDataCompatV21);
+    ? require('./data_compat_v21.js') : root.DeepFocusDataCompatV21, root);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.DF22Preflight = api;
-})(typeof window !== 'undefined' ? window : globalThis, function (D) {
+})(typeof window !== 'undefined' ? window : globalThis, function (D, root) {
   'use strict';
   if (!D) throw new Error('Data compatibility contract must load before v22 preflight');
+  const nativeKeys = Object.values(D.KEYS).flatMap(k=>[k,k+'_mirror']);
+  function validNativePackets(packets) {
+    if (!packets || typeof packets !== 'object' || Array.isArray(packets) ||
+        Object.keys(packets).length!==nativeKeys.length) return false;
+    for (const key of nativeKeys) {
+      if (!Object.prototype.hasOwnProperty.call(packets,key)) return false;
+      if (packets[key]!==null && !D.inspectPacket(packets[key]).ok) return false;
+    }
+    for (const key of Object.values(D.KEYS)) {
+      const a=packets[key],b=packets[key+'_mirror'];
+      if ((a===null)!==(b===null)) return false;
+      if (a!==null && D.inspectPacket(a).payload!==D.inspectPacket(b).payload) return false;
+    }
+    // A valid packet checksum is not proof of a valid v21 data family.
+    // Reject signed, wrong-shaped tasks/notes/cfg before native fsync publication.
+    const records={cfg:{},tasksList:[],notesList:[]};
+    for (const [slot,key] of Object.entries(D.KEYS)) {
+      if (packets[key]===null) continue;
+      records[slot==='cfg'?'cfg':slot==='tasks'?'tasksList':'notesList']=
+        D.inspectPacket(packets[key]).value;
+    }
+    return D.inspectRecords(records).ok;
+  }
+  // Android bridge returns only after AtomicFile + fsync. Browser tests use
+  // their established localStorage semantics without the Android-only bridge.
+  function nativeAcknowledge(storage) {
+    if (!root.ZenNative) return true;
+    if (typeof root.ZenNative.acknowledgeDurableV21!=='function') return false;
+    try {
+      const packets=D.captureRaw(storage);
+      return validNativePackets(packets) &&
+        root.ZenNative.acknowledgeDurableV21(JSON.stringify({version:1,packets}))===true;
+    } catch (_) { return false; }
+  }
+  function replayNative(storage) {
+    if (!root.ZenNative) return;
+    if (typeof root.ZenNative.readDurableV21!=='function' ||
+        typeof root.ZenNative.acknowledgeDurableV21!=='function')
+      throw new Error('Native durable storage bridge unavailable');
+    const raw=root.ZenNative.readDurableV21();
+    if (raw==='NONE') return; // Existing v21 install: first successful write seeds checkpoint.
+    if (typeof raw!=='string' || raw==='ERROR') throw new Error('Native checkpoint unreadable');
+    const checkpoint=JSON.parse(raw);
+    if (checkpoint.version!==1 || !validNativePackets(checkpoint.packets))
+      throw new Error('Native checkpoint invalid; existing records retained');
+    const pending=D.inspectPending(storage);
+    if (pending.pending) {
+      if (!pending.valid) throw new Error('Unverifiable journal: manual recovery required');
+      for (const key of nativeKeys) {
+        const journal=pending.journal;
+        if (checkpoint.packets[key]!==journal.original[key] &&
+            checkpoint.packets[key]!==journal.expected[key])
+          throw new Error('Native/WebView journal conflict: '+key);
+      }
+    }
+    for (const key of nativeKeys) {
+      const expected=checkpoint.packets[key];
+      if (storage.getItem(key)===expected) continue;
+      if (expected===null) storage.removeItem(key);
+      else storage.setItem(key,expected);
+      if (storage.getItem(key)!==expected) throw new Error('Native replay verification failed: '+key);
+    }
+    if (pending.pending) {
+      storage.removeItem(D.JOURNAL_KEY);
+      if (storage.getItem(D.JOURNAL_KEY)!==null) throw new Error('Journal cleanup failed');
+    }
+  }
   function inspect(storage) {
     const pending = D.inspectPending(storage);
     if (pending.pending) return {ok:false, kind:'journal', detail:pending};
@@ -62,10 +129,10 @@
   }
   function allowApp(storage,document) {
     let report;
-    try { report = inspect(storage); }
+    try { replayNative(storage); report = inspect(storage); }
     catch (e) { report = {ok:false,kind:'data',issues:[String(e)]}; }
     if (!report.ok) renderBlocked(document,storage,report);
     return report.ok;
   }
-  return Object.freeze({inspect,allowApp});
+  return Object.freeze({inspect,allowApp,nativeAcknowledge,replayNative});
 });
