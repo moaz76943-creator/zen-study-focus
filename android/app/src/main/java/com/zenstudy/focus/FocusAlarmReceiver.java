@@ -183,12 +183,25 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         long now = System.currentTimeMillis();
         long deadline = now + seconds * 1000L;
         SharedPreferences p = prefs(context);
-        long token = p.getLong("token", 0) + 1;
-        clearSystemAlarm(context);
+        long oldToken = p.getLong("token", 0);
+        boolean oldActive = p.getBoolean("active", false);
+        long oldDeadline = p.getLong("deadline", 0);
+        long oldNotified = p.getLong("lastNotified", 0);
+        String oldTitle = p.getString("title", null);
+        long token = oldToken + 1;
         String safeTitle = cleanTitle(context, title);
         if (!p.edit().putBoolean("active", true).putLong("token", token)
                 .putLong("deadline", deadline).putString("title", safeTitle)
-                .putLong("lastNotified", 0).commit()) return;
+                .putLong("lastNotified", 0).commit()) {
+            // SharedPreferences changes memory even when its disk commit fails.
+            // Restore the generation before returning so the still-scheduled old
+            // PendingIntent remains valid; never cancel it for a refused update.
+            p.edit().putBoolean("active", oldActive).putLong("token", oldToken)
+                    .putLong("deadline", oldDeadline).putString("title", oldTitle)
+                    .putLong("lastNotified", oldNotified).commit();
+            return;
+        }
+        clearSystemAlarm(context);
         scheduleSystemAlarm(context, token, deadline);
         showActive(context, deadline, safeTitle);
     }
@@ -216,6 +229,12 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        handleReceive(context, intent);
+    }
+
+    // The bridge runs on a WebView thread while broadcasts arrive on the main
+    // thread. Share schedule/cancel's class lock across validation and delivery.
+    private static synchronized void handleReceive(Context context, Intent intent) {
         if (intent == null) return;
         SharedPreferences p = prefs(context);
         if (!p.getBoolean("active", false)) return;
