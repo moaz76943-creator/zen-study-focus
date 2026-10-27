@@ -55,3 +55,19 @@ test('official 99-language app catalog takes precedence over the legacy 100-lang
  assert.deepEqual(scanned.META.locales,['ar','de','en']);
  assert.equal(scanned.META.locales.includes('ms'),false);
 });
+
+test('Android framework strings are not missing application translations; app refs remain audited',()=>{
+ const mock={...files,
+  'android/app/src/main/java/com/zenstudy/focus/MainActivity.java':
+   'foo(android.R.string.ok);\nfoo(android . R . string . cancel);\nfoo(R.string.ok);\nfoo(com.zenstudy.focus.R.string.custom_missing);',
+  'android/app/src/main/java/com/zenstudy/focus/FocusAppWebChromeClient.java':
+   'dialog.setPositiveButton(android.R.string.yes, null);',
+  'android/app/src/main/res/values/strings.xml':'<resources><string name="ok">Okay</string></resources>'
+ };
+ const r=scan(mock);
+ assert.ok(!r.KEYS.includes('native:cancel'));
+ assert.ok(!r.KEYS.includes('native:yes'));
+ assert.deepEqual(r.KEY_SOURCE_MAP['native:ok'].references.map(x=>x.line),[3]);
+ assert.ok(r.NATIVE_ANDROID_GAPS.some(x=>x.key==='native:custom_missing'));
+ assert.ok(!r.NATIVE_ANDROID_GAPS.some(x=>x.key==='native:ok'));
+});
