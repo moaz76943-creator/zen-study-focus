@@ -29,7 +29,7 @@ function rig(history){
         appendChild(c){this.children.push(c);return c;}};
     }
   };
-  const ctx={document,cfg:{lang:'en',domain:'study',todayMins:0,sessions:0},
+  const ctx={document,window:{DeepFocusAnalyticsV21:require('../../android/app/src/main/assets/web/analytics_core_v21.js')},cfg:{lang:'en',domain:'study',todayMins:0,sessions:0},
     localDateISO(d=new Date()){d=d||new Date();d.setHours(12,0,0,0);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());},
     L(){return {weekdays:['S','M','T','W','T','F','S']};}};
   vm.createContext(ctx);
@@ -55,4 +55,19 @@ test('legacy 7-day "verified sessions" excludes interrupted, rest and demo rows 
   assert.equal(x.text('waveRecordedMinutes'),'25');
   assert.equal(x.text('share-study'),'100%');
   assert.equal(x.text('share-read'),'0%','Legacy share rendering is preserved, only sources are verified');
+});
+
+test('legacy charts use the canonical deduplicated ledger for both minutes and sessions',()=>{
+  const history=[
+    {id:'real',date:todayKey(),minutes:25,domain:'study',legacy:{keep:true}},
+    {id:'real',date:todayKey(),minutes:25,domain:'study'},
+    {id:'bad-minutes',date:todayKey(),minutes:'20',domain:'study'},
+    {id:'bad-domain',date:todayKey(),minutes:90,domain:'unknown'},
+    {date:todayKey(),minutes:90,domain:'study'},
+    null
+  ];
+  const before=JSON.stringify(history),x=rig(history);
+  assert.equal(x.text('kpiSessionTrend'),'1 verified sessions / 7 days');
+  assert.equal(x.text('kpiWeeklyTrend'),'25 recorded minutes / 7 days');
+  assert.equal(JSON.stringify(history),before,'Rendering must preserve original history and unknown fields');
 });
