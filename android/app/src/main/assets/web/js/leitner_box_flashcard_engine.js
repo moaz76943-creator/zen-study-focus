@@ -77,8 +77,14 @@
     return STRINGS[clean] ? clean : 'en';
   }
 
+  function normalizeBoxIndex(rawBox) {
+    var index = Number(rawBox);
+    if (!isFinite(index) || index % 1 !== 0 || index < 1 || index > 5) return 1;
+    return index;
+  }
+
   function processCardReviewResult(currentBox, isCorrect) {
-    var box = Math.max(1, Math.min(5, parseInt(currentBox, 10) || 1));
+    var box = normalizeBoxIndex(currentBox);
     var newBox = 1;
 
     if (isCorrect) {
@@ -106,7 +112,7 @@
     var boxCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
     cards.forEach(function (card) {
-      var box = Math.max(1, Math.min(5, parseInt(card.box, 10) || 1));
+      var box = normalizeBoxIndex(card.box);
       boxCounts[box]++;
 
       var elapsed = Math.max(0, parseInt(card.daysSinceReview, 10) || 0);
