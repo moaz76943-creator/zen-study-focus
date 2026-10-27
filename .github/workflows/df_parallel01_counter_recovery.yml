@@ -6,6 +6,7 @@ on:
       - 'android/app/src/main/assets/web/app.js'
       - 'tests/integration_recovery/counter_ack_rollback.test.cjs'
       - 'tests/integration_recovery/daily_rollover_durability.test.cjs'
+      - 'tests/integration_recovery/water_counter_ack_rollback.test.cjs'
       - '.github/workflows/df_parallel01_counter_recovery.yml'
 permissions:
   contents: read
@@ -27,4 +28,4 @@ jobs:
           node --check tests/integration_recovery/counter_ack_rollback.test.cjs
           node --check tests/integration_recovery/daily_rollover_durability.test.cjs
       - name: Focused v21 failed-save rollback regressions
-        run: node --test tests/integration_recovery/counter_ack_rollback.test.cjs tests/integration_recovery/daily_rollover_durability.test.cjs
+        run: node --test tests/integration_recovery/counter_ack_rollback.test.cjs tests/integration_recovery/daily_rollover_durability.test.cjs tests/integration_recovery/water_counter_ack_rollback.test.cjs

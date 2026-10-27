@@ -39,6 +39,7 @@ for width in 320 360 393 430; do
       echo "ANDROID_INSTRUMENTATION_COMMAND_FAIL width=$width"; cat "$output"; exit 1;
     }
   if ! grep -q 'INSTRUMENTATION_RESULT: df08_status=PASS' "$output" ||
+      ! grep -q 'INSTRUMENTATION_RESULT: df08_water_ack=PASS' "$output" ||
       ! grep -q 'INSTRUMENTATION_RESULT: df08_physical_taps=' "$output"; then
     echo "ANDROID_TOUCH_NOT_PASS width=$width"
     timeout 15s adb exec-out cat /sdcard/df08_live_failure.png > "$out/foreground-failure-$width.png" 2>/dev/null || true

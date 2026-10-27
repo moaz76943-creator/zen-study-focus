@@ -2901,7 +2901,21 @@ function skipTimerPhase() {
   // The wrapper requests consent before it mutates active/paused sessions.
   return selectTimerModeFromUser(cfg.shortMin, 'short', document.getElementById('modeShortBtn'));
 }
-function addWaterCup() { cfg.water = (cfg.water + 1) % 9; saveFortressData('zen_fortress_cfg_v21', cfg); syncHeaderMetrics(); }
+function addWaterCup() {
+  const previous = Number(cfg.water || 0);
+  if (!Number.isSafeInteger(previous) || previous < 0) return false;
+  const next = {...cfg, water:(previous + 1) % 9};
+  try {
+    if (saveFortressData('zen_fortress_cfg_v21', next) !== true)
+      throw new Error('WATER_COUNTER_SAVE_NOT_ACKNOWLEDGED');
+  } catch (_) {
+    showToast(L().saveFailed || 'Could not save progress. Retry.');
+    return false;
+  }
+  cfg = next;
+  syncHeaderMetrics();
+  return true;
+}
 function toggleDeskClock(show) {
   document.getElementById('deskClockOverlay').classList.toggle('active', show);
   if (window.ZenNative && window.ZenNative.setDeskClockWake) {
