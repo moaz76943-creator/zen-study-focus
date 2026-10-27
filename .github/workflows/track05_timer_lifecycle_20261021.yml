@@ -5,6 +5,27 @@ on:
       - fix/df-final01-track05-native-active-timer-20261026
   pull_request:
     branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/quick_training.js'
+      - 'android/app/src/main/assets/web/timer_settings.js'
+      - 'android/app/src/main/assets/web/preflight_v22.js'
+      - 'android/app/src/main/assets/web/integration_v22.js'
+      - 'android/app/src/main/assets/web/data_compat_v21.js'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'android/app/src/main/java/**'
+      - 'android/app/src/main/res/**'
+      - 'android/app/build.gradle'
+      - 'android/*.gradle'
+      - 'android/gradle.properties'
+      - 'android/gradle/**'
+      - 'tests/track05_timer/**'
+      - 'tests/android_e2e_recovery/**'
+      - 'tests/i18n/quick_training/**'
+      - 'tests/i18n/timer/**'
+      - 'tests/track07_functional/timer*'
+      - 'tests/integration_quality/activity_domain_durable_ack.test.cjs'
+      - '.github/workflows/track05_timer_lifecycle_20261021.yml'
 permissions:
   contents: read
 concurrency:
@@ -30,7 +51,7 @@ jobs:
           node --check tests/track05_timer/live_android_cdp.cjs
           bash -n tests/track05_timer/run_android_timer_qa.sh
       - name: Native active timer checkpoint and lifecycle regression
-        run: node --test tests/track05_timer/native_timer_checkpoint.test.cjs
+        run: node --test tests/track05_timer/native_timer_checkpoint.test.cjs tests/track05_timer/mode_snapshot_ack.test.cjs
       - name: Track05 real-function lifecycle regression and adjacent timer guards
         run: |
           node --test tests/track05_timer/tick_lifecycle.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/integration_quality/activity_domain_durable_ack.test.cjs
