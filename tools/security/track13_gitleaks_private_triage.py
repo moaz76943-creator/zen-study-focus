@@ -17,6 +17,7 @@ CATEGORIES = (
     "compatibility_salt_candidate",
     "storage_key_candidate",
     "git_commit_reference_candidate",
+    "corruption_fixture_candidate",
     "unresolved",
 )
 # Immutable v21 *local storage identifiers*, not credentials.
@@ -107,6 +108,11 @@ def source_context_candidate(repo: Path, row: dict) -> str:
         return "unresolved"
     if SALT_DECLARATION.fullmatch(line):
         return "compatibility_salt_candidate"
+    # Reviewed negative-test marker, never a service credential. Bind both the
+    # exact repository path and exact statement; do not exempt arbitrary tests.
+    if (row.get("File", "").removeprefix("./") == "tests/android_e2e_recovery/native_faults.cjs"
+            and line.strip() == "localStorage.setItem(key,'DF07_CORRUPT_PRIMARY');"):
+        return "corruption_fixture_candidate"
     for name in STORAGE_IDENTIFIERS:
         if ("'" + name + "'" in line) or ('"' + name + '"' in line):
             return "storage_key_candidate"

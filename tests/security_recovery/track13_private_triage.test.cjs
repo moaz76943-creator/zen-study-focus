@@ -18,6 +18,8 @@ function run(rows,sourceSha=SHA){
     const tests=path.join(dir,'tests');
     fs.mkdirSync(tests,{recursive:true});
     fs.writeFileSync(path.join(tests,'config.cjs'),"assert.equal(key,'"+CFG_KEY+"');\n",{mode:0o600});
+    fs.mkdirSync(path.join(tests,'android_e2e_recovery'),{recursive:true});
+    fs.writeFileSync(path.join(tests,'android_e2e_recovery/native_faults.cjs'),"localStorage.setItem(key,'DF07_CORRUPT_PRIMARY');\n",{mode:0o600});
     const report=path.join(dir,'private-report.json');
     if(rows!==null)fs.writeFileSync(report,typeof rows==='string'?rows:JSON.stringify(rows),{mode:0o600});
     const init=spawnSync('git',['init','-q',dir],{encoding:'utf8'});assert.equal(init.status,0);
@@ -46,11 +48,20 @@ test('candidate buckets never turn findings into PASS or leak matched secrets',(
     compatibility_salt_candidate:1,
     storage_key_candidate:1,
     git_commit_reference_candidate:1,
+    corruption_fixture_candidate:0,
     unresolved:1
   });
   assert.ok(!(r.stdout+r.stderr).includes(sentinel));
   assert.ok(!(r.stdout+r.stderr).includes('private/'));
   assert.ok(!(r.stdout+r.stderr).includes('PUBLIC_COMPAT_TEST_FIXTURE_42'));
+});
+test('reviewed corruption marker is a narrow source candidate, never scanner clearance',()=>{
+  const r=run([{RuleID:'generic-api-key',Secret:'REDACTED',File:'tests/android_e2e_recovery/native_faults.cjs',StartLine:1}]);
+  assert.equal(r.status,1);
+  assert.equal(r.output.status,'REVIEW_REQUIRED');
+  assert.equal(r.output.categories.corruption_fixture_candidate,1);
+  assert.equal(r.output.categories.unresolved,0);
+  assert.ok(!r.stdout.includes('DF07_CORRUPT_PRIMARY'));
 });
 test('all classified candidates still require review, never generate a clean security gate',()=>{
   const r=run([{RuleID:'generic-api-key',Secret:'zen_fortress_notes_v21'}]);
@@ -84,7 +95,7 @@ test('scanner-redacted findings are context candidates only, never silently appr
   assert.equal(r.output.status,'REVIEW_REQUIRED');
   assert.deepEqual(r.output.categories,{
     compatibility_salt_candidate:1,storage_key_candidate:1,
-    git_commit_reference_candidate:0,unresolved:1
+    git_commit_reference_candidate:0,corruption_fixture_candidate:0,unresolved:1
   });
   assert.equal(r.output.findings,3);
   assert.ok(!r.stdout.includes('PUBLIC_COMPAT_TEST_FIXTURE_42'));
