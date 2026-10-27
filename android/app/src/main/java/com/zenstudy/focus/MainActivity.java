@@ -92,6 +92,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Exactly the existing v21 six raw packets, preserved byte-for-byte.
+    private final Object durableV21Lock = new Object();
+    private static final int MAX_DURABLE_V21_BYTES = 64 * 1024 * 1024;
+    private static final String[] DURABLE_V21_KEYS = {
+        "zen_fortress_cfg_v21", "zen_fortress_cfg_v21_mirror",
+        "zen_fortress_tasks_v21", "zen_fortress_tasks_v21_mirror",
+        "zen_fortress_notes_v21", "zen_fortress_notes_v21_mirror"
+    };
+    private boolean validV21Envelope(String text) {
+        if (text==null || text.length()>MAX_DURABLE_V21_BYTES) return false;
+        try {
+            org.json.JSONObject data = new org.json.JSONObject(text);
+            if (data.getInt("version")!=1) return false;
+            org.json.JSONObject packets = data.getJSONObject("packets");
+            if (packets.length()!=DURABLE_V21_KEYS.length) return false;
+            for (String key : DURABLE_V21_KEYS) {
+                if (!packets.has(key)) return false;
+                Object packet = packets.get(key);
+                if (packet!=org.json.JSONObject.NULL && !(packet instanceof String)) return false;
+            }
+            return true;
+        } catch (Exception ignored) { return false; }
+    }
+
+
     // Separate, optional active-timer receipt: never alter the six v21 storage keys.
     private final Object activeTimerCheckpointLock = new Object();
     private static final int ACTIVE_TIMER_MAX_BYTES = 256 * 1024;
@@ -120,6 +145,86 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class ZenNativeBridge {
+        // @JavascriptInterface executes on WebView's bridge thread, off the UI thread.
+        // Acknowledgement requires a private AtomicFile with explicit FD sync.
+        @JavascriptInterface
+        public boolean acknowledgeDurableV21(String json) {
+            if (!validV21Envelope(json)) return false;
+            byte[] bytes=json.getBytes(StandardCharsets.UTF_8);
+            if (bytes.length>MAX_DURABLE_V21_BYTES) return false;
+            synchronized (durableV21Lock) {
+                AtomicFile file=new AtomicFile(new File(getFilesDir(),"v21_durable_packets_v1"));
+                // A surviving marker means publication was interrupted or its rollback
+                // could not be verified. Never replay an uncertain/rejected edit.
+                File marker = new File(getFilesDir(),"v21_durable_packets_v1.pending");
+                if (marker.exists()) return false;
+                byte[] previous = null;
+                boolean publicationStarted = false;
+                FileOutputStream stream=null;
+                try {
+                    File base = file.getBaseFile();
+                    if (base.exists() || new File(base.getPath()+".bak").exists())
+                        previous = file.readFully();
+                    try (FileOutputStream pending = new FileOutputStream(marker)) {
+                        pending.write(1);
+                        pending.getFD().sync();
+                    }
+                    publicationStarted = true;
+                    stream=file.startWrite();
+                    stream.write(bytes);
+                    stream.getFD().sync();
+                    file.finishWrite(stream);
+                    stream=null;
+                    // AtomicFile can log a failed rename instead of throwing.
+                    if (!java.util.Arrays.equals(bytes,file.readFully()))
+                        throw new java.io.IOException("Native publication not verified");
+                    if (!marker.delete()) throw new java.io.IOException("Native marker cleanup failed");
+                    return true;
+                } catch (Exception error) {
+                    if (!publicationStarted) return false;
+                    if (stream!=null) file.failWrite(stream);
+                    // Readback can fail AFTER publication. Restore the old receipt
+                    // before returning false so it cannot resurrect after restart.
+                    try {
+                        if (previous == null) {
+                            file.delete();
+                            if (file.getBaseFile().exists()) return false;
+                        } else {
+                            FileOutputStream restore = null;
+                            try {
+                                restore=file.startWrite();
+                                restore.write(previous);
+                                restore.getFD().sync();
+                                file.finishWrite(restore);
+                                restore=null;
+                                if (!java.util.Arrays.equals(previous,file.readFully())) return false;
+                            } finally { if (restore!=null) file.failWrite(restore); }
+                        }
+                        // If rollback fails, retain the marker and fail closed on reboot.
+                        marker.delete();
+                    } catch (Exception rollbackError) { /* retain marker and packets */ }
+                    return false;
+                }
+            }
+        }
+
+        @JavascriptInterface
+        public String readDurableV21() {
+            synchronized (durableV21Lock) {
+                if (new File(getFilesDir(),"v21_durable_packets_v1.pending").exists()) return "ERROR";
+                AtomicFile file=new AtomicFile(new File(getFilesDir(),"v21_durable_packets_v1"));
+                File baseFile=file.getBaseFile();
+                if (!baseFile.exists() && !new File(baseFile.getPath()+".bak").exists()) return "NONE";
+                try {
+                    byte[] bytes=file.readFully();
+                    if (bytes.length>MAX_DURABLE_V21_BYTES) return "ERROR";
+                    String json=new String(bytes,StandardCharsets.UTF_8);
+                    return validV21Envelope(json)?json:"ERROR";
+                } catch (Exception error) { return "ERROR"; }
+            }
+        }
+
+
         // Atomic pause/start checkpoint independent from six-family v21 ACK.
         @JavascriptInterface
         public boolean acknowledgeActiveTimerSnapshot(String packet) {
