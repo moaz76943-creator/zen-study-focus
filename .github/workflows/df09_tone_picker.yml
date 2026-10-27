@@ -6,6 +6,7 @@ on:
       - 'android/app/src/main/assets/web/js/completion_tone_picker.js'
       - 'android/app/src/main/assets/web/index.html'
       - 'tests/df_parallel09_tone*'
+      - 'tests/audio_context/**'
       - '.github/workflows/df09_tone_picker.yml'
 permissions:
   contents: read
@@ -19,7 +20,7 @@ jobs:
         with:
           node-version: '22'
       - name: Exact-source locale and CSS tests
-        run: node --test tests/df_parallel09_tone_picker.test.cjs
+        run: node --test tests/df_parallel09_tone_picker.test.cjs tests/audio_context/*.test.cjs
       - name: Install local Chromium harness
         run: |
           npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
