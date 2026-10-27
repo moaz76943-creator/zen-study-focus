@@ -5,6 +5,7 @@ on:
     paths:
       - 'tests/i18n/analytics/analytics_20_browser.cjs'
       - 'tests/analytics_core/legacy_chart_startup_browser.cjs'
+      - 'tests/security_recovery/share_card_xss_browser.cjs'
       - 'android/app/src/main/assets/web/app.js'
       - 'android/app/src/main/assets/web/index.html'
       - 'android/app/src/main/assets/web/analytics_core_v21.js'
@@ -41,6 +42,7 @@ jobs:
           DF03_ANALYTICS_REPORT: ${{ runner.temp }}/analytics-20.json
           GITHUB_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
+          node tests/security_recovery/share_card_xss_browser.cjs
           node tests/analytics_core/legacy_chart_startup_browser.cjs
           node tests/i18n/analytics/analytics_20_browser.cjs
       - name: Preserve exact source and limitations

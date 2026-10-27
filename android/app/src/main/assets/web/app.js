@@ -3947,23 +3947,23 @@ const ShareCardEngine = (function() {
 
         <!-- Date & Flame -->
         <div class="flex items-center justify-between mb-5">
-          <div class="text-sm font-bold text-slate-300 font-mono" style="font-variant-numeric: lining-nums;">${data.today}</div>
+          <div class="text-sm font-bold text-slate-300 font-mono" style="font-variant-numeric: lining-nums;" id="df-share-date"></div>
           <div class="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full text-xs font-bold flex items-center gap-1.5 font-mono">
             <span>🔥</span>
-            <span>${data.streak} Days Streak</span>
+            <span><span id="df-share-streak"></span> Days Streak</span>
           </div>
         </div>
 
         <!-- Core Metric Box -->
         <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 mb-4 text-center">
-          <div class="text-4xl font-black text-emerald-400 font-mono tracking-tight" style="font-variant-numeric: lining-nums;">${data.mins} <span class="text-xs text-slate-400 font-normal">MINS</span></div>
+          <div class="text-4xl font-black text-emerald-400 font-mono tracking-tight" style="font-variant-numeric: lining-nums;"><span id="df-share-mins"></span> <span class="text-xs text-slate-400 font-normal">MINS</span></div>
           <div class="text-xs text-slate-400 mt-1">Deep Work Immersion Today</div>
         </div>
 
         <!-- Target Milestone -->
         <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-800 text-xs text-slate-300 mb-5 flex items-center gap-2">
           <span>🎯</span>
-          <span class="truncate font-semibold">${data.task}</span>
+          <span id="df-share-task" class="truncate font-semibold"></span>
         </div>
 
         <!-- Share Actions -->
@@ -3978,6 +3978,11 @@ const ShareCardEngine = (function() {
       </div>
     `;
 
+    // Stored task titles and rendered metrics are text, never HTML markup.
+    for (const [id,value] of Object.entries({
+      'df-share-date':data.today,'df-share-streak':data.streak,
+      'df-share-mins':data.mins,'df-share-task':data.task
+    })) modal.querySelector('#'+id).textContent = value;
     document.body.appendChild(modal);
 
     modal.querySelector('#df-share-close').onclick = () => modal.remove();
