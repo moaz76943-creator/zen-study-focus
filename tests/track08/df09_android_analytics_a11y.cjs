@@ -1,13 +1,13 @@
 'use strict';
+const {createEvidenceDirectory}=require('../android_e2e_recovery/private_evidence.cjs');
 // Real disposable Android WebView/CDP probe. No browser emulator or mocked WebView.
-const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const cp=require('node:child_process');
 const codes='en ar es zh hi fr de ru pt ja id tr ko vi it bn ur fa pl nl'.split(' ');
-const folder=process.env.DF09_NATIVE_EVIDENCE||'/tmp/df09-analytics-native';
+const evidence=createEvidenceDirectory(process.env.DF09_NATIVE_EVIDENCE,'df09-analytics-native-');
 const timeout=ms=>new Promise(r=>setTimeout(r,ms));
 const adb=(...args)=>cp.execFileSync('adb',args,{encoding:'utf8',timeout:18000,maxBuffer:1024*1024}).trim();
-fs.mkdirSync(folder,{recursive:true});
+
 const report={kind:'ANDROID_WEBVIEW_DOM_CDP_REAL_QA_DEBUG_APK',
   sourceSha:process.env.GITHUB_SHA||'UNKNOWN',androidApi:process.env.DF09_ANDROID_API||'UNKNOWN',
   results:[],status:'NOT_TESTED',nativeAccessibility:'NOT_TESTED',physicalPhone:'NOT_TESTED',
@@ -110,4 +110,4 @@ async function main(){
   }finally{ws.close();}
 }
 main().catch(e=>{report.status='FAIL';report.error=String(e.stack||e).slice(0,850);console.error(report.error);process.exitCode=1;})
-.finally(()=>{fs.writeFileSync(folder+'/ANDROID_ANALYTICS_20.json',JSON.stringify(report,null,2)+'\n');});
+.finally(()=>{evidence.write('ANDROID_ANALYTICS_20.json',JSON.stringify(report,null,2)+'\n');});

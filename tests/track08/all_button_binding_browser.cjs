@@ -1,8 +1,8 @@
 'use strict';
+const {createEvidenceDirectory}=require('../android_e2e_recovery/private_evidence.cjs');
 const {chromium}=require('playwright');
-const fs=require('node:fs');
 const assert=require('node:assert/strict');
-const output=process.env.DF_BUTTON_BINDING_EVIDENCE||'/tmp/deep-focus-all-buttons';
+const evidence=createEvidenceDirectory(process.env.DF_BUTTON_BINDING_EVIDENCE,'deep-focus-all-buttons-');
 const base=process.env.DF_COMPLETION_URL||'http://127.0.0.1:8770';
 (async()=>{
  const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
@@ -71,8 +71,8 @@ const base=process.env.DF_COMPLETION_URL||'http://127.0.0.1:8770';
    },lang);
    reports.push(report);
   }
-  fs.mkdirSync(output,{recursive:true});
-  fs.writeFileSync(output+'/control-binding-source-observed.json',JSON.stringify({reports,errors,
+
+  evidence.write('control-binding-source-observed.json',JSON.stringify({reports,errors,
    limitations:'Bindings and accessible name check. Does NOT prove functional click postconditions; unassigned may use delegated listeners or native controls.'},null,2));
   const broken=reports.flatMap(r=>r.broken.map(x=>({lang:r.lang,...x})));
   console.log(JSON.stringify({locales:reports.length,totalRendered:reports[0].totalControls,

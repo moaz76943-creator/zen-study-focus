@@ -1,16 +1,15 @@
 'use strict';
+const {createEvidenceDirectory}=require('../android_e2e_recovery/private_evidence.cjs');
 // Selective forward port of #134 QA; application source is current canonical plus this focused CSV fix.
 // Disposable Android QA only. Actual app Analytics Export button opens real
 // ACTION_CREATE_DOCUMENT; verify CANCEL then SAVE + file bytes without using
 // owner data, fabricated native callbacks, or browser-only mock saves.
 const assert=require('node:assert/strict');
-const fs=require('node:fs');
 const cp=require('node:child_process');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const E=process.argv[2]||'/tmp/df-native-saf';
-fs.mkdirSync(E,{recursive:true});
+const evidence=createEvidenceDirectory(process.argv[2],'df-native-saf-');
 const adb=(...args)=>cp.execFileSync('adb',args,{encoding:'utf8',timeout:24000,maxBuffer:4*1024*1024});
-const snap=file=>fs.writeFileSync(E+'/'+file,cp.execFileSync('adb',['exec-out','screencap','-p'],{timeout:16000,maxBuffer:9*1024*1024}));
+const snap=file=>evidence.write(file,cp.execFileSync('adb',['exec-out','screencap','-p'],{timeout:16000,maxBuffer:9*1024*1024}));
 const report={source:'real Android DocumentsUI with bundled Analytics button',results:[],status:'NOT_TESTED',release_approved:false};
 let ws,requestId=0;
 async function evaluate(expression){
@@ -74,7 +73,7 @@ async function waitChooser(stage){
   const x=parseXml();
   return (/documentsui/i.test(x)||(/deep-focus-analytics\.csv/i.test(x)&&/Save|حفظ|SAVE/i.test(x)))?x:null;
  });
- fs.writeFileSync(E+'/'+stage+'-picker.xml',xml);
+ evidence.write(stage+'-picker.xml',xml);
  snap(stage+'-picker.png');
  return xml;
 }
@@ -182,6 +181,6 @@ async function receiptAfter(before,expected){
   process.exitCode=1;
  }finally{
   if(ws)try{ws.close()}catch(_){}
-  fs.writeFileSync(E+'/native-analytics-saf-results.json',JSON.stringify(report,null,2));
+  evidence.write('native-analytics-saf-results.json',JSON.stringify(report,null,2));
  }
 })()
