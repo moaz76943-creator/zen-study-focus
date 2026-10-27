@@ -14,6 +14,7 @@ on:
       - 'tests/android_e2e_recovery/native_faults.cjs'
       - 'tests/android_e2e_recovery/native_faults.test.cjs'
       - 'tests/android_e2e_recovery/prepare_native_probe*.py'
+      - 'tests/android_e2e_recovery/host_resource_probe.py'
       - '.github/workflows/df_parallel01_current_native_android.yml'
 permissions:
   contents: read
@@ -97,6 +98,8 @@ jobs:
           test -c /dev/kvm
           sudo chown "$(id -u):$(id -g)" /dev/kvm
           sudo chmod u+rw /dev/kvm
+          python3 tests/android_e2e_recovery/host_resource_probe.py > "$RUNNER_TEMP/df-pr01-android/host-resources.jsonl" &
+          echo "$!" > "$RUNNER_TEMP/df-pr01-android/host-resource-probe.pid"
       - name: Execute real DocumentsUI, native ACK and force-stop probes
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -106,11 +109,23 @@ jobs:
           profile: pixel_6
           ram-size: 2048M
           heap-size: 256M
+          # API35 lost the emulator process on the previous full-resolution run.
+          # Reduce software-renderer surfaces and remove Vulkan from this experiment.
+          # Keep all native/SAF cases and the API30 configuration unchanged.
+          emulator-options: ${{ matrix.api-level == 35 && '-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -skin 720x1280 -dpi-device 240' || '-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim' }}
           emulator-boot-timeout: 900
           # Android emulator ADB may not accept animation settings immediately after boot;
           # don't abort the real device test before our own readiness checks.
           disable-animations: false
           script: bash tests/android_e2e_recovery/p0_timer_saf_ci.sh
+      - name: Finish bounded host diagnostics
+        if: always()
+        run: |
+          probe_file="$RUNNER_TEMP/df-pr01-android/host-resource-probe.pid"
+          if test -f "$probe_file"; then
+            probe_pid="$(cat "$probe_file")"
+            if [[ "$probe_pid" =~ ^[0-9]+$ ]]; then kill "$probe_pid" 2>/dev/null || true; fi
+          fi
       - name: Preserve real PASS FAIL NOT_TESTED results
         if: always()
         uses: actions/upload-artifact@v4

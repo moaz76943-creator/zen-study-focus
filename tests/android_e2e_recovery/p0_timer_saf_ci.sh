@@ -12,11 +12,11 @@ capture(){
   fi
   timeout 20 adb logcat -d -s AndroidRuntime chromium > "$report/logcat.txt" || true
   if test -n "${PROBE_PID:-}"; then
-    adb shell am force-stop com.zenstudy.focus.e2e >/dev/null 2>&1 || true
+    timeout 10s adb shell am force-stop com.zenstudy.focus.e2e >/dev/null 2>&1 || true
     kill "$PROBE_PID" 2>/dev/null || true
   fi
-  adb forward --remove tcp:38383 >/dev/null 2>&1 || true
-  adb forward --remove tcp:9222 >/dev/null 2>&1 || true
+  timeout 10s adb forward --remove tcp:38383 >/dev/null 2>&1 || true
+  timeout 10s adb forward --remove tcp:9222 >/dev/null 2>&1 || true
 }
 trap capture EXIT
 cp android/app/build/outputs/apk/debug/app-debug.apk "$report/tested-debug.apk"
