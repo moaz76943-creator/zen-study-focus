@@ -112,5 +112,6 @@ test('workflow scans exact source, history and tree; does not upload raw finding
   assert.match(wf, /gitleaks" dir --no-banner/);
   assert.match(wf, /gitleaks" git --no-banner/);
   assert.match(wf, /track13_gitleaks_report\.py/);
+  assert.equal((wf.match(/--config tools\/security\/gitleaks_public_identifiers\.toml/g)||[]).length,2);
   assert.doesNotMatch(wf, /upload-artifact|continue-on-error|\bsecrets\.|\.gitleaks\.toml/);
 });

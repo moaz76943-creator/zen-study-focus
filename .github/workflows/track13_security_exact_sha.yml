@@ -42,6 +42,10 @@ jobs:
           echo '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  '"$RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
           tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
           chmod +x "$RUNNER_TEMP/gitleaks"
+      - name: Prove reviewed public-identifier exceptions retain real detection
+        env:
+          GITLEAKS_BIN: ${{ runner.temp }}/gitleaks
+        run: node --test tests/security_recovery/gitleaks_public_identifiers.test.cjs
       - name: Prove default detection with disposable synthetic credential
         shell: bash
         run: |
@@ -80,9 +84,9 @@ jobs:
           work="$(mktemp -d "$RUNNER_TEMP/df-track13.XXXXXX")"
           trap 'rm -rf "$work"' EXIT
           set +e
-          "$RUNNER_TEMP/gitleaks" dir --no-banner --redact --log-level error --report-format json --report-path "$work/tree.json" . >/dev/null 2>&1
+          "$RUNNER_TEMP/gitleaks" dir --no-banner --config tools/security/gitleaks_public_identifiers.toml --redact --log-level error --report-format json --report-path "$work/tree.json" . >/dev/null 2>&1
           tree_exit=$?
-          "$RUNNER_TEMP/gitleaks" git --no-banner --redact --log-level error --report-format json --report-path "$work/history.json" . >/dev/null 2>&1
+          "$RUNNER_TEMP/gitleaks" git --no-banner --config tools/security/gitleaks_public_identifiers.toml --redact --log-level error --report-format json --report-path "$work/history.json" . >/dev/null 2>&1
           history_exit=$?
           python3 tools/security/track13_gitleaks_report.py --report "$work/tree.json" --sha "$(git rev-parse HEAD)" --scan-exit "$tree_exit" > "$work/tree-summary.json"
           tree_summary_exit=$?
