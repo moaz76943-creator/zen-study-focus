@@ -24,6 +24,7 @@ final class FocusAppWebChromeClient extends WebChromeClient {
     private final MainActivity activity;
     private AlertDialog activeDialog;
     private Runnable activeCancel;
+    private boolean closed;
 
     FocusAppWebChromeClient(MainActivity activity) {
         this.activity = activity;
@@ -62,7 +63,7 @@ final class FocusAppWebChromeClient extends WebChromeClient {
     }
 
     private boolean isTrusted(String url) {
-        return TRUSTED_URL.equals(url) && !activity.isFinishing() && !activity.isDestroyed();
+        return !closed && TRUSTED_URL.equals(url) && !activity.isFinishing() && !activity.isDestroyed();
     }
 
     private boolean display(String url, String message, JsResult result,
@@ -116,15 +117,18 @@ final class FocusAppWebChromeClient extends WebChromeClient {
             dialog.show();
         } catch (RuntimeException error) {
             // Never accept an action if the native dialog could not be presented.
+            // cancel releases ownership before settling JS. Its callback may
+            // synchronously open another dialog; keep that replacement owned.
             cancel.run();
-            activeDialog = null;
-            activeCancel = null;
         }
         return true;
     }
 
     /** Discard any unresolved confirmation when its owner Activity is destroyed. */
     void cancelPending() {
+        // JsResult.cancel can resume JavaScript synchronously. Close admission
+        // before settling it so teardown cannot create an unowned new window.
+        closed = true;
         // Resolve JS once and dismiss the same dialog even if cancel clears fields.
         final AlertDialog showing = activeDialog;
         final Runnable pendingCancel = activeCancel;

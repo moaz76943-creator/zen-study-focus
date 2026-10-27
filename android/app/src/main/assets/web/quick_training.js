@@ -4009,7 +4009,10 @@ function startQuickTraining() {
     showToast(quickSaveError());
     return false;
   }
-  if(timerRunning)toggleTimerPlay();
+  if(timerRunning && toggleTimerPlay() !== true) {
+    showToast(quickSaveError());
+    return false;
+  }
   cfg.domain=quickPresetDomain;
   quickTraining={
     active:true,sets,workSeconds,restSeconds,currentSet:0,phase:'work',
@@ -4019,20 +4022,42 @@ function startQuickTraining() {
   };
   renderDomainState();
   quickInternalChange=true;
-  selectTimerMode(workSeconds/60,'focus',document.getElementById('modeFocusBtn'));
-  quickInternalChange=false;
+  let selected;
+  try { selected=selectTimerMode(workSeconds/60,'focus',document.getElementById('modeFocusBtn')); }
+  finally { quickInternalChange=false; }
+  if(selected===false) {
+    quickTraining=null;
+    showToast(quickSaveError());
+    return false;
+  }
   const preferencesSaved=saveQuickConfig();
-  toggleTimerPlay();
+  if(toggleTimerPlay()===false) {
+    renderQuickTraining();
+    showToast(quickSaveError());
+    return false;
+  }
   renderQuickTraining();
   showToast(preferencesSaved?quickText('started'):quickSaveError());
   quickWorkflowEvent('started',{domain:quickTraining.domain,taskId:quickTraining.taskId,
     sets:quickTraining.sets,workSeconds:quickTraining.workSeconds,restSeconds:quickTraining.restSeconds});
 }
 function stopQuickTrainingInternal() {
+  if(timerRunning && toggleTimerPlay() !== true)return false;
+  // Retain the recoverable workout until the replacement idle snapshot is acknowledged.
+  const previous=quickTraining;
+  const domain=previous?.domain || cfg.domain || 'study';
   quickTraining=null;
-  if(timerRunning)toggleTimerPlay();
-  selectTimerMode(getDomainFocusMinutes(),'focus',document.getElementById('modeFocusBtn'));
+  let selected;
+  quickInternalChange=true;
+  try { selected=selectTimerMode(getDomainFocusMinutes(domain),'focus',document.getElementById('modeFocusBtn')); }
+  finally { quickInternalChange=false; }
+  if(selected===false) {
+    quickTraining=previous;
+    showToast(quickSaveError());
+    return false;
+  }
   renderQuickTraining();
+  return true;
 }
 function cancelQuickTraining(skipPrompt=false) {
   if(!quickTraining?.active)return false;
@@ -4043,8 +4068,7 @@ function cancelQuickTraining(skipPrompt=false) {
     return false;
   }
   const ended=quickTraining;
-  quickTraining=null;
-  stopQuickTrainingInternal();
+  if(stopQuickTrainingInternal()===false)return false;
   quickWorkflowEvent('cancelled',{domain:ended.domain,taskId:ended.taskId??null,
     completedSets:ended.currentSet});
   return true;
@@ -4063,17 +4087,15 @@ function skipQuickTrainingStep() {
 function completeQuickTraining() {
   const finished=quickTraining;
   const domain = quickTraining?.domain || cfg.domain || 'study';
-  quickTraining = null;
-  quickInternalChange = true;
-  selectTimerMode(getDomainFocusMinutes(domain),'focus',document.getElementById('modeFocusBtn'));
-  quickInternalChange = false;
-  renderQuickTraining();
+  if(stopQuickTrainingInternal()===false)return false;
   showToast(quickText('finished'));
   if(finished)quickWorkflowEvent('completed',{domain,taskId:finished.taskId??null,sets:finished.sets});
 }
 function advanceQuickTrainingStep() {
-  const q=quickTraining;
-  if(!q?.active)return false;
+  const previous=quickTraining;
+  if(!previous?.active)return false;
+  // Stage the next phase; a refused timer write must leave the current round intact.
+  const q={...previous};
   if(q.phase==='work') {
     if(q.restSeconds>0 && (q.currentSet<q.sets-1 || !q.skipLastRest)) {
       q.phase='rest';
@@ -4092,9 +4114,17 @@ function advanceQuickTrainingStep() {
   }
   quickInternalChange=true;
   const phase=q.phase==='work'?'focus':'short';
-  selectTimerMode((q.phase==='work'?q.workSeconds:q.restSeconds)/60,phase,
-    document.getElementById(q.phase==='work'?'modeFocusBtn':'modeShortBtn'));
-  quickInternalChange=false;
+  quickTraining=q;
+  let selected;
+  try {
+    selected=selectTimerMode((q.phase==='work'?q.workSeconds:q.restSeconds)/60,phase,
+      document.getElementById(q.phase==='work'?'modeFocusBtn':'modeShortBtn'));
+  } finally { quickInternalChange=false; }
+  if(selected===false) {
+    quickTraining=previous;
+    showToast(quickSaveError());
+    return false;
+  }
   toggleTimerPlay();
   renderQuickTraining();
   quickWorkflowEvent('phase',{domain:q.domain,taskId:q.taskId??null,
