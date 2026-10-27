@@ -266,3 +266,24 @@ test('live v21 matrix: offline CLI run, report consistent, known el/sk timer div
     }
   }
 });
+
+test('CLI resolves shipped dictionaries without an explicit root from an unrelated working directory', () => {
+  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'w03-cli-root-'));
+  try {
+    const output = path.join(outDir, 'report.json');
+    const stdout = execFileSync(process.execPath, [MATRIX, '--output', output], {
+      cwd: outDir, encoding: 'utf8', timeout: 15000
+    });
+    const summary = JSON.parse(stdout);
+    const report = JSON.parse(fs.readFileSync(output, 'utf8'));
+    assert.equal(summary.kind, 'LOCALE_TRUTH_MATRIX_OFFLINE_SOURCE_AUDIT');
+    assert.equal(report.languages.length, 99);
+    assert.ok(report.languages.every(row => row.present_in_catalog));
+    assert.equal(report.android_e2e, 'NOT_TESTED');
+    assert.ok(report.totals.fallback > 0, 'missing translations remain visible');
+    assert.equal(Object.values(report.totals).reduce((sum, n) => sum + n, 0),
+      99 * LIVE_FAMILY_KEY_TOTAL);
+  } finally {
+    fs.rmSync(outDir, { recursive: true, force: true });
+  }
+});
