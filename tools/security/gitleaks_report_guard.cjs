@@ -27,12 +27,13 @@ function parseAndAuditGitleaksReport(reportPath, exitCode = 0) {
     let findings;
     try {
         const rawContent = fs.readFileSync(reportPath, 'utf8').trim();
-        findings = rawContent === "" ? [] : JSON.parse(rawContent);
-    } catch (e) {
+        findings = JSON.parse(rawContent);
+    } catch {
         return {
             status: "BLOCKED_MALFORMED_REPORT",
             clean: false,
-            reason: `Malformed JSON in Gitleaks report: ${e.message}`
+            // JSON parser errors can include snippets containing secret values.
+            reason: "Malformed JSON in Gitleaks report"
         };
     }
 
@@ -44,8 +45,23 @@ function parseAndAuditGitleaksReport(reportPath, exitCode = 0) {
         };
     }
 
+    if (findings.some(finding => finding === null || typeof finding !== "object" || Array.isArray(finding))) {
+        return {
+            status: "BLOCKED_MALFORMED_REPORT",
+            clean: false,
+            reason: "Gitleaks findings must be objects"
+        };
+    }
+
     // 4. Verified Clean Report
     if (findings.length === 0) {
+        if (exitCode !== 0) {
+            return {
+                status: "BLOCKED_SCANNER_ERROR",
+                clean: false,
+                reason: "Gitleaks findings exit conflicts with an empty report"
+            };
+        }
         return {
             status: "PASS",
             clean: true,
