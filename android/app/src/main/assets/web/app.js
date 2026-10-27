@@ -3405,6 +3405,7 @@ function filterSoundsByCat(cat, btn) {
 
 function renderSoundsStudio() {
   const box = document.getElementById('soundsGridBox');
+  const focusedSound = document.activeElement?.getAttribute('data-sound-toggle');
   box.innerHTML = '';
   const d = L();
 
@@ -3414,11 +3415,10 @@ function renderSoundsStudio() {
     const sName = d.sounds[s.id] || s.id;
     const tile = document.createElement('div');
     tile.className = `sound-Rich-tile ${s.cls} ${isOn ? 'playing' : ''}`;
-    tile.onclick = () => toggleSoundTile(s.id);
     tile.innerHTML = `
       <div class="stile-top">
-        <div class="stile-play-btn">${isOn ? '❚❚' : '▶'}</div>
-        <div class="stile-switch"><div class="stile-knob"></div></div>
+        <button type="button" class="stile-play-btn" data-sound-toggle="${s.id}" aria-pressed="${isOn}" aria-label="${escapeHtmlText(sName)}" onclick="toggleSoundTile('${s.id}')">${isOn ? '⏹' : '▶'}</button>
+        <div class="stile-switch" aria-hidden="true"><div class="stile-knob"></div></div>
       </div>
       <div>
         <div class="stile-name">${escapeHtmlText(toWest(sName))}</div>
@@ -3437,6 +3437,11 @@ function renderSoundsStudio() {
     category: soundCat,
     legacy: { locale: cfg.lang, sounds: d.sounds }
   });
+  if (focusedSound) {
+    const control = [...box.querySelectorAll('[data-sound-toggle]')]
+      .find(node => node.getAttribute('data-sound-toggle') === focusedSound);
+    if (control) control.focus({preventScroll:true});
+  }
 }
 
 /* ========================================================
