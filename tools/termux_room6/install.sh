@@ -27,9 +27,10 @@ function patch(before,after){
 }
 patch("  const a=run('node',['--check',task.source],{cwd:work,timeout:30000,logfile:log,quiet:true});", "  // Only JavaScript is valid input to node --check; HTML/CSS have focused content tests instead.\n  const a=/\\.(?:mjs|cjs|js)$/.test(task.source) ? run('node',['--check',task.source],{cwd:work,timeout:30000,logfile:log,quiet:true}) : {ok:true};");
 patch('    const cmd=`node ${JSON.stringify(me)} run ${lane}`;', '    const cmd=`node ${JSON.stringify(me)} run ${lane} >> ${JSON.stringify(path.join(folders.logs,`lane-${lane}.log`))} 2>&1`;');
+patch("  const b=taskBranch(task.id);\n  const x=run('git',['-C',repoDir,'worktree','add','-b',b,work,'FETCH_HEAD'],{timeout:120000});", "  // Rebase-free fresh source for each *new* task; previously saved worktrees stay untouched.\n  const latest=run('git',['-C',repoDir,'fetch','--depth','1','origin',TARGET],{timeout:240000,quiet:true});\n  if(!latest.ok)throw Error('Cannot refresh canonical HEAD before new task');\n  const b=taskBranch(task.id);\n  const x=run('git',['-C',repoDir,'worktree','add','-b',b,work,'FETCH_HEAD'],{timeout:120000});");
 fs.writeFileSync(name,source);
 NODE
-printf '%s  %s\n' '366acd94b41eb918a18f4b7b062c3464032d9791c76ae9248f9b5c3ef90a5143' "$TMP/runner.mjs" | sha256sum -c -
+printf '%s  %s\n' 'aeae891dba744a843384a08dcdd8e464facfb43b729ae530a4cc7f5d3acb9b1c' "$TMP/runner.mjs" | sha256sum -c -
 node --check "$TMP/runner.mjs"
 # Runner reads manifest beside its script; verify both together before replacement.
 (cd "$TMP" && node ./runner.mjs selftest)
