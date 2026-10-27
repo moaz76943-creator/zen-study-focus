@@ -6,7 +6,10 @@ const {parseWebViewBounds,cssPointToAndroid}=require('../android_e2e_recovery/an
 const {readWebViewFrame}=require('../android_e2e_recovery/android_ui_hierarchy.cjs');
 const serial=process.env.DF_TRACK05_SERIAL||'emulator-5554',file=process.argv[2];
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
-const adb=(...args)=>cp.execFileSync('adb',['-s',serial,...args],{encoding:'utf8',timeout:25000}).trim();
+const adb=(...args)=>{
+ try{return cp.execFileSync('adb',['-s',serial,...args],{encoding:'utf8',timeout:25000,stdio:['ignore','pipe','pipe']}).trim()}
+ catch(_){throw Error('TRANSPORT: ADB command failed or timed out')}
+};
 const cases=[];let ws,seq=0;const pending=new Map();
 function record(name,status,detail,evidence){const r={name,status,detail,evidence:evidence||null};cases.push(r);console.log(JSON.stringify(r))}
 async function connect(){
