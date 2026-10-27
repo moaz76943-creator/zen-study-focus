@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths: [.github/workflows/df06_exact_source_packages.yml]
+  push:
+    branches: [integration/master-qa-verified-v21]
+    paths: [.github/workflows/df06_exact_source_packages.yml]
   workflow_dispatch:
 
 permissions:
