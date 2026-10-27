@@ -1,0 +1,116 @@
+name: DF06 exact-source QA packages (no release)
+
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths: [.github/workflows/df06_exact_source_packages.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  packages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      ZEN_UPLOAD_KEYSTORE_PATH: ''
+      ZEN_UPLOAD_STORE_PASSWORD: ''
+      ZEN_UPLOAD_KEY_ALIAS: ''
+      ZEN_UPLOAD_KEY_PASSWORD: ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify exact source
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          mkdir -p "$RUNNER_TEMP/df06-packages"
+          {
+            echo "source_sha=$EXPECTED_SHA"
+            echo "source_tree=$(git rev-parse 'HEAD^{tree}')"
+            echo "android_tree=$(git rev-parse HEAD:android)"
+            echo "workflow_run=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "workflow_ref=$GITHUB_WORKFLOW_REF"
+            echo 'purpose=QA only; no release approval or publication'
+            echo 'build_command=gradle --no-daemon -p android assembleDebug bundleRelease'
+          } > "$RUNNER_TEMP/df06-packages/provenance.txt"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build debug APK and unsigned release AAB
+        run: gradle --no-daemon -p android assembleDebug bundleRelease
+      - name: Verify artifact identity, debug signature and unsigned release manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/df06-packages"
+          apk=android/app/build/outputs/apk/debug/app-debug.apk
+          aab=android/app/build/outputs/bundle/release/app-release.aab
+          test -s "$apk"
+          test -s "$aab"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" > "$evidence/apk-badging.txt"
+          grep -Eq "^package: name='com\.zenstudy\.focus' " "$evidence/apk-badging.txt"
+          grep -Fxq 'application-debuggable' "$evidence/apk-badging.txt"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$apk" > "$evidence/apk-signature.txt"
+          # Compare the packaged certificate with this runner's standard debug key.
+          keytool -exportcert -alias androiddebugkey -keystore "$HOME/.android/debug.keystore" -storepass android > "$RUNNER_TEMP/df06-debug-cert.der"
+          debug_digest="$(sha256sum "$RUNNER_TEMP/df06-debug-cert.der" | cut -d ' ' -f 1)"
+          grep -Fxq "Signer #1 certificate SHA-256 digest: $debug_digest" "$evidence/apk-signature.txt"
+          test "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$evidence/apk-signature.txt")" = 1
+          curl --proto '=https' --tlsv1.2 -fsSL --retry 2 https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar -o "$RUNNER_TEMP/df06-bundletool.jar"
+          echo "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29  $RUNNER_TEMP/df06-bundletool.jar" | sha256sum -c -
+          java -jar "$RUNNER_TEMP/df06-bundletool.jar" validate --bundle="$aab"
+          java -jar "$RUNNER_TEMP/df06-bundletool.jar" dump manifest --bundle="$aab" --module=base > "$evidence/aab-manifest.xml"
+          python3 - "$aab" "$evidence/aab-manifest.xml" <<'PY'
+          import sys, zipfile, xml.etree.ElementTree as ET
+          manifest = ET.parse(sys.argv[2]).getroot()
+          assert manifest.attrib.get('package') == 'com.zenstudy.focus', 'Unexpected bundle package'
+          app = manifest.find('application')
+          assert app is not None, 'Missing bundle application'
+          assert app.get('{http://schemas.android.com/apk/res/android}debuggable', 'false') == 'false', 'Release bundle is debuggable'
+          with zipfile.ZipFile(sys.argv[1]) as bundle:
+              signatures = [name for name in bundle.namelist() if name.upper().startswith('META-INF/') and name.upper().endswith(('.SF', '.RSA', '.DSA', '.EC'))]
+              assert not signatures, 'Release bundle unexpectedly contains signing metadata'
+          PY
+          LC_ALL=C jarsigner -verify "$aab" > "$evidence/aab-signature.txt" 2>&1
+          grep -Fxq 'jar is unsigned.' "$evidence/aab-signature.txt"
+          git diff --exit-code -- android
+          cp "$apk" "$evidence/app-debug.apk"
+          cp "$aab" "$evidence/app-release-unsigned.aab"
+          (
+            cd "$evidence"
+            sha256sum app-debug.apk app-release-unsigned.aab > SHA256SUMS
+          )
+          {
+            echo 'package=com.zenstudy.focus'
+            echo 'apk_signing=runner Android debug certificate; debuggable=true'
+            echo 'aab_signing=unsigned; debuggable=false'
+            echo 'bundletool=1.18.3; checksum verified'
+          } >> "$evidence/provenance.txt"
+          {
+            echo "QA source: $EXPECTED_SHA"
+            echo 'Debug APK and unsigned release AAB; no release approval or publication.'
+            cat "$evidence/SHA256SUMS"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload QA packages and provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: df06-qa-packages-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/df06-packages/
+          if-no-files-found: error
+          retention-days: 14
