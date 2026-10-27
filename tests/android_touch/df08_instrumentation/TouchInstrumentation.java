@@ -96,6 +96,26 @@ public final class TouchInstrumentation extends Instrumentation {
                 }
             }
             js("(()=>{applyLanguage('en');return {lang:cfg.lang};})()");
+            tap("navTimer");
+            js("(()=>{document.getElementById('orbWaterTxt').parentElement.id='df08WaterTapTarget';" +
+                "window.__DF08WaterFault={cfg:JSON.stringify(cfg),primary:localStorage.getItem('zen_fortress_cfg_v21')," +
+                "mirror:localStorage.getItem('zen_fortress_cfg_v21_mirror'),original:Storage.prototype.setItem,hit:false};" +
+                "Storage.prototype.setItem=function(k,v){const f=window.__DF08WaterFault;" +
+                "if(k==='zen_fortress_cfg_v21_mirror'&&!f.hit){f.hit=true;throw new DOMException('Disposable water fault','QuotaExceededError');}" +
+                "return f.original.call(this,k,v);};return {armed:true};})()");
+            try {
+                tap("df08WaterTapTarget");
+                JSONObject water = js("(()=>{const f=window.__DF08WaterFault;return {hit:f.hit," +
+                    "cfgUnchanged:JSON.stringify(cfg)===f.cfg," +
+                    "primaryUnchanged:localStorage.getItem('zen_fortress_cfg_v21')===f.primary," +
+                    "mirrorUnchanged:localStorage.getItem('zen_fortress_cfg_v21_mirror')===f.mirror};})()");
+                assertTrue(water.optBoolean("hit") && water.optBoolean("cfgUnchanged") &&
+                    water.optBoolean("primaryUnchanged") && water.optBoolean("mirrorUnchanged"),
+                    "Physical water tap published a rejected save: "+water);
+                result.putString("df08_water_ack", "PASS");
+            } finally {
+                js("(()=>{Storage.prototype.setItem=window.__DF08WaterFault.original;delete window.__DF08WaterFault;return {restored:true};})()");
+            }
             tap("navNotes");
             tap("nsNewButton");
             JSONObject opened = js("({open:document.getElementById('noteModal').classList.contains('open')})");
