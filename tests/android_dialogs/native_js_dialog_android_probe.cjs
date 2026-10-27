@@ -1,16 +1,15 @@
 'use strict';
+const {createEvidenceDirectory}=require('../android_e2e_recovery/private_evidence.cjs');
 /* Prove genuine Android system AlertDialog host rather than browser-origin popup.
  * Tests JS confirm Cancel / Accept, JS alert Accept and prompt text+Cancel.
  * All stimuli are synthetic (no task, timer, notes or app user state touched).
  */
 const assert=require('node:assert/strict');
-const fs=require('node:fs');
 const http=require('node:http');
 const net=require('node:net');
 const {execFileSync}=require('node:child_process');
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-const E=process.argv[2]||'/tmp/df-p0-dialogs';
-fs.mkdirSync(E,{recursive:true});
+const evidence=createEvidenceDirectory(process.argv[2],'df-p0-dialogs-');
 const adb=(...args)=>execFileSync('adb',args,{encoding:'utf8',timeout:16000,maxBuffer:3*1024*1024});
 function pages(){return new Promise((resolve,reject)=>{
  http.get('http://127.0.0.1:9223/json/list',res=>{
@@ -88,8 +87,8 @@ async function dialog(expected){
  }
  try{
   const safe=expected.replace(/[^a-zA-Z0-9_-]/g,'-').slice(0,48);
-  fs.writeFileSync(E+'/not-proven-'+safe+'.xml',lastXml);
-  fs.writeFileSync(E+'/not-proven-'+safe+'.png',execFileSync('adb',['exec-out','screencap','-p'],{timeout:15000,maxBuffer:9*1024*1024}));
+  evidence.write('not-proven-'+safe+'.xml',lastXml);
+  evidence.write('not-proven-'+safe+'.png',execFileSync('adb',['exec-out','screencap','-p'],{timeout:15000,maxBuffer:9*1024*1024}));
  }catch(_){}
  throw Error('REAL_NATIVE_DIALOG_NOT_PROVEN '+expected+' '+last.slice(0,350));
 }
@@ -141,8 +140,8 @@ async function main(){
   // Actual modal Cancel must return JS false; never replace user's timer session.
   const cancelled=evaluate('window.confirm("DF Confirm CANCEL Arabic: تغيير النشاط سينهي الجلسة الحالية")');
   let xml=await dialog('DF Confirm CANCEL Arabic:');
-  fs.writeFileSync(E+'/cancel-dialog.xml',xml);
-  fs.writeFileSync(E+'/cancel-dialog.png',execFileSync('adb',['exec-out','screencap','-p'],{timeout:18000,maxBuffer:9*1024*1024}));
+  evidence.write('cancel-dialog.xml',xml);
+  evidence.write('cancel-dialog.png',execFileSync('adb',['exec-out','screencap','-p'],{timeout:18000,maxBuffer:9*1024*1024}));
   adb('shell','input','keyevent','KEYCODE_BACK');
   assert.equal((await cancelled).value,false,'Back/Cancel must reject action');
   results.push({operation:'confirm_cancel',status:'PASS',nativeTitle:'Deep Focus',jsResult:false});
@@ -181,7 +180,7 @@ async function main(){
   assert.equal(cancelledPrompt.value,null,'Prompt cancel must be null');
   results.push({operation:'prompt_cancel',status:'PASS'});
   const summary={results,source:'real Android WebView+native UIAutomator',release_approved:false};
-  fs.writeFileSync(E+'/android-native-dialog-results.json',JSON.stringify(summary,null,2));
+  evidence.write('android-native-dialog-results.json',JSON.stringify(summary,null,2));
   console.log('ANDROID_P0_ALL_JS_DIALOGS_PASS',JSON.stringify(summary));
  }finally{ws.close();}
 }

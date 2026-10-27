@@ -1,14 +1,12 @@
 'use strict';
+const {createEvidenceDirectory}=require('../android_e2e_recovery/private_evidence.cjs');
 // Canonical bundled-app desktop Chromium verification only; not Android native UIAutomator.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const path=require('node:path');
 const codes='en ar es zh hi fr de ru pt ja id tr ko vi it bn ur fa pl nl'.split(' ');
 const base=process.env.DF_COMPLETION_URL||'http://127.0.0.1:8770';
-const out=process.env.DF07_LOCALE_TIMER_EVIDENCE||'/tmp/df07-timer20';
+const evidence=createEvidenceDirectory(process.env.DF07_LOCALE_TIMER_EVIDENCE,'df07-timer20-');
 (async()=>{
- fs.mkdirSync(out,{recursive:true});
  const results=[],pageErrors=[];
  const browser=await chromium.launch({executablePath:process.env.DF_CHROMIUM||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
  try {
@@ -65,10 +63,10 @@ const out=process.env.DF07_LOCALE_TIMER_EVIDENCE||'/tmp/df07-timer20';
   assert.deepEqual(pageErrors,[],'Unhandled browser JS exceptions');
   const gaps=[...new Set(results.filter(r=>r.englishFallback&&r.control!=='Reset').map(r=>r.locale))];
   const resetEnglishFallbackLocales=codes.filter(lang=>!['en','ar'].includes(lang));
-  fs.writeFileSync(path.join(out,'timer-20-locale-confirm.json'),JSON.stringify({source:'current checkout',environment:'desktop Chromium mobile emulation only',results,englishFallbackGaps:gaps,resetEnglishFallbackLocales,nativeAndroid:'NOT_TESTED',saf:'NOT_TESTED',releaseApproved:false},null,2)+'\n');
+  evidence.write('timer-20-locale-confirm.json',JSON.stringify({source:'current checkout',environment:'desktop Chromium mobile emulation only',results,englishFallbackGaps:gaps,resetEnglishFallbackLocales,nativeAndroid:'NOT_TESTED',saf:'NOT_TESTED',releaseApproved:false},null,2)+'\n');
   console.log(JSON.stringify({localeCancelPass:results.length,controls:['Short','Reset','Skip'],untranslatedEnglishFallback:gaps,resetEnglishFallbackLocales,jsErrors:pageErrors.length,android:'NOT_TESTED'}));
  } catch(error){
-  fs.writeFileSync(path.join(out,'FAILED.txt'),String(error.stack||error));
+  evidence.write('FAILED.txt',String(error.stack||error));
   throw error;
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
