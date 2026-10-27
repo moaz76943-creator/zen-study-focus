@@ -32,8 +32,8 @@ function scan(files,withConfig=true){
 test('reviewed Gitleaks config extends default rules and requires value AND exact path',()=>{
  const cfg=fs.readFileSync(CONFIG,'utf8');
  assert.match(cfg,/useDefault = true/);
- assert.equal((cfg.match(/condition = "AND"/g)||[]).length,3);
- assert.equal((cfg.match(/regexTarget = "secret"/g)||[]).length,3);
+ assert.equal((cfg.match(/condition = "AND"/g)||[]).length,5);
+ assert.equal((cfg.match(/regexTarget = "secret"/g)||[]).length,5);
  assert.doesNotMatch(cfg,/disabledRules|stopwords|commits\s*=/);
 });
 
@@ -46,8 +46,9 @@ test('actual scanner clears only public v21 value at its reviewed source path',{
 });
 
 test('actual scanner keeps synthetic credentials detectable inside reviewed files',{skip:!SCANNER},()=>{
- const token=crypto.randomBytes(36).toString('base64url');
+ const token=crypto.randomBytes(36).toString('hex');
  const files={'android/app/src/main/assets/web/app.js':'const service_secret = "'+token+'";\n'};
+ assert.ok(scan(files,false).count>0,'default scanner must detect the synthetic control');
  const result=scan(files);
  assert.equal(result.exit,1);
  assert.ok(result.count>0,'exact-path exception must not hide another credential');
@@ -68,7 +69,34 @@ test('actual scanner clears the reviewed Work/Rest storage-key rejection fixture
  assert.ok(scan({[reviewed]:line},false).count>0,'default scanner must reproduce the fixture detection');
  assert.deepEqual(scan({[reviewed]:line}),{exit:0,count:0});
  assert.ok(scan({'unreviewed.test.cjs':line}).count>0,'same identifier outside reviewed paths remains detected');
- const token=crypto.randomBytes(36).toString('base64url');
+ const token=crypto.randomBytes(36).toString('hex');
  assert.ok(scan({[reviewed]:'const service_secret = "'+token+'";\n'}).count>0,
   'reviewing one public fixture value must not hide a credential in that file');
+});
+
+test('actual scanner reviews historical identifiers without exempting historical files',{skip:!SCANNER},()=>{
+ const cfg=fs.readFileSync(CONFIG,'utf8');
+ const checksum=cfg.match(/Historical inline localStorage checksum constant[\s\S]*?regexes = \['''\^([A-Z0-9_]+)\$'''\]/)?.[1];
+ assert.ok(checksum,'historical exception has a finite literal checksum value');
+ const commit=['824d87a0f801361761b14921f59571fbb','590e4df'].join('');
+ const cases=[
+  ['android/app/src/main/assets/web/index.html','const SECRET_SALT = "'+checksum+'";\n'],
+  ['docs/master_completion/LEDGER_197.json','{"key_order_fix_commit":"'+commit+'"}\n'],
+  ...['tests/integration_quality/activity_domain_durable_ack.test.cjs',
+   'tests/integration_recovery/language_switch_durability.test.cjs'].map(file=>
+   [file,"x.reject(key=>key==='"+['zen','fortress','cfg','v21'].join('_')+"');\n"])
+ ];
+ for(const [file,line] of cases){
+  assert.ok(scan({[file]:line},false).count>0,'default scanner reproduces historical public value');
+  assert.deepEqual(scan({[file]:line}),{exit:0,count:0});
+  assert.ok(scan({'unreviewed.js':line}).count>0,'public value at unreviewed path is still detected');
+  const token=crypto.randomBytes(36).toString('hex');
+  assert.ok(scan({[file]:'const service_secret = "'+token+'";\n'}).count>0,
+   'historical reviewed path still detects another credential');
+ }
+ const changed={'docs/master_completion/LEDGER_197.json':
+  '{"key_order_fix_commit":"'+commit.slice(0,-1)+'e"}\n'};
+ assert.ok(scan(changed,false).count>0,'default scanner must detect the changed hash control');
+ assert.ok(scan(changed).count>0,
+  'other hash-shaped values must not be exempted');
 });
