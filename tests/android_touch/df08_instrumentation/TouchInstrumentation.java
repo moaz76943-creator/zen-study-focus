@@ -71,9 +71,18 @@ public final class TouchInstrumentation extends Instrumentation {
             // Reopen in a new Android instrumentation process after real am force-stop.
             // The scenario's title depends on a controlled viewport, not wall-clock time.
             final String width = testArguments == null ? "unknown" : testArguments.getString("width", "unknown");
-            final String noteTitle = "DF08 Instrumented " + width;
+            final String locale = testArguments == null ? "en" : testArguments.getString("locale", "en");
+            final String fontScale = testArguments == null ? "1.0" : testArguments.getString("fontScale", "1.0");
+            assertTrue("en".equals(locale) || "ar".equals(locale), "Unsupported test locale " + locale);
+            final float actualFontScale = activity.getResources().getConfiguration().fontScale;
+            assertTrue(Math.abs(actualFontScale - Float.parseFloat(fontScale)) < 0.01f,
+                "Requested Android font scale not actually tested: " + actualFontScale);
+            result.putString("df08_actual_font_scale", String.valueOf(actualFontScale));
+            final String noteTitle = "DF08 Instrumented " + width + " " + locale + " " + fontScale;
             final String stage = testArguments == null ? "save" : testArguments.getString("stage", "save");
             if ("verify".equals(stage)) {
+                final String expectedId = testArguments.getString("expectedId", "");
+                assertTrue(expectedId.matches("[0-9]+"), "No independently captured saved ID supplied for reopen");
                 JSONObject restored = null;
                 boolean found = false;
                 for (int attempt = 0; attempt < 24; attempt++) {
@@ -82,13 +91,17 @@ public final class TouchInstrumentation extends Instrumentation {
                         "const packet=p&&D?D.inspectPacket(p):{ok:false};" +
                         "const live=(typeof notesList==='undefined'?[]:notesList).filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
                         "const stored=(packet.ok&&Array.isArray(packet.value)?packet.value:[]).filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
-                        "return {matches:live.length,liveBody:live[0]?.body||'',storedMatches:stored.length," +
+                        "return {matches:live.length,liveBody:live[0]?.body||'',liveId:String(live[0]?.id),storedId:String(stored[0]?.id),lang:cfg.lang,dir:document.documentElement.dir,storedMatches:stored.length," +
                         "storedBody:stored[0]?.body||'',mirrorOk:!!p&&p===m&&packet.ok," +
                         "primaryPresent:!!p,mirrorPresent:!!m,advancedUi:document.body.classList.contains('df-v22')," +
                         "storageFamilies:Object.keys(localStorage).filter(k=>k.startsWith('zen_fortress_')).length};})()");
                     found = restored.optInt("matches") == 1 &&
                         restored.optInt("storedMatches") == 1 &&
                         restored.optBoolean("mirrorOk") &&
+                        expectedId.equals(restored.optString("liveId")) &&
+                        expectedId.equals(restored.optString("storedId")) &&
+                        locale.equals(restored.optString("lang")) &&
+                        ("ar".equals(locale) ? "rtl" : "ltr").equals(restored.optString("dir")) &&
                         "Persisted note 2026".equals(restored.optString("liveBody")) &&
                         "Persisted note 2026".equals(restored.optString("storedBody"));
                     if (found) break;
@@ -115,8 +128,8 @@ public final class TouchInstrumentation extends Instrumentation {
                 {"navTraining","sec-timer"}, {"navSounds","sec-sounds"},
                 {"navAnalytics","sec-analytics"}
             };
-            for (String locale : new String[]{"en","ar"}) {
-                final String selected = locale;
+            for (String navLocale : new String[]{"en","ar"}) {
+                final String selected = navLocale;
                 JSONObject language = js("(()=>{applyLanguage("+JSONObject.quote(selected)+");return {lang:cfg.lang,dir:document.documentElement.dir};})()");
                 assertTrue(selected.equals(language.optString("lang")), "Language failed: "+language);
                 for (String[] item : tabs) {
@@ -133,7 +146,7 @@ public final class TouchInstrumentation extends Instrumentation {
                     Log.i(TAG, "NAV_PASS locale="+selected+" tab="+item[0]);
                 }
             }
-            js("(()=>{applyLanguage('en');return {lang:cfg.lang};})()");
+            js("(()=>{applyLanguage(" + JSONObject.quote(locale) + ");return {lang:cfg.lang};})()");
             tap("navTimer");
             js("(()=>{document.getElementById('orbWaterTxt').parentElement.id='df08WaterTapTarget';" +
                 "window.__DF08WaterFault={cfg:JSON.stringify(cfg),primary:localStorage.getItem('zen_fortress_cfg_v21')," +
@@ -195,10 +208,12 @@ public final class TouchInstrumentation extends Instrumentation {
                 "Android Back closed Notes or lost unsaved draft while dismissing IME: "+stillOpen);
             tap("nsSaveButton");
             JSONObject saved = js("(()=>{const a=notesList.filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
-                "return {matches:a.length,body:a[0]?.body||'',open:document.getElementById('noteModal').classList.contains('open')};})()");
+                "return {matches:a.length,id:String(a[0]?.id),body:a[0]?.body||'',open:document.getElementById('noteModal').classList.contains('open')};})()");
             assertTrue(saved.optInt("matches") == 1 &&
                 "Persisted note 2026".equals(saved.optString("body")) && !saved.optBoolean("open"),
                 "Physical Save did not persist note exactly once: "+saved);
+            final String savedId = saved.optString("id");
+            assertTrue(savedId.matches("[0-9]+"), "Physical Save produced an invalid note ID");
             // A successful in-memory Save must also be a verified v21 disk write.
             // Otherwise the following force-stop would only expose an already false PASS.
             JSONObject beforeStop = js("(()=>{const D=window.DeepFocusDataCompatV21,k=D?.KEYS?.notes;" +
@@ -206,11 +221,15 @@ public final class TouchInstrumentation extends Instrumentation {
                 "const packet=p&&D?D.inspectPacket(p):{ok:false};" +
                 "const stored=packet.ok&&Array.isArray(packet.value)?packet.value:[];" +
                 "return {primaryPresent:!!p,mirrorPresent:!!m,mirrorOk:!!p&&p===m&&packet.ok," +
-                "notesOnDisk:stored.filter(n=>n.title==="+JSONObject.quote(noteTitle)+").length," +
+                "savedIds:stored.filter(n=>n.title==="+JSONObject.quote(noteTitle)+").map(n=>String(n.id))," +
                 "advancedUi:document.body.classList.contains('df-v22')," +
                 "integrationAvailable:!!window.DF22Integration};})()");
-            assertTrue(beforeStop.optBoolean("mirrorOk") && beforeStop.optInt("notesOnDisk") == 1,
+            assertTrue(beforeStop.optBoolean("mirrorOk") && beforeStop.getJSONArray("savedIds").length() == 1 &&
+                savedId.equals(beforeStop.getJSONArray("savedIds").getString(0)),
                 "Visible Notes Save lacked v21 packet ACK before process death: "+beforeStop);
+            result.putString("df08_note_id",savedId);
+            result.putString("df08_locale",locale);
+            result.putString("df08_font_scale",fontScale);
             result.putString("df08_status","PASS");
             result.putInt("df08_physical_taps",actualTaps);
             result.putString("df08_platform","Android UIAutomation touch / actual IME / native WebView evaluateJavascript");

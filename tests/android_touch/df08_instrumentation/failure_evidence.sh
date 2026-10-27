@@ -20,6 +20,6 @@ df08_record_failure() {
     free -m
     df -h / /tmp
     ps -eo pid,ppid,rss,comm --sort=-rss | head -20
-    timeout 5s dmesg --ctime | tail -40
+    timeout 5s sudo -n dmesg --ctime | tail -40
   } > "$out/host-failure-${stage}-${width}.txt" 2>&1 || true
 }

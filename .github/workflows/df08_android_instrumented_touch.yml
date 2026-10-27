@@ -30,11 +30,13 @@ jobs:
           bash -n tests/android_touch/df08_instrumentation/prepare_test_build.sh
           bash -n tests/android_touch/df08_instrumentation/run_ci.sh
   android:
-    name: Android API${{ matrix.api }} / 4 widths / real IME
+    name: Android API${{ matrix.api }} / font ${{ matrix.font_scale }} / 4 widths / real IME
     needs: source
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix:
+        font_scale: ['1.0','1.5','2.0']
         api: [30,35]
     runs-on: ubuntu-latest
     timeout-minutes: 55
@@ -72,30 +74,29 @@ jobs:
       - name: Actual Android touch, Notes modal, keyboard and Save at 4 widths
         uses: reactivecircus/android-emulator-runner@v2
         env:
-          DF08_EVIDENCE: ${{ runner.temp }}/df08-api-${{ matrix.api }}
+          DF08_EVIDENCE: ${{ runner.temp }}/df08-api-${{ matrix.api }}-font-${{ matrix.font_scale }}
+          DF08_FONT_SCALE: ${{ matrix.font_scale }}
         with:
           api-level: ${{ matrix.api }}
           arch: x86_64
           target: google_apis
-          profile: ${{ matrix.api == 35 && 'pixel_2' || 'pixel_6' }}
-          ram-size: ${{ matrix.api == 35 && '3072M' || '' }}
-          heap-size: ${{ matrix.api == 35 && '512M' || '' }}
+          profile: pixel_2
           emulator-boot-timeout: 900
           disable-animations: true
-          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect
+          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan
           script: bash tests/android_touch/df08_instrumentation/run_ci.sh
       - name: Record exact head, no production changes and limits
         if: always()
         shell: bash
         run: |
-          mkdir -p "$RUNNER_TEMP/df08-api-${{ matrix.api }}"
-          git rev-parse HEAD > "$RUNNER_TEMP/df08-api-${{ matrix.api }}/EXACT_SOURCE_SHA.txt"
-          printf 'Android emulator API${{ matrix.api }} only. CDP disabled. Physical handset/TalkBack NOT_TESTED. RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df08-api-${{ matrix.api }}/LIMITS.txt"
+          mkdir -p "$RUNNER_TEMP/df08-api-${{ matrix.api }}-font-${{ matrix.font_scale }}"
+          git rev-parse HEAD > "$RUNNER_TEMP/df08-api-${{ matrix.api }}-font-${{ matrix.font_scale }}/EXACT_SOURCE_SHA.txt"
+          printf 'Android emulator API${{ matrix.api }}, font scale ${{ matrix.font_scale }}, EN/AR only. CDP disabled. Physical handset/TalkBack NOT_TESTED. RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df08-api-${{ matrix.api }}-font-${{ matrix.font_scale }}/LIMITS.txt"
           test "$(git diff --name-only)" = "android/app/build.gradle"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: DF08-real-android-API${{ matrix.api }}-${{ github.sha }}
-          path: ${{ runner.temp }}/df08-api-${{ matrix.api }}/
+          name: DF08-real-android-API${{ matrix.api }}-font-${{ matrix.font_scale }}-${{ github.sha }}
+          path: ${{ runner.temp }}/df08-api-${{ matrix.api }}-font-${{ matrix.font_scale }}/
           retention-days: 7
           if-no-files-found: warn
