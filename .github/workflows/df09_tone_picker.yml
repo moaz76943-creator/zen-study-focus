@@ -32,7 +32,9 @@ jobs:
         env:
           DF_CHROMIUM_BIN: /usr/bin/chromium
           DF09_PICKER_OUT: ${{ runner.temp }}/df09-picker
-        run: node tests/df_parallel09_tone_browser.cjs
+        run: |
+          node tests/df_parallel09_tone_browser.cjs
+          node tests/audio_context/sound_toggle_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
