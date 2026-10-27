@@ -157,7 +157,10 @@ function scan(files) {
       if(/\b(?:t|translate|localize)\s*\(\s*[A-Za-z_$][\w$]*\s*,/.test(text))unresolved.push({file,reason:'dynamic lookup requires runtime tracing'});
     }
     if(file.endsWith('.java')||file.endsWith('.kt')||file.endsWith('.xml')&&file.includes('/res/')){
-      for(const m of text.matchAll(/\bR\.string\.([\w]+)/g))ref('native:'+m[1],file,text,m.index,'android-resource');
+      // android.R belongs to the OS; its translations are not app resources.
+      // Keep unqualified and app-qualified R references in the application's audit.
+      for(const m of text.matchAll(/\b(?:(android)\s*\.\s*)?R\s*\.\s*string\s*\.\s*([\w]+)/g))
+        if(!m[1])ref('native:'+m[2],file,text,m.index,'android-resource');
       for(const m of text.matchAll(/@string\/([A-Za-z_][\w]*)/g))ref('native:'+m[1],file,text,m.index,'android-xml-resource');
       for(const m of text.matchAll(/\b(?:android:text|android:hint|android:contentDescription|android:label)\s*=\s*["'](?!@)([^"']+)["']/g))hard(file,text,m.index,m[1],'native-xml-literal');
       for(const m of text.matchAll(/\b(?:setText|setTitle|setContentDescription)\s*\(\s*"([^"\n]+)"/g))hard(file,text,m.index,m[1],'native-java-literal');
