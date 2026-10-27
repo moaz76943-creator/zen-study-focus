@@ -154,8 +154,10 @@ test('A04 agent_work_ledger: atomic file write creates, resumes, and never trunc
 
     const res = mod.writeLedgerAtomically(file, ledger);
     assert.equal(res.ok, true);
-    assert.equal(res.bytesWritten, fs.statSync(file).size);
-    const onDisk = JSON.parse(fs.readFileSync(file, 'utf8'));
+    // Compare the bytes actually read; avoid a separate path stat/read window.
+    const savedBytes = fs.readFileSync(file);
+    assert.equal(res.bytesWritten, savedBytes.length);
+    const onDisk = JSON.parse(savedBytes.toString('utf8'));
     assert.equal(onDisk.taskId, 'A04');
     assert.equal(onDisk.entries.length, 1);
 
