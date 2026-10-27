@@ -2797,16 +2797,28 @@ function applyCustomTimerNow() {
 }
 
 function changeTimerDelta(deltaMins) {
-  timerLeft = Math.max(10, timerLeft + deltaMins * 60);
-  if (timerLeft > timerTotal) timerTotal = timerLeft;
+  const nextLeft = Math.max(10, timerLeft + deltaMins * 60);
+  const nextTotal = Math.max(timerTotal, nextLeft);
+  const nextTargetTime = timerRunning ? Date.now() + (nextLeft * 1000) : timerTargetTime;
+  // Keep the visible countdown and native alarm unchanged if storage refuses.
+  if (!persistActiveTimerSnapshot({
+    total:nextTotal,left:nextLeft,running:timerRunning,
+    endAt:timerRunning ? nextTargetTime : null,
+    mode:currentTimerModeKey,label:customSessionLabel,
+    sessionId:timerSessionId,taskId:focusSessionTaskId,
+    activeMs:timerActiveMs,resumedAt:timerRunning ? timerResumeMs : null,
+    training:quickTraining && quickTraining.active ? {...quickTraining} : null
+  })) return false;
+  timerLeft = nextLeft;
+  timerTotal = nextTotal;
   if (timerRunning) {
-    timerTargetTime = Date.now() + (timerLeft * 1000);
+    timerTargetTime = nextTargetTime;
     if (window.ZenNative && window.ZenNative.startBackgroundService) {
       window.ZenNative.startBackgroundService(timerLeft, document.getElementById('timerModeCaption').textContent);
     }
   }
-  storeTimerSession();
   updateTimerDisplay();
+  return true;
 }
 
 function toggleTimerPlay() {
