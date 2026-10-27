@@ -40,6 +40,8 @@
   const input=(type,value)=>{const n=el('input');n.type=type;n.value=value==null?'':String(value);return n;};
   const selection=(pairs,value)=>{const n=el('select');pairs.forEach(([v,name])=>{const o=el('option','',name);o.value=String(v);n.appendChild(o);});n.value=String(value??'');return n;};
   const current=()=>state;
+  // The live adapter and Tasks Core return these fields in different key orders.
+  const stateSignature=value=>JSON.stringify([value.cfg,value.tasksList]);
   const error=e=>{
    if(typeof adapter.onError==='function')adapter.onError(e);
    else{
@@ -57,7 +59,7 @@
   function apply(change){
    try{
     const latest=adapter.readState();
-    if(JSON.stringify(latest)!==JSON.stringify(state)){state=latest;undoStack=[];redoStack=[];}
+    if(stateSignature(latest)!==stateSignature(state)){state=latest;undoStack=[];redoStack=[];}
     const old=state,output=change(old),next=output.state;
     if(!next||!Array.isArray(next.tasksList))throw new Error('Invalid change result');
     if(JSON.stringify(old)===JSON.stringify(next))return true;
@@ -73,7 +75,7 @@
   function timeTravel(from,to){
    if(!from.length)return;
    const latest=adapter.readState();
-   if(JSON.stringify(latest)!==JSON.stringify(state)){state=latest;undoStack=[];redoStack=[];render();return;}
+   if(stateSignature(latest)!==stateSignature(state)){state=latest;undoStack=[];redoStack=[];render();return;}
    const next=from[from.length-1];
    try{const r=adapter.commit(state,next);if(r&&typeof r.then==='function')throw new Error('Only synchronous commit supported');if(r===false)throw new Error('Task undo/redo not acknowledged');
     from.pop();to.push(state);state=next;editing=null;if(typeof adapter.onAfterChange==='function')adapter.onAfterChange(state);render();
