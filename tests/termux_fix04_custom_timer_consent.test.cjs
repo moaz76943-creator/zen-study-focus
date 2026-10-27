@@ -21,7 +21,7 @@ function setup({quick=false,allow=false,running=true,pauseAck=true,modeAck=true}
     window:{confirm(){prompts++;return allow;}},
     cfg:{lang:'en'},
     timerRunning:running,timerSessionId:'original-session',timerActiveMs:120000,
-    timerLeft:900,timerTotal:1500,timerResumeMs:12345,
+    timerLeft:900,timerTotal:1500,timerResumeMs:12345,focusSessionTaskId:41,
     currentTimerModeKey:'focus',customSessionLabel:'Existing title (25m)',
     quickTraining:quick?{active:true}:null,quickInternalChange:false,
     quickText(){return 'Discard quick training?'},
@@ -106,6 +106,8 @@ test('Rejected custom-mode checkpoint preserves paused progress and open editor'
  assert.equal(t.acknowledgements.length,1);
  assert.equal(t.acknowledgements[0].mode,'custom');
  assert.equal(t.acknowledgements[0].total,2400);
+ assert.equal(t.acknowledgements[0].taskId,41);
+ assert.equal(t.sandbox.focusSessionTaskId,41);
  assert.equal(t.saves.length,0);
  assert.equal(t.metrics().closes,0);
  assert.equal(t.metrics().toasts,0);
