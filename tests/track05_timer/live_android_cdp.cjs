@@ -200,6 +200,27 @@ async function main(){
   assert.equal(ended.sessions,initial.sessions);
   return {domain:first.domain,phases:['work','rest','work'],restRelaunch:true,locale:'ar',cancelBackPreserved:true,endConfirmed:true,credits:ended.sessions-initial.sessions};
  });
+ await test('paused-mode-change-rejected-save-reopen',async()=>{
+  await cleanQAProfile();
+  await tap('#navTimer');await tap('#modeFocusBtn');await tap('#mainPlayBtn');
+  await pause(1500);await tap('#mainPlayBtn');
+  const before=await state(),nativeBefore=await verifiedNativeTimerSnapshot();
+  assert.ok(before.id&&!before.running&&before.mode==='focus');
+  // Reject the real write, while consent and mode controls remain physical taps.
+  // Never replace a packet with fabricated content or mock the native dialog.
+  await evalJs("window.__dfModeOriginalSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='zen_fortress_active_timer_v21')throw new DOMException('Disposable mode ACK fault','QuotaExceededError');return window.__dfModeOriginalSetItem.call(this,k,v);};true");
+  try {
+   await tap('#modeShortBtn');await approve();
+   assert.deepEqual(await state(),before,'Rejected mode save changed paused session');
+   assert.deepEqual(await verifiedNativeTimerSnapshot(),nativeBefore);
+  } finally {
+   await evalJs("Storage.prototype.setItem=window.__dfModeOriginalSetItem;delete window.__dfModeOriginalSetItem;true");
+  }
+  await restart();
+  const after=await state();
+  for(const key of ['id','mode','total','left','running','activeMs','history','sessions'])assert.equal(after[key],before[key],key+' changed after rejected mode / restart');
+  return {id:before.id,modePreserved:true,nativeReceiptPreserved:true,reopen:true};
+ });
 }
 main().catch(e=>record('bootstrap','NOT_TESTED',String(e.message||e).slice(0,250))).finally(()=>{
  const out={headSha:process.env.GITHUB_SHA||null,source:'actual disposable Android emulator + CDP + ADB',cases,summary:{pass:cases.filter(x=>x.status==='PASS').length,fail:cases.filter(x=>x.status==='FAIL').length,notTested:cases.filter(x=>x.status==='NOT_TESTED').length},releaseApproved:false};
