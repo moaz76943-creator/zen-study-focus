@@ -154,17 +154,55 @@ public class MainActivity extends AppCompatActivity {
             if (bytes.length>MAX_DURABLE_V21_BYTES) return false;
             synchronized (durableV21Lock) {
                 AtomicFile file=new AtomicFile(new File(getFilesDir(),"v21_durable_packets_v1"));
+                // A surviving marker means publication was interrupted or its rollback
+                // could not be verified. Never replay an uncertain/rejected edit.
+                File marker = new File(getFilesDir(),"v21_durable_packets_v1.pending");
+                if (marker.exists()) return false;
+                byte[] previous = null;
+                boolean publicationStarted = false;
                 FileOutputStream stream=null;
                 try {
+                    File base = file.getBaseFile();
+                    if (base.exists() || new File(base.getPath()+".bak").exists())
+                        previous = file.readFully();
+                    try (FileOutputStream pending = new FileOutputStream(marker)) {
+                        pending.write(1);
+                        pending.getFD().sync();
+                    }
+                    publicationStarted = true;
                     stream=file.startWrite();
                     stream.write(bytes);
                     stream.getFD().sync();
                     file.finishWrite(stream);
-                    // AtomicFile logs some publication failures without throwing.
-                    // ACK only the exact bytes readable from the published base.
-                    return java.util.Arrays.equals(bytes, file.readFully());
+                    stream=null;
+                    // AtomicFile can log a failed rename instead of throwing.
+                    if (!java.util.Arrays.equals(bytes,file.readFully()))
+                        throw new java.io.IOException("Native publication not verified");
+                    if (!marker.delete()) throw new java.io.IOException("Native marker cleanup failed");
+                    return true;
                 } catch (Exception error) {
+                    if (!publicationStarted) return false;
                     if (stream!=null) file.failWrite(stream);
+                    // Readback can fail AFTER publication. Restore the old receipt
+                    // before returning false so it cannot resurrect after restart.
+                    try {
+                        if (previous == null) {
+                            file.delete();
+                            if (file.getBaseFile().exists()) return false;
+                        } else {
+                            FileOutputStream restore = null;
+                            try {
+                                restore=file.startWrite();
+                                restore.write(previous);
+                                restore.getFD().sync();
+                                file.finishWrite(restore);
+                                restore=null;
+                                if (!java.util.Arrays.equals(previous,file.readFully())) return false;
+                            } finally { if (restore!=null) file.failWrite(restore); }
+                        }
+                        // If rollback fails, retain the marker and fail closed on reboot.
+                        marker.delete();
+                    } catch (Exception rollbackError) { /* retain marker and packets */ }
                     return false;
                 }
             }
@@ -173,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
         @JavascriptInterface
         public String readDurableV21() {
             synchronized (durableV21Lock) {
+                if (new File(getFilesDir(),"v21_durable_packets_v1.pending").exists()) return "ERROR";
                 AtomicFile file=new AtomicFile(new File(getFilesDir(),"v21_durable_packets_v1"));
                 File baseFile=file.getBaseFile();
                 if (!baseFile.exists() && !new File(baseFile.getPath()+".bak").exists()) return "NONE";
