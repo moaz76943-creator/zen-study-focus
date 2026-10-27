@@ -7,6 +7,10 @@ on:
     paths:
       - 'android/app/src/main/java/com/zenstudy/focus/**'
       - 'tests/android_dialogs/**'
+      - 'tests/critical_room7/n02_contract.test.cjs'
+      - 'tests/critical_room7/n03_contract.test.cjs'
+      - 'tests/critical_room7/n04_contract.test.cjs'
+      - 'tools/critical_room7/android_e2e_sha_guard.mjs'
       - '.github/workflows/df_parallel01_native_dialog_android.yml'
 permissions:
   contents: read
@@ -39,6 +43,14 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
+      - name: Native lifecycle and APK guard regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/critical_room7/n04_contract.test.cjs
+          for contract in tests/critical_room7/n02_contract.test.cjs tests/critical_room7/n03_contract.test.cjs; do
+            if [[ -f "$contract" ]]; then node --test "$contract"; fi
+          done
       - name: Verify exact source and source-only contract
         shell: bash
         run: |
