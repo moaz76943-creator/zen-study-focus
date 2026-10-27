@@ -95,7 +95,7 @@ console.log('--- Running 🎯 Mission #151: Offline Cryptographic Vault Tests --
   const decoded = Buffer.from(env.cipherPayload, 'base64').toString('utf8');
   assert.strictEqual(decoded.includes('private study notes 2026'), true);
 
-  // User-facing labels must not claim AES/HMAC or Arabic "encrypted/encryption" (مشفرة/تشفير)
+  // Audit labels must describe the actual checksum, without claiming AES/HMAC.
   const reportEn = Engine.generateVaultAuditReport(env, 'en');
   assert.strictEqual(reportEn.statusLabel.includes('AES'), false);
   assert.strictEqual(reportEn.statusLabel.includes('HMAC'), false);
@@ -107,6 +107,19 @@ console.log('--- Running 🎯 Mission #151: Offline Cryptographic Vault Tests --
   const tampered = Object.assign({}, env, { cipherPayload: Buffer.from('Tampered Payload').toString('base64') });
   assert.strictEqual(Engine.verifyVaultIntegrity(tampered).valid, false);
   assert.strictEqual(Engine.verifyVaultIntegrity(env).valid, true);
+
+  // Historical envelopes remain readable, including Unicode and unknown fields.
+  // The old algorithm/status labels were inaccurate metadata, not a different codec.
+  const legacyPayload = JSON.stringify({ note: 'ملاحظات قديمة — café', extra: { keep: true } });
+  const legacy = {
+    version: 'v21-fortress-aes256', algorithm: 'AES-GCM-256', status: 'sealed',
+    cipherPayload: Buffer.from(legacyPayload, 'utf8').toString('base64'),
+    watermarkChecksum: String([...legacyPayload].reduce((sum, c) => sum + c.charCodeAt(0), 0) % 1000000)
+  };
+  const before = JSON.stringify(legacy);
+  assert.strictEqual(Engine.verifyVaultIntegrity(legacy).unlockedPayload, legacyPayload);
+  assert.strictEqual(JSON.stringify(legacy), before, 'Read must not rewrite historical envelopes');
+  assert.strictEqual(Engine.generateVaultAuditReport(legacy, 'en').statusLabel.includes('HMAC'), false);
 
   console.log('✓ Test 6: SECURITY REGRESSION — honest security claims, zero false confidentiality labels.');
 }
