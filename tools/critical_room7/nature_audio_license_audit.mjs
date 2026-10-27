@@ -1,6 +1,6 @@
 'use strict';
 
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync, openSync, fstatSync, closeSync, constants } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -276,40 +276,16 @@ export function inspectAudioFile(assetRoot, relative) {
     });
   }
 
-  let stat;
-  try {
-    stat = statSync(absolute);
-  } catch {
-    return deepFreeze({
-      exists: false,
-      size: 0,
-      format: null,
-      extension,
-      extensionKnown: expected !== null,
-      formatValid: false,
-      formatMatchesExtension: false,
-      sha256: null,
-      reason: 'AUDIO_FILE_MISSING'
-    });
-  }
-
-  if (!stat.isFile()) {
-    return deepFreeze({
-      exists: false,
-      size: 0,
-      format: null,
-      extension,
-      extensionKnown: expected !== null,
-      formatValid: false,
-      formatMatchesExtension: false,
-      sha256: null,
-      reason: 'AUDIO_FILE_MISSING'
-    });
-  }
-
+  let descriptor;
   let data;
+  let reason = 'AUDIO_FILE_MISSING';
   try {
-    data = readFileSync(absolute);
+    // Inspect and read a single opened file, never check one pathname and then
+    // reopen a potentially replaced file. No-follow also rejects leaf symlinks.
+    descriptor = openSync(absolute, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+    if (!fstatSync(descriptor).isFile()) throw new Error('Not a regular audio file');
+    reason = 'AUDIO_FILE_UNREADABLE';
+    data = readFileSync(descriptor);
   } catch {
     return deepFreeze({
       exists: false,
@@ -320,8 +296,10 @@ export function inspectAudioFile(assetRoot, relative) {
       formatValid: false,
       formatMatchesExtension: false,
       sha256: null,
-      reason: 'AUDIO_FILE_UNREADABLE'
+      reason
     });
+  } finally {
+    if (descriptor !== undefined) closeSync(descriptor);
   }
 
   const sniff = sniffAudioFormat(data.subarray(0, 64));
