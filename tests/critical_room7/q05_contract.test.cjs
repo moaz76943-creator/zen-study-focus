@@ -71,6 +71,38 @@ function load() {
   return import(MODULE);
 }
 
+test('Q05 hashes the opened regular file even when its path is replaced after inspection', async () => {
+  const { inspectAudioFile } = await load();
+  const { syncBuiltinESMExports } = require('node:module');
+  withFixture((root) => {
+    const target = writeFixture(root, 'rain.ogg', OGG);
+    const originalStat = fs.statSync;
+    const originalFstat = fs.fstatSync;
+    let swapped = false;
+    function replaceAfterStat(stat) {
+      if (!swapped) {
+        swapped = true;
+        fs.renameSync(target, target + '.opened');
+        fs.writeFileSync(target, MP3);
+      }
+      return stat;
+    }
+    fs.statSync = (...args) => replaceAfterStat(originalStat(...args));
+    fs.fstatSync = (...args) => replaceAfterStat(originalFstat(...args));
+    syncBuiltinESMExports();
+    let report;
+    try { report = inspectAudioFile(root, 'rain.ogg'); }
+    finally {
+      fs.statSync = originalStat;
+      fs.fstatSync = originalFstat;
+      syncBuiltinESMExports();
+    }
+    assert.equal(swapped, true, 'replace the pathname at the check/read boundary');
+    assert.equal(report.sha256, digest(OGG));
+    assert.equal(report.format, 'ogg');
+  });
+});
+
 function itemFor(report, id) {
   const item = report.items.find((entry) => entry.id === id);
   assert.ok(item, 'missing audit item ' + id);
