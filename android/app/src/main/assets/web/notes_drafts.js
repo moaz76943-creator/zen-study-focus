@@ -143,12 +143,16 @@ function nsRestoreDraft(){
  return true;
 }
 function nsDeleteDraftKey(){
- try{localStorage.removeItem(NS_DRAFT_KEY);localStorage.removeItem(NS_DRAFT_KEY+'_mirror');}catch(e){}
+ try{
+  localStorage.removeItem(NS_DRAFT_KEY);localStorage.removeItem(NS_DRAFT_KEY+'_mirror');
+  return localStorage.getItem(NS_DRAFT_KEY)===null&&localStorage.getItem(NS_DRAFT_KEY+'_mirror')===null;
+ }catch(e){return false;}
 }
 function nsDiscardDraft(){
  const saved=nsGetStoredDraft();
  if(!nsDraftContextMatches(saved))return false;
- nsDeleteDraftKey();nsDraftState('cleared',false);return true;
+ if(!nsDeleteDraftKey()){nsDraftState('failed',true);return false;}
+ nsDraftState('cleared',false);return true;
 }
 function nsClearDraftForSavedNote(){
  if(nsDraftTimer!==null){clearTimeout(nsDraftTimer);nsDraftTimer=null;}
