@@ -38,6 +38,16 @@
     if (typeof root.ZenNative.acknowledgeDurableV21!=='function') return false;
     try {
       const packets=D.captureRaw(storage);
+      // Match loadFortressData: a verified primary wins, otherwise its verified
+      // mirror. Canonicalize the receipt only; never destroy a damaged raw copy
+      // just because an unrelated family is being saved during first startup.
+      for (const key of Object.values(D.KEYS)) {
+        const a=packets[key],b=packets[key+'_mirror'];
+        if (a===null && b===null) continue;
+        const selected=D.inspectPacket(a).ok?a:D.inspectPacket(b).ok?b:null;
+        if (selected===null) return false;
+        packets[key]=packets[key+'_mirror']=selected;
+      }
       return validNativePackets(packets) &&
         root.ZenNative.acknowledgeDurableV21(JSON.stringify({version:1,packets}))===true;
     } catch (_) { return false; }
@@ -56,12 +66,10 @@
     const pending=D.inspectPending(storage);
     if (pending.pending) {
       if (!pending.valid) throw new Error('Unverifiable journal: manual recovery required');
-      for (const key of nativeKeys) {
-        const journal=pending.journal;
-        if (checkpoint.packets[key]!==journal.original[key] &&
-            checkpoint.packets[key]!==journal.expected[key])
-          throw new Error('Native/WebView journal conflict: '+key);
-      }
+      // WebView can flush an old journal after a newer native ACK. The verified
+      // native receipt is authoritative even when neither old journal side
+      // matches it. An unacknowledged newer journal must likewise never replay
+      // over the last durable receipt. Retain the journal until all keys verify.
     }
     for (const key of nativeKeys) {
       const expected=checkpoint.packets[key];

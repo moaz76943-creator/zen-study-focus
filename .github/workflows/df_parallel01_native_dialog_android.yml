@@ -7,6 +7,9 @@ on:
     paths:
       - 'android/app/src/main/java/com/zenstudy/focus/**'
       - 'tests/android_dialogs/**'
+      - 'tests/critical_room7/n01_android_ack_probe.cjs'
+      - 'tests/integration_recovery/native_durable_ack.test.cjs'
+      - 'android/app/src/main/assets/web/preflight_v22.js'
       - 'tests/critical_room7/n02_contract.test.cjs'
       - 'tests/critical_room7/n03_contract.test.cjs'
       - 'tests/critical_room7/n04_contract.test.cjs'
@@ -48,6 +51,7 @@ jobs:
         run: |
           set -euo pipefail
           node --test tests/critical_room7/n04_contract.test.cjs
+          node --test tests/integration_recovery/native_durable_ack.test.cjs
           for contract in tests/critical_room7/n02_contract.test.cjs tests/critical_room7/n03_contract.test.cjs; do
             if [[ -f "$contract" ]]; then node --test "$contract"; fi
           done
