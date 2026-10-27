@@ -13,6 +13,7 @@ on:
       - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
       - 'tests/i18n/quick_training/**'
       - 'tests/i18n/timer/**'
+      - 'tests/track05_timer/reset_snapshot_ack.test.cjs'
       - 'tests/integration_quality/immutable_package_id.test.cjs'
       - 'tests/performance_recovery/**'
       - '.github/workflows/df_integration_critical_regressions.yml'
@@ -52,7 +53,7 @@ jobs:
       - name: Actual 99 Quick Training packs and transition regression
         run: node --test tests/i18n/quick_training/*.test.cjs
       - name: Actual timer consent and stale tick regression
-        run: node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/track05_timer/tick_lifecycle.test.cjs tests/track05_timer/pause_ack_rollback.test.cjs
+        run: node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/track05_timer/tick_lifecycle.test.cjs tests/track05_timer/pause_ack_rollback.test.cjs tests/track05_timer/reset_snapshot_ack.test.cjs
       - name: Offline app startup critical assets (source-only)
         run: node --test tests/performance_recovery/startup_assets.test.cjs
       - name: Application identity and read-only v21 startup guard
