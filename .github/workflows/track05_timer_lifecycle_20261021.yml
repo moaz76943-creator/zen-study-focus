@@ -130,6 +130,11 @@ jobs:
           mkdir -p "$RUNNER_TEMP/track05-android"
           test -s android/app/build/outputs/apk/debug/app-debug.apk
           sha256sum android/app/build/outputs/apk/debug/app-debug.apk | tee "$RUNNER_TEMP/track05-android/apk.sha256"
+          {
+            date -u
+            free -m
+            ps -eo pid,ppid,comm,rss --sort=-rss | sed -n '1,20p'
+          } > "$RUNNER_TEMP/track05-android/host-before.txt"
           test -c /dev/kvm
           sudo chown "$(id -u):$(id -g)" /dev/kvm
           sudo chmod u+rw /dev/kvm
@@ -143,7 +148,27 @@ jobs:
           ram-size: ${{ matrix.api == 30 && '2048M' || '3072M' }}
           emulator-boot-timeout: 600
           disable-animations: false
+          # API35 repeatedly terminated during CDP with ADB offline. Keep the
+          # same SwiftShader renderer and test scope, but disable Vulkan as a
+          # controlled environment hypothesis; real device assertions stay strict.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
           script: bash tests/track05_timer/run_android_timer_qa.sh
+      - name: Bounded host and emulator diagnostics
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/track05-android"
+          {
+            date -u
+            free -m
+            ps -eo pid,ppid,comm,rss --sort=-rss | sed -n '1,20p'
+            if [ -r /sys/fs/cgroup/memory.events ]; then cat /sys/fs/cgroup/memory.events; fi
+            timeout --kill-after=2s 8s sudo -n dmesg --ctime 2>/dev/null | tail -n 80 || true
+          } > "$RUNNER_TEMP/track05-android/host-after.txt" 2>&1
+          {
+            timeout --kill-after=2s 8s adb -s emulator-5554 get-state || true
+            timeout --kill-after=2s 8s adb -s emulator-5554 shell getprop sys.boot_completed || true
+          } > "$RUNNER_TEMP/track05-android/emulator-transport.txt" 2>&1
       - name: Preserve Android actual outcomes, logcat and source SHA
         if: always()
         shell: bash
