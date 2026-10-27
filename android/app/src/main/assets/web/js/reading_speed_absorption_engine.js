@@ -69,7 +69,8 @@
   function calculateReadingMetrics(startPage, endPage, durationMinutes, customWordsPerPage = 250) {
     const start = Math.max(1, parseInt(startPage, 10) || 1);
     const end = Math.max(start, parseInt(endPage, 10) || start);
-    const mins = Math.max(1, parseFloat(durationMinutes) || 1);
+    const parsedDuration = parseFloat(durationMinutes);
+    const mins = Number.isFinite(parsedDuration) ? Math.max(1, parsedDuration) : 1;
     const wpp = Math.max(50, parseInt(customWordsPerPage, 10) || DEFAULTS.wordsPerPageEstimate);
 
     const pagesRead = (end - start) + 1;
