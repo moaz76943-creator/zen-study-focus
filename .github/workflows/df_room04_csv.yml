@@ -26,6 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -73,6 +74,7 @@ jobs:
           test -z "$(git diff --name-only -- android/app/src/main/assets/web)"
           mkdir -p "$DF09_NATIVE_EVIDENCE"
           git rev-parse HEAD > "$DF09_NATIVE_EVIDENCE/SOURCE_SHA.txt"
+          test "$(git rev-parse HEAD)" = '${{ github.event.pull_request.head.sha || github.sha }}' 
           git diff > "$DF09_NATIVE_EVIDENCE/EPHEMERAL_INSTRUMENTATION.diff"
           printf '%s\n' 'QA-only package. Real native DocumentsUI Cancel and Save; independent byte comparison required. TalkBack NOT_TESTED. RELEASE_APPROVED=NO.' > "$DF09_NATIVE_EVIDENCE/LIMITS.txt"
       - name: Build isolated QA Android APK
@@ -108,6 +110,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: DF-ROOM04-CSV-API${{ matrix.api }}-${{ github.sha }}
+          name: DF-ROOM04-CSV-API${{ matrix.api }}-${{ github.event.pull_request.head.sha || github.sha }}
           path: /tmp/df09-android-api${{ matrix.api }}/
           retention-days: 7

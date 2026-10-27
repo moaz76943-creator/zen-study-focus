@@ -165,6 +165,8 @@ async function receiptAfter(before,expected){
   const bytes=cp.execFileSync('adb',['exec-out','cat',first],{timeout:24000,maxBuffer:5*1024*1024});
   const expected=await evaluate('window.__qaExpectedCsv');
   assert.equal(typeof expected,'string','Must capture real generated CSV before bridge');
+  assert.match(expected,/df-room04-csv-1/, 'Actual seeded session must be exported, not only headers');
+  assert.match(expected,/,"25",/, 'Actual 25-minute session must be exported');
   assert.deepEqual(bytes,Buffer.from(expected,'utf8'),'Saved document must match exact generated UTF-8 bytes');
   const text=bytes.toString('utf8');
   assert.ok(text.startsWith('"id"')||text.startsWith('"date"')||text.startsWith('"period"'),'Saved file missing verified Analytics CSV headers');
