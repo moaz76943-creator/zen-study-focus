@@ -66,7 +66,13 @@
   function calculateExamReadiness(syllabusCoveragePct, retentionScorePct, sprintPaceRatio) {
     var cov = Math.max(0, Math.min(100, Number(syllabusCoveragePct) || 0));
     var ret = Math.max(0, Math.min(100, Number(retentionScorePct) || 0));
-    var pace = Math.max(0.1, Math.min(2.0, Number(sprintPaceRatio) || 1.0));
+    var paceNum = Number(sprintPaceRatio);
+    var hasExplicitPace = !isNaN(paceNum) &&
+      sprintPaceRatio !== null &&
+      sprintPaceRatio !== undefined &&
+      sprintPaceRatio !== '' &&
+      sprintPaceRatio !== false;
+    var pace = Math.max(0.1, Math.min(2.0, hasExplicitPace ? paceNum : 1.0));
 
     var paceScore = Math.min(100, pace * 100);
     var rawReadiness = (cov * 0.45) + (ret * 0.40) + (paceScore * 0.15);
