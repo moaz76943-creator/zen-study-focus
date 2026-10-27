@@ -41,6 +41,20 @@
     const check = D.inspectRecords(snapshot);
     if (!check.ok) throw new Error('Record validation failed: ' + check.issues.filter(x => x.severity === 'error').map(x => x.code).join(','));
   }
+  function rejectNewDuplicateIds(before, after) {
+    for (const field of ['tasksList','notesList']) {
+      const previous = new Map(), next = new Map();
+      for (const row of before[field]) previous.set(row.id,(previous.get(row.id)||0)+1);
+      for (const row of after[field]) {
+        const count = (next.get(row.id)||0)+1;
+        next.set(row.id,count);
+        // Preserve legacy duplicate records verbatim, but never create or
+        // increase ambiguity during an edit/import. No IDs are coerced.
+        if (count>1 && count>(previous.get(row.id)||0))
+          throw new Error('Record validation failed: DUPLICATE_ID');
+      }
+    }
+  }
   function rawFor(storage) { return D.captureRaw(storage); }
   function rollback(storage, original) {
     const errors = [];
@@ -87,6 +101,7 @@
     if (!storage || !D) throw new Error('Secure storage unavailable');
     if (D.inspectPending(storage).pending) throw new Error('Unresolved recovery journal');
     validate(before);validate(after);
+    rejectNewDuplicateIds(before,after);
     if (!equal(current(),before)) throw new Error('Application state changed during edit');
     if (equal(before,after)) return true;
     const original = rawFor(storage);
