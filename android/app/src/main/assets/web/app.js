@@ -2887,12 +2887,17 @@ function resetTimerNow() {
         ? 'إعادة الضبط ستلغي تقدم الجلسة الحالية. هل تريد المتابعة؟'
         : 'Reset will discard the current session progress. Continue?')) return false;
   if (timerRunning && toggleTimerPlay() !== true) return false;
+  // Reset may discard paused progress only after its replacement is durable.
+  if (!persistActiveTimerSnapshot({
+    total:timerTotal,left:timerTotal,running:false,endAt:null,
+    mode:currentTimerModeKey,label:customSessionLabel,sessionId:null,taskId:null,
+    activeMs:0,resumedAt:null,training:null
+  })) return false;
   timerLeft = timerTotal;
   timerSessionId = null;
   focusSessionTaskId = null;
   timerActiveMs = 0;
   timerResumeMs = null;
-  storeTimerSession();
   updateTimerDisplay();
   return true;
 }
