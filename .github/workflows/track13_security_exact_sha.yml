@@ -1,0 +1,118 @@
+name: Deep Focus Track 13 Exact-SHA Gitleaks
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+  push:
+    branches: [integration/master-qa-verified-v21]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track13-security-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  gitleaks:
+    name: Gitleaks tree and full history — fail closed
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact source SHA
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          echo "SECURITY_SOURCE_SHA=$EXPECTED_SHA"
+      - name: Run report regressions
+        run: |
+          node --test tests/security_recovery/track13_secret_report.test.cjs tests/security_recovery/track13_private_triage.test.cjs
+          node --test tests/security/*.test.cjs tests/security_recovery/webview*.test.cjs tests/security_recovery/df_pr02_bridge_xss.test.cjs
+      - name: Install checksum-verified scanner
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --proto '=https' --tlsv1.2 -fsSL --retry 2 \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            -o "$RUNNER_TEMP/gitleaks.tgz"
+          echo '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  '"$RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+          chmod +x "$RUNNER_TEMP/gitleaks"
+      - name: Prove default detection with disposable synthetic credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          probe="$(mktemp -d "$RUNNER_TEMP/df-track13-probe.XXXXXX")"
+          trap 'rm -rf "$probe"' EXIT
+          python3 - "$probe" <<'PY'
+          import pathlib, sys
+          from secrets import token_urlsafe
+          path = pathlib.Path(sys.argv[1]) / 'synthetic.env'
+          path.write_text('service_secret = "' + token_urlsafe(48) + '"\n', encoding='utf-8')
+          PY
+          set +e
+          "$RUNNER_TEMP/gitleaks" dir --no-banner --redact --log-level error --report-format json --report-path "$probe/result.json" "$probe" >/dev/null 2>&1
+          scan_exit=$?
+          python3 tools/security/track13_gitleaks_report.py --report "$probe/result.json" --sha "$(git rev-parse HEAD)" --scan-exit "$scan_exit" > "$probe/summary.json"
+          summary_exit=$?
+          set -e
+          if [[ "$scan_exit" -ne 1 || "$summary_exit" -ne 1 ]]; then
+            echo 'SYNTHETIC_PROBE_BLOCKED: scanner did not prove detection'
+            exit 1
+          fi
+          python3 - "$probe/summary.json" <<'PY'
+          import json, sys
+          summary = json.load(open(sys.argv[1], encoding='utf-8'))
+          if summary['status'] != 'FAIL' or summary['findings'] < 1 or not any(x['rule'] == 'generic-api-key' for x in summary['evidence']):
+              raise SystemExit('SYNTHETIC_PROBE_BLOCKED: missing verified generic-api-key evidence')
+          print('SYNTHETIC_PROBE_PASS: generic-api-key detection confirmed; values withheld')
+          PY
+      - name: Scan current tree and complete Git history
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          work="$(mktemp -d "$RUNNER_TEMP/df-track13.XXXXXX")"
+          trap 'rm -rf "$work"' EXIT
+          set +e
+          "$RUNNER_TEMP/gitleaks" dir --no-banner --redact --log-level error --report-format json --report-path "$work/tree.json" . >/dev/null 2>&1
+          tree_exit=$?
+          "$RUNNER_TEMP/gitleaks" git --no-banner --redact --log-level error --report-format json --report-path "$work/history.json" . >/dev/null 2>&1
+          history_exit=$?
+          python3 tools/security/track13_gitleaks_report.py --report "$work/tree.json" --sha "$(git rev-parse HEAD)" --scan-exit "$tree_exit" > "$work/tree-summary.json"
+          tree_summary_exit=$?
+          python3 tools/security/track13_gitleaks_report.py --report "$work/history.json" --sha "$(git rev-parse HEAD)" --scan-exit "$history_exit" > "$work/history-summary.json"
+          history_summary_exit=$?
+          set -e
+          # Both raw Gitleaks reports stay in a 0700 runner-local temporary directory.
+          # Triage is advisory: even fully recognized candidates do NOT alter scanner FAIL.
+          set +e
+          python3 tools/security/track13_gitleaks_private_triage.py --report "$work/tree.json" --repo . --sha "$(git rev-parse HEAD)" > "$work/tree-triage.json"
+          tree_triage_exit=$?
+          python3 tools/security/track13_gitleaks_private_triage.py --report "$work/history.json" --repo . --sha "$(git rev-parse HEAD)" > "$work/history-triage.json"
+          history_triage_exit=$?
+          set -e
+          echo 'GITLEAKS_TREE:'
+          cat "$work/tree-summary.json"
+          echo 'GITLEAKS_HISTORY:'
+          cat "$work/history-summary.json"
+          echo 'GITLEAKS_TREE_TRIAGE_CANDIDATES_NOT_CLEARED:'
+          cat "$work/tree-triage.json"
+          echo 'GITLEAKS_HISTORY_TRIAGE_CANDIDATES_NOT_CLEARED:'
+          cat "$work/history-triage.json"
+          {
+            echo '### Track 13 Gitleaks'
+            echo 'Raw reports and scanner diagnostics are never uploaded. PASS = clean, FAIL = potential finding, BLOCKED = invalid evidence.'
+            echo 'Tree:'
+            cat "$work/tree-summary.json"
+            echo 'History:'
+            cat "$work/history-summary.json"
+          } >> "$GITHUB_STEP_SUMMARY"
+          # A blocked triage is never reported as success, and no finding is suppressed.
+          if [[ "$tree_triage_exit" -gt 1 || "$history_triage_exit" -gt 1 ]]; then exit 1; fi
+          if [[ "$tree_summary_exit" -ne 0 || "$history_summary_exit" -ne 0 ]]; then exit 1; fi
