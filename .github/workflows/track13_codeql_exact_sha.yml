@@ -1,0 +1,79 @@
+name: Deep Focus Track 13 Exact-SHA CodeQL
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: track13-codeql-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  codeql:
+    name: CodeQL JS security-extended — fail closed
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact source SHA
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          echo "CODEQL_SOURCE_SHA=$EXPECTED_SHA"
+      - name: CodeQL SARIF parser RED/GREEN regressions
+        run: node --test tests/security_recovery/track13_codeql_sarif.test.cjs
+      - uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee
+        id: init
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+      - uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee
+        id: analyze
+        with:
+          category: /language:javascript-typescript
+          output: ${{ runner.temp }}/track13-codeql-sarif
+          upload: never
+          upload-database: false
+      - name: Summarize local CodeQL security results
+        id: report
+        env:
+          SARIF_ROOT: ${{ runner.temp }}/track13-codeql-sarif
+        run: |
+          set -euo pipefail
+          set +e
+          python3 tools/security/track13_codeql_sarif_report.py --directory "$SARIF_ROOT" --sha "$(git rev-parse HEAD)" > "$RUNNER_TEMP/track13-codeql-summary.json"
+          report_exit=$?
+          set -e
+          cat "$RUNNER_TEMP/track13-codeql-summary.json"
+          exit "$report_exit"
+      - name: Final classification with no raw findings
+        if: always()
+        env:
+          INIT_OUTCOME: ${{ steps.init.outcome }}
+          ANALYZE_OUTCOME: ${{ steps.analyze.outcome }}
+          REPORT_OUTCOME: ${{ steps.report.outcome }}
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          gate=BLOCKED
+          if [[ "$INIT_OUTCOME" == success && "$ANALYZE_OUTCOME" == success ]]; then
+            gate="$(python3 - "$RUNNER_TEMP/track13-codeql-summary.json" <<'PY'
+          import json, pathlib, sys
+          try:
+              data = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8'))
+              status = data.get('status')
+              print(status if status in ('PASS', 'FAIL', 'BLOCKED') else 'BLOCKED')
+          except (OSError, ValueError, UnicodeError):
+              print('BLOCKED')
+          PY
+            )"
+          fi
+          if [[ "$REPORT_OUTCOME" != success && "$gate" == PASS ]]; then gate=BLOCKED; fi
+          echo "CODEQL_GATE=$gate sha=$EXPECTED_SHA" >> "$GITHUB_STEP_SUMMARY"
+          [[ "$gate" == PASS ]]
