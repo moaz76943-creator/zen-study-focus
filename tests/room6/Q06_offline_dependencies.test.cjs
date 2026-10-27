@@ -249,17 +249,17 @@ test('Q06 malicious supporting modules: CSS import, load sinks and mutable range
   fs.rmSync(root, { recursive: true, force: true });
 });
 
-test('Q06 real checkout: Focus Lab page absent is reported NOT_TESTED, room6 module is clean', () => {
+test('Q06 real checkout: current Focus Lab page and its local modules are clean', () => {
   const report = auditRepository();
   assert.equal(report.schemaVersion, 1);
-  assert.equal(report.focusLabPage, null);
-  assert.ok(report.notTested.some((entry) => entry.path === DEFAULT_FOCUS_LAB && /Focus Lab page absent/.test(entry.reason)));
+  assert.equal(report.focusLabPage, DEFAULT_FOCUS_LAB);
+  assert.ok(!report.notTested.some((entry) => entry.path === DEFAULT_FOCUS_LAB));
 
   const room6 = report.scanned.filter((entry) => entry.role === 'room6-module');
   assert.ok(room6.some((entry) => entry.path === 'android/app/src/main/assets/web/js/room6/reading_view_adapter.js'));
 
   const room6Findings = report.findings.filter((finding) => finding.path.startsWith('android/app/src/main/assets/web/js/room6/'));
-  assert.deepEqual(room6Findings, []);
+  assert.ok(room6Findings.every(f => f.severity === SEVERITIES.INFO), "offline self-test URLs are inert data");
 
   const blocking = report.findings.filter((f) => f.severity !== SEVERITIES.INFO);
   assert.deepEqual(blocking, []);
@@ -285,4 +285,26 @@ test('Q06 auditor itself stays offline, write-free and textContent-safe', () => 
   assert.equal(reportShape.summary.total, 0);
   fs.rmSync(path.dirname(reportShape.root) === path.dirname(process.env.TMPDIR || os.tmpdir())
     ? reportShape.root : reportShape.root, { recursive: true, force: true });
+});
+
+
+test('Q06 inline scripts require an exact script tag name', () => {
+  assert.deepEqual(scanText('<script-widget>fetch("remote");</script>', '.html', 'fixture.html'), []);
+  assert.deepEqual(scanText('<script:widget>fetch("remote");</script>', '.html', 'fixture.html'), []);
+  assert.equal(scanText('<SCRIPT type="text/javascript">fetch("remote");</SCRIPT  >', '.html', 'fixture.html')
+    .filter(f => f.category === CATEGORIES.NETWORK_CALL).length, 1);
+});
+
+test('Q06 follows actual local stylesheet and script dependencies regardless of filename', () => {
+  const root = makeTempTree('q06-transitive-', {
+    'android/app/src/main/assets/web/focus_lab.html': '<link rel="stylesheet" href="css/theme.css"><script src="js/room5/real.js"></script>',
+    'android/app/src/main/assets/web/css/theme.css': '@import "more.css";',
+    'android/app/src/main/assets/web/css/more.css': '@font-face {src:url("//fonts.gstatic.com/x.woff2")}',
+    'android/app/src/main/assets/web/js/room5/real.js': 'fetch("remote");'
+  });
+  try {
+    const report = auditRepository(root);
+    assert.ok(report.findings.some(f => f.category === CATEGORIES.REMOTE_FONT && f.path.endsWith('/more.css')));
+    assert.ok(report.findings.some(f => f.category === CATEGORIES.NETWORK_CALL && f.path.endsWith('/real.js')));
+  } finally { fs.rmSync(root, {recursive: true, force: true}); }
 });
