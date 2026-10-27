@@ -3993,6 +3993,17 @@ const ShareCardEngine = (function() {
       url: 'https://github.com/moaz76943-creator/zen-study-focus'
     };
 
+    async function copySummary(successMessage) {
+      try {
+        await navigator.clipboard.writeText(sharePayload.text);
+        alert(successMessage);
+        return true;
+      } catch (_) {
+        alert('Could not copy progress. Please try again.');
+        return false;
+      }
+    }
+
     modal.querySelector('#df-native-share-btn').onclick = async () => {
       if (window.triggerHaptic) window.triggerHaptic('action');
       if (navigator.share) {
@@ -4000,15 +4011,13 @@ const ShareCardEngine = (function() {
           await navigator.share(sharePayload);
         } catch(e) {}
       } else {
-        navigator.clipboard.writeText(sharePayload.text);
-        alert('Progress copied to clipboard! Paste it into WhatsApp or Stories.');
+        return copySummary('Progress copied to clipboard! Paste it into WhatsApp or Stories.');
       }
     };
 
     modal.querySelector('#df-copy-summary-btn').onclick = () => {
       if (window.triggerHaptic) window.triggerHaptic('click');
-      navigator.clipboard.writeText(sharePayload.text);
-      alert('Copied to clipboard!');
+      return copySummary('Copied to clipboard!');
     };
   }
 
