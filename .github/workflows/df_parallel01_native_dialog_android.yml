@@ -46,6 +46,7 @@ jobs:
           test "$(git rev-parse HEAD)" = '${{ github.event.pull_request.head.sha || github.sha }}'
           node --test tests/android_dialogs/current_native_dialog_handoff.test.cjs
           node --check tests/android_dialogs/native_js_dialog_android_probe.cjs
+          node --check tests/critical_room7/n01_android_ack_probe.cjs
           bash -n tests/android_dialogs/run_native_dialog_device.sh
       - name: Enable CDP for disposable DEBUG APK in runner workspace ONLY
         shell: bash
@@ -95,7 +96,9 @@ jobs:
           heap-size: ${{ matrix.api == 30 && '256M' || '512M' }}
           emulator-boot-timeout: 900
           disable-animations: false
-          script: bash tests/android_dialogs/run_native_dialog_device.sh
+          script: |
+            bash tests/android_dialogs/run_native_dialog_device.sh
+            DF_N01_SERIAL=emulator-5554 DF_N01_DISPOSABLE=1 DF_N01_SOURCE_SHA="$(git rev-parse HEAD)" node tests/critical_room7/n01_android_ack_probe.cjs "$RUNNER_TEMP/df-dialog-evidence/n01-native-ack-results.json"
       - name: Keep evidence without claiming release approval
         if: always()
         uses: actions/upload-artifact@v4
