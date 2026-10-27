@@ -120,20 +120,34 @@ test('controller is offline, pure UMD and exposes the composition factory', () =
 
 test('it runs with absolutely no optional adapters, no native and no storage', () => {
   const doc = makeDocument();
-  const controller = Controller.createFocusLabController({ documentFactory: doc });
+  const controller = Controller.createFocusLabController({
+    documentFactory: doc, navigationModule: null, domModule: null,
+    registryModule: null, readingModule: null
+  });
   assert.deepEqual(controller.adapterSnapshot, {
     navigation: 'absent',
     dom: 'absent',
     registry: 'absent',
-    reading: 'composed'
-  }, 'the F01 reading adapter exists in this checkout; the U04/U05/U06 siblings may be missing');
+    reading: 'absent'
+  }, 'missing optional modules are controlled explicitly, independently of checkout contents');
   assert.deepEqual(Object.keys(controller.getState()).sort(), ['activeView', 'error', 'staged']);
   assert.equal(controller.getActiveView(), 'plans');
-  assert.ok(controller.getAdapter('reading'));
+  assert.equal(controller.getAdapter('reading'), null);
   assert.equal(controller.getAdapter('navigation'), null);
   assert.equal(controller.composeRegistrySnapshot(), null);
   assert.equal(Object.isFrozen(controller.getState()), true);
   assert.equal(Object.isFrozen(controller.adapterSnapshot), true);
+});
+
+test('current checkout composes all four existing optional modules', () => {
+  const controller = Controller.createFocusLabController({ documentFactory: makeDocument() });
+  assert.deepEqual(controller.adapterSnapshot, {
+    navigation: 'composed', dom: 'composed', registry: 'composed', reading: 'composed'
+  });
+  for (const name of ['navigation', 'dom', 'registry', 'reading']) {
+    assert.ok(controller.getAdapter(name), name + ' module composes');
+  }
+  assert.ok(controller.composeRegistrySnapshot());
 });
 
 test('simulated tab clicks switch views accessibly and nothing mutates without a real event', () => {
