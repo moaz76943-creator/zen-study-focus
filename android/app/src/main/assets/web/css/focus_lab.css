@@ -1,0 +1,376 @@
+/*
+ * Deep Focus — Focus Lab White Premium Responsive Styles
+ * Scope: android/app/src/main/assets/web/focus_lab.html (offline standalone page).
+ *
+ * Guarantees:
+ *  - Fully offline: system fonts only, no @import, no fonts.googleapis, no font
+ *    downloads, no analytics or telemetry requests from this stylesheet.
+ *  - White premium identity, opt-in aligned with design_tokens_v22.css via
+ *    var(--df22-*, fallback) lookups so the page also works without the tokens file.
+ *  - Fluid from 320px through 360px, 393px and 430px viewports and beyond;
+ *    nothing wraps badly, nothing clips at a fixed height.
+ *  - RTL-safe: uses CSS logical properties everywhere and [dir="rtl"] overrides
+ *    where visual order matters, so Arabic layouts mirror automatically.
+ *  - Keyboard and screen-reader friendly: :focus-visible outlines, visible skip
+ *    link, comfortable scroll margins for in-page anchors.
+ *  - 200% font scaling: every font size uses rem/clamp(…rem), line-height is
+ *    unitless, and containers grow instead of clipping text.
+ *  - Keyboard avoidance: the page uses 100vh with a 100dvh upgrade so content
+ *    reflows when the Android keyboard opens. Pair with the viewport meta
+ *    "interactive-widget=resizes-content" for the smoothest IME behaviour.
+ */
+
+/* ---------- White premium tokens (offline system font stack) ---------- */
+
+:root {
+  --focuslab-surface: var(--df22-surface, #ffffff);
+  --focuslab-page: var(--df22-page, #f8fafd);
+  --focuslab-soft: var(--df22-surface-soft, #f3f7fd);
+  --focuslab-ink: var(--df22-ink, #1c2e4d);
+  --focuslab-muted: var(--df22-muted, #50617a);
+  --focuslab-primary: var(--df22-primary, #1759ad);
+  --focuslab-on-primary: var(--df22-on-primary, #ffffff);
+  --focuslab-input: var(--df22-blue-soft, #eaf4ff);
+  --focuslab-border: var(--df22-border, #dce5f0);
+  --focuslab-border-strong: var(--df22-border-strong, #b7c8df);
+  --focuslab-danger: var(--df22-danger, #a53733);
+  --focuslab-focus: var(--df22-focus, #1350a1);
+  --focuslab-radius: var(--df22-radius-md, 18px);
+  --focuslab-radius-soft: var(--df22-radius-sm, 14px);
+  --focuslab-shadow: var(--df22-shadow-card, 0 7px 24px rgba(30, 60, 110, 0.08));
+  --focuslab-font: var(
+    --df22-font,
+    system-ui,
+    Roboto,
+    "Noto Sans",
+    "Noto Sans Arabic",
+    sans-serif
+  );
+  --focuslab-leading: var(--df22-leading, 1.5);
+  --focuslab-space: var(--df22-space-4, 1rem);
+  --focuslab-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --focuslab-safe-top: env(safe-area-inset-top, 0px);
+}
+
+/* ---------- Base (mobile-first: authored for 320px and up) ---------- */
+
+html {
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%; /* let the OS zoom grow fonts instead of clipping */
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0 clamp(0.625rem, 4vw, 1.5rem) 0;
+  background: var(--focuslab-page);
+  color: var(--focuslab-ink);
+  font-family: var(--focuslab-font);
+  font-size: 1rem;
+  line-height: var(--focuslab-leading);
+  min-height: 100vh; /* fallback for engines without dvh */
+  min-height: 100dvh; /* keyboard-aware viewport: reflows when the IME opens */
+  box-sizing: border-box;
+}
+
+body *,
+body *::before,
+body *::after {
+  box-sizing: border-box;
+}
+
+/* Keyboard avoidance helpers: anchors clear the header when jumped to. */
+main {
+  display: block;
+  max-width: 62rem;
+  margin-inline: auto;
+  padding-block: 0 2rem;
+}
+
+section[id],
+footer,
+header {
+  scroll-margin-block-start: 1.5rem;
+}
+
+/* Visible skip link, positioned with logical properties for RTL mirroring. */
+.focus-lab-skip {
+  position: absolute;
+  inset-inline-start: -9999px;
+  top: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: var(--focuslab-radius-soft);
+  background: var(--focuslab-primary);
+  color: var(--focuslab-on-primary);
+  font-size: 1rem;
+  text-decoration: none;
+  z-index: 10;
+}
+
+.focus-lab-skip:focus,
+.focus-lab-skip:focus-visible {
+  inset-inline-start: 0.5rem;
+}
+
+/* ---------- Header, nav and footer ---------- */
+
+.focus-lab-header {
+  max-width: 62rem;
+  margin-inline: auto;
+  padding-block: calc(1.25rem + var(--focuslab-safe-top)) 0.75rem;
+}
+
+.focus-lab-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: clamp(1.35rem, 5vw, 1.6rem);
+}
+
+.focus-lab-header p {
+  margin: 0;
+  color: var(--focuslab-muted);
+  max-width: 60ch;
+}
+
+.focus-lab-nav {
+  max-width: 62rem;
+  margin-inline: auto;
+  margin-block-end: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-block: 0.25rem;
+}
+
+.focus-lab-nav a {
+  display: inline-block;
+  padding: 0.65rem 0.9rem;
+  min-height: 2.75rem;
+  border-radius: var(--focuslab-radius-soft);
+  background: var(--focuslab-soft);
+  border: 1px solid var(--focuslab-border);
+  color: var(--focuslab-primary);
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.focus-lab-footer {
+  max-width: 62rem;
+  margin-inline: auto;
+  margin-block-start: 1.5rem;
+  padding-block: 1rem calc(1.5rem + var(--focuslab-safe-bottom));
+  border-block-start: 1px solid var(--focuslab-border);
+  color: var(--focuslab-muted);
+  font-size: 0.9375rem;
+  text-align: start;
+}
+
+/* ---------- Cards: grow with 200% fonts, never clip ---------- */
+
+.focus-card {
+  max-width: 62rem;
+  margin-block: 1rem;
+  padding: clamp(0.875rem, 3vw, 1.25rem);
+  border: 1px solid var(--focuslab-border);
+  border-radius: var(--focuslab-radius);
+  background: var(--focuslab-surface);
+  box-shadow: var(--focuslab-shadow);
+}
+
+[data-focus-card] h2,
+.focus-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.1rem, 4vw, 1.25rem);
+  line-height: 1.3;
+}
+
+.focus-lab-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-end;
+  margin: 0.5rem 0;
+}
+
+.focus-lab-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1 1 12rem;
+  min-width: 0; /* allow inputs to shrink inside narrow flex rows */
+  font-size: 0.9375rem;
+}
+
+/* ---------- Form controls ---------- */
+
+input,
+select,
+textarea {
+  font: inherit;
+  font-size: 1rem;
+  line-height: var(--focuslab-leading);
+  color: var(--focuslab-ink);
+  background: var(--focuslab-input);
+  border: 1px solid var(--focuslab-border-strong);
+  border-radius: 10px;
+  padding: 0.5rem 0.625rem;
+  width: 100%; /* fills the flexible label column, no min-width overflow */
+  max-width: 100%;
+  min-height: 2.75rem;
+}
+
+button {
+  font: inherit;
+  font-size: 1rem;
+  line-height: var(--focuslab-leading);
+  color: var(--focuslab-on-primary);
+  background: var(--focuslab-primary);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0.5rem 0.875rem;
+  min-height: 2.75rem; /* 44dp-equivalent touch target */
+  align-self: flex-end;
+}
+
+button:hover {
+  background: var(--df22-primary-fill, #1350a1);
+}
+
+/* ---------- Outputs and lists: text always wraps, never clips ---------- */
+
+.focus-lab-output,
+[aria-live="polite"] {
+  font-size: 0.9375rem;
+  margin: 0.5rem 0;
+  overflow-wrap: break-word;
+}
+
+[role="alert"] {
+  margin: 0.5rem 0;
+  color: var(--focuslab-danger);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.focus-lab-list {
+  margin: 0.5rem 0;
+  padding-inline-start: 1.25rem;
+  font-size: 0.9375rem;
+}
+
+.focus-lab-list li {
+  margin-block: 0.25rem;
+}
+
+.focus-lab-list button {
+  margin-inline-start: 0.5rem;
+  align-self: auto;
+  min-height: 2.25rem;
+  padding-block: 0.25rem;
+}
+
+/* ---------- Keyboard focus: high-contrast ring, no clicks required ---------- */
+
+:focus-visible {
+  outline: 3px solid var(--focuslab-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- 320px and narrower: every control gets full-width breathing ---------- */
+
+@media (max-width: 320px) {
+  .focus-lab-row label {
+    flex-basis: 100%;
+  }
+}
+
+/* ---------- 361px..360px band: tighten the density for small phones ---------- */
+
+@media (max-width: 360px) {
+  body {
+    padding-inline: 0.5rem;
+  }
+
+  .focus-card {
+    border-radius: 12px;
+  }
+
+  .focus-lab-nav a {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  input,
+  select,
+  textarea {
+    min-height: 2.75rem;
+  }
+}
+
+/* ---------- 361px..393px: Pixel-class widths get the reference layout ---------- */
+
+@media (min-width: 361px) and (max-width: 393px) {
+  .focus-lab-nav {
+    gap: 0.625rem;
+  }
+
+  .focus-lab-row label {
+    flex-basis: 11rem;
+  }
+}
+
+/* ---------- 361px..430px: side paddings recover comfortably ---------- */
+
+@media (min-width: 361px) and (max-width: 430px) {
+  body {
+    padding-inline: 0.875rem;
+  }
+}
+
+/* ---------- 431px and wider: two-line rows can sit on one line ---------- */
+
+@media (min-width: 431px) {
+  body {
+    padding-inline: 1.5rem;
+  }
+
+  .focus-lab-row label {
+    flex-basis: 13rem;
+  }
+
+  .focus-card {
+    padding: 1.5rem;
+  }
+}
+
+/* ---------- RTL: Arabic orientation mirroring ---------- */
+
+[dir="rtl"] body {
+  text-align: start;
+}
+
+[dir="rtl"] .focus-lab-list {
+  padding-inline-start: 1.25rem; /* logical padding mirrors automatically */
+}
+
+[dir="rtl"] .focus-lab-skip {
+  top: 0.5rem;
+  inset-inline-start: -9999px;
+}
+
+[dir="rtl"] .focus-lab-skip:focus,
+[dir="rtl"] .focus-lab-skip:focus-visible {
+  inset-inline-start: 0.5rem;
+}
+
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea {
+  text-align: start; /* keep fields reading right-to-left naturally */
+}
+
+/* Numeric system-generated values stay Western digits and ltr inside RTL flows. */
+[dir="rtl"] .focus-lab-output,
+[dir="rtl"] [dir="ltr"] {
+  unicode-bidi: plaintext;
+}
