@@ -97,3 +97,22 @@ test('N02 actual CDP countdown allows elapsed ticks, never missing or stopped se
  assert.equal(liveTimerStarted({id:null,running:true,left:9},10,650),false);
  assert.equal(liveTimerStarted({id:'real',running:true,left:11},10,650),false);
 });
+
+test('N02 short focus credit requires the actual ID in both history and completed ledger', () => {
+ const {shortFocusCreditReceipt}=require('./n02_android_probe.cjs');
+ const make=()=>({sessions:1,todayMins:0,completedTimerIds:['actual-session'],sessionHistory:[{id:'actual-session',mode:'focus',completed:true,minutes:0}]});
+ assert.deepEqual(shortFocusCreditReceipt(make(),'actual-session'),{sessionId:'actual-session',sessions:1,minutes:0,historyCount:1,completedIdCount:1});
+ for(const change of [
+  c=>{c.sessions=2;}, c=>{c.todayMins=1;},
+  c=>{c.completedTimerIds=[];}, c=>{c.completedTimerIds.push('actual-session');},
+  c=>{c.completedTimerIds=['other-session'];}, c=>{c.sessionHistory=[];},
+  c=>{c.sessionHistory.push({...c.sessionHistory[0]});},
+  c=>{c.sessionHistory[0].id='other-session';},
+  c=>{c.sessionHistory[0].mode='short';}, c=>{c.sessionHistory[0].completed=false;},
+  c=>{c.sessionHistory[0].minutes=1;}
+ ]) {
+  const invalid=make();change(invalid);
+  assert.throws(()=>shortFocusCreditReceipt(invalid,'actual-session'));
+ }
+ assert.throws(()=>shortFocusCreditReceipt(null,'actual-session'),/unavailable/);
+});

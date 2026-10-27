@@ -38,7 +38,24 @@ function liveTimerStarted(value, requestedSeconds, elapsedMs) {
     value.left <= requestedSeconds &&
     value.left >= Math.max(1, requestedSeconds - drift));
 }
-module.exports = {parseAlarmPrefs, notificationKeys, liveTimerStarted};
+// A session counter alone cannot prove deduplication: verify the matching
+// history record and completed-ID ledger in both live and persisted cfg.
+function shortFocusCreditReceipt(cfg, sessionId) {
+  assert.ok(cfg && typeof cfg === 'object', 'Completed cfg receipt unavailable');
+  assert.equal(cfg.sessions, 1, 'Short focus session must be credited exactly once');
+  assert.equal(cfg.todayMins, 0, 'Ten seconds must not inflate focus minutes');
+  assert.ok(Array.isArray(cfg.completedTimerIds), 'Completed-ID ledger unavailable');
+  assert.deepEqual(cfg.completedTimerIds, [sessionId], 'Completed-ID ledger differs from the real session');
+  assert.ok(Array.isArray(cfg.sessionHistory), 'Session history unavailable');
+  assert.equal(cfg.sessionHistory.length, 1, 'Session history must contain one completion');
+  const record = cfg.sessionHistory[0];
+  assert.equal(record.id, sessionId, 'History lost the real session ID');
+  assert.equal(record.mode, 'focus', 'Rest cannot be credited as focus');
+  assert.equal(record.completed, true, 'History completion flag missing');
+  assert.equal(record.minutes, 0, 'Short history record inflated focus minutes');
+  return {sessionId, sessions:cfg.sessions, minutes:record.minutes, historyCount:1, completedIdCount:1};
+}
+module.exports = {parseAlarmPrefs, notificationKeys, liveTimerStarted, shortFocusCreditReceipt};
 
 async function main() {
   const file = process.argv[2];
@@ -56,6 +73,13 @@ async function main() {
   const waiting = new Map(), cases = [];
   const prefs = () => parseAlarmPrefs(adb('shell','run-as',PKG,'cat',PREFS));
   const notifications = id => notificationKeys(adb('shell','cmd','notification','list'),id);
+  async function creditReceipts(sessionId) {
+    const state = await evaluate("({live:cfg,stored:loadFortressData('zen_fortress_cfg_v21',null)})");
+    const live = shortFocusCreditReceipt(state?.live, sessionId);
+    const stored = shortFocusCreditReceipt(state?.stored, sessionId);
+    assert.deepEqual(state.stored.sessionHistory, state.live.sessionHistory, 'Stored history differs from live completion');
+    return {live, stored};
+  }
   function call(method,params={}) {
     return new Promise((resolve,reject) => {
       const id=++sequence,timer=setTimeout(()=>{waiting.delete(id);reject(Error('TRANSPORT: CDP '+method+' timeout'));},15000);
@@ -198,6 +222,7 @@ async function main() {
       const stopped=adb('shell','dumpsys','package',PKG);assert.match(stopped,/stopped=true/,'OS did not mark package stopped');
       await noCompletionThrough(before.deadline);assert.equal(prefs().active,true,'Force-stop should leave disk receipt, not execute receiver');
       await launch();assert.equal(await evaluate('timerRunning'),false);assert.equal(await evaluate('cfg.sessions||0'),1,'Expired real session was not reconciled exactly once');
+      const firstCredit = await creditReceipts(before.id);
       // Android may deliver a single user-facing completion on reopening an expired
       // force-stopped session. The safety contract is NO delivery while stopped
       // and NO duplicate credit or second native delivery after reopening.
@@ -208,10 +233,11 @@ async function main() {
         assert.ok(firstReceipt.lastNotified>=before.deadline,'Reopen completion predates saved deadline');
       }
       await disconnect();adb('shell','am','force-stop',PKG);await launch();assert.equal(await evaluate('cfg.sessions||0'),1,'Reopen credited session twice');
+      assert.deepEqual(await creditReceipts(before.id), firstCredit, 'Second reopen changed persisted session credit');
       const secondKeys=notifications(2002),secondReceipt=prefs();
       assert.deepEqual(secondKeys,firstKeys,'Second reopen delivered another completion notification');
       assert.equal(secondReceipt.lastNotified,firstReceipt.lastNotified,'Second reopen repeated native delivery');
-      return {token:before.token,osStopped:true,noDeliveryWhileStopped:true,expiredReopenCredits:1,completionAfterReopen:firstKeys.length};
+      return {token:before.token,osStopped:true,noDeliveryWhileStopped:true,expiredReopenCredits:1,completionAfterReopen:firstKeys.length,creditReceipts:firstCredit};
     });
     await run('force-stop-future-reopen-rearms-and-delivers-once',async()=>{
       await fresh();const before=await startLive(30);await disconnect();adb('shell','am','force-stop',PKG);await launch();
