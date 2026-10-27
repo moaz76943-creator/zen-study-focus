@@ -168,10 +168,13 @@ function scan(files) {
   const unused=Object.keys(dict).filter(id=>!refs[id]||!refs[id].length).sort();
   const missing={},coverage={},fallback={},sameEnglish={};
   for(const lc of catalog){missing[lc]=[];coverage[lc]={};sameEnglish[lc]=[];
-    for(const id of ids){const s=dict[id]?.screen||screenOf(id);if(!coverage[lc][s])coverage[lc][s]={translated:0,total:0,missing:0,percent:0};
+    for(const id of ids){const s=dict[id]?.screen||screenOf(id);if(!coverage[lc][s])coverage[lc][s]={translated:0,total:0,missing:0,english_identical:0,percent:0};
       const c=coverage[lc][s];c.total++;
       const v=dict[id]?.values?.[lc];if(typeof v==='string'&&v.trim()){
-        c.translated++;if(lc!=='en'&&v===dict[id]?.values?.en)sameEnglish[lc].push(id);
+        // English-identical values (e.g. Latin-digit strings such as "Intervals 20/10")
+        // are flagged for review and are NOT counted as a translation of this locale.
+        if(lc!=='en'&&v===dict[id]?.values?.en){sameEnglish[lc].push(id);c.english_identical++;}
+        else c.translated++;
       }else{missing[lc].push(id);c.missing++;}
     }
     for(const c of Object.values(coverage[lc]))c.percent=c.total?Math.round(c.translated*10000/c.total)/100:0;
@@ -195,8 +198,8 @@ function markdown(r){const out=['# Deep Focus — static i18n inventory','','Gen
   ...['TOTAL_UI_KEYS','FALLBACK_COUNT','DICTIONARY_ENTRY_COUNT'].map(k=>'| '+k+' | '+r[k]+' |'),
   '| HARDCODED_LABELS | '+r.HARDCODED_LABELS.length+' |', '| NATIVE_ANDROID_GAPS | '+r.NATIVE_ANDROID_GAPS.length+' |',
   '| UNUSED_TRANSLATIONS (candidates) | '+r.UNUSED_TRANSLATIONS.length+' |','| Scanned files | '+r.META.scanned_files+' |','',
-  '## Coverage by language (all measured namespaces)','','| Locale | Translated / total | Coverage | Missing |','|---|---:|---:|---:|'];
-  for(const lc of r.META.locales){const values=Object.values(r.COVERAGE_BY_SCREEN[lc]);const t=values.reduce((a,c)=>a+c.translated,0),n=values.reduce((a,c)=>a+c.total,0);out.push('| '+lc+' | '+t+' / '+n+' | '+(n?(100*t/n).toFixed(2):'0.00')+'% | '+r.MISSING_KEYS_BY_LANGUAGE[lc].length+' |');}
+  '## Coverage by language (all measured namespaces)','','| Locale | Translated / total | Coverage | Missing | English-identical (review) |','|---|---:|---:|---:|---:|'];
+  for(const lc of r.META.locales){const values=Object.values(r.COVERAGE_BY_SCREEN[lc]);const t=values.reduce((a,c)=>a+c.translated,0),n=values.reduce((a,c)=>a+c.total,0);out.push('| '+lc+' | '+t+' / '+n+' | '+(n?(100*t/n).toFixed(2):'0.00')+'% | '+r.MISSING_KEYS_BY_LANGUAGE[lc].length+' | '+(r.ENGLISH_IDENTICAL_CANDIDATES[lc]||[]).length+' |');}
   out.push('','## Method and limitations','',...r.META.limitations.map(x=>'- '+x),'','## Section coverage','','| Language | Screen | Translated | Total | Percent |','|---|---|---:|---:|---:|');
   for(const lc of r.META.locales)for(const [s,c] of Object.entries(r.COVERAGE_BY_SCREEN[lc]).sort(([a],[b])=>a.localeCompare(b)))out.push('| '+lc+' | '+s+' | '+c.translated+' | '+c.total+' | '+c.percent+'% |');
   out.push('','## Hardcoded samples (first 100)','',...r.HARDCODED_LABELS.slice(0,100).map(x=>'- \`'+x.file+':'+x.line+'\` ['+x.type+'] '+x.text.replace(/[\`|]/g,' ')),
