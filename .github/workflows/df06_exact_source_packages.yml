@@ -67,14 +67,14 @@ jobs:
           test -s "$apk"
           test -s "$aab"
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" > "$evidence/apk-badging.txt"
-          grep -Eq "^package: name='com\.zenstudy\.focus' " "$evidence/apk-badging.txt"
-          grep -Fxq 'application-debuggable' "$evidence/apk-badging.txt"
+          grep -Eq "^package: name='com\.zenstudy\.focus' " "$evidence/apk-badging.txt" || { echo "::error::Debug APK package mismatch"; exit 1; }
+          grep -Fxq 'application-debuggable' "$evidence/apk-badging.txt" || { echo '::error::Debug APK is not reported debuggable'; exit 1; }
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$apk" > "$evidence/apk-signature.txt"
           # Compare the packaged certificate with this runner's standard debug key.
           keytool -exportcert -alias androiddebugkey -keystore "$HOME/.android/debug.keystore" -storepass android > "$RUNNER_TEMP/df06-debug-cert.der"
           debug_digest="$(sha256sum "$RUNNER_TEMP/df06-debug-cert.der" | cut -d ' ' -f 1)"
-          grep -Fxq "Signer #1 certificate SHA-256 digest: $debug_digest" "$evidence/apk-signature.txt"
-          test "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$evidence/apk-signature.txt")" = 1
+          grep -Fxq "Signer #1 certificate SHA-256 digest: $debug_digest" "$evidence/apk-signature.txt" || { echo "::error::APK certificate does not match runner debug certificate"; exit 1; }
+          test "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$evidence/apk-signature.txt")" = 1 || { echo "::error::Unexpected APK certificate count"; exit 1; }
           curl --proto '=https' --tlsv1.2 -fsSL --retry 2 https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar -o "$RUNNER_TEMP/df06-bundletool.jar"
           echo "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29  $RUNNER_TEMP/df06-bundletool.jar" | sha256sum -c -
           java -jar "$RUNNER_TEMP/df06-bundletool.jar" validate --bundle="$aab"
@@ -111,6 +111,7 @@ jobs:
             cat "$evidence/SHA256SUMS"
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload QA packages and provenance
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: df06-qa-packages-${{ github.event.pull_request.head.sha || github.sha }}
