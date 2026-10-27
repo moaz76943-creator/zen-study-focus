@@ -13,7 +13,7 @@ function node(id = '') {
     classList: {add(){},remove(){},toggle(){return false;},contains(){return false;}},
     setAttribute(k,v){this[k] = v;}, getAttribute(k){return this[k];},
     appendChild(child){this.children.push(child);return child;}, replaceChildren(...children){this.children=[...children];}, addEventListener(){},
-    parentElement:{querySelectorAll(){return [];}},
+    parentElement:{querySelectorAll(){return [];},setAttribute(k,v){this[k]=v;},getAttribute(k){return this[k];}},
     querySelector(){return null;}, querySelectorAll(){return [];},
     focus(){}, scrollIntoView(){}
   };
