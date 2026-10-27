@@ -308,3 +308,13 @@ test('Q06 follows actual local stylesheet and script dependencies regardless of 
     assert.ok(report.findings.some(f => f.category === CATEGORIES.NETWORK_CALL && f.path.endsWith('/real.js')));
   } finally { fs.rmSync(root, {recursive: true, force: true}); }
 });
+
+test('Q06 raw-text script tokenization handles quoted >, end-tag attributes, comments and EOF', () => {
+  const { extractScriptBlocks } = auditor;
+  const blocks = extractScriptBlocks('<!-- <script>bad();</script> --><style>"<script>alsoBad();</script>"</style><SCRIPT data-label="a > b">fetch("remote");</SCRIPT ignored><script>last();');
+  assert.equal(blocks.length, 2);
+  assert.equal(blocks[0].attributes, ' data-label="a > b"');
+  assert.equal(blocks[0].body, 'fetch("remote");');
+  assert.equal(blocks[1].body, 'last();');
+  assert.deepEqual(extractScriptBlocks('<script-widget>bad();</script-widget>'), []);
+});
