@@ -1,0 +1,41 @@
+# Public v21 persistence identifiers and deliberately corrupt test input are not
+# credentials. Each exception requires BOTH an exact value AND a reviewed path.
+# Default Gitleaks detection remains enabled, including within these same files.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Public legacy checksum salt, never encryption or authentication"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^ZEN_FORTRESS_V21_99812$''']
+paths = ['''^android/app/src/main/assets/web/(?:app\.js(?:\.bak)?|data_compat_v21\.js)$''']
+
+[[rules.allowlists]]
+description = "Immutable localStorage v21 identifiers in reviewed regression fixtures"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^zen_fortress_(?:cfg|tasks|notes)_v21(?:_mirror)?$''']
+paths = [
+  '''^tests/focus_workflows/test_focus_workflows\.cjs$''',
+  '''^tests/i18n/goals/goals_studio_i18n\.test\.cjs$''',
+  '''^tests/df09_legacy_analytics\.test\.cjs$''',
+  '''^tests/integration_recovery/(?:counter_ack_rollback|daily_rollover_durability|water_counter_ack_rollback|timer_credit_ack_regression)\.test\.cjs$''',
+  '''^tests/smoke_app\.cjs$''',
+  '''^tests/track07_functional/activity_domain_durable_ack\.test\.cjs$''',
+  '''^tests/track05_timer/qt_transition_probe\.cjs$'''
+]
+
+[[rules.allowlists]]
+description = "Deliberately invalid primary-packet marker used only for fault injection"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^DF07_CORRUPT_PRIMARY$''']
+paths = [
+  '''^tests/android_e2e_recovery/native_faults\.cjs$''',
+  '''^tests/security_recovery/track13_private_triage\.test\.cjs$''',
+  '''^tools/security/track13_gitleaks_private_triage\.py$'''
+]
