@@ -25,7 +25,7 @@ on:
       - 'tests/i18n/quick_training/**'
       - 'tests/i18n/timer/**'
       - 'tests/track07_functional/timer*'
-      - 'tests/integration_quality/activity_domain_durable_ack.test.cjs'
+      - 'tests/track07_functional/activity_domain_durable_ack.test.cjs'
       - '.github/workflows/track05_timer_lifecycle_20261021.yml'
 env:
   DF_TEST_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -58,13 +58,13 @@ jobs:
           node --check android/app/src/main/assets/web/app.js
           node --check tests/track05_timer/live_android_cdp.cjs
           node --check tests/critical_room7/n02_android_probe.cjs
-          node --test tests/critical_room7/n02_contract.test.cjs
+          node --test tests/track05_timer/workflow_test_paths.test.cjs tests/critical_room7/n02_contract.test.cjs
           bash -n tests/track05_timer/run_android_timer_qa.sh
       - name: Native active timer checkpoint and lifecycle regression
         run: node --test tests/track05_timer/native_timer_checkpoint.test.cjs tests/track05_timer/mode_snapshot_ack.test.cjs tests/track05_timer/delta_snapshot_ack.test.cjs tests/track05_timer/adb_timeout.test.cjs tests/track05_timer/adb_classification.test.cjs tests/android_e2e_recovery/private_evidence.test.cjs
       - name: Track05 real-function lifecycle regression and adjacent timer guards
         run: |
-          node --test tests/track05_timer/tick_lifecycle.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/integration_quality/activity_domain_durable_ack.test.cjs
+          node --test tests/track05_timer/tick_lifecycle.test.cjs tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_safety.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs tests/track07_functional/activity_domain_durable_ack.test.cjs
       - name: Record exact SHA and immutable test scope
         if: always()
         shell: bash
@@ -73,7 +73,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: track05-timer-source-${{ github.sha }}
+          name: track05-timer-source-${{ env.DF_TEST_SOURCE_SHA }}
           path: ${{ runner.temp }}/track05-evidence.txt
           retention-days: 7
   android-timer-qa:
@@ -129,7 +129,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$DF_TEST_SOURCE_SHA"
           mkdir -p "$RUNNER_TEMP/track05-android"
           test -s android/app/build/outputs/apk/debug/app-debug.apk
-          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/track05-android/apk.sha256"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk | tee "$RUNNER_TEMP/track05-android/apk.sha256"
           test -c /dev/kvm
           sudo chown "$(id -u):$(id -g)" /dev/kvm
           sudo chmod u+rw /dev/kvm
