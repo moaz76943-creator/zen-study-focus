@@ -86,3 +86,14 @@ test('N02 Android receipt parsers separate actual native state and package notif
  assert.deepEqual(notificationKeys(receipt,2002),['0|com.zenstudy.focus|2002|null|10177']);
  assert.deepEqual(notificationKeys(receipt,1001),['0|com.zenstudy.focus|1001|null|10177']);
 });
+
+test('N02 actual CDP countdown allows elapsed ticks, never missing or stopped sessions', () => {
+ const {liveTimerStarted}=require('./n02_android_probe.cjs');
+ assert.equal(liveTimerStarted({id:'real',running:true,left:10},10,0),true);
+ assert.equal(liveTimerStarted({id:'real',running:true,left:9},10,650),true);
+ assert.equal(liveTimerStarted({id:'real',running:true,left:8},10,1050),true);
+ assert.equal(liveTimerStarted({id:'real',running:true,left:5},10,650),false);
+ assert.equal(liveTimerStarted({id:'real',running:false,left:9},10,650),false);
+ assert.equal(liveTimerStarted({id:null,running:true,left:9},10,650),false);
+ assert.equal(liveTimerStarted({id:'real',running:true,left:11},10,650),false);
+});
