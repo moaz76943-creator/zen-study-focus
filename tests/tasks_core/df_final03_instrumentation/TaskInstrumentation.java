@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.InputDevice;
+import android.view.KeyEvent;
+import android.view.WindowInsets;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
@@ -71,13 +73,26 @@ public final class TaskInstrumentation extends Instrumentation {
                 assertOk(Math.abs(cssWidth.optDouble("visible")-expected)<3,
                     "Requested CSS width not achieved by Android emulator: expected="+expected+" actual="+cssWidth);
             }
+            String fontScale=args==null?"1.0":args.getString("fontScale","1.0");
+            float actualFontScale=activity.getResources().getConfiguration().fontScale;
+            assertOk(Math.abs(actualFontScale-Float.parseFloat(fontScale))<0.01f,
+                "Requested Android font scale not achieved: "+actualFontScale);
+            report.putString("df03_actual_font_scale",String.valueOf(actualFontScale));
             if("verify".equals(stage)) {
                 verifySaved();
             } else if("edit".equals(stage)){
+                JSONObject language=js("(()=>{applyLanguage("+JSONObject.quote(locale)+");return {lang:cfg.lang,dir:document.documentElement.dir};})()");
+                assertOk(locale.equals(language.optString("lang")),"Requested language not applied: "+language);
                 doEdit(locale);
             } else {
                 throw new AssertionError("Unrecognized stage "+stage);
             }
+            JSONObject persistedLanguage=js("({lang:cfg.lang,dir:document.documentElement.dir})");
+            assertOk(locale.equals(persistedLanguage.optString("lang")) &&
+                ("ar".equals(locale)?"rtl":"ltr").equals(persistedLanguage.optString("dir")),
+                "Tasks language not preserved in "+stage+": "+persistedLanguage);
+            if("edit".equals(stage)) report.putString("df03_ime","PASS");
+            report.putString("df03_font_scale",fontScale);
             report.putString("df03_status","PASS");
             report.putString("df03_stage",stage);
             report.putString("df03_locale",locale);
@@ -137,31 +152,38 @@ public final class TaskInstrumentation extends Instrumentation {
         assertOk(seed.optBoolean("ok"),"Fixture durable v21 write not acknowledged "+seed);
         JSONObject ack=receipt();
         assertOk(ack.optBoolean("ok"),"v21 packet ACK missing before touch "+ack);
-        String target="df03TaskHost";
-        mount(target,locale,false);
-        JSONObject found=js("(()=>{const card=[...document.querySelectorAll('#df03TaskHost #df-task-results .df-task')]" +
+        tap("navTasks");
+        JSONObject found=js("(()=>{const card=[...document.querySelectorAll('#df22TasksHost #df-task-results .df-task')]" +
             ".find(c=>c.querySelector('.df-title')?.textContent==="+JSONObject.quote(ORIGINAL)+");" +
             "const b=card&&[...card.querySelectorAll('button')].find(x=>x.textContent.trim()==="+
               JSONObject.quote("ar".equals(locale)?"تعديل":"Edit")+");" +
-            "if(b)b.id='df03Edit';return {found:!!card,button:!!b,dir:document.querySelector('#df03TaskHost .df-tasks')?.getAttribute('dir')};})()");
+            "if(b)b.id='df03Edit';return {found:!!card,button:!!b,dir:document.querySelector('#df22TasksHost .df-tasks')?.getAttribute('dir')};})()");
         assertOk(found.optBoolean("found")&&found.optBoolean("button"),"Tasks Editor not visible "+found);
         assertOk(("ar".equals(locale)?"rtl":"ltr").equals(found.optString("dir")),"Wrong RTL/LTR direction "+found);
         tap("df03Edit");
-        exposeEditor("df03TaskHost");
-        JSONObject draft=js("(()=>{const f=document.querySelector('#df03TaskHost form.df-form');" +
+        // Exercise the shipped main-screen editor without hiding any fields.
+        // Only the later rejected-ACK adapter is mounted in an isolated fixture.
+        JSONObject draft=js("(()=>{const f=document.querySelector('#df22TasksHost form.df-form');" +
             "if(!f)return {form:false};const title=f.querySelector('input[type=text]'),save=f.querySelector('button[type=submit]');" +
             "title.value="+JSONObject.quote(SAVED)+";title.dispatchEvent(new Event('input',{bubbles:true}));" +
-            "save.id='df03Save';return {form:true,date:f.querySelector('input[type=date]')?.value||''," +
+            "title.id='df03Title';save.id='df03Save';return {form:true,date:f.querySelector('input[type=date]')?.value||''," +
             "checked:f.querySelector('input[type=checkbox]')?.checked,title:title.value};})()");
         assertOk(draft.optBoolean("form")&&"".equals(draft.optString("date"))&&!draft.optBoolean("checked"),
             "Editing legacy undated task fabricated date "+draft);
+        tap("df03Title");
+        expectIme(true);
+        pressBack();
+        expectIme(false);
+        JSONObject afterIme=js("({open:!!document.querySelector('#df22TasksHost form.df-form'),draft:document.getElementById('df03Title')?.value})");
+        assertOk(afterIme.optBoolean("open") && SAVED.equals(afterIme.optString("draft")),
+            "Keyboard dismissal closed task editor or lost draft: "+afterIme);
         tap("df03Save");
         JSONObject saved=readFixture();
         if(saved.optInt("count")!=1||!SAVED.equals(saved.optString("title"))){
-            JSONObject diag=js("({events:window.__df03RealClicks||[],form:!!document.querySelector('#df03TaskHost form.df-form')," +
-                "title:document.querySelector('#df03TaskHost form.df-form input[type=text]')?.value||''," +
-                "error:document.querySelector('#df03TaskHost .df-error')?.textContent||''," +
-                "hostError:document.getElementById('df03TaskHost')?.dataset.df03Error||''," +
+            JSONObject diag=js("({events:window.__df03RealClicks||[],form:!!document.querySelector('#df22TasksHost form.df-form')," +
+                "title:document.querySelector('#df22TasksHost form.df-form input[type=text]')?.value||''," +
+                "error:document.querySelector('#df22TasksHost .df-error')?.textContent||''," +
+                "hostError:document.getElementById('df22TasksHost')?.dataset.df03Error||''," +
                 "save:!!document.getElementById('df03Save')})");
             throw new AssertionError("Real Android Save did not persist single edit "+saved+" physicalEvents="+diag);
         }
@@ -186,7 +208,26 @@ public final class TaskInstrumentation extends Instrumentation {
         assertOk("DF03 rejected write".equals(refused.optString("draft")) &&
             SAVED.equals(refused.optString("stored")),"Rejected ACK overwrote task or lost editor draft "+refused);
         assertOk(receipt().optBoolean("ok"),"v21 packet changed on injected rejected ACK");
-        assertOk(realTaps==4,"Expected four genuine Android physical tap events, got "+realTaps);
+        assertOk(realTaps==6,"Expected six genuine Android physical tap events, got "+realTaps);
+    }
+    private void expectIme(boolean expected) {
+        for(int i=0;i<20;i++) {
+            AtomicReference<Boolean> visible=new AtomicReference<>(false);
+            runOnMainSync(()->{
+                WindowInsets insets=view.getRootWindowInsets();
+                visible.set(insets!=null&&insets.isVisible(WindowInsets.Type.ime()));
+            });
+            if(visible.get()==expected)return;
+            SystemClock.sleep(250);
+        }
+        throw new AssertionError("Actual Android Tasks IME state not achieved: visible="+expected);
+    }
+    private void pressBack() {
+        long when=SystemClock.uptimeMillis();
+        KeyEvent down=new KeyEvent(when,when,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BACK,0);
+        KeyEvent up=new KeyEvent(when,when+80,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BACK,0);
+        assertOk(getUiAutomation().injectInputEvent(down,true),"Android rejected Tasks Back down");
+        assertOk(getUiAutomation().injectInputEvent(up,true),"Android rejected Tasks Back up");
     }
     private void exposeEditor(String hostId)throws Exception{
         // Isolate the real Tasks editor within the limited emulator visual viewport.
@@ -229,7 +270,7 @@ public final class TaskInstrumentation extends Instrumentation {
         String source="(()=>{const el=document.getElementById("+JSONObject.quote(id)+");" +
             "if(!el)return {present:false};" +
             "el.scrollIntoView({block:'start',inline:'nearest'});" +
-            "const host=el.closest('#df03TaskHost,#df03RejectHost');let scrolls=0;" +
+            "const host=el.closest('#df22TasksHost,#df03RejectHost');let scrolls=0;" +
             "for(let i=0;i<6;i++){const rect=el.getBoundingClientRect(),v=window.visualViewport;" +
             "const top=v?v.offsetTop:0,height=v?v.height:innerHeight,y=rect.top+rect.height/2;" +
             "if(y>=top+18&&y<top+height-18)break;" +
@@ -275,7 +316,7 @@ public final class TaskInstrumentation extends Instrumentation {
             assertOk(getUiAutomation().injectInputEvent(up,true),"Android physical UP rejected "+id);
         }finally{down.recycle();up.recycle();}
         realTaps++;SystemClock.sleep(350);
-        JSONObject observed=js("({events:window.__df03RealClicks||[],form:!!document.querySelector('#df03TaskHost form.df-form')," +
+        JSONObject observed=js("({events:window.__df03RealClicks||[],form:!!document.querySelector('#df22TasksHost form.df-form')," +
             "edited:!!document.querySelector('#df03RejectHost form.df-form')})");
         Log.i(TAG,"REAL_TOUCH id="+id+" x="+sx+" y="+sy+" geometry="+point+" observed="+observed);
     }

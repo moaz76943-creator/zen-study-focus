@@ -29,15 +29,17 @@ jobs:
           set -euo pipefail
           bash -n tests/tasks_core/df_final03_instrumentation/prepare_test_build.sh
           bash -n tests/tasks_core/df_final03_instrumentation/run_ci.sh
-          node --test tests/tasks_core/tasks_core.test.cjs tests/tasks_core/tasks_studio.test.cjs
+          node --test tests/tasks_core/*.test.cjs tests/android_touch/df08_instrumentation/scenario_matrix.test.cjs
           grep -q 'getUiAutomation().injectInputEvent' tests/tasks_core/df_final03_instrumentation/TaskInstrumentation.java
           grep -q 'setWebContentsDebuggingEnabled(false)' android/app/src/main/java/com/zenstudy/focus/MainActivity.java
   android:
-    name: Android API${{ matrix.api }} Tasks 320-430px real WebView
+    name: Android API${{ matrix.api }} Tasks / font ${{ matrix.font_scale }} / 320-430px EN/AR
     needs: source
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix:
+        font_scale: ['1.0','1.5','2.0']
         api: [30,35]
     runs-on: ubuntu-latest
     timeout-minutes: 55
@@ -73,7 +75,8 @@ jobs:
       - name: Actual WebView pointer edit and six-packet v21 WebView readback after force stop
         uses: reactivecircus/android-emulator-runner@v2
         env:
-          DF03_EVIDENCE: ${{ runner.temp }}/df03-api-${{ matrix.api }}
+          DF03_EVIDENCE: ${{ runner.temp }}/df03-api-${{ matrix.api }}-font-${{ matrix.font_scale }}
+          DF03_FONT_SCALE: ${{ matrix.font_scale }}
         with:
           api-level: ${{ matrix.api }}
           arch: x86_64
@@ -87,14 +90,14 @@ jobs:
         if: always()
         shell: bash
         run: |
-          mkdir -p "$RUNNER_TEMP/df03-api-${{ matrix.api }}"
-          git rev-parse HEAD > "$RUNNER_TEMP/df03-api-${{ matrix.api }}/EXACT_SOURCE_SHA.txt"
-          printf 'API${{ matrix.api }} disposable emulator only. PHYSICAL_HANDSET=NOT_TESTED; IME=NOT_TESTED; SAF=NOT_TESTED; RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df03-api-${{ matrix.api }}/LIMITS.txt"
+          mkdir -p "$RUNNER_TEMP/df03-api-${{ matrix.api }}-font-${{ matrix.font_scale }}"
+          git rev-parse HEAD > "$RUNNER_TEMP/df03-api-${{ matrix.api }}-font-${{ matrix.font_scale }}/EXACT_SOURCE_SHA.txt"
+          printf 'API${{ matrix.api }} font ${{ matrix.font_scale }} EN/AR disposable emulator only. PHYSICAL_HANDSET=NOT_TESTED; SAF=NOT_TESTED; RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df03-api-${{ matrix.api }}-font-${{ matrix.font_scale }}/LIMITS.txt"
           test "$(git diff --name-only)" = 'android/app/build.gradle'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: DF03-Tasks-real-Android-API${{ matrix.api }}-${{ github.sha }}
-          path: ${{ runner.temp }}/df03-api-${{ matrix.api }}
+          name: DF03-Tasks-real-Android-API${{ matrix.api }}-font-${{ matrix.font_scale }}-${{ github.sha }}
+          path: ${{ runner.temp }}/df03-api-${{ matrix.api }}-font-${{ matrix.font_scale }}
           retention-days: 7
           if-no-files-found: warn
