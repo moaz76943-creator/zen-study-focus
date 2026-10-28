@@ -11766,3 +11766,100 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfUpdateCardExample = dfUpdateCardExample;
   }
 })();
+
+/* === M294_PREFIX_LIVE_SEARCH_WITH_HIGHLIGHTING_AND_CODE114_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfHighlightSearchMatch(text, query) {
+    if (!text) return "";
+    var str = String(text);
+    if (!query || typeof query !== "string") return str;
+
+    var q = query.trim().toLowerCase();
+    if (!q) return str;
+
+    var lower = str.toLowerCase();
+    var idx = lower.indexOf(q);
+    if (idx === -1) return str;
+
+    var before = str.slice(0, idx);
+    var match = str.slice(idx, idx + q.length);
+    var after = str.slice(idx + q.length);
+
+    return before +
+      "<mark style=\"background:rgba(250,204,21,0.3);color:#fef08a;border-radius:2px;padding:0 2px;font-weight:bold;\">" +
+      match +
+      "</mark>" +
+      after;
+  }
+
+  function dfSearchVocabCards(query, cardsList) {
+    var list = [];
+    if (Array.isArray(cardsList)) {
+      list = cardsList;
+    } else {
+      try {
+        if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+          list = window.dfGetVocabBankList();
+        } else {
+          var raw = localStorage.getItem("df_vocab_bank_v1");
+          if (raw) list = JSON.parse(raw);
+        }
+      } catch (_) {}
+    }
+
+    if (!Array.isArray(list)) return [];
+    if (!query || typeof query !== "string") return list.slice();
+
+    var q = query.trim().toLowerCase();
+    if (!q) return list.slice();
+
+    var prefixMatches = [];
+    var otherMatches = [];
+
+    for (var i = 0; i < list.length; i++) {
+      var item = list[i];
+      if (!item) continue;
+
+      var word = String(item.word || "").toLowerCase();
+      var meaning = String(item.meaning || "").toLowerCase();
+      var example = String(item.example || "").toLowerCase();
+
+      if (word.startsWith(q)) {
+        prefixMatches.push(item);
+      } else if (word.indexOf(q) !== -1 || meaning.indexOf(q) !== -1 || example.indexOf(q) !== -1) {
+        otherMatches.push(item);
+      }
+    }
+
+    return prefixMatches.concat(otherMatches);
+  }
+
+  function dfRenderSearchMatchCountBadge(matchedCount, totalCount) {
+    var m = Number(matchedCount) || 0;
+    var t = Number(totalCount) || 0;
+    var mStr = dfFormatWesternDigits(m);
+    var tStr = dfFormatWesternDigits(t);
+
+    return "<span class=\"df-search-count-badge\" style=\"font-size:11px;color:#93c5fd;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:12px;padding:2px 8px;\">" +
+      "🔍 " + mStr + " من " + tStr + " كلمة" +
+    "</span>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfHighlightSearchMatch = dfHighlightSearchMatch;
+    window.dfSearchVocabCards = dfSearchVocabCards;
+    window.dfRenderSearchMatchCountBadge = dfRenderSearchMatchCountBadge;
+  }
+})();
