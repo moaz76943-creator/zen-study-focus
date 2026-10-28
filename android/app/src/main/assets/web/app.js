@@ -9212,3 +9212,79 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderSuiteDiagnosticModalHtml = dfRenderSuiteDiagnosticModalHtml;
   }
 })();
+
+/* === M271_SYSTEM_HEALTH_LAUNCHER_IN_SETTINGS_AND_CODE91_V1 === */
+(function() {
+  'use strict';
+
+  function dfRenderHealthCheckSettingsButtonHtml() {
+    return "<div class=\"df-settings-health-section\" style=\"margin:12px 0;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🩺 تشخيص صحة النظام v4</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">فحص جاهزية محرك الصوت والتخزين والمزامنة</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfOpenHealthCheckModal && window.dfOpenHealthCheckModal()\" style=\"background:#2563eb;color:#ffffff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>فحص الآن</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  function dfOpenHealthCheckModal() {
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof document === 'undefined') return false;
+
+      dfCloseHealthCheckModal();
+
+      var modalContainer = document.createElement("div");
+      modalContainer.id = "df-health-check-modal-backdrop";
+      modalContainer.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;direction:rtl;";
+
+      var contentWrapper = document.createElement("div");
+      contentWrapper.style.cssText = "width:100%;max-width:380px;background:#18181b;border:1px solid #27272a;border-radius:12px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,0.5);";
+
+      var bodyHtml = "";
+      if (typeof window !== 'undefined' && typeof window.dfRenderSuiteDiagnosticModalHtml === 'function') {
+        bodyHtml = window.dfRenderSuiteDiagnosticModalHtml();
+      } else {
+        bodyHtml = "<div style=\"padding:16px;text-align:center;color:#f4f4f5;\">تشخيص النظام جاهز</div>";
+      }
+
+      contentWrapper.innerHTML = bodyHtml +
+        "<div style=\"padding:10px 16px;background:rgba(0,0,0,0.3);text-align:center;border-top:1px solid rgba(255,255,255,0.06);\">" +
+          "<button type=\"button\" onclick=\"window.dfCloseHealthCheckModal && window.dfCloseHealthCheckModal()\" style=\"background:rgba(255,255,255,0.1);color:#f4f4f5;border:none;border-radius:6px;padding:6px 20px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+            "<span>إغلاق</span>" +
+          "</button>" +
+        "</div>";
+
+      modalContainer.appendChild(contentWrapper);
+      document.body.appendChild(modalContainer);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfCloseHealthCheckModal() {
+    try {
+      if (typeof document === 'undefined') return;
+      var existing = document.getElementById("df-health-check-modal-backdrop");
+      if (existing && existing.parentNode) {
+        existing.parentNode.removeChild(existing);
+      }
+    } catch (_) {}
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfRenderHealthCheckSettingsButtonHtml = dfRenderHealthCheckSettingsButtonHtml;
+    window.dfOpenHealthCheckModal = dfOpenHealthCheckModal;
+    window.dfCloseHealthCheckModal = dfCloseHealthCheckModal;
+  }
+})();
