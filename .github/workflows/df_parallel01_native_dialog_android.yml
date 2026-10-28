@@ -126,7 +126,6 @@ jobs:
           disable-animations: false
           script: |
             bash tests/android_dialogs/run_native_dialog_device.sh
-            DF_N01_SERIAL=emulator-5554 DF_N01_DISPOSABLE=1 DF_N01_SOURCE_SHA="$(git rev-parse HEAD)" node tests/critical_room7/n01_android_ack_probe.cjs "$RUNNER_TEMP/df-dialog-evidence/n01-native-ack-results.json"
       - name: Preserve bounded host diagnostics after emulator failure
         if: failure()
         shell: bash

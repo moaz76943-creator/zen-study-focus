@@ -16,6 +16,11 @@ jobs:
     name: CodeQL JS security-extended — fail closed
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    env:
+      # PR-only diff ranges hid existing findings that the post-merge scan found.
+      # Supported by the pinned action's feature flag, not a query suppression:
+      # https://github.com/github/codeql-action/blob/6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee/src/feature-flags.ts#L255-L259
+      CODEQL_ACTION_DIFF_INFORMED_QUERIES: 'false'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -29,8 +34,8 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
           echo "CODEQL_SOURCE_SHA=$EXPECTED_SHA"
-      - name: CodeQL SARIF parser RED/GREEN regressions
-        run: node --test tests/security_recovery/track13_codeql_sarif.test.cjs
+      - name: CodeQL parser and secure identity regressions
+        run: node --test tests/security_recovery/track13_codeql_sarif.test.cjs tests/security_recovery/secure_identity.test.cjs
       - uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee
         id: init
         with:
