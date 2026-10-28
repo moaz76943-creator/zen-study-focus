@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 from pathlib import Path
 
 SHA = re.compile(r"[a-f0-9]{40}\Z")
@@ -11,9 +12,58 @@ MAX_BYTES = 32 * 1024 * 1024
 SAFE_CODEQL_RULE = re.compile(r"js/[a-z0-9-]{1,64}(?:/[a-z0-9-]{1,64}){0,3}\Z")
 MAX_RULE_GROUPS = 24
 MAX_EVIDENCE = 16
+SOURCE_SUFFIXES = {'.js', '.cjs', '.mjs', '.java', '.py', '.sh', '.html', '.yml', '.yaml'}
+EVIDENCE_SINK = ('js/http-to-file-access', 'tests/android_e2e_recovery/private_evidence.cjs', 68)
+ADJUDICATION_ID = 'DF-CODEQL-QA-EVIDENCE-001'
 
 
-def summarize(directory: Path, sha: str) -> dict:
+def executable_source_digest(root: Path) -> str:
+    """Bind adjudication to every tracked executable source, including new callers."""
+    names = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-z'], timeout=10)
+    digest = hashlib.sha256()
+    for raw in sorted(set(names.split(b'\0')) - {b''}):
+        relative = raw.decode('utf-8')
+        if Path(relative).suffix.lower() not in SOURCE_SUFFIXES:
+            continue
+        path = root / relative
+        if path.is_symlink() or not path.is_file() or path.stat().st_size > MAX_BYTES:
+            raise ValueError('Invalid tracked source')
+        # Include both names and full bytes: added, renamed, deleted or edited
+        # executable source revokes the review, even outside the helper file.
+        digest.update(raw + b'\0' + hashlib.sha256(path.read_bytes()).digest())
+    return digest.hexdigest()
+
+
+def approved_evidence_sink(root: Path):
+    """One explicit adjudication. Never infer approval or update its snapshot."""
+    try:
+        registry = root / 'tools/security/codeql_adjudications.json'
+        if registry.is_symlink() or registry.stat().st_size > 16384:
+            return None
+        policy = json.loads(registry.read_text(encoding='utf-8'))
+        entries = policy.get('adjudications')
+        if policy.get('schemaVersion') != 1 or not isinstance(entries, list) or len(entries) != 1:
+            return None
+        entry = entries[0]
+        if (entry.get('id') != ADJUDICATION_ID or entry.get('verdict') != 'FALSE_POSITIVE_WITH_EVIDENCE'
+                or entry.get('reviewStatus') != 'APPROVED'
+                or not isinstance(entry.get('reviewedBy'), str) or not entry['reviewedBy'].strip()
+                or (entry.get('rule'), entry.get('path'), entry.get('line')) != EVIDENCE_SINK):
+            return None
+        source_hash, tree_hash = entry.get('sourceSha256'), entry.get('executableSourceSha256')
+        if not all(isinstance(value, str) and re.fullmatch(r'[a-f0-9]{64}', value) for value in (source_hash, tree_hash)):
+            return None
+        source = root / EVIDENCE_SINK[1]
+        if source.is_symlink() or hashlib.sha256(source.read_bytes()).hexdigest() != source_hash:
+            return None
+        if executable_source_digest(root) != tree_hash:
+            return None
+        return {key: entry[key] for key in ('id', 'verdict', 'sourceSha256', 'executableSourceSha256')}
+    except (OSError, ValueError, UnicodeError, subprocess.SubprocessError, AttributeError, TypeError):
+        return None
+
+
+def summarize(directory: Path, sha: str, source_root=None) -> dict:
     is_sha = bool(SHA.fullmatch(sha))
     output = {"sha": sha if is_sha else "", "status": "BLOCKED", "reason": "INVALID_SHA" if not is_sha else "SARIF_UNAVAILABLE", "findings": None}
     if not is_sha:
@@ -27,6 +77,8 @@ def summarize(directory: Path, sha: str) -> dict:
         unclassified_reasons = {}
         unclassified_structure = {}
         evidence = []
+        adjudication = approved_evidence_sink(Path(source_root) if source_root is not None else Path(__file__).resolve().parents[2])
+        adjudicable = 0
         for path in paths:
             if path.stat().st_size > MAX_BYTES:
                 output["reason"] = "SARIF_INVALID"
@@ -97,6 +149,18 @@ def summarize(directory: Path, sha: str) -> dict:
                     if rule not in rule_counts and len(rule_counts) >= MAX_RULE_GROUPS:
                         rule = "unknown"
                     rule_counts[rule] = rule_counts.get(rule, 0) + 1
+                    locations = item.get('locations')
+                    if adjudication and isinstance(locations, list) and len(locations) == 1:
+                        physical = locations[0].get('physicalLocation', {}) if isinstance(locations[0], dict) else {}
+                        if isinstance(physical, dict):
+                            artifact, region = physical.get('artifactLocation', {}), physical.get('region', {})
+                            if (isinstance(artifact, dict) and isinstance(region, dict)
+                                    and artifact.get('uriBaseId') in (None, '%SRCROOT%')
+                                    and type(region.get('startLine')) is int
+                                    and type(region.get('endLine', EVIDENCE_SINK[2])) is int
+                                    and (raw_rule, artifact.get('uri'), region.get('startLine')) == EVIDENCE_SINK
+                                    and region.get('endLine', EVIDENCE_SINK[2]) == EVIDENCE_SINK[2]):
+                                adjudicable += 1
                     if len(evidence) < MAX_EVIDENCE:
                         locations = item.get("locations")
                         location = locations[0] if isinstance(locations, list) and locations and isinstance(locations[0], dict) else {}
@@ -114,7 +178,15 @@ def summarize(directory: Path, sha: str) -> dict:
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError, RecursionError):
         output["reason"] = "SARIF_INVALID"
         return output
-    output.update(findings=count, status="PASS" if count == 0 else "FAIL", reason="ZERO_FINDINGS" if count == 0 else "CODEQL_FINDINGS", rule_counts=dict(sorted(rule_counts.items())), unclassified_reasons=dict(sorted(unclassified_reasons.items())), unclassified_structure=dict(sorted(unclassified_structure.items())), evidence=evidence)
+    # Duplicated/multiple flows at the sink require fresh review. Preserve the
+    # scanner's raw total, its evidence and rule counts even when adjudicated.
+    false_positives = 1 if adjudicable == 1 else 0
+    unresolved = count - false_positives
+    output.update(findings=count, false_positives=false_positives, unresolved=unresolved,
+                  adjudications=[adjudication] if false_positives else [],
+                  status="PASS" if unresolved == 0 else "FAIL",
+                  reason="ZERO_FINDINGS" if count == 0 else "REVIEWED_FALSE_POSITIVE" if unresolved == 0 else "CODEQL_FINDINGS",
+                  rule_counts=dict(sorted(rule_counts.items())), unclassified_reasons=dict(sorted(unclassified_reasons.items())), unclassified_structure=dict(sorted(unclassified_structure.items())), evidence=evidence)
     return output
 
 

@@ -467,6 +467,10 @@ function saveFortressData(key, obj) {
     localStorage.setItem(mirrorKey, packet);
     if (localStorage.getItem(key) !== packet || localStorage.getItem(mirrorKey) !== packet)
       throw new Error('STORAGE_WRITE_NOT_VERIFIED');
+    // Android requires a durable six-family receipt, separate from #402 timer.
+    if (['zen_fortress_cfg_v21','zen_fortress_tasks_v21','zen_fortress_notes_v21'].includes(key)
+        && window.ZenNative && (!window.DF22Preflight || !window.DF22Preflight.nativeAcknowledge(localStorage)))
+      throw new Error('NATIVE_DURABLE_ACK_FAILED');
     return true;
   } catch (writeError) {
     // A failed mirror write must never leave an unverified new primary as the preferred copy.
@@ -2080,45 +2084,53 @@ function verifyAndRestoreBackupCode(codeStr) {
     if (!confirmSensitiveAction('restore')) return false;
     // Build and verify every storage packet before replacing any saved record.
     // If a write fails (e.g. storage quota), roll back all six original keys.
-    const imports = [
-      ['zen_fortress_cfg_v21', verified.cfg],
-      ['zen_fortress_tasks_v21', verified.tasksList],
-      ['zen_fortress_notes_v21', verified.notesList]
-    ];
-    const updates = [];
-    for (const [key, value] of imports) {
-      const payload = JSON.stringify(value);
-      updates.push([key, JSON.stringify({payload, sig:computeHash(payload), ts:Date.now()})]);
-    }
-    const previous = new Map();
-    for (const [key] of updates) {
-      previous.set(key, localStorage.getItem(key));
-      previous.set(key + '_mirror', localStorage.getItem(key + '_mirror'));
-    }
-    try {
-      for (const [key, packet] of updates) {
-        localStorage.setItem(key, packet);
-        localStorage.setItem(key + '_mirror', packet);
+    if (window.DF22Integration) {
+      // The live app shares the same crash-recoverable transaction as Notes/Tasks.
+      const before = window.DF22Integration.getSnapshot();
+      if (window.DF22Integration.write(before, verified) !== true) throw new Error('RESTORE_NOT_VERIFIED');
+    } else {
+      const imports = [
+        ['zen_fortress_cfg_v21', verified.cfg],
+        ['zen_fortress_tasks_v21', verified.tasksList],
+        ['zen_fortress_notes_v21', verified.notesList]
+      ];
+      const updates = [];
+      for (const [key, value] of imports) {
+        const payload = JSON.stringify(value);
+        updates.push([key, JSON.stringify({payload, sig:computeHash(payload), ts:Date.now()})]);
       }
-      for (const [key, packet] of updates) {
-        if (localStorage.getItem(key) !== packet || localStorage.getItem(key + '_mirror') !== packet) {
-          throw new Error('Storage verification failed');
+      const previous = new Map();
+      for (const [key] of updates) {
+        previous.set(key, localStorage.getItem(key));
+        previous.set(key + '_mirror', localStorage.getItem(key + '_mirror'));
+      }
+      try {
+        for (const [key, packet] of updates) {
+          localStorage.setItem(key, packet);
+          localStorage.setItem(key + '_mirror', packet);
         }
-      }
-    } catch (storageError) {
-      for (const [key, oldValue] of previous) {
-        try {
-          if (oldValue === null) localStorage.removeItem(key);
-          else localStorage.setItem(key, oldValue);
-        } catch (rollbackError) {
-          console.error('Backup rollback failed:', key, rollbackError);
+        for (const [key, packet] of updates) {
+          if (localStorage.getItem(key) !== packet || localStorage.getItem(key + '_mirror') !== packet) {
+            throw new Error('Storage verification failed');
+          }
         }
+        if (typeof window !== 'undefined' && window.ZenNative && (!window.DF22Preflight || !window.DF22Preflight.nativeAcknowledge(localStorage)))
+          throw new Error('NATIVE_DURABLE_ACK_FAILED');
+      } catch (storageError) {
+        for (const [key, oldValue] of previous) {
+          try {
+            if (oldValue === null) localStorage.removeItem(key);
+            else localStorage.setItem(key, oldValue);
+          } catch (rollbackError) {
+            console.error('Backup rollback failed:', key, rollbackError);
+          }
+        }
+        throw storageError;
       }
-      throw storageError;
+      cfg = verified.cfg;
+      tasksList = verified.tasksList;
+      notesList = verified.notesList;
     }
-    cfg = verified.cfg;
-    tasksList = verified.tasksList;
-    notesList = verified.notesList;
     syncDailyRollover();
     applyLanguage(cfg.lang);
     closeModal('cloudBackupModal');
@@ -2348,7 +2360,9 @@ function startQuickSportRest(secs) {
   // One confirmed durable transition. Do not Pause/Reset/save intermediate
   // states: those could irrevocably discard focus time on failed storage.
   const startedAt=Date.now();
-  const nextId=String(startedAt)+'-'+String(Math.round(Math.random()*1e9));
+  let nextId;
+  try{nextId=String(startedAt)+'-'+Array.from(globalThis.crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16).padStart(8,'0')).join('');}
+  catch(_){showToast(L().saveFailed || 'Could not create session. Try again.');return false;}
   const next={
     total:seconds,left:seconds,running:true,endAt:startedAt+seconds*1000,
     mode:'short',label:'',sessionId:nextId,taskId:null,
@@ -2856,6 +2870,11 @@ function toggleTimerPlay() {
     }
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
   } else {
+    let nextSessionId=timerSessionId;
+    if(!nextSessionId){
+      try{nextSessionId=String(Date.now())+'-'+Array.from(globalThis.crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16).padStart(8,'0')).join('');}
+      catch(_){showToast(L().saveFailed || 'Could not create session. Try again.');return false;}
+    }
     try {
       if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
@@ -2864,7 +2883,7 @@ function toggleTimerPlay() {
     const oldSessionId = timerSessionId, oldTaskId = focusSessionTaskId;
     const oldResumeMs = timerResumeMs, oldTargetTime = timerTargetTime;
     if (!timerSessionId) {
-      timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
+      timerSessionId = nextSessionId;
       const linked = typeof focusWorkflowGetLinkedTask === 'function' ? focusWorkflowGetLinkedTask() : null;
       focusSessionTaskId = quickTraining?.active && Number.isSafeInteger(quickTraining.taskId)
         ? quickTraining.taskId : (linked?.id ?? null);
@@ -4726,7 +4745,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       var parts = clean.split(/\s*(?:,|;|\t|\s-\s|:|\|)\s*/);
       if (parts.length >= 2 && parts[0] && parts[1]) {
         parsed.push({
-          id: 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          id: 'v_' + Date.now() + '_' + Array.from(globalThis.crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16).padStart(8,'0')).join(''),
           word: parts[0].replace(/^"|"$/g, '').trim(),
           meaning: parts.slice(1).join(' - ').replace(/^"|"$/g, '').trim(),
           color: defaultColor || 'purple',

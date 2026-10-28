@@ -8,7 +8,7 @@ const actual=app.slice(a,b);
 function fixture({running=true,training=true,consent=true,write='true'}={}){
   const events=[],writes=[],toasts=[];
   const button={innerHTML:'original'},title={textContent:'Old focus'};
-  const context={
+  const context={crypto:require('node:crypto').webcrypto,
     TIMER_STORAGE_KEY:'zen_fortress_active_timer_v21',
     quickTraining: training?{active:true,phase:'work'}:null,
     timerRunning:running,timerInterval:77,timerTotal:1500,timerLeft:1200,
@@ -75,4 +75,22 @@ test('invalid sport rest seconds are non-destructive',()=>{
  const f=fixture();const before=f.state();
  assert.equal(f.context.startQuickSportRest(NaN),false);
  assert.equal(f.state(),before);assert.equal(f.writes.length,0);
+});
+
+test('new rest IDs retain timestamp prefix and remain unique with a fixed clock',()=>{
+ const f=fixture();const ids=new Set();
+ f.context.Math=Object.create(Math);f.context.Math.random=()=>{throw Error('Weak randomness forbidden');};
+ for(let n=0;n<100;n++){
+  assert.equal(f.context.startQuickSportRest(45),true);
+  assert.match(f.context.timerSessionId,/^2000000-[0-9a-f]{32}$/);
+  ids.add(f.context.timerSessionId);
+ }
+ assert.equal(ids.size,100);
+});
+
+test('missing secure randomness refuses rest before any session or storage mutation',()=>{
+ const f=fixture();const before=f.state();f.context.crypto={};
+ assert.equal(f.context.startQuickSportRest(45),false);
+ assert.equal(f.state(),before);assert.equal(f.writes.length,0);
+ assert.deepEqual(f.events,['confirm']);assert.equal(f.toasts.length,1);
 });

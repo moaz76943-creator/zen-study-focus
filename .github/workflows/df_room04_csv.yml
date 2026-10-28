@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   real-android:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 55
     strategy:
       fail-fast: false
@@ -38,6 +38,13 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
+      - name: Install matching Android compile SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager_bin="$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f -print -quit)"
+          test -x "$sdkmanager_bin"
+          "$sdkmanager_bin" 'platforms;android-36' 'build-tools;36.0.0'
       - name: Validate test-only code
         run: |
           node --check tests/analytics_csv/real_android_saf.cjs
@@ -94,18 +101,40 @@ jobs:
           test -c /dev/kvm
           sudo chown "$(id -u):$(id -g)" /dev/kvm
           sudo chmod u+rw /dev/kvm
+      - name: Prepare disposable device and exact artifact guard
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/df-room04-disposable.sh" <<'GUARD'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          # Guard before the harness installs the QA APK or changes network state.
+          if [ "$(timeout 15s adb shell getprop ro.kernel.qemu | tr -d '\r')" != 1 ]; then
+            echo 'DISPOSABLE_EMULATOR_REQUIRED; TEST_RESULT=BLOCKED; RELEASE_APPROVED=NO' >&2
+            exit 2
+          fi
+          api="$(timeout 15s adb shell getprop ro.build.version.sdk | tr -d '\r')"
+          test "$api" = '${{ matrix.api }}'
+          printf '%s\n' "$api" > "$DF09_NATIVE_EVIDENCE/ANDROID_API.txt"
+          test "$(git rev-parse HEAD)" = '${{ github.event.pull_request.head.sha || github.sha }}'
+          test "$(cat "$DF09_NATIVE_EVIDENCE/SOURCE_SHA.txt")" = "$(git rev-parse HEAD)"
+          sha256sum --check "$DF09_NATIVE_EVIDENCE/APK_SHA256.txt"
+          bash tests/analytics_csv/run_android.sh
+          GUARD
+          bash -n "$RUNNER_TEMP/df-room04-disposable.sh"
       - name: Real Android WebView API matrix
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api }}
           target: google_apis
           arch: x86_64
-          profile: pixel_6
+          profile: pixel_2
           emulator-boot-timeout: 600
           ram-size: '2048M'
           heap-size: '256M'
+          cores: 2
           disable-animations: false
-          script: bash tests/analytics_csv/run_android.sh
+          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240
+          script: bash "$RUNNER_TEMP/df-room04-disposable.sh"
       - name: Preserve evidence
         uses: actions/upload-artifact@v4
         if: always()

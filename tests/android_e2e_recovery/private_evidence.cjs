@@ -59,7 +59,18 @@ function createEvidenceDirectory(requested,prefix='df-qa-evidence-'){
    let file;
    try{
     file=fs.openSync(temporary,C.O_WRONLY|C.O_CREAT|C.O_EXCL|C.O_NOFOLLOW,0o600);
-    fs.writeFileSync(file,data);fs.fsyncSync(file);fs.closeSync(file);file=undefined;
+    // writeSync accepts only an already-open descriptor. Keeping the path out
+    // of this API also makes the pinned-directory guarantee explicit to SAST.
+    const bytes=typeof data==='string'?Buffer.from(data,'utf8'):
+     ArrayBuffer.isView(data)?Buffer.from(data.buffer,data.byteOffset,data.byteLength):null;
+    if(!bytes)throw TypeError('Evidence data must be a string or byte view');
+    for(let offset=0;offset<bytes.length;){
+     const written=fs.writeSync(file,bytes,offset,bytes.length-offset,null);
+     if(!Number.isInteger(written)||written<=0||written>bytes.length-offset)
+      throw Error('Evidence write stalled');
+     offset+=written;
+    }
+    fs.fsyncSync(file);fs.closeSync(file);file=undefined;
     unchanged();rejectUnsafeTarget(target);
     // rename replaces the directory entry, never follows a target symlink.
     fs.renameSync(temporary,target);
