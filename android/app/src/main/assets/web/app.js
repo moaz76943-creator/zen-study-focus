@@ -7405,3 +7405,38 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M249_VOCAB_CARD_WORD_COUNT_CHAR_LIMIT_AND_CODE69_V1 === */
+(function() {
+  if (window.__M249_ADAPTIVE_TYPO__) return;
+  window.__M249_ADAPTIVE_TYPO__ = true;
+
+  window.dfGetAdaptiveFontSize = function(text) {
+    var len = String(text || '').trim().length;
+    if (len >= 25) return '13px';
+    if (len >= 16) return '16px';
+    return '20px';
+  };
+
+  window.dfApplyAdaptiveTypographyToCards = function() {
+    if (typeof document === 'undefined') return;
+    var wordElems = document.querySelectorAll('.df-vocab-card-word, [data-vocab-word], .df-quiz-card-word');
+    wordElems.forEach(function(el) {
+      var txt = el.textContent || '';
+      el.style.fontSize = window.dfGetAdaptiveFontSize(txt);
+      el.style.wordBreak = 'break-word';
+      el.style.overflowWrap = 'break-word';
+    });
+  };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', window.dfApplyAdaptiveTypographyToCards);
+    } else {
+      setTimeout(window.dfApplyAdaptiveTypographyToCards, 350);
+    }
+    if (typeof setInterval !== 'undefined') {
+      setInterval(window.dfApplyAdaptiveTypographyToCards, 2500);
+    }
+  }
+})();
+
