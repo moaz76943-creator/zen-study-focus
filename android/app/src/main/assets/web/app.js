@@ -7060,3 +7060,45 @@ window.FlashQuizEngine = FlashQuizEngine;
   };
 })();
 
+/* === M240_VOCAB_CARD_TTS_PITCH_STABILITY_AND_CODE60_V1 === */
+(function() {
+  if (window.__M240_PITCH_STABILITY__) return;
+  window.__M240_PITCH_STABILITY__ = true;
+
+  var currentPitch = 1.0;
+  var PITCH_KEY = 'df_vocab_tts_pitch';
+  try {
+    var saved = parseFloat(localStorage.getItem(PITCH_KEY));
+    if (saved >= 0.8 && saved <= 1.2) currentPitch = saved;
+  } catch(e) {}
+
+  window.dfSetVocabTtsPitch = function(p) {
+    var val = parseFloat(p);
+    if (isNaN(val)) val = 1.0;
+    currentPitch = Math.max(0.85, Math.min(1.15, val));
+    try {
+      localStorage.setItem(PITCH_KEY, String(currentPitch));
+    } catch(e) {}
+    return currentPitch;
+  };
+
+  window.dfGetVocabTtsPitch = function() {
+    return currentPitch;
+  };
+
+  if (typeof window.dfSafeSpeakUtterance === 'function') {
+    var origSafeSpeak = window.dfSafeSpeakUtterance;
+    window.dfSafeSpeakUtterance = function(text, lang, rate, onDone) {
+      if (typeof window.SpeechSynthesisUtterance !== 'undefined') {
+        var origUtterance = window.SpeechSynthesisUtterance;
+        window.SpeechSynthesisUtterance = function(t) {
+          var instance = new origUtterance(t);
+          instance.pitch = currentPitch;
+          return instance;
+        };
+      }
+      return origSafeSpeak(text, lang, rate, onDone);
+    };
+  }
+})();
+
