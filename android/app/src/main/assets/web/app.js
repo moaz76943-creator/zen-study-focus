@@ -10473,3 +10473,144 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfFadeOutAndStopNode = dfFadeOutAndStopNode;
   }
 })();
+
+/* === M283_TIBETAN_WIND_CHIMES_GENERATOR_AND_CODE103_V1 === */
+(function() {
+  'use strict';
+
+  var _windChimeTimer = null;
+
+  function dfIsWindChimesEnabled() {
+    try {
+      return localStorage.getItem("df_wind_chimes_enabled_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfToggleWindChimes(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsWindChimesEnabled();
+    try {
+      localStorage.setItem("df_wind_chimes_enabled_v1", String(state));
+    } catch (_) {}
+
+    if (state) {
+      dfStartWindChimesScheduler();
+    } else {
+      dfStopWindChimesScheduler();
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    return state;
+  }
+
+  function dfSynthesizeSingleChime(ctx, freq, delaySec, gainVal) {
+    try {
+      var startTime = ctx.currentTime + delaySec;
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(gainVal, startTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 2.2);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 2.25);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfSynthesizeTibetanWindChimes() {
+    try {
+      if (typeof window === "undefined") return false;
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
+      var ctx = new AudioCtx();
+
+      var strikes = [
+        { freq: 528, delay: 0.0, gain: 0.12 },
+        { freq: 660, delay: 0.18, gain: 0.10 },
+        { freq: 792, delay: 0.42, gain: 0.08 },
+        { freq: 528, delay: 0.75, gain: 0.09 }
+      ];
+
+      for (var i = 0; i < strikes.length; i++) {
+        var s = strikes[i];
+        dfSynthesizeSingleChime(ctx, s.freq, s.delay, s.gain);
+      }
+
+      try {
+        if (typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(15);
+        }
+      } catch (_) {}
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfStartWindChimesScheduler() {
+    dfStopWindChimesScheduler();
+    if (!dfIsWindChimesEnabled()) return false;
+
+    var intervalMs = (5 + Math.random() * 3) * 60 * 1000;
+    _windChimeTimer = setTimeout(function() {
+      dfSynthesizeTibetanWindChimes();
+      dfStartWindChimesScheduler();
+    }, intervalMs);
+
+    return true;
+  }
+
+  function dfStopWindChimesScheduler() {
+    if (_windChimeTimer) {
+      clearTimeout(_windChimeTimer);
+      _windChimeTimer = null;
+    }
+  }
+
+  function dfRenderWindChimesSettingsHtml() {
+    var isEnabled = dfIsWindChimesEnabled();
+    var statusText = isEnabled ? "مفعّل" : "معطّل";
+    var btnBg = isEnabled ? "#10b981" : "rgba(255,255,255,0.1)";
+
+    return "<div class=\"df-settings-chimes-section\" style=\"margin:12px 0;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🔔 رنين أجراس الرياح التبتية</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">أجراس هوائية ناعمة متباعدة لتعزيز السكينة والتركيز</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleWindChimes && window.dfToggleWindChimes()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+      "<button type=\"button\" onclick=\"window.dfSynthesizeTibetanWindChimes && window.dfSynthesizeTibetanWindChimes()\" style=\"background:none;border:none;color:#60a5fa;font-size:11px;cursor:pointer;padding:0;text-decoration:underline;\">" +
+        "استمع لتجربة الرنين الآن" +
+      "</button>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsWindChimesEnabled = dfIsWindChimesEnabled;
+    window.dfToggleWindChimes = dfToggleWindChimes;
+    window.dfSynthesizeTibetanWindChimes = dfSynthesizeTibetanWindChimes;
+    window.dfStartWindChimesScheduler = dfStartWindChimesScheduler;
+    window.dfStopWindChimesScheduler = dfStopWindChimesScheduler;
+    window.dfRenderWindChimesSettingsHtml = dfRenderWindChimesSettingsHtml;
+  }
+})();
