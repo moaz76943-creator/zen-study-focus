@@ -42,6 +42,9 @@ def evidence_source_scope(root: Path) -> list[str]:
     is_guard = lambda name: '.test.' in name or name == 'tools/security/track13_codeql_sarif_report.py'
     scope = {name for name, text in sources.items() if marker.search(text) and not is_guard(name)}
     scope.add(sink)
+    # Local actions can route artifacts or execute downstream consumers. Include
+    # their bodies before closure so action scripts/dependencies are followed.
+    scope.update(name for name in sources if name.startswith('.github/actions/'))
     # QA imports/launchers and output readers form a conservative bidirectional
     # graph. Scan all source files for new edges on every invocation. Literal
     # basename matching intentionally over-includes ambiguous QA references.
