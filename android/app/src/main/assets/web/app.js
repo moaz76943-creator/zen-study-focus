@@ -1246,7 +1246,7 @@ const LANG_CATALOG = [
     "code": "yi",
     "iso": "YI",
     "enName": "Yiddish",
-    "nativeName": "ייִדיש",
+    "nativeName": "Yiddish",
     "dir": "rtl",
     "countries": "global diaspora"
   },
@@ -13009,3 +13009,151 @@ window.FlashQuizEngine = FlashQuizEngine;
     }
   } catch (_) {}
 })();
+
+// ============================================================================
+// MISSION #305: External Physical Keyboard Navigation Suite (v4.3.5)
+// ============================================================================
+function dfHandlePhysicalKeyboardShortcut(e) {
+  if (!e || !e.key) return { handled: false, action: "none" };
+  const target = e.target || {};
+  const tag = (target.tagName || "").toUpperCase();
+  if (tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable) {
+    return { handled: false, action: "ignored_input_field" };
+  }
+
+  const key = e.key;
+  if (key === " " || e.code === "Space") {
+    if (typeof e.preventDefault === "function") e.preventDefault();
+    if (typeof window !== "undefined" && typeof window.dfToggleTimer === "function") {
+      window.dfToggleTimer();
+    }
+    return { handled: true, action: "toggle_timer" };
+  }
+  if (key === "Escape") {
+    if (typeof e.preventDefault === "function") e.preventDefault();
+    if (typeof window !== "undefined" && typeof window.dfCloseAllModals === "function") {
+      window.dfCloseAllModals();
+    }
+    return { handled: true, action: "close_modal" };
+  }
+  if (key === "m" || key === "M") {
+    if (typeof e.preventDefault === "function") e.preventDefault();
+    if (typeof window !== "undefined" && typeof window.dfToggleMute === "function") {
+      window.dfToggleMute();
+    }
+    return { handled: true, action: "toggle_mute" };
+  }
+  if (key === "f" || key === "F") {
+    if (typeof e.preventDefault === "function") e.preventDefault();
+    if (typeof window !== "undefined" && typeof window.dfToggleZenFullscreen === "function") {
+      window.dfToggleZenFullscreen();
+    }
+    return { handled: true, action: "toggle_fullscreen" };
+  }
+  if (key >= "1" && key <= "7") {
+    if (typeof e.preventDefault === "function") e.preventDefault();
+    const tabIndex = parseInt(key, 10);
+    if (typeof window !== "undefined" && typeof window.dfSwitchTabByIndex === "function") {
+      window.dfSwitchTabByIndex(tabIndex);
+    }
+    return { handled: true, action: "switch_tab_" + tabIndex };
+  }
+
+  return { handled: false, action: "unmapped_key" };
+}
+
+if (typeof window !== "undefined") {
+  window.dfHandlePhysicalKeyboardShortcut = dfHandlePhysicalKeyboardShortcut;
+  if (!window.__dfKeyboardShortcutsInitialized) {
+    window.__dfKeyboardShortcutsInitialized = true;
+    if (typeof window.addEventListener === "function") {
+      window.addEventListener("keydown", function(event) {
+        dfHandlePhysicalKeyboardShortcut(event);
+      });
+    }
+  }
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfHandlePhysicalKeyboardShortcut = dfHandlePhysicalKeyboardShortcut;
+}
+
+// ============================================================================
+// MISSION #306: Local Storage Vault Integrity Self-Validator & Corruption Auto-Recovery (v4.3.6)
+// ============================================================================
+function dfVerifyVaultStorageIntegrity(targetStorage) {
+  const schemaMap = {
+    "df_v21_settings": { type: "object", defaultVal: {} },
+    "df_v21_vocab_cards": { type: "array", defaultVal: [] },
+    "df_v21_history": { type: "array", defaultVal: [] },
+    "df_v21_tasks": { type: "array", defaultVal: [] },
+    "df_v21_decks": { type: "array", defaultVal: [] },
+    "df_v21_personal_records": { type: "object", defaultVal: {} }
+  };
+
+  const report = {
+    status: "HEALTHY",
+    checkedKeys: 0,
+    repairedKeys: [],
+    corruptedKeys: [],
+    timestamp: Date.now()
+  };
+
+  const storage = targetStorage || (typeof localStorage !== "undefined" ? localStorage : null);
+  if (!storage) {
+    report.status = "SKIPPED_NO_STORAGE";
+    return report;
+  }
+
+  for (const [key, schema] of Object.entries(schemaMap)) {
+    report.checkedKeys++;
+    const raw = storage.getItem(key);
+    if (raw === null || raw === undefined) {
+      continue;
+    }
+
+    let parsed;
+    let corrupted = false;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      corrupted = true;
+    }
+
+    if (!corrupted) {
+      if (schema.type === "array" && !Array.isArray(parsed)) {
+        corrupted = true;
+      } else if (schema.type === "object" && (parsed === null || typeof parsed !== "object" || Array.isArray(parsed))) {
+        corrupted = true;
+      }
+    }
+
+    if (corrupted) {
+      report.corruptedKeys.push(key);
+      try {
+        storage.setItem(key + "_corrupt_bak_" + Date.now(), raw);
+        storage.setItem(key, JSON.stringify(schema.defaultVal));
+        report.repairedKeys.push(key);
+      } catch (err) {
+        report.status = "ERROR";
+      }
+    }
+  }
+
+  if (report.repairedKeys.length > 0) {
+    report.status = "REPAIRED";
+  }
+
+  return report;
+}
+
+if (typeof window !== "undefined") {
+  window.dfVerifyVaultStorageIntegrity = dfVerifyVaultStorageIntegrity;
+  try {
+    dfVerifyVaultStorageIntegrity();
+  } catch (e) {
+    console.warn("Vault integrity check non-fatal notice:", e);
+  }
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfVerifyVaultStorageIntegrity = dfVerifyVaultStorageIntegrity;
+}
