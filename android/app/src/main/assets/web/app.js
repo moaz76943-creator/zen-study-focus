@@ -6486,3 +6486,47 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M229_VOCAB_QUIZ_AUTO_FOCUS_SHORTCUTS_AND_CODE49_V1 === */
+(function() {
+  if (window.__M229_QUIZ_FOCUS_TRAP__) return;
+  window.__M229_QUIZ_FOCUS_TRAP__ = true;
+
+  window.dfFocusQuizModalOnOpen = function() {
+    if (typeof document === 'undefined') return false;
+    try {
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        var tag = (document.activeElement.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || document.activeElement.isContentEditable) {
+          document.activeElement.blur();
+        }
+      }
+      var card = document.getElementById('df-flash-quiz-card') ||
+                 document.getElementById('df-flash-quiz-modal') ||
+                 document.querySelector('.df-flash-card-inner');
+      if (card && typeof card.focus === 'function') {
+        card.setAttribute('tabindex', '-1');
+        card.focus();
+      }
+      return true;
+    } catch(e) {
+      return false;
+    }
+  };
+
+  if (typeof document !== 'undefined' && typeof MutationObserver !== 'undefined') {
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.target && m.target.id === 'df-flash-quiz-modal') {
+          if (m.target.style && m.target.style.display !== 'none') {
+            setTimeout(window.dfFocusQuizModalOnOpen, 50);
+          }
+        }
+      });
+    });
+    var modalElem = document.getElementById('df-flash-quiz-modal');
+    if (modalElem) {
+      observer.observe(modalElem, { attributes: true, attributeFilter: ['style', 'class'] });
+    }
+  }
+})();
+
