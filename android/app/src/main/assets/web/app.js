@@ -7014,3 +7014,29 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M238_VOCAB_CARD_PLAY_PAUSE_AUDIO_INDICATOR_AND_CODE58_V1 === */
+(function() {
+  if (window.__M238_AUDIO_INDICATOR__) return;
+  window.__M238_AUDIO_INDICATOR__ = true;
+
+  window.dfSetCardAudioPlayingState = function(itemId, isPlaying) {
+    if (typeof document === 'undefined') return false;
+    var btn = document.querySelector('[data-vocab-audio-btn="' + itemId + '"]') ||
+              document.querySelector('[data-audio-id="' + itemId + '"]');
+    if (!btn) return false;
+
+    if (isPlaying) {
+      btn.setAttribute('data-audio-playing', 'true');
+      btn.style.color = '#38bdf8';
+      btn.style.transform = 'scale(1.15)';
+      btn.style.filter = 'drop-shadow(0 0 6px rgba(56,189,248,0.6))';
+    } else {
+      btn.removeAttribute('data-audio-playing');
+      btn.style.color = '';
+      btn.style.transform = '';
+      btn.style.filter = '';
+    }
+    return true;
+  };
+})();
+
