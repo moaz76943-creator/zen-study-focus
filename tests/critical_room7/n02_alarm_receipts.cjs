@@ -30,4 +30,21 @@ function resumedActivities(dump){
  assert.ok(rows.length,'TEST_INFRA: resumed Activity evidence unavailable');
  return rows.map(line=>line.trim());
 }
-module.exports={pendingTimerAlarms,resumedActivities};
+// Force-stop may remove posted notifications. Reopening a completed session
+// may retain a surviving key, but must never restore a removed key, issue a new
+// notification, or change the durable native delivery/generation receipt.
+function completedReopenReceipt(first, stoppedKeys, current){
+ assert.ok(Array.isArray(first.keys)&&Array.isArray(stoppedKeys)&&Array.isArray(current.keys),
+  'TEST_INFRA: completion notification receipts unavailable');
+ assert.ok(first.keys.length<=1&&stoppedKeys.length<=1&&current.keys.length<=1,
+  'Multiple native completion notifications on reopen');
+ assert.ok(stoppedKeys.every(key=>first.keys.includes(key)),
+  'Force-stop unexpectedly introduced a completion notification');
+ assert.ok(current.keys.every(key=>stoppedKeys.includes(key)),
+  'Second reopen delivered another completion notification');
+ assert.equal(current.native.active,false,'Second reopen reactivated completed timer');
+ for(const key of ['token','deadline','lastNotified'])
+  assert.equal(current.native[key],first.native[key],'Second reopen changed native '+key);
+ return {survivingNotifications:current.keys.length,native:{...current.native}};
+}
+module.exports={pendingTimerAlarms,resumedActivities,completedReopenReceipt};

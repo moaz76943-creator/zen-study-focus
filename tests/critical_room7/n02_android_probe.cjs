@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const cp = require('node:child_process');
 const assert = require('node:assert/strict');
-const {pendingTimerAlarms,resumedActivities}=require('./n02_alarm_receipts.cjs');
+const {pendingTimerAlarms,resumedActivities,completedReopenReceipt}=require('./n02_alarm_receipts.cjs');
 const PKG = 'com.zenstudy.focus';
 const PREFS = 'shared_prefs/zen_native_timer_alarm_v21.xml';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -262,12 +262,17 @@ async function main() {
         assert.equal(firstReceipt.active,false,'Reopen notified a still-active timer');
         assert.ok(firstReceipt.lastNotified>=before.deadline,'Reopen completion predates saved deadline');
       }
-      await disconnect();adb('shell','am','force-stop',PKG);await launch();assert.equal(await evaluate('cfg.sessions||0'),1,'Reopen credited session twice');
+      await disconnect();adb('shell','am','force-stop',PKG);
+      const stoppedKeys=notifications(2002);
+      await launch();assert.equal(await evaluate('cfg.sessions||0'),1,'Reopen credited session twice');
       assert.deepEqual(await creditReceipts(before.id), firstCredit, 'Second reopen changed persisted session credit');
-      const secondKeys=notifications(2002),secondReceipt=prefs();
-      assert.deepEqual(secondKeys,firstKeys,'Second reopen delivered another completion notification');
-      assert.equal(secondReceipt.lastNotified,firstReceipt.lastNotified,'Second reopen repeated native delivery');
-      return {token:before.token,osStopped:true,noDeliveryWhileStopped:true,expiredReopenCredits:1,completionAfterReopen:firstKeys.length,creditReceipts:firstCredit};
+      const firstDelivery={keys:firstKeys,native:firstReceipt};
+      completedReopenReceipt(firstDelivery,stoppedKeys,{keys:notifications(2002),native:prefs()});
+      await sleep(8000);
+      const secondDelivery=completedReopenReceipt(firstDelivery,stoppedKeys,{keys:notifications(2002),native:prefs()});
+      systemAlarmState(null,0,'completed-second-reopen');
+      assert.deepEqual(await creditReceipts(before.id),firstCredit,'Delayed second reopen changed persisted session credit');
+      return {token:before.token,osStopped:true,noDeliveryWhileStopped:true,expiredReopenCredits:1,completionAfterReopen:firstKeys.length,notificationsAfterSecondStop:stoppedKeys.length,secondDelivery,duplicateObservationMs:8000,creditReceipts:firstCredit};
     });
     await run('force-stop-future-reopen-rearms-and-delivers-once',async()=>{
       await fresh();const before=await startLive(30);await disconnect();adb('shell','am','force-stop',PKG);await launch();
