@@ -93,9 +93,9 @@ jobs:
           disable-animations: true
           # Match the successful N01 boot framebuffer. run_ci then sets density
           # 160 and each requested width; instrumentation verifies actual CSS px.
-          # API35 uses minimal software-renderer flags from the passing smoke suite.
+          # Use the software ANGLE path that kept API35 Notes navigation observable.
           # Keep API30's previously passing setup unchanged.
-          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -noaudio -no-boot-anim -gpu swiftshader_indirect' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240' }}
+          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -noaudio -no-boot-anim -gpu swangle -feature -Vulkan' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240' }}
           script: bash tests/tasks_core/df_final03_instrumentation/run_ci.sh
       - name: Final source and platform limits
         if: always()
