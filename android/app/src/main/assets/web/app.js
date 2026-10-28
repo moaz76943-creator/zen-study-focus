@@ -8832,3 +8832,82 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderQuizCompletionSummaryModalHtml = dfRenderQuizCompletionSummaryModalHtml;
   }
 })();
+
+/* === M266_QUIZ_SESSION_SHARE_AND_CODE86_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGenerateQuizSessionShareText(summary) {
+    if (!summary) return '';
+    var duration = summary.durationFormatted || '00:00';
+    var total = dfFormatWesternDigits(summary.totalReviewed !== undefined ? summary.totalReviewed : 0);
+    var mastered = dfFormatWesternDigits(summary.masteredCount !== undefined ? summary.masteredCount : 0);
+    var needsReview = dfFormatWesternDigits(summary.needsReviewCount !== undefined ? summary.needsReviewCount : 0);
+    var accuracy = (summary.accuracy && summary.accuracy.formatted) ? summary.accuracy.formatted : '0%';
+    var streak = (summary.streak && summary.streak.formatted) ? summary.streak.formatted : '0';
+
+    var lines = [
+      '📚 ملخص جلسة الاستذكار في Deep Focus:',
+      '⏱️ المدة: ' + duration,
+      '📖 الكلمات المراجعة: ' + total,
+      '✅ متقنة: ' + mastered,
+      '⚠️ للمراجعة: ' + needsReview,
+      '🎯 دقة الإجابة: ' + accuracy,
+      '🔥 سلسلة الاستمرار: ' + streak + ' أيام',
+      '#DeepFocus #Study #Focus'
+    ];
+    return lines.join('\n');
+  }
+
+  function dfShareOrCopyQuizSessionSummary(summary) {
+    var text = dfGenerateQuizSessionShareText(summary);
+    if (!text) {
+      return Promise.resolve({ success: false, reason: 'empty_summary' });
+    }
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
+        window.dfVocabHapticPulse(20);
+      }
+    } catch (_) {}
+
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      return navigator.share({
+        title: 'Deep Focus - ملخص جلسة الاستذكار',
+        text: text
+      }).then(function() {
+        return { success: true, method: 'share' };
+      }).catch(function() {
+        return dfFallbackCopyToClipboard(text);
+      });
+    }
+
+    return dfFallbackCopyToClipboard(text);
+  }
+
+  function dfFallbackCopyToClipboard(text) {
+    if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).then(function() {
+        return { success: true, method: 'clipboard' };
+      }).catch(function() {
+        return { success: false, method: 'clipboard_failed' };
+      });
+    }
+    return Promise.resolve({ success: false, method: 'unsupported' });
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfGenerateQuizSessionShareText = dfGenerateQuizSessionShareText;
+    window.dfShareOrCopyQuizSessionSummary = dfShareOrCopyQuizSessionSummary;
+  }
+})();
