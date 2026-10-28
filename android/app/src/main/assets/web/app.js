@@ -8480,3 +8480,100 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfClearAllVocabFilters = dfClearAllVocabFilters;
   }
 })();
+
+/* === M263_QUIZ_PREFILTERED_BY_RETENTION_TIER_AND_CODE83_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetQuizCardsForTier(tier) {
+    var allCards = [];
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfGetVocabBankList === 'function') {
+        allCards = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem('df_vocab_bank_v1');
+        allCards = raw ? JSON.parse(raw) : [];
+      }
+    } catch (_) {
+      allCards = [];
+    }
+
+    if (!Array.isArray(allCards)) allCards = [];
+
+    if (typeof window !== 'undefined' && typeof window.dfFilterVocabByRetentionTier === 'function') {
+      return window.dfFilterVocabByRetentionTier(allCards, tier);
+    }
+
+    return allCards;
+  }
+
+  function dfStartQuizWithRetentionTier(tier) {
+    var targetTier = tier || (typeof window !== 'undefined' && typeof window.dfGetActiveRetentionFilter === 'function' ? window.dfGetActiveRetentionFilter() : 'all');
+    var filteredCards = dfGetQuizCardsForTier(targetTier);
+
+    if (!filteredCards || filteredCards.length === 0) {
+      return {
+        success: false,
+        reason: 'empty_tier',
+        count: 0,
+        tier: targetTier
+      };
+    }
+
+    try {
+      if (typeof window !== 'undefined') {
+        window.dfCurrentQuizCards = filteredCards.slice();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfOpenFlashcardQuizModal === 'function') {
+        window.dfOpenFlashcardQuizModal(filteredCards);
+      }
+    } catch (_) {}
+
+    return {
+      success: true,
+      count: filteredCards.length,
+      tier: targetTier
+    };
+  }
+
+  function dfRenderStartQuizTierButtonHtml(tier) {
+    var targetTier = tier || (typeof window !== 'undefined' && typeof window.dfGetActiveRetentionFilter === 'function' ? window.dfGetActiveRetentionFilter() : 'all');
+    var cards = dfGetQuizCardsForTier(targetTier);
+    if (!cards || cards.length === 0) return '';
+
+    var countStr = dfFormatWesternDigits(cards.length);
+    var label = 'الكل';
+    if (typeof window !== 'undefined' && typeof window.dfGetActiveFilterDisplayLabel === 'function') {
+      label = window.dfGetActiveFilterDisplayLabel(targetTier) || 'الكل';
+    }
+
+    return '<button type="button" data-tier="' + targetTier + '" onclick="window.dfStartQuizWithRetentionTier && window.dfStartQuizWithRetentionTier(this.dataset.tier)" style="display:inline-flex;align-items:center;gap:6px;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:bold;cursor:pointer;margin-bottom:8px;direction:rtl;">' +
+      '<span>🎯 بدء اختبار ' + label + ' (' + countStr + ')</span>' +
+    '</button>';
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfGetQuizCardsForTier = dfGetQuizCardsForTier;
+    window.dfStartQuizWithRetentionTier = dfStartQuizWithRetentionTier;
+    window.dfRenderStartQuizTierButtonHtml = dfRenderStartQuizTierButtonHtml;
+  }
+})();
