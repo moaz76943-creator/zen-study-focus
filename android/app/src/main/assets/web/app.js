@@ -9427,3 +9427,94 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfOnPomodoroSessionCompleted = dfOnPomodoroSessionCompleted;
   }
 })();
+
+/* === M273_UNIFIED_STUDY_SYNERGY_POINTS_AND_CODE93_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfCalculateSynergyPoints(focusMinutes, wordsReviewed, streakDays) {
+    var mins = Math.max(0, Number(focusMinutes) || 0);
+    var words = Math.max(0, Number(wordsReviewed) || 0);
+    var streak = Math.max(0, Number(streakDays) || 0);
+
+    var basePoints = (mins * 2) + (words * 5);
+    var bonusPct = Math.min(50, Math.round(streak * 5));
+    var multiplier = 1 + (bonusPct / 100);
+    var totalPoints = Math.round(basePoints * multiplier);
+
+    return {
+      basePoints: basePoints,
+      bonusPercentage: bonusPct,
+      totalPoints: totalPoints,
+      totalPointsFormatted: dfFormatWesternDigits(totalPoints),
+      bonusFormatted: dfFormatWesternDigits(bonusPct) + "%"
+    };
+  }
+
+  function dfGetTodaySynergyData() {
+    var todayKey = new Date().toISOString().slice(0, 10);
+    var focusMins = 0;
+    try {
+      var rawMins = localStorage.getItem("df_focus_today_minutes_v1");
+      if (rawMins) {
+        var parsed = JSON.parse(rawMins);
+        if (parsed && parsed.date === todayKey) {
+          focusMins = Number(parsed.minutes) || 0;
+        }
+      }
+    } catch (_) {}
+
+    var wordsReviewed = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabTodayReviewedCount === "function") {
+        wordsReviewed = window.dfGetVocabTodayReviewedCount();
+      }
+    } catch (_) {}
+
+    var streak = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfCalculateVocabStudyStreak === "function") {
+        streak = window.dfCalculateVocabStudyStreak().currentStreak;
+      }
+    } catch (_) {}
+
+    var res = dfCalculateSynergyPoints(focusMins, wordsReviewed, streak);
+
+    return {
+      date: todayKey,
+      focusMinutes: focusMins,
+      focusMinutesFormatted: dfFormatWesternDigits(focusMins),
+      wordsReviewed: wordsReviewed,
+      wordsReviewedFormatted: dfFormatWesternDigits(wordsReviewed),
+      streakDays: streak,
+      streakDaysFormatted: dfFormatWesternDigits(streak),
+      pointsData: res
+    };
+  }
+
+  function dfRenderSynergyPointsBadgeHtml() {
+    var data = dfGetTodaySynergyData();
+    var pts = data.pointsData;
+
+    return "<div class=\"df-synergy-badge\" style=\"display:inline-flex;align-items:center;gap:6px;background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.3);border-radius:16px;padding:4px 10px;font-size:12px;color:#fef08a;direction:rtl;\">" +
+      "<span>⚡ <strong>" + pts.totalPointsFormatted + "</strong> نقطة إنجاز</span>" +
+      (pts.bonusPercentage > 0 ? "<span style=\"color:#fbbf24;font-size:11px;\">(+" + pts.bonusFormatted + " بونص)</span>" : "") +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfCalculateSynergyPoints = dfCalculateSynergyPoints;
+    window.dfGetTodaySynergyData = dfGetTodaySynergyData;
+    window.dfRenderSynergyPointsBadgeHtml = dfRenderSynergyPointsBadgeHtml;
+  }
+})();
