@@ -7289,3 +7289,58 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M246_VOCAB_TTS_ACCENT_FALLBACK_CHAIN_AND_CODE66_V1 === */
+(function() {
+  if (window.__M246_VOICE_RESOLVER__) return;
+  window.__M246_VOICE_RESOLVER__ = true;
+
+  window.dfResolveBestVoiceForLang = function(langCode) {
+    if (typeof window.speechSynthesis === 'undefined' || typeof window.speechSynthesis.getVoices !== 'function') {
+      return null;
+    }
+    var voices = window.speechSynthesis.getVoices() || [];
+    if (!voices.length || !langCode) return null;
+
+    var target = String(langCode).toLowerCase().replace('_', '-');
+    var root = target.split('-')[0];
+
+    // Tier 1: Exact match (e.g. de-de)
+    for (var i = 0; i < voices.length; i++) {
+      var vLang = String(voices[i].lang || '').toLowerCase().replace('_', '-');
+      if (vLang === target) return voices[i];
+    }
+
+    // Tier 2: Prefix match (e.g. de-at for de-de)
+    for (var j = 0; j < voices.length; j++) {
+      var vLang2 = String(voices[j].lang || '').toLowerCase().replace('_', '-');
+      if (vLang2.indexOf(root + '-') === 0) return voices[j];
+    }
+
+    // Tier 3: Root match (e.g. de)
+    for (var k = 0; k < voices.length; k++) {
+      var vLang3 = String(voices[k].lang || '').toLowerCase().replace('_', '-');
+      if (vLang3 === root) return voices[k];
+    }
+
+    return null;
+  };
+
+  if (typeof window.dfSafeSpeakUtterance === 'function') {
+    var prevSafeSpeakM246 = window.dfSafeSpeakUtterance;
+    window.dfSafeSpeakUtterance = function(text, lang, rate, onDone) {
+      if (typeof window.SpeechSynthesisUtterance !== 'undefined') {
+        var baseUtteranceM246 = window.SpeechSynthesisUtterance;
+        window.SpeechSynthesisUtterance = function(t) {
+          var u = new baseUtteranceM246(t);
+          if (lang) {
+            var bestVoice = window.dfResolveBestVoiceForLang(lang);
+            if (bestVoice) u.voice = bestVoice;
+          }
+          return u;
+        };
+      }
+      return prevSafeSpeakM246(text, lang, rate, onDone);
+    };
+  }
+})();
+
