@@ -42,6 +42,14 @@ test('changed helper or changed existing caller revokes the complete source snap
   const r=run();assert.equal(r.status,1);assert.equal(r.out.false_positives,0);
  });
 });
+test('a new or changed browser-only asset does not revoke an unchanged QA evidence review',()=>fixture(({write,source,run})=>{
+ write('android/app/src/main/assets/web/app.js','// WebView code has no access to the Node.js filesystem helper\\n');
+ cp.execFileSync('git',['-C',source,'add','android/app/src/main/assets/web/app.js']);
+ let r=run();assert.equal(r.status,0);assert.equal(r.out.false_positives,1);
+ write('android/app/src/main/assets/web/app.js','// unrelated Gemini UI milestone\\n');
+ r=run();assert.equal(r.status,0);assert.equal(r.out.unresolved,0);
+}));
+
 test('a newly tracked caller revokes approval without modifying the helper',()=>fixture(({write,source,run})=>{
  write('tools/new-consumer.cjs','// Newly introduced consumer must be independently reviewed\n');
  cp.execFileSync('git',['-C',source,'add','tools/new-consumer.cjs']);
