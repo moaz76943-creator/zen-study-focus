@@ -35,7 +35,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
           echo "CODEQL_SOURCE_SHA=$EXPECTED_SHA"
       - name: CodeQL parser and secure identity regressions
-        run: node --test tests/security_recovery/track13_codeql_sarif.test.cjs tests/security_recovery/secure_identity.test.cjs
+        run: node --test tests/security_recovery/track13_codeql_sarif.test.cjs tests/security_recovery/track13_codeql_adjudication.test.cjs tests/security_recovery/secure_identity.test.cjs tests/android_e2e_recovery/private_evidence.test.cjs
       - uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee
         id: init
         with:
