@@ -12026,3 +12026,136 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderDeckFilterChipsHtml = dfRenderDeckFilterChipsHtml;
   }
 })();
+
+/* === M296_SPELLING_AND_TYPING_PRACTICE_MODE_AND_CODE116_V1 === */
+(function() {
+  'use strict';
+
+  function dfIsSpellingModeEnabled() {
+    try {
+      return localStorage.getItem("df_spelling_mode_enabled_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfToggleSpellingMode(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsSpellingModeEnabled();
+    try {
+      localStorage.setItem("df_spelling_mode_enabled_v1", String(state));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    return state;
+  }
+
+  function dfCalculateLevenshteinDistance(a, b) {
+    var s1 = String(a || "").toLowerCase().trim();
+    var s2 = String(b || "").toLowerCase().trim();
+    if (s1 === s2) return 0;
+    if (s1.length === 0) return s2.length;
+    if (s2.length === 0) return s1.length;
+
+    var matrix = [];
+    for (var i = 0; i <= s2.length; i++) {
+      matrix[i] = [i];
+    }
+    for (var j = 0; j <= s1.length; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (var i = 1; i <= s2.length; i++) {
+      for (var j = 1; j <= s1.length; j++) {
+        if (s2.charAt(i - 1) === s1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+
+    return matrix[s2.length][s1.length];
+  }
+
+  function dfCheckSpellingInput(userInput, correctWord) {
+    var input = String(userInput || "").trim();
+    var target = String(correctWord || "").trim();
+    if (!input) {
+      return { correct: false, distance: target.length, message: "يرجى كتابة الكلمة أولاً." };
+    }
+
+    var dist = dfCalculateLevenshteinDistance(input, target);
+
+    if (dist === 0) {
+      try {
+        if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(25);
+        }
+      } catch (_) {}
+
+      return {
+        correct: true,
+        distance: 0,
+        score: 5,
+        message: "إجابة نموذجية صحيحة 100%! 🎉"
+      };
+    } else if (dist === 1) {
+      return {
+        correct: false,
+        nearMiss: true,
+        distance: 1,
+        score: 3,
+        message: "قريب جداً! خطأ في حرف واحد فقط."
+      };
+    } else {
+      return {
+        correct: false,
+        nearMiss: false,
+        distance: dist,
+        score: 1,
+        message: "إملاء غير صحيح، حاول مرة أخرى أو انقر كشف الكلمة."
+      };
+    }
+  }
+
+  function dfRenderSpellingQuizCardHtml(card) {
+    if (!card) return "";
+    var meaning = card.meaning || "بدون ترجمة";
+    var safeWord = String(card.word || "").replace(/"/g, "&quot;").replace(/'/g, "\\'");
+
+    return "<div class=\"df-spelling-quiz-card\" style=\"padding:16px;background:#18181b;border:1px solid #27272a;border-radius:12px;direction:rtl;color:#f4f4f5;text-align:center;\">" +
+      "<div style=\"margin-bottom:12px;\">" +
+        "<span style=\"font-size:11px;color:#a1a1aa;display:block;margin-bottom:4px;\">المعنى المطلوب كتابته:</span>" +
+        "<h3 style=\"margin:0;font-size:18px;color:#60a5fa;\">" + meaning + "</h3>" +
+      "</div>" +
+      "<div style=\"margin-bottom:12px;\">" +
+        "<input type=\"text\" id=\"df-spelling-input\" placeholder=\"اكتب الكلمة باللغة الأجنبية...\" style=\"width:100%;box-sizing:border-box;padding:10px 12px;background:#27272a;border:1px solid #3f3f46;border-radius:8px;color:#f4f4f5;font-size:14px;direction:ltr;text-align:center;\" />" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;\">" +
+        "<button type=\"button\" onclick=\"var input=document.getElementById('df-spelling-input'); if(input && window.dfCheckSpellingInput){ var res = window.dfCheckSpellingInput(input.value, '" + safeWord + "'); alert(res.message); }\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
+          "<span>تحقق من الإملاء</span>" +
+        "</button>" +
+        "<button type=\"button\" onclick=\"alert('الكلمة الصحيحة هي: " + safeWord + "');\" style=\"background:rgba(255,255,255,0.08);color:#a1a1aa;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;\">" +
+          "<span>كشف الكلمة</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsSpellingModeEnabled = dfIsSpellingModeEnabled;
+    window.dfToggleSpellingMode = dfToggleSpellingMode;
+    window.dfCalculateLevenshteinDistance = dfCalculateLevenshteinDistance;
+    window.dfCheckSpellingInput = dfCheckSpellingInput;
+    window.dfRenderSpellingQuizCardHtml = dfRenderSpellingQuizCardHtml;
+  }
+})();
