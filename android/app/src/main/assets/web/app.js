@@ -11440,3 +11440,116 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderAcousticZenMilestoneModalHtml = dfRenderAcousticZenMilestoneModalHtml;
   }
 })();
+
+/* === M291_SUPERMEMO_SM2_INTERVALS_ENGINE_AND_CODE111_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfCalculateSm2Interval(card, qualityScore) {
+    var c = card || {};
+    var q = Math.max(0, Math.min(5, Math.round(Number(qualityScore) || 0)));
+
+    var rep = Number(c.sm2Repetitions) || 0;
+    var ef = Number(c.sm2EasinessFactor) || 2.5;
+    var prevInterval = Number(c.sm2IntervalDays) || 0;
+
+    var newInterval = 1;
+    var newRep = rep;
+
+    if (q >= 3) {
+      if (rep === 0) {
+        newInterval = 1;
+        newRep = 1;
+      } else if (rep === 1) {
+        newInterval = 6;
+        newRep = 2;
+      } else {
+        newInterval = Math.round(prevInterval * ef);
+        newRep = rep + 1;
+      }
+    } else {
+      newRep = 0;
+      newInterval = 1;
+    }
+
+    var newEf = ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+    newEf = Math.max(1.3, Math.round(newEf * 100) / 100);
+
+    var now = Date.now();
+    var nextDueDateMs = now + (newInterval * 24 * 60 * 60 * 1000);
+    var d = new Date(nextDueDateMs);
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    var nextDueDateStr = dfFormatWesternDigits(y + "-" + m + "-" + day);
+
+    return {
+      repetitions: newRep,
+      intervalDays: newInterval,
+      intervalDaysFormatted: dfFormatWesternDigits(newInterval),
+      easinessFactor: newEf,
+      nextDueDateMs: nextDueDateMs,
+      nextDueDateFormatted: nextDueDateStr
+    };
+  }
+
+  function dfApplySm2ToCard(cardId, qualityScore) {
+    if (!cardId && cardId !== 0) return null;
+    var list = [];
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        list = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        if (raw) list = JSON.parse(raw);
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(list)) list = [];
+    var target = null;
+
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        target = list[i];
+        break;
+      }
+    }
+
+    if (!target) return null;
+
+    var sm2 = dfCalculateSm2Interval(target, qualityScore);
+    target.sm2Repetitions = sm2.repetitions;
+    target.sm2IntervalDays = sm2.intervalDays;
+    target.sm2EasinessFactor = sm2.easinessFactor;
+    target.sm2NextDueDateMs = sm2.nextDueDateMs;
+    target.sm2NextDueDateStr = sm2.nextDueDateFormatted;
+    target.lastReviewedAt = Date.now();
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return target;
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfCalculateSm2Interval = dfCalculateSm2Interval;
+    window.dfApplySm2ToCard = dfApplySm2ToCard;
+  }
+})();
