@@ -11668,3 +11668,101 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderDueTodayBannerHtml = dfRenderDueTodayBannerHtml;
   }
 })();
+
+/* === M293_EXAMPLE_SENTENCE_CONTEXT_TRAY_AND_CODE113_V1 === */
+(function() {
+  'use strict';
+
+  function dfSpeakExampleSentence(sentenceText, langCode) {
+    if (!sentenceText || typeof window === "undefined") return false;
+    var synth = window.speechSynthesis;
+    if (!synth) return false;
+
+    try {
+      synth.cancel();
+      var utterance = new SpeechSynthesisUtterance(String(sentenceText));
+      var targetLang = langCode || (typeof window.dfGetActiveLanguagePair === "function" ? window.dfGetActiveLanguagePair().target : "de-DE");
+      utterance.lang = targetLang;
+
+      if (typeof window.dfGetTtsVolume === "function") {
+        utterance.volume = window.dfGetTtsVolume();
+      }
+
+      if (typeof window.dfResolveBestVoiceForLang === "function") {
+        var voice = window.dfResolveBestVoiceForLang(targetLang);
+        if (voice) utterance.voice = voice;
+      }
+
+      synth.speak(utterance);
+
+      if (typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfRenderCardExampleTrayHtml(card) {
+    if (!card || !card.example || typeof card.example !== "string") return "";
+    var cleanExample = card.example.trim();
+    if (!cleanExample) return "";
+
+    var escapedForClick = cleanExample.replace(/"/g, "&quot;").replace(/'/g, "\\'");
+
+    return "<div class=\"df-card-example-tray\" style=\"margin-top:6px;padding:6px 10px;background:rgba(255,255,255,0.04);border-right:3px solid #3b82f6;border-radius:6px;font-size:12px;color:#d4d4d8;direction:ltr;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;\">" +
+      "<span style=\"font-style:italic;flex:1;\">\"" + cleanExample + "\"</span>" +
+      "<button type=\"button\" onclick=\"window.dfSpeakExampleSentence && window.dfSpeakExampleSentence('" + escapedForClick + "')\" style=\"background:none;border:none;color:#60a5fa;cursor:pointer;font-size:14px;padding:2px;display:flex;align-items:center;\" title=\"استمع لنطق الجملة\">" +
+        "<span>🔊</span>" +
+      "</button>" +
+    "</div>";
+  }
+
+  function dfUpdateCardExample(cardId, exampleText) {
+    if (!cardId && cardId !== 0) return false;
+    var list = [];
+    try {
+      if (typeof window.dfGetVocabBankList === "function") {
+        list = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        if (raw) list = JSON.parse(raw);
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(list)) return false;
+    var found = false;
+
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        list[i].example = String(exampleText || "").trim();
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) return false;
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
+    } catch (_) {
+      return false;
+    }
+
+    try {
+      if (typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfSpeakExampleSentence = dfSpeakExampleSentence;
+    window.dfRenderCardExampleTrayHtml = dfRenderCardExampleTrayHtml;
+    window.dfUpdateCardExample = dfUpdateCardExample;
+  }
+})();
