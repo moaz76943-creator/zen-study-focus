@@ -92,3 +92,5 @@ adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
 sleep 3
 adb shell pidof com.zenstudy.focus
 echo "ANDROID_NATIVE_DIALOGS=PASS; USER_DATA=DISPOSABLE_ONLY; RELEASE_APPROVED=NO"
+# Keep the persistent accessibility probe alive for real backup confirmation taps.
+DF_N01_SERIAL=emulator-5554 DF_N01_DISPOSABLE=1 DF_N01_SOURCE_SHA="$(git rev-parse HEAD)" node tests/critical_room7/n01_android_ack_probe.cjs "$E/n01-native-ack-results.json"
