@@ -11705,16 +11705,22 @@ window.FlashQuizEngine = FlashQuizEngine;
     }
   }
 
+  // Render user-imported vocabulary examples as inert HTML text/attributes.
+  function dfEscapeExampleHtml(value) {
+    return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   function dfRenderCardExampleTrayHtml(card) {
     if (!card || !card.example || typeof card.example !== "string") return "";
     var cleanExample = card.example.trim();
     if (!cleanExample) return "";
 
-    var escapedForClick = cleanExample.replace(/"/g, "&quot;").replace(/'/g, "\\'");
+    var escapedExample = dfEscapeExampleHtml(cleanExample);
 
     return "<div class=\"df-card-example-tray\" style=\"margin-top:6px;padding:6px 10px;background:rgba(255,255,255,0.04);border-right:3px solid #3b82f6;border-radius:6px;font-size:12px;color:#d4d4d8;direction:ltr;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;\">" +
-      "<span style=\"font-style:italic;flex:1;\">\"" + cleanExample + "\"</span>" +
-      "<button type=\"button\" onclick=\"window.dfSpeakExampleSentence && window.dfSpeakExampleSentence('" + escapedForClick + "')\" style=\"background:none;border:none;color:#60a5fa;cursor:pointer;font-size:14px;padding:2px;display:flex;align-items:center;\" title=\"استمع لنطق الجملة\">" +
+      "<span style=\"font-style:italic;flex:1;\">\"" + escapedExample + "\"</span>" +
+      "<button type=\"button\" data-df-example-speech=\"1\" data-df-sentence=\"" + escapedExample + "\" style=\"background:none;border:none;color:#60a5fa;cursor:pointer;font-size:14px;padding:2px;display:flex;align-items:center;\" title=\"استمع لنطق الجملة\">" +
         "<span>🔊</span>" +
       "</button>" +
     "</div>";
@@ -11758,6 +11764,18 @@ window.FlashQuizEngine = FlashQuizEngine;
     } catch (_) {}
 
     return true;
+  }
+
+  // Event delegation survives re-rendering and never evaluates user text.
+  if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('click', function(event) {
+      var element = event && event.target;
+      var button = element && typeof element.closest === 'function'
+        ? element.closest('button[data-df-example-speech="1"]') : null;
+      if (!button || !button.closest('.df-card-example-tray')) return;
+      var sentence = button.getAttribute('data-df-sentence');
+      if (sentence) dfSpeakExampleSentence(sentence);
+    });
   }
 
   if (typeof window !== "undefined") {
