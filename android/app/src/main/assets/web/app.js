@@ -9518,3 +9518,98 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderSynergyPointsBadgeHtml = dfRenderSynergyPointsBadgeHtml;
   }
 })();
+
+/* === M274_HALFWAY_INTERVAL_ZEN_CHIME_AND_CODE94_V1 === */
+(function() {
+  'use strict';
+
+  var _halfwayChimePlayedInCurrentSession = false;
+
+  function dfIsHalfwayChimeEnabled() {
+    try {
+      var val = localStorage.getItem("df_halfway_chime_enabled_v1");
+      if (val !== null) return val === "true";
+    } catch (_) {}
+    return true;
+  }
+
+  function dfToggleHalfwayChime(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsHalfwayChimeEnabled();
+    try {
+      localStorage.setItem("df_halfway_chime_enabled_v1", String(state));
+    } catch (_) {}
+    return state;
+  }
+
+  function dfResetHalfwayChimeSession() {
+    _halfwayChimePlayedInCurrentSession = false;
+  }
+
+  function dfPlayHalfwayZenChime() {
+    try {
+      if (typeof window === "undefined") return false;
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
+      var ctx = new AudioCtx();
+
+      var osc1 = ctx.createOscillator();
+      var gain1 = ctx.createGain();
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(528, ctx.currentTime);
+      gain1.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain1.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.04);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.4);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(ctx.currentTime);
+      osc1.stop(ctx.currentTime + 1.4);
+
+      var osc2 = ctx.createOscillator();
+      var gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(660, ctx.currentTime + 0.25);
+      gain2.gain.setValueAtTime(0.001, ctx.currentTime + 0.25);
+      gain2.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.3);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.8);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(ctx.currentTime + 0.25);
+      osc2.stop(ctx.currentTime + 1.8);
+
+      try {
+        if (typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(15);
+        }
+      } catch (_) {}
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfCheckHalfwayChimeTrigger(elapsedSeconds, totalSeconds) {
+    if (!dfIsHalfwayChimeEnabled()) return false;
+    if (_halfwayChimePlayedInCurrentSession) return false;
+
+    var elapsed = Number(elapsedSeconds) || 0;
+    var total = Number(totalSeconds) || 0;
+    if (total <= 60) return false;
+
+    var halfway = Math.floor(total / 2);
+    if (elapsed >= halfway && elapsed <= halfway + 2) {
+      _halfwayChimePlayedInCurrentSession = true;
+      return dfPlayHalfwayZenChime();
+    }
+
+    return false;
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsHalfwayChimeEnabled = dfIsHalfwayChimeEnabled;
+    window.dfToggleHalfwayChime = dfToggleHalfwayChime;
+    window.dfResetHalfwayChimeSession = dfResetHalfwayChimeSession;
+    window.dfPlayHalfwayZenChime = dfPlayHalfwayZenChime;
+    window.dfCheckHalfwayChimeTrigger = dfCheckHalfwayChimeTrigger;
+  }
+})();
