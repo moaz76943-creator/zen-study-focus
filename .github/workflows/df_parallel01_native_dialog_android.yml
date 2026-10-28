@@ -17,6 +17,9 @@ on:
       - '.github/workflows/df_parallel01_native_dialog_android.yml'
 permissions:
   contents: read
+concurrency:
+  group: native-dialog-n01-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   device:
     runs-on: ubuntu-24.04
