@@ -7590,3 +7590,95 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+
+/* === M253_VOCAB_PIN_FAVORITES_AND_CODE73_V1 === */
+(function() {
+  'use strict';
+
+  function dfGetVocabBankList() {
+    try {
+      var raw = localStorage.getItem('df_vocab_bank_v1');
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function dfSaveVocabBankList(list) {
+    try {
+      localStorage.setItem('df_vocab_bank_v1', JSON.stringify(list));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function dfTogglePinVocabCard(cardId) {
+    if (!cardId && cardId !== 0) return false;
+    var list = dfGetVocabBankList();
+    var foundIndex = -1;
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        foundIndex = i;
+        break;
+      }
+    }
+    if (foundIndex === -1) return false;
+
+    var currentPinned = Boolean(list[foundIndex].isPinned);
+    list[foundIndex].isPinned = !currentPinned;
+    list[foundIndex].pinnedAt = !currentPinned ? Date.now() : null;
+
+    dfSaveVocabBankList(list);
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfUpdateVocabFilterChips === 'function') {
+        window.dfUpdateVocabFilterChips();
+      }
+    } catch (_) {}
+
+    return list[foundIndex].isPinned;
+  }
+
+  function dfIsVocabCardPinned(cardId) {
+    if (!cardId && cardId !== 0) return false;
+    var list = dfGetVocabBankList();
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        return Boolean(list[i].isPinned);
+      }
+    }
+    return false;
+  }
+
+  function dfFilterPinnedVocabCards(cardsList) {
+    if (!Array.isArray(cardsList)) return [];
+    return cardsList.filter(function(card) {
+      return Boolean(card && card.isPinned);
+    });
+  }
+
+  function dfGetPinnedCardsCount() {
+    var list = dfGetVocabBankList();
+    var count = 0;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && list[i].isPinned) count++;
+    }
+    return String(count);
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfTogglePinVocabCard = dfTogglePinVocabCard;
+    window.dfIsVocabCardPinned = dfIsVocabCardPinned;
+    window.dfFilterPinnedVocabCards = dfFilterPinnedVocabCards;
+    window.dfGetPinnedCardsCount = dfGetPinnedCardsCount;
+  }
+})();
