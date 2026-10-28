@@ -74,6 +74,16 @@ test('actual scanner clears the reviewed Work/Rest storage-key rejection fixture
   'reviewing one public fixture value must not hide a credential in that file');
 });
 
+test('historical timer recovery fixture is exempt only for its public storage identifier',{skip:!SCANNER},()=>{
+ const file='tests/track05_timer/expired_native_alarm.test.cjs';
+ const fixture=\"saveFortressData(key,next){assert.equal(key,'\"+['zen','fortress','cfg','v21'].join('_')+\"');return true;}\\n\";
+ assert.ok(scan({[file]:fixture},false).count>0,'default scanner must detect before review');
+ assert.deepEqual(scan({[file]:fixture}),{exit:0,count:0},'only reviewed public key is exempt');
+ assert.ok(scan({'tests/track05_timer/other_alarm.test.cjs':fixture}).count>0,'another file must still be detected');
+ const credential=crypto.randomBytes(36).toString('hex');
+ assert.ok(scan({[file]:'const service_secret = \"'+credential+'\";\\n'}).count>0,'real credentials must stay detectable in reviewed file');
+});
+
 test('actual scanner reviews historical identifiers without exempting historical files',{skip:!SCANNER},()=>{
  const cfg=fs.readFileSync(CONFIG,'utf8');
  const checksum=cfg.match(/Historical inline localStorage checksum constant[\s\S]*?regexes = \['''\^([A-Z0-9_]+)\$'''\]/)?.[1];
