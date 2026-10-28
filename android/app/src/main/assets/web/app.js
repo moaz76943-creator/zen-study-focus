@@ -7040,3 +7040,23 @@ window.FlashQuizEngine = FlashQuizEngine;
   };
 })();
 
+/* === M239_VOCAB_CARD_EXPANDABLE_DETAILS_AND_CODE59_V1 === */
+(function() {
+  if (window.__M239_CARD_EXPAND__) return;
+  window.__M239_CARD_EXPAND__ = true;
+
+  window.dfToggleVocabCardDetails = function(itemId) {
+    if (typeof document === 'undefined') return false;
+    var detailsElem = document.getElementById('df-vocab-card-details-' + itemId);
+    var toggleBtn = document.getElementById('df-vocab-card-toggle-' + itemId);
+    if (!detailsElem) return false;
+
+    var isHidden = detailsElem.style.display === 'none' || !detailsElem.style.display;
+    detailsElem.style.display = isHidden ? 'block' : 'none';
+    if (toggleBtn) {
+      toggleBtn.textContent = isHidden ? '📖 إخفاء' : '📖 تفاصيل';
+    }
+    return isHidden;
+  };
+})();
+
