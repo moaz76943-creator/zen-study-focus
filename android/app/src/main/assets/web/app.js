@@ -10105,3 +10105,81 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderLatencyBadgeHtml = dfRenderLatencyBadgeHtml;
   }
 })();
+
+/* === M279_AUDIO_FOCUS_INTERRUPTION_HANDLER_AND_CODE99_V1 === */
+(function() {
+  'use strict';
+
+  var _isAudioSuspendedDueToFocusLoss = false;
+
+  function dfIsAudioSuspended() {
+    return _isAudioSuspendedDueToFocusLoss;
+  }
+
+  function dfHandleAudioFocusLoss() {
+    _isAudioSuspendedDueToFocusLoss = true;
+
+    try {
+      if (typeof window !== "undefined" && window.speechSynthesis && typeof window.speechSynthesis.cancel === "function") {
+        window.speechSynthesis.cancel();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfStopAllVocabSpeech === "function") {
+        window.dfStopAllVocabSpeech();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-focus-lost") : new Event("df:audio-focus-lost");
+        window.dispatchEvent(evt);
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfHandleAudioFocusGain() {
+    if (!_isAudioSuspendedDueToFocusLoss) return false;
+    _isAudioSuspendedDueToFocusLoss = false;
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-focus-gained") : new Event("df:audio-focus-gained");
+        window.dispatchEvent(evt);
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfSimulateAudioFocusChange(state) {
+    if (state === "loss" || state === "loss_transient" || state === "loss_transient_can_duck") {
+      return dfHandleAudioFocusLoss();
+    } else if (state === "gain") {
+      return dfHandleAudioFocusGain();
+    }
+    return false;
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      window.addEventListener("blur", function() {
+        if (typeof document !== "undefined" && document.hidden) {
+          dfHandleAudioFocusLoss();
+        }
+      });
+
+      window.addEventListener("focus", function() {
+        dfHandleAudioFocusGain();
+      });
+
+      window.dfHandleAudioFocusLoss = dfHandleAudioFocusLoss;
+      window.dfHandleAudioFocusGain = dfHandleAudioFocusGain;
+      window.dfSimulateAudioFocusChange = dfSimulateAudioFocusChange;
+      window.dfIsAudioSuspended = dfIsAudioSuspended;
+    }
+  } catch (_) {}
+})();
