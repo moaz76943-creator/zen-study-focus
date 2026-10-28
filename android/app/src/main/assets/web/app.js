@@ -11863,3 +11863,166 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderSearchMatchCountBadge = dfRenderSearchMatchCountBadge;
   }
 })();
+
+/* === M295_CUSTOM_DECKS_AND_TAGS_MANAGER_AND_CODE115_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetActiveDeckFilter() {
+    try {
+      var val = localStorage.getItem("df_active_deck_v1");
+      if (val && typeof val === "string") return val;
+    } catch (_) {}
+    return "all";
+  }
+
+  function dfSetActiveDeckFilter(deckName) {
+    var target = (deckName && typeof deckName === "string") ? deckName.trim() : "all";
+    try {
+      localStorage.setItem("df_active_deck_v1", target);
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return target;
+  }
+
+  function dfGetAllDecks() {
+    var list = [];
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        list = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        if (raw) list = JSON.parse(raw);
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(list)) list = [];
+
+    var deckCounts = Object.create(null);
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i];
+      if (!c) continue;
+      var d = (c.deck && typeof c.deck === "string" && c.deck.trim()) ? c.deck.trim() : "عام";
+      deckCounts[d] = (deckCounts[d] || 0) + 1;
+    }
+
+    var result = [{
+      name: "all",
+      label: "الكل",
+      count: list.length,
+      countFormatted: dfFormatWesternDigits(list.length)
+    }];
+
+    for (var name in deckCounts) {
+      result.push({
+        name: name,
+        label: name,
+        count: deckCounts[name],
+        countFormatted: dfFormatWesternDigits(deckCounts[name])
+      });
+    }
+
+    return result;
+  }
+
+  function dfFilterCardsByDeck(cardsList, deckName) {
+    if (!Array.isArray(cardsList)) return [];
+    var target = (deckName && typeof deckName === "string") ? deckName.trim() : dfGetActiveDeckFilter();
+    if (target === "all") return cardsList.slice();
+
+    return cardsList.filter(function(card) {
+      if (!card) return false;
+      var d = (card.deck && typeof card.deck === "string" && card.deck.trim()) ? card.deck.trim() : "عام";
+      return d.toLowerCase() === target.toLowerCase();
+    });
+  }
+
+  function dfAssignCardDeck(cardId, deckName) {
+    if (!cardId && cardId !== 0) return false;
+    var list = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_bank_v1");
+      if (raw) list = JSON.parse(raw);
+    } catch (_) {}
+
+    if (!Array.isArray(list)) return false;
+    var found = false;
+
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        list[i].deck = (deckName && typeof deckName === "string") ? deckName.trim() : "عام";
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) return false;
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
+    } catch (_) {
+      return false;
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfRenderDeckFilterChipsHtml() {
+    var decks = dfGetAllDecks();
+    var active = dfGetActiveDeckFilter();
+    var chipsHtml = "";
+
+    for (var i = 0; i < decks.length; i++) {
+      var d = decks[i];
+      var isSel = (d.name.toLowerCase() === active.toLowerCase());
+      var bg = isSel ? "#2563eb" : "rgba(255,255,255,0.06)";
+      var border = isSel ? "#3b82f6" : "rgba(255,255,255,0.12)";
+      var color = isSel ? "#ffffff" : "#d4d4d8";
+
+      chipsHtml += "<button type=\"button\" onclick=\"window.dfSetActiveDeckFilter && window.dfSetActiveDeckFilter('" + d.name + "')\" style=\"background:" + bg + ";border:1px solid " + border + ";color:" + color + ";border-radius:14px;padding:3px 10px;font-size:11px;cursor:pointer;white-space:nowrap;font-weight:" + (isSel ? "bold" : "normal") + ";\">" +
+        "<span>" + d.label + " (" + d.countFormatted + ")</span>" +
+      "</button>";
+    }
+
+    return "<div class=\"df-deck-filter-bar\" style=\"margin:8px 0;display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;direction:rtl;\">" +
+      chipsHtml +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetActiveDeckFilter = dfGetActiveDeckFilter;
+    window.dfSetActiveDeckFilter = dfSetActiveDeckFilter;
+    window.dfGetAllDecks = dfGetAllDecks;
+    window.dfFilterCardsByDeck = dfFilterCardsByDeck;
+    window.dfAssignCardDeck = dfAssignCardDeck;
+    window.dfRenderDeckFilterChipsHtml = dfRenderDeckFilterChipsHtml;
+  }
+})();
