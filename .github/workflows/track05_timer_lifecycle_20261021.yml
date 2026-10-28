@@ -152,8 +152,8 @@ jobs:
           cores: 2
           emulator-boot-timeout: 600
           disable-animations: false
-          # Match the real API30/API35 N01 rig; runtime assertions stay strict.
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -skin 720x1280 -dpi-device 240
+          # Emulator 37+: supported software renderer; avoid deprecated GPU/skin/DPI flags.
+          emulator-options: -no-window -gpu software -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
           script: bash tests/track05_timer/run_android_timer_qa.sh
       - name: Bounded host and emulator diagnostics
         if: always()
