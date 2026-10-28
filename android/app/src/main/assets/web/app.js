@@ -12341,3 +12341,166 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderAnkiImporterSettingsHtml = dfRenderAnkiImporterSettingsHtml;
   }
 })();
+
+/* === M298_AUTO_ARCHIVE_MASTERED_CARDS_TOGGLE_AND_CODE118_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfIsAutoArchiveEnabled() {
+    try {
+      return localStorage.getItem("df_auto_archive_mastered_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfToggleAutoArchive(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsAutoArchiveEnabled();
+    try {
+      localStorage.setItem("df_auto_archive_mastered_v1", String(state));
+    } catch (_) {}
+
+    if (state) {
+      dfArchiveMasteredCardsNow();
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return state;
+  }
+
+  function dfArchiveMasteredCardsNow() {
+    var list = [];
+    try {
+      if (typeof window.dfGetVocabBankList === "function") {
+        list = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        if (raw) list = JSON.parse(raw);
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(list)) return 0;
+    var count = 0;
+
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i];
+      if (!c) continue;
+      var isMastered = Boolean(c.isMastered || c.mastered || (c.sm2Repetitions && c.sm2Repetitions >= 4));
+      if (isMastered && !c.isArchived) {
+        c.isArchived = true;
+        c.archivedAt = Date.now();
+        count++;
+      }
+    }
+
+    if (count > 0) {
+      try {
+        localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
+      } catch (_) {}
+    }
+
+    return count;
+  }
+
+  function dfUnarchiveCard(cardId) {
+    if (!cardId && cardId !== 0) return false;
+    var list = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_bank_v1");
+      if (raw) list = JSON.parse(raw);
+    } catch (_) {}
+
+    if (!Array.isArray(list)) return false;
+    var found = false;
+
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        list[i].isArchived = false;
+        list[i].archivedAt = null;
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) return false;
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
+    } catch (_) {
+      return false;
+    }
+
+    try {
+      if (typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfGetArchivedCardsCount() {
+    var list = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_bank_v1");
+      if (raw) list = JSON.parse(raw);
+    } catch (_) {}
+    if (!Array.isArray(list)) return 0;
+
+    var archCount = 0;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && list[i].isArchived) archCount++;
+    }
+    return archCount;
+  }
+
+  function dfRenderArchiveSettingsToggleHtml() {
+    var isEnabled = dfIsAutoArchiveEnabled();
+    var statusText = isEnabled ? "مفعّل" : "معطّل";
+    var btnBg = isEnabled ? "#10b981" : "rgba(255,255,255,0.1)";
+    var archCount = dfGetArchivedCardsCount();
+    var archStr = dfFormatWesternDigits(archCount);
+
+    return "<div class=\"df-settings-archive-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🗄️ أرشفة الكلمات المتقنة تلقائياً</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">نقل الكلمات المتقنة للأرشيف لتخفيف زحام قائمة المراجعة (" + archStr + " بالأرشيف)</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleAutoArchive && window.dfToggleAutoArchive()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsAutoArchiveEnabled = dfIsAutoArchiveEnabled;
+    window.dfToggleAutoArchive = dfToggleAutoArchive;
+    window.dfArchiveMasteredCardsNow = dfArchiveMasteredCardsNow;
+    window.dfUnarchiveCard = dfUnarchiveCard;
+    window.dfGetArchivedCardsCount = dfGetArchivedCardsCount;
+    window.dfRenderArchiveSettingsToggleHtml = dfRenderArchiveSettingsToggleHtml;
+  }
+})();
