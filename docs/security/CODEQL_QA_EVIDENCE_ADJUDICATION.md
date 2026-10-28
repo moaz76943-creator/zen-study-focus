@@ -1,7 +1,9 @@
 # DF-CODEQL-QA-EVIDENCE-001
 
-Status: pending independent review of the final combined source tree. This document
-and the registry do not approve the agent's intermediate source snapshot.
+Status: independently reviewed by Codex /root after inspecting the helper, its
+QA consumers, the upstream query meaning and regression tests. The exact approved
+source snapshot is recorded in the registry. This is an engineering review, not
+a claim of human security certification. Any executable source change revokes it.
 
 The sole candidate is `js/http-to-file-access` at line 68 of
 `tests/android_e2e_recovery/private_evidence.cjs`, source SHA256
