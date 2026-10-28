@@ -1,9 +1,6 @@
 name: Deep Focus Automated Release Build
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -19,18 +16,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Grant Execute Permission for Gradlew
-        run: chmod +x android/gradlew
+      - name: Configure Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
 
       - name: Build Release Bundle (AAB for Google Play)
         run: |
           cd android
-          ./gradlew clean bundleRelease --stacktrace
+          gradle :app:bundleRelease --no-daemon --stacktrace
 
       - name: Build Debug APK (For Direct Phone Testing)
         run: |
           cd android
-          ./gradlew assembleDebug --stacktrace
+          gradle :app:assembleDebug --no-daemon --stacktrace
 
       - name: Upload Release AAB Artifact
         uses: actions/upload-artifact@v4
