@@ -9220,3 +9220,309 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderSuiteDiagnosticModalHtml = dfRenderSuiteDiagnosticModalHtml;
   }
 })();
+
+/* === M271_SYSTEM_HEALTH_LAUNCHER_IN_SETTINGS_AND_CODE91_V1 === */
+(function() {
+  'use strict';
+
+  function dfRenderHealthCheckSettingsButtonHtml() {
+    return "<div class=\"df-settings-health-section\" style=\"margin:12px 0;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🩺 تشخيص صحة النظام v4</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">فحص جاهزية محرك الصوت والتخزين والمزامنة</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfOpenHealthCheckModal && window.dfOpenHealthCheckModal()\" style=\"background:#2563eb;color:#ffffff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>فحص الآن</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  function dfOpenHealthCheckModal() {
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof document === 'undefined') return false;
+
+      dfCloseHealthCheckModal();
+
+      var modalContainer = document.createElement("div");
+      modalContainer.id = "df-health-check-modal-backdrop";
+      modalContainer.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;direction:rtl;";
+
+      var contentWrapper = document.createElement("div");
+      contentWrapper.style.cssText = "width:100%;max-width:380px;background:#18181b;border:1px solid #27272a;border-radius:12px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,0.5);";
+
+      var bodyHtml = "";
+      if (typeof window !== 'undefined' && typeof window.dfRenderSuiteDiagnosticModalHtml === 'function') {
+        bodyHtml = window.dfRenderSuiteDiagnosticModalHtml();
+      } else {
+        bodyHtml = "<div style=\"padding:16px;text-align:center;color:#f4f4f5;\">تشخيص النظام جاهز</div>";
+      }
+
+      contentWrapper.innerHTML = bodyHtml +
+        "<div style=\"padding:10px 16px;background:rgba(0,0,0,0.3);text-align:center;border-top:1px solid rgba(255,255,255,0.06);\">" +
+          "<button type=\"button\" onclick=\"window.dfCloseHealthCheckModal && window.dfCloseHealthCheckModal()\" style=\"background:rgba(255,255,255,0.1);color:#f4f4f5;border:none;border-radius:6px;padding:6px 20px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+            "<span>إغلاق</span>" +
+          "</button>" +
+        "</div>";
+
+      modalContainer.appendChild(contentWrapper);
+      document.body.appendChild(modalContainer);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfCloseHealthCheckModal() {
+    try {
+      if (typeof document === 'undefined') return;
+      var existing = document.getElementById("df-health-check-modal-backdrop");
+      if (existing && existing.parentNode) {
+        existing.parentNode.removeChild(existing);
+      }
+    } catch (_) {}
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfRenderHealthCheckSettingsButtonHtml = dfRenderHealthCheckSettingsButtonHtml;
+    window.dfOpenHealthCheckModal = dfOpenHealthCheckModal;
+    window.dfCloseHealthCheckModal = dfCloseHealthCheckModal;
+  }
+})();
+
+/* === M272_POMODORO_MICRO_REVIEW_BREAK_AND_CODE92_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetMicroReviewCards(limit) {
+    var maxCards = Number(limit) || 5;
+    var allCards = [];
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        allCards = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        allCards = raw ? JSON.parse(raw) : [];
+      }
+    } catch (_) {
+      allCards = [];
+    }
+
+    if (!Array.isArray(allCards) || allCards.length === 0) return [];
+
+    var reviewQueue = [];
+    var otherQueue = [];
+
+    for (var i = 0; i < allCards.length; i++) {
+      var c = allCards[i];
+      if (!c) continue;
+      if (c.needsReview || c.isHard || c.hard) {
+        reviewQueue.push(c);
+      } else if (!c.isMastered && !c.mastered) {
+        otherQueue.push(c);
+      }
+    }
+
+    var selected = reviewQueue.concat(otherQueue).slice(0, maxCards);
+    return selected;
+  }
+
+  function dfRenderMicroReviewBreakBannerHtml(cardCount) {
+    var count = Number(cardCount) || 5;
+    var countStr = dfFormatWesternDigits(count);
+
+    return "<div id=\"df-micro-review-banner\" style=\"margin:12px 0;padding:12px 14px;background:#18181b;border:1px solid #3b82f6;border-radius:12px;direction:rtl;box-shadow:0 6px 18px rgba(0,0,0,0.3);color:#f4f4f5;\">" +
+      "<div style=\"display:flex;align-items:center;gap:8px;margin-bottom:8px;\">" +
+        "<span style=\"font-size:18px;\">☕</span>" +
+        "<div>" +
+          "<strong style=\"font-size:13px;display:block;color:#93c5fd;\">وقت الاستراحة! مراجعة سريعة؟</strong>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">استثمر دقائق الاستراحة في ترسيخ " + countStr + " كلمات بتركيز هادئ.</span>" +
+        "</div>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;margin-top:8px;\">" +
+        "<button type=\"button\" onclick=\"window.dfStartMicroReviewSession && window.dfStartMicroReviewSession(" + count + ")\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
+          "<span>🎯 مراجعة " + countStr + " كلمات</span>" +
+        "</button>" +
+        "<button type=\"button\" onclick=\"window.dfDismissMicroReviewBanner && window.dfDismissMicroReviewBanner()\" style=\"background:rgba(255,255,255,0.08);color:#a1a1aa;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;\">" +
+          "<span>استراحة صامتة</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  function dfStartMicroReviewSession(limit) {
+    var cards = dfGetMicroReviewCards(limit);
+    if (!cards || cards.length === 0) {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("لا توجد كلمات كافية للمراجعة حالياً", "info", 2000);
+      }
+      dfDismissMicroReviewBanner();
+      return false;
+    }
+
+    dfDismissMicroReviewBanner();
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfOpenFlashcardQuizModal === "function") {
+        window.dfCurrentQuizCards = cards.slice();
+        window.dfOpenFlashcardQuizModal(cards);
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfDismissMicroReviewBanner() {
+    try {
+      if (typeof document === "undefined") return;
+      var el = document.getElementById("df-micro-review-banner");
+      if (el && el.parentNode) {
+        el.parentNode.removeChild(el);
+      }
+    } catch (_) {}
+  }
+
+  function dfOnPomodoroSessionCompleted() {
+    try {
+      if (typeof window !== "undefined" && typeof window.dfPlayZenGoalCompletionChime === "function") {
+        window.dfPlayZenGoalCompletionChime();
+      }
+    } catch (_) {}
+
+    var available = dfGetMicroReviewCards(5);
+    if (available && available.length > 0) {
+      try {
+        if (typeof document !== "undefined") {
+          var container = document.getElementById("df-pomodoro-break-actions") || document.body;
+          if (container && !document.getElementById("df-micro-review-banner")) {
+            var div = document.createElement("div");
+            div.innerHTML = dfRenderMicroReviewBreakBannerHtml(available.length);
+            container.insertBefore(div.firstChild, container.firstChild);
+          }
+        }
+      } catch (_) {}
+    }
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetMicroReviewCards = dfGetMicroReviewCards;
+    window.dfRenderMicroReviewBreakBannerHtml = dfRenderMicroReviewBreakBannerHtml;
+    window.dfStartMicroReviewSession = dfStartMicroReviewSession;
+    window.dfDismissMicroReviewBanner = dfDismissMicroReviewBanner;
+    window.dfOnPomodoroSessionCompleted = dfOnPomodoroSessionCompleted;
+  }
+})();
+
+/* === M273_UNIFIED_STUDY_SYNERGY_POINTS_AND_CODE93_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfCalculateSynergyPoints(focusMinutes, wordsReviewed, streakDays) {
+    var mins = Math.max(0, Number(focusMinutes) || 0);
+    var words = Math.max(0, Number(wordsReviewed) || 0);
+    var streak = Math.max(0, Number(streakDays) || 0);
+
+    var basePoints = (mins * 2) + (words * 5);
+    var bonusPct = Math.min(50, Math.round(streak * 5));
+    var multiplier = 1 + (bonusPct / 100);
+    var totalPoints = Math.round(basePoints * multiplier);
+
+    return {
+      basePoints: basePoints,
+      bonusPercentage: bonusPct,
+      totalPoints: totalPoints,
+      totalPointsFormatted: dfFormatWesternDigits(totalPoints),
+      bonusFormatted: dfFormatWesternDigits(bonusPct) + "%"
+    };
+  }
+
+  function dfGetTodaySynergyData() {
+    var todayKey = new Date().toISOString().slice(0, 10);
+    var focusMins = 0;
+    try {
+      var rawMins = localStorage.getItem("df_focus_today_minutes_v1");
+      if (rawMins) {
+        var parsed = JSON.parse(rawMins);
+        if (parsed && parsed.date === todayKey) {
+          focusMins = Number(parsed.minutes) || 0;
+        }
+      }
+    } catch (_) {}
+
+    var wordsReviewed = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabTodayReviewedCount === "function") {
+        wordsReviewed = window.dfGetVocabTodayReviewedCount();
+      }
+    } catch (_) {}
+
+    var streak = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfCalculateVocabStudyStreak === "function") {
+        streak = window.dfCalculateVocabStudyStreak().currentStreak;
+      }
+    } catch (_) {}
+
+    var res = dfCalculateSynergyPoints(focusMins, wordsReviewed, streak);
+
+    return {
+      date: todayKey,
+      focusMinutes: focusMins,
+      focusMinutesFormatted: dfFormatWesternDigits(focusMins),
+      wordsReviewed: wordsReviewed,
+      wordsReviewedFormatted: dfFormatWesternDigits(wordsReviewed),
+      streakDays: streak,
+      streakDaysFormatted: dfFormatWesternDigits(streak),
+      pointsData: res
+    };
+  }
+
+  function dfRenderSynergyPointsBadgeHtml() {
+    var data = dfGetTodaySynergyData();
+    var pts = data.pointsData;
+
+    return "<div class=\"df-synergy-badge\" style=\"display:inline-flex;align-items:center;gap:6px;background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.3);border-radius:16px;padding:4px 10px;font-size:12px;color:#fef08a;direction:rtl;\">" +
+      "<span>⚡ <strong>" + pts.totalPointsFormatted + "</strong> نقطة إنجاز</span>" +
+      (pts.bonusPercentage > 0 ? "<span style=\"color:#fbbf24;font-size:11px;\">(+" + pts.bonusFormatted + " بونص)</span>" : "") +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfCalculateSynergyPoints = dfCalculateSynergyPoints;
+    window.dfGetTodaySynergyData = dfGetTodaySynergyData;
+    window.dfRenderSynergyPointsBadgeHtml = dfRenderSynergyPointsBadgeHtml;
+  }
+})();
