@@ -10416,3 +10416,60 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderSoundscapeSelectorHtml = dfRenderSoundscapeSelectorHtml;
   }
 })();
+
+/* === M282_SMOOTH_AUDIO_FADE_NORMALIZER_AND_CODE102_V1 === */
+(function() {
+  'use strict';
+
+  function dfApplySmoothAudioFade(gainNode, targetVolume, durationSec, audioCtx) {
+    if (!gainNode || !gainNode.gain || !audioCtx) return false;
+
+    var dur = Number(durationSec) > 0 ? Number(durationSec) : 3.0;
+    var target = Math.max(0, Math.min(1.0, Number(targetVolume) || 0));
+    var now = audioCtx.currentTime;
+
+    try {
+      gainNode.gain.cancelScheduledValues(now);
+      var currentVal = Math.max(0.0001, gainNode.gain.value);
+      gainNode.gain.setValueAtTime(currentVal, now);
+
+      if (target <= 0.0001) {
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+        setTimeout(function() {
+          try { gainNode.gain.setValueAtTime(0, audioCtx.currentTime); } catch (_) {}
+        }, Math.round((dur + 0.05) * 1000));
+      } else {
+        gainNode.gain.exponentialRampToValueAtTime(target, now + dur);
+      }
+      return true;
+    } catch (_) {
+      try {
+        gainNode.gain.setValueAtTime(target, now);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+  }
+
+  function dfFadeOutAndStopNode(audioSourceNode, gainNode, audioCtx, durationSec) {
+    if (!audioSourceNode || !gainNode || !audioCtx) return false;
+    var dur = Number(durationSec) > 0 ? Number(durationSec) : 1.5;
+
+    dfApplySmoothAudioFade(gainNode, 0, dur, audioCtx);
+
+    setTimeout(function() {
+      try {
+        if (typeof audioSourceNode.stop === "function") audioSourceNode.stop();
+        if (typeof audioSourceNode.disconnect === "function") audioSourceNode.disconnect();
+      } catch (_) {}
+    }, Math.round((dur + 0.1) * 1000));
+
+    return true;
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfApplySmoothAudioFade = dfApplySmoothAudioFade;
+    window.dfFadeOutAndStopNode = dfFadeOutAndStopNode;
+  }
+})();
