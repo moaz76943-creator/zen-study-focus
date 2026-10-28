@@ -7440,3 +7440,34 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M250_VOCAB_MILESTONE_RELEASE_AND_CODE70_V1 === */
+(function() {
+  if (window.__M250_MILESTONE_70__) return;
+  window.__M250_MILESTONE_70__ = true;
+
+  window.dfApplyCard3dHardwareAcceleration = function() {
+    if (typeof document === 'undefined') return false;
+    var cards = document.querySelectorAll('#df-flash-quiz-card, .df-flash-card-inner, .df-quiz-card');
+    cards.forEach(function(c) {
+      c.style.perspective = '1000px';
+      c.style.transformStyle = 'preserve-3d';
+      c.style.webkitTransformStyle = 'preserve-3d';
+      c.style.backfaceVisibility = 'hidden';
+      c.style.webkitBackfaceVisibility = 'hidden';
+      c.style.willChange = 'transform';
+    });
+    return true;
+  };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', window.dfApplyCard3dHardwareAcceleration);
+    } else {
+      setTimeout(window.dfApplyCard3dHardwareAcceleration, 350);
+    }
+    if (typeof setInterval !== 'undefined') {
+      setInterval(window.dfApplyCard3dHardwareAcceleration, 2500);
+    }
+  }
+})();
+
