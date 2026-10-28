@@ -186,11 +186,21 @@ let snapshot;
   // Keep the old bytes, require rejection, and remove only this disposable fault.
   const staged='files/v21_durable_packets_v1.new';
   adb('shell','run-as',PKG,'mkdir',staged);
+  // AtomicFile.openRead removes an empty stale .new path. A non-empty
+  // directory survives that cleanup and forces the real startWrite failure.
+  adb('shell','run-as',PKG,'touch',staged+'/n01_disposable_fault');
   try{
-    assert.equal(await evaluate('window.DF22Preflight.nativeAcknowledge(localStorage)'),false,'AtomicFile I/O failure must refuse ACK');
+    assert.equal(await evaluate(`(()=>{
+      const envelope=JSON.parse(window.ZenNative.readDurableV21());
+      const key='zen_fortress_notes_v21',notes=window.DeepFocusDataCompatV21.inspectPacket(envelope.packets[key]).value;
+      notes[0].body='REJECTED native I/O edit';
+      envelope.packets[key]=envelope.packets[key+'_mirror']=window.DeepFocusDataCompatV21.encodePacket(notes);
+      return window.ZenNative.acknowledgeDurableV21(JSON.stringify(envelope));
+    })()`),false,'AtomicFile I/O failure must refuse ACK');
     assert.equal(disk(),recovered,'AtomicFile failure overwrote last valid receipt');
     record('atomicfile-startwrite-failure','PASS','Real Android file/directory conflict refuses publication and preserves prior bytes');
   }finally{
+    adb('shell','run-as',PKG,'rm',staged+'/n01_disposable_fault');
     adb('shell','run-as',PKG,'rmdir',staged);
     adb('shell','run-as',PKG,'rm','-f',marker);
   }

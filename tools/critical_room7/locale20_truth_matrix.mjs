@@ -251,7 +251,7 @@ function referenceAvailability(familyKeys, refs) {
 
 export function resolveRoot(explicit) {
   if (explicit) return path.resolve(explicit);
-  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 }
 
 export function readContributionFile(file) {
