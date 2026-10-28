@@ -6598,3 +6598,70 @@ window.FlashQuizEngine = FlashQuizEngine;
   };
 })();
 
+/* === M231_VOCAB_QUIZ_RETRY_HARD_ONLY_ACTION_AND_CODE51_V1 === */
+(function() {
+  if (window.__M231_RETRY_HARD__) return;
+  window.__M231_RETRY_HARD__ = true;
+
+  window.dfRestartQuizWithHardCardsOnly = function() {
+    var eng = window.SpokenVocabEngine;
+    var allItems = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    var hardItems = [];
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i] && allItems[i].hard) {
+        hardItems.push(allItems[i]);
+      }
+    }
+
+    if (!hardItems.length) {
+      alert('ممتاز! أتقنت جميع الكلمات في هذه الجلسة ولا توجد كلمات للمراجعة.');
+      return false;
+    }
+
+    var summaryModal = document.getElementById('df-quiz-summary-modal');
+    if (summaryModal) summaryModal.remove();
+
+    var quiz = window.FlashQuizEngine;
+    if (quiz && typeof quiz.startWithItems === 'function') {
+      quiz.startWithItems(hardItems);
+      return true;
+    } else {
+      var quizModal = document.getElementById('df-flash-quiz-modal');
+      if (quizModal) {
+        quizModal.style.display = 'block';
+        if (typeof window.dfNormalizeQuizCardFlipState === 'function') {
+          window.dfNormalizeQuizCardFlipState();
+        }
+      }
+      return true;
+    }
+  };
+
+  function injectRetryHardButton() {
+    if (typeof document === 'undefined') return;
+    var summaryModal = document.getElementById('df-quiz-summary-modal');
+    if (!summaryModal || document.getElementById('df-quiz-retry-hard-btn')) return;
+
+    var container = summaryModal.querySelector('div');
+    if (!container) return;
+
+    var retryBtn = document.createElement('button');
+    retryBtn.type = 'button';
+    retryBtn.id = 'df-quiz-retry-hard-btn';
+    retryBtn.style.cssText = 'width:100%;padding:10px;border-radius:12px;border:1px solid rgba(248,113,113,0.35);background:rgba(248,113,113,0.15);color:#fca5a5;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;';
+    retryBtn.textContent = '🔄 إعادة اختبار الكلمات الصعبة فقط';
+    retryBtn.onclick = function() { window.dfRestartQuizWithHardCardsOnly(); };
+
+    var closeBtn = document.getElementById('df-quiz-summary-close-btn');
+    if (closeBtn) {
+      container.insertBefore(retryBtn, closeBtn);
+    } else {
+      container.appendChild(retryBtn);
+    }
+  }
+
+  if (typeof document !== 'undefined' && typeof setInterval !== 'undefined') {
+    setInterval(injectRetryHardButton, 1000);
+  }
+})();
+
