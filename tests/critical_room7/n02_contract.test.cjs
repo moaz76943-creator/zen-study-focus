@@ -58,6 +58,25 @@ public class ReceiverTest {
   AtomicReference<Throwable> failure=new AtomicReference<>();Thread receiver=new Thread(()->{try{r.onReceive(c,fire(priorToken));}catch(Throwable t){failure.set(t);}},"receiver");receiver.start();check(c.p.readToken.await(3,TimeUnit.SECONDS),"receiver reached token read");
   CountDownLatch cancelStarted=new CountDownLatch(1),cancelDone=new CountDownLatch(1);Thread cancel=new Thread(()->{cancelStarted.countDown();FocusAlarmReceiver.cancel(c);cancelDone.countDown();});cancel.start();check(cancelStarted.await(3,TimeUnit.SECONDS),"cancel started");
   boolean returnedBeforeDelivery;try{returnedBeforeDelivery=cancelDone.await(200,TimeUnit.MILLISECONDS);}finally{c.p.allowRead.countDown();}receiver.join(3000);cancel.join(3000);check(!returnedBeforeDelivery,"cancel must serialize with in-flight receiver delivery");check(failure.get()==null,"receiver failure: "+failure.get());check(!c.p.getBoolean("active",true),"cancel wins after receiver exits");
+  // Fault injection: a refused pause/reset must not cancel a still-active OS alarm.
+  FocusAlarmReceiver.schedule(c,60,"Keep alarm on cancel failure");
+  long cancelRefusedToken=c.p.getLong("token",0);
+  int cancelsBeforeRefusal=c.a.cancelled;
+  c.p.failNext=true;FocusAlarmReceiver.cancel(c);
+  check(c.a.cancelled==cancelsBeforeRefusal,"refused cancel must not remove live AlarmManager alarm");
+  check(c.p.getBoolean("active",false)&&c.p.getLong("token",0)==cancelRefusedToken,
+    "refused cancel must restore active generation in shared preferences");
+  // Failed completion receipt must retry rather than permanently discard native delivery.
+  c.p.data.put("deadline",System.currentTimeMillis()-1000L);
+  int scheduledBeforeRefusal=c.a.scheduled,notificationsBeforeRefusal=c.n.completed;
+  c.p.failNext=true;r.onReceive(c,fire(cancelRefusedToken));
+  check(c.n.completed==notificationsBeforeRefusal,"refused completion must not notify without durable receipt");
+  check(c.p.getBoolean("active",false),"refused completion must retain active receipt");
+  check(c.a.scheduled==scheduledBeforeRefusal+1,"refused completion must rearm native retry alarm");
+  r.onReceive(c,fire(cancelRefusedToken));
+  check(c.n.completed==notificationsBeforeRefusal+1,"recovered completion should notify exactly once");
+  r.onReceive(c,fire(cancelRefusedToken));
+  check(c.n.completed==notificationsBeforeRefusal+1,"replayed completion must not notify twice");
   System.out.println("N02 JVM lifecycle and fault-injection assertions PASS; Android delivery NOT_TESTED");
  }
 }`
