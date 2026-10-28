@@ -11553,3 +11553,118 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfApplySm2ToCard = dfApplySm2ToCard;
   }
 })();
+
+/* === M292_DUE_TODAY_REVIEW_QUEUE_AND_CODE112_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetDueTodayVocabCards() {
+    var allCards = [];
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        allCards = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        if (raw) allCards = JSON.parse(raw);
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(allCards)) return [];
+
+    var now = Date.now();
+    var endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+    var endOfTodayMs = endOfToday.getTime();
+
+    var dueCards = [];
+
+    for (var i = 0; i < allCards.length; i++) {
+      var c = allCards[i];
+      if (!c) continue;
+
+      if (c.sm2NextDueDateMs && Number(c.sm2NextDueDateMs) <= endOfTodayMs) {
+        dueCards.push(c);
+      } else if (c.needsReview || c.isHard || c.hard) {
+        dueCards.push(c);
+      } else if (!c.sm2Repetitions && !c.isMastered && !c.mastered) {
+        dueCards.push(c);
+      }
+    }
+
+    return dueCards;
+  }
+
+  function dfGetDueTodayCount() {
+    var count = dfGetDueTodayVocabCards().length;
+    return {
+      count: count,
+      countFormatted: dfFormatWesternDigits(count)
+    };
+  }
+
+  function dfStartDueTodayQuiz() {
+    var dueCards = dfGetDueTodayVocabCards();
+    if (!dueCards || dueCards.length === 0) {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("رائع! لا توجد كلمات متأخرة أو مستحقة للمراجعة اليوم 🎉", "success", 2500);
+      }
+      return { started: false, count: 0 };
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfOpenFlashcardQuizModal === "function") {
+        window.dfCurrentQuizCards = dueCards.slice();
+        window.dfOpenFlashcardQuizModal(dueCards);
+      }
+    } catch (_) {}
+
+    return { started: true, count: dueCards.length };
+  }
+
+  function dfRenderDueTodayBannerHtml() {
+    var dueData = dfGetDueTodayCount();
+    var countStr = dueData.countFormatted;
+
+    if (dueData.count === 0) {
+      return "<div class=\"df-due-today-banner\" style=\"margin:10px 0;padding:10px 14px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:10px;direction:rtl;display:flex;align-items:center;justify-content:space-between;color:#a7f3d0;font-size:12px;\">" +
+        "<span>🎉 أحسنت! أنجزت كل مراجعات اليوم المجدولة (SM-2).</span>" +
+        "<span style=\"font-weight:bold;color:#34d399;\">مكتمل ✓</span>" +
+      "</div>";
+    }
+
+    return "<div class=\"df-due-today-banner\" style=\"margin:10px 0;padding:12px 14px;background:#18181b;border:1px solid #3b82f6;border-radius:12px;direction:rtl;box-shadow:0 4px 15px rgba(0,0,0,0.3);color:#f4f4f5;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<strong style=\"font-size:13px;display:block;color:#93c5fd;margin-bottom:2px;\">🎯 مستحق للمراجعة اليوم: " + countStr + " كلمات</strong>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">مجدولة تلقائياً بخوارزمية التكرار المتباعد SM-2</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfStartDueTodayQuiz && window.dfStartDueTodayQuiz()\" style=\"background:#2563eb;color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>🚀 ابدأ المراجعة</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetDueTodayVocabCards = dfGetDueTodayVocabCards;
+    window.dfGetDueTodayCount = dfGetDueTodayCount;
+    window.dfStartDueTodayQuiz = dfStartDueTodayQuiz;
+    window.dfRenderDueTodayBannerHtml = dfRenderDueTodayBannerHtml;
+  }
+})();
