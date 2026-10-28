@@ -136,6 +136,7 @@ def triage(report_path: Path, repo: Path, sha: str) -> dict:
             return blocked
         counts = {key: 0 for key in CATEGORIES}
         unresolved_evidence = []
+        review_paths = set()  # Public candidate locations only, never credential values.
         public_constants = compatibility_constants(repo)
         for row in rows:
             secret = row.get("Secret")
@@ -150,6 +151,15 @@ def triage(report_path: Path, repo: Path, sha: str) -> dict:
             else:
                 category = source_context_candidate(repo, row) if row.get("RuleID") == "generic-api-key" else "unresolved"
             counts[category] += 1
+            if category == "storage_key_candidate":
+                candidate = row.get("File")
+                if isinstance(candidate, str):
+                    candidate = candidate.removeprefix("./")
+                    # Public repository code paths only. Never print arbitrary
+                    # scanner-controlled file names or credential-bearing text.
+                    if (len(candidate) <= 240 and not any(part in ("", ".", "..") for part in candidate.split("/"))
+                            and re.fullmatch(r"(?:tests|test|android|assets|docs|tools)/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+", candidate)):
+                        review_paths.add(candidate)
             if category == "unresolved" and len(unresolved_evidence) < 8:
                 raw_path = row.get("File")
                 raw_path = raw_path if isinstance(raw_path, str) and len(raw_path) <= 8192 else ""
@@ -165,6 +175,7 @@ def triage(report_path: Path, repo: Path, sha: str) -> dict:
                 })
         return {"sha": sha, "status": "REVIEW_REQUIRED" if rows else "NO_FINDINGS",
                 "findings": len(rows), "categories": counts,
+                "review_paths": sorted(review_paths)[:8],
                 "unresolved_evidence": unresolved_evidence}
     except (OSError, UnicodeError, ValueError, RecursionError):
         return blocked

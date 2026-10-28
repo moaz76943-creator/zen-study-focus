@@ -9919,73 +9919,92 @@ window.FlashQuizEngine = FlashQuizEngine;
     return jsonStr;
   }
 
-  function dfValidateAndImportVaultJson(jsonString) {
-    if (!jsonString || typeof jsonString !== "string") {
-      return { success: false, reason: "empty_input" };
-    }
-
-    var parsed = null;
+  // DF_M277_SAFE_JOURNAL_IMPORT_V2: rollback journal survives sudden process death.
+  var DF_VAULT_JOURNAL = "df_vocab_import_journal_v2";
+  function dfRecoverPendingVaultImport() {
+    var raw;
+    try { raw = localStorage.getItem(DF_VAULT_JOURNAL); } catch (_) { return false; }
+    if (!raw) return true;
+    var journal;
+    try { journal = JSON.parse(raw); } catch (_) { return false; }
+    var allowed = ["df_vocab_bank_v1", "df_vocab_study_history_v1", "df_vocab_daily_goal_v1", "df_oled_true_black_v1", "df_halfway_chime_enabled_v1"];
+    if (!journal || journal.schema !== "DF_M277_SAFE_JOURNAL_IMPORT_V2" ||
+        !Array.isArray(journal.keys) || !journal.keys.length || !journal.before ||
+        journal.keys.some(function(k) { return allowed.indexOf(k) < 0 || !Object.prototype.hasOwnProperty.call(journal.before,k); })) return false;
     try {
-      parsed = JSON.parse(jsonString);
-    } catch (_) {
-      return { success: false, reason: "invalid_json" };
-    }
-
-    if (!parsed || typeof parsed !== "object" || !parsed.vault) {
-      return { success: false, reason: "invalid_vault_schema" };
-    }
-
-    var v = parsed.vault;
-    var vocab = Array.isArray(v.vocabBank) ? v.vocabBank : [];
-    var history = Array.isArray(v.studyHistory) ? v.studyHistory : [];
-
-    try {
-      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(vocab));
-      localStorage.setItem("df_vocab_study_history_v1", JSON.stringify(history));
-
-      if (v.dailyGoal && typeof v.dailyGoal === "number") {
-        localStorage.setItem("df_vocab_daily_goal_v1", String(v.dailyGoal));
+      for (var i=0; i<journal.keys.length; i++) {
+        var key=journal.keys[i],old=journal.before[key];
+        if (old === null) localStorage.removeItem(key);
+        else localStorage.setItem(key,old);
       }
-
-      if (v.settings && typeof v.settings === "object") {
-        if (typeof v.settings.oledTrueBlack === "boolean") {
-          localStorage.setItem("df_oled_true_black_v1", String(v.settings.oledTrueBlack));
-          if (typeof window !== "undefined" && typeof window.dfApplyOledTrueBlackState === "function") {
-            window.dfApplyOledTrueBlackState();
-          }
-        }
-        if (typeof v.settings.halfwayChime === "boolean") {
-          localStorage.setItem("df_halfway_chime_enabled_v1", String(v.settings.halfwayChime));
-        }
+      for (var j=0; j<journal.keys.length; j++) {
+        var k=journal.keys[j];
+        if (localStorage.getItem(k) !== journal.before[k]) return false;
       }
-    } catch (_) {
-      return { success: false, reason: "storage_write_failed" };
-    }
-
-    try {
-      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
-        window.dfTriggerVocabStatsSync({ immediate: true });
-      }
-    } catch (_) {}
-
-    try {
-      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
-        window.dfVocabHapticPulse(25);
-      }
-    } catch (_) {}
-
-    try {
-      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
-        window.dfShowVocabToastNotification("تمت استعادة الخزينة بنجاح!", "success");
-      }
-    } catch (_) {}
-
-    return {
-      success: true,
-      wordsCount: vocab.length,
-      historyCount: history.length
-    };
+      localStorage.removeItem(DF_VAULT_JOURNAL);
+      return true;
+    } catch (_) { return false; }
   }
+
+  function dfValidateAndImportVaultJson(jsonString) {
+    if (typeof jsonString !== 'string' || !jsonString || jsonString.length > 5*1024*1024)
+      return {success:false,reason:'invalid_or_oversized_input'};
+    if (!dfRecoverPendingVaultImport()) return {success:false,reason:'recovery_pending'};
+    var parsed;
+    try { parsed = JSON.parse(jsonString); } catch (_) { return {success:false,reason:'invalid_json'}; }
+    if (!parsed || parsed.app !== 'Deep Focus' || parsed.schemaVersion !== 'v4.0.7' ||
+        !parsed.vault || typeof parsed.vault !== 'object' ||
+        !Array.isArray(parsed.vault.vocabBank) || !Array.isArray(parsed.vault.studyHistory))
+      return {success:false,reason:'invalid_vault_schema'};
+    var v=parsed.vault;
+    if (v.vocabBank.some(function(x){return !x || typeof x !== 'object' || Array.isArray(x);}) ||
+        v.studyHistory.some(function(x){return !x || typeof x !== 'object' || Array.isArray(x);}))
+      return {success:false,reason:'invalid_vault_items'};
+    var current;
+    try { current = JSON.parse(localStorage.getItem('df_vocab_bank_v1') || '[]'); } catch (_) { current=[]; }
+    if (Array.isArray(current) && current.length && !v.vocabBank.length)
+      return {success:false,reason:'refuse_empty_vocabulary_overwrite'};
+    var desired={
+      df_vocab_bank_v1:JSON.stringify(v.vocabBank),
+      df_vocab_study_history_v1:JSON.stringify(v.studyHistory)
+    };
+    if (Object.prototype.hasOwnProperty.call(v,'dailyGoal')) {
+      if (!Number.isSafeInteger(v.dailyGoal) || v.dailyGoal<1 || v.dailyGoal>10000)
+        return {success:false,reason:'invalid_daily_goal'};
+      desired.df_vocab_daily_goal_v1=String(v.dailyGoal);
+    }
+    if (v.settings != null) {
+      if (typeof v.settings !== 'object' || Array.isArray(v.settings))
+        return {success:false,reason:'invalid_settings'};
+      if (Object.prototype.hasOwnProperty.call(v.settings,'oledTrueBlack')) {
+        if (typeof v.settings.oledTrueBlack !== 'boolean') return {success:false,reason:'invalid_oled_state'};
+        desired.df_oled_true_black_v1=String(v.settings.oledTrueBlack);
+      }
+      if (Object.prototype.hasOwnProperty.call(v.settings,'halfwayChime')) {
+        if (typeof v.settings.halfwayChime !== 'boolean') return {success:false,reason:'invalid_chime_state'};
+        desired.df_halfway_chime_enabled_v1=String(v.settings.halfwayChime);
+      }
+    }
+    var keys=Object.keys(desired),before=Object.create(null);
+    try {
+      for (var i=0;i<keys.length;i++) before[keys[i]]=localStorage.getItem(keys[i]);
+      localStorage.setItem(DF_VAULT_JOURNAL,JSON.stringify({schema:'DF_M277_SAFE_JOURNAL_IMPORT_V2',keys:keys,before:before}));
+      for (var j=0;j<keys.length;j++) localStorage.setItem(keys[j],desired[keys[j]]);
+      for (var k=0;k<keys.length;k++) if (localStorage.getItem(keys[k])!==desired[keys[k]]) throw Error('readback_failed');
+      localStorage.removeItem(DF_VAULT_JOURNAL);
+    } catch (_) {
+      var restored=dfRecoverPendingVaultImport();
+      return {success:false,reason:restored?'storage_write_failed_rolled_back':'rollback_pending_do_not_close'};
+    }
+    try { if (typeof window !== 'undefined') {
+      if (typeof window.dfApplyOledTrueBlackState === 'function') window.dfApplyOledTrueBlackState();
+      if (typeof window.dfTriggerVocabStatsSync === 'function') window.dfTriggerVocabStatsSync({immediate:true});
+      if (typeof window.dfShowVocabToastNotification === 'function') window.dfShowVocabToastNotification('تم استيراد بيانات المفردات بنجاح','success');
+    }} catch (_) {}
+    return {success:true,wordsCount:v.vocabBank.length,historyCount:v.studyHistory.length};
+  }
+  // A crash during a previous import must not leave half-published values.
+  dfRecoverPendingVaultImport();
 
   function dfRenderVaultBackupSettingsSectionHtml() {
     return "<div class=\"df-settings-vault-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
@@ -10259,5 +10278,1401 @@ window.FlashQuizEngine = FlashQuizEngine;
   if (typeof window !== "undefined") {
     window.dfGetCenturyMilestoneSummary = dfGetCenturyMilestoneSummary;
     window.dfRenderCenturyMilestoneModalHtml = dfRenderCenturyMilestoneModalHtml;
+  }
+})();
+
+/* === M281_PURE_AMBIENT_NATURE_SOUNDSCAPES_SELECTOR_AND_CODE101_V1 === */
+(function() {
+  'use strict';
+
+  var _soundscapeCtx = null;
+  var _soundscapeNode = null;
+  var _soundscapeGain = null;
+
+  function dfGetActiveSoundscape() {
+    try {
+      var val = localStorage.getItem("df_active_soundscape_v1");
+      if (val && ["rain", "stream", "forest", "white_noise", "none"].indexOf(val) !== -1) {
+        return val;
+      }
+    } catch (_) {}
+    return "none";
+  }
+
+  function dfStopAmbientSoundscape() {
+    try {
+      if (_soundscapeGain && _soundscapeCtx) {
+        _soundscapeGain.gain.setValueAtTime(_soundscapeGain.gain.value, _soundscapeCtx.currentTime);
+        _soundscapeGain.gain.exponentialRampToValueAtTime(0.0001, _soundscapeCtx.currentTime + 0.3);
+        setTimeout(function() {
+          if (_soundscapeNode) {
+            try { _soundscapeNode.stop(); _soundscapeNode.disconnect(); } catch (_) {}
+            _soundscapeNode = null;
+          }
+        }, 350);
+      }
+    } catch (_) {}
+
+    try {
+      localStorage.setItem("df_active_soundscape_v1", "none");
+    } catch (_) {}
+
+    return { active: false, type: "none" };
+  }
+
+  function dfStartAmbientSoundscape(soundType) {
+    var type = soundType || "rain";
+    if (type === "none") {
+      return dfStopAmbientSoundscape();
+    }
+
+    dfStopAmbientSoundscape();
+
+    try {
+      if (typeof window === "undefined") return { active: false, reason: "no_window" };
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return { active: false, reason: "no_audio_context" };
+
+      if (!_soundscapeCtx || _soundscapeCtx.state === "closed") {
+        _soundscapeCtx = new AudioCtx();
+      } else if (_soundscapeCtx.state === "suspended") {
+        _soundscapeCtx.resume();
+      }
+
+      var bufferSize = 2 * _soundscapeCtx.sampleRate;
+      var noiseBuffer = _soundscapeCtx.createBuffer(1, bufferSize, _soundscapeCtx.sampleRate);
+      var output = noiseBuffer.getChannelData(0);
+
+      var filterFreq = 800;
+      var gainVal = 0.15;
+
+      if (type === "rain") {
+        filterFreq = 750;
+        gainVal = 0.12;
+      } else if (type === "stream") {
+        filterFreq = 1200;
+        gainVal = 0.10;
+      } else if (type === "forest") {
+        filterFreq = 450;
+        gainVal = 0.14;
+      } else if (type === "white_noise") {
+        filterFreq = 1500;
+        gainVal = 0.08;
+      }
+
+      var lastOut = 0.0;
+      for (var i = 0; i < bufferSize; i++) {
+        var white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = output[i];
+        output[i] *= 3.5;
+      }
+
+      var whiteNoise = _soundscapeCtx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;
+
+      var filter = _soundscapeCtx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(filterFreq, _soundscapeCtx.currentTime);
+
+      _soundscapeGain = _soundscapeCtx.createGain();
+      _soundscapeGain.gain.setValueAtTime(0.001, _soundscapeCtx.currentTime);
+      _soundscapeGain.gain.exponentialRampToValueAtTime(gainVal, _soundscapeCtx.currentTime + 1.0);
+
+      whiteNoise.connect(filter);
+      filter.connect(_soundscapeGain);
+      _soundscapeGain.connect(_soundscapeCtx.destination);
+
+      whiteNoise.start(0);
+      _soundscapeNode = whiteNoise;
+
+      try {
+        localStorage.setItem("df_active_soundscape_v1", type);
+      } catch (_) {}
+
+      try {
+        if (typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(15);
+        }
+      } catch (_) {}
+
+      return { active: true, type: type };
+    } catch (_) {
+      return { active: false, reason: "audio_init_failed" };
+    }
+  }
+
+  function dfRenderSoundscapeSelectorHtml() {
+    var active = dfGetActiveSoundscape();
+    var options = [
+      { id: "rain", label: "🌧️ مطر هادئ" },
+      { id: "stream", label: "🌊 جدول ماء" },
+      { id: "forest", label: "🍃 نسيم غابة" },
+      { id: "none", label: "🔇 صامت" }
+    ];
+
+    var chipsHtml = "";
+    for (var i = 0; i < options.length; i++) {
+      var opt = options[i];
+      var isSel = (opt.id === active);
+      var bg = isSel ? "#2563eb" : "rgba(255,255,255,0.06)";
+      var border = isSel ? "#3b82f6" : "rgba(255,255,255,0.12)";
+      var color = isSel ? "#ffffff" : "#d4d4d8";
+
+      chipsHtml += "<button type=\"button\" onclick=\"window.dfStartAmbientSoundscape && window.dfStartAmbientSoundscape('" + opt.id + "')\" style=\"background:" + bg + ";border:1px solid " + border + ";color:" + color + ";border-radius:16px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:" + (isSel ? "bold" : "normal") + ";\">" +
+        "<span>" + opt.label + "</span>" +
+      "</button>";
+    }
+
+    return "<div class=\"df-soundscape-selector\" style=\"margin:12px 0;padding:12px;background:#18181b;border:1px solid #27272a;border-radius:12px;direction:rtl;\">" +
+      "<div style=\"margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;\">" +
+        "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;\">🎧 عازل الضوضاء الطبيعي (Zero-Music)</span>" +
+        "<span style=\"font-size:11px;color:#10b981;\">أصوات طبيعية حية</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:6px;flex-wrap:wrap;\">" +
+        chipsHtml +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetActiveSoundscape = dfGetActiveSoundscape;
+    window.dfStartAmbientSoundscape = dfStartAmbientSoundscape;
+    window.dfStopAmbientSoundscape = dfStopAmbientSoundscape;
+    window.dfRenderSoundscapeSelectorHtml = dfRenderSoundscapeSelectorHtml;
+  }
+})();
+
+/* === M282_SMOOTH_AUDIO_FADE_NORMALIZER_AND_CODE102_V1 === */
+(function() {
+  'use strict';
+
+  function dfApplySmoothAudioFade(gainNode, targetVolume, durationSec, audioCtx) {
+    if (!gainNode || !gainNode.gain || !audioCtx) return false;
+
+    var dur = Number(durationSec) > 0 ? Number(durationSec) : 3.0;
+    var target = Math.max(0, Math.min(1.0, Number(targetVolume) || 0));
+    var now = audioCtx.currentTime;
+
+    try {
+      gainNode.gain.cancelScheduledValues(now);
+      var currentVal = Math.max(0.0001, gainNode.gain.value);
+      gainNode.gain.setValueAtTime(currentVal, now);
+
+      if (target <= 0.0001) {
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+        setTimeout(function() {
+          try { gainNode.gain.setValueAtTime(0, audioCtx.currentTime); } catch (_) {}
+        }, Math.round((dur + 0.05) * 1000));
+      } else {
+        gainNode.gain.exponentialRampToValueAtTime(target, now + dur);
+      }
+      return true;
+    } catch (_) {
+      try {
+        gainNode.gain.setValueAtTime(target, now);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+  }
+
+  function dfFadeOutAndStopNode(audioSourceNode, gainNode, audioCtx, durationSec) {
+    if (!audioSourceNode || !gainNode || !audioCtx) return false;
+    var dur = Number(durationSec) > 0 ? Number(durationSec) : 1.5;
+
+    dfApplySmoothAudioFade(gainNode, 0, dur, audioCtx);
+
+    setTimeout(function() {
+      try {
+        if (typeof audioSourceNode.stop === "function") audioSourceNode.stop();
+        if (typeof audioSourceNode.disconnect === "function") audioSourceNode.disconnect();
+      } catch (_) {}
+    }, Math.round((dur + 0.1) * 1000));
+
+    return true;
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfApplySmoothAudioFade = dfApplySmoothAudioFade;
+    window.dfFadeOutAndStopNode = dfFadeOutAndStopNode;
+  }
+})();
+
+/* === M283_TIBETAN_WIND_CHIMES_GENERATOR_AND_CODE103_V1 === */
+(function() {
+  'use strict';
+
+  var _windChimeTimer = null;
+
+  function dfIsWindChimesEnabled() {
+    try {
+      return localStorage.getItem("df_wind_chimes_enabled_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfToggleWindChimes(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsWindChimesEnabled();
+    try {
+      localStorage.setItem("df_wind_chimes_enabled_v1", String(state));
+    } catch (_) {}
+
+    if (state) {
+      dfStartWindChimesScheduler();
+    } else {
+      dfStopWindChimesScheduler();
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    return state;
+  }
+
+  function dfSynthesizeSingleChime(ctx, freq, delaySec, gainVal) {
+    try {
+      var startTime = ctx.currentTime + delaySec;
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(gainVal, startTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 2.2);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 2.25);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfSynthesizeTibetanWindChimes() {
+    try {
+      if (typeof window === "undefined") return false;
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
+      var ctx = new AudioCtx();
+
+      var strikes = [
+        { freq: 528, delay: 0.0, gain: 0.12 },
+        { freq: 660, delay: 0.18, gain: 0.10 },
+        { freq: 792, delay: 0.42, gain: 0.08 },
+        { freq: 528, delay: 0.75, gain: 0.09 }
+      ];
+
+      for (var i = 0; i < strikes.length; i++) {
+        var s = strikes[i];
+        dfSynthesizeSingleChime(ctx, s.freq, s.delay, s.gain);
+      }
+
+      try {
+        if (typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(15);
+        }
+      } catch (_) {}
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfStartWindChimesScheduler() {
+    dfStopWindChimesScheduler();
+    if (!dfIsWindChimesEnabled()) return false;
+
+    var intervalMs = (5 + Math.random() * 3) * 60 * 1000;
+    _windChimeTimer = setTimeout(function() {
+      dfSynthesizeTibetanWindChimes();
+      dfStartWindChimesScheduler();
+    }, intervalMs);
+
+    return true;
+  }
+
+  function dfStopWindChimesScheduler() {
+    if (_windChimeTimer) {
+      clearTimeout(_windChimeTimer);
+      _windChimeTimer = null;
+    }
+  }
+
+  function dfRenderWindChimesSettingsHtml() {
+    var isEnabled = dfIsWindChimesEnabled();
+    var statusText = isEnabled ? "مفعّل" : "معطّل";
+    var btnBg = isEnabled ? "#10b981" : "rgba(255,255,255,0.1)";
+
+    return "<div class=\"df-settings-chimes-section\" style=\"margin:12px 0;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🔔 رنين أجراس الرياح التبتية</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">أجراس هوائية ناعمة متباعدة لتعزيز السكينة والتركيز</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleWindChimes && window.dfToggleWindChimes()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+      "<button type=\"button\" onclick=\"window.dfSynthesizeTibetanWindChimes && window.dfSynthesizeTibetanWindChimes()\" style=\"background:none;border:none;color:#60a5fa;font-size:11px;cursor:pointer;padding:0;text-decoration:underline;\">" +
+        "استمع لتجربة الرنين الآن" +
+      "</button>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsWindChimesEnabled = dfIsWindChimesEnabled;
+    window.dfToggleWindChimes = dfToggleWindChimes;
+    window.dfSynthesizeTibetanWindChimes = dfSynthesizeTibetanWindChimes;
+    window.dfStartWindChimesScheduler = dfStartWindChimesScheduler;
+    window.dfStopWindChimesScheduler = dfStopWindChimesScheduler;
+    window.dfRenderWindChimesSettingsHtml = dfRenderWindChimesSettingsHtml;
+  }
+})();
+
+/* === M284_SLEEP_TIMER_WITH_VOLUME_TAPERING_AND_CODE104_V1 === */
+(function() {
+  'use strict';
+
+  var _sleepTimerInterval = null;
+  var _sleepTimerTargetMs = 0;
+  var _isTapering = false;
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfCancelSleepTimer() {
+    if (_sleepTimerInterval) {
+      clearInterval(_sleepTimerInterval);
+      _sleepTimerInterval = null;
+    }
+    _sleepTimerTargetMs = 0;
+    _isTapering = false;
+
+    try {
+      localStorage.removeItem("df_sleep_timer_target_v1");
+    } catch (_) {}
+
+    return { active: false };
+  }
+
+  function dfGetSleepTimerStatus() {
+    if (_sleepTimerTargetMs <= 0) {
+      try {
+        var raw = localStorage.getItem("df_sleep_timer_target_v1");
+        if (raw) _sleepTimerTargetMs = Number(raw) || 0;
+      } catch (_) {}
+    }
+
+    if (_sleepTimerTargetMs <= 0) {
+      return { active: false, remainingSeconds: 0, remainingFormatted: "0" };
+    }
+
+    var now = Date.now();
+    var remainingSec = Math.max(0, Math.round((_sleepTimerTargetMs - now) / 1000));
+
+    if (remainingSec <= 0) {
+      dfCancelSleepTimer();
+      return { active: false, remainingSeconds: 0, remainingFormatted: "0" };
+    }
+
+    var remMins = Math.ceil(remainingSec / 60);
+
+    return {
+      active: true,
+      remainingSeconds: remainingSec,
+      remainingFormatted: dfFormatWesternDigits(remMins),
+      isTapering: _isTapering
+    };
+  }
+
+  function dfStartSleepTimer(minutes) {
+    var mins = Math.max(1, Math.min(180, Number(minutes) || 30));
+    dfCancelSleepTimer();
+
+    var durationMs = mins * 60 * 1000;
+    _sleepTimerTargetMs = Date.now() + durationMs;
+    _isTapering = false;
+
+    try {
+      localStorage.setItem("df_sleep_timer_target_v1", String(_sleepTimerTargetMs));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("تم تفعيل مؤقت النوم: " + dfFormatWesternDigits(mins) + " دقيقة", "info", 2000);
+      }
+    } catch (_) {}
+
+    _sleepTimerInterval = setInterval(function() {
+      var status = dfGetSleepTimerStatus();
+      if (!status.active) {
+        dfCancelSleepTimer();
+        if (typeof window !== "undefined" && typeof window.dfStopAmbientSoundscape === "function") {
+          window.dfStopAmbientSoundscape();
+        }
+        return;
+      }
+
+      if (status.remainingSeconds <= 120 && !_isTapering) {
+        _isTapering = true;
+        try {
+          if (typeof window !== "undefined" && typeof window.dfApplySmoothAudioFade === "function" && window._soundscapeGain && window._soundscapeCtx) {
+            window.dfApplySmoothAudioFade(window._soundscapeGain, 0.0001, status.remainingSeconds, window._soundscapeCtx);
+          }
+        } catch (_) {}
+      }
+    }, 5000);
+
+    return {
+      active: true,
+      minutes: mins,
+      targetTime: _sleepTimerTargetMs
+    };
+  }
+
+  function dfRenderSleepTimerSelectorHtml() {
+    var status = dfGetSleepTimerStatus();
+    var options = [15, 30, 45, 60];
+    var chipsHtml = "";
+
+    for (var i = 0; i < options.length; i++) {
+      var m = options[i];
+      var mStr = dfFormatWesternDigits(m);
+      chipsHtml += "<button type=\"button\" onclick=\"window.dfStartSleepTimer && window.dfStartSleepTimer(" + m + ")\" style=\"background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#d4d4d8;border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer;\">" +
+        "<span>" + mStr + " دقيقة</span>" +
+      "</button>";
+    }
+
+    if (status.active) {
+      chipsHtml += "<button type=\"button\" onclick=\"window.dfCancelSleepTimer && window.dfCancelSleepTimer()\" style=\"background:#ef4444;border:none;color:#ffffff;border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:bold;\">" +
+        "<span>إلغاء (" + status.remainingFormatted + " د)</span>" +
+      "</button>";
+    }
+
+    return "<div class=\"df-sleep-timer-widget\" style=\"margin:10px 0;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;\">" +
+        "<span style=\"font-size:12px;font-weight:bold;color:#f4f4f5;\">⏳ مؤقت النوم والتلاشي التلقائي</span>" +
+        (status.active ? "<span style=\"font-size:11px;color:#60a5fa;\">متبقي: " + status.remainingFormatted + " دقيقة</span>" : "<span style=\"font-size:11px;color:#a1a1aa;\">معطّل</span>") +
+      "</div>" +
+      "<div style=\"display:flex;gap:6px;flex-wrap:wrap;\">" +
+        chipsHtml +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfStartSleepTimer = dfStartSleepTimer;
+    window.dfCancelSleepTimer = dfCancelSleepTimer;
+    window.dfGetSleepTimerStatus = dfGetSleepTimerStatus;
+    window.dfRenderSleepTimerSelectorHtml = dfRenderSleepTimerSelectorHtml;
+  }
+})();
+
+/* === M285_BINAURAL_40HZ_GAMMA_FOCUS_SYNTHESIZER_AND_CODE105_V1 === */
+(function() {
+  'use strict';
+
+  var _binauralCtx = null;
+  var _leftOsc = null;
+  var _rightOsc = null;
+  var _binauralMasterGain = null;
+
+  function dfIsBinauralGammaActive() {
+    try {
+      return localStorage.getItem("df_binaural_gamma_active_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfStopBinauralGamma() {
+    try {
+      if (_binauralMasterGain && _binauralCtx) {
+        _binauralMasterGain.gain.setValueAtTime(_binauralMasterGain.gain.value, _binauralCtx.currentTime);
+        _binauralMasterGain.gain.exponentialRampToValueAtTime(0.0001, _binauralCtx.currentTime + 0.5);
+
+        setTimeout(function() {
+          try {
+            if (_leftOsc) { _leftOsc.stop(); _leftOsc.disconnect(); _leftOsc = null; }
+            if (_rightOsc) { _rightOsc.stop(); _rightOsc.disconnect(); _rightOsc = null; }
+          } catch (_) {}
+        }, 550);
+      }
+    } catch (_) {}
+
+    try {
+      localStorage.setItem("df_binaural_gamma_active_v1", "false");
+    } catch (_) {}
+
+    return { active: false };
+  }
+
+  function dfStartBinauralGamma(carrierFreq) {
+    dfStopBinauralGamma();
+
+    try {
+      if (typeof window === "undefined") return { active: false, reason: "no_window" };
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return { active: false, reason: "no_audio_context" };
+
+      if (!_binauralCtx || _binauralCtx.state === "closed") {
+        _binauralCtx = new AudioCtx();
+      } else if (_binauralCtx.state === "suspended") {
+        _binauralCtx.resume();
+      }
+
+      var carrier = Number(carrierFreq) || 216;
+      var beat = 40;
+
+      var merger = _binauralCtx.createChannelMerger ? _binauralCtx.createChannelMerger(2) : null;
+      _binauralMasterGain = _binauralCtx.createGain();
+      _binauralMasterGain.gain.setValueAtTime(0.0001, _binauralCtx.currentTime);
+      _binauralMasterGain.gain.exponentialRampToValueAtTime(0.08, _binauralCtx.currentTime + 1.5);
+
+      _leftOsc = _binauralCtx.createOscillator();
+      _leftOsc.type = "sine";
+      _leftOsc.frequency.setValueAtTime(carrier, _binauralCtx.currentTime);
+
+      _rightOsc = _binauralCtx.createOscillator();
+      _rightOsc.type = "sine";
+      _rightOsc.frequency.setValueAtTime(carrier + beat, _binauralCtx.currentTime);
+
+      if (merger) {
+        _leftOsc.connect(merger, 0, 0);
+        _rightOsc.connect(merger, 0, 1);
+        merger.connect(_binauralMasterGain);
+      } else {
+        _leftOsc.connect(_binauralMasterGain);
+        _rightOsc.connect(_binauralMasterGain);
+      }
+
+      _binauralMasterGain.connect(_binauralCtx.destination);
+
+      _leftOsc.start(0);
+      _rightOsc.start(0);
+
+      try {
+        localStorage.setItem("df_binaural_gamma_active_v1", "true");
+      } catch (_) {}
+
+      try {
+        if (typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(15);
+        }
+      } catch (_) {}
+
+      return {
+        active: true,
+        beatFrequency: beat,
+        carrierFrequency: carrier
+      };
+    } catch (_) {
+      return { active: false, reason: "init_failed" };
+    }
+  }
+
+  function dfToggleBinauralGamma(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsBinauralGammaActive();
+    if (state) {
+      return dfStartBinauralGamma();
+    } else {
+      return dfStopBinauralGamma();
+    }
+  }
+
+  function dfRenderBinauralGammaSettingsWidgetHtml() {
+    var isActive = dfIsBinauralGammaActive();
+    var statusText = isActive ? "مفعّل" : "معطّل";
+    var btnBg = isActive ? "#10b981" : "rgba(255,255,255,0.1)";
+
+    return "<div class=\"df-settings-binaural-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🧠 موجات التركيز الفائق (40Hz Gamma)</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">تردد ذهني ثنائي الأذنين لتعزيز الحفظ وصفاء الذهن (بالسماعات)</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleBinauralGamma && window.dfToggleBinauralGamma()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsBinauralGammaActive = dfIsBinauralGammaActive;
+    window.dfStartBinauralGamma = dfStartBinauralGamma;
+    window.dfStopBinauralGamma = dfStopBinauralGamma;
+    window.dfToggleBinauralGamma = dfToggleBinauralGamma;
+    window.dfRenderBinauralGammaSettingsWidgetHtml = dfRenderBinauralGammaSettingsWidgetHtml;
+  }
+})();
+
+/* === M286_FLIP_TO_MUTE_SENSOR_DETECTOR_AND_CODE106_V1 === */
+(function() {
+  'use strict';
+
+  var _isFaceDown = false;
+  var _faceDownStartTime = 0;
+
+  function dfIsFlipToMuteEnabled() {
+    try {
+      var val = localStorage.getItem("df_flip_to_mute_enabled_v1");
+      if (val !== null) return val === "true";
+    } catch (_) {}
+    return true;
+  }
+
+  function dfToggleFlipToMute(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsFlipToMuteEnabled();
+    try {
+      localStorage.setItem("df_flip_to_mute_enabled_v1", String(state));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    return state;
+  }
+
+  function dfDetectFaceDownOrientation(beta, gamma) {
+    var b = Number(beta) || 0;
+    var g = Number(gamma) || 0;
+    var isFaceDownAngle = (Math.abs(b) >= 150) && (Math.abs(g) <= 35);
+    return isFaceDownAngle;
+  }
+
+  function dfTriggerFlipToMute() {
+    var mutedSomething = false;
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetActiveSoundscape === "function") {
+        if (window.dfGetActiveSoundscape() !== "none") {
+          window.dfStopAmbientSoundscape();
+          mutedSomething = true;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfIsBinauralGammaActive === "function") {
+        if (window.dfIsBinauralGammaActive()) {
+          window.dfStopBinauralGamma();
+          mutedSomething = true;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfStopAllVocabSpeech === "function") {
+        window.dfStopAllVocabSpeech();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(30);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("تم كتم الصوت بقلب الهاتف 🤫", "info", 2000);
+      }
+    } catch (_) {}
+
+    return { success: true, mutedSomething: mutedSomething };
+  }
+
+  function dfProcessOrientationChange(beta, gamma) {
+    if (!dfIsFlipToMuteEnabled()) return false;
+
+    var faceDown = dfDetectFaceDownOrientation(beta, gamma);
+    var now = Date.now();
+
+    if (faceDown) {
+      if (!_isFaceDown) {
+        _isFaceDown = true;
+        _faceDownStartTime = now;
+      } else if (now - _faceDownStartTime >= 400) {
+        _faceDownStartTime = now + 999999;
+        return dfTriggerFlipToMute();
+      }
+    } else {
+      _isFaceDown = false;
+      _faceDownStartTime = 0;
+    }
+
+    return false;
+  }
+
+  function dfRenderFlipToMuteSettingsToggleHtml() {
+    var isEnabled = dfIsFlipToMuteEnabled();
+    var statusText = isEnabled ? "مفعّل" : "معطّل";
+    var btnBg = isEnabled ? "#10b981" : "rgba(255,255,255,0.1)";
+
+    return "<div class=\"df-settings-flipmute-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🤫 كتم الصوت بقلب الهاتف (Flip-to-Mute)</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">كتم فوري للمؤثرات والنطق بمجرد وضع الهاتف على شاشته</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleFlipToMute && window.dfToggleFlipToMute()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  try {
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+      window.addEventListener("deviceorientation", function(e) {
+        if (e && e.beta !== null && e.gamma !== null) {
+          dfProcessOrientationChange(e.beta, e.gamma);
+        }
+      });
+    }
+  } catch (_) {}
+
+  if (typeof window !== "undefined") {
+    window.dfIsFlipToMuteEnabled = dfIsFlipToMuteEnabled;
+    window.dfToggleFlipToMute = dfToggleFlipToMute;
+    window.dfDetectFaceDownOrientation = dfDetectFaceDownOrientation;
+    window.dfTriggerFlipToMute = dfTriggerFlipToMute;
+    window.dfProcessOrientationChange = dfProcessOrientationChange;
+    window.dfRenderFlipToMuteSettingsToggleHtml = dfRenderFlipToMuteSettingsToggleHtml;
+  }
+})();
+
+/* === M287_DUAL_INDEPENDENT_VOLUME_CONTROLS_AND_CODE107_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetTtsVolume() {
+    try {
+      var val = localStorage.getItem("df_volume_tts_v1");
+      if (val !== null) {
+        var n = parseFloat(val);
+        if (!isNaN(n)) return Math.max(0.0, Math.min(1.0, n));
+      }
+    } catch (_) {}
+    return 1.0;
+  }
+
+  function dfSetTtsVolume(volume) {
+    var v = Math.max(0.0, Math.min(1.0, Number(volume) || 0));
+    try {
+      localStorage.setItem("df_volume_tts_v1", String(v));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(10);
+      }
+    } catch (_) {}
+
+    return v;
+  }
+
+  function dfGetAmbientVolume() {
+    try {
+      var val = localStorage.getItem("df_volume_ambient_v1");
+      if (val !== null) {
+        var n = parseFloat(val);
+        if (!isNaN(n)) return Math.max(0.0, Math.min(1.0, n));
+      }
+    } catch (_) {}
+    return 0.40;
+  }
+
+  function dfSetAmbientVolume(volume) {
+    var v = Math.max(0.0, Math.min(1.0, Number(volume) || 0));
+    try {
+      localStorage.setItem("df_volume_ambient_v1", String(v));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && window._soundscapeGain && window._soundscapeCtx) {
+        if (typeof window.dfApplySmoothAudioFade === "function") {
+          window.dfApplySmoothAudioFade(window._soundscapeGain, v * 0.25, 0.5, window._soundscapeCtx);
+        } else {
+          window._soundscapeGain.gain.setValueAtTime(v * 0.25, window._soundscapeCtx.currentTime);
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(10);
+      }
+    } catch (_) {}
+
+    return v;
+  }
+
+  function dfRenderDualVolumeControlsHtml() {
+    var ttsVol = Math.round(dfGetTtsVolume() * 100);
+    var ambVol = Math.round(dfGetAmbientVolume() * 100);
+
+    var ttsStr = dfFormatWesternDigits(ttsVol);
+    var ambStr = dfFormatWesternDigits(ambVol);
+
+    return "<div class=\"df-dual-volume-controls\" style=\"margin:12px 0;padding:12px;background:#18181b;border:1px solid #27272a;border-radius:12px;direction:rtl;color:#f4f4f5;\">" +
+      "<div style=\"margin-bottom:10px;\">" +
+        "<div style=\"display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;\">" +
+          "<span>🗣️ مستوى نطق المفردات (TTS):</span>" +
+          "<strong id=\"df-tts-vol-val\">" + ttsStr + "%</strong>" +
+        "</div>" +
+        "<input type=\"range\" min=\"0\" max=\"100\" value=\"" + ttsVol + "\" oninput=\"var v = this.value; document.getElementById('df-tts-vol-val').textContent = v + '%'; window.dfSetTtsVolume && window.dfSetTtsVolume(v / 100);\" style=\"width:100%;accent-color:#2563eb;cursor:pointer;\" />" +
+      "</div>" +
+      "<div>" +
+        "<div style=\"display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;\">" +
+          "<span>🌊 مستوى عازل الطبيعة والرنين:</span>" +
+          "<strong id=\"df-amb-vol-val\">" + ambStr + "%</strong>" +
+        "</div>" +
+        "<input type=\"range\" min=\"0\" max=\"100\" value=\"" + ambVol + "\" oninput=\"var v = this.value; document.getElementById('df-amb-vol-val').textContent = v + '%'; window.dfSetAmbientVolume && window.dfSetAmbientVolume(v / 100);\" style=\"width:100%;accent-color:#10b981;cursor:pointer;\" />" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetTtsVolume = dfGetTtsVolume;
+    window.dfSetTtsVolume = dfSetTtsVolume;
+    window.dfGetAmbientVolume = dfGetAmbientVolume;
+    window.dfSetAmbientVolume = dfSetAmbientVolume;
+    window.dfRenderDualVolumeControlsHtml = dfRenderDualVolumeControlsHtml;
+  }
+})();
+
+/* === M288_BACKGROUND_AUDIO_MEDIA_SESSION_BRIDGE_AND_CODE108_V1 === */
+(function() {
+  'use strict';
+
+  function dfUpdateMediaSessionMetadata(title, artist) {
+    try {
+      if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return false;
+      var trackTitle = title || "جلسة تركيز هادئة (Deep Focus)";
+      var trackArtist = artist || "عازل الصوت الطبيعي";
+
+      var metadataObj = {
+        title: String(trackTitle),
+        artist: String(trackArtist),
+        album: "DEEP FOCUS"
+      };
+
+      if (typeof MediaMetadata === "function") {
+        navigator.mediaSession.metadata = new MediaMetadata(metadataObj);
+      } else {
+        navigator.mediaSession.metadata = metadataObj;
+      }
+
+      navigator.mediaSession.playbackState = "playing";
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfClearMediaSession() {
+    try {
+      if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return false;
+      navigator.mediaSession.playbackState = "none";
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfInitMediaSessionActionHandlers() {
+    try {
+      if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return false;
+
+      var handlers = {
+        play: function() {
+          if (typeof window !== "undefined" && typeof window.dfStartAmbientSoundscape === "function") {
+            window.dfStartAmbientSoundscape("rain");
+          }
+          if (navigator.mediaSession) navigator.mediaSession.playbackState = "playing";
+        },
+        pause: function() {
+          if (typeof window !== "undefined" && typeof window.dfStopAmbientSoundscape === "function") {
+            window.dfStopAmbientSoundscape();
+          }
+          if (navigator.mediaSession) navigator.mediaSession.playbackState = "paused";
+        },
+        stop: function() {
+          if (typeof window !== "undefined" && typeof window.dfStopAmbientSoundscape === "function") {
+            window.dfStopAmbientSoundscape();
+          }
+          dfClearMediaSession();
+        },
+        nexttrack: function() {
+          try {
+            if (typeof window !== "undefined" && typeof window.dfOnNextQuizCard === "function") {
+              window.dfOnNextQuizCard();
+            }
+          } catch (_) {}
+        },
+        previoustrack: function() {
+          try {
+            if (typeof window !== "undefined" && typeof window.dfOnPrevQuizCard === "function") {
+              window.dfOnPrevQuizCard();
+            }
+          } catch (_) {}
+        }
+      };
+
+      for (var action in handlers) {
+        try {
+          navigator.mediaSession.setActionHandler(action, handlers[action]);
+        } catch (_) {}
+      }
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      dfInitMediaSessionActionHandlers();
+      window.dfUpdateMediaSessionMetadata = dfUpdateMediaSessionMetadata;
+      window.dfClearMediaSession = dfClearMediaSession;
+      window.dfInitMediaSessionActionHandlers = dfInitMediaSessionActionHandlers;
+    }
+  } catch (_) {}
+})();
+
+/* === M289_AUDIO_DUCKING_POLICY_HANDLER_AND_CODE109_V1 === */
+(function() {
+  'use strict';
+
+  var _isAudioDucked = false;
+  var _preDuckedVolume = 0.40;
+
+  function dfIsAudioDucked() {
+    return _isAudioDucked;
+  }
+
+  function dfApplyAudioDucking() {
+    if (_isAudioDucked) return { ducked: false, reason: "already_ducked" };
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetAmbientVolume === "function") {
+        _preDuckedVolume = window.dfGetAmbientVolume();
+      }
+    } catch (_) {}
+
+    _isAudioDucked = true;
+    var duckedVol = _preDuckedVolume * 0.25;
+
+    try {
+      if (typeof window !== "undefined" && window._soundscapeGain && window._soundscapeCtx) {
+        if (typeof window.dfApplySmoothAudioFade === "function") {
+          window.dfApplySmoothAudioFade(window._soundscapeGain, duckedVol * 0.25, 0.25, window._soundscapeCtx);
+        } else {
+          window._soundscapeGain.gain.setValueAtTime(duckedVol * 0.25, window._soundscapeCtx.currentTime);
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-ducked") : new Event("df:audio-ducked");
+        window.dispatchEvent(evt);
+      }
+    } catch (_) {}
+
+    return { ducked: true, targetVolume: duckedVol };
+  }
+
+  function dfRestoreAudioDucking() {
+    if (!_isAudioDucked) return { restored: false, reason: "not_ducked" };
+    _isAudioDucked = false;
+
+    try {
+      if (typeof window !== "undefined" && window._soundscapeGain && window._soundscapeCtx) {
+        if (typeof window.dfApplySmoothAudioFade === "function") {
+          window.dfApplySmoothAudioFade(window._soundscapeGain, _preDuckedVolume * 0.25, 0.8, window._soundscapeCtx);
+        } else {
+          window._soundscapeGain.gain.setValueAtTime(_preDuckedVolume * 0.25, window._soundscapeCtx.currentTime);
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-duck-restored") : new Event("df:audio-duck-restored");
+        window.dispatchEvent(evt);
+      }
+    } catch (_) {}
+
+    return { restored: true, volume: _preDuckedVolume };
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      var prevSimulate = window.dfSimulateAudioFocusChange;
+      window.dfSimulateAudioFocusChange = function(state) {
+        if (state === "loss_transient_can_duck") {
+          return dfApplyAudioDucking();
+        } else if (state === "gain" && _isAudioDucked) {
+          return dfRestoreAudioDucking();
+        }
+        if (typeof prevSimulate === "function") {
+          return prevSimulate(state);
+        }
+        return false;
+      };
+
+      window.dfIsAudioDucked = dfIsAudioDucked;
+      window.dfApplyAudioDucking = dfApplyAudioDucking;
+      window.dfRestoreAudioDucking = dfRestoreAudioDucking;
+    }
+  } catch (_) {}
+})();
+
+/* === M290_ACOUSTIC_ZEN_MILESTONE_V4_2_0_AND_CODE110_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetAcousticZenMilestoneSummary() {
+    var activeSoundscape = "none";
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetActiveSoundscape === "function") {
+        activeSoundscape = window.dfGetActiveSoundscape();
+      }
+    } catch (_) {}
+
+    var isBinaural = false;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfIsBinauralGammaActive === "function") {
+        isBinaural = window.dfIsBinauralGammaActive();
+      }
+    } catch (_) {}
+
+    var isChimes = false;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfIsWindChimesEnabled === "function") {
+        isChimes = window.dfIsWindChimesEnabled();
+      }
+    } catch (_) {}
+
+    return {
+      version: "4.2.0",
+      versionCode: 110,
+      versionCodeFormatted: dfFormatWesternDigits(110),
+      milestoneTitle: "إصدار السكينة الصوتية (Acoustic Zen)",
+      phaseCompleted: "Phase 2: Acoustic Zen Soundscapes (M281-M290)",
+      soundscapesCountFormatted: dfFormatWesternDigits(4),
+      isZeroMusicCompliant: true,
+      activeSoundscape: activeSoundscape,
+      binauralActive: isBinaural,
+      chimesActive: isChimes
+    };
+  }
+
+  function dfRenderAcousticZenMilestoneModalHtml() {
+    var m = dfGetAcousticZenMilestoneSummary();
+    var boxStyle = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;text-align:center;flex:1;";
+
+    return "<div class=\"df-zen-milestone-modal\" style=\"direction:rtl;padding:16px;background:#18181b;border:1px solid #059669;border-radius:14px;color:#f4f4f5;box-shadow:0 12px 35px rgba(5,150,105,0.25);\">" +
+      "<div style=\"text-align:center;margin-bottom:14px;\">" +
+        "<span style=\"font-size:32px;display:block;margin-bottom:4px;\">🌿</span>" +
+        "<h3 style=\"margin:0 0 4px 0;font-size:18px;color:#34d399;\">" + m.milestoneTitle + " v" + m.version + "</h3>" +
+        "<span style=\"font-size:12px;color:#a7f3d0;display:block;margin-bottom:2px;\">رمز البناء: <strong>" + m.versionCodeFormatted + "</strong></span>" +
+        "<span style=\"font-size:11px;color:#a1a1aa;\">اكتمال المرحلة الثانية الشاملة للبيئة الصوتية الطبيعية بنجاح 100%</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;margin-bottom:12px;\">" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🎧 العوازل</span><span style=\"font-size:15px;font-weight:bold;color:#10b981;\">" + m.soundscapesCountFormatted + " أصوات</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🧠 جاما</span><span style=\"font-size:15px;font-weight:bold;color:#38bdf8;\">40Hz نقي</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🔇 الصمت</span><span style=\"font-size:15px;font-weight:bold;color:#f59e0b;\">Zero-Music</span></div>" +
+      "</div>" +
+      "<div style=\"padding:8px 12px;background:rgba(5,150,105,0.1);border-radius:8px;font-size:11px;color:#a7f3d0;text-align:center;\">" +
+        "✨ جاهز للانطلاق نحو المرحلة الثالثة: خوارزميات التكرار الذكي واحترافية البطاقات (M291-M300)" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetAcousticZenMilestoneSummary = dfGetAcousticZenMilestoneSummary;
+    window.dfRenderAcousticZenMilestoneModalHtml = dfRenderAcousticZenMilestoneModalHtml;
+  }
+})();
+
+/* === M291_SUPERMEMO_SM2_INTERVALS_ENGINE_AND_CODE111_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfCalculateSm2Interval(card, qualityScore) {
+    var c = card || {};
+    var q = Math.max(0, Math.min(5, Math.round(Number(qualityScore) || 0)));
+
+    var rep = Number(c.sm2Repetitions) || 0;
+    var ef = Number(c.sm2EasinessFactor) || 2.5;
+    var prevInterval = Number(c.sm2IntervalDays) || 0;
+
+    var newInterval = 1;
+    var newRep = rep;
+
+    if (q >= 3) {
+      if (rep === 0) {
+        newInterval = 1;
+        newRep = 1;
+      } else if (rep === 1) {
+        newInterval = 6;
+        newRep = 2;
+      } else {
+        newInterval = Math.round(prevInterval * ef);
+        newRep = rep + 1;
+      }
+    } else {
+      newRep = 0;
+      newInterval = 1;
+    }
+
+    var newEf = ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+    newEf = Math.max(1.3, Math.round(newEf * 100) / 100);
+
+    var now = Date.now();
+    var nextDueDateMs = now + (newInterval * 24 * 60 * 60 * 1000);
+    var d = new Date(nextDueDateMs);
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    var nextDueDateStr = dfFormatWesternDigits(y + "-" + m + "-" + day);
+
+    return {
+      repetitions: newRep,
+      intervalDays: newInterval,
+      intervalDaysFormatted: dfFormatWesternDigits(newInterval),
+      easinessFactor: newEf,
+      nextDueDateMs: nextDueDateMs,
+      nextDueDateFormatted: nextDueDateStr
+    };
+  }
+
+  function dfApplySm2ToCard(cardId, qualityScore) {
+    if (!cardId && cardId !== 0) return null;
+    var list = [];
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        list = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        if (raw) list = JSON.parse(raw);
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(list)) list = [];
+    var target = null;
+
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        target = list[i];
+        break;
+      }
+    }
+
+    if (!target) return null;
+
+    var sm2 = dfCalculateSm2Interval(target, qualityScore);
+    target.sm2Repetitions = sm2.repetitions;
+    target.sm2IntervalDays = sm2.intervalDays;
+    target.sm2EasinessFactor = sm2.easinessFactor;
+    target.sm2NextDueDateMs = sm2.nextDueDateMs;
+    target.sm2NextDueDateStr = sm2.nextDueDateFormatted;
+    target.lastReviewedAt = Date.now();
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return target;
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfCalculateSm2Interval = dfCalculateSm2Interval;
+    window.dfApplySm2ToCard = dfApplySm2ToCard;
+  }
+})();
+
+/* === M292_DUE_TODAY_REVIEW_QUEUE_AND_CODE112_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetDueTodayVocabCards() {
+    var allCards = [];
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        allCards = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        if (raw) allCards = JSON.parse(raw);
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(allCards)) return [];
+
+    var now = Date.now();
+    var endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+    var endOfTodayMs = endOfToday.getTime();
+
+    var dueCards = [];
+
+    for (var i = 0; i < allCards.length; i++) {
+      var c = allCards[i];
+      if (!c) continue;
+
+      if (c.sm2NextDueDateMs && Number(c.sm2NextDueDateMs) <= endOfTodayMs) {
+        dueCards.push(c);
+      } else if (c.needsReview || c.isHard || c.hard) {
+        dueCards.push(c);
+      } else if (!c.sm2Repetitions && !c.isMastered && !c.mastered) {
+        dueCards.push(c);
+      }
+    }
+
+    return dueCards;
+  }
+
+  function dfGetDueTodayCount() {
+    var count = dfGetDueTodayVocabCards().length;
+    return {
+      count: count,
+      countFormatted: dfFormatWesternDigits(count)
+    };
+  }
+
+  function dfStartDueTodayQuiz() {
+    var dueCards = dfGetDueTodayVocabCards();
+    if (!dueCards || dueCards.length === 0) {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("رائع! لا توجد كلمات متأخرة أو مستحقة للمراجعة اليوم 🎉", "success", 2500);
+      }
+      return { started: false, count: 0 };
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfOpenFlashcardQuizModal === "function") {
+        window.dfCurrentQuizCards = dueCards.slice();
+        window.dfOpenFlashcardQuizModal(dueCards);
+      }
+    } catch (_) {}
+
+    return { started: true, count: dueCards.length };
+  }
+
+  function dfRenderDueTodayBannerHtml() {
+    var dueData = dfGetDueTodayCount();
+    var countStr = dueData.countFormatted;
+
+    if (dueData.count === 0) {
+      return "<div class=\"df-due-today-banner\" style=\"margin:10px 0;padding:10px 14px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:10px;direction:rtl;display:flex;align-items:center;justify-content:space-between;color:#a7f3d0;font-size:12px;\">" +
+        "<span>🎉 أحسنت! أنجزت كل مراجعات اليوم المجدولة (SM-2).</span>" +
+        "<span style=\"font-weight:bold;color:#34d399;\">مكتمل ✓</span>" +
+      "</div>";
+    }
+
+    return "<div class=\"df-due-today-banner\" style=\"margin:10px 0;padding:12px 14px;background:#18181b;border:1px solid #3b82f6;border-radius:12px;direction:rtl;box-shadow:0 4px 15px rgba(0,0,0,0.3);color:#f4f4f5;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<strong style=\"font-size:13px;display:block;color:#93c5fd;margin-bottom:2px;\">🎯 مستحق للمراجعة اليوم: " + countStr + " كلمات</strong>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">مجدولة تلقائياً بخوارزمية التكرار المتباعد SM-2</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfStartDueTodayQuiz && window.dfStartDueTodayQuiz()\" style=\"background:#2563eb;color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>🚀 ابدأ المراجعة</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetDueTodayVocabCards = dfGetDueTodayVocabCards;
+    window.dfGetDueTodayCount = dfGetDueTodayCount;
+    window.dfStartDueTodayQuiz = dfStartDueTodayQuiz;
+    window.dfRenderDueTodayBannerHtml = dfRenderDueTodayBannerHtml;
   }
 })();
