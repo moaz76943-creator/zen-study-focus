@@ -12912,3 +12912,100 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderDndSettingsToggleHtml = dfRenderDndSettingsToggleHtml;
   }
 })();
+
+/* === M304_WEBVIEW_MEMORY_LEAK_PREVENTION_AND_CODE124_V1 === */
+(function() {
+  'use strict';
+
+  var _periodicCleanupTimer = null;
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfPurgeOrphanedDomNodes() {
+    if (typeof document === "undefined") return 0;
+    var purgedCount = 0;
+
+    var orphanSelectors = [
+      "#df-vocab-toast",
+      "#df-health-check-modal-backdrop",
+      ".df-card-example-tray-temp",
+      "#df-micro-review-banner-stale"
+    ];
+
+    for (var i = 0; i < orphanSelectors.length; i++) {
+      try {
+        var elements = document.querySelectorAll(orphanSelectors[i]);
+        for (var j = 0; j < elements.length; j++) {
+          var el = elements[j];
+          if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+            purgedCount++;
+          }
+        }
+      } catch (_) {}
+    }
+
+    return purgedCount;
+  }
+
+  function dfRunMemoryGarbageCleanup() {
+    var purgedNodes = dfPurgeOrphanedDomNodes();
+
+    try {
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        if (!window.speechSynthesis.speaking && window.speechSynthesis.pending) {
+          window.speechSynthesis.cancel();
+        }
+      }
+    } catch (_) {}
+
+    try {
+      localStorage.removeItem("__df_temp_search_cache__");
+    } catch (_) {}
+
+    return {
+      success: true,
+      purgedNodes: purgedNodes,
+      purgedNodesFormatted: dfFormatWesternDigits(purgedNodes),
+      timestamp: Date.now()
+    };
+  }
+
+  function dfSchedulePeriodicMemoryCleanup() {
+    if (_periodicCleanupTimer) {
+      clearInterval(_periodicCleanupTimer);
+      _periodicCleanupTimer = null;
+    }
+
+    _periodicCleanupTimer = setInterval(function() {
+      dfRunMemoryGarbageCleanup();
+    }, 15 * 60 * 1000);
+
+    return true;
+  }
+
+  try {
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", function() {
+        if (document.hidden) {
+          dfRunMemoryGarbageCleanup();
+        }
+      });
+    }
+
+    if (typeof window !== "undefined") {
+      dfSchedulePeriodicMemoryCleanup();
+      window.dfPurgeOrphanedDomNodes = dfPurgeOrphanedDomNodes;
+      window.dfRunMemoryGarbageCleanup = dfRunMemoryGarbageCleanup;
+      window.dfSchedulePeriodicMemoryCleanup = dfSchedulePeriodicMemoryCleanup;
+    }
+  } catch (_) {}
+})();
