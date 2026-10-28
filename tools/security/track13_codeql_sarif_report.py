@@ -155,6 +155,9 @@ def summarize(directory: Path, sha: str, source_root=None) -> dict:
                         if isinstance(physical, dict):
                             artifact, region = physical.get('artifactLocation', {}), physical.get('region', {})
                             if (isinstance(artifact, dict) and isinstance(region, dict)
+                                    and artifact.get('uriBaseId') in (None, '%SRCROOT%')
+                                    and type(region.get('startLine')) is int
+                                    and type(region.get('endLine', EVIDENCE_SINK[2])) is int
                                     and (raw_rule, artifact.get('uri'), region.get('startLine')) == EVIDENCE_SINK
                                     and region.get('endLine', EVIDENCE_SINK[2]) == EVIDENCE_SINK[2]):
                                 adjudicable += 1
