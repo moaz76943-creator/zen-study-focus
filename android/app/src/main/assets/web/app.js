@@ -10253,3 +10253,166 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderCenturyMilestoneModalHtml = dfRenderCenturyMilestoneModalHtml;
   }
 })();
+
+/* === M281_PURE_AMBIENT_NATURE_SOUNDSCAPES_SELECTOR_AND_CODE101_V1 === */
+(function() {
+  'use strict';
+
+  var _soundscapeCtx = null;
+  var _soundscapeNode = null;
+  var _soundscapeGain = null;
+
+  function dfGetActiveSoundscape() {
+    try {
+      var val = localStorage.getItem("df_active_soundscape_v1");
+      if (val && ["rain", "stream", "forest", "white_noise", "none"].indexOf(val) !== -1) {
+        return val;
+      }
+    } catch (_) {}
+    return "none";
+  }
+
+  function dfStopAmbientSoundscape() {
+    try {
+      if (_soundscapeGain && _soundscapeCtx) {
+        _soundscapeGain.gain.setValueAtTime(_soundscapeGain.gain.value, _soundscapeCtx.currentTime);
+        _soundscapeGain.gain.exponentialRampToValueAtTime(0.0001, _soundscapeCtx.currentTime + 0.3);
+        setTimeout(function() {
+          if (_soundscapeNode) {
+            try { _soundscapeNode.stop(); _soundscapeNode.disconnect(); } catch (_) {}
+            _soundscapeNode = null;
+          }
+        }, 350);
+      }
+    } catch (_) {}
+
+    try {
+      localStorage.setItem("df_active_soundscape_v1", "none");
+    } catch (_) {}
+
+    return { active: false, type: "none" };
+  }
+
+  function dfStartAmbientSoundscape(soundType) {
+    var type = soundType || "rain";
+    if (type === "none") {
+      return dfStopAmbientSoundscape();
+    }
+
+    dfStopAmbientSoundscape();
+
+    try {
+      if (typeof window === "undefined") return { active: false, reason: "no_window" };
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return { active: false, reason: "no_audio_context" };
+
+      if (!_soundscapeCtx || _soundscapeCtx.state === "closed") {
+        _soundscapeCtx = new AudioCtx();
+      } else if (_soundscapeCtx.state === "suspended") {
+        _soundscapeCtx.resume();
+      }
+
+      var bufferSize = 2 * _soundscapeCtx.sampleRate;
+      var noiseBuffer = _soundscapeCtx.createBuffer(1, bufferSize, _soundscapeCtx.sampleRate);
+      var output = noiseBuffer.getChannelData(0);
+
+      var filterFreq = 800;
+      var gainVal = 0.15;
+
+      if (type === "rain") {
+        filterFreq = 750;
+        gainVal = 0.12;
+      } else if (type === "stream") {
+        filterFreq = 1200;
+        gainVal = 0.10;
+      } else if (type === "forest") {
+        filterFreq = 450;
+        gainVal = 0.14;
+      } else if (type === "white_noise") {
+        filterFreq = 1500;
+        gainVal = 0.08;
+      }
+
+      var lastOut = 0.0;
+      for (var i = 0; i < bufferSize; i++) {
+        var white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = output[i];
+        output[i] *= 3.5;
+      }
+
+      var whiteNoise = _soundscapeCtx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;
+
+      var filter = _soundscapeCtx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(filterFreq, _soundscapeCtx.currentTime);
+
+      _soundscapeGain = _soundscapeCtx.createGain();
+      _soundscapeGain.gain.setValueAtTime(0.001, _soundscapeCtx.currentTime);
+      _soundscapeGain.gain.exponentialRampToValueAtTime(gainVal, _soundscapeCtx.currentTime + 1.0);
+
+      whiteNoise.connect(filter);
+      filter.connect(_soundscapeGain);
+      _soundscapeGain.connect(_soundscapeCtx.destination);
+
+      whiteNoise.start(0);
+      _soundscapeNode = whiteNoise;
+
+      try {
+        localStorage.setItem("df_active_soundscape_v1", type);
+      } catch (_) {}
+
+      try {
+        if (typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(15);
+        }
+      } catch (_) {}
+
+      return { active: true, type: type };
+    } catch (_) {
+      return { active: false, reason: "audio_init_failed" };
+    }
+  }
+
+  function dfRenderSoundscapeSelectorHtml() {
+    var active = dfGetActiveSoundscape();
+    var options = [
+      { id: "rain", label: "🌧️ مطر هادئ" },
+      { id: "stream", label: "🌊 جدول ماء" },
+      { id: "forest", label: "🍃 نسيم غابة" },
+      { id: "none", label: "🔇 صامت" }
+    ];
+
+    var chipsHtml = "";
+    for (var i = 0; i < options.length; i++) {
+      var opt = options[i];
+      var isSel = (opt.id === active);
+      var bg = isSel ? "#2563eb" : "rgba(255,255,255,0.06)";
+      var border = isSel ? "#3b82f6" : "rgba(255,255,255,0.12)";
+      var color = isSel ? "#ffffff" : "#d4d4d8";
+
+      chipsHtml += "<button type=\"button\" onclick=\"window.dfStartAmbientSoundscape && window.dfStartAmbientSoundscape('" + opt.id + "')\" style=\"background:" + bg + ";border:1px solid " + border + ";color:" + color + ";border-radius:16px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:" + (isSel ? "bold" : "normal") + ";\">" +
+        "<span>" + opt.label + "</span>" +
+      "</button>";
+    }
+
+    return "<div class=\"df-soundscape-selector\" style=\"margin:12px 0;padding:12px;background:#18181b;border:1px solid #27272a;border-radius:12px;direction:rtl;\">" +
+      "<div style=\"margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;\">" +
+        "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;\">🎧 عازل الضوضاء الطبيعي (Zero-Music)</span>" +
+        "<span style=\"font-size:11px;color:#10b981;\">أصوات طبيعية حية</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:6px;flex-wrap:wrap;\">" +
+        chipsHtml +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetActiveSoundscape = dfGetActiveSoundscape;
+    window.dfStartAmbientSoundscape = dfStartAmbientSoundscape;
+    window.dfStopAmbientSoundscape = dfStopAmbientSoundscape;
+    window.dfRenderSoundscapeSelectorHtml = dfRenderSoundscapeSelectorHtml;
+  }
+})();
