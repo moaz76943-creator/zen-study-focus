@@ -8158,3 +8158,92 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfUpdateVocabHeaderQuickStatsDOM = dfUpdateVocabHeaderQuickStatsDOM;
   }
 })();
+
+/* === M259_VOCAB_STATS_AUTO_SYNC_HOOK_AND_CODE79_V1 === */
+(function() {
+  'use strict';
+
+  var _syncTimer = null;
+
+  function dfExecuteVocabStatsSync() {
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfUpdateVocabHeaderQuickStatsDOM === 'function') {
+        window.dfUpdateVocabHeaderQuickStatsDOM();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfUpdateVocabFilterChips === 'function') {
+        window.dfUpdateVocabFilterChips();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+        var payload = null;
+        if (typeof window.dfGetVocabHeaderStatsData === 'function') {
+          payload = window.dfGetVocabHeaderStatsData();
+        }
+        var evt;
+        if (typeof CustomEvent === 'function') {
+          evt = new CustomEvent('df:vocab-stats-updated', { detail: payload });
+        } else if (typeof Event === 'function') {
+          evt = new Event('df:vocab-stats-updated');
+          evt.detail = payload;
+        }
+        if (evt) {
+          window.dispatchEvent(evt);
+        }
+      }
+    } catch (_) {}
+  }
+
+  function dfTriggerVocabStatsSync(options) {
+    var opts = options || {};
+    if (opts.immediate === true) {
+      if (_syncTimer) {
+        clearTimeout(_syncTimer);
+        _syncTimer = null;
+      }
+      dfExecuteVocabStatsSync();
+      return true;
+    }
+
+    if (_syncTimer) {
+      clearTimeout(_syncTimer);
+    }
+
+    _syncTimer = setTimeout(function() {
+      _syncTimer = null;
+      dfExecuteVocabStatsSync();
+    }, 50);
+
+    return true;
+  }
+
+  function dfRegisterVocabStatsListener(callback) {
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function' || typeof callback !== 'function') {
+      return function() {};
+    }
+
+    var handler = function(e) {
+      try {
+        callback(e && e.detail ? e.detail : null);
+      } catch (_) {}
+    };
+
+    window.addEventListener('df:vocab-stats-updated', handler);
+
+    return function dfUnsubscribe() {
+      try {
+        window.removeEventListener('df:vocab-stats-updated', handler);
+      } catch (_) {}
+    };
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfExecuteVocabStatsSync = dfExecuteVocabStatsSync;
+    window.dfTriggerVocabStatsSync = dfTriggerVocabStatsSync;
+    window.dfRegisterVocabStatsListener = dfRegisterVocabStatsListener;
+  }
+})();
