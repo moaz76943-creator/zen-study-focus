@@ -12159,3 +12159,167 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderSpellingQuizCardHtml = dfRenderSpellingQuizCardHtml;
   }
 })();
+
+/* === M297_ANKI_TSV_DECK_IMPORTER_AND_CODE117_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfStripAnkiHtml(htmlStr) {
+    if (!htmlStr) return "";
+    return String(htmlStr)
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, "\"")
+      .trim();
+  }
+
+  function dfParseAnkiTsvContent(rawContent, defaultDeckName) {
+    if (!rawContent || typeof rawContent !== "string") {
+      return { importedCards: [], totalLines: 0 };
+    }
+
+    var lines = rawContent.split(/\r?\n/);
+    var deck = (defaultDeckName && typeof defaultDeckName === "string") ? defaultDeckName.trim() : "Anki";
+    var cards = [];
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line || line.startsWith("#")) continue;
+
+      var delimiter = "\t";
+      if (line.indexOf("\t") === -1 && line.indexOf(";") !== -1) {
+        delimiter = ";";
+      }
+
+      var cols = line.split(delimiter);
+      if (cols.length < 2) continue;
+
+      var word = dfStripAnkiHtml(cols[0]);
+      var meaning = dfStripAnkiHtml(cols[1]);
+      var example = cols[2] ? dfStripAnkiHtml(cols[2]) : "";
+
+      if (!word || !meaning) continue;
+
+      cards.push({
+        id: "anki_" + Date.now() + "_" + i,
+        word: word,
+        meaning: meaning,
+        example: example,
+        deck: deck,
+        createdAt: Date.now(),
+        isMastered: false,
+        needsReview: false
+      });
+    }
+
+    return {
+      importedCards: cards,
+      totalLines: lines.length
+    };
+  }
+
+  function dfImportAnkiTsvToVocabBank(rawContent, defaultDeckName) {
+    var parseRes = dfParseAnkiTsvContent(rawContent, defaultDeckName);
+    var newCards = parseRes.importedCards;
+    if (newCards.length === 0) {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("لم يتم العثور على بطاقات صالحة في الملف", "warning");
+      }
+      return { success: false, importedCount: 0 };
+    }
+
+    var existing = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_bank_v1");
+      if (raw) existing = JSON.parse(raw);
+    } catch (_) {}
+    if (!Array.isArray(existing)) existing = [];
+
+    var existingWords = Object.create(null);
+    for (var i = 0; i < existing.length; i++) {
+      if (existing[i] && existing[i].word) {
+        existingWords[String(existing[i].word).toLowerCase().trim()] = true;
+      }
+    }
+
+    var added = 0;
+    var skipped = 0;
+
+    for (var j = 0; j < newCards.length; j++) {
+      var card = newCards[j];
+      var key = card.word.toLowerCase().trim();
+      if (!existingWords[key]) {
+        existingWords[key] = true;
+        existing.push(card);
+        added++;
+      } else {
+        skipped++;
+      }
+    }
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(existing));
+    } catch (_) {
+      return { success: false, reason: "storage_failed" };
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        var msg = "تم استيراد " + dfFormatWesternDigits(added) + " كلمة من Anki بنجاح!";
+        if (skipped > 0) msg += " (تخطي " + dfFormatWesternDigits(skipped) + " مكررة)";
+        window.dfShowVocabToastNotification(msg, "success");
+      }
+    } catch (_) {}
+
+    return {
+      success: true,
+      importedCount: added,
+      skippedCount: skipped,
+      totalCount: existing.length
+    };
+  }
+
+  function dfRenderAnkiImporterSettingsHtml() {
+    return "<div class=\"df-settings-anki-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"margin-bottom:8px;\">" +
+        "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">📥 استيراد حزم Anki (TSV / TXT)</span>" +
+        "<span style=\"font-size:11px;color:#a1a1aa;\">استيراد مباشر لبطاقات Anki المجدولة بدون برامج وسيطة</span>" +
+      "</div>" +
+      "<button type=\"button\" onclick=\"var inp = document.getElementById('df-anki-file-picker'); if(inp) inp.click();\" style=\"background:#10b981;color:#ffffff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+        "<span>اختر ملف Anki (TSV/TXT)</span>" +
+      "</button>" +
+      "<input type=\"file\" id=\"df-anki-file-picker\" accept=\".txt,.tsv,.csv\" style=\"display:none;\" onchange=\"var f = this.files[0]; if(f){ var r = new FileReader(); r.onload = function(e){ window.dfImportAnkiTsvToVocabBank && window.dfImportAnkiTsvToVocabBank(e.target.result, 'Anki'); }; r.readAsText(f); }\" />" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfStripAnkiHtml = dfStripAnkiHtml;
+    window.dfParseAnkiTsvContent = dfParseAnkiTsvContent;
+    window.dfImportAnkiTsvToVocabBank = dfImportAnkiTsvToVocabBank;
+    window.dfRenderAnkiImporterSettingsHtml = dfRenderAnkiImporterSettingsHtml;
+  }
+})();
