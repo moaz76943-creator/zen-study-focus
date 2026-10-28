@@ -7471,3 +7471,52 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M251_VOCAB_QUIZ_SLOW_AUDIO_REPLAY_AND_CODE71_V1 === */
+(function() {
+  if (window.__M251_SLOW_REPLAY__) return;
+  window.__M251_SLOW_REPLAY__ = true;
+
+  window.dfReplayCurrentQuizWordSlow = function() {
+    var quizWordElem = document.getElementById('df-quiz-current-word') ||
+                       document.querySelector('.df-quiz-card-word');
+    if (!quizWordElem) return false;
+
+    var wordText = quizWordElem.textContent || '';
+    if (!wordText) return false;
+
+    var eng = window.SpokenVocabEngine;
+    var lang = (eng && eng.config && eng.config.foreignLang) || 'de-DE';
+
+    if (typeof window.dfSafeSpeakUtterance === 'function') {
+      window.dfSafeSpeakUtterance(wordText, lang, 0.6);
+      return true;
+    }
+    return false;
+  };
+
+  function mountSlowReplayBtn() {
+    if (typeof document === 'undefined') return;
+    var toolbar = document.getElementById('df-quiz-extra-toolbar');
+    if (!toolbar || document.getElementById('df-quiz-slow-replay-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-quiz-slow-replay-btn';
+    btn.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid rgba(56,189,248,0.35);background:rgba(56,189,248,0.12);color:#38bdf8;font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = '🐢 نطق بطيء (0.6x)';
+    btn.onclick = function() { window.dfReplayCurrentQuizWordSlow(); };
+    toolbar.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountSlowReplayBtn);
+    } else {
+      setTimeout(mountSlowReplayBtn, 350);
+    }
+    if (typeof setInterval !== 'undefined') {
+      setInterval(mountSlowReplayBtn, 2500);
+    }
+  }
+})();
+
