@@ -9706,3 +9706,106 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderOledThemeSettingsToggleHtml = dfRenderOledThemeSettingsToggleHtml;
   }
 })();
+
+/* === M276_WEEKLY_STUDY_HEATMAP_SPARKLINE_AND_CODE96_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetPast7DaysActivityData(referenceDate) {
+    var ref = referenceDate ? new Date(referenceDate) : new Date();
+    var history = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_study_history_v1");
+      if (raw) history = JSON.parse(raw);
+      if (!Array.isArray(history)) history = [];
+    } catch (_) {
+      history = [];
+    }
+
+    var dayNames = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
+    var days = [];
+
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(ref);
+      d.setDate(d.getDate() - i);
+
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, "0");
+      var day = String(d.getDate()).padStart(2, "0");
+      var dateKey = y + "-" + m + "-" + day;
+
+      var hasStudied = history.indexOf(dateKey) !== -1;
+      var dayName = dayNames[d.getDay()];
+      var dayNumStr = dfFormatWesternDigits(d.getDate());
+
+      days.push({
+        date: dateKey,
+        dayName: dayName,
+        dayNum: dayNumStr,
+        hasStudied: hasStudied,
+        isToday: (i === 0)
+      });
+    }
+
+    return days;
+  }
+
+  function dfRenderWeeklyStudyHeatmapHtml(referenceDate) {
+    var days = dfGetPast7DaysActivityData(referenceDate);
+    var itemsHtml = "";
+
+    for (var i = 0; i < days.length; i++) {
+      var day = days[i];
+      var barBg = day.hasStudied ? "#10b981" : "rgba(255,255,255,0.08)";
+      var barBorder = day.hasStudied ? "#059669" : "rgba(255,255,255,0.12)";
+      var textColor = day.isToday ? "#60a5fa" : "#a1a1aa";
+      var fontWeight = day.isToday ? "bold" : "normal";
+
+      itemsHtml += "<div style=\"flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;\">" +
+        "<span style=\"font-size:10px;color:" + textColor + ";font-weight:" + fontWeight + ";\">" + day.dayName + "</span>" +
+        "<div style=\"width:100%;height:28px;background:" + barBg + ";border:1px solid " + barBorder + ";border-radius:6px;display:flex;align-items:center;justify-content:center;\">" +
+          (day.hasStudied ? "<span style=\"font-size:11px;color:#ffffff;\">✓</span>" : "<span style=\"font-size:10px;color:rgba(255,255,255,0.25);\">·</span>") +
+        "</div>" +
+        "<span style=\"font-size:11px;color:#f4f4f5;font-weight:" + fontWeight + ";\">" + day.dayNum + "</span>" +
+      "</div>";
+    }
+
+    return "<div class=\"df-weekly-heatmap\" style=\"margin:12px 0;padding:12px;background:#18181b;border:1px solid #27272a;border-radius:12px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;\">" +
+        "<span style=\"font-size:12px;font-weight:bold;color:#f4f4f5;\">📅 نشاط الأيام السبعة الماضية</span>" +
+        "<span style=\"font-size:11px;color:#10b981;\">معدل الاستمرار</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:6px;justify-content:space-between;\">" +
+        itemsHtml +
+      "</div>" +
+    "</div>";
+  }
+
+  function dfUpdateWeeklyStudyHeatmapDOM() {
+    try {
+      if (typeof document === "undefined") return false;
+      var el = document.getElementById("df-weekly-heatmap-container");
+      if (el) {
+        el.innerHTML = dfRenderWeeklyStudyHeatmapHtml();
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetPast7DaysActivityData = dfGetPast7DaysActivityData;
+    window.dfRenderWeeklyStudyHeatmapHtml = dfRenderWeeklyStudyHeatmapHtml;
+    window.dfUpdateWeeklyStudyHeatmapDOM = dfUpdateWeeklyStudyHeatmapDOM;
+  }
+})();
