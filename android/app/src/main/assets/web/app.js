@@ -7102,3 +7102,45 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M241_VOCAB_CARD_TTS_VOLUME_CONTROL_AND_CODE61_V1 === */
+(function() {
+  if (window.__M241_TTS_VOLUME__) return;
+  window.__M241_TTS_VOLUME__ = true;
+
+  var currentVolume = 1.0;
+  var VOL_KEY = 'df_vocab_tts_volume';
+  try {
+    var saved = parseFloat(localStorage.getItem(VOL_KEY));
+    if (!isNaN(saved) && saved >= 0.2 && saved <= 1.0) currentVolume = saved;
+  } catch(e) {}
+
+  window.dfSetVocabTtsVolume = function(v) {
+    var val = parseFloat(v);
+    if (isNaN(val)) val = 1.0;
+    currentVolume = Math.max(0.2, Math.min(1.0, val));
+    try {
+      localStorage.setItem(VOL_KEY, String(currentVolume));
+    } catch(e) {}
+    return currentVolume;
+  };
+
+  window.dfGetVocabTtsVolume = function() {
+    return currentVolume;
+  };
+
+  if (typeof window.dfSafeSpeakUtterance === 'function') {
+    var prevSafeSpeak = window.dfSafeSpeakUtterance;
+    window.dfSafeSpeakUtterance = function(text, lang, rate, onDone) {
+      if (typeof window.SpeechSynthesisUtterance !== 'undefined') {
+        var baseUtterance = window.SpeechSynthesisUtterance;
+        window.SpeechSynthesisUtterance = function(t) {
+          var u = new baseUtterance(t);
+          u.volume = currentVolume;
+          return u;
+        };
+      }
+      return prevSafeSpeak(text, lang, rate, onDone);
+    };
+  }
+})();
+
