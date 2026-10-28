@@ -8407,3 +8407,76 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfSetRetentionFilter = dfSetRetentionFilter;
   }
 })();
+
+/* === M262_VOCAB_ACTIVE_FILTER_INDICATOR_AND_CODE82_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetActiveFilterDisplayLabel(tier) {
+    var t = tier || (typeof window !== 'undefined' && typeof window.dfGetActiveRetentionFilter === 'function' ? window.dfGetActiveRetentionFilter() : 'all');
+    if (t === 'mastered') return '✅ متقنة';
+    if (t === 'needs_review') return '⚠️ قيد المراجعة';
+    if (t === 'learning') return '📖 جديدة / تعلم';
+    if (t === 'pinned') return '📌 مثبتة';
+    return '';
+  }
+
+  function dfRenderActiveFilterIndicatorHtml(matchingCount) {
+    var label = dfGetActiveFilterDisplayLabel();
+    if (!label) return '';
+
+    var countStr = dfFormatWesternDigits(matchingCount !== undefined ? matchingCount : 0);
+
+    return '<div class="df-active-filter-indicator" style="display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);border-radius:16px;padding:4px 10px;font-size:12px;color:#93c5fd;margin-bottom:8px;direction:rtl;">' +
+      '<span>تصفية نشطة: <strong>' + label + '</strong> (' + countStr + ')</span>' +
+      '<button type="button" onclick="window.dfClearAllVocabFilters && window.dfClearAllVocabFilters()" style="background:none;border:none;color:#93c5fd;cursor:pointer;font-size:13px;padding:0 2px;line-height:1;" title="إلغاء التصفية">✕</button>' +
+    '</div>';
+  }
+
+  function dfClearAllVocabFilters() {
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfSetRetentionFilter === 'function') {
+        window.dfSetRetentionFilter('all');
+      } else {
+        localStorage.setItem('df_vocab_active_tier_filter_v1', 'all');
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof document !== 'undefined') {
+        var searchInput = document.getElementById('df-vocab-search-input');
+        if (searchInput) searchInput.value = '';
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfTriggerVocabStatsSync === 'function') {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfGetActiveFilterDisplayLabel = dfGetActiveFilterDisplayLabel;
+    window.dfRenderActiveFilterIndicatorHtml = dfRenderActiveFilterIndicatorHtml;
+    window.dfClearAllVocabFilters = dfClearAllVocabFilters;
+  }
+})();
