@@ -7344,3 +7344,36 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M247_VOCAB_QUIZ_CARD_ASPECT_STABILITY_AND_CODE67_V1 === */
+(function() {
+  if (window.__M247_QUIZ_STABILITY__) return;
+  window.__M247_QUIZ_STABILITY__ = true;
+
+  window.dfEnsureQuizCardAspectStability = function() {
+    if (typeof document === 'undefined') return false;
+    var card = document.getElementById('df-flash-quiz-card') ||
+               document.querySelector('.df-flash-card-inner') ||
+               document.querySelector('.df-quiz-card');
+    if (!card || !card.style) return false;
+
+    card.style.minHeight = '180px';
+    card.style.display = 'flex';
+    card.style.flexDirection = 'column';
+    card.style.justifyContent = 'center';
+    card.style.alignItems = 'center';
+    card.style.transition = 'min-height 0.25s ease, transform 0.2s ease';
+    return true;
+  };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', window.dfEnsureQuizCardAspectStability);
+    } else {
+      setTimeout(window.dfEnsureQuizCardAspectStability, 350);
+    }
+    if (typeof setInterval !== 'undefined') {
+      setInterval(window.dfEnsureQuizCardAspectStability, 2500);
+    }
+  }
+})();
+
