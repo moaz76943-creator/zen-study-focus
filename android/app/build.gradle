@@ -16,8 +16,8 @@ android {
         applicationId "com.zenstudy.focus"
         minSdk 24
         targetSdk 36
-        versionCode 60
-        versionName "3.7.0"
+        versionCode 61
+        versionName "3.7.1"
     }
     signingConfigs {
         if (hasUploadSigning) {
