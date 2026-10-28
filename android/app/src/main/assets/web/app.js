@@ -11044,3 +11044,113 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderFlipToMuteSettingsToggleHtml = dfRenderFlipToMuteSettingsToggleHtml;
   }
 })();
+
+/* === M287_DUAL_INDEPENDENT_VOLUME_CONTROLS_AND_CODE107_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetTtsVolume() {
+    try {
+      var val = localStorage.getItem("df_volume_tts_v1");
+      if (val !== null) {
+        var n = parseFloat(val);
+        if (!isNaN(n)) return Math.max(0.0, Math.min(1.0, n));
+      }
+    } catch (_) {}
+    return 1.0;
+  }
+
+  function dfSetTtsVolume(volume) {
+    var v = Math.max(0.0, Math.min(1.0, Number(volume) || 0));
+    try {
+      localStorage.setItem("df_volume_tts_v1", String(v));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(10);
+      }
+    } catch (_) {}
+
+    return v;
+  }
+
+  function dfGetAmbientVolume() {
+    try {
+      var val = localStorage.getItem("df_volume_ambient_v1");
+      if (val !== null) {
+        var n = parseFloat(val);
+        if (!isNaN(n)) return Math.max(0.0, Math.min(1.0, n));
+      }
+    } catch (_) {}
+    return 0.40;
+  }
+
+  function dfSetAmbientVolume(volume) {
+    var v = Math.max(0.0, Math.min(1.0, Number(volume) || 0));
+    try {
+      localStorage.setItem("df_volume_ambient_v1", String(v));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && window._soundscapeGain && window._soundscapeCtx) {
+        if (typeof window.dfApplySmoothAudioFade === "function") {
+          window.dfApplySmoothAudioFade(window._soundscapeGain, v * 0.25, 0.5, window._soundscapeCtx);
+        } else {
+          window._soundscapeGain.gain.setValueAtTime(v * 0.25, window._soundscapeCtx.currentTime);
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(10);
+      }
+    } catch (_) {}
+
+    return v;
+  }
+
+  function dfRenderDualVolumeControlsHtml() {
+    var ttsVol = Math.round(dfGetTtsVolume() * 100);
+    var ambVol = Math.round(dfGetAmbientVolume() * 100);
+
+    var ttsStr = dfFormatWesternDigits(ttsVol);
+    var ambStr = dfFormatWesternDigits(ambVol);
+
+    return "<div class=\"df-dual-volume-controls\" style=\"margin:12px 0;padding:12px;background:#18181b;border:1px solid #27272a;border-radius:12px;direction:rtl;color:#f4f4f5;\">" +
+      "<div style=\"margin-bottom:10px;\">" +
+        "<div style=\"display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;\">" +
+          "<span>🗣️ مستوى نطق المفردات (TTS):</span>" +
+          "<strong id=\"df-tts-vol-val\">" + ttsStr + "%</strong>" +
+        "</div>" +
+        "<input type=\"range\" min=\"0\" max=\"100\" value=\"" + ttsVol + "\" oninput=\"var v = this.value; document.getElementById('df-tts-vol-val').textContent = v + '%'; window.dfSetTtsVolume && window.dfSetTtsVolume(v / 100);\" style=\"width:100%;accent-color:#2563eb;cursor:pointer;\" />" +
+      "</div>" +
+      "<div>" +
+        "<div style=\"display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;\">" +
+          "<span>🌊 مستوى عازل الطبيعة والرنين:</span>" +
+          "<strong id=\"df-amb-vol-val\">" + ambStr + "%</strong>" +
+        "</div>" +
+        "<input type=\"range\" min=\"0\" max=\"100\" value=\"" + ambVol + "\" oninput=\"var v = this.value; document.getElementById('df-amb-vol-val').textContent = v + '%'; window.dfSetAmbientVolume && window.dfSetAmbientVolume(v / 100);\" style=\"width:100%;accent-color:#10b981;cursor:pointer;\" />" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetTtsVolume = dfGetTtsVolume;
+    window.dfSetTtsVolume = dfSetTtsVolume;
+    window.dfGetAmbientVolume = dfGetAmbientVolume;
+    window.dfSetAmbientVolume = dfSetAmbientVolume;
+    window.dfRenderDualVolumeControlsHtml = dfRenderDualVolumeControlsHtml;
+  }
+})();
