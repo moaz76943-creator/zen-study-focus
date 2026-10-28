@@ -8339,3 +8339,71 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderVocabRetentionSummaryHtml = dfRenderVocabRetentionSummaryHtml;
   }
 })();
+
+/* === M261_VOCAB_RETENTION_TIER_FILTERS_AND_CODE81_V1 === */
+(function() {
+  'use strict';
+
+  function dfGetActiveRetentionFilter() {
+    try {
+      var val = localStorage.getItem('df_vocab_active_tier_filter_v1');
+      if (val && ['all', 'mastered', 'needs_review', 'learning', 'pinned'].indexOf(val) !== -1) {
+        return val;
+      }
+    } catch (_) {}
+    return 'all';
+  }
+
+  function dfFilterVocabByRetentionTier(items, tier) {
+    if (!Array.isArray(items)) return [];
+    var t = tier || dfGetActiveRetentionFilter();
+    if (t === 'all') return items.slice();
+
+    return items.filter(function(item) {
+      if (!item) return false;
+      var isMastered = Boolean(item.isMastered || item.mastered);
+      var isHard = Boolean(item.needsReview || item.isHard || item.hard);
+      var isPinned = Boolean(item.isPinned);
+
+      if (t === 'mastered') {
+        return isMastered;
+      } else if (t === 'needs_review') {
+        return isHard && !isMastered;
+      } else if (t === 'learning') {
+        return !isMastered && !isHard;
+      } else if (t === 'pinned') {
+        return isPinned;
+      }
+      return true;
+    });
+  }
+
+  function dfSetRetentionFilter(tier) {
+    var valid = ['all', 'mastered', 'needs_review', 'learning', 'pinned'];
+    var target = valid.indexOf(tier) !== -1 ? tier : 'all';
+
+    try {
+      localStorage.setItem('df_vocab_active_tier_filter_v1', target);
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfTriggerVocabStatsSync === 'function') {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return target;
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfGetActiveRetentionFilter = dfGetActiveRetentionFilter;
+    window.dfFilterVocabByRetentionTier = dfFilterVocabByRetentionTier;
+    window.dfSetRetentionFilter = dfSetRetentionFilter;
+  }
+})();
