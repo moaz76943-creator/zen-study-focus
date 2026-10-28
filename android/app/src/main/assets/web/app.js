@@ -10004,3 +10004,104 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderVaultBackupSettingsSectionHtml = dfRenderVaultBackupSettingsSectionHtml;
   }
 })();
+
+/* === M278_QUIZ_RESPONSE_LATENCY_ANALYTICS_AND_CODE98_V1 === */
+(function() {
+  'use strict';
+
+  var _currentCardStartTime = 0;
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfStartCardTimer() {
+    _currentCardStartTime = Date.now();
+    return _currentCardStartTime;
+  }
+
+  function dfRecordCardLatency() {
+    var now = Date.now();
+    var elapsed = _currentCardStartTime > 0 ? (now - _currentCardStartTime) : 1500;
+    _currentCardStartTime = 0;
+    return Math.max(100, elapsed);
+  }
+
+  function dfCalculateSessionLatencyMetrics(latenciesArray) {
+    if (!Array.isArray(latenciesArray) || latenciesArray.length === 0) {
+      return {
+        averageSeconds: 0,
+        averageFormatted: "0.0",
+        paceTier: "neutral",
+        paceLabel: "غير محدد",
+        fastCount: 0,
+        moderateCount: 0,
+        slowCount: 0
+      };
+    }
+
+    var totalMs = 0;
+    var fast = 0;
+    var moderate = 0;
+    var slow = 0;
+
+    for (var i = 0; i < latenciesArray.length; i++) {
+      var ms = Number(latenciesArray[i]) || 0;
+      totalMs += ms;
+      if (ms < 2500) fast++;
+      else if (ms <= 5000) moderate++;
+      else slow++;
+    }
+
+    var avgSec = Math.round((totalMs / latenciesArray.length / 1000) * 10) / 10;
+    var avgStr = dfFormatWesternDigits(avgSec.toFixed(1));
+
+    var tier = "moderate";
+    var label = "وتيرة متزنة";
+    if (avgSec < 2.5) {
+      tier = "fast";
+      label = "استرجاع فوري";
+    } else if (avgSec > 5.0) {
+      tier = "slow";
+      label = "استرجاع متأنٍ";
+    }
+
+    return {
+      averageSeconds: avgSec,
+      averageFormatted: avgStr,
+      paceTier: tier,
+      paceLabel: label,
+      fastCount: fast,
+      moderateCount: moderate,
+      slowCount: slow
+    };
+  }
+
+  function dfRenderLatencyBadgeHtml(latenciesArray) {
+    var metrics = dfCalculateSessionLatencyMetrics(latenciesArray);
+    if (metrics.averageSeconds === 0) return "";
+
+    var color = "#10b981";
+    if (metrics.paceTier === "moderate") color = "#3b82f6";
+    else if (metrics.paceTier === "slow") color = "#f59e0b";
+
+    return "<div class=\"df-quiz-latency-badge\" style=\"display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:3px 8px;font-size:11px;color:#f4f4f5;direction:rtl;\">" +
+      "<span style=\"color:" + color + ";\">⚡</span>" +
+      "<span>" + metrics.averageFormatted + " ثانية/بطاقة</span>" +
+      "<span style=\"color:#a1a1aa;\">(" + metrics.paceLabel + ")</span>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfStartCardTimer = dfStartCardTimer;
+    window.dfRecordCardLatency = dfRecordCardLatency;
+    window.dfCalculateSessionLatencyMetrics = dfCalculateSessionLatencyMetrics;
+    window.dfRenderLatencyBadgeHtml = dfRenderLatencyBadgeHtml;
+  }
+})();
