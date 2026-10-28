@@ -9911,73 +9911,92 @@ window.FlashQuizEngine = FlashQuizEngine;
     return jsonStr;
   }
 
-  function dfValidateAndImportVaultJson(jsonString) {
-    if (!jsonString || typeof jsonString !== "string") {
-      return { success: false, reason: "empty_input" };
-    }
-
-    var parsed = null;
+  // DF_M277_SAFE_JOURNAL_IMPORT_V2: rollback journal survives sudden process death.
+  var DF_VAULT_JOURNAL = "df_vocab_import_journal_v2";
+  function dfRecoverPendingVaultImport() {
+    var raw;
+    try { raw = localStorage.getItem(DF_VAULT_JOURNAL); } catch (_) { return false; }
+    if (!raw) return true;
+    var journal;
+    try { journal = JSON.parse(raw); } catch (_) { return false; }
+    var allowed = ["df_vocab_bank_v1", "df_vocab_study_history_v1", "df_vocab_daily_goal_v1", "df_oled_true_black_v1", "df_halfway_chime_enabled_v1"];
+    if (!journal || journal.schema !== "DF_M277_SAFE_JOURNAL_IMPORT_V2" ||
+        !Array.isArray(journal.keys) || !journal.keys.length || !journal.before ||
+        journal.keys.some(function(k) { return allowed.indexOf(k) < 0 || !Object.prototype.hasOwnProperty.call(journal.before,k); })) return false;
     try {
-      parsed = JSON.parse(jsonString);
-    } catch (_) {
-      return { success: false, reason: "invalid_json" };
-    }
-
-    if (!parsed || typeof parsed !== "object" || !parsed.vault) {
-      return { success: false, reason: "invalid_vault_schema" };
-    }
-
-    var v = parsed.vault;
-    var vocab = Array.isArray(v.vocabBank) ? v.vocabBank : [];
-    var history = Array.isArray(v.studyHistory) ? v.studyHistory : [];
-
-    try {
-      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(vocab));
-      localStorage.setItem("df_vocab_study_history_v1", JSON.stringify(history));
-
-      if (v.dailyGoal && typeof v.dailyGoal === "number") {
-        localStorage.setItem("df_vocab_daily_goal_v1", String(v.dailyGoal));
+      for (var i=0; i<journal.keys.length; i++) {
+        var key=journal.keys[i],old=journal.before[key];
+        if (old === null) localStorage.removeItem(key);
+        else localStorage.setItem(key,old);
       }
-
-      if (v.settings && typeof v.settings === "object") {
-        if (typeof v.settings.oledTrueBlack === "boolean") {
-          localStorage.setItem("df_oled_true_black_v1", String(v.settings.oledTrueBlack));
-          if (typeof window !== "undefined" && typeof window.dfApplyOledTrueBlackState === "function") {
-            window.dfApplyOledTrueBlackState();
-          }
-        }
-        if (typeof v.settings.halfwayChime === "boolean") {
-          localStorage.setItem("df_halfway_chime_enabled_v1", String(v.settings.halfwayChime));
-        }
+      for (var j=0; j<journal.keys.length; j++) {
+        var k=journal.keys[j];
+        if (localStorage.getItem(k) !== journal.before[k]) return false;
       }
-    } catch (_) {
-      return { success: false, reason: "storage_write_failed" };
-    }
-
-    try {
-      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
-        window.dfTriggerVocabStatsSync({ immediate: true });
-      }
-    } catch (_) {}
-
-    try {
-      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
-        window.dfVocabHapticPulse(25);
-      }
-    } catch (_) {}
-
-    try {
-      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
-        window.dfShowVocabToastNotification("تمت استعادة الخزينة بنجاح!", "success");
-      }
-    } catch (_) {}
-
-    return {
-      success: true,
-      wordsCount: vocab.length,
-      historyCount: history.length
-    };
+      localStorage.removeItem(DF_VAULT_JOURNAL);
+      return true;
+    } catch (_) { return false; }
   }
+
+  function dfValidateAndImportVaultJson(jsonString) {
+    if (typeof jsonString !== 'string' || !jsonString || jsonString.length > 5*1024*1024)
+      return {success:false,reason:'invalid_or_oversized_input'};
+    if (!dfRecoverPendingVaultImport()) return {success:false,reason:'recovery_pending'};
+    var parsed;
+    try { parsed = JSON.parse(jsonString); } catch (_) { return {success:false,reason:'invalid_json'}; }
+    if (!parsed || parsed.app !== 'Deep Focus' || parsed.schemaVersion !== 'v4.0.7' ||
+        !parsed.vault || typeof parsed.vault !== 'object' ||
+        !Array.isArray(parsed.vault.vocabBank) || !Array.isArray(parsed.vault.studyHistory))
+      return {success:false,reason:'invalid_vault_schema'};
+    var v=parsed.vault;
+    if (v.vocabBank.some(function(x){return !x || typeof x !== 'object' || Array.isArray(x);}) ||
+        v.studyHistory.some(function(x){return !x || typeof x !== 'object' || Array.isArray(x);}))
+      return {success:false,reason:'invalid_vault_items'};
+    var current;
+    try { current = JSON.parse(localStorage.getItem('df_vocab_bank_v1') || '[]'); } catch (_) { current=[]; }
+    if (Array.isArray(current) && current.length && !v.vocabBank.length)
+      return {success:false,reason:'refuse_empty_vocabulary_overwrite'};
+    var desired={
+      df_vocab_bank_v1:JSON.stringify(v.vocabBank),
+      df_vocab_study_history_v1:JSON.stringify(v.studyHistory)
+    };
+    if (Object.prototype.hasOwnProperty.call(v,'dailyGoal')) {
+      if (!Number.isSafeInteger(v.dailyGoal) || v.dailyGoal<1 || v.dailyGoal>10000)
+        return {success:false,reason:'invalid_daily_goal'};
+      desired.df_vocab_daily_goal_v1=String(v.dailyGoal);
+    }
+    if (v.settings != null) {
+      if (typeof v.settings !== 'object' || Array.isArray(v.settings))
+        return {success:false,reason:'invalid_settings'};
+      if (Object.prototype.hasOwnProperty.call(v.settings,'oledTrueBlack')) {
+        if (typeof v.settings.oledTrueBlack !== 'boolean') return {success:false,reason:'invalid_oled_state'};
+        desired.df_oled_true_black_v1=String(v.settings.oledTrueBlack);
+      }
+      if (Object.prototype.hasOwnProperty.call(v.settings,'halfwayChime')) {
+        if (typeof v.settings.halfwayChime !== 'boolean') return {success:false,reason:'invalid_chime_state'};
+        desired.df_halfway_chime_enabled_v1=String(v.settings.halfwayChime);
+      }
+    }
+    var keys=Object.keys(desired),before=Object.create(null);
+    try {
+      for (var i=0;i<keys.length;i++) before[keys[i]]=localStorage.getItem(keys[i]);
+      localStorage.setItem(DF_VAULT_JOURNAL,JSON.stringify({schema:'DF_M277_SAFE_JOURNAL_IMPORT_V2',keys:keys,before:before}));
+      for (var j=0;j<keys.length;j++) localStorage.setItem(keys[j],desired[keys[j]]);
+      for (var k=0;k<keys.length;k++) if (localStorage.getItem(keys[k])!==desired[keys[k]]) throw Error('readback_failed');
+      localStorage.removeItem(DF_VAULT_JOURNAL);
+    } catch (_) {
+      var restored=dfRecoverPendingVaultImport();
+      return {success:false,reason:restored?'storage_write_failed_rolled_back':'rollback_pending_do_not_close'};
+    }
+    try { if (typeof window !== 'undefined') {
+      if (typeof window.dfApplyOledTrueBlackState === 'function') window.dfApplyOledTrueBlackState();
+      if (typeof window.dfTriggerVocabStatsSync === 'function') window.dfTriggerVocabStatsSync({immediate:true});
+      if (typeof window.dfShowVocabToastNotification === 'function') window.dfShowVocabToastNotification('تم استيراد بيانات المفردات بنجاح','success');
+    }} catch (_) {}
+    return {success:true,wordsCount:v.vocabBank.length,historyCount:v.studyHistory.length};
+  }
+  // A crash during a previous import must not leave half-published values.
+  dfRecoverPendingVaultImport();
 
   function dfRenderVaultBackupSettingsSectionHtml() {
     return "<div class=\"df-settings-vault-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +

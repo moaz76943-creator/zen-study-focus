@@ -70,6 +70,20 @@ test('all classified candidates still require review, never generate a clean sec
   assert.equal(r.output.findings,1);
   assert.equal(r.output.categories.storage_key_candidate,1);
 });
+test('reviewed public storage-key candidates reveal only safe source path, never credential paths',()=>{
+  const secret='REAL-PATH-SENTINEL-DO-NOT-LOG';
+  const rows=[
+    {RuleID:'generic-api-key',Secret:CFG_KEY,File:'tests/config.cjs',StartLine:1},
+    {RuleID:'github-pat',Secret:secret,File:'private/'+secret+'.env',StartLine:7}
+  ];
+  const r=run(rows);
+  assert.equal(r.status,1);
+  assert.deepEqual(r.output.review_paths,['tests/config.cjs']);
+  assert.ok(!(r.stdout+r.stderr).includes(secret));
+  assert.ok(!(r.stdout+r.stderr).includes('private/'));
+  assert.equal(r.output.status,'REVIEW_REQUIRED');
+});
+
 test('empty report provides zero-findings diagnostics without making the primary scanner PASS',()=>{
   const r=run([]);
   assert.equal(r.status,0);
