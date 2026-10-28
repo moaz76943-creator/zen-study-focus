@@ -7214,3 +7214,35 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M244_VOCAB_QUIZ_AUTO_RESUME_AUDIO_AFTER_CALL_AND_CODE64_V1 === */
+(function() {
+  if (window.__M244_AUDIO_RESUME__) return;
+  window.__M244_AUDIO_RESUME__ = true;
+
+  window.dfHandleVocabAppResume = function() {
+    if (typeof document === 'undefined') return false;
+    if (!document.hidden) {
+      if (typeof window.speechSynthesis !== 'undefined') {
+        try {
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+        } catch(e) {}
+      }
+      if (typeof window.dfUpdateVocabVoiceStatus === 'function') {
+        window.dfUpdateVocabVoiceStatus();
+      }
+      return true;
+    }
+    return false;
+  };
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        setTimeout(window.dfHandleVocabAppResume, 100);
+      }
+    });
+  }
+})();
+
