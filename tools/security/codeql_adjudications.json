@@ -5,12 +5,12 @@
       "id": "DF-CODEQL-QA-EVIDENCE-001",
       "verdict": "FALSE_POSITIVE_WITH_EVIDENCE",
       "reviewStatus": "APPROVED",
-      "reviewedBy": "Codex /root; independent review of /root/release_security_audit implementation and inert QA consumers",
+      "reviewedBy": "Codex /root original sink review; ChatGPT 2026-10-28 W01 scoped diff re-review: evidence sink and its callers unchanged; reviewed six changed QA/Tasks/CI sources, fixed shell injection findings, one intentionally inert evidence write; not independent security certification",
       "rule": "js/http-to-file-access",
       "path": "tests/android_e2e_recovery/private_evidence.cjs",
       "line": 68,
       "sourceSha256": "f5cecf2bfbfc7306270a6a91df474d6f54c10ec1219d49d9c1d3760ea979199e",
-      "executableSourceSha256": "254a49491cde03032de0c84a6482b184abe7f7eadde6bb63f44e6d3a375ff4a9",
+      "executableSourceSha256": "0c8d95cf211124ac7b3350198b760f43d4deafc9b194e14a531538c6209407d3",
       "evidence": "docs/security/CODEQL_QA_EVIDENCE_ADJUDICATION.md"
     }
   ]
