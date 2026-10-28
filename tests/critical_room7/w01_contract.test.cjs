@@ -114,3 +114,20 @@ test('W01 Android Back consumes a rejected draft close and keeps editing until b
  assert.equal(r.run('handleAndroidBack()'),true);assert.equal(open.has('noteModal'),false);
  assert.equal(r.run('nsGetStoredDraft().body'),'لا تفقد النص');
 });
+
+test('W01 untouched checklist does not write a differently ordered snapshot or create ghost Undo',()=>{
+ const r=rig();r.c.tasksList[0].checklist=[{id:88,title:'Existing item',done:false}];
+ r.c.host=new Element(r.doc,'main');
+ r.run(`globalThis.tasks=DeepFocusTasksStudioV21.mount(host,{locale:'en',now:()=>new Date(2026,9,27),
+  readState:()=>{const s=DF22Integration.getSnapshot();return {cfg:s.cfg,tasksList:s.tasksList};},
+  commit:(before,after)=>{const active=DF22Integration.getSnapshot();return DF22Integration.write(active,{...active,cfg:after.cfg,tasksList:after.tasksList});},
+  onError:e=>{globalThis.taskError=e.message;}});`);
+ const before=r.snapshot(),bytes=r.bytes();
+ const checkbox=r.c.host.descendants.find(e=>e.tagName==='INPUT'&&e.type==='checkbox');
+ assert.ok(checkbox,'real checklist toggle must be rendered');
+ assert.equal(checkbox.checked,false);
+ r.reject(true);checkbox.dispatch('change');
+ assert.equal(r.c.taskError,undefined,'no-op must not reach rejected native ACK');
+ assert.deepEqual(r.snapshot(),before);
+ assert.deepEqual(r.bytes(),bytes);
+});
