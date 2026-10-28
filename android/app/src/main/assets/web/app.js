@@ -8247,3 +8247,95 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRegisterVocabStatsListener = dfRegisterVocabStatsListener;
   }
 })();
+
+/* === M260_GOLDEN_MILESTONE_RETENTION_ANALYTICS_AND_CODE80_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetVocabBankItems() {
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfGetVocabBankList === 'function') {
+        return window.dfGetVocabBankList();
+      }
+      var raw = localStorage.getItem('df_vocab_bank_v1');
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function dfCalculateVocabRetentionMetrics() {
+    var items = dfGetVocabBankItems();
+    var total = items.length;
+    var mastered = 0;
+    var needsReview = 0;
+    var learning = 0;
+    var pinned = 0;
+
+    for (var i = 0; i < total; i++) {
+      var item = items[i];
+      if (!item) continue;
+      if (item.isPinned) pinned++;
+      if (item.isMastered || item.mastered) {
+        mastered++;
+      } else if (item.needsReview || item.isHard || item.hard) {
+        needsReview++;
+      } else {
+        learning++;
+      }
+    }
+
+    var retentionRate = total > 0 ? Math.round((mastered / total) * 100) : 0;
+
+    return {
+      total: total,
+      totalFormatted: dfFormatWesternDigits(total),
+      mastered: mastered,
+      masteredFormatted: dfFormatWesternDigits(mastered),
+      needsReview: needsReview,
+      needsReviewFormatted: dfFormatWesternDigits(needsReview),
+      learning: learning,
+      learningFormatted: dfFormatWesternDigits(learning),
+      pinned: pinned,
+      pinnedFormatted: dfFormatWesternDigits(pinned),
+      retentionRate: retentionRate,
+      retentionFormatted: dfFormatWesternDigits(retentionRate) + '%'
+    };
+  }
+
+  function dfRenderVocabRetentionSummaryHtml() {
+    var m = dfCalculateVocabRetentionMetrics();
+    var boxStyle = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;text-align:center;flex:1;';
+    var numStyle = 'font-size:16px;font-weight:bold;display:block;margin-top:2px;';
+
+    return '<div class="df-vocab-retention-summary" style="direction:rtl;padding:12px;background:#18181b;border:1px solid #27272a;border-radius:12px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+        '<span style="font-size:14px;font-weight:bold;color:#f4f4f5;">📊 تحليل استبقاء واستيعاب المفردات</span>' +
+        '<span style="font-size:13px;font-weight:bold;color:#10b981;">معدل الإتقان: ' + m.retentionFormatted + '</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;">' +
+        '<div style="' + boxStyle + '"><span style="font-size:11px;color:#a1a1aa;">✅ متقنة</span><span style="' + numStyle + 'color:#10b981;">' + m.masteredFormatted + '</span></div>' +
+        '<div style="' + boxStyle + '"><span style="font-size:11px;color:#a1a1aa;">⚠️ قيد المراجعة</span><span style="' + numStyle + 'color:#f59e0b;">' + m.needsReviewFormatted + '</span></div>' +
+        '<div style="' + boxStyle + '"><span style="font-size:11px;color:#a1a1aa;">📖 جديدة / تعلم</span><span style="' + numStyle + 'color:#3b82f6;">' + m.learningFormatted + '</span></div>' +
+        '<div style="' + boxStyle + '"><span style="font-size:11px;color:#a1a1aa;">📌 مثبتة</span><span style="' + numStyle + 'color:#ec4899;">' + m.pinnedFormatted + '</span></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfCalculateVocabRetentionMetrics = dfCalculateVocabRetentionMetrics;
+    window.dfRenderVocabRetentionSummaryHtml = dfRenderVocabRetentionSummaryHtml;
+  }
+})();
