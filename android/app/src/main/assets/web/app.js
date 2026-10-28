@@ -9053,3 +9053,64 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfShowVocabToastNotification = dfShowVocabToastNotification;
   }
 })();
+
+/* === M269_SHARE_COPY_TOAST_FEEDBACK_WIRE_AND_CODE89_V1 === */
+(function() {
+  'use strict';
+
+  function dfHandleShareOrCopyFeedback(sharePromise) {
+    if (!sharePromise || typeof sharePromise.then !== 'function') {
+      return Promise.resolve({ success: false, reason: 'invalid_promise' });
+    }
+
+    return sharePromise.then(function(res) {
+      var showToast = (typeof window !== 'undefined' && typeof window.dfShowVocabToastNotification === 'function');
+      if (res && res.success) {
+        if (res.method === 'share') {
+          if (showToast) window.dfShowVocabToastNotification("📤 تم فتح المشاركة بنجاح", "info", 2000);
+        } else if (res.method === 'clipboard') {
+          if (showToast) window.dfShowVocabToastNotification("📋 تم نسخ ملخص الجلسة إلى الحافظة!", "success", 2500);
+        }
+      } else {
+        if (showToast) window.dfShowVocabToastNotification("⚠️ تعذر النسخ التلقائي", "warning", 2500);
+      }
+      return res;
+    }).catch(function(err) {
+      if (typeof window !== 'undefined' && typeof window.dfShowVocabToastNotification === 'function') {
+        window.dfShowVocabToastNotification("⚠️ حدث خطأ أثناء المشاركة", "warning", 2500);
+      }
+      return { success: false, error: err };
+    });
+  }
+
+  function dfOnQuizShareButtonClickedWithFeedback() {
+    var summary = null;
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfGetLastQuizSummary === 'function') {
+        summary = window.dfGetLastQuizSummary();
+      }
+    } catch (_) {}
+
+    if (!summary) {
+      if (typeof window !== 'undefined' && typeof window.dfShowVocabToastNotification === 'function') {
+        window.dfShowVocabToastNotification("لا يوجد ملخص جلسة للمشاركة", "warning", 2000);
+      }
+      return Promise.resolve({ success: false, reason: 'no_summary' });
+    }
+
+    var sharePromise = null;
+    if (typeof window !== 'undefined' && typeof window.dfShareOrCopyQuizSessionSummary === 'function') {
+      sharePromise = window.dfShareOrCopyQuizSessionSummary(summary);
+    } else {
+      sharePromise = Promise.resolve({ success: false, reason: 'helper_missing' });
+    }
+
+    return dfHandleShareOrCopyFeedback(sharePromise);
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfHandleShareOrCopyFeedback = dfHandleShareOrCopyFeedback;
+    window.dfOnQuizShareButtonClickedWithFeedback = dfOnQuizShareButtonClickedWithFeedback;
+    window.dfOnQuizShareButtonClicked = dfOnQuizShareButtonClickedWithFeedback;
+  }
+})();
