@@ -14,4 +14,8 @@ test('Track05 CI references real test files instead of silently omitting missing
   }
   assert.match(workflow, /-gpu software\b/, 'Use supported software GPU for current headless Android emulator');
   assert.doesNotMatch(workflow, /swiftshader_indirect|-dpi-device/, 'Do not use deprecated emulator flags');
+  assert.match(workflow,
+    /runs-on: \\$\\{\\{ matrix\\.api == 35 && 'ubuntu-22\\.04' \\|\\| 'ubuntu-24\\.04' \\}\\}/,
+    'API35 must run on a separate stable host image while retaining API30');
+
 });
