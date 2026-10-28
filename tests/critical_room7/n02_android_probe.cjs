@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const cp = require('node:child_process');
 const assert = require('node:assert/strict');
+const {pendingTimerAlarms,resumedActivities}=require('./n02_alarm_receipts.cjs');
 const PKG = 'com.zenstudy.focus';
 const PREFS = 'shared_prefs/zen_native_timer_alarm_v21.xml';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -70,9 +71,21 @@ async function main() {
   assert.equal(adb('shell','getprop','ro.kernel.qemu'), '1', 'TEST_INFRA: physical devices are forbidden');
   const api = Number(adb('shell','getprop','ro.build.version.sdk'));
   let ws, sequence = 0;
-  const waiting = new Map(), cases = [];
+  const waiting = new Map(), cases = [], alarmReceipts = [];
   const prefs = () => parseAlarmPrefs(adb('shell','run-as',PKG,'cat',PREFS));
   const notifications = id => notificationKeys(adb('shell','cmd','notification','list'),id);
+  function systemAlarmState(expected,count,label) {
+    const alarms=pendingTimerAlarms(adb('shell','dumpsys','alarm'));
+    const receipt={label,observedAt:Date.now(),alarms,native:prefs()};
+    alarmReceipts.push(receipt);
+    assert.equal(alarms.length,count,'Actual pending AlarmManager count differs: '+label);
+    if(expected) {
+      assert.equal(alarms[0].type,0,'Timer must use RTC_WAKEUP');
+      assert.equal(alarms[0].deadline,expected.deadline,'AlarmManager deadline differs from native receipt');
+      assert.equal(receipt.native.token,expected.token,'Native timer generation changed during receipt');
+    }
+    return receipt;
+  }
   async function creditReceipts(sessionId) {
     const state = await evaluate("({live:cfg,stored:loadFortressData('zen_fortress_cfg_v21',null)})");
     const live = shortFocusCreditReceipt(state?.live, sessionId);
@@ -149,11 +162,13 @@ async function main() {
     const state=prefs();assert.equal(state.active,true);return {...state,id:value.id};
   }
   async function noCompletionThrough(deadline) {
+    systemAlarmState(null,0,'cancelled-or-force-stopped');
     while(Date.now()<deadline+5000) {
       assert.equal(notifications(2002).length,0,'Cancelled/stopped timer posted a completion notification');
       assert.equal(prefs().lastNotified,0,'Cancelled/stopped timer was delivered');
       await sleep(800);
     }
+    systemAlarmState(null,0,'cancelled-or-force-stopped-after-deadline');
     return prefs();
   }
   async function deliveredOnce(expected) {
@@ -187,7 +202,7 @@ async function main() {
   }
   function writeReport() {
     const summary={pass:cases.filter(value=>value.status==='PASS').length,fail:cases.filter(value=>value.status==='FAIL').length,notTested:cases.filter(value=>value.status==='NOT_TESTED').length};
-    fs.writeFileSync(file,JSON.stringify({headSha:process.env.DF_TEST_SOURCE_SHA||process.env.GITHUB_SHA,api,source:'actual Android AlarmManager + native SharedPreferences + NotificationManager + live WebView',cases,summary,limits:['inexact alarms; foreground screen-on emulator','Doze/DND/audible/physical-device acceptance NOT_TESTED'],releaseApproved:false},null,2)+'\n');
+    fs.writeFileSync(file,JSON.stringify({headSha:process.env.DF_TEST_SOURCE_SHA||process.env.GITHUB_SHA,api,source:'actual Android AlarmManager dumpsys + native SharedPreferences + NotificationManager + live WebView',cases,alarmReceipts,summary,limits:['inexact alarms; screen-on emulator with explicit HOME background case','Natural 4/1 five-minute cycle NOT_TESTED; preset values only','Doze/DND/audible/physical-device acceptance NOT_TESTED'],releaseApproved:false},null,2)+'\n');
   }
   async function run(name,fn) {
     try {const evidence=await fn();cases.push({name,status:'PASS',evidence});}
@@ -197,12 +212,27 @@ async function main() {
   }
   try {
     await run('native-deadline-delivers-once',async()=>{await fresh();await evaluate("window.ZenNative.startBackgroundService(3,'N02 synthetic deadline');true");return deliveredOnce(prefs());});
+    await run('home-background-native-alarm-delivers-and-reopen-credits-once',async()=>{
+      await fresh();const before=await startLive(30);
+      const scheduled=systemAlarmState(before,1,'before-HOME');
+      adb('shell','input','keyevent','KEYCODE_HOME');await sleep(1000);
+      const resumed=resumedActivities(adb('shell','dumpsys','activity','activities'));
+      assert.ok(resumed.every(line=>!line.includes(PKG)),'App remained resumed after actual HOME');
+      const background=systemAlarmState(before,1,'after-HOME');
+      const delivery=await deliveredOnce(before);
+      systemAlarmState(null,0,'background-alarm-delivered');
+      await disconnect();await launch();
+      const credits=await creditReceipts(before.id);
+      assert.equal(prefs().lastNotified,delivery.lastNotified,'Foreground return repeated native completion');
+      return {scheduled,background,resumed,delivery,credits,actualHome:true};
+    });
     await run('live-pause-suppresses-then-resume-delivers-once',async()=>{
       await fresh();const first=await startLive(10);await sleep(700);
       assert.equal(await evaluate('toggleTimerPlay()'),true,'Pause refused');assert.equal(prefs().active,false);
       await noCompletionThrough(first.deadline);
       assert.equal(await evaluate('toggleTimerPlay()'),true,'Resume refused');const resumed=prefs();
       assert.ok(resumed.active&&resumed.token>first.token,'Resume did not re-arm a fresh generation');
+      systemAlarmState(resumed,1,'pause-resume-rearmed');
       assert.equal(await evaluate('timerSessionId'),first.id,'Resume changed live session ID');
       return {pausedToken:first.token,...await deliveredOnce(resumed)};
     });
@@ -243,6 +273,7 @@ async function main() {
       await fresh();const before=await startLive(30);await disconnect();adb('shell','am','force-stop',PKG);await launch();
       const restored=prefs();assert.equal(await evaluate('timerSessionId'),before.id);assert.equal(await evaluate('timerRunning'),true);
       assert.ok(restored.active&&restored.token>before.token,'Actual reopened page did not re-arm native alarm');assert.ok(Math.abs(restored.deadline-before.deadline)<=1500,'Reopen shifted saved deadline');
+      systemAlarmState(restored,1,'future-force-stop-reopened');
       return {restoredFromToken:before.token,...await deliveredOnce(restored)};
     });
   } finally {
@@ -252,6 +283,6 @@ async function main() {
     writeReport();
   }
   const failed=cases.filter(value=>value.status!=='PASS');
-  if(cases.length<6||failed.length)process.exitCode=failed.some(value=>value.status==='FAIL')?1:2;
+  if(cases.length<7||failed.length)process.exitCode=failed.some(value=>value.status==='FAIL')?1:2;
 }
 if(require.main===module)main().catch(error=>{console.error(String(error.stack||error));process.exitCode=2;});
