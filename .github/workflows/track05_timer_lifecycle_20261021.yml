@@ -77,9 +77,9 @@ jobs:
           path: ${{ runner.temp }}/track05-evidence.txt
           retention-days: 7
   android-timer-qa:
-    # Ubuntu26 hosted AMD/KVM emitted an unhandled WRMSR before API35 transport died.
-    # Pin the host while retaining both API matrices and all runtime assertions.
-    runs-on: ubuntu-24.04
+    # API35 repeatedly lost the Android emulator on the 24.04 hosted AMD/KVM image.
+    # Isolate the host kernel for API35; retain all real-device assertions.
+    runs-on: ${{ matrix.api == 35 && 'ubuntu-22.04' || 'ubuntu-24.04' }}
     timeout-minutes: 45
     strategy:
       fail-fast: false
