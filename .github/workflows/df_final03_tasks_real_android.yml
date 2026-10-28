@@ -3,19 +3,34 @@ on:
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
-      - 'tests/tasks_core/df_final03_instrumentation/**'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/tasks*.js'
+      - 'android/app/src/main/assets/web/notes_core_v21.js'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'android/app/src/main/assets/web/*.css'
+      - 'tests/tasks_core/**'
+      - 'tests/white_premium_qa/track14_install_apk.sh'
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'android/app/build.gradle'
+      - 'android/*.gradle'
+      - 'android/gradle.properties'
+      - '.github/actions/android-emulator/**'
       - '.github/workflows/df_final03_tasks_real_android.yml'
+  push:
+    tags: ['v*']
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: df-final03-tasks-android-${{ github.ref }}
+  group: df03-tasks-real-android-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   source:
     name: Tasks instrumentation source preflight
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    outputs:
+      source_sha: ${{ steps.receipt.outputs.source_sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,7 +39,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Source tests, shell scripts and invariant checks
+      - name: Focused source and instrumentation checks
+        shell: bash
         run: |
           set -euo pipefail
           bash -n tests/tasks_core/df_final03_instrumentation/prepare_test_build.sh
@@ -32,69 +48,106 @@ jobs:
           node --test tests/tasks_core/tasks_core.test.cjs tests/tasks_core/tasks_studio.test.cjs
           grep -q 'getUiAutomation().injectInputEvent' tests/tasks_core/df_final03_instrumentation/TaskInstrumentation.java
           grep -q 'setWebContentsDebuggingEnabled(false)' android/app/src/main/java/com/zenstudy/focus/MainActivity.java
-  android:
-    name: Android API${{ matrix.api }} Tasks 320-430px real WebView
-    needs: source
-    strategy:
-      fail-fast: false
-      matrix:
-        api: [30,35]
-    runs-on: ubuntu-latest
-    timeout-minutes: 55
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install Android 36 compile SDK
+      - name: Install compile SDK once per source
         shell: bash
         run: |
+          set -euo pipefail
           sdkmanager_bin="$(find /usr/local/lib/android/sdk/cmdline-tools -name sdkmanager -type f -print -quit)"
           test -x "$sdkmanager_bin"
           "$sdkmanager_bin" 'platforms;android-36' 'build-tools;36.0.0'
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Wire instrumentation in temporary CI checkout only
-        run: |
-          bash tests/tasks_core/df_final03_instrumentation/prepare_test_build.sh
-          test "$(git diff --name-only)" = 'android/app/build.gradle'
-      - name: Build exact source debug app and isolated Android test APK
-        working-directory: android
-        run: gradle assembleDebug assembleDebugAndroidTest --no-daemon
-      - name: Emulator KVM
-        run: |
-          test -c /dev/kvm
-          sudo chmod 666 /dev/kvm
-      - name: Actual WebView pointer edit and six-packet v21 WebView readback after force stop
-        uses: reactivecircus/android-emulator-runner@v2
-        env:
-          DF03_EVIDENCE: ${{ runner.temp }}/df03-api-${{ matrix.api }}
-        with:
-          api-level: ${{ matrix.api }}
-          arch: x86_64
-          target: google_apis
-          profile: pixel_6
-          emulator-boot-timeout: 600
-          disable-animations: true
-          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect
-          script: bash tests/tasks_core/df_final03_instrumentation/run_ci.sh
-      - name: Final source and platform limits
-        if: always()
+      - name: Prepare isolated instrumentation configuration
         shell: bash
         run: |
-          mkdir -p "$RUNNER_TEMP/df03-api-${{ matrix.api }}"
-          git rev-parse HEAD > "$RUNNER_TEMP/df03-api-${{ matrix.api }}/EXACT_SOURCE_SHA.txt"
-          printf 'API${{ matrix.api }} disposable emulator only. PHYSICAL_HANDSET=NOT_TESTED; IME=NOT_TESTED; SAF=NOT_TESTED; RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df03-api-${{ matrix.api }}/LIMITS.txt"
+          set -euo pipefail
+          bash tests/tasks_core/df_final03_instrumentation/prepare_test_build.sh
           test "$(git diff --name-only)" = 'android/app/build.gradle'
+      - name: Build debug app and test APK once for all device cases
+        working-directory: android
+        run: gradle assembleDebug assembleDebugAndroidTest --no-daemon
+      - name: Bind APK hashes to exact source
+        id: receipt
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(git diff --name-only)" = 'android/app/build.gradle'
+          mkdir -p "$RUNNER_TEMP/df03-tasks-build"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/df03-tasks-build/app-debug.apk"
+          cp android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk "$RUNNER_TEMP/df03-tasks-build/app-debug-androidTest.apk"
+          printf '%s\n' "$EXPECTED_SHA" > "$RUNNER_TEMP/df03-tasks-build/SOURCE_SHA.txt"
+          (cd "$RUNNER_TEMP/df03-tasks-build" && sha256sum app-debug.apk app-debug-androidTest.apk > SHA256SUMS)
+          echo "source_sha=$EXPECTED_SHA" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: df03-tasks-built-apks-${{ steps.receipt.outputs.source_sha }}
+          path: ${{ runner.temp }}/df03-tasks-build/
+          if-no-files-found: error
+          retention-days: 7
+  android:
+    name: Android API${{ matrix.api }} Tasks / font ${{ matrix.font_scale }} / 320-430px EN/AR
+    needs: source
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        api: [30,35]
+        # Full QA remains available for release tags and intentional manual runs.
+        font_scale: ${{ fromJSON(github.event_name == 'pull_request' && '["1.0"]' || '["1.0","1.5","2.0"]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: df03-tasks-built-apks-${{ needs.source.outputs.source_sha }}
+          path: ${{ runner.temp }}/df03-tasks-build
+      - name: Verify immutable build provenance and restore test paths
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ needs.source.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(cat "$RUNNER_TEMP/df03-tasks-build/SOURCE_SHA.txt")" = "$EXPECTED_SHA"
+          (cd "$RUNNER_TEMP/df03-tasks-build" && sha256sum --check SHA256SUMS)
+          mkdir -p android/app/build/outputs/apk/debug android/app/build/outputs/apk/androidTest/debug
+          cp "$RUNNER_TEMP/df03-tasks-build/app-debug.apk" android/app/build/outputs/apk/debug/app-debug.apk
+          cp "$RUNNER_TEMP/df03-tasks-build/app-debug-androidTest.apk" android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+      - name: Real Android feature acceptance
+        uses: ./.github/actions/android-emulator
+        env:
+          DF03_EVIDENCE: ${{ runner.temp }}/df03-tasks-api-${{ matrix.api }}-font-${{ matrix.font_scale }}
+          DF03_FONT_SCALE: ${{ matrix.font_scale }}
+        with:
+          api: ${{ matrix.api }}
+          script: bash tests/tasks_core/df_final03_instrumentation/run_ci.sh
+      - name: Record exact head and platform limits
+        if: always()
+        shell: bash
+        env:
+          EVIDENCE: ${{ runner.temp }}/df03-tasks-api-${{ matrix.api }}-font-${{ matrix.font_scale }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE"
+          git rev-parse HEAD > "$EVIDENCE/EXACT_SOURCE_SHA.txt"
+          printf 'Disposable Android emulator only. PHYSICAL_HANDSET=NOT_TESTED; RELEASE_APPROVED=NO\n' > "$EVIDENCE/LIMITS.txt"
+          git diff --exit-code
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: DF03-Tasks-real-Android-API${{ matrix.api }}-${{ github.sha }}
-          path: ${{ runner.temp }}/df03-api-${{ matrix.api }}
+          name: df03-tasks-real-android-API${{ matrix.api }}-font-${{ matrix.font_scale }}-${{ needs.source.outputs.source_sha }}
+          path: ${{ runner.temp }}/df03-tasks-api-${{ matrix.api }}-font-${{ matrix.font_scale }}/
           retention-days: 7
           if-no-files-found: warn

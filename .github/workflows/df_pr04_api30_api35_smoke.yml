@@ -10,6 +10,9 @@ on:
       - '.github/workflows/df_pr04_api30_api35_smoke.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   android-smoke:
     runs-on: ubuntu-latest

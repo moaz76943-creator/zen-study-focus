@@ -6,6 +6,9 @@ on:
     branches: [integration/master-qa-verified-v21]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   regression:
     runs-on: ubuntu-latest

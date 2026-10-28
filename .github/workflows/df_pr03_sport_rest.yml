@@ -7,6 +7,9 @@ on:
     paths: [android/app/src/main/assets/web/app.js, tests/df_pr03/**, .github/workflows/df_pr03_sport_rest.yml]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   sport-rest:
     runs-on: ubuntu-latest
