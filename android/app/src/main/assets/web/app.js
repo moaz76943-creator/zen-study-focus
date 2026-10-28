@@ -5855,3 +5855,72 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M219_VOCAB_AUTO_BACKUP_SNAPSHOT_AND_CODE39_V1 === */
+(function() {
+  if (window.__M219_VOCAB_SNAPSHOT__) return;
+  window.__M219_VOCAB_SNAPSHOT__ = true;
+
+  var SNAPSHOT_KEY = 'df_spoken_vocab_backup_snapshot';
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfCreateVocabBackupSnapshot = function() {
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    if (!items.length) return false;
+    var snap = {
+      timestamp: Date.now(),
+      count: items.length,
+      items: items
+    };
+    try {
+      localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snap));
+      return true;
+    } catch(e) {
+      return false;
+    }
+  };
+
+  window.dfRestoreVocabBackupSnapshot = function() {
+    try {
+      var raw = localStorage.getItem(SNAPSHOT_KEY);
+      if (!raw) {
+        alert('لا توجد نسخة احتياطية محفوظة حالياً.');
+        return false;
+      }
+      var snap = JSON.parse(raw);
+      if (!snap || !Array.isArray(snap.items) || !snap.items.length) {
+        alert('بيانات النسخة الاحتياطية فارغة أو غير صالحة.');
+        return false;
+      }
+      var eng = window.SpokenVocabEngine;
+      if (eng && typeof eng.saveItems === 'function') {
+        eng.saveItems(snap.items);
+        if (typeof eng.render === 'function') eng.render();
+        if (typeof window.dfUpdateFilterChipBadges === 'function') {
+          window.dfUpdateFilterChipBadges();
+        }
+        if (typeof window.dfUpdateVocabStatsBadge === 'function') {
+          window.dfUpdateVocabStatsBadge();
+        }
+        alert('تمت استعادة ' + toWesternDigits(snap.items.length) + ' كلمة من النسخة الاحتياطية بنجاح!');
+        return true;
+      }
+    } catch(e) {
+      alert('تعذرت استعادة النسخة الاحتياطية.');
+    }
+    return false;
+  };
+
+  try {
+    var lastSnap = localStorage.getItem(SNAPSHOT_KEY);
+    if (!lastSnap) {
+      window.dfCreateVocabBackupSnapshot();
+    }
+  } catch(e) {}
+})();
+
