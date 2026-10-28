@@ -8976,3 +8976,80 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfOnQuizShareButtonClicked = dfOnQuizShareButtonClicked;
   }
 })();
+
+/* === M268_TOAST_FEEDBACK_NOTIFICATION_AND_CODE88_V1 === */
+(function() {
+  'use strict';
+
+  var _activeToastTimeout = null;
+
+  function dfRemoveExistingToast() {
+    try {
+      if (typeof document === 'undefined') return;
+      var oldToast = document.getElementById('df-vocab-toast');
+      if (oldToast && oldToast.parentNode) {
+        oldToast.parentNode.removeChild(oldToast);
+      }
+      if (_activeToastTimeout) {
+        clearTimeout(_activeToastTimeout);
+        _activeToastTimeout = null;
+      }
+    } catch (_) {}
+  }
+
+  function dfShowVocabToastNotification(message, type, durationMs) {
+    if (!message || typeof document === 'undefined') return false;
+
+    dfRemoveExistingToast();
+
+    var dur = Number(durationMs) || 2500;
+    var bg = '#18181b';
+    var border = '#27272a';
+    var color = '#f4f4f5';
+
+    if (type === 'success') {
+      bg = '#064e3b';
+      border = '#059669';
+      color = '#ecfdf5';
+    } else if (type === 'info') {
+      bg = '#1e3a8a';
+      border = '#3b82f6';
+      color = '#eff6ff';
+    } else if (type === 'warning') {
+      bg = '#78350f';
+      border = '#d97706';
+      color = '#fffbeb';
+    }
+
+    try {
+      var toast = document.createElement('div');
+      toast.id = 'df-vocab-toast';
+      toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;padding:10px 16px;border-radius:24px;font-size:13px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,0.4);direction:rtl;text-align:center;pointer-events:none;transition:opacity 0.25s ease;opacity:0;background:' + bg + ';border:1px solid ' + border + ';color:' + color + ';';
+      toast.textContent = String(message);
+
+      document.body.appendChild(toast);
+
+      setTimeout(function() {
+        if (toast) toast.style.opacity = '1';
+      }, 10);
+
+      _activeToastTimeout = setTimeout(function() {
+        if (toast) {
+          toast.style.opacity = '0';
+          setTimeout(function() {
+            if (toast && toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 250);
+        }
+      }, dur);
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfRemoveExistingToast = dfRemoveExistingToast;
+    window.dfShowVocabToastNotification = dfShowVocabToastNotification;
+  }
+})();
