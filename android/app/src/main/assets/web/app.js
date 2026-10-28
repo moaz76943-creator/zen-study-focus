@@ -9809,3 +9809,198 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfUpdateWeeklyStudyHeatmapDOM = dfUpdateWeeklyStudyHeatmapDOM;
   }
 })();
+
+/* === M277_FULL_VAULT_BACKUP_EXPORT_IMPORT_AND_CODE97_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfCreateVaultExportBundle() {
+    var vocab = [];
+    var history = [];
+    var dailyGoal = 10;
+    var oledBlack = false;
+    var halfwayChime = true;
+
+    try {
+      var vRaw = localStorage.getItem("df_vocab_bank_v1");
+      if (vRaw) vocab = JSON.parse(vRaw);
+      if (!Array.isArray(vocab)) vocab = [];
+    } catch (_) {}
+
+    try {
+      var hRaw = localStorage.getItem("df_vocab_study_history_v1");
+      if (hRaw) history = JSON.parse(hRaw);
+      if (!Array.isArray(history)) history = [];
+    } catch (_) {}
+
+    try {
+      var gVal = parseInt(localStorage.getItem("df_vocab_daily_goal_v1"), 10);
+      if (!isNaN(gVal) && gVal > 0) dailyGoal = gVal;
+    } catch (_) {}
+
+    try {
+      oledBlack = localStorage.getItem("df_oled_true_black_v1") === "true";
+    } catch (_) {}
+
+    try {
+      var chimeVal = localStorage.getItem("df_halfway_chime_enabled_v1");
+      if (chimeVal !== null) halfwayChime = chimeVal === "true";
+    } catch (_) {}
+
+    var bundle = {
+      app: "Deep Focus",
+      packageId: "com.deepfocus.study",
+      schemaVersion: "v4.0.7",
+      exportedAt: new Date().toISOString(),
+      vault: {
+        vocabBank: vocab,
+        studyHistory: history,
+        dailyGoal: dailyGoal,
+        settings: {
+          oledTrueBlack: oledBlack,
+          halfwayChime: halfwayChime
+        }
+      }
+    };
+
+    return bundle;
+  }
+
+  function dfExportFullVaultJson() {
+    var bundle = dfCreateVaultExportBundle();
+    var jsonStr = JSON.stringify(bundle, null, 2);
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof document !== "undefined") {
+        var datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        var fileName = "deep_focus_vault_" + dfFormatWesternDigits(datePart) + ".json";
+        var blob = new Blob([jsonStr], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("تم تصدير نسخة الخزينة الاحتياطية بنجاح", "success");
+      }
+    } catch (_) {}
+
+    return jsonStr;
+  }
+
+  function dfValidateAndImportVaultJson(jsonString) {
+    if (!jsonString || typeof jsonString !== "string") {
+      return { success: false, reason: "empty_input" };
+    }
+
+    var parsed = null;
+    try {
+      parsed = JSON.parse(jsonString);
+    } catch (_) {
+      return { success: false, reason: "invalid_json" };
+    }
+
+    if (!parsed || typeof parsed !== "object" || !parsed.vault) {
+      return { success: false, reason: "invalid_vault_schema" };
+    }
+
+    var v = parsed.vault;
+    var vocab = Array.isArray(v.vocabBank) ? v.vocabBank : [];
+    var history = Array.isArray(v.studyHistory) ? v.studyHistory : [];
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(vocab));
+      localStorage.setItem("df_vocab_study_history_v1", JSON.stringify(history));
+
+      if (v.dailyGoal && typeof v.dailyGoal === "number") {
+        localStorage.setItem("df_vocab_daily_goal_v1", String(v.dailyGoal));
+      }
+
+      if (v.settings && typeof v.settings === "object") {
+        if (typeof v.settings.oledTrueBlack === "boolean") {
+          localStorage.setItem("df_oled_true_black_v1", String(v.settings.oledTrueBlack));
+          if (typeof window !== "undefined" && typeof window.dfApplyOledTrueBlackState === "function") {
+            window.dfApplyOledTrueBlackState();
+          }
+        }
+        if (typeof v.settings.halfwayChime === "boolean") {
+          localStorage.setItem("df_halfway_chime_enabled_v1", String(v.settings.halfwayChime));
+        }
+      }
+    } catch (_) {
+      return { success: false, reason: "storage_write_failed" };
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("تمت استعادة الخزينة بنجاح!", "success");
+      }
+    } catch (_) {}
+
+    return {
+      success: true,
+      wordsCount: vocab.length,
+      historyCount: history.length
+    };
+  }
+
+  function dfRenderVaultBackupSettingsSectionHtml() {
+    return "<div class=\"df-settings-vault-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"margin-bottom:8px;\">" +
+        "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">📦 الخزينة الشاملة (Full Vault Backup)</span>" +
+        "<span style=\"font-size:11px;color:#a1a1aa;\">تصدير واسترجاع بنك الكلمات وسجل السلاسل بملف محلي آمن</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;\">" +
+        "<button type=\"button\" onclick=\"window.dfExportFullVaultJson && window.dfExportFullVaultJson()\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
+          "<span>تصدير الخزينة</span>" +
+        "</button>" +
+        "<button type=\"button\" onclick=\"var input = document.getElementById('df-vault-file-picker'); if(input) input.click();\" style=\"background:rgba(255,255,255,0.08);color:#f4f4f5;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;flex:1;\">" +
+          "<span>استيراد ملف</span>" +
+        "</button>" +
+      "</div>" +
+      "<input type=\"file\" id=\"df-vault-file-picker\" accept=\".json\" style=\"display:none;\" onchange=\"var f = this.files[0]; if(f){ var r = new FileReader(); r.onload = function(e){ window.dfValidateAndImportVaultJson && window.dfValidateAndImportVaultJson(e.target.result); }; r.readAsText(f); }\" />" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfCreateVaultExportBundle = dfCreateVaultExportBundle;
+    window.dfExportFullVaultJson = dfExportFullVaultJson;
+    window.dfValidateAndImportVaultJson = dfValidateAndImportVaultJson;
+    window.dfRenderVaultBackupSettingsSectionHtml = dfRenderVaultBackupSettingsSectionHtml;
+  }
+})();
