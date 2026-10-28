@@ -10614,3 +10614,155 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderWindChimesSettingsHtml = dfRenderWindChimesSettingsHtml;
   }
 })();
+
+/* === M284_SLEEP_TIMER_WITH_VOLUME_TAPERING_AND_CODE104_V1 === */
+(function() {
+  'use strict';
+
+  var _sleepTimerInterval = null;
+  var _sleepTimerTargetMs = 0;
+  var _isTapering = false;
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfCancelSleepTimer() {
+    if (_sleepTimerInterval) {
+      clearInterval(_sleepTimerInterval);
+      _sleepTimerInterval = null;
+    }
+    _sleepTimerTargetMs = 0;
+    _isTapering = false;
+
+    try {
+      localStorage.removeItem("df_sleep_timer_target_v1");
+    } catch (_) {}
+
+    return { active: false };
+  }
+
+  function dfGetSleepTimerStatus() {
+    if (_sleepTimerTargetMs <= 0) {
+      try {
+        var raw = localStorage.getItem("df_sleep_timer_target_v1");
+        if (raw) _sleepTimerTargetMs = Number(raw) || 0;
+      } catch (_) {}
+    }
+
+    if (_sleepTimerTargetMs <= 0) {
+      return { active: false, remainingSeconds: 0, remainingFormatted: "0" };
+    }
+
+    var now = Date.now();
+    var remainingSec = Math.max(0, Math.round((_sleepTimerTargetMs - now) / 1000));
+
+    if (remainingSec <= 0) {
+      dfCancelSleepTimer();
+      return { active: false, remainingSeconds: 0, remainingFormatted: "0" };
+    }
+
+    var remMins = Math.ceil(remainingSec / 60);
+
+    return {
+      active: true,
+      remainingSeconds: remainingSec,
+      remainingFormatted: dfFormatWesternDigits(remMins),
+      isTapering: _isTapering
+    };
+  }
+
+  function dfStartSleepTimer(minutes) {
+    var mins = Math.max(1, Math.min(180, Number(minutes) || 30));
+    dfCancelSleepTimer();
+
+    var durationMs = mins * 60 * 1000;
+    _sleepTimerTargetMs = Date.now() + durationMs;
+    _isTapering = false;
+
+    try {
+      localStorage.setItem("df_sleep_timer_target_v1", String(_sleepTimerTargetMs));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("تم تفعيل مؤقت النوم: " + dfFormatWesternDigits(mins) + " دقيقة", "info", 2000);
+      }
+    } catch (_) {}
+
+    _sleepTimerInterval = setInterval(function() {
+      var status = dfGetSleepTimerStatus();
+      if (!status.active) {
+        dfCancelSleepTimer();
+        if (typeof window !== "undefined" && typeof window.dfStopAmbientSoundscape === "function") {
+          window.dfStopAmbientSoundscape();
+        }
+        return;
+      }
+
+      if (status.remainingSeconds <= 120 && !_isTapering) {
+        _isTapering = true;
+        try {
+          if (typeof window !== "undefined" && typeof window.dfApplySmoothAudioFade === "function" && window._soundscapeGain && window._soundscapeCtx) {
+            window.dfApplySmoothAudioFade(window._soundscapeGain, 0.0001, status.remainingSeconds, window._soundscapeCtx);
+          }
+        } catch (_) {}
+      }
+    }, 5000);
+
+    return {
+      active: true,
+      minutes: mins,
+      targetTime: _sleepTimerTargetMs
+    };
+  }
+
+  function dfRenderSleepTimerSelectorHtml() {
+    var status = dfGetSleepTimerStatus();
+    var options = [15, 30, 45, 60];
+    var chipsHtml = "";
+
+    for (var i = 0; i < options.length; i++) {
+      var m = options[i];
+      var mStr = dfFormatWesternDigits(m);
+      chipsHtml += "<button type=\"button\" onclick=\"window.dfStartSleepTimer && window.dfStartSleepTimer(" + m + ")\" style=\"background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#d4d4d8;border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer;\">" +
+        "<span>" + mStr + " دقيقة</span>" +
+      "</button>";
+    }
+
+    if (status.active) {
+      chipsHtml += "<button type=\"button\" onclick=\"window.dfCancelSleepTimer && window.dfCancelSleepTimer()\" style=\"background:#ef4444;border:none;color:#ffffff;border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:bold;\">" +
+        "<span>إلغاء (" + status.remainingFormatted + " د)</span>" +
+      "</button>";
+    }
+
+    return "<div class=\"df-sleep-timer-widget\" style=\"margin:10px 0;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;\">" +
+        "<span style=\"font-size:12px;font-weight:bold;color:#f4f4f5;\">⏳ مؤقت النوم والتلاشي التلقائي</span>" +
+        (status.active ? "<span style=\"font-size:11px;color:#60a5fa;\">متبقي: " + status.remainingFormatted + " دقيقة</span>" : "<span style=\"font-size:11px;color:#a1a1aa;\">معطّل</span>") +
+      "</div>" +
+      "<div style=\"display:flex;gap:6px;flex-wrap:wrap;\">" +
+        chipsHtml +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfStartSleepTimer = dfStartSleepTimer;
+    window.dfCancelSleepTimer = dfCancelSleepTimer;
+    window.dfGetSleepTimerStatus = dfGetSleepTimerStatus;
+    window.dfRenderSleepTimerSelectorHtml = dfRenderSleepTimerSelectorHtml;
+  }
+})();
