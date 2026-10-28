@@ -7377,3 +7377,31 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M248_VOCAB_SPEECH_RAPID_CLICK_THROTTLE_AND_CODE68_V1 === */
+(function() {
+  if (window.__M248_SPEECH_THROTTLE__) return;
+  window.__M248_SPEECH_THROTTLE__ = true;
+
+  var lastSpeechTriggerTime = 0;
+  var THROTTLE_MS = 300;
+
+  window.dfCanTriggerSpeech = function() {
+    var now = Date.now();
+    if (now - lastSpeechTriggerTime < THROTTLE_MS) {
+      return false;
+    }
+    lastSpeechTriggerTime = now;
+    return true;
+  };
+
+  if (typeof window.dfSafeSpeakUtterance === 'function') {
+    var prevSafeSpeakM248 = window.dfSafeSpeakUtterance;
+    window.dfSafeSpeakUtterance = function(text, lang, rate, onDone) {
+      if (!window.dfCanTriggerSpeech()) {
+        return false;
+      }
+      return prevSafeSpeakM248(text, lang, rate, onDone);
+    };
+  }
+})();
+
