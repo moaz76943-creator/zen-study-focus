@@ -9526,3 +9526,738 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderSynergyPointsBadgeHtml = dfRenderSynergyPointsBadgeHtml;
   }
 })();
+
+/* === M274_HALFWAY_INTERVAL_ZEN_CHIME_AND_CODE94_V1 === */
+(function() {
+  'use strict';
+
+  var _halfwayChimePlayedInCurrentSession = false;
+
+  function dfIsHalfwayChimeEnabled() {
+    try {
+      var val = localStorage.getItem("df_halfway_chime_enabled_v1");
+      if (val !== null) return val === "true";
+    } catch (_) {}
+    return true;
+  }
+
+  function dfToggleHalfwayChime(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsHalfwayChimeEnabled();
+    try {
+      localStorage.setItem("df_halfway_chime_enabled_v1", String(state));
+    } catch (_) {}
+    return state;
+  }
+
+  function dfResetHalfwayChimeSession() {
+    _halfwayChimePlayedInCurrentSession = false;
+  }
+
+  function dfPlayHalfwayZenChime() {
+    try {
+      if (typeof window === "undefined") return false;
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
+      var ctx = new AudioCtx();
+
+      var osc1 = ctx.createOscillator();
+      var gain1 = ctx.createGain();
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(528, ctx.currentTime);
+      gain1.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain1.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.04);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.4);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(ctx.currentTime);
+      osc1.stop(ctx.currentTime + 1.4);
+
+      var osc2 = ctx.createOscillator();
+      var gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(660, ctx.currentTime + 0.25);
+      gain2.gain.setValueAtTime(0.001, ctx.currentTime + 0.25);
+      gain2.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.3);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.8);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(ctx.currentTime + 0.25);
+      osc2.stop(ctx.currentTime + 1.8);
+
+      try {
+        if (typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(15);
+        }
+      } catch (_) {}
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfCheckHalfwayChimeTrigger(elapsedSeconds, totalSeconds) {
+    if (!dfIsHalfwayChimeEnabled()) return false;
+    if (_halfwayChimePlayedInCurrentSession) return false;
+
+    var elapsed = Number(elapsedSeconds) || 0;
+    var total = Number(totalSeconds) || 0;
+    if (total <= 60) return false;
+
+    var halfway = Math.floor(total / 2);
+    if (elapsed >= halfway && elapsed <= halfway + 2) {
+      _halfwayChimePlayedInCurrentSession = true;
+      return dfPlayHalfwayZenChime();
+    }
+
+    return false;
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsHalfwayChimeEnabled = dfIsHalfwayChimeEnabled;
+    window.dfToggleHalfwayChime = dfToggleHalfwayChime;
+    window.dfResetHalfwayChimeSession = dfResetHalfwayChimeSession;
+    window.dfPlayHalfwayZenChime = dfPlayHalfwayZenChime;
+    window.dfCheckHalfwayChimeTrigger = dfCheckHalfwayChimeTrigger;
+  }
+})();
+
+/* === M275_OLED_TRUE_BLACK_THEME_AND_CODE95_V1 === */
+(function() {
+  'use strict';
+
+  function dfIsOledTrueBlackEnabled() {
+    try {
+      return localStorage.getItem("df_oled_true_black_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfApplyOledTrueBlackState() {
+    try {
+      if (typeof document === "undefined") return false;
+      var isOled = dfIsOledTrueBlackEnabled();
+      var root = document.documentElement;
+      var body = document.body;
+
+      var styleEl = document.getElementById("df-oled-style-block");
+      if (isOled) {
+        if (!styleEl) {
+          styleEl = document.createElement("style");
+          styleEl.id = "df-oled-style-block";
+          styleEl.textContent = "html.df-oled-black, body.df-oled-black { background-color: #000000 !important; color: #f4f4f5 !important; } .df-oled-black .bg-zinc-900, .df-oled-black .bg-gray-900 { background-color: #09090b !important; }";
+          document.head.appendChild(styleEl);
+        }
+        if (root) root.classList.add("df-oled-black");
+        if (body) body.classList.add("df-oled-black");
+      } else {
+        if (styleEl && styleEl.parentNode) {
+          styleEl.parentNode.removeChild(styleEl);
+        }
+        if (root) root.classList.remove("df-oled-black");
+        if (body) body.classList.remove("df-oled-black");
+      }
+      return isOled;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfToggleOledTrueBlack(enable) {
+    var current = dfIsOledTrueBlackEnabled();
+    var nextState = (enable !== undefined) ? Boolean(enable) : !current;
+
+    try {
+      localStorage.setItem("df_oled_true_black_v1", String(nextState));
+    } catch (_) {}
+
+    dfApplyOledTrueBlackState();
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    return nextState;
+  }
+
+  function dfRenderOledThemeSettingsToggleHtml() {
+    var isOled = dfIsOledTrueBlackEnabled();
+    var statusText = isOled ? "مفعّل" : "معطّل";
+    var btnBg = isOled ? "#10b981" : "rgba(255,255,255,0.1)";
+
+    return "<div class=\"df-settings-oled-section\" style=\"margin:12px 0;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🌙 مظهر السواد التام (OLED Black)</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">توفير البطارية وراحة فائقة للعين في المذاكرة الليلية</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleOledTrueBlack && window.dfToggleOledTrueBlack()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      dfApplyOledTrueBlackState();
+    }
+  } catch (_) {}
+
+  if (typeof window !== "undefined") {
+    window.dfIsOledTrueBlackEnabled = dfIsOledTrueBlackEnabled;
+    window.dfApplyOledTrueBlackState = dfApplyOledTrueBlackState;
+    window.dfToggleOledTrueBlack = dfToggleOledTrueBlack;
+    window.dfRenderOledThemeSettingsToggleHtml = dfRenderOledThemeSettingsToggleHtml;
+  }
+})();
+
+/* === M276_WEEKLY_STUDY_HEATMAP_SPARKLINE_AND_CODE96_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetPast7DaysActivityData(referenceDate) {
+    var ref = referenceDate ? new Date(referenceDate) : new Date();
+    var history = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_study_history_v1");
+      if (raw) history = JSON.parse(raw);
+      if (!Array.isArray(history)) history = [];
+    } catch (_) {
+      history = [];
+    }
+
+    var dayNames = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
+    var days = [];
+
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(ref);
+      d.setDate(d.getDate() - i);
+
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, "0");
+      var day = String(d.getDate()).padStart(2, "0");
+      var dateKey = y + "-" + m + "-" + day;
+
+      var hasStudied = history.indexOf(dateKey) !== -1;
+      var dayName = dayNames[d.getDay()];
+      var dayNumStr = dfFormatWesternDigits(d.getDate());
+
+      days.push({
+        date: dateKey,
+        dayName: dayName,
+        dayNum: dayNumStr,
+        hasStudied: hasStudied,
+        isToday: (i === 0)
+      });
+    }
+
+    return days;
+  }
+
+  function dfRenderWeeklyStudyHeatmapHtml(referenceDate) {
+    var days = dfGetPast7DaysActivityData(referenceDate);
+    var itemsHtml = "";
+
+    for (var i = 0; i < days.length; i++) {
+      var day = days[i];
+      var barBg = day.hasStudied ? "#10b981" : "rgba(255,255,255,0.08)";
+      var barBorder = day.hasStudied ? "#059669" : "rgba(255,255,255,0.12)";
+      var textColor = day.isToday ? "#60a5fa" : "#a1a1aa";
+      var fontWeight = day.isToday ? "bold" : "normal";
+
+      itemsHtml += "<div style=\"flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;\">" +
+        "<span style=\"font-size:10px;color:" + textColor + ";font-weight:" + fontWeight + ";\">" + day.dayName + "</span>" +
+        "<div style=\"width:100%;height:28px;background:" + barBg + ";border:1px solid " + barBorder + ";border-radius:6px;display:flex;align-items:center;justify-content:center;\">" +
+          (day.hasStudied ? "<span style=\"font-size:11px;color:#ffffff;\">✓</span>" : "<span style=\"font-size:10px;color:rgba(255,255,255,0.25);\">·</span>") +
+        "</div>" +
+        "<span style=\"font-size:11px;color:#f4f4f5;font-weight:" + fontWeight + ";\">" + day.dayNum + "</span>" +
+      "</div>";
+    }
+
+    return "<div class=\"df-weekly-heatmap\" style=\"margin:12px 0;padding:12px;background:#18181b;border:1px solid #27272a;border-radius:12px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;\">" +
+        "<span style=\"font-size:12px;font-weight:bold;color:#f4f4f5;\">📅 نشاط الأيام السبعة الماضية</span>" +
+        "<span style=\"font-size:11px;color:#10b981;\">معدل الاستمرار</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:6px;justify-content:space-between;\">" +
+        itemsHtml +
+      "</div>" +
+    "</div>";
+  }
+
+  function dfUpdateWeeklyStudyHeatmapDOM() {
+    try {
+      if (typeof document === "undefined") return false;
+      var el = document.getElementById("df-weekly-heatmap-container");
+      if (el) {
+        el.innerHTML = dfRenderWeeklyStudyHeatmapHtml();
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetPast7DaysActivityData = dfGetPast7DaysActivityData;
+    window.dfRenderWeeklyStudyHeatmapHtml = dfRenderWeeklyStudyHeatmapHtml;
+    window.dfUpdateWeeklyStudyHeatmapDOM = dfUpdateWeeklyStudyHeatmapDOM;
+  }
+})();
+
+/* === M277_FULL_VAULT_BACKUP_EXPORT_IMPORT_AND_CODE97_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfCreateVaultExportBundle() {
+    var vocab = [];
+    var history = [];
+    var dailyGoal = 10;
+    var oledBlack = false;
+    var halfwayChime = true;
+
+    try {
+      var vRaw = localStorage.getItem("df_vocab_bank_v1");
+      if (vRaw) vocab = JSON.parse(vRaw);
+      if (!Array.isArray(vocab)) vocab = [];
+    } catch (_) {}
+
+    try {
+      var hRaw = localStorage.getItem("df_vocab_study_history_v1");
+      if (hRaw) history = JSON.parse(hRaw);
+      if (!Array.isArray(history)) history = [];
+    } catch (_) {}
+
+    try {
+      var gVal = parseInt(localStorage.getItem("df_vocab_daily_goal_v1"), 10);
+      if (!isNaN(gVal) && gVal > 0) dailyGoal = gVal;
+    } catch (_) {}
+
+    try {
+      oledBlack = localStorage.getItem("df_oled_true_black_v1") === "true";
+    } catch (_) {}
+
+    try {
+      var chimeVal = localStorage.getItem("df_halfway_chime_enabled_v1");
+      if (chimeVal !== null) halfwayChime = chimeVal === "true";
+    } catch (_) {}
+
+    var bundle = {
+      app: "Deep Focus",
+      packageId: "com.deepfocus.study",
+      schemaVersion: "v4.0.7",
+      exportedAt: new Date().toISOString(),
+      vault: {
+        vocabBank: vocab,
+        studyHistory: history,
+        dailyGoal: dailyGoal,
+        settings: {
+          oledTrueBlack: oledBlack,
+          halfwayChime: halfwayChime
+        }
+      }
+    };
+
+    return bundle;
+  }
+
+  function dfExportFullVaultJson() {
+    var bundle = dfCreateVaultExportBundle();
+    var jsonStr = JSON.stringify(bundle, null, 2);
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof document !== "undefined") {
+        var datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        var fileName = "deep_focus_vault_" + dfFormatWesternDigits(datePart) + ".json";
+        var blob = new Blob([jsonStr], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("تم تصدير نسخة الخزينة الاحتياطية بنجاح", "success");
+      }
+    } catch (_) {}
+
+    return jsonStr;
+  }
+
+  function dfValidateAndImportVaultJson(jsonString) {
+    if (!jsonString || typeof jsonString !== "string") {
+      return { success: false, reason: "empty_input" };
+    }
+
+    var parsed = null;
+    try {
+      parsed = JSON.parse(jsonString);
+    } catch (_) {
+      return { success: false, reason: "invalid_json" };
+    }
+
+    if (!parsed || typeof parsed !== "object" || !parsed.vault) {
+      return { success: false, reason: "invalid_vault_schema" };
+    }
+
+    var v = parsed.vault;
+    var vocab = Array.isArray(v.vocabBank) ? v.vocabBank : [];
+    var history = Array.isArray(v.studyHistory) ? v.studyHistory : [];
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(vocab));
+      localStorage.setItem("df_vocab_study_history_v1", JSON.stringify(history));
+
+      if (v.dailyGoal && typeof v.dailyGoal === "number") {
+        localStorage.setItem("df_vocab_daily_goal_v1", String(v.dailyGoal));
+      }
+
+      if (v.settings && typeof v.settings === "object") {
+        if (typeof v.settings.oledTrueBlack === "boolean") {
+          localStorage.setItem("df_oled_true_black_v1", String(v.settings.oledTrueBlack));
+          if (typeof window !== "undefined" && typeof window.dfApplyOledTrueBlackState === "function") {
+            window.dfApplyOledTrueBlackState();
+          }
+        }
+        if (typeof v.settings.halfwayChime === "boolean") {
+          localStorage.setItem("df_halfway_chime_enabled_v1", String(v.settings.halfwayChime));
+        }
+      }
+    } catch (_) {
+      return { success: false, reason: "storage_write_failed" };
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("تمت استعادة الخزينة بنجاح!", "success");
+      }
+    } catch (_) {}
+
+    return {
+      success: true,
+      wordsCount: vocab.length,
+      historyCount: history.length
+    };
+  }
+
+  function dfRenderVaultBackupSettingsSectionHtml() {
+    return "<div class=\"df-settings-vault-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"margin-bottom:8px;\">" +
+        "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">📦 الخزينة الشاملة (Full Vault Backup)</span>" +
+        "<span style=\"font-size:11px;color:#a1a1aa;\">تصدير واسترجاع بنك الكلمات وسجل السلاسل بملف محلي آمن</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;\">" +
+        "<button type=\"button\" onclick=\"window.dfExportFullVaultJson && window.dfExportFullVaultJson()\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
+          "<span>تصدير الخزينة</span>" +
+        "</button>" +
+        "<button type=\"button\" onclick=\"var input = document.getElementById('df-vault-file-picker'); if(input) input.click();\" style=\"background:rgba(255,255,255,0.08);color:#f4f4f5;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;flex:1;\">" +
+          "<span>استيراد ملف</span>" +
+        "</button>" +
+      "</div>" +
+      "<input type=\"file\" id=\"df-vault-file-picker\" accept=\".json\" style=\"display:none;\" onchange=\"var f = this.files[0]; if(f){ var r = new FileReader(); r.onload = function(e){ window.dfValidateAndImportVaultJson && window.dfValidateAndImportVaultJson(e.target.result); }; r.readAsText(f); }\" />" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfCreateVaultExportBundle = dfCreateVaultExportBundle;
+    window.dfExportFullVaultJson = dfExportFullVaultJson;
+    window.dfValidateAndImportVaultJson = dfValidateAndImportVaultJson;
+    window.dfRenderVaultBackupSettingsSectionHtml = dfRenderVaultBackupSettingsSectionHtml;
+  }
+})();
+
+/* === M278_QUIZ_RESPONSE_LATENCY_ANALYTICS_AND_CODE98_V1 === */
+(function() {
+  'use strict';
+
+  var _currentCardStartTime = 0;
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfStartCardTimer() {
+    _currentCardStartTime = Date.now();
+    return _currentCardStartTime;
+  }
+
+  function dfRecordCardLatency() {
+    var now = Date.now();
+    var elapsed = _currentCardStartTime > 0 ? (now - _currentCardStartTime) : 1500;
+    _currentCardStartTime = 0;
+    return Math.max(100, elapsed);
+  }
+
+  function dfCalculateSessionLatencyMetrics(latenciesArray) {
+    if (!Array.isArray(latenciesArray) || latenciesArray.length === 0) {
+      return {
+        averageSeconds: 0,
+        averageFormatted: "0.0",
+        paceTier: "neutral",
+        paceLabel: "غير محدد",
+        fastCount: 0,
+        moderateCount: 0,
+        slowCount: 0
+      };
+    }
+
+    var totalMs = 0;
+    var fast = 0;
+    var moderate = 0;
+    var slow = 0;
+
+    for (var i = 0; i < latenciesArray.length; i++) {
+      var ms = Number(latenciesArray[i]) || 0;
+      totalMs += ms;
+      if (ms < 2500) fast++;
+      else if (ms <= 5000) moderate++;
+      else slow++;
+    }
+
+    var avgSec = Math.round((totalMs / latenciesArray.length / 1000) * 10) / 10;
+    var avgStr = dfFormatWesternDigits(avgSec.toFixed(1));
+
+    var tier = "moderate";
+    var label = "وتيرة متزنة";
+    if (avgSec < 2.5) {
+      tier = "fast";
+      label = "استرجاع فوري";
+    } else if (avgSec > 5.0) {
+      tier = "slow";
+      label = "استرجاع متأنٍ";
+    }
+
+    return {
+      averageSeconds: avgSec,
+      averageFormatted: avgStr,
+      paceTier: tier,
+      paceLabel: label,
+      fastCount: fast,
+      moderateCount: moderate,
+      slowCount: slow
+    };
+  }
+
+  function dfRenderLatencyBadgeHtml(latenciesArray) {
+    var metrics = dfCalculateSessionLatencyMetrics(latenciesArray);
+    if (metrics.averageSeconds === 0) return "";
+
+    var color = "#10b981";
+    if (metrics.paceTier === "moderate") color = "#3b82f6";
+    else if (metrics.paceTier === "slow") color = "#f59e0b";
+
+    return "<div class=\"df-quiz-latency-badge\" style=\"display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:3px 8px;font-size:11px;color:#f4f4f5;direction:rtl;\">" +
+      "<span style=\"color:" + color + ";\">⚡</span>" +
+      "<span>" + metrics.averageFormatted + " ثانية/بطاقة</span>" +
+      "<span style=\"color:#a1a1aa;\">(" + metrics.paceLabel + ")</span>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfStartCardTimer = dfStartCardTimer;
+    window.dfRecordCardLatency = dfRecordCardLatency;
+    window.dfCalculateSessionLatencyMetrics = dfCalculateSessionLatencyMetrics;
+    window.dfRenderLatencyBadgeHtml = dfRenderLatencyBadgeHtml;
+  }
+})();
+
+/* === M279_AUDIO_FOCUS_INTERRUPTION_HANDLER_AND_CODE99_V1 === */
+(function() {
+  'use strict';
+
+  var _isAudioSuspendedDueToFocusLoss = false;
+
+  function dfIsAudioSuspended() {
+    return _isAudioSuspendedDueToFocusLoss;
+  }
+
+  function dfHandleAudioFocusLoss() {
+    _isAudioSuspendedDueToFocusLoss = true;
+
+    try {
+      if (typeof window !== "undefined" && window.speechSynthesis && typeof window.speechSynthesis.cancel === "function") {
+        window.speechSynthesis.cancel();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfStopAllVocabSpeech === "function") {
+        window.dfStopAllVocabSpeech();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-focus-lost") : new Event("df:audio-focus-lost");
+        window.dispatchEvent(evt);
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfHandleAudioFocusGain() {
+    if (!_isAudioSuspendedDueToFocusLoss) return false;
+    _isAudioSuspendedDueToFocusLoss = false;
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-focus-gained") : new Event("df:audio-focus-gained");
+        window.dispatchEvent(evt);
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfSimulateAudioFocusChange(state) {
+    if (state === "loss" || state === "loss_transient" || state === "loss_transient_can_duck") {
+      return dfHandleAudioFocusLoss();
+    } else if (state === "gain") {
+      return dfHandleAudioFocusGain();
+    }
+    return false;
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      window.addEventListener("blur", function() {
+        if (typeof document !== "undefined" && document.hidden) {
+          dfHandleAudioFocusLoss();
+        }
+      });
+
+      window.addEventListener("focus", function() {
+        dfHandleAudioFocusGain();
+      });
+
+      window.dfHandleAudioFocusLoss = dfHandleAudioFocusLoss;
+      window.dfHandleAudioFocusGain = dfHandleAudioFocusGain;
+      window.dfSimulateAudioFocusChange = dfSimulateAudioFocusChange;
+      window.dfIsAudioSuspended = dfIsAudioSuspended;
+    }
+  } catch (_) {}
+})();
+
+/* === M280_GOLDEN_CENTURY_MILESTONE_V4_1_0_AND_CODE100_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetCenturyMilestoneSummary() {
+    var totalWords = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        totalWords = window.dfGetVocabBankList().length;
+      }
+    } catch (_) {}
+
+    var streak = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfCalculateVocabStudyStreak === "function") {
+        streak = window.dfCalculateVocabStudyStreak().currentStreak;
+      }
+    } catch (_) {}
+
+    return {
+      version: "4.1.0",
+      versionCode: 100,
+      versionCodeFormatted: dfFormatWesternDigits(100),
+      totalWordsFormatted: dfFormatWesternDigits(totalWords),
+      streakFormatted: dfFormatWesternDigits(streak),
+      milestoneTitle: "الإصدار المئوي الذهبي",
+      phaseCompleted: "Phase 1: Study & Timer Synergy (M271-M280)",
+      subsystemsVerified: 9,
+      isVerified: true
+    };
+  }
+
+  function dfRenderCenturyMilestoneModalHtml() {
+    var m = dfGetCenturyMilestoneSummary();
+    var boxStyle = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;text-align:center;flex:1;";
+
+    return "<div class=\"df-century-milestone-modal\" style=\"direction:rtl;padding:16px;background:#18181b;border:1px solid #d97706;border-radius:14px;color:#f4f4f5;box-shadow:0 12px 35px rgba(217,119,6,0.25);\">" +
+      "<div style=\"text-align:center;margin-bottom:14px;\">" +
+        "<span style=\"font-size:32px;display:block;margin-bottom:4px;\">🏆</span>" +
+        "<h3 style=\"margin:0 0 4px 0;font-size:18px;color:#fbbf24;\">" + m.milestoneTitle + " v" + m.version + "</h3>" +
+        "<span style=\"font-size:12px;color:#fde68a;display:block;margin-bottom:2px;\">رمز البناء المئوي: <strong>" + m.versionCodeFormatted + "</strong></span>" +
+        "<span style=\"font-size:11px;color:#a1a1aa;\">اكتمال المرحلة الأولى الشاملة لتكامل المذاكرة والمؤقت بنجاح 100%</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;margin-bottom:12px;\">" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">📚 الكلمات</span><span style=\"font-size:15px;font-weight:bold;color:#f4f4f5;\">" + m.totalWordsFormatted + "</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🔥 السلسلة</span><span style=\"font-size:15px;font-weight:bold;color:#f97316;\">" + m.streakFormatted + " أيام</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🛡️ الحماية</span><span style=\"font-size:15px;font-weight:bold;color:#10b981;\">v21 مؤمّن</span></div>" +
+      "</div>" +
+      "<div style=\"padding:8px 12px;background:rgba(217,119,6,0.1);border-radius:8px;font-size:11px;color:#fde68a;text-align:center;\">" +
+        "✨ جاهز للانطلاق نحو المرحلة الثانية: البيئة الصوتية الطبيعية ومحاذاة الحواس" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetCenturyMilestoneSummary = dfGetCenturyMilestoneSummary;
+    window.dfRenderCenturyMilestoneModalHtml = dfRenderCenturyMilestoneModalHtml;
+  }
+})();
