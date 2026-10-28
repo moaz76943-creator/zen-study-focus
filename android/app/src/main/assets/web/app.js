@@ -5811,3 +5811,47 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M218_VOCAB_AUTO_PUNCTUATION_TRIM_AND_CODE38_V1 === */
+(function() {
+  if (window.__M218_VOCAB_SANITIZER__) return;
+  window.__M218_VOCAB_SANITIZER__ = true;
+
+  window.dfSanitizeVocabText = function(raw) {
+    if (!raw) return '';
+    return String(raw)
+      .replace(/^[\s"'“”‘’«»(\[{<:;.,\/!?-]+|[\s"'“”‘’«»)\]}>:;.,\/!?-]+$/g, '')
+      .replace(/[\s\t]+/g, ' ')
+      .trim();
+  };
+
+  function hookAddInputs() {
+    if (typeof document === 'undefined') return;
+    var wordInp = document.getElementById('df-vocab-word-input') ||
+                  document.querySelector('.df-vocab-word-input');
+    var meanInp = document.getElementById('df-vocab-meaning-input') ||
+                  document.querySelector('.df-vocab-meaning-input');
+
+    if (wordInp && !wordInp.__m218Hooked) {
+      wordInp.__m218Hooked = true;
+      wordInp.addEventListener('blur', function() {
+        wordInp.value = window.dfSanitizeVocabText(wordInp.value);
+      });
+    }
+    if (meanInp && !meanInp.__m218Hooked) {
+      meanInp.__m218Hooked = true;
+      meanInp.addEventListener('blur', function() {
+        meanInp.value = window.dfSanitizeVocabText(meanInp.value);
+      });
+    }
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', hookAddInputs);
+    } else {
+      setTimeout(hookAddInputs, 350);
+    }
+    setInterval(hookAddInputs, 2500);
+  }
+})();
+
