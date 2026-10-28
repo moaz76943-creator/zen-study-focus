@@ -12774,3 +12774,58 @@ window.FlashQuizEngine = FlashQuizEngine;
     }
   } catch (_) {}
 })();
+
+/* === M302_ANDROID_SPLASH_SCREEN_COMPLIANCE_AND_CODE122_V1 === */
+(function() {
+  'use strict';
+
+  var _isAppReadyDispatched = false;
+
+  function dfDismissSplashScreen() {
+    try {
+      if (typeof document === "undefined") return false;
+      var splashEl = document.getElementById("df-app-loading-splash") || document.getElementById("loading") || document.querySelector(".app-splash-overlay");
+      if (splashEl) {
+        splashEl.style.transition = "opacity 0.25s ease, visibility 0.25s ease";
+        splashEl.style.opacity = "0";
+        setTimeout(function() {
+          if (splashEl && splashEl.parentNode) {
+            splashEl.parentNode.removeChild(splashEl);
+          }
+        }, 260);
+      }
+
+      if (!_isAppReadyDispatched && typeof window !== "undefined") {
+        _isAppReadyDispatched = true;
+        var evt = typeof CustomEvent === "function" ? new CustomEvent("df:app-ready") : new Event("df:app-ready");
+        window.dispatchEvent(evt);
+      }
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfInitSplashScreenDismissal() {
+    if (typeof document === "undefined") return false;
+
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      setTimeout(dfDismissSplashScreen, 50);
+    } else {
+      document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(dfDismissSplashScreen, 50);
+      });
+    }
+
+    return true;
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      dfInitSplashScreenDismissal();
+      window.dfDismissSplashScreen = dfDismissSplashScreen;
+      window.dfInitSplashScreenDismissal = dfInitSplashScreenDismissal;
+    }
+  } catch (_) {}
+})();
