@@ -5924,3 +5924,60 @@ window.FlashQuizEngine = FlashQuizEngine;
   } catch(e) {}
 })();
 
+/* === M220_VOCAB_AUTO_SHUFFLE_ON_QUIZ_START_AND_CODE40_V1 === */
+(function() {
+  if (window.__M220_AUTO_SHUFFLE_START__) return;
+  window.__M220_AUTO_SHUFFLE_START__ = true;
+
+  var SHUFFLE_ON_START_KEY = 'df_vocab_quiz_auto_shuffle_start';
+  var autoShuffleOnStart = false;
+  try {
+    autoShuffleOnStart = localStorage.getItem(SHUFFLE_ON_START_KEY) === 'true';
+  } catch(e) {}
+
+  window.dfToggleQuizAutoShuffleOnStart = function() {
+    autoShuffleOnStart = !autoShuffleOnStart;
+    try {
+      localStorage.setItem(SHUFFLE_ON_START_KEY, autoShuffleOnStart ? 'true' : 'false');
+    } catch(e) {}
+    var btn = document.getElementById('df-quiz-auto-shuffle-start-btn');
+    if (btn) {
+      btn.style.background = autoShuffleOnStart ? 'rgba(168,85,247,0.3)' : 'rgba(255,255,255,0.06)';
+      btn.style.borderColor = autoShuffleOnStart ? '#c084fc' : 'rgba(255,255,255,0.15)';
+      btn.style.color = autoShuffleOnStart ? '#ffffff' : '#94a3b8';
+      btn.textContent = autoShuffleOnStart ? '🎲 خلط تلقائي: مفعّل' : '🎲 خلط تلقائي: معطّل';
+    }
+    return autoShuffleOnStart;
+  };
+
+  window.dfIsQuizAutoShuffleOnStartEnabled = function() {
+    return autoShuffleOnStart;
+  };
+
+  function mountAutoShuffleStartBtn() {
+    if (typeof document === 'undefined') return;
+    var toolbar = document.getElementById('df-quiz-extra-toolbar');
+    if (!toolbar || document.getElementById('df-quiz-auto-shuffle-start-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-quiz-auto-shuffle-start-btn';
+    btn.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid ' +
+      (autoShuffleOnStart ? '#c084fc' : 'rgba(255,255,255,0.15)') + ';background:' +
+      (autoShuffleOnStart ? 'rgba(168,85,247,0.3)' : 'rgba(255,255,255,0.06)') + ';color:' +
+      (autoShuffleOnStart ? '#ffffff' : '#94a3b8') + ';font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = autoShuffleOnStart ? '🎲 خلط تلقائي: مفعّل' : '🎲 خلط تلقائي: معطّل';
+    btn.onclick = function() { window.dfToggleQuizAutoShuffleOnStart(); };
+    toolbar.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountAutoShuffleStartBtn);
+    } else {
+      setTimeout(mountAutoShuffleStartBtn, 350);
+    }
+    setInterval(mountAutoShuffleStartBtn, 2500);
+  }
+})();
+
