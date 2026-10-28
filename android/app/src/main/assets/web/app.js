@@ -6770,3 +6770,92 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M234_VOCAB_CARD_DELETE_SAFETY_CONFIRM_AND_CODE54_V1 === */
+(function() {
+  if (window.__M234_DELETE_UNDO__) return;
+  window.__M234_DELETE_UNDO__ = true;
+
+  window.__dfLastDeletedVocabItem = null;
+  window.__dfLastDeletedVocabIndex = -1;
+
+  window.dfDeleteVocabItemWithUndo = function(itemId) {
+    var eng = window.SpokenVocabEngine;
+    if (!eng || typeof eng.getItems !== 'function' || typeof eng.saveItems !== 'function') return false;
+
+    var items = eng.getItems() || [];
+    var targetIdx = -1;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i] && items[i].id === itemId) {
+        targetIdx = i;
+        break;
+      }
+    }
+    if (targetIdx === -1) return false;
+
+    window.__dfLastDeletedVocabItem = items[targetIdx];
+    window.__dfLastDeletedVocabIndex = targetIdx;
+
+    items.splice(targetIdx, 1);
+    eng.saveItems(items);
+    if (typeof eng.render === 'function') eng.render();
+    if (typeof window.dfUpdateFilterChipBadges === 'function') window.dfUpdateFilterChipBadges();
+    if (typeof window.dfUpdateVocabStatsBadge === 'function') window.dfUpdateVocabStatsBadge();
+
+    window.dfShowVocabDeleteUndoToast(window.__dfLastDeletedVocabItem.word);
+    return true;
+  };
+
+  window.dfRestoreLastDeletedVocabItem = function() {
+    var item = window.__dfLastDeletedVocabItem;
+    if (!item) return false;
+
+    var eng = window.SpokenVocabEngine;
+    if (!eng || typeof eng.getItems !== 'function' || typeof eng.saveItems !== 'function') return false;
+
+    var items = eng.getItems() || [];
+    var idx = window.__dfLastDeletedVocabIndex;
+    if (idx >= 0 && idx <= items.length) {
+      items.splice(idx, 0, item);
+    } else {
+      items.unshift(item);
+    }
+
+    eng.saveItems(items);
+    if (typeof eng.render === 'function') eng.render();
+    if (typeof window.dfUpdateFilterChipBadges === 'function') window.dfUpdateFilterChipBadges();
+    if (typeof window.dfUpdateVocabStatsBadge === 'function') window.dfUpdateVocabStatsBadge();
+
+    window.__dfLastDeletedVocabItem = null;
+    window.__dfLastDeletedVocabIndex = -1;
+
+    var toast = document.getElementById('df-vocab-undo-toast');
+    if (toast) toast.remove();
+    return true;
+  };
+
+  window.dfShowVocabDeleteUndoToast = function(wordText) {
+    if (typeof document === 'undefined') return;
+    var existing = document.getElementById('df-vocab-undo-toast');
+    if (existing) existing.remove();
+
+    var toast = document.createElement('div');
+    toast.id = 'df-vocab-undo-toast';
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid rgba(244,63,94,0.4);border-radius:12px;padding:10px 16px;color:#f8fafc;font-size:13px;display:flex;align-items:center;gap:12px;z-index:99999;box-shadow:0 12px 30px rgba(0,0,0,0.5);';
+    toast.innerHTML =
+      '<span>تم حذف <b>' + (wordText || 'الكلمة') + '</b></span>' +
+      '<button type="button" id="df-vocab-toast-undo-btn" style="padding:4px 10px;border-radius:8px;border:none;background:#9333ea;color:#ffffff;font-weight:700;font-size:12px;cursor:pointer;">↶ تراجع</button>';
+
+    document.body.appendChild(toast);
+
+    var undoBtn = document.getElementById('df-vocab-toast-undo-btn');
+    if (undoBtn) {
+      undoBtn.onclick = function() { window.dfRestoreLastDeletedVocabItem(); };
+    }
+
+    setTimeout(function() {
+      var t = document.getElementById('df-vocab-undo-toast');
+      if (t) t.remove();
+    }, 5000);
+  };
+})();
+
