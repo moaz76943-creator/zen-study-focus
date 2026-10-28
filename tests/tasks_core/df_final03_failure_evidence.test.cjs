@@ -7,8 +7,8 @@ function classify(state,output){
  try {
   fs.writeFileSync(path.join(dir,'adb'),'#!/bin/sh\nprintf "%s\\n" "$DF03_ADB_STATE"\n',{mode:0o700});
   fs.writeFileSync(path.join(dir,'instrumentation.txt'),output);
-  const result=cp.spawnSync('bash',['-c','source "$1"; df03_record_failure edit 320-en "$out/instrumentation.txt" 124','bash',helper],{
-   env:{...process.env,PATH:dir+path.delimiter+process.env.PATH,out:dir,DF03_ADB_STATE:state},encoding:'utf8',timeout:15000
+  const result=cp.spawnSync('/bin/bash',['-c','source "$1"; df03_record_failure edit 320-en "$out/instrumentation.txt" 124','bash',helper],{
+   env:{PATH:dir+':/usr/bin:/bin',out:dir,DF03_ADB_STATE:state},encoding:'utf8',timeout:15000
   });
   assert.equal(result.error,undefined);assert.equal(result.status,0);
   assert.ok(fs.existsSync(path.join(dir,'host-failure-edit-320-en.txt')));
@@ -28,4 +28,13 @@ test('Tasks observed application postcondition failure survives subsequent devic
 });
 test('Tasks evaluateJavascript and input setup errors are not asserted application failures',()=>{
  assert.match(classify('device','INSTRUMENTATION_RESULT: df03_status=FAIL\nINSTRUMENTATION_RESULT: df03_error=java.lang.AssertionError: WebView evaluateJavascript timeout'),/FAILURE_CATEGORY=TEST_HARNESS_FAIL/);
+});
+
+test('diagnostic classification never inherits executable BASH_ENV startup input',()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'df-no-shell-startup-'));
+ const startup=path.join(dir,'startup'),previous=process.env.BASH_ENV;
+ fs.writeFileSync(startup,'printf injected > "$BASH_ENV.marker"\n');
+ process.env.BASH_ENV=startup;
+ try{classify('device','');assert.equal(fs.existsSync(startup+'.marker'),false,'Inherited BASH_ENV executed code');}
+ finally{if(previous===undefined)delete process.env.BASH_ENV;else process.env.BASH_ENV=previous;fs.rmSync(dir,{recursive:true,force:true});}
 });

@@ -8,8 +8,8 @@ function classify(state,output,status=1){
  try {
   fs.writeFileSync(path.join(dir,'adb'),'#!/bin/sh\nprintf "%s\\n" "$DF08_ADB_STATE"\n',{mode:0o700});
   fs.writeFileSync(path.join(dir,'instrumentation.txt'),output);
-  const result=cp.spawnSync('bash',['-c','source "$1"; df08_record_failure save 320 "$out/instrumentation.txt" "$2"','bash',helper,String(status)],{
-   env:{...process.env,PATH:dir+path.delimiter+process.env.PATH,out:dir,DF08_ADB_STATE:state},encoding:'utf8',timeout:15000
+  const result=cp.spawnSync('/bin/bash',['-c','source "$1"; df08_record_failure save 320 "$out/instrumentation.txt" "$2"','bash',helper,String(status)],{
+   env:{PATH:dir+':/usr/bin:/bin',out:dir,DF08_ADB_STATE:state},encoding:'utf8',timeout:15000
   });
   assert.equal(result.error,undefined);assert.equal(result.status,0);
   const evidence=fs.readFileSync(path.join(dir,'failure-save-320.txt'),'utf8');
@@ -29,4 +29,13 @@ test('explicit application postcondition failure is retained even if transport s
 });
 test('injection and evaluation infrastructure errors remain harness failures',()=>{
  assert.match(classify('device','INSTRUMENTATION_RESULT: df08_status=FAIL\nINSTRUMENTATION_RESULT: df08_error=java.lang.AssertionError: WebView.evaluateJavascript timed out'),/FAILURE_CATEGORY=TEST_HARNESS_FAIL/);
+});
+
+test('diagnostic classification never inherits executable BASH_ENV startup input',()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'df-no-shell-startup-'));
+ const startup=path.join(dir,'startup'),previous=process.env.BASH_ENV;
+ fs.writeFileSync(startup,'printf injected > "$BASH_ENV.marker"\n');
+ process.env.BASH_ENV=startup;
+ try{classify('device','');assert.equal(fs.existsSync(startup+'.marker'),false,'Inherited BASH_ENV executed code');}
+ finally{if(previous===undefined)delete process.env.BASH_ENV;else process.env.BASH_ENV=previous;fs.rmSync(dir,{recursive:true,force:true});}
 });
