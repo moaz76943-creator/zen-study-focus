@@ -11154,3 +11154,103 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderDualVolumeControlsHtml = dfRenderDualVolumeControlsHtml;
   }
 })();
+
+/* === M288_BACKGROUND_AUDIO_MEDIA_SESSION_BRIDGE_AND_CODE108_V1 === */
+(function() {
+  'use strict';
+
+  function dfUpdateMediaSessionMetadata(title, artist) {
+    try {
+      if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return false;
+      var trackTitle = title || "جلسة تركيز هادئة (Deep Focus)";
+      var trackArtist = artist || "عازل الصوت الطبيعي";
+
+      var metadataObj = {
+        title: String(trackTitle),
+        artist: String(trackArtist),
+        album: "DEEP FOCUS"
+      };
+
+      if (typeof MediaMetadata === "function") {
+        navigator.mediaSession.metadata = new MediaMetadata(metadataObj);
+      } else {
+        navigator.mediaSession.metadata = metadataObj;
+      }
+
+      navigator.mediaSession.playbackState = "playing";
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfClearMediaSession() {
+    try {
+      if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return false;
+      navigator.mediaSession.playbackState = "none";
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfInitMediaSessionActionHandlers() {
+    try {
+      if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return false;
+
+      var handlers = {
+        play: function() {
+          if (typeof window !== "undefined" && typeof window.dfStartAmbientSoundscape === "function") {
+            window.dfStartAmbientSoundscape("rain");
+          }
+          if (navigator.mediaSession) navigator.mediaSession.playbackState = "playing";
+        },
+        pause: function() {
+          if (typeof window !== "undefined" && typeof window.dfStopAmbientSoundscape === "function") {
+            window.dfStopAmbientSoundscape();
+          }
+          if (navigator.mediaSession) navigator.mediaSession.playbackState = "paused";
+        },
+        stop: function() {
+          if (typeof window !== "undefined" && typeof window.dfStopAmbientSoundscape === "function") {
+            window.dfStopAmbientSoundscape();
+          }
+          dfClearMediaSession();
+        },
+        nexttrack: function() {
+          try {
+            if (typeof window !== "undefined" && typeof window.dfOnNextQuizCard === "function") {
+              window.dfOnNextQuizCard();
+            }
+          } catch (_) {}
+        },
+        previoustrack: function() {
+          try {
+            if (typeof window !== "undefined" && typeof window.dfOnPrevQuizCard === "function") {
+              window.dfOnPrevQuizCard();
+            }
+          } catch (_) {}
+        }
+      };
+
+      for (var action in handlers) {
+        try {
+          navigator.mediaSession.setActionHandler(action, handlers[action]);
+        } catch (_) {}
+      }
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      dfInitMediaSessionActionHandlers();
+      window.dfUpdateMediaSessionMetadata = dfUpdateMediaSessionMetadata;
+      window.dfClearMediaSession = dfClearMediaSession;
+      window.dfInitMediaSessionActionHandlers = dfInitMediaSessionActionHandlers;
+    }
+  } catch (_) {}
+})();
