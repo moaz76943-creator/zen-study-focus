@@ -73,15 +73,15 @@ async function connect(){
  });
  await call('Runtime.enable',{});
 }
-function call(method,params){
- return new Promise((resolve,reject)=>{const id=++next,timer=setTimeout(()=>{pending.delete(id);reject(Error('TRANSPORT: CDP '+method+' timeout'));},15000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params}));});
+function call(method,params,timeout=15000){
+ return new Promise((resolve,reject)=>{const id=++next,timer=setTimeout(()=>{pending.delete(id);reject(Error('TRANSPORT: CDP '+method+' timeout'));},timeout);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params}));});
 }
-async function evaluate(script){return (await call('Runtime.evaluate',{expression:script,returnByValue:true})).result?.value;}
-async function nativeConfirmation(){
+async function evaluate(script,timeout){return (await call('Runtime.evaluate',{expression:script,returnByValue:true},timeout)).result?.value;}
+async function nativeHierarchy(){
  assert.equal(process.env.DF_DIALOG_NATIVE_PORT,'38384','TEST_INFRA: persistent native accessibility probe required');
- const xml=await new Promise((resolve,reject)=>{
+ return new Promise((resolve,reject)=>{
   const socket=net.createConnection({host:'127.0.0.1',port:38384});let data='',settled=false;
-  const timer=setTimeout(()=>{socket.destroy();reject(Error('TRANSPORT: native hierarchy timeout'));},10000);
+ const timer=setTimeout(()=>{socket.destroy();reject(Error('TRANSPORT: native hierarchy timeout'));},2500);
   socket.on('error',e=>{clearTimeout(timer);reject(e);});socket.on('connect',()=>socket.write('DUMP\n'));
   socket.on('end',()=>{if(!settled){clearTimeout(timer);reject(Error('TRANSPORT: native hierarchy disconnected'));}});
   socket.on('data',chunk=>{data+=chunk.toString('utf8');
@@ -90,9 +90,15 @@ async function nativeConfirmation(){
    try{const message=JSON.parse(data.slice(0,data.indexOf('\n')));settled=true;clearTimeout(timer);socket.end();resolve(message.xml);}catch(e){clearTimeout(timer);socket.destroy();reject(e);}
   });
  });
- assert.equal(typeof xml,'string');
- assert.match(xml,/package="com\.zenstudy\.focus"/);assert.ok(xml.includes('Deep Focus'),'Real branded restore confirmation missing');
- const node=[...xml.matchAll(/<node\b[^>]*>/g)].map(x=>x[0]).find(x=>x.includes('resource-id="android:id/button1"'));
+}
+async function nativeConfirmation(){
+ let node;
+ for(let attempt=0;attempt<6;attempt++){
+  const xml=await nativeHierarchy();assert.equal(typeof xml,'string');
+  if(/package="com\.zenstudy\.focus"/.test(xml)&&xml.includes('Deep Focus'))
+   node=[...xml.matchAll(/<node\b[^>]*>/g)].map(x=>x[0]).find(x=>x.includes('resource-id="android:id/button1"'));
+  if(node)break;await sleep(350);
+ }
  assert.ok(node,'Actual native affirmative button missing');
  const box=/bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/.exec(node);assert.ok(box);
  const x=(Number(box[1])+Number(box[3]))/2,y=(Number(box[2])+Number(box[4]))/2;
@@ -108,7 +114,16 @@ async function cancelDocumentsPicker(expression){
   await sleep(350);
  }
  assert.equal(opened,true,'Actual SAF DocumentsUI did not open');
- adb('shell','input','keyevent','KEYCODE_BACK');await sleep(800);
+ for(let back=0;back<3;back++){
+  adb('shell','input','keyevent','KEYCODE_BACK');
+  for(let n=0;n<8;n++){
+   const resumed=adb('shell','dumpsys','activity','activities').split('\n').filter(x=>/mResumedActivity|topResumedActivity/.test(x));
+   if(resumed.some(x=>/com\.zenstudy\.focus\/(?:com\.zenstudy\.focus\.)?\.?(?:MainActivity)\b/.test(x))&&
+      !resumed.some(x=>/com\.(?:google\.)?android\.documentsui\//.test(x)))return;
+   await sleep(250);
+  }
+ }
+ throw Error('SAF cancellation did not return to MainActivity');
 }
 async function start(){
  adb('shell','am','start','-W','-n',PKG+'/.MainActivity');await sleep(1600);
@@ -255,7 +270,7 @@ let snapshot;
   assert.equal(await evaluate('window.ZenNative.readDurableV21()'),beforeInvalid);
   record('invalid-backup-preserves-native-records','PASS','Real restore parser rejects invalid backup without changing durable receipt');
   assert.equal(await evaluate(`(()=>{const a=DF22Integration.getSnapshot(),b=JSON.parse(JSON.stringify(a));b.notesList[0].body='Temporary backup test edit';return DF22Integration.write(a,b);})()`),true);
-  const restored=evaluate('verifyAndRestoreBackupCode('+JSON.stringify(backupCode)+')');
+  const restored=evaluate('verifyAndRestoreBackupCode('+JSON.stringify(backupCode)+')',60000);
   restored.catch(()=>{}); // Await below after the real native confirmation is tapped.
   await sleep(700);await nativeConfirmation();
   assert.equal(await restored,true,'Actual native-confirmed backup restore failed');
