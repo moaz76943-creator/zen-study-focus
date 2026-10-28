@@ -183,20 +183,40 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         long now = System.currentTimeMillis();
         long deadline = now + seconds * 1000L;
         SharedPreferences p = prefs(context);
-        long token = p.getLong("token", 0) + 1;
-        clearSystemAlarm(context);
+        long oldToken = p.getLong("token", 0);
+        boolean oldActive = p.getBoolean("active", false);
+        long oldDeadline = p.getLong("deadline", 0);
+        long oldNotified = p.getLong("lastNotified", 0);
+        String oldTitle = p.getString("title", null);
+        long token = oldToken + 1;
         String safeTitle = cleanTitle(context, title);
         if (!p.edit().putBoolean("active", true).putLong("token", token)
                 .putLong("deadline", deadline).putString("title", safeTitle)
-                .putLong("lastNotified", 0).commit()) return;
+                .putLong("lastNotified", 0).commit()) {
+            // SharedPreferences changes memory even when its disk commit fails.
+            // Restore the generation before returning so the still-scheduled old
+            // PendingIntent remains valid; never cancel it for a refused update.
+            p.edit().putBoolean("active", oldActive).putLong("token", oldToken)
+                    .putLong("deadline", oldDeadline).putString("title", oldTitle)
+                    .putLong("lastNotified", oldNotified).commit();
+            return;
+        }
+        clearSystemAlarm(context);
         scheduleSystemAlarm(context, token, deadline);
         showActive(context, deadline, safeTitle);
     }
 
     /** Called when user pauses/cancels a countdown. Never clears v21 WebView data. */
     public static synchronized void cancel(Context context) {
+        SharedPreferences p = prefs(context);
+        boolean wasActive = p.getBoolean("active", false);
+        // Do not remove the existing OS alarm until native cancellation is durable.
+        // A failed SharedPreferences commit still updates its in-memory map.
+        if (!p.edit().putBoolean("active", false).commit()) {
+            p.edit().putBoolean("active", wasActive).commit();
+            return;
+        }
         clearSystemAlarm(context);
-        prefs(context).edit().putBoolean("active", false).commit();
         NotificationManager manager = notifications(context);
         if (manager != null) manager.cancel(ACTIVE_NOTIFICATION);
     }
@@ -205,17 +225,34 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
     public static synchronized void completeNow(Context context, String title) {
         SharedPreferences p = prefs(context);
         long now = System.currentTimeMillis();
+        boolean wasActive = p.getBoolean("active", false);
+        long previousNotified = p.getLong("lastNotified", 0);
         // Prevent duplicate alert if AlarmManager has already posted completion.
-        if (!p.getBoolean("active", false) && now - p.getLong("lastNotified", 0) < 120000) return;
-        clearSystemAlarm(context);
+        if (!wasActive && now - previousNotified < 120000) return;
         String safeTitle = cleanTitle(context, title);
         if (p.edit().putBoolean("active", false).putLong("lastNotified", now).commit()) {
+            clearSystemAlarm(context);
             showDone(context, safeTitle);
+        } else {
+            // Refusing a completion receipt must not permanently lose notification.
+            // Restore the in-memory state and retry inexact delivery after a bounded
+            // delay. The old token remains authoritative; a later Cancel invalidates it.
+            p.edit().putBoolean("active", wasActive)
+                    .putLong("lastNotified", previousNotified).commit();
+            if (wasActive) {
+                scheduleSystemAlarm(context, p.getLong("token", 0), now + 30000L);
+            }
         }
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        handleReceive(context, intent);
+    }
+
+    // The bridge runs on a WebView thread while broadcasts arrive on the main
+    // thread. Share schedule/cancel's class lock across validation and delivery.
+    private static synchronized void handleReceive(Context context, Intent intent) {
         if (intent == null) return;
         SharedPreferences p = prefs(context);
         if (!p.getBoolean("active", false)) return;

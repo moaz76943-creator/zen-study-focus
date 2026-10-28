@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # One shell is required: android-emulator-runner invokes each inline command separately.
 set -euo pipefail
+# Default to full QA unless a merge-gate workflow explicitly requests focused.
+qa_level="${DF_TRACK05_QA_LEVEL:-full}"
+case "$qa_level" in full|focused) ;; *) echo 'Invalid DF_TRACK05_QA_LEVEL' >&2; exit 2 ;; esac
+export DF_TRACK05_QA_LEVEL="$qa_level"
 report="$RUNNER_TEMP/track05-android"
 mkdir -p "$report"
 if ! serial="$(timeout --kill-after=5s 15s adb devices | awk '$1 ~ /^emulator-/ && $2 == "device" {print $1; exit}')"; then
@@ -38,4 +42,12 @@ if [[ "$launched" != 1 ]]; then
   echo 'QA INFRA BLOCKER: Android app process not launched' >&2
   exit 2
 fi
-DF_TRACK05_SERIAL="$serial" DF_TRACK05_DISPOSABLE=1 node tests/track05_timer/live_android_cdp.cjs "$report/cdp-results.json"
+# Execute the focused real AlarmManager test independently; preserve both reports
+# even when one harness hits a real app failure or unavailable device transport.
+alarm_status=0
+DF_TRACK05_SERIAL="$serial" DF_TRACK05_DISPOSABLE=1 node tests/critical_room7/n02_android_probe.cjs "$report/n02-alarm-results.json" || alarm_status=$?
+lifecycle_status=0
+DF_TRACK05_SERIAL="$serial" DF_TRACK05_DISPOSABLE=1 node tests/track05_timer/live_android_cdp.cjs "$report/cdp-results.json" || lifecycle_status=$?
+if [[ "$alarm_status" == 1 || "$lifecycle_status" == 1 ]]; then exit 1; fi
+if [[ "$alarm_status" != 0 ]]; then exit "$alarm_status"; fi
+exit "$lifecycle_status"

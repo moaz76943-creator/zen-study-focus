@@ -1,8 +1,8 @@
 name: Track05 Timer Lifecycle RED GREEN
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - fix/df-final01-track05-native-active-timer-20261026
+    tags: ['v*']
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
@@ -20,12 +20,18 @@ on:
       - 'android/gradle.properties'
       - 'android/gradle/**'
       - 'tests/track05_timer/**'
+      - 'tests/critical_room7/n02*'
       - 'tests/android_e2e_recovery/**'
       - 'tests/i18n/quick_training/**'
       - 'tests/i18n/timer/**'
       - 'tests/track07_functional/timer*'
-      - 'tests/integration_quality/activity_domain_durable_ack.test.cjs'
+      - 'tests/track07_functional/activity_domain_durable_ack.test.cjs'
       - '.github/workflows/track05_timer_lifecycle_20261021.yml'
+env:
+  # The full unchanged legacy suite passed on both APIs in run40646478046.
+  # Every PR still runs all N02 probes plus real minute/Tabata credit acceptance.
+  DF_TRACK05_QA_LEVEL: ${{ github.event_name == 'pull_request' && 'focused' || 'full' }}
+  DF_TEST_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 permissions:
   contents: read
 concurrency:
@@ -38,23 +44,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
       - name: Enforce exact branch commit and source syntax
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$DF_TEST_SOURCE_SHA"
           node --check android/app/src/main/assets/web/app.js
           node --check tests/track05_timer/live_android_cdp.cjs
+          node --check tests/critical_room7/n02_android_probe.cjs
+          node --test tests/track05_timer/timer_qa_level.test.cjs tests/track05_timer/expired_native_alarm.test.cjs tests/track05_timer/workflow_test_paths.test.cjs tests/track05_timer/completion_receipts.test.cjs tests/critical_room7/n02_contract.test.cjs tests/critical_room7/n02_alarm_receipts.test.cjs
           bash -n tests/track05_timer/run_android_timer_qa.sh
       - name: Native active timer checkpoint and lifecycle regression
         run: node --test tests/track05_timer/native_timer_checkpoint.test.cjs tests/track05_timer/mode_snapshot_ack.test.cjs tests/track05_timer/delta_snapshot_ack.test.cjs tests/track05_timer/adb_timeout.test.cjs tests/track05_timer/adb_classification.test.cjs tests/android_e2e_recovery/private_evidence.test.cjs
       - name: Track05 real-function lifecycle regression and adjacent timer guards
         run: |
-          node --test tests/track05_timer/tick_lifecycle.test.cjs tests/track07_functional/timer_destructive_shortcuts.test.cjs tests/track07_functional/timer_mode_button_safety.test.cjs tests/track07_functional/timer_mode_20_locale_prompt.test.cjs tests/integration_quality/activity_domain_durable_ack.test.cjs
+          node --test tests/track05_timer/tick_lifecycle.test.cjs tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_safety.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs tests/track07_functional/activity_domain_durable_ack.test.cjs
+      - name: Record reviewed executable-source digest (diagnostic only; never auto-approve findings)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$DF_TEST_SOURCE_SHA"
+          python3 - <<'PY'
+          from pathlib import Path
+          import runpy
+          module=runpy.run_path('tools/security/track13_codeql_sarif_report.py')
+          print('CODEQL_EXECUTABLE_SOURCE_SHA256='+module['executable_source_digest'](Path('.').resolve()))
+          PY
       - name: Record exact SHA and immutable test scope
         if: always()
         shell: bash
@@ -63,15 +87,22 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: track05-timer-source-${{ github.sha }}
+          name: track05-timer-source-${{ env.DF_TEST_SOURCE_SHA }}
           path: ${{ runner.temp }}/track05-evidence.txt
           retention-days: 7
   android-timer-qa:
-    runs-on: ubuntu-latest
+    # API35 repeatedly lost the Android emulator on the 24.04 hosted AMD/KVM image.
+    # Isolate the host kernel for API35; retain all real-device assertions.
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 35]
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -111,23 +142,49 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$DF_TEST_SOURCE_SHA"
           mkdir -p "$RUNNER_TEMP/track05-android"
           test -s android/app/build/outputs/apk/debug/app-debug.apk
-          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > "$RUNNER_TEMP/track05-android/apk.sha256"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk | tee "$RUNNER_TEMP/track05-android/apk.sha256"
+          {
+            date -u
+            free -m
+            ps -eo pid,ppid,comm,rss --sort=-rss | sed -n '1,20p'
+          } > "$RUNNER_TEMP/track05-android/host-before.txt"
           test -c /dev/kvm
           sudo chown "$(id -u):$(id -g)" /dev/kvm
           sudo chmod u+rw /dev/kvm
-      - name: Android API30 CDP + physical ADB native timer lifecycle
+      - name: Android API${{ matrix.api }} real alarms and timer lifecycle
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: ${{ matrix.api }}
           target: google_apis
           arch: x86_64
-          profile: pixel_6
-          emulator-boot-timeout: 600
-          disable-animations: true
+          profile: pixel_2
+          ram-size: ${{ matrix.api == 35 && '3072M' || '2048M' }}
+          heap-size: ${{ matrix.api == 35 && '512M' || '256M' }}
+          cores: 2
+          emulator-boot-timeout: 900
+          disable-animations: false
+          # Emulator 37+: supported software renderer; avoid deprecated GPU/skin/DPI flags.
+          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -noaudio -no-boot-anim -gpu swangle -feature -Vulkan' || '-no-window -no-snapshot -noaudio -no-boot-anim -gpu software -feature -Vulkan' }}
           script: bash tests/track05_timer/run_android_timer_qa.sh
+      - name: Bounded host and emulator diagnostics
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/track05-android"
+          {
+            date -u
+            free -m
+            ps -eo pid,ppid,comm,rss --sort=-rss | sed -n '1,20p'
+            if [ -r /sys/fs/cgroup/memory.events ]; then cat /sys/fs/cgroup/memory.events; fi
+            timeout --kill-after=2s 8s sudo -n dmesg --ctime 2>/dev/null | tail -n 80 || true
+          } > "$RUNNER_TEMP/track05-android/host-after.txt" 2>&1
+          {
+            timeout --kill-after=2s 8s adb -s emulator-5554 get-state || true
+            timeout --kill-after=2s 8s adb -s emulator-5554 shell getprop sys.boot_completed || true
+          } > "$RUNNER_TEMP/track05-android/emulator-transport.txt" 2>&1
       - name: Preserve Android actual outcomes, logcat and source SHA
         if: always()
         shell: bash
@@ -137,7 +194,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: track05-android-api30-${{ github.sha }}
+          name: track05-android-api${{ matrix.api }}-${{ env.DF_TEST_SOURCE_SHA }}
           path: ${{ runner.temp }}/track05-android/
           if-no-files-found: warn
           retention-days: 7

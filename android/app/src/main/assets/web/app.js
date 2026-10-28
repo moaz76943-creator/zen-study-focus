@@ -2689,7 +2689,15 @@ function restoreTimerSession() {
     timerLeft = Math.max(0, Math.ceil((timerTargetTime - Date.now()) / 1000));
     if (timerLeft === 0) {
       // Android completion alarm may already have notified; reconcile saved deadline.
-      finalizeTimerSession(false);
+      const reconciled = finalizeTimerSession(false);
+      // Force-stop removes OS alarms but leaves their durable active receipt.
+      // Retire that receipt only after accepted credit, without cancelling the
+      // next Quick Training interval that finalization may have just started.
+      if (reconciled !== false && !timerRunning && window.ZenNative &&
+          typeof window.ZenNative.stopBackgroundService === 'function') {
+        try { window.ZenNative.stopBackgroundService(); }
+        catch (error) { console.warn('Unable to retire completed timer alert', error); }
+      }
       return;
     }
     timerRunning = true;

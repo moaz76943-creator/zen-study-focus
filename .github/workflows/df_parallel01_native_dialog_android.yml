@@ -119,13 +119,13 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_2
-          ram-size: '2048M'
-          heap-size: '256M'
+          ram-size: ${{ matrix.api == 35 && '3072M' || '2048M' }}
+          heap-size: ${{ matrix.api == 35 && '512M' || '256M' }}
           cores: 2
           emulator-boot-timeout: 900
           # Bound guest RAM and software-rendered framebuffer on hosted runners.
           # These dialog/receipt checks do not certify phone width coverage.
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -skin 720x1280 -dpi-device 240
+          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -noaudio -no-boot-anim -gpu swangle -feature -Vulkan' || '-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -skin 720x1280 -dpi-device 240' }}
           disable-animations: false
           script: |
             bash tests/android_dialogs/run_native_dialog_device.sh
