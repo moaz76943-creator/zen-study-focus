@@ -6665,3 +6665,40 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M232_VOCAB_QUIZ_AUTO_SCROLL_TOP_AND_CODE52_V1 === */
+(function() {
+  if (window.__M232_QUIZ_SCROLL_ALIGN__) return;
+  window.__M232_QUIZ_SCROLL_ALIGN__ = true;
+
+  window.dfScrollQuizCardIntoView = function() {
+    if (typeof document === 'undefined') return false;
+    var card = document.getElementById('df-flash-quiz-card') ||
+               document.querySelector('.df-flash-card-inner') ||
+               document.getElementById('df-flash-quiz-modal');
+    if (!card) return false;
+    try {
+      if (typeof card.scrollIntoView === 'function') {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      var modal = document.getElementById('df-flash-quiz-modal');
+      if (modal && typeof modal.scrollTop === 'number') {
+        modal.scrollTop = 0;
+      }
+      return true;
+    } catch(e) {
+      return false;
+    }
+  };
+
+  var quiz = window.FlashQuizEngine;
+  if (quiz && !quiz.__m232ScrollHooked && typeof quiz.nextCard === 'function') {
+    quiz.__m232ScrollHooked = true;
+    var origNext = quiz.nextCard.bind(quiz);
+    quiz.nextCard = function() {
+      var res = origNext.apply(quiz, arguments);
+      setTimeout(window.dfScrollQuizCardIntoView, 60);
+      return res;
+    };
+  }
+})();
+
