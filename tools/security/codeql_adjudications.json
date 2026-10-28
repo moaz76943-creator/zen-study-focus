@@ -5,7 +5,7 @@
       "id": "DF-CODEQL-QA-EVIDENCE-001",
       "verdict": "FALSE_POSITIVE_WITH_EVIDENCE",
       "reviewStatus": "APPROVED",
-      "reviewedBy": "Codex /root/security_review: final helper, network dataflow, consumers and workflow review; Codex /root: independent scoped mechanism and integrated CI review, 2026-10-28 (engineering review)",
+      "reviewedBy": "Codex /root/security_review: final helper, network dataflow, consumers and workflow review; Codex /root: independent scoped mechanism and integrated CI review, 2026-10-28 (engineering review); /root/security_review and /root re-reviewed expired-reconcile diagnostics and focused/full scheduling",
       "rule": "js/http-to-file-access",
       "path": "tests/android_e2e_recovery/private_evidence.cjs",
       "line": 68,
@@ -23,7 +23,7 @@
         "executableSourceSha256": "1d2ed2e6ad522631683f7c8917f206ab5484c454644e597f81c7d9d9f827e221",
         "evidence": "docs/security/CODEQL_QA_EVIDENCE_ADJUDICATION.md"
       },
-      "relevantSourceSha256": "949c3682052ef9009d0dee23c444f8bd71a6ea12c3c9245bb1b8e54cb8f76376"
+      "relevantSourceSha256": "6a0c2681aff0f01a495728a35e32a3360410b5eab808c5986af7f6aebd4dda88"
     }
   ]
 }
