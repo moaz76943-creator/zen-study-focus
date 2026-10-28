@@ -2360,7 +2360,9 @@ function startQuickSportRest(secs) {
   // One confirmed durable transition. Do not Pause/Reset/save intermediate
   // states: those could irrevocably discard focus time on failed storage.
   const startedAt=Date.now();
-  const nextId=String(startedAt)+'-'+String(Math.round(Math.random()*1e9));
+  let nextId;
+  try{nextId=String(startedAt)+'-'+Array.from(globalThis.crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16).padStart(8,'0')).join('');}
+  catch(_){showToast(L().saveFailed || 'Could not create session. Try again.');return false;}
   const next={
     total:seconds,left:seconds,running:true,endAt:startedAt+seconds*1000,
     mode:'short',label:'',sessionId:nextId,taskId:null,
@@ -2877,6 +2879,11 @@ function toggleTimerPlay() {
     }
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
   } else {
+    let nextSessionId=timerSessionId;
+    if(!nextSessionId){
+      try{nextSessionId=String(Date.now())+'-'+Array.from(globalThis.crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16).padStart(8,'0')).join('');}
+      catch(_){showToast(L().saveFailed || 'Could not create session. Try again.');return false;}
+    }
     try {
       if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
@@ -2885,7 +2892,7 @@ function toggleTimerPlay() {
     const oldSessionId = timerSessionId, oldTaskId = focusSessionTaskId;
     const oldResumeMs = timerResumeMs, oldTargetTime = timerTargetTime;
     if (!timerSessionId) {
-      timerSessionId = String(Date.now()) + '-' + String(Math.round(Math.random()*1e9));
+      timerSessionId = nextSessionId;
       const linked = typeof focusWorkflowGetLinkedTask === 'function' ? focusWorkflowGetLinkedTask() : null;
       focusSessionTaskId = quickTraining?.active && Number.isSafeInteger(quickTraining.taskId)
         ? quickTraining.taskId : (linked?.id ?? null);
@@ -4747,7 +4754,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       var parts = clean.split(/\s*(?:,|;|\t|\s-\s|:|\|)\s*/);
       if (parts.length >= 2 && parts[0] && parts[1]) {
         parsed.push({
-          id: 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          id: 'v_' + Date.now() + '_' + Array.from(globalThis.crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16).padStart(8,'0')).join(''),
           word: parts[0].replace(/^"|"$/g, '').trim(),
           meaning: parts.slice(1).join(' - ').replace(/^"|"$/g, '').trim(),
           color: defaultColor || 'purple',

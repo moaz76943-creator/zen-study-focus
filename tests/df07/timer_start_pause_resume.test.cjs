@@ -20,7 +20,7 @@ function rig({saveAcks=[]}={}){
   const calls={saves:[],nativeStarts:[],nativeStops:0,intervals:0,clears:0,completions:0};
   const button={innerHTML:''},caption={textContent:'Study 25m'};
   let handle=0;
-  const c={
+  const c={crypto:require('node:crypto').webcrypto,
     timerRunning:false,timerSessionId:null,timerLeft:1500,timerTotal:1500,
     timerTargetTime:null,timerResumeMs:null,timerActiveMs:0,timerInterval:null,
     quickTraining:null,focusSessionTaskId:null,chimeCtx:null,
@@ -44,6 +44,25 @@ function rig({saveAcks=[]}={}){
   const state=()=>JSON.parse(evaluate('JSON.stringify({running:timerRunning,id:timerSessionId,left:timerLeft,total:timerTotal,resume:timerResumeMs,active:timerActiveMs})'));
   return {c,calls,state,play:()=>evaluate('toggleTimerPlay()'),tick:()=>evaluate('runTimerTick()')};
 }
+
+test('missing secure randomness refuses new focus IDs before any state, audio or storage mutation',()=>{
+ const t=rig();const before=t.state();t.c.crypto={};
+ t.c.L=()=>({});t.c.showToast=()=>{};
+ assert.equal(t.play(),false);assert.deepEqual(t.state(),before);
+ assert.equal(t.c.chimeCtx,null);assert.equal(t.calls.saves.length,0);
+ assert.equal(t.calls.nativeStarts.length,0);assert.equal(t.calls.intervals,0);
+});
+
+test('new focus IDs remain unique at a fixed clock while existing IDs resume without crypto',()=>{
+ const ids=new Set();
+ for(let n=0;n<100;n++){
+  const t=rig();t.c.Date=class extends Date{static now(){return 2000000}};
+  t.play();assert.match(t.state().id,/^2000000-[0-9a-f]{32}$/);ids.add(t.state().id);
+ }
+ assert.equal(ids.size,100);
+ const t=rig();t.play();const id=t.state().id;t.play();t.c.crypto={};t.play();
+ assert.equal(t.state().id,id);assert.equal(t.state().running,true);
+});
 
 test('Start, Pause and Resume retain exactly one session ID without changing timer duration',()=>{
   const t=rig();

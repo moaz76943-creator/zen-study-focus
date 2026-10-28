@@ -102,3 +102,29 @@ test('explicit single-file report paths preserve CI destinations',()=>fixture(di
  try{report.write('synthetic');assert.equal(fs.readFileSync(requested,'utf8'),'synthetic');}
  finally{report.close();}
 }));
+
+test('descriptor-only writes handle short writes without truncating UTF-8 or binary evidence',()=>fixture(dir=>{
+ const store=helper().createEvidenceDirectory(path.join(dir,'safe'));
+ const original=fs.writeSync;let calls=0;
+ fs.writeSync=(fd,buffer,offset,length,position)=>{
+  assert.equal(typeof fd,'number');calls++;
+  return original(fd,buffer,offset,Math.min(length,3),position);
+ };
+ try{
+  store.write('arabic.txt','نص محفوظ');
+  store.write('image.bin',Buffer.from([0,255,128,1,2,3,4]));
+ }finally{fs.writeSync=original;store.close();}
+ assert.ok(calls>2,'Must exercise the descriptor-only short-write loop');
+ assert.equal(fs.readFileSync(path.join(dir,'safe','arabic.txt'),'utf8'),'نص محفوظ');
+ assert.deepEqual(fs.readFileSync(path.join(dir,'safe','image.bin')),Buffer.from([0,255,128,1,2,3,4]));
+}));
+
+test('a stalled descriptor write refuses publication and preserves the prior artifact',()=>fixture(dir=>{
+ const store=helper().createEvidenceDirectory(path.join(dir,'safe'));
+ store.write('report','original');
+ const original=fs.writeSync;fs.writeSync=()=>0;
+ try{assert.throws(()=>store.write('report','partial'),/Evidence write stalled/);}
+ finally{fs.writeSync=original;store.close();}
+ assert.equal(fs.readFileSync(path.join(dir,'safe','report'),'utf8'),'original');
+ assert.deepEqual(fs.readdirSync(path.join(dir,'safe')),['report']);
+}));
