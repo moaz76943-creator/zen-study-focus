@@ -42,3 +42,15 @@ test('Android records exact Notes footer DOM ancestry and real rule match',()=>{
   assert.match(java,/footerAncestor:/);
   assert.match(java,/editorAncestor:/);
 });
+
+
+test('actual Android Notes save survives force-stop and matches both v21 mirror packets',()=>{
+  assert.match(shell,/am force-stop com\.zenstudy\.focus/);
+  assert.match(shell,/stage verify -e width/);
+  assert.match(shell,/df08_reopen=PASS/);
+  assert.match(java,/DF08_NOTES_REOPEN_PASS/);
+  assert.match(java,/DeepFocusDataCompatV21/);
+  assert.match(java,/storedMatches/);
+  assert.match(java,/mirrorOk/);
+  assert.doesNotMatch(shell,/pm clear com\.zenstudy\.focus.*reopen/);
+});
