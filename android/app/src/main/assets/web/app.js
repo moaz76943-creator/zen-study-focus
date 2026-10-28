@@ -7970,3 +7970,92 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfGetVocabDailyGoalProgress = dfGetVocabDailyGoalProgress;
   }
 })();
+
+/* === M257_ZEN_GOAL_CHIME_CELEBRATION_AND_CODE77_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetTodayDateStr() {
+    var d = new Date();
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return dfFormatWesternDigits(y + '-' + m + '-' + day);
+  }
+
+  function dfPlayZenGoalCompletionChime() {
+    try {
+      if (typeof window === 'undefined') return false;
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
+      var ctx = new AudioCtx();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(528, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.8);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 1.8);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfTriggerGoalCelebrationIfNeeded(isGoalCompleted) {
+    if (!isGoalCompleted) {
+      return { celebrated: false, reason: 'not_completed' };
+    }
+
+    var todayKey = dfGetTodayDateStr();
+    var lastCelebrated = null;
+    try {
+      lastCelebrated = localStorage.getItem('df_vocab_goal_celebrated_v1');
+    } catch (_) {}
+
+    if (lastCelebrated === todayKey) {
+      return { celebrated: false, reason: 'already_celebrated_today' };
+    }
+
+    try {
+      localStorage.setItem('df_vocab_goal_celebrated_v1', todayKey);
+    } catch (_) {}
+
+    var chimeSuccess = dfPlayZenGoalCompletionChime();
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
+        window.dfVocabHapticPulse(40);
+      }
+    } catch (_) {}
+
+    return {
+      celebrated: true,
+      chimePlayed: chimeSuccess,
+      date: todayKey
+    };
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfPlayZenGoalCompletionChime = dfPlayZenGoalCompletionChime;
+    window.dfTriggerGoalCelebrationIfNeeded = dfTriggerGoalCelebrationIfNeeded;
+  }
+})();
