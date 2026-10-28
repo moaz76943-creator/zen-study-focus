@@ -2,10 +2,9 @@ name: Deep Focus Track 13 Exact-SHA CodeQL
 on:
   pull_request:
     branches: [integration/master-qa-verified-v21]
-    paths: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs', '**/*.ts', '**/*.tsx', '**/*.html', '**/*.sh', '**/package*.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml', 'tools/security/**', 'docs/security/**', '.github/workflows/**', '.github/actions/**']
   push:
     branches: [integration/master-qa-verified-v21]
-    paths: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs', '**/*.ts', '**/*.tsx', '**/*.html', '**/*.sh', '**/package*.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml', 'tools/security/**', 'docs/security/**', '.github/workflows/**', '.github/actions/**']
+    paths: ['android/**', 'tools/**', 'tests/**', '.github/workflows/**']
   workflow_dispatch:
 permissions:
   contents: read
@@ -35,12 +34,15 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
           echo "CODEQL_SOURCE_SHA=$EXPECTED_SHA"
-          # Diagnostic only. The strict SARIF gate and approved digest remain unchanged.
+      - name: Print read-only QA review dependency digest
+        shell: bash
+        run: |
+          set -euo pipefail
           python3 - <<'PY'
-          import runpy
           from pathlib import Path
-          report = runpy.run_path("tools/security/track13_codeql_sarif_report.py")
-          print("CODEQL_SOURCE_TREE_SHA256=" + report["executable_source_digest"](Path.cwd()))
+          import runpy
+          module = runpy.run_path('tools/security/track13_codeql_sarif_report.py')
+          print('CODEQL_QA_DEPENDENCY_SHA256=' + module['executable_source_digest'](Path.cwd()))
           PY
       - name: CodeQL parser and secure identity regressions
         run: node --test tests/security_recovery/track13_codeql_sarif.test.cjs tests/security_recovery/track13_codeql_adjudication.test.cjs tests/security_recovery/secure_identity.test.cjs tests/android_e2e_recovery/private_evidence.test.cjs
