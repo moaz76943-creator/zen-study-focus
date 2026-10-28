@@ -6859,3 +6859,45 @@ window.FlashQuizEngine = FlashQuizEngine;
   };
 })();
 
+/* === M235_VOCAB_CARD_COUNT_FILTER_BADGE_SYNC_AND_CODE55_V1 === */
+(function() {
+  if (window.__M235_COLOR_SYNC__) return;
+  window.__M235_COLOR_SYNC__ = true;
+
+  var COLORS = ['purple', 'blue', 'red', 'green'];
+
+  window.dfCycleVocabCardColorWithSync = function(itemId) {
+    var eng = window.SpokenVocabEngine;
+    if (!eng || typeof eng.getItems !== 'function' || typeof eng.saveItems !== 'function') return null;
+
+    var items = eng.getItems() || [];
+    var targetItem = null;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i] && items[i].id === itemId) {
+        targetItem = items[i];
+        break;
+      }
+    }
+    if (!targetItem) return null;
+
+    var curColor = (targetItem.color || 'purple').toLowerCase();
+    var curIdx = COLORS.indexOf(curColor);
+    var nextColor = COLORS[(curIdx + 1) % COLORS.length];
+    targetItem.color = nextColor;
+
+    eng.saveItems(items);
+    if (typeof eng.render === 'function') eng.render();
+
+    if (typeof window.dfUpdateFilterChipBadges === 'function') {
+      window.dfUpdateFilterChipBadges();
+    }
+    if (typeof window.dfUpdateVocabStatsBadge === 'function') {
+      window.dfUpdateVocabStatsBadge();
+    }
+    if (typeof window.dfVocabHapticPulse === 'function') {
+      window.dfVocabHapticPulse('flip');
+    }
+    return nextColor;
+  };
+})();
+
