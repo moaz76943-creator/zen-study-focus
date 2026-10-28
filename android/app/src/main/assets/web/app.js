@@ -6104,3 +6104,61 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M223_VOCAB_AUTO_PROGRESS_BAR_ON_QUIZ_AND_CODE43_V1 === */
+(function() {
+  if (window.__M223_QUIZ_PROGRESS_BAR__) return;
+  window.__M223_QUIZ_PROGRESS_BAR__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  window.dfUpdateQuizProgressBar = function(currentIdx, totalCount) {
+    if (typeof document === 'undefined') return;
+    var barFill = document.getElementById('df-quiz-progress-fill');
+    var label = document.getElementById('df-quiz-progress-text');
+    var total = Math.max(1, parseInt(totalCount, 10) || 1);
+    var cur = Math.max(0, Math.min(total, parseInt(currentIdx, 10) || 0));
+    var percent = Math.round((cur / total) * 100);
+
+    if (barFill) {
+      barFill.style.width = percent + '%';
+    }
+    if (label) {
+      label.textContent = toWesternDigits(cur) + ' / ' + toWesternDigits(total) + ' (' + toWesternDigits(percent) + '%)';
+    }
+  };
+
+  function mountProgressBarUI() {
+    if (typeof document === 'undefined') return;
+    var container = document.getElementById('df-flash-quiz-header') ||
+                    document.getElementById('df-quiz-extra-toolbar');
+    if (!container || document.getElementById('df-quiz-progress-wrapper')) return;
+
+    var wrapper = document.createElement('div');
+    wrapper.id = 'df-quiz-progress-wrapper';
+    wrapper.style.cssText = 'width:100%;margin:6px 0;box-sizing:border-box;';
+    wrapper.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;font-size:11px;color:#94a3b8;font-weight:600;">' +
+        '<span>التقدم في الاختبار</span>' +
+        '<span id="df-quiz-progress-text">0 / 0 (0%)</span>' +
+      '</div>' +
+      '<div style="width:100%;height:6px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;">' +
+        '<div id="df-quiz-progress-fill" style="width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #a855f7, #38bdf8);transition:width 0.3s ease;"></div>' +
+      '</div>';
+
+    container.parentNode.insertBefore(wrapper, container.nextSibling);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountProgressBarUI);
+    } else {
+      setTimeout(mountProgressBarUI, 350);
+    }
+    setInterval(mountProgressBarUI, 2500);
+  }
+})();
+
