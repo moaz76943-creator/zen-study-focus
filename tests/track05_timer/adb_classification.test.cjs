@@ -4,6 +4,9 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),cp=r
 const source=fs.readFileSync(path.join(__dirname,'live_android_cdp.cjs'),'utf8');
 function harness(dir) {
  const cases=[],logs=[],options=[],ctx={serial:'emulator-5554',cases,seq:0,ws:null,file:null,
+  // Production runner initializes this selector in main(); the isolated
+  // classification harness must supply the same executed-case contract.
+  qa:{level:'full',deferred:[],async run(name,fn){return {executed:true,value:await fn()};},verify(){}},
   process:{env:{},exitCode:0},console:{log:s=>logs.push(s)},
   record:(name,status,detail)=>cases.push({name,status,detail}),
   cp:{execFileSync:(cmd,args,opts)=>{
