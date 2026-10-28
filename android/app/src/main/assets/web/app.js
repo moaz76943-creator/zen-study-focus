@@ -12714,3 +12714,63 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderMasteryVaultMilestoneModalHtml = dfRenderMasteryVaultMilestoneModalHtml;
   }
 })();
+
+/* === M301_ANDROID_APP_SHORTCUTS_AND_CODE121_V1 === */
+(function() {
+  'use strict';
+
+  function dfHandleDeepLinkAction(actionKey) {
+    var action = actionKey;
+    if (!action && typeof window !== "undefined" && window.location) {
+      var hash = window.location.hash || "";
+      var match = hash.match(/action=([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        action = match[1];
+      }
+    }
+
+    if (!action) return { handled: false, action: null };
+
+    var executed = false;
+
+    if (action === "review" || action === "due_today") {
+      try {
+        if (typeof window !== "undefined" && typeof window.dfStartDueTodayQuiz === "function") {
+          window.dfStartDueTodayQuiz();
+          executed = true;
+        }
+      } catch (_) {}
+    } else if (action === "ambient" || action === "rain") {
+      try {
+        if (typeof window !== "undefined" && typeof window.dfStartAmbientSoundscape === "function") {
+          window.dfStartAmbientSoundscape("rain");
+          executed = true;
+        }
+      } catch (_) {}
+    } else if (action === "focus" || action === "timer") {
+      try {
+        if (typeof window !== "undefined" && typeof window.dfSwitchTab === "function") {
+          window.dfSwitchTab("timer");
+          executed = true;
+        }
+      } catch (_) {}
+    }
+
+    try {
+      if (executed && typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(20);
+      }
+    } catch (_) {}
+
+    return { handled: executed, action: action };
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      window.addEventListener("load", function() {
+        dfHandleDeepLinkAction();
+      });
+      window.dfHandleDeepLinkAction = dfHandleDeepLinkAction;
+    }
+  } catch (_) {}
+})();
