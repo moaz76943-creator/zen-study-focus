@@ -89,9 +89,9 @@ jobs:
           disable-animations: true
           # Initial boot framebuffer only: run_ci overrides density/size and
           # instrumentation still verifies all requested CSS widths and fonts.
-          # API35 uses minimal software-renderer flags from the passing smoke suite.
+          # Isolate API35 post-ready renderer crashes with the supported software ANGLE path.
           # Keep API30's previously passing setup unchanged.
-          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -noaudio -no-boot-anim -gpu swiftshader_indirect' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240' }}
+          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -noaudio -no-boot-anim -gpu swangle -feature -Vulkan' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240' }}
           script: bash tests/android_touch/df08_instrumentation/run_ci.sh
       - name: Record exact head, no production changes and limits
         if: always()
