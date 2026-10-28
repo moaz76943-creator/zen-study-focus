@@ -16,6 +16,11 @@ jobs:
     name: CodeQL JS security-extended — fail closed
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    env:
+      # PR-only diff ranges hid existing findings that the post-merge scan found.
+      # Supported by the pinned action's feature flag, not a query suppression:
+      # https://github.com/github/codeql-action/blob/6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee/src/feature-flags.ts#L255-L259
+      CODEQL_ACTION_DIFF_INFORMED_QUERIES: 'false'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:

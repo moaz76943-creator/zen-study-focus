@@ -116,3 +116,9 @@ test('CodeQL workflow cannot upload SARIF or databases and analyzes exact checko
   assert.match(wf,/track13_codeql_sarif_report\.py/);
   assert.doesNotMatch(wf,/upload-artifact|continue-on-error|\bsecrets\./);
 });
+
+test('PR CodeQL scans the complete checked-out HEAD before accepting a merge',()=>{
+  const wf=fs.readFileSync(path.join(root,'.github/workflows/track13_codeql_exact_sha.yml'),'utf8');
+  const job=wf.slice(wf.indexOf('  codeql:'),wf.indexOf('    steps:'));
+  assert.match(job,/    env:\n(?:[^\n]*\n)*?      CODEQL_ACTION_DIFF_INFORMED_QUERIES: 'false'/);
+});
