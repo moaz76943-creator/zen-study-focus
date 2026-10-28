@@ -184,4 +184,13 @@ async function main(){
   console.log('ANDROID_P0_ALL_JS_DIALOGS_PASS',JSON.stringify(summary));
  }finally{ws.close();}
 }
-main().catch(e=>{console.error('ANDROID_P0_NATIVE_DIALOG_FAIL',String(e));process.exitCode=1;});
+main().catch(e=>{
+ const {deviceHealth,classifyFailure}=require('./device_failure.cjs');
+ const health=deviceHealth(),failureCategory=classifyFailure(e,health);
+ evidence.write('android-native-dialog-failure.json',JSON.stringify({
+  status:'FAIL',failureCategory,health,sourceSha:process.env.DF_TEST_SOURCE_SHA||null,
+  reason:String(e).slice(0,500),releaseApproved:false
+ },null,2));
+ console.error('ANDROID_P0_NATIVE_DIALOG_FAIL',failureCategory,String(e));
+ process.exitCode=1;
+});
