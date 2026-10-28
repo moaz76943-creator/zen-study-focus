@@ -6290,3 +6290,89 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M226_VOCAB_TTS_ACCENT_PAIR_SWITCH_INDICATOR_AND_CODE46_V1 === */
+(function() {
+  if (window.__M226_LANG_PAIR_INDICATOR__) return;
+  window.__M226_LANG_PAIR_INDICATOR__ = true;
+
+  var PAIRS = [
+    { code: 'de-DE', flag: '🇩🇪', label: 'الألمانية (DE)' },
+    { code: 'en-US', flag: '🇬🇧', label: 'الإنجليزية (EN)' },
+    { code: 'fr-FR', flag: '🇫🇷', label: 'الفرنسية (FR)' },
+    { code: 'es-ES', flag: '🇪🇸', label: 'الإسبانية (ES)' },
+    { code: 'tr-TR', flag: '🇹🇷', label: 'التركية (TR)' }
+  ];
+
+  window.dfGetActiveLanguagePairInfo = function() {
+    var eng = window.SpokenVocabEngine;
+    var currentCode = (eng && eng.config && eng.config.foreignLang) || 'de-DE';
+    for (var i = 0; i < PAIRS.length; i++) {
+      if (PAIRS[i].code.toLowerCase() === currentCode.toLowerCase()) {
+        return PAIRS[i];
+      }
+    }
+    return PAIRS[0];
+  };
+
+  window.dfCycleLanguagePair = function() {
+    var eng = window.SpokenVocabEngine;
+    if (!eng) return null;
+    if (!eng.config) eng.config = {};
+    var currentCode = eng.config.foreignLang || 'de-DE';
+
+    var curIdx = 0;
+    for (var i = 0; i < PAIRS.length; i++) {
+      if (PAIRS[i].code.toLowerCase() === currentCode.toLowerCase()) {
+        curIdx = i;
+        break;
+      }
+    }
+    var nextPair = PAIRS[(curIdx + 1) % PAIRS.length];
+    eng.config.foreignLang = nextPair.code;
+
+    try {
+      localStorage.setItem('df_vocab_foreign_lang', nextPair.code);
+    } catch(e) {}
+
+    updateLangPairBadgeUI();
+    if (typeof window.dfUpdateVocabVoiceStatus === 'function') {
+      window.dfUpdateVocabVoiceStatus();
+    }
+    return nextPair;
+  };
+
+  function updateLangPairBadgeUI() {
+    if (typeof document === 'undefined') return;
+    var btn = document.getElementById('df-vocab-lang-pair-badge-btn');
+    if (!btn) return;
+    var pair = window.dfGetActiveLanguagePairInfo();
+    btn.textContent = pair.flag + ' ' + pair.label;
+  }
+
+  function mountLangPairBadge() {
+    if (typeof document === 'undefined') return;
+    var targetRow = document.getElementById('df-vocab-search-row') ||
+                    document.getElementById('df-vocab-filter-bar');
+    if (!targetRow || document.getElementById('df-vocab-lang-pair-badge-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-vocab-lang-pair-badge-btn';
+    btn.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid rgba(168,85,247,0.35);background:rgba(168,85,247,0.12);color:#d8b4fe;font-size:12px;font-weight:700;cursor:pointer;';
+    var pair = window.dfGetActiveLanguagePairInfo();
+    btn.textContent = pair.flag + ' ' + pair.label;
+    btn.onclick = function() { window.dfCycleLanguagePair(); };
+
+    targetRow.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountLangPairBadge);
+    } else {
+      setTimeout(mountLangPairBadge, 350);
+    }
+    setInterval(updateLangPairBadgeUI, 2500);
+  }
+})();
+
