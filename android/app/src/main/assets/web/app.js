@@ -11254,3 +11254,92 @@ window.FlashQuizEngine = FlashQuizEngine;
     }
   } catch (_) {}
 })();
+
+/* === M289_AUDIO_DUCKING_POLICY_HANDLER_AND_CODE109_V1 === */
+(function() {
+  'use strict';
+
+  var _isAudioDucked = false;
+  var _preDuckedVolume = 0.40;
+
+  function dfIsAudioDucked() {
+    return _isAudioDucked;
+  }
+
+  function dfApplyAudioDucking() {
+    if (_isAudioDucked) return { ducked: false, reason: "already_ducked" };
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetAmbientVolume === "function") {
+        _preDuckedVolume = window.dfGetAmbientVolume();
+      }
+    } catch (_) {}
+
+    _isAudioDucked = true;
+    var duckedVol = _preDuckedVolume * 0.25;
+
+    try {
+      if (typeof window !== "undefined" && window._soundscapeGain && window._soundscapeCtx) {
+        if (typeof window.dfApplySmoothAudioFade === "function") {
+          window.dfApplySmoothAudioFade(window._soundscapeGain, duckedVol * 0.25, 0.25, window._soundscapeCtx);
+        } else {
+          window._soundscapeGain.gain.setValueAtTime(duckedVol * 0.25, window._soundscapeCtx.currentTime);
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-ducked") : new Event("df:audio-ducked");
+        window.dispatchEvent(evt);
+      }
+    } catch (_) {}
+
+    return { ducked: true, targetVolume: duckedVol };
+  }
+
+  function dfRestoreAudioDucking() {
+    if (!_isAudioDucked) return { restored: false, reason: "not_ducked" };
+    _isAudioDucked = false;
+
+    try {
+      if (typeof window !== "undefined" && window._soundscapeGain && window._soundscapeCtx) {
+        if (typeof window.dfApplySmoothAudioFade === "function") {
+          window.dfApplySmoothAudioFade(window._soundscapeGain, _preDuckedVolume * 0.25, 0.8, window._soundscapeCtx);
+        } else {
+          window._soundscapeGain.gain.setValueAtTime(_preDuckedVolume * 0.25, window._soundscapeCtx.currentTime);
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-duck-restored") : new Event("df:audio-duck-restored");
+        window.dispatchEvent(evt);
+      }
+    } catch (_) {}
+
+    return { restored: true, volume: _preDuckedVolume };
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      var prevSimulate = window.dfSimulateAudioFocusChange;
+      window.dfSimulateAudioFocusChange = function(state) {
+        if (state === "loss_transient_can_duck") {
+          return dfApplyAudioDucking();
+        } else if (state === "gain" && _isAudioDucked) {
+          return dfRestoreAudioDucking();
+        }
+        if (typeof prevSimulate === "function") {
+          return prevSimulate(state);
+        }
+        return false;
+      };
+
+      window.dfIsAudioDucked = dfIsAudioDucked;
+      window.dfApplyAudioDucking = dfApplyAudioDucking;
+      window.dfRestoreAudioDucking = dfRestoreAudioDucking;
+    }
+  } catch (_) {}
+})();
