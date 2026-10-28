@@ -12504,3 +12504,136 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderArchiveSettingsToggleHtml = dfRenderArchiveSettingsToggleHtml;
   }
 })();
+
+/* === M299_PERSONAL_RECORDS_MILESTONE_TRACKER_AND_CODE119_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetPersonalRecords() {
+    var defaultRecords = {
+      allTimeMastered: 0,
+      longestStreak: 0,
+      mostReviewedSingleDay: 0,
+      longestFocusSessionMins: 0
+    };
+
+    try {
+      var raw = localStorage.getItem("df_personal_records_v1");
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          defaultRecords.allTimeMastered = Number(parsed.allTimeMastered) || 0;
+          defaultRecords.longestStreak = Number(parsed.longestStreak) || 0;
+          defaultRecords.mostReviewedSingleDay = Number(parsed.mostReviewedSingleDay) || 0;
+          defaultRecords.longestFocusSessionMins = Number(parsed.longestFocusSessionMins) || 0;
+        }
+      }
+    } catch (_) {}
+
+    return {
+      allTimeMastered: defaultRecords.allTimeMastered,
+      allTimeMasteredFormatted: dfFormatWesternDigits(defaultRecords.allTimeMastered),
+      longestStreak: defaultRecords.longestStreak,
+      longestStreakFormatted: dfFormatWesternDigits(defaultRecords.longestStreak),
+      mostReviewedSingleDay: defaultRecords.mostReviewedSingleDay,
+      mostReviewedSingleDayFormatted: dfFormatWesternDigits(defaultRecords.mostReviewedSingleDay),
+      longestFocusSessionMins: defaultRecords.longestFocusSessionMins,
+      longestFocusSessionMinsFormatted: dfFormatWesternDigits(defaultRecords.longestFocusSessionMins)
+    };
+  }
+
+  function dfUpdatePersonalRecords(stats) {
+    var input = stats || {};
+    var current = dfGetPersonalRecords();
+    var records = {
+      allTimeMastered: current.allTimeMastered,
+      longestStreak: current.longestStreak,
+      mostReviewedSingleDay: current.mostReviewedSingleDay,
+      longestFocusSessionMins: current.longestFocusSessionMins
+    };
+
+    var broken = [];
+
+    if (input.mastered !== undefined && Number(input.mastered) > records.allTimeMastered) {
+      records.allTimeMastered = Number(input.mastered);
+      broken.push("إجمالي الكلمات المتقنة (" + dfFormatWesternDigits(records.allTimeMastered) + ")");
+    }
+
+    if (input.streak !== undefined && Number(input.streak) > records.longestStreak) {
+      records.longestStreak = Number(input.streak);
+      broken.push("أطول سلسلة متتالية (" + dfFormatWesternDigits(records.longestStreak) + " أيام)");
+    }
+
+    if (input.reviewedToday !== undefined && Number(input.reviewedToday) > records.mostReviewedSingleDay) {
+      records.mostReviewedSingleDay = Number(input.reviewedToday);
+      broken.push("أعلى مراجعة يومية (" + dfFormatWesternDigits(records.mostReviewedSingleDay) + " كلمة)");
+    }
+
+    if (input.focusMins !== undefined && Number(input.focusMins) > records.longestFocusSessionMins) {
+      records.longestFocusSessionMins = Number(input.focusMins);
+      broken.push("أطول جلسة تركيز (" + dfFormatWesternDigits(records.longestFocusSessionMins) + " دقيقة)");
+    }
+
+    if (broken.length > 0) {
+      try {
+        localStorage.setItem("df_personal_records_v1", JSON.stringify(records));
+      } catch (_) {}
+
+      try {
+        if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(30);
+        }
+      } catch (_) {}
+
+      try {
+        if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+          window.dfShowVocabToastNotification("🏆 رقم قياسي جديد: " + broken[0] + "!", "success", 2500);
+        }
+      } catch (_) {}
+
+      try {
+        if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+          window.dfTriggerVocabStatsSync({ immediate: true });
+        }
+      } catch (_) {}
+
+      return { isNewRecord: true, brokenRecords: broken, records: records };
+    }
+
+    return { isNewRecord: false, brokenRecords: [], records: records };
+  }
+
+  function dfRenderPersonalRecordsCardHtml() {
+    var rec = dfGetPersonalRecords();
+    var boxStyle = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;text-align:center;flex:1;";
+    var valStyle = "font-size:15px;font-weight:bold;color:#fef08a;display:block;margin-top:2px;";
+
+    return "<div class=\"df-personal-records-card\" style=\"margin:12px 0;padding:12px;background:#18181b;border:1px solid #d97706;border-radius:12px;direction:rtl;color:#f4f4f5;\">" +
+      "<div style=\"display:flex;align-items:center;gap:6px;margin-bottom:10px;\">" +
+        "<span style=\"font-size:18px;\">🏆</span>" +
+        "<strong style=\"font-size:13px;color:#fbbf24;\">لوحة الأرقام القياسية الشخصية (Personal Records)</strong>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;\">" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;\">🔥 أفضل تتابع</span><span style=\"" + valStyle + "\">" + rec.longestStreakFormatted + " أيام</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;\">📚 إتقان تراكمي</span><span style=\"" + valStyle + "\">" + rec.allTimeMasteredFormatted + "</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;\">⚡ أعلى يوم</span><span style=\"" + valStyle + "\">" + rec.mostReviewedSingleDayFormatted + "</span></div>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetPersonalRecords = dfGetPersonalRecords;
+    window.dfUpdatePersonalRecords = dfUpdatePersonalRecords;
+    window.dfRenderPersonalRecordsCardHtml = dfRenderPersonalRecordsCardHtml;
+  }
+})();
