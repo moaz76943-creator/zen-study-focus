@@ -9114,3 +9114,101 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfOnQuizShareButtonClicked = dfOnQuizShareButtonClickedWithFeedback;
   }
 })();
+
+/* === M270_MAJOR_GOLDEN_MILESTONE_V4_0_0_AND_CODE90_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetVocabSuiteHealthReport() {
+    var hasTts = (typeof window !== "undefined" && "speechSynthesis" in window);
+    var hasAudioCtx = (typeof window !== "undefined" && Boolean(window.AudioContext || window.webkitAudioContext));
+    var hasShare = (typeof navigator !== "undefined" && typeof navigator.share === "function");
+    var hasClipboard = (typeof navigator !== "undefined" && Boolean(navigator.clipboard && navigator.clipboard.writeText));
+
+    var storageHealthy = false;
+    try {
+      var testKey = "__df_v4_health_check__";
+      localStorage.setItem(testKey, "ok");
+      storageHealthy = (localStorage.getItem(testKey) === "ok");
+      localStorage.removeItem(testKey);
+    } catch (_) {
+      storageHealthy = false;
+    }
+
+    var totalWords = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        totalWords = window.dfGetVocabBankList().length;
+      }
+    } catch (_) {}
+
+    var streak = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfCalculateVocabStudyStreak === "function") {
+        streak = window.dfCalculateVocabStudyStreak().currentStreak;
+      }
+    } catch (_) {}
+
+    return {
+      version: "4.0.0",
+      versionCode: 90,
+      versionCodeFormatted: "90",
+      isHealthy: Boolean(storageHealthy),
+      subsystems: {
+        speechSynthesis: hasTts,
+        zenAudioChime: hasAudioCtx,
+        localStorage: storageHealthy,
+        webShare: hasShare,
+        clipboard: hasClipboard
+      },
+      stats: {
+        totalWords: totalWords,
+        totalWordsFormatted: dfFormatWesternDigits(totalWords),
+        streak: streak,
+        streakFormatted: dfFormatWesternDigits(streak)
+      }
+    };
+  }
+
+  function dfRenderSuiteDiagnosticModalHtml() {
+    var report = dfGetVocabSuiteHealthReport();
+    var okBadge = "<span style=\"color:#10b981;font-weight:bold;\">جاهز ✓</span>";
+    var warnBadge = "<span style=\"color:#f59e0b;font-weight:bold;\">احتياطي ⚠️</span>";
+
+    var rowStyle = "display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:12px;";
+
+    return "<div class=\"df-suite-health-modal\" style=\"direction:rtl;padding:16px;background:#18181b;border:1px solid #27272a;border-radius:12px;color:#f4f4f5;\">" +
+      "<div style=\"text-align:center;margin-bottom:12px;\">" +
+        "<span style=\"font-size:20px;display:block;margin-bottom:4px;\">🌟</span>" +
+        "<h3 style=\"margin:0 0 4px 0;font-size:16px;color:#f4f4f5;\">DEEP FOCUS v" + report.version + " (" + report.versionCodeFormatted + ")</h3>" +
+        "<span style=\"font-size:12px;color:#10b981;font-weight:bold;\">المحطة الذهبية الكبرى مكتملة ومؤمنة بنجاح</span>" +
+      "</div>" +
+      "<div style=\"margin-bottom:12px;\">" +
+        "<div style=\"" + rowStyle + "\"><span>🗣️ محرك النطق الصوتي (TTS):</span>" + (report.subsystems.speechSynthesis ? okBadge : warnBadge) + "</div>" +
+        "<div style=\"" + rowStyle + "\"><span>🔔 رنين جرس التأمل (Zen Chime):</span>" + (report.subsystems.zenAudioChime ? okBadge : warnBadge) + "</div>" +
+        "<div style=\"" + rowStyle + "\"><span>💾 سلامة التخزين المحلي (Storage):</span>" + (report.subsystems.localStorage ? okBadge : warnBadge) + "</div>" +
+        "<div style=\"" + rowStyle + "\"><span>📤 مشاركة الإنجاز (Web Share):</span>" + (report.subsystems.webShare ? okBadge : warnBadge) + "</div>" +
+        "<div style=\"" + rowStyle + "\"><span>📋 النسخ إلى الحافظة (Clipboard):</span>" + (report.subsystems.clipboard ? okBadge : warnBadge) + "</div>" +
+      "</div>" +
+      "<div style=\"background:rgba(255,255,255,0.04);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-around;text-align:center;\">" +
+        "<div><span style=\"font-size:11px;color:#a1a1aa;display:block;\">📚 الكلمات</span><span style=\"font-size:14px;font-weight:bold;color:#f4f4f5;\">" + report.stats.totalWordsFormatted + "</span></div>" +
+        "<div><span style=\"font-size:11px;color:#a1a1aa;display:block;\">🔥 السلسلة</span><span style=\"font-size:14px;font-weight:bold;color:#f97316;\">" + report.stats.streakFormatted + " أيام</span></div>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetVocabSuiteHealthReport = dfGetVocabSuiteHealthReport;
+    window.dfRenderSuiteDiagnosticModalHtml = dfRenderSuiteDiagnosticModalHtml;
+  }
+})();
