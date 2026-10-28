@@ -8,7 +8,8 @@ function classify(state,output,status=1){
  try {
   fs.writeFileSync(path.join(dir,'adb'),'#!/bin/sh\nprintf "%s\\n" "$DF08_ADB_STATE"\n',{mode:0o700});
   fs.writeFileSync(path.join(dir,'instrumentation.txt'),output);
-  const result=cp.spawnSync('/bin/bash',['-c','source "$1"; df08_record_failure save 320 "$out/instrumentation.txt" "$2"','bash',helper,String(status)],{
+  const driver=path.join(__dirname,'../../security_recovery/qa_failure_driver.sh');
+  const result=cp.spawnSync('/bin/bash',['--noprofile','--norc',driver,helper,'df08',String(status)],{
    env:{PATH:dir+':/usr/bin:/bin',out:dir,DF08_ADB_STATE:state},encoding:'utf8',timeout:15000
   });
   assert.equal(result.error,undefined);assert.equal(result.status,0);
