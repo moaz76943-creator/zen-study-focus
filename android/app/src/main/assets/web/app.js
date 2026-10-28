@@ -7144,3 +7144,50 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M242_VOCAB_CARD_TTS_AUTO_STOP_ON_TAB_SWITCH_AND_CODE62_V1 === */
+(function() {
+  if (window.__M242_SPEECH_AUTO_STOP__) return;
+  window.__M242_SPEECH_AUTO_STOP__ = true;
+
+  window.dfStopAllVocabSpeech = function() {
+    try {
+      if (typeof window.speechSynthesis !== 'undefined') {
+        window.speechSynthesis.cancel();
+      }
+    } catch(e) {}
+
+    if (typeof document !== 'undefined') {
+      var playingBtns = document.querySelectorAll('[data-audio-playing]');
+      playingBtns.forEach(function(btn) {
+        btn.removeAttribute('data-audio-playing');
+        btn.style.color = '';
+        btn.style.transform = '';
+        btn.style.filter = '';
+      });
+    }
+    return true;
+  };
+
+  function hookTabSwitches() {
+    if (typeof document === 'undefined') return;
+    var navTabs = document.querySelectorAll('.nav-tab, [data-tab], .tab-btn, .bottom-nav-item');
+    navTabs.forEach(function(tab) {
+      if (!tab.__m242Hooked) {
+        tab.__m242Hooked = true;
+        tab.addEventListener('click', function() {
+          window.dfStopAllVocabSpeech();
+        });
+      }
+    });
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', hookTabSwitches);
+    } else {
+      setTimeout(hookTabSwitches, 350);
+    }
+    setInterval(hookTabSwitches, 2500);
+  }
+})();
+
