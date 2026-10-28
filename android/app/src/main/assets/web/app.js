@@ -7765,3 +7765,106 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfGetQuizSessionAccuracyBadge = dfGetQuizSessionAccuracyBadge;
   }
 })();
+
+/* === M255_VOCAB_STUDY_STREAK_AND_CODE75_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetTodayDateString(dateObj) {
+    var d = dateObj || new Date();
+    var year = d.getFullYear();
+    var month = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return dfFormatWesternDigits(year + '-' + month + '-' + day);
+  }
+
+  function dfGetStudyHistory() {
+    try {
+      var raw = localStorage.getItem('df_vocab_study_history_v1');
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function dfRecordVocabStudySession(mockDate) {
+    var today = dfGetTodayDateString(mockDate);
+    var history = dfGetStudyHistory();
+    if (history.indexOf(today) === -1) {
+      history.push(today);
+      history.sort();
+      try {
+        localStorage.setItem('df_vocab_study_history_v1', JSON.stringify(history));
+      } catch (_) {}
+    }
+    return history;
+  }
+
+  function dfCalculateVocabStudyStreak(historyList, referenceDate) {
+    var list = Array.isArray(historyList) ? historyList.slice() : dfGetStudyHistory();
+    if (list.length === 0) {
+      return { currentStreak: 0, formatted: '0', isStudiedToday: false };
+    }
+
+    var uniqueDays = Array.from(new Set(list)).sort().reverse();
+    var ref = referenceDate ? new Date(referenceDate) : new Date();
+    var todayStr = dfGetTodayDateString(ref);
+
+    var yesterday = new Date(ref);
+    yesterday.setDate(yesterday.getDate() - 1);
+    var yesterdayStr = dfGetTodayDateString(yesterday);
+
+    var isStudiedToday = uniqueDays.indexOf(todayStr) !== -1;
+    var isStudiedYesterday = uniqueDays.indexOf(yesterdayStr) !== -1;
+
+    if (!isStudiedToday && !isStudiedYesterday) {
+      return { currentStreak: 0, formatted: '0', isStudiedToday: false };
+    }
+
+    var streak = 0;
+    var checkDate = isStudiedToday ? new Date(ref) : yesterday;
+
+    while (true) {
+      var checkStr = dfGetTodayDateString(checkDate);
+      if (uniqueDays.indexOf(checkStr) !== -1) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    return {
+      currentStreak: streak,
+      formatted: dfFormatWesternDigits(streak),
+      isStudiedToday: isStudiedToday
+    };
+  }
+
+  function dfGetVocabStreakBadge() {
+    var res = dfCalculateVocabStudyStreak();
+    var streakNum = res.formatted;
+    return '<span class="df-vocab-streak-badge" style="display:inline-block;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:bold;color:#fff;background-color:#e65100;">' +
+      '🔥 ' + streakNum + ' ' + (res.currentStreak === 1 ? 'يوم' : 'أيام') +
+      '</span>';
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfGetTodayDateString = dfGetTodayDateString;
+    window.dfRecordVocabStudySession = dfRecordVocabStudySession;
+    window.dfCalculateVocabStudyStreak = dfCalculateVocabStudyStreak;
+    window.dfGetVocabStreakBadge = dfGetVocabStreakBadge;
+  }
+})();
