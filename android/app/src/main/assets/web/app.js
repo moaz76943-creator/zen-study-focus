@@ -12637,3 +12637,80 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderPersonalRecordsCardHtml = dfRenderPersonalRecordsCardHtml;
   }
 })();
+
+/* === M300_MASTERY_VAULT_MILESTONE_V4_3_0_AND_CODE120_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetMasteryVaultMilestoneSummary() {
+    var totalWords = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        totalWords = window.dfGetVocabBankList().length;
+      }
+    } catch (_) {}
+
+    var dueCount = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetDueTodayCount === "function") {
+        dueCount = window.dfGetDueTodayCount().count;
+      }
+    } catch (_) {}
+
+    var allTimeRec = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetPersonalRecords === "function") {
+        allTimeRec = window.dfGetPersonalRecords().allTimeMastered;
+      }
+    } catch (_) {}
+
+    return {
+      version: "4.3.0",
+      versionCode: 120,
+      versionCodeFormatted: dfFormatWesternDigits(120),
+      milestoneTitle: "خزينة الإتقان الشاملة (Mastery Vault)",
+      phaseCompleted: "Phase 3: Spaced Repetition & Mastery (M291-M300)",
+      totalWordsFormatted: dfFormatWesternDigits(totalWords),
+      dueCountFormatted: dfFormatWesternDigits(dueCount),
+      allTimeMasteredFormatted: dfFormatWesternDigits(allTimeRec),
+      isSm2Active: true
+    };
+  }
+
+  function dfRenderMasteryVaultMilestoneModalHtml() {
+    var m = dfGetMasteryVaultMilestoneSummary();
+    var boxStyle = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;text-align:center;flex:1;";
+
+    return "<div class=\"df-mastery-milestone-modal\" style=\"direction:rtl;padding:16px;background:#18181b;border:1px solid #7c3aed;border-radius:14px;color:#f4f4f5;box-shadow:0 12px 35px rgba(124,58,237,0.25);\">" +
+      "<div style=\"text-align:center;margin-bottom:14px;\">" +
+        "<span style=\"font-size:32px;display:block;margin-bottom:4px;\">💎</span>" +
+        "<h3 style=\"margin:0 0 4px 0;font-size:18px;color:#c084fc;\">" + m.milestoneTitle + " v" + m.version + "</h3>" +
+        "<span style=\"font-size:12px;color:#e9d5ff;display:block;margin-bottom:2px;\">رمز البناء المتقدم: <strong>" + m.versionCodeFormatted + "</strong></span>" +
+        "<span style=\"font-size:11px;color:#a1a1aa;\">اكتمال المرحلة الثالثة لخوارزميات التكرار المتباعد SM-2 واحترافية البطاقات بنجاح 100%</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;margin-bottom:12px;\">" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🧠 الخوارزمية</span><span style=\"font-size:14px;font-weight:bold;color:#a855f7;\">SM-2 مفعّل</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🎯 مراجعة اليوم</span><span style=\"font-size:14px;font-weight:bold;color:#38bdf8;\">" + m.dueCountFormatted + "</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🏆 إتقان قياسي</span><span style=\"font-size:14px;font-weight:bold;color:#10b981;\">" + m.allTimeMasteredFormatted + "</span></div>" +
+      "</div>" +
+      "<div style=\"padding:8px 12px;background:rgba(124,58,237,0.1);border-radius:8px;font-size:11px;color:#e9d5ff;text-align:center;\">" +
+        "✨ جاهز للانطلاق نحو المرحلة الرابعة والأخيرة: تكامل النظام، الأداء العالي، وجاهزية المتجر الرسمية (M301-M310)" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetMasteryVaultMilestoneSummary = dfGetMasteryVaultMilestoneSummary;
+    window.dfRenderMasteryVaultMilestoneModalHtml = dfRenderMasteryVaultMilestoneModalHtml;
+  }
+})();
