@@ -9613,3 +9613,96 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfCheckHalfwayChimeTrigger = dfCheckHalfwayChimeTrigger;
   }
 })();
+
+/* === M275_OLED_TRUE_BLACK_THEME_AND_CODE95_V1 === */
+(function() {
+  'use strict';
+
+  function dfIsOledTrueBlackEnabled() {
+    try {
+      return localStorage.getItem("df_oled_true_black_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfApplyOledTrueBlackState() {
+    try {
+      if (typeof document === "undefined") return false;
+      var isOled = dfIsOledTrueBlackEnabled();
+      var root = document.documentElement;
+      var body = document.body;
+
+      var styleEl = document.getElementById("df-oled-style-block");
+      if (isOled) {
+        if (!styleEl) {
+          styleEl = document.createElement("style");
+          styleEl.id = "df-oled-style-block";
+          styleEl.textContent = "html.df-oled-black, body.df-oled-black { background-color: #000000 !important; color: #f4f4f5 !important; } .df-oled-black .bg-zinc-900, .df-oled-black .bg-gray-900 { background-color: #09090b !important; }";
+          document.head.appendChild(styleEl);
+        }
+        if (root) root.classList.add("df-oled-black");
+        if (body) body.classList.add("df-oled-black");
+      } else {
+        if (styleEl && styleEl.parentNode) {
+          styleEl.parentNode.removeChild(styleEl);
+        }
+        if (root) root.classList.remove("df-oled-black");
+        if (body) body.classList.remove("df-oled-black");
+      }
+      return isOled;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfToggleOledTrueBlack(enable) {
+    var current = dfIsOledTrueBlackEnabled();
+    var nextState = (enable !== undefined) ? Boolean(enable) : !current;
+
+    try {
+      localStorage.setItem("df_oled_true_black_v1", String(nextState));
+    } catch (_) {}
+
+    dfApplyOledTrueBlackState();
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    return nextState;
+  }
+
+  function dfRenderOledThemeSettingsToggleHtml() {
+    var isOled = dfIsOledTrueBlackEnabled();
+    var statusText = isOled ? "مفعّل" : "معطّل";
+    var btnBg = isOled ? "#10b981" : "rgba(255,255,255,0.1)";
+
+    return "<div class=\"df-settings-oled-section\" style=\"margin:12px 0;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🌙 مظهر السواد التام (OLED Black)</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">توفير البطارية وراحة فائقة للعين في المذاكرة الليلية</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleOledTrueBlack && window.dfToggleOledTrueBlack()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  try {
+    if (typeof window !== "undefined") {
+      dfApplyOledTrueBlackState();
+    }
+  } catch (_) {}
+
+  if (typeof window !== "undefined") {
+    window.dfIsOledTrueBlackEnabled = dfIsOledTrueBlackEnabled;
+    window.dfApplyOledTrueBlackState = dfApplyOledTrueBlackState;
+    window.dfToggleOledTrueBlack = dfToggleOledTrueBlack;
+    window.dfRenderOledThemeSettingsToggleHtml = dfRenderOledThemeSettingsToggleHtml;
+  }
+})();
