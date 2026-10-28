@@ -12,9 +12,12 @@ test('Track05 CI references real test files instead of silently omitting missing
   for (const file of files) {
     assert.ok(fs.existsSync(path.join(root, file)), 'Missing required timer CI suite: ' + file);
   }
-  assert.match(workflow, /-gpu software\b/, 'Use supported software GPU for current headless Android emulator');
+  assert.match(workflow, /-gpu software\b/, 'API30 must retain supported software GPU');
+  assert.match(workflow, /-gpu swangle\b/, 'API35 must use independently passing ANGLE software GPU');
   assert.doesNotMatch(workflow, /swiftshader_indirect|-dpi-device/, 'Do not use deprecated emulator flags');
-  assert.ok(workflow.includes("runs-on: ${{ matrix.api == 35 && 'ubuntu-22.04' || 'ubuntu-24.04' }}"),
-    'API35 must run on a separate stable host image while retaining API30');
+  assert.match(workflow, /runs-on: ubuntu-24\.04/, 'Use proven same-host Android 30 and 35 image');
+  assert.match(workflow, /matrix\.api == 35 && '3072M'/, 'API35 must have independently tested RAM');
+  assert.match(workflow, /matrix\.api == 35 && '512M'/, 'API35 must have sufficient heap');
+  assert.match(workflow, /emulator-boot-timeout: 900/, 'Do not confuse delayed boot with app error');
 
 });
