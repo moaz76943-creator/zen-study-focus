@@ -10905,3 +10905,142 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderBinauralGammaSettingsWidgetHtml = dfRenderBinauralGammaSettingsWidgetHtml;
   }
 })();
+
+/* === M286_FLIP_TO_MUTE_SENSOR_DETECTOR_AND_CODE106_V1 === */
+(function() {
+  'use strict';
+
+  var _isFaceDown = false;
+  var _faceDownStartTime = 0;
+
+  function dfIsFlipToMuteEnabled() {
+    try {
+      var val = localStorage.getItem("df_flip_to_mute_enabled_v1");
+      if (val !== null) return val === "true";
+    } catch (_) {}
+    return true;
+  }
+
+  function dfToggleFlipToMute(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsFlipToMuteEnabled();
+    try {
+      localStorage.setItem("df_flip_to_mute_enabled_v1", String(state));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    return state;
+  }
+
+  function dfDetectFaceDownOrientation(beta, gamma) {
+    var b = Number(beta) || 0;
+    var g = Number(gamma) || 0;
+    var isFaceDownAngle = (Math.abs(b) >= 150) && (Math.abs(g) <= 35);
+    return isFaceDownAngle;
+  }
+
+  function dfTriggerFlipToMute() {
+    var mutedSomething = false;
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetActiveSoundscape === "function") {
+        if (window.dfGetActiveSoundscape() !== "none") {
+          window.dfStopAmbientSoundscape();
+          mutedSomething = true;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfIsBinauralGammaActive === "function") {
+        if (window.dfIsBinauralGammaActive()) {
+          window.dfStopBinauralGamma();
+          mutedSomething = true;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfStopAllVocabSpeech === "function") {
+        window.dfStopAllVocabSpeech();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(30);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("تم كتم الصوت بقلب الهاتف 🤫", "info", 2000);
+      }
+    } catch (_) {}
+
+    return { success: true, mutedSomething: mutedSomething };
+  }
+
+  function dfProcessOrientationChange(beta, gamma) {
+    if (!dfIsFlipToMuteEnabled()) return false;
+
+    var faceDown = dfDetectFaceDownOrientation(beta, gamma);
+    var now = Date.now();
+
+    if (faceDown) {
+      if (!_isFaceDown) {
+        _isFaceDown = true;
+        _faceDownStartTime = now;
+      } else if (now - _faceDownStartTime >= 400) {
+        _faceDownStartTime = now + 999999;
+        return dfTriggerFlipToMute();
+      }
+    } else {
+      _isFaceDown = false;
+      _faceDownStartTime = 0;
+    }
+
+    return false;
+  }
+
+  function dfRenderFlipToMuteSettingsToggleHtml() {
+    var isEnabled = dfIsFlipToMuteEnabled();
+    var statusText = isEnabled ? "مفعّل" : "معطّل";
+    var btnBg = isEnabled ? "#10b981" : "rgba(255,255,255,0.1)";
+
+    return "<div class=\"df-settings-flipmute-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🤫 كتم الصوت بقلب الهاتف (Flip-to-Mute)</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">كتم فوري للمؤثرات والنطق بمجرد وضع الهاتف على شاشته</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleFlipToMute && window.dfToggleFlipToMute()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  try {
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+      window.addEventListener("deviceorientation", function(e) {
+        if (e && e.beta !== null && e.gamma !== null) {
+          dfProcessOrientationChange(e.beta, e.gamma);
+        }
+      });
+    }
+  } catch (_) {}
+
+  if (typeof window !== "undefined") {
+    window.dfIsFlipToMuteEnabled = dfIsFlipToMuteEnabled;
+    window.dfToggleFlipToMute = dfToggleFlipToMute;
+    window.dfDetectFaceDownOrientation = dfDetectFaceDownOrientation;
+    window.dfTriggerFlipToMute = dfTriggerFlipToMute;
+    window.dfProcessOrientationChange = dfProcessOrientationChange;
+    window.dfRenderFlipToMuteSettingsToggleHtml = dfRenderFlipToMuteSettingsToggleHtml;
+  }
+})();
