@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # One shell is required: android-emulator-runner invokes each inline command separately.
 set -euo pipefail
+# Default to full QA unless a merge-gate workflow explicitly requests focused.
+qa_level="${DF_TRACK05_QA_LEVEL:-full}"
+case "$qa_level" in full|focused) ;; *) echo 'Invalid DF_TRACK05_QA_LEVEL' >&2; exit 2 ;; esac
+export DF_TRACK05_QA_LEVEL="$qa_level"
 report="$RUNNER_TEMP/track05-android"
 mkdir -p "$report"
 if ! serial="$(timeout --kill-after=5s 15s adb devices | awk '$1 ~ /^emulator-/ && $2 == "device" {print $1; exit}')"; then

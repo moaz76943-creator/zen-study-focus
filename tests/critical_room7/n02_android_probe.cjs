@@ -257,6 +257,7 @@ async function main() {
       // force-stopped session. The safety contract is NO delivery while stopped
       // and NO duplicate credit or second native delivery after reopening.
       const firstKeys=notifications(2002),firstReceipt=prefs();
+      alarmReceipts.push({label:'completed-first-reopen-native',observedAt:Date.now(),native:firstReceipt,notificationKeys:firstKeys});
       assert.ok(firstKeys.length<=1,'Multiple native completion notifications on reopen');
       if(firstKeys.length) {
         assert.equal(firstReceipt.active,false,'Reopen notified a still-active timer');
@@ -267,7 +268,9 @@ async function main() {
       await launch();assert.equal(await evaluate('cfg.sessions||0'),1,'Reopen credited session twice');
       assert.deepEqual(await creditReceipts(before.id), firstCredit, 'Second reopen changed persisted session credit');
       const firstDelivery={keys:firstKeys,native:firstReceipt};
-      completedReopenReceipt(firstDelivery,stoppedKeys,{keys:notifications(2002),native:prefs()});
+      const secondNative=systemAlarmState(null,0,'completed-second-reopen-before-deduplication-check').native;
+      alarmReceipts.push({label:'completed-second-reopen-native',observedAt:Date.now(),native:secondNative,notificationKeys:notifications(2002),stoppedNotificationKeys:stoppedKeys});
+      completedReopenReceipt(firstDelivery,stoppedKeys,{keys:notifications(2002),native:secondNative});
       await sleep(8000);
       const secondDelivery=completedReopenReceipt(firstDelivery,stoppedKeys,{keys:notifications(2002),native:prefs()});
       systemAlarmState(null,0,'completed-second-reopen');

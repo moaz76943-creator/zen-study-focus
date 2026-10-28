@@ -5,6 +5,37 @@ const fs=require('node:fs'),cp=require('node:child_process'),assert=require('nod
 const {parseWebViewBounds,cssPointToAndroid}=require('../android_e2e_recovery/android_device_touch.cjs');
 const {readWebViewFrame}=require('../android_e2e_recovery/android_ui_hierarchy.cjs');
 const {completionReceipt}=require('./completion_receipts.cjs');
+const FOCUSED_COMPLETION_CASES=Object.freeze([
+ 'custom-one-minute-natural-completion-persisted-once',
+ 'quick-20-10-natural-work-rest-completes-without-rest-credit'
+]);
+// Selection changes scheduling only. Each selected callback still runs against
+// the real Android device; deferred release-QA cases are never counted as PASS.
+function createQaSelection(level='full'){
+ if(level!=='full'&&level!=='focused')throw Error('TEST_INFRA: invalid DF_TRACK05_QA_LEVEL');
+ const seen=new Set(),executed=new Set(),deferred=[];
+ return {
+  level,deferred,
+  async run(name,fn){
+   if(seen.has(name))throw Error('TEST_INFRA: duplicate timer QA case '+name);
+   seen.add(name);
+   if(level==='focused'&&name!=='preflight'&&!FOCUSED_COMPLETION_CASES.includes(name)){
+    deferred.push({name,reason:'LEVEL_2_FULL_QA: retained for intentional full acceptance'});
+    return {executed:false};
+   }
+   executed.add(name);
+   return {executed:true,value:await fn()};
+  },
+  verify(){
+   if(executed.size===0)throw Error('TEST_INFRA: timer QA executed no cases');
+   if(level==='focused')for(const name of ['preflight',...FOCUSED_COMPLETION_CASES]){
+    if(!executed.has(name))throw Error('TEST_INFRA: required focused timer QA case missing: '+name);
+   }
+  }
+ };
+}
+module.exports={createQaSelection};
+let qa;
 const serial=process.env.DF_TRACK05_SERIAL||'emulator-5554',file=process.argv[2];
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const adb=(...args)=>{
@@ -105,10 +136,11 @@ async function approve(){
  adb('shell','input','tap',String(Math.round((a+c)/2)),String(Math.round((b+d)/2)));await pause(500);
 }
 async function test(name,fn){
- try{record(name,'PASS','Observed Android outcome',await fn())}
+ try{const result=await qa.run(name,fn);if(result.executed)record(name,'PASS','Observed Android outcome',result.value)}
  catch(e){const msg=String(e.message||e).slice(0,320);record(name,/^(TRANSPORT:|TEST_INFRA:|TEST_PROTOCOL:|DEPENDENCY_NOT_TESTED:)/.test(msg)?'NOT_TESTED':'FAIL',msg)}
 }
 async function main(){
+ qa=createQaSelection(process.env.DF_TRACK05_QA_LEVEL||'full');
  assert.equal(process.env.DF_TRACK05_DISPOSABLE,'1','TEST_INFRA: explicit fresh profile required');
  assert.match(serial,/^emulator-\d+$/);assert.equal(adb('shell','getprop','ro.kernel.qemu'),'1');
  await connect();await ready();
@@ -331,8 +363,9 @@ async function main(){
   return {requestedWorkSeconds:240,requestedRestSeconds:60,sets:1,workId:work.id,restId:rest.id,minutes:4,naturalWaitMs:Date.now()-began,reopened:true};
  });
 }
-main().catch(e=>record('bootstrap','NOT_TESTED',String(e.message||e).slice(0,250))).finally(()=>{
- const out={headSha:process.env.DF_TEST_SOURCE_SHA||process.env.GITHUB_SHA||null,source:'actual disposable Android emulator + CDP + ADB',cases,summary:{pass:cases.filter(x=>x.status==='PASS').length,fail:cases.filter(x=>x.status==='FAIL').length,notTested:cases.filter(x=>x.status==='NOT_TESTED').length},releaseApproved:false};
+if(require.main===module)main().catch(e=>record('bootstrap','NOT_TESTED',String(e.message||e).slice(0,250))).finally(()=>{
+ if(qa)try{qa.verify()}catch(error){record('qa-selection','FAIL',String(error.message).slice(0,320))}
+ const out={headSha:process.env.DF_TEST_SOURCE_SHA||process.env.GITHUB_SHA||null,source:'actual disposable Android emulator + CDP + ADB',qaLevel:qa?.level||process.env.DF_TRACK05_QA_LEVEL||'full',deferredTests:qa?.deferred||[],cases,summary:{pass:cases.filter(x=>x.status==='PASS').length,fail:cases.filter(x=>x.status==='FAIL').length,notTested:cases.filter(x=>x.status==='NOT_TESTED').length},releaseApproved:false};
  if(file)fs.writeFileSync(file,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out.summary));
  try{ws?.close()}catch(_){}
  if(out.summary.fail)process.exitCode=1;else if(out.summary.notTested)process.exitCode=2;
