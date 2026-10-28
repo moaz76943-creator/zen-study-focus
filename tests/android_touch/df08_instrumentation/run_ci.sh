@@ -7,6 +7,11 @@ font_scale="${DF08_FONT_SCALE:-1.0}"
 mkdir -p "$out"
 git rev-parse HEAD > "$out/EXACT_SOURCE_SHA.txt"
 printf 'Android emulator WebView touch and IME only. NOT a physical handset, TalkBack or release approval.\nRELEASE_APPROVED=NO\n' > "$out/PLATFORM_LIMITS.txt"
+qemu="$(timeout --kill-after=2s 10s adb shell getprop ro.kernel.qemu 2>/dev/null | tr -d '\r')" || qemu=unavailable
+if [[ "$qemu" != 1 ]]; then
+ printf 'TEST_RESULT=BLOCKED\nFAILURE_CATEGORY=TEST_HARNESS_FAIL\nDISPOSABLE_EMULATOR_REQUIRED\n' | tee "$out/failure-disposable-guard.txt" >&2
+ exit 2
+fi
 api="$(timeout 20s adb shell getprop ro.build.version.sdk | tr -d '\r')"
 printf '%s\n' "$api" > "$out/ANDROID_API.txt"
 printf '%s\n' "$font_scale" > "$out/FONT_SCALE.txt"

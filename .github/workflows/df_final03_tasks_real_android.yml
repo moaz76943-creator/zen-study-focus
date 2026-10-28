@@ -31,6 +31,7 @@ jobs:
           set -euo pipefail
           bash -n tests/tasks_core/df_final03_instrumentation/prepare_test_build.sh
           bash -n tests/tasks_core/df_final03_instrumentation/run_ci.sh
+          bash -n tests/tasks_core/df_final03_instrumentation/failure_evidence.sh
           node --test tests/tasks_core/*.test.cjs tests/android_touch/df08_instrumentation/scenario_matrix.test.cjs
           grep -q 'getUiAutomation().injectInputEvent' tests/tasks_core/df_final03_instrumentation/TaskInstrumentation.java
           grep -q 'setWebContentsDebuggingEnabled(false)' android/app/src/main/java/com/zenstudy/focus/MainActivity.java
@@ -89,7 +90,9 @@ jobs:
           cores: 2
           emulator-boot-timeout: 600
           disable-animations: true
-          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan
+          # Match the successful N01 boot framebuffer. run_ci then sets density
+          # 160 and each requested width; instrumentation verifies actual CSS px.
+          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240
           script: bash tests/tasks_core/df_final03_instrumentation/run_ci.sh
       - name: Final source and platform limits
         if: always()

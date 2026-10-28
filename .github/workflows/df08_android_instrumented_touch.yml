@@ -86,7 +86,9 @@ jobs:
           cores: 2
           emulator-boot-timeout: 900
           disable-animations: true
-          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan
+          # Initial boot framebuffer only: run_ci overrides density/size and
+          # instrumentation still verifies all requested CSS widths and fonts.
+          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240
           script: bash tests/android_touch/df08_instrumentation/run_ci.sh
       - name: Record exact head, no production changes and limits
         if: always()

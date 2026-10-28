@@ -2,12 +2,12 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),cp=require('node:child_process');
-function run(missingId=false,tasks=false){
+function run(missingId=false,tasks=false,physical=false,taskFailure=false){
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'df08-matrix-'));
  try {
   const scripts=tasks?'tests/tasks_core/df_final03_instrumentation':'tests/android_touch/df08_instrumentation';
   fs.mkdirSync(path.join(dir,scripts),{recursive:true});
-  for(const file of (tasks?['run_ci.sh']:['run_ci.sh','failure_evidence.sh'])) fs.copyFileSync(tasks?path.join(__dirname,'../../tasks_core/df_final03_instrumentation',file):path.join(__dirname,file),path.join(dir,scripts,file));
+  for(const file of ['run_ci.sh','failure_evidence.sh']) fs.copyFileSync(tasks?path.join(__dirname,'../../tasks_core/df_final03_instrumentation',file):path.join(__dirname,file),path.join(dir,scripts,file));
   fs.mkdirSync(path.join(dir,'tests/white_premium_qa'),{recursive:true});
   fs.copyFileSync(path.join(__dirname,'../../white_premium_qa/track14_install_apk.sh'),path.join(dir,'tests/white_premium_qa/track14_install_apk.sh'));
   for(const file of ['android/app/build/outputs/apk/debug/app-debug.apk','android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk']){
@@ -16,7 +16,9 @@ function run(missingId=false,tasks=false){
   fs.mkdirSync(path.join(dir,'bin'));fs.mkdirSync(path.join(dir,'evidence'));
   fs.writeFileSync(path.join(dir,'bin/git'),'#!/bin/sh\necho synthetic-test-sha\n',{mode:0o700});
   fs.writeFileSync(path.join(dir,'bin/adb'),`#!/usr/bin/env bash
+printf '%s\\n' "$*" >> "$DF08_COMMANDS"
 if [[ "$1 $2 $3" == 'shell am instrument' ]]; then
+ [[ "$DF03_COMMAND_FAILURE" != 1 ]] || exit 124
  stage= width= locale= font= expected=
  while (($#)); do
   if [[ "$1" == -e ]]; then
@@ -38,14 +40,19 @@ if [[ "$1 $2 $3" == 'shell am instrument' ]]; then
   echo 'INSTRUMENTATION_RESULT: df08_reopen=PASS'
  fi
 elif [[ "$*" == 'shell getprop ro.build.version.sdk' ]]; then echo 35
+elif [[ "$*" == 'shell getprop ro.kernel.qemu' ]]; then [[ "$DF08_PHYSICAL" == 1 ]] && echo 0 || echo 1
 elif [[ "$*" == 'shell pm path com.zenstudy.focus' ]]; then echo 'package:/synthetic-test-only.apk'
-elif [[ "$*" == get-state ]]; then echo device
+elif [[ "$*" == get-state ]]; then [[ "$DF03_COMMAND_FAILURE" == 1 ]] && echo offline || echo device
 fi
 exit 0
 `,{mode:0o700});
-  const result=cp.spawnSync('bash',[scripts+'/run_ci.sh'],{cwd:dir,env:{...process.env,PATH:path.join(dir,'bin')+path.delimiter+process.env.PATH,DF08_EVIDENCE:path.join(dir,'evidence'),DF08_FONT_SCALE:'2.0',DF03_EVIDENCE:path.join(dir,'evidence'),DF03_FONT_SCALE:'2.0',DF08_LEDGER:path.join(dir,'ledger'),DF08_MISSING_NOTE_ID:missingId?'1':'0'},encoding:'utf8',timeout:30000});
+  const result=cp.spawnSync('bash',[scripts+'/run_ci.sh'],{cwd:dir,env:{...process.env,PATH:path.join(dir,'bin')+path.delimiter+process.env.PATH,DF08_EVIDENCE:path.join(dir,'evidence'),DF08_FONT_SCALE:'2.0',DF03_EVIDENCE:path.join(dir,'evidence'),DF03_FONT_SCALE:'2.0',DF08_LEDGER:path.join(dir,'ledger'),DF08_COMMANDS:path.join(dir,'commands'),DF08_PHYSICAL:physical?'1':'0',DF03_COMMAND_FAILURE:taskFailure?'1':'0',DF08_MISSING_NOTE_ID:missingId?'1':'0'},encoding:'utf8',timeout:30000});
   assert.equal(result.error,undefined);
-  return {status:result.status,stdout:result.stdout,ledger:fs.readFileSync(path.join(dir,'ledger'),'utf8').trim().split('\n'),summary:fs.existsSync(path.join(dir,'evidence/summary.txt'))};
+  return {status:result.status,stdout:result.stdout,stderr:result.stderr,
+   ledger:fs.existsSync(path.join(dir,'ledger'))?fs.readFileSync(path.join(dir,'ledger'),'utf8').trim().split('\n'):[],
+   commands:fs.readFileSync(path.join(dir,'commands'),'utf8').trim().split('\n'),
+   evidenceFiles:fs.readdirSync(path.join(dir,'evidence')),
+   summary:fs.existsSync(path.join(dir,'evidence/summary.txt'))};
  } finally {fs.rmSync(dir,{recursive:true,force:true});}
 }
 test('runner requests actual save/reopen for both locales at all widths and passes captured ID to new process',()=>{
@@ -67,4 +74,21 @@ test('Tasks runner requests genuine Edit/Save and process reopen for EN/AR at al
   const expected=`verify ${width} ${locale} 2.0`;
   assert.ok(result.ledger.some(line=>line.trim()===expected));
  }
+});
+for(const tasks of [false,true])test((tasks?'Tasks':'Notes')+' rejects a physical handset before install, clear or settings mutations',()=>{
+ const result=run(false,tasks,true);
+ assert.equal(result.status,2);assert.equal(result.summary,false);assert.equal(result.ledger.length,0);
+ assert.match(result.stdout+result.stderr,/DISPOSABLE_EMULATOR_REQUIRED/);
+ assert.deepEqual(result.commands,['shell getprop ro.kernel.qemu']);
+});
+test('Tasks starts host and streamed guest evidence before install, and preserves failed transport without PASS',()=>{
+ const result=run(false,true,false,true);
+ assert.equal(result.status,1);assert.equal(result.summary,false);
+ assert.match(result.stdout,/FAILURE_CATEGORY=EMULATOR_TRANSPORT_FAIL/);
+ const stream=result.commands.findIndex(command=>command.startsWith('logcat -v threadtime'));
+ const install=result.commands.findIndex(command=>command.startsWith('install '));
+ assert.ok(stream>=0&&stream<install,'Streaming must start before APK install/test can kill the guest');
+ assert.ok(result.evidenceFiles.includes('live-logcat.txt'));
+ assert.ok(result.evidenceFiles.includes('host-before.txt'));
+ assert.ok(result.evidenceFiles.includes('host-failure-edit-320-en-font-2.0.txt'));
 });
