@@ -11714,16 +11714,22 @@ window.FlashQuizEngine = FlashQuizEngine;
     }
   }
 
+  // Render user-imported vocabulary examples as inert HTML text/attributes.
+  function dfEscapeExampleHtml(value) {
+    return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   function dfRenderCardExampleTrayHtml(card) {
     if (!card || !card.example || typeof card.example !== "string") return "";
     var cleanExample = card.example.trim();
     if (!cleanExample) return "";
 
-    var escapedForClick = cleanExample.replace(/"/g, "&quot;").replace(/'/g, "\\'");
+    var escapedExample = dfEscapeExampleHtml(cleanExample);
 
     return "<div class=\"df-card-example-tray\" style=\"margin-top:6px;padding:6px 10px;background:rgba(255,255,255,0.04);border-right:3px solid #3b82f6;border-radius:6px;font-size:12px;color:#d4d4d8;direction:ltr;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;\">" +
-      "<span style=\"font-style:italic;flex:1;\">\"" + cleanExample + "\"</span>" +
-      "<button type=\"button\" onclick=\"window.dfSpeakExampleSentence && window.dfSpeakExampleSentence('" + escapedForClick + "')\" style=\"background:none;border:none;color:#60a5fa;cursor:pointer;font-size:14px;padding:2px;display:flex;align-items:center;\" title=\"استمع لنطق الجملة\">" +
+      "<span style=\"font-style:italic;flex:1;\">\"" + escapedExample + "\"</span>" +
+      "<button type=\"button\" data-df-example-speech=\"1\" data-df-sentence=\"" + escapedExample + "\" style=\"background:none;border:none;color:#60a5fa;cursor:pointer;font-size:14px;padding:2px;display:flex;align-items:center;\" title=\"استمع لنطق الجملة\">" +
         "<span>🔊</span>" +
       "</button>" +
     "</div>";
@@ -11767,6 +11773,18 @@ window.FlashQuizEngine = FlashQuizEngine;
     } catch (_) {}
 
     return true;
+  }
+
+  // Event delegation survives re-rendering and never evaluates user text.
+  if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('click', function(event) {
+      var element = event && event.target;
+      var button = element && typeof element.closest === 'function'
+        ? element.closest('button[data-df-example-speech="1"]') : null;
+      if (!button || !button.closest('.df-card-example-tray')) return;
+      var sentence = button.getAttribute('data-df-sentence');
+      if (sentence) dfSpeakExampleSentence(sentence);
+    });
   }
 
   if (typeof window !== "undefined") {
@@ -11870,5 +11888,838 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfHighlightSearchMatch = dfHighlightSearchMatch;
     window.dfSearchVocabCards = dfSearchVocabCards;
     window.dfRenderSearchMatchCountBadge = dfRenderSearchMatchCountBadge;
+  }
+})();
+
+/* === M295_CUSTOM_DECKS_AND_TAGS_MANAGER_AND_CODE115_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetActiveDeckFilter() {
+    try {
+      var val = localStorage.getItem("df_active_deck_v1");
+      if (val && typeof val === "string") return val;
+    } catch (_) {}
+    return "all";
+  }
+
+  function dfSetActiveDeckFilter(deckName) {
+    var target = (deckName && typeof deckName === "string") ? deckName.trim() : "all";
+    try {
+      localStorage.setItem("df_active_deck_v1", target);
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return target;
+  }
+
+  function dfGetAllDecks() {
+    var list = [];
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        list = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        if (raw) list = JSON.parse(raw);
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(list)) list = [];
+
+    var deckCounts = Object.create(null);
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i];
+      if (!c) continue;
+      var d = (c.deck && typeof c.deck === "string" && c.deck.trim()) ? c.deck.trim() : "عام";
+      deckCounts[d] = (deckCounts[d] || 0) + 1;
+    }
+
+    var result = [{
+      name: "all",
+      label: "الكل",
+      count: list.length,
+      countFormatted: dfFormatWesternDigits(list.length)
+    }];
+
+    for (var name in deckCounts) {
+      result.push({
+        name: name,
+        label: name,
+        count: deckCounts[name],
+        countFormatted: dfFormatWesternDigits(deckCounts[name])
+      });
+    }
+
+    return result;
+  }
+
+  function dfFilterCardsByDeck(cardsList, deckName) {
+    if (!Array.isArray(cardsList)) return [];
+    var target = (deckName && typeof deckName === "string") ? deckName.trim() : dfGetActiveDeckFilter();
+    if (target === "all") return cardsList.slice();
+
+    return cardsList.filter(function(card) {
+      if (!card) return false;
+      var d = (card.deck && typeof card.deck === "string" && card.deck.trim()) ? card.deck.trim() : "عام";
+      return d.toLowerCase() === target.toLowerCase();
+    });
+  }
+
+  function dfAssignCardDeck(cardId, deckName) {
+    if (!cardId && cardId !== 0) return false;
+    var list = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_bank_v1");
+      if (raw) list = JSON.parse(raw);
+    } catch (_) {}
+
+    if (!Array.isArray(list)) return false;
+    var found = false;
+
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        list[i].deck = (deckName && typeof deckName === "string") ? deckName.trim() : "عام";
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) return false;
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
+    } catch (_) {
+      return false;
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfRenderDeckFilterChipsHtml() {
+    var decks = dfGetAllDecks();
+    var active = dfGetActiveDeckFilter();
+    var chipsHtml = "";
+
+    for (var i = 0; i < decks.length; i++) {
+      var d = decks[i];
+      var isSel = (d.name.toLowerCase() === active.toLowerCase());
+      var bg = isSel ? "#2563eb" : "rgba(255,255,255,0.06)";
+      var border = isSel ? "#3b82f6" : "rgba(255,255,255,0.12)";
+      var color = isSel ? "#ffffff" : "#d4d4d8";
+
+      chipsHtml += "<button type=\"button\" onclick=\"window.dfSetActiveDeckFilter && window.dfSetActiveDeckFilter('" + d.name + "')\" style=\"background:" + bg + ";border:1px solid " + border + ";color:" + color + ";border-radius:14px;padding:3px 10px;font-size:11px;cursor:pointer;white-space:nowrap;font-weight:" + (isSel ? "bold" : "normal") + ";\">" +
+        "<span>" + d.label + " (" + d.countFormatted + ")</span>" +
+      "</button>";
+    }
+
+    return "<div class=\"df-deck-filter-bar\" style=\"margin:8px 0;display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;direction:rtl;\">" +
+      chipsHtml +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetActiveDeckFilter = dfGetActiveDeckFilter;
+    window.dfSetActiveDeckFilter = dfSetActiveDeckFilter;
+    window.dfGetAllDecks = dfGetAllDecks;
+    window.dfFilterCardsByDeck = dfFilterCardsByDeck;
+    window.dfAssignCardDeck = dfAssignCardDeck;
+    window.dfRenderDeckFilterChipsHtml = dfRenderDeckFilterChipsHtml;
+  }
+})();
+
+/* === M296_SPELLING_AND_TYPING_PRACTICE_MODE_AND_CODE116_V1 === */
+(function() {
+  'use strict';
+
+  function dfIsSpellingModeEnabled() {
+    try {
+      return localStorage.getItem("df_spelling_mode_enabled_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfToggleSpellingMode(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsSpellingModeEnabled();
+    try {
+      localStorage.setItem("df_spelling_mode_enabled_v1", String(state));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    return state;
+  }
+
+  function dfCalculateLevenshteinDistance(a, b) {
+    var s1 = String(a || "").toLowerCase().trim();
+    var s2 = String(b || "").toLowerCase().trim();
+    if (s1 === s2) return 0;
+    if (s1.length === 0) return s2.length;
+    if (s2.length === 0) return s1.length;
+
+    var matrix = [];
+    for (var i = 0; i <= s2.length; i++) {
+      matrix[i] = [i];
+    }
+    for (var j = 0; j <= s1.length; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (var i = 1; i <= s2.length; i++) {
+      for (var j = 1; j <= s1.length; j++) {
+        if (s2.charAt(i - 1) === s1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+
+    return matrix[s2.length][s1.length];
+  }
+
+  function dfCheckSpellingInput(userInput, correctWord) {
+    var input = String(userInput || "").trim();
+    var target = String(correctWord || "").trim();
+    if (!input) {
+      return { correct: false, distance: target.length, message: "يرجى كتابة الكلمة أولاً." };
+    }
+
+    var dist = dfCalculateLevenshteinDistance(input, target);
+
+    if (dist === 0) {
+      try {
+        if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(25);
+        }
+      } catch (_) {}
+
+      return {
+        correct: true,
+        distance: 0,
+        score: 5,
+        message: "إجابة نموذجية صحيحة 100%! 🎉"
+      };
+    } else if (dist === 1) {
+      return {
+        correct: false,
+        nearMiss: true,
+        distance: 1,
+        score: 3,
+        message: "قريب جداً! خطأ في حرف واحد فقط."
+      };
+    } else {
+      return {
+        correct: false,
+        nearMiss: false,
+        distance: dist,
+        score: 1,
+        message: "إملاء غير صحيح، حاول مرة أخرى أو انقر كشف الكلمة."
+      };
+    }
+  }
+
+  function dfRenderSpellingQuizCardHtml(card) {
+    if (!card) return "";
+    var meaning = card.meaning || "بدون ترجمة";
+    var safeWord = String(card.word || "").replace(/"/g, "&quot;").replace(/'/g, "\\'");
+
+    return "<div class=\"df-spelling-quiz-card\" style=\"padding:16px;background:#18181b;border:1px solid #27272a;border-radius:12px;direction:rtl;color:#f4f4f5;text-align:center;\">" +
+      "<div style=\"margin-bottom:12px;\">" +
+        "<span style=\"font-size:11px;color:#a1a1aa;display:block;margin-bottom:4px;\">المعنى المطلوب كتابته:</span>" +
+        "<h3 style=\"margin:0;font-size:18px;color:#60a5fa;\">" + meaning + "</h3>" +
+      "</div>" +
+      "<div style=\"margin-bottom:12px;\">" +
+        "<input type=\"text\" id=\"df-spelling-input\" placeholder=\"اكتب الكلمة باللغة الأجنبية...\" style=\"width:100%;box-sizing:border-box;padding:10px 12px;background:#27272a;border:1px solid #3f3f46;border-radius:8px;color:#f4f4f5;font-size:14px;direction:ltr;text-align:center;\" />" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;\">" +
+        "<button type=\"button\" onclick=\"var input=document.getElementById('df-spelling-input'); if(input && window.dfCheckSpellingInput){ var res = window.dfCheckSpellingInput(input.value, '" + safeWord + "'); alert(res.message); }\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
+          "<span>تحقق من الإملاء</span>" +
+        "</button>" +
+        "<button type=\"button\" onclick=\"alert('الكلمة الصحيحة هي: " + safeWord + "');\" style=\"background:rgba(255,255,255,0.08);color:#a1a1aa;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;\">" +
+          "<span>كشف الكلمة</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsSpellingModeEnabled = dfIsSpellingModeEnabled;
+    window.dfToggleSpellingMode = dfToggleSpellingMode;
+    window.dfCalculateLevenshteinDistance = dfCalculateLevenshteinDistance;
+    window.dfCheckSpellingInput = dfCheckSpellingInput;
+    window.dfRenderSpellingQuizCardHtml = dfRenderSpellingQuizCardHtml;
+  }
+})();
+
+/* === M297_ANKI_TSV_DECK_IMPORTER_AND_CODE117_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfStripAnkiHtml(htmlStr) {
+    if (!htmlStr) return "";
+    return String(htmlStr)
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, "\"")
+      .trim();
+  }
+
+  function dfParseAnkiTsvContent(rawContent, defaultDeckName) {
+    if (!rawContent || typeof rawContent !== "string") {
+      return { importedCards: [], totalLines: 0 };
+    }
+
+    var lines = rawContent.split(/\r?\n/);
+    var deck = (defaultDeckName && typeof defaultDeckName === "string") ? defaultDeckName.trim() : "Anki";
+    var cards = [];
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line || line.startsWith("#")) continue;
+
+      var delimiter = "\t";
+      if (line.indexOf("\t") === -1 && line.indexOf(";") !== -1) {
+        delimiter = ";";
+      }
+
+      var cols = line.split(delimiter);
+      if (cols.length < 2) continue;
+
+      var word = dfStripAnkiHtml(cols[0]);
+      var meaning = dfStripAnkiHtml(cols[1]);
+      var example = cols[2] ? dfStripAnkiHtml(cols[2]) : "";
+
+      if (!word || !meaning) continue;
+
+      cards.push({
+        id: "anki_" + Date.now() + "_" + i,
+        word: word,
+        meaning: meaning,
+        example: example,
+        deck: deck,
+        createdAt: Date.now(),
+        isMastered: false,
+        needsReview: false
+      });
+    }
+
+    return {
+      importedCards: cards,
+      totalLines: lines.length
+    };
+  }
+
+  function dfImportAnkiTsvToVocabBank(rawContent, defaultDeckName) {
+    var parseRes = dfParseAnkiTsvContent(rawContent, defaultDeckName);
+    var newCards = parseRes.importedCards;
+    if (newCards.length === 0) {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("لم يتم العثور على بطاقات صالحة في الملف", "warning");
+      }
+      return { success: false, importedCount: 0 };
+    }
+
+    var existing = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_bank_v1");
+      if (raw) existing = JSON.parse(raw);
+    } catch (_) {}
+    if (!Array.isArray(existing)) existing = [];
+
+    var existingWords = Object.create(null);
+    for (var i = 0; i < existing.length; i++) {
+      if (existing[i] && existing[i].word) {
+        existingWords[String(existing[i].word).toLowerCase().trim()] = true;
+      }
+    }
+
+    var added = 0;
+    var skipped = 0;
+
+    for (var j = 0; j < newCards.length; j++) {
+      var card = newCards[j];
+      var key = card.word.toLowerCase().trim();
+      if (!existingWords[key]) {
+        existingWords[key] = true;
+        existing.push(card);
+        added++;
+      } else {
+        skipped++;
+      }
+    }
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(existing));
+    } catch (_) {
+      return { success: false, reason: "storage_failed" };
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        var msg = "تم استيراد " + dfFormatWesternDigits(added) + " كلمة من Anki بنجاح!";
+        if (skipped > 0) msg += " (تخطي " + dfFormatWesternDigits(skipped) + " مكررة)";
+        window.dfShowVocabToastNotification(msg, "success");
+      }
+    } catch (_) {}
+
+    return {
+      success: true,
+      importedCount: added,
+      skippedCount: skipped,
+      totalCount: existing.length
+    };
+  }
+
+  function dfRenderAnkiImporterSettingsHtml() {
+    return "<div class=\"df-settings-anki-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"margin-bottom:8px;\">" +
+        "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">📥 استيراد حزم Anki (TSV / TXT)</span>" +
+        "<span style=\"font-size:11px;color:#a1a1aa;\">استيراد مباشر لبطاقات Anki المجدولة بدون برامج وسيطة</span>" +
+      "</div>" +
+      "<button type=\"button\" onclick=\"var inp = document.getElementById('df-anki-file-picker'); if(inp) inp.click();\" style=\"background:#10b981;color:#ffffff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+        "<span>اختر ملف Anki (TSV/TXT)</span>" +
+      "</button>" +
+      "<input type=\"file\" id=\"df-anki-file-picker\" accept=\".txt,.tsv,.csv\" style=\"display:none;\" onchange=\"var f = this.files[0]; if(f){ var r = new FileReader(); r.onload = function(e){ window.dfImportAnkiTsvToVocabBank && window.dfImportAnkiTsvToVocabBank(e.target.result, 'Anki'); }; r.readAsText(f); }\" />" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfStripAnkiHtml = dfStripAnkiHtml;
+    window.dfParseAnkiTsvContent = dfParseAnkiTsvContent;
+    window.dfImportAnkiTsvToVocabBank = dfImportAnkiTsvToVocabBank;
+    window.dfRenderAnkiImporterSettingsHtml = dfRenderAnkiImporterSettingsHtml;
+  }
+})();
+
+/* === M298_AUTO_ARCHIVE_MASTERED_CARDS_TOGGLE_AND_CODE118_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfIsAutoArchiveEnabled() {
+    try {
+      return localStorage.getItem("df_auto_archive_mastered_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfToggleAutoArchive(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsAutoArchiveEnabled();
+    try {
+      localStorage.setItem("df_auto_archive_mastered_v1", String(state));
+    } catch (_) {}
+
+    if (state) {
+      dfArchiveMasteredCardsNow();
+    }
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return state;
+  }
+
+  function dfArchiveMasteredCardsNow() {
+    var list = [];
+    try {
+      if (typeof window.dfGetVocabBankList === "function") {
+        list = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        if (raw) list = JSON.parse(raw);
+      }
+    } catch (_) {}
+
+    if (!Array.isArray(list)) return 0;
+    var count = 0;
+
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i];
+      if (!c) continue;
+      var isMastered = Boolean(c.isMastered || c.mastered || (c.sm2Repetitions && c.sm2Repetitions >= 4));
+      if (isMastered && !c.isArchived) {
+        c.isArchived = true;
+        c.archivedAt = Date.now();
+        count++;
+      }
+    }
+
+    if (count > 0) {
+      try {
+        localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
+      } catch (_) {}
+    }
+
+    return count;
+  }
+
+  function dfUnarchiveCard(cardId) {
+    if (!cardId && cardId !== 0) return false;
+    var list = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_bank_v1");
+      if (raw) list = JSON.parse(raw);
+    } catch (_) {}
+
+    if (!Array.isArray(list)) return false;
+    var found = false;
+
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        list[i].isArchived = false;
+        list[i].archivedAt = null;
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) return false;
+
+    try {
+      localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
+    } catch (_) {
+      return false;
+    }
+
+    try {
+      if (typeof window.dfTriggerVocabStatsSync === "function") {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfGetArchivedCardsCount() {
+    var list = [];
+    try {
+      var raw = localStorage.getItem("df_vocab_bank_v1");
+      if (raw) list = JSON.parse(raw);
+    } catch (_) {}
+    if (!Array.isArray(list)) return 0;
+
+    var archCount = 0;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && list[i].isArchived) archCount++;
+    }
+    return archCount;
+  }
+
+  function dfRenderArchiveSettingsToggleHtml() {
+    var isEnabled = dfIsAutoArchiveEnabled();
+    var statusText = isEnabled ? "مفعّل" : "معطّل";
+    var btnBg = isEnabled ? "#10b981" : "rgba(255,255,255,0.1)";
+    var archCount = dfGetArchivedCardsCount();
+    var archStr = dfFormatWesternDigits(archCount);
+
+    return "<div class=\"df-settings-archive-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🗄️ أرشفة الكلمات المتقنة تلقائياً</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">نقل الكلمات المتقنة للأرشيف لتخفيف زحام قائمة المراجعة (" + archStr + " بالأرشيف)</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleAutoArchive && window.dfToggleAutoArchive()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsAutoArchiveEnabled = dfIsAutoArchiveEnabled;
+    window.dfToggleAutoArchive = dfToggleAutoArchive;
+    window.dfArchiveMasteredCardsNow = dfArchiveMasteredCardsNow;
+    window.dfUnarchiveCard = dfUnarchiveCard;
+    window.dfGetArchivedCardsCount = dfGetArchivedCardsCount;
+    window.dfRenderArchiveSettingsToggleHtml = dfRenderArchiveSettingsToggleHtml;
+  }
+})();
+
+/* === M299_PERSONAL_RECORDS_MILESTONE_TRACKER_AND_CODE119_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetPersonalRecords() {
+    var defaultRecords = {
+      allTimeMastered: 0,
+      longestStreak: 0,
+      mostReviewedSingleDay: 0,
+      longestFocusSessionMins: 0
+    };
+
+    try {
+      var raw = localStorage.getItem("df_personal_records_v1");
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          defaultRecords.allTimeMastered = Number(parsed.allTimeMastered) || 0;
+          defaultRecords.longestStreak = Number(parsed.longestStreak) || 0;
+          defaultRecords.mostReviewedSingleDay = Number(parsed.mostReviewedSingleDay) || 0;
+          defaultRecords.longestFocusSessionMins = Number(parsed.longestFocusSessionMins) || 0;
+        }
+      }
+    } catch (_) {}
+
+    return {
+      allTimeMastered: defaultRecords.allTimeMastered,
+      allTimeMasteredFormatted: dfFormatWesternDigits(defaultRecords.allTimeMastered),
+      longestStreak: defaultRecords.longestStreak,
+      longestStreakFormatted: dfFormatWesternDigits(defaultRecords.longestStreak),
+      mostReviewedSingleDay: defaultRecords.mostReviewedSingleDay,
+      mostReviewedSingleDayFormatted: dfFormatWesternDigits(defaultRecords.mostReviewedSingleDay),
+      longestFocusSessionMins: defaultRecords.longestFocusSessionMins,
+      longestFocusSessionMinsFormatted: dfFormatWesternDigits(defaultRecords.longestFocusSessionMins)
+    };
+  }
+
+  function dfUpdatePersonalRecords(stats) {
+    var input = stats || {};
+    var current = dfGetPersonalRecords();
+    var records = {
+      allTimeMastered: current.allTimeMastered,
+      longestStreak: current.longestStreak,
+      mostReviewedSingleDay: current.mostReviewedSingleDay,
+      longestFocusSessionMins: current.longestFocusSessionMins
+    };
+
+    var broken = [];
+
+    if (input.mastered !== undefined && Number(input.mastered) > records.allTimeMastered) {
+      records.allTimeMastered = Number(input.mastered);
+      broken.push("إجمالي الكلمات المتقنة (" + dfFormatWesternDigits(records.allTimeMastered) + ")");
+    }
+
+    if (input.streak !== undefined && Number(input.streak) > records.longestStreak) {
+      records.longestStreak = Number(input.streak);
+      broken.push("أطول سلسلة متتالية (" + dfFormatWesternDigits(records.longestStreak) + " أيام)");
+    }
+
+    if (input.reviewedToday !== undefined && Number(input.reviewedToday) > records.mostReviewedSingleDay) {
+      records.mostReviewedSingleDay = Number(input.reviewedToday);
+      broken.push("أعلى مراجعة يومية (" + dfFormatWesternDigits(records.mostReviewedSingleDay) + " كلمة)");
+    }
+
+    if (input.focusMins !== undefined && Number(input.focusMins) > records.longestFocusSessionMins) {
+      records.longestFocusSessionMins = Number(input.focusMins);
+      broken.push("أطول جلسة تركيز (" + dfFormatWesternDigits(records.longestFocusSessionMins) + " دقيقة)");
+    }
+
+    if (broken.length > 0) {
+      try {
+        localStorage.setItem("df_personal_records_v1", JSON.stringify(records));
+      } catch (_) {}
+
+      try {
+        if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(30);
+        }
+      } catch (_) {}
+
+      try {
+        if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+          window.dfShowVocabToastNotification("🏆 رقم قياسي جديد: " + broken[0] + "!", "success", 2500);
+        }
+      } catch (_) {}
+
+      try {
+        if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
+          window.dfTriggerVocabStatsSync({ immediate: true });
+        }
+      } catch (_) {}
+
+      return { isNewRecord: true, brokenRecords: broken, records: records };
+    }
+
+    return { isNewRecord: false, brokenRecords: [], records: records };
+  }
+
+  function dfRenderPersonalRecordsCardHtml() {
+    var rec = dfGetPersonalRecords();
+    var boxStyle = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;text-align:center;flex:1;";
+    var valStyle = "font-size:15px;font-weight:bold;color:#fef08a;display:block;margin-top:2px;";
+
+    return "<div class=\"df-personal-records-card\" style=\"margin:12px 0;padding:12px;background:#18181b;border:1px solid #d97706;border-radius:12px;direction:rtl;color:#f4f4f5;\">" +
+      "<div style=\"display:flex;align-items:center;gap:6px;margin-bottom:10px;\">" +
+        "<span style=\"font-size:18px;\">🏆</span>" +
+        "<strong style=\"font-size:13px;color:#fbbf24;\">لوحة الأرقام القياسية الشخصية (Personal Records)</strong>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;\">" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;\">🔥 أفضل تتابع</span><span style=\"" + valStyle + "\">" + rec.longestStreakFormatted + " أيام</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;\">📚 إتقان تراكمي</span><span style=\"" + valStyle + "\">" + rec.allTimeMasteredFormatted + "</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;\">⚡ أعلى يوم</span><span style=\"" + valStyle + "\">" + rec.mostReviewedSingleDayFormatted + "</span></div>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetPersonalRecords = dfGetPersonalRecords;
+    window.dfUpdatePersonalRecords = dfUpdatePersonalRecords;
+    window.dfRenderPersonalRecordsCardHtml = dfRenderPersonalRecordsCardHtml;
+  }
+})();
+
+/* === M300_MASTERY_VAULT_MILESTONE_V4_3_0_AND_CODE120_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetMasteryVaultMilestoneSummary() {
+    var totalWords = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        totalWords = window.dfGetVocabBankList().length;
+      }
+    } catch (_) {}
+
+    var dueCount = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetDueTodayCount === "function") {
+        dueCount = window.dfGetDueTodayCount().count;
+      }
+    } catch (_) {}
+
+    var allTimeRec = 0;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetPersonalRecords === "function") {
+        allTimeRec = window.dfGetPersonalRecords().allTimeMastered;
+      }
+    } catch (_) {}
+
+    return {
+      version: "4.3.0",
+      versionCode: 120,
+      versionCodeFormatted: dfFormatWesternDigits(120),
+      milestoneTitle: "خزينة الإتقان الشاملة (Mastery Vault)",
+      phaseCompleted: "Phase 3: Spaced Repetition & Mastery (M291-M300)",
+      totalWordsFormatted: dfFormatWesternDigits(totalWords),
+      dueCountFormatted: dfFormatWesternDigits(dueCount),
+      allTimeMasteredFormatted: dfFormatWesternDigits(allTimeRec),
+      isSm2Active: true
+    };
+  }
+
+  function dfRenderMasteryVaultMilestoneModalHtml() {
+    var m = dfGetMasteryVaultMilestoneSummary();
+    var boxStyle = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;text-align:center;flex:1;";
+
+    return "<div class=\"df-mastery-milestone-modal\" style=\"direction:rtl;padding:16px;background:#18181b;border:1px solid #7c3aed;border-radius:14px;color:#f4f4f5;box-shadow:0 12px 35px rgba(124,58,237,0.25);\">" +
+      "<div style=\"text-align:center;margin-bottom:14px;\">" +
+        "<span style=\"font-size:32px;display:block;margin-bottom:4px;\">💎</span>" +
+        "<h3 style=\"margin:0 0 4px 0;font-size:18px;color:#c084fc;\">" + m.milestoneTitle + " v" + m.version + "</h3>" +
+        "<span style=\"font-size:12px;color:#e9d5ff;display:block;margin-bottom:2px;\">رمز البناء المتقدم: <strong>" + m.versionCodeFormatted + "</strong></span>" +
+        "<span style=\"font-size:11px;color:#a1a1aa;\">اكتمال المرحلة الثالثة لخوارزميات التكرار المتباعد SM-2 واحترافية البطاقات بنجاح 100%</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;margin-bottom:12px;\">" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🧠 الخوارزمية</span><span style=\"font-size:14px;font-weight:bold;color:#a855f7;\">SM-2 مفعّل</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🎯 مراجعة اليوم</span><span style=\"font-size:14px;font-weight:bold;color:#38bdf8;\">" + m.dueCountFormatted + "</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🏆 إتقان قياسي</span><span style=\"font-size:14px;font-weight:bold;color:#10b981;\">" + m.allTimeMasteredFormatted + "</span></div>" +
+      "</div>" +
+      "<div style=\"padding:8px 12px;background:rgba(124,58,237,0.1);border-radius:8px;font-size:11px;color:#e9d5ff;text-align:center;\">" +
+        "✨ جاهز للانطلاق نحو المرحلة الرابعة والأخيرة: تكامل النظام، الأداء العالي، وجاهزية المتجر الرسمية (M301-M310)" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetMasteryVaultMilestoneSummary = dfGetMasteryVaultMilestoneSummary;
+    window.dfRenderMasteryVaultMilestoneModalHtml = dfRenderMasteryVaultMilestoneModalHtml;
   }
 })();
