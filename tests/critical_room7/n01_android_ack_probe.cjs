@@ -2,7 +2,7 @@
 // Real disposable Android emulator only. No fake bridge/AtomicFile; no user data.
 // Proves native receipt readback, process-death durability, rejection and startup
 // fail-closed on a deliberately placed pending marker (not a power-cut test).
-const fs=require('node:fs'),cp=require('node:child_process'),crypto=require('node:crypto'),assert=require('node:assert/strict');
+const fs=require('node:fs'),cp=require('node:child_process'),crypto=require('node:crypto'),assert=require('node:assert/strict'),net=require('node:net');
 const PKG='com.zenstudy.focus',sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const file=process.argv[2];assert.ok(file,'N01 evidence file required');
 const serial=process.env.DF_N01_SERIAL||'emulator-5554';
@@ -38,7 +38,7 @@ const cases=[];let ws,next=0;const pending=new Map();
 function record(name,status,reason,evidence={}){cases.push({name,status,reason,evidence});fs.writeFileSync(file,JSON.stringify({
  headSha:process.env.DF_N01_SOURCE_SHA||null,api,source:'installed debug Android WebView/ZenNative + private AtomicFile readback',
  cases,summary:{pass:cases.filter(x=>x.status==='PASS').length,fail:cases.filter(x=>x.status==='FAIL').length,notTested:cases.filter(x=>x.status==='NOT_TESTED').length},
- limits:['Injected pending marker models interrupted publication; physical power-cut fsync and SAF DocumentsUI remain NOT_TESTED'],
+ limits:['Injected pending marker models interrupted publication; physical power-cut fsync and SAF successful document write/import remain NOT_TESTED; DocumentsUI cancellation is exercised'],
  releaseApproved:false},null,2)+'\n');console.log(JSON.stringify(cases.at(-1)));}
 function status(err){return /^TRANSPORT:/.test(String(err.message||err))?'NOT_TESTED':'FAIL';}
 let api=null;
@@ -77,6 +77,39 @@ function call(method,params){
  return new Promise((resolve,reject)=>{const id=++next,timer=setTimeout(()=>{pending.delete(id);reject(Error('TRANSPORT: CDP '+method+' timeout'));},15000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params}));});
 }
 async function evaluate(script){return (await call('Runtime.evaluate',{expression:script,returnByValue:true})).result?.value;}
+async function nativeConfirmation(){
+ assert.equal(process.env.DF_DIALOG_NATIVE_PORT,'38384','TEST_INFRA: persistent native accessibility probe required');
+ const xml=await new Promise((resolve,reject)=>{
+  const socket=net.createConnection({host:'127.0.0.1',port:38384});let data='',settled=false;
+  const timer=setTimeout(()=>{socket.destroy();reject(Error('TRANSPORT: native hierarchy timeout'));},10000);
+  socket.on('error',e=>{clearTimeout(timer);reject(e);});socket.on('connect',()=>socket.write('DUMP\n'));
+  socket.on('end',()=>{if(!settled){clearTimeout(timer);reject(Error('TRANSPORT: native hierarchy disconnected'));}});
+  socket.on('data',chunk=>{data+=chunk.toString('utf8');
+   if(data.length>8*1024*1024)return socket.destroy(Error('TRANSPORT: oversized native hierarchy'));
+   if(!data.includes('\n'))return;
+   try{const message=JSON.parse(data.slice(0,data.indexOf('\n')));settled=true;clearTimeout(timer);socket.end();resolve(message.xml);}catch(e){clearTimeout(timer);socket.destroy();reject(e);}
+  });
+ });
+ assert.equal(typeof xml,'string');
+ assert.match(xml,/package="com\.zenstudy\.focus"/);assert.ok(xml.includes('Deep Focus'),'Real branded restore confirmation missing');
+ const node=[...xml.matchAll(/<node\b[^>]*>/g)].map(x=>x[0]).find(x=>x.includes('resource-id="android:id/button1"'));
+ assert.ok(node,'Actual native affirmative button missing');
+ const box=/bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/.exec(node);assert.ok(box);
+ const x=(Number(box[1])+Number(box[3]))/2,y=(Number(box[2])+Number(box[4]))/2;
+ assert.ok(Number(box[3])>Number(box[1])&&Number(box[4])>Number(box[2]));
+ adb('shell','input','tap',String(Math.round(x)),String(Math.round(y)));
+}
+async function cancelDocumentsPicker(expression){
+ assert.equal(await evaluate(expression+';true'),true);
+ let opened=false;
+ for(let i=0;i<20;i++){
+  const resumed=adb('shell','dumpsys','activity','activities').split('\n').filter(x=>/mResumedActivity|topResumedActivity/.test(x));
+  if(resumed.some(x=>/com\.(?:google\.)?android\.documentsui\//.test(x))){opened=true;break;}
+  await sleep(350);
+ }
+ assert.equal(opened,true,'Actual SAF DocumentsUI did not open');
+ adb('shell','input','keyevent','KEYCODE_BACK');await sleep(800);
+}
 async function start(){
  adb('shell','am','start','-W','-n',PKG+'/.MainActivity');await sleep(1600);
  await connect();
@@ -216,6 +249,26 @@ let snapshot;
   }finally{adb('shell','run-as',PKG,'cp',backup,'files/v21_durable_packets_v1');adb('shell','run-as',PKG,'rm',backup);}
   await restart();
   assertFixture(await evaluate('window.ZenNative.readDurableV21()'));
+  const backupCode=await evaluate('generateEncryptedBackupCode()');assert.ok(backupCode.startsWith('ZEN21::'));
+  const beforeInvalid=await evaluate('window.ZenNative.readDurableV21()');
+  assert.equal(await evaluate("verifyAndRestoreBackupCode('ZEN21::not-a-backup')"),false);
+  assert.equal(await evaluate('window.ZenNative.readDurableV21()'),beforeInvalid);
+  record('invalid-backup-preserves-native-records','PASS','Real restore parser rejects invalid backup without changing durable receipt');
+  assert.equal(await evaluate(`(()=>{const a=DF22Integration.getSnapshot(),b=JSON.parse(JSON.stringify(a));b.notesList[0].body='Temporary backup test edit';return DF22Integration.write(a,b);})()`),true);
+  const restored=evaluate('verifyAndRestoreBackupCode('+JSON.stringify(backupCode)+')');
+  restored.catch(()=>{}); // Await below after the real native confirmation is tapped.
+  await sleep(700);await nativeConfirmation();
+  assert.equal(await restored,true,'Actual native-confirmed backup restore failed');
+  assertFixture(await evaluate('window.ZenNative.readDurableV21()'));
+  await restart();assertFixture(await evaluate('window.ZenNative.readDurableV21()'));
+  record('native-confirmed-backup-restore-reopens','PASS','Physical native confirmation restores original IDs, unknown fields, signed payloads and single session credit after force-stop');
+  const beforePicker=await evaluate('window.ZenNative.readDurableV21()');
+  await cancelDocumentsPicker('window.ZenNative.importBackupFromFile()');
+  assert.equal(await evaluate('window.ZenNative.readDurableV21()'),beforePicker);
+  await cancelDocumentsPicker('window.ZenNative.exportBackupToFile('+JSON.stringify(backupCode)+')');
+  assert.equal(await evaluate('window.ZenNative.readDurableV21()'),beforePicker);
+  await restart();assertFixture(await evaluate('window.ZenNative.readDurableV21()'));
+  record('saf-import-export-cancel-preserves-data','PASS','Actual DocumentsUI import and export canceled through Android Back; durable records and session credit preserved after force-stop');
  }finally{try{adb('shell','run-as',PKG,'rm','-f',marker);}catch(_){}await disconnect();}
 })().catch(e=>{record('native-ack-probe',status(e),String(e.message||e).slice(0,350));process.exitCode=status(e)==='FAIL'?1:2;}).finally(()=>{
  if(cases.some(c=>c.status!=='PASS'))process.exitCode=cases.some(c=>c.status==='FAIL')?1:2;
