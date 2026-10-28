@@ -269,7 +269,7 @@ public final class TaskInstrumentation extends Instrumentation {
     private void tap(String id)throws Exception{
         String source="(()=>{const el=document.getElementById("+JSONObject.quote(id)+");" +
             "if(!el)return {present:false};" +
-            "el.scrollIntoView({block:'start',inline:'nearest'});" +
+            "el.scrollIntoView({block:'center',inline:'nearest'});" +
             "const host=el.closest('#df22TasksHost,#df03RejectHost');let scrolls=0;" +
             "for(let i=0;i<6;i++){const rect=el.getBoundingClientRect(),v=window.visualViewport;" +
             "const top=v?v.offsetTop:0,height=v?v.height:innerHeight,y=rect.top+rect.height/2;" +
