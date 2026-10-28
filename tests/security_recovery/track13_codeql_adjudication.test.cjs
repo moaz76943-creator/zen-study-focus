@@ -56,3 +56,12 @@ test('additional or duplicated findings remain FAIL and preserve their raw count
  assert.equal(r.status,1);assert.equal(r.out.findings,2);assert.equal(r.out.false_positives,1);assert.equal(r.out.unresolved,1);
  r=run([finding(),finding()]);assert.equal(r.status,1);assert.equal(r.out.findings,2);assert.equal(r.out.false_positives,0);assert.equal(r.out.unresolved,2);
 }));
+test('an external URI base or non-integer source location cannot impersonate the canonical sink',()=>fixture(({run})=>{
+ const external=finding();external.locations[0].physicalLocation.artifactLocation.uriBaseId='REMOTE_SOURCE';
+ const fractional=finding();fractional.locations[0].physicalLocation.region.startLine=68.5;
+ for(const f of [external,fractional]){
+  const r=run([f]);assert.equal(r.status,1);assert.equal(r.out.false_positives,0);
+ }
+ const canonical=finding();canonical.locations[0].physicalLocation.artifactLocation.uriBaseId='%SRCROOT%';
+ assert.equal(run([canonical]).status,0);
+}));
