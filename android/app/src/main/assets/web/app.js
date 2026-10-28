@@ -6702,3 +6702,71 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M233_VOCAB_EMPTY_STATE_GUIDE_AND_CODE53_V1 === */
+(function() {
+  if (window.__M233_EMPTY_GUIDE__) return;
+  window.__M233_EMPTY_GUIDE__ = true;
+
+  window.dfLoadSampleVocabWords = function() {
+    var eng = window.SpokenVocabEngine;
+    if (!eng || typeof eng.saveItems !== 'function') return false;
+    var samples = [
+      { id: 'v_sample_1', word: 'Buch', meaning: 'كتاب', color: 'purple', hard: false },
+      { id: 'v_sample_2', word: 'Wasser', meaning: 'ماء', color: 'blue', hard: false },
+      { id: 'v_sample_3', word: 'Lernen', meaning: 'تعلّم ودراسة', color: 'green', hard: true }
+    ];
+    eng.saveItems(samples);
+    if (typeof eng.render === 'function') eng.render();
+    if (typeof window.dfUpdateFilterChipBadges === 'function') window.dfUpdateFilterChipBadges();
+    if (typeof window.dfUpdateVocabStatsBadge === 'function') window.dfUpdateVocabStatsBadge();
+    var guide = document.getElementById('df-vocab-empty-guide-card');
+    if (guide) guide.remove();
+    return true;
+  };
+
+  window.dfCheckAndRenderVocabEmptyState = function() {
+    if (typeof document === 'undefined') return false;
+    var eng = window.SpokenVocabEngine;
+    var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
+    var container = document.getElementById('df-vocab-cards-container') ||
+                    document.getElementById('df-spoken-vocab-list') ||
+                    document.getElementById('df-vocab-search-row');
+    if (!container) return false;
+
+    var existing = document.getElementById('df-vocab-empty-guide-card');
+    if (items.length > 0) {
+      if (existing) existing.remove();
+      return false;
+    }
+
+    if (!existing) {
+      var guide = document.createElement('div');
+      guide.id = 'df-vocab-empty-guide-card';
+      guide.style.cssText = 'padding:20px;border-radius:16px;background:rgba(15,23,42,0.6);border:1px dashed rgba(168,85,247,0.3);text-align:center;margin:12px 0;color:#94a3b8;width:100%;box-sizing:border-box;';
+      guide.innerHTML =
+        '<div style="font-size:28px;margin-bottom:6px;">📚</div>' +
+        '<strong style="font-size:14px;color:#e2e8f0;display:block;margin-bottom:6px;">بنك الكلمات فارغ حالياً</strong>' +
+        '<p style="font-size:12px;line-height:1.5;margin:0 0 12px 0;">أضف أول كلمة أجنبية في الحقول أعلاه، أو الصق قائمة كلمات دفعة واحدة.</p>' +
+        '<button type="button" id="df-vocab-load-sample-btn" style="padding:8px 14px;border-radius:10px;border:none;background:#9333ea;color:#ffffff;font-size:12px;font-weight:700;cursor:pointer;">' +
+        '✨ إضافة 3 كلمات تجريبية' +
+        '</button>';
+      container.parentNode.insertBefore(guide, container.nextSibling);
+
+      var btn = document.getElementById('df-vocab-load-sample-btn');
+      if (btn) btn.onclick = function() { window.dfLoadSampleVocabWords(); };
+    }
+    return true;
+  };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', window.dfCheckAndRenderVocabEmptyState);
+    } else {
+      setTimeout(window.dfCheckAndRenderVocabEmptyState, 350);
+    }
+    if (typeof setInterval !== 'undefined') {
+      setInterval(window.dfCheckAndRenderVocabEmptyState, 3000);
+    }
+  }
+})();
+
