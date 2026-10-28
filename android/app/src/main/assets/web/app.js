@@ -6218,3 +6218,75 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M225_VOCAB_KEYBOARD_SHORTCUTS_AND_CODE45_V1 === */
+(function() {
+  if (window.__M225_QUIZ_SHORTCUTS__) return;
+  window.__M225_QUIZ_SHORTCUTS__ = true;
+
+  window.dfHandleQuizKeyboardEvent = function(e) {
+    if (!e) return;
+    var target = e.target || {};
+    var tag = (target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || target.isContentEditable) return;
+
+    var quizModal = document.getElementById('df-flash-quiz-modal') ||
+                    document.querySelector('.df-flash-quiz-overlay');
+    if (!quizModal || quizModal.style.display === 'none') return;
+
+    var key = e.key || '';
+    var code = e.code || '';
+
+    if (key === ' ' || code === 'Space' || key === 'Enter') {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      var card = document.getElementById('df-flash-quiz-card') ||
+                 document.querySelector('.df-flash-card-inner');
+      if (card) {
+        card.click();
+      } else if (window.FlashQuizEngine && typeof window.FlashQuizEngine.flipCard === 'function') {
+        window.FlashQuizEngine.flipCard();
+      }
+    } else if (key === '1' || key === 'ArrowLeft') {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      var hardBtn = document.getElementById('df-quiz-btn-hard') ||
+                    document.querySelector('.df-quiz-btn-hard');
+      if (hardBtn) hardBtn.click();
+    } else if (key === '2' || key === 'ArrowRight') {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      var easyBtn = document.getElementById('df-quiz-btn-easy') ||
+                    document.querySelector('.df-quiz-btn-easy');
+      if (easyBtn) easyBtn.click();
+    } else if (key === 'r' || key === 'R' || key === 'ArrowUp') {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof window.dfReplayCurrentQuizWord === 'function') {
+        window.dfReplayCurrentQuizWord();
+      }
+    }
+  };
+
+  function mountKeyboardShortcutsHint() {
+    if (typeof document === 'undefined') return;
+    var quizHeader = document.getElementById('df-flash-quiz-header') ||
+                     document.getElementById('df-quiz-extra-toolbar');
+    if (!quizHeader || document.getElementById('df-quiz-shortcuts-hint')) return;
+
+    var hint = document.createElement('div');
+    hint.id = 'df-quiz-shortcuts-hint';
+    hint.style.cssText = 'font-size:10px;color:#94a3b8;margin:2px 0;text-align:center;width:100%;';
+    hint.textContent = '⌨ اختصارات: مسافة للقلب | 1 للصعب | 2 للسهل | R لإعادة النطق';
+
+    quizHeader.parentNode.insertBefore(hint, quizHeader.nextSibling);
+  }
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('keydown', window.dfHandleQuizKeyboardEvent);
+  }
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountKeyboardShortcutsHint);
+    } else {
+      setTimeout(mountKeyboardShortcutsHint, 350);
+    }
+    setInterval(mountKeyboardShortcutsHint, 2500);
+  }
+})();
+
