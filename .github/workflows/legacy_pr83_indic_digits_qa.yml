@@ -12,6 +12,9 @@ on:
       - '.github/workflows/legacy_pr83_indic_digits_qa.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   generated-digits:
     runs-on: ubuntu-latest

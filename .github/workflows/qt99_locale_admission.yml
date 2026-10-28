@@ -12,6 +12,9 @@ on:
       - '.github/workflows/qt99_locale_admission.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   structural-locale-regression:
     runs-on: ubuntu-latest

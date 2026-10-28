@@ -1,0 +1,35 @@
+name: Bounded Android acceptance emulator
+description: Shared API30/API35 disposable emulator configuration; test failures remain failures.
+inputs:
+  api:
+    description: Android API level (30 or 35)
+    required: true
+  script:
+    description: Checked-in acceptance command; caller supplies test-specific environment variables
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Validate API and enable KVM
+      shell: bash
+      env:
+        ACCEPTANCE_API: ${{ inputs.api }}
+      run: |
+        set -euo pipefail
+        case "$ACCEPTANCE_API" in 30|35) ;; *) echo 'Unsupported acceptance API' >&2; exit 2 ;; esac
+        test -c /dev/kvm
+        sudo chown "$(id -u):$(id -g)" /dev/kvm
+        sudo chmod u+rw /dev/kvm
+    - name: Run real Android acceptance
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ inputs.api }}
+        target: google_apis
+        arch: x86_64
+        profile: pixel_6
+        ram-size: 2048M
+        heap-size: 256M
+        emulator-boot-timeout: 900
+        disable-animations: false
+        emulator-options: ${{ inputs.api == '35' && '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect' }}
+        script: ${{ inputs.script }}

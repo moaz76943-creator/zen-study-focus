@@ -8,6 +8,9 @@ on:
       - 'tests/df09_legacy_analytics.test.cjs'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   analytics:
     runs-on: ubuntu-latest

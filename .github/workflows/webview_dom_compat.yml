@@ -9,6 +9,9 @@ on:
       - '.github/workflows/webview_dom_compat.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   source-regression:
     runs-on: ubuntu-latest
