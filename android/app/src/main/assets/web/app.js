@@ -6376,3 +6376,74 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M227_VOCAB_QUIZ_AUTO_PRONOUNCE_QUESTION_AND_CODE47_V1 === */
+(function() {
+  if (window.__M227_QUIZ_AUTO_PRONOUNCE__) return;
+  window.__M227_QUIZ_AUTO_PRONOUNCE__ = true;
+
+  var AUTO_PRONOUNCE_KEY = 'df_vocab_quiz_auto_pronounce';
+  var autoPronounce = false;
+  try {
+    autoPronounce = localStorage.getItem(AUTO_PRONOUNCE_KEY) === 'true';
+  } catch(e) {}
+
+  window.dfToggleQuizAutoPronounce = function() {
+    autoPronounce = !autoPronounce;
+    try {
+      localStorage.setItem(AUTO_PRONOUNCE_KEY, autoPronounce ? 'true' : 'false');
+    } catch(e) {}
+    var btn = document.getElementById('df-quiz-auto-pronounce-btn');
+    if (btn) {
+      btn.style.background = autoPronounce ? 'rgba(56,189,248,0.3)' : 'rgba(255,255,255,0.06)';
+      btn.style.borderColor = autoPronounce ? '#38bdf8' : 'rgba(255,255,255,0.15)';
+      btn.style.color = autoPronounce ? '#ffffff' : '#94a3b8';
+      btn.textContent = autoPronounce ? '🔊 نطق تلقائي: مفعّل' : '🔊 نطق تلقائي: معطّل';
+    }
+    return autoPronounce;
+  };
+
+  window.dfIsQuizAutoPronounceEnabled = function() {
+    return autoPronounce;
+  };
+
+  window.dfOnQuizCardDisplayed = function(wordText) {
+    if (!autoPronounce || !wordText) return;
+    setTimeout(function() {
+      if (typeof window.dfReplayCurrentQuizWord === 'function') {
+        window.dfReplayCurrentQuizWord();
+      } else {
+        var eng = window.SpokenVocabEngine;
+        if (eng && typeof eng.speakWord === 'function') {
+          eng.speakWord(wordText);
+        }
+      }
+    }, 200);
+  };
+
+  function mountAutoPronounceBtn() {
+    if (typeof document === 'undefined') return;
+    var toolbar = document.getElementById('df-quiz-extra-toolbar');
+    if (!toolbar || document.getElementById('df-quiz-auto-pronounce-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-quiz-auto-pronounce-btn';
+    btn.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid ' +
+      (autoPronounce ? '#38bdf8' : 'rgba(255,255,255,0.15)') + ';background:' +
+      (autoPronounce ? 'rgba(56,189,248,0.3)' : 'rgba(255,255,255,0.06)') + ';color:' +
+      (autoPronounce ? '#ffffff' : '#94a3b8') + ';font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = autoPronounce ? '🔊 نطق تلقائي: مفعّل' : '🔊 نطق تلقائي: معطّل';
+    btn.onclick = function() { window.dfToggleQuizAutoPronounce(); };
+    toolbar.appendChild(btn);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountAutoPronounceBtn);
+    } else {
+      setTimeout(mountAutoPronounceBtn, 350);
+    }
+    setInterval(mountAutoPronounceBtn, 2500);
+  }
+})();
+
