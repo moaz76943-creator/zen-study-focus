@@ -26,10 +26,11 @@ runs:
         api-level: ${{ inputs.api }}
         target: google_apis
         arch: x86_64
-        profile: pixel_6
-        ram-size: 2048M
-        heap-size: 256M
+        profile: ${{ inputs.api == '35' && 'pixel_2' || 'pixel_6' }}
+        ram-size: ${{ inputs.api == '35' && '3072M' || '2048M' }}
+        heap-size: ${{ inputs.api == '35' && '512M' || '256M' }}
+        cores: 2
         emulator-boot-timeout: 900
         disable-animations: false
-        emulator-options: ${{ inputs.api == '35' && '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect' }}
+        emulator-options: ${{ inputs.api == '35' && '-no-window -no-snapshot -noaudio -no-boot-anim -gpu swangle -feature -Vulkan' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect' }}
         script: ${{ inputs.script }}

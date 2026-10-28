@@ -19,6 +19,13 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      api:
+        description: 'Full font QA on both APIs or a focused platform rerun'
+        type: choice
+        options: [all, '30', '35']
+        default: all
+        required: true
 permissions:
   contents: read
 concurrency:
@@ -97,9 +104,9 @@ jobs:
     needs: source
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 3
       matrix:
-        api: [30,35]
+        api: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.api == '30' && '[30]' || github.event_name == 'workflow_dispatch' && inputs.api == '35' && '[35]' || '[30,35]') }}
         # Full QA remains available for release tags and intentional manual runs.
         font_scale: ${{ fromJSON(github.event_name == 'pull_request' && '["1.0"]' || '["1.0","1.5","2.0"]') }}
     runs-on: ubuntu-24.04

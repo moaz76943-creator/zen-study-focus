@@ -26,8 +26,12 @@ a failure.
 ## Implemented shared configuration
 
 `.github/actions/android-emulator/action.yml` provides one disposable emulator
-configuration for API30/API35: 2048M RAM, 256M heap, 900s boot bound, no snapshots,
-no audio, software GPU, and Vulkan disabled with the reduced API35 skin. Callers
+configuration with a 900s boot bound and no snapshots/audio. API30 retains
+2048M/256M and its existing software renderer. API35 uses the independently
+passing Timer/Native Dialog profile: pixel_2,3072M/512M,two cores,swangle and
+Vulkan disabled; no deprecated GPU/skin/DPI flags. The prior shared API35
+configuration lost its transport in run40646568964. Focused manual dispatch can
+select one API while retaining all three font scales. Callers
 retain their own command, environment, isolation, source/APK receipts and strict
 exit status. Notes and Tasks now each build one app/test-APK pair in their source job, then
 download the same immutable pair for every device case. Each download verifies
@@ -38,7 +42,7 @@ on both APIs. Known failing cases still require explicit reruns before merging.
 
 `auto_release_build.yml` now uses the existing installed Gradle 8.11.1 convention
 and Android36 SDK, because this repository has no committed Gradle wrapper.
-It runs only for `v*` tags or manual dispatch. Manual dispatch defaults to debug;
+It runs only by intentional manual dispatch. Manual dispatch defaults to debug;
 AAB and combined builds require an explicit choice. The AAB is labelled unsigned,
 not production-ready. No signing keys, package identity or release publication
 are changed. A combined build uses one Gradle invocation and no redundant clean.
