@@ -7520,3 +7520,73 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M252_VOCAB_QUIZ_TOTAL_STUDY_TIME_TRACKER_AND_CODE72_V1 === */
+(function() {
+  if (window.__M252_QUIZ_TIMER__) return;
+  window.__M252_QUIZ_TIMER__ = true;
+
+  function toWesternDigits(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
+  }
+
+  var quizStartTime = 0;
+  var quizElapsedSec = 0;
+  var timerInterval = null;
+
+  window.dfFormatQuizDuration = function(totalSec) {
+    var m = Math.floor(totalSec / 60);
+    var s = totalSec % 60;
+    var mm = m < 10 ? '0' + m : String(m);
+    var ss = s < 10 ? '0' + s : String(s);
+    return toWesternDigits(mm + ':' + ss);
+  };
+
+  window.dfStartQuizSessionTimer = function() {
+    quizStartTime = Date.now();
+    quizElapsedSec = 0;
+    if (timerInterval) clearInterval(timerInterval);
+    if (typeof setInterval !== 'undefined') {
+      timerInterval = setInterval(function() {
+        if (typeof document !== 'undefined' && !document.hidden) {
+          quizElapsedSec = Math.floor((Date.now() - quizStartTime) / 1000);
+          var badge = document.getElementById('df-quiz-session-timer-badge');
+          if (badge) {
+            badge.textContent = '⏱ ' + window.dfFormatQuizDuration(quizElapsedSec);
+          }
+        }
+      }, 1000);
+    }
+  };
+
+  window.dfGetQuizSessionDuration = function() {
+    return {
+      seconds: quizElapsedSec,
+      formatted: window.dfFormatQuizDuration(quizElapsedSec)
+    };
+  };
+
+  function mountQuizTimerUI() {
+    if (typeof document === 'undefined') return;
+    var header = document.getElementById('df-flash-quiz-header') ||
+                 document.getElementById('df-quiz-extra-toolbar');
+    if (!header || document.getElementById('df-quiz-session-timer-badge')) return;
+
+    var badge = document.createElement('span');
+    badge.id = 'df-quiz-session-timer-badge';
+    badge.style.cssText = 'font-size:11px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.3);padding:3px 8px;border-radius:8px;margin:2px 4px;display:inline-flex;align-items:center;';
+    badge.textContent = '⏱ 00:00';
+    header.appendChild(badge);
+    window.dfStartQuizSessionTimer();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountQuizTimerUI);
+    } else {
+      setTimeout(mountQuizTimerUI, 350);
+    }
+  }
+})();
+
