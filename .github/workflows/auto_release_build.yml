@@ -1,8 +1,6 @@
 name: Deep Focus Intentional Release or Debug Build
 
 on:
-  push:
-    tags: ['v*']
   workflow_dispatch:
     inputs:
       artifact:
@@ -23,7 +21,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
-      ARTIFACT_KIND: ${{ github.event_name == 'push' && 'unsigned-aab' || inputs.artifact }}
+      ARTIFACT_KIND: ${{ inputs.artifact }}
     steps:
       - name: Checkout requested source
         uses: actions/checkout@v4
