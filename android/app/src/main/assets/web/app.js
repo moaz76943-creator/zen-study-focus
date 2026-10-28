@@ -6162,3 +6162,59 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M224_VOCAB_HAPTIC_FEEDBACK_ON_ACTIONS_AND_CODE44_V1 === */
+(function() {
+  if (window.__M224_VOCAB_HAPTICS__) return;
+  window.__M224_VOCAB_HAPTICS__ = true;
+
+  window.dfVocabHapticPulse = function(type) {
+    if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return false;
+    try {
+      if (type === 'easy') {
+        navigator.vibrate(20);
+      } else if (type === 'hard') {
+        navigator.vibrate([35, 40, 35]);
+      } else if (type === 'flip') {
+        navigator.vibrate(15);
+      } else {
+        navigator.vibrate(15);
+      }
+      return true;
+    } catch(e) {
+      return false;
+    }
+  };
+
+  function hookQuizHaptics() {
+    if (typeof document === 'undefined') return;
+    var easyBtn = document.getElementById('df-quiz-btn-easy') ||
+                  document.querySelector('.df-quiz-btn-easy');
+    var hardBtn = document.getElementById('df-quiz-btn-hard') ||
+                  document.querySelector('.df-quiz-btn-hard');
+    var cardElem = document.getElementById('df-flash-quiz-card') ||
+                   document.querySelector('.df-flash-card-inner');
+
+    if (easyBtn && !easyBtn.__m224HapticHooked) {
+      easyBtn.__m224HapticHooked = true;
+      easyBtn.addEventListener('click', function() { window.dfVocabHapticPulse('easy'); });
+    }
+    if (hardBtn && !hardBtn.__m224HapticHooked) {
+      hardBtn.__m224HapticHooked = true;
+      hardBtn.addEventListener('click', function() { window.dfVocabHapticPulse('hard'); });
+    }
+    if (cardElem && !cardElem.__m224HapticHooked) {
+      cardElem.__m224HapticHooked = true;
+      cardElem.addEventListener('click', function() { window.dfVocabHapticPulse('flip'); });
+    }
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', hookQuizHaptics);
+    } else {
+      setTimeout(hookQuizHaptics, 350);
+    }
+    setInterval(hookQuizHaptics, 2500);
+  }
+})();
+
