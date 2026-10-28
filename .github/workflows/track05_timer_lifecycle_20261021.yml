@@ -147,13 +147,13 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_2
-          ram-size: ${{ matrix.api == 30 && '2048M' || '3072M' }}
+          ram-size: '2048M'
+          heap-size: '256M'
+          cores: 2
           emulator-boot-timeout: 600
           disable-animations: false
-          # API35 repeatedly terminated during CDP with ADB offline. Keep the
-          # same SwiftShader renderer and test scope, but disable Vulkan as a
-          # controlled environment hypothesis; real device assertions stay strict.
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
+          # Match the real API30/API35 N01 rig; runtime assertions stay strict.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -skin 720x1280 -dpi-device 240
           script: bash tests/track05_timer/run_android_timer_qa.sh
       - name: Bounded host and emulator diagnostics
         if: always()

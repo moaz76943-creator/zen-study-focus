@@ -308,6 +308,28 @@ async function main(){
   assert.deepEqual(await completedReceipts(workIds,[0,0],40),secondWork,'Reopen duplicated or lost training credit');
   return {requestedWorkSeconds:20,requestedRestSeconds:10,sets:2,phases,workIds,restIds,minutes:0,workRemainderSeconds:40,naturalWaitMs:Date.now()-startedAt,reopened:true,workoutPresetVerifiedOnly:true};
  });
+ await test('quick-4-1-natural-cycle-persists-four-work-minutes-and-no-rest-credit',async()=>{
+  await cleanQAProfile();await tap('#navTimer');
+  await evalJs("document.getElementById('quickTrainingDetails').open=true;true");
+  await tap("button[data-qt='presetWorkout']");
+  assert.deepEqual(await evalJs("({work:document.getElementById('qtWork').value,rest:document.getElementById('qtRest').value})"),{work:'04:00',rest:'01:00'});
+  await evalJs("document.getElementById('qtSets').value='1';document.getElementById('qtSkipLast').checked=false;true");
+  await tap('#qtStartButton');
+  const work=await state(),began=Date.now();
+  assert.ok(work.running&&work.id&&work.training?.phase==='work');
+  assert.equal(work.total,240);assert.equal(work.training.sets,1);
+  const native=await verifiedNativeTimerSnapshot();assert.equal(native.id,work.id);assert.equal(native.running,true);
+  const rest=await waitForActualState(s=>s.training?.phase==='rest','naturally finish four work minutes',290000);
+  assert.equal(rest.total,60);assert.equal(rest.sessions,1);assert.equal(rest.history,1);
+  assert.notEqual(rest.id,work.id,'Rest must have its own uncredited identity');
+  const credit=await completedReceipts([work.id],[4],0);
+  const done=await waitForActualState(s=>!s.training&&!s.running,'naturally finish final one-minute rest',90000);
+  assert.equal(done.sessions,1);assert.equal(done.history,1);
+  assert.deepEqual(await completedReceipts([work.id],[4],0),credit,'Final rest credited focus minutes');
+  await pause(8000);await restart();
+  assert.deepEqual(await completedReceipts([work.id],[4],0),credit,'Reopen duplicated or lost 4/1 work credit');
+  return {requestedWorkSeconds:240,requestedRestSeconds:60,sets:1,workId:work.id,restId:rest.id,minutes:4,naturalWaitMs:Date.now()-began,reopened:true};
+ });
 }
 main().catch(e=>record('bootstrap','NOT_TESTED',String(e.message||e).slice(0,250))).finally(()=>{
  const out={headSha:process.env.DF_TEST_SOURCE_SHA||process.env.GITHUB_SHA||null,source:'actual disposable Android emulator + CDP + ADB',cases,summary:{pass:cases.filter(x=>x.status==='PASS').length,fail:cases.filter(x=>x.status==='FAIL').length,notTested:cases.filter(x=>x.status==='NOT_TESTED').length},releaseApproved:false};

@@ -202,7 +202,7 @@ async function main() {
   }
   function writeReport() {
     const summary={pass:cases.filter(value=>value.status==='PASS').length,fail:cases.filter(value=>value.status==='FAIL').length,notTested:cases.filter(value=>value.status==='NOT_TESTED').length};
-    fs.writeFileSync(file,JSON.stringify({headSha:process.env.DF_TEST_SOURCE_SHA||process.env.GITHUB_SHA,api,source:'actual Android AlarmManager dumpsys + native SharedPreferences + NotificationManager + live WebView',cases,alarmReceipts,summary,limits:['inexact alarms; screen-on emulator with explicit HOME background case','Natural 4/1 five-minute cycle NOT_TESTED; preset values only','Doze/DND/audible/physical-device acceptance NOT_TESTED'],releaseApproved:false},null,2)+'\n');
+    fs.writeFileSync(file,JSON.stringify({headSha:process.env.DF_TEST_SOURCE_SHA||process.env.GITHUB_SHA,api,source:'actual Android AlarmManager dumpsys + native SharedPreferences + NotificationManager + live WebView',cases,alarmReceipts,summary,limits:['inexact alarms; screen-on emulator with explicit HOME background case','Natural 4/1 cycle acceptance is recorded separately in cdp-results.json','Doze/DND/audible/physical-device acceptance NOT_TESTED'],releaseApproved:false},null,2)+'\n');
   }
   async function run(name,fn) {
     try {const evidence=await fn();cases.push({name,status:'PASS',evidence});}
