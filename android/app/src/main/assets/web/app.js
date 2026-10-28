@@ -7246,3 +7246,46 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M245_VOCAB_TTS_SPEED_KEYBOARD_SHORTCUTS_AND_CODE65_V1 === */
+(function() {
+  if (window.__M245_SPEED_SHORTCUTS__) return;
+  window.__M245_SPEED_SHORTCUTS__ = true;
+
+  var SPEEDS = [0.75, 1.0, 1.25];
+
+  window.dfStepVocabTtsSpeed = function(delta) {
+    var cur = (typeof window.dfGetVocabPlaybackSpeed === 'function') ? window.dfGetVocabPlaybackSpeed() : 1.0;
+    var idx = 1;
+    for (var i = 0; i < SPEEDS.length; i++) {
+      if (Math.abs(SPEEDS[i] - cur) < 0.05) {
+        idx = i;
+        break;
+      }
+    }
+    var targetIdx = Math.max(0, Math.min(SPEEDS.length - 1, idx + delta));
+    var newSpeed = SPEEDS[targetIdx];
+    if (typeof window.dfSetVocabPlaybackSpeed === 'function') {
+      window.dfSetVocabPlaybackSpeed(newSpeed);
+    }
+    return newSpeed;
+  };
+
+  window.dfHandleSpeedShortcutEvent = function(e) {
+    if (!e) return;
+    var target = e.target || {};
+    var tag = (target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || target.isContentEditable) return;
+
+    var key = e.key || '';
+    if (key === '[' || key === '-') {
+      window.dfStepVocabTtsSpeed(-1);
+    } else if (key === ']' || key === '=' || key === '+') {
+      window.dfStepVocabTtsSpeed(1);
+    }
+  };
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('keydown', window.dfHandleSpeedShortcutEvent);
+  }
+})();
+
