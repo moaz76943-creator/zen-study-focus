@@ -62,7 +62,7 @@
     if(stateSignature(latest)!==stateSignature(state)){state=latest;undoStack=[];redoStack=[];}
     const old=state,output=change(old),next=output.state;
     if(!next||!Array.isArray(next.tasksList))throw new Error('Invalid change result');
-    if(JSON.stringify(old)===JSON.stringify(next))return true;
+    if(stateSignature(old)===stateSignature(next))return true;
     const committed=adapter.commit(old,next);
     if(committed && typeof committed.then==='function')throw new Error('Only synchronous commit supported');
     if(committed === false)throw new Error('Task change was not durably acknowledged');
