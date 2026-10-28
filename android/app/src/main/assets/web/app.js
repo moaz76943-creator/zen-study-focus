@@ -11343,3 +11343,81 @@ window.FlashQuizEngine = FlashQuizEngine;
     }
   } catch (_) {}
 })();
+
+/* === M290_ACOUSTIC_ZEN_MILESTONE_V4_2_0_AND_CODE110_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetAcousticZenMilestoneSummary() {
+    var activeSoundscape = "none";
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetActiveSoundscape === "function") {
+        activeSoundscape = window.dfGetActiveSoundscape();
+      }
+    } catch (_) {}
+
+    var isBinaural = false;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfIsBinauralGammaActive === "function") {
+        isBinaural = window.dfIsBinauralGammaActive();
+      }
+    } catch (_) {}
+
+    var isChimes = false;
+    try {
+      if (typeof window !== "undefined" && typeof window.dfIsWindChimesEnabled === "function") {
+        isChimes = window.dfIsWindChimesEnabled();
+      }
+    } catch (_) {}
+
+    return {
+      version: "4.2.0",
+      versionCode: 110,
+      versionCodeFormatted: dfFormatWesternDigits(110),
+      milestoneTitle: "إصدار السكينة الصوتية (Acoustic Zen)",
+      phaseCompleted: "Phase 2: Acoustic Zen Soundscapes (M281-M290)",
+      soundscapesCountFormatted: dfFormatWesternDigits(4),
+      isZeroMusicCompliant: true,
+      activeSoundscape: activeSoundscape,
+      binauralActive: isBinaural,
+      chimesActive: isChimes
+    };
+  }
+
+  function dfRenderAcousticZenMilestoneModalHtml() {
+    var m = dfGetAcousticZenMilestoneSummary();
+    var boxStyle = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;text-align:center;flex:1;";
+
+    return "<div class=\"df-zen-milestone-modal\" style=\"direction:rtl;padding:16px;background:#18181b;border:1px solid #059669;border-radius:14px;color:#f4f4f5;box-shadow:0 12px 35px rgba(5,150,105,0.25);\">" +
+      "<div style=\"text-align:center;margin-bottom:14px;\">" +
+        "<span style=\"font-size:32px;display:block;margin-bottom:4px;\">🌿</span>" +
+        "<h3 style=\"margin:0 0 4px 0;font-size:18px;color:#34d399;\">" + m.milestoneTitle + " v" + m.version + "</h3>" +
+        "<span style=\"font-size:12px;color:#a7f3d0;display:block;margin-bottom:2px;\">رمز البناء: <strong>" + m.versionCodeFormatted + "</strong></span>" +
+        "<span style=\"font-size:11px;color:#a1a1aa;\">اكتمال المرحلة الثانية الشاملة للبيئة الصوتية الطبيعية بنجاح 100%</span>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;margin-bottom:12px;\">" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🎧 العوازل</span><span style=\"font-size:15px;font-weight:bold;color:#10b981;\">" + m.soundscapesCountFormatted + " أصوات</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🧠 جاما</span><span style=\"font-size:15px;font-weight:bold;color:#38bdf8;\">40Hz نقي</span></div>" +
+        "<div style=\"" + boxStyle + "\"><span style=\"font-size:10px;color:#a1a1aa;display:block;\">🔇 الصمت</span><span style=\"font-size:15px;font-weight:bold;color:#f59e0b;\">Zero-Music</span></div>" +
+      "</div>" +
+      "<div style=\"padding:8px 12px;background:rgba(5,150,105,0.1);border-radius:8px;font-size:11px;color:#a7f3d0;text-align:center;\">" +
+        "✨ جاهز للانطلاق نحو المرحلة الثالثة: خوارزميات التكرار الذكي واحترافية البطاقات (M291-M300)" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetAcousticZenMilestoneSummary = dfGetAcousticZenMilestoneSummary;
+    window.dfRenderAcousticZenMilestoneModalHtml = dfRenderAcousticZenMilestoneModalHtml;
+  }
+})();
