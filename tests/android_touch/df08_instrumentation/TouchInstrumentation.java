@@ -298,11 +298,12 @@ public final class TouchInstrumentation extends Instrumentation {
             "altHit:!!alt&&(alt===n||n.contains(alt))," +
             "hit:!!hit&&(hit===n||n.contains(hit))};})()";
         js("(()=>{if(window.__df08Events)return {installed:true};window.__df08Events=[];" +
-            "for(const kind of ['touchstart','touchend','click','pointerdown','pointerup']){" +
+            "for(const kind of ['touchstart','touchend','touchcancel','click','contextmenu','pointerdown','pointerup','pointercancel']){" +
             "document.addEventListener(kind,e=>{const p=e.changedTouches?.[0]||e;" +
             "window.__df08Events.push({kind,clientX:p.clientX,clientY:p.clientY," +
             "target:e.target?.id||e.target?.closest('.bnav-btn')?.id||e.target?.tagName," +
-            "trusted:e.isTrusted});if(window.__df08Events.length>16)window.__df08Events.shift();},true)}" +
+            "trusted:e.isTrusted,eventTime:e.timeStamp,observedAt:performance.now(),defaultPrevented:e.defaultPrevented});" +
+            "if(window.__df08Events.length>24)window.__df08Events.shift();},true)}" +
             "return {installed:true};})()");
         js(expression);
         SystemClock.sleep(140);
@@ -330,16 +331,7 @@ public final class TouchInstrumentation extends Instrumentation {
         int y=(int)Math.round(box[1]+(p.getDouble("y")-p.getDouble("visY"))*box[3]/p.getDouble("visHeight"));
         assertTrue(x>=box[0]&&x<box[0]+box[2]&&y>=box[1]&&y<box[1]+box[3],
             "WebView mapped touch outside physical bounds "+id);
-        long down=SystemClock.uptimeMillis();
-        MotionEvent press=MotionEvent.obtain(down,down,MotionEvent.ACTION_DOWN,x,y,0);
-        MotionEvent release=MotionEvent.obtain(down,down+90,MotionEvent.ACTION_UP,x,y,0);
-        press.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        release.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        try {
-            assertTrue(getUiAutomation().injectInputEvent(press,true),"Android rejected touchStart "+id);
-            SystemClock.sleep(90);
-            assertTrue(getUiAutomation().injectInputEvent(release,true),"Android rejected touchEnd "+id);
-        } finally {press.recycle();release.recycle();}
+        long physicalPressMillis=injectPhysicalTap(x,y,id);
         actualTaps++;
         SystemClock.sleep(400);
         JSONObject after=js("({events:window.__df08Events?.slice(-8)||[]," +
@@ -368,8 +360,30 @@ public final class TouchInstrumentation extends Instrumentation {
         } catch(Throwable ignored) { activeWindow="unavailable"; }
         lastTapDiagnostics="id="+id+" css="+p+" screen="+x+","+y+
             " webview="+java.util.Arrays.toString(box)+
-            " native="+insetsDiag.get()+" activeWindow="+activeWindow+" observed="+after;
+            " native="+insetsDiag.get()+" activeWindow="+activeWindow+
+            " physicalPressMillis="+physicalPressMillis+" observed="+after;
         Log.i(TAG,"TAP_DIAGNOSTICS "+lastTapDiagnostics);
+    }
+
+    // UP must describe the real release time. Synchronous injection may spend
+    // time waiting for dispatch; precomputing down+90 conceals that delay.
+    private long injectPhysicalTap(int x,int y,String id) {
+        long down=SystemClock.uptimeMillis();
+        MotionEvent press=MotionEvent.obtain(down,down,MotionEvent.ACTION_DOWN,x,y,0);
+        MotionEvent release=null;
+        press.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+        try {
+            assertTrue(getUiAutomation().injectInputEvent(press,true),"Android rejected touchStart "+id);
+            SystemClock.sleep(90);
+            long up=SystemClock.uptimeMillis();
+            release=MotionEvent.obtain(down,up,MotionEvent.ACTION_UP,x,y,0);
+            release.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+            assertTrue(getUiAutomation().injectInputEvent(release,true),"Android rejected touchEnd "+id);
+            return up-down;
+        } finally {
+            press.recycle();
+            if(release!=null)release.recycle();
+        }
     }
 
     private void key(int code) {
