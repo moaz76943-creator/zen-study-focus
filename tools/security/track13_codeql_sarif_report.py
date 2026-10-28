@@ -12,18 +12,25 @@ MAX_BYTES = 32 * 1024 * 1024
 SAFE_CODEQL_RULE = re.compile(r"js/[a-z0-9-]{1,64}(?:/[a-z0-9-]{1,64}){0,3}\Z")
 MAX_RULE_GROUPS = 24
 MAX_EVIDENCE = 16
-SOURCE_SUFFIXES = {'.js', '.cjs', '.mjs', '.java', '.py', '.sh', '.html', '.yml', '.yaml'}
+SOURCE_SUFFIXES = {'.js', '.cjs', '.mjs', '.py', '.sh', '.yml', '.yaml'}
 EVIDENCE_SINK = ('js/http-to-file-access', 'tests/android_e2e_recovery/private_evidence.cjs', 68)
 ADJUDICATION_ID = 'DF-CODEQL-QA-EVIDENCE-001'
 
 
 def executable_source_digest(root: Path) -> str:
-    """Bind adjudication to every tracked executable source, including new callers."""
+    """Bind the QA-only Node evidence review to every tracked server/CI source.
+
+    Android Java and WebView assets cannot import the Node.js fs evidence helper.
+    CodeQL still analyzes the entire checkout; only the scope of a previously
+    independently reviewed QA-only finding is narrowed. New server/QA callers,
+    tests and workflow changes continue to invalidate that prior review.
+    """
     names = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-z'], timeout=10)
     digest = hashlib.sha256()
     for raw in sorted(set(names.split(b'\0')) - {b''}):
         relative = raw.decode('utf-8')
-        if Path(relative).suffix.lower() not in SOURCE_SUFFIXES:
+        if (relative.startswith('android/app/src/main/assets/web/')
+                or Path(relative).suffix.lower() not in SOURCE_SUFFIXES):
             continue
         path = root / relative
         if path.is_symlink() or not path.is_file() or path.stat().st_size > MAX_BYTES:
