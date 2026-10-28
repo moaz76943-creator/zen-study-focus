@@ -65,6 +65,17 @@ jobs:
       - name: Track05 real-function lifecycle regression and adjacent timer guards
         run: |
           node --test tests/track05_timer/tick_lifecycle.test.cjs tests/i18n/timer/timer_destructive_consent.test.cjs tests/i18n/timer/timer_safety.test.cjs tests/i18n/timer/timer_legacy135_localized_consent.test.cjs tests/track07_functional/activity_domain_durable_ack.test.cjs
+      - name: Record reviewed executable-source digest (diagnostic only; never auto-approve findings)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$DF_TEST_SOURCE_SHA"
+          python3 - <<'PY'
+          from pathlib import Path
+          import runpy
+          module=runpy.run_path('tools/security/track13_codeql_sarif_report.py')
+          print('CODEQL_EXECUTABLE_SOURCE_SHA256='+module['executable_source_digest'](Path('.').resolve()))
+          PY
       - name: Record exact SHA and immutable test scope
         if: always()
         shell: bash
@@ -79,7 +90,7 @@ jobs:
   android-timer-qa:
     # API35 repeatedly lost the Android emulator on the 24.04 hosted AMD/KVM image.
     # Isolate the host kernel for API35; retain all real-device assertions.
-    runs-on: ${{ matrix.api == 35 && 'ubuntu-22.04' || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -147,13 +158,13 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_2
-          ram-size: '2048M'
-          heap-size: '256M'
+          ram-size: ${{ matrix.api == 35 && '3072M' || '2048M' }}
+          heap-size: ${{ matrix.api == 35 && '512M' || '256M' }}
           cores: 2
-          emulator-boot-timeout: 600
+          emulator-boot-timeout: 900
           disable-animations: false
           # Emulator 37+: supported software renderer; avoid deprecated GPU/skin/DPI flags.
-          emulator-options: -no-window -gpu software -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
+          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -noaudio -no-boot-anim -gpu swangle -feature -Vulkan' || '-no-window -no-snapshot -noaudio -no-boot-anim -gpu software -feature -Vulkan' }}
           script: bash tests/track05_timer/run_android_timer_qa.sh
       - name: Bounded host and emulator diagnostics
         if: always()
