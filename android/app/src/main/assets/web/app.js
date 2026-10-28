@@ -5981,3 +5981,63 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M221_VOCAB_TAG_FILTER_ALL_RESET_AND_CODE41_V1 === */
+(function() {
+  if (window.__M221_FILTER_RESET__) return;
+  window.__M221_FILTER_RESET__ = true;
+
+  window.dfResetAllVocabFilters = function() {
+    if (typeof document === 'undefined') return;
+
+    var searchInput = document.getElementById('df-vocab-live-search');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    var filterBar = document.getElementById('df-vocab-filter-bar');
+    if (filterBar) {
+      var allChip = filterBar.querySelector('[data-filter="all"]') || filterBar.querySelector('button');
+      if (allChip) allChip.click();
+    }
+
+    var cards = document.querySelectorAll('[data-vocab-card-id], .df-vocab-card, .vocab-item-card');
+    cards.forEach(function(card) {
+      card.style.display = '';
+    });
+
+    var resetBtn = document.getElementById('df-vocab-reset-filter-btn');
+    if (resetBtn) resetBtn.style.display = 'none';
+  };
+
+  function mountFilterResetUI() {
+    if (typeof document === 'undefined') return;
+    var searchRow = document.getElementById('df-vocab-search-row');
+    if (!searchRow || document.getElementById('df-vocab-reset-filter-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'df-vocab-reset-filter-btn';
+    btn.style.cssText = 'display:none;padding:8px 12px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:rgba(239,68,68,0.12);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;';
+    btn.textContent = '✕ مسح التصفية';
+    btn.onclick = function() { window.dfResetAllVocabFilters(); };
+    searchRow.appendChild(btn);
+
+    var searchInput = document.getElementById('df-vocab-live-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        var hasQuery = (searchInput.value || '').trim().length > 0;
+        btn.style.display = hasQuery ? 'inline-block' : 'none';
+      });
+    }
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountFilterResetUI);
+    } else {
+      setTimeout(mountFilterResetUI, 350);
+    }
+    setInterval(mountFilterResetUI, 2500);
+  }
+})();
+
