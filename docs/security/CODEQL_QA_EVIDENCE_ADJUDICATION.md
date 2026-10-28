@@ -3,7 +3,8 @@
 Status: independently reviewed by Codex /root after inspecting the helper, its
 QA consumers, the upstream query meaning and regression tests. The exact approved
 source snapshot is recorded in the registry. This is an engineering review, not
-a claim of human security certification. Any executable source change revokes it.
+a claim of human security certification. A change to tracked server/CI/QA
+source revokes the review, including new consumers of the Node evidence helper.
 
 The sole candidate is `js/http-to-file-access` at line 68 of
 `tests/android_e2e_recovery/private_evidence.cjs`, source SHA256
@@ -40,11 +41,18 @@ the upstream network-content advisory.
 The reviewer must inspect the final source and callers and run those tests before
 setting `reviewStatus` to `APPROVED`, recording `reviewedBy`, and recording the
 current executable-source digest in `tools/security/codeql_adjudications.json`.
-The registry is not automatically refreshed. The source digest uses `git ls-files`
-and hashes sorted tracked paths and complete content for `.js`, `.cjs`, `.mjs`,
-`.java`, `.py`, `.sh`, `.html`, `.yml` and `.yaml` across the entire checkout.
-The JSON registry is excluded. Any changed/new/removed/renamed tracked executable
-source revokes approval, including a new caller of the unchanged helper.
+The registry is not automatically refreshed. The QA dependency digest uses
+`git ls-files` and hashes sorted tracked paths and complete content of all
+non-WebView `.js`, `.cjs`, `.mjs`, `.py`, `.sh`, `.yml` and `.yaml` files, including
+all tests, tools, scripts and GitHub Actions workflow definitions. Java and
+Android WebView files cannot import Node.js `fs` or this evidence helper and
+therefore do not independently revoke its QA-only review. This avoids repeated
+manual reapproval after unrelated Gemini app.js UI additions. The JSON registry
+is excluded. Any changed/new/removed/renamed tracked QA/CI executable source
+still revokes approval; new Node callers and changed CI paths are included.
+CodeQL itself still analyzes the complete checkout with security-extended queries;
+new findings, changed sinks, duplicated findings and changed QA consumers remain
+fail-closed. No query is disabled and no raw finding is suppressed.
 
 The reviewer can calculate the snapshot with Python, without changing approval:
 
