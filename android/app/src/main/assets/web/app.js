@@ -9288,3 +9288,142 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfCloseHealthCheckModal = dfCloseHealthCheckModal;
   }
 })();
+
+/* === M272_POMODORO_MICRO_REVIEW_BREAK_AND_CODE92_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return "0";
+    var str = String(val);
+    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetMicroReviewCards(limit) {
+    var maxCards = Number(limit) || 5;
+    var allCards = [];
+    try {
+      if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
+        allCards = window.dfGetVocabBankList();
+      } else {
+        var raw = localStorage.getItem("df_vocab_bank_v1");
+        allCards = raw ? JSON.parse(raw) : [];
+      }
+    } catch (_) {
+      allCards = [];
+    }
+
+    if (!Array.isArray(allCards) || allCards.length === 0) return [];
+
+    var reviewQueue = [];
+    var otherQueue = [];
+
+    for (var i = 0; i < allCards.length; i++) {
+      var c = allCards[i];
+      if (!c) continue;
+      if (c.needsReview || c.isHard || c.hard) {
+        reviewQueue.push(c);
+      } else if (!c.isMastered && !c.mastered) {
+        otherQueue.push(c);
+      }
+    }
+
+    var selected = reviewQueue.concat(otherQueue).slice(0, maxCards);
+    return selected;
+  }
+
+  function dfRenderMicroReviewBreakBannerHtml(cardCount) {
+    var count = Number(cardCount) || 5;
+    var countStr = dfFormatWesternDigits(count);
+
+    return "<div id=\"df-micro-review-banner\" style=\"margin:12px 0;padding:12px 14px;background:#18181b;border:1px solid #3b82f6;border-radius:12px;direction:rtl;box-shadow:0 6px 18px rgba(0,0,0,0.3);color:#f4f4f5;\">" +
+      "<div style=\"display:flex;align-items:center;gap:8px;margin-bottom:8px;\">" +
+        "<span style=\"font-size:18px;\">☕</span>" +
+        "<div>" +
+          "<strong style=\"font-size:13px;display:block;color:#93c5fd;\">وقت الاستراحة! مراجعة سريعة؟</strong>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">استثمر دقائق الاستراحة في ترسيخ " + countStr + " كلمات بتركيز هادئ.</span>" +
+        "</div>" +
+      "</div>" +
+      "<div style=\"display:flex;gap:8px;margin-top:8px;\">" +
+        "<button type=\"button\" onclick=\"window.dfStartMicroReviewSession && window.dfStartMicroReviewSession(" + count + ")\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
+          "<span>🎯 مراجعة " + countStr + " كلمات</span>" +
+        "</button>" +
+        "<button type=\"button\" onclick=\"window.dfDismissMicroReviewBanner && window.dfDismissMicroReviewBanner()\" style=\"background:rgba(255,255,255,0.08);color:#a1a1aa;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;\">" +
+          "<span>استراحة صامتة</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  function dfStartMicroReviewSession(limit) {
+    var cards = dfGetMicroReviewCards(limit);
+    if (!cards || cards.length === 0) {
+      if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
+        window.dfShowVocabToastNotification("لا توجد كلمات كافية للمراجعة حالياً", "info", 2000);
+      }
+      dfDismissMicroReviewBanner();
+      return false;
+    }
+
+    dfDismissMicroReviewBanner();
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(25);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfOpenFlashcardQuizModal === "function") {
+        window.dfCurrentQuizCards = cards.slice();
+        window.dfOpenFlashcardQuizModal(cards);
+      }
+    } catch (_) {}
+
+    return true;
+  }
+
+  function dfDismissMicroReviewBanner() {
+    try {
+      if (typeof document === "undefined") return;
+      var el = document.getElementById("df-micro-review-banner");
+      if (el && el.parentNode) {
+        el.parentNode.removeChild(el);
+      }
+    } catch (_) {}
+  }
+
+  function dfOnPomodoroSessionCompleted() {
+    try {
+      if (typeof window !== "undefined" && typeof window.dfPlayZenGoalCompletionChime === "function") {
+        window.dfPlayZenGoalCompletionChime();
+      }
+    } catch (_) {}
+
+    var available = dfGetMicroReviewCards(5);
+    if (available && available.length > 0) {
+      try {
+        if (typeof document !== "undefined") {
+          var container = document.getElementById("df-pomodoro-break-actions") || document.body;
+          if (container && !document.getElementById("df-micro-review-banner")) {
+            var div = document.createElement("div");
+            div.innerHTML = dfRenderMicroReviewBreakBannerHtml(available.length);
+            container.insertBefore(div.firstChild, container.firstChild);
+          }
+        }
+      } catch (_) {}
+    }
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfGetMicroReviewCards = dfGetMicroReviewCards;
+    window.dfRenderMicroReviewBreakBannerHtml = dfRenderMicroReviewBreakBannerHtml;
+    window.dfStartMicroReviewSession = dfStartMicroReviewSession;
+    window.dfDismissMicroReviewBanner = dfDismissMicroReviewBanner;
+    window.dfOnPomodoroSessionCompleted = dfOnPomodoroSessionCompleted;
+  }
+})();
