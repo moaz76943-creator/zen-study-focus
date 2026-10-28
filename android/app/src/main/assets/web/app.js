@@ -12829,3 +12829,86 @@ window.FlashQuizEngine = FlashQuizEngine;
     }
   } catch (_) {}
 })();
+
+/* === M303_DO_NOT_DISTURB_DND_STATUS_INDICATOR_AND_CODE123_V1 === */
+(function() {
+  'use strict';
+
+  function dfIsDndReminderEnabled() {
+    try {
+      var val = localStorage.getItem("df_dnd_focus_reminder_v1");
+      if (val !== null) return val === "true";
+    } catch (_) {}
+    return true;
+  }
+
+  function dfToggleDndReminder(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsDndReminderEnabled();
+    try {
+      localStorage.setItem("df_dnd_focus_reminder_v1", String(state));
+    } catch (_) {}
+
+    try {
+      if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
+        window.dfVocabHapticPulse(15);
+      }
+    } catch (_) {}
+
+    return state;
+  }
+
+  function dfOpenSystemDndSettings() {
+    try {
+      if (typeof window !== "undefined") {
+        window.location.href = "intent:#Intent;action=android.settings.ZEN_MODE_SETTINGS;end";
+        return true;
+      }
+    } catch (_) {
+      try {
+        window.location.href = "intent:#Intent;action=android.settings.NOTIFICATION_SETTINGS;end";
+        return true;
+      } catch (_) {}
+    }
+    return false;
+  }
+
+  function dfRenderDndFocusBannerHtml() {
+    if (!dfIsDndReminderEnabled()) return "";
+
+    return "<div class=\"df-dnd-focus-banner\" style=\"margin:8px 0;padding:8px 12px;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.25);border-radius:10px;direction:rtl;display:flex;align-items:center;justify-content:space-between;color:#fef08a;font-size:12px;\">" +
+      "<div style=\"display:flex;align-items:center;gap:6px;\">" +
+        "<span>🔕</span>" +
+        "<span>تأكد من تفعيل وضع عدم الإزعاج (DND) لتركيز خالٍ من التشتيت</span>" +
+      "</div>" +
+      "<button type=\"button\" onclick=\"window.dfOpenSystemDndSettings && window.dfOpenSystemDndSettings()\" style=\"background:none;border:none;color:#fbbf24;cursor:pointer;font-size:11px;text-decoration:underline;padding:2px;font-weight:bold;\">" +
+        "فتح الضبط" +
+      "</button>" +
+    "</div>";
+  }
+
+  function dfRenderDndSettingsToggleHtml() {
+    var isEnabled = dfIsDndReminderEnabled();
+    var statusText = isEnabled ? "مفعّل" : "معطّل";
+    var btnBg = isEnabled ? "#10b981" : "rgba(255,255,255,0.1)";
+
+    return "<div class=\"df-settings-dnd-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🔕 تذكير وضع عدم الإزعاج (DND)</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">تنبيه ذكي بحجب الإشعارات عند بدء جلسات التركيز</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleDndReminder && window.dfToggleDndReminder()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsDndReminderEnabled = dfIsDndReminderEnabled;
+    window.dfToggleDndReminder = dfToggleDndReminder;
+    window.dfOpenSystemDndSettings = dfOpenSystemDndSettings;
+    window.dfRenderDndFocusBannerHtml = dfRenderDndFocusBannerHtml;
+    window.dfRenderDndSettingsToggleHtml = dfRenderDndSettingsToggleHtml;
+  }
+})();
