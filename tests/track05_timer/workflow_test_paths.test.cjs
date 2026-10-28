@@ -12,4 +12,6 @@ test('Track05 CI references real test files instead of silently omitting missing
   for (const file of files) {
     assert.ok(fs.existsSync(path.join(root, file)), 'Missing required timer CI suite: ' + file);
   }
+  assert.match(workflow, /-gpu software\b/, 'Use supported software GPU for current headless Android emulator');
+  assert.doesNotMatch(workflow, /swiftshader_indirect|-dpi-device/, 'Do not use deprecated emulator flags');
 });
