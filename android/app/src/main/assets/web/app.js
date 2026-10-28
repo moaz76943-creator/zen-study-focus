@@ -7868,3 +7868,105 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfGetVocabStreakBadge = dfGetVocabStreakBadge;
   }
 })();
+
+/* === M256_VOCAB_DAILY_GOAL_PROGRESS_AND_CODE76_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetTodayKey() {
+    var d = new Date();
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return dfFormatWesternDigits(y + '-' + m + '-' + day);
+  }
+
+  function dfGetVocabDailyGoal() {
+    try {
+      var val = localStorage.getItem('df_vocab_daily_goal_v1');
+      var num = parseInt(val, 10);
+      if (!isNaN(num) && num > 0) return num;
+    } catch (_) {}
+    return 10;
+  }
+
+  function dfSetVocabDailyGoal(goalNumber) {
+    var num = parseInt(goalNumber, 10);
+    if (isNaN(num) || num < 1) num = 10;
+    if (num > 500) num = 500;
+    try {
+      localStorage.setItem('df_vocab_daily_goal_v1', String(num));
+    } catch (_) {}
+    return num;
+  }
+
+  function dfGetTodayReviewedMap() {
+    try {
+      var raw = localStorage.getItem('df_vocab_today_reviewed_v1');
+      if (!raw) return {};
+      var parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') return parsed;
+    } catch (_) {}
+    return {};
+  }
+
+  function dfRecordVocabWordReviewedToday(wordId) {
+    if (!wordId && wordId !== 0) return 0;
+    var todayKey = dfGetTodayKey();
+    var map = dfGetTodayReviewedMap();
+    if (!Array.isArray(map[todayKey])) {
+      map = {};
+      map[todayKey] = [];
+    }
+    var idStr = String(wordId);
+    if (map[todayKey].indexOf(idStr) === -1) {
+      map[todayKey].push(idStr);
+      try {
+        localStorage.setItem('df_vocab_today_reviewed_v1', JSON.stringify(map));
+      } catch (_) {}
+    }
+    return map[todayKey].length;
+  }
+
+  function dfGetVocabTodayReviewedCount() {
+    var todayKey = dfGetTodayKey();
+    var map = dfGetTodayReviewedMap();
+    if (Array.isArray(map[todayKey])) {
+      return map[todayKey].length;
+    }
+    return 0;
+  }
+
+  function dfGetVocabDailyGoalProgress() {
+    var goal = dfGetVocabDailyGoal();
+    var reviewed = dfGetVocabTodayReviewedCount();
+    var pct = Math.min(100, Math.round((reviewed / goal) * 100));
+    var isCompleted = reviewed >= goal;
+
+    return {
+      goal: goal,
+      reviewed: reviewed,
+      percentage: pct,
+      isCompleted: isCompleted,
+      formattedText: '🎯 الهدف اليومي: ' + dfFormatWesternDigits(reviewed) + ' / ' + dfFormatWesternDigits(goal) + ' (' + dfFormatWesternDigits(pct) + '%)'
+    };
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfGetVocabDailyGoal = dfGetVocabDailyGoal;
+    window.dfSetVocabDailyGoal = dfSetVocabDailyGoal;
+    window.dfRecordVocabWordReviewedToday = dfRecordVocabWordReviewedToday;
+    window.dfGetVocabTodayReviewedCount = dfGetVocabTodayReviewedCount;
+    window.dfGetVocabDailyGoalProgress = dfGetVocabDailyGoalProgress;
+  }
+})();
