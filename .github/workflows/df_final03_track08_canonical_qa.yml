@@ -3,6 +3,8 @@ on:
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
+      - 'android/app/src/main/assets/web/tasks_studio.js'
+      - 'android/app/src/main/assets/web/tasks_core_v21.js'
       - 'tests/tasks_core/df_final03_chromium.cjs'
       - 'tests/tasks_core/df_final03_android_e2e.cjs'
       - '.github/workflows/df_final03_track08_canonical_qa.yml'

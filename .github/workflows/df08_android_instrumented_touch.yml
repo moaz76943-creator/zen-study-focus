@@ -14,7 +14,7 @@ concurrency:
 jobs:
   source:
     name: Source-only validation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
       matrix:
         font_scale: ['1.0','1.5','2.0']
         api: [30,35]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
@@ -81,6 +81,9 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_2
+          ram-size: '2048M'
+          heap-size: '256M'
+          cores: 2
           emulator-boot-timeout: 900
           disable-animations: true
           emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan
