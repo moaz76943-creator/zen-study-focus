@@ -10,7 +10,7 @@
       "path": "tests/android_e2e_recovery/private_evidence.cjs",
       "line": 68,
       "sourceSha256": "f5cecf2bfbfc7306270a6a91df474d6f54c10ec1219d49d9c1d3760ea979199e",
-      "executableSourceSha256": "1d2ed2e6ad522631683f7c8917f206ab5484c454644e597f81c7d9d9f827e221",
+      "executableSourceSha256": "c2a28956a83193f6b251f8be67e1b987fe27f2cba73c87c5f36a3f261ccfbdb8",
       "evidence": "docs/security/CODEQL_QA_EVIDENCE_ADJUDICATION.md"
     }
   ]
