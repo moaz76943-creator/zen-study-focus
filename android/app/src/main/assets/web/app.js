@@ -10766,3 +10766,142 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderSleepTimerSelectorHtml = dfRenderSleepTimerSelectorHtml;
   }
 })();
+
+/* === M285_BINAURAL_40HZ_GAMMA_FOCUS_SYNTHESIZER_AND_CODE105_V1 === */
+(function() {
+  'use strict';
+
+  var _binauralCtx = null;
+  var _leftOsc = null;
+  var _rightOsc = null;
+  var _binauralMasterGain = null;
+
+  function dfIsBinauralGammaActive() {
+    try {
+      return localStorage.getItem("df_binaural_gamma_active_v1") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfStopBinauralGamma() {
+    try {
+      if (_binauralMasterGain && _binauralCtx) {
+        _binauralMasterGain.gain.setValueAtTime(_binauralMasterGain.gain.value, _binauralCtx.currentTime);
+        _binauralMasterGain.gain.exponentialRampToValueAtTime(0.0001, _binauralCtx.currentTime + 0.5);
+
+        setTimeout(function() {
+          try {
+            if (_leftOsc) { _leftOsc.stop(); _leftOsc.disconnect(); _leftOsc = null; }
+            if (_rightOsc) { _rightOsc.stop(); _rightOsc.disconnect(); _rightOsc = null; }
+          } catch (_) {}
+        }, 550);
+      }
+    } catch (_) {}
+
+    try {
+      localStorage.setItem("df_binaural_gamma_active_v1", "false");
+    } catch (_) {}
+
+    return { active: false };
+  }
+
+  function dfStartBinauralGamma(carrierFreq) {
+    dfStopBinauralGamma();
+
+    try {
+      if (typeof window === "undefined") return { active: false, reason: "no_window" };
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return { active: false, reason: "no_audio_context" };
+
+      if (!_binauralCtx || _binauralCtx.state === "closed") {
+        _binauralCtx = new AudioCtx();
+      } else if (_binauralCtx.state === "suspended") {
+        _binauralCtx.resume();
+      }
+
+      var carrier = Number(carrierFreq) || 216;
+      var beat = 40;
+
+      var merger = _binauralCtx.createChannelMerger ? _binauralCtx.createChannelMerger(2) : null;
+      _binauralMasterGain = _binauralCtx.createGain();
+      _binauralMasterGain.gain.setValueAtTime(0.0001, _binauralCtx.currentTime);
+      _binauralMasterGain.gain.exponentialRampToValueAtTime(0.08, _binauralCtx.currentTime + 1.5);
+
+      _leftOsc = _binauralCtx.createOscillator();
+      _leftOsc.type = "sine";
+      _leftOsc.frequency.setValueAtTime(carrier, _binauralCtx.currentTime);
+
+      _rightOsc = _binauralCtx.createOscillator();
+      _rightOsc.type = "sine";
+      _rightOsc.frequency.setValueAtTime(carrier + beat, _binauralCtx.currentTime);
+
+      if (merger) {
+        _leftOsc.connect(merger, 0, 0);
+        _rightOsc.connect(merger, 0, 1);
+        merger.connect(_binauralMasterGain);
+      } else {
+        _leftOsc.connect(_binauralMasterGain);
+        _rightOsc.connect(_binauralMasterGain);
+      }
+
+      _binauralMasterGain.connect(_binauralCtx.destination);
+
+      _leftOsc.start(0);
+      _rightOsc.start(0);
+
+      try {
+        localStorage.setItem("df_binaural_gamma_active_v1", "true");
+      } catch (_) {}
+
+      try {
+        if (typeof window.dfVocabHapticPulse === "function") {
+          window.dfVocabHapticPulse(15);
+        }
+      } catch (_) {}
+
+      return {
+        active: true,
+        beatFrequency: beat,
+        carrierFrequency: carrier
+      };
+    } catch (_) {
+      return { active: false, reason: "init_failed" };
+    }
+  }
+
+  function dfToggleBinauralGamma(enable) {
+    var state = (enable !== undefined) ? Boolean(enable) : !dfIsBinauralGammaActive();
+    if (state) {
+      return dfStartBinauralGamma();
+    } else {
+      return dfStopBinauralGamma();
+    }
+  }
+
+  function dfRenderBinauralGammaSettingsWidgetHtml() {
+    var isActive = dfIsBinauralGammaActive();
+    var statusText = isActive ? "مفعّل" : "معطّل";
+    var btnBg = isActive ? "#10b981" : "rgba(255,255,255,0.1)";
+
+    return "<div class=\"df-settings-binaural-section\" style=\"margin:12px 0;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;direction:rtl;\">" +
+      "<div style=\"display:flex;justify-content:space-between;align-items:center;\">" +
+        "<div>" +
+          "<span style=\"font-size:13px;font-weight:bold;color:#f4f4f5;display:block;\">🧠 موجات التركيز الفائق (40Hz Gamma)</span>" +
+          "<span style=\"font-size:11px;color:#a1a1aa;\">تردد ذهني ثنائي الأذنين لتعزيز الحفظ وصفاء الذهن (بالسماعات)</span>" +
+        "</div>" +
+        "<button type=\"button\" onclick=\"window.dfToggleBinauralGamma && window.dfToggleBinauralGamma()\" style=\"background:" + btnBg + ";color:#ffffff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:bold;cursor:pointer;\">" +
+          "<span>" + statusText + "</span>" +
+        "</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  if (typeof window !== "undefined") {
+    window.dfIsBinauralGammaActive = dfIsBinauralGammaActive;
+    window.dfStartBinauralGamma = dfStartBinauralGamma;
+    window.dfStopBinauralGamma = dfStopBinauralGamma;
+    window.dfToggleBinauralGamma = dfToggleBinauralGamma;
+    window.dfRenderBinauralGammaSettingsWidgetHtml = dfRenderBinauralGammaSettingsWidgetHtml;
+  }
+})();
