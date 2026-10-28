@@ -8577,3 +8577,149 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfRenderStartQuizTierButtonHtml = dfRenderStartQuizTierButtonHtml;
   }
 })();
+
+/* === M264_QUIZ_MASTERY_PROMOTION_HOOK_AND_CODE84_V1 === */
+(function() {
+  'use strict';
+
+  function dfGetVocabBankListSafe() {
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfGetVocabBankList === 'function') {
+        return window.dfGetVocabBankList();
+      }
+      var raw = localStorage.getItem('df_vocab_bank_v1');
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function dfSaveVocabBankListSafe(list) {
+    try {
+      localStorage.setItem('df_vocab_bank_v1', JSON.stringify(list));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dfPromoteQuizCardMastery(cardId, isMastered) {
+    if (!cardId && cardId !== 0) return { success: false, reason: 'invalid_id' };
+    var list = dfGetVocabBankListSafe();
+    var foundIndex = -1;
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(cardId)) {
+        foundIndex = i;
+        break;
+      }
+    }
+    if (foundIndex === -1) return { success: false, reason: 'not_found' };
+
+    var card = list[foundIndex];
+    card.isMastered = Boolean(isMastered);
+    card.mastered = Boolean(isMastered);
+    if (isMastered) {
+      card.needsReview = false;
+      card.isHard = false;
+      card.hard = false;
+    } else {
+      card.needsReview = true;
+      card.isHard = true;
+      card.hard = true;
+    }
+    card.reviewCount = (Number(card.reviewCount) || 0) + 1;
+    card.lastReviewedAt = Date.now();
+
+    dfSaveVocabBankListSafe(list);
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfRecordVocabWordReviewedToday === 'function') {
+        window.dfRecordVocabWordReviewedToday(cardId);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfTriggerVocabStatsSync === 'function') {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    return {
+      success: true,
+      cardId: cardId,
+      isMastered: card.isMastered,
+      reviewCount: card.reviewCount
+    };
+  }
+
+  function dfBulkPromoteQuizSessionResults(resultsArray) {
+    if (!Array.isArray(resultsArray) || resultsArray.length === 0) {
+      return { promotedCount: 0, totalProcessed: 0 };
+    }
+
+    var list = dfGetVocabBankListSafe();
+    var lookup = Object.create(null);
+    for (var i = 0; i < list.length; i++) {
+      lookup[String(list[i].id)] = list[i];
+    }
+
+    var promoted = 0;
+    for (var j = 0; j < resultsArray.length; j++) {
+      var res = resultsArray[j];
+      if (!res || (!res.cardId && res.cardId !== 0)) continue;
+      var card = lookup[String(res.cardId)];
+      if (!card) continue;
+
+      var isMastered = Boolean(res.isMastered);
+      card.isMastered = isMastered;
+      card.mastered = isMastered;
+      if (isMastered) {
+        card.needsReview = false;
+        card.isHard = false;
+        card.hard = false;
+        promoted++;
+      } else {
+        card.needsReview = true;
+        card.isHard = true;
+        card.hard = true;
+      }
+      card.reviewCount = (Number(card.reviewCount) || 0) + 1;
+      card.lastReviewedAt = Date.now();
+
+      try {
+        if (typeof window !== 'undefined' && typeof window.dfRecordVocabWordReviewedToday === 'function') {
+          window.dfRecordVocabWordReviewedToday(res.cardId);
+        }
+      } catch (_) {}
+    }
+
+    dfSaveVocabBankListSafe(list);
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfTriggerVocabStatsSync === 'function') {
+        window.dfTriggerVocabStatsSync({ immediate: true });
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfGetVocabDailyGoalProgress === 'function' && typeof window.dfTriggerGoalCelebrationIfNeeded === 'function') {
+        var progress = window.dfGetVocabDailyGoalProgress();
+        if (progress && progress.isCompleted) {
+          window.dfTriggerGoalCelebrationIfNeeded(true);
+        }
+      }
+    } catch (_) {}
+
+    return {
+      promotedCount: promoted,
+      totalProcessed: resultsArray.length
+    };
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfPromoteQuizCardMastery = dfPromoteQuizCardMastery;
+    window.dfBulkPromoteQuizSessionResults = dfBulkPromoteQuizSessionResults;
+  }
+})();
