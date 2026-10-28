@@ -6447,3 +6447,42 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M228_VOCAB_QUIZ_AUTO_HIDE_ANSWER_ON_ADVANCE_AND_CODE48_V1 === */
+(function() {
+  if (window.__M228_QUIZ_FLIP_RESET__) return;
+  window.__M228_QUIZ_FLIP_RESET__ = true;
+
+  window.dfNormalizeQuizCardFlipState = function() {
+    if (typeof document === 'undefined') return false;
+    var card = document.getElementById('df-flash-quiz-card') ||
+               document.querySelector('.df-flash-card-inner') ||
+               document.querySelector('.df-quiz-card');
+    if (!card) return false;
+
+    if (card.classList) {
+      card.classList.remove('is-flipped', 'flipped', 'show-answer');
+    }
+    var ans = document.getElementById('df-quiz-card-answer') ||
+              document.querySelector('.df-quiz-answer-text');
+    if (ans && ans.style) {
+      ans.style.display = 'none';
+      ans.style.opacity = '0';
+    }
+    var prompt = document.getElementById('df-quiz-flip-prompt');
+    if (prompt && prompt.style) {
+      prompt.style.display = 'block';
+    }
+    return true;
+  };
+
+  var quiz = window.FlashQuizEngine;
+  if (quiz && !quiz.__m228ResetHooked && typeof quiz.nextCard === 'function') {
+    quiz.__m228ResetHooked = true;
+    var origNext = quiz.nextCard.bind(quiz);
+    quiz.nextCard = function() {
+      window.dfNormalizeQuizCardFlipState();
+      return origNext.apply(quiz, arguments);
+    };
+  }
+})();
+
