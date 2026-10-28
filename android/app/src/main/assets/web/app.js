@@ -6983,3 +6983,34 @@ window.FlashQuizEngine = FlashQuizEngine;
   };
 })();
 
+/* === M237_VOCAB_QUIZ_AUTO_PRONOUNCE_ANSWER_ON_FLIP_AND_CODE57_V1 === */
+(function() {
+  if (window.__M237_FLIP_PRONOUNCE__) return;
+  window.__M237_FLIP_PRONOUNCE__ = true;
+
+  window.dfOnQuizCardFlipped = function(foreignWordText) {
+    if (typeof window.dfSafeSpeakUtterance !== 'function' || !foreignWordText) return false;
+    var eng = window.SpokenVocabEngine;
+    var lang = (eng && eng.config && eng.config.foreignLang) || 'de-DE';
+    var speed = (eng && eng.playbackSpeed) || 1.0;
+    setTimeout(function() {
+      window.dfSafeSpeakUtterance(foreignWordText, lang, speed);
+    }, 150);
+    return true;
+  };
+
+  var quiz = window.FlashQuizEngine;
+  if (quiz && !quiz.__m237FlipHooked && typeof quiz.flipCard === 'function') {
+    quiz.__m237FlipHooked = true;
+    var origFlip = quiz.flipCard.bind(quiz);
+    quiz.flipCard = function() {
+      var res = origFlip.apply(quiz, arguments);
+      var currentItem = quiz._currentItem || (quiz.getCurrentItem && quiz.getCurrentItem());
+      if (currentItem && currentItem.word) {
+        window.dfOnQuizCardFlipped(currentItem.word);
+      }
+      return res;
+    };
+  }
+})();
+
