@@ -7682,3 +7682,86 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfGetPinnedCardsCount = dfGetPinnedCardsCount;
   }
 })();
+
+/* === M254_VOCAB_QUIZ_ACCURACY_SCORE_AND_CODE74_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfFormatWesternPercent(num) {
+    var n = Number(num);
+    if (isNaN(n) || n < 0) n = 0;
+    if (n > 100) n = 100;
+    return dfFormatWesternDigits(Math.round(n)) + '%';
+  }
+
+  function dfCalculateQuizAccuracy(correctCount, totalReviewed) {
+    var c = Number(correctCount);
+    var t = Number(totalReviewed);
+    if (isNaN(c) || c < 0) c = 0;
+    if (isNaN(t) || t <= 0) {
+      return {
+        percentage: 0,
+        formatted: '0%',
+        correctCount: 0,
+        totalReviewed: 0,
+        tier: 'neutral',
+        label: 'لا توجد بيانات كافية'
+      };
+    }
+
+    if (c > t) c = t;
+    var pct = Math.round((c / t) * 100);
+    var tier = 'needs_review';
+    var label = 'يحتاج إلى مراجعة';
+
+    if (pct >= 90) {
+      tier = 'master';
+      label = 'إتقان استثنائي';
+    } else if (pct >= 75) {
+      tier = 'good';
+      label = 'مستوى جيد جداً';
+    } else if (pct >= 60) {
+      tier = 'passing';
+      label = 'مقبول';
+    }
+
+    return {
+      percentage: pct,
+      formatted: dfFormatWesternPercent(pct),
+      correctCount: c,
+      totalReviewed: t,
+      tier: tier,
+      label: label
+    };
+  }
+
+  function dfGetQuizSessionAccuracyBadge(correctCount, totalReviewed) {
+    var res = dfCalculateQuizAccuracy(correctCount, totalReviewed);
+    var color = '#9e9e9e';
+    if (res.tier === 'master') color = '#2e7d32';
+    else if (res.tier === 'good') color = '#1565c0';
+    else if (res.tier === 'passing') color = '#f57f17';
+    else if (res.tier === 'needs_review') color = '#c62828';
+
+    return '<span class="df-quiz-accuracy-badge" style="display:inline-block;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:bold;color:#fff;background-color:' + color + ';">' +
+      '🎯 ' + res.formatted + ' (' + res.label + ')' +
+      '</span>';
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfFormatWesternDigits = dfFormatWesternDigits;
+    window.dfFormatWesternPercent = dfFormatWesternPercent;
+    window.dfCalculateQuizAccuracy = dfCalculateQuizAccuracy;
+    window.dfGetQuizSessionAccuracyBadge = dfGetQuizSessionAccuracyBadge;
+  }
+})();
