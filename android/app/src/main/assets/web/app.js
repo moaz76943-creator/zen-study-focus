@@ -7191,3 +7191,26 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M243_VOCAB_QUIZ_AUTO_PAUSE_ON_BACKGROUND_AND_CODE63_V1 === */
+(function() {
+  if (window.__M243_VISIBILITY_PAUSE__) return;
+  window.__M243_VISIBILITY_PAUSE__ = true;
+
+  window.dfHandleVocabVisibilityChange = function() {
+    if (typeof document === 'undefined') return false;
+    if (document.hidden) {
+      if (typeof window.dfStopAllVocabSpeech === 'function') {
+        window.dfStopAllVocabSpeech();
+      } else if (typeof window.speechSynthesis !== 'undefined') {
+        try { window.speechSynthesis.cancel(); } catch(e) {}
+      }
+      return true;
+    }
+    return false;
+  };
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', window.dfHandleVocabVisibilityChange);
+  }
+})();
+
