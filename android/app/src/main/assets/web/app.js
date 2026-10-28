@@ -8059,3 +8059,102 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfTriggerGoalCelebrationIfNeeded = dfTriggerGoalCelebrationIfNeeded;
   }
 })();
+
+/* === M258_VOCAB_HEADER_QUICK_STATS_AND_CODE78_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfGetVocabHeaderStatsData() {
+    var totalWords = 0;
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfGetVocabBankList === 'function') {
+        totalWords = window.dfGetVocabBankList().length;
+      } else {
+        var raw = localStorage.getItem('df_vocab_bank_v1');
+        var parsed = raw ? JSON.parse(raw) : [];
+        totalWords = Array.isArray(parsed) ? parsed.length : 0;
+      }
+    } catch (_) {
+      totalWords = 0;
+    }
+
+    var reviewedToday = 0;
+    var dailyGoal = 10;
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfGetVocabTodayReviewedCount === 'function') {
+        reviewedToday = window.dfGetVocabTodayReviewedCount();
+      }
+      if (typeof window !== 'undefined' && typeof window.dfGetVocabDailyGoal === 'function') {
+        dailyGoal = window.dfGetVocabDailyGoal();
+      }
+    } catch (_) {}
+
+    var streak = 0;
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfCalculateVocabStudyStreak === 'function') {
+        streak = window.dfCalculateVocabStudyStreak().currentStreak;
+      }
+    } catch (_) {}
+
+    return {
+      totalWords: totalWords,
+      totalWordsFormatted: dfFormatWesternDigits(totalWords),
+      reviewedToday: reviewedToday,
+      reviewedTodayFormatted: dfFormatWesternDigits(reviewedToday),
+      dailyGoal: dailyGoal,
+      dailyGoalFormatted: dfFormatWesternDigits(dailyGoal),
+      streak: streak,
+      streakFormatted: dfFormatWesternDigits(streak)
+    };
+  }
+
+  function dfRenderVocabHeaderQuickStatsHtml() {
+    var data = dfGetVocabHeaderStatsData();
+    var boxStyle = 'flex:1;min-width:80px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;text-align:center;';
+    var labelStyle = 'font-size:11px;color:#a0a0a0;display:block;margin-bottom:2px;';
+    var valueStyle = 'font-size:14px;font-weight:bold;color:#f0f0f0;display:block;';
+
+    return '<div class="df-vocab-header-quick-stats" style="display:flex;gap:8px;margin-bottom:12px;direction:rtl;">' +
+      '<div style="' + boxStyle + '">' +
+        '<span style="' + labelStyle + '">📚 الكلمات</span>' +
+        '<span style="' + valueStyle + '">' + data.totalWordsFormatted + '</span>' +
+      '</div>' +
+      '<div style="' + boxStyle + '">' +
+        '<span style="' + labelStyle + '">🎯 اليوم</span>' +
+        '<span style="' + valueStyle + '">' + data.reviewedTodayFormatted + ' / ' + data.dailyGoalFormatted + '</span>' +
+      '</div>' +
+      '<div style="' + boxStyle + '">' +
+        '<span style="' + labelStyle + '">🔥 السلسلة</span>' +
+        '<span style="' + valueStyle + '">' + data.streakFormatted + ' أيام</span>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function dfUpdateVocabHeaderQuickStatsDOM() {
+    try {
+      if (typeof document === 'undefined') return false;
+      var container = document.getElementById('df-vocab-header-quick-stats');
+      if (container) {
+        container.innerHTML = dfRenderVocabHeaderQuickStatsHtml();
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfGetVocabHeaderStatsData = dfGetVocabHeaderStatsData;
+    window.dfRenderVocabHeaderQuickStatsHtml = dfRenderVocabHeaderQuickStatsHtml;
+    window.dfUpdateVocabHeaderQuickStatsDOM = dfUpdateVocabHeaderQuickStatsDOM;
+  }
+})();
