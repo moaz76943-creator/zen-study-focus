@@ -31,6 +31,7 @@ paths = [
   '''^tests/security_recovery/track13_private_triage\.test\.cjs$''',
   '''^tests/smoke_app\.cjs$''',
   '''^tests/track07_functional/activity_domain_durable_ack\.test\.cjs$''',
+  '''^tests/track05_timer/expired_native_alarm\.test\.cjs$''',
   '''^tests/track05_timer/qt_transition_probe\.cjs$'''
 ]
 
