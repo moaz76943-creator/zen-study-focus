@@ -335,6 +335,23 @@ public final class TouchInstrumentation extends Instrumentation {
         long physicalPressMillis=injectPhysicalTap(x,y,id);
         actualTaps++;
         SystemClock.sleep(400);
+        if("nsSaveButton".equals(id)) {
+            // API35 may acknowledge an OS injection even when Chromium never
+            // dispatches a trusted click. Never retry a Save that dispatched.
+            JSONObject delivered=js("(()=>{const a=window.__df08Events||[];" +
+                "return {clicks:a.filter(e=>e.kind==='click'&&e.target==='nsSaveButton'&&e.trusted).length," +
+                "open:document.getElementById('noteModal').classList.contains('open')};})()");
+            if(delivered.optInt("clicks")==0 && delivered.optBoolean("open")) {
+                awaitRenderedTouchGeometry();
+                injectPhysicalTap(x,y,id); // Exactly one more *physical* attempt.
+                actualTaps++;
+                SystemClock.sleep(400);
+                delivered=js("(()=>{const a=window.__df08Events||[];" +
+                    "return {clicks:a.filter(e=>e.kind==='click'&&e.target==='nsSaveButton'&&e.trusted).length};})()");
+            }
+            assertTrue(delivered.optInt("clicks")==1,
+                "Save must receive exactly one trusted Android click; got "+delivered);
+        }
         JSONObject after=js("({events:window.__df08Events?.slice(-8)||[]," +
             "nav:[...document.querySelectorAll('.bnav-btn.active')].map(n=>n.id)," +
             "sections:[...document.querySelectorAll('.screen-section.active')].map(n=>n.id)," +
