@@ -93,7 +93,7 @@ test('rejected native Pause receipt cannot stop service, lose ID or report a pau
 });
 test('rejected start receipt cannot create a phantom running session or native alert',()=>{
  let starts=0;const btn={innerHTML:''};
- const ctx={timerRunning:false,timerSessionId:null,timerLeft:60,timerTotal:60,
+ const ctx={crypto:require('node:crypto').webcrypto,timerRunning:false,timerSessionId:null,timerLeft:60,timerTotal:60,
   timerTargetTime:null,timerResumeMs:null,timerActiveMs:0,timerInterval:null,
   focusSessionTaskId:null,chimeCtx:{state:'running'},quickTraining:null,
   window:{ZenNative:{}},document:{getElementById:id=>id==='mainPlayBtn'?btn:{textContent:'Focus'}},
