@@ -8723,3 +8723,112 @@ window.FlashQuizEngine = FlashQuizEngine;
     window.dfBulkPromoteQuizSessionResults = dfBulkPromoteQuizSessionResults;
   }
 })();
+
+/* === M265_QUIZ_COMPLETION_HANDLER_AND_CODE85_V1 === */
+(function() {
+  'use strict';
+
+  function dfFormatWesternDigits(val) {
+    if (val === null || val === undefined) return '0';
+    var str = String(val);
+    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    for (var i = 0; i < eastern.length; i++) {
+      str = str.split(eastern[i]).join(String(i));
+    }
+    return str;
+  }
+
+  function dfFormatSecondsToMMSS(seconds) {
+    var s = Math.max(0, Math.floor(Number(seconds) || 0));
+    var mins = Math.floor(s / 60);
+    var rem = s % 60;
+    var mm = String(mins).padStart(2, '0');
+    var ss = String(rem).padStart(2, '0');
+    return dfFormatWesternDigits(mm + ':' + ss);
+  }
+
+  function dfHandleQuizSessionCompletion(sessionData) {
+    var data = sessionData || {};
+    var results = Array.isArray(data.results) ? data.results : [];
+    var duration = Number(data.durationSeconds) || 0;
+
+    var masteredCount = 0;
+    var needsReviewCount = 0;
+
+    for (var i = 0; i < results.length; i++) {
+      if (results[i] && results[i].isMastered) {
+        masteredCount++;
+      } else {
+        needsReviewCount++;
+      }
+    }
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfBulkPromoteQuizSessionResults === 'function') {
+        window.dfBulkPromoteQuizSessionResults(results);
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfRecordVocabStudySession === 'function') {
+        window.dfRecordVocabStudySession();
+      }
+    } catch (_) {}
+
+    var accuracy = { percentage: 0, formatted: '0%', tier: 'neutral', label: 'مكتمل' };
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfCalculateQuizAccuracy === 'function') {
+        accuracy = window.dfCalculateQuizAccuracy(masteredCount, results.length);
+      }
+    } catch (_) {}
+
+    var streak = { currentStreak: 0, formatted: '0' };
+    try {
+      if (typeof window !== 'undefined' && typeof window.dfCalculateVocabStudyStreak === 'function') {
+        streak = window.dfCalculateVocabStudyStreak();
+      }
+    } catch (_) {}
+
+    return {
+      totalReviewed: results.length,
+      totalReviewedFormatted: dfFormatWesternDigits(results.length),
+      masteredCount: masteredCount,
+      masteredCountFormatted: dfFormatWesternDigits(masteredCount),
+      needsReviewCount: needsReviewCount,
+      needsReviewCountFormatted: dfFormatWesternDigits(needsReviewCount),
+      accuracy: accuracy,
+      streak: streak,
+      durationSeconds: duration,
+      durationFormatted: dfFormatSecondsToMMSS(duration)
+    };
+  }
+
+  function dfRenderQuizCompletionSummaryModalHtml(summary) {
+    if (!summary) return '';
+    var boxStyle = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;text-align:center;flex:1;';
+    var numStyle = 'font-size:16px;font-weight:bold;display:block;margin-top:2px;';
+
+    return '<div class="df-quiz-session-summary" style="direction:rtl;padding:14px;background:#18181b;border:1px solid #27272a;border-radius:12px;color:#f4f4f5;">' +
+      '<div style="text-align:center;margin-bottom:12px;">' +
+        '<div style="font-size:24px;margin-bottom:4px;">🎉</div>' +
+        '<h3 style="margin:0 0 4px 0;font-size:16px;">اكتملت جلسة الاستذكار بنجاح!</h3>' +
+        '<span style="font-size:12px;color:#a1a1aa;">المدة المستغرقة: ' + summary.durationFormatted + '</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
+        '<div style="' + boxStyle + '"><span style="font-size:11px;color:#a1a1aa;">المراجعة</span><span style="' + numStyle + 'color:#f4f4f5;">' + summary.totalReviewedFormatted + '</span></div>' +
+        '<div style="' + boxStyle + '"><span style="font-size:11px;color:#a1a1aa;">✅ متقنة</span><span style="' + numStyle + 'color:#10b981;">' + summary.masteredCountFormatted + '</span></div>' +
+        '<div style="' + boxStyle + '"><span style="font-size:11px;color:#a1a1aa;">⚠️ للمراجعة</span><span style="' + numStyle + 'color:#f59e0b;">' + summary.needsReviewCountFormatted + '</span></div>' +
+        '<div style="' + boxStyle + '"><span style="font-size:11px;color:#a1a1aa;">🎯 الدقة</span><span style="' + numStyle + 'color:#3b82f6;">' + summary.accuracy.formatted + '</span></div>' +
+      '</div>' +
+      '<div style="text-align:center;font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);padding:6px;border-radius:6px;">' +
+        '🔥 سلسلة استمرارك الحالية: <strong>' + summary.streak.formatted + ' أيام</strong>' +
+      '</div>' +
+    '</div>';
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dfFormatSecondsToMMSS = dfFormatSecondsToMMSS;
+    window.dfHandleQuizSessionCompletion = dfHandleQuizSessionCompletion;
+    window.dfRenderQuizCompletionSummaryModalHtml = dfRenderQuizCompletionSummaryModalHtml;
+  }
+})();
