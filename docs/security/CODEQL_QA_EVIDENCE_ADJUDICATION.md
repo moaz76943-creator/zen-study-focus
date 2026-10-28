@@ -108,3 +108,9 @@ rule counts and safe evidence. A matched adjudication reports
 Another rule/path/line, altered source snapshot, duplicated sink finding or any
 additional unresolved finding remains FAIL. Missing, pending or invalid approval
 cannot classify a finding. No query or SARIF result is suppressed.
+
+Final 2026-10-28 engineering review: `/root/security_review` inspected the helper,
+10 inert consumers, saved JSON reader, launchers, workflow artifacts and local
+action closure; `/root` independently inspected the mechanism and integrated CI.
+The registry records the approved branch-specific scope after this review.
+Actual CodeQL scanning remains required; no new finding is auto-approved.
