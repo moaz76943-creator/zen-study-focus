@@ -20,7 +20,7 @@ test('actual Tasks keyboard and native font condition must be observed before ac
 });
 
 test('Android pointer injection positions editor fields away from top system-bar occlusion',()=>{
- assert.match(java,/el\.scrollIntoView\(\{block:'center',inline:'nearest'\}\)/);
+ assert.match(java,/el\.scrollIntoView\(\{behavior:'instant',block:'center',inline:'nearest'\}\)/);
  assert.match(java,/getUiAutomation\(\)\.injectInputEvent\(down,true\)/);
  assert.match(java,/getUiAutomation\(\)\.injectInputEvent\(up,true\)/);
 });

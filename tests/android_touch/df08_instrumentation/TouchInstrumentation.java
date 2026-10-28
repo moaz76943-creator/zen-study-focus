@@ -270,7 +270,8 @@ public final class TouchInstrumentation extends Instrumentation {
 
     private void tap(String id) throws Exception {
         String expression="(()=>{const n=document.getElementById("+JSONObject.quote(id)+");" +
-            "if(!n)return {exists:false};n.scrollIntoView({block:'center',inline:'nearest'});" +
+            "if(!n)return {exists:false};const prepare=true;" +
+            "if(prepare)n.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});" +
             "const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;" +
             "const hit=document.elementFromPoint(x,y);" +
             "const vv=window.visualViewport;" +
@@ -306,8 +307,8 @@ public final class TouchInstrumentation extends Instrumentation {
             "if(window.__df08Events.length>24)window.__df08Events.shift();},true)}" +
             "return {installed:true};})()");
         js(expression);
-        SystemClock.sleep(140);
-        JSONObject p=js(expression);
+        awaitRenderedTouchGeometry();
+        JSONObject p=js(expression.replace("const prepare=true;","const prepare=false;"));
         assertTrue(p.optBoolean("exists") && p.optDouble("width")>0 && p.optDouble("height")>=40 &&
             p.optDouble("x")>=0 && p.optDouble("y")>=0 &&
             p.optDouble("x")>=p.optDouble("visX") &&
@@ -363,6 +364,20 @@ public final class TouchInstrumentation extends Instrumentation {
             " native="+insetsDiag.get()+" activeWindow="+activeWindow+
             " physicalPressMillis="+physicalPressMillis+" observed="+after;
         Log.i(TAG,"TAP_DIAGNOSTICS "+lastTapDiagnostics);
+    }
+
+    // JavaScript layout is not proof that Chromium's compositor has committed
+    // scroll/IME changes. Fence that state and two Android frames before DOWN.
+    private void awaitRenderedTouchGeometry() throws Exception {
+        CountDownLatch rendered=new CountDownLatch(1);
+        runOnMainSync(() -> view.postVisualStateCallback(SystemClock.uptimeMillis(),
+            new WebView.VisualStateCallback() {
+                @Override public void onComplete(long requestId) {
+                    view.postOnAnimation(() -> view.postOnAnimation(rendered::countDown));
+                }
+            }));
+        assertTrue(rendered.await(12,TimeUnit.SECONDS),"WebView touch geometry frame timed out");
+        waitForIdleSync();
     }
 
     // UP must describe the real release time. Synchronous injection may spend

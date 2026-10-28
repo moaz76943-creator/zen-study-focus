@@ -266,12 +266,46 @@ public final class TaskInstrumentation extends Instrumentation {
         JSONObject mounted=js(script);
         assertOk(mounted.optBoolean("mounted")&&mounted.optInt("count")>0,"Real WebView Tasks UI not mounted "+mounted);
     }
+    // JavaScript layout is not proof that Chromium's compositor has committed
+    // scroll/IME changes. Fence that state and two Android frames before DOWN.
+    private void awaitRenderedTouchGeometry() throws Exception {
+        CountDownLatch rendered=new CountDownLatch(1);
+        runOnMainSync(() -> view.postVisualStateCallback(SystemClock.uptimeMillis(),
+            new WebView.VisualStateCallback() {
+                @Override public void onComplete(long requestId) {
+                    view.postOnAnimation(() -> view.postOnAnimation(rendered::countDown));
+                }
+            }));
+        assertOk(rendered.await(12,TimeUnit.SECONDS),"WebView touch geometry frame timed out");
+        waitForIdleSync();
+    }
+
+    private long injectPhysicalTap(int x,int y,String id) {
+        long down=SystemClock.uptimeMillis();
+        MotionEvent press=MotionEvent.obtain(down,down,MotionEvent.ACTION_DOWN,x,y,0);
+        MotionEvent release=null;
+        press.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+        try {
+            assertOk(getUiAutomation().injectInputEvent(press,true),"Android rejected touchStart "+id);
+            SystemClock.sleep(90);
+            long up=SystemClock.uptimeMillis();
+            release=MotionEvent.obtain(down,up,MotionEvent.ACTION_UP,x,y,0);
+            release.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+            assertOk(getUiAutomation().injectInputEvent(release,true),"Android rejected touchEnd "+id);
+            return up-down;
+        } finally {
+            press.recycle();
+            if(release!=null)release.recycle();
+        }
+    }
+
+
     private void tap(String id)throws Exception{
         String source="(()=>{const el=document.getElementById("+JSONObject.quote(id)+");" +
             "if(!el)return {present:false};" +
-            "el.scrollIntoView({block:'center',inline:'nearest'});" +
+            "const prepare=true;if(prepare)el.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});" +
             "const host=el.closest('#df22TasksHost,#df03RejectHost');let scrolls=0;" +
-            "for(let i=0;i<6;i++){const rect=el.getBoundingClientRect(),v=window.visualViewport;" +
+            "for(let i=0;prepare&&i<6;i++){const rect=el.getBoundingClientRect(),v=window.visualViewport;" +
             "const top=v?v.offsetTop:0,height=v?v.height:innerHeight,y=rect.top+rect.height/2;" +
             "if(y>=top+18&&y<top+height-18)break;" +
             "const delta=y-(top+Math.min(height*.38,85));" +
@@ -284,12 +318,14 @@ public final class TaskInstrumentation extends Instrumentation {
             "visY:v?v.offsetTop:0,visWidth:v?v.width:innerWidth,visHeight:v?v.height:innerHeight," +
             "scrolls,hostTop:host?.scrollTop||0,hit:!!hit&&(hit===el||el.contains(hit))};})()";
         js("(()=>{if(window.__df03RealClicks)return {ready:true};window.__df03RealClicks=[];" +
-            "for(const k of ['pointerdown','touchend','click'])document.addEventListener(k,e=>{" +
+            "for(const k of ['pointerdown','touchstart','pointerup','touchend','pointercancel','touchcancel','contextmenu','click'])document.addEventListener(k,e=>{" +
             "window.__df03RealClicks.push({type:k,target:e.target?.id||e.target?.tagName," +
-            "trusted:e.isTrusted});if(window.__df03RealClicks.length>12)window.__df03RealClicks.shift();" +
+            "trusted:e.isTrusted,eventTime:e.timeStamp,observedAt:performance.now(),defaultPrevented:e.defaultPrevented});" +
+            "if(window.__df03RealClicks.length>24)window.__df03RealClicks.shift();" +
             "},true);return {ready:true};})()");
-        js(source);SystemClock.sleep(170);
-        JSONObject point=js(source);
+        JSONObject prepared=js(source);
+        awaitRenderedTouchGeometry();
+        JSONObject point=js(source.replace("const prepare=true;","const prepare=false;"));
         assertOk(point.optBoolean("present")&&point.optBoolean("hit")&&point.optDouble("width")>=20 &&
             point.optDouble("height")>=43.5&&
             point.optDouble("y")>=point.optDouble("visY")&&
@@ -306,18 +342,10 @@ public final class TaskInstrumentation extends Instrumentation {
         int sx=(int)Math.round(b[0]+x),sy=(int)Math.round(b[1]+y);
         assertOk(sx>=b[0]&&sx<b[0]+b[2]&&sy>=b[1]&&sy<b[1]+b[3],
             "Touch coordinate outside WebView "+id+" "+point);
-        long time=SystemClock.uptimeMillis();
-        MotionEvent down=MotionEvent.obtain(time,time,MotionEvent.ACTION_DOWN,sx,sy,0);
-        MotionEvent up=MotionEvent.obtain(time,time+100,MotionEvent.ACTION_UP,sx,sy,0);
-        down.setSource(InputDevice.SOURCE_TOUCHSCREEN);up.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        try{
-            assertOk(getUiAutomation().injectInputEvent(down,true),"Android physical DOWN rejected "+id);
-            SystemClock.sleep(100);
-            assertOk(getUiAutomation().injectInputEvent(up,true),"Android physical UP rejected "+id);
-        }finally{down.recycle();up.recycle();}
+        long physicalPressMillis=injectPhysicalTap(sx,sy,id);
         realTaps++;SystemClock.sleep(350);
         JSONObject observed=js("({events:window.__df03RealClicks||[],form:!!document.querySelector('#df22TasksHost form.df-form')," +
             "edited:!!document.querySelector('#df03RejectHost form.df-form')})");
-        Log.i(TAG,"REAL_TOUCH id="+id+" x="+sx+" y="+sy+" geometry="+point+" observed="+observed);
+        Log.i(TAG,"REAL_TOUCH id="+id+" x="+sx+" y="+sy+" geometry="+point+" prepared="+prepared+" physicalPressMillis="+physicalPressMillis+" observed="+observed);
     }
 }

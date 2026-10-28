@@ -3,14 +3,15 @@
 // method under controlled dispatch delays. This is not Android touch evidence.
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),cp=require('node:child_process');
-const source=fs.readFileSync(path.join(__dirname,'TouchInstrumentation.java'),'utf8');
+for(const file of [path.join(__dirname,'TouchInstrumentation.java'),path.join(__dirname,'../../tasks_core/df_final03_instrumentation/TaskInstrumentation.java')]){
+const source=fs.readFileSync(file,'utf8');
 const start=source.indexOf('    private long injectPhysicalTap(');
 assert.ok(start>=0,'Actual instrumentation injection method missing');
 let end=source.indexOf('{',start)+1,depth=1;
 while(depth&&end<source.length){if(source[end]==='{')depth++;else if(source[end]==='}')depth--;end++;}
 const method=source.slice(start,end);
 
-test('real Java injection timestamps release after synchronous dispatch, keeps one gesture and recycles failures',()=>{
+test(path.basename(file)+': real Java injection timestamps release after synchronous dispatch and recycles failures',()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'df08-touch-time-'));
  try {
   const java=`import java.util.*;
@@ -30,6 +31,7 @@ class TouchTimingProbe {
  Automation automation=new Automation(); Automation getUiAutomation(){return automation;}
  static void check(boolean okay,String reason){if(!okay)throw new AssertionError(reason);}
  static void assertTrue(boolean okay,String reason){check(okay,reason);}
+ static void assertOk(boolean okay,String reason){check(okay,reason);}
  ${method}
  public static void main(String[] args){
   for(long delay:new long[]{0,300,900}){
@@ -56,3 +58,5 @@ class TouchTimingProbe {
   assert.equal(result.status,0,result.stderr);assert.match(result.stdout,/PASS actual injection Java/);
  } finally {fs.rmSync(dir,{recursive:true,force:true});}
 });
+
+}
