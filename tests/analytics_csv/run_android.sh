@@ -2,6 +2,11 @@
 set -euo pipefail
 E="$DF09_NATIVE_EVIDENCE"
 mkdir -p "$E"
+qemu="$(timeout --kill-after=2s 10s adb shell getprop ro.kernel.qemu 2>/dev/null | tr -d '\r')" || qemu=unavailable
+if [[ "$qemu" != 1 ]]; then
+  echo 'DISPOSABLE_EMULATOR_REQUIRED; TEST_RESULT=BLOCKED; RELEASE_APPROVED=NO' >&2
+  exit 2
+fi
 # All state is disposable com.zenstudy.focus.qa. No primary package installs/data reads.
 timeout 45s adb install -r "$E/DeepFocus-DF09-QA-only.apk"
 installed="$(timeout 15s adb shell pm path com.zenstudy.focus.qa | tr -d '\r' | sed -n 's/^package://p' | head -1)"
