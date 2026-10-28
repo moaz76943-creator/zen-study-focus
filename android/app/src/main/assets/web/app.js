@@ -6041,3 +6041,66 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 })();
 
+/* === M222_VOCAB_AUTO_SPEECH_RETRY_FALLBACK_AND_CODE42_V1 === */
+(function() {
+  if (window.__M222_SPEECH_WATCHDOG__) return;
+  window.__M222_SPEECH_WATCHDOG__ = true;
+
+  window.dfSafeSpeakUtterance = function(text, lang, rate, onDone) {
+    var executed = false;
+    function finish() {
+      if (!executed) {
+        executed = true;
+        if (typeof onDone === 'function') onDone();
+      }
+    }
+
+    if (typeof window.speechSynthesis === 'undefined' || !text) {
+      finish();
+      return;
+    }
+
+    try {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+    } catch(e) {}
+
+    var u = new SpeechSynthesisUtterance(String(text));
+    if (lang) u.lang = lang;
+    if (rate) u.rate = parseFloat(rate) || 1.0;
+
+    u.onend = function() { finish(); };
+    u.onerror = function() { finish(); };
+
+    var charCount = String(text).length;
+    var maxWaitMs = Math.max(3000, Math.min(12000, Math.round((charCount / 5) * 1000) + 2500));
+    setTimeout(function() {
+      if (!executed) {
+        try {
+          if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.resume();
+          }
+        } catch(e) {}
+        finish();
+      }
+    }, maxWaitMs);
+
+    try {
+      window.speechSynthesis.speak(u);
+    } catch(e) {
+      finish();
+    }
+  };
+
+  var eng = window.SpokenVocabEngine;
+  if (eng && !eng.__m222WatchdogHooked) {
+    eng.__m222WatchdogHooked = true;
+    eng.speakWord = function(text, lang, onDone) {
+      var foreignLang = lang || (eng.config && eng.config.foreignLang) || 'de-DE';
+      var speed = eng.playbackSpeed || (eng.config && eng.config.speed) || 1.0;
+      window.dfSafeSpeakUtterance(text, foreignLang, speed, onDone);
+    };
+  }
+})();
+
