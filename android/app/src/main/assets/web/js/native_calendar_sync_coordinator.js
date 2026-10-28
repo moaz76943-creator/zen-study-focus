@@ -66,7 +66,7 @@
     const durationSec = Math.max(60, parseInt(s.durationSeconds, 10) || 1500);
     const endTimeMs = startTimeMs + (durationSec * 1000);
 
-    const uid = s.id ? `deepfocus-${s.id}@zenstudy` : `deepfocus-${startTimeMs}-${Math.floor(Math.random() * 10000)}@zenstudy`;
+    const uid = s.id ? `deepfocus-${s.id}@zenstudy` : `deepfocus-${startTimeMs}-${Array.from(globalThis.crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16).padStart(8,'0')).join('')}@zenstudy`;
     const category = s.category || 'General Focus';
     const quality = s.qualityScore !== undefined ? toWesternDigits(s.qualityScore) : '85';
 

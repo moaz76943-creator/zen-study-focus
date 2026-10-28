@@ -7,6 +7,9 @@ on:
     paths:
       - 'android/app/src/main/java/com/zenstudy/focus/**'
       - 'tests/android_dialogs/**'
+      - 'tests/critical_room7/n01_android_ack_probe.cjs'
+      - 'tests/integration_recovery/native_durable_ack.test.cjs'
+      - 'android/app/src/main/assets/web/preflight_v22.js'
       - 'tests/critical_room7/n02_contract.test.cjs'
       - 'tests/critical_room7/n03_contract.test.cjs'
       - 'tests/critical_room7/n04_contract.test.cjs'
@@ -14,9 +17,12 @@ on:
       - '.github/workflows/df_parallel01_native_dialog_android.yml'
 permissions:
   contents: read
+concurrency:
+  group: native-dialog-n01-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   device:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -48,6 +54,7 @@ jobs:
         run: |
           set -euo pipefail
           node --test tests/critical_room7/n04_contract.test.cjs
+          node --test tests/integration_recovery/native_durable_ack.test.cjs
           for contract in tests/critical_room7/n02_contract.test.cjs tests/critical_room7/n03_contract.test.cjs; do
             if [[ -f "$contract" ]]; then node --test "$contract"; fi
           done
@@ -56,8 +63,9 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = '${{ github.event.pull_request.head.sha || github.sha }}'
-          node --test tests/android_dialogs/current_native_dialog_handoff.test.cjs
+          node --test tests/android_dialogs/*.test.cjs
           node --check tests/android_dialogs/native_js_dialog_android_probe.cjs
+          node --check tests/critical_room7/n01_android_ack_probe.cjs
           bash -n tests/android_dialogs/run_native_dialog_device.sh
       - name: Enable CDP for disposable DEBUG APK in runner workspace ONLY
         shell: bash
@@ -104,16 +112,35 @@ jobs:
           test -r /dev/kvm && test -w /dev/kvm
       - name: Real on-device Dialog Cancel Back Confirm Alert Prompt API ${{ matrix.api }}
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          DF_TEST_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         with:
           api-level: ${{ matrix.api }}
           target: google_apis
           arch: x86_64
           profile: pixel_2
-          ram-size: ${{ matrix.api == 30 && '2048M' || '3072M' }}
-          heap-size: ${{ matrix.api == 30 && '256M' || '512M' }}
+          ram-size: '2048M'
+          heap-size: '256M'
+          cores: 2
           emulator-boot-timeout: 900
+          # Bound guest RAM and software-rendered framebuffer on hosted runners.
+          # These dialog/receipt checks do not certify phone width coverage.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -skin 720x1280 -dpi-device 240
           disable-animations: false
-          script: bash tests/android_dialogs/run_native_dialog_device.sh
+          script: |
+            bash tests/android_dialogs/run_native_dialog_device.sh
+      - name: Preserve bounded host diagnostics after emulator failure
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/df-dialog-evidence"
+          {
+            free -m
+            df -h / /tmp
+            if [ -r /sys/fs/cgroup/memory.events ]; then cat /sys/fs/cgroup/memory.events; fi
+            timeout 8s adb -s emulator-5554 get-state || true
+            timeout 8s sudo -n dmesg --ctime 2>/dev/null | grep -Ei 'out of memory|killed process|oom-kill|segfault' | tail -n 25 || true
+          } > "$RUNNER_TEMP/df-dialog-evidence/host-health.txt" 2>&1
       - name: Keep evidence without claiming release approval
         if: always()
         uses: actions/upload-artifact@v4
