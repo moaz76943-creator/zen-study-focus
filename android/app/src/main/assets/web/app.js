@@ -13443,3 +13443,34 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetLiveNotificationPayload = dfGetLiveNotificationPayload;
 }
+
+// ============================================================================
+// MISSION #316: Picture-in-Picture (PiP) Floating Zen Timer State Bridge (v4.4.6)
+// ============================================================================
+function dfGetPipParamsPayload(timerState) {
+  const s = timerState || {};
+  const isRunning = Boolean(s.isRunning);
+  const secondsLeft = typeof s.secondsLeft === "number" ? Math.max(0, s.secondsLeft) : 1500;
+  const m = Math.floor(secondsLeft / 60);
+  const sec = secondsLeft % 60;
+  const formattedTime = (m < 10 ? "0" + m : "" + m) + ":" + (sec < 10 ? "0" + sec : "" + sec);
+
+  return {
+    versionCode: 136,
+    versionName: "4.4.6",
+    aspectRatio: { numerator: 16, denominator: 9 },
+    autoEnterEnabled: isRunning,
+    formattedTime: formattedTime,
+    isRunning: isRunning,
+    actionLabel: isRunning ? "PAUSE" : "RESUME",
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetPipParamsPayload = dfGetPipParamsPayload;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetPipParamsPayload = dfGetPipParamsPayload;
+}
