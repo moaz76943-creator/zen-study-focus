@@ -13365,3 +13365,34 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetWidgetVocabCardPayload = dfGetWidgetVocabCardPayload;
 }
+
+// ============================================================================
+// MISSION #314: Android Quick Settings Tile State Bridge (v4.4.4)
+// ============================================================================
+function dfGetQuickSettingsTilePayload(timerState) {
+  const s = timerState || {};
+  const isRunning = Boolean(s.isRunning);
+  const secondsLeft = typeof s.secondsLeft === "number" ? Math.max(0, s.secondsLeft) : 1500;
+  const m = Math.floor(secondsLeft / 60);
+  const sec = secondsLeft % 60;
+  const formattedTime = (m < 10 ? "0" + m : "" + m) + ":" + (sec < 10 ? "0" + sec : "" + sec);
+
+  return {
+    versionCode: 134,
+    versionName: "4.4.4",
+    tileState: isRunning ? "STATE_ACTIVE" : "STATE_INACTIVE",
+    label: "Zen Focus",
+    subtitle: isRunning ? formattedTime + " Active" : "Tap to Focus",
+    isRunning: isRunning,
+    formattedTime: formattedTime,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetQuickSettingsTilePayload = dfGetQuickSettingsTilePayload;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetQuickSettingsTilePayload = dfGetQuickSettingsTilePayload;
+}
