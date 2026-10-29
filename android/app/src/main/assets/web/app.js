@@ -14454,3 +14454,144 @@ if (typeof globalThis !== "undefined") {
   globalThis.dfProcessLeitnerReviewStep = dfProcessLeitnerReviewStep;
   globalThis.dfGetLeitnerVaultDistribution = dfGetLeitnerVaultDistribution;
 }
+
+// ============================================================================
+// MISSION #332: Flashcard Deck CSV & JSON Importer/Exporter Suite (v4.6.2)
+// ============================================================================
+function dfExportDeckToCsv(cardsList, filterDeck) {
+  const list = Array.isArray(cardsList) ? cardsList : [];
+  const deckFilter = filterDeck && typeof filterDeck === "string" ? filterDeck.trim().toLowerCase() : null;
+
+  const filtered = list.filter(c => {
+    if (!c || !c.term) return false;
+    if (deckFilter && (c.deck || "General").trim().toLowerCase() !== deckFilter) return false;
+    return true;
+  });
+
+  const escapeCsv = (str) => {
+    const s = str === null || str === undefined ? "" : String(str);
+    if (s.indexOf(",") !== -1 || s.indexOf('"') !== -1 || s.indexOf("\n") !== -1 || s.indexOf("\r") !== -1) {
+      return '"' + s.split('"').join('""') + '"';
+    }
+    return s;
+  };
+
+  const headers = ["Term", "Definition", "Phonetic", "Deck", "Box"];
+  const rows = [headers.join(",")];
+
+  for (const c of filtered) {
+    const boxNum = typeof c.box === "number" && c.box >= 1 && c.box <= 5 ? c.box : 1;
+    const row = [
+      escapeCsv(c.term),
+      escapeCsv(c.definition || ""),
+      escapeCsv(c.phonetic || ""),
+      escapeCsv(c.deck || "General"),
+      boxNum
+    ];
+    rows.push(row.join(","));
+  }
+
+  const csvContent = rows.join("\r\n");
+
+  return {
+    versionCode: 152,
+    versionName: "4.6.2",
+    totalExported: filtered.length,
+    deck: filterDeck || "ALL_DECKS",
+    csvText: csvContent,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+function dfImportDeckFromCsv(csvText, targetDeckName, existingCardsList) {
+  const text = typeof csvText === "string" ? csvText.trim() : "";
+  if (!text) {
+    return { versionCode: 152, importedCount: 0, skippedDuplicates: 0, cards: [] };
+  }
+
+  const existing = Array.isArray(existingCardsList) ? existingCardsList : [];
+  const existingSet = new Set(existing.map(c => ((c.deck || "General") + ":::" + (c.term || "")).toLowerCase().trim()));
+
+  const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+  if (lines.length <= 1) {
+    return { versionCode: 152, importedCount: 0, skippedDuplicates: 0, cards: [] };
+  }
+
+  const parseLine = (line) => {
+    const values = [];
+    let insideQuotes = false;
+    let entry = "";
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        if (insideQuotes && i + 1 < line.length && line[i + 1] === '"') {
+          entry += '"';
+          i++;
+        } else {
+          insideQuotes = !insideQuotes;
+        }
+      } else if (char === "," && !insideQuotes) {
+        values.push(entry.trim());
+        entry = "";
+      } else {
+        entry += char;
+      }
+    }
+    values.push(entry.trim());
+    return values;
+  };
+
+  const newCards = [];
+  let skipped = 0;
+  let counter = 1;
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = parseLine(lines[i]);
+    const term = cols[0] ? cols[0].replace(/^"|"$/g, "") : "";
+    const def = cols[1] ? cols[1].replace(/^"|"$/g, "") : "";
+    const phon = cols[2] ? cols[2].replace(/^"|"$/g, "") : "";
+    const deck = targetDeckName || (cols[3] ? cols[3].replace(/^"|"$/g, "") : "Imported Deck");
+    const rawBox = cols[4] ? parseInt(cols[4], 10) : 1;
+    const box = rawBox >= 1 && rawBox <= 5 ? rawBox : 1;
+
+    if (!term || !def) continue;
+
+    const key = (deck + ":::" + term).toLowerCase().trim();
+    if (existingSet.has(key)) {
+      skipped++;
+      continue;
+    }
+
+    existingSet.add(key);
+    newCards.push({
+      id: "card_imp_" + Date.now() + "_" + counter++,
+      term: term,
+      definition: def,
+      phonetic: phon,
+      deck: deck,
+      box: box,
+      reviewCount: 0,
+      createdAt: Date.now()
+    });
+  }
+
+  return {
+    versionCode: 152,
+    versionName: "4.6.2",
+    importedCount: newCards.length,
+    skippedDuplicates: skipped,
+    cards: newCards,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfExportDeckToCsv = dfExportDeckToCsv;
+  window.dfImportDeckFromCsv = dfImportDeckFromCsv;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfExportDeckToCsv = dfExportDeckToCsv;
+  globalThis.dfImportDeckFromCsv = dfImportDeckFromCsv;
+}
