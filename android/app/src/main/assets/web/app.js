@@ -13898,3 +13898,62 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetNsdrResetProtocolMetrics = dfGetNsdrResetProtocolMetrics;
 }
+
+// ============================================================================
+// MISSION #324: Dual Multi-Band Binaural Brainwave Generator (v4.5.4)
+// ============================================================================
+function dfSynthesizeBinauralBeats(bandType, customCarrierHz) {
+  const band = (typeof bandType === "string" ? bandType.toUpperCase() : "ALPHA");
+  const bandProfiles = {
+    "THETA": {
+      offsetHz: 6.0,
+      defaultCarrier: 200,
+      target: "Creative Insight & Diffuse Reflection",
+      recommendedMode: "Break / NSDR"
+    },
+    "ALPHA": {
+      offsetHz: 10.0,
+      defaultCarrier: 210,
+      target: "Calm Cognitive Absorption & Vocab Review",
+      recommendedMode: "Reading & Retention"
+    },
+    "BETA": {
+      offsetHz: 18.0,
+      defaultCarrier: 250,
+      target: "High-Alert Mathematical Problem Solving",
+      recommendedMode: "Deep Execution & Coding"
+    }
+  };
+
+  const profile = bandProfiles[band] || bandProfiles["ALPHA"];
+  const carrier = typeof customCarrierHz === "number" && customCarrierHz >= 100 && customCarrierHz <= 500
+    ? customCarrierHz
+    : profile.defaultCarrier;
+
+  const halfOffset = profile.offsetHz / 2;
+  const leftFreq = Math.round((carrier - halfOffset) * 10) / 10;
+  const rightFreq = Math.round((carrier + halfOffset) * 10) / 10;
+
+  return {
+    versionCode: 144,
+    versionName: "4.5.4",
+    band: bandProfiles[band] ? band : "ALPHA",
+    offsetHz: profile.offsetHz,
+    carrierHz: carrier,
+    leftFreqHz: leftFreq,
+    rightFreqHz: rightFreq,
+    cognitiveTarget: profile.target,
+    recommendedMode: profile.recommendedMode,
+    isSynthesized: true,
+    zeroMusicPolicy: true,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfSynthesizeBinauralBeats = dfSynthesizeBinauralBeats;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfSynthesizeBinauralBeats = dfSynthesizeBinauralBeats;
+}
