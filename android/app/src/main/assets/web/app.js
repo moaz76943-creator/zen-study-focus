@@ -13572,3 +13572,58 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetAmbientDisplayConfig = dfGetAmbientDisplayConfig;
 }
+
+// ============================================================================
+// MISSION #319: Quick Sensor Trigger for Shake to Focus (v4.4.9)
+// ============================================================================
+function dfDetectShakeGesture(accel, options, state) {
+  const a = accel || {};
+  const opts = options || {};
+  const s = state || {};
+
+  const threshold = typeof opts.threshold === "number" && opts.threshold > 0 ? opts.threshold : 15.0;
+  const debounceMs = typeof opts.debounceMs === "number" && opts.debounceMs > 0 ? opts.debounceMs : 1000;
+  const now = typeof opts.currentTime === "number" ? opts.currentTime : Date.now();
+
+  const x = typeof a.x === "number" ? a.x : 0;
+  const y = typeof a.y === "number" ? a.y : 0;
+  const z = typeof a.z === "number" ? a.z : 0;
+
+  const lastX = typeof s.lastX === "number" ? s.lastX : 0;
+  const lastY = typeof s.lastY === "number" ? s.lastY : 0;
+  const lastZ = typeof s.lastZ === "number" ? s.lastZ : 0;
+  const lastTime = typeof s.lastTime === "number" ? s.lastTime : 0;
+
+  const deltaX = Math.abs(x - lastX);
+  const deltaY = Math.abs(y - lastY);
+  const deltaZ = Math.abs(z - lastZ);
+  const speed = (deltaX + deltaY + deltaZ);
+
+  s.lastX = x;
+  s.lastY = y;
+  s.lastZ = z;
+
+  let triggered = false;
+  if (speed > threshold && (now - lastTime) > debounceMs) {
+    triggered = true;
+    s.lastTime = now;
+  }
+
+  return {
+    versionCode: 139,
+    versionName: "4.4.9",
+    triggered: triggered,
+    speed: Math.round(speed * 100) / 100,
+    threshold: threshold,
+    action: triggered ? "TOGGLE_TIMER" : "NONE",
+    westernDigits: true,
+    timestamp: now
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfDetectShakeGesture = dfDetectShakeGesture;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfDetectShakeGesture = dfDetectShakeGesture;
+}
