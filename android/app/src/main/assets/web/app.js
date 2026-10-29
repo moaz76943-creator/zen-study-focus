@@ -14262,3 +14262,104 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfAnalyzeChronotypePeakHours = dfAnalyzeChronotypePeakHours;
 }
+
+// ============================================================================
+// MISSION #330: Box Breathing & 4-7-8 Pre-Session Pacer (v4.6.0)
+// ============================================================================
+function dfGetBoxBreathingPacerMetrics(elapsedSeconds, patternType, totalCyclesCount) {
+  const elapsed = typeof elapsedSeconds === "number" && elapsedSeconds >= 0 ? Math.floor(elapsedSeconds) : 0;
+  const pattern = (patternType || "BOX_4_4_4_4").toUpperCase();
+  const maxCycles = typeof totalCyclesCount === "number" && totalCyclesCount > 0 ? Math.floor(totalCyclesCount) : 4;
+
+  let intervals = [
+    { name: "INHALE", duration: 4, cue: "Inhale Slowly Through Nose" },
+    { name: "HOLD_IN", duration: 4, cue: "Hold Breath Gently" },
+    { name: "EXHALE", duration: 4, cue: "Smooth Exhale Through Mouth" },
+    { name: "HOLD_OUT", duration: 4, cue: "Rest Empty" }
+  ];
+
+  if (pattern === "RELAX_4_7_8") {
+    intervals = [
+      { name: "INHALE", duration: 4, cue: "Deep Inhale Through Nose" },
+      { name: "HOLD_IN", duration: 7, cue: "Hold Breath with Relaxation" },
+      { name: "EXHALE", duration: 8, cue: "Whoosh Exhale Through Mouth" }
+    ];
+  }
+
+  const cycleDuration = intervals.reduce((acc, x) => acc + x.duration, 0);
+  const totalDuration = cycleDuration * maxCycles;
+
+  if (elapsed >= totalDuration) {
+    return {
+      versionCode: 150,
+      versionName: "4.6.0",
+      pattern: pattern,
+      currentPhase: "COMPLETE",
+      phaseCue: "Centering Complete: Enter Flow State",
+      phaseProgressPercent: 100,
+      currentCycle: maxCycles,
+      totalCycles: maxCycles,
+      isSessionReady: true,
+      westernDigits: true,
+      timestamp: Date.now()
+    };
+  }
+
+  const currentCycleIndex = Math.min(maxCycles, Math.floor(elapsed / cycleDuration) + 1);
+  const cycleOffset = elapsed % cycleDuration;
+
+  let accumulated = 0;
+  let activePhase = intervals[0];
+  let phaseElapsed = 0;
+
+  for (const interval of intervals) {
+    if (cycleOffset < accumulated + interval.duration) {
+      activePhase = interval;
+      phaseElapsed = cycleOffset - accumulated;
+      break;
+    }
+    accumulated += interval.duration;
+  }
+
+  const phaseRemaining = activePhase.duration - phaseElapsed;
+  const phaseProgress = Math.min(100, Math.round((phaseElapsed / activePhase.duration) * 100));
+
+  return {
+    versionCode: 150,
+    versionName: "4.6.0",
+    pattern: pattern,
+    currentPhase: activePhase.name,
+    phaseCue: activePhase.cue,
+    phaseSecondsRemaining: phaseRemaining,
+    phaseProgressPercent: phaseProgress,
+    currentCycle: currentCycleIndex,
+    totalCycles: maxCycles,
+    isSessionReady: false,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+function dfGetPhase2MilestoneSummary() {
+  return {
+    versionCode: 150,
+    versionName: "4.6.0",
+    status: "PHASE_2_COMPLETED",
+    phaseTitle: "Neuroscience & Flow State Engines",
+    missionsCompleted: 20,
+    totalMissionsInPlan: 50,
+    progressPercent: 40,
+    protocolsImplemented: 10,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetBoxBreathingPacerMetrics = dfGetBoxBreathingPacerMetrics;
+  window.dfGetPhase2MilestoneSummary = dfGetPhase2MilestoneSummary;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetBoxBreathingPacerMetrics = dfGetBoxBreathingPacerMetrics;
+  globalThis.dfGetPhase2MilestoneSummary = dfGetPhase2MilestoneSummary;
+}
