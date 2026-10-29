@@ -14820,3 +14820,82 @@ if (typeof globalThis !== "undefined") {
   globalThis.dfGenerateSmartMcqQuestion = dfGenerateSmartMcqQuestion;
   globalThis.dfEvaluateMcqAnswer = dfEvaluateMcqAnswer;
 }
+
+// ============================================================================
+// MISSION #335: Weak Cards Vault & Pre-Exam Cramming Mode (v4.6.5)
+// ============================================================================
+function dfGetWeakCardsCrammingQueue(cardsList, options) {
+  const list = Array.isArray(cardsList) ? cardsList : [];
+  const opts = options || {};
+  const maxCards = typeof opts.maxCards === "number" && opts.maxCards > 0 ? Math.min(100, Math.floor(opts.maxCards)) : 20;
+  const deckFilter = opts.deckFilter && typeof opts.deckFilter === "string" ? opts.deckFilter.trim().toLowerCase() : null;
+
+  const scoredCards = [];
+  let totalWeak = 0;
+  let highRisk = 0;
+
+  for (const c of list) {
+    if (!c || !c.term) continue;
+    if (deckFilter && (c.deck || "General").trim().toLowerCase() !== deckFilter) continue;
+
+    const lapses = typeof c.lapses === "number" ? c.lapses : (typeof c.incorrectCount === "number" ? c.incorrectCount : 0);
+    const correct = typeof c.correctReviews === "number" ? c.correctReviews : 0;
+    const totalRev = lapses + correct;
+    const accuracy = totalRev > 0 ? (correct / totalRev) : 0.5;
+    const box = typeof c.box === "number" && c.box >= 1 && c.box <= 5 ? c.box : 1;
+
+    const boxPenalty = (6 - box) * 12;
+    const lapsePenalty = lapses * 18;
+    const accuracyPenalty = Math.round((1.0 - accuracy) * 50);
+    const weaknessScore = boxPenalty + lapsePenalty + accuracyPenalty;
+
+    const isWeak = (box <= 2) || (lapses >= 2) || (totalRev >= 2 && accuracy < 0.6);
+    if (isWeak) {
+      totalWeak++;
+      if (box === 1 && (lapses >= 3 || accuracy < 0.4)) {
+        highRisk++;
+      }
+      scoredCards.push({
+        id: c.id || "card_" + Math.random(),
+        term: c.term,
+        definition: c.definition || "",
+        deck: c.deck || "General",
+        box: box,
+        lapses: lapses,
+        accuracyPercent: Math.round(accuracy * 100),
+        weaknessScore: weaknessScore
+      });
+    }
+  }
+
+  scoredCards.sort((a, b) => b.weaknessScore - a.weaknessScore);
+  const queue = scoredCards.slice(0, maxCards);
+
+  let totalAcc = 0;
+  for (const q of queue) {
+    totalAcc += q.accuracyPercent;
+  }
+  const avgAccuracy = queue.length > 0 ? Math.round(totalAcc / queue.length) : 0;
+  const recommendedMinutes = Math.max(3, Math.ceil(queue.length * 0.75));
+
+  return {
+    versionCode: 155,
+    versionName: "4.6.5",
+    crammingMode: true,
+    queueLength: queue.length,
+    totalWeakCardsInVault: totalWeak,
+    highRiskCount: highRisk,
+    averageWeakAccuracyPercent: avgAccuracy,
+    recommendedCramMinutes: recommendedMinutes,
+    cramCards: queue,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetWeakCardsCrammingQueue = dfGetWeakCardsCrammingQueue;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetWeakCardsCrammingQueue = dfGetWeakCardsCrammingQueue;
+}
