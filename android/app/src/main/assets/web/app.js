@@ -14019,3 +14019,45 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetExamSimulationMetrics = dfGetExamSimulationMetrics;
 }
+
+// ============================================================================
+// MISSION #326: Hardcore Monk Mode Protocol (v4.5.6)
+// ============================================================================
+function dfGetMonkModeSessionMetrics(options, state) {
+  const opts = options || {};
+  const s = state || {};
+
+  const isEnabled = opts.enabled !== false;
+  const strictness = (opts.strictnessLevel || "STRICT").toUpperCase();
+  const sessionMin = typeof opts.sessionDurationMinutes === "number" && opts.sessionDurationMinutes > 0 ? opts.sessionDurationMinutes : 60;
+  const penaltyMin = typeof opts.penaltyMinutes === "number" && opts.penaltyMinutes >= 0 ? opts.penaltyMinutes : 15;
+
+  const elapsedSec = typeof s.elapsedSeconds === "number" && s.elapsedSeconds >= 0 ? Math.floor(s.elapsedSeconds) : 0;
+  const isRunning = Boolean(s.isRunning);
+  const abandonments = typeof s.abandonmentsToday === "number" && s.abandonmentsToday >= 0 ? Math.floor(s.abandonmentsToday) : 0;
+
+  const discipline = Math.max(0, 100 - (abandonments * 15));
+  const isLocked = isEnabled && isRunning && (elapsedSec < sessionMin * 60);
+
+  return {
+    versionCode: 146,
+    versionName: "4.5.6",
+    monkModeActive: isEnabled,
+    strictnessLevel: strictness === "ZEN_COMPACT" ? "ZEN_COMPACT" : "STRICT",
+    isLocked: isLocked,
+    pauseDisabled: isLocked && strictness === "STRICT",
+    coolingOffWindowSec: strictness === "ZEN_COMPACT" ? 30 : 0,
+    disciplineScore: discipline,
+    penaltyMinutes: penaltyMin,
+    abandonmentsToday: abandonments,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetMonkModeSessionMetrics = dfGetMonkModeSessionMetrics;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetMonkModeSessionMetrics = dfGetMonkModeSessionMetrics;
+}
