@@ -13689,3 +13689,68 @@ if (typeof globalThis !== "undefined") {
   globalThis.dfGetWeeklySparklineWidgetPayload = dfGetWeeklySparklineWidgetPayload;
   globalThis.dfGetPhase1MilestoneSummary = dfGetPhase1MilestoneSummary;
 }
+
+// ============================================================================
+// MISSION #321: 90-Minute Ultradian Rhythm Cycles Protocol (v4.5.1)
+// ============================================================================
+function dfGetUltradianCycleMetrics(elapsedSeconds, isBreakMode) {
+  const elapsed = typeof elapsedSeconds === "number" && elapsedSeconds >= 0 ? Math.floor(elapsedSeconds) : 0;
+  const elapsedMin = Math.floor(elapsed / 60);
+
+  if (Boolean(isBreakMode)) {
+    const restTotal = 20;
+    const progress = Math.min(100, Math.round((elapsedMin / restTotal) * 100));
+    return {
+      versionCode: 141,
+      versionName: "4.5.1",
+      elapsedMinutes: elapsedMin,
+      currentPhase: "RESTORATIVE_REST",
+      phaseLabel: "Restorative Rest",
+      energyScore: Math.min(100, 50 + Math.round((elapsedMin / restTotal) * 45)),
+      recommendedAction: "Walk, hydrate, and rest visual focus to reset dopamine",
+      cycleProgressPercent: progress,
+      westernDigits: true,
+      timestamp: Date.now()
+    };
+  }
+
+  const cycleTotal = 90;
+  const progress = Math.min(100, Math.round((elapsedMin / cycleTotal) * 100));
+
+  let phase = "FOCUS_RAMP_UP";
+  let phaseLabel = "Focus Ramp-Up";
+  let energy = 75;
+  let action = "Settle into work, eliminate distractions, set session goals";
+
+  if (elapsedMin >= 15 && elapsedMin < 75) {
+    phase = "PEAK_FLOW_STATE";
+    phaseLabel = "Peak Flow State";
+    energy = 95;
+    action = "Maximum neuro-plasticity: tackle difficult concepts and problem sets";
+  } else if (elapsedMin >= 75) {
+    phase = "FATIGUE_CONSOLIDATION";
+    phaseLabel = "Cognitive Consolidation";
+    energy = 60;
+    action = "Summarize insights, wind down complex tasks, prepare for rest";
+  }
+
+  return {
+    versionCode: 141,
+    versionName: "4.5.1",
+    elapsedMinutes: elapsedMin,
+    currentPhase: phase,
+    phaseLabel: phaseLabel,
+    energyScore: energy,
+    recommendedAction: action,
+    cycleProgressPercent: progress,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetUltradianCycleMetrics = dfGetUltradianCycleMetrics;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetUltradianCycleMetrics = dfGetUltradianCycleMetrics;
+}
