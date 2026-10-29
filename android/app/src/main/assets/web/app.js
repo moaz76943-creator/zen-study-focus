@@ -14595,3 +14595,106 @@ if (typeof globalThis !== "undefined") {
   globalThis.dfExportDeckToCsv = dfExportDeckToCsv;
   globalThis.dfImportDeckFromCsv = dfImportDeckFromCsv;
 }
+
+// ============================================================================
+// MISSION #333: Reverse Review Mode Definition to Term (v4.6.3)
+// ============================================================================
+function dfGetReverseReviewCard(card, options) {
+  const c = card || {};
+  const opts = options || {};
+  const term = String(c.term || "Focus").trim();
+  const definition = String(c.definition || "Concentration of mental effort").trim();
+  const sentence = typeof c.exampleSentence === "string" ? c.exampleSentence : "";
+
+  let maskedSentence = "";
+  if (sentence) {
+    const reg = new RegExp(term, "gi");
+    maskedSentence = sentence.replace(reg, "______");
+  }
+
+  const firstLetter = term.charAt(0).toUpperCase();
+  const len = term.length;
+  const hintType = opts.hintType || "FIRST_LETTER";
+  let hint = "";
+
+  if (opts.revealHint) {
+    if (hintType === "PHONETIC" && c.phonetic) {
+      hint = c.phonetic;
+    } else {
+      hint = firstLetter + "_".repeat(Math.max(1, len - 1)) + " (" + len + " letters)";
+    }
+  }
+
+  return {
+    versionCode: 153,
+    versionName: "4.6.3",
+    cardId: c.id || "card_rev",
+    reviewMode: "REVERSE_ACTIVE_RECALL",
+    promptFront: definition,
+    contextSentenceMasked: maskedSentence,
+    targetBack: term,
+    phonetic: c.phonetic || "",
+    deck: c.deck || "General",
+    box: c.box || 1,
+    hintText: hint,
+    isHintRevealed: Boolean(opts.revealHint),
+    termLength: len,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+function dfEvaluateReverseRecallInput(userAnswer, targetTerm) {
+  const ans = String(userAnswer || "").trim().toLowerCase();
+  const target = String(targetTerm || "").trim().toLowerCase();
+
+  if (!ans || !target) {
+    return { isCorrect: false, isExact: false, score: 0, feedback: "EMPTY_INPUT" };
+  }
+
+  if (ans === target) {
+    return { isCorrect: true, isExact: true, score: 100, feedback: "EXACT_MATCH", westernDigits: true };
+  }
+
+  const m = ans.length;
+  const n = target.length;
+  const dp = [];
+  for (let i = 0; i <= m; i++) dp[i] = [i];
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (ans[i - 1] === target[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = Math.min(dp[i - 1][j - 1] + 1, dp[i][j - 1] + 1, dp[i - 1][j] + 1);
+      }
+    }
+  }
+  const dist = dp[m][n];
+  const maxLen = Math.max(m, n);
+  const similarity = Math.max(0, Math.round(((maxLen - dist) / maxLen) * 100));
+  const isClose = (dist === 1 && target.length >= 6);
+
+  return {
+    versionCode: 153,
+    versionName: "4.6.3",
+    isCorrect: isClose,
+    isExact: false,
+    score: isClose ? 85 : Math.max(0, similarity - 20),
+    similarityPercent: similarity,
+    editDistance: dist,
+    feedback: isClose ? "TYPO_CLOSE_MATCH" : "INCORRECT",
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetReverseReviewCard = dfGetReverseReviewCard;
+  window.dfEvaluateReverseRecallInput = dfEvaluateReverseRecallInput;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetReverseReviewCard = dfGetReverseReviewCard;
+  globalThis.dfEvaluateReverseRecallInput = dfEvaluateReverseRecallInput;
+}
