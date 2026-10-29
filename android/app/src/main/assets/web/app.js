@@ -14061,3 +14061,62 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetMonkModeSessionMetrics = dfGetMonkModeSessionMetrics;
 }
+
+// ============================================================================
+// MISSION #327: Phone Pickup & Movement Distraction Alert (v4.5.7)
+// ============================================================================
+function dfGetDistractionMovementMetrics(sensorReading, sessionState, options) {
+  const reading = sensorReading || {};
+  const state = sessionState || {};
+  const opts = options || {};
+
+  const isRunning = Boolean(state.isRunning);
+  const now = typeof opts.currentTime === "number" ? opts.currentTime : Date.now();
+  const lastAlertTime = typeof state.lastAlertTime === "number" ? state.lastAlertTime : 0;
+  const currentPickups = typeof state.pickupCount === "number" && state.pickupCount >= 0 ? Math.floor(state.pickupCount) : 0;
+
+  const pitch = Math.abs(typeof reading.pitch === "number" ? reading.pitch : 0);
+  const roll = Math.abs(typeof reading.roll === "number" ? reading.roll : 0);
+  const accel = typeof reading.accelDelta === "number" ? reading.accelDelta : 0;
+
+  const sensitivity = (opts.alertSensitivity || "NORMAL").toUpperCase();
+  const pitchThreshold = sensitivity === "HIGH" ? 18 : (sensitivity === "LOW" ? 35 : 25);
+  const rollThreshold = sensitivity === "HIGH" ? 20 : (sensitivity === "LOW" ? 40 : 30);
+  const accelThreshold = sensitivity === "HIGH" ? 1.5 : (sensitivity === "LOW" ? 3.0 : 2.0);
+
+  const isMoving = isRunning && (pitch > pitchThreshold || roll > rollThreshold) && (accel > accelThreshold);
+  const isDebounced = lastAlertTime === 0 || (now - lastAlertTime) >= 5000;
+
+  let triggered = false;
+  let newPickups = currentPickups;
+
+  if (isMoving && isDebounced) {
+    triggered = true;
+    newPickups++;
+    state.lastAlertTime = now;
+    state.pickupCount = newPickups;
+  }
+
+  const purity = Math.max(0, 100 - (newPickups * 5));
+
+  return {
+    versionCode: 147,
+    versionName: "4.5.7",
+    isPickupDetected: triggered,
+    pickupCount: newPickups,
+    focusPurityPercent: purity,
+    shouldTriggerAlertChime: triggered && opts.audioChimeEnabled !== false,
+    reminderAdvice: triggered
+      ? "Unconscious phone pickup detected: place phone back on desk and return to focus"
+      : "Device resting stable on desk",
+    westernDigits: true,
+    timestamp: now
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetDistractionMovementMetrics = dfGetDistractionMovementMetrics;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetDistractionMovementMetrics = dfGetDistractionMovementMetrics;
+}
