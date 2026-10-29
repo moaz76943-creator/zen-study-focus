@@ -13957,3 +13957,65 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfSynthesizeBinauralBeats = dfSynthesizeBinauralBeats;
 }
+
+// ============================================================================
+// MISSION #325: Exam Simulation Mode with 5-Minute Warning (v4.5.5)
+// ============================================================================
+function dfGetExamSimulationMetrics(elapsedSeconds, totalDurationMinutes) {
+  const elapsed = typeof elapsedSeconds === "number" && elapsedSeconds >= 0 ? Math.floor(elapsedSeconds) : 0;
+  const totalMin = typeof totalDurationMinutes === "number" && totalDurationMinutes > 0 ? Math.floor(totalDurationMinutes) : 90;
+  const totalSec = totalMin * 60;
+
+  const remSec = Math.max(0, totalSec - elapsed);
+  const progress = Math.min(100, Math.round((elapsed / totalSec) * 100));
+
+  const remM = Math.floor(remSec / 60);
+  const remS = remSec % 60;
+  const formattedRemaining = (remM < 10 ? "0" + remM : "" + remM) + ":" + (remS < 10 ? "0" + remS : "" + remS);
+
+  let stage = "NORMAL_PROGRESS";
+  let stageLabel = "Exam In Progress";
+  let advice = "Pace yourself evenly; answer confident questions first";
+  let isFinal5 = false;
+  let triggerChime = false;
+
+  if (remSec === 0) {
+    stage = "TIME_EXPIRED";
+    stageLabel = "Time Expired";
+    advice = "Pencils down: review your final score and take a rest";
+  } else if (remSec <= 300) {
+    stage = "FINAL_5_MINUTES";
+    stageLabel = "Final 5 Minutes";
+    advice = "Review answer sheet, ensure all required fields are filled, double check flagged items";
+    isFinal5 = true;
+    if (remSec === 300) triggerChime = true;
+  } else if (progress >= 75) {
+    stage = "URGENCY_WARNING";
+    stageLabel = "Final Quarter";
+    advice = "Final 25% of time remaining: begin wrapping up complex essay / math problems";
+  }
+
+  return {
+    versionCode: 145,
+    versionName: "4.5.5",
+    stage: stage,
+    stageLabel: stageLabel,
+    totalDurationMinutes: totalMin,
+    elapsedSeconds: elapsed,
+    remainingSeconds: remSec,
+    formattedRemaining: formattedRemaining,
+    isFinal5Minutes: isFinal5,
+    shouldTrigger5mChime: triggerChime,
+    pacingAdvice: advice,
+    progressPercent: progress,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetExamSimulationMetrics = dfGetExamSimulationMetrics;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetExamSimulationMetrics = dfGetExamSimulationMetrics;
+}
