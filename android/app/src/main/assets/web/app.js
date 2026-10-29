@@ -13287,3 +13287,37 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetWidgetTimerPayload = dfGetWidgetTimerPayload;
 }
+
+// ============================================================================
+// MISSION #312: Daily Goal & Streak Bar Widget State Bridge (v4.4.2)
+// ============================================================================
+function dfGetWidgetDailyGoalProgressPayload(stats) {
+  const s = stats || {};
+  const streakDays = typeof s.streakDays === "number" && s.streakDays >= 0 ? Math.floor(s.streakDays) : 0;
+  const todayMinutes = typeof s.todayMinutes === "number" && s.todayMinutes >= 0 ? Math.floor(s.todayMinutes) : 0;
+  const goalMinutes = typeof s.goalMinutes === "number" && s.goalMinutes > 0 ? Math.floor(s.goalMinutes) : 120;
+
+  const percent = Math.min(100, Math.round((todayMinutes / goalMinutes) * 100));
+  const isGoalMet = todayMinutes >= goalMinutes;
+
+  return {
+    versionCode: 132,
+    versionName: "4.4.2",
+    streakDays: streakDays,
+    todayMinutes: todayMinutes,
+    goalMinutes: goalMinutes,
+    percent: percent,
+    isGoalMet: isGoalMet,
+    formattedGoalString: todayMinutes + " / " + goalMinutes + " MIN",
+    formattedStreakString: "🔥 " + streakDays + " DAYS",
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetWidgetDailyGoalProgressPayload = dfGetWidgetDailyGoalProgressPayload;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetWidgetDailyGoalProgressPayload = dfGetWidgetDailyGoalProgressPayload;
+}
