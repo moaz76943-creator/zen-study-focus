@@ -14698,3 +14698,125 @@ if (typeof globalThis !== "undefined") {
   globalThis.dfGetReverseReviewCard = dfGetReverseReviewCard;
   globalThis.dfEvaluateReverseRecallInput = dfEvaluateReverseRecallInput;
 }
+
+// ============================================================================
+// MISSION #334: Smart Multiple-Choice Quiz Generator (v4.6.4)
+// ============================================================================
+function dfGenerateSmartMcqQuestion(targetCard, deckCards, options) {
+  const card = targetCard || { term: "Focus", definition: "Attention state", deck: "General" };
+  const allCards = Array.isArray(deckCards) ? deckCards : [];
+  const opts = options || {};
+
+  const qType = opts.questionType === "TERM_TO_DEF" ? "TERM_TO_DEF" : "DEF_TO_TERM";
+  const optCount = typeof opts.optionCount === "number" && opts.optionCount >= 2 && opts.optionCount <= 6 ? opts.optionCount : 4;
+
+  const candidatePool = allCards.filter(c => c && c.id !== card.id && (c.term || "").trim().toLowerCase() !== (card.term || "").trim().toLowerCase());
+
+  const sameDeck = candidatePool.filter(c => (c.deck || "General").toLowerCase() === (card.deck || "General").toLowerCase());
+  let distractors = [...sameDeck];
+
+  if (distractors.length < (optCount - 1)) {
+    const diffDeck = candidatePool.filter(c => (c.deck || "General").toLowerCase() !== (card.deck || "General").toLowerCase());
+    for (const d of diffDeck) {
+      if (distractors.length >= (optCount - 1)) break;
+      distractors.push(d);
+    }
+  }
+
+  const fallbacks = [
+    { term: "Neuroplasticity", definition: "Brain adaptability" },
+    { term: "Homeostasis", definition: "Internal equilibrium" },
+    { term: "Serendipity", definition: "Fortunate happenstance" },
+    { term: "Resilience", definition: "Capacity to recover" }
+  ];
+  for (const f of fallbacks) {
+    if (distractors.length >= (optCount - 1)) break;
+    if (f.term.toLowerCase() !== (card.term || "").toLowerCase()) {
+      distractors.push(f);
+    }
+  }
+
+  distractors = distractors.slice(0, optCount - 1);
+
+  const correctOptionText = qType === "TERM_TO_DEF" ? (card.definition || card.term) : card.term;
+  const rawOptions = [
+    { text: correctOptionText, isCorrect: true, cardId: card.id || "target" }
+  ];
+
+  for (const d of distractors) {
+    const dText = qType === "TERM_TO_DEF" ? (d.definition || d.term) : d.term;
+    rawOptions.push({ text: dText, isCorrect: false, cardId: d.id || "distractor" });
+  }
+
+  for (let i = rawOptions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = rawOptions[i];
+    rawOptions[i] = rawOptions[j];
+    rawOptions[j] = temp;
+  }
+
+  const optionLetters = ["A", "B", "C", "D", "E", "F"];
+  let correctLetter = "A";
+  let correctIndex = 0;
+
+  const finalOptions = rawOptions.map((opt, idx) => {
+    const letter = optionLetters[idx] || String(idx + 1);
+    if (opt.isCorrect) {
+      correctLetter = letter;
+      correctIndex = idx;
+    }
+    return {
+      id: letter,
+      text: opt.text,
+      isCorrect: opt.isCorrect
+    };
+  });
+
+  const prompt = qType === "TERM_TO_DEF"
+    ? 'What is the meaning of: "' + card.term + '"?'
+    : 'Which term matches: "' + (card.definition || card.term) + '"?';
+
+  return {
+    versionCode: 154,
+    versionName: "4.6.4",
+    questionType: qType,
+    promptText: prompt,
+    targetTerm: card.term,
+    targetDefinition: card.definition,
+    options: finalOptions,
+    correctOptionId: correctLetter,
+    correctOptionIndex: correctIndex,
+    totalOptions: finalOptions.length,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+function dfEvaluateMcqAnswer(selectedOptionId, mcqQuestion) {
+  const q = mcqQuestion || {};
+  const selected = String(selectedOptionId || "").toUpperCase().trim();
+  const correct = String(q.correctOptionId || "").toUpperCase().trim();
+
+  const isCorrect = Boolean(selected && selected === correct);
+
+  return {
+    versionCode: 154,
+    versionName: "4.6.4",
+    selectedOptionId: selected,
+    correctOptionId: correct,
+    isCorrect: isCorrect,
+    feedback: isCorrect ? "CORRECT" : "INCORRECT",
+    explanation: "Correct answer: (" + correct + ") " + (q.targetTerm || ""),
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGenerateSmartMcqQuestion = dfGenerateSmartMcqQuestion;
+  window.dfEvaluateMcqAnswer = dfEvaluateMcqAnswer;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGenerateSmartMcqQuestion = dfGenerateSmartMcqQuestion;
+  globalThis.dfEvaluateMcqAnswer = dfEvaluateMcqAnswer;
+}
