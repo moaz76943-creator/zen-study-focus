@@ -13321,3 +13321,47 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetWidgetDailyGoalProgressPayload = dfGetWidgetDailyGoalProgressPayload;
 }
+
+// ============================================================================
+// MISSION #313: Daily Vocab Flashcard Widget State Bridge (v4.4.3)
+// ============================================================================
+function dfGetWidgetVocabCardPayload(cards, activeIndex) {
+  const cardList = Array.isArray(cards) && cards.length > 0 ? cards : [
+    {
+      term: "Serendipity",
+      definition: "Finding valuable or agreeable things not sought for",
+      phonetic: "/ˌser.ənˈdɪp.ə.ti/",
+      deck: "Zen Essentials"
+    }
+  ];
+
+  const total = cardList.length;
+  let idx = typeof activeIndex === "number" ? Math.floor(activeIndex) : 0;
+  if (idx < 0 || idx >= total) idx = 0;
+
+  const card = cardList[idx] || cardList[0];
+  const displayNum = idx + 1;
+  const numStr = displayNum < 10 ? "0" + displayNum : "" + displayNum;
+  const totalStr = total < 10 ? "0" + total : "" + total;
+
+  return {
+    versionCode: 133,
+    versionName: "4.4.3",
+    currentIndex: displayNum,
+    totalCards: total,
+    term: card.term || "Serenity",
+    definition: card.definition || "The state of being calm, peaceful, and untroubled",
+    phonetic: card.phonetic || "",
+    deck: card.deck || "General",
+    formattedCardIndex: "CARD " + numStr + " / " + totalStr,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetWidgetVocabCardPayload = dfGetWidgetVocabCardPayload;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetWidgetVocabCardPayload = dfGetWidgetVocabCardPayload;
+}
