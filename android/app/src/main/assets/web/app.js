@@ -13754,3 +13754,84 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetUltradianCycleMetrics = dfGetUltradianCycleMetrics;
 }
+
+// ============================================================================
+// MISSION #322: DeskTime 52/17 High-Performance Protocol (v4.5.2)
+// ============================================================================
+function dfGetDeskTime5217Metrics(elapsedSeconds, isBreakMode) {
+  const elapsed = typeof elapsedSeconds === "number" && elapsedSeconds >= 0 ? Math.floor(elapsedSeconds) : 0;
+  const elapsedMin = Math.floor(elapsed / 60);
+
+  if (Boolean(isBreakMode)) {
+    const totalRest = 17;
+    const remMin = Math.max(0, totalRest - elapsedMin);
+    const progress = Math.min(100, Math.round((elapsedMin / totalRest) * 100));
+
+    let stage = "DISCONNECT_STAGE";
+    let stageLabel = "Screen Disconnect";
+    let advice = "Step away from all screens: look at distance and rest eye muscles";
+
+    if (elapsedMin >= 8) {
+      stage = "REJUVENATION_STAGE";
+      stageLabel = "Rejuvenation & Hydration";
+      advice = "Light movement, hydrate, and prepare mind for the next sprint";
+    }
+
+    return {
+      versionCode: 142,
+      versionName: "4.5.2",
+      mode: "BREAK_17M",
+      stage: stage,
+      stageLabel: stageLabel,
+      elapsedMinutes: elapsedMin,
+      remainingMinutes: remMin,
+      progressPercent: progress,
+      burnoutRisk: "LOW",
+      recommendedProtocol: advice,
+      westernDigits: true,
+      timestamp: Date.now()
+    };
+  }
+
+  const totalWork = 52;
+  const remMin = Math.max(0, totalWork - elapsedMin);
+  const progress = Math.min(100, Math.round((elapsedMin / totalWork) * 100));
+
+  let stage = "INITIAL_SPRINT";
+  let stageLabel = "Initial Sprint";
+  let risk = "LOW";
+  let advice = "Lock in on the single most critical task of this block";
+
+  if (elapsedMin >= 20 && elapsedMin < 45) {
+    stage = "DEEP_EXECUTION";
+    stageLabel = "Deep Execution";
+    advice = "Zero context switching: maintain continuous momentum";
+  } else if (elapsedMin >= 45) {
+    stage = "FINAL_PUSH";
+    stageLabel = "Final Push";
+    advice = "Wrap up active sub-tasks; do not start new cognitive branches";
+    if (elapsedMin > 52) risk = "MODERATE";
+  }
+
+  return {
+    versionCode: 142,
+    versionName: "4.5.2",
+    mode: "WORK_52M",
+    stage: stage,
+    stageLabel: stageLabel,
+    elapsedMinutes: elapsedMin,
+    remainingMinutes: remMin,
+    progressPercent: progress,
+    burnoutRisk: risk,
+    recommendedProtocol: advice,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetDeskTime5217Metrics = dfGetDeskTime5217Metrics;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetDeskTime5217Metrics = dfGetDeskTime5217Metrics;
+}
