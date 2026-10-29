@@ -13835,3 +13835,66 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetDeskTime5217Metrics = dfGetDeskTime5217Metrics;
 }
+
+// ============================================================================
+// MISSION #323: Non-Sleep Deep Rest (NSDR) Reset Protocol (v4.5.3)
+// ============================================================================
+function dfGetNsdrResetProtocolMetrics(elapsedSeconds, targetMinutes) {
+  const elapsed = typeof elapsedSeconds === "number" && elapsedSeconds >= 0 ? Math.floor(elapsedSeconds) : 0;
+  const target = typeof targetMinutes === "number" && targetMinutes > 0 ? Math.floor(targetMinutes) : 10;
+  const totalSeconds = target * 60;
+  const elapsedMin = Math.floor(elapsed / 60);
+  const remSeconds = Math.max(0, totalSeconds - elapsed);
+  const remMin = Math.ceil(remSeconds / 60);
+  const progress = Math.min(100, Math.round((elapsed / totalSeconds) * 100));
+
+  let phase = "BODY_SCAN";
+  let phaseTitle = "Somatic Release & Grounding";
+  let instruction = "Close your eyes, let gravity pull your shoulders down, feel your feet on the ground";
+  let inhale = 4;
+  let exhale = 4;
+
+  if (progress >= 25 && progress < 50) {
+    phase = "EXHALATION_PACING";
+    phaseTitle = "Vagus Nerve Deceleration";
+    instruction = "Inhale slowly for 4 seconds, exhale softly for 8 seconds to lower heart rate";
+    inhale = 4;
+    exhale = 8;
+  } else if (progress >= 50 && progress < 80) {
+    phase = "DIFFUSE_ATTENTION";
+    phaseTitle = "Hypnagogic Reverie (Theta Boundary)";
+    instruction = "Release all mental tasks; let thoughts float by without catching them";
+    inhale = 5;
+    exhale = 7;
+  } else if (progress >= 80) {
+    phase = "GENTLE_REEMERGENCE";
+    phaseTitle = "Cognitive Re-engagement";
+    instruction = "Wiggle your fingers, take two energizing deep breaths, bring focus back into room";
+    inhale = 4;
+    exhale = 4;
+  }
+
+  const restoration = Math.min(100, Math.round(progress * 0.95) + (progress >= 100 ? 5 : 0));
+
+  return {
+    versionCode: 143,
+    versionName: "4.5.3",
+    phase: phase,
+    phaseTitle: phaseTitle,
+    elapsedMinutes: elapsedMin,
+    remainingMinutes: remMin,
+    progressPercent: progress,
+    instructionText: instruction,
+    breathingRatio: { inhale: inhale, exhale: exhale },
+    dopamineRestorationPercent: restoration,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetNsdrResetProtocolMetrics = dfGetNsdrResetProtocolMetrics;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetNsdrResetProtocolMetrics = dfGetNsdrResetProtocolMetrics;
+}
