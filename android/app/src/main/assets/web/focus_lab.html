@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Deep Focus Lab — offline focus planning</title>
+  <meta name="description" content="Offline Deep Focus Lab: plan study blocks, reading progress, weekly intentions, sport intervals and project time budgets without any network access.">
+  <link rel="stylesheet" href="design_tokens_v22.css">
+  <link rel="stylesheet" href="ui_components_v22.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0 1rem 2rem;
+      background: var(--df-color-surface, #f5f6fa);
+      color: var(--df-color-on-surface, #1b1e27);
+      font-family: var(--df-font-body, system-ui, sans-serif);
+      line-height: 1.5;
+    }
+    .focus-lab-header {
+      max-width: 62rem;
+      margin: 0 auto;
+      padding: 1.5rem 0 0.5rem;
+    }
+    .focus-lab-header h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
+    .focus-lab-skip {
+      position: absolute;
+      left: -9999px;
+      padding: 0.5rem 1rem;
+      background: var(--df-color-accent, #4a63d8);
+      color: #fff;
+    }
+    .focus-lab-skip:focus { left: 0.5rem; top: 0.5rem; }
+    .focus-lab-nav {
+      max-width: 62rem;
+      margin: 0 auto 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .focus-lab-nav a {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.5rem;
+      background: var(--df-color-chip, #e6e9f5);
+      color: var(--df-color-on-chip, #28305a);
+      text-decoration: none;
+    }
+    .focus-card {
+      max-width: 62rem;
+      margin: 1rem auto;
+      padding: 1rem;
+      border: 1px solid var(--df-color-border, #d3d7e6);
+      border-radius: 0.75rem;
+      background: var(--df-color-card, #ffffff);
+    }
+    .focus-card h2 { margin: 0 0 0.5rem; font-size: 1.15rem; }
+    .focus-lab-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0.5rem 0; }
+    .focus-lab-row label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.9rem; }
+    .focus-lab-output { font-size: 0.95rem; margin: 0.5rem 0; }
+    [role="alert"] { margin: 0.5rem 0; color: var(--df-color-alert, #a4262c); font-size: 0.95rem; }
+    .focus-lab-list { padding-left: 1.25rem; margin: 0.5rem 0; }
+    .focus-lab-list button { margin-left: 0.5rem; }
+    .focus-lab-footer { max-width: 62rem; margin: 2rem auto 0; font-size: 0.85rem; color: var(--df-color-muted, #5a5f72); }
+  </style>
+</head>
+<body>
+  <a class="focus-lab-skip" href="#focus-lab-main">Skip to main content</a>
+
+  <header class="focus-lab-header">
+    <h1>Deep Focus Lab</h1>
+    <p>Offline planning workspace. This page works without a network: study plans, reading
+      progress, weekly intentions, sport intervals and project time budgets are all built
+      locally and nothing is uploaded anywhere.</p>
+  </header>
+
+  <nav class="focus-lab-nav" aria-label="Focus lab sections">
+    <a href="#study-plans">Study plans</a>
+    <a href="#reading">Reading</a>
+    <a href="#weekly-intentions">Weekly intentions</a>
+    <a href="#sports-training">Sports training</a>
+    <a href="#projects">Projects</a>
+    <a href="index.html">Open main library</a>
+  </nav>
+
+  <main id="focus-lab-main">
+    <section class="focus-card" id="study-plans" aria-labelledby="study-plans-heading" data-focus-card>
+      <h2 id="study-plans-heading">Study plans</h2>
+      <div class="focus-lab-row">
+        <label for="study-name">Plan name
+          <input id="study-name" type="text" autocomplete="off" placeholder="Exam Math">
+        </label>
+        <label for="study-subject">Subject
+          <input id="study-subject" type="text" autocomplete="off" placeholder="Linear algebra">
+        </label>
+        <label for="study-template">Template
+          <select id="study-template"></select>
+        </label>
+        <button id="study-plan-apply" type="button">Create study plan</button>
+      </div>
+      <p class="focus-lab-output" id="study-plan-summary" aria-live="polite"></p>
+      <ul class="focus-lab-list" id="study-plan-days" aria-label="Planned study days"></ul>
+      <p id="study-plan-error" role="alert"></p>
+    </section>
+
+    <section class="focus-card" id="reading" aria-labelledby="reading-heading" data-focus-card>
+      <h2 id="reading-heading">Reading</h2>
+      <div class="focus-lab-row">
+        <label for="reading-title">Book title
+          <input id="reading-title" type="text" autocomplete="off" placeholder="Deep Work">
+        </label>
+        <label for="reading-total-pages">Total pages
+          <input id="reading-total-pages" type="number" min="1" value="240">
+        </label>
+        <button id="reading-book-open" type="button">Start a book</button>
+      </div>
+      <div class="focus-lab-row">
+        <label for="reading-current-page">Current page
+          <input id="reading-current-page" type="number" min="0" value="0">
+        </label>
+        <button id="reading-progress-apply" type="button">Update progress</button>
+      </div>
+      <div class="focus-lab-row">
+        <label for="reading-bookmark-page">Bookmark page
+          <input id="reading-bookmark-page" type="number" min="1" value="1">
+        </label>
+        <label for="reading-bookmark-label">Bookmark label
+          <input id="reading-bookmark-label" type="text" autocomplete="off" placeholder="Key chapter">
+        </label>
+        <button id="reading-bookmark-add" type="button">Add bookmark</button>
+      </div>
+      <p class="focus-lab-output" id="reading-summary" aria-live="polite"></p>
+      <ul class="focus-lab-list" id="reading-bookmark-list" aria-label="Reading bookmarks"></ul>
+      <p id="reading-error" role="alert"></p>
+    </section>
+
+    <section class="focus-card" id="weekly-intentions" aria-labelledby="weekly-intentions-heading" data-focus-card>
+      <h2 id="weekly-intentions-heading">Weekly intentions</h2>
+      <div class="focus-lab-row">
+        <label for="intentions-week-start">Week starting
+          <input id="intentions-week-start" type="date">
+        </label>
+        <label for="intention-title">Intention
+          <input id="intention-title" type="text" autocomplete="off" placeholder="Review German verbs">
+        </label>
+        <label for="intention-day">Day
+          <select id="intention-day">
+            <option value="mon">Mon</option>
+            <option value="tue">Tue</option>
+            <option value="wed">Wed</option>
+            <option value="thu">Thu</option>
+            <option value="fri">Fri</option>
+            <option value="sat">Sat</option>
+            <option value="sun">Sun</option>
+          </select>
+        </label>
+        <label for="intention-minutes">Planned minutes
+          <input id="intention-minutes" type="number" min="1" max="600" value="30">
+        </label>
+        <button id="intention-add" type="button">Add intention</button>
+      </div>
+      <p class="focus-lab-output" id="intentions-summary" aria-live="polite"></p>
+      <ul class="focus-lab-list" id="intention-list" aria-label="Weekly intentions"></ul>
+      <p id="intentions-error" role="alert"></p>
+    </section>
+
+    <section class="focus-card" id="sports-training" aria-labelledby="sports-training-heading" data-focus-card>
+      <h2 id="sports-training-heading">Sports training</h2>
+      <div class="focus-lab-row">
+        <label for="sport-template">Interval session
+          <select id="sport-template"></select>
+        </label>
+        <label for="sport-name">Session name
+          <input id="sport-name" type="text" autocomplete="off" placeholder="Morning HIIT">
+        </label>
+        <button id="sport-session-build" type="button">Build session timeline</button>
+      </div>
+      <p class="focus-lab-output" id="sport-summary" aria-live="polite"></p>
+      <ol class="focus-lab-list" id="sport-timeline" aria-label="Session timeline"></ol>
+      <p id="sport-error" role="alert"></p>
+    </section>
+
+    <section class="focus-card" id="projects" aria-labelledby="projects-heading" data-focus-card>
+      <h2 id="projects-heading">Projects</h2>
+      <div class="focus-lab-row">
+        <label for="project-name">Project name
+          <input id="project-name" type="text" autocomplete="off" placeholder="Deck rebuild">
+        </label>
+        <label for="project-budget-minutes">Budget minutes
+          <input id="project-budget-minutes" type="number" min="15" value="600">
+        </label>
+        <button id="project-budget-open" type="button">Open project budget</button>
+      </div>
+      <div class="focus-lab-row">
+        <label for="project-log-label">Session label
+          <input id="project-log-label" type="text" autocomplete="off" placeholder="Core layout">
+        </label>
+        <label for="project-log-minutes">Session minutes
+          <input id="project-log-minutes" type="number" min="1" value="90">
+        </label>
+        <label for="project-log-category">Category
+          <select id="project-log-category">
+            <option value="focus">Focus</option>
+            <option value="admin">Admin</option>
+            <option value="review">Review</option>
+            <option value="meeting">Meeting</option>
+          </select>
+        </label>
+        <button id="project-session-log" type="button">Log session</button>
+      </div>
+      <p class="focus-lab-output" id="project-summary" aria-live="polite"></p>
+      <p id="project-error" role="alert"></p>
+    </section>
+  </main>
+
+  <footer class="focus-lab-footer">
+    <p>Deep Focus Lab runs entirely on this device. Plans, books, intentions, sessions and budgets
+      are calculated by the local engines; no data leaves the page.</p>
+  </footer>
+
+  <script src="js/room5/study_plan_templates_engine.js"></script>
+  <script src="js/room5/reading_bookmarks_engine.js"></script>
+  <script src="js/room5/focus_weekly_intentions_engine.js"></script>
+  <script src="js/room5/sport_interval_builder_engine.js"></script>
+  <script src="js/room5/project_time_budget_engine.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var STUDY = window.StudyPlanTemplatesEngine;
+      var READING = window.DeepFocusReadingBookmarks;
+      var INTENTIONS = window.DeepFocusWeeklyIntentions;
+      var SPORT = window.SportIntervalBuilderEngine;
+      var PROJECT = window.ProjectTimeBudgetEngine;
+
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function text(node, value) {
+        node.textContent = value;
+      }
+
+      function clearNode(node) {
+        node.replaceChildren();
+      }
+
+      function showError(node, messages) {
+        text(node, messages.join(' '));
+      }
+
+      function fillSelect(select, templates) {
+        clearNode(select);
+        for (var i = 0; i < templates.length; i++) {
+          var option = document.createElement('option');
+          option.value = templates[i].id;
+          option.textContent = templates[i].name;
+          select.appendChild(option);
+        }
+      }
+
+      function mondayOfCurrentWeek() {
+        var now = new Date();
+        var day = now.getDay();
+        var diff = (day === 0 ? 6 : day - 1);
+        var monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diff);
+        var month = String(monday.getMonth() + 1);
+        var date = String(monday.getDate());
+        if (month.length < 2) month = '0' + month;
+        if (date.length < 2) date = '0' + date;
+        return monday.getFullYear() + '-' + month + '-' + date;
+      }
+
+      var studySummary = byId('study-plan-summary');
+      var studyList = byId('study-plan-days');
+      var studyError = byId('study-plan-error');
+      if (STUDY) {
+        fillSelect(byId('study-template'), STUDY.listTemplates());
+      }
+
+      byId('study-plan-apply').addEventListener('click', function () {
+        var name = byId('study-name').value.trim();
+        var subject = byId('study-subject').value.trim();
+        var templateId = byId('study-template').value;
+        var problems = [];
+        if (!name) problems.push('Enter a plan name.');
+        if (!subject) problems.push('Enter a subject.');
+        if (problems.length) {
+          showError(studyError, problems);
+          return;
+        }
+        clearNode(studyError);
+        var result = STUDY.createPlanFromTemplate(templateId, {
+          name: name,
+          subject: subject,
+          days: ['mon', 'tue', 'wed', 'thu', 'fri']
+        });
+        if (!result.ok) {
+          var messages = [];
+          for (var i = 0; i < result.errors.length; i++) messages.push(result.errors[i].message);
+          showError(studyError, messages);
+          return;
+        }
+        var plan = result.plan;
+        var summary = STUDY.summarizePlan(plan);
+        text(studySummary, plan.name + ' (' + plan.subject + '): ' + summary.minutesPerWeek +
+          ' focused minutes per week across ' + summary.daysPerWeek + ' study days; plan spans ' +
+          summary.planHours + ' hours in total.');
+        clearNode(studyList);
+        for (var d = 0; d < plan.days.length; d++) {
+          var item = document.createElement('li');
+          text(item, plan.days[d] + ' — ' + plan.sessionsPerDay + ' x ' + plan.sessionMinutes +
+            ' min' + ' + ' + plan.breakMinutes + ' min break');
+          studyList.appendChild(item);
+        }
+      });
+
+      var book = null;
+      var readingSummary = byId('reading-summary');
+      var readingBookmarks = byId('reading-bookmark-list');
+      var readingError = byId('reading-error');
+
+      function renderReadingSummary() {
+        var summary = READING.summarizeBook(book);
+        text(readingSummary, book.title + ': page ' + summary.currentPage + ' of ' +
+          summary.totalPages + ' (' + summary.percentComplete + '% complete).');
+      }
+
+      byId('reading-book-open').addEventListener('click', function () {
+        var title = byId('reading-title').value.trim();
+        var total = parseInt(byId('reading-total-pages').value, 10);
+        if (!title) {
+          showError(readingError, ['Enter a book title.']);
+          return;
+        }
+        clearNode(readingError);
+        var result = READING.createBook({ title: title, totalPages: total, currentPage: 0 });
+        if (!result.ok) {
+          showError(readingError, ['Start a real book: enter a title and a positive page count.']);
+          return;
+        }
+        book = result.book;
+        renderReadingSummary();
+      });
+
+      byId('reading-progress-apply').addEventListener('click', function () {
+        if (!book) {
+          showError(readingError, ['Start a book first.']);
+          return;
+        }
+        clearNode(readingError);
+        var page = parseInt(byId('reading-current-page').value, 10);
+        var result = READING.updateProgress(book, page);
+        if (!result.ok) {
+          showError(readingError, ['Enter a whole page number.']);
+          return;
+        }
+        book = result.book;
+        renderReadingSummary();
+      });
+
+      byId('reading-bookmark-add').addEventListener('click', function () {
+        if (!book) {
+          showError(readingError, ['Start a book first.']);
+          return;
+        }
+        var page = parseInt(byId('reading-bookmark-page').value, 10);
+        var label = byId('reading-bookmark-label').value.trim();
+        if (!label) {
+          showError(readingError, ['Give the bookmark a label.']);
+          return;
+        }
+        clearNode(readingError);
+        var result = READING.addBookmark(book, { page: page, label: label });
+        if (!result.ok) {
+          showError(readingError, ['Bookmark pages must be between 1 and the total page count.']);
+          return;
+        }
+        book = result.book;
+        clearNode(readingBookmarks);
+        for (var i = 0; i < book.bookmarks.length; i++) {
+          var marker = book.bookmarks[i];
+          var item = document.createElement('li');
+          text(item, 'page ' + marker.page + ' — ' + marker.label);
+          readingBookmarks.appendChild(item);
+        }
+        renderReadingSummary();
+      });
+
+      var week = null;
+      var intentionsSummary = byId('intentions-summary');
+      var intentionList = byId('intention-list');
+      var intentionsError = byId('intentions-error');
+      byId('intentions-week-start').value = mondayOfCurrentWeek();
+
+      function ensureWeek() {
+        if (week) return true;
+        var weekStart = byId('intentions-week-start').value;
+        var result = INTENTIONS.createWeeklyPlan({
+          weekStart: weekStart,
+          intentions: []
+        });
+        if (!result.ok) {
+          showError(intentionsError, ['Choose a valid week start date.']);
+          return false;
+        }
+        week = result.plan;
+        return true;
+      }
+
+      function renderIntentions() {
+        var summary = INTENTIONS.summarizeWeeklyPlan(week);
+        text(intentionsSummary, summary.completed + ' of ' + summary.total +
+          ' intentions done; ' + summary.doneMinutes + ' of ' + summary.plannedMinutes +
+          ' planned minutes completed.');
+        clearNode(intentionList);
+        for (var i = 0; i < week.intentions.length; i++) {
+          addIntentionRow(week.intentions[i], i);
+        }
+      }
+
+      function addIntentionRow(intention, index) {
+        var item = document.createElement('li');
+        text(item, (intention.completed ? '[done] ' : '') + intention.day + ': ' + intention.title +
+          ' (' + (intention.estimatedMinutes || 0) + ' min)');
+        var toggle = document.createElement('input');
+        toggle.type = 'checkbox';
+        toggle.id = 'intention-done-' + index;
+        toggle.checked = intention.completed === true;
+        toggle.setAttribute('aria-label', 'Mark "' + intention.title + '" as done');
+        toggle.addEventListener('change', function () {
+          var result = INTENTIONS.setCompleted(week, intention.id, toggle.checked);
+          if (result.ok) {
+            week = result.plan;
+            renderIntentions();
+          }
+        });
+        item.appendChild(toggle);
+        var remove = document.createElement('button');
+        remove.type = 'button';
+        remove.id = 'intention-remove-' + index;
+        remove.textContent = 'Remove';
+        remove.addEventListener('click', function () {
+          var result = INTENTIONS.removeIntention(week, intention.id);
+          if (result.ok) {
+            week = result.plan;
+            renderIntentions();
+          }
+        });
+        item.appendChild(remove);
+        intentionList.appendChild(item);
+      }
+
+      byId('intention-add').addEventListener('click', function () {
+        if (!ensureWeek()) return;
+        var title = byId('intention-title').value.trim();
+        var minutes = parseInt(byId('intention-minutes').value, 10);
+        if (!title) {
+          showError(intentionsError, ['Write the intention you want to commit to.']);
+          return;
+        }
+        if (!isFinite(minutes) || minutes < 1 || minutes > 600) {
+          showError(intentionsError, ['Plan between 1 and 600 minutes for an intention.']);
+          return;
+        }
+        clearNode(intentionsError);
+        var day = byId('intention-day').value;
+        var result = INTENTIONS.addIntention(week, {
+          title: title,
+          day: day,
+          estimatedMinutes: minutes
+        });
+        if (!result.ok) {
+          showError(intentionsError, ['The local engine rejected the intention: check title, day and minutes.']);
+          return;
+        }
+        week = result.plan;
+        renderIntentions();
+      });
+
+      var sportSummary = byId('sport-summary');
+      var sportTimeline = byId('sport-timeline');
+      var sportError = byId('sport-error');
+      if (SPORT) {
+        fillSelect(byId('sport-template'), SPORT.listTemplates());
+      }
+
+      byId('sport-session-build').addEventListener('click', function () {
+        var name = byId('sport-name').value.trim();
+        if (!name) {
+          showError(sportError, ['Name the session, for example Morning HIIT.']);
+          return;
+        }
+        clearNode(sportError);
+        var result = SPORT.createSessionFromTemplate(byId('sport-template').value, { name: name });
+        if (!result.ok) {
+          showError(sportError, ['Pick one of the built in interval sessions.']);
+          return;
+        }
+        var timeline = SPORT.buildTimeline(result.plan);
+        clearNode(sportTimeline);
+        for (var i = 0; i < timeline.steps.length; i++) {
+          var step = timeline.steps[i];
+          var item = document.createElement('li');
+          text(item, step.label + ' — ' + step.minutes + ' min (' + step.startMinute + '-' +
+            step.endMinute + ', intensity ' + step.intensity + ')');
+          sportTimeline.appendChild(item);
+        }
+        text(sportSummary, result.plan.name + ': ' + timeline.totalMinutes +
+          ' min total, including ' + timeline.workMinutes + ' hard minutes across ' +
+          timeline.totalSteps + ' steps.');
+      });
+
+      var budget = null;
+      var projectSummary = byId('project-summary');
+      var projectError = byId('project-error');
+
+      byId('project-budget-open').addEventListener('click', function () {
+        var name = byId('project-name').value.trim();
+        if (!name) {
+          showError(projectError, ['Name the project you want to budget.']);
+          return;
+        }
+        clearNode(projectError);
+        var minutes = parseInt(byId('project-budget-minutes').value, 10);
+        var result = PROJECT.createBudget({ name: name, budgetMinutes: minutes });
+        if (!result.ok) {
+          showError(projectError, ['Choose a project name and a positive budget in minutes.']);
+          return;
+        }
+        budget = result.budget;
+        renderProjectSummary();
+      });
+
+      function renderProjectSummary() {
+        var summary = PROJECT.summarizeBudget(budget);
+        var over = '';
+        if (summary.overBudget) {
+          over = ' over budget by ' + summary.overByMinutes + ' minutes,';
+        }
+        text(projectSummary, budget.name + ': ' + summary.remainingMinutes +
+          ' of ' + summary.budgetMinutes + ' minutes left (' + summary.usedPercent +
+          '% used,' + over + ' ' + summary.sessionCount + ' sessions logged).');
+      }
+
+      byId('project-session-log').addEventListener('click', function () {
+        if (!budget) {
+          showError(projectError, ['Open a project budget first.']);
+          return;
+        }
+        var label = byId('project-log-label').value.trim();
+        if (!label) {
+          showError(projectError, ['Describe what you worked on.']);
+          return;
+        }
+        clearNode(projectError);
+        var result = PROJECT.addSession(budget, {
+          label: label,
+          minutes: parseInt(byId('project-log-minutes').value, 10),
+          category: byId('project-log-category').value
+        });
+        if (!result.ok) {
+          showError(projectError, ['Sessions need a label, a positive minute count and a valid category.']);
+          return;
+        }
+        budget = result.budget;
+        renderProjectSummary();
+      });
+    }());
+  </script>
+</body>
+</html>

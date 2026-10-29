@@ -1,0 +1,218 @@
+{
+  "zu": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "2",
+        "8",
+        "14",
+        "27",
+        "34"
+      ],
+      "tasks": [
+        "addCheck",
+        "delegate",
+        "do",
+        "eliminate",
+        "notConnected",
+        "schedule"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 129,
+    "native_review_pending": true,
+    "font_device_qa": "REVIEW_REQUIRED",
+    "runtime_no_silent_fallback_qa": "NOT_TESTED"
+  },
+  "xh": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "2",
+        "8",
+        "14",
+        "27",
+        "34"
+      ],
+      "tasks": [
+        "addCheck",
+        "delegate",
+        "do",
+        "eliminate",
+        "notConnected",
+        "schedule"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 129,
+    "native_review_pending": true,
+    "font_device_qa": "REVIEW_REQUIRED",
+    "runtime_no_silent_fallback_qa": "NOT_TESTED"
+  },
+  "sn": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "1",
+        "2",
+        "7",
+        "8",
+        "14",
+        "27",
+        "34"
+      ],
+      "tasks": [
+        "addCheck",
+        "delegate",
+        "do",
+        "eliminate",
+        "estimated",
+        "invalid",
+        "notConnected",
+        "schedule"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 125,
+    "native_review_pending": true,
+    "font_device_qa": "REVIEW_REQUIRED",
+    "runtime_no_silent_fallback_qa": "NOT_TESTED"
+  },
+  "st": {
+    "status": "REVIEW_REQUIRED",
+    "review_required": {
+      "analytics": [
+        "noGoals"
+      ],
+      "goals": [
+        "desc",
+        "hint",
+        "invalid",
+        "weekInvalid"
+      ],
+      "notes": [
+        "1",
+        "2",
+        "7",
+        "8",
+        "14",
+        "27",
+        "34"
+      ],
+      "tasks": [
+        "addCheck",
+        "delegate",
+        "do",
+        "eliminate",
+        "estimated",
+        "invalid",
+        "notConnected",
+        "schedule"
+      ],
+      "timer": [
+        "2",
+        "9"
+      ]
+    },
+    "prior_reviewed_keys": 0,
+    "new_candidate_keys": 125,
+    "native_review_pending": true,
+    "font_device_qa": "REVIEW_REQUIRED",
+    "runtime_no_silent_fallback_qa": "NOT_TESTED"
+  },
+  "_suspicious_duplicates": [
+    {
+      "pair": [
+        "zu",
+        "xh"
+      ],
+      "family": "timer",
+      "key": "3",
+      "text": "Ukugxila · imizuzu"
+    },
+    {
+      "pair": [
+        "zu",
+        "xh"
+      ],
+      "family": "timer",
+      "key": "5",
+      "text": "Ikhefu elide · imizuzu"
+    },
+    {
+      "pair": [
+        "zu",
+        "xh"
+      ],
+      "family": "tasks",
+      "key": "task",
+      "text": "Igama lomsebenzi"
+    },
+    {
+      "pair": [
+        "zu",
+        "xh"
+      ],
+      "family": "tasks",
+      "key": "review",
+      "text": "Ukufunda incwadi"
+    },
+    {
+      "pair": [
+        "zu",
+        "xh"
+      ],
+      "family": "notes",
+      "key": "33",
+      "text": "Bonisa impendulo"
+    },
+    {
+      "pair": [
+        "zu",
+        "xh"
+      ],
+      "family": "analyticsDomain",
+      "key": "read",
+      "text": "Ukufunda incwadi"
+    }
+  ]
+}

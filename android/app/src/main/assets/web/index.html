@@ -2,14 +2,11 @@
 <html lang="en" dir="ltr" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ZEN FOCUS - v21 Ultimate Edition</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Focus - v21 Ultimate Edition</title>
   <style>
     :root {
-      --bg-sheet: #f4f7fc;
+      --bg-sheet: #fbfdff;
       --card-pure: #ffffff;
       --primary: #2563eb;
       --primary-cyan: #06b6d4;
@@ -26,7 +23,7 @@
       --text-muted: #64748b;
       --text-light: #94a3b8;
       --border-soft: #e2e8f0;
-      --shadow-card: 0 12px 30px -6px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+      --shadow-card: 0 8px 24px -8px rgba(15, 23, 42, 0.07), 0 2px 8px -3px rgba(15, 23, 42, 0.025);
       --shadow-float: 0 16px 36px -6px rgba(37, 99, 235, 0.28);
       --radius-sheet: 34px;
       --radius-xl: 24px;
@@ -37,12 +34,12 @@
 
     * {
       box-sizing: border-box; margin: 0; padding: 0;
-      font-family: 'Inter', 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Noto Sans Arabic', sans-serif;
       font-variant-numeric: tabular-nums lining-nums;
       -webkit-tap-highlight-color: transparent;
     }
     body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 104px; overflow-x: hidden; user-select: none; }
-    input, textarea { user-select: text; direction: ltr; text-align: start; }
+    input, textarea { user-select: text; text-align: start; }
 
     body.deep-lockdown .dynamic-hero-header,
     body.deep-lockdown .bottom-nav-capsule,
@@ -57,7 +54,7 @@
       padding: 24px; text-align: center;
     }
     .desk-clock-overlay.active { display: flex; animation: fadeIn 0.25s ease-out; }
-    .desk-digits { font-size: 5.8rem; font-weight: 900; color: var(--text-main); letter-spacing: -3px; line-height: 1; }
+    .desk-digits { font-size: 5.8rem; font-weight: 600; color: var(--text-main); letter-spacing: -3px; line-height: 1; }
 
     .app-shell { width: 100%; max-width: 440px; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
 
@@ -97,7 +94,7 @@
     }
 
     .header-titles-center { text-align: center; position: relative; z-index: 2; }
-    .header-main-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.3px; }
+    .header-main-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
     .header-sub-caption { font-size: 0.76rem; opacity: 0.88; margin-top: 2px; font-weight: 500; }
 
     .ecosystem-strip {
@@ -111,7 +108,7 @@
 
     /* Main White Sheet */
     .main-white-sheet {
-      background: var(--bg-sheet);
+      background: #ffffff;
       border-top-left-radius: var(--radius-sheet);
       border-top-right-radius: var(--radius-sheet);
       margin-top: -26px;
@@ -141,6 +138,7 @@
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px;
     }
     .domain-card {
+      appearance: none; width: 100%; min-width: 0; font: inherit; text-align: center;
       background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 18px;
       padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 5px;
       cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
@@ -183,7 +181,7 @@
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 14px; border-bottom: 1px solid #f1f5f9; margin-bottom: 14px;
     }
-    .balance-big-digits { font-size: 1.7rem; font-weight: 900; color: var(--text-main); display: flex; align-items: baseline; gap: 6px; }
+    .balance-big-digits { font-size: 1.7rem; font-weight: 600; color: var(--text-main); display: flex; align-items: baseline; gap: 6px; }
     .growth-pill-green {
       background: var(--emerald-soft); color: var(--emerald); padding: 4px 11px;
       border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 800;
@@ -215,7 +213,7 @@
     .ring-bar.golden-warning { stroke: #f59e0b !important; }
     .ring-center { position: absolute; text-align: center; }
     .ring-plant { font-size: 1.85rem; margin-bottom: 2px; }
-    .ring-time { font-size: 3.15rem; font-weight: 900; letter-spacing: -1.2px; color: var(--text-main); line-height: 1; }
+    .ring-time { font-size: 3.15rem; font-weight: 600; letter-spacing: -1.5px; color: var(--text-main); line-height: 1; }
     .ring-mode-txt { font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; max-width: 165px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .ring-task-pill {
       font-size: 0.68rem; font-weight: 800; color: var(--primary); background: var(--primary-soft);
@@ -354,7 +352,7 @@
 
     .sbg-ocean { background-image: linear-gradient(180deg, rgba(3, 105, 161, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/ocean.jpg'); background-color: #0284c7; }
     .sbg-rain { background-image: linear-gradient(180deg, rgba(51, 65, 85, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/rain.jpg'); background-color: #475569; }
-    .sbg-fire { background-image: linear-gradient(180deg, rgba(180, 83, 9, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/fire.jpg'); background-color: #d97706; }
+    .sbg-fire { background-image: linear-gradient(180deg, rgba(180, 83, 9, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/fire.svg'); background-color: #d97706; }
     .sbg-forest { background-image: linear-gradient(180deg, rgba(5, 150, 105, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/forest.jpg'); background-color: #059669; }
     .sbg-stream { background-image: linear-gradient(180deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/stream.jpg'); background-color: #0369a1; }
     .sbg-leaves { background-image: linear-gradient(180deg, rgba(22, 101, 52, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/leaves.jpg'); background-color: #15803d; }
@@ -383,10 +381,10 @@
     .analytics-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     .an-kpi-card {
       background: var(--card-pure); border-radius: 20px; padding: 14px 16px;
-      box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8); cursor: pointer;
+      box-shadow: var(--shadow-card); border: 1px solid rgba(226, 232, 240, 0.8);
     }
     .an-kpi-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.73rem; font-weight: 700; color: var(--text-muted); }
-    .an-kpi-num { font-size: 1.55rem; font-weight: 900; color: var(--text-main); margin: 4px 0; }
+    .an-kpi-num { font-size: 1.55rem; font-weight: 600; color: var(--text-main); margin: 4px 0; }
     .an-kpi-trend { font-size: 0.7rem; font-weight: 800; color: var(--emerald); }
 
     .overview-split-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
@@ -423,6 +421,173 @@
     }
     .bnav-btn svg { width: 19px; height: 19px; fill: currentColor; }
     .bnav-btn.active { color: var(--primary); background: var(--primary-soft); }
+
+    /* Accessibility, readable saved notes, and compact phones */
+    .lcard-body { user-select: text; -webkit-user-select: text; }
+    button:focus-visible, input:focus-visible, select:focus-visible,
+    textarea:focus-visible, .domain-card:focus-visible {
+      outline: 2px solid var(--primary-cyan);
+      outline-offset: 2px;
+    }
+    .lang-switcher-pill { max-width: 56%; min-width: 0; }
+    #currentLangLabel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @media (max-width: 350px) {
+      .bottom-nav-capsule { width: calc(100% - 12px); padding: 5px 3px; }
+      .bnav-btn { padding: 5px 2px; font-size: .56rem; min-width: 0; }
+      .bnav-btn svg { width: 18px; height: 18px; }
+      .ring-container { width: 195px; height: 195px; }
+      .ring-time { font-size: 2.9rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+
+    /* Deep Focus / White 2100. Functional screen, not an image background. */
+    :root { --header-grad: linear-gradient(135deg,#f9fcff 0%,#f2f8ff 65%,#fbfaff 100%); --radius-xl: 26px; }
+    body { background: #fbfcff; }
+    body.timer-home:not(.deep-lockdown) .dynamic-hero-header {
+      background: radial-gradient(ellipse at 78% 0%,rgba(101,118,255,.09),transparent 45%),
+                  linear-gradient(135deg,#ffffff 0%,#f5fbff 100%) !important;
+      color: #18253e; padding: 10px 16px 7px;
+      border-bottom: 1px solid rgba(190,212,243,.6);
+    }
+    body.timer-home .dynamic-hero-header::before { opacity:.3; }
+    body.timer-home .dynamic-hero-header .header-top-row { margin-bottom:5px; }
+    body.timer-home .header-icon-btn { background:#f1f6ff; color:#3458a3; border-color:#dce7fb; }
+    body.timer-home .lang-switcher-pill { background:#f1f6ff; color:#253d73; border-color:#dce7fb; }
+    body.timer-home .header-main-title { font-size:1.04rem; font-weight:750; }
+    body.timer-home .header-sub-caption { font-size:.68rem; color:#64748b; margin-top:1px; }
+    body.timer-home .ecosystem-strip { display:none; }
+    body.timer-home:not(.deep-lockdown) .main-white-sheet { margin-top:0; border-radius:0; box-shadow:none; padding:8px 14px 30px; }
+    body.timer-home:not(.deep-lockdown) .pure-white-card { border:1px solid #e7edfa; box-shadow:0 9px 28px -14px rgba(38,80,147,.12),0 2px 8px rgba(52,99,165,.025); }
+    .focus-hero-card { isolation:isolate; overflow:hidden; padding:13px 15px 15px; border-radius:30px; }
+    .focus-hero-card::before { content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+      background:radial-gradient(ellipse 65% 48% at 50% 40%,rgba(56,189,248,.095),transparent 75%),
+      radial-gradient(ellipse 45% 42% at 88% 58%,rgba(153,102,255,.07),transparent 80%),#fff; }
+    .focus-card-topline {display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;gap:8px;}
+    .focus-card-eyebrow {color:#3a5a9f;font-size:.74rem;font-weight:700;letter-spacing:.1px;}
+    .focus-status {font-size:.65rem;color:#109e82;background:#ebfcf7;border:1px solid #d3f8ea;border-radius:50px;padding:4px 11px;}
+    .focus-hero-card .segmented-pills-bar {background:#f1f5fd;margin-bottom:5px;}
+    .focus-hero-card .seg-pill {font-size:.73rem;padding:8px 6px;}
+    .focus-hero-card .seg-pill.active {background:linear-gradient(125deg,#ebf8ff,#fff);color:#1766bb;box-shadow:0 2px 8px rgba(49,114,242,.12);}
+    .focus-hero-card .timer-ring-box {padding:0 0 7px;}
+    .focus-hero-card .ring-container {width:min(59vw,239px);height:min(59vw,239px);max-width:239px;max-height:239px;}
+    .focus-hero-card .ring-container::before {content:"";position:absolute;inset:4%;border-radius:50%;
+      background:radial-gradient(circle at 36% 23%,rgba(255,255,255,.96),rgba(223,244,255,.25) 65%,rgba(224,222,255,.14));
+      box-shadow:inset 0 0 20px rgba(82,131,209,.06),0 0 29px rgba(0,172,237,.07);}
+    .focus-hero-card .ring-bg {stroke:#ebeffd;stroke-width:8;}
+    .focus-hero-card .ring-bar {stroke-width:9;filter:drop-shadow(0 0 6px rgba(8,173,241,.34));}
+    .focus-hero-card .ring-center {width:90%;pointer-events:none;}
+    .focus-hero-card .ring-time {font-size:clamp(2.6rem,12vw,3.45rem);font-weight:600;letter-spacing:-2.2px;}
+    .focus-hero-card .ring-plant {font-size:1.35rem;}
+    .focus-hero-card .ring-task-pill {pointer-events:auto;max-width:190px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+    .focus-hero-card .timer-main-controls {margin:0 auto 1px;max-width:270px;}
+    .focus-hero-card .btn-round-play {width:63px;height:63px;background:linear-gradient(135deg,#19bcf3,#4367ff 58%,#9763ed);box-shadow:0 8px 26px rgba(56,117,232,.28);}
+    .focus-hero-card .btn-round-sec {width:43px;height:43px;border-color:#e1eafa;}
+    .focus-hero-card .time-delta-row {margin-top:12px;gap:5px;flex-wrap:nowrap;}
+    .focus-hero-card .delta-chip {padding:7px 5px;flex:1;min-width:0;font-size:.7rem;font-weight:650;}
+    .home-domains-heading {display:flex;justify-content:space-between;align-items:center;gap:8px;padding:0 6px;margin:7px 0 9px;}
+    .home-domains-heading span {font-size:.93rem;font-weight:750;color:#1d2c4a;}
+    .home-domains-heading small {font-size:.65rem;color:#8391a8;}
+    #sec-timer .domain-pedestal-grid {margin-bottom:12px;}
+    #sec-timer .domain-card {border:1px solid #e6edfb;padding:11px 3px 10px;border-radius:20px;background:linear-gradient(150deg,#ffffff,#f9fbff);box-shadow:0 5px 16px -10px rgba(24,66,131,.18);}
+    #sec-timer .domain-card.active {border-color:#72c2ff;background:linear-gradient(140deg,#eafaff,#f7f5ff);box-shadow:0 0 0 2px rgba(83,168,252,.11),0 7px 22px -11px rgba(52,105,220,.34);transform:none;}
+    #sec-timer .domain-squircle {width:39px;height:39px;border-radius:14px;font-size:1.15rem;}
+    #sec-timer .domain-title {font-size:.73rem;font-weight:650;}
+    #sec-timer .domain-context-bar {background:#fff;border-color:#e6ecfa;}
+    .quick-training-card {padding:0 !important;overflow:hidden;}
+    .training-summary {display:flex;align-items:center;gap:12px;padding:15px;cursor:pointer;list-style:none;}
+    .training-summary::-webkit-details-marker {display:none;}
+    .training-icon {background:linear-gradient(145deg,#e4faff,#e9e5ff);border:1px solid #e7dcff;border-radius:14px;width:43px;height:43px;display:grid;place-items:center;font-size:1.25rem;}
+    .training-summary-text {display:flex;flex-direction:column;flex:1;gap:3px;min-width:0;}
+    .training-summary-text strong {font-size:.92rem;color:#172c53;font-weight:750;}
+    .training-summary-text small {font-size:.68rem;color:#71839f;}
+    .training-chevron {font-size:1.4rem;color:#6a84b7;transition:transform .2s;}
+    details[open] .training-chevron {transform:rotate(180deg);}
+    .training-content {padding:4px 15px 15px;border-top:1px solid #eef2fb;}
+    .training-fields {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px;}
+    .training-fields label {display:flex;flex-direction:column;gap:5px;font-size:.69rem;color:#64758f;text-align:center;}
+    .training-fields input {width:100%;border:1px solid #e0eaf9;border-radius:13px;background:#f7faff;padding:9px 4px;text-align:center;direction:ltr;color:#102a4f;font-size:1.15rem;font-weight:650;font-variant-numeric:tabular-nums;}
+    .training-toggle {display:flex;align-items:center;gap:9px;margin:14px 1px;color:#344b70;font-size:.76rem;}
+    .training-toggle input {accent-color:#18bf95;width:19px;height:19px;}
+    .training-exercises-head {display:flex;justify-content:space-between;align-items:center;margin:11px 0 7px;font-size:.77rem;color:#23385b;}
+    .training-exercises-head span {color:#6684af;}
+    .training-add-row {display:flex;gap:6px;}
+    .training-add-row input {min-width:0;flex:1;border:1px solid #e1e9f7;background:#f9fbff;padding:10px;border-radius:12px;font-size:.73rem;}
+    .training-add-row button,.training-progress-actions button {border:0;border-radius:12px;padding:9px 11px;background:#eef5ff;color:#2e62b2;font-size:.7rem;font-weight:700;cursor:pointer;}
+    .training-exercises {display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+    .training-exercises button {border:1px solid #dce7f9;background:white;color:#54698a;padding:5px 9px;border-radius:30px;font-size:.7rem;}
+    .training-presets {display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:7px 0 13px;}
+    .training-presets button {flex:0 0 auto;background:#f7f9ff;border:1px solid #e0e8fa;border-radius:10px;padding:8px 9px;color:#52688a;font-size:.68rem;cursor:pointer;}
+    .training-progress {margin:3px 0 12px;padding:10px;background:#f4faff;border-radius:14px;color:#2b568d;font-size:.74rem;}
+    .training-progress-bar,.today-progress-track {height:6px;border-radius:10px;overflow:hidden;background:#e6ecf8;margin-top:8px;}
+    .training-progress-bar span,.today-progress-track span {display:block;width:0;height:100%;background:linear-gradient(90deg,#15c6ac,#32b8fa,#8165ff);border-radius:10px;transition:width .2s;}
+    .training-progress-actions {display:flex;gap:8px;margin-top:11px;}
+    .training-progress-actions button:last-child {color:#bc5267;background:#ffedf1;}
+    .training-primary {display:block;width:100%;border:0;border-radius:14px;background:linear-gradient(110deg,#2b83ff,#7055ee);color:#fff;padding:12px;font-size:.86rem;font-weight:750;box-shadow:0 8px 20px -10px #5174f0;cursor:pointer;}
+    .today-plan-card {padding:15px 17px;}
+    .today-plan-title {display:flex;align-items:center;justify-content:space-between;}
+    .today-plan-title h2 {font-size:1rem;font-weight:750;}
+    .small-kicker {font-size:.63rem;color:#4779bb;}
+    .today-plan-title button {border:0;background:#f1f6ff;padding:8px 10px;border-radius:12px;color:#4372c5;font-size:.7rem;}
+    .today-plan-stats {display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:#2b4e83;}
+    .today-plan-stats strong {font-size:.95rem;font-weight:700;}.today-plan-stats span {font-size:.74rem;}
+    .today-plan-preview {display:grid;gap:7px;margin-top:12px;}
+    .today-plan-entry {display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:12px;background:#f9fbff;border:1px solid #f0f4fa;color:#334765;font-size:.72rem;}
+    .today-plan-entry>span:first-child {font-size:1.04rem;}
+    .today-plan-entry>span:nth-child(2) {flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    #sec-timer .quick-orbs-card {margin-top:0;}
+    @media (max-width:350px) {.focus-hero-card .ring-container{width:205px;height:205px}.training-summary{padding:12px}.focus-hero-card .time-delta-row .delta-chip{font-size:.63rem}}
+
+
+    /* Shared white 2100 visual language: no repeated dark marketing masthead. */
+    body:not(.deep-lockdown) .dynamic-hero-header {
+      background:var(--page-ambient,linear-gradient(135deg,#fff,#f3faff)) !important;
+      color:#1c2a47;
+      padding:12px 17px 12px;
+      border-bottom:1px solid rgba(194,214,239,.7);
+    }
+    body:not(.deep-lockdown) .dynamic-hero-header::before {
+      top:-65px;right:-32px;width:185px;height:175px;
+      background:radial-gradient(circle,rgba(115,132,255,.11),transparent 65%);
+    }
+    body:not(.deep-lockdown) .header-top-row {margin-bottom:5px;}
+    body:not(.deep-lockdown) .header-icon-btn {background:#f2f6ff;border-color:#e0e9fa;color:#3c65a1;}
+    body:not(.deep-lockdown) .lang-switcher-pill {background:#f2f6ff;border-color:#dce6f9;color:#33517e;}
+    body:not(.deep-lockdown) .lang-iso-badge {background:#d9f4ff;color:#11639b;}
+    body:not(.deep-lockdown) .header-main-title {font-size:1.05rem;font-weight:750;}
+    body:not(.deep-lockdown) .header-sub-caption {font-size:.69rem;color:#73819a;}
+    body:not(.deep-lockdown) .ecosystem-strip {margin-top:6px;gap:4px;}
+    body:not(.deep-lockdown) .eco-badge {
+      color:#5473a0;background:rgba(255,255,255,.65);
+      border-color:#e0e9f9;padding:4px 8px;font-size:.61rem;
+    }
+    body:not(.deep-lockdown) .main-white-sheet {
+      margin-top:0;border-radius:0;box-shadow:none;
+      background:linear-gradient(180deg,#fff,#fbfdff);
+      padding:12px 14px 30px;
+    }
+    body:not(.deep-lockdown) .pure-white-card {
+      border-color:#e5edfb;
+      box-shadow:0 10px 32px -16px rgba(51,92,163,.16),
+                 0 2px 8px rgba(51,92,163,.025);
+    }
+    .bottom-nav-capsule {
+      background:rgba(255,255,255,.98);
+      border:1px solid #e5ebf9;
+      box-shadow:0 8px 32px -10px rgba(45,87,167,.15);
+    }
+    body:not(.deep-lockdown) #sec-analytics .wave-chart-card {
+      background:linear-gradient(145deg,#f5f9ff 0%,#e8f4ff 65%,#f8f4ff 100%);
+      color:#254069;border:1px solid #dceafa;
+      box-shadow:0 10px 27px -12px rgba(52,95,178,.13);
+    }
+    body:not(.deep-lockdown) #sec-analytics .wave-chart-card .an-kpi-trend {color:#059669;}
+    #sec-analytics .an-kpi-num {font-weight:600;}
+    #sec-tasks .showcase-task-card,#sec-notes .learning-rich-card {
+      border-color:#e5ecf7;box-shadow:0 8px 24px -14px rgba(29,66,137,.12);
+    }
 
     /* Modals */
     .modal-overlay {
@@ -465,6 +630,31 @@
     }
     .toast-pill.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
+  <link rel="stylesheet" href="white_2100.css">
+  <link rel="stylesheet" href="design_tokens_v22.css">
+  <link rel="stylesheet" href="ui_components_v22.css">
+  <link rel="stylesheet" href="completion_alert_picker.css">
+  <style>#sec-tasks.df22-tasks-live > :not(#df22TasksHost),#sec-analytics.df22-analytics-live > :not(#df22AnalyticsHost){display:none} #df22TasksHost,#df22AnalyticsHost{max-width:100%;min-width:0} .df-v22 .screen-section{min-width:0}</style>
+  <style id="western-digits-enforcement-style">
+    input[type="date"], input[type="time"], .date-display, [data-date] {
+      font-variant-numeric: lining-nums !important;
+      -webkit-locale: "en-US" !important;
+      direction: ltr !important;
+    }
+  </style>
+  <style id="pristine-modern-ui-styles">
+    /* ترتيب أزرار الكروت لتصبح أنيقة ومدمجة */
+    .note-card button, .task-card button {
+      border-radius: 10px !important;
+      padding: 4px 10px !important;
+      font-size: 11px !important;
+    }
+    /* فرض الأرقام الغربية في حقول الإدخال */
+    input[type="date"]::-webkit-datetime-edit {
+      font-family: monospace !important;
+      font-variant-numeric: lining-nums !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -484,6 +674,11 @@
           <stop offset="0%" stop-color="#2563eb" />
           <stop offset="100%" stop-color="#06b6d4" />
         </linearGradient>
+        <linearGradient id="zenFutureGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#23d4ef"/>
+          <stop offset="53%" stop-color="#258bfc"/>
+          <stop offset="100%" stop-color="#9659f5"/>
+        </linearGradient>
       </defs>
     </svg>
 
@@ -502,7 +697,7 @@
       </div>
 
       <div class="header-titles-center">
-        <h1 class="header-main-title" id="hdrMainTitle">Focus & Performance</h1>
+        <h1 class="header-main-title" id="hdrMainTitle">Deep Focus</h1>
         <p class="header-sub-caption" id="hdrSubTitle">A smarter world for study, sports & deep work</p>
       </div>
 
@@ -510,7 +705,7 @@
         <span class="eco-badge" onclick="openCloudBackupModal()">☁️ <span data-i18n="pillCloud">Google Backup</span></span>
         <span class="eco-badge" onclick="testCompletionSoundChime()">🔔 <span data-i18n="pillSound">Test Sound</span></span>
         <span class="eco-badge" onclick="shareAppWithFriends()">📤 <span data-i18n="pillShare">Share App</span></span>
-        <span class="eco-badge">🛡️ <span data-i18n="pillSecure">Anti-Mod</span></span>
+        <span class="eco-badge">🔒 <span data-i18n="pillSecure">Local Data</span></span>
       </div>
     </header>
 
@@ -521,87 +716,15 @@
            1. TIMER & MULTI-DOMAIN SECTION
            ====================================================== -->
       <main class="screen-section active" id="sec-timer">
-
-        <div class="domain-pedestal-grid">
-          <div class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)">
-            <div class="domain-squircle">📚</div>
-            <span class="domain-title" data-i18n="domStudy">Study</span>
+                <div class="pure-white-card focus-hero-card" id="focusHeroCard">
+          <div class="focus-card-topline">
+            <span class="focus-card-eyebrow" data-qt="focusToday">✦ مساحة التركيز</span>
+            <span class="focus-status" id="focusStatusLabel" data-qt="ready">جاهز للإنجاز</span>
           </div>
-          <div class="domain-card dom-sport" id="domBtn-sport" onclick="switchActivityDomain('sport', this)">
-            <div class="domain-squircle">🏋️</div>
-            <span class="domain-title" data-i18n="domSport">Workout</span>
-          </div>
-          <div class="domain-card dom-read" id="domBtn-read" onclick="switchActivityDomain('read', this)">
-            <div class="domain-squircle">📖</div>
-            <span class="domain-title" data-i18n="domRead">Reading</span>
-          </div>
-          <div class="domain-card dom-work" id="domBtn-work" onclick="switchActivityDomain('work', this)">
-            <div class="domain-squircle">💻</div>
-            <span class="domain-title" data-i18n="domWork">Deep Work</span>
-          </div>
-        </div>
-
-        <div class="domain-context-bar" id="sportContextBar">
-          <div>
-            <div style="font-size:0.72rem; font-weight:800; color:var(--emerald);" data-i18n="sportSetsTitle">🏋️ Workout Sets & Rest</div>
-            <div style="font-size:0.84rem; font-weight:900;" id="sportSetCounterTxt">Set 1 / 4 • 12 Reps</div>
-          </div>
-          <div style="display:flex; gap:5px;">
-            <button class="delta-chip" onclick="logWorkoutSet()">+1 Set ✓</button>
-            <button class="delta-chip" style="background:var(--emerald-soft); color:var(--emerald);" onclick="startQuickSportRest(45)">Rest 45s</button>
-          </div>
-        </div>
-
-        <div class="domain-context-bar" id="readContextBar">
-          <div>
-            <div style="font-size:0.72rem; font-weight:800; color:var(--violet);" data-i18n="readTrackerTitle">📖 Reading Session Progress</div>
-            <div style="font-size:0.84rem; font-weight:900;" id="readPagesCounterTxt">Pages Read Today: 24</div>
-          </div>
-          <div style="display:flex; gap:5px;">
-            <button class="delta-chip" onclick="addReadPages(5)">+5</button>
-            <button class="delta-chip" onclick="addReadPages(10)">+10</button>
-          </div>
-        </div>
-
-        <div class="pure-white-card quick-orbs-card">
-          <div class="hero-balance-header">
-            <div>
-              <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;" data-i18n="totalFocusToday">Total Active Minutes Today</div>
-              <div class="balance-big-digits">
-                <span id="hdrFocusMins">120</span>
-                <span style="font-size:0.85rem; color:var(--text-muted);" data-i18n="minsUnit">mins</span>
-              </div>
-            </div>
-            <div>
-              <span class="growth-pill-green" id="hdrStreakBadge">↑ 🔥 5 days</span>
-            </div>
-          </div>
-
-          <div class="quick-orbs-row">
-            <div class="orb-item" onclick="openBrainDumpModal()">
-              <div class="orb-circle orb-green">💭</div>
-              <span class="orb-label" data-i18n="orbDump">Quick Idea</span>
-            </div>
-            <div class="orb-item" onclick="addWaterCup()">
-              <div class="orb-circle orb-blue">💧</div>
-              <span class="orb-label" id="orbWaterTxt">Water 4/8</span>
-            </div>
-            <div class="orb-item" onclick="openCloudBackupModal()">
-              <div class="orb-circle orb-purple">☁️</div>
-              <span class="orb-label" data-i18n="orbCloud">Cloud Sync</span>
-            </div>
-            <div class="orb-item" onclick="toggleDeskClock(true)">
-              <div class="orb-circle orb-amber">🖥️</div>
-              <span class="orb-label" data-i18n="orbDesk">Desk Clock</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="pure-white-card">
           <div class="segmented-pills-bar">
-            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerMode(cfg.focusMin, 'focus', this)" data-i18n="modeFocus">25m</button>
-            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerMode(cfg.shortMin, 'short', this)" data-i18n="modeShort">5m</button>
-            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerMode(cfg.longMin, 'long', this)" data-i18n="modeLong">15m</button>
+            <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerModeFromUser(getDomainFocusMinutes(), 'focus', this)" data-i18n="modeFocus">25m</button>
+            <button class="seg-pill" id="modeShortBtn" onclick="selectTimerModeFromUser(cfg.shortMin, 'short', this)" data-i18n="modeShort">5m</button>
+            <button class="seg-pill" id="modeLongBtn" onclick="selectTimerModeFromUser(cfg.longMin, 'long', this)" data-i18n="modeLong">15m</button>
             <button class="seg-pill" id="modeCustomBtn" onclick="openCustomTimerModal()" data-i18n="modeCustom">Custom ⚡</button>
           </div>
 
@@ -622,7 +745,7 @@
 
           <div class="timer-main-controls">
             <button class="btn-round-sec" onclick="resetTimerNow()">↺</button>
-            <button class="btn-round-play" id="mainPlayBtn" onclick="toggleTimerPlay()">
+            <button type="button" class="btn-round-play" id="mainPlayBtn" onclick="toggleTimerPlay()" aria-label="Start or pause timer">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </button>
             <button class="btn-round-sec" onclick="skipTimerPhase()">⏭</button>
@@ -634,6 +757,155 @@
             <button class="delta-chip" onclick="changeTimerDelta(1)">+1m</button>
             <button class="delta-chip" onclick="changeTimerDelta(5)">+5m</button>
             <button class="delta-chip" onclick="changeTimerDelta(10)">+10m</button>
+          </div>
+        </div>
+        <div class="home-domains-heading"><span data-qt="chooseActivity">اختر نوع نشاطك</span><small data-qt="domainsHint">لكل نشاط جلسته المناسبة</small></div>
+        <div class="domain-pedestal-grid">
+          <button type="button" class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)" aria-pressed="true">
+            <div class="domain-squircle">📚</div>
+            <span class="domain-title" data-i18n="domStudy">Study</span>
+            <span class="domain-duration">25:00</span>
+          </button>
+          <button type="button" class="domain-card dom-sport" id="domBtn-sport" onclick="switchActivityDomain('sport', this)" aria-pressed="false">
+            <div class="domain-squircle">🏋️</div>
+            <span class="domain-title" data-i18n="domSport">Workout</span>
+            <span class="domain-duration">30:00</span>
+          </button>
+          <button type="button" class="domain-card dom-read" id="domBtn-read" onclick="switchActivityDomain('read', this)" aria-pressed="false">
+            <div class="domain-squircle">📖</div>
+            <span class="domain-title" data-i18n="domRead">Reading</span>
+            <span class="domain-duration">20:00</span>
+          </button>
+          <button type="button" class="domain-card dom-work" id="domBtn-work" onclick="switchActivityDomain('work', this)" aria-pressed="false">
+            <div class="domain-squircle">💻</div>
+            <span class="domain-title" data-i18n="domWork">Deep Work</span>
+            <span class="domain-duration">50:00</span>
+          </button>
+        </div>
+
+        <div class="home-quick-sessions" aria-label="Focus session shortcuts">
+          <div class="home-quick-heading"><span data-qt="quickSessions">جلسات سريعة</span><button class="timer-settings-chip" type="button" onclick="openTimerSettings()" id="timerSettingsChip">⚙ تخصيص</button></div>
+          <div class="home-quick-options" role="group" aria-label="Quick focus durations">
+            <button type="button" class="home-quick-chip" id="homeQuick10" aria-pressed="false" onclick="selectHomeQuickSession(10)">10:00</button>
+            <button type="button" class="home-quick-chip" id="homeQuick25" aria-pressed="true" onclick="selectHomeQuickSession(25)">25:00</button>
+            <button type="button" class="home-quick-chip" id="homeQuick50" aria-pressed="false" onclick="selectHomeQuickSession(50)">50:00</button>
+          </div>
+        </div>
+
+        <div class="domain-context-bar" id="sportContextBar">
+          <div>
+            <div style="font-size:0.72rem; font-weight:800; color:var(--emerald);" data-i18n="sportSetsTitle">🏋️ Workout Sets & Rest</div>
+            <div style="font-size:0.84rem; font-weight:900;" id="sportSetCounterTxt">Set 0 / 4 • 12 Reps</div>
+          </div>
+          <div style="display:flex; gap:5px;">
+            <button class="delta-chip" onclick="logWorkoutSet()">+1 Set ✓</button>
+            <button class="delta-chip" style="background:var(--emerald-soft); color:var(--emerald);" onclick="startQuickSportRest(45)">Rest 45s</button>
+          </div>
+        </div>
+
+        <div class="domain-context-bar" id="readContextBar">
+          <div>
+            <div style="font-size:0.72rem; font-weight:800; color:var(--violet);" data-i18n="readTrackerTitle">📖 Reading Session Progress</div>
+            <div style="font-size:0.84rem; font-weight:900;" id="readPagesCounterTxt">Pages Read Today: 0</div>
+          </div>
+          <div style="display:flex; gap:5px;">
+            <button class="delta-chip" onclick="addReadPages(5)">+5</button>
+            <button class="delta-chip" onclick="addReadPages(10)">+10</button>
+          </div>
+        </div>
+
+
+        <section class="pure-white-card quick-training-card" id="quickTrainingCard" aria-label="Quick training">
+          <details id="quickTrainingDetails">
+            <summary class="training-summary">
+              <span class="training-icon">⚡</span>
+              <span class="training-summary-text"><strong data-qt="trainingTitle">تدريب سريع</strong><small data-qt="trainingSubtitle">جولات عمل وراحة قابلة للتخصيص</small></span>
+              <span class="training-chevron">⌄</span>
+            </summary>
+            <div class="training-content">
+              <div class="training-fields">
+                <label><span data-qt="rounds">المجموعات</span><input id="qtSets" type="text" inputmode="numeric" value="4" maxlength="2" aria-label="Sets"></label>
+                <label><span data-qt="work">العمل (د:ث)</span><input id="qtWork" type="text" inputmode="text" value="04:00" maxlength="6" aria-label="Work minutes"></label>
+                <label><span data-qt="rest">الراحة (د:ث)</span><input id="qtRest" type="text" inputmode="text" value="00:30" maxlength="6" aria-label="Rest seconds"></label>
+              </div>
+              <label class="training-toggle"><input id="qtSkipLast" type="checkbox" checked><span data-qt="skipLastRest">تخطي الراحة الأخيرة</span></label>
+              <div class="training-exercises-head">
+                <strong data-qt="exercises">التمارين المتتابعة</strong>
+                <span id="qtExerciseCount">0</span>
+              </div>
+              <div class="training-add-row">
+                <input id="qtNewExercise" type="text" maxlength="70" data-qt-placeholder="exercisePlaceholder" placeholder="مثل: تمارين الإطالة أو القراءة المركزة">
+                <button type="button" onclick="addQuickExercise()" data-qt="addExercise">+ إضافة</button>
+              </div>
+              <div class="training-exercises" id="qtExerciseList"></div>
+              <div class="training-presets" role="group" aria-label="Training presets">
+                <button type="button" onclick="applyQuickTrainingPreset('tabata')" data-qt="presetTabata">تدريب 20/10</button>
+                <button type="button" onclick="applyQuickTrainingPreset('workout')" data-qt="presetWorkout">رياضة 4/1</button>
+                <button type="button" onclick="applyQuickTrainingPreset('reading')" data-qt="presetReading">قراءة 20/5</button>
+                <button type="button" onclick="applyQuickTrainingPreset('work')" data-qt="presetWork">عمل 50/10</button>
+              </div>
+              <div class="training-progress" id="qtProgressPanel" hidden>
+                <span id="qtProgressTitle"></span>
+                <div class="training-progress-bar"><span id="qtProgressFill"></span></div>
+                <div class="training-progress-actions">
+                  <button type="button" onclick="skipQuickTrainingStep()" data-qt="skipStep">تخطي المرحلة</button>
+                  <button type="button" onclick="cancelQuickTraining()" data-qt="stopTraining">إنهاء التدريب</button>
+                </div>
+              </div>
+              <button type="button" id="qtStartButton" class="training-primary" onclick="startQuickTraining()" data-qt="startTraining">▶ ابدأ التدريب</button>
+            </div>
+          </details>
+        </section>
+        <section class="pure-white-card today-plan-card" aria-label="Today activity snapshot">
+          <div class="today-plan-title">
+            <div><span class="small-kicker" data-qt="todayProgress">✧ تقدمك اليوم</span><h2 data-qt="todayPlan">خطة اليوم</h2></div>
+            <button type="button" onclick="switchTab('sec-tasks',document.getElementById('navTasks'))" data-qt="viewAll">عرض الكل ↗</button>
+          </div>
+          <div class="home-week-strip" id="homeWeekStrip" aria-label="This week"></div>
+          <div class="today-plan-stats"><strong id="todayPlanRatio">0/0</strong><span id="todayPlanPercent">0%</span></div>
+          <div class="today-progress-track"><span id="todayPlanFill"></span></div>
+          <div id="todayPlanPreview" class="today-plan-preview"></div>
+        </section>
+
+        <section class="pure-white-card daily-goals-card" id="dailyGoalsCard" aria-labelledby="dailyGoalsHeading">
+          <div class="goals-header">
+            <div><span class="small-kicker" id="goalsKicker">✦ DAILY GOALS</span><h2 id="dailyGoalsHeading">Progress by activity</h2>
+            <p id="dailyGoalsDescription">Only completed focus minutes count.</p></div>
+            <button type="button" class="goals-edit" id="goalsEditButton" onclick="openDailyGoalsModal()">⚙ Goals</button>
+          </div>
+          <div class="goals-rows" id="dailyGoalsRows"></div>
+        </section>
+        <div class="pure-white-card quick-orbs-card">
+          <div class="hero-balance-header">
+            <div>
+              <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;" data-i18n="totalFocusToday">Total Active Minutes Today</div>
+              <div class="balance-big-digits">
+                <span id="hdrFocusMins">0</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);" data-i18n="minsUnit">mins</span>
+              </div>
+            </div>
+            <div>
+              <span class="growth-pill-green" id="hdrStreakBadge">↑ 🔥 0 days</span>
+            </div>
+          </div>
+
+          <div class="quick-orbs-row">
+            <div class="orb-item" onclick="openBrainDumpModal()">
+              <div class="orb-circle orb-green">💭</div>
+              <span class="orb-label" data-i18n="orbDump">Quick Idea</span>
+            </div>
+            <div class="orb-item" onclick="addWaterCup()">
+              <div class="orb-circle orb-blue">💧</div>
+              <span class="orb-label" id="orbWaterTxt">Water 0/8</span>
+            </div>
+            <div class="orb-item" onclick="openCloudBackupModal()">
+              <div class="orb-circle orb-purple">☁️</div>
+              <span class="orb-label" data-i18n="orbCloud">Cloud Sync</span>
+            </div>
+            <div class="orb-item" onclick="toggleDeskClock(true)">
+              <div class="orb-circle orb-amber">🖥️</div>
+              <span class="orb-label" data-i18n="orbDesk">Desk Clock</span>
+            </div>
           </div>
         </div>
       </main>
@@ -661,6 +933,7 @@
         </div>
 
         <div class="tasks-showcase-list" id="tasksShowcaseBox"></div>
+        <div id="df22TasksHost" aria-label="Advanced tasks and calendar"></div>
       </main>
 
       <!-- ======================================================
@@ -690,22 +963,26 @@
            4. SMART NOTES SECTION (FULL SEARCH, TAGS & BLUR RECALL)
            ====================================================== -->
       <main class="screen-section" id="sec-notes">
-        <div class="search-pill-box">
-          <span>🔍</span>
-          <input type="text" class="search-pill-inp" id="inpSearchNotes" data-i18n-placeholder="phSearchNotes" placeholder="Search notes, workouts or book summaries..." oninput="renderNotesStack()">
-          <button class="task-mini-sel" onclick="exportAllNotes()" style="cursor:pointer;">📥 TXT</button>
+        <section class="notes-studio-hero">
+          <div class="notes-studio-heading"><small id="nsEyebrow">✦ Notes Studio</small><h2 id="nsTitle">Your ideas, organized</h2><p id="nsSubtitle">Write, revisit and develop your thoughts.</p></div>
+          <div class="notes-studio-stats"><div><strong id="nsTotal">0</strong><span id="nsTotalLabel">My notes</span></div><div><strong id="nsPinned">0</strong><span id="nsPinnedLabel">Pinned</span></div></div>
+          <button type="button" id="nsNewButton" class="ns-new" onclick="openNoteModal()">＋ New note</button>
+        </section>
+        <div class="ns-section-title"><strong id="nsTemplatesTitle">Ready-to-use templates</strong><span id="nsTemplatesHint">Tap to start</span></div>
+        <div id="nsTemplates" class="ns-templates" aria-label="Note templates"></div>
+        <div class="ns-toolbar">
+          <div class="search-pill-box"><span aria-hidden="true">⌕</span><input type="search" class="search-pill-inp" id="inpSearchNotes" placeholder="Search notes..." oninput="renderNotesStack()" aria-label="Search notes"><button id="nsExport" type="button" class="ns-export" onclick="exportAllNotes()" aria-label="Copy all notes">⇩</button></div>
+          <div class="ns-controls"><button id="nsPinnedOnly" type="button" aria-pressed="false" onclick="nsTogglePinnedOnly()">♧ <span id="nsPinnedOnlyLabel">Pinned only</span></button><label><span id="nsSortLabel">Sort</span> <select id="nsSort" onchange="renderNotesStack()" aria-label="Sort notes"><option value="recent">Recent</option><option value="oldest">Oldest</option><option value="title">Title</option></select></label></div>
         </div>
-
-        <div class="segmented-pills-bar">
+        <div class="segmented-pills-bar ns-filters">
           <button class="seg-pill active" onclick="filterNotesByTag('all', this)" data-i18n="filterAll">All</button>
-          <button class="seg-pill" onclick="filterNotesByTag('cornell', this)" data-i18n="tagCornell">Cornell 📋</button>
+          <button class="seg-pill" onclick="filterNotesByTag('cornell', this)" data-i18n="tagCornell">Structured Notes 📋</button>
           <button class="seg-pill" onclick="filterNotesByTag('flash', this)" data-i18n="tagFlash">Recall 👁️</button>
           <button class="seg-pill" onclick="filterNotesByTag('quick', this)" data-i18n="tagQuick">Log 💡</button>
         </div>
-
-        <div class="learning-cards-stack" id="notesStackBox"></div>
-
-        <button class="floating-plus-fab" onclick="openNoteModal()">+</button>
+        <div class="ns-count" id="nsVisibleCount" aria-live="polite"></div>
+        <div class="learning-cards-stack ns-cards" id="notesStackBox"></div>
+        <button class="floating-plus-fab" onclick="openNoteModal()" aria-label="New note">+</button>
       </main>
 
       <!-- ======================================================
@@ -727,6 +1004,7 @@
           <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
         </div>
 
+        <section id="df-tone-picker-card" aria-label="Completion sound"><div id="completionAlertPickerHost"></div></section>
         <div class="sounds-photo-grid" id="soundsGridBox"></div>
       </main>
 
@@ -735,15 +1013,15 @@
            ====================================================== -->
       <main class="screen-section" id="sec-analytics">
         <div class="analytics-kpi-grid">
-          <div class="an-kpi-card" onclick="addQuickSessionRecord()">
+          <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiMinutes">Active Minutes</span><span>🕒</span></div>
-            <div class="an-kpi-num" id="kpiTotalMins">420</div>
-            <div class="an-kpi-trend" data-i18n="kpiTrendWeek">↑ +18% this week</div>
+            <div class="an-kpi-num" id="kpiTotalMins">0</div>
+            <div class="an-kpi-trend" id="kpiWeeklyTrend">Based on recorded focus sessions</div>
           </div>
-          <div class="an-kpi-card" onclick="addQuickSessionRecord()">
+          <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiSessions">Completed Sessions</span><span>🎯</span></div>
-            <div class="an-kpi-num" id="kpiTotalSessions">18</div>
-            <div class="an-kpi-trend" data-i18n="kpiTrendGreat">↑ +12% consistency</div>
+            <div class="an-kpi-num" id="kpiTotalSessions">0</div>
+            <div class="an-kpi-trend" id="kpiSessionTrend">Completed focus sessions only</div>
           </div>
         </div>
 
@@ -756,20 +1034,18 @@
           <div class="overview-split-row">
             <div class="mini-bars-box" id="anMiniBarsBox"></div>
             <div class="donut-box">
-              <svg width="105" height="105" viewBox="0 0 100 100" style="transform:rotate(-90deg);">
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#f1f5f9" stroke-width="11"></circle>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" stroke-width="11" stroke-dasharray="238" stroke-dashoffset="76" stroke-linecap="round"></circle>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#3b82f6" stroke-width="11" stroke-dasharray="238" stroke-dashoffset="165" stroke-linecap="round"></circle>
-              </svg>
-              <div class="donut-center-txt">68%</div>
+              <div id="activityDonut" style="width:105px;height:105px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
+                <div style="width:77px;height:77px;border-radius:50%;background:white;"></div>
+              </div>
+              <div class="donut-center-txt" id="activityDonutText">—</div>
             </div>
           </div>
 
           <div class="legend-grid">
-            <div class="legend-item"><span><i class="legend-dot" style="background:#3b82f6;"></i><span data-i18n="domStudy">Study</span></span><span>38%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#10b981;"></i><span data-i18n="domSport">Workout</span></span><span>30%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#8b5cf6;"></i><span data-i18n="domRead">Reading</span></span><span>20%</span></div>
-            <div class="legend-item"><span><i class="legend-dot" style="background:#f59e0b;"></i><span data-i18n="domWork">Deep Work</span></span><span>12%</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#3b82f6;"></i><span data-i18n="domStudy">Study</span></span><span id="share-study">—</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#10b981;"></i><span data-i18n="domSport">Workout</span></span><span id="share-sport">—</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#8b5cf6;"></i><span data-i18n="domRead">Reading</span></span><span id="share-read">—</span></div>
+            <div class="legend-item"><span><i class="legend-dot" style="background:#f59e0b;"></i><span data-i18n="domWork">Deep Work</span></span><span id="share-work">—</span></div>
           </div>
         </div>
 
@@ -777,9 +1053,9 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <div>
               <div style="font-size:0.74rem; opacity:0.8;" data-i18n="waveFlowTitle">Weekly Performance Index</div>
-              <div style="font-size:1.25rem; font-weight:900;">125.6K <span style="font-size:0.75rem; color:#34d399;">↑ 24%</span></div>
+              <div style="font-size:1.25rem; font-weight:700;"><span id="waveRecordedMinutes">0</span> <span style="font-size:0.75rem;opacity:.85;" id="waveUnit">min / 7 days</span></div>
             </div>
-            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;" data-i18n="peakPerfBadge">Peak Flow</span>
+            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;" id="peakPerfBadge">7 days</span>
           </div>
           <svg viewBox="0 0 320 95" style="width:100%; height:90px; overflow:visible;">
             <defs>
@@ -788,9 +1064,9 @@
                 <stop offset="100%" stop-color="#6366f1" stop-opacity="0.0"/>
               </linearGradient>
             </defs>
-            <path d="M0,75 C40,45 70,80 110,50 C150,20 180,65 225,22 C260,5 290,45 320,30 L320,95 L0,95 Z" fill="url(#waveAreaGrad)"></path>
-            <path d="M0,75 C40,45 70,80 110,50 C150,20 180,65 225,22 C260,5 290,45 320,30" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"></path>
-            <circle cx="225" cy="22" r="5" fill="#10b981" stroke="#ffffff" stroke-width="2"></circle>
+            <path id="waveArea" d="M0 95 L320 95 Z" fill="url(#waveAreaGrad)"></path>
+            <path id="waveLine" d="M0 95 L320 95" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"></path>
+            <circle id="wavePeak" cx="0" cy="95" r="5" fill="#10b981" stroke="#ffffff" stroke-width="2"></circle>
           </svg>
           <div id="waveDaysRow" style="display:flex; justify-content:space-between; font-size:0.65rem; opacity:0.75; margin-top:4px;"></div>
         </div>
@@ -804,16 +1080,13 @@
           </div>
           <div id="syllabusCalcOut" style="font-size:0.78rem; font-weight:800; color:var(--emerald); background:var(--emerald-soft); padding:9px 12px; border-radius:12px;"></div>
         </div>
+        <div id="df22AnalyticsHost" aria-label="History-backed analytics"></div>
       </main>
 
     </div>
 
-    <!-- 6-TAB FLOATING GLASS BOTTOM NAVIGATION -->
-    <nav class="bottom-nav-capsule">
-      <button class="bnav-btn active" id="navTimer" onclick="switchTab('sec-timer', this)">
-        <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-        <span data-i18n="navTimer">Timer</span>
-      </button>
+    <!-- 7-TAB GLASS NAVIGATION: TIMER IN CENTRAL SLOT -->
+    <nav class="bottom-nav-capsule" aria-label="Main navigation">
       <button class="bnav-btn" id="navTasks" onclick="switchTab('sec-tasks', this)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
         <span data-i18n="navTasks">Tasks</span>
@@ -826,6 +1099,11 @@
         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
         <span data-i18n="navNotes">Notes</span>
       </button>
+      <button class="bnav-btn active" id="navTimer" onclick="switchTab('sec-timer', this)">
+        <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+        <span data-i18n="navTimer">Timer</span>
+      </button>
+      <button class="bnav-btn" id="navTraining" onclick="openQuickTrainingFromNav(this)" aria-label="Quick training"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9h3v6H2V9zm4-3h3v12H6V6zm9 0h3v12h-3V6zm4 3h3v6h-3V9zM10 11h4v2h-4v-2z"/></svg><span id="navTrainingText">Training</span></button>
       <button class="bnav-btn" id="navSounds" onclick="switchTab('sec-sounds', this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span data-i18n="navSounds">Nature</span>
@@ -841,10 +1119,10 @@
   <div class="modal-overlay" id="langModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>🌐 Language & Country Search</span>
+        <span data-i18n="langSearchTitle">🌐 Language & Country Search</span>
         <button class="task-mini-sel" onclick="closeModal('langModal')">✕</button>
       </div>
-      <input type="text" class="modal-inp" id="inpLangCountrySearch" placeholder="Search language or country (e.g. Jordan, Spain, USA, مصر)..." oninput="renderLanguageList()">
+      <input type="text" class="modal-inp" id="inpLangCountrySearch" data-i18n-placeholder="langSearchPlaceholder" placeholder="Search language or country (e.g. Jordan, Spain, USA, مصر)..." oninput="renderLanguageList()">
       <div class="lang-list-scroll" id="langListScrollBox"></div>
     </div>
   </div>
@@ -852,25 +1130,53 @@
   <div class="modal-overlay" id="cloudBackupModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>☁️ Google Email & Drive Cloud Sync</span>
+        <span>☁️ Manual Backup & Restore</span>
         <button class="task-mini-sel" onclick="closeModal('cloudBackupModal')">✕</button>
       </div>
       <div style="background:var(--emerald-soft); color:var(--emerald); padding:10px 12px; border-radius:12px; font-size:0.74rem; font-weight:800; margin-bottom:10px;">
-        🛡️ Encrypted & Signed Backup: Save directly to your Google Email (Gmail) or Google Drive to restore on any phone without creating an internal account.
+        ⚠️ Exported backup codes contain readable personal notes and tasks. They are NOT encrypted. Share or save them privately; anyone with the code can read its contents.
       </div>
       <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
-        <button class="mbtn-pri" onclick="syncToGoogleCloudNow()">📧 Save to Gmail / Google Drive</button>
-        <button class="mbtn-sec" onclick="downloadEncryptedBackupFile()">💾 Download Backup File (.zenbackup)</button>
+        <button class="mbtn-pri" onclick="syncToGoogleCloudNow()">📤 Share Backup Code (Manual)</button>
+        <button class="mbtn-sec" onclick="downloadEncryptedBackupFile()">💾 Export Backup File (.zenbackup)</button>
       </div>
       <div style="border-top:1px solid #e2e8f0; padding-top:10px; margin-top:6px;">
         <div style="font-size:0.76rem; font-weight:800; margin-bottom:6px;">🔄 Restore Progress on New Phone:</div>
-        <textarea class="modal-inp" id="inpRestorePayload" style="height:65px; resize:none; font-size:0.72rem;" placeholder="Paste encrypted backup code from your Gmail/Drive here..."></textarea>
+        <textarea class="modal-inp" id="inpRestorePayload" style="height:65px; resize:none; font-size:0.72rem;" placeholder="Paste your backup code here (contains readable data)..."></textarea>
         <div class="modal-actions">
           <button class="mbtn-pri" style="background:var(--emerald);" onclick="restoreFromEncryptedCode()">Restore Code ✓</button>
-          <button class="mbtn-sec" onclick="document.getElementById('fileRestoreInput').click()">📂 Load File</button>
+          <button class="mbtn-sec" onclick="window.ZenNative && typeof ZenNative.importBackupFromFile==='function' ? ZenNative.importBackupFromFile() : document.getElementById('fileRestoreInput').click()">📂 Load File</button>
           <input type="file" id="fileRestoreInput" style="display:none;" accept=".zenbackup,.json,.txt" onchange="restoreFromFileInput(event)">
         </div>
       </div>
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="dailyGoalsModal">
+    <div class="modal-card goals-modal" role="dialog" aria-modal="true" aria-labelledby="goalsModalHeading">
+      <div class="modal-head"><span id="goalsModalHeading">Daily activity goals</span>
+        <button type="button" class="task-mini-sel" onclick="closeModal('dailyGoalsModal')" aria-label="Close">✕</button></div>
+      <p id="goalsModalHint" class="goals-hint">Set 0 to disable a goal. Saved focus sessions count toward each goal.</p>
+      <div class="goals-edit-grid" id="goalsEditGrid"></div>
+      <div class="modal-actions">
+        <button type="button" class="mbtn-sec" onclick="closeModal('dailyGoalsModal')" data-i18n="btnCancel">Cancel</button>
+        <button type="button" class="mbtn-pri" onclick="saveDailyGoals()" data-i18n="btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="timerSettingsModal">
+    <div class="modal-card timer-settings-dialog" role="dialog" aria-modal="true" aria-labelledby="tsetHeading">
+      <div class="modal-head"><span id="tsetHeading">Customize focus cycles</span><button class="task-mini-sel" type="button" onclick="closeModal('timerSettingsModal')">✕</button></div>
+      <p class="timer-settings-info" id="tsetHint">Choose your activity durations; current sessions will not be interrupted.</p>
+      <div class="timer-settings-grid">
+        <label><span id="tsetFocusLabel">Focus minutes</span><input id="tsetFocus" type="number" inputmode="numeric" class="modal-inp" min="1" max="240"></label>
+        <label><span id="tsetShortLabel">Short rest</span><input id="tsetShort" type="number" inputmode="numeric" class="modal-inp" min="1" max="60"></label>
+        <label><span id="tsetLongLabel">Long rest</span><input id="tsetLong" type="number" inputmode="numeric" class="modal-inp" min="1" max="120"></label>
+        <label><span id="tsetRoundsLabel">Focus sessions per cycle</span><input id="tsetRounds" type="number" inputmode="numeric" class="modal-inp" min="1" max="12"></label>
+      </div>
+      <div class="modal-actions"><button class="mbtn-sec" type="button" id="tsetReset" onclick="resetTimerSettingsFields()">Defaults</button><button class="mbtn-pri" type="button" id="tsetSave" onclick="saveTimerSettings()">Save</button></div>
     </div>
   </div>
 
@@ -898,32 +1204,24 @@
   </div>
 
   <div class="modal-overlay" id="noteModal">
-    <div class="modal-card">
-      <div class="modal-head">
-        <span data-i18n="navNotes">📝 Smart Note & Calendar</span>
-        <button class="task-mini-sel" onclick="closeModal('noteModal')">✕</button>
+    <div class="modal-card ns-editor" role="dialog" aria-modal="true" aria-labelledby="nsEditorHeading">
+      <div class="modal-head"><span id="nsEditorHeading">New note</span><button class="task-mini-sel" onclick="nsCloseEditor()" aria-label="Close">✕</button></div>
+      <div id="nsEditorTemplates" class="ns-editor-templates"></div>
+      <label for="inpNoteTitle" id="nsTitleLabel">Title</label>
+      <input type="text" class="modal-inp" id="inpNoteTitle" dir="auto" maxlength="250" placeholder="Title or question" oninput="nsUpdateCount()">
+      <div class="ns-meta">
+        <label><span id="nsTypeLabel">Type</span><select class="modal-inp" id="selNoteCat"><option value="cornell" data-i18n="tagCornell">Cornell</option><option value="flash" data-i18n="tagFlash">Recall</option><option value="quick" data-i18n="tagQuick">Log</option></select></label>
+        <label><span id="nsDateLabel">Date</span><input type="date" class="modal-inp" id="inpNoteCalDate"></label>
       </div>
-      <div style="display:flex; gap:6px; margin-bottom:8px;">
-        <button class="task-mini-sel" onclick="fillNoteTpl('cornell')" data-i18n="tagCornell">📋 Cornell</button>
-        <button class="task-mini-sel" onclick="fillNoteTpl('flash')" data-i18n="tagFlash">👁️ Recall</button>
+      <label for="inpNoteBody" id="nsBodyLabel">Content</label><textarea class="modal-inp" id="inpNoteBody" dir="auto" maxlength="500000" rows="10" placeholder="Write here..." oninput="nsUpdateCount()"></textarea>
+      <small id="nsCounter" aria-live="polite">0 words</small>
+      <div class="ns-draft-bar" id="nsDraftBar"><span id="nsDraftStatus" aria-live="polite"></span><button type="button" id="nsDraftRestore" onclick="nsRestoreDraft()" hidden>Restore</button><button type="button" id="nsDraftDiscard" onclick="nsDiscardDraft()" hidden>Discard</button></div>
+      <div class="ns-options">
+        <label><input id="nsPinCheck" type="checkbox"><span id="nsPinCheckLabel">Pin</span></label>
+        <label><input id="nsFavCheck" type="checkbox"><span id="nsFavCheckLabel">Favorite</span></label>
+        <label><input type="checkbox" id="chkNoteBlur"><span data-i18n="lblBlurAnswer">Hide answer</span></label>
       </div>
-      <input type="text" class="modal-inp" id="inpNoteTitle" placeholder="Title or Question...">
-      <div style="display:flex; gap:6px; margin-bottom:10px;">
-        <select class="modal-inp" id="selNoteCat" style="margin:0; flex:1;">
-          <option value="cornell" data-i18n="tagCornell">📋 Cornell</option>
-          <option value="flash" data-i18n="tagFlash">👁️ Recall</option>
-          <option value="quick" data-i18n="tagQuick">💡 Log</option>
-        </select>
-        <input type="date" class="modal-inp" id="inpNoteCalDate" style="margin:0; flex:1;">
-      </div>
-      <textarea class="modal-inp" id="inpNoteBody" style="height:105px; resize:none;" placeholder="Details..."></textarea>
-      <label style="display:flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:700; margin-bottom:8px;">
-        <input type="checkbox" id="chkNoteBlur"> <span data-i18n="lblBlurAnswer">Blur text for active recall (Tap to reveal)</span>
-      </label>
-      <div class="modal-actions">
-        <button class="mbtn-pri" onclick="saveNewNote()" data-i18n="btnSave">Save</button>
-        <button class="mbtn-sec" onclick="closeModal('noteModal')" data-i18n="btnCancel">Cancel</button>
-      </div>
+      <div class="modal-actions"><button class="mbtn-sec" onclick="nsCloseEditor()" data-i18n="btnCancel">Cancel</button><button class="mbtn-pri" id="nsSaveButton" onclick="saveNewNote()">Save</button></div>
     </div>
   </div>
 
@@ -941,6 +1239,34 @@
     </div>
   </div>
 
+  <script src="js/dom_compat.js"></script>
+  <script src="locale_rows.js"></script>
+  <script src="locale_extras.js"></script>
+  <script src="js/df99_multiscreen_i18n.js"></script>
+  <script src="quick_training.js"></script>
+  <!-- Localization sources must be ready before app.js applies the persisted language. -->
+  <script src="locale_premium_v22.js"></script>
+  <script src="js/df99_reviewed_packs.js"></script>
+  <script src="localization_20_recovery.js"></script>
+  <script src="js/legacy20_analytics_bridge.js"></script>
+  <script src="data_compat_v21.js"></script>
+  <script src="preflight_v22.js"></script>
+  <script src="analytics_core_v21.js"></script>
   <script src="app.js"></script>
+  <script src="notes_core_v21.js"></script>
+  <script src="notes_studio.js"></script>
+  <script src="notes_editor_ui.js"></script>
+  <script src="notes_drafts.js"></script>
+  <script src="tasks_core_v21.js"></script>
+  <script src="tasks_studio.js"></script>
+  <script src="analytics_studio.js"></script>
+  <script src="goals_studio.js"></script>
+  <script src="timer_settings.js"></script>
+  <script src="sound_mix_controls.js"></script>
+  <script src="js/locale_audio_settings_bridge.js"></script>
+  <script src="integration_v22.js"></script>
+  <script src="completion_alert_locales.js"></script>
+  <script src="js/completion_tone_picker.js"></script>
+  <script src="js/deep_focus_runtime_activator.js"></script>
 </body>
 </html>

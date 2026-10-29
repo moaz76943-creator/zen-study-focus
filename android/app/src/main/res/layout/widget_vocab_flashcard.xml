@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_vocab_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="12dp"
+    android:background="#18181B">
+
+    <TextView
+        android:id="@+id/widget_vocab_index"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CARD 01 / 15"
+        android:textColor="#38BDF8"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/widget_vocab_term"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Serendipity"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/widget_vocab_definition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Finding valuable things not sought for"
+        android:textColor="#A1A1AA"
+        android:textSize="12sp"
+        android:maxLines="2"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/widget_btn_next_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NEXT CARD →"
+        android:textColor="#4ADE80"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:layout_marginTop="6dp" />
+</LinearLayout>

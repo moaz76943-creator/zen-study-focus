@@ -1,0 +1,69 @@
+/* Optional v21 nature mixer controller. app.js owns audio playback; this file
+ * coordinates only its public callbacks and explicit lifecycle cleanup.
+ */
+(function(root) {
+ 'use strict';
+ function createSoundMixer({catalog,isPlaying,start,stop,setVolume}) {
+  if(!Array.isArray(catalog)||typeof isPlaying!=='function'||typeof start!=='function'||
+     typeof stop!=='function'||typeof setVolume!=='function')throw new TypeError('Sound mixer dependencies required');
+  const ids=new Set(catalog.map(s=>s&&s.id).filter(id=>typeof id==='string'));
+  if(ids.size!==catalog.length)throw new TypeError('Duplicate sound ID');
+  let disposed=false;
+  const subscriptions=new Set();
+  function percentage(value) {
+   if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>100)return null;
+   return Math.round(value)/100;
+  }
+  function setPercent(id,pct) {
+   if(disposed||!ids.has(id))return false;
+   const level=percentage(pct);if(level===null)return false;
+   setVolume(id,level);return true;
+  }
+  function applyMix(requested) {
+   if(disposed||!Array.isArray(requested)||requested.length>ids.size)return false;
+   const wants=new Map();
+   for(const entry of requested) {
+    if(!entry||!ids.has(entry.id)||wants.has(entry.id))return false;
+    const level=percentage(entry.percent);
+    if(level===null)return false;
+    wants.set(entry.id,level);
+   }
+   for(const id of ids)if(!wants.has(id)&&isPlaying(id))stop(id);
+   for(const [id,level] of wants){
+    if(!isPlaying(id))start(id);
+    setVolume(id,level);
+   }
+   return true;
+  }
+  function stopAll() {
+   if(disposed)return;
+   for(const id of ids)if(isPlaying(id))stop(id);
+  }
+  function activeIds() {return disposed?[]:[...ids].filter(id=>isPlaying(id));}
+  // Optional opt-in: the host decides whether audio continues in background.
+  // In particular, changing locale must never invoke stopAll or playback.
+  function attachLifecycle(doc,{stopOnBackground=false}={}) {
+   if(disposed||!doc||typeof doc.addEventListener!=='function'||
+       typeof doc.removeEventListener!=='function')return () => {};
+   function hidden() {if(stopOnBackground&&doc.visibilityState==='hidden')stopAll();}
+   function leave() {if(stopOnBackground)stopAll();}
+   doc.addEventListener('visibilitychange',hidden);
+   doc.addEventListener('pagehide',leave);
+   let active=true;
+   function detach() {
+    if(!active)return;
+    active=false;
+    doc.removeEventListener('visibilitychange',hidden);
+    doc.removeEventListener('pagehide',leave);
+    subscriptions.delete(detach);
+   }
+   subscriptions.add(detach);
+   return detach;
+  }
+  function dispose() {if(disposed)return;stopAll();for(const detach of [...subscriptions])detach();disposed=true;}
+  return Object.freeze({applyMix,setPercent,stopAll,activeIds,attachLifecycle,dispose});
+ }
+ const api=Object.freeze({createSoundMixer});
+ if(typeof module!=='undefined'&&module.exports)module.exports=api;
+ else root.DeepFocusSoundMixer=api;
+})(typeof window!=='undefined'?window:globalThis);

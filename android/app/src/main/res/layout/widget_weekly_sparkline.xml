@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_sparkline_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#18181B">
+
+    <TextView
+        android:id="@+id/widget_sparkline_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WEEKLY STUDY ACTIVITY"
+        android:textColor="#38BDF8"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/widget_sparkline_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="14.5 HRS THIS WEEK"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="2dp" />
+
+    <LinearLayout
+        android:id="@+id/widget_sparkline_bars_row"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="bottom"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

@@ -1,0 +1,214 @@
+{
+  "language": "ga",
+  "status": "TRANSLATED",
+  "sections": {
+    "notes": {
+      "0": "✦ STIÚIDEO NÓTAÍ",
+      "1": "Do chuid smaointe eagraithe go soiléir",
+      "2": "Scríobh, eagraigh agus athbhreithnigh do chuid smaointe go héasca.",
+      "3": "Mo nótaí",
+      "4": "Pionnáilte",
+      "5": "＋ Nóta nua",
+      "6": "Teimpléid scríbhneoireachta",
+      "7": "Roghnaigh teimpléad le tosú",
+      "8": "Pionnáilte amháin",
+      "9": "Sórtáil",
+      "10": "Is déanaí",
+      "11": "Is sine",
+      "12": "Teideal",
+      "13": "Torthaí",
+      "14": "Níl nótaí meaitseála ann. Bain triail as teimpléad.",
+      "15": "Nóta nua",
+      "16": "Cuir nóta in eagar",
+      "17": "Teideal",
+      "18": "Cineál",
+      "19": "Dáta",
+      "20": "Ábhar",
+      "21": "Pionnáil",
+      "22": "Ceanán",
+      "23": "Focail",
+      "24": "Carachtair",
+      "25": "Sábháil nóta",
+      "26": "Sábháil athruithe",
+      "27": "An gcuirfear an teimpléad in ionad an téacs reatha?",
+      "28": "Cuir in eagar",
+      "29": "Dúblaigh",
+      "30": "Cóipeáil",
+      "31": "Féilire",
+      "32": "Scrios",
+      "33": "Taispeáin freagra",
+      "34": "Níorbh fhéidir cóipeáil.",
+      "35": "Sábháilte"
+    },
+    "timer": {
+      "0": {
+        "text": "⚙ Saincheap",
+        "status": "REVIEW_REQUIRED"
+      },
+      "1": {
+        "text": "Socruithe dírithe agus sosa",
+        "status": "REVIEW_REQUIRED"
+      },
+      "2": {
+        "text": "Coinnítear an seisiún reatha; ní bhaineann athruithe ach le seisiúin nua.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "3": {
+        "text": "Díriú · nóim",
+        "status": "REVIEW_REQUIRED"
+      },
+      "4": {
+        "text": "Sos gearr · nóim",
+        "status": "REVIEW_REQUIRED"
+      },
+      "5": {
+        "text": "Sos fada · nóim",
+        "status": "REVIEW_REQUIRED"
+      },
+      "6": {
+        "text": "Seisiúin sa timthriall",
+        "status": "REVIEW_REQUIRED"
+      },
+      "7": {
+        "text": "Réamhshocruithe",
+        "status": "REVIEW_REQUIRED"
+      },
+      "8": {
+        "text": "Sábháil",
+        "status": "REVIEW_REQUIRED"
+      },
+      "9": {
+        "text": "Cuir isteach slánuimhreacha laistigh de na teorainneacha léirithe.",
+        "status": "REVIEW_REQUIRED"
+      },
+      "10": {
+        "text": "Socruithe sábháilte",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "analyticsDomain": {
+      "study": {
+        "text": "Staidéar",
+        "status": "REVIEW_REQUIRED"
+      },
+      "read": {
+        "text": "Léitheoireacht",
+        "status": "REVIEW_REQUIRED"
+      },
+      "work": {
+        "text": "Obair",
+        "status": "REVIEW_REQUIRED"
+      },
+      "sport": {
+        "text": "Spórt",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "tasks": {
+      "title": {
+        "text": "Tascanna",
+        "status": "REVIEW_REQUIRED"
+      },
+      "add": {
+        "text": "Tasc nua",
+        "status": "REVIEW_REQUIRED"
+      },
+      "search": {
+        "text": "Cuardaigh tascanna",
+        "status": "REVIEW_REQUIRED"
+      },
+      "save": {
+        "text": "Sábháil",
+        "status": "REVIEW_REQUIRED"
+      },
+      "cancel": {
+        "text": "Cealaigh",
+        "status": "REVIEW_REQUIRED"
+      },
+      "edit": {
+        "text": "Cuir in eagar",
+        "status": "REVIEW_REQUIRED"
+      },
+      "done": {
+        "text": "Críochnaigh",
+        "status": "REVIEW_REQUIRED"
+      },
+      "calendar": {
+        "text": "Féilire",
+        "status": "REVIEW_REQUIRED"
+      },
+      "priority": {
+        "text": "Tosaíocht",
+        "status": "REVIEW_REQUIRED"
+      },
+      "archive": {
+        "text": "Cartlannaigh",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "goals": {
+      "heading": {
+        "text": "Dul chun cinn gach lá",
+        "status": "REVIEW_REQUIRED"
+      },
+      "edit": {
+        "text": "⚙ Cuir in eagar",
+        "status": "REVIEW_REQUIRED"
+      },
+      "minute": {
+        "text": "nóim",
+        "status": "REVIEW_REQUIRED"
+      },
+      "today": {
+        "text": "inniu",
+        "status": "REVIEW_REQUIRED"
+      },
+      "week": {
+        "text": "An tseachtain seo",
+        "status": "REVIEW_REQUIRED"
+      },
+      "noGoal": {
+        "text": "Socraigh sprioc",
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    "analytics": {
+      "title": {
+        "text": "Anailís ar ghníomhaíocht",
+        "status": "REVIEW_REQUIRED"
+      },
+      "activity": {
+        "text": "Gníomhaíocht",
+        "status": "REVIEW_REQUIRED"
+      },
+      "period": {
+        "text": "Tréimhse",
+        "status": "REVIEW_REQUIRED"
+      },
+      "start": {
+        "text": "Ó",
+        "status": "REVIEW_REQUIRED"
+      },
+      "end": {
+        "text": "Go",
+        "status": "REVIEW_REQUIRED"
+      },
+      "minutes": {
+        "text": "Nóiméid taifeadta",
+        "status": "REVIEW_REQUIRED"
+      },
+      "sessions": {
+        "text": "Seisiúin",
+        "status": "REVIEW_REQUIRED"
+      },
+      "year": {
+        "text": "Bliain",
+        "status": "REVIEW_REQUIRED"
+      },
+      "export": {
+        "text": "Easpórtáil CSV",
+        "status": "REVIEW_REQUIRED"
+      }
+    }
+  }
+}

@@ -1,0 +1,179 @@
+# Builds the exact Mission 177 visual-suite source on the approved integration branch.
+# Never uses main or legacy application commits.
+name: Deep Focus Mission 177 - Closed Test AAB
+
+on:
+  push:
+    branches:
+      - integration/master-qa-verified-v21
+    paths:
+      - .github/workflows/build_closed_test_aab.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deep-focus-mission177-closed-test-aab
+  cancel-in-progress: false
+
+jobs:
+  mission177-aab:
+    name: Build and verify pinned Mission 177 AAB
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ZEN_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
+      ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
+      ZEN_UPLOAD_KEY_ALIAS: ${{ secrets.ZEN_UPLOAD_KEY_ALIAS }}
+      ZEN_UPLOAD_KEY_PASSWORD: ${{ secrets.ZEN_UPLOAD_KEY_PASSWORD }}
+    steps:
+      - name: Checkout exact v3.0.2 release commit
+        uses: actions/checkout@v4
+        with:
+          ref: ef6bba52b827042fe5a6c264787c865c0b84fb01
+          persist-credentials: false
+
+      - name: Verify release tag, source and activated visual features
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "ef6bba52b827042fe5a6c264787c865c0b84fb01"
+          TAG_TARGET="$(git ls-remote origin 'refs/tags/v3.0.2-visual-suite-v21^{}' | awk '{print $1}')"
+          test "$TAG_TARGET" = "ef6bba52b827042fe5a6c264787c865c0b84fb01" || { echo "::error::Mission 177 tag mismatch"; exit 1; }
+          test -f android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
+          test -f android/app/src/main/assets/web/js/deep_focus_visual_suite.js
+          grep -Fq '<script src="js/deep_focus_runtime_activator.js"></script>' android/app/src/main/assets/web/index.html
+          grep -Fq '<script src="js/deep_focus_visual_suite.js"></script>' android/app/src/main/assets/web/index.html
+          grep -Fq 'applicationId "com.zenstudy.focus"' android/app/build.gradle
+          node --check android/app/src/main/assets/web/js/deep_focus_runtime_activator.js
+          node --check android/app/src/main/assets/web/js/deep_focus_visual_suite.js
+          node --test test/runtime_activator_integration.test.js test/visual_suite_integration.test.js
+          echo "Pinned source: ef6bba52b827042fe5a6c264787c865c0b84fb01"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android API 36
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Prepare upload signing only if all secrets exist
+        id: signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$ZEN_UPLOAD_KEYSTORE_BASE64" && -n "$ZEN_UPLOAD_STORE_PASSWORD" && -n "$ZEN_UPLOAD_KEY_ALIAS" && -n "$ZEN_UPLOAD_KEY_PASSWORD" ]]; then
+            umask 077
+            printf '%s' "$ZEN_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/mission177-upload-keystore.jks"
+            test -s "$RUNNER_TEMP/mission177-upload-keystore.jks"
+            echo "ZEN_UPLOAD_KEYSTORE_PATH=$RUNNER_TEMP/mission177-upload-keystore.jks" >> "$GITHUB_ENV"
+            echo "mode=upload-signed-release" >> "$GITHUB_OUTPUT"
+            echo "Upload-signing secrets present; producing Release AAB."
+          else
+            echo "mode=unsigned-release" >> "$GITHUB_OUTPUT"
+            echo "::warning::Upload-signing secrets not all configured. Release AAB will be UNSIGNED and cannot be uploaded to Google Play; also generating Debug AAB for engineering testing."
+          fi
+
+      - name: Generate Gradle wrapper if missing
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -f ./gradlew ]]; then
+            gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
+          fi
+          chmod +x ./gradlew
+
+      - name: Build Release App Bundle from pinned Mission 177 source
+        working-directory: android
+        shell: bash
+        run: ./gradlew clean bundleRelease --stacktrace
+
+      - name: Build Debug App Bundle as fallback when upload signing is absent
+        if: steps.signing.outputs.mode == 'unsigned-release'
+        working-directory: android
+        shell: bash
+        run: ./gradlew bundleDebug --stacktrace
+
+      - name: Verify AAB packaging, signing mode and SHA256
+        id: verify_bundle
+        shell: bash
+        env:
+          EXPECTED_SIGNING_MODE: ${{ steps.signing.outputs.mode }}
+        run: |
+          set -euo pipefail
+          RELEASE="android/app/build/outputs/bundle/release/app-release.aab"
+          test -s "$RELEASE"
+          unzip -tq "$RELEASE" > "$RUNNER_TEMP/mission177-aab-ziptest.txt"
+          unzip -Z -1 "$RELEASE" > "$RUNNER_TEMP/mission177-aab-entries.txt"
+          grep -Fxq 'base/assets/web/index.html' "$RUNNER_TEMP/mission177-aab-entries.txt"
+          grep -Fxq 'base/assets/web/js/deep_focus_runtime_activator.js' "$RUNNER_TEMP/mission177-aab-entries.txt"
+          grep -Fxq 'base/assets/web/js/deep_focus_visual_suite.js' "$RUNNER_TEMP/mission177-aab-entries.txt"
+          sha256sum "$RELEASE" | tee "$RUNNER_TEMP/mission177-release-aab-sha256.txt"
+          if [[ "$EXPECTED_SIGNING_MODE" == "upload-signed-release" ]]; then
+            jarsigner -verify -verbose -certs "$RELEASE" > "$RUNNER_TEMP/mission177-signature-verification.txt" 2>&1
+            grep -q 'jar verified' "$RUNNER_TEMP/mission177-signature-verification.txt" || { echo "::error::Release AAB did not verify as a signed JAR"; exit 1; }
+            grep -Eq '^META-INF/.*\.(RSA|DSA|EC)$' "$RUNNER_TEMP/mission177-aab-entries.txt" || { echo "::error::Release AAB missing signing certificate block"; exit 1; }
+            echo "release_play_upload_signature=verified" >> "$RUNNER_TEMP/mission177-provenance.txt"
+          else
+            if grep -Eq '^META-INF/.*\.(RSA|DSA|EC)$' "$RUNNER_TEMP/mission177-aab-entries.txt"; then
+              echo "::error::Unexpected signature on supposedly unsigned Release AAB"; exit 1
+            fi
+            echo "release_play_upload_signature=MISSING" >> "$RUNNER_TEMP/mission177-provenance.txt"
+            DEBUG="android/app/build/outputs/bundle/debug/app-debug.aab"
+            test -s "$DEBUG"
+            unzip -tq "$DEBUG" > "$RUNNER_TEMP/mission177-debug-aab-ziptest.txt"
+            sha256sum "$DEBUG" | tee "$RUNNER_TEMP/mission177-debug-aab-sha256.txt"
+            echo "::warning::Neither unsigned Release AAB nor Debug AAB is Google Play closed-testing upload-ready."
+          fi
+          {
+            echo "source_tag=v3.0.2-visual-suite-v21"
+            echo "source_commit=ef6bba52b827042fe5a6c264787c865c0b84fb01"
+            echo "workflow_commit=$GITHUB_SHA"
+            echo "source_branch=integration/master-qa-verified-v21"
+            echo "build_command=./gradlew clean bundleRelease --stacktrace"
+            echo "signing_mode=$EXPECTED_SIGNING_MODE"
+            echo "package=com.zenstudy.focus"
+            echo "release_bundle_path=$RELEASE"
+            echo "google_play_acceptance=NOT_TESTED"
+          } >> "$RUNNER_TEMP/mission177-provenance.txt"
+          {
+            echo "### Mission 177 Visual Suite AAB"
+            echo "Source pinned at ef6bba52b827042fe5a6c264787c865c0b84fb01"
+            echo "Signing: $EXPECTED_SIGNING_MODE"
+            echo "SHA256:"
+            cat "$RUNNER_TEMP/mission177-release-aab-sha256.txt"
+            if [[ "$EXPECTED_SIGNING_MODE" == "unsigned-release" ]]; then
+              echo "WARNING: AAB is unsigned. Configure the four ZEN_UPLOAD_* signing secrets before Google Play closed testing."
+            else
+              echo "Upload signature verified. Play Console upload acceptance and test enrollment remain independent gates."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Release and fallback Debug AAB plus verification receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepFocus-Mission177-v3.0.2-AAB-${{ steps.signing.outputs.mode }}
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/bundle/debug/app-debug.aab
+            ${{ runner.temp }}/mission177-release-aab-sha256.txt
+            ${{ runner.temp }}/mission177-debug-aab-sha256.txt
+            ${{ runner.temp }}/mission177-provenance.txt
+            ${{ runner.temp }}/mission177-signature-verification.txt
+            ${{ runner.temp }}/mission177-aab-ziptest.txt

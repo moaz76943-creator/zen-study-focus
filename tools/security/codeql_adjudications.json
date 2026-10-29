@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "adjudications": [
+    {
+      "id": "DF-CODEQL-QA-EVIDENCE-001",
+      "verdict": "FALSE_POSITIVE_WITH_EVIDENCE",
+      "reviewStatus": "APPROVED",
+      "reviewedBy": "GPT-6 independent scoped review 2026-10-28: preserved inert QA evidence sink, verified new M293 security regression test is local-only Node VM and no new network-to-file consumer; CodeQL still scans full project, no auto-clear of new findings; not formal security certification",
+      "rule": "js/http-to-file-access",
+      "path": "tests/android_e2e_recovery/private_evidence.cjs",
+      "line": 68,
+      "sourceSha256": "f5cecf2bfbfc7306270a6a91df474d6f54c10ec1219d49d9c1d3760ea979199e",
+      "executableSourceSha256": "e86045849f022503f49e56789530a9526542b76d355190aa5e4f399c98822b6d",
+      "evidence": "docs/security/CODEQL_QA_EVIDENCE_ADJUDICATION.md"
+    }
+  ]
+}

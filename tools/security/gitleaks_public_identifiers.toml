@@ -1,0 +1,65 @@
+# Public v21 persistence identifiers and deliberately corrupt test input are not
+# credentials. Each exception requires BOTH an exact value AND a reviewed path.
+# Default Gitleaks detection remains enabled, including within these same files.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Public legacy checksum salt, never encryption or authentication"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^ZEN_FORTRESS_V21_99812$''']
+paths = ['''^android/app/src/main/assets/web/(?:app\.js(?:\.bak)?|data_compat_v21\.js)$''']
+
+[[rules.allowlists]]
+description = "Immutable localStorage v21 identifiers in reviewed regression fixtures"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^zen_fortress_(?:cfg|tasks|notes)_v21(?:_mirror)?$''']
+paths = [
+  '''^tests/critical_room7/w05_contract\.test\.cjs$''',
+  '''^tests/focus_workflows/test_focus_workflows\.cjs$''',
+  '''^tests/focus_workflows/track09_chromium\.cjs$''',
+  '''^tests/i18n/goals/goals_studio_i18n\.test\.cjs$''',
+  '''^tests/df09_legacy_analytics\.test\.cjs$''',
+  '''^tests/integration_recovery/(?:counter_ack_rollback|daily_rollover_durability|water_counter_ack_rollback|timer_credit_ack_regression)\.test\.cjs$''',
+  '''^tests/integration_quality/activity_domain_durable_ack\.test\.cjs$''',
+  '''^tests/integration_recovery/language_switch_durability\.test\.cjs$''',
+  '''^tests/security_recovery/track13_private_triage\.test\.cjs$''',
+  '''^tests/smoke_app\.cjs$''',
+  '''^tests/track07_functional/activity_domain_durable_ack\.test\.cjs$''',
+  '''^tests/track05_timer/expired_native_alarm\.test\.cjs$''',
+  '''^tests/track05_timer/qt_transition_probe\.cjs$'''
+]
+
+[[rules.allowlists]]
+description = "Deliberately invalid primary-packet marker used only for fault injection"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^DF07_CORRUPT_PRIMARY$''']
+paths = [
+  '''^tests/android_e2e_recovery/native_faults\.cjs$''',
+  '''^tests/security_recovery/track13_private_triage\.test\.cjs$''',
+  '''^tools/security/track13_gitleaks_private_triage\.py$'''
+]
+
+[[rules.allowlists]]
+# git cat-file confirms the value is a commit object. Historical ledger entries
+# name it key_order_fix_commit; this is not a credential or arbitrary SHA rule.
+description = "Reviewed Git commit object recorded in the historical completion ledger"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^824d87a0f801361761b14921f59571fbb590e4df$''']
+paths = ['''^docs/master_completion/LEDGER_197\.json$''']
+
+[[rules.allowlists]]
+# Reviewed 645ad4086468802c391b9204dbff7c0d21d1c0a6:index.html:990-1005:
+# this constant feeds only computeHash and localStorage packet integrity.
+description = "Historical inline localStorage checksum constant, not authentication"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^ZEN_FORTRESS_V19_99481$''']
+paths = ['''^android/app/src/main/assets/web/index\.html$''']

@@ -1,0 +1,469 @@
+/*
+ * Deep Focus v22 / components and legacy adapters
+ * All rules opt in through body.df-v22; load AFTER white_2100.css.
+ * All components support text expansion, normal browser focus and 320px screens.
+ */
+.df-v22 {
+  background: var(--df22-page);
+  color: var(--df22-ink);
+  font: 400 var(--df22-body-size)/var(--df22-leading) var(--df22-font);
+  -webkit-font-smoothing: antialiased;
+}
+.df-v22 *, .df-v22 *::before, .df-v22 *::after { box-sizing: border-box; }
+.df-v22 :where(h1,h2,h3,p,strong,label,button,span,small) {
+  overflow-wrap: anywhere;
+}
+.df-v22 :where(.screen-section,.main-white-sheet,.df22-card,.df22-grid,.df22-timer-zone) {
+  min-width: 0;
+}
+.df-v22 :where(input,textarea,select,button) { font: inherit; }
+.df-v22 :where(input,textarea,[contenteditable="true"],.df22-bidi) {
+  text-align: start;
+  unicode-bidi: plaintext;
+}
+.df-v22 :where(.ring-time,.domain-duration,.an-kpi-num,.df22-number,.df22-chart-value) {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-variant-numeric: tabular-nums;
+}
+html[dir="rtl"] .df-v22 :where(.df22-copy,.df22-empty,.df22-card) { text-align: start; }
+html[dir="rtl"] .df-v22 .df22-icon--next { transform: scaleX(-1); }
+.df-v22 .df22-bidi { direction: inherit; }
+
+.df-v22 .df22-card {
+  display: block;
+  min-width: 0;
+  padding: var(--df22-space-4);
+  border: 1px solid var(--df22-border);
+  border-radius: var(--df22-radius-lg);
+  background: var(--df22-surface);
+  box-shadow: var(--df22-shadow-card);
+  color: var(--df22-ink);
+}
+.df-v22 .df22-card--selected { border-color: var(--df22-primary); background: var(--df22-surface-selected); }
+.df-v22 .df22-card-title {
+  margin: 0 0 var(--df22-space-2);
+  font-size: var(--df22-title-size);
+  line-height: 1.28;
+  font-weight: 750;
+}
+.df-v22 .df22-card-subtitle { color: var(--df22-muted); font-size: .92rem; line-height: 1.55; }
+.df-v22 .df22-stack { display: grid; grid-template-columns: minmax(0,1fr); gap: var(--df22-space-3); }
+.df-v22 .df22-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--df22-space-2); min-width: 0; }
+.df-v22 .df22-toolbar > * { min-width: 0; }
+
+.df-v22 .df22-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--df22-touch);
+  min-width: var(--df22-touch);
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--df22-primary-fill);
+  border-radius: var(--df22-radius-sm);
+  background: var(--df22-primary-fill);
+  color: var(--df22-on-primary);
+  text-decoration: none;
+  text-align: center;
+  line-height: 1.35;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--df22-ease), border-color var(--df22-ease);
+}
+.df-v22 .df22-button--secondary {
+  color: var(--df22-primary);
+  background: var(--df22-surface);
+  border-color: var(--df22-border-strong);
+}
+.df-v22 .df22-button--danger {
+  color: var(--df22-danger);
+  background: var(--df22-surface);
+  border-color: var(--df22-border-strong);
+}
+.df-v22 .df22-icon-button {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: var(--df22-touch);
+  min-height: var(--df22-touch);
+  padding: 8px;
+  border: 1px solid var(--df22-border-strong);
+  border-radius: var(--df22-radius-sm);
+  background: var(--df22-surface);
+  color: var(--df22-primary);
+  cursor: pointer;
+}
+.df-v22 :where(.df22-button,.df22-icon-button):disabled,
+.df-v22 :where(.df22-button,.df22-icon-button)[aria-disabled="true"] {
+  opacity: .55;
+  cursor: not-allowed;
+}
+.df-v22 .df22-button:active, .df-v22 .df22-icon-button:active { background-color: var(--df22-surface-selected); }
+.df-v22 .df22-button:active:not(.df22-button--secondary):not(.df22-button--danger) {
+  background-color: var(--df22-primary-fill);
+}
+.df-v22 .df22-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--df22-touch);
+  padding: 10px 13px;
+  border: 1px solid var(--df22-border-strong);
+  border-radius: var(--df22-radius-sm);
+  background: var(--df22-surface);
+  color: var(--df22-ink);
+  line-height: 1.5;
+}
+.df-v22 textarea.df22-input { min-height: 120px; resize: vertical; }
+.df-v22 .df22-input::placeholder { color: var(--df22-muted); opacity: 1; }
+.df-v22 .df22-input[aria-invalid="true"] { border-color: var(--df22-danger); }
+.df-v22 .df22-form-field { display: grid; grid-template-columns: minmax(0,1fr); gap: 6px; min-width: 0; }
+.df-v22 .df22-form-field > label { font-size: .94rem; font-weight: 650; }
+.df-v22 .df22-help { color: var(--df22-muted); font-size: .88rem; }
+.df-v22 .df22-error { color: var(--df22-danger); font-size: .88rem; }
+.df-v22 .df22-empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 30px 16px;
+  border: 1px dashed var(--df22-border-strong);
+  border-radius: var(--df22-radius-lg);
+  background: var(--df22-surface);
+  color: var(--df22-muted);
+  text-align: center;
+  line-height: 1.5;
+}
+.df-v22 .df22-empty strong { color: var(--df22-ink); font-size: 1.04rem; }
+.df-v22 .df22-empty p { max-width: 44ch; }
+.df-v22 .df22-modal {
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+  border: 1px solid var(--df22-border);
+  border-radius: var(--df22-radius-lg);
+  background: var(--df22-surface);
+  color: var(--df22-ink);
+  box-shadow: 0 20px 45px rgba(28,46,77,.15);
+}
+.df-v22 .df22-modal-heading { font-size: 1.17rem; line-height: 1.4; font-weight: 750; }
+.df-v22 .df22-modal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.df-v22 .df22-modal-actions > * { flex: 1 1 120px; }
+.df-v22 .df22-bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(7,minmax(52px,1fr));
+  gap: 2px;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 6px max(6px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom));
+  border: 1px solid var(--df22-border);
+  border-radius: var(--df22-radius-lg);
+  background: var(--df22-surface);
+  box-shadow: var(--df22-shadow-card);
+  scrollbar-width: thin;
+}
+.df-v22 .df22-bottom-nav > button {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  min-width: 52px;
+  min-height: 50px;
+  padding: 5px 3px;
+  border: 0;
+  border-radius: var(--df22-radius-xs);
+  background: transparent;
+  color: var(--df22-muted);
+  font-size: .72rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.df-v22 .df22-bottom-nav > button[aria-current="page"] { background: var(--df22-surface-selected); color: var(--df22-primary); }
+.df-v22 .df22-chart {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  overflow-x: auto;
+  padding: var(--df22-space-3);
+  border: 1px solid var(--df22-border);
+  border-radius: var(--df22-radius-md);
+  background: var(--df22-surface);
+}
+.df-v22 .df22-chart-title { font-size: 1rem; font-weight: 700; line-height: 1.5; }
+.df-v22 .df22-chart-legend { display: flex; flex-wrap: wrap; gap: 8px 12px; font-size: .88rem; color: var(--df22-ink); }
+.df-v22 .df22-chart-grid { stroke: var(--df22-graph-grid); stroke-width: 1; }
+.df-v22 .df22-chart-value { font-size: .9rem; color: var(--df22-ink); }
+.df-v22 .df22-chart-label { font-size: .85rem; fill: var(--df22-muted); }
+.df-v22 .df22-chart svg { max-width: 100%; height: auto; }
+.df-v22 .df22-chart :where(canvas,svg) { flex-shrink: 0; }
+.df-v22 .df22-timer-zone {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--df22-space-3);
+  align-items: start;
+  margin-bottom: var(--df22-space-3);
+}
+.df-v22 .df22-timer-zone > * { min-width: 0; margin: 0; }
+
+/* Explicit v21 adapters. No source markup is modified by this stylesheet. */
+body.df-v22:not(.deep-lockdown) .main-white-sheet { background: var(--df22-page); }
+body.df-v22:not(.deep-lockdown) :where(.pure-white-card,.ns-card,.showcase-task-card,.an-kpi-card) {
+  border: 1px solid var(--df22-border);
+  background: var(--df22-surface);
+  color: var(--df22-ink);
+  border-radius: var(--df22-radius-lg);
+  box-shadow: var(--df22-shadow-card);
+  min-width: 0;
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card {
+  padding: 14px;
+  margin-bottom: 12px;
+  border: 1px solid var(--df22-border);
+  border-radius: var(--df22-radius-lg);
+  background: var(--df22-surface);
+  box-shadow: var(--df22-shadow-card);
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card::before { background: none; }
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .ring-container {
+  width: min(63vw, 222px);
+  height: min(63vw, 222px);
+  max-width: 222px;
+  max-height: 222px;
+  min-width: 0;
+  min-height: 0;
+  filter: none;
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .ring-container::before {
+  background: var(--df22-surface);
+  box-shadow: none;
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .ring-bar { filter: none; }
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .ring-time {
+  font-size: var(--df22-number-size);
+  color: var(--df22-ink);
+  font-weight: 680;
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .timer-main-controls { margin: 0 auto; }
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .btn-round-sec {
+  min-height: 44px;
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
+  background: var(--df22-surface);
+  border: 1px solid var(--df22-border-strong);
+  color: var(--df22-primary);
+  box-shadow: none;
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .btn-round-play {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  background: var(--df22-primary-fill);
+  border-color: var(--df22-surface);
+  box-shadow: var(--df22-shadow-low);
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .segmented-pills-bar {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  min-width: 0;
+  padding: 4px;
+  gap: 4px;
+  background: var(--df22-surface-soft);
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .seg-pill {
+  min-width: 0;
+  min-height: 42px;
+  padding: 6px 3px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  line-height: 1.2;
+  color: var(--df22-muted);
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .seg-pill.active {
+  background: var(--df22-surface);
+  color: var(--df22-primary);
+  box-shadow: none;
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .time-delta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
+  min-width: 0;
+  min-height: 40px;
+  flex: 1 1 44px;
+  color: var(--df22-primary);
+  background: var(--df22-surface-soft);
+  border-color: var(--df22-border);
+}
+body.df-v22:not(.deep-lockdown) .quick-training-card { overflow: visible; }
+body.df-v22:not(.deep-lockdown) .training-summary { min-height: var(--df22-touch); flex-wrap: wrap; }
+body.df-v22:not(.deep-lockdown) .training-summary-text { min-width: 0; flex: 1 1 95px; }
+body.df-v22:not(.deep-lockdown) .training-summary-text :where(strong,small) {
+  display: block;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  color: var(--df22-ink);
+}
+body.df-v22:not(.deep-lockdown) .training-fields {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 6px;
+  min-width: 0;
+}
+body.df-v22:not(.deep-lockdown) .training-fields input {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  font-size: 1rem;
+}
+body.df-v22:not(.deep-lockdown) .training-content { min-width: 0; }
+body.df-v22:not(.deep-lockdown) .training-add-row { flex-wrap: wrap; }
+body.df-v22:not(.deep-lockdown) .training-add-row input { flex: 1 1 110px; }
+body.df-v22:not(.deep-lockdown) .training-add-row button { min-height: var(--df22-touch); }
+body.df-v22:not(.deep-lockdown) :where(.ns-card,.showcase-task-card,.an-kpi-card) {
+  overflow-wrap: anywhere;
+  line-height: var(--df22-leading);
+}
+body.df-v22:not(.deep-lockdown) :where(.modal-card,.ns-editor) {
+  max-width: min(420px,100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 1px solid var(--df22-border);
+  border-radius: var(--df22-radius-lg);
+  background: var(--df22-surface);
+  color: var(--df22-ink);
+  box-shadow: 0 20px 45px rgba(28,46,77,.15);
+}
+body.df-v22:not(.deep-lockdown) :where(.modal-inp,.task-creator-inp,.search-pill-inp) {
+  min-width: 0;
+  min-height: 44px;
+  max-width: 100%;
+  text-align: start;
+  color: var(--df22-ink);
+  background: var(--df22-surface);
+  border-color: var(--df22-border-strong);
+}
+body.df-v22:not(.deep-lockdown) .bottom-nav-capsule {
+  background: var(--df22-surface);
+  border-color: var(--df22-border);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--df22-shadow-card);
+}
+body.df-v22:not(.deep-lockdown) #sec-analytics :where(.wave-chart-card,.an-kpi-card) {
+  background: var(--df22-surface);
+  color: var(--df22-ink);
+  border-color: var(--df22-border);
+}
+body.df-v22:not(.deep-lockdown) #sec-analytics :where(.an-kpi-num,.donut-center-txt) { color: var(--df22-ink); }
+body.df-v22:not(.deep-lockdown) #sec-analytics .an-kpi-trend { color: var(--df22-success); }
+body.df-v22:not(.deep-lockdown) .df22-chart [role="img"] { color: var(--df22-ink); }
+
+/* Visible focus is not limited to hardware keyboard alone (TalkBack / D-pad). */
+.df-v22 :where(button,a,input,select,textarea,[role="button"],summary):focus-visible {
+  outline: 3px solid var(--df22-focus) !important;
+  outline-offset: 3px;
+}
+.df-v22 :where(button,a,input,select,textarea,[role="button"],summary):focus:not(:focus-visible) {
+  /* Avoid obscuring text on touch; real keyboard focus uses the rule above. */
+}
+.df-v22 :where(button,[role="button"])[aria-pressed="true"] { border-color: var(--df22-primary); }
+.df-v22 :where(button,[role="button"])[aria-disabled="true"] { cursor: not-allowed; }
+@media (min-width: 440px) {
+  .df-v22 .df22-timer-zone { grid-template-columns: minmax(0,1.18fr) minmax(0,.82fr); }
+  body.df-v22.timer-home .df22-timer-zone .focus-hero-card .ring-container {
+    width: min(44vw,205px);
+    height: min(44vw,205px);
+  }
+}
+@media (max-width: 359px) {
+  body.df-v22:not(.deep-lockdown) .main-white-sheet { padding-inline: 9px; }
+  body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card { padding: 11px 8px; }
+  body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .ring-container {
+    width: 184px;
+    height: 184px;
+  }
+  body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .ring-time { font-size: 2.54rem; }
+  body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .seg-pill { font-size: .7rem; }
+  body.df-v22:not(.deep-lockdown) .training-content { padding-inline: 8px; }
+  body.df-v22:not(.deep-lockdown) .training-fields { gap: 4px; }
+  .df-v22 .df22-card { padding: 12px; }
+  .df-v22 .df22-bottom-nav { border-radius: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .df-v22 *, .df-v22 *::before, .df-v22 *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (prefers-contrast: more) {
+  .df-v22 :where(.df22-card,.df22-input,.df22-modal) { border-color: var(--df22-ink); }
+  .df-v22 :where(.df22-button,.df22-icon-button):focus-visible { outline-width: 4px !important; }
+}
+
+
+/* DF-LANE-11: preserve v22 premium palette; allow long localized labels and text zoom. */
+.df-v22 :where(.df22-card,.df22-modal,.df22-toolbar,.df22-stack,.df22-form-field,.df22-bottom-nav,.df22-timer-zone) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.df-v22 :where(.df22-button,.df22-card-title,.df22-card-subtitle,.df22-modal-heading,.df22-chart-title,.df22-bottom-nav > button) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.45;
+}
+.df-v22 .df22-button { flex-shrink: 1; }
+.df-v22 .df22-modal { max-inline-size: calc(100vw - 16px); }
+.df-v22 .df22-modal-actions { flex-wrap: wrap; }
+.df-v22 .df22-modal-actions > * { flex: 1 1 110px; min-inline-size: 0; }
+.df-v22 .df22-bottom-nav { grid-template-columns: repeat(7,minmax(44px,1fr)); }
+.df-v22 .df22-bottom-nav > button { min-block-size: 44px; }
+.df-v22 :where(.df22-number,.df22-chart-value,.df22-timer-zone .ring-time) {
+  direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums;
+}
+.df-v22 :where(button,a,input,textarea,select,[role="button"],[tabindex]):focus-visible {
+  outline: 3px solid var(--df22-focus) !important;
+  outline-offset: 3px;
+}
+html[dir="rtl"] .df-v22 :where(.df22-toolbar,.df22-modal-actions) { direction: rtl; }
+html[dir="rtl"] .df-v22 :where(.df22-card-title,.df22-card-subtitle,.df22-form-field,.df22-modal-heading) { text-align: start; }
+html:lang(ar) .df-v22,html:lang(fa) .df-v22,html:lang(ur) .df-v22,
+html:lang(ps) .df-v22,html:lang(ckb) .df-v22,html:lang(sd) .df-v22,html:lang(ug) .df-v22 {
+  font-family: "Noto Sans Arabic", "Noto Naskh Arabic", "Noto Nastaliq Urdu", system-ui, sans-serif;
+}
+html:lang(zh) .df-v22,html:lang(ja) .df-v22,html:lang(ko) .df-v22 {
+  font-family: "Noto Sans CJK SC", "Noto Sans CJK JP", "Noto Sans CJK KR", system-ui, sans-serif;
+}
+html:lang(hi) .df-v22,html:lang(mr) .df-v22,html:lang(ne) .df-v22 {
+  font-family: "Noto Sans Devanagari", system-ui, sans-serif;
+}
+html:lang(bn) .df-v22 { font-family: "Noto Sans Bengali", system-ui, sans-serif; }
+html:lang(ru) .df-v22,html:lang(uk) .df-v22,html:lang(bg) .df-v22,
+html:lang(sr) .df-v22 { font-family: "Noto Sans", system-ui, sans-serif; }
+@media (max-width: 430px) {
+  .df-v22 .df22-toolbar { flex-wrap: wrap; }
+  .df-v22 .df22-toolbar > button { flex: 1 1 100px; }
+  .df-v22 :where(.df22-bottom-nav,.df22-modal) { max-inline-size: 100%; }
+}
+@media (max-width: 360px) {
+  .df-v22 .df22-modal { padding: 12px; }
+  .df-v22 .df22-modal-actions > * { flex-basis: 100%; }
+}
+
+
+/* Locale-specific glyph priority: JP/KR forms must not resolve through SC first. */
+html:lang(zh) .df-v22 { font-family: "Noto Sans CJK SC", system-ui, sans-serif; }
+html:lang(ja) .df-v22 { font-family: "Noto Sans CJK JP", system-ui, sans-serif; }
+html:lang(ko) .df-v22 { font-family: "Noto Sans CJK KR", system-ui, sans-serif; }
+html:lang(ur) .df-v22 { font-family: "Noto Nastaliq Urdu", "Noto Naskh Arabic", system-ui, sans-serif; line-height: 1.65; }

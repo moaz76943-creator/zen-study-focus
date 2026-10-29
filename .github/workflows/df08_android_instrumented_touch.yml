@@ -1,0 +1,101 @@
+name: DF08 actual Android WebView touch and IME acceptance
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/android_touch/df08_instrumentation/**'
+      - '.github/workflows/df08_android_instrumented_touch.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: df08-real-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    name: Source-only validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Contract plus legacy CDP geometry source checks
+        run: |
+          node --test tests/android_touch/*.test.cjs tests/android_touch/df08_instrumentation/*.test.cjs
+          bash -n tests/android_touch/df08_instrumentation/prepare_test_build.sh
+          bash -n tests/android_touch/df08_instrumentation/run_ci.sh
+  android:
+    name: Android API${{ matrix.api }} / 4 widths / real IME
+    needs: source
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30,35]
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android 36 compilation SDK
+        shell: bash
+        run: |
+          sdkmanager_bin="$(find /usr/local/lib/android/sdk/cmdline-tools -name sdkmanager -type f -print -quit)"
+          test -x "$sdkmanager_bin"
+          "$sdkmanager_bin" 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Wire Android instrumentation only in ephemeral checkout
+        run: |
+          bash tests/android_touch/df08_instrumentation/prepare_test_build.sh
+          git status --short
+          test "$(git diff --name-only)" = "android/app/build.gradle"
+      - name: Compile actual shipped debug APK and isolated test APK
+        working-directory: android
+        run: gradle assembleDebug assembleDebugAndroidTest --no-daemon
+      - name: Emulator KVM access
+        shell: bash
+        run: |
+          test -c /dev/kvm
+          sudo chmod 666 /dev/kvm
+      - name: Actual Android touch, Notes modal, keyboard and Save at 4 widths
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          DF08_EVIDENCE: ${{ runner.temp }}/df08-api-${{ matrix.api }}
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          ram-size: ${{ matrix.api == 35 && '2048M' || '' }}
+          heap-size: ${{ matrix.api == 35 && '256M' || '' }}
+          emulator-boot-timeout: 600
+          disable-animations: true
+          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect' }}
+          script: bash tests/android_touch/df08_instrumentation/run_ci.sh
+      - name: Record exact head, no production changes and limits
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/df08-api-${{ matrix.api }}"
+          git rev-parse HEAD > "$RUNNER_TEMP/df08-api-${{ matrix.api }}/EXACT_SOURCE_SHA.txt"
+          printf 'Android emulator API${{ matrix.api }} only. CDP disabled. Physical handset/TalkBack NOT_TESTED. RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df08-api-${{ matrix.api }}/LIMITS.txt"
+          test "$(git diff --name-only)" = "android/app/build.gradle"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DF08-real-android-API${{ matrix.api }}-${{ github.sha }}
+          path: ${{ runner.temp }}/df08-api-${{ matrix.api }}/
+          retention-days: 7
+          if-no-files-found: warn

@@ -1,0 +1,69 @@
+{
+  "language": "gd",
+  "status": "REVIEW_REQUIRED",
+  "sections": {
+    "timer": {
+      "0": "⚙ Gnàthaich",
+      "1": "Roghainnean fòcais is fois",
+      "2": "Thèid an seisean làithreach a ghleidheadh; chan eil atharrachaidhean a' buntainn ach ri seiseanan ùra.",
+      "3": "Fòcas · mion",
+      "4": "Fois ghoirid · mion",
+      "5": "Fois fhada · mion",
+      "6": "Seiseanan gach cuairt",
+      "7": "Roghainnean bunaiteach",
+      "8": "Sàbhail",
+      "9": "Cuir a-steach àireamhan slàna taobh a-staigh nan crìochan.",
+      "10": "Chaidh na roghainnean a shàbhaladh"
+    },
+    "tasks": {
+      "title": "Gnìomhan",
+      "add": "Gnìomh ùr",
+      "search": "Lorg gnìomhan",
+      "save": "Sàbhail",
+      "cancel": "Sguir dheth",
+      "edit": "Deasaich",
+      "done": "Crìochnaich",
+      "calendar": "Mìosachan",
+      "priority": "Prìomhachas",
+      "archive": "Tasglannaich"
+    },
+    "notes": {
+      "0": "✦ NÒTAICHEAN",
+      "3": "Na nòtaichean agam",
+      "5": "＋ Nòta ùr",
+      "6": "Teamplaidean",
+      "9": "Seòrsaich",
+      "12": "Tiotal",
+      "15": "Nòta ùr",
+      "20": "Susbaint",
+      "25": "Sàbhail nòta",
+      "32": "Sguab às"
+    },
+    "goals": {
+      "heading": "Adhartas beag gach latha",
+      "edit": "⚙ Deasaich",
+      "minute": "mion",
+      "today": "an-diugh",
+      "week": "An t-seachdain seo",
+      "noGoal": "Suidhich amas"
+    },
+    "analytics": {
+      "title": "Mion-sgrùdadh air gnìomhachd",
+      "activity": "Gnìomhachd",
+      "period": "Ùine",
+      "start": "Bho",
+      "end": "Gu",
+      "minutes": "Mionaidean clàraichte",
+      "sessions": "Seiseanan",
+      "year": "Bliadhna",
+      "export": "Às-phortaich CSV",
+      "noData": "Chan eil seiseanan clàraichte san ùine seo"
+    },
+    "analyticsDomain": {
+      "study": "Ionnsachadh",
+      "read": "Leughadh",
+      "work": "Obair",
+      "sport": "Spòrs"
+    }
+  }
+}

@@ -1,0 +1,44 @@
+name: DF09 completion-tone mobile locale QA
+on:
+  pull_request:
+    paths:
+      - 'android/app/src/main/assets/web/completion_alert*'
+      - 'android/app/src/main/assets/web/js/completion_tone_picker.js'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'tests/df_parallel09_tone*'
+      - 'tests/audio_context/**'
+      - '.github/workflows/df09_tone_picker.yml'
+permissions:
+  contents: read
+jobs:
+  picker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact-source locale and CSS tests
+        run: node --test tests/df_parallel09_tone_picker.test.cjs tests/audio_context/*.test.cjs
+      - name: Install local Chromium harness
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          if ! command -v chromium >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq chromium
+          fi
+      - name: 24 narrow-width RTL and font-scale browser runs
+        env:
+          DF_CHROMIUM_BIN: /usr/bin/chromium
+          DF09_PICKER_OUT: ${{ runner.temp }}/df09-picker
+        run: |
+          node tests/df_parallel09_tone_browser.cjs
+          node tests/audio_context/sound_toggle_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: df09-tone-picker-${{ github.sha }}
+          path: ${{ runner.temp }}/df09-picker/
+          if-no-files-found: warn
+          retention-days: 5

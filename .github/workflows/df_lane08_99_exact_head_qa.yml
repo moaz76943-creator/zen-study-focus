@@ -1,0 +1,25 @@
+name: Lane08 99 locale exact-head source QA
+on:
+  push:
+    branches: [lane08/quick-training-99-consolidated-20261026]
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact checkout
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Run source syntax and focused regressions
+        run: |
+          set -euo pipefail
+          node --check android/app/src/main/assets/web/quick_training.js
+          node --test tests/i18n/quick_training/*.test.cjs
+          node --test tests/i18n/timer/timer_destructive_consent.test.cjs tests/track05_timer/tick_lifecycle.test.cjs

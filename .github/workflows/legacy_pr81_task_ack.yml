@@ -1,0 +1,20 @@
+name: Legacy PR81 tasks ACK regression
+on:
+  push:
+    branches:
+      - fix/port-legacy-pr81-task-ack-20261026
+permissions:
+  contents: read
+jobs:
+  task-ack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Tasks Studio syntax
+        run: node --check android/app/src/main/assets/web/tasks_studio.js
+      - name: Run original failed-ACK regression from PR81
+        run: node --test tests/track07_functional/task_checklist_ack.test.cjs

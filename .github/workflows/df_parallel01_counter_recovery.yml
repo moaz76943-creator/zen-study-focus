@@ -1,0 +1,31 @@
+name: DF Parallel01 v21 rollback focused source QA
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/assets/web/app.js'
+      - 'tests/integration_recovery/counter_ack_rollback.test.cjs'
+      - 'tests/integration_recovery/daily_rollover_durability.test.cjs'
+      - 'tests/integration_recovery/water_counter_ack_rollback.test.cjs'
+      - '.github/workflows/df_parallel01_counter_recovery.yml'
+permissions:
+  contents: read
+jobs:
+  data-rollback-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact source SHA and script syntax
+        run: |
+          set -euo pipefail
+          node --check android/app/src/main/assets/web/app.js
+          node --check tests/integration_recovery/counter_ack_rollback.test.cjs
+          node --check tests/integration_recovery/daily_rollover_durability.test.cjs
+      - name: Focused v21 failed-save rollback regressions
+        run: node --test tests/integration_recovery/counter_ack_rollback.test.cjs tests/integration_recovery/daily_rollover_durability.test.cjs tests/integration_recovery/water_counter_ack_rollback.test.cjs

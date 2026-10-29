@@ -1,0 +1,65 @@
+name: DF03 Analytics 20-locale real browser accessibility
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/i18n/analytics/analytics_20_browser.cjs'
+      - 'tests/analytics_core/legacy_chart_startup_browser.cjs'
+      - 'tests/security_recovery/share_card_xss_browser.cjs'
+      - 'tests/security_recovery/share_card_clipboard_browser.cjs'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'android/app/src/main/assets/web/analytics_core_v21.js'
+      - '.github/workflows/df03_analytics_browser.yml'
+permissions:
+  contents: read
+jobs:
+  analytics-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify test and prepare Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.58.2
+          test -x /usr/bin/chromium || { sudo apt-get update -qq; sudo apt-get install -y chromium; }
+          node --check tests/i18n/analytics/analytics_20_browser.cjs
+      - name: Serve current offline app web bundle
+        shell: bash
+        run: |
+          cd android/app/src/main/assets/web
+          python3 -m http.server 8770 --bind 127.0.0.1 > "$RUNNER_TEMP/df03-analytics-server.log" 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8770/index.html >/dev/null && exit 0; sleep 1; done
+          exit 1
+      - name: Run real Analytics DOM checks across 20 locales
+        env:
+          DF03_ANALYTICS_REPORT: ${{ runner.temp }}/analytics-20.json
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          node tests/security_recovery/share_card_xss_browser.cjs
+          node tests/security_recovery/share_card_clipboard_browser.cjs
+          node tests/analytics_core/legacy_chart_startup_browser.cjs
+          node tests/i18n/analytics/analytics_20_browser.cjs
+      - name: Preserve exact source and limitations
+        if: always()
+        shell: bash
+        run: |
+          git rev-parse HEAD > "$RUNNER_TEMP/ANALYTICS_SOURCE_SHA.txt"
+          printf 'Browser DOM only; no Android E2E, no full translation parity, no release approval\n' > "$RUNNER_TEMP/ANALYTICS_LIMITS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: df03-analytics-20-locale-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/analytics-20.json
+            ${{ runner.temp }}/ANALYTICS_SOURCE_SHA.txt
+            ${{ runner.temp }}/ANALYTICS_LIMITS.txt
+          retention-days: 7
+          if-no-files-found: warn
