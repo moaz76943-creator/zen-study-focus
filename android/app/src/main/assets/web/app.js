@@ -13474,3 +13474,61 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetPipParamsPayload = dfGetPipParamsPayload;
 }
+
+// ============================================================================
+// MISSION #317: Lock Screen Quick Launch & Dynamic Shortcuts State Bridge (v4.4.7)
+// ============================================================================
+function dfGetDynamicShortcutsPayload(appState) {
+  const s = appState || {};
+  const timer = s.timer || {};
+  const isRunning = Boolean(timer.isRunning);
+  const secondsLeft = typeof timer.secondsLeft === "number" ? Math.max(0, timer.secondsLeft) : 1500;
+  const m = Math.floor(secondsLeft / 60);
+  const sec = secondsLeft % 60;
+  const formattedTime = (m < 10 ? "0" + m : "" + m) + ":" + (sec < 10 ? "0" + sec : "" + sec);
+
+  const dueCount = typeof s.dueVocabCount === "number" && s.dueVocabCount >= 0 ? Math.floor(s.dueVocabCount) : 0;
+  const streakDays = typeof s.streakDays === "number" && s.streakDays >= 0 ? Math.floor(s.streakDays) : 0;
+  const todayMin = typeof s.todayMinutes === "number" && s.todayMinutes >= 0 ? Math.floor(s.todayMinutes) : 0;
+  const goalMin = typeof s.goalMinutes === "number" && s.goalMinutes > 0 ? Math.floor(s.goalMinutes) : 120;
+
+  const shortcuts = [
+    {
+      id: "dynamic_timer_action",
+      shortLabel: isRunning ? "Pause Timer" : "Start 25m Focus",
+      longLabel: isRunning ? "Pause Active Focus Session (" + formattedTime + ")" : "Start 25-Minute Zen Focus",
+      intentAction: "com.deepfocus.study.ACTION_TOGGLE_TIMER",
+      rank: 1
+    },
+    {
+      id: "dynamic_vocab_review",
+      shortLabel: dueCount > 0 ? "Review " + dueCount + " Cards" : "Daily Vocab Quiz",
+      longLabel: dueCount > 0 ? "Spaced Repetition: " + dueCount + " Cards Due" : "Daily Vocabulary Practice",
+      intentAction: "com.deepfocus.study.ACTION_REVIEW_VOCAB",
+      rank: 2
+    },
+    {
+      id: "dynamic_streak_goal",
+      shortLabel: "Day " + streakDays + " Streak",
+      longLabel: streakDays + " Days Streak • " + todayMin + "/" + goalMin + "m Studied",
+      intentAction: "com.deepfocus.study.ACTION_VIEW_STATS",
+      rank: 3
+    }
+  ];
+
+  return {
+    versionCode: 137,
+    versionName: "4.4.7",
+    shortcutsCount: shortcuts.length,
+    shortcuts: shortcuts,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetDynamicShortcutsPayload = dfGetDynamicShortcutsPayload;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetDynamicShortcutsPayload = dfGetDynamicShortcutsPayload;
+}
