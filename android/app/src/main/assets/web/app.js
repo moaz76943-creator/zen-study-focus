@@ -13532,3 +13532,43 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetDynamicShortcutsPayload = dfGetDynamicShortcutsPayload;
 }
+
+// ============================================================================
+// MISSION #318: Ambient Always-On Display Mode for Desk Study (v4.4.8)
+// ============================================================================
+function dfGetAmbientDisplayConfig(options) {
+  const opts = options || {};
+  const isAmbientEnabled = opts.ambientDeskMode !== false;
+  const isTimerRunning = Boolean(opts.isRunning);
+  const keepScreenOn = isAmbientEnabled && isTimerRunning;
+
+  const cycleCount = typeof opts.cycleCount === "number" ? Math.floor(opts.cycleCount) : 0;
+  const shiftOffsets = [
+    { x: 0, y: 0 },
+    { x: 2, y: 1 },
+    { x: -1, y: 2 },
+    { x: -2, y: -1 },
+    { x: 1, y: -2 }
+  ];
+  const shift = shiftOffsets[Math.abs(cycleCount) % shiftOffsets.length];
+
+  return {
+    versionCode: 138,
+    versionName: "4.4.8",
+    ambientDeskMode: isAmbientEnabled,
+    keepScreenOn: keepScreenOn,
+    dimLevel: 0.15,
+    pixelShiftIntervalMs: 60000,
+    pixelShiftOffset: shift,
+    oledTrueBlack: true,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetAmbientDisplayConfig = dfGetAmbientDisplayConfig;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetAmbientDisplayConfig = dfGetAmbientDisplayConfig;
+}
