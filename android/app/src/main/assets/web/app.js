@@ -14899,3 +14899,85 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetWeakCardsCrammingQueue = dfGetWeakCardsCrammingQueue;
 }
+
+// ============================================================================
+// MISSION #336: Long-Term Memory Retention Index Calculator (v4.6.6)
+// ============================================================================
+function dfCalculateLongTermRetentionIndex(cardsList, options) {
+  const list = Array.isArray(cardsList) ? cardsList : [];
+  const opts = options || {};
+  const now = typeof opts.currentTime === "number" ? opts.currentTime : Date.now();
+
+  if (list.length === 0) {
+    return {
+      versionCode: 156,
+      versionName: "4.6.6",
+      retentionIndexPercent: 100,
+      retentionGrade: "A+ (EXEMPLARY)",
+      totalCardsEvaluated: 0,
+      masteredCardsCount: 0,
+      atRiskCardsCount: 0,
+      projected7DayRetentionPercent: 100,
+      formattedGradeSummary: "100% • A+ (EXEMPLARY)",
+      westernDigits: true,
+      timestamp: now
+    };
+  }
+
+  let totalR = 0;
+  let totalR7 = 0;
+  let mastered = 0;
+  let atRisk = 0;
+
+  for (const c of list) {
+    if (!c) continue;
+    const intervalDays = typeof c.intervalDays === "number" && c.intervalDays > 0 ? c.intervalDays : (typeof c.box === "number" ? [1, 1, 2, 5, 9, 14][c.box] || 1 : 1);
+    const streak = typeof c.consecutiveCorrect === "number" && c.consecutiveCorrect >= 0 ? c.consecutiveCorrect : 1;
+    const lastRev = typeof c.lastReviewed === "number" ? c.lastReviewed : (now - 86400000);
+
+    const stability = Math.max(1, intervalDays * Math.min(2.5, 1 + streak * 0.15));
+    const elapsedDays = Math.max(0, (now - lastRev) / (24 * 60 * 60 * 1000));
+
+    const r = Math.exp(-elapsedDays / stability);
+    const r7 = Math.exp(-(elapsedDays + 7) / stability);
+
+    totalR += r;
+    totalR7 += r7;
+
+    if (r >= 0.88 && stability >= 10) {
+      mastered++;
+    } else if (r < 0.70) {
+      atRisk++;
+    }
+  }
+
+  const avgRetention = Math.min(100, Math.max(0, Math.round((totalR / list.length) * 100)));
+  const avgRetention7 = Math.min(100, Math.max(0, Math.round((totalR7 / list.length) * 100)));
+
+  let grade = "A (EXCELLENT)";
+  if (avgRetention >= 93) grade = "A+ (EXEMPLARY)";
+  else if (avgRetention >= 80) grade = "A (EXCELLENT)";
+  else if (avgRetention >= 70) grade = "B (SOLID)";
+  else grade = "C (NEEDS_REVIEW)";
+
+  return {
+    versionCode: 156,
+    versionName: "4.6.6",
+    retentionIndexPercent: avgRetention,
+    retentionGrade: grade,
+    totalCardsEvaluated: list.length,
+    masteredCardsCount: mastered,
+    atRiskCardsCount: atRisk,
+    projected7DayRetentionPercent: avgRetention7,
+    formattedGradeSummary: avgRetention + "% • " + grade,
+    westernDigits: true,
+    timestamp: now
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfCalculateLongTermRetentionIndex = dfCalculateLongTermRetentionIndex;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfCalculateLongTermRetentionIndex = dfCalculateLongTermRetentionIndex;
+}
