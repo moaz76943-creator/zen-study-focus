@@ -14363,3 +14363,94 @@ if (typeof globalThis !== "undefined") {
   globalThis.dfGetBoxBreathingPacerMetrics = dfGetBoxBreathingPacerMetrics;
   globalThis.dfGetPhase2MilestoneSummary = dfGetPhase2MilestoneSummary;
 }
+
+// ============================================================================
+// MISSION #331: 5-Box Leitner Spaced Repetition Core Engine (v4.6.1)
+// ============================================================================
+function dfProcessLeitnerReviewStep(card, isCorrect, options) {
+  const c = card || {};
+  const opts = options || {};
+  const currentBox = typeof c.box === "number" && c.box >= 1 && c.box <= 5 ? Math.floor(c.box) : 1;
+  const now = typeof opts.currentTime === "number" ? opts.currentTime : Date.now();
+
+  const boxIntervals = {
+    1: 1,  // Daily
+    2: 2,  // Every 2 days
+    3: 5,  // Every 5 days
+    4: 9,  // Every 9 days
+    5: 14  // Every 14 days (Mastered)
+  };
+
+  let newBox = 1;
+  let action = "DEMOTED";
+
+  if (Boolean(isCorrect)) {
+    if (currentBox < 5) {
+      newBox = currentBox + 1;
+      action = "PROMOTED";
+    } else {
+      newBox = 5;
+      action = "RETAINED_MASTERED";
+    }
+  } else {
+    newBox = 1;
+    action = currentBox === 1 ? "FAILED_RETRY" : "DEMOTED_TO_BOX_1";
+  }
+
+  const intervalDays = boxIntervals[newBox] || 1;
+  const nextReviewDate = now + (intervalDays * 24 * 60 * 60 * 1000);
+
+  return {
+    versionCode: 151,
+    versionName: "4.6.1",
+    cardId: c.id || "card_unknown",
+    previousBox: currentBox,
+    newBox: newBox,
+    action: action,
+    isCorrect: Boolean(isCorrect),
+    intervalDays: intervalDays,
+    nextReviewDate: nextReviewDate,
+    westernDigits: true,
+    timestamp: now
+  };
+}
+
+function dfGetLeitnerVaultDistribution(cardsList) {
+  const list = Array.isArray(cardsList) ? cardsList : [];
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  let total = 0;
+
+  for (const c of list) {
+    if (!c) continue;
+    const b = typeof c.box === "number" && c.box >= 1 && c.box <= 5 ? Math.floor(c.box) : 1;
+    counts[b]++;
+    total++;
+  }
+
+  const calcPct = (cnt) => (total > 0 ? Math.round((cnt / total) * 100) : 0);
+
+  return {
+    versionCode: 151,
+    versionName: "4.6.1",
+    totalCards: total,
+    boxes: {
+      box1: { count: counts[1], percent: calcPct(counts[1]), label: "Box 1 (Daily)" },
+      box2: { count: counts[2], percent: calcPct(counts[2]), label: "Box 2 (2 Days)" },
+      box3: { count: counts[3], percent: calcPct(counts[3]), label: "Box 3 (5 Days)" },
+      box4: { count: counts[4], percent: calcPct(counts[4]), label: "Box 4 (9 Days)" },
+      box5: { count: counts[5], percent: calcPct(counts[5]), label: "Box 5 (Mastered)" }
+    },
+    masteryRatePercent: calcPct(counts[5]),
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfProcessLeitnerReviewStep = dfProcessLeitnerReviewStep;
+  window.dfGetLeitnerVaultDistribution = dfGetLeitnerVaultDistribution;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfProcessLeitnerReviewStep = dfProcessLeitnerReviewStep;
+  globalThis.dfGetLeitnerVaultDistribution = dfGetLeitnerVaultDistribution;
+}
