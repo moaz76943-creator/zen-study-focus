@@ -13396,3 +13396,50 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetQuickSettingsTilePayload = dfGetQuickSettingsTilePayload;
 }
+
+// ============================================================================
+// MISSION #315: Dynamic Notification with Live Countdown Actions (v4.4.5)
+// ============================================================================
+function dfGetLiveNotificationPayload(timerState) {
+  const s = timerState || {};
+  const isRunning = Boolean(s.isRunning);
+  const secondsLeft = typeof s.secondsLeft === "number" ? Math.max(0, s.secondsLeft) : 1500;
+  const totalSeconds = typeof s.totalSeconds === "number" && s.totalSeconds > 0 ? s.totalSeconds : 1500;
+  const mode = s.mode === "break" ? "Zen Break" : "Zen Study Session";
+
+  const m = Math.floor(secondsLeft / 60);
+  const sec = secondsLeft % 60;
+  const formattedTime = (m < 10 ? "0" + m : "" + m) + ":" + (sec < 10 ? "0" + sec : "" + sec);
+
+  const elapsed = Math.max(0, totalSeconds - secondsLeft);
+  const progressPercent = Math.min(100, Math.max(0, Math.round((elapsed / totalSeconds) * 100)));
+
+  return {
+    versionCode: 135,
+    versionName: "4.4.5",
+    notificationId: 1001,
+    channelId: "deep_focus_live_timer",
+    channelName: "Live Focus Timer",
+    title: mode,
+    content: isRunning ? "Focusing: " + formattedTime + " remaining" : "Session Paused (" + formattedTime + ")",
+    formattedTime: formattedTime,
+    progressCurrent: elapsed,
+    progressMax: totalSeconds,
+    progressPercent: progressPercent,
+    isOngoing: isRunning,
+    actions: [
+      { id: "toggle", label: isRunning ? "PAUSE" : "RESUME" },
+      { id: "add_5m", label: "+5 MIN" },
+      { id: "skip", label: "SKIP" }
+    ],
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetLiveNotificationPayload = dfGetLiveNotificationPayload;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetLiveNotificationPayload = dfGetLiveNotificationPayload;
+}
