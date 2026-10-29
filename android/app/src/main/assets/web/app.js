@@ -13252,3 +13252,38 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetProductionGoldenReleaseSummary = dfGetProductionGoldenReleaseSummary;
 }
+
+// ============================================================================
+// MISSION #311: Android Quick Timer Home Widget State Bridge (v4.4.1)
+// ============================================================================
+function dfGetWidgetTimerPayload(state) {
+  const s = state || {};
+  const secondsLeft = typeof s.secondsLeft === "number" ? Math.max(0, s.secondsLeft) : 1500;
+  const isRunning = Boolean(s.isRunning);
+  const mode = s.mode === "break" ? "BREAK" : "FOCUS";
+  const total = typeof s.totalSeconds === "number" && s.totalSeconds > 0 ? s.totalSeconds : 1500;
+
+  const m = Math.floor(secondsLeft / 60);
+  const sec = secondsLeft % 60;
+  const formattedTime = (m < 10 ? "0" + m : "" + m) + ":" + (sec < 10 ? "0" + sec : "" + sec);
+  const progressPercent = Math.min(100, Math.max(0, Math.round(((total - secondsLeft) / total) * 100)));
+
+  return {
+    versionCode: 131,
+    versionName: "4.4.1",
+    formattedTime: formattedTime,
+    isRunning: isRunning,
+    mode: mode,
+    progressPercent: progressPercent,
+    actionLabel: isRunning ? "PAUSE" : "START",
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetWidgetTimerPayload = dfGetWidgetTimerPayload;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetWidgetTimerPayload = dfGetWidgetTimerPayload;
+}
