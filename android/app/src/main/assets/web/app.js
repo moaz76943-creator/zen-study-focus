@@ -14186,3 +14186,79 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfRateSessionFocusQuality = dfRateSessionFocusQuality;
 }
+
+// ============================================================================
+// MISSION #329: Chronotype Peak Productivity Hours Analytics (v4.5.9)
+// ============================================================================
+function dfAnalyzeChronotypePeakHours(historyList) {
+  const history = Array.isArray(historyList) ? historyList : [];
+  const hourBins = new Array(24).fill(0);
+  let totalSessions = 0;
+
+  for (const item of history) {
+    if (!item) continue;
+    const ts = typeof item.timestamp === "number" ? item.timestamp : Date.now();
+    const date = new Date(ts);
+    const hour = date.getHours();
+    const duration = typeof item.durationMinutes === "number" && item.durationMinutes > 0 ? item.durationMinutes : 25;
+    const rating = typeof item.rating === "number" && item.rating >= 1 && item.rating <= 5 ? item.rating : 3;
+
+    hourBins[hour] += duration * (rating / 3.0);
+    totalSessions++;
+  }
+
+  const indexed = hourBins.map((score, h) => ({ hour: h, score: score }));
+  indexed.sort((a, b) => b.score - a.score);
+
+  const top3 = indexed.slice(0, 3).map(x => x.hour);
+  const topHour = top3[0] || 10;
+
+  let morningScore = 0;
+  let afternoonScore = 0;
+  let nightScore = 0;
+
+  for (let h = 0; h < 24; h++) {
+    if (h >= 5 && h < 11) morningScore += hourBins[h];
+    else if (h >= 11 && h < 18) afternoonScore += hourBins[h];
+    else nightScore += hourBins[h];
+  }
+
+  let chronotype = "BEAR";
+  let chronotypeLabel = "Steady Daytime Focus (Bear)";
+  let recWindow = "10:00 - 13:00";
+
+  if (morningScore > afternoonScore && morningScore > nightScore) {
+    chronotype = "LARK";
+    chronotypeLabel = "Early Morning Peak (Lark)";
+    recWindow = "07:00 - 10:30";
+  } else if (nightScore > morningScore && nightScore > afternoonScore) {
+    chronotype = "OWL";
+    chronotypeLabel = "Late Evening Focus (Night Owl)";
+    recWindow = "20:00 - 23:30";
+  }
+
+  const pad = (n) => (n < 10 ? "0" + n : "" + n);
+  const nextHour = (topHour + 1) % 24;
+  const topFormatted = pad(topHour) + ":00 - " + pad(nextHour) + ":00";
+
+  return {
+    versionCode: 149,
+    versionName: "4.5.9",
+    chronotype: chronotype,
+    chronotypeLabel: chronotypeLabel,
+    topPeakHour: topHour,
+    topPeakWindowFormatted: topFormatted,
+    top3PeakHours: top3,
+    totalAnalyzedSessions: totalSessions,
+    recommendedDeepWorkWindow: recWindow,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfAnalyzeChronotypePeakHours = dfAnalyzeChronotypePeakHours;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfAnalyzeChronotypePeakHours = dfAnalyzeChronotypePeakHours;
+}
