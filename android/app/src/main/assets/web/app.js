@@ -13627,3 +13627,65 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfDetectShakeGesture = dfDetectShakeGesture;
 }
+
+// ============================================================================
+// MISSION #320: Weekly Sparkline Widget & Phase 1 Milestone Summary (v4.5.0)
+// ============================================================================
+function dfGetWeeklySparklineWidgetPayload(historyList) {
+  const list = Array.isArray(historyList) ? historyList : [];
+  const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  const daysData = [];
+  let totalMin = 0;
+  let maxMin = 1;
+
+  for (let i = 6; i >= 0; i--) {
+    const dayMin = typeof list[i] === "number" && list[i] >= 0 ? Math.floor(list[i]) : 0;
+    daysData.push({ dayIndex: 6 - i, minutes: dayMin });
+    totalMin += dayMin;
+    if (dayMin > maxMin) maxMin = dayMin;
+  }
+
+  const daysFormatted = daysData.map((d, idx) => ({
+    dayLabel: dayNames[idx % 7],
+    minutes: d.minutes,
+    heightPercent: Math.min(100, Math.round((d.minutes / maxMin) * 100))
+  }));
+
+  const totalHours = Math.round((totalMin / 60) * 10) / 10;
+
+  return {
+    versionCode: 140,
+    versionName: "4.5.0",
+    days: daysFormatted,
+    totalMinutes: totalMin,
+    totalHours: totalHours,
+    formattedTotal: totalHours + " HRS THIS WEEK",
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+function dfGetPhase1MilestoneSummary() {
+  return {
+    versionCode: 140,
+    versionName: "4.5.0",
+    status: "PHASE_1_COMPLETED",
+    phaseTitle: "Android Home Widgets & Live Surfaces",
+    missionsCompleted: 10,
+    totalMissionsInPlan: 50,
+    progressPercent: 20,
+    widgetsConfigured: 4,
+    systemIntegrations: 6,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetWeeklySparklineWidgetPayload = dfGetWeeklySparklineWidgetPayload;
+  window.dfGetPhase1MilestoneSummary = dfGetPhase1MilestoneSummary;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetWeeklySparklineWidgetPayload = dfGetWeeklySparklineWidgetPayload;
+  globalThis.dfGetPhase1MilestoneSummary = dfGetPhase1MilestoneSummary;
+}
