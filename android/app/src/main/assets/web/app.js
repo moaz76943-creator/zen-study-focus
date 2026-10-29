@@ -14120,3 +14120,69 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetDistractionMovementMetrics = dfGetDistractionMovementMetrics;
 }
+
+// ============================================================================
+// MISSION #328: Focus Quality & Friction Tagging Rating (v4.5.8)
+// ============================================================================
+function dfRateSessionFocusQuality(ratingData, historyList) {
+  const d = ratingData || {};
+  const rawRating = typeof d.rating === "number" ? Math.floor(d.rating) : 5;
+  const rating = Math.min(5, Math.max(1, rawRating));
+
+  const allowedTags = [
+    "MENTAL_FATIGUE",
+    "EXTERNAL_NOISE",
+    "DIFFICULT_MATERIAL",
+    "PHONE_TEMPTATION",
+    "HUNGER_THIRST",
+    "POOR_SLEEP",
+    "PERFECT_FLOW"
+  ];
+
+  const inputTags = Array.isArray(d.frictionTags) ? d.frictionTags : [];
+  const validTags = inputTags.filter(t => allowedTags.includes(String(t).toUpperCase()));
+  if (rating === 5 && validTags.length === 0) {
+    validTags.push("PERFECT_FLOW");
+  }
+
+  const starSymbols = ["☆☆☆☆☆", "★☆☆☆☆", "★★☆☆☆", "★★★☆☆", "★★★★☆", "★★★★★"];
+  const starsVisual = starSymbols[rating];
+
+  let category = "DEEP_FLOW";
+  if (rating <= 2) category = "HIGH_FRICTION";
+  else if (rating === 3) category = "MODERATE_FOCUS";
+  else if (rating === 4) category = "STRONG_FOCUS";
+
+  const history = Array.isArray(historyList) ? historyList : [];
+  let totalRating = rating;
+  let count = 1;
+
+  for (const item of history) {
+    if (item && typeof item.rating === "number" && item.rating >= 1 && item.rating <= 5) {
+      totalRating += item.rating;
+      count++;
+    }
+  }
+
+  const avgRating = Math.round((totalRating / count) * 10) / 10;
+
+  return {
+    versionCode: 148,
+    versionName: "4.5.8",
+    rating: rating,
+    starsVisual: starsVisual,
+    frictionTags: validTags,
+    qualityCategory: category,
+    averageRating: avgRating,
+    formattedAverage: avgRating + " / 5.0",
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfRateSessionFocusQuality = dfRateSessionFocusQuality;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfRateSessionFocusQuality = dfRateSessionFocusQuality;
+}
