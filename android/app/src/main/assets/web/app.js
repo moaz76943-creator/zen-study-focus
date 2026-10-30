@@ -15443,3 +15443,43 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfOptimizeAudioNodeLifecycle = dfOptimizeAudioNodeLifecycle;
 }
+
+// ============================================================================
+// MISSION #342: Ultra Battery Saver Zen Mode (v4.7.2)
+// ============================================================================
+function dfApplyUltraBatterySaverMode(batteryLevel, isCharging, options) {
+  const opts = options || {};
+  let rawLevel = typeof batteryLevel === "number" ? batteryLevel : 1.0;
+  if (rawLevel > 1.0) rawLevel = rawLevel / 100.0;
+  rawLevel = Math.max(0.0, Math.min(1.0, rawLevel));
+
+  const charging = Boolean(isCharging);
+  const threshold = typeof opts.autoThreshold === "number" ? opts.autoThreshold : 0.20;
+  const isForced = Boolean(opts.forceEnable);
+
+  const shouldActivate = isForced || (!charging && rawLevel <= threshold);
+
+  return {
+    versionCode: 162,
+    versionName: "4.7.2",
+    isUltraSaverActive: shouldActivate,
+    batteryLevelPercent: Math.round(rawLevel * 100),
+    isCharging: charging,
+    fpsCap: shouldActivate ? 1 : 60,
+    tickerMode: shouldActivate ? "DISCRETE_1HZ" : "CONTINUOUS_60HZ",
+    animationsDisabled: shouldActivate,
+    blurEffectsDisabled: shouldActivate,
+    canvasGlowDisabled: shouldActivate,
+    backgroundBlackHex: shouldActivate ? "#000000" : "#121212",
+    estimatedPowerReductionPercent: shouldActivate ? 75 : 0,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfApplyUltraBatterySaverMode = dfApplyUltraBatterySaverMode;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfApplyUltraBatterySaverMode = dfApplyUltraBatterySaverMode;
+}
