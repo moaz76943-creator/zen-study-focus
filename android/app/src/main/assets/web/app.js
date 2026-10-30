@@ -15173,3 +15173,122 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfSynthesizeCardPronunciation = dfSynthesizeCardPronunciation;
 }
+
+// ============================================================================
+// MISSION #339: Ready-to-Use Subject Flashcard Templates Pack (v4.6.9)
+// ============================================================================
+function dfGetSubjectDeckTemplates() {
+  return [
+    {
+      id: "STEM_ALGORITHMS",
+      name: "Computer Science & Algorithms",
+      subjectColor: "BLUE",
+      colorHex: "#38BDF8",
+      description: "Essential data structures, algorithm complexities, and paradigms",
+      cards: [
+        { term: "Dynamic Programming", definition: "Solving complex problems by breaking them down into simpler overlapping subproblems", phonetic: "/daɪˈnæm.ɪk/", tags: ["#stem", "#algorithms", "#cs"] },
+        { term: "Memoization", definition: "Optimization technique storing the results of expensive function calls", phonetic: "/ˌmem.oʊ.əˈzeɪ.ʃən/", tags: ["#stem", "#optimization"] },
+        { term: "Breadth-First Search", definition: "Algorithm for traversing tree or graph data structures level by level", phonetic: "/bredθ fɜːst sɜːtʃ/", tags: ["#stem", "#graphs"] },
+        { term: "Time Complexity", definition: "Computational complexity describing execution time of an algorithm", phonetic: "/taɪm kəmˈplek.sə.ti/", tags: ["#stem", "#big_o"] }
+      ]
+    },
+    {
+      id: "BIO_MEDICINE",
+      name: "Biology & Medical High-Yield",
+      subjectColor: "EMERALD",
+      colorHex: "#34D399",
+      description: "High-yield physiological processes and cellular biology terms",
+      cards: [
+        { term: "Homeostasis", definition: "State of steady internal physical and chemical conditions maintained by living systems", phonetic: "/ˌhoʊ.mi.oʊˈsteɪ.sɪs/", tags: ["#medicine", "#biology", "#physiology"] },
+        { term: "Neuroplasticity", definition: "Ability of the nervous system to rewire its structure and functions in response to experience", phonetic: "/ˌnʊr.oʊ.plæsˈtɪs.ə.ti/", tags: ["#neuroscience", "#brain"] },
+        { term: "Action Potential", definition: "Rapid sequence of voltage changes across an excitable cell membrane", phonetic: "/ˈæk.ʃən pəˈten.ʃəl/", tags: ["#physiology", "#nerves"] },
+        { term: "Mitochondria", definition: "Double-membrane-bound cellular organelle generating most chemical energy ATP", phonetic: "/ˌmaɪ.təˈkɑːn.dri.ə/", tags: ["#biology", "#cell"] }
+      ]
+    },
+    {
+      id: "ACADEMIC_VOCAB",
+      name: "Advanced Academic Vocabulary",
+      subjectColor: "VIOLET",
+      colorHex: "#A78BFA",
+      description: "Sophisticated terms for thesis writing, debate, and advanced reading",
+      cards: [
+        { term: "Serendipity", definition: "The occurrence of events by chance in a happy or beneficial way", phonetic: "/ˌser.ənˈdɪp.ə.ti/", tags: ["#vocab", "#english", "#literature"] },
+        { term: "Epiphany", definition: "A moment of sudden revelation or intuitive insight", phonetic: "/ɪˈpɪf.ən.i/", tags: ["#vocab", "#mindset"] },
+        { term: "Paradigm", definition: "A distinct set of concepts or thought patterns, including theories and research methods", phonetic: "/ˈpær.ə.daɪm/", tags: ["#academic", "#philosophy"] },
+        { term: "Ubiquitous", definition: "Present, appearing, or found everywhere simultaneously", phonetic: "/juːˈbɪk.wə.təs/", tags: ["#vocab", "#gre"] }
+      ]
+    },
+    {
+      id: "LAW_JURISPRUDENCE",
+      name: "Law & Constitutional Jurisprudence",
+      subjectColor: "AMBER",
+      colorHex: "#FBBF24",
+      description: "Fundamental Latin legal doctrines and constitutional principles",
+      cards: [
+        { term: "Habeas Corpus", definition: "Legal recourse requiring a person under arrest to be brought before a judge or into court", phonetic: "/ˌheɪ.bi.əs ˈkɔːr.pəs/", tags: ["#law", "#rights"] },
+        { term: "Stare Decisis", definition: "Doctrine of precedent obligating courts to follow previous judicial decisions", phonetic: "/ˌstɑː.reɪ dɪˈsaɪ.sɪs/", tags: ["#law", "#courts"] },
+        { term: "Prima Facie", definition: "On its first encounter or based on the first impression as accepted as correct until proven otherwise", phonetic: "/ˌpraɪ.mə ˈfeɪ.ʃi/", tags: ["#law", "#evidence"] },
+        { term: "Due Process", definition: "Legal requirement that state must respect all legal rights that are owed to a person", phonetic: "/djuː ˈprɑː.ses/", tags: ["#law", "#constitution"] }
+      ]
+    }
+  ];
+}
+
+function dfInstantiateSubjectDeckTemplate(templateId, existingCardsList) {
+  const templates = dfGetSubjectDeckTemplates();
+  const targetId = String(templateId || "").toUpperCase().trim();
+  const tmpl = templates.find(t => t.id === targetId) || templates[0];
+
+  const existing = Array.isArray(existingCardsList) ? existingCardsList : [];
+  const existingSet = new Set(existing.map(c => ((c.deck || "General") + ":::" + (c.term || "")).toLowerCase().trim()));
+
+  const instantiated = [];
+  let skipped = 0;
+  let counter = 1;
+
+  for (const c of tmpl.cards) {
+    const key = (tmpl.name + ":::" + c.term).toLowerCase().trim();
+    if (existingSet.has(key)) {
+      skipped++;
+      continue;
+    }
+
+    existingSet.add(key);
+    instantiated.push({
+      id: "card_tmpl_" + Date.now() + "_" + counter++,
+      term: c.term,
+      definition: c.definition,
+      phonetic: c.phonetic || "",
+      deck: tmpl.name,
+      box: 1,
+      tags: Array.isArray(c.tags) ? [...c.tags] : [],
+      subjectName: tmpl.subjectColor,
+      colorCode: tmpl.colorHex,
+      reviewCount: 0,
+      createdAt: Date.now()
+    });
+  }
+
+  return {
+    versionCode: 159,
+    versionName: "4.6.9",
+    templateId: tmpl.id,
+    deckName: tmpl.name,
+    subjectColor: tmpl.subjectColor,
+    colorHex: tmpl.colorHex,
+    cardsInstantiatedCount: instantiated.length,
+    skippedDuplicatesCount: skipped,
+    cards: instantiated,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetSubjectDeckTemplates = dfGetSubjectDeckTemplates;
+  window.dfInstantiateSubjectDeckTemplate = dfInstantiateSubjectDeckTemplate;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetSubjectDeckTemplates = dfGetSubjectDeckTemplates;
+  globalThis.dfInstantiateSubjectDeckTemplate = dfInstantiateSubjectDeckTemplate;
+}
