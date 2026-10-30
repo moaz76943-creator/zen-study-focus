@@ -15091,3 +15091,85 @@ if (typeof globalThis !== "undefined") {
   globalThis.dfManageCardTagsAndColorMatrix = dfManageCardTagsAndColorMatrix;
   globalThis.dfFilterCardsByTagMatrix = dfFilterCardsByTagMatrix;
 }
+
+// ============================================================================
+// MISSION #338: Android Offline Native TTS Engine Pronunciation Hook (v4.6.8)
+// ============================================================================
+function dfSynthesizeCardPronunciation(termText, langCode, options) {
+  const text = String(termText || "").trim();
+  const rawLang = String(langCode || "en-US").trim();
+  const opts = options || {};
+
+  const lowerLang = rawLang.toLowerCase();
+  if (lowerLang.startsWith("he") || lowerLang.startsWith("iw") || /[\u0590-\u05FF]/.test(text)) {
+    return {
+      versionCode: 158,
+      versionName: "4.6.8",
+      error: "FORBIDDEN_LOCALE_OR_SCRIPT",
+      isDispatched: false,
+      timestamp: Date.now()
+    };
+  }
+
+  if (!text) {
+    return {
+      versionCode: 158,
+      versionName: "4.6.8",
+      error: "EMPTY_TEXT",
+      isDispatched: false,
+      timestamp: Date.now()
+    };
+  }
+
+  const rate = typeof opts.speechRate === "number" && opts.speechRate >= 0.5 && opts.speechRate <= 2.0
+    ? Math.round(opts.speechRate * 100) / 100
+    : 0.85;
+  const pitch = typeof opts.speechPitch === "number" && opts.speechPitch >= 0.5 && opts.speechPitch <= 1.5
+    ? Math.round(opts.speechPitch * 100) / 100
+    : 1.0;
+
+  let engineUsed = "SIMULATED_VM";
+
+  if (typeof window !== "undefined") {
+    if (window.AndroidBridge && typeof window.AndroidBridge.speakText === "function") {
+      try {
+        window.AndroidBridge.speakText(text, rawLang, rate, pitch);
+        engineUsed = "ANDROID_NATIVE_TTS_BRIDGE";
+      } catch (e) {
+        engineUsed = "BRIDGE_ERROR_FALLBACK";
+      }
+    } else if (window.speechSynthesis && typeof window.SpeechSynthesisUtterance !== "undefined") {
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new window.SpeechSynthesisUtterance(text);
+        utterance.lang = rawLang;
+        utterance.rate = rate;
+        utterance.pitch = pitch;
+        window.speechSynthesis.speak(utterance);
+        engineUsed = "WEB_SPEECH_API";
+      } catch (e) {
+        engineUsed = "WEB_SPEECH_ERROR";
+      }
+    }
+  }
+
+  return {
+    versionCode: 158,
+    versionName: "4.6.8",
+    term: text,
+    locale: rawLang,
+    rate: rate,
+    pitch: pitch,
+    engine: engineUsed,
+    isDispatched: true,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfSynthesizeCardPronunciation = dfSynthesizeCardPronunciation;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfSynthesizeCardPronunciation = dfSynthesizeCardPronunciation;
+}
