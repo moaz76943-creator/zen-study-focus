@@ -15483,3 +15483,61 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfApplyUltraBatterySaverMode = dfApplyUltraBatterySaverMode;
 }
+
+// ============================================================================
+// MISSION #343: Dynamic CSS Hardware Acceleration & Low-Battery Blur Disabler (v4.7.3)
+// ============================================================================
+function dfApplyGpuRenderProfile(systemState, options) {
+  const state = systemState || {};
+  const opts = options || {};
+
+  let rawBattery = typeof state.batteryLevel === "number" ? state.batteryLevel : 1.0;
+  if (rawBattery > 1.0) rawBattery = rawBattery / 100.0;
+  rawBattery = Math.max(0.0, Math.min(1.0, rawBattery));
+
+  const isLowBattery = Boolean(state.isLowBattery) || (rawBattery <= 0.20 && !state.isCharging);
+  const isThrottling = Boolean(state.isThermalThrottling);
+  const forceHighPerf = Boolean(opts.forceHighPerfMode);
+
+  const shouldThrottle = (isLowBattery || isThrottling) && !forceHighPerf;
+
+  let profile = "GPU_ENHANCED_ZEN";
+  let blur = true;
+  let shadows = true;
+  let stressReduction = 0;
+
+  if (shouldThrottle) {
+    profile = "GPU_LIGHTWEIGHT_COOLING";
+    blur = false;
+    shadows = false;
+    stressReduction = 65;
+  }
+
+  const cssVariables = {
+    "--df-gpu-transform": "translate3d(0,0,0)",
+    "--df-backdrop-blur": blur ? "blur(12px)" : "none",
+    "--df-glass-bg": blur ? "rgba(24, 24, 27, 0.75)" : "rgba(24, 24, 27, 0.96)",
+    "--df-card-shadow": shadows ? "0 4px 20px -2px rgba(0, 0, 0, 0.5)" : "none",
+    "--df-card-border": shadows ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid #27272A"
+  };
+
+  return {
+    versionCode: 163,
+    versionName: "4.7.3",
+    profileName: profile,
+    hardwareAccelerationActive: true,
+    backdropBlurActive: blur,
+    heavyShadowsActive: shadows,
+    thermalStressReductionPercent: stressReduction,
+    cssVariables: cssVariables,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfApplyGpuRenderProfile = dfApplyGpuRenderProfile;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfApplyGpuRenderProfile = dfApplyGpuRenderProfile;
+}
