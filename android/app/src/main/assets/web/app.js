@@ -14981,3 +14981,113 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfCalculateLongTermRetentionIndex = dfCalculateLongTermRetentionIndex;
 }
+
+// ============================================================================
+// MISSION #337: Multi-Tagging & Subject Color Matrix (v4.6.7)
+// ============================================================================
+function dfManageCardTagsAndColorMatrix(card, action, tagPayload) {
+  const c = card || {};
+  const act = (action || "GET").toUpperCase();
+  const payload = tagPayload || {};
+
+  const colorMatrix = {
+    "BLUE": { hex: "#38BDF8", subject: "STEM / Computer Science" },
+    "EMERALD": { hex: "#34D399", subject: "Biology / Medicine" },
+    "AMBER": { hex: "#FBBF24", subject: "Law / Economics" },
+    "ROSE": { hex: "#FB7185", subject: "History / Humanities" },
+    "VIOLET": { hex: "#A78BFA", subject: "Languages / Vocabulary" },
+    "SLATE": { hex: "#94A3B8", subject: "General / Miscellaneous" }
+  };
+
+  let currentTags = Array.isArray(c.tags) ? [...c.tags] : [];
+  let currentColor = c.colorCode || colorMatrix.SLATE.hex;
+  let currentSubject = c.subjectName || "SLATE";
+
+  const sanitizeTag = (t) => {
+    let s = String(t || "").trim().toLowerCase().replace(/\s+/g, "_");
+    if (!s.startsWith("#")) s = "#" + s;
+    return s;
+  };
+
+  if (act === "ADD_TAG" && payload.tag) {
+    const clean = sanitizeTag(payload.tag);
+    if (!currentTags.includes(clean)) currentTags.push(clean);
+  } else if (act === "REMOVE_TAG" && payload.tag) {
+    const clean = sanitizeTag(payload.tag);
+    currentTags = currentTags.filter(t => t !== clean);
+  } else if (act === "SET_TAGS_BULK" && Array.isArray(payload.tags)) {
+    currentTags = payload.tags.map(sanitizeTag).filter((v, i, a) => a.indexOf(v) === i);
+  } else if (act === "SET_COLOR" && payload.colorName) {
+    const name = String(payload.colorName).toUpperCase().trim();
+    if (colorMatrix[name]) {
+      currentColor = colorMatrix[name].hex;
+      currentSubject = name;
+    }
+  }
+
+  c.tags = currentTags;
+  c.colorCode = currentColor;
+  c.subjectName = currentSubject;
+
+  return {
+    versionCode: 157,
+    versionName: "4.6.7",
+    cardId: c.id || "card_tag",
+    tags: currentTags,
+    colorCode: currentColor,
+    subjectName: currentSubject,
+    totalTagsOnCard: currentTags.length,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+function dfFilterCardsByTagMatrix(cardsList, filterCriteria) {
+  const list = Array.isArray(cardsList) ? cardsList : [];
+  const criteria = filterCriteria || {};
+  const targetTag = criteria.tag ? String(criteria.tag).toLowerCase().trim() : null;
+  const targetColor = criteria.subjectName ? String(criteria.subjectName).toUpperCase().trim() : null;
+
+  const tagDistribution = {};
+  const filtered = [];
+
+  for (const c of list) {
+    if (!c) continue;
+    const tags = Array.isArray(c.tags) ? c.tags : [];
+    const subject = c.subjectName || "SLATE";
+
+    for (const t of tags) {
+      tagDistribution[t] = (tagDistribution[t] || 0) + 1;
+    }
+
+    let match = true;
+    if (targetTag && !tags.some(t => t.toLowerCase() === targetTag || t.toLowerCase() === "#" + targetTag)) {
+      match = false;
+    }
+    if (targetColor && subject !== targetColor) {
+      match = false;
+    }
+
+    if (match) filtered.push(c);
+  }
+
+  return {
+    versionCode: 157,
+    versionName: "4.6.7",
+    matchingCardsCount: filtered.length,
+    totalCardsEvaluated: list.length,
+    filteredCards: filtered,
+    tagDistribution: tagDistribution,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfManageCardTagsAndColorMatrix = dfManageCardTagsAndColorMatrix;
+  window.dfFilterCardsByTagMatrix = dfFilterCardsByTagMatrix;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfManageCardTagsAndColorMatrix = dfManageCardTagsAndColorMatrix;
+  globalThis.dfFilterCardsByTagMatrix = dfFilterCardsByTagMatrix;
+}
