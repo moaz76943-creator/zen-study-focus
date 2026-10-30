@@ -15906,3 +15906,92 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfMixNatureSoundscapes = dfMixNatureSoundscapes;
 }
+
+// ============================================================================
+// MISSION #348: Motion-Sensing Audio Sleep Auto-Fade Timer (v4.7.8)
+// ============================================================================
+function dfGetMotionSleepFadeMetrics(motionState, options) {
+  const s = motionState || {};
+  const opts = options || {};
+
+  const isEnabled = opts.enabled !== false;
+  const now = typeof opts.currentTime === "number" ? opts.currentTime : Date.now();
+  const lastMove = typeof s.lastMovementTime === "number" ? s.lastMovementTime : now;
+  const isMoving = Boolean(s.isCurrentlyMoving);
+
+  const stillnessMin = typeof opts.stillnessThresholdMinutes === "number" && opts.stillnessThresholdMinutes > 0 ? opts.stillnessThresholdMinutes : 20;
+  const fadeMin = typeof opts.fadeDurationMinutes === "number" && opts.fadeDurationMinutes > 0 ? opts.fadeDurationMinutes : 5;
+
+  const stillnessMs = stillnessMin * 60 * 1000;
+  const fadeMs = fadeMin * 60 * 1000;
+
+  if (!isEnabled) {
+    return {
+      versionCode: 168,
+      versionName: "4.7.8",
+      sleepTimerActive: false,
+      state: "DISABLED",
+      volumeMultiplier: 1.0,
+      isAudioSuspended: false,
+      westernDigits: true,
+      timestamp: now
+    };
+  }
+
+  if (isMoving && s.lastState && s.lastState !== "STILLNESS_COUNTDOWN") {
+    return {
+      versionCode: 168,
+      versionName: "4.7.8",
+      sleepTimerActive: true,
+      state: "RESTORED_BY_MOTION",
+      stillnessElapsedMinutes: 0,
+      stillnessThresholdMinutes: stillnessMin,
+      volumeMultiplier: 1.0,
+      isAudioSuspended: false,
+      westernDigits: true,
+      timestamp: now
+    };
+  }
+
+  const idleTimeMs = Math.max(0, now - lastMove);
+  const idleMinutes = Math.floor(idleTimeMs / 60000);
+
+  let state = "STILLNESS_COUNTDOWN";
+  let volMult = 1.0;
+  let isSuspended = false;
+  let fadeProgress = 0;
+
+  if (idleTimeMs >= (stillnessMs + fadeMs)) {
+    state = "SLEEP_SUSPENDED";
+    volMult = 0.0;
+    isSuspended = true;
+    fadeProgress = 100;
+  } else if (idleTimeMs >= stillnessMs) {
+    state = "FADING_DOWN";
+    const fadeElapsedMs = idleTimeMs - stillnessMs;
+    fadeProgress = Math.min(100, Math.round((fadeElapsedMs / fadeMs) * 100));
+    volMult = Math.max(0.0, Math.round((1.0 - (fadeElapsedMs / fadeMs)) * 100) / 100);
+  }
+
+  return {
+    versionCode: 168,
+    versionName: "4.7.8",
+    sleepTimerActive: true,
+    state: state,
+    stillnessElapsedMinutes: idleMinutes,
+    stillnessThresholdMinutes: stillnessMin,
+    fadeDurationMinutes: fadeMin,
+    fadeProgressPercent: fadeProgress,
+    volumeMultiplier: volMult,
+    isAudioSuspended: isSuspended,
+    westernDigits: true,
+    timestamp: now
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetMotionSleepFadeMetrics = dfGetMotionSleepFadeMetrics;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetMotionSleepFadeMetrics = dfGetMotionSleepFadeMetrics;
+}
