@@ -15292,3 +15292,96 @@ if (typeof globalThis !== "undefined") {
   globalThis.dfGetSubjectDeckTemplates = dfGetSubjectDeckTemplates;
   globalThis.dfInstantiateSubjectDeckTemplate = dfInstantiateSubjectDeckTemplate;
 }
+
+// ============================================================================
+// MISSION #340: Break Micro-Quiz Hook & Phase 3 Milestone (v4.7.0)
+// ============================================================================
+function dfGetBreakMicroQuizSession(cardsList, options) {
+  const list = Array.isArray(cardsList) ? cardsList : [];
+  const opts = options || {};
+  const maxQuestions = typeof opts.questionCount === "number" && opts.questionCount > 0 ? Math.min(5, Math.floor(opts.questionCount)) : 3;
+
+  if (list.length === 0) {
+    return {
+      versionCode: 160,
+      versionName: "4.7.0",
+      sessionId: "micro_quiz_empty",
+      questionCount: 0,
+      cards: [],
+      synergyPointsBonus: 0,
+      estimatedDurationSeconds: 0,
+      westernDigits: true,
+      timestamp: Date.now()
+    };
+  }
+
+  const box1Cards = list.filter(c => c && (c.box === 1 || !c.box));
+  const box23Cards = list.filter(c => c && (c.box === 2 || c.box === 3));
+  const otherCards = list.filter(c => c && c.box > 3);
+
+  const selected = [];
+  const usedIds = new Set();
+
+  const addCard = (c) => {
+    if (c && !usedIds.has(c.id || c.term) && selected.length < maxQuestions) {
+      usedIds.add(c.id || c.term);
+      selected.push({
+        id: c.id || "card_mq_" + selected.length,
+        term: c.term,
+        definition: c.definition || "",
+        phonetic: c.phonetic || "",
+        deck: c.deck || "General",
+        box: c.box || 1,
+        sourceBox: c.box || 1
+      });
+    }
+  };
+
+  if (box1Cards.length > 0) addCard(box1Cards[Math.floor(Math.random() * box1Cards.length)]);
+  if (box23Cards.length > 0) addCard(box23Cards[Math.floor(Math.random() * box23Cards.length)]);
+  if (otherCards.length > 0) addCard(otherCards[Math.floor(Math.random() * otherCards.length)]);
+
+  for (const c of list) {
+    if (selected.length >= maxQuestions) break;
+    addCard(c);
+  }
+
+  const estSec = selected.length * 30;
+  const bonus = selected.length * 10;
+
+  return {
+    versionCode: 160,
+    versionName: "4.7.0",
+    sessionId: "micro_quiz_" + Date.now(),
+    questionCount: selected.length,
+    cards: selected,
+    synergyPointsBonus: bonus,
+    estimatedDurationSeconds: estSec,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+function dfGetPhase3MilestoneSummary() {
+  return {
+    versionCode: 160,
+    versionName: "4.7.0",
+    status: "PHASE_3_COMPLETED",
+    phaseTitle: "Adaptive Leitner & Memory Vault 2.0",
+    missionsCompleted: 30,
+    totalMissionsInPlan: 50,
+    progressPercent: 60,
+    featuresImplemented: 10,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfGetBreakMicroQuizSession = dfGetBreakMicroQuizSession;
+  window.dfGetPhase3MilestoneSummary = dfGetPhase3MilestoneSummary;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfGetBreakMicroQuizSession = dfGetBreakMicroQuizSession;
+  globalThis.dfGetPhase3MilestoneSummary = dfGetPhase3MilestoneSummary;
+}
