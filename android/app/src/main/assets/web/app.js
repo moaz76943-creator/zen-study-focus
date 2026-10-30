@@ -15830,3 +15830,79 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfCompressAndPruneVaultStorage = dfCompressAndPruneVaultStorage;
 }
+
+// ============================================================================
+// MISSION #347: Dual Multi-Track Nature Soundscape Mixer (v4.7.7)
+// ============================================================================
+function dfMixNatureSoundscapes(primaryTrack, secondaryTrack, masterOptions) {
+  const p = primaryTrack || {};
+  const s = secondaryTrack || {};
+  const opts = masterOptions || {};
+
+  const allowedSounds = ["RAIN", "STREAM", "FIRE", "WIND", "WHITE_NOISE", "OFF"];
+
+  const sanitizeSound = (snd, defaultSnd) => {
+    const u = String(snd || defaultSnd).toUpperCase().trim();
+    return allowedSounds.includes(u) ? u : defaultSnd;
+  };
+
+  const sanitizeVol = (vol, defaultVol) => {
+    const v = typeof vol === "number" ? vol : defaultVol;
+    return Math.max(0.0, Math.min(1.0, Math.round(v * 100) / 100));
+  };
+
+  const primarySound = sanitizeSound(p.sound, "RAIN");
+  const primaryVol = sanitizeVol(p.volume, 0.70);
+
+  const secondarySound = sanitizeSound(s.sound, "OFF");
+  const secondaryVol = sanitizeVol(s.volume, 0.30);
+
+  const masterVol = sanitizeVol(opts.masterVolume, 1.0);
+  const isMuted = Boolean(opts.isMuted);
+
+  const effVolP = isMuted ? 0.0 : Math.round((primaryVol * masterVol) * 100) / 100;
+  const effVolS = (isMuted || secondarySound === "OFF") ? 0.0 : Math.round((secondaryVol * masterVol) * 100) / 100;
+
+  const isDual = primarySound !== "OFF" && secondarySound !== "OFF" && !isMuted;
+  const activeSources = (primarySound !== "OFF" ? 1 : 0) + (secondarySound !== "OFF" && !isMuted ? 1 : 0);
+
+  const soundProfiles = {
+    "RAIN": { filterType: "lowpass", freqHz: 850, noise: "pink" },
+    "STREAM": { filterType: "bandpass", freqHz: 1200, noise: "brown" },
+    "FIRE": { filterType: "lowpass", freqHz: 600, popGenerator: "random_impulse" },
+    "WIND": { filterType: "bandpass", freqHz: 400, lfoModulationHz: 0.2 },
+    "WHITE_NOISE": { filterType: "allpass", freqHz: 1000, noise: "white" }
+  };
+
+  return {
+    versionCode: 167,
+    versionName: "4.7.7",
+    isDualTrackActive: isDual,
+    primaryTrack: {
+      sound: primarySound,
+      volume: primaryVol,
+      effectiveVolume: effVolP,
+      profile: soundProfiles[primarySound] || null
+    },
+    secondaryTrack: {
+      sound: secondarySound,
+      volume: secondaryVol,
+      effectiveVolume: effVolS,
+      profile: soundProfiles[secondarySound] || null
+    },
+    masterVolume: masterVol,
+    isMuted: isMuted,
+    totalActiveAudioSources: activeSources,
+    smoothFadeMs: typeof opts.smoothFadeMs === "number" ? opts.smoothFadeMs : 1500,
+    zeroMusicPolicy: true,
+    westernDigits: true,
+    timestamp: Date.now()
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfMixNatureSoundscapes = dfMixNatureSoundscapes;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfMixNatureSoundscapes = dfMixNatureSoundscapes;
+}
