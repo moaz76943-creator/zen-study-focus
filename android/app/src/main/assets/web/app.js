@@ -15702,3 +15702,131 @@ if (typeof window !== "undefined") {
 if (typeof globalThis !== "undefined") {
   globalThis.dfVerifyOfflineFirstIntegrity = dfVerifyOfflineFirstIntegrity;
 }
+
+// ============================================================================
+// MISSION #346: Local Storage & Vault Auto-Pruning Compression Engine (v4.7.6)
+// ============================================================================
+function dfCompressAndPruneVaultStorage(options, storageAdapter) {
+  const opts = options || {};
+  const storage = storageAdapter || (typeof localStorage !== "undefined" ? localStorage : null);
+  const now = typeof opts.currentTime === "number" ? opts.currentTime : Date.now();
+  const retentionDays = typeof opts.retentionDays === "number" && opts.retentionDays > 0 ? opts.retentionDays : 90;
+  const cutoffTime = now - (retentionDays * 24 * 60 * 60 * 1000);
+
+  if (!storage) {
+    return {
+      versionCode: 166,
+      versionName: "4.7.6",
+      storageStatus: "SKIPPED_NO_STORAGE",
+      bytesFreed: 0,
+      westernDigits: true,
+      timestamp: now
+    };
+  }
+
+  let bytesBefore = 0;
+  const allKeys = [];
+  if (typeof storage.length === "number") {
+    for (let i = 0; i < storage.length; i++) {
+      const k = storage.key(i);
+      if (k) allKeys.push(k);
+    }
+  } else if (storage._data) {
+    allKeys.push(...Object.keys(storage._data));
+  }
+
+  for (const k of allKeys) {
+    const v = storage.getItem(k) || "";
+    bytesBefore += (k.length + v.length) * 2;
+  }
+
+  const rawHistory = storage.getItem("df_v21_history");
+  let historyList = [];
+  try {
+    historyList = JSON.parse(rawHistory) || [];
+  } catch (e) {
+    historyList = [];
+  }
+
+  const recentSessions = [];
+  const monthlyBuckets = {};
+  let prunedCount = 0;
+
+  for (const s of historyList) {
+    if (!s) continue;
+    const ts = typeof s.timestamp === "number" ? s.timestamp : now;
+    if (ts >= cutoffTime) {
+      recentSessions.push(s);
+    } else {
+      prunedCount++;
+      const d = new Date(ts);
+      const mKey = d.getFullYear() + "-" + (d.getMonth() + 1 < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1));
+      if (!monthlyBuckets[mKey]) {
+        monthlyBuckets[mKey] = { totalMinutes: 0, sessionCount: 0, totalRating: 0 };
+      }
+      monthlyBuckets[mKey].totalMinutes += (typeof s.durationMinutes === "number" ? s.durationMinutes : 25);
+      monthlyBuckets[mKey].sessionCount++;
+      monthlyBuckets[mKey].totalRating += (typeof s.rating === "number" ? s.rating : 4);
+    }
+  }
+
+  if (!opts.dryRun && prunedCount > 0) {
+    storage.setItem("df_v21_history", JSON.stringify(recentSessions));
+
+    const rawArchive = storage.getItem("df_v21_history_monthly_archive");
+    let existingArchive = {};
+    try { existingArchive = JSON.parse(rawArchive) || {}; } catch (e) {}
+
+    for (const [m, b] of Object.entries(monthlyBuckets)) {
+      if (!existingArchive[m]) existingArchive[m] = { totalMinutes: 0, sessionCount: 0, avgRating: 4.0 };
+      existingArchive[m].totalMinutes += b.totalMinutes;
+      existingArchive[m].sessionCount += b.sessionCount;
+      existingArchive[m].avgRating = Math.round((b.totalRating / b.sessionCount) * 10) / 10;
+    }
+    storage.setItem("df_v21_history_monthly_archive", JSON.stringify(existingArchive));
+  }
+
+  let orphanedRemoved = 0;
+  const backupCutoff = now - (7 * 24 * 60 * 60 * 1000);
+  for (const k of allKeys) {
+    if (k.includes("_corrupt_bak_")) {
+      const parts = k.split("_corrupt_bak_");
+      const bakTime = parseInt(parts[1], 10);
+      if (bakTime && bakTime < backupCutoff) {
+        if (!opts.dryRun) storage.removeItem(k);
+        orphanedRemoved++;
+      }
+    }
+  }
+
+  let bytesAfter = 0;
+  for (const k of allKeys) {
+    const v = storage.getItem(k) || "";
+    bytesAfter += (k.length + v.length) * 2;
+  }
+
+  const bytesFreed = Math.max(0, bytesBefore - bytesAfter);
+  const ratio = bytesBefore > 0 ? Math.round((bytesFreed / bytesBefore) * 100) : 0;
+
+  return {
+    versionCode: 166,
+    versionName: "4.7.6",
+    storageStatus: "OPTIMIZED",
+    bytesUsedBefore: bytesBefore,
+    bytesUsedAfter: bytesAfter,
+    bytesFreed: bytesFreed,
+    compressionRatioPercent: ratio,
+    granularSessionsRetained: recentSessions.length,
+    prunedSessionsArchived: prunedCount,
+    orphanedKeysRemovedCount: orphanedRemoved,
+    westernDigits: true,
+    timestamp: now
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.dfCompressAndPruneVaultStorage = dfCompressAndPruneVaultStorage;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.dfCompressAndPruneVaultStorage = dfCompressAndPruneVaultStorage;
+}
