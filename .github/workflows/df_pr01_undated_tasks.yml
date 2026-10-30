@@ -13,6 +13,9 @@ on:
       - '.github/workflows/df_pr01_undated_tasks.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   v21-task-contract:
     runs-on: ubuntu-latest

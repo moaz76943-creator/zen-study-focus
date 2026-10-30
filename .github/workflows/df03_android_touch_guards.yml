@@ -1,12 +1,12 @@
 name: DF03 Android touch geometry source tests
+# Identical geometry checks run in df08 source validation; retain manual entry.
 on:
-  pull_request:
-    branches: [integration/master-qa-verified-v21]
-    paths:
-      - 'tests/android_touch/**'
-      - '.github/workflows/df03_android_touch_guards.yml'
+  workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   geometry:
     runs-on: ubuntu-24.04

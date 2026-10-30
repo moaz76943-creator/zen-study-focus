@@ -2487,7 +2487,16 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 window.handleAndroidBack = function() {
   if (document.getElementById('deskClockOverlay').classList.contains('active')) { toggleDeskClock(false); return true; }
   const openM = document.querySelectorAll('.modal-overlay.open');
-  if (openM.length > 0) { openM.forEach(m => m.classList.remove('open')); return true; }
+  if (openM.length > 0) {
+    // Notes owns draft backup and explicit discard consent; consume Back even
+    // when the user keeps editing after a failed backup.
+    const noteModal = document.getElementById('noteModal');
+    if (noteModal && noteModal.classList.contains('open') && typeof nsCloseEditor === 'function') {
+      if (nsCloseEditor() !== true) return true;
+    }
+    openM.forEach(m => m.classList.remove('open'));
+    return true;
+  }
   const timerTab = document.getElementById('sec-timer');
   if (timerTab && !timerTab.classList.contains('active')) {
     switchTab('sec-timer', document.getElementById('navTimer'));

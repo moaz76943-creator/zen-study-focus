@@ -30,9 +30,11 @@ public final class TouchInstrumentation extends Instrumentation {
     private WebView view;
     private int actualTaps = 0;
     private String lastTapDiagnostics = "none";
+    private Bundle testArguments;
 
     @Override public void onCreate(Bundle arguments) {
         super.onCreate(arguments);
+        testArguments = arguments;
         start();
     }
 
@@ -66,6 +68,55 @@ public final class TouchInstrumentation extends Instrumentation {
                 SystemClock.sleep(400);
             }
             assertTrue(ready, "WebView app bootstrap NOT verified");
+            // Reopen in a new Android instrumentation process after real am force-stop.
+            // The scenario's title depends on a controlled viewport, not wall-clock time.
+            final String width = testArguments == null ? "unknown" : testArguments.getString("width", "unknown");
+            final String locale = testArguments == null ? "en" : testArguments.getString("locale", "en");
+            final String fontScale = testArguments == null ? "1.0" : testArguments.getString("fontScale", "1.0");
+            assertTrue("en".equals(locale) || "ar".equals(locale), "Unsupported test locale " + locale);
+            final float actualFontScale = activity.getResources().getConfiguration().fontScale;
+            assertTrue(Math.abs(actualFontScale - Float.parseFloat(fontScale)) < 0.01f,
+                "Requested Android font scale not actually tested: " + actualFontScale);
+            result.putString("df08_actual_font_scale", String.valueOf(actualFontScale));
+            final String noteTitle = "DF08 Instrumented " + width + " " + locale + " " + fontScale;
+            final String stage = testArguments == null ? "save" : testArguments.getString("stage", "save");
+            if ("verify".equals(stage)) {
+                final String expectedId = testArguments.getString("expectedId", "");
+                assertTrue(expectedId.matches("[0-9]+"), "No independently captured saved ID supplied for reopen");
+                JSONObject restored = null;
+                boolean found = false;
+                for (int attempt = 0; attempt < 24; attempt++) {
+                    restored = js("(()=>{const D=window.DeepFocusDataCompatV21,k=D?.KEYS?.notes;" +
+                        "const p=k?localStorage.getItem(k):null,m=k?localStorage.getItem(k+'_mirror'):null;" +
+                        "const packet=p&&D?D.inspectPacket(p):{ok:false};" +
+                        "const live=(typeof notesList==='undefined'?[]:notesList).filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
+                        "const stored=(packet.ok&&Array.isArray(packet.value)?packet.value:[]).filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
+                        "return {matches:live.length,liveBody:live[0]?.body||'',liveId:String(live[0]?.id),storedId:String(stored[0]?.id),lang:cfg.lang,dir:document.documentElement.dir,storedMatches:stored.length," +
+                        "storedBody:stored[0]?.body||'',mirrorOk:!!p&&p===m&&packet.ok," +
+                        "primaryPresent:!!p,mirrorPresent:!!m,advancedUi:document.body.classList.contains('df-v22')," +
+                        "storageFamilies:Object.keys(localStorage).filter(k=>k.startsWith('zen_fortress_')).length};})()");
+                    found = restored.optInt("matches") == 1 &&
+                        restored.optInt("storedMatches") == 1 &&
+                        restored.optBoolean("mirrorOk") &&
+                        expectedId.equals(restored.optString("liveId")) &&
+                        expectedId.equals(restored.optString("storedId")) &&
+                        locale.equals(restored.optString("lang")) &&
+                        ("ar".equals(locale) ? "rtl" : "ltr").equals(restored.optString("dir")) &&
+                        "Persisted note 2026".equals(restored.optString("liveBody")) &&
+                        "Persisted note 2026".equals(restored.optString("storedBody"));
+                    if (found) break;
+                    SystemClock.sleep(250);
+                }
+                assertTrue(found, "Force-stop/relaunch Notes mirror and rendered state FAILED: " + restored);
+                result.putString("df08_status", "PASS");
+                result.putString("df08_reopen", "PASS");
+                result.putString("df08_stage", "verify");
+                Log.i(TAG, "DF08_NOTES_REOPEN_PASS width=" + width);
+                finish(Activity.RESULT_OK, result);
+                return;
+            }
+            assertTrue("save".equals(stage), "Unknown isolated test stage " + stage);
+
             JSONObject viewport=js("({cssWidth:visualViewport.width,dpr:devicePixelRatio})");
             AtomicReference<Integer> nativeWidth=new AtomicReference<>(0);
             runOnMainSync(() -> nativeWidth.set(view.getWidth()));
@@ -77,8 +128,8 @@ public final class TouchInstrumentation extends Instrumentation {
                 {"navTraining","sec-timer"}, {"navSounds","sec-sounds"},
                 {"navAnalytics","sec-analytics"}
             };
-            for (String locale : new String[]{"en","ar"}) {
-                final String selected = locale;
+            for (String navLocale : new String[]{"en","ar"}) {
+                final String selected = navLocale;
                 JSONObject language = js("(()=>{applyLanguage("+JSONObject.quote(selected)+");return {lang:cfg.lang,dir:document.documentElement.dir};})()");
                 assertTrue(selected.equals(language.optString("lang")), "Language failed: "+language);
                 for (String[] item : tabs) {
@@ -95,7 +146,7 @@ public final class TouchInstrumentation extends Instrumentation {
                     Log.i(TAG, "NAV_PASS locale="+selected+" tab="+item[0]);
                 }
             }
-            js("(()=>{applyLanguage('en');return {lang:cfg.lang};})()");
+            js("(()=>{applyLanguage(" + JSONObject.quote(locale) + ");return {lang:cfg.lang};})()");
             tap("navTimer");
             js("(()=>{document.getElementById('orbWaterTxt').parentElement.id='df08WaterTapTarget';" +
                 "window.__DF08WaterFault={cfg:JSON.stringify(cfg),primary:localStorage.getItem('zen_fortress_cfg_v21')," +
@@ -132,7 +183,7 @@ public final class TouchInstrumentation extends Instrumentation {
                 SystemClock.sleep(250);
             }
             assertTrue(imeShown, "Actual Android soft keyboard NOT visible after body tap");
-            String noteTitle = "DF08 Instrumented "+System.currentTimeMillis();
+            // Stable note title allows a separate process to verify this exact saved record.
             JSONObject draft = js("(()=>{" +
                 "const t=document.getElementById('inpNoteTitle'),b=document.getElementById('inpNoteBody');" +
                 "t.value="+JSONObject.quote(noteTitle)+";b.value='Persisted note 2026';" +
@@ -157,10 +208,28 @@ public final class TouchInstrumentation extends Instrumentation {
                 "Android Back closed Notes or lost unsaved draft while dismissing IME: "+stillOpen);
             tap("nsSaveButton");
             JSONObject saved = js("(()=>{const a=notesList.filter(n=>n.title==="+JSONObject.quote(noteTitle)+");" +
-                "return {matches:a.length,body:a[0]?.body||'',open:document.getElementById('noteModal').classList.contains('open')};})()");
+                "return {matches:a.length,id:String(a[0]?.id),body:a[0]?.body||'',open:document.getElementById('noteModal').classList.contains('open')};})()");
             assertTrue(saved.optInt("matches") == 1 &&
                 "Persisted note 2026".equals(saved.optString("body")) && !saved.optBoolean("open"),
                 "Physical Save did not persist note exactly once: "+saved);
+            final String savedId = saved.optString("id");
+            assertTrue(savedId.matches("[0-9]+"), "Physical Save produced an invalid note ID");
+            // A successful in-memory Save must also be a verified v21 disk write.
+            // Otherwise the following force-stop would only expose an already false PASS.
+            JSONObject beforeStop = js("(()=>{const D=window.DeepFocusDataCompatV21,k=D?.KEYS?.notes;" +
+                "const p=k?localStorage.getItem(k):null,m=k?localStorage.getItem(k+'_mirror'):null;" +
+                "const packet=p&&D?D.inspectPacket(p):{ok:false};" +
+                "const stored=packet.ok&&Array.isArray(packet.value)?packet.value:[];" +
+                "return {primaryPresent:!!p,mirrorPresent:!!m,mirrorOk:!!p&&p===m&&packet.ok," +
+                "savedIds:stored.filter(n=>n.title==="+JSONObject.quote(noteTitle)+").map(n=>String(n.id))," +
+                "advancedUi:document.body.classList.contains('df-v22')," +
+                "integrationAvailable:!!window.DF22Integration};})()");
+            assertTrue(beforeStop.optBoolean("mirrorOk") && beforeStop.getJSONArray("savedIds").length() == 1 &&
+                savedId.equals(beforeStop.getJSONArray("savedIds").getString(0)),
+                "Visible Notes Save lacked v21 packet ACK before process death: "+beforeStop);
+            result.putString("df08_note_id",savedId);
+            result.putString("df08_locale",locale);
+            result.putString("df08_font_scale",fontScale);
             result.putString("df08_status","PASS");
             result.putInt("df08_physical_taps",actualTaps);
             result.putString("df08_platform","Android UIAutomation touch / actual IME / native WebView evaluateJavascript");
@@ -201,7 +270,8 @@ public final class TouchInstrumentation extends Instrumentation {
 
     private void tap(String id) throws Exception {
         String expression="(()=>{const n=document.getElementById("+JSONObject.quote(id)+");" +
-            "if(!n)return {exists:false};n.scrollIntoView({block:'center',inline:'nearest'});" +
+            "if(!n)return {exists:false};const prepare=true;" +
+            "if(prepare)n.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});" +
             "const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;" +
             "const hit=document.elementFromPoint(x,y);" +
             "const vv=window.visualViewport;" +
@@ -229,15 +299,16 @@ public final class TouchInstrumentation extends Instrumentation {
             "altHit:!!alt&&(alt===n||n.contains(alt))," +
             "hit:!!hit&&(hit===n||n.contains(hit))};})()";
         js("(()=>{if(window.__df08Events)return {installed:true};window.__df08Events=[];" +
-            "for(const kind of ['touchstart','touchend','click','pointerdown','pointerup']){" +
+            "for(const kind of ['touchstart','touchend','touchcancel','click','contextmenu','pointerdown','pointerup','pointercancel']){" +
             "document.addEventListener(kind,e=>{const p=e.changedTouches?.[0]||e;" +
             "window.__df08Events.push({kind,clientX:p.clientX,clientY:p.clientY," +
             "target:e.target?.id||e.target?.closest('.bnav-btn')?.id||e.target?.tagName," +
-            "trusted:e.isTrusted});if(window.__df08Events.length>16)window.__df08Events.shift();},true)}" +
+            "trusted:e.isTrusted,eventTime:e.timeStamp,observedAt:performance.now(),defaultPrevented:e.defaultPrevented});" +
+            "if(window.__df08Events.length>24)window.__df08Events.shift();},true)}" +
             "return {installed:true};})()");
         js(expression);
-        SystemClock.sleep(140);
-        JSONObject p=js(expression);
+        awaitRenderedTouchGeometry();
+        JSONObject p=js(expression.replace("const prepare=true;","const prepare=false;"));
         assertTrue(p.optBoolean("exists") && p.optDouble("width")>0 && p.optDouble("height")>=40 &&
             p.optDouble("x")>=0 && p.optDouble("y")>=0 &&
             p.optDouble("x")>=p.optDouble("visX") &&
@@ -261,18 +332,26 @@ public final class TouchInstrumentation extends Instrumentation {
         int y=(int)Math.round(box[1]+(p.getDouble("y")-p.getDouble("visY"))*box[3]/p.getDouble("visHeight"));
         assertTrue(x>=box[0]&&x<box[0]+box[2]&&y>=box[1]&&y<box[1]+box[3],
             "WebView mapped touch outside physical bounds "+id);
-        long down=SystemClock.uptimeMillis();
-        MotionEvent press=MotionEvent.obtain(down,down,MotionEvent.ACTION_DOWN,x,y,0);
-        MotionEvent release=MotionEvent.obtain(down,down+90,MotionEvent.ACTION_UP,x,y,0);
-        press.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        release.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        try {
-            assertTrue(getUiAutomation().injectInputEvent(press,true),"Android rejected touchStart "+id);
-            SystemClock.sleep(90);
-            assertTrue(getUiAutomation().injectInputEvent(release,true),"Android rejected touchEnd "+id);
-        } finally {press.recycle();release.recycle();}
+        long physicalPressMillis=injectPhysicalTap(x,y,id);
         actualTaps++;
         SystemClock.sleep(400);
+        if("nsSaveButton".equals(id)) {
+            // API35 may acknowledge an OS injection even when Chromium never
+            // dispatches a trusted click. Never retry a Save that dispatched.
+            JSONObject delivered=js("(()=>{const a=window.__df08Events||[];" +
+                "return {clicks:a.filter(e=>e.kind==='click'&&e.target==='nsSaveButton'&&e.trusted).length," +
+                "open:document.getElementById('noteModal').classList.contains('open')};})()");
+            if(delivered.optInt("clicks")==0 && delivered.optBoolean("open")) {
+                awaitRenderedTouchGeometry();
+                injectPhysicalTap(x,y,id); // Exactly one more *physical* attempt.
+                actualTaps++;
+                SystemClock.sleep(400);
+                delivered=js("(()=>{const a=window.__df08Events||[];" +
+                    "return {clicks:a.filter(e=>e.kind==='click'&&e.target==='nsSaveButton'&&e.trusted).length};})()");
+            }
+            assertTrue(delivered.optInt("clicks")==1,
+                "Save must receive exactly one trusted Android click; got "+delivered);
+        }
         JSONObject after=js("({events:window.__df08Events?.slice(-8)||[]," +
             "nav:[...document.querySelectorAll('.bnav-btn.active')].map(n=>n.id)," +
             "sections:[...document.querySelectorAll('.screen-section.active')].map(n=>n.id)," +
@@ -299,8 +378,44 @@ public final class TouchInstrumentation extends Instrumentation {
         } catch(Throwable ignored) { activeWindow="unavailable"; }
         lastTapDiagnostics="id="+id+" css="+p+" screen="+x+","+y+
             " webview="+java.util.Arrays.toString(box)+
-            " native="+insetsDiag.get()+" activeWindow="+activeWindow+" observed="+after;
+            " native="+insetsDiag.get()+" activeWindow="+activeWindow+
+            " physicalPressMillis="+physicalPressMillis+" observed="+after;
         Log.i(TAG,"TAP_DIAGNOSTICS "+lastTapDiagnostics);
+    }
+
+    // JavaScript layout is not proof that Chromium's compositor has committed
+    // scroll/IME changes. Fence that state and two Android frames before DOWN.
+    private void awaitRenderedTouchGeometry() throws Exception {
+        CountDownLatch rendered=new CountDownLatch(1);
+        runOnMainSync(() -> view.postVisualStateCallback(SystemClock.uptimeMillis(),
+            new WebView.VisualStateCallback() {
+                @Override public void onComplete(long requestId) {
+                    view.postOnAnimation(() -> view.postOnAnimation(rendered::countDown));
+                }
+            }));
+        assertTrue(rendered.await(12,TimeUnit.SECONDS),"WebView touch geometry frame timed out");
+        waitForIdleSync();
+    }
+
+    // UP must describe the real release time. Synchronous injection may spend
+    // time waiting for dispatch; precomputing down+90 conceals that delay.
+    private long injectPhysicalTap(int x,int y,String id) {
+        long down=SystemClock.uptimeMillis();
+        MotionEvent press=MotionEvent.obtain(down,down,MotionEvent.ACTION_DOWN,x,y,0);
+        MotionEvent release=null;
+        press.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+        try {
+            assertTrue(getUiAutomation().injectInputEvent(press,true),"Android rejected touchStart "+id);
+            SystemClock.sleep(90);
+            long up=SystemClock.uptimeMillis();
+            release=MotionEvent.obtain(down,up,MotionEvent.ACTION_UP,x,y,0);
+            release.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+            assertTrue(getUiAutomation().injectInputEvent(release,true),"Android rejected touchEnd "+id);
+            return up-down;
+        } finally {
+            press.recycle();
+            if(release!=null)release.recycle();
+        }
     }
 
     private void key(int code) {

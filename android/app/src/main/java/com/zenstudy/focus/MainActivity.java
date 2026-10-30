@@ -48,6 +48,27 @@ public class MainActivity extends AppCompatActivity {
 
         webView = new WebView(this);
         setContentView(webView);
+        // Android 15 enforces edge-to-edge for targetSdk 35. Keep genuine
+        // WebView pointer targets outside status/navigation system bars,
+        // including the bottom timer/notes/tasks navigation controls.
+        if (Build.VERSION.SDK_INT >= 35) {
+            webView.setOnApplyWindowInsetsListener((target, insets) -> {
+                android.graphics.Insets bars =
+                        insets.getInsets(android.view.WindowInsets.Type.systemBars());
+                android.view.ViewGroup.LayoutParams raw = target.getLayoutParams();
+                if (raw instanceof android.view.ViewGroup.MarginLayoutParams) {
+                    android.view.ViewGroup.MarginLayoutParams margins =
+                            (android.view.ViewGroup.MarginLayoutParams) raw;
+                    if (margins.leftMargin != bars.left || margins.topMargin != bars.top
+                            || margins.rightMargin != bars.right || margins.bottomMargin != bars.bottom) {
+                        margins.setMargins(bars.left,bars.top,bars.right,bars.bottom);
+                        target.setLayoutParams(margins);
+                    }
+                }
+                return insets;
+            });
+            webView.requestApplyInsets();
+        }
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);

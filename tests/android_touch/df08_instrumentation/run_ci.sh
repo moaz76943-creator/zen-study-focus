@@ -2,22 +2,36 @@
 # No production Java/Gradle changes are committed; AndroidTest wired in ephemeral CI checkout.
 set -euo pipefail
 out="${DF08_EVIDENCE:-${RUNNER_TEMP:-/tmp}/df08-real-android}"
+font_scale="${DF08_FONT_SCALE:-1.0}"
+[[ "$font_scale" == 1.0 || "$font_scale" == 1.5 || "$font_scale" == 2.0 ]] || { echo "Invalid DF08_FONT_SCALE" >&2; exit 2; }
 mkdir -p "$out"
 git rev-parse HEAD > "$out/EXACT_SOURCE_SHA.txt"
 printf 'Android emulator WebView touch and IME only. NOT a physical handset, TalkBack or release approval.\nRELEASE_APPROVED=NO\n' > "$out/PLATFORM_LIMITS.txt"
+qemu="$(timeout --kill-after=2s 10s adb shell getprop ro.kernel.qemu 2>/dev/null | tr -d '\r')" || qemu=unavailable
+if [[ "$qemu" != 1 ]]; then
+ printf 'TEST_RESULT=BLOCKED\nFAILURE_CATEGORY=TEST_HARNESS_FAIL\nDISPOSABLE_EMULATOR_REQUIRED\n' | tee "$out/failure-disposable-guard.txt" >&2
+ exit 2
+fi
 api="$(timeout 20s adb shell getprop ro.build.version.sdk | tr -d '\r')"
 printf '%s\n' "$api" > "$out/ANDROID_API.txt"
+printf '%s\n' "$font_scale" > "$out/FONT_SCALE.txt"
 apk="android/app/build/outputs/apk/debug/app-debug.apk"
 testapk="android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
 test -s "$apk" && test -s "$testapk"
 sha256sum "$apk" "$testapk" > "$out/APK_SHA256.txt"
+source tests/android_touch/df08_instrumentation/failure_evidence.sh
+logcat_pid=
 cleanup() {
+  if [[ -n "${logcat_pid:-}" ]]; then kill "$logcat_pid" 2>/dev/null || true; fi
   timeout 10s adb shell wm size reset >/dev/null 2>&1 || true
   timeout 10s adb shell wm density reset >/dev/null 2>&1 || true
   timeout 10s adb shell settings put system font_scale 1.0 >/dev/null 2>&1 || true
   timeout 10s adb logcat -d -s DF08_REAL_ANDROID AndroidRuntime > "$out/logcat.txt" 2>&1 || true
 }
 trap cleanup EXIT
+# Stream to the host before testing: a dead emulator cannot supply post-failure logcat.
+adb logcat -v threadtime -s DF08_REAL_ANDROID AndroidRuntime > "$out/live-logcat.txt" 2>&1 &
+logcat_pid=$!
 bash tests/white_premium_qa/track14_install_apk.sh "$apk"
 timeout 180s adb install --no-streaming -r "$testapk" > "$out/test-apk-install.txt" 2>&1
 # Force 1 physical pixel per CSS pixel for the requested 320/360/393/430px
@@ -27,30 +41,53 @@ timeout 20s adb shell wm density 160
 # profile, so it cannot cover the WebView and intercept all pointer events.
 timeout 20s adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
 for width in 320 360 393 430; do
+ for locale in en ar; do
+  case_id="${width}-${locale}-font-${font_scale}"
   timeout 20s adb shell wm size "${width}x820"
-  timeout 20s adb shell settings put system font_scale 1.0
+  timeout 20s adb shell settings put system font_scale "$font_scale"
   timeout 20s adb shell am force-stop com.zenstudy.focus || true
   timeout 20s adb shell pm clear com.zenstudy.focus >/dev/null
   timeout 20s adb shell pm grant com.zenstudy.focus android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
-  output="$out/actual-touch-${width}.txt"
-  timeout 160s adb shell am instrument -w -r \
+  output="$out/actual-touch-${case_id}.txt"
+  timeout 160s adb shell am instrument -w -r -e stage save -e width "$width" -e locale "$locale" -e fontScale "$font_scale" \
     com.zenstudy.focus.test/com.zenstudy.focus.df08.TouchInstrumentation \
     > "$output" 2>&1 || {
+      command_status=$?
+      df08_record_failure save "$case_id" "$output" "$command_status"
       echo "ANDROID_INSTRUMENTATION_COMMAND_FAIL width=$width"; cat "$output"; exit 1;
     }
   if ! grep -q 'INSTRUMENTATION_RESULT: df08_status=PASS' "$output" ||
       ! grep -q 'INSTRUMENTATION_RESULT: df08_water_ack=PASS' "$output" ||
       ! grep -q 'INSTRUMENTATION_RESULT: df08_physical_taps=' "$output"; then
+    df08_record_failure save "$case_id" "$output" 0
     echo "ANDROID_TOUCH_NOT_PASS width=$width"
-    timeout 15s adb exec-out cat /sdcard/df08_live_failure.png > "$out/foreground-failure-$width.png" 2>/dev/null || true
-        timeout 30s adb exec-out screencap -p > "$out/failure-$width.png" 2>/dev/null || true
+    timeout 15s adb exec-out cat /sdcard/df08_live_failure.png > "$out/foreground-failure-$case_id.png" 2>/dev/null || true
+        timeout 30s adb exec-out screencap -p > "$out/failure-$case_id.png" 2>/dev/null || true
     timeout 35s adb shell uiautomator dump /sdcard/df08_hierarchy.xml >/dev/null 2>&1 || true
-    timeout 15s adb exec-out cat /sdcard/df08_hierarchy.xml > "$out/failure-$width.xml" 2>/dev/null || true
-    timeout 15s adb shell dumpsys window > "$out/window-$width.txt" 2>&1 || true
+    timeout 15s adb exec-out cat /sdcard/df08_hierarchy.xml > "$out/failure-$case_id.xml" 2>/dev/null || true
+    timeout 15s adb shell dumpsys window > "$out/window-$case_id.txt" 2>&1 || true
     cat "$output"
     exit 1
   fi
-  timeout 40s adb exec-out screencap -p > "$out/after-${width}.png" || true
-  echo "ANDROID_REAL_TOUCH_PASS api=$api width=$width"
+  note_id="$(sed -n 's/^INSTRUMENTATION_RESULT: df08_note_id=//p' "$output" | tr -d '\r')"
+  [[ "$note_id" =~ ^[0-9]+$ ]] || { df08_record_failure save "$case_id" "$output" 0; echo "Saved Notes ID missing"; exit 1; }
+  # Retain profile data and verify in a new Android process after force-stop.
+  timeout 20s adb shell am force-stop com.zenstudy.focus
+  reopen="$out/reopen-${case_id}.txt"
+  timeout 160s adb shell am instrument -w -r -e stage verify -e width "$width" -e locale "$locale" -e fontScale "$font_scale" -e expectedId "$note_id" \
+    com.zenstudy.focus.test/com.zenstudy.focus.df08.TouchInstrumentation \
+    > "$reopen" 2>&1 || {
+      command_status=$?
+      df08_record_failure verify "$case_id" "$reopen" "$command_status"
+      echo "ANDROID_NOTES_REOPEN_COMMAND_FAIL api=$api width=$width"; cat "$reopen"; exit 1;
+    }
+  if ! grep -q 'INSTRUMENTATION_RESULT: df08_status=PASS' "$reopen" ||
+     ! grep -q 'INSTRUMENTATION_RESULT: df08_reopen=PASS' "$reopen"; then
+    df08_record_failure verify "$case_id" "$reopen" 0
+    echo "ANDROID_NOTES_REOPEN_NOT_PASS api=$api width=$width"; cat "$reopen"; exit 1
+  fi
+  timeout 40s adb exec-out screencap -p > "$out/after-${case_id}.png" || true
+  echo "ANDROID_REAL_TOUCH_PASS api=$api width=$width locale=$locale font_scale=$font_scale note_id=$note_id"
+ done
 done
-printf 'PASSED actual instrumented WebView navigation, IME, Notes Save at four widths; API=%s\n' "$api" > "$out/summary.txt"
+printf 'PASSED actual instrumented WebView navigation, IME, Notes Save plus force-stop/reopen at four widths in EN/AR; API=%s font_scale=%s\n' "$api" "$font_scale" > "$out/summary.txt"

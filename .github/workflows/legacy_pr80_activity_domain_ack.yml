@@ -15,6 +15,9 @@ on:
       - .github/workflows/legacy_pr80_activity_domain_ack.yml
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   exact-source-regression:
     runs-on: ubuntu-latest

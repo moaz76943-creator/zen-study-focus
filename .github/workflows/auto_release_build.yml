@@ -1,46 +1,102 @@
-name: Deep Focus Automated Release Build
+name: Deep Focus Intentional Release or Debug Build
 
 on:
   workflow_dispatch:
+    inputs:
+      artifact:
+        description: 'Choose debug for phone testing; release AAB is unsigned build evidence only'
+        type: choice
+        options: [debug, unsigned-aab, both]
+        default: debug
+        required: true
+
+permissions:
+  contents: read
+concurrency:
+  group: intentional-release-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      ARTIFACT_KIND: ${{ inputs.artifact }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout requested source
         uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Require source from the official branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor HEAD origin/integration/master-qa-verified-v21
+          git rev-parse HEAD > "$RUNNER_TEMP/release-source-sha.txt"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
           java-version: '17'
-
-      - name: Configure Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Install matching compile SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager_bin="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager -print -quit)"
+          test -x "$sdkmanager_bin"
+          "$sdkmanager_bin" 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-
-      - name: Build Release Bundle (AAB for Google Play)
+      - name: Build selected artifacts with installed Gradle
+        working-directory: android
+        shell: bash
         run: |
-          cd android
-          gradle :app:bundleRelease --no-daemon --stacktrace
-
-      - name: Build Debug APK (For Direct Phone Testing)
+          set -euo pipefail
+          case "$ARTIFACT_KIND" in
+            debug) gradle :app:assembleDebug --no-daemon --stacktrace ;;
+            unsigned-aab) gradle :app:bundleRelease --no-daemon --stacktrace ;;
+            both) gradle :app:assembleDebug :app:bundleRelease --no-daemon --stacktrace ;;
+            *) echo 'Invalid artifact choice' >&2; exit 2 ;;
+          esac
+      - name: Record build limitations and hashes
+        shell: bash
         run: |
-          cd android
-          gradle :app:assembleDebug --no-daemon --stacktrace
-
-      - name: Upload Release AAB Artifact
+          set -euo pipefail
+          case "$ARTIFACT_KIND" in
+            debug) test -s android/app/build/outputs/apk/debug/app-debug.apk ;;
+            unsigned-aab) test -s android/app/build/outputs/bundle/release/app-release.aab ;;
+            both)
+              test -s android/app/build/outputs/apk/debug/app-debug.apk
+              test -s android/app/build/outputs/bundle/release/app-release.aab
+              ;;
+          esac
+          {
+            echo "SOURCE_SHA=$(git rev-parse HEAD)"
+            echo "ARTIFACT_KIND=$ARTIFACT_KIND"
+            echo 'RELEASE_APPROVED=NO'
+            echo 'Release AAB has no upload signing configured by this workflow. It is not production-ready.'
+            echo 'Debug APK uses Android debug signing and is for testing only.'
+            find android/app/build/outputs -type f \( -name '*.apk' -o -name '*.aab' \) -exec sha256sum {} +
+          } > "$RUNNER_TEMP/release-build-evidence.txt"
+          cat "$RUNNER_TEMP/release-build-evidence.txt" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload unsigned AAB build evidence (not production-ready)
+        if: env.ARTIFACT_KIND == 'unsigned-aab' || env.ARTIFACT_KIND == 'both'
         uses: actions/upload-artifact@v4
         with:
-          name: deep-focus-release-aab
-          path: android/app/build/outputs/bundle/release/*.aab
+          name: deep-focus-unsigned-aab-NOT-PRODUCTION-${{ github.sha }}
+          path: |
+            android/app/build/outputs/bundle/release/*.aab
+            ${{ runner.temp }}/release-build-evidence.txt
+          if-no-files-found: error
           retention-days: 30
-
-      - name: Upload Debug APK Artifact
+      - name: Upload debug APK for testing
+        if: env.ARTIFACT_KIND == 'debug' || env.ARTIFACT_KIND == 'both'
         uses: actions/upload-artifact@v4
         with:
-          name: deep-focus-debug-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          name: deep-focus-debug-apk-${{ github.sha }}
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            ${{ runner.temp }}/release-build-evidence.txt
+          if-no-files-found: error
           retention-days: 30

@@ -10,6 +10,9 @@ on:
       - '.github/workflows/df09_tone_picker.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   picker:
     runs-on: ubuntu-latest
