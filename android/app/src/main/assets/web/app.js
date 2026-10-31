@@ -16607,3 +16607,48 @@ window.dfGetMilestoneVersion590AuditSeal = function() {
     return { success: false, error: err ? err.message : 'Unknown milestone seal error' };
   }
 };
+
+
+/**
+ * DEEP FOCUS — DEEP THETA (5.5Hz) TWILIGHT BRAINWAVE SYNTHESIZER (M451)
+ * Generates 5.5Hz binaural differential over a warm 136.1Hz carrier frequency
+ * for deep memory consolidation, reflective review, and twilight calming.
+ * 100% Zero-Music compliant (pure mathematical binaural acoustic modeling).
+ */
+window.dfSynthesizeSubDeltaThetaAcoustics = function(options = {}) {
+  try {
+    const thetaBeatHz = Math.min(8.0, Math.max(4.0, Number(options.thetaBeatHz) || 5.5));
+    const carrierHz = Math.min(220, Math.max(100, Number(options.carrierHz) || 136.1));
+    const intensity = Math.min(1.0, Math.max(0.1, Number(options.intensity) || 0.65));
+    const storageKey = 'df_theta_brainwave_config';
+
+    const acousticProfile = {
+      brainwaveBand: "Theta",
+      thetaBeatHz: thetaBeatHz,
+      carrierLeftHz: carrierHz,
+      carrierRightHz: Number((carrierHz + thetaBeatHz).toFixed(1)),
+      targetCognitiveState: "deep_contemplation_and_memory_consolidation",
+      binauralPanSpread: 0.85,
+      carrierWaveform: "pure_sine",
+      gainScale: intensity,
+      updatedAt: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(acousticProfile));
+      } catch (e) {}
+    }
+
+    return {
+      success: true,
+      thetaBeatHz: thetaBeatHz,
+      carrierHz: carrierHz,
+      acousticProfile: acousticProfile,
+      persistedKey: storageKey,
+      timestamp: acousticProfile.updatedAt
+    };
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown theta synthesis error' };
+  }
+};
