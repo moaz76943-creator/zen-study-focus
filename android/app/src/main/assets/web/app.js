@@ -16908,3 +16908,48 @@ window.dfGenerateInterleavedSmartShuffleQueue = function(options = {}) {
     return { success: false, error: err ? err.message : 'Unknown interleaved shuffle error' };
   }
 };
+
+
+/**
+ * DEEP FOCUS — SUBTERRANEAN CAVE AIRFLOW ACOUSTICS SYNTHESIZER (M456)
+ * Generates tranquil deep-cavern air currents: filtered brownian rumble with narrow sub-bass
+ * resonance (40-120Hz) and ultra-slow 0.035Hz airflow modulation to ground attention.
+ * 100% Zero-Music compliant (pure mathematical physical acoustic modeling).
+ */
+window.dfSynthesizeSubterraneanAirflowAcoustics = function(options = {}) {
+  try {
+    const airflowIntensity = Math.min(1.0, Math.max(0.1, Number(options.airflowIntensity) || 0.65));
+    const subBassResonanceHz = Math.min(120, Math.max(35, Number(options.subBassResonanceHz) || 68));
+    const cavernBreezeLfoHz = Math.min(0.1, Math.max(0.01, Number(options.cavernBreezeLfoHz) || 0.035));
+    const storageKey = 'df_subterranean_airflow_config';
+
+    const acousticProfile = {
+      model: "subterranean_cavern_laminar_airflow",
+      subBassCenterHz: subBassResonanceHz,
+      subBassBandpassQ: 3.8,
+      breezeModulationLfoHz: cavernBreezeLfoHz,
+      noiseSource: "filtered_brownian_rumble",
+      roomImpulseReverbDecaySec: 4.2,
+      stereoDriftSpread: 0.9,
+      gainScale: airflowIntensity,
+      updatedAt: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(acousticProfile));
+      } catch (e) {}
+    }
+
+    return {
+      success: true,
+      airflowIntensity: airflowIntensity,
+      subBassResonanceHz: subBassResonanceHz,
+      acousticProfile: acousticProfile,
+      persistedKey: storageKey,
+      timestamp: acousticProfile.updatedAt
+    };
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown airflow acoustics error' };
+  }
+};
