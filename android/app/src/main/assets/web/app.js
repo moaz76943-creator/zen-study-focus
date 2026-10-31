@@ -16953,3 +16953,58 @@ window.dfSynthesizeSubterraneanAirflowAcoustics = function(options = {}) {
     return { success: false, error: err ? err.message : 'Unknown airflow acoustics error' };
   }
 };
+
+
+/**
+ * DEEP FOCUS — COGNITIVE STAMINA & FATIGUE RESISTANCE METER (M457)
+ * Evaluates focus endurance across consecutive study blocks, factoring total volume,
+ * consecutive block consistency, and late-session distraction resistance into a 0-100 Stamina Index.
+ */
+window.dfCalculateCognitiveStaminaIndex = function(options = {}) {
+  try {
+    const consecutiveSessionsCount = Math.max(1, Number(options.consecutiveSessionsCount) || 3);
+    const totalFocusMinutesLogged = Math.max(15, Number(options.totalFocusMinutesLogged) || 135);
+    const lateBlockFrictionDistractions = Math.max(0, Number(options.lateBlockFrictionDistractions) || 1);
+    const storageKey = 'df_cognitive_stamina_index_v21';
+
+    const volumeScore = Math.min(50, Math.round((totalFocusMinutesLogged / 180) * 50));
+    const consistencyScore = Math.min(30, consecutiveSessionsCount * 10);
+    const frictionPenalty = Math.min(25, lateBlockFrictionDistractions * 6);
+    const resistanceScore = Math.max(5, 20 - frictionPenalty);
+
+    const staminaIndex = Math.min(100, Math.max(10, volumeScore + consistencyScore + resistanceScore));
+
+    let staminaRating = 'robust_cognitive_endurance';
+    let prescription = 'Superb mental stamina. High resilience against cognitive fatigue.';
+
+    if (staminaIndex < 45) {
+      staminaRating = 'fatigue_onset';
+      prescription = 'Cognitive stamina depleting. Schedule an NSDR rest or light walk before next block.';
+    } else if (staminaIndex < 70) {
+      staminaRating = 'moderate_endurance';
+      prescription = 'Solid focus endurance. Keep hydration high and take a 10-minute micro-break.';
+    }
+
+    const result = {
+      success: true,
+      consecutiveSessionsCount: consecutiveSessionsCount,
+      totalFocusMinutesLogged: totalFocusMinutesLogged,
+      lateBlockFrictionDistractions: lateBlockFrictionDistractions,
+      staminaIndex: staminaIndex,
+      staminaRating: staminaRating,
+      prescription: prescription,
+      persistedKey: storageKey,
+      timestamp: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(result));
+      } catch (e) {}
+    }
+
+    return result;
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown stamina calculation error' };
+  }
+};
