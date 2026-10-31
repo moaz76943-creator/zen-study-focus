@@ -16766,3 +16766,66 @@ window.dfSynthesizeSolfeggioHarmonicResonance = function(options = {}) {
     return { success: false, error: err ? err.message : 'Unknown solfeggio error' };
   }
 };
+
+
+/**
+ * DEEP FOCUS — REAL-TIME DAILY STUDY VELOCITY METER (M454)
+ * Calculates focus minutes completed per hour of waking day, evaluates required velocity
+ * to achieve targets before bedtime, and outputs real-time pace pacing ratios.
+ */
+window.dfCalculateDailyStudyVelocityMeter = function(options = {}) {
+  try {
+    const dailyTargetMinutes = Math.max(30, Number(options.dailyTargetMinutes) || 240);
+    const completedFocusMinutes = Math.max(0, Number(options.completedFocusMinutes) || 150);
+    const wakeHour = Math.min(12, Math.max(4, Number(options.wakeHour) || 7));
+    const currentHour = options.currentHour !== undefined ? Number(options.currentHour) : new Date().getHours();
+    const bedHour = Math.min(24, Math.max(18, Number(options.bedHour) || 23));
+    const storageKey = 'df_daily_velocity_meter_v21';
+
+    const elapsedDayHours = Math.max(0.5, currentHour - wakeHour);
+    const remainingDayHours = Math.max(0.1, bedHour - currentHour);
+
+    const currentVelocityMinsPerHour = Number((completedFocusMinutes / elapsedDayHours).toFixed(1));
+    const remainingTargetMinutes = Math.max(0, dailyTargetMinutes - completedFocusMinutes);
+    const requiredVelocityMinsPerHour = Number((remainingTargetMinutes / remainingDayHours).toFixed(1));
+    const pacingRatio = Number((currentVelocityMinsPerHour / (requiredVelocityMinsPerHour || 0.1)).toFixed(2));
+
+    let pacingStatus = 'on_track';
+    let advisory = 'Current velocity is on schedule to achieve today target.';
+
+    if (remainingTargetMinutes === 0) {
+      pacingStatus = 'daily_target_completed';
+      advisory = 'Goal fulfilled! Relax or do light spaced repetition review.';
+    } else if (pacingRatio >= 1.2) {
+      pacingStatus = 'ahead_of_daily_pace';
+      advisory = 'Ahead of target! Pace yourself to avoid evening cognitive fatigue.';
+    } else if (pacingRatio < 0.7) {
+      pacingStatus = 'behind_daily_pace';
+      advisory = 'Pacing deficit detected. Schedule a dedicated 45-minute sprint block soon.';
+    }
+
+    const result = {
+      success: true,
+      dailyTargetMinutes: dailyTargetMinutes,
+      completedFocusMinutes: completedFocusMinutes,
+      remainingTargetMinutes: remainingTargetMinutes,
+      currentVelocityMinsPerHour: currentVelocityMinsPerHour,
+      requiredVelocityMinsPerHour: requiredVelocityMinsPerHour,
+      pacingRatio: pacingRatio,
+      pacingStatus: pacingStatus,
+      advisory: advisory,
+      persistedKey: storageKey,
+      timestamp: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(result));
+      } catch (e) {}
+    }
+
+    return result;
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown velocity meter error' };
+  }
+};
