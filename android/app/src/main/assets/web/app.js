@@ -16829,3 +16829,182 @@ window.dfCalculateDailyStudyVelocityMeter = function(options = {}) {
     return { success: false, error: err ? err.message : 'Unknown velocity meter error' };
   }
 };
+
+
+/**
+ * DEEP FOCUS — FLASHCARD INTERLEAVED SMART-SHUFFLE QUEUE (M455)
+ * Groups flashcards by distinct disciplinary tags and round-robin interleaves them,
+ * training cognitive switching and preventing rote blocked review memorization.
+ */
+window.dfGenerateInterleavedSmartShuffleQueue = function(options = {}) {
+  try {
+    const queueLimit = Math.max(4, Number(options.queueLimit) || 16);
+    const storageKey = 'df_interleaved_shuffle_cache_v21';
+
+    let flashcards = [];
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('df_vocab_flashcards_v21');
+        if (raw) flashcards = JSON.parse(raw);
+      } catch (e) {}
+    }
+    if (Array.isArray(options.sampleCards)) {
+      flashcards = options.sampleCards;
+    }
+
+    if (!flashcards || flashcards.length === 0) {
+      flashcards = [
+        { id: "1", term: "Krebs", tag: "biochemistry" },
+        { id: "2", term: "Glycolysis", tag: "biochemistry" },
+        { id: "3", term: "Action Potential", tag: "physiology" },
+        { id: "4", term: "Refractory Period", tag: "physiology" },
+        { id: "5", term: "Beta Blocker", tag: "pharmacology" },
+        { id: "6", term: "ACE Inhibitor", tag: "pharmacology" }
+      ];
+    }
+
+    const subjectBuckets = {};
+    flashcards.forEach(function(card) {
+      const tag = (Array.isArray(card.tags) && card.tags[0]) || card.tag || "general";
+      if (!subjectBuckets[tag]) subjectBuckets[tag] = [];
+      subjectBuckets[tag].push(card);
+    });
+
+    const interleavedQueue = [];
+    const bucketKeys = Object.keys(subjectBuckets);
+    let hasMore = true;
+    let roundIndex = 0;
+
+    while (hasMore && interleavedQueue.length < queueLimit) {
+      hasMore = false;
+      bucketKeys.forEach(function(key) {
+        const bucket = subjectBuckets[key];
+        if (roundIndex < bucket.length && interleavedQueue.length < queueLimit) {
+          interleavedQueue.push(bucket[roundIndex]);
+          hasMore = true;
+        }
+      });
+      roundIndex++;
+    }
+
+    const result = {
+      success: true,
+      totalCardsAnalyzed: flashcards.length,
+      distinctSubjectsCount: bucketKeys.length,
+      interleavedQueueCount: interleavedQueue.length,
+      queue: interleavedQueue,
+      persistedKey: storageKey,
+      timestamp: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(result));
+      } catch (e) {}
+    }
+
+    return result;
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown interleaved shuffle error' };
+  }
+};
+
+
+/**
+ * DEEP FOCUS — SUBTERRANEAN CAVE AIRFLOW ACOUSTICS SYNTHESIZER (M456)
+ * Generates tranquil deep-cavern air currents: filtered brownian rumble with narrow sub-bass
+ * resonance (40-120Hz) and ultra-slow 0.035Hz airflow modulation to ground attention.
+ * 100% Zero-Music compliant (pure mathematical physical acoustic modeling).
+ */
+window.dfSynthesizeSubterraneanAirflowAcoustics = function(options = {}) {
+  try {
+    const airflowIntensity = Math.min(1.0, Math.max(0.1, Number(options.airflowIntensity) || 0.65));
+    const subBassResonanceHz = Math.min(120, Math.max(35, Number(options.subBassResonanceHz) || 68));
+    const cavernBreezeLfoHz = Math.min(0.1, Math.max(0.01, Number(options.cavernBreezeLfoHz) || 0.035));
+    const storageKey = 'df_subterranean_airflow_config';
+
+    const acousticProfile = {
+      model: "subterranean_cavern_laminar_airflow",
+      subBassCenterHz: subBassResonanceHz,
+      subBassBandpassQ: 3.8,
+      breezeModulationLfoHz: cavernBreezeLfoHz,
+      noiseSource: "filtered_brownian_rumble",
+      roomImpulseReverbDecaySec: 4.2,
+      stereoDriftSpread: 0.9,
+      gainScale: airflowIntensity,
+      updatedAt: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(acousticProfile));
+      } catch (e) {}
+    }
+
+    return {
+      success: true,
+      airflowIntensity: airflowIntensity,
+      subBassResonanceHz: subBassResonanceHz,
+      acousticProfile: acousticProfile,
+      persistedKey: storageKey,
+      timestamp: acousticProfile.updatedAt
+    };
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown airflow acoustics error' };
+  }
+};
+
+
+/**
+ * DEEP FOCUS — COGNITIVE STAMINA & FATIGUE RESISTANCE METER (M457)
+ * Evaluates focus endurance across consecutive study blocks, factoring total volume,
+ * consecutive block consistency, and late-session distraction resistance into a 0-100 Stamina Index.
+ */
+window.dfCalculateCognitiveStaminaIndex = function(options = {}) {
+  try {
+    const consecutiveSessionsCount = Math.max(1, Number(options.consecutiveSessionsCount) || 3);
+    const totalFocusMinutesLogged = Math.max(15, Number(options.totalFocusMinutesLogged) || 135);
+    const lateBlockFrictionDistractions = Math.max(0, Number(options.lateBlockFrictionDistractions) || 1);
+    const storageKey = 'df_cognitive_stamina_index_v21';
+
+    const volumeScore = Math.min(50, Math.round((totalFocusMinutesLogged / 180) * 50));
+    const consistencyScore = Math.min(30, consecutiveSessionsCount * 10);
+    const frictionPenalty = Math.min(25, lateBlockFrictionDistractions * 6);
+    const resistanceScore = Math.max(5, 20 - frictionPenalty);
+
+    const staminaIndex = Math.min(100, Math.max(10, volumeScore + consistencyScore + resistanceScore));
+
+    let staminaRating = 'robust_cognitive_endurance';
+    let prescription = 'Superb mental stamina. High resilience against cognitive fatigue.';
+
+    if (staminaIndex < 45) {
+      staminaRating = 'fatigue_onset';
+      prescription = 'Cognitive stamina depleting. Schedule an NSDR rest or light walk before next block.';
+    } else if (staminaIndex < 70) {
+      staminaRating = 'moderate_endurance';
+      prescription = 'Solid focus endurance. Keep hydration high and take a 10-minute micro-break.';
+    }
+
+    const result = {
+      success: true,
+      consecutiveSessionsCount: consecutiveSessionsCount,
+      totalFocusMinutesLogged: totalFocusMinutesLogged,
+      lateBlockFrictionDistractions: lateBlockFrictionDistractions,
+      staminaIndex: staminaIndex,
+      staminaRating: staminaRating,
+      prescription: prescription,
+      persistedKey: storageKey,
+      timestamp: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(result));
+      } catch (e) {}
+    }
+
+    return result;
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown stamina calculation error' };
+  }
+};
