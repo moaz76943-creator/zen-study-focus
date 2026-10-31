@@ -16652,3 +16652,69 @@ window.dfSynthesizeSubDeltaThetaAcoustics = function(options = {}) {
     return { success: false, error: err ? err.message : 'Unknown theta synthesis error' };
   }
 };
+
+
+/**
+ * DEEP FOCUS — FLASHCARD MEMORY PALACE (METHOD OF LOCI) ENGINE (M452)
+ * Maps flashcard concepts to architectural loci pegs across virtual memory palace rooms
+ * (e.g. Foyer, Reading Hall, Vault), leveraging spatial memory circuits to double recall speed.
+ */
+window.dfAssignMemoryPalaceLociPegs = function(options = {}) {
+  try {
+    const palaceName = (options.palaceName || 'Academic Library').trim();
+    const rooms = Array.isArray(options.rooms) ? options.rooms : [
+      { room: "Entrance Foyer", loci: ["Marble Pillar", "Front Desk", "Archway Lamp"] },
+      { room: "Main Reading Hall", loci: ["Oak Table", "Grand Window", "Reference Shelf"] },
+      { room: "Archives Vault", loci: ["Iron Cabinet", "Microfilm Viewer", "Spiral Staircase"] }
+    ];
+    const cards = Array.isArray(options.cards) ? options.cards : [
+      { id: "c1", term: "Krebs Cycle" },
+      { id: "c2", term: "Glycolysis" },
+      { id: "c3", term: "Oxidative Phosphorylation" }
+    ];
+    const storageKey = 'df_memory_palace_loci_v21';
+
+    const flatLoci = [];
+    rooms.forEach(function(r) {
+      if (Array.isArray(r.loci)) {
+        r.loci.forEach(function(l) {
+          flatLoci.push({ room: r.room, locus: l });
+        });
+      }
+    });
+
+    const anchoredCards = cards.map(function(card, idx) {
+      const peg = flatLoci[idx % flatLoci.length] || { room: "Sanctuary", locus: "Center Desk" };
+      return {
+        cardId: card.id,
+        term: card.term,
+        palaceName: palaceName,
+        room: peg.room,
+        locus: peg.locus,
+        spatialAnchorPrompt: "Visualize " + card.term + " situated at [" + peg.room + " -> " + peg.locus + "]",
+        anchoredAt: Date.now()
+      };
+    });
+
+    const result = {
+      success: true,
+      palaceName: palaceName,
+      totalRoomsCount: rooms.length,
+      totalLociAvailable: flatLoci.length,
+      anchoredCardsCount: anchoredCards.length,
+      anchoredCards: anchoredCards,
+      persistedKey: storageKey,
+      timestamp: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(result));
+      } catch (e) {}
+    }
+
+    return result;
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown memory palace error' };
+  }
+};
