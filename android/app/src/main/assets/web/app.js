@@ -16829,3 +16829,82 @@ window.dfCalculateDailyStudyVelocityMeter = function(options = {}) {
     return { success: false, error: err ? err.message : 'Unknown velocity meter error' };
   }
 };
+
+
+/**
+ * DEEP FOCUS — FLASHCARD INTERLEAVED SMART-SHUFFLE QUEUE (M455)
+ * Groups flashcards by distinct disciplinary tags and round-robin interleaves them,
+ * training cognitive switching and preventing rote blocked review memorization.
+ */
+window.dfGenerateInterleavedSmartShuffleQueue = function(options = {}) {
+  try {
+    const queueLimit = Math.max(4, Number(options.queueLimit) || 16);
+    const storageKey = 'df_interleaved_shuffle_cache_v21';
+
+    let flashcards = [];
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('df_vocab_flashcards_v21');
+        if (raw) flashcards = JSON.parse(raw);
+      } catch (e) {}
+    }
+    if (Array.isArray(options.sampleCards)) {
+      flashcards = options.sampleCards;
+    }
+
+    if (!flashcards || flashcards.length === 0) {
+      flashcards = [
+        { id: "1", term: "Krebs", tag: "biochemistry" },
+        { id: "2", term: "Glycolysis", tag: "biochemistry" },
+        { id: "3", term: "Action Potential", tag: "physiology" },
+        { id: "4", term: "Refractory Period", tag: "physiology" },
+        { id: "5", term: "Beta Blocker", tag: "pharmacology" },
+        { id: "6", term: "ACE Inhibitor", tag: "pharmacology" }
+      ];
+    }
+
+    const subjectBuckets = {};
+    flashcards.forEach(function(card) {
+      const tag = (Array.isArray(card.tags) && card.tags[0]) || card.tag || "general";
+      if (!subjectBuckets[tag]) subjectBuckets[tag] = [];
+      subjectBuckets[tag].push(card);
+    });
+
+    const interleavedQueue = [];
+    const bucketKeys = Object.keys(subjectBuckets);
+    let hasMore = true;
+    let roundIndex = 0;
+
+    while (hasMore && interleavedQueue.length < queueLimit) {
+      hasMore = false;
+      bucketKeys.forEach(function(key) {
+        const bucket = subjectBuckets[key];
+        if (roundIndex < bucket.length && interleavedQueue.length < queueLimit) {
+          interleavedQueue.push(bucket[roundIndex]);
+          hasMore = true;
+        }
+      });
+      roundIndex++;
+    }
+
+    const result = {
+      success: true,
+      totalCardsAnalyzed: flashcards.length,
+      distinctSubjectsCount: bucketKeys.length,
+      interleavedQueueCount: interleavedQueue.length,
+      queue: interleavedQueue,
+      persistedKey: storageKey,
+      timestamp: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(result));
+      } catch (e) {}
+    }
+
+    return result;
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown interleaved shuffle error' };
+  }
+};
