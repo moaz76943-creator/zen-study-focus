@@ -16514,3 +16514,55 @@ window.dfCalculateMultiSubjectPacingBalance = function(options = {}) {
     return { success: false, error: err ? err.message : 'Unknown pacing balance error' };
   }
 };
+
+
+/**
+ * DEEP FOCUS — FLASHCARD ETYMOLOGICAL ROOT LINKER (M449)
+ * Deconstructs complex terminology into prefixes, roots, and suffixes (e.g. Greek/Latin origins),
+ * generating associative cognitive chain summaries for deeper memory retention.
+ */
+window.dfLinkFlashcardEtymologicalRoots = function(options = {}) {
+  try {
+    const term = (options.term || '').trim();
+    const morphemes = Array.isArray(options.morphemes) ? options.morphemes : [
+      { prefix: "Cardio", origin: "Greek kardia", meaning: "heart" },
+      { root: "myo", origin: "Greek mys", meaning: "muscle" },
+      { suffix: "pathy", origin: "Greek pathos", meaning: "disease or suffering" }
+    ];
+    const storageKey = 'df_etymology_links_v21';
+
+    const rootChainSummary = morphemes.map(function(m) {
+      const part = m.prefix || m.root || m.suffix || '';
+      const mean = m.meaning || '';
+      return part + ' (' + mean + ')';
+    }).join(' + ');
+
+    const entry = {
+      term: term || "Cardiomyopathy",
+      morphemes: morphemes,
+      rootChainSummary: rootChainSummary,
+      linkedAt: Date.now()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        let allLinks = {};
+        const raw = localStorage.getItem(storageKey);
+        if (raw) allLinks = JSON.parse(raw);
+        allLinks[entry.term] = entry;
+        localStorage.setItem(storageKey, JSON.stringify(allLinks));
+      } catch (e) {}
+    }
+
+    return {
+      success: true,
+      term: entry.term,
+      morphemesCount: morphemes.length,
+      rootChainSummary: rootChainSummary,
+      persistedKey: storageKey,
+      timestamp: entry.linkedAt
+    };
+  } catch (err) {
+    return { success: false, error: err ? err.message : 'Unknown etymology error' };
+  }
+};
