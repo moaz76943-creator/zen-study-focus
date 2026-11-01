@@ -17872,3 +17872,73 @@ window.df_i18n = (function() {
   };
 })();
 
+// --- FULL PARITY GLOBAL MULTILINGUAL EXTENSION SUITE ---
+(function() {
+  if (!window.df_i18n) return;
+
+  var globalPacks = {
+    // Russian
+    ru: {
+      btn_start: 'Начать фокус', btn_pause: 'Пауза', btn_resume: 'Продолжить', btn_reset: 'Сброс',
+      mode_pomodoro: 'Помодоро 25м', mode_short_break: 'Короткий перерыв', mode_long_break: 'Длинный перерыв',
+      btn_flip_card: 'Показать ответ', rate_again: 'Снова', rate_hard: 'Трудно', rate_good: 'Хорошо', rate_easy: 'Легко',
+      lbl_due_today: 'К повторению сегодня', sound_rain: 'Дождь за окном', sound_ocean: 'Морские волны', sound_campfire: 'Костер',
+      sound_bamboo: 'Бамбуковый фонтан', sound_cave: 'Эхо пещеры', sound_wind: 'Горный ветер',
+      opt_amoled: 'AMOLED Черный', opt_eink: 'Бумага E-Ink', opt_twilight: 'Ночной фильтр света',
+      prompt_palming: 'Отдых для глаз 20-20-20', prompt_water: 'Сделайте глоток воды',
+      badge_streak: 'Серия дней', msg_saved: 'Успешно сохранено', dlg_confirm: 'Подтвердить', dlg_cancel: 'Отмена'
+    },
+    // Simplified Chinese
+    zh: {
+      btn_start: '开始专注', btn_pause: '暂停', btn_resume: '继续', btn_reset: '重置',
+      mode_pomodoro: '番茄钟 25分', mode_short_break: '短休息', mode_long_break: '长休息',
+      btn_flip_card: '翻开卡片', rate_again: '重来', rate_hard: '困难', rate_good: '良好', rate_easy: '简单',
+      lbl_due_today: '今日待复习', sound_rain: '窗外雨声', sound_ocean: '海浪声', sound_campfire: '篝火劈啪',
+      sound_bamboo: '日式竹水景', sound_cave: '深洞回声', sound_wind: '高山清风',
+      opt_amoled: 'AMOLED 纯黑', opt_eink: '电子墨水纸', opt_twilight: '夜间护眼微光',
+      prompt_palming: '20-20-20 护眼放松', prompt_water: '喝一口温水',
+      badge_streak: '连续天数', msg_saved: '保存成功', dlg_confirm: '确认', dlg_cancel: '取消'
+    },
+    // Japanese
+    ja: {
+      btn_start: '集中スタート', btn_pause: '一時停止', btn_resume: '再開', btn_reset: 'リセット',
+      mode_pomodoro: 'ポモドーロ 25分', mode_short_break: '小休憩', mode_long_break: '大休憩',
+      btn_flip_card: '答えを見る', rate_again: 'もう一度', rate_hard: '難しい', rate_good: '普通', rate_easy: '簡単',
+      lbl_due_today: '今日復習する', sound_rain: '窓の雨音', sound_ocean: '波の音', sound_campfire: '焚き火の音',
+      sound_bamboo: '鹿威しの水音', sound_cave: '洞窟の反響', sound_wind: '山のそよ風',
+      opt_amoled: 'AMOLED 純黒', opt_eink: 'E-Ink ペーパー', opt_twilight: '夜間ブルーライト軽減',
+      prompt_palming: '20-20-20 目の休憩', prompt_water: '水分補給の案内',
+      badge_streak: '継続日数', msg_saved: '正常に保存されました', dlg_confirm: '確認', dlg_cancel: 'キャンセル'
+    },
+    // Portuguese
+    pt: {
+      btn_start: 'Iniciar Foco', btn_pause: 'Pausar', btn_resume: 'Retomar', btn_reset: 'Redefinir',
+      mode_pomodoro: 'Pomodoro 25m', mode_short_break: 'Pausa Curta', mode_long_break: 'Pausa Longa',
+      btn_flip_card: 'Revelar Resposta', rate_again: 'De Novo', rate_hard: 'Difícil', rate_good: 'Bom', rate_easy: 'Fácil',
+      lbl_due_today: 'Para Revisar Hoje', sound_rain: 'Chuva na Janela', sound_ocean: 'Ondas do Mar', sound_campfire: 'Fogueira',
+      sound_bamboo: 'Bambu Zen', sound_cave: 'Eco de Caverna', sound_wind: 'Vento Alpino',
+      opt_amoled: 'Preto Puro AMOLED', opt_eink: 'Papel E-Ink', opt_twilight: 'Filtro Luz Noturna',
+      prompt_palming: 'Descanso Ocular 20-20-20', prompt_water: 'Beba um gole de água',
+      badge_streak: 'Sequência de Dias', msg_saved: 'Salvo com sucesso', dlg_confirm: 'Confirmar', dlg_cancel: 'Cancelar'
+    },
+    // Hindi
+    hi: {
+      btn_start: 'फोकस शुरू करें', btn_pause: 'रोकें', btn_resume: 'जारी रखें', btn_reset: 'रीसेट',
+      mode_pomodoro: 'पोमोडोरो 25 मिनट', mode_short_break: 'छोटा ब्रेक', mode_long_break: 'लंबा ब्रेक',
+      btn_flip_card: 'उत्तर देखें', rate_again: 'फिर से', rate_hard: 'कठिन', rate_good: 'अच्छा', rate_easy: 'आसान',
+      lbl_due_today: 'आज की समीक्षा', sound_rain: 'खिड़की पर बारिश', sound_ocean: 'समुद्र की लहरें', sound_campfire: 'अलाव की आवाज',
+      sound_bamboo: 'बांस का फव्वारा', sound_cave: 'गुफा की गूंज', sound_wind: 'पहाड़ी हवा',
+      opt_amoled: 'एमोलेड गहरा काला', opt_eink: 'ई-इंक पेपर मोड', opt_twilight: 'रात की रोशनी कम करें',
+      prompt_palming: '20-20-20 आंखों का आराम', prompt_water: 'पानी का घूंट पिएं',
+      badge_streak: 'दैनिक स्ट्रीक', msg_saved: 'सफलतापूर्वक सहेजा गया', dlg_confirm: 'पुष्टि करें', dlg_cancel: 'रद्द करें'
+    }
+  };
+
+  window.df_i18n_packs = globalPacks;
+  window.dfRegisterLanguagePack = function(lang, pack) {
+    if (['he', 'iw', 'syc', 'ber', 'zgh'].indexOf(lang) !== -1) return false;
+    globalPacks[lang] = pack;
+    return true;
+  };
+})();
+
