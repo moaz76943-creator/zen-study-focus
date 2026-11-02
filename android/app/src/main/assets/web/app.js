@@ -37115,6 +37115,9 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    nio: { name: "Nganasan", focus: "Manya", rest: "Khotu", start: "Tanyso", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    sjd: { name: "Kildin Sami", focus: "Ushke", rest: "Voyyke", start: "Alke", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    enf: { name: "Forest Enets", focus: "Moda", rest: "Kasa", start: "Toba", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     ulc: { name: "Ulch", focus: "Mian", rest: "Dalbu", start: "Bono", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     kdd: { name: "Yankunytjatjara", focus: "Kulinma", rest: "Ngaringi", start: "Tjulyanypa", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     aly: { name: "Alyawarr", focus: "Itelaytnh-itnh", rest: "Arlkwarlpay", start: "Alparnpenh", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38676,3 +38679,5 @@ function dfGetMilestoneVersion3310AuditSeal() { return { milestone: "M3170", rel
 function dfGetMilestoneVersion3320AuditSeal() { return { milestone: "M3180", release: "v33.2.0", versionCode: 3000, date: new Date().toISOString(), polyglotLangs: 872, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3330AuditSeal() { return { milestone: "M3190", release: "v33.3.0", versionCode: 3010, date: new Date().toISOString(), polyglotLangs: 877, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3340AuditSeal() { return { milestone: "M3200", release: "v33.4.0", versionCode: 3020, date: new Date().toISOString(), polyglotLangs: 882, dspCertified: true, zeroPii: true }; }
