@@ -40954,3 +40954,26 @@ window.dfRenderClozeCard = function(text, isRevealed) {
     return { prompt: answer, isCloze: true };
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: OEM TASK KILLER & BACKGROUND SLEEP SENTINEL
+   Detects aggressive OEM power managers (MIUI, OneUI, EMUI)
+   ========================================================== */
+window.dfDetectOEMRestrictions = function() {
+  const ua = (typeof navigator !== "undefined" && navigator.userAgent) ? navigator.userAgent.toLowerCase() : "";
+  let manufacturer = "standard";
+
+  if (ua.includes("samsung") || ua.includes("sm-")) manufacturer = "samsung";
+  else if (ua.includes("xiaomi") || ua.includes("redmi") || ua.includes("miui")) manufacturer = "xiaomi";
+  else if (ua.includes("huawei") || ua.includes("honor")) manufacturer = "huawei";
+  else if (ua.includes("oppo") || ua.includes("cph")) manufacturer = "oppo";
+
+  console.log("[OEM GUARD] Device profile detected:", manufacturer);
+  return {
+    manufacturer: manufacturer,
+    needsOptimizationGuide: manufacturer !== "standard",
+    recommendation: manufacturer !== "standard" 
+      ? "Allow unrestricted background battery usage in phone settings for unbroken timer reliability."
+      : "Standard Android power profile active."
+  };
+};
