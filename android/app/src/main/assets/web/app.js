@@ -42373,3 +42373,28 @@ window.dfGetCalibratedExactSeconds = function(startEpochMs) {
   }
   return Math.floor(rawElapsedMs / 1000);
 };
+
+/* ==========================================================
+   DEEP FOCUS: MULTI-DAY OPEN SESSION & OVERFLOW SENTINEL
+   Safely partitions midnight-crossing sessions into daily ledger buckets
+   ========================================================== */
+window.dfPartitionMidnightSession = function(startEpochMs, durationSeconds) {
+  const startDate = new Date(startEpochMs);
+  const endDate = new Date(startEpochMs + (durationSeconds * 1000));
+  const startDay = startDate.toISOString().split("T")[0];
+  const endDay = endDate.toISOString().split("T")[0];
+
+  if (startDay === endDay) {
+    return [{ date: startDay, durationMinutes: Math.floor(durationSeconds / 60) }];
+  }
+
+  // Cross-midnight split calculation
+  const midnightEpoch = new Date(startDay + "T23:59:59.999Z").getTime();
+  const day1Seconds = Math.max(0, Math.floor((midnightEpoch - startEpochMs) / 1000));
+  const day2Seconds = Math.max(0, durationSeconds - day1Seconds);
+
+  return [
+    { date: startDay, durationMinutes: Math.floor(day1Seconds / 60) },
+    { date: endDay, durationMinutes: Math.floor(day2Seconds / 60) }
+  ];
+};
