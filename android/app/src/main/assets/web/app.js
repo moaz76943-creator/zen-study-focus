@@ -43167,3 +43167,28 @@ window.dfDetectMixedScriptSpoofing = function(text) {
   const hasCyrillicLookalikes = /[аеорсух]/.test(text);
   return hasLatin && hasCyrillicLookalikes;
 };
+
+/* ==========================================================
+   DEEP FOCUS: CLICKJACKING & IFRAME SANDBOX IMMUNITY SHIELD
+   Ensures application cannot be framed or visually hijacked
+   ========================================================== */
+window.dfEnforceFrameIsolation = function() {
+  if (typeof window !== "undefined" && window.top !== window.self) {
+    try {
+      window.top.location = window.self.location;
+    } catch (e) {
+      document.body.innerHTML = "<h2 style='color:red;'>Access Denied: Embedded Frame Blocked</h2>";
+    }
+  }
+
+  // Prevent accidental drop of untrusted external script files
+  if (typeof window !== "undefined") {
+    window.addEventListener("dragover", (e) => e.preventDefault(), false);
+    window.addEventListener("drop", (e) => e.preventDefault(), false);
+  }
+  console.log("[SECURITY] Frame isolation and drop protection active.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfEnforceFrameIsolation();
+}
