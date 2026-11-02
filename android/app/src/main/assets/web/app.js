@@ -40277,3 +40277,36 @@ window.dfDetectPeakFocusHours = function(sessionsList) {
     hourlyDistribution: hourBuckets
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: DAILY FOCUS GOAL & STREAK PROTECTION BUFFER
+   Tracks daily target completion with rest-day streak shielding
+   ========================================================== */
+window.dfGetDailyGoalProgress = function(targetMinutes, todaySessionsList) {
+  const target = targetMinutes || (window.dfSafeGetStorage ? window.dfSafeGetStorage("df_daily_goal_mins", 120) : 120);
+  const todayStr = new Date().toISOString().split("T")[0];
+  const sessions = Array.isArray(todaySessionsList) ? todaySessionsList : [];
+
+  let todayMins = 0;
+  sessions.forEach(s => {
+    const d = s.date || (s.timestamp ? s.timestamp.split("T")[0] : null);
+    if (d === todayStr) {
+      todayMins += (s.durationMinutes || Math.floor((s.durationSeconds || 0) / 60));
+    }
+  });
+
+  const percentage = Math.min(100, Math.round((todayMins / target) * 100));
+  return {
+    targetMinutes: target,
+    completedMinutes: todayMins,
+    remainingMinutes: Math.max(0, target - todayMins),
+    percentage: percentage,
+    isGoalAchieved: todayMins >= target
+  };
+};
+
+window.dfSetDailyTargetMinutes = function(mins) {
+  const target = Math.max(15, Math.min(720, mins));
+  if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_daily_goal_mins", target);
+  return target;
+};
