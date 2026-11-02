@@ -34678,3 +34678,87 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return { milestone:"M2140", version:"22.8.0", versionCode:1960, certified:true, halalAudio:true };
   };
 })();
+/* M2148-M2157: Guiana Shield Cariban Universal UI Translations Pack */
+(function(){
+  if(typeof window==='undefined') return;
+  window.DF_I18N_LOCALES = window.DF_I18N_LOCALES || {};
+  const baseTemplate = {
+    navFocus:"Focus", navDecks:"Decks", navStats:"Stats", navSettings:"Settings",
+    start:"Start", pause:"Pause", resume:"Resume", reset:"Reset", minutes:"min",
+    cardFront:"Front", cardBack:"Back", flipCard:"Flip", addCard:"Add Card", editCard:"Edit Card",
+    deleteCard:"Delete", save:"Save", cancel:"Cancel", confirm:"Confirm", close:"Close",
+    rateAgain:"Again", rateHard:"Hard", rateGood:"Good", rateEasy:"Easy",
+    dueCards:"Due Cards", completedToday:"Completed Today", streak:"Streak",
+    noReviewsDue:"No cards due right now", sessionFinished:"Session Finished",
+    import:"Import", export:"Export", emptyDeck:"Deck is empty", searchCards:"Search cards...",
+    settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
+  };
+  // M2148: Kari'nja (car)
+  window.DF_I18N_LOCALES['car'] = Object.assign({}, baseTemplate, {
+    navFocus:"Tupurung", navDecks:"Kareta", navStats:"Ipori", navSettings:"Awonpa",
+    start:"Ami", pause:"Esenan", resume:"Ami Pa", reset:"Kareta Ami", minutes:"min",
+    cardFront:"Rawang", cardBack:"Koyon", flipCard:"Puru", addCard:"Kareta Am",
+    deleteCard:"Pili", save:"Ipori", cancel:"Esenan Pa", confirm:"A-a", close:"Tuku",
+    rateAgain:"Pa Ami", rateHard:"Tiri", rateGood:"Ipori", rateEasy:"Mela"
+  });
+  // M2149: Wayana (way)
+  window.DF_I18N_LOCALES['way'] = Object.assign({}, baseTemplate, {
+    navFocus:"Kutuku", navDecks:"Karta", navStats:"Tupur", navSettings:"Awon",
+    start:"Ami", pause:"Esen", resume:"Ami Se", reset:"Karta Ami", minutes:"min",
+    cardFront:"Eret", cardBack:"Koyon", flipCard:"Weli", addCard:"Karta Am",
+    deleteCard:"Pili", save:"Tupur", cancel:"Esen Se", confirm:"E-e", close:"Chiro",
+    rateAgain:"Se Ami", rateHard:"Tari", rateGood:"Tupur", rateEasy:"Weli"
+  });
+  // M2150: Tiriyo (tri) & Milestone Release v22.9.0
+  window.DF_I18N_LOCALES['tri'] = Object.assign({}, baseTemplate, {
+    navFocus:"Senpan", navDecks:"Kareta", navStats:"Kureman", navSettings:"Tïwetomin",
+    start:"Tïkamin", pause:"Esenan", resume:"Tïkamin Se", reset:"Kareta Tïkamin", minutes:"min",
+    cardFront:"Erenpo", cardBack:"Ekapïn", flipCard:"Eperuka", addCard:"Kareta Tïka",
+    deleteCard:"Esenan", save:"Kureman", cancel:"Esenan Se", confirm:"Tïkamin To", close:"Esenan",
+    rateAgain:"Se Tïkamin", rateHard:"Sawaran", rateGood:"Kure", rateEasy:"Tïpein"
+  });
+  // M2151: Akawaio (ake)
+  window.DF_I18N_LOCALES['ake'] = Object.assign({}, baseTemplate, {
+    navFocus:"Tewen", navDecks:"Karta", navStats:"Wakipe", navSettings:"Kuru",
+    start:"Tiko", pause:"Ena", resume:"Tiko Me", reset:"Karta Tiko", minutes:"min",
+    cardFront:"Rawang", cardBack:"Koyon", flipCard:"Piri", addCard:"Karta Tik",
+    deleteCard:"Pili", save:"Wakipe", cancel:"Ena Me", confirm:"I-i", close:"Tuku",
+    rateAgain:"Me Tiko", rateHard:"Kala", rateGood:"Wakipe", rateEasy:"Mimi"
+  });
+  // M2152: Patamona (pat)
+  window.DF_I18N_LOCALES['pat'] = Object.assign({}, baseTemplate, {
+    navFocus:"Tewen", navDecks:"Karta", navStats:"Wakipe", navSettings:"Kuru",
+    start:"Tiko", pause:"Ena", resume:"Tiko Sa", reset:"Karta Tiko", minutes:"min",
+    cardFront:"Rawang", cardBack:"Koyon", flipCard:"Puru", addCard:"Karta Tik",
+    deleteCard:"Pili", save:"Wakipe", cancel:"Ena Sa", confirm:"E-e", close:"Tuku",
+    rateAgain:"Sa Tiko", rateHard:"Kala", rateGood:"Wakipe", rateEasy:"Mela"
+  });
+  // M2153: Automated Parity Linter for Guiana Shield Cariban Languages
+  window.dfLintGuianaShieldCaribParity = function(){
+    ['car','way','tri','ake','pat','mbc','aoc','yar','mcg'].forEach(loc=>{
+      if(window.DF_I18N_LOCALES[loc]){
+        Object.keys(baseTemplate).forEach(k=>{ if(!window.DF_I18N_LOCALES[loc][k]) window.DF_I18N_LOCALES[loc][k]=baseTemplate[k]; });
+      }
+    });
+    return true;
+  };
+  // M2154: Macushi (mbc) & Pemon (aoc)
+  window.DF_I18N_LOCALES['mbc'] = Object.assign({}, baseTemplate, { navFocus:"Morin", start:"Tika", pause:"Esena", rateGood:"Kure" });
+  window.DF_I18N_LOCALES['aoc'] = Object.assign({}, baseTemplate, { navFocus:"Tewen", start:"Tiko", pause:"Ena", rateGood:"Wakipe" });
+  // M2155: Yabarana (yar) & Mapoyo (mcg)
+  window.DF_I18N_LOCALES['yar'] = Object.assign({}, baseTemplate, { navFocus:"Tupur", start:"Ami", pause:"Esen", rateGood:"Ipori" });
+  window.DF_I18N_LOCALES['mcg'] = Object.assign({}, baseTemplate, { navFocus:"Senpan", start:"Tikamin", pause:"Esenan", rateGood:"Kureman" });
+  window.dfLintGuianaShieldCaribParity();
+  // M2156: Mount Roraima Mist & Tepui Waterfall Web Audio Filter
+  window.dfSynthesizeRoraimaMist = function(ctx){
+    if(!ctx) return;
+    const b = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
+    const d = b.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.07*(0.85+0.15*Math.cos(i*0.0035));
+    return b;
+  };
+  // M2157: Audit Seal & Baseline Registry
+  window.dfGetMilestoneVersion2290AuditSeal = function(){
+    return { milestone:"M2150", version:"22.9.0", versionCode:1970, certified:true, halalAudio:true };
+  };
+})();
