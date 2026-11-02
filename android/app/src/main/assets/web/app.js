@@ -39552,3 +39552,42 @@ if (typeof window !== "undefined" && window.dfSafeGetStorage) {
   const savedOLED = window.dfSafeGetStorage("df_oled_theme", false);
   if (savedOLED) window.dfToggleOLEDMode(true);
 }
+
+/* ==========================================================
+   DEEP FOCUS: SRS RETENTION RATE & LEECH CARD DETECTOR
+   Memory retention forecasting and difficult card early warning
+   ========================================================== */
+window.dfAnalyzeDeckRetention = function(cardsList) {
+  if (!Array.isArray(cardsList) || cardsList.length === 0) {
+    return { retentionRate: 100, leechCards: [], totalReviewed: 0 };
+  }
+
+  let totalPass = 0;
+  let totalFail = 0;
+  const leechCards = [];
+
+  cardsList.forEach(card => {
+    const lapses = card.lapses || 0;
+    const reps = card.reps || 0;
+
+    // Card failed 4 or more times is a leech card needing breakdown
+    if (lapses >= 4) {
+      leechCards.push({ id: card.id, question: card.front || card.q, lapses: lapses });
+    }
+
+    if (reps > 0) {
+      totalPass += reps;
+      totalFail += lapses;
+    }
+  });
+
+  const totalReviews = totalPass + totalFail;
+  const retentionRate = totalReviews > 0 ? Math.round((totalPass / totalReviews) * 100) : 100;
+
+  return {
+    retentionRate: retentionRate,
+    leechCardsCount: leechCards.length,
+    leechCards: leechCards.slice(0, 5),
+    healthStatus: retentionRate >= 85 ? "EXCELLENT" : (retentionRate >= 70 ? "GOOD" : "NEEDS_REVIEW")
+  };
+};
