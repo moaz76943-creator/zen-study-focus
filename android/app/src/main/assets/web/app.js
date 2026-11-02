@@ -42920,3 +42920,31 @@ window.dfVerifyJoinerIntegrity = function(text) {
   const hasZWJ = text && text.includes("‍");
   return { hasZWNJ, hasZWJ, preserved: true };
 };
+
+/* ==========================================================
+   DEEP FOCUS: VERTICAL SCRIPT FLOW & MONGOLIAN WRITING ENGINE (v55.1.0)
+   Enables vertical-lr text layout for Traditional Mongolian and Manchu
+   ========================================================== */
+window.DF_VERTICAL_SCRIPTS_LOCALES = ["mon-Mong", "mnc", "xal-Mong"];
+
+window.dfApplyVerticalScriptLayout = function(localeCode) {
+  const code = localeCode || window.DF_CURRENT_LOCALE || "";
+  const isVertical = window.DF_VERTICAL_SCRIPTS_LOCALES.includes(code);
+
+  if (typeof document !== "undefined") {
+    document.querySelectorAll(".df-card-text, [data-vertical-flow]").forEach(el => {
+      if (isVertical) {
+        el.style.writingMode = "vertical-lr";
+        el.style.textOrientation = "sideways";
+        el.style.overflowX = "auto";
+        el.style.overflowY = "hidden";
+      } else {
+        el.style.writingMode = "";
+        el.style.textOrientation = "";
+        el.style.overflowX = "";
+        el.style.overflowY = "";
+      }
+    });
+  }
+  return isVertical;
+};
