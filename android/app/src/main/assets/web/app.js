@@ -38853,3 +38853,37 @@ window.dfImportUserData = function(jsonString) {
     return { success: false, error: err.message };
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: MULTI-TIER i18n FALLBACK & ZERO-UNDEFINED SHIELD
+   Guarantees 100% resilient UI text resolution across all 1000 locales
+   ========================================================== */
+window.DF_DEFAULT_FALLBACK_LOCALE = "ar";
+
+window.dfGetText = function(key, targetLocale) {
+  const lang = targetLocale || window.DF_CURRENT_LOCALE || window.DF_DEFAULT_FALLBACK_LOCALE;
+  const dict = window.DF_I18N_LOCALES || {};
+  
+  // Tier 1: Selected locale direct match
+  if (dict[lang] && dict[lang][key]) return dict[lang][key];
+  
+  // Tier 2: Default fallback locale match
+  if (dict[window.DF_DEFAULT_FALLBACK_LOCALE] && dict[window.DF_DEFAULT_FALLBACK_LOCALE][key]) {
+    return dict[window.DF_DEFAULT_FALLBACK_LOCALE][key];
+  }
+  
+  // Tier 3: English baseline fallback match
+  if (dict["en"] && dict["en"][key]) return dict["en"][key];
+  
+  // Tier 4: Capitalized key fallback - never return undefined
+  return key ? key.charAt(0).toUpperCase() + key.slice(1) : "";
+};
+
+window.dfApplyLocaleUI = function(localeCode) {
+  const code = localeCode || window.DF_CURRENT_LOCALE || window.DF_DEFAULT_FALLBACK_LOCALE;
+  if (typeof document === "undefined") return;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (key) el.textContent = window.dfGetText(key, code);
+  });
+};
