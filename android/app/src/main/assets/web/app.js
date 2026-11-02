@@ -39493,3 +39493,29 @@ window.dfStartThrottledTimer = function(duration, onTick, onComplete) {
     prevStartTimer(duration, onTick, wrappedComplete);
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: SMART POMODORO CYCLE & LONG BREAK AUTO-CHAINER
+   Tracks 4-cycle sets, short breaks (5m) and long breaks (15m)
+   ========================================================== */
+window.DF_CYCLE_COUNT = 0;
+
+window.dfAdvancePomodoroCycle = function() {
+  window.DF_CYCLE_COUNT = (window.DF_CYCLE_COUNT || 0) + 1;
+  const isLongBreak = (window.DF_CYCLE_COUNT % 4) === 0;
+  const breakDurationMinutes = isLongBreak ? 15 : 5;
+  const breakDurationSeconds = breakDurationMinutes * 60;
+
+  console.log("[POMODORO] Completed session #" + window.DF_CYCLE_COUNT + ". Next break: " + (isLongBreak ? "LONG (15m)" : "SHORT (5m)"));
+
+  return {
+    cycleNumber: window.DF_CYCLE_COUNT,
+    isLongBreak: isLongBreak,
+    breakDurationSeconds: breakDurationSeconds,
+    breakDurationMinutes: breakDurationMinutes
+  };
+};
+
+window.dfResetDailyCycleCount = function() {
+  window.DF_CYCLE_COUNT = 0;
+};
