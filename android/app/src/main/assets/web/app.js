@@ -44886,3 +44886,65 @@ window.DF_MASTER_LEXICON.az = {
 window.dfGetMilestoneM5527UzbekKazakhAzeriSeal = function() {
   return { milestone: 'M5518-M5527 Central Asian Turkic Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5528-M5537: Balkan and Somali Master Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.bs = {
+  timer_start: "Pocni Duboki Fokus",
+  timer_pause: "Pauziraj Sesiju",
+  timer_resume: "Nastavi Fokus",
+  timer_reset: "Resetuj Tajmer",
+  timer_stop: "Zavrsi Sesiju",
+  phase_focus: "Sesija Duboke Koncentracije",
+  phase_short_break: "Kratki Mentalni Odmor",
+  phase_long_break: "Produzeni Odmor",
+  session_completed: "Masallah! Sesija Uspjesno Zavrsena",
+  card_flip: "Okreni Karticu",
+  card_show_answer: "Prikazi Odgovor",
+  rating_again: "Potrebno Ponavljanje",
+  rating_hard: "Tesko Zapamceno",
+  rating_good: "Dobro Prisjecanje",
+  rating_easy: "Potpuno Utvrdeno"
+};
+
+window.DF_MASTER_LEXICON.sq = {
+  timer_start: "Fillo Perqendrimin e Thelle",
+  timer_pause: "Pezullo Perkohesisht",
+  timer_resume: "Vazhdo Perqendrimin",
+  timer_reset: "Rivendos Kohatesin",
+  timer_stop: "Perfundo Seancen",
+  phase_focus: "Seance Studimi e Thelle",
+  phase_short_break: "Pushim i Shkurter Mendor",
+  phase_long_break: "Pushim i Zgjatur",
+  session_completed: "Urime! Seanca u Perfundua me Sukses",
+  card_flip: "Kthe Karten",
+  card_show_answer: "Shfaq Pergjigjen",
+  rating_again: "Kerkon Rishikim",
+  rating_hard: "E Veshtire",
+  rating_good: "Kujtese e Mire",
+  rating_easy: "E Ngulitur Plotesisht"
+};
+
+window.DF_MASTER_LEXICON.so = {
+  timer_start: "Bilow Diirada Qotada Dheer",
+  timer_pause: "Hakad Gal",
+  timer_resume: "Sii Wad Diirada",
+  timer_reset: "Dib u Deji",
+  timer_stop: "Soo Afjar Casharka",
+  phase_focus: "Xilliga Wax Akhriska Sare",
+  phase_short_break: "Nasasho Gaaban oo Maskaxda ah",
+  phase_long_break: "Nasasho Dheer",
+  session_completed: "Masha Allah! Casharkii Wuu Dhamaaday",
+  card_flip: "Gaddoomi Kaarka",
+  card_show_answer: "Muuji Jawaabta",
+  rating_again: "U Baahan Ku Celis",
+  rating_hard: "Adag in la Xasuusto",
+  rating_good: "Xasuus Wacan",
+  rating_easy: "Si Fiican loo Xafiday"
+};
+
+window.dfGetMilestoneM5537BalkanSomaliSeal = function() {
+  return { milestone: 'M5528-M5537 Balkan and Somali Master Lexicons', status: 'VERIFIED' };
+};
