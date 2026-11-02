@@ -37115,6 +37115,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    gup: { name: "Bininj Kunwok", focus: "Bengkan", rest: "Munguyh", start: "Worrkikwon", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    arr: { name: "Arrernte", focus: "Itelareme", rest: "Arlkweme", start: "Ampeke", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     trv: { name: "Taroko Seediq", focus: "Knxalan", rest: "Hmutan", start: "Prngagan", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     bnn: { name: "Bunun", focus: "Is-ang", rest: "Palaqa", start: "Pansumsum", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     pwn: { name: "Paiwan", focus: "Varung", rest: "Pulinget", start: "Patanuvac", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38662,3 +38664,5 @@ function dfGetMilestoneVersion3280AuditSeal() { return { milestone: "M3140", rel
 function dfGetMilestoneVersion3290AuditSeal() { return { milestone: "M3150", release: "v32.9.0", versionCode: 2970, date: new Date().toISOString(), polyglotLangs: 857, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3300GrandSeal() { return { milestone: "M3160", release: "v33.0.0", versionCode: 2980, date: new Date().toISOString(), polyglotLangs: 862, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3310AuditSeal() { return { milestone: "M3170", release: "v33.1.0", versionCode: 2990, date: new Date().toISOString(), polyglotLangs: 867, dspCertified: true, zeroPii: true }; }
