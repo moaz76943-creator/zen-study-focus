@@ -44824,3 +44824,65 @@ window.DF_MASTER_LEXICON.ku = {
 window.dfGetMilestoneM5517MalayPashtoKurdishSeal = function() {
   return { milestone: 'M5508-M5517 Malay Pashto Kurdish Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5518-M5527: Central Asian Turkic Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.uz = {
+  timer_start: "Chuqur Diqqatni Boshlash",
+  timer_pause: "Vaqtinchalik Tanaffus",
+  timer_resume: "Diqqatni Davom Ettirish",
+  timer_reset: "Taymerni Qayta O'rnatish",
+  timer_stop: "Mashg'ulotni Tugatish",
+  phase_focus: "Chuqur O'rganish Seansi",
+  phase_short_break: "Qisqa Fikr Tanaffusi",
+  phase_long_break: "Kengaytirilgan Dam Olish",
+  session_completed: "Mashalloh! Seans Yakunlandi",
+  card_flip: "Kartani Aylantirish",
+  card_show_answer: "Javobni Ko'rsatish",
+  rating_again: "Qayta Ko'rish Zarur",
+  rating_hard: "Qiyin Eslab Qolindi",
+  rating_good: "Yaxshi Eslab Qolish",
+  rating_easy: "Mustahkam Xotira"
+};
+
+window.DF_MASTER_LEXICON.kk = {
+  timer_start: "Терең Зейінді Бастау",
+  timer_pause: "Уақытша Кідірту",
+  timer_resume: "Зейінді Жалғастыру",
+  timer_reset: "Қайта Орнату",
+  timer_stop: "Сессияны Аяқтау",
+  phase_focus: "Терең Оқу Кезеңі",
+  phase_short_break: "Қысқа Сергу Үзілісі",
+  phase_long_break: "Ұзақ Демалыс",
+  session_completed: "Жарайсың! Сабақ Аяқталды",
+  card_flip: "Картаны Аударыңыз",
+  card_show_answer: "Жауапты Көрсету",
+  rating_again: "Қайталау Қажет",
+  rating_hard: "Қиын Еске Түсті",
+  rating_good: "Жақсы Есте Сақтау",
+  rating_easy: "Берік Меңгерілген"
+};
+
+window.DF_MASTER_LEXICON.az = {
+  timer_start: "Dərin Diqqəti Başla",
+  timer_pause: "Müvəqqəti Fasilə",
+  timer_resume: "Diqqəti Davam Etdir",
+  timer_reset: "Sıfırla",
+  timer_stop: "Sessiyanı Bitir",
+  phase_focus: "Dərin Zəka Sessiyası",
+  phase_short_break: "Qısa Fikir Fasiləsi",
+  phase_long_break: "Uzun İstirahət",
+  session_completed: "Əhsən! Sessiya Uğurla Bitdi",
+  card_flip: "Kartı Çevir",
+  card_show_answer: "Cavabı Göstər",
+  rating_again: "Təkrar Lazımdır",
+  rating_hard: "Çətin Xatırlandı",
+  rating_good: "Dəqiq Xatırlama",
+  rating_easy: "Möhkəm Yaddaş"
+};
+
+window.dfGetMilestoneM5527UzbekKazakhAzeriSeal = function() {
+  return { milestone: 'M5518-M5527 Central Asian Turkic Lexicons', status: 'VERIFIED' };
+};
