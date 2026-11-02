@@ -40865,3 +40865,32 @@ window.dfCalculateFSRS = function(card, rating, targetRetention) {
     dueDate: nextDueDate.toISOString().split("T")[0]
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: INSTANT SRS RATING UNDO BUFFER SENTINEL
+   Reverses accidental ratings and restores exact interval snapshots
+   ========================================================== */
+window.DF_UNDO_BUFFER = null;
+
+window.dfCaptureCardSnapshot = function(card) {
+  if (!card) return;
+  window.DF_UNDO_BUFFER = {
+    cardId: card.id,
+    previousState: JSON.parse(JSON.stringify(card)),
+    timestamp: Date.now()
+  };
+};
+
+window.dfUndoLastCardRating = function(cardsList) {
+  if (!window.DF_UNDO_BUFFER || !Array.isArray(cardsList)) return false;
+  const snapshot = window.DF_UNDO_BUFFER;
+  const cardIndex = cardsList.findIndex(c => c.id === snapshot.cardId);
+
+  if (cardIndex !== -1) {
+    cardsList[cardIndex] = snapshot.previousState;
+    window.DF_UNDO_BUFFER = null;
+    console.log("[SRS UNDO] Successfully reverted card rating:", snapshot.cardId);
+    return true;
+  }
+  return false;
+};
