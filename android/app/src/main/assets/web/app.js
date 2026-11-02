@@ -37115,6 +37115,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    kwh: { name: "Kowiai", focus: "Nawon", rest: "Mani", start: "Tefur", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    ekg: { name: "Ekari Mee", focus: "Dimu", rest: "Bada", start: "Puya", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    dna: { name: "Grand Valley Dani", focus: "Nenggip", rest: "Yok", start: "Epalak", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    wep: { name: "West Dani", focus: "Abit", rest: "Abuk", start: "Wulok", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    bhw: { name: "Biak", focus: "Kno", rest: "Fafyef", start: "Wos", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     kvd: { name: "Kui Alor", focus: "Mane", rest: "Pala", start: "Toka", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     kem: { name: "Kemak", focus: "Noin", rest: "Dada", start: "Hahu", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     abf: { name: "Abui", focus: "Nehen", rest: "Pakang", start: "Tahai", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38623,3 +38628,5 @@ function dfGetMilestoneVersion3210AuditSeal() { return { milestone: "M3070", rel
 function dfGetMilestoneVersion3220AuditSeal() { return { milestone: "M3080", release: "v32.2.0", versionCode: 2900, date: new Date().toISOString(), polyglotLangs: 822, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3230AuditSeal() { return { milestone: "M3090", release: "v32.3.0", versionCode: 2910, date: new Date().toISOString(), polyglotLangs: 827, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3240AuditSeal() { return { milestone: "M3100", release: "v32.4.0", versionCode: 2920, date: new Date().toISOString(), polyglotLangs: 832, dspCertified: true, zeroPii: true }; }
