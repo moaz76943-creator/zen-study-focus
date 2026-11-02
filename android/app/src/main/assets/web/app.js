@@ -37115,6 +37115,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    sro: { name: "Sardinian Campidanese", focus: "Atentzioni", rest: "Pàusa", start: "Comintzai", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    pms: { name: "Piedmontese", focus: "Atension", rest: "Pàusa", start: "Inandié", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    lmo: { name: "Lombard", focus: "Atenzion", rest: "Pausa", start: "Comenzà", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    nap: { name: "Neapolitan", focus: "Attenzione", rest: "Pausa", start: "Scummincià", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    scn: { name: "Sicilian", focus: "Attinzioni", rest: "Pausa", start: "Accuminciari", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     vec: { name: "Venetian", focus: "Atension", rest: "Pauxa", start: "Tacar", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     lij: { name: "Ligurian", focus: "Atençion", rest: "Pösa", start: "Comensâ", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     cos: { name: "Corsican", focus: "Attenzione", rest: "Posa", start: "Principià", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38738,3 +38743,5 @@ function dfGetMilestoneVersion3450AuditSeal() { return { milestone: "M3310", rel
 function dfGetMilestoneVersion3460AuditSeal() { return { milestone: "M3320", release: "v34.6.0", versionCode: 3140, date: new Date().toISOString(), polyglotLangs: 942, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3470AuditSeal() { return { milestone: "M3330", release: "v34.7.0", versionCode: 3150, date: new Date().toISOString(), polyglotLangs: 947, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3500GrandSeal() { return { milestone: "M3340", release: "v35.0.0", versionCode: 3160, date: new Date().toISOString(), polyglotLangs: 952, dspCertified: true, zeroPii: true }; }
