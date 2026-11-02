@@ -37115,6 +37115,10 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    stq: { name: "Saterland Frisian", focus: "Ounsicht", rest: "Räiste", start: "Beguun", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    fur: { name: "Friulian", focus: "Atenzion", rest: "Pruibit", start: "Inviâ", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    lld: { name: "Ladin", focus: "Atenzion", rest: "Pausa", start: "Mete man", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    roh: { name: "Romansh", focus: "Attenziun", rest: "Pussanza", start: "Cumenzar", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     frr: { name: "Northern Frisian", focus: "Kääre", rest: "Rüst", start: "Began", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     sco: { name: "Scots", focus: "Heid", rest: "Rist", start: "Stairt", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     fkv: { name: "Kven", focus: "Mieli", rest: "Leppo", start: "Alkkaa", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38725,3 +38729,5 @@ function dfGetMilestoneVersion3430AuditSeal() { return { milestone: "M3290", rel
 function dfGetMilestoneVersion3440AuditSeal() { return { milestone: "M3300", release: "v34.4.0", versionCode: 3120, date: new Date().toISOString(), polyglotLangs: 932, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3450AuditSeal() { return { milestone: "M3310", release: "v34.5.0", versionCode: 3130, date: new Date().toISOString(), polyglotLangs: 937, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3460AuditSeal() { return { milestone: "M3320", release: "v34.6.0", versionCode: 3140, date: new Date().toISOString(), polyglotLangs: 942, dspCertified: true, zeroPii: true }; }
