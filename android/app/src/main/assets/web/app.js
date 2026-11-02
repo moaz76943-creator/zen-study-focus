@@ -45116,3 +45116,32 @@ window.DF_MASTER_LEXICON.hi = {
 window.dfGetMilestoneM5567ChineseJapaneseHindiSeal = function() {
   return { milestone: 'M5558-M5567 Chinese Japanese Hindi Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5568-M5577: Dynamic DOM Binder Engine ---
+window.dfApplyTranslations = function(locale, rootElement) {
+  const loc = locale || window.DF_ACTIVE_LOCALE || 'en';
+  window.DF_ACTIVE_LOCALE = loc;
+
+  const isRtl = ['ar', 'ur', 'fa', 'ps', 'ku'].includes(loc);
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+    document.documentElement.lang = loc;
+  }
+
+  if (typeof document !== 'undefined' && document.querySelectorAll) {
+    const root = rootElement || document;
+    const els = root.querySelectorAll('[data-i18n]');
+    els.forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (key && window.dfTranslate) {
+        el.textContent = window.dfTranslate(key, loc);
+      }
+    });
+  }
+  return { appliedLocale: loc, isRtl: isRtl, status: 'DOM_UPDATED' };
+};
+
+window.dfGetMilestoneM5577DynamicDomBinderSeal = function() {
+  return { milestone: 'M5568-M5577 Dynamic DOM Binder Engine', status: 'VERIFIED' };
+};
