@@ -39519,3 +39519,36 @@ window.dfAdvancePomodoroCycle = function() {
 window.dfResetDailyCycleCount = function() {
   window.DF_CYCLE_COUNT = 0;
 };
+
+/* ==========================================================
+   DEEP FOCUS: PURE AMOLED PITCH BLACK THEME & NIGHT SENTINEL
+   Zero-pixel illumination (#000000) for max battery conservation
+   ========================================================== */
+window.DF_OLED_MODE_ACTIVE = false;
+
+window.dfToggleOLEDMode = function(enable) {
+  window.DF_OLED_MODE_ACTIVE = Boolean(enable);
+  if (typeof document === "undefined" || !document.body) return;
+
+  if (window.DF_OLED_MODE_ACTIVE) {
+    document.body.style.backgroundColor = "#000000";
+    document.body.style.color = "#e2e8f0";
+    document.documentElement.style.backgroundColor = "#000000";
+    document.querySelectorAll(".df-card, .df-container, [data-themeable]").forEach(el => {
+      el.style.backgroundColor = "#000000";
+      el.style.borderColor = "#1a202c";
+    });
+  } else {
+    document.body.style.backgroundColor = "";
+    document.body.style.color = "";
+    document.documentElement.style.backgroundColor = "";
+  }
+  if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_oled_theme", window.DF_OLED_MODE_ACTIVE);
+  console.log("[THEME] True OLED Pitch Black Mode is now:", window.DF_OLED_MODE_ACTIVE ? "ON" : "OFF");
+};
+
+// Auto-restore saved OLED preference on boot
+if (typeof window !== "undefined" && window.dfSafeGetStorage) {
+  const savedOLED = window.dfSafeGetStorage("df_oled_theme", false);
+  if (savedOLED) window.dfToggleOLEDMode(true);
+}
