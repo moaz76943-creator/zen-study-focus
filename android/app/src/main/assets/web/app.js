@@ -40310,3 +40310,31 @@ window.dfSetDailyTargetMinutes = function(mins) {
   if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_daily_goal_mins", target);
   return target;
 };
+
+/* ==========================================================
+   DEEP FOCUS: ZERO-XSS INPUT SANITIZER & HTML SHIELD
+   Safely neutralizes malicious scripts and malformed tags during paste
+   ========================================================== */
+window.dfSanitizeHTML = function(dirtyInput) {
+  if (!dirtyInput || typeof dirtyInput !== "string") return "";
+  
+  // Replace dangerous HTML entities
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#x27;",
+    "/": "&#x2F;"
+  };
+  const sanitized = dirtyInput.replace(/[&<>"'/]/g, (s) => map[s]);
+  
+  // Strip dangerous javascript: or data: pseudo protocols
+  return sanitized.replace(/javascript:/gi, "").replace(/data:/gi, "");
+};
+
+window.dfSafeSetCardText = function(element, rawText) {
+  if (!element) return;
+  // Always use textContent to prevent arbitrary script execution
+  element.textContent = rawText || "";
+};
