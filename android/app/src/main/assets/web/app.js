@@ -43081,3 +43081,19 @@ window.dfGetSector5TypographySeal = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: CONSTANT-TIME STRING COMPARISON SENTINEL (SECTOR 6 LAUNCH)
+   Eliminates side-channel microsecond timing attacks on PIN verification
+   ========================================================== */
+window.dfConstantTimeEquals = function(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  let mismatch = a.length === b.length ? 0 : 1;
+  const len = Math.min(a.length, b.length);
+
+  // Bitwise XOR loop always evaluates every single character identically
+  for (let i = 0; i < len; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+};
