@@ -41594,3 +41594,19 @@ window.dfGetBreakHealthTip = function() {
   const index = Math.floor(Math.random() * window.DF_HEALTH_PROMPTS.length);
   return window.DF_HEALTH_PROMPTS[index];
 };
+
+/* ==========================================================
+   DEEP FOCUS: ANTI-BURNOUT COGNITIVE BRAKE (PILLAR 7 COMPLETE)
+   Guards against diminishing returns and mental exhaustion
+   ========================================================== */
+window.dfCheckStudyBurnoutBrake = function(todayMinutes) {
+  const mins = todayMinutes || 0;
+  // If student studied over 4.5 hours in a day, suggest mandatory recharge
+  if (mins >= 270) {
+    return {
+      brakeTriggered: true,
+      message: "You have completed 4.5+ hours of intense focus today. Diminishing returns occur beyond this threshold. Rest and sleep to cement memory."
+    };
+  }
+  return { brakeTriggered: false };
+};
