@@ -43192,3 +43192,32 @@ window.dfEnforceFrameIsolation = function() {
 if (typeof window !== "undefined") {
   window.dfEnforceFrameIsolation();
 }
+
+/* ==========================================================
+   DEEP FOCUS: CRYPTOGRAPHIC NONCE RE-USE PREVENTION SENTINEL
+   Enforces CSPRNG fresh 96-bit IV initialization per encryption cycle
+   ========================================================== */
+window.DF_RECENT_NONCES = new Set();
+
+window.dfGenerateFreshIV = function() {
+  if (typeof crypto === "undefined" || !crypto.getRandomValues) {
+    throw new Error("CSPRNG unavailable for secure encryption");
+  }
+  let iv;
+  let ivKey;
+  let attempts = 0;
+
+  do {
+    iv = crypto.getRandomValues(new Uint8Array(12));
+    ivKey = Array.from(iv).join(",");
+    attempts++;
+  } while (window.DF_RECENT_NONCES.has(ivKey) && attempts < 10);
+
+  window.DF_RECENT_NONCES.add(ivKey);
+  // Cap recent nonce registry to 500 items
+  if (window.DF_RECENT_NONCES.size > 500) {
+    const first = window.DF_RECENT_NONCES.values().next().value;
+    window.DF_RECENT_NONCES.delete(first);
+  }
+  return iv;
+};
