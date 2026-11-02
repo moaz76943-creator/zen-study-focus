@@ -40405,3 +40405,42 @@ window.dfFilterAnomalousSessions = function(sessionsList) {
 
   return validSessions;
 };
+
+/* ==========================================================
+   DEEP FOCUS: ULTRA HIGH-CONTRAST MODE (WCAG 2.1 AAA)
+   Sharp border rendering and 7:1 contrast ratio for bright daylight
+   ========================================================== */
+window.DF_HIGH_CONTRAST_ACTIVE = false;
+
+window.dfToggleHighContrast = function(enable) {
+  window.DF_HIGH_CONTRAST_ACTIVE = Boolean(enable);
+  if (typeof document === "undefined" || !document.head) return;
+
+  const styleId = "df-high-contrast-style";
+  let styleEl = document.getElementById(styleId);
+
+  if (window.DF_HIGH_CONTRAST_ACTIVE) {
+    if (!styleEl) {
+      styleEl = document.createElement("style");
+      styleEl.id = styleId;
+      styleEl.textContent = `
+        body.df-high-contrast { background: #000000 !important; color: #ffffff !important; }
+        body.df-high-contrast .df-btn, body.df-high-contrast button {
+          border: 2px solid #ffff00 !important; color: #ffff00 !important; font-weight: bold !important;
+        }
+        body.df-high-contrast .df-card { border: 2px solid #ffffff !important; background: #0a0a0a !important; }
+      `;
+      document.head.appendChild(styleEl);
+    }
+    document.body.classList.add("df-high-contrast");
+  } else {
+    if (document.body) document.body.classList.remove("df-high-contrast");
+  }
+
+  if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_high_contrast", window.DF_HIGH_CONTRAST_ACTIVE);
+  console.log("[A11Y] High Contrast mode:", window.DF_HIGH_CONTRAST_ACTIVE ? "ACTIVE" : "DISABLED");
+};
+
+if (typeof window !== "undefined" && window.dfSafeGetStorage) {
+  if (window.dfSafeGetStorage("df_high_contrast", false)) window.dfToggleHighContrast(true);
+}
