@@ -37115,6 +37115,10 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    gil: { name: "Gilbertese", focus: "Iango", rest: "Motirawa", start: "Moana", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    chk: { name: "Chuukese", focus: "Ekiek", rest: "Asoso", start: "Poputa", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    pon: { name: "Pohnpeian", focus: "Lemedeme", rest: "Kommoal", start: "Tepida", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    mah: { name: "Marshallese", focus: "Kallimur", rest: "Kakkije", start: "Jinoe", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     tah: { name: "Tahitian", focus: "Manaonao", rest: "Faafaa", start: "Haamata", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     kvc: { name: "Kove", focus: "Wototona", rest: "Pao", start: "Pani", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     len: { name: "Lenakel", focus: "Nolkeikeian", rest: "Aumwi", start: "Epwuh", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38649,3 +38653,5 @@ function dfGetMilestoneVersion3260AuditSeal() { return { milestone: "M3120", rel
 function dfGetMilestoneVersion3270AuditSeal() { return { milestone: "M3130", release: "v32.7.0", versionCode: 2950, date: new Date().toISOString(), polyglotLangs: 847, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3280AuditSeal() { return { milestone: "M3140", release: "v32.8.0", versionCode: 2960, date: new Date().toISOString(), polyglotLangs: 852, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3290AuditSeal() { return { milestone: "M3150", release: "v32.9.0", versionCode: 2970, date: new Date().toISOString(), polyglotLangs: 857, dspCertified: true, zeroPii: true }; }
