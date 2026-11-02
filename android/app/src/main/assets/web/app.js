@@ -39769,3 +39769,52 @@ window.dfGetLocaleData = function(code) {
   }
   return null;
 };
+
+/* ==========================================================
+   DEEP FOCUS: VIRTUAL LIST DOM ENGINE & GARBAGE COLLECTOR
+   Renders only visible items during 1,000-language scrolling, recycling DOM nodes
+   ========================================================== */
+window.dfRenderVirtualList = function(containerEl, items, renderItemFn, itemHeightPx, visibleCount) {
+  if (!containerEl || !Array.isArray(items)) return;
+  const height = itemHeightPx || 48;
+  const count = visibleCount || 15;
+  const totalHeight = items.length * height;
+
+  containerEl.style.position = "relative";
+  containerEl.style.overflowY = "auto";
+  containerEl.style.height = (count * height) + "px";
+
+  const phantomScroller = document.createElement("div");
+  phantomScroller.style.height = totalHeight + "px";
+  phantomScroller.style.width = "100%";
+  phantomScroller.style.position = "absolute";
+  phantomScroller.style.top = "0";
+  phantomScroller.style.left = "0";
+  phantomScroller.style.pointerEvents = "none";
+
+  const viewport = document.createElement("div");
+  viewport.style.position = "absolute";
+  viewport.style.width = "100%";
+  viewport.style.top = "0";
+  viewport.style.left = "0";
+
+  containerEl.innerHTML = "";
+  containerEl.appendChild(phantomScroller);
+  containerEl.appendChild(viewport);
+
+  const updateVisibleItems = () => {
+    const scrollTop = containerEl.scrollTop;
+    const startIndex = Math.max(0, Math.floor(scrollTop / height) - 2);
+    const endIndex = Math.min(items.length, startIndex + count + 5);
+
+    viewport.style.transform = "translateY(" + (startIndex * height) + "px)";
+    viewport.innerHTML = "";
+    for (let i = startIndex; i < endIndex; i++) {
+      const node = renderItemFn(items[i], i);
+      if (node) viewport.appendChild(node);
+    }
+  };
+
+  containerEl.addEventListener("scroll", updateVisibleItems, { passive: true });
+  updateVisibleItems();
+};
