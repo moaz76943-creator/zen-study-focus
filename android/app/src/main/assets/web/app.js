@@ -42461,3 +42461,24 @@ window.dfBroadcastDataSync = function(storeName) {
     } catch (e) {}
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: PERSISTENT STORAGE PERMISSION SENTINEL (v53.1.0)
+   Prevents Android OS from evicting IndexedDB under low disk conditions
+   ========================================================== */
+window.dfEnsurePersistentStorage = async function() {
+  if (typeof navigator !== "undefined" && navigator.storage && navigator.storage.persist) {
+    try {
+      const isPersisted = await navigator.storage.persist();
+      console.log("[STORAGE DEFENSE] Persistent storage status:", isPersisted ? "LOCKED_IMMUNE" : "DEFAULT");
+      return isPersisted;
+    } catch (e) {
+      return false;
+    }
+  }
+  return false;
+};
+
+if (typeof window !== "undefined") {
+  window.dfEnsurePersistentStorage();
+}
