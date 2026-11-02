@@ -42261,3 +42261,28 @@ window.dfDetectTimeSkew = function(deltaMs) {
   }
   return false;
 };
+
+/* ==========================================================
+   DEEP FOCUS: TRANS-MERIDIAN TIMEZONE SHIFT NORMALIZER
+   Protects daily study streaks when travelling across international timezones
+   ========================================================== */
+window.dfNormalizeTimezoneTransition = function(sessionRecord) {
+  if (!sessionRecord || !sessionRecord.timestamp) return sessionRecord;
+  // Compute absolute UTC calendar date to prevent duplicate or missing day streaks
+  const sessionUtcDate = new Date(sessionRecord.timestamp).toISOString().split("T")[0];
+  sessionRecord.utcAnchorDate = sessionUtcDate;
+  return sessionRecord;
+};
+
+window.dfDetectTimezoneOffsetChange = function() {
+  const currentOffset = new Date().getTimezoneOffset();
+  const savedOffset = window.dfSafeGetStorage ? window.dfSafeGetStorage("df_last_tz_offset", currentOffset) : currentOffset;
+  if (currentOffset !== savedOffset) {
+    console.log("[TIMEZONE TRANSITION] Timezone change detected:", savedOffset, "->", currentOffset, "minutes.");
+    if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_last_tz_offset", currentOffset);
+  }
+};
+
+if (typeof window !== "undefined") {
+  window.dfDetectTimezoneOffsetChange();
+}
