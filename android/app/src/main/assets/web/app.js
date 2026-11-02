@@ -43889,3 +43889,15 @@ window.dfTriggerZenCelebrationGlow = function() {
   document.body.classList.add("df-celebrating");
   console.log("[ZEN REWARD] Particle-free celebration aura engaged.");
 };
+
+/* ==========================================================
+   DEEP FOCUS: AUDIO-VISUAL SPATIAL SYNERGY CONTROLLER
+   Couples real-time procedural DSP energy with ambient visual rings
+   ========================================================== */
+window.dfSyncVisualRippleWithAudio = function(ringElement, soundIntensity) {
+  if (!ringElement) return;
+  const intensity = Math.max(0.1, Math.min(1.0, soundIntensity || 0.5));
+  const glowSpread = Math.round(20 + (intensity * 25));
+  ringElement.style.setProperty("--df-glow-ring", "rgba(56, 161, 105, " + (0.15 + (intensity * 0.15)) + ")");
+  ringElement.style.boxShadow = "0 0 " + glowSpread + "px var(--df-glow-ring)";
+};
