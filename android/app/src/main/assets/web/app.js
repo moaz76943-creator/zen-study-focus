@@ -42116,3 +42116,24 @@ window.dfUpdateSVGProgressRing = function(svgCircleEl, percentage) {
   svgCircleEl.style.strokeDasharray = circumference + " " + circumference;
   svgCircleEl.style.strokeDashoffset = offset;
 };
+
+/* ==========================================================
+   DEEP FOCUS: GPU TEXTURE DISPOSAL & VRAM RELEASE SENTINEL
+   Explicitly releases hardware backing surfaces to prevent VRAM accumulation
+   ========================================================== */
+window.dfDisposeCanvasTexture = function(canvasElement) {
+  if (!canvasElement || typeof canvasElement.getContext !== "function") return;
+  try {
+    const ctx = canvasElement.getContext("2d");
+    if (ctx && ctx.clearRect) {
+      ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    }
+    // Forcing width/height to 0 signals Chromium GPU compositor to release texture buffer
+    canvasElement.width = 0;
+    canvasElement.height = 0;
+    if (canvasElement.parentNode) {
+      canvasElement.parentNode.removeChild(canvasElement);
+    }
+    console.log("[GPU COMPOSITOR] Canvas texture buffer released from VRAM.");
+  } catch (e) {}
+};
