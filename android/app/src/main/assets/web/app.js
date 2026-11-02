@@ -40583,3 +40583,27 @@ window.dfMergeCardsConflictFree = function(existingCards, incomingCards) {
     skippedDuplicates: skippedDuplicates
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: DEEP-LINK OFFLINE PAYLOAD RESOLVER
+   Detects URL import hashes and facilitates zero-cloud deck imports
+   ========================================================== */
+window.dfCheckUrlImportPayload = function() {
+  if (typeof window === "undefined" || !window.location) return;
+  const hash = window.location.hash || "";
+  if (hash.startsWith("#import=")) {
+    const payload = hash.substring(8);
+    if (payload && window.dfDecompressDeckPayload) {
+      const cards = window.dfDecompressDeckPayload(payload);
+      if (cards.length > 0) {
+        console.log("[DEEP LINK] Incoming study payload detected:", cards.length, "cards.");
+        return cards;
+      }
+    }
+  }
+  return null;
+};
+
+if (typeof window !== "undefined") {
+  window.dfCheckUrlImportPayload();
+}
