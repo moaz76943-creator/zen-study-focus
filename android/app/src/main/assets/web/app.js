@@ -42157,3 +42157,17 @@ window.dfRegisterForGCDetection = function(targetObject, label) {
     } catch (e) {}
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: PASSIVE TOUCH & HIGH-FREQUENCY SCROLL SENTINEL
+   Enforces passive event listeners to unlock 120Hz smooth scrolling
+   ========================================================== */
+window.dfAddPassiveListener = function(targetElement, eventType, handlerFn) {
+  if (!targetElement || typeof targetElement.addEventListener !== "function") return;
+  targetElement.addEventListener(eventType, handlerFn, { passive: true, capture: false });
+};
+
+window.dfSafeRemoveListener = function(targetElement, eventType, handlerFn) {
+  if (!targetElement || typeof targetElement.removeEventListener !== "function") return;
+  targetElement.removeEventListener(eventType, handlerFn, { passive: true, capture: false });
+};
