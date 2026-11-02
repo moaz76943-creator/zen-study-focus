@@ -39064,3 +39064,43 @@ window.dfHandleHardwareBack = function() {
 if (typeof document !== "undefined") {
   document.addEventListener("backbutton", window.dfHandleHardwareBack, false);
 }
+
+/* ==========================================================
+   DEEP FOCUS: HARDENED SM-2 SPACED REPETITION ENGINE
+   Immune to NaN intervals, corrupted ease factors, and timezone shifts
+   ========================================================== */
+window.dfCalculateNextSRS = function(card, rating) {
+  // rating: 1 (Again), 2 (Hard), 3 (Good), 4 (Easy)
+  let reps = card.reps || 0;
+  let interval = card.interval || 0;
+  let easeFactor = card.easeFactor || 2.5;
+
+  if (rating < 3) {
+    reps = 0;
+    interval = 1;
+  } else {
+    if (reps === 0) {
+      interval = 1;
+    } else if (reps === 1) {
+      interval = 6;
+    } else {
+      interval = Math.round(interval * easeFactor);
+    }
+    reps += 1;
+  }
+
+  // SM-2 Ease Factor calculation with strict safety bounds [1.3 to 2.5]
+  easeFactor = easeFactor + (0.1 - (4 - rating) * (0.08 + (4 - rating) * 0.02));
+  if (isNaN(easeFactor) || easeFactor < 1.3) easeFactor = 1.3;
+  if (easeFactor > 2.5) easeFactor = 2.5;
+
+  const nextReviewDate = new Date();
+  nextReviewDate.setDate(nextReviewDate.getDate() + Math.max(1, interval));
+
+  return {
+    reps: reps,
+    interval: Math.max(1, interval),
+    easeFactor: parseFloat(easeFactor.toFixed(2)),
+    dueDate: nextReviewDate.toISOString().split("T")[0]
+  };
+};
