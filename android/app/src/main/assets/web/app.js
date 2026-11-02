@@ -42769,3 +42769,28 @@ window.dfInjectDropletImpulses = function(channelData, dropletRatePerSec, sample
     }
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: PROCEDURAL RIVER CAVITATION & FLUID RESONANCE DSP
+   Dual-pole modulating bandpass simulating continuous water turbulence
+   ========================================================== */
+window.dfCreateRiverCavitationFilter = function(ctx) {
+  if (!ctx || typeof ctx.createBiquadFilter !== "function") return null;
+  const filter = ctx.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.frequency.setValueAtTime(320, ctx.currentTime);
+  filter.Q.setValueAtTime(1.8, ctx.currentTime);
+
+  // Slow LFO fluid frequency modulation (0.2Hz wave cycle)
+  if (ctx.createOscillator) {
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.frequency.setValueAtTime(0.2, ctx.currentTime);
+    lfoGain.gain.setValueAtTime(80, ctx.currentTime); // Swings between 240Hz and 400Hz
+    lfo.connect(lfoGain);
+    lfoGain.connect(filter.frequency);
+    lfo.start(0);
+    if (window.DF_ACTIVE_AUDIO_NODES) window.DF_ACTIVE_AUDIO_NODES.push(lfo, lfoGain);
+  }
+  return filter;
+};
