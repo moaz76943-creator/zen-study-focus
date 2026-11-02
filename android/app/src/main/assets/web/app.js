@@ -41272,3 +41272,41 @@ window.dfDecryptText = async function(cipherPackage, secretKeyStr) {
     return cipherPackage;
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: RECENT APPS SCREENSHOT & PEEKING PRIVACY MASK
+   Blurs view upon application blur/pause to protect private study sets
+   ========================================================== */
+window.dfInitPrivacyMaskSentinel = function() {
+  if (typeof document === "undefined") return;
+
+  const styleId = "df-privacy-mask-style";
+  if (!document.getElementById(styleId)) {
+    const styleEl = document.createElement("style");
+    styleEl.id = styleId;
+    styleEl.textContent = `
+      body.df-privacy-peeking-masked {
+        filter: blur(25px) grayscale(100%) !important;
+        pointer-events: none !important;
+        transition: filter 0.15s ease-out !important;
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+
+  // Mask on visibility loss (Recent apps switcher opened)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      document.body.classList.add("df-privacy-peeking-masked");
+    } else {
+      setTimeout(() => {
+        document.body.classList.remove("df-privacy-peeking-masked");
+      }, 100);
+    }
+  });
+  console.log("[PRIVACY] Recent apps screenshot blur sentinel active.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfInitPrivacyMaskSentinel();
+}
