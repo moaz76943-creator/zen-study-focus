@@ -43036,3 +43036,13 @@ window.dfSegmentContinuousScript = function(text, localeCode) {
   // Safe zero-width space injection allowing natural browser line breaks
   return text.replace(/([\u1780-\u17FF\u0E00-\u0E7F])/g, "$1\u200B");
 };
+
+/* ==========================================================
+   DEEP FOCUS: CAUCASIAN CYRILLIC PALOCHKA GLYPH NORMALIZER
+   Harmonizes Caucasian aspiration character (\u04C0) preventing Latin font clashes
+   ========================================================== */
+window.dfNormalizeCaucasianPalochka = function(text) {
+  if (!text || typeof text !== "string") return "";
+  // Unify ASCII pipe/Latin-I masquerading as Caucasian Palochka to authentic Cyrillic \u04C0
+  return text.replace(/([\u0400-\u04FF])[|I1]([\u0400-\u04FF])/g, "$1\u04C0$2");
+};
