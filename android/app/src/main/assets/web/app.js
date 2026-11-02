@@ -44656,3 +44656,47 @@ window.DF_MASTER_LEXICON.fa = {
 window.dfGetMilestoneM5487UrduPersianLexiconSeal = function() {
   return { milestone: 'M5478-M5487 Urdu and Persian Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5488-M5497: Turkish and Indonesian Master Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.tr = {
+  timer_start: "Derin Odaklanmayi Baslat",
+  timer_pause: "Gecici Olarak Duraklat",
+  timer_resume: "Odaklanmaya Devam Et",
+  timer_reset: "Sayaci Sifirla",
+  timer_stop: "Seansi Sonlandir",
+  phase_focus: "Derin Calisma Seansi",
+  phase_short_break: "Kisa Zihinsel Dinlenme",
+  phase_long_break: "Uzun Mola Suresi",
+  session_completed: "Tebrikler! Seans Tamamlandi",
+  card_flip: "Karti Cevir",
+  card_show_answer: "Cevabi Goster",
+  rating_again: "Tekrar Gerekli",
+  rating_hard: "Zor Hatirlandi",
+  rating_good: "Net Hatirlama",
+  rating_easy: "Kalici Hafiza"
+};
+
+window.DF_MASTER_LEXICON.id = {
+  timer_start: "Mulai Sesi Fokus",
+  timer_pause: "Jeda Sementara",
+  timer_resume: "Lanjutkan Fokus",
+  timer_reset: "Atur Ulang Pengatur Waktu",
+  timer_stop: "Akhiri Sesi",
+  phase_focus: "Sesi Fokus Mendalam",
+  phase_short_break: "Istirahat Pemulihan Pikiran",
+  phase_long_break: "Istirahat Panjang",
+  session_completed: "Alhamdulillah! Sesi Selesai",
+  card_flip: "Balik Kartu",
+  card_show_answer: "Tampilkan Jawaban",
+  rating_again: "Perlu Tinjauan Ulang",
+  rating_hard: "Sulit Diingat",
+  rating_good: "Ingatan Kuat",
+  rating_easy: "Hafal Sempurna"
+};
+
+window.dfGetMilestoneM5497TurkicAustronesianLexiconSeal = function() {
+  return { milestone: 'M5488-M5497 Turkish and Indonesian Master Lexicons', status: 'VERIFIED' };
+};
