@@ -43559,3 +43559,21 @@ window.dfBuildInterleavedSession = function(decksArray) {
   console.log("[COGNITIVE ENGINE] Interleaved session constructed with " + interleavedResult.length + " cards across " + decksArray.length + " subjects.");
   return interleavedResult;
 };
+
+/* ==========================================================
+   DEEP FOCUS: DAILY REVIEW COMPLETION ETA CALCULATOR (v58.1.0)
+   Estimates realistic completion duration based on historical pace
+   ========================================================== */
+window.dfEstimateReviewSessionETA = function(remainingCardsCount, avgSecondsPerCard) {
+  const count = Math.max(0, remainingCardsCount || 0);
+  const pace = Math.max(2, Math.min(60, avgSecondsPerCard || 5.0)); // 5 seconds average baseline
+  const totalSeconds = Math.round(count * pace);
+  const minutes = Math.ceil(totalSeconds / 60);
+
+  return {
+    remainingCards: count,
+    estimatedTotalSeconds: totalSeconds,
+    estimatedMinutes: minutes,
+    displayETA: minutes <= 1 ? "About 1 minute" : ("~" + minutes + " minutes remaining")
+  };
+};
