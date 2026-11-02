@@ -42286,3 +42286,42 @@ window.dfDetectTimezoneOffsetChange = function() {
 if (typeof window !== "undefined") {
   window.dfDetectTimezoneOffsetChange();
 }
+
+/* ==========================================================
+   DEEP FOCUS: POWER-CUT ATOMIC RESUSCITATION SENTINEL
+   Logs periodic 15-second heartbeats saving focus minutes before battery dies
+   ========================================================== */
+window.dfWriteTimerHeartbeat = function(elapsedSec, targetSec) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const heartbeat = {
+      elapsed: elapsedSec,
+      target: targetSec,
+      pulseTime: Date.now()
+    };
+    localStorage.setItem("df_timer_heartbeat_pulse", JSON.stringify(heartbeat));
+  } catch (e) {}
+};
+
+window.dfRecoverPowerCutMinutes = function() {
+  if (typeof localStorage === "undefined") return 0;
+  try {
+    const raw = localStorage.getItem("df_timer_heartbeat_pulse");
+    if (!raw) return 0;
+    const pulse = JSON.parse(raw);
+    const ageMs = Date.now() - (pulse.pulseTime || 0);
+
+    // If an unfinished heartbeat exists and is older than 5 minutes (indicating phone shut down)
+    if (pulse.elapsed >= 60 && ageMs > 300000 && ageMs < (12 * 3600000)) {
+      const rescuedMinutes = Math.floor(pulse.elapsed / 60);
+      localStorage.removeItem("df_timer_heartbeat_pulse");
+      console.log("[RESUSCITATION] Rescued " + rescuedMinutes + " minutes from sudden power loss.");
+      return rescuedMinutes;
+    }
+  } catch (e) {}
+  return 0;
+};
+
+if (typeof window !== "undefined") {
+  window.dfRecoverPowerCutMinutes();
+}
