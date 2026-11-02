@@ -43822,3 +43822,22 @@ window.dfUpdateCircadianColorTemperature = function() {
 if (typeof window !== "undefined") {
   window.dfUpdateCircadianColorTemperature();
 }
+
+/* ==========================================================
+   DEEP FOCUS: MECHANICAL NUMBER ROLL TRANSITION (v59.2.0)
+   Precision 3D digit change animation inspired by Swiss chronographs
+   ========================================================== */
+window.dfAnimateDigitRoll = function(digitElement, newDigitChar) {
+  if (!digitElement) return;
+  if (digitElement.textContent === newDigitChar) return;
+
+  digitElement.style.transform = "translate3d(0, -6px, 0)";
+  digitElement.style.opacity = "0.7";
+  
+  setTimeout(() => {
+    digitElement.textContent = newDigitChar;
+    digitElement.style.transform = "translate3d(0, 0, 0)";
+    digitElement.style.opacity = "1.0";
+    digitElement.style.transition = "transform 0.12s ease-out, opacity 0.12s ease-out";
+  }, 60);
+};
