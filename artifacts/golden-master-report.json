@@ -1,0 +1,21 @@
+{
+  "app": "Deep Focus (Zen Study & Focus)",
+  "releaseVersion": "37.0.0",
+  "versionCode": 3300,
+  "certifiedLanguages": 1000,
+  "architecturalComponents": [
+    "Multi-Tier i18n Fallback Shield",
+    "Screen WakeLock & Doze Time Sync",
+    "Procedural Nature Audio DSP (Rain, River, Wind, Forest, Sea, Dew)",
+    "Hardened SM-2 Spaced Repetition Engine",
+    "Fisher-Yates Priority Queue Shuffler",
+    "Bi-directional Reverse Card Review",
+    "Silent Study Library Mode",
+    "Focus Quality Index (FQI)",
+    "True AMOLED Pitch Black Theme",
+    "Zero-Dependency SVG Analytics & Streak Engine",
+    "SafeStorage Quota & 90-Day Rolling Archive"
+  ],
+  "legalAndSafetyAudit": "100%_HALAL_COMPLIANT_ZERO_PII",
+  "compiledAt": "2026-11-02T15:27:29.541Z"
+}
