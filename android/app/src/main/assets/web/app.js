@@ -43508,3 +43508,31 @@ window.dfGetSector7AndroidSeal = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: VACATION BACKLOG SMOOTHING & ANTI-DESPAIR ALGORITHM
+   Distributes accumulated overdue cards across a gentle multi-day buffer
+   ========================================================== */
+window.dfSmoothOverdueBacklog = function(cardsList, maxDailyQuota) {
+  if (!Array.isArray(cardsList)) return cardsList;
+  const quota = maxDailyQuota || 30; // Max comfortable daily review intake
+  const todayStr = new Date().toISOString().split("T")[0];
+
+  const overdue = cardsList.filter(c => c.dueDate && c.dueDate < todayStr);
+  if (overdue.length <= quota) return cardsList;
+
+  console.log("[FSRS SMOOTHING] Distributing " + overdue.length + " accumulated cards across multiple days.");
+  let dayOffset = 0;
+  overdue.forEach((card, index) => {
+    if (index > 0 && (index % quota) === 0) {
+      dayOffset++;
+    }
+    if (dayOffset > 0) {
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + dayOffset);
+      card.dueDate = targetDate.toISOString().split("T")[0];
+    }
+  });
+
+  return cardsList;
+};
