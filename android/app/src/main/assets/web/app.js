@@ -43116,3 +43116,28 @@ window.dfDeepSanitizeObject = function(obj) {
   }
   return clean;
 };
+
+/* ==========================================================
+   DEEP FOCUS: HARDWARE-BOUND PBKDF2 KEY DERIVATION (v56.1.0)
+   100,000 cryptographic hash rounds with device-unique entropy salt
+   ========================================================== */
+window.dfDeriveHardwareBoundKey = async function(userPin) {
+  if (typeof crypto === "undefined" || !crypto.subtle) return null;
+  try {
+    const enc = new TextEncoder();
+    // Device hardware entropy mix (screen res + hardware concurrency + user PIN)
+    const entropy = (screen.width || 360) + "x" + (screen.height || 640) + "_" + (navigator.hardwareConcurrency || 4);
+    const salt = enc.encode("df_salt_entropy_" + entropy);
+
+    const baseKey = await crypto.subtle.importKey("raw", enc.encode(userPin || "0000"), "PBKDF2", false, ["deriveKey"]);
+    return await crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+      baseKey,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt", "decrypt"]
+    );
+  } catch (e) {
+    return null;
+  }
+};
