@@ -40937,3 +40937,20 @@ window.dfHighlightCode = function(rawCode) {
 
   return '<pre style="background:#1a202c;padding:12px;border-radius:8px;overflow-x:auto;font-family:monospace;font-size:13px;line-height:1.5;">' + html + '</pre>';
 };
+
+/* ==========================================================
+   DEEP FOCUS: INTERACTIVE CLOZE DELETION ENGINE (PILLAR 2 COMPLETE)
+   Transforms {{c1::Answer}} syntax into active recall occlusions
+   ========================================================== */
+window.dfRenderClozeCard = function(text, isRevealed) {
+  if (!text || typeof text !== "string") return { prompt: "", answer: "" };
+  const regex = /\{\{c[0-9]+::(.*?)(?:::.*?)?\}\}/g;
+  
+  if (!isRevealed) {
+    const prompt = text.replace(regex, '<span style="background:#2d3748;color:#63b3ed;padding:2px 8px;border-radius:4px;font-weight:bold;cursor:pointer;">[...]</span>');
+    return { prompt: prompt, isCloze: true };
+  } else {
+    const answer = text.replace(regex, '<span style="background:#276749;color:#9ae6b4;padding:2px 8px;border-radius:4px;font-weight:bold;">$1</span>');
+    return { prompt: answer, isCloze: true };
+  }
+};
