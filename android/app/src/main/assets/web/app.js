@@ -43667,3 +43667,16 @@ window.dfSimulate180DayMemoryConsolidation = function() {
   console.log("[MEMORY SIMULATOR] 180-day trajectory test passed. Final stability:", stability, "days on day:", simulatedDay);
   return { trajectoryValidated: true, sixMonthStability: stability };
 };
+
+/* ==========================================================
+   DEEP FOCUS: DIFFERENTIAL FIELD REPETITION WEIGHT CALCULATOR
+   Balances multi-field cards ensuring sub-field weaknesses are addressed
+   ========================================================== */
+window.dfCalculateFieldDifferentialWeight = function(card, fieldType) {
+  if (!card) return 1.0;
+  const weights = { "audio": 1.15, "spelling": 1.25, "meaning": 1.0, "grammar": 1.3 };
+  const multiplier = weights[fieldType] || 1.0;
+  const baseInterval = card.interval || 1;
+  // Apply targeted cognitive difficulty multiplier
+  return Math.max(1, Math.round(baseInterval * multiplier));
+};
