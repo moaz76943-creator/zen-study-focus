@@ -41977,3 +41977,33 @@ window.dfVerifyProductionPurity = function() {
   console.log("[PRODUCTION BUNDLE] Build purity audit: 100% Pristine.");
   return audit;
 };
+
+/* ==========================================================
+   DEEP FOCUS: ANDROID 14/15 EDGE-TO-EDGE & SAFE AREA SENTINEL
+   Prevents button clipping by Android gesture bars and camera cutouts
+   ========================================================== */
+window.dfApplySafeAreaInsets = function() {
+  if (typeof document === "undefined" || !document.head) return;
+  const styleId = "df-safe-area-insets";
+  if (document.getElementById(styleId)) return;
+
+  const insetsCSS = `
+    body {
+      padding-top: env(safe-area-inset-top, 0px) !important;
+      padding-bottom: env(safe-area-inset-bottom, 16px) !important;
+      padding-left: env(safe-area-inset-left, 0px) !important;
+      padding-right: env(safe-area-inset-right, 0px) !important;
+      box-sizing: border-box !important;
+    }
+  `;
+
+  const styleEl = document.createElement("style");
+  styleEl.id = styleId;
+  styleEl.textContent = insetsCSS;
+  document.head.appendChild(styleEl);
+  console.log("[SYSTEM] Android 14/15 edge-to-edge safe area insets applied.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfApplySafeAreaInsets();
+}
