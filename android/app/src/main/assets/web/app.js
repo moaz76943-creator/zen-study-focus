@@ -43624,3 +43624,26 @@ window.dfCompressScheduleForExam = function(cardsList, targetExamDateISO) {
   console.log("[FSRS EXAM] Compressed schedule: All cards anchored before exam horizon (" + maxAvailableDays + " days).");
   return cardsList;
 };
+
+/* ==========================================================
+   DEEP FOCUS: OPTIMAL RETENTION TARGET & STUDY EFFICIENCY CALCULATOR
+   Finds the sweet spot between memory retention and daily time investment
+   ========================================================== */
+window.dfCalculateOptimalRetentionTarget = function(totalDeckCards, dailyAvailableMinutes) {
+  const cards = Math.max(10, totalDeckCards || 100);
+  const time = Math.max(10, dailyAvailableMinutes || 30);
+
+  // Studying for 95% retention requires 3x more review workload than 85%
+  let optimalRetention = 0.90;
+  if (cards > 1000 && time < 45) {
+    optimalRetention = 0.85; // Prioritize sustainable volume
+  } else if (cards < 300 && time >= 30) {
+    optimalRetention = 0.93; // High mastery capacity
+  }
+
+  return {
+    optimalTargetPercent: Math.round(optimalRetention * 100),
+    efficiencyProfile: optimalRetention <= 0.86 ? "BALANCED_VOLUME" : "HIGH_MASTERY",
+    estimatedDailyReviews: Math.round((cards * 0.08) * (optimalRetention / 0.9))
+  };
+};
