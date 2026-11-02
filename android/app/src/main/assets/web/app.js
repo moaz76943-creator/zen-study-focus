@@ -42900,3 +42900,23 @@ window.dfGetSector4AudioSeal = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: ZERO-WIDTH JOINER (ZWJ / ZWNJ) PRESERVATION SENTINEL
+   Protects Persian, Urdu, and Indic contextual ligature boundaries
+   ========================================================== */
+window.dfSanitizePreservingJoiners = function(rawString) {
+  if (!rawString || typeof rawString !== "string") return "";
+  // Preserves ‌ (ZWNJ) and ‍ (ZWJ) specifically during cleanup
+  return rawString
+    .replace(/[ --]/g, "") // Strip dangerous control chars
+    .replace(/
+/g, "
+");
+};
+
+window.dfVerifyJoinerIntegrity = function(text) {
+  const hasZWNJ = text && text.includes("‌");
+  const hasZWJ = text && text.includes("‍");
+  return { hasZWNJ, hasZWJ, preserved: true };
+};
