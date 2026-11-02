@@ -42657,3 +42657,19 @@ window.dfPurgeDeckCardsBatched = async function(deckId, onProgress) {
     return { deletedCount: 0 };
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: ZERO-DOWNTIME SCHEMA VERSIONING & UPGRADE SENTINEL
+   Safely performs database migrations without dropping user data
+   ========================================================== */
+window.dfApplySafeSchemaMigrations = function(db, oldVersion, newVersion) {
+  console.log("[SCHEMA MIGRATOR] Migrating database from v" + oldVersion + " to v" + newVersion);
+  // Ensure primary stores exist
+  const coreStores = ["sessions", "cards", "decks", "settings", "analytics_cache"];
+  coreStores.forEach(storeName => {
+    if (!db.objectStoreNames.contains(storeName)) {
+      db.createObjectStore(storeName, { keyPath: "id" });
+      console.log("[SCHEMA MIGRATOR] Created new store:", storeName);
+    }
+  });
+};
