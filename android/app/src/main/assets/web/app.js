@@ -40827,3 +40827,41 @@ window.dfQueryCardsByDueDate = async function(maxDueDateStr, limit) {
     return [];
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: FREE SPACED REPETITION SCHEDULER (FSRS CORE)
+   Next-gen memory stabilization math replacing legacy 1987 SM-2
+   ========================================================== */
+window.dfCalculateFSRS = function(card, rating, targetRetention) {
+  // rating: 1 (Again), 2 (Hard), 3 (Good), 4 (Easy)
+  const ret = targetRetention || 0.90; // Standard 90% target retention
+  let stability = card.stability || 1.0;
+  let difficulty = card.difficulty || 5.0;
+
+  // 1. Difficulty update (bounded between 1.0 and 10.0)
+  const diffDelta = (rating - 3) * -0.6;
+  difficulty = Math.max(1.0, Math.min(10.0, difficulty + diffDelta));
+
+  // 2. Stability update
+  if (rating === 1) {
+    stability = Math.max(0.5, stability * 0.4); // Forgetting drop
+  } else if (rating === 2) {
+    stability = stability * (1.0 + (11 - difficulty) * 0.1);
+  } else if (rating === 3) {
+    stability = stability * (1.0 + (11 - difficulty) * 0.25);
+  } else if (rating === 4) {
+    stability = stability * (1.0 + (11 - difficulty) * 0.45);
+  }
+
+  // 3. Interval calculation derived from stability and target retention
+  const intervalDays = Math.max(1, Math.round(stability * (Math.log(ret) / Math.log(0.9))));
+  const nextDueDate = new Date();
+  nextDueDate.setDate(nextDueDate.getDate() + intervalDays);
+
+  return {
+    stability: parseFloat(stability.toFixed(2)),
+    difficulty: parseFloat(difficulty.toFixed(2)),
+    interval: intervalDays,
+    dueDate: nextDueDate.toISOString().split("T")[0]
+  };
+};
