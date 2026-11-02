@@ -41521,3 +41521,21 @@ window.dfAssessCognitiveFatigue = function() {
     fatigueLevel: continuousHours > 3 ? "HIGH" : (continuousHours > 1.5 ? "MODERATE" : "FRESH")
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: SLEEP GATEKEEPER & CIRCADIAN REST GUARD
+   Gentle nocturnal advice promoting memory consolidation via sleep
+   ========================================================== */
+window.dfCheckCircadianGate = function() {
+  const currentHour = new Date().getHours();
+  // Late night danger window: 02:00 AM to 05:00 AM
+  const isLateNight = currentHour >= 2 && currentHour < 5;
+  if (isLateNight) {
+    console.log("[CIRCADIAN] Late night focus detected. Memory consolidation reminder active.");
+  }
+  return {
+    isLateNight: isLateNight,
+    currentHour: currentHour,
+    advice: isLateNight ? "Memory retention consolidates during REM sleep. Consider resting soon." : "Optimal study window active."
+  };
+};
