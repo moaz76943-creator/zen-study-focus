@@ -42079,3 +42079,27 @@ if (typeof window !== "undefined") {
   // Run passive memory sweep every 15 minutes
   setInterval(window.dfPurgeTransientCaches, 15 * 60 * 1000);
 }
+
+/* ==========================================================
+   DEEP FOCUS: STALE CLOSURE & DANGLING TIMER NEUTRALIZER
+   Explicitly severs inner closure references upon interval termination
+   ========================================================== */
+window.dfSafeClearTimerRef = function(timerRefHolder, refProperty) {
+  if (timerRefHolder && timerRefHolder[refProperty]) {
+    clearInterval(timerRefHolder[refProperty]);
+    clearTimeout(timerRefHolder[refProperty]);
+    timerRefHolder[refProperty] = null;
+  }
+};
+
+// Override interval cleanup to guarantee closure dereferencing
+const prevStopThrottled = window.dfStopThrottledTimer;
+window.dfStopThrottledTimer = function() {
+  if (window.DF_TICK_INTERVAL_REF) {
+    clearInterval(window.DF_TICK_INTERVAL_REF);
+    window.DF_TICK_INTERVAL_REF = null;
+  }
+  if (window.dfReleaseScreenWakeLock) window.dfReleaseScreenWakeLock();
+  if (typeof prevStopThrottled === "function") prevStopThrottled();
+  console.log("[CLOSURE SHIELD] Timer interval cleared and dereferenced.");
+};
