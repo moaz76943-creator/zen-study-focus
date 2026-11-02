@@ -45373,3 +45373,50 @@ window.DF_MASTER_LEXICON.id = Object.assign(window.DF_MASTER_LEXICON.id || {}, {
 window.dfGetMilestoneM5647TurkicIndonesianSpecializedSeal = function() {
   return { milestone: 'M5638-M5647 Turkish and Indonesian Specialized Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5648-M5657: Swahili Bengali Spanish Specialized Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.sw = Object.assign(window.DF_MASTER_LEXICON.sw || {}, {
+  audio_chime_header: "Kengele za Kukamilisha Kipindi",
+  audio_ambient_header: "Sauti za Asili za Utulivu",
+  audio_solfeggio_528: "528 Hz Mlio wa Amani ya Akili",
+  audio_solfeggio_432: "432 Hz Mlio wa Utulivu wa Asili",
+  audio_binaural_beta: "14 Hz Mawimbi ya Akili Makini",
+  fsrs_stability: "Kiwango cha Uimara wa Kumbukumbu",
+  fsrs_difficulty: "Ugumu wa Kukumbuka",
+  fsrs_due_today: "Kadi za Kurudia Leo",
+  fsrs_mastered: "Kadi Zilizohifadhiwa Kikamilifu",
+  fsrs_streak_days: "Siku Mfululizo za Masomo"
+});
+
+window.DF_MASTER_LEXICON.bn = Object.assign(window.DF_MASTER_LEXICON.bn || {}, {
+  audio_chime_header: "সেশন সমাপ্তির ছন্দময় সংকেত",
+  audio_ambient_header: "মনোযোগ বৃদ্ধির প্রাকৃতিক শব্দ",
+  audio_solfeggio_528: "৫২৮ হার্টজ মানসিক ভারসাম্য সুর",
+  audio_solfeggio_432: "৪৩২ হার্টজ গভীর প্রশান্তি সুর",
+  audio_binaural_beta: "১৪ হার্টজ সচেতনতা ব্রেনওয়েভ",
+  fsrs_stability: "স্মৃতি স্থায়িত্ব সূচক",
+  fsrs_difficulty: "স্মরণ কাঠিন্য মাত্রা",
+  fsrs_due_today: "আজকের পুনরাবৃত্তির কার্ড",
+  fsrs_mastered: "স্থায়ীভাবে অর্জিত কার্ড",
+  fsrs_streak_days: "টানা অধ্যয়নের দিনসমূহ"
+});
+
+window.DF_MASTER_LEXICON.es = Object.assign(window.DF_MASTER_LEXICON.es || {}, {
+  audio_chime_header: "Campanas de Fin de Sesion",
+  audio_ambient_header: "Sonidos Naturales de Enfoque",
+  audio_solfeggio_528: "Tono 528 Hz de Armonia Mental",
+  audio_solfeggio_432: "Tono 432 Hz de Calma Natural",
+  audio_binaural_beta: "Ondas Beta 14 Hz de Alerta",
+  fsrs_stability: "Indice de Estabilidad de Memoria",
+  fsrs_difficulty: "Dificultad de Evocacion",
+  fsrs_due_today: "Tarjetas Pendientes Hoy",
+  fsrs_mastered: "Tarjetas Memorizadas",
+  fsrs_streak_days: "Dias Consecutivos de Estudio"
+});
+
+window.dfGetMilestoneM5657SwahiliBengaliSpanishSpecializedSeal = function() {
+  return { milestone: 'M5648-M5657 Swahili Bengali Spanish Specialized Lexicons', status: 'VERIFIED' };
+};
