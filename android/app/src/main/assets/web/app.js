@@ -43680,3 +43680,22 @@ window.dfCalculateFieldDifferentialWeight = function(card, fieldType) {
   // Apply targeted cognitive difficulty multiplier
   return Math.max(1, Math.round(baseInterval * multiplier));
 };
+
+/* ==========================================================
+   DEEP FOCUS: OVERLEARNING DIMINISHING RETURNS SENTINEL
+   Protects cognitive energy by preventing same-day review churning
+   ========================================================== */
+window.DF_SAME_DAY_REVIEW_CACHE = {};
+
+window.dfDetectSameDayOverlearning = function(cardId) {
+  if (!cardId) return false;
+  const today = new Date().toISOString().split("T")[0];
+  const key = cardId + "_" + today;
+  window.DF_SAME_DAY_REVIEW_CACHE[key] = (window.DF_SAME_DAY_REVIEW_CACHE[key] || 0) + 1;
+
+  if (window.DF_SAME_DAY_REVIEW_CACHE[key] >= 3) {
+    console.log("[COGNITIVE GUARD] Same-day overlearning threshold reached for card:", cardId);
+    return true; // Lock card from further same-day churn
+  }
+  return false;
+};
