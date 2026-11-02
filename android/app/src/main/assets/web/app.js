@@ -39818,3 +39818,40 @@ window.dfRenderVirtualList = function(containerEl, items, renderItemFn, itemHeig
   containerEl.addEventListener("scroll", updateVisibleItems, { passive: true });
   updateVisibleItems();
 };
+
+/* ==========================================================
+   DEEP FOCUS: EVENT LISTENER DETACHER & MEMORY LEAK SENTINEL
+   Tracks and unbinds detached view listeners on screen transitions
+   ========================================================== */
+window.DF_SCREEN_SUBSCRIPTIONS = {};
+
+window.dfRegisterSubscription = function(screenId, cleanupFn) {
+  if (!window.DF_SCREEN_SUBSCRIPTIONS[screenId]) {
+    window.DF_SCREEN_SUBSCRIPTIONS[screenId] = [];
+  }
+  if (typeof cleanupFn === "function") {
+    window.DF_SCREEN_SUBSCRIPTIONS[screenId].push(cleanupFn);
+  }
+};
+
+window.dfCleanupScreenSubscriptions = function(screenId) {
+  if (!window.DF_SCREEN_SUBSCRIPTIONS[screenId]) return;
+  window.DF_SCREEN_SUBSCRIPTIONS[screenId].forEach(fn => {
+    try { fn(); } catch (e) {}
+  });
+  window.DF_SCREEN_SUBSCRIPTIONS[screenId] = [];
+  console.log("[MEMORY SENTINEL] Cleaned subscriptions for screen:", screenId);
+};
+
+// Hook into screen navigation to auto-purge previous screen listeners
+const prevNav = window.dfNavigateToScreen;
+window.dfNavigateToScreen = function(newScreenId) {
+  const current = window.DF_CURRENT_SCREEN;
+  if (current && current !== newScreenId) {
+    window.dfCleanupScreenSubscriptions(current);
+  }
+  if (typeof prevNav === "function") {
+    return prevNav(newScreenId);
+  }
+  return true;
+};
