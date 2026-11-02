@@ -39017,3 +39017,50 @@ window.dfRunBootIntegrityCheck = function() {
 if (typeof window !== "undefined") {
   window.dfRunBootIntegrityCheck();
 }
+
+/* ==========================================================
+   DEEP FOCUS: FAULT-TOLERANT SCREEN ROUTER & ANDROID BACK GUARD
+   Seamless SPA screen transitions and hardware back button trap
+   ========================================================== */
+window.DF_CURRENT_SCREEN = "timer";
+window.DF_SCREEN_HISTORY = ["timer"];
+
+window.dfNavigateToScreen = function(screenId) {
+  const validScreens = ["timer", "decks", "stats", "settings", "locales_modal"];
+  if (!validScreens.includes(screenId)) return false;
+  
+  window.DF_CURRENT_SCREEN = screenId;
+  window.DF_SCREEN_HISTORY.push(screenId);
+  if (window.DF_SCREEN_HISTORY.length > 20) window.DF_SCREEN_HISTORY.shift();
+
+  if (typeof document !== "undefined") {
+    document.querySelectorAll(".df-screen, [data-screen]").forEach(el => {
+      const target = el.getAttribute("data-screen") || el.id;
+      if (target === screenId) {
+        el.style.display = "block";
+        el.classList.add("active");
+      } else {
+        el.style.display = "none";
+        el.classList.remove("active");
+      }
+    });
+  }
+  return true;
+};
+
+// Android Hardware Back Button Coordinator
+window.dfHandleHardwareBack = function() {
+  if (window.DF_CURRENT_SCREEN === "locales_modal") {
+    window.dfNavigateToScreen("settings");
+    return true;
+  }
+  if (window.DF_CURRENT_SCREEN !== "timer") {
+    window.dfNavigateToScreen("timer");
+    return true;
+  }
+  return false; // Allow app exit only from root timer screen
+};
+
+if (typeof document !== "undefined") {
+  document.addEventListener("backbutton", window.dfHandleHardwareBack, false);
+}
