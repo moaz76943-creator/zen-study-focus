@@ -37115,6 +37115,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    tah: { name: "Tahitian", focus: "Manaonao", rest: "Faafaa", start: "Haamata", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     kvc: { name: "Kove", focus: "Wototona", rest: "Pao", start: "Pani", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     len: { name: "Lenakel", focus: "Nolkeikeian", rest: "Aumwi", start: "Epwuh", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     cha: { name: "Chamorro", focus: "Hasso", rest: "Deskansa", start: "Tutuhon", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38646,3 +38647,5 @@ function dfGetMilestoneVersion3250AuditSeal() { return { milestone: "M3110", rel
 function dfGetMilestoneVersion3260AuditSeal() { return { milestone: "M3120", release: "v32.6.0", versionCode: 2940, date: new Date().toISOString(), polyglotLangs: 842, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3270AuditSeal() { return { milestone: "M3130", release: "v32.7.0", versionCode: 2950, date: new Date().toISOString(), polyglotLangs: 847, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3280AuditSeal() { return { milestone: "M3140", release: "v32.8.0", versionCode: 2960, date: new Date().toISOString(), polyglotLangs: 852, dspCertified: true, zeroPii: true }; }
