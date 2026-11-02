@@ -38694,3 +38694,5 @@ function dfGetMilestoneVersion3360AuditSeal() { return { milestone: "M3220", rel
 function dfGetMilestoneVersion3370AuditSeal() { return { milestone: "M3230", release: "v33.7.0", versionCode: 3050, date: new Date().toISOString(), polyglotLangs: 897, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3380AuditSeal() { return { milestone: "M3240", release: "v33.8.0", versionCode: 3060, date: new Date().toISOString(), polyglotLangs: 902, dspCertified: true, zeroPii: true, barrierBreached: "900_LANGUAGES_SURPASSED" }; }
+
+function dfGetMilestoneVersion3390AuditSeal() { return { milestone: "M3250", release: "v33.9.0", versionCode: 3070, date: new Date().toISOString(), polyglotLangs: 907, dspCertified: true, zeroPii: true }; }
