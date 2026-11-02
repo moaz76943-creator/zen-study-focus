@@ -44762,3 +44762,65 @@ window.DF_MASTER_LEXICON.bn = {
 window.dfGetMilestoneM5507AfricanBengaliLexiconSeal = function() {
   return { milestone: 'M5498-M5507 Swahili Hausa and Bengali Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5508-M5517: Malay Pashto Kurdish Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ms = {
+  timer_start: "Mulakan Sesi Fokus",
+  timer_pause: "Jeda Sementara",
+  timer_resume: "Sambung Fokus",
+  timer_reset: "Tetapkan Semula",
+  timer_stop: "Tamatkan Sesi",
+  phase_focus: "Sesi Tumpuan Mendalam",
+  phase_short_break: "Rehat Minda Ringkas",
+  phase_long_break: "Tempoh Rehat Panjang",
+  session_completed: "Tahniah! Sesi Selesai",
+  card_flip: "Pusing Kad",
+  card_show_answer: "Papar Jawapan",
+  rating_again: "Perlu Ulang Kaji",
+  rating_hard: "Sukar Diingat",
+  rating_good: "Ingatan Kukuh",
+  rating_easy: "Kekal Dalam Ingatan"
+};
+
+window.DF_MASTER_LEXICON.ps = {
+  timer_start: "د ژور تمرکز پیل",
+  timer_pause: "لنډ ځنډ",
+  timer_resume: "تمرکز ته دوام ورکړئ",
+  timer_reset: "بیا تنظیم",
+  timer_stop: "د ناستې پای",
+  phase_focus: "د ژور فکر ناسته",
+  phase_short_break: "لنډ ذهني ارام",
+  phase_long_break: "اوږد ارام",
+  session_completed: "مبارک شه! ناسته بشپړه شوه",
+  card_flip: "پاڼه واړوئ",
+  card_show_answer: "ځواب وګورئ",
+  rating_again: "بیا کتنې ته اړتیا",
+  rating_hard: "سخت یادول",
+  rating_good: "ښه یادښت",
+  rating_easy: "پوره یاد"
+};
+
+window.DF_MASTER_LEXICON.ku = {
+  timer_start: "Destpeka Baldisana Kur",
+  timer_pause: "Rawestandina Kemi",
+  timer_resume: "Berdewamiya Baldisan",
+  timer_reset: "Ji Nu Ve Danin",
+  timer_stop: "Dawiya Danistine",
+  phase_focus: "Danistina Hizra Kur",
+  phase_short_break: "Behnvedana Kirt",
+  phase_long_break: "Behnvedana Drezh",
+  session_completed: "Piroz be! Danistin xelas bu",
+  card_flip: "Karti Bizivirine",
+  card_show_answer: "Bersiwe Bibine",
+  rating_again: "Dubarekirin Peveist e",
+  rating_hard: "Bi Zehmet",
+  rating_good: "Birhatina Bash",
+  rating_easy: "Bi Hesani"
+};
+
+window.dfGetMilestoneM5517MalayPashtoKurdishSeal = function() {
+  return { milestone: 'M5508-M5517 Malay Pashto Kurdish Lexicons', status: 'VERIFIED' };
+};
