@@ -37115,6 +37115,10 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    kvc: { name: "Kove", focus: "Wototona", rest: "Pao", start: "Pani", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    len: { name: "Lenakel", focus: "Nolkeikeian", rest: "Aumwi", start: "Epwuh", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    cha: { name: "Chamorro", focus: "Hasso", rest: "Deskansa", start: "Tutuhon", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    pau: { name: "Palauan", focus: "Umdasu", rest: "Omesingel", start: "Omuchel", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     rov: { name: "Roviana", focus: "Binalabala", rest: "Mangana", start: "Podalae", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     hoh: { name: "Hiri Motu", focus: "Laloa", rest: "Laga-ani", start: "Hamatamaia", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     byr: { name: "Baruya", focus: "Nyuwanna", rest: "Bala", start: "Yala", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38640,3 +38644,5 @@ function dfGetMilestoneVersion3240AuditSeal() { return { milestone: "M3100", rel
 function dfGetMilestoneVersion3250AuditSeal() { return { milestone: "M3110", release: "v32.5.0", versionCode: 2930, date: new Date().toISOString(), polyglotLangs: 837, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3260AuditSeal() { return { milestone: "M3120", release: "v32.6.0", versionCode: 2940, date: new Date().toISOString(), polyglotLangs: 842, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3270AuditSeal() { return { milestone: "M3130", release: "v32.7.0", versionCode: 2950, date: new Date().toISOString(), polyglotLangs: 847, dspCertified: true, zeroPii: true }; }
