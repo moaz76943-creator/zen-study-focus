@@ -42815,3 +42815,16 @@ window.dfApplyOceanSwellEnvelope = function(ctx, gainNode) {
   if (window.DF_ACTIVE_AUDIO_NODES) window.DF_ACTIVE_AUDIO_NODES.push(lfo, lfoDepth);
   console.log("[DSP OCEAN] 10-second rhythmic tidal surge active.");
 };
+
+/* ==========================================================
+   DEEP FOCUS: PINE FOREST NEEDLE RUSTLE & WIND-SHEAR DSP
+   High-shelf acoustic resonance (2.4kHz - 5.2kHz) simulating mountain pines
+   ========================================================== */
+window.dfCreatePineForestFilter = function(ctx) {
+  if (!ctx || typeof ctx.createBiquadFilter !== "function") return null;
+  const highShelf = ctx.createBiquadFilter();
+  highShelf.type = "highshelf";
+  highShelf.frequency.setValueAtTime(3200, ctx.currentTime);
+  highShelf.gain.setValueAtTime(6.0, ctx.currentTime); // Gentle airy acoustic boost
+  return highShelf;
+};
