@@ -42857,3 +42857,29 @@ window.dfTriggerDewDroplet = function(ctx) {
   osc.start(now);
   osc.stop(now + 0.1);
 };
+
+/* ==========================================================
+   DEEP FOCUS: BINAURAL SPATIAL PANNING & ACOUSTIC WIDTH DSP
+   Creates an expansive spatial soundstage relieving in-head listener fatigue
+   ========================================================== */
+window.dfCreateSpatialPannerNode = function(ctx) {
+  if (!ctx) return null;
+  if (typeof ctx.createStereoPanner === "function") {
+    const panner = ctx.createStereoPanner();
+    panner.pan.setValueAtTime(0.0, ctx.currentTime);
+    console.log("[DSP SPATIAL] Binaural stereo panner node attached.");
+    return panner;
+  }
+  return null;
+};
+
+window.dfSetAcousticStereoWidth = function(panValue) {
+  const pan = Math.max(-1.0, Math.min(1.0, Number(panValue) || 0.0));
+  if (window.DF_ACTIVE_AUDIO_NODES) {
+    const panner = window.DF_ACTIVE_AUDIO_NODES.find(n => n instanceof StereoPannerNode);
+    if (panner && panner.pan) {
+      panner.pan.setTargetAtTime(pan, 0, 0.15);
+      console.log("[DSP SPATIAL] Stereo pan adjusted to:", pan);
+    }
+  }
+};
