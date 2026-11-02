@@ -40547,3 +40547,39 @@ window.dfDecompressDeckPayload = function(compressedBase64) {
     return [];
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: CONFLICT-FREE CARD MERGING & DEDUPLICATION ENGINE
+   Seamlessly integrates peer cards without overwriting existing study progress
+   ========================================================== */
+window.dfMergeCardsConflictFree = function(existingCards, incomingCards) {
+  const existing = Array.isArray(existingCards) ? [...existingCards] : [];
+  const incoming = Array.isArray(incomingCards) ? incomingCards : [];
+
+  const existingMap = new Set();
+  existing.forEach(c => {
+    const key = (c.front || "").trim().toLowerCase();
+    if (key) existingMap.add(key);
+  });
+
+  let addedCount = 0;
+  let skippedDuplicates = 0;
+
+  incoming.forEach(card => {
+    const key = (card.front || "").trim().toLowerCase();
+    if (key && !existingMap.has(key)) {
+      existing.push(card);
+      existingMap.add(key);
+      addedCount++;
+    } else {
+      skippedDuplicates++;
+    }
+  });
+
+  console.log("[P2P MERGE] Merged " + addedCount + " new cards, skipped " + skippedDuplicates + " duplicates.");
+  return {
+    mergedList: existing,
+    addedCount: addedCount,
+    skippedDuplicates: skippedDuplicates
+  };
+};
