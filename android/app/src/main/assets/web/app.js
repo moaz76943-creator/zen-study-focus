@@ -41716,3 +41716,35 @@ window.dfToggleEInkMode = function(enable) {
 if (typeof window !== "undefined" && window.dfSafeGetStorage) {
   if (window.dfSafeGetStorage("df_eink_mode", false)) window.dfToggleEInkMode(true);
 }
+
+/* ==========================================================
+   DEEP FOCUS: ANDROID HOME SCREEN WIDGET DATA PROVIDER (v41.8.0)
+   Exposes high-speed JSON payload for Android App Widgets
+   ========================================================== */
+window.dfGetAndroidWidgetSnapshot = function() {
+  const todayStr = new Date().toISOString().split("T")[0];
+  const sessions = window.dfSafeGetStorage ? window.dfSafeGetStorage("df_sessions", []) : [];
+  let todayMins = 0;
+  sessions.forEach(s => {
+    if ((s.date || (s.timestamp && s.timestamp.split("T")[0])) === todayStr) {
+      todayMins += (s.durationMinutes || Math.floor((s.durationSeconds || 0) / 60));
+    }
+  });
+
+  const streakObj = window.dfCalculateDailyStreak ? window.dfCalculateDailyStreak(sessions) : { currentStreak: 0 };
+  const widgetPayload = {
+    todayMinutes: todayMins,
+    currentStreak: streakObj.currentStreak,
+    isTimerRunning: Boolean(window.DF_TICK_INTERVAL_REF),
+    updatedAt: Date.now()
+  };
+
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem("df_android_widget_payload", JSON.stringify(widgetPayload));
+  }
+  return widgetPayload;
+};
+
+if (typeof window !== "undefined") {
+  window.dfGetAndroidWidgetSnapshot();
+}
