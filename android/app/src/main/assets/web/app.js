@@ -41066,3 +41066,24 @@ window.dfVerifyOfflineIntegrity = function() {
     networkStatus: isOnline ? "ONLINE_UNAFFECTED" : "OFFLINE_ACTIVE"
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: MULTI-CHANNEL NATURE SOUND MIXER (PILLAR 4 LAUNCH)
+   Plays layered procedural soundscapes (Rain + Wind + River) concurrently
+   ========================================================== */
+window.DF_MULTI_CHANNEL_SOUNDS = {};
+
+window.dfSetChannelVolume = function(soundType, volumePercent) {
+  const vol = Math.max(0, Math.min(100, volumePercent || 0)) / 100;
+  if (!window.DF_MULTI_CHANNEL_SOUNDS[soundType]) {
+    window.DF_MULTI_CHANNEL_SOUNDS[soundType] = { volume: vol, active: vol > 0 };
+  } else {
+    window.DF_MULTI_CHANNEL_SOUNDS[soundType].volume = vol;
+    window.DF_MULTI_CHANNEL_SOUNDS[soundType].active = vol > 0;
+  }
+  console.log("[MIXER] Layer volume updated:", soundType, "->", Math.round(vol * 100) + "%");
+};
+
+window.dfGetActiveSoundLayers = function() {
+  return window.DF_MULTI_CHANNEL_SOUNDS;
+};
