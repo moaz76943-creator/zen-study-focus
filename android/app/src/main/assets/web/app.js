@@ -41087,3 +41087,36 @@ window.dfSetChannelVolume = function(soundType, volumePercent) {
 window.dfGetActiveSoundLayers = function() {
   return window.DF_MULTI_CHANNEL_SOUNDS;
 };
+
+/* ==========================================================
+   DEEP FOCUS: SMART AUDIO DUCKING & NOTIFICATION SHIELD
+   Softly dips ambient sound to 20% on notifications, restoring smoothly
+   ========================================================== */
+window.DF_IS_DUCKED = false;
+
+window.dfTriggerAudioDucking = function(durationMs, duckLevelPercent) {
+  const targetLevel = (duckLevelPercent || 20) / 100;
+  const holdDuration = durationMs || 1500;
+  const ctx = window.dfGetSafeAudioContext ? window.dfGetSafeAudioContext() : null;
+  if (!ctx || !window.DF_ACTIVE_AUDIO_NODES) return;
+
+  const masterGain = window.DF_ACTIVE_AUDIO_NODES.find(n => n instanceof GainNode);
+  if (!masterGain || !masterGain.gain) return;
+
+  const currentVol = masterGain.gain.value;
+  window.DF_IS_DUCKED = true;
+
+  // Smooth 200ms ramp down
+  masterGain.gain.cancelScheduledValues(ctx.currentTime);
+  masterGain.gain.setTargetAtTime(Math.max(0.001, currentVol * targetLevel), ctx.currentTime, 0.08);
+
+  // Restore back smoothly after notification ends
+  setTimeout(() => {
+    if (window.DF_IS_DUCKED && masterGain.gain) {
+      masterGain.gain.cancelScheduledValues(ctx.currentTime);
+      masterGain.gain.setTargetAtTime(Math.max(0.001, currentVol), ctx.currentTime, 0.25);
+      window.DF_IS_DUCKED = false;
+      console.log("[DSP DUCKING] Audio restored to full baseline volume.");
+    }
+  }, holdDuration);
+};
