@@ -42103,3 +42103,16 @@ window.dfStopThrottledTimer = function() {
   if (typeof prevStopThrottled === "function") prevStopThrottled();
   console.log("[CLOSURE SHIELD] Timer interval cleared and dereferenced.");
 };
+
+/* ==========================================================
+   DEEP FOCUS: SVG NODE RECYCLER & DOM FRAGMENTATION GUARD (v51.0.0)
+   Re-uses existing SVG elements preventing DOM heap thrashing
+   ========================================================== */
+window.dfUpdateSVGProgressRing = function(svgCircleEl, percentage) {
+  if (!svgCircleEl) return;
+  const radius = parseFloat(svgCircleEl.getAttribute("r") || 90);
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - ((percentage / 100) * circumference);
+  svgCircleEl.style.strokeDasharray = circumference + " " + circumference;
+  svgCircleEl.style.strokeDashoffset = offset;
+};
