@@ -42605,3 +42605,21 @@ window.dfVerifyDatabaseIndexIntegrity = async function() {
 if (typeof window !== "undefined") {
   setTimeout(() => { if (window.dfVerifyDatabaseIndexIntegrity) window.dfVerifyDatabaseIndexIntegrity(); }, 800);
 }
+
+/* ==========================================================
+   DEEP FOCUS: W3C WEB LOCKS API CONCURRENCY MUTEX
+   Exclusive transaction lock preventing race conditions across multi-views
+   ========================================================== */
+window.dfWithExclusiveDBLock = async function(lockName, asyncOperationFn) {
+  if (typeof navigator !== "undefined" && navigator.locks && navigator.locks.request) {
+    try {
+      return await navigator.locks.request(lockName || "df_master_db_mutex", async () => {
+        return await asyncOperationFn();
+      });
+    } catch (e) {
+      return await asyncOperationFn();
+    }
+  }
+  // Graceful fallback on standard WebView contexts
+  return await asyncOperationFn();
+};
