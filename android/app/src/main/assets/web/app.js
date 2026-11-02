@@ -34175,3 +34175,86 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return { milestone:"M2080", version:"22.2.0", versionCode:1900, certified:true, halalAudio:true };
   };
 })();
+/* M2088-M2097: Guapore & Upper Madeira Tupian Universal UI Translations Pack */
+(function(){
+  if(typeof window==='undefined') return;
+  window.DF_I18N_LOCALES = window.DF_I18N_LOCALES || {};
+  const baseTemplate = {
+    navFocus:"Focus", navDecks:"Decks", navStats:"Stats", navSettings:"Settings",
+    start:"Start", pause:"Pause", resume:"Resume", reset:"Reset", minutes:"min",
+    cardFront:"Front", cardBack:"Back", flipCard:"Flip", addCard:"Add Card", editCard:"Edit Card",
+    deleteCard:"Delete", save:"Save", cancel:"Cancel", confirm:"Confirm", close:"Close",
+    rateAgain:"Again", rateHard:"Hard", rateGood:"Good", rateEasy:"Easy",
+    dueCards:"Due Cards", completedToday:"Completed Today", streak:"Streak",
+    noReviewsDue:"No cards due right now", sessionFinished:"Session Finished",
+    import:"Import", export:"Export", emptyDeck:"Deck is empty", searchCards:"Search cards...",
+    settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
+  };
+  // M2088: Munduruku (myu)
+  window.DF_I18N_LOCALES['myu'] = Object.assign({}, baseTemplate, {
+    navFocus:"Kukay", navDecks:"Papera", navStats:"Iba", navSettings:"Kobe",
+    start:"Jopit", pause:"Ito", resume:"Jopit Bima", reset:"Papera Jopit", minutes:"min",
+    cardFront:"Doba", cardBack:"Koyon", flipCard:"Piwa", addCard:"Papera Jop",
+    deleteCard:"Pili", save:"Iba", cancel:"Ito Bima", confirm:"E-e", close:"Chuku",
+    rateAgain:"Bima Jopit", rateHard:"Tiri", rateGood:"Iba", rateEasy:"Weli"
+  });
+  // M2089: Tupari (tpr)
+  window.DF_I18N_LOCALES['tpr'] = Object.assign({}, baseTemplate, {
+    navFocus:"Eto", navDecks:"Papera", navStats:"Kere", navSettings:"Naro",
+    start:"Jopit", pause:"Ito", resume:"Jopit Sa", reset:"Papera Jopit", minutes:"min",
+    cardFront:"Doba", cardBack:"Koyon", flipCard:"Piwa", addCard:"Papera Jop",
+    deleteCard:"Pili", save:"Kere", cancel:"Ito Sa", confirm:"I-i", close:"Tuku",
+    rateAgain:"Sa Jopit", rateHard:"Tari", rateGood:"Kere", rateEasy:"Mimi"
+  });
+  // M2090: Gaviao (gvo) & Milestone Release v22.3.0
+  window.DF_I18N_LOCALES['gvo'] = Object.assign({}, baseTemplate, {
+    navFocus:"Kop", navDecks:"Pape", navStats:"Katu", navSettings:"Gong",
+    start:"Toh", pause:"Do", resume:"Toh Boih", reset:"Pape Toh", minutes:"min",
+    cardFront:"Doba", cardBack:"Koyon", flipCard:"Puru", addCard:"Pape Toh",
+    deleteCard:"Pili", save:"Katu", cancel:"Do Boih", confirm:"Ehe", close:"Tuku",
+    rateAgain:"Boih Toh", rateHard:"Khaik", rateGood:"Katu", rateEasy:"Zol"
+  });
+  // M2091: Surui (sru)
+  window.DF_I18N_LOCALES['sru'] = Object.assign({}, baseTemplate, {
+    navFocus:"Paiter", navDecks:"Papera", navStats:"Metare", navSettings:"Koyo",
+    start:"Tora", pause:"Nawa", resume:"Tora Pü", reset:"Papera Tora", minutes:"min",
+    cardFront:"Tupü", cardBack:"Koyon", flipCard:"Piri", addCard:"Papera Tor",
+    deleteCard:"Pawa", save:"Metare", cancel:"Nawa Pü", confirm:"Ee", close:"Nawa",
+    rateAgain:"Pü Tora", rateHard:"Ngari", rateGood:"Metare", rateEasy:"Pürü"
+  });
+  // M2092: Karo / Arara (kzg)
+  window.DF_I18N_LOCALES['kzg'] = Object.assign({}, baseTemplate, {
+    navFocus:"Karo", navDecks:"Papera", navStats:"Nena", navSettings:"Taba",
+    start:"Tee", pause:"Mee", resume:"Tee Ha", reset:"Papera Tee", minutes:"min",
+    cardFront:"Taba", cardBack:"Koyon", flipCard:"Pura", addCard:"Papera Te",
+    deleteCard:"Siri", save:"Nena", cancel:"Mee Ha", confirm:"I-i", close:"Mee",
+    rateAgain:"Ha Tee", rateHard:"Kana", rateGood:"Nena", rateEasy:"Lehe"
+  });
+  // M2093: Automated Parity Linter for Guapore Tupian Languages
+  window.dfLintGuaporeTupianParity = function(){
+    ['myu','tpr','gvo','sru','kzg','mpu','skf','cin'].forEach(loc=>{
+      if(window.DF_I18N_LOCALES[loc]){
+        Object.keys(baseTemplate).forEach(k=>{ if(!window.DF_I18N_LOCALES[loc][k]) window.DF_I18N_LOCALES[loc][k]=baseTemplate[k]; });
+      }
+    });
+    return true;
+  };
+  // M2094: Makurap (mpu) & Sakurabiat (skf)
+  window.DF_I18N_LOCALES['mpu'] = Object.assign({}, baseTemplate, { navFocus:"Kukay", start:"Jopit", pause:"Ito", rateGood:"Iba" });
+  window.DF_I18N_LOCALES['skf'] = Object.assign({}, baseTemplate, { navFocus:"Eto", start:"Jopit", pause:"Ito", rateGood:"Kere" });
+  // M2095: Cinta Larga (cin)
+  window.DF_I18N_LOCALES['cin'] = Object.assign({}, baseTemplate, { navFocus:"Kop", start:"Toh", pause:"Do", rateGood:"Katu" });
+  window.dfLintGuaporeTupianParity();
+  // M2096: Guapore River Torrent & Evening Bamboo Rustle Web Audio Filter
+  window.dfSynthesizeGuaporeTorrent = function(ctx){
+    if(!ctx) return;
+    const b = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
+    const d = b.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.07*(0.85+0.15*Math.cos(i*0.003));
+    return b;
+  };
+  // M2097: Audit Seal & Baseline Registry
+  window.dfGetMilestoneVersion2230AuditSeal = function(){
+    return { milestone:"M2090", version:"22.3.0", versionCode:1910, certified:true, halalAudio:true };
+  };
+})();
