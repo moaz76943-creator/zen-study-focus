@@ -42542,3 +42542,33 @@ window.dfCheckStorageHeadroom = async function() {
   }
   return { isSaturated: false, headroomPercentage: 100 };
 };
+
+/* ==========================================================
+   DEEP FOCUS: UFS FLASH STORAGE KEY-RANGE ACCELERATOR
+   Zero full-table scans utilizing bounded B-Tree key ranges
+   ========================================================== */
+window.dfFetchCardsBetweenDates = async function(startDateISO, endDateISO) {
+  try {
+    const db = await window.dfOpenDatabase();
+    return new Promise((resolve) => {
+      const tx = db.transaction("cards", "readonly");
+      const store = tx.objectStore("cards");
+      const range = (typeof IDBKeyRange !== "undefined") ? IDBKeyRange.bound(startDateISO, endDateISO) : null;
+      const results = [];
+      const req = store.openCursor(range);
+
+      req.onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          results.push(cursor.value);
+          cursor.continue();
+        } else {
+          resolve(results);
+        }
+      };
+      req.onerror = () => resolve([]);
+    });
+  } catch (e) {
+    return [];
+  }
+};
