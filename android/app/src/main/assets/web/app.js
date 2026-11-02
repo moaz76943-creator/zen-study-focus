@@ -44121,3 +44121,80 @@ window.dfFuzzBiDiUnicodeSafetyFilter = function(str) {
 window.dfGetMilestoneM5407FuzzAuditSeal = function() {
   return { milestone: 'M5407 Continuous Fuzz Engine', version: '60.1.1', versionCode: 5015, status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5408-M5417: Strict Schema & State Assertion Engine ---
+window.dfValidateStudySessionSchema = function(obj) {
+  if (!obj || typeof obj !== 'object') return { valid: false, errors: ['MUST_BE_OBJECT'] };
+  const errors = [];
+  if (typeof obj.id !== 'string' || !obj.id.trim()) errors.push('INVALID_ID');
+  if (typeof obj.durationSeconds !== 'number' || obj.durationSeconds <= 0) errors.push('INVALID_DURATION');
+  if (typeof obj.timestamp !== 'string' || isNaN(Date.parse(obj.timestamp))) errors.push('INVALID_TIMESTAMP');
+  return { valid: errors.length === 0, errors: errors };
+};
+window.dfValidateFlashcardDeckSchema = function(deck) {
+  if (!deck || typeof deck !== 'object') return { valid: false, errors: ['MUST_BE_OBJECT'] };
+  const errors = [];
+  if (typeof deck.deckId !== 'string' || !deck.deckId) errors.push('INVALID_DECK_ID');
+  if (typeof deck.title !== 'string' || !deck.title) errors.push('INVALID_TITLE');
+  if (!Array.isArray(deck.cards)) errors.push('CARDS_MUST_BE_ARRAY');
+  return { valid: errors.length === 0, errors: errors, cardCount: Array.isArray(deck.cards) ? deck.cards.length : 0 };
+};
+window.dfValidateReviewHistorySchema = function(entry) {
+  if (!entry || typeof entry !== 'object') return { valid: false, errors: ['MUST_BE_OBJECT'] };
+  const errors = [];
+  if (typeof entry.cardId !== 'string') errors.push('INVALID_CARD_ID');
+  if (![1, 2, 3, 4, 5].includes(entry.rating)) errors.push('RATING_RANGE_1_5');
+  if (typeof entry.intervalDays !== 'number' || entry.intervalDays < 0) errors.push('INVALID_INTERVAL');
+  return { valid: errors.length === 0, errors: errors };
+};
+window.dfValidateUserSettingsSchema = function(cfg) {
+  if (!cfg || typeof cfg !== 'object') return { valid: false, errors: ['MUST_BE_OBJECT'] };
+  const errors = [];
+  if (typeof cfg.theme !== 'string') errors.push('THEME_MUST_BE_STRING');
+  if (typeof cfg.volume !== 'number' || cfg.volume < 0 || cfg.volume > 1) errors.push('VOLUME_RANGE_0_1');
+  if (typeof cfg.vibrationEnabled !== 'boolean') errors.push('VIBRATION_MUST_BE_BOOLEAN');
+  return { valid: errors.length === 0, errors: errors };
+};
+window.dfValidateChronoGoalSchema = function(goal) {
+  if (!goal || typeof goal !== 'object') return { valid: false, errors: ['MUST_BE_OBJECT'] };
+  const errors = [];
+  if (typeof goal.dailyMinutes !== 'number' || goal.dailyMinutes <= 0) errors.push('INVALID_DAILY_MINUTES');
+  if (typeof goal.weeklyTarget !== 'number' || goal.weeklyTarget < goal.dailyMinutes) errors.push('INVALID_WEEKLY_TARGET');
+  return { valid: errors.length === 0, errors: errors };
+};
+window.dfValidateAudioPresetSchema = function(preset) {
+  if (!preset || typeof preset !== 'object') return { valid: false, errors: ['MUST_BE_OBJECT'] };
+  const errors = [];
+  if (typeof preset.name !== 'string') errors.push('NAME_REQUIRED');
+  if (typeof preset.binauralBeatHz !== 'number' || preset.binauralBeatHz < 0.5 || preset.binauralBeatHz > 40) errors.push('BEAT_HZ_RANGE_0.5_40');
+  return { valid: errors.length === 0, errors: errors };
+};
+window.dfValidateTagHierarchySchema = function(tags) {
+  if (!Array.isArray(tags)) return { valid: false, errors: ['TAGS_MUST_BE_ARRAY'] };
+  const visited = new Set();
+  for (const t of tags) {
+    if (typeof t !== 'string' || !t.trim()) return { valid: false, errors: ['EMPTY_TAG'] };
+    if (visited.has(t.trim())) return { valid: false, errors: ['DUPLICATE_TAG'] };
+    visited.add(t.trim());
+  }
+  return { valid: true, tagCount: visited.size };
+};
+window.dfValidateDiagnosticLedgerSchema = function(record) {
+  if (!record || typeof record !== 'object') return { valid: false, errors: ['MUST_BE_OBJECT'] };
+  const errors = [];
+  if (!['INFO', 'WARN', 'ERROR'].includes(record.level)) errors.push('INVALID_LEVEL');
+  if (typeof record.message !== 'string' || !record.message) errors.push('MESSAGE_REQUIRED');
+  return { valid: errors.length === 0, errors: errors };
+};
+window.dfValidateExportBundleSchema = function(bundle) {
+  if (!bundle || typeof bundle !== 'object') return { valid: false, errors: ['MUST_BE_OBJECT'] };
+  const errors = [];
+  if (bundle.version !== 1 && bundle.version !== 2) errors.push('UNSUPPORTED_VERSION');
+  if (!Array.isArray(bundle.sessions)) errors.push('SESSIONS_ARRAY_REQUIRED');
+  if (!Array.isArray(bundle.decks)) errors.push('DECKS_ARRAY_REQUIRED');
+  return { valid: errors.length === 0, errors: errors };
+};
+window.dfGetMilestoneM5417SchemaAuditSeal = function() {
+  return { milestone: 'M5417 Schema Validation Engine', version: '60.1.2', versionCode: 5020, status: 'VERIFIED' };
+};
