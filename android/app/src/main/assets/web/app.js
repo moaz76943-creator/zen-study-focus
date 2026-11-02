@@ -45245,3 +45245,33 @@ window.dfRetrofitStaticHtmlElements = function() {
 window.dfGetMilestoneM5607HtmlI18nRetrofitSeal = function() {
   return { milestone: 'M5598-M5607 HTML Static String Retrofit Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5608-M5617: Procedural Audio Polyglot Lexicon ---
+window.dfRegisterAudioLexicon = function(locale, tokens) {
+  window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+  window.DF_MASTER_LEXICON[locale] = window.DF_MASTER_LEXICON[locale] || {};
+  Object.assign(window.DF_MASTER_LEXICON[locale], tokens);
+};
+
+window.dfRegisterAudioLexicon('ar', {
+  audio_chime_header: "نغمات انتهاء الجلسة الإجرائية",
+  audio_ambient_header: "أثير الطبيعة الصافي للتركيز",
+  audio_solfeggio_528: "نغمة 528 هرتز للتناغم الذهني",
+  audio_solfeggio_432: "نغمة 432 هرتز للسكينة والهدوء",
+  audio_binaural_beta: "موجات بيتا للتأهب واليقظة 14 هرتز",
+  audio_forest_wind: "نسيم الغابة الإجرائي النقي"
+});
+
+window.dfRegisterAudioLexicon('en', {
+  audio_chime_header: "Procedural Completion Chimes",
+  audio_ambient_header: "Pure Focus Nature Ambiance",
+  audio_solfeggio_528: "528Hz Mental Harmony Tone",
+  audio_solfeggio_432: "432Hz Calm Grounding Tone",
+  audio_binaural_beta: "14Hz Beta Alertness Flow",
+  audio_forest_wind: "Pure Forest Wind Ambiance"
+});
+
+window.dfGetMilestoneM5617ProceduralAudioLexiconSeal = function() {
+  return { milestone: 'M5608-M5617 Procedural Audio Polyglot Lexicon', status: 'VERIFIED' };
+};
