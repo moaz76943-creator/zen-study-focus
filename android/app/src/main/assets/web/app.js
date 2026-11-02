@@ -40004,3 +40004,37 @@ window.dfInjectWordBreakRules = function() {
 if (typeof window !== "undefined") {
   window.dfInjectWordBreakRules();
 }
+
+/* ==========================================================
+   DEEP FOCUS: PARAMETRIC NATURE SOUND CUSTOMIZER ENGINE
+   Real-time mathematical filter tuning (Intensity, Tone, Cutoff)
+   ========================================================== */
+window.DF_SOUND_PARAMS = {
+  intensity: 0.5, // 0.1 (gentle) to 1.0 (deep)
+  tone: "soft"    // "soft", "balanced", "crisp"
+};
+
+window.dfSetSoundParameters = function(intensity, tone) {
+  if (typeof intensity === "number") {
+    window.DF_SOUND_PARAMS.intensity = Math.max(0.1, Math.min(1.0, intensity));
+  }
+  if (tone && ["soft", "balanced", "crisp"].includes(tone)) {
+    window.DF_SOUND_PARAMS.tone = tone;
+  }
+
+  // Live-update active filter nodes if audio is currently playing
+  if (window.DF_ACTIVE_AUDIO_NODES) {
+    const filterNode = window.DF_ACTIVE_AUDIO_NODES.find(n => n instanceof BiquadFilterNode);
+    if (filterNode && filterNode.frequency) {
+      const baseFreq = window.DF_SOUND_PARAMS.tone === "soft" ? 450 : (window.DF_SOUND_PARAMS.tone === "crisp" ? 1200 : 750);
+      filterNode.frequency.setTargetAtTime(baseFreq * window.DF_SOUND_PARAMS.intensity, 0, 0.2);
+    }
+  }
+  if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_sound_params", window.DF_SOUND_PARAMS);
+  console.log("[DSP] Sound parameters updated:", window.DF_SOUND_PARAMS);
+};
+
+if (typeof window !== "undefined" && window.dfSafeGetStorage) {
+  const saved = window.dfSafeGetStorage("df_sound_params", null);
+  if (saved) window.DF_SOUND_PARAMS = saved;
+}
