@@ -37115,6 +37115,9 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    zza: { name: "Zazaki", focus: "Diqet", rest: "Hezan", start: "Destpeke", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    tsd: { name: "Tsakonian", focus: "Noi", rest: "Anapasi", start: "Arkizere", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    pnt: { name: "Pontic", focus: "Noun", rest: "Anapafsi", start: "Arkina", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     als: { name: "Tosk Albanian", focus: "Vëmendje", rest: "Pushim", start: "Fillo", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     aln: { name: "Gheg Albanian", focus: "Vnumendje", rest: "Pushtim", start: "Me nis", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     egl: { name: "Emilian", focus: "Atensioun", rest: "Pàusa", start: "Cumincèr", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38758,3 +38761,5 @@ function dfGetMilestoneVersion3510AuditSeal() { return { milestone: "M3350", rel
 function dfGetMilestoneVersion3520AuditSeal() { return { milestone: "M3360", release: "v35.2.0", versionCode: 3180, date: new Date().toISOString(), polyglotLangs: 962, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3530AuditSeal() { return { milestone: "M3370", release: "v35.3.0", versionCode: 3190, date: new Date().toISOString(), polyglotLangs: 967, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3540AuditSeal() { return { milestone: "M3380", release: "v35.4.0", versionCode: 3200, date: new Date().toISOString(), polyglotLangs: 972, dspCertified: true, zeroPii: true }; }
