@@ -39354,3 +39354,33 @@ window.dfPlaySessionCompletionChime = async function() {
   }
   console.log("[DEEP FOCUS] Harmonic completion chime sounded gently.");
 };
+
+/* ==========================================================
+   DEEP FOCUS: BI-DIRECTIONAL LAYOUT (RTL/LTR) & DIGIT ISOLATOR
+   Automatic interface mirroring with Western ASCII digit isolation
+   ========================================================== */
+window.DF_RTL_LOCALES = ["ar", "fa", "ur", "ps", "sd", "bal", "ug", "ckb", "mzn", "glk", "bqi"];
+
+window.dfUpdateLayoutDirection = function(localeCode) {
+  const code = localeCode || window.DF_CURRENT_LOCALE || "ar";
+  const isRTL = window.DF_RTL_LOCALES.includes(code);
+  
+  if (typeof document !== "undefined" && document.documentElement) {
+    document.documentElement.dir = isRTL ? "rtl" : "ltr";
+    document.documentElement.setAttribute("lang", code);
+    
+    // Isolate timer and digit elements to strictly LTR Western layout
+    document.querySelectorAll(".df-timer-digits, [data-isolate-digits]").forEach(el => {
+      el.style.direction = "ltr";
+      el.style.unicodeBidi = "isolate";
+    });
+  }
+  return isRTL;
+};
+
+// Hook into existing locale changes
+const prevApplyLocale = window.dfApplyLocaleUI;
+window.dfApplyLocaleUI = function(code) {
+  window.dfUpdateLayoutDirection(code);
+  if (typeof prevApplyLocale === "function") prevApplyLocale(code);
+};
