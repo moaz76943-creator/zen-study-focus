@@ -41673,3 +41673,46 @@ window.dfApplyDynamicSystemPalette = function() {
 if (typeof window !== "undefined") {
   window.dfApplyDynamicSystemPalette();
 }
+
+/* ==========================================================
+   DEEP FOCUS: MONOCHROME E-INK PAPER EMULATION SENTINEL
+   Zero-color paper-like focus mode for dense academic reading
+   ========================================================== */
+window.DF_EINK_MODE_ACTIVE = false;
+
+window.dfToggleEInkMode = function(enable) {
+  window.DF_EINK_MODE_ACTIVE = Boolean(enable);
+  if (typeof document === "undefined" || !document.head) return;
+
+  const styleId = "df-eink-mode-style";
+  let styleEl = document.getElementById(styleId);
+
+  if (window.DF_EINK_MODE_ACTIVE) {
+    if (!styleEl) {
+      styleEl = document.createElement("style");
+      styleEl.id = styleId;
+      styleEl.textContent = `
+        body.df-eink-paper-mode {
+          filter: grayscale(100%) contrast(110%) !important;
+          background: #fdfbf7 !important;
+          color: #111111 !important;
+        }
+        body.df-eink-paper-mode * {
+          box-shadow: none !important;
+          text-shadow: none !important;
+        }
+      `;
+      document.head.appendChild(styleEl);
+    }
+    document.body.classList.add("df-eink-paper-mode");
+  } else {
+    if (document.body) document.body.classList.remove("df-eink-paper-mode");
+  }
+
+  if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_eink_mode", window.DF_EINK_MODE_ACTIVE);
+  console.log("[E-INK] Paper reading mode is now:", window.DF_EINK_MODE_ACTIVE ? "ENABLED" : "DISABLED");
+};
+
+if (typeof window !== "undefined" && window.dfSafeGetStorage) {
+  if (window.dfSafeGetStorage("df_eink_mode", false)) window.dfToggleEInkMode(true);
+}
