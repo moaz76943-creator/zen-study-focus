@@ -41490,3 +41490,34 @@ window.dfInjectAdaptiveTabletLayout = function() {
 if (typeof window !== "undefined") {
   window.dfInjectAdaptiveTabletLayout();
 }
+
+/* ==========================================================
+   DEEP FOCUS: COGNITIVE FATIGUE & FOCUS DRIFT DETECTOR (PILLAR 7 LAUNCH)
+   Detects mental exhaustion based on reaction latencies and pause frequency
+   ========================================================== */
+window.DF_SESSION_START_TIME = Date.now();
+window.DF_RECENT_ANSWER_LATENCIES = [];
+
+window.dfRecordCardAnswerLatency = function(latencySeconds) {
+  window.DF_RECENT_ANSWER_LATENCIES.push(latencySeconds);
+  if (window.DF_RECENT_ANSWER_LATENCIES.length > 10) {
+    window.DF_RECENT_ANSWER_LATENCIES.shift();
+  }
+};
+
+window.dfAssessCognitiveFatigue = function() {
+  const continuousHours = (Date.now() - window.DF_SESSION_START_TIME) / (3600 * 1000);
+  const lats = window.DF_RECENT_ANSWER_LATENCIES;
+  let avgLatency = 3.0;
+  if (lats.length >= 5) {
+    avgLatency = lats.reduce((a, b) => a + b, 0) / lats.length;
+  }
+
+  const isFatigued = continuousHours >= 2.5 || avgLatency >= 10.0;
+  return {
+    isFatigued: isFatigued,
+    continuousHoursFocused: parseFloat(continuousHours.toFixed(1)),
+    averageCardLatencySeconds: parseFloat(avgLatency.toFixed(1)),
+    fatigueLevel: continuousHours > 3 ? "HIGH" : (continuousHours > 1.5 ? "MODERATE" : "FRESH")
+  };
+};
