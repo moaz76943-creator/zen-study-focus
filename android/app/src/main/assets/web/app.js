@@ -44700,3 +44700,65 @@ window.DF_MASTER_LEXICON.id = {
 window.dfGetMilestoneM5497TurkicAustronesianLexiconSeal = function() {
   return { milestone: 'M5488-M5497 Turkish and Indonesian Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5498-M5507: Swahili Hausa and Bengali Master Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.sw = {
+  timer_start: "Anza Kipindi cha Umakini",
+  timer_pause: "Sitisha kwa Muda",
+  timer_resume: "Endelea na Umakini",
+  timer_reset: "Weka Upya Kipima Muda",
+  timer_stop: "Maliza Kipindi",
+  phase_focus: "Kipindi cha Umakini wa Kina",
+  phase_short_break: "Pumziko Fupi la Akili",
+  phase_long_break: "Pumziko Maalum",
+  session_completed: "Hongera! Umekamilisha Kipindi",
+  card_flip: "Pindua Kadi",
+  card_show_answer: "Onyesha Jibu",
+  rating_again: "Inahitaji Kurudiwa",
+  rating_hard: "Ngumu Kukumbuka",
+  rating_good: "Kumbukumbu Nzuri",
+  rating_easy: "Imethibiti Kikamilifu"
+};
+
+window.DF_MASTER_LEXICON.ha = {
+  timer_start: "Fara Mayar da Hankali",
+  timer_pause: "Dakata na Dan Lokaci",
+  timer_resume: "Ci gaba da Mayar da Hankali",
+  timer_reset: "Sake Saita Lokaci",
+  timer_stop: "Kammala Lokacin Nazari",
+  phase_focus: "Zaman Mayar da Hankali Sosai",
+  phase_short_break: "Gajeren Hutu na Hankali",
+  phase_long_break: "Dogon Hutu",
+  session_completed: "Madalla! An kammala lokacin nazari",
+  card_flip: "Juya Katin",
+  card_show_answer: "Nuna Amsa",
+  rating_again: "Ana Bukatar Maimaitawa",
+  rating_hard: "Da Wuya a Tuna",
+  rating_good: "Kyakkyawan Tunawa",
+  rating_easy: "An Kware Sosai"
+};
+
+window.DF_MASTER_LEXICON.bn = {
+  timer_start: "গভীর মনোযোগ শুরু করুন",
+  timer_pause: "সাময়িক বিরতি",
+  timer_resume: "মনোযোগ পুনরায় শুরু করুন",
+  timer_reset: "টাইমার রিসেট করুন",
+  timer_stop: "সেশন শেষ করুন",
+  phase_focus: "গভীর অধ্যয়নের সেশন",
+  phase_short_break: "সংক্ষিপ্ত মানসিক বিরতি",
+  phase_long_break: "দীর্ঘ বিশ্রাম",
+  session_completed: "মাশাআল্লাহ! সেশন সম্পন্ন হয়েছে",
+  card_flip: "কার্ড উল্টান",
+  card_show_answer: "উত্তর দেখুন",
+  rating_again: "পুনরাবৃত্তি প্রয়োজন",
+  rating_hard: "কঠিন স্মরণ",
+  rating_good: "স্পষ্ট স্মরণ",
+  rating_easy: "সহজে স্মরণে আছে"
+};
+
+window.dfGetMilestoneM5507AfricanBengaliLexiconSeal = function() {
+  return { milestone: 'M5498-M5507 Swahili Hausa and Bengali Master Lexicons', status: 'VERIFIED' };
+};
