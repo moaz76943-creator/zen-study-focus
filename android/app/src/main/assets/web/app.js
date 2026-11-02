@@ -39855,3 +39855,24 @@ window.dfNavigateToScreen = function(newScreenId) {
   }
   return true;
 };
+
+/* ==========================================================
+   DEEP FOCUS: HEADSET UNPLUG & BLUETOOTH DISCONNECT GUARD
+   Instantly mutes audio when headphones detach to preserve library quietude
+   ========================================================== */
+window.dfInitHeadsetDisconnectGuard = function() {
+  if (typeof navigator !== "undefined" && navigator.mediaDevices && navigator.mediaDevices.ondevicechange !== undefined) {
+    navigator.mediaDevices.ondevicechange = () => {
+      // Check if active audio was playing through headphones
+      if (window.DF_ACTIVE_AUDIO_NODES && window.DF_ACTIVE_AUDIO_NODES.length > 0) {
+        if (window.dfStopAllSounds) window.dfStopAllSounds();
+        console.log("[HEADSET GUARD] Audio route changed/detached. Output muted instantly for privacy.");
+      }
+    };
+    console.log("[DEEP FOCUS] Headset disconnect listener active.");
+  }
+};
+
+if (typeof window !== "undefined") {
+  window.dfInitHeadsetDisconnectGuard();
+}
