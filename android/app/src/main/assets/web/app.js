@@ -39384,3 +39384,39 @@ window.dfApplyLocaleUI = function(code) {
   window.dfUpdateLayoutDirection(code);
   if (typeof prevApplyLocale === "function") prevApplyLocale(code);
 };
+
+/* ==========================================================
+   DEEP FOCUS: KEYBOARD SHORTCUTS & TABLET FOCUS CONTROLLER
+   Fast desktop/tablet controls without breaking flow state
+   ========================================================== */
+window.dfInitKeyboardShortcuts = function() {
+  if (typeof document === "undefined") return;
+
+  document.addEventListener("keydown", (e) => {
+    // Ignore keystrokes when typing in inputs or textareas
+    const tag = e.target.tagName ? e.target.tagName.toLowerCase() : "";
+    if (tag === "input" || tag === "textarea" || e.target.isContentEditable) return;
+
+    if (e.code === "Space") {
+      e.preventDefault();
+      const toggleBtn = document.getElementById("df-timer-toggle") || document.querySelector("[data-action='toggle']");
+      if (toggleBtn) toggleBtn.click();
+    } else if (e.key === "r" || e.key === "R") {
+      const resetBtn = document.getElementById("df-timer-reset") || document.querySelector("[data-action='reset']");
+      if (resetBtn) resetBtn.click();
+    } else if (e.key === "m" || e.key === "M") {
+      const soundBtn = document.getElementById("df-sound-toggle") || document.querySelector("[data-action='sound']");
+      if (soundBtn) soundBtn.click();
+    } else if (e.code === "Escape") {
+      if (window.dfHandleHardwareBack) window.dfHandleHardwareBack();
+    } else if (["1", "2", "3", "4"].includes(e.key)) {
+      const ratingBtn = document.querySelector('[data-srs-rating="' + e.key + '"]');
+      if (ratingBtn) ratingBtn.click();
+    }
+  });
+  console.log("[DEEP FOCUS] Keyboard shortcuts listener initialized.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfInitKeyboardShortcuts();
+}
