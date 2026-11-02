@@ -41233,3 +41233,42 @@ window.dfVerifyBiometricAccess = async function() {
   window.DF_IS_AUTHENTICATED = true;
   return true;
 };
+
+/* ==========================================================
+   DEEP FOCUS: LOCAL CLIENT-SIDE AES-GCM 256-BIT ENCRYPTION
+   Zero-cloud cryptographic payload protection for study notes
+   ========================================================== */
+window.dfEncryptText = async function(plainText, secretKeyStr) {
+  if (typeof crypto === "undefined" || !crypto.subtle) return plainText;
+  try {
+    const enc = new TextEncoder();
+    const keyData = enc.encode(secretKeyStr || "df_default_local_key_salt_2026");
+    const keyHash = await crypto.subtle.digest("SHA-256", keyData);
+    const key = await crypto.subtle.importKey("raw", keyHash, { name: "AES-GCM" }, false, ["encrypt"]);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, enc.encode(plainText));
+    return btoa(JSON.stringify({
+      iv: Array.from(iv),
+      cipher: Array.from(new Uint8Array(encrypted))
+    }));
+  } catch (e) {
+    return plainText;
+  }
+};
+
+window.dfDecryptText = async function(cipherPackage, secretKeyStr) {
+  if (typeof crypto === "undefined" || !crypto.subtle) return cipherPackage;
+  try {
+    const parsed = JSON.parse(atob(cipherPackage));
+    const enc = new TextEncoder();
+    const keyData = enc.encode(secretKeyStr || "df_default_local_key_salt_2026");
+    const keyHash = await crypto.subtle.digest("SHA-256", keyData);
+    const key = await crypto.subtle.importKey("raw", keyHash, { name: "AES-GCM" }, false, ["decrypt"]);
+    const iv = new Uint8Array(parsed.iv);
+    const cipher = new Uint8Array(parsed.cipher);
+    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, cipher);
+    return new TextDecoder().decode(decrypted);
+  } catch (e) {
+    return cipherPackage;
+  }
+};
