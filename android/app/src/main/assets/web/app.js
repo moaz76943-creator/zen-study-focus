@@ -43451,3 +43451,30 @@ window.dfNormalizeSystemInsets = function() {
 if (typeof window !== "undefined") {
   window.dfNormalizeSystemInsets();
 }
+
+/* ==========================================================
+   DEEP FOCUS: FOLDABLE FLEX-MODE & HINGE POSTURE SENTINEL
+   Splits view between top display and bottom desk-rested surface
+   ========================================================== */
+window.dfDetectFoldablePosture = function() {
+  if (typeof window === "undefined") return;
+
+  const checkPosture = () => {
+    // Detect screen segments or dual display posture
+    const isFoldedAngle = (window.innerHeight < 600 && window.innerWidth >= 600);
+    if (typeof document !== "undefined" && document.body) {
+      if (isFoldedAngle) {
+        document.body.classList.add("df-foldable-flex-mode");
+      } else {
+        document.body.classList.remove("df-foldable-flex-mode");
+      }
+    }
+  };
+
+  window.addEventListener("resize", checkPosture, { passive: true });
+  checkPosture();
+};
+
+if (typeof window !== "undefined") {
+  window.dfDetectFoldablePosture();
+}
