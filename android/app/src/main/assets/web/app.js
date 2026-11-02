@@ -37115,6 +37115,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    fkv: { name: "Kven", focus: "Mieli", rest: "Leppo", start: "Alkkaa", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    fit: { name: "Meankieli", focus: "Mieli", rest: "Lepo", start: "Alkaa", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    sms: { name: "Skolt Sami", focus: "Miõll", rest: "Võiggstõõllâd", start: "Alggted", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    smn: { name: "Inari Sami", focus: "Mielâ", rest: "Vuoiŋâstiđ", start: "Algâttiđ", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    smj: { name: "Lule Sami", focus: "Mielas", rest: "Vuojŋŋestit", start: "Álgget", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     sma: { name: "Southern Sami", focus: "Ussjohke", rest: "Lïegkedidh", start: "Aelkedh", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     vro: { name: "Voro", focus: "Meele", rest: "Hingüs", start: "Alosta", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     olo: { name: "Livvi Karelian", focus: "Mieli", rest: "Levo", start: "Ruveta", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38714,3 +38719,5 @@ function dfGetMilestoneVersion3410AuditSeal() { return { milestone: "M3270", rel
 function dfGetMilestoneVersion3420AuditSeal() { return { milestone: "M3280", release: "v34.2.0", versionCode: 3100, date: new Date().toISOString(), polyglotLangs: 922, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3430AuditSeal() { return { milestone: "M3290", release: "v34.3.0", versionCode: 3110, date: new Date().toISOString(), polyglotLangs: 927, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3440AuditSeal() { return { milestone: "M3300", release: "v34.4.0", versionCode: 3120, date: new Date().toISOString(), polyglotLangs: 932, dspCertified: true, zeroPii: true }; }
