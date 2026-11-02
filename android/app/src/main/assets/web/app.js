@@ -39456,3 +39456,40 @@ window.dfBuildDailyReviewQueue = function(cardsList) {
   // Priority queue: Due reviews first, followed by new cards
   return [...shuffle(dueCards), ...shuffle(newCards)];
 };
+
+/* ==========================================================
+   DEEP FOCUS: STRICT ZEN MODE & PROCRASTINATION BLOCKER
+   Dims non-essential UI chrome and guards active focus sessions
+   ========================================================== */
+window.DF_ZEN_MODE_ACTIVE = false;
+
+window.dfToggleZenMode = function(isActive) {
+  window.DF_ZEN_MODE_ACTIVE = Boolean(isActive);
+  if (typeof document === "undefined") return;
+
+  const chromeElements = document.querySelectorAll(".df-header, .df-nav-tabs, .df-settings-gear, [data-chrome]");
+  chromeElements.forEach(el => {
+    if (window.DF_ZEN_MODE_ACTIVE) {
+      el.style.opacity = "0.15";
+      el.style.pointerEvents = "none";
+      el.style.transition = "opacity 0.6s ease";
+    } else {
+      el.style.opacity = "1";
+      el.style.pointerEvents = "auto";
+    }
+  });
+  console.log("[DEEP FOCUS] Strict Zen Mode is now:", window.DF_ZEN_MODE_ACTIVE ? "ENABLED" : "DISABLED");
+};
+
+// Hook into timer start to auto-engage Zen mode
+const prevStartTimer = window.dfStartThrottledTimer;
+window.dfStartThrottledTimer = function(duration, onTick, onComplete) {
+  window.dfToggleZenMode(true);
+  const wrappedComplete = () => {
+    window.dfToggleZenMode(false);
+    if (typeof onComplete === "function") onComplete();
+  };
+  if (typeof prevStartTimer === "function") {
+    prevStartTimer(duration, onTick, wrappedComplete);
+  }
+};
