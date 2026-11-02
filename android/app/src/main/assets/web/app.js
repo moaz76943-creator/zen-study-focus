@@ -40894,3 +40894,24 @@ window.dfUndoLastCardRating = function(cardsList) {
   }
   return false;
 };
+
+/* ==========================================================
+   DEEP FOCUS: ZERO-DEPENDENCY SCIENTIFIC FORMULA RENDERER
+   Lightweight inline math and symbol replacement ($x^2$, sqrt, fractions)
+   ========================================================== */
+window.dfRenderScientificText = function(rawText) {
+  if (!rawText || typeof rawText !== "string") return "";
+  let rendered = rawText;
+
+  // Exponents: x^2 -> x²
+  rendered = rendered.replace(/\^([0-9])/g, (m, d) => ["⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹"][parseInt(d)]);
+  // Greek letters: \alpha, \beta, \pi, \theta
+  const greek = { "\\alpha": "α", "\\beta": "β", "\\pi": "π", "\\theta": "θ", "\\sigma": "σ", "\\delta": "Δ", "\\sqrt": "√" };
+  for (const [k, v] of Object.entries(greek)) {
+    rendered = rendered.split(k).join(v);
+  }
+  // Fractions: \frac{a}{b} -> a/b
+  rendered = rendered.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, "($1 / $2)");
+
+  return rendered;
+};
