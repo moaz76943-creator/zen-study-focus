@@ -43798,3 +43798,27 @@ window.dfTriggerLRAHaptic = function(patternType) {
     } catch (e) {}
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: CIRCADIAN TWILIGHT GLOW & COLOR TEMPERATURE ENGINE
+   Soft amber spectrum transition during evening study hours
+   ========================================================== */
+window.dfUpdateCircadianColorTemperature = function() {
+  if (typeof document === "undefined" || !document.documentElement) return;
+  const hour = new Date().getHours();
+  const isEvening = (hour >= 19 || hour < 6);
+
+  if (isEvening) {
+    // Warm soothing amber tones (eliminates harsh blue glare)
+    document.documentElement.style.setProperty("--df-accent-green", "#d69e2e");
+    document.documentElement.style.setProperty("--df-glow-ring", "rgba(214, 158, 46, 0.2)");
+    console.log("[CIRCADIAN] Evening Twilight Warm Palette active.");
+  } else {
+    document.documentElement.style.setProperty("--df-accent-green", "#38a169");
+    document.documentElement.style.setProperty("--df-glow-ring", "rgba(56, 161, 105, 0.25)");
+  }
+};
+
+if (typeof window !== "undefined") {
+  window.dfUpdateCircadianColorTemperature();
+}
