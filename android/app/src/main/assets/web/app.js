@@ -43141,3 +43141,29 @@ window.dfDeriveHardwareBoundKey = async function(userPin) {
     return null;
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: UNICODE HOMOGLYPH SPOOFING & CONFUSABLES SENTINEL
+   Detects cross-script visual deception in imported deck titles
+   ========================================================== */
+window.DF_CONFUSABLE_MAP = {
+  "а": "a", "е": "e", "о": "o", "р": "p",
+  "с": "c", "у": "y", "х": "x", "ο": "o"
+};
+
+window.dfNormalizeHomoglyphs = function(rawName) {
+  if (!rawName || typeof rawName !== "string") return "";
+  let clean = "";
+  for (let i = 0; i < rawName.length; i++) {
+    const ch = rawName[i];
+    clean += window.DF_CONFUSABLE_MAP[ch] || ch;
+  }
+  return clean;
+};
+
+window.dfDetectMixedScriptSpoofing = function(text) {
+  if (!text) return false;
+  const hasLatin = /[a-zA-Z]/.test(text);
+  const hasCyrillicLookalikes = /[аеорсух]/.test(text);
+  return hasLatin && hasCyrillicLookalikes;
+};
