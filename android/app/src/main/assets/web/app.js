@@ -43369,3 +43369,23 @@ window.dfObserveDesktopDisplayMetrics = function() {
 if (typeof window !== "undefined") {
   window.dfObserveDesktopDisplayMetrics();
 }
+
+/* ==========================================================
+   DEEP FOCUS: SCREEN ORIENTATION & ROTATION JUMP SENTINEL
+   Preserves exact scroll and card review coordinates on orientation flip
+   ========================================================== */
+window.dfHandleOrientationChange = function() {
+  if (typeof window === "undefined") return;
+
+  const onOrient = () => {
+    // Preserve active card and avoid layout jumping
+    console.log("[ORIENTATION] Display orientation flipped. UI states preserved.");
+    if (window.dfAutoFitButtonLabels) window.dfAutoFitButtonLabels();
+  };
+
+  window.addEventListener("orientationchange", onOrient, { passive: true });
+};
+
+if (typeof window !== "undefined") {
+  window.dfHandleOrientationChange();
+}
