@@ -40130,3 +40130,35 @@ window.dfExportDeckToTSV = function(cardsList) {
     return (c.front || "") + "\t" + (c.back || "") + (tags ? "\t" + tags : "");
   }).join("\n");
 };
+
+/* ==========================================================
+   DEEP FOCUS: HIERARCHICAL SUB-DECKS & TAG TAXONOMY ENGINE
+   Standard double-colon namespace hierarchy (Parent::Child::Topic)
+   ========================================================== */
+window.dfParseDeckHierarchy = function(deckName) {
+  if (!deckName) return { root: "Default", path: ["Default"], depth: 1 };
+  const parts = deckName.split("::").map(p => p.trim()).filter(Boolean);
+  return {
+    root: parts[0] || "Default",
+    leaf: parts[parts.length - 1],
+    path: parts,
+    depth: parts.length
+  };
+};
+
+window.dfFilterCardsByTag = function(cardsList, targetTag) {
+  if (!Array.isArray(cardsList) || !targetTag) return cardsList;
+  const tagLower = targetTag.toLowerCase();
+  return cardsList.filter(c => {
+    return Array.isArray(c.tags) && c.tags.some(t => t.toLowerCase() === tagLower);
+  });
+};
+
+window.dfExtractAllDeckTags = function(cardsList) {
+  if (!Array.isArray(cardsList)) return [];
+  const tagSet = new Set();
+  cardsList.forEach(c => {
+    if (Array.isArray(c.tags)) c.tags.forEach(t => tagSet.add(t));
+  });
+  return Array.from(tagSet).sort();
+};
