@@ -42794,3 +42794,24 @@ window.dfCreateRiverCavitationFilter = function(ctx) {
   }
   return filter;
 };
+
+/* ==========================================================
+   DEEP FOCUS: OCEAN TIDAL SURGE & BREATHING ENVELOPE DSP
+   Non-linear 10-second sinusoidal swell emulating rolling ocean waves
+   ========================================================== */
+window.dfApplyOceanSwellEnvelope = function(ctx, gainNode) {
+  if (!ctx || !gainNode || !ctx.createOscillator) return;
+  const lfo = ctx.createOscillator();
+  const lfoDepth = ctx.createGain();
+
+  // 0.1Hz = exactly 10-second wave cycle (natural deep breathing rhythm)
+  lfo.frequency.setValueAtTime(0.1, ctx.currentTime);
+  lfoDepth.gain.setValueAtTime(0.035, ctx.currentTime);
+
+  lfo.connect(lfoDepth);
+  lfoDepth.connect(gainNode.gain);
+  lfo.start(0);
+
+  if (window.DF_ACTIVE_AUDIO_NODES) window.DF_ACTIVE_AUDIO_NODES.push(lfo, lfoDepth);
+  console.log("[DSP OCEAN] 10-second rhythmic tidal surge active.");
+};
