@@ -43750,3 +43750,30 @@ window.dfAnimateSpring = function(targetElement, startVal, endVal, onUpdate, onC
   };
   requestAnimationFrame(step);
 };
+
+/* ==========================================================
+   DEEP FOCUS: SYNCHRONIZED CIRCADIAN BREATHING PULSE (0.1Hz)
+   Harmonizes visual halo with human parasympathetic relaxation rhythm
+   ========================================================== */
+window.dfStartSynchronizedBreathingPulse = function(ringElement) {
+  if (!ringElement || typeof document === "undefined") return;
+  const styleId = "df-breathing-pulse-style";
+  if (!document.getElementById(styleId)) {
+    const styleEl = document.createElement("style");
+    styleEl.id = styleId;
+    styleEl.textContent = `
+      @keyframes dfBreathingHalo {
+        0% { transform: scale(1.0); opacity: 0.35; }
+        40% { transform: scale(1.035); opacity: 0.85; } /* 4s Inhale */
+        100% { transform: scale(1.0); opacity: 0.35; }  /* 6s Exhale */
+      }
+      .df-breathing-active {
+        animation: dfBreathingHalo 10s ease-in-out infinite !important;
+        will-change: transform, opacity;
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+  ringElement.classList.add("df-breathing-active");
+  console.log("[ZEN AESTHETICS] 10-second circadian breathing pulse engaged.");
+};
