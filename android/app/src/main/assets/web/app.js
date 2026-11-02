@@ -42187,3 +42187,21 @@ window.dfPlayTransientAnimation = function(element, keyframes, options) {
   };
   return anim;
 };
+
+/* ==========================================================
+   DEEP FOCUS: TYPED ARRAY BUFFER POOLING & ZERO-ALLOCATION DSP
+   Re-uses pre-allocated Float32Array instances across audio generations
+   ========================================================== */
+window.DF_STATIC_AUDIO_BUFFER_POOL = {};
+
+window.dfGetOrCreateAudioBuffer = function(ctx, type, durationSeconds) {
+  const dur = durationSeconds || 2;
+  const key = type + "_" + dur;
+  if (!window.DF_STATIC_AUDIO_BUFFER_POOL[key] && ctx) {
+    const bufferSize = ctx.sampleRate * dur;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    window.DF_STATIC_AUDIO_BUFFER_POOL[key] = buffer;
+    console.log("[AUDIO POOL] Created reusable static sound buffer:", key);
+  }
+  return window.DF_STATIC_AUDIO_BUFFER_POOL[key];
+};
