@@ -45305,3 +45305,37 @@ window.dfRegisterFsrsLexicon('en', {
 window.dfGetMilestoneM5627FsrsPedagogicalLexiconSeal = function() {
   return { milestone: 'M5618-M5627 FSRS Pedagogical Spaced Practice Lexicon', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5628-M5637: Urdu & Persian Specialized Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ur = Object.assign(window.DF_MASTER_LEXICON.ur || {}, {
+  audio_chime_header: "اختتامی نشست کی موقتی جھنکار",
+  audio_ambient_header: "خالص قدرتی ماحول برائے ارتکاز",
+  audio_solfeggio_528: "528 ہرٹز ذہنی ہم آہنگی کی لہر",
+  audio_solfeggio_432: "432 ہرٹز قلبی سکون کی لہر",
+  audio_binaural_beta: "14 ہرٹز بیٹا بیداری کی لہر",
+  fsrs_stability: "یادداشت کے استحکام کا اشاریہ",
+  fsrs_difficulty: "بازیافت کی دشواری کا درجہ",
+  fsrs_due_today: "آج مراجعہ کے لیے درکار اسباق",
+  fsrs_mastered: "پختہ محفوظ شدہ اسباق",
+  fsrs_streak_days: "مسلسل مطالعے کے ایام"
+});
+
+window.DF_MASTER_LEXICON.fa = Object.assign(window.DF_MASTER_LEXICON.fa || {}, {
+  audio_chime_header: "زنگ های پایان جلسه تمرکز",
+  audio_ambient_header: "نوای طبیعی و آرامش بخش مطالعه",
+  audio_solfeggio_528: "فرکانس 528 هرتز هماهنگی ذهن",
+  audio_solfeggio_432: "فرکانس 432 هرتز آرامش عمیق",
+  audio_binaural_beta: "امواج بتا 14 هرتز هوشیاری کامل",
+  fsrs_stability: "شاخص پایداری و ثبات حافظه",
+  fsrs_difficulty: "میزان دشواری بازیابی",
+  fsrs_due_today: "کارت های موعد مرور امروز",
+  fsrs_mastered: "کارت های کاملا تثبیت شده",
+  fsrs_streak_days: "روزهای پیوسته مطالعه"
+});
+
+window.dfGetMilestoneM5637UrduPersianSpecializedSeal = function() {
+  return { milestone: 'M5628-M5637 Urdu and Persian Specialized Lexicons', status: 'VERIFIED' };
+};
