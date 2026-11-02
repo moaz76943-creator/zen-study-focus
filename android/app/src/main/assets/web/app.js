@@ -40236,3 +40236,44 @@ window.dfGenerateYearlyHeatmapSVG = function(sessionsList) {
   svg += '</svg>';
   return svg;
 };
+
+/* ==========================================================
+   DEEP FOCUS: CHRONOTYPE & PEAK FOCUS HOURS DETECTOR
+   Discovers peak mental productivity windows across 24 hourly buckets
+   ========================================================== */
+window.dfDetectPeakFocusHours = function(sessionsList) {
+  const sessions = Array.isArray(sessionsList) ? sessionsList : [];
+  const hourBuckets = new Array(24).fill(0);
+
+  sessions.forEach(s => {
+    if (s.timestamp) {
+      const hour = new Date(s.timestamp).getHours();
+      hourBuckets[hour] += (s.durationMinutes || Math.floor((s.durationSeconds || 0) / 60));
+    }
+  });
+
+  let maxMinutes = 0;
+  let peakHour = 9; // Default 09:00 AM
+  hourBuckets.forEach((mins, h) => {
+    if (mins > maxMinutes) {
+      maxMinutes = mins;
+      peakHour = h;
+    }
+  });
+
+  const formatHour = (h) => (h < 10 ? "0" + h : "" + h) + ":00";
+  const peakWindow = formatHour(peakHour) + " - " + formatHour((peakHour + 2) % 24);
+
+  let chronotype = "BALANCED";
+  if (peakHour >= 5 && peakHour < 12) chronotype = "EARLY_BIRD";
+  else if (peakHour >= 12 && peakHour < 18) chronotype = "AFTERNOON_FOCUSED";
+  else if (peakHour >= 18 || peakHour < 5) chronotype = "NIGHT_OWL";
+
+  return {
+    peakHour: peakHour,
+    peakWindow: peakWindow,
+    chronotype: chronotype,
+    peakMinutesTotal: maxMinutes,
+    hourlyDistribution: hourBuckets
+  };
+};
