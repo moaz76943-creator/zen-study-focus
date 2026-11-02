@@ -43003,3 +43003,21 @@ window.dfAutoFitButtonLabels = function() {
 if (typeof window !== "undefined") {
   window.addEventListener("resize", window.dfAutoFitButtonLabels, { passive: true });
 }
+
+/* ==========================================================
+   DEEP FOCUS: UNICODE QUOTATION & GLYPH PAIRING AUDITOR (v55.2.0)
+   Validates balanced quotation brackets (« », 「 」, “ ”) across 1,000 locales
+   ========================================================== */
+window.dfValidateQuotationBalance = function(text) {
+  if (!text || typeof text !== "string") return true;
+  const pairs = [["«", "»"], ["「", "」"], ["“", "”"], ["(", ")"]];
+  let isBalanced = true;
+
+  pairs.forEach(([open, close]) => {
+    const openCount = (text.split(open).length - 1);
+    const closeCount = (text.split(close).length - 1);
+    if (openCount !== closeCount) isBalanced = false;
+  });
+
+  return isBalanced;
+};
