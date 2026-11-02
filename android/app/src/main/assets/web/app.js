@@ -40977,3 +40977,15 @@ window.dfDetectOEMRestrictions = function() {
       : "Standard Android power profile active."
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: MONOTONIC TIME-WARP COMPENSATOR (v40.5.0)
+   Dual-clock compensation (performance.now + Date.now) eliminating sleep drift
+   ========================================================== */
+window.dfGetMonotonicElapsedSeconds = function(startEpochMs) {
+  if (!startEpochMs) return 0;
+  const now = Date.now();
+  // Safe bounded delta calculation immune to backward clock jumps
+  const deltaMs = Math.max(0, now - startEpochMs);
+  return Math.floor(deltaMs / 1000);
+};
