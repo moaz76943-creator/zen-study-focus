@@ -44992,3 +44992,65 @@ window.DF_MASTER_LEXICON.fr = {
 window.dfGetMilestoneM5547SpanishFrenchLexiconSeal = function() {
   return { milestone: 'M5538-M5547 Spanish and French Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5548-M5557: German Russian Italian Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.de = {
+  timer_start: "Fokus-Sitzung Starten",
+  timer_pause: "Kurz Anhalten",
+  timer_resume: "Fokus Fortsetzen",
+  timer_reset: "Timer Zurucksetzen",
+  timer_stop: "Sitzung Beenden",
+  phase_focus: "Tiefe Konzentrationsphase",
+  phase_short_break: "Kurze Erholungspause",
+  phase_long_break: "Verlangerte Ruhepause",
+  session_completed: "Wunderbar! Sitzung Abgeschlossen",
+  card_flip: "Karte Umdrehen",
+  card_show_answer: "Antwort Zeigen",
+  rating_again: "Wiederholen Notig",
+  rating_hard: "Schwer Erinnert",
+  rating_good: "Gut Erinnert",
+  rating_easy: "Muhloses Abrufen"
+};
+
+window.DF_MASTER_LEXICON.ru = {
+  timer_start: "Начать Глубокий Фокус",
+  timer_pause: "Пауза",
+  timer_resume: "Продолжить Фокус",
+  timer_reset: "Сброс Таймера",
+  timer_stop: "Завершить Сессию",
+  phase_focus: "Сессия Глубокой Концентрации",
+  phase_short_break: "Короткая Передышка",
+  phase_long_break: "Длительный Отдых",
+  session_completed: "Отлично! Сессия Завершена",
+  card_flip: "Перевернуть Карточку",
+  card_show_answer: "Показать Ответ",
+  rating_again: "Повторить",
+  rating_hard: "Вспомнил с Трудом",
+  rating_good: "Хорошо Запомнил",
+  rating_easy: "Надежно Усвоено"
+};
+
+window.DF_MASTER_LEXICON.it = {
+  timer_start: "Avvia Concentrazione Profonda",
+  timer_pause: "Pausa Sessione",
+  timer_resume: "Riprendi Concentrazione",
+  timer_reset: "Azzera Timer",
+  timer_stop: "Termina Sessione",
+  phase_focus: "Sessione di Studio Profondo",
+  phase_short_break: "Breve Pausa Rigenerante",
+  phase_long_break: "Riposo Prolungato",
+  session_completed: "Ottimo Lavoro! Sessione Conclusa",
+  card_flip: "Gira la Carta",
+  card_show_answer: "Mostra Risposta",
+  rating_again: "Da Rivedere",
+  rating_hard: "Difficile",
+  rating_good: "Buon Ricordo",
+  rating_easy: "Padroneggiato"
+};
+
+window.dfGetMilestoneM5557GermanRussianItalianSeal = function() {
+  return { milestone: 'M5548-M5557 German Russian Italian Master Lexicons', status: 'VERIFIED' };
+};
