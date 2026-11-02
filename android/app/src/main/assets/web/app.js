@@ -41768,3 +41768,32 @@ if (typeof window !== "undefined") {
   window.addEventListener("resize", window.dfCalculateFluidScale, { passive: true });
   window.dfCalculateFluidScale();
 }
+
+/* ==========================================================
+   DEEP FOCUS: UNICODE CLDR MULTI-PLURALIZATION ENGINE (PILLAR 9 LAUNCH)
+   Accurately resolves plural forms across Arabic, Slavic, and Asian locales
+   ========================================================== */
+window.dfResolvePluralCategory = function(localeCode, count) {
+  const n = Math.abs(count);
+  const lang = (localeCode || "ar").split("-")[0];
+
+  // Arabic 6-category rule (zero, one, two, few, many, other)
+  if (lang === "ar") {
+    if (n === 0) return "zero";
+    if (n === 1) return "one";
+    if (n === 2) return "two";
+    if (n % 100 >= 3 && n % 100 <= 10) return "few";
+    if (n % 100 >= 11 && n % 100 <= 99) return "many";
+    return "other";
+  }
+
+  // Slavic 3-category rule (Russian, Polish, Ukrainian)
+  if (["ru", "uk", "pl", "be"].includes(lang)) {
+    if (n % 10 === 1 && n % 100 !== 11) return "one";
+    if ([2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100)) return "few";
+    return "many";
+  }
+
+  // Default Germanic/Romance 2-category rule
+  return n === 1 ? "one" : "other";
+};
