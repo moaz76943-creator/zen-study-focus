@@ -37115,6 +37115,10 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    kvd: { name: "Kui Alor", focus: "Mane", rest: "Pala", start: "Toka", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    kem: { name: "Kemak", focus: "Noin", rest: "Dada", start: "Hahu", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    abf: { name: "Abui", focus: "Nehen", rest: "Pakang", start: "Tahai", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    mqy: { name: "Manggarai", focus: "Nuk", rest: "Hami", start: "Puung", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     hvn: { name: "Hawu Savu", focus: "Henge", rest: "Made", start: "Pekadhu", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     mkn: { name: "Kupang Malay", focus: "Pikir", rest: "Barenti", start: "Mulai", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     bdr: { name: "West Coast Bajau", focus: "Pikilan", rest: "Ngena", start: "Timpun", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38617,3 +38621,5 @@ if (typeof window !== 'undefined') window.dfGetMilestoneVersion3020AuditSeal = f
 function dfGetMilestoneVersion3210AuditSeal() { return { milestone: "M3070", release: "v32.1.0", versionCode: 2890, date: new Date().toISOString(), polyglotLangs: 817, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3220AuditSeal() { return { milestone: "M3080", release: "v32.2.0", versionCode: 2900, date: new Date().toISOString(), polyglotLangs: 822, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3230AuditSeal() { return { milestone: "M3090", release: "v32.3.0", versionCode: 2910, date: new Date().toISOString(), polyglotLangs: 827, dspCertified: true, zeroPii: true }; }
