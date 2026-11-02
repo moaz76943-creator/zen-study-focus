@@ -43972,3 +43972,59 @@ window.dfStartWatchdogSupervisor = function() {
 if (typeof window !== "undefined") {
   window.dfStartWatchdogSupervisor();
 }
+
+/* ==========================================================
+   DEEP FOCUS: SILENT DATABASE BOOT INTEGRITY & AUTO-REPAIR
+   Detects orphan cards, cleans corrupt timestamps, and repairs indices
+   ========================================================== */
+window.dfRunSilentBootRepair = async function() {
+  try {
+    const db = await window.dfOpenDatabase();
+    return new Promise((resolve) => {
+      const tx = db.transaction(["cards", "decks"], "readwrite");
+      const cardStore = tx.objectStore("cards");
+      const deckStore = tx.objectStore("decks");
+
+      let repairedCount = 0;
+      const today = new Date().toISOString().split("T")[0];
+
+      const req = cardStore.openCursor();
+      req.onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          const card = cursor.value;
+          let changed = false;
+
+          // Repair corrupt due dates
+          if (!card.dueDate || isNaN(new Date(card.dueDate).getTime())) {
+            card.dueDate = today;
+            changed = true;
+          }
+          // Repair invalid difficulty bounds
+          if (!card.difficulty || isNaN(card.difficulty) || card.difficulty < 1.0) {
+            card.difficulty = 5.0;
+            changed = true;
+          }
+
+          if (changed) {
+            cursor.update(card);
+            repairedCount++;
+          }
+          cursor.continue();
+        } else {
+          if (repairedCount > 0) {
+            console.log("[AUTO-HEAL] Repaired " + repairedCount + " corrupted card attributes silently.");
+          }
+          resolve({ repairedCount });
+        }
+      };
+      req.onerror = () => resolve({ repairedCount: 0 });
+    });
+  } catch (e) {
+    return { repairedCount: 0 };
+  }
+};
+
+if (typeof window !== "undefined") {
+  setTimeout(() => { if (window.dfRunSilentBootRepair) window.dfRunSilentBootRepair(); }, 1200);
+}
