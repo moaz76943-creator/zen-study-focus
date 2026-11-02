@@ -43841,3 +43841,23 @@ window.dfAnimateDigitRoll = function(digitElement, newDigitChar) {
     digitElement.style.transition = "transform 0.12s ease-out, opacity 0.12s ease-out";
   }, 60);
 };
+
+/* ==========================================================
+   DEEP FOCUS: 3D SPATIAL CARD DEPTH & TACTILE PERSPECTIVE
+   Adds physical paper tactile realism with zero GPU memory overhead
+   ========================================================== */
+window.dfApply3DCardPerspective = function(cardEl) {
+  if (!cardEl || typeof document === "undefined") return;
+  cardEl.style.perspective = "1200px";
+  cardEl.style.transformStyle = "preserve-3d";
+
+  cardEl.addEventListener("touchstart", () => {
+    cardEl.style.transform = "scale(0.985) translateZ(-8px)";
+    cardEl.style.transition = "transform 0.1s ease-out";
+  }, { passive: true });
+
+  cardEl.addEventListener("touchend", () => {
+    cardEl.style.transform = "scale(1.0) translateZ(0px)";
+    cardEl.style.transition = "transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+  }, { passive: true });
+};
