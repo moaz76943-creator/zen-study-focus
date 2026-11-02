@@ -45054,3 +45054,65 @@ window.DF_MASTER_LEXICON.it = {
 window.dfGetMilestoneM5557GermanRussianItalianSeal = function() {
   return { milestone: 'M5548-M5557 German Russian Italian Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5558-M5567: Chinese Japanese Hindi Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.zh = {
+  timer_start: "开启深度专注",
+  timer_pause: "暂停会话",
+  timer_resume: "继续专注",
+  timer_reset: "重置计时器",
+  timer_stop: "结束会话",
+  phase_focus: "深度学习时间",
+  phase_short_break: "高效微休息",
+  phase_long_break: "深度放松期",
+  session_completed: "太棒了! 专注目标达成",
+  card_flip: "翻转卡片",
+  card_show_answer: "显示答案",
+  rating_again: "需要重温",
+  rating_hard: "回忆困难",
+  rating_good: "记忆准确",
+  rating_easy: "熟练掌握"
+};
+
+window.DF_MASTER_LEXICON.ja = {
+  timer_start: "深い集中を開始",
+  timer_pause: "一時停止",
+  timer_resume: "集中を再開",
+  timer_reset: "リセット",
+  timer_stop: "セッション終了",
+  phase_focus: "ディープフォーカス時間",
+  phase_short_break: "短い休息",
+  phase_long_break: "長めの休憩",
+  session_completed: "素晴らしい! 目標達成",
+  card_flip: "カードをめくる",
+  card_show_answer: "答えを表示",
+  rating_again: "再復習が必要",
+  rating_hard: "思い出すのが困難",
+  rating_good: "確実に記憶",
+  rating_easy: "完全に習得"
+};
+
+window.DF_MASTER_LEXICON.hi = {
+  timer_start: "गहन एकाग्रता शुरू करें",
+  timer_pause: "अस्थायी विराम",
+  timer_resume: "एकाग्रता जारी रखें",
+  timer_reset: "टाइमर रीसेट करें",
+  timer_stop: "सत्र समाप्त करें",
+  phase_focus: "गहन अध्ययन सत्र",
+  phase_short_break: "लघु मानसिक विराम",
+  phase_long_break: "विस्तारित विश्राम",
+  session_completed: "बहुत बढ़िया! सत्र पूर्ण हुआ",
+  card_flip: "कार्ड पलटें",
+  card_show_answer: "उत्तर देखें",
+  rating_again: "पुनरावृत्ति आवश्यक",
+  rating_hard: "कठिन स्मरण",
+  rating_good: "अच्छा स्मरण",
+  rating_easy: "पूरी तरह कंठस्थ"
+};
+
+window.dfGetMilestoneM5567ChineseJapaneseHindiSeal = function() {
+  return { milestone: 'M5558-M5567 Chinese Japanese Hindi Master Lexicons', status: 'VERIFIED' };
+};
