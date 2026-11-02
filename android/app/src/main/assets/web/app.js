@@ -43577,3 +43577,24 @@ window.dfEstimateReviewSessionETA = function(remainingCardsCount, avgSecondsPerC
     displayETA: minutes <= 1 ? "About 1 minute" : ("~" + minutes + " minutes remaining")
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: GUESSING VS AUTHENTIC RECALL LATENCY DISCRIMINATOR
+   Guards against premature card graduation caused by rapid button spamming
+   ========================================================== */
+window.dfAuditResponseAuthenticity = function(card, rating, latencyMs) {
+  const isTooFast = latencyMs < 900; // Sub-second reflex
+  const isDifficultCard = (card.difficulty || 5.0) > 6.0;
+
+  if (isTooFast && isDifficultCard && rating >= 3) {
+    console.warn("[FSRS PSYCHOLOGY] Rapid sub-second response on difficult card. Applying dampener.");
+    return {
+      adjustedRating: 2, // Soften rating to Hard to enforce sooner re-evaluation
+      isFlaggedGuessing: true
+    };
+  }
+  return {
+    adjustedRating: rating,
+    isFlaggedGuessing: false
+  };
+};
