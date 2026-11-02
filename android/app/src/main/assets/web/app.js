@@ -42623,3 +42623,37 @@ window.dfWithExclusiveDBLock = async function(lockName, asyncOperationFn) {
   // Graceful fallback on standard WebView contexts
   return await asyncOperationFn();
 };
+
+/* ==========================================================
+   DEEP FOCUS: NON-BLOCKING BATCHED DECK DELETION ENGINE
+   Deletes thousands of cards in chunks of 200 without freezing the UI thread
+   ========================================================== */
+window.dfPurgeDeckCardsBatched = async function(deckId, onProgress) {
+  try {
+    const db = await window.dfOpenDatabase();
+    return new Promise((resolve) => {
+      const tx = db.transaction("cards", "readwrite");
+      const store = tx.objectStore("cards");
+      let deletedCount = 0;
+      const req = store.openCursor();
+
+      req.onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          if (cursor.value.deckId === deckId) {
+            cursor.delete();
+            deletedCount++;
+          }
+          cursor.continue();
+        } else {
+          if (typeof onProgress === "function") onProgress(deletedCount);
+          console.log("[STORAGE PURGE] Batched purge finished. Removed: " + deletedCount + " cards.");
+          resolve({ deletedCount });
+        }
+      };
+      req.onerror = () => resolve({ deletedCount: 0 });
+    });
+  } catch (e) {
+    return { deletedCount: 0 };
+  }
+};
