@@ -38887,3 +38887,43 @@ window.dfApplyLocaleUI = function(localeCode) {
     if (key) el.textContent = window.dfGetText(key, code);
   });
 };
+
+/* ==========================================================
+   DEEP FOCUS: ANDROID LIFECYCLE, WAKELOCK & TIME-SYNC SHIELD
+   Survives screen lock, Doze mode, and background sleep without time drift
+   ========================================================== */
+window.DF_WAKELOCK_SENTINEL = null;
+window.DF_TIMER_ANCHOR_TIMESTAMP = null;
+window.DF_TIMER_TARGET_DURATION = 0;
+
+window.dfRequestScreenWakeLock = async function() {
+  if (typeof navigator !== "undefined" && "wakeLock" in navigator) {
+    try {
+      window.DF_WAKELOCK_SENTINEL = await navigator.wakeLock.request("screen");
+      window.DF_WAKELOCK_SENTINEL.addEventListener("release", () => {
+        window.DF_WAKELOCK_SENTINEL = null;
+      });
+    } catch (e) {
+      // Graceful fallback on non-supported WebView contexts
+    }
+  }
+};
+
+window.dfReleaseScreenWakeLock = function() {
+  if (window.DF_WAKELOCK_SENTINEL) {
+    window.DF_WAKELOCK_SENTINEL.release().catch(() => {});
+    window.DF_WAKELOCK_SENTINEL = null;
+  }
+};
+
+// Auto-sync elapsed timer on visibility restoration
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && window.DF_TIMER_ANCHOR_TIMESTAMP) {
+      const elapsedSeconds = Math.floor((Date.now() - window.DF_TIMER_ANCHOR_TIMESTAMP) / 1000);
+      if (typeof window.dfOnTimeResynced === "function") {
+        window.dfOnTimeResynced(elapsedSeconds);
+      }
+    }
+  });
+}
