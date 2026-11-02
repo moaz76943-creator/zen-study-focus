@@ -37115,6 +37115,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    mns: { name: "Mansi", focus: "Nomt", rest: "Unyil", start: "Patykes", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     nio: { name: "Nganasan", focus: "Manya", rest: "Khotu", start: "Tanyso", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     sjd: { name: "Kildin Sami", focus: "Ushke", rest: "Voyyke", start: "Alke", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     enf: { name: "Forest Enets", focus: "Moda", rest: "Kasa", start: "Toba", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38681,3 +38682,5 @@ function dfGetMilestoneVersion3320AuditSeal() { return { milestone: "M3180", rel
 function dfGetMilestoneVersion3330AuditSeal() { return { milestone: "M3190", release: "v33.3.0", versionCode: 3010, date: new Date().toISOString(), polyglotLangs: 877, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3340AuditSeal() { return { milestone: "M3200", release: "v33.4.0", versionCode: 3020, date: new Date().toISOString(), polyglotLangs: 882, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3350AuditSeal() { return { milestone: "M3210", release: "v33.5.0", versionCode: 3030, date: new Date().toISOString(), polyglotLangs: 887, dspCertified: true, zeroPii: true }; }
