@@ -43422,3 +43422,32 @@ window.dfEnforcePhantomKillerImmunity = function() {
 if (typeof window !== "undefined") {
   window.dfEnforcePhantomKillerImmunity();
 }
+
+/* ==========================================================
+   DEEP FOCUS: DYNAMIC SYSTEM BAR & CAMERA CUTOUT INSET SENTINEL
+   Prevents interactive controls clipping beneath navigation bar pill
+   ========================================================== */
+window.dfNormalizeSystemInsets = function() {
+  if (typeof document === "undefined" || !document.head) return;
+  const styleId = "df-dynamic-insets-style";
+  if (document.getElementById(styleId)) return;
+
+  const insetsCSS = `
+    .df-header {
+      padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
+    }
+    .df-nav-tabs, .df-footer-controls {
+      padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
+    }
+  `;
+
+  const styleEl = document.createElement("style");
+  styleEl.id = styleId;
+  styleEl.textContent = insetsCSS;
+  document.head.appendChild(styleEl);
+  console.log("[SYSTEM] Dynamic edge-to-edge padding normalized.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfNormalizeSystemInsets();
+}
