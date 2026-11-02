@@ -37115,6 +37115,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    kdd: { name: "Yankunytjatjara", focus: "Kulinma", rest: "Ngaringi", start: "Tjulyanypa", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    aly: { name: "Alyawarr", focus: "Itelaytnh-itnh", rest: "Arlkwarlpay", start: "Alparnpenh", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    kld: { name: "Gamilaraay", focus: "Winangay", rest: "Ngarri", start: "Gii", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    dhu: { name: "Yolngu Dhuwal", focus: "Guyaŋa", rest: "Gurrkurr", start: "Nhurra", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    yij: { name: "Yindjibarndi", focus: "Kurlangka", rest: "Murla", start: "Wangka", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     gup: { name: "Bininj Kunwok", focus: "Bengkan", rest: "Munguyh", start: "Worrkikwon", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     arr: { name: "Arrernte", focus: "Itelareme", rest: "Arlkweme", start: "Ampeke", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     trv: { name: "Taroko Seediq", focus: "Knxalan", rest: "Hmutan", start: "Prngagan", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38666,3 +38671,5 @@ function dfGetMilestoneVersion3290AuditSeal() { return { milestone: "M3150", rel
 function dfGetMilestoneVersion3300GrandSeal() { return { milestone: "M3160", release: "v33.0.0", versionCode: 2980, date: new Date().toISOString(), polyglotLangs: 862, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3310AuditSeal() { return { milestone: "M3170", release: "v33.1.0", versionCode: 2990, date: new Date().toISOString(), polyglotLangs: 867, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3320AuditSeal() { return { milestone: "M3180", release: "v33.2.0", versionCode: 3000, date: new Date().toISOString(), polyglotLangs: 872, dspCertified: true, zeroPii: true }; }
