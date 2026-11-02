@@ -41387,3 +41387,31 @@ window.dfInjectHardwareAcceleration = function() {
 if (typeof window !== "undefined") {
   window.dfInjectHardwareAcceleration();
 }
+
+/* ==========================================================
+   DEEP FOCUS: LAYOUT THRASHING & FORCED REFLOW ELIMINATOR
+   Batches DOM reads before writes inside requestAnimationFrame
+   ========================================================== */
+window.DF_DOM_READ_QUEUE = [];
+window.DF_DOM_WRITE_QUEUE = [];
+window.DF_RAF_SCHEDULED = false;
+
+window.dfBatchDOMUpdate = function(readFn, writeFn) {
+  if (typeof readFn === "function") window.DF_DOM_READ_QUEUE.push(readFn);
+  if (typeof writeFn === "function") window.DF_DOM_WRITE_QUEUE.push(writeFn);
+
+  if (!window.DF_RAF_SCHEDULED && typeof requestAnimationFrame !== "undefined") {
+    window.DF_RAF_SCHEDULED = true;
+    requestAnimationFrame(() => {
+      // 1. Execute all reads first (Zero Forced Reflow)
+      while (window.DF_DOM_READ_QUEUE.length > 0) {
+        try { window.DF_DOM_READ_QUEUE.shift()(); } catch (e) {}
+      }
+      // 2. Execute all writes together
+      while (window.DF_DOM_WRITE_QUEUE.length > 0) {
+        try { window.DF_DOM_WRITE_QUEUE.shift()(); } catch (e) {}
+      }
+      window.DF_RAF_SCHEDULED = false;
+    });
+  }
+};
