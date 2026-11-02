@@ -39104,3 +39104,65 @@ window.dfCalculateNextSRS = function(card, rating) {
     dueDate: nextReviewDate.toISOString().split("T")[0]
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: PURE MATHEMATICAL WEB AUDIO NATURE SOUNDSCAPES
+   100% Procedural synthesis (Rain, River, Wind, Forest, Sea, Dew)
+   Zero audio files - Zero music - 100% Halal Procedural Sound
+   ========================================================== */
+window.DF_ACTIVE_AUDIO_NODES = [];
+
+window.dfStopAllSounds = function() {
+  window.DF_ACTIVE_AUDIO_NODES.forEach(n => {
+    try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch (e) {}
+  });
+  window.DF_ACTIVE_AUDIO_NODES = [];
+};
+
+window.dfGenerateNoiseBuffer = function(ctx, type) {
+  const bufferSize = ctx.sampleRate * 2;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let lastOut = 0.0;
+  for (let i = 0; i < bufferSize; i++) {
+    const white = Math.random() * 2 - 1;
+    if (type === "brown") {
+      data[i] = (lastOut + (0.02 * white)) / 1.02;
+      lastOut = data[i];
+      data[i] *= 3.5;
+    } else {
+      data[i] = white * 0.15;
+    }
+  }
+  return buffer;
+};
+
+window.dfPlayNatureSound = async function(soundType) {
+  window.dfStopAllSounds();
+  if (!soundType || soundType === "none") return;
+  const ctx = window.dfGetSafeAudioContext ? window.dfGetSafeAudioContext() : null;
+  if (!ctx) return;
+  if (window.dfEnsureAudioActive) await window.dfEnsureAudioActive();
+
+  const buffer = window.dfGenerateNoiseBuffer(ctx, (soundType === "river" || soundType === "wind") ? "brown" : "white");
+  const noiseSource = ctx.createBufferSource();
+  noiseSource.buffer = buffer;
+  noiseSource.loop = true;
+
+  const filter = ctx.createBiquadFilter();
+  if (soundType === "rain") { filter.type = "lowpass"; filter.frequency.value = 1000; }
+  else if (soundType === "wind") { filter.type = "bandpass"; filter.frequency.value = 350; }
+  else if (soundType === "sea") { filter.type = "lowpass"; filter.frequency.value = 450; }
+  else { filter.type = "lowpass"; filter.frequency.value = 800; }
+
+  const gain = ctx.createGain();
+  gain.gain.value = 0.05;
+
+  noiseSource.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  noiseSource.start(0);
+  window.DF_ACTIVE_AUDIO_NODES.push(noiseSource, filter, gain);
+  console.log("[DEEP FOCUS DSP] Procedural soundscape active:", soundType);
+};
