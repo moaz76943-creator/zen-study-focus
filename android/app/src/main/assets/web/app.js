@@ -40773,3 +40773,27 @@ window.dfSafePutItem = async function(storeName, key, value) {
     return true;
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: UNIFIED ASYNC DATA STORAGE API (v40.1.0)
+   Single resilient gateway for all persistent database operations
+   ========================================================== */
+window.dfDB = {
+  get: async function(storeName, key) {
+    try {
+      const db = await window.dfOpenDatabase();
+      return new Promise((resolve) => {
+        const tx = db.transaction(storeName, "readonly");
+        const store = tx.objectStore(storeName);
+        const req = store.get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(window.DF_MEMORY_DATA_STORES[storeName] ? window.DF_MEMORY_DATA_STORES[storeName][key] : null);
+      });
+    } catch (e) {
+      return window.DF_MEMORY_DATA_STORES[storeName] ? window.DF_MEMORY_DATA_STORES[storeName][key] : null;
+    }
+  },
+  set: async function(storeName, key, value) {
+    return window.dfSafePutItem(storeName, key, value);
+  }
+};
