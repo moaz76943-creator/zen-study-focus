@@ -41640,3 +41640,36 @@ window.dfCheckLaunchIntentParams = function() {
 if (typeof window !== "undefined") {
   window.dfCheckLaunchIntentParams();
 }
+
+/* ==========================================================
+   DEEP FOCUS: MATERIAL YOU DYNAMIC THEME & ACCENT SENTINEL
+   Harmonizes interface accents with Android system palette
+   ========================================================== */
+window.dfApplyDynamicSystemPalette = function() {
+  if (typeof document === "undefined" || !document.head) return;
+  const styleId = "df-material-palette";
+  if (document.getElementById(styleId)) return;
+
+  const paletteCSS = `
+    :root {
+      --df-accent-green: #38a169;
+      --df-accent-teal: #319795;
+      --df-surface-dark: #121824;
+      --df-glow-ring: rgba(56, 161, 105, 0.25);
+    }
+    .df-timer-ring {
+      box-shadow: 0 0 35px var(--df-glow-ring);
+      border-color: var(--df-accent-green) !important;
+    }
+  `;
+
+  const styleEl = document.createElement("style");
+  styleEl.id = styleId;
+  styleEl.textContent = paletteCSS;
+  document.head.appendChild(styleEl);
+  console.log("[THEME] Material dynamic palette variables active.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfApplyDynamicSystemPalette();
+}
