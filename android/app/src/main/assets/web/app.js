@@ -40060,3 +40060,27 @@ window.dfGetSafeMasterDestination = function(ctx) {
   }
   return window.DF_MASTER_COMPRESSOR;
 };
+
+/* ==========================================================
+   DEEP FOCUS: SMOOTH CROSSFADE & END-OF-SESSION FADE-OUT SENTINEL
+   Eliminates jarring sound cuts with 2.5s exponential audio crossfade
+   ========================================================== */
+window.dfCrossfadeToSound = async function(newSoundType, fadeDurationSec) {
+  const duration = fadeDurationSec || 2.0;
+  const ctx = window.dfGetSafeAudioContext ? window.dfGetSafeAudioContext() : null;
+  
+  if (window.DF_ACTIVE_AUDIO_NODES && window.DF_ACTIVE_AUDIO_NODES.length > 0 && ctx) {
+    const gainNode = window.DF_ACTIVE_AUDIO_NODES.find(n => n instanceof GainNode);
+    if (gainNode && gainNode.gain) {
+      gainNode.gain.cancelScheduledValues(ctx.currentTime);
+      gainNode.gain.setValueAtTime(gainNode.gain.value, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+      setTimeout(() => {
+        window.dfStopAllSounds();
+        if (newSoundType && newSoundType !== "none") window.dfPlayNatureSound(newSoundType);
+      }, duration * 1000);
+      return;
+    }
+  }
+  if (newSoundType && newSoundType !== "none") window.dfPlayNatureSound(newSoundType);
+};
