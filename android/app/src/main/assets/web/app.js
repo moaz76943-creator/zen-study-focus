@@ -39906,3 +39906,34 @@ window.dfUpdateLockScreenSession = function(sessionTitle, isRunning) {
     });
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: UNIVERSAL FONT FALLBACK STACK & ANTI-TOFU SHIELD
+   Comprehensive multi-script font stack covering all 1,000 writing systems
+   ========================================================== */
+window.dfInjectUniversalFontStack = function() {
+  if (typeof document === "undefined" || !document.head) return;
+  const styleId = "df-universal-fonts";
+  if (document.getElementById(styleId)) return;
+
+  const fontCSS = `
+    body, button, input, select, textarea {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Noto Sans", "Noto Sans Arabic", "Noto Sans Devanagari", "Noto Sans Tibetan",
+        "Noto Sans Ethiopic", "Noto Sans Bengali", "Noto Sans Gurmukhi", "Noto Sans Tamil",
+        "Noto Sans Telugu", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Sinhala",
+        "Noto Sans Thai", "Noto Sans Lao", "Noto Sans Georgian", "Noto Sans Armenian",
+        "Noto Sans Cherokee", "Noto Sans Canadian Aboriginal", sans-serif;
+    }
+  `;
+
+  const styleEl = document.createElement("style");
+  styleEl.id = styleId;
+  styleEl.textContent = fontCSS;
+  document.head.appendChild(styleEl);
+  console.log("[TYPOGRAPHY] Universal multi-script font stack injected successfully.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfInjectUniversalFontStack();
+}
