@@ -39678,3 +39678,51 @@ window.dfPlaySessionCompletionChime = async function() {
     await prevCompletionChime();
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: FOCUS QUALITY INDEX (FQI) & FLOW STATE SENTINEL
+   Calculates session purity and rewards uninterrupted concentration
+   ========================================================== */
+window.DF_CURRENT_SESSION_METRICS = {
+  pauseCount: 0,
+  activeSeconds: 0,
+  totalElapsedSeconds: 0,
+  longestUnbrokenStreakSeconds: 0,
+  currentStreakSeconds: 0
+};
+
+window.dfRecordSessionPause = function() {
+  window.DF_CURRENT_SESSION_METRICS.pauseCount++;
+  window.DF_CURRENT_SESSION_METRICS.currentStreakSeconds = 0;
+};
+
+window.dfRecordSessionSecond = function() {
+  window.DF_CURRENT_SESSION_METRICS.activeSeconds++;
+  window.DF_CURRENT_SESSION_METRICS.currentStreakSeconds++;
+  if (window.DF_CURRENT_SESSION_METRICS.currentStreakSeconds > window.DF_CURRENT_SESSION_METRICS.longestUnbrokenStreakSeconds) {
+    window.DF_CURRENT_SESSION_METRICS.longestUnbrokenStreakSeconds = window.DF_CURRENT_SESSION_METRICS.currentStreakSeconds;
+  }
+};
+
+window.dfCalculateSessionFQI = function() {
+  const m = window.DF_CURRENT_SESSION_METRICS;
+  const target = window.DF_TIMER_TARGET_DURATION || (25 * 60);
+  if (m.activeSeconds === 0) return { fqiScore: 100, flowTier: "PRISTINE" };
+
+  // Penalty: -4% per pause (max penalty 30%)
+  const pausePenalty = Math.min(30, m.pauseCount * 4);
+  const timeRatio = Math.min(1, m.activeSeconds / target);
+  const rawScore = Math.round((timeRatio * 100) - pausePenalty);
+  const fqiScore = Math.max(10, Math.min(100, rawScore));
+
+  let flowTier = "DEEP_FLOW";
+  if (fqiScore < 60) flowTier = "FRAGMENTED";
+  else if (fqiScore < 85) flowTier = "STEADY";
+
+  return {
+    fqiScore: fqiScore,
+    flowTier: flowTier,
+    pauseCount: m.pauseCount,
+    longestUnbrokenMinutes: Math.round(m.longestUnbrokenStreakSeconds / 60)
+  };
+};
