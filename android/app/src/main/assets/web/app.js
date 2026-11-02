@@ -42751,3 +42751,21 @@ if (typeof window !== "undefined") {
     ctx.addEventListener("statechange", window.dfHandleBluetoothCodecSwitch);
   }
 }
+
+/* ==========================================================
+   DEEP FOCUS: STOCHASTIC RAIN DROPLET & WIND TURBULENCE DSP (v54.1.0)
+   Non-periodic Poisson statistical distribution of natural water micro-impulses
+   ========================================================== */
+window.dfInjectDropletImpulses = function(channelData, dropletRatePerSec, sampleRate) {
+  const totalSamples = channelData.length;
+  const numDroplets = Math.floor(dropletRatePerSec * (totalSamples / sampleRate));
+
+  for (let d = 0; d < numDroplets; d++) {
+    const idx = Math.floor(Math.random() * (totalSamples - 256));
+    const intensity = 0.08 * (Math.random() * 0.5 + 0.5);
+    // Micro-exponential drop impulse
+    for (let k = 0; k < 64; k++) {
+      channelData[idx + k] += intensity * Math.exp(-k / 8) * (Math.random() * 2 - 1);
+    }
+  }
+};
