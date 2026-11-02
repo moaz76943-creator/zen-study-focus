@@ -43021,3 +43021,18 @@ window.dfValidateQuotationBalance = function(text) {
 
   return isBalanced;
 };
+
+/* ==========================================================
+   DEEP FOCUS: CONTINUOUS SCRIPT ZERO-WIDTH WRAPPER (KHMER/THAI)
+   Injects boundary break hints (\u200B) preventing mid-syllable word severance
+   ========================================================== */
+window.DF_SPACELESS_SCRIPTS_LOCALES = ["khm", "tha", "lao", "mya"];
+
+window.dfSegmentContinuousScript = function(text, localeCode) {
+  if (!text || typeof text !== "string") return "";
+  const code = localeCode || window.DF_CURRENT_LOCALE || "";
+  if (!window.DF_SPACELESS_SCRIPTS_LOCALES.includes(code)) return text;
+  
+  // Safe zero-width space injection allowing natural browser line breaks
+  return text.replace(/([\u1780-\u17FF\u0E00-\u0E7F])/g, "$1\u200B");
+};
