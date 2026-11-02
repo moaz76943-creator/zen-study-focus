@@ -39876,3 +39876,33 @@ window.dfInitHeadsetDisconnectGuard = function() {
 if (typeof window !== "undefined") {
   window.dfInitHeadsetDisconnectGuard();
 }
+
+/* ==========================================================
+   DEEP FOCUS: ANDROID LOCK-SCREEN MEDIA SESSION CONTROLLER
+   Native lock-screen controls for play/pause without unlocking phone
+   ========================================================== */
+window.dfUpdateLockScreenSession = function(sessionTitle, isRunning) {
+  if (typeof navigator !== "undefined" && "mediaSession" in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: sessionTitle || "Deep Focus Session",
+      artist: "Deep Focus (Zen Study)",
+      album: "1,000 Living Languages Edition"
+    });
+
+    navigator.mediaSession.playbackState = isRunning ? "playing" : "paused";
+
+    navigator.mediaSession.setActionHandler("play", () => {
+      const toggleBtn = document.getElementById("df-timer-toggle") || document.querySelector("[data-action='toggle']");
+      if (toggleBtn) toggleBtn.click();
+    });
+
+    navigator.mediaSession.setActionHandler("pause", () => {
+      const toggleBtn = document.getElementById("df-timer-toggle") || document.querySelector("[data-action='toggle']");
+      if (toggleBtn) toggleBtn.click();
+    });
+
+    navigator.mediaSession.setActionHandler("stop", () => {
+      if (window.dfStopThrottledTimer) window.dfStopThrottledTimer();
+    });
+  }
+};
