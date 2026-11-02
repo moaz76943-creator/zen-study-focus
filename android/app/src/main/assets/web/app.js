@@ -41578,3 +41578,19 @@ window.dfGetSoundscapeEffectiveness = function(sessionsList) {
     breakdown: soundStats
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: 20-20-20 EYE STRAIN RELIEVER & MICRO-STRETCH PROMPTER
+   Gentle health guidance during break intervals to protect vision
+   ========================================================== */
+window.DF_HEALTH_PROMPTS = [
+  "Look at an object 20 feet (6 meters) away for 20 seconds to relax ciliary eye muscles.",
+  "Gently roll your shoulders backward 5 times to release trapezius tension.",
+  "Take three deep diaphragmatic breaths through your nose to oxygenate the brain.",
+  "Hydrate with a glass of water before starting your next focus block."
+];
+
+window.dfGetBreakHealthTip = function() {
+  const index = Math.floor(Math.random() * window.DF_HEALTH_PROMPTS.length);
+  return window.DF_HEALTH_PROMPTS[index];
+};
