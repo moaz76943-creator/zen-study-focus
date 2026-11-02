@@ -39420,3 +39420,39 @@ window.dfInitKeyboardShortcuts = function() {
 if (typeof window !== "undefined") {
   window.dfInitKeyboardShortcuts();
 }
+
+/* ==========================================================
+   DEEP FOCUS: FISHER-YATES WEIGHTED DAILY SRS QUEUE SHUFFLER
+   Prevents positional card memorization and optimizes recall
+   ========================================================== */
+window.dfBuildDailyReviewQueue = function(cardsList) {
+  if (!Array.isArray(cardsList) || cardsList.length === 0) return [];
+  const todayStr = new Date().toISOString().split("T")[0];
+
+  const dueCards = [];
+  const newCards = [];
+  const futureCards = [];
+
+  cardsList.forEach(card => {
+    if (!card.dueDate || card.reps === 0) {
+      newCards.push(card);
+    } else if (card.dueDate <= todayStr) {
+      dueCards.push(card);
+    } else {
+      futureCards.push(card);
+    }
+  });
+
+  // Fisher-Yates pure mathematical shuffle
+  const shuffle = (array) => {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+
+  // Priority queue: Due reviews first, followed by new cards
+  return [...shuffle(dueCards), ...shuffle(newCards)];
+};
