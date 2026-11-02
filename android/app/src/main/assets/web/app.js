@@ -39974,3 +39974,33 @@ window.dfApplyLocaleUI = function(code) {
   if (typeof prevBidiApply === "function") prevBidiApply(code);
   window.dfNormalizeScriptTypography(code);
 };
+
+/* ==========================================================
+   DEEP FOCUS: AGGLUTINATIVE WORD-BREAK & OVERFLOW SENTINEL
+   Prevents layout clipping for 30+ character compound words
+   ========================================================== */
+window.dfInjectWordBreakRules = function() {
+  if (typeof document === "undefined" || !document.head) return;
+  const styleId = "df-word-break-rules";
+  if (document.getElementById(styleId)) return;
+
+  const breakCSS = `
+    .df-btn, button, .df-badge, .df-header-title, [data-i18n] {
+      word-break: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      max-width: 100%;
+    }
+  `;
+
+  const styleEl = document.createElement("style");
+  styleEl.id = styleId;
+  styleEl.textContent = breakCSS;
+  document.head.appendChild(styleEl);
+  console.log("[TYPOGRAPHY] Agglutinative word-break rules applied.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfInjectWordBreakRules();
+}
