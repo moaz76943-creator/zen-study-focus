@@ -39166,3 +39166,42 @@ window.dfPlayNatureSound = async function(soundType) {
   window.DF_ACTIVE_AUDIO_NODES.push(noiseSource, filter, gain);
   console.log("[DEEP FOCUS DSP] Procedural soundscape active:", soundType);
 };
+
+/* ==========================================================
+   DEEP FOCUS: BATTERY SAVER & 1Hz THROTTLED RENDER SENTINEL
+   Prevents CPU heating and battery drain during multi-hour focus sessions
+   ========================================================== */
+window.DF_TICK_INTERVAL_REF = null;
+
+window.dfStartThrottledTimer = function(durationSeconds, onTickCallback, onCompleteCallback) {
+  if (window.DF_TICK_INTERVAL_REF) clearInterval(window.DF_TICK_INTERVAL_REF);
+  
+  window.DF_TIMER_ANCHOR_TIMESTAMP = Date.now();
+  window.DF_TIMER_TARGET_DURATION = durationSeconds;
+  if (window.dfRequestScreenWakeLock) window.dfRequestScreenWakeLock();
+
+  // Exactly 1Hz tick interval - eliminates CPU frame thrashing
+  window.DF_TICK_INTERVAL_REF = setInterval(() => {
+    const elapsedSeconds = Math.floor((Date.now() - window.DF_TIMER_ANCHOR_TIMESTAMP) / 1000);
+    const remainingSeconds = Math.max(0, window.DF_TIMER_TARGET_DURATION - elapsedSeconds);
+
+    if (typeof onTickCallback === "function") {
+      onTickCallback(remainingSeconds, elapsedSeconds);
+    }
+
+    if (remainingSeconds <= 0) {
+      clearInterval(window.DF_TICK_INTERVAL_REF);
+      window.DF_TICK_INTERVAL_REF = null;
+      if (window.dfReleaseScreenWakeLock) window.dfReleaseScreenWakeLock();
+      if (typeof onCompleteCallback === "function") onCompleteCallback();
+    }
+  }, 1000);
+};
+
+window.dfStopThrottledTimer = function() {
+  if (window.DF_TICK_INTERVAL_REF) {
+    clearInterval(window.DF_TICK_INTERVAL_REF);
+    window.DF_TICK_INTERVAL_REF = null;
+  }
+  if (window.dfReleaseScreenWakeLock) window.dfReleaseScreenWakeLock();
+};
