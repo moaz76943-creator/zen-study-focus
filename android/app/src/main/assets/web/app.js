@@ -37115,6 +37115,10 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    gin: { name: "Hinukh", focus: "Fikru", rest: "Isho", start: "Bekora", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    kap: { name: "Bezhta", focus: "Fikir", rest: "Ashin", start: "Bakur", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    ddo: { name: "Tsez Dido", focus: "Fikru", rest: "Eshe", start: "Bikora", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    ani: { name: "Andi", focus: "Pikru", rest: "Usshe", start: "Bechura", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     tin: { name: "Tindi", focus: "Pikru", rest: "Sohar", start: "Kikize", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     bph: { name: "Botlikh", focus: "Pikru", rest: "Sohar", start: "Baybikize", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     mhr: { name: "Meadow Mari", focus: "Shonysh", rest: "Kano", start: "Tymash", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38703,3 +38707,5 @@ function dfGetMilestoneVersion3390AuditSeal() { return { milestone: "M3250", rel
 function dfGetMilestoneVersion3400GrandSeal() { return { milestone: "M3260", release: "v34.0.0", versionCode: 3080, date: new Date().toISOString(), polyglotLangs: 912, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3410AuditSeal() { return { milestone: "M3270", release: "v34.1.0", versionCode: 3090, date: new Date().toISOString(), polyglotLangs: 917, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3420AuditSeal() { return { milestone: "M3280", release: "v34.2.0", versionCode: 3100, date: new Date().toISOString(), polyglotLangs: 922, dspCertified: true, zeroPii: true }; }
