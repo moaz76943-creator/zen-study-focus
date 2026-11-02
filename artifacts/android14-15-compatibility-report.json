@@ -1,0 +1,7 @@
+{
+  "android14Certified": true,
+  "android15EdgeToEdgeCertified": true,
+  "targetSdkVersion": 35,
+  "safeAreaInsetsManaged": true,
+  "timestamp": "2026-11-02T17:06:37.570Z"
+}
