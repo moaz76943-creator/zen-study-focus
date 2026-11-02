@@ -39937,3 +39937,40 @@ window.dfInjectUniversalFontStack = function() {
 if (typeof window !== "undefined") {
   window.dfInjectUniversalFontStack();
 }
+
+/* ==========================================================
+   DEEP FOCUS: SCRIPT-AWARE LINE-HEIGHT & DIACRITIC CLIPPING GUARD
+   Expands vertical bounding boxes for stacked scripts (Tibetan, Arabic, Devanagari)
+   ========================================================== */
+window.DF_STACKED_SCRIPTS_LOCALES = [
+  "ar", "fa", "ur", "dzo", "sip", "lep", "bod", "hi", "mr", "ne",
+  "san", "tha", "lao", "mya", "khm", "vie"
+];
+
+window.dfNormalizeScriptTypography = function(localeCode) {
+  const code = localeCode || window.DF_CURRENT_LOCALE || "ar";
+  const isStacked = window.DF_STACKED_SCRIPTS_LOCALES.includes(code);
+
+  if (typeof document !== "undefined") {
+    document.querySelectorAll(".df-btn, button, .df-card-text, [data-typography]").forEach(el => {
+      if (isStacked) {
+        el.style.lineHeight = "1.6";
+        el.style.overflow = "visible";
+        el.style.paddingTop = "10px";
+        el.style.paddingBottom = "10px";
+      } else {
+        el.style.lineHeight = "1.35";
+        el.style.paddingTop = "";
+        el.style.paddingBottom = "";
+      }
+    });
+  }
+  return isStacked;
+};
+
+// Hook into locale updates
+const prevBidiApply = window.dfApplyLocaleUI;
+window.dfApplyLocaleUI = function(code) {
+  if (typeof prevBidiApply === "function") prevBidiApply(code);
+  window.dfNormalizeScriptTypography(code);
+};
