@@ -40038,3 +40038,25 @@ if (typeof window !== "undefined" && window.dfSafeGetStorage) {
   const saved = window.dfSafeGetStorage("df_sound_params", null);
   if (saved) window.DF_SOUND_PARAMS = saved;
 }
+
+/* ==========================================================
+   DEEP FOCUS: ACOUSTIC EAR-SAFETY LIMITER & ANTI-CLIPPING GUARD
+   Studio-grade dynamic compression preventing listener fatigue
+   ========================================================== */
+window.DF_MASTER_COMPRESSOR = null;
+
+window.dfGetSafeMasterDestination = function(ctx) {
+  if (!ctx) return null;
+  if (!window.DF_MASTER_COMPRESSOR) {
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.setValueAtTime(-18, ctx.currentTime); // Soft knee starts at -18dB
+    comp.knee.setValueAtTime(12, ctx.currentTime);
+    comp.ratio.setValueAtTime(12, ctx.currentTime);        // Brickwall limiter ratio
+    comp.attack.setValueAtTime(0.003, ctx.currentTime);    // 3ms instant peak catch
+    comp.release.setValueAtTime(0.25, ctx.currentTime);
+    comp.connect(ctx.destination);
+    window.DF_MASTER_COMPRESSOR = comp;
+    console.log("[DSP SECURITY] Acoustic Ear-Safety Master Limiter active.");
+  }
+  return window.DF_MASTER_COMPRESSOR;
+};
