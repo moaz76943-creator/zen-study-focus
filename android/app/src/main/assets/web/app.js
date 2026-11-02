@@ -38821,3 +38821,35 @@ window.dfSetCurrentLocale = function(code) {
   }
   return true;
 };
+
+/* ==========================================================
+   DEEP FOCUS: LOCAL OFFLINE BACKUP & EXPORT/IMPORT ENGINE
+   100% Client-side JSON data portability - Zero cloud / Zero PII
+   ========================================================== */
+window.dfExportUserData = function() {
+  const exportPayload = {
+    app: "Deep Focus (Zen Study & Focus)",
+    version: "36.1.0",
+    exportedAt: new Date().toISOString(),
+    localesSupported: 1000,
+    currentLocale: window.DF_CURRENT_LOCALE || "ar",
+    sessions: JSON.parse(localStorage.getItem("df_sessions") || "[]"),
+    decks: JSON.parse(localStorage.getItem("df_decks") || "[]"),
+    stats: JSON.parse(localStorage.getItem("df_stats") || "{}")
+  };
+  return JSON.stringify(exportPayload, null, 2);
+};
+
+window.dfImportUserData = function(jsonString) {
+  try {
+    const data = JSON.parse(jsonString);
+    if (!data.app || !data.version) throw new Error("Invalid backup payload format");
+    if (data.sessions) localStorage.setItem("df_sessions", JSON.stringify(data.sessions));
+    if (data.decks) localStorage.setItem("df_decks", JSON.stringify(data.decks));
+    if (data.stats) localStorage.setItem("df_stats", JSON.stringify(data.stats));
+    if (data.currentLocale && window.dfSetCurrentLocale) window.dfSetCurrentLocale(data.currentLocale);
+    return { success: true, message: "Data successfully restored offline!" };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+};
