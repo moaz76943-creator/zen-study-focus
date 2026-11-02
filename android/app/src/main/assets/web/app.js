@@ -43901,3 +43901,21 @@ window.dfSyncVisualRippleWithAudio = function(ringElement, soundIntensity) {
   ringElement.style.setProperty("--df-glow-ring", "rgba(56, 161, 105, " + (0.15 + (intensity * 0.15)) + ")");
   ringElement.style.boxShadow = "0 0 " + glowSpread + "px var(--df-glow-ring)";
 };
+
+/* ==========================================================
+   DEEP FOCUS: SEAMLESS THEME CROSSFADE CONTROLLER (v59.3.0)
+   180ms smooth opacity blending eliminating harsh visual theme pops
+   ========================================================== */
+window.dfSmoothThemeTransition = function(applyThemeCallback) {
+  if (typeof document === "undefined" || !document.body) {
+    if (typeof applyThemeCallback === "function") applyThemeCallback();
+    return;
+  }
+  document.body.style.transition = "background-color 0.18s ease, color 0.18s ease";
+  if (typeof applyThemeCallback === "function") {
+    applyThemeCallback();
+  }
+  setTimeout(() => {
+    document.body.style.transition = "";
+  }, 200);
+};
