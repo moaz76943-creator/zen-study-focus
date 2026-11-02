@@ -42051,3 +42051,31 @@ window.dfDeepCleanAudioGraph = function() {
 
 // Replace shallow stop with deep graph destruction
 window.dfStopAllSounds = window.dfDeepCleanAudioGraph;
+
+/* ==========================================================
+   DEEP FOCUS: HEAP MEMORY MONITOR & ACTIVE GC SENTINEL
+   Purges temporary caches and resets object pools before heap bloat occurs
+   ========================================================== */
+window.dfPurgeTransientCaches = function() {
+  // Clear volatile memory buffers
+  if (window.DF_ACTIVE_LOCALE_CACHE) {
+    const keys = Object.keys(window.DF_ACTIVE_LOCALE_CACHE);
+    if (keys.length > 5) {
+      // Keep only current language in memory
+      const current = window.DF_CURRENT_LOCALE || "ar";
+      const preserved = window.DF_ACTIVE_LOCALE_CACHE[current];
+      window.DF_ACTIVE_LOCALE_CACHE = {};
+      if (preserved) window.DF_ACTIVE_LOCALE_CACHE[current] = preserved;
+    }
+  }
+  // Clear undo snapshot buffer if older than 5 minutes
+  if (window.DF_UNDO_BUFFER && (Date.now() - window.DF_UNDO_BUFFER.timestamp > 300000)) {
+    window.DF_UNDO_BUFFER = null;
+  }
+  console.log("[MEMORY SENTINEL] Transient caches purged cleanly.");
+};
+
+if (typeof window !== "undefined") {
+  // Run passive memory sweep every 15 minutes
+  setInterval(window.dfPurgeTransientCaches, 15 * 60 * 1000);
+}
