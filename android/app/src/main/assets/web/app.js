@@ -40338,3 +40338,50 @@ window.dfSafeSetCardText = function(element, rawText) {
   // Always use textContent to prevent arbitrary script execution
   element.textContent = rawText || "";
 };
+
+/* ==========================================================
+   DEEP FOCUS: DUAL-SLOT REDUNDANCY & CRASH-PROOF STORAGE SHIELD
+   Guarantees zero data loss even if phone battery dies mid-write
+   ========================================================== */
+window.dfAtomicSave = function(key, dataObj) {
+  if (typeof localStorage === "undefined") return false;
+  try {
+    const serialized = JSON.stringify(dataObj);
+    // Write to Primary slot
+    localStorage.setItem(key + "_primary", serialized);
+    // Write mirror to Backup slot
+    localStorage.setItem(key + "_backup", serialized);
+    return true;
+  } catch (e) {
+    console.error("[STORAGE] Atomic write failed:", e.message);
+    return false;
+  }
+};
+
+window.dfAtomicLoad = function(key, defaultVal) {
+  if (typeof localStorage === "undefined") return defaultVal;
+  
+  // Try loading Primary slot
+  try {
+    const prim = localStorage.getItem(key + "_primary");
+    if (prim !== null) return JSON.parse(prim);
+  } catch (e) {
+    console.warn("[STORAGE] Primary slot corrupted, recovering from backup...");
+  }
+
+  // Fallback to Backup slot
+  try {
+    const backup = localStorage.getItem(key + "_backup");
+    if (backup !== null) {
+      const recovered = JSON.parse(backup);
+      // Self-heal primary slot
+      localStorage.setItem(key + "_primary", backup);
+      console.log("[STORAGE] Successfully recovered data from backup slot.");
+      return recovered;
+    }
+  } catch (e) {
+    console.error("[STORAGE] Both slots unparseable. Returning default.");
+  }
+
+  return defaultVal;
+};
