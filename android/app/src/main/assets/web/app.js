@@ -43536,3 +43536,26 @@ window.dfSmoothOverdueBacklog = function(cardsList, maxDailyQuota) {
 
   return cardsList;
 };
+
+/* ==========================================================
+   DEEP FOCUS: INTERLEAVED PRACTICE & MULTI-SUBJECT SHUFFLER
+   Prevents contextual bias by alternating study topics in a single session
+   ========================================================== */
+window.dfBuildInterleavedSession = function(decksArray) {
+  if (!Array.isArray(decksArray) || decksArray.length === 0) return [];
+  const queues = decksArray.map(d => (Array.isArray(d.cards) ? [...d.cards] : []));
+  const interleavedResult = [];
+  let remaining = true;
+
+  while (remaining) {
+    remaining = false;
+    queues.forEach(q => {
+      if (q.length > 0) {
+        interleavedResult.push(q.shift());
+        remaining = true;
+      }
+    });
+  }
+  console.log("[COGNITIVE ENGINE] Interleaved session constructed with " + interleavedResult.length + " cards across " + decksArray.length + " subjects.");
+  return interleavedResult;
+};
