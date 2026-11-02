@@ -42948,3 +42948,13 @@ window.dfApplyVerticalScriptLayout = function(localeCode) {
   }
   return isVertical;
 };
+
+/* ==========================================================
+   DEEP FOCUS: BIDI MATHEMATICAL & NUMERICAL ISOLATION SENTINEL
+   Strictly isolates percentage badges, fractions and negative values in RTL
+   ========================================================== */
+window.dfIsolateBiDiNumbers = function(rawString) {
+  if (!rawString || typeof rawString !== "string") return "";
+  // Wrap numbers with percentages, signs, or fractions inside <bdi> tokens
+  return rawString.replace(/([+\-−]?[0-9]+(?:\.[0-9]+)?%?|[0-9]+\/[0-9]+)/g, '<bdi dir="ltr" style="unicode-bidi:isolate;">$1</bdi>');
+};
