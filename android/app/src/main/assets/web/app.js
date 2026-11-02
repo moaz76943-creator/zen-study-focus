@@ -41539,3 +41539,42 @@ window.dfCheckCircadianGate = function() {
     advice: isLateNight ? "Memory retention consolidates during REM sleep. Consider resting soon." : "Optimal study window active."
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: SOUNDSCAPE EFFECTIVENESS & PRODUCTIVITY CORRELATOR
+   Analyzes which nature soundscape yields highest retention and flow
+   ========================================================== */
+window.dfGetSoundscapeEffectiveness = function(sessionsList) {
+  const sessions = Array.isArray(sessionsList) ? sessionsList : [];
+  const soundStats = {};
+
+  sessions.forEach(s => {
+    const sound = s.soundType || "rain";
+    const minutes = s.durationMinutes || Math.floor((s.durationSeconds || 0) / 60);
+    const fqi = (s.fqi && s.fqi.fqiScore) ? s.fqi.fqiScore : 85;
+
+    if (!soundStats[sound]) {
+      soundStats[sound] = { totalMinutes: 0, fqiSum: 0, count: 0 };
+    }
+    soundStats[sound].totalMinutes += minutes;
+    soundStats[sound].fqiSum += fqi;
+    soundStats[sound].count++;
+  });
+
+  let bestSound = "rain";
+  let highestAverageFQI = 0;
+
+  Object.keys(soundStats).forEach(snd => {
+    const avg = soundStats[snd].fqiSum / Math.max(1, soundStats[snd].count);
+    if (avg > highestAverageFQI && soundStats[snd].totalMinutes >= 30) {
+      highestAverageFQI = Math.round(avg);
+      bestSound = snd;
+    }
+  });
+
+  return {
+    optimalSoundscape: bestSound,
+    averageFQI: highestAverageFQI || 88,
+    breakdown: soundStats
+  };
+};
