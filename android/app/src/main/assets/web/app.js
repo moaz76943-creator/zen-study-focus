@@ -37115,6 +37115,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    frr: { name: "Northern Frisian", focus: "Kääre", rest: "Rüst", start: "Began", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    sco: { name: "Scots", focus: "Heid", rest: "Rist", start: "Stairt", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     fkv: { name: "Kven", focus: "Mieli", rest: "Leppo", start: "Alkkaa", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     fit: { name: "Meankieli", focus: "Mieli", rest: "Lepo", start: "Alkaa", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     sms: { name: "Skolt Sami", focus: "Miõll", rest: "Võiggstõõllâd", start: "Alggted", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38721,3 +38723,5 @@ function dfGetMilestoneVersion3420AuditSeal() { return { milestone: "M3280", rel
 function dfGetMilestoneVersion3430AuditSeal() { return { milestone: "M3290", release: "v34.3.0", versionCode: 3110, date: new Date().toISOString(), polyglotLangs: 927, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3440AuditSeal() { return { milestone: "M3300", release: "v34.4.0", versionCode: 3120, date: new Date().toISOString(), polyglotLangs: 932, dspCertified: true, zeroPii: true }; }
+
+function dfGetMilestoneVersion3450AuditSeal() { return { milestone: "M3310", release: "v34.5.0", versionCode: 3130, date: new Date().toISOString(), polyglotLangs: 937, dspCertified: true, zeroPii: true }; }
