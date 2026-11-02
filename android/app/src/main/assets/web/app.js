@@ -42027,3 +42027,27 @@ window.dfGetHistoricCoronationSealV50 = function() {
     coronatedAt: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: DEEP WEBAUDIO GRAPH DESTRUCTOR (SECTOR 1 LAUNCH)
+   Explicitly severs all audio node connections to prevent memory accumulation
+   ========================================================== */
+window.dfDeepCleanAudioGraph = function() {
+  if (Array.isArray(window.DF_ACTIVE_AUDIO_NODES)) {
+    window.DF_ACTIVE_AUDIO_NODES.forEach(node => {
+      try {
+        if (typeof node.stop === "function") node.stop();
+      } catch (e) {}
+      try {
+        if (typeof node.disconnect === "function") node.disconnect();
+      } catch (e) {}
+    });
+    window.DF_ACTIVE_AUDIO_NODES.length = 0;
+  }
+  // Reset audio master compressor references if context is recycled
+  window.DF_ACTIVE_AUDIO_NODES = [];
+  console.log("[AUDIO PURGE] Complete WebAudio node graph severed and garbage-collected.");
+};
+
+// Replace shallow stop with deep graph destruction
+window.dfStopAllSounds = window.dfDeepCleanAudioGraph;
