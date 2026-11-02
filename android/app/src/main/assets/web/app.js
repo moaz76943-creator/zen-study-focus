@@ -43861,3 +43861,31 @@ window.dfApply3DCardPerspective = function(cardEl) {
     cardEl.style.transition = "transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
   }, { passive: true });
 };
+
+/* ==========================================================
+   DEEP FOCUS: PARTICLE-FREE ZEN CELEBRATION AURA (CSS ONLY)
+   Zero DOM node creation celebration glow preserving 120 FPS
+   ========================================================== */
+window.dfTriggerZenCelebrationGlow = function() {
+  if (typeof document === "undefined" || !document.body) return;
+  const styleId = "df-zen-celebration-style";
+  if (!document.getElementById(styleId)) {
+    const styleEl = document.createElement("style");
+    styleEl.id = styleId;
+    styleEl.textContent = `
+      @keyframes dfCelebrationFlash {
+        0% { box-shadow: inset 0 0 0px rgba(56, 161, 105, 0); }
+        50% { box-shadow: inset 0 0 60px rgba(56, 161, 105, 0.35); }
+        100% { box-shadow: inset 0 0 0px rgba(56, 161, 105, 0); }
+      }
+      .df-celebrating {
+        animation: dfCelebrationFlash 1.4s ease-out !important;
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+  document.body.classList.remove("df-celebrating");
+  void document.body.offsetWidth; // Force CSS reflow cleanly
+  document.body.classList.add("df-celebrating");
+  console.log("[ZEN REWARD] Particle-free celebration aura engaged.");
+};
