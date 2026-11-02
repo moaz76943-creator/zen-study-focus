@@ -40915,3 +40915,25 @@ window.dfRenderScientificText = function(rawText) {
 
   return rendered;
 };
+
+/* ==========================================================
+   DEEP FOCUS: ZERO-DEPENDENCY CODE SYNTAX HIGHLIGHTER
+   Lightweight regex-based colorizer for programming flashcards
+   ========================================================== */
+window.dfHighlightCode = function(rawCode) {
+  if (!rawCode || typeof rawCode !== "string") return "";
+  let html = rawCode
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  // Strings (green)
+  html = html.replace(/(".*?"|'.*?'|`.*?`)/g, '<span style="color:#68d391;">$1</span>');
+  // Keywords (purple/pink)
+  const keywords = /\b(const|let|var|function|return|if|else|for|while|class|import|from|export|def|async|await)\b/g;
+  html = html.replace(keywords, '<span style="color:#b794f4;font-weight:bold;">$1</span>');
+  // Numbers (orange)
+  html = html.replace(/\b([0-9]+)\b/g, '<span style="color:#f6ad55;">$1</span>');
+  // Comments (gray italic)
+  html = html.replace(/(\/\/.*?$|#.*?$)/gm, '<span style="color:#718096;font-style:italic;">$1</span>');
+
+  return '<pre style="background:#1a202c;padding:12px;border-radius:8px;overflow-x:auto;font-family:monospace;font-size:13px;line-height:1.5;">' + html + '</pre>';
+};
