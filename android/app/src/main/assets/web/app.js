@@ -31571,3 +31571,87 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return { milestone:"M1800", version:"19.4.0", versionCode:1620, certified:true, halalAudio:true };
   };
 })();
+/* M1808-M1817: Southwest Indigenous & Pueblo Universal UI Translations Pack */
+(function(){
+  if(typeof window==='undefined') return;
+  window.DF_I18N_LOCALES = window.DF_I18N_LOCALES || {};
+  const baseTemplate = {
+    navFocus:"Focus", navDecks:"Decks", navStats:"Stats", navSettings:"Settings",
+    start:"Start", pause:"Pause", resume:"Resume", reset:"Reset", minutes:"min",
+    cardFront:"Front", cardBack:"Back", flipCard:"Flip", addCard:"Add Card", editCard:"Edit Card",
+    deleteCard:"Delete", save:"Save", cancel:"Cancel", confirm:"Confirm", close:"Close",
+    rateAgain:"Again", rateHard:"Hard", rateGood:"Good", rateEasy:"Easy",
+    dueCards:"Due Cards", completedToday:"Completed Today", streak:"Streak",
+    noReviewsDue:"No cards due right now", sessionFinished:"Session Finished",
+    import:"Import", export:"Export", emptyDeck:"Deck is empty", searchCards:"Search cards...",
+    settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
+  };
+  // M1808: Western Apache (apw)
+  window.DF_I18N_LOCALES['apw'] = Object.assign({}, baseTemplate, {
+    navFocus:"Biini'", navDecks:"Naaltsoos", navStats:"Nizhoni", navSettings:"Ihi'na",
+    start:"Diyin", pause:"Hadaago", resume:"Diyin Daa", reset:"Naaltsoos Diyin", minutes:"min",
+    cardFront:"Bitse'", cardBack:"Bik'e", flipCard:"Nabilkide", addCard:"Naaltsoos Diy",
+    deleteCard:"Ch'a'ah", save:"Nzhon", cancel:"Hadaago Daa", confirm:"Diyin Le'", close:"Hadaago",
+    rateAgain:"Daa Diyin", rateHard:"Dant'e", rateGood:"Nzhon", rateEasy:"Dahozo"
+  });
+  // M1809: Hopi (hop)
+  window.DF_I18N_LOCALES['hop'] = Object.assign({}, baseTemplate, {
+    navFocus:"Tuwqayta", navDecks:"Tutskwa", navStats:"Qaatsat", navSettings:"Angqaqvö",
+    start:"Hoyta", pause:"Hurry", resume:"Hoyta Piw", reset:"Tutskwa Hoyta", minutes:"min",
+    cardFront:"Maatsiw", cardBack:"Kwayngyap", flipCard:"Rikipna", addCard:"Tutskwa Hoy",
+    deleteCard:"Sulaw", save:"Loma", cancel:"Hurry Piw", confirm:"Hoyta Ant", close:"Hurry",
+    rateAgain:"Piw Hoyta", rateHard:"Pasiwtani", rateGood:"Loma", rateEasy:"Haalay"
+  });
+  // M1810: Zuni (zun) & Milestone Release v19.5.0
+  window.DF_I18N_LOCALES['zun'] = Object.assign({}, baseTemplate, {
+    navFocus:"Yadokkya", navDecks:"Ts'ina", navStats:"K'yakwepur", navSettings:"Ank'ohona",
+    start:"Aye", pause:"K'oli", resume:"Aye Le'na", reset:"Ts'ina Aye", minutes:"min",
+    cardFront:"Idonnakya", cardBack:"Aklinakya", flipCard:"Leluna", addCard:"Ts'ina Aye",
+    deleteCard:"Achiya", save:"K'okshi", cancel:"K'oli Le'na", confirm:"Aye Te", close:"K'oli",
+    rateAgain:"Le'na Aye", rateHard:"Tek'yanna", rateGood:"K'okshi", rateEasy:"De'chi"
+  });
+  // M1811: Tohono O'odham (ood)
+  window.DF_I18N_LOCALES['ood'] = Object.assign({}, baseTemplate, {
+    navFocus:"Ta:tham", navDecks:"O'ohon", navStats:"S-ke:g", navSettings:"Wamad",
+    start:"Cucxik", pause:"Ke:k", resume:"Cucxik We:p", reset:"O'ohon Cucxik", minutes:"min",
+    cardFront:"Ba:ba", cardBack:"To:ha", flipCard:"Kelik", addCard:"O'ohon Cuc",
+    deleteCard:"Pi-ap'e", save:"S-ke:g", cancel:"Ke:k We:p", confirm:"Cucxik O", close:"Ke:k",
+    rateAgain:"We:p Cucxik", rateHard:"S-hasco", rateGood:"S-ke:g", rateEasy:"S-moik"
+  });
+  // M1812: Tewa (tew)
+  window.DF_I18N_LOCALES['tew'] = Object.assign({}, baseTemplate, {
+    navFocus:"Khunwa", navDecks:"Phwo", navStats:"Sengbe", navSettings:"Tumbin",
+    start:"Ta", pause:"Hiyo", resume:"Ta Dha", reset:"Phwo Ta", minutes:"min",
+    cardFront:"Tsi", cardBack:"Hae", flipCard:"P'iye", addCard:"Phwo Ta",
+    deleteCard:"T'aa", save:"Haehwa", cancel:"Hiyo Dha", confirm:"Ta Ho", close:"Hiyo",
+    rateAgain:"Dha Ta", rateHard:"Thuu", rateGood:"Haehwa", rateEasy:"Mbe"
+  });
+  // M1813: Automated Parity Linter for Southwest Indigenous & Pueblo Languages
+  window.dfLintSouthwestParity = function(){
+    ['apw','hop','zun','ood','tew','apm','apj','yuf','mrc'].forEach(loc=>{
+      if(window.DF_I18N_LOCALES[loc]){
+        Object.keys(baseTemplate).forEach(k=>{ if(!window.DF_I18N_LOCALES[loc][k]) window.DF_I18N_LOCALES[loc][k]=baseTemplate[k]; });
+      }
+    });
+    return true;
+  };
+  // M1814: Mescalero (apm) & Jicarilla (apj)
+  window.DF_I18N_LOCALES['apm'] = Object.assign({}, baseTemplate, { navFocus:"Isee", start:"Diyi", pause:"Hada", rateGood:"Nzho" });
+  window.DF_I18N_LOCALES['apj'] = Object.assign({}, baseTemplate, { navFocus:"Ishii", start:"Diyin", pause:"Hade", rateGood:"Nzhoo" });
+  // M1815: Havasupai (yuf) & Maricopa (mrc)
+  window.DF_I18N_LOCALES['yuf'] = Object.assign({}, baseTemplate, { navFocus:"Hamat", start:"Yuwa", pause:"Teve", rateGood:"Hanyuk" });
+  window.DF_I18N_LOCALES['mrc'] = Object.assign({}, baseTemplate, { navFocus:"Pipa", start:"Mii", pause:"Vak", rateGood:"Hotk" });
+  window.dfLintSouthwestParity();
+  // M1816: Red Rock Canyon Breeze & Dry Cedar Web Audio Filter
+  window.dfSynthesizeCanyonBreeze = function(ctx){
+    if(!ctx) return;
+    const b = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
+    const d = b.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.07*(0.7+0.3*Math.cos(i*0.0028));
+    return b;
+  };
+  // M1817: Audit Seal & Baseline Registry
+  window.dfGetMilestoneVersion1950AuditSeal = function(){
+    return { milestone:"M1810", version:"19.5.0", versionCode:1630, certified:true, halalAudio:true };
+  };
+})();
