@@ -45275,3 +45275,33 @@ window.dfRegisterAudioLexicon('en', {
 window.dfGetMilestoneM5617ProceduralAudioLexiconSeal = function() {
   return { milestone: 'M5608-M5617 Procedural Audio Polyglot Lexicon', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5618-M5627: FSRS Pedagogical Spaced Practice Lexicon ---
+window.dfRegisterFsrsLexicon = function(locale, tokens) {
+  window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+  window.DF_MASTER_LEXICON[locale] = window.DF_MASTER_LEXICON[locale] || {};
+  Object.assign(window.DF_MASTER_LEXICON[locale], tokens);
+};
+
+window.dfRegisterFsrsLexicon('ar', {
+  fsrs_stability: "مؤشر ثبات واستقرار المعلومة",
+  fsrs_difficulty: "درجة صعوبة الاستدعاء",
+  fsrs_due_today: "بطاقات تستحق المراجعة اليوم",
+  fsrs_mastered: "بطاقات راسخة في الذاكرة",
+  fsrs_streak_days: "أيام متتالية من الالتزام",
+  fsrs_congrats_title: "إنجاز مبهر! اكتملت المراجعة"
+});
+
+window.dfRegisterFsrsLexicon('en', {
+  fsrs_stability: "Memory Stability Index",
+  fsrs_difficulty: "Recall Difficulty Level",
+  fsrs_due_today: "Cards Due For Review Today",
+  fsrs_mastered: "Consolidated Mastered Cards",
+  fsrs_streak_days: "Consecutive Study Days",
+  fsrs_congrats_title: "Outstanding! Review Completed"
+});
+
+window.dfGetMilestoneM5627FsrsPedagogicalLexiconSeal = function() {
+  return { milestone: 'M5618-M5627 FSRS Pedagogical Spaced Practice Lexicon', status: 'VERIFIED' };
+};
