@@ -42482,3 +42482,34 @@ window.dfEnsurePersistentStorage = async function() {
 if (typeof window !== "undefined") {
   window.dfEnsurePersistentStorage();
 }
+
+/* ==========================================================
+   DEEP FOCUS: ATOMIC BATCH TRANSACTION & ROLLBACK SENTINEL
+   Guarantees zero partial writes and clean rollbacks during deck inserts
+   ========================================================== */
+window.dfAtomicBatchInsert = async function(storeName, itemsList) {
+  if (!Array.isArray(itemsList) || itemsList.length === 0) return { success: true, count: 0 };
+  try {
+    const db = await window.dfOpenDatabase();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, "readwrite");
+      const store = tx.objectStore(storeName);
+      let inserted = 0;
+
+      tx.oncomplete = () => {
+        if (window.dfBroadcastDataSync) window.dfBroadcastDataSync(storeName);
+        resolve({ success: true, count: inserted });
+      };
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(new Error("Transaction aborted safely"));
+
+      itemsList.forEach(item => {
+        store.put(item);
+        inserted++;
+      });
+    });
+  } catch (err) {
+    console.error("[STORAGE ATOMIC] Batch transaction failed, safely rolled back:", err.message);
+    return { success: false, error: err.message };
+  }
+};
