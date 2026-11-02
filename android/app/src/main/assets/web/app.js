@@ -40505,3 +40505,45 @@ window.dfAnnounceToScreenReader = function(message) {
   }
   liveRegion.textContent = message;
 };
+
+/* ==========================================================
+   DEEP FOCUS: OFFLINE QR PAYLOAD COMPRESSION ENGINE
+   Mathematical text compression enabling offline camera card transfers
+   ========================================================== */
+window.dfCompressDeckPayload = function(cardsList) {
+  if (!Array.isArray(cardsList) || cardsList.length === 0) return "";
+  // Compact representation: array of [front, back, tagsString]
+  const compactArray = cardsList.map(c => [
+    c.front || "",
+    c.back || "",
+    Array.isArray(c.tags) ? c.tags.join(",") : ""
+  ]);
+  const rawJSON = JSON.stringify(compactArray);
+  // Base64 safe URI component encoding
+  try {
+    return btoa(encodeURIComponent(rawJSON));
+  } catch (e) {
+    return "";
+  }
+};
+
+window.dfDecompressDeckPayload = function(compressedBase64) {
+  if (!compressedBase64 || typeof compressedBase64 !== "string") return [];
+  try {
+    const rawJSON = decodeURIComponent(atob(compressedBase64));
+    const compactArray = JSON.parse(rawJSON);
+    return compactArray.map((item, idx) => ({
+      id: "shared_" + Date.now() + "_" + idx,
+      front: item[0] || "",
+      back: item[1] || "",
+      tags: item[2] ? item[2].split(",").map(t => t.trim()).filter(Boolean) : [],
+      reps: 0,
+      interval: 0,
+      easeFactor: 2.5,
+      dueDate: new Date().toISOString().split("T")[0]
+    }));
+  } catch (e) {
+    console.error("[DEEP FOCUS P2P] Decompression failed:", e.message);
+    return [];
+  }
+};
