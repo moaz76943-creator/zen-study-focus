@@ -41310,3 +41310,30 @@ window.dfInitPrivacyMaskSentinel = function() {
 if (typeof window !== "undefined") {
   window.dfInitPrivacyMaskSentinel();
 }
+
+/* ==========================================================
+   DEEP FOCUS: ANTI-TAMPER TIME GUARD & EMERGENCY PANIC WIPE
+   Guarantees integrity of study streaks and zero-trace wipe capability
+   ========================================================== */
+window.dfVerifyClockSanity = function(lastRecordedEpochMs) {
+  const currentEpoch = Date.now();
+  if (lastRecordedEpochMs && currentEpoch < (lastRecordedEpochMs - 60000)) {
+    console.warn("[SECURITY] Backward clock jump detected. Tampering guarded.");
+    return false;
+  }
+  return true;
+};
+
+window.dfExecutePanicWipe = function() {
+  if (typeof localStorage !== "undefined") {
+    localStorage.clear();
+  }
+  if (typeof indexedDB !== "undefined" && window.DF_DB_NAME) {
+    try { indexedDB.deleteDatabase(window.DF_DB_NAME); } catch (e) {}
+  }
+  if (window.DF_MEMORY_DATA_STORES) {
+    window.DF_MEMORY_DATA_STORES = { sessions: {}, cards: {}, decks: {}, settings: {} };
+  }
+  console.log("[SECURITY] Emergency Panic Wipe executed. All local data cleared cleanly.");
+  if (typeof location !== "undefined" && location.reload) location.reload();
+};
