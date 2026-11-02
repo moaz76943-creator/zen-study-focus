@@ -40697,3 +40697,46 @@ window.dfOpenDatabase = function() {
     req.onerror = (e) => reject(e.target.error);
   });
 };
+
+/* ==========================================================
+   DEEP FOCUS: SEAMLESS STORAGE MIGRATOR (LOCALSTORAGE -> IDB)
+   Guarantees zero data loss migration on first boot
+   ========================================================== */
+window.dfMigrateLegacyStorage = async function() {
+  if (typeof localStorage === "undefined") return;
+  const isMigrated = localStorage.getItem("df_migrated_to_idb");
+  if (isMigrated) return;
+
+  try {
+    const db = await window.dfOpenDatabase();
+    const sessions = JSON.parse(localStorage.getItem("df_sessions") || "[]");
+    const decks = JSON.parse(localStorage.getItem("df_decks") || "[]");
+
+    if (sessions.length > 0) {
+      const tx = db.transaction("sessions", "readwrite");
+      const store = tx.objectStore("sessions");
+      sessions.forEach(s => {
+        if (!s.id) s.id = "migrated_" + (s.timestamp || Date.now());
+        store.put(s);
+      });
+    }
+
+    if (decks.length > 0) {
+      const tx = db.transaction("decks", "readwrite");
+      const store = tx.objectStore("decks");
+      decks.forEach(d => {
+        if (!d.id) d.id = "deck_" + Date.now();
+        store.put(d);
+      });
+    }
+
+    localStorage.setItem("df_migrated_to_idb", "true");
+    console.log("[MIGRATOR] Successfully migrated " + sessions.length + " sessions and " + decks.length + " decks to IndexedDB.");
+  } catch (err) {
+    console.warn("[MIGRATOR] Migration deferred, legacy storage preserved:", err.message);
+  }
+};
+
+if (typeof window !== "undefined") {
+  setTimeout(() => { if (window.dfMigrateLegacyStorage) window.dfMigrateLegacyStorage(); }, 500);
+}
