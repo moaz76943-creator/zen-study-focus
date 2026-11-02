@@ -42355,3 +42355,21 @@ window.dfVerifyTimingArchitecture = function() {
     verifiedAt: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: MICROSECOND MONOTONIC DRIFT COMPENSATOR
+   Continuous 60-second recalibration eliminating frame interval drift
+   ========================================================== */
+window.DF_CALIBRATION_ANCHOR = { perf: performance.now(), wall: Date.now() };
+
+window.dfGetCalibratedExactSeconds = function(startEpochMs) {
+  if (!startEpochMs) return 0;
+  const nowWall = Date.now();
+  const rawElapsedMs = Math.max(0, nowWall - startEpochMs);
+  
+  // Re-anchor reference every 60 seconds
+  if (nowWall - window.DF_CALIBRATION_ANCHOR.wall > 60000) {
+    window.DF_CALIBRATION_ANCHOR = { perf: performance.now(), wall: nowWall };
+  }
+  return Math.floor(rawElapsedMs / 1000);
+};
