@@ -39319,3 +39319,38 @@ window.dfAttachFastButtonListener = function(element, callback) {
     window.dfDebounceAction(callback);
   });
 };
+
+/* ==========================================================
+   DEEP FOCUS: PROCEDURAL HARMONIC COMPLETION CHIME SENTINEL
+   Soft mathematical twin sine chime - zero music - non-intrusive
+   ========================================================== */
+window.dfPlaySessionCompletionChime = async function() {
+  const ctx = window.dfGetSafeAudioContext ? window.dfGetSafeAudioContext() : null;
+  if (!ctx) return;
+  if (window.dfEnsureAudioActive) await window.dfEnsureAudioActive();
+
+  const now = ctx.currentTime;
+  // Harmonic twin frequencies: 528Hz and 660Hz (Pure mathematical acoustic interval)
+  [528, 660].forEach((freq, idx) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, now + (idx * 0.15));
+
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.exponentialRampToValueAtTime(0.08, now + (idx * 0.15) + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + (idx * 0.15) + 1.2);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now + (idx * 0.15));
+    osc.stop(now + (idx * 0.15) + 1.3);
+  });
+
+  // Gentle double vibration on completion
+  if (typeof navigator !== "undefined" && navigator.vibrate) {
+    try { navigator.vibrate([150, 80, 150]); } catch (e) {}
+  }
+  console.log("[DEEP FOCUS] Harmonic completion chime sounded gently.");
+};
