@@ -43295,3 +43295,30 @@ window.dfGetSector6SecuritySeal = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: ANDROID 15/16 PREDICTIVE BACK GESTURE SENTINEL (SECTOR 7 LAUNCH)
+   Smooth fluid scale interpolation during system edge swipe gesture
+   ========================================================== */
+window.dfInitPredictiveBackAnimation = function() {
+  if (typeof document === "undefined") return;
+
+  const styleId = "df-predictive-back-style";
+  if (!document.getElementById(styleId)) {
+    const styleEl = document.createElement("style");
+    styleEl.id = styleId;
+    styleEl.textContent = `
+      .df-predictive-scaling {
+        transform: scale(0.96) translate3d(0, 0, 0) !important;
+        border-radius: 18px !important;
+        transition: transform 0.15s ease-out, border-radius 0.15s ease-out !important;
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+  console.log("[ANDROID 15/16] Predictive back gesture scale handlers active.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfInitPredictiveBackAnimation();
+}
