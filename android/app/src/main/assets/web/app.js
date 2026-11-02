@@ -38966,3 +38966,54 @@ window.dfSafeRampGain = function(gainNode, targetValue, durationMs) {
   gainNode.gain.setValueAtTime(Math.max(gainNode.gain.value, 0.0001), now);
   gainNode.gain.exponentialRampToValueAtTime(Math.max(targetValue, 0.0001), now + durationSec);
 };
+
+/* ==========================================================
+   DEEP FOCUS: STORAGE INTEGRITY, QUOTA & AUTO-HEAL SHIELD
+   Safe storage abstraction preventing JSON parse crashes and quota errors
+   ========================================================== */
+window.DF_MEMORY_STORAGE_FALLBACK = {};
+
+window.dfSafeGetStorage = function(key, defaultValue) {
+  try {
+    if (typeof localStorage !== "undefined") {
+      const val = localStorage.getItem(key);
+      if (val === null) return defaultValue;
+      return JSON.parse(val);
+    }
+  } catch (e) {
+    // If JSON is corrupted or storage blocked, return in-memory or default
+  }
+  return window.DF_MEMORY_STORAGE_FALLBACK[key] !== undefined 
+    ? window.DF_MEMORY_STORAGE_FALLBACK[key] 
+    : defaultValue;
+};
+
+window.dfSafeSetStorage = function(key, value) {
+  try {
+    const serialized = JSON.stringify(value);
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(key, serialized);
+    }
+    window.DF_MEMORY_STORAGE_FALLBACK[key] = value;
+    return true;
+  } catch (e) {
+    // Graceful in-memory fallback on QuotaExceededError
+    window.DF_MEMORY_STORAGE_FALLBACK[key] = value;
+    return false;
+  }
+};
+
+// Automatic Startup Health Check
+window.dfRunBootIntegrityCheck = function() {
+  const schemaVersion = window.dfSafeGetStorage("df_schema_version", 1);
+  const sessions = window.dfSafeGetStorage("df_sessions", []);
+  if (!Array.isArray(sessions)) {
+    window.dfSafeSetStorage("df_sessions", []);
+  }
+  window.dfSafeSetStorage("df_schema_version", 2);
+  console.log("[DEEP FOCUS] Startup integrity check passed. Schema v2 active.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfRunBootIntegrityCheck();
+}
