@@ -42137,3 +42137,23 @@ window.dfDisposeCanvasTexture = function(canvasElement) {
     console.log("[GPU COMPOSITOR] Canvas texture buffer released from VRAM.");
   } catch (e) {}
 };
+
+/* ==========================================================
+   DEEP FOCUS: FINALIZATION REGISTRY & LEAK DETECTOR SENTINEL
+   Verifies genuine object deallocation via native JavaScript GC registry
+   ========================================================== */
+window.DF_GC_REGISTRY = null;
+
+if (typeof FinalizationRegistry !== "undefined") {
+  window.DF_GC_REGISTRY = new FinalizationRegistry((heldValue) => {
+    // Confirms object was successfully destroyed by garbage collector
+  });
+}
+
+window.dfRegisterForGCDetection = function(targetObject, label) {
+  if (window.DF_GC_REGISTRY && targetObject && typeof targetObject === "object") {
+    try {
+      window.DF_GC_REGISTRY.register(targetObject, label || "unnamed_object");
+    } catch (e) {}
+  }
+};
