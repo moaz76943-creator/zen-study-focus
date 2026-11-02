@@ -45339,3 +45339,37 @@ window.DF_MASTER_LEXICON.fa = Object.assign(window.DF_MASTER_LEXICON.fa || {}, {
 window.dfGetMilestoneM5637UrduPersianSpecializedSeal = function() {
   return { milestone: 'M5628-M5637 Urdu and Persian Specialized Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5638-M5647: Turkish & Indonesian Specialized Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.tr = Object.assign(window.DF_MASTER_LEXICON.tr || {}, {
+  audio_chime_header: "Seans Bitisi Icrasi Zil Tonlari",
+  audio_ambient_header: "Derin Odaklanma Dogal Sesleri",
+  audio_solfeggio_528: "528 Hz Zihinsel Uyum Tonu",
+  audio_solfeggio_432: "432 Hz Dogal Huzur Tonu",
+  audio_binaural_beta: "14 Hz Beta Uyaniklik Dalgasi",
+  fsrs_stability: "Hafiza Kararlilik Gostergesi",
+  fsrs_difficulty: "Hatirlama Zorluk Derecesi",
+  fsrs_due_today: "Bugun Tekrar Edilecek Kartlar",
+  fsrs_mastered: "Tamamen Pekistirilmis Bilgiler",
+  fsrs_streak_days: "Kesintisiz Calisma Gunleri"
+});
+
+window.DF_MASTER_LEXICON.id = Object.assign(window.DF_MASTER_LEXICON.id || {}, {
+  audio_chime_header: "Lonceng Penyelesaian Sesi Prosedural",
+  audio_ambient_header: "Suara Alam Penenang Pikiran",
+  audio_solfeggio_528: "528 Hz Nada Harmoni Mental",
+  audio_solfeggio_432: "432 Hz Nada Ketenangan Alami",
+  audio_binaural_beta: "14 Hz Gelombang Beta Kewaspadaan",
+  fsrs_stability: "Indeks Stabilitas Ingatan",
+  fsrs_difficulty: "Tingkat Kesulitan Mengingat",
+  fsrs_due_today: "Kartu Jatuh Tempo Hari Ini",
+  fsrs_mastered: "Kartu Hafal Sempurna",
+  fsrs_streak_days: "Hari Belajar Berturut-turut"
+});
+
+window.dfGetMilestoneM5647TurkicIndonesianSpecializedSeal = function() {
+  return { milestone: 'M5638-M5647 Turkish and Indonesian Specialized Lexicons', status: 'VERIFIED' };
+};
