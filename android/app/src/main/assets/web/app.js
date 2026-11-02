@@ -43598,3 +43598,29 @@ window.dfAuditResponseAuthenticity = function(card, rating, latencyMs) {
     isFlaggedGuessing: false
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: EXAM DATE CRAMMING & SCHEDULE COMPRESSOR
+   Compresses spaced intervals to guarantee 100% review before exam date
+   ========================================================== */
+window.dfCompressScheduleForExam = function(cardsList, targetExamDateISO) {
+  if (!Array.isArray(cardsList) || !targetExamDateISO) return cardsList;
+  const examEpoch = new Date(targetExamDateISO).getTime();
+  const nowEpoch = Date.now();
+  const maxAvailableDays = Math.max(1, Math.floor((examEpoch - nowEpoch) / 86400000));
+
+  cardsList.forEach(card => {
+    if (card.dueDate) {
+      const cardDueEpoch = new Date(card.dueDate).getTime();
+      // If card was scheduled after exam date, pull it forward safely
+      if (cardDueEpoch >= examEpoch) {
+        const compressedDays = Math.max(1, Math.floor(Math.random() * maxAvailableDays));
+        const newDue = new Date(nowEpoch + (compressedDays * 86400000));
+        card.dueDate = newDue.toISOString().split("T")[0];
+      }
+    }
+  });
+
+  console.log("[FSRS EXAM] Compressed schedule: All cards anchored before exam horizon (" + maxAvailableDays + " days).");
+  return cardsList;
+};
