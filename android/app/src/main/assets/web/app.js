@@ -43777,3 +43777,24 @@ window.dfStartSynchronizedBreathingPulse = function(ringElement) {
   ringElement.classList.add("df-breathing-active");
   console.log("[ZEN AESTHETICS] 10-second circadian breathing pulse engaged.");
 };
+
+/* ==========================================================
+   DEEP FOCUS: MULTI-TIER LRA HAPTIC FEEDBACK SYNTHESIZER
+   Tailored micro-vibrations for tactile tactile button confirmation
+   ========================================================== */
+window.DF_HAPTIC_PATTERNS = {
+  "tick": [8],               // Ultra-subtle 8ms tick
+  "card_flip": [12],         // Crisp 12ms tactile snap
+  "rating_click": [16],      // Solid 16ms button press
+  "session_success": [20, 40, 30], // Celebratory double pulse
+  "warning": [45]            // Alert vibration
+};
+
+window.dfTriggerLRAHaptic = function(patternType) {
+  if (typeof navigator !== "undefined" && navigator.vibrate) {
+    const pattern = window.DF_HAPTIC_PATTERNS[patternType] || [12];
+    try {
+      navigator.vibrate(pattern);
+    } catch (e) {}
+  }
+};
