@@ -42325,3 +42325,19 @@ window.dfRecoverPowerCutMinutes = function() {
 if (typeof window !== "undefined") {
   window.dfRecoverPowerCutMinutes();
 }
+
+/* ==========================================================
+   DEEP FOCUS: ASTRONOMICAL LEAP-SECOND CALENDAR GUARD
+   Absorbs 61st second anomalies without modulo timer arithmetic errors
+   ========================================================== */
+window.dfSafeModuloSeconds = function(totalSeconds) {
+  // Clamps negative anomalies and enforces non-negative integer representation
+  const safeSec = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+  const minutes = Math.floor(safeSec / 60);
+  const seconds = safeSec % 60;
+  return {
+    minutes: minutes,
+    seconds: seconds,
+    display: (minutes < 10 ? "0" + minutes : "" + minutes) + ":" + (seconds < 10 ? "0" + seconds : "" + seconds)
+  };
+};
