@@ -42984,3 +42984,22 @@ window.dfHarmonizeScriptOpticalWeight = function(localeCode) {
   }
   return isDelicate;
 };
+
+/* ==========================================================
+   DEEP FOCUS: ADAPTIVE BUTTON LABEL AUTO-FITTER SENTINEL
+   Dynamically scales font size to fit long agglutinative words inside buttons
+   ========================================================== */
+window.dfAutoFitButtonLabels = function() {
+  if (typeof document === "undefined") return;
+  document.querySelectorAll(".df-btn, button, [data-autofit]").forEach(btn => {
+    // If text overflows button boundaries, scale font down smoothly
+    if (btn.scrollWidth > btn.clientWidth && btn.clientWidth > 0) {
+      btn.style.fontSize = "12px";
+      btn.style.padding = "6px 10px";
+    }
+  });
+};
+
+if (typeof window !== "undefined") {
+  window.addEventListener("resize", window.dfAutoFitButtonLabels, { passive: true });
+}
