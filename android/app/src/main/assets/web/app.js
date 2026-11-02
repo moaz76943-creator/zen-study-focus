@@ -43243,3 +43243,21 @@ window.dfVerifyDeckIntegrity = async function(cardsList, expectedSig) {
   const currentSig = await window.dfComputeDeckSignature(cardsList);
   return window.dfConstantTimeEquals ? window.dfConstantTimeEquals(currentSig, expectedSig) : (currentSig === expectedSig);
 };
+
+/* ==========================================================
+   DEEP FOCUS: ANTI-REDOS & SAFE SEARCH REGEX SENTINEL
+   Prevents CPU lockups caused by pathological regex backtracking
+   ========================================================== */
+window.dfSafeRegexSearch = function(patternStr, targetText, maxScanLength) {
+  if (!patternStr || !targetText) return false;
+  // Bounded scan length to prevent long string stalling
+  const text = targetText.slice(0, maxScanLength || 5000);
+  // Sanitize regex special characters to enforce literal text search
+  const escaped = patternStr.replace(/[.*+?^$${}()|[\]\\]/g, "\\$&");
+  try {
+    const reg = new RegExp(escaped, "i");
+    return reg.test(text);
+  } catch (e) {
+    return text.toLowerCase().includes(patternStr.toLowerCase());
+  }
+};
