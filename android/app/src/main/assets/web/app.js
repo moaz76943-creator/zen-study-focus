@@ -42513,3 +42513,32 @@ window.dfAtomicBatchInsert = async function(storeName, itemsList) {
     return { success: false, error: err.message };
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: STORAGE QUOTA HEADROOM & DISK CAPACITY SENTINEL
+   Preemptively alerts on disk saturation before QuotaExceededError occurs
+   ========================================================== */
+window.dfCheckStorageHeadroom = async function() {
+  if (typeof navigator !== "undefined" && navigator.storage && navigator.storage.estimate) {
+    try {
+      const estimate = await navigator.storage.estimate();
+      const usedMB = Math.round((estimate.usage || 0) / (1024 * 1024));
+      const quotaMB = Math.round((estimate.quota || 0) / (1024 * 1024));
+      const usageRatio = estimate.quota ? (estimate.usage / estimate.quota) : 0;
+
+      const isSaturated = usageRatio > 0.85;
+      if (isSaturated) {
+        console.warn("[STORAGE SENTINEL] Low storage headroom detected. Used: " + usedMB + "MB / " + quotaMB + "MB");
+      }
+      return {
+        usedMB: usedMB,
+        quotaMB: quotaMB,
+        isSaturated: isSaturated,
+        headroomPercentage: Math.round((1 - usageRatio) * 100)
+      };
+    } catch (e) {
+      return { isSaturated: false, headroomPercentage: 100 };
+    }
+  }
+  return { isSaturated: false, headroomPercentage: 100 };
+};
