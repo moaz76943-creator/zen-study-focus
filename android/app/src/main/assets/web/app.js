@@ -41018,3 +41018,35 @@ window.dfRestoreProcessDeathState = function() {
   } catch (e) {}
   return null;
 };
+
+/* ==========================================================
+   DEEP FOCUS: INLINE WEB WORKER INDEPENDENT TIMER THREAD
+   Immune to main-thread UI lag and heavy DOM operations
+   ========================================================== */
+window.DF_WORKER_REF = null;
+
+window.dfCreateInlineWorkerTimer = function(onTickCallback) {
+  if (window.DF_WORKER_REF) {
+    try { window.DF_WORKER_REF.terminate(); } catch (e) {}
+    window.DF_WORKER_REF = null;
+  }
+  if (typeof Worker === "undefined" || typeof Blob === "undefined") return null;
+
+  try {
+    const workerCode = "let timer = null; self.onmessage = function(e) { if (e.data === 'start') { if (timer) clearInterval(timer); timer = setInterval(function() { self.postMessage('tick'); }, 1000); } else if (e.data === 'stop') { if (timer) clearInterval(timer); timer = null; } };";
+    const blob = new Blob([workerCode], { type: "application/javascript" });
+    const worker = new Worker(URL.createObjectURL(blob));
+
+    worker.onmessage = function(e) {
+      if (e.data === "tick" && typeof onTickCallback === "function") {
+        onTickCallback();
+      }
+    };
+    window.DF_WORKER_REF = worker;
+    console.log("[TIMER THREAD] Independent Web Worker thread spawned.");
+    return worker;
+  } catch (err) {
+    console.warn("[TIMER THREAD] Web Worker fallback to main interval:", err.message);
+    return null;
+  }
+};
