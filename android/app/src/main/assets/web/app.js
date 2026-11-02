@@ -40162,3 +40162,36 @@ window.dfExtractAllDeckTags = function(cardsList) {
   });
   return Array.from(tagSet).sort();
 };
+
+/* ==========================================================
+   DEEP FOCUS: EXAM READINESS & EBBINGHAUS FORGETTING FORECASTER
+   Computes required daily study velocity based on exam target date
+   ========================================================== */
+window.dfComputeExamForecast = function(cardsList, examDateISO) {
+  if (!Array.isArray(cardsList) || !examDateISO) {
+    return { daysRemaining: 0, dailyPaceRequired: 0, readinessScore: 100 };
+  }
+
+  const now = new Date().getTime();
+  const examTime = new Date(examDateISO).getTime();
+  const daysRemaining = Math.max(1, Math.ceil((examTime - now) / 86400000));
+
+  let unmasteredCards = 0;
+  cardsList.forEach(c => {
+    if ((c.interval || 0) < 21 || (c.reps || 0) < 3) {
+      unmasteredCards++;
+    }
+  });
+
+  const dailyPace = Math.ceil(unmasteredCards / daysRemaining);
+  const total = Math.max(1, cardsList.length);
+  const readiness = Math.round(((total - unmasteredCards) / total) * 100);
+
+  return {
+    daysRemaining: daysRemaining,
+    unmasteredCards: unmasteredCards,
+    dailyPaceRequired: dailyPace,
+    readinessScore: readiness,
+    recommendation: dailyPace <= 15 ? "ON_TRACK" : (dailyPace <= 35 ? "ACCELERATE" : "INTENSIVE_REVISION")
+  };
+};
