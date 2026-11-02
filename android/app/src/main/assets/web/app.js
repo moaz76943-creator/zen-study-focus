@@ -39286,3 +39286,36 @@ window.dfPruneAndCompactLogs = function() {
 if (typeof window !== "undefined") {
   window.dfPruneAndCompactLogs();
 }
+
+/* ==========================================================
+   DEEP FOCUS: FAST-TOUCH & ANTI-DOUBLE-CLICK HAPTIC SENTINEL
+   Zero 300ms tap latency and accidental double-action prevention
+   ========================================================== */
+window.DF_LAST_ACTION_TIMESTAMP = 0;
+
+window.dfDebounceAction = function(actionCallback, debounceCooldownMs) {
+  const now = Date.now();
+  const cooldown = debounceCooldownMs || 350;
+  if (now - window.DF_LAST_ACTION_TIMESTAMP < cooldown) {
+    return false; // Prevent accidental rapid double tap
+  }
+  window.DF_LAST_ACTION_TIMESTAMP = now;
+
+  // Gentle tactile confirmation on supported devices
+  if (typeof navigator !== "undefined" && navigator.vibrate) {
+    try { navigator.vibrate(15); } catch (e) {}
+  }
+
+  if (typeof actionCallback === "function") {
+    actionCallback();
+  }
+  return true;
+};
+
+window.dfAttachFastButtonListener = function(element, callback) {
+  if (!element) return;
+  element.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.dfDebounceAction(callback);
+  });
+};
