@@ -40667,3 +40667,33 @@ window.dfGetMonumentalReleaseSealV40 = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: ASYNC INDEXED-DB CORE WRAPPER (M3968-M3977)
+   Bypasses legacy 5MB localStorage limits with high-speed async storage
+   ========================================================== */
+window.DF_DB_NAME = "deep_focus_db";
+window.DF_DB_VERSION = 1;
+window.DF_IDB_INSTANCE = null;
+
+window.dfOpenDatabase = function() {
+  return new Promise((resolve, reject) => {
+    if (window.DF_IDB_INSTANCE) return resolve(window.DF_IDB_INSTANCE);
+    if (typeof indexedDB === "undefined") return reject(new Error("IndexedDB unsupported"));
+
+    const req = indexedDB.open(window.DF_DB_NAME, window.DF_DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains("sessions")) db.createObjectStore("sessions", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("cards")) db.createObjectStore("cards", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("decks")) db.createObjectStore("decks", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("settings")) db.createObjectStore("settings");
+    };
+    req.onsuccess = (e) => {
+      window.DF_IDB_INSTANCE = e.target.result;
+      console.log("[STORAGE ENGINE] IndexedDB initialized successfully.");
+      resolve(window.DF_IDB_INSTANCE);
+    };
+    req.onerror = (e) => reject(e.target.error);
+  });
+};
