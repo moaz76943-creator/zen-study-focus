@@ -37115,6 +37115,9 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
+    bem: { name: "Bemba", focus: "Kutontonkanya", rest: "Kutuusha", start: "Tampeni", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    lin: { name: "Lingala", focus: "Makanisi", rest: "Pema", start: "Banda", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
+    kng: { name: "Koongo", focus: "Mabanza", rest: "Vundu", start: "Bandisa", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     tem: { name: "Temne", focus: "A-tente", rest: "Ka-fumpo", start: "Ka-toth", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     sus: { name: "Susu", focus: "Xaxili", rest: "Matabu", start: "Folo", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     mnk: { name: "Mandinka", focus: "Hakiloo", rest: "Siinangho", start: "Folu", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
@@ -38784,3 +38787,5 @@ function dfGetMilestoneVersion3550AuditSeal() { return { milestone: "M3390", rel
 function dfGetMilestoneVersion3560AuditSeal() { return { milestone: "M3400", release: "v35.6.0", versionCode: 3220, date: new Date().toISOString(), polyglotLangs: 986, dspCertified: true, zeroPii: true }; }
 
 function dfGetMilestoneVersion3570AuditSeal() { return { milestone: "M3410", release: "v35.7.0", versionCode: 3230, date: new Date().toISOString(), polyglotLangs: 993, dspCertified: true, zeroPii: true }; }
+
+function dfGetMonumental1000LivingLanguagesGrandSeal() { return { milestone: "M3420", release: "v36.0.0", versionCode: 3240, date: new Date().toISOString(), polyglotLangs: 1000, historicMilestone: "ONE_THOUSAND_LIVING_LANGUAGES_ACCOMPLISHED", legalStatus: "PERFECT_SAFETY", zeroTracking: true }; }
