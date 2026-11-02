@@ -41180,3 +41180,23 @@ window.dfApplyPreset = function(presetId) {
   console.log("[PRESETS] Preset applied successfully:", p.name || presetId);
   return true;
 };
+
+/* ==========================================================
+   DEEP FOCUS: SELECTABLE HARMONIC CHIME PROFILES (PILLAR 4 COMPLETE)
+   Pure mathematical sine intervals (Dawn, Horizon, Breeze, Shimmer)
+   ========================================================== */
+window.DF_CHIME_PROFILES = {
+  "dawn": [528, 660],      // 528Hz Solfeggio + Major Third
+  "horizon": [432, 540],   // 432Hz Natural A + Major Third
+  "breeze": [587, 734],    // 587Hz D5 + Fifth
+  "shimmer": [659, 824]    // 659Hz E5 + High Octave Interval
+};
+
+window.dfSetPreferredChimeProfile = function(profileKey) {
+  if (window.DF_CHIME_PROFILES[profileKey]) {
+    if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_chime_profile", profileKey);
+    console.log("[CHIME SELECTOR] Chime profile set to:", profileKey);
+    return true;
+  }
+  return false;
+};
