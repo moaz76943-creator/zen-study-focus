@@ -42690,3 +42690,23 @@ window.dfGetSector3StorageSeal = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: HARDWARE SAMPLE-RATE ADAPTER (SECTOR 4 LAUNCH)
+   Dynamically aligns procedural buffer synthesis with DAC native clock (44.1k/48k/96k)
+   ========================================================== */
+window.dfGetHardwareSampleRate = function(ctx) {
+  if (ctx && typeof ctx.sampleRate === "number") {
+    return ctx.sampleRate;
+  }
+  return 48000; // Standard modern Android audio HAL default
+};
+
+window.dfCreateHardwareAlignedBuffer = function(ctx, durationSec) {
+  if (!ctx) return null;
+  const sampleRate = window.dfGetHardwareSampleRate(ctx);
+  const bufferSize = Math.floor(sampleRate * (durationSec || 2));
+  const buffer = ctx.createBuffer(1, bufferSize, sampleRate);
+  console.log("[DSP HARDWARE] Created hardware-aligned audio buffer @ " + sampleRate + "Hz.");
+  return buffer;
+};
