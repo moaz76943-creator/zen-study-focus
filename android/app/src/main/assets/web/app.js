@@ -42222,3 +42222,22 @@ window.dfGetSector1MemorySeal = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: DAYLIGHT SAVING TIME & CLOCK FOLD SENTINEL (SECTOR 2 LAUNCH)
+   Immunizes focus timer against 1-hour DST forward/backward jumps
+   ========================================================== */
+window.DF_UTC_START_EPOCH = 0;
+
+window.dfAnchorUTCSession = function() {
+  window.DF_UTC_START_EPOCH = Date.now();
+  window.DF_TIMEZONE_OFFSET_ANCHOR = new Date().getTimezoneOffset();
+  console.log("[TIME SENTINEL] Session anchored to absolute UTC epoch:", window.DF_UTC_START_EPOCH);
+};
+
+window.dfGetTrueElapsedSeconds = function() {
+  if (!window.DF_UTC_START_EPOCH) return 0;
+  // Absolute milliseconds elapsed regardless of local clock adjustments
+  const absoluteElapsedMs = Math.max(0, Date.now() - window.DF_UTC_START_EPOCH);
+  return Math.floor(absoluteElapsedMs / 1000);
+};
