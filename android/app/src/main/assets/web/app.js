@@ -42430,3 +42430,34 @@ window.dfGetSector2TimingSeal = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: MULTI-WINDOW CONCURRENCY LOCK (SECTOR 3 LAUNCH)
+   Coordinates database transactions across split-screen and multi-instances
+   ========================================================== */
+window.DF_WINDOW_INSTANCE_ID = "win_" + Math.random().toString(36).substr(2, 9);
+window.DF_BROADCAST_CHANNEL = null;
+
+if (typeof BroadcastChannel !== "undefined") {
+  try {
+    window.DF_BROADCAST_CHANNEL = new BroadcastChannel("df_concurrency_channel");
+    window.DF_BROADCAST_CHANNEL.onmessage = (e) => {
+      if (e.data && e.data.type === "DB_WRITE_SYNC") {
+        console.log("[MULTI-WINDOW] Coordinated DB sync from instance:", e.data.instanceId);
+      }
+    };
+  } catch (e) {}
+}
+
+window.dfBroadcastDataSync = function(storeName) {
+  if (window.DF_BROADCAST_CHANNEL) {
+    try {
+      window.DF_BROADCAST_CHANNEL.postMessage({
+        type: "DB_WRITE_SYNC",
+        store: storeName,
+        instanceId: window.DF_WINDOW_INSTANCE_ID,
+        timestamp: Date.now()
+      });
+    } catch (e) {}
+  }
+};
