@@ -38927,3 +38927,42 @@ if (typeof document !== "undefined") {
     }
   });
 }
+
+/* ==========================================================
+   DEEP FOCUS: RESILIENT WEB AUDIO DSP & AUTO-RESUME SHIELD
+   Eliminates autoplay blocks, clicking pops, and suspended audio states
+   ========================================================== */
+window.DF_AUDIO_CTX = null;
+
+window.dfGetSafeAudioContext = function() {
+  if (!window.DF_AUDIO_CTX && typeof window !== "undefined") {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      window.DF_AUDIO_CTX = new AudioContextClass();
+    }
+  }
+  return window.DF_AUDIO_CTX;
+};
+
+window.dfEnsureAudioActive = async function() {
+  const ctx = window.dfGetSafeAudioContext();
+  if (ctx && ctx.state === "suspended") {
+    try {
+      await ctx.resume();
+    } catch (e) {
+      // Fallback silently if user interaction is still pending
+    }
+  }
+  return ctx && ctx.state === "running";
+};
+
+// Zero-Click Exponential Gain Ramp Helper
+window.dfSafeRampGain = function(gainNode, targetValue, durationMs) {
+  if (!gainNode || !gainNode.gain) return;
+  const ctx = window.dfGetSafeAudioContext();
+  const now = ctx ? ctx.currentTime : 0;
+  const durationSec = (durationMs || 50) / 1000;
+  gainNode.gain.cancelScheduledValues(now);
+  gainNode.gain.setValueAtTime(Math.max(gainNode.gain.value, 0.0001), now);
+  gainNode.gain.exponentialRampToValueAtTime(Math.max(targetValue, 0.0001), now + durationSec);
+};
