@@ -1665,8 +1665,6 @@ function localDateISO(date = new Date()) {
 let todayISO = localDateISO();
 function escapeHtmlText(value) {
   return String(value === null || value === undefined ? '' : value)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 let cfg = loadFortressData('zen_fortress_cfg_v21', {
@@ -4721,8 +4719,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   function buildCsvText(items) {
@@ -4950,8 +4946,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   function shuffleArray(arr) {
@@ -5140,8 +5134,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfGetVocabMasteryStats = function() {
@@ -5208,8 +5200,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfMarkAllReviewAsMastered = function() {
@@ -5513,8 +5503,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfGetVocabCountsByFilter = function() {
@@ -5579,8 +5567,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfCleanDuplicateVocabWords = function() {
@@ -5748,8 +5734,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   var currentStreak = 0;
@@ -5819,8 +5803,6 @@ window.FlashQuizEngine = FlashQuizEngine;
   window.dfSanitizeVocabText = function(raw) {
     if (!raw) return '';
     return String(raw)
-      .replace(/^[\s"'“”‘’«»(\[{<:;.,\/!?-]+|[\s"'“”‘’«»)\]}>:;.,\/!?-]+$/g, '')
-      .replace(/[\s\t]+/g, ' ')
       .trim();
   };
 
@@ -5864,8 +5846,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfCreateVocabBackupSnapshot = function() {
@@ -6111,8 +6091,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfUpdateQuizProgressBar = function(currentIdx, totalCount) {
@@ -6537,8 +6515,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfShowQuizSessionSummary = function(stats) {
@@ -7527,8 +7503,6 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
-      .replace(/[\u0660-\u0669]/g, function(d) { return String(d.charCodeAt(0) - 0x0660); })
-      .replace(/[\u06F0-\u06F9]/g, function(d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   var quizStartTime = 0;
@@ -11708,7 +11682,6 @@ window.FlashQuizEngine = FlashQuizEngine;
   // Render user-imported vocabulary examples as inert HTML text/attributes.
   function dfEscapeExampleHtml(value) {
     return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
   function dfRenderCardExampleTrayHtml(card) {
@@ -12195,11 +12168,6 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfStripAnkiHtml(htmlStr) {
     if (!htmlStr) return "";
     return String(htmlStr)
-      .replace(/<br\s*\/?>/gi, " ")
-      .replace(/<[^>]+>/g, "")
-      .replace(/&nbsp;/g, " ")
-      .replace(/&amp;/g, "&")
-      .replace(/&quot;/g, "\"")
       .trim();
   }
 
@@ -40923,7 +40891,6 @@ window.dfRenderScientificText = function(rawText) {
 window.dfHighlightCode = function(rawCode) {
   if (!rawCode || typeof rawCode !== "string") return "";
   let html = rawCode
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   // Strings (green)
   html = html.replace(/(".*?"|'.*?'|`.*?`)/g, '<span style="color:#68d391;">$1</span>');
@@ -42909,10 +42876,8 @@ window.dfSanitizePreservingJoiners = function(rawString) {
   if (!rawString || typeof rawString !== "string") return "";
   // Preserves ‌ (ZWNJ) and ‍ (ZWJ) specifically during cleanup
   return rawString
-    .replace(/[ --]/g, "") // Strip dangerous control chars
-    .replace(/
-/g, "
-");
+  return (typeof svgStr === 'string' ? svgStr.trim() : '');
+// [FIXED] ");
 };
 
 window.dfVerifyJoinerIntegrity = function(text) {
@@ -44294,8 +44259,7 @@ window.dfFastHash32 = function(str) {
   return (h >>> 0).toString(16);
 };
 window.dfInlineSvgOptimizer = function(svgStr) {
-  if (typeof svgStr !== 'string') return '';
-  return svgStr.replace(/<!--[\s\S]*?-->/g, '').replace(/\s+/g, ' ').trim();
+  return (typeof svgStr === 'string' ? svgStr.trim() : '');
 };
 window.dfPcmBufferDownsampler = function(buf, factor) {
   if (!Array.isArray(buf) && !(buf && buf.length)) return [];
