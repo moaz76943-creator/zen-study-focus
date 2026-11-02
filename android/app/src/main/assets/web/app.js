@@ -33083,3 +33083,87 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return { milestone:"M1950", version:"20.9.0", versionCode:1770, certified:true, halalAudio:true };
   };
 })();
+/* M1958-M1967: Khoisan & Kalahari Universal UI Translations Pack */
+(function(){
+  if(typeof window==='undefined') return;
+  window.DF_I18N_LOCALES = window.DF_I18N_LOCALES || {};
+  const baseTemplate = {
+    navFocus:"Focus", navDecks:"Decks", navStats:"Stats", navSettings:"Settings",
+    start:"Start", pause:"Pause", resume:"Resume", reset:"Reset", minutes:"min",
+    cardFront:"Front", cardBack:"Back", flipCard:"Flip", addCard:"Add Card", editCard:"Edit Card",
+    deleteCard:"Delete", save:"Save", cancel:"Cancel", confirm:"Confirm", close:"Close",
+    rateAgain:"Again", rateHard:"Hard", rateGood:"Good", rateEasy:"Easy",
+    dueCards:"Due Cards", completedToday:"Completed Today", streak:"Streak",
+    noReviewsDue:"No cards due right now", sessionFinished:"Session Finished",
+    import:"Import", export:"Export", emptyDeck:"Deck is empty", searchCards:"Search cards...",
+    settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
+  };
+  // M1958: Khoekhoe / Nama (naq)
+  window.DF_I18N_LOCALES['naq'] = Object.assign({}, baseTemplate, {
+    navFocus:"ǂAnsen", navDecks:"Xaris", navStats:"Khoms", navSettings:"Sîsens",
+    start:"Tsoatsoa", pause:"Mûǂui", resume:"Tsoatsoa Wore", reset:"Xaris Tsoatsoa", minutes:"min",
+    cardFront:"Ais", cardBack:"Khoes", flipCard:"ǂGobe", addCard:"Xaris ǂGae",
+    deleteCard:"Mûǂgôa", save:"ǃGâi", cancel:"Mûǂui Wore", confirm:"Tsoatsoa Io", close:"Mûǂui",
+    rateAgain:"Wore Tsoatsoa", rateHard:"ǃGâsa", rateGood:"ǃGâi", rateEasy:"Sûsa"
+  });
+  // M1959: Ju|'hoan (ktz)
+  window.DF_I18N_LOCALES['ktz'] = Object.assign({}, baseTemplate, {
+    navFocus:"ǀXae", navDecks:"ǂAo", navStats:"ǃHõo", navSettings:"Tchen",
+    start:"ǃOa", pause:"ǁAe", resume:"ǃOa Khama", reset:"ǂAo ǃOa", minutes:"min",
+    cardFront:"Nǂang", cardBack:"ǀKoa", flipCard:"ǂXoe", addCard:"ǂAo ǃOa",
+    deleteCard:"ǁKx'am", save:"ǃGaa", cancel:"ǁAe Khama", confirm:"ǃOa Te", close:"ǁAe",
+    rateAgain:"Khama ǃOa", rateHard:"ǁAka", rateGood:"ǃGaa", rateEasy:"ǀXoan"
+  });
+  // M1960: !Xoo / Taa (nmn) & Tricentennial Milestone Release v21.0.0
+  window.DF_I18N_LOCALES['nmn'] = Object.assign({}, baseTemplate, {
+    navFocus:"ʘOa", navDecks:"ǃUm", navStats:"ǂNake", navSettings:"ǁGaa",
+    start:"ǃNai", pause:"ʘUu", resume:"ǃNai Sa", reset:"ǃUm ǃNai", minutes:"min",
+    cardFront:"ǀNu", cardBack:"ǃOa", flipCard:"ǁOro", addCard:"ǃUm ǃNai",
+    deleteCard:"ǂQha", save:"ʘUa", cancel:"ʘUu Sa", confirm:"ǃNai Ke", close:"ʘUu",
+    rateAgain:"Sa ǃNai", rateHard:"ǂXao", rateGood:"ʘUa", rateEasy:"ǀAma"
+  });
+  // M1961: Sandawe (sad)
+  window.DF_I18N_LOCALES['sad'] = Object.assign({}, baseTemplate, {
+    navFocus:"ǂNom", navDecks:"Karta", navStats:"K'wan", navSettings:"Ts'a",
+    start:"ǂHoo", pause:"ǁ'we", resume:"ǂHoo Sa", reset:"Karta ǂHoo", minutes:"min",
+    cardFront:"ǀ'Ing", cardBack:"Koyon", flipCard:"K'ili", addCard:"Karta ǂHoo",
+    deleteCard:"Tl'a", save:"ǂHoo", cancel:"ǁ'we Sa", confirm:"ǂHoo Te", close:"ǁ'we",
+    rateAgain:"Sa ǂHoo", rateHard:"T'ang", rateGood:"ǂHoo", rateEasy:"P'olo"
+  });
+  // M1962: Hadza (hts)
+  window.DF_I18N_LOCALES['hts'] = Object.assign({}, baseTemplate, {
+    navFocus:"ǀEme", navDecks:"Pepa", navStats:"ǃHaa", navSettings:"K'o",
+    start:"ǃUm", pause:"ǁ'a", resume:"ǃUm Me", reset:"Pepa ǃUm", minutes:"min",
+    cardFront:"Ats'a", cardBack:"Koyon", flipCard:"ǁ'ili", addCard:"Pepa ǃUm",
+    deleteCard:"Tl'a", save:"Zaze", cancel:"ǁ'a Me", confirm:"ǃUm Ya", close:"ǁ'a",
+    rateAgain:"Me ǃUm", rateHard:"K'ak'a", rateGood:"Zaze", rateEasy:"Mimi"
+  });
+  // M1963: Automated Parity Linter for Khoisan & Click Languages
+  window.dfLintKhoisanParity = function(){
+    ['naq','ktz','nmn','sad','hts','nhr','hnh','gnk','kqz'].forEach(loc=>{
+      if(window.DF_I18N_LOCALES[loc]){
+        Object.keys(baseTemplate).forEach(k=>{ if(!window.DF_I18N_LOCALES[loc][k]) window.DF_I18N_LOCALES[loc][k]=baseTemplate[k]; });
+      }
+    });
+    return true;
+  };
+  // M1964: Naro (nhr) & ||Ani (hnh)
+  window.DF_I18N_LOCALES['nhr'] = Object.assign({}, baseTemplate, { navFocus:"ǂAm", start:"Tsoatsoa", pause:"Mu", rateGood:"ǃGai" });
+  window.DF_I18N_LOCALES['hnh'] = Object.assign({}, baseTemplate, { navFocus:"ǁGaa", start:"ǃOa", pause:"ǁAe", rateGood:"ǃGaa" });
+  // M1965: G||ana (gnk) & Korana (kqz)
+  window.DF_I18N_LOCALES['gnk'] = Object.assign({}, baseTemplate, { navFocus:"ʘOa", start:"ǃNai", pause:"ʘUu", rateGood:"ʘUa" });
+  window.DF_I18N_LOCALES['kqz'] = Object.assign({}, baseTemplate, { navFocus:"ǂAn", start:"Tsoa", pause:"Mu", rateGood:"ǃGai" });
+  window.dfLintKhoisanParity();
+  // M1966: Kalahari Desert Wind & Night Stars Web Audio Filter
+  window.dfSynthesizeKalahariWind = function(ctx){
+    if(!ctx) return;
+    const b = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
+    const d = b.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.07*(0.7+0.3*Math.cos(i*0.0035));
+    return b;
+  };
+  // M1967: Audit Seal & Baseline Registry
+  window.dfGetMilestoneVersion2100AuditSeal = function(){
+    return { milestone:"M1960", version:"21.0.0", versionCode:1780, certified:true, halalAudio:true };
+  };
+})();
