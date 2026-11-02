@@ -41452,3 +41452,41 @@ window.DF_ICONS = {
 window.dfGetIconSVG = function(iconName) {
   return window.DF_ICONS[iconName] || "";
 };
+
+/* ==========================================================
+   DEEP FOCUS: ADAPTIVE TWO-COLUMN TABLET & FOLDABLE LAYOUT
+   Transforms view into split-screen on tablets and wide screens (PILLAR 6 COMPLETE)
+   ========================================================== */
+window.dfInjectAdaptiveTabletLayout = function() {
+  if (typeof document === "undefined" || !document.head) return;
+  const styleId = "df-tablet-split-layout";
+  if (document.getElementById(styleId)) return;
+
+  const tabletCSS = `
+    @media (min-width: 768px) {
+      .df-main-viewport {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 24px !important;
+        max-width: 1100px !important;
+        margin: 0 auto !important;
+        padding: 24px !important;
+      }
+      .df-timer-column {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+      }
+    }
+  `;
+
+  const styleEl = document.createElement("style");
+  styleEl.id = styleId;
+  styleEl.textContent = tabletCSS;
+  document.head.appendChild(styleEl);
+  console.log("[TABLET ENGINE] Pillar 6 Complete: Adaptive Split Layout Active.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfInjectAdaptiveTabletLayout();
+}
