@@ -42710,3 +42710,17 @@ window.dfCreateHardwareAlignedBuffer = function(ctx, durationSec) {
   console.log("[DSP HARDWARE] Created hardware-aligned audio buffer @ " + sampleRate + "Hz.");
   return buffer;
 };
+
+/* ==========================================================
+   DEEP FOCUS: DC-OFFSET BLOCKER & INFRASONIC SUB-BASS FILTER
+   2nd-order 15Hz high-pass filter protecting headphone transducer coils
+   ========================================================== */
+window.dfCreateDCOffsetBlocker = function(ctx) {
+  if (!ctx || typeof ctx.createBiquadFilter !== "function") return null;
+  const filter = ctx.createBiquadFilter();
+  filter.type = "highpass";
+  filter.frequency.setValueAtTime(15, ctx.currentTime); // Infrasonic cutoff (15Hz)
+  filter.Q.setValueAtTime(0.707, ctx.currentTime);      // Butterworth maximally flat
+  console.log("[DSP SECURITY] DC-Offset Blocker filter configured (15Hz Butterworth).");
+  return filter;
+};
