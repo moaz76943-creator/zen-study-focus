@@ -41144,3 +41144,39 @@ window.dfGeneratePinkNoiseBuffer = function(ctx) {
   }
   return buffer;
 };
+
+/* ==========================================================
+   DEEP FOCUS: CUSTOM SOUNDSCAPE PRESETS & PROFILE SAVER
+   Saves and instantly recalls multi-channel natural sound configurations
+   ========================================================== */
+window.DF_DEFAULT_SOUND_PRESETS = {
+  "deep_rain": { name: "Deep Rain", rain: 80, wind: 20, river: 0 },
+  "mountain_camp": { name: "Mountain Camp", wind: 60, forest: 40, rain: 0 },
+  "river_valley": { name: "River Valley", river: 70, dew: 30, wind: 0 }
+};
+
+window.dfSaveCustomPreset = function(presetId, presetName, layersObj) {
+  const presets = window.dfSafeGetStorage ? window.dfSafeGetStorage("df_sound_presets", window.DF_DEFAULT_SOUND_PRESETS) : window.DF_DEFAULT_SOUND_PRESETS;
+  presets[presetId] = {
+    name: presetName || presetId,
+    layers: layersObj || {}
+  };
+  if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_sound_presets", presets);
+  console.log("[PRESETS] Custom soundscape preset saved:", presetName);
+  return presets;
+};
+
+window.dfApplyPreset = function(presetId) {
+  const presets = window.dfSafeGetStorage ? window.dfSafeGetStorage("df_sound_presets", window.DF_DEFAULT_SOUND_PRESETS) : window.DF_DEFAULT_SOUND_PRESETS;
+  const p = presets[presetId];
+  if (!p) return false;
+
+  const layers = p.layers || p;
+  Object.keys(layers).forEach(soundKey => {
+    if (typeof layers[soundKey] === "number" && window.dfSetChannelVolume) {
+      window.dfSetChannelVolume(soundKey, layers[soundKey]);
+    }
+  });
+  console.log("[PRESETS] Preset applied successfully:", p.name || presetId);
+  return true;
+};
