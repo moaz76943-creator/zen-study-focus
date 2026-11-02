@@ -42171,3 +42171,19 @@ window.dfSafeRemoveListener = function(targetElement, eventType, handlerFn) {
   if (!targetElement || typeof targetElement.removeEventListener !== "function") return;
   targetElement.removeEventListener(eventType, handlerFn, { passive: true, capture: false });
 };
+
+/* ==========================================================
+   DEEP FOCUS: WEB ANIMATION API SCRUBBER & COMPOSITOR RECYCLER
+   Cancels and dereferences completed animations preventing compositor heap leaks
+   ========================================================== */
+window.dfPlayTransientAnimation = function(element, keyframes, options) {
+  if (!element || typeof element.animate !== "function") return null;
+  const anim = element.animate(keyframes, options);
+  anim.onfinish = () => {
+    try {
+      anim.commitStyles();
+      anim.cancel(); // Sever animation instance from element compositor node
+    } catch (e) {}
+  };
+  return anim;
+};
