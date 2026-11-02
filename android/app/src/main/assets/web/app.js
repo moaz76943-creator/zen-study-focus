@@ -41610,3 +41610,33 @@ window.dfCheckStudyBurnoutBrake = function(todayMinutes) {
   }
   return { brakeTriggered: false };
 };
+
+/* ==========================================================
+   DEEP FOCUS: ANDROID APP SHORTCUTS & QUICK-LAUNCH DISPATCHER
+   Handles long-press launcher shortcuts directly (Timer, Decks, Stats)
+   ========================================================== */
+window.dfHandleAppShortcutAction = function(actionKey) {
+  console.log("[LAUNCHER] Dispatching home screen shortcut action:", actionKey);
+  if (actionKey === "quick_25m") {
+    if (window.dfNavigateToScreen) window.dfNavigateToScreen("timer");
+    const toggleBtn = document.getElementById("df-timer-toggle") || document.querySelector("[data-action='toggle']");
+    if (toggleBtn) toggleBtn.click();
+  } else if (actionKey === "review_today") {
+    if (window.dfNavigateToScreen) window.dfNavigateToScreen("decks");
+  } else if (actionKey === "view_stats") {
+    if (window.dfNavigateToScreen) window.dfNavigateToScreen("stats");
+  }
+};
+
+window.dfCheckLaunchIntentParams = function() {
+  if (typeof window === "undefined" || !window.location) return;
+  const params = new URLSearchParams(window.location.search);
+  const action = params.get("shortcut_action");
+  if (action) {
+    setTimeout(() => { window.dfHandleAppShortcutAction(action); }, 300);
+  }
+};
+
+if (typeof window !== "undefined") {
+  window.dfCheckLaunchIntentParams();
+}
