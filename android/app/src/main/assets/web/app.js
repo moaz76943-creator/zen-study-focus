@@ -40084,3 +40084,49 @@ window.dfCrossfadeToSound = async function(newSoundType, fadeDurationSec) {
   }
   if (newSoundType && newSoundType !== "none") window.dfPlayNatureSound(newSoundType);
 };
+
+/* ==========================================================
+   DEEP FOCUS: UNIVERSAL ANKI & CSV FLASHCARD IMPORTER/EXPORTER
+   Parses Tab, Comma, and Semicolon delimited study sets seamlessly
+   ========================================================== */
+window.dfParseCardsFromText = function(rawText) {
+  if (!rawText || typeof rawText !== "string") return [];
+  const lines = rawText.split(/\r?\n/).filter(line => line.trim().length > 0);
+  const parsedCards = [];
+
+  lines.forEach((line, index) => {
+    // Auto-detect delimiter: Tab (Anki) vs Semicolon vs Comma
+    let parts = line.split("\t");
+    if (parts.length < 2) parts = line.split(";");
+    if (parts.length < 2) parts = line.split(",");
+
+    if (parts.length >= 2) {
+      const front = parts[0].trim();
+      const back = parts[1].trim();
+      const tags = parts[2] ? parts[2].split(" ").map(t => t.trim()).filter(Boolean) : [];
+
+      if (front && back) {
+        parsedCards.push({
+          id: "card_" + Date.now() + "_" + index,
+          front: front,
+          back: back,
+          tags: tags,
+          reps: 0,
+          interval: 0,
+          easeFactor: 2.5,
+          dueDate: new Date().toISOString().split("T")[0]
+        });
+      }
+    }
+  });
+  console.log("[SRS IMPORTER] Successfully parsed " + parsedCards.length + " cards from text payload.");
+  return parsedCards;
+};
+
+window.dfExportDeckToTSV = function(cardsList) {
+  if (!Array.isArray(cardsList)) return "";
+  return cardsList.map(c => {
+    const tags = Array.isArray(c.tags) ? c.tags.join(" ") : "";
+    return (c.front || "") + "\t" + (c.back || "") + (tags ? "\t" + tags : "");
+  }).join("\n");
+};
