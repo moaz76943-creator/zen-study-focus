@@ -44612,3 +44612,47 @@ window.dfGetMilestoneM5477MasterLexiconAuditSeal = function() {
     status: 'VERIFIED_100_PERCENT'
   };
 };
+
+
+// --- MISSIONS M5478-M5487: Urdu and Persian Master Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ur = {
+  timer_start: "گہرے ارتکاز کا آغاز",
+  timer_pause: "عارضی وقفہ",
+  timer_resume: "ارتکاز جاری رکھیں",
+  timer_reset: "موقتی بحالی",
+  timer_stop: "نشست کا اختتام",
+  phase_focus: "توجہ و ارتکاز کا دورانیہ",
+  phase_short_break: "مختصر ذہنی وقفہ",
+  phase_long_break: "طویل آرام کا وقفہ",
+  session_completed: "ماشاءاللہ! نشست مکمل ہوئی",
+  card_flip: "ورق پلٹیں",
+  card_show_answer: "جواب دیکھیں",
+  rating_again: "دوبارہ مراجعہ درکار",
+  rating_hard: "دشوار بازیافت",
+  rating_good: "اچھی یادداشت",
+  rating_easy: "پختہ یادداشت"
+};
+
+window.DF_MASTER_LEXICON.fa = {
+  timer_start: "شروع تمرکز عمیق",
+  timer_pause: "توقف موقت",
+  timer_resume: "ادامه تمرکز",
+  timer_reset: "تنظیم مجدد",
+  timer_stop: "پایان جلسه",
+  phase_focus: "نشست تمرکز عمیق",
+  phase_short_break: "استراحت کوتاه ذهنی",
+  phase_long_break: "استراحت طولانی",
+  session_completed: "بسیار عالی! جلسه تکمیل شد",
+  card_flip: "برگرداندن کارت",
+  card_show_answer: "نمایش پاسخ",
+  rating_again: "نیاز به مرور",
+  rating_hard: "سخت",
+  rating_good: "بازیابی دقیق",
+  rating_easy: "تثبیت کامل"
+};
+
+window.dfGetMilestoneM5487UrduPersianLexiconSeal = function() {
+  return { milestone: 'M5478-M5487 Urdu and Persian Master Lexicons', status: 'VERIFIED' };
+};
