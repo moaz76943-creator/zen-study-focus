@@ -41797,3 +41797,43 @@ window.dfResolvePluralCategory = function(localeCode, count) {
   // Default Germanic/Romance 2-category rule
   return n === 1 ? "one" : "other";
 };
+
+/* ==========================================================
+   DEEP FOCUS: FAULT-TOLERANT FUZZY LOCALE SEARCH ENGINE
+   Matches misspelled language names and alternate phonetic spellings
+   ========================================================== */
+window.dfComputeLevenshteinDistance = function(a, b) {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = [];
+
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+};
+
+window.dfFuzzySearchLocales = function(query) {
+  const q = (query || "").trim().toLowerCase();
+  if (!q || !window.DF_I18N_LOCALES) return [];
+
+  const results = [];
+  Object.entries(window.DF_I18N_LOCALES).forEach(([code, data]) => {
+    const name = (data.name || "").toLowerCase();
+    const dist = window.dfComputeLevenshteinDistance(q, name.slice(0, q.length));
+    if (dist <= 2 || name.includes(q) || code.includes(q)) {
+      results.push({ code, name: data.name, score: dist });
+    }
+  });
+
+  return results.sort((a, b) => a.score - b.score).slice(0, 25);
+};
