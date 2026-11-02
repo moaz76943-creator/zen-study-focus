@@ -40740,3 +40740,36 @@ window.dfMigrateLegacyStorage = async function() {
 if (typeof window !== "undefined") {
   setTimeout(() => { if (window.dfMigrateLegacyStorage) window.dfMigrateLegacyStorage(); }, 500);
 }
+
+/* ==========================================================
+   DEEP FOCUS: INCOGNITO SHIELD & RESTRICTED WEBVIEW FALLBACK
+   Zero-crash in-memory fallback for environments with blocked storage
+   ========================================================== */
+window.DF_MEMORY_DATA_STORES = {
+  sessions: {},
+  cards: {},
+  decks: {},
+  settings: {}
+};
+
+window.dfSafePutItem = async function(storeName, key, value) {
+  try {
+    const db = await window.dfOpenDatabase();
+    return new Promise((resolve) => {
+      const tx = db.transaction(storeName, "readwrite");
+      const store = tx.objectStore(storeName);
+      const req = store.put(value, key);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => {
+        window.DF_MEMORY_DATA_STORES[storeName][key] = value;
+        resolve(true);
+      };
+    });
+  } catch (e) {
+    // Graceful fallback to memory store
+    if (window.DF_MEMORY_DATA_STORES[storeName]) {
+      window.DF_MEMORY_DATA_STORES[storeName][key] = value;
+    }
+    return true;
+  }
+};
