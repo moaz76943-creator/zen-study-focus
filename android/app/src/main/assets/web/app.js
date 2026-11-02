@@ -40989,3 +40989,32 @@ window.dfGetMonotonicElapsedSeconds = function(startEpochMs) {
   const deltaMs = Math.max(0, now - startEpochMs);
   return Math.floor(deltaMs / 1000);
 };
+
+/* ==========================================================
+   DEEP FOCUS: ANDROID PROCESS DEATH & CRASH RESTORER SENTINEL
+   Restores active timer and card review state after OS task killing
+   ========================================================== */
+window.dfPersistLiveSessionState = function(stateObj) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const payload = Object.assign({}, stateObj, { savedAt: Date.now() });
+    localStorage.setItem("df_live_session_snapshot", JSON.stringify(payload));
+  } catch (e) {}
+};
+
+window.dfRestoreProcessDeathState = function() {
+  if (typeof localStorage === "undefined") return null;
+  try {
+    const raw = localStorage.getItem("df_live_session_snapshot");
+    if (!raw) return null;
+    const snapshot = JSON.parse(raw);
+    const elapsedSinceSave = Date.now() - (snapshot.savedAt || 0);
+
+    // If killed within the last 2 hours and was running, provide recovery payload
+    if (elapsedSinceSave < (2 * 3600 * 1000) && snapshot.isRunning) {
+      console.log("[LIFECYCLE] Recovered session after Android OS process death.");
+      return snapshot;
+    }
+  } catch (e) {}
+  return null;
+};
