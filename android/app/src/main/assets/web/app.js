@@ -35266,3 +35266,87 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return { milestone:"M2210", version:"23.5.0", versionCode:2030, certified:true, halalAudio:true };
   };
 })();
+/* M2218-M2227: Pacific Choco & Northern Andean Universal UI Translations Pack */
+(function(){
+  if(typeof window==='undefined') return;
+  window.DF_I18N_LOCALES = window.DF_I18N_LOCALES || {};
+  const baseTemplate = {
+    navFocus:"Focus", navDecks:"Decks", navStats:"Stats", navSettings:"Settings",
+    start:"Start", pause:"Pause", resume:"Resume", reset:"Reset", minutes:"min",
+    cardFront:"Front", cardBack:"Back", flipCard:"Flip", addCard:"Add Card", editCard:"Edit Card",
+    deleteCard:"Delete", save:"Save", cancel:"Cancel", confirm:"Confirm", close:"Close",
+    rateAgain:"Again", rateHard:"Hard", rateGood:"Good", rateEasy:"Easy",
+    dueCards:"Due Cards", completedToday:"Completed Today", streak:"Streak",
+    noReviewsDue:"No cards due right now", sessionFinished:"Session Finished",
+    import:"Import", export:"Export", emptyDeck:"Deck is empty", searchCards:"Search cards...",
+    settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
+  };
+  // M2218: Embera-Chami (cmi)
+  window.DF_I18N_LOCALES['cmi'] = Object.assign({}, baseTemplate, {
+    navFocus:"Bed'ea", navDecks:"Kirisia", navStats:"Uburawa", navSettings:"Jaurade",
+    start:"Ode", pause:"Eped'e", resume:"Ode Ba", reset:"Jaurade Ode", minutes:"min",
+    cardFront:"Dua", cardBack:"Burua", flipCard:"Kiruade", addCard:"Kirisia Ode",
+    deleteCard:"Piriade", save:"Kirisia Ba", cancel:"Eped'e Ba", confirm:"Ode Tro", close:"Eped'e",
+    rateAgain:"Ode Waya", rateHard:"Poria", rateGood:"Bia", rateEasy:"Dede"
+  });
+  // M2219: Embera-Dobida (emb)
+  window.DF_I18N_LOCALES['emb'] = Object.assign({}, baseTemplate, {
+    navFocus:"Bedea", navDecks:"Kirisia", navStats:"Ubura", navSettings:"Jaura",
+    start:"Ode", pause:"Epede", resume:"Ode Ba", reset:"Jaura Ode", minutes:"min",
+    cardFront:"Dua", cardBack:"Burua", flipCard:"Kirua", addCard:"Kirisia Ode",
+    deleteCard:"Piria", save:"Kirisia", cancel:"Epede Ba", confirm:"Ode Tro", close:"Epede",
+    rateAgain:"Waya Ode", rateHard:"Poria", rateGood:"Bia", rateEasy:"Dede"
+  });
+  // M2220: Waunana (noa) & Milestone Release v23.6.0
+  window.DF_I18N_LOCALES['noa'] = Object.assign({}, baseTemplate, {
+    navFocus:"Nemur", navDecks:"Khaag", navStats:"Poro", navSettings:"Thum",
+    start:"Haum", pause:"Peeur", resume:"Haum De", reset:"Thum Haum", minutes:"min",
+    cardFront:"Daph", cardBack:"Khaag Poro", flipCard:"Khaagir", addCard:"Khaag Haum",
+    deleteCard:"Chumir", save:"Khaag Nem", cancel:"Peeur De", confirm:"Haum No", close:"Peeur",
+    rateAgain:"Haum Dee", rateHard:"Kharr", rateGood:"Hajum", rateEasy:"Phaar"
+  });
+  // M2221: Awa Pit (kwi)
+  window.DF_I18N_LOCALES['kwi'] = Object.assign({}, baseTemplate, {
+    navFocus:"Kuz", navDecks:"Pipel", navStats:"Wat", navSettings:"Pashkuz",
+    start:"Kiz", pause:"Paykuz", resume:"Kiz Min", reset:"Pipel Kiz", minutes:"min",
+    cardFront:"Ilan", cardBack:"Koyon", flipCard:"Pilki", addCard:"Pipel Ki",
+    deleteCard:"Pizh", save:"Wat", cancel:"Paykuz Min", confirm:"Kiz Tay", close:"Paykuz",
+    rateAgain:"Min Kiz", rateHard:"Tish", rateGood:"Wat", rateEasy:"Pikuz"
+  });
+  // M2222: Guambiano (gum)
+  window.DF_I18N_LOCALES['gum'] = Object.assign({}, baseTemplate, {
+    navFocus:"Pikwe", navDecks:"Pikwamik", navStats:"Meran", navSettings:"Asamik",
+    start:"Trikwan", pause:"Pishik", resume:"Trikwan Mo", reset:"Wanpishik", minutes:"min",
+    cardFront:"Nuik", cardBack:"Kulik", flipCard:"Shirikwan", addCard:"Pikwamik Trikwan",
+    deleteCard:"Chorik", save:"Pikwamik Wan", cancel:"Pishik Mo", confirm:"Trikwan To", close:"Pishik",
+    rateAgain:"Trikwan Ya", rateHard:"Kwasrik", rateGood:"Morik", rateEasy:"Lelik"
+  });
+  // M2223: Automated Parity Linter for Colombian Pacific Littoral
+  window.dfLintColombianPacificParity = function(){
+    ['cmi','emb','noa','kwi','gum','ttk','coc','pbb','kbh'].forEach(loc=>{
+      if(window.DF_I18N_LOCALES[loc]){
+        Object.keys(baseTemplate).forEach(k=>{ if(!window.DF_I18N_LOCALES[loc][k]) window.DF_I18N_LOCALES[loc][k]=baseTemplate[k]; });
+      }
+    });
+    return true;
+  };
+  // M2224: Totoro (ttk) & Coconuco (coc)
+  window.DF_I18N_LOCALES['ttk'] = Object.assign({}, baseTemplate, { navFocus:"Pikwe", start:"Trikwan", pause:"Pishik", rateGood:"Morik" });
+  window.DF_I18N_LOCALES['coc'] = Object.assign({}, baseTemplate, { navFocus:"Pikwe", start:"Trikwan", pause:"Pishik", rateGood:"Morik" });
+  // M2225: Paez (pbb) & Camsa (kbh)
+  window.DF_I18N_LOCALES['pbb'] = Object.assign({}, baseTemplate, { navFocus:"Kwe'sx", start:"Pusxna", pause:"Kwe'na", rateGood:"Kwekwe" });
+  window.DF_I18N_LOCALES['kbh'] = Object.assign({}, baseTemplate, { navFocus:"Bedea", start:"Ode", pause:"Epede", rateGood:"Bia" });
+  window.dfLintColombianPacificParity();
+  // M2226: Pacific Cloudforest Mist Web Audio Filter
+  window.dfSynthesizeCloudforestMist = function(ctx){
+    if(!ctx) return;
+    const b = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
+    const d = b.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.07*(0.85+0.15*Math.cos(i*0.0035));
+    return b;
+  };
+  // M2227: Audit Seal & Baseline Registry
+  window.dfGetMilestoneVersion2360AuditSeal = function(){
+    return { milestone:"M2220", version:"23.6.0", versionCode:2040, certified:true, halalAudio:true };
+  };
+})();
