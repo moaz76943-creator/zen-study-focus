@@ -43716,3 +43716,37 @@ window.dfGetSector8MemoryPsychologySeal = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: DAMPED HARMONIC SPRING PHYSICS ANIMATION (SECTOR 9 LAUNCH)
+   Mass-spring-damper equations (F = -kx - cv) for organic UI card flips
+   ========================================================== */
+window.dfAnimateSpring = function(targetElement, startVal, endVal, onUpdate, onComplete) {
+  let position = startVal;
+  let velocity = 0;
+  const tension = 170; // Spring stiffness constant (k)
+  const friction = 22; // Damping coefficient (c)
+  let lastTime = performance.now();
+
+  const step = (currentTime) => {
+    const dt = Math.min((currentTime - lastTime) / 1000, 0.032);
+    lastTime = currentTime;
+
+    const springForce = -tension * (position - endVal);
+    const dampingForce = -friction * velocity;
+    const acceleration = springForce + dampingForce;
+
+    velocity += acceleration * dt;
+    position += velocity * dt;
+
+    if (typeof onUpdate === "function") onUpdate(position);
+
+    if (Math.abs(position - endVal) < 0.005 && Math.abs(velocity) < 0.005) {
+      if (typeof onUpdate === "function") onUpdate(endVal);
+      if (typeof onComplete === "function") onComplete();
+    } else {
+      requestAnimationFrame(step);
+    }
+  };
+  requestAnimationFrame(step);
+};
