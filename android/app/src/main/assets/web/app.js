@@ -42828,3 +42828,32 @@ window.dfCreatePineForestFilter = function(ctx) {
   highShelf.gain.setValueAtTime(6.0, ctx.currentTime); // Gentle airy acoustic boost
   return highShelf;
 };
+
+/* ==========================================================
+   DEEP FOCUS: MORNING DEW MICRO-DROPLET DISPERSION DSP (v54.2.0)
+   Sparse stochastic condensation pings on gentle ambient floor
+   ========================================================== */
+window.dfTriggerDewDroplet = function(ctx) {
+  if (!ctx || !ctx.createOscillator) return;
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  // Pure high-frequency water droplet ping (1400Hz to 800Hz drop)
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(1400, now);
+  osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+
+  gain.gain.setValueAtTime(0.015, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+  osc.connect(gain);
+  if (window.dfGetSafeMasterDestination) {
+    gain.connect(window.dfGetSafeMasterDestination(ctx));
+  } else {
+    gain.connect(ctx.destination);
+  }
+
+  osc.start(now);
+  osc.stop(now + 0.1);
+};
