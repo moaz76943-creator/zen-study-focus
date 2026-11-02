@@ -39205,3 +39205,49 @@ window.dfStopThrottledTimer = function() {
   }
   if (window.dfReleaseScreenWakeLock) window.dfReleaseScreenWakeLock();
 };
+
+/* ==========================================================
+   DEEP FOCUS: ZERO-DEPENDENCY SVG ANALYTICS & STREAK ENGINE
+   Ultra-lightweight procedural charting and streak tracking
+   ========================================================== */
+window.dfCalculateDailyStreak = function(sessions) {
+  if (!Array.isArray(sessions) || sessions.length === 0) return { currentStreak: 0, longestStreak: 0 };
+  const dates = [...new Set(sessions.map(s => s.date || (s.timestamp ? s.timestamp.split("T")[0] : null)).filter(Boolean))].sort().reverse();
+  if (dates.length === 0) return { currentStreak: 0, longestStreak: 0 };
+
+  let currentStreak = 0;
+  const today = new Date().toISOString().split("T")[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+
+  let checkDate = dates[0] === today ? today : (dates[0] === yesterday ? yesterday : null);
+  if (checkDate) {
+    let d = new Date(checkDate);
+    for (const dateStr of dates) {
+      if (dateStr === d.toISOString().split("T")[0]) {
+        currentStreak++;
+        d.setDate(d.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+  }
+  return { currentStreak, longestStreak: Math.max(currentStreak, dates.length) };
+};
+
+window.dfRenderWeeklyBarChartSVG = function(last7DaysMinutes) {
+  // Input: array of 7 numbers (minutes focused per day)
+  const data = (last7DaysMinutes && last7DaysMinutes.length === 7) ? last7DaysMinutes : [0, 0, 0, 0, 0, 0, 0];
+  const max = Math.max(...data, 60);
+  const width = 280, height = 100, barWidth = 26, gap = 12;
+
+  let svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" width="100%" height="100" xmlns="http://www.w3.org/2000/svg">';
+  data.forEach((val, i) => {
+    const barHeight = Math.round((val / max) * (height - 24));
+    const x = i * (barWidth + gap) + 10;
+    const y = height - barHeight - 16;
+    svg += '<rect x="' + x + '" y="' + y + '" width="' + barWidth + '" height="' + Math.max(2, barHeight) + '" rx="4" fill="#38a169" opacity="0.85"/>';
+    svg += '<text x="' + (x + barWidth / 2) + '" y="' + (height - 2) + '" font-size="10" text-anchor="middle" fill="#718096">D' + (i + 1) + '</text>';
+  });
+  svg += '</svg>';
+  return svg;
+};
