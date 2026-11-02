@@ -42241,3 +42241,23 @@ window.dfGetTrueElapsedSeconds = function() {
   const absoluteElapsedMs = Math.max(0, Date.now() - window.DF_UTC_START_EPOCH);
   return Math.floor(absoluteElapsedMs / 1000);
 };
+
+/* ==========================================================
+   DEEP FOCUS: NTP NETWORK TIME SKEW SMOOTHER (v52.1.0)
+   Absorbs cellular tower time shifts with monotonic cadence smoothing
+   ========================================================== */
+window.DF_LAST_CADENCE_TICK = performance.now();
+
+window.dfDetectTimeSkew = function(deltaMs) {
+  const currentPerf = performance.now();
+  const perfElapsedMs = currentPerf - window.DF_LAST_CADENCE_TICK;
+  window.DF_LAST_CADENCE_TICK = currentPerf;
+
+  // If wall clock delta differs from monotonic clock by > 2000ms, flag NTP skew
+  const divergence = Math.abs(deltaMs - perfElapsedMs);
+  if (divergence > 2000) {
+    console.warn("[TIME SENTINEL] Network NTP time step detected. Smoothing applied:", Math.round(divergence) + "ms");
+    return true;
+  }
+  return false;
+};
