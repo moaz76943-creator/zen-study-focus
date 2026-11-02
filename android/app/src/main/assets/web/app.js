@@ -40444,3 +40444,42 @@ window.dfToggleHighContrast = function(enable) {
 if (typeof window !== "undefined" && window.dfSafeGetStorage) {
   if (window.dfSafeGetStorage("df_high_contrast", false)) window.dfToggleHighContrast(true);
 }
+
+/* ==========================================================
+   DEEP FOCUS: DYSLEXIA-FRIENDLY TYPOGRAPHY & SPACING ENGINE
+   Weighted baseline and expanded character tracking for neurodivergent focus
+   ========================================================== */
+window.DF_DYSLEXIA_MODE_ACTIVE = false;
+
+window.dfToggleDyslexiaMode = function(enable) {
+  window.DF_DYSLEXIA_MODE_ACTIVE = Boolean(enable);
+  if (typeof document === "undefined" || !document.head) return;
+
+  const styleId = "df-dyslexia-style";
+  let styleEl = document.getElementById(styleId);
+
+  if (window.DF_DYSLEXIA_MODE_ACTIVE) {
+    if (!styleEl) {
+      styleEl = document.createElement("style");
+      styleEl.id = styleId;
+      styleEl.textContent = `
+        body.df-dyslexia-mode {
+          letter-spacing: 0.12em !important;
+          word-spacing: 0.2em !important;
+          line-height: 1.8 !important;
+        }
+      `;
+      document.head.appendChild(styleEl);
+    }
+    document.body.classList.add("df-dyslexia-mode");
+  } else {
+    if (document.body) document.body.classList.remove("df-dyslexia-mode");
+  }
+
+  if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_dyslexia_mode", window.DF_DYSLEXIA_MODE_ACTIVE);
+  console.log("[A11Y] Dyslexia-friendly mode:", window.DF_DYSLEXIA_MODE_ACTIVE ? "ACTIVE" : "DISABLED");
+};
+
+if (typeof window !== "undefined" && window.dfSafeGetStorage) {
+  if (window.dfSafeGetStorage("df_dyslexia_mode", false)) window.dfToggleDyslexiaMode(true);
+}
