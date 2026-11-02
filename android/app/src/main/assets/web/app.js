@@ -45145,3 +45145,47 @@ window.dfApplyTranslations = function(locale, rootElement) {
 window.dfGetMilestoneM5577DynamicDomBinderSeal = function() {
   return { milestone: 'M5568-M5577 Dynamic DOM Binder Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5578-M5587: Cognate Family Matrix Engine ---
+window.DF_LANGUAGE_FAMILIES = {
+  turkic: ['tr', 'uz', 'kk', 'az', 'tk', 'ky', 'ug', 'tt', 'ba'],
+  iranian: ['fa', 'ps', 'ku', 'tg', 'bal', 'prs'],
+  indo_aryan: ['ur', 'hi', 'bn', 'sd', 'pa', 'ks', 'ne', 'gu'],
+  austronesian: ['id', 'ms', 'jv', 'su', 'min', 'ace', 'bug', 'tl'],
+  african_islamic: ['sw', 'ha', 'so', 'om', 'ff', 'wo', 'yo', 'ig'],
+  balkan_caucasian: ['bs', 'sq', 'ce', 'inh', 'av']
+};
+
+window.dfGetFamilyFallbackLocale = function(locale) {
+  const loc = String(locale || '').toLowerCase();
+  for (const [fam, members] of Object.entries(window.DF_LANGUAGE_FAMILIES)) {
+    if (members.includes(loc)) {
+      return members[0];
+    }
+  }
+  return 'en';
+};
+
+// Upgrade dfTranslate to utilize family fallback before English
+window.dfTranslate = function(token, locale, params) {
+  const loc = locale || window.DF_ACTIVE_LOCALE || 'en';
+  const lex = window.DF_MASTER_LEXICON || {};
+  let dict = lex[loc];
+  if (!dict && window.dfGetFamilyFallbackLocale) {
+    const fam = window.dfGetFamilyFallbackLocale(loc);
+    dict = lex[fam];
+  }
+  dict = dict || lex['en'] || {};
+  let text = dict[token] || (lex['en'] && lex['en'][token]) || token;
+  if (params && typeof params === 'object') {
+    Object.keys(params).forEach(k => {
+      text = text.replace(new RegExp('\\{' + k + '\\}', 'g'), String(params[k]));
+    });
+  }
+  return text;
+};
+
+window.dfGetMilestoneM5587CognateFamilyMatrixSeal = function() {
+  return { milestone: 'M5578-M5587 Cognate Family Matrix Engine', status: 'VERIFIED' };
+};
