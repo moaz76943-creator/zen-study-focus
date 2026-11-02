@@ -43936,3 +43936,39 @@ window.dfGetSector9AestheticsSeal = function() {
     certifiedTimestamp: new Date().toISOString()
   };
 };
+
+/* ==========================================================
+   DEEP FOCUS: SELF-HEALING WATCHDOG SUPERVISOR THREAD (SECTOR 10 LAUNCH)
+   Monitors timer cadence every 2.5s and auto-resuscitates stalled loops
+   ========================================================== */
+window.DF_WATCHDOG_LAST_ALIVE = Date.now();
+window.DF_WATCHDOG_TIMER_REF = null;
+
+window.dfPingWatchdogHeartbeat = function() {
+  window.DF_WATCHDOG_LAST_ALIVE = Date.now();
+};
+
+window.dfStartWatchdogSupervisor = function() {
+  if (window.DF_WATCHDOG_TIMER_REF) clearInterval(window.DF_WATCHDOG_TIMER_REF);
+
+  window.DF_WATCHDOG_TIMER_REF = setInterval(() => {
+    // Only inspect if timer is flagged active
+    if (window.DF_TIMER_ANCHOR_TIMESTAMP && window.DF_TICK_INTERVAL_REF) {
+      const timeSinceLastPulse = Date.now() - window.DF_WATCHDOG_LAST_ALIVE;
+      // If frozen for more than 2500ms, execute self-healing restart
+      if (timeSinceLastPulse > 2500) {
+        console.warn("[WATCHDOG SUPERVISOR] Timer stall detected (" + timeSinceLastPulse + "ms). Self-healing resync executing...");
+        const elapsed = Math.floor((Date.now() - window.DF_TIMER_ANCHOR_TIMESTAMP) / 1000);
+        if (typeof window.dfOnTimeResynced === "function") {
+          window.dfOnTimeResynced(elapsed);
+        }
+        window.dfPingWatchdogHeartbeat();
+      }
+    }
+  }, 2500);
+  console.log("[SUPERVISOR] Self-healing watchdog supervisor thread active.");
+};
+
+if (typeof window !== "undefined") {
+  window.dfStartWatchdogSupervisor();
+}
