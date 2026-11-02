@@ -43342,3 +43342,30 @@ window.dfValidate16KBMemoryAlignment = function() {
 if (typeof window !== "undefined") {
   window.dfValidate16KBMemoryAlignment();
 }
+
+/* ==========================================================
+   DEEP FOCUS: SAMSUNG DEX & ANDROID DESKTOP WINDOW MODE CONTROLLER
+   Fluid multi-window resizing for external monitors and desktop stations
+   ========================================================== */
+window.dfObserveDesktopDisplayMetrics = function() {
+  if (typeof window === "undefined") return;
+
+  const handleResize = () => {
+    const isDeX = (window.innerWidth >= 1200 && window.innerHeight >= 700);
+    if (typeof document !== "undefined" && document.body) {
+      if (isDeX) {
+        document.body.classList.add("df-dex-desktop-mode");
+      } else {
+        document.body.classList.remove("df-dex-desktop-mode");
+      }
+    }
+    console.log("[DISPLAY HAL] Window metrics updated. DeX mode:", isDeX);
+  };
+
+  window.addEventListener("resize", handleResize, { passive: true });
+  handleResize();
+};
+
+if (typeof window !== "undefined") {
+  window.dfObserveDesktopDisplayMetrics();
+}
