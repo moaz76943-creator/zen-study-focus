@@ -40385,3 +40385,23 @@ window.dfAtomicLoad = function(key, defaultVal) {
 
   return defaultVal;
 };
+
+/* ==========================================================
+   DEEP FOCUS: ANOMALOUS DATA FILTER & TIME-TAMPERING SENTINEL
+   Purges invalid session lengths caused by manual clock manipulation
+   ========================================================== */
+window.dfFilterAnomalousSessions = function(sessionsList) {
+  if (!Array.isArray(sessionsList)) return [];
+  const maxSessionSeconds = 12 * 3600; // 12 hours max continuous session
+  const validSessions = [];
+
+  sessionsList.forEach(s => {
+    const sec = s.durationSeconds || (s.durationMinutes ? s.durationMinutes * 60 : 0);
+    // Discard negative durations or absurdly large values
+    if (sec > 0 && sec <= maxSessionSeconds && s.timestamp) {
+      validSessions.push(s);
+    }
+  });
+
+  return validSessions;
+};
