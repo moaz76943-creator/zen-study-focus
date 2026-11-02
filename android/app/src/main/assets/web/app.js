@@ -41748,3 +41748,23 @@ window.dfGetAndroidWidgetSnapshot = function() {
 if (typeof window !== "undefined") {
   window.dfGetAndroidWidgetSnapshot();
 }
+
+/* ==========================================================
+   DEEP FOCUS: FLUID DYNAMIC TYPOGRAPHY & DENSITY SCALER (PILLAR 8 COMPLETE)
+   Adjusts UI proportions dynamically across compact phones and large tablets
+   ========================================================== */
+window.dfCalculateFluidScale = function() {
+  if (typeof window === "undefined") return 1.0;
+  const screenWidth = window.innerWidth || 360;
+  // Bounded scale multiplier between 0.85 (compact) and 1.35 (tablet)
+  const scale = Math.max(0.85, Math.min(1.35, screenWidth / 390));
+  if (typeof document !== "undefined" && document.documentElement) {
+    document.documentElement.style.setProperty("--df-fluid-scale", scale.toFixed(2));
+  }
+  return scale;
+};
+
+if (typeof window !== "undefined") {
+  window.addEventListener("resize", window.dfCalculateFluidScale, { passive: true });
+  window.dfCalculateFluidScale();
+}
