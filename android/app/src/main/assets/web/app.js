@@ -40483,3 +40483,25 @@ window.dfToggleDyslexiaMode = function(enable) {
 if (typeof window !== "undefined" && window.dfSafeGetStorage) {
   if (window.dfSafeGetStorage("df_dyslexia_mode", false)) window.dfToggleDyslexiaMode(true);
 }
+
+/* ==========================================================
+   DEEP FOCUS: ARIA LIVE REGIONS & SCREEN READER ANNOUNCER
+   TalkBack accessibility bridge announcing timer milestones
+   ========================================================== */
+window.dfAnnounceToScreenReader = function(message) {
+  if (typeof document === "undefined") return;
+  let liveRegion = document.getElementById("df-aria-live-announcer");
+  if (!liveRegion) {
+    liveRegion = document.createElement("div");
+    liveRegion.id = "df-aria-live-announcer";
+    liveRegion.setAttribute("aria-live", "polite");
+    liveRegion.setAttribute("aria-atomic", "true");
+    liveRegion.style.position = "absolute";
+    liveRegion.style.width = "1px";
+    liveRegion.style.height = "1px";
+    liveRegion.style.overflow = "hidden";
+    liveRegion.style.clip = "rect(1px, 1px, 1px, 1px)";
+    document.body.appendChild(liveRegion);
+  }
+  liveRegion.textContent = message;
+};
