@@ -39251,3 +39251,38 @@ window.dfRenderWeeklyBarChartSVG = function(last7DaysMinutes) {
   svg += '</svg>';
   return svg;
 };
+
+/* ==========================================================
+   DEEP FOCUS: STORAGE LOG PRUNING & AGGREGATE ROLLING SENTINEL
+   Prevents storage overflow while keeping lifetime totals intact
+   ========================================================== */
+window.dfPruneAndCompactLogs = function() {
+  if (!window.dfSafeGetStorage || !window.dfSafeSetStorage) return;
+  const sessions = window.dfSafeGetStorage("df_sessions", []);
+  if (!Array.isArray(sessions) || sessions.length < 150) return;
+
+  const ninetyDaysAgo = Date.now() - (90 * 86400000);
+  const activeSessions = [];
+  let archivedMinutes = 0;
+
+  sessions.forEach(s => {
+    const sessionTime = s.timestamp ? new Date(s.timestamp).getTime() : 0;
+    if (sessionTime > ninetyDaysAgo) {
+      activeSessions.push(s);
+    } else {
+      archivedMinutes += (s.durationMinutes || Math.floor((s.durationSeconds || 0) / 60));
+    }
+  });
+
+  if (archivedMinutes > 0) {
+    const stats = window.dfSafeGetStorage("df_stats", {});
+    stats.lifetimeArchivedMinutes = (stats.lifetimeArchivedMinutes || 0) + archivedMinutes;
+    window.dfSafeSetStorage("df_stats", stats);
+    window.dfSafeSetStorage("df_sessions", activeSessions);
+    console.log("[STORAGE SENTINEL] Rolled " + (sessions.length - activeSessions.length) + " old sessions into lifetime archive.");
+  }
+};
+
+if (typeof window !== "undefined") {
+  window.dfPruneAndCompactLogs();
+}
