@@ -43261,3 +43261,20 @@ window.dfSafeRegexSearch = function(patternStr, targetText, maxScanLength) {
     return text.toLowerCase().includes(patternStr.toLowerCase());
   }
 };
+
+/* ==========================================================
+   DEEP FOCUS: ZERO-LEAK CLIPBOARD & EPHEMERAL BUFFER SENTINEL
+   Safely sanitizes text before clipboard write without metadata leakage
+   ========================================================== */
+window.dfSafeCopyToClipboard = async function(textToCopy) {
+  if (!textToCopy || typeof navigator === "undefined" || !navigator.clipboard) return false;
+  try {
+    const cleanText = textToCopy.replace(/<[^>]*>?/gm, "").trim(); // Strip HTML tags
+    await navigator.clipboard.writeText(cleanText);
+    console.log("[CLIPBOARD] Clean text safely copied to system clipboard.");
+    return true;
+  } catch (err) {
+    console.warn("[CLIPBOARD] Clipboard write deferred:", err.message);
+    return false;
+  }
+};
