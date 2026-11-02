@@ -44948,3 +44948,47 @@ window.DF_MASTER_LEXICON.so = {
 window.dfGetMilestoneM5537BalkanSomaliSeal = function() {
   return { milestone: 'M5528-M5537 Balkan and Somali Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5538-M5547: Spanish and French Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.es = {
+  timer_start: "Iniciar Enfoque Profundo",
+  timer_pause: "Pausar Sesion",
+  timer_resume: "Reanudar Enfoque",
+  timer_reset: "Reiniciar Temporizador",
+  timer_stop: "Finalizar Sesion",
+  phase_focus: "Sesion de Enfoque Profundo",
+  phase_short_break: "Pausa Mental Corta",
+  phase_long_break: "Descanso Prolongado",
+  session_completed: "Excelente! Sesion Completada",
+  card_flip: "Voltear Tarjeta",
+  card_show_answer: "Mostrar Respuesta",
+  rating_again: "Requiere Repaso",
+  rating_hard: "Recuerdo Dificil",
+  rating_good: "Buen Recuerdo",
+  rating_easy: "Totalmente Dominado"
+};
+
+window.DF_MASTER_LEXICON.fr = {
+  timer_start: "Demarrer la Concentration",
+  timer_pause: "Suspendre la Session",
+  timer_resume: "Reprendre la Session",
+  timer_reset: "Reinitialiser",
+  timer_stop: "Terminer la Session",
+  phase_focus: "Session de Travail Profond",
+  phase_short_break: "Pause Mentale Courte",
+  phase_long_break: "Repos Prolonge",
+  session_completed: "Felicitations! Session Accomplie",
+  card_flip: "Retourner la Carte",
+  card_show_answer: "Afficher la Reponse",
+  rating_again: "A Revoir",
+  rating_hard: "Difficile",
+  rating_good: "Bonne Retenue",
+  rating_easy: "Parfaitement Assimile"
+};
+
+window.dfGetMilestoneM5547SpanishFrenchLexiconSeal = function() {
+  return { milestone: 'M5538-M5547 Spanish and French Master Lexicons', status: 'VERIFIED' };
+};
