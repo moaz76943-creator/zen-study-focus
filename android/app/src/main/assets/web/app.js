@@ -43097,3 +43097,22 @@ window.dfConstantTimeEquals = function(a, b) {
   }
   return mismatch === 0;
 };
+
+/* ==========================================================
+   DEEP FOCUS: ANTI-PROTOTYPE POLLUTION JSON SANITIZER
+   Neutralizes malicious __proto__ and constructor keys during deck ingestion
+   ========================================================== */
+window.dfDeepSanitizeObject = function(obj) {
+  if (obj === null || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) return obj.map(window.dfDeepSanitizeObject);
+
+  const clean = Object.create(null); // Pure dictionary without prototype chain
+  for (const key of Object.keys(obj)) {
+    if (key === "__proto__" || key === "constructor" || key === "prototype") {
+      console.warn("[SECURITY BLOCKED] Prototype pollution vector neutralized:", key);
+      continue;
+    }
+    clean[key] = window.dfDeepSanitizeObject(obj[key]);
+  }
+  return clean;
+};
