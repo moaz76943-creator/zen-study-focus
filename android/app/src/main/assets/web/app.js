@@ -39609,3 +39609,35 @@ window.dfVerifySecurityCompliance = function() {
   };
   return audit;
 };
+
+/* ==========================================================
+   DEEP FOCUS: BI-DIRECTIONAL REVERSE FLASHCARD REVIEW ENGINE
+   Dynamically tests active recall in both directions with zero storage overhead
+   ========================================================== */
+window.DF_REVERSE_MODE_ACTIVE = false;
+
+window.dfToggleReverseReviewMode = function(enable) {
+  window.DF_REVERSE_MODE_ACTIVE = Boolean(enable);
+  if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_reverse_mode", window.DF_REVERSE_MODE_ACTIVE);
+  console.log("[SRS] Bi-directional Reverse Review is now:", window.DF_REVERSE_MODE_ACTIVE ? "ACTIVE" : "STANDARD");
+};
+
+window.dfResolveCardFaces = function(card) {
+  if (!card) return { front: "", back: "" };
+  if (window.DF_REVERSE_MODE_ACTIVE) {
+    return {
+      front: card.back || card.answer || "",
+      back: card.front || card.question || "",
+      isReversed: true
+    };
+  }
+  return {
+    front: card.front || card.question || "",
+    back: card.back || card.answer || "",
+    isReversed: false
+  };
+};
+
+if (typeof window !== "undefined" && window.dfSafeGetStorage) {
+  window.DF_REVERSE_MODE_ACTIVE = window.dfSafeGetStorage("df_reverse_mode", false);
+}
