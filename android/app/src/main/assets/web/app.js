@@ -42958,3 +42958,29 @@ window.dfIsolateBiDiNumbers = function(rawString) {
   // Wrap numbers with percentages, signs, or fractions inside <bdi> tokens
   return rawString.replace(/([+\-−]?[0-9]+(?:\.[0-9]+)?%?|[0-9]+\/[0-9]+)/g, '<bdi dir="ltr" style="unicode-bidi:isolate;">$1</bdi>');
 };
+
+/* ==========================================================
+   DEEP FOCUS: SCRIPT OPTICAL WEIGHT & CONTRAST HARMONIZER
+   Compensates hairline strokes in Indic, Georgian and Armenian scripts
+   ========================================================== */
+window.DF_DELICATE_SCRIPTS_LOCALES = [
+  "tam", "tel", "kan", "mal", "kat", "hye", "sin", "mya", "khm"
+];
+
+window.dfHarmonizeScriptOpticalWeight = function(localeCode) {
+  const code = localeCode || window.DF_CURRENT_LOCALE || "";
+  const isDelicate = window.DF_DELICATE_SCRIPTS_LOCALES.includes(code);
+
+  if (typeof document !== "undefined") {
+    document.querySelectorAll(".df-btn, button, .df-header-title, [data-optical-weight]").forEach(el => {
+      if (isDelicate) {
+        el.style.fontWeight = "600";
+        el.style.letterSpacing = "0.03em";
+      } else {
+        el.style.fontWeight = "";
+        el.style.letterSpacing = "";
+      }
+    });
+  }
+  return isDelicate;
+};
