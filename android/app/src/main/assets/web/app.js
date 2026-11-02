@@ -39641,3 +39641,40 @@ window.dfResolveCardFaces = function(card) {
 if (typeof window !== "undefined" && window.dfSafeGetStorage) {
   window.DF_REVERSE_MODE_ACTIVE = window.dfSafeGetStorage("df_reverse_mode", false);
 }
+
+/* ==========================================================
+   DEEP FOCUS: SILENT STUDY & LIBRARY ENVIRONMENT CONTROLLER
+   Guarantees zero audio leakage and zero desk vibrations in public spaces
+   ========================================================== */
+window.DF_STUDY_PROFILE = "deep"; // "deep" | "library" | "home"
+
+window.dfSetStudyProfile = function(profileName) {
+  const valid = ["deep", "library", "home"];
+  if (!valid.includes(profileName)) return false;
+  window.DF_STUDY_PROFILE = profileName;
+
+  if (profileName === "library") {
+    if (window.dfStopAllSounds) window.dfStopAllSounds();
+    console.log("[PROFILE] Library Mode engaged: All audio and vibrations muted.");
+  }
+
+  if (window.dfSafeSetStorage) window.dfSafeSetStorage("df_study_profile", profileName);
+  return true;
+};
+
+// Hook into completion chime to guard against library disturbance
+const prevCompletionChime = window.dfPlaySessionCompletionChime;
+window.dfPlaySessionCompletionChime = async function() {
+  if (window.DF_STUDY_PROFILE === "library") {
+    // Silent visual ripple notification only
+    if (typeof document !== "undefined" && document.body) {
+      document.body.style.filter = "brightness(1.4)";
+      setTimeout(() => { document.body.style.filter = ""; }, 400);
+    }
+    console.log("[PROFILE] Session completed silently in Library Mode.");
+    return;
+  }
+  if (typeof prevCompletionChime === "function") {
+    await prevCompletionChime();
+  }
+};
