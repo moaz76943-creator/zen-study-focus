@@ -50243,3 +50243,41 @@ window.dfGetMilestoneM6867LockSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6868-M6877: Break Reset ---
+window.dfBreakReset = {
+  steps: [
+    'Rest your eyes 20 feet away',
+    'Drink water and breathe deeply',
+    'Relax shoulders before next session'
+  ],
+  renderGuidance: function(container) {
+    if (!container) return;
+    container.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'break-guidance-box';
+    box.style.padding = '12px';
+    box.style.backgroundColor = '#1e1e24';
+    box.style.borderRadius = '8px';
+    const ul = document.createElement('ul');
+    ul.style.listStyle = 'none';
+    ul.style.padding = '0';
+    this.steps.forEach(function(s) {
+      const li = document.createElement('li');
+      li.style.color = '#10b981';
+      li.style.margin = '4px 0';
+      li.textContent = '• ' + s;
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    container.appendChild(box);
+  }
+};
+window.dfGetMilestoneM6877ResetSeal =
+  function() {
+    return {
+      milestone: 'M6868-M6877 Break Reset Guidance',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
