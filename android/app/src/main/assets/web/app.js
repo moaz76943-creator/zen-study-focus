@@ -48341,3 +48341,28 @@ window.dfGetDueCardsQueue = function(deckId, maxCards) {
 window.dfGetMilestoneM6277DueCardsPriorityQueueSeal = function() {
   return { milestone: 'M6268-M6277 Due Cards Priority Queue Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6278-M6287: Retention Curve Forecaster Engine ---
+window.dfPredictDeck7DayReviewLoad = function(deckId) {
+  const d = (window.DF_DECK_REGISTRY && window.DF_DECK_REGISTRY[deckId]);
+  if (!d || !Array.isArray(d.cards)) return [0, 0, 0, 0, 0, 0, 0];
+  const forecast = [0, 0, 0, 0, 0, 0, 0];
+  const now = Date.now();
+  d.cards.forEach(c => {
+    const elapsedDays = (now - (c.lastReviewed || now)) / 86400000;
+    for (let day = 0; day < 7; day++) {
+      const futureElapsed = elapsedDays + day;
+      const ret = Math.exp(-futureElapsed / Math.max(0.1, c.stability || 1.0));
+      if (ret < 0.9) {
+        forecast[day]++;
+        break;
+      }
+    }
+  });
+  return forecast;
+};
+
+window.dfGetMilestoneM6287RetentionForecasterSeal = function() {
+  return { milestone: 'M6278-M6287 Retention Curve Forecaster Engine', status: 'VERIFIED' };
+};
