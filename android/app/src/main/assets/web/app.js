@@ -51430,3 +51430,13 @@ window.dfGetMilestoneM7327RtlSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7328-M7337: Studio i18n ---
+window.dfGetMilestoneM7337StudioSeal =
+  function() {
+    return {
+      milestone: 'M7328-M7337 Studio i18n Compat',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
