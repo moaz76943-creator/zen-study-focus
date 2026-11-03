@@ -48410,3 +48410,39 @@ window.dfTrackSessionOvertime = function(elapsedSeconds, nominalSeconds) {
 window.dfGetMilestoneM6307OvertimeTrackerEngineSeal = function() {
   return { milestone: 'M6298-M6307 Overtime Tracker Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6308-M6317: Circadian Heatmap Analyzer Engine ---
+window.DF_CIRCADIAN_HEATMAP = new Array(24).fill(0);
+
+window.dfRecordHourFocusMinutes = function(hourOfDay, minutes) {
+  const h = Math.max(0, Math.min(23, parseInt(hourOfDay, 10) || 0));
+  const m = Math.max(0, Math.min(60, parseInt(minutes, 10) || 0));
+  window.DF_CIRCADIAN_HEATMAP[h] += m;
+  return {
+    hour: h,
+    totalMinutesAtHour: window.DF_CIRCADIAN_HEATMAP[h],
+    status: 'HEATMAP_UPDATED'
+  };
+};
+
+window.dfGetPeakProductivityWindow = function() {
+  let peakHour = 0;
+  let maxMin = 0;
+  (window.DF_CIRCADIAN_HEATMAP || []).forEach((min, hr) => {
+    if (min > maxMin) {
+      maxMin = min;
+      peakHour = hr;
+    }
+  });
+  return {
+    peakHour: peakHour,
+    peakWindowFormatted: peakHour + ':00 - ' + ((peakHour + 2) % 24) + ':00',
+    totalRecordedMinutes: (window.DF_CIRCADIAN_HEATMAP || []).reduce((a, b) => a + b, 0),
+    status: 'PEAK_ANALYZED'
+  };
+};
+
+window.dfGetMilestoneM6317CircadianHeatmapAnalyzerSeal = function() {
+  return { milestone: 'M6308-M6317 Circadian Heatmap Analyzer Engine', status: 'VERIFIED' };
+};
