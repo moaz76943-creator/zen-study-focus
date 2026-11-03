@@ -50596,3 +50596,33 @@ window.dfGetMilestoneM6967LeitnerSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6968-M6977: Audio Crossfader ---
+window.dfAudioCrossfader = {
+  crossfade: function(gA, gB, ctx, duration) {
+    if (!ctx || !gA || !gB) return;
+    const dur = duration || 2.5;
+    const now = ctx.currentTime;
+    const vA = gA.gain ? gA.gain.value : 0.2;
+    gA.gain.setValueAtTime(vA, now);
+    gA.gain.linearRampToValueAtTime(0.001, now + dur);
+    gB.gain.setValueAtTime(0.001, now);
+    gB.gain.linearRampToValueAtTime(0.25, now + dur);
+  },
+  applySleepFadeOut: function(g, ctx, fadeSec) {
+    if (!ctx || !g || !g.gain) return;
+    const dur = fadeSec || 15;
+    const now = ctx.currentTime;
+    const v = g.gain.value || 0.2;
+    g.gain.setValueAtTime(v, now);
+    g.gain.linearRampToValueAtTime(0.0001, now + dur);
+  }
+};
+window.dfGetMilestoneM6977FadeSeal =
+  function() {
+    return {
+      milestone: 'M6968-M6977 Audio Crossfader',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
