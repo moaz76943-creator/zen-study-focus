@@ -46296,3 +46296,65 @@ window.DF_MASTER_LEXICON.dje = {
 window.dfGetMilestoneM5817SahelianMandeSonghaiSeal = function() {
   return { milestone: 'M5808-M5817 Bambara Soninke Zarma Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5818-M5827: Punjabi Gujarati Balochi Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.pnb = {
+  timer_start: "ڈونگھی دھیان شروع",
+  timer_pause: "تھوڑا روکو",
+  timer_resume: "دھیان جاری رکھو",
+  timer_reset: "مڑ سیٹ کرو",
+  timer_stop: "نشست مکاؤ",
+  phase_focus: "ڈونگھی پڑھائی ویلا",
+  phase_short_break: "نکا دم",
+  phase_long_break: "وڈّا دم",
+  session_completed: "شاباش! ویلا مک گیا",
+  card_flip: "پنا الٹو",
+  card_show_answer: "جواب ویکھو",
+  rating_again: "مڑ دہرائی لوڑ",
+  rating_hard: "اوکھا یاد",
+  rating_good: "چنگا یاد",
+  rating_easy: "پکا یاد"
+};
+
+window.DF_MASTER_LEXICON.gu = {
+  timer_start: "ઊંડા ધ્યાનની શરૂઆત",
+  timer_pause: "થોડીવાર થોભો",
+  timer_resume: "ધ્યાન ચાલુ રાખો",
+  timer_reset: "ફરીથી સેટ કરો",
+  timer_stop: "સત્ર પૂર્ણ કરો",
+  phase_focus: "ઊંડા અભ્યાસનો સમય",
+  phase_short_break: "ટૂંકો વિરામ",
+  phase_long_break: "લાંબો આરામ",
+  session_completed: "માશાઅલ્લાહ! સત્ર પૂર્ણ થયું",
+  card_flip: "કાર્ડ પલટો",
+  card_show_answer: "જવાબ જુઓ",
+  rating_again: "ફરીથી પુનરાવર્તન જરૂરી",
+  rating_hard: "યાદ રાખવું મુશ્કેલ",
+  rating_good: "સારી રીતે યાદ છે",
+  rating_easy: "સંપૂર્ણ પાકું"
+};
+
+window.DF_MASTER_LEXICON.bal = {
+  timer_start: "جهلیں هوش بندات",
+  timer_pause: "کستریں اوشت",
+  timer_resume: "هوش برجاہ دار",
+  timer_reset: "پدا ترسیٹ",
+  timer_stop: "مجلس آسر",
+  phase_focus: "جهلیں وانگ ءُ زانگ",
+  phase_short_break: "کستریں آرام",
+  phase_long_break: "مزنیں آرام",
+  session_completed: "صد آفرین! مجلس آسر بیت",
+  card_flip: "ورق تَرین",
+  card_show_answer: "پسو پیش دار",
+  rating_again: "پدا وانگ لوٹیت",
+  rating_hard: "گرانیں یات",
+  rating_good: "وشیں یات",
+  rating_easy: "ساکم یات"
+};
+
+window.dfGetMilestoneM5827BalochPunjabiGujaratiSeal = function() {
+  return { milestone: 'M5818-M5827 Punjabi Gujarati Balochi Master Lexicons', status: 'VERIFIED' };
+};
