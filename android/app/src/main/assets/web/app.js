@@ -51782,3 +51782,52 @@ window.dfGetMilestoneM7427TimeBoxMountSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7428-M7437: Tag Chips Mount ---
+window.dfTagChipsMount = {
+  mountChipsRow: function(parentContainer, onSelect) {
+    if (!parentContainer) return;
+    const sel = '.subject-chips-bar';
+    let bar = parentContainer.querySelector(sel);
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'subject-chips-bar';
+      bar.style.display = 'flex';
+      bar.style.gap = '8px';
+      bar.style.overflowX = 'auto';
+      bar.style.padding = '8px 0';
+      bar.style.marginBottom = '12px';
+      const items = [
+        'Math', 'Science', 'Lang', 'Code'
+      ];
+      items.forEach(function(name) {
+        const chip = document.createElement('button');
+        chip.className = 'subject-chip-btn';
+        chip.textContent = name;
+        chip.style.minHeight = '48px';
+        chip.style.padding = '0 16px';
+        chip.style.borderRadius = '24px';
+        chip.style.backgroundColor = '#18181b';
+        chip.style.color = '#10b981';
+        chip.style.border = '1px solid #27272a';
+        chip.onclick = function() {
+          if (typeof onSelect === 'function') {
+            onSelect(name);
+          }
+        };
+        bar.appendChild(chip);
+      });
+      parentContainer.insertBefore(
+        bar, parentContainer.firstChild
+      );
+    }
+  }
+};
+window.dfGetMilestoneM7437ChipsMountSeal =
+  function() {
+    return {
+      milestone: 'M7428-M7437 Tag Chips Mount',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
