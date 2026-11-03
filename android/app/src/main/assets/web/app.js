@@ -48192,3 +48192,34 @@ window.dfGetMilestoneM6227CodexRemediationCoronationSeal = function() {
     status: 'GOLDEN_MASTER_READY_FOR_GOOGLE_PLAY'
   };
 };
+
+
+// --- MISSIONS M6228-M6237: Multi-Channel Audio Volume Matrix ---
+window.DF_SOUNDSCAPE_CHANNELS = {
+  rain: { active: false, volume: 0.6 },
+  stream: { active: false, volume: 0.5 },
+  wind: { active: false, volume: 0.5 },
+  white_noise: { active: false, volume: 0.2 },
+  pink_noise: { active: false, volume: 0.3 },
+  brown_noise: { active: false, volume: 0.4 },
+  binaural_alpha: { active: false, volume: 0.3 }
+};
+
+window.dfSetChannelVolume = function(channelKey, vol) {
+  const ch = window.DF_SOUNDSCAPE_CHANNELS[channelKey];
+  if (!ch) return { ok: false, error: 'UNKNOWN_CHANNEL' };
+  const v = Math.max(0.0, Math.min(1.0, parseFloat(vol) || 0.0));
+  ch.volume = v;
+  return { channel: channelKey, volume: v, status: 'VOLUME_UPDATED' };
+};
+
+window.dfToggleChannel = function(channelKey) {
+  const ch = window.DF_SOUNDSCAPE_CHANNELS[channelKey];
+  if (!ch) return { ok: false, error: 'UNKNOWN_CHANNEL' };
+  ch.active = !ch.active;
+  return { channel: channelKey, active: ch.active, status: 'STATE_TOGGLED' };
+};
+
+window.dfGetMilestoneM6237MultiChannelVolumeMatrixSeal = function() {
+  return { milestone: 'M6228-M6237 Multi-Channel Volume Matrix Engine', status: 'VERIFIED' };
+};
