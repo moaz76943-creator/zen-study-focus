@@ -51390,3 +51390,13 @@ window.dfGetMilestoneM7287BrandingSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7288-M7297: i18n Fixture ---
+window.dfGetMilestoneM7297I18nSeal =
+  function() {
+    return {
+      milestone: 'M7288-M7297 i18n Test Fixture',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
