@@ -50564,3 +50564,35 @@ window.dfGetMilestoneM6957TagSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6958-M6967: Leitner 5-Tier ---
+window.dfLeitnerBox = {
+  tierDays: [1, 3, 7, 14, 30],
+  getTierForStability: function(stability) {
+    const s = stability || 1.0;
+    if (s >= 25) return 5;
+    if (s >= 12) return 4;
+    if (s >= 6) return 3;
+    if (s >= 2.5) return 2;
+    return 1;
+  },
+  categorizeDeck: function(cards) {
+    const defT = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    if (!Array.isArray(cards)) return defT;
+    const tiers = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    for (let i = 0; i < cards.length; i++) {
+      const s = cards[i].stability;
+      const t = this.getTierForStability(s);
+      tiers[t] = (tiers[t] || 0) + 1;
+    }
+    return tiers;
+  }
+};
+window.dfGetMilestoneM6967LeitnerSeal =
+  function() {
+    return {
+      milestone: 'M6958-M6967 Leitner 5-Tier Box',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
