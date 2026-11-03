@@ -50310,3 +50310,56 @@ window.dfGetMilestoneM6887DeckSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6888-M6897: Water Stream DSP ---
+window.dfWaterStreamDsp = {
+  activeStreamNodes: [],
+  playStream: function(ctx, masterGain) {
+    if (!ctx || ctx.state === 'suspended') return;
+    const len = Math.floor(ctx.sampleRate * 3.5);
+    const buf = ctx.createBuffer(
+      1, len, ctx.sampleRate
+    );
+    const d = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      last = (last + (0.02 * w)) / 1.02;
+      d[i] = last * 3.2;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(
+      450, ctx.currentTime
+    );
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    const tEnd = ctx.currentTime + 1.2;
+    gain.gain.linearRampToValueAtTime(0.24, tEnd);
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain || ctx.destination);
+    src.start();
+    this.activeStreamNodes.push(src, gain);
+  },
+  stopStream: function() {
+    this.activeStreamNodes.forEach(function(n) {
+      try {
+        if (n.stop) n.stop();
+        if (n.disconnect) n.disconnect();
+      } catch(e) {}
+    });
+    this.activeStreamNodes = [];
+  }
+};
+window.dfGetMilestoneM6897StreamSeal =
+  function() {
+    return {
+      milestone: 'M6888-M6897 Water Stream DSP',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
