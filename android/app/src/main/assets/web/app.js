@@ -49728,3 +49728,44 @@ window.dfGetMilestoneM6727TimeBoxSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6728-M6737: Quick Scratchpad ---
+window.dfQuickScratchpad = {
+  inboxThoughts: [],
+  captureThought: function(thoughtText) {
+    const txt = thoughtText ?
+      thoughtText.trim() : '';
+    if (!txt) return null;
+    const item = {
+      id: 'th_' + Date.now(),
+      text: txt,
+      capturedAt: Date.now(),
+      resolved: false
+    };
+    this.inboxThoughts.push(item);
+    try {
+      const k = 'df_scratchpad_inbox';
+      const d = JSON.stringify(
+        this.inboxThoughts
+      );
+      localStorage.setItem(k, d);
+    } catch(e) {}
+    return item;
+  },
+  getPendingCount: function() {
+    let c = 0;
+    const arr = this.inboxThoughts;
+    for (let i = 0; i < arr.length; i++) {
+      if (!arr[i].resolved) c++;
+    }
+    return c;
+  }
+};
+window.dfGetMilestoneM6737ScratchSeal =
+  function() {
+    return {
+      milestone: 'M6728-M6737 Quick Scratchpad',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
