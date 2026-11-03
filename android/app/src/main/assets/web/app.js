@@ -46110,3 +46110,65 @@ window.DF_MASTER_LEXICON.ba = {
 window.dfGetMilestoneM5787TurkmenKyrgyzBashkirSeal = function() {
   return { milestone: 'M5778-M5787 Turkmen Kyrgyz Bashkir Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5788-M5797: Ingush Karachay Circassian Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.inh = {
+  timer_start: "КIоарга Теркам Болабе",
+  timer_pause: "Юкъ-юкъе Соцаде",
+  timer_resume: "Теркам ДIахьо",
+  timer_reset: "Юхаоттаде",
+  timer_stop: "Сесси Чачаккхе",
+  phase_focus: "КIоарга Дешара Хан",
+  phase_short_break: "Лоаца СадаIар",
+  phase_long_break: "Деха СадаIар",
+  session_completed: "Дика да хьа! Чачаккхар",
+  card_flip: "Карта Юхаерзае",
+  card_show_answer: "Жоп Хьагойта",
+  rating_again: "Юха Хьажа Деза",
+  rating_hard: "Хала Дагадехар",
+  rating_good: "Дика Дагахьа да",
+  rating_easy: "ЧIоагIа Хьаийцад"
+};
+
+window.DF_MASTER_LEXICON.krc = {
+  timer_start: "Терен Эсни Башла",
+  timer_pause: "Заманнга Тохтат",
+  timer_resume: "Эсни Бардыр",
+  timer_reset: "Джангыдан Къур",
+  timer_stop: "Дерсни Боша",
+  phase_focus: "Терен Окъуу Заман",
+  phase_short_break: "Къысха Солуу",
+  phase_long_break: "Узун Солуу",
+  session_completed: "Сау бол! Дерс Бошалды",
+  card_flip: "Картны Бур",
+  card_show_answer: "Джууапны Кёргюз",
+  rating_again: "Къайтарыргъа Керекди",
+  rating_hard: "Къыйын Эсге Тюшдю",
+  rating_good: "Иги Эсдеди",
+  rating_easy: "Толу Билинеди"
+};
+
+window.DF_MASTER_LEXICON.ady = {
+  timer_start: "Куу ГущыIэм Егъэжьэн",
+  timer_pause: "ТIэкIу Зэтегъэуцон",
+  timer_resume: "ЛъыгъэкIотэн",
+  timer_reset: "ЗэблъэгъэкIын",
+  timer_stop: "Ухын",
+  phase_focus: "Куу Еджэгъу Уахът",
+  phase_short_break: "КIэко Зыгъэпсэфын",
+  phase_long_break: "КIыхьэ Зыгъэпсэфын",
+  session_completed: "Тхьауегъэпсэу! Ухыгъэ хъугъэ",
+  card_flip: "Картэр Зэблэдзын",
+  card_show_answer: "Джэуапыр Гъэлъэгъон",
+  rating_again: "КIэрытIысхьажьын",
+  rating_hard: "Хьылъэу ГукъэкIыжьын",
+  rating_good: "Дэгъоу Гум Илъ",
+  rating_easy: "Пэрыуагъо Хэмылъэу"
+};
+
+window.dfGetMilestoneM5797NorthCaucasianCircassianSeal = function() {
+  return { milestone: 'M5788-M5797 Ingush Karachay Circassian Master Lexicons', status: 'VERIFIED' };
+};
