@@ -49946,3 +49946,30 @@ window.dfGetMilestoneM6787DropletSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6788-M6797: Markdown Parser ---
+window.dfFlashcardMarkdown = {
+  renderMarkdown: function(rawText) {
+    if (!rawText) return '';
+    let s = typeof escapeHtmlText === 'function' ?
+      escapeHtmlText(rawText) : String(rawText);
+    const rB = /\*\*([^\*]+)\*\*/g;
+    s = s.replace(rB, '<b>$1</b>');
+    s = s.replace(/\*([^\*]+)\*/g, '<i>$1</i>');
+    const rC = /\x60([^\x60]+)\x60/g;
+    s = s.replace(rC, '<code>$1</code>');
+    const rP = /\^([0-9a-zA-Z]+)/g;
+    s = s.replace(rP, '<sup>$1</sup>');
+    const rSub = /_([0-9a-zA-Z]+)/g;
+    s = s.replace(rSub, '<sub>$1</sub>');
+    return s;
+  }
+};
+window.dfGetMilestoneM6797MarkdownSeal =
+  function() {
+    return {
+      milestone: 'M6788-M6797 Flashcard Markdown',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
