@@ -46482,3 +46482,65 @@ window.DF_MASTER_LEXICON.sus = {
 window.dfGetMilestoneM5847MandinkaSusuNigerLexiconSeal = function() {
   return { milestone: 'M5838-M5847 Mandinka Susu Niger Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5848-M5857: Kumyk Lezgin Dargin Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.kum = {
+  timer_start: "Терен Эсни Башламакъ",
+  timer_pause: "Аз Болжалгъа Токътав",
+  timer_resume: "Эсни Давам Этив",
+  timer_reset: "Башдан Тюзлев",
+  timer_stop: "Дарсны Тамамлав",
+  phase_focus: "Терен Окъув Вакъти",
+  phase_short_break: "Къысгъа Рагьатлыкъ",
+  phase_long_break: "Узакъ Рагьатлыкъ",
+  session_completed: "Баракаллагь! Дарс Битди",
+  card_flip: "Картны Айландырыв",
+  card_show_answer: "Жавапны Гёрсетюв",
+  rating_again: "Къайтарыв Герек",
+  rating_hard: "Къыйын Эсге Гелди",
+  rating_good: "Яхшы Эсде Бар",
+  rating_easy: "Толу Енгил Эсде"
+};
+
+window.DF_MASTER_LEXICON.lez = {
+  timer_start: "Дерин Фикир Башламишун",
+  timer_pause: "ТIимил Акватун",
+  timer_resume: "Фикир Давамарун",
+  timer_reset: "ЦIийикIа Эцигун",
+  timer_stop: "Тарс Куьтяхун",
+  phase_focus: "Дерин Тарсунин Вахт",
+  phase_short_break: "Куьруь Ял Ягъун",
+  phase_long_break: "Яргъи Ял Ягъун",
+  session_completed: "Аферин! Тарс Куьтягь Хьана",
+  card_flip: "Карта Элькъуьрун",
+  card_show_answer: "Жаваб Къалурун",
+  rating_again: "Тикрарун Лазим Я",
+  rating_hard: "Четин РикIел Хтана",
+  rating_good: "Хъсан РикIел Ала",
+  rating_easy: "КIевиз Чир Хьана"
+};
+
+window.DF_MASTER_LEXICON.dar = {
+  timer_start: "ГIямкъаб Пикри БехIбихьихъес",
+  timer_pause: "Камси Кьабулдеш",
+  timer_resume: "Пикри Бузахъес",
+  timer_reset: "Сагадан ГIядулкарес",
+  timer_stop: "Дарс Таманбарес",
+  phase_focus: "ГIямкъаб БучIнила Замана",
+  phase_short_break: "КIуси ГIурладеш",
+  phase_long_break: "Хъалила ГIурладеш",
+  session_completed: "Баркаллагь! Дарс Таманбиуб",
+  card_flip: "Карт Шурбарес",
+  card_show_answer: "Жаваб Чебаахъес",
+  rating_again: "Тикрарбарес ГIягIнибиркур",
+  rating_hard: "Къиянни ГIясибилбикиб",
+  rating_good: "ГIяхIил ГIясибилбикиб",
+  rating_easy: "ГIяхIил Урхьуб"
+};
+
+window.dfGetMilestoneM5857DagestanScholarlyLexiconSeal = function() {
+  return { milestone: 'M5848-M5857 Kumyk Lezgin Dargin Master Lexicons', status: 'VERIFIED' };
+};
