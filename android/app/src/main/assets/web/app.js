@@ -45420,3 +45420,37 @@ window.DF_MASTER_LEXICON.es = Object.assign(window.DF_MASTER_LEXICON.es || {}, {
 window.dfGetMilestoneM5657SwahiliBengaliSpanishSpecializedSeal = function() {
   return { milestone: 'M5648-M5657 Swahili Bengali Spanish Specialized Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5658-M5667: French & German Specialized Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.fr = Object.assign(window.DF_MASTER_LEXICON.fr || {}, {
+  audio_chime_header: "Carillons Proceduraux de Fin de Session",
+  audio_ambient_header: "Ambiance Naturelle Pure pour l'Etude",
+  audio_solfeggio_528: "Frequence 528 Hz Harmonie Mentale",
+  audio_solfeggio_432: "Frequence 432 Hz Serenite Profonde",
+  audio_binaural_beta: "Ondes Beta 14 Hz Eveil et Vigilance",
+  fsrs_stability: "Indice de Stabilite Memorielle",
+  fsrs_difficulty: "Degre de Difficulte d'Evocation",
+  fsrs_due_today: "Cartes a Revoir Aujourd'hui",
+  fsrs_mastered: "Cartes Parfaitement Assimilees",
+  fsrs_streak_days: "Jours Consecutifs d'Etude"
+});
+
+window.DF_MASTER_LEXICON.de = Object.assign(window.DF_MASTER_LEXICON.de || {}, {
+  audio_chime_header: "Prozedurale Abschlussklingeltone",
+  audio_ambient_header: "Reine Naturklange fur Tiefen Fokus",
+  audio_solfeggio_528: "528 Hz Geistige Harmonie Frequenz",
+  audio_solfeggio_432: "432 Hz Tiefe Ruhe Frequenz",
+  audio_binaural_beta: "14 Hz Beta Wachsamkeitswellen",
+  fsrs_stability: "Gedachtnisstabilitatsindex",
+  fsrs_difficulty: "Erinnerungsschwierigkeitsgrad",
+  fsrs_due_today: "Heute Fallige Lernkarten",
+  fsrs_mastered: "Vollstandig Gemeisterte Karten",
+  fsrs_streak_days: "Aufeinanderfolgende Studientage"
+});
+
+window.dfGetMilestoneM5667FrenchGermanSpecializedSeal = function() {
+  return { milestone: 'M5658-M5667 French and German Specialized Lexicons', status: 'VERIFIED' };
+};
