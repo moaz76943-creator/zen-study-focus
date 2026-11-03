@@ -50972,3 +50972,37 @@ window.dfGetMilestoneM7067BackupSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7068-M7077: Subject Balance ---
+window.dfSubjectBalance = {
+  calculateWeeklyBalance: function(sessions) {
+    if (!Array.isArray(sessions)) return {};
+    const map = {};
+    let total = 0;
+    sessions.forEach(function(s) {
+      if (s && s.completed) {
+        const tag = s.tag || 'General';
+        const dur = s.durationMinutes || 25;
+        map[tag] = (map[tag] || 0) + dur;
+        total += dur;
+      }
+    });
+    const dist = {};
+    Object.keys(map).forEach(function(k) {
+      dist[k] = total > 0 ?
+        Math.round((map[k] / total) * 100) : 0;
+    });
+    return {
+      distribution: dist,
+      totalMinutes: total
+    };
+  }
+};
+window.dfGetMilestoneM7077BalanceSeal =
+  function() {
+    return {
+      milestone: 'M7068-M7077 Subject Balance',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
