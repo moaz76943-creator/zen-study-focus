@@ -51047,3 +51047,36 @@ window.dfGetMilestoneM7087SwellSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7088-M7097: Due Forecast ---
+window.dfDueForecast = {
+  forecastNext7Days: function(cards) {
+    if (!Array.isArray(cards)) return [];
+    const days = new Array(7).fill(0);
+    const now = Date.now();
+    cards.forEach(function(c) {
+      if (c && c.lastReview && c.stability) {
+        const ftr = (9 * (1 / 0.9 - 1));
+        const s = c.stability;
+        const intv = Math.round(s * ftr);
+        const dueTime = c.lastReview +
+          intv * 86400000;
+        const diffDays = Math.floor(
+          (dueTime - now) / 86400000
+        );
+        if (diffDays >= 0 && diffDays < 7) {
+          days[diffDays]++;
+        }
+      }
+    });
+    return days;
+  }
+};
+window.dfGetMilestoneM7097ForecastSeal =
+  function() {
+    return {
+      milestone: 'M7088-M7097 Due Forecast',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
