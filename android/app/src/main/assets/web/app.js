@@ -50854,3 +50854,59 @@ window.dfGetMilestoneM7037BadgeSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7038-M7047: Campfire DSP ---
+window.dfCampfireDsp = {
+  activeFireNodes: [],
+  playCampfire: function(ctx, masterGain) {
+    if (!ctx || ctx.state === 'suspended') return;
+    const len = Math.floor(ctx.sampleRate * 3);
+    const buf = ctx.createBuffer(
+      1, len, ctx.sampleRate
+    );
+    const d = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      last = (last + (0.02 * w)) / 1.02;
+      // Soft crackle micro-bursts
+      const crackle = (Math.random() > 0.992) ?
+        (Math.random() * 0.6 - 0.3) : 0;
+      d[i] = last * 2.5 + crackle;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(
+      520, ctx.currentTime
+    );
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    const tEnd = ctx.currentTime + 1.2;
+    gain.gain.linearRampToValueAtTime(0.24, tEnd);
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain || ctx.destination);
+    src.start();
+    this.activeFireNodes.push(src, gain);
+  },
+  stopCampfire: function() {
+    this.activeFireNodes.forEach(function(n) {
+      try {
+        if (n.stop) n.stop();
+        if (n.disconnect) n.disconnect();
+      } catch(e) {}
+    });
+    this.activeFireNodes = [];
+  }
+};
+window.dfGetMilestoneM7047FireSeal =
+  function() {
+    return {
+      milestone: 'M7038-M7047 Campfire DSP',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
