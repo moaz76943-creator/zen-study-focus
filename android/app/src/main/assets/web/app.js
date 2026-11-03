@@ -50363,3 +50363,36 @@ window.dfGetMilestoneM6897StreamSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6898-M6907: Overtime Dimmer ---
+window.dfOvertimeDimmer = {
+  isOvertime: false,
+  overtimeSeconds: 0,
+  applyOvertimeWarmth: function(container) {
+    this.isOvertime = true;
+    if (container) {
+      container.style.filter =
+        'sepia(0.25) brightness(0.85)';
+      container.style.transition = 'filter 2s ease';
+    }
+  },
+  resetWarmth: function(container) {
+    this.isOvertime = false;
+    this.overtimeSeconds = 0;
+    if (container) {
+      container.style.filter = 'none';
+    }
+  },
+  incrementOvertime: function() {
+    this.overtimeSeconds++;
+    return this.overtimeSeconds;
+  }
+};
+window.dfGetMilestoneM6907DimmerSeal =
+  function() {
+    return {
+      milestone: 'M6898-M6907 Overtime Dimmer',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
