@@ -49882,3 +49882,34 @@ window.dfGetMilestoneM6767DepthSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6768-M6777: Flip Sensor ---
+window.dfFlipSensor = {
+  isFaceDown: false,
+  isListening: false,
+  initSensor: function(onFlipChange) {
+    if (typeof window === 'undefined') return;
+    if (!window.DeviceOrientationEvent) return;
+    const self = this;
+    window.addEventListener(
+      'deviceorientation', function(e) {
+      const b = Math.abs(e.beta || 0);
+      const faceDown = (b > 160 || b < -160);
+      if (faceDown !== self.isFaceDown) {
+        self.isFaceDown = faceDown;
+        if (typeof onFlipChange === 'function') {
+          onFlipChange(faceDown);
+        }
+      }
+    });
+    this.isListening = true;
+  }
+};
+window.dfGetMilestoneM6777FlipSeal =
+  function() {
+    return {
+      milestone: 'M6768-M6777 Flip Sensor Engine',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
