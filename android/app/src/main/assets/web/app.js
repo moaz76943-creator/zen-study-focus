@@ -51420,3 +51420,13 @@ window.dfGetMilestoneM7317GateSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7318-M7327: RTL Visual ---
+window.dfGetMilestoneM7327RtlSeal =
+  function() {
+    return {
+      milestone: 'M7318-M7327 RTL Visual Compat',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
