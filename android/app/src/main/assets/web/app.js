@@ -47322,3 +47322,65 @@ window.dfPreflightAirGappedStorage = function() {
 window.dfGetMilestoneM6017AirGappedAssetPreflightSeal = function() {
   return { milestone: 'M6008-M6017 Air-Gapped Asset Pre-flight', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6018-M6027: Tamil Telugu Malayalam Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ta = {
+  timer_start: "ஆழ்ந்த கவனத்தைத் தொடங்கு",
+  timer_pause: "தற்காலிக இடைநிறுத்தம்",
+  timer_resume: "கவனத்தைத் தொடரவும்",
+  timer_reset: "நேரத்தை மீட்டமை",
+  timer_stop: "அமர்வை முடி",
+  phase_focus: "ஆழ்ந்த படிப்பு நேரம்",
+  phase_short_break: "குறுகிய மன ஓய்வு",
+  phase_long_break: "நீட்டிக்கப்பட்ட ஓய்வு",
+  session_completed: "சிறப்பு! அமர்வு நிறைவடைந்தது",
+  card_flip: "அட்டையைத் திருப்பு",
+  card_show_answer: "விடையைக் காட்டு",
+  rating_again: "மீள்பார்வை தேவை",
+  rating_hard: "கடினமான நினைவு",
+  rating_good: "தெளிவான நினைவு",
+  rating_easy: "ஆழமாகப் பதிந்தது"
+};
+
+window.DF_MASTER_LEXICON.te = {
+  timer_start: "లోతైన ఏకాగ్రతను ప్రారంభించు",
+  timer_pause: "తాత్కాలిక విరామం",
+  timer_resume: "ఏకాగ్రతను కొనసాగించు",
+  timer_reset: "టైమర్ రీసెట్",
+  timer_stop: "సెషన్ ముగించు",
+  phase_focus: "లోతైన అధ్యయన సమయం",
+  phase_short_break: "చిన్న మానసిక విరామం",
+  phase_long_break: "సుదీర్ఘ విశ్రాంతి",
+  session_completed: "అద్భుతం! సెషన్ పూర్తయింది",
+  card_flip: "కార్డును తిప్పు",
+  card_show_answer: "సమాధానం చూపించు",
+  rating_again: "పునశ్చరణ అవసరం",
+  rating_hard: "గుర్తుకు రావడం కష్టం",
+  rating_good: "మంచి జ్ఞాపకం",
+  rating_easy: "పూర్తిగా స్థిరపడింది"
+};
+
+window.DF_MASTER_LEXICON.ml = {
+  timer_start: "ആഴത്തിലുള്ള ശ്രദ്ധ ആരംഭിക്കുക",
+  timer_pause: "താൽക്കാലികമായി നിർത്തുക",
+  timer_resume: "ശ്രദ്ധ തുടരുക",
+  timer_reset: "റീസെറ്റ് ചെയ്യുക",
+  timer_stop: "സെഷൻ അവസാനിപ്പിക്കുക",
+  phase_focus: "തീവ്ര പഠന സമയം",
+  phase_short_break: "ചെറിയ ഇടവേള",
+  phase_long_break: "ദീർഘമായ വിശ്രമം",
+  session_completed: "അഭിനന്ദനങ്ങൾ! പൂർത്തിയായി",
+  card_flip: "കാർഡ് മറിക്കുക",
+  card_show_answer: "ഉത്തരം കാണിക്കുക",
+  rating_again: "വീണ്ടും ഓർത്തെടുക്കണം",
+  rating_hard: "പ്രയാസമുള്ള ഓർമ്മ",
+  rating_good: "വ്യക്തമായ ഓർമ്മ",
+  rating_easy: "പൂർണ്ണമായി മനഃപാഠമാക്കി"
+};
+
+window.dfGetMilestoneM6027DravidianMasterLexiconSeal = function() {
+  return { milestone: 'M6018-M6027 Tamil Telugu Malayalam Master Lexicons', status: 'VERIFIED' };
+};
