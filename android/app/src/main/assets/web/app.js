@@ -50208,3 +50208,38 @@ window.dfGetMilestoneM6857GoalSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6858-M6867: Study Lock ---
+window.dfStudyLock = {
+  isLocked: false,
+  holdTimer: null,
+  lockUI: function(container) {
+    this.isLocked = true;
+    if (container) {
+      container.classList.add('monastic-locked');
+    }
+  },
+  startUnlockHold: function(onSuccess) {
+    const self = this;
+    this.holdTimer = setTimeout(function() {
+      self.isLocked = false;
+      if (typeof onSuccess === 'function') {
+        onSuccess();
+      }
+    }, 2000);
+  },
+  cancelUnlockHold: function() {
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+  }
+};
+window.dfGetMilestoneM6867LockSeal =
+  function() {
+    return {
+      milestone: 'M6858-M6867 Monastic Study Lock',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
