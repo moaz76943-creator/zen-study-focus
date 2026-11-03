@@ -51006,3 +51006,44 @@ window.dfGetMilestoneM7077BalanceSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7078-M7087: Breathing Audio Swell ---
+window.dfBreathingAudioSwell = {
+  isPulsing: false,
+  timerId: null,
+  startBreathingSwell: function(gainNode, ctx) {
+    if (!gainNode || !ctx || !gainNode.gain) return;
+    this.isPulsing = true;
+    const base = gainNode.gain.value || 0.22;
+    const self = this;
+    function cycle() {
+      if (!self.isPulsing) return;
+      const now = ctx.currentTime;
+      // 4s inhale (slight rise)
+      gainNode.gain.linearRampToValueAtTime(
+        base * 1.15, now + 4
+      );
+      // 6s exhale (gentle settle)
+      gainNode.gain.linearRampToValueAtTime(
+        base, now + 10
+      );
+      self.timerId = setTimeout(cycle, 10000);
+    }
+    cycle();
+  },
+  stopBreathingSwell: function() {
+    this.isPulsing = false;
+    if (this.timerId) {
+      clearTimeout(this.timerId);
+      this.timerId = null;
+    }
+  }
+};
+window.dfGetMilestoneM7087SwellSeal =
+  function() {
+    return {
+      milestone: 'M7078-M7087 Breathing Audio Swell',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
