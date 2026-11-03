@@ -46172,3 +46172,65 @@ window.DF_MASTER_LEXICON.ady = {
 window.dfGetMilestoneM5797NorthCaucasianCircassianSeal = function() {
   return { milestone: 'M5788-M5797 Ingush Karachay Circassian Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5798-M5807: Rohingya Acehnese Buginese Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.rhg = {
+  timer_start: "Gohir Diyan Shuru Goro",
+  timer_pause: "Ekkehana Dhoro",
+  timer_resume: "Diyan Sali Rawo",
+  timer_reset: "Noya Gori Lagao",
+  timer_stop: "Session Hotom Goro",
+  phase_focus: "Gohir Forar Waqt",
+  phase_short_break: "Suto Jiram",
+  phase_long_break: "Boro Jiram",
+  session_completed: "Shukur! Session Fuwasa",
+  card_flip: "Kard Ultaso",
+  card_show_answer: "Zawab Dehao",
+  rating_again: "Abar Fosan Poribo",
+  rating_hard: "Moshkil Mone Ail",
+  rating_good: "Bhal Gori Mone Ashey",
+  rating_easy: "Pura Mukhostho"
+};
+
+window.DF_MASTER_LEXICON.ace = {
+  timer_start: "Peuphoon Fokus Mandoeng",
+  timer_pause: "Piyoh Sikeujap",
+  timer_resume: "Lanjut Fokus",
+  timer_reset: "Peugot Baro",
+  timer_stop: "Peugadeh Sesi",
+  phase_focus: "Watee Beuet Sunggoh",
+  phase_short_break: "Piyoh Paneuk",
+  phase_long_break: "Piyoh Panyang",
+  session_completed: "Alhamdulillah! Ka Kahe",
+  card_flip: "Baleek Kartu",
+  card_show_answer: "Peuleumah Jaweueb",
+  rating_again: "Haba Ulang",
+  rating_hard: "Payah Ingat",
+  rating_good: "Kong That Ingat",
+  rating_easy: "Ka Hafeyh Bit"
+};
+
+window.DF_MASTER_LEXICON.bug = {
+  timer_start: "Pammulai Pikkiri Malo",
+  timer_pause: "Rappang Mattempa",
+  timer_resume: "Tuluseng Pikkiri",
+  timer_reset: "Papesau Pole",
+  timer_stop: "Purani Jamang",
+  phase_focus: "Wettu Mappangaja Malo",
+  phase_short_break: "Mattempa Macenning",
+  phase_long_break: "Mattempa Malampa",
+  session_completed: "Kurru Sumange! Purani",
+  card_flip: "Pinra Kertasa",
+  card_show_answer: "Paitang Papbali",
+  rating_again: "Sipato Ripaddupa",
+  rating_hard: "Maresa Riingerrang",
+  rating_good: "Madeceng Riingerrang",
+  rating_easy: "Tassapani Riati"
+};
+
+window.dfGetMilestoneM5807RohingyaAcehBugisSeal = function() {
+  return { milestone: 'M5798-M5807 Rohingya Acehnese Buginese Master Lexicons', status: 'VERIFIED' };
+};
