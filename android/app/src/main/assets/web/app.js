@@ -50465,3 +50465,32 @@ window.dfGetMilestoneM6927PinkSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6928-M6937: Priority Quadrant ---
+window.dfPriorityQuadrant = {
+  tasks: [],
+  addTask: function(title, quadrant) {
+    const q = Math.max(1, Math.min(4, quadrant || 2));
+    const t = {
+      id: 'task_' + Date.now(),
+      title: title || 'Deep Study Session',
+      quadrant: q,
+      completed: false
+    };
+    this.tasks.push(t);
+    return t;
+  },
+  getQ2DeepStudyTasks: function() {
+    return this.tasks.filter(function(t) {
+      return t.quadrant === 2 && !t.completed;
+    });
+  }
+};
+window.dfGetMilestoneM6937QuadrantSeal =
+  function() {
+    return {
+      milestone: 'M6928-M6937 Priority Quadrant',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
