@@ -49121,3 +49121,40 @@ window.dfGetMilestoneM6557CycleSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- OLED & Timer Pill Fixes ---
+window.dfApplyRealOledSurfaces = function() {
+  if (typeof document === 'undefined') return;
+  const sel = [
+    '.main-white-sheet', '.focus-hero-card',
+    '.pure-white-card', '.timer-card',
+    '.card', '[class*="bg-white"]'
+  ];
+  sel.forEach(function(s) {
+    const list = document.querySelectorAll(s);
+    for (let i = 0; i < list.length; i++) {
+      list[i].style.backgroundColor = '#000';
+      list[i].style.color = '#e0e0e0';
+    }
+  });
+  if (document.body) {
+    document.body.style.backgroundColor = '#000';
+  }
+};
+
+window.dfSyncTimerPillSelection = function(dur) {
+  if (typeof document === 'undefined') return;
+  const pills = document.querySelectorAll(
+    '.timer-pill, .pill-btn, [data-duration]'
+  );
+  pills.forEach(function(p) {
+    const d = p.getAttribute('data-duration') ||
+      p.textContent;
+    if (dur && d && d.indexOf(dur) !== -1) {
+      p.classList.add('active');
+    } else {
+      p.classList.remove('active');
+    }
+  });
+};
