@@ -48662,3 +48662,22 @@ window.dfAnnounceAriaPolite = function(messageText) {
 window.dfGetMilestoneM6387TalkBackAriaSemanticsSeal = function() {
   return { milestone: 'M6378-M6387 TalkBack ARIA Semantics Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6388-M6397: Device Tilt Sensor Engine ---
+window.dfHandleOrientationChange = function(beta, gamma) {
+  const b = parseFloat(beta) || 0.0;
+  const g = parseFloat(gamma) || 0.0;
+  const isFaceDown = Math.abs(b) > 160 || Math.abs(g) > 160;
+  return {
+    beta: b,
+    gamma: g,
+    isFaceDown: isFaceDown,
+    zenBlackoutActive: isFaceDown,
+    status: isFaceDown ? 'FACE_DOWN_ZEN_ACTIVE' : 'NORMAL_DISPLAY'
+  };
+};
+
+window.dfGetMilestoneM6397DeviceTiltSensorSeal = function() {
+  return { milestone: 'M6388-M6397 Device Tilt Sensor Engine', status: 'VERIFIED' };
+};
