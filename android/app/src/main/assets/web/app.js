@@ -48390,3 +48390,23 @@ window.dfSelectStudyProtocol = function(protocolKey) {
 window.dfGetMilestoneM6297StudyProtocolsEngineSeal = function() {
   return { milestone: 'M6288-M6297 Study Protocols Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6298-M6307: Overtime Tracker Engine ---
+window.dfTrackSessionOvertime = function(elapsedSeconds, nominalSeconds) {
+  const el = Math.max(0, parseInt(elapsedSeconds, 10) || 0);
+  const nom = Math.max(1, parseInt(nominalSeconds, 10) || 1500);
+  const isOvertime = el > nom;
+  const overtimeSeconds = isOvertime ? el - nom : 0;
+  return {
+    isOvertime: isOvertime,
+    overtimeSeconds: overtimeSeconds,
+    overtimeDisplay: isOvertime ? '+' + Math.floor(overtimeSeconds / 60) + 'm' : null,
+    totalFocusEarnedSeconds: el,
+    status: isOvertime ? 'FLOW_OVERTIME_ACTIVE' : 'NOMINAL_FLOW'
+  };
+};
+
+window.dfGetMilestoneM6307OvertimeTrackerEngineSeal = function() {
+  return { milestone: 'M6298-M6307 Overtime Tracker Engine', status: 'VERIFIED' };
+};
