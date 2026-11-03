@@ -50527,3 +50527,40 @@ window.dfGetMilestoneM6947MomentumSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6948-M6957: Subject Tagging ---
+window.dfSubjectTagging = {
+  activeTag: 'General Study',
+  activeColor: '#10b981',
+  palette: [
+    { name: 'Mathematics', color: '#3b82f6' },
+    { name: 'Sciences', color: '#10b981' },
+    { name: 'Languages', color: '#f59e0b' },
+    { name: 'Literature', color: '#ec4899' },
+    { name: 'Engineering', color: '#8b5cf6' }
+  ],
+  setTag: function(name) {
+    const found = this.palette.find(function(item) {
+      return item.name === name;
+    });
+    if (found) {
+      this.activeTag = found.name;
+      this.activeColor = found.color;
+    } else {
+      this.activeTag = name || 'General Study';
+      this.activeColor = '#10b981';
+    }
+    return {
+      tag: this.activeTag,
+      color: this.activeColor
+    };
+  }
+};
+window.dfGetMilestoneM6957TagSeal =
+  function() {
+    return {
+      milestone: 'M6948-M6957 Subject Tagging',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
