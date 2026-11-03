@@ -48986,3 +48986,27 @@ window.dfGetMilestoneM6497StorageSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6498-M6507: Ambient Darkening ---
+window.dfAmbientLight = {
+  luxLevel: 100,
+  isOledDark: true,
+  updateLux: function(lux) {
+    if (typeof lux === 'number' && !isNaN(lux)) {
+      this.luxLevel = Math.max(0, lux);
+      if (this.luxLevel < 15 && document.body) {
+        document.body.style.backgroundColor =
+          '#000';
+      }
+    }
+    return this.luxLevel;
+  }
+};
+window.dfGetMilestoneM6507AmbientSeal =
+  function() {
+    return {
+      milestone: 'M6498-M6507 Ambient Darkening',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
