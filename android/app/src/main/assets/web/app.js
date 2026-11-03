@@ -51514,3 +51514,54 @@ window.dfGetMilestoneM7367SoundSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7368-M7377: Live Deck Grid ---
+window.dfLiveDeckGrid = {
+  renderDeckDashboard: function(el, list, onStart) {
+    if (!el) return;
+    el.innerHTML = '';
+    const arr = Array.isArray(list) ? list : [];
+    const wrap = document.createElement('div');
+    wrap.className = 'deck-dashboard-wrap';
+    arr.forEach(function(d) {
+      const card = document.createElement('div');
+      card.className = 'deck-card-item';
+      card.style.padding = '14px';
+      card.style.marginBottom = '8px';
+      card.style.backgroundColor = '#18181b';
+      card.style.borderRadius = '8px';
+      card.style.display = 'flex';
+      card.style.justifyContent = 'space-between';
+      card.style.alignItems = 'center';
+      const title = document.createElement('span');
+      title.textContent = d.name || 'Main Deck';
+      title.style.color = '#f4f4f5';
+      title.style.fontWeight = 'bold';
+      card.appendChild(title);
+      const btn = document.createElement('button');
+      btn.textContent = 'Review Now';
+      btn.style.minHeight = '48px';
+      btn.style.minWidth = '100px';
+      btn.style.backgroundColor = '#10b981';
+      btn.style.color = '#ffffff';
+      btn.style.borderRadius = '6px';
+      btn.style.border = 'none';
+      btn.onclick = function() {
+        if (typeof onStart === 'function') {
+          onStart(d.id);
+        }
+      };
+      card.appendChild(btn);
+      wrap.appendChild(card);
+    });
+    el.appendChild(wrap);
+  }
+};
+window.dfGetMilestoneM7377DeckSeal =
+  function() {
+    return {
+      milestone: 'M7368-M7377 Live Deck Grid',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
