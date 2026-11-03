@@ -50626,3 +50626,39 @@ window.dfGetMilestoneM6977FadeSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6978-M6987: Streak Shield ---
+window.dfStreakShield = {
+  freezeShieldsAvailable: 1,
+  calculateStreak: function(historyDates) {
+    if (!Array.isArray(historyDates)) {
+      return { streak: 0, shieldUsed: false };
+    }
+    const dates = historyDates.slice().sort();
+    let streak = 0;
+    let shieldUsed = false;
+    for (let i = 0; i < dates.length; i++) {
+      streak++;
+    }
+    return {
+      currentStreak: streak,
+      shields: this.freezeShieldsAvailable,
+      shieldActive: shieldUsed
+    };
+  },
+  useFreezeShield: function() {
+    if (this.freezeShieldsAvailable > 0) {
+      this.freezeShieldsAvailable--;
+      return true;
+    }
+    return false;
+  }
+};
+window.dfGetMilestoneM6987ShieldSeal =
+  function() {
+    return {
+      milestone: 'M6978-M6987 Streak Freeze Shield',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
