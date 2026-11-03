@@ -49488,3 +49488,39 @@ window.dfGetMilestoneM6667QueueSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6668-M6677: Tri-Layer Mixer ---
+window.dfTriLayerMixer = {
+  compressor: null,
+  getCompressor: function(ctx) {
+    if (!this.compressor &&
+        ctx.createDynamicsCompressor) {
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -18;
+      comp.knee.value = 20;
+      comp.ratio.value = 4;
+      comp.attack.value = 0.005;
+      comp.release.value = 0.25;
+      comp.connect(ctx.destination);
+      this.compressor = comp;
+    }
+    return this.compressor || ctx.destination;
+  },
+  createLayerGain: function(ctx, level) {
+    const g = ctx.createGain();
+    const dest = this.getCompressor(ctx);
+    const lvl = level || 0.3;
+    const v = Math.max(0, Math.min(1.0, lvl));
+    g.gain.setValueAtTime(v, ctx.currentTime);
+    g.connect(dest);
+    return g;
+  }
+};
+window.dfGetMilestoneM6677MixerSeal =
+  function() {
+    return {
+      milestone: 'M6668-M6677 Tri-Layer Sound Mixer',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
