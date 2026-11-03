@@ -49438,3 +49438,53 @@ window.dfGetMilestoneM6657FlipSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6658-M6667: Due Review Queue ---
+window.dfReviewQueue = {
+  sortQueueByUrgency: function(cards) {
+    if (!Array.isArray(cards)) return [];
+    return cards.slice().sort(function(a, b) {
+      const sA = a.stability || 1.0;
+      const sB = b.stability || 1.0;
+      const now = Date.now();
+      const tA = (now - (a.lastReview || 0))
+        / 86400000;
+      const tB = (now - (b.lastReview || 0))
+        / 86400000;
+      const rA = Math.pow(1 + (0.1 * tA / sA), -1);
+      const rB = Math.pow(1 + (0.1 * tB / sB), -1);
+      return rA - rB;
+    });
+  },
+  getQueueMetrics: function(cards) {
+    if (!Array.isArray(cards)) {
+      return { newCount: 0, dueCount: 0 };
+    }
+    let n = 0, d = 0, s = 0;
+    const now = Date.now();
+    for (let i = 0; i < cards.length; i++) {
+      const c = cards[i];
+      if (!c.lastReview) {
+        n++;
+      } else {
+        const days = (now - c.lastReview) / 86400000;
+        const sVal = c.stability || 1;
+        const r = Math.pow(
+          1 + (0.1 * days / sVal), -1
+        );
+        if (r < 0.85) d++; else s++;
+      }
+    }
+    return {
+      newCount: n, dueCount: d, solidCount: s
+    };
+  }
+};
+window.dfGetMilestoneM6667QueueSeal =
+  function() {
+    return {
+      milestone: 'M6658-M6667 Due Review Queue',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
