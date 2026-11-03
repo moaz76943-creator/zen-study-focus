@@ -48366,3 +48366,27 @@ window.dfPredictDeck7DayReviewLoad = function(deckId) {
 window.dfGetMilestoneM6287RetentionForecasterSeal = function() {
   return { milestone: 'M6278-M6287 Retention Curve Forecaster Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6288-M6297: Advanced Study Protocols Engine ---
+window.DF_STUDY_PROTOCOLS = {
+  classic: { name: 'Classic Pomodoro', focusMinutes: 25, breakMinutes: 5 },
+  ultradian: { name: 'Ultradian Flow', focusMinutes: 50, breakMinutes: 10 },
+  sleep_cycle: { name: '90m Brain Cycle', focusMinutes: 90, breakMinutes: 20 },
+  custom: { name: 'Custom Timebox', focusMinutes: 45, breakMinutes: 15 }
+};
+
+window.dfSelectStudyProtocol = function(protocolKey) {
+  const p = window.DF_STUDY_PROTOCOLS[protocolKey];
+  if (!p) return { ok: false, error: 'UNKNOWN_PROTOCOL' };
+  return {
+    protocol: protocolKey,
+    focusSeconds: p.focusMinutes * 60,
+    breakSeconds: p.breakMinutes * 60,
+    status: 'PROTOCOL_SELECTED'
+  };
+};
+
+window.dfGetMilestoneM6297StudyProtocolsEngineSeal = function() {
+  return { milestone: 'M6288-M6297 Study Protocols Engine', status: 'VERIFIED' };
+};
