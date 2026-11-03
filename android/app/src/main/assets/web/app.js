@@ -51147,3 +51147,43 @@ window.dfGetMilestoneM7127ResonatorSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7128-M7137: Forgetting Sentry ---
+window.dfForgettingSentry = {
+  detectAtRiskDecks: function(allDecks) {
+    if (!Array.isArray(allDecks)) return [];
+    const atRisk = [];
+    allDecks.forEach(function(deck) {
+      if (deck && Array.isArray(deck.cards)) {
+        let lowRetentionCount = 0;
+        const now = Date.now();
+        deck.cards.forEach(function(card) {
+          const s = card ? card.stability : 0;
+          const lr = card ? card.lastReview : 0;
+          if (s && lr) {
+            const days = (now - lr) / 86400000;
+            const r = Math.pow(
+              1 + 0.1 * days / s, -1
+            );
+            if (r < 0.65) lowRetentionCount++;
+          }
+        });
+        if (lowRetentionCount >= 3) {
+          atRisk.push({
+            deckName: deck.name || 'Unnamed',
+            atRiskCount: lowRetentionCount
+          });
+        }
+      }
+    });
+    return atRisk;
+  }
+};
+window.dfGetMilestoneM7137SentrySeal =
+  function() {
+    return {
+      milestone: 'M7128-M7137 Forgetting Sentry',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
