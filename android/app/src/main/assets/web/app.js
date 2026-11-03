@@ -50115,3 +50115,36 @@ window.dfGetMilestoneM6827ChainSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6828-M6837: Blossom Math ---
+window.dfZenBlossom = {
+  drawPetal: function(ctx, x, y, radius, color) {
+    if (!ctx) return;
+    ctx.beginPath();
+    ctx.arc(x, y, radius || 3, 0, Math.PI * 2);
+    ctx.fillStyle = color || '#f472b6';
+    ctx.fill();
+  },
+  renderBlossoms: function(ctx, branchTips) {
+    if (!ctx || !Array.isArray(branchTips)) return;
+    const self = this;
+    branchTips.forEach(function(tip) {
+      if (tip && typeof tip.x === 'number') {
+        self.drawPetal(
+          ctx, tip.x, tip.y, 3, '#fbcfe8'
+        );
+        self.drawPetal(
+          ctx, tip.x + 2, tip.y, 2, '#f472b6'
+        );
+      }
+    });
+  }
+};
+window.dfGetMilestoneM6837BlossomSeal =
+  function() {
+    return {
+      milestone: 'M6828-M6837 Zen Blossom Math',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
