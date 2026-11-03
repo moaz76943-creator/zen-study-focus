@@ -45986,3 +45986,65 @@ window.DF_MASTER_LEXICON.dv = {
 window.dfGetMilestoneM5767SouthAsianIslamicLexiconSeal = function() {
   return { milestone: 'M5758-M5767 Sindhi Kashmiri Dhivehi Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5768-M5777: Maranao Maguindanao Tausug Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.mrw = {
+  timer_start: "Ipuun so Matanog a Kapamikir",
+  timer_pause: "Paganay a Tareda",
+  timer_resume: "Pakatatapa so Kapamikir",
+  timer_reset: "Kambalingan sa Pakaasal",
+  timer_stop: "Kapupusan o Masa",
+  phase_focus: "Masa a Matanog a Kapagadal",
+  phase_short_break: "Maito a Kasilay",
+  phase_long_break: "Mala a Kasilay",
+  session_completed: "Alhamdulillah! Miyapasad",
+  card_flip: "Balintowagen so Karta",
+  card_show_answer: "Pakilayn so Sembag",
+  rating_again: "Makatademan Puman",
+  rating_hard: "Mapegaw a Katadem",
+  rating_good: "Mapiya Katademan",
+  rating_easy: "Malamit a Kapangadi"
+};
+
+window.DF_MASTER_LEXICON.mdh = {
+  timer_start: "Pagitun su Dalem a Kapangaji",
+  timer_pause: "Ipaayaw Muna",
+  timer_resume: "Pangipus su Kapangaji",
+  timer_reset: "Ibaling su Oras",
+  timer_stop: "Tepusan su Oras",
+  phase_focus: "Masa nu Dalem a Kapangaji",
+  phase_short_break: "Maiket a Kapulaylay",
+  phase_long_break: "Mala a Kapulaylay",
+  session_completed: "Sukran! Napanay den",
+  card_flip: "Ipaliyo su Karta",
+  card_show_answer: "Pakitukaw su Tabag",
+  rating_again: "Kailangan Balikan",
+  rating_hard: "Malegen Katademan",
+  rating_good: "Mapia Katadem",
+  rating_easy: "Mapanay Katadem"
+};
+
+window.DF_MASTER_LEXICON.tsg = {
+  timer_start: "Tagnaan in Lalim Pangatud",
+  timer_pause: "Hundungun Manatad",
+  timer_resume: "Sambungun in Pangatud",
+  timer_reset: "Balikan pa Tagna",
+  timer_stop: "Ubusun in Masa",
+  phase_focus: "Masa sin Lalim Pag-iskul",
+  phase_short_break: "Hangkaray Hawa",
+  phase_long_break: "Mataud Hawa",
+  session_completed: "Magsukur! Na-ubus na",
+  card_flip: "Pinda-a in Karta",
+  card_show_answer: "Paita in Sambung",
+  rating_again: "Subay Balikan",
+  rating_hard: "Mahunit Tumtuman",
+  rating_good: "Marayaw in Tumtum",
+  rating_easy: "Tantu Ha Ati"
+};
+
+window.dfGetMilestoneM5777MoroAustronesianLexiconSeal = function() {
+  return { milestone: 'M5768-M5777 Maranao Maguindanao Tausug Master Lexicons', status: 'VERIFIED' };
+};
