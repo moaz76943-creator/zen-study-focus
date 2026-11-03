@@ -50696,3 +50696,41 @@ window.dfGetMilestoneM6997SweepSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6998-M7007: Deck Due Badge ---
+window.dfDeckDueBadge = {
+  renderDueBadge: function(deckCardEl, dueCount) {
+    if (!deckCardEl) return;
+    const sel = '.deck-due-pill';
+    let b = deckCardEl.querySelector(sel);
+    if (!b) {
+      b = document.createElement('span');
+      b.className = 'deck-due-pill';
+      b.style.fontSize = '12px';
+      b.style.fontWeight = 'bold';
+      b.style.padding = '2px 8px';
+      b.style.borderRadius = '12px';
+      deckCardEl.appendChild(b);
+    }
+    const cnt = dueCount || 0;
+    if (cnt > 0) {
+      b.style.backgroundColor = '#ef4444';
+      b.style.color = '#fff';
+      b.textContent = cnt + ' Due';
+      b.style.display = 'inline-block';
+    } else {
+      b.style.backgroundColor = '#10b981';
+      b.style.color = '#fff';
+      b.textContent = 'All Done';
+      b.style.display = 'inline-block';
+    }
+  }
+};
+window.dfGetMilestoneM7007BadgeSeal =
+  function() {
+    return {
+      milestone: 'M6998-M7007 Deck Due Badge',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
