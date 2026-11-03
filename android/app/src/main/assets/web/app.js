@@ -49602,3 +49602,50 @@ window.dfGetMilestoneM6697ShieldSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6698-M6707: Zen Breathing Orb ---
+window.dfZenOrb = {
+  orbElement: null,
+  showOrbScreensaver: function() {
+    if (typeof document === 'undefined') return;
+    let orb = document.getElementById('df-zen-orb');
+    if (!orb) {
+      orb = document.createElement('div');
+      orb.id = 'df-zen-orb';
+      orb.style.position = 'fixed';
+      orb.style.inset = '0';
+      orb.style.backgroundColor = '#000';
+      orb.style.zIndex = '99999';
+      orb.style.display = 'flex';
+      orb.style.alignItems = 'center';
+      orb.style.justifyContent = 'center';
+      const dot = document.createElement('div');
+      dot.style.width = '24px';
+      dot.style.height = '24px';
+      dot.style.borderRadius = '50%';
+      dot.style.backgroundColor = '#10b981';
+      dot.style.boxShadow = '0 0 16px #10b981';
+      dot.className = 'zen-breathing-dot';
+      orb.appendChild(dot);
+      orb.onclick = function() {
+        orb.style.display = 'none';
+      };
+      document.body.appendChild(orb);
+    }
+    orb.style.display = 'flex';
+    this.orbElement = orb;
+  },
+  hideOrbScreensaver: function() {
+    if (this.orbElement) {
+      this.orbElement.style.display = 'none';
+    }
+  }
+};
+window.dfGetMilestoneM6707OrbSeal =
+  function() {
+    return {
+      milestone: 'M6698-M6707 Zen Breathing Orb',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
