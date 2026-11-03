@@ -45676,3 +45676,65 @@ window.DF_MASTER_LEXICON.ku = Object.assign(window.DF_MASTER_LEXICON.ku || {}, {
 window.dfGetMilestoneM5717MalayPashtoKurdishSpecializedSeal = function() {
   return { milestone: 'M5708-M5717 Malay Pashto Kurdish Specialized Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5718-M5727: Fulfulde Wolof Kanuri Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ff = {
+  timer_start: "Fudo Hakkilantaaku",
+  timer_pause: "Darnu Seeda",
+  timer_resume: "Jokku Hakkilantaaku",
+  timer_reset: "Wartir Bawo",
+  timer_stop: "Timmin Yewtere",
+  phase_focus: "Sahaa Hakkilantaaku Luggidngu",
+  phase_short_break: "Siwto Famardi",
+  phase_long_break: "Siwto Juutndi",
+  session_completed: "Yoo Alla Rokku Barke! A timminii",
+  card_flip: "Waylu Kadiwal",
+  card_show_answer: "Hollu Jaabawol",
+  rating_again: "Haabti Loricagol",
+  rating_hard: "Tiidii Siftorde",
+  rating_good: "Siftorgo Lobbo",
+  rating_easy: "Hebti Kanko E Hoore Mum"
+};
+
+window.DF_MASTER_LEXICON.wo = {
+  timer_start: "Door Xalaat bu Xoot",
+  timer_pause: "Taxawal Tuuti",
+  timer_resume: "Weyale Xalaat bi",
+  timer_reset: "Delloo ci Ndorteel gi",
+  timer_stop: "Jeexal Waxtaan wi",
+  phase_focus: "Waxtu Jang bu Xoot",
+  phase_short_break: "Noppalu bu Gatt",
+  phase_long_break: "Noppalu bu Yaatu",
+  session_completed: "Am nga ndam! Waxtu wi jeex na",
+  card_flip: "Welbati Koos bi",
+  card_show_answer: "Wone Tontu bi",
+  rating_again: "Laaj na Xoolaat",
+  rating_hard: "Jafe na Fattaali",
+  rating_good: "Mokk na bu Baax",
+  rating_easy: "Dencu na ci Xel mi"
+};
+
+window.DF_MASTER_LEXICON.kr = {
+  timer_start: "Hankal Hakke Tamma",
+  timer_pause: "Gana Yasa",
+  timer_resume: "Hankal Tamma",
+  timer_reset: "Wala Kolji",
+  timer_stop: "Gana Tammi",
+  phase_focus: "Kuraa Hankal Zaye",
+  phase_short_break: "Gana Famaye",
+  phase_long_break: "Gana Kura",
+  session_completed: "Alhamdulillah! Tammi Bula",
+  card_flip: "Kati Kalji",
+  card_show_answer: "Jawabu Kuru",
+  rating_again: "Yasa Kuru",
+  rating_hard: "Rawa Mana",
+  rating_good: "Bula Mana",
+  rating_easy: "Kureye Mana"
+};
+
+window.dfGetMilestoneM5727SahelAfricanLexiconSeal = function() {
+  return { milestone: 'M5718-M5727 Fulfulde Wolof Kanuri Master Lexicons', status: 'VERIFIED' };
+};
