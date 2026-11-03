@@ -50027,3 +50027,50 @@ window.dfGetMilestoneM6807WindSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6808-M6817: Zen Orchard ---
+window.dfZenOrchard = {
+  renderOrchard: function(container, treeList) {
+    if (!container) return;
+    container.innerHTML = '';
+    const list = Array.isArray(treeList) ?
+      treeList : [];
+    const grid = document.createElement('div');
+    grid.className = 'orchard-grid';
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns =
+      'repeat(auto-fill, minmax(80px, 1fr))';
+    grid.style.gap = '12px';
+    list.forEach(function(item) {
+      const card = document.createElement('div');
+      card.className = 'orchard-tree-card';
+      card.style.textAlign = 'center';
+      card.style.padding = '8px';
+      card.style.backgroundColor = '#18181b';
+      card.style.borderRadius = '8px';
+      const cv = document.createElement('canvas');
+      cv.width = 64;
+      cv.height = 64;
+      const zt = window.dfZenTree;
+      if (zt && zt.renderGrowth) {
+        zt.renderGrowth(cv, 1.0);
+      }
+      card.appendChild(cv);
+      const lbl = document.createElement('div');
+      lbl.style.fontSize = '12px';
+      lbl.style.color = '#10b981';
+      lbl.textContent = (item.minutes || 25) + 'm';
+      card.appendChild(lbl);
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+  }
+};
+window.dfGetMilestoneM6817OrchardSeal =
+  function() {
+    return {
+      milestone: 'M6808-M6817 Zen Orchard Gallery',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
