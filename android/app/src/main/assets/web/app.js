@@ -46358,3 +46358,65 @@ window.DF_MASTER_LEXICON.bal = {
 window.dfGetMilestoneM5827BalochPunjabiGujaratiSeal = function() {
   return { milestone: 'M5818-M5827 Punjabi Gujarati Balochi Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5828-M5837: Cham Banjar Sasak Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.cjm = {
+  timer_start: "Tagok Panuec Khak",
+  timer_pause: "Pajeh Daok",
+  timer_resume: "Palao Panuec Khak",
+  timer_reset: "Tuan Pajeh",
+  timer_stop: "Abih Tuk",
+  phase_focus: "Waktu Blah Khak",
+  phase_short_break: "Pajeh Sit",
+  phase_long_break: "Pajeh Praong",
+  session_completed: "Sukran! Abih tuk nan",
+  card_flip: "Palei Karta",
+  card_show_answer: "Tua Ndom",
+  rating_again: "Tuan Blah",
+  rating_hard: "Kan Patih",
+  rating_good: "Siam Patih",
+  rating_easy: "Khak Patih"
+};
+
+window.DF_MASTER_LEXICON.bjn = {
+  timer_start: "Mulai Fokus Mandalam",
+  timer_pause: "Barantay Sabantar",
+  timer_resume: "Terusakan Fokus",
+  timer_reset: "Setel Pulang",
+  timer_stop: "Tuntungakan Sesi",
+  phase_focus: "Wayah Balajar Khusyuk",
+  phase_short_break: "Baistirahat Halus",
+  phase_long_break: "Baistirahat Ganal",
+  session_completed: "Alhamdulillah! Tuntung Suda",
+  card_flip: "Balik Karto",
+  card_show_answer: "Tiringi Jawapan",
+  rating_again: "Paralu Diulang",
+  rating_hard: "Ngalih Dingat",
+  rating_good: "Bagus Ingatan",
+  rating_easy: "Paham Banar"
+};
+
+window.DF_MASTER_LEXICON.sas = {
+  timer_start: "Mulaian Pikir Dalem",
+  timer_pause: "Bedait Sakedek",
+  timer_resume: "Lanjut Pikir",
+  timer_reset: "Setel Ulang",
+  timer_stop: "Tutupe Sesi",
+  phase_focus: "Waktun Belajar Khusyuk",
+  phase_short_break: "Nginep Sakedek",
+  phase_long_break: "Nginep Beriq",
+  session_completed: "Tampi Asih! Uwah Tutup",
+  card_flip: "Puter Kartu",
+  card_show_answer: "Pentaik Jawaban",
+  rating_again: "Kudu Balik",
+  rating_hard: "Keliwat Nyeret",
+  rating_good: "Solah Inget",
+  rating_easy: "Uwah Tetes"
+};
+
+window.dfGetMilestoneM5837ChamBanjarSasakSeal = function() {
+  return { milestone: 'M5828-M5837 Cham Banjar Sasak Master Lexicons', status: 'VERIFIED' };
+};
