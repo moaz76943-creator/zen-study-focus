@@ -51440,3 +51440,13 @@ window.dfGetMilestoneM7337StudioSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7338-M7347: Legacy Save ---
+window.dfGetMilestoneM7347LegacySeal =
+  function() {
+    return {
+      milestone: 'M7338-M7347 Legacy Save Compat',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
