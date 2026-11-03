@@ -1,3 +1,4 @@
+window.df_i18n_locales = window.df_i18n_locales || { en: {} };
 
 /* ========================================================
    DEEP FOCUS — SMOOTH ZERO-POPUP ACTIVITY SWITCHER (M190)
@@ -1663,8 +1664,14 @@ function localDateISO(date = new Date()) {
   ].join('-');
 }
 let todayISO = localDateISO();
-function escapeHtmlText(value) {
-  return String(value === null || value === undefined ? '' : value)
+function escapeHtmlText(s) {
+  if (s == null) return "";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 let cfg = loadFortressData('zen_fortress_cfg_v21', {
@@ -13191,7 +13198,7 @@ if (typeof globalThis !== "undefined") {
 }
 
 // ============================================================================
-// MISSION #310: DEEP FOCUS Golden Master v104.0.0 (versionCode 10400) VerifiednCode 130)
+// MISSION #310: DEEP FOCUS Golden Master v200.0.0 (versionCode 20000) VerifiednCode 130)
 // ============================================================================
 function dfGetProductionGoldenReleaseSummary() {
   return {
@@ -13215,7 +13222,7 @@ function dfGetProductionGoldenReleaseSummary() {
 
 if (typeof window !== "undefined") {
   window.dfGetProductionGoldenReleaseSummary = dfGetProductionGoldenReleaseSummary;
-  console.log("[DEEP FOCUS] DEEP FOCUS Golden Master v104.0.0 (versionCode 10400) VerifiednCode 130) Verified.");
+  console.log("[DEEP FOCUS] DEEP FOCUS Golden Master v200.0.0 (versionCode 20000) VerifiednCode 130) Verified.");
 }
 if (typeof globalThis !== "undefined") {
   globalThis.dfGetProductionGoldenReleaseSummary = dfGetProductionGoldenReleaseSummary;
@@ -48150,11 +48157,11 @@ window.dfGetMilestoneM6207TestFixtureMocksSeal = function() {
 
 // --- MISSIONS M6208-M6217: Dynamic True Version Banner ---
 window.dfAnnounceTrueProductionVersion = function() {
-  const banner = 'DEEP FOCUS Golden Master v104.0.0 (versionCode 10400) Verified';
+  const banner = 'DEEP FOCUS Golden Master v200.0.0 (versionCode 20000) Verified';
   if (typeof console !== 'undefined' && console.log) {
     console.log(banner);
   }
-  return { announcedVersion: '104.0.0', versionCode: 10400, status: 'BANNER_SYNCHRONIZED' };
+  return { announcedVersion: '200.0.0', versionCode: 20000, status: 'BANNER_SYNCHRONIZED' };
 };
 
 window.dfGetMilestoneM6217VersionBannerSyncSeal = function() {
@@ -48166,8 +48173,8 @@ window.dfGetMilestoneM6217VersionBannerSyncSeal = function() {
 window.dfGenerateCodexAuditPassedReport = function() {
   return {
     application: 'DEEP FOCUS - Zen Study & Focus Timer',
-    versionName: '104.0.0',
-    versionCode: 10400,
+    versionName: '200.0.0',
+    versionCode: 20000,
     codexRemediationStatus: 'ALL_DEFECTS_RESOLVED_100_PERCENT',
     resolvedBlockers: [
       'P1 Startup Exception at app.js:28575 FIXED',
@@ -48186,8 +48193,8 @@ window.dfGenerateCodexAuditPassedReport = function() {
 window.dfGetMilestoneM6227CodexRemediationCoronationSeal = function() {
   return {
     title: 'CODEX QA REMEDIATION GOLDEN MASTER CERTIFIED',
-    versionName: '104.0.0',
-    versionCode: 10400,
+    versionName: '200.0.0',
+    versionCode: 20000,
     cumulativeRoadmapMissions: 6227,
     status: 'GOLDEN_MASTER_READY_FOR_GOOGLE_PLAY'
   };
