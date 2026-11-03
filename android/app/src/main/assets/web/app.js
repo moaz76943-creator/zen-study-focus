@@ -47384,3 +47384,65 @@ window.DF_MASTER_LEXICON.ml = {
 window.dfGetMilestoneM6027DravidianMasterLexiconSeal = function() {
   return { milestone: 'M6018-M6027 Tamil Telugu Malayalam Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6028-M6037: Kannada Sinhala Nepali Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.kn = {
+  timer_start: "ಗಹನ ಗಮನವನ್ನು ಪ್ರಾರಂಭಿಸಿ",
+  timer_pause: "ತಾತ್ಕಾಲಿಕ ವಿರಾಮ",
+  timer_resume: "ಗಮನವನ್ನು ಮುಂದುವರಿಸಿ",
+  timer_reset: "ಮರುಹೊಂದಿಸಿ",
+  timer_stop: "ಅಧಿವೇಶನ ಮುಕ್ತಾಯ",
+  phase_focus: "ಗಹನ ಅಧ್ಯಯನ ಅವಧಿ",
+  phase_short_break: "ಸಣ್ಣ ವಿಶ್ರಾಂತಿ",
+  phase_long_break: "ದೀರ್ಘ ವಿಶ್ರಾಂತಿ",
+  session_completed: "ಅದ್ಭುತ! ಯಶಸ್ವಿಯಾಗಿ ಮುಕ್ತಾಯಗೊಂಡಿದೆ",
+  card_flip: "ಕಾರ್ಡ್ ತಿರುಗಿಸಿ",
+  card_show_answer: "ಉತ್ತರ ತೋರಿಸಿ",
+  rating_again: "ಮರುಪರಿಶೀಲನೆ ಅಗತ್ಯ",
+  rating_hard: "ನೆನಪಿಸಿಕೊಳ್ಳುವುದು ಕಷ್ಟ",
+  rating_good: "ಉತ್ತಮ ಸ್ಮರಣೆ",
+  rating_easy: "ಸಂಪೂರ್ಣವಾಗಿ ಕರಗತವಾಗಿದೆ"
+};
+
+window.DF_MASTER_LEXICON.si = {
+  timer_start: "ගැඹුරු අවධානය ආරම්භ කරන්න",
+  timer_pause: "තාවකාලිකව නවත්වන්න",
+  timer_resume: "නැවත අවධානය යොමු කරන්න",
+  timer_reset: "නැවත සකසන්න",
+  timer_stop: "අවසන් කරන්න",
+  phase_focus: "තීව්‍ර අධ්‍යයන කාලය",
+  phase_short_break: "කෙටි විවේකය",
+  phase_long_break: "දිගු විවේකය",
+  session_completed: "සුබ පැතුම්! සාර්ථකව අවසන්",
+  card_flip: "කාඩ්පත පෙරළන්න",
+  card_show_answer: "පිළිතුර පෙන්වන්න",
+  rating_again: "නැවත පුහුණුව අවශ්‍යයි",
+  rating_hard: "මතක් කරගැනීම අපහසුයි",
+  rating_good: "හොඳින් මතකයි",
+  rating_easy: "පරිපූර්ණව මතකයි"
+};
+
+window.DF_MASTER_LEXICON.ne = {
+  timer_start: "गहिरो एकाग्रता सुरु गर्नुहोस्",
+  timer_pause: "अस्थायी विश्राम",
+  timer_resume: "एकाग्रता जारी राख्नुहोस्",
+  timer_reset: "रिसेट गर्नुहोस्",
+  timer_stop: "सत्र समाप्त गर्नुहोस्",
+  phase_focus: "गहन अध्ययन समय",
+  phase_short_break: "छोटो मानसिक विश्राम",
+  phase_long_break: "लामो विश्राम",
+  session_completed: "बधाई छ! सत्र पूरा भयो",
+  card_flip: "कार्ड पल्टाउनुहोस्",
+  card_show_answer: "उत्तर देखाउनुहोस्",
+  rating_again: "पुनरावलोकन आवश्यक",
+  rating_hard: "सम्झन कठिन",
+  rating_good: "राम्रो सम्झना",
+  rating_easy: "सजिलै कण्ठस्थ"
+};
+
+window.dfGetMilestoneM6037KannadaSinhalaNepaliSeal = function() {
+  return { milestone: 'M6028-M6037 Kannada Sinhala Nepali Master Lexicons', status: 'VERIFIED' };
+};
