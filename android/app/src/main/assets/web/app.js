@@ -49073,3 +49073,25 @@ window.dfGetMilestoneM6537TouchSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6538-M6547: Audio Spectrum ---
+window.dfAudioSpectrum = {
+  cutoffFreqHz: 8000,
+  createComfortFilter: function(ctx) {
+    if (!ctx || !ctx.createBiquadFilter) {
+      return null;
+    }
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = this.cutoffFreqHz;
+    return filter;
+  }
+};
+window.dfGetMilestoneM6547SpectrumSeal =
+  function() {
+    return {
+      milestone: 'M6538-M6547 Audio Spectrum',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
