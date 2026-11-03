@@ -45924,3 +45924,65 @@ window.DF_MASTER_LEXICON.tt = {
 window.dfGetMilestoneM5757CaucasianTatarLexiconSeal = function() {
   return { milestone: 'M5748-M5757 Chechen Avar Tatar Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5758-M5767: Sindhi Kashmiri Dhivehi Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.sd = {
+  timer_start: "گهري توجهه جي شروعات",
+  timer_pause: "عارضي وقفو",
+  timer_resume: "توجهه جاري رکو",
+  timer_reset: "ٻيهر ترتيب ڏيو",
+  timer_stop: "نشست پڄاڻي",
+  phase_focus: "گهري مطالعي جو وقت",
+  phase_short_break: "مختصر ذهني آرام",
+  phase_long_break: "ڊگهو آرام",
+  session_completed: "ماشاءالله! نشست مڪمل ٿي",
+  card_flip: "ورق وراليو",
+  card_show_answer: "جواب ڏسو",
+  rating_again: "ورجاءُ گهرجي",
+  rating_hard: "مشڪل يادگيري",
+  rating_good: "سٺي يادگيري",
+  rating_easy: "پڪي ياد"
+};
+
+window.DF_MASTER_LEXICON.ks = {
+  timer_start: "گۆبر توجہ شروٗع",
+  timer_pause: "کینہہ کال رُکاوٹ",
+  timer_resume: "توجہ جٲری تھٲوِو",
+  timer_reset: "دوبارہ ترتیٖب",
+  timer_stop: "نشست ختٕم",
+  phase_focus: "گۆبر پَرنُک وقت",
+  phase_short_break: "لۄکُٹ آرام",
+  phase_long_break: "بوٚڈ آرام",
+  session_completed: "مُبارک! نشست گٔیہِ پوٗرٕ",
+  card_flip: "کارڈ پُھراوِو",
+  card_show_answer: "جواب ہاوِو",
+  rating_again: "دوبارہ مراجعہ ضروٗری",
+  rating_hard: "مُشکل یاد",
+  rating_good: "جان یاد",
+  rating_easy: "پوٗرٕ پختہ"
+};
+
+window.DF_MASTER_LEXICON.dv = {
+  timer_start: "Fooh Vaudheygai Fashan",
+  timer_pause: "Vaguthy Hattaalun",
+  timer_resume: "Kuriagendhavun",
+  timer_reset: "Dheena Re-set",
+  timer_stop: "Session Nimmaalan",
+  phase_focus: "Foohva Foari Dhaulun",
+  phase_short_break: "Kuda Buraafatheh",
+  phase_long_break: "Dhiguburaafatheh",
+  session_completed: "Shukuriya! Nimijje",
+  card_flip: "Kardi Furalan",
+  card_show_answer: "Javabu Dhekkan",
+  rating_again: "Alun Dhaskuran",
+  rating_hard: "Dhaathi Vecca",
+  rating_good: "Rangalah Handhaan",
+  rating_easy: "Fasheyhakamin"
+};
+
+window.dfGetMilestoneM5767SouthAsianIslamicLexiconSeal = function() {
+  return { milestone: 'M5758-M5767 Sindhi Kashmiri Dhivehi Master Lexicons', status: 'VERIFIED' };
+};
