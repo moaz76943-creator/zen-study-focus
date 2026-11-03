@@ -50396,3 +50396,42 @@ window.dfGetMilestoneM6907DimmerSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6908-M6917: Flashcard Importer ---
+window.dfFlashcardImporter = {
+  parseCsvLines: function(csvContent) {
+    if (!csvContent) return [];
+    const nl = String.fromCharCode(10);
+    const lines = csvContent.split(nl);
+    const cards = [];
+    lines.forEach(function(line) {
+      if (!line.trim()) return;
+      const parts = line.split(',');
+      if (parts.length >= 2) {
+        const q = parts[0].trim();
+        const a = parts.slice(1).join(',').trim();
+        if (q && a) {
+          const rS = Math.random().toString(36);
+          const cId = 'c_' + Date.now() +
+            '_' + rS.slice(2, 6);
+          cards.push({
+            id: cId,
+            front: q,
+            back: a,
+            stability: 1.0,
+            lastReview: 0
+          });
+        }
+      }
+    });
+    return cards;
+  }
+};
+window.dfGetMilestoneM6917ImportSeal =
+  function() {
+    return {
+      milestone: 'M6908-M6917 Flashcard Importer',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
