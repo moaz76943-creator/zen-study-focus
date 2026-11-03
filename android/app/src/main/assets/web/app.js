@@ -45582,3 +45582,50 @@ window.DF_MASTER_LEXICON.az = Object.assign(window.DF_MASTER_LEXICON.az || {}, {
 window.dfGetMilestoneM5697TurkicSpecializedSeal = function() {
   return { milestone: 'M5688-M5697 Kazakh Uzbek Azeri Specialized Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5698-M5707: Balkan Somali Specialized Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.bs = Object.assign(window.DF_MASTER_LEXICON.bs || {}, {
+  audio_chime_header: "Zvukovi Zavrsetka Sesije",
+  audio_ambient_header: "Prirodni Ambijent za Fokus",
+  audio_solfeggio_528: "528 Hz Zvuk Mentalne Harmonije",
+  audio_solfeggio_432: "432 Hz Zvuk Dubokog Mira",
+  audio_binaural_beta: "14 Hz Beta Talasi Budnosti",
+  fsrs_stability: "Indeks Stabilnosti Pamcenja",
+  fsrs_difficulty: "Nivo Tezine Prisjecanja",
+  fsrs_due_today: "Kartice za Ponavljanje Danas",
+  fsrs_mastered: "Potpuno Savladane Kartice",
+  fsrs_streak_days: "Uzastopni Dani Ucenja"
+});
+
+window.DF_MASTER_LEXICON.sq = Object.assign(window.DF_MASTER_LEXICON.sq || {}, {
+  audio_chime_header: "Tingujt e Perfundimit te Seances",
+  audio_ambient_header: "Mjedis Natyror per Perqendrim",
+  audio_solfeggio_528: "528 Hz Tingull Harmonie Mendore",
+  audio_solfeggio_432: "432 Hz Qetesi e Thelle Natyrore",
+  audio_binaural_beta: "14 Hz Vala Beta Zgjuarsie",
+  fsrs_stability: "Indeksi i Qendrueshmerise se Kujteses",
+  fsrs_difficulty: "Niveli i Veshtiresise se Kujtimit",
+  fsrs_due_today: "Karta per Rishikim Sot",
+  fsrs_mastered: "Karta Plotesisht te Mesuara",
+  fsrs_streak_days: "Dite te Pasnjepasnjeshme Studimi"
+});
+
+window.DF_MASTER_LEXICON.so = Object.assign(window.DF_MASTER_LEXICON.so || {}, {
+  audio_chime_header: "Dhawaaqyada Dhamaadka Casharka",
+  audio_ambient_header: "Jawiga Dabiiciga ah ee Wax Akhriska",
+  audio_solfeggio_528: "528 Hz Dheelitirka Maskaxda",
+  audio_solfeggio_432: "432 Hz Deganaansho Qoto Dheer",
+  audio_binaural_beta: "14 Hz Mawjadaha Feejignaanta",
+  fsrs_stability: "Heerka Sugnaanta Xasuusta",
+  fsrs_difficulty: "Heerka Adkaanta Xasuusashada",
+  fsrs_due_today: "Kaararka Maanta Dib Loo Eegayo",
+  fsrs_mastered: "Kaararka Si Buuxda loo Xafiday",
+  fsrs_streak_days: "Maalmaha Xiriirka ah ee Waxbarashada"
+});
+
+window.dfGetMilestoneM5707BalkanSomaliSpecializedSeal = function() {
+  return { milestone: 'M5698-M5707 Bosnian Albanian Somali Specialized Lexicons', status: 'VERIFIED' };
+};
