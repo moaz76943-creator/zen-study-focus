@@ -47040,3 +47040,65 @@ window.DF_MASTER_LEXICON.rej = {
 window.dfGetMilestoneM5937BorneoSumatraLexiconSeal = function() {
   return { milestone: 'M5928-M5937 Borneo Sumatra Regional Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5938-M5947: Salar Karakalpak Nogai Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.slr = {
+  timer_start: "Deli Pikir Bashla",
+  timer_pause: "Biraz Tohta",
+  timer_resume: "Pikirni Ula",
+  timer_reset: "Beshin Duzel",
+  timer_stop: "Vaqti Tamam",
+  phase_focus: "Deli Oqush Vasti",
+  phase_short_break: "Qisqa Dinjel",
+  phase_long_break: "Uzun Dinjel",
+  session_completed: "Alla Rozi Bolsun! Tamam",
+  card_flip: "Karta Ayir",
+  card_show_answer: "Jovob Gozget",
+  rating_again: "Yene Dargor",
+  rating_hard: "Qati Yadga Geldi",
+  rating_good: "Yaxshi Yadga Geldi",
+  rating_easy: "Kamil Yadga Keldi"
+};
+
+window.DF_MASTER_LEXICON.kaa = {
+  timer_start: "Tere'n Diqqatti Baslaw",
+  timer_pause: "Waqtinsha Toqtatiw",
+  timer_resume: "Diqqatti Dawam Etiw",
+  timer_reset: "Qaytadan Sa'wleleniw",
+  timer_stop: "Seansti Juwmaqlaw",
+  phase_focus: "Tere'n Oqiw Waqti",
+  phase_short_break: "Qisqa Dem Alis",
+  phase_long_break: "Uzaq Dem Alis",
+  session_completed: "A'jayiyp! Waqit Tamamlandi",
+  card_flip: "Kartani Awdariw",
+  card_show_answer: "Juwapti Ko'rsew",
+  rating_again: "Qaytalaw Za'ru'r",
+  rating_hard: "Qiyin Yada Tu'sti",
+  rating_good: "Jaqsi Yatta",
+  rating_easy: "Bekkem O'zlestirildi"
+};
+
+window.DF_MASTER_LEXICON.nog = {
+  timer_start: "Терен Эсти Баслав",
+  timer_pause: "Бираз Токтав",
+  timer_resume: "Эсти Бардырув",
+  timer_reset: "Бастан Туьзуьв",
+  timer_stop: "Дерсти Тамамлав",
+  phase_focus: "Терен Окув Заманы",
+  phase_short_break: "Кыска Тыншаюв",
+  phase_long_break: "Узак Тыншаюв",
+  session_completed: "Машалла! Дерс Тамамланды",
+  card_flip: "Картты Бурув",
+  card_show_answer: "Явапты Коьрсетуьв",
+  rating_again: "Кайтарув Керек",
+  rating_hard: "Кыйын Эске Келди",
+  rating_good: "Ийги Эсте",
+  rating_easy: "Берк Билинеди"
+};
+
+window.dfGetMilestoneM5947SalarKarakalpakNogaiSeal = function() {
+  return { milestone: 'M5938-M5947 Salar Karakalpak Nogai Master Lexicons', status: 'VERIFIED' };
+};
