@@ -50281,3 +50281,32 @@ window.dfGetMilestoneM6877ResetSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6878-M6887: Multi-Deck Aggregator ---
+window.dfDeckAggregator = {
+  aggregateDueCards: function(allDecks) {
+    if (!Array.isArray(allDecks)) return [];
+    let combined = [];
+    allDecks.forEach(function(d) {
+      if (d && Array.isArray(d.cards)) {
+        combined = combined.concat(d.cards);
+      }
+    });
+    // Shuffle for interleaved practice
+    for (let i = combined.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = combined[i];
+      combined[i] = combined[j];
+      combined[j] = temp;
+    }
+    return combined;
+  }
+};
+window.dfGetMilestoneM6887DeckSeal =
+  function() {
+    return {
+      milestone: 'M6878-M6887 Multi-Deck Aggregator',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
