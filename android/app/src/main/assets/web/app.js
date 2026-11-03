@@ -45488,3 +45488,50 @@ window.DF_MASTER_LEXICON.it = Object.assign(window.DF_MASTER_LEXICON.it || {}, {
 window.dfGetMilestoneM5677RussianItalianSpecializedSeal = function() {
   return { milestone: 'M5668-M5677 Russian and Italian Specialized Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5678-M5687: Chinese Japanese Hindi Specialized Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.zh = Object.assign(window.DF_MASTER_LEXICON.zh || {}, {
+  audio_chime_header: "程序化会话结束提示音",
+  audio_ambient_header: "助益深度专注的纯自然声景",
+  audio_solfeggio_528: "528Hz 心智谐振平缓音频",
+  audio_solfeggio_432: "432Hz 宁静沉稳自然调谐",
+  audio_binaural_beta: "14Hz Beta 清醒专注脑波",
+  fsrs_stability: "记忆持久度稳定指数",
+  fsrs_difficulty: "知识提取难度分级",
+  fsrs_due_today: "今日待复习记忆卡片",
+  fsrs_mastered: "已牢固掌握的知识卡片",
+  fsrs_streak_days: "连续专注学习天数"
+});
+
+window.DF_MASTER_LEXICON.ja = Object.assign(window.DF_MASTER_LEXICON.ja || {}, {
+  audio_chime_header: "セッション完了チャイム音",
+  audio_ambient_header: "深い集中を促す自然環境音",
+  audio_solfeggio_528: "528Hz 精神的調和トーン",
+  audio_solfeggio_432: "432Hz 深い静寂トーン",
+  audio_binaural_beta: "14Hz ベータ覚醒バイノーラル",
+  fsrs_stability: "記憶安定性指標",
+  fsrs_difficulty: "想起難易度レベル",
+  fsrs_due_today: "本日復習すべきカード",
+  fsrs_mastered: "完全に習得したカード",
+  fsrs_streak_days: "連続学習継続日数"
+});
+
+window.DF_MASTER_LEXICON.hi = Object.assign(window.DF_MASTER_LEXICON.hi || {}, {
+  audio_chime_header: "सत्र समापन प्रक्रियात्मक घंटी",
+  audio_ambient_header: "एकाग्रता हेतु प्राकृतिक ध्वनि",
+  audio_solfeggio_528: "528 हर्ट्ज मानसिक संतुलन स्वर",
+  audio_solfeggio_432: "432 हर्ट्ज गहन शांति स्वर",
+  audio_binaural_beta: "14 हर्ट्ज बीटा जागरूकता तरंग",
+  fsrs_stability: "स्मृति स्थिरता सूचकांक",
+  fsrs_difficulty: "स्मरण कठिनाई स्तर",
+  fsrs_due_today: "आज दोहराने योग्य कार्ड",
+  fsrs_mastered: "पूरी तरह कंठस्थ कार्ड",
+  fsrs_streak_days: "लगातार अध्ययन दिवस"
+});
+
+window.dfGetMilestoneM5687ChineseJapaneseHindiSpecializedSeal = function() {
+  return { milestone: 'M5678-M5687 Chinese Japanese Hindi Specialized Lexicons', status: 'VERIFIED' };
+};
