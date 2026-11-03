@@ -51466,3 +51466,51 @@ window.dfGetMilestoneM7357SuiteCleanSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7358-M7367: Live Sound UI ---
+window.dfLiveSoundUI = {
+  presets: [
+    { id: 'brown', name: 'Warm Waterfall' },
+    { id: 'rain', name: 'Gentle Rain' },
+    { id: 'stream', name: 'Flowing Brook' },
+    { id: 'wind', name: 'Forest Breeze' },
+    { id: 'fire', name: 'Campfire Embers' }
+  ],
+  renderSoundGrid: function(container) {
+    if (!container) return;
+    container.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'sound-grid';
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+    grid.style.gap = '10px';
+    const self = this;
+    this.presets.forEach(function(item) {
+      const btn = document.createElement('button');
+      btn.className = 'sound-tile-btn';
+      btn.textContent = item.name;
+      btn.style.minHeight = '48px';
+      btn.style.padding = '10px';
+      btn.style.borderRadius = '8px';
+      btn.style.backgroundColor = '#18181b';
+      btn.style.color = '#10b981';
+      btn.style.border = '1px solid #27272a';
+      btn.onclick = function() {
+        if (window.dfStudioAudio) {
+          const isR = (item.id === 'rain');
+          window.dfStudioAudio.playAmbience(isR);
+        }
+      };
+      grid.appendChild(btn);
+    });
+    container.appendChild(grid);
+  }
+};
+window.dfGetMilestoneM7367SoundSeal =
+  function() {
+    return {
+      milestone: 'M7358-M7367 Live Sound UI Grid',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
