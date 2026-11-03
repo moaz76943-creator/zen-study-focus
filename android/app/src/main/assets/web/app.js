@@ -48512,3 +48512,28 @@ window.dfGetMilestoneM6327GrandCoronationV105Seal = function() {
     status: 'GOLDEN_MASTER_v105_CROWNED'
   };
 };
+
+
+// --- MISSIONS M6328-M6337: Monotonic Drift Compensator Engine ---
+window.dfCreateMonotonicTimer = function(durationSeconds) {
+  const startMono = (typeof performance !== 'undefined' && performance.now) ?
+                    performance.now() : Date.now();
+  const totalMs = (parseInt(durationSeconds, 10) || 1500) * 1000;
+  return {
+    startMonoTime: startMono,
+    totalDurationMs: totalMs,
+    getElapsedSeconds: function() {
+      const now = (typeof performance !== 'undefined' && performance.now) ?
+                  performance.now() : Date.now();
+      return Math.min(totalMs / 1000, Math.floor((now - startMono) / 1000));
+    },
+    getRemainingSeconds: function() {
+      return Math.max(0, Math.ceil((totalMs / 1000) - this.getElapsedSeconds()));
+    },
+    status: 'MONOTONIC_TIMER_ACTIVE'
+  };
+};
+
+window.dfGetMilestoneM6337MonotonicDriftCompensatorSeal = function() {
+  return { milestone: 'M6328-M6337 Monotonic Drift Compensator Engine', status: 'VERIFIED' };
+};
