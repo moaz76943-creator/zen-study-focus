@@ -45454,3 +45454,37 @@ window.DF_MASTER_LEXICON.de = Object.assign(window.DF_MASTER_LEXICON.de || {}, {
 window.dfGetMilestoneM5667FrenchGermanSpecializedSeal = function() {
   return { milestone: 'M5658-M5667 French and German Specialized Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5668-M5677: Russian & Italian Specialized Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ru = Object.assign(window.DF_MASTER_LEXICON.ru || {}, {
+  audio_chime_header: "Процедурные Звуки Завершения Сессии",
+  audio_ambient_header: "Природная Атмосфера для Концентрации",
+  audio_solfeggio_528: "528 Гц Частота Ясности Ума",
+  audio_solfeggio_432: "432 Гц Частота Глубокого Спокойствия",
+  audio_binaural_beta: "14 Гц Бета-Волны Бодрости",
+  fsrs_stability: "Индекс Стабильности Памяти",
+  fsrs_difficulty: "Уровень Сложности Воспроизведения",
+  fsrs_due_today: "Карточки к Повторению Сегодня",
+  fsrs_mastered: "Прочно Усвоенные Карточки",
+  fsrs_streak_days: "Дней Непрерывного Обучения"
+});
+
+window.DF_MASTER_LEXICON.it = Object.assign(window.DF_MASTER_LEXICON.it || {}, {
+  audio_chime_header: "Suoni Procedurali di Fine Sessione",
+  audio_ambient_header: "Atmosfera Naturale per lo Studio",
+  audio_solfeggio_528: "Frequenza 528 Hz di Armonia Mentale",
+  audio_solfeggio_432: "Frequenza 432 Hz di Quiete Profonda",
+  audio_binaural_beta: "Onde Beta 14 Hz di Massima Allerta",
+  fsrs_stability: "Indice di Stabilita della Memoria",
+  fsrs_difficulty: "Livello di Difficolta di Richiamo",
+  fsrs_due_today: "Carte in Scadenza Oggi",
+  fsrs_mastered: "Carte Pienamente Acquisite",
+  fsrs_streak_days: "Giorni Consecutivi di Studio"
+});
+
+window.dfGetMilestoneM5677RussianItalianSpecializedSeal = function() {
+  return { milestone: 'M5668-M5677 Russian and Italian Specialized Lexicons', status: 'VERIFIED' };
+};
