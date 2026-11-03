@@ -47756,3 +47756,65 @@ window.DF_MASTER_LEXICON.gl = {
 window.dfGetMilestoneM6087EuropeanRegionalSeal = function() {
   return { milestone: 'M6078-M6087 Catalan Basque Galician Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6088-M6097: Celtic Regional Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ga = {
+  timer_start: "Tosaigh Doimhin-Diriu",
+  timer_pause: "Sos Beag",
+  timer_resume: "Lean ar Aghaidh",
+  timer_reset: "Athshocraigh",
+  timer_stop: "Crioch leis an Seisiun",
+  phase_focus: "Treimhse Dian-Leann",
+  phase_short_break: "Sos Gearr Meabhrach",
+  phase_long_break: "Sos Fada",
+  session_completed: "Maith thu! Seisiun criochnaithe",
+  card_flip: "Iompaigh an Carta",
+  card_show_answer: "Taispeain Freagra",
+  rating_again: "Athbhreithniu Ag Teastail",
+  rating_hard: "Deacair Cuimhneamh",
+  rating_good: "Cuimhne Mhaith",
+  rating_easy: "Foghlamtha go hIomlan"
+};
+
+window.DF_MASTER_LEXICON.cy = {
+  timer_start: "Dechrau Canolbwyntio Dwfn",
+  timer_pause: "Oedi dros Dro",
+  timer_resume: "Parhau a Chanolbwyntio",
+  timer_reset: "Ailosod Amser",
+  timer_stop: "Gorffen Sesiwn",
+  phase_focus: "Cyfnod Astudio Dwfn",
+  phase_short_break: "Ewyllys Byr",
+  phase_long_break: "Seibiant Hir",
+  session_completed: "Da iawn! Sesiwn wedi gorffen",
+  card_flip: "Troi Cerdyn",
+  card_show_answer: "Dangos Ateb",
+  rating_again: "Angen Adolygu",
+  rating_hard: "Anodd Cofio",
+  rating_good: "Cofio Da",
+  rating_easy: "Meistrolwyd yn Llawn"
+};
+
+window.DF_MASTER_LEXICON.gd = {
+  timer_start: "Toisich Focas Doimhne",
+  timer_pause: "Stad Car Tamall",
+  timer_resume: "Lean air Adhart",
+  timer_reset: "Ath-shuidhich Uair",
+  timer_stop: "Cuir Crioch air",
+  phase_focus: "Uair Ionnsachaidh Dhoimhne",
+  phase_short_break: "Fois Ghoirid",
+  phase_long_break: "Fois Fhada",
+  session_completed: "Gle mhath! Tha thu deiseil",
+  card_flip: "Tionndaidh a Chairt",
+  card_show_answer: "Seall am Freagairt",
+  rating_again: "Feumar Ath-sgrudadh",
+  rating_hard: "Doirbh a Chuimhneachadh",
+  rating_good: "Cuimhne Mhath",
+  rating_easy: "Ionnsaichte gu Leir"
+};
+
+window.dfGetMilestoneM6097CelticRegionalSeal = function() {
+  return { milestone: 'M6088-M6097 Irish Welsh Scottish Gaelic Master Lexicons', status: 'VERIFIED' };
+};
