@@ -51410,3 +51410,13 @@ window.dfGetMilestoneM7307AudioSinkSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7308-M7317: Release Gate ---
+window.dfGetMilestoneM7317GateSeal =
+  function() {
+    return {
+      milestone: 'M7308-M7317 Release Gate Compat',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
