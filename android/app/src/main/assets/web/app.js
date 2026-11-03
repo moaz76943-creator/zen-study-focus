@@ -46916,3 +46916,65 @@ window.DF_MASTER_LEXICON['sw-bar'] = {
 window.dfGetMilestoneM5917SwahiliHistoricDialectsSeal = function() {
   return { milestone: 'M5908-M5917 Swahili Historic Dialects Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5918-M5927: South Sulawesi Makassar Mandar Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON['bug-bon'] = {
+  timer_start: "Pammulai Pikkiri Malo",
+  timer_pause: "Rappang Mattempa",
+  timer_resume: "Tuluseng Pikkiri",
+  timer_reset: "Papesau Pole",
+  timer_stop: "Purani Jamang",
+  phase_focus: "Wettu Mappangaja Malo",
+  phase_short_break: "Mattempa Macenning",
+  phase_long_break: "Mattempa Malampa",
+  session_completed: "Kurru Sumange! Purani",
+  card_flip: "Pinra Kertasa",
+  card_show_answer: "Paitang Papbali",
+  rating_again: "Sipato Ripaddupa",
+  rating_hard: "Maresa Riingerrang",
+  rating_good: "Madeceng Riingerrang",
+  rating_easy: "Tassapani Riati"
+};
+
+window.DF_MASTER_LEXICON.mak = {
+  timer_start: "Appakaramula Pikiring Dalang",
+  timer_pause: "Rammang Sinampe",
+  timer_resume: "Tulusang Pikiring",
+  timer_reset: "Pasimballang Pole",
+  timer_stop: "Ubusang Jamang",
+  phase_focus: "Wattu Pangngaji Dalang",
+  phase_short_break: "Pammari-mari Sinampe",
+  phase_long_break: "Pammari-mari Lompo",
+  session_completed: "Salama! Leppami Jamang",
+  card_flip: "Bale Karto",
+  card_show_answer: "Ciniki Balinna",
+  rating_again: "Parallu Niulang",
+  rating_hard: "Sukkara Niingak",
+  rating_good: "Bajiki Niingak",
+  rating_easy: "Apal Sanna"
+};
+
+window.DF_MASTER_LEXICON.mdr = {
+  timer_start: "Pake Pikkirang Mandalam",
+  timer_pause: "Motte Sakendek",
+  timer_resume: "Lanjut Pikkirang",
+  timer_reset: "Petondong Pole",
+  timer_stop: "Pura Jamang",
+  phase_focus: "Wattu Meguru Khusyuk",
+  phase_short_break: "Mattempe Sakendek",
+  phase_long_break: "Mattempe Malambe",
+  session_completed: "Kurru Sumanga! Pura Mi",
+  card_flip: "Giling Karti",
+  card_show_answer: "Paitang Papbalinna",
+  rating_again: "Kallu Niulang",
+  rating_hard: "Masekke Diingak",
+  rating_good: "Makarama Diingak",
+  rating_easy: "Apal Pura"
+};
+
+window.dfGetMilestoneM5927SouthSulawesiMakassarSeal = function() {
+  return { milestone: 'M5918-M5927 South Sulawesi Makassar Mandar Lexicons', status: 'VERIFIED' };
+};
