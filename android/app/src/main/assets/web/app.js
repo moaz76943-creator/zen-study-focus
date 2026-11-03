@@ -46420,3 +46420,65 @@ window.DF_MASTER_LEXICON.sas = {
 window.dfGetMilestoneM5837ChamBanjarSasakSeal = function() {
   return { milestone: 'M5828-M5837 Cham Banjar Sasak Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5838-M5847: Mandinka Susu Niger Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.mnk = {
+  timer_start: "Hakilo Tuuta Damin",
+  timer_pause: "Domo Sabari",
+  timer_resume: "Hakilo Tuuta Silo",
+  timer_reset: "Koto Faala",
+  timer_stop: "Waqto Banta",
+  phase_focus: "Hakilo Karan Jamano",
+  phase_short_break: "Karan Siitoo Surunto",
+  phase_long_break: "Karan Siitoo Jango",
+  session_completed: "Abaraka! Karan banta",
+  card_flip: "Kardoo Yelema",
+  card_show_answer: "Jaaboo Yitandi",
+  rating_again: "Kotondiro Laafi",
+  rating_hard: "Hakilo Koleyaata",
+  rating_good: "Hakilo Beteyaata",
+  rating_easy: "Karan Faayidaata"
+};
+
+window.DF_MASTER_LEXICON['ha-NE'] = {
+  timer_start: "Fara Mai Da Hankali",
+  timer_pause: "Dakata Kadan",
+  timer_resume: "Dora Hankali",
+  timer_reset: "Sake Fara Lokaci",
+  timer_stop: "Kare Lokaci",
+  phase_focus: "Zaman Mayar Da Hankali Kwarai",
+  phase_short_break: "Gajeren Hutu Na Hankali",
+  phase_long_break: "Dogon Hutu Na Nazari",
+  session_completed: "Madalla Kwarai! An Kammala",
+  card_flip: "Juya Wannan Katin",
+  card_show_answer: "Nuna Amsa",
+  rating_again: "Dole A Maimaita",
+  rating_hard: "Da Wuya Kwarai",
+  rating_good: "Yana Nan Cikin Rai",
+  rating_easy: "An Rike Da Kyau"
+};
+
+window.DF_MASTER_LEXICON.sus = {
+  timer_start: "Xaxili Tindin Folo",
+  timer_pause: "Mati Doxonde",
+  timer_resume: "Xaxili Tindin Sigae",
+  timer_reset: "Gbilen Na Folo",
+  timer_stop: "Waxi Ganyi",
+  phase_focus: "Xaxili Tinde Waxi",
+  phase_short_break: "Mati Xoride",
+  phase_long_break: "Mati Xukunde",
+  session_completed: "Inuali! Waxi ganyi kanyi",
+  card_flip: "Kardi Mafilen",
+  card_show_answer: "Yabir Masen",
+  rating_again: "Katan Na Folo",
+  rating_hard: "Mire Gbele",
+  rating_good: "Xaxili Fanxi",
+  rating_easy: "Gboxo Kanyi"
+};
+
+window.dfGetMilestoneM5847MandinkaSusuNigerLexiconSeal = function() {
+  return { milestone: 'M5838-M5847 Mandinka Susu Niger Master Lexicons', status: 'VERIFIED' };
+};
