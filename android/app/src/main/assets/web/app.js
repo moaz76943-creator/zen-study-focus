@@ -46730,3 +46730,65 @@ window.DF_MASTER_LEXICON.bft = {
 window.dfGetMilestoneM5887HazaragiShinaBaltiSeal = function() {
   return { milestone: 'M5878-M5887 Hazaragi Shina Balti Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5888-M5897: Gorontalo Madurese Ternate Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.gor = {
+  timer_start: "Tumula Fokus Mowali",
+  timer_pause: "Pangganga Ngopeei",
+  timer_resume: "Lanjuti Fokus",
+  timer_reset: "Aturu Ulangi",
+  timer_stop: "Pulito Waktu",
+  phase_focus: "Wakutu Mowali Belajari",
+  phase_short_break: "Mohuheli Ngopeei",
+  phase_long_break: "Mohuheli Hayaya",
+  session_completed: "Alhamdulillah! Lopulito",
+  card_flip: "Boliha Kartu",
+  card_show_answer: "Popobilohe Jawabi",
+  rating_again: "Paralu Ulangiyo",
+  rating_hard: "Sukari Elingolo",
+  rating_good: "Oontonga Elingolo",
+  rating_easy: "Wawu Oontonga Daa"
+};
+
+window.DF_MASTER_LEXICON.mad = {
+  timer_start: "Molae Fokus Sajjana",
+  timer_pause: "Nenggu Sakejjek",
+  timer_resume: "Paterros Fokus",
+  timer_reset: "Pabali Pole",
+  timer_stop: "Mari Sesi",
+  phase_focus: "Bakte Ajar Khusyuk",
+  phase_short_break: "Ngaso Sakejjek",
+  phase_long_break: "Ngaso Lanjhang",
+  session_completed: "Alhamdulillah! Ampun Mari",
+  card_flip: "Bhalik Karto",
+  card_show_answer: "Tengguh Jawabanna",
+  rating_again: "Kodu Ebaleni",
+  rating_hard: "Malarat Ekaenga",
+  rating_good: "Sahe Ekaenga",
+  rating_easy: "Ampon Apal Onggu"
+};
+
+window.DF_MASTER_LEXICON.tft = {
+  timer_start: "Tagi Hida Fokus",
+  timer_pause: "Pari Tulu Kasi",
+  timer_resume: "Lanjut Hida",
+  timer_reset: "Setel Ulangi",
+  timer_stop: "Hala Waktu",
+  phase_focus: "Waktu Belajar Khusyuk",
+  phase_short_break: "Rari Kasi",
+  phase_long_break: "Rari Gura",
+  session_completed: "Syukur Doa! Sioko Hala",
+  card_flip: "Kalesa Kartu",
+  card_show_answer: "Coba Jawabi",
+  rating_again: "Pari Ulangi",
+  rating_hard: "Gala Ingati",
+  rating_good: "Ija Ingati",
+  rating_easy: "Sioko Tetes"
+};
+
+window.dfGetMilestoneM5897MaduraGorontaloTernateSeal = function() {
+  return { milestone: 'M5888-M5897 Gorontalo Madurese Ternate Master Lexicons', status: 'VERIFIED' };
+};
