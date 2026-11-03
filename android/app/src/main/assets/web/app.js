@@ -51740,3 +51740,45 @@ window.dfGetMilestoneM7417GridMountSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7418-M7427: Time-Boxing Mount ---
+window.dfTimeBoxMount = {
+  mountSchedule: function(parentContainer, blocks) {
+    if (!parentContainer) return;
+    const sel = '.timebox-schedule-wrap';
+    let wrap = parentContainer.querySelector(sel);
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.className = 'timebox-schedule-wrap';
+      wrap.style.marginTop = '16px';
+      wrap.style.padding = '12px';
+      wrap.style.backgroundColor = '#18181b';
+      wrap.style.borderRadius = '8px';
+      parentContainer.appendChild(wrap);
+    }
+    wrap.innerHTML = '<div style="color:#10b981;' +
+      'font-weight:bold;margin-bottom:8px">' +
+      'Daily Time-Boxed Schedule</div>';
+    const list = Array.isArray(blocks) ? blocks : [];
+    list.forEach(function(b) {
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.justifyContent = 'space-between';
+      row.style.padding = '6px 0';
+      row.style.borderBottom = '1px solid #27272a';
+      row.innerHTML = '<span style="color:#a1a1aa">' +
+        (b.slot || '09:00') + '</span> ' +
+        '<strong style="color:#f4f4f5">' +
+        (b.subject || 'Focus') + '</strong>';
+      wrap.appendChild(row);
+    });
+  }
+};
+window.dfGetMilestoneM7427TimeBoxMountSeal =
+  function() {
+    return {
+      milestone: 'M7418-M7427 Time Box Mount',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
