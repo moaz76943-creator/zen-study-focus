@@ -46234,3 +46234,65 @@ window.DF_MASTER_LEXICON.bug = {
 window.dfGetMilestoneM5807RohingyaAcehBugisSeal = function() {
   return { milestone: 'M5798-M5807 Rohingya Acehnese Buginese Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5808-M5817: Bambara Soninke Zarma Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.bm = {
+  timer_start: "Hakili Jagoya Damine",
+  timer_pause: "Dolo Seba",
+  timer_resume: "Hakili Jagoya Kalan",
+  timer_reset: "Lasegin Koko",
+  timer_stop: "Waqti Laban",
+  phase_focus: "Hakili Kalan Dunan",
+  phase_short_break: "Kalan Lafiya Dunan",
+  phase_long_break: "Kalan Lafiya Jan",
+  session_completed: "I ni ce! Kalan banna",
+  card_flip: "Kardi Yelema",
+  card_show_answer: "Jaabi Yira",
+  rating_again: "Seginka Fo",
+  rating_hard: "Kelen Hakili",
+  rating_good: "Hakili Noogo",
+  rating_easy: "Kalan Dabila"
+};
+
+window.DF_MASTER_LEXICON.snk = {
+  timer_start: "Haqille Xoore Raga",
+  timer_pause: "Kitto Danna",
+  timer_resume: "Haqille Xoore Jokku",
+  timer_reset: "Wartu Gada",
+  timer_stop: "Waxtu Banna",
+  phase_focus: "Doxu Haqille Jamana",
+  phase_short_break: "Siwto Xarane",
+  phase_long_break: "Siwto Kuuto",
+  session_completed: "Barkante! Waxtu Banna",
+  card_flip: "Kardi Faaba",
+  card_show_answer: "Jaabi Kutu",
+  rating_again: "Wartu Xaran",
+  rating_hard: "Tiiye Hakke",
+  rating_good: "Haqille Buro",
+  rating_easy: "Doxu Hakke"
+};
+
+window.DF_MASTER_LEXICON.dje = {
+  timer_start: "Laakal Yaamar Sintin",
+  timer_pause: "Ganda Kayya",
+  timer_resume: "Laakal Yaamar Gaay",
+  timer_reset: "Yeeti Sintin",
+  timer_stop: "Alwaati Ben",
+  phase_focus: "Laakal Beeri Alwaati",
+  phase_short_break: "Foliya Kayna",
+  phase_long_break: "Foliya Beeri",
+  session_completed: "Alhamdulillah! I ben",
+  card_flip: "Tira Barmay",
+  card_show_answer: "Zaabi Cebe",
+  rating_again: "Yeeti Cebe",
+  rating_hard: "Sanda Foora",
+  rating_good: "Laakal Boori",
+  rating_easy: "Tuma Foora"
+};
+
+window.dfGetMilestoneM5817SahelianMandeSonghaiSeal = function() {
+  return { milestone: 'M5808-M5817 Bambara Soninke Zarma Master Lexicons', status: 'VERIFIED' };
+};
