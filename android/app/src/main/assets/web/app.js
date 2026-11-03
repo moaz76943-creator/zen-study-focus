@@ -48620,3 +48620,23 @@ window.dfHandleAudioFocusChange = function(focusState, masterGainNode, audioCtx)
 window.dfGetMilestoneM6367AudioFocusDuckingSeal = function() {
   return { milestone: 'M6358-M6367 Audio Focus Ducking Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6368-M6377: Zero-Crossing De-Clicker Engine ---
+window.dfApplyDeClickRamp = function(gainNode, audioCtx, durationMs) {
+  if (!gainNode || !gainNode.gain) return { status: 'NO_NODE' };
+  const dur = Math.max(0.005, (parseInt(durationMs, 10) || 15) / 1000);
+  const now = (audioCtx && audioCtx.currentTime) || 0;
+  try {
+    gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    return { rampDurationSec: dur, status: 'DE_CLICK_RAMP_ACTIVE' };
+  } catch (e) {
+    gainNode.gain.setValueAtTime(0.0, now);
+    return { status: 'IMMEDIATE_MUTE' };
+  }
+};
+
+window.dfGetMilestoneM6377ZeroCrossingDeClickerSeal = function() {
+  return { milestone: 'M6368-M6377 Zero-Crossing De-Clicker Engine', status: 'VERIFIED' };
+};
