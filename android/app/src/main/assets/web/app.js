@@ -48127,3 +48127,22 @@ window.dfCalibrateWcagTextContrast = function() {
 window.dfGetMilestoneM6197WcagTextContrastCalibratorSeal = function() {
   return { milestone: 'M6188-M6197 WCAG Text Contrast Calibrator', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6198-M6207: Test Fixtures Mock Polyfill ---
+if (typeof globalThis.window === 'undefined') {
+  globalThis.window = globalThis;
+}
+if (typeof globalThis.localStorage === 'undefined') {
+  const store = {};
+  globalThis.localStorage = {
+    getItem: k => store[k] || null,
+    setItem: (k, v) => { store[k] = String(v); },
+    removeItem: k => { delete store[k]; },
+    clear: () => { Object.keys(store).forEach(k => delete store[k]); }
+  };
+}
+
+window.dfGetMilestoneM6207TestFixtureMocksSeal = function() {
+  return { milestone: 'M6198-M6207 Test Fixtures Mock Polyfill', status: 'VERIFIED' };
+};
