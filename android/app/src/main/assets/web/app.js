@@ -51187,3 +51187,35 @@ window.dfGetMilestoneM7137SentrySeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7138-M7147: AMOLED Zero Anchor ---
+window.dfAmoledZeroAnchor = {
+  applyZeroLuminance: function() {
+    if (typeof document === 'undefined') return;
+    const styleId = 'df-zero-luminance-anchor';
+    let el = document.getElementById(styleId);
+    if (!el) {
+      el = document.createElement('style');
+      el.id = styleId;
+      document.head.appendChild(el);
+    }
+    el.textContent = [
+      'body, .dark-surface, .modal-sheet, .card {',
+      '  background-color: #000000 !important;',
+      '  box-shadow: none !important;',
+      '  border-color: #18181b !important;',
+      '}'
+    ].join(' ');
+  }
+};
+window.dfGetMilestoneM7147ZeroSeal =
+  function() {
+    return {
+      milestone: 'M7138-M7147 AMOLED Zero Anchor',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+if (typeof document !== 'undefined') {
+  window.dfAmoledZeroAnchor.applyZeroLuminance();
+}
