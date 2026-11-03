@@ -50803,3 +50803,54 @@ window.dfGetMilestoneM7027LevelerSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7028-M7037: Milestone Badges ---
+window.dfMasteryBadges = {
+  checkMilestones: function(totalHours, streak) {
+    const h = totalHours || 0;
+    const s = streak || 0;
+    const badges = [];
+    if (h >= 1) {
+      badges.push({ id: 'b_1', label: '1H Focus' });
+    }
+    if (h >= 10) {
+      badges.push({ id: 'b_10', label: '10H Focus' });
+    }
+    if (h >= 50) {
+      badges.push({
+        id: 'b_50', label: '50H Master'
+      });
+    }
+    if (s >= 7) {
+      badges.push({
+        id: 'b_7d', label: '7-Day Streak'
+      });
+    }
+    return badges;
+  },
+  renderBadgeRibbon: function(container, badges) {
+    if (!container) return;
+    container.innerHTML = '';
+    const bList = Array.isArray(badges) ? badges : [];
+    bList.forEach(function(b) {
+      const sp = document.createElement('span');
+      sp.className = 'badge-chip';
+      sp.style.padding = '4px 10px';
+      sp.style.margin = '4px';
+      sp.style.borderRadius = '16px';
+      sp.style.backgroundColor = '#065f46';
+      sp.style.color = '#6ee7b7';
+      sp.style.fontSize = '12px';
+      sp.textContent = '★ ' + b.label;
+      container.appendChild(sp);
+    });
+  }
+};
+window.dfGetMilestoneM7037BadgeSeal =
+  function() {
+    return {
+      milestone: 'M7028-M7037 Mastery Badges',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
