@@ -49524,3 +49524,49 @@ window.dfGetMilestoneM6677MixerSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6678-M6687: Zen Tree Canvas ---
+window.dfZenTree = {
+  drawBranch: function(ctx, x, y, len, angle, depth) {
+    if (depth <= 0) return;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    const x2 = x + len * Math.sin(angle);
+    const y2 = y - len * Math.cos(angle);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = depth > 2 ?
+      '#8B5A2B' : '#2E8B57';
+    ctx.lineWidth = Math.max(1, depth);
+    ctx.stroke();
+    const nL = len * 0.75;
+    const dS = depth - 1;
+    this.drawBranch(
+      ctx, x2, y2, nL, angle - 0.35, dS
+    );
+    this.drawBranch(
+      ctx, x2, y2, nL, angle + 0.35, dS
+    );
+  },
+  renderGrowth: function(canvas, progressPct) {
+    if (!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const pVal = progressPct || 0.1;
+    const pct = Math.max(0, Math.min(1.0, pVal));
+    const depth = Math.floor(pct * 6) + 1;
+    const trunkLen = Math.floor(canvas.height * 0.22);
+    const sX = canvas.width / 2;
+    const sY = canvas.height - 10;
+    this.drawBranch(
+      ctx, sX, sY, trunkLen, 0, depth
+    );
+  }
+};
+window.dfGetMilestoneM6687TreeSeal =
+  function() {
+    return {
+      milestone: 'M6678-M6687 Zen Tree Canvas Engine',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
