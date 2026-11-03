@@ -45862,3 +45862,65 @@ window.DF_MASTER_LEXICON.min = {
 window.dfGetMilestoneM5747AustronesianRegionalLexiconSeal = function() {
   return { milestone: 'M5738-M5747 Javanese Sundanese Minangkabau Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5748-M5757: Chechen Avar Tatar Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ce = {
+  timer_start: "КIорггера Тидам Боло",
+  timer_pause: "Сацаде Ханна",
+  timer_resume: "ДIахьо Тидам",
+  timer_reset: "ЮхадIахIотто",
+  timer_stop: "Сесси Чекхъяккха",
+  phase_focus: "КIорггера Iаморан Хан",
+  phase_short_break: "Доца СадаIар",
+  phase_long_break: "Деха СадаIар",
+  session_completed: "Дика болх би ахь! Чекхъяьлла",
+  card_flip: "Кегдиллина Карта",
+  card_show_answer: "Жоп Гайта",
+  rating_again: "Юха Хьажа Деза",
+  rating_hard: "Хала Дагадеана",
+  rating_good: "Дика Дагахь Ду",
+  rating_easy: "ЦIена Iамийна"
+};
+
+window.DF_MASTER_LEXICON.av = {
+  timer_start: "Гъваридаб Пикру Байбихьизе",
+  timer_pause: "Цо ГьитIинаб ЧIей",
+  timer_resume: "Халат Бахъинабизе",
+  timer_reset: "ЦIидасан Байбихьизе",
+  timer_stop: "Дарс ЛъугIизабизе",
+  phase_focus: "Гъваридаб ЦIалул Заман",
+  phase_short_break: "Къокъаб СадаIар",
+  phase_long_break: "Халатаб СадаIар",
+  session_completed: "Баракаллагь! Дарс ЛъугIана",
+  card_flip: "Карт Свердезабизе",
+  card_show_answer: "Жаваб Бихьизабизе",
+  rating_again: "ЦIидасан Такрар Гьабизе",
+  rating_hard: "ЗахIматго РакIалде Щвана",
+  rating_good: "ЛъикI РакIалда Буго",
+  rating_easy: "МухIкамго ХIадураб"
+};
+
+window.DF_MASTER_LEXICON.tt = {
+  timer_start: "Тәрән Игътибарны Башлау",
+  timer_pause: "Вакытлыча Туктату",
+  timer_resume: "Игътибарны Дәвам Итү",
+  timer_reset: "Баштан Көйләү",
+  timer_stop: "Дәресне Тәмамлау",
+  phase_focus: "Тәрән Өйрәнү Вакыты",
+  phase_short_break: "Кыска Ял Вакыты",
+  phase_long_break: "Озын Ял",
+  session_completed: "Афәрин! Дәрес Тәмамланды",
+  card_flip: "Картны Әйләндерү",
+  card_show_answer: "Җавапны Күрсәтү",
+  rating_again: "Кабатлау Кирәк",
+  rating_hard: "Авырлык Белән Хәтерләнде",
+  rating_good: "Яхшы Хәтердә",
+  rating_easy: "Камил Үзләштерелгән"
+};
+
+window.dfGetMilestoneM5757CaucasianTatarLexiconSeal = function() {
+  return { milestone: 'M5748-M5757 Chechen Avar Tatar Master Lexicons', status: 'VERIFIED' };
+};
