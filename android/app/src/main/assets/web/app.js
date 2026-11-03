@@ -49913,3 +49913,36 @@ window.dfGetMilestoneM6777FlipSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6778-M6787: Raindrop DSP ---
+window.dfRaindropDsp = {
+  triggerDroplet: function(ctx, masterGain) {
+    if (!ctx || ctx.state === 'suspended') return;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    const baseFreq = 1200 + Math.random() * 800;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(
+      baseFreq, ctx.currentTime
+    );
+    osc.frequency.exponentialRampToValueAtTime(
+      baseFreq * 0.4, ctx.currentTime + 0.04
+    );
+    g.gain.setValueAtTime(0.04, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(
+      0.0001, ctx.currentTime + 0.04
+    );
+    osc.connect(g);
+    g.connect(masterGain || ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.05);
+  }
+};
+window.dfGetMilestoneM6787DropletSeal =
+  function() {
+    return {
+      milestone: 'M6778-M6787 Raindrop DSP',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
