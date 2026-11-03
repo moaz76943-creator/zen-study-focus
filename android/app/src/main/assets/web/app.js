@@ -45629,3 +45629,50 @@ window.DF_MASTER_LEXICON.so = Object.assign(window.DF_MASTER_LEXICON.so || {}, {
 window.dfGetMilestoneM5707BalkanSomaliSpecializedSeal = function() {
   return { milestone: 'M5698-M5707 Bosnian Albanian Somali Specialized Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5708-M5717: Malay Pashto Kurdish Specialized Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ms = Object.assign(window.DF_MASTER_LEXICON.ms || {}, {
+  audio_chime_header: "Bunyi Penyelesaian Sesi Prosedural",
+  audio_ambient_header: "Suasana Semula Jadi untuk Fokus",
+  audio_solfeggio_528: "528 Hz Nada Keharmonian Minda",
+  audio_solfeggio_432: "432 Hz Nada Ketenangan Tulen",
+  audio_binaural_beta: "14 Hz Gelombang Beta Kewaspadaan",
+  fsrs_stability: "Indeks Kestabilan Ingatan",
+  fsrs_difficulty: "Tahap Kesukaran Mengingat",
+  fsrs_due_today: "Kad Perlu Ulang Kaji Hari Ini",
+  fsrs_mastered: "Kad Kuasai Sepenuhnya",
+  fsrs_streak_days: "Hari Belajar Berturut-turut"
+});
+
+window.DF_MASTER_LEXICON.ps = Object.assign(window.DF_MASTER_LEXICON.ps || {}, {
+  audio_chime_header: "د ناستې پای پروسیجري زنګونه",
+  audio_ambient_header: "د تمرکز لپاره خالص طبعي چاپېریال",
+  audio_solfeggio_528: "528 هرټز ذهني توازن لړزه",
+  audio_solfeggio_432: "432 هرټز ژور ارامتیا لړزه",
+  audio_binaural_beta: "14 هرټز بیټا ویښتابه لړزه",
+  fsrs_stability: "د حافظې د ثبات شاخص",
+  fsrs_difficulty: "د یادولو د سختۍ کچه",
+  fsrs_due_today: "نن تکرارېدونکي کارتونه",
+  fsrs_mastered: "بشپړ یاد شوي کارتونه",
+  fsrs_streak_days: "د پرله پسې زده کړې ورځې"
+});
+
+window.DF_MASTER_LEXICON.ku = Object.assign(window.DF_MASTER_LEXICON.ku || {}, {
+  audio_chime_header: "Dengen Xelaskirina Danistine",
+  audio_ambient_header: "Hawidore Xwezayi ji bo Baldisan",
+  audio_solfeggio_528: "528 Hz Tona Hevsengiya Hiş",
+  audio_solfeggio_432: "432 Hz Tona Aştîya Kûr",
+  audio_binaural_beta: "14 Hz Pelên Beta yên Hişyariyê",
+  fsrs_stability: "Indexa Aramiya Bîrê",
+  fsrs_difficulty: "Asta Zehmetiya Bîranînê",
+  fsrs_due_today: "Kartên Îro Tên Dubarekirin",
+  fsrs_mastered: "Kartên Temam Hînbûyî",
+  fsrs_streak_days: "Rojên Xwendinê yên Li Pey Hev"
+});
+
+window.dfGetMilestoneM5717MalayPashtoKurdishSpecializedSeal = function() {
+  return { milestone: 'M5708-M5717 Malay Pashto Kurdish Specialized Lexicons', status: 'VERIFIED' };
+};
