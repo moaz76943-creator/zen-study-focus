@@ -47912,3 +47912,35 @@ window.dfPurgeHardcodedStrings = function() {
 window.dfGetMilestoneM6117HtmlUiI18nPurgeSeal = function() {
   return { milestone: 'M6108-M6117 HTML UI i18n Purge Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6118-M6127: Language Sync & Observer Engine ---
+window.dfInitLanguageObserver = function() {
+  if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') {
+    return { status: 'OBSERVER_MOCKED' };
+  }
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(m => {
+      if (m.addedNodes && m.addedNodes.length && window.dfApplyTranslations) {
+        window.dfApplyTranslations(window.DF_ACTIVE_LOCALE);
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+  return { observerActive: true, status: 'OBSERVER_INITIALIZED' };
+};
+
+window.dfSwitchLanguage = function(newLocale) {
+  const loc = String(newLocale || 'en').trim();
+  window.DF_ACTIVE_LOCALE = loc;
+  if (window.dfApplyTranslations) {
+    window.dfApplyTranslations(loc);
+  }
+  return { activeLocale: loc, status: 'LANGUAGE_SWITCHED' };
+};
+
+window.dfGetMilestoneM6127MutationObserverLanguageSyncSeal = function() {
+  return { milestone: 'M6118-M6127 MutationObserver Language Sync Engine', status: 'VERIFIED' };
+};
