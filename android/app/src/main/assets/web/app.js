@@ -47508,3 +47508,65 @@ window.DF_MASTER_LEXICON.tl = {
 window.dfGetMilestoneM6047VietnameseThaiTagalogSeal = function() {
   return { milestone: 'M6038-M6047 Vietnamese Thai Tagalog Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6048-M6057: Yoruba Igbo Akan Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.yo = {
+  timer_start: "Bere Idojuko Jinle",
+  timer_pause: "Duro Die",
+  timer_resume: "Tesiwaju Idojuko",
+  timer_reset: "Tun Aago Bere",
+  timer_stop: "Pari Akoko",
+  phase_focus: "Akoko Eko Jinle",
+  phase_short_break: "Isinmi Kukuru",
+  phase_long_break: "Isinmi Gigun",
+  session_completed: "O ku oriire! Akoko ti pari",
+  card_flip: "Yi Kaadi Pada",
+  card_show_answer: "Fi Idahun Han",
+  rating_again: "Nilo Atunyewo",
+  rating_hard: "O nira Lati Ranti",
+  rating_good: "Ranti Daadaa",
+  rating_easy: "Ti Mo Daju"
+};
+
+window.DF_MASTER_LEXICON.ig = {
+  timer_start: "Malite Nleba Anya",
+  timer_pause: "Kwusitu Nwa Oge",
+  timer_resume: "Gaa N'ihu Nleba Anya",
+  timer_reset: "Togharia Oge",
+  timer_stop: "Kwusi Oge Omumu",
+  phase_focus: "Oge Omumu Miriri Emi",
+  phase_short_break: "Nzurike Nta",
+  phase_long_break: "Nzurike Ukwu",
+  session_completed: "I meela! Oge a agwula",
+  card_flip: "Tugharia Kaadi",
+  card_show_answer: "Gosi Aziza",
+  rating_again: "Choro Ntuleghari",
+  rating_hard: "O Siri Ike Icheta",
+  rating_good: "Chetara nke Oma",
+  rating_easy: "A Matara nke Oma"
+};
+
+window.DF_MASTER_LEXICON.ak = {
+  timer_start: "Fi Adwene Si So Ahyease",
+  timer_pause: "Gyae Kakra",
+  timer_resume: "Toa So Ko So",
+  timer_reset: "San Hyehye Bere",
+  timer_stop: "Wie Bere No",
+  phase_focus: "Adesua Bere A Emu Do",
+  phase_short_break: "Ahomegye Tiawa",
+  phase_long_break: "Ahomegye Kese",
+  session_completed: "Mo ne yo! Woawie bere no",
+  card_flip: "Dane Kaad No",
+  card_show_answer: "Kyere Mmuaee No",
+  rating_again: "Ehia Nsanmu Bio",
+  rating_hard: "Eye Den Se Wobekae",
+  rating_good: "Kae No Yie",
+  rating_easy: "Nim No Yie Paa"
+};
+
+window.dfGetMilestoneM6057YorubaIgboAkanSeal = function() {
+  return { milestone: 'M6048-M6057 Yoruba Igbo Akan Master Lexicons', status: 'VERIFIED' };
+};
