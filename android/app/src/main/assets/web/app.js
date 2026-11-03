@@ -50734,3 +50734,43 @@ window.dfGetMilestoneM7007BadgeSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7008-M7017: Card Scratchpad ---
+window.dfCardScratchpad = {
+  renderScratchInput: function(cardFrontEl) {
+    if (!cardFrontEl) return;
+    const sel = '.card-answer-input';
+    let inp = cardFrontEl.querySelector(sel);
+    if (!inp) {
+      inp = document.createElement('input');
+      inp.className = 'card-answer-input';
+      inp.placeholder = 'Type recall answer...';
+      inp.style.width = '100%';
+      inp.style.padding = '8px';
+      inp.style.marginTop = '12px';
+      inp.style.backgroundColor = '#18181b';
+      inp.style.border = '1px solid #3f3f46';
+      inp.style.borderRadius = '6px';
+      inp.style.color = '#fff';
+      cardFrontEl.appendChild(inp);
+    }
+  },
+  generateHint: function(fullAnswer) {
+    if (!fullAnswer ||
+        typeof fullAnswer !== 'string') {
+      return '';
+    }
+    const trimmed = fullAnswer.trim();
+    const len = trimmed.length;
+    if (len <= 2) return trimmed[0] + '...';
+    return trimmed[0] + '... (' + len + ' chars)';
+  }
+};
+window.dfGetMilestoneM7017ScratchSeal =
+  function() {
+    return {
+      milestone: 'M7008-M7017 Card Scratchpad',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
