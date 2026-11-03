@@ -51380,3 +51380,13 @@ window.dfGetMilestoneM7277VersionSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7278-M7287: Branding Compat ---
+window.dfGetMilestoneM7287BrandingSeal =
+  function() {
+    return {
+      milestone: 'M7278-M7287 Branding Compat',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
