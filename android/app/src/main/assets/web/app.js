@@ -46544,3 +46544,65 @@ window.DF_MASTER_LEXICON.dar = {
 window.dfGetMilestoneM5857DagestanScholarlyLexiconSeal = function() {
   return { milestone: 'M5848-M5857 Kumyk Lezgin Dargin Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5858-M5867: Comorian Makhuwa Bajuni Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.zdj = {
+  timer_start: "Andza Umakini wa Ndro",
+  timer_pause: "Huma Chini Haba",
+  timer_resume: "Endeleza Umakini",
+  timer_reset: "Rejeza Haraka",
+  timer_stop: "Maliza Kipindi",
+  phase_focus: "Wakati wa Masomo ya Ndro",
+  phase_short_break: "Pumziko Dogo",
+  phase_long_break: "Pumziko Kubwa",
+  session_completed: "Mungu Akubariki! Ikahe",
+  card_flip: "Pindua Kadi",
+  card_show_answer: "Onyesa Djawabu",
+  rating_again: "Rudi Tena",
+  rating_hard: "Zito Kukumbuka",
+  rating_good: "Kumbukumbu Ndro",
+  rating_easy: "Imekolea Rohoni"
+};
+
+window.DF_MASTER_LEXICON.vmw = {
+  timer_start: "Opahela Matho Vathi",
+  timer_pause: "Omala Vakani",
+  timer_resume: "Okhoma Matho Vathi",
+  timer_reset: "Orukunuxa Wopachera",
+  timer_stop: "Omala Nihiku",
+  phase_focus: "Okathi Wosoma Wowisisa",
+  phase_short_break: "Ophumula Vakani",
+  phase_long_break: "Ophumula Wulupale",
+  session_completed: "Oreera Vano! Okhumelela",
+  card_flip: "Orukunuxa Ekaata",
+  card_show_answer: "Othoniha Yoowakhula",
+  rating_again: "Othokororya Otthuneya",
+  rating_hard: "Okhwela Wupuwela",
+  rating_good: "Wupuwelela Saana",
+  rating_easy: "Osuwela Wothene"
+};
+
+window.DF_MASTER_LEXICON.swb = {
+  timer_start: "Fungula Dini ya Umakini",
+  timer_pause: "Tuza Kidoko",
+  timer_resume: "Enda Nayo Umakini",
+  timer_reset: "Vundula Mpya",
+  timer_stop: "Koma Shuhuli",
+  phase_focus: "Muda wa Dini ya Akili",
+  phase_short_break: "Pumuo Doko",
+  phase_long_break: "Pumuo Kuu",
+  session_completed: "Asante Mno! Shuhuli Isakoma",
+  card_flip: "Geleza Kadi",
+  card_show_answer: "Vumbua Jawabu",
+  rating_again: "Rejea Tena",
+  rating_hard: "Nzito Kumbuani",
+  rating_good: "Yumo Moyoni",
+  rating_easy: "Sahali Kabisa"
+};
+
+window.dfGetMilestoneM5867SwahiliCoastComorianSeal = function() {
+  return { milestone: 'M5858-M5867 Comorian Makhuwa Bajuni Master Lexicons', status: 'VERIFIED' };
+};
