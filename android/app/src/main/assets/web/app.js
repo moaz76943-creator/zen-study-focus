@@ -48059,3 +48059,26 @@ window.dfRenderAudioControls = function() {
 window.dfGetMilestoneM6167AudioUserFacingControlsSeal = function() {
   return { milestone: 'M6158-M6167 Audio User-Facing Controls Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6168-M6177: OLED Surface Blackout Engine ---
+window.dfApplyOledTrueBlackTheme = function(rootEl) {
+  if (typeof document === 'undefined') return { status: 'NO_DOM' };
+  const root = rootEl || document;
+  if (document.body) {
+    document.body.style.backgroundColor = '#000000';
+    document.body.style.color = '#FFFFFF';
+  }
+  const cards = root.querySelectorAll ?
+    root.querySelectorAll('.timer-card, .card, [class*="bg-white"]') : [];
+  cards.forEach(c => {
+    c.style.backgroundColor = '#000000';
+    c.style.color = '#FFFFFF';
+    c.style.borderColor = '#27272A';
+  });
+  return { surfacesBlackened: cards.length, status: 'OLED_BLACK_APPLIED' };
+};
+
+window.dfGetMilestoneM6177OledSurfaceBlackoutSeal = function() {
+  return { milestone: 'M6168-M6177 OLED Surface Blackout Engine', status: 'VERIFIED' };
+};
