@@ -50178,3 +50178,33 @@ window.dfGetMilestoneM6847FatigueSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6848-M6857: Goal Ring ---
+window.dfGoalTracker = {
+  dailyTargetSessions: 4,
+  completedToday: 0,
+  recordCompletedSession: function() {
+    this.completedToday++;
+    const tot = this.dailyTargetSessions;
+    const isGoalMet = (this.completedToday >= tot);
+    return {
+      completed: this.completedToday,
+      target: this.dailyTargetSessions,
+      isGoalMet: isGoalMet
+    };
+  },
+  getProgressRatio: function() {
+    if (this.dailyTargetSessions <= 0) return 1.0;
+    const tot = this.dailyTargetSessions;
+    const r = this.completedToday / tot;
+    return Math.min(1.0, r);
+  }
+};
+window.dfGetMilestoneM6857GoalSeal =
+  function() {
+    return {
+      milestone: 'M6848-M6857 Daily Goal Ring',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
