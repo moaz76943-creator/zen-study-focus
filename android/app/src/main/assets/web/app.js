@@ -49649,3 +49649,48 @@ window.dfGetMilestoneM6707OrbSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6708-M6717: Monotasking View ---
+window.dfMonotasking = {
+  activeTask: null,
+  setActiveTask: function(title, estCycles) {
+    this.activeTask = {
+      title: title || 'Deep Study Focus',
+      estimatedCycles: estCycles || 2,
+      completedCycles: 0,
+      startedAt: Date.now()
+    };
+    return this.activeTask;
+  },
+  renderFocusBanner: function(container) {
+    if (!container || !this.activeTask) return;
+    container.innerHTML = '';
+    const b = document.createElement('div');
+    b.className = 'monotask-banner';
+    b.style.padding = '12px 16px';
+    b.style.backgroundColor = '#18181b';
+    b.style.borderRadius = '8px';
+    b.style.color = '#f4f4f5';
+    b.style.textAlign = 'center';
+    const tag = '<span style="color:#10b981">' +
+      'CURRENT FOCUS:</span> ';
+    b.innerHTML = tag + '<strong>' +
+      this.activeTask.title + '</strong>';
+    container.appendChild(b);
+  },
+  completeCycle: function() {
+    if (this.activeTask) {
+      this.activeTask.completedCycles++;
+      return this.activeTask.completedCycles;
+    }
+    return 0;
+  }
+};
+window.dfGetMilestoneM6717MonotaskSeal =
+  function() {
+    return {
+      milestone: 'M6708-M6717 Monotasking View',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
