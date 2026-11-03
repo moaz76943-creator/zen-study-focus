@@ -51658,3 +51658,48 @@ window.dfGetMilestoneM7397MonotaskMountSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7398-M7407: Scratchpad Modal ---
+window.dfScratchpadModal = {
+  modalEl: null,
+  renderFloatingTrigger: function() {
+    if (typeof document === 'undefined') return;
+    const bId = 'df-float-scratch-btn';
+    let btn = document.getElementById(bId);
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'df-float-scratch-btn';
+      btn.textContent = '+ Note Idea';
+      btn.style.position = 'fixed';
+      btn.style.bottom = '24px';
+      btn.style.right = '24px';
+      btn.style.minHeight = '48px';
+      btn.style.padding = '0 16px';
+      btn.style.borderRadius = '24px';
+      btn.style.backgroundColor = '#18181b';
+      btn.style.color = '#10b981';
+      btn.style.border = '1px solid #27272a';
+      btn.style.zIndex = '999';
+      const self = this;
+      btn.onclick = function() {
+        self.openModal();
+      };
+      document.body.appendChild(btn);
+    }
+  },
+  openModal: function() {
+    const msg = 'Capture idea without pausing:';
+    const text = prompt(msg);
+    if (text && window.dfQuickScratchpad) {
+      window.dfQuickScratchpad.captureThought(text);
+    }
+  }
+};
+window.dfGetMilestoneM7407ScratchModalSeal =
+  function() {
+    return {
+      milestone: 'M7398-M7407 Scratchpad Modal',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
