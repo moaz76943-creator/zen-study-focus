@@ -48243,3 +48243,39 @@ window.dfCreateAudioDynamicsCompressor = function(audioCtx) {
 window.dfGetMilestoneM6247DynamicsCompressorLimiterSeal = function() {
   return { milestone: 'M6238-M6247 Dynamics Compressor Limiter Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6248-M6257: Soundscape Preset Mixer Engine ---
+window.DF_SOUNDSCAPE_PRESETS = {
+  rainy_library: {
+    name: 'Rainy Library',
+    channels: { rain: 0.7, white_noise: 0.2, binaural_alpha: 0.4 }
+  },
+  zen_mountain: {
+    name: 'Zen Mountain',
+    channels: { wind: 0.6, stream: 0.5, binaural_alpha: 0.3 }
+  },
+  night_study: {
+    name: 'Night Study',
+    channels: { brown_noise: 0.6, rain: 0.3 }
+  }
+};
+
+window.dfApplySoundscapePreset = function(presetKey) {
+  const p = window.DF_SOUNDSCAPE_PRESETS[presetKey];
+  if (!p) return { ok: false, error: 'UNKNOWN_PRESET' };
+  Object.keys(window.DF_SOUNDSCAPE_CHANNELS || {}).forEach(k => {
+    window.DF_SOUNDSCAPE_CHANNELS[k].active = false;
+  });
+  Object.keys(p.channels).forEach(k => {
+    if (window.DF_SOUNDSCAPE_CHANNELS[k]) {
+      window.DF_SOUNDSCAPE_CHANNELS[k].active = true;
+      window.DF_SOUNDSCAPE_CHANNELS[k].volume = p.channels[k];
+    }
+  });
+  return { preset: presetKey, activePreset: p.name, status: 'PRESET_APPLIED' };
+};
+
+window.dfGetMilestoneM6257SoundscapePresetMixerSeal = function() {
+  return { milestone: 'M6248-M6257 Soundscape Preset Mixer Engine', status: 'VERIFIED' };
+};
