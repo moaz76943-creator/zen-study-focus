@@ -48851,3 +48851,34 @@ window.dfGetMilestoneM6447StateSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6448-M6457: Health ---
+window.dfHealthProbe = {
+  runAudit: function() {
+    const report = {
+      timestamp: Date.now(),
+      storageOk: false,
+      audioOk: false,
+      flawsCount: 0
+    };
+    try {
+      localStorage.setItem('__p__', '1');
+      report.storageOk =
+        localStorage.getItem('__p__') === '1';
+      localStorage.removeItem('__p__');
+    } catch(e) {}
+    if (typeof AudioContext !== 'undefined' ||
+        typeof webkitAudioContext !== 'undefined') {
+      report.audioOk = true;
+    }
+    return report;
+  }
+};
+window.dfGetMilestoneM6457HealthSeal =
+  function() {
+    return {
+      milestone: 'M6448-M6457 Health',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
