@@ -47446,3 +47446,65 @@ window.DF_MASTER_LEXICON.ne = {
 window.dfGetMilestoneM6037KannadaSinhalaNepaliSeal = function() {
   return { milestone: 'M6028-M6037 Kannada Sinhala Nepali Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6038-M6047: Vietnamese Thai Tagalog Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.vi = {
+  timer_start: "Bat Dau Tap Trung Sau",
+  timer_pause: "Tam Dung Phien",
+  timer_resume: "Tiep Tuc Tap Trung",
+  timer_reset: "Dat Lai Bo Dem",
+  timer_stop: "Ket Thuc Phien",
+  phase_focus: "Khoang Thoi Gian Hoc Sau",
+  phase_short_break: "Nghi Ngoi Ngan",
+  phase_long_break: "Nghi Ngoi Dai",
+  session_completed: "Tuyet Voi! Hoan Thanh Phien Hoc",
+  card_flip: "Lat The",
+  card_show_answer: "Hien Thi Dap An",
+  rating_again: "Can On Lai",
+  rating_hard: "Kho Nho",
+  rating_good: "Nho Tot",
+  rating_easy: "Ghi Nho Hoan Hao"
+};
+
+window.DF_MASTER_LEXICON.th = {
+  timer_start: "เริ่มการโฟกัสอย่างลึกซึ้ง",
+  timer_pause: "หยุดชั่วคราว",
+  timer_resume: "ทำสมาธิต่อ",
+  timer_reset: "รีเซ็ตเวลา",
+  timer_stop: "สิ้นสุดเซสชัน",
+  phase_focus: "ช่วงเวลาการเรียนรู้อย่างลึกซึ้ง",
+  phase_short_break: "พักผ่อนระยะสั้น",
+  phase_long_break: "พักผ่อนระยะยาว",
+  session_completed: "ยอดเยี่ยมมาก! สำเร็จแล้ว",
+  card_flip: "พลิกการ์ด",
+  card_show_answer: "แสดงคำตอบ",
+  rating_again: "ต้องทบทวนอีกครั้ง",
+  rating_hard: "นึกออกยาก",
+  rating_good: "จำได้ดี",
+  rating_easy: "จำได้อย่างแม่นยำ"
+};
+
+window.DF_MASTER_LEXICON.tl = {
+  timer_start: "Simulan ang Malalim na Pokus",
+  timer_pause: "Sandaling Itigil",
+  timer_resume: "Ipagpatuloy ang Pokus",
+  timer_reset: "I-reset ang Oras",
+  timer_stop: "Tapusin ang Sesyon",
+  phase_focus: "Panahon ng Masusing Pag-aaral",
+  phase_short_break: "Maikling Pahinga",
+  phase_long_break: "Mahabang Pahinga",
+  session_completed: "Magaling! Matagumpay na Natapos",
+  card_flip: "Baligtarin ang Tarheta",
+  card_show_answer: "Ipakita ang Kasagutan",
+  rating_again: "Kailangang Balikan",
+  rating_hard: "Mahirap Alalahanin",
+  rating_good: "Maayos na Naalala",
+  rating_easy: "Lubos na Kabisado"
+};
+
+window.dfGetMilestoneM6047VietnameseThaiTagalogSeal = function() {
+  return { milestone: 'M6038-M6047 Vietnamese Thai Tagalog Master Lexicons', status: 'VERIFIED' };
+};
