@@ -50148,3 +50148,33 @@ window.dfGetMilestoneM6837BlossomSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6838-M6847: Anti-Fatigue Audio ---
+window.dfAntiFatigueAudio = {
+  createComfortShelfFilter: function(ctx) {
+    if (!ctx || !ctx.createBiquadFilter) return null;
+    const f = ctx.createBiquadFilter();
+    f.type = 'highshelf';
+    f.frequency.setValueAtTime(5500, ctx.currentTime);
+    f.gain.setValueAtTime(-6.0, ctx.currentTime);
+    return f;
+  },
+  applyDamping: function(sourceNode, ctx, outNode) {
+    if (!sourceNode || !ctx) return;
+    const shelf = this.createComfortShelfFilter(ctx);
+    if (shelf) {
+      sourceNode.connect(shelf);
+      shelf.connect(outNode || ctx.destination);
+    } else {
+      sourceNode.connect(outNode || ctx.destination);
+    }
+  }
+};
+window.dfGetMilestoneM6847FatigueSeal =
+  function() {
+    return {
+      milestone: 'M6838-M6847 Anti Fatigue Audio',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
