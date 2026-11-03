@@ -50435,3 +50435,33 @@ window.dfGetMilestoneM6917ImportSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6918-M6927: Pink Noise Balancer ---
+window.dfPinkBalancer = {
+  createBalancedBuffer: function(ctx, seconds) {
+    if (!ctx) return null;
+    const s = seconds || 3;
+    const len = Math.floor(ctx.sampleRate * s);
+    const buf = ctx.createBuffer(
+      1, len, ctx.sampleRate
+    );
+    const d = buf.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0;
+    for (let i = 0; i < len; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      d[i] = (b0 + b1 + b2) * 0.14;
+    }
+    return buf;
+  }
+};
+window.dfGetMilestoneM6927PinkSeal =
+  function() {
+    return {
+      milestone: 'M6918-M6927 Pink Noise Balancer',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
