@@ -46978,3 +46978,65 @@ window.DF_MASTER_LEXICON.mdr = {
 window.dfGetMilestoneM5927SouthSulawesiMakassarSeal = function() {
   return { milestone: 'M5918-M5927 South Sulawesi Makassar Mandar Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5928-M5937: Borneo Sumatra Regional Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON['tsg-su'] = {
+  timer_start: "Tagnaan in Lalim Pangatud",
+  timer_pause: "Hundungun Manatad",
+  timer_resume: "Sambungun in Pangatud",
+  timer_reset: "Balikan pa Tagna",
+  timer_stop: "Ubusun in Masa",
+  phase_focus: "Masa sin Lalim Pag-iskul",
+  phase_short_break: "Hangkaray Hawa",
+  phase_long_break: "Mataud Hawa",
+  session_completed: "Magsukur! Na-ubus na",
+  card_flip: "Pinda-a in Karta",
+  card_show_answer: "Paita in Sambung",
+  rating_again: "Subay Balikan",
+  rating_hard: "Mahunit Tumtuman",
+  rating_good: "Marayaw in Tumtum",
+  rating_easy: "Tantu Ha Ati"
+};
+
+window.DF_MASTER_LEXICON.bkr = {
+  timer_start: "Mulai Pikir Bapakat",
+  timer_pause: "Tonan Sikot",
+  timer_resume: "Terus Pikir Bapakat",
+  timer_reset: "Setel Ulang",
+  timer_stop: "Udah Sesi",
+  phase_focus: "Waktu Ajar Khusyuk",
+  phase_short_break: "Piyoh Sikot",
+  phase_long_break: "Piyoh Lawas",
+  session_completed: "Alhamdulillah! Udah Tutup",
+  card_flip: "Balik Kartu",
+  card_show_answer: "Liati Jawaban",
+  rating_again: "Kudu Inulang",
+  rating_hard: "Buhul Inget",
+  rating_good: "Bahalap Inget",
+  rating_easy: "Kaluar Di Hati"
+};
+
+window.DF_MASTER_LEXICON.rej = {
+  timer_start: "Mulai Pikil Lolo",
+  timer_pause: "Nahan Setio",
+  timer_resume: "Tulus Pikil",
+  timer_reset: "Pulei Mula",
+  timer_stop: "Tammat Sesi",
+  phase_focus: "Tikot Belajal Lolo",
+  phase_short_break: "Nginei Setio",
+  phase_long_break: "Nginei Biek",
+  session_completed: "Matur Tuhu! Tammat Yo",
+  card_flip: "Baleak Katoes",
+  card_show_answer: "Tuloak Jawap",
+  rating_again: "Parleui Pulei",
+  rating_hard: "Payah Ingat",
+  rating_good: "Baek Ingat",
+  rating_easy: "Tetap Ke Ati"
+};
+
+window.dfGetMilestoneM5937BorneoSumatraLexiconSeal = function() {
+  return { milestone: 'M5928-M5937 Borneo Sumatra Regional Lexicons', status: 'VERIFIED' };
+};
