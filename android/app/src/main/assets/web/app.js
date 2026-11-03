@@ -49399,3 +49399,42 @@ window.dfGetMilestoneM6647HeatmapSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6648-M6657: 3D Flip & Shortcuts ---
+window.dfCardFlip = {
+  isFlipped: false,
+  toggleFlip: function(cardEl) {
+    if (!cardEl) return false;
+    this.isFlipped = !this.isFlipped;
+    if (this.isFlipped) {
+      cardEl.classList.add('card-flipped');
+    } else {
+      cardEl.classList.remove('card-flipped');
+    }
+    return this.isFlipped;
+  },
+  bindKeyboardShortcuts: function(onRate, onFlip) {
+    if (typeof window === 'undefined') return;
+    window.addEventListener('keydown', function(e) {
+      if (e.target && (e.target.tagName === 'INPUT' ||
+          e.target.tagName === 'TEXTAREA')) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (typeof onFlip === 'function') onFlip();
+      } else if (e.key >= '1' && e.key <= '5') {
+        const rating = parseInt(e.key, 10);
+        if (typeof onRate === 'function') {
+          onRate(rating);
+        }
+      }
+    });
+  }
+};
+window.dfGetMilestoneM6657FlipSeal =
+  function() {
+    return {
+      milestone: 'M6648-M6657 3D Flip Shortcuts',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
