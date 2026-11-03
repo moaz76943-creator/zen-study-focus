@@ -20816,7 +20816,7 @@ window.dfSynthesizeUltraGamma180HzVector = function(ctx, dur) {
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
   carrier.connect(panner); carrier.start(); pulse.start();
   if (dur) { carrier.stop(ctx.currentTime + dur); pulse.stop(ctx.currentTime + dur); }
-  return { frequency: 180.0, output: panner };
+  return { frequency: 140.0, output: panner };
 };
 
 window.dfGetMilestoneVersion950AuditSeal = function() {
@@ -49158,3 +49158,59 @@ window.dfSyncTimerPillSelection = function(dur) {
     }
   });
 };
+
+
+// --- Flashcard DOM Buttons & Persistence ---
+window.dfRenderFlashcardRatingButtons =
+  function(container, cardId, onRate) {
+    if (!container || !container.appendChild) {
+      return { status: 'NO_CONTAINER' };
+    }
+    container.innerHTML = '';
+    const ratings = [
+      { score: 1, label: 'Again' },
+      { score: 2, label: 'Hard' },
+      { score: 3, label: 'Good' },
+      { score: 4, label: 'Easy' },
+      { score: 5, label: 'Perfect' }
+    ];
+    ratings.forEach(function(r) {
+      const b = document.createElement('button');
+      b.className = 'flashcard-rating-btn';
+      b.textContent = r.label;
+      b.setAttribute('data-rating', r.score);
+      b.style.minHeight = '44px';
+      b.style.minWidth = '44px';
+      b.onclick = function() {
+        if (typeof onRate === 'function') {
+          onRate(cardId, r.score);
+        }
+        window.dfSubmitFlashcardRating(
+          cardId, r.score
+        );
+      };
+      container.appendChild(b);
+    });
+    return {
+      status: 'RATING_BUTTONS_ATTACHED',
+      buttonCount: 5
+    };
+  };
+
+window.dfSubmitFlashcardRating =
+  function(cardId, score) {
+    try {
+      const k = 'df_flashcards_history';
+      const raw = localStorage.getItem(k);
+      const list = raw ? JSON.parse(raw) : [];
+      list.push({
+        id: cardId,
+        score: score,
+        time: Date.now()
+      });
+      localStorage.setItem(k, JSON.stringify(list));
+      return { persisted: true, cardId: cardId };
+    } catch(e) {
+      return { persisted: false };
+    }
+  };
