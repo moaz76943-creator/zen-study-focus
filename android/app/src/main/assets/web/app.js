@@ -46792,3 +46792,65 @@ window.DF_MASTER_LEXICON.tft = {
 window.dfGetMilestoneM5897MaduraGorontaloTernateSeal = function() {
   return { milestone: 'M5888-M5897 Gorontalo Madurese Ternate Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5898-M5907: Wakhi Shughni Yagnobi Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.wbl = {
+  timer_start: "Rukhn Fikar Shuru",
+  timer_pause: "Dram Tsok",
+  timer_resume: "Fikar Ravan Tu",
+  timer_reset: "Noyish Chork",
+  timer_stop: "Waqt Khals",
+  phase_focus: "Ghung Khano Waqt",
+  phase_short_break: "Ghazok Rahat",
+  phase_long_break: "Lup Rahat",
+  session_completed: "Afarin! Khano Khals",
+  card_flip: "Karto Pirosh",
+  card_show_answer: "Jawab Wuchuk",
+  rating_again: "Tekror Dargor",
+  rating_hard: "Giron Yad",
+  rating_good: "Shinj Yad",
+  rating_easy: "Pukhto Yad"
+};
+
+window.DF_MASTER_LEXICON.sgh = {
+  timer_start: "Gind Fikr Shuru",
+  timer_pause: "Dost Sakht",
+  timer_resume: "Fikr Davom Diy",
+  timer_reset: "Taza Chod",
+  timer_stop: "Sessiya Tamom",
+  phase_focus: "Gind Dars Waqt",
+  phase_short_break: "Tits Rahat",
+  phase_long_break: "Zukh Rahat",
+  session_completed: "Barakallah! Tamom Sut",
+  card_flip: "Karta Gardos",
+  card_show_answer: "Javob Vinth",
+  rating_again: "Bo Tekror Lov",
+  rating_hard: "Muzhkil Yad",
+  rating_good: "Khub Yad",
+  rating_easy: "Lapk Asan"
+};
+
+window.DF_MASTER_LEXICON.yai = {
+  timer_start: "Fikar Buxsh Vaghsh",
+  timer_pause: "Kam Sakit",
+  timer_resume: "Fikar Davom Vaghsh",
+  timer_reset: "Nav Kar",
+  timer_stop: "Vaqt Aser",
+  phase_focus: "Gund Vangna Vaqt",
+  phase_short_break: "Kam Oromi",
+  phase_long_break: "Pil Oromi",
+  session_completed: "Afarin! Aser Bita",
+  card_flip: "Karta Gardon",
+  card_show_answer: "Javob Binash",
+  rating_again: "Nav Vangna",
+  rating_hard: "Sakht Yod",
+  rating_good: "Naxsh Yod",
+  rating_easy: "Ustuvor Yod"
+};
+
+window.dfGetMilestoneM5907PamirSogdianLexiconSeal = function() {
+  return { milestone: 'M5898-M5907 Wakhi Shughni Yagnobi Master Lexicons', status: 'VERIFIED' };
+};
