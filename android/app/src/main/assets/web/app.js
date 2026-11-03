@@ -46854,3 +46854,65 @@ window.DF_MASTER_LEXICON.yai = {
 window.dfGetMilestoneM5907PamirSogdianLexiconSeal = function() {
   return { milestone: 'M5898-M5907 Wakhi Shughni Yagnobi Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5908-M5917: Swahili Historic Dialects Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON['sw-amu'] = {
+  timer_start: "Fungua Dhati ya Umakini",
+  timer_pause: "Tua Kitambo",
+  timer_resume: "Endeleza Dhati",
+  timer_reset: "Rejeza Asili",
+  timer_stop: "Komeza Kipindi",
+  phase_focus: "Wakati wa Dhati Kuu",
+  phase_short_break: "Kipumuo Kidogo",
+  phase_long_break: "Kipumuo Kikubwa",
+  session_completed: "Kheri na Baraka! Imetimu",
+  card_flip: "Pindua Kadi",
+  card_show_answer: "Dhihirisha Jawabu",
+  rating_again: "Yataka Kurudiwa",
+  rating_hard: "Nzito Kukumbuka",
+  rating_good: "Imetua Moyoni",
+  rating_easy: "Yajulikana Dhahiri"
+};
+
+window.DF_MASTER_LEXICON.wmw = {
+  timer_start: "Anza Kuripikira Maso",
+  timer_pause: "Tula Kasaidi",
+  timer_resume: "Eneza Maso Pano",
+  timer_reset: "Pwerera Tente",
+  timer_stop: "Mala Wakati",
+  phase_focus: "Wakati wa Kufundi Kisisa",
+  phase_short_break: "Kupumula Kasaidi",
+  phase_long_break: "Kupumula Kukulu",
+  session_completed: "Shukrani! Yasa Kumala",
+  card_flip: "Pindula Karata",
+  card_show_answer: "Latya Jawabu",
+  rating_again: "Kwazira Kurudya",
+  rating_hard: "Ncito Kukumbukila",
+  rating_good: "Viri Mumoyo",
+  rating_easy: "Kusoma Salama"
+};
+
+window.DF_MASTER_LEXICON['sw-bar'] = {
+  timer_start: "Shurua Umakini wa Roho",
+  timer_pause: "Simama Chidogo",
+  timer_resume: "Endeleza Nia",
+  timer_reset: "Rejeza Mwanzo",
+  timer_stop: "Maliza Shuhuli",
+  phase_focus: "Muda wa Dini ya Akili",
+  phase_short_break: "Pumuo Chidogo",
+  phase_long_break: "Pumuo Kulu",
+  session_completed: "Barakallah! Isakoma",
+  card_flip: "Zungusha Kadi",
+  card_show_answer: "Unyise Jawabu",
+  rating_again: "Yataka Rudisa",
+  rating_hard: "Nzito Kumbuani",
+  rating_good: "Njema Kumbuani",
+  rating_easy: "Iko Dhahiri"
+};
+
+window.dfGetMilestoneM5917SwahiliHistoricDialectsSeal = function() {
+  return { milestone: 'M5908-M5917 Swahili Historic Dialects Master Lexicons', status: 'VERIFIED' };
+};
