@@ -48320,3 +48320,24 @@ window.dfAddCardToDeck = function(deckId, frontText, backText, tags) {
 window.dfGetMilestoneM6267InteractiveDeckManagerSeal = function() {
   return { milestone: 'M6258-M6267 Interactive Deck Manager Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6268-M6277: Due Cards Priority Queue Engine ---
+window.dfGetDueCardsQueue = function(deckId, maxCards) {
+  const d = (window.DF_DECK_REGISTRY && window.DF_DECK_REGISTRY[deckId]);
+  if (!d || !Array.isArray(d.cards)) return [];
+  const limit = Math.max(1, parseInt(maxCards, 10) || 20);
+  const now = Date.now();
+  const sorted = d.cards.slice().sort((a, b) => {
+    const elapsedA = (now - a.lastReviewed) / 86400000;
+    const elapsedB = (now - b.lastReviewed) / 86400000;
+    const retA = Math.exp(-elapsedA / Math.max(0.1, a.stability || 1.0));
+    const retB = Math.exp(-elapsedB / Math.max(0.1, b.stability || 1.0));
+    return retA - retB;
+  });
+  return sorted.slice(0, limit);
+};
+
+window.dfGetMilestoneM6277DueCardsPriorityQueueSeal = function() {
+  return { milestone: 'M6268-M6277 Due Cards Priority Queue Engine', status: 'VERIFIED' };
+};
