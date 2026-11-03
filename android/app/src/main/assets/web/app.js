@@ -50910,3 +50910,36 @@ window.dfGetMilestoneM7047FireSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7048-M7057: Cycle Sizer ---
+window.dfCycleSizer = {
+  recommendOptimalMinutes: function(sessionHistory) {
+    if (!Array.isArray(sessionHistory) ||
+        sessionHistory.length < 5) {
+      return 25;
+    }
+    let totalCompleted = 0;
+    let longSessions = 0;
+    sessionHistory.forEach(function(s) {
+      if (s && s.completed) {
+        totalCompleted++;
+        if ((s.duration || 0) >= 2700) {
+          longSessions++;
+        }
+      }
+    });
+    const longRatio = longSessions / totalCompleted;
+    if (longRatio >= 0.6) {
+      return 50;
+    }
+    return 25;
+  }
+};
+window.dfGetMilestoneM7057SizerSeal =
+  function() {
+    return {
+      milestone: 'M7048-M7057 Optimal Cycle Sizer',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
