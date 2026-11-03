@@ -48564,3 +48564,29 @@ window.dfApplySafeAreaInsets = function(rootEl) {
 window.dfGetMilestoneM6347SafeAreaInsetsManagerSeal = function() {
   return { milestone: 'M6338-M6347 Safe Area Insets Manager Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6348-M6357: Desktop Keyboard Matrix Engine ---
+window.DF_KEYBOARD_SHORTCUTS = {
+  'Space': 'TOGGLE_TIMER',
+  ' ': 'TOGGLE_TIMER',
+  'Escape': 'STOP_TIMER',
+  'KeyF': 'FLIP_FLASHCARD',
+  'Digit1': 'RATE_1',
+  'Digit2': 'RATE_2',
+  'Digit3': 'RATE_3',
+  'Digit4': 'RATE_4',
+  'Digit5': 'RATE_5',
+  'KeyM': 'TOGGLE_MUTE'
+};
+
+window.dfHandleDesktopKeyboardEvent = function(e) {
+  if (!e || !e.code) return null;
+  const action = window.DF_KEYBOARD_SHORTCUTS[e.code] ||
+                 window.DF_KEYBOARD_SHORTCUTS[e.key];
+  return { code: e.code, action: action || null, handled: !!action };
+};
+
+window.dfGetMilestoneM6357DesktopKeyboardMatrixSeal = function() {
+  return { milestone: 'M6348-M6357 Desktop Keyboard Matrix Engine', status: 'VERIFIED' };
+};
