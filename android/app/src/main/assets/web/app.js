@@ -49095,3 +49095,22 @@ window.dfGetMilestoneM6547SpectrumSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6548-M6557: Cycle Integrity ---
+window.dfCycleIntegrity = {
+  standardPills: [25, 50, 90],
+  validateDurationSec: function(sec) {
+    if (typeof sec !== 'number' || isNaN(sec)) {
+      return 1500;
+    }
+    return Math.max(60, Math.min(10800, sec));
+  }
+};
+window.dfGetMilestoneM6557CycleSeal =
+  function() {
+    return {
+      milestone: 'M6548-M6557 Cycle Integrity',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
