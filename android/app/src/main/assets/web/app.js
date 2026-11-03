@@ -47570,3 +47570,65 @@ window.DF_MASTER_LEXICON.ak = {
 window.dfGetMilestoneM6057YorubaIgboAkanSeal = function() {
   return { milestone: 'M6048-M6057 Yoruba Igbo Akan Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6058-M6067: Amharic Tigrinya Lingala Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.am = {
+  timer_start: "ጥልቅ ትኩረት ጀምር",
+  timer_pause: "ለጥቂት ጊዜ አቁም",
+  timer_resume: "ትኩረትን ቀጥል",
+  timer_reset: "ሰዓቱን ዳግም ጀምር",
+  timer_stop: "ክፍለ-ጊዜውን አጠናቅቅ",
+  phase_focus: "የጥልቅ ትምህርት ጊዜ",
+  phase_short_break: "አጭር እረፍት",
+  phase_long_break: "ረጅም እረፍት",
+  session_completed: "እንኳን ደስ አለዎት! ተጠናቋል",
+  card_flip: "ካርዱን ገልብጥ",
+  card_show_answer: "መልሱን አሳይ",
+  rating_again: "ድጋሚ መከለስ አለበት",
+  rating_hard: "ለማስታወስ ከባድ",
+  rating_good: "በጥሩ ሁኔታ ታውቋል",
+  rating_easy: "ሙሉ በሙሉ የተካነ"
+};
+
+window.DF_MASTER_LEXICON.ti = {
+  timer_start: "ዕሙቕ ቆላሕታ ጀምር",
+  timer_pause: "ንቑሩብ ደው ኣብል",
+  timer_resume: "ቆላሕታኻ ቐጽል",
+  timer_reset: "ዳግማይ ኣስተኻኽል",
+  timer_stop: "እቲ ክፍለ-ጊዜ ወደእ",
+  phase_focus: "ናይ ዕሙቕ መጽናዕቲ እዋን",
+  phase_short_break: "ሓጺር ዕረፍቲ",
+  phase_long_break: "ነዊሕ ዕረፍቲ",
+  session_completed: "እንቋዕ ሓጎሰኩም! ተወዲኡ",
+  card_flip: "ካርድ ገልብጥ",
+  card_show_answer: "መልሲ ኣርእይ",
+  rating_again: "ድጋሚ ምድጋም የድሊ",
+  rating_hard: "ንምዝካር ከቢድ",
+  rating_good: "ጽቡቕ ዝኽሪ",
+  rating_easy: "ብምሉእ ዝተሓዘ"
+};
+
+window.DF_MASTER_LEXICON.ln = {
+  timer_start: "Banda Makanisi ya Mozindo",
+  timer_pause: "Pema Moke",
+  timer_resume: "Koboba Makanisi",
+  timer_reset: "Banda Lisusu",
+  timer_stop: "Suka na Ntango",
+  phase_focus: "Ntango ya Boyekoli ya Mozindo",
+  phase_short_break: "Bopemi ya Moke",
+  phase_long_break: "Bopemi ya Molayi",
+  session_completed: "Felicitation! Mosala Esili",
+  card_flip: "Balola Karti",
+  card_show_answer: "Lakisa Eyano",
+  rating_again: "Esengeli Kozongela",
+  rating_hard: "Pasi na Kokanisa",
+  rating_good: "Nakanisi Malamu",
+  rating_easy: "Esimbi Penza"
+};
+
+window.dfGetMilestoneM6067AmharicTigrinyaLingalaSeal = function() {
+  return { milestone: 'M6058-M6067 Amharic Tigrinya Lingala Master Lexicons', status: 'VERIFIED' };
+};
