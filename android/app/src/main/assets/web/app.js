@@ -45800,3 +45800,65 @@ window.DF_MASTER_LEXICON.har = {
 window.dfGetMilestoneM5737CushiticHornLexiconSeal = function() {
   return { milestone: 'M5728-M5737 Oromo Afar Harari Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5738-M5747: Javanese Sundanese Minangkabau Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.jv = {
+  timer_start: "Miwiti Sinau Khusyuk",
+  timer_pause: "Kendel Sedhela",
+  timer_resume: "Nglajengaken Fokus",
+  timer_reset: "Wangsul Wiwitan",
+  timer_stop: "Mungkasi Sinau",
+  phase_focus: "Wekdal Sinau Jeru",
+  phase_short_break: "Ngaso Sedhela",
+  phase_long_break: "Ngaso Dawane",
+  session_completed: "Matur Nuwun! Sampun Rampung",
+  card_flip: "Walik Kertu",
+  card_show_answer: "Tingalaken Wangsulan",
+  rating_again: "Kudu Dibolan-baleni",
+  rating_hard: "Angel Kelingan",
+  rating_good: "Eling Kanthi Sae",
+  rating_easy: "Wis Apal Banget"
+};
+
+window.DF_MASTER_LEXICON.su = {
+  timer_start: "Mimitian Fokus Jero",
+  timer_pause: "Reureuh Sakeudeung",
+  timer_resume: "Teruskeun Fokus",
+  timer_reset: "Setel Deui",
+  timer_stop: "Rengsekeun Sesi",
+  phase_focus: "Mangsa Diajar Jero",
+  phase_short_break: "Reureuh Singkat",
+  phase_long_break: "Reureuh Panjang",
+  session_completed: "Alhamdulillah! Parantos Rengse",
+  card_flip: "Balikkeun Kartu",
+  card_show_answer: "Tembongkeun Jawaban",
+  rating_again: "Kudu Diulang",
+  rating_hard: "Hese Diinget",
+  rating_good: "Inget Kalawan Sae",
+  rating_easy: "Kacida Apalna"
+};
+
+window.DF_MASTER_LEXICON.min = {
+  timer_start: "Muloi Fokus Mandalam",
+  timer_pause: "Baranti Sabanta",
+  timer_resume: "Lanjuikkan Fokus",
+  timer_reset: "Setel Ulang",
+  timer_stop: "Salasai Sesi",
+  phase_focus: "Wakatu Belajar Khusyuk",
+  phase_short_break: "Istirahet Sabanta",
+  phase_long_break: "Istirahet Panjang",
+  session_completed: "Alhamdulillah! Lah Salasai",
+  card_flip: "Baliak Kartu",
+  card_show_answer: "Caliakkan Jawaban",
+  rating_again: "Paralu Diulang",
+  rating_hard: "Sulik Diingek",
+  rating_good: "Ingek Bana",
+  rating_easy: "Lah Hafeez Bana"
+};
+
+window.dfGetMilestoneM5747AustronesianRegionalLexiconSeal = function() {
+  return { milestone: 'M5738-M5747 Javanese Sundanese Minangkabau Lexicons', status: 'VERIFIED' };
+};
