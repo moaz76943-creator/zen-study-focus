@@ -46048,3 +46048,65 @@ window.DF_MASTER_LEXICON.tsg = {
 window.dfGetMilestoneM5777MoroAustronesianLexiconSeal = function() {
   return { milestone: 'M5768-M5777 Maranao Maguindanao Tausug Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5778-M5787: Turkmen Kyrgyz Bashkir Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.tk = {
+  timer_start: "Cun Unsi Baslat",
+  timer_pause: "Wagtlayyn Sakla",
+  timer_resume: "Unsi Dowam Et",
+  timer_reset: "Tazeden Sayla",
+  timer_stop: "Seansy Tamamla",
+  phase_focus: "Cun Okow Dowri",
+  phase_short_break: "Gysga Dynch Alsh",
+  phase_long_break: "Uzak Dynch Alsh",
+  session_completed: "Berekella! Seans Tamamlandy",
+  card_flip: "Karty Owur",
+  card_show_answer: "Jogaby Gorkez",
+  rating_again: "Gaytalamak Zerur",
+  rating_hard: "Kyn Yatlandy",
+  rating_good: "Gowy Yatda",
+  rating_easy: "Doly Ozlesdirildi"
+};
+
+window.DF_MASTER_LEXICON.ky = {
+  timer_start: "Терең Көңүлдү Баштоо",
+  timer_pause: "Убактылуу Тыныгуу",
+  timer_resume: "Улантуу",
+  timer_reset: "Башынан Баштоо",
+  timer_stop: "Сессияны Аяктоо",
+  phase_focus: "Терең Окуу Мезгили",
+  phase_short_break: "Кыска Тыныгуу",
+  phase_long_break: "Узак Эс Алуу",
+  session_completed: "Азаматсыз! Сабак Аяктады",
+  card_flip: "Картаны Оодаруу",
+  card_show_answer: "Жоопту Көрсөтүү",
+  rating_again: "Кайталоо Керек",
+  rating_hard: "Кыйындык Менен Эстедим",
+  rating_good: "Жакшы Эсте",
+  rating_easy: "Толук Өздөштүрүлдү"
+};
+
+window.DF_MASTER_LEXICON.ba = {
+  timer_start: "Тәрән Иғтибарҙы Башлау",
+  timer_pause: "Ваҡытлыса Туҡтатыу",
+  timer_resume: "Иғтибарҙы Дауам Итеү",
+  timer_reset: "Яңынан Көйләү",
+  timer_stop: "Дәресте Тамамлау",
+  phase_focus: "Тәрән Өйрәнеү Мәле",
+  phase_short_break: "Ҡыҫҡа Ял Вакыты",
+  phase_long_break: "Оҙон Ял",
+  session_completed: "Афарин! Дәрес Тамамланды",
+  card_flip: "Картты Әйләндереү",
+  card_show_answer: "Яуапты Күрһәтеү",
+  rating_again: "Ҡабатлау Кәрәк",
+  rating_hard: "Ауырлыҡ Менән Хәтерләнде",
+  rating_good: "Яҡшы Хәтерҙә",
+  rating_easy: "Камил Үҙләштерелгән"
+};
+
+window.dfGetMilestoneM5787TurkmenKyrgyzBashkirSeal = function() {
+  return { milestone: 'M5778-M5787 Turkmen Kyrgyz Bashkir Master Lexicons', status: 'VERIFIED' };
+};
