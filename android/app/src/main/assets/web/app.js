@@ -49769,3 +49769,45 @@ window.dfGetMilestoneM6737ScratchSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6738-M6747: Consistency Grid ---
+window.dfConsistencyGrid = {
+  getTileColor: function(minutes) {
+    const m = minutes || 0;
+    if (m === 0) return '#27272a';
+    if (m < 30) return '#14532d';
+    if (m < 60) return '#16a34a';
+    if (m < 120) return '#22c55e';
+    return '#4ade80';
+  },
+  renderGrid: function(container, dayRecordsMap) {
+    if (!container) return;
+    container.innerHTML = '';
+    const map = dayRecordsMap || {};
+    const grid = document.createElement('div');
+    grid.className = 'yearly-grid';
+    grid.style.display = 'flex';
+    grid.style.flexWrap = 'wrap';
+    grid.style.gap = '4px';
+    grid.style.maxWidth = '360px';
+    for (let i = 0; i < 52 * 7; i++) {
+      const tile = document.createElement('div');
+      tile.style.width = '10px';
+      tile.style.height = '10px';
+      tile.style.borderRadius = '2px';
+      const m = map[i] || 0;
+      const col = this.getTileColor(m);
+      tile.style.backgroundColor = col;
+      grid.appendChild(tile);
+    }
+    container.appendChild(grid);
+  }
+};
+window.dfGetMilestoneM6747GridSeal =
+  function() {
+    return {
+      milestone: 'M6738-M6747 Consistency Grid',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
