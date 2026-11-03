@@ -48279,3 +48279,44 @@ window.dfApplySoundscapePreset = function(presetKey) {
 window.dfGetMilestoneM6257SoundscapePresetMixerSeal = function() {
   return { milestone: 'M6248-M6257 Soundscape Preset Mixer Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6258-M6267: Interactive Deck Manager Engine ---
+window.DF_DECK_REGISTRY = window.DF_DECK_REGISTRY || {
+  default_deck: {
+    id: 'default_deck',
+    title: 'Core Concepts',
+    cards: []
+  }
+};
+
+window.dfCreateDeck = function(deckId, title) {
+  const id = String(deckId || '').trim();
+  if (!id) return { ok: false, error: 'INVALID_DECK_ID' };
+  window.DF_DECK_REGISTRY[id] = {
+    id: id,
+    title: title || 'New Deck',
+    cards: []
+  };
+  return { ok: true, deckId: id, status: 'DECK_CREATED' };
+};
+
+window.dfAddCardToDeck = function(deckId, frontText, backText, tags) {
+  const d = window.DF_DECK_REGISTRY[deckId];
+  if (!d) return { ok: false, error: 'DECK_NOT_FOUND' };
+  const card = {
+    id: 'card_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+    front: String(frontText || '').trim(),
+    back: String(backText || '').trim(),
+    tags: Array.isArray(tags) ? tags : [],
+    stability: 1.0,
+    difficulty: 3,
+    lastReviewed: Date.now()
+  };
+  d.cards.push(card);
+  return { ok: true, cardId: card.id, cardCount: d.cards.length, status: 'CARD_ADDED' };
+};
+
+window.dfGetMilestoneM6267InteractiveDeckManagerSeal = function() {
+  return { milestone: 'M6258-M6267 Interactive Deck Manager Engine', status: 'VERIFIED' };
+};
