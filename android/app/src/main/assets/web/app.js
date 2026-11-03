@@ -47818,3 +47818,65 @@ window.DF_MASTER_LEXICON.gd = {
 window.dfGetMilestoneM6097CelticRegionalSeal = function() {
   return { milestone: 'M6088-M6097 Irish Welsh Scottish Gaelic Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6098-M6107: Quechua Guarani Maori Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.qu = {
+  timer_start: "Ukhu Yuyaykuyta Qallariy",
+  timer_pause: "Tukuy Samariy",
+  timer_resume: "Yuyaykuyta Puririy",
+  timer_reset: "Kutipachiypa Kutin",
+  timer_stop: "Tukuy Pacha",
+  phase_focus: "Ukhu Yachakuy Pacha",
+  phase_short_break: "Uchuy Samariy",
+  phase_long_break: "Hatun Samariy",
+  session_completed: "Allillamanta! Pacha tukusqa",
+  card_flip: "Kardata Tikray",
+  card_show_answer: "Kutichiyta Rikuchiy",
+  rating_again: "Kutin Yachana",
+  rating_hard: "Sasallamanta Yuyariy",
+  rating_good: "Allin Yuyaypi",
+  rating_easy: "Tukuylla Umallapi"
+};
+
+window.DF_MASTER_LEXICON.gn = {
+  timer_start: "Nepyru Jesareko Pypuku",
+  timer_pause: "Pytu'u Sapy'ami",
+  timer_resume: "Jesareko Segi",
+  timer_reset: "Mohendajey Ara",
+  timer_stop: "Mba'apo Paha",
+  phase_focus: "Arandura Pypuku Avo",
+  phase_short_break: "Pytu'u Mbykymi",
+  phase_long_break: "Pytu'u Puku",
+  session_completed: "Iporaite! Opa tembiapo",
+  card_flip: "Mbojere Kuatia'i",
+  card_show_answer: "Hechauka Mbohovai",
+  rating_again: "Tekoteve Jehechajey",
+  rating_hard: "Hasy Nanemandu'a",
+  rating_good: "Mandu'a Pora",
+  rating_easy: "Kuaapapyre Oima"
+};
+
+window.DF_MASTER_LEXICON.mi = {
+  timer_start: "Timata Whakaaro Hohonu",
+  timer_pause: "Whakatau Rangitahi",
+  timer_resume: "Haere Tonu te Whakaaro",
+  timer_reset: "Tautuhi Ano",
+  timer_stop: "Whakaoti Wahi",
+  phase_focus: "Wahi Akoranga Hohonu",
+  phase_short_break: "Okiokinga Poto",
+  phase_long_break: "Okiokinga Roa",
+  session_completed: "Ka pai! Kua oti te mahi",
+  card_flip: "Hurihia te Kaari",
+  card_show_answer: "Whakaatuhia te Whakautu",
+  rating_again: "Me Whakahoki Ano",
+  rating_hard: "He Uaua ki te Mahara",
+  rating_good: "Pai te Mahara",
+  rating_easy: "Kua Mau Paitia"
+};
+
+window.dfGetMilestoneM6107IndigenousAmericasPacificSeal = function() {
+  return { milestone: 'M6098-M6107 Quechua Guarani Maori Master Lexicons', status: 'VERIFIED' };
+};
