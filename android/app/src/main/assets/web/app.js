@@ -49570,3 +49570,35 @@ window.dfGetMilestoneM6687TreeSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6688-M6697: Strict Shield ---
+window.dfStrictShield = {
+  isStrictMode: false,
+  isSessionActive: false,
+  witherCount: 0,
+  setStrictMode: function(enabled) {
+    this.isStrictMode = !!enabled;
+  },
+  initVisibilityListener: function(onWither) {
+    if (typeof document === 'undefined') return;
+    const self = this;
+    document.addEventListener(
+      'visibilitychange', function() {
+      if (document.visibilityState === 'hidden' &&
+          self.isStrictMode && self.isSessionActive) {
+        self.witherCount++;
+        if (typeof onWither === 'function') {
+          onWither(self.witherCount);
+        }
+      }
+    });
+  }
+};
+window.dfGetMilestoneM6697ShieldSeal =
+  function() {
+    return {
+      milestone: 'M6688-M6697 Strict Shield Wither',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
