@@ -47102,3 +47102,65 @@ window.DF_MASTER_LEXICON.nog = {
 window.dfGetMilestoneM5947SalarKarakalpakNogaiSeal = function() {
   return { milestone: 'M5938-M5947 Salar Karakalpak Nogai Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5948-M5957: Dagaare Nupe Ebira Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.dga = {
+  timer_start: "Piili Zannoo Teena",
+  timer_pause: "Dobie Kpoŋ Kpie",
+  timer_resume: "Tu Zannoo Teena",
+  timer_reset: "Lahi Piili",
+  timer_stop: "Baahe Zannoo",
+  phase_focus: "Zannoo Teena Saŋa",
+  phase_short_break: "Vʋhʋʋ Fiee",
+  phase_long_break: "Vʋhʋʋ Kpoŋ",
+  session_completed: "Barkaa Yaga! A baahe ya",
+  card_flip: "Leɛre Kaadi",
+  card_show_answer: "Wuli A Noba",
+  rating_again: "Sɛge Lahi Leɛ",
+  rating_hard: "Tuo Teɛre",
+  rating_good: "Soma Teɛre",
+  rating_easy: "Bɛŋ Teɛre Vɛŋ"
+};
+
+window.DF_MASTER_LEXICON.nup = {
+  timer_start: "Tswitswa Efe Hakili",
+  timer_pause: "Dina Fiti Kankan",
+  timer_resume: "Chizhe Efe Hakili",
+  timer_reset: "Yiri Tswitswa",
+  timer_stop: "Zuman Efe",
+  phase_focus: "Eka Karatu Dokun",
+  phase_short_break: "Woro Kankan",
+  phase_long_break: "Woro Dokun",
+  session_completed: "Alhamdulillah! Efe Jinza",
+  card_flip: "Gban Karta",
+  card_show_answer: "Mizhi Eba",
+  rating_again: "Wuzhe Karatu",
+  rating_hard: "Kaka Ye Hakili",
+  rating_good: "Ge Ye Hakili",
+  rating_easy: "Kobo Ye Hakili"
+};
+
+window.DF_MASTER_LEXICON.ebk = {
+  timer_start: "Tu Ose Erene",
+  timer_pause: "Re Kere Ene",
+  timer_resume: "Si Tu Erene",
+  timer_reset: "Kpi Tu Mesi",
+  timer_stop: "Mani Ose",
+  phase_focus: "Wakati Eko Erene",
+  phase_short_break: "Ozu Kere",
+  phase_long_break: "Ozu Oyi",
+  session_completed: "Eshey Oyi! Ose Mani",
+  card_flip: "Gba Kadi",
+  card_show_answer: "Ziri Eni",
+  rating_again: "Kpi Tu Eko",
+  rating_hard: "Kuku Nyene",
+  rating_good: "Dede Nyene",
+  rating_easy: "Nyene Tete"
+};
+
+window.dfGetMilestoneM5957SahelianNupeEbiraSeal = function() {
+  return { milestone: 'M5948-M5957 Dagaare Nupe Ebira Master Lexicons', status: 'VERIFIED' };
+};
