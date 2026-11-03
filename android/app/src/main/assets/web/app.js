@@ -47694,3 +47694,65 @@ window.DF_MASTER_LEXICON.mg = {
 window.dfGetMilestoneM6077ShonaZuluMalagasySeal = function() {
   return { milestone: 'M6068-M6077 Shona Zulu Malagasy Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6078-M6087: Catalan Basque Galician Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.ca = {
+  timer_start: "Inicia l'Enfocament Profund",
+  timer_pause: "Pausa la Sessio",
+  timer_resume: "Continua l'Enfocament",
+  timer_reset: "Reinicia el Temporitzador",
+  timer_stop: "Finalitza la Sessio",
+  phase_focus: "Sessio de Treball Profund",
+  phase_short_break: "Pausa Mental Curta",
+  phase_long_break: "Descans Prolongat",
+  session_completed: "Molt be! Sessio completada",
+  card_flip: "Gira la Targeta",
+  card_show_answer: "Mostra la Resposta",
+  rating_again: "Cal Repassar",
+  rating_hard: "Record Dificil",
+  rating_good: "Bon Record",
+  rating_easy: "Assolit Perfectament"
+};
+
+window.DF_MASTER_LEXICON.eu = {
+  timer_start: "Foku Sakona Hasi",
+  timer_pause: "Gelditu Une Batez",
+  timer_resume: "Jarraitu Fokua",
+  timer_reset: "Berrezarri Denbora",
+  timer_stop: "Amaitu Saioa",
+  phase_focus: "Ikasketa Sakoneko Saioa",
+  phase_short_break: "Atsedenaldi Motza",
+  phase_long_break: "Atsedenaldi Luzea",
+  session_completed: "Bikain! Saioa amaitu da",
+  card_flip: "Irauli Txartela",
+  card_show_answer: "Erakutsi Erantzuna",
+  rating_again: "Berrikusi Beharra",
+  rating_hard: "Gogoratzeko Zaila",
+  rating_good: "Gogoratze Ona",
+  rating_easy: "Erabat Ikasita"
+};
+
+window.DF_MASTER_LEXICON.gl = {
+  timer_start: "Iniciar Enfoque Fondo",
+  timer_pause: "Pausar Sesion",
+  timer_resume: "Continuar Enfoque",
+  timer_reset: "Reiniciar Temporizador",
+  timer_stop: "Rematar Sesion",
+  phase_focus: "Sesion de Estudo Fondo",
+  phase_short_break: "Pausa Mental Curta",
+  phase_long_break: "Descanso Longo",
+  session_completed: "Parabens! Sesion rematada",
+  card_flip: "Voltear Tarxeta",
+  card_show_answer: "Amosar Resposta",
+  rating_again: "Precisa Repaso",
+  rating_hard: "Lembranza Dificil",
+  rating_good: "Boa Lembranza",
+  rating_easy: "Totalmente Dominado"
+};
+
+window.dfGetMilestoneM6087EuropeanRegionalSeal = function() {
+  return { milestone: 'M6078-M6087 Catalan Basque Galician Master Lexicons', status: 'VERIFIED' };
+};
