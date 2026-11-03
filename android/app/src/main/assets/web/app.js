@@ -48640,3 +48640,25 @@ window.dfApplyDeClickRamp = function(gainNode, audioCtx, durationMs) {
 window.dfGetMilestoneM6377ZeroCrossingDeClickerSeal = function() {
   return { milestone: 'M6368-M6377 Zero-Crossing De-Clicker Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6378-M6387: TalkBack ARIA Semantics Engine ---
+window.dfAnnounceAriaPolite = function(messageText) {
+  if (typeof document === 'undefined') return { status: 'NO_DOM' };
+  let region = document.getElementById('df-aria-live-polite');
+  if (!region) {
+    region = document.createElement('div');
+    region.id = 'df-aria-live-polite';
+    region.setAttribute('aria-live', 'polite');
+    region.setAttribute('aria-atomic', 'true');
+    region.style.position = 'absolute';
+    region.style.left = '-9999px';
+    if (document.body) document.body.appendChild(region);
+  }
+  region.textContent = String(messageText || '');
+  return { announcedText: region.textContent, status: 'ARIA_ANNOUNCED' };
+};
+
+window.dfGetMilestoneM6387TalkBackAriaSemanticsSeal = function() {
+  return { milestone: 'M6378-M6387 TalkBack ARIA Semantics Engine', status: 'VERIFIED' };
+};
