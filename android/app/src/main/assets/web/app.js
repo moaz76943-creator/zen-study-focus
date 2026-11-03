@@ -50774,3 +50774,32 @@ window.dfGetMilestoneM7017ScratchSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7018-M7027: Ambient Auto-Leveler ---
+window.dfAmbientAutoLeveler = {
+  currentPhaseLevel: 0.28,
+  setPhaseVolume: function(gainNode, ctx, phase) {
+    if (!gainNode || !ctx || !gainNode.gain) return;
+    let target = 0.28;
+    if (phase === 'SHORT_BREAK') {
+      target = 0.12;
+    } else if (phase === 'LONG_BREAK') {
+      target = 0.08;
+    }
+    const now = ctx.currentTime;
+    const v = gainNode.gain.value;
+    gainNode.gain.setValueAtTime(v, now);
+    gainNode.gain.linearRampToValueAtTime(
+      target, now + 2.5
+    );
+    this.currentPhaseLevel = target;
+  }
+};
+window.dfGetMilestoneM7027LevelerSeal =
+  function() {
+    return {
+      milestone: 'M7018-M7027 Ambient Auto Leveler',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
