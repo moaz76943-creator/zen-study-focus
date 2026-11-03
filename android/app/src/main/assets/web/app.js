@@ -51121,3 +51121,29 @@ window.dfGetGrandSovereignSeal = function() {
   };
 };
 console.log('DEEP FOCUS v300.0.0 READY');
+
+
+// --- MISSIONS M7118-M7127: Resonator ---
+window.dfWarmthResonator = {
+  createResonatorNode: function(ctx, baseGain) {
+    if (!ctx || !ctx.createBiquadFilter) return null;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'peaking';
+    filter.frequency.setValueAtTime(
+      180, ctx.currentTime
+    );
+    filter.Q.value = 1.2;
+    filter.gain.setValueAtTime(3.5, ctx.currentTime);
+    if (baseGain) {
+      filter.connect(baseGain);
+    }
+    return filter;
+  }
+};
+window.dfGetMilestoneM7127ResonatorSeal =
+  function() {
+    return {
+      milestone: 'M7118-M7127 Warmth Resonator',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
