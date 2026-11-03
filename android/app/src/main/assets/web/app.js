@@ -45738,3 +45738,65 @@ window.DF_MASTER_LEXICON.kr = {
 window.dfGetMilestoneM5727SahelAfricanLexiconSeal = function() {
   return { milestone: 'M5718-M5727 Fulfulde Wolof Kanuri Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5728-M5737: Oromo Afar Harari Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.om = {
+  timer_start: "Xiyyeeffannoo Jalqabi",
+  timer_pause: "Xiqqoo Dhaabi",
+  timer_resume: "Xiyyeeffannoo Itti Fufi",
+  timer_reset: "Haareessi",
+  timer_stop: "Xumuri",
+  phase_focus: "Yeroo Qayyabannoo Gad-fagoo",
+  phase_short_break: "Boqonnaa Gabaabaa",
+  phase_long_break: "Boqonnaa Dheeraa",
+  session_completed: "Baga Gammatte! Xumurameera",
+  card_flip: "Kaardii Garagali",
+  card_show_answer: "Deebii Agarsiisi",
+  rating_again: "Irra Deebiin Barbaachisa",
+  rating_hard: "Yaada Cimaa",
+  rating_good: "Yaada Gaarii",
+  rating_easy: "Salphaatti Qabame"
+};
+
+window.DF_MASTER_LEXICON.aa = {
+  timer_start: "Kas Qimbis",
+  timer_pause: "Dacarsa Sabbaati",
+  timer_resume: "Kas Wadir Edde",
+  timer_reset: "Gasit Qimbis",
+  timer_stop: "Kobox Geer",
+  phase_focus: "Duma Kasih Wakhti",
+  phase_short_break: "Qarafta Sabbaati",
+  phase_long_break: "Der Qarafta",
+  session_completed: "Masha Allah! Taame Maaqe",
+  card_flip: "Karta Koris",
+  card_show_answer: "Gaba Yaballug",
+  rating_again: "Qellal Kassit",
+  rating_hard: "Kaxxa Gibdi",
+  rating_good: "Meqe Kassit",
+  rating_easy: "Soolo Kassit"
+};
+
+window.DF_MASTER_LEXICON.har = {
+  timer_start: "Fikir Egel",
+  timer_pause: "Qeyshe Nass",
+  timer_resume: "Fikir Itti Wulud",
+  timer_reset: "Meqel Egel",
+  timer_stop: "Majlis Xim",
+  phase_focus: "Gidir Fikir Waqti",
+  phase_short_break: "Qeyshe Rahat",
+  phase_long_break: "Gidir Rahat",
+  session_completed: "Mabruk! Majlis Xima",
+  card_flip: "Waraqa Gelbux",
+  card_show_answer: "Jawab Ashta",
+  rating_again: "Kutluk Yilex",
+  rating_hard: "Ciqat Yada",
+  rating_good: "Toxir Yada",
+  rating_easy: "Sahal Yada"
+};
+
+window.dfGetMilestoneM5737CushiticHornLexiconSeal = function() {
+  return { milestone: 'M5728-M5737 Oromo Afar Harari Master Lexicons', status: 'VERIFIED' };
+};
