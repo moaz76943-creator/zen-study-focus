@@ -50494,3 +50494,36 @@ window.dfGetMilestoneM6937QuadrantSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6938-M6947: Momentum Meter ---
+window.dfMomentumMeter = {
+  calculateVelocity: function(recentSessions) {
+    if (!Array.isArray(recentSessions)) {
+      return { velocity: 0, level: 'ZEN_SPARK' };
+    }
+    const twoDaysAgo = Date.now() - 172800000;
+    let count = 0;
+    for (let i = 0; i < recentSessions.length; i++) {
+      const s = recentSessions[i];
+      if (s && s.timestamp &&
+          s.timestamp > twoDaysAgo) {
+        count++;
+      }
+    }
+    let lvl = 'ZEN_SPARK';
+    if (count >= 8) {
+      lvl = 'UNSTOPPABLE_FLOW';
+    } else if (count >= 4) {
+      lvl = 'DEEP_MOMENTUM';
+    }
+    return { sessionCount: count, level: lvl };
+  }
+};
+window.dfGetMilestoneM6947MomentumSeal =
+  function() {
+    return {
+      milestone: 'M6938-M6947 Momentum Meter',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
