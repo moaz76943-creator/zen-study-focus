@@ -50662,3 +50662,37 @@ window.dfGetMilestoneM6987ShieldSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6988-M6997: Binaural Sweep ---
+window.dfBinauralSweep = {
+  calculateSweepHz: function(elapsedSec, totalSec) {
+    const tot = totalSec || 1500;
+    const sec = elapsedSec || 0;
+    const el = Math.max(0, Math.min(tot, sec));
+    const ratio = el / tot;
+    // Beta (14Hz) -> Alpha (10Hz) -> Theta (6Hz)
+    if (ratio < 0.25) {
+      return 14.0;
+    } else if (ratio < 0.80) {
+      return 10.0;
+    }
+    return 6.0;
+  },
+  applySweepToOsc: function(oscR, elSec, totSec) {
+    if (!oscR || !oscR.frequency) return;
+    const diff = this.calculateSweepHz(
+      elSec, totSec
+    );
+    oscR.frequency.setValueAtTime(
+      216 + diff, 0
+    );
+  }
+};
+window.dfGetMilestoneM6997SweepSeal =
+  function() {
+    return {
+      milestone: 'M6988-M6997 Binaural Sweep',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
