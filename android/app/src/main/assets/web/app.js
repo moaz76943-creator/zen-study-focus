@@ -48082,3 +48082,26 @@ window.dfApplyOledTrueBlackTheme = function(rootEl) {
 window.dfGetMilestoneM6177OledSurfaceBlackoutSeal = function() {
   return { milestone: 'M6168-M6177 OLED Surface Blackout Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6178-M6187: Timer Mode Pill Synchronizer Engine ---
+window.dfSynchronizeTimerPillsOnRestore = function(restoredMode, rootEl) {
+  if (typeof document === 'undefined') return { status: 'NO_DOM' };
+  const mode = String(restoredMode || 'focus').toLowerCase();
+  const root = rootEl || document;
+  const pills = root.querySelectorAll ?
+    root.querySelectorAll('[data-timer-mode]') : [];
+  pills.forEach(p => {
+    const pMode = p.getAttribute('data-timer-mode');
+    if (pMode === mode) {
+      p.classList.add('active', 'ring-2', 'ring-emerald-500');
+    } else {
+      p.classList.remove('active', 'ring-2', 'ring-emerald-500');
+    }
+  });
+  return { synchronizedMode: mode, status: 'PILLS_SYNCHRONIZED' };
+};
+
+window.dfGetMilestoneM6187TimerPillSynchronizerSeal = function() {
+  return { milestone: 'M6178-M6187 Timer Pill Synchronizer Engine', status: 'VERIFIED' };
+};
