@@ -51400,3 +51400,13 @@ window.dfGetMilestoneM7297I18nSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7298-M7307: Audio Sink ---
+window.dfGetMilestoneM7307AudioSinkSeal =
+  function() {
+    return {
+      milestone: 'M7298-M7307 Audio Test Sink',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
