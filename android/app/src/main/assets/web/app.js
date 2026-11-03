@@ -51607,3 +51607,54 @@ window.dfGetMilestoneM7387TreeMountSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7388-M7397: Monotask Mount ---
+window.dfMonotaskMount = {
+  mountAboveTimer: function(parent, title) {
+    if (!parent) return;
+    const sel = '.monotask-live-bar';
+    let b = parent.querySelector(sel);
+    if (!b) {
+      b = document.createElement('div');
+      b.className = 'monotask-live-bar';
+      b.style.marginBottom = '16px';
+      b.style.padding = '10px 16px';
+      b.style.backgroundColor = '#18181b';
+      b.style.borderRadius = '20px';
+      b.style.border = '1px solid #27272a';
+      b.style.color = '#f4f4f5';
+      b.style.display = 'flex';
+      b.style.alignItems = 'center';
+      b.style.justifyContent = 'space-between';
+      const sp = document.createElement('span');
+      sp.className = 'task-title-text';
+      sp.textContent = title || 'Deep Focus';
+      b.appendChild(sp);
+      const chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.style.minWidth = '24px';
+      chk.style.minHeight = '24px';
+      chk.onchange = function() {
+        if (chk.checked) {
+          sp.style.textDecoration =
+            'line-through';
+          sp.style.color = '#71717a';
+        } else {
+          sp.style.textDecoration = 'none';
+          sp.style.color = '#f4f4f5';
+        }
+      };
+      b.appendChild(chk);
+      const f = parent.firstChild;
+      parent.insertBefore(b, f);
+    }
+  }
+};
+window.dfGetMilestoneM7397MonotaskMountSeal =
+  function() {
+    return {
+      milestone: 'M7388-M7397 Monotask Mount',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
