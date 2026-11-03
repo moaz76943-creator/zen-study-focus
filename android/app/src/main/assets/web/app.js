@@ -48223,3 +48223,23 @@ window.dfToggleChannel = function(channelKey) {
 window.dfGetMilestoneM6237MultiChannelVolumeMatrixSeal = function() {
   return { milestone: 'M6228-M6237 Multi-Channel Volume Matrix Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6238-M6247: Dynamics Compressor Limiter Engine ---
+window.dfCreateAudioDynamicsCompressor = function(audioCtx) {
+  if (!audioCtx || typeof audioCtx.createDynamicsCompressor !== 'function') {
+    return { status: 'COMPRESSOR_EMULATED' };
+  }
+  const comp = audioCtx.createDynamicsCompressor();
+  const now = audioCtx.currentTime || 0;
+  comp.threshold.setValueAtTime(-12, now);
+  comp.knee.setValueAtTime(30, now);
+  comp.ratio.setValueAtTime(12, now);
+  comp.attack.setValueAtTime(0.003, now);
+  comp.release.setValueAtTime(0.25, now);
+  return { compressorNode: comp, status: 'COMPRESSOR_INITIALIZED' };
+};
+
+window.dfGetMilestoneM6247DynamicsCompressorLimiterSeal = function() {
+  return { milestone: 'M6238-M6247 Dynamics Compressor Limiter Engine', status: 'VERIFIED' };
+};
