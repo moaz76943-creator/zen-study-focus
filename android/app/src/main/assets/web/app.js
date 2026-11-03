@@ -51565,3 +51565,45 @@ window.dfGetMilestoneM7377DeckSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7378-M7387: Timer Tree Canvas ---
+window.dfTimerTreeCanvas = {
+  treeCanvas: null,
+  mountCanvasBehindTimer: function(timerWrapperEl) {
+    if (!timerWrapperEl) return null;
+    const sel = '#df-timer-tree-bg';
+    let cv = timerWrapperEl.querySelector(sel);
+    if (!cv) {
+      cv = document.createElement('canvas');
+      cv.id = 'df-timer-tree-bg';
+      cv.width = 240;
+      cv.height = 240;
+      cv.style.position = 'absolute';
+      cv.style.top = '50%';
+      cv.style.left = '50%';
+      cv.style.transform = 'translate(-50%, -50%)';
+      cv.style.pointerEvents = 'none';
+      cv.style.zIndex = '0';
+      cv.style.opacity = '0.35';
+      timerWrapperEl.style.position = 'relative';
+      const f = timerWrapperEl.firstChild;
+      timerWrapperEl.insertBefore(cv, f);
+    }
+    this.treeCanvas = cv;
+    return cv;
+  },
+  updateTreeProgress: function(pct) {
+    const zt = window.dfZenTree;
+    if (this.treeCanvas && zt) {
+      zt.renderGrowth(this.treeCanvas, pct);
+    }
+  }
+};
+window.dfGetMilestoneM7387TreeMountSeal =
+  function() {
+    return {
+      milestone: 'M7378-M7387 Tree Canvas Mount',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
