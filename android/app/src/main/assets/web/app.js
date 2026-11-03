@@ -46668,3 +46668,65 @@ window.DF_MASTER_LEXICON.mos = {
 window.dfGetMilestoneM5877SonghaiGaoGambianLexiconSeal = function() {
   return { milestone: 'M5868-M5877 Songhai Wolof Moore Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5878-M5887: Hazaragi Shina Balti Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.haz = {
+  timer_start: "شروع توجو موکم",
+  timer_pause: "پاوست کدو",
+  timer_resume: "دوم دار کدو",
+  timer_reset: "از سر کدو",
+  timer_stop: "آخیر کدو",
+  phase_focus: "وقت خاندو موکم",
+  phase_short_break: "دم گیرتو خورد",
+  phase_long_break: "دم گیرتو کلو",
+  session_completed: "صد آفرین! خاندو پور شد",
+  card_flip: "ورق چرخ بدین",
+  card_show_answer: "جواب ره بپترن",
+  rating_again: "بازم خاندو بکار است",
+  rating_hard: "سخت یاد اماد",
+  rating_good: "خوب یاد مه است",
+  rating_easy: "پخته از یاد مه نمرود"
+};
+
+window.DF_MASTER_LEXICON.scl = {
+  timer_start: "کوت دھیان شروع تھوت",
+  timer_pause: "کمہ گھڑی اوشٹی",
+  timer_resume: "دھیان آگے بین",
+  timer_reset: "مڑ نو تھوت",
+  timer_stop: "سیشن ختم تھوت",
+  phase_focus: "کوت سبق وقت",
+  phase_short_break: "چونی دم",
+  phase_long_break: "بڑی دم",
+  session_completed: "شاباش! سبق پورو بل",
+  card_flip: "کارڈ بدل تھوت",
+  card_show_answer: "جواب پشے تھوت",
+  rating_again: "مڑ والو ضروری",
+  rating_hard: "مشکل چیت بل",
+  rating_good: "جان چیت بل",
+  rating_easy: "پکو چیت بل"
+};
+
+window.DF_MASTER_LEXICON.bft = {
+  timer_start: "Lhamo Hrid Shuru",
+  timer_pause: "Titi Ngyal",
+  timer_resume: "Hrid Skyod",
+  timer_reset: "Sosoh Zhag",
+  timer_stop: "Tshogs Thug",
+  phase_focus: "Gyangpa Slobnyer Dus",
+  phase_short_break: "Titi Ngyal Dus",
+  phase_long_break: "Rgyaspa Ngyal Dus",
+  session_completed: "Las-la Legs-so! Thug-so",
+  card_flip: "Phyi-la Skor",
+  card_show_answer: "Lan Stan",
+  rating_again: "Slaryang Dgos",
+  rating_hard: "Ka-ba Dran-pa",
+  rating_good: "Legspa Dran-pa",
+  rating_easy: "Gting-nas Shespa"
+};
+
+window.dfGetMilestoneM5887HazaragiShinaBaltiSeal = function() {
+  return { milestone: 'M5878-M5887 Hazaragi Shina Balti Master Lexicons', status: 'VERIFIED' };
+};
