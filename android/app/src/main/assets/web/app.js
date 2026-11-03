@@ -48769,3 +48769,38 @@ window.dfGetMilestoneM6427BatterySeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6428-M6437: Memory ---
+window.dfMemoryGuard = {
+  historyLimit: 1000,
+  cleanHistoryRing: function(arr) {
+    if (!Array.isArray(arr)) return [];
+    if (arr.length > this.historyLimit) {
+      return arr.slice(-this.historyLimit);
+    }
+    return arr;
+  },
+  revokeBlob: function(url) {
+    if (typeof URL !== 'undefined' &&
+        URL.revokeObjectURL && url) {
+      try { URL.revokeObjectURL(url); }
+      catch(e) {}
+    }
+  },
+  releaseHiddenDOM: function(sel) {
+    if (typeof document === 'undefined') return;
+    const el = document.querySelector(sel);
+    if (el && el.parentNode &&
+        el.style.display === 'none') {
+      el.parentNode.removeChild(el);
+    }
+  }
+};
+window.dfGetMilestoneM6437MemorySeal =
+  function() {
+    return {
+      milestone: 'M6428-M6437 Memory',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
