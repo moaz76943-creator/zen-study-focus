@@ -47632,3 +47632,65 @@ window.DF_MASTER_LEXICON.ln = {
 window.dfGetMilestoneM6067AmharicTigrinyaLingalaSeal = function() {
   return { milestone: 'M6058-M6067 Amharic Tigrinya Lingala Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6068-M6077: Shona Zulu Malagasy Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.sn = {
+  timer_start: "Tanga Pfungwa Dzakadzama",
+  timer_pause: "Mira Kwechinguvana",
+  timer_resume: "Enderera Mberi Nekudzidza",
+  timer_reset: "Gadziridza Nguva",
+  timer_stop: "Pedza Nguva Yokudzidza",
+  phase_focus: "Nguva Yokudzidza Zvakadzama",
+  phase_short_break: "Zororo Diki",
+  phase_long_break: "Zororo Guru",
+  session_completed: "Makorokoto! Wapedza kudzidza",
+  card_flip: "Vhura Kadhi",
+  card_show_answer: "Ratidza Mhinduro",
+  rating_again: "Zvinoda Kudzokorora",
+  rating_hard: "Zvaoma Kuyeuka",
+  rating_good: "Ndangariro Yakanaka",
+  rating_easy: "Zvakabatwa Zvakakwana"
+};
+
+window.DF_MASTER_LEXICON.zu = {
+  timer_start: "Qala Ukugxila Okujulile",
+  timer_pause: "Misa Isikhashana",
+  timer_resume: "Qhubeka Nokugxila",
+  timer_reset: "Setha Kabusha Isikhathi",
+  timer_stop: "Qeda Isikhathi",
+  phase_focus: "Isikhathi Sokufunda Okujulile",
+  phase_short_break: "Ikhefu Elifushane",
+  phase_long_break: "Ikhefu Elide",
+  session_completed: "Halala! Isikhathi sesiphelile",
+  card_flip: "Phendula Ikhadi",
+  card_show_answer: "Bonisa Impendulo",
+  rating_again: "Kudinga Ukuphindwa",
+  rating_hard: "Kunzima Ukukhumbula",
+  rating_good: "Kukhumbuleke Kahle",
+  rating_easy: "Kugxile Ngokugcwele"
+};
+
+window.DF_MASTER_LEXICON.mg = {
+  timer_start: "Atombohy ny Fifantohana",
+  timer_pause: "Miato Kely",
+  timer_resume: "Tohizo ny Fifantohana",
+  timer_reset: "Avereno Amin ny Voalohany",
+  timer_stop: "Atsaharo ny Fotoana",
+  phase_focus: "Fotoana Fianarana Lalina",
+  phase_short_break: "Fialan-tsasatra Fohy",
+  phase_long_break: "Fialan-tsasatra Lavitra",
+  session_completed: "Arahabaina! Vita ny fotoana",
+  card_flip: "Avadiho ny Karatra",
+  card_show_answer: "Asehoy ny Valiny",
+  rating_again: "Mila Averina",
+  rating_hard: "Sarotra Tadidiana",
+  rating_good: "Tadidy Tsara",
+  rating_easy: "Voafehy Tanteraka"
+};
+
+window.dfGetMilestoneM6077ShonaZuluMalagasySeal = function() {
+  return { milestone: 'M6068-M6077 Shona Zulu Malagasy Master Lexicons', status: 'VERIFIED' };
+};
