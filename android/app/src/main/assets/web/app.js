@@ -45535,3 +45535,50 @@ window.DF_MASTER_LEXICON.hi = Object.assign(window.DF_MASTER_LEXICON.hi || {}, {
 window.dfGetMilestoneM5687ChineseJapaneseHindiSpecializedSeal = function() {
   return { milestone: 'M5678-M5687 Chinese Japanese Hindi Specialized Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5688-M5697: Turkic Specialized Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.kk = Object.assign(window.DF_MASTER_LEXICON.kk || {}, {
+  audio_chime_header: "Сабақты Аяқтау Дыбыстары",
+  audio_ambient_header: "Табиғи Зейін Ахуалы",
+  audio_solfeggio_528: "528 Гц Зейін Үйлесімі",
+  audio_solfeggio_432: "432 Гц Терең Тыныштық",
+  audio_binaural_beta: "14 Гц Бета Белсенділік",
+  fsrs_stability: "Жады Тұрақтылығы Индексі",
+  fsrs_difficulty: "Еске Түсіру Қиындығы",
+  fsrs_due_today: "Бүгін Қайталайтын Карталар",
+  fsrs_mastered: "Берік Меңгерілген Карталар",
+  fsrs_streak_days: "Үздіксіз Оқу Күндері"
+});
+
+window.DF_MASTER_LEXICON.uz = Object.assign(window.DF_MASTER_LEXICON.uz || {}, {
+  audio_chime_header: "Mashg'ulot Yakuni Sadolari",
+  audio_ambient_header: "Chuqur Diqqat Tabiiy Ovozlar",
+  audio_solfeggio_528: "528 Gts Aqliy Uyg'unlik",
+  audio_solfeggio_432: "432 Gts Chuqur Xotirjamlik",
+  audio_binaural_beta: "14 Gts Beta Hushyorlik",
+  fsrs_stability: "Xotira Barqarorligi Indeksi",
+  fsrs_difficulty: "Eslab Qolish Qiyinligi",
+  fsrs_due_today: "Bugun Qaytariladigan Kartalar",
+  fsrs_mastered: "Pishiq O'zlashtirilgan Kartalar",
+  fsrs_streak_days: "Uzluksiz O'rganish Kunlari"
+});
+
+window.DF_MASTER_LEXICON.az = Object.assign(window.DF_MASTER_LEXICON.az || {}, {
+  audio_chime_header: "Sessiyanin Bitis Zenglari",
+  audio_ambient_header: "Konsentrasiya Tebii Sesler",
+  audio_solfeggio_528: "528 Hz Zehni Harmoniya",
+  audio_solfeggio_432: "432 Hz Derin Sakitlik",
+  audio_binaural_beta: "14 Hz Beta Ayiqliq Dalgalari",
+  fsrs_stability: "Yaddas Sabitliyi Indeksi",
+  fsrs_difficulty: "Xatirlama Cetinliyi Derecesi",
+  fsrs_due_today: "Bu Gun Tekrar Edilecek Kartlar",
+  fsrs_mastered: "Mokhem Menimsenilmis Kartlar",
+  fsrs_streak_days: "Ardicil Tehsil Gunleri"
+});
+
+window.dfGetMilestoneM5697TurkicSpecializedSeal = function() {
+  return { milestone: 'M5688-M5697 Kazakh Uzbek Azeri Specialized Lexicons', status: 'VERIFIED' };
+};
