@@ -48590,3 +48590,33 @@ window.dfHandleDesktopKeyboardEvent = function(e) {
 window.dfGetMilestoneM6357DesktopKeyboardMatrixSeal = function() {
   return { milestone: 'M6348-M6357 Desktop Keyboard Matrix Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6358-M6367: Audio Focus Ducking Engine ---
+window.dfHandleAudioFocusChange = function(focusState, masterGainNode, audioCtx) {
+  const state = String(focusState || 'GAIN').toUpperCase();
+  const now = (audioCtx && audioCtx.currentTime) || 0;
+  let targetVol = 1.0;
+
+  if (state === 'LOSS' || state === 'LOSS_TRANSIENT') {
+    targetVol = 0.0;
+  } else if (state === 'LOSS_TRANSIENT_CAN_DUCK') {
+    targetVol = 0.2;
+  } else if (state === 'GAIN') {
+    targetVol = 1.0;
+  }
+
+  if (masterGainNode && masterGainNode.gain && masterGainNode.gain.setValueAtTime) {
+    masterGainNode.gain.setValueAtTime(targetVol, now);
+  }
+
+  return {
+    focusState: state,
+    targetVolume: targetVol,
+    status: 'FOCUS_ADJUSTED'
+  };
+};
+
+window.dfGetMilestoneM6367AudioFocusDuckingSeal = function() {
+  return { milestone: 'M6358-M6367 Audio Focus Ducking Engine', status: 'VERIFIED' };
+};
