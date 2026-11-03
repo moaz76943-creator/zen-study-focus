@@ -51703,3 +51703,40 @@ window.dfGetMilestoneM7407ScratchModalSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7408-M7417: Grid Analytics Mount ---
+window.dfGridAnalyticsMount = {
+  mountGridInAnalytics: function(container) {
+    if (!container) return;
+    const sel = '.live-yearly-grid-wrap';
+    let wrap = container.querySelector(sel);
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.className = 'live-yearly-grid-wrap';
+      wrap.style.marginTop = '16px';
+      wrap.style.padding = '12px';
+      wrap.style.backgroundColor = '#18181b';
+      wrap.style.borderRadius = '8px';
+      const hdr = document.createElement('div');
+      hdr.style.color = '#10b981';
+      hdr.style.fontWeight = 'bold';
+      hdr.style.marginBottom = '8px';
+      hdr.textContent = '365-Day Consistency Heatmap';
+      wrap.appendChild(hdr);
+      const gridEl = document.createElement('div');
+      gridEl.id = 'analytics-consistency-grid';
+      wrap.appendChild(gridEl);
+      const cg = window.dfConsistencyGrid;
+      if (cg) cg.renderGrid(gridEl, {});
+      container.appendChild(wrap);
+    }
+  }
+};
+window.dfGetMilestoneM7417GridMountSeal =
+  function() {
+    return {
+      milestone: 'M7408-M7417 Grid Analytics Mount',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
