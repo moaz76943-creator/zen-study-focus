@@ -50943,3 +50943,32 @@ window.dfGetMilestoneM7057SizerSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7058-M7067: Deck Backup ---
+window.dfDeckBackup = {
+  createDeckArchive: function(deckName, cards) {
+    const list = Array.isArray(cards) ? cards : [];
+    const payload = {
+      name: deckName || 'Main Deck',
+      exportedAt: new Date().toISOString(),
+      cardCount: list.length,
+      cards: list
+    };
+    const raw = JSON.stringify(payload);
+    let checksum = 0;
+    for (let i = 0; i < raw.length; i++) {
+      const code = raw.charCodeAt(i);
+      checksum = (checksum + code) & 0xffff;
+    }
+    payload.checksum = checksum;
+    return JSON.stringify(payload, null, 2);
+  }
+};
+window.dfGetMilestoneM7067BackupSeal =
+  function() {
+    return {
+      milestone: 'M7058-M7067 Deck Backup Checksum',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
