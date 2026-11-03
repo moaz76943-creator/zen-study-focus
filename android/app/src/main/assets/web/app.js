@@ -46606,3 +46606,65 @@ window.DF_MASTER_LEXICON.swb = {
 window.dfGetMilestoneM5867SwahiliCoastComorianSeal = function() {
   return { milestone: 'M5858-M5867 Comorian Makhuwa Bajuni Master Lexicons', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M5868-M5877: Songhai Wolof Moore Lexicons ---
+window.DF_MASTER_LEXICON = window.DF_MASTER_LEXICON || {};
+
+window.DF_MASTER_LEXICON.son = {
+  timer_start: "Fahamu Beeri Sintin",
+  timer_pause: "Kayya Seeda",
+  timer_resume: "Fahamu Yaamar Gaay",
+  timer_reset: "Yeeti Sintin",
+  timer_stop: "Waqti Ben",
+  phase_focus: "Fahamu Beeri Alwaati",
+  phase_short_break: "Foliya Kayna",
+  phase_long_break: "Foliya Kuuto",
+  session_completed: "I ni ce! Kalan ben",
+  card_flip: "Kardi Barmay",
+  card_show_answer: "Zaabi Cebe",
+  rating_again: "Yeeti Kalan",
+  rating_hard: "Sanda Foora",
+  rating_good: "Fahamu Boori",
+  rating_easy: "Kalan Noogo"
+};
+
+window.DF_MASTER_LEXICON['wo-GM'] = {
+  timer_start: "Door Xalaat bu Xoote",
+  timer_pause: "Taxawal Ndank",
+  timer_resume: "Weyale Xalaat bi",
+  timer_reset: "Delloo ci Ndorteel",
+  timer_stop: "Jeexal Jamano",
+  phase_focus: "Jamano Jang bu Xoot",
+  phase_short_break: "Noppalu bu Doot",
+  phase_long_break: "Noppalu bu Yaatu",
+  session_completed: "Masha Allah! Jamano jeex na",
+  card_flip: "Welbati Koos bi",
+  card_show_answer: "Wone Tontu bi",
+  rating_again: "Laaj na Saytu",
+  rating_hard: "Jafe na Fattaali",
+  rating_good: "Mokk na bu Baax",
+  rating_easy: "Dencu na ci Xel"
+};
+
+window.DF_MASTER_LEXICON.mos = {
+  timer_start: "Silli Yamleo Singre",
+  timer_pause: "Gilli Bilfu",
+  timer_resume: "Kelle Yamleo Kamba",
+  timer_reset: "Lebge Singre",
+  timer_stop: "Saabo Waqto",
+  phase_focus: "Yamleo Karem Waqto",
+  phase_short_break: "Vomsgo Bilfu",
+  phase_long_break: "Vomsgo Woko",
+  session_completed: "Bark wusgo! Karem saabo",
+  card_flip: "Kard Lebge",
+  card_show_answer: "Leore Wilgi",
+  rating_again: "Segle Lebge",
+  rating_hard: "Toogo Tegre",
+  rating_good: "Neere Tegre",
+  rating_easy: "Nana Tegre"
+};
+
+window.dfGetMilestoneM5877SonghaiGaoGambianLexiconSeal = function() {
+  return { milestone: 'M5868-M5877 Songhai Wolof Moore Master Lexicons', status: 'VERIFIED' };
+};
