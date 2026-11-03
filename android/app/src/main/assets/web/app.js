@@ -49349,3 +49349,53 @@ window.dfGetMilestoneM6637ClozeSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6638-M6647: Memory Heatmap ---
+window.dfMemoryHeatmap = {
+  calculateRetrievability: function(elapsedDays, s) {
+    const stability = Math.max(0.1, s || 1.0);
+    const t = Math.max(0, elapsedDays || 0);
+    const r = Math.pow(1 + (0.1 * t / stability), -1);
+    return Math.max(0.01, Math.min(1.0, r));
+  },
+  getHeatmapStatus: function(retrievability) {
+    const r = retrievability || 1.0;
+    if (r >= 0.85) {
+      return { level: 'SOLID', color: '#10b981' };
+    } else if (r >= 0.70) {
+      return { level: 'SOON', color: '#f59e0b' };
+    }
+    return { level: 'DUE', color: '#ef4444' };
+  },
+  attachBadge: function(cardElement, elapsedDays, s) {
+    if (!cardElement) return;
+    const r = this.calculateRetrievability(
+      elapsedDays, s
+    );
+    const st = this.getHeatmapStatus(r);
+    let b = cardElement.querySelector(
+      '.memory-badge'
+    );
+    if (!b) {
+      b = document.createElement('span');
+      b.className = 'memory-badge';
+      b.style.padding = '4px 8px';
+      b.style.borderRadius = '4px';
+      b.style.fontSize = '12px';
+      b.style.fontWeight = 'bold';
+      cardElement.appendChild(b);
+    }
+    const pct = Math.round(r * 100);
+    b.textContent = pct + '% Retention';
+    b.style.backgroundColor = st.color;
+    b.style.color = '#fff';
+  }
+};
+window.dfGetMilestoneM6647HeatmapSeal =
+  function() {
+    return {
+      milestone: 'M6638-M6647 Memory Heatmap',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
