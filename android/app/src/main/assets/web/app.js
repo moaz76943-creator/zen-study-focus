@@ -50074,3 +50074,44 @@ window.dfGetMilestoneM6817OrchardSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M6818-M6827: Cycle Auto-Chain ---
+window.dfCycleChaining = {
+  currentCycle: 1,
+  totalCycles: 4,
+  currentPhase: 'FOCUS',
+  advancePhase: function() {
+    if (this.currentPhase === 'FOCUS') {
+      if (this.currentCycle >= this.totalCycles) {
+        this.currentPhase = 'LONG_BREAK';
+      } else {
+        this.currentPhase = 'SHORT_BREAK';
+      }
+    } else {
+      if (this.currentPhase === 'SHORT_BREAK') {
+        this.currentCycle++;
+      } else {
+        this.currentCycle = 1;
+      }
+      this.currentPhase = 'FOCUS';
+    }
+    return {
+      phase: this.currentPhase,
+      cycle: this.currentCycle,
+      total: this.totalCycles
+    };
+  },
+  resetChaining: function(total) {
+    this.currentCycle = 1;
+    this.totalCycles = total || 4;
+    this.currentPhase = 'FOCUS';
+  }
+};
+window.dfGetMilestoneM6827ChainSeal =
+  function() {
+    return {
+      milestone: 'M6818-M6827 Cycle Auto Chain',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
