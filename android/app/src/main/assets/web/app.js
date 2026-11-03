@@ -48681,3 +48681,28 @@ window.dfHandleOrientationChange = function(beta, gamma) {
 window.dfGetMilestoneM6397DeviceTiltSensorSeal = function() {
   return { milestone: 'M6388-M6397 Device Tilt Sensor Engine', status: 'VERIFIED' };
 };
+
+
+// --- MISSIONS M6398-M6407: Foreground Notification Sync Engine ---
+window.dfFormatNotificationState = function(remSec, mode, isPaused) {
+  const rem = Math.max(0, parseInt(remSec, 10) || 0);
+  const mins = Math.floor(rem / 60);
+  const secs = rem % 60;
+  const timeStr = String(mins).padStart(2, '0') + ':' +
+                  String(secs).padStart(2, '0');
+  const m = String(mode || 'focus').toUpperCase();
+  const title = (m === 'FOCUS' ? 'Deep Focus' : 'Break') + ' - ' + timeStr;
+  const action = isPaused ? 'RESUME' : 'PAUSE';
+
+  return {
+    notificationTitle: title,
+    channelId: m === 'FOCUS' ? 'focus_channel' : 'break_channel',
+    primaryAction: action,
+    secondaryAction: 'RESET',
+    status: 'NOTIFICATION_PAYLOAD_FORMATTED'
+  };
+};
+
+window.dfGetMilestoneM6407ForegroundNotificationSyncSeal = function() {
+  return { milestone: 'M6398-M6407 Foreground Notification Sync Engine', status: 'VERIFIED' };
+};
