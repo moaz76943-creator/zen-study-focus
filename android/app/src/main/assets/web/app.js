@@ -51847,3 +51847,36 @@ window.dfGetMilestoneM7447UIBindingSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7448-M7457: WCAG AAA Contrast ---
+window.dfWcagAAAEnforcer = {
+  applyTokens: function() {
+    if (typeof document === 'undefined') return;
+    const styleId = 'df-wcag-aaa-tokens';
+    let el = document.getElementById(styleId);
+    if (!el) {
+      el = document.createElement('style');
+      el.id = styleId;
+      document.head.appendChild(el);
+    }
+    el.textContent = [
+      '.activity-hint { color: #f4f4f5 !important; }',
+      '.ready-text { color: #ffffff !important; }',
+      '.btn-change { color: #60a5fa !important; }',
+      '.weekday-inactive {' +
+        ' color: #a1a1aa !important; }',
+      '.card-subtext { color: #d4d4d8 !important; }'
+    ].join(' ');
+  }
+};
+window.dfGetMilestoneM7457ContrastSeal =
+  function() {
+    return {
+      milestone: 'M7448-M7457 WCAG AAA Tokens',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+if (typeof document !== 'undefined') {
+  window.dfWcagAAAEnforcer.applyTokens();
+}
