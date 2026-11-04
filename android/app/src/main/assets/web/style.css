@@ -1,0 +1,9 @@
+/* AMOLED True Black WCAG AAA */
+*{box-sizing:border-box;margin:0}
+body{background:#000;color:#fff}
+body{font-family:sans-serif}
+.timer-display{font-size:64px}
+.timer-display{color:#10b981}
+button{min-width:48px;min-height:48px}
+button{padding:12px;background:#18181b}
+button:focus{outline:3px solid #10b981}

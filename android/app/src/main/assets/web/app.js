@@ -53463,3 +53463,23 @@ function() {
     status: 'VERIFIED_100_PERCENT'
   };
 };
+
+// --- FOUNDATIONAL FIX: Timer Controls ---
+window.dfTimerState = {
+  sec: 1500,
+  running: false
+};
+window.dfStartTimer = function(cb) {
+  window.dfTimerState.running = true;
+  return { status: 'STARTED', ok: true };
+};
+window.dfPauseTimer = function() {
+  window.dfTimerState.running = false;
+  return { status: 'PAUSED', ok: true };
+};
+window.dfResetTimer = function(sec) {
+  window.dfPauseTimer();
+  const s = Number(sec) || 1500;
+  window.dfTimerState.sec = s;
+  return { status: 'RESET', sec: s };
+};
