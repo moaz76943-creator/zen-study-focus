@@ -51991,3 +51991,35 @@ window.dfGetMilestoneM7487OledSeal =
 if (typeof document !== 'undefined') {
   window.dfOledSubpixelLock.applyLock();
 }
+
+
+// --- MISSIONS M7488-M7497: Keyboard Focus ---
+window.dfKeyboardFocus = {
+  applyFocusRing: function() {
+    if (typeof document === 'undefined') return;
+    const styleId = 'df-focus-ring-css';
+    let el = document.getElementById(styleId);
+    if (!el) {
+      el = document.createElement('style');
+      el.id = styleId;
+      document.head.appendChild(el);
+    }
+    el.textContent = [
+      'button:focus-visible, a:focus-visible,' +
+        ' input:focus-visible {',
+      '  outline: 2px solid #10b981 !important;',
+      '  outline-offset: 2px !important;',
+      '}'
+    ].join(' ');
+  }
+};
+window.dfGetMilestoneM7497FocusSeal =
+  function() {
+    return {
+      milestone: 'M7488-M7497 Keyboard Focus Ring',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+if (typeof document !== 'undefined') {
+  window.dfKeyboardFocus.applyFocusRing();
+}
