@@ -54882,7 +54882,7 @@ function(word, idx) {
 window.dfSanitizeClozeTemplateFormatting =
 function(raw) {
   const r = String(raw || '');
-  const s = r.replace(/[	]/g, ' ');
+  const s = r.trim();
   return { sanitized: s, clean: true };
 };
 window.dfBatchGenerateClozeCardSet =
