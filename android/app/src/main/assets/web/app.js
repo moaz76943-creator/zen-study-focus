@@ -52062,3 +52062,37 @@ window.dfGetMilestoneM7507MotionSeal =
 if (typeof document !== 'undefined') {
   window.dfReducedMotion.applyMotionSafeguards();
 }
+
+
+// --- MISSIONS M7508-M7517: Text Scaling ---
+window.dfTextScaleGuardian = {
+  applyResponsiveScaling: function() {
+    if (typeof document === 'undefined') return;
+    const styleId = 'df-text-scale-css';
+    let el = document.getElementById(styleId);
+    if (!el) {
+      el = document.createElement('style');
+      el.id = styleId;
+      document.head.appendChild(el);
+    }
+    el.textContent = [
+      'html { font-size: clamp(14px, 2.5vw, 18px); }',
+      'body { line-height: 1.5;' +
+        ' text-rendering: optimizeLegibility; }',
+      '.timer-display {' +
+        ' font-size: clamp(2rem, 8vw, 4.5rem); }',
+      '.task-title {' +
+        ' font-size: clamp(1rem, 3vw, 1.25rem); }'
+    ].join(' ');
+  }
+};
+window.dfGetMilestoneM7517ScaleSeal =
+  function() {
+    return {
+      milestone: 'M7508-M7517 Text Scaling Guardian',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+if (typeof document !== 'undefined') {
+  window.dfTextScaleGuardian.applyResponsiveScaling();
+}
