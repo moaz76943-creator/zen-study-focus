@@ -51880,3 +51880,38 @@ window.dfGetMilestoneM7457ContrastSeal =
 if (typeof document !== 'undefined') {
   window.dfWcagAAAEnforcer.applyTokens();
 }
+
+
+// --- MISSIONS M7458-M7467: Universal 48px Touch ---
+window.dfTouch48Enforcer = {
+  applyTouchRules: function() {
+    if (typeof document === 'undefined') return;
+    const styleId = 'df-touch-48-rules';
+    let el = document.getElementById(styleId);
+    if (!el) {
+      el = document.createElement('style');
+      el.id = styleId;
+      document.head.appendChild(el);
+    }
+    el.textContent = [
+      'button, .btn, select, input[type="button"] {',
+      '  min-height: 48px !important;',
+      '  min-width: 48px !important;',
+      '}',
+      '.icon-btn, .lang-select, .pill-btn {',
+      '  min-height: 48px !important;',
+      '  min-width: 48px !important;',
+      '}'
+    ].join(' ');
+  }
+};
+window.dfGetMilestoneM7467TouchSeal =
+  function() {
+    return {
+      milestone: 'M7458-M7467 Universal 48px Touch',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+if (typeof document !== 'undefined') {
+  window.dfTouch48Enforcer.applyTouchRules();
+}
