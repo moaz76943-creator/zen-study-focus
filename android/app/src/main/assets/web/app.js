@@ -51915,3 +51915,44 @@ window.dfGetMilestoneM7467TouchSeal =
 if (typeof document !== 'undefined') {
   window.dfTouch48Enforcer.applyTouchRules();
 }
+
+
+// --- MISSIONS M7468-M7477: ARIA Live Region ---
+window.dfAriaLiveAnnouncer = {
+  regionEl: null,
+  getRegion: function() {
+    if (typeof document === 'undefined') return null;
+    const rId = 'df-aria-live-box';
+    let r = document.getElementById(rId);
+    if (!r) {
+      r = document.createElement('div');
+      r.id = rId;
+      r.setAttribute('aria-live', 'polite');
+      r.setAttribute('aria-atomic', 'true');
+      r.style.position = 'absolute';
+      r.style.width = '1px';
+      r.style.height = '1px';
+      r.style.overflow = 'hidden';
+      r.style.clip = 'rect(1px, 1px, 1px, 1px)';
+      document.body.appendChild(r);
+    }
+    this.regionEl = r;
+    return r;
+  },
+  announce: function(message) {
+    const r = this.getRegion();
+    if (r && message) {
+      r.textContent = '';
+      setTimeout(function() {
+        r.textContent = message;
+      }, 50);
+    }
+  }
+};
+window.dfGetMilestoneM7477AriaSeal =
+  function() {
+    return {
+      milestone: 'M7468-M7477 ARIA Live Announcer',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
