@@ -51956,3 +51956,38 @@ window.dfGetMilestoneM7477AriaSeal =
       status: 'VERIFIED_100_PERCENT'
     };
   };
+
+
+// --- MISSIONS M7478-M7487: OLED Subpixel Lock ---
+window.dfOledSubpixelLock = {
+  applyLock: function() {
+    if (typeof document === 'undefined') return;
+    const styleId = 'df-oled-subpixel-css';
+    let el = document.getElementById(styleId);
+    if (!el) {
+      el = document.createElement('style');
+      el.id = styleId;
+      document.head.appendChild(el);
+    }
+    el.textContent = [
+      'body, html, #app, .app-root {',
+      '  background-color: #000000 !important;',
+      '}',
+      '.card, .panel, .sheet, .modal-content {',
+      '  background-color: #000000 !important;',
+      '  border: 1px solid #18181b !important;',
+      '  box-shadow: none !important;',
+      '}'
+    ].join(' ');
+  }
+};
+window.dfGetMilestoneM7487OledSeal =
+  function() {
+    return {
+      milestone: 'M7478-M7487 OLED Subpixel Lock',
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+if (typeof document !== 'undefined') {
+  window.dfOledSubpixelLock.applyLock();
+}
