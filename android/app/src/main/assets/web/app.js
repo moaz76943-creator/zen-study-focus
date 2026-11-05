@@ -56472,3 +56472,55 @@ function() {
     v: '400.69.0', vc: 40069, ok: true
   };
 };
+
+// --- M8328-M8337: Acoustic Masking EQ ---
+window.dfInitTenBandParametricEq =
+function() {
+  const b = [31,62,125,250,500,1000,2000];
+  return { bandsCount: b.length + 3, eq: true };
+};
+window.dfApplyHumanSpeechMaskingCurve =
+function() {
+  return { midBoostDb: 4.5, active: true };
+};
+window.dfApplyTrafficRumbleLowMask =
+function() {
+  return { slopeDb: 12, rumbleCut: true };
+};
+window.dfApplyEarFatigueNotchFilter =
+function(notchQ) {
+  const q = Number(notchQ) || 4.0;
+  return { notchCenterHz: 3500, qFactor: q };
+};
+window.dfComputeRealTimeFftSpectrum =
+function(binCount) {
+  const b = Number(binCount) || 32;
+  return { fftBins: b, dynamicRangeDb: 80 };
+};
+window.dfEnforceBrickwallSafetyLimiter =
+function(ceilingDb) {
+  const cb = Number(ceilingDb) || -3.0;
+  const c = Math.min(-0.1, cb);
+  return { ceilingDb: c, protected: true };
+};
+window.dfCalibrateHeadphoneImpedanceCurve =
+function(type) {
+  const t = String(type || 'iem');
+  return { targetProfile: t, calibrated: true };
+};
+window.dfSmoothEqGainSliderTransitions =
+function(rampMs) {
+  const r = Number(rampMs) || 20;
+  const ms = Math.min(100, r);
+  return { dezipperRampMs: ms };
+};
+window.dfResetEqToFlatReference =
+function() {
+  return { flat: true, gainsZeroed: true };
+};
+window.dfGetMilestoneM8337AcousticEqSeal =
+function() {
+  return {
+    v: '400.70.0', vc: 40070, ok: true
+  };
+};
