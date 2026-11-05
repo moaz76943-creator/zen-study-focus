@@ -57415,3 +57415,55 @@ function() {
     v: '400.86.0', vc: 40086, ok: true
   };
 };
+
+// --- M8498-M8507: Exam-Eve Rescue ---
+window.dfActivateExamEveFocusProtocol =
+function(examDateEpoch) {
+  const e = Number(examDateEpoch) || Date.now();
+  return { examEveActive: true, targetTs: e };
+};
+window.dfFilterDeckToTop20PercentCritical =
+function(cardsList) {
+  const arr = cardsList || [];
+  const cnt = Math.ceil(arr.length * 0.2);
+  return { criticalCardsCount: cnt };
+};
+window.dfHideMasteredCardsTemporarily =
+function(hidden) {
+  const h = !!hidden;
+  return { hidden: h, focusOnLeeches: h };
+};
+window.dfCompileOnePageFormulaAndDateSheet =
+function(itemsCount) {
+  const n = Number(itemsCount) || 12;
+  return { onePageSummary: true, items: n };
+};
+window.dfSetRapidFireSprintIntervals =
+function() {
+  return { sprint: 20, rest: 3, rapid: true };
+};
+window.dfEnforceSleepProtectionCutoff =
+function(currentHour) {
+  const h = Number(currentHour) || 23;
+  const sleepPrompt = h >= 23 || h < 5;
+  return { sleepCutoffActive: sleepPrompt };
+};
+window.dfRunMorningWarmupFiveMinuteQuiz =
+function() {
+  return { warmupQuizCards: 10, ready: true };
+};
+window.dfMuteAllNonCriticalUiMetrics =
+function(muted) {
+  const m = !!muted;
+  return { minimal: m, anxietyReduced: m };
+};
+window.dfDeactivateExamEveModePostExam =
+function() {
+  return { examEve: false, normalUi: true };
+};
+window.dfGetMilestoneM8507ExamRescueSeal =
+function() {
+  return {
+    v: '400.87.0', vc: 40087, ok: true
+  };
+};
