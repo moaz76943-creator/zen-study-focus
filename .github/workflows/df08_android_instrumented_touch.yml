@@ -3,9 +3,28 @@ on:
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths:
-      - 'tests/android_touch/df08_instrumentation/**'
+      - 'android/app/src/main/assets/web/app.js'
+      - 'android/app/src/main/assets/web/notes*.js'
+      - 'android/app/src/main/assets/web/index.html'
+      - 'android/app/src/main/assets/web/*.css'
+      - 'tests/android_touch/**'
+      - 'tests/white_premium_qa/track14_install_apk.sh'
+      - 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'
+      - 'android/app/build.gradle'
+      - 'android/*.gradle'
+      - 'android/gradle.properties'
+      - '.github/actions/android-emulator/**'
       - '.github/workflows/df08_android_instrumented_touch.yml'
+  push:
+    tags: ['v*']
   workflow_dispatch:
+    inputs:
+      api:
+        description: 'Full font QA on both APIs or a focused platform rerun'
+        type: choice
+        options: [all, '30', '35']
+        default: all
+        required: true
 permissions:
   contents: read
 concurrency:
@@ -14,8 +33,10 @@ concurrency:
 jobs:
   source:
     name: Source-only validation
-    runs-on: ubuntu-latest
-    timeout-minutes: 6
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    outputs:
+      source_sha: ${{ steps.receipt.outputs.source_sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,78 +45,113 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Contract plus legacy CDP geometry source checks
+      - name: Focused source and instrumentation checks
+        shell: bash
         run: |
+          set -euo pipefail
           node --test tests/android_touch/*.test.cjs tests/android_touch/df08_instrumentation/*.test.cjs
           bash -n tests/android_touch/df08_instrumentation/prepare_test_build.sh
           bash -n tests/android_touch/df08_instrumentation/run_ci.sh
-  android:
-    name: Android API${{ matrix.api }} / 4 widths / real IME
-    needs: source
-    strategy:
-      fail-fast: false
-      matrix:
-        api: [30,35]
-    runs-on: ubuntu-latest
-    timeout-minutes: 55
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install Android 36 compilation SDK
+      - name: Install compile SDK once per source
         shell: bash
         run: |
+          set -euo pipefail
           sdkmanager_bin="$(find /usr/local/lib/android/sdk/cmdline-tools -name sdkmanager -type f -print -quit)"
           test -x "$sdkmanager_bin"
           "$sdkmanager_bin" 'platforms;android-36' 'build-tools;36.0.0'
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Wire Android instrumentation only in ephemeral checkout
+      - name: Prepare isolated instrumentation configuration
+        shell: bash
         run: |
+          set -euo pipefail
           bash tests/android_touch/df08_instrumentation/prepare_test_build.sh
-          git status --short
-          test "$(git diff --name-only)" = "android/app/build.gradle"
-      - name: Compile actual shipped debug APK and isolated test APK
+          test "$(git diff --name-only)" = 'android/app/build.gradle'
+      - name: Build debug app and test APK once for all device cases
         working-directory: android
         run: gradle assembleDebug assembleDebugAndroidTest --no-daemon
-      - name: Emulator KVM access
+      - name: Bind APK hashes to exact source
+        id: receipt
         shell: bash
-        run: |
-          test -c /dev/kvm
-          sudo chmod 666 /dev/kvm
-      - name: Actual Android touch, Notes modal, keyboard and Save at 4 widths
-        uses: reactivecircus/android-emulator-runner@v2
         env:
-          DF08_EVIDENCE: ${{ runner.temp }}/df08-api-${{ matrix.api }}
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(git diff --name-only)" = 'android/app/build.gradle'
+          mkdir -p "$RUNNER_TEMP/df08-build"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/df08-build/app-debug.apk"
+          cp android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk "$RUNNER_TEMP/df08-build/app-debug-androidTest.apk"
+          printf '%s\n' "$EXPECTED_SHA" > "$RUNNER_TEMP/df08-build/SOURCE_SHA.txt"
+          (cd "$RUNNER_TEMP/df08-build" && sha256sum app-debug.apk app-debug-androidTest.apk > SHA256SUMS)
+          echo "source_sha=$EXPECTED_SHA" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
         with:
-          api-level: ${{ matrix.api }}
-          arch: x86_64
-          target: google_apis
-          profile: pixel_6
-          ram-size: ${{ matrix.api == 35 && '2048M' || '' }}
-          heap-size: ${{ matrix.api == 35 && '256M' || '' }}
-          emulator-boot-timeout: 600
-          disable-animations: true
-          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240' || '-no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect' }}
+          name: df08-built-apks-${{ steps.receipt.outputs.source_sha }}
+          path: ${{ runner.temp }}/df08-build/
+          if-no-files-found: error
+          retention-days: 7
+  android:
+    name: Android API${{ matrix.api }} / font ${{ matrix.font_scale }} / 4 widths / real IME
+    needs: source
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        api: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.api == '30' && '[30]' || github.event_name == 'workflow_dispatch' && inputs.api == '35' && '[35]' || '[30,35]') }}
+        # Full QA remains available for release tags and intentional manual runs.
+        font_scale: ${{ fromJSON(github.event_name == 'pull_request' && '["1.0"]' || '["1.0","1.5","2.0"]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: df08-built-apks-${{ needs.source.outputs.source_sha }}
+          path: ${{ runner.temp }}/df08-build
+      - name: Verify immutable build provenance and restore test paths
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ needs.source.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(cat "$RUNNER_TEMP/df08-build/SOURCE_SHA.txt")" = "$EXPECTED_SHA"
+          (cd "$RUNNER_TEMP/df08-build" && sha256sum --check SHA256SUMS)
+          mkdir -p android/app/build/outputs/apk/debug android/app/build/outputs/apk/androidTest/debug
+          cp "$RUNNER_TEMP/df08-build/app-debug.apk" android/app/build/outputs/apk/debug/app-debug.apk
+          cp "$RUNNER_TEMP/df08-build/app-debug-androidTest.apk" android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+      - name: Real Android feature acceptance
+        uses: ./.github/actions/android-emulator
+        env:
+          DF08_EVIDENCE: ${{ runner.temp }}/df08-api-${{ matrix.api }}-font-${{ matrix.font_scale }}
+          DF08_FONT_SCALE: ${{ matrix.font_scale }}
+        with:
+          api: ${{ matrix.api }}
           script: bash tests/android_touch/df08_instrumentation/run_ci.sh
-      - name: Record exact head, no production changes and limits
+      - name: Record exact head and platform limits
         if: always()
         shell: bash
+        env:
+          EVIDENCE: ${{ runner.temp }}/df08-api-${{ matrix.api }}-font-${{ matrix.font_scale }}
         run: |
-          mkdir -p "$RUNNER_TEMP/df08-api-${{ matrix.api }}"
-          git rev-parse HEAD > "$RUNNER_TEMP/df08-api-${{ matrix.api }}/EXACT_SOURCE_SHA.txt"
-          printf 'Android emulator API${{ matrix.api }} only. CDP disabled. Physical handset/TalkBack NOT_TESTED. RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df08-api-${{ matrix.api }}/LIMITS.txt"
-          test "$(git diff --name-only)" = "android/app/build.gradle"
+          set -euo pipefail
+          mkdir -p "$EVIDENCE"
+          git rev-parse HEAD > "$EVIDENCE/EXACT_SOURCE_SHA.txt"
+          printf 'Disposable Android emulator only. PHYSICAL_HANDSET=NOT_TESTED; RELEASE_APPROVED=NO\n' > "$EVIDENCE/LIMITS.txt"
+          git diff --exit-code
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: DF08-real-android-API${{ matrix.api }}-${{ github.sha }}
-          path: ${{ runner.temp }}/df08-api-${{ matrix.api }}/
+          name: df08-real-android-API${{ matrix.api }}-font-${{ matrix.font_scale }}-${{ needs.source.outputs.source_sha }}
+          path: ${{ runner.temp }}/df08-api-${{ matrix.api }}-font-${{ matrix.font_scale }}/
           retention-days: 7
           if-no-files-found: warn

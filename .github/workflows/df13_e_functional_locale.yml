@@ -10,6 +10,9 @@ on:
       - '.github/workflows/df13_e_functional_locale.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   source-and-runtime-parity:
     runs-on: ubuntu-latest

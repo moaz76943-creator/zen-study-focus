@@ -9,6 +9,9 @@ on:
       - '.github/workflows/df05_nature_catalog.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   catalog:
     runs-on: ubuntu-latest

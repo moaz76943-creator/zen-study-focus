@@ -11,6 +11,9 @@ on:
     branches: [fix/df-pr03-quick-config-ack-20261026]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   real-source:
     runs-on: ubuntu-latest

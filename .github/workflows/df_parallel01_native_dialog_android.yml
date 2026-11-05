@@ -67,6 +67,17 @@ jobs:
           node --check tests/android_dialogs/native_js_dialog_android_probe.cjs
           node --check tests/critical_room7/n01_android_ack_probe.cjs
           bash -n tests/android_dialogs/run_native_dialog_device.sh
+      - name: Print exact-source security review digest (audit only, never auto-approve)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = '${{ github.event.pull_request.head.sha || github.sha }}'
+          python3 - <<'PY'
+          from pathlib import Path
+          import runpy
+          module=runpy.run_path('tools/security/track13_codeql_sarif_report.py')
+          print('CODEQL_EXECUTABLE_SOURCE_SHA256='+module['executable_source_digest'](Path('.').resolve()))
+          PY
       - name: Enable CDP for disposable DEBUG APK in runner workspace ONLY
         shell: bash
         run: |
@@ -119,13 +130,13 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_2
-          ram-size: '2048M'
-          heap-size: '256M'
+          ram-size: ${{ matrix.api == 35 && '3072M' || '2048M' }}
+          heap-size: ${{ matrix.api == 35 && '512M' || '256M' }}
           cores: 2
           emulator-boot-timeout: 900
           # Bound guest RAM and software-rendered framebuffer on hosted runners.
           # These dialog/receipt checks do not certify phone width coverage.
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -skin 720x1280 -dpi-device 240
+          emulator-options: ${{ matrix.api == 35 && '-no-window -no-snapshot -noaudio -no-boot-anim -gpu swangle -feature -Vulkan' || '-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -skin 720x1280 -dpi-device 240' }}
           disable-animations: false
           script: |
             bash tests/android_dialogs/run_native_dialog_device.sh

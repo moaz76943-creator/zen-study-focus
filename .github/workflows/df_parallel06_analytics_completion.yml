@@ -8,6 +8,9 @@ on:
       - '.github/workflows/df_parallel06_analytics_completion.yml'
   push:
     branches: [fix/df-parallel06-analytics-completion-20261026]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   analytics-truth:
     runs-on: ubuntu-latest

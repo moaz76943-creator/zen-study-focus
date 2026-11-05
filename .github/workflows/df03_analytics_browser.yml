@@ -13,6 +13,9 @@ on:
       - '.github/workflows/df03_analytics_browser.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   analytics-browser:
     runs-on: ubuntu-24.04

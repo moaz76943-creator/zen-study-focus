@@ -42,3 +42,24 @@ test('Android records exact Notes footer DOM ancestry and real rule match',()=>{
   assert.match(java,/footerAncestor:/);
   assert.match(java,/editorAncestor:/);
 });
+
+
+test('actual Android Notes save survives force-stop and matches both v21 mirror packets',()=>{
+  assert.match(shell,/am force-stop com\.zenstudy\.focus/);
+  assert.match(shell,/stage verify -e width/);
+  assert.match(shell,/df08_reopen=PASS/);
+  assert.match(java,/DF08_NOTES_REOPEN_PASS/);
+  assert.match(java,/DeepFocusDataCompatV21/);
+  assert.match(java,/storedMatches/);
+  assert.match(java,/mirrorOk/);
+  assert.doesNotMatch(shell,/pm clear com\.zenstudy\.focus.*reopen/);
+});
+
+test('Android 15 WebView physically stays within system-bar insets, without opting out',()=>{
+ const native=fs.readFileSync(path.join(dir,'../../../android/app/src/main/java/com/zenstudy/focus/MainActivity.java'),'utf8');
+ assert.match(native,/Build\.VERSION\.SDK_INT\s*>=\s*35/);
+ assert.match(native,/WindowInsets\.Type\.systemBars\(\)/);
+ assert.match(native,/setMargins\(bars\.left,bars\.top,bars\.right,bars\.bottom\)/);
+ assert.match(native,/requestApplyInsets\(\)/);
+ assert.doesNotMatch(native,/windowOptOutEdgeToEdgeEnforcement/);
+});
