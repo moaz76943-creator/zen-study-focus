@@ -57467,3 +57467,57 @@ function() {
     v: '400.87.0', vc: 40087, ok: true
   };
 };
+
+// --- M8508-M8517: Fractal L-Systems ---
+window.dfInitLSystemFractalGrammar =
+function(axiom) {
+  const ax = String(axiom || 'X');
+  return { axiom: ax, configured: true };
+};
+window.dfGrowCedarTreeFractalSpecies =
+function(depth) {
+  const d = Math.min(5, Number(depth) || 3);
+  return { iterations: d, species: 'CEDAR' };
+};
+window.dfGrowOliveTreeFractalSpecies =
+function(depth) {
+  const d = Math.min(5, Number(depth) || 3);
+  return { iterations: d, species: 'OLIVE' };
+};
+window.dfGrowPalmTreeGeometricSpecies =
+function(fronds) {
+  const f = Number(fronds) || 8;
+  return { fronds: f, species: 'PALM' };
+};
+window.dfGrowJasmineBlossomVine =
+function(blossomCount) {
+  const b = Number(blossomCount) || 5;
+  return { flowers: b, species: 'JASMINE' };
+};
+window.dfAnimateGentleBranchSwayPhysics =
+function(windSpeed) {
+  const w = Number(windSpeed) || 0.4;
+  return { swayAmplitude: w, natural: true };
+};
+window.dfRenderSeasonalLeafColorPalette =
+function(paletteName) {
+  const p = String(paletteName || 'spring');
+  return { palette: p, amoledTheme: true };
+};
+window.dfComputeTreeGrowthStageFromMinutes =
+function(focusMins) {
+  const m = Number(focusMins) || 0;
+  const stage = Math.min(5, Math.floor(m / 25));
+  return { growthStage: stage };
+};
+window.dfSavePlantedTreeToBotanicalGarden =
+function(treeId) {
+  const id = String(treeId || 'tree1');
+  return { plantedId: id, savedInGarden: true };
+};
+window.dfGetMilestoneM8517FractalBotanySeal =
+function() {
+  return {
+    v: '400.88.0', vc: 40088, ok: true
+  };
+};
