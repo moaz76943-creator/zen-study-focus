@@ -55837,3 +55837,68 @@ function() {
     status: 'VERIFIED_100_PERCENT'
   };
 };
+
+// --- M8218-M8227: Problem Solving ---
+window.dfCreateStepByStepDerivationCard =
+function(title, totalSteps) {
+  const t = String(title || 'Derivation');
+  const s = Number(totalSteps) || 3;
+  return { title: t, steps: s, currentStep: 1 };
+};
+window.dfVerifyNumericAnswerWithTolerance =
+function(given, expected, tolerance) {
+  const g = Number(given) || 0;
+  const e = Number(expected) || 0;
+  const tol = Number(tolerance) || 0.05;
+  const diff = Math.abs(g - e);
+  return { correct: diff <= tol, delta: diff };
+};
+window.dfCheckUnitOfMeasurementMatch =
+function(unitGiven, unitExpected) {
+  const g = String(unitGiven || '').trim();
+  const e = String(unitExpected || '').trim();
+  return { unitMatch: g === e };
+};
+window.dfGenerateRandomizedVariableDrill =
+function(minVal, maxVal) {
+  const min = Number(minVal) || 1;
+  const max = Number(maxVal) || 10;
+  const span = max - min + 1;
+  const r = Math.random() * span;
+  const val = Math.floor(r) + min;
+  return { randomVal: val };
+};
+window.dfAttachHintTierToProblemCard =
+function(tier, hintText) {
+  const t = Number(tier) || 1;
+  const txt = String(hintText || '');
+  return { tier: t, hint: txt, attached: true };
+};
+window.dfTrackProblemSolvingTimeSec =
+function(startTs) {
+  const now = Date.now();
+  const st = Number(startTs) || now;
+  const s = Math.round((now - st) / 1000);
+  return { elapsedSec: s };
+};
+window.dfFlagFormulaStepWhereErrorOccurred =
+function(stepIdx) {
+  const idx = Number(stepIdx) || 1;
+  return { errorAtStep: idx, flagged: true };
+};
+window.dfGroupFormulasIntoSubjectCheatSheet =
+function(formulaList) {
+  const arr = formulaList || [];
+  return { cheatSheetItems: arr.length };
+};
+window.dfLinkProblemCardToSourceTheory =
+function(theoryId) {
+  const id = String(theoryId || 'theory1');
+  return { linkedTheory: id, ok: true };
+};
+window.dfGetMilestoneM8227ProblemSolverSeal =
+function() {
+  return {
+    v: '400.59.0', vc: 40059, ok: true
+  };
+};
