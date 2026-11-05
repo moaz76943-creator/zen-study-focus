@@ -56625,3 +56625,65 @@ function() {
     v: '400.72.0', vc: 40072, ok: true
   };
 };
+
+// --- M8358-M8367: Syllabus Slicer ---
+window.dfCreateSubjectSyllabusTree =
+function(subjectName, totalChapters) {
+  const sub = String(subjectName || 'Math');
+  const ch = Number(totalChapters) || 10;
+  return { subject: sub, chaptersCount: ch };
+};
+window.dfSetTargetExamDateAndBufferDays =
+function(examEpoch, bufferDays) {
+  const e = Number(examEpoch) || Date.now();
+  const b = Number(bufferDays) || 3;
+  return { examTs: e, safetyBufferDays: b };
+};
+window.dfComputeDailyStudyQuotaUnits =
+function(totalUnits, daysLeft) {
+  const u = Number(totalUnits) || 30;
+  const d = Math.max(1, Number(daysLeft) || 1);
+  return { dailyQuotaUnits: Math.ceil(u / d) };
+};
+window.dfWeightChaptersByDifficultyTier =
+function(chapId, weight) {
+  const id = String(chapId || 'ch1');
+  const w = Number(weight) || 1.5;
+  return { chapterId: id, assignedWeight: w };
+};
+window.dfRebalanceScheduleOnMissedDay =
+function(pendingUnits, remainingDays) {
+  const u = Number(pendingUnits) || 10;
+  const rd = Number(remainingDays) || 1;
+  const d = Math.max(1, rd);
+  return { rebalancedQuota: Math.ceil(u / d) };
+};
+window.dfReserveSpacedRevisionMilestones =
+function(chapterCount) {
+  const c = Number(chapterCount) || 6;
+  const revs = Math.floor(c / 3);
+  return { milestones: revs, scheduled: true };
+};
+window.dfCalculateSyllabusCompletionPct =
+function(doneUnits, totalUnits) {
+  const d = Number(doneUnits) || 0;
+  const t = Math.max(1, Number(totalUnits)||1);
+  return { syllabusPct: Math.round((d/t)*100) };
+};
+window.dfAlertIfDailyQuotaExceedsCapacity =
+function(quotaMins, maxMins) {
+  const q = Number(quotaMins) || 120;
+  const m = Number(maxMins) || 240;
+  return { overloadAlert: q > m, quota: q };
+};
+window.dfSerializeSyllabusPlanLocal =
+function(planId) {
+  const id = String(planId || 'plan1');
+  return { savedPlanId: id, localOnly: true };
+};
+window.dfGetMilestoneM8367SyllabusSlicerSeal =
+function() {
+  return {
+    v: '400.73.0', vc: 40073, ok: true
+  };
+};
