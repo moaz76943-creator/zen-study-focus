@@ -57680,3 +57680,58 @@ function() {
     v: '400.91.0', vc: 40091, ok: true
   };
 };
+
+// --- M8548-M8557: Study Wrapped Stories ---
+window.dfCompileWeeklyStudyWrappedData =
+function(totalHours, topSub) {
+  const th = Number(totalHours) || 15;
+  const ts = String(topSub || 'Math');
+  return { weeklyHours: th, topSubject: ts };
+};
+window.dfRenderStorySlideTotalHours =
+function(hours, delta) {
+  const h = Number(hours) || 15;
+  const d = Number(delta) || 2;
+  return { hours: h, growthHours: d };
+};
+window.dfRenderStorySlideTopSubject =
+function(subject, mastery) {
+  const s = String(subject || 'Math');
+  const m = Number(mastery) || 90;
+  return { slide2Subject: s, masteryPct: m };
+};
+window.dfRenderStorySlideMemoryStrength =
+function(retainedCount) {
+  const r = Number(retainedCount) || 50;
+  return { retainedCount: r, card: true };
+};
+window.dfRenderStorySlidePeakChronotype =
+function(peakHour) {
+  const ph = Number(peakHour) || 10;
+  return { goldenHour: ph, chronotype: true };
+};
+window.dfGenerateNextWeekActionableGoal =
+function(goalHours) {
+  const gh = Number(goalHours) || 20;
+  return { targetHours: gh, locked: true };
+};
+window.dfExportWeeklySummaryCardPng =
+function() {
+  return { cardFormat: 'png', exported: true };
+};
+window.dfCompileYearlyMonumentalReview =
+function(yearTotalHours) {
+  const yh = Number(yearTotalHours) || 500;
+  return { yearlyHours: yh, monumental: true };
+};
+window.dfArchiveWrappedReportsHistory =
+function(reportId) {
+  const id = String(reportId || 'w1');
+  return { reportId: id, savedLocal: true };
+};
+window.dfGetMilestoneM8557StudyWrappedSeal =
+function() {
+  return {
+    v: '400.92.0', vc: 40092, ok: true
+  };
+};
