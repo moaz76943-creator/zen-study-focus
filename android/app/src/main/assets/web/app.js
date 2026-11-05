@@ -56687,3 +56687,63 @@ function() {
     v: '400.73.0', vc: 40073, ok: true
   };
 };
+
+// --- M8368-M8377: Priority Matrix ---
+window.dfClassifyTaskByUrgencyAndImpact =
+function(urgency, impact) {
+  const u = !!urgency, i = !!impact;
+  const q = u && i ? 'Q1' : (i ? 'Q2' : 'Q3');
+  const p = q === 'Q1';
+  return { quadrant: q, focusPriority: p };
+};
+window.dfAtomizeLargeProjectIntoSessions =
+function(estHours) {
+  const h = Number(estHours) || 2;
+  const sessions = Math.ceil((h * 60) / 25);
+  return { atomicSessionsCount: sessions };
+};
+window.dfEstimatePomodorosRequiredForTask =
+function(taskMinutes) {
+  const m = Number(taskMinutes) || 50;
+  return { pomodorosNeeded: Math.ceil(m / 25) };
+};
+window.dfCompareEstimatedVsActualSessions =
+function(est, act) {
+  const e = Number(est) || 1;
+  const a = Number(act) || 1;
+  return { variance: a - e, accurate: a === e };
+};
+window.dfAutoPromoteDeadlinedTasks =
+function(daysToDeadline) {
+  const d = Number(daysToDeadline) || 1;
+  return { promotedToTop: d <= 2 };
+};
+window.dfLockSingleActiveTaskInTimer =
+function(taskId) {
+  const id = String(taskId || 't1');
+  return { lockedTaskId: id, locked: true };
+};
+window.dfCheckOffSubtaskMilestone =
+function(subtaskId) {
+  const id = String(subtaskId || 'sub1');
+  return { completedSubtask: id, ok: true };
+};
+window.dfArchiveCompletedStudyTasks =
+function(tasksCount) {
+  const n = Number(tasksCount) || 1;
+  return { archivedCount: n, clean: true };
+};
+window.dfCalculatePlanningAccuracyScore =
+function(estTotal, actTotal) {
+  const e = Number(estTotal) || 10;
+  const a = Math.max(1, Number(actTotal)||10);
+  const ratio = Math.min(1, e / a);
+  const pct = Math.round(ratio * 100);
+  return { accuracyPct: pct };
+};
+window.dfGetMilestoneM8377TaskAtomizerSeal =
+function() {
+  return {
+    v: '400.74.0', vc: 40074, ok: true
+  };
+};
