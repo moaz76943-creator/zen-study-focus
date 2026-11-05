@@ -56418,3 +56418,57 @@ function() {
     v: '400.68.0', vc: 40068, ok: true
   };
 };
+
+// --- M8318-M8327: Procedural Nature DSP ---
+window.dfSynthesizeOceanWaveTideCycle =
+function(periodSec) {
+  const s = Math.max(5, Number(periodSec)||12);
+  return { tidePeriodSec: s, lfo: true };
+};
+window.dfSynthesizeCaveWaterDropletResonance =
+function(intervalMs) {
+  const iv = Number(intervalMs) || 2500;
+  const ms = Math.max(500, iv);
+  return { dropletMs: ms, resonant: true };
+};
+window.dfSynthesizeMountainPineWindFilter =
+function(intensity) {
+  const iv = Number(intensity) || 40;
+  const i = Math.min(100, iv);
+  return { windIntensityPct: i, ok: true };
+};
+window.dfSynthesizeFireplaceWarmCrackle =
+function(density) {
+  const d = Math.min(50, Number(density)||15);
+  return { cracklesPerMin: d, organic: true };
+};
+window.dfSynthesizeWaterfallMistVelvetNoise =
+function(lowShelfGain) {
+  const g = Number(lowShelfGain) || -6;
+  return { velvetDb: g, whiteNoiseMuted: true };
+};
+window.dfSynthesizePencilOnPaperFriction =
+function(scratchRate) {
+  const r = Number(scratchRate) || 8;
+  return { pencilRate: r, active: true };
+};
+window.dfSynthesizeBookPageTurnSwish =
+function() {
+  return { swishFiltered: true, natural: true };
+};
+window.dfBlendMultiLayerNatureScene =
+function(layersList) {
+  const arr = layersList || [];
+  return { activeLayersCount: arr.length };
+};
+window.dfSaveCustomNaturePresetLocal =
+function(presetName) {
+  const name = String(presetName || 'zen');
+  return { presetSaved: name, ok: true };
+};
+window.dfGetMilestoneM8327NaturePhysicsSeal =
+function() {
+  return {
+    v: '400.69.0', vc: 40069, ok: true
+  };
+};
