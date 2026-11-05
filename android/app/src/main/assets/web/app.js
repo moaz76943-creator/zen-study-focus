@@ -57521,3 +57521,55 @@ function() {
     v: '400.88.0', vc: 40088, ok: true
   };
 };
+
+// --- M8518-M8527: Sanctuary Canvas ---
+window.dfRenderIsoGridBotanicalSanctuary =
+function() {
+  return { isoGrid: true, amoledBg: '#000' };
+};
+window.dfPlaceEarnedTreesOnSanctuaryGrid =
+function(treeCount) {
+  const n = Number(treeCount) || 1;
+  return { placedTrees: n, layoutGrid: true };
+};
+window.dfRenderStarlightConstellationSky =
+function(totalHours) {
+  const h = Number(totalHours) || 10;
+  const stars = Math.floor(h / 10);
+  return { starlight: stars, sky: true };
+};
+window.dfRenderFlowingWaterStreamCanvas =
+function(streakDays) {
+  const s = Number(streakDays) || 0;
+  const st = s >= 7;
+  return { streamActive: st, flow: 1.0 };
+};
+window.dfInspectTreeSessionDetailsOnTap =
+function(treeId) {
+  const id = String(treeId || 'tree1');
+  return { treeId: id, detailsShown: true };
+};
+window.dfFilterSanctuaryViewBySubject =
+function(subject) {
+  const sub = String(subject || 'all');
+  return { activeSubjectFilter: sub };
+};
+window.dfRenderTimelapseGardenGrowth =
+function(frameCount) {
+  const f = Number(frameCount) || 30;
+  return { timelapseFrames: f, playing: true };
+};
+window.dfOptimizeSanctuaryCanvas60Fps =
+function() {
+  return { targetFps: 60, lowPower: true };
+};
+window.dfExportSanctuaryHighResPoster =
+function() {
+  return { mime: 'image/png', scale: 2.0 };
+};
+window.dfGetMilestoneM8527SanctuarySeal =
+function() {
+  return {
+    v: '400.89.0', vc: 40089, ok: true
+  };
+};
