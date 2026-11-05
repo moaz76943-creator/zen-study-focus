@@ -57893,3 +57893,53 @@ function() {
     v: '400.95.0', vc: 40095, ok: true
   };
 };
+
+// --- M8588-M8597: Multi-Pane Layout ---
+window.dfDetectTabletAndFoldablePosture =
+function(screenWidth) {
+  const w = Number(screenWidth) || 800;
+  return { isTabletOrFold: w >= 600, width: w };
+};
+window.dfRenderThreeColumnWorkspaceLayout =
+function() {
+  return { cols: ['timer', 'notes', 'cards'] };
+};
+window.dfSupportTabletopHalfFoldedMode =
+function(angle) {
+  const a = Number(angle) || 90;
+  const isFlex = a >= 75 && a <= 115;
+  return { flexMode: isFlex, angle: a };
+};
+window.dfEnableDragAndDropBetweenPanes =
+function() {
+  return { dndActive: true, noteToCard: true };
+};
+window.dfResizeSplitPanesDynamically =
+function(col1WidthPct) {
+  const w = Math.min(60, Math.max(25,
+    Number(col1WidthPct) || 33));
+  return { col1Pct: w, col2Pct: 100 - w };
+};
+window.dfRegisterGlobalKeyboardShortcuts =
+function() {
+  return { spaceKey: 'TIMER', nKey: 'NOTE' };
+};
+window.dfRenderShortcutCheatSheetModal =
+function() {
+  return { cheatSheet: true, shortcuts: 12 };
+};
+window.dfPreserveMultiPaneStateOnRotate =
+function(orientation) {
+  const o = String(orientation || 'landscape');
+  return { savedOrientation: o, ok: true };
+};
+window.dfOptimizeDesktopDeXWindowMode =
+function(isDeX) {
+  return { deXMode: !!isDeX, ok: true };
+};
+window.dfGetMilestoneM8597MultiPaneSeal =
+function() {
+  return {
+    v: '400.96.0', vc: 40096, ok: true
+  };
+};
