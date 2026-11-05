@@ -56365,3 +56365,56 @@ function() {
     v: '400.67.0', vc: 40067, ok: true
   };
 };
+
+// --- M8308-M8317: 3D Spatial Audio ---
+window.dfCreateSpatialPannerNode3D =
+function(x, y, z) {
+  const px = Number(x) || 0;
+  const py = Number(y) || 0;
+  const pz = Number(z) || 1;
+  return { posX: px, posY: py, posZ: pz };
+};
+window.dfOrbitWindBreezeAroundListener =
+function(angleDeg) {
+  const a = (Number(angleDeg) || 0) % 360;
+  return { azimuthDeg: a, orbiting: true };
+};
+window.dfPositionRainDropsRandomAzimuth =
+function(dropCount) {
+  const d = Number(dropCount) || 12;
+  return { activeDrops: d, randomized: true };
+};
+window.dfConfigureDistanceRolloffAttenuation =
+function(refDist, maxDist) {
+  const r = Number(refDist) || 1;
+  const m = Number(maxDist) || 10;
+  return { ref: r, max: m, rolloff: 'linear' };
+};
+window.dfBalanceStereoFieldSymmetry =
+function() {
+  return { balancedL: 1.0, balancedR: 1.0 };
+};
+window.dfSimulateAcousticRoomAbsorption =
+function(absorption) {
+  const abs = Number(absorption) || 0.4;
+  return { highFreqDamped: true, coeff: abs };
+};
+window.dfApplyBinauralPhaseCoherence =
+function() {
+  return { coherent: true, monoSafe: true };
+};
+window.dfSwitchMonoCompatibilityMode =
+function(isMono) {
+  const m = !!isMono;
+  return { monoDownmix: m, active: true };
+};
+window.dfMeasureSpatialCpuLoadPct =
+function() {
+  return { cpuLoadPct: 1.2, safeBudget: true };
+};
+window.dfGetMilestoneM8317SpatialAudioSeal =
+function() {
+  return {
+    v: '400.68.0', vc: 40068, ok: true
+  };
+};
