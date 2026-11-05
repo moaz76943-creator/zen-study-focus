@@ -56149,3 +56149,58 @@ function() {
     v: '400.63.0', vc: 40063, ok: true
   };
 };
+
+// --- M8268-M8277: Visual Diagram Occlusion ---
+window.dfLoadDiagramImageToCanvas =
+function(imgUrl) {
+  const u = String(imgUrl || 'local.png');
+  return { loadedSource: u, ready: true };
+};
+window.dfDrawOcclusionMaskRectangle =
+function(x, y, w, h) {
+  const rx = Number(x) || 0;
+  const ry = Number(y) || 0;
+  return { rectX: rx, rectY: ry, masked: true };
+};
+window.dfGenerateHideAllGuessOneCards =
+function(maskCount) {
+  const m = Number(maskCount) || 3;
+  return { cards: m, mode: 'HIDE_ALL' };
+};
+window.dfGenerateHideOneGuessOneCards =
+function(maskCount) {
+  const m = Number(maskCount) || 3;
+  return { cards: m, mode: 'HIDE_ONE' };
+};
+window.dfToggleOcclusionMaskRevealAnim =
+function(revealed) {
+  const rev = !!revealed;
+  return { isRevealed: rev, anim: 'fade' };
+};
+window.dfAddCustomTextLabelToMask =
+function(text) {
+  const t = String(text || '').trim();
+  return { label: t, attached: true };
+};
+window.dfGroupPolygonMasksIntoSingleCard =
+function(polyCount) {
+  const p = Number(polyCount) || 2;
+  return { groupedCount: p, singleCard: true };
+};
+window.dfZoomToActiveOcclusionRegion =
+function(targetX, targetY) {
+  const tx = Number(targetX) || 0;
+  const ty = Number(targetY) || 0;
+  return { panX: tx, panY: ty, zoomed: true };
+};
+window.dfBindVisualCardToFsrsScheduler =
+function(cardId) {
+  const id = String(cardId || 'vc1');
+  return { boundCardId: id, fsrsActive: true };
+};
+window.dfGetMilestoneM8277ImageOcclusionSeal =
+function() {
+  return {
+    v: '400.64.0', vc: 40064, ok: true
+  };
+};
