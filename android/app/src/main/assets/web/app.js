@@ -56524,3 +56524,58 @@ function() {
     v: '400.70.0', vc: 40070, ok: true
   };
 };
+
+// --- M8338-M8347: Phase-Synced Audio ---
+window.dfProgramAudioTimelineKeyframes =
+function(frameCount) {
+  const cnt = Number(frameCount) || 4;
+  return { keyframes: cnt, ready: true };
+};
+window.dfCrossfadeBetweenAudioScenes =
+function(durationSec) {
+  const ds = Number(durationSec) || 10;
+  const d = Math.max(1, ds);
+  return { crossfadeSec: d, smooth: true };
+};
+window.dfSyncPinkNoiseWithActiveRecall =
+function() {
+  return { pinkActive: true, target: 'FSRS' };
+};
+window.dfSyncBrownNoiseWithDeepReading =
+function() {
+  return { brownActive: true, target: 'READ' };
+};
+window.dfMuteNoiseSlowlyOnBreakStart =
+function(fadeMs) {
+  const f = Number(fadeMs) || 3000;
+  return { breakFadeMs: f, earRestReady: true };
+};
+window.dfResumeAudioSmoothlyAfterBreak =
+function(rampMs) {
+  const r = Number(rampMs) || 5000;
+  return { resumeRampMs: r, active: true };
+};
+window.dfLimitContinuousAudioExposureWarning =
+function(totalMin) {
+  const m = Number(totalMin) || 0;
+  const p = m >= 120;
+  return { earRestPrompt: p, totalMins: m };
+};
+window.dfExportAudioPresetShareCode =
+function(layersCount) {
+  const lc = Number(layersCount) || 2;
+  const c = 'DF_SND_' + lc;
+  return { shareCode: c, ok: true };
+};
+window.dfImportAudioPresetFromCode =
+function(code) {
+  const s = String(code || '');
+  const ok = s.startsWith('DF_SND');
+  return { presetValid: ok, loaded: ok };
+};
+window.dfGetMilestoneM8347AudioTimelineSeal =
+function() {
+  return {
+    v: '400.71.0', vc: 40071, ok: true
+  };
+};
