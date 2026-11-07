@@ -3150,14 +3150,33 @@ function renderSelectedDateAgenda() {
   dayTasks.forEach(t => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(String(t.title || ''))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>`;
+
+    const spanTitle = document.createElement('span');
+    spanTitle.textContent = `${t.done ? '✅' : '📋'} ${String(t.title || '')}`;
+    item.appendChild(spanTitle);
+
+    const spanCat = document.createElement('span');
+    spanCat.style.cssText = 'color:var(--text-muted); font-size:0.7rem;';
+    spanCat.textContent = toWest(getCatLabel(t.catKey));
+    item.appendChild(spanCat);
+
     box.appendChild(item);
   });
 
   dayNotes.forEach(n => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#fffbeb; border-right:4px solid #f59e0b; font-size:0.8rem;';
-    item.innerHTML = `<div style="font-weight:900;">📝 ${escapeHtmlText(String(n.title || ''))}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${escapeHtmlText(String(n.body || ''))}</div>`;
+
+    const divTitle = document.createElement('div');
+    divTitle.style.cssText = 'font-weight:900;';
+    divTitle.textContent = `📝 ${String(n.title || '')}`;
+    item.appendChild(divTitle);
+
+    const divBody = document.createElement('div');
+    divBody.style.cssText = 'color:var(--text-muted); font-size:0.74rem; margin-top:3px;';
+    divBody.textContent = String(n.body || '');
+    item.appendChild(divBody);
+
     box.appendChild(item);
   });
 }
