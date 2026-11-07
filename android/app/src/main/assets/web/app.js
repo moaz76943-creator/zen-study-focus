@@ -2796,7 +2796,7 @@ function selectTimerMode(mins, modeKey, btn) {
   timerTotal = mins * 60;
   timerLeft = timerTotal;
   if (btn) {
-    btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
+    btn.parentElement.querySelector('.active')?.classList.remove('active');
     btn.classList.add('active');
   }
   timerSessionId = null;
@@ -2986,7 +2986,7 @@ let taskFilterStatus = 'all';
 
 function filterTasksByStatus(st, btn) {
   taskFilterStatus = st;
-  btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
+  btn.parentElement.querySelector('.active')?.classList.remove('active');
   btn.classList.add('active');
   renderTasksList();
 }
@@ -3179,7 +3179,7 @@ function getNoteTagLabel(k) {
 
 function filterNotesByTag(tag, btn) {
   noteTagFilter = tag;
-  btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
+  btn.parentElement.querySelector('.active')?.classList.remove('active');
   btn.classList.add('active');
   renderNotesStack();
 }
@@ -3453,7 +3453,7 @@ function stopAllAudio() {
 
 function filterSoundsByCat(cat, btn) {
   soundCat = cat;
-  btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
+  btn.parentElement.querySelector('.active')?.classList.remove('active');
   btn.classList.add('active');
   renderSoundsStudio();
 }
