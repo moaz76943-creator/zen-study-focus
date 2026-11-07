@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '../..');
 const app = fs.readFileSync(path.join(root,'android/app/src/main/assets/web/app.js'),'utf8');
 const main = fs.readFileSync(path.join(root,'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'),'utf8');
 test('untrusted user text is escaped before legacy task/note HTML interpolation',()=>{
-  const start = app.indexOf('function escapeHtmlText(value) {');
+  const start = app.indexOf('function escapeHtmlText(s) {');
   assert.ok(start>=0, 'render-safe encoder required');
   const end = app.indexOf('\n}',start);
   assert.ok(end>start, 'encoder function boundary required');
