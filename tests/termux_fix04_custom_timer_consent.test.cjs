@@ -15,7 +15,7 @@ function setup({quick=false,allow=false,running=true,pauseAck=true,modeAck=true}
   const fields={
     inpCustomMins:{value:'40'},
     inpCustomTitle:{value:'New project'},
-    modeCustomBtn:{classList:{add(){}},parentElement:{querySelectorAll(){return []}}}
+    modeCustomBtn:{classList:{add(){}},parentElement:{querySelector(){return null}}}
   };
   const sandbox={
     window:{confirm(){prompts++;return allow;}},
