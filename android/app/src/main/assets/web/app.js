@@ -58194,3 +58194,103 @@ function() {
     v: '410.4.0', vc: 41004, ok: true
   };
 };
+// === DEEP FOCUS VERIFIED ENGINE FUNCTIONS ===
+function dfLinkTaskToActiveSession(id){
+if(!id)return{linked:false};try{const k='df_active_session_v1';
+const r=typeof localStorage!=='undefined'?localStorage.getItem(k):null;
+const o=r?JSON.parse(r):{active:true};o.linkedTaskId=String(id);
+o.linkedAt=new Date().toISOString();
+if(typeof localStorage!=='undefined')localStorage.setItem(k,JSON.stringify(o));
+return{linked:true,taskId:String(id)};}catch(e){return{linked:false};}}
+function dfRecordSessionFocusOnTask(id,m,d){
+if(!id||typeof m!=='number')return{updated:false};try{const k='df_tasks_v1';
+const r=typeof localStorage!=='undefined'?localStorage.getItem(k):null;
+const l=r?JSON.parse(r):[];let it=null;for(let i=0;i<l.length;i++){
+if(String(l[i].id)===String(id)){it=l[i];break;}}if(!it)return{updated:false};
+it.focusedMinutes=(it.focusedMinutes||0)+Math.max(0,Math.round(m));
+if(d===true)it.status='completed';it.updatedAt=new Date().toISOString();
+if(typeof localStorage!=='undefined')localStorage.setItem(k,JSON.stringify(l));
+return{updated:true,total:it.focusedMinutes};}catch(e){return{updated:false};}}
+function dfGenerateTasksFromNoteCues(nid){
+if(!nid)return{createdCount:0,taskIds:[]};try{const rN=typeof localStorage!=='undefined'?
+localStorage.getItem('df_notes_v1'):null;const nl=rN?JSON.parse(rN):[];
+let n=null;for(let i=0;i<nl.length;i++){if(String(nl[i].id)===String(nid)){n=nl[i];break;}}
+if(!n)return{createdCount:0,taskIds:[]};const cues=[];if(Array.isArray(n.cues))cues.push(...n.cues);
+const NL=String.fromCharCode(10);const t=[n.cuesText||'',n.body||'',n.content||''].join(NL);
+for(const l of t.split(NL)){const x=l.trim();if(x.startsWith('- [ ]'))cues.push(x.slice(5).trim());
+else if(x.startsWith('[ ]'))cues.push(x.slice(3).trim());}if(!cues.length)return{createdCount:0,taskIds:[]};
+const rT=typeof localStorage!=='undefined'?localStorage.getItem('df_tasks_v1'):null;
+const tl=rT?JSON.parse(rT):[];const ids=[];const iso=new Date().toISOString();
+for(let i=0;i<cues.length;i++){const tid='task_cue_'+Date.now()+'_'+i;
+tl.push({id:tid,title:cues[i],sourceNoteId:String(nid),status:'pending',focusedMinutes:0,createdAt:iso});
+ids.push(tid);}if(typeof localStorage!=='undefined')localStorage.setItem('df_tasks_v1',JSON.stringify(tl));
+return{createdCount:ids.length,taskIds:ids};}catch(e){return{createdCount:0,taskIds:[]};}}
+function dfGetActiveSessionLinkedTask(){
+try{const kS='df_active_session_v1';const rS=typeof localStorage!=='undefined'?localStorage.getItem(kS):null;
+const s=rS?JSON.parse(rS):null;if(!s||!s.linkedTaskId)return null;const kT='df_tasks_v1';
+const rT=typeof localStorage!=='undefined'?localStorage.getItem(kT):null;const tl=rT?JSON.parse(rT):[];
+for(let i=0;i<tl.length;i++){if(String(tl[i].id)===String(s.linkedTaskId))return tl[i];}
+return null;}catch(e){return null;}}
+function dfComputeOptimalBreakPacing(){
+try{const kH='df_session_history_v1';const raw=typeof localStorage!=='undefined'?localStorage.getItem(kH):null;
+const h=raw?JSON.parse(raw):[];const d=new Date().toISOString().slice(0,10);
+const ts=h.filter(x=>(x.completedAt||x.date||'').startsWith(d));let tf=0,tb=0,cb=0;
+for(let i=ts.length-1;i>=0;i--){const s=ts[i];if(s.mode==='focus'||!s.mode){tf+=(s.durationMinutes||s.minutes||25);cb++;}
+else{tb+=(s.durationMinutes||s.minutes||5);break;}}const sh=tf/60;const rf=(cb*0.18)+(sh*0.12)-(tb*0.04);
+const fi=Math.max(0,Math.min(1.0,Math.round(rf*100)/100));let bm=5,pace='light';
+if(fi>=0.70||cb>=4){bm=20;pace='deep_recovery';}else if(fi>=0.40||cb>=2){bm=10;pace='moderate';}
+const rec={fatigueIndex:fi,consecutiveBlocks:cb,totalFocusMins:tf,recommendedBreakMinutes:bm,paceLevel:pace,evaluatedAt:new Date().toISOString()};
+if(typeof localStorage!=='undefined')localStorage.setItem('df_break_pacing_v1',JSON.stringify(rec));return rec;
+}catch(e){return{fatigueIndex:0,recommendedBreakMinutes:5,paceLevel:'light'};}}
+function dfComputeTagHourlyDistribution(){
+try{const kH='df_session_history_v1';const raw=typeof localStorage!=='undefined'?localStorage.getItem(kH):null;
+const h=raw?JSON.parse(raw):[];const m=new Array(24).fill(0);const tm={};let tot=0;
+for(let i=0;i<h.length;i++){const s=h[i];if(s.mode==='focus'||!s.mode){const mins=s.durationMinutes||s.minutes||25;
+const dt=s.completedAt?new Date(s.completedAt):(s.date?new Date(s.date):new Date());const hr=dt.getHours();
+if(hr>=0&&hr<24){m[hr]+=mins;tot+=mins;const tg=(s.subject||s.tag||'عام').trim();tm[tg]=(tm[tg]||0)+mins;}}}
+let ph=0,pm=0;for(let i=0;i<24;i++){if(m[i]>pm){pm=m[i];ph=i;}}const res={hourlyMatrix:m,peakHour:ph,peakMins:pm,totalMinutes:tot,tagMap:tm,computedAt:new Date().toISOString()};
+if(typeof localStorage!=='undefined')localStorage.setItem('df_hourly_focus_distribution_v1',JSON.stringify(res));return res;
+}catch(e){return{hourlyMatrix:new Array(24).fill(0),peakHour:0,peakMins:0,totalMinutes:0,tagMap:{}};}}
+function dfComputeRetentionVelocity(){
+try{const rC=typeof localStorage!=='undefined'?localStorage.getItem('df_cards_v1'):null;const cards=rC?JSON.parse(rC):[];
+let sumR=0,due=0,active=0;const now=Date.now();for(let i=0;i<cards.length;i++){const c=cards[i];if(c.deleted)continue;
+active++;const st=Math.max(1,c.stability||1);const lr=c.lastReview;const last=lr?new Date(lr).getTime():now;
+const elDays=Math.max(0,(now-last)/86400000);const r=Math.pow(0.9,elDays/st);sumR+=r;if(elDays>=st)due++;}
+const avgR=active>0?Math.round((sumR/active)*100):100;const res={activeCards:active,dueCount:due,retentionRate:avgR,status:avgR>=85?'optimal':'needs_review',updatedAt:new Date().toISOString()};
+if(typeof localStorage!=='undefined')localStorage.setItem('df_retention_velocity_v1',JSON.stringify(res));return res;
+}catch(e){return{activeCards:0,dueCount:0,retentionRate:100,status:'optimal'};}}
+function dfEvalDailyMilestones(){
+try{const kT='df_daily_targets_v1';const rT=typeof localStorage!=='undefined'?localStorage.getItem(kT):null;
+const cfg=rT?JSON.parse(rT):{};const tgtM=cfg.targetMins||120;const tgtB=cfg.targetBlocks||4;const kH='df_session_history_v1';
+const rH=typeof localStorage!=='undefined'?localStorage.getItem(kH):null;const h=rH?JSON.parse(rH):[];
+const today=new Date().toISOString().slice(0,10);let curM=0,curB=0;for(let i=0;i<h.length;i++){const s=h[i];
+const d=(s.completedAt||s.date||'').slice(0,10);if(d===today&&(s.mode==='focus'||!s.mode)){curM+=(s.durationMinutes||s.minutes||25);curB++;}}
+const pct=Math.min(100,Math.round((curM/tgtM)*100));const st=pct>=100?'achieved':(pct>0?'in_progress':'pending');
+const res={focusedMins:curM,targetMins:tgtM,percent:pct,blocksCount:curB,targetBlocks:tgtB,status:st,evaluatedAt:new Date().toISOString()};
+if(typeof localStorage!=='undefined'){localStorage.setItem('df_daily_progress_v1',JSON.stringify(res));}return res;
+}catch(e){return{focusedMins:0,targetMins:120,percent:0,blocksCount:0,targetBlocks:4,status:'pending'};}}
+function dfComputeFocusMomentum(){
+try{const kH='df_session_history_v1';const rH=typeof localStorage!=='undefined'?localStorage.getItem(kH):null;
+const h=rH?JSON.parse(rH):[];const now=Date.now();const d1=86400000;let m0=0,m1=0,m2=0;for(let i=0;i<h.length;i++){
+const s=h[i];if(s.mode!=='focus'&&s.mode)continue;const t=s.completedAt?new Date(s.completedAt).getTime():now;
+const diff=now-t;const mins=s.durationMinutes||25;if(diff<d1){m0+=mins;}else if(diff<d1*2){m1+=mins;}else if(diff<d1*3){m2+=mins;}}
+const rawScore=(m0*0.5)+(m1*0.3)+(m2*0.2);const score=Math.min(100,Math.round((rawScore/120)*100));let tier='building';
+if(score>=80){tier='peak_flow';}else if(score>=40){tier='accelerating';}const res={momentumScore:score,todayMins:m0,rollingTotal:m0+m1+m2,velocityTier:tier,evaluatedAt:new Date().toISOString()};
+if(typeof localStorage!=='undefined'){localStorage.setItem('df_focus_momentum_v1',JSON.stringify(res));}return res;
+}catch(e){return{momentumScore:0,todayMins:0,rollingTotal:0,velocityTier:'building'};}}
+function dfInitExamSimulation(sub,durM,qCount){
+const dm=Math.max(5,Number(durM)||60);const qc=Math.max(1,Number(qCount)||20);const now=Date.now();const endsAt=now+(dm*60000);
+const paceSec=Math.round((dm*60)/qc);const eid='exam_'+now;const exam={id:eid,subject:String(sub||'عام'),durationMins:dm,questionCount:qc,startsAt:now,endsAt,pacePerQuestionSec:paceSec,active:true};
+try{if(typeof localStorage!=='undefined'){localStorage.setItem('df_active_exam_v1',JSON.stringify(exam));}}catch(e){}return exam;}
+function dfComputeFractalBranches(depth){
+const num=Number(depth)||3;const d=Math.max(1,Math.min(5,num));const branches=[];function grow(x,y,len,ang,iter){if(iter>d)return;const rad=ang*Math.PI/180;
+const x2=Math.round(x+len*Math.sin(rad));const y2=Math.round(y-len*Math.cos(rad));const sw=Math.max(1,Math.round((d-iter+1)*1.2));const col=iter===d?'#059669':'#334155';
+branches.push({x1:x,y1:y,x2,y2,sw,col});grow(x2,y2,len*0.72,ang-25,iter+1);grow(x2,y2,len*0.72,ang+25,iter+1);}grow(100,140,36,0,1);return branches;}
+function dfEvalBurnoutShield(){
+try{const kH='df_session_history_v1';const rH=typeof localStorage!=='undefined'?localStorage.getItem(kH):null;const h=rH?JSON.parse(rH):[];const now=Date.now();let wMins=0;const dCnt={};
+for(let i=0;i<h.length;i++){const s=h[i];if(s.mode!=='focus'&&s.mode)continue;const ca=s.completedAt;const t=ca?new Date(ca).getTime():now;if(now-t<604800000){const m=s.durationMinutes||25;wMins+=m;
+const dt=(s.completedAt||'').slice(0,10);if(dt)dCnt[dt]=(dCnt[dt]||0)+m;}}const daysCount=Object.keys(dCnt).length;const activeDays=Math.max(1,daysCount);const avgDaily=Math.round(wMins/activeDays);
+let tier='healthy_flow';let act='وتيرة متوازنة ومستدامة';if(avgDaily>=360){tier='burnout_warning';act='إجهاد مرتفع: يوصى بيوم استراحة';}else if(avgDaily>=240){tier='elevated_strain';act='ضغط دراسي: احرص على فترات تعافٍ';}
+const res={avgDailyMins:avgDaily,totalWeekMins:wMins,activeDays,riskTier:tier,recommendedAction:act,evaluatedAt:new Date().toISOString()};
+if(typeof localStorage!=='undefined'){localStorage.setItem('df_burnout_shield_v1',JSON.stringify(res));}return res;
+}catch(e){return{avgDailyMins:0,totalWeekMins:0,riskTier:'healthy_flow',recommendedAction:'طبيعي'};}}
