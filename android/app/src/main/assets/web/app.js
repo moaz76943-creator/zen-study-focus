@@ -58927,3 +58927,64 @@ Object.assign(window,{
 dfLogBreakActivity,
 dfGetRefuelAdvisorSummary,
 dfRenderRefuelAdvisorDom});}
+
+function dfSaveSessionReflection(sid,txt,rate){
+const sId=String(sid||"cur_session");
+const note=String(txt||"فكرة").trim();
+const r=Math.max(1,Math.min(5,Number(rate)));
+const k="df_session_reflections_v1";
+try{
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const list=raw?JSON.parse(raw):[];
+const item={id:"ref_"+Date.now(),sessionId:sId,
+note:note,clarity:r,
+at:new Date().toISOString()};
+list.unshift(item);
+if(list.length>50)list.pop();
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(k,JSON.stringify(list));}
+return{logged:true,item:item};
+}catch(e){return{logged:false};}}
+function dfGetRecentReflections(lim){
+try{const k="df_session_reflections_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const list=raw?JSON.parse(raw):[];
+const l=Math.max(1,Math.min(20,Number(lim)));
+return{count:list.length,
+items:list.slice(0,l)};
+}catch(e){return{count:0,items:[]};}}
+function dfRenderReflectionJournalDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfJournalMount");
+if(!el)return{rendered:false};
+try{const data=dfGetRecentReflections(3);
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="سجل خلاصات الجلسات</div>";
+h+="<div style='margin-top:6px;'>";
+h+="<input id='dfRefInput' type='text' ";
+h+="placeholder='أهم ما تعلمته في الجلسة...' ";
+h+="style='width:100%;box-sizing:border-box;";
+h+="padding:6px 10px;border-radius:8px;";
+h+="border:1px solid #94a3b8;'";
+h+="/></div>";
+if(data.items.length>0){
+const top=data.items[0];
+h+="<div style='margin-top:6px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="فائدة: "+top.note.slice(0,25)+"</div>";}
+h+="</div>";el.innerHTML=h;
+return{rendered:true,total:data.count};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfSaveSessionReflection,
+dfGetRecentReflections,
+dfRenderReflectionJournalDom});}
