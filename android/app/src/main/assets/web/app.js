@@ -58479,3 +58479,63 @@ if(typeof window!=="undefined"){
 Object.assign(window,{
 dfAnalyzeFeynmanExplanation,
 dfRenderFeynmanCardDom});}
+
+function dfPlanWorkload(sub,totTop,examDate){
+try{const sName=String(sub||"عام");
+const total=Math.max(1,Number(totTop)||10);
+const now=Date.now();
+const exD=examDate?new Date(examDate):null;
+const examMs=exD?exD.getTime():now+1209600000;
+const days=Math.max(1,
+Math.round((examMs-now)/86400000));
+const kC="df_curriculum_progress_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(kC):null;
+const store=raw?JSON.parse(raw):{};
+const stItem=store[sName];
+const comp=stItem?Number(stItem.done)||0:0;
+const rem=Math.max(0,total-comp);
+const perDay=Math.round((rem/days)*10)/10;
+const reqMins=Math.round(perDay*45);
+const res={subject:sName,totalTopics:total,
+doneTopics:comp,remainingTopics:rem,
+daysRemaining:days,topicsPerDay:perDay,
+dailyTargetMins:reqMins,evaluatedAt:
+new Date().toISOString()};
+store[sName]=res;
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(kC,JSON.stringify(store));}
+return res;
+}catch(e){return{daysRemaining:14,
+dailyTargetMins:45};}}
+function dfRenderWorkloadScheduleDom(cid,sub){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfWorkloadMount");
+if(!el)return{rendered:false};
+try{const sName=sub||"عام";
+const d=dfPlanWorkload(sName,12);
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="خطة منهج: "+d.subject+"</div>";
+h+="<div style='margin-top:6px;font-size:12px;";
+h+="color:#64748b;'>";
+h+="متبقي "+d.daysRemaining+" يوم (";
+h+=d.remainingTopics+" موضوع)</div>";
+h+="<div style='margin-top:6px;";
+h+="font-weight:600;color:#059669;";
+h+="font-size:12px;'>";
+h+="الهدف اليومي: "+
+d.dailyTargetMins+" دقيقة</div></div>";
+el.innerHTML=h;
+return{rendered:true,
+targetMins:d.dailyTargetMins};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfPlanWorkload,
+dfRenderWorkloadScheduleDom});}
