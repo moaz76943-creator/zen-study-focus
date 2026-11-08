@@ -58859,3 +58859,71 @@ Object.assign(window,{
 dfRecordSessionCheckpoint,
 dfGetActiveSessionCheckpoints,
 dfRenderCheckpointDom});}
+
+function dfLogBreakActivity(bType,durS,rate){
+const t=String(bType||"hydration").trim();
+const s=Math.max(30,Number(durS)||300);
+const r=Math.max(1,Math.min(5,Number(rate)));
+let bonus=20;
+if(t==="walk"||t==="stretch")bonus=30;
+else if(t==="eye_rest")bonus=25;
+else if(t==="screen")bonus=-10;
+const sc=Math.max(0,Math.min(100,r*14+bonus));
+const k="df_break_refuel_v1";
+try{
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const list=raw?JSON.parse(raw):[];
+const item={id:"brk_"+Date.now(),type:t,
+durSec:s,score:sc,at:new Date().toISOString()};
+list.unshift(item);
+if(list.length>50)list.pop();
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(k,JSON.stringify(list));}
+return{logged:true,score:sc,type:t};
+}catch(e){return{logged:false};}}
+function dfGetRefuelAdvisorSummary(){
+try{const k="df_break_refuel_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const list=raw?JSON.parse(raw):[];
+if(list.length===0){
+return{avgScore:70,suggested:"راحة بصرية"};}
+let sum=0,totS=0;
+const n=Math.min(5,list.length);
+for(let i=0;i<n;i++){
+sum+=list[i].score;totS+=list[i].durSec;}
+const avg=Math.round(sum/n);
+let rec="راحة بصرية وترطيب";
+if(avg<60)rec="مشى خفيف وتمدد";
+return{avgScore:avg,todayBreakMins:Math.round(
+totS/60),suggested:rec};
+}catch(e){return{avgScore:70};}}
+function dfRenderRefuelAdvisorDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfRefuelMount");
+if(!el)return{rendered:false};
+try{const s=dfGetRefuelAdvisorSummary();
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="مستشار استعادة الطاقة</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="جودة الاستراحة: "+s.avgScore+"/100</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="المقترح: "+s.suggested+"</div></div>";
+el.innerHTML=h;
+return{rendered:true,score:s.avgScore};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfLogBreakActivity,
+dfGetRefuelAdvisorSummary,
+dfRenderRefuelAdvisorDom});}
