@@ -6825,7 +6825,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     toast.id = 'df-vocab-undo-toast';
     toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid rgba(244,63,94,0.4);border-radius:12px;padding:10px 16px;color:#f8fafc;font-size:13px;display:flex;align-items:center;gap:12px;z-index:99999;box-shadow:0 12px 30px rgba(0,0,0,0.5);';
     toast.innerHTML =
-      '<span>تم حذف <b>' + (wordText || 'الكلمة') + '</b></span>' +
+      '<span>تم حذف <b>' + escapeHtmlText(String(wordText||'الكلمة')) + '</b></span>' +
       '<button type="button" id="df-vocab-toast-undo-btn" style="padding:4px 10px;border-radius:8px;border:none;background:#9333ea;color:#ffffff;font-weight:700;font-size:12px;cursor:pointer;">↶ تراجع</button>';
 
     document.body.appendChild(toast);
@@ -49676,7 +49676,7 @@ window.dfMonotasking = {
     const tag = '<span style="color:#10b981">' +
       'CURRENT FOCUS:</span> ';
     b.innerHTML = tag + '<strong>' +
-      this.activeTask.title + '</strong>';
+      escapeHtmlText(String(this.activeTask.title||'')) + '</strong>';
     container.appendChild(b);
   },
   completeCycle: function() {
@@ -58979,7 +58979,7 @@ if(data.items.length>0){
 const top=data.items[0];
 h+="<div style='margin-top:6px;";
 h+="font-size:11px;color:#64748b;'>";
-h+="فائدة: "+top.note.slice(0,25)+"</div>";}
+h+="فائدة: "+dfSanitizeText(String(top.note).slice(0,25))+"</div>";}
 h+="</div>";el.innerHTML=h;
 return{rendered:true,total:data.count};
 }catch(e){return{rendered:false};}}
