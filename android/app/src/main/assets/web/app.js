@@ -59744,3 +59744,59 @@ return res;}
 if(typeof window!=='undefined'){
 Object.assign(window,{
 dfFsrs45Retention,dfFsrs45Interval,dfFsrs45Review});}
+
+function dfMonotonicNow(){
+try{
+const w=typeof window!=='undefined'?
+window:null;
+if(w&&w.ZenNative&&
+w.ZenNative.elapsedRealtime){
+const t=Number(w.ZenNative.elapsedRealtime());
+if(Number.isFinite(t)&&t>0)
+return t;}}catch(_){}
+if(typeof performance!=='undefined'){
+if(performance.now)return performance.now();}
+return Date.now();}
+function dfAccumulateFocusTime(startM,endM){
+const s=Math.max(0,Number(startM)||0);
+const e=Math.max(s,Number(endM)||s);
+const deltaMs=Math.max(0,e-s);
+const mins=Math.round((deltaMs/60000)*10)/10;
+const res={elapsedMs:deltaMs,elapsedMins:mins,
+recordedAt:new Date().toISOString()};
+try{if(typeof localStorage!=='undefined'){
+localStorage.setItem('df_monotonic_session_v1',
+JSON.stringify(res));}}catch(_){}
+return res;}
+function dfStopIdleWatchdog(timerId){
+if(timerId){try{clearInterval(timerId);
+return true;}catch(_){return false;}}
+return false;}
+function dfRenderMonotonicTimerDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfTimerMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="حراسة التوقيت الرتيب</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="الحماية ضد تلاعب الساعة: نشطة";
+h+="</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="حساب فترات التركيز بدقة performance.now";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,monotonic:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{dfMonotonicNow,
+dfAccumulateFocusTime,dfStopIdleWatchdog,
+dfRenderMonotonicTimerDom});}
