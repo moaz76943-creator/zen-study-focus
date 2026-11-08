@@ -58417,3 +58417,65 @@ Object.assign(window,{
 dfGenReadingQuiz,
 dfSubmitReadingAnswer,
 dfRenderReadingQuizHudDom});}
+
+function dfAnalyzeFeynmanExplanation(title,txt){
+const t=String(txt||"").trim();
+const words=t.split(" ").filter(Boolean);
+const NL=String.fromCharCode(10);
+const sents=t.split(".").concat(t.split(NL)).
+filter(x=>x.trim().length>3);
+const numSents=Math.max(1,sents.length);
+const numWords=words.length;
+const avgLen=Math.round(numWords/numSents);
+let jargon=0;
+for(let i=0;i<words.length;i++){
+if(words[i].length>=10)jargon++;}
+const raw=100-(avgLen*1.4)-(jargon*6);
+const rScore=Math.round(raw);
+const score=Math.max(0,Math.min(100,rScore));
+let tier="good";
+if(score>=80){tier="pure_clarity";}
+else if(score<60){tier="dense_jargon";}
+const res={title:String(title||"مفهوم"),
+wordCount:numWords,avgSentenceLen:avgLen,
+simplicityScore:score,clarityTier:tier,
+evaluatedAt:new Date().toISOString()};
+try{if(typeof localStorage!=="undefined"){
+const k="df_feynman_analyses_v1";
+const rawH=localStorage.getItem(k);
+const h=rawH?JSON.parse(rawH):[];
+h.push(res);
+localStorage.setItem(k,JSON.stringify(h));
+}}catch(e){}
+return res;}
+function dfRenderFeynmanCardDom(cid,title){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfFeynmanMount");
+if(!el)return{rendered:false};
+try{const kF="df_feynman_analyses_v1";
+const rawH=typeof localStorage!=="undefined"?
+localStorage.getItem(kF):null;
+const h=rawH?JSON.parse(rawH):[];
+const it=h.length>0?h[h.length-1]:
+{title:title||"مفهوم",simplicityScore:85};
+let htm="<div style='background:#f8fafc;";
+htm+="padding:12px;border:1px solid #cbd5e1;";
+htm+="border-radius:12px;'>";
+htm+="<div style='font-size:13px;";
+htm+="color:#0f172a;";
+htm+="font-weight:700;'>تبسيط فاينمان: "+
+it.title+"</div>";
+htm+="<div style='margin-top:6px;";
+htm+="font-size:12px;";
+htm+="color:#059669;font-weight:600;'>";
+htm+="مؤشر الوضوح البسيط: "+
+it.simplicityScore+"%</div></div>";
+el.innerHTML=htm;
+return{rendered:true,score:it.simplicityScore};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfAnalyzeFeynmanExplanation,
+dfRenderFeynmanCardDom});}
