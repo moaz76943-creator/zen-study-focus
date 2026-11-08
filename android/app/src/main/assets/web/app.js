@@ -59168,3 +59168,70 @@ Object.assign(window,{
 dfSetFocusSoundscapeProfile,
 dfGetActiveSoundscapeProfile,
 dfRenderSoundscapeSelectorDom});}
+
+function dfReconcileFocusDebt(targetM){
+const tgt=Math.max(30,Math.min(360,+targetM));
+const kH="df_session_history_v1";
+const kD="df_focus_debt_recon_v1";
+try{
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(kH):null;
+const h=raw?JSON.parse(raw):[];
+const now=Date.now();let m0=0;
+for(let i=0;i<h.length;i++){
+const it=h[i];
+const t=it.completedAt?
+new Date(it.completedAt).getTime():now;
+if(now-t<86400000){
+m0+=Number(it.durationMinutes)||25;}}
+const def=Math.max(0,tgt-m0);
+const spread=Math.min(20,Math.round(def/3));
+const nextTgt=tgt+spread;
+const res={targetMins:tgt,actualMins:m0,
+deficitMins:def,spreadPerDay:spread,
+adjustedDailyTarget:nextTgt,
+reconciledAt:new Date().toISOString()};
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(kD,JSON.stringify(res));}
+return res;
+}catch(e){return{targetMins:tgt,actualMins:0,
+deficitMins:0,adjustedDailyTarget:tgt};}}
+function dfGetFocusDebtStatus(){
+try{const kD="df_focus_debt_recon_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(kD):null;
+return raw?JSON.parse(raw):
+dfReconcileFocusDebt(120);
+}catch(e){return{targetMins:120};}}
+function dfRenderFocusDebtDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfDebtMount");
+if(!el)return{rendered:false};
+try{const d=dfGetFocusDebtStatus();
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="تسوية خطة التركيز اليومية</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="المنجز اليوم: "+d.actualMins+" / ";
+h+=d.targetMins+" دقيقة</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+if(d.deficitMins>0){
+h+="استدراك مرن: +"+d.spreadPerDay;
+h+=" دقيقة للأيام القادمة</div></div>";}
+else{h+="حققت المستهدف بنجاح!</div></div>";}
+el.innerHTML=h;
+return{rendered:true,tgt:d.targetMins};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfReconcileFocusDebt,
+dfGetFocusDebtStatus,
+dfRenderFocusDebtDom});}
