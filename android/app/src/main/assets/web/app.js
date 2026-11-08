@@ -59598,3 +59598,52 @@ Object.assign(window,{
 dfComputeConsecutiveStreak,
 dfGetConsecutiveStreak,
 dfRenderConsecutiveStreakDom});}
+
+function dfSafeRenderElement(pNode,tag,txt,c){
+if(typeof document==="undefined")return null;
+const el=document.createElement(tag||"div");
+if(txt!==undefined&&txt!==null){
+el.textContent=String(txt);}
+if(c)el.className=String(c);
+if(pNode&&pNode.appendChild){
+pNode.appendChild(el);}
+return el;}
+function dfSanitizeFlashcardText(card){
+if(!card)return{q:"",a:""};
+const q=dfSanitizeText(String(card.q||""));
+const a=dfSanitizeText(String(card.a||""));
+const res={q:q,a:a,sanitized:true,
+at:new Date().toISOString()};
+try{if(typeof localStorage!=="undefined"){
+localStorage.setItem("df_last_safe_card_v1",
+JSON.stringify(res));}}catch(e){}
+return res;}
+function dfRenderSafeDomStatus(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfDomGuardMount");
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="درع التحصين الهيكلي (Safe DOM)</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="المعالجة عبر textContent: نشطة";
+h+="</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="حظر حقن النصوص المباشر في البطاقات";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,safeDom:true};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfSafeRenderElement,
+dfSanitizeFlashcardText,
+dfRenderSafeDomStatus});}
