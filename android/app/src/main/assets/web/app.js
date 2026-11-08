@@ -59050,3 +59050,64 @@ Object.assign(window,{
 dfEvaluateSubjectDifficulty,
 dfGetCognitiveBalanceStatus,
 dfRenderCognitiveBalanceDom});}
+
+function dfAuditFocusEnergyWindow(){
+try{const kH="df_session_history_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(kH):null;
+const h=raw?JSON.parse(raw):[];
+const bins=new Array(24).fill(0);
+for(let i=0;i<h.length;i++){
+const it=h[i];
+if(!it.completedAt)continue;
+const hr=new Date(it.completedAt).getHours();
+bins[hr]+=Number(it.durationMinutes)||25;}
+let bHr=9,maxM=0;
+for(let hr=0;hr<24;hr++){
+if(bins[hr]>maxM){maxM=bins[hr];bHr=hr;}}
+const peakM=maxM>0?maxM:60;
+const rec="التركيز الصباحي هو الأنسب لك";
+const res={peakStart:bHr,peakEnd:(bHr+2)%24,
+peakMins:peakM,advice:rec,
+at:new Date().toISOString()};
+if(typeof localStorage!=="undefined"){
+localStorage.setItem("df_focus_energy_v1",
+JSON.stringify(res));}return res;
+}catch(e){return{peakStart:9,peakEnd:11,
+peakMins:60,advice:"ساعات الصباح"};}}
+function dfGetFocusEnergyStatus(){
+try{const k="df_focus_energy_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+return raw?JSON.parse(raw):
+dfAuditFocusEnergyWindow();
+}catch(e){return{peakStart:9,peakEnd:11};}}
+function dfRenderFocusEnergyDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfEnergyMount");
+if(!el)return{rendered:false};
+try{const d=dfGetFocusEnergyStatus();
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="ذروة الطاقة والتدفق الذهني</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="أفضل نافذة تركيز: "+d.peakStart+":00 - ";
+h+=d.peakEnd+":00</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="إجمالي دقائق الذروة: "+d.peakMins; 
+h+=" دقيقة</div></div>";el.innerHTML=h;
+return{rendered:true,start:d.peakStart};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfAuditFocusEnergyWindow,
+dfGetFocusEnergyStatus,
+dfRenderFocusEnergyDom});}
