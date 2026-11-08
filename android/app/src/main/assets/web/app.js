@@ -58666,3 +58666,63 @@ Object.assign(window,{
 dfLogDistraction,
 dfGetDistractionStats,
 dfRenderDistractionDom});}
+
+function dfComputeStudyTempo(){
+try{const kH="df_session_history_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(kH):null;
+const h=raw?JSON.parse(raw):[];
+let totM=0,cnt=0;const now=Date.now();
+for(let i=0;i<h.length;i++){
+const s=h[i];
+const t=s.completedAt?new Date(s.completedAt).
+getTime():now;if(now-t<86400000){
+totM+=Number(s.durationMinutes)||25;cnt++;}}
+const avg=cnt>0?Math.round(totM/cnt):25;
+let tier="steady";
+if(totM>=180||avg>=45){tier="deep_flow";}
+else if(totM>=90){tier="accelerated";}
+else if(cnt===0){tier="fresh";}
+const res={todayMins:totM,sessions:cnt,
+avgSessionMins:avg,tempoTier:tier,
+evaluatedAt:new Date().toISOString()};
+if(typeof localStorage!=="undefined"){
+localStorage.setItem("df_study_tempo_v1",
+JSON.stringify(res));}return res;
+}catch(e){return{todayMins:0,tier:"steady",
+sessions:0,avgSessionMins:25};}}
+function dfRenderStudyTempoDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfTempoMount");
+if(!el)return{rendered:false};
+try{const t=dfComputeStudyTempo();
+let col="#059669";let lbl="وتيرة ثابتة";
+if(t.tempoTier==="deep_flow"){
+col="#2563eb";lbl="تدفق عميق مكثف";}
+else if(t.tempoTier==="accelerated"){
+col="#0d9488";lbl="وتيرة متسارعة";}
+else if(t.tempoTier==="fresh"){
+col="#64748b";lbl="جاهز للبدء";}
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="معدل وتيرة المذاكرة</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:"+col+";";
+h+="font-weight:600;'>";
+h+=lbl+" ("+t.todayMins+" دقيقة اليوم)</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="معدل الجلسة: "+t.avgSessionMins+" دقيقة";
+h+=" | عدد: "+t.sessions+"</div></div>";
+el.innerHTML=h;
+return{rendered:true,tier:t.tempoTier};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfComputeStudyTempo,
+dfRenderStudyTempoDom});}
