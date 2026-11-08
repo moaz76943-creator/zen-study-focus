@@ -13,11 +13,11 @@ android {
     namespace 'com.zenstudy.focus'
     compileSdk 36
     defaultConfig {
-        applicationId "com.zenstudy.focus"
+        applicationId "com.deepfocus.study"
         minSdk 24
         targetSdk 36
-        versionCode 41092
-        versionName "419.2.0"
+        versionCode 41093
+        versionName "419.3.0"
     }
     signingConfigs {
         if (hasUploadSigning) {
