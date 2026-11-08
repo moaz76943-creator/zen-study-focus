@@ -58988,3 +58988,65 @@ Object.assign(window,{
 dfSaveSessionReflection,
 dfGetRecentReflections,
 dfRenderReflectionJournalDom});}
+
+function dfEvaluateSubjectDifficulty(sub,wt){
+const sName=String(sub||"عام").trim();
+const w=Math.max(1,Math.min(3,Number(wt)||2));
+const k="df_cognitive_balance_v1";
+try{
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const store=raw?JSON.parse(raw):{};
+let rec="مراجعة خفيفة أو بطاقات";
+if(w===1){rec="مادة عالية التركيز";}
+else if(w===2){rec="استراحة ثم قراءة متصلة";}
+const entry={subject:sName,weight:w,
+next:rec,at:new Date().toISOString()};
+store[sName]=entry;store._last=entry;
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(k,JSON.stringify(store));}
+return{balanced:true,entry:entry};
+}catch(e){return{balanced:false};}}
+function dfGetCognitiveBalanceStatus(){
+try{const k="df_cognitive_balance_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const store=raw?JSON.parse(raw):{};
+const last=store._last||{subject:"عام",
+weight:2,next:"مراجعة خفيفة"};
+return{subject:last.subject,weight:last.weight,
+next:last.next};
+}catch(e){return{weight:2,subject:"عام"};}}
+function dfRenderCognitiveBalanceDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfBalanceMount");
+if(!el)return{rendered:false};
+try{const st=dfGetCognitiveBalanceStatus();
+let wLbl="متوسط الإجهاد";let col="#059669";
+if(st.weight===3){wLbl="حمل ذهني عالٍ";
+col="#dc2626";}
+else if(st.weight===1){wLbl="نشاط خفيف";
+col="#0284c7";}
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="موازن الحمل الذهني</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:"+col+";";
+h+="font-weight:600;'>";
+h+=st.subject+": "+wLbl+"</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="التوصية: "+st.next+"</div></div>";
+el.innerHTML=h;
+return{rendered:true,weight:st.weight};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfEvaluateSubjectDifficulty,
+dfGetCognitiveBalanceStatus,
+dfRenderCognitiveBalanceDom});}
