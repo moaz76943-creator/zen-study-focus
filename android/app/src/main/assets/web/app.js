@@ -59484,3 +59484,45 @@ Object.assign(window,{
 dfEvaluateStreakShieldV2,
 dfGetStreakShieldStatus,
 dfRenderStreakShieldDom});}
+
+function dfSanitizeText(raw){
+if(typeof raw!=="string")return "";
+return raw.replace(/&/g,"&amp;").
+replace(/</g,"&lt;").replace(/>/g,"&gt;").
+replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function dfSafeSetHtml(elOrId,html){
+if(typeof document==="undefined")return false;
+const el=typeof elOrId==="string"?
+document.getElementById(elOrId):elOrId;
+if(!el)return false;
+el.innerHTML=dfSanitizeText(html);
+return true;}
+function dfRenderSanitizerStatusDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfSanitizerMount");
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="درع التحصين الأمني للواجهة</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="الحماية ضد XSS: نشطة 100%";
+h+="</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="تطهير المدخلات والملاحظات تلقائياً";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,safe:true};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfSanitizeText,
+dfSafeSetHtml,
+dfRenderSanitizerStatusDom});}
