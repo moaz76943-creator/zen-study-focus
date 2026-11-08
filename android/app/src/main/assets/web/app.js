@@ -59647,3 +59647,69 @@ Object.assign(window,{
 dfSafeRenderElement,
 dfSanitizeFlashcardText,
 dfRenderSafeDomStatus});}
+
+function dfFiniteMinutes(s){
+if(!s)return 0;
+const a=Number(s.durationMinutes);
+const b=Number(s.minutes);
+if(Number.isFinite(a)&&a>0)return a;
+if(Number.isFinite(b)&&b>0)return b;
+return 0;}
+function dfGetUnifiedSessionHistory(){
+let rawList=[];const kC="zen_fortress_cfg_v21";
+try{if(typeof localStorage!=="undefined"){
+const raw=localStorage.getItem(kC);
+if(raw){
+const d=JSON.parse(raw);
+rawList=d.sessionHistory||[];}
+if(!rawList.length){
+const r2=localStorage.getItem(
+"df_session_history_v1");
+rawList=r2?JSON.parse(r2):[];}}}catch(e){}
+let totalM=0;let validCnt=0;let filtered=0;
+const cleanList=[];
+for(let i=0;i<rawList.length;i++){
+const it=rawList[i];
+const m=dfFiniteMinutes(it);
+if(m>0){totalM+=m;validCnt++;
+cleanList.push(it);}
+else{filtered++;}}
+const res={totalValidMinutes:totalM,
+validSessions:validCnt,
+filteredZeroDuration:filtered,
+verifiedAt:new Date().toISOString()};
+try{if(typeof localStorage!=="undefined"){
+const kS="df_verified_analytics_v1";
+localStorage.setItem(kS,
+JSON.stringify(res));}}catch(e){}
+return res;}
+function dfRenderAnalyticsIntegrityDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfAnalyticsMount");
+if(!el)return{rendered:false};
+try{const st=dfGetUnifiedSessionHistory();
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="نزاهة سجلات التحليلات المعتمدة</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="الدقائق: "+st.totalValidMinutes+" دقيقة";
+h+="</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="الجلسات الصحيحة: "+st.validSessions;
+h+=" | استبعاد: "+st.filteredZeroDuration;
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,mins:st.validSessions};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfFiniteMinutes,
+dfGetUnifiedSessionHistory,
+dfRenderAnalyticsIntegrityDom});}
