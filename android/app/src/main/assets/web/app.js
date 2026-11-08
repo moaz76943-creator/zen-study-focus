@@ -59363,3 +59363,67 @@ Object.assign(window,{
 dfRegisterExamMilestone,
 dfGetExamSentinelStatus,
 dfRenderExamSentinelDom});}
+
+function dfAnalyzeMindMapComplexity(nid,tree){
+const nId=String(nid||"map_default");
+const raw=typeof tree==="string"?
+tree:JSON.stringify(tree||{});
+const len=raw.length;const bCount=Math.max(1,
+(raw.match(/:/g)||[]).length);
+const depth=Math.min(5,Math.max(1,
+(raw.match(/{/g)||[]).length));
+const rawSc=Math.round((bCount*6)+(depth*8));
+const score=Math.min(100,rawSc);
+let st="متزن ومعياري";
+if(bCount>12)st="متشعب - جزّئه";
+else if(depth<2)st="سطحي - فصّله";
+const res={noteId:nId,branches:bCount,
+depth:depth,densityScore:score,status:st,
+at:new Date().toISOString()};
+const k="df_mindmap_density_v1";
+try{
+const sRaw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const store=sRaw?JSON.parse(sRaw):{};
+store[nId]=res;
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(k,JSON.stringify(store));}
+return res;
+}catch(e){return{densityScore:score};}}
+function dfGetMindMapDensityStatus(nid){
+try{const nId=String(nid||"map_default");
+const k="df_mindmap_density_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const store=raw?JSON.parse(raw):{};
+return store[nId]||{densityScore:50,
+status:"جاهز للتحليل",branches:3,depth:2};
+}catch(e){return{densityScore:50};}}
+function dfRenderMindMapDensityDom(cid,nid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfMindMapMount");
+if(!el)return{rendered:false};
+try{const d=dfGetMindMapDensityStatus(nid);
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="كثافة الخريطة الذهنية</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="الترابط: "+d.densityScore+"/100</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="التشعب: "+d.branches+" فروع | ";
+h+=d.status+"</div></div>";el.innerHTML=h;
+return{rendered:true,score:d.densityScore};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfAnalyzeMindMapComplexity,
+dfGetMindMapDensityStatus,
+dfRenderMindMapDensityDom});}
