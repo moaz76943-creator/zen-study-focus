@@ -58726,3 +58726,69 @@ if(typeof window!=="undefined"){
 Object.assign(window,{
 dfComputeStudyTempo,
 dfRenderStudyTempoDom});}
+
+function dfRecordRecallLatency(cId,lMs,rate){
+const cid=String(cId||"card_"+Date.now());
+const ms=Math.max(100,Number(lMs)||1500);
+const r=Math.max(1,Math.min(4,Number(rate)));
+const k="df_recall_latency_v1";
+try{
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const list=raw?JSON.parse(raw):[];
+let tier="fluent";
+if(ms<2000){tier="instant";}
+else if(ms>8000){tier="hesitant";}
+const item={id:cid,ms:ms,rate:r,tier:tier,
+at:new Date().toISOString()};
+list.unshift(item);
+if(list.length>100)list.pop();
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(k,JSON.stringify(list));}
+return{logged:true,item:item};
+}catch(e){return{logged:false};}}
+function dfGetRecallLatencyStats(){
+try{const k="df_recall_latency_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const list=raw?JSON.parse(raw):[];
+if(list.length===0){return{avgMs:0,count:0};}
+let sum=0,flu=0;
+for(let i=0;i<list.length;i++){
+sum+=list[i].ms;
+if(list[i].tier==="instant"||
+list[i].tier==="fluent"){flu++;}}
+const avg=Math.round(sum/list.length);
+const ratio=Math.round((flu/list.length)*100);
+return{avgMs:avg,fluentPct:ratio,
+cnt:list.length};
+}catch(e){return{avgMs:0,fluentPct:0,cnt:0};}}
+function dfRenderRecallLatencyDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfLatencyMount");
+if(!el)return{rendered:false};
+try{const st=dfGetRecallLatencyStats();
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="محلل سرعة الاسترجاع النشط</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="متوسط الاستجابة: "+st.avgMs+" ms</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="نسبة الطلاقة الفورية: "+st.fluentPct+"% ";
+h+="("+st.cnt+" بطاقة)</div></div>";
+el.innerHTML=h;
+return{rendered:true,avg:st.avgMs};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfRecordRecallLatency,
+dfGetRecallLatencyStats,
+dfRenderRecallLatencyDom});}
