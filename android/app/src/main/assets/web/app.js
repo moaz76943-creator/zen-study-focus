@@ -59111,3 +59111,60 @@ Object.assign(window,{
 dfAuditFocusEnergyWindow,
 dfGetFocusEnergyStatus,
 dfRenderFocusEnergyDom});}
+
+function dfSetFocusSoundscapeProfile(m,lvl){
+const mode=String(m||"silent").trim();
+const int=Math.max(0,Math.min(100,+lvl||0));
+const k="df_soundscape_profile_v1";
+const prof={mode:mode,intensity:int,
+updatedAt:new Date().toISOString()};
+try{if(typeof localStorage!=="undefined"){
+localStorage.setItem(k,JSON.stringify(prof));}
+return{configured:true,profile:prof};
+}catch(e){return{configured:false};}}
+const defP={mode:"silent",intensity:0};
+function dfGetActiveSoundscapeProfile(){
+try{const k="df_soundscape_profile_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+return raw?JSON.parse(raw):defP;
+}catch(e){return defP;}}
+function dfRenderSoundscapeSelectorDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfSoundscapeMount");
+if(!el)return{rendered:false};
+try{const cur=dfGetActiveSoundscapeProfile();
+const modes=[
+{id:"silent",lbl:"عزل صامت"},
+{id:"pink",lbl:"حفيف هادئ"},
+{id:"brown",lbl:"تدفق عميق"},
+{id:"white",lbl:"ضجيج أبيض"}];
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="بيئة الصوت المعرفي المحايد</div>";
+h+="<div style='display:flex;gap:6px;";
+h+="margin-top:8px;flex-wrap:wrap;'>";
+for(let i=0;i<modes.length;i++){
+const it=modes[i];const isA=cur.mode===it.id;
+const bg=isA?"#059669":"#ffffff";
+const col=isA?"#ffffff":"#0f172a";
+h+="<button class='df-snd-btn' ";
+h+="data-id='"+it.id+"' ";
+h+="style='padding:4px 8px;border-radius:8px;";
+h+="border:1px solid #cbd5e1;font-size:11px;";
+h+="font-weight:600;";
+h+="background:"+bg+";color:"+col+";'>";
+h+=it.lbl+"</button>";}
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,mode:cur.mode};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfSetFocusSoundscapeProfile,
+dfGetActiveSoundscapeProfile,
+dfRenderSoundscapeSelectorDom});}
