@@ -59235,3 +59235,73 @@ Object.assign(window,{
 dfReconcileFocusDebt,
 dfGetFocusDebtStatus,
 dfRenderFocusDebtDom});}
+
+function dfSmoothStudyVelocity(winDays){
+const d=Math.max(1,Math.min(14,+winDays||5));
+const kH="df_session_history_v1";
+const kS="df_velocity_smoother_v1";
+try{
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(kH):null;
+const h=raw?JSON.parse(raw):[];
+const now=Date.now();const cut=now-d*86400000;
+let ema=0;let count=0;
+for(let i=h.length-1;i>=0;i--){
+const it=h[i];
+const t=it.completedAt?
+new Date(it.completedAt).getTime():now;
+if(t>=cut){
+const m=Number(it.durationMinutes)||25;
+ema=count===0?m:(0.3*m+0.7*ema);count++;}}
+const sm=Math.round(ema)||25;let tr="stable";
+if(sm>=40)tr="ascending";
+else if(sm<20)tr="dropping";
+const res={smoothedMins:sm,trend:tr,
+microSprintRecommended:tr==="dropping",
+sessions:count,at:new Date().toISOString()};
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(kS,JSON.stringify(res));}
+return res;
+}catch(e){return{smoothedMins:25,trend:"ok"};}}
+function dfGetSmoothedVelocityStatus(){
+try{const kS="df_velocity_smoother_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(kS):null;
+return raw?JSON.parse(raw):
+dfSmoothStudyVelocity(5);
+}catch(e){return{smoothedMins:25};}}
+function dfRenderVelocitySmootherDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfSmootherMount");
+if(!el)return{rendered:false};
+try{const d=dfGetSmoothedVelocityStatus();
+let col="#059669";let trLbl="وتيرة متزنة";
+if(d.trend==="ascending"){
+col="#2563eb";trLbl="وتيرة متصاعدة";}
+else if(d.trend==="dropping"){
+col="#dc2626";trLbl="وتيرة متباطئة";}
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="سلاسة وتيرة التعلم</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:"+col+";";
+h+="font-weight:600;'>";
+h+=trLbl+" ("+d.smoothedMins+" دقيقة)</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+if(d.microSprintRecommended){
+h+="مقترح: جلسة سريعة 15 دقيقة";}
+else{h+="الزخم مستمر ومستقر بحمد الله";}
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,mins:d.smoothedMins};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfSmoothStudyVelocity,
+dfGetSmoothedVelocityStatus,
+dfRenderVelocitySmootherDom});}
