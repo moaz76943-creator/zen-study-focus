@@ -59427,3 +59427,60 @@ Object.assign(window,{
 dfAnalyzeMindMapComplexity,
 dfGetMindMapDensityStatus,
 dfRenderMindMapDensityDom});}
+
+function dfEvaluateStreakShieldV2(){
+const kH="df_session_history_v1";
+const kS="df_streak_shield_v2";
+try{
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(kH):null;
+const h=raw?JSON.parse(raw):[];
+const days=new Set();
+for(let i=0;i<h.length;i++){
+const at=h[i].completedAt;
+if(at)days.add(at.slice(0,10));}
+const streak=days.size;
+const sh=Math.min(3,Math.floor(streak/7)+1);
+const res={currentStreak:streak,shields:sh,
+shielded:true,at:new Date().toISOString()};
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(kS,JSON.stringify(res));}
+return res;
+}catch(e){return{currentStreak:1,shields:1};}}
+function dfGetStreakShieldStatus(){
+try{const kS="df_streak_shield_v2";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(kS):null;
+return raw?JSON.parse(raw):
+dfEvaluateStreakShieldV2();
+}catch(e){return{currentStreak:1,shields:1};}}
+function dfRenderStreakShieldDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfShieldMount");
+if(!el)return{rendered:false};
+try{const d=dfGetStreakShieldStatus();
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="درع استمرارية التركيز</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="السلسلة الحالية: "+d.currentStreak;
+h+=" أيام متتالية</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="دروع الحماية المتاحة: "+d.shields;
+h+=" (تمنع انكسار السلسلة)</div></div>";
+el.innerHTML=h;
+return{rendered:true,streak:d.currentStreak};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfEvaluateStreakShieldV2,
+dfGetStreakShieldStatus,
+dfRenderStreakShieldDom});}
