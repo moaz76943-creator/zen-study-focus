@@ -59713,3 +59713,34 @@ Object.assign(window,{
 dfFiniteMinutes,
 dfGetUnifiedSessionHistory,
 dfRenderAnalyticsIntegrityDom});}
+
+function dfFsrs45Retention(tDays,sVal){
+const t=Math.max(0,Number(tDays)||0);
+const s=Math.max(0.1,Number(sVal)||1);
+return Math.pow(1+(19*t)/(81*s),-0.5);}
+function dfFsrs45Interval(sVal,rTarget){
+const s=Math.max(0.1,Number(sVal)||1);
+const r=Math.min(0.97,Math.max(0.7,Number(rTarget)||0.9));
+const d=(81*s/19)*(Math.pow(r,-2)-1);
+return Math.min(3650,Math.max(1,Math.round(d)));}
+function dfFsrs45Review(sVal,dVal,tDays,grade){
+const s=Math.max(0.1,Number(sVal)||1);
+const d=Math.min(10,Math.max(1,Number(dVal)||5));
+const t=Math.max(0,Number(tDays)||0);
+const g=Math.min(4,Math.max(1,Number(grade)||3));
+const r=dfFsrs45Retention(t,s);
+const nextD=Math.min(10,Math.max(1,d-0.8*(g-3)));
+let nextS=s;
+if(g===1){nextS=Math.max(0.1,s*0.4);}
+else{const mult=g===2?1.2:(g===3?2.1:3.2);
+nextS=Math.min(3650,Math.max(0.2,s*(1+mult*(1-r))));}
+const res={stability:nextS,difficulty:nextD,
+retrievability:r,interval:dfFsrs45Interval(nextS,0.9),
+at:new Date().toISOString()};
+try{if(typeof localStorage!=='undefined'){
+localStorage.setItem('df_last_fsrs45_v1',JSON.stringify(res));
+}}catch(e){}
+return res;}
+if(typeof window!=='undefined'){
+Object.assign(window,{
+dfFsrs45Retention,dfFsrs45Interval,dfFsrs45Review});}
