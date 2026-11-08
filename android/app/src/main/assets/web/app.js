@@ -58354,3 +58354,66 @@ if(typeof window!=="undefined"){
 Object.assign(window,{
 dfComputeIntervalBuckets,
 dfRenderIntervalSvg});}
+
+function dfGenReadingQuiz(txt,maxQ){
+const str=String(txt||"").trim();
+const limit=Math.max(1,
+Math.min(5,Number(maxQ)||3));
+const NL=String.fromCharCode(10);
+const sents=str.split(NL).
+filter(x=>x.trim().length>15);
+const qList=[];
+for(let i=0;i<Math.min(limit,sents.length);i++){
+const words=sents[i].trim().split(" ");
+if(words.length>=4){
+const targetIdx=Math.floor(words.length/2);
+const expected=words[targetIdx];
+const prompt=words.map((w,idx)=>
+idx===targetIdx?"_____":w).join(" ");
+qList.push({id:"rq_"+i,prompt,expected});}}
+return{quizId:"quiz_"+Date.now(),
+questions:qList,total:qList.length};}
+function dfSubmitReadingAnswer(qid,uA,eA){
+const u=String(uA||"").trim().toLowerCase();
+const e=String(eA||"").trim().toLowerCase();
+const ok=u===e;
+try{if(typeof localStorage!=="undefined"){
+const k="df_reading_quiz_history_v1";
+const raw=localStorage.getItem(k);
+const h=raw?JSON.parse(raw):[];
+const at=new Date().toISOString();
+h.push({quizId:qid,isCorrect:ok,at});
+localStorage.setItem(k,JSON.stringify(h));
+}}catch(err){}
+return{isCorrect:ok,expected:eA};}
+function dfRenderReadingQuizHudDom(cid,qObj){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfReadingQuizMount");
+if(!el)return{rendered:false};
+const defQ={prompt:"القراءة تتطلب _____",
+expected:"تركيزاً"};
+const q=(qObj&&qObj.questions&&
+qObj.questions[0])?qObj.questions[0]:defQ;
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;color:#0f172a;";
+h+="font-weight:600;'>"+q.prompt+"</div>";
+h+="<input id='dfReadingQuizInput' ";
+h+="type='text' placeholder='...' ";
+h+="style='margin-top:8px;width:100%;";
+h+="padding:8px;border-radius:8px;";
+h+="border:1px solid #cbd5e1;'/>";
+h+="<button id='dfReadingQuizBtn' ";
+h+="style='margin-top:8px;padding:8px 16px;";
+h+="background:#059669;color:#fff;border:none;";
+h+="border-radius:8px;font-weight:600;'>";
+h+="تأكيد الإجابة</button></div>";
+el.innerHTML=h;return{rendered:true,qId:q.id};}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfGenReadingQuiz,
+dfSubmitReadingAnswer,
+dfRenderReadingQuizHudDom});}
