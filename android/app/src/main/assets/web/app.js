@@ -58792,3 +58792,70 @@ Object.assign(window,{
 dfRecordRecallLatency,
 dfGetRecallLatencyStats,
 dfRenderRecallLatencyDom});}
+
+function dfRecordSessionCheckpoint(sid,s,pct){
+const sId=String(sid||"cur_session");
+const desc=String(s||"محطة إنجاز").trim();
+const p=Math.max(0,Math.min(100,Number(pct)));
+const k="df_session_checkpoints_v1";
+try{
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const store=raw?JSON.parse(raw):{};
+if(!store[sId])store[sId]=[];
+const cp={id:"cp_"+Date.now(),desc:desc,pct:p,
+at:new Date().toISOString()};
+store[sId].push(cp);
+if(store[sId].length>20)store[sId].shift();
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(k,JSON.stringify(store));}
+return{logged:true,checkpoint:cp};
+}catch(e){return{logged:false};}}
+function dfGetActiveSessionCheckpoints(sid){
+try{const sId=String(sid||"cur_session");
+const k="df_session_checkpoints_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const store=raw?JSON.parse(raw):{};
+const list=store[sId]||[];
+const last=list.length>0?list[list.length-1]:
+null;
+return{sessionId:sId,count:list.length,
+lastCheckpoint:last,list:list};
+}catch(e){return{count:0,list:[]};}}
+function dfRenderCheckpointDom(cid,sid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfCheckpointMount");
+if(!el)return{rendered:false};
+try{
+const res=dfGetActiveSessionCheckpoints(sid);
+const lastP=res.lastCheckpoint?
+res.lastCheckpoint.pct:0;
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='display:flex;";
+h+="justify-content:space-between;";
+h+="font-size:12px;font-weight:700;";
+h+="color:#0f172a;'><span>المحطات</span>";
+h+="<span style='color:#059669;'>"+lastP;
+h+="%</span></div>";
+h+="<div style='width:100%;height:8px;";
+h+="background:#e2e8f0;border-radius:4px;";
+h+="margin-top:6px;overflow:hidden;'>";
+h+="<div style='width:"+lastP+"%;height:100%;";
+h+="background:#059669;'>";
+h+="</div></div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="محطات مسجلة: "+res.count+"</div></div>";
+el.innerHTML=h;
+return{rendered:true,progress:lastP};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfRecordSessionCheckpoint,
+dfGetActiveSessionCheckpoints,
+dfRenderCheckpointDom});}
