@@ -59305,3 +59305,61 @@ Object.assign(window,{
 dfSmoothStudyVelocity,
 dfGetSmoothedVelocityStatus,
 dfRenderVelocitySmootherDom});}
+
+function dfRegisterExamMilestone(tit,dStr,tot){
+const tName=String(tit||"امتحان نهائي").trim();
+const total=Math.max(1,+tot||20);
+const now=Date.now();
+const dObj=dStr?new Date(dStr):null;
+const dMs=dObj&&!isNaN(dObj.getTime())?
+dObj.getTime():now+1209600000;
+const days=Math.max(1,Math.round((dMs-now)/
+86400000));
+const perDay=Math.round((total/days)*10)/10;
+const reqM=Math.round(perDay*35);
+const res={examTitle:tName,daysRemaining:days,
+totalTopics:total,topicsPerDay:perDay,
+dailyTargetMins:reqM,
+at:new Date().toISOString()};
+const k="df_exam_sentinel_v1";
+try{if(typeof localStorage!=="undefined"){
+localStorage.setItem(k,JSON.stringify(res));}
+return res;
+}catch(e){return{daysRemaining:days};}}
+const defEx={examTitle:"امتحان شامل",
+daysRemaining:14,dailyTargetMins:60};
+function dfGetExamSentinelStatus(){
+try{const k="df_exam_sentinel_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+return raw?JSON.parse(raw):defEx;
+}catch(e){return defEx;}}
+function dfRenderExamSentinelDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfExamMount");
+if(!el)return{rendered:false};
+try{const d=dfGetExamSentinelStatus();
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="حارس العد التنازلي: "+d.examTitle+"</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="متبقي "+d.daysRemaining+" يوم على الموعد";
+h+="</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="المستهدف: "+d.dailyTargetMins;
+h+=" دقيقة يومياً</div></div>";el.innerHTML=h;
+return{rendered:true,days:d.daysRemaining};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfRegisterExamMilestone,
+dfGetExamSentinelStatus,
+dfRenderExamSentinelDom});}
