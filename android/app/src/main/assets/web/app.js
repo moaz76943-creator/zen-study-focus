@@ -59526,3 +59526,75 @@ Object.assign(window,{
 dfSanitizeText,
 dfSafeSetHtml,
 dfRenderSanitizerStatusDom});}
+
+function dfComputeConsecutiveStreak(hist){
+let h=hist;const kC="zen_fortress_cfg_v21";
+try{if(!h&&typeof localStorage!=="undefined"){
+const raw=localStorage.getItem(kC);
+if(raw){h=JSON.parse(raw).sessionHistory||[];}
+if(!h||!h.length){
+const r2=localStorage.getItem(
+"df_session_history_v1");
+h=r2?JSON.parse(r2):[];}}}catch(e){h=[];}
+const set=new Set();const now=new Date();
+for(let i=0;i<(h||[]).length;i++){
+const at=h[i].completedAt;
+if(at){const d=new Date(at);
+if(!isNaN(d.getTime())){
+const y=d.getFullYear();
+const m=String(d.getMonth()+1).padStart(2,'0');
+const dy=String(d.getDate()).padStart(2,'0');
+set.add(y+'-'+m+'-'+dy);}}}
+const dObj=new Date(now.getFullYear(),
+now.getMonth(),now.getDate());
+function kD(d){const y=d.getFullYear();
+const m=String(d.getMonth()+1).padStart(2,'0');
+const dy=String(d.getDate()).padStart(2,'0');
+return y+'-'+m+'-'+dy;}
+let curKey=kD(dObj);let isT=set.has(curKey);
+if(!isT){dObj.setDate(dObj.getDate()-1);
+curKey=kD(dObj);}
+let count=0;while(set.has(curKey)){count++;
+dObj.setDate(dObj.getDate()-1);
+curKey=kD(dObj);}
+const res={streak:count,isToday:isT,
+totalDays:set.size,
+at:new Date().toISOString()};
+try{localStorage.setItem("df_true_streak_v1",
+JSON.stringify(res));}catch(e){}
+return res;}
+function dfGetConsecutiveStreak(){
+try{const k="df_true_streak_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+return raw?JSON.parse(raw):
+dfComputeConsecutiveStreak();
+}catch(e){return{streak:0};}}
+function dfRenderConsecutiveStreakDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfStreakMount");
+if(!el)return{rendered:false};
+try{const st=dfGetConsecutiveStreak();
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="السلسلة المتتالية الحقيقية</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="أيام متواصلة: "+st.streak+" يوم</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="إجمالي الأيام: "+st.totalDays+"</div>";
+h+="</div>";el.innerHTML=h;
+return{rendered:true,cnt:st.streak};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfComputeConsecutiveStreak,
+dfGetConsecutiveStreak,
+dfRenderConsecutiveStreakDom});}
