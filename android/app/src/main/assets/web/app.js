@@ -58602,3 +58602,67 @@ Object.assign(window,{
 dfConfigIntervals,
 dfGetActiveIntervals,
 dfRenderIntervalPresetSelectorDom});}
+
+function dfLogDistraction(reason,tType){
+const r=String(reason||"خاطرة").trim();
+const t=tType==="ext"?"ext":"int";
+const k="df_distractions_v1";
+try{
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const list=raw?JSON.parse(raw):[];
+const item={id:"dst_"+Date.now(),
+reason:r,type:t,at:new Date().toISOString()};
+list.unshift(item);
+if(list.length>100)list.pop();
+if(typeof localStorage!=="undefined"){
+localStorage.setItem(k,JSON.stringify(list));}
+return{logged:true,item:item,cnt:list.length};
+}catch(e){return{logged:false};}}
+function dfGetDistractionStats(){
+try{const k="df_distractions_v1";
+const raw=typeof localStorage!=="undefined"?
+localStorage.getItem(k):null;
+const list=raw?JSON.parse(raw):[];
+const iso=new Date().toISOString();
+const today=iso.slice(0,10);
+let cTod=0,cInt=0,cExt=0;
+for(let i=0;i<list.length;i++){
+const it=list[i];
+if(it.at&&it.at.slice(0,10)===today)cTod++;
+if(it.type==="ext")cExt++;else cInt++;}
+return{todayCount:cTod,internalCount:cInt,
+externalCount:cExt,totalCount:list.length};
+}catch(e){return{todayCount:0,totalCount:0};}}
+function dfRenderDistractionDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfDistractionMount");
+if(!el)return{rendered:false};
+try{const st=dfGetDistractionStats();
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="مستودع الخواطر والمشتتات</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:12px;color:#64748b;'>";
+h+="اليوم: "+st.todayCount+" (";
+h+="داخلي: "+st.internalCount+" / ";
+h+="خارجي: "+st.externalCount+")</div>";
+h+="<div style='margin-top:8px;'>";
+h+="<input id='dfDstInput' type='text' ";
+h+="placeholder='فرّغ فكرتك هنا...' ";
+h+="style='width:100%;box-sizing:border-box;";
+h+="padding:6px 10px;border-radius:8px;";
+h+="border:1px solid #94a3b8;'";
+h+="/></div></div>";el.innerHTML=h;
+return{rendered:true,today:st.todayCount};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfLogDistraction,
+dfGetDistractionStats,
+dfRenderDistractionDom});}
