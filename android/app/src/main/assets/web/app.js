@@ -58539,3 +58539,66 @@ if(typeof window!=="undefined"){
 Object.assign(window,{
 dfPlanWorkload,
 dfRenderWorkloadScheduleDom});}
+
+function dfConfigIntervals(pName,fM,sbM,lbM,c){
+const p=String(pName||"classic").trim();
+const focus=Math.max(5,
+Math.min(120,Number(fM)||25));
+const sb=Math.max(1,
+Math.min(30,Number(sbM)||5));
+const lb=Math.max(5,
+Math.min(60,Number(lbM)||15));
+const cLen=Math.max(2,
+Math.min(8,Number(c)||4));
+const matrix={activePreset:p,
+focusMins:focus,shortBreakMins:sb,
+longBreakMins:lb,cycleBlocks:cLen,
+updatedAt:new Date().toISOString()};
+try{if(typeof localStorage!=="undefined"){
+const kM="df_custom_interval_matrix_v1";
+localStorage.setItem(kM,JSON.stringify(matrix));
+}}catch(e){}
+return matrix;}
+const defM={activePreset:"classic",
+focusMins:25,shortBreakMins:5,
+longBreakMins:15,cycleBlocks:4};
+function dfGetActiveIntervals(){
+try{const kM="df_custom_interval_matrix_v1";
+const raw=localStorage.getItem(kM);
+return raw?JSON.parse(raw):defM;
+}catch(e){return defM;}}
+function dfRenderIntervalPresetSelectorDom(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfPresetMount");
+if(!el)return{rendered:false};
+try{const cur=dfGetActiveIntervals();
+const presets=[
+{id:"sprint",label:"سريع 15/3",f:15},
+{id:"classic",label:"قياسي 25/5",f:25},
+{id:"ext",label:"عميق 50/10",f:50},
+{id:"ultra",label:"أولتراديان 90/20",f:90}
+];
+let h="<div style='display:flex;";
+h+="gap:6px;flex-wrap:wrap;'>";
+for(let i=0;i<presets.length;i++){
+const it=presets[i];
+const isA=cur.activePreset===it.id;
+const bg=isA?"#059669":"#ffffff";
+const col=isA?"#ffffff":"#0f172a";
+h+="<button class='df-preset-btn' ";
+h+="data-id='"+it.id+"' ";
+h+="style='padding:6px 12px;";
+h+="border-radius:20px;font-size:12px;";
+h+="border:1px solid #cbd5e1;";
+h+="background:"+bg+";color:"+col+";";
+h+="font-weight:600;'>"+it.label+"</button>";}
+h+="</div>";el.innerHTML=h;
+return{rendered:true,active:cur.activePreset};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfConfigIntervals,
+dfGetActiveIntervals,
+dfRenderIntervalPresetSelectorDom});}
