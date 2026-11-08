@@ -58294,3 +58294,63 @@ let tier='healthy_flow';let act='وتيرة متوازنة ومستدامة';if(
 const res={avgDailyMins:avgDaily,totalWeekMins:wMins,activeDays,riskTier:tier,recommendedAction:act,evaluatedAt:new Date().toISOString()};
 if(typeof localStorage!=='undefined'){localStorage.setItem('df_burnout_shield_v1',JSON.stringify(res));}return res;
 }catch(e){return{avgDailyMins:0,totalWeekMins:0,riskTier:'healthy_flow',recommendedAction:'طبيعي'};}}
+
+function dfComputeIntervalBuckets(){
+try{const rC=typeof localStorage!=="undefined"?
+localStorage.getItem("df_cards_v1"):null;
+const cards=rC?JSON.parse(rC):[];
+let b0=0,b1=0,b2=0,b3=0,b4=0,tot=0;
+const now=Date.now();
+for(let i=0;i<cards.length;i++){
+const c=cards[i];if(c.deleted)continue;tot++;
+const st=Math.max(1,c.stability||1);
+const lr=c.lastReview?new Date(c.lastReview).
+getTime():now;
+const elDays=Math.max(0,(now-lr)/86400000);
+const rem=st-elDays;
+if(rem<=0){b0++;}else if(rem<=3){b1++;}
+else if(rem<=7){b2++;}else if(rem<=14){b3++;}
+else{b4++;}}
+const res={totalActive:tot,buckets:{dueToday:b0,
+in1To3:b1,in4To7:b2,in8To14:b3,mature15Plus:b4},
+evaluatedAt:new Date().toISOString()};
+if(typeof localStorage!=="undefined"){
+localStorage.setItem("df_card_intervals_v1",
+JSON.stringify(res));}
+return res;
+}catch(e){return{totalActive:0,
+buckets:{dueToday:0,in1To3:0,
+in4To7:0,in8To14:0,mature15Plus:0}};}}
+function dfRenderIntervalSvg(cid){
+if(typeof document==="undefined")
+return{rendered:false};
+const el=document.getElementById(
+cid||"dfIntervalMount");
+if(!el)return{rendered:false};
+try{const d=dfComputeIntervalBuckets();
+const b=d.buckets;
+const maxVal=Math.max(1,b.dueToday,
+b.in1To3,b.in4To7,b.in8To14,b.mature15Plus);
+const w=200,h=60;const vals=[b.dueToday,
+b.in1To3,b.in4To7,b.in8To14,b.mature15Plus];
+const lbls=["اليوم","3د","7د","14د","15+"];
+let svg="<svg width='"+w+"' height='"+h+"' ";
+svg+="role='img' ";
+svg+="aria-label='توزيع فترات البطاقات'>";
+for(let i=0;i<5;i++){
+const bh=Math.max(3,
+Math.round((vals[i]/maxVal)*36));
+const x=i*38+8;const y=44-bh;
+const col=i===0?"#dc2626":"#059669";
+svg+="<rect x='"+x+"' y='"+y+"' width='24' ";
+svg+="height='"+bh+"' rx='3' fill='"+col+"'/>";
+svg+="<text x='"+(x+12)+"' y='56' ";
+svg+="text-anchor='middle' font-size='9' ";
+svg+="fill='#64748b'>"+lbls[i]+"</text>";}
+svg+="</svg>";el.innerHTML=svg;
+return{rendered:true,total:d.totalActive};
+}catch(e){return{rendered:false};}}
+if(typeof window!=="undefined"){
+Object.assign(window,{
+dfComputeIntervalBuckets,
+dfRenderIntervalSvg});}
