@@ -59527,18 +59527,35 @@ dfSanitizeText,
 dfSafeSetHtml,
 dfRenderSanitizerStatusDom});}
 
+function dfUnpackV21(raw){
+try{if(!raw)return null;
+let o=typeof raw==='string'?
+JSON.parse(raw):raw;
+if(o&&o.payload){
+if(typeof o.payload==='string'){
+try{return JSON.parse(o.payload);}
+catch(_){return o.payload;}}
+return o.payload;}return o;
+}catch(_){return null;}}
 function dfComputeConsecutiveStreak(hist){
-let h=hist;const kC="zen_fortress_cfg_v21";
-try{if(!h&&typeof localStorage!=="undefined"){
-const raw=localStorage.getItem(kC);
-if(raw){h=JSON.parse(raw).sessionHistory||[];}
-if(!h||!h.length){
+let h=hist;const kC='zen_fortress_cfg_v21';
+try{if(!h&&typeof localStorage!=='undefined'){
+const r1=localStorage.getItem(kC);
+const u1=dfUnpackV21(r1);
+if(u1){h=u1.sessionHistory||u1.sessions||u1;}
+if(!Array.isArray(h)){h=[];}
+if(!h.length){
 const r2=localStorage.getItem(
-"df_session_history_v1");
-h=r2?JSON.parse(r2):[];}}}catch(e){h=[];}
+'df_session_history_v1');
+const u2=dfUnpackV21(r2);
+h=Array.isArray(u2)?u2:
+(u2&&u2.sessionHistory)||[];
+}}}catch(_){h=[];}
 const set=new Set();const now=new Date();
 for(let i=0;i<(h||[]).length;i++){
-const at=h[i].completedAt;
+const item=h[i]||{};
+const at=item.completedAt||item.timestamp||
+item.ts||item.createdAt||item.time||item.date;
 if(at){const d=new Date(at);
 if(!isNaN(d.getTime())){
 const y=d.getFullYear();
