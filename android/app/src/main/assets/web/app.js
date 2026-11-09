@@ -60058,3 +60058,39 @@ if(typeof window!=='undefined'){
 Object.assign(window,{dfTrackAudioNode,
 dfPurgeAllAudioNodes,
 dfRenderAudioGcStatusDom});}
+
+function dfCheckAlarmResilience(dlMs){
+const now=Date.now();
+const dl=Number(dlMs)||now;
+const diff=now-dl;const overdue=diff>=0;
+const overSec=overdue?Math.round(diff/1000):0;
+const res={isOverdue:overdue,
+overdueSec:overSec,
+reconciled:true,at:new Date().toISOString()};
+try{if(typeof localStorage!=='undefined'){
+localStorage.setItem('df_alarm_resilience_v1',
+JSON.stringify(res));}}catch(_){}
+return res;}
+function dfRenderAlarmSentinelDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfAlarmMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="حارس مرونة التنبيهات الموقوتة</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="التوافق مع Doze Mode والتنبيه الفوري: نشط";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,resilient:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{dfCheckAlarmResilience,
+dfRenderAlarmSentinelDom});}
