@@ -60362,6 +60362,23 @@ c+='.df-scale{max-width:100%;}';
 el.textContent=c;
 document.head.appendChild(el);dfApplyRtlA11yStyles();}
 return true;}
+
+function dfApplyRtlA11yStyles(){
+if(typeof document==='undefined')return false;
+let el=document.getElementById('dfA11yGuard');
+if(!el){el=document.createElement('style');
+el.id='dfA11yGuard';
+let c=':root{--df-zoom:1;';
+c+='--df-line-h:1.5;}';
+c+='body{direction:rtl;';
+c+='text-align:right;}';
+c+='input,textarea{';
+c+='background:#fff;';
+c+='color:#0f172a;}';
+c+='.df-scale{max-width:100%;}';
+el.textContent=c;
+document.head.appendChild(el);dfApplyRtlA11yStyles();}
+return true;}
 function dfEnforceWhitePremiumTheme(){
 if(typeof document==='undefined')
 return{enforced:false};
