@@ -60364,6 +60364,47 @@ Object.assign(window,{
 dfEnforceWhitePremiumTheme,
 dfRenderThemeGuardDom});}
 
+
+function dfEnforceOfflineNetworkShield(){
+if(typeof window==='undefined')
+return{offlineOnly:true};
+try{
+const w=window;
+if(w.fetch){
+const origFetch=w.fetch;
+w.fetch=function(url,opt){
+const u=String(url||'');
+if(u.startsWith('http://')||
+u.startsWith('https://')){
+return Promise.reject(new Error('OFFLINE'));}
+return origFetch.apply(this,arguments);};}
+return{shieldActive:true,offlineOnly:true,
+at:new Date().toISOString()};
+}catch(_){return{offlineOnly:true};}}
+function dfRenderNetworkShieldDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfNetShieldMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="درع العزل الشبكي السيادي</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="حظر الطلبات الخارجية: نشط (100% Offline)";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,shieldReady:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{
+dfEnforceOfflineNetworkShield,
+dfRenderNetworkShieldDom});}
 function dfEnforceZeroTrackingGate(){
 if(typeof window==='undefined')
 return{offlineOnly:true};
