@@ -19,7 +19,9 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: '8.11.1'
 
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew 2>/dev/null || chmod +x android/gradlew 2>/dev/null || true
@@ -28,8 +30,8 @@ jobs:
         run: |
           GW="./gradlew"
           [ -f "$GW" ] || GW="android/gradlew"
-          "$GW" assembleRelease
-          "$GW" bundleRelease
+          gradle -p android assembleRelease bundleRelease
+          
 
       - name: Upload APK & AAB Artifacts
         uses: actions/upload-artifact@v4
