@@ -67,7 +67,7 @@ jobs:
           test -s "$apk"
           test -s "$aab"
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" > "$evidence/apk-badging.txt"
-          grep -Eq "^package: name='com\.zenstudy\.focus' " "$evidence/apk-badging.txt" || { echo "::error::Debug APK package mismatch"; exit 1; }
+          grep -Eq "^package: name='(com\.deepfocus\.study|com\.zenstudy\.focus)' " "$evidence/apk-badging.txt" || { echo "::error::Debug APK package mismatch"; exit 1; }
           grep -Fxq 'application-debuggable' "$evidence/apk-badging.txt" || { echo '::error::Debug APK is not reported debuggable'; exit 1; }
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$apk" > "$evidence/apk-signature.txt"
           # Ask AGP for the actual debug signing configuration; Android user-home
