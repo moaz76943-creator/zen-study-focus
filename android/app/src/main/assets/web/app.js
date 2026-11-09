@@ -60282,6 +60282,30 @@ return txt.replace(/[ً-ٰٟ]/g,'')
 .replace(/ة/g,'ه')
 .replace(/ى/g,'ي')
 .trim().toLowerCase();}
+
+function dfSearchArabicVaultScored(qStr,items){
+const q=dfNormalizeArabicQuery(qStr);
+if(!q)return[];
+const tokens=q.split(/\s+/).filter(Boolean);
+const list=Array.isArray(items)?items:[];
+const scored=[];
+for(let i=0;i<list.length;i++){
+const it=list[i]||{};
+const sT=it.title||it.q||'';
+const t=dfNormalizeArabicQuery(sT);
+const sC=it.content||it.a||it.note||'';
+const c=dfNormalizeArabicQuery(sC);
+let score=0;
+if(t===q)score+=50;
+else if(t.includes(q))score+=25;
+if(c.includes(q))score+=10;
+for(let j=0;j<tokens.length;j++){
+const tok=tokens[j];
+if(t.includes(tok))score+=15;
+if(c.includes(tok))score+=5;}
+if(score>0)scored.push({item:it,score});}
+scored.sort((a,b)=>b.score-a.score);
+return scored.map(s=>s.item);}
 function dfSearchArabicVault(query,items){
 const q=dfNormalizeArabicQuery(query);
 if(!q)return[];
@@ -60319,7 +60343,7 @@ return{rendered:true,count:cnt||0};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
 Object.assign(window,{dfNormalizeArabicQuery,
-dfSearchArabicVault,dfRenderSearchStatusDom});}
+dfSearchArabicVault,dfSearchArabicVaultScored,dfRenderSearchStatusDom});}
 
 function dfEnforceWhitePremiumTheme(){
 if(typeof document==='undefined')
