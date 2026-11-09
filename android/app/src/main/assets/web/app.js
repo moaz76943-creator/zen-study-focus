@@ -60073,6 +60073,16 @@ if(DF_ACTIVE_NODES.length>50){
 const old=DF_ACTIVE_NODES.shift();
 try{old.disconnect();}catch(_){}}}}
 
+
+let DF_HALT_TIMERS=[];
+function dfClearAudioTimers(){
+while(DF_HALT_TIMERS.length>0){
+const t=DF_HALT_TIMERS.pop();
+try{clearTimeout(t);}catch(_){}}}
+function dfSafeDisconnectNode(n){
+if(!n||n.__disconnected)return false;
+try{n.disconnect();n.__disconnected=true;
+return true;}catch(_){return false;}}
 function dfSafeHaltAudio(ctx){
 let c=0;const now=ctx?ctx.currentTime:0;
 while(DF_ACTIVE_NODES.length>0){
