@@ -268,15 +268,49 @@
     const left=validDate(a.date)?a.date:'',right=validDate(b.date)?b.date:'';
     return left.localeCompare(right)||a.id-b.id;
   }
+  function normalizeTaskSearch(text) {
+    return String(text ?? '')
+      .normalize('NFKC')
+      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '')
+      .replace(/[أإآٱ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/ؤ/g, 'و')
+      .replace(/ئ/g, 'ي')
+      .toLocaleLowerCase()
+      .trim();
+  }
+  function scoreTaskMatch(t, q) {
+    if (!q) return 1;
+    const normTitle = normalizeTaskSearch(t.title || '');
+    const normMeta = normalizeTaskSearch([t.description, t.group, t.catKey].join(' '));
+    let score = 0;
+    if (normTitle === q) score += 120;
+    else if (normTitle.startsWith(q)) score += 90;
+    else if (normTitle.includes(q)) score += 65;
+    if (normMeta.includes(q)) score += 35;
+    return score;
+  }
   function searchTasks(state,filter={}) {
-    const q=String(filter.query||'').trim().toLocaleLowerCase();
+    const q=normalizeTaskSearch(filter.query||'');
+    const scores=new Map();
     return listTasks(state,{includeArchived:!!filter.includeArchived,includeTrash:!!filter.includeTrash}).filter(t=>{
       if(filter.status && statusOf(t)!==filter.status)return false;
       if(filter.catKey && t.catKey!==filter.catKey)return false;
       if(filter.projectId!==undefined && t.projectId!==filter.projectId)return false;
       if(filter.date && t.date!==filter.date)return false;
-      return !q||[t.title,t.description,t.group,t.catKey].some(s=>String(s||'').toLocaleLowerCase().includes(q));
-    }).sort(compareTaskDates);
+      if(!q)return true;
+      const sc=scoreTaskMatch(t,q);
+      if(sc<=0)return false;
+      scores.set(t.id,sc);
+      return true;
+    }).sort((a,b)=>{
+      if(q){
+        const diff=(scores.get(b.id)||0)-(scores.get(a.id)||0);
+        if(diff!==0)return diff;
+      }
+      return compareTaskDates(a,b);
+    });
   }
   function calendarTasks(state,date) {
     if(!validDate(date))fail('Invalid calendar date');return searchTasks(state,{date});
