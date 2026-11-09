@@ -52,9 +52,8 @@ function reviewCard(card, g, days) {
   const nD = nextD(c.difficulty || 5, g);
   const nS = nextS(c.stability || 1,
     nD, ret, g);
-  return { stability: nS, difficulty: nD,
-    interval: interval(nS, 0.9),
-    retrievability: ret };
+  const iv = interval(nS, 0.9); const reps = ((card && card.reps) || 0) + 1;
+  return { stability: nS, s: nS, difficulty: nD, d: nD, interval: iv, ivl: iv, retrievability: ret, reps: reps };
 }
 if (typeof module !== 'undefined') {
   module.exports = { W, retention, interval,
