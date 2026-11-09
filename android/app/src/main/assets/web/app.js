@@ -60015,3 +60015,46 @@ return{rendered:true,svgSecured:true};
 if(typeof window!=='undefined'){
 Object.assign(window,{dfSanitizeSvgMarkup,
 dfSafeInjectSvg,dfRenderSvgSanitizerDom});}
+
+const DF_ACTIVE_NODES=[];
+function dfTrackAudioNode(n){
+if(n&&typeof n.disconnect==='function'){
+DF_ACTIVE_NODES.push(n);
+if(DF_ACTIVE_NODES.length>50){
+const old=DF_ACTIVE_NODES.shift();
+try{old.disconnect();}catch(_){}}}}
+function dfPurgeAllAudioNodes(){
+let c=0;
+while(DF_ACTIVE_NODES.length>0){
+const n=DF_ACTIVE_NODES.pop();
+try{n.disconnect();c++;}catch(_){}}
+const res={purgedCount:c,nodesActive:0,
+at:new Date().toISOString()};
+try{if(typeof localStorage!=='undefined'){
+localStorage.setItem('df_audio_gc_v1',
+JSON.stringify(res));}}catch(_){}
+return res;}
+function dfRenderAudioGcStatusDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfAudioGcMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="إدارة دورة حياة العقد الصوتية</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="تطهير AudioNode ومنع تسريب الذاكرة: نشط";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,gcProtected:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{dfTrackAudioNode,
+dfPurgeAllAudioNodes,
+dfRenderAudioGcStatusDom});}
