@@ -59832,3 +59832,55 @@ return{rendered:true,cleaned:true};
 if(typeof window!=='undefined'){
 Object.assign(window,{dfCleanCaveReverb,
 dfRenderAudioCleanDom});}
+
+const DF_CACHE_KEYS=[
+'df_hourly_focus_distribution_v1',
+'df_daily_progress_v1',
+'df_focus_momentum_v1',
+'df_card_intervals_v1'];
+function dfSafeWriteAuxiliary(k,val){
+if(typeof localStorage==='undefined')
+return false;
+const raw=JSON.stringify(val);
+try{localStorage.setItem(k,raw);return true;
+}catch(e){
+const isQ=e&&(e.name==='QuotaExceededError'||
+e.code===22);
+if(!isQ)return false;
+for(let i=0;i<DF_CACHE_KEYS.length;i++){
+if(DF_CACHE_KEYS[i]!==k){
+try{localStorage.removeItem(DF_CACHE_KEYS[i]);
+}catch(_){}}}
+try{localStorage.setItem(k,raw);return true;
+}catch(_){return false;}}}
+function dfGetStorageHealth(){
+return{quotaGuard:true,evictSafe:true,
+protectedAuthoritative:['v21_cfg','v21_tasks'],
+at:new Date().toISOString()};}
+function dfRenderStorageQuotaDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfQuotaMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="حراسة التخزين (Quota Guard)</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="الحماية ضد امتلاء المساحة: نشطة";
+h+="</div>";
+h+="<div style='margin-top:4px;";
+h+="font-size:11px;color:#64748b;'>";
+h+="عزل بيانات v21 وحماية الملاحظات والمهام";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,quotaProtected:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{dfSafeWriteAuxiliary,
+dfGetStorageHealth,dfRenderStorageQuotaDom});}
