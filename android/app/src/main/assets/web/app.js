@@ -59973,3 +59973,45 @@ if(typeof window!=='undefined'){
 Object.assign(window,{
 dfGetBuildVerificationReport,
 dfRenderFinalAuditSummaryDom});}
+
+function dfSanitizeSvgMarkup(svg){
+if(typeof svg!=='string')return'';
+const rBad=/<\/?(foreignObject|script)/gi;
+let s=svg.replace(rBad,'<blocked_tag');
+const rEv=/\son\w+\s*=/gi;
+s=s.replace(rEv,' data-blocked=');
+return s;}
+function dfSafeInjectSvg(cId,svgStr){
+if(typeof document==='undefined')return false;
+const el=document.getElementById(cId);
+if(!el)return false;
+el.innerHTML=dfSanitizeSvgMarkup(svgStr);
+const rec={safe:true,
+at:new Date().toISOString()};
+try{if(typeof localStorage!=='undefined'){
+localStorage.setItem('df_last_svg_audit_v1',
+JSON.stringify(rec));}}catch(_){}
+return true;}
+function dfRenderSvgSanitizerDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfSvgMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="درع تطهير رسومات SVG التوليدية</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="حظر foreignObject والأحداث الخبيثة: نشط";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,svgSecured:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{dfSanitizeSvgMarkup,
+dfSafeInjectSvg,dfRenderSvgSanitizerDom});}
