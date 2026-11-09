@@ -60072,6 +60072,27 @@ DF_ACTIVE_NODES.push(n);
 if(DF_ACTIVE_NODES.length>50){
 const old=DF_ACTIVE_NODES.shift();
 try{old.disconnect();}catch(_){}}}}
+
+function dfSafeHaltAudio(ctx){
+let c=0;const now=ctx?ctx.currentTime:0;
+while(DF_ACTIVE_NODES.length>0){
+const n=DF_ACTIVE_NODES.pop();
+try{
+if(ctx&&n.gain&&now>0){
+n.gain.cancelScheduledValues(now);
+n.gain.setValueAtTime(n.gain.value,now);
+n.gain.linearRampToValueAtTime(0.0001,
+now+0.08);
+setTimeout(()=>{try{n.disconnect();}
+catch(_){}},100);
+}else{n.disconnect();}
+c++;}catch(_){}}
+const res={haltedCount:c,fadeMs:80,
+antiClick:true,at:new Date().toISOString()};
+try{if(typeof localStorage!=='undefined'){
+localStorage.setItem('df_audio_halt_v1',
+JSON.stringify(res));}}catch(_){}
+return res;}
 function dfPurgeAllAudioNodes(){
 let c=0;
 while(DF_ACTIVE_NODES.length>0){
@@ -60104,7 +60125,7 @@ h+="</div></div>";el.innerHTML=h;
 return{rendered:true,gcProtected:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
-Object.assign(window,{dfTrackAudioNode,
+Object.assign(window,{dfTrackAudioNode,dfSafeHaltAudio,
 dfPurgeAllAudioNodes,
 dfRenderAudioGcStatusDom});}
 
