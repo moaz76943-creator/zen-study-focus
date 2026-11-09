@@ -28,8 +28,8 @@ jobs:
         run: |
           GW="./gradlew"
           [ -f "$GW" ] || GW="android/gradlew"
-          "$GW" assembleRelease || true
-          "$GW" bundleRelease || true
+          "$GW" assembleRelease
+          "$GW" bundleRelease
 
       - name: Upload APK & AAB Artifacts
         uses: actions/upload-artifact@v4
