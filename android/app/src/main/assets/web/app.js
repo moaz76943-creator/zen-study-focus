@@ -60320,3 +60320,46 @@ return{rendered:true,count:cnt||0};
 if(typeof window!=='undefined'){
 Object.assign(window,{dfNormalizeArabicQuery,
 dfSearchArabicVault,dfRenderSearchStatusDom});}
+
+function dfEnforceWhitePremiumTheme(){
+if(typeof document==='undefined')
+return{enforced:false};
+try{
+let el=document.getElementById(
+'dfWhitePremiumGuard');
+if(!el){
+el=document.createElement('style');
+el.id='dfWhitePremiumGuard';
+let c=':root{--df-bg:#fff;--df-card:#f8fafc;';
+c+='--df-border:#e2e8f0;--df-text:#0f172a;}';
+c+='.df-white-premium{background:#fff;';
+c+='color:#0f172a!important;}';
+c+='body{background:#fff;color:#0f172a;}';
+el.textContent=c;
+document.head.appendChild(el);}
+return{enforced:true,theme:'white_premium'};
+}catch(_){return{enforced:false};}}
+function dfRenderThemeGuardDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfThemeMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="درع الهوية البصرية (White Premium)</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="حماية التباين وسلامة العرض: نشطة";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,premium:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{
+dfEnforceWhitePremiumTheme,
+dfRenderThemeGuardDom});}
