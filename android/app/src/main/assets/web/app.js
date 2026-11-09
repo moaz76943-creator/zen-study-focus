@@ -2999,32 +2999,66 @@ function getCatLabel(catKey) {
 
 function renderTasksList() {
   const box = document.getElementById('tasksShowcaseBox');
-  box.innerHTML = '';
+  if (!box) return;
+  box.textContent = '';
 
-  tasksList.filter(t => {
+  const filtered = tasksList.filter(t => {
     if (taskFilterStatus === 'active') return !t.done;
     if (taskFilterStatus === 'done') return t.done;
     return true;
-  }).forEach(t => {
+  });
+  if (typeof dfSafeRenderTasks === 'function') {
+    dfSafeRenderTasks(box, filtered);
+  }
+  box.textContent = '';
+  filtered.forEach(t => {
     const id = Number(t.id);
     if (!Number.isSafeInteger(id) || id < 0) return;
-    const safeIcon = escapeHtmlText(t.icon || '🎯');
+    const safeIcon = String(t.icon || '🎯');
     const safeTheme = ['tp-blue','tp-amber','tp-emerald','tp-rose'].includes(t.theme) ? t.theme : 'tp-blue';
     const card = document.createElement('div');
     card.className = `showcase-task-card ${t.done ? 'done' : ''}`;
-    card.innerHTML = `
-      <div class="showcase-task-top">
-        <div class="task-check-sq" onclick="toggleTaskDone(${id})">✓</div>
-        <div class="task-center-info" onclick="focusOnTask(${id})">
-          <div class="task-main-name">${escapeHtmlText(String(t.title || ''))}</div>
-          <div class="task-time-sub">
-            <span>📅 ${escapeHtmlText(toWest(t.date || todayISO))}</span>
-            <span style="color:var(--primary); font-weight:700;">• ${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>
-          </div>
-        </div>
-        <div class="task-pastel-icon ${safeTheme}" onclick="deleteTaskItem(${id})">${safeIcon}</div>
-      </div>
-    `;
+
+    const top = document.createElement('div');
+    top.className = 'showcase-task-top';
+
+    const checkSq = document.createElement('div');
+    checkSq.className = 'task-check-sq';
+    checkSq.textContent = '✓';
+    checkSq.onclick = () => toggleTaskDone(id);
+
+    const centerInfo = document.createElement('div');
+    centerInfo.className = 'task-center-info';
+    centerInfo.onclick = () => focusOnTask(id);
+
+    const mainName = document.createElement('div');
+    mainName.className = 'task-main-name';
+    mainName.textContent = String(t.title || '');
+
+    const timeSub = document.createElement('div');
+    timeSub.className = 'task-time-sub';
+
+    const dateSpan = document.createElement('span');
+    dateSpan.textContent = `📅 ${toWest(t.date || todayISO)}`;
+
+    const catSpan = document.createElement('span');
+    catSpan.style.cssText = 'color:var(--primary); font-weight:700;';
+    catSpan.textContent = `• ${toWest(getCatLabel(t.catKey))}`;
+
+    timeSub.appendChild(dateSpan);
+    timeSub.appendChild(catSpan);
+    centerInfo.appendChild(mainName);
+    centerInfo.appendChild(timeSub);
+
+    const iconBox = document.createElement('div');
+    iconBox.className = `task-pastel-icon ${safeTheme}`;
+    iconBox.textContent = safeIcon;
+    iconBox.onclick = () => deleteTaskItem(id);
+
+    top.appendChild(checkSq);
+    top.appendChild(centerInfo);
+    top.appendChild(iconBox);
+    card.appendChild(top);
     box.appendChild(card);
   });
   renderTodayPlan();
@@ -3110,7 +3144,7 @@ function renderCalendar() {
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
   const grid = document.getElementById('calDaysGrid');
-  grid.innerHTML = '';
+  grid.textContent = '';
 
   for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
 
@@ -3122,13 +3156,22 @@ function renderCalendar() {
     const cell = document.createElement('div');
     cell.className = `cal-day-cell ${iso === todayISO ? 'today' : ''} ${iso === selectedCalDate ? 'selected' : ''}`;
     cell.onclick = () => { selectedCalDate = iso; renderCalendar(); };
-    cell.innerHTML = `
-      <span>${toWest(day)}</span>
-      <div class="cal-dots-row">
-        ${hasTasks ? '<span class="cal-dot dot-task"></span>' : ''}
-        ${hasNotes ? '<span class="cal-dot dot-note"></span>' : ''}
-      </div>
-    `;
+    const daySpan = document.createElement('span');
+    daySpan.textContent = toWest(day);
+    const dotsRow = document.createElement('div');
+    dotsRow.className = 'cal-dots-row';
+    if (hasTasks) {
+      const dotTask = document.createElement('span');
+      dotTask.className = 'cal-dot dot-task';
+      dotsRow.appendChild(dotTask);
+    }
+    if (hasNotes) {
+      const dotNote = document.createElement('span');
+      dotNote.className = 'cal-dot dot-note';
+      dotsRow.appendChild(dotNote);
+    }
+    cell.appendChild(daySpan);
+    cell.appendChild(dotsRow);
     grid.appendChild(cell);
   }
   renderSelectedDateAgenda();
@@ -3137,27 +3180,44 @@ function renderCalendar() {
 function renderSelectedDateAgenda() {
   document.getElementById('selectedDateLabel').textContent = toWest(`📅 ${selectedCalDate}`);
   const box = document.getElementById('calendarDayAgendaBox');
-  box.innerHTML = '';
+  if (!box) return;
+  box.textContent = '';
 
   const dayTasks = tasksList.filter(t => t.date === selectedCalDate);
   const dayNotes = notesList.filter(n => n.calDate === selectedCalDate);
 
   if (dayTasks.length === 0 && dayNotes.length === 0) {
-    box.innerHTML = `<div style="font-size:0.78rem; color:var(--text-light); text-align:center; padding:12px;">✨ ${L().btnAddCalNote}</div>`;
+    const emptyEl = document.createElement('div');
+    emptyEl.style.cssText = 'font-size:0.78rem; color:var(--text-light); text-align:center; padding:12px;';
+    emptyEl.textContent = `✨ ${L().btnAddCalNote}`;
+    box.appendChild(emptyEl);
     return;
   }
 
   dayTasks.forEach(t => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#f8fafc; border-right:4px solid #10b981; font-size:0.8rem; font-weight:800; display:flex; justify-content:space-between;';
-    item.innerHTML = `<span>${t.done ? '✅' : '📋'} ${escapeHtmlText(String(t.title || ''))}</span><span style="color:var(--text-muted); font-size:0.7rem;">${escapeHtmlText(toWest(getCatLabel(t.catKey)))}</span>`;
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = `${t.done ? '✅' : '📋'} ${String(t.title || '')}`;
+    const catSpan = document.createElement('span');
+    catSpan.style.cssText = 'color:var(--text-muted); font-size:0.7rem;';
+    catSpan.textContent = toWest(getCatLabel(t.catKey));
+    item.appendChild(titleSpan);
+    item.appendChild(catSpan);
     box.appendChild(item);
   });
 
   dayNotes.forEach(n => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 12px; border-radius:14px; background:#fffbeb; border-right:4px solid #f59e0b; font-size:0.8rem;';
-    item.innerHTML = `<div style="font-weight:900;">📝 ${escapeHtmlText(String(n.title || ''))}</div><div style="color:var(--text-muted); font-size:0.74rem; margin-top:3px;">${escapeHtmlText(String(n.body || ''))}</div>`;
+    const titleDiv = document.createElement('div');
+    titleDiv.style.fontWeight = '900';
+    titleDiv.textContent = `📝 ${String(n.title || '')}`;
+    const bodyDiv = document.createElement('div');
+    bodyDiv.style.cssText = 'color:var(--text-muted); font-size:0.74rem; margin-top:3px;';
+    bodyDiv.textContent = String(n.body || '');
+    item.appendChild(titleDiv);
+    item.appendChild(bodyDiv);
     box.appendChild(item);
   });
 }
@@ -3186,33 +3246,80 @@ function filterNotesByTag(tag, btn) {
 
 function renderNotesStack() {
   const box = document.getElementById('notesStackBox');
-  const q = (document.getElementById('inpSearchNotes').value || '').toLowerCase();
-  box.innerHTML = '';
+  if (!box) return;
+  const searchInput = document.getElementById('inpSearchNotes');
+  const q = ((searchInput && searchInput.value) || '').toLowerCase();
+  box.textContent = '';
 
-  notesList.filter(n => {
+  const filtered = notesList.filter(n => {
     if (!(n.title + ' ' + n.body).toLowerCase().includes(q)) return false;
     if (noteTagFilter !== 'all' && n.catKey !== noteTagFilter) return false;
     return true;
-  }).forEach(n => {
+  });
+  if (typeof dfSafeRenderNotes === 'function') {
+    dfSafeRenderNotes(box, filtered);
+  }
+  box.textContent = '';
+  filtered.forEach(n => {
     const id = Number(n.id);
     if (!Number.isSafeInteger(id) || id < 0) return;
     const card = document.createElement('div');
-    card.className = `learning-rich-card ${n.theme}`;
-    card.innerHTML = `
-      <div class="lcard-head">
-        <div class="lcard-title"><span>✨</span> <span>${escapeHtmlText(String(n.title || ''))}</span></div>
-        <div style="display:flex; gap:8px;">
-          <span style="cursor:pointer;" onclick="pinNoteToTodayCalendar(${id})">📅</span>
-          <span style="cursor:pointer;" onclick="toggleNoteBlur(${id})">👁️</span>
-          <span style="cursor:pointer; color:var(--rose);" onclick="deleteNoteCard(${id})">✕</span>
-        </div>
-      </div>
-      <div class="lcard-body ${n.blur ? 'blurred-secret' : ''}" onclick="this.classList.toggle('blurred-secret')">${escapeHtmlText(String(n.body || ''))}</div>
-      <div class="lcard-foot">
-        <span>📅 ${escapeHtmlText(toWest(n.calDate || todayISO))}</span>
-        <span style="font-weight:800; color:var(--primary);">${escapeHtmlText(toWest(getNoteTagLabel(n.catKey)))}</span>
-      </div>
-    `;
+    card.className = `learning-rich-card ${n.theme || 'theme-violet'}`;
+
+    const head = document.createElement('div');
+    head.className = 'lcard-head';
+
+    const titleWrap = document.createElement('div');
+    titleWrap.className = 'lcard-title';
+    const sparkSpan = document.createElement('span');
+    sparkSpan.textContent = '✨';
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = String(n.title || '');
+    titleWrap.appendChild(sparkSpan);
+    titleWrap.appendChild(document.createTextNode(' '));
+    titleWrap.appendChild(titleSpan);
+
+    const actions = document.createElement('div');
+    actions.style.cssText = 'display:flex; gap:8px;';
+    const pinBtn = document.createElement('span');
+    pinBtn.style.cursor = 'pointer';
+    pinBtn.textContent = '📅';
+    pinBtn.onclick = () => pinNoteToTodayCalendar(id);
+
+    const blurBtn = document.createElement('span');
+    blurBtn.style.cursor = 'pointer';
+    blurBtn.textContent = '👁️';
+    blurBtn.onclick = () => toggleNoteBlur(id);
+
+    const delBtn = document.createElement('span');
+    delBtn.style.cssText = 'cursor:pointer; color:var(--rose);';
+    delBtn.textContent = '✕';
+    delBtn.onclick = () => deleteNoteCard(id);
+
+    actions.appendChild(pinBtn);
+    actions.appendChild(blurBtn);
+    actions.appendChild(delBtn);
+    head.appendChild(titleWrap);
+    head.appendChild(actions);
+
+    const body = document.createElement('div');
+    body.className = `lcard-body ${n.blur ? 'blurred-secret' : ''}`;
+    body.textContent = String(n.body || '');
+    body.onclick = function() { this.classList.toggle('blurred-secret'); };
+
+    const foot = document.createElement('div');
+    foot.className = 'lcard-foot';
+    const footDate = document.createElement('span');
+    footDate.textContent = `📅 ${toWest(n.calDate || todayISO)}`;
+    const footTag = document.createElement('span');
+    footTag.style.cssText = 'font-weight:800; color:var(--primary);';
+    footTag.textContent = toWest(getNoteTagLabel(n.catKey));
+    foot.appendChild(footDate);
+    foot.appendChild(footTag);
+
+    card.appendChild(head);
+    card.appendChild(body);
+    card.appendChild(foot);
     box.appendChild(card);
   });
 }
@@ -4222,14 +4329,31 @@ const VocabAudioBankEngine = (function() {
   }
 
   
-  function setCardReviewStatus(cardId, needsReview) {
+  function setCardReviewStatus(cardId, needsReview, gradeOpt) {
+    const grade = Number.isFinite(Number(gradeOpt))
+      ? Math.min(4, Math.max(1, Number(gradeOpt)))
+      : (needsReview ? 1 : 3);
+    const fsrsApi = (typeof window !== 'undefined' && window.FSRS45)
+      || (typeof dfGetFsrs45Kernel === 'function' ? dfGetFsrs45Kernel() : null);
+    const nowIso = new Date().toISOString().slice(0, 10);
     const list = getVocabList().map(c => {
       if (c.id === cardId) {
+        const prevReviewed = c.lastReviewed ? new Date(c.lastReviewed).getTime() : Date.now();
+        const elapsedDays = Math.max(0, Math.round((Date.now() - prevReviewed) / 86400000));
+        const fsrsState = fsrsApi && typeof fsrsApi.reviewCard === 'function'
+          ? fsrsApi.reviewCard({ s: c.stability || c.s || 0, d: c.difficulty || c.d || 5, reps: c.reviewCount || 0 }, grade, elapsedDays)
+          : (typeof dfFsrs45Review === 'function'
+              ? dfFsrs45Review(c.stability || 1, c.difficulty || 5, elapsedDays, grade)
+              : { s: 1, d: 5, ivl: 1 });
         return {
           ...c,
           needsReview: needsReview,
+          stability: fsrsState.s !== undefined ? fsrsState.s : fsrsState.stability,
+          difficulty: fsrsState.d !== undefined ? fsrsState.d : fsrsState.difficulty,
+          interval: fsrsState.ivl !== undefined ? fsrsState.ivl : fsrsState.interval,
+          due: fsrsState.due || Date.now() + ((fsrsState.ivl || fsrsState.interval || 1) * 86400000),
           reviewCount: (c.reviewCount || 0) + 1,
-          lastReviewed: new Date().toISOString().slice(0, 10)
+          lastReviewed: nowIso
         };
       }
       return c;
@@ -4338,30 +4462,74 @@ const VocabUIController = (function() {
       </div>
 
       <!-- Word Cards List -->
-      <div id="df-vocab-cards-container" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
-        ${items.map(item => `
-          <div data-card-id="${item.id}" data-card-color="${item.color || 'purple'}" data-card-review="${item.needsReview ? 'true' : 'false'}" style="position:relative;background:#ffffff;border-radius:18px;border:1px solid #e2e8f0;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.02);display:flex;gap:14px;align-items:flex-start;">
-            <!-- Foreign Word Column -->
-            <div style="flex:1;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <button data-audio-term="${item.term}" style="background:#f1f5f9;border:none;border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;" title="Listen Foreign">🔊</button>
-                <div style="font-size:14px;font-weight:700;color:#0f172a;line-height:1.4;">${item.term}</div>
-              </div>
-            </div>
-
-            <!-- Translation Column -->
-            <div style="flex:1;border-right:1px solid #f1f5f9;padding-right:12px;direction:rtl;text-align:right;">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <span class="df-color-dot" data-dot-card-id="${item.id}" title="Click to change color" style="width:12px;height:12px;border-radius:50%;background:${getColorHex(item.color)};display:inline-block;shrink:0;box-shadow:0 0 0 2px #ffffff, 0 0 0 3px #cbd5e1;"></span><button class="df-card-delete-btn" data-delete-card-id="${item.id}" style="background:transparent;border:none;color:#94a3b8;font-size:11px;cursor:pointer;margin-right:auto;" title="Delete Card">✕</button>
-                <div style="font-size:14px;font-weight:700;color:#1e293b;line-height:1.4;">${item.translation}</div>
-                <button data-audio-trans="${item.translation}" style="background:#f1f5f9;border:none;border-radius:8px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;margin-right:auto;" title="Listen Arabic">🔊</button>
-              </div>
-              ${item.notes ? `<div style="font-size:11px;color:#64748b;margin-top:4px;line-height:1.4;background:#f8fafc;padding:6px 8px;border-radius:8px;">${item.notes}</div>` : ''}
-            </div>
-          </div>
-        `).join('')}
-      </div>
+      <div id="df-vocab-cards-container" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;"></div>
     `;
+
+    const cardsContainer = modal.querySelector('#df-vocab-cards-container');
+    items.forEach(item => {
+      const cardRow = document.createElement('div');
+      cardRow.dataset.cardId = String(item.id);
+      cardRow.dataset.cardColor = String(item.color || 'purple');
+      cardRow.dataset.cardReview = item.needsReview ? 'true' : 'false';
+      cardRow.style.cssText = 'position:relative;background:#ffffff;border-radius:18px;border:1px solid #e2e8f0;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.02);display:flex;gap:14px;align-items:flex-start;';
+
+      const foreignCol = document.createElement('div');
+      foreignCol.style.flex = '1';
+      const foreignInner = document.createElement('div');
+      foreignInner.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+      const audioTermBtn = document.createElement('button');
+      audioTermBtn.dataset.audioTerm = String(item.term || '');
+      audioTermBtn.style.cssText = 'background:#f1f5f9;border:none;border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;';
+      audioTermBtn.title = 'Listen Foreign';
+      audioTermBtn.textContent = '🔊';
+      const termText = document.createElement('div');
+      termText.style.cssText = 'font-size:14px;font-weight:700;color:#0f172a;line-height:1.4;';
+      termText.textContent = String(item.term || '');
+      foreignInner.appendChild(audioTermBtn);
+      foreignInner.appendChild(termText);
+      foreignCol.appendChild(foreignInner);
+
+      const transCol = document.createElement('div');
+      transCol.style.cssText = 'flex:1;border-right:1px solid #f1f5f9;padding-right:12px;direction:rtl;text-align:right;';
+      const transInner = document.createElement('div');
+      transInner.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px;';
+      const colorDot = document.createElement('span');
+      colorDot.className = 'df-color-dot';
+      colorDot.dataset.dotCardId = String(item.id);
+      colorDot.title = 'Click to change color';
+      colorDot.style.cssText = `width:12px;height:12px;border-radius:50%;background:${getColorHex(item.color)};display:inline-block;shrink:0;box-shadow:0 0 0 2px #ffffff, 0 0 0 3px #cbd5e1;`;
+      const delCardBtn = document.createElement('button');
+      delCardBtn.className = 'df-card-delete-btn';
+      delCardBtn.dataset.deleteCardId = String(item.id);
+      delCardBtn.style.cssText = 'background:transparent;border:none;color:#94a3b8;font-size:11px;cursor:pointer;margin-right:auto;';
+      delCardBtn.title = 'Delete Card';
+      delCardBtn.textContent = '✕';
+      const transText = document.createElement('div');
+      transText.style.cssText = 'font-size:14px;font-weight:700;color:#1e293b;line-height:1.4;';
+      transText.textContent = String(item.translation || '');
+      const audioTransBtn = document.createElement('button');
+      audioTransBtn.dataset.audioTrans = String(item.translation || '');
+      audioTransBtn.style.cssText = 'background:#f1f5f9;border:none;border-radius:8px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;margin-right:auto;';
+      audioTransBtn.title = 'Listen Arabic';
+      audioTransBtn.textContent = '🔊';
+
+      transInner.appendChild(colorDot);
+      transInner.appendChild(delCardBtn);
+      transInner.appendChild(transText);
+      transInner.appendChild(audioTransBtn);
+      transCol.appendChild(transInner);
+
+      if (item.notes) {
+        const noteBox = document.createElement('div');
+        noteBox.style.cssText = 'font-size:11px;color:#64748b;margin-top:4px;line-height:1.4;background:#f8fafc;padding:6px 8px;border-radius:8px;';
+        noteBox.textContent = String(item.notes);
+        transCol.appendChild(noteBox);
+      }
+
+      cardRow.appendChild(foreignCol);
+      cardRow.appendChild(transCol);
+      cardsContainer.appendChild(cardRow);
+    });
 
     document.body.appendChild(modal);
 
@@ -4638,15 +4806,14 @@ const FlashQuizEngine = (function() {
 
         <!-- Term Box -->
         <div style="background:#0f172a;border:1px solid #1e293b;border-radius:20px;padding:24px 16px;margin-bottom:18px;">
-          <div style="font-size:17px;font-weight:800;color:#38bdf8;line-height:1.4;margin-bottom:10px;">${card.term}</div>
+          <div id="df-quiz-term-txt" style="font-size:17px;font-weight:800;color:#38bdf8;line-height:1.4;margin-bottom:10px;"></div>
           <button id="df-quiz-listen-term" style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:6px 14px;color:#94a3b8;font-size:12px;cursor:pointer;font-weight:600;">🔊 Listen</button>
         </div>
 
         <!-- Answer Section (Hidden by default) -->
         <div id="df-quiz-answer-section" style="display:none;margin-bottom:20px;">
-          <div style="background:#0284c715;border:1px solid #0284c740;border-radius:18px;padding:16px;direction:rtl;text-align:right;">
-            <div style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">${card.translation}</div>
-            ${card.notes ? `<div style="font-size:11px;color:#94a3b8;line-height:1.4;">${card.notes}</div>` : ''}
+          <div id="df-quiz-answer-inner" style="background:#0284c715;border:1px solid #0284c740;border-radius:18px;padding:16px;direction:rtl;text-align:right;">
+            <div id="df-quiz-trans-txt" style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:6px;"></div>
           </div>
         </div>
 
@@ -4661,6 +4828,20 @@ const FlashQuizEngine = (function() {
     `;
 
     document.body.appendChild(modal);
+
+    const termTxtEl = document.getElementById('df-quiz-term-txt');
+    if (termTxtEl) termTxtEl.textContent = String(card.term || '');
+    const transTxtEl = document.getElementById('df-quiz-trans-txt');
+    if (transTxtEl) transTxtEl.textContent = String(card.translation || '');
+    if (card.notes) {
+      const ansInner = document.getElementById('df-quiz-answer-inner');
+      if (ansInner) {
+        const noteEl = document.createElement('div');
+        noteEl.style.cssText = 'font-size:11px;color:#94a3b8;line-height:1.4;';
+        noteEl.textContent = String(card.notes);
+        ansInner.appendChild(noteEl);
+      }
+    }
 
     document.getElementById('df-quiz-close').onclick = () => modal.remove();
 
@@ -4677,13 +4858,17 @@ const FlashQuizEngine = (function() {
       if (window.triggerHaptic) window.triggerHaptic('click');
     };
 
-    document.getElementById('df-quiz-hard').onclick = () => { if(window.VocabAudioBankEngine) window.VocabAudioBankEngine.setCardReviewStatus(card.id, true);
+    document.getElementById('df-quiz-hard').onclick = () => {
+      if (window.VocabAudioBankEngine) window.VocabAudioBankEngine.setCardReviewStatus(card.id, true, 1);
+      if (typeof dfFsrs45Review === 'function') dfFsrs45Review(card.stability || 1, card.difficulty || 5, 1, 1);
       currentIndex++;
       renderQuizCard();
       if (window.triggerHaptic) window.triggerHaptic('step');
     };
 
-    document.getElementById('df-quiz-easy').onclick = () => { if(window.VocabAudioBankEngine) window.VocabAudioBankEngine.setCardReviewStatus(card.id, false);
+    document.getElementById('df-quiz-easy').onclick = () => {
+      if (window.VocabAudioBankEngine) window.VocabAudioBankEngine.setCardReviewStatus(card.id, false, 4);
+      if (typeof dfFsrs45Review === 'function') dfFsrs45Review(card.stability || 1, card.difficulty || 5, 1, 4);
       correctCount++;
       currentIndex++;
       renderQuizCard();
@@ -59731,36 +59916,88 @@ dfFiniteMinutes,
 dfGetUnifiedSessionHistory,
 dfRenderAnalyticsIntegrityDom});}
 
+const DF_FSRS45_W=[
+0.4,0.6,2.4,5.8,4.93,0.94,0.86,0.01,
+1.49,0.14,0.94,2.18,0.05,0.34,1.26,0.29,2.61];
+function dfGetFsrs45Kernel(){
+try{if(typeof window!=='undefined'&&window.FSRS45)
+return window.FSRS45;
+if(typeof require==='function'){
+const m=require('./modules/flashcards/fsrs.js');
+if(m)return m;}}catch(_){}
+return null;}
 function dfFsrs45Retention(tDays,sVal){
+const k=dfGetFsrs45Kernel();
+if(k&&typeof k.retention==='function')
+return k.retention(tDays,sVal);
 const t=Math.max(0,Number(tDays)||0);
 const s=Math.max(0.1,Number(sVal)||1);
 return Math.pow(1+(19*t)/(81*s),-0.5);}
 function dfFsrs45Interval(sVal,rTarget){
+const k=dfGetFsrs45Kernel();
+if(k&&typeof k.interval==='function')
+return k.interval(sVal,rTarget);
 const s=Math.max(0.1,Number(sVal)||1);
 const r=Math.min(0.97,Math.max(0.7,Number(rTarget)||0.9));
 const d=(81*s/19)*(Math.pow(r,-2)-1);
 return Math.min(3650,Math.max(1,Math.round(d)));}
 function dfFsrs45Review(sVal,dVal,tDays,grade){
-const s=Math.max(0.1,Number(sVal)||1);
-const d=Math.min(10,Math.max(1,Number(dVal)||5));
+const k=dfGetFsrs45Kernel();
+const w=(k&&Array.isArray(k.W)&&k.W.length===17)?
+k.W:DF_FSRS45_W;
+const s=Math.max(0.1,Number(sVal)||w[0]);
+const d=Math.min(10,Math.max(1,Number(dVal)||w[4]));
 const t=Math.max(0,Number(tDays)||0);
 const g=Math.min(4,Math.max(1,Number(grade)||3));
 const r=dfFsrs45Retention(t,s);
-const nextD=Math.min(10,Math.max(1,d-0.8*(g-3)));
-let nextS=s;
-if(g===1){nextS=Math.max(0.1,s*0.4);}
-else{const mult=g===2?1.2:(g===3?2.1:3.2);
-nextS=Math.min(3650,Math.max(0.2,s*(1+mult*(1-r))));}
-const res={stability:nextS,difficulty:nextD,
-retrievability:r,interval:dfFsrs45Interval(nextS,0.9),
+let nextD,nextS;
+if(k&&typeof k.nextD==='function'&&
+typeof k.nextS==='function'){
+nextD=k.nextD(d,g);
+nextS=k.nextS(s,d,r,g);
+}else{
+const d0=w[4]-w[5]*(g-3);
+const delta=-w[6]*(g-3);
+const dPrime=d+delta*((10-d)/9);
+nextD=Math.min(10,Math.max(1,w[7]*d0+(1-w[7])*dPrime));
+if(g===1){
+const p=Math.pow(d,-w[12]);
+const sp=Math.pow(s+1,w[13])-1;
+const ex=Math.exp(w[14]*(1-r));
+nextS=Math.min(s,Math.max(0.1,w[11]*p*sp*ex));
+}else{
+const h=g===2?w[15]:1;
+const b=g===4?w[16]:1;
+const inc=Math.exp(w[8])*(11-d)*Math.pow(s,-w[9])*
+(Math.exp(w[10]*(1-r))-1)*h*b;
+nextS=Math.min(3650,Math.max(0.1,s*(1+inc)));}}
+const ivl=dfFsrs45Interval(nextS,0.9);
+const res={s:nextS,d:nextD,ivl:ivl,
+stability:nextS,difficulty:nextD,
+retrievability:r,interval:ivl,
+weightsCount:w.length,
 at:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
 localStorage.setItem('df_last_fsrs45_v1',JSON.stringify(res));
 }}catch(e){}
 return res;}
+function dfReviewFlashcardFsrs45(card,grade,elapsedDays){
+const k=dfGetFsrs45Kernel();
+if(k&&typeof k.reviewCard==='function'){
+const out=k.reviewCard(card||{},grade,elapsedDays);
+const r=dfFsrs45Retention(elapsedDays||0,(card&&card.s)||out.s);
+return Object.assign({},out,{
+stability:out.s,difficulty:out.d,
+retrievability:r,interval:out.ivl,
+weightsCount:(k.W&&k.W.length)||17});}
+const c=card||{};
+return dfFsrs45Review(c.s||c.stability||0.4,
+c.d||c.difficulty||5,elapsedDays||0,grade||3);}
 if(typeof window!=='undefined'){
 Object.assign(window,{
-dfFsrs45Retention,dfFsrs45Interval,dfFsrs45Review});}
+DF_FSRS45_W,dfGetFsrs45Kernel,
+dfFsrs45Retention,dfFsrs45Interval,
+dfFsrs45Review,dfReviewFlashcardFsrs45});}
 
 function dfMonotonicNow(){
 try{
@@ -60255,7 +60492,7 @@ for(let i=0;i<list.length;i++){
 const n=list[i]||{};
 const d=document.createElement('div');
 d.className='df-safe-note';
-const nv=n.content||n.text||'';
+const nv=n.content||n.text||n.body||n.title||'';
 d.textContent=String(nv);
 el.appendChild(d);}
 return{count:list.length,safe:true};}
@@ -60263,6 +60500,27 @@ if(typeof window!=='undefined'){
 Object.assign(window,{dfSafeRenderTaskItem,
 dfSafeRenderTasks,dfSafeRenderNotes});}
 
+function dfRenderVaultSafDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfVaultMount');
+if(!el)return{rendered:false};
+try{
+el.textContent='';
+const box=document.createElement('div');
+box.style.cssText='background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:12px;';
+const h1=document.createElement('div');
+h1.style.cssText='font-size:13px;font-weight:700;color:#0f172a;';
+h1.textContent='خزنة النسخ الاحتياطي السيادي (SAF Vault)';
+const h2=document.createElement('div');
+h2.style.cssText='margin-top:6px;font-size:12px;color:#059669;font-weight:600;';
+h2.textContent='تخزين محلي معزول ومؤمّن: نشط';
+box.appendChild(h1);
+box.appendChild(h2);
+el.appendChild(box);
+return{rendered:true,vaultReady:true};
+}catch(_){return{rendered:false};}}
 function dfInitSovereignUiBridge(){
 if(typeof document==='undefined')
 return{mounted:false};
@@ -60277,12 +60535,13 @@ dfRenderConsecutiveStreakDom('dfStreakMount');
 return{mounted:true,active:true};
 }catch(_){return{mounted:false};}}
 if(typeof document!=='undefined'){
-if(document.readyState==='loading'){
 document.addEventListener('DOMContentLoaded',
-dfInitSovereignUiBridge);}
-else{dfInitSovereignUiBridge();}}
+dfInitSovereignUiBridge);
+if(document.readyState!=='loading'){
+dfInitSovereignUiBridge();}}
 if(typeof window!=='undefined'){
 Object.assign(window,{
+dfRenderVaultSafDom,
 dfInitSovereignUiBridge});}
 
 function dfNormalizeArabicQuery(txt){
@@ -60370,24 +60629,7 @@ c+='background:#fff;';
 c+='color:#0f172a;}';
 c+='.df-scale{max-width:100%;}';
 el.textContent=c;
-document.head.appendChild(el);dfApplyRtlA11yStyles();}
-return true;}
-
-function dfApplyRtlA11yStyles(){
-if(typeof document==='undefined')return false;
-let el=document.getElementById('dfA11yGuard');
-if(!el){el=document.createElement('style');
-el.id='dfA11yGuard';
-let c=':root{--df-zoom:1;';
-c+='--df-line-h:1.5;}';
-c+='body{direction:rtl;';
-c+='text-align:right;}';
-c+='input,textarea{';
-c+='background:#fff;';
-c+='color:#0f172a;}';
-c+='.df-scale{max-width:100%;}';
-el.textContent=c;
-document.head.appendChild(el);dfApplyRtlA11yStyles();}
+document.head.appendChild(el);}
 return true;}
 function dfEnforceWhitePremiumTheme(){
 if(typeof document==='undefined')
