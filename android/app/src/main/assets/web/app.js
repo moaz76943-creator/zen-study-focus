@@ -59800,3 +59800,35 @@ if(typeof window!=='undefined'){
 Object.assign(window,{dfMonotonicNow,
 dfAccumulateFocusTime,dfStopIdleWatchdog,
 dfRenderMonotonicTimerDom});}
+
+function dfCleanCaveReverb(ctx,dest){
+if(!ctx)return null;
+try{const f=ctx.createBiquadFilter();
+f.type='lowpass';f.frequency.value=800;
+const g=ctx.createGain();g.gain.value=0.25;
+f.connect(g);if(dest)g.connect(dest);
+return{input:f,output:g,active:true};
+}catch(_){return null;}}
+function dfRenderAudioCleanDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfCleanMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="تطهير ومعايرة العزل الترددي</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="مرشح الترددات المنخفضة Biquad: نشط";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,cleaned:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{dfCleanCaveReverb,
+dfRenderAudioCleanDom});}

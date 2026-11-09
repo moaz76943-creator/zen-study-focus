@@ -509,7 +509,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if (appDialogs != null) appDialogs.cancelPending();
-        super.onDestroy();
+        WebView old = webView;
+    webView = null;
+    if (old != null) {
+        old.destroy();
+    }
+    super.onDestroy();
     }
 
     @Override
