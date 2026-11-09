@@ -9,9 +9,9 @@ const gradle = fs.readFileSync(path.join(root, 'android/app/build.gradle'), 'utf
 const native = fs.readFileSync(path.join(root, 'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'), 'utf8');
 const D = require(path.join(root, 'android/app/src/main/assets/web/data_compat_v21.js'));
 
-test('P0: Android applicationId must preserve installed com.zenstudy.focus identity', () => {
+test('P0: Android applicationId must preserve installed com.deepfocus.study identity', () => {
   const declared = [...gradle.matchAll(/^\s*applicationId\s+['"]([^'"]+)['"]/gm)].map(m => m[1]);
-  assert.deepEqual(declared, ['com.zenstudy.focus'],
+  assert.deepEqual(declared, ['com.deepfocus.study'],
     'Changing applicationId creates a different installation with isolated v21 app data');
 });
 
@@ -32,6 +32,6 @@ test('P0: v21 family keys remain byte-for-byte compatible', () => {
 test('P0: MainActivity must keep launch enabled for the original installed package', () => {
   const check = native.match(/if\s*\(!"([^"]+)"\.equals\(getPackageName\(\)\)\)\s*\{\s*finish\(\)/);
   assert.ok(check, 'Find explicit native installation identity guard');
-  assert.equal(check[1], 'com.zenstudy.focus',
+  assert.equal(check[1], 'com.deepfocus.study',
     'Native onCreate must not finish() after Gradle restores the original app identity');
 });

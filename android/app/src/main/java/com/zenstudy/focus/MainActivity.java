@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         // Display stays awake only in user-selected Desk Clock mode.
 
         WebView.setWebContentsDebuggingEnabled(false);
-        if (!"com.zenstudy.focus".equals(getPackageName())) {
+        if (!("com.deepfocus.study".equals(getPackageName()) || "com.zenstudy.focus".equals(getPackageName()))) {
             finish();
             return;
         }

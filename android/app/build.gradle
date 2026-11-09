@@ -16,8 +16,8 @@ android {
         applicationId "com.deepfocus.study"
         minSdk 24
         targetSdk 36
-        versionCode 41109
-        versionName "420.9.0"
+        versionCode 41110
+        versionName "421.0.0"
     }
     signingConfigs {
         if (hasUploadSigning) {
