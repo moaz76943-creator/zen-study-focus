@@ -59884,3 +59884,51 @@ return{rendered:true,quotaProtected:true};
 if(typeof window!=='undefined'){
 Object.assign(window,{dfSafeWriteAuxiliary,
 dfGetStorageHealth,dfRenderStorageQuotaDom});}
+
+function dfNormalizeArabic(raw,strict){
+if(!raw)return'';
+let t=String(raw).normalize('NFKC');
+if(!strict){
+const rH=/[ً-ٰٟـ]/g;
+t=t.replace(rH,'');}
+return t.replace(/\s+/g,' ').trim();}
+function dfParseStrictCloze(txt){
+const s=String(txt||'');
+const answers=[];let out='';let cur=0;
+while(cur<s.length){
+const op=s.indexOf('{{',cur);
+if(op===-1){out+=s.slice(cur);break;}
+out+=s.slice(cur,op);
+const cl=s.indexOf('}}',op+2);
+if(cl===-1){out+=s.slice(op);break;}
+const ans=s.slice(op+2,cl).trim();
+if(ans&&!ans.includes('{{')){
+answers.push(ans);
+out+='['+answers.length+']';}
+else{out+=s.slice(op,cl+2);}
+cur=cl+2;}
+return{template:out,answers:answers,
+count:answers.length};}
+function dfRenderClozeParserDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfClozeMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="محلل تفريغ النصوص والتشكيل</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="معالجة Cloze والتشكيل العربي: نشطة";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,clozeReady:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{dfNormalizeArabic,
+dfParseStrictCloze,dfRenderClozeParserDom});}
