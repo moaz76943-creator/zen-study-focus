@@ -60152,3 +60152,50 @@ if(typeof window!=='undefined'){
 Object.assign(window,{
 dfComputeAdaptiveBreakPacing,
 dfRenderBreakPacingDom});}
+
+function dfSafeRenderTaskItem(pNode,task){
+if(!pNode||!task)return null;
+if(typeof document==='undefined')return null;
+const it=document.createElement('div');
+it.className='df-safe-task';
+const t=document.createElement('span');
+t.className='df-task-title';
+const val=task.title||task.text||'';
+t.textContent=String(val);
+it.appendChild(t);
+if(task.note){
+const n=document.createElement('small');
+n.className='df-task-note';
+n.textContent=' - '+String(task.note);
+it.appendChild(n);}
+pNode.appendChild(it);return it;}
+function dfSafeRenderTasks(cId,tasks){
+if(typeof document==='undefined')
+return{count:0};
+const el=typeof cId==='string'?
+document.getElementById(cId):cId;
+if(!el)return{count:0};
+el.textContent='';
+const list=Array.isArray(tasks)?tasks:[];
+for(let i=0;i<list.length;i++){
+dfSafeRenderTaskItem(el,list[i]);}
+return{count:list.length,safe:true};}
+function dfSafeRenderNotes(cId,notes){
+if(typeof document==='undefined')
+return{count:0};
+const el=typeof cId==='string'?
+document.getElementById(cId):cId;
+if(!el)return{count:0};
+el.textContent='';
+const list=Array.isArray(notes)?notes:[];
+for(let i=0;i<list.length;i++){
+const n=list[i]||{};
+const d=document.createElement('div');
+d.className='df-safe-note';
+const nv=n.content||n.text||'';
+d.textContent=String(nv);
+el.appendChild(d);}
+return{count:list.length,safe:true};}
+if(typeof window!=='undefined'){
+Object.assign(window,{dfSafeRenderTaskItem,
+dfSafeRenderTasks,dfSafeRenderNotes});}
