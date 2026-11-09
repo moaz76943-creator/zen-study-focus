@@ -60094,3 +60094,44 @@ return{rendered:true,resilient:true};
 if(typeof window!=='undefined'){
 Object.assign(window,{dfCheckAlarmResilience,
 dfRenderAlarmSentinelDom});}
+
+function dfComputeAdaptiveBreakPacing(fM){
+const m=Math.max(1,Number(fM)||25);
+let b=5;
+if(m>=90){b=20;}
+else if(m>=50){b=10;}
+else if(m>=25){b=5;}
+else{b=3;}
+const ratio=Math.round((b/m)*100)/100;
+const res={focusMinutes:m,breakMinutes:b,
+pacingRatio:ratio,at:new Date().toISOString()};
+try{if(typeof localStorage!=='undefined'){
+localStorage.setItem('df_break_pacing_v1',
+JSON.stringify(res));}}catch(_){}
+return res;}
+function dfRenderBreakPacingDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfBreakPacingMount');
+if(!el)return{rendered:false};
+try{const p=dfComputeAdaptiveBreakPacing(25);
+let h="<div style='background:#f1f5f9;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="منظّم فترات الراحة التكيفية</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#2563eb;";
+h+="font-weight:600;'>";
+h+="راحة موصى بها: "+p.breakMinutes+" دقيقة";
+h+=" (نسبة الإيقاع: "+p.pacingRatio+")";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,
+breakMinutes:p.breakMinutes};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{
+dfComputeAdaptiveBreakPacing,
+dfRenderBreakPacingDom});}
