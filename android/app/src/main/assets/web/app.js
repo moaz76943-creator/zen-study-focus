@@ -60363,3 +60363,38 @@ if(typeof window!=='undefined'){
 Object.assign(window,{
 dfEnforceWhitePremiumTheme,
 dfRenderThemeGuardDom});}
+
+function dfEnforceZeroTrackingGate(){
+if(typeof window==='undefined')
+return{offlineOnly:true};
+try{
+if(navigator&&navigator.sendBeacon){
+navigator.sendBeacon=function(){
+return false;};}
+return{offlineOnly:true,zeroPii:true,
+at:new Date().toISOString()};
+}catch(_){return{offlineOnly:true};}}
+function dfRenderZeroPiiGateDom(cid){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfPrivacyMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="بوابة السيادة التامة (Zero-PII)</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="تتبع صفري، وعمل محلي 100% بدون إنترنت";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,zeroTracking:true};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{
+dfEnforceZeroTrackingGate,
+dfRenderZeroPiiGateDom});}
