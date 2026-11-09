@@ -60252,3 +60252,25 @@ return{count:list.length,safe:true};}
 if(typeof window!=='undefined'){
 Object.assign(window,{dfSafeRenderTaskItem,
 dfSafeRenderTasks,dfSafeRenderNotes});}
+
+function dfInitSovereignUiBridge(){
+if(typeof document==='undefined')
+return{mounted:false};
+try{
+if(typeof dfRenderVaultSafDom==='function')
+dfRenderVaultSafDom('dfVaultMount');
+if(typeof dfRenderBreakPacingDom==='function')
+dfRenderBreakPacingDom('dfBreakPacingMount');
+const fn=typeof dfRenderConsecutiveStreakDom;
+if(fn==='function')
+dfRenderConsecutiveStreakDom('dfStreakMount');
+return{mounted:true,active:true};
+}catch(_){return{mounted:false};}}
+if(typeof document!=='undefined'){
+if(document.readyState==='loading'){
+document.addEventListener('DOMContentLoaded',
+dfInitSovereignUiBridge);}
+else{dfInitSovereignUiBridge();}}
+if(typeof window!=='undefined'){
+Object.assign(window,{
+dfInitSovereignUiBridge});}
