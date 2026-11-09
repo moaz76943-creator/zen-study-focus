@@ -60274,3 +60274,49 @@ else{dfInitSovereignUiBridge();}}
 if(typeof window!=='undefined'){
 Object.assign(window,{
 dfInitSovereignUiBridge});}
+
+function dfNormalizeArabicQuery(txt){
+if(typeof txt!=='string')return'';
+return txt.replace(/[ً-ٰٟ]/g,'')
+.replace(/[إأآا]/g,'ا')
+.replace(/ة/g,'ه')
+.replace(/ى/g,'ي')
+.trim().toLowerCase();}
+function dfSearchArabicVault(query,items){
+const q=dfNormalizeArabicQuery(query);
+if(!q)return[];
+const list=Array.isArray(items)?items:[];
+const matched=[];
+for(let i=0;i<list.length;i++){
+const it=list[i]||{};
+const sT=it.title||it.q||'';
+const t=dfNormalizeArabicQuery(sT);
+const sC=it.content||it.a||it.note||'';
+const c=dfNormalizeArabicQuery(sC);
+if(t.includes(q)||c.includes(q)){
+matched.push(it);}}
+return matched;}
+function dfRenderSearchStatusDom(cid,cnt){
+if(typeof document==='undefined')
+return{rendered:false};
+const el=document.getElementById(
+cid||'dfSearchMount');
+if(!el)return{rendered:false};
+try{
+let h="<div style='background:#f8fafc;";
+h+="padding:12px;border:1px solid #cbd5e1;";
+h+="border-radius:12px;'>";
+h+="<div style='font-size:13px;";
+h+="font-weight:700;color:#0f172a;'>";
+h+="محرك البحث العربي الدقيق</div>";
+h+="<div style='margin-top:6px;";
+h+="font-size:12px;color:#059669;";
+h+="font-weight:600;'>";
+h+="تطبيع التشكيل والهمزات: نشط (";
+h+=(cnt||0)+" نتائج)";
+h+="</div></div>";el.innerHTML=h;
+return{rendered:true,count:cnt||0};
+}catch(_){return{rendered:false};}}
+if(typeof window!=='undefined'){
+Object.assign(window,{dfNormalizeArabicQuery,
+dfSearchArabicVault,dfRenderSearchStatusDom});}
