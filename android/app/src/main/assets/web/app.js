@@ -59991,6 +59991,35 @@ Object.assign(window,{
 dfGetBuildVerificationReport,
 dfRenderFinalAuditSummaryDom});}
 
+
+const dfSvgAllowlistTags=new Set([
+'svg','g','path','rect','circle','ellipse',
+'line','polyline','polygon','text','tspan',
+'defs','linearGradient','radialGradient',
+'stop','clipPath','mask']);
+function dfSanitizeSvgDom(svgStr){
+if(typeof DOMParser==='undefined')
+return null;
+try{const p=new DOMParser();
+const doc=p.parseFromString(
+svgStr,'image/svg+xml');
+const all=Array.from(
+doc.querySelectorAll('*'));
+for(let i=0;i<all.length;i++){
+const el=all[i];
+const tag=el.tagName.toLowerCase();
+if(!dfSvgAllowlistTags.has(tag)){
+el.remove();continue;}
+const atts=Array.from(el.attributes);
+for(let j=0;j<atts.length;j++){
+const an=atts[j].name.toLowerCase();
+const av=atts[j].value.toLowerCase();
+if(an.startsWith('on')||
+av.includes('javascript:')||
+av.includes('data:text/html')){
+el.removeAttribute(atts[j].name);}}}
+return doc.documentElement;
+}catch(_){return null;}}
 function dfSanitizeSvgMarkup(svg){
 if(typeof svg!=='string')return'';
 const rBad=/<\/?(foreignObject|script)/gi;
@@ -60002,7 +60031,10 @@ function dfSafeInjectSvg(cId,svgStr){
 if(typeof document==='undefined')return false;
 const el=document.getElementById(cId);
 if(!el)return false;
-el.innerHTML=dfSanitizeSvgMarkup(svgStr);
+const cln=dfSanitizeSvgDom(svgStr);
+if(cln){el.textContent='';
+el.appendChild(document.adoptNode(cln));}
+else{el.textContent='';}
 const rec={safe:true,
 at:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
