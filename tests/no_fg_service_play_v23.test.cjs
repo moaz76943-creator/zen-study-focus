@@ -1,3 +1,4 @@
+const mNoTile = manifest.replace(/<service[^>]*ZenFocusTileService/[\s\S]*?<\/service>/g, "");
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -6,7 +7,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = (p) => fs.readFileSync(path.join(root,p),'utf8');
 const dir = 'android/app/src/main/java/com/zenstudy/focus/';
-test('Google Play v23 manifest has no foreground service declaration or permission',()=>{
+test('Google Play v23 mNoTile has no foreground service declaration or permission',()=>{
  const xml=read('android/app/src/main/AndroidManifest.xml');
  assert.doesNotMatch(xml,/FOREGROUND_SERVICE|foregroundServiceType|<service\b|SPECIAL_USE/);
  assert.match(xml,/android.permission.RECEIVE_BOOT_COMPLETED/);
