@@ -179,7 +179,19 @@
   }
   function normalizeSearch(text) {
     return String(text ?? '').normalize('NFKC').replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,'')
-      .replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').toLocaleLowerCase();
+      .replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/ؤ/g,'و').replace(/ئ/g,'ي').toLocaleLowerCase();
+  }
+  function scoreNoteMatch(n, q) {
+    if (!q) return 1;
+    const e = ext(n);
+    const normTitle = normalizeSearch(n.title || '');
+    const normBody = normalizeSearch([n.body, n.catKey, e.cornell?.cues, e.cornell?.notes, e.cornell?.summary, ...(Array.isArray(e.tags) ? e.tags : [])].join(' '));
+    let score = 0;
+    if (normTitle === q) score += 120;
+    else if (normTitle.startsWith(q)) score += 90;
+    else if (normTitle.includes(q)) score += 65;
+    if (normBody.includes(q)) score += 35;
+    return score;
   }
   function search(notes, options = {}) {
     checkRecords(notes); const q = normalizeSearch(options.query || '').trim();
@@ -189,6 +201,7 @@
     const mode = options.status || 'active';
     if (!['active','archived','trash','all'].includes(mode)) throw new Error('Invalid status');
     const matches = [];
+    const scores = new Map();
     for (const n of notes) {
       if (!n || !idOK(n.id)) continue;
       const e = ext(n);
@@ -198,14 +211,22 @@
       if (options.notebookId !== undefined && e.notebookId !== options.notebookId) continue;
       if (options.kind && (e.kind || n.catKey) !== options.kind) continue;
       if (tags.length && !tags.every(tag => Array.isArray(e.tags) && e.tags.includes(tag))) continue;
-      if (q && !normalizeSearch([n.title,n.body,n.catKey,e.cornell?.cues,e.cornell?.notes,e.cornell?.summary,...(Array.isArray(e.tags) ? e.tags : [])].join(' ')).includes(q)) continue;
+      if (q) {
+        const sc = scoreNoteMatch(n, q);
+        if (sc <= 0) continue;
+        scores.set(n.id, sc);
+      }
       matches.push(n);
     }
     const sort = options.sort || 'recent';
-    if (!['recent','oldest','title'].includes(sort)) throw new Error('Invalid sort');
+    if (!['recent','oldest','title','ranked'].includes(sort)) throw new Error('Invalid sort');
     const stamp = n => typeof n.updatedAt === 'number' ? n.updatedAt : typeof n.createdAt === 'number' ? n.createdAt : n.id;
     matches.sort((a,b) => {
       if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+      if (q && (sort === 'ranked' || !options.sort)) {
+        const diffScore = (scores.get(b.id) || 0) - (scores.get(a.id) || 0);
+        if (diffScore !== 0) return diffScore;
+      }
       const c = sort === 'title' ? String(a.title).localeCompare(String(b.title)) : sort === 'oldest' ? stamp(a)-stamp(b) : stamp(b)-stamp(a);
       return c || a.id-b.id;
     });
