@@ -1,2 +1,5 @@
 zen-agent.mjs
 generate_store.mjs
+
+*.keystore
+*.jks
