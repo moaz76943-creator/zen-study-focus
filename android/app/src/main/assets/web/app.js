@@ -83708,3 +83708,8 @@ if (typeof StudioNavigatorDrawer !== "undefined") {
 // [Task #658] Precision Timer & Back Button Init
 if (typeof HighPrecisionTimerEngine !== "undefined") HighPrecisionTimerEngine.init();
 if (typeof BackButtonManager !== "undefined") BackButtonManager.init();
+
+// [Task #659] Web Audio Singleton Initialization
+if (typeof WebAudioSingletonEngine !== "undefined") {
+    WebAudioSingletonEngine.init();
+}
