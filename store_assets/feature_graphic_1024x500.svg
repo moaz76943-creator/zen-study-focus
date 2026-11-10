@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <rect width="1024" height="500" fill="#FAFAFA"/>
+  <rect x="20" y="20" width="984" height="460" rx="24" fill="none" stroke="#E2E8F0" stroke-width="3"/>
+  <g transform="translate(180, 250)">
+    <circle cx="0" cy="0" r="85" fill="#FFFFFF" stroke="#0F172A" stroke-width="6"/>
+    <circle cx="0" cy="0" r="50" fill="#0F172A"/>
+    <circle cx="0" cy="0" r="20" fill="#FFFFFF"/>
+  </g>
+  <text x="320" y="240" font-family="system-ui, sans-serif" font-size="52" font-weight="800" fill="#0F172A" letter-spacing="4">DEEP FOCUS</text>
+  <text x="320" y="295" font-family="system-ui, sans-serif" font-size="22" font-weight="500" fill="#64748B" letter-spacing="1">Sovereign Offline Study &amp; Academic Mastery OS</text>
+  <text x="320" y="340" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="#0F172A">100% OFFLINE • ZERO TRACKING • FSRS-4.5 • PROCEDURAL AUDIO</text>
+</svg>
