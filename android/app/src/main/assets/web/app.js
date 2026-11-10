@@ -80687,6 +80687,45 @@ Object.assign(window,{
 dfEnforceZeroTrackingGate,
 dfRenderZeroPiiGateDom});}
 
+
+function dfCalculateExamPacing(targetDateStr, totalItems, completedItems) {
+  try {
+    const target = new Date(targetDateStr).getTime();
+    const now = Date.now();
+    const diffMs = target - now;
+    const diffDays = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+    const studyDays = Math.max(1, diffDays - 2); // 48-hour buffer before exam
+    const remaining = Math.max(0, (+totalItems || 0) - (+completedItems || 0));
+    const itemsPerDay = Math.ceil(remaining / studyDays);
+    const schedule = {
+      targetDate: targetDateStr,
+      daysRemaining: diffDays,
+      studyDaysAllocated: studyDays,
+      totalItems: +totalItems || 0,
+      completedItems: +completedItems || 0,
+      remainingItems: remaining,
+      dailyTarget: itemsPerDay,
+      updatedAt: Date.now()
+    };
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('df_syllabus_schedule_v1', JSON.stringify(schedule));
+    }
+    return schedule;
+  } catch (err) {
+    return { error: String(err), dailyTarget: 10 };
+  }
+}
+
+function dfGetSyllabusSchedule() {
+  try {
+    if (typeof localStorage === 'undefined') return null;
+    const raw = localStorage.getItem('df_syllabus_schedule_v1');
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 function dfVerifyReleaseManifest(manifest){
 const reqAssets=['index.html','app.js',
 'modules/flashcards/fsrs.js',
@@ -80737,7 +80776,7 @@ if(typeof window!=='undefined'){
 window.dfVerifyReleaseManifest=
 dfVerifyReleaseManifest;
 Object.assign(window,{
-dfVerifyReleaseManifest,
+dfVerifyReleaseManifest,dfCalculateExamPacing,dfGetSyllabusSchedule,
 dfRenderReleaseManifestDom});
 if(typeof window.dfSyncInfiniteLocaleRegistry==='function'){
 try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
