@@ -83635,3 +83635,9 @@ if (typeof window !== 'undefined' && window.ExamEveRescueProtocol) {
   window.dfExamEveRescueProtocol = new window.ExamEveRescueProtocol();
   console.log('[Runtime] ExamEveRescueProtocol successfully mounted.');
 }
+
+// Auto-wire InteractiveSanctuaryCanvas into runtime
+if (typeof window !== 'undefined' && window.InteractiveSanctuaryCanvas) {
+  window.dfInteractiveSanctuaryCanvas = new window.InteractiveSanctuaryCanvas();
+  console.log('[Runtime] InteractiveSanctuaryCanvas successfully mounted.');
+}
