@@ -83671,3 +83671,9 @@ if (typeof window !== 'undefined' && window.AntiClutterThumbZone) {
   window.dfAntiClutterThumbZone = new window.AntiClutterThumbZone();
   console.log('[Runtime] AntiClutterThumbZone successfully mounted.');
 }
+
+// Auto-wire WebWorker120HzEngine into runtime
+if (typeof window !== 'undefined' && window.WebWorker120HzEngine) {
+  window.dfWebWorker120HzEngine = new window.WebWorker120HzEngine();
+  console.log('[Runtime] WebWorker120HzEngine successfully mounted.');
+}
