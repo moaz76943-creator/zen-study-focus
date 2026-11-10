@@ -83611,3 +83611,9 @@ window.ZenNavigatorBridge = {
     return this.instance;
   }
 };
+
+// Auto-wire LocalStudyPodEngine into runtime
+if (typeof window !== 'undefined' && window.LocalStudyPodEngine) {
+  window.dfLocalStudyPodEngine = new window.LocalStudyPodEngine();
+  console.log('[Runtime] LocalStudyPodEngine successfully mounted.');
+}
