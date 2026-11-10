@@ -83527,3 +83527,17 @@ window.ZenP2PBridge = {
     return this.instance;
   }
 };
+
+/* ==============================================================================
+ * Sovereign Cornell Tri-Zone & Vector Mind-Map Bridge (v444.0.0)
+ * ============================================================================== */
+window.ZenCornellBridge = {
+  version: '444.0.0',
+  instance: null,
+  getStudio() {
+    if (!this.instance && typeof CornellStudio === 'function') {
+      this.instance = new CornellStudio();
+    }
+    return this.instance;
+  }
+};
