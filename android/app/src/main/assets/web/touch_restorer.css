@@ -52,3 +52,69 @@ button:active, .btn:active, [role="button"]:active {
 * {
   font-feature-settings: "tnum" 1, "lnum" 1 !important;
 }
+
+/* ==============================================================================
+ * Cornell Tri-Zone Responsive Grid & Active Masking Styles
+ * ============================================================================== */
+.cornell-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (min-width: 640px) {
+  .cornell-grid {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+.cornell-zone {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 14px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.cornell-zone textarea {
+  width: 100% !important;
+  min-height: 120px;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+/* Active Recall Masking Effect */
+.recall-masked-content {
+  filter: blur(9px) grayscale(100%) !important;
+  user-select: none !important;
+  pointer-events: none !important;
+  transition: filter 0.2s ease;
+}
+
+.recall-masked-wrapper {
+  position: relative;
+}
+
+.recall-mask-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(2px);
+  border-radius: 8px;
+  z-index: 5;
+  font-weight: 700;
+  color: #2563EB;
+}
