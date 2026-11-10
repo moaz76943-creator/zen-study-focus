@@ -932,6 +932,7 @@
           <button class="seg-pill active" onclick="filterTasksByStatus('all', this)" data-i18n="filterAll">All</button>
           <button class="seg-pill" onclick="filterTasksByStatus('active', this)" data-i18n="filterToday">Active</button>
           <button class="seg-pill" onclick="filterTasksByStatus('done', this)" data-i18n="filterDone">Completed</button>
+          <button class="seg-pill" id="btnLaunchSyllabusStudio" onclick="dfOpenSyllabusStudio()" style="color:#2563eb; font-weight:800;" data-i18n="navSyllabusRoadmap">🗺️ Syllabus</button>
         </div>
 
         <div class="task-creator-bar">
@@ -947,6 +948,7 @@
         </div>
 
         <div class="tasks-showcase-list" id="tasksShowcaseBox"></div>
+        <div id="dfPillar6SyllabusMount" aria-label="Master Pillar 6: Dynamic Syllabus Load-Balancer & Adaptive Exam Pacing Engine"></div>
         <div id="df22TasksHost" aria-label="Advanced tasks and calendar"></div>
       </main>
 
@@ -1100,6 +1102,7 @@
             <input type="text" inputmode="numeric" class="modal-inp" id="inpDailyRate" value="15" style="margin:0; direction:ltr;" oninput="updateSyllabusCalc()">
           </div>
           <div id="syllabusCalcOut" style="font-size:0.78rem; font-weight:800; color:var(--emerald); background:var(--emerald-soft); padding:9px 12px; border-radius:12px;"></div>
+          <div style="margin-top:8px;"><button type="button" class="task-mini-sel" onclick="dfOpenSyllabusStudio()" style="width:100%; padding:8px 12px; background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; font-size:12px; font-weight:800; border-radius:10px; cursor:pointer;" data-i18n="btnOpenSyllabusRoadmap">🗺️ Launch Adaptive Syllabus Roadmap & Exam Pacer</button></div>
         </div>
         <div id="df22AnalyticsHost" aria-label="History-backed analytics"></div>
       </main>
