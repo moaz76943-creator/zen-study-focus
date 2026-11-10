@@ -1,23 +1,24 @@
-Deep Focus — Sovereign Offline Study & Academic Mastery
+Deep Focus — Автономное Пространство для Учебы и Концентрации (Версия 439.0.0)
 
-Master your academic goals in a distraction-free, air-gapped study environment built for students, university scholars, and deep learners.
+Достигайте академических целей в защищенном пространстве для глубокого погружения в учебу без интернета и отвлекающих факторов.
 
-✦ 100% Offline & Private (Zero Telemetry)
-No cloud servers. No tracking. Your notes, study schedules, and flashcard vaults remain strictly on your local device.
+✦ 100% Офлайн и Конфиденциальность (Без Слежки)
+Никаких облачных серверов. Ваши заметки, графики и карточки надежно зашифрованы исключительно на вашем устройстве.
 
-✦ State-of-the-Art FSRS-4.5 Spaced Repetition
-Harness the proven Free Spaced Repetition Scheduler algorithm to optimize retention intervals with personalized difficulty and stability curves.
+✦ Алгоритм Интервального Повторения FSRS-4.5
+Передовая научная система для долговременного запоминания с адаптивной калибровкой сложности и стабильности знаний.
 
-✦ Real-Time Procedural Soundscapes
-Synthesize pure pink noise, rain resonance, and 40Hz binaural waves natively via Web Audio API without looping audio files.
+✦ Процедурные Звуковые Ландшафты (Zero-Music)
+Генерация розового шума, шума дождя и гамма-волн 40 Гц в реальном времени через Web Audio API без повторяющихся треков.
 
-✦ Tri-Zone Cornell Note Architecture
-Organize thoughts systematically into Cues, Notes, and Summary zones, linked directly to flashcards.
+✦ Трехзонная Система Заметок Корнелла
+Структурируйте материал на Ключи, Конспекты и Выводы с двусторонней привязкой к карточкам для повторения.
 
-✦ RSVP Speed Reader & ORP Visual Guide
-Process academic texts at 100 to 1000 words per minute with Optical Recognition Point focal alignment.
+✦ RSVP Скорочтение с Оптическим Фокусом
+Изучайте научные статьи со скоростью от 100 до 1000 слов в минуту с помощью точки оптимального распознавания (ORP).
 
-✦ Botanical Zen Garden & Habit Matrix
-Watch procedural bonsai and bamboo trees flourish through consistent daily focus sessions.
+✦ Рендеринг Математических и STEM Формул
+Четкое векторное отображение сложных уравнений и матриц на базе чистого SVG без внешних библиотек.
 
-Reclaim your focus and academic sovereignty with Deep Focus.
+✦ Ботанический Дзен-Сад и Матрица Привычек
+Наблюдайте за ростом процедурных деревьев бонсай и бамбука по мере накопления часов продуктивной учебы.
