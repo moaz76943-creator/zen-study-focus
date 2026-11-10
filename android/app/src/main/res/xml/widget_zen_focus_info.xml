@@ -5,7 +5,7 @@
     android:targetCellWidth="3"
     android:targetCellHeight="2"
     android:updatePeriodMillis="0"
-    android:previewImage="@drawable/ic_launcher_background"
+    android:previewImage="@drawable/ic_zen_launcher_bg"
     android:initialLayout="@layout/widget_zen_focus"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
