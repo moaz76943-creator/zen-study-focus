@@ -3416,6 +3416,11 @@ function renderDomainState() {
   document.getElementById('modeFocusBtn').textContent = toWest(getDomainFocusMinutes(dom) + 'm');
   document.getElementById('sportContextBar').classList.toggle('visible', dom === 'sport');
   document.getElementById('readContextBar').classList.toggle('visible', dom === 'read');
+  const studyContextBar = document.getElementById('studyContextBar');
+  if (studyContextBar) {
+    studyContextBar.style.display = dom === 'study' ? 'flex' : 'none';
+    studyContextBar.classList.toggle('visible', dom === 'study');
+  }
 }
 
 function switchActivityDomain(dom, el) {
