@@ -35,7 +35,7 @@
   --df22-space-4: 16px;
   --df22-space-5: 20px;
   --df22-space-6: 24px;
-  --df22-touch: 44px;
+  --df22-touch: 48px; /* Material Design & WCAG AAA >=48dp touch target standard */
   --df22-font: system-ui, Roboto, "Noto Sans", "Noto Sans Arabic", "Noto Sans Devanagari", "Noto Sans Bengali", sans-serif;
   --df22-leading: 1.5;
   --df22-body-size: 1rem; /* respects user font scaling */
