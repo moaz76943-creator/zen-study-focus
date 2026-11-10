@@ -83713,3 +83713,8 @@ if (typeof BackButtonManager !== "undefined") BackButtonManager.init();
 if (typeof WebAudioSingletonEngine !== "undefined") {
     WebAudioSingletonEngine.init();
 }
+
+// [Task #660] Color Contrast Harmonizer Initialization
+if (typeof ColorContrastHarmonizer !== "undefined") {
+    ColorContrastHarmonizer.init();
+}
