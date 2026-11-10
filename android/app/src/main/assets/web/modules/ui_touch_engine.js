@@ -274,3 +274,75 @@
 
   window.addEventListener('load', initFullStemController);
 })();
+
+/* ==============================================================================
+ * Comprehensive Whiteboard & Diagram Occlusion Bindings (Task #635)
+ * ============================================================================== */
+(function() {
+  'use strict';
+
+  function initWhiteboardController() {
+    if (typeof WhiteboardStudio !== 'function') return;
+
+    const canvas = document.querySelector('#whiteboardCanvas, canvas');
+    if (!canvas) return;
+
+    // Set real display dimensions to eliminate coordinate distortion
+    canvas.width = canvas.parentElement ? canvas.parentElement.clientWidth : 400;
+    canvas.height = 340;
+
+    const studio = new WhiteboardStudio(canvas);
+    window.activeWhiteboardStudio = studio;
+    studio.redraw();
+
+    // 1. Tool Buttons (Pen, Highlighter, Eraser, Shape Snap)
+    const toolBtns = document.querySelectorAll('button');
+    toolBtns.forEach(btn => {
+      const text = btn.textContent.toLowerCase().trim();
+      if (text.includes('pen')) {
+        btn.addEventListener('click', () => { studio.setTool('pen'); highlightActive(btn, toolBtns); });
+      } else if (text.includes('highlighter')) {
+        btn.addEventListener('click', () => { studio.setTool('highlighter'); highlightActive(btn, toolBtns); });
+      } else if (text.includes('eraser')) {
+        btn.addEventListener('click', () => { studio.setTool('eraser'); highlightActive(btn, toolBtns); });
+      } else if (text.includes('shape snap') || text.includes('shapesnap')) {
+        btn.addEventListener('click', () => { studio.setTool('shapesnap'); highlightActive(btn, toolBtns); });
+      } else if (text.includes('undo')) {
+        btn.addEventListener('click', () => studio.undo());
+      } else if (text.includes('clear')) {
+        btn.addEventListener('click', () => studio.clear());
+      }
+    });
+
+    function highlightActive(activeBtn, all) {
+      all.forEach(b => b.style.outline = '');
+      activeBtn.style.outline = '2px solid #2563EB';
+    }
+
+    // 2. Palette Color Buttons
+    const colorSwatches = document.querySelectorAll('[data-color], .color-swatch');
+    colorSwatches.forEach(swatch => {
+      const col = swatch.getAttribute('data-color') || swatch.style.backgroundColor;
+      if (col) {
+        swatch.addEventListener('click', () => {
+          studio.setColor(col);
+          colorSwatches.forEach(s => s.style.transform = '');
+          swatch.style.transform = 'scale(1.2)';
+        });
+      }
+    });
+
+    // 3. Grid Selector Dropdown
+    const gridSelect = document.querySelector('#whiteboardGridSelect, select');
+    if (gridSelect) {
+      gridSelect.addEventListener('change', () => {
+        const val = gridSelect.value.toLowerCase();
+        if (val.includes('dot')) studio.setGrid('dots');
+        else if (val.includes('line')) studio.setGrid('lines');
+        else if (val.includes('blank')) studio.setGrid('blank');
+      });
+    }
+  }
+
+  window.addEventListener('load', initWhiteboardController);
+})();
