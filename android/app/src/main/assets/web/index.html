@@ -815,6 +815,16 @@
           </div>
         </div>
 
+        <div class="domain-context-bar" id="studyContextBar" style="display:flex;">
+          <div>
+            <div style="font-size:0.72rem; font-weight:800; color:var(--primary);" data-i18n="studyContextTitle">📐 STEM & Exam Studio</div>
+            <div style="font-size:0.84rem; font-weight:900;" id="studyContextSub">Pure SVG STEM & Strict Exam Simulator</div>
+          </div>
+          <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center;">
+            <button type="button" class="delta-chip" id="btnLaunchStemStudio" style="background:#eff6ff; color:#2563eb; font-weight:800; border:1px solid #bfdbfe;" onclick="dfOpenStemStudioFromTimer()" data-i18n="btnStemStudio">📐 STEM Studio ↗</button>
+          </div>
+        </div>
+
 
         <section class="pure-white-card quick-training-card" id="quickTrainingCard" aria-label="Quick training" data-i18n-aria="trainingTitle">
           <details id="quickTrainingDetails">
@@ -984,6 +994,7 @@
         <div class="ns-count" id="nsVisibleCount" aria-live="polite"></div>
         <div id="dfPillar1StudioMount" aria-label="Tri-Zone Cornell Notes and Vector Mind-Map Studio"></div>
         <div id="dfPillar2SpeedReaderMount" aria-label="Speed Reading and Visual Pacing Engine"></div>
+        <div id="dfPillar3StemMount" aria-label="Pure SVG STEM Typesetter and Strict Timed Exam Simulator"></div>
         <div class="learning-cards-stack ns-cards" id="notesStackBox"></div>
         <button class="floating-plus-fab" onclick="openNoteModal()" aria-label="New note" data-i18n-aria="nsNewButton">+</button>
       </main>
@@ -1272,5 +1283,5 @@
   <script src="completion_alert_locales.js"></script>
   <script src="js/completion_tone_picker.js"></script>
   <script src="js/deep_focus_runtime_activator.js"></script>
-<div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div><div id="dfSpeedReaderMount"></div></div></body>
+<div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div><div id="dfSpeedReaderMount"></div><div id="dfPillar3StemMountHidden"></div></div></body>
 </html>
