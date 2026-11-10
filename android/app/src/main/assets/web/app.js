@@ -83659,3 +83659,9 @@ if (typeof window !== 'undefined' && window.StudyWrappedStory) {
   window.dfStudyWrappedStory = new window.StudyWrappedStory();
   console.log('[Runtime] StudyWrappedStory successfully mounted.');
 }
+
+// Auto-wire GlobalI18nEngine into runtime
+if (typeof window !== 'undefined' && window.GlobalI18nEngine) {
+  window.dfGlobalI18nEngine = new window.GlobalI18nEngine();
+  console.log('[Runtime] GlobalI18nEngine successfully mounted.');
+}
