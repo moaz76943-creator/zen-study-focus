@@ -83718,3 +83718,8 @@ if (typeof WebAudioSingletonEngine !== "undefined") {
 if (typeof ColorContrastHarmonizer !== "undefined") {
     ColorContrastHarmonizer.init();
 }
+
+// [Task #661] Offline Data Vault Initialization
+if (typeof OfflineDataVault !== "undefined") {
+    OfflineDataVault.init();
+}
