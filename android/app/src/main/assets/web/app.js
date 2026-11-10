@@ -83677,3 +83677,9 @@ if (typeof window !== 'undefined' && window.WebWorker120HzEngine) {
   window.dfWebWorker120HzEngine = new window.WebWorker120HzEngine();
   console.log('[Runtime] WebWorker120HzEngine successfully mounted.');
 }
+
+// Auto-wire UniversalAccessibilityStudio into runtime
+if (typeof window !== 'undefined' && window.UniversalAccessibilityStudio) {
+  window.dfUniversalAccessibilityStudio = new window.UniversalAccessibilityStudio();
+  console.log('[Runtime] UniversalAccessibilityStudio successfully mounted.');
+}
