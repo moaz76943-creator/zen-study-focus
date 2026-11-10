@@ -26,7 +26,7 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew 2>/dev/null || chmod +x android/gradlew 2>/dev/null || true
 
-      - name: Build Android Release APK & AAB
+      - name: Clean & Build Android Release APK & AAB
         env:
           ZEN_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ZEN_UPLOAD_KEYSTORE_BASE64 }}
           ZEN_UPLOAD_STORE_PASSWORD: ${{ secrets.ZEN_UPLOAD_STORE_PASSWORD }}
@@ -42,12 +42,33 @@ jobs:
             unset ZEN_UPLOAD_KEYSTORE_PATH ZEN_UPLOAD_STORE_PASSWORD ZEN_UPLOAD_KEY_ALIAS ZEN_UPLOAD_KEY_PASSWORD
           fi
           if [ -x "./gradlew" ]; then
-            ./gradlew -p android assembleRelease bundleRelease
+            ./gradlew -p android clean assembleRelease bundleRelease
           elif [ -x "android/gradlew" ]; then
-            ./android/gradlew -p android assembleRelease bundleRelease
+            ./android/gradlew -p android clean assembleRelease bundleRelease
           else
-            gradle -p android assembleRelease bundleRelease
+            gradle -p android clean assembleRelease bundleRelease
           fi
+
+      - name: Verify Clean Compilation & Release AAB Artifact Packaging
+        run: |
+          echo "=== Verifying Clean Release AAB Artifact Packaging for Google Play Console ==="
+          AAB_FILE=$(find android/app/build/outputs/bundle/release -name "*.aab" 2>/dev/null | head -n 1)
+          if [ -z "$AAB_FILE" ]; then
+            AAB_FILE=$(find . -path "*/build/outputs/bundle/release/*.aab" 2>/dev/null | head -n 1)
+          fi
+          if [ -z "$AAB_FILE" ] || [ ! -f "$AAB_FILE" ]; then
+            echo "::error::Release AAB artifact not found! Clean compilation and release packaging failed."
+            exit 1
+          fi
+          AAB_SIZE=$(stat -c%s "$AAB_FILE" 2>/dev/null || stat -f%z "$AAB_FILE" 2>/dev/null || wc -c < "$AAB_FILE")
+          if [ "$AAB_SIZE" -le 1024 ]; then
+            echo "::error::Release AAB artifact is abnormally small ($AAB_SIZE bytes)."
+            exit 1
+          fi
+          echo "✓ Clean compilation confirmed."
+          echo "✓ Release AAB artifact detected at: $AAB_FILE ($AAB_SIZE bytes)"
+          echo "✓ SHA-256 Checksum: $(sha256sum "$AAB_FILE" | awk '{print $1}')"
+          echo "✓ Ready for Google Play Console deployment."
 
       - name: Upload APK & AAB Artifacts
         uses: actions/upload-artifact@v4
@@ -57,3 +78,12 @@ jobs:
           path: |
             **/build/outputs/apk/release/*.apk
             **/build/outputs/bundle/release/*.aab
+
+      - name: Upload Google Play Release AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-focus-google-play-release-bundle-v430.0.0
+          if-no-files-found: error
+          path: |
+            **/build/outputs/bundle/release/*.aab
+            **/build/outputs/mapping/release/*.txt
