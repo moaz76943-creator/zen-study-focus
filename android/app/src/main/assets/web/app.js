@@ -83597,3 +83597,17 @@ window.ZenBotanicalBridge = {
     return this.instance;
   }
 };
+
+/* ==============================================================================
+ * Sovereign Studio Navigator Bridge (v452.0.0)
+ * ============================================================================== */
+window.ZenNavigatorBridge = {
+  version: '452.0.0',
+  instance: null,
+  getNavigator() {
+    if (!this.instance && typeof StudioNavigator === 'function') {
+      this.instance = new StudioNavigator();
+    }
+    return this.instance;
+  }
+};
