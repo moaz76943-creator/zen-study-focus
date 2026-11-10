@@ -83665,3 +83665,9 @@ if (typeof window !== 'undefined' && window.GlobalI18nEngine) {
   window.dfGlobalI18nEngine = new window.GlobalI18nEngine();
   console.log('[Runtime] GlobalI18nEngine successfully mounted.');
 }
+
+// Auto-wire AntiClutterThumbZone into runtime
+if (typeof window !== 'undefined' && window.AntiClutterThumbZone) {
+  window.dfAntiClutterThumbZone = new window.AntiClutterThumbZone();
+  console.log('[Runtime] AntiClutterThumbZone successfully mounted.');
+}
