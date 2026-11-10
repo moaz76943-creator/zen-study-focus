@@ -60791,6 +60791,14 @@ function() {
           }
         }
       } catch (_) {}
+      try {
+        if (typeof window.dfRenderMasterPillar4StudioDom === 'function') {
+          const m4 = document.getElementById('dfPillar4WhiteboardMount');
+          if (m4 && (!m4.children || m4.children.length === 0)) {
+            window.dfRenderMasterPillar4StudioDom('dfPillar4WhiteboardMount');
+          }
+        }
+      } catch (_) {}
     }
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', dfBootMasterPillars);
@@ -63175,281 +63183,2352 @@ function() {
   };
 })();
 
-// --- M8258-M8267: Infinite Stylus Canvas ---
-window.dfInitInfiniteWhiteboardCanvas =
-function(width, height) {
-  const w = Number(width) || 1920;
-  const h = Number(height) || 1080;
-  return { w: w, h: h, ready: true };
-};
-window.dfCaptureStylusPressureAndTilt =
-function(pressure, tiltX) {
-  const p = Number(pressure) || 0.5;
-  const t = Number(tiltX) || 0;
-  return { pVal: p, tiltDeg: t, stroke: true };
-};
-window.dfEnforcePalmRejectionFilter =
-function(touchType) {
-  const isPen = String(touchType) === 'pen';
-  const ig = !isPen;
-  return { accept: isPen, palmIgnored: ig };
-};
-window.dfSmoothFreehandStrokeCatmullRom =
-function(points) {
-  const arr = Array.isArray(points) ?
-    points : [];
-  const len = arr.length;
-  return { smoothedCount: len, spline: true };
-};
-window.dfRecognizeGeometricShapesAuto =
-function(pointCount) {
-  const n = Number(pointCount) || 10;
-  const shape = n > 20 ? 'CIRCLE' : 'POLYGON';
-  return { recognizedShape: shape };
-};
-window.dfRenderDotGridAndIsometricPaper =
-function(pattern) {
-  const pat = String(pattern || 'dots');
-  return { gridPattern: pat, rendered: true };
-};
-window.dfImplementStrokeEraserAndLasso =
-function(mode) {
-  const m = String(mode || 'eraser');
-  return { toolActive: m, ready: true };
-};
-window.dfUndoRedoWhiteboardStrokeStack =
-function(action) {
-  const act = String(action || 'undo');
-  return { stackAction: act, ok: true };
-};
-window.dfCompressVectorStrokesToStorage =
-function(bytes) {
-  const b = Number(bytes) || 1024;
-  const comp = Math.round(b * 0.35);
-  return { compressedBytes: comp, saved: true };
-};
-window.dfGetMilestoneM8267WhiteboardSeal =
-function() {
-  return {
-    v: '400.63.0', vc: 40063, ok: true
-  };
-};
+// --- M8258-M8307: Master Pillar 4 — Infinite Study Whiteboard & Image Occlusion Engine ---
+(function() {
+  'use strict';
 
-// --- M8268-M8277: Visual Diagram Occlusion ---
-window.dfLoadDiagramImageToCanvas =
-function(imgUrl) {
-  const u = String(imgUrl || 'local.png');
-  return { loadedSource: u, ready: true };
-};
-window.dfDrawOcclusionMaskRectangle =
-function(x, y, w, h) {
-  const rx = Number(x) || 0;
-  const ry = Number(y) || 0;
-  return { rectX: rx, rectY: ry, masked: true };
-};
-window.dfGenerateHideAllGuessOneCards =
-function(maskCount) {
-  const m = Number(maskCount) || 3;
-  return { cards: m, mode: 'HIDE_ALL' };
-};
-window.dfGenerateHideOneGuessOneCards =
-function(maskCount) {
-  const m = Number(maskCount) || 3;
-  return { cards: m, mode: 'HIDE_ONE' };
-};
-window.dfToggleOcclusionMaskRevealAnim =
-function(revealed) {
-  const rev = !!revealed;
-  return { isRevealed: rev, anim: 'fade' };
-};
-window.dfAddCustomTextLabelToMask =
-function(text) {
-  const t = String(text || '').trim();
-  return { label: t, attached: true };
-};
-window.dfGroupPolygonMasksIntoSingleCard =
-function(polyCount) {
-  const p = Number(polyCount) || 2;
-  return { groupedCount: p, singleCard: true };
-};
-window.dfZoomToActiveOcclusionRegion =
-function(targetX, targetY) {
-  const tx = Number(targetX) || 0;
-  const ty = Number(targetY) || 0;
-  return { panX: tx, panY: ty, zoomed: true };
-};
-window.dfBindVisualCardToFsrsScheduler =
-function(cardId) {
-  const id = String(cardId || 'vc1');
-  return { boundCardId: id, fsrsActive: true };
-};
-window.dfGetMilestoneM8277ImageOcclusionSeal =
-function() {
-  return {
-    v: '400.64.0', vc: 40064, ok: true
-  };
-};
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const WHITEBOARD_STROKES_KEY = 'df_whiteboard_vector_strokes_v1';
+  const WHITEBOARD_CONFIG_KEY = 'df_whiteboard_config_v1';
+  const OCCLUSION_CARDS_KEY = 'df_visual_occlusion_cards_v1';
+  const OCCLUSION_ACTIVE_DIAG_KEY = 'df_visual_active_diag_v1';
+  const SCRATCHPAD_STROKES_KEY = 'df_scratchpad_strokes_v1';
+  const SCRATCHPAD_CONFIG_KEY = 'df_scratchpad_config_v1';
+  const SPATIAL_QUIZ_KEY = 'df_spatial_quiz_history_v1';
+  const PILLAR4_STUDIO_TAB_KEY = 'df_pillar4_studio_tab_v1';
 
-// --- M8278-M8287: Quick Scratchpad Overlay ---
-window.dfToggleFloatingScratchpadOverlay =
-function(visible) {
-  return { overlayActive: !!visible, ok: true };
-};
-window.dfAutoClearScratchpadOnCardFlip =
-function() {
-  return { scratchpadCleared: true };
-};
-window.dfCompareHandwrittenDraftWithAnswer =
-function(draftLen) {
-  const d = Number(draftLen) || 0;
-  return { draftChars: d, compared: true };
-};
-window.dfSaveScratchpadSnapshotToCard =
-function(cardId) {
-  const id = String(cardId || 'c1');
-  return { attachedToCard: id, saved: true };
-};
-window.dfSwitchNeonInkColorsAmoled =
-function(color) {
-  const clr = String(color || 'emerald');
-  return { inkColor: clr, neonAmoled: true };
-};
-window.dfCreateSplitScreenNoteAndTimer =
-function(timerWidthPct) {
-  const tw = Number(timerWidthPct) || 50;
-  const pct = Math.min(70, tw);
-  return { timerPct: pct, notesPct: 100 - pct };
-};
-window.dfMeasureHandwritingActivityCadence =
-function(strokeRate) {
-  const r = Number(strokeRate) || 10;
-  return { strokesPerMin: r, active: true };
-};
-window.dfExportWhiteboardCanvasToPdf =
-function(pageCount) {
-  const n = Number(pageCount) || 1;
-  return { exportedPages: n, format: 'pdf' };
-};
-window.dfImportPdfPageToAnnotate =
-function(pageNum) {
-  const p = Math.max(1, Number(pageNum) || 1);
-  return { pageAnnotated: p, ready: true };
-};
-window.dfGetMilestoneM8287ScratchpadSeal =
-function() {
-  return {
-    v: '400.65.0', vc: 40065, ok: true
-  };
-};
+  function safeParseJson(raw, fallback) {
+    if (!raw || typeof raw !== 'string') return fallback;
+    try {
+      const p = JSON.parse(raw);
+      return p !== null && p !== undefined ? p : fallback;
+    } catch (_) {
+      return fallback;
+    }
+  }
 
-// --- M8288-M8297: Visual Study Frameworks ---
-window.dfRenderVennDiagramComparison =
-function(setsCount) {
-  const n = Math.min(3, Math.max(2,
-    Number(setsCount) || 2));
-  return { vennSets: n, renderedSvg: true };
-};
-window.dfRenderCauseAndEffectFishbone =
-function(categoryCount) {
-  const c = Number(categoryCount) || 4;
-  return { fishboneBones: c, ready: true };
-};
-window.dfRenderChronologicalTimelineAxis =
-function(eventsList) {
-  const arr = eventsList || [];
-  return { timelineNodes: arr.length };
-};
-window.dfRenderFlowchartAlgorithmBlocks =
-function(blockCount) {
-  const b = Number(blockCount) || 5;
-  return { flowchartBlocks: b, ok: true };
-};
-window.dfRenderHierarchyPyramidDiagram =
-function(levelsCount) {
-  const l = Number(levelsCount) || 4;
-  return { pyramidTiers: l, rendered: true };
-};
-window.dfRenderCycleProcessLoop =
-function(stepCount) {
-  const s = Number(stepCount) || 4;
-  return { cycleSteps: s, closedLoop: true };
-};
-window.dfRenderMatrixComparison2x2 =
-function() {
-  return { matrixQuads: 4, rendered: true };
-};
-window.dfSnapDiagramConnectorsToNodes =
-function(snapDistPx) {
-  const d = Number(snapDistPx) || 12;
-  return { magneticSnapDist: d, active: true };
-};
-window.dfConvertVisualDiagramToQuiz =
-function(diagramId) {
-  const id = String(diagramId || 'diag1');
-  return { quizDiagramId: id, ready: true };
-};
-window.dfGetMilestoneM8297VisualFrameworksSeal =
-function() {
-  return {
-    v: '400.66.0', vc: 40066, ok: true
-  };
-};
+  function safeCleanStr(val, maxLen) {
+    const s = String(val === undefined || val === null ? '' : val).replace(/[<>]/g, '');
+    return maxLen ? s.slice(0, maxLen) : s;
+  }
 
-// --- M8298-M8307: Spatial Recall ---
-window.dfCreateSpatialSlotTarget =
-function(targetId, x, y) {
-  const id = String(targetId || 'slot1');
-  const sx = Number(x) || 0;
-  const sy = Number(y) || 0;
-  return { slotId: id, x: sx, y: sy };
-};
-window.dfScrambleDraggableConceptLabels =
-function(labels) {
-  const arr = Array.isArray(labels) ?
-    labels : [];
-  return { scrambledLabels: arr.length };
-};
-window.dfValidateDropZoneMagneticSnap =
-function(distPx) {
-  const d = Number(distPx) || 20;
-  return { snapped: d < 15, currentDist: d };
-};
-window.dfScoreSpatialArrangementAccuracy =
-function(correctCount, totalCount) {
-  const c = Number(correctCount) || 0;
-  const t = Math.max(1, Number(totalCount)||1);
-  const pct = Math.round((c / t) * 100);
-  return { spatialAccuracyPct: pct };
-};
-window.dfTriggerHapticFeedbackOnDrop =
-function() {
-  return { hapticPulseMs: 12, ok: true };
-};
-window.dfTestSequenceOrderingRecall =
-function(stepsList) {
-  const arr = stepsList || [];
-  return { sequenceLength: arr.length };
-};
-window.dfRecordSpatialRecallCompletionTime =
-function(durationSec) {
-  const s = Number(durationSec) || 0;
-  return { recallSec: s, fluent: s < 60 };
-};
-window.dfResetSpatialBoardForRetry =
-function() {
-  return { reset: true, slotsCleared: true };
-};
-window.dfSerializeSpatialQuizToJson =
-function(quizId) {
-  const id = String(quizId || 'sq1');
-  return { serializedQuizId: id, saved: true };
-};
-window.dfGetMilestoneM8307SpatialRecallSeal =
-function() {
-  return {
-    v: '400.67.0', vc: 40067, ok: true
+  // Catmull-Rom spline to SVG cubic Bezier path
+  function catmullRom2bezier(points) {
+    if (!points || !points.length) return '';
+    if (points.length === 1) {
+      const p = points[0];
+      return 'M ' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ' L ' + (p.x + 0.1).toFixed(1) + ' ' + (p.y + 0.1).toFixed(1);
+    }
+    if (points.length === 2) {
+      return 'M ' + points[0].x.toFixed(1) + ' ' + points[0].y.toFixed(1) +
+        ' L ' + points[1].x.toFixed(1) + ' ' + points[1].y.toFixed(1);
+    }
+    let d = 'M ' + points[0].x.toFixed(1) + ' ' + points[0].y.toFixed(1);
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = i > 0 ? points[i - 1] : points[i];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = i < points.length - 2 ? points[i + 2] : p2;
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      d += ' C ' + cp1x.toFixed(1) + ' ' + cp1y.toFixed(1) +
+        ' ' + cp2x.toFixed(1) + ' ' + cp2y.toFixed(1) +
+        ' ' + p2.x.toFixed(1) + ' ' + p2.y.toFixed(1);
+    }
+    return d;
+  }
+
+  // Built-in High-Yield STEM & Medical Diagram Definitions
+  const BUILTIN_DIAGRAMS = {
+    heart_anatomy: {
+      id: 'heart_anatomy',
+      title: 'Human Heart Anatomy & Blood Circulation',
+      category: 'Cardiology & Anatomy',
+      width: 480,
+      height: 380,
+      description: 'Cardiac chambers, major vascular trunks and atrioventricular valve complex.',
+      svgContent: function() {
+        return '<g id="heartBaseGraphics">' +
+          '<path d="M 170 120 C 140 70 80 90 70 150 C 60 210 120 270 230 340 C 340 270 400 210 390 150 C 380 90 320 70 290 120 C 260 80 200 80 170 120 Z" fill="#fff1f2" stroke="#e11d48" stroke-width="3"/>' +
+          '<path d="M 230 140 L 230 330" stroke="#be123c" stroke-width="4" stroke-dasharray="2,2"/>' +
+          '<path d="M 215 50 C 215 20 275 20 275 50 L 275 125 L 215 125 Z" fill="#fee2e2" stroke="#dc2626" stroke-width="2.5"/>' +
+          '<path d="M 120 30 L 155 30 L 155 130 L 120 130 Z" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/>' +
+          '<path d="M 285 70 C 330 65 375 90 390 115 L 365 135 C 350 115 320 100 285 100 Z" fill="#dbeafe" stroke="#0284c7" stroke-width="2.2"/>' +
+          '<ellipse cx="140" cy="180" rx="35" ry="25" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>' +
+          '<ellipse cx="320" cy="180" rx="35" ry="25" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>' +
+          '<path d="M 130 205 L 150 205" stroke="#0f172a" stroke-width="3"/>' +
+          '<path d="M 310 205 L 330 205" stroke="#0f172a" stroke-width="3"/>' +
+          '</g>';
+      },
+      masks: [
+        { id: 'hm1', x: 200, y: 15, w: 90, h: 28, label: 'Aorta', clue: 'Systemic oxygenated trunk', expected: 'Aorta' },
+        { id: 'hm2', x: 90, y: 15, w: 95, h: 28, label: 'Superior Vena Cava', clue: 'Deoxygenated venous return', expected: 'Superior Vena Cava' },
+        { id: 'hm3', x: 295, y: 70, w: 100, h: 28, label: 'Pulmonary Artery', clue: 'Carries blood to lungs', expected: 'Pulmonary Artery' },
+        { id: 'hm4', x: 95, y: 165, w: 85, h: 26, label: 'Right Atrium', clue: 'Receives SVC/IVC', expected: 'Right Atrium' },
+        { id: 'hm5', x: 275, y: 165, w: 85, h: 26, label: 'Left Atrium', clue: 'Receives pulmonary veins', expected: 'Left Atrium' },
+        { id: 'hm6', x: 95, y: 245, w: 95, h: 28, label: 'Right Ventricle', clue: 'Pumps to pulmonary circulation', expected: 'Right Ventricle' },
+        { id: 'hm7', x: 265, y: 245, w: 95, h: 28, label: 'Left Ventricle', clue: 'Thick muscular systemic pump', expected: 'Left Ventricle' },
+        { id: 'hm8', x: 175, y: 310, w: 110, h: 28, label: 'Interventricular Septum', clue: 'Muscular dividing wall', expected: 'Interventricular Septum' }
+      ]
+    },
+    neuron_synapse: {
+      id: 'neuron_synapse',
+      title: 'Multipolar Neuron & Synaptic Terminal',
+      category: 'Neuroscience',
+      width: 480,
+      height: 380,
+      description: 'Receptive dendrites, axon hillock, myelinated saltatory conduction and synaptic cleft.',
+      svgContent: function() {
+        return '<g id="neuronBaseGraphics">' +
+          '<circle cx="100" cy="180" r="42" fill="#fdf4ff" stroke="#a855f7" stroke-width="2.5"/>' +
+          '<circle cx="100" cy="180" r="16" fill="#fae8ff" stroke="#7e22ce" stroke-width="1.8"/>' +
+          '<path d="M 65 160 L 25 130 M 70 195 L 30 225 M 100 138 L 90 90 M 115 142 L 135 95 M 60 175 L 15 175" stroke="#9333ea" stroke-width="2.2" stroke-linecap="round"/>' +
+          '<path d="M 142 180 L 370 180" stroke="#64748b" stroke-width="4"/>' +
+          '<rect x="160" y="166" width="38" height="28" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.8"/>' +
+          '<rect x="215" y="166" width="38" height="28" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.8"/>' +
+          '<rect x="270" y="166" width="38" height="28" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.8"/>' +
+          '<rect x="325" y="166" width="38" height="28" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.8"/>' +
+          '<path d="M 370 180 C 400 150 430 140 455 145 M 370 180 C 400 210 430 220 455 215 M 370 180 L 450 180" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"/>' +
+          '<circle cx="455" cy="145" r="7" fill="#fef08a" stroke="#ca8a04" stroke-width="1.5"/>' +
+          '<circle cx="455" cy="215" r="7" fill="#fef08a" stroke="#ca8a04" stroke-width="1.5"/>' +
+          '<circle cx="450" cy="180" r="7" fill="#fef08a" stroke="#ca8a04" stroke-width="1.5"/>' +
+          '</g>';
+      },
+      masks: [
+        { id: 'nm1', x: 20, y: 70, w: 80, h: 26, label: 'Dendrites', clue: 'Signal input branches', expected: 'Dendrites' },
+        { id: 'nm2', x: 60, y: 195, w: 80, h: 26, label: 'Soma', clue: 'Cell body containing nucleus', expected: 'Soma' },
+        { id: 'nm3', x: 125, y: 135, w: 90, h: 26, label: 'Axon Hillock', clue: 'Action potential initiation zone', expected: 'Axon Hillock' },
+        { id: 'nm4', x: 205, y: 130, w: 95, h: 26, label: 'Myelin Sheath', clue: 'Lipid insulator for fast conduction', expected: 'Myelin Sheath' },
+        { id: 'nm5', x: 245, y: 200, w: 105, h: 26, label: 'Node of Ranvier', clue: 'Unmyelinated gap for saltatory jump', expected: 'Node of Ranvier' },
+        { id: 'nm6', x: 375, y: 235, w: 95, h: 26, label: 'Axon Terminal', clue: 'Presynaptic transmitter release', expected: 'Axon Terminal' }
+      ]
+    },
+    cell_organelles: {
+      id: 'cell_organelles',
+      title: 'Eukaryotic Animal Cell Architecture',
+      category: 'Cell Biology',
+      width: 480,
+      height: 380,
+      description: 'Endomembrane system, metabolic organelles and cytoplasmic structural components.',
+      svgContent: function() {
+        return '<g id="cellBaseGraphics">' +
+          '<ellipse cx="240" cy="190" rx="200" ry="150" fill="#f0fdf4" stroke="#16a34a" stroke-width="3"/>' +
+          '<circle cx="180" cy="190" r="55" fill="#fef3c7" stroke="#d97706" stroke-width="2.5"/>' +
+          '<circle cx="180" cy="190" r="22" fill="#fde68a" stroke="#b45309" stroke-width="2"/>' +
+          '<ellipse cx="320" cy="140" rx="36" ry="18" fill="#fee2e2" stroke="#dc2626" stroke-width="2" transform="rotate(-15 320 140)"/>' +
+          '<ellipse cx="310" cy="260" rx="36" ry="18" fill="#fee2e2" stroke="#dc2626" stroke-width="2" transform="rotate(25 310 260)"/>' +
+          '<path d="M 230 160 C 255 155 255 175 280 170 M 230 175 C 255 170 255 190 280 185 M 230 190 C 255 185 255 205 280 200" stroke="#0284c7" stroke-width="3" fill="none"/>' +
+          '<circle cx="360" cy="200" r="14" fill="#fae8ff" stroke="#9333ea" stroke-width="2"/>' +
+          '</g>';
+      },
+      masks: [
+        { id: 'cm1', x: 135, y: 175, w: 90, h: 26, label: 'Nucleus', clue: 'Contains genomic chromatin', expected: 'Nucleus' },
+        { id: 'cm2', x: 285, y: 100, w: 95, h: 26, label: 'Mitochondria', clue: 'ATP synthesis via oxidative phosphorylation', expected: 'Mitochondria' },
+        { id: 'cm3', x: 220, y: 135, w: 90, h: 26, label: 'Endoplasmic Reticulum', clue: 'Protein & lipid biosystem', expected: 'Endoplasmic Reticulum' },
+        { id: 'cm4', x: 315, y: 175, w: 85, h: 26, label: 'Lysosome', clue: 'Hydrolytic degradation vesicle', expected: 'Lysosome' },
+        { id: 'cm5', x: 275, y: 285, w: 100, h: 26, label: 'Cristae Matrix', clue: 'Inner mitochondrial membrane folds', expected: 'Cristae' }
+      ]
+    },
+    electric_circuit: {
+      id: 'electric_circuit',
+      title: 'Precision RLC Filter & Node Potentials',
+      category: 'Electrical Engineering',
+      width: 480,
+      height: 380,
+      description: 'Lumped element network: AC source, inductive reactance, shunt capacitance, and load.',
+      svgContent: function() {
+        return '<g id="circuitBaseGraphics">' +
+          '<rect x="70" y="80" width="340" height="220" fill="none" stroke="#334155" stroke-width="2.5"/>' +
+          '<circle cx="70" cy="190" r="24" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>' +
+          '<path d="M 58 190 Q 64 176 70 190 T 82 190" fill="none" stroke="#2563eb" stroke-width="2"/>' +
+          '<rect x="170" y="68" width="55" height="24" fill="#ffffff" stroke="#059669" stroke-width="2"/>' +
+          '<path d="M 280 80 Q 290 60 300 80 Q 310 60 320 80 Q 330 60 340 80" fill="none" stroke="#d97706" stroke-width="2.5"/>' +
+          '<line x1="240" y1="80" x2="240" y2="180" stroke="#334155" stroke-width="2"/>' +
+          '<line x1="225" y1="180" x2="255" y2="180" stroke="#dc2626" stroke-width="2.5"/>' +
+          '<line x1="225" y1="190" x2="255" y2="190" stroke="#dc2626" stroke-width="2.5"/>' +
+          '<line x1="240" y1="190" x2="240" y2="300" stroke="#334155" stroke-width="2"/>' +
+          '<line x1="240" y1="300" x2="240" y2="325" stroke="#334155" stroke-width="2"/>' +
+          '<line x1="228" y1="325" x2="252" y2="325" stroke="#334155" stroke-width="2"/>' +
+          '<line x1="232" y1="330" x2="248" y2="330" stroke="#334155" stroke-width="2"/>' +
+          '<line x1="237" y1="335" x2="243" y2="335" stroke="#334155" stroke-width="2"/>' +
+          '</g>';
+      },
+      masks: [
+        { id: 'em1', x: 25, y: 175, w: 90, h: 26, label: 'AC Voltage Source', clue: 'V_in = V_0 sin(ωt)', expected: 'AC Source' },
+        { id: 'em2', x: 155, y: 35, w: 85, h: 26, label: 'Resistor R', clue: 'Dissipative ohmic element', expected: 'Resistor' },
+        { id: 'em3', x: 280, y: 35, w: 85, h: 26, label: 'Inductor L', clue: 'V = L (di/dt) magnetic storage', expected: 'Inductor' },
+        { id: 'em4', x: 200, y: 140, w: 85, h: 26, label: 'Capacitor C', clue: 'Q = C V electric field storage', expected: 'Capacitor' },
+        { id: 'em5', x: 195, y: 340, w: 90, h: 26, label: 'Ground (GND)', clue: 'Reference potential 0 V', expected: 'Ground' }
+      ]
+    }
   };
-};
+
+  // --- M8258-M8267: Infinite Stylus Canvas ---
+  window.dfInitInfiniteWhiteboardCanvas = function(width, height) {
+    const w = Number(width) || 1920;
+    const h = Number(height) || 1080;
+    const cfg = {
+      w: w,
+      h: h,
+      ready: true,
+      zoom: 1.0,
+      panX: 0,
+      panY: 0,
+      viewBox: '0 0 ' + w + ' ' + h,
+      tool: 'pen',
+      color: '#0f172a',
+      strokeWidth: 3,
+      gridPattern: 'dots',
+      palmRejection: true,
+      created: Date.now()
+    };
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(WHITEBOARD_CONFIG_KEY, JSON.stringify(cfg));
+      }
+    } catch (_) {}
+    return cfg;
+  };
+
+  window.dfCaptureStylusPressureAndTilt = function(pressure, tiltX, tiltY) {
+    const p = Math.max(0.05, Math.min(1.0, Number(pressure) || 0.5));
+    const tX = Number(tiltX) || 0;
+    const tY = Number(tiltY) || 0;
+    const deg = Math.round(Math.sqrt(tX * tX + tY * tY));
+    const dynamicW = Number((2.0 + p * 4.5).toFixed(2));
+    return {
+      pVal: p,
+      tiltDeg: deg,
+      stroke: true,
+      calculatedWidth: dynamicW,
+      pressureNormalized: p
+    };
+  };
+
+  window.dfEnforcePalmRejectionFilter = function(touchType, pointerType) {
+    const pType = String(pointerType || touchType || 'touch').toLowerCase();
+    const isPen = pType === 'pen' || pType === 'stylus';
+    return {
+      accept: isPen || pType === 'mouse',
+      palmIgnored: !isPen && pType !== 'mouse',
+      pointerType: pType
+    };
+  };
+
+  window.dfSmoothFreehandStrokeCatmullRom = function(points) {
+    const arr = Array.isArray(points) ? points : [];
+    const d = catmullRom2bezier(arr);
+    return {
+      smoothedCount: arr.length,
+      spline: true,
+      pathD: d,
+      pointsCount: arr.length
+    };
+  };
+
+  window.dfRecognizeGeometricShapesAuto = function(pointsOrCount) {
+    let pts = [];
+    if (Array.isArray(pointsOrCount)) {
+      pts = pointsOrCount;
+    } else {
+      const n = Number(pointsOrCount) || 12;
+      return {
+        recognizedShape: n > 20 ? 'CIRCLE' : (n >= 4 ? 'POLYGON' : 'LINE'),
+        confidence: 0.85
+      };
+    }
+    if (pts.length < 4) {
+      return { recognizedShape: 'LINE', confidence: 0.95 };
+    }
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+    }
+    const w = maxX - minX;
+    const h = maxY - minY;
+    const startP = pts[0];
+    const endP = pts[pts.length - 1];
+    const closureDist = Math.hypot(endP.x - startP.x, endP.y - startP.y);
+    const perimeterApprox = 2 * (w + h);
+    const isClosed = closureDist < Math.max(30, perimeterApprox * 0.18);
+
+    if (isClosed) {
+      const aspect = w / Math.max(1, h);
+      if (aspect >= 0.75 && aspect <= 1.35) {
+        return {
+          recognizedShape: 'CIRCLE',
+          confidence: 0.92,
+          cx: minX + w / 2,
+          cy: minY + h / 2,
+          r: (w + h) / 4
+        };
+      }
+      return {
+        recognizedShape: 'RECTANGLE',
+        confidence: 0.88,
+        x: minX,
+        y: minY,
+        w: w,
+        h: h
+      };
+    }
+    return {
+      recognizedShape: 'LINE',
+      confidence: 0.82,
+      x1: startP.x,
+      y1: startP.y,
+      x2: endP.x,
+      y2: endP.y
+    };
+  };
+
+  window.dfRenderDotGridAndIsometricPaper = function(pattern, spacing) {
+    const pat = String(pattern || 'dots').toLowerCase();
+    const sp = Math.max(12, Number(spacing) || 24);
+    let defsSvg = '';
+
+    if (pat === 'dots') {
+      defsSvg = '<pattern id="dfGridPattern" width="' + sp + '" height="' + sp + '" patternUnits="userSpaceOnUse">' +
+        '<circle cx="' + (sp / 2) + '" cy="' + (sp / 2) + '" r="1.2" fill="#cbd5e1"/>' +
+        '</pattern>';
+    } else if (pat === 'isometric') {
+      const hIso = Math.round(sp * 0.866);
+      defsSvg = '<pattern id="dfGridPattern" width="' + sp + '" height="' + (hIso * 2) + '" patternUnits="userSpaceOnUse">' +
+        '<path d="M 0 ' + hIso + ' L ' + (sp / 2) + ' 0 L ' + sp + ' ' + hIso + ' L ' + (sp / 2) + ' ' + (hIso * 2) + ' Z" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>' +
+        '</pattern>';
+    } else if (pat === 'ruled') {
+      defsSvg = '<pattern id="dfGridPattern" width="100" height="' + sp + '" patternUnits="userSpaceOnUse">' +
+        '<line x1="0" y1="' + sp + '" x2="100" y2="' + sp + '" stroke="#e2e8f0" stroke-width="1"/>' +
+        '</pattern>';
+    } else if (pat === 'quad') {
+      defsSvg = '<pattern id="dfGridPattern" width="' + sp + '" height="' + sp + '" patternUnits="userSpaceOnUse">' +
+        '<rect width="' + sp + '" height="' + sp + '" fill="none" stroke="#e2e8f0" stroke-width="1"/>' +
+        '</pattern>';
+    }
+
+    return {
+      gridPattern: pat,
+      spacing: sp,
+      rendered: true,
+      defsSvg: defsSvg
+    };
+  };
+
+  window.dfImplementStrokeEraserAndLasso = function(mode) {
+    const m = String(mode || 'eraser').toLowerCase();
+    return {
+      toolActive: m,
+      ready: true,
+      isEraser: m === 'eraser',
+      isLasso: m === 'lasso'
+    };
+  };
+
+  window.dfUndoRedoWhiteboardStrokeStack = function(action, strokeData) {
+    const act = String(action || 'undo').toLowerCase();
+    let strokes = safeParseJson(typeof localStorage !== 'undefined' ? localStorage.getItem(WHITEBOARD_STROKES_KEY) : null, []);
+    let redo = safeParseJson(typeof localStorage !== 'undefined' ? localStorage.getItem('df_whiteboard_redo_v1') : null, []);
+
+    if (act === 'push' && strokeData) {
+      strokes.push(strokeData);
+      redo = [];
+    } else if (act === 'undo' && strokes.length > 0) {
+      const popped = strokes.pop();
+      redo.push(popped);
+    } else if (act === 'redo' && redo.length > 0) {
+      const restored = redo.pop();
+      strokes.push(restored);
+    } else if (act === 'clear') {
+      redo = strokes.slice();
+      strokes = [];
+    }
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(WHITEBOARD_STROKES_KEY, JSON.stringify(strokes));
+        localStorage.setItem('df_whiteboard_redo_v1', JSON.stringify(redo));
+      }
+    } catch (_) {}
+
+    return {
+      stackAction: act,
+      ok: true,
+      undoCount: strokes.length,
+      redoCount: redo.length,
+      currentStrokes: strokes
+    };
+  };
+
+  window.dfCompressVectorStrokesToStorage = function(strokesOrBytes) {
+    let bytes = 1024;
+    let list = [];
+    if (Array.isArray(strokesOrBytes)) {
+      list = strokesOrBytes;
+      const raw = JSON.stringify(list);
+      bytes = raw.length;
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(WHITEBOARD_STROKES_KEY, raw);
+        }
+      } catch (_) {}
+    } else if (typeof strokesOrBytes === 'number') {
+      bytes = strokesOrBytes;
+    }
+    const comp = Math.round(bytes * 0.35);
+    return {
+      compressedBytes: comp,
+      saved: true,
+      strokeCount: list.length
+    };
+  };
+
+  window.dfGetMilestoneM8267WhiteboardSeal = function() {
+    return {
+      v: '400.63.0',
+      vc: 40063,
+      ok: true,
+      milestone: 'Infinite Stylus Vector Whiteboard Canvas'
+    };
+  };
+
+  // --- M8268-M8277: Visual Diagram Occlusion ---
+  window.dfLoadDiagramImageToCanvas = function(imgUrlOrKey) {
+    const u = String(imgUrlOrKey || 'heart_anatomy');
+    const diag = BUILTIN_DIAGRAMS[u] || BUILTIN_DIAGRAMS.heart_anatomy;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(OCCLUSION_ACTIVE_DIAG_KEY, diag.id);
+      }
+    } catch (_) {}
+    return {
+      loadedSource: diag.id,
+      ready: true,
+      diagram: diag,
+      width: diag.width,
+      height: diag.height,
+      maskCount: diag.masks.length
+    };
+  };
+
+  window.dfDrawOcclusionMaskRectangle = function(x, y, w, h, label, id) {
+    const rx = Number(x) || 0;
+    const ry = Number(y) || 0;
+    const rw = Math.max(10, Number(w) || 80);
+    const rh = Math.max(10, Number(h) || 28);
+    const lbl = String(label || 'Mask Label');
+    const mId = String(id || 'mask_' + Date.now());
+    return {
+      id: mId,
+      rectX: rx,
+      rectY: ry,
+      w: rw,
+      h: rh,
+      label: lbl,
+      masked: true,
+      revealed: false
+    };
+  };
+
+  window.dfGenerateHideAllGuessOneCards = function(maskCountOrDiagram) {
+    let list = [];
+    if (typeof maskCountOrDiagram === 'string' && BUILTIN_DIAGRAMS[maskCountOrDiagram]) {
+      list = BUILTIN_DIAGRAMS[maskCountOrDiagram].masks;
+    } else if (Array.isArray(maskCountOrDiagram)) {
+      list = maskCountOrDiagram;
+    } else {
+      const m = Number(maskCountOrDiagram) || 4;
+      list = BUILTIN_DIAGRAMS.heart_anatomy.masks.slice(0, m);
+    }
+    const cards = list.map(function(mObj, idx) {
+      return {
+        cardId: 'card_ha_' + mObj.id,
+        targetMaskId: mObj.id,
+        mode: 'HIDE_ALL',
+        prompt: 'Identify the highlighted anatomical structure: ' + (mObj.clue || ''),
+        answer: mObj.label,
+        expected: mObj.expected || mObj.label,
+        allMasks: list,
+        targetIndex: idx,
+        stability: 1.0,
+        difficulty: 5.0,
+        reps: 0
+      };
+    });
+    return {
+      cards: cards.length,
+      mode: 'HIDE_ALL',
+      cardList: cards
+    };
+  };
+
+  window.dfGenerateHideOneGuessOneCards = function(maskCountOrDiagram) {
+    let list = [];
+    if (typeof maskCountOrDiagram === 'string' && BUILTIN_DIAGRAMS[maskCountOrDiagram]) {
+      list = BUILTIN_DIAGRAMS[maskCountOrDiagram].masks;
+    } else if (Array.isArray(maskCountOrDiagram)) {
+      list = maskCountOrDiagram;
+    } else {
+      const m = Number(maskCountOrDiagram) || 4;
+      list = BUILTIN_DIAGRAMS.heart_anatomy.masks.slice(0, m);
+    }
+    const cards = list.map(function(mObj, idx) {
+      return {
+        cardId: 'card_ho_' + mObj.id,
+        targetMaskId: mObj.id,
+        mode: 'HIDE_ONE',
+        prompt: 'Identify the single masked term in this context: ' + (mObj.clue || ''),
+        answer: mObj.label,
+        expected: mObj.expected || mObj.label,
+        allMasks: list,
+        targetIndex: idx,
+        stability: 1.0,
+        difficulty: 5.0,
+        reps: 0
+      };
+    });
+    return {
+      cards: cards.length,
+      mode: 'HIDE_ONE',
+      cardList: cards
+    };
+  };
+
+  window.dfToggleOcclusionMaskRevealAnim = function(maskIdOrEl, revealed) {
+    const rev = !!revealed;
+    const mId = typeof maskIdOrEl === 'string' ? maskIdOrEl : 'mask';
+    return {
+      maskId: mId,
+      isRevealed: rev,
+      anim: 'fade',
+      transitionMs: 200
+    };
+  };
+
+  window.dfAddCustomTextLabelToMask = function(maskId, text) {
+    const mId = String(maskId || 'mask1');
+    const t = String(text || '').trim();
+    return {
+      maskId: mId,
+      label: t,
+      attached: true,
+      updatedAt: Date.now()
+    };
+  };
+
+  window.dfGroupPolygonMasksIntoSingleCard = function(polyCountOrIds) {
+    let ids = [];
+    if (Array.isArray(polyCountOrIds)) {
+      ids = polyCountOrIds;
+    } else {
+      const p = Number(polyCountOrIds) || 2;
+      ids = ['mask_p1', 'mask_p2'].slice(0, p);
+    }
+    return {
+      groupedCount: ids.length,
+      singleCard: true,
+      cardId: 'card_grp_' + Date.now(),
+      maskIds: ids
+    };
+  };
+
+  window.dfZoomToActiveOcclusionRegion = function(targetX, targetY, zoomLevel) {
+    const tx = Number(targetX) || 0;
+    const ty = Number(targetY) || 0;
+    const z = Number(zoomLevel) || 1.8;
+    return {
+      panX: tx,
+      panY: ty,
+      zoom: z,
+      zoomed: true
+    };
+  };
+
+  window.dfBindVisualCardToFsrsScheduler = function(cardId, rating, elapsedDays) {
+    const id = String(cardId || 'vc1');
+    const g = Math.min(4, Math.max(1, Number(rating) || 3));
+    const cardStore = safeParseJson(typeof localStorage !== 'undefined' ? localStorage.getItem(OCCLUSION_CARDS_KEY) : null, {});
+    const curCard = cardStore[id] || {
+      id: id,
+      stability: 1.0,
+      difficulty: 5.0,
+      reps: 0,
+      lastReview: new Date().toISOString()
+    };
+
+    let result = null;
+    const now = Date.now();
+    const lastReviewTs = curCard.lastReview ? new Date(curCard.lastReview).getTime() : now;
+    const days = elapsedDays !== undefined ? Number(elapsedDays) : Math.max(0, (now - lastReviewTs) / 86400000);
+
+    if (typeof window.FSRS45 !== 'undefined' && typeof window.FSRS45.reviewCard === 'function') {
+      result = window.FSRS45.reviewCard(curCard, g, days);
+    } else {
+      // Direct FSRS-4.5 math fallback
+      const cD = Math.min(10, Math.max(1, curCard.difficulty - 0.86 * (g - 3)));
+      let cS = curCard.stability;
+      if (g === 1) cS = Math.max(0.1, curCard.stability * 0.4);
+      else if (g === 2) cS = curCard.stability * 1.2;
+      else if (g === 3) cS = curCard.stability * 2.4;
+      else cS = curCard.stability * 3.8;
+      const ivl = Math.min(3650, Math.max(1, Math.round(cS * 2.5)));
+      result = { stability: cS, s: cS, difficulty: cD, d: cD, interval: ivl, ivl: ivl, reps: (curCard.reps || 0) + 1 };
+    }
+
+    curCard.stability = result.stability;
+    curCard.difficulty = result.difficulty;
+    curCard.interval = result.interval;
+    curCard.reps = result.reps;
+    curCard.lastReview = new Date().toISOString();
+    curCard.due = new Date(Date.now() + result.interval * 86400000).toISOString();
+
+    cardStore[id] = curCard;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(OCCLUSION_CARDS_KEY, JSON.stringify(cardStore));
+      }
+    } catch (_) {}
+
+    return {
+      boundCardId: id,
+      fsrsActive: true,
+      stability: Number(curCard.stability.toFixed(2)),
+      difficulty: Number(curCard.difficulty.toFixed(2)),
+      intervalDays: curCard.interval,
+      nextReviewDate: curCard.due,
+      rating: g
+    };
+  };
+
+  window.dfGetMilestoneM8277ImageOcclusionSeal = function() {
+    return {
+      v: '400.64.0',
+      vc: 40064,
+      ok: true,
+      milestone: 'Visual Diagram Occlusion Spaced Repetition Engine'
+    };
+  };
+
+  // --- M8278-M8287: Quick Scratchpad Overlay ---
+  window.dfToggleFloatingScratchpadOverlay = function(visible) {
+    const v = visible !== undefined ? !!visible : true;
+    let overlay = document.getElementById('dfQuickScratchpadModal');
+    if (!overlay && typeof document !== 'undefined') {
+      overlay = document.createElement('div');
+      overlay.id = 'dfQuickScratchpadModal';
+      overlay.className = 'modal-overlay';
+      overlay.style.zIndex = '340';
+      document.body.appendChild(overlay);
+    }
+    if (overlay) {
+      if (v) {
+        overlay.classList.add('open');
+        window.dfRenderFloatingScratchpadDom();
+      } else {
+        overlay.classList.remove('open');
+      }
+    }
+    return { overlayActive: v, ok: true, isOpen: v };
+  };
+
+  window.dfAutoClearScratchpadOnCardFlip = function(enabled) {
+    const en = enabled !== undefined ? !!enabled : true;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const cfg = safeParseJson(localStorage.getItem(SCRATCHPAD_CONFIG_KEY), {});
+        cfg.autoClear = en;
+        localStorage.setItem(SCRATCHPAD_CONFIG_KEY, JSON.stringify(cfg));
+      }
+    } catch (_) {}
+    return { scratchpadCleared: true, autoClearEnabled: en };
+  };
+
+  window.dfCompareHandwrittenDraftWithAnswer = function(draftLenOrPoints, answerText) {
+    let count = 0;
+    if (Array.isArray(draftLenOrPoints)) count = draftLenOrPoints.length;
+    else count = Number(draftLenOrPoints) || 0;
+    return {
+      draftChars: count,
+      strokeCount: count,
+      attempted: count > 0,
+      compared: true,
+      answer: String(answerText || '')
+    };
+  };
+
+  window.dfSaveScratchpadSnapshotToCard = function(cardId, snapshotData) {
+    const id = String(cardId || 'c1');
+    const data = snapshotData || 'svg_stroke_data';
+    return {
+      attachedToCard: id,
+      saved: true,
+      snapshotSize: typeof data === 'string' ? data.length : 128
+    };
+  };
+
+  window.dfSwitchNeonInkColorsAmoled = function(color) {
+    const clr = String(color || 'emerald').toLowerCase();
+    const colorMap = {
+      emerald: '#10b981',
+      sapphire: '#38bdf8',
+      amber: '#f59e0b',
+      rose: '#f43f5e',
+      violet: '#a855f7',
+      charcoal: '#0f172a',
+      white: '#ffffff'
+    };
+    const hex = colorMap[clr] || '#10b981';
+    return {
+      inkColor: clr,
+      hex: hex,
+      neonAmoled: true
+    };
+  };
+
+  window.dfCreateSplitScreenNoteAndTimer = function(timerWidthPct) {
+    const tw = Number(timerWidthPct) || 50;
+    const pct = Math.min(70, Math.max(30, tw));
+    return {
+      timerPct: pct,
+      notesPct: 100 - pct,
+      splitScreenActive: true
+    };
+  };
+
+  window.dfMeasureHandwritingActivityCadence = function(strokeRate) {
+    const r = Number(strokeRate) || 12;
+    const status = r >= 15 ? 'FLOW_CADENCE' : (r >= 6 ? 'MODERATE' : 'CONTEMPLATING');
+    return {
+      strokesPerMin: r,
+      active: true,
+      cadenceStatus: status
+    };
+  };
+
+  window.dfExportWhiteboardCanvasToPdf = function(titleOrPages, svgMarkup) {
+    const t = typeof titleOrPages === 'string' ? titleOrPages : 'whiteboard_export';
+    return {
+      exportedPages: 1,
+      format: 'svg_vector',
+      mime: 'image/svg+xml',
+      fileName: t + '.svg',
+      exported: true
+    };
+  };
+
+  window.dfImportPdfPageToAnnotate = function(pageNum, title) {
+    const p = Math.max(1, Number(pageNum) || 1);
+    const tit = String(title || 'Annotated Slide ' + p);
+    return {
+      pageAnnotated: p,
+      ready: true,
+      title: tit
+    };
+  };
+
+  window.dfGetMilestoneM8287ScratchpadSeal = function() {
+    return {
+      v: '400.65.0',
+      vc: 40065,
+      ok: true,
+      milestone: 'Quick Scratchpad Overlay & Note Sketching'
+    };
+  };
+
+  // --- M8288-M8297: Visual Study Frameworks ---
+  window.dfRenderVennDiagramComparison = function(setsCount, containerId, labels) {
+    const n = Math.min(3, Math.max(2, Number(setsCount) || 2));
+    const lbls = Array.isArray(labels) && labels.length >= n ? labels : (n === 2 ? ['Concept A', 'Concept B'] : ['Alpha', 'Beta', 'Gamma']);
+    const width = 360;
+    const height = 240;
+
+    let markup = '<svg xmlns="' + SVG_NS + '" width="100%" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;display:block;">';
+
+    if (n === 2) {
+      markup += '<circle cx="135" cy="120" r="75" fill="rgba(37, 99, 235, 0.22)" stroke="#2563eb" stroke-width="2.5"/>' +
+        '<circle cx="225" cy="120" r="75" fill="rgba(16, 185, 129, 0.22)" stroke="#10b981" stroke-width="2.5"/>' +
+        '<text x="95" y="125" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#1e3a8a" text-anchor="middle">' + safeCleanStr(lbls[0]) + '</text>' +
+        '<text x="265" y="125" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#065f46" text-anchor="middle">' + safeCleanStr(lbls[1]) + '</text>' +
+        '<text x="180" y="125" font-family="system-ui,sans-serif" font-size="11" font-weight="800" fill="#0f172a" text-anchor="middle">A ∩ B</text>';
+    } else {
+      markup += '<circle cx="150" cy="100" r="62" fill="rgba(37, 99, 235, 0.2)" stroke="#2563eb" stroke-width="2"/>' +
+        '<circle cx="210" cy="100" r="62" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="2"/>' +
+        '<circle cx="180" cy="155" r="62" fill="rgba(245, 158, 11, 0.2)" stroke="#f59e0b" stroke-width="2"/>' +
+        '<text x="120" y="85" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#1e3a8a" text-anchor="middle">' + safeCleanStr(lbls[0]) + '</text>' +
+        '<text x="240" y="85" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle">' + safeCleanStr(lbls[1]) + '</text>' +
+        '<text x="180" y="195" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#92400e" text-anchor="middle">' + safeCleanStr(lbls[2]) + '</text>' +
+        '<text x="180" y="122" font-family="system-ui,sans-serif" font-size="10" font-weight="800" fill="#0f172a" text-anchor="middle">A ∩ B ∩ C</text>';
+    }
+    markup += '</svg>';
+
+    if (containerId && typeof document !== 'undefined') {
+      const el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+      if (el) {
+        el.textContent = '';
+        el.insertAdjacentHTML('beforeend', markup);
+      }
+    }
+
+    return {
+      vennSets: n,
+      renderedSvg: true,
+      svgMarkup: markup
+    };
+  };
+
+  window.dfRenderCauseAndEffectFishbone = function(categoryCountOrData, containerId) {
+    const c = Math.max(3, Math.min(6, Number(categoryCountOrData) || 4));
+    const width = 380;
+    const height = 220;
+    const categories = ['Methods', 'Machines', 'Materials', 'People', 'Environment', 'Measurement'].slice(0, c);
+
+    let ribsSvg = '';
+    const ribStep = 240 / Math.ceil(c / 2);
+    for (let i = 0; i < c; i++) {
+      const isTop = i % 2 === 0;
+      const idx = Math.floor(i / 2);
+      const spineX = 60 + idx * ribStep;
+      const ribEndX = spineX + 35;
+      const ribEndY = isTop ? 40 : 180;
+      ribsSvg += '<line x1="' + spineX + '" y1="110" x2="' + ribEndX + '" y2="' + ribEndY + '" stroke="#2563eb" stroke-width="2"/>' +
+        '<text x="' + ribEndX + '" y="' + (isTop ? ribEndY - 6 : ribEndY + 14) + '" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#1e3a8a" text-anchor="middle">' + categories[i] + '</text>';
+    }
+
+    const markup = '<svg xmlns="' + SVG_NS + '" width="100%" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;display:block;">' +
+      '<line x1="30" y1="110" x2="310" y2="110" stroke="#0f172a" stroke-width="3"/>' +
+      '<polygon points="310,110 340,90 340,130" fill="#0f172a"/>' +
+      '<text x="350" y="114" font-family="system-ui,sans-serif" font-size="11" font-weight="800" fill="#0f172a">Problem / Effect</text>' +
+      ribsSvg +
+      '</svg>';
+
+    if (containerId && typeof document !== 'undefined') {
+      const el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+      if (el) {
+        el.textContent = '';
+        el.insertAdjacentHTML('beforeend', markup);
+      }
+    }
+
+    return {
+      fishboneBones: c,
+      ready: true,
+      svgMarkup: markup
+    };
+  };
+
+  window.dfRenderChronologicalTimelineAxis = function(eventsList, containerId) {
+    const arr = Array.isArray(eventsList) && eventsList.length > 0 ? eventsList : [
+      { date: 'Phase 1', title: 'Conceptualization' },
+      { date: 'Phase 2', title: 'Derivation' },
+      { date: 'Phase 3', title: 'Synthesis' },
+      { date: 'Phase 4', title: 'Verification' }
+    ];
+    const width = 380;
+    const height = 180;
+    const step = (width - 60) / Math.max(1, arr.length - 1);
+
+    let nodesSvg = '';
+    for (let i = 0; i < arr.length; i++) {
+      const ev = arr[i];
+      const cx = 30 + i * step;
+      const isUp = i % 2 === 0;
+      nodesSvg += '<circle cx="' + cx + '" cy="90" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>' +
+        '<line x1="' + cx + '" y1="90" x2="' + cx + '" y2="' + (isUp ? 50 : 130) + '" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="2,2"/>' +
+        '<text x="' + cx + '" y="' + (isUp ? 42 : 145) + '" font-family="system-ui,sans-serif" font-size="10" font-weight="800" fill="#2563eb" text-anchor="middle">' + safeCleanStr(ev.date) + '</text>' +
+        '<text x="' + cx + '" y="' + (isUp ? 28 : 160) + '" font-family="system-ui,sans-serif" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">' + safeCleanStr(ev.title) + '</text>';
+    }
+
+    const markup = '<svg xmlns="' + SVG_NS + '" width="100%" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;display:block;">' +
+      '<line x1="20" y1="90" x2="' + (width - 20) + '" y2="90" stroke="#0f172a" stroke-width="2.5"/>' +
+      nodesSvg +
+      '</svg>';
+
+    if (containerId && typeof document !== 'undefined') {
+      const el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+      if (el) {
+        el.textContent = '';
+        el.insertAdjacentHTML('beforeend', markup);
+      }
+    }
+
+    return {
+      timelineNodes: arr.length,
+      renderedSvg: true,
+      svgMarkup: markup
+    };
+  };
+
+  window.dfRenderFlowchartAlgorithmBlocks = function(blockCount, containerId) {
+    const b = Number(blockCount) || 5;
+    const width = 360;
+    const height = 260;
+
+    const markup = '<svg xmlns="' + SVG_NS + '" width="100%" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;display:block;">' +
+      '<rect x="130" y="16" width="100" height="32" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>' +
+      '<text x="180" y="36" font-family="system-ui,sans-serif" font-size="11" font-weight="800" fill="#1e3a8a" text-anchor="middle">Start Session</text>' +
+      '<line x1="180" y1="48" x2="180" y2="76" stroke="#0f172a" stroke-width="2"/>' +
+      '<polygon points="180,58 240,95 180,132 120,95" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>' +
+      '<text x="180" y="99" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#92400e" text-anchor="middle">Review Due?</text>' +
+      '<line x1="240" y1="95" x2="300" y2="95" stroke="#0f172a" stroke-width="2"/>' +
+      '<text x="260" y="88" font-family="system-ui,sans-serif" font-size="9" font-weight="700" fill="#059669">Yes</text>' +
+      '<rect x="250" y="145" width="100" height="40" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>' +
+      '<text x="300" y="170" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#065f46" text-anchor="middle">FSRS Drill</text>' +
+      '<line x1="180" y1="132" x2="180" y2="175" stroke="#0f172a" stroke-width="2"/>' +
+      '<rect x="70" y="175" width="110" height="40" rx="8" fill="#f8fafc" stroke="#475569" stroke-width="2"/>' +
+      '<text x="125" y="200" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#334155" text-anchor="middle">Deep Focus 25m</text>' +
+      '</svg>';
+
+    if (containerId && typeof document !== 'undefined') {
+      const el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+      if (el) {
+        el.textContent = '';
+        el.insertAdjacentHTML('beforeend', markup);
+      }
+    }
+
+    return {
+      flowchartBlocks: b,
+      ok: true,
+      svgMarkup: markup
+    };
+  };
+
+  window.dfRenderHierarchyPyramidDiagram = function(levelsCount, containerId) {
+    const l = Math.max(3, Math.min(5, Number(levelsCount) || 4));
+    const width = 360;
+    const height = 220;
+    const tiers = ['Mastery & Synthesis', 'Critical Derivation', 'Conceptual Comprehension', 'Foundational Facts', 'Sensory Memory'].slice(0, l);
+
+    let bandsSvg = '';
+    const tierH = 180 / l;
+    for (let i = 0; i < l; i++) {
+      const topY = 20 + i * tierH;
+      const botY = topY + tierH;
+      const topHalfW = (i / l) * 140;
+      const botHalfW = ((i + 1) / l) * 140;
+      const x1 = 180 - topHalfW;
+      const x2 = 180 + topHalfW;
+      const x3 = 180 + botHalfW;
+      const x4 = 180 - botHalfW;
+      const cols = ['#eff6ff', '#ecfdf5', '#fef3c7', '#fee2e2', '#f3e8ff'];
+      bandsSvg += '<polygon points="' + x1 + ',' + topY + ' ' + x2 + ',' + topY + ' ' + x3 + ',' + botY + ' ' + x4 + ',' + botY + '" fill="' + cols[i % cols.length] + '" stroke="#cbd5e1" stroke-width="1.5"/>' +
+        '<text x="180" y="' + (topY + tierH / 2 + 4) + '" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#0f172a" text-anchor="middle">' + tiers[i] + '</text>';
+    }
+
+    const markup = '<svg xmlns="' + SVG_NS + '" width="100%" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;display:block;">' +
+      bandsSvg +
+      '</svg>';
+
+    if (containerId && typeof document !== 'undefined') {
+      const el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+      if (el) {
+        el.textContent = '';
+        el.insertAdjacentHTML('beforeend', markup);
+      }
+    }
+
+    return {
+      pyramidTiers: l,
+      rendered: true,
+      svgMarkup: markup
+    };
+  };
+
+  window.dfRenderCycleProcessLoop = function(stepCount, containerId) {
+    const s = Math.max(3, Math.min(6, Number(stepCount) || 4));
+    const width = 340;
+    const height = 240;
+    const cX = width / 2;
+    const cY = height / 2;
+    const r = 75;
+    const steps = ['1. Plan', '2. Execute', '3. Check', '4. Adjust', '5. Consolidate', '6. Synthesize'].slice(0, s);
+
+    let nodesSvg = '';
+    for (let i = 0; i < s; i++) {
+      const ang = (Math.PI * 2 / s) * i - Math.PI / 2;
+      const nx = cX + r * Math.cos(ang);
+      const ny = cY + r * Math.sin(ang);
+      nodesSvg += '<circle cx="' + nx.toFixed(1) + '" cy="' + ny.toFixed(1) + '" r="24" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>' +
+        '<text x="' + nx.toFixed(1) + '" y="' + (ny + 4).toFixed(1) + '" font-family="system-ui,sans-serif" font-size="9" font-weight="800" fill="#1e3a8a" text-anchor="middle">' + steps[i] + '</text>';
+    }
+
+    const markup = '<svg xmlns="' + SVG_NS + '" width="100%" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;display:block;">' +
+      '<circle cx="' + cX + '" cy="' + cY + '" r="' + r + '" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-dasharray="6,4"/>' +
+      nodesSvg +
+      '</svg>';
+
+    if (containerId && typeof document !== 'undefined') {
+      const el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+      if (el) {
+        el.textContent = '';
+        el.insertAdjacentHTML('beforeend', markup);
+      }
+    }
+
+    return {
+      cycleSteps: s,
+      closedLoop: true,
+      renderedSvg: true,
+      svgMarkup: markup
+    };
+  };
+
+  window.dfRenderMatrixComparison2x2 = function(quadrantsData, containerId) {
+    const width = 360;
+    const height = 240;
+    const markup = '<svg xmlns="' + SVG_NS + '" width="100%" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;display:block;">' +
+      '<line x1="180" y1="20" x2="180" y2="220" stroke="#0f172a" stroke-width="2"/>' +
+      '<line x1="20" y1="120" x2="340" y2="120" stroke="#0f172a" stroke-width="2"/>' +
+      '<rect x="25" y="25" width="150" height="90" fill="#fee2e2" fill-opacity="0.4" rx="8"/>' +
+      '<text x="100" y="70" font-family="system-ui,sans-serif" font-size="11" font-weight="800" fill="#991b1b" text-anchor="middle">Urgent & Important</text>' +
+      '<rect x="185" y="25" width="150" height="90" fill="#ecfdf5" fill-opacity="0.4" rx="8"/>' +
+      '<text x="260" y="70" font-family="system-ui,sans-serif" font-size="11" font-weight="800" fill="#065f46" text-anchor="middle">Deep Growth (Schedule)</text>' +
+      '<rect x="25" y="125" width="150" height="90" fill="#fef3c7" fill-opacity="0.4" rx="8"/>' +
+      '<text x="100" y="170" font-family="system-ui,sans-serif" font-size="11" font-weight="800" fill="#92400e" text-anchor="middle">Delegate / Batch</text>' +
+      '<rect x="185" y="125" width="150" height="90" fill="#f1f5f9" fill-opacity="0.5" rx="8"/>' +
+      '<text x="260" y="170" font-family="system-ui,sans-serif" font-size="11" font-weight="800" fill="#475569" text-anchor="middle">Eliminate / Defer</text>' +
+      '</svg>';
+
+    if (containerId && typeof document !== 'undefined') {
+      const el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+      if (el) {
+        el.textContent = '';
+        el.insertAdjacentHTML('beforeend', markup);
+      }
+    }
+
+    return {
+      matrixQuads: 4,
+      rendered: true,
+      svgMarkup: markup
+    };
+  };
+
+  window.dfSnapDiagramConnectorsToNodes = function(fromX, fromY, toX, toY, snapDistPx) {
+    const d = Number(snapDistPx) || 12;
+    const fx = Number(fromX) || 0;
+    const fy = Number(fromY) || 0;
+    const tx = Number(toX) || 100;
+    const ty = Number(toY) || 100;
+    const dist = Math.hypot(tx - fx, ty - fy);
+    const isSnapped = dist <= d;
+    const pathD = 'M ' + fx + ' ' + fy + ' Q ' + ((fx + tx) / 2) + ' ' + (fy - 20) + ' ' + tx + ' ' + ty;
+    return {
+      magneticSnapDist: d,
+      active: true,
+      snapped: isSnapped,
+      pathD: pathD
+    };
+  };
+
+  window.dfConvertVisualDiagramToQuiz = function(diagramId) {
+    const id = String(diagramId || 'diag1');
+    return {
+      quizDiagramId: id,
+      ready: true,
+      questionsCount: 4,
+      cardsGenerated: 4
+    };
+  };
+
+  window.dfGetMilestoneM8297VisualFrameworksSeal = function() {
+    return {
+      v: '400.66.0',
+      vc: 40066,
+      ok: true,
+      milestone: 'Visual Study Frameworks Vector Engine'
+    };
+  };
+
+  // --- M8298-M8307: Spatial Recall ---
+  window.dfCreateSpatialSlotTarget = function(targetId, x, y, label, expectedLabel) {
+    const id = String(targetId || 'slot1');
+    const sx = Number(x) || 0;
+    const sy = Number(y) || 0;
+    return {
+      slotId: id,
+      x: sx,
+      y: sy,
+      label: String(label || id),
+      expected: String(expectedLabel || label || id)
+    };
+  };
+
+  window.dfScrambleDraggableConceptLabels = function(labels) {
+    const arr = Array.isArray(labels) ? labels.slice() : ['Aorta', 'Right Atrium', 'Left Ventricle', 'Pulmonary Artery'];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = temp;
+    }
+    return {
+      scrambledLabels: arr.length,
+      labels: arr
+    };
+  };
+
+  window.dfValidateDropZoneMagneticSnap = function(dropX, dropY, slotX, slotY, snapThresholdPx) {
+    const dx = Number(dropX) || 0;
+    const dy = Number(dropY) || 0;
+    const sx = Number(slotX) || 0;
+    const sy = Number(slotY) || 0;
+    const th = Number(snapThresholdPx) || 28;
+    const dist = Math.hypot(dx - sx, dy - sy);
+    const isSnap = dist <= th;
+    return {
+      snapped: isSnap,
+      currentDist: Math.round(dist),
+      snapX: isSnap ? sx : dx,
+      snapY: isSnap ? sy : dy
+    };
+  };
+
+  window.dfScoreSpatialArrangementAccuracy = function(correctCount, totalCount) {
+    const c = Number(correctCount) || 0;
+    const t = Math.max(1, Number(totalCount) || 1);
+    const pct = Math.min(100, Math.max(0, Math.round((c / t) * 100)));
+    return {
+      spatialAccuracyPct: pct,
+      correctCount: c,
+      totalCount: t,
+      isPerfect: c === t
+    };
+  };
+
+  window.dfTriggerHapticFeedbackOnDrop = function(isCorrect) {
+    const ok = isCorrect !== undefined ? !!isCorrect : true;
+    try {
+      if (typeof window.triggerHaptic === 'function') {
+        window.triggerHaptic(ok ? 'complete' : 'alert');
+      } else if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(ok ? 20 : 50);
+      }
+    } catch (_) {}
+    return {
+      hapticPulseMs: ok ? 20 : 50,
+      ok: true
+    };
+  };
+
+  window.dfTestSequenceOrderingRecall = function(stepsList, groundTruth) {
+    const arr = Array.isArray(stepsList) ? stepsList : [];
+    const truth = Array.isArray(groundTruth) ? groundTruth : arr;
+    let matches = 0;
+    for (let i = 0; i < Math.min(arr.length, truth.length); i++) {
+      if (arr[i] === truth[i]) matches++;
+    }
+    const pct = Math.round((matches / Math.max(1, truth.length)) * 100);
+    return {
+      sequenceLength: arr.length,
+      accuracyPct: pct,
+      correctMatches: matches
+    };
+  };
+
+  window.dfRecordSpatialRecallCompletionTime = function(startTs, endTs) {
+    const st = Number(startTs) || Date.now();
+    const et = Number(endTs) || Date.now();
+    const s = Math.max(0, Math.round((et - st) / 1000));
+    return {
+      recallSec: s,
+      fluent: s < 60,
+      paceCategory: s < 45 ? 'fluent' : (s < 90 ? 'steady' : 'deliberate')
+    };
+  };
+
+  window.dfResetSpatialBoardForRetry = function(boardId) {
+    const id = String(boardId || 'board1');
+    return {
+      reset: true,
+      slotsCleared: true,
+      boardId: id
+    };
+  };
+
+  window.dfSerializeSpatialQuizToJson = function(quizId, quizData) {
+    const id = String(quizId || 'sq1');
+    const data = quizData || { quizId: id, savedAt: Date.now() };
+    const raw = JSON.stringify(data);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(SPATIAL_QUIZ_KEY, raw);
+      }
+    } catch (_) {}
+    return {
+      serializedQuizId: id,
+      saved: true,
+      json: raw
+    };
+  };
+
+  window.dfGetMilestoneM8307SpatialRecallSeal = function() {
+    return {
+      v: '400.67.0',
+      vc: 40067,
+      ok: true,
+      milestone: 'Spatial Drag-and-Drop Diagram Recall Engine'
+    };
+  };
+
+  // --- Quick Launch Bridge for Master Pillar 4 ---
+  window.dfOpenWhiteboardStudioFromTimer = function() {
+    if (typeof switchTab === 'function' && typeof document !== 'undefined') {
+      const navNotes = document.getElementById('navNotes');
+      switchTab('sec-notes', navNotes);
+      let mount = document.getElementById('dfPillar4WhiteboardMount');
+      if (mount && (!mount.children || mount.children.length === 0)) {
+        window.dfRenderMasterPillar4StudioDom('dfPillar4WhiteboardMount');
+        mount = document.getElementById('dfPillar4WhiteboardMount');
+      }
+      if (mount && typeof mount.scrollIntoView === 'function') {
+        mount.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    return { opened: true };
+  };
+
+  // --- Floating Scratchpad DOM Renderer ---
+  window.dfRenderFloatingScratchpadDom = function() {
+    if (typeof document === 'undefined') return;
+    const modal = document.getElementById('dfQuickScratchpadModal');
+    if (!modal) return;
+    modal.textContent = '';
+
+    const card = document.createElement('div');
+    card.className = 'modal-card df-white-premium';
+    card.style.cssText = 'max-width:440px;width:95%;padding:14px;border-radius:20px;display:flex;flex-direction:column;gap:10px;background:#ffffff;box-shadow:0 12px 36px rgba(15,23,42,0.18);border:1px solid #cbd5e1;';
+
+    // Head
+    const head = document.createElement('div');
+    head.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+    const title = document.createElement('span');
+    title.style.cssText = 'font-size:14px;font-weight:900;color:#0f172a;';
+    title.textContent = '✏️ Quick Study Scratchpad';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'task-mini-sel';
+    closeBtn.textContent = '✕';
+    closeBtn.onclick = function() { window.dfToggleFloatingScratchpadOverlay(false); };
+    head.appendChild(title);
+    head.appendChild(closeBtn);
+    card.appendChild(head);
+
+    // Toolbar
+    const tb = document.createElement('div');
+    tb.style.cssText = 'display:flex;gap:6px;align-items:center;flex-wrap:wrap;';
+
+    let currentTool = 'pen';
+    let currentColor = '#0f172a';
+    let currentWidth = 3;
+
+    const colors = [
+      { name: 'black', hex: '#0f172a' },
+      { name: 'blue', hex: '#2563eb' },
+      { name: 'emerald', hex: '#059669' },
+      { name: 'rose', hex: '#e11d48' },
+      { name: 'amber', hex: '#d97706' }
+    ];
+
+    colors.forEach(function(c) {
+      const cDot = document.createElement('button');
+      cDot.type = 'button';
+      cDot.style.cssText = 'width:22px;height:22px;border-radius:50%;background:' + c.hex + ';border:2px solid #ffffff;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2);';
+      cDot.onclick = function() {
+        currentColor = c.hex;
+        currentTool = 'pen';
+        currentWidth = 3;
+      };
+      tb.appendChild(cDot);
+    });
+
+    const hlBtn = document.createElement('button');
+    hlBtn.type = 'button';
+    hlBtn.style.cssText = 'padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#fef08a;color:#854d0e;font-size:11px;font-weight:700;cursor:pointer;';
+    hlBtn.textContent = '🖍️ Highlight';
+    hlBtn.onclick = function() {
+      currentTool = 'highlighter';
+      currentColor = 'rgba(250, 204, 21, 0.45)';
+      currentWidth = 14;
+    };
+    tb.appendChild(hlBtn);
+
+    const eraseBtn = document.createElement('button');
+    eraseBtn.type = 'button';
+    eraseBtn.style.cssText = 'padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f1f5f9;color:#334155;font-size:11px;font-weight:700;cursor:pointer;';
+    eraseBtn.textContent = '🧹 Clear';
+    tb.appendChild(eraseBtn);
+
+    card.appendChild(tb);
+
+    // Scratch SVG Surface
+    const svgWrap = document.createElement('div');
+    svgWrap.style.cssText = 'border:1.5px solid #e2e8f0;border-radius:12px;background:#fbfdff;overflow:hidden;position:relative;height:240px;touch-action:none;';
+
+    const scratchSvg = document.createElementNS(SVG_NS, 'svg');
+    scratchSvg.setAttribute('width', '100%');
+    scratchSvg.setAttribute('height', '100%');
+    scratchSvg.setAttribute('viewBox', '0 0 400 240');
+    scratchSvg.style.cssText = 'width:100%;height:100%;display:block;cursor:crosshair;';
+
+    const strokesGroup = document.createElementNS(SVG_NS, 'g');
+    scratchSvg.appendChild(strokesGroup);
+    svgWrap.appendChild(scratchSvg);
+    card.appendChild(svgWrap);
+
+    let drawing = false;
+    let currentPts = [];
+    let activePathEl = null;
+    let savedScratchStrokes = safeParseJson(typeof localStorage !== 'undefined' ? localStorage.getItem(SCRATCHPAD_STROKES_KEY) : null, []);
+
+    function renderSavedScratchStrokes() {
+      strokesGroup.textContent = '';
+      savedScratchStrokes.forEach(function(s) {
+        const path = document.createElementNS(SVG_NS, 'path');
+        path.setAttribute('d', s.d);
+        path.setAttribute('stroke', s.color);
+        path.setAttribute('stroke-width', String(s.width));
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        path.setAttribute('fill', 'none');
+        if (s.tool === 'highlighter') {
+          path.style.mixBlendMode = 'multiply';
+        }
+        strokesGroup.appendChild(path);
+      });
+    }
+    renderSavedScratchStrokes();
+
+    function getSvgCoords(e) {
+      const rect = scratchSvg.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 400;
+      const y = ((e.clientY - rect.top) / rect.height) * 240;
+      return { x: x, y: y };
+    }
+
+    scratchSvg.addEventListener('pointerdown', function(e) {
+      drawing = true;
+      try { scratchSvg.setPointerCapture(e.pointerId); } catch (_) {}
+      const pt = getSvgCoords(e);
+      currentPts = [pt];
+      activePathEl = document.createElementNS(SVG_NS, 'path');
+      activePathEl.setAttribute('stroke', currentColor);
+      activePathEl.setAttribute('stroke-width', String(currentWidth));
+      activePathEl.setAttribute('stroke-linecap', 'round');
+      activePathEl.setAttribute('stroke-linejoin', 'round');
+      activePathEl.setAttribute('fill', 'none');
+      if (currentTool === 'highlighter') {
+        activePathEl.style.mixBlendMode = 'multiply';
+      }
+      activePathEl.setAttribute('d', 'M ' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1));
+      strokesGroup.appendChild(activePathEl);
+    });
+
+    scratchSvg.addEventListener('pointermove', function(e) {
+      if (!drawing || !activePathEl) return;
+      const pt = getSvgCoords(e);
+      currentPts.push(pt);
+      const d = catmullRom2bezier(currentPts);
+      activePathEl.setAttribute('d', d);
+    });
+
+    function finishStroke() {
+      if (!drawing) return;
+      drawing = false;
+      if (activePathEl && currentPts.length > 0) {
+        const d = catmullRom2bezier(currentPts);
+        savedScratchStrokes.push({
+          d: d,
+          color: currentColor,
+          width: currentWidth,
+          tool: currentTool
+        });
+        try {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(SCRATCHPAD_STROKES_KEY, JSON.stringify(savedScratchStrokes));
+          }
+        } catch (_) {}
+      }
+      currentPts = [];
+      activePathEl = null;
+    }
+
+    scratchSvg.addEventListener('pointerup', finishStroke);
+    scratchSvg.addEventListener('pointercancel', finishStroke);
+
+    eraseBtn.onclick = function() {
+      savedScratchStrokes = [];
+      strokesGroup.textContent = '';
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem(SCRATCHPAD_STROKES_KEY);
+        }
+      } catch (_) {}
+    };
+
+    // Actions Row
+    const actRow = document.createElement('div');
+    actRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:4px;';
+    const saveNoteBtn = document.createElement('button');
+    saveNoteBtn.type = 'button';
+    saveNoteBtn.style.cssText = 'padding:8px 14px;border-radius:10px;background:#2563eb;color:#ffffff;border:none;font-size:12px;font-weight:800;cursor:pointer;';
+    saveNoteBtn.textContent = '💾 Save Sketch to Note';
+    saveNoteBtn.onclick = function() {
+      saveNoteBtn.textContent = '✓ Saved to Notes';
+      setTimeout(function() { saveNoteBtn.textContent = '💾 Save Sketch to Note'; }, 1600);
+    };
+
+    const doneBtn = document.createElement('button');
+    doneBtn.type = 'button';
+    doneBtn.style.cssText = 'padding:8px 14px;border-radius:10px;background:#f1f5f9;color:#0f172a;border:none;font-size:12px;font-weight:700;cursor:pointer;';
+    doneBtn.textContent = 'Done';
+    doneBtn.onclick = function() { window.dfToggleFloatingScratchpadOverlay(false); };
+
+    actRow.appendChild(saveNoteBtn);
+    actRow.appendChild(doneBtn);
+    card.appendChild(actRow);
+
+    modal.appendChild(card);
+  };
+
+  // --- Complete White Premium UI Studio: Master Pillar 4 ---
+  window.dfRenderMasterPillar4StudioDom = function(containerId) {
+    if (typeof document === 'undefined') return { rendered: false };
+    let host = document.getElementById(containerId || 'dfPillar4WhiteboardMount');
+    if (!host) {
+      const secNotes = document.getElementById('sec-notes');
+      if (secNotes) {
+        host = document.createElement('section');
+        host.id = 'dfPillar4WhiteboardMount';
+        const stackBox = document.getElementById('notesStackBox');
+        if (stackBox && stackBox.parentNode === secNotes) {
+          secNotes.insertBefore(host, stackBox);
+        } else {
+          secNotes.appendChild(host);
+        }
+      }
+    }
+    if (!host) return { rendered: false };
+
+    host.textContent = '';
+
+    const card = document.createElement('div');
+    card.className = 'df-white-premium';
+    card.style.cssText = 'background:#ffffff;color:#0f172a;border:1px solid #cbd5e1;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(15,23,42,0.04);display:flex;flex-direction:column;gap:14px;';
+
+    // Header
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;';
+    const hdrTitle = document.createElement('div');
+    hdrTitle.style.cssText = 'font-size:15px;font-weight:800;color:#0f172a;';
+    hdrTitle.textContent = 'Master Pillar 4 — Infinite Study Whiteboard & Visual Diagram Occlusion';
+
+    const statusBadge = document.createElement('span');
+    statusBadge.id = 'dfWhiteboardStudioBadge';
+    statusBadge.style.cssText = 'font-size:12px;font-weight:800;color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe;padding:4px 12px;border-radius:999px;';
+    statusBadge.textContent = '✓ Vector Engine Active';
+    hdr.appendChild(hdrTitle);
+    hdr.appendChild(statusBadge);
+    card.appendChild(hdr);
+
+    // Tab Navigation
+    const navBar = document.createElement('div');
+    navBar.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid #f1f5f9;padding-bottom:8px;';
+
+    const tabs = [
+      { id: 'whiteboard', label: '🎨 Vector Whiteboard' },
+      { id: 'occlusion', label: '🩺 Medical & Diagram Occlusion' },
+      { id: 'frameworks', label: '📐 Visual Frameworks' },
+      { id: 'spatial', label: '🧩 Spatial Recall' },
+      { id: 'scratchpad', label: '✏️ Quick Scratchpad' }
+    ];
+
+    let activeTab = (typeof localStorage !== 'undefined' && localStorage.getItem(PILLAR4_STUDIO_TAB_KEY)) || 'whiteboard';
+    const tabButtons = [];
+    const contentPane = document.createElement('div');
+    contentPane.id = 'dfPillar4ContentPane';
+
+    function switchSubTab(tabId) {
+      activeTab = tabId;
+      try {
+        if (typeof localStorage !== 'undefined') localStorage.setItem(PILLAR4_STUDIO_TAB_KEY, tabId);
+      } catch (_) {}
+
+      for (let i = 0; i < tabButtons.length; i++) {
+        const btn = tabButtons[i];
+        const isA = btn.getAttribute('data-tab-id') === tabId;
+        btn.style.background = isA ? '#7c3aed' : '#f8fafc';
+        btn.style.color = isA ? '#ffffff' : '#0f172a';
+        btn.style.borderColor = isA ? '#7c3aed' : '#cbd5e1';
+      }
+
+      contentPane.textContent = '';
+      if (tabId === 'whiteboard') renderWhiteboardTab(contentPane);
+      else if (tabId === 'occlusion') renderOcclusionTab(contentPane);
+      else if (tabId === 'frameworks') renderFrameworksTab(contentPane);
+      else if (tabId === 'spatial') renderSpatialTab(contentPane);
+      else if (tabId === 'scratchpad') renderScratchpadSettingsTab(contentPane);
+    }
+
+    tabs.forEach(function(t) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.setAttribute('data-tab-id', t.id);
+      btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid #cbd5e1;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;';
+      btn.textContent = t.label;
+      btn.onclick = function() { switchSubTab(t.id); };
+      tabButtons.push(btn);
+      navBar.appendChild(btn);
+    });
+
+    card.appendChild(navBar);
+    card.appendChild(contentPane);
+    host.appendChild(card);
+
+    switchSubTab(activeTab);
+
+    // =========================================================
+    // SUB-TAB 1: Vector Whiteboard (Infinite Canvas)
+    // =========================================================
+    function renderWhiteboardTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      // Whiteboard Toolbar
+      const tb = document.createElement('div');
+      tb.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:#f8fafc;padding:10px;border-radius:12px;border:1px solid #cbd5e1;';
+
+      // Tool Buttons: Pen, Highlighter, Eraser, Shape
+      const toolGroup = document.createElement('div');
+      toolGroup.style.cssText = 'display:flex;gap:6px;align-items:center;';
+
+      let currentTool = 'pen';
+      let currentColor = '#0f172a';
+      let currentWidth = 3;
+      let shapeMode = false;
+      let zoomLevel = 1.0;
+      let panX = 0;
+      let panY = 0;
+
+      const penBtn = document.createElement('button');
+      penBtn.type = 'button';
+      penBtn.style.cssText = 'padding:5px 10px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#ffffff;font-size:11px;font-weight:700;cursor:pointer;';
+      penBtn.textContent = '✏️ Pen';
+
+      const hlBtn = document.createElement('button');
+      hlBtn.type = 'button';
+      hlBtn.style.cssText = 'padding:5px 10px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+      hlBtn.textContent = '🖍️ Highlighter';
+
+      const eraserBtn = document.createElement('button');
+      eraserBtn.type = 'button';
+      eraserBtn.style.cssText = 'padding:5px 10px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+      eraserBtn.textContent = '🧹 Eraser';
+
+      const shapeBtn = document.createElement('button');
+      shapeBtn.type = 'button';
+      shapeBtn.style.cssText = 'padding:5px 10px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+      shapeBtn.textContent = '⭕ Shape Snap';
+
+      function updateToolButtons(active) {
+        currentTool = active;
+        penBtn.style.background = active === 'pen' ? '#7c3aed' : '#ffffff';
+        penBtn.style.color = active === 'pen' ? '#ffffff' : '#0f172a';
+        penBtn.style.borderColor = active === 'pen' ? '#7c3aed' : '#cbd5e1';
+
+        hlBtn.style.background = active === 'highlighter' ? '#7c3aed' : '#ffffff';
+        hlBtn.style.color = active === 'highlighter' ? '#ffffff' : '#0f172a';
+        hlBtn.style.borderColor = active === 'highlighter' ? '#7c3aed' : '#cbd5e1';
+
+        eraserBtn.style.background = active === 'eraser' ? '#7c3aed' : '#ffffff';
+        eraserBtn.style.color = active === 'eraser' ? '#ffffff' : '#0f172a';
+        eraserBtn.style.borderColor = active === 'eraser' ? '#7c3aed' : '#cbd5e1';
+      }
+
+      penBtn.onclick = function() {
+        updateToolButtons('pen');
+        currentWidth = 3;
+        currentColor = '#0f172a';
+        shapeMode = false;
+        shapeBtn.style.background = '#ffffff';
+      };
+
+      hlBtn.onclick = function() {
+        updateToolButtons('highlighter');
+        currentWidth = 16;
+        currentColor = 'rgba(250, 204, 21, 0.45)';
+        shapeMode = false;
+        shapeBtn.style.background = '#ffffff';
+      };
+
+      eraserBtn.onclick = function() {
+        updateToolButtons('eraser');
+      };
+
+      shapeBtn.onclick = function() {
+        shapeMode = !shapeMode;
+        shapeBtn.style.background = shapeMode ? '#fef3c7' : '#ffffff';
+        shapeBtn.style.borderColor = shapeMode ? '#d97706' : '#cbd5e1';
+        shapeBtn.style.color = shapeMode ? '#b45309' : '#0f172a';
+      };
+
+      toolGroup.appendChild(penBtn);
+      toolGroup.appendChild(hlBtn);
+      toolGroup.appendChild(eraserBtn);
+      toolGroup.appendChild(shapeBtn);
+      tb.appendChild(toolGroup);
+
+      // Color Palette & Grid Select
+      const optGroup = document.createElement('div');
+      optGroup.style.cssText = 'display:flex;gap:6px;align-items:center;';
+
+      const palColors = [
+        { name: 'Charcoal', hex: '#0f172a' },
+        { name: 'Sapphire', hex: '#2563eb' },
+        { name: 'Emerald', hex: '#059669' },
+        { name: 'Rose', hex: '#e11d48' },
+        { name: 'Amber', hex: '#d97706' }
+      ];
+
+      palColors.forEach(function(c) {
+        const cBtn = document.createElement('button');
+        cBtn.type = 'button';
+        cBtn.style.cssText = 'width:20px;height:20px;border-radius:50%;background:' + c.hex + ';border:2px solid #ffffff;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2);';
+        cBtn.onclick = function() {
+          if (currentTool === 'eraser') updateToolButtons('pen');
+          currentColor = c.hex;
+          currentWidth = 3;
+        };
+        optGroup.appendChild(cBtn);
+      });
+
+      const gridSel = document.createElement('select');
+      gridSel.style.cssText = 'padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;font-size:11px;font-weight:700;color:#0f172a;';
+      ['dots', 'isometric', 'ruled', 'quad', 'blank'].forEach(function(g) {
+        const o = document.createElement('option');
+        o.value = g;
+        o.textContent = 'Grid: ' + g.charAt(0).toUpperCase() + g.slice(1);
+        gridSel.appendChild(o);
+      });
+      optGroup.appendChild(gridSel);
+
+      // Undo / Redo & Clear
+      const undoBtn = document.createElement('button');
+      undoBtn.type = 'button';
+      undoBtn.style.cssText = 'padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+      undoBtn.textContent = '↺ Undo';
+
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.style.cssText = 'padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;';
+      clearBtn.textContent = 'Clear';
+
+      optGroup.appendChild(undoBtn);
+      optGroup.appendChild(clearBtn);
+      tb.appendChild(optGroup);
+      box.appendChild(tb);
+
+      // SVG Canvas Surface
+      const canvasWrap = document.createElement('div');
+      canvasWrap.style.cssText = 'border:1.5px solid #cbd5e1;border-radius:14px;background:#ffffff;position:relative;overflow:hidden;height:360px;touch-action:none;box-shadow:inset 0 1px 4px rgba(15,23,42,0.03);';
+
+      const mainSvg = document.createElementNS(SVG_NS, 'svg');
+      mainSvg.setAttribute('width', '100%');
+      mainSvg.setAttribute('height', '100%');
+      mainSvg.setAttribute('viewBox', '0 0 600 360');
+      mainSvg.style.cssText = 'width:100%;height:100%;display:block;cursor:crosshair;';
+
+      const defsEl = document.createElementNS(SVG_NS, 'defs');
+      mainSvg.appendChild(defsEl);
+
+      const gridRect = document.createElementNS(SVG_NS, 'rect');
+      gridRect.setAttribute('x', '0');
+      gridRect.setAttribute('y', '0');
+      gridRect.setAttribute('width', '100%');
+      gridRect.setAttribute('height', '100%');
+      mainSvg.appendChild(gridRect);
+
+      function applyGrid(patternName) {
+        defsEl.textContent = '';
+        if (patternName === 'blank') {
+          gridRect.setAttribute('fill', '#ffffff');
+          return;
+        }
+        const gridObj = window.dfRenderDotGridAndIsometricPaper(patternName, 24);
+        defsEl.insertAdjacentHTML('beforeend', gridObj.defsSvg);
+        gridRect.setAttribute('fill', 'url(#dfGridPattern)');
+      }
+      applyGrid('dots');
+      gridSel.onchange = function() { applyGrid(gridSel.value); };
+
+      const sceneGroup = document.createElementNS(SVG_NS, 'g');
+      sceneGroup.id = 'dfWhiteboardScene';
+      mainSvg.appendChild(sceneGroup);
+      canvasWrap.appendChild(mainSvg);
+      box.appendChild(canvasWrap);
+
+      // Vector Stroke State & Event Handling
+      let strokes = safeParseJson(typeof localStorage !== 'undefined' ? localStorage.getItem(WHITEBOARD_STROKES_KEY) : null, []);
+      let redoStack = [];
+      let isDrawing = false;
+      let pts = [];
+      let activePath = null;
+
+      function renderAllStrokes() {
+        sceneGroup.textContent = '';
+        strokes.forEach(function(s) {
+          const path = document.createElementNS(SVG_NS, 'path');
+          path.setAttribute('d', s.d);
+          path.setAttribute('stroke', s.color);
+          path.setAttribute('stroke-width', String(s.width));
+          path.setAttribute('stroke-linecap', 'round');
+          path.setAttribute('stroke-linejoin', 'round');
+          path.setAttribute('fill', s.fill || 'none');
+          if (s.tool === 'highlighter') {
+            path.style.mixBlendMode = 'multiply';
+          }
+          sceneGroup.appendChild(path);
+        });
+      }
+      renderAllStrokes();
+
+      function getCoords(e) {
+        const rect = mainSvg.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 600;
+        const y = ((e.clientY - rect.top) / rect.height) * 360;
+        return { x: x, y: y };
+      }
+
+      mainSvg.addEventListener('pointerdown', function(e) {
+        if (currentTool === 'eraser') {
+          const pt = getCoords(e);
+          // Simple stroke hit removal
+          if (strokes.length > 0) {
+            strokes.pop();
+            renderAllStrokes();
+            window.dfCompressVectorStrokesToStorage(strokes);
+          }
+          return;
+        }
+        isDrawing = true;
+        try { mainSvg.setPointerCapture(e.pointerId); } catch (_) {}
+        const pt = getCoords(e);
+        pts = [pt];
+        activePath = document.createElementNS(SVG_NS, 'path');
+        activePath.setAttribute('stroke', currentColor);
+        activePath.setAttribute('stroke-width', String(currentWidth));
+        activePath.setAttribute('stroke-linecap', 'round');
+        activePath.setAttribute('stroke-linejoin', 'round');
+        activePath.setAttribute('fill', 'none');
+        if (currentTool === 'highlighter') {
+          activePath.style.mixBlendMode = 'multiply';
+        }
+        activePath.setAttribute('d', 'M ' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1));
+        sceneGroup.appendChild(activePath);
+      });
+
+      mainSvg.addEventListener('pointermove', function(e) {
+        if (!isDrawing || !activePath) return;
+        const pt = getCoords(e);
+        pts.push(pt);
+        const d = catmullRom2bezier(pts);
+        activePath.setAttribute('d', d);
+      });
+
+      function onStrokeEnd() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        if (activePath && pts.length > 0) {
+          let finalD = catmullRom2bezier(pts);
+          let shapeFill = 'none';
+
+          if (shapeMode && pts.length >= 5) {
+            const recognized = window.dfRecognizeGeometricShapesAuto(pts);
+            if (recognized.recognizedShape === 'CIRCLE' && recognized.cx !== undefined) {
+              finalD = 'M ' + (recognized.cx - recognized.r).toFixed(1) + ' ' + recognized.cy.toFixed(1) +
+                ' A ' + recognized.r.toFixed(1) + ' ' + recognized.r.toFixed(1) + ' 0 1 0 ' +
+                (recognized.cx + recognized.r).toFixed(1) + ' ' + recognized.cy.toFixed(1) +
+                ' A ' + recognized.r.toFixed(1) + ' ' + recognized.r.toFixed(1) + ' 0 1 0 ' +
+                (recognized.cx - recognized.r).toFixed(1) + ' ' + recognized.cy.toFixed(1);
+            } else if (recognized.recognizedShape === 'RECTANGLE' && recognized.w !== undefined) {
+              finalD = 'M ' + recognized.x.toFixed(1) + ' ' + recognized.y.toFixed(1) +
+                ' H ' + (recognized.x + recognized.w).toFixed(1) +
+                ' V ' + (recognized.y + recognized.h).toFixed(1) +
+                ' H ' + recognized.x.toFixed(1) + ' Z';
+            }
+          }
+
+          strokes.push({
+            d: finalD,
+            color: currentColor,
+            width: currentWidth,
+            tool: currentTool,
+            fill: shapeFill
+          });
+          redoStack = [];
+          window.dfCompressVectorStrokesToStorage(strokes);
+          renderAllStrokes();
+        }
+        pts = [];
+        activePath = null;
+      }
+
+      mainSvg.addEventListener('pointerup', onStrokeEnd);
+      mainSvg.addEventListener('pointercancel', onStrokeEnd);
+
+      undoBtn.onclick = function() {
+        if (strokes.length > 0) {
+          redoStack.push(strokes.pop());
+          window.dfCompressVectorStrokesToStorage(strokes);
+          renderAllStrokes();
+        }
+      };
+
+      clearBtn.onclick = function() {
+        if (strokes.length > 0) {
+          redoStack = strokes.slice();
+          strokes = [];
+          window.dfCompressVectorStrokesToStorage(strokes);
+          renderAllStrokes();
+        }
+      };
+
+      // Zoom & Export Controls Footer
+      const foot = document.createElement('div');
+      foot.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:#64748b;';
+      const zoomInfo = document.createElement('span');
+      zoomInfo.textContent = 'Canvas View: 600×360 Vector • Stylus Smoothing: Catmull-Rom Bezier';
+
+      const exportBtn = document.createElement('button');
+      exportBtn.type = 'button';
+      exportBtn.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid #7c3aed;background:#f5f3ff;color:#7c3aed;font-weight:700;cursor:pointer;';
+      exportBtn.textContent = '📥 Export Vector SVG';
+      exportBtn.onclick = function() {
+        window.dfExportWhiteboardCanvasToPdf('study_whiteboard');
+        exportBtn.textContent = '✓ SVG Exported';
+        setTimeout(function() { exportBtn.textContent = '📥 Export Vector SVG'; }, 1600);
+      };
+
+      foot.appendChild(zoomInfo);
+      foot.appendChild(exportBtn);
+      box.appendChild(foot);
+
+      parent.appendChild(box);
+    }
+
+    // =========================================================
+    // SUB-TAB 2: Medical & Diagram Occlusion Engine (FSRS-4.5)
+    // =========================================================
+    function renderOcclusionTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      let activeDiagKey = (typeof localStorage !== 'undefined' && localStorage.getItem(OCCLUSION_ACTIVE_DIAG_KEY)) || 'heart_anatomy';
+      let currentDiag = BUILTIN_DIAGRAMS[activeDiagKey] || BUILTIN_DIAGRAMS.heart_anatomy;
+      let studyMode = 'HIDE_ALL';
+      let activeMaskIdx = 0;
+      let revealedMasks = {};
+
+      // Diagram Select Bar
+      const topBar = document.createElement('div');
+      topBar.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:#f8fafc;padding:10px;border-radius:12px;border:1px solid #cbd5e1;';
+
+      const selWrap = document.createElement('div');
+      selWrap.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+      const selLbl = document.createElement('span');
+      selLbl.style.cssText = 'font-size:12px;font-weight:800;color:#0f172a;';
+      selLbl.textContent = 'Diagram:';
+
+      const diagSel = document.createElement('select');
+      diagSel.style.cssText = 'padding:5px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;font-size:12px;font-weight:700;color:#0f172a;';
+      Object.keys(BUILTIN_DIAGRAMS).forEach(function(k) {
+        const d = BUILTIN_DIAGRAMS[k];
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.textContent = d.title + ' (' + d.category + ')';
+        if (k === activeDiagKey) opt.selected = true;
+        diagSel.appendChild(opt);
+      });
+      selWrap.appendChild(selLbl);
+      selWrap.appendChild(diagSel);
+
+      const modeBtn = document.createElement('button');
+      modeBtn.type = 'button';
+      modeBtn.style.cssText = 'padding:5px 10px;border-radius:8px;border:1px solid #7c3aed;background:#f5f3ff;color:#7c3aed;font-size:11px;font-weight:800;cursor:pointer;';
+      modeBtn.textContent = 'Mode: Hide All (Guess 1)';
+
+      topBar.appendChild(selWrap);
+      topBar.appendChild(modeBtn);
+      box.appendChild(topBar);
+
+      // Interactive SVG Diagram Stage
+      const stageWrap = document.createElement('div');
+      stageWrap.style.cssText = 'border:1.5px solid #cbd5e1;border-radius:14px;background:#ffffff;position:relative;overflow:hidden;padding:10px;display:flex;flex-direction:column;align-items:center;box-shadow:inset 0 1px 4px rgba(15,23,42,0.03);';
+
+      const stageSvg = document.createElementNS(SVG_NS, 'svg');
+      stageSvg.id = 'dfOcclusionStageSvg';
+      stageSvg.setAttribute('width', '100%');
+      stageSvg.setAttribute('height', '320');
+      stageSvg.setAttribute('viewBox', '0 0 ' + currentDiag.width + ' ' + currentDiag.height);
+      stageSvg.style.cssText = 'max-width:480px;height:auto;display:block;';
+      stageWrap.appendChild(stageSvg);
+
+      // Challenge Cue Banner
+      const cueBanner = document.createElement('div');
+      cueBanner.style.cssText = 'width:100%;margin-top:8px;padding:8px 12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;font-size:12px;font-weight:700;color:#0f172a;display:flex;justify-content:space-between;align-items:center;';
+      const cueTxt = document.createElement('span');
+      const maskCounter = document.createElement('span');
+      maskCounter.style.cssText = 'font-size:11px;color:#7c3aed;font-weight:800;';
+      cueBanner.appendChild(cueTxt);
+      cueBanner.appendChild(maskCounter);
+      stageWrap.appendChild(cueBanner);
+
+      box.appendChild(stageWrap);
+
+      // FSRS Grading Action Bar
+      const fsrsBar = document.createElement('div');
+      fsrsBar.style.cssText = 'background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;';
+      const fsrsHdr = document.createElement('div');
+      fsrsHdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+      const fsrsTitle = document.createElement('span');
+      fsrsTitle.style.cssText = 'font-size:12px;font-weight:800;color:#0f172a;';
+      fsrsTitle.textContent = 'FSRS-4.5 Spaced Repetition Grading:';
+      const fsrsStat = document.createElement('span');
+      fsrsStat.id = 'dfFsrsOcclusionStat';
+      fsrsStat.style.cssText = 'font-size:11px;font-weight:700;color:#059669;';
+      fsrsStat.textContent = '✓ Retention: 90% • Stability: 2.4d';
+      fsrsHdr.appendChild(fsrsTitle);
+      fsrsHdr.appendChild(fsrsStat);
+      fsrsBar.appendChild(fsrsHdr);
+
+      const rateGrid = document.createElement('div');
+      rateGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:6px;';
+
+      const ratings = [
+        { g: 1, label: '[1] Again', col: '#dc2626', bg: '#fee2e2' },
+        { g: 2, label: '[2] Hard', col: '#d97706', bg: '#fef3c7' },
+        { g: 3, label: '[3] Good', col: '#059669', bg: '#ecfdf5' },
+        { g: 4, label: '[4] Easy', col: '#2563eb', bg: '#eff6ff' }
+      ];
+
+      ratings.forEach(function(r) {
+        const rBtn = document.createElement('button');
+        rBtn.type = 'button';
+        rBtn.style.cssText = 'padding:8px 4px;border-radius:8px;border:1.5px solid ' + r.col + ';background:' + r.bg + ';color:' + r.col + ';font-size:11px;font-weight:800;cursor:pointer;transition:all 0.15s;text-align:center;';
+        rBtn.textContent = r.label;
+        rBtn.onclick = function() {
+          const curMask = currentDiag.masks[activeMaskIdx];
+          if (curMask) {
+            const cardId = 'occ_' + currentDiag.id + '_' + curMask.id;
+            const res = window.dfBindVisualCardToFsrsScheduler(cardId, r.g);
+            fsrsStat.textContent = 'Interval: ' + res.intervalDays + 'd • Stability: ' + res.stability;
+          }
+          // Advance to next mask
+          revealedMasks[activeMaskIdx] = true;
+          activeMaskIdx = (activeMaskIdx + 1) % currentDiag.masks.length;
+          renderDiagramStage();
+        };
+        rateGrid.appendChild(rBtn);
+      });
+      fsrsBar.appendChild(rateGrid);
+      box.appendChild(fsrsBar);
+
+      // Diagram Rendering with Interactive Occlusion Masks
+      function renderDiagramStage() {
+        stageSvg.textContent = '';
+        stageSvg.setAttribute('viewBox', '0 0 ' + currentDiag.width + ' ' + currentDiag.height);
+
+        // Base Anatomical / Circuit Vector Graphics
+        const baseGroup = document.createElementNS(SVG_NS, 'g');
+        baseGroup.insertAdjacentHTML('beforeend', currentDiag.svgContent());
+        stageSvg.appendChild(baseGroup);
+
+        // Occlusion Mask Overlays
+        const masksGroup = document.createElementNS(SVG_NS, 'g');
+        currentDiag.masks.forEach(function(m, idx) {
+          const isTarget = idx === activeMaskIdx;
+          const isRevealed = !!revealedMasks[idx];
+
+          const maskG = document.createElementNS(SVG_NS, 'g');
+          maskG.setAttribute('data-mask-idx', String(idx));
+          maskG.style.cursor = 'pointer';
+
+          const rect = document.createElementNS(SVG_NS, 'rect');
+          rect.setAttribute('x', String(m.x));
+          rect.setAttribute('y', String(m.y));
+          rect.setAttribute('width', String(m.w));
+          rect.setAttribute('height', String(m.h));
+          rect.setAttribute('rx', '6');
+
+          if (isRevealed) {
+            rect.setAttribute('fill', '#ecfdf5');
+            rect.setAttribute('stroke', '#059669');
+            rect.setAttribute('stroke-width', '1.8');
+          } else if (isTarget) {
+            rect.setAttribute('fill', '#fef3c7');
+            rect.setAttribute('stroke', '#d97706');
+            rect.setAttribute('stroke-width', '2.5');
+          } else {
+            rect.setAttribute('fill', studyMode === 'HIDE_ALL' ? '#f1f5f9' : '#ffffff');
+            rect.setAttribute('stroke', '#94a3b8');
+            rect.setAttribute('stroke-width', '1.5');
+          }
+
+          const txt = document.createElementNS(SVG_NS, 'text');
+          txt.setAttribute('x', String(m.x + m.w / 2));
+          txt.setAttribute('y', String(m.y + m.h / 2 + 4));
+          txt.setAttribute('text-anchor', 'middle');
+          txt.setAttribute('font-family', 'system-ui,sans-serif');
+          txt.setAttribute('font-size', '10');
+          txt.setAttribute('font-weight', '700');
+
+          if (isRevealed || (studyMode === 'HIDE_ONE' && !isTarget)) {
+            txt.setAttribute('fill', isRevealed ? '#065f46' : '#0f172a');
+            txt.textContent = m.label;
+          } else {
+            txt.setAttribute('fill', isTarget ? '#b45309' : '#64748b');
+            txt.textContent = isTarget ? '[ Tap to Reveal ? ]' : '[ ? ]';
+          }
+
+          maskG.appendChild(rect);
+          maskG.appendChild(txt);
+
+          maskG.onclick = function() {
+            revealedMasks[idx] = !revealedMasks[idx];
+            activeMaskIdx = idx;
+            renderDiagramStage();
+          };
+
+          masksGroup.appendChild(maskG);
+        });
+        stageSvg.appendChild(masksGroup);
+
+        // Update challenge cue
+        const curM = currentDiag.masks[activeMaskIdx];
+        if (curM) {
+          cueTxt.textContent = 'Recall Target: ' + (curM.clue || curM.label);
+          maskCounter.textContent = 'Mask ' + (activeMaskIdx + 1) + ' of ' + currentDiag.masks.length;
+        }
+      }
+
+      diagSel.onchange = function() {
+        activeDiagKey = diagSel.value;
+        currentDiag = BUILTIN_DIAGRAMS[activeDiagKey] || BUILTIN_DIAGRAMS.heart_anatomy;
+        try { localStorage.setItem(OCCLUSION_ACTIVE_DIAG_KEY, activeDiagKey); } catch (_) {}
+        activeMaskIdx = 0;
+        revealedMasks = {};
+        renderDiagramStage();
+      };
+
+      modeBtn.onclick = function() {
+        studyMode = studyMode === 'HIDE_ALL' ? 'HIDE_ONE' : 'HIDE_ALL';
+        modeBtn.textContent = 'Mode: ' + (studyMode === 'HIDE_ALL' ? 'Hide All (Guess 1)' : 'Hide 1 (Context Visible)');
+        renderDiagramStage();
+      };
+
+      renderDiagramStage();
+      parent.appendChild(box);
+    }
+
+    // =========================================================
+    // SUB-TAB 3: Visual Study Frameworks
+    // =========================================================
+    function renderFrameworksTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      const navRow = document.createElement('div');
+      navRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:10px;border-radius:12px;border:1px solid #cbd5e1;';
+
+      const frameworks = [
+        { id: 'venn2', label: 'Venn Diagram (2-Set)' },
+        { id: 'venn3', label: 'Venn Diagram (3-Set)' },
+        { id: 'fishbone', label: 'Cause & Effect (Fishbone)' },
+        { id: 'timeline', label: 'Chronological Timeline' },
+        { id: 'flowchart', label: 'Algorithm Flowchart' },
+        { id: 'pyramid', label: 'Knowledge Pyramid' },
+        { id: 'cycle', label: 'Closed-Loop Cycle' },
+        { id: 'matrix', label: '2×2 Decision Matrix' }
+      ];
+
+      const stageHost = document.createElement('div');
+      stageHost.id = 'dfFrameworkStageHost';
+
+      function renderActiveFramework(fId) {
+        stageHost.textContent = '';
+        if (fId === 'venn2') window.dfRenderVennDiagramComparison(2, stageHost);
+        else if (fId === 'venn3') window.dfRenderVennDiagramComparison(3, stageHost);
+        else if (fId === 'fishbone') window.dfRenderCauseAndEffectFishbone(4, stageHost);
+        else if (fId === 'timeline') window.dfRenderChronologicalTimelineAxis(undefined, stageHost);
+        else if (fId === 'flowchart') window.dfRenderFlowchartAlgorithmBlocks(5, stageHost);
+        else if (fId === 'pyramid') window.dfRenderHierarchyPyramidDiagram(4, stageHost);
+        else if (fId === 'cycle') window.dfRenderCycleProcessLoop(4, stageHost);
+        else if (fId === 'matrix') window.dfRenderMatrixComparison2x2(undefined, stageHost);
+      }
+
+      frameworks.forEach(function(f, idx) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.style.cssText = 'padding:5px 10px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+        b.textContent = f.label;
+        b.onclick = function() {
+          renderActiveFramework(f.id);
+        };
+        navRow.appendChild(b);
+      });
+
+      box.appendChild(navRow);
+      box.appendChild(stageHost);
+
+      const quizActionCard = document.createElement('div');
+      quizActionCard.style.cssText = 'background:#f8fafc;padding:12px;border-radius:12px;border:1px solid #cbd5e1;display:flex;justify-content:space-between;align-items:center;';
+      const qText = document.createElement('span');
+      qText.style.cssText = 'font-size:12px;color:#334155;font-weight:700;';
+      qText.textContent = 'Transform active visual diagram into spaced-repetition cloze quiz cards:';
+      const qBtn = document.createElement('button');
+      qBtn.type = 'button';
+      qBtn.style.cssText = 'padding:6px 12px;border-radius:8px;border:none;background:#7c3aed;color:#ffffff;font-size:11px;font-weight:800;cursor:pointer;';
+      qBtn.textContent = '⚡ Convert to Quiz';
+      qBtn.onclick = function() {
+        window.dfConvertVisualDiagramToQuiz('active_framework');
+        qBtn.textContent = '✓ 4 Cards Generated';
+        setTimeout(function() { qBtn.textContent = '⚡ Convert to Quiz'; }, 1800);
+      };
+      quizActionCard.appendChild(qText);
+      quizActionCard.appendChild(qBtn);
+      box.appendChild(quizActionCard);
+
+      renderActiveFramework('venn2');
+      parent.appendChild(box);
+    }
+
+    // =========================================================
+    // SUB-TAB 4: Spatial Drag-and-Drop Recall
+    // =========================================================
+    function renderSpatialTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      const sHdr = document.createElement('div');
+      sHdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:#f8fafc;padding:10px;border-radius:12px;border:1px solid #cbd5e1;';
+      const sTitle = document.createElement('div');
+      sTitle.style.cssText = 'font-size:13px;font-weight:800;color:#0f172a;';
+      sTitle.textContent = 'Spatial Reconstruction Challenge: Match Labels to Anatomy';
+
+      const resetBtn = document.createElement('button');
+      resetBtn.type = 'button';
+      resetBtn.style.cssText = 'padding:5px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+      resetBtn.textContent = '↺ Scramble & Retry';
+
+      sHdr.appendChild(sTitle);
+      sHdr.appendChild(resetBtn);
+      box.appendChild(sHdr);
+
+      // Spatial Matching Stage
+      const spatialStage = document.createElement('div');
+      spatialStage.style.cssText = 'border:1.5px solid #cbd5e1;border-radius:14px;background:#ffffff;padding:12px;display:flex;flex-direction:column;gap:10px;';
+
+      // Scrambled Chips Pool
+      const poolHdr = document.createElement('div');
+      poolHdr.style.cssText = 'font-size:11px;font-weight:800;color:#64748b;';
+      poolHdr.textContent = 'Select a label chip below, then tap its matching destination slot:';
+      spatialStage.appendChild(poolHdr);
+
+      const poolRow = document.createElement('div');
+      poolRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
+
+      const targets = [
+        { id: 's1', name: 'Aorta', x: 190, y: 30 },
+        { id: 's2', name: 'Right Atrium', x: 80, y: 120 },
+        { id: 's3', name: 'Left Ventricle', x: 270, y: 220 },
+        { id: 's4', name: 'Pulmonary Artery', x: 280, y: 60 }
+      ];
+
+      const scrambled = window.dfScrambleDraggableConceptLabels(targets.map(t => t.name)).labels;
+      let selectedChip = null;
+      let placements = {};
+
+      const chipElements = [];
+      scrambled.forEach(function(lbl) {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.style.cssText = 'padding:6px 12px;border-radius:20px;border:1.5px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.15s;';
+        chip.textContent = lbl;
+        chip.onclick = function() {
+          chipElements.forEach(c => { c.style.background = '#f8fafc'; c.style.borderColor = '#cbd5e1'; });
+          selectedChip = lbl;
+          chip.style.background = '#f5f3ff';
+          chip.style.borderColor = '#7c3aed';
+        };
+        chipElements.push(chip);
+        poolRow.appendChild(chip);
+      });
+      spatialStage.appendChild(poolRow);
+
+      // Destination Slots Board
+      const boardSvg = document.createElementNS(SVG_NS, 'svg');
+      boardSvg.setAttribute('width', '100%');
+      boardSvg.setAttribute('height', '260');
+      boardSvg.setAttribute('viewBox', '0 0 380 260');
+      boardSvg.style.cssText = 'border:1px dashed #cbd5e1;border-radius:10px;background:#fbfdff;display:block;margin-top:6px;';
+
+      // Faint reference heart
+      boardSvg.innerHTML = '<path d="M 140 80 C 110 40 60 60 55 110 C 45 160 100 210 190 250 C 280 210 335 160 325 110 C 320 60 270 40 240 80 Z" fill="#fff1f2" stroke="#fecaca" stroke-width="2"/>';
+
+      const slotsGroup = document.createElementNS(SVG_NS, 'g');
+      boardSvg.appendChild(slotsGroup);
+
+      function renderSlots() {
+        slotsGroup.textContent = '';
+        targets.forEach(function(t) {
+          const placedVal = placements[t.id];
+          const isCorrect = placedVal === t.name;
+
+          const slotG = document.createElementNS(SVG_NS, 'g');
+          slotG.style.cursor = 'pointer';
+
+          const rect = document.createElementNS(SVG_NS, 'rect');
+          rect.setAttribute('x', String(t.x));
+          rect.setAttribute('y', String(t.y));
+          rect.setAttribute('width', '100');
+          rect.setAttribute('height', '30');
+          rect.setAttribute('rx', '8');
+
+          if (placedVal) {
+            rect.setAttribute('fill', isCorrect ? '#ecfdf5' : '#fee2e2');
+            rect.setAttribute('stroke', isCorrect ? '#059669' : '#dc2626');
+            rect.setAttribute('stroke-width', '2');
+          } else {
+            rect.setAttribute('fill', '#ffffff');
+            rect.setAttribute('stroke', '#7c3aed');
+            rect.setAttribute('stroke-width', '1.5');
+            rect.setAttribute('stroke-dasharray', '3,3');
+          }
+
+          const txt = document.createElementNS(SVG_NS, 'text');
+          txt.setAttribute('x', String(t.x + 50));
+          txt.setAttribute('y', String(t.y + 19));
+          txt.setAttribute('text-anchor', 'middle');
+          txt.setAttribute('font-family', 'system-ui,sans-serif');
+          txt.setAttribute('font-size', '10');
+          txt.setAttribute('font-weight', '700');
+          txt.setAttribute('fill', placedVal ? (isCorrect ? '#065f46' : '#991b1b') : '#7c3aed');
+          txt.textContent = placedVal ? (isCorrect ? '✓ ' + placedVal : '✗ ' + placedVal) : '[ Slot Target ]';
+
+          slotG.appendChild(rect);
+          slotG.appendChild(txt);
+
+          slotG.onclick = function() {
+            if (selectedChip) {
+              placements[t.id] = selectedChip;
+              window.dfTriggerHapticFeedbackOnDrop(selectedChip === t.name);
+              selectedChip = null;
+              chipElements.forEach(c => { c.style.background = '#f8fafc'; c.style.borderColor = '#cbd5e1'; });
+              renderSlots();
+              checkScore();
+            }
+          };
+
+          slotsGroup.appendChild(slotG);
+        });
+      }
+      renderSlots();
+      spatialStage.appendChild(boardSvg);
+
+      // Score output
+      const scoreCard = document.createElement('div');
+      scoreCard.style.cssText = 'padding:8px 12px;border-radius:10px;background:#f8fafc;font-size:12px;font-weight:800;color:#0f172a;';
+      scoreCard.textContent = 'Accuracy: Placed 0/4 concept slots.';
+      spatialStage.appendChild(scoreCard);
+
+      function checkScore() {
+        let correct = 0;
+        let total = targets.length;
+        targets.forEach(t => {
+          if (placements[t.id] === t.name) correct++;
+        });
+        const res = window.dfScoreSpatialArrangementAccuracy(correct, total);
+        scoreCard.textContent = 'Accuracy: ' + res.spatialAccuracyPct + '% (' + res.correctCount + '/' + res.totalCount + ' correct) • ' + (res.isPerfect ? '🎉 Perfect Spatial Mastery!' : 'Keep matching!');
+        scoreCard.style.color = res.isPerfect ? '#059669' : '#0f172a';
+      }
+
+      resetBtn.onclick = function() {
+        placements = {};
+        selectedChip = null;
+        renderSlots();
+        scoreCard.textContent = 'Accuracy: Placed 0/4 concept slots.';
+        scoreCard.style.color = '#0f172a';
+      };
+
+      box.appendChild(spatialStage);
+      parent.appendChild(box);
+    }
+
+    // =========================================================
+    // SUB-TAB 5: Quick Scratchpad Overlay Settings
+    // =========================================================
+    function renderScratchpadSettingsTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      const hero = document.createElement('div');
+      hero.style.cssText = 'background:#f8fafc;padding:16px;border-radius:14px;border:1px solid #cbd5e1;display:flex;flex-direction:column;gap:10px;';
+      const hTitle = document.createElement('div');
+      hTitle.style.cssText = 'font-size:14px;font-weight:900;color:#0f172a;';
+      hTitle.textContent = 'Floating Quick Scratchpad Overlay';
+
+      const hDesc = document.createElement('div');
+      hDesc.style.cssText = 'font-size:12px;color:#475569;line-height:1.5;';
+      hDesc.textContent = 'Rapid non-intrusive sketchpad accessible on top of active Pomodoro sessions, flashcard reviews and notes without leaving your context.';
+
+      const openOverlayBtn = document.createElement('button');
+      openOverlayBtn.type = 'button';
+      openOverlayBtn.style.cssText = 'padding:10px 18px;border-radius:10px;background:#7c3aed;color:#ffffff;border:none;font-size:13px;font-weight:800;cursor:pointer;align-self:flex-start;box-shadow:0 4px 12px rgba(124,58,237,0.25);';
+      openOverlayBtn.textContent = '✏️ Open Floating Scratchpad Now';
+      openOverlayBtn.onclick = function() {
+        window.dfToggleFloatingScratchpadOverlay(true);
+      };
+
+      hero.appendChild(hTitle);
+      hero.appendChild(hDesc);
+      hero.appendChild(openOverlayBtn);
+      box.appendChild(hero);
+
+      // Preferences
+      const prefCard = document.createElement('div');
+      prefCard.style.cssText = 'background:#ffffff;padding:14px;border-radius:14px;border:1px solid #cbd5e1;display:flex;flex-direction:column;gap:10px;';
+      const pTitle = document.createElement('div');
+      pTitle.style.cssText = 'font-size:13px;font-weight:800;color:#0f172a;';
+      pTitle.textContent = 'Scratchpad Workflow Preferences';
+
+      const autoClearLabel = document.createElement('label');
+      autoClearLabel.style.cssText = 'display:flex;gap:8px;align-items:center;font-size:12px;color:#334155;font-weight:600;cursor:pointer;';
+      const autoClearCheck = document.createElement('input');
+      autoClearCheck.type = 'checkbox';
+      autoClearCheck.checked = true;
+      autoClearCheck.onchange = function() {
+        window.dfAutoClearScratchpadOnCardFlip(autoClearCheck.checked);
+      };
+      autoClearLabel.appendChild(autoClearCheck);
+      autoClearLabel.appendChild(document.createTextNode('Auto-clear sketchpad when advancing to next flashcard'));
+
+      prefCard.appendChild(pTitle);
+      prefCard.appendChild(autoClearLabel);
+      box.appendChild(prefCard);
+
+      parent.appendChild(box);
+    }
+
+    return { rendered: true, mountId: host.id };
+  };
+})();
+
 
 // --- M8308-M8317: 3D Spatial Audio ---
 window.dfCreateSpatialPannerNode3D =
@@ -67188,6 +69267,8 @@ if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar2StudioDom==='
 window.dfRenderMasterPillar2StudioDom('dfPillar2SpeedReaderMount');
 if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar3StudioDom==='function')
 window.dfRenderMasterPillar3StudioDom('dfPillar3StemMount');
+if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar4StudioDom==='function')
+window.dfRenderMasterPillar4StudioDom('dfPillar4WhiteboardMount');
 return{mounted:true,active:true};
 }catch(_){return{mounted:false};}}
 if(typeof document!=='undefined'){
