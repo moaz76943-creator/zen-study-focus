@@ -1,0 +1,8 @@
+{
+  "totalFilesScanned": 261,
+  "potentialXssPatterns": 5,
+  "easternNumeralsFound": 30,
+  "medicalTermsFound": 3,
+  "bannedScriptsFound": 606,
+  "scanTimestamp": "2026-11-10T23:46:28.995Z"
+}
