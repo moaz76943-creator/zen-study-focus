@@ -83694,3 +83694,8 @@ if (typeof ActionDispatcherEngine !== "undefined") {
 if (typeof DOMFlatteningEngine !== "undefined") {
     DOMFlatteningEngine.optimize();
 }
+
+// [Task #656] Module Loader Initialization
+if (typeof ConsolidatedModuleLoader !== "undefined") {
+    ConsolidatedModuleLoader.init();
+}
