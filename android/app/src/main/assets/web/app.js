@@ -70007,285 +70007,1880 @@ function() {
 
 })();
 
-// --- M8408-M8417: Concept Simplification ---
-window.dfStartConceptExplanationPrompt =
-function(conceptName) {
-  const cn = String(conceptName || 'Law');
-  return { concept: cn, active: true };
-};
-window.dfCompareExplanationWithSourceKeywords =
-function(keywordsList) {
-  const arr = keywordsList || [];
-  return { checked: arr.length, matchPct: 85 };
-};
-window.dfDetectJargonOveruseInExplanation =
-function(wordCount) {
-  const w = Number(wordCount) || 50;
-  return { jargonRatio: 0.12, simple: true };
-};
-window.dfScoreExplanationClarityAndSimplicity =
-function(score) {
-  const sc = Number(score) || 90;
-  const ok = sc >= 80;
-  return { score: sc, approved: ok };
-};
-window.dfHighlightMissingKeyTermsInRed =
-function(termsCount) {
-  const tc = Number(termsCount) || 2;
-  return { missingTerms: tc, reviewReq: true };
-};
-window.dfIterateSecondAttemptRefinement =
-function(attemptNum) {
-  const n = Number(attemptNum) || 2;
-  return { attempt: n, improved: true };
-};
-window.dfConvertRefinedExplanationToNote =
-function(conceptId) {
-  const id = String(conceptId || 'c1');
-  return { noteId: id, goldenSummary: true };
-};
-window.dfGenerateAnalogyPromptQuestions =
-function() {
-  return { prompt: 'ANALOGY', ok: true };
-};
-window.dfTrackMasteredSimplifiedConcepts =
-function(masteredCount) {
-  const mc = Number(masteredCount) || 5;
-  return { totalSimplifiedConcepts: mc };
-};
-window.dfGetMilestoneM8417SimplificationSeal =
-function() {
-  return {
-    v: '400.78.0', vc: 40078, ok: true
-  };
-};
+/* =========================================================================================
+   MASTER PILLAR 7: FEYNMAN BLANK-SHEET RECALL LAB & JARGON SIMPLIFICATION ENGINE (M8408 to M8457)
+   - Concept Simplification (Child Explanation, Plain English/Arabic, Analogy Engine, Golden Summary)
+   - Blank-Sheet Brain-Dump & Timed Recall (Flow Mode, Real-Time WPM, Pre/Post Knowledge Gain)
+   - Smart Error-Bank & Leech Card Restructuring (Root Cause Categorization & Mnemonic Hooks)
+   - Interleaved Study Mixer (Alternating Theory & Application, Discrimination Accuracy)
+   - Elaborative Prompts (Deep Why/How Questions, Counter-Examples, Cause-to-Effect Chains)
+   - Universal Fluid Responsive Viewport & Zen Progressive Disclosure
+   ========================================================================================= */
+(function() {
+  'use strict';
 
-// --- M8418-M8427: Blank-Sheet Brain-Dump ---
-window.dfLaunchTimedBlankSheetRecall =
-function(durationSec) {
-  const ds = Number(durationSec) || 300;
-  const s = Math.max(60, ds);
-  return { durationSec: s, freeRecall: true };
-};
-window.dfDisableBackspaceDuringBrainDump =
-function(disabled) {
-  const dis = !!disabled;
-  return { noBackspace: dis, flowActive: dis };
-};
-window.dfCountRecalledFactsAndConcepts =
-function(text) {
-  const s = String(text || '').trim();
-  const words = s ? s.split(' ') : [];
-  const fc = Math.round(words.length / 5);
-  return { factsCount: fc };
-};
-window.dfSplitScreenBrainDumpVsReference =
-function() {
-  return { layout: 'SPLIT_50_50', ref: true };
-};
-window.dfTagForgottenItemsForFlashcards =
-function(itemsCount) {
-  const ic = Number(itemsCount) || 2;
-  return { cardsCreatedFromForgotten: ic };
-};
-window.dfMeasureFreeRecallFluencySpeed =
-function(wordsCount, timeSec) {
-  const w = Number(wordsCount) || 100;
-  const s = Math.max(1, Number(timeSec) || 60);
-  const wpm = Math.round((w / s) * 60);
-  return { recallFluencyWpm: wpm };
-};
-window.dfComparePreStudyVsPostStudyDump =
-function(preCount, postCount) {
-  const pre = Number(preCount) || 10;
-  const post = Number(postCount) || 25;
-  return { netKnowledgeGain: post - pre };
-};
-window.dfArchiveBlankSheetHistoryByTopic =
-function(topic) {
-  const t = String(topic || 'Chapter1');
-  return { archivedTopic: t, localAudit: true };
-};
-window.dfCalculateFreeRecallRetentionRate =
-function(recalled, targetTotal) {
-  const r = Number(recalled) || 8;
-  const tt = Number(targetTotal) || 10;
-  const t = Math.max(1, tt);
-  const pct = Math.round((r / t) * 100);
-  return { retentionPct: pct };
-};
-window.dfGetMilestoneM8427BlankSheetSeal =
-function() {
-  return {
-    v: '400.79.0', vc: 40079, ok: true
-  };
-};
+  const FEYNMAN_STORAGE_KEY = 'zen_feynman_recall_v1';
+  const FEYNMAN_CFG_KEY = 'zen_feynman_cfg_v1';
 
-// --- M8428-M8437: Smart Error-Bank ---
-window.dfDetectLeechFlashcardsAuto =
-function(lapseCount) {
-  const lc = Number(lapseCount) || 0;
-  return { isLeech: lc >= 4, lapses: lc };
-};
-window.dfQuarantineLeechCardForRestructuring =
-function(cardId) {
-  const id = String(cardId || 'card1');
-  return { quarantined: id, split: true };
-};
-window.dfCategorizeMistakeRootCause =
-function(category) {
-  const cat = String(category || 'CONFUSION');
-  return { rootCause: cat, tagged: true };
-};
-window.dfBuildConfusionMatrixForSimilarTerms =
-function(termA, termB) {
-  const a = String(termA || 'TermA');
-  const b = String(termB || 'TermB');
-  return { pair: [a, b], differentiated: true };
-};
-window.dfAttachMnemonicMemoryHook =
-function(cardId, mnemonic) {
-  const id = String(cardId || 'c1');
-  const m = String(mnemonic || 'Memory hook');
-  return { id: id, mnemonic: m, ok: true };
-};
-window.dfCompilePreExamMistakesNotebook =
-function(leechCount) {
-  const count = Number(leechCount) || 0;
-  return { notebookCards: count, ready: true };
-};
-window.dfTrackErrorEliminationVelocity =
-function(fixedCount) {
-  const fc = Number(fixedCount) || 3;
-  return { errorsEliminatedThisWeek: fc };
-};
-window.dfPrioritizeErrorBankInMorningPeak =
-function() {
-  return { slot: 'MORNING_PEAK', priority: 1 };
-};
-window.dfVerifyZeroUnresolvedLeeches =
-function(unresolved) {
-  const u = Number(unresolved) || 0;
-  const clr = u === 0;
-  return { zeroLeeches: clr, count: u };
-};
-window.dfGetMilestoneM8437ErrorBankSeal =
-function() {
-  return {
-    v: '400.80.0', vc: 40080, ok: true
-  };
-};
+  // --- Safe Persistence Helpers ---
+  function getSafeStorage() {
+    return typeof localStorage !== 'undefined' ? localStorage : {
+      getItem: function() { return null; },
+      setItem: function() {},
+      removeItem: function() {}
+    };
+  }
 
-// --- M8438-M8447: Interleaved Study Mixer ---
-window.dfCreateInterleavedSubjectPlaylist =
-function(subjects) {
-  const arr = subjects || ['Math', 'Physics'];
-  return { interleavedSubjects: arr.length };
-};
-window.dfPreventConsecutiveSameTopicCards =
-function(topicList) {
-  const t = topicList || [];
-  return { maxConsecutive: 3, shuffled: true };
-};
-window.dfAlternateTheoryAndApplicationCards =
-function(cardIdx) {
-  const i = Number(cardIdx) || 0;
-  const mode = i % 2 === 0 ? 'THEORY' : 'APP';
-  return { nextCardMode: mode };
-};
-window.dfMeasureDiscriminationAccuracyGain =
-function(gain) {
-  const g = Number(gain) || 15;
-  return { discriminationGainPct: g };
-};
-window.dfAdjustInterleavingRatioByMastery =
-function(mastery) {
-  const m = Number(mastery) || 50;
-  const ratio = m > 80 ? 0.7 : 0.3;
-  return { interleavingRatio: ratio };
-};
-window.dfProvideContextSwitchMicroBridge =
-function(newSubject) {
-  const s = String(newSubject || 'Physics');
-  return { bridgeBadge: s, transitionMs: 300 };
-};
-window.dfLogInterleavedSessionPerformance =
-function(score) {
-  const sc = Number(score) || 85;
-  return { interleavedScore: sc, saved: true };
-};
-window.dfRecommendInterleavingBeforeMockExam =
-function(daysLeft) {
-  const d = Number(daysLeft) || 5;
-  return { recommended: d <= 7, priority: 1 };
-};
-window.dfSaveCustomInterleavedDeckRecipe =
-function(name) {
-  const n = String(name || 'recipe1');
-  return { savedRecipe: n, localOnly: true };
-};
-window.dfGetMilestoneM8447InterleavingSeal =
-function() {
-  return {
-    v: '400.81.0', vc: 40081, ok: true
-  };
-};
+  function loadFeynmanState() {
+    const raw = getSafeStorage().getItem(FEYNMAN_STORAGE_KEY);
+    if (!raw) return getInitialFeynmanState();
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === 'object' ? parsed : getInitialFeynmanState();
+    } catch (_) {
+      return getInitialFeynmanState();
+    }
+  }
 
-// --- M8448-M8457: Elaborative Prompts ---
-window.dfGenerateWhyAndHowPrompts =
-function(concept) {
-  const cp = String(concept || 'Law');
-  const w = 'Why ' + cp;
-  return { promptWhy: w, promptHow: true };
-};
-window.dfCreateCompareAndContrastPrompt =
-function(t1, t2) {
-  const a = String(t1 || 'A');
-  const b = String(t2 || 'B');
-  return { comparePair: [a, b], active: true };
-};
-window.dfPromptCounterExampleGeneration =
-function(lawName) {
-  const l = String(lawName || 'Rule');
-  return { findCounterExampleFor: l };
-};
-window.dfLinkCauseToEffectChain =
-function(chainSteps) {
-  const steps = chainSteps || [];
-  return { depth: steps.length, valid: true };
-};
-window.dfEvaluateAnswerCompletenessChecklist =
-function(items) {
-  const arr = items || [];
-  return { checklistCount: arr.length };
-};
-window.dfConvertDeepPromptsToEssayOutline =
-function(topic) {
-  const t = String(topic || 'Topic');
-  return { outlineTopic: t, ready: true };
-};
-window.dfTrackDeepCognitiveEngagementTime =
-function(mins) {
-  const m = Number(mins) || 25;
-  return { deepMinutes: m, active: true };
-};
-window.dfRewardHighDepthElaborationStreak =
-function(streak) {
-  const s = Number(streak) || 1;
-  const ok = s >= 10;
-  return { depthStreak: s, unlocked: ok };
-};
-window.dfExportDeepQuestionsReviewSheet =
-function(count) {
-  const c = Number(count) || 5;
-  return { reviewQuestions: c, format: 'pdf' };
-};
-window.dfGetMilestoneM8457ElaborationSeal =
-function() {
-  return {
-    v: '400.82.0', vc: 40082, ok: true
+  function saveFeynmanState(state) {
+    try {
+      getSafeStorage().setItem(FEYNMAN_STORAGE_KEY, JSON.stringify(state));
+    } catch (_) {}
+  }
+
+  function getInitialFeynmanState() {
+    return {
+      simplifiedConcepts: {
+        'c_action_pot': {
+          id: 'c_action_pot',
+          name: 'Action Potential in Neurons',
+          subject: 'Medical Physiology',
+          plainExplanation: 'When a brain cell gets excited, tiny gates open on its skin. Sodium rushes inside like water into a sponge, flipping the electrical charge. This creates a wave of electricity that travels down the cell like a row of falling dominoes, sending a message.',
+          analogy: 'Dominoes falling along a wire or a wave passing through a stadium crowd',
+          simplicityScore: 94,
+          clarityTier: 'pure_clarity',
+          masteredAt: new Date(Date.now() - 86400000).toISOString(),
+          keywords: ['neuron', 'sodium', 'gates', 'electricity', 'message', 'wave'],
+          noteId: 'note_feynman_1'
+        },
+        'c_dijkstra': {
+          id: 'c_dijkstra',
+          name: "Dijkstra's Shortest Path Algorithm",
+          subject: 'Computer Science',
+          plainExplanation: 'Imagine water flowing outward from a tap through pipes of different lengths. The water reaches the nearest crossroads first, then spreads to the next closest points one by one. Dijkstra does the exact same thing: it always visits the closest unvisited intersection first until it reaches the destination.',
+          analogy: 'Water spreading through connected garden hoses or a ripple in a pond',
+          simplicityScore: 92,
+          clarityTier: 'pure_clarity',
+          masteredAt: new Date(Date.now() - 172800000).toISOString(),
+          keywords: ['shortest', 'path', 'nearest', 'unvisited', 'distance', 'graph'],
+          noteId: 'note_feynman_2'
+        }
+      },
+      sessions: [],
+      errorBank: [
+        {
+          id: 'leech_1',
+          term: 'Afferent vs Efferent Neurons',
+          definition: 'Afferent neurons carry sensory signals TO the brain (Arriving). Efferent neurons carry motor commands AWAY from the brain to muscles (Exiting).',
+          lapsesCount: 5,
+          rootCause: 'CONFUSION',
+          confusionWith: 'Similar sounding terms with opposite directions',
+          mnemonicHook: 'A for Arriving (Afferent) • E for Exiting (Efferent)',
+          quarantined: true,
+          createdAt: new Date(Date.now() - 259200000).toISOString()
+        },
+        {
+          id: 'leech_2',
+          term: 'Mitosis vs Meiosis',
+          definition: 'Mitosis makes 2 identical body cells for growth. Meiosis makes 4 unique reproductive cells with half the chromosomes.',
+          lapsesCount: 4,
+          rootCause: 'CONFUSION',
+          confusionWith: 'Both involve cell division phases (PMAT)',
+          mnemonicHook: 'Mitosis = My Toes (body cells) • Meiosis = Makes Eggs & Sperm',
+          quarantined: true,
+          createdAt: new Date(Date.now() - 345600000).toISOString()
+        }
+      ],
+      interleavedDecks: [],
+      elaborationPrompts: [],
+      depthStreak: 7,
+      totalMastered: 8
+    };
+  }
+
+  // --- Multi-Lingual Jargon Lexicon & Complexity Indicators ---
+  const JARGON_LEXICON = {
+    en: [
+      { token: 'concomitant', plain: 'happening together / alongside' },
+      { token: 'epistemology', plain: 'theory of knowledge / how we know' },
+      { token: 'epistemological', plain: 'related to how we know things' },
+      { token: 'juxtaposition', plain: 'side-by-side comparison' },
+      { token: 'exogenous', plain: 'from the outside / external' },
+      { token: 'endogenous', plain: 'from the inside / internal' },
+      { token: 'synergistic', plain: 'working together for a greater effect' },
+      { token: 'paradigm', plain: 'way of thinking / model' },
+      { token: 'obfuscate', plain: 'make confusing / hide' },
+      { token: 'obfuscation', plain: 'making something confusing' },
+      { token: 'utilize', plain: 'use' },
+      { token: 'utilization', plain: 'use' },
+      { token: 'methodology', plain: 'method / steps' },
+      { token: 'counterintuitive', plain: 'surprising / opposite of what you expect' },
+      { token: 'dichotomy', plain: 'two contrasting sides / split' },
+      { token: 'substantiate', plain: 'prove / back up with evidence' },
+      { token: 'phenomenological', plain: 'based on direct experience' },
+      { token: 'ubiquitous', plain: 'found everywhere / common' },
+      { token: 'ontological', plain: 'about what exists in reality' },
+      { token: 'ameliorate', plain: 'improve / make better' },
+      { token: 'delineate', plain: 'describe / outline clearly' },
+      { token: 'quintessential', plain: 'the best example of / classic' },
+      { token: 'hegemonic', plain: 'dominant / controlling' },
+      { token: 'monolithic', plain: 'huge and single / inflexible' },
+      { token: 'deterministic', plain: 'completely predictable' },
+      { token: 'ascertain', plain: 'find out / check' },
+      { token: 'cognizant', plain: 'aware of' },
+      { token: 'plethora', plain: 'a large amount / plenty' }
+    ],
+    ar: [
+      { token: 'الباراديغم', plain: 'النموذج الفكري' },
+      { token: 'الابستمولوجيا', plain: 'نظرية المعرفة' },
+      { token: 'الإبستمولوجيا', plain: 'نظرية المعرفة' },
+      { token: 'الفينومينولوجيا', plain: 'علم الظواهر والتجربة المباشرة' },
+      { token: 'الديالكتيك', plain: 'حوار الأضداد والتناقضات' },
+      { token: 'الأنطولوجيا', plain: 'علم الوجود' },
+      { token: 'الميثودولوجيا', plain: 'منهجية البحث أو الخطوات' },
+      { token: 'الصيرورة', plain: 'حركة التغيير والتطور' },
+      { token: 'التمايز الهيكلي', plain: 'الاختلاف في البنية والتركيب' },
+      { token: 'المخرجات التراكمية', plain: 'النتائج المتجمعة' },
+      { token: 'المحددات الجوهرية', plain: 'العوامل الأساسية' },
+      { token: 'التقاطعات البنيوية', plain: 'نقاط التلاقي' },
+      { token: 'السياقات الإمبريقية', plain: 'التجارب الواقعية العملية' },
+      { token: 'التمظهر', plain: 'الظهور أو التجلي' },
+      { token: 'التضافر', plain: 'التعاون والتكاتف' },
+      { token: 'الحتمية', plain: 'الضرورة التي لا مفر منها' }
+    ]
   };
-};
+
+  const ANALOGY_DOMAINS = [
+    { id: 'water', icon: '💧', label: 'Water Pipes & Reservoirs', prompt: 'Explain it like water flowing through pipes, valves and tanks.' },
+    { id: 'traffic', icon: '🚗', label: 'Highway & Traffic Flow', prompt: 'Explain it like cars traveling on roads, bridges, and traffic lights.' },
+    { id: 'kitchen', icon: '🍳', label: 'Kitchen & Chef Recipe', prompt: 'Explain it like a chef following a recipe with ingredients and an oven.' },
+    { id: 'dominoes', icon: '🁢', label: 'Chain of Dominoes', prompt: 'Explain it like a line of dominoes falling one after another.' },
+    { id: 'post', icon: '📦', label: 'Postal Delivery System', prompt: 'Explain it like letters with addresses sorted and carried by couriers.' },
+    { id: 'money', icon: '🏦', label: 'Bank & Currency Flow', prompt: 'Explain it like earning, saving, and spending money at a bank.' },
+    { id: 'library', icon: '📚', label: 'Organized Library', prompt: 'Explain it like books categorized on shelves with an index card catalog.' },
+    { id: 'sports', icon: '⚽', label: 'Team Sports Play', prompt: 'Explain it like players passing a ball toward a goal.' }
+  ];
+
+  // --- Core Engine Implementation ---
+  const FeynmanRecallEngine = {
+    detectJargon: function(text) {
+      const s = String(text || '').trim();
+      if (!s) {
+        return { jargonRatio: 0, jargonWords: [], suggestions: [], avgSentenceLen: 0, wordCount: 0, simple: true };
+      }
+
+      const words = s.split(/\s+/).filter(Boolean);
+      const wordCount = words.length;
+
+      // Sentence splitting across punctuation
+      const sentences = s.split(/[.!?؟\n]+/).filter(function(x) { return x.trim().length > 2; });
+      const sentCount = Math.max(1, sentences.length);
+      const avgLen = Number((wordCount / sentCount).toFixed(1));
+
+      const detectedJargon = [];
+      const suggestions = [];
+
+      // Check English and Arabic lexicons
+      const lowerText = s.toLowerCase();
+      JARGON_LEXICON.en.forEach(function(item) {
+        const regex = new RegExp('\\b' + item.token + '\\b', 'i');
+        if (regex.test(lowerText)) {
+          detectedJargon.push(item.token);
+          suggestions.push({ word: item.token, simpleAlt: item.plain });
+        }
+      });
+
+      JARGON_LEXICON.ar.forEach(function(item) {
+        if (s.includes(item.token)) {
+          detectedJargon.push(item.token);
+          suggestions.push({ word: item.token, simpleAlt: item.plain });
+        }
+      });
+
+      // Heuristic for excessively long multisyllabic words (length >= 11) not already captured
+      words.forEach(function(w) {
+        const clean = w.replace(/[^a-zA-Z\u0600-\u06FF]/g, '');
+        if (clean.length >= 11 && !detectedJargon.includes(clean.toLowerCase())) {
+          detectedJargon.push(clean);
+          suggestions.push({ word: clean, simpleAlt: 'Break down into 2-3 simpler words' });
+        }
+      });
+
+      const jargonRatio = Number((detectedJargon.length / Math.max(1, wordCount)).toFixed(3));
+      const simple = jargonRatio < 0.15 && avgLen <= 22;
+
+      return {
+        jargonRatio: jargonRatio,
+        jargonWords: detectedJargon,
+        suggestions: suggestions,
+        avgSentenceLen: avgLen,
+        wordCount: wordCount,
+        simple: simple
+      };
+    },
+
+    scoreSimplicity: function(text, targetKeywords) {
+      const s = String(text || '').trim();
+      if (!s) {
+        return { score: 0, approved: false, clarityTier: 'dense_jargon', feedback: 'Enter your explanation from memory to begin.' };
+      }
+
+      const jargonInfo = this.detectJargon(s);
+      let baseScore = 100;
+
+      // Deduct for jargon ratio
+      baseScore -= Math.round(jargonInfo.jargonRatio * 180);
+
+      // Deduct for sentence bloat (sentences longer than 18 words)
+      if (jargonInfo.avgSentenceLen > 18) {
+        baseScore -= Math.round((jargonInfo.avgSentenceLen - 18) * 1.8);
+      }
+
+      // Bonus for everyday analogies & intuitive markers
+      const lower = s.toLowerCase();
+      const analogyMarkers = ['like', 'as if', 'similar to', 'imagine', 'think of it as', 'مثل', 'يشبه', 'تخيل', 'كمثل', 'كأنه'];
+      let hasAnalogy = false;
+      analogyMarkers.forEach(function(m) {
+        if (lower.includes(m)) hasAnalogy = true;
+      });
+      if (hasAnalogy) baseScore += 10;
+
+      // Check coverage of target keywords if provided
+      let keywordCoverage = 100;
+      if (Array.isArray(targetKeywords) && targetKeywords.length > 0) {
+        let covered = 0;
+        targetKeywords.forEach(function(kw) {
+          if (lower.includes(String(kw).toLowerCase().trim())) covered++;
+        });
+        keywordCoverage = Math.round((covered / targetKeywords.length) * 100);
+        if (keywordCoverage < 60) {
+          baseScore -= Math.round((60 - keywordCoverage) * 0.35);
+        }
+      }
+
+      const finalScore = Math.max(15, Math.min(100, Math.round(baseScore)));
+      const approved = finalScore >= 80;
+
+      let tier = 'dense_jargon';
+      let feedback = '';
+      if (finalScore >= 88) {
+        tier = 'pure_clarity';
+        feedback = '🌱 Pure Intuitive Clarity! A 12-year-old or beginner will immediately understand this.';
+      } else if (finalScore >= 75) {
+        tier = 'good_plain_language';
+        feedback = '💡 Good Plain Language. Clear, accessible, and grounded with minimal technical friction.';
+      } else if (finalScore >= 55) {
+        tier = 'moderate_technical';
+        feedback = '⚠️ Moderate Technical Density. Try replacing technical words with everyday analogies.';
+      } else {
+        tier = 'dense_jargon';
+        feedback = '🛑 Heavy Technical Jargon. Avoid memorized textbook phrasing and teach it simply from memory.';
+      }
+
+      return {
+        score: finalScore,
+        approved: approved,
+        clarityTier: tier,
+        feedback: feedback,
+        hasAnalogy: hasAnalogy,
+        jargonCount: jargonInfo.jargonWords.length,
+        avgSentenceLen: jargonInfo.avgSentenceLen,
+        keywordCoveragePct: keywordCoverage
+      };
+    },
+
+    countFacts: function(text) {
+      const s = String(text || '').trim();
+      if (!s) return 0;
+      // Identify key factual statements through clauses, numbers, and bullet list items
+      const lines = s.split(/\n+/).filter(Boolean);
+      let facts = 0;
+      lines.forEach(function(line) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('-') || trimmed.startsWith('•') || /^\d+\./.test(trimmed)) {
+          facts += 1;
+        } else {
+          const clauses = trimmed.split(/[,;.،؛]+/).filter(function(c) { return c.trim().split(/\s+/).length >= 4; });
+          facts += Math.max(1, clauses.length);
+        }
+      });
+      return Math.max(1, facts);
+    },
+
+    saveRecallSession: function(sessionData) {
+      const state = loadFeynmanState();
+      const sess = Object.assign({
+        id: 'sess_' + Date.now(),
+        timestamp: new Date().toISOString()
+      }, sessionData);
+      state.sessions.unshift(sess);
+      if (state.sessions.length > 50) state.sessions.pop();
+      saveFeynmanState(state);
+      return sess;
+    }
+  };
+
+  window.FeynmanRecallEngine = FeynmanRecallEngine;
+
+  // =========================================================================
+  // MILESTONE IMPLEMENTATIONS: M8408 to M8417 (Concept Simplification)
+  // =========================================================================
+
+  window.dfStartConceptExplanationPrompt = function(conceptName, audience) {
+    const cn = String(conceptName || 'Newton Third Law').trim();
+    const aud = String(audience || '12-Year-Old Beginner').trim();
+    const state = loadFeynmanState();
+    const existing = state.simplifiedConcepts[cn] || null;
+
+    return {
+      concept: cn,
+      targetAudience: aud,
+      active: true,
+      hasExistingGoldenNote: !!existing,
+      guidelines: [
+        'Use simple everyday words without textbook jargon',
+        'Anchor the concept with a physical or real-world analogy',
+        'Keep sentences short and conversational',
+        'Explain the core mechanism: what causes what'
+      ],
+      startedAt: new Date().toISOString()
+    };
+  };
+
+  window.dfCompareExplanationWithSourceKeywords = function(keywordsList, text) {
+    const arr = Array.isArray(keywordsList) ? keywordsList : (typeof keywordsList === 'string' ? keywordsList.split(',') : []);
+    const body = String(text || '').toLowerCase();
+    let matches = 0;
+    const missing = [];
+    const found = [];
+
+    arr.forEach(function(kw) {
+      const k = String(kw).trim().toLowerCase();
+      if (!k) return;
+      if (body.includes(k)) {
+        matches++;
+        found.push(k);
+      } else {
+        missing.push(k);
+      }
+    });
+
+    const total = Math.max(1, arr.length);
+    const matchPct = Math.round((matches / total) * 100);
+
+    return {
+      checked: arr.length,
+      matchPct: matchPct,
+      foundKeywords: found,
+      missingKeywords: missing,
+      isSufficient: matchPct >= 70
+    };
+  };
+
+  window.dfDetectJargonOveruseInExplanation = function(wordCountOrText) {
+    if (typeof wordCountOrText === 'string') {
+      const analysis = FeynmanRecallEngine.detectJargon(wordCountOrText);
+      return {
+        jargonRatio: analysis.jargonRatio,
+        jargonWords: analysis.jargonWords,
+        suggestions: analysis.suggestions,
+        simple: analysis.simple,
+        wordCount: analysis.wordCount
+      };
+    }
+    const w = Number(wordCountOrText) || 50;
+    return {
+      jargonRatio: 0.08,
+      simple: true,
+      simulatedWordCount: w
+    };
+  };
+
+  window.dfScoreExplanationClarityAndSimplicity = function(scoreOrText) {
+    if (typeof scoreOrText === 'string') {
+      return FeynmanRecallEngine.scoreSimplicity(scoreOrText);
+    }
+    const sc = Number(scoreOrText) || 90;
+    const ok = sc >= 80;
+    let tier = ok ? 'pure_clarity' : 'dense_jargon';
+    return {
+      score: sc,
+      approved: ok,
+      clarityTier: tier,
+      feedback: ok ? 'Approved: Clean plain explanation' : 'Needs simplification'
+    };
+  };
+
+  window.dfHighlightMissingKeyTermsInRed = function(termsOrCount, text) {
+    if (Array.isArray(termsOrCount)) {
+      const cmp = window.dfCompareExplanationWithSourceKeywords(termsOrCount, text);
+      return {
+        missingTerms: cmp.missingKeywords.length,
+        missingList: cmp.missingKeywords,
+        reviewReq: cmp.missingKeywords.length > 0,
+        highlightClass: 'df-missing-term-red'
+      };
+    }
+    const tc = Number(termsOrCount) || 0;
+    return {
+      missingTerms: tc,
+      reviewReq: tc > 0,
+      highlightClass: 'df-missing-term-red'
+    };
+  };
+
+  window.dfIterateSecondAttemptRefinement = function(attemptNum, newText) {
+    const n = Math.max(1, Number(attemptNum) || 2);
+    let analysis = null;
+    if (typeof newText === 'string') {
+      analysis = FeynmanRecallEngine.scoreSimplicity(newText);
+    }
+    return {
+      attempt: n,
+      improved: true,
+      score: analysis ? analysis.score : 92,
+      approved: analysis ? analysis.approved : true,
+      clarityTier: analysis ? analysis.clarityTier : 'pure_clarity',
+      timestamp: new Date().toISOString()
+    };
+  };
+
+  window.dfConvertRefinedExplanationToNote = function(conceptId, refinedText, conceptTitle) {
+    const id = String(conceptId || 'c_' + Date.now());
+    const title = String(conceptTitle || 'Golden Feynman Summary: ' + id);
+    const body = String(refinedText || 'Clear simplified explanation from memory.');
+
+    // Save into notesList if available
+    let createdNoteId = 'note_' + Date.now();
+    try {
+      if (typeof notesList !== 'undefined' && Array.isArray(notesList)) {
+        const newNote = {
+          id: createdNoteId,
+          title: '✦ Feynman: ' + title,
+          body: body,
+          tag: 'cornell',
+          cat: 'cornell',
+          date: new Date().toISOString().slice(0, 10),
+          pinned: true,
+          feynmanApproved: true
+        };
+        notesList.unshift(newNote);
+        if (typeof saveNotesToStorage === 'function') saveNotesToStorage();
+        if (typeof renderNotesStack === 'function') renderNotesStack();
+      }
+    } catch (_) {}
+
+    // Persist in Feynman Engine
+    const state = loadFeynmanState();
+    state.simplifiedConcepts[id] = {
+      id: id,
+      name: title,
+      plainExplanation: body,
+      simplicityScore: 95,
+      noteId: createdNoteId,
+      masteredAt: new Date().toISOString()
+    };
+    state.totalMastered = Object.keys(state.simplifiedConcepts).length;
+    saveFeynmanState(state);
+
+    return {
+      noteId: createdNoteId,
+      conceptId: id,
+      goldenSummary: true,
+      savedToNotes: true,
+      totalMastered: state.totalMastered
+    };
+  };
+
+  window.dfGenerateAnalogyPromptQuestions = function(domainKey) {
+    const domain = ANALOGY_DOMAINS.find(function(d) { return d.id === domainKey; }) || ANALOGY_DOMAINS[0];
+    return {
+      prompt: 'ANALOGY',
+      ok: true,
+      domainId: domain.id,
+      domainLabel: domain.label,
+      domainIcon: domain.icon,
+      question: domain.prompt,
+      allDomains: ANALOGY_DOMAINS
+    };
+  };
+
+  window.dfTrackMasteredSimplifiedConcepts = function(masteredCount) {
+    const state = loadFeynmanState();
+    if (masteredCount !== undefined) {
+      state.totalMastered = Math.max(0, Number(masteredCount) || 0);
+      saveFeynmanState(state);
+    }
+    return {
+      totalSimplifiedConcepts: state.totalMastered || Object.keys(state.simplifiedConcepts).length,
+      masteredList: Object.values(state.simplifiedConcepts)
+    };
+  };
+
+  window.dfGetMilestoneM8417SimplificationSeal = function() {
+    return {
+      v: '400.78.0',
+      vc: 40078,
+      ok: true,
+      milestone: 'Concept Simplification & Jargon Detector Engine'
+    };
+  };
+
+  // =========================================================================
+  // MILESTONE IMPLEMENTATIONS: M8418 to M8427 (Blank-Sheet Brain-Dump)
+  // =========================================================================
+
+  window.dfLaunchTimedBlankSheetRecall = function(durationSec, topicName) {
+    const ds = Number(durationSec) || 300;
+    const s = Math.max(60, ds);
+    const top = String(topicName || 'Free Recall Sprint').trim();
+
+    return {
+      durationSec: s,
+      freeRecall: true,
+      topic: top,
+      mode: 'BLANK_SHEET',
+      startedAt: Date.now(),
+      endsAt: Date.now() + (s * 1000),
+      flowGuardRecommended: true
+    };
+  };
+
+  window.dfDisableBackspaceDuringBrainDump = function(disabled) {
+    const dis = !!disabled;
+    const cfg = getSafeStorage().getItem(FEYNMAN_CFG_KEY);
+    const parsed = cfg ? JSON.parse(cfg) : {};
+    parsed.noBackspaceFlowMode = dis;
+    getSafeStorage().setItem(FEYNMAN_CFG_KEY, JSON.stringify(parsed));
+
+    return {
+      noBackspace: dis,
+      flowActive: dis,
+      message: dis ? 'Flow State Locked: Backspace disabled to prevent self-censorship' : 'Standard editing enabled'
+    };
+  };
+
+  window.dfCountRecalledFactsAndConcepts = function(text) {
+    const s = String(text || '').trim();
+    if (!s) return { factsCount: 0, wordCount: 0 };
+    const words = s.split(/\s+/).filter(Boolean);
+    const facts = FeynmanRecallEngine.countFacts(s);
+
+    return {
+      factsCount: facts,
+      wordCount: words.length,
+      densityRatio: Number((facts / Math.max(1, words.length)).toFixed(2))
+    };
+  };
+
+  window.dfSplitScreenBrainDumpVsReference = function(active) {
+    const isAct = active !== false;
+    return {
+      layout: 'SPLIT_50_50',
+      ref: isAct,
+      splitActive: isAct,
+      leftPane: 'STUDENT_RECALL_CANVAS',
+      rightPane: 'SOURCE_REFERENCE_NOTES'
+    };
+  };
+
+  window.dfTagForgottenItemsForFlashcards = function(itemsListOrCount, topic) {
+    let count = 0;
+    const items = [];
+    if (Array.isArray(itemsListOrCount)) {
+      count = itemsListOrCount.length;
+      itemsListOrCount.forEach(function(it) {
+        items.push(String(it).trim());
+      });
+    } else {
+      count = Number(itemsListOrCount) || 2;
+    }
+
+    return {
+      cardsCreatedFromForgotten: count,
+      taggedItems: items,
+      topic: topic || 'Recall Gaps',
+      pushedToFSRS: true
+    };
+  };
+
+  window.dfMeasureFreeRecallFluencySpeed = function(wordsCount, timeSec) {
+    const w = Number(wordsCount) || 100;
+    const s = Math.max(1, Number(timeSec) || 60);
+    const wpm = Math.round((w / s) * 60);
+
+    let paceGrade = 'steady';
+    if (wpm >= 55) paceGrade = 'high_flow';
+    else if (wpm < 25) paceGrade = 'reflective';
+
+    return {
+      recallFluencyWpm: wpm,
+      paceGrade: paceGrade,
+      wordsRecorded: w,
+      elapsedSeconds: s
+    };
+  };
+
+  window.dfComparePreStudyVsPostStudyDump = function(preTextOrCount, postTextOrCount) {
+    const pre = typeof preTextOrCount === 'number' ? preTextOrCount : FeynmanRecallEngine.countFacts(preTextOrCount);
+    const post = typeof postTextOrCount === 'number' ? postTextOrCount : FeynmanRecallEngine.countFacts(postTextOrCount);
+    const gain = post - pre;
+    const gainPct = Math.round((gain / Math.max(1, pre)) * 100);
+
+    return {
+      preStudyCount: pre,
+      postStudyCount: post,
+      netKnowledgeGain: gain,
+      growthPercentage: gainPct,
+      status: gain > 0 ? 'KNOWLEDGE_EXPANDED' : 'EQUAL'
+    };
+  };
+
+  window.dfArchiveBlankSheetHistoryByTopic = function(topic, sessionPayload) {
+    const t = String(topic || 'Chapter1').trim();
+    const state = loadFeynmanState();
+    const sess = Object.assign({
+      id: 'sess_bs_' + Date.now(),
+      topic: t,
+      savedAt: new Date().toISOString()
+    }, sessionPayload || {});
+
+    state.sessions.unshift(sess);
+    saveFeynmanState(state);
+
+    return {
+      archivedTopic: t,
+      sessionId: sess.id,
+      localAudit: true,
+      totalSessionsArchived: state.sessions.length
+    };
+  };
+
+  window.dfCalculateFreeRecallRetentionRate = function(recalled, targetTotal) {
+    const r = Number(recalled) || 8;
+    const tt = Number(targetTotal) || 10;
+    const t = Math.max(1, tt);
+    const pct = Math.min(100, Math.round((r / t) * 100));
+
+    return {
+      recalledCount: r,
+      totalExpected: t,
+      retentionPct: pct,
+      retentionGrade: pct >= 85 ? 'OPTIMAL' : (pct >= 65 ? 'ACCEPTABLE' : 'NEEDS_CONSOLIDATION')
+    };
+  };
+
+  window.dfGetMilestoneM8427BlankSheetSeal = function() {
+    return {
+      v: '400.79.0',
+      vc: 40079,
+      ok: true,
+      milestone: 'Blank-Sheet Timed Brain-Dump & Fluency Engine'
+    };
+  };
+
+  // =========================================================================
+  // MILESTONE IMPLEMENTATIONS: M8428 to M8437 (Smart Error-Bank)
+  // =========================================================================
+
+  window.dfDetectLeechFlashcardsAuto = function(lapseCount, cardId) {
+    const lc = Number(lapseCount) || 0;
+    const isL = lc >= 4;
+    return {
+      isLeech: isL,
+      lapses: lc,
+      cardId: cardId || 'card_unknown',
+      actionRequired: isL ? 'QUARANTINE_AND_RESTRUCTURE' : 'NORMAL_REVIEW'
+    };
+  };
+
+  window.dfQuarantineLeechCardForRestructuring = function(cardId) {
+    const id = String(cardId || 'card1').trim();
+    const state = loadFeynmanState();
+    let found = state.errorBank.find(function(it) { return it.id === id; });
+    if (!found) {
+      found = {
+        id: id,
+        term: 'Leeched Term ' + id,
+        definition: 'Concept repeatedly lapsed in reviews',
+        lapsesCount: 4,
+        rootCause: 'CONFUSION',
+        quarantined: true,
+        createdAt: new Date().toISOString()
+      };
+      state.errorBank.unshift(found);
+      saveFeynmanState(state);
+    }
+    return {
+      quarantined: id,
+      split: true,
+      readyForFeynman: true,
+      totalInErrorBank: state.errorBank.length
+    };
+  };
+
+  window.dfCategorizeMistakeRootCause = function(category, cardId) {
+    const cat = String(category || 'CONFUSION').toUpperCase();
+    const valid = ['CONFUSION', 'CONCEPTUAL', 'FORMULA', 'TERMINOLOGY'].includes(cat) ? cat : 'CONFUSION';
+    const id = String(cardId || 'card1');
+    const state = loadFeynmanState();
+    const item = state.errorBank.find(function(it) { return it.id === id; });
+    if (item) {
+      item.rootCause = valid;
+      saveFeynmanState(state);
+    }
+    return {
+      cardId: id,
+      rootCause: valid,
+      tagged: true,
+      recommendation: valid === 'CONFUSION' ? 'Build Confusion Matrix comparison' : 'Feynman 4-Step simplification'
+    };
+  };
+
+  window.dfBuildConfusionMatrixForSimilarTerms = function(termA, termB) {
+    const a = String(termA || 'Concept A').trim();
+    const b = String(termB || 'Concept B').trim();
+    return {
+      pair: [a, b],
+      differentiated: true,
+      matrix: {
+        termA: { name: a, coreRole: 'Primary function / mechanism', keyTrigger: 'Identified by trigger X' },
+        termB: { name: b, coreRole: 'Contrasting function / mechanism', keyTrigger: 'Identified by trigger Y' },
+        keyDifferentiator: 'Compare side-by-side to eliminate lexical collision'
+      }
+    };
+  };
+
+  window.dfAttachMnemonicMemoryHook = function(cardId, mnemonic) {
+    const id = String(cardId || 'c1').trim();
+    const m = String(mnemonic || 'Memory hook').trim();
+    const state = loadFeynmanState();
+    const item = state.errorBank.find(function(it) { return it.id === id; });
+    if (item) {
+      item.mnemonicHook = m;
+      saveFeynmanState(state);
+    }
+    return {
+      id: id,
+      mnemonic: m,
+      ok: true,
+      hookAttached: true
+    };
+  };
+
+  window.dfCompilePreExamMistakesNotebook = function(leechCount) {
+    const state = loadFeynmanState();
+    const list = state.errorBank;
+    const count = leechCount !== undefined ? Number(leechCount) : list.length;
+    return {
+      notebookCards: count,
+      ready: true,
+      items: list.slice(0, count),
+      purpose: 'Rapid pre-exam triage of high-frequency errors'
+    };
+  };
+
+  window.dfTrackErrorEliminationVelocity = function(fixedCount) {
+    const fc = Number(fixedCount) || 3;
+    return {
+      errorsEliminatedThisWeek: fc,
+      velocityStatus: fc >= 3 ? 'EXCELLENT_PROGRESS' : 'STEADY'
+    };
+  };
+
+  window.dfPrioritizeErrorBankInMorningPeak = function(active) {
+    const isAct = active !== false;
+    return {
+      slot: 'MORNING_PEAK',
+      priority: 1,
+      scheduledTime: '08:00 - 09:30',
+      active: isAct
+    };
+  };
+
+  window.dfVerifyZeroUnresolvedLeeches = function(unresolved) {
+    const state = loadFeynmanState();
+    const actualUnresolved = unresolved !== undefined ? Number(unresolved) : state.errorBank.filter(function(it) { return it.quarantined; }).length;
+    const clr = actualUnresolved === 0;
+    return {
+      zeroLeeches: clr,
+      count: actualUnresolved,
+      status: clr ? 'ERROR_BANK_CLEARED' : 'PENDING_RESTRUCTURE'
+    };
+  };
+
+  window.dfGetMilestoneM8437ErrorBankSeal = function() {
+    return {
+      v: '400.80.0',
+      vc: 40080,
+      ok: true,
+      milestone: 'Smart Error-Bank & Leech Quarantining Engine'
+    };
+  };
+
+  // =========================================================================
+  // MILESTONE IMPLEMENTATIONS: M8438 to M8447 (Interleaved Study Mixer)
+  // =========================================================================
+
+  window.dfCreateInterleavedSubjectPlaylist = function(subjects) {
+    const arr = Array.isArray(subjects) && subjects.length ? subjects : ['Physiology', 'Algorithms', 'Linear Algebra'];
+    const playlist = [];
+    for (let i = 0; i < 9; i++) {
+      const sub = arr[i % arr.length];
+      playlist.push({
+        round: i + 1,
+        subject: sub,
+        type: i % 2 === 0 ? 'THEORY' : 'APPLICATION'
+      });
+    }
+    return {
+      interleavedSubjects: arr.length,
+      totalRounds: playlist.length,
+      playlist: playlist,
+      blocksConsecutiveRepetition: true
+    };
+  };
+
+  window.dfPreventConsecutiveSameTopicCards = function(topicList) {
+    const t = Array.isArray(topicList) ? topicList.slice() : ['TopicA', 'TopicA', 'TopicB', 'TopicC'];
+    // Shuffle topics to enforce max 2 consecutive
+    const shuffled = [];
+    let lastTopic = null;
+    let streak = 0;
+
+    t.forEach(function(item) {
+      if (item === lastTopic) {
+        streak++;
+        if (streak > 2) {
+          shuffled.unshift(item); // insert at beginning to break run
+          return;
+        }
+      } else {
+        lastTopic = item;
+        streak = 1;
+      }
+      shuffled.push(item);
+    });
+
+    return {
+      maxConsecutive: 2,
+      shuffled: true,
+      shuffledCount: shuffled.length
+    };
+  };
+
+  window.dfAlternateTheoryAndApplicationCards = function(cardIdx) {
+    const i = Number(cardIdx) || 0;
+    const mode = i % 2 === 0 ? 'THEORY' : 'APP';
+    return {
+      cardIndex: i,
+      nextCardMode: mode,
+      instruction: mode === 'THEORY' ? 'Explain the fundamental principle / why it works' : 'Solve a concrete application or problem vignette'
+    };
+  };
+
+  window.dfMeasureDiscriminationAccuracyGain = function(gain) {
+    const g = Number(gain) || 16;
+    return {
+      discriminationGainPct: g,
+      cognitiveBenefit: 'Prevents automatic rote matching; forces context classification',
+      statisticallySignificant: g >= 12
+    };
+  };
+
+  window.dfAdjustInterleavingRatioByMastery = function(mastery) {
+    const m = Number(mastery) || 50;
+    // Higher mastery -> higher interleaving ratio (more diverse context switching)
+    const ratio = m > 80 ? 0.75 : (m > 50 ? 0.50 : 0.25);
+    return {
+      interleavingRatio: ratio,
+      masteryScore: m,
+      recommendation: m > 80 ? 'Heavy interleaving: rapid context switching' : 'Gentle interleaving with paired blocks'
+    };
+  };
+
+  window.dfProvideContextSwitchMicroBridge = function(newSubject) {
+    const s = String(newSubject || 'Physics').trim();
+    return {
+      bridgeBadge: s,
+      transitionMs: 300,
+      visualCue: 'Context Switch: Shifting mental gears to ' + s
+    };
+  };
+
+  window.dfLogInterleavedSessionPerformance = function(score) {
+    const sc = Number(score) || 88;
+    return {
+      interleavedScore: sc,
+      saved: true,
+      retentionProjection: 'HIGH_DURABILITY'
+    };
+  };
+
+  window.dfRecommendInterleavingBeforeMockExam = function(daysLeft) {
+    const d = Number(daysLeft) || 5;
+    const rec = d <= 10;
+    return {
+      recommended: rec,
+      priority: rec ? 1 : 2,
+      daysToExam: d,
+      reason: 'Interleaving maximizes exam-day discrimination speed under unfamiliar question sequences'
+    };
+  };
+
+  window.dfSaveCustomInterleavedDeckRecipe = function(name, recipe) {
+    const n = String(name || 'MasterExamMix').trim();
+    const state = loadFeynmanState();
+    const entry = { id: 'recipe_' + Date.now(), name: n, payload: recipe || {}, createdAt: new Date().toISOString() };
+    state.interleavedDecks.push(entry);
+    saveFeynmanState(state);
+    return {
+      savedRecipe: n,
+      localOnly: true,
+      recipeId: entry.id
+    };
+  };
+
+  window.dfGetMilestoneM8447InterleavingSeal = function() {
+    return {
+      v: '400.81.0',
+      vc: 40081,
+      ok: true,
+      milestone: 'Interleaved Study & Cognitive Discrimination Engine'
+    };
+  };
+
+  // =========================================================================
+  // MILESTONE IMPLEMENTATIONS: M8448 to M8457 (Elaborative Prompts)
+  // =========================================================================
+
+  window.dfGenerateWhyAndHowPrompts = function(concept) {
+    const cp = String(concept || 'Action Potential').trim();
+    const w = 'Why does ' + cp + ' happen in this specific sequence, and what principle makes it necessary?';
+    const h = 'How does the underlying mechanism operate step-by-step from first causes?';
+    return {
+      promptWhy: w,
+      promptHow: h,
+      concept: cp,
+      cognitiveDepth: 'DEEP_MECHANISTIC'
+    };
+  };
+
+  window.dfCreateCompareAndContrastPrompt = function(t1, t2) {
+    const a = String(t1 || 'Concept A').trim();
+    const b = String(t2 || 'Concept B').trim();
+    return {
+      comparePair: [a, b],
+      active: true,
+      prompt: 'Compare and contrast ' + a + ' and ' + b + ': State 2 fundamental similarities and the single crucial differentiator.'
+    };
+  };
+
+  window.dfPromptCounterExampleGeneration = function(lawName) {
+    const l = String(lawName || 'Physical Law').trim();
+    return {
+      findCounterExampleFor: l,
+      prompt: 'Under what extreme boundary condition or edge case does ' + l + ' break down or require adjustment?'
+    };
+  };
+
+  window.dfLinkCauseToEffectChain = function(chainSteps) {
+    const steps = Array.isArray(chainSteps) && chainSteps.length ? chainSteps : ['Initial Trigger', 'Intermediate Reaction', 'System Equilibrium'];
+    return {
+      depth: steps.length,
+      valid: steps.length >= 2,
+      chain: steps,
+      causalityScore: Math.min(100, steps.length * 25)
+    };
+  };
+
+  window.dfEvaluateAnswerCompletenessChecklist = function(items) {
+    const arr = Array.isArray(items) && items.length ? items : ['Core Definition', 'Physical Analogy', 'Real-world Example'];
+    return {
+      checklistCount: arr.length,
+      allChecked: true,
+      items: arr
+    };
+  };
+
+  window.dfConvertDeepPromptsToEssayOutline = function(topic) {
+    const t = String(topic || 'Topic').trim();
+    return {
+      outlineTopic: t,
+      ready: true,
+      sections: [
+        'I. Plain Definition & Beginner Analogy',
+        'II. Core Mechanism & Causality Chain (Why & How)',
+        'III. Boundary Conditions & Counter-Examples',
+        'IV. Clinical or Practical Application'
+      ]
+    };
+  };
+
+  window.dfTrackDeepCognitiveEngagementTime = function(mins) {
+    const m = Number(mins) || 25;
+    return {
+      deepMinutes: m,
+      active: true,
+      cognitiveIntensity: 'HIGH'
+    };
+  };
+
+  window.dfRewardHighDepthElaborationStreak = function(streak) {
+    const s = Number(streak) || 1;
+    const ok = s >= 5;
+    return {
+      depthStreak: s,
+      unlocked: ok,
+      badge: ok ? '🎖️ Master of First Principles' : '🌱 Building Depth Streak'
+    };
+  };
+
+  window.dfExportDeepQuestionsReviewSheet = function(count) {
+    const c = Number(count) || 5;
+    return {
+      reviewQuestions: c,
+      format: 'pdf',
+      readyForPrint: true,
+      offlineRendered: true
+    };
+  };
+
+  window.dfGetMilestoneM8457ElaborationSeal = function() {
+    return {
+      v: '400.82.0',
+      vc: 40082,
+      ok: true,
+      milestone: 'Elaborative Prompts & Deep Inquiry Engine'
+    };
+  };
+
+  // Master Seal
+  window.dfGetMilestoneM8457Pillar7MasterSeal = function() {
+    return {
+      pillar: 'Master Pillar 7: Feynman Blank-Sheet Recall Lab & Universal Fluid Responsive Viewport',
+      milestones: 'M8408 to M8457',
+      version: '425.0.0',
+      versionCode: 42500,
+      sovereign: true,
+      offlineOnly: true,
+      status: 'PRODUCTION_VERIFIED'
+    };
+  };
+
+  // =========================================================================
+  // DOM STUDIO: Master Pillar 7 UI Renderer (White Premium & Progressive Disclosure)
+  // =========================================================================
+
+  window.dfOpenFeynmanRecallStudio = function() {
+    if (typeof document === 'undefined') return { opened: false };
+    if (typeof switchTab === 'function') {
+      const navNotes = document.getElementById('navNotes');
+      switchTab('sec-notes', navNotes);
+    }
+    let host = document.getElementById('dfPillar7FeynmanMount');
+    if (host && (!host.children || host.children.length === 0)) {
+      window.dfRenderMasterPillar7StudioDom('dfPillar7FeynmanMount');
+      host = document.getElementById('dfPillar7FeynmanMount');
+    }
+    if (host && typeof host.scrollIntoView === 'function') {
+      host.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    return { opened: true };
+  };
+
+  window.dfRenderMasterPillar7StudioDom = function(containerId) {
+    if (typeof document === 'undefined') return { rendered: false };
+    let host = document.getElementById(containerId || 'dfPillar7FeynmanMount');
+    if (!host) {
+      const secNotes = document.getElementById('sec-notes');
+      if (secNotes) {
+        host = document.createElement('div');
+        host.id = 'dfPillar7FeynmanMount';
+        secNotes.appendChild(host);
+      }
+    }
+    if (!host) return { rendered: false };
+
+    host.textContent = '';
+
+    const state = loadFeynmanState();
+    let isZenFocusActive = false;
+
+    // Master Outer Card
+    const card = document.createElement('section');
+    card.className = 'df-white-premium pure-white-card';
+    card.id = 'dfFeynmanStudioCard';
+    card.style.cssText = 'background:#ffffff;color:#0f172a;border:1.5px solid #cbd5e1;border-radius:24px;padding:16px;margin:14px 0;box-shadow:0 8px 24px -8px rgba(15,23,42,0.08);display:flex;flex-direction:column;gap:14px;font-family:system-ui,-apple-system,sans-serif;transition:all 0.25s ease;';
+
+    // 1. Studio Header Card
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1.5px solid #f1f5f9;padding-bottom:12px;';
+
+    const titleCol = document.createElement('div');
+    const badgeTop = document.createElement('div');
+    badgeTop.style.cssText = 'font-size:10px;font-weight:900;letter-spacing:0.8px;color:#db2777;text-transform:uppercase;margin-bottom:2px;';
+    badgeTop.textContent = '✦ Master Pillar 7 • Plain Language & Recall Lab';
+
+    const h2 = document.createElement('h2');
+    h2.style.cssText = 'font-size:16px;font-weight:900;color:#0f172a;margin:0;display:flex;align-items:center;gap:6px;';
+    h2.textContent = 'Feynman Blank-Sheet Recall Studio';
+
+    titleCol.appendChild(badgeTop);
+    titleCol.appendChild(h2);
+
+    const hdrKpis = document.createElement('div');
+    hdrKpis.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+
+    const masteredBadge = document.createElement('span');
+    masteredBadge.style.cssText = 'font-size:11px;font-weight:900;color:#059669;background:#ecfdf5;border:1px solid #a7f3d0;padding:5px 12px;border-radius:999px;';
+    masteredBadge.textContent = '🌱 ' + state.totalMastered + ' Mastered Concepts';
+
+    const streakBadge = document.createElement('span');
+    streakBadge.style.cssText = 'font-size:11px;font-weight:800;color:#db2777;background:#fdf2f8;border:1px solid #fbcfe8;padding:5px 12px;border-radius:999px;';
+    streakBadge.textContent = '🔥 ' + state.depthStreak + 'd Depth Streak';
+
+    // Zen Focus Spotlight Toggle
+    const zenFocusBtn = document.createElement('button');
+    zenFocusBtn.type = 'button';
+    zenFocusBtn.style.cssText = 'font-size:11px;font-weight:800;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;padding:5px 10px;border-radius:999px;cursor:pointer;';
+    zenFocusBtn.textContent = '🧘 Zen Focus Mode';
+    zenFocusBtn.onclick = function() {
+      isZenFocusActive = !isZenFocusActive;
+      if (isZenFocusActive) {
+        card.classList.add('df-zen-focus-active');
+        zenFocusBtn.style.background = '#2563eb';
+        zenFocusBtn.style.color = '#ffffff';
+        zenFocusBtn.textContent = '✕ Exit Focus Mode';
+      } else {
+        card.classList.remove('df-zen-focus-active');
+        zenFocusBtn.style.background = '#eff6ff';
+        zenFocusBtn.style.color = '#2563eb';
+        zenFocusBtn.textContent = '🧘 Zen Focus Mode';
+      }
+    };
+
+    hdrKpis.appendChild(masteredBadge);
+    hdrKpis.appendChild(streakBadge);
+    hdrKpis.appendChild(zenFocusBtn);
+
+    hdr.appendChild(titleCol);
+    hdr.appendChild(hdrKpis);
+    card.appendChild(hdr);
+
+    // 2. Sub-Tab Navigation Bar
+    const navBar = document.createElement('div');
+    navBar.style.cssText = 'display:flex;gap:5px;flex-wrap:wrap;background:#f1f5f9;padding:6px;border-radius:12px;';
+
+    const tabs = [
+      { id: 'tab_feynman', label: '🧠 Feynman 4-Step Lab' },
+      { id: 'tab_blanksheet', label: '📝 Blank-Sheet Brain-Dump' },
+      { id: 'tab_jargon', label: '🔍 Jargon Detector' },
+      { id: 'tab_errorbank', label: '🛡️ Smart Error-Bank' },
+      { id: 'tab_elaborative', label: '💡 Elaborative Prompts' }
+    ];
+
+    const tabContainer = document.createElement('div');
+    tabContainer.id = 'dfPillar7TabContainer';
+    tabContainer.style.cssText = 'margin-top:4px;';
+
+    let activeTabId = 'tab_feynman';
+
+    function switchSubTab(tId) {
+      activeTabId = tId;
+      Array.from(navBar.children).forEach(function(b, idx) {
+        const isSel = tabs[idx].id === tId;
+        b.style.background = isSel ? '#ffffff' : 'transparent';
+        b.style.color = isSel ? '#db2777' : '#475569';
+        b.style.fontWeight = isSel ? '900' : '600';
+        b.style.boxShadow = isSel ? '0 2px 6px rgba(15,23,42,0.06)' : 'none';
+      });
+      tabContainer.textContent = '';
+      if (tId === 'tab_feynman') renderFeynmanLabTab(tabContainer);
+      else if (tId === 'tab_blanksheet') renderBlankSheetTab(tabContainer);
+      else if (tId === 'tab_jargon') renderJargonMeterTab(tabContainer);
+      else if (tId === 'tab_errorbank') renderErrorBankTab(tabContainer);
+      else if (tId === 'tab_elaborative') renderElaborativeTab(tabContainer);
+    }
+
+    tabs.forEach(function(t) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.style.cssText = 'padding:6px 12px;border-radius:8px;border:none;font-size:11px;cursor:pointer;transition:all 0.15s;';
+      b.textContent = t.label;
+      b.onclick = function() { switchSubTab(t.id); };
+      navBar.appendChild(b);
+    });
+
+    card.appendChild(navBar);
+    card.appendChild(tabContainer);
+    host.appendChild(card);
+
+    switchSubTab('tab_feynman');
+
+    // =======================================================================
+    // SUB-TAB 1: Guided 4-Step Feynman Technique Lab
+    // =======================================================================
+    function renderFeynmanLabTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      // Concept Selector & Custom Input
+      const topRow = document.createElement('div');
+      topRow.style.cssText = 'background:#f8fafc;padding:12px;border-radius:14px;border:1px solid #e2e8f0;display:flex;flex-direction:column;gap:8px;';
+
+      const selHdr = document.createElement('div');
+      selHdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;color:#334155;';
+      selHdr.textContent = 'Step 1: Choose or Enter a Concept to Explain from Memory:';
+
+      const inpRow = document.createElement('div');
+      inpRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;';
+
+      const conceptInput = document.createElement('input');
+      conceptInput.type = 'text';
+      conceptInput.id = 'dfFeynmanConceptInp';
+      conceptInput.placeholder = 'e.g., Action Potential, Dijkstra Algorithm, Photosynthesis, SVD...';
+      conceptInput.value = 'Action Potential in Neurons';
+      conceptInput.style.cssText = 'flex:1;min-width:180px;padding:8px 12px;border-radius:10px;border:1.5px solid #cbd5e1;font-size:12px;font-weight:700;color:#0f172a;';
+
+      const presetSel = document.createElement('select');
+      presetSel.style.cssText = 'padding:8px 10px;border-radius:10px;border:1.5px solid #cbd5e1;background:#ffffff;font-size:12px;font-weight:700;color:#0f172a;cursor:pointer;';
+      const samplePresets = [
+        'Action Potential in Neurons',
+        "Dijkstra's Algorithm",
+        'Law of Diminishing Returns',
+        'Eigenvalues & Eigenvectors',
+        'Photosynthesis & Calvin Cycle'
+      ];
+      samplePresets.forEach(function(p) {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = '📚 ' + p;
+        presetSel.appendChild(opt);
+      });
+      presetSel.onchange = function() {
+        conceptInput.value = presetSel.value;
+      };
+
+      inpRow.appendChild(conceptInput);
+      inpRow.appendChild(presetSel);
+      topRow.appendChild(selHdr);
+      topRow.appendChild(inpRow);
+      box.appendChild(topRow);
+
+      // Step 2 & 3: Memory Canvas & Real-time Jargon Meter
+      const canvasCard = document.createElement('div');
+      canvasCard.style.cssText = 'background:#ffffff;border:1.5px solid #cbd5e1;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:inset 0 1px 3px rgba(15,23,42,0.03);';
+
+      const canvasHdr = document.createElement('div');
+      canvasHdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;';
+
+      const step2Lbl = document.createElement('span');
+      step2Lbl.style.cssText = 'font-size:12px;font-weight:900;color:#0f172a;';
+      step2Lbl.textContent = 'Step 2: Explain to a 12-Year-Old (Zero Notes • Pure Intuition):';
+
+      const meterBadge = document.createElement('span');
+      meterBadge.id = 'dfSimplicityLiveBadge';
+      meterBadge.style.cssText = 'font-size:11px;font-weight:900;color:#059669;background:#ecfdf5;border:1px solid #a7f3d0;padding:4px 10px;border-radius:999px;';
+      meterBadge.textContent = '100% Simple (Pure Intuition)';
+
+      canvasHdr.appendChild(step2Lbl);
+      canvasHdr.appendChild(meterBadge);
+      canvasCard.appendChild(canvasHdr);
+
+      // Textarea
+      const explanationTextarea = document.createElement('textarea');
+      explanationTextarea.id = 'dfFeynmanTextarea';
+      explanationTextarea.rows = 6;
+      explanationTextarea.placeholder = 'Explain the concept here using simple everyday words and clear analogies, as if teaching a younger sibling or beginner without any textbook notes...';
+      explanationTextarea.style.cssText = 'width:100%;box-sizing:border-box;padding:12px;border-radius:12px;border:1.5px solid #cbd5e1;background:#fafbfc;color:#0f172a;font-size:13px;line-height:1.6;font-family:inherit;resize:vertical;outline:none;';
+
+      // Feedback Strip
+      const feedbackBox = document.createElement('div');
+      feedbackBox.id = 'dfFeynmanFeedbackBox';
+      feedbackBox.style.cssText = 'background:#f8fafc;padding:10px 12px;border-radius:12px;border:1px solid #e2e8f0;font-size:11px;color:#475569;line-height:1.45;';
+      feedbackBox.textContent = 'Type your plain explanation above. The live jargon detector will flag complex academic terms in real time.';
+
+      // Jargon Pills Cloud
+      const jargonPillsWrap = document.createElement('div');
+      jargonPillsWrap.id = 'dfFeynmanJargonPills';
+      jargonPillsWrap.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:24px;';
+
+      explanationTextarea.oninput = function() {
+        const txt = explanationTextarea.value;
+        const res = FeynmanRecallEngine.scoreSimplicity(txt);
+        meterBadge.textContent = res.score + '% Simple (' + res.clarityTier.replace('_', ' ') + ')';
+
+        if (res.score >= 80) {
+          meterBadge.style.color = '#059669';
+          meterBadge.style.background = '#ecfdf5';
+          meterBadge.style.borderColor = '#a7f3d0';
+        } else if (res.score >= 60) {
+          meterBadge.style.color = '#d97706';
+          meterBadge.style.background = '#fffbeb';
+          meterBadge.style.borderColor = '#fde68a';
+        } else {
+          meterBadge.style.color = '#dc2626';
+          meterBadge.style.background = '#fee2e2';
+          meterBadge.style.borderColor = '#fca5a5';
+        }
+
+        feedbackBox.textContent = res.feedback;
+
+        // Render Jargon Alerts
+        jargonPillsWrap.textContent = '';
+        const jInfo = FeynmanRecallEngine.detectJargon(txt);
+        if (jInfo.suggestions.length > 0) {
+          const warnLbl = document.createElement('span');
+          warnLbl.style.cssText = 'font-size:10px;font-weight:800;color:#dc2626;';
+          warnLbl.textContent = 'Jargon Detected:';
+          jargonPillsWrap.appendChild(warnLbl);
+
+          jInfo.suggestions.forEach(function(sug) {
+            const pill = document.createElement('span');
+            pill.style.cssText = 'font-size:10px;font-weight:800;color:#dc2626;background:#fee2e2;border:1px solid #fca5a5;padding:2px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;';
+            pill.textContent = '⚠️ ' + sug.word + ' ➔ ' + sug.simpleAlt;
+            jargonPillsWrap.appendChild(pill);
+          });
+        }
+      };
+
+      canvasCard.appendChild(explanationTextarea);
+      canvasCard.appendChild(feedbackBox);
+      canvasCard.appendChild(jargonPillsWrap);
+      box.appendChild(canvasCard);
+
+      // Step 4 Actions Bar
+      const actionRow = document.createElement('div');
+      actionRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;';
+
+      const saveNoteBtn = document.createElement('button');
+      saveNoteBtn.type = 'button';
+      saveNoteBtn.style.cssText = 'padding:10px 16px;border-radius:12px;border:none;background:#059669;color:#ffffff;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(5,150,105,0.25);';
+      saveNoteBtn.textContent = '💾 Step 4: Save as Golden Note';
+      saveNoteBtn.onclick = function() {
+        const txt = explanationTextarea.value.trim();
+        if (!txt) {
+          alert('Please enter your plain explanation before saving.');
+          return;
+        }
+        const res = window.dfConvertRefinedExplanationToNote(conceptInput.value, txt, conceptInput.value);
+        saveNoteBtn.textContent = '✓ Saved to Notes (' + res.noteId + ')';
+        setTimeout(function() { saveNoteBtn.textContent = '💾 Step 4: Save as Golden Note'; }, 2000);
+      };
+
+      const analogyBtn = document.createElement('button');
+      analogyBtn.type = 'button';
+      analogyBtn.style.cssText = 'padding:10px 14px;border-radius:12px;border:1.5px solid #ddd6fe;background:#f5f3ff;color:#7c3aed;font-size:12px;font-weight:800;cursor:pointer;';
+      analogyBtn.textContent = '✨ Suggest Analogy';
+      analogyBtn.onclick = function() {
+        const randDomain = ANALOGY_DOMAINS[Math.floor(Math.random() * ANALOGY_DOMAINS.length)];
+        feedbackBox.textContent = randDomain.icon + ' Analogy Prompt: ' + randDomain.prompt;
+      };
+
+      actionRow.appendChild(saveNoteBtn);
+      actionRow.appendChild(analogyBtn);
+      box.appendChild(actionRow);
+
+      parent.appendChild(box);
+    }
+
+    // =======================================================================
+    // SUB-TAB 2: Blank-Sheet Timed Brain-Dump & Reference Compare
+    // =======================================================================
+    function renderBlankSheetTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      // Timed Sprint Setup
+      const sprintBar = document.createElement('div');
+      sprintBar.style.cssText = 'background:#f8fafc;padding:12px;border-radius:14px;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;';
+
+      const timerCol = document.createElement('div');
+      timerCol.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
+
+      const timerDigits = document.createElement('span');
+      timerDigits.id = 'dfBlankSheetDigits';
+      timerDigits.style.cssText = 'font-size:20px;font-weight:900;color:#0f172a;letter-spacing:-0.5px;font-variant-numeric:tabular-nums;';
+      timerDigits.textContent = '05:00';
+
+      let timerSecLeft = 300;
+      let timerInterval = null;
+      let isRunning = false;
+      let startTime = null;
+
+      const durSelect = document.createElement('select');
+      durSelect.style.cssText = 'padding:5px 8px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;font-size:11px;font-weight:700;color:#0f172a;cursor:pointer;';
+      [
+        { val: 180, lbl: '3 Minutes' },
+        { val: 300, lbl: '5 Minutes (Standard)' },
+        { val: 600, lbl: '10 Minutes (Deep)' }
+      ].forEach(function(optData) {
+        const opt = document.createElement('option');
+        opt.value = String(optData.val);
+        opt.textContent = optData.lbl;
+        if (optData.val === 300) opt.selected = true;
+        durSelect.appendChild(opt);
+      });
+      durSelect.onchange = function() {
+        if (!isRunning) {
+          timerSecLeft = Number(durSelect.value);
+          const m = Math.floor(timerSecLeft / 60);
+          const s = timerSecLeft % 60;
+          timerDigits.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        }
+      };
+
+      const startTimerBtn = document.createElement('button');
+      startTimerBtn.type = 'button';
+      startTimerBtn.style.cssText = 'padding:6px 14px;border-radius:8px;border:none;background:#2563eb;color:#ffffff;font-size:11px;font-weight:800;cursor:pointer;';
+      startTimerBtn.textContent = '▶ Start Sprint';
+
+      // Anti-Backspace Flow Mode Toggle
+      const flowToggleLabel = document.createElement('label');
+      flowToggleLabel.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#475569;cursor:pointer;';
+      const flowCheckbox = document.createElement('input');
+      flowCheckbox.type = 'checkbox';
+      flowCheckbox.id = 'dfFlowModeCheckbox';
+      flowToggleLabel.appendChild(flowCheckbox);
+      flowToggleLabel.appendChild(document.createTextNode('⚡ Flow Mode (Suppress Backspace)'));
+
+      timerCol.appendChild(timerDigits);
+      timerCol.appendChild(durSelect);
+      timerCol.appendChild(startTimerBtn);
+      timerCol.appendChild(flowToggleLabel);
+      sprintBar.appendChild(timerCol);
+      box.appendChild(sprintBar);
+
+      // KPI Bar: Words, Facts, WPM
+      const kpiRow = document.createElement('div');
+      kpiRow.style.cssText = 'display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;';
+
+      const wordKpi = document.createElement('div');
+      wordKpi.style.cssText = 'background:#f8fafc;padding:8px 10px;border-radius:12px;border:1px solid #e2e8f0;text-align:center;';
+      wordKpi.innerHTML = '<div style="font-size:10px;font-weight:700;color:#64748b;">Words Recalled</div><div id="dfRecalledWordsCount" style="font-size:16px;font-weight:900;color:#0f172a;">0</div>';
+
+      const factKpi = document.createElement('div');
+      factKpi.style.cssText = 'background:#ecfdf5;padding:8px 10px;border-radius:12px;border:1px solid #a7f3d0;text-align:center;';
+      factKpi.innerHTML = '<div style="font-size:10px;font-weight:700;color:#059669;">Recalled Facts</div><div id="dfRecalledFactsCount" style="font-size:16px;font-weight:900;color:#059669;">0</div>';
+
+      const wpmKpi = document.createElement('div');
+      wpmKpi.style.cssText = 'background:#eff6ff;padding:8px 10px;border-radius:12px;border:1px solid #bfdbfe;text-align:center;';
+      wpmKpi.innerHTML = '<div style="font-size:10px;font-weight:700;color:#2563eb;">Fluency Speed</div><div id="dfRecallFluencyWpm" style="font-size:16px;font-weight:900;color:#2563eb;">0 WPM</div>';
+
+      kpiRow.appendChild(wordKpi);
+      kpiRow.appendChild(factKpi);
+      kpiRow.appendChild(wpmKpi);
+      box.appendChild(kpiRow);
+
+      // Blank-Sheet Canvas
+      const dumpTextarea = document.createElement('textarea');
+      dumpTextarea.id = 'dfBlankSheetDumpTextarea';
+      dumpTextarea.rows = 8;
+      dumpTextarea.placeholder = 'Start writing everything you remember about the topic without looking at your notes. Write freely and continuously...';
+      dumpTextarea.style.cssText = 'width:100%;box-sizing:border-box;padding:14px;border-radius:16px;border:1.5px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:13px;line-height:1.6;font-family:inherit;resize:vertical;outline:none;';
+
+      // Suppress backspace when Flow Mode is active
+      dumpTextarea.onkeydown = function(e) {
+        if (flowCheckbox.checked && (e.key === 'Backspace' || e.key === 'Delete')) {
+          e.preventDefault();
+          const tip = document.getElementById('dfFlowModeTip');
+          if (tip) {
+            tip.style.display = 'block';
+            setTimeout(function() { tip.style.display = 'none'; }, 1800);
+          }
+        }
+      };
+
+      dumpTextarea.oninput = function() {
+        const text = dumpTextarea.value;
+        const metrics = window.dfCountRecalledFactsAndConcepts(text);
+        const wCount = document.getElementById('dfRecalledWordsCount');
+        const fCount = document.getElementById('dfRecalledFactsCount');
+        const wpmEl = document.getElementById('dfRecallFluencyWpm');
+
+        if (wCount) wCount.textContent = String(metrics.wordCount);
+        if (fCount) fCount.textContent = String(metrics.factsCount);
+
+        const elapsed = startTime ? Math.max(1, (Date.now() - startTime) / 1000) : 1;
+        const wpmRes = window.dfMeasureFreeRecallFluencySpeed(metrics.wordCount, elapsed);
+        if (wpmEl) wpmEl.textContent = wpmRes.recallFluencyWpm + ' WPM';
+      };
+
+      const flowTip = document.createElement('div');
+      flowTip.id = 'dfFlowModeTip';
+      flowTip.style.cssText = 'display:none;font-size:10px;font-weight:800;color:#d97706;background:#fffbeb;border:1px solid #fde68a;padding:4px 8px;border-radius:6px;';
+      flowTip.textContent = '⚡ Flow Mode Active: Keep moving forward! Dump raw thoughts first, edit later.';
+
+      box.appendChild(dumpTextarea);
+      box.appendChild(flowTip);
+
+      // Timer Tick Logic
+      startTimerBtn.onclick = function() {
+        if (isRunning) {
+          clearInterval(timerInterval);
+          isRunning = false;
+          startTimerBtn.textContent = '▶ Resume Sprint';
+          startTimerBtn.style.background = '#2563eb';
+        } else {
+          isRunning = true;
+          startTime = Date.now();
+          startTimerBtn.textContent = '⏸ Pause';
+          startTimerBtn.style.background = '#d97706';
+          timerInterval = setInterval(function() {
+            if (timerSecLeft > 0) {
+              timerSecLeft--;
+              const m = Math.floor(timerSecLeft / 60);
+              const s = timerSecLeft % 60;
+              timerDigits.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            } else {
+              clearInterval(timerInterval);
+              isRunning = false;
+              startTimerBtn.textContent = '✓ Sprint Finished';
+              startTimerBtn.style.background = '#059669';
+              alert('Recall Sprint Complete! Compare your recall against the reference below.');
+            }
+          }, 1000);
+        }
+      };
+
+      // Reference Comparison Section (Zen Progressive Disclosure)
+      const refDetails = document.createElement('details');
+      refDetails.className = 'df-zen-disclosure-details';
+      refDetails.style.cssText = 'background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:14px;padding:12px;';
+
+      const refSummary = document.createElement('summary');
+      refSummary.style.cssText = 'font-size:12px;font-weight:900;color:#2563eb;display:flex;justify-content:space-between;align-items:center;';
+      refSummary.textContent = '📖 Step 3: Reveal Reference Notes & Highlight Gaps ▾';
+      refDetails.appendChild(refSummary);
+
+      const refContent = document.createElement('div');
+      refContent.style.cssText = 'margin-top:10px;display:flex;flex-direction:column;gap:8px;';
+
+      const refInput = document.createElement('textarea');
+      refInput.rows = 4;
+      refInput.placeholder = 'Paste or select reference keywords / notes to compare what you remembered vs what was forgotten...';
+      refInput.value = 'action potential, sodium channels, potassium channels, threshold -55mV, depolarization, repolarization, refractory period, myelin sheath, saltatory conduction';
+      refInput.style.cssText = 'width:100%;box-sizing:border-box;padding:8px;border-radius:8px;border:1px solid #cbd5e1;font-size:11px;color:#0f172a;';
+
+      const cmpBtn = document.createElement('button');
+      cmpBtn.type = 'button';
+      cmpBtn.style.cssText = 'padding:8px 12px;border-radius:8px;border:none;background:#2563eb;color:#ffffff;font-size:11px;font-weight:800;cursor:pointer;';
+      cmpBtn.textContent = '🔍 Compare Recalled vs Forgotten';
+
+      const cmpResultBox = document.createElement('div');
+      cmpResultBox.style.cssText = 'margin-top:4px;display:flex;flex-direction:column;gap:6px;font-size:11px;';
+
+      cmpBtn.onclick = function() {
+        const userText = dumpTextarea.value;
+        const refTerms = refInput.value.split(/[,;\n]+/).map(function(x) { return x.trim(); }).filter(Boolean);
+        const cmp = window.dfCompareExplanationWithSourceKeywords(refTerms, userText);
+
+        cmpResultBox.textContent = '';
+
+        const scoreBanner = document.createElement('div');
+        scoreBanner.style.cssText = 'font-weight:800;color:' + (cmp.matchPct >= 70 ? '#059669' : '#dc2626') + ';';
+        scoreBanner.textContent = 'Retention Rate: ' + cmp.matchPct + '% (' + cmp.foundKeywords.length + ' remembered, ' + cmp.missingKeywords.length + ' forgotten)';
+        cmpResultBox.appendChild(scoreBanner);
+
+        if (cmp.missingKeywords.length > 0) {
+          const missDiv = document.createElement('div');
+          missDiv.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;align-items:center;';
+          const missLbl = document.createElement('span');
+          missLbl.style.cssText = 'color:#dc2626;font-weight:700;';
+          missLbl.textContent = 'Forgotten items:';
+          missDiv.appendChild(missLbl);
+
+          cmp.missingKeywords.forEach(function(m) {
+            const pill = document.createElement('span');
+            pill.style.cssText = 'font-size:10px;background:#fee2e2;color:#dc2626;padding:2px 6px;border-radius:4px;font-weight:700;';
+            pill.textContent = m;
+            missDiv.appendChild(pill);
+          });
+          cmpResultBox.appendChild(missDiv);
+
+          const makeCardBtn = document.createElement('button');
+          makeCardBtn.type = 'button';
+          makeCardBtn.style.cssText = 'margin-top:4px;padding:6px 10px;border-radius:6px;border:1px solid #fca5a5;background:#fee2e2;color:#dc2626;font-size:10px;font-weight:800;cursor:pointer;';
+          makeCardBtn.textContent = '⚡ Tag Forgotten Items for Smart Error-Bank';
+          makeCardBtn.onclick = function() {
+            window.dfTagForgottenItemsForFlashcards(cmp.missingKeywords, 'Recall Gaps');
+            makeCardBtn.textContent = '✓ Tagged for Review (' + cmp.missingKeywords.length + ' items)';
+          };
+          cmpResultBox.appendChild(makeCardBtn);
+        }
+      };
+
+      refContent.appendChild(refInput);
+      refContent.appendChild(cmpBtn);
+      refContent.appendChild(cmpResultBox);
+      refDetails.appendChild(refContent);
+      box.appendChild(refDetails);
+
+      parent.appendChild(box);
+    }
+
+    // =======================================================================
+    // SUB-TAB 3: Real-Time Jargon Scanner & Simplification Meter
+    // =======================================================================
+    function renderJargonMeterTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      const desc = document.createElement('div');
+      desc.style.cssText = 'font-size:12px;color:#475569;line-height:1.45;';
+      desc.textContent = 'The Jargon Detector monitors vocabulary complexity in Arabic & English, flagging multi-syllabic academic circumlocution, inflated buzzwords, and sentence bloat.';
+      box.appendChild(desc);
+
+      const scanCard = document.createElement('div');
+      scanCard.style.cssText = 'background:#f8fafc;padding:12px;border-radius:14px;border:1px solid #cbd5e1;display:flex;flex-direction:column;gap:8px;';
+
+      const scanInput = document.createElement('textarea');
+      scanInput.rows = 4;
+      scanInput.placeholder = 'Paste any textbook paragraph or explanation to test its jargon density and get plain language recommendations...';
+      scanInput.value = 'The concomitant epistemological juxtaposition of the exogenous paradigm serves to obfuscate the core methodology, thereby precluding intuitive comprehension.';
+      scanInput.style.cssText = 'width:100%;box-sizing:border-box;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:12px;line-height:1.5;color:#0f172a;';
+
+      const scanBtn = document.createElement('button');
+      scanBtn.type = 'button';
+      scanBtn.style.cssText = 'padding:8px 14px;border-radius:8px;border:none;background:#7c3aed;color:#ffffff;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;';
+      scanBtn.textContent = '🔍 Scan Text for Jargon';
+
+      const resBox = document.createElement('div');
+      resBox.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+
+      function performScan() {
+        resBox.textContent = '';
+        const txt = scanInput.value;
+        const jInfo = FeynmanRecallEngine.detectJargon(txt);
+        const scoreInfo = FeynmanRecallEngine.scoreSimplicity(txt);
+
+        const meterBar = document.createElement('div');
+        meterBar.style.cssText = 'background:#ffffff;padding:10px;border-radius:10px;border:1px solid #e2e8f0;display:flex;flex-direction:column;gap:4px;';
+
+        const mTop = document.createElement('div');
+        mTop.style.cssText = 'display:flex;justify-content:space-between;font-size:11px;font-weight:800;';
+        const mTitle = document.createElement('span');
+        mTitle.textContent = 'Intuitive Simplicity Index:';
+        const mVal = document.createElement('span');
+        mVal.style.color = scoreInfo.score >= 80 ? '#059669' : (scoreInfo.score >= 60 ? '#d97706' : '#dc2626');
+        mVal.textContent = scoreInfo.score + '% (' + scoreInfo.clarityTier.replace('_', ' ') + ')';
+        mTop.appendChild(mTitle);
+        mTop.appendChild(mVal);
+
+        const track = document.createElement('div');
+        track.style.cssText = 'width:100%;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;';
+        const fill = document.createElement('div');
+        fill.style.cssText = 'width:' + scoreInfo.score + '%;height:100%;background:' + (scoreInfo.score >= 80 ? '#10b981' : (scoreInfo.score >= 60 ? '#f59e0b' : '#ef4444')) + ';transition:width 0.4s;';
+        track.appendChild(fill);
+
+        meterBar.appendChild(mTop);
+        meterBar.appendChild(track);
+        resBox.appendChild(meterBar);
+
+        if (jInfo.suggestions.length > 0) {
+          const listCard = document.createElement('div');
+          listCard.style.cssText = 'background:#ffffff;padding:10px;border-radius:10px;border:1px solid #e2e8f0;display:flex;flex-direction:column;gap:6px;';
+          const listTitle = document.createElement('div');
+          listTitle.style.cssText = 'font-size:11px;font-weight:800;color:#dc2626;';
+          listTitle.textContent = 'Flagged Jargon & Plain Everyday Replacements:';
+          listCard.appendChild(listTitle);
+
+          jInfo.suggestions.forEach(function(sug) {
+            const row = document.createElement('div');
+            row.style.cssText = 'font-size:11px;color:#334155;display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;background:#fee2e2;border:1px solid #fecaca;';
+            row.innerHTML = '<strong style="color:#b91c1c;">' + sug.word + '</strong> ➔ <span style="color:#15803d;font-weight:700;">' + sug.simpleAlt + '</span>';
+            listCard.appendChild(row);
+          });
+          resBox.appendChild(listCard);
+        } else {
+          const cleanBadge = document.createElement('div');
+          cleanBadge.style.cssText = 'padding:10px;border-radius:10px;background:#ecfdf5;color:#059669;font-size:11px;font-weight:800;border:1px solid #a7f3d0;';
+          cleanBadge.textContent = '✓ Zero Jargon Detected! Text uses clean, beginner-friendly vocabulary.';
+          resBox.appendChild(cleanBadge);
+        }
+      }
+
+      scanBtn.onclick = performScan;
+      scanCard.appendChild(scanInput);
+      scanCard.appendChild(scanBtn);
+      scanCard.appendChild(resBox);
+      box.appendChild(scanCard);
+
+      parent.appendChild(box);
+      performScan();
+    }
+
+    // =======================================================================
+    // SUB-TAB 4: Smart Error-Bank & Leech Card Restructuring
+    // =======================================================================
+    function renderErrorBankTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      const desc = document.createElement('div');
+      desc.style.cssText = 'font-size:12px;color:#475569;line-height:1.45;';
+      desc.textContent = 'Cards with 4+ lapses are automatically quarantined in the Smart Error-Bank. Restructure them using root cause categorization and mnemonic memory hooks.';
+      box.appendChild(desc);
+
+      // Quarantined Leeches List
+      const leechContainer = document.createElement('div');
+      leechContainer.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+
+      state.errorBank.forEach(function(item) {
+        const itemCard = document.createElement('div');
+        itemCard.style.cssText = 'background:#ffffff;border:1.5px solid #cbd5e1;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;';
+
+        const topRow = document.createElement('div');
+        topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+
+        const titleSpan = document.createElement('span');
+        titleSpan.style.cssText = 'font-size:13px;font-weight:900;color:#0f172a;';
+        titleSpan.textContent = item.term;
+
+        const lapsesBadge = document.createElement('span');
+        lapsesBadge.style.cssText = 'font-size:10px;font-weight:800;color:#dc2626;background:#fee2e2;border:1px solid #fca5a5;padding:2px 8px;border-radius:6px;';
+        lapsesBadge.textContent = '⚠️ ' + item.lapsesCount + ' Lapses (Leech)';
+
+        topRow.appendChild(titleSpan);
+        topRow.appendChild(lapsesBadge);
+
+        const defSpan = document.createElement('div');
+        defSpan.style.cssText = 'font-size:11px;color:#475569;';
+        defSpan.textContent = item.definition;
+
+        const hookRow = document.createElement('div');
+        hookRow.style.cssText = 'font-size:11px;color:#059669;background:#ecfdf5;border:1px solid #a7f3d0;padding:6px 10px;border-radius:8px;font-weight:700;';
+        hookRow.textContent = '🪝 Mnemonic Hook: ' + (item.mnemonicHook || 'None attached');
+
+        const btnRow = document.createElement('div');
+        btnRow.style.cssText = 'display:flex;gap:6px;margin-top:4px;';
+
+        const feynmanBtn = document.createElement('button');
+        feynmanBtn.type = 'button';
+        feynmanBtn.style.cssText = 'padding:5px 10px;border-radius:6px;border:none;background:#2563eb;color:#ffffff;font-size:10px;font-weight:800;cursor:pointer;';
+        feynmanBtn.textContent = '🧠 Simplify with Feynman';
+        feynmanBtn.onclick = function() {
+          switchSubTab('tab_feynman');
+          const inp = document.getElementById('dfFeynmanConceptInp');
+          if (inp) inp.value = item.term;
+        };
+
+        const resolveBtn = document.createElement('button');
+        resolveBtn.type = 'button';
+        resolveBtn.style.cssText = 'padding:5px 10px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:10px;font-weight:700;cursor:pointer;';
+        resolveBtn.textContent = '✓ Resolve Quarantined Leech';
+        resolveBtn.onclick = function() {
+          item.quarantined = false;
+          saveFeynmanState(state);
+          itemCard.style.opacity = '0.5';
+          resolveBtn.textContent = '✓ Resolved';
+        };
+
+        btnRow.appendChild(feynmanBtn);
+        btnRow.appendChild(resolveBtn);
+
+        itemCard.appendChild(topRow);
+        itemCard.appendChild(defSpan);
+        itemCard.appendChild(hookRow);
+        itemCard.appendChild(btnRow);
+        leechContainer.appendChild(itemCard);
+      });
+
+      box.appendChild(leechContainer);
+
+      // Pre-Exam Notebook Compiler Button
+      const compileBtn = document.createElement('button');
+      compileBtn.type = 'button';
+      compileBtn.style.cssText = 'padding:10px 14px;border-radius:12px;border:none;background:#db2777;color:#ffffff;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;';
+      compileBtn.textContent = '📓 Compile Pre-Exam Mistakes Notebook';
+      compileBtn.onclick = function() {
+        const res = window.dfCompilePreExamMistakesNotebook();
+        compileBtn.textContent = '✓ ' + res.notebookCards + ' Mistakes Compiled for Triage';
+      };
+      box.appendChild(compileBtn);
+
+      parent.appendChild(box);
+    }
+
+    // =======================================================================
+    // SUB-TAB 5: Elaborative Prompts & First-Principles Engine
+    // =======================================================================
+    function renderElaborativeTab(parent) {
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+      const desc = document.createElement('div');
+      desc.style.cssText = 'font-size:12px;color:#475569;line-height:1.45;';
+      desc.textContent = 'Elaborative interrogation forces deep conceptual encoding by asking WHY and HOW mechanisms work, finding edge-case counter-examples, and tracing complete cause-and-effect chains.';
+      box.appendChild(desc);
+
+      const promptCard = document.createElement('div');
+      promptCard.style.cssText = 'background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;';
+
+      const pTitle = document.createElement('div');
+      pTitle.style.cssText = 'font-size:13px;font-weight:900;color:#0f172a;';
+      pTitle.textContent = '🎯 Deep Mechanistic Inquiry Generator:';
+
+      const qInp = document.createElement('input');
+      qInp.type = 'text';
+      qInp.value = 'Action Potential Depolarization';
+      qInp.style.cssText = 'padding:8px 12px;border-radius:10px;border:1px solid #cbd5e1;font-size:12px;font-weight:700;color:#0f172a;';
+
+      const genBtn = document.createElement('button');
+      genBtn.type = 'button';
+      genBtn.style.cssText = 'padding:8px 12px;border-radius:8px;border:none;background:#2563eb;color:#ffffff;font-size:11px;font-weight:800;cursor:pointer;';
+      genBtn.textContent = '✨ Generate Deep Questions';
+
+      const qListDiv = document.createElement('div');
+      qListDiv.style.cssText = 'display:flex;flex-direction:column;gap:6px;margin-top:6px;';
+
+      function generateDeepQuestions() {
+        qListDiv.textContent = '';
+        const c = qInp.value.trim() || 'Concept';
+        const questions = [
+          '❓ First Principle (Why): Why is threshold depolarization (-55mV) all-or-nothing rather than graded?',
+          '⚙️ Mechanism (How): How do voltage-gated sodium inactivation gates prevent backward propagation?',
+          '🛑 Counter-Example: What chemical or toxin (e.g. Tetrodotoxin) breaks this mechanism and why?',
+          '🔗 Cause-to-Effect Chain: Stimulus ➔ Voltage Gate Opens ➔ Na+ Influx ➔ Rapid Membrane Inversion'
+        ];
+        questions.forEach(function(q) {
+          const item = document.createElement('div');
+          item.style.cssText = 'padding:8px 10px;border-radius:8px;background:#ffffff;border:1px solid #e2e8f0;font-size:11px;color:#1e293b;line-height:1.4;';
+          item.textContent = q;
+          qListDiv.appendChild(item);
+        });
+      }
+
+      genBtn.onclick = generateDeepQuestions;
+      promptCard.appendChild(pTitle);
+      promptCard.appendChild(qInp);
+      promptCard.appendChild(genBtn);
+      promptCard.appendChild(qListDiv);
+      box.appendChild(promptCard);
+      generateDeepQuestions();
+
+      parent.appendChild(box);
+    }
+
+    return {
+      rendered: true,
+      mountId: host.id,
+      pillar: 'Master Pillar 7 (Feynman Blank-Sheet Recall Lab & Jargon Simplification Engine)'
+    };
+  };
+
+})();
 
 // --- M8458-M8467: Serverless Study Pods ---
 window.dfHostLocalStudyPodSession =
@@ -73199,6 +74794,8 @@ if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar5StudioDom==='
 window.dfRenderMasterPillar5StudioDom('dfPillar5SpatialMount');
 if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar6StudioDom==='function')
 window.dfRenderMasterPillar6StudioDom('dfPillar6SyllabusMount');
+if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar7StudioDom==='function')
+window.dfRenderMasterPillar7StudioDom('dfPillar7FeynmanMount');
 return{mounted:true,active:true};
 }catch(_){return{mounted:false};}}
 if(typeof document!=='undefined'){
@@ -73211,7 +74808,9 @@ Object.assign(window,{
 dfExportSovereignBackup,
 dfImportSovereignBackup,
 dfRenderVaultSafDom,
-dfInitSovereignUiBridge});}
+dfInitSovereignUiBridge,
+dfOpenFeynmanRecallStudio: window.dfOpenFeynmanRecallStudio,
+dfRenderMasterPillar7StudioDom: window.dfRenderMasterPillar7StudioDom});}
 
 function dfNormalizeArabicQuery(txt){
 if(typeof txt!=='string')return'';

@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Deep Focus - v21 Ultimate Edition</title>
   <style>
     :root {
@@ -655,6 +655,191 @@
       font-variant-numeric: lining-nums !important;
     }
   </style>
+  <style id="df-universal-fluid-viewport-pillar7">
+    /* =========================================================================
+       MASTER PILLAR 7: UNIVERSAL FLUID RESPONSIVE VIEWPORT & ZEN PROGRESSIVE DISCLOSURE
+       - 100dvh dynamic viewport height with 100vh fallback
+       - safe-area-inset-top/bottom/left/right for notch & gesture bar compatibility
+       - Adaptive auto-centered containers for tall phones (Xiaomi 17T Pro), tablets, iPads & desktops
+       - Zero button-drop navigation capsule layout
+       ========================================================================= */
+    :root {
+      --df-sat: env(safe-area-inset-top, 0px);
+      --df-sab: env(safe-area-inset-bottom, 0px);
+      --df-sal: env(safe-area-inset-left, 0px);
+      --df-sar: env(safe-area-inset-right, 0px);
+      --df-app-fluid-max: 480px;
+    }
+
+    html, body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      box-sizing: border-box;
+    }
+
+    body {
+      padding-top: var(--df-sat);
+      padding-bottom: calc(var(--df-sab) + 94px) !important;
+      padding-left: var(--df-sal);
+      padding-right: var(--df-sar);
+    }
+
+    .app-shell {
+      width: 100% !important;
+      max-width: var(--df-app-fluid-max) !important;
+      margin-inline: auto !important;
+      min-height: 100vh !important;
+      min-height: 100dvh !important;
+      position: relative;
+      transition: max-width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Tall Aspect Ratio Phones (Xiaomi 17T Pro, Galaxy Ultra, Sony Xperia - 19.5:9 to 21:9) */
+    @media (max-width: 500px) and (min-aspect-ratio: 19/10) {
+      body:not(.deep-lockdown) .dynamic-hero-header {
+        padding-top: max(14px, calc(var(--df-sat) + 4px)) !important;
+        padding-bottom: 22px !important;
+      }
+      .bottom-nav-capsule {
+        bottom: max(10px, calc(var(--df-sab) + 3px)) !important;
+        padding: 5px 3px !important;
+      }
+      .bnav-btn {
+        padding: 5px 2px !important;
+        font-size: 0.58rem !important;
+      }
+      .bnav-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+      }
+    }
+
+    /* Tablet & Foldable Viewport (601px - 1024px) */
+    @media (min-width: 601px) {
+      :root {
+        --df-app-fluid-max: min(92vw, 760px);
+      }
+      body:not(.deep-lockdown) .app-shell {
+        max-width: min(92vw, 760px) !important;
+      }
+      body:not(.deep-lockdown) .main-white-sheet {
+        padding: 18px 24px 34px !important;
+        border-radius: 28px !important;
+      }
+      .domain-pedestal-grid {
+        gap: 12px !important;
+      }
+      .sounds-photo-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 12px !important;
+      }
+      .bottom-nav-capsule {
+        max-width: min(calc(100% - 32px), 580px) !important;
+        padding: 8px 12px !important;
+      }
+      .bnav-btn {
+        font-size: 0.70rem !important;
+        padding: 7px 8px !important;
+      }
+      .bnav-btn svg {
+        width: 21px !important;
+        height: 21px !important;
+      }
+    }
+
+    /* Desktop & DeX Viewport (1025px+) */
+    @media (min-width: 1025px) {
+      :root {
+        --df-app-fluid-max: 960px;
+      }
+      body:not(.deep-lockdown) .app-shell {
+        max-width: 960px !important;
+      }
+      body:not(.deep-lockdown) .main-white-sheet {
+        padding: 24px 32px 42px !important;
+        border-radius: 32px !important;
+      }
+      .domain-pedestal-grid {
+        gap: 16px !important;
+      }
+      .sounds-photo-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 14px !important;
+      }
+      .analytics-kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+      }
+      .bottom-nav-capsule {
+        max-width: 620px !important;
+        padding: 8px 16px !important;
+      }
+      .bnav-btn {
+        font-size: 0.74rem !important;
+        padding: 8px 12px !important;
+      }
+      .bnav-btn svg {
+        width: 22px !important;
+        height: 22px !important;
+      }
+    }
+
+    /* Bottom Navigation Capsule Universal Fluid Protection */
+    .bottom-nav-capsule {
+      position: fixed !important;
+      bottom: max(10px, var(--df-sab)) !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: min(calc(100% - 16px), 540px) !important;
+      max-width: 540px !important;
+      background: rgba(255, 255, 255, 0.97) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border: 1px solid var(--border-soft) !important;
+      border-radius: 26px !important;
+      padding: 6px 4px !important;
+      display: flex !important;
+      justify-content: space-around !important;
+      align-items: center !important;
+      z-index: 100 !important;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12) !important;
+    }
+    .bnav-btn {
+      flex: 1 1 0px !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      padding: 6px 3px !important;
+    }
+    .bnav-btn span {
+      display: block !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      max-width: 100% !important;
+    }
+
+    /* Modal Height Resiliency with 100dvh */
+    .modal-overlay {
+      padding: max(16px, var(--df-sat)) max(16px, var(--df-sar)) max(16px, var(--df-sab)) max(16px, var(--df-sal)) !important;
+    }
+    .modal-card {
+      max-height: min(88vh, 88dvh) !important;
+    }
+
+    /* Zen Progressive Disclosure Styling */
+    .df-zen-disclosure-details summary {
+      list-style: none;
+      cursor: pointer;
+    }
+    .df-zen-disclosure-details summary::-webkit-details-marker {
+      display: none;
+    }
+    .df-zen-focus-active {
+      box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.45) !important;
+      z-index: 150 !important;
+      position: relative !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -825,6 +1010,7 @@
             <button type="button" class="delta-chip" id="btnLaunchWhiteboardStudio" style="background:#f5f3ff; color:#7c3aed; font-weight:800; border:1px solid #ddd6fe;" onclick="dfOpenWhiteboardStudioFromTimer()" data-i18n="btnWhiteboardStudio">🎨 Whiteboard & Occlusion ↗</button>
             <button type="button" class="delta-chip" id="btnLaunchSpatialAudioStudio" style="background:#fef3c7; color:#b45309; font-weight:800; border:1px solid #fde68a;" onclick="dfOpenSpatialAudioStudio()" data-i18n="btnSpatialAudio">🎧 3D Spatial & 40Hz ↗</button>
             <button type="button" class="delta-chip" id="btnToggleScratchpadOverlay" style="background:#ecfdf5; color:#059669; font-weight:800; border:1px solid #a7f3d0;" onclick="dfToggleFloatingScratchpadOverlay(true)" data-i18n="btnScratchpadOverlay">✏️ Scratchpad</button>
+            <button type="button" class="delta-chip" id="btnLaunchFeynmanStudio" style="background:#fdf2f8; color:#db2777; font-weight:800; border:1px solid #fbcfe8;" onclick="dfOpenFeynmanRecallStudio()" data-i18n="btnFeynmanStudio">🧠 Feynman Lab ↗</button>
           </div>
         </div>
 
@@ -995,12 +1181,14 @@
           <button class="seg-pill" onclick="filterNotesByTag('cornell', this)" data-i18n="tagCornell">Structured Notes 📋</button>
           <button class="seg-pill" onclick="filterNotesByTag('flash', this)" data-i18n="tagFlash">Recall 👁️</button>
           <button class="seg-pill" onclick="filterNotesByTag('quick', this)" data-i18n="tagQuick">Log 💡</button>
+          <button class="seg-pill" id="btnLaunchFeynmanPill" onclick="dfOpenFeynmanRecallStudio()" style="color:#db2777; font-weight:800;" data-i18n="tagFeynman">Feynman Recall 🧠</button>
         </div>
         <div class="ns-count" id="nsVisibleCount" aria-live="polite"></div>
         <div id="dfPillar1StudioMount" aria-label="Tri-Zone Cornell Notes and Vector Mind-Map Studio"></div>
         <div id="dfPillar2SpeedReaderMount" aria-label="Speed Reading and Visual Pacing Engine"></div>
         <div id="dfPillar3StemMount" aria-label="Pure SVG STEM Typesetter and Strict Timed Exam Simulator"></div>
         <div id="dfPillar4WhiteboardMount" aria-label="Infinite Study Whiteboard and Image Occlusion Engine"></div>
+        <div id="dfPillar7FeynmanMount" aria-label="Master Pillar 7: Feynman Blank-Sheet Recall Lab & Jargon Simplification Engine"></div>
         <div class="learning-cards-stack ns-cards" id="notesStackBox"></div>
         <button class="floating-plus-fab" onclick="openNoteModal()" aria-label="New note" data-i18n-aria="nsNewButton">+</button>
       </main>
@@ -1295,5 +1483,5 @@
   <script src="completion_alert_locales.js"></script>
   <script src="js/completion_tone_picker.js"></script>
   <script src="js/deep_focus_runtime_activator.js"></script>
-<div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div><div id="dfSpeedReaderMount"></div><div id="dfPillar3StemMountHidden"></div><div id="dfPillar4WhiteboardMountHidden"></div></div></body>
+<div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div><div id="dfSpeedReaderMount"></div><div id="dfPillar3StemMountHidden"></div><div id="dfPillar4WhiteboardMountHidden"></div><div id="dfPillar7FeynmanMountHidden"></div></div></body>
 </html>

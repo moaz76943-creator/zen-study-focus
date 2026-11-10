@@ -16,7 +16,7 @@ body:not(.deep-lockdown) {
               linear-gradient(180deg,#fafdff,#fff 42%,#f9fcff 100%);
   color:var(--zen-ink);
 }
-body:not(.deep-lockdown) .app-shell {max-width:480px;}
+body:not(.deep-lockdown) .app-shell {max-width:var(--df-app-fluid-max, 480px); margin-inline:auto; min-height:100vh; min-height:100dvh;}
 body:not(.deep-lockdown) .dynamic-hero-header {
   background:linear-gradient(120deg,rgba(255,255,255,.99),rgba(244,250,255,.98)) !important;
   border-bottom:1px solid rgba(209,226,252,.72);
