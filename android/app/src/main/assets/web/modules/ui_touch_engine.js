@@ -580,3 +580,65 @@
 
   window.addEventListener('load', initErrorBankController);
 })();
+
+/* ==============================================================================
+ * Comprehensive Botanical Garden Controller Bindings (Task #639)
+ * ============================================================================== */
+(function() {
+  'use strict';
+
+  function initBotanicalController() {
+    if (typeof BotanicalEngine !== 'function') return;
+
+    const gardenCanvas = document.querySelector('#botanicalCanvas, .botanical-canvas, canvas[data-garden]');
+    if (!gardenCanvas) return;
+
+    gardenCanvas.width = gardenCanvas.parentElement ? gardenCanvas.parentElement.clientWidth : 360;
+    gardenCanvas.height = 260;
+
+    const engine = new BotanicalEngine(gardenCanvas);
+    window.activeBotanicalEngine = engine;
+    engine.renderCurrentTree();
+
+    // 1. Connect Species Selection Buttons (Bonsai, Bamboo, Sakura, Oak)
+    const allButtons = document.querySelectorAll('button');
+    allButtons.forEach(btn => {
+      const text = btn.textContent.toLowerCase().trim();
+      if (text.includes('bonsai') || text.includes('بونساي')) {
+        btn.addEventListener('click', () => { engine.setSpecies('bonsai'); highlight(btn); });
+      } else if (text.includes('bamboo') || text.includes('خيزران')) {
+        btn.addEventListener('click', () => { engine.setSpecies('bamboo'); highlight(btn); });
+      } else if (text.includes('sakura') || text.includes('كرز') || text.includes('ساكورا')) {
+        btn.addEventListener('click', () => { engine.setSpecies('sakura'); highlight(btn); });
+      } else if (text.includes('oak') || text.includes('سنديان')) {
+        btn.addEventListener('click', () => { engine.setSpecies('oak'); highlight(btn); });
+      } else if (text.includes('plant') || text.includes('اغرس') || text.includes('harvest')) {
+        btn.addEventListener('click', () => {
+          const res = engine.plantCurrentTree('Focused Study Session', 45);
+          btn.style.transform = 'scale(0.92)';
+          btn.style.background = '#059669';
+          btn.style.color = '#FFFFFF';
+          btn.textContent = `✓ Planted! (${res.totalGardenTrees} Trees)`;
+          setTimeout(() => {
+            btn.style.transform = '';
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.textContent = '🌱 Plant in Garden';
+          }, 1800);
+        });
+      }
+    });
+
+    function highlight(activeBtn) {
+      allButtons.forEach(b => {
+        if (b.textContent.toLowerCase().includes('bonsai') || b.textContent.toLowerCase().includes('bamboo') ||
+            b.textContent.toLowerCase().includes('sakura') || b.textContent.toLowerCase().includes('oak')) {
+          b.style.outline = '';
+        }
+      });
+      activeBtn.style.outline = '2px solid #059669';
+    }
+  }
+
+  window.addEventListener('load', initBotanicalController);
+})();
