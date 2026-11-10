@@ -83495,3 +83495,21 @@ window.dfInitVaultBackup = function() {
         window.dfRenderVaultBackup('dfBackupMount');
     }
 };
+
+/* ==============================================================================
+ * Sovereign Dogfood Simulator & AAA Benchmark Bridge (v440.0.0)
+ * ============================================================================== */
+window.ZenDogfoodBridge = {
+  version: '440.0.0',
+  async runAudit() {
+    if (typeof DogfoodSimulator === 'function') {
+      const sim = new DogfoodSimulator({
+        logCallback: (msg) => console.log('[DogfoodQA] ' + msg)
+      });
+      return await sim.runFullBenchmark();
+    } else {
+      console.warn('[DogfoodQA] DogfoodSimulator module not attached to window.');
+      return null;
+    }
+  }
+};
