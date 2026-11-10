@@ -82549,12 +82549,12 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
       const logRes = (typeof global.dfLogReadingSessionMetricsLocal === 'function')
         ? global.dfLogReadingSessionMetricsLocal(400, 100, { wordsRead: 350, subject: 'Neuroscience' })
         : { loggedWpm: 400, netWpm: 400, savedLocal: true };
-      const pauseRes = (typeof global.dfPauseFocalStreamRsvp === 'function')
+      const pauseRsvpRes = (typeof global.dfPauseFocalStreamRsvp === 'function')
         ? global.dfPauseFocalStreamRsvp()
         : { running: false, wordIndex: 3 };
       results.steps.push({
         step: 'SESSION_METRICS_LOG_AND_CLEAN_PAUSE',
-        success: Boolean(logRes && logRes.savedLocal && !pauseRes.running),
+        success: Boolean(logRes && logRes.savedLocal && !pauseRsvpRes.running),
         playbackState: 'PAUSED_CLEAN'
       });
 
@@ -83465,3 +83465,33 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
 
 
 
+
+// ==============================================================================
+// Android Home Screen Widget Integration (v437.0.0)
+// ==============================================================================
+window.dfInitWidgetSync = function() {
+    const mount = document.getElementById('dfWidgetMount');
+    if (mount && window.dfRenderWidgetSimulator) {
+        window.dfRenderWidgetSimulator('dfWidgetMount');
+    }
+};
+
+// ==============================================================================
+// Cognitive Flow Profiler Integration (v438.0.0)
+// ==============================================================================
+window.dfInitCognitiveProfiler = function() {
+    const mount = document.getElementById('dfCognitiveMount');
+    if (mount && window.dfRenderCognitiveProfiler) {
+        window.dfRenderCognitiveProfiler('dfCognitiveMount');
+    }
+};
+
+// ==============================================================================
+// Sovereign Encrypted Vault Backup Integration (v439.0.0)
+// ==============================================================================
+window.dfInitVaultBackup = function() {
+    const mount = document.getElementById('dfBackupMount');
+    if (mount && window.dfRenderVaultBackup) {
+        window.dfRenderVaultBackup('dfBackupMount');
+    }
+};
