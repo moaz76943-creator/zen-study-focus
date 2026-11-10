@@ -83617,3 +83617,9 @@ if (typeof window !== 'undefined' && window.LocalStudyPodEngine) {
   window.dfLocalStudyPodEngine = new window.LocalStudyPodEngine();
   console.log('[Runtime] LocalStudyPodEngine successfully mounted.');
 }
+
+// Auto-wire FocusCommitmentContracts into runtime
+if (typeof window !== 'undefined' && window.FocusCommitmentContracts) {
+  window.dfFocusCommitmentContracts = new window.FocusCommitmentContracts();
+  console.log('[Runtime] FocusCommitmentContracts successfully mounted.');
+}
