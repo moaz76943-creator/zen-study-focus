@@ -808,9 +808,10 @@
             <div style="font-size:0.72rem; font-weight:800; color:var(--violet);" data-i18n="readTrackerTitle">📖 Reading Session Progress</div>
             <div style="font-size:0.84rem; font-weight:900;" id="readPagesCounterTxt">Pages Read Today: 0</div>
           </div>
-          <div style="display:flex; gap:5px;">
+          <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center;">
             <button class="delta-chip" onclick="addReadPages(5)">+5</button>
             <button class="delta-chip" onclick="addReadPages(10)">+10</button>
+            <button type="button" class="delta-chip" id="btnLaunchSpeedReader" style="background:#eff6ff; color:#2563eb; font-weight:800; border:1px solid #bfdbfe;" onclick="dfOpenSpeedReaderFromTimer()" data-i18n="btnSpeedReader">⚡ Speed Reader</button>
           </div>
         </div>
 
@@ -982,6 +983,7 @@
         </div>
         <div class="ns-count" id="nsVisibleCount" aria-live="polite"></div>
         <div id="dfPillar1StudioMount" aria-label="Tri-Zone Cornell Notes and Vector Mind-Map Studio"></div>
+        <div id="dfPillar2SpeedReaderMount" aria-label="Speed Reading and Visual Pacing Engine"></div>
         <div class="learning-cards-stack ns-cards" id="notesStackBox"></div>
         <button class="floating-plus-fab" onclick="openNoteModal()" aria-label="New note" data-i18n-aria="nsNewButton">+</button>
       </main>
@@ -1270,5 +1272,5 @@
   <script src="completion_alert_locales.js"></script>
   <script src="js/completion_tone_picker.js"></script>
   <script src="js/deep_focus_runtime_activator.js"></script>
-<div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div></div></body>
+<div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div><div id="dfSpeedReaderMount"></div></div></body>
 </html>
