@@ -83623,3 +83623,9 @@ if (typeof window !== 'undefined' && window.FocusCommitmentContracts) {
   window.dfFocusCommitmentContracts = new window.FocusCommitmentContracts();
   console.log('[Runtime] FocusCommitmentContracts successfully mounted.');
 }
+
+// Auto-wire PersonalBestLeaderboard into runtime
+if (typeof window !== 'undefined' && window.PersonalBestLeaderboard) {
+  window.dfPersonalBestLeaderboard = new window.PersonalBestLeaderboard();
+  console.log('[Runtime] PersonalBestLeaderboard successfully mounted.');
+}
