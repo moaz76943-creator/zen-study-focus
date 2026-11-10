@@ -1,0 +1,23 @@
+Deep Focus — Sovereign Offline Study & Academic Mastery
+
+Master your academic goals in a distraction-free, air-gapped study environment built for students, university scholars, and deep learners.
+
+✦ 100% Offline & Private (Zero Telemetry)
+No cloud servers. No tracking. Your notes, study schedules, and flashcard vaults remain strictly on your local device.
+
+✦ State-of-the-Art FSRS-4.5 Spaced Repetition
+Harness the proven Free Spaced Repetition Scheduler algorithm to optimize retention intervals with personalized difficulty and stability curves.
+
+✦ Real-Time Procedural Soundscapes
+Synthesize pure pink noise, rain resonance, and 40Hz binaural waves natively via Web Audio API without looping audio files.
+
+✦ Tri-Zone Cornell Note Architecture
+Organize thoughts systematically into Cues, Notes, and Summary zones, linked directly to flashcards.
+
+✦ RSVP Speed Reader & ORP Visual Guide
+Process academic texts at 100 to 1000 words per minute with Optical Recognition Point focal alignment.
+
+✦ Botanical Zen Garden & Habit Matrix
+Watch procedural bonsai and bamboo trees flourish through consistent daily focus sessions.
+
+Reclaim your focus and academic sovereignty with Deep Focus.
