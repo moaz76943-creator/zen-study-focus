@@ -822,6 +822,8 @@
           </div>
           <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center;">
             <button type="button" class="delta-chip" id="btnLaunchStemStudio" style="background:#eff6ff; color:#2563eb; font-weight:800; border:1px solid #bfdbfe;" onclick="dfOpenStemStudioFromTimer()" data-i18n="btnStemStudio">📐 STEM Studio ↗</button>
+            <button type="button" class="delta-chip" id="btnLaunchWhiteboardStudio" style="background:#f5f3ff; color:#7c3aed; font-weight:800; border:1px solid #ddd6fe;" onclick="dfOpenWhiteboardStudioFromTimer()" data-i18n="btnWhiteboardStudio">🎨 Whiteboard & Occlusion ↗</button>
+            <button type="button" class="delta-chip" id="btnToggleScratchpadOverlay" style="background:#ecfdf5; color:#059669; font-weight:800; border:1px solid #a7f3d0;" onclick="dfToggleFloatingScratchpadOverlay(true)" data-i18n="btnScratchpadOverlay">✏️ Scratchpad</button>
           </div>
         </div>
 
@@ -995,6 +997,7 @@
         <div id="dfPillar1StudioMount" aria-label="Tri-Zone Cornell Notes and Vector Mind-Map Studio"></div>
         <div id="dfPillar2SpeedReaderMount" aria-label="Speed Reading and Visual Pacing Engine"></div>
         <div id="dfPillar3StemMount" aria-label="Pure SVG STEM Typesetter and Strict Timed Exam Simulator"></div>
+        <div id="dfPillar4WhiteboardMount" aria-label="Infinite Study Whiteboard and Image Occlusion Engine"></div>
         <div class="learning-cards-stack ns-cards" id="notesStackBox"></div>
         <button class="floating-plus-fab" onclick="openNoteModal()" aria-label="New note" data-i18n-aria="nsNewButton">+</button>
       </main>
@@ -1253,6 +1256,8 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="dfQuickScratchpadModal" style="z-index:340;"></div>
+
   <script src="js/dom_compat.js"></script>
   <script src="locale_rows.js"></script>
   <script src="locale_extras.js"></script>
@@ -1283,5 +1288,5 @@
   <script src="completion_alert_locales.js"></script>
   <script src="js/completion_tone_picker.js"></script>
   <script src="js/deep_focus_runtime_activator.js"></script>
-<div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div><div id="dfSpeedReaderMount"></div><div id="dfPillar3StemMountHidden"></div></div></body>
+<div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div><div id="dfSpeedReaderMount"></div><div id="dfPillar3StemMountHidden"></div><div id="dfPillar4WhiteboardMountHidden"></div></div></body>
 </html>
