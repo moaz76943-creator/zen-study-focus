@@ -83513,3 +83513,17 @@ window.ZenDogfoodBridge = {
     }
   }
 };
+
+/* ==============================================================================
+ * Sovereign P2P Capsule Exchange Bridge (v442.0.0)
+ * ============================================================================== */
+window.ZenP2PBridge = {
+  version: '442.0.0',
+  instance: null,
+  getExchange() {
+    if (!this.instance && typeof P2PCapsuleExchange === 'function') {
+      this.instance = new P2PCapsuleExchange();
+    }
+    return this.instance;
+  }
+};
