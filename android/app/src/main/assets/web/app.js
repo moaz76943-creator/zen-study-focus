@@ -83704,3 +83704,7 @@ if (typeof ConsolidatedModuleLoader !== "undefined") {
 if (typeof StudioNavigatorDrawer !== "undefined") {
     StudioNavigatorDrawer.init();
 }
+
+// [Task #658] Precision Timer & Back Button Init
+if (typeof HighPrecisionTimerEngine !== "undefined") HighPrecisionTimerEngine.init();
+if (typeof BackButtonManager !== "undefined") BackButtonManager.init();
