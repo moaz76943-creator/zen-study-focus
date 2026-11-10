@@ -1,23 +1,26 @@
-Deep Focus — Sovereign Offline Study & Academic Mastery
+تطبيق ديب فوكس (Deep Focus) — مساحتك الأكاديمية السيادية للتركيز والمذاكرة العميقة
 
-Master your academic goals in a distraction-free, air-gapped study environment built for students, university scholars, and deep learners.
+حقق أهدافك الدراسية واستعد صفاء ذهنك في بيئة دراسية هادئة، تعمل بالكامل بدون إنترنت وبدون أي تشتيت، مصممة خصيصاً للطلاب والباحثين الأكاديميين.
 
-✦ 100% Offline & Private (Zero Telemetry)
-No cloud servers. No tracking. Your notes, study schedules, and flashcard vaults remain strictly on your local device.
+✦ خصوصية تامة بنسبة 100% بدون إنترنت (Zero Tracking)
+لا توجد خوادم سحابية ولا تتبع لبياناتك. جميع ملاحظاتك، وبطاقاتك التعليمية، وسجلات مذاكرتك تبقى مشفرة ومحفوظة محلياً داخل جهازك فقط.
 
-✦ State-of-the-Art FSRS-4.5 Spaced Repetition
-Harness the proven Free Spaced Repetition Scheduler algorithm to optimize retention intervals with personalized difficulty and stability curves.
+✦ خوارزمية التكرار المتباعد المتقدمة (FSRS-4.5)
+استفد من أحدث خوارزمية علمية لتثبيت الحفظ في الذاكرة طويلة المدى، مع منحنيات ذكية تتكيف مع مستوى استقرار وصعوبة كل بطاقة استذكار لتقليل مجهود المراجعة.
 
-✦ Real-Time Procedural Soundscapes
-Synthesize pure pink noise, rain resonance, and 40Hz binaural waves natively via Web Audio API without looping audio files.
+✦ صوتيات تركيز إجرائية وموجات غاما وألفا (Zero-Music)
+توليد فوري ومباشر لأصوات الضوضاء الوردية، وصوت المطر، وموجات غاما 40 هرتز العلمية عبر محرك الصوت Web Audio بدون مقاطع موسيقية مكررة.
 
-✦ Tri-Zone Cornell Note Architecture
-Organize thoughts systematically into Cues, Notes, and Summary zones, linked directly to flashcards.
+✦ هيكلية كورنيل ثلاثية المناطق لتدوين الملاحظات
+قسّم أفكارك وملاحظاتك الأكاديمية باحترافية إلى: إشارات، وملاحظات، وملخصات، مع ربط ثنائي الاتجاه بالبطاقات التعليمية لمراجعة أسرع.
 
-✦ RSVP Speed Reader & ORP Visual Guide
-Process academic texts at 100 to 1000 words per minute with Optical Recognition Point focal alignment.
+✦ استوديو القراءة السريعة البصرية (RSVP)
+اقرأ الكتب والمراجع العلمية بسرعة تتراوح بين 100 إلى 1000 كلمة في الدقيقة مع نقطة التركيز البصري الذكية (ORP) لتقليل حركة العين وزيادة الاستيعاب.
 
-✦ Botanical Zen Garden & Habit Matrix
-Watch procedural bonsai and bamboo trees flourish through consistent daily focus sessions.
+✦ مرسم الصيغ الرياضية والهندسية (STEM)
+عرض المعادلات الرياضية المعقدة، والكسور، والجذور، والمصفوفات بوضوح فيكتور فائق الدقة (SVG) دون الحاجة لأي مكتبات خارجية.
 
-Reclaim your focus and academic sovereignty with Deep Focus.
+✦ حديقة زن التفاعلية ومصفوفة العادات
+شاهد انضباطك الدراسي يتجسد بصرياً في نمو أشجار البونساي والخيزران الإجرائية مع كل جلسة تركيز متواصلة، وحافظ على سلسلة إنتاجيتك السنوية.
+
+استعد سيادتك الذهنية وحقق التفوق الدراسي مع Deep Focus.
