@@ -83569,3 +83569,17 @@ window.ZenSyllabusBridge = {
     return this.instance;
   }
 };
+
+/* ==============================================================================
+ * Sovereign Feynman Error Bank Studio Bridge (v450.0.0)
+ * ============================================================================== */
+window.ZenErrorBankBridge = {
+  version: '450.0.0',
+  instance: null,
+  getStudio() {
+    if (!this.instance && typeof FeynmanErrorBankStudio === 'function') {
+      this.instance = new FeynmanErrorBankStudio();
+    }
+    return this.instance;
+  }
+};

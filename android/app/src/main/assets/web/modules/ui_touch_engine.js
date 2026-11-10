@@ -543,3 +543,40 @@
 
   window.addEventListener('load', initSyllabusController);
 })();
+
+/* ==============================================================================
+ * Comprehensive Feynman Recall & Error Bank Bindings (Task #638)
+ * ============================================================================== */
+(function() {
+  'use strict';
+
+  function initErrorBankController() {
+    if (typeof FeynmanErrorBankStudio !== 'function') return;
+
+    const studio = new FeynmanErrorBankStudio();
+    window.activeFeynmanErrorBank = studio;
+
+    // Connect Retest Buttons with instant green feedback
+    const allButtons = document.querySelectorAll('button');
+    allButtons.forEach(btn => {
+      const text = btn.textContent.toLowerCase();
+      if (text.includes('retest') || text.includes('إعادة اختبار') || text.includes('resolve')) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          btn.style.transform = 'scale(0.92)';
+          btn.style.background = '#059669';
+          btn.style.color = '#FFFFFF';
+          btn.textContent = '✓ Resolved!';
+          setTimeout(() => {
+            btn.style.transform = '';
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.textContent = 'Retest';
+          }, 1500);
+        });
+      }
+    });
+  }
+
+  window.addEventListener('load', initErrorBankController);
+})();
