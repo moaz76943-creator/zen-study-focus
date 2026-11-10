@@ -83647,3 +83647,9 @@ if (typeof window !== 'undefined' && window.DesignCritiqueButtonAuditor) {
   window.dfDesignCritiqueButtonAuditor = new window.DesignCritiqueButtonAuditor();
   console.log('[Runtime] DesignCritiqueButtonAuditor successfully mounted.');
 }
+
+// Auto-wire AmoledThemeStudio into runtime
+if (typeof window !== 'undefined' && window.AmoledThemeStudio) {
+  window.dfAmoledThemeStudio = new window.AmoledThemeStudio();
+  console.log('[Runtime] AmoledThemeStudio successfully mounted.');
+}
