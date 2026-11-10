@@ -83653,3 +83653,9 @@ if (typeof window !== 'undefined' && window.AmoledThemeStudio) {
   window.dfAmoledThemeStudio = new window.AmoledThemeStudio();
   console.log('[Runtime] AmoledThemeStudio successfully mounted.');
 }
+
+// Auto-wire StudyWrappedStory into runtime
+if (typeof window !== 'undefined' && window.StudyWrappedStory) {
+  window.dfStudyWrappedStory = new window.StudyWrappedStory();
+  console.log('[Runtime] StudyWrappedStory successfully mounted.');
+}
