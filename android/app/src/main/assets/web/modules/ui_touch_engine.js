@@ -469,3 +469,77 @@
 
   window.addEventListener('load', initAcousticController);
 })();
+
+/* ==============================================================================
+ * Comprehensive Syllabus Roadmap & Rebalance Controller (Task #637)
+ * ============================================================================== */
+(function() {
+  'use strict';
+
+  function initSyllabusController() {
+    if (typeof SyllabusLoadBalancer !== 'function') return;
+
+    const balancer = new SyllabusLoadBalancer();
+    window.activeSyllabusBalancer = balancer;
+
+    const readinessBadge = document.querySelector('.exam-ready-badge, [data-exam-ready]');
+    const daysBadge = document.querySelector('.days-to-exam-badge, [data-days-to-exam]');
+    const syllabusSelect = document.querySelector('#syllabusSelect, select[name="syllabus"]');
+    const dateInput = document.querySelector('#examDateInput, input[type="date"]');
+    const rebalanceBtn = document.querySelector('button');
+
+    function updateBadges(report) {
+      if (readinessBadge) {
+        readinessBadge.textContent = `🎓 ${report.readinessPct}% Exam Ready`;
+      }
+      if (daysBadge) {
+        daysBadge.textContent = `${report.daysRemaining} Days to Exam`;
+      }
+    }
+
+    // Connect Rebalance Button
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(btn => {
+      if (btn.textContent.includes('Rebalance') || btn.textContent.includes('إعادة توازن')) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const report = balancer.rebalance();
+          updateBadges(report);
+
+          btn.style.transform = 'scale(0.92)';
+          btn.style.background = '#059669';
+          btn.textContent = '✓ Rebalanced!';
+          setTimeout(() => {
+            btn.style.transform = '';
+            btn.style.background = '';
+            btn.textContent = '⚡ Rebalance';
+          }, 1400);
+        });
+      }
+    });
+
+    // Connect Syllabus Select
+    if (syllabusSelect) {
+      syllabusSelect.addEventListener('change', () => {
+        balancer.selectSyllabus(syllabusSelect.value);
+        const report = balancer.rebalance();
+        updateBadges(report);
+      });
+    }
+
+    // Connect Date Input
+    if (dateInput) {
+      dateInput.value = balancer.examDateString;
+      dateInput.addEventListener('change', () => {
+        balancer.setExamDate(dateInput.value);
+        const report = balancer.rebalance();
+        updateBadges(report);
+      });
+    }
+
+    // Initial update
+    updateBadges(balancer.rebalance());
+  }
+
+  window.addEventListener('load', initSyllabusController);
+})();
