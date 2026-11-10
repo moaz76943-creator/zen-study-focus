@@ -1,0 +1,1 @@
+Bezsaistes mācību vide ar FSRS-4.5 kartītēm un procedurālajiem skaņu viļņiem.
