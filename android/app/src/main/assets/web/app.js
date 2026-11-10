@@ -83689,3 +83689,8 @@ if (typeof window !== 'undefined' && window.UniversalAccessibilityStudio) {
 if (typeof ActionDispatcherEngine !== "undefined") {
     ActionDispatcherEngine.init();
 }
+
+// [Task #655] DOM Hierarchy Optimization
+if (typeof DOMFlatteningEngine !== "undefined") {
+    DOMFlatteningEngine.optimize();
+}
