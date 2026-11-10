@@ -83555,3 +83555,17 @@ window.ZenAcousticBridge = {
     return this.instance;
   }
 };
+
+/* ==============================================================================
+ * Sovereign Syllabus Roadmap & Dynamic Load-Balancer Bridge (v449.0.0)
+ * ============================================================================== */
+window.ZenSyllabusBridge = {
+  version: '449.0.0',
+  instance: null,
+  getBalancer() {
+    if (!this.instance && typeof SyllabusLoadBalancer === 'function') {
+      this.instance = new SyllabusLoadBalancer();
+    }
+    return this.instance;
+  }
+};
