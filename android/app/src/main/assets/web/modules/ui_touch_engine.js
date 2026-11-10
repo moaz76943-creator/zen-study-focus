@@ -182,3 +182,95 @@
 
   window.addEventListener('load', initFullRsvpController);
 })();
+
+/* ==============================================================================
+ * Comprehensive STEM Symbols & Typesetter Controller Bindings (Task #634)
+ * ============================================================================== */
+(function() {
+  'use strict';
+
+  function initFullStemController() {
+    if (typeof StemStudio !== 'function') return;
+
+    const stem = new StemStudio();
+    window.activeStemStudio = stem;
+
+    const formulaInput = document.querySelector('#stemFormulaInput, input[value*="E = m"], input[placeholder*="formula"]');
+    const previewContainer = document.querySelector('#stemFormulaPreview, .stem-formula-preview, [data-stem-preview]');
+    const presetSelect = document.querySelector('#stemPresetSelect, select');
+    const clozeBtn = document.querySelector('button[data-action="create-cloze"], button');
+
+    function refreshPreview() {
+      if (formulaInput && previewContainer) {
+        previewContainer.innerHTML = stem.renderFormulaSvg(formulaInput.value);
+      }
+    }
+
+    // 1. Connect all 24 Math & Greek Symbol Buttons
+    const SYMBOLS = ['π', 'θ', 'α', 'β', 'λ', 'Δ', 'Σ', 'Ω', '√', '½', '±', '×', '÷', '·', '≠', '≤', '≥', '≈', '∞', '∫', '∑', '∂', '→', '⇌'];
+    const allButtons = document.querySelectorAll('button');
+    allButtons.forEach(btn => {
+      const text = btn.textContent.trim();
+      if (SYMBOLS.includes(text)) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (formulaInput) {
+            stem.insertSymbolAtCursor(formulaInput, text);
+            refreshPreview();
+            btn.style.transform = 'scale(0.88)';
+            btn.style.background = '#2563EB';
+            btn.style.color = '#FFFFFF';
+            setTimeout(() => {
+              btn.style.transform = '';
+              btn.style.background = '';
+              btn.style.color = '';
+            }, 140);
+          }
+        });
+      }
+    });
+
+    // 2. Connect Formula Presets Dropdown
+    if (presetSelect) {
+      presetSelect.addEventListener('change', () => {
+        const val = presetSelect.value;
+        const preset = stem.loadPreset(val) || stem.loadPreset('mass_energy');
+        if (formulaInput && preset) {
+          formulaInput.value = preset.formula;
+          refreshPreview();
+        }
+      });
+    }
+
+    // 3. Connect Live Typing Input
+    if (formulaInput) {
+      formulaInput.addEventListener('input', () => refreshPreview());
+    }
+
+    // 4. Connect Create Cloze Card button with tactile toast
+    allButtons.forEach(btn => {
+      if (btn.textContent.includes('Create Cloze Card')) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const card = stem.createClozeCard();
+          if (card) {
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Cloze Card Created!';
+            btn.style.background = '#059669';
+            btn.style.color = '#FFFFFF';
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.style.background = '';
+              btn.style.color = '';
+            }, 1800);
+          }
+        });
+      }
+    });
+
+    // Initial render
+    refreshPreview();
+  }
+
+  window.addEventListener('load', initFullStemController);
+})();
