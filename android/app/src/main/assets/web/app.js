@@ -83583,3 +83583,17 @@ window.ZenErrorBankBridge = {
     return this.instance;
   }
 };
+
+/* ==============================================================================
+ * Sovereign Fractal Botanical Garden Bridge (v451.0.0)
+ * ============================================================================== */
+window.ZenBotanicalBridge = {
+  version: '451.0.0',
+  instance: null,
+  getEngine(canvas) {
+    if (!this.instance && typeof BotanicalEngine === 'function') {
+      this.instance = new BotanicalEngine(canvas);
+    }
+    return this.instance;
+  }
+};
