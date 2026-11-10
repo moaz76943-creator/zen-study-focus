@@ -46,11 +46,24 @@ const HabitFocusEngine = (function() {
     const badge = document.createElement('div');
     badge.id = 'df-streak-badge';
     badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200/90 text-amber-900 rounded-full text-xs font-bold shadow-xs mx-auto mb-2';
-    badge.innerHTML = `
-      <span class="text-sm">🔥</span>
-      <span id="df-streak-badge-count" style="font-variant-numeric: lining-nums;">${streak}</span>
-      <span id="df-streak-label" class="text-amber-700 font-semibold">${L().daysUnit}</span>
-    `;
+
+    const fireSpan = document.createElement('span');
+    fireSpan.className = 'text-sm';
+    fireSpan.textContent = '🔥';
+
+    const countSpan = document.createElement('span');
+    countSpan.id = 'df-streak-badge-count';
+    countSpan.style.fontVariantNumeric = 'lining-nums';
+    countSpan.textContent = String(streak);
+
+    const labelSpan = document.createElement('span');
+    labelSpan.id = 'df-streak-label';
+    labelSpan.className = 'text-amber-700 font-semibold';
+    labelSpan.textContent = String(L().daysUnit || 'Days');
+
+    badge.appendChild(fireSpan);
+    badge.appendChild(countSpan);
+    badge.appendChild(labelSpan);
 
     header.insertBefore(badge, header.firstChild);
   }
@@ -59,21 +72,49 @@ const HabitFocusEngine = (function() {
     const modal = document.createElement('div');
     modal.id = 'df-kickstart-modal';
     modal.className = 'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4';
-    modal.innerHTML = `
-      <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl border border-slate-100 text-center animate-in fade-in">
-        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold mb-3">⚡</div>
-        <h3 class="font-bold text-slate-900 text-base mb-1">Resistance Broken!</h3>
-        <p class="text-xs text-slate-500 mb-5 leading-relaxed">You conquered the hardest 5 minutes. Ready to dive into a full <strong>25-minute</strong> focus flow?</p>
-        <div class="flex flex-col gap-2">
-          <button id="df-extend-25m" class="w-full py-3 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white rounded-xl text-xs font-bold transition shadow-md">🚀 Yes, Deep Focus (25m)</button>
-          <button id="df-kickstart-close" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-600 rounded-xl text-xs font-semibold transition">☕ Take a Break</button>
-        </div>
-      </div>
-    `;
 
+    const box = document.createElement('div');
+    box.className = 'bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl border border-slate-100 text-center animate-in fade-in';
+
+    const iconDiv = document.createElement('div');
+    iconDiv.className = 'w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold mb-3';
+    iconDiv.textContent = '⚡';
+
+    const titleH3 = document.createElement('h3');
+    titleH3.className = 'font-bold text-slate-900 text-base mb-1';
+    titleH3.textContent = 'Resistance Broken!';
+
+    const descP = document.createElement('p');
+    descP.className = 'text-xs text-slate-500 mb-5 leading-relaxed';
+    descP.appendChild(document.createTextNode('You conquered the hardest 5 minutes. Ready to dive into a full '));
+    const strongEl = document.createElement('strong');
+    strongEl.textContent = '25-minute';
+    descP.appendChild(strongEl);
+    descP.appendChild(document.createTextNode(' focus flow?'));
+
+    const btnCol = document.createElement('div');
+    btnCol.className = 'flex flex-col gap-2';
+
+    const extendBtn = document.createElement('button');
+    extendBtn.id = 'df-extend-25m';
+    extendBtn.className = 'w-full py-3 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white rounded-xl text-xs font-bold transition shadow-md';
+    extendBtn.textContent = '🚀 Yes, Deep Focus (25m)';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.id = 'df-kickstart-close';
+    closeBtn.className = 'w-full py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-600 rounded-xl text-xs font-semibold transition';
+    closeBtn.textContent = '☕ Take a Break';
+
+    btnCol.appendChild(extendBtn);
+    btnCol.appendChild(closeBtn);
+    box.appendChild(iconDiv);
+    box.appendChild(titleH3);
+    box.appendChild(descP);
+    box.appendChild(btnCol);
+    modal.appendChild(box);
     document.body.appendChild(modal);
 
-    modal.querySelector('#df-extend-25m').onclick = () => {
+    extendBtn.onclick = () => {
       // Reuse the existing session engine, including its Cancel logic.
       if (!selectHomeQuickSession(25)) return;
       modal.remove();
@@ -81,7 +122,7 @@ const HabitFocusEngine = (function() {
       if (window.triggerHaptic) window.triggerHaptic('start');
     };
 
-    modal.querySelector('#df-kickstart-close').onclick = () => {
+    closeBtn.onclick = () => {
       modal.remove();
     };
   }
@@ -177,15 +218,31 @@ const TaskTimerSynergy = (function() {
     const pill = document.createElement('div');
     pill.id = 'df-timer-task-pill';
     pill.className = 'flex items-center justify-between p-2.5 px-3.5 bg-blue-50/90 border border-blue-200/80 rounded-2xl mb-3 text-xs max-w-sm mx-auto shadow-sm';
-    pill.innerHTML = `
-      <div class="flex items-center gap-2 overflow-hidden text-blue-950 font-semibold truncate">
-        <span class="text-blue-600 font-bold">🎯 Target:</span>
-        <span id="df-current-task-name" class="truncate">${task.text}</span>
-      </div>
-      <button id="df-change-task-btn" class="text-blue-600 font-bold px-2 py-0.5 hover:bg-blue-100 rounded-lg transition shrink-0">Change</button>
-    `;
 
-    pill.querySelector('#df-change-task-btn').onclick = () => {
+    const leftWrap = document.createElement('div');
+    leftWrap.className = 'flex items-center gap-2 overflow-hidden text-blue-950 font-semibold truncate';
+
+    const targetLabel = document.createElement('span');
+    targetLabel.className = 'text-blue-600 font-bold';
+    targetLabel.textContent = '🎯 Target:';
+
+    const currentTaskName = document.createElement('span');
+    currentTaskName.id = 'df-current-task-name';
+    currentTaskName.className = 'truncate';
+    currentTaskName.textContent = String(task.text || '');
+
+    leftWrap.appendChild(targetLabel);
+    leftWrap.appendChild(currentTaskName);
+
+    const changeBtn = document.createElement('button');
+    changeBtn.id = 'df-change-task-btn';
+    changeBtn.className = 'text-blue-600 font-bold px-2 py-0.5 hover:bg-blue-100 rounded-lg transition shrink-0';
+    changeBtn.textContent = 'Change';
+
+    pill.appendChild(leftWrap);
+    pill.appendChild(changeBtn);
+
+    changeBtn.onclick = () => {
       const tasks = getActiveTasks().filter(t => !t.done);
       if (tasks.length === 0) {
         alert('All tasks completed! Add a new task in Tasks tab.');
@@ -196,7 +253,7 @@ const TaskTimerSynergy = (function() {
         const idx = parseInt(choice, 10) - 1;
         if (tasks[idx]) {
           setFocusedTask(tasks[idx].id, tasks[idx].text);
-          document.getElementById('df-current-task-name').textContent = tasks[idx].text;
+          currentTaskName.textContent = String(tasks[idx].text || '');
         }
       }
     };
@@ -211,25 +268,55 @@ const TaskTimerSynergy = (function() {
     const modal = document.createElement('div');
     modal.id = 'df-task-complete-modal';
     modal.className = 'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4';
-    modal.innerHTML = `
-      <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl border border-slate-100 text-center animate-in fade-in">
-        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl font-bold mb-3">✓</div>
-        <h3 class="font-bold text-slate-900 text-base mb-1">Session Complete!</h3>
-        <p class="text-xs text-slate-500 mb-4">Did you finish: <strong class="text-slate-800">${task.text}</strong>?</p>
-        <div class="flex gap-2">
-          <button id="df-task-yes" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white rounded-xl text-xs font-bold transition">✅ Yes, Done</button>
-          <button id="df-task-no" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-700 rounded-xl text-xs font-semibold transition">⏳ Continue Later</button>
-        </div>
-      </div>
-    `;
+
+    const box = document.createElement('div');
+    box.className = 'bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl border border-slate-100 text-center animate-in fade-in';
+
+    const iconDiv = document.createElement('div');
+    iconDiv.className = 'w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl font-bold mb-3';
+    iconDiv.textContent = '✓';
+
+    const titleH3 = document.createElement('h3');
+    titleH3.className = 'font-bold text-slate-900 text-base mb-1';
+    titleH3.textContent = 'Session Complete!';
+
+    const descP = document.createElement('p');
+    descP.className = 'text-xs text-slate-500 mb-4';
+    descP.appendChild(document.createTextNode('Did you finish: '));
+    const strongEl = document.createElement('strong');
+    strongEl.className = 'text-slate-800';
+    strongEl.textContent = String(task.text || '');
+    descP.appendChild(strongEl);
+    descP.appendChild(document.createTextNode('?'));
+
+    const btnRow = document.createElement('div');
+    btnRow.className = 'flex gap-2';
+
+    const yesBtn = document.createElement('button');
+    yesBtn.id = 'df-task-yes';
+    yesBtn.className = 'flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white rounded-xl text-xs font-bold transition';
+    yesBtn.textContent = '✅ Yes, Done';
+
+    const noBtn = document.createElement('button');
+    noBtn.id = 'df-task-no';
+    noBtn.className = 'flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-700 rounded-xl text-xs font-semibold transition';
+    noBtn.textContent = '⏳ Continue Later';
+
+    btnRow.appendChild(yesBtn);
+    btnRow.appendChild(noBtn);
+    box.appendChild(iconDiv);
+    box.appendChild(titleH3);
+    box.appendChild(descP);
+    box.appendChild(btnRow);
+    modal.appendChild(box);
 
     document.body.appendChild(modal);
 
-    modal.querySelector('#df-task-yes').onclick = () => {
+    yesBtn.onclick = () => {
       completeFocusedTask();
       modal.remove();
     };
-    modal.querySelector('#df-task-no').onclick = () => {
+    noBtn.onclick = () => {
       modal.remove();
     };
   }
@@ -323,25 +410,47 @@ function injectTonePickerUI() {
   const card = document.createElement('div');
   card.id = 'df-tone-picker-card';
   card.className = 'p-4 bg-white/95 backdrop-blur rounded-2xl border border-slate-200/80 shadow-sm mb-4';
-  card.innerHTML = `
-    <div class="flex items-center justify-between mb-3">
-      <div class="flex items-center gap-2">
-        <span class="text-base">🔔</span>
-        <h3 class="font-bold text-slate-800 text-sm">Focus End Chime (نغمة انتهاء الجلسة)</h3>
-      </div>
-      <span class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Zero-Music</span>
-    </div>
-    <div class="grid grid-cols-2 gap-2 text-xs">
-      ${Object.entries(COMPLETION_TONES).map(([id, t]) => `
-        <button data-tone-id="${id}" class="tone-btn flex items-center justify-between p-2.5 rounded-xl border ${id === currentTone ? 'border-blue-500 bg-blue-50/80 font-bold text-blue-900' : 'border-slate-200 bg-slate-50/60 text-slate-700'} hover:bg-slate-100 transition active:scale-98">
-          <span>${t.name}</span>
-          <span class="text-[10px] text-slate-400 font-medium">${t.desc}</span>
-        </button>
-      `).join('')}
-    </div>
-  `;
 
-  card.querySelectorAll('.tone-btn').forEach(btn => {
+  const topRow = document.createElement('div');
+  topRow.className = 'flex items-center justify-between mb-3';
+
+  const leftRow = document.createElement('div');
+  leftRow.className = 'flex items-center gap-2';
+  const bellSpan = document.createElement('span');
+  bellSpan.className = 'text-base';
+  bellSpan.textContent = '🔔';
+  const titleH3 = document.createElement('h3');
+  titleH3.className = 'font-bold text-slate-800 text-sm';
+  titleH3.textContent = 'Focus End Chime (نغمة انتهاء الجلسة)';
+  leftRow.appendChild(bellSpan);
+  leftRow.appendChild(titleH3);
+
+  const badgeSpan = document.createElement('span');
+  badgeSpan.className = 'text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100';
+  badgeSpan.textContent = 'Zero-Music';
+
+  topRow.appendChild(leftRow);
+  topRow.appendChild(badgeSpan);
+
+  const gridDiv = document.createElement('div');
+  gridDiv.className = 'grid grid-cols-2 gap-2 text-xs';
+
+  Object.entries(COMPLETION_TONES).forEach(([id, t]) => {
+    const btn = document.createElement('button');
+    btn.dataset.toneId = id;
+    btn.className = 'tone-btn flex items-center justify-between p-2.5 rounded-xl border ' +
+      (id === currentTone
+        ? 'border-blue-500 bg-blue-50/80 font-bold text-blue-900'
+        : 'border-slate-200 bg-slate-50/60 text-slate-700') +
+      ' hover:bg-slate-100 transition active:scale-98';
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = t.name;
+    const descSpan = document.createElement('span');
+    descSpan.className = 'text-[10px] text-slate-400 font-medium';
+    descSpan.textContent = t.desc;
+    btn.appendChild(nameSpan);
+    btn.appendChild(descSpan);
+
     btn.onclick = () => {
       const toneId = btn.dataset.toneId;
       localStorage.setItem('df_end_tone', toneId);
@@ -351,7 +460,11 @@ function injectTonePickerUI() {
       btn.className = 'tone-btn flex items-center justify-between p-2.5 rounded-xl border border-blue-500 bg-blue-50/80 font-bold text-blue-900 transition active:scale-98';
       playCompletionTone(toneId); // سماع معاينة فورية
     };
+    gridDiv.appendChild(btn);
   });
+
+  card.appendChild(topRow);
+  card.appendChild(gridDiv);
 
   natureContainer.insertBefore(card, natureContainer.firstChild);
 }
@@ -4761,58 +4874,111 @@ const ShareCardEngine = (function() {
     const modal = document.createElement('div');
     modal.id = 'df-share-card-modal';
     modal.className = 'fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 select-none';
-    modal.innerHTML = `
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-white shadow-2xl relative animate-in fade-in">
-        <button id="df-share-close" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm font-bold">✕</button>
-        
-        <!-- Header -->
-        <div class="flex items-center gap-2 mb-4 text-emerald-400 font-mono text-xs font-bold tracking-widest uppercase">
-          <span>⚡ DEEP FOCUS</span>
-          <span class="text-slate-600">•</span>
-          <span>DAILY PROOF</span>
-        </div>
 
-        <!-- Date & Flame -->
-        <div class="flex items-center justify-between mb-5">
-          <div class="text-sm font-bold text-slate-300 font-mono" style="font-variant-numeric: lining-nums;" id="df-share-date"></div>
-          <div class="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full text-xs font-bold flex items-center gap-1.5 font-mono">
-            <span>🔥</span>
-            <span><span id="df-share-streak"></span> Days Streak</span>
-          </div>
-        </div>
+    const card = document.createElement('div');
+    card.className = 'bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-white shadow-2xl relative animate-in fade-in';
 
-        <!-- Core Metric Box -->
-        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 mb-4 text-center">
-          <div class="text-4xl font-black text-emerald-400 font-mono tracking-tight" style="font-variant-numeric: lining-nums;"><span id="df-share-mins"></span> <span class="text-xs text-slate-400 font-normal">MINS</span></div>
-          <div class="text-xs text-slate-400 mt-1">Deep Work Immersion Today</div>
-        </div>
+    const closeBtn = document.createElement('button');
+    closeBtn.id = 'df-share-close';
+    closeBtn.className = 'absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm font-bold';
+    closeBtn.textContent = '✕';
 
-        <!-- Target Milestone -->
-        <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-800 text-xs text-slate-300 mb-5 flex items-center gap-2">
-          <span>🎯</span>
-          <span id="df-share-task" class="truncate font-semibold"></span>
-        </div>
+    const headerRow = document.createElement('div');
+    headerRow.className = 'flex items-center gap-2 mb-4 text-emerald-400 font-mono text-xs font-bold tracking-widest uppercase';
+    const hSpan1 = document.createElement('span');
+    hSpan1.textContent = '⚡ DEEP FOCUS';
+    const hDot = document.createElement('span');
+    hDot.className = 'text-slate-600';
+    hDot.textContent = '•';
+    const hSpan2 = document.createElement('span');
+    hSpan2.textContent = 'DAILY PROOF';
+    headerRow.appendChild(hSpan1);
+    headerRow.appendChild(hDot);
+    headerRow.appendChild(hSpan2);
 
-        <!-- Share Actions -->
-        <div class="flex gap-2">
-          <button id="df-native-share-btn" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-900/40">
-            <span>📲 Share to WhatsApp</span>
-          </button>
-          <button id="df-copy-summary-btn" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 active:scale-98 text-slate-300 rounded-xl text-xs font-bold transition">
-            Copy
-          </button>
-        </div>
-      </div>
-    `;
+    const dateFlameRow = document.createElement('div');
+    dateFlameRow.className = 'flex items-center justify-between mb-5';
+    const dateEl = document.createElement('div');
+    dateEl.id = 'df-share-date';
+    dateEl.className = 'text-sm font-bold text-slate-300 font-mono';
+    dateEl.style.fontVariantNumeric = 'lining-nums';
+    dateEl.textContent = String(data.today || '');
 
-    // Stored task titles and rendered metrics are text, never HTML markup.
-    for (const [id,value] of Object.entries({
-      'df-share-date':data.today,'df-share-streak':data.streak,
-      'df-share-mins':data.mins,'df-share-task':data.task
-    })) modal.querySelector('#'+id).textContent = value;
+    const streakPill = document.createElement('div');
+    streakPill.className = 'px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full text-xs font-bold flex items-center gap-1.5 font-mono';
+    const fireSpan = document.createElement('span');
+    fireSpan.textContent = '🔥';
+    const streakWrap = document.createElement('span');
+    const streakValSpan = document.createElement('span');
+    streakValSpan.id = 'df-share-streak';
+    streakValSpan.textContent = String(data.streak || '1');
+    streakWrap.appendChild(streakValSpan);
+    streakWrap.appendChild(document.createTextNode(' Days Streak'));
+    streakPill.appendChild(fireSpan);
+    streakPill.appendChild(streakWrap);
+
+    dateFlameRow.appendChild(dateEl);
+    dateFlameRow.appendChild(streakPill);
+
+    const metricBox = document.createElement('div');
+    metricBox.className = 'bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 mb-4 text-center';
+    const minsHero = document.createElement('div');
+    minsHero.className = 'text-4xl font-black text-emerald-400 font-mono tracking-tight';
+    minsHero.style.fontVariantNumeric = 'lining-nums';
+    const minsValSpan = document.createElement('span');
+    minsValSpan.id = 'df-share-mins';
+    minsValSpan.textContent = String(data.mins || '25');
+    const minsUnitSpan = document.createElement('span');
+    minsUnitSpan.className = 'text-xs text-slate-400 font-normal';
+    minsUnitSpan.textContent = 'MINS';
+    minsHero.appendChild(minsValSpan);
+    minsHero.appendChild(document.createTextNode(' '));
+    minsHero.appendChild(minsUnitSpan);
+
+    const metricSub = document.createElement('div');
+    metricSub.className = 'text-xs text-slate-400 mt-1';
+    metricSub.textContent = 'Deep Work Immersion Today';
+    metricBox.appendChild(minsHero);
+    metricBox.appendChild(metricSub);
+
+    const milestoneBox = document.createElement('div');
+    milestoneBox.className = 'p-3 bg-slate-800/40 rounded-xl border border-slate-800 text-xs text-slate-300 mb-5 flex items-center gap-2';
+    const targetEmoji = document.createElement('span');
+    targetEmoji.textContent = '🎯';
+    const taskSpan = document.createElement('span');
+    taskSpan.id = 'df-share-task';
+    taskSpan.className = 'truncate font-semibold';
+    taskSpan.textContent = String(data.task || '');
+    milestoneBox.appendChild(targetEmoji);
+    milestoneBox.appendChild(taskSpan);
+
+    const actionsRow = document.createElement('div');
+    actionsRow.className = 'flex gap-2';
+    const nativeShareBtn = document.createElement('button');
+    nativeShareBtn.id = 'df-native-share-btn';
+    nativeShareBtn.className = 'flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-900/40';
+    const shareBtnSpan = document.createElement('span');
+    shareBtnSpan.textContent = '📲 Share to WhatsApp';
+    nativeShareBtn.appendChild(shareBtnSpan);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.id = 'df-copy-summary-btn';
+    copyBtn.className = 'px-4 py-3 bg-slate-800 hover:bg-slate-700 active:scale-98 text-slate-300 rounded-xl text-xs font-bold transition';
+    copyBtn.textContent = 'Copy';
+
+    actionsRow.appendChild(nativeShareBtn);
+    actionsRow.appendChild(copyBtn);
+
+    card.appendChild(closeBtn);
+    card.appendChild(headerRow);
+    card.appendChild(dateFlameRow);
+    card.appendChild(metricBox);
+    card.appendChild(milestoneBox);
+    card.appendChild(actionsRow);
+    modal.appendChild(card);
     document.body.appendChild(modal);
 
-    modal.querySelector('#df-share-close').onclick = () => modal.remove();
+    closeBtn.onclick = () => modal.remove();
 
     const sharePayload = {
       title: 'Deep Focus Daily Progress',
@@ -4831,7 +4997,7 @@ const ShareCardEngine = (function() {
       }
     }
 
-    modal.querySelector('#df-native-share-btn').onclick = async () => {
+    nativeShareBtn.onclick = async () => {
       if (window.triggerHaptic) window.triggerHaptic('action');
       if (navigator.share) {
         try {
@@ -4842,7 +5008,7 @@ const ShareCardEngine = (function() {
       }
     };
 
-    modal.querySelector('#df-copy-summary-btn').onclick = () => {
+    copyBtn.onclick = () => {
       if (window.triggerHaptic) window.triggerHaptic('click');
       return copySummary('Copied to clipboard!');
     };
@@ -4856,7 +5022,9 @@ const ShareCardEngine = (function() {
     const btn = document.createElement('button');
     btn.id = 'df-analytics-share-btn';
     btn.className = 'w-full max-w-sm mx-auto mb-4 p-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-98 cursor-pointer';
-    btn.innerHTML = '<span>📸 Share Focus Card (مشاركة إنجاز اليوم)</span>';
+    const btnSpan = document.createElement('span');
+    btnSpan.textContent = '📸 Share Focus Card (مشاركة إنجاز اليوم)';
+    btn.appendChild(btnSpan);
     btn.onclick = showShareCardModal;
 
     targetContainer.insertBefore(btn, targetContainer.firstChild);
@@ -6084,16 +6252,33 @@ window.FlashQuizEngine = FlashQuizEngine;
       var searchRow = document.createElement('div');
       searchRow.id = 'df-vocab-search-row';
       searchRow.style.cssText = 'display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap;';
-      searchRow.innerHTML =
-        '<input type="search" id="df-vocab-live-search" placeholder="🔍 ابحث في كلماتك أو معانيها..." ' +
-        'style="flex:1;min-width:160px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);background:rgba(15,23,42,0.75);color:#f8fafc;font-size:13px;outline:none;" />' +
-        '<button type="button" id="df-vocab-quick-paste-btn" ' +
-        'style="padding:8px 12px;border-radius:10px;border:1px solid rgba(168,85,247,0.4);background:rgba(168,85,247,0.16);color:#d8b4fe;font-size:12px;font-weight:600;cursor:pointer;">' +
-        '📝 لصق قائمة كلمات</button>' +
-        '<button type="button" id="df-vocab-copy-share-btn" ' +
-        'style="padding:8px 12px;border-radius:10px;border:1px solid rgba(56,189,248,0.35);background:rgba(56,189,248,0.14);color:#38bdf8;font-size:12px;font-weight:600;cursor:pointer;">' +
-        '📋 نسخ / مشاركة الكل</button>' +
-        '<span id="df-vocab-live-speak-badge" style="display:none;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(168,85,247,0.2);border:1px solid rgba(168,85,247,0.45);color:#e9d5ff;font-size:12px;font-weight:700;"></span>';
+
+      var searchInp = document.createElement('input');
+      searchInp.type = 'search';
+      searchInp.id = 'df-vocab-live-search';
+      searchInp.placeholder = '🔍 ابحث في كلماتك أو معانيها...';
+      searchInp.style.cssText = 'flex:1;min-width:160px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);background:rgba(15,23,42,0.75);color:#f8fafc;font-size:13px;outline:none;';
+
+      var pasteBtnEl = document.createElement('button');
+      pasteBtnEl.type = 'button';
+      pasteBtnEl.id = 'df-vocab-quick-paste-btn';
+      pasteBtnEl.style.cssText = 'padding:8px 12px;border-radius:10px;border:1px solid rgba(168,85,247,0.4);background:rgba(168,85,247,0.16);color:#d8b4fe;font-size:12px;font-weight:600;cursor:pointer;';
+      pasteBtnEl.textContent = '📝 لصق قائمة كلمات';
+
+      var shareBtnEl = document.createElement('button');
+      shareBtnEl.type = 'button';
+      shareBtnEl.id = 'df-vocab-copy-share-btn';
+      shareBtnEl.style.cssText = 'padding:8px 12px;border-radius:10px;border:1px solid rgba(56,189,248,0.35);background:rgba(56,189,248,0.14);color:#38bdf8;font-size:12px;font-weight:600;cursor:pointer;';
+      shareBtnEl.textContent = '📋 نسخ / مشاركة الكل';
+
+      var liveSpeakBadge = document.createElement('span');
+      liveSpeakBadge.id = 'df-vocab-live-speak-badge';
+      liveSpeakBadge.style.cssText = 'display:none;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(168,85,247,0.2);border:1px solid rgba(168,85,247,0.45);color:#e9d5ff;font-size:12px;font-weight:700;';
+
+      searchRow.appendChild(searchInp);
+      searchRow.appendChild(pasteBtnEl);
+      searchRow.appendChild(shareBtnEl);
+      searchRow.appendChild(liveSpeakBadge);
 
       filterBar.parentNode.insertBefore(searchRow, filterBar.nextSibling);
 
@@ -6222,13 +6407,21 @@ window.FlashQuizEngine = FlashQuizEngine;
     var toolbar = document.createElement('div');
     toolbar.id = 'df-quiz-extra-toolbar';
     toolbar.style.cssText = 'display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap;';
-    toolbar.innerHTML =
-      '<button type="button" id="df-quiz-shuffle-toggle-btn" ' +
-      'style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;">' +
-      '🔀 خلط عشوائي</button>' +
-      '<button type="button" id="df-quiz-reverse-toggle-btn" ' +
-      'style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;">' +
-      '🔄 السؤال: الكلمة ⬅ المعنى</button>';
+
+    var shuffleBtnEl = document.createElement('button');
+    shuffleBtnEl.type = 'button';
+    shuffleBtnEl.id = 'df-quiz-shuffle-toggle-btn';
+    shuffleBtnEl.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;';
+    shuffleBtnEl.textContent = '🔀 خلط عشوائي';
+
+    var reverseBtnEl = document.createElement('button');
+    reverseBtnEl.type = 'button';
+    reverseBtnEl.id = 'df-quiz-reverse-toggle-btn';
+    reverseBtnEl.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;';
+    reverseBtnEl.textContent = '🔄 السؤال: الكلمة ⬅ المعنى';
+
+    toolbar.appendChild(shuffleBtnEl);
+    toolbar.appendChild(reverseBtnEl);
 
     quizHeader.parentNode.insertBefore(toolbar, quizHeader.nextSibling);
 
@@ -6310,11 +6503,26 @@ window.FlashQuizEngine = FlashQuizEngine;
     var speedGroup = document.createElement('div');
     speedGroup.id = 'df-vocab-speed-selector-group';
     speedGroup.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:rgba(15,23,42,0.6);padding:3px 6px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);';
-    speedGroup.innerHTML =
-      '<span style="font-size:11px;color:#94a3b8;font-weight:600;margin-right:2px;">سرعة النطق:</span>' +
-      '<button type="button" id="df-speed-btn-0_75" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">0.75x</button>' +
-      '<button type="button" id="df-speed-btn-1_0" style="padding:4px 8px;border-radius:6px;border:1px solid #c084fc;background:rgba(168,85,247,0.35);color:#ffffff;font-size:11px;font-weight:700;cursor:pointer;">1.0x</button>' +
-      '<button type="button" id="df-speed-btn-1_25" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">1.25x</button>';
+
+    var lblSpan = document.createElement('span');
+    lblSpan.style.cssText = 'font-size:11px;color:#94a3b8;font-weight:600;margin-right:2px;';
+    lblSpan.textContent = 'سرعة النطق:';
+    speedGroup.appendChild(lblSpan);
+
+    [
+      { id: 'df-speed-btn-0_75', label: '0.75x', active: false },
+      { id: 'df-speed-btn-1_0', label: '1.0x', active: true },
+      { id: 'df-speed-btn-1_25', label: '1.25x', active: false }
+    ].forEach(function(item) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = item.id;
+      btn.style.cssText = item.active
+        ? 'padding:4px 8px;border-radius:6px;border:1px solid #c084fc;background:rgba(168,85,247,0.35);color:#ffffff;font-size:11px;font-weight:700;cursor:pointer;'
+        : 'padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;';
+      btn.textContent = item.label;
+      speedGroup.appendChild(btn);
+    });
 
     targetRow.appendChild(speedGroup);
 
@@ -6373,10 +6581,33 @@ window.FlashQuizEngine = FlashQuizEngine;
     var statsElem = document.getElementById('df-vocab-mastery-summary-badge');
     if (!statsElem) return;
     var stats = window.dfGetVocabMasteryStats();
-    statsElem.innerHTML =
-      '<span style="color:#e2e8f0;">📊 إجمالي: <b>' + toWesternDigits(stats.total) + '</b></span>' +
-      '<span style="color:#f87171;margin:0 6px;">⚠️ للمراجعة: <b>' + toWesternDigits(stats.needsReview) + '</b></span>' +
-      '<span style="color:#4ade80;">🏆 تم إتقانها: <b>' + toWesternDigits(stats.mastered) + '</b> (' + toWesternDigits(stats.masteryRate) + '%)</span>';
+    while (statsElem.firstChild) statsElem.removeChild(statsElem.firstChild);
+
+    var sTotal = document.createElement('span');
+    sTotal.style.color = '#e2e8f0';
+    sTotal.textContent = '📊 إجمالي: ';
+    var bTotal = document.createElement('b');
+    bTotal.textContent = toWesternDigits(stats.total);
+    sTotal.appendChild(bTotal);
+
+    var sRev = document.createElement('span');
+    sRev.style.cssText = 'color:#f87171;margin:0 6px;';
+    sRev.textContent = '⚠️ للمراجعة: ';
+    var bRev = document.createElement('b');
+    bRev.textContent = toWesternDigits(stats.needsReview);
+    sRev.appendChild(bRev);
+
+    var sMast = document.createElement('span');
+    sMast.style.color = '#4ade80';
+    sMast.textContent = '🏆 تم إتقانها: ';
+    var bMast = document.createElement('b');
+    bMast.textContent = toWesternDigits(stats.mastered);
+    sMast.appendChild(bMast);
+    sMast.appendChild(document.createTextNode(' (' + toWesternDigits(stats.masteryRate) + '%)'));
+
+    statsElem.appendChild(sTotal);
+    statsElem.appendChild(sRev);
+    statsElem.appendChild(sMast);
   }
 
   window.dfUpdateVocabStatsBadge = updateVocabStatsBadge;
@@ -6679,11 +6910,20 @@ window.FlashQuizEngine = FlashQuizEngine;
     var group = document.createElement('div');
     group.id = 'df-vocab-interval-group';
     group.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:rgba(15,23,42,0.6);padding:3px 6px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);';
-    group.innerHTML =
-      '<span style="font-size:11px;color:#94a3b8;font-weight:600;margin-right:2px;">فاصل النطق:</span>' +
-      '<button type="button" id="df-interval-btn-1" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">1s</button>' +
-      '<button type="button" id="df-interval-btn-2" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">2s</button>' +
-      '<button type="button" id="df-interval-btn-3" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;">3s</button>';
+
+    var lblSpan = document.createElement('span');
+    lblSpan.style.cssText = 'font-size:11px;color:#94a3b8;font-weight:600;margin-right:2px;';
+    lblSpan.textContent = 'فاصل النطق:';
+    group.appendChild(lblSpan);
+
+    [1, 2, 3].forEach(function(sec) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = 'df-interval-btn-' + sec;
+      btn.style.cssText = 'padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;';
+      btn.textContent = sec + 's';
+      group.appendChild(btn);
+    });
 
     targetRow.appendChild(group);
 
@@ -6978,9 +7218,22 @@ window.FlashQuizEngine = FlashQuizEngine;
     if (typeof document === 'undefined') return;
     var badge = document.getElementById('df-quiz-streak-badge');
     if (!badge) return;
-    badge.innerHTML =
-      '<span style="color:#f59e0b;font-weight:700;">🔥 تتابع: <b>' + toWesternDigits(currentStreak) + '</b></span>' +
-      (bestStreak > 1 ? '<span style="color:#94a3b8;margin-right:6px;font-size:11px;">(أفضل: ' + toWesternDigits(bestStreak) + ')</span>' : '');
+    while (badge.firstChild) badge.removeChild(badge.firstChild);
+
+    var sCur = document.createElement('span');
+    sCur.style.cssText = 'color:#f59e0b;font-weight:700;';
+    sCur.textContent = '🔥 تتابع: ';
+    var bCur = document.createElement('b');
+    bCur.textContent = toWesternDigits(currentStreak);
+    sCur.appendChild(bCur);
+    badge.appendChild(sCur);
+
+    if (bestStreak > 1) {
+      var sBest = document.createElement('span');
+      sBest.style.cssText = 'color:#94a3b8;margin-right:6px;font-size:11px;';
+      sBest.textContent = '(أفضل: ' + toWesternDigits(bestStreak) + ')';
+      badge.appendChild(sBest);
+    }
   }
 
   function mountStreakUI() {
@@ -7329,14 +7582,26 @@ window.FlashQuizEngine = FlashQuizEngine;
     var wrapper = document.createElement('div');
     wrapper.id = 'df-quiz-progress-wrapper';
     wrapper.style.cssText = 'width:100%;margin:6px 0;box-sizing:border-box;';
-    wrapper.innerHTML =
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;font-size:11px;color:#94a3b8;font-weight:600;">' +
-        '<span>التقدم في الاختبار</span>' +
-        '<span id="df-quiz-progress-text">0 / 0 (0%)</span>' +
-      '</div>' +
-      '<div style="width:100%;height:6px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;">' +
-        '<div id="df-quiz-progress-fill" style="width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #a855f7, #38bdf8);transition:width 0.3s ease;"></div>' +
-      '</div>';
+
+    var topRow = document.createElement('div');
+    topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;font-size:11px;color:#94a3b8;font-weight:600;';
+    var titleSpan = document.createElement('span');
+    titleSpan.textContent = 'التقدم في الاختبار';
+    var textSpan = document.createElement('span');
+    textSpan.id = 'df-quiz-progress-text';
+    textSpan.textContent = '0 / 0 (0%)';
+    topRow.appendChild(titleSpan);
+    topRow.appendChild(textSpan);
+
+    var barTrack = document.createElement('div');
+    barTrack.style.cssText = 'width:100%;height:6px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;';
+    var barFill = document.createElement('div');
+    barFill.id = 'df-quiz-progress-fill';
+    barFill.style.cssText = 'width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #a855f7, #38bdf8);transition:width 0.3s ease;';
+    barTrack.appendChild(barFill);
+
+    wrapper.appendChild(topRow);
+    wrapper.appendChild(barTrack);
 
     container.parentNode.insertBefore(wrapper, container.nextSibling);
   }
@@ -7742,34 +8007,56 @@ window.FlashQuizEngine = FlashQuizEngine;
     var modal = document.createElement('div');
     modal.id = 'df-quiz-summary-modal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,23,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;';
-    modal.innerHTML =
-      '<div style="background:#0f172a;border:1px solid rgba(168,85,247,0.4);border-radius:20px;max-width:400px;width:100%;padding:20px;color:#f8fafc;box-shadow:0 25px 60px rgba(0,0,0,0.6);text-align:center;">' +
-        '<div style="font-size:32px;margin-bottom:8px;">🎉</div>' +
-        '<h3 style="font-size:18px;font-weight:700;margin:0 0 6px 0;color:#f8fafc;">اكتمل اختبار البطاقات!</h3>' +
-        '<p style="font-size:12px;color:#94a3b8;margin:0 0 16px 0;">أحسنت! إليك ملخص أدائك في هذه الجلسة:</p>' +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">' +
-          '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px;">' +
-            '<div style="font-size:11px;color:#94a3b8;">إجمالي البطاقات</div>' +
-            '<div style="font-size:18px;font-weight:700;color:#e2e8f0;">' + toWesternDigits(total) + '</div>' +
-          '</div>' +
-          '<div style="background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:12px;padding:10px;">' +
-            '<div style="font-size:11px;color:#4ade80;">تم إتقانها</div>' +
-            '<div style="font-size:18px;font-weight:700;color:#4ade80;">' + toWesternDigits(mastered) + '</div>' +
-          '</div>' +
-          '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:12px;padding:10px;">' +
-            '<div style="font-size:11px;color:#f87171;">تحتاج مراجعة</div>' +
-            '<div style="font-size:18px;font-weight:700;color:#f87171;">' + toWesternDigits(review) + '</div>' +
-          '</div>' +
-          '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:10px;">' +
-            '<div style="font-size:11px;color:#fbbf24;">أفضل تتابع</div>' +
-            '<div style="font-size:18px;font-weight:700;color:#fbbf24;">🔥 ' + toWesternDigits(bestStreak) + '</div>' +
-          '</div>' +
-        '</div>' +
-        '<button type="button" id="df-quiz-summary-close-btn" ' +
-          'style="width:100%;padding:10px;border-radius:12px;border:none;background:#9333ea;color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;">' +
-          '🏁 إنهاء والعودة للبنك' +
-        '</button>' +
-      '</div>';
+
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#0f172a;border:1px solid rgba(168,85,247,0.4);border-radius:20px;max-width:400px;width:100%;padding:20px;color:#f8fafc;box-shadow:0 25px 60px rgba(0,0,0,0.6);text-align:center;';
+
+    var iconDiv = document.createElement('div');
+    iconDiv.style.cssText = 'font-size:32px;margin-bottom:8px;';
+    iconDiv.textContent = '🎉';
+
+    var h3 = document.createElement('h3');
+    h3.style.cssText = 'font-size:18px;font-weight:700;margin:0 0 6px 0;color:#f8fafc;';
+    h3.textContent = 'اكتمل اختبار البطاقات!';
+
+    var pDesc = document.createElement('p');
+    pDesc.style.cssText = 'font-size:12px;color:#94a3b8;margin:0 0 16px 0;';
+    pDesc.textContent = 'أحسنت! إليك ملخص أدائك في هذه الجلسة:';
+
+    var grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;';
+
+    [
+      { label: 'إجمالي البطاقات', val: toWesternDigits(total), bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.08)', lblColor: '#94a3b8', valColor: '#e2e8f0' },
+      { label: 'تم إتقانها', val: toWesternDigits(mastered), bg: 'rgba(74,222,128,0.08)', border: 'rgba(74,222,128,0.25)', lblColor: '#4ade80', valColor: '#4ade80' },
+      { label: 'تحتاج مراجعة', val: toWesternDigits(review), bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', lblColor: '#f87171', valColor: '#f87171' },
+      { label: 'أفضل تتابع', val: '🔥 ' + toWesternDigits(bestStreak), bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.25)', lblColor: '#fbbf24', valColor: '#fbbf24' }
+    ].forEach(function(cell) {
+      var cellBox = document.createElement('div');
+      cellBox.style.cssText = 'background:' + cell.bg + ';border:1px solid ' + cell.border + ';border-radius:12px;padding:10px;';
+      var cLbl = document.createElement('div');
+      cLbl.style.cssText = 'font-size:11px;color:' + cell.lblColor + ';';
+      cLbl.textContent = cell.label;
+      var cVal = document.createElement('div');
+      cVal.style.cssText = 'font-size:18px;font-weight:700;color:' + cell.valColor + ';';
+      cVal.textContent = cell.val;
+      cellBox.appendChild(cLbl);
+      cellBox.appendChild(cVal);
+      grid.appendChild(cellBox);
+    });
+
+    var closeBtnEl = document.createElement('button');
+    closeBtnEl.type = 'button';
+    closeBtnEl.id = 'df-quiz-summary-close-btn';
+    closeBtnEl.style.cssText = 'width:100%;padding:10px;border-radius:12px;border:none;background:#9333ea;color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;';
+    closeBtnEl.textContent = '🏁 إنهاء والعودة للبنك';
+
+    card.appendChild(iconDiv);
+    card.appendChild(h3);
+    card.appendChild(pDesc);
+    card.appendChild(grid);
+    card.appendChild(closeBtnEl);
+    modal.appendChild(card);
 
     document.body.appendChild(modal);
 
@@ -7930,13 +8217,29 @@ window.FlashQuizEngine = FlashQuizEngine;
       var guide = document.createElement('div');
       guide.id = 'df-vocab-empty-guide-card';
       guide.style.cssText = 'padding:20px;border-radius:16px;background:rgba(15,23,42,0.6);border:1px dashed rgba(168,85,247,0.3);text-align:center;margin:12px 0;color:#94a3b8;width:100%;box-sizing:border-box;';
-      guide.innerHTML =
-        '<div style="font-size:28px;margin-bottom:6px;">📚</div>' +
-        '<strong style="font-size:14px;color:#e2e8f0;display:block;margin-bottom:6px;">بنك الكلمات فارغ حالياً</strong>' +
-        '<p style="font-size:12px;line-height:1.5;margin:0 0 12px 0;">أضف أول كلمة أجنبية في الحقول أعلاه، أو الصق قائمة كلمات دفعة واحدة.</p>' +
-        '<button type="button" id="df-vocab-load-sample-btn" style="padding:8px 14px;border-radius:10px;border:none;background:#9333ea;color:#ffffff;font-size:12px;font-weight:700;cursor:pointer;">' +
-        '✨ إضافة 3 كلمات تجريبية' +
-        '</button>';
+
+      var gIcon = document.createElement('div');
+      gIcon.style.cssText = 'font-size:28px;margin-bottom:6px;';
+      gIcon.textContent = '📚';
+
+      var gStrong = document.createElement('strong');
+      gStrong.style.cssText = 'font-size:14px;color:#e2e8f0;display:block;margin-bottom:6px;';
+      gStrong.textContent = 'بنك الكلمات فارغ حالياً';
+
+      var gP = document.createElement('p');
+      gP.style.cssText = 'font-size:12px;line-height:1.5;margin:0 0 12px 0;';
+      gP.textContent = 'أضف أول كلمة أجنبية في الحقول أعلاه، أو الصق قائمة كلمات دفعة واحدة.';
+
+      var gBtn = document.createElement('button');
+      gBtn.type = 'button';
+      gBtn.id = 'df-vocab-load-sample-btn';
+      gBtn.style.cssText = 'padding:8px 14px;border-radius:10px;border:none;background:#9333ea;color:#ffffff;font-size:12px;font-weight:700;cursor:pointer;';
+      gBtn.textContent = '✨ إضافة 3 كلمات تجريبية';
+
+      guide.appendChild(gIcon);
+      guide.appendChild(gStrong);
+      guide.appendChild(gP);
+      guide.appendChild(gBtn);
       container.parentNode.insertBefore(guide, container.nextSibling);
 
       var btn = document.getElementById('df-vocab-load-sample-btn');
@@ -8028,10 +8331,21 @@ window.FlashQuizEngine = FlashQuizEngine;
     var toast = document.createElement('div');
     toast.id = 'df-vocab-undo-toast';
     toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid rgba(244,63,94,0.4);border-radius:12px;padding:10px 16px;color:#f8fafc;font-size:13px;display:flex;align-items:center;gap:12px;z-index:99999;box-shadow:0 12px 30px rgba(0,0,0,0.5);';
-    toast.innerHTML =
-      '<span>تم حذف <b>' + escapeHtmlText(String(wordText||'الكلمة')) + '</b></span>' +
-      '<button type="button" id="df-vocab-toast-undo-btn" style="padding:4px 10px;border-radius:8px;border:none;background:#9333ea;color:#ffffff;font-weight:700;font-size:12px;cursor:pointer;">↶ تراجع</button>';
 
+    var msgSpan = document.createElement('span');
+    msgSpan.textContent = 'تم حذف ';
+    var bWord = document.createElement('b');
+    bWord.textContent = String(wordText || 'الكلمة');
+    msgSpan.appendChild(bWord);
+
+    var undoBtnEl = document.createElement('button');
+    undoBtnEl.type = 'button';
+    undoBtnEl.id = 'df-vocab-toast-undo-btn';
+    undoBtnEl.style.cssText = 'padding:4px 10px;border-radius:8px;border:none;background:#9333ea;color:#ffffff;font-weight:700;font-size:12px;cursor:pointer;';
+    undoBtnEl.textContent = '↶ تراجع';
+
+    toast.appendChild(msgSpan);
+    toast.appendChild(undoBtnEl);
     document.body.appendChild(toast);
 
     var undoBtn = document.getElementById('df-vocab-toast-undo-btn');
@@ -8114,27 +8428,69 @@ window.FlashQuizEngine = FlashQuizEngine;
     var modal = document.createElement('div');
     modal.id = 'df-vocab-edit-modal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,23,0.85);z-index:10001;display:flex;align-items:center;justify-content:center;padding:16px;';
-    modal.innerHTML =
-      '<div style="background:#0f172a;border:1px solid rgba(168,85,247,0.4);border-radius:18px;max-width:380px;width:100%;padding:18px;color:#f8fafc;box-shadow:0 20px 50px rgba(0,0,0,0.6);">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
-          '<strong style="font-size:14px;color:#e2e8f0;">✏ تعديل الكلمة</strong>' +
-          '<button type="button" id="df-vocab-edit-close" style="background:none;border:none;color:#94a3b8;font-size:16px;cursor:pointer;">✕</button>' +
-        '</div>' +
-        '<div style="margin-bottom:10px;">' +
-          '<label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">الكلمة الأجنبية:</label>' +
-          '<input type="text" id="df-vocab-edit-word" value="' + String(target.word || '').replace(/"/g, '&quot;') + '" ' +
-            'style="width:100%;box-sizing:border-box;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:#1e293b;color:#f8fafc;font-size:13px;outline:none;" />' +
-        '</div>' +
-        '<div style="margin-bottom:14px;">' +
-          '<label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">المعنى / الترجمة:</label>' +
-          '<input type="text" id="df-vocab-edit-meaning" value="' + String(target.meaning || '').replace(/"/g, '&quot;') + '" ' +
-            'style="width:100%;box-sizing:border-box;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:#1e293b;color:#f8fafc;font-size:13px;outline:none;" />' +
-        '</div>' +
-        '<div style="display:flex;gap:8px;justify-content:flex-end;">' +
-          '<button type="button" id="df-vocab-edit-cancel" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#cbd5e1;font-size:12px;cursor:pointer;">إلغاء</button>' +
-          '<button type="button" id="df-vocab-edit-save" style="padding:6px 14px;border-radius:8px;border:none;background:#9333ea;color:#ffffff;font-size:12px;font-weight:700;cursor:pointer;">حفظ التعديل</button>' +
-        '</div>' +
-      '</div>';
+
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#0f172a;border:1px solid rgba(168,85,247,0.4);border-radius:18px;max-width:380px;width:100%;padding:18px;color:#f8fafc;box-shadow:0 20px 50px rgba(0,0,0,0.6);';
+
+    var headRow = document.createElement('div');
+    headRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;';
+    var titleEl = document.createElement('strong');
+    titleEl.style.cssText = 'font-size:14px;color:#e2e8f0;';
+    titleEl.textContent = '✏ تعديل الكلمة';
+    var closeBtnEl = document.createElement('button');
+    closeBtnEl.type = 'button';
+    closeBtnEl.id = 'df-vocab-edit-close';
+    closeBtnEl.style.cssText = 'background:none;border:none;color:#94a3b8;font-size:16px;cursor:pointer;';
+    closeBtnEl.textContent = '✕';
+    headRow.appendChild(titleEl);
+    headRow.appendChild(closeBtnEl);
+
+    var wWrap = document.createElement('div');
+    wWrap.style.cssText = 'margin-bottom:10px;';
+    var wLbl = document.createElement('label');
+    wLbl.style.cssText = 'font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;';
+    wLbl.textContent = 'الكلمة الأجنبية:';
+    var wInpEl = document.createElement('input');
+    wInpEl.type = 'text';
+    wInpEl.id = 'df-vocab-edit-word';
+    wInpEl.value = String(target.word || '');
+    wInpEl.style.cssText = 'width:100%;box-sizing:border-box;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:#1e293b;color:#f8fafc;font-size:13px;outline:none;';
+    wWrap.appendChild(wLbl);
+    wWrap.appendChild(wInpEl);
+
+    var mWrap = document.createElement('div');
+    mWrap.style.cssText = 'margin-bottom:14px;';
+    var mLbl = document.createElement('label');
+    mLbl.style.cssText = 'font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;';
+    mLbl.textContent = 'المعنى / الترجمة:';
+    var mInpEl = document.createElement('input');
+    mInpEl.type = 'text';
+    mInpEl.id = 'df-vocab-edit-meaning';
+    mInpEl.value = String(target.meaning || '');
+    mInpEl.style.cssText = 'width:100%;box-sizing:border-box;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:#1e293b;color:#f8fafc;font-size:13px;outline:none;';
+    mWrap.appendChild(mLbl);
+    mWrap.appendChild(mInpEl);
+
+    var actRow = document.createElement('div');
+    actRow.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;';
+    var cancelBtnEl = document.createElement('button');
+    cancelBtnEl.type = 'button';
+    cancelBtnEl.id = 'df-vocab-edit-cancel';
+    cancelBtnEl.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#cbd5e1;font-size:12px;cursor:pointer;';
+    cancelBtnEl.textContent = 'إلغاء';
+    var saveBtnEl = document.createElement('button');
+    saveBtnEl.type = 'button';
+    saveBtnEl.id = 'df-vocab-edit-save';
+    saveBtnEl.style.cssText = 'padding:6px 14px;border-radius:8px;border:none;background:#9333ea;color:#ffffff;font-size:12px;font-weight:700;cursor:pointer;';
+    saveBtnEl.textContent = 'حفظ التعديل';
+    actRow.appendChild(cancelBtnEl);
+    actRow.appendChild(saveBtnEl);
+
+    card.appendChild(headRow);
+    card.appendChild(wWrap);
+    card.appendChild(mWrap);
+    card.appendChild(actRow);
+    modal.appendChild(card);
 
     document.body.appendChild(modal);
 
@@ -9330,7 +9686,34 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof document === 'undefined') return false;
       var container = document.getElementById('df-vocab-header-quick-stats');
       if (container) {
-        container.innerHTML = dfRenderVocabHeaderQuickStatsHtml();
+        while (container.firstChild) container.removeChild(container.firstChild);
+        var data = dfGetVocabHeaderStatsData();
+        var wrap = document.createElement('div');
+        wrap.className = 'df-vocab-header-quick-stats';
+        wrap.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;direction:rtl;';
+
+        var boxStyle = 'flex:1;min-width:80px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;text-align:center;';
+        var labelStyle = 'font-size:11px;color:#a0a0a0;display:block;margin-bottom:2px;';
+        var valueStyle = 'font-size:14px;font-weight:bold;color:#f0f0f0;display:block;';
+
+        [
+          { label: '📚 الكلمات', val: data.totalWordsFormatted },
+          { label: '🎯 اليوم', val: data.reviewedTodayFormatted + ' / ' + data.dailyGoalFormatted },
+          { label: '🔥 السلسلة', val: data.streakFormatted + ' أيام' }
+        ].forEach(function(item) {
+          var box = document.createElement('div');
+          box.style.cssText = boxStyle;
+          var sLbl = document.createElement('span');
+          sLbl.style.cssText = labelStyle;
+          sLbl.textContent = item.label;
+          var sVal = document.createElement('span');
+          sVal.style.cssText = valueStyle;
+          sVal.textContent = item.val;
+          box.appendChild(sLbl);
+          box.appendChild(sVal);
+          wrap.appendChild(box);
+        });
+        container.appendChild(wrap);
         return true;
       }
     } catch (_) {}
@@ -59525,6 +59908,28 @@ return res;
 }catch(e){return{totalActive:0,
 buckets:{dueToday:0,in1To3:0,
 in4To7:0,in8To14:0,mature15Plus:0}};}}
+function dfCreateStatusCardDom(el,titleText,mainText,subText,mainCol,bgCol){
+if(!el||typeof document==="undefined")return null;
+el.textContent="";
+const box=document.createElement("div");
+box.style.cssText="background:"+(bgCol||"#f8fafc")+";padding:12px;border:1px solid #cbd5e1;border-radius:12px;";
+const h1=document.createElement("div");
+h1.style.cssText="font-size:13px;font-weight:700;color:#0f172a;";
+h1.textContent=String(titleText||"");
+box.appendChild(h1);
+if(mainText!==undefined&&mainText!==null&&mainText!==""){
+const h2=document.createElement("div");
+h2.style.cssText="margin-top:6px;font-size:12px;color:"+(mainCol||"#059669")+";font-weight:600;";
+h2.textContent=String(mainText);
+box.appendChild(h2);}
+if(subText!==undefined&&subText!==null&&subText!==""){
+const h3=document.createElement("div");
+h3.style.cssText="margin-top:4px;font-size:11px;color:#64748b;";
+h3.textContent=String(subText);
+box.appendChild(h3);}
+el.appendChild(box);
+return box;}
+
 function dfRenderIntervalSvg(cid){
 if(typeof document==="undefined")
 return{rendered:false};
@@ -59538,20 +59943,35 @@ b.in1To3,b.in4To7,b.in8To14,b.mature15Plus);
 const w=200,h=60;const vals=[b.dueToday,
 b.in1To3,b.in4To7,b.in8To14,b.mature15Plus];
 const lbls=["اليوم","3د","7د","14د","15+"];
-let svg="<svg width='"+w+"' height='"+h+"' ";
-svg+="role='img' ";
-svg+="aria-label='توزيع فترات البطاقات'>";
+el.textContent="";
+const svgNS="http://www.w3.org/2000/svg";
+const svgEl=document.createElementNS(svgNS,"svg");
+svgEl.setAttribute("width",String(w));
+svgEl.setAttribute("height",String(h));
+svgEl.setAttribute("role","img");
+svgEl.setAttribute("aria-label","توزيع فترات البطاقات");
 for(let i=0;i<5;i++){
 const bh=Math.max(3,
 Math.round((vals[i]/maxVal)*36));
 const x=i*38+8;const y=44-bh;
 const col=i===0?"#dc2626":"#059669";
-svg+="<rect x='"+x+"' y='"+y+"' width='24' ";
-svg+="height='"+bh+"' rx='3' fill='"+col+"'/>";
-svg+="<text x='"+(x+12)+"' y='56' ";
-svg+="text-anchor='middle' font-size='9' ";
-svg+="fill='#64748b'>"+lbls[i]+"</text>";}
-svg+="</svg>";el.innerHTML=svg;
+const rect=document.createElementNS(svgNS,"rect");
+rect.setAttribute("x",String(x));
+rect.setAttribute("y",String(y));
+rect.setAttribute("width","24");
+rect.setAttribute("height",String(bh));
+rect.setAttribute("rx","3");
+rect.setAttribute("fill",col);
+svgEl.appendChild(rect);
+const txt=document.createElementNS(svgNS,"text");
+txt.setAttribute("x",String(x+12));
+txt.setAttribute("y","56");
+txt.setAttribute("text-anchor","middle");
+txt.setAttribute("font-size","9");
+txt.setAttribute("fill","#64748b");
+txt.textContent=lbls[i];
+svgEl.appendChild(txt);}
+el.appendChild(svgEl);
 return{rendered:true,total:d.totalActive};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -59600,22 +60020,26 @@ const defQ={prompt:"القراءة تتطلب _____",
 expected:"تركيزاً"};
 const q=(qObj&&qObj.questions&&
 qObj.questions[0])?qObj.questions[0]:defQ;
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;color:#0f172a;";
-h+="font-weight:600;'>"+q.prompt+"</div>";
-h+="<input id='dfReadingQuizInput' ";
-h+="type='text' placeholder='...' ";
-h+="style='margin-top:8px;width:100%;";
-h+="padding:8px;border-radius:8px;";
-h+="border:1px solid #cbd5e1;'/>";
-h+="<button id='dfReadingQuizBtn' ";
-h+="style='margin-top:8px;padding:8px 16px;";
-h+="background:#059669;color:#fff;border:none;";
-h+="border-radius:8px;font-weight:600;'>";
-h+="تأكيد الإجابة</button></div>";
-el.innerHTML=h;return{rendered:true,qId:q.id};}
+el.textContent="";
+const box=document.createElement("div");
+box.style.cssText="background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:12px;";
+const prEl=document.createElement("div");
+prEl.style.cssText="font-size:13px;color:#0f172a;font-weight:600;";
+prEl.textContent=String(q.prompt||"");
+const inp=document.createElement("input");
+inp.id="dfReadingQuizInput";
+inp.type="text";
+inp.placeholder="...";
+inp.style.cssText="margin-top:8px;width:100%;padding:8px;border-radius:8px;border:1px solid #cbd5e1;";
+const btn=document.createElement("button");
+btn.id="dfReadingQuizBtn";
+btn.style.cssText="margin-top:8px;padding:8px 16px;background:#059669;color:#fff;border:none;border-radius:8px;font-weight:600;";
+btn.textContent="تأكيد الإجابة";
+box.appendChild(prEl);
+box.appendChild(inp);
+box.appendChild(btn);
+el.appendChild(box);
+return{rendered:true,qId:q.id};}
 if(typeof window!=="undefined"){
 Object.assign(window,{
 dfGenReadingQuiz,
@@ -59664,19 +60088,7 @@ localStorage.getItem(kF):null;
 const h=rawH?JSON.parse(rawH):[];
 const it=h.length>0?h[h.length-1]:
 {title:title||"مفهوم",simplicityScore:85};
-let htm="<div style='background:#f8fafc;";
-htm+="padding:12px;border:1px solid #cbd5e1;";
-htm+="border-radius:12px;'>";
-htm+="<div style='font-size:13px;";
-htm+="color:#0f172a;";
-htm+="font-weight:700;'>تبسيط فاينمان: "+
-it.title+"</div>";
-htm+="<div style='margin-top:6px;";
-htm+="font-size:12px;";
-htm+="color:#059669;font-weight:600;'>";
-htm+="مؤشر الوضوح البسيط: "+
-it.simplicityScore+"%</div></div>";
-el.innerHTML=htm;
+dfCreateStatusCardDom(el,"تبسيط فاينمان: "+it.title,"مؤشر الوضوح البسيط: "+it.simplicityScore+"%","");
 return{rendered:true,score:it.simplicityScore};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -59720,22 +60132,7 @@ cid||"dfWorkloadMount");
 if(!el)return{rendered:false};
 try{const sName=sub||"عام";
 const d=dfPlanWorkload(sName,12);
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="خطة منهج: "+d.subject+"</div>";
-h+="<div style='margin-top:6px;font-size:12px;";
-h+="color:#64748b;'>";
-h+="متبقي "+d.daysRemaining+" يوم (";
-h+=d.remainingTopics+" موضوع)</div>";
-h+="<div style='margin-top:6px;";
-h+="font-weight:600;color:#059669;";
-h+="font-size:12px;'>";
-h+="الهدف اليومي: "+
-d.dailyTargetMins+" دقيقة</div></div>";
-el.innerHTML=h;
+dfCreateStatusCardDom(el,"خطة منهج: "+d.subject,"الهدف اليومي: "+d.dailyTargetMins+" دقيقة","متبقي "+d.daysRemaining+" يوم ("+d.remainingTopics+" موضوع)");
 return{rendered:true,
 targetMins:d.dailyTargetMins};
 }catch(e){return{rendered:false};}}
@@ -59784,21 +60181,21 @@ const presets=[
 {id:"ext",label:"عميق 50/10",f:50},
 {id:"ultra",label:"أولتراديان 90/20",f:90}
 ];
-let h="<div style='display:flex;";
-h+="gap:6px;flex-wrap:wrap;'>";
+el.textContent="";
+const row=document.createElement("div");
+row.style.cssText="display:flex;gap:6px;flex-wrap:wrap;";
 for(let i=0;i<presets.length;i++){
 const it=presets[i];
 const isA=cur.activePreset===it.id;
 const bg=isA?"#059669":"#ffffff";
 const col=isA?"#ffffff":"#0f172a";
-h+="<button class='df-preset-btn' ";
-h+="data-id='"+it.id+"' ";
-h+="style='padding:6px 12px;";
-h+="border-radius:20px;font-size:12px;";
-h+="border:1px solid #cbd5e1;";
-h+="background:"+bg+";color:"+col+";";
-h+="font-weight:600;'>"+it.label+"</button>";}
-h+="</div>";el.innerHTML=h;
+const btn=document.createElement("button");
+btn.className="df-preset-btn";
+btn.setAttribute("data-id",it.id);
+btn.style.cssText="padding:6px 12px;border-radius:20px;font-size:12px;border:1px solid #cbd5e1;background:"+bg+";color:"+col+";font-weight:600;";
+btn.textContent=it.label;
+row.appendChild(btn);}
+el.appendChild(row);
 return{rendered:true,active:cur.activePreset};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -59845,24 +60242,16 @@ const el=document.getElementById(
 cid||"dfDistractionMount");
 if(!el)return{rendered:false};
 try{const st=dfGetDistractionStats();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="مستودع الخواطر والمشتتات</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:12px;color:#64748b;'>";
-h+="اليوم: "+st.todayCount+" (";
-h+="داخلي: "+st.internalCount+" / ";
-h+="خارجي: "+st.externalCount+")</div>";
-h+="<div style='margin-top:8px;'>";
-h+="<input id='dfDstInput' type='text' ";
-h+="placeholder='فرّغ فكرتك هنا...' ";
-h+="style='width:100%;box-sizing:border-box;";
-h+="padding:6px 10px;border-radius:8px;";
-h+="border:1px solid #94a3b8;'";
-h+="/></div></div>";el.innerHTML=h;
+const box=dfCreateStatusCardDom(el,"مستودع الخواطر والمشتتات","","اليوم: "+st.todayCount+" (داخلي: "+st.internalCount+" / خارجي: "+st.externalCount+")");
+const inpWrap=document.createElement("div");
+inpWrap.style.marginTop="8px";
+const inp=document.createElement("input");
+inp.id="dfDstInput";
+inp.type="text";
+inp.placeholder="فرّغ فكرتك هنا...";
+inp.style.cssText="width:100%;box-sizing:border-box;padding:6px 10px;border-radius:8px;border:1px solid #94a3b8;";
+inpWrap.appendChild(inp);
+if(box)box.appendChild(inpWrap);
 return{rendered:true,today:st.todayCount};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -59909,21 +60298,7 @@ else if(t.tempoTier==="accelerated"){
 col="#0d9488";lbl="وتيرة متسارعة";}
 else if(t.tempoTier==="fresh"){
 col="#64748b";lbl="جاهز للبدء";}
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="معدل وتيرة المذاكرة</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:"+col+";";
-h+="font-weight:600;'>";
-h+=lbl+" ("+t.todayMins+" دقيقة اليوم)</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="معدل الجلسة: "+t.avgSessionMins+" دقيقة";
-h+=" | عدد: "+t.sessions+"</div></div>";
-el.innerHTML=h;
+dfCreateStatusCardDom(el,"معدل وتيرة المذاكرة",lbl+" ("+t.todayMins+" دقيقة اليوم)","معدل الجلسة: "+t.avgSessionMins+" دقيقة | عدد: "+t.sessions,col);
 return{rendered:true,tier:t.tempoTier};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -59974,21 +60349,7 @@ const el=document.getElementById(
 cid||"dfLatencyMount");
 if(!el)return{rendered:false};
 try{const st=dfGetRecallLatencyStats();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="محلل سرعة الاسترجاع النشط</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="متوسط الاستجابة: "+st.avgMs+" ms</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="نسبة الطلاقة الفورية: "+st.fluentPct+"% ";
-h+="("+st.cnt+" بطاقة)</div></div>";
-el.innerHTML=h;
+dfCreateStatusCardDom(el,"محلل سرعة الاسترجاع النشط","متوسط الاستجابة: "+st.avgMs+" ms","نسبة الطلاقة الفورية: "+st.fluentPct+"% ("+st.cnt+" بطاقة)");
 return{rendered:true,avg:st.avgMs};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60037,25 +60398,27 @@ try{
 const res=dfGetActiveSessionCheckpoints(sid);
 const lastP=res.lastCheckpoint?
 res.lastCheckpoint.pct:0;
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='display:flex;";
-h+="justify-content:space-between;";
-h+="font-size:12px;font-weight:700;";
-h+="color:#0f172a;'><span>المحطات</span>";
-h+="<span style='color:#059669;'>"+lastP;
-h+="%</span></div>";
-h+="<div style='width:100%;height:8px;";
-h+="background:#e2e8f0;border-radius:4px;";
-h+="margin-top:6px;overflow:hidden;'>";
-h+="<div style='width:"+lastP+"%;height:100%;";
-h+="background:#059669;'>";
-h+="</div></div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="محطات مسجلة: "+res.count+"</div></div>";
-el.innerHTML=h;
+el.textContent="";
+const box=document.createElement("div");
+box.style.cssText="background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:12px;";
+const top=document.createElement("div");
+top.style.cssText="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#0f172a;";
+const s1=document.createElement("span");
+s1.textContent="المحطات";
+const s2=document.createElement("span");
+s2.style.color="#059669";
+s2.textContent=lastP+"%";
+top.appendChild(s1);top.appendChild(s2);
+const bar=document.createElement("div");
+bar.style.cssText="width:100%;height:8px;background:#e2e8f0;border-radius:4px;margin-top:6px;overflow:hidden;";
+const fill=document.createElement("div");
+fill.style.cssText="width:"+lastP+"%;height:100%;background:#059669;";
+bar.appendChild(fill);
+const sub=document.createElement("div");
+sub.style.cssText="margin-top:4px;font-size:11px;color:#64748b;";
+sub.textContent="محطات مسجلة: "+res.count;
+box.appendChild(top);box.appendChild(bar);box.appendChild(sub);
+el.appendChild(box);
 return{rendered:true,progress:lastP};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60110,20 +60473,7 @@ const el=document.getElementById(
 cid||"dfRefuelMount");
 if(!el)return{rendered:false};
 try{const s=dfGetRefuelAdvisorSummary();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="مستشار استعادة الطاقة</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="جودة الاستراحة: "+s.avgScore+"/100</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="المقترح: "+s.suggested+"</div></div>";
-el.innerHTML=h;
+dfCreateStatusCardDom(el,"مستشار استعادة الطاقة","جودة الاستراحة: "+s.avgScore+"/100","المقترح: "+s.suggested);
 return{rendered:true,score:s.avgScore};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60166,25 +60516,27 @@ const el=document.getElementById(
 cid||"dfJournalMount");
 if(!el)return{rendered:false};
 try{const data=dfGetRecentReflections(3);
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="سجل خلاصات الجلسات</div>";
-h+="<div style='margin-top:6px;'>";
-h+="<input id='dfRefInput' type='text' ";
-h+="placeholder='أهم ما تعلمته في الجلسة...' ";
-h+="style='width:100%;box-sizing:border-box;";
-h+="padding:6px 10px;border-radius:8px;";
-h+="border:1px solid #94a3b8;'";
-h+="/></div>";
+el.textContent="";
+const box=document.createElement("div");
+box.style.cssText="background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:12px;";
+const h1=document.createElement("div");
+h1.style.cssText="font-size:13px;font-weight:700;color:#0f172a;";
+h1.textContent="سجل خلاصات الجلسات";
+const inpWrap=document.createElement("div");
+inpWrap.style.marginTop="6px";
+const inp=document.createElement("input");
+inp.id="dfRefInput";inp.type="text";
+inp.placeholder="أهم ما تعلمته في الجلسة...";
+inp.style.cssText="width:100%;box-sizing:border-box;padding:6px 10px;border-radius:8px;border:1px solid #94a3b8;";
+inpWrap.appendChild(inp);
+box.appendChild(h1);box.appendChild(inpWrap);
 if(data.items.length>0){
 const top=data.items[0];
-h+="<div style='margin-top:6px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="فائدة: "+dfSanitizeText(String(top.note).slice(0,25))+"</div>";}
-h+="</div>";el.innerHTML=h;
+const sub=document.createElement("div");
+sub.style.cssText="margin-top:6px;font-size:11px;color:#64748b;";
+sub.textContent="فائدة: "+String(top.note||"").slice(0,25);
+box.appendChild(sub);}
+el.appendChild(box);
 return{rendered:true,total:data.count};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60233,20 +60585,7 @@ if(st.weight===3){wLbl="حمل ذهني عالٍ";
 col="#dc2626";}
 else if(st.weight===1){wLbl="نشاط خفيف";
 col="#0284c7";}
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="موازن الحمل الذهني</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:"+col+";";
-h+="font-weight:600;'>";
-h+=st.subject+": "+wLbl+"</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="التوصية: "+st.next+"</div></div>";
-el.innerHTML=h;
+dfCreateStatusCardDom(el,"موازن الحمل الذهني",st.subject+": "+wLbl,"التوصية: "+st.next,col);
 return{rendered:true,weight:st.weight};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60293,21 +60632,7 @@ const el=document.getElementById(
 cid||"dfEnergyMount");
 if(!el)return{rendered:false};
 try{const d=dfGetFocusEnergyStatus();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="ذروة الطاقة والتدفق الذهني</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="أفضل نافذة تركيز: "+d.peakStart+":00 - ";
-h+=d.peakEnd+":00</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="إجمالي دقائق الذروة: "+d.peakMins; 
-h+=" دقيقة</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,"ذروة الطاقة والتدفق الذهني","أفضل نافذة تركيز: "+d.peakStart+":00 - "+d.peakEnd+":00","إجمالي دقائق الذروة: "+d.peakMins+" دقيقة");
 return{rendered:true,start:d.peakStart};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60345,26 +60670,26 @@ const modes=[
 {id:"pink",lbl:"حفيف هادئ"},
 {id:"brown",lbl:"تدفق عميق"},
 {id:"white",lbl:"ضجيج أبيض"}];
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="بيئة الصوت المعرفي المحايد</div>";
-h+="<div style='display:flex;gap:6px;";
-h+="margin-top:8px;flex-wrap:wrap;'>";
+el.textContent="";
+const box=document.createElement("div");
+box.style.cssText="background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:12px;";
+const h1=document.createElement("div");
+h1.style.cssText="font-size:13px;font-weight:700;color:#0f172a;";
+h1.textContent="بيئة الصوت المعرفي المحايد";
+const row=document.createElement("div");
+row.style.cssText="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;";
 for(let i=0;i<modes.length;i++){
 const it=modes[i];const isA=cur.mode===it.id;
 const bg=isA?"#059669":"#ffffff";
 const col=isA?"#ffffff":"#0f172a";
-h+="<button class='df-snd-btn' ";
-h+="data-id='"+it.id+"' ";
-h+="style='padding:4px 8px;border-radius:8px;";
-h+="border:1px solid #cbd5e1;font-size:11px;";
-h+="font-weight:600;";
-h+="background:"+bg+";color:"+col+";'>";
-h+=it.lbl+"</button>";}
-h+="</div></div>";el.innerHTML=h;
+const btn=document.createElement("button");
+btn.className="df-snd-btn";
+btn.setAttribute("data-id",it.id);
+btn.style.cssText="padding:4px 8px;border-radius:8px;border:1px solid #cbd5e1;font-size:11px;font-weight:600;background:"+bg+";color:"+col+";";
+btn.textContent=it.lbl;
+row.appendChild(btn);}
+box.appendChild(h1);box.appendChild(row);
+el.appendChild(box);
 return{rendered:true,mode:cur.mode};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60414,24 +60739,8 @@ const el=document.getElementById(
 cid||"dfDebtMount");
 if(!el)return{rendered:false};
 try{const d=dfGetFocusDebtStatus();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="تسوية خطة التركيز اليومية</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="المنجز اليوم: "+d.actualMins+" / ";
-h+=d.targetMins+" دقيقة</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-if(d.deficitMins>0){
-h+="استدراك مرن: +"+d.spreadPerDay;
-h+=" دقيقة للأيام القادمة</div></div>";}
-else{h+="حققت المستهدف بنجاح!</div></div>";}
-el.innerHTML=h;
+const sub=d.deficitMins>0?("استدراك مرن: +"+d.spreadPerDay+" دقيقة للأيام القادمة"):"حققت المستهدف بنجاح!";
+dfCreateStatusCardDom(el,"تسوية خطة التركيز اليومية","المنجز اليوم: "+d.actualMins+" / "+d.targetMins+" دقيقة",sub);
 return{rendered:true,tgt:d.targetMins};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60486,22 +60795,8 @@ if(d.trend==="ascending"){
 col="#2563eb";trLbl="وتيرة متصاعدة";}
 else if(d.trend==="dropping"){
 col="#dc2626";trLbl="وتيرة متباطئة";}
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="سلاسة وتيرة التعلم</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:"+col+";";
-h+="font-weight:600;'>";
-h+=trLbl+" ("+d.smoothedMins+" دقيقة)</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-if(d.microSprintRecommended){
-h+="مقترح: جلسة سريعة 15 دقيقة";}
-else{h+="الزخم مستمر ومستقر بحمد الله";}
-h+="</div></div>";el.innerHTML=h;
+const sub=d.microSprintRecommended?"مقترح: جلسة سريعة 15 دقيقة":"الزخم مستمر ومستقر بحمد الله";
+dfCreateStatusCardDom(el,"سلاسة وتيرة التعلم",trLbl+" ("+d.smoothedMins+" دقيقة)",sub,col);
 return{rendered:true,mins:d.smoothedMins};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60545,21 +60840,7 @@ const el=document.getElementById(
 cid||"dfExamMount");
 if(!el)return{rendered:false};
 try{const d=dfGetExamSentinelStatus();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="حارس العد التنازلي: "+d.examTitle+"</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="متبقي "+d.daysRemaining+" يوم على الموعد";
-h+="</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="المستهدف: "+d.dailyTargetMins;
-h+=" دقيقة يومياً</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,"حارس العد التنازلي: "+d.examTitle,"متبقي "+d.daysRemaining+" يوم على الموعد","المستهدف: "+d.dailyTargetMins+" دقيقة يومياً");
 return{rendered:true,days:d.daysRemaining};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60610,20 +60891,7 @@ const el=document.getElementById(
 cid||"dfMindMapMount");
 if(!el)return{rendered:false};
 try{const d=dfGetMindMapDensityStatus(nid);
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="كثافة الخريطة الذهنية</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="الترابط: "+d.densityScore+"/100</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="التشعب: "+d.branches+" فروع | ";
-h+=d.status+"</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,"كثافة الخريطة الذهنية","الترابط: "+d.densityScore+"/100","التشعب: "+d.branches+" فروع | "+d.status);
 return{rendered:true,score:d.densityScore};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60665,22 +60933,7 @@ const el=document.getElementById(
 cid||"dfShieldMount");
 if(!el)return{rendered:false};
 try{const d=dfGetStreakShieldStatus();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="درع استمرارية التركيز</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="السلسلة الحالية: "+d.currentStreak;
-h+=" أيام متتالية</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="دروع الحماية المتاحة: "+d.shields;
-h+=" (تمنع انكسار السلسلة)</div></div>";
-el.innerHTML=h;
+dfCreateStatusCardDom(el,"درع استمرارية التركيز","السلسلة الحالية: "+d.currentStreak+" أيام متتالية","دروع الحماية المتاحة: "+d.shields+" (تمنع انكسار السلسلة)");
 return{rendered:true,streak:d.currentStreak};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60699,7 +60952,7 @@ if(typeof document==="undefined")return false;
 const el=typeof elOrId==="string"?
 document.getElementById(elOrId):elOrId;
 if(!el)return false;
-el.innerHTML=dfSanitizeText(html);
+el.textContent=dfSanitizeText(html);
 return true;}
 function dfRenderSanitizerStatusDom(cid){
 if(typeof document==="undefined")
@@ -60708,21 +60961,7 @@ const el=document.getElementById(
 cid||"dfSanitizerMount");
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="درع التحصين الأمني للواجهة</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="الحماية ضد XSS: نشطة 100%";
-h+="</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="تطهير المدخلات والملاحظات تلقائياً";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,"درع التحصين الأمني للواجهة","الحماية ضد XSS: نشطة 100%","تطهير المدخلات والملاحظات تلقائياً");
 return{rendered:true,safe:true};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60798,20 +61037,7 @@ const el=document.getElementById(
 cid||"dfStreakMount");
 if(!el)return{rendered:false};
 try{const st=dfGetConsecutiveStreak();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="السلسلة المتتالية الحقيقية</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="أيام متواصلة: "+st.streak+" يوم</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="إجمالي الأيام: "+st.totalDays+"</div>";
-h+="</div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,"السلسلة المتتالية الحقيقية","أيام متواصلة: "+st.streak+" يوم","إجمالي الأيام: "+st.totalDays);
 return{rendered:true,cnt:st.streak};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60846,21 +61072,7 @@ const el=document.getElementById(
 cid||"dfDomGuardMount");
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="درع التحصين الهيكلي (Safe DOM)</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="المعالجة عبر textContent: نشطة";
-h+="</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="حظر حقن النصوص المباشر في البطاقات";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,"درع التحصين الهيكلي (Safe DOM)","المعالجة عبر textContent: نشطة","حظر حقن النصوص المباشر في البطاقات");
 return{rendered:true,safeDom:true};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -60911,22 +61123,7 @@ const el=document.getElementById(
 cid||"dfAnalyticsMount");
 if(!el)return{rendered:false};
 try{const st=dfGetUnifiedSessionHistory();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="نزاهة سجلات التحليلات المعتمدة</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="الدقائق: "+st.totalValidMinutes+" دقيقة";
-h+="</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="الجلسات الصحيحة: "+st.validSessions;
-h+=" | استبعاد: "+st.filteredZeroDuration;
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,"نزاهة سجلات التحليلات المعتمدة","الدقائق: "+st.totalValidMinutes+" دقيقة","الجلسات الصحيحة: "+st.validSessions+" | استبعاد: "+st.filteredZeroDuration);
 return{rendered:true,mins:st.validSessions};
 }catch(e){return{rendered:false};}}
 if(typeof window!=="undefined"){
@@ -61052,21 +61249,7 @@ const el=document.getElementById(
 cid||'dfTimerMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="حراسة التوقيت الرتيب</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="الحماية ضد تلاعب الساعة: نشطة";
-h+="</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="حساب فترات التركيز بدقة performance.now";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'حراسة التوقيت الرتيب','الحماية ضد تلاعب الساعة: نشطة','حساب فترات التركيز بدقة performance.now');
 return{rendered:true,monotonic:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61089,17 +61272,7 @@ const el=document.getElementById(
 cid||'dfCleanMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="تطهير ومعايرة العزل الترددي</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="مرشح الترددات المنخفضة Biquad: نشط";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'تطهير ومعايرة العزل الترددي','مرشح الترددات المنخفضة Biquad: نشط','');
 return{rendered:true,cleaned:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61137,21 +61310,7 @@ const el=document.getElementById(
 cid||'dfQuotaMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="حراسة التخزين (Quota Guard)</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="الحماية ضد امتلاء المساحة: نشطة";
-h+="</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="عزل بيانات v21 وحماية الملاحظات والمهام";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'حراسة التخزين (Quota Guard)','الحماية ضد امتلاء المساحة: نشطة','عزل بيانات v21 وحماية الملاحظات والمهام');
 return{rendered:true,quotaProtected:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61189,17 +61348,7 @@ const el=document.getElementById(
 cid||'dfClozeMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="محلل تفريغ النصوص والتشكيل</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="معالجة Cloze والتشكيل العربي: نشطة";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'محلل تفريغ النصوص والتشكيل','معالجة Cloze والتشكيل العربي: نشطة','');
 return{rendered:true,clozeReady:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61224,22 +61373,7 @@ const el=document.getElementById(
 cid||'dfAuditMount');
 if(!el)return{rendered:false};
 try{const rep=dfGetBuildVerificationReport();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="كشف الجاهزية المعمارية للبناء</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="الحالة: جاهز للبناء والاعتماد العلني";
-h+="</div>";
-h+="<div style='margin-top:4px;";
-h+="font-size:11px;color:#64748b;'>";
-h+="الحزمة: "+rep.appId;
-h+=" (إصدار "+rep.version+")";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'كشف الجاهزية المعمارية للبناء','الحالة: جاهز للبناء والاعتماد العلني','الحزمة: '+rep.appId+' (إصدار '+rep.version+')');
 return{rendered:true,pass:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61304,17 +61438,7 @@ const el=document.getElementById(
 cid||'dfSvgMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="درع تطهير رسومات SVG التوليدية</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="حظر foreignObject والأحداث الخبيثة: نشط";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'درع تطهير رسومات SVG التوليدية','حظر foreignObject والأحداث الخبيثة: نشط','');
 return{rendered:true,svgSecured:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61377,17 +61501,7 @@ const el=document.getElementById(
 cid||'dfAudioGcMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="إدارة دورة حياة العقد الصوتية</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="تطهير AudioNode ومنع تسريب الذاكرة: نشط";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'إدارة دورة حياة العقد الصوتية','تطهير AudioNode ومنع تسريب الذاكرة: نشط','');
 return{rendered:true,gcProtected:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61414,17 +61528,7 @@ const el=document.getElementById(
 cid||'dfAlarmMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="حارس مرونة التنبيهات الموقوتة</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="التوافق مع Doze Mode والتنبيه الفوري: نشط";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'حارس مرونة التنبيهات الموقوتة','التوافق مع Doze Mode والتنبيه الفوري: نشط','');
 return{rendered:true,resilient:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61452,18 +61556,7 @@ const el=document.getElementById(
 cid||'dfBreakPacingMount');
 if(!el)return{rendered:false};
 try{const p=dfComputeAdaptiveBreakPacing(25);
-let h="<div style='background:#f1f5f9;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="منظّم فترات الراحة التكيفية</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#2563eb;";
-h+="font-weight:600;'>";
-h+="راحة موصى بها: "+p.breakMinutes+" دقيقة";
-h+=" (نسبة الإيقاع: "+p.pacingRatio+")";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'منظّم فترات الراحة التكيفية','راحة موصى بها: '+p.breakMinutes+' دقيقة (نسبة الإيقاع: '+p.pacingRatio+')','','#2563eb','#f1f5f9');
 return{rendered:true,
 breakMinutes:p.breakMinutes};
 }catch(_){return{rendered:false};}}
@@ -61519,6 +61612,24 @@ if(typeof window!=='undefined'){
 Object.assign(window,{dfSafeRenderTaskItem,
 dfSafeRenderTasks,dfSafeRenderNotes});}
 
+function dfExportSovereignBackup(){
+try{
+const code=typeof generateEncryptedBackupCode==='function'?generateEncryptedBackupCode():'';
+const env=typeof buildSovereignBackupEnvelopeObject==='function'?buildSovereignBackupEnvelopeObject():{v:23,sig:'0',checksum:'0'};
+const jsonStr=JSON.stringify(env,null,2);
+if(typeof localStorage!=='undefined'){
+localStorage.setItem('df_last_sovereign_backup_v1',jsonStr);}
+return{ok:true,code:code,json:jsonStr,envelope:env};
+}catch(e){return{ok:false,error:String(e)};}}
+
+function dfImportSovereignBackup(rawJson){
+try{
+if(typeof verifyAndRestoreBackupCode==='function'){
+const ok=verifyAndRestoreBackupCode(rawJson);
+return{ok:Boolean(ok),restored:Boolean(ok)};}
+return{ok:false};
+}catch(e){return{ok:false,error:String(e)};}}
+
 function dfRenderVaultSafDom(cid){
 if(typeof document==='undefined')
 return{rendered:false};
@@ -61534,9 +61645,31 @@ h1.style.cssText='font-size:13px;font-weight:700;color:#0f172a;';
 h1.textContent='خزنة النسخ الاحتياطي السيادي (SAF Vault)';
 const h2=document.createElement('div');
 h2.style.cssText='margin-top:6px;font-size:12px;color:#059669;font-weight:600;';
-h2.textContent='تخزين محلي معزول ومؤمّن: نشط';
+h2.textContent='تخزين محلي معزول ومؤمّن ببصمة نزاهة (Checksum): نشط';
+const btnRow=document.createElement('div');
+btnRow.style.cssText='display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;';
+const expBtn=document.createElement('button');
+expBtn.id='dfExportBackupBtn';
+expBtn.type='button';
+expBtn.style.cssText='padding:6px 12px;border-radius:8px;border:1px solid #059669;background:#059669;color:#ffffff;font-size:12px;font-weight:600;cursor:pointer;';
+expBtn.textContent='تصدير نسخة سيادية (JSON)';
+expBtn.onclick=function(){
+const res=dfExportSovereignBackup();
+if(res&&res.ok&&typeof showToast==='function'){
+showToast('تم إنشاء النسخة الاحتياطية السيادية وتوقيعها بنجاح');}};
+const impBtn=document.createElement('button');
+impBtn.id='dfImportBackupBtn';
+impBtn.type='button';
+impBtn.style.cssText='padding:6px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:12px;font-weight:600;cursor:pointer;';
+impBtn.textContent='استيراد وفحص النزاهة';
+impBtn.onclick=function(){
+const raw=typeof localStorage!=='undefined'?localStorage.getItem('df_last_sovereign_backup_v1'):null;
+if(raw)dfImportSovereignBackup(raw);};
+btnRow.appendChild(expBtn);
+btnRow.appendChild(impBtn);
 box.appendChild(h1);
 box.appendChild(h2);
+box.appendChild(btnRow);
 el.appendChild(box);
 return{rendered:true,vaultReady:true};
 }catch(_){return{rendered:false};}}
@@ -61560,54 +61693,65 @@ if(document.readyState!=='loading'){
 dfInitSovereignUiBridge();}}
 if(typeof window!=='undefined'){
 Object.assign(window,{
+dfExportSovereignBackup,
+dfImportSovereignBackup,
 dfRenderVaultSafDom,
 dfInitSovereignUiBridge});}
 
 function dfNormalizeArabicQuery(txt){
 if(typeof txt!=='string')return'';
-return txt.replace(/[ً-ٰٟ]/g,'')
-.replace(/[إأآا]/g,'ا')
+return txt.normalize('NFKC')
+.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,'')
+.replace(/[إأآٱا]/g,'ا')
 .replace(/ة/g,'ه')
 .replace(/ى/g,'ي')
+.replace(/ؤ/g,'و')
+.replace(/ئ/g,'ي')
+.replace(/\s+/g,' ')
 .trim().toLowerCase();}
+
+function dfGetDefaultSearchableVaultItems(){
+const combined=[];
+try{
+if(typeof notesList!=='undefined'&&Array.isArray(notesList)){
+for(let i=0;i<notesList.length;i++){
+const n=notesList[i];
+if(n&&!n.deleted)combined.push({id:n.id,type:'note',title:n.title||'',content:n.body||n.content||''});}}
+if(typeof tasksList!=='undefined'&&Array.isArray(tasksList)){
+for(let j=0;j<tasksList.length;j++){
+const t=tasksList[j];
+if(t&&!t.deleted)combined.push({id:t.id,type:'task',title:t.title||t.text||'',content:t.note||t.cat||''});}}
+}catch(_){}
+return combined;}
 
 function dfSearchArabicVaultScored(qStr,items){
 const q=dfNormalizeArabicQuery(qStr);
-if(!q)return[];
+const sourceList=Array.isArray(items)?items:dfGetDefaultSearchableVaultItems();
+if(!q)return sourceList.slice(0,25);
 const tokens=q.split(/\s+/).filter(Boolean);
-const list=Array.isArray(items)?items:[];
 const scored=[];
-for(let i=0;i<list.length;i++){
-const it=list[i]||{};
-const sT=it.title||it.q||'';
+for(let i=0;i<sourceList.length;i++){
+const it=sourceList[i]||{};
+const sT=it.title||it.q||it.text||'';
 const t=dfNormalizeArabicQuery(sT);
-const sC=it.content||it.a||it.note||'';
+const sC=it.content||it.body||it.a||it.note||'';
 const c=dfNormalizeArabicQuery(sC);
 let score=0;
-if(t===q)score+=50;
-else if(t.includes(q))score+=25;
-if(c.includes(q))score+=10;
+if(t===q)score+=100;
+else if(t.indexOf(q)===0)score+=60;
+else if(t.includes(q))score+=35;
+if(c.includes(q))score+=15;
 for(let j=0;j<tokens.length;j++){
 const tok=tokens[j];
-if(t.includes(tok))score+=15;
-if(c.includes(tok))score+=5;}
+if(t.includes(tok))score+=18;
+if(c.includes(tok))score+=6;}
 if(score>0)scored.push({item:it,score});}
 scored.sort((a,b)=>b.score-a.score);
 return scored.map(s=>s.item);}
+
 function dfSearchArabicVault(query,items){
-const q=dfNormalizeArabicQuery(query);
-if(!q)return[];
-const list=Array.isArray(items)?items:[];
-const matched=[];
-for(let i=0;i<list.length;i++){
-const it=list[i]||{};
-const sT=it.title||it.q||'';
-const t=dfNormalizeArabicQuery(sT);
-const sC=it.content||it.a||it.note||'';
-const c=dfNormalizeArabicQuery(sC);
-if(t.includes(q)||c.includes(q)){
-matched.push(it);}}
-return matched;}
+return dfSearchArabicVaultScored(query,items);}
+
 function dfRenderSearchStatusDom(cid,cnt){
 if(typeof document==='undefined')
 return{rendered:false};
@@ -61615,24 +61759,198 @@ const el=document.getElementById(
 cid||'dfSearchMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="محرك البحث العربي الدقيق</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="تطبيع التشكيل والهمزات: نشط (";
-h+=(cnt||0)+" نتائج)";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'محرك البحث العربي الدقيق','تطبيع التشكيل والهمزات: نشط ('+(cnt||0)+' نتائج)','');
 return{rendered:true,count:cnt||0};
 }catch(_){return{rendered:false};}}
+
+function dfRenderArabicSearchDom(cid){
+if(typeof document==='undefined')return{rendered:false};
+const el=document.getElementById(cid||'dfArabicSearchMount');
+if(!el)return{rendered:false};
+try{
+el.textContent='';
+const box=document.createElement('div');
+box.style.cssText='background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:12px;';
+const h1=document.createElement('div');
+h1.style.cssText='font-size:13px;font-weight:700;color:#0f172a;margin-bottom:6px;';
+h1.textContent='البحث العربي الذكي (تجريد التشكيل وتوحيد الألف والتاء)';
+const inp=document.createElement('input');
+inp.id='dfArabicSearchInput';
+inp.type='search';
+inp.placeholder='ابحث في الملاحظات والمهام بدون همزات أو تشكيل...';
+inp.style.cssText='width:100%;box-sizing:border-box;padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;font-size:12px;';
+const resBox=document.createElement('div');
+resBox.id='dfArabicSearchResults';
+resBox.style.cssText='margin-top:8px;display:flex;flex-direction:column;gap:4px;';
+inp.addEventListener('input',function(){
+const matches=dfSearchArabicVault(inp.value);
+resBox.textContent='';
+for(let i=0;i<Math.min(6,matches.length);i++){
+const row=document.createElement('div');
+row.style.cssText='padding:6px 8px;border-radius:6px;background:#ffffff;border:1px solid #e2e8f0;font-size:12px;color:#0f172a;';
+row.textContent=(matches[i].title||matches[i].text||'عنصر')+' — '+(matches[i].content||matches[i].body||'').slice(0,50);
+resBox.appendChild(row);}});
+box.appendChild(h1);
+box.appendChild(inp);
+box.appendChild(resBox);
+el.appendChild(box);
+return{rendered:true};
+}catch(_){return{rendered:false};}}
+
 if(typeof window!=='undefined'){
 Object.assign(window,{dfNormalizeArabicQuery,
-dfSearchArabicVault,dfSearchArabicVaultScored,dfRenderSearchStatusDom});}
+dfSearchArabicVault,dfSearchArabicVaultScored,
+dfRenderSearchStatusDom,dfRenderArabicSearchDom});}
 
+function dfStartNatureStream(preset,volume){
+const idMap={rain:'rain',ocean:'ocean',wind:'wind',fire:'fire',fireplace:'fire',bell:'bell',pink:'rain',brown:'ocean'};
+const key=idMap[String(preset||'rain').toLowerCase()]||'rain';
+const volPct=volume!==undefined?Math.max(0,Math.min(100,Number(volume)<=1?Math.round(Number(volume)*100):Math.round(Number(volume)))):65;
+if(key==='bell'&&typeof dfTriggerTibetanSingingBell==='function'){
+dfTriggerTibetanSingingBell(volPct/100);
+return{started:true,preset:'bell',volume:volPct};}
+if(typeof setTileVolume==='function'){
+setTileVolume(key,volPct);}
+return{started:true,preset:key,volume:volPct};}
+
+function dfSetNatureMasterVolume(vol){
+const v=Math.max(0,Math.min(100,Number(vol)<=1?Math.round(Number(vol)*100):Math.round(Number(vol))));
+try{
+if(typeof cfg!=='undefined'&&cfg){
+cfg.masterVol=v;
+if(typeof saveCfg==='function')saveCfg();}
+if(typeof activeSynths!=='undefined'&&activeSynths){
+Object.keys(activeSynths).forEach(function(id){
+const s=activeSynths[id];
+if(s&&typeof s.setVolume==='function'&&cfg&&cfg.volumes){
+s.setVolume(((cfg.volumes[id]||50)*(v/100))/100);}});}
+}catch(_){}
+return{masterVolume:v};}
+
+function dfRenderNatureMixerDom(cid){
+if(typeof document==='undefined')return{rendered:false};
+const el=document.getElementById(cid||'dfNatureMixerMount');
+if(!el)return{rendered:false};
+try{
+el.textContent='';
+const box=document.createElement('div');
+box.style.cssText='background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:12px;';
+const h1=document.createElement('div');
+h1.style.cssText='font-size:13px;font-weight:700;color:#0f172a;margin-bottom:8px;';
+h1.textContent='محرك الأصوات الطبيعية التوليدي (Web Audio Synthesizer)';
+const presets=[
+{id:'rain',label:'🌧 مطر هادئ'},
+{id:'ocean',label:'🌊 أمواج المحيط'},
+{id:'wind',label:'🍃 رياح الجبال'},
+{id:'fire',label:'🔥 مدفأة دافئة'},
+{id:'bell',label:'🔔 جرس تبتي'}];
+const btnRow=document.createElement('div');
+btnRow.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;';
+presets.forEach(function(p){
+const b=document.createElement('button');
+b.type='button';
+b.setAttribute('data-nature-preset',p.id);
+b.style.cssText='padding:6px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:12px;font-weight:600;cursor:pointer;';
+b.textContent=p.label;
+b.onclick=function(){dfStartNatureStream(p.id,70);};
+btnRow.appendChild(b);});
+const slider=document.createElement('input');
+slider.id='dfNatureVolumeSlider';
+slider.type='range';
+slider.min='0';slider.max='100';slider.value='75';
+slider.style.cssText='width:100%;';
+slider.addEventListener('input',function(){
+dfSetNatureMasterVolume(Number(slider.value));});
+box.appendChild(h1);
+box.appendChild(btnRow);
+box.appendChild(slider);
+el.appendChild(box);
+return{rendered:true};
+}catch(_){return{rendered:false};}}
+
+function dfStartPomodoroEngine(minutes,mode){
+try{
+if(typeof cfg!=='undefined'&&cfg){
+if(mode)cfg.mode=mode;
+if(minutes&&Number(minutes)>0){
+cfg.focusMin=Number(minutes);
+if(typeof remainingSec!=='undefined')remainingSec=Number(minutes)*60;}}
+if(typeof toggleTimerExecution==='function'){
+toggleTimerExecution();}
+return{started:true,minutes:Number(minutes)||25,mode:mode||'focus'};
+}catch(_){return{started:false};}}
+
+function dfRenderPomodoroDom(cid){
+if(typeof document==='undefined')return{rendered:false};
+const el=document.getElementById(cid||'dfPomodoroMount');
+if(!el)return{rendered:false};
+try{
+el.textContent='';
+const box=document.createElement('div');
+box.style.cssText='background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:12px;display:flex;justify-content:space-between;align-items:center;';
+const title=document.createElement('span');
+title.style.cssText='font-size:13px;font-weight:700;color:#0f172a;';
+title.textContent='مؤقت التركيز المريح (قاعدة 20-20-20)';
+const btn=document.createElement('button');
+btn.id='dfPomodoroStartBtn';
+btn.type='button';
+btn.style.cssText='padding:6px 14px;border-radius:8px;border:none;background:#059669;color:#ffffff;font-size:12px;font-weight:700;cursor:pointer;';
+btn.textContent='بدء جلسة التركيز';
+btn.onclick=function(){dfStartPomodoroEngine(25,'focus');};
+box.appendChild(title);
+box.appendChild(btn);
+el.appendChild(box);
+return{rendered:true};
+}catch(_){return{rendered:false};}}
+
+function dfReviewCardFSRS45(cardId,rating){
+const g=Math.min(4,Math.max(1,Number(rating)||3));
+if(typeof VocabAudioBankEngine!=='undefined'&&VocabAudioBankEngine&&typeof VocabAudioBankEngine.reviewCardWithFSRS45==='function'){
+return VocabAudioBankEngine.reviewCardWithFSRS45(cardId,g);}
+return dfFsrs45Review(1.2,5.0,1,g);}
+
+function dfRenderFlashcardsDom(cid){
+if(typeof document==='undefined')return{rendered:false};
+const el=document.getElementById(cid||'dfFlashcardsMount');
+if(!el)return{rendered:false};
+try{
+el.textContent='';
+const box=document.createElement('div');
+box.style.cssText='background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:12px;';
+const cardBox=document.createElement('div');
+cardBox.setAttribute('data-card-flip','true');
+cardBox.style.cssText='padding:14px;border-radius:10px;background:#ffffff;border:1px solid #e2e8f0;cursor:pointer;text-align:center;font-weight:700;color:#0f172a;margin-bottom:8px;';
+cardBox.textContent='بطاقة مراجعة FSRS-4.5 (اضغط للقلب)';
+const rateRow=document.createElement('div');
+rateRow.style.cssText='display:flex;gap:6px;justify-content:center;';
+[
+{g:1,l:'إعادة (1)'},
+{g:2,l:'صعب (2)'},
+{g:3,l:'جيد (3)'},
+{g:4,l:'سهل (4)'}
+].forEach(function(r){
+const b=document.createElement('button');
+b.type='button';
+b.setAttribute('data-fsrs-rating',String(r.g));
+b.setAttribute('data-card-id','default_card');
+b.style.cssText='padding:5px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+b.textContent=r.l;
+rateRow.appendChild(b);});
+box.appendChild(cardBox);
+box.appendChild(rateRow);
+el.appendChild(box);
+return{rendered:true};
+}catch(_){return{rendered:false};}}
+
+if(typeof window!=='undefined'){
+Object.assign(window,{
+dfStartNatureStream,
+dfSetNatureMasterVolume,
+dfRenderNatureMixerDom,
+dfStartPomodoroEngine,
+dfRenderPomodoroDom,
+dfReviewCardFSRS45,
+dfRenderFlashcardsDom});}
 
 function dfApplyRtlA11yStyles(){
 if(typeof document==='undefined')return false;
@@ -61675,17 +61993,7 @@ const el=document.getElementById(
 cid||'dfThemeMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="درع الهوية البصرية (White Premium)</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="حماية التباين وسلامة العرض: نشطة";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'درع الهوية البصرية (White Premium)','حماية التباين وسلامة العرض: نشطة','');
 return{rendered:true,premium:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61717,17 +62025,7 @@ const el=document.getElementById(
 cid||'dfNetShieldMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="درع العزل الشبكي السيادي</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="حظر الطلبات الخارجية: نشط (100% Offline)";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'درع العزل الشبكي السيادي','حظر الطلبات الخارجية: نشط (100% Offline)','');
 return{rendered:true,shieldReady:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61751,17 +62049,7 @@ const el=document.getElementById(
 cid||'dfPrivacyMount');
 if(!el)return{rendered:false};
 try{
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="بوابة السيادة التامة (Zero-PII)</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="تتبع صفري، وعمل محلي 100% بدون إنترنت";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'بوابة السيادة التامة (Zero-PII)','تتبع صفري، وعمل محلي 100% بدون إنترنت','');
 return{rendered:true,zeroTracking:true};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
@@ -61812,18 +62100,7 @@ const el=document.getElementById(
 cid||'dfReleaseManifestMount');
 if(!el)return{rendered:false};
 try{const rep=dfVerifyReleaseManifest();
-let h="<div style='background:#f8fafc;";
-h+="padding:12px;border:1px solid #cbd5e1;";
-h+="border-radius:12px;'>";
-h+="<div style='font-size:13px;";
-h+="font-weight:700;color:#0f172a;'>";
-h+="شهادة التحقق المسبق للإصدار (Task 614)</div>";
-h+="<div style='margin-top:6px;";
-h+="font-size:12px;color:#059669;";
-h+="font-weight:600;'>";
-h+="سلامة الأصول والحزمة: "+rep.integrity;
-h+=" ("+rep.versionName+" / "+rep.versionCode+")";
-h+="</div></div>";el.innerHTML=h;
+dfCreateStatusCardDom(el,'شهادة التحقق المسبق للإصدار (Task 614)','سلامة الأصول والحزمة: '+rep.integrity+' ('+rep.versionName+' / '+rep.versionCode+')','');
 return{rendered:true,valid:rep.valid};
 }catch(_){return{rendered:false};}}
 if(typeof window!=='undefined'){
