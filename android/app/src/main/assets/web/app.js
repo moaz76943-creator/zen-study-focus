@@ -83699,3 +83699,8 @@ if (typeof DOMFlatteningEngine !== "undefined") {
 if (typeof ConsolidatedModuleLoader !== "undefined") {
     ConsolidatedModuleLoader.init();
 }
+
+// [Task #657] Studio Navigator Drawer Initialization
+if (typeof StudioNavigatorDrawer !== "undefined") {
+    StudioNavigatorDrawer.init();
+}
