@@ -80816,6 +80816,64 @@ function dfGetWorkerMetrics() {
   return Object.assign({}, DF_WORKER_METRICS);
 }
 
+
+const DF_THERMAL_SENTINEL = {
+  batteryLevel: 1.0,
+  isCharging: true,
+  isPowerSaveMode: false,
+  targetFps: 120,
+  lastCheckTs: Date.now()
+};
+
+function dfInitBatteryThermalSentinel() {
+  if (typeof navigator !== 'undefined' && navigator.getBattery) {
+    try {
+      navigator.getBattery().then(battery => {
+        function update() {
+          DF_THERMAL_SENTINEL.batteryLevel = battery.level;
+          DF_THERMAL_SENTINEL.isCharging = battery.charging;
+          if (!battery.charging && battery.level < 0.20) {
+            DF_THERMAL_SENTINEL.isPowerSaveMode = true;
+            DF_THERMAL_SENTINEL.targetFps = 30;
+          } else if (!battery.charging && battery.level < 0.40) {
+            DF_THERMAL_SENTINEL.isPowerSaveMode = false;
+            DF_THERMAL_SENTINEL.targetFps = 60;
+          } else {
+            DF_THERMAL_SENTINEL.isPowerSaveMode = false;
+            DF_THERMAL_SENTINEL.targetFps = 120;
+          }
+          DF_THERMAL_SENTINEL.lastCheckTs = Date.now();
+        }
+        update();
+        battery.addEventListener('levelchange', update);
+        battery.addEventListener('chargingchange', update);
+      }).catch(() => {});
+    } catch (_) {}
+  }
+}
+
+function dfGetBatteryThermalStatus() {
+  return Object.assign({}, DF_THERMAL_SENTINEL);
+}
+
+function dfSetThermalMode(mode) {
+  if (mode === 'power_save') {
+    DF_THERMAL_SENTINEL.targetFps = 30;
+    DF_THERMAL_SENTINEL.isPowerSaveMode = true;
+  } else if (mode === 'balanced') {
+    DF_THERMAL_SENTINEL.targetFps = 60;
+    DF_THERMAL_SENTINEL.isPowerSaveMode = false;
+  } else {
+    DF_THERMAL_SENTINEL.targetFps = 120;
+    DF_THERMAL_SENTINEL.isPowerSaveMode = false;
+  }
+  return dfGetBatteryThermalStatus();
+}
+
+if (typeof window !== 'undefined') {
+  dfInitBatteryThermalSentinel();
+}
+
 function dfVerifyReleaseManifest(manifest){
 const reqAssets=['index.html','app.js',
 'modules/flashcards/fsrs.js',
@@ -80866,7 +80924,7 @@ if(typeof window!=='undefined'){
 window.dfVerifyReleaseManifest=
 dfVerifyReleaseManifest;
 Object.assign(window,{
-dfVerifyReleaseManifest,dfRunOffloadedTask,dfGetWorkerMetrics,dfInitWorkerBridge,dfCalculateExamPacing,dfGetSyllabusSchedule,
+dfVerifyReleaseManifest,dfGetBatteryThermalStatus,dfSetThermalMode,dfInitBatteryThermalSentinel,dfRunOffloadedTask,dfGetWorkerMetrics,dfInitWorkerBridge,dfCalculateExamPacing,dfGetSyllabusSchedule,
 dfRenderReleaseManifestDom});
 if(typeof window.dfSyncInfiniteLocaleRegistry==='function'){
 try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
