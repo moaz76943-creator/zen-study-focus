@@ -1,23 +1,24 @@
-Deep Focus — Sovereign Offline Study & Academic Mastery
+Deep Focus — Autonomer Offline-Lernbereich & Akademische Meisterschaft (Version 439.0.0)
 
-Master your academic goals in a distraction-free, air-gapped study environment built for students, university scholars, and deep learners.
+Erreichen Sie Ihre akademischen Ziele und vertiefen Sie Ihren Lernfokus in einem ablenkungsfreien, 100% Offline-Lernbereich.
 
-✦ 100% Offline & Private (Zero Telemetry)
-No cloud servers. No tracking. Your notes, study schedules, and flashcard vaults remain strictly on your local device.
+✦ 100% Offline & Privat (Keine Telemetrie)
+Keine Cloud-Abhängigkeit und kein Benutzertracking. Alle Karteikarten, Notizen und Lernpläne bleiben lokal und sicher auf Ihrem Gerät.
 
-✦ State-of-the-Art FSRS-4.5 Spaced Repetition
-Harness the proven Free Spaced Repetition Scheduler algorithm to optimize retention intervals with personalized difficulty and stability curves.
+✦ Modernste FSRS-4.5 Spaced Repetition
+Nutzen Sie den fortschrittlichen FSRS-4.5 Algorithmus für maximale Langzeit-Erinnerung bei minimalem Wiederholungsaufwand.
 
-✦ Real-Time Procedural Soundscapes
-Synthesize pure pink noise, rain resonance, and 40Hz binaural waves natively via Web Audio API without looping audio files.
+✦ Prozedurale Natur- & Fokus-Klanglandschaften (Zero-Music)
+Echtzeit-Synthese via Web Audio: Reines rosa Rauschen, Regenresonanz und 40 Hz Gamma-Wellen ohne statische Audioschleifen.
 
-✦ Tri-Zone Cornell Note Architecture
-Organize thoughts systematically into Cues, Notes, and Summary zones, linked directly to flashcards.
+✦ Tri-Zone Cornell-Notizarchitektur
+Strukturieren Sie Ihre Vorlesungsnotizen in Stichpunkte, Notizen und Zusammenfassungen mit direkter Verknüpfung zu Karteikarten.
 
-✦ RSVP Speed Reader & ORP Visual Guide
-Process academic texts at 100 to 1000 words per minute with Optical Recognition Point focal alignment.
+✦ RSVP-Schnelllesestudio
+Erfassen Sie Fachliteratur mit 100 bis 1000 Wörtern pro Minute durch optische Fokuspunkt-Führung (ORP).
 
-✦ Botanical Zen Garden & Habit Matrix
-Watch procedural bonsai and bamboo trees flourish through consistent daily focus sessions.
+✦ Mathematischer & Technischer SVG-Formelsatz (STEM)
+Kristallklare Vektordarstellung von Gleichungen, Wurzeln und Matrizen ohne externe Frameworks.
 
-Reclaim your focus and academic sovereignty with Deep Focus.
+✦ Botanischer Zen-Garten & Gewohnheitsmatrix
+Beobachten Sie das prozedurale Wachstum von Bonsai- und Bambusbäumen als Spiegelbild Ihrer täglichen Disziplin.

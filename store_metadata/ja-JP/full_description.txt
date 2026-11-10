@@ -1,23 +1,24 @@
-Deep Focus — Sovereign Offline Study & Academic Mastery
+Deep Focus — 完全オフライン集中学習＆記憶術スペース（バージョン 439.0.0）
 
-Master your academic goals in a distraction-free, air-gapped study environment built for students, university scholars, and deep learners.
+気を散らす要素を排除し、学術研究や試験勉強に没頭できる100%オフラインの自立型学習サンクチュアリ。
 
-✦ 100% Offline & Private (Zero Telemetry)
-No cloud servers. No tracking. Your notes, study schedules, and flashcard vaults remain strictly on your local device.
+✦ 100% オフライン＆プライバシー保護（追跡ゼロ）
+クラウド依存やデータ収集は一切ありません。学習記録、ノート、暗記カードはすべて端末内に安全に保持されます。
 
-✦ State-of-the-Art FSRS-4.5 Spaced Repetition
-Harness the proven Free Spaced Repetition Scheduler algorithm to optimize retention intervals with personalized difficulty and stability curves.
+✦ 次世代間隔反復アルゴリズム FSRS-4.5
+最適な難易度と安定度曲線に基づいて記憶の定着率を最大化し、復習の負担を最小限に抑えます。
 
-✦ Real-Time Procedural Soundscapes
-Synthesize pure pink noise, rain resonance, and 40Hz binaural waves natively via Web Audio API without looping audio files.
+✦ 手続き的ニューラル音響（Zero-Music）
+Web Audio APIによるリアルタイム合成。ループ再生ではない純粋なピンクノイズ、雨の残響、40Hzガンマ波バイノーラルサウンド。
 
-✦ Tri-Zone Cornell Note Architecture
-Organize thoughts systematically into Cues, Notes, and Summary zones, linked directly to flashcards.
+✦ 3ゾーン・コーネル式ノート術
+キーワード、本文、要約に整理し、暗記カードと双方向リンクで効率的に復習。
 
-✦ RSVP Speed Reader & ORP Visual Guide
-Process academic texts at 100 to 1000 words per minute with Optical Recognition Point focal alignment.
+✦ RSVP視覚誘導型スピードリーダー
+視覚認識ポイント（ORP）の誘導により、毎分100〜1000文字のペースで学術文献やテキストを速読。
 
-✦ Botanical Zen Garden & Habit Matrix
-Watch procedural bonsai and bamboo trees flourish through consistent daily focus sessions.
+✦ 純粋SVGによるSTEM数式・図形描画
+数式、分数、行列を高精度なベクターグラフィックで鮮明に表示。
 
-Reclaim your focus and academic sovereignty with Deep Focus.
+✦ 手続き的植物ゼンガーデン＆習慣マトリックス
+集中学習セッションを重ねるごとに美しく成長する盆栽や竹を眺めながら、学習習慣を確立。

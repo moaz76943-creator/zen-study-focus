@@ -1,23 +1,24 @@
-Deep Focus — Sovereign Offline Study & Academic Mastery
+Deep Focus — Estudio Soberano y Dominio Académico (Versión 439.0.0)
 
-Master your academic goals in a distraction-free, air-gapped study environment built for students, university scholars, and deep learners.
+Domina tus metas de estudio y recupera tu flujo mental en un santuario sin distracciones, 100% offline y diseñado para estudiantes universitarios y académicos.
 
-✦ 100% Offline & Private (Zero Telemetry)
-No cloud servers. No tracking. Your notes, study schedules, and flashcard vaults remain strictly on your local device.
+✦ 100% Offline y Privado (Cero Rastreo)
+Sin servidores en la nube ni telemetría. Todas tus notas, planes de estudio y tarjetas de memoria permanecen estrictamente cifrados en tu dispositivo.
 
-✦ State-of-the-Art FSRS-4.5 Spaced Repetition
-Harness the proven Free Spaced Repetition Scheduler algorithm to optimize retention intervals with personalized difficulty and stability curves.
+✦ Repetición Espaciada de Vanguardia FSRS-4.5
+Aprovecha el algoritmo Free Spaced Repetition Scheduler para optimizar los intervalos de retención con curvas personalizadas de estabilidad y dificultad.
 
-✦ Real-Time Procedural Soundscapes
-Synthesize pure pink noise, rain resonance, and 40Hz binaural waves natively via Web Audio API without looping audio files.
+✦ Paisajes Sonoros Neuronales y Procedurales (Zero-Music)
+Síntesis matemática en tiempo real mediante Web Audio de ruido rosa puro, resonancia de lluvia y ondas gamma de 40 Hz sin archivos de audio en bucle.
 
-✦ Tri-Zone Cornell Note Architecture
-Organize thoughts systematically into Cues, Notes, and Summary zones, linked directly to flashcards.
+✦ Estructura de Notas Cornell de Tres Zonas
+Organiza tus apuntes sistemáticamente en Pistas, Notas y Resúmenes, con enlaces bidireccionales hacia tus tarjetas de memoria.
 
-✦ RSVP Speed Reader & ORP Visual Guide
-Process academic texts at 100 to 1000 words per minute with Optical Recognition Point focal alignment.
+✦ Estudio de Lectura Rápida RSVP
+Procesa lecturas y libros a velocidades de 100 a 1000 palabras por minuto mediante el Punto de Reconocimiento Óptico (ORP).
 
-✦ Botanical Zen Garden & Habit Matrix
-Watch procedural bonsai and bamboo trees flourish through consistent daily focus sessions.
+✦ Tipografía Matemática y Científica (STEM)
+Visualiza fórmulas complejas, matrices y derivadas paso a paso mediante gráficos vectoriales SVG sin librerías externas.
 
-Reclaim your focus and academic sovereignty with Deep Focus.
+✦ Jardín Zen Botánico y Matriz de Hábitos
+Observa cómo crecen árboles bonsái y bambúes generados proceduralmente a medida que completas sesiones de estudio continuo.
