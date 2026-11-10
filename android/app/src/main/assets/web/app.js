@@ -83683,3 +83683,9 @@ if (typeof window !== 'undefined' && window.UniversalAccessibilityStudio) {
   window.dfUniversalAccessibilityStudio = new window.UniversalAccessibilityStudio();
   console.log('[Runtime] UniversalAccessibilityStudio successfully mounted.');
 }
+
+
+// [Task #654] Core Action Dispatcher Initialization
+if (typeof ActionDispatcherEngine !== "undefined") {
+    ActionDispatcherEngine.init();
+}
