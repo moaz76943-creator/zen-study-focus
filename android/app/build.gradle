@@ -11,13 +11,13 @@ def hasUploadSigning = [uploadKeyStorePath, uploadKeyStorePassword, uploadKeyAli
 
 android {
     namespace 'com.zenstudy.focus'
-    compileSdk 36
+    compileSdk 35
     defaultConfig {
         applicationId "com.deepfocus.study"
         minSdk 24
-        targetSdk 36
-        versionCode 41160
-        versionName "440.0.0"
+        targetSdk 35
+        versionCode 41161
+        versionName "441.0.0"
     }
     signingConfigs {
         if (hasUploadSigning) {
