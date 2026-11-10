@@ -823,6 +823,7 @@
           <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center;">
             <button type="button" class="delta-chip" id="btnLaunchStemStudio" style="background:#eff6ff; color:#2563eb; font-weight:800; border:1px solid #bfdbfe;" onclick="dfOpenStemStudioFromTimer()" data-i18n="btnStemStudio">📐 STEM Studio ↗</button>
             <button type="button" class="delta-chip" id="btnLaunchWhiteboardStudio" style="background:#f5f3ff; color:#7c3aed; font-weight:800; border:1px solid #ddd6fe;" onclick="dfOpenWhiteboardStudioFromTimer()" data-i18n="btnWhiteboardStudio">🎨 Whiteboard & Occlusion ↗</button>
+            <button type="button" class="delta-chip" id="btnLaunchSpatialAudioStudio" style="background:#fef3c7; color:#b45309; font-weight:800; border:1px solid #fde68a;" onclick="dfOpenSpatialAudioStudio()" data-i18n="btnSpatialAudio">🎧 3D Spatial & 40Hz ↗</button>
             <button type="button" class="delta-chip" id="btnToggleScratchpadOverlay" style="background:#ecfdf5; color:#059669; font-weight:800; border:1px solid #a7f3d0;" onclick="dfToggleFloatingScratchpadOverlay(true)" data-i18n="btnScratchpadOverlay">✏️ Scratchpad</button>
           </div>
         </div>
@@ -1008,11 +1009,14 @@
       <main class="screen-section" id="sec-sounds">
         <div class="mixer-status-bar">
           <span id="mixerStatusTxt" data-i18n="mixerReady">🎵 Pure Nature Studio Ready</span>
-          <div style="display:flex; gap:6px;">
+          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+            <button type="button" class="task-mini-sel" id="btnLaunch3DSpatialStudio" onclick="dfOpenSpatialAudioStudio()" style="cursor:pointer; color:#7c3aed; font-weight:800; background:#f5f3ff; border:1px solid #ddd6fe;" data-i18n="btn3DSpatial">🎧 3D Spatial & 40Hz</button>
             <button class="task-mini-sel" onclick="playPresetRelaxMix()" style="cursor:pointer; color:var(--primary);" data-i18n="btnMyMix">✨ Mix</button>
             <button class="task-mini-sel" onclick="stopAllAudio()" style="cursor:pointer; color:var(--rose);" data-i18n="btnStopAll">⏹ Stop</button>
           </div>
         </div>
+
+        <div id="dfPillar5SpatialMount" aria-label="Master Pillar 5: 3D Spatial Acoustic Physics & Bio-Frequency Synthesis"></div>
 
         <div class="segmented-pills-bar">
           <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All (12)</button>
