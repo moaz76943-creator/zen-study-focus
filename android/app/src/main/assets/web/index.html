@@ -663,7 +663,7 @@
   <div class="desk-clock-overlay" id="deskClockOverlay">
     <div style="font-size:0.9rem; font-weight:800; color:var(--primary); margin-bottom:10px;" data-i18n="orbDesk">🖥️ DESK CLOCK MODE</div>
     <div class="desk-digits" id="deskClockDigits">25:00</div>
-    <div style="font-size:0.85rem; color:var(--text-muted); margin: 12px 0 24px;" id="deskClockTask">Active Session</div>
+    <div style="font-size:0.85rem; color:var(--text-muted); margin: 12px 0 24px;" id="deskClockTask" data-i18n="deskClockTask">Active Session</div>
     <button class="mbtn-pri" style="max-width:200px; padding:12px 28px;" onclick="toggleDeskClock(false)" data-i18n="btnCancel">Exit ✕</button>
   </div>
 
@@ -686,19 +686,19 @@
     <header class="dynamic-hero-header" id="heroHeader">
       <div class="header-top-row">
         <div style="display:flex; gap:8px;">
-          <button class="header-icon-btn" onclick="openCloudBackupModal()" title="Cloud Sync & Backup">☁️</button>
-          <button class="header-icon-btn" onclick="shareAppWithFriends()" title="Share App">📤</button>
+          <button class="header-icon-btn" onclick="openCloudBackupModal()" title="Cloud Sync & Backup" data-i18n-title="pillCloud" data-i18n-aria="pillCloud">☁️</button>
+          <button class="header-icon-btn" onclick="shareAppWithFriends()" title="Share App" data-i18n-title="pillShare" data-i18n-aria="pillShare">📤</button>
         </div>
 
-        <button class="lang-switcher-pill" onclick="openLanguageModal()">
+        <button class="lang-switcher-pill" onclick="openLanguageModal()" data-i18n-aria="langSearchTitle">
           <span class="lang-iso-badge" id="currentLangIso">EN</span>
           <span id="currentLangLabel">English</span>
         </button>
       </div>
 
       <div class="header-titles-center">
-        <h1 class="header-main-title" id="hdrMainTitle">Deep Focus</h1>
-        <p class="header-sub-caption" id="hdrSubTitle">A smarter world for study, sports & deep work</p>
+        <h1 class="header-main-title" id="hdrMainTitle" data-i18n="title">Deep Focus</h1>
+        <p class="header-sub-caption" id="hdrSubTitle" data-i18n="sub">A smarter world for study, sports & deep work</p>
       </div>
 
       <div class="ecosystem-strip">
@@ -718,8 +718,8 @@
       <main class="screen-section active" id="sec-timer">
                 <div class="pure-white-card focus-hero-card" id="focusHeroCard">
           <div class="focus-card-topline">
-            <span class="focus-card-eyebrow" data-qt="focusToday">✦ مساحة التركيز</span>
-            <span class="focus-status" id="focusStatusLabel" data-qt="ready">جاهز للإنجاز</span>
+            <span class="focus-card-eyebrow" data-qt="focusToday" data-i18n="focusToday">✦ مساحة التركيز</span>
+            <span class="focus-status" id="focusStatusLabel" data-qt="ready" data-i18n="statusReady">جاهز للإنجاز</span>
           </div>
           <div class="segmented-pills-bar">
             <button class="seg-pill active" id="modeFocusBtn" onclick="selectTimerModeFromUser(getDomainFocusMinutes(), 'focus', this)" data-i18n="modeFocus">25m</button>
@@ -737,29 +737,29 @@
               <div class="ring-center">
                 <div class="ring-plant" id="ringPlantEmoji">🌱</div>
                 <div class="ring-time" id="timerDigitsTxt">25:00</div>
-                <div class="ring-mode-txt" id="timerModeCaption">Focus Session</div>
+                <div class="ring-mode-txt" id="timerModeCaption" data-i18n="modeFocusCaption">Focus Session</div>
                 <div class="ring-task-pill" id="timerLinkedTask" onclick="switchTab('sec-tasks', document.getElementById('navTasks'))" data-i18n="startFocusAchieve">Plan • Execute • Achieve</div>
               </div>
             </div>
           </div>
 
           <div class="timer-main-controls">
-            <button class="btn-round-sec" onclick="resetTimerNow()">↺</button>
-            <button type="button" class="btn-round-play" id="mainPlayBtn" onclick="toggleTimerPlay()" aria-label="Start or pause timer">
+            <button class="btn-round-sec" onclick="resetTimerNow()" data-i18n-aria="timerReset" data-i18n-title="timerReset">↺</button>
+            <button type="button" class="btn-round-play" id="mainPlayBtn" onclick="toggleTimerPlay()" aria-label="Start or pause timer" data-i18n-aria="timerStart">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </button>
-            <button class="btn-round-sec" onclick="skipTimerPhase()">⏭</button>
+            <button class="btn-round-sec" onclick="skipTimerPhase()" data-i18n-aria="skipStep" data-i18n-title="skipStep">⏭</button>
           </div>
 
           <div class="time-delta-row">
-            <button class="delta-chip" onclick="changeTimerDelta(-5)">-5m</button>
-            <button class="delta-chip" onclick="changeTimerDelta(-1)">-1m</button>
-            <button class="delta-chip" onclick="changeTimerDelta(1)">+1m</button>
-            <button class="delta-chip" onclick="changeTimerDelta(5)">+5m</button>
-            <button class="delta-chip" onclick="changeTimerDelta(10)">+10m</button>
+            <button class="delta-chip" onclick="changeTimerDelta(-5)" data-i18n="deltaMinus5">-5m</button>
+            <button class="delta-chip" onclick="changeTimerDelta(-1)" data-i18n="deltaMinus1">-1m</button>
+            <button class="delta-chip" onclick="changeTimerDelta(1)" data-i18n="deltaPlus1">+1m</button>
+            <button class="delta-chip" onclick="changeTimerDelta(5)" data-i18n="deltaPlus5">+5m</button>
+            <button class="delta-chip" onclick="changeTimerDelta(10)" data-i18n="deltaPlus10">+10m</button>
           </div>
         </div>
-        <div class="home-domains-heading"><span data-qt="chooseActivity">اختر نوع نشاطك</span><small data-qt="domainsHint">لكل نشاط جلسته المناسبة</small></div>
+        <div class="home-domains-heading"><span data-qt="chooseActivity" data-i18n="chooseActivity">اختر نوع نشاطك</span><small data-qt="domainsHint" data-i18n="domainsHint">لكل نشاط جلسته المناسبة</small></div>
         <div class="domain-pedestal-grid">
           <button type="button" class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)" aria-pressed="true">
             <div class="domain-squircle">📚</div>
@@ -783,8 +783,8 @@
           </button>
         </div>
 
-        <div class="home-quick-sessions" aria-label="Focus session shortcuts">
-          <div class="home-quick-heading"><span data-qt="quickSessions">جلسات سريعة</span><button class="timer-settings-chip" type="button" onclick="openTimerSettings()" id="timerSettingsChip">⚙ تخصيص</button></div>
+        <div class="home-quick-sessions" aria-label="Focus session shortcuts" data-i18n-aria="quickSessions">
+          <div class="home-quick-heading"><span data-qt="quickSessions" data-i18n="quickSessions">جلسات سريعة</span><button class="timer-settings-chip" type="button" onclick="openTimerSettings()" id="timerSettingsChip" data-i18n="btnCustomize">⚙ تخصيص</button></div>
           <div class="home-quick-options" role="group" aria-label="Quick focus durations">
             <button type="button" class="home-quick-chip" id="homeQuick10" aria-pressed="false" onclick="selectHomeQuickSession(10)">10:00</button>
             <button type="button" class="home-quick-chip" id="homeQuick25" aria-pressed="true" onclick="selectHomeQuickSession(25)">25:00</button>
@@ -798,8 +798,8 @@
             <div style="font-size:0.84rem; font-weight:900;" id="sportSetCounterTxt">Set 0 / 4 • 12 Reps</div>
           </div>
           <div style="display:flex; gap:5px;">
-            <button class="delta-chip" onclick="logWorkoutSet()">+1 Set ✓</button>
-            <button class="delta-chip" style="background:var(--emerald-soft); color:var(--emerald);" onclick="startQuickSportRest(45)">Rest 45s</button>
+            <button class="delta-chip" onclick="logWorkoutSet()" data-i18n="btnLogSet">+1 Set ✓</button>
+            <button class="delta-chip" style="background:var(--emerald-soft); color:var(--emerald);" onclick="startQuickSportRest(45)" data-i18n="btnRest45s">Rest 45s</button>
           </div>
         </div>
 
@@ -815,53 +815,53 @@
         </div>
 
 
-        <section class="pure-white-card quick-training-card" id="quickTrainingCard" aria-label="Quick training">
+        <section class="pure-white-card quick-training-card" id="quickTrainingCard" aria-label="Quick training" data-i18n-aria="trainingTitle">
           <details id="quickTrainingDetails">
             <summary class="training-summary">
               <span class="training-icon">⚡</span>
-              <span class="training-summary-text"><strong data-qt="trainingTitle">تدريب سريع</strong><small data-qt="trainingSubtitle">جولات عمل وراحة قابلة للتخصيص</small></span>
+              <span class="training-summary-text"><strong data-qt="trainingTitle" data-i18n="trainingTitle">تدريب سريع</strong><small data-qt="trainingSubtitle" data-i18n="trainingSubtitle">جولات عمل وراحة قابلة للتخصيص</small></span>
               <span class="training-chevron">⌄</span>
             </summary>
             <div class="training-content">
               <div class="training-fields">
-                <label><span data-qt="rounds">المجموعات</span><input id="qtSets" type="text" inputmode="numeric" value="4" maxlength="2" aria-label="Sets"></label>
-                <label><span data-qt="work">العمل (د:ث)</span><input id="qtWork" type="text" inputmode="text" value="04:00" maxlength="6" aria-label="Work minutes"></label>
-                <label><span data-qt="rest">الراحة (د:ث)</span><input id="qtRest" type="text" inputmode="text" value="00:30" maxlength="6" aria-label="Rest seconds"></label>
+                <label><span data-qt="rounds" data-i18n="rounds">المجموعات</span><input id="qtSets" type="text" inputmode="numeric" value="4" maxlength="2" aria-label="Sets" data-i18n-aria="rounds"></label>
+                <label><span data-qt="work" data-i18n="work">العمل (د:ث)</span><input id="qtWork" type="text" inputmode="text" value="04:00" maxlength="6" aria-label="Work minutes" data-i18n-aria="work"></label>
+                <label><span data-qt="rest" data-i18n="rest">الراحة (د:ث)</span><input id="qtRest" type="text" inputmode="text" value="00:30" maxlength="6" aria-label="Rest seconds" data-i18n-aria="rest"></label>
               </div>
-              <label class="training-toggle"><input id="qtSkipLast" type="checkbox" checked><span data-qt="skipLastRest">تخطي الراحة الأخيرة</span></label>
+              <label class="training-toggle"><input id="qtSkipLast" type="checkbox" checked><span data-qt="skipLastRest" data-i18n="skipLastRest">تخطي الراحة الأخيرة</span></label>
               <div class="training-exercises-head">
-                <strong data-qt="exercises">التمارين المتتابعة</strong>
+                <strong data-qt="exercises" data-i18n="exercises">التمارين المتتابعة</strong>
                 <span id="qtExerciseCount">0</span>
               </div>
               <div class="training-add-row">
-                <input id="qtNewExercise" type="text" maxlength="70" data-qt-placeholder="exercisePlaceholder" placeholder="مثل: تمارين الإطالة أو القراءة المركزة">
-                <button type="button" onclick="addQuickExercise()" data-qt="addExercise">+ إضافة</button>
+                <input id="qtNewExercise" type="text" maxlength="70" data-qt-placeholder="exercisePlaceholder" data-i18n-placeholder="exercisePlaceholder" placeholder="مثل: تمارين الإطالة أو القراءة المركزة">
+                <button type="button" onclick="addQuickExercise()" data-qt="addExercise" data-i18n="addExercise">+ إضافة</button>
               </div>
               <div class="training-exercises" id="qtExerciseList"></div>
               <div class="training-presets" role="group" aria-label="Training presets">
-                <button type="button" onclick="applyQuickTrainingPreset('tabata')" data-qt="presetTabata">تدريب 20/10</button>
-                <button type="button" onclick="applyQuickTrainingPreset('workout')" data-qt="presetWorkout">رياضة 4/1</button>
-                <button type="button" onclick="applyQuickTrainingPreset('reading')" data-qt="presetReading">قراءة 20/5</button>
-                <button type="button" onclick="applyQuickTrainingPreset('work')" data-qt="presetWork">عمل 50/10</button>
+                <button type="button" onclick="applyQuickTrainingPreset('tabata')" data-qt="presetTabata" data-i18n="presetTabata">تدريب 20/10</button>
+                <button type="button" onclick="applyQuickTrainingPreset('workout')" data-qt="presetWorkout" data-i18n="presetWorkout">رياضة 4/1</button>
+                <button type="button" onclick="applyQuickTrainingPreset('reading')" data-qt="presetReading" data-i18n="presetReading">قراءة 20/5</button>
+                <button type="button" onclick="applyQuickTrainingPreset('work')" data-qt="presetWork" data-i18n="presetWork">عمل 50/10</button>
               </div>
               <div class="training-progress" id="qtProgressPanel" hidden>
                 <span id="qtProgressTitle"></span>
                 <div class="training-progress-bar"><span id="qtProgressFill"></span></div>
                 <div class="training-progress-actions">
-                  <button type="button" onclick="skipQuickTrainingStep()" data-qt="skipStep">تخطي المرحلة</button>
-                  <button type="button" onclick="cancelQuickTraining()" data-qt="stopTraining">إنهاء التدريب</button>
+                  <button type="button" onclick="skipQuickTrainingStep()" data-qt="skipStep" data-i18n="skipStep">تخطي المرحلة</button>
+                  <button type="button" onclick="cancelQuickTraining()" data-qt="stopTraining" data-i18n="stopTraining">إنهاء التدريب</button>
                 </div>
               </div>
-              <button type="button" id="qtStartButton" class="training-primary" onclick="startQuickTraining()" data-qt="startTraining">▶ ابدأ التدريب</button>
+              <button type="button" id="qtStartButton" class="training-primary" onclick="startQuickTraining()" data-qt="startTraining" data-i18n="startTraining">▶ ابدأ التدريب</button>
             </div>
           </details>
         </section>
-        <section class="pure-white-card today-plan-card" aria-label="Today activity snapshot">
+        <section class="pure-white-card today-plan-card" aria-label="Today activity snapshot" data-i18n-aria="todayPlan">
           <div class="today-plan-title">
-            <div><span class="small-kicker" data-qt="todayProgress">✧ تقدمك اليوم</span><h2 data-qt="todayPlan">خطة اليوم</h2></div>
-            <button type="button" onclick="switchTab('sec-tasks',document.getElementById('navTasks'))" data-qt="viewAll">عرض الكل ↗</button>
+            <div><span class="small-kicker" data-qt="todayProgress" data-i18n="todayProgress">✧ تقدمك اليوم</span><h2 data-qt="todayPlan" data-i18n="todayPlan">خطة اليوم</h2></div>
+            <button type="button" onclick="switchTab('sec-tasks',document.getElementById('navTasks'))" data-qt="viewAll" data-i18n="viewAll">عرض الكل ↗</button>
           </div>
-          <div class="home-week-strip" id="homeWeekStrip" aria-label="This week"></div>
+          <div class="home-week-strip" id="homeWeekStrip" aria-label="This week" data-i18n-aria="badgeThisWeek"></div>
           <div class="today-plan-stats"><strong id="todayPlanRatio">0/0</strong><span id="todayPlanPercent">0%</span></div>
           <div class="today-progress-track"><span id="todayPlanFill"></span></div>
           <div id="todayPlanPreview" class="today-plan-preview"></div>
@@ -869,9 +869,9 @@
 
         <section class="pure-white-card daily-goals-card" id="dailyGoalsCard" aria-labelledby="dailyGoalsHeading">
           <div class="goals-header">
-            <div><span class="small-kicker" id="goalsKicker">✦ DAILY GOALS</span><h2 id="dailyGoalsHeading">Progress by activity</h2>
-            <p id="dailyGoalsDescription">Only completed focus minutes count.</p></div>
-            <button type="button" class="goals-edit" id="goalsEditButton" onclick="openDailyGoalsModal()">⚙ Goals</button>
+            <div><span class="small-kicker" id="goalsKicker" data-i18n="goalsKicker">✦ DAILY GOALS</span><h2 id="dailyGoalsHeading" data-i18n="dailyGoalsHeading">Progress by activity</h2>
+            <p id="dailyGoalsDescription" data-i18n="dailyGoalsDesc">Only completed focus minutes count.</p></div>
+            <button type="button" class="goals-edit" id="goalsEditButton" onclick="openDailyGoalsModal()" data-i18n="goalsEditBtn">⚙ Goals</button>
           </div>
           <div class="goals-rows" id="dailyGoalsRows"></div>
         </section>
@@ -929,7 +929,7 @@
             <option value="review" data-i18n="catReview">📖 Reading</option>
             <option value="exam" data-i18n="catExam">💻 Work</option>
           </select>
-          <button class="btn-task-plus" onclick="createNewTask()">+</button>
+          <button class="btn-task-plus" onclick="createNewTask()" data-i18n-aria="addExercise">+</button>
         </div>
 
         <div class="tasks-showcase-list" id="tasksShowcaseBox"></div>
@@ -942,9 +942,9 @@
       <main class="screen-section" id="sec-calendar">
         <div class="pure-white-card">
           <div class="cal-header-nav">
-            <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(-1)">❮</button>
+            <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(-1)" data-i18n-aria="prevMonth">❮</button>
             <div class="cal-month-title" id="calMonthYearTitle">October 2026</div>
-            <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(1)">❯</button>
+            <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(1)" data-i18n-aria="nextMonth">❯</button>
           </div>
           <div class="cal-weekdays-grid" id="calWeekdaysRow"></div>
           <div class="cal-days-grid" id="calDaysGrid"></div>
@@ -964,15 +964,15 @@
            ====================================================== -->
       <main class="screen-section" id="sec-notes">
         <section class="notes-studio-hero">
-          <div class="notes-studio-heading"><small id="nsEyebrow">✦ Notes Studio</small><h2 id="nsTitle">Your ideas, organized</h2><p id="nsSubtitle">Write, revisit and develop your thoughts.</p></div>
-          <div class="notes-studio-stats"><div><strong id="nsTotal">0</strong><span id="nsTotalLabel">My notes</span></div><div><strong id="nsPinned">0</strong><span id="nsPinnedLabel">Pinned</span></div></div>
-          <button type="button" id="nsNewButton" class="ns-new" onclick="openNoteModal()">＋ New note</button>
+          <div class="notes-studio-heading"><small id="nsEyebrow" data-i18n="nsEyebrow">✦ Notes Studio</small><h2 id="nsTitle" data-i18n="nsTitle">Your ideas, organized</h2><p id="nsSubtitle" data-i18n="nsSubtitle">Write, revisit and develop your thoughts.</p></div>
+          <div class="notes-studio-stats"><div><strong id="nsTotal">0</strong><span id="nsTotalLabel" data-i18n="nsTotalLabel">My notes</span></div><div><strong id="nsPinned">0</strong><span id="nsPinnedLabel" data-i18n="nsPinnedLabel">Pinned</span></div></div>
+          <button type="button" id="nsNewButton" class="ns-new" onclick="openNoteModal()" data-i18n="nsNewButton">＋ New note</button>
         </section>
-        <div class="ns-section-title"><strong id="nsTemplatesTitle">Ready-to-use templates</strong><span id="nsTemplatesHint">Tap to start</span></div>
+        <div class="ns-section-title"><strong id="nsTemplatesTitle" data-i18n="nsTemplatesTitle">Ready-to-use templates</strong><span id="nsTemplatesHint" data-i18n="nsTemplatesHint">Tap to start</span></div>
         <div id="nsTemplates" class="ns-templates" aria-label="Note templates"></div>
         <div class="ns-toolbar">
-          <div class="search-pill-box"><span aria-hidden="true">⌕</span><input type="search" class="search-pill-inp" id="inpSearchNotes" placeholder="Search notes..." oninput="renderNotesStack()" aria-label="Search notes"><button id="nsExport" type="button" class="ns-export" onclick="exportAllNotes()" aria-label="Copy all notes">⇩</button></div>
-          <div class="ns-controls"><button id="nsPinnedOnly" type="button" aria-pressed="false" onclick="nsTogglePinnedOnly()">♧ <span id="nsPinnedOnlyLabel">Pinned only</span></button><label><span id="nsSortLabel">Sort</span> <select id="nsSort" onchange="renderNotesStack()" aria-label="Sort notes"><option value="recent">Recent</option><option value="oldest">Oldest</option><option value="title">Title</option></select></label></div>
+          <div class="search-pill-box"><span aria-hidden="true">⌕</span><input type="search" class="search-pill-inp" id="inpSearchNotes" data-i18n-placeholder="phSearchNotes" placeholder="Search notes..." oninput="renderNotesStack()" aria-label="Search notes"><button id="nsExport" type="button" class="ns-export" onclick="exportAllNotes()" aria-label="Copy all notes" data-i18n-aria="btnExportNotes">⇩</button></div>
+          <div class="ns-controls"><button id="nsPinnedOnly" type="button" aria-pressed="false" onclick="nsTogglePinnedOnly()">♧ <span id="nsPinnedOnlyLabel" data-i18n="nsPinnedOnlyLabel">Pinned only</span></button><label><span id="nsSortLabel" data-i18n="nsSortLabel">Sort</span> <select id="nsSort" onchange="renderNotesStack()" aria-label="Sort notes"><option value="recent" data-i18n="sortRecent">Recent</option><option value="oldest" data-i18n="sortOldest">Oldest</option><option value="title" data-i18n="sortTitle">Title</option></select></label></div>
         </div>
         <div class="segmented-pills-bar ns-filters">
           <button class="seg-pill active" onclick="filterNotesByTag('all', this)" data-i18n="filterAll">All</button>
@@ -982,7 +982,7 @@
         </div>
         <div class="ns-count" id="nsVisibleCount" aria-live="polite"></div>
         <div class="learning-cards-stack ns-cards" id="notesStackBox"></div>
-        <button class="floating-plus-fab" onclick="openNoteModal()" aria-label="New note">+</button>
+        <button class="floating-plus-fab" onclick="openNoteModal()" aria-label="New note" data-i18n-aria="nsNewButton">+</button>
       </main>
 
       <!-- ======================================================
@@ -1016,12 +1016,12 @@
           <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiMinutes">Active Minutes</span><span>🕒</span></div>
             <div class="an-kpi-num" id="kpiTotalMins">0</div>
-            <div class="an-kpi-trend" id="kpiWeeklyTrend">Based on recorded focus sessions</div>
+            <div class="an-kpi-trend" id="kpiWeeklyTrend" data-i18n="kpiTrendWeek">Based on recorded focus sessions</div>
           </div>
           <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiSessions">Completed Sessions</span><span>🎯</span></div>
             <div class="an-kpi-num" id="kpiTotalSessions">0</div>
-            <div class="an-kpi-trend" id="kpiSessionTrend">Completed focus sessions only</div>
+            <div class="an-kpi-trend" id="kpiSessionTrend" data-i18n="kpiTrendGreat">Completed focus sessions only</div>
           </div>
         </div>
 
@@ -1053,9 +1053,9 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <div>
               <div style="font-size:0.74rem; opacity:0.8;" data-i18n="waveFlowTitle">Weekly Performance Index</div>
-              <div style="font-size:1.25rem; font-weight:700;"><span id="waveRecordedMinutes">0</span> <span style="font-size:0.75rem;opacity:.85;" id="waveUnit">min / 7 days</span></div>
+              <div style="font-size:1.25rem; font-weight:700;"><span id="waveRecordedMinutes">0</span> <span style="font-size:0.75rem;opacity:.85;" id="waveUnit" data-i18n="waveUnit">min / 7 days</span></div>
             </div>
-            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;" id="peakPerfBadge">7 days</span>
+            <span style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:99px; font-size:0.7rem; font-weight:800;" id="peakPerfBadge" data-i18n="peakPerfBadge">7 days</span>
           </div>
           <svg viewBox="0 0 320 95" style="width:100%; height:90px; overflow:visible;">
             <defs>
@@ -1103,7 +1103,7 @@
         <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
         <span data-i18n="navTimer">Timer</span>
       </button>
-      <button class="bnav-btn" id="navTraining" onclick="openQuickTrainingFromNav(this)" aria-label="Quick training"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9h3v6H2V9zm4-3h3v12H6V6zm9 0h3v12h-3V6zm4 3h3v6h-3V9zM10 11h4v2h-4v-2z"/></svg><span id="navTrainingText">Training</span></button>
+      <button class="bnav-btn" id="navTraining" onclick="openQuickTrainingFromNav(this)" aria-label="Quick training" data-i18n-aria="navTraining"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9h3v6H2V9zm4-3h3v12H6V6zm9 0h3v12h-3V6zm4 3h3v6h-3V9zM10 11h4v2h-4v-2z"/></svg><span id="navTrainingText" data-i18n="navTraining">Training</span></button>
       <button class="bnav-btn" id="navSounds" onclick="switchTab('sec-sounds', this)">
         <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span data-i18n="navSounds">Nature</span>
@@ -1120,7 +1120,7 @@
     <div class="modal-card">
       <div class="modal-head">
         <span data-i18n="langSearchTitle">🌐 Language & Country Search</span>
-        <button class="task-mini-sel" onclick="closeModal('langModal')">✕</button>
+        <button class="task-mini-sel" onclick="closeModal('langModal')" data-i18n-aria="btnCancel">✕</button>
       </div>
       <input type="text" class="modal-inp" id="inpLangCountrySearch" data-i18n-placeholder="langSearchPlaceholder" placeholder="Search language or country (e.g. Jordan, Spain, USA, مصر)..." oninput="renderLanguageList()">
       <div class="lang-list-scroll" id="langListScrollBox"></div>
@@ -1130,22 +1130,22 @@
   <div class="modal-overlay" id="cloudBackupModal">
     <div class="modal-card">
       <div class="modal-head">
-        <span>☁️ Manual Backup & Restore</span>
-        <button class="task-mini-sel" onclick="closeModal('cloudBackupModal')">✕</button>
+        <span data-i18n="cloudModalTitle">☁️ Manual Backup & Restore</span>
+        <button class="task-mini-sel" onclick="closeModal('cloudBackupModal')" data-i18n-aria="btnCancel">✕</button>
       </div>
-      <div style="background:var(--emerald-soft); color:var(--emerald); padding:10px 12px; border-radius:12px; font-size:0.74rem; font-weight:800; margin-bottom:10px;">
+      <div style="background:var(--emerald-soft); color:var(--emerald); padding:10px 12px; border-radius:12px; font-size:0.74rem; font-weight:800; margin-bottom:10px;" data-i18n="cloudWarningTxt">
         ⚠️ Exported backup codes contain readable personal notes and tasks. They are NOT encrypted. Share or save them privately; anyone with the code can read its contents.
       </div>
       <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
-        <button class="mbtn-pri" onclick="syncToGoogleCloudNow()">📤 Share Backup Code (Manual)</button>
-        <button class="mbtn-sec" onclick="downloadEncryptedBackupFile()">💾 Export Backup File (.zenbackup)</button>
+        <button class="mbtn-pri" onclick="syncToGoogleCloudNow()" data-i18n="btnShareBackup">📤 Share Backup Code (Manual)</button>
+        <button class="mbtn-sec" onclick="downloadEncryptedBackupFile()" data-i18n="btnExportBackupFile">💾 Export Backup File (.zenbackup)</button>
       </div>
       <div style="border-top:1px solid #e2e8f0; padding-top:10px; margin-top:6px;">
-        <div style="font-size:0.76rem; font-weight:800; margin-bottom:6px;">🔄 Restore Progress on New Phone:</div>
-        <textarea class="modal-inp" id="inpRestorePayload" style="height:65px; resize:none; font-size:0.72rem;" placeholder="Paste your backup code here (contains readable data)..."></textarea>
+        <div style="font-size:0.76rem; font-weight:800; margin-bottom:6px;" data-i18n="restoreHeading">🔄 Restore Progress on New Phone:</div>
+        <textarea class="modal-inp" id="inpRestorePayload" style="height:65px; resize:none; font-size:0.72rem;" data-i18n-placeholder="phRestorePayload" placeholder="Paste your backup code here (contains readable data)..."></textarea>
         <div class="modal-actions">
-          <button class="mbtn-pri" style="background:var(--emerald);" onclick="restoreFromEncryptedCode()">Restore Code ✓</button>
-          <button class="mbtn-sec" onclick="window.ZenNative && typeof ZenNative.importBackupFromFile==='function' ? ZenNative.importBackupFromFile() : document.getElementById('fileRestoreInput').click()">📂 Load File</button>
+          <button class="mbtn-pri" style="background:var(--emerald);" onclick="restoreFromEncryptedCode()" data-i18n="btnRestoreCode">Restore Code ✓</button>
+          <button class="mbtn-sec" onclick="window.ZenNative && typeof ZenNative.importBackupFromFile==='function' ? ZenNative.importBackupFromFile() : document.getElementById('fileRestoreInput').click()" data-i18n="btnLoadFile">📂 Load File</button>
           <input type="file" id="fileRestoreInput" style="display:none;" accept=".zenbackup,.json,.txt" onchange="restoreFromFileInput(event)">
         </div>
       </div>
@@ -1155,9 +1155,9 @@
 
   <div class="modal-overlay" id="dailyGoalsModal">
     <div class="modal-card goals-modal" role="dialog" aria-modal="true" aria-labelledby="goalsModalHeading">
-      <div class="modal-head"><span id="goalsModalHeading">Daily activity goals</span>
-        <button type="button" class="task-mini-sel" onclick="closeModal('dailyGoalsModal')" aria-label="Close">✕</button></div>
-      <p id="goalsModalHint" class="goals-hint">Set 0 to disable a goal. Saved focus sessions count toward each goal.</p>
+      <div class="modal-head"><span id="goalsModalHeading" data-i18n="goalsModalHeading">Daily activity goals</span>
+        <button type="button" class="task-mini-sel" onclick="closeModal('dailyGoalsModal')" aria-label="Close" data-i18n-aria="btnCancel">✕</button></div>
+      <p id="goalsModalHint" class="goals-hint" data-i18n="goalsModalHint">Set 0 to disable a goal. Saved focus sessions count toward each goal.</p>
       <div class="goals-edit-grid" id="goalsEditGrid"></div>
       <div class="modal-actions">
         <button type="button" class="mbtn-sec" onclick="closeModal('dailyGoalsModal')" data-i18n="btnCancel">Cancel</button>
@@ -1168,15 +1168,15 @@
 
   <div class="modal-overlay" id="timerSettingsModal">
     <div class="modal-card timer-settings-dialog" role="dialog" aria-modal="true" aria-labelledby="tsetHeading">
-      <div class="modal-head"><span id="tsetHeading">Customize focus cycles</span><button class="task-mini-sel" type="button" onclick="closeModal('timerSettingsModal')">✕</button></div>
-      <p class="timer-settings-info" id="tsetHint">Choose your activity durations; current sessions will not be interrupted.</p>
+      <div class="modal-head"><span id="tsetHeading" data-i18n="tsetHeading">Customize focus cycles</span><button class="task-mini-sel" type="button" onclick="closeModal('timerSettingsModal')" data-i18n-aria="btnCancel">✕</button></div>
+      <p class="timer-settings-info" id="tsetHint" data-i18n="tsetHint">Choose your activity durations; current sessions will not be interrupted.</p>
       <div class="timer-settings-grid">
-        <label><span id="tsetFocusLabel">Focus minutes</span><input id="tsetFocus" type="number" inputmode="numeric" class="modal-inp" min="1" max="240"></label>
-        <label><span id="tsetShortLabel">Short rest</span><input id="tsetShort" type="number" inputmode="numeric" class="modal-inp" min="1" max="60"></label>
-        <label><span id="tsetLongLabel">Long rest</span><input id="tsetLong" type="number" inputmode="numeric" class="modal-inp" min="1" max="120"></label>
-        <label><span id="tsetRoundsLabel">Focus sessions per cycle</span><input id="tsetRounds" type="number" inputmode="numeric" class="modal-inp" min="1" max="12"></label>
+        <label><span id="tsetFocusLabel" data-i18n="tsetFocusLabel">Focus minutes</span><input id="tsetFocus" type="number" inputmode="numeric" class="modal-inp" min="1" max="240"></label>
+        <label><span id="tsetShortLabel" data-i18n="tsetShortLabel">Short rest</span><input id="tsetShort" type="number" inputmode="numeric" class="modal-inp" min="1" max="60"></label>
+        <label><span id="tsetLongLabel" data-i18n="tsetLongLabel">Long rest</span><input id="tsetLong" type="number" inputmode="numeric" class="modal-inp" min="1" max="120"></label>
+        <label><span id="tsetRoundsLabel" data-i18n="tsetRoundsLabel">Focus sessions per cycle</span><input id="tsetRounds" type="number" inputmode="numeric" class="modal-inp" min="1" max="12"></label>
       </div>
-      <div class="modal-actions"><button class="mbtn-sec" type="button" id="tsetReset" onclick="resetTimerSettingsFields()">Defaults</button><button class="mbtn-pri" type="button" id="tsetSave" onclick="saveTimerSettings()">Save</button></div>
+      <div class="modal-actions"><button class="mbtn-sec" type="button" id="tsetReset" onclick="resetTimerSettingsFields()" data-i18n="btnDefaults">Defaults</button><button class="mbtn-pri" type="button" id="tsetSave" onclick="saveTimerSettings()" data-i18n="btnSave">Save</button></div>
     </div>
   </div>
 
@@ -1184,7 +1184,7 @@
     <div class="modal-card">
       <div class="modal-head">
         <span data-i18n="modeCustom">⏱️ Custom Session</span>
-        <button class="task-mini-sel" onclick="closeModal('customTimerModal')">✕</button>
+        <button class="task-mini-sel" onclick="closeModal('customTimerModal')" data-i18n-aria="btnCancel">✕</button>
       </div>
       <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
         <button class="delta-chip" onclick="setCustomPresetValues(20)">20m</button>
@@ -1194,8 +1194,8 @@
         <button class="delta-chip" onclick="setCustomPresetValues(90)">90m</button>
         <button class="delta-chip" onclick="setCustomPresetValues(120)">120m</button>
       </div>
-      <input type="text" inputmode="numeric" class="modal-inp" id="inpCustomMins" value="45" placeholder="Minutes (1-240)">
-      <input type="text" class="modal-inp" id="inpCustomTitle" placeholder="Session Name (Study, Gym, Reading, Work)...">
+      <input type="text" inputmode="numeric" class="modal-inp" id="inpCustomMins" value="45" data-i18n-placeholder="phCustomMins" placeholder="Minutes (1-240)">
+      <input type="text" class="modal-inp" id="inpCustomTitle" data-i18n-placeholder="phCustomTitle" placeholder="Session Name (Study, Gym, Reading, Work)...">
       <div class="modal-actions">
         <button class="mbtn-pri" onclick="applyCustomTimerNow()" data-i18n="btnSave">Save & Start</button>
         <button class="mbtn-sec" onclick="closeModal('customTimerModal')" data-i18n="btnCancel">Cancel</button>
@@ -1205,23 +1205,23 @@
 
   <div class="modal-overlay" id="noteModal">
     <div class="modal-card ns-editor" role="dialog" aria-modal="true" aria-labelledby="nsEditorHeading">
-      <div class="modal-head"><span id="nsEditorHeading">New note</span><button class="task-mini-sel" onclick="nsCloseEditor()" aria-label="Close">✕</button></div>
+      <div class="modal-head"><span id="nsEditorHeading" data-i18n="nsEditorHeading">New note</span><button class="task-mini-sel" onclick="nsCloseEditor()" aria-label="Close" data-i18n-aria="btnCancel">✕</button></div>
       <div id="nsEditorTemplates" class="ns-editor-templates"></div>
-      <label for="inpNoteTitle" id="nsTitleLabel">Title</label>
-      <input type="text" class="modal-inp" id="inpNoteTitle" dir="auto" maxlength="250" placeholder="Title or question" oninput="nsUpdateCount()">
+      <label for="inpNoteTitle" id="nsTitleLabel" data-i18n="nsTitleLabel">Title</label>
+      <input type="text" class="modal-inp" id="inpNoteTitle" dir="auto" maxlength="250" data-i18n-placeholder="phNoteTitle" placeholder="Title or question" oninput="nsUpdateCount()">
       <div class="ns-meta">
-        <label><span id="nsTypeLabel">Type</span><select class="modal-inp" id="selNoteCat"><option value="cornell" data-i18n="tagCornell">Cornell</option><option value="flash" data-i18n="tagFlash">Recall</option><option value="quick" data-i18n="tagQuick">Log</option></select></label>
-        <label><span id="nsDateLabel">Date</span><input type="date" class="modal-inp" id="inpNoteCalDate"></label>
+        <label><span id="nsTypeLabel" data-i18n="nsTypeLabel">Type</span><select class="modal-inp" id="selNoteCat"><option value="cornell" data-i18n="tagCornell">Cornell</option><option value="flash" data-i18n="tagFlash">Recall</option><option value="quick" data-i18n="tagQuick">Log</option></select></label>
+        <label><span id="nsDateLabel" data-i18n="nsDateLabel">Date</span><input type="date" class="modal-inp" id="inpNoteCalDate"></label>
       </div>
-      <label for="inpNoteBody" id="nsBodyLabel">Content</label><textarea class="modal-inp" id="inpNoteBody" dir="auto" maxlength="500000" rows="10" placeholder="Write here..." oninput="nsUpdateCount()"></textarea>
+      <label for="inpNoteBody" id="nsBodyLabel" data-i18n="nsBodyLabel">Content</label><textarea class="modal-inp" id="inpNoteBody" dir="auto" maxlength="500000" rows="10" data-i18n-placeholder="phNoteBody" placeholder="Write here..." oninput="nsUpdateCount()"></textarea>
       <small id="nsCounter" aria-live="polite">0 words</small>
-      <div class="ns-draft-bar" id="nsDraftBar"><span id="nsDraftStatus" aria-live="polite"></span><button type="button" id="nsDraftRestore" onclick="nsRestoreDraft()" hidden>Restore</button><button type="button" id="nsDraftDiscard" onclick="nsDiscardDraft()" hidden>Discard</button></div>
+      <div class="ns-draft-bar" id="nsDraftBar"><span id="nsDraftStatus" aria-live="polite"></span><button type="button" id="nsDraftRestore" onclick="nsRestoreDraft()" data-i18n="btnRestore" hidden>Restore</button><button type="button" id="nsDraftDiscard" onclick="nsDiscardDraft()" data-i18n="btnDiscard" hidden>Discard</button></div>
       <div class="ns-options">
-        <label><input id="nsPinCheck" type="checkbox"><span id="nsPinCheckLabel">Pin</span></label>
-        <label><input id="nsFavCheck" type="checkbox"><span id="nsFavCheckLabel">Favorite</span></label>
+        <label><input id="nsPinCheck" type="checkbox"><span id="nsPinCheckLabel" data-i18n="lblPin">Pin</span></label>
+        <label><input id="nsFavCheck" type="checkbox"><span id="nsFavCheckLabel" data-i18n="lblFavorite">Favorite</span></label>
         <label><input type="checkbox" id="chkNoteBlur"><span data-i18n="lblBlurAnswer">Hide answer</span></label>
       </div>
-      <div class="modal-actions"><button class="mbtn-sec" onclick="nsCloseEditor()" data-i18n="btnCancel">Cancel</button><button class="mbtn-pri" id="nsSaveButton" onclick="saveNewNote()">Save</button></div>
+      <div class="modal-actions"><button class="mbtn-sec" onclick="nsCloseEditor()" data-i18n="btnCancel">Cancel</button><button class="mbtn-pri" id="nsSaveButton" onclick="saveNewNote()" data-i18n="btnSave">Save</button></div>
     </div>
   </div>
 
@@ -1229,9 +1229,9 @@
     <div class="modal-card">
       <div class="modal-head">
         <span data-i18n="orbDump">💭 Quick Capture</span>
-        <button class="task-mini-sel" onclick="closeModal('brainDumpModal')">✕</button>
+        <button class="task-mini-sel" onclick="closeModal('brainDumpModal')" data-i18n-aria="btnCancel">✕</button>
       </div>
-      <input type="text" class="modal-inp" id="inpQuickDump" placeholder="...">
+      <input type="text" class="modal-inp" id="inpQuickDump" data-i18n-placeholder="phQuickDump" placeholder="...">
       <div class="modal-actions">
         <button class="mbtn-pri" onclick="saveQuickDump(false)" data-i18n="navNotes">Save Note</button>
         <button class="mbtn-sec" onclick="saveQuickDump(true)" data-i18n="navTasks">Save Task</button>

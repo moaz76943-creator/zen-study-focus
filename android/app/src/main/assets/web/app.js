@@ -69,6 +69,8 @@ const HabitFocusEngine = (function() {
   }
 
   function showKickstartPrompt() {
+    const lang = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? cfg.lang : 'en';
+    const tr = (k, fb) => (typeof window.dfGetLocalizedText === 'function' ? window.dfGetLocalizedText(k, lang, fb) : fb);
     const modal = document.createElement('div');
     modal.id = 'df-kickstart-modal';
     modal.className = 'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4';
@@ -82,15 +84,13 @@ const HabitFocusEngine = (function() {
 
     const titleH3 = document.createElement('h3');
     titleH3.className = 'font-bold text-slate-900 text-base mb-1';
-    titleH3.textContent = 'Resistance Broken!';
+    titleH3.setAttribute('data-i18n', 'kickstartResistanceBroken');
+    titleH3.textContent = tr('kickstartResistanceBroken', 'Resistance Broken!');
 
     const descP = document.createElement('p');
     descP.className = 'text-xs text-slate-500 mb-5 leading-relaxed';
-    descP.appendChild(document.createTextNode('You conquered the hardest 5 minutes. Ready to dive into a full '));
-    const strongEl = document.createElement('strong');
-    strongEl.textContent = '25-minute';
-    descP.appendChild(strongEl);
-    descP.appendChild(document.createTextNode(' focus flow?'));
+    descP.setAttribute('data-i18n', 'kickstartConqueredDesc');
+    descP.textContent = tr('kickstartConqueredDesc', 'You conquered the hardest 5 minutes. Ready to dive into a full 25-minute focus flow?');
 
     const btnCol = document.createElement('div');
     btnCol.className = 'flex flex-col gap-2';
@@ -98,12 +98,14 @@ const HabitFocusEngine = (function() {
     const extendBtn = document.createElement('button');
     extendBtn.id = 'df-extend-25m';
     extendBtn.className = 'w-full py-3 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white rounded-xl text-xs font-bold transition shadow-md';
-    extendBtn.textContent = '🚀 Yes, Deep Focus (25m)';
+    extendBtn.setAttribute('data-i18n', 'kickstartExtend25m');
+    extendBtn.textContent = tr('kickstartExtend25m', '🚀 Yes, Deep Focus (25m)');
 
     const closeBtn = document.createElement('button');
     closeBtn.id = 'df-kickstart-close';
     closeBtn.className = 'w-full py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-600 rounded-xl text-xs font-semibold transition';
-    closeBtn.textContent = '☕ Take a Break';
+    closeBtn.setAttribute('data-i18n', 'kickstartTakeBreak');
+    closeBtn.textContent = tr('kickstartTakeBreak', '☕ Take a Break');
 
     btnCol.appendChild(extendBtn);
     btnCol.appendChild(closeBtn);
@@ -184,9 +186,13 @@ const TaskTimerSynergy = (function() {
 
   function getFocusedTask() {
     const storage = getSafeStorage();
+    const lang = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? cfg.lang : 'en';
+    const defaultTask = typeof window.dfGetLocalizedText === 'function'
+      ? window.dfGetLocalizedText('generalStudySession', lang, 'General Study Session')
+      : 'General Study Session';
     return {
       id: storage.getItem('df_focused_task_id'),
-      text: storage.getItem('df_focused_task_text') || 'General Study Session'
+      text: storage.getItem('df_focused_task_text') || defaultTask
     };
   }
 
@@ -214,6 +220,9 @@ const TaskTimerSynergy = (function() {
     const timerHeader = document.querySelector('.timer-display, #timerDisplay, .circular-timer, [class*="timer" i] h2')?.parentElement;
     if (!timerHeader) return;
 
+    const lang = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? cfg.lang : 'en';
+    const tr = (k, fb) => (typeof window.dfGetLocalizedText === 'function' ? window.dfGetLocalizedText(k, lang, fb) : fb);
+
     const task = getFocusedTask();
     const pill = document.createElement('div');
     pill.id = 'df-timer-task-pill';
@@ -224,7 +233,8 @@ const TaskTimerSynergy = (function() {
 
     const targetLabel = document.createElement('span');
     targetLabel.className = 'text-blue-600 font-bold';
-    targetLabel.textContent = '🎯 Target:';
+    targetLabel.setAttribute('data-i18n', 'timerTargetLabel');
+    targetLabel.textContent = tr('timerTargetLabel', '🎯 Target:');
 
     const currentTaskName = document.createElement('span');
     currentTaskName.id = 'df-current-task-name';
@@ -237,18 +247,21 @@ const TaskTimerSynergy = (function() {
     const changeBtn = document.createElement('button');
     changeBtn.id = 'df-change-task-btn';
     changeBtn.className = 'text-blue-600 font-bold px-2 py-0.5 hover:bg-blue-100 rounded-lg transition shrink-0';
-    changeBtn.textContent = 'Change';
+    changeBtn.setAttribute('data-i18n', 'timerTargetChange');
+    changeBtn.textContent = tr('timerTargetChange', 'Change');
 
     pill.appendChild(leftWrap);
     pill.appendChild(changeBtn);
 
     changeBtn.onclick = () => {
+      const activeLang = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? cfg.lang : 'en';
+      const tLoc = (k, fb) => (typeof window.dfGetLocalizedText === 'function' ? window.dfGetLocalizedText(k, activeLang, fb) : fb);
       const tasks = getActiveTasks().filter(t => !t.done);
       if (tasks.length === 0) {
-        alert('All tasks completed! Add a new task in Tasks tab.');
+        alert(tLoc('allTasksCompletedAlert', 'All tasks completed! Add a new task in Tasks tab.'));
         return;
       }
-      const choice = prompt('Select active target task:\n' + tasks.map((t, i) => `${i+1}. ${t.text}`).join('\n'), '1');
+      const choice = prompt(tLoc('selectActiveTargetPrompt', 'Select active target task:') + '\n' + tasks.map((t, i) => `${i+1}. ${t.text}`).join('\n'), '1');
       if (choice) {
         const idx = parseInt(choice, 10) - 1;
         if (tasks[idx]) {
@@ -265,6 +278,9 @@ const TaskTimerSynergy = (function() {
     const task = getFocusedTask();
     if (!task.id) return;
 
+    const lang = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? cfg.lang : 'en';
+    const tr = (k, fb) => (typeof window.dfGetLocalizedText === 'function' ? window.dfGetLocalizedText(k, lang, fb) : fb);
+
     const modal = document.createElement('div');
     modal.id = 'df-task-complete-modal';
     modal.className = 'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4';
@@ -278,11 +294,15 @@ const TaskTimerSynergy = (function() {
 
     const titleH3 = document.createElement('h3');
     titleH3.className = 'font-bold text-slate-900 text-base mb-1';
-    titleH3.textContent = 'Session Complete!';
+    titleH3.setAttribute('data-i18n', 'sessionCompleteTitle');
+    titleH3.textContent = tr('sessionCompleteTitle', 'Session Complete!');
 
     const descP = document.createElement('p');
     descP.className = 'text-xs text-slate-500 mb-4';
-    descP.appendChild(document.createTextNode('Did you finish: '));
+    const didFinishSpan = document.createElement('span');
+    didFinishSpan.setAttribute('data-i18n', 'didYouFinishTask');
+    didFinishSpan.textContent = tr('didYouFinishTask', 'Did you finish: ');
+    descP.appendChild(didFinishSpan);
     const strongEl = document.createElement('strong');
     strongEl.className = 'text-slate-800';
     strongEl.textContent = String(task.text || '');
@@ -295,12 +315,14 @@ const TaskTimerSynergy = (function() {
     const yesBtn = document.createElement('button');
     yesBtn.id = 'df-task-yes';
     yesBtn.className = 'flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white rounded-xl text-xs font-bold transition';
-    yesBtn.textContent = '✅ Yes, Done';
+    yesBtn.setAttribute('data-i18n', 'taskCompleteYesDone');
+    yesBtn.textContent = tr('taskCompleteYesDone', '✅ Yes, Done');
 
     const noBtn = document.createElement('button');
     noBtn.id = 'df-task-no';
     noBtn.className = 'flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-700 rounded-xl text-xs font-semibold transition';
-    noBtn.textContent = '⏳ Continue Later';
+    noBtn.setAttribute('data-i18n', 'taskCompleteContinueLater');
+    noBtn.textContent = tr('taskCompleteContinueLater', '⏳ Continue Later');
 
     btnRow.appendChild(yesBtn);
     btnRow.appendChild(noBtn);
@@ -344,12 +366,12 @@ document.addEventListener('DOMContentLoaded', () => {
    DEEP FOCUS — ACOUSTIC COMPLETION TONES & SELECTOR (M185)
    ======================================================== */
 const COMPLETION_TONES = {
-  zen_bell: { name: 'Zen Bell 🎐', desc: 'Gentle', freq: 587.33, decay: 2.8, level: 0.3 },
-  tibetan_bowl: { name: 'Tibetan Bowl 🧘', desc: 'Deep', freq: 432, decay: 3.5, level: 0.35 },
-  woodblock: { name: 'Woodblock 🪵', desc: 'Crisp', freq: 800, decay: 0.25, level: 0.4 },
-  crystal: { name: 'Crystal Bell 🔔', desc: 'Clear', freq: 1046.5, decay: 2.5, level: 0.35 },
-  gong: { name: 'Temple Gong ⛩️', desc: 'Loud', freq: 220, decay: 4.0, level: 0.5 },
-  vibrate: { name: 'Vibrate Only 📳', desc: 'Silent', freq: 0, decay: 0, level: 0 }
+  zen_bell: { name: 'Zen Bell 🎐', nameKey: 'toneZenBell', desc: 'Gentle', descKey: 'toneDescGentle', freq: 587.33, decay: 2.8, level: 0.3 },
+  tibetan_bowl: { name: 'Tibetan Bowl 🧘', nameKey: 'toneTibetanBowl', desc: 'Deep', descKey: 'toneDescDeep', freq: 432, decay: 3.5, level: 0.35 },
+  woodblock: { name: 'Woodblock 🪵', nameKey: 'toneWoodblock', desc: 'Crisp', descKey: 'toneDescCrisp', freq: 800, decay: 0.25, level: 0.4 },
+  crystal: { name: 'Crystal Bell 🔔', nameKey: 'toneCrystalBell', desc: 'Clear', descKey: 'toneDescClear', freq: 1046.5, decay: 2.5, level: 0.35 },
+  gong: { name: 'Temple Gong ⛩️', nameKey: 'toneTempleGong', desc: 'Loud', descKey: 'toneDescLoud', freq: 220, decay: 4.0, level: 0.5 },
+  vibrate: { name: 'Vibrate Only 📳', nameKey: 'toneVibrateOnly', desc: 'Silent', descKey: 'toneDescSilent', freq: 0, decay: 0, level: 0 }
 };
 
 let toneCtx = null;
@@ -405,6 +427,8 @@ function injectTonePickerUI() {
   const natureContainer = document.querySelector('#view-nature, [data-view="nature"], .nature-container') || document.querySelector('.sound-card')?.parentElement;
   if (!natureContainer) return;
 
+  const lang = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? cfg.lang : 'en';
+  const tr = (k, fb) => (typeof window.dfGetLocalizedText === 'function' ? window.dfGetLocalizedText(k, lang, fb) : fb);
   const currentTone = localStorage.getItem('df_end_tone') || 'zen_bell';
 
   const card = document.createElement('div');
@@ -421,13 +445,15 @@ function injectTonePickerUI() {
   bellSpan.textContent = '🔔';
   const titleH3 = document.createElement('h3');
   titleH3.className = 'font-bold text-slate-800 text-sm';
-  titleH3.textContent = 'Focus End Chime (نغمة انتهاء الجلسة)';
+  titleH3.setAttribute('data-i18n', 'focusEndChimeTitle');
+  titleH3.textContent = tr('focusEndChimeTitle', 'Focus End Chime');
   leftRow.appendChild(bellSpan);
   leftRow.appendChild(titleH3);
 
   const badgeSpan = document.createElement('span');
   badgeSpan.className = 'text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100';
-  badgeSpan.textContent = 'Zero-Music';
+  badgeSpan.setAttribute('data-i18n', 'zeroMusicBadge');
+  badgeSpan.textContent = tr('zeroMusicBadge', 'Zero-Music');
 
   topRow.appendChild(leftRow);
   topRow.appendChild(badgeSpan);
@@ -444,10 +470,12 @@ function injectTonePickerUI() {
         : 'border-slate-200 bg-slate-50/60 text-slate-700') +
       ' hover:bg-slate-100 transition active:scale-98';
     const nameSpan = document.createElement('span');
-    nameSpan.textContent = t.name;
+    nameSpan.setAttribute('data-i18n', t.nameKey);
+    nameSpan.textContent = tr(t.nameKey, t.name);
     const descSpan = document.createElement('span');
     descSpan.className = 'text-[10px] text-slate-400 font-medium';
-    descSpan.textContent = t.desc;
+    descSpan.setAttribute('data-i18n', t.descKey);
+    descSpan.textContent = tr(t.descKey, t.desc);
     btn.appendChild(nameSpan);
     btn.appendChild(descSpan);
 
@@ -1357,12 +1385,12 @@ const LANG_CATALOG = [
     "countries": "united kingdom scotland"
   },
   {
-    "code": "yi",
-    "iso": "YI",
-    "enName": "Yiddish",
-    "nativeName": "Yiddish",
+    "code": "prs",
+    "iso": "PRS",
+    "enName": "Dari",
+    "nativeName": "دری",
     "dir": "rtl",
-    "countries": "global diaspora"
+    "countries": "afghanistan kabul herat"
   },
   {
     "code": "co",
@@ -1858,8 +1886,842 @@ function syncDailyRollover() {
   return true;
 }
 
+/* ============================================================================
+   UNIVERSAL THOUSAND-LANGUAGE ARCHITECTURE — INFINITE LOCALE REGISTRY (v22+)
+   - Dynamically loads, synthesizes, and maps 1,000+ world languages & regional dialects
+   - Strictly excludes Hebrew, Syriac, and Amazigh across all registries and UI
+   - Enforces dynamic RTL for right-to-left languages and LTR for all others
+   - Guarantees Western standard digits (0123456789) across every language
+   ============================================================================ */
+const DF_EXCLUDED_LOCALE_CODES = new Set([
+  'he', 'iw', 'heb', 'hbo', 'yi', 'yid', 'jrb', 'jpr', 'lad',
+  'syc', 'syr', 'aii', 'cld', 'tru', 'oar', 'sam', 'tmr', 'jpa', 'cpb',
+  'ber', 'zgh', 'tzm', 'kab', 'shi', 'rif', 'tmh', 'taq', 'zen', 'gha', 'mzb', 'oua', 'sjs', 'siz', 'tjo', 'thv', 'thz', 'ttq', 'cnu', 'grr'
+]);
+const DF_EXCLUDED_SCRIPT_RE = /[\u0590-\u05FF\u0700-\u074F\u2D30-\u2D7F]/;
+
+function dfIsExcludedLocale(code, meta) {
+  if (!code || typeof code !== 'string') return true;
+  const raw = code.toLowerCase().trim();
+  if (!raw) return true;
+  const parts = raw.split(/[-_]/);
+  for (let i = 0; i < parts.length; i++) {
+    if (DF_EXCLUDED_LOCALE_CODES.has(parts[i])) return true;
+  }
+  if (DF_EXCLUDED_LOCALE_CODES.has(raw)) return true;
+  if (meta && typeof meta === 'object') {
+    const labelBlob = `${meta.enName || ''} ${meta.nativeName || ''} ${meta.name || ''}`.toLowerCase();
+    if (/hebrew|syriac|amazigh|tamazight|tifinagh|berber|aramaic|assyrian|chaldean|yiddish/.test(labelBlob)) return true;
+    if (DF_EXCLUDED_SCRIPT_RE.test(labelBlob)) return true;
+  }
+  return false;
+}
+window.dfIsExcludedLocale = dfIsExcludedLocale;
+
+const DF_RTL_BASE_CODES = new Set([
+  'ar', 'fa', 'ur', 'ps', 'sd', 'ug', 'ckb', 'prs', 'dv', 'ks',
+  'bal', 'bqi', 'glk', 'mzn', 'lrc', 'azb', 'pnb', 'khw', 'hno',
+  'skr', 'haz', 'rhg', 'shu', 'ary', 'arz', 'apd', 'acm', 'acw',
+  'acq', 'aeb', 'ajp', 'apc', 'ars', 'avl', 'ayh', 'ayl', 'ayn',
+  'ayp', 'bbz', 'pga', 'sqr', 'ssh', 'abv', 'aec', 'afb', 'ags'
+]);
+
+function dfIsRtlLocale(code) {
+  if (!code || typeof code !== 'string') return false;
+  const clean = code.toLowerCase().trim();
+  if (DF_RTL_BASE_CODES.has(clean)) return true;
+  const parts = clean.split(/[-_]/);
+  if (DF_RTL_BASE_CODES.has(parts[0])) return true;
+  if (parts.includes('arab') || parts.includes('thaa') || parts.includes('nkoo') || parts.includes('adlm') || parts.includes('rohg')) return true;
+  const cat = Array.isArray(LANG_CATALOG) ? LANG_CATALOG.find(x => x && x.code && x.code.toLowerCase() === clean) : null;
+  if (cat && cat.dir === 'rtl') return true;
+  return false;
+}
+window.dfIsRtlLocale = dfIsRtlLocale;
+
+const DF_EXTRA_UI_TRANSLATIONS = {
+  en: {
+    appBrandTitle: 'Deep Focus',
+    langBtnAria: 'Select Language & Country',
+    backupBtnAria: 'Cloud Backup & Restore',
+    deskClockToggleTitle: 'Full-Screen Desk Clock Mode',
+    deskClockFocusSession: 'FOCUS SESSION',
+    deskClockTapToExit: 'Tap anywhere to exit',
+    statMinFocus: 'Min Focus',
+    statDayStreak: 'Day Streak',
+    statDoneTasks: 'Done Tasks',
+    timerSettingsAria: 'Timer Settings',
+    timerSettingBtnLabel: '⏱️ Setting',
+    timerPause: '⏸ Pause',
+    timerResume: '▶ Resume',
+    homeDomainsHeading: 'Focus Domains & Training',
+    homeQuickSessionsAria: 'Quick Session Durations',
+    quickDur5m: '⚡ 5m Kickstart',
+    quickDur15m: '15m Sprint',
+    quickDur25m: '25m Classic',
+    quickDur45m: '45m Deep',
+    quickDur60m: '60m Ultra',
+    quickDur90m: '90m Mastery',
+    quickDurCustom: '⚙️ Custom',
+    sportWorkSecLabel: 'Work (sec)',
+    sportRestSecLabel: 'Rest (sec)',
+    sportSetsLabel: 'Sets',
+    sportApply: 'Apply',
+    readTargetPagesLabel: 'Target Pages',
+    readDaysLabel: 'Days',
+    dailyGoalsTitle: '🎯 Daily Study Goals & Progress',
+    dailyGoalsSetBtn: '⚙️ Set Goals',
+    dailyGoalHoursLabel: '⏰ Daily Focus Hours',
+    dailyGoalPagesLabel: '📖 Daily Reading Pages',
+    dailyGoalTasksLabel: '✅ Daily Tasks Completed',
+    logPagePlusOne: '📖 +1 Page Read',
+    logPagePlusFive: '📚 +5 Pages Read',
+    logTaskPlusOne: '✅ +1 Task Done',
+    tasksPriorityAria: 'Task priority',
+    tasksAddBtnAria: 'Add task',
+    tasksClearDone: 'Clear Done',
+    calPrevMonthAria: 'Previous month',
+    calNextMonthAria: 'Next month',
+    notesToolbarAria: 'Note studio actions',
+    notesSearchPlaceholder: 'Search notes, tags, or subjects...',
+    notesSortRecent: 'Recent',
+    notesSortUpdated: 'Updated',
+    notesSortTitle: 'A–Z',
+    notesSortPinned: 'Pinned first',
+    notesExportJson: '⬇️ Export',
+    notesExportMd: '📄 Markdown',
+    notesTemplatesBtn: '📋 Templates',
+    notesSelectModeBtn: '☑️ Select',
+    notesSelectAllBtn: 'All',
+    notesBulkPinBtn: '📌 Pin',
+    notesBulkDeleteBtn: '🗑️ Delete',
+    notesBulkCancelBtn: 'Done',
+    notesDrawerCloseBtn: '✕',
+    notesTitleInputPlaceholder: 'Note Title...',
+    notesSubjectInputPlaceholder: 'Subject / Course (e.g. Biology, Calculus)',
+    notesTagsInputPlaceholder: 'Tags comma-separated (exam, chapter-1, urgent)',
+    notesFormatToolbarAria: 'Quick note formatting',
+    notesFmtBoldTitle: 'Bold',
+    notesFmtBulletTitle: 'Bullet list',
+    notesFmtCheckTitle: 'Checklist item',
+    notesFmtHeadingTitle: 'Heading',
+    notesFmtRuleTitle: 'Divider',
+    notesStatWords: '0 words',
+    notesStatChars: '0 chars',
+    notesStatRead: '1 min read',
+    notesDeleteCurrentBtn: '🗑️ Delete',
+    notesDuplicateCurrentBtn: '📄 Duplicate',
+    notesShareCurrentBtn: '📤 Share / Copy',
+    notesSaveDrawerBtn: '💾 Save Note',
+    soundsMasterVolAria: 'Master volume',
+    analyticsRecordedLabel: 'Recorded Analytics',
+    analyticsOverviewTitle: 'Study & Focus Overview',
+    analyticsTodayFocusLabel: 'Today Focus',
+    analyticsPomodorosLabel: 'Pomodoros',
+    analyticsTasksDoneLabel: 'Tasks Done',
+    analytics7DayTitle: 'Last 7 Days (Recorded Minutes)',
+    analyticsSummaryTitle: 'Recorded Summary',
+    analyticsTotalHoursLabel: 'Total Focus Hours',
+    analyticsCompletedTasksLabel: 'Completed Tasks',
+    analyticsSavedNotesLabel: 'Saved Notes',
+    analyticsActiveStreakLabel: 'Active Streak',
+    navMainAria: 'Main navigation',
+    navTrainingText: 'Quick training',
+    cloudBackupDesc: 'Keep your study logs, tasks, notes, and streaks safe. Export a portable backup file or restore from an existing backup.',
+    cloudBackupExportBtn: '📤 Export Backup File (.json)',
+    cloudBackupShareBtn: '📲 Quick Share Summary',
+    cloudBackupImportLabel: '📥 Import & Restore Backup',
+    dailyGoalsModalTitle: '🎯 Customize Daily Goals',
+    dailyGoalsHoursInputLabel: 'Target Daily Focus Hours (1 - 16h)',
+    dailyGoalsPagesInputLabel: 'Target Daily Reading Pages (1 - 300p)',
+    dailyGoalsTasksInputLabel: 'Target Daily Tasks (1 - 50)',
+    dailyGoalsSaveBtn: '💾 Save Daily Targets',
+    tsetModalTitle: '⏱️ Focus Timer Settings',
+    tsetFocusMinLabel: '🎯 Focus Session Duration (Minutes)',
+    tsetShortBreakLabel: '☕ Short Break Duration (Minutes)',
+    tsetLongBreakLabel: '🌿 Long Break Duration (Minutes)',
+    tsetCyclesLabel: '🔄 Sessions Before Long Break',
+    tsetAutoBreakLabel: 'Auto-start Break after Focus ends',
+    tsetAutoFocusLabel: 'Auto-start Next Focus after Break',
+    tsetSoundAlertLabel: 'Acoustic Completion Bell Alert',
+    tsetSaveApplyBtn: '✅ Save & Apply Now',
+    tsetResetDefaultsBtn: '↺ Reset Defaults (25 / 5 / 15)',
+    kickstartResistanceBroken: 'Resistance Broken!',
+    kickstartConqueredDesc: 'You conquered the hardest 5 minutes. Ready to dive into a full 25-minute focus flow?',
+    kickstartExtend25m: '🚀 Yes, Deep Focus (25m)',
+    kickstartTakeBreak: '☕ Take a Break',
+    generalStudySession: 'General Study Session',
+    timerTargetLabel: '🎯 Target:',
+    timerTargetChange: 'Change',
+    allTasksCompletedAlert: 'All tasks completed! Add a new task in Tasks tab.',
+    selectActiveTargetPrompt: 'Select active target task:',
+    sessionCompleteTitle: 'Session Complete!',
+    didYouFinishTask: 'Did you finish: ',
+    taskCompleteYesDone: '✅ Yes, Done',
+    taskCompleteContinueLater: '⏳ Continue Later',
+    focusEndChimeTitle: 'Focus End Chime',
+    zeroMusicBadge: 'Zero-Music',
+    toneZenBell: 'Zen Bell 🎐',
+    toneTibetanBowl: 'Tibetan Bowl 🧘',
+    toneWoodblock: 'Woodblock 🪵',
+    toneCrystalBell: 'Crystal Bell 🔔',
+    toneTempleGong: 'Temple Gong ⛩️',
+    toneVibrateOnly: 'Vibrate Only 📳',
+    toneDescGentle: 'Gentle',
+    toneDescDeep: 'Deep',
+    toneDescCrisp: 'Crisp',
+    toneDescClear: 'Clear',
+    toneDescLoud: 'Loud',
+    toneDescSilent: 'Silent',
+    eyeReliefTitle: '👁️ 20-20-20 Rule — Eye-Strain Relief',
+    eyeReliefStartBtn: '▶ Start 20s Eye Rest',
+    eyeReliefRestingBtn: '⏳ Resting eyes...',
+    eyeReliefDoneBtn: '✅ Eye Rest Complete!',
+    eyeReliefDismissBtn: 'Dismiss',
+    soundVolumeLabel: '🔉 Volume',
+    shareCardHeaderProof: 'DAILY PROOF',
+    shareCardDaysStreak: ' Days Streak',
+    shareCardMinsUnit: 'MINS',
+    shareCardImmersionSub: 'Deep Work Immersion Today',
+    shareCardWhatsAppBtn: '📲 Share to WhatsApp',
+    shareCardCopyBtn: 'Copy',
+    shareAnalyticsBtn: '📸 Share Focus Card'
+  },
+  ar: {
+    appBrandTitle: 'التركيز العميق',
+    langBtnAria: 'اختيار اللغة والبلد',
+    backupBtnAria: 'النسخ الاحتياطي والاستعادة',
+    deskClockToggleTitle: 'وضع ساعة المكتب بملء الشاشة',
+    deskClockFocusSession: 'جلسة تركيز',
+    deskClockTapToExit: 'انقر في أي مكان للخروج',
+    statMinFocus: 'دقائق التركيز',
+    statDayStreak: 'أيام الاستمرارية',
+    statDoneTasks: 'المهام المنجزة',
+    timerSettingsAria: 'إعدادات المؤقت',
+    timerSettingBtnLabel: '⏱️ الإعدادات',
+    timerPause: '⏸ إيقاف مؤقت',
+    timerResume: '▶ استئناف',
+    homeDomainsHeading: 'مجالات التركيز والتدريب',
+    homeQuickSessionsAria: 'مدد الجلسات السريعة',
+    quickDur5m: '⚡ 5 د انطلاقة',
+    quickDur15m: '15 د سريعة',
+    quickDur25m: '25 د كلاسيكية',
+    quickDur45m: '45 د عميقة',
+    quickDur60m: '60 د فائقة',
+    quickDur90m: '90 د إتقان',
+    quickDurCustom: '⚙️ مخصص',
+    sportWorkSecLabel: 'تمرين (ث)',
+    sportRestSecLabel: 'راحة (ث)',
+    sportSetsLabel: 'جولات',
+    sportApply: 'تطبيق',
+    readTargetPagesLabel: 'الصفحات المستهدفة',
+    readDaysLabel: 'الأيام',
+    dailyGoalsTitle: '🎯 أهداف الدراسة اليومية والتقدم',
+    dailyGoalsSetBtn: '⚙️ ضبط الأهداف',
+    dailyGoalHoursLabel: '⏰ ساعات التركيز اليومية',
+    dailyGoalPagesLabel: '📖 صفحات القراءة اليومية',
+    dailyGoalTasksLabel: '✅ المهام اليومية المنجزة',
+    logPagePlusOne: '📖 +1 صفحة مقروءة',
+    logPagePlusFive: '📚 +5 صفحات مقروءة',
+    logTaskPlusOne: '✅ +1 مهمة منجزة',
+    tasksPriorityAria: 'أولوية المهمة',
+    tasksAddBtnAria: 'إضافة مهمة',
+    tasksClearDone: 'مسح المنجز',
+    calPrevMonthAria: 'الشهر السابق',
+    calNextMonthAria: 'الشهر التالي',
+    notesToolbarAria: 'أدوات استوديو الملاحظات',
+    notesSearchPlaceholder: 'ابحث في الملاحظات أو الوسوم أو المواد...',
+    notesSortRecent: 'الأحدث',
+    notesSortUpdated: 'المحدثة',
+    notesSortTitle: 'أ–ي',
+    notesSortPinned: 'المثبتة أولاً',
+    notesExportJson: '⬇️ تصدير',
+    notesExportMd: '📄 ماركداون',
+    notesTemplatesBtn: '📋 قوالب',
+    notesSelectModeBtn: '☑️ تحديد',
+    notesSelectAllBtn: 'الكل',
+    notesBulkPinBtn: '📌 تثبيت',
+    notesBulkDeleteBtn: '🗑️ حذف',
+    notesBulkCancelBtn: 'تم',
+    notesDrawerCloseBtn: '✕',
+    notesTitleInputPlaceholder: 'عنوان الملاحظة...',
+    notesSubjectInputPlaceholder: 'المادة / المساق (مثل الأحياء، التفاضل)',
+    notesTagsInputPlaceholder: 'وسوم مفصولة بفواصل (اختبار، فصل-1، هام)',
+    notesFormatToolbarAria: 'تنسيق سريع للملاحظة',
+    notesFmtBoldTitle: 'عريض',
+    notesFmtBulletTitle: 'قائمة نقطية',
+    notesFmtCheckTitle: 'عنصر قائمة مهام',
+    notesFmtHeadingTitle: 'عنوان فرعي',
+    notesFmtRuleTitle: 'فاصل أفقي',
+    notesStatWords: '0 كلمة',
+    notesStatChars: '0 حرف',
+    notesStatRead: '1 د قراءة',
+    notesDeleteCurrentBtn: '🗑️ حذف',
+    notesDuplicateCurrentBtn: '📄 تكرار',
+    notesShareCurrentBtn: '📤 مشاركة / نسخ',
+    notesSaveDrawerBtn: '💾 حفظ الملاحظة',
+    soundsMasterVolAria: 'مستوى الصوت الرئيسي',
+    analyticsRecordedLabel: 'الإحصاءات المسجلة',
+    analyticsOverviewTitle: 'ملخص الدراسة والتركيز',
+    analyticsTodayFocusLabel: 'تركيز اليوم',
+    analyticsPomodorosLabel: 'جلسات بومودورو',
+    analyticsTasksDoneLabel: 'المهام المنجزة',
+    analytics7DayTitle: 'آخر 7 أيام (الدقائق المسجلة)',
+    analyticsSummaryTitle: 'الملخص المسجل',
+    analyticsTotalHoursLabel: 'إجمالي ساعات التركيز',
+    analyticsCompletedTasksLabel: 'المهام المكتملة',
+    analyticsSavedNotesLabel: 'الملاحظات المحفوظة',
+    analyticsActiveStreakLabel: 'سلسلة الأيام النشطة',
+    navMainAria: 'التنقل الرئيسي',
+    navTrainingText: 'تدريب سريع',
+    cloudBackupDesc: 'احفظ سجلات الدراسة والمهام والملاحظات وسلسلة الإنجاز بأمان. صدّر ملف نسخة احتياطية أو استعد بياناتك.',
+    cloudBackupExportBtn: '📤 تصدير ملف النسخة الاحتياطية (.json)',
+    cloudBackupShareBtn: '📲 مشاركة سريعة للملخص',
+    cloudBackupImportLabel: '📥 استيراد واستعادة النسخة الاحتياطية',
+    dailyGoalsModalTitle: '🎯 تخصيص الأهداف اليومية',
+    dailyGoalsHoursInputLabel: 'ساعات التركيز اليومية المستهدفة (1 - 16 ساعة)',
+    dailyGoalsPagesInputLabel: 'صفحات القراءة اليومية المستهدفة (1 - 300 صفحة)',
+    dailyGoalsTasksInputLabel: 'المهام اليومية المستهدفة (1 - 50)',
+    dailyGoalsSaveBtn: '💾 حفظ الأهداف اليومية',
+    tsetModalTitle: '⏱️ إعدادات مؤقت التركيز',
+    tsetFocusMinLabel: '🎯 مدة جلسة التركيز (بالدقائق)',
+    tsetShortBreakLabel: '☕ مدة الاستراحة القصيرة (بالدقائق)',
+    tsetLongBreakLabel: '🌿 مدة الاستراحة الطويلة (بالدقائق)',
+    tsetCyclesLabel: '🔄 عدد الجلسات قبل الاستراحة الطويلة',
+    tsetAutoBreakLabel: 'بدء الاستراحة تلقائياً بعد انتهاء التركيز',
+    tsetAutoFocusLabel: 'بدء جلسة التركيز التالية تلقائياً بعد الاستراحة',
+    tsetSoundAlertLabel: 'تنبيه صوتي هادئ عند انتهاء الجلسة',
+    tsetSaveApplyBtn: '✅ حفظ وتطبيق الآن',
+    tsetResetDefaultsBtn: '↺ استعادة الافتراضي (25 / 5 / 15)',
+    kickstartResistanceBroken: 'تحطمت مقاومة البداية!',
+    kickstartConqueredDesc: 'لقد أنجزت أصعب 5 دقائق. هل أنت مستعد للانطلاق في جلسة تركيز عميق كاملة لمدة 25 دقيقة؟',
+    kickstartExtend25m: '🚀 نعم، تركيز عميق (25 د)',
+    kickstartTakeBreak: '☕ خذ استراحة',
+    generalStudySession: 'جلسة دراسة عامة',
+    timerTargetLabel: '🎯 الهدف:',
+    timerTargetChange: 'تغيير',
+    allTasksCompletedAlert: 'تم إنجاز جميع المهام! أضف مهمة جديدة في تبويب المهام.',
+    selectActiveTargetPrompt: 'اختر المهمة المستهدفة النشطة:',
+    sessionCompleteTitle: 'اكتملت الجلسة!',
+    didYouFinishTask: 'هل أنجزت: ',
+    taskCompleteYesDone: '✅ نعم، أُنجزت',
+    taskCompleteContinueLater: '⏳ المتابعة لاحقاً',
+    focusEndChimeTitle: 'نغمة انتهاء الجلسة',
+    zeroMusicBadge: 'بدون موسيقى',
+    toneZenBell: 'جرس زن الهادئ 🎐',
+    toneTibetanBowl: 'وعاء الرنين العميق 🧘',
+    toneWoodblock: 'إيقاع خشبي نقي 🪵',
+    toneCrystalBell: 'جرس كريستالي صافي 🔔',
+    toneTempleGong: 'جرس عميق واضح ⛩️',
+    toneVibrateOnly: 'اهتزاز فقط 📳',
+    toneDescGentle: 'لطيف',
+    toneDescDeep: 'عميق',
+    toneDescCrisp: 'واضح',
+    toneDescClear: 'صافي',
+    toneDescLoud: 'قوي',
+    toneDescSilent: 'صامت',
+    eyeReliefTitle: '👁️ قاعدة 20-20-20 لراحة العينين',
+    eyeReliefStartBtn: '▶ ابدأ 20 ثانية راحة بصرية',
+    eyeReliefRestingBtn: '⏳ جارٍ إراحة العينين...',
+    eyeReliefDoneBtn: '✅ اكتملت راحة العينين!',
+    eyeReliefDismissBtn: 'إغلاق',
+    soundVolumeLabel: '🔉 مستوى الصوت',
+    shareCardHeaderProof: 'إنجاز اليوم',
+    shareCardDaysStreak: ' يوم متتالي',
+    shareCardMinsUnit: 'دقيقة',
+    shareCardImmersionSub: 'التركيز العميق اليوم',
+    shareCardWhatsAppBtn: '📲 مشاركة عبر واتساب',
+    shareCardCopyBtn: 'نسخ',
+    shareAnalyticsBtn: '📸 مشاركة بطاقة الإنجاز'
+  }
+};
+
+// Regional & World Dialect Matrix to expand LANG_CATALOG & Infinite Registry past 1,050+ locales
+const DF_REGIONAL_DIALECT_MATRIX = [
+  ['ar', 'Arabic', 'العربية', 'rtl', [
+    ['JO','Jordan','الأردن'],['SA','Saudi Arabia','السعودية'],['EG','Egypt','مصر'],['AE','UAE','الإمارات'],
+    ['MA','Morocco','المغرب'],['DZ','Algeria','الجزائر'],['TN','Tunisia','تونس'],['LY','Libya','ليبيا'],
+    ['IQ','Iraq','العراق'],['SY','Syria','سوريا'],['LB','Lebanon','لبنان'],['PS','Palestine','فلسطين'],
+    ['KW','Kuwait','الكويت'],['QA','Qatar','قطر'],['BH','Bahrain','البحرين'],['OM','Oman','عُمان'],
+    ['YE','Yemen','اليمن'],['SD','Sudan','السودان'],['MR','Mauritania','موريتانيا'],['SO','Somalia','الصومال'],
+    ['DJ','Djibouti','جيبوتي'],['KM','Comoros','جزر القمر'],['TD','Chad','تشاد'],['ER','Eritrea','إريتريا']
+  ]],
+  ['en', 'English', 'English', 'ltr', [
+    ['US','United States','United States'],['GB','United Kingdom','United Kingdom'],['CA','Canada','Canada'],
+    ['AU','Australia','Australia'],['NZ','New Zealand','New Zealand'],['IE','Ireland','Ireland'],
+    ['ZA','South Africa','South Africa'],['IN','India','India'],['SG','Singapore','Singapore'],
+    ['PH','Philippines','Philippines'],['NG','Nigeria','Nigeria'],['KE','Kenya','Kenya'],
+    ['GH','Ghana','Ghana'],['TZ','Tanzania','Tanzania'],['UG','Uganda','Uganda'],['ZM','Zambia','Zambia'],
+    ['ZW','Zimbabwe','Zimbabwe'],['PK','Pakistan','Pakistan'],['MY','Malaysia','Malaysia'],['HK','Hong Kong','Hong Kong'],
+    ['JM','Jamaica','Jamaica'],['TT','Trinidad & Tobago','Trinidad & Tobago'],['MT','Malta','Malta'],['FJ','Fiji','Fiji']
+  ]],
+  ['es', 'Spanish', 'Español', 'ltr', [
+    ['ES','Spain','España'],['MX','Mexico','México'],['AR','Argentina','Argentina'],['CO','Colombia','Colombia'],
+    ['CL','Chile','Chile'],['PE','Peru','Perú'],['VE','Venezuela','Venezuela'],['EC','Ecuador','Ecuador'],
+    ['GT','Guatemala','Guatemala'],['CU','Cuba','Cuba'],['BO','Bolivia','Bolivia'],['DO','Dominican Republic','República Dominicana'],
+    ['HN','Honduras','Honduras'],['PY','Paraguay','Paraguay'],['SV','El Salvador','El Salvador'],['NI','Nicaragua','Nicaragua'],
+    ['CR','Costa Rica','Costa Rica'],['PA','Panama','Panamá'],['UY','Uruguay','Uruguay'],['PR','Puerto Rico','Puerto Rico'],
+    ['GQ','Equatorial Guinea','Guinea Ecuatorial'],['US','United States','Estados Unidos']
+  ]],
+  ['fr', 'French', 'Français', 'ltr', [
+    ['FR','France','France'],['CA','Canada','Canada'],['BE','Belgium','Belgique'],['CH','Switzerland','Suisse'],
+    ['LU','Luxembourg','Luxembourg'],['MC','Monaco','Monaco'],['SN','Senegal','Sénégal'],['CI','Côte d’Ivoire','Côte d’Ivoire'],
+    ['CM','Cameroon','Cameroun'],['CD','DR Congo','RD Congo'],['CG','Congo','Congo'],['ML','Mali','Mali'],
+    ['BF','Burkina Faso','Burkina Faso'],['NE','Niger','Niger'],['TG','Togo','Togo'],['BJ','Benin','Bénin'],
+    ['GN','Guinea','Guinée'],['MG','Madagascar','Madagascar'],['HT','Haiti','Haïti'],['RW','Rwanda','Rwanda'],
+    ['BI','Burundi','Burundi'],['GA','Gabon','Gabon'],['DJ','Djibouti','Djibouti'],['KM','Comoros','Comores']
+  ]],
+  ['de', 'German', 'Deutsch', 'ltr', [
+    ['DE','Germany','Deutschland'],['AT','Austria','Österreich'],['CH','Switzerland','Schweiz'],
+    ['LI','Liechtenstein','Liechtenstein'],['LU','Luxembourg','Luxemburg'],['BE','Belgium','Belgien'],['IT','South Tyrol','Südtirol']
+  ]],
+  ['pt', 'Portuguese', 'Português', 'ltr', [
+    ['BR','Brazil','Brasil'],['PT','Portugal','Portugal'],['AO','Angola','Angola'],['MZ','Mozambique','Moçambique'],
+    ['CV','Cape Verde','Cabo Verde'],['GW','Guinea-Bissau','Guiné-Bissau'],['ST','São Tomé & Príncipe','São Tomé e Príncipe'],
+    ['TL','Timor-Leste','Timor-Leste'],['MO','Macau','Macau']
+  ]],
+  ['zh', 'Chinese', '中文', 'ltr', [
+    ['CN','Mainland China (Simplified)','简体中文 (中国)'],['TW','Taiwan (Traditional)','繁體中文 (台灣)'],
+    ['HK','Hong Kong','繁體中文 (香港)'],['SG','Singapore','简体中文 (新加坡)'],['MY','Malaysia','简体中文 (马来西亚)'],['MO','Macau','繁體中文 (澳門)']
+  ]],
+  ['ru', 'Russian', 'Русский', 'ltr', [
+    ['RU','Russia','Россия'],['KZ','Kazakhstan','Казахстан'],['BY','Belarus','Беларусь'],
+    ['KG','Kyrgyzstan','Кыргызстан'],['UZ','Uzbekistan','Узбекистан'],['MD','Moldova','Молдова']
+  ]],
+  ['hi', 'Hindi', 'हिन्दी', 'ltr', [
+    ['IN','India (Standard)','भारत'],['FJ','Fiji','फ़िजी'],['NP','Nepal','नेपाल'],['MU','Mauritius','मॉरीशस']
+  ]],
+  ['ur', 'Urdu', 'اردو', 'rtl', [
+    ['PK','Pakistan','پاکستان'],['IN','India','بھارت'],['AE','UAE','امارات'],['GB','United Kingdom','برطانیہ']
+  ]],
+  ['fa', 'Persian', 'فارسی', 'rtl', [
+    ['IR','Iran','ایران'],['AF','Afghanistan (Dari)','افغانستان (دری)'],['TJ','Tajikistan (Tajik)','تاجیکستان']
+  ]],
+  ['bn', 'Bengali', 'বাংলা', 'ltr', [
+    ['BD','Bangladesh','বাংলাদেশ'],['IN','India (West Bengal)','ভারত'],['SG','Singapore','সিঙ্গাপুর']
+  ]],
+  ['tr', 'Turkish', 'Türkçe', 'ltr', [
+    ['TR','Turkey','Türkiye'],['CY','Cyprus','Kıbrıs'],['DE','Germany','Almanya'],['BG','Bulgaria','Bulgaristan']
+  ]],
+  ['sw', 'Swahili', 'Kiswahili', 'ltr', [
+    ['TZ','Tanzania','Tanzania'],['KE','Kenya','Kenya'],['UG','Uganda','Uganda'],['CD','DR Congo','Kongo'],['RW','Rwanda','Rwanda']
+  ]],
+  ['ms', 'Malay', 'Bahasa Melayu', 'ltr', [
+    ['MY','Malaysia','Malaysia'],['BN','Brunei','Brunei'],['SG','Singapore','Singapura'],['ID','Indonesia (Riau)','Indonesia']
+  ]],
+  ['id', 'Indonesian', 'Bahasa Indonesia', 'ltr', [
+    ['ID','Indonesia','Indonesia'],['TL','Timor-Leste','Timor-Leste']
+  ]],
+  ['it', 'Italian', 'Italiano', 'ltr', [
+    ['IT','Italy','Italia'],['CH','Switzerland (Ticino)','Svizzera'],['SM','San Marino','San Marino'],['VA','Vatican City','Città del Vaticano']
+  ]],
+  ['nl', 'Dutch', 'Nederlands', 'ltr', [
+    ['NL','Netherlands','Nederland'],['BE','Belgium (Flemish)','België (Vlaams)'],['SR','Suriname','Suriname'],['CW','Curaçao','Curaçao']
+  ]],
+  ['ko', 'Korean', '한국어', 'ltr', [
+    ['KR','South Korea','대한민국'],['CN','Yanbian','중국 연변']
+  ]],
+  ['ja', 'Japanese', '日本語', 'ltr', [
+    ['JP','Japan','日本'],['PW','Palau','パラオ']
+  ]],
+  ['vi', 'Vietnamese', 'Tiếng Việt', 'ltr', [
+    ['VN','Vietnam','Việt Nam']
+  ]],
+  ['pl', 'Polish', 'Polski', 'ltr', [
+    ['PL','Poland','Polska']
+  ]],
+  ['uk', 'Ukrainian', 'Українська', 'ltr', [
+    ['UA','Ukraine','Україна']
+  ]],
+  ['ro', 'Romanian', 'Română', 'ltr', [
+    ['RO','Romania','România'],['MD','Moldova','Moldova']
+  ]],
+  ['el', 'Greek', 'Ελληνικά', 'ltr', [
+    ['GR','Greece','Ελλάδα'],['CY','Cyprus','Κύπρος']
+  ]],
+  ['sv', 'Swedish', 'Svenska', 'ltr', [
+    ['SE','Sweden','Sverige'],['FI','Finland','Finland']
+  ]],
+  ['sq', 'Albanian', 'Shqip', 'ltr', [
+    ['AL','Albania','Shqipëri'],['XK','Kosovo','Kosovë'],['MK','North Macedonia','Maqedonia e Veriut']
+  ]],
+  ['sr', 'Serbian', 'Српски', 'ltr', [
+    ['RS','Serbia','Србија'],['BA','Bosnia & Herzegovina','Босна и Херцеговина'],['ME','Montenegro','Црна Гора']
+  ]],
+  ['hr', 'Croatian', 'Hrvatski', 'ltr', [
+    ['HR','Croatia','Hrvatska'],['BA','Bosnia & Herzegovina','Bosna i Hercegovina']
+  ]],
+  ['ha', 'Hausa', 'Hausa', 'ltr', [
+    ['NG','Nigeria','Nijeriya'],['NE','Niger','Nijar'],['GH','Ghana','Gana']
+  ]],
+  ['yo', 'Yoruba', 'Èdè Yorùbá', 'ltr', [
+    ['NG','Nigeria','Nàìjíríà'],['BJ','Benin','Bẹ̀nẹ̀'],['TG','Togo','Tógò']
+  ]],
+  ['ig', 'Igbo', 'Asụsụ Igbo', 'ltr', [
+    ['NG','Nigeria','Naịjịrịa']
+  ]],
+  ['am', 'Amharic', 'አማርኛ', 'ltr', [
+    ['ET','Ethiopia','ኢትዮጵያ']
+  ]],
+  ['so', 'Somali', 'Soomaali', 'ltr', [
+    ['SO','Somalia','Soomaaliya'],['DJ','Djibouti','Jabuuti'],['ET','Ethiopia','Itoobiya'],['KE','Kenya','Kiinya']
+  ]],
+  ['ps', 'Pashto', 'پښتو', 'rtl', [
+    ['AF','Afghanistan','افغانستان'],['PK','Pakistan','پاکستان']
+  ]],
+  ['ku', 'Kurdish', 'Kurdî', 'ltr', [
+    ['IQ','Iraq','Îraq'],['TR','Turkey','Tirkiye'],['SY','Syria','Sûriye']
+  ]],
+  ['ckb', 'Central Kurdish (Sorani)', 'کوردیی ناوەندی', 'rtl', [
+    ['IQ','Iraq (Kurdistan)','عێراق'],['IR','Iran','ئێران']
+  ]],
+  ['uz', 'Uzbek', 'Oʻzbek', 'ltr', [
+    ['UZ','Uzbekistan','Oʻzbekiston'],['AF','Afghanistan','Afgʻoniston'],['TJ','Tajikistan','Tojikiston']
+  ]],
+  ['kk', 'Kazakh', 'Қазақ тілі', 'ltr', [
+    ['KZ','Kazakhstan','Қазақстан'],['MN','Mongolia','Моңғолия']
+  ]],
+  ['az', 'Azerbaijani', 'Azərbaycan', 'ltr', [
+    ['AZ','Azerbaijan','Azərbaycan']
+  ]],
+  ['ta', 'Tamil', 'தமிழ்', 'ltr', [
+    ['IN','India (Tamil Nadu)','இந்தியா'],['LK','Sri Lanka','இலங்கை'],['SG','Singapore','சிங்கப்பூர்'],['MY','Malaysia','மலேசியா']
+  ]],
+  ['te', 'Telugu', 'తెలుగు', 'ltr', [
+    ['IN','India (Andhra Pradesh & Telangana)','భారతదేశం']
+  ]],
+  ['mr', 'Marathi', 'मराठी', 'ltr', [
+    ['IN','India (Maharashtra)','भारत']
+  ]],
+  ['gu', 'Gujarati', 'ગુજરાતી', 'ltr', [
+    ['IN','India (Gujarat)','ભારત']
+  ]],
+  ['kn', 'Kannada', 'ಕನ್ನಡ', 'ltr', [
+    ['IN','India (Karnataka)','ಭಾರತ']
+  ]],
+  ['ml', 'Malayalam', 'മലയാളം', 'ltr', [
+    ['IN','India (Kerala)','ഇന്ത്യ']
+  ]],
+  ['pa', 'Punjabi', 'ਪੰਜਾਬੀ', 'ltr', [
+    ['IN','India (Punjab)','ਭਾਰਤ']
+  ]],
+  ['sd', 'Sindhi', 'سنڌي', 'rtl', [
+    ['PK','Pakistan (Sindh)','پاڪستان'],['IN','India','ڀارت']
+  ]],
+  ['ne', 'Nepali', 'नेपाली', 'ltr', [
+    ['NP','Nepal','नेपाल'],['IN','India (Sikkim & Darjeeling)','भारत'],['BT','Bhutan','भुटान']
+  ]],
+  ['si', 'Sinhala', 'සිංහල', 'ltr', [
+    ['LK','Sri Lanka','ශ්‍රී ලංකාව']
+  ]],
+  ['my', 'Burmese', 'မြန်မာ', 'ltr', [
+    ['MM','Myanmar','မြန်မာ']
+  ]],
+  ['th', 'Thai', 'ไทย', 'ltr', [
+    ['TH','Thailand','ประเทศไทย']
+  ]],
+  ['km', 'Khmer', 'ខ្មែរ', 'ltr', [
+    ['KH','Cambodia','កម្ពុជា']
+  ]],
+  ['lo', 'Lao', 'ລາວ', 'ltr', [
+    ['LA','Laos','ລາວ']
+  ]],
+  ['tl', 'Filipino (Tagalog)', 'Filipino', 'ltr', [
+    ['PH','Philippines','Pilipinas']
+  ]],
+  ['jv', 'Javanese', 'Basa Jawa', 'ltr', [
+    ['ID','Indonesia (Java)','Indonésia']
+  ]],
+  ['su', 'Sundanese', 'Basa Sunda', 'ltr', [
+    ['ID','Indonesia (West Java)','Indonésia']
+  ]]
+];
+
+// Global Infinite Locale Registry Singleton
+window.DF_INFINITE_LOCALE_REGISTRY = window.DF_INFINITE_LOCALE_REGISTRY || {
+  locales: Object.create(null),
+  catalogMap: Object.create(null),
+  packsIntegrated: false
+};
+
+function dfPurgeExcludedLocalesEverywhere() {
+  if (Array.isArray(LANG_CATALOG)) {
+    for (let i = LANG_CATALOG.length - 1; i >= 0; i--) {
+      const item = LANG_CATALOG[i];
+      if (!item || dfIsExcludedLocale(item.code, item)) {
+        LANG_CATALOG.splice(i, 1);
+      }
+    }
+  }
+  const stores = [
+    typeof DICT !== 'undefined' ? DICT : null,
+    window.DF_I18N_LOCALES,
+    window.df_i18n_locales,
+    window.DF_MASTER_LEXICON,
+    window.DF_INFINITE_LOCALE_REGISTRY && window.DF_INFINITE_LOCALE_REGISTRY.locales
+  ];
+  stores.forEach(store => {
+    if (!store || typeof store !== 'object') return;
+    Object.keys(store).forEach(k => {
+      if (dfIsExcludedLocale(k, store[k])) {
+        try { delete store[k]; } catch (_) {}
+      }
+    });
+  });
+}
+
+function dfSyncInfiniteLocaleRegistry() {
+  const reg = window.DF_INFINITE_LOCALE_REGISTRY;
+  if (!reg) return 0;
+
+  // 1. Trigger any deferred pack integrators once if they exist on window
+  if (!reg.packsIntegrated && typeof window !== 'undefined') {
+    const fnNames = Object.keys(window).filter(k =>
+      /^df(Integrate.*Pack|RegisterExhaustive.*Dictionary)$/.test(k) && typeof window[k] === 'function'
+    );
+    if (fnNames.length > 0) {
+      fnNames.forEach(fn => {
+        try { window[fn](); } catch (_) {}
+      });
+      reg.packsIntegrated = true;
+    }
+  }
+
+  // 2. Purge excluded locales first
+  dfPurgeExcludedLocalesEverywhere();
+
+  // 3. Index existing LANG_CATALOG entries
+  if (Array.isArray(LANG_CATALOG)) {
+    LANG_CATALOG.forEach(entry => {
+      if (!entry || !entry.code || dfIsExcludedLocale(entry.code, entry)) return;
+      const code = entry.code.trim();
+      entry.dir = dfIsRtlLocale(code) ? 'rtl' : 'ltr';
+      reg.catalogMap[code.toLowerCase()] = entry;
+      if (!reg.locales[code.toLowerCase()]) reg.locales[code.toLowerCase()] = Object.create(null);
+    });
+  }
+
+  // 4. Register regional dialect matrix entries into LANG_CATALOG & registry
+  DF_REGIONAL_DIALECT_MATRIX.forEach(([baseCode, baseEn, baseNat, baseDir, regions]) => {
+    if (dfIsExcludedLocale(baseCode)) return;
+    regions.forEach(([countryIso, countryEn, countryNat]) => {
+      const dialectCode = `${baseCode}-${countryIso.toLowerCase()}`;
+      if (dfIsExcludedLocale(dialectCode)) return;
+      const key = dialectCode.toLowerCase();
+      if (!reg.catalogMap[key]) {
+        const meta = {
+          code: key,
+          iso: countryIso.toUpperCase(),
+          enName: `${baseEn} (${countryEn})`,
+          nativeName: `${baseNat} (${countryNat})`,
+          dir: dfIsRtlLocale(key) ? 'rtl' : (baseDir || 'ltr'),
+          countries: `${countryEn.toLowerCase()} ${countryNat.toLowerCase()} ${baseEn.toLowerCase()} ${countryIso.toLowerCase()}`
+        };
+        LANG_CATALOG.push(meta);
+        reg.catalogMap[key] = meta;
+      }
+      if (!reg.locales[key]) reg.locales[key] = Object.create(null);
+    });
+  });
+
+  // 5. Harvest all locales from window.DF_I18N_LOCALES (700+ locales), window.df_i18n_locales, and window.DF_MASTER_LEXICON
+  const externalStores = [
+    window.DF_I18N_LOCALES,
+    window.df_i18n_locales,
+    window.DF_MASTER_LEXICON,
+    typeof DICT !== 'undefined' ? DICT : null
+  ];
+  externalStores.forEach(store => {
+    if (!store || typeof store !== 'object') return;
+    Object.keys(store).forEach(rawCode => {
+      const pack = store[rawCode];
+      if (!pack || typeof pack !== 'object') return;
+      if (dfIsExcludedLocale(rawCode, pack)) return;
+      const key = rawCode.toLowerCase().trim();
+      if (!reg.locales[key]) reg.locales[key] = Object.create(null);
+      Object.assign(reg.locales[key], pack);
+      if (!reg.catalogMap[key]) {
+        const iso = key.split(/[-_]/)[0].slice(0, 3).toUpperCase();
+        const enName = pack._name || pack.lang_name || pack.enName || rawCode.toUpperCase();
+        const nativeName = pack._native || pack.nativeName || pack.lang_name || enName;
+        if (dfIsExcludedLocale(key, { enName, nativeName })) {
+          delete reg.locales[key];
+          return;
+        }
+        const meta = {
+          code: key,
+          iso: iso,
+          enName: String(enName),
+          nativeName: String(nativeName),
+          dir: dfIsRtlLocale(key) ? 'rtl' : 'ltr',
+          countries: `${String(enName).toLowerCase()} ${String(nativeName).toLowerCase()} ${key}`
+        };
+        LANG_CATALOG.push(meta);
+        reg.catalogMap[key] = meta;
+      }
+    });
+  });
+
+  return Object.keys(reg.catalogMap).length;
+}
+window.dfSyncInfiniteLocaleRegistry = dfSyncInfiniteLocaleRegistry;
+
+// Cross-key alias bridge between index.html data-i18n keys and multi-generation packs
+const DF_KEY_ALIAS_MAP = {
+  timerStart: ['start_focus', 'start'],
+  timerPause: ['pause_focus', 'pause'],
+  timerResume: ['resume_focus', 'start_focus'],
+  timerReset: ['reset_timer', 'reset'],
+  navTimer: ['timer', 'focus_timer'],
+  navTasks: ['tasks', 'study_plan'],
+  navCalendar: ['calendar'],
+  navNotes: ['notes'],
+  navSounds: ['nature_sounds', 'sounds'],
+  navAnalytics: ['analytics', 'statistics'],
+  navTrainingText: ['quickTraining', 'trainingTitle'],
+  secSoundsTitle: ['nature_sounds', 'sounds'],
+  secTasksTitle: ['tasks'],
+  secCalTitle: ['calendar'],
+  secNotesTitle: ['notes'],
+  tsetSaveApplyBtn: ['save'],
+  dailyGoalsSaveBtn: ['save'],
+  notesSaveDrawerBtn: ['save'],
+  customTimerApply: ['save'],
+  customTimerCancel: ['cancel'],
+  noteCancel: ['cancel'],
+  noteSave: ['save'],
+  notesBulkDeleteBtn: ['delete'],
+  notesDeleteCurrentBtn: ['delete'],
+  soundRain: ['rain'],
+  soundRiver: ['river'],
+  soundWind: ['wind'],
+  soundForest: ['forest', 'trees'],
+  soundSea: ['sea', 'ocean'],
+  soundFire: ['fire'],
+  soundDew: ['dew', 'morning_dew'],
+  soundNight: ['night', 'birds']
+};
+
+/**
+ * Master Localization Engine: dfGetLocalizedText(key, langCode, fallback)
+ * Resolves any UI key across 1,000+ languages & dialects with zero missing stubs
+ * and enforces Western standard digits (0123456789).
+ */
+function dfGetLocalizedText(key, langCode, fallback) {
+  if (!key || typeof key !== 'string') return toWest(fallback || '');
+  dfSyncInfiniteLocaleRegistry();
+
+  // Support both (key, langCode, fallback) and legacy (key, fallback) call signatures
+  let rawLang = (typeof langCode === 'string' && langCode.trim()) ? langCode.trim().toLowerCase() : '';
+  let explicitFallback = typeof fallback === 'string' ? fallback : '';
+  if (rawLang && rawLang.length > 12 && !explicitFallback) {
+    explicitFallback = langCode;
+    rawLang = '';
+  }
+  if (!rawLang || dfIsExcludedLocale(rawLang)) {
+    rawLang = (typeof cfg !== 'undefined' && cfg && cfg.lang && !dfIsExcludedLocale(cfg.lang))
+      ? String(cfg.lang).toLowerCase().trim()
+      : 'en';
+  }
+  const baseLang = rawLang.split(/[-_]/)[0] || 'en';
+  const candidateLangs = rawLang !== baseLang ? [rawLang, baseLang] : [baseLang];
+
+  for (let i = 0; i < candidateLangs.length; i++) {
+    const lc = candidateLangs[i];
+    if (dfIsExcludedLocale(lc)) continue;
+
+    // 1. Primary DICT
+    if (typeof DICT !== 'undefined' && DICT[lc] && typeof DICT[lc][key] === 'string' && DICT[lc][key].trim()) {
+      return toWest(DICT[lc][key]);
+    }
+
+    // 2. DF_EXTRA_UI_TRANSLATIONS & SHELL_LABELS
+    if (DF_EXTRA_UI_TRANSLATIONS[lc] && typeof DF_EXTRA_UI_TRANSLATIONS[lc][key] === 'string') {
+      return toWest(DF_EXTRA_UI_TRANSLATIONS[lc][key]);
+    }
+    if (typeof SHELL_LABELS !== 'undefined' && SHELL_LABELS[lc] && typeof SHELL_LABELS[lc][key] === 'string') {
+      return toWest(SHELL_LABELS[lc][key]);
+    }
+
+    // 3. Reviewed DF99Locale multi-screen packs
+    if (window.DF99Locale && typeof window.DF99Locale.t === 'function') {
+      const scopes = ['shell', 'timer', 'tasks', 'calendar', 'notes', 'sounds', 'analytics', 'goals', 'settings'];
+      for (let s = 0; s < scopes.length; s++) {
+        const rev = window.DF99Locale.t(lc, scopes[s], key, '');
+        if (typeof rev === 'string' && rev.trim() && rev !== key) {
+          return toWest(rev);
+        }
+      }
+    }
+
+    // 4. DF22Locale premium translations
+    const df22 = window.DF22Locale && window.DF22Locale.translations && window.DF22Locale.translations[lc];
+    if (df22 && typeof df22[key] === 'string' && df22[key].trim()) {
+      return toWest(df22[key]);
+    }
+
+    // 5. Quick Training translations (QUICK_TRANSLATIONS)
+    if (typeof QUICK_TRANSLATIONS !== 'undefined' && QUICK_TRANSLATIONS[lc] && typeof QUICK_TRANSLATIONS[lc][key] === 'string') {
+      return toWest(QUICK_TRANSLATIONS[lc][key]);
+    }
+
+    // 6. Infinite Locale Registry & DF_I18N_LOCALES & DF_MASTER_LEXICON (direct + alias keys)
+    const regPack = window.DF_INFINITE_LOCALE_REGISTRY && window.DF_INFINITE_LOCALE_REGISTRY.locales[lc];
+    const i18nPack = window.DF_I18N_LOCALES && window.DF_I18N_LOCALES[lc];
+    const lowerPack = window.df_i18n_locales && window.df_i18n_locales[lc];
+    const masterPack = window.DF_MASTER_LEXICON && window.DF_MASTER_LEXICON[lc];
+    const packs = [regPack, i18nPack, lowerPack, masterPack];
+    const keysToCheck = [key].concat(DF_KEY_ALIAS_MAP[key] || []);
+    for (let p = 0; p < packs.length; p++) {
+      const pk = packs[p];
+      if (!pk || typeof pk !== 'object') continue;
+      for (let kIdx = 0; kIdx < keysToCheck.length; kIdx++) {
+        const candidateKey = keysToCheck[kIdx];
+        if (typeof pk[candidateKey] === 'string' && pk[candidateKey].trim()) {
+          return toWest(pk[candidateKey]);
+        }
+      }
+    }
+  }
+
+  // 7. English baseline fallbacks (never return raw key or undefined)
+  if (typeof DICT !== 'undefined' && DICT.en && typeof DICT.en[key] === 'string' && DICT.en[key].trim()) {
+    return toWest(DICT.en[key]);
+  }
+  if (DF_EXTRA_UI_TRANSLATIONS.en && typeof DF_EXTRA_UI_TRANSLATIONS.en[key] === 'string') {
+    return toWest(DF_EXTRA_UI_TRANSLATIONS.en[key]);
+  }
+  if (typeof SHELL_LABELS !== 'undefined' && SHELL_LABELS.en && typeof SHELL_LABELS.en[key] === 'string') {
+    return toWest(SHELL_LABELS.en[key]);
+  }
+  if (typeof QUICK_TRANSLATIONS !== 'undefined' && QUICK_TRANSLATIONS.en && typeof QUICK_TRANSLATIONS.en[key] === 'string') {
+    return toWest(QUICK_TRANSLATIONS.en[key]);
+  }
+  const df22En = window.DF22Locale && window.DF22Locale.translations && window.DF22Locale.translations.en;
+  if (df22En && typeof df22En[key] === 'string' && df22En[key].trim()) {
+    return toWest(df22En[key]);
+  }
+  if (explicitFallback && explicitFallback.trim()) {
+    return toWest(explicitFallback);
+  }
+  return toWest(key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).trim());
+}
+window.dfGetLocalizedText = dfGetLocalizedText;
+
 function L() {
-  return DICT[cfg.lang] || DICT.en;
+  const raw = (cfg && cfg.lang) ? String(cfg.lang).toLowerCase().trim() : 'en';
+  const base = raw.split(/[-_]/)[0];
+  const baseDict = DICT[raw] || DICT[base] || DICT.en;
+  if (typeof Proxy === 'function') {
+    return new Proxy(baseDict, {
+      get(target, prop) {
+        if (typeof prop !== 'string') return target[prop];
+        if (prop in target && target[prop] !== undefined) return target[prop];
+        return dfGetLocalizedText(prop, raw, DICT.en[prop] || '');
+      }
+    });
+  }
+  return baseDict;
 }
 
 // Shell-only labels. Reviewed DF99 shell packs take priority; legacy DICT and
@@ -1875,14 +2737,7 @@ const SHELL_LABELS = Object.freeze({
   })
 });
 function shellLabel(code, key, current) {
-  const dict=DICT[code] || {};
-  const primary=typeof dict[key]==='string' && dict[key].trim() ? dict[key] : null;
-  const extra=SHELL_LABELS[code] && SHELL_LABELS[code][key];
-  const english=DICT.en[key] || (SHELL_LABELS.en && SHELL_LABELS.en[key]);
-  const fallback=primary || extra || english || current || '';
-  const reviewed=window.DF99Locale?.t(code,'shell',key,fallback);
-  const label=typeof reviewed==='string' && reviewed.trim() && reviewed!==key ? reviewed : fallback;
-  return toWest(label);
+  return dfGetLocalizedText(key, code, current);
 }
 
 const CONFIRMATION_TEXT = {
@@ -1988,51 +2843,58 @@ const CONFIRMATION_TEXT = {
   ]
 };
 function confirmSensitiveAction(kind) {
-  const copy = CONFIRMATION_TEXT[cfg.lang] || CONFIRMATION_TEXT.en;
+  const base = (cfg && cfg.lang) ? String(cfg.lang).toLowerCase().split(/[-_]/)[0] : 'en';
+  const copy = CONFIRMATION_TEXT[cfg.lang] || CONFIRMATION_TEXT[base] || CONFIRMATION_TEXT.en;
   const index = {task:0, note:1, restore:2}[kind];
   if (!Number.isInteger(index)) return false;
   return window.confirm(copy[index]);
 }
 
 function openLanguageModal() {
+  dfSyncInfiniteLocaleRegistry();
   document.getElementById('inpLangCountrySearch').value = '';
   renderLanguageList();
   document.getElementById('langModal').classList.add('open');
 }
 
 function renderLanguageList() {
+  dfSyncInfiniteLocaleRegistry();
   const q = (document.getElementById('inpLangCountrySearch').value || '').toLowerCase().trim();
   const box = document.getElementById('langListScrollBox');
+  if (!box) return;
   box.replaceChildren();
 
   LANG_CATALOG.filter(l => {
+    if (!l || dfIsExcludedLocale(l.code, l)) return false;
     if (!q) return true;
-    return l.enName.toLowerCase().includes(q) ||
-           l.nativeName.toLowerCase().includes(q) ||
-           l.iso.toLowerCase().includes(q) ||
-           l.countries.toLowerCase().includes(q);
+    return (l.enName || '').toLowerCase().includes(q) ||
+           (l.nativeName || '').toLowerCase().includes(q) ||
+           (l.iso || '').toLowerCase().includes(q) ||
+           (l.code || '').toLowerCase().includes(q) ||
+           (l.countries || '').toLowerCase().includes(q);
   }).forEach(l => {
     const row = document.createElement('button');
     row.type = 'button';
-    row.className = `lang-row-btn ${cfg.lang === l.code ? 'active' : ''}`;
-    row.setAttribute('aria-pressed', String(cfg.lang === l.code));
+    const isActive = cfg.lang === l.code;
+    row.className = `lang-row-btn ${isActive ? 'active' : ''}`;
+    row.setAttribute('aria-pressed', String(isActive));
     row.onclick = () => applyLanguage(l.code);
     const icon = document.createElement('div');
     icon.className = 'lang-code-monogram';
-    icon.textContent = l.iso;
+    icon.textContent = toWest(l.iso);
     const names = document.createElement('div');
     names.className = 'lang-names-col';
     const english = document.createElement('div');
     english.className = 'lang-en-title';
-    english.textContent = l.enName;
+    english.textContent = toWest(l.enName);
     const native = document.createElement('div');
     native.className = 'lang-native-sub';
-    native.textContent = l.nativeName;
+    native.textContent = toWest(l.nativeName);
     names.appendChild(english);
     names.appendChild(native);
     const mark = document.createElement('span');
     mark.style.cssText = 'font-size:0.75rem;font-weight:900;color:var(--primary);';
-    mark.textContent = cfg.lang === l.code ? '✓' : '';
+    mark.textContent = isActive ? '✓' : '';
     row.appendChild(icon);
     row.appendChild(names);
     row.appendChild(mark);
@@ -2072,51 +2934,86 @@ function localizeStarterPreviews(target) {
 }
 
 function applyLanguage(code) {
-  const normalized = typeof code === 'string' ? code.toLowerCase().trim().split(/[-_]/)[0] : 'en';
-  const meta = LANG_CATALOG.find(x => x.code === normalized && x.code !== 'he' && x.code !== 'iw')
+  dfSyncInfiniteLocaleRegistry();
+  const rawInput = typeof code === 'string' ? code.toLowerCase().trim() : 'en';
+  const safeInput = dfIsExcludedLocale(rawInput) ? 'en' : rawInput;
+  const baseCode = safeInput.split(/[-_]/)[0] || 'en';
+  const meta = LANG_CATALOG.find(x => x.code.toLowerCase() === safeInput && !dfIsExcludedLocale(x.code, x))
+    || LANG_CATALOG.find(x => x.code.toLowerCase() === baseCode && !dfIsExcludedLocale(x.code, x))
     || LANG_CATALOG.find(x => x.code === 'en');
-  const previousLang=cfg.lang;
+  const previousLang = cfg.lang;
   cfg.lang = meta.code;
+  window.DF_CURRENT_LOCALE = meta.code;
   try {
     saveFortressData('zen_fortress_cfg_v21', cfg);
   } catch (error) {
-    cfg.lang=previousLang; // An unacknowledged write must not change the active locale.
+    cfg.lang = previousLang; // An unacknowledged write must not change the active locale.
     throw error;
   }
   const d = L();
+  const isRtl = dfIsRtlLocale(meta.code);
+  const resolvedDir = isRtl ? 'rtl' : 'ltr';
+  meta.dir = resolvedDir;
 
-  const root = document.getElementById('htmlRoot');
-  root.setAttribute('lang', meta.code);
-  root.setAttribute('dir', meta.dir);
+  const root = document.getElementById('htmlRoot') || document.documentElement;
+  if (root) {
+    root.setAttribute('lang', meta.code);
+    root.setAttribute('dir', resolvedDir);
+    root.dir = resolvedDir;
+  }
+  if (document.body) {
+    document.body.setAttribute('dir', resolvedDir);
+    document.body.style.direction = resolvedDir;
+    document.body.style.textAlign = isRtl ? 'right' : 'left';
+  }
+  if (typeof window.dfApplyRtlA11yStyles === 'function') {
+    window.dfApplyRtlA11yStyles();
+  }
 
-  document.getElementById('currentLangIso').textContent = meta.iso;
+  const isoEl = document.getElementById('currentLangIso');
+  if (isoEl) isoEl.textContent = toWest(meta.iso);
   const languageLabel = document.getElementById('currentLangLabel');
-  languageLabel.textContent = `${meta.enName} • ${meta.nativeName}`;
-  // Older WebViews can retain the button's initial computed accessible name
-  // when only its child spans change. Publish the current name explicitly.
-  languageLabel.parentElement?.setAttribute('aria-label',
-    `${meta.iso} ${meta.enName} • ${meta.nativeName}`);
-  document.getElementById('hdrMainTitle').textContent = 'Deep Focus';
-  document.getElementById('hdrSubTitle').textContent = d.sub;
+  if (languageLabel) {
+    languageLabel.textContent = toWest(`${meta.enName} • ${meta.nativeName}`);
+    languageLabel.parentElement?.setAttribute('aria-label',
+      toWest(`${meta.iso} ${meta.enName} • ${meta.nativeName}`));
+  }
+  const hdrMain = document.getElementById('hdrMainTitle');
+  if (hdrMain) hdrMain.textContent = 'Deep Focus';
+  const hdrSub = document.getElementById('hdrSubTitle');
+  if (hdrSub) hdrSub.textContent = toWest(d.sub || dfGetLocalizedText('sub', meta.code, 'Zero-Cloud Academic & Athletic Sanctuary'));
   const tn = document.getElementById('navTrainingText');
-  const trainingLabel = window.DF22Locale?.translations?.[meta.code]?.quickTraining
-    || (typeof quickText === 'function' ? quickText('trainingTitle') : 'Quick training');
-  if (tn) tn.textContent = trainingLabel;
-  document.getElementById('navTraining')?.setAttribute('aria-label', trainingLabel);
+  const trainingLabel = dfGetLocalizedText('navTrainingText', meta.code,
+    window.DF22Locale?.translations?.[baseCode]?.quickTraining
+    || (typeof quickText === 'function' ? quickText('trainingTitle') : 'Quick training'));
+  if (tn) tn.textContent = toWest(trainingLabel);
+  document.getElementById('navTraining')?.setAttribute('aria-label', toWest(trainingLabel));
   if (typeof refreshTimerSettings === 'function') refreshTimerSettings();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     // Never replace an editable value or arbitrary user-generated content.
     if (el.isContentEditable || /^(INPUT|TEXTAREA)$/i.test(el.tagName || '')) return;
     const k = el.getAttribute('data-i18n');
-    const value=shellLabel(meta.code,k,el.textContent);
-    if (value && value!==k && el.textContent!==value) el.textContent=value;
+    const value = dfGetLocalizedText(k, meta.code, el.textContent);
+    if (value && value !== k && el.textContent !== value) el.textContent = toWest(value);
   });
 
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const k = el.getAttribute('data-i18n-placeholder');
-    const value=shellLabel(meta.code,k,el.getAttribute('placeholder'));
-    if (value && value!==k) el.setAttribute('placeholder',value);
+    const value = dfGetLocalizedText(k, meta.code, el.getAttribute('placeholder') || '');
+    if (value && value !== k) el.setAttribute('placeholder', toWest(value));
+  });
+
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const k = el.getAttribute('data-i18n-title');
+    const value = dfGetLocalizedText(k, meta.code, el.getAttribute('title') || '');
+    if (value && value !== k) el.setAttribute('title', toWest(value));
+  });
+
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+    const k = el.getAttribute('data-i18n-aria');
+    const value = dfGetLocalizedText(k, meta.code, el.getAttribute('aria-label') || '');
+    if (value && value !== k) el.setAttribute('aria-label', toWest(value));
   });
 
   localizeStarterPreviews(d);
@@ -2131,9 +3028,9 @@ function applyLanguage(code) {
   renderSoundsStudio();
   updateSyllabusCalc();
   closeModal('langModal');
-  quickL10n();
+  if (typeof quickL10n === 'function') quickL10n();
   // Premium labels may also be created by re-rendered screens; refresh last.
-  if (window.DF22Locale?.apply) window.DF22Locale.apply(document,meta.code);
+  if (window.DF22Locale?.apply) window.DF22Locale.apply(document, baseCode);
   if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
   try {
     if (window.ZenNative && typeof window.ZenNative.setNativeLocale === 'function')
@@ -2900,7 +3797,8 @@ function renderEyeStrainReliefPrompt202020(completedMins = 20) {
     eyeReliefTimerId = null;
   }
 
-  const isAr = cfg.lang === 'ar';
+  const isAr = (cfg.lang || '').split(/[-_]/)[0] === 'ar';
+  const tr = (k, fb) => (typeof window.dfGetLocalizedText === 'function' ? window.dfGetLocalizedText(k, cfg.lang, fb) : fb);
   const banner = document.createElement('div');
   banner.id = 'df-eye-strain-202020-banner';
   banner.setAttribute('role', 'status');
@@ -2912,9 +3810,10 @@ function renderEyeStrainReliefPrompt202020(completedMins = 20) {
 
   const titleEl = document.createElement('strong');
   titleEl.style.cssText = 'font-size:13px;font-weight:800;color:#065f46;';
-  titleEl.textContent = isAr
+  titleEl.setAttribute('data-i18n', 'eyeReliefTitle');
+  titleEl.textContent = tr('eyeReliefTitle', isAr
     ? '👁️ قاعدة 20-20-20 لراحة العينين (Eye-Strain Relief)'
-    : '👁️ 20-20-20 Rule — Eye-Strain Relief';
+    : '👁️ 20-20-20 Rule — Eye-Strain Relief');
 
   const countdownBadge = document.createElement('span');
   countdownBadge.id = 'df-202020-countdown-badge';
@@ -2937,17 +3836,20 @@ function renderEyeStrainReliefPrompt202020(completedMins = 20) {
   const startEyeRestBtn = document.createElement('button');
   startEyeRestBtn.type = 'button';
   startEyeRestBtn.style.cssText = 'padding:6px 12px;border-radius:10px;border:none;background:#059669;color:#ffffff;font-size:12px;font-weight:700;cursor:pointer;';
-  startEyeRestBtn.textContent = isAr ? '▶ ابدأ 20 ثانية راحة بصرية' : '▶ Start 20s Eye Rest';
+  startEyeRestBtn.setAttribute('data-i18n', 'eyeReliefStartBtn');
+  startEyeRestBtn.textContent = tr('eyeReliefStartBtn', isAr ? '▶ ابدأ 20 ثانية راحة بصرية' : '▶ Start 20s Eye Rest');
 
   const dismissBtn = document.createElement('button');
   dismissBtn.type = 'button';
   dismissBtn.style.cssText = 'padding:6px 12px;border-radius:10px;border:1px solid #a7f3d0;background:#ffffff;color:#065f46;font-size:12px;font-weight:600;cursor:pointer;';
-  dismissBtn.textContent = isAr ? 'إغلاق' : 'Dismiss';
+  dismissBtn.setAttribute('data-i18n', 'eyeReliefDismissBtn');
+  dismissBtn.textContent = tr('eyeReliefDismissBtn', isAr ? 'إغلاق' : 'Dismiss');
 
   startEyeRestBtn.addEventListener('click', () => {
     if (eyeReliefTimerId) return;
     startEyeRestBtn.disabled = true;
-    startEyeRestBtn.textContent = isAr ? '⏳ جارٍ إراحة العينين...' : '⏳ Resting eyes...';
+    startEyeRestBtn.setAttribute('data-i18n', 'eyeReliefRestingBtn');
+    startEyeRestBtn.textContent = tr('eyeReliefRestingBtn', isAr ? '⏳ جارٍ إراحة العينين...' : '⏳ Resting eyes...');
     eyeReliefTimerId = setInterval(() => {
       secRemaining = Math.max(0, secRemaining - 1);
       countdownBadge.textContent = `${toWest(secRemaining)}s`;
@@ -2955,7 +3857,8 @@ function renderEyeStrainReliefPrompt202020(completedMins = 20) {
         clearInterval(eyeReliefTimerId);
         eyeReliefTimerId = null;
         countdownBadge.textContent = '✓ 20s';
-        startEyeRestBtn.textContent = isAr ? '✅ اكتملت راحة العينين!' : '✅ Eye Rest Complete!';
+        startEyeRestBtn.setAttribute('data-i18n', 'eyeReliefDoneBtn');
+        startEyeRestBtn.textContent = tr('eyeReliefDoneBtn', isAr ? '✅ اكتملت راحة العينين!' : '✅ Eye Rest Complete!');
         try {
           if (typeof dfLogBreakActivity === 'function') dfLogBreakActivity('eye_rest', 20, 5);
           if (typeof localStorage !== 'undefined') {
@@ -4354,7 +5257,10 @@ function renderSoundsStudio() {
     const volLabel = document.createElement('div');
     volLabel.className = 'stile-volume-label';
     const volText = document.createElement('span');
-    volText.textContent = `🔉 ${cfg.lang === 'ar' ? 'مستوى الصوت' : 'Volume'}`;
+    volText.setAttribute('data-i18n', 'soundVolumeLabel');
+    volText.textContent = typeof window.dfGetLocalizedText === 'function'
+      ? window.dfGetLocalizedText('soundVolumeLabel', cfg.lang, `🔉 ${(cfg.lang || '').startsWith('ar') ? 'مستوى الصوت' : 'Volume'}`)
+      : `🔉 ${(cfg.lang || '').startsWith('ar') ? 'مستوى الصوت' : 'Volume'}`;
     const volPct = document.createElement('strong');
     volPct.className = 'stile-volume-pct';
     volPct.textContent = `${Math.round(s.vol * 100)}%`;
@@ -4870,6 +5776,8 @@ const ShareCardEngine = (function() {
   function showShareCardModal() {
     if (document.getElementById('df-share-card-modal')) return;
     const data = getSafeData();
+    const lang = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? cfg.lang : 'en';
+    const tr = (k, fb) => (typeof window.dfGetLocalizedText === 'function' ? window.dfGetLocalizedText(k, lang, fb) : fb);
 
     const modal = document.createElement('div');
     modal.id = 'df-share-card-modal';
@@ -4891,7 +5799,8 @@ const ShareCardEngine = (function() {
     hDot.className = 'text-slate-600';
     hDot.textContent = '•';
     const hSpan2 = document.createElement('span');
-    hSpan2.textContent = 'DAILY PROOF';
+    hSpan2.setAttribute('data-i18n', 'shareCardHeaderProof');
+    hSpan2.textContent = tr('shareCardHeaderProof', 'DAILY PROOF');
     headerRow.appendChild(hSpan1);
     headerRow.appendChild(hDot);
     headerRow.appendChild(hSpan2);
@@ -4912,8 +5821,11 @@ const ShareCardEngine = (function() {
     const streakValSpan = document.createElement('span');
     streakValSpan.id = 'df-share-streak';
     streakValSpan.textContent = String(data.streak || '1');
+    const streakSuffixSpan = document.createElement('span');
+    streakSuffixSpan.setAttribute('data-i18n', 'shareCardDaysStreak');
+    streakSuffixSpan.textContent = tr('shareCardDaysStreak', ' Days Streak');
     streakWrap.appendChild(streakValSpan);
-    streakWrap.appendChild(document.createTextNode(' Days Streak'));
+    streakWrap.appendChild(streakSuffixSpan);
     streakPill.appendChild(fireSpan);
     streakPill.appendChild(streakWrap);
 
@@ -4930,14 +5842,16 @@ const ShareCardEngine = (function() {
     minsValSpan.textContent = String(data.mins || '25');
     const minsUnitSpan = document.createElement('span');
     minsUnitSpan.className = 'text-xs text-slate-400 font-normal';
-    minsUnitSpan.textContent = 'MINS';
+    minsUnitSpan.setAttribute('data-i18n', 'shareCardMinsUnit');
+    minsUnitSpan.textContent = tr('shareCardMinsUnit', 'MINS');
     minsHero.appendChild(minsValSpan);
     minsHero.appendChild(document.createTextNode(' '));
     minsHero.appendChild(minsUnitSpan);
 
     const metricSub = document.createElement('div');
     metricSub.className = 'text-xs text-slate-400 mt-1';
-    metricSub.textContent = 'Deep Work Immersion Today';
+    metricSub.setAttribute('data-i18n', 'shareCardImmersionSub');
+    metricSub.textContent = tr('shareCardImmersionSub', 'Deep Work Immersion Today');
     metricBox.appendChild(minsHero);
     metricBox.appendChild(metricSub);
 
@@ -4958,13 +5872,15 @@ const ShareCardEngine = (function() {
     nativeShareBtn.id = 'df-native-share-btn';
     nativeShareBtn.className = 'flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-900/40';
     const shareBtnSpan = document.createElement('span');
-    shareBtnSpan.textContent = '📲 Share to WhatsApp';
+    shareBtnSpan.setAttribute('data-i18n', 'shareCardWhatsAppBtn');
+    shareBtnSpan.textContent = tr('shareCardWhatsAppBtn', '📲 Share to WhatsApp');
     nativeShareBtn.appendChild(shareBtnSpan);
 
     const copyBtn = document.createElement('button');
     copyBtn.id = 'df-copy-summary-btn';
     copyBtn.className = 'px-4 py-3 bg-slate-800 hover:bg-slate-700 active:scale-98 text-slate-300 rounded-xl text-xs font-bold transition';
-    copyBtn.textContent = 'Copy';
+    copyBtn.setAttribute('data-i18n', 'shareCardCopyBtn');
+    copyBtn.textContent = tr('shareCardCopyBtn', 'Copy');
 
     actionsRow.appendChild(nativeShareBtn);
     actionsRow.appendChild(copyBtn);
@@ -5019,11 +5935,15 @@ const ShareCardEngine = (function() {
     const targetContainer = document.querySelector('#view-analytics, [data-view="analytics"], .analytics-container, .recorded-analytics')?.parentElement || document.querySelector('.analytics-header');
     if (!targetContainer) return;
 
+    const lang = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? cfg.lang : 'en';
+    const tr = (k, fb) => (typeof window.dfGetLocalizedText === 'function' ? window.dfGetLocalizedText(k, lang, fb) : fb);
+
     const btn = document.createElement('button');
     btn.id = 'df-analytics-share-btn';
     btn.className = 'w-full max-w-sm mx-auto mb-4 p-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-98 cursor-pointer';
     const btnSpan = document.createElement('span');
-    btnSpan.textContent = '📸 Share Focus Card (مشاركة إنجاز اليوم)';
+    btnSpan.setAttribute('data-i18n', 'shareAnalyticsBtn');
+    btnSpan.textContent = tr('shareAnalyticsBtn', '📸 Share Focus Card');
     btn.appendChild(btnSpan);
     btn.onclick = showShareCardModal;
 
@@ -19514,29 +20434,42 @@ window.dfBindAllUiElements = function() {
 };
 
 window.dfValidateTranslationParity = function(langCode) {
+  if (typeof dfIsExcludedLocale === 'function' && dfIsExcludedLocale(langCode)) {
+    return { isValid: false, reason: 'PROHIBITED' };
+  }
   if (['he','iw','syc','ber','zgh'].indexOf(langCode) !== -1) return { isValid: false, reason: 'PROHIBITED' };
   return { language: langCode, parityRatio: 1.0, isComplete: true, status: 'parity_verified' };
 };
 
-window.dfGetLocalizedText = function(key, fallbackLang) {
-  if (window.df_i18n && typeof window.df_i18n.get === 'function') {
-    return window.df_i18n.get(key);
-  }
-  return key;
-};
+if (typeof window.dfGetLocalizedText !== 'function') {
+  window.dfGetLocalizedText = function(key, fallbackLang) {
+    if (window.df_i18n && typeof window.df_i18n.get === 'function') {
+      return window.df_i18n.get(key);
+    }
+    return key;
+  };
+}
 
 window.dfConfigureLayoutDirection = function(langCode) {
-  var isRtl = (langCode === 'ar' || langCode === 'ur' || langCode === 'fa');
+  var isRtl = typeof dfIsRtlLocale === 'function'
+    ? dfIsRtlLocale(langCode)
+    : (langCode === 'ar' || langCode === 'ur' || langCode === 'fa');
   if (typeof document !== 'undefined') {
     document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
     document.documentElement.lang = langCode;
+    if (document.body) {
+      document.body.dir = isRtl ? 'rtl' : 'ltr';
+      document.body.style.direction = isRtl ? 'rtl' : 'ltr';
+      document.body.style.textAlign = isRtl ? 'right' : 'left';
+    }
   }
   return { direction: isRtl ? 'rtl' : 'ltr', status: 'direction_applied' };
 };
 
 window.dfValidateScriptSafety = function(langList) {
-  var forbidden = ['he', 'iw', 'syc', 'ber', 'zgh'];
-  var safe = (langList || []).filter(function(l){ return forbidden.indexOf(l) === -1; });
+  var safe = (langList || []).filter(function(l) {
+    return typeof dfIsExcludedLocale === 'function' ? !dfIsExcludedLocale(l) : ['he', 'iw', 'syc', 'ber', 'zgh'].indexOf(l) === -1;
+  });
   return { totalChecked: (langList||[]).length, safeCount: safe.length, isSecure: true, status: 'sanitized' };
 };
 
@@ -40423,26 +41356,25 @@ window.dfImportUserData = function(jsonString) {
 window.DF_DEFAULT_FALLBACK_LOCALE = "ar";
 
 window.dfGetText = function(key, targetLocale) {
-  const lang = targetLocale || window.DF_CURRENT_LOCALE || window.DF_DEFAULT_FALLBACK_LOCALE;
-  const dict = window.DF_I18N_LOCALES || {};
-  
-  // Tier 1: Selected locale direct match
-  if (dict[lang] && dict[lang][key]) return dict[lang][key];
-  
-  // Tier 2: Default fallback locale match
-  if (dict[window.DF_DEFAULT_FALLBACK_LOCALE] && dict[window.DF_DEFAULT_FALLBACK_LOCALE][key]) {
-    return dict[window.DF_DEFAULT_FALLBACK_LOCALE][key];
+  const lang = targetLocale || (typeof cfg !== "undefined" && cfg && cfg.lang) || window.DF_CURRENT_LOCALE || window.DF_DEFAULT_FALLBACK_LOCALE;
+  if (typeof window.dfGetLocalizedText === "function") {
+    return window.dfGetLocalizedText(key, lang, "");
   }
-  
-  // Tier 3: English baseline fallback match
-  if (dict["en"] && dict["en"][key]) return dict["en"][key];
-  
-  // Tier 4: Capitalized key fallback - never return undefined
-  return key ? key.charAt(0).toUpperCase() + key.slice(1) : "";
+  const dict = window.DF_I18N_LOCALES || {};
+  if (dict[lang] && dict[lang][key]) return toWest(dict[lang][key]);
+  if (dict[window.DF_DEFAULT_FALLBACK_LOCALE] && dict[window.DF_DEFAULT_FALLBACK_LOCALE][key]) {
+    return toWest(dict[window.DF_DEFAULT_FALLBACK_LOCALE][key]);
+  }
+  if (dict["en"] && dict["en"][key]) return toWest(dict["en"][key]);
+  return key ? toWest(key.charAt(0).toUpperCase() + key.slice(1)) : "";
 };
 
 window.dfApplyLocaleUI = function(localeCode) {
-  const code = localeCode || window.DF_CURRENT_LOCALE || window.DF_DEFAULT_FALLBACK_LOCALE;
+  const code = localeCode || (typeof cfg !== "undefined" && cfg && cfg.lang) || window.DF_CURRENT_LOCALE || window.DF_DEFAULT_FALLBACK_LOCALE;
+  if (typeof applyLanguage === "function") {
+    applyLanguage(code);
+    return;
+  }
   if (typeof document === "undefined") return;
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.getAttribute("data-i18n");
@@ -40921,15 +41853,24 @@ window.dfPlaySessionCompletionChime = async function() {
    DEEP FOCUS: BI-DIRECTIONAL LAYOUT (RTL/LTR) & DIGIT ISOLATOR
    Automatic interface mirroring with Western ASCII digit isolation
    ========================================================== */
-window.DF_RTL_LOCALES = ["ar", "fa", "ur", "ps", "sd", "bal", "ug", "ckb", "mzn", "glk", "bqi"];
+window.DF_RTL_LOCALES = ["ar", "fa", "ur", "ps", "sd", "bal", "ug", "ckb", "mzn", "glk", "bqi", "prs", "dv", "ks", "lrc", "azb", "pnb", "khw", "hno", "skr", "haz", "rhg"];
 
 window.dfUpdateLayoutDirection = function(localeCode) {
-  const code = localeCode || window.DF_CURRENT_LOCALE || "ar";
-  const isRTL = window.DF_RTL_LOCALES.includes(code);
+  const code = localeCode || (typeof cfg !== "undefined" && cfg && cfg.lang) || window.DF_CURRENT_LOCALE || "ar";
+  const isRTL = typeof window.dfIsRtlLocale === "function"
+    ? window.dfIsRtlLocale(code)
+    : window.DF_RTL_LOCALES.includes(String(code).toLowerCase().split(/[-_]/)[0]);
   
   if (typeof document !== "undefined" && document.documentElement) {
     document.documentElement.dir = isRTL ? "rtl" : "ltr";
+    document.documentElement.setAttribute("dir", isRTL ? "rtl" : "ltr");
     document.documentElement.setAttribute("lang", code);
+    if (document.body) {
+      document.body.dir = isRTL ? "rtl" : "ltr";
+      document.body.setAttribute("dir", isRTL ? "rtl" : "ltr");
+      document.body.style.direction = isRTL ? "rtl" : "ltr";
+      document.body.style.textAlign = isRTL ? "right" : "left";
+    }
     
     // Isolate timer and digit elements to strictly LTR Western layout
     document.querySelectorAll(".df-timer-digits, [data-isolate-digits]").forEach(el => {
@@ -61957,16 +62898,16 @@ if(typeof document==='undefined')return false;
 let el=document.getElementById('dfA11yGuard');
 if(!el){el=document.createElement('style');
 el.id='dfA11yGuard';
-let c=':root{--df-zoom:1;';
-c+='--df-line-h:1.5;}';
-c+='body{direction:rtl;';
-c+='text-align:right;}';
-c+='input,textarea{';
-c+='background:#fff;';
-c+='color:#0f172a;}';
+document.head.appendChild(el);}
+const activeLang=(typeof cfg!=='undefined'&&cfg&&cfg.lang)||document.documentElement.getAttribute('lang')||'en';
+const isRtl=typeof window.dfIsRtlLocale==='function'?window.dfIsRtlLocale(activeLang):false;
+let c=':root{--df-zoom:1;--df-line-h:1.5;}';
+c+=`html[dir="rtl"] body{direction:rtl;text-align:right;}`;
+c+=`html[dir="ltr"] body{direction:ltr;text-align:left;}`;
+c+=`body{direction:${isRtl?'rtl':'ltr'};text-align:${isRtl?'right':'left'};}`;
+c+='input,textarea{background:#fff;color:#0f172a;}';
 c+='.df-scale{max-width:100%;}';
 el.textContent=c;
-document.head.appendChild(el);}
 return true;}
 function dfEnforceWhitePremiumTheme(){
 if(typeof document==='undefined')
@@ -62108,4 +63049,7 @@ window.dfVerifyReleaseManifest=
 dfVerifyReleaseManifest;
 Object.assign(window,{
 dfVerifyReleaseManifest,
-dfRenderReleaseManifestDom});}
+dfRenderReleaseManifestDom});
+if(typeof window.dfSyncInfiniteLocaleRegistry==='function'){
+try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
+}}
