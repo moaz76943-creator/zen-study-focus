@@ -840,6 +840,335 @@
       position: relative !important;
     }
   </style>
+  <style id="df-zen-progressive-polish">
+    /* =========================================================================
+       THE RUTHLESS UX DOGFOODING & ZEN POLISH SPRINT:
+       - Progressive Disclosure: advanced studios neatly tucked into Zen Suite
+       - Strict >=48dp (48px) touch targets across all interactive elements
+       - Fluid responsive layout for Xiaomi 17T Pro (tall 20.5:9), Tablets & Desktops
+       ========================================================================= */
+    :root {
+      --df-touch-min: 48px;
+    }
+
+    /* Guaranteed >=48dp touch targets on all interactive controls */
+    button,
+    .bnav-btn,
+    .header-icon-btn,
+    .lang-switcher-pill,
+    .delta-chip,
+    .task-mini-sel,
+    .home-quick-chip,
+    .mbtn-pri,
+    .mbtn-sec,
+    .seg-pill,
+    .domain-card,
+    .zen-suite-trigger-btn,
+    .zen-compact-suite-btn,
+    .zen-suite-card-btn,
+    .btn-round-sec {
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+
+    .btn-round-sec {
+      min-width: 48px !important;
+      min-height: 48px !important;
+    }
+
+    .header-icon-btn {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      border-radius: 14px !important;
+    }
+
+    .lang-switcher-pill {
+      min-height: 48px !important;
+      padding: 8px 14px !important;
+    }
+
+    .delta-chip {
+      min-height: 48px !important;
+      padding: 10px 14px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .home-quick-chip {
+      min-height: 48px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .task-mini-sel {
+      min-height: 48px !important;
+      min-width: 48px !important;
+    }
+
+    .modal-head .task-mini-sel,
+    .zen-modal-close {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      width: 48px !important;
+      height: 48px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 1.1rem !important;
+      background: #f1f5f9 !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 14px !important;
+      cursor: pointer !important;
+      transition: background 0.15s, transform 0.1s !important;
+    }
+    .zen-modal-close:active {
+      transform: scale(0.92);
+      background: #e2e8f0 !important;
+    }
+
+    /* Small visual targets touch expansion to >=48dp */
+    .task-check-sq {
+      min-width: 28px !important;
+      min-height: 28px !important;
+      position: relative !important;
+    }
+    .task-check-sq::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      min-width: 48px;
+      min-height: 48px;
+    }
+
+    /* Bottom Nav Capsule 48dp Touch Safety */
+    .bottom-nav-capsule {
+      min-height: 58px !important;
+      padding: 4px 6px !important;
+    }
+    .bnav-btn {
+      min-height: 48px !important;
+      padding: 6px 4px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 3px !important;
+    }
+
+    /* Zen Progressive Disclosure Styling */
+    .zen-progressive-bar {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%) !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 18px !important;
+      padding: 10px 14px !important;
+      margin-bottom: 14px !important;
+      gap: 12px !important;
+    }
+    .zen-context-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .zen-suite-trigger-btn {
+      min-height: 48px !important;
+      padding: 8px 16px !important;
+      border-radius: 999px !important;
+      border: 1.5px solid #bfdbfe !important;
+      background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%) !important;
+      color: #2563eb !important;
+      font-size: 0.78rem !important;
+      font-weight: 800 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      cursor: pointer !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      flex-shrink: 0 !important;
+    }
+    .zen-suite-trigger-btn:active {
+      transform: scale(0.95);
+      background: #dbeafe !important;
+    }
+    .zen-suite-trigger-btn .zen-star {
+      font-size: 0.95rem;
+      color: #3b82f6;
+    }
+    .zen-suite-trigger-btn .zen-caret {
+      font-size: 0.75rem;
+      opacity: 0.75;
+      transition: transform 0.2s;
+    }
+
+    /* Zen Suite Card & Grid */
+    .zen-suite-card {
+      max-width: 440px !important;
+      width: 100% !important;
+      border-radius: 28px !important;
+      padding: 20px !important;
+      background: rgba(255, 255, 255, 0.98) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      border: 1px solid rgba(226, 232, 240, 0.9) !important;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22) !important;
+    }
+    .zen-suite-grid {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 10px !important;
+      margin-top: 14px !important;
+      max-height: min(65vh, 65dvh) !important;
+      overflow-y: auto !important;
+      padding-right: 2px !important;
+    }
+    .zen-suite-card-btn {
+      min-height: 56px !important;
+      padding: 10px 14px !important;
+      border-radius: 16px !important;
+      border: 1px solid #e2e8f0 !important;
+      background: #f8fafc !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      text-align: left !important;
+      cursor: pointer !important;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      width: 100% !important;
+    }
+    html[dir="rtl"] .zen-suite-card-btn {
+      text-align: right !important;
+    }
+    .zen-suite-card-btn:hover {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05) !important;
+      transform: translateY(-1px);
+    }
+    .zen-suite-card-btn:active {
+      transform: scale(0.98);
+      background: #f1f5f9 !important;
+    }
+    .zen-tool-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .zen-tool-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .zen-tool-name {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .zen-tool-desc {
+      font-size: 0.70rem;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .zen-tool-arrow {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Zen Compact Analytics Suite Buttons */
+    .zen-compact-suite-btn {
+      min-height: 48px !important;
+      padding: 10px 14px !important;
+      border-radius: 16px !important;
+      border: 1.5px solid #dce7f9 !important;
+      background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%) !important;
+      color: #1e3a8a !important;
+      font-size: 0.78rem !important;
+      font-weight: 800 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      cursor: pointer !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.06) !important;
+      transition: all 0.15s !important;
+    }
+    .zen-compact-suite-btn:active {
+      transform: scale(0.97);
+      background: #eff6ff !important;
+    }
+
+    /* Zen Ecosystem Strip (Minimalist & Unobtrusive) */
+    .zen-ecosystem-strip {
+      display: flex !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      margin-top: 8px !important;
+    }
+    .zen-sovereign-badge {
+      background: rgba(255, 255, 255, 0.16) !important;
+      border: 1px solid rgba(255, 255, 255, 0.28) !important;
+      color: rgba(255, 255, 255, 0.98) !important;
+      font-size: 0.65rem !important;
+      font-weight: 750 !important;
+      padding: 5px 12px !important;
+      border-radius: 999px !important;
+      backdrop-filter: blur(10px) !important;
+    }
+    body.timer-home .zen-sovereign-badge {
+      background: #f1f6ff !important;
+      border-color: #dbeafe !important;
+      color: #1e40af !important;
+    }
+
+    /* Tall Aspect Ratio Resiliency (Xiaomi 17T Pro: 20.5:9, 1220x2712) */
+    @media (max-width: 540px) and (min-aspect-ratio: 19/10) {
+      body {
+        padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
+        padding-bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 100px) !important;
+      }
+      .app-shell {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+      }
+      .focus-hero-card {
+        margin-top: 4px !important;
+        margin-bottom: 16px !important;
+        padding: 16px 16px 20px !important;
+      }
+      .focus-hero-card .ring-container {
+        width: min(66vw, 252px) !important;
+        height: min(66vw, 252px) !important;
+      }
+      .bottom-nav-capsule {
+        bottom: max(12px, calc(env(safe-area-inset-bottom, 0px) + 6px)) !important;
+      }
+    }
+
+    /* Tablet & Foldables (601px - 1024px) */
+    @media (min-width: 601px) {
+      .zen-suite-grid {
+        grid-template-columns: 1fr 1fr !important;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -886,11 +1215,10 @@
         <p class="header-sub-caption" id="hdrSubTitle" data-i18n="sub">A smarter world for study, sports & deep work</p>
       </div>
 
-      <div class="ecosystem-strip">
-        <span class="eco-badge" onclick="openCloudBackupModal()">☁️ <span data-i18n="pillCloud">Google Backup</span></span>
-        <span class="eco-badge" onclick="testCompletionSoundChime()">🔔 <span data-i18n="pillSound">Test Sound</span></span>
-        <span class="eco-badge" onclick="shareAppWithFriends()">📤 <span data-i18n="pillShare">Share App</span></span>
-        <span class="eco-badge">🔒 <span data-i18n="pillSecure">Local Data</span></span>
+      <div class="ecosystem-strip zen-ecosystem-strip">
+        <span class="eco-badge zen-sovereign-badge">🔒 <span data-i18n="pillSecure">100% Sovereign Offline Data</span></span>
+        <span class="eco-badge eco-badge-subtle" onclick="openCloudBackupModal()" title="Cloud Backup">☁️ <span data-i18n="pillCloud">Backup</span></span>
+        <span class="eco-badge eco-badge-subtle" onclick="testCompletionSoundChime()" title="Sound Chime">🔔 <span data-i18n="pillSound">Chime</span></span>
       </div>
     </header>
 
@@ -1000,18 +1328,17 @@
           </div>
         </div>
 
-        <div class="domain-context-bar" id="studyContextBar" style="display:flex;">
-          <div>
-            <div style="font-size:0.72rem; font-weight:800; color:var(--primary);" data-i18n="studyContextTitle">📐 STEM & Exam Studio</div>
-            <div style="font-size:0.84rem; font-weight:900;" id="studyContextSub">Pure SVG STEM & Strict Exam Simulator</div>
+        <div class="domain-context-bar zen-progressive-bar" id="studyContextBar" style="display:flex;">
+          <div class="zen-context-text">
+            <div style="font-size:0.75rem; font-weight:800; color:var(--primary);" data-i18n="studyContextTitle">📐 STEM & Exam Studio</div>
+            <div style="font-size:0.82rem; font-weight:700; color:var(--text-muted);" id="studyContextSub">Pure SVG STEM & Strict Exam Simulator</div>
           </div>
-          <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center;">
-            <button type="button" class="delta-chip" id="btnLaunchStemStudio" style="background:#eff6ff; color:#2563eb; font-weight:800; border:1px solid #bfdbfe;" onclick="dfOpenStemStudioFromTimer()" data-i18n="btnStemStudio">📐 STEM Studio ↗</button>
-            <button type="button" class="delta-chip" id="btnLaunchWhiteboardStudio" style="background:#f5f3ff; color:#7c3aed; font-weight:800; border:1px solid #ddd6fe;" onclick="dfOpenWhiteboardStudioFromTimer()" data-i18n="btnWhiteboardStudio">🎨 Whiteboard & Occlusion ↗</button>
-            <button type="button" class="delta-chip" id="btnLaunchSpatialAudioStudio" style="background:#fef3c7; color:#b45309; font-weight:800; border:1px solid #fde68a;" onclick="dfOpenSpatialAudioStudio()" data-i18n="btnSpatialAudio">🎧 3D Spatial & 40Hz ↗</button>
-            <button type="button" class="delta-chip" id="btnToggleScratchpadOverlay" style="background:#ecfdf5; color:#059669; font-weight:800; border:1px solid #a7f3d0;" onclick="dfToggleFloatingScratchpadOverlay(true)" data-i18n="btnScratchpadOverlay">✏️ Scratchpad</button>
-            <button type="button" class="delta-chip" id="btnLaunchFeynmanStudio" style="background:#fdf2f8; color:#db2777; font-weight:800; border:1px solid #fbcfe8;" onclick="dfOpenFeynmanRecallStudio()" data-i18n="btnFeynmanStudio">🧠 Feynman Lab ↗</button>
-            <button type="button" class="delta-chip" id="btnLaunchBotanicalGardenTimer" style="background:#ecfdf5; color:#059669; font-weight:800; border:1px solid #a7f3d0;" onclick="dfOpenBotanicalZenGardenStudio()" data-i18n="btnBotanicalGarden">🌿 Zen Garden ↗</button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button type="button" class="zen-suite-trigger-btn" id="btnZenStudySuite" onclick="dfToggleZenStudySuite(event)" aria-haspopup="dialog" aria-expanded="false" data-i18n="btnZenStudySuite">
+              <span class="zen-star">✦</span>
+              <span class="zen-trigger-text" data-i18n="zenStudioSuite">Studio Suite</span>
+              <span class="zen-caret">▾</span>
+            </button>
           </div>
         </div>
 
@@ -1224,12 +1551,19 @@
            6. ANALYTICS SECTION (FULL DONUT + WAVE CHARTS + WESTERN NUMS)
            ====================================================== -->
       <main class="screen-section" id="sec-analytics">
-        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
-          <button type="button" class="delta-chip" id="btnLaunchHighPerfEngine" style="width:100%; padding:10px 14px; background:#eff6ff; color:#2563eb; font-weight:800; border:1.5px solid #bfdbfe; border-radius:14px; cursor:pointer; font-size:12px; box-shadow:0 2px 8px rgba(37,99,235,0.12);" onclick="dfOpenHighPerformanceStudio()" data-i18n="btnHighPerfEngine">⚡ Launch High-Performance 120 FPS Engine & Zero-GC Studio ↗</button>
-          <button type="button" class="delta-chip" id="btnLaunchBotanicalGarden" style="width:100%; padding:10px 14px; background:#ecfdf5; color:#059669; font-weight:800; border:1.5px solid #a7f3d0; border-radius:14px; cursor:pointer; font-size:12px; box-shadow:0 2px 8px rgba(16,185,129,0.12);" onclick="dfOpenBotanicalZenGardenStudio()" data-i18n="btnBotanicalGarden">🌿 Launch Botanical Zen Sanctuary & 365-Day Heatmap Matrix ↗</button>
+        <div class="zen-analytics-strip" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+          <button type="button" class="zen-compact-suite-btn" id="btnLaunchHighPerfEngine" onclick="dfOpenHighPerformanceStudio()" data-i18n="btnHighPerfEngine">
+            <span style="font-size:1.15rem;">⚡</span>
+            <span>120 FPS Engine</span>
+          </button>
+          <button type="button" class="zen-compact-suite-btn" id="btnLaunchBotanicalGarden" onclick="dfOpenBotanicalZenGardenStudio()" data-i18n="btnBotanicalGarden">
+            <span style="font-size:1.15rem;">🌿</span>
+            <span>Zen Sanctuary</span>
+          </button>
         </div>
         <div id="dfPillar10HighPerfMount" aria-label="Master Pillar 10: High-Performance Engine, 120 FPS WebWorkers Architecture & Zero-GC Pooling"></div>
         <div id="dfPillar9BotanicalHeatmapMount" aria-label="Master Pillar 9: Procedural Botanical Zen Garden & Yearly Habit Heatmap"></div>
+        <div id="dfSystemHealthMount" aria-label="Sovereign Dogfooding & System Health Report (Rating AAA)"></div>
         <div class="analytics-kpi-grid">
           <div class="an-kpi-card">
             <div class="an-kpi-top"><span data-i18n="kpiMinutes">Active Minutes</span><span>🕒</span></div>
@@ -1459,6 +1793,72 @@
   </div>
 
   <div class="modal-overlay" id="dfQuickScratchpadModal" style="z-index:340;"></div>
+
+  <!-- ZEN PROGRESSIVE DISCLOSURE: CONTEXTUAL STUDY SUITE MODAL -->
+  <div class="modal-overlay" id="dfZenStudySuiteModal" onclick="if(event.target===this)dfToggleZenStudySuite(false)">
+    <div class="modal-card zen-suite-card" role="dialog" aria-modal="true" aria-labelledby="zenSuiteTitle">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.25rem;">✦</span>
+          <div>
+            <div style="font-size:0.96rem; font-weight:900; color:var(--text-main);" id="zenSuiteTitle" data-i18n="zenSuiteTitle">Zen Study Suite</div>
+            <div style="font-size:0.72rem; color:var(--text-muted); font-weight:600;" data-i18n="zenSuiteSub">Contextual Advanced Learning Studios</div>
+          </div>
+        </div>
+        <button type="button" class="zen-modal-close" onclick="dfToggleZenStudySuite(false)" aria-label="Close" data-i18n-aria="btnCancel">✕</button>
+      </div>
+      <div class="zen-suite-grid">
+        <button type="button" class="zen-suite-card-btn" id="btnLaunchStemStudio" onclick="dfLaunchSuiteTool('stem')">
+          <div class="zen-tool-icon" style="background:#eff6ff; color:#2563eb;">📐</div>
+          <div class="zen-tool-body">
+            <strong class="zen-tool-name" data-i18n="btnStemStudio">STEM & Exam Studio</strong>
+            <small class="zen-tool-desc">Pure SVG formulas & strict exam simulator</small>
+          </div>
+          <span class="zen-tool-arrow">↗</span>
+        </button>
+        <button type="button" class="zen-suite-card-btn" id="btnLaunchWhiteboardStudio" onclick="dfLaunchSuiteTool('whiteboard')">
+          <div class="zen-tool-icon" style="background:#f5f3ff; color:#7c3aed;">🎨</div>
+          <div class="zen-tool-body">
+            <strong class="zen-tool-name" data-i18n="btnWhiteboardStudio">Whiteboard & Occlusion</strong>
+            <small class="zen-tool-desc">Infinite canvas & image occlusion cards</small>
+          </div>
+          <span class="zen-tool-arrow">↗</span>
+        </button>
+        <button type="button" class="zen-suite-card-btn" id="btnLaunchSpatialAudioStudio" onclick="dfLaunchSuiteTool('spatial')">
+          <div class="zen-tool-icon" style="background:#fef3c7; color:#b45309;">🎧</div>
+          <div class="zen-tool-body">
+            <strong class="zen-tool-name" data-i18n="btnSpatialAudio">3D Spatial & 40Hz Audio</strong>
+            <small class="zen-tool-desc">Binaural acoustics & gamma brainwaves</small>
+          </div>
+          <span class="zen-tool-arrow">↗</span>
+        </button>
+        <button type="button" class="zen-suite-card-btn" id="btnToggleScratchpadOverlay" onclick="dfLaunchSuiteTool('scratchpad')">
+          <div class="zen-tool-icon" style="background:#ecfdf5; color:#059669;">✏️</div>
+          <div class="zen-tool-body">
+            <strong class="zen-tool-name" data-i18n="btnScratchpadOverlay">Floating Scratchpad</strong>
+            <small class="zen-tool-desc">Instant gesture notes & calculations</small>
+          </div>
+          <span class="zen-tool-arrow">↗</span>
+        </button>
+        <button type="button" class="zen-suite-card-btn" id="btnLaunchFeynmanStudio" onclick="dfLaunchSuiteTool('feynman')">
+          <div class="zen-tool-icon" style="background:#fdf2f8; color:#db2777;">🧠</div>
+          <div class="zen-tool-body">
+            <strong class="zen-tool-name" data-i18n="btnFeynmanStudio">Feynman Recall Lab</strong>
+            <small class="zen-tool-desc">Blank-sheet active recall & simplification</small>
+          </div>
+          <span class="zen-tool-arrow">↗</span>
+        </button>
+        <button type="button" class="zen-suite-card-btn" id="btnLaunchBotanicalGardenTimer" onclick="dfLaunchSuiteTool('botanical')">
+          <div class="zen-tool-icon" style="background:#ecfdf5; color:#059669;">🌿</div>
+          <div class="zen-tool-body">
+            <strong class="zen-tool-name" data-i18n="btnBotanicalGarden">Zen Botanical Sanctuary</strong>
+            <small class="zen-tool-desc">Procedural L-system grove & habit heatmap</small>
+          </div>
+          <span class="zen-tool-arrow">↗</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script src="js/dom_compat.js"></script>
   <script src="locale_rows.js"></script>
