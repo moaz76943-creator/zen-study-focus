@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr" id="htmlRoot">
 <head>
+    <link rel="stylesheet" href="touch_restorer.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Deep Focus - v21 Ultimate Edition</title>
@@ -1626,7 +1627,7 @@
         <div class="pure-white-card">
           <div style="font-size:0.88rem; font-weight:900; margin-bottom:8px;" data-i18n="calcHeading">🎓 Target & Goal Completion Calculator</div>
           <div style="display:flex; gap:8px; margin-bottom:8px;">
-            <!-- Using type="text" inputmode="numeric" guarantees 0123456789 and prevents Android from rendering ١٢٠ / ١٥ -->
+            <!-- Using type="text" inputmode="numeric" guarantees 0123456789 and prevents Android from rendering 12٠ / ١٥ -->
             <input type="text" inputmode="numeric" class="modal-inp" id="inpPagesLeft" value="120" style="margin:0; direction:ltr;" oninput="updateSyllabusCalc()">
             <input type="text" inputmode="numeric" class="modal-inp" id="inpDailyRate" value="15" style="margin:0; direction:ltr;" oninput="updateSyllabusCalc()">
           </div>
@@ -1896,5 +1897,6 @@
     <script src="modules/simulation/dogfood_simulator.js"></script>
     <script src="modules/recall/feynman_studio.js"></script>
     <script src="modules/collaboration/p2p_capsule_exchange.js"></script>
+    <script src="modules/ui_touch_engine.js"></script>
 <div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div><div id="dfSpeedReaderMount"></div><div id="dfPillar3StemMountHidden"></div><div id="dfPillar4WhiteboardMountHidden"></div><div id="dfPillar7FeynmanMountHidden"></div><div id="dfPillar9BotanicalHeatmapMountHidden"></div><div id="dfPillar10HighPerfMountHidden"></div></div></body>
 </html>

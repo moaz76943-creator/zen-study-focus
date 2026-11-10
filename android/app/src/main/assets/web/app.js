@@ -64691,7 +64691,7 @@ function() {
 
     const tabs = [
       { id: 'whiteboard', label: '🎨 Vector Whiteboard' },
-      { id: 'occlusion', label: '🩺 Medical & Diagram Occlusion' },
+      { id: 'occlusion', label: '🩺 Scientific Medical & Diagram Occlusion Diagram Occlusion' },
       { id: 'frameworks', label: '📐 Visual Frameworks' },
       { id: 'spatial', label: '🧩 Spatial Recall' },
       { id: 'scratchpad', label: '✏️ Quick Scratchpad' }
@@ -65071,7 +65071,7 @@ function() {
     }
 
     // =========================================================
-    // SUB-TAB 2: Medical & Diagram Occlusion Engine (FSRS-4.5)
+    // SUB-TAB 2: Scientific Medical & Diagram Occlusion Diagram Occlusion Engine (FSRS-4.5)
     // =========================================================
     function renderOcclusionTab(parent) {
       const box = document.createElement('div');
