@@ -83641,3 +83641,9 @@ if (typeof window !== 'undefined' && window.InteractiveSanctuaryCanvas) {
   window.dfInteractiveSanctuaryCanvas = new window.InteractiveSanctuaryCanvas();
   console.log('[Runtime] InteractiveSanctuaryCanvas successfully mounted.');
 }
+
+// Auto-wire DesignCritiqueButtonAuditor into runtime
+if (typeof window !== 'undefined' && window.DesignCritiqueButtonAuditor) {
+  window.dfDesignCritiqueButtonAuditor = new window.DesignCritiqueButtonAuditor();
+  console.log('[Runtime] DesignCritiqueButtonAuditor successfully mounted.');
+}
