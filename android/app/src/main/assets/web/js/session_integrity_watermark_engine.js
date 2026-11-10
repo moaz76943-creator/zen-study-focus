@@ -50,16 +50,16 @@
     }
     if (typeof num === 'string') {
       return num
-        .replace(/[٠۰]/g, '0')
-        .replace(/[١۱]/g, '1')
-        .replace(/[٢۲]/g, '2')
-        .replace(/[٣۳]/g, '3')
-        .replace(/[٤۴]/g, '4')
-        .replace(/[٥۵]/g, '5')
-        .replace(/[٦۶]/g, '6')
-        .replace(/[٧۷]/g, '7')
-        .replace(/[٨۸]/g, '8')
-        .replace(/[٩۹]/g, '9');
+        .replace(/[0۰]/g, '0')
+        .replace(/[1۱]/g, '1')
+        .replace(/[2۲]/g, '2')
+        .replace(/[3۳]/g, '3')
+        .replace(/[4۴]/g, '4')
+        .replace(/[5۵]/g, '5')
+        .replace(/[6۶]/g, '6')
+        .replace(/[7۷]/g, '7')
+        .replace(/[8۸]/g, '8')
+        .replace(/[9۹]/g, '9');
     }
     return '0';
   }

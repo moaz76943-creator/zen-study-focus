@@ -6,7 +6,7 @@
  *  - 100-Locale Support with Strict English-Only Fallback
  *  - Absolute Hebrew Exclusion (he, iw -> en)
  *  - Strict Western Digits 0123456789
- *  - Zero Medical / Clinical Claims (Mindful Pacing Only)
+ *  - Zero academic / Clinical Claims (Mindful Pacing Only)
  */
 
 (function (root, factory) {

@@ -6,7 +6,7 @@
  *  - 100-Locale Support with Strict English-Only Fallback
  *  - Absolute Hebrew Exclusion (he, iw -> en)
  *  - Strict Western Digits 0123456789
- *  - Zero Medical / Clinical Claims (Purely Ergonomic Comfort)
+ *  - Zero academic / Clinical Claims (Purely Ergonomic Comfort)
  */
 
 (function (root, factory) {

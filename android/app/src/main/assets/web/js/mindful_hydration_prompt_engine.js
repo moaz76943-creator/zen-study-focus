@@ -1,7 +1,7 @@
 /**
  * DEEP FOCUS — Mindful Hydration & Ergonomic Prompt Engine
  * Cycle: CYCLE-104 (Mission #104)
- * Architecture: v21 Data Fortress Safe, Zero Medical Claims, Purely Mindful & Ergonomic
+ * Architecture: v21 Data Fortress Safe, Zero academic Claims, Purely Mindful & Ergonomic
  * Strict Rules:
  *  - 100-Locale Support with Strict English-Only Fallback
  *  - Absolute Hebrew Exclusion (he, iw -> en)

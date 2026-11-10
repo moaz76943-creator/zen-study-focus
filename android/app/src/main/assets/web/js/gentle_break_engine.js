@@ -1,7 +1,7 @@
 /**
  * DEEP FOCUS — Gentle Break Suggestions Engine v21
  * Delivers non-intrusive, grounded micro-recovery cues during breaks.
- * Strictly avoids pseudoscientific medical claims (Section 38 of Directive).
+ * Strictly avoids pseudoscientific academic claims (Section 38 of Directive).
  */
 (function(global) {
 

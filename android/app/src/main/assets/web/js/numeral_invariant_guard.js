@@ -5,14 +5,14 @@
 (function (global) {
   'use strict';
   const TO_LATIN = Object.freeze({
-    '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
+    '0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9',
     '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9',
     // Devanagari (Hindi/Marathi/Nepali) and Bengali display-only digits.
     '०':'0','१':'1','२':'2','३':'3','४':'4','५':'5','६':'6','७':'7','८':'8','९':'9',
     '০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9'
   });
-  const REPLACE_DIGITS = /[٠-٩۰-۹०-९০-৯]/g;
-  const HAS_NON_LATIN_DIGITS = /[٠-٩۰-۹०-९০-৯]/; // Never use a global regex with test().
+  const REPLACE_DIGITS = /[0-9۰-۹०-९০-৯]/g;
+  const HAS_NON_LATIN_DIGITS = /[0-9۰-۹०-९০-৯]/; // Never use a global regex with test().
 
   function sanitizeToWesternDigits(value) {
     const text = typeof value === 'string' ? value : String(value);

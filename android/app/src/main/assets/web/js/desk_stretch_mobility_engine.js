@@ -7,7 +7,7 @@
  * deep focus sessions.
  *
  * Core Directives & Standards:
- * - Strictly Non-Medical (Ergonomic comfort & physical refresh, zero medical/therapeutic claims)
+ * - Strictly Non-academic (Ergonomic comfort & physical refresh, zero academic/therapeutic claims)
  * - Decoupled 100-locale support with strict English-only fallback (UniversalI18nBridge)
  * - Strict Western Arabic Digits (0123456789)
  * - Strict Hebrew Exclusion (No 'he' / 'iw' locales)

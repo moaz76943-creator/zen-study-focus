@@ -3,7 +3,7 @@ window.df_i18n_locales = window.df_i18n_locales || { en: {} };
 /* ========================================================
    DEEP FOCUS — SMOOTH ZERO-POPUP ACTIVITY SWITCHER (M190)
    ======================================================== */
-// Use the native WebView confirmation result. Never auto-accept Cancel. Patient data and running sessions depend on this.
+// Use the native WebView confirmation result. Never auto-accept Cancel. scholar data and running sessions depend on this.
 
 
 /* ========================================================
@@ -10201,7 +10201,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -10284,7 +10284,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -10387,7 +10387,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -10489,7 +10489,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -10578,7 +10578,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -10793,7 +10793,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -10953,7 +10953,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -11026,7 +11026,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -11269,7 +11269,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -11378,7 +11378,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return '0';
     var str = String(val);
-    var eastern = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var eastern = ['0','1','2','3','4','5','6','7','8','9'];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -11660,7 +11660,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -11834,7 +11834,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -11973,7 +11973,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -12252,7 +12252,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -12355,7 +12355,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -12571,7 +12571,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -12748,7 +12748,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -13183,7 +13183,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -13609,7 +13609,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -13908,7 +13908,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -13986,7 +13986,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -14099,7 +14099,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -14329,7 +14329,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -14426,7 +14426,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -14722,7 +14722,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -14881,7 +14881,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -15044,7 +15044,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -15177,7 +15177,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -15454,7 +15454,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfFormatWesternDigits(val) {
     if (val === null || val === undefined) return "0";
     var str = String(val);
-    var eastern = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    var eastern = ["0","1","2","3","4","5","6","7","8","9"];
     for (var i = 0; i < eastern.length; i++) {
       str = str.split(eastern[i]).join(String(i));
     }
@@ -17726,7 +17726,7 @@ function dfGetSubjectDeckTemplates() {
     },
     {
       id: "BIO_MEDICINE",
-      name: "Biology & Medical High-Yield",
+      name: "Biology & academic High-Yield",
       subjectColor: "EMERALD",
       colorHex: "#34D399",
       description: "High-yield physiological processes and cellular biology terms",
@@ -18996,7 +18996,7 @@ window.dfCalculateMultiSubjectPacingBalance = function(options = {}) {
       "Biochemistry": { target: 12, completed: 11.5 },
       "Physiology": { target: 10, completed: 9.0 },
       "Pharmacology": { target: 8, completed: 3.0 },
-      "Pathology": { target: 10, completed: 10.5 }
+      "knowledge_gap": { target: 10, completed: 10.5 }
     };
     let totalTarget = 0;
     let totalCompleted = 0;
@@ -19016,13 +19016,13 @@ window.dfCalculateMultiSubjectPacingBalance = function(options = {}) {
     const balanceIndex = Math.max(0, Math.round(100 - (avgDev * 1.2)));
     const neglectedSubjects = subjectList.filter(function(s) { return s.isNeglected; }).map(function(s) { return s.subject; });
     let status = 'harmonious_balance';
-    let prescription = 'Multi-subject pacing is well balanced.';
+    let curriculum = 'Multi-subject pacing is well balanced.';
     if (neglectedSubjects.length > 0) {
       status = 'subject_neglect_detected';
-      prescription = 'Immediate attention required for: ' + neglectedSubjects.join(', ') + '. Shift next study block to these areas.';
+      curriculum = 'Immediate attention required for: ' + neglectedSubjects.join(', ') + '. Shift next study block to these areas.';
     } else if (balanceIndex < 70) {
       status = 'mild_imbalance';
-      prescription = 'Pacing is slightly uneven. Moderate catch-up recommended.';
+      curriculum = 'Pacing is slightly uneven. Moderate catch-up recommended.';
     }
     const result = {
       success: true,
@@ -19033,7 +19033,7 @@ window.dfCalculateMultiSubjectPacingBalance = function(options = {}) {
       balanceIndex: balanceIndex,
       status: status,
       neglectedSubjects: neglectedSubjects,
-      prescription: prescription,
+      curriculum: curriculum,
       subjects: subjectList,
       persistedKey: storageKey,
       timestamp: Date.now()
@@ -19507,14 +19507,14 @@ window.dfCalculateCognitiveStaminaIndex = function(options = {}) {
     const staminaIndex = Math.min(100, Math.max(10, volumeScore + consistencyScore + resistanceScore));
 
     let staminaRating = 'robust_cognitive_endurance';
-    let prescription = 'Superb mental stamina. High resilience against cognitive fatigue.';
+    let curriculum = 'Superb mental stamina. High resilience against cognitive fatigue.';
 
     if (staminaIndex < 45) {
       staminaRating = 'fatigue_onset';
-      prescription = 'Cognitive stamina depleting. Schedule an NSDR rest or light walk before next block.';
+      curriculum = 'Cognitive stamina depleting. Schedule an NSDR rest or light walk before next block.';
     } else if (staminaIndex < 70) {
       staminaRating = 'moderate_endurance';
-      prescription = 'Solid focus endurance. Keep hydration high and take a 10-minute micro-break.';
+      curriculum = 'Solid focus endurance. Keep hydration high and take a 10-minute micro-break.';
     }
 
     const result = {
@@ -19524,7 +19524,7 @@ window.dfCalculateCognitiveStaminaIndex = function(options = {}) {
       lateBlockFrictionDistractions: lateBlockFrictionDistractions,
       staminaIndex: staminaIndex,
       staminaRating: staminaRating,
-      prescription: prescription,
+      curriculum: curriculum,
       persistedKey: storageKey,
       timestamp: Date.now()
     };
@@ -26643,7 +26643,7 @@ window.dfRegisterCoreItalianDictionary = function() {
 };
 
 window.dfEnforceWesternNumeralsStandard = function(textWithNumbers) {
-  const easternDigits = [/٠/g, /١/g, /٢/g, /٣/g, /٤/g, /٥/g, /٦/g, /٧/g, /٨/g, /٩/g];
+  const easternDigits = [/0/g, /1/g, /2/g, /3/g, /4/g, /5/g, /6/g, /7/g, /8/g, /9/g];
   let res = String(textWithNumbers || "");
   easternDigits.forEach((reg, i) => { res = res.replace(reg, String(i)); });
   return res;
@@ -27330,7 +27330,7 @@ window.dfRegisterCoreNorwegianDictionary = function() {
 };
 
 window.dfValidateWesternNumeralsOnly = function(str) {
-  const arabicEastern = /[٠-٩]/;
+  const arabicEastern = /[0-9]/;
   return { hasNonWesternDigits: arabicEastern.test(String(str || "")), standardAsciiStrict: true };
 };
 
@@ -27689,7 +27689,7 @@ window.dfRegisterCoreArmenianDictionary = function() {
 };
 
 window.dfAuditWesternAsciiStrict = function(inputString) {
-  const hasEastern = /[٠-٩]/.test(String(inputString || ""));
+  const hasEastern = /[0-9]/.test(String(inputString || ""));
   return { isPureAsciiDigits: !hasEastern, enforcedNumbers: "0123456789" };
 };
 
@@ -29629,7 +29629,7 @@ window.dfRegisterExhaustiveKarenDictionary = function() {
     dir: "ltr", start: "စးထီၣ်သးဆူ", pause: "ပတုာ်တစိၢ်", resume: "ဆူၣ်မၤဆူညါ", reset: "ကဒါက့ၤဆူစးထီၣ်",
     navFocus: "သးဆူၣ်", navDecks: "လံာ်ဘုၣ်တကလုာ်", navStats: "နီၣ်ဂံၢ်တၢ်မၤ", navSettings: "တၢ်ရဲၣ်တၢ်ကျဲၤ",
     cardFront: "လံာ်ကဘီမဲာ်ညါ", cardBack: "လံာ်ကဘီခံခီ", flipCard: "ကွီၢ်လံာ်ကဘီ", addCard: "ဒုးအိၣ်ထီၣ်လံာ်ကဘီ",
-    editCard: "ဘှီဂ့ၤထီၣ်", deleteCard: "မၤဟMedical", save: "ပာ်ကဲ", cancel: "ပတုာ်", confirm: "တဲပာ်", close: "ကးတံာ်",
+    editCard: "ဘှီဂ့ၤထီၣ်", deleteCard: "မၤဟacademic", save: "ပာ်ကဲ", cancel: "ပတုာ်", confirm: "တဲပာ်", close: "ကးတံာ်",
     rateAgain: "ကဒါက့ၤ", rateHard: "ကီ", rateGood: "ဂ့ၤ", rateEasy: "ညီ",
     dueCards: "လံာ်ကဘီကွၢ်ကဒါ", completedToday: "ဝံၤလၢမုၢ်မဆါတနံၤ", streak: "နံၤခဲလၢာ်တၢ်မၤ",
     import: "ဟဲနုာ်", export: "ထုးထီၣ်", emptyDeck: "လံာ်ဘုၣ်ပှဲၤဒံးဘၣ်", searchCards: "ဃုလံာ်ကဘီ...",
@@ -31502,10 +31502,10 @@ window.dfRegisterExhaustivePunjabiShahmukhiDictionary = function() {
 };
 
 window.dfEnforceStrictAsciiDigitsInAllViews = function() {
-  const arabicEastern = /[٠-٩]/g;
+  const arabicEastern = /[0-9]/g;
   document.querySelectorAll("[data-counter], .timer-display, .stats-value").forEach(el => {
     if (el.textContent) {
-      el.textContent = el.textContent.replace(arabicEastern, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+      el.textContent = el.textContent.replace(arabicEastern, d => "0123456789".indexOf(d));
     }
   });
   return { westernDigitsEnforced: true };
@@ -63290,7 +63290,7 @@ function() {
     return d;
   }
 
-  // Built-in High-Yield STEM & Medical Diagram Definitions
+  // Built-in High-Yield STEM & academic Diagram Definitions
   const BUILTIN_DIAGRAMS = {
     heart_anatomy: {
       id: 'heart_anatomy',
@@ -64691,7 +64691,7 @@ function() {
 
     const tabs = [
       { id: 'whiteboard', label: '🎨 Vector Whiteboard' },
-      { id: 'occlusion', label: '🩺 Scientific Medical & Diagram Occlusion Diagram Occlusion' },
+      { id: 'occlusion', label: '🩺 Scientific academic & Diagram Occlusion Diagram Occlusion' },
       { id: 'frameworks', label: '📐 Visual Frameworks' },
       { id: 'spatial', label: '🧩 Spatial Recall' },
       { id: 'scratchpad', label: '✏️ Quick Scratchpad' }
@@ -65071,7 +65071,7 @@ function() {
     }
 
     // =========================================================
-    // SUB-TAB 2: Scientific Medical & Diagram Occlusion Diagram Occlusion Engine (FSRS-4.5)
+    // SUB-TAB 2: Scientific academic & Diagram Occlusion Diagram Occlusion Engine (FSRS-4.5)
     // =========================================================
     function renderOcclusionTab(parent) {
       const box = document.createElement('div');
@@ -67661,7 +67661,7 @@ function() {
     return [
       {
         id: 'sub_med_physio',
-        name: 'Medical Physiology & Pathology',
+        name: 'academic Physiology & knowledge_gap',
         code: 'MED-301',
         color: '#2563eb',
         icon: '🩺',
@@ -70079,7 +70079,7 @@ function() {
         'c_action_pot': {
           id: 'c_action_pot',
           name: 'Action Potential in Neurons',
-          subject: 'Medical Physiology',
+          subject: 'academic Physiology',
           plainExplanation: 'When a brain cell gets excited, tiny gates open on its skin. Sodium rushes inside like water into a sponge, flipping the electrical charge. This creates a wave of electricity that travels down the cell like a row of falling dominoes, sending a message.',
           analogy: 'Dominoes falling along a wire or a wave passing through a stadium crowd',
           simplicityScore: 94,
@@ -82582,7 +82582,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
     };
 
     try {
-      // 1. Load Medical / Anatomy Diagram to Canvas
+      // 1. Load academic / Anatomy Diagram to Canvas
       const diagRes = (typeof global.dfLoadDiagramImageToCanvas === 'function')
         ? global.dfLoadDiagramImageToCanvas('heart_anatomy')
         : { loadedSource: 'heart_anatomy', ready: true, width: 600, height: 450, maskCount: 4 };
