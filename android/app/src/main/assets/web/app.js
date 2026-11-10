@@ -83541,3 +83541,17 @@ window.ZenCornellBridge = {
     return this.instance;
   }
 };
+
+/* ==============================================================================
+ * Sovereign 3D Spatial Acoustic Studio Bridge (v448.0.0)
+ * ============================================================================== */
+window.ZenAcousticBridge = {
+  version: '448.0.0',
+  instance: null,
+  getStudio() {
+    if (!this.instance && typeof AcousticStudio === 'function') {
+      this.instance = new AcousticStudio();
+    }
+    return this.instance;
+  }
+};

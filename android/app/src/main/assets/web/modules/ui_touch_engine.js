@@ -346,3 +346,126 @@
 
   window.addEventListener('load', initWhiteboardController);
 })();
+
+/* ==============================================================================
+ * Comprehensive Audio & 10-Band Parametric EQ Bindings (Task #636)
+ * ============================================================================== */
+(function() {
+  'use strict';
+
+  function initAcousticController() {
+    if (typeof AcousticStudio !== 'function') return;
+
+    const studio = new AcousticStudio();
+    window.activeAcousticStudio = studio;
+
+    // 1. Preset Buttons (Rain, Ocean, Pink Noise, 40Hz Gamma)
+    const audioButtons = document.querySelectorAll('button');
+    audioButtons.forEach(btn => {
+      const text = btn.textContent.toLowerCase();
+      if (text.includes('rain') || text.includes('مطر')) {
+        btn.addEventListener('click', () => toggleAudio('rain', btn));
+      } else if (text.includes('ocean') || text.includes('أمواج')) {
+        btn.addEventListener('click', () => toggleAudio('ocean', btn));
+      } else if (text.includes('pink noise') || text.includes('ضوضاء')) {
+        btn.addEventListener('click', () => toggleAudio('pink_noise', btn));
+      } else if (text.includes('40hz') || text.includes('gamma') || text.includes('جاما')) {
+        btn.addEventListener('click', () => toggleAudio('binaural_40hz', btn));
+      } else if (text.includes('test sound') || text.includes('صوت')) {
+        btn.addEventListener('click', () => toggleAudio('pink_noise', btn));
+      }
+    });
+
+    function toggleAudio(preset, btn) {
+      if (studio.isPlaying && studio.activePreset === preset) {
+        studio.stop();
+        btn.style.background = '';
+        btn.style.color = '';
+      } else {
+        studio.startPreset(preset);
+        audioButtons.forEach(b => { b.style.outline = ''; });
+        btn.style.outline = '2px solid #2563EB';
+        btn.style.background = '#2563EB';
+        btn.style.color = '#FFFFFF';
+      }
+    }
+
+    // 2. Master Volume Slider
+    const volSlider = document.querySelector('#audioMasterVolume, input[type="range"][max="1"]');
+    if (volSlider) {
+      volSlider.addEventListener('input', () => {
+        studio.setMasterVolume(volSlider.value);
+      });
+    }
+
+    // 3. Connect 10-Band EQ Sliders
+    const eqSliders = document.querySelectorAll('.eq-slider, input[type="range"][min="-12"]');
+    eqSliders.forEach((slider, idx) => {
+      slider.addEventListener('input', () => {
+        studio.setEqBandGain(idx, slider.value);
+      });
+    });
+  }
+
+  window.addEventListener('load', initAcousticController);
+})();
+
+/* ==============================================================================
+ * Comprehensive Audio & 10-Band Parametric EQ Bindings (Task #636)
+ * ============================================================================== */
+(function() {
+  'use strict';
+
+  function initAcousticController() {
+    if (typeof AcousticStudio !== 'function') return;
+
+    const studio = new AcousticStudio();
+    window.activeAcousticStudio = studio;
+
+    const audioButtons = document.querySelectorAll('button');
+    audioButtons.forEach(btn => {
+      const text = btn.textContent.toLowerCase();
+      if (text.includes('rain') || text.includes('مطر')) {
+        btn.addEventListener('click', () => toggleAudio('rain', btn));
+      } else if (text.includes('ocean') || text.includes('أمواج')) {
+        btn.addEventListener('click', () => toggleAudio('ocean', btn));
+      } else if (text.includes('pink noise') || text.includes('ضوضاء')) {
+        btn.addEventListener('click', () => toggleAudio('pink_noise', btn));
+      } else if (text.includes('40hz') || text.includes('gamma') || text.includes('جاما')) {
+        btn.addEventListener('click', () => toggleAudio('binaural_40hz', btn));
+      } else if (text.includes('test sound') || text.includes('صوت')) {
+        btn.addEventListener('click', () => toggleAudio('pink_noise', btn));
+      }
+    });
+
+    function toggleAudio(preset, btn) {
+      if (studio.isPlaying && studio.activePreset === preset) {
+        studio.stop();
+        btn.style.background = '';
+        btn.style.color = '';
+      } else {
+        studio.startPreset(preset);
+        audioButtons.forEach(b => { b.style.outline = ''; });
+        btn.style.outline = '2px solid #2563EB';
+        btn.style.background = '#2563EB';
+        btn.style.color = '#FFFFFF';
+      }
+    }
+
+    const volSlider = document.querySelector('#audioMasterVolume, input[type="range"][max="1"]');
+    if (volSlider) {
+      volSlider.addEventListener('input', () => {
+        studio.setMasterVolume(volSlider.value);
+      });
+    }
+
+    const eqSliders = document.querySelectorAll('.eq-slider, input[type="range"][min="-12"]');
+    eqSliders.forEach((slider, idx) => {
+      slider.addEventListener('input', () => {
+        studio.setEqBandGain(idx, slider.value);
+      });
+    });
+  }
+
+  window.addEventListener('load', initAcousticController);
+})();
