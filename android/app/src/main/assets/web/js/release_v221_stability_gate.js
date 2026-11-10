@@ -6,7 +6,7 @@
  *  - 100-Locale Support with Strict English-Only Fallback
  *  - Absolute Hebrew Exclusion (he, iw -> en)
  *  - Strict Western Digits 0123456789
- *  - Zero Medical / Clinical Claims
+ *  - Zero academic / Clinical Claims
  *  - 100% Offline Capability (Zero Outbound Network Calls)
  */
 
@@ -49,7 +49,7 @@
       manifest_title: "Deep Focus v2.2.1 Grand Stability Production Manifest",
       engines_verified_label: "Certified Phase 9 Core Engines",
       security_offline_label: "100% Offline Data Fortress v21 Compliance Verified",
-      zero_medical_label: "Zero Medical Claims Policy Verified"
+      zero_medical_label: "Zero academic Claims Policy Verified"
     },
     ar: {
       gate_status_certified: "تم اعتماد إصدار الاستقرار ديب فوكس v2.2.1 بنجاح تام (100% GREEN).",

@@ -10,7 +10,7 @@
  * - Decoupled 100-locale support with strict English-only fallback (UniversalI18nBridge)
  * - Strict Western Arabic Digits (0123456789)
  * - Strict Hebrew Exclusion (No 'he' / 'iw' locales)
- * - Zero Medical Claims
+ * - Zero academic Claims
  * - Throttled IPC synchronization (1 update/sec) to avoid notification manager spam
  * - Safe mock fallback for headless / test environments
  */

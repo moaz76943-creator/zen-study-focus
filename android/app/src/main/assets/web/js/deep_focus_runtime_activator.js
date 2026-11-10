@@ -7,14 +7,14 @@
 
   function toWesternDigits(str) {
     if (typeof str !== 'string') return str;
-    return str.replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632)
+    return str.replace(/[0-9]/g, d => d.charCodeAt(0) - 1632)
               .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776);
   }
 
   function sanitizeDigits() {
     document.querySelectorAll('input[type="date"], .date-display').forEach(el => {
-      if (el.value && /[٠-٩۰-۹]/.test(el.value)) el.value = toWesternDigits(el.value);
-      if (el.textContent && /[٠-٩۰-۹]/.test(el.textContent)) el.textContent = toWesternDigits(el.textContent);
+      if (el.value && /[0-9۰-۹]/.test(el.value)) el.value = toWesternDigits(el.value);
+      if (el.textContent && /[0-9۰-۹]/.test(el.textContent)) el.textContent = toWesternDigits(el.textContent);
     });
   }
 

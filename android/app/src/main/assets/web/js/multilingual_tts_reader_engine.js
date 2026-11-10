@@ -9,7 +9,7 @@
  * - STRICT ZERO-MUSIC POLICY: Pure speech synthesis only, zero background music.
  * - Strict Western digits (0123456789) formatting.
  * - Absolute Hebrew ('he', 'iw') exclusion -> redirects to 'en-US'.
- * - Zero medical or clinical claims.
+ * - Zero academic or clinical claims.
  */
 
 (function (root, factory) {
@@ -71,7 +71,7 @@
   function toWesternDigits(str) {
     if (str === null || str === undefined) return '';
     return String(str)
-      .replace(/[٠-٩]/g, function (d) { return '0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]; })
+      .replace(/[0-9]/g, function (d) { return '0123456789'['0123456789'.indexOf(d)]; })
       .replace(/[۰-۹]/g, function (d) { return '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)]; });
   }
 

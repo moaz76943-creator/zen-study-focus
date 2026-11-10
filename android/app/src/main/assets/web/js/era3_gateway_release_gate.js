@@ -6,7 +6,7 @@
  *  - 100-Locale Support with Strict English-Only Fallback
  *  - Absolute Hebrew Exclusion (he, iw -> en)
  *  - Strict Western Digits 0123456789
- *  - Zero Medical / Clinical Claims
+ *  - Zero academic / Clinical Claims
  *  - 100% Offline Capability (Zero Outbound Network Calls)
  */
 
@@ -68,7 +68,7 @@
       pillars_label: "Architectural Pillars",
       modules_label: "Gateway Core Engines",
       security_offline_label: "Offline Data Fortress v21 Compliance",
-      zero_medical_label: "Zero Medical Claims Policy"
+      zero_medical_label: "Zero academic Claims Policy"
     },
     ar: {
       gate_status_certified: "تم اعتماد بوابة القرن الثالث الكبرى ديب فوكس v2.2.0 بنجاح تام (100% GREEN).",

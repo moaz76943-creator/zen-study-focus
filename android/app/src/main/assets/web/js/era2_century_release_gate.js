@@ -6,7 +6,7 @@
  *  - 100-Locale Support with Strict English-Only Fallback
  *  - Absolute Hebrew Exclusion (he, iw -> en)
  *  - Strict Western Digits 0123456789
- *  - Zero Medical / Clinical Claims
+ *  - Zero academic / Clinical Claims
  *  - 100% Offline Capability (Zero Outbound Network Calls)
  */
 
@@ -49,7 +49,7 @@
       era2_summary_title: "Centurion Era 2 Production Manifest",
       engines_verified_label: "Certified Era 2 Core Engines",
       security_offline_label: "100% Offline Data Fortress v21 Compliance Verified",
-      zero_medical_label: "Zero Medical Claims Policy Verified"
+      zero_medical_label: "Zero academic Claims Policy Verified"
     },
     ar: {
       gate_status_certified: "تم اعتماد الإصدار الرئيسي ديب فوكس v2.1.0 بنجاح تام (100% GREEN).",

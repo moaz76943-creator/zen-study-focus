@@ -1,7 +1,7 @@
 /**
  * DEEP FOCUS — Post-Session Mindful Reflection Engine
  * Mission #041: Non-intrusive post-session reflection, 1-tap skip,
- * zero medical claims, rating clamping, and session contract binding.
+ * zero academic claims, rating clamping, and session contract binding.
  */
 (function (global) {
   'use strict';

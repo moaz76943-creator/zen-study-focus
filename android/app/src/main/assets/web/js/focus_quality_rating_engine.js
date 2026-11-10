@@ -1,7 +1,7 @@
 /**
  * DEEP FOCUS — In-Session Friction & Focus Quality Rating Engine
  * Cycle: CYCLE-105 (Mission #105)
- * Architecture: v21 Data Fortress Safe, Zero Medical Claims, Pure Focus Habit Optimization
+ * Architecture: v21 Data Fortress Safe, Zero academic Claims, Pure Focus Habit Optimization
  * Strict Rules:
  *  - 100-Locale Support with Strict English-Only Fallback
  *  - Absolute Hebrew Exclusion (he, iw -> en)

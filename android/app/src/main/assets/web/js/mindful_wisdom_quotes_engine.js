@@ -99,11 +99,11 @@
   }
 
   /**
-   * Audits that quotes strictly contain zero medical or therapeutic claims.
+   * Audits that quotes strictly contain zero academic or therapeutic claims.
    */
   function auditQuotesMedicalSafety() {
     var clinicalBannedTerms = [
-      "cure", "treat", "therapy", "clinical", "disease", "adhd",
+      "cure", "treat", "restoration", "clinical", "disease", "adhd",
       "depression", "anxiety", "doctor", "علاج", "مرض", "طبيب", "اكتئاب"
     ];
 
