@@ -80726,6 +80726,96 @@ function dfGetSyllabusSchedule() {
   }
 }
 
+
+let DF_WORKER_INSTANCE = null;
+const DF_WORKER_METRICS = { tasksProcessed: 0, totalDurationMs: 0, fallbacks: 0 };
+
+function dfInitWorkerBridge() {
+  if (typeof Worker === 'undefined' || typeof Blob === 'undefined') return false;
+  try {
+    if (DF_WORKER_INSTANCE) return true;
+    const workerScript = `
+      self.onmessage = function(e) {
+        const { taskId, action, payload } = e.data || {};
+        const startTime = Date.now();
+        let result = null;
+        try {
+          if (action === 'aggregate_heatmap') {
+            const sessions = Array.isArray(payload) ? payload : [];
+            const map = {};
+            for (let i = 0; i < sessions.length; i++) {
+              const d = sessions[i].date || 'unknown';
+              map[d] = (map[d] || 0) + (+sessions[i].minutes || 0);
+            }
+            result = { success: true, map };
+          } else if (action === 'rank_search_tokens') {
+            const { items, query } = payload || {};
+            const q = String(query || '').toLowerCase().trim();
+            const ranked = (items || []).filter(it => {
+              const text = (it.text || it.title || it.content || '').toLowerCase();
+              return text.includes(q);
+            });
+            result = { success: true, count: ranked.length, items: ranked.slice(0, 50) };
+          } else {
+            result = { success: true, echo: payload };
+          }
+        } catch (err) {
+          result = { success: false, error: String(err) };
+        }
+        self.postMessage({ taskId, result, durationMs: Date.now() - startTime });
+      };
+    `;
+    const blob = new Blob([workerScript], { type: 'application/javascript' });
+    DF_WORKER_INSTANCE = new Worker(URL.createObjectURL(blob));
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+function dfRunOffloadedTask(action, payload) {
+  return new Promise((resolve) => {
+    const startTime = Date.now();
+    const taskId = 'task_' + Math.random().toString(36).substring(2, 9);
+    const workerReady = dfInitWorkerBridge();
+    
+    if (workerReady && DF_WORKER_INSTANCE) {
+      const handler = function(e) {
+        if (e.data && e.data.taskId === taskId) {
+          DF_WORKER_INSTANCE.removeEventListener('message', handler);
+          DF_WORKER_METRICS.tasksProcessed++;
+          DF_WORKER_METRICS.totalDurationMs += (e.data.durationMs || 0);
+          resolve(e.data.result);
+        }
+      };
+      DF_WORKER_INSTANCE.addEventListener('message', handler);
+      DF_WORKER_INSTANCE.postMessage({ taskId, action, payload });
+      
+      // 5-second watchdog timer to avoid deadlocks
+      setTimeout(() => {
+        DF_WORKER_INSTANCE.removeEventListener('message', handler);
+        resolve({ success: false, timedOut: true });
+      }, 5000);
+    } else {
+      // Non-blocking fallback
+      DF_WORKER_METRICS.fallbacks++;
+      setTimeout(() => {
+        let res = { success: true, fallback: true };
+        if (action === 'aggregate_heatmap') {
+          const map = {};
+          (payload || []).forEach(it => { map[it.date] = (map[it.date] || 0) + (it.minutes || 0); });
+          res.map = map;
+        }
+        resolve(res);
+      }, 10);
+    }
+  });
+}
+
+function dfGetWorkerMetrics() {
+  return Object.assign({}, DF_WORKER_METRICS);
+}
+
 function dfVerifyReleaseManifest(manifest){
 const reqAssets=['index.html','app.js',
 'modules/flashcards/fsrs.js',
@@ -80776,7 +80866,7 @@ if(typeof window!=='undefined'){
 window.dfVerifyReleaseManifest=
 dfVerifyReleaseManifest;
 Object.assign(window,{
-dfVerifyReleaseManifest,dfCalculateExamPacing,dfGetSyllabusSchedule,
+dfVerifyReleaseManifest,dfRunOffloadedTask,dfGetWorkerMetrics,dfInitWorkerBridge,dfCalculateExamPacing,dfGetSyllabusSchedule,
 dfRenderReleaseManifestDom});
 if(typeof window.dfSyncInfiniteLocaleRegistry==='function'){
 try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
