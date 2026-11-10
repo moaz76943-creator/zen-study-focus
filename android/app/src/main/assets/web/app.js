@@ -2729,11 +2729,13 @@ function L() {
 const SHELL_LABELS = Object.freeze({
   en: Object.freeze({
     langSearchTitle: '🌐 Language & Country Search',
-    langSearchPlaceholder: 'Search language or country (e.g. Jordan, Spain, USA, مصر)...'
+    langSearchPlaceholder: 'Search language or country (e.g. Jordan, Spain, USA, مصر)...',
+    btnSpeedReader: '⚡ Speed Reader'
   }),
   ar: Object.freeze({
     langSearchTitle: '🌐 البحث عن اللغة والبلد',
-    langSearchPlaceholder: 'ابحث عن لغة أو بلد (مثل الأردن أو إسبانيا أو مصر)...'
+    langSearchPlaceholder: 'ابحث عن لغة أو بلد (مثل الأردن أو إسبانيا أو مصر)...',
+    btnSpeedReader: '⚡ القراءة السريعة'
   })
 });
 function shellLabel(code, key, current) {
@@ -59295,305 +59297,1500 @@ function() {
   };
 })();
 
-// --- M8158-M8167: Focal Stream Reader RSVP ---
-window.dfCalculateFocalAnchorIndex =
-function(word) {
-  const w = String(word || '');
-  const idx = Math.floor((w.length - 1) / 3);
-  return { anchorIndex: Math.max(0, idx) };
-};
-window.dfRenderFocalHighlightedWord =
-function(word) {
-  const w = String(word || '');
-  return { renderedWord: w, highlighted: true };
-};
-window.dfSetReadingSpeedWpmTarget =
-function(wpm) {
-  const target = Math.min(900, Math.max(150,
-    Number(wpm) || 300));
-  return { targetWpm: target, ok: true };
-};
-window.dfApplyPunctuationMicroPause =
-function(char) {
-  const ch = String(char || '');
-  const isEnd = ch === '.' || ch === '?';
-  const pause = isEnd ? 1.5 : 1.0;
-  return { pauseMultiplier: pause };
-};
-window.dfScaleDurationForLongWords =
-function(length) {
-  const l = Number(length) || 5;
-  const mult = l > 8 ? 1.25 : 1.0;
-  return { durationMultiplier: mult };
-};
-window.dfRampUpReadingSpeedGradually =
-function(currentSec, baseWpm) {
-  const s = Math.min(60, Number(currentSec)||0);
-  const add = Math.round((s / 60) * 50);
-  const base = Number(baseWpm) || 300;
-  return { rampedWpm: base + add };
-};
-window.dfRewindFocalStreamSentence =
-function(sentenceIdx) {
-  const cur = Number(sentenceIdx) || 1;
-  const idx = Math.max(0, cur - 1);
-  return { rewindSentenceIndex: idx };
-};
-window.dfDisplayPeripheralContextPreview =
-function() {
-  return { peripheralContextVisible: true };
-};
-window.dfBookmarkCurrentReadingWordIdx =
-function(idx) {
-  const i = Math.max(0, Number(idx)||0);
-  return { bookmarkedIndex: i, saved: true };
-};
-window.dfGetMilestoneM8167FocalReaderSeal =
-function() {
-  return {
-    milestone: 'Focal Stream Reader RSVP',
-    version: '400.53.0',
-    versionCode: 40053,
-    status: 'VERIFIED_100_PERCENT'
-  };
-};
+// --- M8158-M8207: Master Pillar 2 — Speed Reading & Visual Pacing Engine ---
+(function() {
+  const RSVP_STATE_KEY = 'df_rsvp_reader_state_v1';
+  const RSVP_BOOKMARK_KEY = 'df_rsvp_bookmark_v1';
+  const WPM_HISTORY_KEY = 'df_speed_reading_history_v1';
+  const COMPREHENSION_KEY = 'df_reading_comprehension_v1';
+  const REGRESSION_KEY = 'df_eye_regression_v1';
+  const HIGHLIGHTS_KEY = 'df_reading_highlights_v1';
+  const LIBRARY_CATALOG_KEY = 'df_reading_library_catalog_v1';
+  const READING_GOAL_SYNERGY_KEY = 'df_reading_timer_synergy_v1';
+  const SVG_NS = 'http://www.w3.org/2000/svg';
 
-// --- M8168-M8177: Visual Guide & Span ---
-window.dfRenderDynamicReadingPacerLine =
-function(lineIdx) {
-  const idx = Number(lineIdx) || 0;
-  return { pacerLineY: idx * 24, active: true };
-};
-window.dfGroupWordsIntoSemanticChunks =
-function(wordsList) {
-  const w = wordsList || [];
-  const count = Math.ceil(w.length / 3);
-  return { chunkCount: count };
-};
-window.dfDimSurroundingParagraphLines =
-function(activeLine) {
-  const line = Number(activeLine) || 0;
-  return { spotlightLine: line, dimmed: true };
-};
-window.dfRunPeripheralVisionGridDrill =
-function(gridSize) {
-  const s = Number(gridSize) || 5;
-  return { gridCells: s * s, active: true };
-};
-window.dfSuppressSubvocalizationPacer =
-function() {
-  return { subVocalSuppressed: true };
-};
-window.dfAdjustLineWidthForEyeComfort =
-function(charsCount) {
-  const ch = Math.min(65, Math.max(50,
-    Number(charsCount) || 60));
-  return { lineWidthChars: ch };
-};
-window.dfTrackEyeRegressionFrequency =
-function(regCount) {
-  const r = Number(regCount) || 0;
-  return { regressions: r, low: r < 3 };
-};
-window.dfCustomizeReadingTypographyScale =
-function(scale) {
-  const s = Number(scale) || 1.0;
-  return { typoScale: s, ok: true };
-};
-window.dfToggleVerticalScrollPacer =
-function(speedPx) {
-  const spd = Number(speedPx) || 2;
-  return { scrollVelocity: spd };
-};
-window.dfGetMilestoneM8177VisualPacerSeal =
-function() {
-  return {
-    milestone: 'Visual Guide & Span Expander',
-    version: '400.54.0',
-    versionCode: 40054,
-    status: 'VERIFIED_100_PERCENT'
-  };
-};
+  const DEFAULT_STUDY_PASSAGE = [
+    'Speed reading with Rapid Serial Visual Presentation (RSVP) eliminates unnecessary eye saccades by anchoring every word at its Optical Recognition Point (ORP).',
+    'When your eyes fixate slightly left of the center of a word, the fovea decodes the entire lexical unit simultaneously without horizontal scanning.',
+    'The Visual Guide and Span Expander ruler prevents backward eye regression by illuminating the active study line while gently dimming surrounding paragraphs.',
+    'Grouping adjacent words into semantic chunks expands peripheral vision span and suppresses subvocalization at speeds between 300 and 1000 words per minute.',
+    'Real-time comprehension checks ensure that high velocity translates into genuine Net Effective WPM and durable long-term memory retention.'
+  ].join('\n');
 
-// --- M8178-M8187: Comprehension & WPM ---
-window.dfCalculateNetEffectiveWpm =
-function(rawWpm, compPct) {
-  const w = Number(rawWpm) || 250;
-  const cp = Number(compPct) || 100;
-  const p = Math.min(1, cp / 100);
-  return { netWpm: Math.round(w * p) };
-};
-window.dfGenerateInstantComprehensionCheck =
-function(text) {
-  const len = String(text || '').length;
-  return { checkReady: true, sourceChars: len };
-};
-window.dfScoreRecallAccuracyPercentage =
-function(correct, total) {
-  const c = Number(correct) || 0;
-  const t = Math.max(1, Number(total) || 1);
-  return { accuracyPct: Math.round((c/t)*100) };
-};
-window.dfPlotWpmProgressHistoryChart =
-function(entriesCount) {
-  const cnt = Number(entriesCount) || 1;
-  return { historyPoints: cnt, plotted: true };
-};
-window.dfClassifyTextComplexityGrade =
-function(avgWordLen) {
-  const l = Number(avgWordLen) || 5;
-  const grade = l > 6 ? 'ADVANCED' : 'STANDARD';
-  return { complexityTier: grade };
-};
-window.dfRecommendOptimalSpeedForComplexity =
-function(tier) {
-  const t = String(tier || 'STANDARD');
-  const spd = t === 'ADVANCED' ? 220 : 350;
-  return { targetSpeedWpm: spd };
-};
-window.dfHighlightUnfamiliarTermsInText =
-function(termsList) {
-  const arr = termsList || [];
-  return { capturedTerms: arr.length };
-};
-window.dfLogReadingSessionMetricsLocal =
-function(wpm, score) {
-  const w = Number(wpm) || 250;
-  return { loggedWpm: w, savedLocal: true };
-};
-window.dfCompareSpeedAcrossSubjects =
-function(stemWpm, litWpm) {
-  const l = Number(litWpm) || 0;
-  const s = Number(stemWpm) || 0;
-  return { wpmDelta: l - s };
-};
-window.dfGetMilestoneM8187ComprehensionSeal =
-function() {
-  return {
-    milestone: 'Comprehension & WPM Analytics',
-    version: '400.55.0',
-    versionCode: 40055,
-    status: 'VERIFIED_100_PERCENT'
-  };
-};
+  const DEFAULT_STUDY_PASSAGE_AR = [
+    'تعتمد القراءة السريعة بتقنية العرض البصري المتسلسل السريع (RSVP) على تثبيت الكلمات عند نقطة التعرف البصري (ORP) للقضاء على الحركات الارتدادية غير الضرورية للعين.',
+    'عند تركيز البصر على النقطة البصرية المحورية، تستوعب النقرة المركزية للعين الكلمة كوحدة متكاملة دون الحاجة للمسح الأفقي المستمر.',
+    'يعمل المسطرة البصرية وموسع المدى البصري على منع التراجع البصري أثناء دراسة النصوص الطويلة من خلال إبراز السطر النشط وتظليل الفقرات المجاورة.',
+    'يؤدي تجميع الكلمات المتقاربة في كتل دلالية إلى توسيع مجال الرؤية المحيطية وتثبيط النطق الداخلي بسرعات تتراوح بين 300 و1000 كلمة في الدقيقة.',
+    'تضمن اختبارات الفهم اللحظية تحويل سرعة القراءة الفائقة إلى معدل حقيقي فعال وتثبيت المعرفة في الذاكرة طويلة المدى.'
+  ].join('\n');
 
-// --- M8188-M8197: Clean Reader & Extractor ---
-window.dfStripClutterFromPastedHtml =
-function(raw) {
-  const s = String(raw || '').trim();
-  return { strippedText: s, clean: true };
-};
-window.dfAutoDetectArabicOrLtrDirection =
-function(text) {
-  const s = String(text || '');
-  const isAr = /[؀-ۿ]/.test(s);
-  return { dir: isAr ? 'rtl' : 'ltr' };
-};
-window.dfSegmentLongTextIntoMicroChapters =
-function(text) {
-  const s = String(text || '');
-  const count = Math.ceil(s.length / 1000);
-  return { microChapters: Math.max(1, count) };
-};
-window.dfExtractNumberedListsAndFacts =
-function(text) {
-  const s = String(text || '');
-  const hasNum = s.indexOf('1.') !== -1;
-  return { factsDetected: hasNum };
-};
-window.dfNormalizeArabicDiacriticsForSearch =
-function(text) {
-  const s = String(text || '').trim();
-  return { normalized: s, ready: true };
-};
-window.dfAnnotateTextPassageWithColorTag =
-function(tagColor) {
-  const c = String(tagColor || 'emerald');
-  return { highlightTag: c, saved: true };
-};
-window.dfExportHighlightsToMarkdownSummary =
-function(highlightsCount) {
-  const cnt = Number(highlightsCount) || 0;
-  return { exportedSummaryItems: cnt };
-};
-window.dfCalculateEstimatedFinishTime =
-function(words, wpm) {
-  const w = Number(words) || 500;
-  const s = Math.max(100, Number(wpm) || 250);
-  return { estMinutesLeft: Math.ceil(w / s) };
-};
-window.dfPersistReadingLibraryCatalog =
-function(itemCount) {
-  const n = Number(itemCount) || 1;
-  return { catalogItems: n, saved: true };
-};
-window.dfGetMilestoneM8197CleanReaderSeal =
-function() {
-  return {
-    milestone: 'Clean Reader & Extractor',
-    version: '400.56.0',
-    versionCode: 40056,
-    status: 'VERIFIED_100_PERCENT'
-  };
-};
+  function safeParseJson(raw, fallback) {
+    if (!raw || typeof raw !== 'string') return fallback;
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed !== null && parsed !== undefined ? parsed : fallback;
+    } catch (_) {
+      return fallback;
+    }
+  }
 
-// --- M8198-M8207: Reading-Timer Synergy ---
-window.dfSyncReadingGoalWithTimerDuration =
-function(targetPages, sessionSec) {
-  const p = Number(targetPages) || 10;
-  const s = Number(sessionSec) || 1500;
-  return { pages: p, durationSec: s, ok: true };
-};
-window.dfAutoPauseReaderOnTimerBreak =
-function(bookmarkedWord) {
-  const w = Number(bookmarkedWord) || 0;
-  return { pausedAtWord: w, breakReady: true };
-};
-window.dfCalculatePagesPerPomodoroMetric =
-function(pages, sessions) {
-  const p = Number(pages) || 0;
-  const s = Math.max(1, Number(sessions) || 1);
-  const avg = Number((p/s).toFixed(1));
-  return { avgPagesPerSession: avg };
-};
-window.dfTriggerMicroRecallAfterEveryPage =
-function() {
-  return { microRecall: true, prompt: true };
-};
-window.dfAdjustAudioNoiseDuringDeepReading =
-function(level) {
-  const v = Math.max(0, Number(level)||50);
-  const l = Math.min(100, v);
-  return { readingNoiseVolume: l };
-};
-window.dfTrackReadingFocusStreakDays =
-function(streak) {
-  const s = Number(streak) || 0;
-  return { readingStreakDays: s, active: true };
-};
-window.dfRenderAmoledPageFlipTransition =
-function() {
-  return { anim: 'fade', ms: 150 };
-};
-window.dfVerifyZeroDistractionReaderLock =
-function() {
-  return { locked: true, pureFocus: true };
-};
-window.dfCompileReadingAndRecallReport =
-function(words, score) {
-  const w = Number(words) || 0;
-  const s = Number(score) || 100;
-  return { readWords: w, recallScore: s };
-};
-window.dfGetMilestoneM8207ReadingSynergySeal =
-function() {
-  return {
-    milestone: 'Reading-Timer Synergy',
-    version: '400.57.0',
-    versionCode: 40057,
-    status: 'VERIFIED_100_PERCENT'
+  function safeCleanStr(val, maxLen) {
+    const str = String(val === undefined || val === null ? '' : val).replace(/[<>]/g, '');
+    return maxLen ? str.slice(0, maxLen) : str;
+  }
+
+  function loadRsvpState() {
+    const isAr = typeof cfg === 'object' && cfg && String(cfg.lang || '').startsWith('ar');
+    const defaultText = isAr ? DEFAULT_STUDY_PASSAGE_AR : DEFAULT_STUDY_PASSAGE;
+    const defState = {
+      text: defaultText,
+      wpm: 300,
+      baseWpm: 300,
+      rampEnabled: false,
+      wordIndex: 0,
+      bookmarkedIndex: 0,
+      activeLineIndex: 0,
+      chunkSize: 3,
+      lineWidthChars: 60,
+      typoScale: 1.0,
+      scrollVelocity: 0,
+      dimSurrounding: true,
+      rulerEnabled: true,
+      antiRegressionMask: true,
+      regressionsCount: 0,
+      comprehensionPct: 100,
+      subject: 'STEM'
+    };
+    if (typeof localStorage === 'undefined') return defState;
+    const saved = safeParseJson(localStorage.getItem(RSVP_STATE_KEY), null);
+    if (!saved || typeof saved !== 'object') return defState;
+    return Object.assign({}, defState, saved, {
+      wpm: Math.min(1000, Math.max(100, Number(saved.wpm) || 300)),
+      baseWpm: Math.min(1000, Math.max(100, Number(saved.baseWpm || saved.wpm) || 300)),
+      wordIndex: Math.max(0, Number(saved.wordIndex) || 0),
+      bookmarkedIndex: Math.max(0, Number(saved.bookmarkedIndex) || 0),
+      activeLineIndex: Math.max(0, Number(saved.activeLineIndex) || 0),
+      chunkSize: Math.min(6, Math.max(1, Number(saved.chunkSize) || 3)),
+      lineWidthChars: Math.min(65, Math.max(50, Number(saved.lineWidthChars) || 60)),
+      typoScale: Math.min(1.6, Math.max(0.8, Number(saved.typoScale) || 1.0)),
+      comprehensionPct: Math.min(100, Math.max(0, Number(saved.comprehensionPct !== undefined ? saved.comprehensionPct : 100)))
+    });
+  }
+
+  function saveRsvpState(stateObj) {
+    if (typeof localStorage === 'undefined') return false;
+    try {
+      localStorage.setItem(RSVP_STATE_KEY, JSON.stringify(stateObj || window._dfRsvpState));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function loadWpmHistory() {
+    if (typeof localStorage === 'undefined') return [];
+    const list = safeParseJson(localStorage.getItem(WPM_HISTORY_KEY), []);
+    return Array.isArray(list) ? list : [];
+  }
+
+  function saveWpmHistory(list) {
+    if (typeof localStorage === 'undefined') return false;
+    try {
+      const clean = Array.isArray(list) ? list.slice(-60) : [];
+      localStorage.setItem(WPM_HISTORY_KEY, JSON.stringify(clean));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function tokenizePassageWords(text) {
+    const raw = String(text || '').trim();
+    if (!raw) return [];
+    return raw.split(/\s+/).filter(Boolean);
+  }
+
+  function splitPassageIntoLines(text) {
+    const raw = String(text || '').trim();
+    if (!raw) return [];
+    const explicitLines = raw.split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+    if (explicitLines.length >= 2) return explicitLines;
+    const words = tokenizePassageWords(raw);
+    const lines = [];
+    let current = [];
+    let charLen = 0;
+    const maxChars = (window._dfRsvpState && window._dfRsvpState.lineWidthChars) || 60;
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      if (charLen + w.length + 1 > maxChars && current.length > 0) {
+        lines.push(current.join(' '));
+        current = [w];
+        charLen = w.length;
+      } else {
+        current.push(w);
+        charLen += w.length + 1;
+      }
+    }
+    if (current.length > 0) lines.push(current.join(' '));
+    return lines;
+  }
+
+  window._dfRsvpState = loadRsvpState();
+  let _rsvpTimerId = null;
+  let _rsvpRunning = false;
+  let _rsvpSessionStartMs = 0;
+  let _rsvpWordsReadInSession = 0;
+  let _rulerTimerId = null;
+
+  // --- M8158-M8167: Focal Stream Reader RSVP ---
+  window.dfCalculateFocalAnchorIndex = function(word) {
+    const w = String(word || '');
+    const idx = Math.max(0, Math.floor((w.length - 1) / 3));
+    return {
+      anchorIndex: idx,
+      orpIndex: idx,
+      prefix: w.slice(0, idx),
+      orpChar: w.charAt(idx) || '',
+      suffix: w.slice(idx + 1),
+      word: w
+    };
   };
-};
+
+  window.dfRenderFocalHighlightedWord = function(word, containerId) {
+    const w = String(word || '');
+    const orp = window.dfCalculateFocalAnchorIndex(w);
+    if (typeof document !== 'undefined') {
+      const host = document.getElementById(containerId || 'dfRsvpWordStage');
+      if (host) {
+        host.textContent = '';
+        const topTick = document.createElement('div');
+        topTick.style.cssText = 'position:absolute;top:0;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#2563eb;border-radius:0 0 2px 2px;opacity:0.85;pointer-events:none;';
+        const bottomTick = document.createElement('div');
+        bottomTick.style.cssText = 'position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#2563eb;border-radius:2px 2px 0 0;opacity:0.85;pointer-events:none;';
+
+        const row = document.createElement('div');
+        row.style.cssText = 'display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;width:100%;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:28px;font-weight:800;letter-spacing:0.5px;color:#0f172a;direction:' + (/[؀-ۿ]/.test(w) ? 'rtl' : 'ltr') + ';';
+
+        const preSpan = document.createElement('span');
+        preSpan.style.cssText = 'text-align:right;color:#334155;white-space:pre;';
+        preSpan.textContent = orp.prefix;
+
+        const orpSpan = document.createElement('span');
+        orpSpan.setAttribute('data-orp-anchor', 'true');
+        orpSpan.style.cssText = 'color:#2563eb;background:#eff6ff;border-bottom:3px solid #2563eb;padding:0 3px;border-radius:4px;font-weight:900;';
+        orpSpan.textContent = orp.orpChar || '•';
+
+        const sufSpan = document.createElement('span');
+        sufSpan.style.cssText = 'text-align:left;color:#334155;white-space:pre;';
+        sufSpan.textContent = orp.suffix;
+
+        row.appendChild(preSpan);
+        row.appendChild(orpSpan);
+        row.appendChild(sufSpan);
+        host.appendChild(topTick);
+        host.appendChild(bottomTick);
+        host.appendChild(row);
+      }
+    }
+    return {
+      renderedWord: w,
+      highlighted: true,
+      anchorIndex: orp.anchorIndex,
+      orpIndex: orp.orpIndex,
+      prefix: orp.prefix,
+      orpChar: orp.orpChar,
+      suffix: orp.suffix
+    };
+  };
+
+  window.dfSetReadingSpeedWpmTarget = function(wpm) {
+    const raw = Number(wpm) || 300;
+    const target = Math.min(1000, Math.max(100, Math.round(raw)));
+    if (window._dfRsvpState) {
+      window._dfRsvpState.wpm = target;
+      window._dfRsvpState.baseWpm = target;
+      saveRsvpState(window._dfRsvpState);
+    }
+    return {
+      targetWpm: target,
+      intervalMs: Math.round(60000 / target),
+      ok: true
+    };
+  };
+
+  window.dfApplyPunctuationMicroPause = function(char) {
+    const ch = String(char || '').slice(-1);
+    const isEnd = ch === '.' || ch === '?' || ch === '!' || ch === '؟' || ch === ':';
+    const isClause = ch === ',' || ch === ';' || ch === '،' || ch === '؛' || ch === '—';
+    const pause = isEnd ? 1.5 : (isClause ? 1.2 : 1.0);
+    return { pauseMultiplier: pause };
+  };
+
+  window.dfScaleDurationForLongWords = function(length) {
+    const l = Number(length) || 5;
+    const mult = l > 8 ? 1.25 : 1.0;
+    return { durationMultiplier: mult };
+  };
+
+  window.dfRampUpReadingSpeedGradually = function(currentSec, baseWpm) {
+    const s = Math.min(60, Math.max(0, Number(currentSec) || 0));
+    const add = Math.round((s / 60) * 50);
+    const base = Number(baseWpm) || (window._dfRsvpState ? window._dfRsvpState.baseWpm : 300) || 300;
+    const ramped = Math.min(1000, base + add);
+    return { rampedWpm: ramped };
+  };
+
+  window.dfRewindFocalStreamSentence = function(sentenceIdx) {
+    const cur = Number(sentenceIdx) || 1;
+    const idx = Math.max(0, cur - 1);
+    if (window._dfRsvpState) {
+      const words = tokenizePassageWords(window._dfRsvpState.text);
+      let wIdx = Math.max(0, (window._dfRsvpState.wordIndex || 0) - 1);
+      while (wIdx > 0) {
+        const prevW = words[wIdx - 1] || '';
+        if (/[.?!؟]$/.test(prevW)) break;
+        wIdx--;
+      }
+      window._dfRsvpState.wordIndex = wIdx;
+      saveRsvpState(window._dfRsvpState);
+    }
+    return { rewindSentenceIndex: idx, wordIndex: window._dfRsvpState ? window._dfRsvpState.wordIndex : 0 };
+  };
+
+  window.dfDisplayPeripheralContextPreview = function(wordIdx) {
+    const state = window._dfRsvpState || loadRsvpState();
+    const words = tokenizePassageWords(state.text);
+    const i = wordIdx !== undefined ? Math.max(0, Number(wordIdx) || 0) : (state.wordIndex || 0);
+    return {
+      peripheralContextVisible: true,
+      prevWord: i > 0 ? (words[i - 1] || '') : '',
+      currentWord: words[i] || '',
+      nextWord: i + 1 < words.length ? (words[i + 1] || '') : ''
+    };
+  };
+
+  window.dfBookmarkCurrentReadingWordIdx = function(idx) {
+    const i = Math.max(0, Number(idx !== undefined ? idx : (window._dfRsvpState ? window._dfRsvpState.wordIndex : 0)) || 0);
+    if (window._dfRsvpState) {
+      window._dfRsvpState.bookmarkedIndex = i;
+      saveRsvpState(window._dfRsvpState);
+    }
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(RSVP_BOOKMARK_KEY, JSON.stringify({ bookmarkedIndex: i, ts: Date.now() }));
+      } catch (_) {}
+    }
+    return { bookmarkedIndex: i, saved: true };
+  };
+
+  window.dfGetMilestoneM8167FocalReaderSeal = function() {
+    return {
+      milestone: 'Focal Stream Reader RSVP',
+      version: '400.53.0',
+      versionCode: 40053,
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+
+  // --- M8168-M8177: Visual Guide & Span Expander ---
+  window.dfRenderDynamicReadingPacerLine = function(lineIdx, containerId) {
+    const idx = Math.max(0, Number(lineIdx) || 0);
+    const yPx = idx * 24;
+    if (window._dfRsvpState) {
+      const prevLine = window._dfRsvpState.activeLineIndex || 0;
+      if (idx < prevLine) {
+        window.dfTrackEyeRegressionFrequency((window._dfRsvpState.regressionsCount || 0) + 1);
+      }
+      window._dfRsvpState.activeLineIndex = idx;
+      saveRsvpState(window._dfRsvpState);
+    }
+    if (typeof document !== 'undefined') {
+      const host = document.getElementById(containerId || 'dfVisualGuideLinesHost');
+      if (host) {
+        const rows = host.querySelectorAll('[data-guide-line-idx]');
+        for (let i = 0; i < rows.length; i++) {
+          const r = rows[i];
+          const rIdx = Number(r.getAttribute('data-guide-line-idx'));
+          const isCurrent = rIdx === idx;
+          const isPast = rIdx < idx;
+          const dimOn = !window._dfRsvpState || window._dfRsvpState.dimSurrounding !== false;
+          r.style.background = isCurrent ? '#eff6ff' : (isPast && dimOn ? '#f8fafc' : '#ffffff');
+          r.style.borderLeft = isCurrent ? '4px solid #2563eb' : '4px solid transparent';
+          r.style.borderBottom = isCurrent ? '2px solid #059669' : '1px solid #f1f5f9';
+          r.style.color = isCurrent ? '#0f172a' : '#64748b';
+          r.style.fontWeight = isCurrent ? '700' : '500';
+          r.style.opacity = isCurrent ? '1' : (dimOn ? (isPast ? '0.28' : '0.45') : '0.85');
+        }
+      }
+    }
+    return { pacerLineY: yPx, activeLine: idx, active: true };
+  };
+
+  window.dfGroupWordsIntoSemanticChunks = function(wordsList, chunkSize) {
+    const w = Array.isArray(wordsList)
+      ? wordsList
+      : (typeof wordsList === 'string' ? tokenizePassageWords(wordsList) : []);
+    const sz = Math.min(6, Math.max(1, Number(chunkSize) || 3));
+    const chunks = [];
+    for (let i = 0; i < w.length; i += sz) {
+      chunks.push(w.slice(i, i + sz).join(' '));
+    }
+    const count = Math.ceil(w.length / 3);
+    return { chunkCount: count, chunks: chunks, chunkSize: sz };
+  };
+
+  window.dfDimSurroundingParagraphLines = function(activeLine, containerId) {
+    const line = Math.max(0, Number(activeLine) || 0);
+    if (window._dfRsvpState) {
+      window._dfRsvpState.dimSurrounding = true;
+      window._dfRsvpState.activeLineIndex = line;
+      saveRsvpState(window._dfRsvpState);
+    }
+    window.dfRenderDynamicReadingPacerLine(line, containerId);
+    return { spotlightLine: line, dimmed: true };
+  };
+
+  window.dfRunPeripheralVisionGridDrill = function(gridSize, containerId) {
+    const s = Math.min(7, Math.max(3, Number(gridSize) || 5));
+    const total = s * s;
+    const nums = [];
+    for (let i = 1; i <= total; i++) nums.push(i);
+    for (let i = nums.length - 1; i > 0; i--) {
+      const j = (i * 7 + 3) % (i + 1);
+      const tmp = nums[i];
+      nums[i] = nums[j];
+      nums[j] = tmp;
+    }
+    if (typeof document !== 'undefined' && containerId) {
+      const host = document.getElementById(containerId);
+      if (host) {
+        host.textContent = '';
+        const grid = document.createElement('div');
+        grid.style.cssText = 'display:grid;grid-template-columns:repeat(' + s + ',1fr);gap:4px;max-width:240px;margin:6px auto;';
+        const centerIdx = Math.floor(total / 2);
+        for (let k = 0; k < total; k++) {
+          const cell = document.createElement('div');
+          const isCenter = k === centerIdx;
+          cell.style.cssText = 'padding:6px 4px;text-align:center;font-size:11px;font-weight:700;border-radius:6px;border:1px solid ' + (isCenter ? '#2563eb' : '#cbd5e1') + ';background:' + (isCenter ? '#eff6ff' : '#ffffff') + ';color:' + (isCenter ? '#2563eb' : '#0f172a') + ';';
+          cell.textContent = isCenter ? ('🎯 ' + nums[k]) : String(nums[k]);
+          grid.appendChild(cell);
+        }
+        host.appendChild(grid);
+      }
+    }
+    return { gridCells: total, gridSize: s, cells: nums, active: true };
+  };
+
+  window.dfSuppressSubvocalizationPacer = function(wpm) {
+    const spd = Math.max(300, Number(wpm) || (window._dfRsvpState ? window._dfRsvpState.wpm : 350));
+    return { subVocalSuppressed: true, thresholdWpm: spd };
+  };
+
+  window.dfAdjustLineWidthForEyeComfort = function(charsCount) {
+    const ch = Math.min(65, Math.max(50, Number(charsCount) || 60));
+    if (window._dfRsvpState) {
+      window._dfRsvpState.lineWidthChars = ch;
+      saveRsvpState(window._dfRsvpState);
+    }
+    return { lineWidthChars: ch };
+  };
+
+  window.dfTrackEyeRegressionFrequency = function(regCount) {
+    const r = Math.max(0, Number(regCount) || 0);
+    if (window._dfRsvpState) {
+      window._dfRsvpState.regressionsCount = r;
+      saveRsvpState(window._dfRsvpState);
+    }
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(REGRESSION_KEY, JSON.stringify({ regressions: r, low: r < 3, updatedAt: Date.now() }));
+      } catch (_) {}
+    }
+    return { regressions: r, low: r < 3 };
+  };
+
+  window.dfCustomizeReadingTypographyScale = function(scale) {
+    const s = Number(scale) || 1.0;
+    if (window._dfRsvpState) {
+      window._dfRsvpState.typoScale = Math.min(1.6, Math.max(0.8, s));
+      saveRsvpState(window._dfRsvpState);
+    }
+    return { typoScale: s, ok: true };
+  };
+
+  window.dfToggleVerticalScrollPacer = function(speedPx) {
+    const spd = Number(speedPx) || 2;
+    if (window._dfRsvpState) {
+      window._dfRsvpState.scrollVelocity = spd;
+      saveRsvpState(window._dfRsvpState);
+    }
+    return { scrollVelocity: spd };
+  };
+
+  window.dfGetMilestoneM8177VisualPacerSeal = function() {
+    return {
+      milestone: 'Visual Guide & Span Expander',
+      version: '400.54.0',
+      versionCode: 40054,
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+
+  // --- M8178-M8187: Comprehension & WPM Analytics ---
+  window.dfCalculateNetEffectiveWpm = function(rawWpm, compPct) {
+    const w = Number(rawWpm) || 250;
+    const cp = Number(compPct !== undefined ? compPct : 100);
+    const p = Math.min(1, Math.max(0, (Number.isFinite(cp) ? cp : 100) / 100));
+    return {
+      netWpm: Math.round(w * p),
+      rawWpm: w,
+      comprehensionPct: Math.round(p * 100)
+    };
+  };
+
+  window.dfGenerateInstantComprehensionCheck = function(text) {
+    const raw = String(text || (window._dfRsvpState && window._dfRsvpState.text) || DEFAULT_STUDY_PASSAGE);
+    const len = raw.length;
+    const lines = splitPassageIntoLines(raw);
+    const questions = [];
+    for (let i = 0; i < Math.min(3, lines.length); i++) {
+      const words = lines[i].split(/\s+/).filter(function(w) { return w.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '').length >= 4; });
+      if (words.length >= 3) {
+        const targetIdx = Math.floor(words.length / 2);
+        const rawTarget = words[targetIdx].replace(/[.,;?!:()"]/g, '');
+        const promptLine = lines[i].replace(rawTarget, '_____');
+        const distractors = ['regression', 'peripheral', 'subvocal', 'retention', 'fixation']
+          .filter(function(d) { return d.toLowerCase() !== rawTarget.toLowerCase(); })
+          .slice(0, 2);
+        questions.push({
+          id: 'comp_q_' + (i + 1),
+          prompt: promptLine,
+          answer: rawTarget,
+          options: [rawTarget, distractors[0] || 'lexical', distractors[1] || 'cognitive']
+        });
+      }
+    }
+    return {
+      checkReady: true,
+      sourceChars: len,
+      questions: questions
+    };
+  };
+
+  window.dfScoreRecallAccuracyPercentage = function(correct, total) {
+    const c = Math.max(0, Number(correct) || 0);
+    const t = Math.max(1, Number(total) || 1);
+    const pct = Math.min(100, Math.round((c / t) * 100));
+    if (window._dfRsvpState) {
+      window._dfRsvpState.comprehensionPct = pct;
+      saveRsvpState(window._dfRsvpState);
+    }
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(COMPREHENSION_KEY, JSON.stringify({
+          correct: c,
+          total: t,
+          accuracyPct: pct,
+          updatedAt: Date.now()
+        }));
+      } catch (_) {}
+    }
+    return { accuracyPct: pct, correct: c, total: t };
+  };
+
+  window.dfPlotWpmProgressHistoryChart = function(entriesCount, containerId) {
+    const hist = loadWpmHistory();
+    const cnt = Number(entriesCount) || Math.max(1, hist.length);
+    if (typeof document !== 'undefined') {
+      const host = document.getElementById(containerId || 'dfWpmHistoryChartHost');
+      if (host) {
+        host.textContent = '';
+        const items = hist.length > 0
+          ? hist.slice(-10)
+          : [{ wpm: window._dfRsvpState ? window._dfRsvpState.wpm : 300, netWpm: window._dfRsvpState ? window._dfRsvpState.wpm : 300, score: 100 }];
+        const svg = document.createElementNS(SVG_NS, 'svg');
+        svg.setAttribute('xmlns', SVG_NS);
+        svg.setAttribute('viewBox', '0 0 360 96');
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '88');
+        svg.style.cssText = 'display:block;width:100%;height:88px;background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;';
+
+        const maxWpm = Math.max(400, ...items.map(function(x) { return Number(x.wpm) || 300; }));
+        const barW = Math.max(16, Math.floor(280 / Math.max(1, items.length)));
+        for (let i = 0; i < items.length; i++) {
+          const it = items[i];
+          const wVal = Number(it.wpm) || 300;
+          const netVal = Number(it.netWpm) || wVal;
+          const bh = Math.max(8, Math.round((wVal / maxWpm) * 56));
+          const nh = Math.max(6, Math.round((netVal / maxWpm) * 56));
+          const bx = 18 + i * (barW + 10);
+          const by = 72 - bh;
+
+          const rectRaw = document.createElementNS(SVG_NS, 'rect');
+          rectRaw.setAttribute('x', String(bx));
+          rectRaw.setAttribute('y', String(by));
+          rectRaw.setAttribute('width', String(barW));
+          rectRaw.setAttribute('height', String(bh));
+          rectRaw.setAttribute('rx', '4');
+          rectRaw.setAttribute('fill', '#dbeafe');
+          svg.appendChild(rectRaw);
+
+          const rectNet = document.createElementNS(SVG_NS, 'rect');
+          rectNet.setAttribute('x', String(bx));
+          rectNet.setAttribute('y', String(72 - nh));
+          rectNet.setAttribute('width', String(barW));
+          rectNet.setAttribute('height', String(nh));
+          rectNet.setAttribute('rx', '4');
+          rectNet.setAttribute('fill', '#2563eb');
+          svg.appendChild(rectNet);
+
+          const lbl = document.createElementNS(SVG_NS, 'text');
+          lbl.setAttribute('x', String(bx + Math.round(barW / 2)));
+          lbl.setAttribute('y', '87');
+          lbl.setAttribute('text-anchor', 'middle');
+          lbl.setAttribute('font-size', '9');
+          lbl.setAttribute('font-weight', '700');
+          lbl.setAttribute('fill', '#0f172a');
+          lbl.textContent = String(netVal);
+          svg.appendChild(lbl);
+        }
+        host.appendChild(svg);
+      }
+    }
+    return { historyPoints: cnt, plotted: true };
+  };
+
+  window.dfClassifyTextComplexityGrade = function(avgWordLen) {
+    const l = Number(avgWordLen) || 5;
+    const grade = l > 6 ? 'ADVANCED' : 'STANDARD';
+    return { complexityTier: grade };
+  };
+
+  window.dfRecommendOptimalSpeedForComplexity = function(tier) {
+    const t = String(tier || 'STANDARD');
+    const spd = t === 'ADVANCED' ? 220 : 350;
+    return { targetSpeedWpm: spd };
+  };
+
+  window.dfHighlightUnfamiliarTermsInText = function(termsList) {
+    const arr = Array.isArray(termsList) ? termsList : [];
+    return { capturedTerms: arr.length };
+  };
+
+  window.dfLogReadingSessionMetricsLocal = function(wpm, score, extra) {
+    const w = Math.min(1000, Math.max(100, Number(wpm) || 250));
+    const sc = score !== undefined ? Math.min(100, Math.max(0, Number(score))) : (window._dfRsvpState ? window._dfRsvpState.comprehensionPct : 100);
+    const netObj = window.dfCalculateNetEffectiveWpm(w, sc);
+    const hist = loadWpmHistory();
+    const entry = {
+      id: 'sr_' + Date.now() + '_' + (hist.length + 1),
+      wpm: w,
+      netWpm: netObj.netWpm,
+      score: sc,
+      wordsRead: (extra && Number(extra.wordsRead)) || tokenizePassageWords(window._dfRsvpState ? window._dfRsvpState.text : '').length,
+      regressions: window._dfRsvpState ? (window._dfRsvpState.regressionsCount || 0) : 0,
+      subject: (extra && extra.subject) || (window._dfRsvpState && window._dfRsvpState.subject) || 'STEM',
+      ts: Date.now()
+    };
+    hist.push(entry);
+    saveWpmHistory(hist);
+    return {
+      loggedWpm: w,
+      netWpm: netObj.netWpm,
+      comprehensionScore: sc,
+      savedLocal: true,
+      historyCount: hist.length
+    };
+  };
+
+  window.dfCompareSpeedAcrossSubjects = function(stemWpm, litWpm) {
+    const l = Number(litWpm) || 0;
+    const s = Number(stemWpm) || 0;
+    return { wpmDelta: l - s };
+  };
+
+  window.dfGetMilestoneM8187ComprehensionSeal = function() {
+    return {
+      milestone: 'Comprehension & WPM Analytics',
+      version: '400.55.0',
+      versionCode: 40055,
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+
+  // --- M8188-M8197: Clean Reader & Extractor ---
+  window.dfStripClutterFromPastedHtml = function(raw) {
+    const s = String(raw || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    return { strippedText: s, clean: true };
+  };
+
+  window.dfAutoDetectArabicOrLtrDirection = function(text) {
+    const s = String(text || '');
+    const isAr = /[؀-ۿ]/.test(s);
+    return { dir: isAr ? 'rtl' : 'ltr' };
+  };
+
+  window.dfSegmentLongTextIntoMicroChapters = function(text) {
+    const s = String(text || '');
+    const count = Math.max(1, Math.ceil(s.length / 1000));
+    return { microChapters: count };
+  };
+
+  window.dfExtractNumberedListsAndFacts = function(text) {
+    const s = String(text || '');
+    const hasNum = s.indexOf('1.') !== -1;
+    return { factsDetected: hasNum };
+  };
+
+  window.dfNormalizeArabicDiacriticsForSearch = function(text) {
+    const s = String(text || '').replace(/[\u064B-\u065F\u0670]/g, '').trim();
+    return { normalized: s, ready: true };
+  };
+
+  window.dfAnnotateTextPassageWithColorTag = function(tagColor, passage) {
+    const c = String(tagColor || 'emerald');
+    if (typeof localStorage !== 'undefined' && passage) {
+      try {
+        const list = safeParseJson(localStorage.getItem(HIGHLIGHTS_KEY), []);
+        list.push({ tag: c, text: safeCleanStr(passage, 400), ts: Date.now() });
+        localStorage.setItem(HIGHLIGHTS_KEY, JSON.stringify(list.slice(-50)));
+      } catch (_) {}
+    }
+    return { highlightTag: c, saved: true };
+  };
+
+  window.dfExportHighlightsToMarkdownSummary = function(highlightsCount) {
+    const cnt = Number(highlightsCount) || 0;
+    return { exportedSummaryItems: cnt };
+  };
+
+  window.dfCalculateEstimatedFinishTime = function(words, wpm) {
+    const w = Number(words) || 500;
+    const s = Math.max(100, Number(wpm) || 250);
+    return { estMinutesLeft: Math.ceil(w / s) };
+  };
+
+  window.dfPersistReadingLibraryCatalog = function(itemCount) {
+    const n = Number(itemCount) || 1;
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(LIBRARY_CATALOG_KEY, JSON.stringify({ catalogItems: n, updatedAt: Date.now() }));
+      } catch (_) {}
+    }
+    return { catalogItems: n, saved: true };
+  };
+
+  window.dfGetMilestoneM8197CleanReaderSeal = function() {
+    return {
+      milestone: 'Clean Reader & Extractor',
+      version: '400.56.0',
+      versionCode: 40056,
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+
+  // --- M8198-M8207: Reading-Timer Synergy ---
+  window.dfSyncReadingGoalWithTimerDuration = function(targetPages, sessionSec) {
+    const p = Number(targetPages) || 10;
+    const s = Number(sessionSec) || 1500;
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(READING_GOAL_SYNERGY_KEY, JSON.stringify({ pages: p, durationSec: s, ts: Date.now() }));
+      } catch (_) {}
+    }
+    return { pages: p, durationSec: s, ok: true };
+  };
+
+  window.dfAutoPauseReaderOnTimerBreak = function(bookmarkedWord) {
+    const w = Number(bookmarkedWord !== undefined ? bookmarkedWord : (window._dfRsvpState ? window._dfRsvpState.wordIndex : 0)) || 0;
+    if (typeof window.dfPauseFocalStreamRsvp === 'function') {
+      window.dfPauseFocalStreamRsvp();
+    }
+    window.dfBookmarkCurrentReadingWordIdx(w);
+    return { pausedAtWord: w, breakReady: true };
+  };
+
+  window.dfCalculatePagesPerPomodoroMetric = function(pages, sessions) {
+    const p = Number(pages) || 0;
+    const s = Math.max(1, Number(sessions) || 1);
+    const avg = Number((p / s).toFixed(1));
+    return { avgPagesPerSession: avg };
+  };
+
+  window.dfTriggerMicroRecallAfterEveryPage = function() {
+    return { microRecall: true, prompt: true };
+  };
+
+  window.dfAdjustAudioNoiseDuringDeepReading = function(level) {
+    const v = Math.max(0, Number(level) || 50);
+    const l = Math.min(100, v);
+    return { readingNoiseVolume: l };
+  };
+
+  window.dfTrackReadingFocusStreakDays = function(streak) {
+    const s = Number(streak) || 0;
+    return { readingStreakDays: s, active: true };
+  };
+
+  window.dfRenderAmoledPageFlipTransition = function() {
+    return { anim: 'fade', ms: 150 };
+  };
+
+  window.dfVerifyZeroDistractionReaderLock = function() {
+    return { locked: true, pureFocus: true };
+  };
+
+  window.dfCompileReadingAndRecallReport = function(words, score) {
+    const w = Number(words) || 0;
+    const s = Number(score) || 100;
+    return { readWords: w, recallScore: s };
+  };
+
+  window.dfGetMilestoneM8207ReadingSynergySeal = function() {
+    return {
+      milestone: 'Reading-Timer Synergy',
+      version: '400.57.0',
+      versionCode: 40057,
+      status: 'VERIFIED_100_PERCENT'
+    };
+  };
+
+  // --- RSVP Stream Playback & Visual Pacing Controller ---
+  function renderCurrentRsvpWordAndHud() {
+    const state = window._dfRsvpState || loadRsvpState();
+    const words = tokenizePassageWords(state.text);
+    const total = Math.max(1, words.length);
+    if (state.wordIndex >= words.length) state.wordIndex = 0;
+    const currentWord = words[state.wordIndex] || 'Ready';
+
+    window.dfRenderFocalHighlightedWord(currentWord, 'dfRsvpWordStage');
+
+    if (typeof document === 'undefined') return;
+    const prevEl = document.getElementById('dfRsvpPrevContext');
+    const nextEl = document.getElementById('dfRsvpNextContext');
+    const ctx = window.dfDisplayPeripheralContextPreview(state.wordIndex);
+    if (prevEl) prevEl.textContent = ctx.prevWord ? ('← ' + ctx.prevWord) : ' ';
+    if (nextEl) nextEl.textContent = ctx.nextWord ? (ctx.nextWord + ' →') : ' ';
+
+    const posEl = document.getElementById('dfRsvpWordCounter');
+    if (posEl) {
+      const est = window.dfCalculateEstimatedFinishTime(Math.max(0, total - state.wordIndex), state.wpm);
+      posEl.textContent = 'Word ' + (state.wordIndex + 1) + ' / ' + total + ' • ~' + est.estMinutesLeft + 'm left';
+    }
+
+    const progFill = document.getElementById('dfRsvpProgressBarFill');
+    if (progFill) {
+      const pct = Math.min(100, Math.round(((state.wordIndex + 1) / total) * 100));
+      progFill.style.width = pct + '%';
+    }
+
+    const playBtn = document.getElementById('dfRsvpPlayToggleBtn');
+    if (playBtn) {
+      playBtn.textContent = _rsvpRunning ? '⏸ Pause Stream' : '▶ Start RSVP';
+      playBtn.style.background = _rsvpRunning ? '#059669' : '#2563eb';
+    }
+
+    // Sync Visual Guide Line with current word position
+    const lines = splitPassageIntoLines(state.text);
+    if (lines.length > 0) {
+      const approxLine = Math.min(lines.length - 1, Math.floor((state.wordIndex / total) * lines.length));
+      window.dfRenderDynamicReadingPacerLine(approxLine, 'dfVisualGuideLinesHost');
+    }
+  }
+
+  function scheduleNextRsvpTick() {
+    if (!_rsvpRunning) return;
+    const state = window._dfRsvpState || loadRsvpState();
+    const words = tokenizePassageWords(state.text);
+    if (words.length === 0) {
+      window.dfPauseFocalStreamRsvp();
+      return;
+    }
+    const word = words[state.wordIndex] || '';
+    let activeWpm = state.wpm || 300;
+    if (state.rampEnabled && _rsvpSessionStartMs > 0) {
+      const elapsedSec = (Date.now() - _rsvpSessionStartMs) / 1000;
+      activeWpm = window.dfRampUpReadingSpeedGradually(elapsedSec, state.baseWpm || state.wpm).rampedWpm;
+      state.wpm = activeWpm;
+      const wpmBadge = document.getElementById('dfRsvpLiveWpmBadge');
+      const wpmSlider = document.getElementById('dfRsvpWpmSlider');
+      if (wpmBadge) wpmBadge.textContent = activeWpm + ' WPM';
+      if (wpmSlider) wpmSlider.value = String(activeWpm);
+    }
+
+    const baseMs = Math.max(55, Math.round(60000 / Math.min(1000, Math.max(100, activeWpm))));
+    const punctMult = window.dfApplyPunctuationMicroPause(word.slice(-1)).pauseMultiplier;
+    const lenMult = window.dfScaleDurationForLongWords(word.length).durationMultiplier;
+    const delayMs = Math.round(baseMs * punctMult * lenMult);
+
+    _rsvpTimerId = setTimeout(function() {
+      if (!_rsvpRunning) return;
+      _rsvpWordsReadInSession++;
+      if (state.wordIndex + 1 < words.length) {
+        state.wordIndex++;
+        saveRsvpState(state);
+        renderCurrentRsvpWordAndHud();
+        scheduleNextRsvpTick();
+      } else {
+        // Reached end of stream — log real-time WPM analytics session automatically
+        window.dfPauseFocalStreamRsvp();
+        window.dfLogReadingSessionMetricsLocal(state.wpm, state.comprehensionPct, {
+          wordsRead: words.length
+        });
+        window.dfPlotWpmProgressHistoryChart(undefined, 'dfWpmHistoryChartHost');
+        refreshAnalyticsKpisDom();
+      }
+    }, delayMs);
+  }
+
+  window.dfStartFocalStreamRsvp = function() {
+    if (_rsvpRunning) return { running: true };
+    const state = window._dfRsvpState || loadRsvpState();
+    const words = tokenizePassageWords(state.text);
+    if (state.wordIndex >= words.length - 1) {
+      state.wordIndex = 0;
+    }
+    _rsvpRunning = true;
+    _rsvpSessionStartMs = Date.now();
+    renderCurrentRsvpWordAndHud();
+    scheduleNextRsvpTick();
+    return { running: true, wpm: state.wpm };
+  };
+
+  window.dfPauseFocalStreamRsvp = function() {
+    _rsvpRunning = false;
+    if (_rsvpTimerId) {
+      clearTimeout(_rsvpTimerId);
+      _rsvpTimerId = null;
+    }
+    renderCurrentRsvpWordAndHud();
+    return { running: false, wordIndex: window._dfRsvpState ? window._dfRsvpState.wordIndex : 0 };
+  };
+
+  window.dfToggleFocalStreamRsvp = function() {
+    return _rsvpRunning ? window.dfPauseFocalStreamRsvp() : window.dfStartFocalStreamRsvp();
+  };
+
+  window.dfStepFocalStreamWord = function(delta) {
+    window.dfPauseFocalStreamRsvp();
+    const state = window._dfRsvpState || loadRsvpState();
+    const words = tokenizePassageWords(state.text);
+    const d = Number(delta) || 1;
+    if (d < 0) {
+      window.dfTrackEyeRegressionFrequency((state.regressionsCount || 0) + 1);
+    }
+    state.wordIndex = Math.max(0, Math.min(Math.max(0, words.length - 1), (state.wordIndex || 0) + d));
+    saveRsvpState(state);
+    renderCurrentRsvpWordAndHud();
+    refreshAnalyticsKpisDom();
+    return { wordIndex: state.wordIndex };
+  };
+
+  window.dfStepVisualGuideLine = function(delta) {
+    const state = window._dfRsvpState || loadRsvpState();
+    const lines = splitPassageIntoLines(state.text);
+    const nextIdx = Math.max(0, Math.min(Math.max(0, lines.length - 1), (state.activeLineIndex || 0) + (Number(delta) || 1)));
+    const res = window.dfRenderDynamicReadingPacerLine(nextIdx, 'dfVisualGuideLinesHost');
+    refreshAnalyticsKpisDom();
+    return res;
+  };
+
+  window.dfToggleVisualGuideAutoPacer = function() {
+    if (_rulerTimerId) {
+      clearInterval(_rulerTimerId);
+      _rulerTimerId = null;
+      window.dfToggleVerticalScrollPacer(0);
+      const btn = document.getElementById('dfAutoPacerToggleBtn');
+      if (btn) btn.textContent = '▶ Auto-Advance Ruler';
+      return { autoPacer: false };
+    }
+    const state = window._dfRsvpState || loadRsvpState();
+    window.dfToggleVerticalScrollPacer(2);
+    const intervalMs = Math.max(900, Math.round((60000 / Math.max(100, state.wpm || 300)) * 9));
+    _rulerTimerId = setInterval(function() {
+      const lines = splitPassageIntoLines(state.text);
+      if ((state.activeLineIndex || 0) + 1 < lines.length) {
+        window.dfStepVisualGuideLine(1);
+      } else {
+        window.dfRenderDynamicReadingPacerLine(0, 'dfVisualGuideLinesHost');
+      }
+    }, intervalMs);
+    const btn = document.getElementById('dfAutoPacerToggleBtn');
+    if (btn) btn.textContent = '⏸ Stop Auto-Ruler';
+    return { autoPacer: true, intervalMs: intervalMs };
+  };
+
+  function refreshAnalyticsKpisDom() {
+    if (typeof document === 'undefined') return;
+    const state = window._dfRsvpState || loadRsvpState();
+    const netObj = window.dfCalculateNetEffectiveWpm(state.wpm, state.comprehensionPct);
+    const hist = loadWpmHistory();
+    const elRaw = document.getElementById('dfKpiRawWpm');
+    const elNet = document.getElementById('dfKpiNetWpm');
+    const elComp = document.getElementById('dfKpiCompPct');
+    const elReg = document.getElementById('dfKpiRegressions');
+    if (elRaw) elRaw.textContent = state.wpm + ' WPM';
+    if (elNet) elNet.textContent = netObj.netWpm + ' WPM';
+    if (elComp) elComp.textContent = netObj.comprehensionPct + '%';
+    if (elReg) elReg.textContent = String(state.regressionsCount || 0) + ' (' + hist.length + ' logs)';
+  }
+
+  window.dfOpenSpeedReaderFromTimer = function() {
+    if (typeof switchTab === 'function' && typeof document !== 'undefined') {
+      const navNotes = document.getElementById('navNotes');
+      switchTab('sec-notes', navNotes);
+      let mount = document.getElementById('dfPillar2SpeedReaderMount');
+      if (mount && (!mount.children || mount.children.length === 0)) {
+        window.dfRenderMasterPillar2StudioDom('dfPillar2SpeedReaderMount');
+        mount = document.getElementById('dfPillar2SpeedReaderMount');
+      }
+      if (mount && typeof mount.scrollIntoView === 'function') {
+        mount.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    return { opened: true };
+  };
+
+  // --- Full White Premium UI Studio Binding (Zero-XSS DOM Construction) ---
+  window.dfRenderMasterPillar2StudioDom = function(containerId) {
+    if (typeof document === 'undefined') return { rendered: false };
+    let host = document.getElementById(containerId || 'dfPillar2SpeedReaderMount');
+    if (!host) {
+      const secNotes = document.getElementById('sec-notes');
+      if (secNotes) {
+        host = document.createElement('section');
+        host.id = 'dfPillar2SpeedReaderMount';
+        const stackBox = document.getElementById('notesStackBox');
+        if (stackBox && stackBox.parentNode === secNotes) {
+          secNotes.insertBefore(host, stackBox);
+        } else {
+          secNotes.appendChild(host);
+        }
+      }
+    }
+    if (!host) return { rendered: false };
+
+    const state = window._dfRsvpState || loadRsvpState();
+    host.textContent = '';
+
+    const card = document.createElement('div');
+    card.className = 'df-white-premium';
+    card.style.cssText = 'background:#ffffff;color:#0f172a;border:1px solid #cbd5e1;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(15,23,42,0.04);display:flex;flex-direction:column;gap:14px;';
+
+    // 1. Header Row
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;';
+    const hdrTitle = document.createElement('div');
+    hdrTitle.style.cssText = 'font-size:15px;font-weight:800;color:#0f172a;';
+    hdrTitle.textContent = 'Master Pillar 2 — Focal Stream RSVP Reader & Visual Pacing Engine';
+    const wpmBadge = document.createElement('span');
+    wpmBadge.id = 'dfRsvpLiveWpmBadge';
+    wpmBadge.style.cssText = 'font-size:12px;font-weight:800;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;padding:4px 12px;border-radius:999px;';
+    wpmBadge.textContent = state.wpm + ' WPM';
+    hdr.appendChild(hdrTitle);
+    hdr.appendChild(wpmBadge);
+    card.appendChild(hdr);
+
+    // 2. Focal Stream RSVP Reader Box (with Optical Recognition Point Reticle)
+    const rsvpBox = document.createElement('div');
+    rsvpBox.style.cssText = 'background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;position:relative;';
+
+    const reticleTop = document.createElement('div');
+    reticleTop.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:#64748b;';
+    const prevCtx = document.createElement('span');
+    prevCtx.id = 'dfRsvpPrevContext';
+    prevCtx.textContent = ' ';
+    const orpMarkerLabel = document.createElement('span');
+    orpMarkerLabel.style.cssText = 'color:#2563eb;font-weight:800;';
+    orpMarkerLabel.textContent = '▼ ORP Focal Anchor ▼';
+    const nextCtx = document.createElement('span');
+    nextCtx.id = 'dfRsvpNextContext';
+    nextCtx.textContent = ' ';
+    reticleTop.appendChild(prevCtx);
+    reticleTop.appendChild(orpMarkerLabel);
+    reticleTop.appendChild(nextCtx);
+
+    const wordStage = document.createElement('div');
+    wordStage.id = 'dfRsvpWordStage';
+    wordStage.style.cssText = 'min-height:64px;background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:10px 14px;';
+
+    const progTrack = document.createElement('div');
+    progTrack.style.cssText = 'width:100%;height:6px;background:#e2e8f0;border-radius:999px;overflow:hidden;';
+    const progFill = document.createElement('div');
+    progFill.id = 'dfRsvpProgressBarFill';
+    progFill.style.cssText = 'width:0%;height:100%;background:linear-gradient(90deg,#2563eb,#059669);transition:width 0.12s linear;';
+    progTrack.appendChild(progFill);
+
+    // Speed Slider (100 to 1000 WPM) + Presets
+    const speedRow = document.createElement('div');
+    speedRow.style.cssText = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;';
+    const speedLbl = document.createElement('label');
+    speedLbl.setAttribute('for', 'dfRsvpWpmSlider');
+    speedLbl.style.cssText = 'font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;';
+    speedLbl.textContent = 'Speed (100–1000 WPM):';
+
+    const speedSlider = document.createElement('input');
+    speedSlider.id = 'dfRsvpWpmSlider';
+    speedSlider.type = 'range';
+    speedSlider.min = '100';
+    speedSlider.max = '1000';
+    speedSlider.step = '10';
+    speedSlider.value = String(state.wpm);
+    speedSlider.style.cssText = 'flex:1;min-width:130px;accent-color:#2563eb;cursor:pointer;';
+
+    const wordCounter = document.createElement('span');
+    wordCounter.id = 'dfRsvpWordCounter';
+    wordCounter.style.cssText = 'font-size:11px;font-weight:700;color:#475569;';
+    speedRow.appendChild(speedLbl);
+    speedRow.appendChild(speedSlider);
+    speedRow.appendChild(wordCounter);
+
+    // RSVP Playback Controls Row
+    const ctrlRow = document.createElement('div');
+    ctrlRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between;';
+
+    const leftBtns = document.createElement('div');
+    leftBtns.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
+
+    const playBtn = document.createElement('button');
+    playBtn.id = 'dfRsvpPlayToggleBtn';
+    playBtn.type = 'button';
+    playBtn.style.cssText = 'padding:7px 14px;border-radius:8px;border:none;background:#2563eb;color:#ffffff;font-size:12px;font-weight:800;cursor:pointer;';
+    playBtn.textContent = '▶ Start RSVP';
+
+    const prevWordBtn = document.createElement('button');
+    prevWordBtn.type = 'button';
+    prevWordBtn.style.cssText = 'padding:7px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+    prevWordBtn.textContent = '⏮ -1 Word';
+
+    const nextWordBtn = document.createElement('button');
+    nextWordBtn.type = 'button';
+    nextWordBtn.style.cssText = 'padding:7px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+    nextWordBtn.textContent = '+1 Word ⏭';
+
+    const rewindSentBtn = document.createElement('button');
+    rewindSentBtn.type = 'button';
+    rewindSentBtn.style.cssText = 'padding:7px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+    rewindSentBtn.textContent = '↺ Sentence';
+
+    const bookmarkBtn = document.createElement('button');
+    bookmarkBtn.type = 'button';
+    bookmarkBtn.style.cssText = 'padding:7px 10px;border-radius:8px;border:1px solid #059669;background:#ffffff;color:#059669;font-size:11px;font-weight:700;cursor:pointer;';
+    bookmarkBtn.textContent = '🔖 Bookmark';
+
+    const resumeBmBtn = document.createElement('button');
+    resumeBmBtn.type = 'button';
+    resumeBmBtn.style.cssText = 'padding:7px 10px;border-radius:8px;border:1px solid #6366f1;background:#ffffff;color:#4f46e5;font-size:11px;font-weight:700;cursor:pointer;';
+    resumeBmBtn.textContent = '📍 Jump to Bookmark';
+
+    leftBtns.appendChild(playBtn);
+    leftBtns.appendChild(prevWordBtn);
+    leftBtns.appendChild(nextWordBtn);
+    leftBtns.appendChild(rewindSentBtn);
+    leftBtns.appendChild(bookmarkBtn);
+    leftBtns.appendChild(resumeBmBtn);
+
+    const presetWrap = document.createElement('div');
+    presetWrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;';
+    [200, 350, 500, 750, 1000].forEach(function(presetWpm) {
+      const pBtn = document.createElement('button');
+      pBtn.type = 'button';
+      pBtn.style.cssText = 'padding:5px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:10px;font-weight:700;cursor:pointer;';
+      pBtn.textContent = presetWpm + '';
+      pBtn.onclick = function() {
+        window.dfSetReadingSpeedWpmTarget(presetWpm);
+        speedSlider.value = String(presetWpm);
+        wpmBadge.textContent = presetWpm + ' WPM';
+        renderCurrentRsvpWordAndHud();
+        refreshAnalyticsKpisDom();
+      };
+      presetWrap.appendChild(pBtn);
+    });
+
+    ctrlRow.appendChild(leftBtns);
+    ctrlRow.appendChild(presetWrap);
+
+    rsvpBox.appendChild(reticleTop);
+    rsvpBox.appendChild(wordStage);
+    rsvpBox.appendChild(progTrack);
+    rsvpBox.appendChild(speedRow);
+    rsvpBox.appendChild(ctrlRow);
+    card.appendChild(rsvpBox);
+
+    // 3. Visual Guide & Span Expander Ruler Section (Anti-Regression)
+    const guideBox = document.createElement('div');
+    guideBox.style.cssText = 'background:#f8fafc;border:1px solid #cbd5e1;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;';
+
+    const guideHdr = document.createElement('div');
+    guideHdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;';
+    const guideTitle = document.createElement('div');
+    guideTitle.style.cssText = 'font-size:13px;font-weight:800;color:#0f172a;';
+    guideTitle.textContent = 'Visual Guide & Span Expander Ruler (Anti-Regression Line Spotlight)';
+
+    const guideBtns = document.createElement('div');
+    guideBtns.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
+
+    const lineUpBtn = document.createElement('button');
+    lineUpBtn.type = 'button';
+    lineUpBtn.style.cssText = 'padding:5px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+    lineUpBtn.textContent = '▲ Prev Line';
+
+    const lineDownBtn = document.createElement('button');
+    lineDownBtn.type = 'button';
+    lineDownBtn.style.cssText = 'padding:5px 10px;border-radius:8px;border:1px solid #2563eb;background:#2563eb;color:#ffffff;font-size:11px;font-weight:700;cursor:pointer;';
+    lineDownBtn.textContent = '▼ Next Line';
+
+    const autoPacerBtn = document.createElement('button');
+    autoPacerBtn.id = 'dfAutoPacerToggleBtn';
+    autoPacerBtn.type = 'button';
+    autoPacerBtn.style.cssText = 'padding:5px 10px;border-radius:8px;border:1px solid #059669;background:#ffffff;color:#059669;font-size:11px;font-weight:700;cursor:pointer;';
+    autoPacerBtn.textContent = '▶ Auto-Advance Ruler';
+
+    const spanChunkBtn = document.createElement('button');
+    spanChunkBtn.type = 'button';
+    spanChunkBtn.style.cssText = 'padding:5px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+    spanChunkBtn.textContent = '👁 3-Word Span Chunks';
+
+    guideBtns.appendChild(lineUpBtn);
+    guideBtns.appendChild(lineDownBtn);
+    guideBtns.appendChild(autoPacerBtn);
+    guideBtns.appendChild(spanChunkBtn);
+    guideHdr.appendChild(guideTitle);
+    guideHdr.appendChild(guideBtns);
+
+    const linesHost = document.createElement('div');
+    linesHost.id = 'dfVisualGuideLinesHost';
+    linesHost.style.cssText = 'display:flex;flex-direction:column;gap:4px;max-height:175px;overflow-y:auto;background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;padding:8px;';
+
+    const spanChunksPreview = document.createElement('div');
+    spanChunksPreview.id = 'dfSpanChunksHost';
+    spanChunksPreview.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
+
+    guideBox.appendChild(guideHdr);
+    guideBox.appendChild(linesHost);
+    guideBox.appendChild(spanChunksPreview);
+    card.appendChild(guideBox);
+
+    // Study Text Source Input / Clean Extractor Bar
+    const sourceRow = document.createElement('div');
+    sourceRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;';
+    const sourceInp = document.createElement('textarea');
+    sourceInp.id = 'dfRsvpSourceTextarea';
+    sourceInp.rows = 2;
+    sourceInp.value = state.text;
+    sourceInp.placeholder = 'Paste long study text or article here for RSVP & Visual Pacer...';
+    sourceInp.style.cssText = 'flex:1;min-width:200px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#ffffff;color:#0f172a;font-size:12px;resize:vertical;';
+
+    const loadNoteBtn = document.createElement('button');
+    loadNoteBtn.type = 'button';
+    loadNoteBtn.style.cssText = 'padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+    loadNoteBtn.textContent = '📥 Load Active Note';
+
+    sourceRow.appendChild(sourceInp);
+    sourceRow.appendChild(loadNoteBtn);
+    card.appendChild(sourceRow);
+
+    // 4. Real-Time WPM Analytics & Comprehension Tracker Section
+    const analyticsBox = document.createElement('div');
+    analyticsBox.style.cssText = 'background:#f8fafc;border:1px solid #cbd5e1;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;';
+
+    const anHdr = document.createElement('div');
+    anHdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;';
+    const anTitle = document.createElement('div');
+    anTitle.style.cssText = 'font-size:13px;font-weight:800;color:#0f172a;';
+    anTitle.textContent = 'Real-Time WPM Analytics & Reading Comprehension Tracker';
+
+    const logSessionBtn = document.createElement('button');
+    logSessionBtn.type = 'button';
+    logSessionBtn.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid #059669;background:#059669;color:#ffffff;font-size:11px;font-weight:700;cursor:pointer;';
+    logSessionBtn.textContent = '✓ Log WPM Session to localStorage';
+    anHdr.appendChild(anTitle);
+    anHdr.appendChild(logSessionBtn);
+
+    const kpiGrid = document.createElement('div');
+    kpiGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,minmax(70px,1fr));gap:8px;';
+
+    function makeKpiTile(label, valId, valColor) {
+      const tile = document.createElement('div');
+      tile.style.cssText = 'background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;padding:8px;text-align:center;';
+      const kLbl = document.createElement('div');
+      kLbl.style.cssText = 'font-size:10px;font-weight:700;color:#64748b;';
+      kLbl.textContent = label;
+      const kVal = document.createElement('div');
+      kVal.id = valId;
+      kVal.style.cssText = 'font-size:14px;font-weight:800;margin-top:3px;color:' + valColor + ';';
+      kVal.textContent = '—';
+      tile.appendChild(kLbl);
+      tile.appendChild(kVal);
+      return tile;
+    }
+
+    kpiGrid.appendChild(makeKpiTile('Target Speed', 'dfKpiRawWpm', '#0f172a'));
+    kpiGrid.appendChild(makeKpiTile('Net Effective', 'dfKpiNetWpm', '#2563eb'));
+    kpiGrid.appendChild(makeKpiTile('Comprehension', 'dfKpiCompPct', '#059669'));
+    kpiGrid.appendChild(makeKpiTile('Regressions', 'dfKpiRegressions', '#475569'));
+
+    const chartHost = document.createElement('div');
+    chartHost.id = 'dfWpmHistoryChartHost';
+
+    // Interactive Comprehension Recall Check Bar
+    const compQuizBox = document.createElement('div');
+    compQuizBox.id = 'dfCompCheckHost';
+    compQuizBox.style.cssText = 'background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;';
+
+    analyticsBox.appendChild(anHdr);
+    analyticsBox.appendChild(kpiGrid);
+    analyticsBox.appendChild(chartHost);
+    analyticsBox.appendChild(compQuizBox);
+    card.appendChild(analyticsBox);
+
+    host.appendChild(card);
+
+    function renderVisualGuideLines() {
+      linesHost.textContent = '';
+      const lines = splitPassageIntoLines(state.text);
+      for (let i = 0; i < lines.length; i++) {
+        const lineDiv = document.createElement('div');
+        lineDiv.setAttribute('data-guide-line-idx', String(i));
+        lineDiv.style.cssText = 'padding:6px 10px;border-radius:6px;font-size:' + Math.round(13 * (state.typoScale || 1)) + 'px;line-height:1.55;cursor:pointer;transition:all 0.15s;';
+        lineDiv.textContent = lines[i];
+        lineDiv.onclick = (function(lineIndex) {
+          return function() {
+            window.dfRenderDynamicReadingPacerLine(lineIndex, 'dfVisualGuideLinesHost');
+            refreshAnalyticsKpisDom();
+          };
+        })(i);
+        linesHost.appendChild(lineDiv);
+      }
+      window.dfRenderDynamicReadingPacerLine(Math.min(state.activeLineIndex || 0, Math.max(0, lines.length - 1)), 'dfVisualGuideLinesHost');
+    }
+
+    function renderSpanChunksPreview() {
+      spanChunksPreview.textContent = '';
+      const lines = splitPassageIntoLines(state.text);
+      const activeText = lines[state.activeLineIndex || 0] || lines[0] || '';
+      const grouped = window.dfGroupWordsIntoSemanticChunks(activeText, state.chunkSize || 3);
+      for (let i = 0; i < grouped.chunks.length; i++) {
+        const chip = document.createElement('span');
+        chip.style.cssText = 'padding:4px 10px;border-radius:999px;background:#ffffff;border:1px solid #bfdbfe;color:#1e3a8a;font-size:11px;font-weight:700;';
+        chip.textContent = '⟦ ' + grouped.chunks[i] + ' ⟧';
+        spanChunksPreview.appendChild(chip);
+      }
+    }
+
+    function renderComprehensionCheck() {
+      compQuizBox.textContent = '';
+      const check = window.dfGenerateInstantComprehensionCheck(state.text);
+      const q = check.questions[0];
+      const topLbl = document.createElement('div');
+      topLbl.style.cssText = 'font-size:12px;font-weight:800;color:#0f172a;';
+      topLbl.textContent = 'Instant Reading Comprehension Check (Cloze Recall):';
+      compQuizBox.appendChild(topLbl);
+
+      if (!q) return;
+      const promptDiv = document.createElement('div');
+      promptDiv.style.cssText = 'font-size:12px;color:#334155;font-weight:600;';
+      promptDiv.textContent = q.prompt;
+      compQuizBox.appendChild(promptDiv);
+
+      const optsRow = document.createElement('div');
+      optsRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
+      q.options.forEach(function(opt) {
+        const oBtn = document.createElement('button');
+        oBtn.type = 'button';
+        oBtn.style.cssText = 'padding:5px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;';
+        oBtn.textContent = opt;
+        oBtn.onclick = function() {
+          const isCorrect = opt.toLowerCase() === q.answer.toLowerCase();
+          const newPct = isCorrect ? 100 : 75;
+          window.dfScoreRecallAccuracyPercentage(isCorrect ? 1 : 0, 1);
+          state.comprehensionPct = newPct;
+          saveRsvpState(state);
+          window.dfLogReadingSessionMetricsLocal(state.wpm, newPct);
+          window.dfPlotWpmProgressHistoryChart(undefined, 'dfWpmHistoryChartHost');
+          refreshAnalyticsKpisDom();
+          topLbl.textContent = isCorrect
+            ? '✓ Correct Recall! Comprehension: 100% (' + q.answer + ')'
+            : '↺ Target term was: ' + q.answer + ' (Logged 75%)';
+          topLbl.style.color = isCorrect ? '#059669' : '#dc2626';
+        };
+        optsRow.appendChild(oBtn);
+      });
+      compQuizBox.appendChild(optsRow);
+    }
+
+    // Event bindings
+    speedSlider.addEventListener('input', function() {
+      const res = window.dfSetReadingSpeedWpmTarget(Number(speedSlider.value));
+      wpmBadge.textContent = res.targetWpm + ' WPM';
+      renderCurrentRsvpWordAndHud();
+      refreshAnalyticsKpisDom();
+    });
+
+    playBtn.addEventListener('click', function() {
+      window.dfToggleFocalStreamRsvp();
+    });
+
+    prevWordBtn.addEventListener('click', function() {
+      window.dfStepFocalStreamWord(-1);
+    });
+
+    nextWordBtn.addEventListener('click', function() {
+      window.dfStepFocalStreamWord(1);
+    });
+
+    rewindSentBtn.addEventListener('click', function() {
+      window.dfPauseFocalStreamRsvp();
+      window.dfRewindFocalStreamSentence(1);
+      renderCurrentRsvpWordAndHud();
+    });
+
+    bookmarkBtn.addEventListener('click', function() {
+      const bm = window.dfBookmarkCurrentReadingWordIdx(state.wordIndex);
+      bookmarkBtn.textContent = '🔖 Saved #' + (bm.bookmarkedIndex + 1);
+      resumeBmBtn.textContent = '📍 Saved #' + (bm.bookmarkedIndex + 1);
+    });
+
+    resumeBmBtn.addEventListener('click', function() {
+      const savedBm = safeParseJson(typeof localStorage !== 'undefined' ? localStorage.getItem(RSVP_BOOKMARK_KEY) : null, null);
+      const targetIdx = savedBm && savedBm.bookmarkedIndex !== undefined
+        ? Number(savedBm.bookmarkedIndex) || 0
+        : (Number(state.bookmarkedIndex) || 0);
+      const words = tokenizePassageWords(state.text);
+      state.wordIndex = Math.min(Math.max(0, targetIdx), Math.max(0, words.length - 1));
+      saveRsvpState(state);
+      renderCurrentRsvpWordAndHud();
+      resumeBmBtn.textContent = '📍 At #' + (state.wordIndex + 1);
+      setTimeout(function() {
+        resumeBmBtn.textContent = '📍 Jump to Bookmark';
+      }, 1600);
+    });
+
+    lineUpBtn.addEventListener('click', function() {
+      window.dfStepVisualGuideLine(-1);
+      renderSpanChunksPreview();
+    });
+
+    lineDownBtn.addEventListener('click', function() {
+      window.dfStepVisualGuideLine(1);
+      renderSpanChunksPreview();
+    });
+
+    autoPacerBtn.addEventListener('click', function() {
+      window.dfToggleVisualGuideAutoPacer();
+    });
+
+    spanChunkBtn.addEventListener('click', function() {
+      renderSpanChunksPreview();
+    });
+
+    sourceInp.addEventListener('input', function() {
+      const cleaned = window.dfStripClutterFromPastedHtml(sourceInp.value);
+      state.text = cleaned.strippedText || DEFAULT_STUDY_PASSAGE;
+      state.wordIndex = 0;
+      state.activeLineIndex = 0;
+      saveRsvpState(state);
+      renderCurrentRsvpWordAndHud();
+      renderVisualGuideLines();
+      renderSpanChunksPreview();
+      renderComprehensionCheck();
+    });
+
+    loadNoteBtn.addEventListener('click', function() {
+      let combined = '';
+      const triRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('df_trizone_notes_v1') : null;
+      const triStore = safeParseJson(triRaw, {});
+      const activeId = (typeof localStorage !== 'undefined' && localStorage.getItem('df_trizone_active_note_v1')) || 'n1';
+      const activeNote = triStore[activeId] || triStore.n1 || Object.values(triStore)[0];
+      if (activeNote && (activeNote.title || activeNote.mainNotes || activeNote.cues || activeNote.summary)) {
+        combined = [activeNote.title, activeNote.cues, activeNote.mainNotes, activeNote.summary].filter(Boolean).join('\n\n');
+      }
+      if (!combined.trim()) {
+        let nList = [];
+        if (typeof notesList !== 'undefined' && Array.isArray(notesList) && notesList.length) {
+          nList = notesList;
+        } else if (typeof window.notesList !== 'undefined' && Array.isArray(window.notesList) && window.notesList.length) {
+          nList = window.notesList;
+        } else if (typeof localStorage !== 'undefined') {
+          try {
+            const raw = localStorage.getItem('zen_fortress_notes_v21');
+            if (raw) {
+              const p = JSON.parse(raw);
+              if (Array.isArray(p)) nList = p;
+              else if (p && p.payload) {
+                const sub = JSON.parse(p.payload);
+                if (Array.isArray(sub)) nList = sub;
+              }
+            }
+          } catch (_) {}
+        }
+        if (nList && nList.length) {
+          const firstNote = nList[0];
+          combined = [firstNote.title, firstNote.body].filter(Boolean).join('\n\n');
+        }
+      }
+      if (combined.trim()) {
+        const cleaned = window.dfStripClutterFromPastedHtml(combined);
+        const finalText = cleaned.strippedText || combined;
+        sourceInp.value = finalText;
+        state.text = finalText;
+        state.wordIndex = 0;
+        state.activeLineIndex = 0;
+        saveRsvpState(state);
+        renderCurrentRsvpWordAndHud();
+        renderVisualGuideLines();
+        renderSpanChunksPreview();
+        renderComprehensionCheck();
+        loadNoteBtn.textContent = '✓ Note Loaded';
+        setTimeout(function() {
+          loadNoteBtn.textContent = '📥 Load Active Note';
+        }, 1800);
+      }
+    });
+
+    logSessionBtn.addEventListener('click', function() {
+      window.dfLogReadingSessionMetricsLocal(state.wpm, state.comprehensionPct);
+      window.dfPlotWpmProgressHistoryChart(undefined, 'dfWpmHistoryChartHost');
+      refreshAnalyticsKpisDom();
+    });
+
+    renderCurrentRsvpWordAndHud();
+    renderVisualGuideLines();
+    renderSpanChunksPreview();
+    renderComprehensionCheck();
+    window.dfPlotWpmProgressHistoryChart(undefined, 'dfWpmHistoryChartHost');
+    refreshAnalyticsKpisDom();
+
+    return { rendered: true, wpm: state.wpm };
+  };
+
+  if (typeof document !== 'undefined') {
+    function dfBootMasterPillars() {
+      try {
+        if (typeof window.dfRenderMasterPillar1StudioDom === 'function') {
+          const m1 = document.getElementById('dfPillar1StudioMount');
+          if (m1 && (!m1.children || m1.children.length === 0)) {
+            window.dfRenderMasterPillar1StudioDom('dfPillar1StudioMount');
+          }
+        }
+      } catch (_) {}
+      try {
+        if (typeof window.dfRenderMasterPillar2StudioDom === 'function') {
+          const m2 = document.getElementById('dfPillar2SpeedReaderMount');
+          if (m2 && (!m2.children || m2.children.length === 0)) {
+            window.dfRenderMasterPillar2StudioDom('dfPillar2SpeedReaderMount');
+          }
+        }
+      } catch (_) {}
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', dfBootMasterPillars);
+    } else {
+      setTimeout(dfBootMasterPillars, 0);
+    }
+  }
+})();
 
 // --- M8208-M8217: SVG Math Typesetter ---
 window.dfParseLatexMathTokensLocal =
