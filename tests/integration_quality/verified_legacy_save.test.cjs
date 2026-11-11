@@ -14,12 +14,16 @@ function fixture(){
    if(key===control.noOpKey)return;
    map.set(key,String(value));
   },
-  removeItem:key=>map.delete(key)
+  removeItem:key=>{
+   if(key===control.rollbackFailKey)throw new Error('Rollback failure');
+   map.delete(key);
+  }
  };
  const ctx=vm.createContext({localStorage:store,Date,JSON});
+ ctx.window = {}; // Ensure window object is defined in the VM context.
  vm.runInContext(saveCode,ctx,{timeout:1000});
- return {save:v=>vm.runInContext('saveFortressData("zen_fortress_notes_v21",'+JSON.stringify(v)+')',ctx),
-  map,control,decode:key=>JSON.parse(map.get(key))};
+ return {save:(v,k="zen_fortress_notes_v21")=>vm.runInContext(`saveFortressData("${k}",`+JSON.stringify(v)+')',ctx),
+  map,control,ctx,decode:key=>JSON.parse(map.get(key))};
 }
 const key='zen_fortress_notes_v21',mirror=key+'_mirror';
 test('legacy save confirms both copies, preserving v21 payload and checksum packet',()=>{
@@ -44,4 +48,42 @@ test('legacy storage silent no-op must fail instead of claiming save succeeded',
  f.control.noOpKey=mirror;
  assert.throws(()=>f.save([{id:2,title:'New',body:'New body'}]),/STORAGE_WRITE_NOT_VERIFIED/);
  assert.deepEqual([f.map.get(key),f.map.get(mirror)],original);
+});
+
+test('saveFortressData rejects un-serializable values', () => {
+ const f = fixture();
+ // Use a circular structure which JSON.stringify cannot serialize
+ const obj = {};
+ obj.self = obj;
+ assert.throws(() => f.save(obj), TypeError);
+});
+
+test('saveFortressData STORAGE_WRITE_FAILED_ROLLBACK_UNVERIFIED: failure during rollback', () => {
+ const f = fixture();
+ const key = 'zen_fortress_notes_v21';
+ const mirrorKey = key + '_mirror';
+
+ f.control.failKey = mirrorKey;
+ f.control.rollbackFailKey = key;
+
+ assert.throws(() => {
+   f.save([{ id: 1 }]);
+ }, /STORAGE_WRITE_FAILED_ROLLBACK_UNVERIFIED:zen_fortress_notes_v21/);
+});
+
+test('saveFortressData NATIVE_DURABLE_ACK_FAILED: throws when native sync fails for protected keys', () => {
+ const f = fixture();
+ const key = 'zen_fortress_cfg_v21'; // Ensure it's one of the protected keys
+
+ // Mock native sync failure in the VM context
+ vm.runInContext(`
+   window.ZenNative = {};
+   window.DF22Preflight = {
+     nativeAcknowledge: () => false
+   };
+ `, f.ctx);
+
+ assert.throws(() => {
+   f.save([{ setting: true }], key);
+ }, /NATIVE_DURABLE_ACK_FAILED/);
 });
