@@ -83805,3 +83805,8 @@ if (typeof SessionAbortShield !== "undefined") {
 if (typeof LocalStudyScheduler !== "undefined") {
     LocalStudyScheduler.init();
 }
+
+// [Task #683] Four Button Density Enforcer Initialization
+if (typeof FourButtonDensityEnforcer !== "undefined") {
+    FourButtonDensityEnforcer.init();
+}
