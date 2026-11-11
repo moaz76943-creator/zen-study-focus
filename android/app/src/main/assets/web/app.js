@@ -1,4 +1,10 @@
 
+// [Task #682] Unhandled Error Shield Initialization
+if (typeof UnhandledErrorShield !== "undefined") {
+    UnhandledErrorShield.init();
+}
+
+
 // [Task #680] Safe DOM Proxy Shield Initialization
 if (typeof SafeDOMProxyShield !== "undefined") {
     SafeDOMProxyShield.init();

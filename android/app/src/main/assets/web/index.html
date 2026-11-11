@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr" id="htmlRoot">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:;">
     <link rel="stylesheet" href="touch_restorer.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -1910,6 +1911,7 @@
     <script src="modules/core/session_abort_shield.js"></script>
     <script src="modules/core/safe_dom_proxy_shield.js"></script>
     <script src="modules/core/local_study_scheduler.js"></script>
+    <script src="modules/core/unhandled_error_shield.js"></script>
     <script src="app.js"></script>
   <script src="notes_core_v21.js"></script>
   <script src="notes_studio.js"></script>
