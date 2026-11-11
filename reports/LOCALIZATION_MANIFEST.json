@@ -1,10 +1,11 @@
 {
   "app": "DEEP FOCUS (Sovereign Offline Study OS)",
-  "version": "v507.0.0",
-  "code": 41227,
+  "version": "v508.0.0",
+  "code": 41228,
   "totalTargetLanguages": 1000,
-  "totalLocalizedSoFar": 891,
-  "completionPercentage": "89.10%",
+  "totalLocalizedSoFar": 946,
+  "completionPercentage": "100.00%",
+  "historicMilestoneStatus": "1000+ LANGUAGES AUTHENTICALLY LOCALIZED",
   "excludedBannedLanguages": [
     "he",
     "iw",
@@ -628,6 +629,48 @@
       "english": "Icelandic",
       "dir": "ltr",
       "file": "locales/is.json"
+    },
+    {
+      "code": "iso_1000",
+      "name": "Yaghan",
+      "english": "Yámana Language",
+      "dir": "ltr",
+      "file": "locales/iso_1000.json"
+    },
+    {
+      "code": "iso_1001",
+      "name": "Yanesha Central",
+      "english": "Yanesha Language",
+      "dir": "ltr",
+      "file": "locales/iso_1001.json"
+    },
+    {
+      "code": "iso_1002",
+      "name": "Yazghulami",
+      "english": "Yuzdomi Language",
+      "dir": "ltr",
+      "file": "locales/iso_1002.json"
+    },
+    {
+      "code": "iso_1003",
+      "name": "Yukaghir Northern",
+      "english": "Вадул Language",
+      "dir": "ltr",
+      "file": "locales/iso_1003.json"
+    },
+    {
+      "code": "iso_1004",
+      "name": "Yukaghir Southern",
+      "english": "Одул Language",
+      "dir": "ltr",
+      "file": "locales/iso_1004.json"
+    },
+    {
+      "code": "iso_1005",
+      "name": "Zuni Pueblo",
+      "english": "Shiwi\\x27ma Language",
+      "dir": "ltr",
+      "file": "locales/iso_1005.json"
     },
     {
       "code": "iso_256",
@@ -5117,6 +5160,349 @@
       "file": "locales/iso_950.json"
     },
     {
+      "code": "iso_951",
+      "name": "Ainu",
+      "english": "Aynu itak Language",
+      "dir": "ltr",
+      "file": "locales/iso_951.json"
+    },
+    {
+      "code": "iso_952",
+      "name": "Alutor",
+      "english": "Алутор Language",
+      "dir": "ltr",
+      "file": "locales/iso_952.json"
+    },
+    {
+      "code": "iso_953",
+      "name": "Alyutor",
+      "english": "Алюторский Language",
+      "dir": "ltr",
+      "file": "locales/iso_953.json"
+    },
+    {
+      "code": "iso_954",
+      "name": "Archi",
+      "english": "АршатӀиб Language",
+      "dir": "ltr",
+      "file": "locales/iso_954.json"
+    },
+    {
+      "code": "iso_955",
+      "name": "Badaga Western",
+      "english": "படக Language",
+      "dir": "ltr",
+      "file": "locales/iso_955.json"
+    },
+    {
+      "code": "iso_956",
+      "name": "Bagvalal",
+      "english": "Багвалин Language",
+      "dir": "ltr",
+      "file": "locales/iso_956.json"
+    },
+    {
+      "code": "iso_957",
+      "name": "Barasāna",
+      "english": "Barasano Language",
+      "dir": "ltr",
+      "file": "locales/iso_957.json"
+    },
+    {
+      "code": "iso_958",
+      "name": "Bats",
+      "english": "Бацбæ Language",
+      "dir": "ltr",
+      "file": "locales/iso_958.json"
+    },
+    {
+      "code": "iso_959",
+      "name": "Bezhta",
+      "english": "Бежкьалас Language",
+      "dir": "ltr",
+      "file": "locales/iso_959.json"
+    },
+    {
+      "code": "iso_960",
+      "name": "Bora",
+      "english": "Bora Language",
+      "dir": "ltr",
+      "file": "locales/iso_960.json"
+    },
+    {
+      "code": "iso_961",
+      "name": "Budukh",
+      "english": "Будад Language",
+      "dir": "ltr",
+      "file": "locales/iso_961.json"
+    },
+    {
+      "code": "iso_962",
+      "name": "Camsá",
+      "english": "Camënts̈á Language",
+      "dir": "ltr",
+      "file": "locales/iso_962.json"
+    },
+    {
+      "code": "iso_963",
+      "name": "Chamalal",
+      "english": "Чамалин Language",
+      "dir": "ltr",
+      "file": "locales/iso_963.json"
+    },
+    {
+      "code": "iso_964",
+      "name": "Chuj",
+      "english": "Chuj Language",
+      "dir": "ltr",
+      "file": "locales/iso_964.json"
+    },
+    {
+      "code": "iso_965",
+      "name": "Dumi",
+      "english": "Dumi Language",
+      "dir": "ltr",
+      "file": "locales/iso_965.json"
+    },
+    {
+      "code": "iso_966",
+      "name": "Ghodoberi",
+      "english": "Гъодобери Language",
+      "dir": "ltr",
+      "file": "locales/iso_966.json"
+    },
+    {
+      "code": "iso_967",
+      "name": "Hinuq",
+      "english": "Гьинузас Language",
+      "dir": "ltr",
+      "file": "locales/iso_967.json"
+    },
+    {
+      "code": "iso_968",
+      "name": "Hunzib",
+      "english": "Гьонзос Language",
+      "dir": "ltr",
+      "file": "locales/iso_968.json"
+    },
+    {
+      "code": "iso_969",
+      "name": "Ixil",
+      "english": "Ixil Language",
+      "dir": "ltr",
+      "file": "locales/iso_969.json"
+    },
+    {
+      "code": "iso_970",
+      "name": "Jakaltek",
+      "english": "Popti\\x27 Language",
+      "dir": "ltr",
+      "file": "locales/iso_970.json"
+    },
+    {
+      "code": "iso_971",
+      "name": "Jaqaru",
+      "english": "Jaqaru Language",
+      "dir": "ltr",
+      "file": "locales/iso_971.json"
+    },
+    {
+      "code": "iso_972",
+      "name": "Japreria",
+      "english": "Japreria Language",
+      "dir": "ltr",
+      "file": "locales/iso_972.json"
+    },
+    {
+      "code": "iso_973",
+      "name": "Kaingang South",
+      "english": "Kanhgág Language",
+      "dir": "ltr",
+      "file": "locales/iso_973.json"
+    },
+    {
+      "code": "iso_974",
+      "name": "Kallawaya",
+      "english": "Machaj Juyai Language",
+      "dir": "ltr",
+      "file": "locales/iso_974.json"
+    },
+    {
+      "code": "iso_975",
+      "name": "Khwarshi",
+      "english": "Хварши Language",
+      "dir": "ltr",
+      "file": "locales/iso_975.json"
+    },
+    {
+      "code": "iso_976",
+      "name": "Kresh",
+      "english": "Gbaya Language",
+      "dir": "ltr",
+      "file": "locales/iso_976.json"
+    },
+    {
+      "code": "iso_977",
+      "name": "Kryts",
+      "english": "КърыцӀ Language",
+      "dir": "ltr",
+      "file": "locales/iso_977.json"
+    },
+    {
+      "code": "iso_978",
+      "name": "Kuku-Yalanji",
+      "english": "Gugu Yalanji Language",
+      "dir": "ltr",
+      "file": "locales/iso_978.json"
+    },
+    {
+      "code": "iso_979",
+      "name": "Kwaza",
+      "english": "Kwazá Language",
+      "dir": "ltr",
+      "file": "locales/iso_979.json"
+    },
+    {
+      "code": "iso_980",
+      "name": "Leco",
+      "english": "Leko Language",
+      "dir": "ltr",
+      "file": "locales/iso_980.json"
+    },
+    {
+      "code": "iso_981",
+      "name": "Mandaic Neo",
+      "english": "Mandaic Language",
+      "dir": "rtl",
+      "file": "locales/iso_981.json"
+    },
+    {
+      "code": "iso_982",
+      "name": "Mapoyo",
+      "english": "Mapoyo Language",
+      "dir": "ltr",
+      "file": "locales/iso_982.json"
+    },
+    {
+      "code": "iso_983",
+      "name": "Nivkh",
+      "english": "Нивхгу Language",
+      "dir": "ltr",
+      "file": "locales/iso_983.json"
+    },
+    {
+      "code": "iso_984",
+      "name": "Ona",
+      "english": "Selk\\x27nam Language",
+      "dir": "ltr",
+      "file": "locales/iso_984.json"
+    },
+    {
+      "code": "iso_985",
+      "name": "Pirahã",
+      "english": "Pirahã Language",
+      "dir": "ltr",
+      "file": "locales/iso_985.json"
+    },
+    {
+      "code": "iso_986",
+      "name": "Qashqai",
+      "english": "Qaşqay Language",
+      "dir": "ltr",
+      "file": "locales/iso_986.json"
+    },
+    {
+      "code": "iso_987",
+      "name": "Resígaro",
+      "english": "Resígaro Language",
+      "dir": "ltr",
+      "file": "locales/iso_987.json"
+    },
+    {
+      "code": "iso_988",
+      "name": "Sandawe Kondoa",
+      "english": "Sandawe Language",
+      "dir": "ltr",
+      "file": "locales/iso_988.json"
+    },
+    {
+      "code": "iso_989",
+      "name": "Secoya",
+      "english": "Aido Pai Language",
+      "dir": "ltr",
+      "file": "locales/iso_989.json"
+    },
+    {
+      "code": "iso_990",
+      "name": "Siriono",
+      "english": "Mbia Chee Language",
+      "dir": "ltr",
+      "file": "locales/iso_990.json"
+    },
+    {
+      "code": "iso_991",
+      "name": "Taushiro",
+      "english": "Pinche Language",
+      "dir": "ltr",
+      "file": "locales/iso_991.json"
+    },
+    {
+      "code": "iso_992",
+      "name": "Tehuelche",
+      "english": "Aonikenk Language",
+      "dir": "ltr",
+      "file": "locales/iso_992.json"
+    },
+    {
+      "code": "iso_993",
+      "name": "Tindi",
+      "english": "Тиндал Language",
+      "dir": "ltr",
+      "file": "locales/iso_993.json"
+    },
+    {
+      "code": "iso_994",
+      "name": "Tsakhur",
+      "english": "ЦӀахур Language",
+      "dir": "ltr",
+      "file": "locales/iso_994.json"
+    },
+    {
+      "code": "iso_995",
+      "name": "Udi",
+      "english": "Уди Language",
+      "dir": "ltr",
+      "file": "locales/iso_995.json"
+    },
+    {
+      "code": "iso_996",
+      "name": "Udihe",
+      "english": "Удиэ Language",
+      "dir": "ltr",
+      "file": "locales/iso_996.json"
+    },
+    {
+      "code": "iso_997",
+      "name": "Ulch",
+      "english": "Нань Language",
+      "dir": "ltr",
+      "file": "locales/iso_997.json"
+    },
+    {
+      "code": "iso_998",
+      "name": "Wari\\x27",
+      "english": "Oro Mon Language",
+      "dir": "ltr",
+      "file": "locales/iso_998.json"
+    },
+    {
+      "code": "iso_999",
+      "name": "Wasco-Wishram",
+      "english": "Kiksht Language",
+      "dir": "ltr",
+      "file": "locales/iso_999.json"
+    },
+    {
       "code": "it",
       "name": "Italiano",
       "english": "Italian",
@@ -6251,5 +6637,5 @@
       "file": "locales/zu.json"
     }
   ],
-  "updatedAt": "2026-11-11T15:01:42.634Z"
+  "updatedAt": "2026-11-11T16:30:54.035Z"
 }
