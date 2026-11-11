@@ -3379,7 +3379,7 @@ async function shareAppWithFriends() {
 let chimeCtx = null;
 function playRichCompletionChime(titleText, skipNative = false) {
   if (!skipNative && window.ZenNative && window.ZenNative.triggerCompletionSound) {
-    try { window.ZenNative.triggerCompletionSound(titleText || "Session Completed!"); } catch(e){}
+    try { window.ZenNative.triggerCompletionSound(titleText || "Session Completed!"); } catch(e){ console.error("Native completion sound error:", e); }
   }
   try {
     if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3395,8 +3395,8 @@ function playRichCompletionChime(titleText, skipNative = false) {
       osc.start(chimeCtx.currentTime + idx * 0.35);
       osc.stop(chimeCtx.currentTime + idx * 0.35 + 1.6);
     });
-  } catch (e) {}
-  if (navigator.vibrate) try { navigator.vibrate([300, 150, 300, 150, 500]); } catch (e) {}
+  } catch (e) { console.error("Rich chime generation error:", e); }
+  if (navigator.vibrate) try { navigator.vibrate([300, 150, 300, 150, 500]); } catch (e) { console.error("Vibration error:", e); }
 }
 
 function testCompletionSoundChime() {
