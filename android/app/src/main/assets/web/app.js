@@ -83748,3 +83748,8 @@ if (typeof HighDpiCanvasScaler !== "undefined") {
 if (typeof PhysiologicalRespirationPacer !== "undefined") {
     PhysiologicalRespirationPacer.init();
 }
+
+// [Task #672] Adaptive Debounce Guard Initialization
+if (typeof AdaptiveDebounceGuard !== "undefined") {
+    AdaptiveDebounceGuard.init();
+}
