@@ -1,8 +1,10 @@
 {
   "app": "DEEP FOCUS (Sovereign Offline Study OS)",
+  "version": "v499.0.0",
+  "code": 41219,
   "totalTargetLanguages": 1000,
-  "totalLocalizedSoFar": 98,
-  "completionPercentage": "9.80%",
+  "totalLocalizedSoFar": 196,
+  "completionPercentage": "19.60%",
   "excludedBannedLanguages": [
     "he",
     "iw",
@@ -12,494 +14,18 @@
   ],
   "localizedLanguages": [
     {
-      "code": "ar",
-      "name": "العربية",
-      "english": "Arabic",
-      "dir": "rtl",
-      "file": "locales/ar.json"
-    },
-    {
-      "code": "en",
-      "name": "English",
-      "english": "English",
+      "code": "ab",
+      "name": "Аҧсшәа",
+      "english": "Abkhaz",
       "dir": "ltr",
-      "file": "locales/en.json"
+      "file": "locales/ab.json"
     },
     {
-      "code": "zh",
-      "name": "中文",
-      "english": "Chinese",
+      "code": "ady",
+      "name": "Адыгэбзэ",
+      "english": "Adyghe",
       "dir": "ltr",
-      "file": "locales/zh.json"
-    },
-    {
-      "code": "es",
-      "name": "Español",
-      "english": "Spanish",
-      "dir": "ltr",
-      "file": "locales/es.json"
-    },
-    {
-      "code": "hi",
-      "name": "हिन्दी",
-      "english": "Hindi",
-      "dir": "ltr",
-      "file": "locales/hi.json"
-    },
-    {
-      "code": "bn",
-      "name": "বাংলা",
-      "english": "Bengali",
-      "dir": "ltr",
-      "file": "locales/bn.json"
-    },
-    {
-      "code": "pt",
-      "name": "Português",
-      "english": "Portuguese",
-      "dir": "ltr",
-      "file": "locales/pt.json"
-    },
-    {
-      "code": "ru",
-      "name": "Русский",
-      "english": "Russian",
-      "dir": "ltr",
-      "file": "locales/ru.json"
-    },
-    {
-      "code": "ja",
-      "name": "日本語",
-      "english": "Japanese",
-      "dir": "ltr",
-      "file": "locales/ja.json"
-    },
-    {
-      "code": "ur",
-      "name": "اردو",
-      "english": "Urdu",
-      "dir": "rtl",
-      "file": "locales/ur.json"
-    },
-    {
-      "code": "id",
-      "name": "Bahasa Indonesia",
-      "english": "Indonesian",
-      "dir": "ltr",
-      "file": "locales/id.json"
-    },
-    {
-      "code": "de",
-      "name": "Deutsch",
-      "english": "German",
-      "dir": "ltr",
-      "file": "locales/de.json"
-    },
-    {
-      "code": "fr",
-      "name": "Français",
-      "english": "French",
-      "dir": "ltr",
-      "file": "locales/fr.json"
-    },
-    {
-      "code": "tr",
-      "name": "Türkçe",
-      "english": "Turkish",
-      "dir": "ltr",
-      "file": "locales/tr.json"
-    },
-    {
-      "code": "fa",
-      "name": "فارسی",
-      "english": "Persian",
-      "dir": "rtl",
-      "file": "locales/fa.json"
-    },
-    {
-      "code": "ko",
-      "name": "한국어",
-      "english": "Korean",
-      "dir": "ltr",
-      "file": "locales/ko.json"
-    },
-    {
-      "code": "vi",
-      "name": "Tiếng Việt",
-      "english": "Vietnamese",
-      "dir": "ltr",
-      "file": "locales/vi.json"
-    },
-    {
-      "code": "it",
-      "name": "Italiano",
-      "english": "Italian",
-      "dir": "ltr",
-      "file": "locales/it.json"
-    },
-    {
-      "code": "pl",
-      "name": "Polski",
-      "english": "Polish",
-      "dir": "ltr",
-      "file": "locales/pl.json"
-    },
-    {
-      "code": "uk",
-      "name": "Українська",
-      "english": "Ukrainian",
-      "dir": "ltr",
-      "file": "locales/uk.json"
-    },
-    {
-      "code": "nl",
-      "name": "Nederlands",
-      "english": "Dutch",
-      "dir": "ltr",
-      "file": "locales/nl.json"
-    },
-    {
-      "code": "th",
-      "name": "ไทย",
-      "english": "Thai",
-      "dir": "ltr",
-      "file": "locales/th.json"
-    },
-    {
-      "code": "tl",
-      "name": "Tagalog",
-      "english": "Filipino",
-      "dir": "ltr",
-      "file": "locales/tl.json"
-    },
-    {
-      "code": "sw",
-      "name": "Kiswahili",
-      "english": "Swahili",
-      "dir": "ltr",
-      "file": "locales/sw.json"
-    },
-    {
-      "code": "ha",
-      "name": "Hausa",
-      "english": "Hausa",
-      "dir": "ltr",
-      "file": "locales/ha.json"
-    },
-    {
-      "code": "yo",
-      "name": "Yorùbá",
-      "english": "Yoruba",
-      "dir": "ltr",
-      "file": "locales/yo.json"
-    },
-    {
-      "code": "so",
-      "name": "Soomaali",
-      "english": "Somali",
-      "dir": "ltr",
-      "file": "locales/so.json"
-    },
-    {
-      "code": "az",
-      "name": "Azərbaycan",
-      "english": "Azerbaijani",
-      "dir": "ltr",
-      "file": "locales/az.json"
-    },
-    {
-      "code": "uz",
-      "name": "Oʻzbek",
-      "english": "Uzbek",
-      "dir": "ltr",
-      "file": "locales/uz.json"
-    },
-    {
-      "code": "kk",
-      "name": "Қазақша",
-      "english": "Kazakh",
-      "dir": "ltr",
-      "file": "locales/kk.json"
-    },
-    {
-      "code": "ps",
-      "name": "پښتو",
-      "english": "Pashto",
-      "dir": "rtl",
-      "file": "locales/ps.json"
-    },
-    {
-      "code": "ku",
-      "name": "Kurdî",
-      "english": "Kurdish",
-      "dir": "rtl",
-      "file": "locales/ku.json"
-    },
-    {
-      "code": "sd",
-      "name": "سنڌي",
-      "english": "Sindhi",
-      "dir": "rtl",
-      "file": "locales/sd.json"
-    },
-    {
-      "code": "ug",
-      "name": "ئۇيغۇرچە",
-      "english": "Uyghur",
-      "dir": "rtl",
-      "file": "locales/ug.json"
-    },
-    {
-      "code": "am",
-      "name": "አማርኛ",
-      "english": "Amharic",
-      "dir": "ltr",
-      "file": "locales/am.json"
-    },
-    {
-      "code": "om",
-      "name": "Oromoo",
-      "english": "Oromo",
-      "dir": "ltr",
-      "file": "locales/om.json"
-    },
-    {
-      "code": "ti",
-      "name": "ትግርኛ",
-      "english": "Tigrinya",
-      "dir": "ltr",
-      "file": "locales/ti.json"
-    },
-    {
-      "code": "ta",
-      "name": "தமிழ்",
-      "english": "Tamil",
-      "dir": "ltr",
-      "file": "locales/ta.json"
-    },
-    {
-      "code": "te",
-      "name": "తెలుగు",
-      "english": "Telugu",
-      "dir": "ltr",
-      "file": "locales/te.json"
-    },
-    {
-      "code": "mr",
-      "name": "मराठी",
-      "english": "Marathi",
-      "dir": "ltr",
-      "file": "locales/mr.json"
-    },
-    {
-      "code": "gu",
-      "name": "ગુજરાતી",
-      "english": "Gujarati",
-      "dir": "ltr",
-      "file": "locales/gu.json"
-    },
-    {
-      "code": "kn",
-      "name": "ಕನ್ನಡ",
-      "english": "Kannada",
-      "dir": "ltr",
-      "file": "locales/kn.json"
-    },
-    {
-      "code": "ml",
-      "name": "മലയാളം",
-      "english": "Malayalam",
-      "dir": "ltr",
-      "file": "locales/ml.json"
-    },
-    {
-      "code": "pa",
-      "name": "ਪੰਜਾਬੀ",
-      "english": "Punjabi",
-      "dir": "ltr",
-      "file": "locales/pa.json"
-    },
-    {
-      "code": "or",
-      "name": "ଓଡ଼ିଆ",
-      "english": "Odia",
-      "dir": "ltr",
-      "file": "locales/or.json"
-    },
-    {
-      "code": "my",
-      "name": "မြန်မာဘာသာ",
-      "english": "Burmese",
-      "dir": "ltr",
-      "file": "locales/my.json"
-    },
-    {
-      "code": "km",
-      "name": "ភាសាខ្មែរ",
-      "english": "Khmer",
-      "dir": "ltr",
-      "file": "locales/km.json"
-    },
-    {
-      "code": "lo",
-      "name": "ພາສາລາວ",
-      "english": "Lao",
-      "dir": "ltr",
-      "file": "locales/lo.json"
-    },
-    {
-      "code": "ne",
-      "name": "नेपाली",
-      "english": "Nepali",
-      "dir": "ltr",
-      "file": "locales/ne.json"
-    },
-    {
-      "code": "si",
-      "name": "සිංහල",
-      "english": "Sinhala",
-      "dir": "ltr",
-      "file": "locales/si.json"
-    },
-    {
-      "code": "el",
-      "name": "Ελληνικά",
-      "english": "Greek",
-      "dir": "ltr",
-      "file": "locales/el.json"
-    },
-    {
-      "code": "cs",
-      "name": "Čeština",
-      "english": "Czech",
-      "dir": "ltr",
-      "file": "locales/cs.json"
-    },
-    {
-      "code": "ro",
-      "name": "Română",
-      "english": "Romanian",
-      "dir": "ltr",
-      "file": "locales/ro.json"
-    },
-    {
-      "code": "hu",
-      "name": "Magyar",
-      "english": "Hungarian",
-      "dir": "ltr",
-      "file": "locales/hu.json"
-    },
-    {
-      "code": "sv",
-      "name": "Svenska",
-      "english": "Swedish",
-      "dir": "ltr",
-      "file": "locales/sv.json"
-    },
-    {
-      "code": "bg",
-      "name": "Български",
-      "english": "Bulgarian",
-      "dir": "ltr",
-      "file": "locales/bg.json"
-    },
-    {
-      "code": "sr",
-      "name": "Српски",
-      "english": "Serbian",
-      "dir": "ltr",
-      "file": "locales/sr.json"
-    },
-    {
-      "code": "hr",
-      "name": "Hrvatski",
-      "english": "Croatian",
-      "dir": "ltr",
-      "file": "locales/hr.json"
-    },
-    {
-      "code": "bs",
-      "name": "Bosanski",
-      "english": "Bosnian",
-      "dir": "ltr",
-      "file": "locales/bs.json"
-    },
-    {
-      "code": "sk",
-      "name": "Slovenčina",
-      "english": "Slovak",
-      "dir": "ltr",
-      "file": "locales/sk.json"
-    },
-    {
-      "code": "da",
-      "name": "Dansk",
-      "english": "Danish",
-      "dir": "ltr",
-      "file": "locales/da.json"
-    },
-    {
-      "code": "fi",
-      "name": "Suomi",
-      "english": "Finnish",
-      "dir": "ltr",
-      "file": "locales/fi.json"
-    },
-    {
-      "code": "no",
-      "name": "Norsk",
-      "english": "Norwegian",
-      "dir": "ltr",
-      "file": "locales/no.json"
-    },
-    {
-      "code": "sq",
-      "name": "Shqip",
-      "english": "Albanian",
-      "dir": "ltr",
-      "file": "locales/sq.json"
-    },
-    {
-      "code": "hy",
-      "name": "Հայերեն",
-      "english": "Armenian",
-      "dir": "ltr",
-      "file": "locales/hy.json"
-    },
-    {
-      "code": "ka",
-      "name": "ქართული",
-      "english": "Georgian",
-      "dir": "ltr",
-      "file": "locales/ka.json"
-    },
-    {
-      "code": "mn",
-      "name": "Монгол",
-      "english": "Mongolian",
-      "dir": "ltr",
-      "file": "locales/mn.json"
-    },
-    {
-      "code": "tg",
-      "name": "Тоҷикӣ",
-      "english": "Tajik",
-      "dir": "ltr",
-      "file": "locales/tg.json"
-    },
-    {
-      "code": "tk",
-      "name": "Türkmençe",
-      "english": "Turkmen",
-      "dir": "ltr",
-      "file": "locales/tk.json"
-    },
-    {
-      "code": "ky",
-      "name": "Кыргызча",
-      "english": "Kyrgyz",
-      "dir": "ltr",
-      "file": "locales/ky.json"
+      "file": "locales/ady.json"
     },
     {
       "code": "af",
@@ -509,130 +35,116 @@
       "file": "locales/af.json"
     },
     {
-      "code": "zu",
-      "name": "isiZulu",
-      "english": "Zulu",
+      "code": "ak",
+      "name": "Akan",
+      "english": "Akan",
       "dir": "ltr",
-      "file": "locales/zu.json"
+      "file": "locales/ak.json"
     },
     {
-      "code": "xh",
-      "name": "isiXhosa",
-      "english": "Xhosa",
+      "code": "alt",
+      "name": "Алтай тил",
+      "english": "Altai",
       "dir": "ltr",
-      "file": "locales/xh.json"
+      "file": "locales/alt.json"
     },
     {
-      "code": "sn",
-      "name": "chiShona",
-      "english": "Shona",
+      "code": "am",
+      "name": "አማርኛ",
+      "english": "Amharic",
       "dir": "ltr",
-      "file": "locales/sn.json"
+      "file": "locales/am.json"
     },
     {
-      "code": "ig",
-      "name": "Asụsụ Igbo",
-      "english": "Igbo",
-      "dir": "ltr",
-      "file": "locales/ig.json"
+      "code": "ar",
+      "name": "العربية",
+      "english": "Arabic",
+      "dir": "rtl",
+      "file": "locales/ar.json"
     },
     {
-      "code": "st",
-      "name": "Sesotho",
-      "english": "Southern Sotho",
+      "code": "ava",
+      "name": "Авар мацӀ",
+      "english": "Avar",
       "dir": "ltr",
-      "file": "locales/st.json"
+      "file": "locales/ava.json"
     },
     {
-      "code": "tn",
-      "name": "Setswana",
-      "english": "Tswana",
+      "code": "ay",
+      "name": "Aymar Aru",
+      "english": "Aymara",
       "dir": "ltr",
-      "file": "locales/tn.json"
+      "file": "locales/ay.json"
     },
     {
-      "code": "rw",
-      "name": "Kinyarwanda",
-      "english": "Kinyarwanda",
+      "code": "az",
+      "name": "Azərbaycan",
+      "english": "Azerbaijani",
       "dir": "ltr",
-      "file": "locales/rw.json"
+      "file": "locales/az.json"
     },
     {
-      "code": "mg",
-      "name": "Malagasy",
-      "english": "Malagasy",
+      "code": "ba",
+      "name": "Башҡортса",
+      "english": "Bashkir",
       "dir": "ltr",
-      "file": "locales/mg.json"
+      "file": "locales/ba.json"
     },
     {
-      "code": "ceb",
-      "name": "Sinugboanon",
-      "english": "Cebuano",
+      "code": "bem",
+      "name": "Ichibemba",
+      "english": "Bemba",
       "dir": "ltr",
-      "file": "locales/ceb.json"
+      "file": "locales/bem.json"
     },
     {
-      "code": "jv",
-      "name": "Basa Jawa",
-      "english": "Javanese",
+      "code": "bg",
+      "name": "Български",
+      "english": "Bulgarian",
       "dir": "ltr",
-      "file": "locales/jv.json"
+      "file": "locales/bg.json"
     },
     {
-      "code": "su",
-      "name": "Basa Sunda",
-      "english": "Sundanese",
+      "code": "bi",
+      "name": "Bislama",
+      "english": "Bislama",
       "dir": "ltr",
-      "file": "locales/su.json"
+      "file": "locales/bi.json"
     },
     {
-      "code": "mad",
-      "name": "Madhurâ",
-      "english": "Madurese",
+      "code": "bm",
+      "name": "Bamanankan",
+      "english": "Bambara",
       "dir": "ltr",
-      "file": "locales/mad.json"
+      "file": "locales/bm.json"
     },
     {
-      "code": "min",
-      "name": "Baso Minangkabau",
-      "english": "Minangkabau",
+      "code": "bn",
+      "name": "বাংলা",
+      "english": "Bengali",
       "dir": "ltr",
-      "file": "locales/min.json"
+      "file": "locales/bn.json"
     },
     {
-      "code": "fil",
-      "name": "Wikang Filipino",
-      "english": "Filipino",
+      "code": "bo",
+      "name": "བོད་སྐད་",
+      "english": "Tibetan",
       "dir": "ltr",
-      "file": "locales/fil.json"
+      "file": "locales/bo.json"
     },
     {
-      "code": "ilo",
-      "name": "Ilokano",
-      "english": "Ilocano",
+      "code": "br",
+      "name": "Brezhoneg",
+      "english": "Breton",
       "dir": "ltr",
-      "file": "locales/ilo.json"
+      "file": "locales/br.json"
     },
     {
-      "code": "hil",
-      "name": "Ilonggo",
-      "english": "Hiligaynon",
+      "code": "bs",
+      "name": "Bosanski",
+      "english": "Bosnian",
       "dir": "ltr",
-      "file": "locales/hil.json"
-    },
-    {
-      "code": "war",
-      "name": "Winaray",
-      "english": "Waray",
-      "dir": "ltr",
-      "file": "locales/war.json"
-    },
-    {
-      "code": "eu",
-      "name": "Euskara",
-      "english": "Basque",
-      "dir": "ltr",
-      "file": "locales/eu.json"
+      "file": "locales/bs.json"
     },
     {
       "code": "ca",
@@ -642,11 +154,53 @@
       "file": "locales/ca.json"
     },
     {
-      "code": "gl",
-      "name": "Galego",
-      "english": "Galician",
+      "code": "ceb",
+      "name": "Sinugboanon",
+      "english": "Cebuano",
       "dir": "ltr",
-      "file": "locales/gl.json"
+      "file": "locales/ceb.json"
+    },
+    {
+      "code": "ch",
+      "name": "Chamoru",
+      "english": "Chamorro",
+      "dir": "ltr",
+      "file": "locales/ch.json"
+    },
+    {
+      "code": "che",
+      "name": "Нохчийн мотт",
+      "english": "Chechen",
+      "dir": "ltr",
+      "file": "locales/che.json"
+    },
+    {
+      "code": "chr",
+      "name": "ᏣᎳᎩ",
+      "english": "Cherokee",
+      "dir": "ltr",
+      "file": "locales/chr.json"
+    },
+    {
+      "code": "chv",
+      "name": "Чӑвашла",
+      "english": "Chuvash",
+      "dir": "ltr",
+      "file": "locales/chv.json"
+    },
+    {
+      "code": "co",
+      "name": "Corsu",
+      "english": "Corsican",
+      "dir": "ltr",
+      "file": "locales/co.json"
+    },
+    {
+      "code": "cs",
+      "name": "Čeština",
+      "english": "Czech",
+      "dir": "ltr",
+      "file": "locales/cs.json"
     },
     {
       "code": "cy",
@@ -656,32 +210,60 @@
       "file": "locales/cy.json"
     },
     {
-      "code": "ga",
-      "name": "Gaeilge",
-      "english": "Irish",
+      "code": "da",
+      "name": "Dansk",
+      "english": "Danish",
       "dir": "ltr",
-      "file": "locales/ga.json"
+      "file": "locales/da.json"
     },
     {
-      "code": "gd",
-      "name": "Gàidhlig",
-      "english": "Scottish Gaelic",
+      "code": "dar",
+      "name": "Дарган мез",
+      "english": "Dargwa",
       "dir": "ltr",
-      "file": "locales/gd.json"
+      "file": "locales/dar.json"
     },
     {
-      "code": "is",
-      "name": "Íslenska",
-      "english": "Icelandic",
+      "code": "de",
+      "name": "Deutsch",
+      "english": "German",
       "dir": "ltr",
-      "file": "locales/is.json"
+      "file": "locales/de.json"
     },
     {
-      "code": "mt",
-      "name": "Malti",
-      "english": "Maltese",
+      "code": "dyu",
+      "name": "Julakan",
+      "english": "Dyula",
       "dir": "ltr",
-      "file": "locales/mt.json"
+      "file": "locales/dyu.json"
+    },
+    {
+      "code": "dz",
+      "name": "རྫོང་ཁ",
+      "english": "Dzongkha",
+      "dir": "ltr",
+      "file": "locales/dz.json"
+    },
+    {
+      "code": "ee",
+      "name": "Eʋegbe",
+      "english": "Ewe",
+      "dir": "ltr",
+      "file": "locales/ee.json"
+    },
+    {
+      "code": "el",
+      "name": "Ελληνικά",
+      "english": "Greek",
+      "dir": "ltr",
+      "file": "locales/el.json"
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "english": "English",
+      "dir": "ltr",
+      "file": "locales/en.json"
     },
     {
       "code": "eo",
@@ -691,12 +273,1118 @@
       "file": "locales/eo.json"
     },
     {
+      "code": "es",
+      "name": "Español",
+      "english": "Spanish",
+      "dir": "ltr",
+      "file": "locales/es.json"
+    },
+    {
+      "code": "eu",
+      "name": "Euskara",
+      "english": "Basque",
+      "dir": "ltr",
+      "file": "locales/eu.json"
+    },
+    {
+      "code": "fa",
+      "name": "فارسی",
+      "english": "Persian",
+      "dir": "rtl",
+      "file": "locales/fa.json"
+    },
+    {
+      "code": "fi",
+      "name": "Suomi",
+      "english": "Finnish",
+      "dir": "ltr",
+      "file": "locales/fi.json"
+    },
+    {
+      "code": "fil",
+      "name": "Wikang Filipino",
+      "english": "Filipino",
+      "dir": "ltr",
+      "file": "locales/fil.json"
+    },
+    {
+      "code": "fj",
+      "name": "Na Vosa Vakaviti",
+      "english": "Fijian",
+      "dir": "ltr",
+      "file": "locales/fj.json"
+    },
+    {
+      "code": "fo",
+      "name": "Føroyskt",
+      "english": "Faroese",
+      "dir": "ltr",
+      "file": "locales/fo.json"
+    },
+    {
+      "code": "fon",
+      "name": "Fɔngbe",
+      "english": "Fon",
+      "dir": "ltr",
+      "file": "locales/fon.json"
+    },
+    {
+      "code": "fr",
+      "name": "Français",
+      "english": "French",
+      "dir": "ltr",
+      "file": "locales/fr.json"
+    },
+    {
+      "code": "ful",
+      "name": "Fulfulde",
+      "english": "Fula",
+      "dir": "ltr",
+      "file": "locales/ful.json"
+    },
+    {
+      "code": "fur",
+      "name": "Furlan",
+      "english": "Friulian",
+      "dir": "ltr",
+      "file": "locales/fur.json"
+    },
+    {
+      "code": "ga",
+      "name": "Gaeilge",
+      "english": "Irish",
+      "dir": "ltr",
+      "file": "locales/ga.json"
+    },
+    {
+      "code": "gaa",
+      "name": "Ga",
+      "english": "Ga",
+      "dir": "ltr",
+      "file": "locales/gaa.json"
+    },
+    {
+      "code": "gd",
+      "name": "Gàidhlig",
+      "english": "Scottish Gaelic",
+      "dir": "ltr",
+      "file": "locales/gd.json"
+    },
+    {
+      "code": "gl",
+      "name": "Galego",
+      "english": "Galician",
+      "dir": "ltr",
+      "file": "locales/gl.json"
+    },
+    {
+      "code": "gn",
+      "name": "Avañe'ẽ",
+      "english": "Guarani",
+      "dir": "ltr",
+      "file": "locales/gn.json"
+    },
+    {
+      "code": "gu",
+      "name": "ગુજરાતી",
+      "english": "Gujarati",
+      "dir": "ltr",
+      "file": "locales/gu.json"
+    },
+    {
+      "code": "gv",
+      "name": "Gaelg",
+      "english": "Manx",
+      "dir": "ltr",
+      "file": "locales/gv.json"
+    },
+    {
+      "code": "ha",
+      "name": "Hausa",
+      "english": "Hausa",
+      "dir": "ltr",
+      "file": "locales/ha.json"
+    },
+    {
+      "code": "haw",
+      "name": "ʻŌlelo Hawaiʻi",
+      "english": "Hawaiian",
+      "dir": "ltr",
+      "file": "locales/haw.json"
+    },
+    {
+      "code": "hi",
+      "name": "हिन्दी",
+      "english": "Hindi",
+      "dir": "ltr",
+      "file": "locales/hi.json"
+    },
+    {
+      "code": "hil",
+      "name": "Ilonggo",
+      "english": "Hiligaynon",
+      "dir": "ltr",
+      "file": "locales/hil.json"
+    },
+    {
+      "code": "hr",
+      "name": "Hrvatski",
+      "english": "Croatian",
+      "dir": "ltr",
+      "file": "locales/hr.json"
+    },
+    {
+      "code": "ht",
+      "name": "Kreyòl Ayisyen",
+      "english": "Haitian Creole",
+      "dir": "ltr",
+      "file": "locales/ht.json"
+    },
+    {
+      "code": "hu",
+      "name": "Magyar",
+      "english": "Hungarian",
+      "dir": "ltr",
+      "file": "locales/hu.json"
+    },
+    {
+      "code": "hy",
+      "name": "Հայերեն",
+      "english": "Armenian",
+      "dir": "ltr",
+      "file": "locales/hy.json"
+    },
+    {
+      "code": "id",
+      "name": "Bahasa Indonesia",
+      "english": "Indonesian",
+      "dir": "ltr",
+      "file": "locales/id.json"
+    },
+    {
+      "code": "ig",
+      "name": "Asụsụ Igbo",
+      "english": "Igbo",
+      "dir": "ltr",
+      "file": "locales/ig.json"
+    },
+    {
+      "code": "ilo",
+      "name": "Ilokano",
+      "english": "Ilocano",
+      "dir": "ltr",
+      "file": "locales/ilo.json"
+    },
+    {
+      "code": "inh",
+      "name": "ГӀалгӀай мотт",
+      "english": "Ingush",
+      "dir": "ltr",
+      "file": "locales/inh.json"
+    },
+    {
+      "code": "is",
+      "name": "Íslenska",
+      "english": "Icelandic",
+      "dir": "ltr",
+      "file": "locales/is.json"
+    },
+    {
+      "code": "it",
+      "name": "Italiano",
+      "english": "Italian",
+      "dir": "ltr",
+      "file": "locales/it.json"
+    },
+    {
+      "code": "iu",
+      "name": "ᐃᓄᒃᑎᑐᑦ",
+      "english": "Inuktitut",
+      "dir": "ltr",
+      "file": "locales/iu.json"
+    },
+    {
+      "code": "ja",
+      "name": "日本語",
+      "english": "Japanese",
+      "dir": "ltr",
+      "file": "locales/ja.json"
+    },
+    {
+      "code": "jv",
+      "name": "Basa Jawa",
+      "english": "Javanese",
+      "dir": "ltr",
+      "file": "locales/jv.json"
+    },
+    {
+      "code": "ka",
+      "name": "ქართული",
+      "english": "Georgian",
+      "dir": "ltr",
+      "file": "locales/ka.json"
+    },
+    {
+      "code": "kal",
+      "name": "Kalenjin",
+      "english": "Kalenjin",
+      "dir": "ltr",
+      "file": "locales/kal.json"
+    },
+    {
+      "code": "kam",
+      "name": "Kikamba",
+      "english": "Kamba",
+      "dir": "ltr",
+      "file": "locales/kam.json"
+    },
+    {
+      "code": "kbd",
+      "name": "Адыгэбзэ (Къэбэрдей)",
+      "english": "Kabardian",
+      "dir": "ltr",
+      "file": "locales/kbd.json"
+    },
+    {
+      "code": "kg",
+      "name": "Kikongo",
+      "english": "Kongo",
+      "dir": "ltr",
+      "file": "locales/kg.json"
+    },
+    {
+      "code": "kik",
+      "name": "Gĩkũyũ",
+      "english": "Kikuyu",
+      "dir": "ltr",
+      "file": "locales/kik.json"
+    },
+    {
+      "code": "kk",
+      "name": "Қазақша",
+      "english": "Kazakh",
+      "dir": "ltr",
+      "file": "locales/kk.json"
+    },
+    {
+      "code": "kl",
+      "name": "Kalaallisut",
+      "english": "Greenlandic",
+      "dir": "ltr",
+      "file": "locales/kl.json"
+    },
+    {
+      "code": "km",
+      "name": "ភាសាខ្មែរ",
+      "english": "Khmer",
+      "dir": "ltr",
+      "file": "locales/km.json"
+    },
+    {
+      "code": "kn",
+      "name": "ಕನ್ನಡ",
+      "english": "Kannada",
+      "dir": "ltr",
+      "file": "locales/kn.json"
+    },
+    {
+      "code": "ko",
+      "name": "한국어",
+      "english": "Korean",
+      "dir": "ltr",
+      "file": "locales/ko.json"
+    },
+    {
+      "code": "koi",
+      "name": "Перем коми",
+      "english": "Komi-Permyak",
+      "dir": "ltr",
+      "file": "locales/koi.json"
+    },
+    {
+      "code": "kpv",
+      "name": "Коми кыв",
+      "english": "Komi-Zyrian",
+      "dir": "ltr",
+      "file": "locales/kpv.json"
+    },
+    {
+      "code": "krc",
+      "name": "Къарачай-малкъар",
+      "english": "Karachay-Balkar",
+      "dir": "ltr",
+      "file": "locales/krc.json"
+    },
+    {
+      "code": "krl",
+      "name": "Karjalan kieli",
+      "english": "Karelian",
+      "dir": "ltr",
+      "file": "locales/krl.json"
+    },
+    {
+      "code": "ku",
+      "name": "Kurdî",
+      "english": "Kurdish",
+      "dir": "rtl",
+      "file": "locales/ku.json"
+    },
+    {
+      "code": "kum",
+      "name": "Къумукъ тил",
+      "english": "Kumyk",
+      "dir": "ltr",
+      "file": "locales/kum.json"
+    },
+    {
+      "code": "kw",
+      "name": "Kernewek",
+      "english": "Cornish",
+      "dir": "ltr",
+      "file": "locales/kw.json"
+    },
+    {
+      "code": "ky",
+      "name": "Кыргызча",
+      "english": "Kyrgyz",
+      "dir": "ltr",
+      "file": "locales/ky.json"
+    },
+    {
       "code": "la",
       "name": "Latina",
       "english": "Latin",
       "dir": "ltr",
       "file": "locales/la.json"
+    },
+    {
+      "code": "lb",
+      "name": "Lëtzebuergesch",
+      "english": "Luxembourgish",
+      "dir": "ltr",
+      "file": "locales/lb.json"
+    },
+    {
+      "code": "lbe",
+      "name": "Лакку маз",
+      "english": "Lak",
+      "dir": "ltr",
+      "file": "locales/lbe.json"
+    },
+    {
+      "code": "lez",
+      "name": "Лезги чӀал",
+      "english": "Lezgian",
+      "dir": "ltr",
+      "file": "locales/lez.json"
+    },
+    {
+      "code": "liv",
+      "name": "Līvõ kēļ",
+      "english": "Livonian",
+      "dir": "ltr",
+      "file": "locales/liv.json"
+    },
+    {
+      "code": "lmo",
+      "name": "Lombard",
+      "english": "Lombard",
+      "dir": "ltr",
+      "file": "locales/lmo.json"
+    },
+    {
+      "code": "ln",
+      "name": "Lingála",
+      "english": "Lingala",
+      "dir": "ltr",
+      "file": "locales/ln.json"
+    },
+    {
+      "code": "lo",
+      "name": "ພາສາລາວ",
+      "english": "Lao",
+      "dir": "ltr",
+      "file": "locales/lo.json"
+    },
+    {
+      "code": "loz",
+      "name": "Silozi",
+      "english": "Lozi",
+      "dir": "ltr",
+      "file": "locales/loz.json"
+    },
+    {
+      "code": "lua",
+      "name": "Tshiluba",
+      "english": "Luba-Kasai",
+      "dir": "ltr",
+      "file": "locales/lua.json"
+    },
+    {
+      "code": "luo",
+      "name": "Dholuo",
+      "english": "Luo",
+      "dir": "ltr",
+      "file": "locales/luo.json"
+    },
+    {
+      "code": "luy",
+      "name": "Oluluyia",
+      "english": "Luhya",
+      "dir": "ltr",
+      "file": "locales/luy.json"
+    },
+    {
+      "code": "mad",
+      "name": "Madhurâ",
+      "english": "Madurese",
+      "dir": "ltr",
+      "file": "locales/mad.json"
+    },
+    {
+      "code": "mas",
+      "name": "Maa",
+      "english": "Maasai",
+      "dir": "ltr",
+      "file": "locales/mas.json"
+    },
+    {
+      "code": "mdf",
+      "name": "Мокшень кяль",
+      "english": "Moksha",
+      "dir": "ltr",
+      "file": "locales/mdf.json"
+    },
+    {
+      "code": "mer",
+      "name": "Kĩmĩrũ",
+      "english": "Meru",
+      "dir": "ltr",
+      "file": "locales/mer.json"
+    },
+    {
+      "code": "mg",
+      "name": "Malagasy",
+      "english": "Malagasy",
+      "dir": "ltr",
+      "file": "locales/mg.json"
+    },
+    {
+      "code": "mhr",
+      "name": "Олык марий",
+      "english": "Meadow Mari",
+      "dir": "ltr",
+      "file": "locales/mhr.json"
+    },
+    {
+      "code": "mi",
+      "name": "Te Reo Māori",
+      "english": "Māori",
+      "dir": "ltr",
+      "file": "locales/mi.json"
+    },
+    {
+      "code": "min",
+      "name": "Baso Minangkabau",
+      "english": "Minangkabau",
+      "dir": "ltr",
+      "file": "locales/min.json"
+    },
+    {
+      "code": "ml",
+      "name": "മലയാളം",
+      "english": "Malayalam",
+      "dir": "ltr",
+      "file": "locales/ml.json"
+    },
+    {
+      "code": "mn",
+      "name": "Монгол",
+      "english": "Mongolian",
+      "dir": "ltr",
+      "file": "locales/mn.json"
+    },
+    {
+      "code": "mos",
+      "name": "Mooré",
+      "english": "Mossi",
+      "dir": "ltr",
+      "file": "locales/mos.json"
+    },
+    {
+      "code": "mr",
+      "name": "मराठी",
+      "english": "Marathi",
+      "dir": "ltr",
+      "file": "locales/mr.json"
+    },
+    {
+      "code": "mrj",
+      "name": "Кырык мары",
+      "english": "Hill Mari",
+      "dir": "ltr",
+      "file": "locales/mrj.json"
+    },
+    {
+      "code": "mt",
+      "name": "Malti",
+      "english": "Maltese",
+      "dir": "ltr",
+      "file": "locales/mt.json"
+    },
+    {
+      "code": "my",
+      "name": "မြန်မာဘာသာ",
+      "english": "Burmese",
+      "dir": "ltr",
+      "file": "locales/my.json"
+    },
+    {
+      "code": "myv",
+      "name": "Эрзянь кель",
+      "english": "Erzya",
+      "dir": "ltr",
+      "file": "locales/myv.json"
+    },
+    {
+      "code": "nah",
+      "name": "Nāhuatl",
+      "english": "Nahuatl",
+      "dir": "ltr",
+      "file": "locales/nah.json"
+    },
+    {
+      "code": "nap",
+      "name": "Nnapulitano",
+      "english": "Neapolitan",
+      "dir": "ltr",
+      "file": "locales/nap.json"
+    },
+    {
+      "code": "nav",
+      "name": "Diné Bizaad",
+      "english": "Navajo",
+      "dir": "ltr",
+      "file": "locales/nav.json"
+    },
+    {
+      "code": "ne",
+      "name": "नेपाली",
+      "english": "Nepali",
+      "dir": "ltr",
+      "file": "locales/ne.json"
+    },
+    {
+      "code": "nl",
+      "name": "Nederlands",
+      "english": "Dutch",
+      "dir": "ltr",
+      "file": "locales/nl.json"
+    },
+    {
+      "code": "no",
+      "name": "Norsk",
+      "english": "Norwegian",
+      "dir": "ltr",
+      "file": "locales/no.json"
+    },
+    {
+      "code": "nog",
+      "name": "Ногай тили",
+      "english": "Nogai",
+      "dir": "ltr",
+      "file": "locales/nog.json"
+    },
+    {
+      "code": "nr",
+      "name": "isiNdebele",
+      "english": "Southern Ndebele",
+      "dir": "ltr",
+      "file": "locales/nr.json"
+    },
+    {
+      "code": "nya",
+      "name": "Chichewa",
+      "english": "Chewa",
+      "dir": "ltr",
+      "file": "locales/nya.json"
+    },
+    {
+      "code": "oc",
+      "name": "Occitan",
+      "english": "Occitan",
+      "dir": "ltr",
+      "file": "locales/oc.json"
+    },
+    {
+      "code": "om",
+      "name": "Oromoo",
+      "english": "Oromo",
+      "dir": "ltr",
+      "file": "locales/om.json"
+    },
+    {
+      "code": "or",
+      "name": "ଓଡ଼ିଆ",
+      "english": "Odia",
+      "dir": "ltr",
+      "file": "locales/or.json"
+    },
+    {
+      "code": "pa",
+      "name": "ਪੰਜਾਬੀ",
+      "english": "Punjabi",
+      "dir": "ltr",
+      "file": "locales/pa.json"
+    },
+    {
+      "code": "pap",
+      "name": "Papiamento",
+      "english": "Papiamento",
+      "dir": "ltr",
+      "file": "locales/pap.json"
+    },
+    {
+      "code": "pl",
+      "name": "Polski",
+      "english": "Polish",
+      "dir": "ltr",
+      "file": "locales/pl.json"
+    },
+    {
+      "code": "pms",
+      "name": "Piemontèis",
+      "english": "Piedmontese",
+      "dir": "ltr",
+      "file": "locales/pms.json"
+    },
+    {
+      "code": "ps",
+      "name": "پښتو",
+      "english": "Pashto",
+      "dir": "rtl",
+      "file": "locales/ps.json"
+    },
+    {
+      "code": "pt",
+      "name": "Português",
+      "english": "Portuguese",
+      "dir": "ltr",
+      "file": "locales/pt.json"
+    },
+    {
+      "code": "qu",
+      "name": "Runa Simi",
+      "english": "Quechua",
+      "dir": "ltr",
+      "file": "locales/qu.json"
+    },
+    {
+      "code": "rm",
+      "name": "Rumantsch",
+      "english": "Romansh",
+      "dir": "ltr",
+      "file": "locales/rm.json"
+    },
+    {
+      "code": "ro",
+      "name": "Română",
+      "english": "Romanian",
+      "dir": "ltr",
+      "file": "locales/ro.json"
+    },
+    {
+      "code": "ru",
+      "name": "Русский",
+      "english": "Russian",
+      "dir": "ltr",
+      "file": "locales/ru.json"
+    },
+    {
+      "code": "rut",
+      "name": "МыхӀабишды чӀел",
+      "english": "Rutul",
+      "dir": "ltr",
+      "file": "locales/rut.json"
+    },
+    {
+      "code": "rw",
+      "name": "Kinyarwanda",
+      "english": "Kinyarwanda",
+      "dir": "ltr",
+      "file": "locales/rw.json"
+    },
+    {
+      "code": "sah",
+      "name": "Саха тыла",
+      "english": "Yakut",
+      "dir": "ltr",
+      "file": "locales/sah.json"
+    },
+    {
+      "code": "sc",
+      "name": "Sardu",
+      "english": "Sardinian",
+      "dir": "ltr",
+      "file": "locales/sc.json"
+    },
+    {
+      "code": "scn",
+      "name": "Sicilianu",
+      "english": "Sicilian",
+      "dir": "ltr",
+      "file": "locales/scn.json"
+    },
+    {
+      "code": "sd",
+      "name": "سنڌي",
+      "english": "Sindhi",
+      "dir": "rtl",
+      "file": "locales/sd.json"
+    },
+    {
+      "code": "si",
+      "name": "සිංහල",
+      "english": "Sinhala",
+      "dir": "ltr",
+      "file": "locales/si.json"
+    },
+    {
+      "code": "sk",
+      "name": "Slovenčina",
+      "english": "Slovak",
+      "dir": "ltr",
+      "file": "locales/sk.json"
+    },
+    {
+      "code": "sm",
+      "name": "Gagana Sāmoa",
+      "english": "Samoan",
+      "dir": "ltr",
+      "file": "locales/sm.json"
+    },
+    {
+      "code": "sme",
+      "name": "Davvisámegiella",
+      "english": "Northern Sami",
+      "dir": "ltr",
+      "file": "locales/sme.json"
+    },
+    {
+      "code": "smj",
+      "name": "Julevsámegiella",
+      "english": "Lule Sami",
+      "dir": "ltr",
+      "file": "locales/smj.json"
+    },
+    {
+      "code": "smn",
+      "name": "Anarâškielâ",
+      "english": "Inari Sami",
+      "dir": "ltr",
+      "file": "locales/smn.json"
+    },
+    {
+      "code": "sn",
+      "name": "chiShona",
+      "english": "Shona",
+      "dir": "ltr",
+      "file": "locales/sn.json"
+    },
+    {
+      "code": "snk",
+      "name": "Soninkara",
+      "english": "Soninke",
+      "dir": "ltr",
+      "file": "locales/snk.json"
+    },
+    {
+      "code": "so",
+      "name": "Soomaali",
+      "english": "Somali",
+      "dir": "ltr",
+      "file": "locales/so.json"
+    },
+    {
+      "code": "sq",
+      "name": "Shqip",
+      "english": "Albanian",
+      "dir": "ltr",
+      "file": "locales/sq.json"
+    },
+    {
+      "code": "sr",
+      "name": "Српски",
+      "english": "Serbian",
+      "dir": "ltr",
+      "file": "locales/sr.json"
+    },
+    {
+      "code": "ss",
+      "name": "SiSwati",
+      "english": "Swati",
+      "dir": "ltr",
+      "file": "locales/ss.json"
+    },
+    {
+      "code": "st",
+      "name": "Sesotho",
+      "english": "Southern Sotho",
+      "dir": "ltr",
+      "file": "locales/st.json"
+    },
+    {
+      "code": "su",
+      "name": "Basa Sunda",
+      "english": "Sundanese",
+      "dir": "ltr",
+      "file": "locales/su.json"
+    },
+    {
+      "code": "sv",
+      "name": "Svenska",
+      "english": "Swedish",
+      "dir": "ltr",
+      "file": "locales/sv.json"
+    },
+    {
+      "code": "sw",
+      "name": "Kiswahili",
+      "english": "Swahili",
+      "dir": "ltr",
+      "file": "locales/sw.json"
+    },
+    {
+      "code": "ta",
+      "name": "தமிழ்",
+      "english": "Tamil",
+      "dir": "ltr",
+      "file": "locales/ta.json"
+    },
+    {
+      "code": "tab",
+      "name": "Табасаран чӀал",
+      "english": "Tabasaran",
+      "dir": "ltr",
+      "file": "locales/tab.json"
+    },
+    {
+      "code": "te",
+      "name": "తెలుగు",
+      "english": "Telugu",
+      "dir": "ltr",
+      "file": "locales/te.json"
+    },
+    {
+      "code": "tg",
+      "name": "Тоҷикӣ",
+      "english": "Tajik",
+      "dir": "ltr",
+      "file": "locales/tg.json"
+    },
+    {
+      "code": "th",
+      "name": "ไทย",
+      "english": "Thai",
+      "dir": "ltr",
+      "file": "locales/th.json"
+    },
+    {
+      "code": "ti",
+      "name": "ትግርኛ",
+      "english": "Tigrinya",
+      "dir": "ltr",
+      "file": "locales/ti.json"
+    },
+    {
+      "code": "tk",
+      "name": "Türkmençe",
+      "english": "Turkmen",
+      "dir": "ltr",
+      "file": "locales/tk.json"
+    },
+    {
+      "code": "tl",
+      "name": "Tagalog",
+      "english": "Filipino",
+      "dir": "ltr",
+      "file": "locales/tl.json"
+    },
+    {
+      "code": "tn",
+      "name": "Setswana",
+      "english": "Tswana",
+      "dir": "ltr",
+      "file": "locales/tn.json"
+    },
+    {
+      "code": "ton",
+      "name": "Lea Faka-Tonga",
+      "english": "Tongan",
+      "dir": "ltr",
+      "file": "locales/ton.json"
+    },
+    {
+      "code": "tpi",
+      "name": "Tok Pisin",
+      "english": "Tok Pisin",
+      "dir": "ltr",
+      "file": "locales/tpi.json"
+    },
+    {
+      "code": "tr",
+      "name": "Türkçe",
+      "english": "Turkish",
+      "dir": "ltr",
+      "file": "locales/tr.json"
+    },
+    {
+      "code": "ts",
+      "name": "Xitsonga",
+      "english": "Tsonga",
+      "dir": "ltr",
+      "file": "locales/ts.json"
+    },
+    {
+      "code": "tt",
+      "name": "Татарча",
+      "english": "Tatar",
+      "dir": "ltr",
+      "file": "locales/tt.json"
+    },
+    {
+      "code": "tum",
+      "name": "Chitumbuka",
+      "english": "Tumbuka",
+      "dir": "ltr",
+      "file": "locales/tum.json"
+    },
+    {
+      "code": "ty",
+      "name": "Reo Tahiti",
+      "english": "Tahitian",
+      "dir": "ltr",
+      "file": "locales/ty.json"
+    },
+    {
+      "code": "tyv",
+      "name": "Тыва дыл",
+      "english": "Tuvan",
+      "dir": "ltr",
+      "file": "locales/tyv.json"
+    },
+    {
+      "code": "udm",
+      "name": "Удмурт кыл",
+      "english": "Udmurt",
+      "dir": "ltr",
+      "file": "locales/udm.json"
+    },
+    {
+      "code": "ug",
+      "name": "ئۇيغۇرچە",
+      "english": "Uyghur",
+      "dir": "rtl",
+      "file": "locales/ug.json"
+    },
+    {
+      "code": "uk",
+      "name": "Українська",
+      "english": "Ukrainian",
+      "dir": "ltr",
+      "file": "locales/uk.json"
+    },
+    {
+      "code": "ur",
+      "name": "اردو",
+      "english": "Urdu",
+      "dir": "rtl",
+      "file": "locales/ur.json"
+    },
+    {
+      "code": "uz",
+      "name": "Oʻzbek",
+      "english": "Uzbek",
+      "dir": "ltr",
+      "file": "locales/uz.json"
+    },
+    {
+      "code": "ve",
+      "name": "Tshivenda",
+      "english": "Venda",
+      "dir": "ltr",
+      "file": "locales/ve.json"
+    },
+    {
+      "code": "vec",
+      "name": "Vèneto",
+      "english": "Venetian",
+      "dir": "ltr",
+      "file": "locales/vec.json"
+    },
+    {
+      "code": "vep",
+      "name": "Vepsän kel’",
+      "english": "Veps",
+      "dir": "ltr",
+      "file": "locales/vep.json"
+    },
+    {
+      "code": "vi",
+      "name": "Tiếng Việt",
+      "english": "Vietnamese",
+      "dir": "ltr",
+      "file": "locales/vi.json"
+    },
+    {
+      "code": "war",
+      "name": "Winaray",
+      "english": "Waray",
+      "dir": "ltr",
+      "file": "locales/war.json"
+    },
+    {
+      "code": "wol",
+      "name": "Wolof",
+      "english": "Wolof",
+      "dir": "ltr",
+      "file": "locales/wol.json"
+    },
+    {
+      "code": "xal",
+      "name": "Хальмг келн",
+      "english": "Kalmyk",
+      "dir": "ltr",
+      "file": "locales/xal.json"
+    },
+    {
+      "code": "xh",
+      "name": "isiXhosa",
+      "english": "Xhosa",
+      "dir": "ltr",
+      "file": "locales/xh.json"
+    },
+    {
+      "code": "yo",
+      "name": "Yorùbá",
+      "english": "Yoruba",
+      "dir": "ltr",
+      "file": "locales/yo.json"
+    },
+    {
+      "code": "zh",
+      "name": "中文",
+      "english": "Chinese",
+      "dir": "ltr",
+      "file": "locales/zh.json"
+    },
+    {
+      "code": "zu",
+      "name": "isiZulu",
+      "english": "Zulu",
+      "dir": "ltr",
+      "file": "locales/zu.json"
     }
   ],
-  "updatedAt": "2026-11-11T13:18:04.330Z"
+  "updatedAt": "2026-11-11T13:27:31.164Z"
 }

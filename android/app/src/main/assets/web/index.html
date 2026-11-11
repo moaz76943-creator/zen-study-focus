@@ -1284,22 +1284,22 @@
         </div>
         <div class="home-domains-heading"><span data-qt="chooseActivity" data-i18n="chooseActivity">اختر نوع نشاطك</span><small data-qt="domainsHint" data-i18n="domainsHint">لكل نشاط جلسته المناسبة</small></div>
         <div class="domain-pedestal-grid">
-          <button type="button" class="domain-card dom-study active" id="domBtn-study" onclick="switchActivityDomain('study', this)" aria-pressed="true">
+          <button type="button" class="domain-card dom-study active" id="domBtn-study" data-i18n="study" onclick="switchActivityDomain('study', this)" aria-pressed="true">
             <div class="domain-squircle">📚</div>
             <span class="domain-title" data-i18n="domStudy">Study</span>
             <span class="domain-duration">25:00</span>
           </button>
-          <button type="button" class="domain-card dom-sport" id="domBtn-sport" onclick="switchActivityDomain('sport', this)" aria-pressed="false">
+          <button type="button" class="domain-card dom-sport" id="domBtn-sport" data-i18n="sport" onclick="switchActivityDomain('sport', this)" aria-pressed="false">
             <div class="domain-squircle">🏋️</div>
             <span class="domain-title" data-i18n="domSport">Workout</span>
             <span class="domain-duration">30:00</span>
           </button>
-          <button type="button" class="domain-card dom-read" id="domBtn-read" onclick="switchActivityDomain('read', this)" aria-pressed="false">
+          <button type="button" class="domain-card dom-read" id="domBtn-read" data-i18n="read" onclick="switchActivityDomain('read', this)" aria-pressed="false">
             <div class="domain-squircle">📖</div>
             <span class="domain-title" data-i18n="domRead">Reading</span>
             <span class="domain-duration">20:00</span>
           </button>
-          <button type="button" class="domain-card dom-work" id="domBtn-work" onclick="switchActivityDomain('work', this)" aria-pressed="false">
+          <button type="button" class="domain-card dom-work" id="domBtn-work" data-i18n="work" onclick="switchActivityDomain('work', this)" aria-pressed="false">
             <div class="domain-squircle">💻</div>
             <span class="domain-title" data-i18n="domWork">Deep Work</span>
             <span class="domain-duration">50:00</span>
@@ -1390,7 +1390,7 @@
                   <button type="button" onclick="cancelQuickTraining()" data-qt="stopTraining" data-i18n="stopTraining">إنهاء التدريب</button>
                 </div>
               </div>
-              <button type="button" id="qtStartButton" class="training-primary" onclick="startQuickTraining()" data-qt="startTraining" data-i18n="startTraining">▶ ابدأ التدريب</button>
+              <button type="button" id="qtStartButton" data-i18n="start" class="training-primary" onclick="startQuickTraining()" data-qt="startTraining" data-i18n="startTraining">▶ ابدأ التدريب</button>
             </div>
           </details>
         </section>
@@ -1409,7 +1409,7 @@
           <div class="goals-header">
             <div><span class="small-kicker" id="goalsKicker" data-i18n="goalsKicker">✦ DAILY GOALS</span><h2 id="dailyGoalsHeading" data-i18n="dailyGoalsHeading">Progress by activity</h2>
             <p id="dailyGoalsDescription" data-i18n="dailyGoalsDesc">Only completed focus minutes count.</p></div>
-            <button type="button" class="goals-edit" id="goalsEditButton" onclick="openDailyGoalsModal()" data-i18n="goalsEditBtn">⚙ Goals</button>
+            <button type="button" class="goals-edit" id="goalsEditButton" data-i18n="goals" onclick="openDailyGoalsModal()" data-i18n="goalsEditBtn">⚙ Goals</button>
           </div>
           <div class="goals-rows" id="dailyGoalsRows"></div>
         </section>
