@@ -84146,3 +84146,150 @@ window.SovereignAudioPrewarmer = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN SUPERMEMO SM-2 SPACED REPETITION ENGINE (TASK #713)
+// ==============================================================================
+window.SovereignSRS = (function() {
+    const STORAGE_KEY = "deep_focus_srs_decks_v1";
+
+    // Initialize or load decks
+    function loadDecks() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : getStarterDeck();
+        } catch(e) {
+            console.warn("⚠️ [SRS] Could not read decks from localStorage:", e);
+            return getStarterDeck();
+        }
+    }
+
+    function saveDecks(decks) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(decks));
+        } catch(e) {
+            console.error("❌ [SRS] Failed to persist flashcard decks:", e);
+        }
+    }
+
+    // Mathematical SM-2 Algorithm Implementation
+    // quality: 0 (Blackout), 1 (Wrong), 2 (Hard), 3 (Good), 4 (Easy)
+    function calculateNextInterval(card, quality) {
+        let repetitions = card.repetitions || 0;
+        let interval = card.interval || 0;
+        let easeFactor = card.easeFactor || 2.5;
+
+        // Quality < 3 means failed recall (reset repetitions to 0, review again today/tomorrow)
+        if (quality < 3) {
+            repetitions = 0;
+            interval = 1;
+        } else {
+            if (repetitions === 0) {
+                interval = 1;
+            } else if (repetitions === 1) {
+                interval = 6;
+            } else {
+                interval = Math.round(interval * easeFactor);
+            }
+            repetitions += 1;
+        }
+
+        // Adjust Ease Factor using standard SM-2 polynomial
+        // EF' = EF + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
+        easeFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+        if (easeFactor < 1.3) easeFactor = 1.3; // Minimum boundary
+
+        const nextDate = new Date();
+        nextDate.setDate(nextDate.getDate() + interval);
+
+        return {
+            repetitions: repetitions,
+            interval: interval,
+            easeFactor: parseFloat(easeFactor.toFixed(2)),
+            dueDate: nextDate.toISOString().split("T")[0],
+            lastReviewed: new Date().toISOString()
+        };
+    }
+
+    // Default academic starter flashcards
+    function getStarterDeck() {
+        const today = new Date().toISOString().split("T")[0];
+        return [
+            {
+                id: "card_01",
+                front: "ما هي الدورة الدموية الكبرى (Systemic Circulation)؟",
+                back: "تبدأ من البطين الأيسر وتضخ الدم المؤكسج لكافة أنسجة الجسم عبر الشريان الأبهر، ثم تعود بالدم غير المؤكسج للأذين الأيمن.",
+                repetitions: 0,
+                interval: 1,
+                easeFactor: 2.5,
+                dueDate: today
+            },
+            {
+                id: "card_02",
+                front: "قانون فاراداي للحث الكهرومغناطيسي (Faraday's Law)",
+                back: "القوة الدافعة الكهربائية الحثية المتولدة في دائرة مغلقة تتناسب طردياً مع المعدل الزمني للتغير في التدفق المغناطيسي الذي يجتازها.",
+                repetitions: 0,
+                interval: 1,
+                easeFactor: 2.5,
+                dueDate: today
+            },
+            {
+                id: "card_03",
+                front: "What is the Time Complexity of Merge Sort?",
+                back: "O(n log n) in all cases (Best, Average, and Worst) because it divides the array in half and takes linear time to merge.",
+                repetitions: 0,
+                interval: 1,
+                easeFactor: 2.5,
+                dueDate: today
+            }
+        ];
+    }
+
+    // Get cards scheduled for review today or overdue
+    function getDueCards() {
+        const decks = loadDecks();
+        const today = new Date().toISOString().split("T")[0];
+        return decks.filter(c => !c.dueDate || c.dueDate <= today);
+    }
+
+    // Rate card and update schedule
+    function reviewCard(cardId, quality) {
+        const decks = loadDecks();
+        const idx = decks.findIndex(c => c.id === cardId);
+        if (idx !== -1) {
+            const updatedMetrics = calculateNextInterval(decks[idx], quality);
+            decks[idx] = Object.assign({}, decks[idx], updatedMetrics);
+            saveDecks(decks);
+            console.log(`🧠 [SRS] Card ${cardId} reviewed (Quality ${quality}). Next interval: ${updatedMetrics.interval} day(s).`);
+            return decks[idx];
+        }
+        return null;
+    }
+
+    // Add new card
+    function addCard(front, back) {
+        if (!front || !back) return null;
+        const decks = loadDecks();
+        const newCard = {
+            id: "card_" + Date.now(),
+            front: front.trim(),
+            back: back.trim(),
+            repetitions: 0,
+            interval: 1,
+            easeFactor: 2.5,
+            dueDate: new Date().toISOString().split("T")[0]
+        };
+        decks.push(newCard);
+        saveDecks(decks);
+        return newCard;
+    }
+
+    return {
+        loadDecks: loadDecks,
+        getDueCards: getDueCards,
+        reviewCard: reviewCard,
+        addCard: addCard
+    };
+})();
+
