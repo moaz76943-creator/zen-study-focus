@@ -83815,3 +83815,40 @@ if (typeof FourButtonDensityEnforcer !== "undefined") {
 if (typeof UniversalI18nHotSwap !== "undefined") {
     UniversalI18nHotSwap.init();
 }
+
+
+// [Task #699] Explicit Hardened Button Binding Guard
+(function initExplicitButtonGuards() {
+    if (typeof document === "undefined") return;
+
+    function bind(id, handler) {
+        const el = document.getElementById(id);
+        if (el && !el.dataset.explicitGuarded) {
+            el.addEventListener("click", handler);
+            el.dataset.explicitGuarded = "true";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Presets
+        bind("domBtn-study", () => window.ActionDispatcherEngine?.dispatch("preset-study"));
+        bind("domBtn-sport", () => window.ActionDispatcherEngine?.dispatch("preset-sport"));
+        bind("domBtn-read", () => window.ActionDispatcherEngine?.dispatch("preset-read"));
+        bind("domBtn-work", () => window.ActionDispatcherEngine?.dispatch("preset-work"));
+
+        // Controls
+        bind("qtStartButton", () => window.ActionDispatcherEngine?.dispatch("toggle-timer"));
+        bind("qtResetButton", () => window.ActionDispatcherEngine?.dispatch("reset-timer"));
+
+        // Modals & Triggers
+        bind("zenStudioTriggerPill", () => window.StudioNavigatorDrawer?.toggleDrawer?.());
+        bind("goalsEditButton", () => window.ActionDispatcherEngine?.dispatch("open-goals"));
+        bind("zenExamEveBtn", () => window.ActionDispatcherEngine?.dispatch("toggle-rescue"));
+        bind("zenLanguageFloatingTrigger", () => window.MassivePolyglotCatalog?.openModal?.());
+        bind("sessionAbortCancelBtn", () => window.ActionDispatcherEngine?.dispatch("cancel-abort"));
+        bind("sessionAbortConfirmBtn", () => window.ActionDispatcherEngine?.dispatch("confirm-abort"));
+        bind("zenDailyGoalSaveBtn", () => window.ActionDispatcherEngine?.dispatch("save-goals"));
+        bind("zenDailyGoalCancelBtn", () => window.ActionDispatcherEngine?.dispatch("close-goals"));
+        bind("zenPolyglotCloseBtn", () => window.MassivePolyglotCatalog?.closeModal?.());
+    });
+})();
