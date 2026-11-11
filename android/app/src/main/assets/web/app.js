@@ -83753,3 +83753,8 @@ if (typeof PhysiologicalRespirationPacer !== "undefined") {
 if (typeof AdaptiveDebounceGuard !== "undefined") {
     AdaptiveDebounceGuard.init();
 }
+
+// [Task #673] Session Crash Recovery Initialization
+if (typeof SessionCrashRecoveryEngine !== "undefined") {
+    SessionCrashRecoveryEngine.init();
+}
