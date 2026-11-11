@@ -84879,3 +84879,121 @@ window.SovereignExamSimulator = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN COGNITIVE MOMENTUM & OFFLINE ANALYTICS CANVAS (TASK #717)
+// ==============================================================================
+window.SovereignAnalytics = (function() {
+    const STORAGE_KEY = "deep_focus_session_logs_v1";
+
+    function getSessionLogs() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : generateDefaultHistory();
+        } catch(e) {
+            return generateDefaultHistory();
+        }
+    }
+
+    function generateDefaultHistory() {
+        // Last 7 days baseline (hours focused)
+        return [
+            { day: "Sun", hours: 2.5, completed: 3 },
+            { day: "Mon", hours: 4.0, completed: 5 },
+            { day: "Tue", hours: 3.2, completed: 4 },
+            { day: "Wed", hours: 5.5, completed: 6 },
+            { day: "Thu", hours: 4.8, completed: 5 },
+            { day: "Fri", hours: 6.0, completed: 7 },
+            { day: "Sat", hours: 3.5, completed: 4 }
+        ];
+    }
+
+    // Mathematical Focus Momentum Score: 0 to 100
+    function calculateMomentumScore(logs) {
+        if (!logs || logs.length === 0) return 0;
+        let totalHours = 0;
+        let totalCompleted = 0;
+        logs.forEach(l => {
+            totalHours += (l.hours || 0);
+            totalCompleted += (l.completed || 0);
+        });
+        const consistencyFactor = logs.filter(l => (l.hours || 0) >= 2.0).length / logs.length;
+        const rawScore = (totalHours * 1.8) + (totalCompleted * 2.5) * consistencyFactor;
+        return Math.min(100, Math.round(rawScore));
+    }
+
+    // Render 100% Pure Canvas Bar Chart (Zero External Libraries)
+    function renderAnalyticsChart() {
+        const canvas = document.getElementById("analyticsWeeklyCanvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        
+        canvas.width = rect.width * dpr || 340 * dpr;
+        canvas.height = rect.height * dpr || 180 * dpr;
+        ctx.scale(dpr, dpr);
+
+        const w = rect.width || 340;
+        const h = rect.height || 180;
+
+        ctx.fillStyle = "#000000"; // Pure AMOLED black
+        ctx.fillRect(0, 0, w, h);
+
+        const logs = getSessionLogs();
+        const maxHours = Math.max(8, ...logs.map(l => l.hours || 0));
+
+        // Horizontal Gridlines
+        ctx.strokeStyle = "#161616";
+        ctx.lineWidth = 1;
+        for (let yVal = 2; yVal <= maxHours; yVal += 2) {
+            const y = (h - 30) - (yVal / maxHours) * (h - 55);
+            ctx.beginPath();
+            ctx.moveTo(30, y);
+            ctx.lineTo(w - 10, y);
+            ctx.stroke();
+
+            ctx.fillStyle = "#555";
+            ctx.font = "9px sans-serif";
+            ctx.fillText(`${yVal}h`, 6, y + 3);
+        }
+
+        // Draw Bars
+        const barWidth = Math.max(16, (w - 60) / logs.length - 12);
+        logs.forEach((log, idx) => {
+            const barHeight = ((log.hours || 0) / maxHours) * (h - 55);
+            const x = 38 + idx * ((w - 50) / logs.length);
+            const y = (h - 30) - barHeight;
+
+            // Bar Gradient
+            const grad = ctx.createLinearGradient(0, y, 0, h - 30);
+            grad.addColorStop(0, "#4ade80");
+            grad.addColorStop(1, "#166534");
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.roundRect(x, y, barWidth, barHeight, [4, 4, 0, 0]);
+            ctx.fill();
+
+            // Day label
+            ctx.fillStyle = "#888";
+            ctx.font = "10px -apple-system, sans-serif";
+            ctx.fillText(log.day, x + (barWidth / 2) - 9, h - 12);
+        });
+
+        // Update Momentum Score Badge
+        const scoreBadge = document.getElementById("momentumScoreDisplay");
+        if (scoreBadge) {
+            const score = calculateMomentumScore(logs);
+            scoreBadge.textContent = `${score}/100`;
+        }
+    }
+
+    return {
+        getLogs: getSessionLogs,
+        render: renderAnalyticsChart,
+        getScore: calculateMomentumScore
+    };
+})();
+
