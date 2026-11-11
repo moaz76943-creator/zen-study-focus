@@ -1,7 +1,7 @@
 {
   "app": "DEEP FOCUS (Sovereign Offline Study OS)",
-  "version": "v499.0.0",
-  "code": 41219,
+  "version": "v500.0.0",
+  "code": 41220,
   "totalTargetLanguages": 1000,
   "totalLocalizedSoFar": 196,
   "completionPercentage": "19.60%",
@@ -1386,5 +1386,5 @@
       "file": "locales/zu.json"
     }
   ],
-  "updatedAt": "2026-11-11T13:27:31.164Z"
+  "updatedAt": "2026-11-11T14:06:28.951Z"
 }

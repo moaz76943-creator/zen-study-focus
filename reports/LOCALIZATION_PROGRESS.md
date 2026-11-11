@@ -1,10 +1,10 @@
 # 🌐 DEEP FOCUS — Official Localization Progress Ledger
 
-- **Current Version:** v499.0.0 (Code 41219)
+- **Current Version:** v500.0.0 (Code 41220)
 - **Total Fully Localized Languages:** 196 / 1000 (19.60%)
 - **Permanent Sovereign Exclusion:** Hebrew (`he`, `iw`), Syriac (`syc`), Amazigh (`ber`, `zgh`) permanently banned.
 - **Numerals Policy:** Strict ASCII Western Arabic digits exclusively (`0123456789`).
-- **UI Coverage:** 100% of all interactive buttons and modals tagged with `data-i18n`.
+- **Translator Engine:** Qwen 2.5 (100% Offline via Ollama)
 
 ### ✅ Master List of Localized Languages (1 to 196):
 
