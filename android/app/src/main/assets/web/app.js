@@ -83738,3 +83738,8 @@ if (typeof ThumbZoneErgonomicsOptimizer !== "undefined") {
 if (typeof MicroscopicUIPolisher !== "undefined") {
     MicroscopicUIPolisher.init();
 }
+
+// [Task #670] High-DPI Canvas Scaler Initialization
+if (typeof HighDpiCanvasScaler !== "undefined") {
+    HighDpiCanvasScaler.init();
+}
