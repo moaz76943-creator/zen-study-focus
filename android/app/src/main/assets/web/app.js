@@ -86025,3 +86025,117 @@ window.SovereignHeatmap = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN ACOUSTIC WAVE SPECTRUM ANALYSER & VISUALIZER (TASK #726)
+// 100% Zero-Permission — Internal DSP Bus Tap — Pure Canvas 120Hz/144Hz
+// ==============================================================================
+window.SovereignAudioVisualizer = (function() {
+    let analyser = null;
+    let animId = null;
+    let dataArray = null;
+    let isVisualizing = false;
+
+    function getAnalyser(ctx) {
+        if (!analyser && ctx) {
+            analyser = ctx.createAnalyser();
+            analyser.fftSize = 64; // Low-latency 32 frequency bins (lightweight on CPU)
+            analyser.smoothingTimeConstant = 0.8;
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+        }
+        return analyser;
+    }
+
+    // Connect safe destination through analyser node
+    const originalGetSafeAudioDestination = window.getSafeAudioDestination;
+    window.getSafeAudioDestination = function(ctx) {
+        const dest = originalGetSafeAudioDestination ? originalGetSafeAudioDestination(ctx) : ctx.destination;
+        const an = getAnalyser(ctx);
+        if (an) {
+            try { an.disconnect(); } catch(e){}
+            an.connect(dest);
+            return an;
+        }
+        return dest;
+    };
+
+    function draw() {
+        if (!isVisualizing) return;
+        const canvas = document.getElementById("acousticSpectrumCanvas");
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width = (canvas.clientWidth || 320);
+        const h = canvas.height = 48;
+
+        if (analyser && dataArray) {
+            analyser.getByteFrequencyData(dataArray);
+        }
+
+        ctx.fillStyle = "#000000"; // Pure AMOLED black
+        ctx.fillRect(0, 0, w, h);
+
+        const binCount = dataArray ? dataArray.length : 32;
+        const barWidth = Math.max(3, (w / binCount) - 2);
+
+        for (let i = 0; i < binCount; i++) {
+            const val = dataArray ? dataArray[i] : 0;
+            const percent = val / 255;
+            const barHeight = Math.max(2, percent * (h - 6));
+            const x = i * (barWidth + 2) + 2;
+            const y = h - barHeight - 2;
+
+            // Emerald focus gradient for active frequencies
+            if (percent > 0.05) {
+                const grad = ctx.createLinearGradient(0, y, 0, h);
+                grad.addColorStop(0, "#4ade80");
+                grad.addColorStop(1, "#166534");
+                ctx.fillStyle = grad;
+            } else {
+                ctx.fillStyle = "#161616"; // Resting ambient bar
+            }
+
+            ctx.beginPath();
+            ctx.roundRect(x, y, barWidth, barHeight, 2);
+            ctx.fill();
+        }
+
+        animId = requestAnimationFrame(draw);
+    }
+
+    function start() {
+        if (isVisualizing) return;
+        isVisualizing = true;
+        const panel = document.getElementById("acousticSpectrumPanel");
+        if (panel) panel.style.display = "flex";
+        animId = requestAnimationFrame(draw);
+        console.log("🌊 [AudioVisualizer] Spectrum visualizer started.");
+    }
+
+    function stop() {
+        isVisualizing = false;
+        if (animId) cancelAnimationFrame(animId);
+        const panel = document.getElementById("acousticSpectrumPanel");
+        if (panel) panel.style.display = "none";
+        console.log("🌊 [AudioVisualizer] Spectrum visualizer stopped.");
+    }
+
+    function toggle() {
+        if (isVisualizing) {
+            stop();
+        } else {
+            start();
+        }
+    }
+
+    return {
+        start: start,
+        stop: stop,
+        toggle: toggle,
+        getAnalyser: getAnalyser,
+        isActive: () => isVisualizing
+    };
+})();
+
