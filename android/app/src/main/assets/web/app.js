@@ -84066,3 +84066,83 @@ window.SovereignDataVault = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN ZERO-LATENCY AUDIO PRE-WARMING & CROSSFADE ENGINE (TASK #710)
+// ==============================================================================
+window.SovereignAudioPrewarmer = (function() {
+    let isPrewarmed = false;
+    let activeChannelGainA = null;
+    let activeChannelGainB = null;
+    let currentChannel = "A";
+
+    function initializePrewarmedGraph(ctx) {
+        if (!ctx || isPrewarmed) return;
+        try {
+            const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
+            
+            // Dual channel architecture for click-free equal-power crossfading
+            activeChannelGainA = ctx.createGain();
+            activeChannelGainB = ctx.createGain();
+            activeChannelGainA.gain.setValueAtTime(1.0, ctx.currentTime);
+            activeChannelGainB.gain.setValueAtTime(0.0001, ctx.currentTime);
+            
+            activeChannelGainA.connect(dest);
+            activeChannelGainB.connect(dest);
+
+            // Pre-generate white/pink noise buffer in memory to eliminate allocation lag
+            const bufferSize = ctx.sampleRate * 2;
+            const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522;
+                b5 = -0.7616 * b5 - white * 0.0168980;
+                output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+                b6 = white * 0.115926;
+            }
+            ctx._prewarmedNoiseBuffer = noiseBuffer;
+            isPrewarmed = true;
+            console.log("🛡️ [WebAudio] Pre-warming complete: Dual crossfade channels & noise buffers primed in RAM.");
+        } catch (e) {
+            console.warn("⚠️ [WebAudio] Pre-warming initialization deferred:", e);
+        }
+    }
+
+    // Smooth click-free transition between sound generators (Equal-Power 60ms)
+    function smoothTransition(targetGainNode, targetValue, duration = 0.06) {
+        if (!targetGainNode || !window.audioContext) return;
+        const ctx = window.audioContext;
+        const t = ctx.currentTime;
+        targetGainNode.gain.cancelScheduledValues(t);
+        targetGainNode.gain.setValueAtTime(Math.max(0.0001, targetGainNode.gain.value), t);
+        targetGainNode.gain.exponentialRampToValueAtTime(Math.max(0.0001, targetValue), t + duration);
+    }
+
+    // Defensive auto-init on first touch
+    if (typeof window !== "undefined") {
+        const triggerPrewarm = () => {
+            if (window.audioContext) {
+                if (window.audioContext.state === "suspended") {
+                    window.audioContext.resume();
+                }
+                initializePrewarmedGraph(window.audioContext);
+            }
+        };
+        window.addEventListener("pointerdown", triggerPrewarm, { once: true, passive: true });
+        window.addEventListener("touchstart", triggerPrewarm, { once: true, passive: true });
+    }
+
+    return {
+        prewarm: initializePrewarmedGraph,
+        crossfade: smoothTransition,
+        isReady: () => isPrewarmed
+    };
+})();
+
