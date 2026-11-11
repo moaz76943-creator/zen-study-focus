@@ -2,4 +2,6 @@ zen-agent.mjs
 generate_store.mjs
 
 *.keystore
-*.jks
+
+# Allow release keystore
+!android/app/zenfocus2026.jks
