@@ -84732,3 +84732,150 @@ window.SovereignBrainwaveDSP = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN HIGH-STAKES EXAM SIMULATION & ENDURANCE SUITE (TASK #716)
+// ==============================================================================
+window.SovereignExamSimulator = (function() {
+    let timerInterval = null;
+    let totalSeconds = 3600; // Default 60-min block
+    let remainingSeconds = 3600;
+    let totalQuestions = 40;
+    let currentQuestion = 0;
+    let isRunning = false;
+    let milestone50Fired = false;
+    let milestone75Fired = false;
+    let milestone5MinFired = false;
+
+    // Procedural Harmonic Chime (Pure Web Audio Synthesis - Zero Music)
+    function playHarmonicCue(freq = 528, duration = 0.8) {
+        if (!window.audioContext) return;
+        const ctx = window.audioContext;
+        if (ctx.state === "suspended") ctx.resume();
+        try {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
+
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+            gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(dest);
+
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        } catch(e) {
+            console.warn("⚠️ [ExamSimulator] Harmonic cue error:", e);
+        }
+    }
+
+    function startExam(durationMinutes = 60, questionsCount = 40) {
+        clearInterval(timerInterval);
+        totalSeconds = Math.max(60, durationMinutes * 60);
+        remainingSeconds = totalSeconds;
+        totalQuestions = Math.max(1, questionsCount);
+        currentQuestion = 0;
+        isRunning = true;
+        milestone50Fired = false;
+        milestone75Fired = false;
+        milestone5MinFired = false;
+
+        if (window.requestScreenLock) window.requestScreenLock();
+
+        updateDisplay();
+        playHarmonicCue(440, 0.5); // Start acoustic cue
+
+        timerInterval = setInterval(() => {
+            if (remainingSeconds > 0) {
+                remainingSeconds--;
+                checkMilestones();
+                updateDisplay();
+            } else {
+                finishExam();
+            }
+        }, 1000);
+        console.log(`⏱️ [ExamSimulator] Simulation started: ${durationMinutes} mins, ${questionsCount} questions.`);
+    }
+
+    function checkMilestones() {
+        const elapsedRatio = (totalSeconds - remainingSeconds) / totalSeconds;
+        if (elapsedRatio >= 0.5 && !milestone50Fired) {
+            milestone50Fired = true;
+            playHarmonicCue(528, 0.9); // 50% Time Passed
+            console.log("⏱️ [ExamSimulator] Milestone: 50% Time Elapsed.");
+        }
+        if (elapsedRatio >= 0.75 && !milestone75Fired) {
+            milestone75Fired = true;
+            playHarmonicCue(660, 0.9); // 75% Time Passed
+            console.log("⏱️ [ExamSimulator] Milestone: 75% Time Elapsed.");
+        }
+        if (remainingSeconds === 300 && !milestone5MinFired) {
+            milestone5MinFired = true;
+            playHarmonicCue(880, 1.2); // 5 Minutes Warning
+            console.log("⏱️ [ExamSimulator] Milestone: 5 Minutes Remaining.");
+        }
+    }
+
+    function advanceQuestion() {
+        if (isRunning && currentQuestion < totalQuestions) {
+            currentQuestion++;
+            updateDisplay();
+        }
+    }
+
+    function calculatePace() {
+        if (!isRunning || currentQuestion === 0) return { expectedSec: 0, actualSec: 0, deltaMins: 0 };
+        const elapsedSec = totalSeconds - remainingSeconds;
+        const targetSecPerQ = totalSeconds / totalQuestions;
+        const expectedSec = currentQuestion * targetSecPerQ;
+        const deltaSec = expectedSec - elapsedSec;
+        return {
+            targetPace: Math.round(targetSecPerQ),
+            deltaMinutes: Math.round(deltaSec / 60)
+        };
+    }
+
+    function finishExam() {
+        clearInterval(timerInterval);
+        isRunning = false;
+        playHarmonicCue(528, 1.5);
+        if (window.releaseScreenLock) window.releaseScreenLock();
+        alert("🏁 انتهى وقت محاكاة الامتحان! | Exam Simulation Completed!");
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        const timerEl = document.getElementById("examTimerDisplay");
+        const paceEl = document.getElementById("examPaceDisplay");
+        const progressEl = document.getElementById("examProgressBar");
+
+        if (timerEl) {
+            const m = Math.floor(remainingSeconds / 60);
+            const s = remainingSeconds % 60;
+            timerEl.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+        }
+        if (paceEl) {
+            const pace = calculatePace();
+            const sign = pace.deltaMinutes >= 0 ? "+" : "";
+            paceEl.textContent = `السؤال: ${currentQuestion}/${totalQuestions} | فارق الإيقاع: ${sign}${pace.deltaMinutes} دقيقة`;
+        }
+        if (progressEl) {
+            const pct = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
+            progressEl.style.width = `${pct}%`;
+        }
+    }
+
+    return {
+        start: startExam,
+        advance: advanceQuestion,
+        isRunning: () => isRunning,
+        finish: finishExam
+    };
+})();
+
