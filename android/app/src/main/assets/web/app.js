@@ -84293,3 +84293,136 @@ window.SovereignSRS = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN SM-2 VISUAL DECK REVIEWER & EBBINGHAUS RETENTION ENGINE (TASK #714)
+// ==============================================================================
+window.SovereignSRSReviewer = (function() {
+    let currentCardIndex = 0;
+    let dueCards = [];
+    let isFlipped = false;
+
+    function initReviewer() {
+        if (!window.SovereignSRS) return;
+        dueCards = window.SovereignSRS.getDueCards();
+        currentCardIndex = 0;
+        isFlipped = false;
+        renderCurrentCard();
+        drawEbbinghausCurve();
+    }
+
+    function renderCurrentCard() {
+        const frontEl = document.getElementById("srsCardFront");
+        const backEl = document.getElementById("srsCardBack");
+        const cardContainer = document.getElementById("srsCardInner");
+        const counterEl = document.getElementById("srsDueCounter");
+        const actionsEl = document.getElementById("srsActionButtons");
+
+        if (!frontEl || !backEl || !cardContainer) return;
+
+        if (cardContainer.classList.contains("is-flipped")) {
+            cardContainer.classList.remove("is-flipped");
+        }
+        isFlipped = false;
+
+        if (actionsEl) actionsEl.style.display = "none";
+
+        if (dueCards.length === 0 || currentCardIndex >= dueCards.length) {
+            frontEl.innerHTML = "<div style='text-align:center; padding: 2rem;'><h3 style='color:#4ade80;'>🎉 تم إنجاز مراجعات اليوم!</h3><p style='color:#888; margin-top:0.5rem;'>All due flashcards reviewed. Great cognitive retention!</p></div>";
+            backEl.innerHTML = "";
+            if (counterEl) counterEl.textContent = "0";
+            return;
+        }
+
+        const card = dueCards[currentCardIndex];
+        frontEl.innerHTML = `<div style="font-size: 1.1rem; line-height: 1.6; color: #fff;">${card.front}</div><div style="font-size: 0.8rem; color: #666; margin-top: 1rem;">انقر لقلب البطاقة | Tap to Flip</div>`;
+        backEl.innerHTML = `<div style="font-size: 1.05rem; line-height: 1.6; color: #4ade80;">${card.back}</div>`;
+        if (counterEl) counterEl.textContent = dueCards.length - currentCardIndex;
+    }
+
+    function flipCard() {
+        const cardContainer = document.getElementById("srsCardInner");
+        const actionsEl = document.getElementById("srsActionButtons");
+        if (cardContainer && dueCards.length > 0 && currentCardIndex < dueCards.length) {
+            isFlipped = !isFlipped;
+            cardContainer.classList.toggle("is-flipped", isFlipped);
+            if (actionsEl) {
+                actionsEl.style.display = isFlipped ? "flex" : "none";
+            }
+        }
+    }
+
+    function rateCard(quality) {
+        if (dueCards.length > 0 && currentCardIndex < dueCards.length) {
+            const card = dueCards[currentCardIndex];
+            window.SovereignSRS.reviewCard(card.id, quality);
+            currentCardIndex++;
+            renderCurrentCard();
+            drawEbbinghausCurve();
+        }
+    }
+
+    // Mathematical Ebbinghaus Retention Curve (R = e^(-t/S))
+    function drawEbbinghausCurve() {
+        const canvas = document.getElementById("ebbinghausCanvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.fillStyle = "#0a0a0a";
+        ctx.fillRect(0, 0, w, h);
+
+        // Grid lines
+        ctx.strokeStyle = "#1a1a1a";
+        ctx.lineWidth = 1;
+        for (let y = 20; y < h; y += 30) {
+            ctx.beginPath();
+            ctx.moveTo(30, y);
+            ctx.lineTo(w - 10, y);
+            ctx.stroke();
+        }
+
+        // Calculate average retention strength from deck
+        const decks = window.SovereignSRS.loadDecks();
+        let totalStrength = 0;
+        decks.forEach(c => { totalStrength += (c.interval || 1) * (c.easeFactor || 2.5); });
+        const avgStrength = decks.length > 0 ? Math.max(2, totalStrength / decks.length) : 5;
+
+        // Draw curve: R = exp(-t / S)
+        ctx.strokeStyle = "#4ade80";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (let t = 0; t <= 30; t += 0.5) {
+            const r = Math.exp(-t / (avgStrength * 3));
+            const x = 30 + (t / 30) * (w - 45);
+            const y = (h - 25) - r * (h - 45);
+            if (t === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Axes labels
+        ctx.fillStyle = "#888";
+        ctx.font = "10px sans-serif";
+        ctx.fillText("100%", 4, 25);
+        ctx.fillText("50%", 8, h / 2);
+        ctx.fillText("0d", 30, h - 8);
+        ctx.fillText("15d", w / 2, h - 8);
+        ctx.fillText("30d", w - 25, h - 8);
+    }
+
+    // Auto-init on studio open
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(initReviewer, 500);
+    });
+
+    return {
+        init: initReviewer,
+        flip: flipCard,
+        rate: rateCard,
+        drawCurve: drawEbbinghausCurve
+    };
+})();
+
