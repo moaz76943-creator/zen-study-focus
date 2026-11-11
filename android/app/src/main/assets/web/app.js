@@ -86639,3 +86639,57 @@ window.SovereignDeltaClock = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN CALM UI & PROGRESSIVE DISCLOSURE CONTROLLER (TASK #734)
+// Declutters Main Focus Screen — Groups Advanced Tools into Clean Collapsible Hub
+// ==============================================================================
+window.SovereignCalmUI = (function() {
+    let isDrawerOpen = false;
+
+    function organizeAdvancedControls() {
+        const container = document.getElementById("sovereignCalmToolsDrawer");
+        const body = document.getElementById("sovereignCalmToolsBody");
+        if (!container || !body) return;
+
+        const toolIds = [
+            "testFibonacciChimeBtn",
+            "toggleBinauralAlphaBtn",
+            "toggleSpectrumBtn",
+            "profilerTriggerBtn",
+            "deckExchangeTriggerBtn",
+            "healthHubTriggerBtn",
+            "runStressAuditBtn",
+            "stressAuditResultBadge"
+        ];
+
+        toolIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.parentElement !== body) {
+                body.appendChild(el);
+            }
+        });
+    }
+
+    function toggleDrawer() {
+        const body = document.getElementById("sovereignCalmToolsBody");
+        const arrow = document.getElementById("sovereignCalmToolsArrow");
+        if (!body) return;
+        isDrawerOpen = !isDrawerOpen;
+        body.style.display = isDrawerOpen ? "flex" : "none";
+        if (arrow) arrow.textContent = isDrawerOpen ? "▲" : "▼";
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", organizeAdvancedControls);
+    } else {
+        organizeAdvancedControls();
+    }
+
+    return {
+        toggleDrawer: toggleDrawer,
+        organize: organizeAdvancedControls
+    };
+})();
+
