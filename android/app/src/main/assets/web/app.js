@@ -85485,3 +85485,97 @@ window.SovereignViewportOptimizer = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN FIBONACCI HARMONIC ACOUSTIC SYNTHESIZER (TASK #721)
+// 100% Procedural Web Audio API — Strict Zero-Music Policy — Golden Ratio DSP
+// ==============================================================================
+window.SovereignChimes = (function() {
+    const PHI = 1.618033988749895; // Golden Ratio constant
+    const BASE_VERDI_FREQ = 432;   // Natural harmonic Verdi tuning (A=432Hz)
+
+    function getAudioContext() {
+        if (!window.audioContext) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) window.audioContext = new AudioCtx();
+        }
+        if (window.audioContext && window.audioContext.state === "suspended") {
+            window.audioContext.resume();
+        }
+        return window.audioContext;
+    }
+
+    function getDestination(ctx) {
+        return window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
+    }
+
+    // Single Harmonic Pure Sine Voice with Smooth Bell Envelope
+    function playHarmonicTone(ctx, freq, startTime, duration, peakGain) {
+        try {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const dest = getDestination(ctx);
+
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, startTime);
+
+            // Natural organic envelope (zero clicking, zero clipping)
+            gain.gain.setValueAtTime(0.00001, startTime);
+            gain.gain.linearRampToValueAtTime(peakGain, startTime + 0.035);
+            gain.gain.exponentialRampToValueAtTime(0.00001, startTime + duration);
+
+            osc.connect(gain);
+            gain.connect(dest);
+
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        } catch (e) {
+            console.warn("Chime voice error:", e);
+        }
+    }
+
+    // Multi-Tone Golden Ratio Fibonacci Chord (432Hz, 699Hz, 1131Hz)
+    function playZenBowl() {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        const duration = 2.8;
+
+        // Fibonacci harmonic multiplier ratios
+        const harmonicMultipliers = [1.0, PHI, PHI * PHI];
+        const voiceGains = [0.18, 0.10, 0.05]; // Attenuated so combined peak < -3dB
+
+        harmonicMultipliers.forEach((mult, idx) => {
+            const freq = BASE_VERDI_FREQ * mult;
+            playHarmonicTone(ctx, freq, now, duration, voiceGains[idx]);
+        });
+        console.log("🔔 [SovereignChimes] Synthesized Fibonacci Harmonic Chime (432Hz triad).");
+    }
+
+    // Ascending Milestone Arpeggio (Session Completion Celebration)
+    function playMilestoneArpeggio() {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        const stepDelay = 0.18;
+        const notes = [
+            BASE_VERDI_FREQ,
+            BASE_VERDI_FREQ * PHI,
+            BASE_VERDI_FREQ * PHI * PHI
+        ];
+
+        notes.forEach((freq, idx) => {
+            playHarmonicTone(ctx, freq, now + (idx * stepDelay), 1.8, 0.16);
+        });
+        console.log("🌟 [SovereignChimes] Synthesized Fibonacci Ascending Arpeggio.");
+    }
+
+    return {
+        playZenBowl: playZenBowl,
+        playMilestoneArpeggio: playMilestoneArpeggio,
+        PHI: PHI,
+        BASE_FREQ: BASE_VERDI_FREQ
+    };
+})();
+
