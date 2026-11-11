@@ -84426,3 +84426,199 @@ window.SovereignSRSReviewer = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN SM-2 STUDIO: STUDENT DECK CREATOR, MULTI-LANG TTS & EBBINGHAUS ENGINE (TASK #714)
+// ==============================================================================
+window.SovereignSRSReviewer = (function() {
+    let currentCardIndex = 0;
+    let dueCards = [];
+    let isFlipped = false;
+
+    // Offline Native Android Text-to-Speech Engine for all 1005 languages
+    function speakText(text, langCode = "en-US") {
+        if (!text || typeof window === "undefined" || !("speechSynthesis" in window)) {
+            console.warn("⚠️ [TTS] SpeechSynthesis not supported on this device.");
+            return;
+        }
+        try {
+            window.speechSynthesis.cancel(); // Stop prior utterance
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.92; // Slightly measured pace for academic clarity
+            utterance.pitch = 1.0;
+            
+            // Map active locale or fallback
+            const activeLang = (window.UniversalI18nHotSwap && window.UniversalI18nHotSwap.getCurrentLocale) 
+                ? window.UniversalI18nHotSwap.getCurrentLocale() 
+                : langCode;
+            utterance.lang = activeLang;
+
+            window.speechSynthesis.speak(utterance);
+            console.log(`🔊 [TTS] Pronounced: "${text.substring(0, 30)}..." [Lang: ${activeLang}]`);
+        } catch(e) {
+            console.warn("⚠️ [TTS] Pronunciation failed:", e);
+        }
+    }
+
+    function initReviewer() {
+        if (!window.SovereignSRS) return;
+        dueCards = window.SovereignSRS.getDueCards();
+        currentCardIndex = 0;
+        isFlipped = false;
+        renderCurrentCard();
+        drawEbbinghausCurve();
+    }
+
+    function renderCurrentCard() {
+        const frontEl = document.getElementById("srsCardFront");
+        const backEl = document.getElementById("srsCardBack");
+        const cardContainer = document.getElementById("srsCardInner");
+        const counterEl = document.getElementById("srsDueCounter");
+        const actionsEl = document.getElementById("srsActionButtons");
+
+        if (!frontEl || !backEl || !cardContainer) return;
+
+        if (cardContainer.classList.contains("is-flipped")) {
+            cardContainer.classList.remove("is-flipped");
+        }
+        isFlipped = false;
+
+        if (actionsEl) actionsEl.style.display = "none";
+
+        if (dueCards.length === 0 || currentCardIndex >= dueCards.length) {
+            frontEl.innerHTML = `<div style="text-align:center; padding: 1.5rem;">
+                <h3 style="color:#4ade80; font-size: clamp(1.1rem, 3vw, 1.4rem);">🎉 تم إنجاز مراجعات اليوم!</h3>
+                <p style="color:#888; font-size: clamp(0.8rem, 2.5vw, 0.95rem); margin-top:0.5rem;">All due flashcards reviewed with active recall!</p>
+            </div>`;
+            backEl.innerHTML = "";
+            if (counterEl) counterEl.textContent = "0";
+            return;
+        }
+
+        const card = dueCards[currentCardIndex];
+        frontEl.innerHTML = `
+            <div style="font-size: clamp(1rem, 2.8vw, 1.25rem); line-height: 1.6; color: #fff; width: 100%; text-align: center;">${card.front}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; width: 100%; margin-top: 1rem;">
+                <button type="button" class="btn" onclick="event.stopPropagation(); window.SovereignSRSReviewer.speak(window.SovereignSRSReviewer.getCurrentFront())" style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; border-radius: 6px; padding: 6px 12px; font-size: 0.85rem;" title="Listen">🔊 نطق</button>
+                <span style="font-size: 0.75rem; color: #666;">انقر لقلب البطاقة | Tap to Flip</span>
+            </div>`;
+
+        backEl.innerHTML = `
+            <div style="font-size: clamp(0.95rem, 2.5vw, 1.15rem); line-height: 1.6; color: #4ade80; width: 100%; text-align: center;">${card.back}</div>
+            <div style="display:flex; justify-content:flex-end; width: 100%; margin-top: 0.8rem;">
+                <button type="button" class="btn" onclick="event.stopPropagation(); window.SovereignSRSReviewer.speak(window.SovereignSRSReviewer.getCurrentBack())" style="background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; border-radius: 6px; padding: 6px 12px; font-size: 0.85rem;" title="Listen Answer">🔊 نطق الإجابة</button>
+            </div>`;
+
+        if (counterEl) counterEl.textContent = dueCards.length - currentCardIndex;
+    }
+
+    function flipCard() {
+        const cardContainer = document.getElementById("srsCardInner");
+        const actionsEl = document.getElementById("srsActionButtons");
+        if (cardContainer && dueCards.length > 0 && currentCardIndex < dueCards.length) {
+            isFlipped = !isFlipped;
+            cardContainer.classList.toggle("is-flipped", isFlipped);
+            if (actionsEl) {
+                actionsEl.style.display = isFlipped ? "flex" : "none";
+            }
+        }
+    }
+
+    function rateCard(quality) {
+        if (dueCards.length > 0 && currentCardIndex < dueCards.length) {
+            const card = dueCards[currentCardIndex];
+            window.SovereignSRS.reviewCard(card.id, quality);
+            currentCardIndex++;
+            renderCurrentCard();
+            drawEbbinghausCurve();
+        }
+    }
+
+    // Student Card Creator (Zero Medical/Legal liability - 100% Student Authored)
+    function createCustomCard(frontText, backText) {
+        if (!frontText || !backText || !frontText.trim() || !backText.trim()) {
+            alert("يرجى كتابة السؤال والإجابة | Please enter both front and back text.");
+            return false;
+        }
+        const created = window.SovereignSRS.addCard(frontText, backText);
+        if (created) {
+            dueCards.push(created);
+            renderCurrentCard();
+            drawEbbinghausCurve();
+            console.log("✅ [SRS] Custom student card created successfully.");
+            return true;
+        }
+        return false;
+    }
+
+    // Mathematical Ebbinghaus Retention Curve (R = e^(-t/S))
+    function drawEbbinghausCurve() {
+        const canvas = document.getElementById("ebbinghausCanvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Match responsive dimensions
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr || 340 * dpr;
+        canvas.height = rect.height * dpr || 140 * dpr;
+        ctx.scale(dpr, dpr);
+        
+        const w = rect.width || 340;
+        const h = rect.height || 140;
+
+        ctx.fillStyle = "#000000"; // Pure AMOLED background
+        ctx.fillRect(0, 0, w, h);
+
+        // Grid lines
+        ctx.strokeStyle = "#161616";
+        ctx.lineWidth = 1;
+        for (let y = 20; y < h; y += 28) {
+            ctx.beginPath();
+            ctx.moveTo(35, y);
+            ctx.lineTo(w - 12, y);
+            ctx.stroke();
+        }
+
+        // Calculate average retention strength from deck
+        const decks = window.SovereignSRS.loadDecks();
+        let totalStrength = 0;
+        decks.forEach(c => { totalStrength += (c.interval || 1) * (c.easeFactor || 2.5); });
+        const avgStrength = decks.length > 0 ? Math.max(2, totalStrength / decks.length) : 5;
+
+        // Draw curve: R = exp(-t / (avgStrength * 3))
+        ctx.strokeStyle = "#4ade80";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (let t = 0; t <= 30; t += 0.5) {
+            const r = Math.exp(-t / (avgStrength * 3));
+            const x = 35 + (t / 30) * (w - 50);
+            const y = (h - 25) - r * (h - 45);
+            if (t === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Axes labels
+        ctx.fillStyle = "#777";
+        ctx.font = "10px -apple-system, sans-serif";
+        ctx.fillText("100%", 4, 22);
+        ctx.fillText("50%", 8, h / 2);
+        ctx.fillText("0d", 35, h - 8);
+        ctx.fillText("15d", w / 2, h - 8);
+        ctx.fillText("30d", w - 30, h - 8);
+    }
+
+    return {
+        init: initReviewer,
+        flip: flipCard,
+        rate: rateCard,
+        speak: speakText,
+        addCustomCard: createCustomCard,
+        getCurrentFront: () => (dueCards[currentCardIndex] ? dueCards[currentCardIndex].front : ""),
+        getCurrentBack: () => (dueCards[currentCardIndex] ? dueCards[currentCardIndex].back : ""),
+        drawCurve: drawEbbinghausCurve
+    };
+})();
+
