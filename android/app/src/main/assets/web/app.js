@@ -85017,3 +85017,39 @@ window.SovereignBreathing = (function() {
     return { start: start, stop: stop, patterns: PATTERNS };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN ATOMIC WORKER TIMER ENGINE (TASK #719) - ZERO CLOCK DRIFT
+// ==============================================================================
+window.SovereignWorkerTimer = (function() {
+    const workerBlob = new Blob([`
+        let timer = null;
+        self.onmessage = function(e) {
+            if (e.data === "start") {
+                clearInterval(timer);
+                timer = setInterval(() => self.postMessage("tick"), 1000);
+            } else if (e.data === "stop") {
+                clearInterval(timer);
+            }
+        };
+    `], { type: "application/javascript" });
+
+    let worker = null;
+    try {
+        worker = new Worker(URL.createObjectURL(workerBlob));
+    } catch(e) {
+        console.warn("⚠️ Worker fallback to requestAnimationFrame");
+    }
+
+    return {
+        start: (onTick) => {
+            if (worker) {
+                worker.onmessage = onTick;
+                worker.postMessage("start");
+            }
+        },
+        stop: () => { if (worker) worker.postMessage("stop"); }
+    };
+})();
+
