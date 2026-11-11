@@ -1,3 +1,9 @@
+
+// [Task #680] Safe DOM Proxy Shield Initialization
+if (typeof SafeDOMProxyShield !== "undefined") {
+    SafeDOMProxyShield.init();
+}
+
 window.df_i18n_locales = window.df_i18n_locales || { en: {} };
 
 /* ========================================================
