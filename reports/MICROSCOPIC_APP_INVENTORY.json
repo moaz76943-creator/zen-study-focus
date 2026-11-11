@@ -1,0 +1,746 @@
+{
+  "totalInteractiveButtons": 110,
+  "buttonsList": [
+    {
+      "index": 1,
+      "id": "no-id",
+      "className": "mbtn-pri",
+      "label": "Exit ✕"
+    },
+    {
+      "index": 2,
+      "id": "no-id",
+      "className": "header-icon-btn",
+      "label": "☁️"
+    },
+    {
+      "index": 3,
+      "id": "no-id",
+      "className": "header-icon-btn",
+      "label": "📤"
+    },
+    {
+      "index": 4,
+      "id": "currentLangIso",
+      "className": "lang-switcher-pill",
+      "label": "EN\n          English"
+    },
+    {
+      "index": 5,
+      "id": "modeFocusBtn",
+      "className": "seg-pill active",
+      "label": "25m"
+    },
+    {
+      "index": 6,
+      "id": "modeShortBtn",
+      "className": "seg-pill",
+      "label": "5m"
+    },
+    {
+      "index": 7,
+      "id": "modeLongBtn",
+      "className": "seg-pill",
+      "label": "15m"
+    },
+    {
+      "index": 8,
+      "id": "modeCustomBtn",
+      "className": "seg-pill",
+      "label": "Custom ⚡"
+    },
+    {
+      "index": 9,
+      "id": "no-id",
+      "className": "btn-round-sec",
+      "label": "↺"
+    },
+    {
+      "index": 10,
+      "id": "mainPlayBtn",
+      "className": "btn-round-play",
+      "label": "icon-only"
+    },
+    {
+      "index": 11,
+      "id": "no-id",
+      "className": "btn-round-sec",
+      "label": "⏭"
+    },
+    {
+      "index": 12,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "-5m"
+    },
+    {
+      "index": 13,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "-1m"
+    },
+    {
+      "index": 14,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "+1m"
+    },
+    {
+      "index": 15,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "+5m"
+    },
+    {
+      "index": 16,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "+10m"
+    },
+    {
+      "index": 17,
+      "id": "domBtn-study",
+      "className": "domain-card dom-study active",
+      "label": "📚\n            Study\n            25:00"
+    },
+    {
+      "index": 18,
+      "id": "domBtn-sport",
+      "className": "domain-card dom-sport",
+      "label": "🏋️\n            Workout\n            30:0"
+    },
+    {
+      "index": 19,
+      "id": "domBtn-read",
+      "className": "domain-card dom-read",
+      "label": "📖\n            Reading\n            20:00"
+    },
+    {
+      "index": 20,
+      "id": "domBtn-work",
+      "className": "domain-card dom-work",
+      "label": "💻\n            Deep Work\n            50:"
+    },
+    {
+      "index": 21,
+      "id": "timerSettingsChip",
+      "className": "timer-settings-chip",
+      "label": "⚙ تخصيص"
+    },
+    {
+      "index": 22,
+      "id": "homeQuick10",
+      "className": "home-quick-chip",
+      "label": "10:00"
+    },
+    {
+      "index": 23,
+      "id": "homeQuick25",
+      "className": "home-quick-chip",
+      "label": "25:00"
+    },
+    {
+      "index": 24,
+      "id": "homeQuick50",
+      "className": "home-quick-chip",
+      "label": "50:00"
+    },
+    {
+      "index": 25,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "+1 Set ✓"
+    },
+    {
+      "index": 26,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "Rest 45s"
+    },
+    {
+      "index": 27,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "+5"
+    },
+    {
+      "index": 28,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "+10"
+    },
+    {
+      "index": 29,
+      "id": "btnLaunchSpeedReader",
+      "className": "delta-chip",
+      "label": "⚡ Speed Reader"
+    },
+    {
+      "index": 30,
+      "id": "btnZenStudySuite",
+      "className": "zen-suite-trigger-btn",
+      "label": "✦\n              Studio Suite\n           "
+    },
+    {
+      "index": 31,
+      "id": "no-id",
+      "className": "none",
+      "label": "+ إضافة"
+    },
+    {
+      "index": 32,
+      "id": "no-id",
+      "className": "none",
+      "label": "تدريب 20/10"
+    },
+    {
+      "index": 33,
+      "id": "no-id",
+      "className": "none",
+      "label": "رياضة 4/1"
+    },
+    {
+      "index": 34,
+      "id": "no-id",
+      "className": "none",
+      "label": "قراءة 20/5"
+    },
+    {
+      "index": 35,
+      "id": "no-id",
+      "className": "none",
+      "label": "عمل 50/10"
+    },
+    {
+      "index": 36,
+      "id": "no-id",
+      "className": "none",
+      "label": "تخطي المرحلة"
+    },
+    {
+      "index": 37,
+      "id": "no-id",
+      "className": "none",
+      "label": "إنهاء التدريب"
+    },
+    {
+      "index": 38,
+      "id": "qtStartButton",
+      "className": "training-primary",
+      "label": "▶ ابدأ التدريب"
+    },
+    {
+      "index": 39,
+      "id": "no-id",
+      "className": "none",
+      "label": "عرض الكل ↗"
+    },
+    {
+      "index": 40,
+      "id": "goalsEditButton",
+      "className": "goals-edit",
+      "label": "⚙ Goals"
+    },
+    {
+      "index": 41,
+      "id": "no-id",
+      "className": "seg-pill active",
+      "label": "All"
+    },
+    {
+      "index": 42,
+      "id": "no-id",
+      "className": "seg-pill",
+      "label": "Active"
+    },
+    {
+      "index": 43,
+      "id": "no-id",
+      "className": "seg-pill",
+      "label": "Completed"
+    },
+    {
+      "index": 44,
+      "id": "btnLaunchSyllabusStudio",
+      "className": "seg-pill",
+      "label": "🗺️ Syllabus"
+    },
+    {
+      "index": 45,
+      "id": "no-id",
+      "className": "btn-task-plus",
+      "label": "+"
+    },
+    {
+      "index": 46,
+      "id": "no-id",
+      "className": "btn-round-sec",
+      "label": "❮"
+    },
+    {
+      "index": 47,
+      "id": "no-id",
+      "className": "btn-round-sec",
+      "label": "❯"
+    },
+    {
+      "index": 48,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "+ Add Note to Date"
+    },
+    {
+      "index": 49,
+      "id": "nsNewButton",
+      "className": "ns-new",
+      "label": "＋ New note"
+    },
+    {
+      "index": 50,
+      "id": "nsExport",
+      "className": "ns-export",
+      "label": "⇩"
+    },
+    {
+      "index": 51,
+      "id": "nsPinnedOnly",
+      "className": "none",
+      "label": "♧ Pinned only"
+    },
+    {
+      "index": 52,
+      "id": "no-id",
+      "className": "seg-pill active",
+      "label": "All"
+    },
+    {
+      "index": 53,
+      "id": "no-id",
+      "className": "seg-pill",
+      "label": "Structured Notes 📋"
+    },
+    {
+      "index": 54,
+      "id": "no-id",
+      "className": "seg-pill",
+      "label": "Recall 👁️"
+    },
+    {
+      "index": 55,
+      "id": "no-id",
+      "className": "seg-pill",
+      "label": "Log 💡"
+    },
+    {
+      "index": 56,
+      "id": "btnLaunchFeynmanPill",
+      "className": "seg-pill",
+      "label": "Feynman Recall 🧠"
+    },
+    {
+      "index": 57,
+      "id": "no-id",
+      "className": "floating-plus-fab",
+      "label": "+"
+    },
+    {
+      "index": 58,
+      "id": "btnLaunch3DSpatialStudio",
+      "className": "task-mini-sel",
+      "label": "🎧 3D Spatial & 40Hz"
+    },
+    {
+      "index": 59,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "✨ Mix"
+    },
+    {
+      "index": 60,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "⏹ Stop"
+    },
+    {
+      "index": 61,
+      "id": "no-id",
+      "className": "seg-pill active",
+      "label": "All (12)"
+    },
+    {
+      "index": 62,
+      "id": "no-id",
+      "className": "seg-pill",
+      "label": "Water & Rain 🌧️"
+    },
+    {
+      "index": 63,
+      "id": "no-id",
+      "className": "seg-pill",
+      "label": "Forest & Wind 🌲"
+    },
+    {
+      "index": 64,
+      "id": "no-id",
+      "className": "seg-pill",
+      "label": "Fire & Earth 🔥"
+    },
+    {
+      "index": 65,
+      "id": "btnLaunchHighPerfEngine",
+      "className": "zen-compact-suite-btn",
+      "label": "⚡\n            120 FPS Engine"
+    },
+    {
+      "index": 66,
+      "id": "btnLaunchBotanicalGarden",
+      "className": "zen-compact-suite-btn",
+      "label": "🌿\n            Zen Sanctuary"
+    },
+    {
+      "index": 67,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "🗺️ Launch Adaptive Syllabus Roadmap & E"
+    },
+    {
+      "index": 68,
+      "id": "navTasks",
+      "className": "bnav-btn",
+      "label": "Tasks"
+    },
+    {
+      "index": 69,
+      "id": "navCalendar",
+      "className": "bnav-btn",
+      "label": "Calendar"
+    },
+    {
+      "index": 70,
+      "id": "navNotes",
+      "className": "bnav-btn",
+      "label": "Notes"
+    },
+    {
+      "index": 71,
+      "id": "navTimer",
+      "className": "bnav-btn active",
+      "label": "Timer"
+    },
+    {
+      "index": 72,
+      "id": "navTraining",
+      "className": "bnav-btn",
+      "label": "Training"
+    },
+    {
+      "index": 73,
+      "id": "navSounds",
+      "className": "bnav-btn",
+      "label": "Nature"
+    },
+    {
+      "index": 74,
+      "id": "navAnalytics",
+      "className": "bnav-btn",
+      "label": "Analytics"
+    },
+    {
+      "index": 75,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "✕"
+    },
+    {
+      "index": 76,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "✕"
+    },
+    {
+      "index": 77,
+      "id": "no-id",
+      "className": "mbtn-pri",
+      "label": "📤 Share Backup Code (Manual)"
+    },
+    {
+      "index": 78,
+      "id": "no-id",
+      "className": "mbtn-sec",
+      "label": "💾 Export Backup File (.zenbackup)"
+    },
+    {
+      "index": 79,
+      "id": "no-id",
+      "className": "mbtn-pri",
+      "label": "Restore Code ✓"
+    },
+    {
+      "index": 80,
+      "id": "no-id",
+      "className": "mbtn-sec",
+      "label": "📂 Load File"
+    },
+    {
+      "index": 81,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "✕"
+    },
+    {
+      "index": 82,
+      "id": "no-id",
+      "className": "mbtn-sec",
+      "label": "Cancel"
+    },
+    {
+      "index": 83,
+      "id": "no-id",
+      "className": "mbtn-pri",
+      "label": "Save"
+    },
+    {
+      "index": 84,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "✕"
+    },
+    {
+      "index": 85,
+      "id": "tsetReset",
+      "className": "mbtn-sec",
+      "label": "Defaults"
+    },
+    {
+      "index": 86,
+      "id": "tsetSave",
+      "className": "mbtn-pri",
+      "label": "Save"
+    },
+    {
+      "index": 87,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "✕"
+    },
+    {
+      "index": 88,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "20m"
+    },
+    {
+      "index": 89,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "35m"
+    },
+    {
+      "index": 90,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "45m"
+    },
+    {
+      "index": 91,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "60m"
+    },
+    {
+      "index": 92,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "90m"
+    },
+    {
+      "index": 93,
+      "id": "no-id",
+      "className": "delta-chip",
+      "label": "120m"
+    },
+    {
+      "index": 94,
+      "id": "no-id",
+      "className": "mbtn-pri",
+      "label": "Save & Start"
+    },
+    {
+      "index": 95,
+      "id": "no-id",
+      "className": "mbtn-sec",
+      "label": "Cancel"
+    },
+    {
+      "index": 96,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "✕"
+    },
+    {
+      "index": 97,
+      "id": "nsDraftRestore",
+      "className": "none",
+      "label": "Restore"
+    },
+    {
+      "index": 98,
+      "id": "nsDraftDiscard",
+      "className": "none",
+      "label": "Discard"
+    },
+    {
+      "index": 99,
+      "id": "no-id",
+      "className": "mbtn-sec",
+      "label": "Cancel"
+    },
+    {
+      "index": 100,
+      "id": "nsSaveButton",
+      "className": "mbtn-pri",
+      "label": "Save"
+    },
+    {
+      "index": 101,
+      "id": "no-id",
+      "className": "task-mini-sel",
+      "label": "✕"
+    },
+    {
+      "index": 102,
+      "id": "no-id",
+      "className": "mbtn-pri",
+      "label": "Save Note"
+    },
+    {
+      "index": 103,
+      "id": "no-id",
+      "className": "mbtn-sec",
+      "label": "Save Task"
+    },
+    {
+      "index": 104,
+      "id": "no-id",
+      "className": "zen-modal-close",
+      "label": "✕"
+    },
+    {
+      "index": 105,
+      "id": "btnLaunchStemStudio",
+      "className": "zen-suite-card-btn",
+      "label": "📐\n          \n            STEM & Exam St"
+    },
+    {
+      "index": 106,
+      "id": "btnLaunchWhiteboardStudio",
+      "className": "zen-suite-card-btn",
+      "label": "🎨\n          \n            Whiteboard & O"
+    },
+    {
+      "index": 107,
+      "id": "btnLaunchSpatialAudioStudio",
+      "className": "zen-suite-card-btn",
+      "label": "🎧\n          \n            3D Spatial & 4"
+    },
+    {
+      "index": 108,
+      "id": "btnToggleScratchpadOverlay",
+      "className": "zen-suite-card-btn",
+      "label": "✏️\n          \n            Floating Scrat"
+    },
+    {
+      "index": 109,
+      "id": "btnLaunchFeynmanStudio",
+      "className": "zen-suite-card-btn",
+      "label": "🧠\n          \n            Feynman Recall"
+    },
+    {
+      "index": 110,
+      "id": "btnLaunchBotanicalGardenTimer",
+      "className": "zen-suite-card-btn",
+      "label": "🌿\n          \n            Zen Botanical "
+    }
+  ],
+  "coreSectionsAudited": [
+    {
+      "name": "Header & Mode Switcher",
+      "present": true
+    },
+    {
+      "name": "Circular Timer Canvas",
+      "present": true
+    },
+    {
+      "name": "Preset Selector Buttons",
+      "present": true
+    },
+    {
+      "name": "Quick Adjustment Buttons (10m, 25m, 50m)",
+      "present": true
+    },
+    {
+      "name": "Studio Navigator Trigger Pill",
+      "present": false
+    },
+    {
+      "name": "Bottom Drawer Sheet Overlay",
+      "present": true
+    },
+    {
+      "name": "Daily Goals Sheet Modal",
+      "present": true
+    }
+  ],
+  "activeModulesCount": 47,
+  "modulesList": [
+    "accessibility/universal_accessibility_studio.js",
+    "analytics/cognitive_profiler.js",
+    "audio/dsp.js",
+    "audio/spatial_acoustic_studio.js",
+    "collaboration/local_study_pod_engine.js",
+    "collaboration/p2p_capsule_exchange.js",
+    "contracts/focus_commitment_contracts.js",
+    "core/action_dispatcher_engine.js",
+    "core/consolidated_module_loader.js",
+    "core/high_precision_timer_engine.js",
+    "core/lifecycle_memory_sentinel.js",
+    "core/offline_data_vault.js",
+    "core/registry.js",
+    "core/state.js",
+    "core/studio_navigator.js",
+    "core/web_audio_singleton_engine.js",
+    "ergonomics/anti_clutter_thumb_zone.js",
+    "flashcards/fsrs.js",
+    "garden/fractal_botanical_engine.js",
+    "garden/interactive_sanctuary_canvas.js",
+    "i18n/global_i18n_engine.js",
+    "loader.js",
+    "native/widget_sync.js",
+    "notes/tri_zone_cornell_studio.js",
+    "performance/web_worker_120hz_engine.js",
+    "reader/focal_stream_rsvp_engine.js",
+    "recall/feynman_error_bank_studio.js",
+    "recall/feynman_studio.js",
+    "records/personal_best_leaderboard.js",
+    "rescue/exam_eve_rescue_protocol.js",
+    "security/vault_backup.js",
+    "simulation/dogfood_simulator.js",
+    "stem/stem_typesetter_studio.js",
+    "syllabus/adaptive_load_balancer.js",
+    "theme/amoled_theme_studio.js",
+    "timer/engine.js",
+    "ui/back_button_manager.js",
+    "ui/color_contrast_harmonizer.js",
+    "ui/design_critique_button_auditor.js",
+    "ui/dom_flattening_engine.js",
+    "ui/studio_navigator_drawer.js",
+    "ui/theme.js",
+    "ui/thumb_zone_ergonomics_optimizer.js",
+    "ui_touch_engine.js",
+    "whiteboard/vector_whiteboard_studio.js",
+    "wrapped/study_wrapped_story.js",
+    "zen/canvas.js"
+  ],
+  "inspectedAt": "2026-11-11T00:15:09.797Z"
+}
