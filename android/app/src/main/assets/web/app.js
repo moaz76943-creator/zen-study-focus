@@ -83778,3 +83778,8 @@ if (typeof TamperProofIntegrityGuard !== "undefined") {
 if (typeof BatteryThermalGuard !== "undefined") {
     BatteryThermalGuard.init();
 }
+
+// [Task #678] Eyes-Free Haptic Engine Initialization
+if (typeof EyesFreeHapticEngine !== "undefined") {
+    EyesFreeHapticEngine.init();
+}
