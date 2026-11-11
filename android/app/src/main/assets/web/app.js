@@ -83773,3 +83773,8 @@ if (typeof DistractionShieldEngine !== "undefined") {
 if (typeof TamperProofIntegrityGuard !== "undefined") {
     TamperProofIntegrityGuard.init();
 }
+
+// [Task #677] Battery Thermal Guard Initialization
+if (typeof BatteryThermalGuard !== "undefined") {
+    BatteryThermalGuard.init();
+}
