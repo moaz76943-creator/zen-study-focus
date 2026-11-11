@@ -83728,3 +83728,8 @@ if (typeof OfflineDataVault !== "undefined") {
 if (typeof LifecycleMemorySentinel !== "undefined") {
     LifecycleMemorySentinel.init();
 }
+
+// [Task #665] Thumb Zone Ergonomics Optimizer Initialization
+if (typeof ThumbZoneErgonomicsOptimizer !== "undefined") {
+    ThumbZoneErgonomicsOptimizer.init();
+}
