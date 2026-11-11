@@ -83763,3 +83763,13 @@ if (typeof SessionCrashRecoveryEngine !== "undefined") {
 if (typeof SunlightContrastBooster !== "undefined") {
     SunlightContrastBooster.init();
 }
+
+// [Task #675] Distraction Shield Engine Initialization
+if (typeof DistractionShieldEngine !== "undefined") {
+    DistractionShieldEngine.init();
+}
+
+// [Task #676] Tamper-Proof Integrity Guard Initialization
+if (typeof TamperProofIntegrityGuard !== "undefined") {
+    TamperProofIntegrityGuard.init();
+}
