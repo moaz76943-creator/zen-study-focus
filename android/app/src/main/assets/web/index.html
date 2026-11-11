@@ -1410,6 +1410,18 @@ body {
     }
     </style>
 
+
+    <!-- 120HZ SMOOTH CALM DRAWER TRANSITION (TASK #735) -->
+    <style id="calmDrawer120HzCss">
+    #sovereignCalmToolsBody {
+        transition: opacity 0.18s cubic-bezier(0.22, 1, 0.36, 1), transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: opacity, transform;
+    }
+    #sovereignCalmToolsDrawer button:active {
+        transform: scale(0.985);
+    }
+    </style>
+
 </head>
 <body>
 

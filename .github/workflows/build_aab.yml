@@ -76,14 +76,24 @@ jobs:
 
       - name: 📦 Compile Production Android App Bundle (.AAB)
         run: |
+          set -o pipefail
           cd android
           if [ -f "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            ./gradlew bundleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m"
+            ./gradlew bundleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m" 2>&1 | tee gradle_build.log
           else
             echo "Wrapper jar absent; using Standalone Gradle 8.7..."
-            gradle bundleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m"
+            gradle bundleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m" 2>&1 | tee gradle_build.log
           fi
           cd ..
+
+      - name: 🔍 Upload Gradle Failure Log (If Build Failed)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-failure-log
+          path: android/gradle_build.log
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: 📦 Compile Production APK (For Direct Device Install)
         run: |
