@@ -29,9 +29,21 @@ android {
             }
         }
     }
-    buildTypes {
+    
+
+    signingConfigs {
         release {
             signingConfig signingConfigs.release
+            storeFile file("zenfocus2026.jks")
+            storePassword "zenfocus2026"
+            keyAlias "zenfocus2026"
+            keyPassword "zenfocus2026"
+        }
+    }
+
+    buildTypes {
+        release {
+            
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
