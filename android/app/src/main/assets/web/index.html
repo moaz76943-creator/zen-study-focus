@@ -658,6 +658,64 @@ body {
     box-sizing: border-box !important;
 }
 
+
+/* SM-2 3D FLIP CARD & EBBINGHAUS STYLING */
+.srs-card-scene {
+    width: 100%;
+    max-width: 480px;
+    height: 220px;
+    margin: 1rem auto;
+    perspective: 1000px;
+    cursor: pointer;
+}
+.srs-card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+}
+.srs-card-inner.is-flipped {
+    transform: rotateY(180deg);
+}
+.srs-card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 12px;
+    background: #0d0d0d;
+    border: 1px solid #222;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+.srs-card-back {
+    transform: rotateY(180deg);
+    border-color: #4ade80;
+    background: #111;
+}
+.srs-rate-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 1rem;
+}
+.srs-rate-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
 </style>
   <link rel="stylesheet" href="white_2100.css">
   <link rel="stylesheet" href="design_tokens_v22.css">
