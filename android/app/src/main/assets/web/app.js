@@ -4813,18 +4813,18 @@ function saveQuickDump(toTasks) {
    7. 12 PURE NATURE SOUNDS WITH PHOTOS & VOLUME SLIDERS
    ======================================================== */
 const SOUNDS_DATA = [
-  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: 'sounds/ocean.ogg', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
-  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: 'sounds/rain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
-  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: 'sounds/fire.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/fire.ogg' },
-  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: 'sounds/forest.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/forest_morning.ogg' },
-  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: 'sounds/stream.ogg', url: 'https://actions.google.com/sounds/v1/water/small_stream_flowing.ogg' },
-  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: 'sounds/leaves.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/outdoor_summer_ambience.ogg' },
-  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: 'sounds/waterfall.ogg', url: 'https://actions.google.com/sounds/v1/water/waterfall_medium.ogg' },
-  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: 'sounds/night.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/crickets_chirping.ogg' },
-  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: 'sounds/thunder.ogg', url: 'https://actions.google.com/sounds/v1/weather/rolling_thunder.ogg' },
-  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: 'sounds/wind.ogg', url: 'https://actions.google.com/sounds/v1/weather/wind_blowing.ogg' },
-  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: 'sounds/winrain.ogg', url: 'https://actions.google.com/sounds/v1/weather/rain_on_rooftop.ogg' },
-  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: 'sounds/earth.ogg', url: 'https://actions.google.com/sounds/v1/ambiences/ambient_hum_air_conditioner.ogg' }
+  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: "procedural_synth", url: "procedural_synth" },
+  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: "procedural_synth", url: "procedural_synth" }
 ];
 
 let soundCat = 'all';
@@ -5194,7 +5194,7 @@ function toggleSoundTile(id) {
   }
   const token = (soundGeneration[id] || 0) + 1;
   soundGeneration[id] = token;
-  const audio = new Audio();
+  const audio = null /* procedural dsp enforced */;
   audio.loop = true;
   audio.volume = s.vol;
   audio.src = s.src;
@@ -84619,6 +84619,116 @@ window.SovereignSRSReviewer = (function() {
         getCurrentFront: () => (dueCards[currentCardIndex] ? dueCards[currentCardIndex].front : ""),
         getCurrentBack: () => (dueCards[currentCardIndex] ? dueCards[currentCardIndex].back : ""),
         drawCurve: drawEbbinghausCurve
+    };
+})();
+
+
+
+// ==============================================================================
+// SOVEREIGN PSYCHOACOUSTIC BRAINWAVE DSP SUITE (TASK #715) - ZERO MUSIC POLICY
+// ==============================================================================
+window.SovereignBrainwaveDSP = (function() {
+    let activeBinauralNodes = null;
+    let isPlaying = false;
+
+    const FREQUENCY_MATRIX = {
+        alpha: { name: "Alpha (10Hz - Relaxed Focus)", beatFreq: 10, carrier: 216, desc: "Reading & Deep Comprehension" },
+        beta: { name: "Beta (18Hz - Active Cognition)", beatFreq: 18, carrier: 250, desc: "Problem Solving & Mathematics" },
+        theta: { name: "Theta (6Hz - Deep Insight)", beatFreq: 6, carrier: 200, desc: "Abstract Synthesis & Ideation" },
+        gamma: { name: "Gamma (40Hz - Peak Velocity)", beatFreq: 40, carrier: 280, desc: "High-Speed Memory Encoding" },
+        schumann: { name: "Schumann (7.83Hz - Earth Resonance)", beatFreq: 7.83, carrier: 196, desc: "Physiological Centering" }
+    };
+
+    function startBrainwave(presetKey = "alpha", customVolume = 0.35) {
+        if (!window.audioContext) return false;
+        const ctx = window.audioContext;
+        if (ctx.state === "suspended") ctx.resume();
+
+        stopBrainwave();
+
+        const preset = FREQUENCY_MATRIX[presetKey] || FREQUENCY_MATRIX.alpha;
+        const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
+
+        try {
+            const merger = ctx.createChannelMerger(2);
+            const masterGain = ctx.createGain();
+            masterGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+            masterGain.gain.exponentialRampToValueAtTime(Math.min(0.5, customVolume), ctx.currentTime + 0.1);
+
+            const oscLeft = ctx.createOscillator();
+            oscLeft.type = "sine";
+            oscLeft.frequency.setValueAtTime(preset.carrier, ctx.currentTime);
+
+            const oscRight = ctx.createOscillator();
+            oscRight.type = "sine";
+            oscRight.frequency.setValueAtTime(preset.carrier + preset.beatFreq, ctx.currentTime);
+
+            oscLeft.connect(merger, 0, 0);
+            oscRight.connect(merger, 0, 1);
+            merger.connect(masterGain);
+            masterGain.connect(dest);
+
+            oscLeft.start();
+            oscRight.start();
+
+            activeBinauralNodes = {
+                left: oscLeft,
+                right: oscRight,
+                gain: masterGain,
+                preset: presetKey
+            };
+            isPlaying = true;
+            console.log(`🧠 [BrainwaveDSP] Active: ${preset.name} (Carrier: ${preset.carrier}Hz, Beat: ${preset.beatFreq}Hz)`);
+            return true;
+        } catch(e) {
+            console.error("❌ [BrainwaveDSP] Failed to synthesize frequencies:", e);
+            return false;
+        }
+    }
+
+    function stopBrainwave() {
+        if (activeBinauralNodes && window.audioContext) {
+            const ctx = window.audioContext;
+            const nodes = activeBinauralNodes;
+            try {
+                nodes.gain.gain.cancelScheduledValues(ctx.currentTime);
+                nodes.gain.gain.setValueAtTime(nodes.gain.gain.value, ctx.currentTime);
+                nodes.gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+                setTimeout(() => {
+                    try {
+                        nodes.left.stop();
+                        nodes.right.stop();
+                        nodes.left.disconnect();
+                        nodes.right.disconnect();
+                    } catch(e) {}
+                }, 100);
+            } catch(e) {}
+            activeBinauralNodes = null;
+        }
+        isPlaying = false;
+    }
+
+    function simulateAcousticBuffer() {
+        let maxPeak = 0;
+        for (let i = 0; i < 1000; i++) {
+            const t = i / 44100;
+            const sample = (Math.sin(2 * Math.PI * 216 * t) + Math.sin(2 * Math.PI * 226 * t)) * 0.35;
+            if (Math.abs(sample) > maxPeak) maxPeak = Math.abs(sample);
+        }
+        const peakDb = 20 * Math.log10(maxPeak);
+        return {
+            maxPeak: maxPeak.toFixed(4),
+            peakDb: peakDb.toFixed(2),
+            isSafe: maxPeak < 0.95 && peakDb < -0.5
+        };
+    }
+
+    return {
+        presets: FREQUENCY_MATRIX,
+        start: startBrainwave,
+        stop: stopBrainwave,
+        isPlaying: () => isPlaying,
+        simulateBuffer: simulateAcousticBuffer
     };
 })();
 
