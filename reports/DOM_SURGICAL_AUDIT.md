@@ -1,0 +1,5 @@
+1. **Dynamic Processing for Runtime-Nodes**: The universal i18n hotswap feature ensures that every dynamically created node (like buttons or inputs) is processed by dynamic mapping instead of replacing root nodes. This preserves i18n mappings, such as emojis and numerals, across all languages without bypassing initial i18n sweeps.
+
+2. **Preserving Structured Translations**: The hotswap handles each replaced node dynamically, ensuring that all characters (including emojis) are correctly mapped to their respective translations in different languages, thus preserving the structure of texts created from other scripts.
+
+3. **Robust Numerical Processing**: Proper encoding and handling of numerals ensure RTL compliance even during replacement, preventing RTL failures in critical features like timers and controls by ensuring numerical translations are accurate across all supported scripts.
