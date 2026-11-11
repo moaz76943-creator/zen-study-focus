@@ -29705,7 +29705,7 @@ window.dfRegisterExhaustiveAfarDictionary = function() {
 window.dfRegisterExhaustiveTigrinyaDictionary = function() {
   const ti = {
     dir: "ltr", start: "ትኹረት ጀምር", pause: "ኣዕርፍ", resume: "ቀጽል", reset: "ናብ መበገሲ ምለስ",
-    navFocus: "ትኹረት", navDecks: "ጥራዛት መጽናዕቲ", navStats: "ስታቲስቲክስ", navSettings: "ቅጥעታት",
+    navFocus: "ትኹረት", navDecks: "ጥራዛት መጽናዕቲ", navStats: "ስታቲስቲክስ", navSettings: "ቅጥታት",
     cardFront: "ቅድሚት ካርታ", cardBack: "ድሕሪት ካርታ", flipCard: "ካርታ ግልበጥ", addCard: "ካርታ ወስኽ",
     editCard: "ኣመዓራሪ", deleteCard: "ደምስስ", save: "ኣቐምጥ", cancel: "ሰርዝ", confirm: "ኣረጋግጽ", close: "ዕጾ",
     rateAgain: "ከም ብሓዲሽ", rateHard: "ኸቢድ", rateGood: "ጽቡቕ", rateEasy: "ቐሊል",

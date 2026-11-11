@@ -30,7 +30,7 @@
     _initPrecompiledRegexes() {
       // M8575: Precompile frequent regex patterns in memory
       this.regexRegistry.set('westernDigits', /^[0-9]+$/);
-      this.regexRegistry.set('easternDigits', /[٠١٢٣٤٥٦٧٨٩]/g);
+      this.regexRegistry.set('easternDigits', /[0123456789]/g);
       this.regexRegistry.set('markdownHeaders', /^#{1,6}\s+(.+)$/gm);
       this.regexRegistry.set('mathSymbols', /[∫∑√πθ∂±×÷≠≈≤≥∞]/);
       this.regexRegistry.set('xssSanitizer', /[<>'"&]/g);
