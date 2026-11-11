@@ -1,0 +1,140 @@
+{
+  "app": "DEEP FOCUS (Sovereign Offline Study OS)",
+  "version": "v497.0.0",
+  "code": 41217,
+  "batchNumber": 1,
+  "batchSize": 15,
+  "totalLocalizedSoFar": 15,
+  "totalTargetLanguages": 1000,
+  "completionPercentage": "1.50%",
+  "excludedBannedLanguages": [
+    "he",
+    "iw",
+    "syc",
+    "ber",
+    "zgh"
+  ],
+  "localizedLanguages": [
+    {
+      "code": "ar",
+      "name": "العربية",
+      "english": "Arabic",
+      "dir": "rtl",
+      "keysCount": 28,
+      "file": "locales/ar.json"
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "english": "English",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/en.json"
+    },
+    {
+      "code": "zh",
+      "name": "中文",
+      "english": "Chinese",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/zh.json"
+    },
+    {
+      "code": "es",
+      "name": "Español",
+      "english": "Spanish",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/es.json"
+    },
+    {
+      "code": "hi",
+      "name": "हिन्दी",
+      "english": "Hindi",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/hi.json"
+    },
+    {
+      "code": "bn",
+      "name": "বাংলা",
+      "english": "Bengali",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/bn.json"
+    },
+    {
+      "code": "pt",
+      "name": "Português",
+      "english": "Portuguese",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/pt.json"
+    },
+    {
+      "code": "ru",
+      "name": "Русский",
+      "english": "Russian",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/ru.json"
+    },
+    {
+      "code": "ja",
+      "name": "日本語",
+      "english": "Japanese",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/ja.json"
+    },
+    {
+      "code": "ur",
+      "name": "اردو",
+      "english": "Urdu",
+      "dir": "rtl",
+      "keysCount": 28,
+      "file": "locales/ur.json"
+    },
+    {
+      "code": "id",
+      "name": "Bahasa Indonesia",
+      "english": "Indonesian",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/id.json"
+    },
+    {
+      "code": "de",
+      "name": "Deutsch",
+      "english": "German",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/de.json"
+    },
+    {
+      "code": "fr",
+      "name": "Français",
+      "english": "French",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/fr.json"
+    },
+    {
+      "code": "tr",
+      "name": "Türkçe",
+      "english": "Turkish",
+      "dir": "ltr",
+      "keysCount": 28,
+      "file": "locales/tr.json"
+    },
+    {
+      "code": "fa",
+      "name": "فارسی",
+      "english": "Persian",
+      "dir": "rtl",
+      "keysCount": 28,
+      "file": "locales/fa.json"
+    }
+  ],
+  "updatedAt": "2026-11-11T12:53:44.397Z"
+}

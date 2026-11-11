@@ -1,0 +1,1629 @@
+{
+  "syntaxErrors": [],
+  "unprotectedLocalStorageSet": [],
+  "unhandledJsonParse": [],
+  "orphanedDomReferences": [
+    {
+      "file": "app.js",
+      "targetId": "df-streak-badge-count"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-streak-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-streak-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-streak-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-timer-task-pill"
+    },
+    {
+      "file": "app.js",
+      "targetId": "domBtn- + key"
+    },
+    {
+      "file": "app.js",
+      "targetId": "secId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "id"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-eye-strain-202020-banner"
+    },
+    {
+      "file": "app.js",
+      "targetId": "view-timer"
+    },
+    {
+      "file": "app.js",
+      "targetId": "longRest ? modeLongBtn : modeShortBtn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-streak-badge-count"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-streak-label"
+    },
+    {
+      "file": "app.js",
+      "targetId": "homeQuick + duration"
+    },
+    {
+      "file": "app.js",
+      "targetId": "share- + k"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-share-card-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-analytics-share-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-oled-desk-clock"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-studio-view"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-back"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-file-input"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-import-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-export-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-pair-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-speed-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-speed-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-repeat-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-repeat-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-sort-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-import-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-start-quiz-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-add-card-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-bank-pill"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-answer-section"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-reveal-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-action-buttons"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-card"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-paste-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-live-speak-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-live-search"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-quick-paste-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-copy-share-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-shuffle-toggle-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-reverse-toggle-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-header"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-shuffle-toggle-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-reverse-toggle-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-speed-btn- + String(s"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-current-word"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-speed-selector-group"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-speed-btn-0_75"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-speed-btn-1_0"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-speed-btn-1_25"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-mastery-summary-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-mastery-summary-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-mark-all-mastered-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-autoadvance-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-next-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-autoadvance-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-voice-status-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-voice-test-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-interval-btn- + Math.round(s"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-interval-group"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-interval-btn-1"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-interval-btn-2"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-interval-btn-3"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-clean-duplicates-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-sort-mode-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-sort-mode-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-streak-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-header"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-streak-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-word-input"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-meaning-input"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-auto-shuffle-start-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-auto-shuffle-start-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-live-search"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-reset-filter-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-reset-filter-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-live-search"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-progress-fill"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-progress-text"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-header"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-progress-wrapper"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-btn-easy"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-btn-hard"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-card"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-card"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-btn-hard"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-btn-easy"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-header"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-shortcuts-hint"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-lang-pair-badge-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-filter-bar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-lang-pair-badge-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-auto-pronounce-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-auto-pronounce-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-card"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-card-answer"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-flip-prompt"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-card"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-summary-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-summary-close-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-summary-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-summary-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-retry-hard-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-summary-close-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-card"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-empty-guide-card"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-cards-container"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-spoken-vocab-list"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-row"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-empty-guide-card"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-load-sample-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-undo-toast"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-undo-toast"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-toast-undo-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-undo-toast"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-edit-modal"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-edit-close"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-edit-cancel"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-edit-save"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-edit-word"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-edit-meaning"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-card-details- + itemId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-card-toggle- + itemId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-card"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-current-word"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-slow-replay-btn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-session-timer-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-flash-quiz-header"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-extra-toolbar"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-quiz-session-timer-badge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-header-quick-stats"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-search-input"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vocab-toast"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-health-check-modal-backdrop"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-micro-review-banner"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-pomodoro-break-actions"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-micro-review-banner"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-oled-style-block"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-weekly-heatmap-container"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-vault-file-picker"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-tts-vol-val"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-amb-vol-val"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-spelling-input"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-anki-file-picker"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-app-loading-splash"
+    },
+    {
+      "file": "app.js",
+      "targetId": "loading"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-timer-toggle"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-timer-reset"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-sound-toggle"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-timer-toggle"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-timer-toggle"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-aria-live-announcer"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "s"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-timer-toggle"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-wcag-contrast-style"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-safe-area-style"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-aria-live-polite"
+    },
+    {
+      "file": "app.js",
+      "targetId": "df-zen-orb"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "bId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "rId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || _activeSvgContainerId || dfMindMapCanvasHost"
+    },
+    {
+      "file": "app.js",
+      "targetId": "_activeSvgContainerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar1StudioMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfRsvpWordStage"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfVisualGuideLinesHost"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfWpmHistoryChartHost"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRsvpPrevContext"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRsvpNextContext"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRsvpWordCounter"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRsvpProgressBarFill"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRsvpPlayToggleBtn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRsvpLiveWpmBadge"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRsvpWpmSlider"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfAutoPacerToggleBtn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfAutoPacerToggleBtn"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfKpiRawWpm"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfKpiNetWpm"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfKpiCompPct"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfKpiRegressions"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar2SpeedReaderMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar3StemMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfFormulaInput"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfFormulaInput"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfFormulaInput"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfSvgFormulaStage"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfExamTimerCountdown"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfExamProgFill"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar4WhiteboardMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar5SpatialMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar6SyllabusMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar7FeynmanMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfFlowModeTip"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRecalledWordsCount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRecalledFactsCount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfRecallFluencyWpm"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfFeynmanConceptInp"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfPillar8StudyPodMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfPillar8StudyPodMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar8StudyPodMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar9BotanicalHeatmapMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfPillar10HighPerfMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfIntervalMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfReadingQuizMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfFeynmanMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfWorkloadMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfPresetMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfDistractionMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfTempoMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfLatencyMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfCheckpointMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfRefuelMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfJournalMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfBalanceMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfEnergyMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfSoundscapeMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfDebtMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfSmootherMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfExamMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfMindMapMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfShieldMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "elOrId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfSanitizerMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfStreakMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfDomGuardMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfAnalyticsMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfTimerMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfCleanMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfQuotaMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfClozeMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfAuditMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "cId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfSvgMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfAudioGcMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfAlarmMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfBreakPacingMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "cId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "cId"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfVaultMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfSearchMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "cid||dfArabicSearchMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "cid||dfNatureMixerMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "cid||dfPomodoroMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "cid||dfFlashcardsMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfA11yGuard"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ndfWhitePremiumGuard"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfThemeMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfNetShieldMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfPrivacyMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "\ncid||dfReleaseManifestMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfSystemHealthMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfGoldenMasterMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfReleaseManifestMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "containerId || dfMultiStudioAuditMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfWidgetMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfCognitiveMount"
+    },
+    {
+      "file": "app.js",
+      "targetId": "dfBackupMount"
+    },
+    {
+      "file": "goals_studio.js",
+      "targetId": "id"
+    },
+    {
+      "file": "goals_studio.js",
+      "targetId": "goalInput-+domain"
+    },
+    {
+      "file": "goals_studio.js",
+      "targetId": "goalWeeklyInput-+domain"
+    },
+    {
+      "file": "goals_studio.js",
+      "targetId": "domBtn-+domain"
+    },
+    {
+      "file": "modules/accessibility/universal_accessibility_studio.js",
+      "targetId": "df-live-announcer"
+    },
+    {
+      "file": "modules/analytics/cognitive_profiler.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "modules/core/action_dispatcher_engine.js",
+      "targetId": "id"
+    },
+    {
+      "file": "modules/core/action_dispatcher_engine.js",
+      "targetId": "timerDisplay"
+    },
+    {
+      "file": "modules/core/action_dispatcher_engine.js",
+      "targetId": "modeTitle"
+    },
+    {
+      "file": "modules/core/action_dispatcher_engine.js",
+      "targetId": "currentSessionTitle"
+    },
+    {
+      "file": "modules/core/action_dispatcher_engine.js",
+      "targetId": "startBtn"
+    },
+    {
+      "file": "modules/core/action_dispatcher_engine.js",
+      "targetId": "id"
+    },
+    {
+      "file": "modules/core/high_precision_timer_engine.js",
+      "targetId": "timerDisplay"
+    },
+    {
+      "file": "modules/native/widget_sync.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "modules/native/widget_sync.js",
+      "targetId": "dfWidgetSimTimer"
+    },
+    {
+      "file": "modules/native/widget_sync.js",
+      "targetId": "dfWidgetSimDue"
+    },
+    {
+      "file": "modules/native/widget_sync.js",
+      "targetId": "dfWidgetSimBtn"
+    },
+    {
+      "file": "modules/security/vault_backup.js",
+      "targetId": "containerId"
+    },
+    {
+      "file": "modules/ui/design_critique_button_auditor.js",
+      "targetId": "styleId"
+    },
+    {
+      "file": "modules/ui/studio_navigator_drawer.js",
+      "targetId": "studioId + StudioModal"
+    },
+    {
+      "file": "modules/ui/studio_navigator_drawer.js",
+      "targetId": "studioId + Modal"
+    },
+    {
+      "file": "modules/ui_touch_engine.js",
+      "targetId": "preset.id"
+    },
+    {
+      "file": "modules/ui_touch_engine.js",
+      "targetId": "timerMinutes"
+    },
+    {
+      "file": "modules/ui_touch_engine.js",
+      "targetId": "timerDisplay"
+    },
+    {
+      "file": "modules/ui_touch_engine.js",
+      "targetId": "settingsDrawer"
+    },
+    {
+      "file": "modules/ui_touch_engine.js",
+      "targetId": "btnId"
+    },
+    {
+      "file": "nature_library_v2.js",
+      "targetId": "natureLibraryV2"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-status"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-book-filter"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-tag-filter"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-filters"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "id"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-style"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-cornell"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-recall"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-preview"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-find"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-preview"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-preview-toggle"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-focus-toggle"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-find"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-search-count"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-search-count"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-preview"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-find"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-search-count"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-focus-toggle"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-filters"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-book-filter"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-tag-filter"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-status"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-book-filter"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-tag-filter"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-preview"
+    },
+    {
+      "file": "notes_editor_ui.js",
+      "targetId": "nsux-filters"
+    },
+    {
+      "file": "notes_studio.js",
+      "targetId": "id"
+    },
+    {
+      "file": "notes_studio.js",
+      "targetId": "id"
+    },
+    {
+      "file": "notes_studio.js",
+      "targetId": "id"
+    },
+    {
+      "file": "notes_studio.js",
+      "targetId": "id"
+    },
+    {
+      "file": "preflight_v22.js",
+      "targetId": "df22-startup-block"
+    },
+    {
+      "file": "quick_training.js",
+      "targetId": "id"
+    },
+    {
+      "file": "quick_training.js",
+      "targetId": "id"
+    },
+    {
+      "file": "quick_training.js",
+      "targetId": "id"
+    },
+    {
+      "file": "quick_training.js",
+      "targetId": "key"
+    },
+    {
+      "file": "quick_training.js",
+      "targetId": "key"
+    },
+    {
+      "file": "quick_training.js",
+      "targetId": "q.phase===work?modeFocusBtn:modeShortBtn"
+    },
+    {
+      "file": "timer_settings.js",
+      "targetId": "id"
+    },
+    {
+      "file": "timer_settings.js",
+      "targetId": "id"
+    },
+    {
+      "file": "timer_settings.js",
+      "targetId": "mode===focus?modeFocusBtn:mode===short?modeShortBtn:modeLongBtn"
+    }
+  ],
+  "policyViolations": {
+    "easternNumerals": 0,
+    "medicalWords": 0,
+    "bannedScripts": 0
+  },
+  "scannedFilesCount": 266
+}
