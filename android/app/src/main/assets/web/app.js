@@ -85579,3 +85579,162 @@ window.SovereignChimes = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN PRODUCTION SUITE: STATE SNAPSHOTTING & 10HZ ALPHA BINAURAL (TASK #722)
+// 100% Client-Side Sovereign Resilience — Zero Data Loss — Pure Procedural Focus
+// ==============================================================================
+window.SovereignStateSnapshot = (function() {
+    const SNAPSHOT_KEY = "deep_focus_state_snapshot_v1";
+    let snapshotTimer = null;
+
+    function saveSnapshot() {
+        try {
+            const snapshot = {
+                timestamp: Date.now(),
+                timerSeconds: window.currentSecondsRemaining || 0,
+                activeMode: window.currentMode || "focus",
+                momentumScore: (window.SovereignAnalytics && window.SovereignAnalytics.getScore) ? window.SovereignAnalytics.getScore() : 90
+            };
+            localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot));
+            console.log("💾 [StateSnapshot] Study session state checkpoint saved.");
+        } catch(e) {
+            console.warn("Snapshot save warning:", e);
+        }
+    }
+
+    function restoreSnapshot() {
+        try {
+            const raw = localStorage.getItem(SNAPSHOT_KEY);
+            if (!raw) return null;
+            const data = JSON.parse(raw);
+            // Ignore snapshots older than 12 hours
+            if (Date.now() - data.timestamp > 12 * 3600 * 1000) return null;
+            return data;
+        } catch(e) {
+            return null;
+        }
+    }
+
+    function initAutoSnapshot() {
+        if (!snapshotTimer) {
+            snapshotTimer = setInterval(saveSnapshot, 60000); // 60s automated checkpoint
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initAutoSnapshot);
+    } else {
+        initAutoSnapshot();
+    }
+
+    return {
+        save: saveSnapshot,
+        restore: restoreSnapshot,
+        clear: () => localStorage.removeItem(SNAPSHOT_KEY)
+    };
+})();
+
+// 10Hz Alpha Wave Binaural Tone Generator (Procedural Dual Sine Synthesis)
+window.SovereignBinauralAlpha = (function() {
+    let oscLeft = null;
+    let oscRight = null;
+    let gainNode = null;
+    let isPlaying = false;
+
+    function getAudioContext() {
+        if (!window.audioContext) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) window.audioContext = new AudioCtx();
+        }
+        if (window.audioContext && window.audioContext.state === "suspended") {
+            window.audioContext.resume();
+        }
+        return window.audioContext;
+    }
+
+    function toggle() {
+        if (isPlaying) {
+            stop();
+        } else {
+            start();
+        }
+    }
+
+    function start() {
+        const ctx = getAudioContext();
+        if (!ctx || isPlaying) return;
+
+        try {
+            const merger = ctx.createChannelMerger(2);
+            gainNode = ctx.createGain();
+            const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
+
+            // Carrier: 432 Hz, Offset: 442 Hz -> 10 Hz Alpha Entrainment
+            oscLeft = ctx.createOscillator();
+            oscLeft.type = "sine";
+            oscLeft.frequency.setValueAtTime(432, ctx.currentTime);
+
+            oscRight = ctx.createOscillator();
+            oscRight.type = "sine";
+            oscRight.frequency.setValueAtTime(442, ctx.currentTime);
+
+            gainNode.gain.setValueAtTime(0.0001, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 1.2); // Ultra subtle background tone
+
+            oscLeft.connect(merger, 0, 0);  // Left ear
+            oscRight.connect(merger, 0, 1); // Right ear
+            merger.connect(gainNode);
+            gainNode.connect(dest);
+
+            oscLeft.start();
+            oscRight.start();
+            isPlaying = true;
+
+            const btn = document.getElementById("toggleBinauralAlphaBtn");
+            if (btn) {
+                btn.textContent = "🧠 إيقاف تدفق 10Hz Alpha";
+                btn.style.borderColor = "#4ade80";
+                btn.style.color = "#4ade80";
+            }
+            console.log("🧠 [BinauralAlpha] 10Hz Alpha tone entrainment started (432Hz/442Hz).");
+        } catch(e) {
+            console.warn("Binaural start error:", e);
+        }
+    }
+
+    function stop() {
+        const ctx = getAudioContext();
+        if (!isPlaying || !ctx) return;
+        try {
+            if (gainNode) {
+                gainNode.gain.setValueAtTime(gainNode.gain.value, ctx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+            }
+            setTimeout(() => {
+                if (oscLeft) { try { oscLeft.stop(); oscLeft.disconnect(); } catch(e){} }
+                if (oscRight) { try { oscRight.stop(); oscRight.disconnect(); } catch(e){} }
+                isPlaying = false;
+            }, 550);
+
+            const btn = document.getElementById("toggleBinauralAlphaBtn");
+            if (btn) {
+                btn.textContent = "🧠 تفعيل تدفق 10Hz Alpha";
+                btn.style.borderColor = "rgba(74,222,128,0.25)";
+                btn.style.color = "#888";
+            }
+            console.log("🧠 [BinauralAlpha] 10Hz Alpha tone stopped.");
+        } catch(e) {
+            console.warn("Binaural stop error:", e);
+        }
+    }
+
+    return {
+        start: start,
+        stop: stop,
+        toggle: toggle,
+        isActive: () => isPlaying
+    };
+})();
+
