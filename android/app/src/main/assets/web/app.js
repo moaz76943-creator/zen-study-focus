@@ -83942,3 +83942,127 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
     }
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN OFFLINE DATA VAULT BACKUP & RESTORATION ENGINE (TASK #709)
+// ==============================================================================
+window.SovereignDataVault = (function() {
+    const VAULT_VERSION = "1.0.0";
+    const VAULT_HEADER = "DEEP_FOCUS_SOVEREIGN_VAULT_BACKUP";
+
+    // Export entire application state into a validated sovereign JSON payload
+    function generateExportPayload() {
+        const payload = {
+            header: VAULT_HEADER,
+            vaultVersion: VAULT_VERSION,
+            appVersion: "v521.0.0",
+            timestamp: new Date().toISOString(),
+            data: {}
+        };
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && !key.startsWith("__temp_")) {
+                    payload.data[key] = localStorage.getItem(key);
+                }
+            }
+            return JSON.stringify(payload, null, 2);
+        } catch (e) {
+            console.error("❌ [DataVault] Failed to generate backup payload:", e);
+            throw new Error("Local storage access failed during export.");
+        }
+    }
+
+    // Copy backup string directly to system clipboard (Zero network, zero permissions)
+    async function exportToClipboard() {
+        try {
+            const jsonText = generateExportPayload();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(jsonText);
+            } else {
+                const textarea = document.createElement("textarea");
+                textarea.value = jsonText;
+                textarea.style.position = "fixed";
+                textarea.style.opacity = "0";
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+            }
+            showVaultToast("✅ تم نسخ النسخة الاحتياطية بنجاح | Backup Copied!");
+            console.log("🛡️ [DataVault] Backup payload successfully copied to clipboard.");
+            return true;
+        } catch (e) {
+            console.error("❌ [DataVault] Export to clipboard failed:", e);
+            showVaultToast("❌ تعذر النسخ للحافظة | Copy failed");
+            return false;
+        }
+    }
+
+    // Validate and restore data from an input JSON string
+    function restoreFromPayload(rawInput) {
+        if (!rawInput || typeof rawInput !== "string") {
+            showVaultToast("❌ نص النسخة الاحتياطية غير صالح | Invalid payload");
+            return false;
+        }
+        try {
+            const parsed = JSON.parse(rawInput.trim());
+            if (parsed.header !== VAULT_HEADER || !parsed.data || typeof parsed.data !== "object") {
+                throw new Error("Invalid vault signature or malformed backup structure.");
+            }
+            let restoreCount = 0;
+            Object.keys(parsed.data).forEach(k => {
+                localStorage.setItem(k, parsed.data[k]);
+                restoreCount++;
+            });
+            showVaultToast(`✅ تم استعادة ${restoreCount} عنصراً بنجاح | Restored ${restoreCount} items`);
+            console.log(`🛡️ [DataVault] Restored ${restoreCount} storage keys successfully.`);
+            setTimeout(() => {
+                if (window.UniversalI18nHotSwap && window.UniversalI18nHotSwap.sweepDom) {
+                    window.UniversalI18nHotSwap.sweepDom();
+                }
+            }, 300);
+            return true;
+        } catch (e) {
+            console.error("❌ [DataVault] Restoration validation failed:", e);
+            showVaultToast("❌ فشل التحقق من صحة النسخة | Verification failed");
+            return false;
+        }
+    }
+
+    // Complete local wipe (Sovereign Reset)
+    function sovereignWipeAll() {
+        try {
+            localStorage.clear();
+            showVaultToast("🗑️ تم مسح كافة البيانات محلياً | Local Storage Cleared");
+            console.log("🛡️ [DataVault] Sovereign wipe completed.");
+            return true;
+        } catch (e) {
+            console.error("❌ [DataVault] Wipe failed:", e);
+            return false;
+        }
+    }
+
+    // Lightweight AMOLED UI Toast
+    function showVaultToast(msg) {
+        let toast = document.getElementById("vaultToast");
+        if (!toast) {
+            toast = document.createElement("div");
+            toast.id = "vaultToast";
+            toast.style.cssText = "position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #111111; color: #4ade80; border: 1px solid #333333; padding: 10px 20px; border-radius: 8px; font-size: 14px; z-index: 999999; box-shadow: 0 4px 12px rgba(0,0,0,0.8); pointer-events: none; transition: opacity 0.3s ease;";
+            document.body.appendChild(toast);
+        }
+        toast.textContent = msg;
+        toast.style.opacity = "1";
+        setTimeout(() => { toast.style.opacity = "0"; }, 2500);
+    }
+
+    return {
+        exportPayload: generateExportPayload,
+        exportToClipboard: exportToClipboard,
+        restoreFromPayload: restoreFromPayload,
+        wipeAll: sovereignWipeAll
+    };
+})();
+
