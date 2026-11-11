@@ -83758,3 +83758,8 @@ if (typeof AdaptiveDebounceGuard !== "undefined") {
 if (typeof SessionCrashRecoveryEngine !== "undefined") {
     SessionCrashRecoveryEngine.init();
 }
+
+// [Task #674] Sunlight Contrast Booster Initialization
+if (typeof SunlightContrastBooster !== "undefined") {
+    SunlightContrastBooster.init();
+}
