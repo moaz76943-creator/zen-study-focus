@@ -7,3 +7,15 @@
 .nature-library-row.is-pending{opacity:.72}
 .nature-library-name{font-size:.9rem;font-weight:650;overflow-wrap:anywhere}
 .nature-library-state{font-size:.73rem;opacity:.8;overflow-wrap:anywhere}
+
+
+/* ZERO-LATENCY TOUCH ENFORCEMENT */
+button, .btn, .nav-btn, .action-btn, [role="button"], .tab-btn {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    min-height: 48px !important;
+    min-width: 48px !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+

@@ -744,3 +744,15 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
     flex: 1 1 110px;
   }
 }
+
+
+/* ZERO-LATENCY TOUCH ENFORCEMENT */
+button, .btn, .nav-btn, .action-btn, [role="button"], .tab-btn {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    min-height: 48px !important;
+    min-width: 48px !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+

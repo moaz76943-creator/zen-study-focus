@@ -171,3 +171,15 @@ button:active, .btn:active, [role="button"]:active {
   font-size: 20px;
   margin-bottom: 2px;
 }
+
+
+/* ZERO-LATENCY TOUCH ENFORCEMENT */
+button, .btn, .nav-btn, .action-btn, [role="button"], .tab-btn {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    min-height: 48px !important;
+    min-width: 48px !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+

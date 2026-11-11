@@ -83852,3 +83852,24 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
         bind("zenPolyglotCloseBtn", () => window.MassivePolyglotCatalog?.closeModal?.());
     });
 })();
+
+
+/* FAST-TOUCH POINTER DISPATCHER */
+(function() {
+    if (typeof window !== "undefined") {
+        document.addEventListener("pointerdown", function(e) {
+            const btn = e.target.closest("button, .btn, .nav-btn, [role='button']");
+            if (btn && !btn.disabled) {
+                btn.style.transform = "scale(0.97)";
+                const reset = () => {
+                    btn.style.transform = "";
+                    window.removeEventListener("pointerup", reset);
+                    window.removeEventListener("pointercancel", reset);
+                };
+                window.addEventListener("pointerup", reset, { once: true });
+                window.addEventListener("pointercancel", reset, { once: true });
+            }
+        }, { passive: true });
+    }
+})();
+

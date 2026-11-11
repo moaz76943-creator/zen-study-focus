@@ -152,3 +152,15 @@
   #df-tone-picker-card { padding:12px; }
   #completionAlertPickerHost .completion-alert-option { min-inline-size:0; }
 }
+
+
+/* ZERO-LATENCY TOUCH ENFORCEMENT */
+button, .btn, .nav-btn, .action-btn, [role="button"], .tab-btn {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    min-height: 48px !important;
+    min-width: 48px !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+

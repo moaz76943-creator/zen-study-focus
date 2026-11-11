@@ -467,3 +467,15 @@ html:lang(zh) .df-v22 { font-family: "Noto Sans CJK SC", system-ui, sans-serif; 
 html:lang(ja) .df-v22 { font-family: "Noto Sans CJK JP", system-ui, sans-serif; }
 html:lang(ko) .df-v22 { font-family: "Noto Sans CJK KR", system-ui, sans-serif; }
 html:lang(ur) .df-v22 { font-family: "Noto Nastaliq Urdu", "Noto Naskh Arabic", system-ui, sans-serif; line-height: 1.65; }
+
+
+/* ZERO-LATENCY TOUCH ENFORCEMENT */
+button, .btn, .nav-btn, .action-btn, [role="button"], .tab-btn {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    min-height: 48px !important;
+    min-width: 48px !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
