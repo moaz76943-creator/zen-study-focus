@@ -83794,3 +83794,8 @@ if (typeof EyesFreeHapticEngine !== "undefined") {
 if (typeof SessionAbortShield !== "undefined") {
     SessionAbortShield.init();
 }
+
+// [Task #681] Local Study Scheduler Initialization
+if (typeof LocalStudyScheduler !== "undefined") {
+    LocalStudyScheduler.init();
+}
