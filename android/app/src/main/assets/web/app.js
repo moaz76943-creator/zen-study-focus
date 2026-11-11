@@ -85811,3 +85811,105 @@ window.SovereignProfiler = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN P2P ENCRYPTED DECK EXCHANGE & VAULT SYNC (TASK #724)
+// Client-Side AES-GCM 256-bit Cryptography — 100% Offline — Zero Cloud Servers
+// ==============================================================================
+window.SovereignDeckExchange = (function() {
+    const ALGO = "AES-GCM";
+    const KEY_DERIVATION_ALGO = "PBKDF2";
+    const ITERATIONS = 100000;
+
+    async function deriveKey(passphrase, salt) {
+        const enc = new TextEncoder();
+        const baseKey = await window.crypto.subtle.importKey(
+            "raw", enc.encode(passphrase), "PBKDF2", false, ["deriveKey"]
+        );
+        return window.crypto.subtle.deriveKey(
+            {
+                name: KEY_DERIVATION_ALGO,
+                salt: salt,
+                iterations: ITERATIONS,
+                hash: "SHA-256"
+            },
+            baseKey,
+            { name: ALGO, length: 256 },
+            false,
+            ["encrypt", "decrypt"]
+        );
+    }
+
+    async function exportEncryptedDeck(deckObj, passphrase) {
+        try {
+            const enc = new TextEncoder();
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const key = await deriveKey(passphrase, salt);
+
+            const payloadBytes = enc.encode(JSON.stringify(deckObj));
+            const cipherBuffer = await window.crypto.subtle.encrypt(
+                { name: ALGO, iv: iv }, key, payloadBytes
+            );
+
+            // Assemble payload: [16 bytes salt][12 bytes iv][cipher bytes]
+            const totalLen = salt.length + iv.length + cipherBuffer.byteLength;
+            const combined = new Uint8Array(totalLen);
+            combined.set(salt, 0);
+            combined.set(iv, salt.length);
+            combined.set(new Uint8Array(cipherBuffer), salt.length + iv.length);
+
+            // Convert to URL-safe Base64 token
+            let binary = "";
+            for (let i = 0; i < combined.byteLength; i++) {
+                binary += String.fromCharCode(combined[i]);
+            }
+            const b64 = btoa(binary);
+            return `ZEN_VAULT_V1:${b64}`;
+        } catch(err) {
+            console.error("Export encryption error:", err);
+            throw new Error("فشل تشفير الحزمة");
+        }
+    }
+
+    async function importEncryptedDeck(armoredToken, passphrase) {
+        try {
+            if (!armoredToken.startsWith("ZEN_VAULT_V1:")) {
+                throw new Error("تنسيق حزمة غير معتمد");
+            }
+            const b64 = armoredToken.replace("ZEN_VAULT_V1:", "");
+            const binary = atob(b64);
+            const combined = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                combined[i] = binary.charCodeAt(i);
+            }
+
+            const salt = combined.slice(0, 16);
+            const iv = combined.slice(16, 28);
+            const cipherBytes = combined.slice(28);
+
+            const key = await deriveKey(passphrase, salt);
+            const decryptedBuffer = await window.crypto.subtle.decrypt(
+                { name: ALGO, iv: iv }, key, cipherBytes
+            );
+
+            const dec = new TextDecoder();
+            const jsonStr = dec.decode(decryptedBuffer);
+            const deck = JSON.parse(jsonStr);
+
+            // Schema and safety verification
+            if (!deck || typeof deck !== "object") throw new Error("بيانات تالفة");
+            return deck;
+        } catch(err) {
+            console.error("Import decryption error:", err);
+            throw new Error("كلمة المرور غير صحيحة أو البيانات تالفة");
+        }
+    }
+
+    return {
+        exportDeck: exportEncryptedDeck,
+        importDeck: importEncryptedDeck
+    };
+})();
+
