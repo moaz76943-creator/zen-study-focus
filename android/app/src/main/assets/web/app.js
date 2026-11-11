@@ -83723,3 +83723,8 @@ if (typeof ColorContrastHarmonizer !== "undefined") {
 if (typeof OfflineDataVault !== "undefined") {
     OfflineDataVault.init();
 }
+
+// [Task #664] Lifecycle Memory Sentinel Initialization
+if (typeof LifecycleMemorySentinel !== "undefined") {
+    LifecycleMemorySentinel.init();
+}
