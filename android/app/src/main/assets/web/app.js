@@ -85085,3 +85085,218 @@ window.SovereignChimes = (function() {
     return { playZenBowl: playZenBowl };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN NEURO-RESPIRATION STUDIO (TASK #718)
+// Real-Time Physiological Coherence & Cognitive Focus Regulation
+// ==============================================================================
+window.SovereignBreathing = (function() {
+    let animFrameId = null;
+    let isRunning = false;
+    let currentMode = "box";
+    let phaseStartTime = 0;
+    let currentPhaseIndex = 0;
+    let totalCyclesCompleted = 0;
+
+    // Strict Neutral Study Focus Patterns (Zero medical claims)
+    const PATTERNS = {
+        box: {
+            name: "مربع التركيز (Box 4-4-4-4)",
+            description: "توازن ذهني تام لصفاء الانتباه وتثبيت التركيز",
+            phases: [
+                { name: "شهيق", duration: 4000, scaleStart: 1.0, scaleEnd: 1.45, freq: 528 },
+                { name: "حبس", duration: 4000, scaleStart: 1.45, scaleEnd: 1.45, freq: 432 },
+                { name: "زفير", duration: 4000, scaleStart: 1.45, scaleEnd: 1.0, freq: 396 },
+                { name: "حبس", duration: 4000, scaleStart: 1.0, scaleEnd: 1.0, freq: 432 }
+            ]
+        },
+        relax: {
+            name: "استرخاء ذهني (Relax 4-7-8)",
+            description: "تهدئة التشتت وخفض فرط التيقظ قبل جلسات الحفظ العميقة",
+            phases: [
+                { name: "شهيق", duration: 4000, scaleStart: 1.0, scaleEnd: 1.45, freq: 528 },
+                { name: "حبس", duration: 7000, scaleStart: 1.45, scaleEnd: 1.45, freq: 432 },
+                { name: "زفير", duration: 8000, scaleStart: 1.45, scaleEnd: 1.0, freq: 396 }
+            ]
+        },
+        coherence: {
+            name: "تناغم عصبي (Coherence 5.5s)",
+            description: "مزامنة الإيقاع الحركي مع التركيز المتدفق بمعدل 5.5 ثوانٍ",
+            phases: [
+                { name: "شهيق", duration: 5500, scaleStart: 1.0, scaleEnd: 1.45, freq: 528 },
+                { name: "زفير", duration: 5500, scaleStart: 1.45, scaleEnd: 1.0, freq: 396 }
+            ]
+        }
+    };
+
+    // Procedural Sine Chime on Phase Transitions (Zero Music Policy)
+    function playPhaseChime(freq) {
+        if (!window.audioContext) return;
+        const ctx = window.audioContext;
+        if (ctx.state === "suspended") ctx.resume();
+        try {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
+
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+            // Smooth bell envelope (zero clipping)
+            gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.04);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.65);
+
+            osc.connect(gain);
+            gain.connect(dest);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 0.65);
+        } catch(e) {
+            console.warn("Audio cue error:", e);
+        }
+    }
+
+    // Trigger subtle haptic pulse if available
+    function triggerHaptic() {
+        if (typeof navigator !== "undefined" && navigator.vibrate) {
+            try { navigator.vibrate(35); } catch(e) {}
+        }
+    }
+
+    function updateUI(phase, elapsed, duration) {
+        const ring = document.getElementById("breathingVisualRing");
+        const phaseLabel = document.getElementById("breathingPhaseLabel");
+        const countdownLabel = document.getElementById("breathingCountdown");
+        const cycleLabel = document.getElementById("breathingCycleCount");
+
+        const progress = Math.min(1.0, elapsed / duration);
+        const currentScale = phase.scaleStart + (phase.scaleEnd - phase.scaleStart) * progress;
+
+        if (ring) {
+            ring.style.transform = `scale(${currentScale})`;
+            if (phase.name === "شهيق") {
+                ring.style.borderColor = "#4ade80";
+                ring.style.boxShadow = "0 0 25px rgba(74, 222, 128, 0.4)";
+            } else if (phase.name === "زفير") {
+                ring.style.borderColor = "#38bdf8";
+                ring.style.boxShadow = "0 0 25px rgba(56, 189, 248, 0.4)";
+            } else {
+                ring.style.borderColor = "#fbbf24";
+                ring.style.boxShadow = "0 0 20px rgba(251, 191, 36, 0.3)";
+            }
+        }
+
+        if (phaseLabel) {
+            phaseLabel.textContent = phase.name;
+        }
+
+        if (countdownLabel) {
+            const remainingSec = Math.ceil((duration - elapsed) / 1000);
+            countdownLabel.textContent = `${remainingSec}s`;
+        }
+
+        if (cycleLabel) {
+            cycleLabel.textContent = `الدورات: ${totalCyclesCompleted}`;
+        }
+    }
+
+    function loop(timestamp) {
+        if (!isRunning) return;
+
+        const pattern = PATTERNS[currentMode] || PATTERNS.box;
+        const currentPhase = pattern.phases[currentPhaseIndex];
+        const elapsed = timestamp - phaseStartTime;
+
+        if (elapsed >= currentPhase.duration) {
+            // Advance Phase
+            currentPhaseIndex = (currentPhaseIndex + 1) % pattern.phases.length;
+            if (currentPhaseIndex === 0) {
+                totalCyclesCompleted++;
+            }
+            phaseStartTime = timestamp;
+            const nextPhase = pattern.phases[currentPhaseIndex];
+            playPhaseChime(nextPhase.freq);
+            triggerHaptic();
+        }
+
+        updateUI(currentPhase, Math.min(elapsed, currentPhase.duration), currentPhase.duration);
+        animFrameId = requestAnimationFrame(loop);
+    }
+
+    function start(mode) {
+        if (mode && PATTERNS[mode]) currentMode = mode;
+        if (isRunning) return;
+        isRunning = true;
+        phaseStartTime = performance.now();
+        currentPhaseIndex = 0;
+        const pattern = PATTERNS[currentMode];
+        playPhaseChime(pattern.phases[0].freq);
+        triggerHaptic();
+        animFrameId = requestAnimationFrame(loop);
+
+        const btn = document.getElementById("breathingToggleBtn");
+        if (btn) btn.textContent = "إيقاف مؤقت";
+    }
+
+    function pause() {
+        isRunning = false;
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+        const btn = document.getElementById("breathingToggleBtn");
+        if (btn) btn.textContent = "استئناف";
+    }
+
+    function toggle() {
+        if (isRunning) {
+            pause();
+        } else {
+            start();
+        }
+    }
+
+    function reset() {
+        pause();
+        currentPhaseIndex = 0;
+        totalCyclesCompleted = 0;
+        const ring = document.getElementById("breathingVisualRing");
+        if (ring) {
+            ring.style.transform = "scale(1.0)";
+            ring.style.borderColor = "#4ade80";
+            ring.style.boxShadow = "none";
+        }
+        const phaseLabel = document.getElementById("breathingPhaseLabel");
+        if (phaseLabel) phaseLabel.textContent = "جاهز";
+        const countdownLabel = document.getElementById("breathingCountdown");
+        if (countdownLabel) countdownLabel.textContent = "0s";
+        const cycleLabel = document.getElementById("breathingCycleCount");
+        if (cycleLabel) cycleLabel.textContent = "الدورات: 0";
+        const btn = document.getElementById("breathingToggleBtn");
+        if (btn) btn.textContent = "بدء التنفس";
+    }
+
+    function setMode(mode) {
+        if (PATTERNS[mode]) {
+            currentMode = mode;
+            reset();
+            const desc = document.getElementById("breathingModeDesc");
+            if (desc) desc.textContent = PATTERNS[mode].description;
+            
+            // Update active pill button
+            document.querySelectorAll(".breathing-mode-pill").forEach(pill => {
+                pill.style.background = (pill.getAttribute("data-mode") === mode) ? "#222" : "transparent";
+                pill.style.borderColor = (pill.getAttribute("data-mode") === mode) ? "#4ade80" : "#333";
+            });
+        }
+    }
+
+    return {
+        start: start,
+        pause: pause,
+        toggle: toggle,
+        reset: reset,
+        setMode: setMode,
+        patterns: PATTERNS
+    };
+})();
+
