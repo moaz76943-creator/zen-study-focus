@@ -83873,3 +83873,41 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
     }
 })();
 
+
+
+/* SOVEREIGN WAKELOCK & AUDIO RESUME ENGINE */
+(function() {
+    let wakeLockSentinel = null;
+    async function requestScreenLock() {
+        try {
+            if ("wakeLock" in navigator) {
+                wakeLockSentinel = await navigator.wakeLock.request("screen");
+                console.log("🛡️ [WakeLock] Study session screen lock acquired.");
+            }
+        } catch (e) {
+            console.warn("⚠️ [WakeLock] Could not acquire lock:", e);
+        }
+    }
+    function releaseScreenLock() {
+        if (wakeLockSentinel) {
+            wakeLockSentinel.release().then(() => { wakeLockSentinel = null; });
+            console.log("🛡️ [WakeLock] Screen lock released.");
+        }
+    }
+    document.addEventListener("visibilitychange", async () => {
+        if (wakeLockSentinel !== null && document.visibilityState === "visible") {
+            await requestScreenLock();
+        }
+    });
+    // Auto-resume audio context defensively on user gestures
+    window.addEventListener("pointerdown", () => {
+        if (window.audioContext && window.audioContext.state === "suspended") {
+            window.audioContext.resume();
+        }
+    }, { passive: true });
+    window.requestScreenLock = requestScreenLock;
+    window.releaseScreenLock = releaseScreenLock;
+    // Activate screen lock automatically on load
+    requestScreenLock();
+})();
+
