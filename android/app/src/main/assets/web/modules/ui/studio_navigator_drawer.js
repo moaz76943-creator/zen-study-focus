@@ -140,7 +140,8 @@
             else this.openDrawer();
         },
 
-        openDrawer: function () {
+        openDrawer: function() {
+            if (window.UniversalI18nHotSwap && window.UniversalI18nHotSwap.activeDictionary) { window.UniversalI18nHotSwap.sweepDom(window.UniversalI18nHotSwap.activeDictionary); }
             const overlay = document.getElementById("zenStudioDrawerOverlay");
             if (!overlay) return;
             overlay.style.display = "block";
