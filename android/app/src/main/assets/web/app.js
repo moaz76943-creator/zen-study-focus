@@ -86480,3 +86480,89 @@ window.SovereignLocaleResolver = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN AUDIOCONTEXT INTERRUPTION GUARDIAN (TASK #730)
+// Auto-Resumes DSP Pipeline After Phone Calls, Sleep, or Bluetooth Disconnects
+// ==============================================================================
+window.SovereignAudioGuardian = (function() {
+    let recoveryCount = 0;
+    let isBound = false;
+
+    async function attemptResume(triggerSource) {
+        const ctx = window.audioContext;
+        if (!ctx) return false;
+
+        if (ctx.state === "suspended" || ctx.state === "interrupted") {
+            try {
+                await ctx.resume();
+                recoveryCount++;
+                console.log(`🔊 [AudioGuardian] Resumed AudioContext (${ctx.state}) via ${triggerSource} [Recoveries: ${recoveryCount}]`);
+                return true;
+            } catch (err) {
+                console.warn("⚠️ [AudioGuardian] Resume deferred until next user gesture:", err);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function bindAudioStateWatcher() {
+        const ctx = window.audioContext;
+        if (ctx && !ctx._guardianAttached) {
+            ctx._guardianAttached = true;
+            ctx.addEventListener("statechange", () => {
+                if (ctx.state === "interrupted" || ctx.state === "suspended") {
+                    if (!document.hidden) {
+                        attemptResume("statechange");
+                    }
+                }
+            });
+        }
+    }
+
+    function init() {
+        if (isBound) return;
+        isBound = true;
+
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) {
+                bindAudioStateWatcher();
+                attemptResume("visibilitychange");
+            }
+        });
+
+        window.addEventListener("focus", () => {
+            bindAudioStateWatcher();
+            attemptResume("window-focus");
+        });
+
+        window.addEventListener("pageshow", () => {
+            bindAudioStateWatcher();
+            attemptResume("pageshow");
+        });
+
+        // First-touch unlock & recovery fallback
+        ["touchstart", "pointerdown", "keydown"].forEach(evt => {
+            document.addEventListener(evt, () => {
+                bindAudioStateWatcher();
+                attemptResume(evt);
+            }, { passive: true });
+        });
+
+        console.log("🛡️ [AudioGuardian] Interruption & Bluetooth auto-recovery armed.");
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+
+    return {
+        resumeNow: () => attemptResume("manual"),
+        getRecoveryCount: () => recoveryCount
+    };
+})();
+

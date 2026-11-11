@@ -1388,6 +1388,28 @@ body {
     }
     </style>
 
+
+    <!-- ACCESSIBILITY FONT-SCALE GUARD (TASK #730) -->
+    <style id="accessibilityFontScaleGuard">
+    button, .btn, [role="button"] {
+        min-height: 48px;
+        height: auto !important;
+        line-height: 1.4;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+    p, span, label, h1, h2, h3, div {
+        overflow-wrap: anywhere;
+    }
+    .card, [id$="Container"], [id$="Controls"], [id$="Panel"] {
+        height: auto !important;
+        min-height: fit-content;
+    }
+    </style>
+
 </head>
 <body>
 
