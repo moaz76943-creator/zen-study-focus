@@ -86422,3 +86422,61 @@ window.SovereignStressAudit = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN BUNDLED LOCALE RESOLVER (TASK #729)
+// O(1) Core-20 Fast Path + Lazy Regional Pack Loader (100% Offline, Zero Net)
+// ==============================================================================
+window.SovereignLocaleResolver = (function() {
+    const packCache = {};
+    let manifestCache = null;
+
+    async function loadManifest() {
+        if (manifestCache) return manifestCache;
+        try {
+            const resp = await fetch("locale_packs/manifest.json");
+            if (resp.ok) {
+                manifestCache = await resp.json();
+                return manifestCache;
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    async function loadPack(packName) {
+        if (packCache[packName]) return packCache[packName];
+        const resp = await fetch("locale_packs/" + packName);
+        if (!resp.ok) throw new Error("Pack not found: " + packName);
+        const data = await resp.json();
+        packCache[packName] = data;
+        return data;
+    }
+
+    async function getLocale(langCode) {
+        try {
+            // 1. Try Core-20 fast bundle first
+            const core = await loadPack("core_20.json");
+            if (core && core[langCode]) return core[langCode];
+
+            // 2. Lookup regional pack via manifest index
+            const manifest = await loadManifest();
+            if (manifest && manifest.index && manifest.index[langCode]) {
+                const pack = await loadPack(manifest.index[langCode]);
+                if (pack && pack[langCode]) return pack[langCode];
+            }
+        } catch (e) {
+            console.warn("Locale pack fallback to individual file:", langCode);
+        }
+
+        // 3. Legacy individual file fallback
+        const resp = await fetch("locales/" + langCode + ".json");
+        return resp.ok ? await resp.json() : null;
+    }
+
+    return {
+        getLocale: getLocale,
+        getCacheStats: () => ({ cachedPacks: Object.keys(packCache).length })
+    };
+})();
+
