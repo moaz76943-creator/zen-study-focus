@@ -86566,3 +86566,76 @@ window.SovereignAudioGuardian = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN DELTA-TIME ANIMATION SCHEDULER & TALKBACK ARIA GUARD (TASK #731)
+// Frame-Rate Independent Timing (60Hz Battery Saver <-> 144Hz Flagship AMOLED)
+// ==============================================================================
+window.SovereignDeltaClock = (function() {
+    let subscribers = [];
+    let lastTimestamp = performance.now();
+    let rafId = null;
+
+    function tick(now) {
+        // Clamp dt to 100ms max to prevent huge jumps after OS backgrounding
+        const dtMs = Math.min(100, Math.max(0, now - lastTimestamp));
+        lastTimestamp = now;
+
+        subscribers.forEach(fn => {
+            try { fn(dtMs, now); } catch (e) {}
+        });
+
+        if (subscribers.length > 0) {
+            rafId = requestAnimationFrame(tick);
+        } else {
+            rafId = null;
+        }
+    }
+
+    function subscribe(fn) {
+        if (typeof fn !== "function") return;
+        if (!subscribers.includes(fn)) {
+            subscribers.push(fn);
+        }
+        if (!rafId) {
+            lastTimestamp = performance.now();
+            rafId = requestAnimationFrame(tick);
+        }
+    }
+
+    function unsubscribe(fn) {
+        subscribers = subscribers.filter(s => s !== fn);
+    }
+
+    function applyAriaLabels() {
+        const ariaMap = {
+            "testFibonacciChimeBtn": "تجربة رنين فيبوناتشي التوافقي بتردد 432 هرتز",
+            "toggleBinauralAlphaBtn": "تفعيل أو إيقاف تيار التردد الثنائي 10 هرتز ألفا",
+            "profilerTriggerBtn": "فتح أو إغلاق لوحة تشخيص الأداء العتادي",
+            "deckExchangeTriggerBtn": "فتح نافذة تبادل حزم البطاقات المشفرة",
+            "healthHubTriggerBtn": "تشغيل فحص الصيانة الدوري للنظام",
+            "runStressAuditBtn": "تشغيل اختبار التحمل الإجهادي وتنظيف التخزين",
+            "toggleSpectrumBtn": "تفعيل أو إخفاء محلل الطيف الترددي الصوتي"
+        };
+        Object.keys(ariaMap).forEach(id => {
+            const el = document.getElementById(id);
+            if (el && !el.getAttribute("aria-label")) {
+                el.setAttribute("aria-label", ariaMap[id]);
+            }
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", applyAriaLabels);
+    } else {
+        applyAriaLabels();
+    }
+
+    return {
+        subscribe: subscribe,
+        unsubscribe: unsubscribe,
+        applyAriaLabels: applyAriaLabels
+    };
+})();
+
