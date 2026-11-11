@@ -83783,3 +83783,8 @@ if (typeof BatteryThermalGuard !== "undefined") {
 if (typeof EyesFreeHapticEngine !== "undefined") {
     EyesFreeHapticEngine.init();
 }
+
+// [Task #679] Session Abort Shield Initialization
+if (typeof SessionAbortShield !== "undefined") {
+    SessionAbortShield.init();
+}
