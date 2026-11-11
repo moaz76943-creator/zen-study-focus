@@ -83911,3 +83911,34 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
     requestScreenLock();
 })();
 
+
+
+/* MASTER AUDIO DYNAMICS COMPRESSOR */
+(function() {
+    if (typeof window !== "undefined") {
+        window.getSafeAudioDestination = function(ctx) {
+            if (!ctx) return null;
+            if (!ctx._masterCompressor) {
+                try {
+                    const comp = ctx.createDynamicsCompressor();
+                    comp.threshold.setValueAtTime(-14, ctx.currentTime);
+                    comp.knee.setValueAtTime(35, ctx.currentTime);
+                    comp.ratio.setValueAtTime(12, ctx.currentTime);
+                    comp.attack.setValueAtTime(0.003, ctx.currentTime);
+                    comp.release.setValueAtTime(0.25, ctx.currentTime);
+                    comp.connect(ctx.destination);
+                    ctx._masterCompressor = comp;
+                    console.log("🛡️ [WebAudio] Master DynamicsCompressor attached to prevent digital clipping.");
+                } catch(e) {
+                    console.warn("⚠️ [WebAudio] DynamicsCompressor initialization fallback:", e);
+                    return ctx.destination;
+                }
+            }
+            return ctx._masterCompressor;
+        };
+        if (window.audioContext) {
+            window.getSafeAudioDestination(window.audioContext);
+        }
+    }
+})();
+
