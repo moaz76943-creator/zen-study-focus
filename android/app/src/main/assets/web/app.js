@@ -83743,3 +83743,8 @@ if (typeof MicroscopicUIPolisher !== "undefined") {
 if (typeof HighDpiCanvasScaler !== "undefined") {
     HighDpiCanvasScaler.init();
 }
+
+// [Task #671] Physiological Respiration Pacer Initialization
+if (typeof PhysiologicalRespirationPacer !== "undefined") {
+    PhysiologicalRespirationPacer.init();
+}
