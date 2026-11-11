@@ -7,3 +7,14 @@ body{font-family:sans-serif}
 button{min-width:48px;min-height:48px}
 button{padding:12px;background:#18181b}
 button:focus{outline:3px solid #10b981}
+
+/* ZERO-LATENCY TOUCH ENFORCEMENT */
+button, .btn, .nav-btn, .action-btn, [role="button"], .tab-btn {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    min-height: 48px !important;
+    min-width: 48px !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
