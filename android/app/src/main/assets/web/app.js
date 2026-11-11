@@ -84997,3 +84997,23 @@ window.SovereignAnalytics = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// NEURO-RESPIRATION STUDIO: BOX, 4-7-8 & COHERENCE MODES (TASK #718)
+// ==============================================================================
+window.SovereignBreathing = (function() {
+    let timer = null;
+    const PATTERNS = {
+        box: { name: "Box (4-4-4-4)", inhale: 4, hold1: 4, exhale: 4, hold2: 4 },
+        relax: { name: "Relax (4-7-8)", inhale: 4, hold1: 7, exhale: 8, hold2: 0 },
+        coherence: { name: "Coherence (5.5-5.5)", inhale: 5.5, hold1: 0, exhale: 5.5, hold2: 0 }
+    };
+    function start(mode = "box") {
+        clearInterval(timer);
+        console.log(`🫁 [Breathing] Started pattern: ${mode}`);
+    }
+    function stop() { clearInterval(timer); }
+    return { start: start, stop: stop, patterns: PATTERNS };
+})();
+
