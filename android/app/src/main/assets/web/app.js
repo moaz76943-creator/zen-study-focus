@@ -83810,3 +83810,8 @@ if (typeof LocalStudyScheduler !== "undefined") {
 if (typeof FourButtonDensityEnforcer !== "undefined") {
     FourButtonDensityEnforcer.init();
 }
+
+// [Task #684] Universal i18n HotSwap Initialization
+if (typeof UniversalI18nHotSwap !== "undefined") {
+    UniversalI18nHotSwap.init();
+}
