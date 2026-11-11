@@ -1,0 +1,12 @@
+{
+  "duplicateDomIds": [],
+  "unhandledJsonParseRisks": 0,
+  "mobileViewportSafeDvh": "OK (100dvh configured)",
+  "safeAreaInsetsConfigured": "OK",
+  "androidPermissions": [
+    "android.permission.VIBRATE",
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.RECEIVE_BOOT_COMPLETED"
+  ],
+  "auditedAt": "2026-11-11T00:29:16.030Z"
+}
