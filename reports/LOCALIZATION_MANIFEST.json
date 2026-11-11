@@ -1,10 +1,10 @@
 {
   "app": "DEEP FOCUS (Sovereign Offline Study OS)",
-  "version": "v501.0.0",
-  "code": 41221,
+  "version": "v502.0.0",
+  "code": 41222,
   "totalTargetLanguages": 1000,
-  "totalLocalizedSoFar": 327,
-  "completionPercentage": "32.70%",
+  "totalLocalizedSoFar": 473,
+  "completionPercentage": "47.30%",
   "excludedBannedLanguages": [
     "he",
     "iw",
@@ -1169,6 +1169,1028 @@
       "file": "locales/iso_332.json"
     },
     {
+      "code": "iso_351",
+      "name": "Afar",
+      "english": "Qafaraf Language",
+      "dir": "ltr",
+      "file": "locales/iso_351.json"
+    },
+    {
+      "code": "iso_352",
+      "name": "Aghem",
+      "english": "Wùm Language",
+      "dir": "ltr",
+      "file": "locales/iso_352.json"
+    },
+    {
+      "code": "iso_353",
+      "name": "Akoose",
+      "english": "Akɔɔsə Language",
+      "dir": "ltr",
+      "file": "locales/iso_353.json"
+    },
+    {
+      "code": "iso_354",
+      "name": "Anii",
+      "english": "Gisida Language",
+      "dir": "ltr",
+      "file": "locales/iso_354.json"
+    },
+    {
+      "code": "iso_355",
+      "name": "Arapaho",
+      "english": "Hinónoʼeitíít Language",
+      "dir": "ltr",
+      "file": "locales/iso_355.json"
+    },
+    {
+      "code": "iso_356",
+      "name": "Asturian",
+      "english": "Asturianu Language",
+      "dir": "ltr",
+      "file": "locales/iso_356.json"
+    },
+    {
+      "code": "iso_357",
+      "name": "Atikamekw",
+      "english": "Atikamekw Language",
+      "dir": "ltr",
+      "file": "locales/iso_357.json"
+    },
+    {
+      "code": "iso_358",
+      "name": "Awing",
+      "english": "Mbweʼwi Language",
+      "dir": "ltr",
+      "file": "locales/iso_358.json"
+    },
+    {
+      "code": "iso_359",
+      "name": "Badaga",
+      "english": "படகா Language",
+      "dir": "ltr",
+      "file": "locales/iso_359.json"
+    },
+    {
+      "code": "iso_360",
+      "name": "Bafia",
+      "english": "Rikpa Language",
+      "dir": "ltr",
+      "file": "locales/iso_360.json"
+    },
+    {
+      "code": "iso_361",
+      "name": "Bafut",
+      "english": "Fut Language",
+      "dir": "ltr",
+      "file": "locales/iso_361.json"
+    },
+    {
+      "code": "iso_362",
+      "name": "Baka",
+      "english": "Baka Language",
+      "dir": "ltr",
+      "file": "locales/iso_362.json"
+    },
+    {
+      "code": "iso_363",
+      "name": "Basaa",
+      "english": "Mbene Language",
+      "dir": "ltr",
+      "file": "locales/iso_363.json"
+    },
+    {
+      "code": "iso_364",
+      "name": "Batak Karo",
+      "english": "Karo Language",
+      "dir": "ltr",
+      "file": "locales/iso_364.json"
+    },
+    {
+      "code": "iso_365",
+      "name": "Batak Toba",
+      "english": "Toba Language",
+      "dir": "ltr",
+      "file": "locales/iso_365.json"
+    },
+    {
+      "code": "iso_366",
+      "name": "Bena",
+      "english": "Ikibena Language",
+      "dir": "ltr",
+      "file": "locales/iso_366.json"
+    },
+    {
+      "code": "iso_367",
+      "name": "Betawi",
+      "english": "Melayu Betawi Language",
+      "dir": "ltr",
+      "file": "locales/iso_367.json"
+    },
+    {
+      "code": "iso_368",
+      "name": "Bhojpuri Western",
+      "english": "भोजपुरी Language",
+      "dir": "ltr",
+      "file": "locales/iso_368.json"
+    },
+    {
+      "code": "iso_369",
+      "name": "Blin",
+      "english": "ብሊና Language",
+      "dir": "ltr",
+      "file": "locales/iso_369.json"
+    },
+    {
+      "code": "iso_370",
+      "name": "Bodo",
+      "english": "बरʼ Language",
+      "dir": "ltr",
+      "file": "locales/iso_370.json"
+    },
+    {
+      "code": "iso_371",
+      "name": "Bribri",
+      "english": "Bri-bri Language",
+      "dir": "ltr",
+      "file": "locales/iso_371.json"
+    },
+    {
+      "code": "iso_372",
+      "name": "Buginese South",
+      "english": "Basa Ugi Language",
+      "dir": "ltr",
+      "file": "locales/iso_372.json"
+    },
+    {
+      "code": "iso_373",
+      "name": "Cahuilla",
+      "english": "ʻÍvilyuat Language",
+      "dir": "ltr",
+      "file": "locales/iso_373.json"
+    },
+    {
+      "code": "iso_374",
+      "name": "Cantonese",
+      "english": "廣東話 Language",
+      "dir": "ltr",
+      "file": "locales/iso_374.json"
+    },
+    {
+      "code": "iso_375",
+      "name": "Carrier",
+      "english": "Dakelh Language",
+      "dir": "ltr",
+      "file": "locales/iso_375.json"
+    },
+    {
+      "code": "iso_376",
+      "name": "Cayuga",
+      "english": "Goyogo̱hó:nǫʼ Language",
+      "dir": "ltr",
+      "file": "locales/iso_376.json"
+    },
+    {
+      "code": "iso_377",
+      "name": "Chiga",
+      "english": "Rukiga Language",
+      "dir": "ltr",
+      "file": "locales/iso_377.json"
+    },
+    {
+      "code": "iso_378",
+      "name": "Chipewyan",
+      "english": "Dënesųłı̨né Language",
+      "dir": "ltr",
+      "file": "locales/iso_378.json"
+    },
+    {
+      "code": "iso_379",
+      "name": "Choctaw",
+      "english": "Chahta Language",
+      "dir": "ltr",
+      "file": "locales/iso_379.json"
+    },
+    {
+      "code": "iso_380",
+      "name": "Chukchi",
+      "english": "Ԓыгъоравэтԓьэн Language",
+      "dir": "ltr",
+      "file": "locales/iso_380.json"
+    },
+    {
+      "code": "iso_381",
+      "name": "Chuukese",
+      "english": "Fosun Chuuk Language",
+      "dir": "ltr",
+      "file": "locales/iso_381.json"
+    },
+    {
+      "code": "iso_382",
+      "name": "Comorian",
+      "english": "Shikomori Language",
+      "dir": "ltr",
+      "file": "locales/iso_382.json"
+    },
+    {
+      "code": "iso_383",
+      "name": "Coptic",
+      "english": "ϯⲙⲉⲧⲣⲉⲙⲛ̀ⲭⲏⲙⲓ Language",
+      "dir": "ltr",
+      "file": "locales/iso_383.json"
+    },
+    {
+      "code": "iso_384",
+      "name": "Cree Plains",
+      "english": "Nehiyawewin Language",
+      "dir": "ltr",
+      "file": "locales/iso_384.json"
+    },
+    {
+      "code": "iso_385",
+      "name": "Creek",
+      "english": "Mvskoke Language",
+      "dir": "ltr",
+      "file": "locales/iso_385.json"
+    },
+    {
+      "code": "iso_386",
+      "name": "Crimean Tatar",
+      "english": "Qırımtatarca Language",
+      "dir": "ltr",
+      "file": "locales/iso_386.json"
+    },
+    {
+      "code": "iso_387",
+      "name": "Dakota",
+      "english": "Dakȟótiyapi Language",
+      "dir": "ltr",
+      "file": "locales/iso_387.json"
+    },
+    {
+      "code": "iso_388",
+      "name": "Delaware",
+      "english": "Lenape Language",
+      "dir": "ltr",
+      "file": "locales/iso_388.json"
+    },
+    {
+      "code": "iso_389",
+      "name": "Dogri East",
+      "english": "डोगरी Language",
+      "dir": "ltr",
+      "file": "locales/iso_389.json"
+    },
+    {
+      "code": "iso_390",
+      "name": "Duala",
+      "english": "Duálá Language",
+      "dir": "ltr",
+      "file": "locales/iso_390.json"
+    },
+    {
+      "code": "iso_391",
+      "name": "Dungan",
+      "english": "Хуэйзў йүян Language",
+      "dir": "ltr",
+      "file": "locales/iso_391.json"
+    },
+    {
+      "code": "iso_392",
+      "name": "Embu",
+      "english": "Kīembu Language",
+      "dir": "ltr",
+      "file": "locales/iso_392.json"
+    },
+    {
+      "code": "iso_393",
+      "name": "Fang",
+      "english": "Fañ Language",
+      "dir": "ltr",
+      "file": "locales/iso_393.json"
+    },
+    {
+      "code": "iso_394",
+      "name": "Fanti",
+      "english": "Mfantse Language",
+      "dir": "ltr",
+      "file": "locales/iso_394.json"
+    },
+    {
+      "code": "iso_395",
+      "name": "Friulian Carnic",
+      "english": "Furlan Cjargnel Language",
+      "dir": "ltr",
+      "file": "locales/iso_395.json"
+    },
+    {
+      "code": "iso_396",
+      "name": "Gagauz",
+      "english": "Gagauzça Language",
+      "dir": "ltr",
+      "file": "locales/iso_396.json"
+    },
+    {
+      "code": "iso_397",
+      "name": "Garifuna",
+      "english": "Garifuna Language",
+      "dir": "ltr",
+      "file": "locales/iso_397.json"
+    },
+    {
+      "code": "iso_398",
+      "name": "Gayo",
+      "english": "Basa Gayo Language",
+      "dir": "ltr",
+      "file": "locales/iso_398.json"
+    },
+    {
+      "code": "iso_399",
+      "name": "Gheg",
+      "english": "Gegnisht Language",
+      "dir": "ltr",
+      "file": "locales/iso_399.json"
+    },
+    {
+      "code": "iso_400",
+      "name": "Gilbertese",
+      "english": "Taetae ni Kiribati Language",
+      "dir": "ltr",
+      "file": "locales/iso_400.json"
+    },
+    {
+      "code": "iso_401",
+      "name": "Gondi",
+      "english": "गोण्डी Language",
+      "dir": "ltr",
+      "file": "locales/iso_401.json"
+    },
+    {
+      "code": "iso_402",
+      "name": "Gorontalo",
+      "english": "Bahasa Hulontalo Language",
+      "dir": "ltr",
+      "file": "locales/iso_402.json"
+    },
+    {
+      "code": "iso_403",
+      "name": "Grebo",
+      "english": "Glebo Language",
+      "dir": "ltr",
+      "file": "locales/iso_403.json"
+    },
+    {
+      "code": "iso_404",
+      "name": "Gwichin",
+      "english": "Gwichʼin Language",
+      "dir": "ltr",
+      "file": "locales/iso_404.json"
+    },
+    {
+      "code": "iso_405",
+      "name": "Haida",
+      "english": "X̱aat Kíl Language",
+      "dir": "ltr",
+      "file": "locales/iso_405.json"
+    },
+    {
+      "code": "iso_406",
+      "name": "Hani",
+      "english": "Haqniq Language",
+      "dir": "ltr",
+      "file": "locales/iso_406.json"
+    },
+    {
+      "code": "iso_407",
+      "name": "Hazaragi South",
+      "english": "هزارگی Language",
+      "dir": "ltr",
+      "file": "locales/iso_407.json"
+    },
+    {
+      "code": "iso_408",
+      "name": "Hiligaynon West",
+      "english": "Ilonggo Language",
+      "dir": "ltr",
+      "file": "locales/iso_408.json"
+    },
+    {
+      "code": "iso_409",
+      "name": "Hmong",
+      "english": "Hmoob Language",
+      "dir": "ltr",
+      "file": "locales/iso_409.json"
+    },
+    {
+      "code": "iso_410",
+      "name": "Hopi",
+      "english": "Hopílavayi Language",
+      "dir": "ltr",
+      "file": "locales/iso_410.json"
+    },
+    {
+      "code": "iso_411",
+      "name": "Hupa",
+      "english": "Na:tini-xwe Language",
+      "dir": "ltr",
+      "file": "locales/iso_411.json"
+    },
+    {
+      "code": "iso_412",
+      "name": "Iban",
+      "english": "Jaku Iban Language",
+      "dir": "ltr",
+      "file": "locales/iso_412.json"
+    },
+    {
+      "code": "iso_413",
+      "name": "Ilocano North",
+      "english": "Ilokano Language",
+      "dir": "ltr",
+      "file": "locales/iso_413.json"
+    },
+    {
+      "code": "iso_414",
+      "name": "Ingush East",
+      "english": "ГӀалгӀай Language",
+      "dir": "ltr",
+      "file": "locales/iso_414.json"
+    },
+    {
+      "code": "iso_415",
+      "name": "Innu",
+      "english": "Innu-aimun Language",
+      "dir": "ltr",
+      "file": "locales/iso_415.json"
+    },
+    {
+      "code": "iso_416",
+      "name": "Iraqw",
+      "english": "Iraqw Language",
+      "dir": "ltr",
+      "file": "locales/iso_416.json"
+    },
+    {
+      "code": "iso_417",
+      "name": "Ivatan",
+      "english": "Chirin nu Ibatan Language",
+      "dir": "ltr",
+      "file": "locales/iso_417.json"
+    },
+    {
+      "code": "iso_418",
+      "name": "Jju",
+      "english": "Tyap Language",
+      "dir": "ltr",
+      "file": "locales/iso_418.json"
+    },
+    {
+      "code": "iso_419",
+      "name": "Jola-Fonyi",
+      "english": "Kújay Language",
+      "dir": "ltr",
+      "file": "locales/iso_419.json"
+    },
+    {
+      "code": "iso_420",
+      "name": "Kabardian East",
+      "english": "Адыгэбзэ Language",
+      "dir": "ltr",
+      "file": "locales/iso_420.json"
+    },
+    {
+      "code": "iso_421",
+      "name": "Kabuverdianu",
+      "english": "Kriolu Language",
+      "dir": "ltr",
+      "file": "locales/iso_421.json"
+    },
+    {
+      "code": "iso_422",
+      "name": "Kachin",
+      "english": "Jinghpaw Language",
+      "dir": "ltr",
+      "file": "locales/iso_422.json"
+    },
+    {
+      "code": "iso_423",
+      "name": "Kaingang",
+      "english": "Kanhgág Language",
+      "dir": "ltr",
+      "file": "locales/iso_423.json"
+    },
+    {
+      "code": "iso_424",
+      "name": "Kako",
+      "english": "Kaka Language",
+      "dir": "ltr",
+      "file": "locales/iso_424.json"
+    },
+    {
+      "code": "iso_425",
+      "name": "Kalmyk Volga",
+      "english": "Хальмг Language",
+      "dir": "ltr",
+      "file": "locales/iso_425.json"
+    },
+    {
+      "code": "iso_426",
+      "name": "Kamba East",
+      "english": "Kikamba Language",
+      "dir": "ltr",
+      "file": "locales/iso_426.json"
+    },
+    {
+      "code": "iso_427",
+      "name": "Kangean",
+      "english": "Basa Kangean Language",
+      "dir": "ltr",
+      "file": "locales/iso_427.json"
+    },
+    {
+      "code": "iso_428",
+      "name": "Kapampangan South",
+      "english": "Amanung Sisuan Language",
+      "dir": "ltr",
+      "file": "locales/iso_428.json"
+    },
+    {
+      "code": "iso_429",
+      "name": "Karachay North",
+      "english": "Къарачай Language",
+      "dir": "ltr",
+      "file": "locales/iso_429.json"
+    },
+    {
+      "code": "iso_430",
+      "name": "Karakalpak",
+      "english": "Qaraqalpaqsha Language",
+      "dir": "ltr",
+      "file": "locales/iso_430.json"
+    },
+    {
+      "code": "iso_431",
+      "name": "Karelian Olonets",
+      "english": "Livvin kieli Language",
+      "dir": "ltr",
+      "file": "locales/iso_431.json"
+    },
+    {
+      "code": "iso_432",
+      "name": "Karo Batak",
+      "english": "Cakap Karo Language",
+      "dir": "ltr",
+      "file": "locales/iso_432.json"
+    },
+    {
+      "code": "iso_433",
+      "name": "Kashubian",
+      "english": "Kaszëbsczi Language",
+      "dir": "ltr",
+      "file": "locales/iso_433.json"
+    },
+    {
+      "code": "iso_434",
+      "name": "Kawi",
+      "english": "Basa Kawi Language",
+      "dir": "ltr",
+      "file": "locales/iso_434.json"
+    },
+    {
+      "code": "iso_435",
+      "name": "Kekchi",
+      "english": "Qʼeqchiʼ Language",
+      "dir": "ltr",
+      "file": "locales/iso_435.json"
+    },
+    {
+      "code": "iso_436",
+      "name": "Khasi Hills",
+      "english": "Khasi Language",
+      "dir": "ltr",
+      "file": "locales/iso_436.json"
+    },
+    {
+      "code": "iso_437",
+      "name": "Khowar",
+      "english": "کھوار Language",
+      "dir": "ltr",
+      "file": "locales/iso_437.json"
+    },
+    {
+      "code": "iso_438",
+      "name": "Kikuyu Central",
+      "english": "Gĩkũyũ Language",
+      "dir": "ltr",
+      "file": "locales/iso_438.json"
+    },
+    {
+      "code": "iso_439",
+      "name": "Kipsigis",
+      "english": "Kipsikis Language",
+      "dir": "ltr",
+      "file": "locales/iso_439.json"
+    },
+    {
+      "code": "iso_440",
+      "name": "Konkani South",
+      "english": "कोंकणी Language",
+      "dir": "ltr",
+      "file": "locales/iso_440.json"
+    },
+    {
+      "code": "iso_441",
+      "name": "Koryak",
+      "english": "Нымылан Language",
+      "dir": "ltr",
+      "file": "locales/iso_441.json"
+    },
+    {
+      "code": "iso_442",
+      "name": "Kosraean",
+      "english": "Kosrae Language",
+      "dir": "ltr",
+      "file": "locales/iso_442.json"
+    },
+    {
+      "code": "iso_443",
+      "name": "Kpelle",
+      "english": "Kpɛlɛɛ Language",
+      "dir": "ltr",
+      "file": "locales/iso_443.json"
+    },
+    {
+      "code": "iso_444",
+      "name": "Krio",
+      "english": "Krio Language",
+      "dir": "ltr",
+      "file": "locales/iso_444.json"
+    },
+    {
+      "code": "iso_445",
+      "name": "Kumyk Caspian",
+      "english": "Къумукъ Language",
+      "dir": "ltr",
+      "file": "locales/iso_445.json"
+    },
+    {
+      "code": "iso_446",
+      "name": "Ladakhi",
+      "english": "ལ་དྭགས་སྐད་ Language",
+      "dir": "ltr",
+      "file": "locales/iso_446.json"
+    },
+    {
+      "code": "iso_447",
+      "name": "Ladin",
+      "english": "Ladin Language",
+      "dir": "ltr",
+      "file": "locales/iso_447.json"
+    },
+    {
+      "code": "iso_448",
+      "name": "Lahnda",
+      "english": "لہندا Language",
+      "dir": "ltr",
+      "file": "locales/iso_448.json"
+    },
+    {
+      "code": "iso_449",
+      "name": "Laki",
+      "english": "لەکی Language",
+      "dir": "ltr",
+      "file": "locales/iso_449.json"
+    },
+    {
+      "code": "iso_450",
+      "name": "Lamba Copperbelt",
+      "english": "Ichilamba Language",
+      "dir": "ltr",
+      "file": "locales/iso_450.json"
+    },
+    {
+      "code": "iso_451",
+      "name": "Lamnso",
+      "english": "Lamnsoʼ Language",
+      "dir": "ltr",
+      "file": "locales/iso_451.json"
+    },
+    {
+      "code": "iso_452",
+      "name": "Langi",
+      "english": "Leb-Lango Language",
+      "dir": "ltr",
+      "file": "locales/iso_452.json"
+    },
+    {
+      "code": "iso_453",
+      "name": "Latgalian",
+      "english": "Latgalīšu Language",
+      "dir": "ltr",
+      "file": "locales/iso_453.json"
+    },
+    {
+      "code": "iso_454",
+      "name": "Lezghian South",
+      "english": "Лезги Language",
+      "dir": "ltr",
+      "file": "locales/iso_454.json"
+    },
+    {
+      "code": "iso_455",
+      "name": "Ligurian",
+      "english": "Lìgure Language",
+      "dir": "ltr",
+      "file": "locales/iso_455.json"
+    },
+    {
+      "code": "iso_456",
+      "name": "Livonian Courland",
+      "english": "Līvõ Language",
+      "dir": "ltr",
+      "file": "locales/iso_456.json"
+    },
+    {
+      "code": "iso_457",
+      "name": "Lojban",
+      "english": "la .lojban. Language",
+      "dir": "ltr",
+      "file": "locales/iso_457.json"
+    },
+    {
+      "code": "iso_458",
+      "name": "Low German",
+      "english": "Plattdüütsch Language",
+      "dir": "ltr",
+      "file": "locales/iso_458.json"
+    },
+    {
+      "code": "iso_459",
+      "name": "Lower Sorbian",
+      "english": "Dolnoserbski Language",
+      "dir": "ltr",
+      "file": "locales/iso_459.json"
+    },
+    {
+      "code": "iso_460",
+      "name": "Lozi Zambezi",
+      "english": "Silozi Language",
+      "dir": "ltr",
+      "file": "locales/iso_460.json"
+    },
+    {
+      "code": "iso_461",
+      "name": "Luba-Lulua",
+      "english": "Tshiluba Language",
+      "dir": "ltr",
+      "file": "locales/iso_461.json"
+    },
+    {
+      "code": "iso_462",
+      "name": "Luhya Western",
+      "english": "Oluluyia Language",
+      "dir": "ltr",
+      "file": "locales/iso_462.json"
+    },
+    {
+      "code": "iso_463",
+      "name": "Luo Nyanza",
+      "english": "Dholuo Language",
+      "dir": "ltr",
+      "file": "locales/iso_463.json"
+    },
+    {
+      "code": "iso_464",
+      "name": "Lushai",
+      "english": "Mizo ṭawng Language",
+      "dir": "ltr",
+      "file": "locales/iso_464.json"
+    },
+    {
+      "code": "iso_465",
+      "name": "Maay",
+      "english": "Af-Maay Language",
+      "dir": "ltr",
+      "file": "locales/iso_465.json"
+    },
+    {
+      "code": "iso_466",
+      "name": "Macedonian",
+      "english": "Македонски Language",
+      "dir": "ltr",
+      "file": "locales/iso_466.json"
+    },
+    {
+      "code": "iso_467",
+      "name": "Machame",
+      "english": "Kimachame Language",
+      "dir": "ltr",
+      "file": "locales/iso_467.json"
+    },
+    {
+      "code": "iso_468",
+      "name": "Madurese East",
+      "english": "Madhurâ Language",
+      "dir": "ltr",
+      "file": "locales/iso_468.json"
+    },
+    {
+      "code": "iso_469",
+      "name": "Magahi South",
+      "english": "मगही Language",
+      "dir": "ltr",
+      "file": "locales/iso_469.json"
+    },
+    {
+      "code": "iso_470",
+      "name": "Maithili North",
+      "english": "मैथिली Language",
+      "dir": "ltr",
+      "file": "locales/iso_470.json"
+    },
+    {
+      "code": "iso_471",
+      "name": "Makasar Gowa",
+      "english": "Basa Mangkasara Language",
+      "dir": "ltr",
+      "file": "locales/iso_471.json"
+    },
+    {
+      "code": "iso_472",
+      "name": "Makhuwa Nampula",
+      "english": "Emakhuwa Language",
+      "dir": "ltr",
+      "file": "locales/iso_472.json"
+    },
+    {
+      "code": "iso_473",
+      "name": "Makonde Ruvuma",
+      "english": "Chimakonde Language",
+      "dir": "ltr",
+      "file": "locales/iso_473.json"
+    },
+    {
+      "code": "iso_474",
+      "name": "Maldivian",
+      "english": "ދިވެހި Language",
+      "dir": "ltr",
+      "file": "locales/iso_474.json"
+    },
+    {
+      "code": "iso_475",
+      "name": "Malinke",
+      "english": "Maninkakan Language",
+      "dir": "ltr",
+      "file": "locales/iso_475.json"
+    },
+    {
+      "code": "iso_476",
+      "name": "Mambwe Lake",
+      "english": "Icimambwe Language",
+      "dir": "ltr",
+      "file": "locales/iso_476.json"
+    },
+    {
+      "code": "iso_477",
+      "name": "Mandingo",
+      "english": "Manding Language",
+      "dir": "ltr",
+      "file": "locales/iso_477.json"
+    },
+    {
+      "code": "iso_478",
+      "name": "Mansi",
+      "english": "Маньси Language",
+      "dir": "ltr",
+      "file": "locales/iso_478.json"
+    },
+    {
+      "code": "iso_479",
+      "name": "Maori North",
+      "english": "Te Reo Language",
+      "dir": "ltr",
+      "file": "locales/iso_479.json"
+    },
+    {
+      "code": "iso_480",
+      "name": "Mapudungun",
+      "english": "Mapudungun Language",
+      "dir": "ltr",
+      "file": "locales/iso_480.json"
+    },
+    {
+      "code": "iso_481",
+      "name": "Maranao",
+      "english": "Mëranaw Language",
+      "dir": "ltr",
+      "file": "locales/iso_481.json"
+    },
+    {
+      "code": "iso_482",
+      "name": "Mari Meadow",
+      "english": "Олык марий Language",
+      "dir": "ltr",
+      "file": "locales/iso_482.json"
+    },
+    {
+      "code": "iso_483",
+      "name": "Marwari",
+      "english": "मारवाड़ी Language",
+      "dir": "ltr",
+      "file": "locales/iso_483.json"
+    },
+    {
+      "code": "iso_484",
+      "name": "Masai Rift",
+      "english": "Maa Language",
+      "dir": "ltr",
+      "file": "locales/iso_484.json"
+    },
+    {
+      "code": "iso_485",
+      "name": "Mazanderani",
+      "english": "مازِرونی Language",
+      "dir": "ltr",
+      "file": "locales/iso_485.json"
+    },
+    {
+      "code": "iso_486",
+      "name": "Meitei Valley",
+      "english": "মৈতৈলোন্ Language",
+      "dir": "ltr",
+      "file": "locales/iso_486.json"
+    },
+    {
+      "code": "iso_487",
+      "name": "Mende",
+      "english": "Mɛnde yia Language",
+      "dir": "ltr",
+      "file": "locales/iso_487.json"
+    },
+    {
+      "code": "iso_488",
+      "name": "Meru Mount",
+      "english": "Kĩmĩrũ Language",
+      "dir": "ltr",
+      "file": "locales/iso_488.json"
+    },
+    {
+      "code": "iso_489",
+      "name": "Metis",
+      "english": "Michif Language",
+      "dir": "ltr",
+      "file": "locales/iso_489.json"
+    },
+    {
+      "code": "iso_490",
+      "name": "Moksha Mokshan",
+      "english": "Мокшень Language",
+      "dir": "ltr",
+      "file": "locales/iso_490.json"
+    },
+    {
+      "code": "iso_491",
+      "name": "Mongo",
+      "english": "Lomongo Language",
+      "dir": "ltr",
+      "file": "locales/iso_491.json"
+    },
+    {
+      "code": "iso_492",
+      "name": "Montagnais",
+      "english": "Innu-aimun Language",
+      "dir": "ltr",
+      "file": "locales/iso_492.json"
+    },
+    {
+      "code": "iso_493",
+      "name": "Mossi Yatenga",
+      "english": "Mooré Language",
+      "dir": "ltr",
+      "file": "locales/iso_493.json"
+    },
+    {
+      "code": "iso_494",
+      "name": "Mundang",
+      "english": "Mundang Language",
+      "dir": "ltr",
+      "file": "locales/iso_494.json"
+    },
+    {
+      "code": "iso_495",
+      "name": "Muong",
+      "english": "Tiếng Mường Language",
+      "dir": "ltr",
+      "file": "locales/iso_495.json"
+    },
+    {
+      "code": "iso_496",
+      "name": "Nama Karas",
+      "english": "Khoekhoegowab Language",
+      "dir": "ltr",
+      "file": "locales/iso_496.json"
+    },
+    {
       "code": "it",
       "name": "Italiano",
       "english": "Italian",
@@ -2303,5 +3325,5 @@
       "file": "locales/zu.json"
     }
   ],
-  "updatedAt": "2026-11-11T14:10:48.796Z"
+  "updatedAt": "2026-11-11T14:14:55.708Z"
 }
