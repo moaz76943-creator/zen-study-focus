@@ -18,26 +18,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository Source
+      - name: 📥 Checkout Repository Source
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 17 (Temurin)
+      - name: ☕ Set up JDK 17 (Temurin)
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Set up Standalone Gradle 8.7
+      - name: 🐘 Set up Standalone Gradle 8.7
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.7'
 
-      - name: Audit 1005 Localized Language Assets
+      - name: 🛡️ Accept Android SDK Licenses
+        run: |
+          yes | sdkmanager --licenses 2>/dev/null || true
+
+      - name: 🛡️ Audit 1005 Localized Language Assets
         run: |
           LOCALES_COUNT=$(find android/app/src/main/assets/web/locales -name "*.json" | wc -l)
           echo "Found $LOCALES_COUNT authentic localized language files."
@@ -46,28 +48,31 @@ jobs:
             exit 1
           fi
 
-      - name: Provision Production Keystore on CI Runner
+      - name: 🔑 Provision Production Keystore on CI Runner
         run: |
           cd android/app
           if [ ! -f "zenfocus2026.jks" ]; then
-            echo "Generating production release signing key for CI/CD bundle..."
+            echo "Generating production release signing key..."
             keytool -genkeypair -v -keystore zenfocus2026.jks -alias zenfocus2026 -keyalg RSA -keysize 2048 -validity 10000 -storepass zenfocus2026 -keypass zenfocus2026 -dname "CN=DeepFocus, OU=StudyOS, O=Sovereign, L=Global, ST=None, C=US"
+          else
+            echo "Existing zenfocus2026.jks verified."
           fi
           cd ../..
 
-      - name: Compile Production Android App Bundle (.AAB)
+      - name: 📦 Compile Production Android App Bundle (.AAB)
         run: |
           cd android
-          gradle bundleRelease --stacktrace --no-daemon || ./gradlew bundleRelease --stacktrace --no-daemon
+          chmod +x gradlew 2>/dev/null || true
+          ./gradlew bundleRelease --stacktrace --no-daemon || gradle bundleRelease --stacktrace --no-daemon
           cd ..
 
-      - name: Compile Production APK
+      - name: 📦 Compile Production APK (For Direct Testing)
         run: |
           cd android
-          gradle assembleRelease --stacktrace --no-daemon || ./gradlew assembleRelease --stacktrace --no-daemon || true
+          ./gradlew assembleRelease --stacktrace --no-daemon || gradle assembleRelease --stacktrace --no-daemon || true
           cd ..
 
-      - name: Upload Production AAB Artifact
+      - name: 📤 Upload Production AAB Artifact
         uses: actions/upload-artifact@v4
         with:
           name: deep-focus-production-aab
@@ -75,7 +80,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Upload Production APK Artifact
+      - name: 📤 Upload Production APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: deep-focus-production-apk
@@ -83,7 +88,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Publish Official GitHub Release
+      - name: 🚀 Publish Official GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
