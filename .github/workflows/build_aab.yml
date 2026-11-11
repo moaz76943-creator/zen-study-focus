@@ -41,10 +41,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🐘 Set up Standalone Gradle 8.7
+      - name: 🐘 Set up Standalone Gradle 8.11.1
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.7'
+          gradle-version: '8.11.1'
 
       - name: 📱 Configure Android SDK 35 & Licenses
         run: |
@@ -81,7 +81,7 @@ jobs:
           if [ -f "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
             ./gradlew bundleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m" 2>&1 | tee gradle_build.log
           else
-            echo "Wrapper jar absent; using Standalone Gradle 8.7..."
+            echo "Wrapper jar absent; using Standalone Gradle 8.11.1..."
             gradle bundleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m" 2>&1 | tee gradle_build.log
           fi
           cd ..
