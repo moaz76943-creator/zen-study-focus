@@ -83733,3 +83733,8 @@ if (typeof LifecycleMemorySentinel !== "undefined") {
 if (typeof ThumbZoneErgonomicsOptimizer !== "undefined") {
     ThumbZoneErgonomicsOptimizer.init();
 }
+
+// [Task #668] Microscopic UI Polisher Initialization
+if (typeof MicroscopicUIPolisher !== "undefined") {
+    MicroscopicUIPolisher.init();
+}
