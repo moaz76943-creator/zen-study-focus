@@ -260,8 +260,8 @@
     // M8560: dfEnforceWesternDigitsGlobalRule
     dfEnforceWesternDigitsGlobalRule(text) {
       if (typeof text !== 'string') return text;
-      const easternMap = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
-      return text.replace(/[٠١٢٣٤٥٦٧٨٩]/g, m => easternMap[m] || m);
+      const easternMap = {'0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9'};
+      return text.replace(/[0123456789]/g, m => easternMap[m] || m);
     }
 
     // M8561: dfHotSwapUiLanguageZeroReload

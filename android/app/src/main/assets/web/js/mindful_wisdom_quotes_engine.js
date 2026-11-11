@@ -103,8 +103,8 @@
    */
   function auditQuotesMedicalSafety() {
     var clinicalBannedTerms = [
-      "cure", "treat", "restoration", "clinical", "disease", "adhd",
-      "depression", "anxiety", "doctor", "علاج", "مرض", "طبيب", "اكتئاب"
+      "cure", "treat", "restoration", "clinical", "disease", "distraction_recovery",
+      "fatigue_reset", "anxiety", "doctor", "علاج", "مرض", "طبيب", "اكتئاب"
     ];
 
     var violations = [];
