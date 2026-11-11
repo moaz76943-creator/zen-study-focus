@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer Focus Ring -->
+    <path
+        android:strokeColor="#4ade80"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M 54, 26 A 28,28 0 1,1 53.99, 26 Z" />
+    <!-- Intermediate Pulse Ring -->
+    <path
+        android:strokeColor="#22c55e"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.6"
+        android:pathData="M 54, 36 A 18,18 0 1,1 53.99, 36 Z" />
+    <!-- Sovereign Core Monolith -->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M 54,46 L 56.5,51.5 L 62,54 L 56.5,56.5 L 54,62 L 51.5,56.5 L 46,54 L 51.5,51.5 Z" />
+</vector>
