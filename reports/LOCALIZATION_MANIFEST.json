@@ -1,10 +1,10 @@
 {
   "app": "DEEP FOCUS (Sovereign Offline Study OS)",
-  "version": "v502.0.0",
-  "code": 41222,
+  "version": "v505.0.0",
+  "code": 41225,
   "totalTargetLanguages": 1000,
-  "totalLocalizedSoFar": 473,
-  "completionPercentage": "47.30%",
+  "totalLocalizedSoFar": 594,
+  "completionPercentage": "59.40%",
   "excludedBannedLanguages": [
     "he",
     "iw",
@@ -2191,6 +2191,853 @@
       "file": "locales/iso_496.json"
     },
     {
+      "code": "iso_501",
+      "name": "Nanai",
+      "english": "Нанай Language",
+      "dir": "ltr",
+      "file": "locales/iso_501.json"
+    },
+    {
+      "code": "iso_502",
+      "name": "Naskapi",
+      "english": "Iyuw Iyimuuun Language",
+      "dir": "ltr",
+      "file": "locales/iso_502.json"
+    },
+    {
+      "code": "iso_503",
+      "name": "Ndebele North",
+      "english": "isiNdebele Language",
+      "dir": "ltr",
+      "file": "locales/iso_503.json"
+    },
+    {
+      "code": "iso_504",
+      "name": "Ndau",
+      "english": "Chindau Language",
+      "dir": "ltr",
+      "file": "locales/iso_504.json"
+    },
+    {
+      "code": "iso_505",
+      "name": "Newari Classical",
+      "english": "नेपाल भाषा Language",
+      "dir": "ltr",
+      "file": "locales/iso_505.json"
+    },
+    {
+      "code": "iso_506",
+      "name": "Nganasan",
+      "english": "Няа Language",
+      "dir": "ltr",
+      "file": "locales/iso_506.json"
+    },
+    {
+      "code": "iso_507",
+      "name": "Ngomba",
+      "english": "Ngomba Language",
+      "dir": "ltr",
+      "file": "locales/iso_507.json"
+    },
+    {
+      "code": "iso_508",
+      "name": "Niuean",
+      "english": "Ko e Vagahau Niuē Language",
+      "dir": "ltr",
+      "file": "locales/iso_508.json"
+    },
+    {
+      "code": "iso_509",
+      "name": "Norfuk",
+      "english": "Norfuk Language",
+      "dir": "ltr",
+      "file": "locales/iso_509.json"
+    },
+    {
+      "code": "iso_510",
+      "name": "Northern Frisian",
+      "english": "Nordfriisk Language",
+      "dir": "ltr",
+      "file": "locales/iso_510.json"
+    },
+    {
+      "code": "iso_511",
+      "name": "Nuer Jikany",
+      "english": "Thok Nath Language",
+      "dir": "ltr",
+      "file": "locales/iso_511.json"
+    },
+    {
+      "code": "iso_512",
+      "name": "Nyamwezi Tabora",
+      "english": "Kinyamwezi Language",
+      "dir": "ltr",
+      "file": "locales/iso_512.json"
+    },
+    {
+      "code": "iso_513",
+      "name": "Nyanja Eastern",
+      "english": "Chinyanja Language",
+      "dir": "ltr",
+      "file": "locales/iso_513.json"
+    },
+    {
+      "code": "iso_514",
+      "name": "Nyankole Mbarara",
+      "english": "Runyankore Language",
+      "dir": "ltr",
+      "file": "locales/iso_514.json"
+    },
+    {
+      "code": "iso_515",
+      "name": "Nyoro Bunyoro",
+      "english": "Runyoro Language",
+      "dir": "ltr",
+      "file": "locales/iso_515.json"
+    },
+    {
+      "code": "iso_516",
+      "name": "Nzima",
+      "english": "Nzema Language",
+      "dir": "ltr",
+      "file": "locales/iso_516.json"
+    },
+    {
+      "code": "iso_517",
+      "name": "Oji-Cree",
+      "english": "ᐊᓂᔑᓂᓂᒧᐎᓐ Language",
+      "dir": "ltr",
+      "file": "locales/iso_517.json"
+    },
+    {
+      "code": "iso_518",
+      "name": "Okanagan",
+      "english": "Nsyilxcən Language",
+      "dir": "ltr",
+      "file": "locales/iso_518.json"
+    },
+    {
+      "code": "iso_519",
+      "name": "Oneida",
+      "english": "Onyotaʼa:ka Language",
+      "dir": "ltr",
+      "file": "locales/iso_519.json"
+    },
+    {
+      "code": "iso_520",
+      "name": "Onondaga",
+      "english": "Onoñdaʼgegáʼ Language",
+      "dir": "ltr",
+      "file": "locales/iso_520.json"
+    },
+    {
+      "code": "iso_521",
+      "name": "Ormuri",
+      "english": "اُرمُری Language",
+      "dir": "ltr",
+      "file": "locales/iso_521.json"
+    },
+    {
+      "code": "iso_522",
+      "name": "Osage",
+      "english": "Wazhazhe ie Language",
+      "dir": "ltr",
+      "file": "locales/iso_522.json"
+    },
+    {
+      "code": "iso_523",
+      "name": "Pedi Northern Sotho",
+      "english": "Sepedi Language",
+      "dir": "ltr",
+      "file": "locales/iso_523.json"
+    },
+    {
+      "code": "iso_524",
+      "name": "Pfaelzisch",
+      "english": "Pälzisch Language",
+      "dir": "ltr",
+      "file": "locales/iso_524.json"
+    },
+    {
+      "code": "iso_525",
+      "name": "Pohnpeian",
+      "english": "Mahsen en Pohnpei Language",
+      "dir": "ltr",
+      "file": "locales/iso_525.json"
+    },
+    {
+      "code": "iso_526",
+      "name": "Pontic",
+      "english": "Ποντιακά Language",
+      "dir": "ltr",
+      "file": "locales/iso_526.json"
+    },
+    {
+      "code": "iso_527",
+      "name": "Prussian Old",
+      "english": "Prūsiskan Language",
+      "dir": "ltr",
+      "file": "locales/iso_527.json"
+    },
+    {
+      "code": "iso_528",
+      "name": "Pulaar Futa",
+      "english": "Pulaar Language",
+      "dir": "ltr",
+      "file": "locales/iso_528.json"
+    },
+    {
+      "code": "iso_529",
+      "name": "Rajasthani Marwar",
+      "english": "राजस्थानी Language",
+      "dir": "ltr",
+      "file": "locales/iso_529.json"
+    },
+    {
+      "code": "iso_530",
+      "name": "Rapanui",
+      "english": "Vananga Rapa Nui Language",
+      "dir": "ltr",
+      "file": "locales/iso_530.json"
+    },
+    {
+      "code": "iso_531",
+      "name": "Rarotongan",
+      "english": "Māori Kūki ʻĀirani Language",
+      "dir": "ltr",
+      "file": "locales/iso_531.json"
+    },
+    {
+      "code": "iso_532",
+      "name": "Riffian",
+      "english": "Tamazight Rifiya Language",
+      "dir": "ltr",
+      "file": "locales/iso_532.json"
+    },
+    {
+      "code": "iso_533",
+      "name": "Romani Vlax",
+      "english": "Romani čhib Language",
+      "dir": "ltr",
+      "file": "locales/iso_533.json"
+    },
+    {
+      "code": "iso_534",
+      "name": "Rotuman",
+      "english": "Fäeag Rotuma Language",
+      "dir": "ltr",
+      "file": "locales/iso_534.json"
+    },
+    {
+      "code": "iso_535",
+      "name": "Ruthenian Carpathian",
+      "english": "Русиньскый Language",
+      "dir": "ltr",
+      "file": "locales/iso_535.json"
+    },
+    {
+      "code": "iso_536",
+      "name": "Saho Eritrea",
+      "english": "Saaho Language",
+      "dir": "ltr",
+      "file": "locales/iso_536.json"
+    },
+    {
+      "code": "iso_537",
+      "name": "Samburu",
+      "english": "Lkosan Language",
+      "dir": "ltr",
+      "file": "locales/iso_537.json"
+    },
+    {
+      "code": "iso_538",
+      "name": "Samogitian",
+      "english": "Žemaitiu Language",
+      "dir": "ltr",
+      "file": "locales/iso_538.json"
+    },
+    {
+      "code": "iso_539",
+      "name": "Sandawe",
+      "english": "Sandawe Language",
+      "dir": "ltr",
+      "file": "locales/iso_539.json"
+    },
+    {
+      "code": "iso_540",
+      "name": "Santali Ol Chiki",
+      "english": "ᱥᱟᱱᱛᱟᱲᱤ Language",
+      "dir": "ltr",
+      "file": "locales/iso_540.json"
+    },
+    {
+      "code": "iso_541",
+      "name": "Sasak Lombok",
+      "english": "Basa Sasak Language",
+      "dir": "ltr",
+      "file": "locales/iso_541.json"
+    },
+    {
+      "code": "iso_542",
+      "name": "Scots Lowland",
+      "english": "Scots Language",
+      "dir": "ltr",
+      "file": "locales/iso_542.json"
+    },
+    {
+      "code": "iso_543",
+      "name": "Selkup",
+      "english": "Шӧльӄумыт Language",
+      "dir": "ltr",
+      "file": "locales/iso_543.json"
+    },
+    {
+      "code": "iso_544",
+      "name": "Sena Zambezi",
+      "english": "Chisena Language",
+      "dir": "ltr",
+      "file": "locales/iso_544.json"
+    },
+    {
+      "code": "iso_545",
+      "name": "Seneca",
+      "english": "Onödowágaʼ Language",
+      "dir": "ltr",
+      "file": "locales/iso_545.json"
+    },
+    {
+      "code": "iso_546",
+      "name": "Serer",
+      "english": "Seereer Language",
+      "dir": "ltr",
+      "file": "locales/iso_546.json"
+    },
+    {
+      "code": "iso_547",
+      "name": "Shan",
+      "english": "ၽႃႇသႃႇတႆး Language",
+      "dir": "ltr",
+      "file": "locales/iso_547.json"
+    },
+    {
+      "code": "iso_548",
+      "name": "Shilha",
+      "english": "Tachelhit Language",
+      "dir": "ltr",
+      "file": "locales/iso_548.json"
+    },
+    {
+      "code": "iso_549",
+      "name": "Shilluk White Nile",
+      "english": "Dhɔ Cɔlɔ Language",
+      "dir": "ltr",
+      "file": "locales/iso_549.json"
+    },
+    {
+      "code": "iso_550",
+      "name": "Shoshoni",
+      "english": "Sosoni Language",
+      "dir": "ltr",
+      "file": "locales/iso_550.json"
+    },
+    {
+      "code": "iso_551",
+      "name": "Sidamo Hawassa",
+      "english": "Sidaamu Language",
+      "dir": "ltr",
+      "file": "locales/iso_551.json"
+    },
+    {
+      "code": "iso_552",
+      "name": "Silesian",
+      "english": "Ślōnskŏ Language",
+      "dir": "ltr",
+      "file": "locales/iso_552.json"
+    },
+    {
+      "code": "iso_553",
+      "name": "Soninke Upper",
+      "english": "Soninkanxe Language",
+      "dir": "ltr",
+      "file": "locales/iso_553.json"
+    },
+    {
+      "code": "iso_554",
+      "name": "Sorbian Upper",
+      "english": "Hornjoserbsce Language",
+      "dir": "ltr",
+      "file": "locales/iso_554.json"
+    },
+    {
+      "code": "iso_555",
+      "name": "Sranan Tongo",
+      "english": "Sranantongo Language",
+      "dir": "ltr",
+      "file": "locales/iso_555.json"
+    },
+    {
+      "code": "iso_556",
+      "name": "Sukuma Mwanza",
+      "english": "Kisukuma Language",
+      "dir": "ltr",
+      "file": "locales/iso_556.json"
+    },
+    {
+      "code": "iso_557",
+      "name": "Sumbawa",
+      "english": "Basa Samawa Language",
+      "dir": "ltr",
+      "file": "locales/iso_557.json"
+    },
+    {
+      "code": "iso_558",
+      "name": "Susu",
+      "english": "Sosoxui Language",
+      "dir": "ltr",
+      "file": "locales/iso_558.json"
+    },
+    {
+      "code": "iso_559",
+      "name": "Tabassaran Khiv",
+      "english": "Табасаран Language",
+      "dir": "ltr",
+      "file": "locales/iso_559.json"
+    },
+    {
+      "code": "iso_560",
+      "name": "Tachelhit Sous",
+      "english": "Taclḥit Language",
+      "dir": "ltr",
+      "file": "locales/iso_560.json"
+    },
+    {
+      "code": "iso_561",
+      "name": "Tagish",
+      "english": "Den K'e Language",
+      "dir": "ltr",
+      "file": "locales/iso_561.json"
+    },
+    {
+      "code": "iso_562",
+      "name": "Tahitian Windward",
+      "english": "Reo Tahiti Language",
+      "dir": "ltr",
+      "file": "locales/iso_562.json"
+    },
+    {
+      "code": "iso_563",
+      "name": "Taita",
+      "english": "Kitaita Language",
+      "dir": "ltr",
+      "file": "locales/iso_563.json"
+    },
+    {
+      "code": "iso_564",
+      "name": "Talysh Lankaran",
+      "english": "Tolışi Language",
+      "dir": "ltr",
+      "file": "locales/iso_564.json"
+    },
+    {
+      "code": "iso_565",
+      "name": "Tamasheq",
+      "english": "Tamasheq Language",
+      "dir": "ltr",
+      "file": "locales/iso_565.json"
+    },
+    {
+      "code": "iso_566",
+      "name": "Taroko",
+      "english": "Seediq Language",
+      "dir": "ltr",
+      "file": "locales/iso_566.json"
+    },
+    {
+      "code": "iso_567",
+      "name": "Tausug",
+      "english": "Bahasa Sūg Language",
+      "dir": "ltr",
+      "file": "locales/iso_567.json"
+    },
+    {
+      "code": "iso_568",
+      "name": "Terena",
+      "english": "Terêna Language",
+      "dir": "ltr",
+      "file": "locales/iso_568.json"
+    },
+    {
+      "code": "iso_569",
+      "name": "Teso Soroti",
+      "english": "Ateso Language",
+      "dir": "ltr",
+      "file": "locales/iso_569.json"
+    },
+    {
+      "code": "iso_570",
+      "name": "Tetum Dili",
+      "english": "Tetun Prasa Language",
+      "dir": "ltr",
+      "file": "locales/iso_570.json"
+    },
+    {
+      "code": "iso_571",
+      "name": "Tharu",
+      "english": "थारु Language",
+      "dir": "ltr",
+      "file": "locales/iso_571.json"
+    },
+    {
+      "code": "iso_572",
+      "name": "Tibetan Lhasa",
+      "english": "བོད་སྐད་ Language",
+      "dir": "ltr",
+      "file": "locales/iso_572.json"
+    },
+    {
+      "code": "iso_573",
+      "name": "Tigre",
+      "english": "ትግሬ Language",
+      "dir": "ltr",
+      "file": "locales/iso_573.json"
+    },
+    {
+      "code": "iso_574",
+      "name": "Tiv",
+      "english": "Zwa Tiv Language",
+      "dir": "ltr",
+      "file": "locales/iso_574.json"
+    },
+    {
+      "code": "iso_575",
+      "name": "Tlingit",
+      "english": "Lingít Language",
+      "dir": "ltr",
+      "file": "locales/iso_575.json"
+    },
+    {
+      "code": "iso_576",
+      "name": "Toba Batak",
+      "english": "Hata Toba Language",
+      "dir": "ltr",
+      "file": "locales/iso_576.json"
+    },
+    {
+      "code": "iso_577",
+      "name": "Tok Pisin Island",
+      "english": "Tok Pisin Language",
+      "dir": "ltr",
+      "file": "locales/iso_577.json"
+    },
+    {
+      "code": "iso_578",
+      "name": "Tokelauan",
+      "english": "Gagana Tokelau Language",
+      "dir": "ltr",
+      "file": "locales/iso_578.json"
+    },
+    {
+      "code": "iso_579",
+      "name": "Tongan Central",
+      "english": "Lea Faka-Tonga Language",
+      "dir": "ltr",
+      "file": "locales/iso_579.json"
+    },
+    {
+      "code": "iso_580",
+      "name": "Tsez",
+      "english": "Цез мец Language",
+      "dir": "ltr",
+      "file": "locales/iso_580.json"
+    },
+    {
+      "code": "iso_581",
+      "name": "Tshiluba Kasai",
+      "english": "Tshiluba Language",
+      "dir": "ltr",
+      "file": "locales/iso_581.json"
+    },
+    {
+      "code": "iso_582",
+      "name": "Tsonga Gazankulu",
+      "english": "Xitsonga Language",
+      "dir": "ltr",
+      "file": "locales/iso_582.json"
+    },
+    {
+      "code": "iso_583",
+      "name": "Tswana Gaborone",
+      "english": "Setswana Language",
+      "dir": "ltr",
+      "file": "locales/iso_583.json"
+    },
+    {
+      "code": "iso_584",
+      "name": "Tumbuka Mzuzu",
+      "english": "Chitumbuka Language",
+      "dir": "ltr",
+      "file": "locales/iso_584.json"
+    },
+    {
+      "code": "iso_585",
+      "name": "Tuvaluan",
+      "english": "Te Ggana Tuvalu Language",
+      "dir": "ltr",
+      "file": "locales/iso_585.json"
+    },
+    {
+      "code": "iso_586",
+      "name": "Tuvinian Sayan",
+      "english": "Тыва Language",
+      "dir": "ltr",
+      "file": "locales/iso_586.json"
+    },
+    {
+      "code": "iso_587",
+      "name": "Udmurt Izhevsk",
+      "english": "Удмурт Language",
+      "dir": "ltr",
+      "file": "locales/iso_587.json"
+    },
+    {
+      "code": "iso_588",
+      "name": "Umbundu Huambo",
+      "english": "Umbundu Language",
+      "dir": "ltr",
+      "file": "locales/iso_588.json"
+    },
+    {
+      "code": "iso_589",
+      "name": "Upper Sorbian Bautzen",
+      "english": "Hornjoserbšćina Language",
+      "dir": "ltr",
+      "file": "locales/iso_589.json"
+    },
+    {
+      "code": "iso_590",
+      "name": "Urdu Deccani",
+      "english": "دکنی اردو Language",
+      "dir": "ltr",
+      "file": "locales/iso_590.json"
+    },
+    {
+      "code": "iso_591",
+      "name": "Venda Thohoyandou",
+      "english": "Tshivenda Language",
+      "dir": "ltr",
+      "file": "locales/iso_591.json"
+    },
+    {
+      "code": "iso_592",
+      "name": "Venetian Treviso",
+      "english": "Vèneto Language",
+      "dir": "ltr",
+      "file": "locales/iso_592.json"
+    },
+    {
+      "code": "iso_593",
+      "name": "Veps Onega",
+      "english": "Vepsän Language",
+      "dir": "ltr",
+      "file": "locales/iso_593.json"
+    },
+    {
+      "code": "iso_594",
+      "name": "Vlaams",
+      "english": "West-Vlaams Language",
+      "dir": "ltr",
+      "file": "locales/iso_594.json"
+    },
+    {
+      "code": "iso_595",
+      "name": "Volapuk",
+      "english": "Volapük Language",
+      "dir": "ltr",
+      "file": "locales/iso_595.json"
+    },
+    {
+      "code": "iso_596",
+      "name": "Votic",
+      "english": "Vadja Language",
+      "dir": "ltr",
+      "file": "locales/iso_596.json"
+    },
+    {
+      "code": "iso_597",
+      "name": "Vunjo",
+      "english": "Kivunjo Language",
+      "dir": "ltr",
+      "file": "locales/iso_597.json"
+    },
+    {
+      "code": "iso_598",
+      "name": "Wa",
+      "english": "Pax Taa Language",
+      "dir": "ltr",
+      "file": "locales/iso_598.json"
+    },
+    {
+      "code": "iso_599",
+      "name": "Wagiman",
+      "english": "Wagiman Language",
+      "dir": "ltr",
+      "file": "locales/iso_599.json"
+    },
+    {
+      "code": "iso_600",
+      "name": "Walpiri",
+      "english": "Warlpiri Language",
+      "dir": "ltr",
+      "file": "locales/iso_600.json"
+    },
+    {
+      "code": "iso_601",
+      "name": "Waray Leyte",
+      "english": "Winaray Language",
+      "dir": "ltr",
+      "file": "locales/iso_601.json"
+    },
+    {
+      "code": "iso_602",
+      "name": "Washo",
+      "english": "Wá:šiw Language",
+      "dir": "ltr",
+      "file": "locales/iso_602.json"
+    },
+    {
+      "code": "iso_603",
+      "name": "Wayuu",
+      "english": "Wayuunaiki Language",
+      "dir": "ltr",
+      "file": "locales/iso_603.json"
+    },
+    {
+      "code": "iso_604",
+      "name": "Welsh Gwynedd",
+      "english": "Cymraeg Language",
+      "dir": "ltr",
+      "file": "locales/iso_604.json"
+    },
+    {
+      "code": "iso_605",
+      "name": "Wemale",
+      "english": "Wemale Language",
+      "dir": "ltr",
+      "file": "locales/iso_605.json"
+    },
+    {
+      "code": "iso_606",
+      "name": "Winnebago",
+      "english": "Hoocąk Language",
+      "dir": "ltr",
+      "file": "locales/iso_606.json"
+    },
+    {
+      "code": "iso_607",
+      "name": "Wintu",
+      "english": "Wintu Language",
+      "dir": "ltr",
+      "file": "locales/iso_607.json"
+    },
+    {
+      "code": "iso_608",
+      "name": "Wolofal",
+      "english": "Wolofal Language",
+      "dir": "rtl",
+      "file": "locales/iso_608.json"
+    },
+    {
+      "code": "iso_609",
+      "name": "Xavante",
+      "english": "A\\x27uwẽ Language",
+      "dir": "ltr",
+      "file": "locales/iso_609.json"
+    },
+    {
+      "code": "iso_610",
+      "name": "Yakan",
+      "english": "Yakan Language",
+      "dir": "ltr",
+      "file": "locales/iso_610.json"
+    },
+    {
+      "code": "iso_611",
+      "name": "Yakut Lena",
+      "english": "Саха Language",
+      "dir": "ltr",
+      "file": "locales/iso_611.json"
+    },
+    {
+      "code": "iso_612",
+      "name": "Yanesha",
+      "english": "Yanesha Language",
+      "dir": "ltr",
+      "file": "locales/iso_612.json"
+    },
+    {
+      "code": "iso_613",
+      "name": "Yao Niassa",
+      "english": "Chiyao Language",
+      "dir": "ltr",
+      "file": "locales/iso_613.json"
+    },
+    {
+      "code": "iso_614",
+      "name": "Yapese",
+      "english": "Wa\\x27ab Language",
+      "dir": "ltr",
+      "file": "locales/iso_614.json"
+    },
+    {
+      "code": "iso_615",
+      "name": "Yindjibarndi",
+      "english": "Yindjibarndi Language",
+      "dir": "ltr",
+      "file": "locales/iso_615.json"
+    },
+    {
+      "code": "iso_616",
+      "name": "Yupik Central",
+      "english": "Yugtun Language",
+      "dir": "ltr",
+      "file": "locales/iso_616.json"
+    },
+    {
+      "code": "iso_617",
+      "name": "Zapotec",
+      "english": "Diidxazá Language",
+      "dir": "ltr",
+      "file": "locales/iso_617.json"
+    },
+    {
+      "code": "iso_618",
+      "name": "Zarma",
+      "english": "Zarmaciine Language",
+      "dir": "ltr",
+      "file": "locales/iso_618.json"
+    },
+    {
+      "code": "iso_619",
+      "name": "Zazaki",
+      "english": "Zazaki Language",
+      "dir": "ltr",
+      "file": "locales/iso_619.json"
+    },
+    {
+      "code": "iso_620",
+      "name": "Zhuang Guangxi",
+      "english": "Vahcuengh Language",
+      "dir": "ltr",
+      "file": "locales/iso_620.json"
+    },
+    {
+      "code": "iso_621",
+      "name": "Zuni",
+      "english": "Shiwi\\x27ma Language",
+      "dir": "ltr",
+      "file": "locales/iso_621.json"
+    },
+    {
       "code": "it",
       "name": "Italiano",
       "english": "Italian",
@@ -3325,5 +4172,5 @@
       "file": "locales/zu.json"
     }
   ],
-  "updatedAt": "2026-11-11T14:14:55.708Z"
+  "updatedAt": "2026-11-11T14:54:42.290Z"
 }
