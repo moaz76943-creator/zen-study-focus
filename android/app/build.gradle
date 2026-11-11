@@ -2,57 +2,55 @@ plugins {
     id 'com.android.application'
 }
 
-def uploadKeyStorePath = System.getenv('ZEN_UPLOAD_KEYSTORE_PATH')
-def uploadKeyStorePassword = System.getenv('ZEN_UPLOAD_STORE_PASSWORD')
-def uploadKeyAlias = System.getenv('ZEN_UPLOAD_KEY_ALIAS')
-def uploadKeyPassword = System.getenv('ZEN_UPLOAD_KEY_PASSWORD')
-def hasUploadSigning = [uploadKeyStorePath, uploadKeyStorePassword, uploadKeyAlias, uploadKeyPassword]
-        .every { it != null && !it.trim().isEmpty() }
+def uploadKeyStorePath = System.getenv("DEEPFOCUS_UPLOAD_KEYSTORE") ?: "zenfocus2026.jks"
+def uploadKeyAlias = System.getenv("DEEPFOCUS_KEY_ALIAS") ?: "zenfocus2026"
+def uploadStorePassword = System.getenv("DEEPFOCUS_STORE_PASSWORD") ?: "zenfocus2026"
+def uploadKeyPassword = System.getenv("DEEPFOCUS_KEY_PASSWORD") ?: "zenfocus2026"
 
 android {
     namespace 'com.zenstudy.focus'
     compileSdk 35
+
     defaultConfig {
         applicationId "com.deepfocus.study"
         minSdk 24
         targetSdk 35
-        versionCode 41268
-        versionName "548.0.0"
+        versionCode 41269
+        versionName "549.0.0"
     }
-    signingConfigs {
-        if (hasUploadSigning) {
-            upload {
-                storeFile file(uploadKeyStorePath)
-                storePassword uploadKeyStorePassword
-                keyAlias uploadKeyAlias
-                keyPassword uploadKeyPassword
-            }
-        }
-    }
-    
 
     signingConfigs {
         release {
-            signingConfig signingConfigs.release
-            storeFile file("zenfocus2026.jks")
-            storePassword "zenfocus2026"
-            keyAlias "zenfocus2026"
-            keyPassword "zenfocus2026"
+            storeFile file(uploadKeyStorePath)
+            storePassword uploadStorePassword
+            keyAlias uploadKeyAlias
+            keyPassword uploadKeyPassword
         }
     }
 
     buildTypes {
         release {
-            
-            minifyEnabled true
-            shrinkResources true
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // Never sign a Play Store release with Android's debug key.
-            if (hasUploadSigning) signingConfig signingConfigs.upload
+        }
+        debug {
+            minifyEnabled false
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    androidResources {
+        noCompress 'json'
+    }
 }
+
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.webkit:webkit:1.10.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
 }
