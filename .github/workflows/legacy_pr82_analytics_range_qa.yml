@@ -13,6 +13,9 @@ on:
       - '.github/workflows/legacy_pr82_analytics_range_qa.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   analytics-invalid-range:
     runs-on: ubuntu-latest

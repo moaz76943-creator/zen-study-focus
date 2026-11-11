@@ -4,14 +4,14 @@ on:
   pull_request:
     branches: [integration/master-qa-verified-v21]
     paths: [.github/workflows/df06_exact_source_packages.yml]
-  push:
-    branches: [integration/master-qa-verified-v21]
-    paths: [.github/workflows/df06_exact_source_packages.yml, android/app/src/main/assets/web/app.js]
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   packages:
     runs-on: ubuntu-latest

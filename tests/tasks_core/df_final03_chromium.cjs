@@ -37,6 +37,10 @@ const path=require('node:path');
    const oldCard=page.locator('#df-task-results .df-task').filter({hasText:'مهمة قديمة بدون تاريخ'});
    await oldCard.getByRole('button',{name:edit,exact:true}).click();
    const form=page.locator('form.df-form');
+   for(const target of [form.locator('input[type="text"]').first(),form.getByRole('button',{name:save,exact:true})]){
+    const box=await target.boundingBox();
+    assert.ok(box&&box.height>=43.5,'Tasks editor touch target below 44px at '+width+'px '+locale+': '+JSON.stringify(box));
+   }
    assert.equal(await form.locator('input[type="date"]').inputValue(),'');
    assert.equal(await form.locator('input[type="checkbox"]').first().isChecked(),false);
    await form.locator('input[type="text"]').first().fill('مهمة معدلة بدون تاريخ');

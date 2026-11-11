@@ -10,6 +10,9 @@ on:
       - '.github/workflows/df07_kpi_noninteractive.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   kpi-source:
     runs-on: ubuntu-latest

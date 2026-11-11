@@ -10,6 +10,9 @@ on:
       - '.github/workflows/df_parallel01_counter_recovery.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   data-rollback-source:
     runs-on: ubuntu-latest

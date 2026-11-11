@@ -8,6 +8,9 @@ on:
       - '.github/workflows/df_parallel01_timer_credit.yml'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   timer-credit:
     runs-on: ubuntu-latest
