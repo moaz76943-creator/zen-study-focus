@@ -1,10 +1,10 @@
 {
   "app": "DEEP FOCUS (Sovereign Offline Study OS)",
-  "version": "v506.0.0",
-  "code": 41226,
+  "version": "v507.0.0",
+  "code": 41227,
   "totalTargetLanguages": 1000,
-  "totalLocalizedSoFar": 741,
-  "completionPercentage": "74.10%",
+  "totalLocalizedSoFar": 891,
+  "completionPercentage": "89.10%",
   "excludedBannedLanguages": [
     "he",
     "iw",
@@ -4067,6 +4067,1056 @@
       "file": "locales/iso_797.json"
     },
     {
+      "code": "iso_801",
+      "name": "Khoisan",
+      "english": "Khoekhoegowab Language",
+      "dir": "ltr",
+      "file": "locales/iso_801.json"
+    },
+    {
+      "code": "iso_802",
+      "name": "Munda",
+      "english": "Mundari Language",
+      "dir": "ltr",
+      "file": "locales/iso_802.json"
+    },
+    {
+      "code": "iso_803",
+      "name": "Ho",
+      "english": "Ho Language",
+      "dir": "ltr",
+      "file": "locales/iso_803.json"
+    },
+    {
+      "code": "iso_804",
+      "name": "Korku",
+      "english": "Korku Language",
+      "dir": "ltr",
+      "file": "locales/iso_804.json"
+    },
+    {
+      "code": "iso_805",
+      "name": "Kharia",
+      "english": "Kharia Language",
+      "dir": "ltr",
+      "file": "locales/iso_805.json"
+    },
+    {
+      "code": "iso_806",
+      "name": "Sora",
+      "english": "Sora Language",
+      "dir": "ltr",
+      "file": "locales/iso_806.json"
+    },
+    {
+      "code": "iso_807",
+      "name": "Savara",
+      "english": "Savara Language",
+      "dir": "ltr",
+      "file": "locales/iso_807.json"
+    },
+    {
+      "code": "iso_808",
+      "name": "Kurukh",
+      "english": "Kurukh Language",
+      "dir": "ltr",
+      "file": "locales/iso_808.json"
+    },
+    {
+      "code": "iso_809",
+      "name": "Malto",
+      "english": "Paharia Language",
+      "dir": "ltr",
+      "file": "locales/iso_809.json"
+    },
+    {
+      "code": "iso_810",
+      "name": "Kui",
+      "english": "Kui Language",
+      "dir": "ltr",
+      "file": "locales/iso_810.json"
+    },
+    {
+      "code": "iso_811",
+      "name": "Kuvi",
+      "english": "Kuvi Language",
+      "dir": "ltr",
+      "file": "locales/iso_811.json"
+    },
+    {
+      "code": "iso_812",
+      "name": "Pengo",
+      "english": "Pengo Language",
+      "dir": "ltr",
+      "file": "locales/iso_812.json"
+    },
+    {
+      "code": "iso_813",
+      "name": "Manda Orissa",
+      "english": "Manda Language",
+      "dir": "ltr",
+      "file": "locales/iso_813.json"
+    },
+    {
+      "code": "iso_814",
+      "name": "Konda",
+      "english": "Konda-Dora Language",
+      "dir": "ltr",
+      "file": "locales/iso_814.json"
+    },
+    {
+      "code": "iso_815",
+      "name": "Gondi Adilabad",
+      "english": "Gondi Language",
+      "dir": "ltr",
+      "file": "locales/iso_815.json"
+    },
+    {
+      "code": "iso_816",
+      "name": "Kolami",
+      "english": "Kolami Language",
+      "dir": "ltr",
+      "file": "locales/iso_816.json"
+    },
+    {
+      "code": "iso_817",
+      "name": "Naiki",
+      "english": "Naiki Language",
+      "dir": "ltr",
+      "file": "locales/iso_817.json"
+    },
+    {
+      "code": "iso_818",
+      "name": "Parji",
+      "english": "Duruwa Language",
+      "dir": "ltr",
+      "file": "locales/iso_818.json"
+    },
+    {
+      "code": "iso_819",
+      "name": "Ollari",
+      "english": "Gadaba Language",
+      "dir": "ltr",
+      "file": "locales/iso_819.json"
+    },
+    {
+      "code": "iso_820",
+      "name": "Toda",
+      "english": "Toda Language",
+      "dir": "ltr",
+      "file": "locales/iso_820.json"
+    },
+    {
+      "code": "iso_821",
+      "name": "Kota",
+      "english": "Kota Language",
+      "dir": "ltr",
+      "file": "locales/iso_821.json"
+    },
+    {
+      "code": "iso_822",
+      "name": "Badaga Nilgiri",
+      "english": "Badaga Language",
+      "dir": "ltr",
+      "file": "locales/iso_822.json"
+    },
+    {
+      "code": "iso_823",
+      "name": "Irula",
+      "english": "Irula Language",
+      "dir": "ltr",
+      "file": "locales/iso_823.json"
+    },
+    {
+      "code": "iso_824",
+      "name": "Kurumba",
+      "english": "Kurumba Language",
+      "dir": "ltr",
+      "file": "locales/iso_824.json"
+    },
+    {
+      "code": "iso_825",
+      "name": "Paniya",
+      "english": "Paniya Language",
+      "dir": "ltr",
+      "file": "locales/iso_825.json"
+    },
+    {
+      "code": "iso_826",
+      "name": "Kattunayakan",
+      "english": "Kattunayakan Language",
+      "dir": "ltr",
+      "file": "locales/iso_826.json"
+    },
+    {
+      "code": "iso_827",
+      "name": "Tulu Mangalore",
+      "english": "Tulu Language",
+      "dir": "ltr",
+      "file": "locales/iso_827.json"
+    },
+    {
+      "code": "iso_828",
+      "name": "Koraga",
+      "english": "Koraga Language",
+      "dir": "ltr",
+      "file": "locales/iso_828.json"
+    },
+    {
+      "code": "iso_829",
+      "name": "Beary",
+      "english": "Beary bashe Language",
+      "dir": "ltr",
+      "file": "locales/iso_829.json"
+    },
+    {
+      "code": "iso_830",
+      "name": "Kodava Coorg",
+      "english": "Kodava Takk Language",
+      "dir": "ltr",
+      "file": "locales/iso_830.json"
+    },
+    {
+      "code": "iso_831",
+      "name": "Yerava",
+      "english": "Yerava Language",
+      "dir": "ltr",
+      "file": "locales/iso_831.json"
+    },
+    {
+      "code": "iso_832",
+      "name": "Havyaka",
+      "english": "Havyaka Kannada Language",
+      "dir": "ltr",
+      "file": "locales/iso_832.json"
+    },
+    {
+      "code": "iso_833",
+      "name": "Sankethi",
+      "english": "Sankethi Language",
+      "dir": "ltr",
+      "file": "locales/iso_833.json"
+    },
+    {
+      "code": "iso_834",
+      "name": "Arebhashe",
+      "english": "Arebhashe Language",
+      "dir": "ltr",
+      "file": "locales/iso_834.json"
+    },
+    {
+      "code": "iso_835",
+      "name": "Barke",
+      "english": "Barke Language",
+      "dir": "ltr",
+      "file": "locales/iso_835.json"
+    },
+    {
+      "code": "iso_836",
+      "name": "Nihali",
+      "english": "Kalto Language",
+      "dir": "ltr",
+      "file": "locales/iso_836.json"
+    },
+    {
+      "code": "iso_837",
+      "name": "Kusunda",
+      "english": "Kusunda Language",
+      "dir": "ltr",
+      "file": "locales/iso_837.json"
+    },
+    {
+      "code": "iso_838",
+      "name": "Raute",
+      "english": "Raute Language",
+      "dir": "ltr",
+      "file": "locales/iso_838.json"
+    },
+    {
+      "code": "iso_839",
+      "name": "Raji",
+      "english": "Raji Language",
+      "dir": "ltr",
+      "file": "locales/iso_839.json"
+    },
+    {
+      "code": "iso_840",
+      "name": "Chepang",
+      "english": "Chepang Language",
+      "dir": "ltr",
+      "file": "locales/iso_840.json"
+    },
+    {
+      "code": "iso_841",
+      "name": "Thami",
+      "english": "Thangmi Language",
+      "dir": "ltr",
+      "file": "locales/iso_841.json"
+    },
+    {
+      "code": "iso_842",
+      "name": "Baram",
+      "english": "Baram Language",
+      "dir": "ltr",
+      "file": "locales/iso_842.json"
+    },
+    {
+      "code": "iso_843",
+      "name": "Hayu",
+      "english": "Vayu Language",
+      "dir": "ltr",
+      "file": "locales/iso_843.json"
+    },
+    {
+      "code": "iso_844",
+      "name": "Sunwar",
+      "english": "Kõits Language",
+      "dir": "ltr",
+      "file": "locales/iso_844.json"
+    },
+    {
+      "code": "iso_845",
+      "name": "Yakkha",
+      "english": "Yakkha Language",
+      "dir": "ltr",
+      "file": "locales/iso_845.json"
+    },
+    {
+      "code": "iso_846",
+      "name": "Limbu",
+      "english": "Sirijanga Language",
+      "dir": "ltr",
+      "file": "locales/iso_846.json"
+    },
+    {
+      "code": "iso_847",
+      "name": "Lepcha",
+      "english": "Róng Language",
+      "dir": "ltr",
+      "file": "locales/iso_847.json"
+    },
+    {
+      "code": "iso_848",
+      "name": "Meche",
+      "english": "Meche Language",
+      "dir": "ltr",
+      "file": "locales/iso_848.json"
+    },
+    {
+      "code": "iso_849",
+      "name": "Dhimal",
+      "english": "Dhimal Language",
+      "dir": "ltr",
+      "file": "locales/iso_849.json"
+    },
+    {
+      "code": "iso_850",
+      "name": "Koch",
+      "english": "Koch Language",
+      "dir": "ltr",
+      "file": "locales/iso_850.json"
+    },
+    {
+      "code": "iso_851",
+      "name": "Rabha",
+      "english": "Rabha Language",
+      "dir": "ltr",
+      "file": "locales/iso_851.json"
+    },
+    {
+      "code": "iso_852",
+      "name": "Tiwa",
+      "english": "Tiwa Language",
+      "dir": "ltr",
+      "file": "locales/iso_852.json"
+    },
+    {
+      "code": "iso_853",
+      "name": "Karbi",
+      "english": "Karbi Language",
+      "dir": "ltr",
+      "file": "locales/iso_853.json"
+    },
+    {
+      "code": "iso_854",
+      "name": "Dimasa",
+      "english": "Dimasa Language",
+      "dir": "ltr",
+      "file": "locales/iso_854.json"
+    },
+    {
+      "code": "iso_855",
+      "name": "Deori",
+      "english": "Deori Language",
+      "dir": "ltr",
+      "file": "locales/iso_855.json"
+    },
+    {
+      "code": "iso_856",
+      "name": "Mising",
+      "english": "Mising Language",
+      "dir": "ltr",
+      "file": "locales/iso_856.json"
+    },
+    {
+      "code": "iso_857",
+      "name": "Chakma",
+      "english": "Changma Language",
+      "dir": "ltr",
+      "file": "locales/iso_857.json"
+    },
+    {
+      "code": "iso_858",
+      "name": "Hajong",
+      "english": "Hajong Language",
+      "dir": "ltr",
+      "file": "locales/iso_858.json"
+    },
+    {
+      "code": "iso_859",
+      "name": "Khyang",
+      "english": "Khyang Language",
+      "dir": "ltr",
+      "file": "locales/iso_859.json"
+    },
+    {
+      "code": "iso_860",
+      "name": "Pangkhua",
+      "english": "Pangkhua Language",
+      "dir": "ltr",
+      "file": "locales/iso_860.json"
+    },
+    {
+      "code": "iso_861",
+      "name": "Bawm",
+      "english": "Bawm Language",
+      "dir": "ltr",
+      "file": "locales/iso_861.json"
+    },
+    {
+      "code": "iso_862",
+      "name": "Khumi",
+      "english": "Khumi Language",
+      "dir": "ltr",
+      "file": "locales/iso_862.json"
+    },
+    {
+      "code": "iso_863",
+      "name": "Marma",
+      "english": "Marma Language",
+      "dir": "ltr",
+      "file": "locales/iso_863.json"
+    },
+    {
+      "code": "iso_864",
+      "name": "Tanchangya",
+      "english": "Tanchangya Language",
+      "dir": "ltr",
+      "file": "locales/iso_864.json"
+    },
+    {
+      "code": "iso_865",
+      "name": "Tripuri",
+      "english": "Kokborok Language",
+      "dir": "ltr",
+      "file": "locales/iso_865.json"
+    },
+    {
+      "code": "iso_866",
+      "name": "Reang",
+      "english": "Bru Language",
+      "dir": "ltr",
+      "file": "locales/iso_866.json"
+    },
+    {
+      "code": "iso_867",
+      "name": "Jamatia",
+      "english": "Jamatia Language",
+      "dir": "ltr",
+      "file": "locales/iso_867.json"
+    },
+    {
+      "code": "iso_868",
+      "name": "Noatia",
+      "english": "Noatia Language",
+      "dir": "ltr",
+      "file": "locales/iso_868.json"
+    },
+    {
+      "code": "iso_869",
+      "name": "Halam",
+      "english": "Halam Language",
+      "dir": "ltr",
+      "file": "locales/iso_869.json"
+    },
+    {
+      "code": "iso_870",
+      "name": "Molsom",
+      "english": "Molsom Language",
+      "dir": "ltr",
+      "file": "locales/iso_870.json"
+    },
+    {
+      "code": "iso_871",
+      "name": "Kaipeng",
+      "english": "Kaipeng Language",
+      "dir": "ltr",
+      "file": "locales/iso_871.json"
+    },
+    {
+      "code": "iso_872",
+      "name": "Kalai",
+      "english": "Kalai Language",
+      "dir": "ltr",
+      "file": "locales/iso_872.json"
+    },
+    {
+      "code": "iso_873",
+      "name": "Rupini",
+      "english": "Rupini Language",
+      "dir": "ltr",
+      "file": "locales/iso_873.json"
+    },
+    {
+      "code": "iso_874",
+      "name": "Murasing",
+      "english": "Murasing Language",
+      "dir": "ltr",
+      "file": "locales/iso_874.json"
+    },
+    {
+      "code": "iso_875",
+      "name": "Uchoi",
+      "english": "Uchoi Language",
+      "dir": "ltr",
+      "file": "locales/iso_875.json"
+    },
+    {
+      "code": "iso_876",
+      "name": "Kuki",
+      "english": "Kuki Language",
+      "dir": "ltr",
+      "file": "locales/iso_876.json"
+    },
+    {
+      "code": "iso_877",
+      "name": "Paite",
+      "english": "Paite Language",
+      "dir": "ltr",
+      "file": "locales/iso_877.json"
+    },
+    {
+      "code": "iso_878",
+      "name": "Vaiphei",
+      "english": "Vaiphei Language",
+      "dir": "ltr",
+      "file": "locales/iso_878.json"
+    },
+    {
+      "code": "iso_879",
+      "name": "Zou",
+      "english": "Zou Language",
+      "dir": "ltr",
+      "file": "locales/iso_879.json"
+    },
+    {
+      "code": "iso_880",
+      "name": "Simte",
+      "english": "Simte Language",
+      "dir": "ltr",
+      "file": "locales/iso_880.json"
+    },
+    {
+      "code": "iso_881",
+      "name": "Gangte",
+      "english": "Gangte Language",
+      "dir": "ltr",
+      "file": "locales/iso_881.json"
+    },
+    {
+      "code": "iso_882",
+      "name": "Kom",
+      "english": "Kom Language",
+      "dir": "ltr",
+      "file": "locales/iso_882.json"
+    },
+    {
+      "code": "iso_883",
+      "name": "Anal",
+      "english": "Anal Language",
+      "dir": "ltr",
+      "file": "locales/iso_883.json"
+    },
+    {
+      "code": "iso_884",
+      "name": "Monsang",
+      "english": "Monsang Language",
+      "dir": "ltr",
+      "file": "locales/iso_884.json"
+    },
+    {
+      "code": "iso_885",
+      "name": "Moyon",
+      "english": "Moyon Language",
+      "dir": "ltr",
+      "file": "locales/iso_885.json"
+    },
+    {
+      "code": "iso_886",
+      "name": "Lamkang",
+      "english": "Lamkang Language",
+      "dir": "ltr",
+      "file": "locales/iso_886.json"
+    },
+    {
+      "code": "iso_887",
+      "name": "Tarao",
+      "english": "Tarao Language",
+      "dir": "ltr",
+      "file": "locales/iso_887.json"
+    },
+    {
+      "code": "iso_888",
+      "name": "Chothe",
+      "english": "Chothe Language",
+      "dir": "ltr",
+      "file": "locales/iso_888.json"
+    },
+    {
+      "code": "iso_889",
+      "name": "Purum",
+      "english": "Purum Language",
+      "dir": "ltr",
+      "file": "locales/iso_889.json"
+    },
+    {
+      "code": "iso_890",
+      "name": "Koireng",
+      "english": "Koireng Language",
+      "dir": "ltr",
+      "file": "locales/iso_890.json"
+    },
+    {
+      "code": "iso_891",
+      "name": "Kharam",
+      "english": "Kharam Language",
+      "dir": "ltr",
+      "file": "locales/iso_891.json"
+    },
+    {
+      "code": "iso_892",
+      "name": "Aimol",
+      "english": "Aimol Language",
+      "dir": "ltr",
+      "file": "locales/iso_892.json"
+    },
+    {
+      "code": "iso_893",
+      "name": "Chiru",
+      "english": "Chiru Language",
+      "dir": "ltr",
+      "file": "locales/iso_893.json"
+    },
+    {
+      "code": "iso_894",
+      "name": "Maring",
+      "english": "Maring Language",
+      "dir": "ltr",
+      "file": "locales/iso_894.json"
+    },
+    {
+      "code": "iso_895",
+      "name": "Tangkhul",
+      "english": "Tangkhul Language",
+      "dir": "ltr",
+      "file": "locales/iso_895.json"
+    },
+    {
+      "code": "iso_896",
+      "name": "Mao",
+      "english": "Mao Language",
+      "dir": "ltr",
+      "file": "locales/iso_896.json"
+    },
+    {
+      "code": "iso_897",
+      "name": "Maram",
+      "english": "Maram Language",
+      "dir": "ltr",
+      "file": "locales/iso_897.json"
+    },
+    {
+      "code": "iso_898",
+      "name": "Thangal",
+      "english": "Thangal Language",
+      "dir": "ltr",
+      "file": "locales/iso_898.json"
+    },
+    {
+      "code": "iso_899",
+      "name": "Poumai",
+      "english": "Poumai Language",
+      "dir": "ltr",
+      "file": "locales/iso_899.json"
+    },
+    {
+      "code": "iso_900",
+      "name": "Zeme",
+      "english": "Zeme Language",
+      "dir": "ltr",
+      "file": "locales/iso_900.json"
+    },
+    {
+      "code": "iso_901",
+      "name": "Liangmai",
+      "english": "Liangmai Language",
+      "dir": "ltr",
+      "file": "locales/iso_901.json"
+    },
+    {
+      "code": "iso_902",
+      "name": "Rongmei",
+      "english": "Rongmei Language",
+      "dir": "ltr",
+      "file": "locales/iso_902.json"
+    },
+    {
+      "code": "iso_903",
+      "name": "Inpui",
+      "english": "Inpui Language",
+      "dir": "ltr",
+      "file": "locales/iso_903.json"
+    },
+    {
+      "code": "iso_904",
+      "name": "Angami",
+      "english": "Tenyidie Language",
+      "dir": "ltr",
+      "file": "locales/iso_904.json"
+    },
+    {
+      "code": "iso_905",
+      "name": "Ao",
+      "english": "Ao Chungli Language",
+      "dir": "ltr",
+      "file": "locales/iso_905.json"
+    },
+    {
+      "code": "iso_906",
+      "name": "Sema",
+      "english": "Sümi Language",
+      "dir": "ltr",
+      "file": "locales/iso_906.json"
+    },
+    {
+      "code": "iso_907",
+      "name": "Lotha",
+      "english": "Lotha Language",
+      "dir": "ltr",
+      "file": "locales/iso_907.json"
+    },
+    {
+      "code": "iso_908",
+      "name": "Chakhesang",
+      "english": "Chokri Language",
+      "dir": "ltr",
+      "file": "locales/iso_908.json"
+    },
+    {
+      "code": "iso_909",
+      "name": "Khezha",
+      "english": "Khezha Language",
+      "dir": "ltr",
+      "file": "locales/iso_909.json"
+    },
+    {
+      "code": "iso_910",
+      "name": "Pochury",
+      "english": "Pochury Language",
+      "dir": "ltr",
+      "file": "locales/iso_910.json"
+    },
+    {
+      "code": "iso_911",
+      "name": "Rengma",
+      "english": "Rengma Language",
+      "dir": "ltr",
+      "file": "locales/iso_911.json"
+    },
+    {
+      "code": "iso_912",
+      "name": "Sangtam",
+      "english": "Sangtam Language",
+      "dir": "ltr",
+      "file": "locales/iso_912.json"
+    },
+    {
+      "code": "iso_913",
+      "name": "Yimkhiung",
+      "english": "Yimkhiungrü Language",
+      "dir": "ltr",
+      "file": "locales/iso_913.json"
+    },
+    {
+      "code": "iso_914",
+      "name": "Khiamniungan",
+      "english": "Khiamniungan Language",
+      "dir": "ltr",
+      "file": "locales/iso_914.json"
+    },
+    {
+      "code": "iso_915",
+      "name": "Chang",
+      "english": "Chang Language",
+      "dir": "ltr",
+      "file": "locales/iso_915.json"
+    },
+    {
+      "code": "iso_916",
+      "name": "Phom",
+      "english": "Phom Language",
+      "dir": "ltr",
+      "file": "locales/iso_916.json"
+    },
+    {
+      "code": "iso_917",
+      "name": "Konyak",
+      "english": "Konyak Language",
+      "dir": "ltr",
+      "file": "locales/iso_917.json"
+    },
+    {
+      "code": "iso_918",
+      "name": "Tikhir",
+      "english": "Tikhir Language",
+      "dir": "ltr",
+      "file": "locales/iso_918.json"
+    },
+    {
+      "code": "iso_919",
+      "name": "Zeliang",
+      "english": "Zeliang Language",
+      "dir": "ltr",
+      "file": "locales/iso_919.json"
+    },
+    {
+      "code": "iso_920",
+      "name": "Kuki-Chin",
+      "english": "Chin Language",
+      "dir": "ltr",
+      "file": "locales/iso_920.json"
+    },
+    {
+      "code": "iso_921",
+      "name": "Mru",
+      "english": "Mru Language",
+      "dir": "ltr",
+      "file": "locales/iso_921.json"
+    },
+    {
+      "code": "iso_922",
+      "name": "Khumi Chin",
+      "english": "Khumi Language",
+      "dir": "ltr",
+      "file": "locales/iso_922.json"
+    },
+    {
+      "code": "iso_923",
+      "name": "Asho Chin",
+      "english": "Asho Language",
+      "dir": "ltr",
+      "file": "locales/iso_923.json"
+    },
+    {
+      "code": "iso_924",
+      "name": "Cho Chin",
+      "english": "Mindat Language",
+      "dir": "ltr",
+      "file": "locales/iso_924.json"
+    },
+    {
+      "code": "iso_925",
+      "name": "Daai Chin",
+      "english": "Daai Language",
+      "dir": "ltr",
+      "file": "locales/iso_925.json"
+    },
+    {
+      "code": "iso_926",
+      "name": "Falam Chin",
+      "english": "Falam Language",
+      "dir": "ltr",
+      "file": "locales/iso_926.json"
+    },
+    {
+      "code": "iso_927",
+      "name": "Tedim Chin",
+      "english": "Tedim Language",
+      "dir": "ltr",
+      "file": "locales/iso_927.json"
+    },
+    {
+      "code": "iso_928",
+      "name": "Thado Chin",
+      "english": "Thadou Language",
+      "dir": "ltr",
+      "file": "locales/iso_928.json"
+    },
+    {
+      "code": "iso_929",
+      "name": "Zophei Chin",
+      "english": "Zophei Language",
+      "dir": "ltr",
+      "file": "locales/iso_929.json"
+    },
+    {
+      "code": "iso_930",
+      "name": "Mara Chin",
+      "english": "Mara Language",
+      "dir": "ltr",
+      "file": "locales/iso_930.json"
+    },
+    {
+      "code": "iso_931",
+      "name": "Lushai Chin",
+      "english": "Mizo Language",
+      "dir": "ltr",
+      "file": "locales/iso_931.json"
+    },
+    {
+      "code": "iso_932",
+      "name": "Hmar",
+      "english": "Hmar Language",
+      "dir": "ltr",
+      "file": "locales/iso_932.json"
+    },
+    {
+      "code": "iso_933",
+      "name": "Ralte",
+      "english": "Ralte Language",
+      "dir": "ltr",
+      "file": "locales/iso_933.json"
+    },
+    {
+      "code": "iso_934",
+      "name": "Pawi",
+      "english": "Lai Language",
+      "dir": "ltr",
+      "file": "locales/iso_934.json"
+    },
+    {
+      "code": "iso_935",
+      "name": "Pang",
+      "english": "Pang Language",
+      "dir": "ltr",
+      "file": "locales/iso_935.json"
+    },
+    {
+      "code": "iso_936",
+      "name": "Bawm Chin",
+      "english": "Bawm Language",
+      "dir": "ltr",
+      "file": "locales/iso_936.json"
+    },
+    {
+      "code": "iso_937",
+      "name": "Khyang Chin",
+      "english": "Khyang Language",
+      "dir": "ltr",
+      "file": "locales/iso_937.json"
+    },
+    {
+      "code": "iso_938",
+      "name": "Mro Chin",
+      "english": "Mro Language",
+      "dir": "ltr",
+      "file": "locales/iso_938.json"
+    },
+    {
+      "code": "iso_939",
+      "name": "Anu Chin",
+      "english": "Anu Language",
+      "dir": "ltr",
+      "file": "locales/iso_939.json"
+    },
+    {
+      "code": "iso_940",
+      "name": "Hkongso Chin",
+      "english": "Hkongso Language",
+      "dir": "ltr",
+      "file": "locales/iso_940.json"
+    },
+    {
+      "code": "iso_941",
+      "name": "Kaang Chin",
+      "english": "Kaang Language",
+      "dir": "ltr",
+      "file": "locales/iso_941.json"
+    },
+    {
+      "code": "iso_942",
+      "name": "Laitu Chin",
+      "english": "Laitu Language",
+      "dir": "ltr",
+      "file": "locales/iso_942.json"
+    },
+    {
+      "code": "iso_943",
+      "name": "Lautu Chin",
+      "english": "Lautu Language",
+      "dir": "ltr",
+      "file": "locales/iso_943.json"
+    },
+    {
+      "code": "iso_944",
+      "name": "Matu Chin",
+      "english": "Matu Language",
+      "dir": "ltr",
+      "file": "locales/iso_944.json"
+    },
+    {
+      "code": "iso_945",
+      "name": "Mün Chin",
+      "english": "Mün Language",
+      "dir": "ltr",
+      "file": "locales/iso_945.json"
+    },
+    {
+      "code": "iso_946",
+      "name": "Ngawn Chin",
+      "english": "Ngawn Language",
+      "dir": "ltr",
+      "file": "locales/iso_946.json"
+    },
+    {
+      "code": "iso_947",
+      "name": "Rungtu Chin",
+      "english": "Rungtu Language",
+      "dir": "ltr",
+      "file": "locales/iso_947.json"
+    },
+    {
+      "code": "iso_948",
+      "name": "Senthang Chin",
+      "english": "Senthang Language",
+      "dir": "ltr",
+      "file": "locales/iso_948.json"
+    },
+    {
+      "code": "iso_949",
+      "name": "Songlai Chin",
+      "english": "Songlai Language",
+      "dir": "ltr",
+      "file": "locales/iso_949.json"
+    },
+    {
+      "code": "iso_950",
+      "name": "Tawr Chin",
+      "english": "Tawr Language",
+      "dir": "ltr",
+      "file": "locales/iso_950.json"
+    },
+    {
       "code": "it",
       "name": "Italiano",
       "english": "Italian",
@@ -5201,5 +6251,5 @@
       "file": "locales/zu.json"
     }
   ],
-  "updatedAt": "2026-11-11T14:59:03.122Z"
+  "updatedAt": "2026-11-11T15:01:42.634Z"
 }

@@ -1,12 +1,12 @@
 # 🌐 DEEP FOCUS — Official Localization Progress Ledger
 
-- **Current Version:** v506.0.0 (Code 41226)
-- **Total Fully Localized Languages:** 741 / 1000 (74.10%)
+- **Current Version:** v507.0.0 (Code 41227)
+- **Total Fully Localized Languages:** 891 / 1000 (89.10%)
 - **Permanent Sovereign Exclusion:** Hebrew (`he`, `iw`), Syriac (`syc`), Amazigh (`ber`, `zgh`) permanently banned.
 - **Numerals Policy:** Strict ASCII Western Arabic digits exclusively (`0123456789`).
 - **UI Coverage:** 100% of all interactive buttons, studios & modals tagged with `data-i18n`.
 
-### ✅ Master List of Localized Languages (1 to 741):
+### ✅ Master List of Localized Languages (1 to 891):
 
 | # | Code | Native Name | English Name | Dir | File |
 |---|------|-------------|--------------|-----|------|
@@ -589,165 +589,315 @@
 | 577 | `iso_795` | **Kashmiri Srinagar** | کٲشُر Language | `LTR` | `locales/iso_795.json` |
 | 578 | `iso_796` | **Kashubian Gdansk** | Kaszëbsczi Language | `LTR` | `locales/iso_796.json` |
 | 579 | `iso_797` | **Kazakh Almaty** | Қазақша Language | `LTR` | `locales/iso_797.json` |
-| 580 | `it` | **Italiano** | Italian | `LTR` | `locales/it.json` |
-| 581 | `iu` | **ᐃᓄᒃᑎᑐᑦ** | Inuktitut | `LTR` | `locales/iu.json` |
-| 582 | `ja` | **日本語** | Japanese | `LTR` | `locales/ja.json` |
-| 583 | `jv` | **Basa Jawa** | Javanese | `LTR` | `locales/jv.json` |
-| 584 | `ka` | **ქართული** | Georgian | `LTR` | `locales/ka.json` |
-| 585 | `kal` | **Kalenjin** | Kalenjin | `LTR` | `locales/kal.json` |
-| 586 | `kam` | **Kikamba** | Kamba | `LTR` | `locales/kam.json` |
-| 587 | `kas` | **کٲشُر** | Kashmiri | `RTL` | `locales/kas.json` |
-| 588 | `kbd` | **Адыгэбзэ (Къэбэрдей)** | Kabardian | `LTR` | `locales/kbd.json` |
-| 589 | `kfa` | **Kodava** | Kodava | `LTR` | `locales/kfa.json` |
-| 590 | `kg` | **Kikongo** | Kongo | `LTR` | `locales/kg.json` |
-| 591 | `kha` | **Ka Tien Khasi** | Khasi | `LTR` | `locales/kha.json` |
-| 592 | `kik` | **Gĩkũyũ** | Kikuyu | `LTR` | `locales/kik.json` |
-| 593 | `kk` | **Қазақша** | Kazakh | `LTR` | `locales/kk.json` |
-| 594 | `kl` | **Kalaallisut** | Greenlandic | `LTR` | `locales/kl.json` |
-| 595 | `km` | **ភាសាខ្មែរ** | Khmer | `LTR` | `locales/km.json` |
-| 596 | `kmb` | **Kimbundu** | Kimbundu | `LTR` | `locales/kmb.json` |
-| 597 | `kn` | **ಕನ್ನಡ** | Kannada | `LTR` | `locales/kn.json` |
-| 598 | `ko` | **한국어** | Korean | `LTR` | `locales/ko.json` |
-| 599 | `koi` | **Перем коми** | Komi-Permyak | `LTR` | `locales/koi.json` |
-| 600 | `kok` | **कोंकणी** | Konkani | `LTR` | `locales/kok.json` |
-| 601 | `kpv` | **Коми кыв** | Komi-Zyrian | `LTR` | `locales/kpv.json` |
-| 602 | `krc` | **Къарачай-малкъар** | Karachay-Balkar | `LTR` | `locales/krc.json` |
-| 603 | `krl` | **Karjalan kieli** | Karelian | `LTR` | `locales/krl.json` |
-| 604 | `ks` | **कॉशुर** | Kashmiri Devanagari | `LTR` | `locales/ks.json` |
-| 605 | `ku` | **Kurdî** | Kurdish | `RTL` | `locales/ku.json` |
-| 606 | `kum` | **Къумукъ тил** | Kumyk | `LTR` | `locales/kum.json` |
-| 607 | `kw` | **Kernewek** | Cornish | `LTR` | `locales/kw.json` |
-| 608 | `kwy` | **Kikwango** | Kikwango | `LTR` | `locales/kwy.json` |
-| 609 | `ky` | **Кыргызча** | Kyrgyz | `LTR` | `locales/ky.json` |
-| 610 | `la` | **Latina** | Latin | `LTR` | `locales/la.json` |
-| 611 | `lb` | **Lëtzebuergesch** | Luxembourgish | `LTR` | `locales/lb.json` |
-| 612 | `lbe` | **Лакку маз** | Lak | `LTR` | `locales/lbe.json` |
-| 613 | `lez` | **Лезги чӀал** | Lezgian | `LTR` | `locales/lez.json` |
-| 614 | `lg` | **Luganda** | Ganda | `LTR` | `locales/lg.json` |
-| 615 | `lgg` | **Lugbara** | Lugbara | `LTR` | `locales/lgg.json` |
-| 616 | `liv` | **Līvõ kēļ** | Livonian | `LTR` | `locales/liv.json` |
-| 617 | `lmo` | **Lombard** | Lombard | `LTR` | `locales/lmo.json` |
-| 618 | `ln` | **Lingála** | Lingala | `LTR` | `locales/ln.json` |
-| 619 | `lo` | **ພາສາລາວ** | Lao | `LTR` | `locales/lo.json` |
-| 620 | `loz` | **Silozi** | Lozi | `LTR` | `locales/loz.json` |
-| 621 | `lua` | **Tshiluba** | Luba-Kasai | `LTR` | `locales/lua.json` |
-| 622 | `luo` | **Dholuo** | Luo | `LTR` | `locales/luo.json` |
-| 623 | `lus` | **Mizo ṭawng** | Mizo | `LTR` | `locales/lus.json` |
-| 624 | `luy` | **Oluluyia** | Luhya | `LTR` | `locales/luy.json` |
-| 625 | `mad` | **Madhurâ** | Madurese | `LTR` | `locales/mad.json` |
-| 626 | `mag` | **मगही** | Magahi | `LTR` | `locales/mag.json` |
-| 627 | `mai` | **मैथिली** | Maithili | `LTR` | `locales/mai.json` |
-| 628 | `mak` | **Basa Mangkasara** | Makasar | `LTR` | `locales/mak.json` |
-| 629 | `mas` | **Maa** | Maasai | `LTR` | `locales/mas.json` |
-| 630 | `mdf` | **Мокшень кяль** | Moksha | `LTR` | `locales/mdf.json` |
-| 631 | `mer` | **Kĩmĩrũ** | Meru | `LTR` | `locales/mer.json` |
-| 632 | `mg` | **Malagasy** | Malagasy | `LTR` | `locales/mg.json` |
-| 633 | `mhr` | **Олык марий** | Meadow Mari | `LTR` | `locales/mhr.json` |
-| 634 | `mi` | **Te Reo Māori** | Māori | `LTR` | `locales/mi.json` |
-| 635 | `min` | **Baso Minangkabau** | Minangkabau | `LTR` | `locales/min.json` |
-| 636 | `ml` | **മലയാളം** | Malayalam | `LTR` | `locales/ml.json` |
-| 637 | `mn` | **Монгол** | Mongolian | `LTR` | `locales/mn.json` |
-| 638 | `mni` | **মৈতৈলোন্** | Manipuri | `LTR` | `locales/mni.json` |
-| 639 | `mos` | **Mooré** | Mossi | `LTR` | `locales/mos.json` |
-| 640 | `mr` | **मराठी** | Marathi | `LTR` | `locales/mr.json` |
-| 641 | `mrj` | **Кырык мары** | Hill Mari | `LTR` | `locales/mrj.json` |
-| 642 | `mt` | **Malti** | Maltese | `LTR` | `locales/mt.json` |
-| 643 | `my` | **မြန်မာဘာသာ** | Burmese | `LTR` | `locales/my.json` |
-| 644 | `myv` | **Эрзянь кель** | Erzya | `LTR` | `locales/myv.json` |
-| 645 | `nah` | **Nāhuatl** | Nahuatl | `LTR` | `locales/nah.json` |
-| 646 | `nap` | **Nnapulitano** | Neapolitan | `LTR` | `locales/nap.json` |
-| 647 | `nav` | **Diné Bizaad** | Navajo | `LTR` | `locales/nav.json` |
-| 648 | `ne` | **नेपाली** | Nepali | `LTR` | `locales/ne.json` |
-| 649 | `new` | **नेपाल भाषा** | Newari | `LTR` | `locales/new.json` |
-| 650 | `nl` | **Nederlands** | Dutch | `LTR` | `locales/nl.json` |
-| 651 | `no` | **Norsk** | Norwegian | `LTR` | `locales/no.json` |
-| 652 | `nog` | **Ногай тили** | Nogai | `LTR` | `locales/nog.json` |
-| 653 | `nr` | **isiNdebele** | Southern Ndebele | `LTR` | `locales/nr.json` |
-| 654 | `nus` | **Thok Nath** | Nuer | `LTR` | `locales/nus.json` |
-| 655 | `nya` | **Chichewa** | Chewa | `LTR` | `locales/nya.json` |
-| 656 | `nyn` | **Runyankore** | Nyankole | `LTR` | `locales/nyn.json` |
-| 657 | `nyo` | **Runyoro** | Nyoro | `LTR` | `locales/nyo.json` |
-| 658 | `oc` | **Occitan** | Occitan | `LTR` | `locales/oc.json` |
-| 659 | `om` | **Oromoo** | Oromo | `LTR` | `locales/om.json` |
-| 660 | `or` | **ଓଡ଼ିଆ** | Odia | `LTR` | `locales/or.json` |
-| 661 | `oss` | **Ирон æвзаг** | Ossetian | `LTR` | `locales/oss.json` |
-| 662 | `pa` | **ਪੰਜਾਬੀ** | Punjabi | `LTR` | `locales/pa.json` |
-| 663 | `pag` | **Pangasinan** | Pangasinan | `LTR` | `locales/pag.json` |
-| 664 | `pam` | **Kapampangan** | Kapampangan | `LTR` | `locales/pam.json` |
-| 665 | `pap` | **Papiamento** | Papiamento | `LTR` | `locales/pap.json` |
-| 666 | `pl` | **Polski** | Polish | `LTR` | `locales/pl.json` |
-| 667 | `pms` | **Piemontèis** | Piedmontese | `LTR` | `locales/pms.json` |
-| 668 | `ps` | **پښتو** | Pashto | `RTL` | `locales/ps.json` |
-| 669 | `pt` | **Português** | Portuguese | `LTR` | `locales/pt.json` |
-| 670 | `qu` | **Runa Simi** | Quechua | `LTR` | `locales/qu.json` |
-| 671 | `raj` | **राजस्थानी** | Rajasthani | `LTR` | `locales/raj.json` |
-| 672 | `rm` | **Rumantsch** | Romansh | `LTR` | `locales/rm.json` |
-| 673 | `ro` | **Română** | Romanian | `LTR` | `locales/ro.json` |
-| 674 | `ru` | **Русский** | Russian | `LTR` | `locales/ru.json` |
-| 675 | `rut` | **МыхӀабишды чӀел** | Rutul | `LTR` | `locales/rut.json` |
-| 676 | `rw` | **Kinyarwanda** | Kinyarwanda | `LTR` | `locales/rw.json` |
-| 677 | `sah` | **Саха тыла** | Yakut | `LTR` | `locales/sah.json` |
-| 678 | `sas` | **Basa Sasak** | Sasak | `LTR` | `locales/sas.json` |
-| 679 | `sat` | **ᱥᱟᱱᱛᱟᱲᱤ** | Santali | `LTR` | `locales/sat.json` |
-| 680 | `sc` | **Sardu** | Sardinian | `LTR` | `locales/sc.json` |
-| 681 | `scn` | **Sicilianu** | Sicilian | `LTR` | `locales/scn.json` |
-| 682 | `sd` | **سنڌي** | Sindhi | `RTL` | `locales/sd.json` |
-| 683 | `shk` | **Shilluk** | Shilluk | `LTR` | `locales/shk.json` |
-| 684 | `si` | **සිංහල** | Sinhala | `LTR` | `locales/si.json` |
-| 685 | `sid` | **Sidaamu Afoo** | Sidamo | `LTR` | `locales/sid.json` |
-| 686 | `sit` | **Garo** | Garo | `LTR` | `locales/sit.json` |
-| 687 | `sk` | **Slovenčina** | Slovak | `LTR` | `locales/sk.json` |
-| 688 | `sm` | **Gagana Sāmoa** | Samoan | `LTR` | `locales/sm.json` |
-| 689 | `sme` | **Davvisámegiella** | Northern Sami | `LTR` | `locales/sme.json` |
-| 690 | `smj` | **Julevsámegiella** | Lule Sami | `LTR` | `locales/smj.json` |
-| 691 | `smn` | **Anarâškielâ** | Inari Sami | `LTR` | `locales/smn.json` |
-| 692 | `sn` | **chiShona** | Shona | `LTR` | `locales/sn.json` |
-| 693 | `snk` | **Soninkara** | Soninke | `LTR` | `locales/snk.json` |
-| 694 | `so` | **Soomaali** | Somali | `LTR` | `locales/so.json` |
-| 695 | `sq` | **Shqip** | Albanian | `LTR` | `locales/sq.json` |
-| 696 | `sr` | **Српски** | Serbian | `LTR` | `locales/sr.json` |
-| 697 | `ss` | **SiSwati** | Swati | `LTR` | `locales/ss.json` |
-| 698 | `st` | **Sesotho** | Southern Sotho | `LTR` | `locales/st.json` |
-| 699 | `su` | **Basa Sunda** | Sundanese | `LTR` | `locales/su.json` |
-| 700 | `sv` | **Svenska** | Swedish | `LTR` | `locales/sv.json` |
-| 701 | `sw` | **Kiswahili** | Swahili | `LTR` | `locales/sw.json` |
-| 702 | `ta` | **தமிழ்** | Tamil | `LTR` | `locales/ta.json` |
-| 703 | `tab` | **Табасаран чӀал** | Tabasaran | `LTR` | `locales/tab.json` |
-| 704 | `te` | **తెలుగు** | Telugu | `LTR` | `locales/te.json` |
-| 705 | `teo` | **Ateso** | Teso | `LTR` | `locales/teo.json` |
-| 706 | `tet` | **Lia-Tetun** | Tetum | `LTR` | `locales/tet.json` |
-| 707 | `tg` | **Тоҷикӣ** | Tajik | `LTR` | `locales/tg.json` |
-| 708 | `th` | **ไทย** | Thai | `LTR` | `locales/th.json` |
-| 709 | `ti` | **ትግርኛ** | Tigrinya | `LTR` | `locales/ti.json` |
-| 710 | `tk` | **Türkmençe** | Turkmen | `LTR` | `locales/tk.json` |
-| 711 | `tl` | **Tagalog** | Filipino | `LTR` | `locales/tl.json` |
-| 712 | `tly` | **Tolışi** | Talysh | `LTR` | `locales/tly.json` |
-| 713 | `tn` | **Setswana** | Tswana | `LTR` | `locales/tn.json` |
-| 714 | `ton` | **Lea Faka-Tonga** | Tongan | `LTR` | `locales/ton.json` |
-| 715 | `tpi` | **Tok Pisin** | Tok Pisin | `LTR` | `locales/tpi.json` |
-| 716 | `tr` | **Türkçe** | Turkish | `LTR` | `locales/tr.json` |
-| 717 | `ts` | **Xitsonga** | Tsonga | `LTR` | `locales/ts.json` |
-| 718 | `tt` | **Татарча** | Tatar | `LTR` | `locales/tt.json` |
-| 719 | `ttt` | **Tati** | Tat | `LTR` | `locales/ttt.json` |
-| 720 | `tum` | **Chitumbuka** | Tumbuka | `LTR` | `locales/tum.json` |
-| 721 | `tuv` | **Ngaturkana** | Turkana | `LTR` | `locales/tuv.json` |
-| 722 | `ty` | **Reo Tahiti** | Tahitian | `LTR` | `locales/ty.json` |
-| 723 | `tyv` | **Тыва дыл** | Tuvan | `LTR` | `locales/tyv.json` |
-| 724 | `udm` | **Удмурт кыл** | Udmurt | `LTR` | `locales/udm.json` |
-| 725 | `ug` | **ئۇيغۇرچە** | Uyghur | `RTL` | `locales/ug.json` |
-| 726 | `uk` | **Українська** | Ukrainian | `LTR` | `locales/uk.json` |
-| 727 | `umb` | **Umbundu** | Umbundu | `LTR` | `locales/umb.json` |
-| 728 | `ur` | **اردو** | Urdu | `RTL` | `locales/ur.json` |
-| 729 | `uz` | **Oʻzbek** | Uzbek | `LTR` | `locales/uz.json` |
-| 730 | `ve` | **Tshivenda** | Venda | `LTR` | `locales/ve.json` |
-| 731 | `vec` | **Vèneto** | Venetian | `LTR` | `locales/vec.json` |
-| 732 | `vep` | **Vepsän kel’** | Veps | `LTR` | `locales/vep.json` |
-| 733 | `vi` | **Tiếng Việt** | Vietnamese | `LTR` | `locales/vi.json` |
-| 734 | `wal` | **Wolaytta** | Wolaytta | `LTR` | `locales/wal.json` |
-| 735 | `war` | **Winaray** | Waray | `LTR` | `locales/war.json` |
-| 736 | `wol` | **Wolof** | Wolof | `LTR` | `locales/wol.json` |
-| 737 | `xal` | **Хальмг келн** | Kalmyk | `LTR` | `locales/xal.json` |
-| 738 | `xh` | **isiXhosa** | Xhosa | `LTR` | `locales/xh.json` |
-| 739 | `yo` | **Yorùbá** | Yoruba | `LTR` | `locales/yo.json` |
-| 740 | `zh` | **中文** | Chinese | `LTR` | `locales/zh.json` |
-| 741 | `zu` | **isiZulu** | Zulu | `LTR` | `locales/zu.json` |
+| 580 | `iso_801` | **Khoisan** | Khoekhoegowab Language | `LTR` | `locales/iso_801.json` |
+| 581 | `iso_802` | **Munda** | Mundari Language | `LTR` | `locales/iso_802.json` |
+| 582 | `iso_803` | **Ho** | Ho Language | `LTR` | `locales/iso_803.json` |
+| 583 | `iso_804` | **Korku** | Korku Language | `LTR` | `locales/iso_804.json` |
+| 584 | `iso_805` | **Kharia** | Kharia Language | `LTR` | `locales/iso_805.json` |
+| 585 | `iso_806` | **Sora** | Sora Language | `LTR` | `locales/iso_806.json` |
+| 586 | `iso_807` | **Savara** | Savara Language | `LTR` | `locales/iso_807.json` |
+| 587 | `iso_808` | **Kurukh** | Kurukh Language | `LTR` | `locales/iso_808.json` |
+| 588 | `iso_809` | **Malto** | Paharia Language | `LTR` | `locales/iso_809.json` |
+| 589 | `iso_810` | **Kui** | Kui Language | `LTR` | `locales/iso_810.json` |
+| 590 | `iso_811` | **Kuvi** | Kuvi Language | `LTR` | `locales/iso_811.json` |
+| 591 | `iso_812` | **Pengo** | Pengo Language | `LTR` | `locales/iso_812.json` |
+| 592 | `iso_813` | **Manda Orissa** | Manda Language | `LTR` | `locales/iso_813.json` |
+| 593 | `iso_814` | **Konda** | Konda-Dora Language | `LTR` | `locales/iso_814.json` |
+| 594 | `iso_815` | **Gondi Adilabad** | Gondi Language | `LTR` | `locales/iso_815.json` |
+| 595 | `iso_816` | **Kolami** | Kolami Language | `LTR` | `locales/iso_816.json` |
+| 596 | `iso_817` | **Naiki** | Naiki Language | `LTR` | `locales/iso_817.json` |
+| 597 | `iso_818` | **Parji** | Duruwa Language | `LTR` | `locales/iso_818.json` |
+| 598 | `iso_819` | **Ollari** | Gadaba Language | `LTR` | `locales/iso_819.json` |
+| 599 | `iso_820` | **Toda** | Toda Language | `LTR` | `locales/iso_820.json` |
+| 600 | `iso_821` | **Kota** | Kota Language | `LTR` | `locales/iso_821.json` |
+| 601 | `iso_822` | **Badaga Nilgiri** | Badaga Language | `LTR` | `locales/iso_822.json` |
+| 602 | `iso_823` | **Irula** | Irula Language | `LTR` | `locales/iso_823.json` |
+| 603 | `iso_824` | **Kurumba** | Kurumba Language | `LTR` | `locales/iso_824.json` |
+| 604 | `iso_825` | **Paniya** | Paniya Language | `LTR` | `locales/iso_825.json` |
+| 605 | `iso_826` | **Kattunayakan** | Kattunayakan Language | `LTR` | `locales/iso_826.json` |
+| 606 | `iso_827` | **Tulu Mangalore** | Tulu Language | `LTR` | `locales/iso_827.json` |
+| 607 | `iso_828` | **Koraga** | Koraga Language | `LTR` | `locales/iso_828.json` |
+| 608 | `iso_829` | **Beary** | Beary bashe Language | `LTR` | `locales/iso_829.json` |
+| 609 | `iso_830` | **Kodava Coorg** | Kodava Takk Language | `LTR` | `locales/iso_830.json` |
+| 610 | `iso_831` | **Yerava** | Yerava Language | `LTR` | `locales/iso_831.json` |
+| 611 | `iso_832` | **Havyaka** | Havyaka Kannada Language | `LTR` | `locales/iso_832.json` |
+| 612 | `iso_833` | **Sankethi** | Sankethi Language | `LTR` | `locales/iso_833.json` |
+| 613 | `iso_834` | **Arebhashe** | Arebhashe Language | `LTR` | `locales/iso_834.json` |
+| 614 | `iso_835` | **Barke** | Barke Language | `LTR` | `locales/iso_835.json` |
+| 615 | `iso_836` | **Nihali** | Kalto Language | `LTR` | `locales/iso_836.json` |
+| 616 | `iso_837` | **Kusunda** | Kusunda Language | `LTR` | `locales/iso_837.json` |
+| 617 | `iso_838` | **Raute** | Raute Language | `LTR` | `locales/iso_838.json` |
+| 618 | `iso_839` | **Raji** | Raji Language | `LTR` | `locales/iso_839.json` |
+| 619 | `iso_840` | **Chepang** | Chepang Language | `LTR` | `locales/iso_840.json` |
+| 620 | `iso_841` | **Thami** | Thangmi Language | `LTR` | `locales/iso_841.json` |
+| 621 | `iso_842` | **Baram** | Baram Language | `LTR` | `locales/iso_842.json` |
+| 622 | `iso_843` | **Hayu** | Vayu Language | `LTR` | `locales/iso_843.json` |
+| 623 | `iso_844` | **Sunwar** | Kõits Language | `LTR` | `locales/iso_844.json` |
+| 624 | `iso_845` | **Yakkha** | Yakkha Language | `LTR` | `locales/iso_845.json` |
+| 625 | `iso_846` | **Limbu** | Sirijanga Language | `LTR` | `locales/iso_846.json` |
+| 626 | `iso_847` | **Lepcha** | Róng Language | `LTR` | `locales/iso_847.json` |
+| 627 | `iso_848` | **Meche** | Meche Language | `LTR` | `locales/iso_848.json` |
+| 628 | `iso_849` | **Dhimal** | Dhimal Language | `LTR` | `locales/iso_849.json` |
+| 629 | `iso_850` | **Koch** | Koch Language | `LTR` | `locales/iso_850.json` |
+| 630 | `iso_851` | **Rabha** | Rabha Language | `LTR` | `locales/iso_851.json` |
+| 631 | `iso_852` | **Tiwa** | Tiwa Language | `LTR` | `locales/iso_852.json` |
+| 632 | `iso_853` | **Karbi** | Karbi Language | `LTR` | `locales/iso_853.json` |
+| 633 | `iso_854` | **Dimasa** | Dimasa Language | `LTR` | `locales/iso_854.json` |
+| 634 | `iso_855` | **Deori** | Deori Language | `LTR` | `locales/iso_855.json` |
+| 635 | `iso_856` | **Mising** | Mising Language | `LTR` | `locales/iso_856.json` |
+| 636 | `iso_857` | **Chakma** | Changma Language | `LTR` | `locales/iso_857.json` |
+| 637 | `iso_858` | **Hajong** | Hajong Language | `LTR` | `locales/iso_858.json` |
+| 638 | `iso_859` | **Khyang** | Khyang Language | `LTR` | `locales/iso_859.json` |
+| 639 | `iso_860` | **Pangkhua** | Pangkhua Language | `LTR` | `locales/iso_860.json` |
+| 640 | `iso_861` | **Bawm** | Bawm Language | `LTR` | `locales/iso_861.json` |
+| 641 | `iso_862` | **Khumi** | Khumi Language | `LTR` | `locales/iso_862.json` |
+| 642 | `iso_863` | **Marma** | Marma Language | `LTR` | `locales/iso_863.json` |
+| 643 | `iso_864` | **Tanchangya** | Tanchangya Language | `LTR` | `locales/iso_864.json` |
+| 644 | `iso_865` | **Tripuri** | Kokborok Language | `LTR` | `locales/iso_865.json` |
+| 645 | `iso_866` | **Reang** | Bru Language | `LTR` | `locales/iso_866.json` |
+| 646 | `iso_867` | **Jamatia** | Jamatia Language | `LTR` | `locales/iso_867.json` |
+| 647 | `iso_868` | **Noatia** | Noatia Language | `LTR` | `locales/iso_868.json` |
+| 648 | `iso_869` | **Halam** | Halam Language | `LTR` | `locales/iso_869.json` |
+| 649 | `iso_870` | **Molsom** | Molsom Language | `LTR` | `locales/iso_870.json` |
+| 650 | `iso_871` | **Kaipeng** | Kaipeng Language | `LTR` | `locales/iso_871.json` |
+| 651 | `iso_872` | **Kalai** | Kalai Language | `LTR` | `locales/iso_872.json` |
+| 652 | `iso_873` | **Rupini** | Rupini Language | `LTR` | `locales/iso_873.json` |
+| 653 | `iso_874` | **Murasing** | Murasing Language | `LTR` | `locales/iso_874.json` |
+| 654 | `iso_875` | **Uchoi** | Uchoi Language | `LTR` | `locales/iso_875.json` |
+| 655 | `iso_876` | **Kuki** | Kuki Language | `LTR` | `locales/iso_876.json` |
+| 656 | `iso_877` | **Paite** | Paite Language | `LTR` | `locales/iso_877.json` |
+| 657 | `iso_878` | **Vaiphei** | Vaiphei Language | `LTR` | `locales/iso_878.json` |
+| 658 | `iso_879` | **Zou** | Zou Language | `LTR` | `locales/iso_879.json` |
+| 659 | `iso_880` | **Simte** | Simte Language | `LTR` | `locales/iso_880.json` |
+| 660 | `iso_881` | **Gangte** | Gangte Language | `LTR` | `locales/iso_881.json` |
+| 661 | `iso_882` | **Kom** | Kom Language | `LTR` | `locales/iso_882.json` |
+| 662 | `iso_883` | **Anal** | Anal Language | `LTR` | `locales/iso_883.json` |
+| 663 | `iso_884` | **Monsang** | Monsang Language | `LTR` | `locales/iso_884.json` |
+| 664 | `iso_885` | **Moyon** | Moyon Language | `LTR` | `locales/iso_885.json` |
+| 665 | `iso_886` | **Lamkang** | Lamkang Language | `LTR` | `locales/iso_886.json` |
+| 666 | `iso_887` | **Tarao** | Tarao Language | `LTR` | `locales/iso_887.json` |
+| 667 | `iso_888` | **Chothe** | Chothe Language | `LTR` | `locales/iso_888.json` |
+| 668 | `iso_889` | **Purum** | Purum Language | `LTR` | `locales/iso_889.json` |
+| 669 | `iso_890` | **Koireng** | Koireng Language | `LTR` | `locales/iso_890.json` |
+| 670 | `iso_891` | **Kharam** | Kharam Language | `LTR` | `locales/iso_891.json` |
+| 671 | `iso_892` | **Aimol** | Aimol Language | `LTR` | `locales/iso_892.json` |
+| 672 | `iso_893` | **Chiru** | Chiru Language | `LTR` | `locales/iso_893.json` |
+| 673 | `iso_894` | **Maring** | Maring Language | `LTR` | `locales/iso_894.json` |
+| 674 | `iso_895` | **Tangkhul** | Tangkhul Language | `LTR` | `locales/iso_895.json` |
+| 675 | `iso_896` | **Mao** | Mao Language | `LTR` | `locales/iso_896.json` |
+| 676 | `iso_897` | **Maram** | Maram Language | `LTR` | `locales/iso_897.json` |
+| 677 | `iso_898` | **Thangal** | Thangal Language | `LTR` | `locales/iso_898.json` |
+| 678 | `iso_899` | **Poumai** | Poumai Language | `LTR` | `locales/iso_899.json` |
+| 679 | `iso_900` | **Zeme** | Zeme Language | `LTR` | `locales/iso_900.json` |
+| 680 | `iso_901` | **Liangmai** | Liangmai Language | `LTR` | `locales/iso_901.json` |
+| 681 | `iso_902` | **Rongmei** | Rongmei Language | `LTR` | `locales/iso_902.json` |
+| 682 | `iso_903` | **Inpui** | Inpui Language | `LTR` | `locales/iso_903.json` |
+| 683 | `iso_904` | **Angami** | Tenyidie Language | `LTR` | `locales/iso_904.json` |
+| 684 | `iso_905` | **Ao** | Ao Chungli Language | `LTR` | `locales/iso_905.json` |
+| 685 | `iso_906` | **Sema** | Sümi Language | `LTR` | `locales/iso_906.json` |
+| 686 | `iso_907` | **Lotha** | Lotha Language | `LTR` | `locales/iso_907.json` |
+| 687 | `iso_908` | **Chakhesang** | Chokri Language | `LTR` | `locales/iso_908.json` |
+| 688 | `iso_909` | **Khezha** | Khezha Language | `LTR` | `locales/iso_909.json` |
+| 689 | `iso_910` | **Pochury** | Pochury Language | `LTR` | `locales/iso_910.json` |
+| 690 | `iso_911` | **Rengma** | Rengma Language | `LTR` | `locales/iso_911.json` |
+| 691 | `iso_912` | **Sangtam** | Sangtam Language | `LTR` | `locales/iso_912.json` |
+| 692 | `iso_913` | **Yimkhiung** | Yimkhiungrü Language | `LTR` | `locales/iso_913.json` |
+| 693 | `iso_914` | **Khiamniungan** | Khiamniungan Language | `LTR` | `locales/iso_914.json` |
+| 694 | `iso_915` | **Chang** | Chang Language | `LTR` | `locales/iso_915.json` |
+| 695 | `iso_916` | **Phom** | Phom Language | `LTR` | `locales/iso_916.json` |
+| 696 | `iso_917` | **Konyak** | Konyak Language | `LTR` | `locales/iso_917.json` |
+| 697 | `iso_918` | **Tikhir** | Tikhir Language | `LTR` | `locales/iso_918.json` |
+| 698 | `iso_919` | **Zeliang** | Zeliang Language | `LTR` | `locales/iso_919.json` |
+| 699 | `iso_920` | **Kuki-Chin** | Chin Language | `LTR` | `locales/iso_920.json` |
+| 700 | `iso_921` | **Mru** | Mru Language | `LTR` | `locales/iso_921.json` |
+| 701 | `iso_922` | **Khumi Chin** | Khumi Language | `LTR` | `locales/iso_922.json` |
+| 702 | `iso_923` | **Asho Chin** | Asho Language | `LTR` | `locales/iso_923.json` |
+| 703 | `iso_924` | **Cho Chin** | Mindat Language | `LTR` | `locales/iso_924.json` |
+| 704 | `iso_925` | **Daai Chin** | Daai Language | `LTR` | `locales/iso_925.json` |
+| 705 | `iso_926` | **Falam Chin** | Falam Language | `LTR` | `locales/iso_926.json` |
+| 706 | `iso_927` | **Tedim Chin** | Tedim Language | `LTR` | `locales/iso_927.json` |
+| 707 | `iso_928` | **Thado Chin** | Thadou Language | `LTR` | `locales/iso_928.json` |
+| 708 | `iso_929` | **Zophei Chin** | Zophei Language | `LTR` | `locales/iso_929.json` |
+| 709 | `iso_930` | **Mara Chin** | Mara Language | `LTR` | `locales/iso_930.json` |
+| 710 | `iso_931` | **Lushai Chin** | Mizo Language | `LTR` | `locales/iso_931.json` |
+| 711 | `iso_932` | **Hmar** | Hmar Language | `LTR` | `locales/iso_932.json` |
+| 712 | `iso_933` | **Ralte** | Ralte Language | `LTR` | `locales/iso_933.json` |
+| 713 | `iso_934` | **Pawi** | Lai Language | `LTR` | `locales/iso_934.json` |
+| 714 | `iso_935` | **Pang** | Pang Language | `LTR` | `locales/iso_935.json` |
+| 715 | `iso_936` | **Bawm Chin** | Bawm Language | `LTR` | `locales/iso_936.json` |
+| 716 | `iso_937` | **Khyang Chin** | Khyang Language | `LTR` | `locales/iso_937.json` |
+| 717 | `iso_938` | **Mro Chin** | Mro Language | `LTR` | `locales/iso_938.json` |
+| 718 | `iso_939` | **Anu Chin** | Anu Language | `LTR` | `locales/iso_939.json` |
+| 719 | `iso_940` | **Hkongso Chin** | Hkongso Language | `LTR` | `locales/iso_940.json` |
+| 720 | `iso_941` | **Kaang Chin** | Kaang Language | `LTR` | `locales/iso_941.json` |
+| 721 | `iso_942` | **Laitu Chin** | Laitu Language | `LTR` | `locales/iso_942.json` |
+| 722 | `iso_943` | **Lautu Chin** | Lautu Language | `LTR` | `locales/iso_943.json` |
+| 723 | `iso_944` | **Matu Chin** | Matu Language | `LTR` | `locales/iso_944.json` |
+| 724 | `iso_945` | **Mün Chin** | Mün Language | `LTR` | `locales/iso_945.json` |
+| 725 | `iso_946` | **Ngawn Chin** | Ngawn Language | `LTR` | `locales/iso_946.json` |
+| 726 | `iso_947` | **Rungtu Chin** | Rungtu Language | `LTR` | `locales/iso_947.json` |
+| 727 | `iso_948` | **Senthang Chin** | Senthang Language | `LTR` | `locales/iso_948.json` |
+| 728 | `iso_949` | **Songlai Chin** | Songlai Language | `LTR` | `locales/iso_949.json` |
+| 729 | `iso_950` | **Tawr Chin** | Tawr Language | `LTR` | `locales/iso_950.json` |
+| 730 | `it` | **Italiano** | Italian | `LTR` | `locales/it.json` |
+| 731 | `iu` | **ᐃᓄᒃᑎᑐᑦ** | Inuktitut | `LTR` | `locales/iu.json` |
+| 732 | `ja` | **日本語** | Japanese | `LTR` | `locales/ja.json` |
+| 733 | `jv` | **Basa Jawa** | Javanese | `LTR` | `locales/jv.json` |
+| 734 | `ka` | **ქართული** | Georgian | `LTR` | `locales/ka.json` |
+| 735 | `kal` | **Kalenjin** | Kalenjin | `LTR` | `locales/kal.json` |
+| 736 | `kam` | **Kikamba** | Kamba | `LTR` | `locales/kam.json` |
+| 737 | `kas` | **کٲشُر** | Kashmiri | `RTL` | `locales/kas.json` |
+| 738 | `kbd` | **Адыгэбзэ (Къэбэрдей)** | Kabardian | `LTR` | `locales/kbd.json` |
+| 739 | `kfa` | **Kodava** | Kodava | `LTR` | `locales/kfa.json` |
+| 740 | `kg` | **Kikongo** | Kongo | `LTR` | `locales/kg.json` |
+| 741 | `kha` | **Ka Tien Khasi** | Khasi | `LTR` | `locales/kha.json` |
+| 742 | `kik` | **Gĩkũyũ** | Kikuyu | `LTR` | `locales/kik.json` |
+| 743 | `kk` | **Қазақша** | Kazakh | `LTR` | `locales/kk.json` |
+| 744 | `kl` | **Kalaallisut** | Greenlandic | `LTR` | `locales/kl.json` |
+| 745 | `km` | **ភាសាខ្មែរ** | Khmer | `LTR` | `locales/km.json` |
+| 746 | `kmb` | **Kimbundu** | Kimbundu | `LTR` | `locales/kmb.json` |
+| 747 | `kn` | **ಕನ್ನಡ** | Kannada | `LTR` | `locales/kn.json` |
+| 748 | `ko` | **한국어** | Korean | `LTR` | `locales/ko.json` |
+| 749 | `koi` | **Перем коми** | Komi-Permyak | `LTR` | `locales/koi.json` |
+| 750 | `kok` | **कोंकणी** | Konkani | `LTR` | `locales/kok.json` |
+| 751 | `kpv` | **Коми кыв** | Komi-Zyrian | `LTR` | `locales/kpv.json` |
+| 752 | `krc` | **Къарачай-малкъар** | Karachay-Balkar | `LTR` | `locales/krc.json` |
+| 753 | `krl` | **Karjalan kieli** | Karelian | `LTR` | `locales/krl.json` |
+| 754 | `ks` | **कॉशुर** | Kashmiri Devanagari | `LTR` | `locales/ks.json` |
+| 755 | `ku` | **Kurdî** | Kurdish | `RTL` | `locales/ku.json` |
+| 756 | `kum` | **Къумукъ тил** | Kumyk | `LTR` | `locales/kum.json` |
+| 757 | `kw` | **Kernewek** | Cornish | `LTR` | `locales/kw.json` |
+| 758 | `kwy` | **Kikwango** | Kikwango | `LTR` | `locales/kwy.json` |
+| 759 | `ky` | **Кыргызча** | Kyrgyz | `LTR` | `locales/ky.json` |
+| 760 | `la` | **Latina** | Latin | `LTR` | `locales/la.json` |
+| 761 | `lb` | **Lëtzebuergesch** | Luxembourgish | `LTR` | `locales/lb.json` |
+| 762 | `lbe` | **Лакку маз** | Lak | `LTR` | `locales/lbe.json` |
+| 763 | `lez` | **Лезги чӀал** | Lezgian | `LTR` | `locales/lez.json` |
+| 764 | `lg` | **Luganda** | Ganda | `LTR` | `locales/lg.json` |
+| 765 | `lgg` | **Lugbara** | Lugbara | `LTR` | `locales/lgg.json` |
+| 766 | `liv` | **Līvõ kēļ** | Livonian | `LTR` | `locales/liv.json` |
+| 767 | `lmo` | **Lombard** | Lombard | `LTR` | `locales/lmo.json` |
+| 768 | `ln` | **Lingála** | Lingala | `LTR` | `locales/ln.json` |
+| 769 | `lo` | **ພາສາລາວ** | Lao | `LTR` | `locales/lo.json` |
+| 770 | `loz` | **Silozi** | Lozi | `LTR` | `locales/loz.json` |
+| 771 | `lua` | **Tshiluba** | Luba-Kasai | `LTR` | `locales/lua.json` |
+| 772 | `luo` | **Dholuo** | Luo | `LTR` | `locales/luo.json` |
+| 773 | `lus` | **Mizo ṭawng** | Mizo | `LTR` | `locales/lus.json` |
+| 774 | `luy` | **Oluluyia** | Luhya | `LTR` | `locales/luy.json` |
+| 775 | `mad` | **Madhurâ** | Madurese | `LTR` | `locales/mad.json` |
+| 776 | `mag` | **मगही** | Magahi | `LTR` | `locales/mag.json` |
+| 777 | `mai` | **मैथिली** | Maithili | `LTR` | `locales/mai.json` |
+| 778 | `mak` | **Basa Mangkasara** | Makasar | `LTR` | `locales/mak.json` |
+| 779 | `mas` | **Maa** | Maasai | `LTR` | `locales/mas.json` |
+| 780 | `mdf` | **Мокшень кяль** | Moksha | `LTR` | `locales/mdf.json` |
+| 781 | `mer` | **Kĩmĩrũ** | Meru | `LTR` | `locales/mer.json` |
+| 782 | `mg` | **Malagasy** | Malagasy | `LTR` | `locales/mg.json` |
+| 783 | `mhr` | **Олык марий** | Meadow Mari | `LTR` | `locales/mhr.json` |
+| 784 | `mi` | **Te Reo Māori** | Māori | `LTR` | `locales/mi.json` |
+| 785 | `min` | **Baso Minangkabau** | Minangkabau | `LTR` | `locales/min.json` |
+| 786 | `ml` | **മലയാളം** | Malayalam | `LTR` | `locales/ml.json` |
+| 787 | `mn` | **Монгол** | Mongolian | `LTR` | `locales/mn.json` |
+| 788 | `mni` | **মৈতৈলোন্** | Manipuri | `LTR` | `locales/mni.json` |
+| 789 | `mos` | **Mooré** | Mossi | `LTR` | `locales/mos.json` |
+| 790 | `mr` | **मराठी** | Marathi | `LTR` | `locales/mr.json` |
+| 791 | `mrj` | **Кырык мары** | Hill Mari | `LTR` | `locales/mrj.json` |
+| 792 | `mt` | **Malti** | Maltese | `LTR` | `locales/mt.json` |
+| 793 | `my` | **မြန်မာဘာသာ** | Burmese | `LTR` | `locales/my.json` |
+| 794 | `myv` | **Эрзянь кель** | Erzya | `LTR` | `locales/myv.json` |
+| 795 | `nah` | **Nāhuatl** | Nahuatl | `LTR` | `locales/nah.json` |
+| 796 | `nap` | **Nnapulitano** | Neapolitan | `LTR` | `locales/nap.json` |
+| 797 | `nav` | **Diné Bizaad** | Navajo | `LTR` | `locales/nav.json` |
+| 798 | `ne` | **नेपाली** | Nepali | `LTR` | `locales/ne.json` |
+| 799 | `new` | **नेपाल भाषा** | Newari | `LTR` | `locales/new.json` |
+| 800 | `nl` | **Nederlands** | Dutch | `LTR` | `locales/nl.json` |
+| 801 | `no` | **Norsk** | Norwegian | `LTR` | `locales/no.json` |
+| 802 | `nog` | **Ногай тили** | Nogai | `LTR` | `locales/nog.json` |
+| 803 | `nr` | **isiNdebele** | Southern Ndebele | `LTR` | `locales/nr.json` |
+| 804 | `nus` | **Thok Nath** | Nuer | `LTR` | `locales/nus.json` |
+| 805 | `nya` | **Chichewa** | Chewa | `LTR` | `locales/nya.json` |
+| 806 | `nyn` | **Runyankore** | Nyankole | `LTR` | `locales/nyn.json` |
+| 807 | `nyo` | **Runyoro** | Nyoro | `LTR` | `locales/nyo.json` |
+| 808 | `oc` | **Occitan** | Occitan | `LTR` | `locales/oc.json` |
+| 809 | `om` | **Oromoo** | Oromo | `LTR` | `locales/om.json` |
+| 810 | `or` | **ଓଡ଼ିଆ** | Odia | `LTR` | `locales/or.json` |
+| 811 | `oss` | **Ирон æвзаг** | Ossetian | `LTR` | `locales/oss.json` |
+| 812 | `pa` | **ਪੰਜਾਬੀ** | Punjabi | `LTR` | `locales/pa.json` |
+| 813 | `pag` | **Pangasinan** | Pangasinan | `LTR` | `locales/pag.json` |
+| 814 | `pam` | **Kapampangan** | Kapampangan | `LTR` | `locales/pam.json` |
+| 815 | `pap` | **Papiamento** | Papiamento | `LTR` | `locales/pap.json` |
+| 816 | `pl` | **Polski** | Polish | `LTR` | `locales/pl.json` |
+| 817 | `pms` | **Piemontèis** | Piedmontese | `LTR` | `locales/pms.json` |
+| 818 | `ps` | **پښتو** | Pashto | `RTL` | `locales/ps.json` |
+| 819 | `pt` | **Português** | Portuguese | `LTR` | `locales/pt.json` |
+| 820 | `qu` | **Runa Simi** | Quechua | `LTR` | `locales/qu.json` |
+| 821 | `raj` | **राजस्थानी** | Rajasthani | `LTR` | `locales/raj.json` |
+| 822 | `rm` | **Rumantsch** | Romansh | `LTR` | `locales/rm.json` |
+| 823 | `ro` | **Română** | Romanian | `LTR` | `locales/ro.json` |
+| 824 | `ru` | **Русский** | Russian | `LTR` | `locales/ru.json` |
+| 825 | `rut` | **МыхӀабишды чӀел** | Rutul | `LTR` | `locales/rut.json` |
+| 826 | `rw` | **Kinyarwanda** | Kinyarwanda | `LTR` | `locales/rw.json` |
+| 827 | `sah` | **Саха тыла** | Yakut | `LTR` | `locales/sah.json` |
+| 828 | `sas` | **Basa Sasak** | Sasak | `LTR` | `locales/sas.json` |
+| 829 | `sat` | **ᱥᱟᱱᱛᱟᱲᱤ** | Santali | `LTR` | `locales/sat.json` |
+| 830 | `sc` | **Sardu** | Sardinian | `LTR` | `locales/sc.json` |
+| 831 | `scn` | **Sicilianu** | Sicilian | `LTR` | `locales/scn.json` |
+| 832 | `sd` | **سنڌي** | Sindhi | `RTL` | `locales/sd.json` |
+| 833 | `shk` | **Shilluk** | Shilluk | `LTR` | `locales/shk.json` |
+| 834 | `si` | **සිංහල** | Sinhala | `LTR` | `locales/si.json` |
+| 835 | `sid` | **Sidaamu Afoo** | Sidamo | `LTR` | `locales/sid.json` |
+| 836 | `sit` | **Garo** | Garo | `LTR` | `locales/sit.json` |
+| 837 | `sk` | **Slovenčina** | Slovak | `LTR` | `locales/sk.json` |
+| 838 | `sm` | **Gagana Sāmoa** | Samoan | `LTR` | `locales/sm.json` |
+| 839 | `sme` | **Davvisámegiella** | Northern Sami | `LTR` | `locales/sme.json` |
+| 840 | `smj` | **Julevsámegiella** | Lule Sami | `LTR` | `locales/smj.json` |
+| 841 | `smn` | **Anarâškielâ** | Inari Sami | `LTR` | `locales/smn.json` |
+| 842 | `sn` | **chiShona** | Shona | `LTR` | `locales/sn.json` |
+| 843 | `snk` | **Soninkara** | Soninke | `LTR` | `locales/snk.json` |
+| 844 | `so` | **Soomaali** | Somali | `LTR` | `locales/so.json` |
+| 845 | `sq` | **Shqip** | Albanian | `LTR` | `locales/sq.json` |
+| 846 | `sr` | **Српски** | Serbian | `LTR` | `locales/sr.json` |
+| 847 | `ss` | **SiSwati** | Swati | `LTR` | `locales/ss.json` |
+| 848 | `st` | **Sesotho** | Southern Sotho | `LTR` | `locales/st.json` |
+| 849 | `su` | **Basa Sunda** | Sundanese | `LTR` | `locales/su.json` |
+| 850 | `sv` | **Svenska** | Swedish | `LTR` | `locales/sv.json` |
+| 851 | `sw` | **Kiswahili** | Swahili | `LTR` | `locales/sw.json` |
+| 852 | `ta` | **தமிழ்** | Tamil | `LTR` | `locales/ta.json` |
+| 853 | `tab` | **Табасаран чӀал** | Tabasaran | `LTR` | `locales/tab.json` |
+| 854 | `te` | **తెలుగు** | Telugu | `LTR` | `locales/te.json` |
+| 855 | `teo` | **Ateso** | Teso | `LTR` | `locales/teo.json` |
+| 856 | `tet` | **Lia-Tetun** | Tetum | `LTR` | `locales/tet.json` |
+| 857 | `tg` | **Тоҷикӣ** | Tajik | `LTR` | `locales/tg.json` |
+| 858 | `th` | **ไทย** | Thai | `LTR` | `locales/th.json` |
+| 859 | `ti` | **ትግርኛ** | Tigrinya | `LTR` | `locales/ti.json` |
+| 860 | `tk` | **Türkmençe** | Turkmen | `LTR` | `locales/tk.json` |
+| 861 | `tl` | **Tagalog** | Filipino | `LTR` | `locales/tl.json` |
+| 862 | `tly` | **Tolışi** | Talysh | `LTR` | `locales/tly.json` |
+| 863 | `tn` | **Setswana** | Tswana | `LTR` | `locales/tn.json` |
+| 864 | `ton` | **Lea Faka-Tonga** | Tongan | `LTR` | `locales/ton.json` |
+| 865 | `tpi` | **Tok Pisin** | Tok Pisin | `LTR` | `locales/tpi.json` |
+| 866 | `tr` | **Türkçe** | Turkish | `LTR` | `locales/tr.json` |
+| 867 | `ts` | **Xitsonga** | Tsonga | `LTR` | `locales/ts.json` |
+| 868 | `tt` | **Татарча** | Tatar | `LTR` | `locales/tt.json` |
+| 869 | `ttt` | **Tati** | Tat | `LTR` | `locales/ttt.json` |
+| 870 | `tum` | **Chitumbuka** | Tumbuka | `LTR` | `locales/tum.json` |
+| 871 | `tuv` | **Ngaturkana** | Turkana | `LTR` | `locales/tuv.json` |
+| 872 | `ty` | **Reo Tahiti** | Tahitian | `LTR` | `locales/ty.json` |
+| 873 | `tyv` | **Тыва дыл** | Tuvan | `LTR` | `locales/tyv.json` |
+| 874 | `udm` | **Удмурт кыл** | Udmurt | `LTR` | `locales/udm.json` |
+| 875 | `ug` | **ئۇيغۇرچە** | Uyghur | `RTL` | `locales/ug.json` |
+| 876 | `uk` | **Українська** | Ukrainian | `LTR` | `locales/uk.json` |
+| 877 | `umb` | **Umbundu** | Umbundu | `LTR` | `locales/umb.json` |
+| 878 | `ur` | **اردو** | Urdu | `RTL` | `locales/ur.json` |
+| 879 | `uz` | **Oʻzbek** | Uzbek | `LTR` | `locales/uz.json` |
+| 880 | `ve` | **Tshivenda** | Venda | `LTR` | `locales/ve.json` |
+| 881 | `vec` | **Vèneto** | Venetian | `LTR` | `locales/vec.json` |
+| 882 | `vep` | **Vepsän kel’** | Veps | `LTR` | `locales/vep.json` |
+| 883 | `vi` | **Tiếng Việt** | Vietnamese | `LTR` | `locales/vi.json` |
+| 884 | `wal` | **Wolaytta** | Wolaytta | `LTR` | `locales/wal.json` |
+| 885 | `war` | **Winaray** | Waray | `LTR` | `locales/war.json` |
+| 886 | `wol` | **Wolof** | Wolof | `LTR` | `locales/wol.json` |
+| 887 | `xal` | **Хальмг келн** | Kalmyk | `LTR` | `locales/xal.json` |
+| 888 | `xh` | **isiXhosa** | Xhosa | `LTR` | `locales/xh.json` |
+| 889 | `yo` | **Yorùbá** | Yoruba | `LTR` | `locales/yo.json` |
+| 890 | `zh` | **中文** | Chinese | `LTR` | `locales/zh.json` |
+| 891 | `zu` | **isiZulu** | Zulu | `LTR` | `locales/zu.json` |
