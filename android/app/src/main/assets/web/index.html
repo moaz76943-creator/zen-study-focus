@@ -789,6 +789,18 @@ body {
     box-sizing: border-box;
 }
 
+
+/* UNIVERSAL FLUID AMOLED TUNING (TASK #720) */
+:root {
+    --fluid-header-size: clamp(1.2rem, 4vw, 1.8rem);
+    --fluid-timer-size: clamp(3rem, 14vw, 5.5rem);
+    --fluid-card-padding: clamp(0.75rem, 2.5vw, 1.5rem);
+}
+* {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
 </style>
   <link rel="stylesheet" href="white_2100.css">
   <link rel="stylesheet" href="design_tokens_v22.css">
