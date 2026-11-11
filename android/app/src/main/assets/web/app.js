@@ -86693,3 +86693,53 @@ window.SovereignCalmUI = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN SMART BACK-STACK & MODAL DISMISSAL HANDLER (TASK #737)
+// Closes Active Overlays/Modals Gracefully Before Triggering App Exit Guard
+// ==============================================================================
+window.SovereignBackStack = (function() {
+    function dismissTopOverlay() {
+        const modal = document.getElementById("deckExchangeModal");
+        if (modal && modal.style.display !== "none" && modal.style.display !== "") {
+            modal.style.display = "none";
+            return true;
+        }
+
+        const profiler = document.getElementById("sovereignProfilerOverlay");
+        if (profiler && profiler.style.display !== "none" && profiler.style.display !== "") {
+            if (window.SovereignProfiler) window.SovereignProfiler.toggle();
+            else profiler.style.display = "none";
+            return true;
+        }
+
+        const spectrum = document.getElementById("acousticSpectrumPanel");
+        if (spectrum && spectrum.style.display !== "none" && spectrum.style.display !== "") {
+            if (window.SovereignAudioVisualizer) window.SovereignAudioVisualizer.stop();
+            else spectrum.style.display = "none";
+            return true;
+        }
+
+        const calmBody = document.getElementById("sovereignCalmToolsBody");
+        if (calmBody && calmBody.style.display !== "none" && calmBody.style.display !== "") {
+            if (window.SovereignCalmUI) window.SovereignCalmUI.toggleDrawer();
+            else calmBody.style.display = "none";
+            return true;
+        }
+
+        return false;
+    }
+
+    // Bind Escape key for external keyboards / Android desktop mode
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            dismissTopOverlay();
+        }
+    });
+
+    return {
+        dismissTopOverlay: dismissTopOverlay
+    };
+})();
+
