@@ -85300,3 +85300,134 @@ window.SovereignBreathing = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN ZERO-DRIFT ATOMIC WORKER CLOCK ENGINE (TASK #719)
+// Isolated Background Thread Execution — Immune to Android WebView Throttling
+// ==============================================================================
+window.SovereignWorkerTimer = (function() {
+    let worker = null;
+    let fallbackTimer = null;
+    let isRunning = false;
+    let expectedTickTime = 0;
+    let tickCallbacks = [];
+    let driftMetrics = { maxDriftMs: 0, totalTicks: 0, accumulatedDriftMs: 0 };
+
+    // Self-Contained Web Worker Blob (100% Offline - Zero External CDN)
+    const workerScript = `
+        let timerId = null;
+        let intervalMs = 1000;
+        let expectedTime = 0;
+
+        self.onmessage = function(e) {
+            const data = e.data;
+            if (data.action === "start") {
+                clearInterval(timerId);
+                intervalMs = data.interval || 1000;
+                expectedTime = Date.now() + intervalMs;
+                timerId = setInterval(() => {
+                    const now = Date.now();
+                    const drift = now - expectedTime;
+                    expectedTime += intervalMs;
+                    self.postMessage({ type: "tick", timestamp: now, drift: drift });
+                }, intervalMs);
+            } else if (data.action === "stop") {
+                clearInterval(timerId);
+                timerId = null;
+            }
+        };
+    `;
+
+    function initWorker() {
+        if (typeof Worker !== "undefined" && !worker) {
+            try {
+                const blob = new Blob([workerScript], { type: "application/javascript" });
+                worker = new Worker(URL.createObjectURL(blob));
+                worker.onmessage = function(e) {
+                    if (e.data && e.data.type === "tick") {
+                        handleWorkerTick(e.data);
+                    }
+                };
+                console.log("⏱️ [AtomicWorker] High-precision background timer worker initialized.");
+            } catch (err) {
+                console.warn("⚠️ [AtomicWorker] Worker blob restricted, falling back to performance.now RAF loop:", err);
+                worker = null;
+            }
+        }
+    }
+
+    function handleWorkerTick(data) {
+        driftMetrics.totalTicks++;
+        const absDrift = Math.abs(data.drift || 0);
+        driftMetrics.accumulatedDriftMs += absDrift;
+        if (absDrift > driftMetrics.maxDriftMs) {
+            driftMetrics.maxDriftMs = absDrift;
+        }
+
+        // Notify all registered timer listeners
+        tickCallbacks.forEach(cb => {
+            try { cb(data); } catch(err) { console.error("Tick callback error:", err); }
+        });
+
+        // Update UI Atomic Badge
+        const badge = document.getElementById("atomicClockStatusBadge");
+        if (badge) {
+            badge.textContent = `مؤقت ذري مستقل (انحراف: ${absDrift}ms)`;
+        }
+    }
+
+    function start(onTick, intervalMs = 1000) {
+        if (onTick && !tickCallbacks.includes(onTick)) {
+            tickCallbacks.push(onTick);
+        }
+        if (isRunning) return;
+        isRunning = true;
+        initWorker();
+
+        if (worker) {
+            worker.postMessage({ action: "start", interval: intervalMs });
+        } else {
+            // High-Resolution Fallback using requestAnimationFrame & performance.now
+            let lastTick = performance.now();
+            function fallbackLoop(now) {
+                if (!isRunning) return;
+                if (now - lastTick >= intervalMs) {
+                    const drift = (now - lastTick) - intervalMs;
+                    lastTick = now;
+                    handleWorkerTick({ type: "tick", timestamp: Date.now(), drift: drift });
+                }
+                fallbackTimer = requestAnimationFrame(fallbackLoop);
+            }
+            fallbackTimer = requestAnimationFrame(fallbackLoop);
+        }
+    }
+
+    function stop() {
+        isRunning = false;
+        if (worker) {
+            worker.postMessage({ action: "stop" });
+        }
+        if (fallbackTimer) {
+            cancelAnimationFrame(fallbackTimer);
+            fallbackTimer = null;
+        }
+    }
+
+    function getMetrics() {
+        return {
+            ...driftMetrics,
+            avgDriftMs: driftMetrics.totalTicks > 0 ? (driftMetrics.accumulatedDriftMs / driftMetrics.totalTicks).toFixed(2) : 0,
+            isWorkerActive: worker !== null
+        };
+    }
+
+    return {
+        start: start,
+        stop: stop,
+        subscribe: (cb) => { if (!tickCallbacks.includes(cb)) tickCallbacks.push(cb); },
+        unsubscribe: (cb) => { tickCallbacks = tickCallbacks.filter(c => c !== cb); },
+        getMetrics: getMetrics
+    };
+})();
+
