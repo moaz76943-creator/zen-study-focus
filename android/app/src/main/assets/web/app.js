@@ -85053,3 +85053,35 @@ window.SovereignWorkerTimer = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// FIBONACCI HARMONIC ZEN ACOUSTIC CHIMES (TASK #721) - PURE DSP SYNTHESIS
+// ==============================================================================
+window.SovereignChimes = (function() {
+    function playZenBowl() {
+        if (!window.audioContext) return;
+        const ctx = window.audioContext;
+        if (ctx.state === "suspended") ctx.resume();
+        const baseFreq = 432; // Harmonic Verdi Tuning
+        const harmonics = [1, 1.618, 2.618]; // Golden Ratio Fibonacci multipliers
+        const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
+
+        harmonics.forEach((ratio, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(baseFreq * ratio, ctx.currentTime);
+            gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.15 / (i + 1), ctx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.5);
+            osc.connect(gain);
+            gain.connect(dest);
+            osc.start();
+            osc.stop(ctx.currentTime + 2.5);
+        });
+        console.log("🔔 [ZenChimes] Synthesized Fibonacci harmonic chime.");
+    }
+    return { playZenBowl: playZenBowl };
+})();
+
