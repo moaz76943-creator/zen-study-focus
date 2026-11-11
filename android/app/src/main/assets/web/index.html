@@ -1349,6 +1349,45 @@ body {
             user-select: none;
         }
         </style>
+
+    <!-- UNIVERSAL FLUID AMOLED & 120HZ/144HZ TUNING (TASK #720) -->
+    <style id="fluidAmoledTuning">
+    :root {
+        --amoled-black: #000000;
+        --amoled-surface: #0a0a0a;
+        --amoled-border: #1a1a1a;
+        --fluid-header-size: clamp(1.2rem, 4vw, 1.85rem);
+        --fluid-timer-size: clamp(3.2rem, 15vw, 6rem);
+        --fluid-card-padding: clamp(0.75rem, 3vw, 1.5rem);
+    }
+    html, body {
+        background-color: #000000 !important;
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+    * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+    button, input, select, textarea {
+        touch-action: manipulation;
+    }
+    /* Hardware Accelerated Compositing Layers */
+    #timer, #analyticsWeeklyCanvas, #breathingVisualRing {
+        transform: translateZ(0);
+        will-change: transform;
+    }
+    /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro */
+    body {
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        padding-left: env(safe-area-inset-left, 0px);
+        padding-right: env(safe-area-inset-right, 0px);
+    }
+    </style>
+
 </head>
 <body>
 
