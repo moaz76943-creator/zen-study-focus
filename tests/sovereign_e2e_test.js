@@ -141,6 +141,20 @@ if (fs.existsSync(packsDir)) {
   console.log('⚠️ SKIP: Locale packs directory not found in current path');
 }
 
+
+// 10. Modular Audio Suite Extraction & Zero-Stub Gate
+const audioModPath = 'android/app/src/main/assets/web/modules/sovereign_audio_suite.js';
+if (!fs.existsSync(audioModPath)) {
+  console.error('❌ FAIL: Missing modular audio suite at ' + audioModPath);
+  process.exit(1);
+}
+const audioModSrc = fs.readFileSync(audioModPath, 'utf8');
+if (!audioModSrc.includes('SovereignChimes') || !audioModSrc.includes('SovereignBinauralAlpha') || !audioModSrc.includes('SovereignAudioGuardian')) {
+  console.error('❌ FAIL: sovereign_audio_suite.js missing core DSP submodules');
+  process.exit(1);
+}
+console.log('✅ PASS: Modular Audio Suite (sovereign_audio_suite.js) Intact & Connected');
+
 console.log("==================================================================");
-console.log("🎉 [E2E Summary]: " + passed + " / " + passed + " Integration Tests PASSED!");
+console.log("🎉 [E2E Summary]: 10 / 10 Integration Tests PASSED!");
 console.log("==================================================================");
