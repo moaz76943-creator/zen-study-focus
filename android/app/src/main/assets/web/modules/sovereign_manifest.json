@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "574.0.0",
+  "appVersion": "575.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -63,6 +63,12 @@
       "file": "modules/sovereign_widget_bridge.js",
       "required": true,
       "description": "Live AppWidgetManager push synchronization without polling."
+    },
+    {
+      "id": "sovereign_shortcuts_bridge",
+      "file": "modules/sovereign_shortcuts_bridge.js",
+      "required": true,
+      "description": "Dynamic App Shortcuts and intent deep-linking routing for Android 15."
     }
   ],
   "styles": [

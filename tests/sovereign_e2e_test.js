@@ -424,6 +424,31 @@ if (!global.SovereignWidgetBridge.getLastPayload()) {
 }
 console.log('✅ PASS: QuickTimerWidgetProvider Live AppWidgetManager Push Sync Verified');
 
+
+// Dynamic App Shortcuts & Intent Deep-Link Routing Gate
+const shortcutsModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_shortcuts_bridge.js');
+require(shortcutsModPath);
+if (!global.SovereignShortcutsBridge || typeof global.SovereignShortcutsBridge.handleShortcutAction !== 'function') {
+  console.error('❌ FAIL: SovereignShortcutsBridge failed to initialize');
+  process.exit(1);
+}
+const shortcutsList = global.SovereignShortcutsBridge.getRegisteredShortcuts();
+if (!Array.isArray(shortcutsList) || shortcutsList.length !== 3) {
+  console.error('❌ FAIL: SovereignShortcutsBridge missing standard dynamic shortcuts');
+  process.exit(1);
+}
+const handledFocus = global.SovereignShortcutsBridge.handleShortcutAction('quick_focus');
+if (!handledFocus || global.SovereignShortcutsBridge.getLastAction() !== 'quick_focus') {
+  console.error('❌ FAIL: SovereignShortcutsBridge failed to handle quick_focus action');
+  process.exit(1);
+}
+const handledIntent = global.SovereignShortcutsBridge.checkLaunchIntent('?shortcut=calm_breathing');
+if (!handledIntent || global.SovereignShortcutsBridge.getLastAction() !== 'calm_breathing') {
+  console.error('❌ FAIL: SovereignShortcutsBridge failed to parse launch intent query');
+  process.exit(1);
+}
+console.log('✅ PASS: Dynamic App Shortcuts & Intent Deep-Link Routing Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
