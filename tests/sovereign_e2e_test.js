@@ -369,6 +369,22 @@ if (!cssContent.includes('df-notch-top') || !cssContent.includes('safe-area-inse
 }
 console.log('✅ PASS: Xiaomi 17T Pro Edge-to-Edge WindowInsets & Notch Calibration Verified');
 
+
+// 120Hz/144Hz Frame Pacer & Idle Battery Suspension Gate
+const pacerModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_frame_pacer.js');
+require(pacerModPath);
+if (!global.SovereignFramePacer || typeof global.SovereignFramePacer.requestFrameLoop !== 'function') {
+  console.error('❌ FAIL: SovereignFramePacer failed to initialize');
+  process.exit(1);
+}
+global.SovereignFramePacer.requestFrameLoop('e2e_pacer_probe', () => {});
+global.SovereignFramePacer.cancelFrameLoop('e2e_pacer_probe');
+if (!global.SovereignFramePacer.isSuspended()) {
+  console.error('❌ FAIL: SovereignFramePacer did not enter idle suspension when tasks emptied');
+  process.exit(1);
+}
+console.log('✅ PASS: 120Hz/144Hz Adaptive Frame Pacer & Idle Battery Suspension Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
