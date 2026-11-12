@@ -36,7 +36,7 @@
           delivered++;
         } catch (err) {
           if (typeof console !== 'undefined' && console.warn) {
-            console.warn('[SovereignEventBus] Isolated error in "' + event + '":', err);
+            console.warn('[SovereignEventBus] Isolated error in "' + event + '": ' + (err && err.message ? err.message : err));
           }
         }
       }
