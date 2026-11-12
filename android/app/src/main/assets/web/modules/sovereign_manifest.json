@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "613.0.0",
+  "appVersion": "601.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -159,6 +159,14 @@
       "file": "modules/sovereign_cognitive_pacing.js",
       "description": "On-device study stamina modeling, cognitive load pacing & optimal intermission recommendations.",
       "type": "productivity"
+    },
+    {
+      "id": "sovereign_startup_booster",
+      "name": "Sovereign Startup Booster",
+      "version": "601.0.0",
+      "file": "modules/sovereign_startup_booster.js",
+      "description": "Phased zero-jank boot orchestrator with requestIdleCallback deferrals for <300ms cold start.",
+      "type": "performance"
     }
   ],
   "styles": [

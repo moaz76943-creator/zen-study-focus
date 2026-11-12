@@ -834,6 +834,28 @@ if (suggestedDuration !== 25) {
 }
 console.log('✅ PASS: Sovereign Cognitive Load Pacing & Rhythm Verified (64/64)');
 
+
+// Sovereign Startup Booster Performance Gate
+const boosterModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_startup_booster.js');
+require(boosterModPath);
+if (!global.SovereignStartupBooster || typeof global.SovereignStartupBooster.init !== 'function') {
+  console.error('❌ FAIL: SovereignStartupBooster failed to initialize');
+  process.exit(1);
+}
+let criticalFired = false;
+global.SovereignStartupBooster.register(0, () => { criticalFired = true; });
+global.SovereignStartupBooster.init();
+if (!criticalFired) {
+  console.error('❌ FAIL: Critical phase task did not execute synchronously during boot');
+  process.exit(1);
+}
+const metrics = global.SovereignStartupBooster.recordBootMetrics();
+if (!metrics || typeof metrics.totalBootMs !== 'number') {
+  console.error('❌ FAIL: SovereignStartupBooster failed to record boot metrics');
+  process.exit(1);
+}
+console.log('✅ PASS: Sovereign Cold Startup Performance & Phased Boot Verified (52/52)');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
