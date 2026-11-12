@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "591.0.0",
+  "appVersion": "593.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -135,6 +135,14 @@
       "file": "modules/sovereign_date_formatter.js",
       "required": true,
       "description": "Unified regional date, wall-clock, duration MM:SS, and relative time formatter."
+    },
+    {
+      "id": "sovereign_indexed_db",
+      "name": "Sovereign IndexedDB Engine",
+      "version": "593.0.0",
+      "file": "modules/sovereign_indexed_db.js",
+      "description": "High-performance transactional IndexedDB storage with zero UI thread jank and memory fallback.",
+      "type": "storage"
     }
   ],
   "styles": [

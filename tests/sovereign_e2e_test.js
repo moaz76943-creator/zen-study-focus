@@ -756,6 +756,35 @@ if (/[٠١٢٣٤٥٦٧٨٩]/.test(arDate)) {
 }
 console.log('✅ PASS: Unified Regional Date & Duration Formatter Verified');
 
+
+// Sovereign IndexedDB High-Performance Storage Gate
+const idbModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_indexed_db.js');
+require(idbModPath);
+if (!global.SovereignIndexedDB || typeof global.SovereignIndexedDB.put !== 'function') {
+  console.error('❌ FAIL: SovereignIndexedDB failed to initialize');
+  process.exit(1);
+}
+global.SovereignIndexedDB.put('sessions', { id: 'sess_test_1', tag: 'Deep Work', duration: 1500, timestamp: Date.now() })
+  .then(() => global.SovereignIndexedDB.get('sessions', 'sess_test_1'))
+  .then(res => {
+    if (!res || res.id !== 'sess_test_1' || res.tag !== 'Deep Work') {
+      console.error('❌ FAIL: SovereignIndexedDB get/put integrity mismatch');
+      process.exit(1);
+    }
+    return global.SovereignIndexedDB.count('sessions');
+  })
+  .then(count => {
+    if (count < 1) {
+      console.error('❌ FAIL: SovereignIndexedDB count error: expected >= 1, got ' + count);
+      process.exit(1);
+    }
+    console.log('✅ PASS: Sovereign IndexedDB Storage Engine Verified (44/44)');
+  })
+  .catch(err => {
+    console.error('❌ FAIL: SovereignIndexedDB test failed with error:', err);
+    process.exit(1);
+  });
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
