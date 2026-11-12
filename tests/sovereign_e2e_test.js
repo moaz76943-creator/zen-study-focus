@@ -337,6 +337,24 @@ function findMainActivity(dir) {
 findMainActivity('android/app/src/main/java');
 console.log('✅ PASS: Android Java Bridge & Zero-Memory-Leak Architecture Verified');
 
+
+// Android 15 (SDK 35) Receiver & Alarm Security Gate
+const manPath = path.resolve('android/app/src/main/AndroidManifest.xml');
+if (!fs.existsSync(manPath)) {
+  console.error('❌ FAIL: Missing AndroidManifest.xml');
+  process.exit(1);
+}
+const mXml = fs.readFileSync(manPath, 'utf8');
+if (mXml.includes('FOREGROUND_SERVICE') || mXml.includes('SYSTEM_ALERT_WINDOW')) {
+  console.error('❌ FAIL: Manifest declares forbidden background services');
+  process.exit(1);
+}
+if (!mXml.includes('FocusAlarmReceiver') || !mXml.includes('android:exported="false"')) {
+  console.error('❌ FAIL: FocusAlarmReceiver missing or lacks explicit exported="false"');
+  process.exit(1);
+}
+console.log('✅ PASS: Android 15 (SDK 35) Background Alarm & Receiver Security Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
