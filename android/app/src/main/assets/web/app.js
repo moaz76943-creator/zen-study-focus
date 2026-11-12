@@ -86790,3 +86790,39 @@ window.SovereignEyeComfort = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN TWILIGHT PERSISTENCE HOOK (TASK #741)
+// Restores & Persists Eye-Comfort Preference Safely via SovereignStorageVacuum
+// ==============================================================================
+(function() {
+    const KEY = "deep_focus_twilight_v1";
+    function syncTwilight() {
+        try {
+            const saved = localStorage.getItem(KEY);
+            if (saved === "1" && window.SovereignEyeComfort && !window.SovereignEyeComfort.isActive()) {
+                window.SovereignEyeComfort.toggle();
+            }
+            const origToggle = window.SovereignEyeComfort && window.SovereignEyeComfort.toggle;
+            if (origToggle && !window.SovereignEyeComfort._persisted) {
+                window.SovereignEyeComfort.toggle = function() {
+                    origToggle();
+                    const state = window.SovereignEyeComfort.isActive() ? "1" : "0";
+                    if (window.SovereignStorageVacuum && window.SovereignStorageVacuum.safeSetItem) {
+                        window.SovereignStorageVacuum.safeSetItem(KEY, state);
+                    } else {
+                        localStorage.setItem(KEY, state);
+                    }
+                };
+                window.SovereignEyeComfort._persisted = true;
+            }
+        } catch(e) {}
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", syncTwilight);
+    } else {
+        syncTwilight();
+    }
+})();
+
