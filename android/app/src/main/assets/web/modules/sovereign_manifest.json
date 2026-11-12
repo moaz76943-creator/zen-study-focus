@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "586.0.0",
+  "appVersion": "588.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -117,6 +117,12 @@
       "file": "modules/sovereign_card_exporter.js",
       "required": true,
       "description": "High-DPI HTML5 Canvas study milestone card rendering and image export."
+    },
+    {
+      "id": "sovereign_onboarding_tour",
+      "file": "modules/sovereign_onboarding_tour.js",
+      "required": true,
+      "description": "Dignified 4-step Zen onboarding tour and preference synchronization."
     }
   ],
   "styles": [
@@ -125,5 +131,5 @@
     "styles/twilight_theme.css",
     "styles/rtl_typography.css"
   ],
-  "phase": "Phase 3: Deep Study Engine"
+  "phase": "Phase 3 Complete / Phase 4 Ready"
 }

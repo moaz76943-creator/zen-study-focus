@@ -670,6 +670,30 @@ if (!exportedUrl || !exportedUrl.startsWith('data:image/png')) {
 }
 console.log('✅ PASS: Canvas Study Milestone Card Exporter Verified');
 
+
+// Sovereign Onboarding Tour & Phase 3 Sealing Gate
+const tourModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_onboarding_tour.js');
+require(tourModPath);
+if (!global.SovereignOnboardingTour || typeof global.SovereignOnboardingTour.getTourSteps !== 'function') {
+  console.error('❌ FAIL: SovereignOnboardingTour failed to initialize');
+  process.exit(1);
+}
+const steps = global.SovereignOnboardingTour.getTourSteps();
+if (!Array.isArray(steps) || steps.length !== 4) {
+  console.error('❌ FAIL: SovereignOnboardingTour step count mismatch');
+  process.exit(1);
+}
+const completed = global.SovereignOnboardingTour.completeTour({
+  profileId: 'deep_work',
+  weeklyMinutes: 600,
+  restDays: 2
+});
+if (!completed) {
+  console.error('❌ FAIL: SovereignOnboardingTour completeTour failed');
+  process.exit(1);
+}
+console.log('✅ PASS: Sovereign Onboarding Tour & Phase 3 Sealing Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
