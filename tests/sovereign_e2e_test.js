@@ -785,6 +785,26 @@ global.SovereignIndexedDB.put('sessions', { id: 'sess_test_1', tag: 'Deep Work',
     process.exit(1);
   });
 
+
+// Sovereign Advanced Self-Diagnostics Portal Gate
+const diagModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_diagnostics_portal.js');
+require(diagModPath);
+if (!global.SovereignDiagnosticsPortal || typeof global.SovereignDiagnosticsPortal.gatherTelemetry !== 'function') {
+  console.error('❌ FAIL: SovereignDiagnosticsPortal failed to initialize');
+  process.exit(1);
+}
+const telemetry = global.SovereignDiagnosticsPortal.gatherTelemetry();
+if (!telemetry || !telemetry.device || telemetry.privacy.zeroPII !== true) {
+  console.error('❌ FAIL: SovereignDiagnosticsPortal telemetry integrity check failed');
+  process.exit(1);
+}
+const selfCheck = global.SovereignDiagnosticsPortal.runSelfCheck();
+if (!selfCheck || !selfCheck.passed) {
+  console.error('❌ FAIL: SovereignDiagnosticsPortal self-check failed:', selfCheck);
+  process.exit(1);
+}
+console.log('✅ PASS: Sovereign Advanced Self-Diagnostics Portal Verified (47/47)');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
