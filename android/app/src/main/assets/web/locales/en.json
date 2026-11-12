@@ -92,5 +92,13 @@
   "dyn_urgent_important": "Urgent & Important",
   "dyn_words_recalled": "Words Recalled",
   "dyn_yes": "Yes",
-  "dyn_zero_music": "Zero-Music"
+  "dyn_zero_music": "Zero-Music",
+  "phAddTask": "Add study, workout or reading goal...",
+  "phCustomMins": "Minutes (1-240)",
+  "phCustomTitle": "Session Name (Study, Gym, Reading, Work)...",
+  "phSearchNotes": "Search notes...",
+  "phNoteTitle": "Title or question",
+  "phNoteBody": "Write here...",
+  "langSearchPlaceholder": "Search language or country...",
+  "phRestorePayload": "Paste your backup code here..."
 }

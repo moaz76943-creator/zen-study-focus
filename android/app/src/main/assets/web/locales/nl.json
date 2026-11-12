@@ -92,5 +92,13 @@
   "dyn_urgent_important": "Urgent & Belangrijk",
   "dyn_words_recalled": "Onthouden woorden",
   "dyn_yes": "Ja",
-  "dyn_zero_music": "Natuurgeluiden"
+  "dyn_zero_music": "Natuurgeluiden",
+  "phAddTask": "Studie-, sport- of leesdoel toevoegen...",
+  "phCustomMins": "Minuten (1-240)",
+  "phCustomTitle": "Sessienaam (Studie, Sport, Lezen, Werk)...",
+  "phSearchNotes": "Notities doorzoeken...",
+  "phNoteTitle": "Titel of vraag",
+  "phNoteBody": "Schrijf hier...",
+  "langSearchPlaceholder": "Zoek taal of land...",
+  "phRestorePayload": "Plak hier je back-upcode..."
 }

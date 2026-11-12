@@ -92,5 +92,13 @@
   "dyn_urgent_important": "Urgente e importante",
   "dyn_words_recalled": "Palavras lembradas",
   "dyn_yes": "Sim",
-  "dyn_zero_music": "Sons naturais"
+  "dyn_zero_music": "Sons naturais",
+  "phAddTask": "Adicionar meta de estudo, treino ou leitura...",
+  "phCustomMins": "Minutos (1-240)",
+  "phCustomTitle": "Nome da sessão (Estudo, Treino, Leitura, Trabalho)...",
+  "phSearchNotes": "Pesquisar notas...",
+  "phNoteTitle": "Título ou pergunta",
+  "phNoteBody": "Escreva aqui...",
+  "langSearchPlaceholder": "Pesquisar idioma ou país...",
+  "phRestorePayload": "Cole seu código de backup aqui..."
 }

@@ -92,5 +92,13 @@
   "dyn_urgent_important": "緊急かつ重要",
   "dyn_words_recalled": "思い出した単語",
   "dyn_yes": "はい",
-  "dyn_zero_music": "自然環境音"
+  "dyn_zero_music": "自然環境音",
+  "phAddTask": "学習・運動・読書の目標を追加...",
+  "phCustomMins": "分 (1-240)",
+  "phCustomTitle": "セッション名（勉強、運動、読書、仕事）...",
+  "phSearchNotes": "ノートを検索...",
+  "phNoteTitle": "タイトルまたは質問",
+  "phNoteBody": "ここに入力...",
+  "langSearchPlaceholder": "言語または国を検索...",
+  "phRestorePayload": "バックアップコードをここに貼り付け..."
 }

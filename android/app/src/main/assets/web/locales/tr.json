@@ -92,5 +92,13 @@
   "dyn_urgent_important": "Acil ve Önemli",
   "dyn_words_recalled": "Hatırlanan Kelimeler",
   "dyn_yes": "Evet",
-  "dyn_zero_music": "Doğal Sesler"
+  "dyn_zero_music": "Doğal Sesler",
+  "phAddTask": "Çalışma, egzersiz veya okuma hedefi ekle...",
+  "phCustomMins": "Dakika (1-240)",
+  "phCustomTitle": "Oturum Adı (Çalışma, Spor, Okuma, İş)...",
+  "phSearchNotes": "Notlarda ara...",
+  "phNoteTitle": "Başlık veya soru",
+  "phNoteBody": "Buraya yazın...",
+  "langSearchPlaceholder": "Dil veya ülke ara...",
+  "phRestorePayload": "Yedekleme kodunu buraya yapıştırın..."
 }

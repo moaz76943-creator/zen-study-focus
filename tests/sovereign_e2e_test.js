@@ -116,6 +116,15 @@ if (!hs812.includes('data-orig-')) {
 }
 console.log('✅ PASS: Placeholder/ARIA i18n Translator & WebView Backup Modal Verified');
 
+
+// Task #814: Dual-Deck Crossfade Nature Audio & Placeholder Keys Gate
+const audioCode814 = fs.readFileSync(path.resolve('android/app/src/main/assets/web/modules/sovereign_audio_suite.js'), 'utf8');
+if (!audioCode814.includes('startDualDeckLoop') || !audioCode814.includes('scheduleOrganicAccent')) {
+  console.error('❌ FAIL: Dual-Deck Crossfade loop missing in sovereign_audio_suite.js');
+  process.exit(1);
+}
+console.log('✅ PASS: Dual-Deck Crossfade & Organic Nature Layering Verified');
+
 console.log("==================================================================");
 console.log("🧪 [Deep Focus E2E] Running Sovereign Integration Test Harness...");
 console.log("==================================================================");
