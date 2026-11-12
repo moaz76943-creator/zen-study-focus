@@ -469,6 +469,37 @@ if (last.text !== 'Focus session active' || last.priority !== 'polite') {
 }
 console.log('✅ PASS: TalkBack Semantics & ARIA Live Regions Hardening Verified');
 
+
+// Study Profiles & Zen Focus Presets Engine Gate
+const profilesModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_study_profiles.js');
+require(profilesModPath);
+if (!global.SovereignStudyProfiles || typeof global.SovereignStudyProfiles.listProfiles !== 'function') {
+  console.error('❌ FAIL: SovereignStudyProfiles failed to initialize');
+  process.exit(1);
+}
+const list = global.SovereignStudyProfiles.listProfiles();
+if (!Array.isArray(list) || list.length < 4) {
+  console.error('❌ FAIL: SovereignStudyProfiles missing default presets');
+  process.exit(1);
+}
+const switched = global.SovereignStudyProfiles.setActiveProfile('reading_zen');
+if (!switched || global.SovereignStudyProfiles.getActiveProfile().id !== 'reading_zen') {
+  console.error('❌ FAIL: SovereignStudyProfiles failed to switch active profile');
+  process.exit(1);
+}
+const custom = global.SovereignStudyProfiles.createCustomProfile({
+  id: 'exam_prep',
+  name: 'Exam Preparation',
+  focusSec: 3600,
+  breakSec: 600,
+  soundMode: 'brown_noise'
+});
+if (!custom || custom.id !== 'exam_prep' || custom.focusSec !== 3600) {
+  console.error('❌ FAIL: SovereignStudyProfiles failed to create custom profile');
+  process.exit(1);
+}
+console.log('✅ PASS: Study Profiles & Zen Focus Presets Engine Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");

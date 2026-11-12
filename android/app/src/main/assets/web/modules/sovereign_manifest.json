@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "576.0.0",
+  "appVersion": "579.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -75,6 +75,12 @@
       "file": "modules/sovereign_accessibility_suite.js",
       "required": true,
       "description": "TalkBack screen-reader ARIA live regions and 48dp touch target auditing."
+    },
+    {
+      "id": "sovereign_study_profiles",
+      "file": "modules/sovereign_study_profiles.js",
+      "required": true,
+      "description": "Study Profiles, customizable presets (Deep Work, Pomodoro, Sprint, Reading)."
     }
   ],
   "styles": [
@@ -82,5 +88,6 @@
     "styles/calm_drawer.css",
     "styles/twilight_theme.css",
     "styles/rtl_typography.css"
-  ]
+  ],
+  "phase": "Phase 3: Deep Study Engine"
 }
