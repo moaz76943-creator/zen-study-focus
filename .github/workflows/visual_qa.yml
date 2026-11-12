@@ -1,0 +1,41 @@
+name: Mobile Visual QA (Playwright 412x915)
+
+on:
+  push:
+    branches: [ main, integration/master-qa-verified-v21 ]
+  workflow_dispatch:
+
+jobs:
+  visual-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright & Chromium
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install --no-save playwright
+          npx playwright install chromium --with-deps
+
+      - name: Run Mobile Visual QA Suite (412x915)
+        run: |
+          python3 -m http.server 4173 --directory android/app/src/main/assets/web &
+          SERVER_PID=$!
+          sleep 2
+          node tests/playwright_visual_qa.js
+          kill $SERVER_PID 2>/dev/null || true
+
+      - name: Upload Mobile Screenshots Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-qa-screenshots
+          path: tests/screenshots/
+          retention-days: 7
