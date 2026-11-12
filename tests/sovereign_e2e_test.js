@@ -617,6 +617,35 @@ if (!heldExit || global.SovereignLockInMode.isLockInActive()) {
 }
 console.log('✅ PASS: Zen Lock-In Mode & Full Sensory Shielding Verified');
 
+
+// Detailed Study Session Log & Multi-Tag Engine Gate
+const loggerModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_session_logger.js');
+require(loggerModPath);
+if (!global.SovereignSessionLogger || typeof global.SovereignSessionLogger.logSession !== 'function') {
+  console.error('❌ FAIL: SovereignSessionLogger failed to initialize');
+  process.exit(1);
+}
+const logged = global.SovereignSessionLogger.logSession({
+  durationMinutes: 45,
+  tags: ['Physics', 'Quantum'],
+  qualityScore: 5
+});
+if (!logged || logged.durationMinutes !== 45 || logged.tags.length !== 2) {
+  console.error('❌ FAIL: SovereignSessionLogger failed to log session payload');
+  process.exit(1);
+}
+const physicsSessions = global.SovereignSessionLogger.querySessions({ tag: 'Physics' });
+if (!Array.isArray(physicsSessions) || physicsSessions.length < 1) {
+  console.error('❌ FAIL: SovereignSessionLogger tag querying failed');
+  process.exit(1);
+}
+const tagDist = global.SovereignSessionLogger.getTagDistribution();
+if (!tagDist.Physics || tagDist.Physics.totalMinutes < 45) {
+  console.error('❌ FAIL: SovereignSessionLogger tag distribution aggregation corrupted');
+  process.exit(1);
+}
+console.log('✅ PASS: Detailed Study Session Log & Multi-Tag Engine Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
