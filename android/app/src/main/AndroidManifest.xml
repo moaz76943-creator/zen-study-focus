@@ -5,23 +5,23 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
-        android:hardwareAccelerated="true"
-        android:localeConfig="@xml/locales_config"
-        android:label="Deep Focus"
-        android:icon="@drawable/ic_launcher"
-        android:roundIcon="@drawable/ic_launcher"
-        android:allowBackup="false"
-        android:fullBackupContent="false"
-        android:usesCleartextTraffic="false"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+ android:hardwareAccelerated="true"
+ android:localeConfig="@xml/locales_config"
+ android:label="Deep Focus"
+ android:icon="@drawable/ic_launcher"
+ android:roundIcon="@drawable/ic_launcher"
+ android:allowBackup="false"
+ android:fullBackupContent="false"
+ android:usesCleartextTraffic="false"
+ android:theme="@style/Theme.AppCompat.NoActionBar">
 
         <activity
-            android:screenOrientation="portrait"
-            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout"
-            android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize|keyboardHidden">
+ android:screenOrientation="portrait"
+ android:configChanges="orientation|screenSize|keyboardHidden|screenLayout"
+ android:name=".MainActivity"
+ android:exported="true"
+ android:launchMode="singleTop"
+ >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -30,8 +30,8 @@
 
         <!-- System-delivered user timer alarm; no foreground service or FGS declaration (Google Play DF06 compliant). -->
         <receiver
-            android:name=".FocusAlarmReceiver"
-            android:exported="false">
+ android:name=".FocusAlarmReceiver"
+ android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -42,8 +42,8 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_quick_timer_info" />
+ android:name="android.appwidget.provider"
+ android:resource="@xml/widget_quick_timer_info" />
         </receiver>
 
         <receiver android:name=".widget.DailyStreakWidgetProvider" android:exported="false">
@@ -51,8 +51,8 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_daily_streak_bar_info" />
+ android:name="android.appwidget.provider"
+ android:resource="@xml/widget_daily_streak_bar_info" />
         </receiver>
 
         <receiver android:name=".widget.VocabFlashcardWidgetProvider" android:exported="false">
@@ -60,17 +60,17 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_vocab_flashcard_info" />
+ android:name="android.appwidget.provider"
+ android:resource="@xml/widget_vocab_flashcard_info" />
         </receiver>
 
         <!-- Strict Google Play DF06 compliance: ZenFocusTileService is the sole declared service; no unauthorized foreground services. -->
         <service
-            android:name=".service.ZenFocusTileService"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="Zen Focus"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+ android:name=".service.ZenFocusTileService"
+ android:exported="true"
+ android:icon="@mipmap/ic_launcher"
+ android:label="Zen Focus"
+ android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
@@ -81,8 +81,8 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_weekly_sparkline_info" />
+ android:name="android.appwidget.provider"
+ android:resource="@xml/widget_weekly_sparkline_info" />
         </receiver>
     </application>
 </manifest>
