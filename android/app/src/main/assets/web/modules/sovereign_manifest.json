@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "589.0.0",
+  "appVersion": "590.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -123,6 +123,12 @@
       "file": "modules/sovereign_onboarding_tour.js",
       "required": true,
       "description": "Dignified 4-step Zen onboarding tour and preference synchronization."
+    },
+    {
+      "id": "sovereign_bidi_engine",
+      "file": "modules/sovereign_bidi_engine.js",
+      "required": true,
+      "description": "Bi-directional RTL/LTR dynamic layout mirroring and LTR number isolation."
     }
   ],
   "styles": [
