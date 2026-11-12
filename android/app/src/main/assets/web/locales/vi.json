@@ -77,5 +77,20 @@
   "ui_recorded_min_7d": "0 Phút / 7",
   "ui_verified_sess_7d": "0 Phiên Hoàn Thành / 7",
   "ui_3d_spatial": "3D • Điều Khiển Âm Thanh Tự Nhiên",
-  "ui_all_sounds": "Tất Cả (4)"
+  "ui_all_sounds": "Tất Cả (4)",
+  "dyn_best_daily_minutes": "Số phút tốt nhất mỗi ngày",
+  "dyn_consistency_grade": "Điểm kiên trì",
+  "dyn_deep_focus_25m": "Tập trung sâu 25m",
+  "dyn_delegate_batch": "Ủy thác / Gom nhóm",
+  "dyn_eliminate_defer": "Loại bỏ / Hoãn",
+  "dyn_fsrs_drill": "Luyện tập FSRS",
+  "dyn_fluency_speed": "Tốc độ trôi chảy",
+  "dyn_problem_effect": "Vấn đề / Tác động",
+  "dyn_recall_streak": "Chuỗi ghi nhớ",
+  "dyn_recalled_facts": "Kiến thức đã nhớ",
+  "dyn_start_session": "Bắt đầu phiên",
+  "dyn_urgent_important": "Khẩn cấp & Quan trọng",
+  "dyn_words_recalled": "Từ đã nhớ",
+  "dyn_yes": "Có",
+  "dyn_zero_music": "Âm thanh tự nhiên"
 }

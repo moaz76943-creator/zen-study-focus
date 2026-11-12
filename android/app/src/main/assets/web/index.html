@@ -1531,6 +1531,17 @@ body {
   </script>
 
   <script src="modules/ui/sovereign_missing_handlers_809.js"></script>
+<!-- TASK #811: Bottom Nav Clearance & Long-Language Button Wrap -->
+<style id="task-811-layout-fix">
+  main, .tab-content, .view-section, section[id*="view"], div[id*="view"], #app {
+    padding-bottom: 108px !important;
+  }
+  button, .pill, .chip, .tab-btn {
+    white-space: normal !important;
+    word-break: break-word !important;
+    line-height: 1.25 !important;
+  }
+</style>
 </head>
 <body>
 

@@ -77,5 +77,20 @@
   "ui_recorded_min_7d": "0 分钟 / 7",
   "ui_verified_sess_7d": "0 完成阶段 / 7",
   "ui_3d_spatial": "3D • 自然原声控制",
-  "ui_all_sounds": "全部 (4)"
+  "ui_all_sounds": "全部 (4)",
+  "dyn_best_daily_minutes": "最佳每日分钟数",
+  "dyn_consistency_grade": "坚持度评分",
+  "dyn_deep_focus_25m": "深度专注 25m",
+  "dyn_delegate_batch": "委派 / 批量处理",
+  "dyn_eliminate_defer": "删除 / 推迟",
+  "dyn_fsrs_drill": "FSRS 间隔复习",
+  "dyn_fluency_speed": "流利速度",
+  "dyn_problem_effect": "问题 / 影响",
+  "dyn_recall_streak": "连续回忆天数",
+  "dyn_recalled_facts": "已回忆知识点",
+  "dyn_start_session": "开始专注",
+  "dyn_urgent_important": "紧急且重要",
+  "dyn_words_recalled": "已回忆词汇",
+  "dyn_yes": "是",
+  "dyn_zero_music": "纯自然音效"
 }

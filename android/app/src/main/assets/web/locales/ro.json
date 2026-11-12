@@ -77,5 +77,20 @@
   "ui_recorded_min_7d": "0 Minute / 7",
   "ui_verified_sess_7d": "0 Sesiuni Finalizate / 7",
   "ui_3d_spatial": "3D • Control Sunete Naturale",
-  "ui_all_sounds": "Toate (4)"
+  "ui_all_sounds": "Toate (4)",
+  "dyn_best_daily_minutes": "Cele mai bune minute zilnice",
+  "dyn_consistency_grade": "Grad de consecvență",
+  "dyn_deep_focus_25m": "Concentrare profundă 25m",
+  "dyn_delegate_batch": "Delegare / Grupare",
+  "dyn_eliminate_defer": "Eliminare / Amânare",
+  "dyn_fsrs_drill": "Exercițiu FSRS",
+  "dyn_fluency_speed": "Viteză de fluență",
+  "dyn_problem_effect": "Problemă / Efect",
+  "dyn_recall_streak": "Serie de reamintire",
+  "dyn_recalled_facts": "Informații reamintite",
+  "dyn_start_session": "Începe sesiunea",
+  "dyn_urgent_important": "Urgent și important",
+  "dyn_words_recalled": "Cuvinte reamintite",
+  "dyn_yes": "Da",
+  "dyn_zero_music": "Sunete naturale"
 }

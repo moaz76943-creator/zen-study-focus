@@ -77,5 +77,20 @@
   "ui_recorded_min_7d": "0 Minut / 7",
   "ui_verified_sess_7d": "0 Ukończone Sesje / 7",
   "ui_3d_spatial": "3D • Sterowanie Dźwiękami Natury",
-  "ui_all_sounds": "Wszystkie (4)"
+  "ui_all_sounds": "Wszystkie (4)",
+  "dyn_best_daily_minutes": "Najlepsze minuty dnia",
+  "dyn_consistency_grade": "Ocena systematyczności",
+  "dyn_deep_focus_25m": "Głębokie skupienie 25m",
+  "dyn_delegate_batch": "Deleguj / Grupuj",
+  "dyn_eliminate_defer": "Usuń / Odłóż",
+  "dyn_fsrs_drill": "Ćwiczenie FSRS",
+  "dyn_fluency_speed": "Szybkość płynności",
+  "dyn_problem_effect": "Problem / Efekt",
+  "dyn_recall_streak": "Seria powtórek",
+  "dyn_recalled_facts": "Zapamiętane fakty",
+  "dyn_start_session": "Rozpocznij sesję",
+  "dyn_urgent_important": "Pilne i ważne",
+  "dyn_words_recalled": "Zapamiętane słowa",
+  "dyn_yes": "Tak",
+  "dyn_zero_music": "Dźwięki natury"
 }

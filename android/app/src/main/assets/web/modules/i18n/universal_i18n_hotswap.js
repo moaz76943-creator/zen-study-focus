@@ -19,6 +19,21 @@
   var EXCLUDED_CODES = new Set(["he", "iw", "syc", "ber", "zgh"]);
   var LOADED_LOCALES = {};
   var PHRASE_TO_KEY = {
+    "best daily minutes": "dyn_best_daily_minutes",
+    "consistency grade": "dyn_consistency_grade",
+    "deep focus 25m": "dyn_deep_focus_25m",
+    "delegate / batch": "dyn_delegate_batch",
+    "eliminate / defer": "dyn_eliminate_defer",
+    "fsrs drill": "dyn_fsrs_drill",
+    "fluency speed": "dyn_fluency_speed",
+    "problem / effect": "dyn_problem_effect",
+    "recall streak": "dyn_recall_streak",
+    "recalled facts": "dyn_recalled_facts",
+    "start session": "dyn_start_session",
+    "urgent & important": "dyn_urgent_important",
+    "words recalled": "dyn_words_recalled",
+    "yes": "dyn_yes",
+    "zero-music": "dyn_zero_music",
     "local data": "ui_local_data",
     "🔒 local data": "ui_local_data",
     "manual backup": "ui_manual_backup",

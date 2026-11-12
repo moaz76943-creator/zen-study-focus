@@ -77,5 +77,20 @@
   "ui_recorded_min_7d": "0 Minuti / 7",
   "ui_verified_sess_7d": "0 Sessioni Completate / 7",
   "ui_3d_spatial": "3D • Controllo Suoni della Natura",
-  "ui_all_sounds": "Tutti (4)"
+  "ui_all_sounds": "Tutti (4)",
+  "dyn_best_daily_minutes": "Migliori minuti giornalieri",
+  "dyn_consistency_grade": "Voto di costanza",
+  "dyn_deep_focus_25m": "Focus profondo 25m",
+  "dyn_delegate_batch": "Delega / Raggruppa",
+  "dyn_eliminate_defer": "Elimina / Rimanda",
+  "dyn_fsrs_drill": "Esercizio FSRS",
+  "dyn_fluency_speed": "Velocità di fluidità",
+  "dyn_problem_effect": "Problema / Effetto",
+  "dyn_recall_streak": "Serie di richiamo",
+  "dyn_recalled_facts": "Fatti ricordati",
+  "dyn_start_session": "Avvia sessione",
+  "dyn_urgent_important": "Urgente e importante",
+  "dyn_words_recalled": "Parole ricordate",
+  "dyn_yes": "Sì",
+  "dyn_zero_music": "Suoni naturali"
 }
