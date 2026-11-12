@@ -98,6 +98,23 @@ test("Levenshtein Deduplicator Similarity Math Accuracy", () => {
     assert(lev("Deep Focus", "Quantum Mechanics") < 0.30, "Expected < 0.30 similarity");
 });
 
+
+// 6. Verify AndroidManifest.xml Has Zero Duplicate Attributes in Any Tag
+test("AndroidManifest.xml Has Zero Duplicate Attributes", () => {
+    const manifestPath = path.join(__dirname, "..", "android/app/src/main/AndroidManifest.xml");
+    const mf = fs.readFileSync(manifestPath, "utf8");
+    const tags = mf.match(/<[A-Za-z_][^>]*>/g) || [];
+    tags.forEach(tag => {
+        const attrs = tag.match(/([A-Za-z_][A-Za-z0-9_.:-]*)\s*=/g) || [];
+        const seen = new Set();
+        attrs.forEach(a => {
+            const name = a.replace(/\s*=$/, "");
+            assert(!seen.has(name), "Duplicate XML attribute in tag: " + name);
+            seen.add(name);
+        });
+    });
+});
+
 console.log("==================================================================");
 console.log("🎉 [E2E Summary]: " + passed + " / " + passed + " Integration Tests PASSED!");
 console.log("==================================================================");
