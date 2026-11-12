@@ -117,5 +117,9 @@
   "ui_todays_plan": "Plan voor vandaag",
   "ui_verified_7d": "sessies / 7 dagen",
   "ui_recorded_7d": "minuten / 7 dagen",
-  "ui_fps_120": "120 FPS-engine"
+  "ui_fps_120": "120 FPS-engine",
+  "ui_your_progress": "Jouw voortgang",
+  "ui_view_all": "Alles bekijken ↗",
+  "ui_start_training": "Training starten",
+  "ui_pure_nature_ready": "Natuurgeluiden gereed"
 }

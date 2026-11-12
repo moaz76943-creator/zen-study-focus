@@ -117,5 +117,9 @@
   "ui_todays_plan": "오늘의 계획",
   "ui_verified_7d": "완료 세션 / 7일",
   "ui_recorded_7d": "기록 시간 / 7일",
-  "ui_fps_120": "120 FPS 엔진"
+  "ui_fps_120": "120 FPS 엔진",
+  "ui_your_progress": "나의 진행도",
+  "ui_view_all": "전체 보기 ↗",
+  "ui_start_training": "훈련 시작",
+  "ui_pure_nature_ready": "자연의 소리 준비 완료"
 }

@@ -143,6 +143,22 @@ const { chromium } = require('playwright');
   }
   console.log('✅ PASS: Zero Error Banner & Audio Play/Stop Verified');
 
+
+  // 7. Verify dynamic DOM translation after tab switching in Arabic
+  await page.evaluate(async () => {
+    if (window.UniversalI18nHotSwap) await window.UniversalI18nHotSwap.setLanguage('ar');
+  });
+  await page.waitForTimeout(500);
+  const arabicUntranslated = await page.evaluate(() => {
+    const raw = document.body.innerText || '';
+    const matches = raw.match(/\b(Your progress|Start training|Pure Nature Studio Ready)\b/i);
+    return matches ? matches[0] : null;
+  });
+  if (arabicUntranslated) {
+    throw new Error('Dynamic string untranslated in Arabic mode: ' + arabicUntranslated);
+  }
+  console.log('✅ PASS: Dynamic Tab Injections Translated in Arabic Mode');
+
   await browser.close();
   console.log('🎉 [Playwright Visual QA]: ALL MOBILE SCREEN CHECKS PASSED!');
 })();

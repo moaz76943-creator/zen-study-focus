@@ -117,5 +117,9 @@
   "ui_todays_plan": "आज की योजना",
   "ui_verified_7d": "सत्यापित सत्र / 7 दिन",
   "ui_recorded_7d": "दर्ज मिनट / 7 दिन",
-  "ui_fps_120": "120 FPS इंजन"
+  "ui_fps_120": "120 FPS इंजन",
+  "ui_your_progress": "आपकी प्रगति",
+  "ui_view_all": "सभी देखें ↗",
+  "ui_start_training": "प्रशिक्षण शुरू करें",
+  "ui_pure_nature_ready": "प्राकृतिक ध्वनि तैयार"
 }
