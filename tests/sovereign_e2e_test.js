@@ -965,6 +965,38 @@ if (report.totalBreaches !== 2 || report.integrityScore >= 100 || report.isFlawl
 }
 console.log('✅ PASS: Sovereign Distraction Shield & Integrity Verified (66/66)');
 
+
+// Sovereign Thermal Sentinel & Hardware Guard Gate
+const sentinelModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_thermal_sentinel.js');
+require(sentinelModPath);
+if (!global.SovereignThermalSentinel || typeof global.SovereignThermalSentinel.checkExecutionPermit !== 'function') {
+  console.error('❌ FAIL: SovereignThermalSentinel failed to initialize');
+  process.exit(1);
+}
+global.SovereignThermalSentinel.resetSentinelState();
+const permit1 = global.SovereignThermalSentinel.checkExecutionPermit();
+if (!permit1.canExecute) {
+  console.error('❌ FAIL: Initial permit should be granted');
+  process.exit(1);
+}
+const acquired = global.SovereignThermalSentinel.acquireLock();
+if (!acquired || !global.SovereignThermalSentinel.isInferring) {
+  console.error('❌ FAIL: Lock acquisition failed');
+  process.exit(1);
+}
+const permit2 = global.SovereignThermalSentinel.checkExecutionPermit();
+if (permit2.canExecute || permit2.reason !== 'concurrency_lock_active') {
+  console.error('❌ FAIL: Concurrency lock failed to block secondary request');
+  process.exit(1);
+}
+global.SovereignThermalSentinel.releaseLock(true);
+const permit3 = global.SovereignThermalSentinel.checkExecutionPermit();
+if (permit3.canExecute || permit3.reason !== 'thermal_cooling_active') {
+  console.error('❌ FAIL: Mandatory cooling interval not enforced');
+  process.exit(1);
+}
+console.log('✅ PASS: Sovereign Thermal Sentinel & Hardware Guard Verified (68/68)');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");

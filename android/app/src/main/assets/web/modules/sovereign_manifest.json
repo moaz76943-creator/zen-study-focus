@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "615.0.0",
+  "appVersion": "617.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -199,6 +199,14 @@
       "file": "modules/sovereign_distraction_shield.js",
       "description": "On-device study mode containment shield, notification dampener & window blur focus integrity monitor.",
       "type": "productivity"
+    },
+    {
+      "id": "sovereign_thermal_sentinel",
+      "name": "Sovereign Thermal Sentinel",
+      "version": "617.0.0",
+      "file": "modules/sovereign_thermal_sentinel.js",
+      "description": "On-device hardware guard, cooling intervals, battery threshold protection & local AI throttling sentinel.",
+      "type": "hardware"
     }
   ],
   "styles": [
