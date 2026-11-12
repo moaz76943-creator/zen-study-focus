@@ -100,5 +100,22 @@
   "phNoteTitle": "タイトルまたは質問",
   "phNoteBody": "ここに入力...",
   "langSearchPlaceholder": "言語または国を検索...",
-  "phRestorePayload": "バックアップコードをここに貼り付け..."
+  "phRestorePayload": "バックアップコードをここに貼り付け...",
+  "ui_quick_session": "クイックセッション",
+  "ui_studio_suite": "スタジオスイート",
+  "ui_stem_studio": "STEM・試験スタジオ",
+  "ui_stem_sub": "SVG科学図解＆試験シミュレーター",
+  "ui_quick_training": "クイックトレーニング",
+  "ui_custom_intervals": "作業と休憩のカスタム間隔",
+  "ui_rest_mmss": "休憩 (MM:SS)",
+  "ui_work_mmss": "作業 (MM:SS)",
+  "ui_sets": "セット数",
+  "ui_skip_final_rest": "最後の休憩をスキップ",
+  "ui_exercise_seq": "エクササイズ順",
+  "ui_ex_placeholder": "例：ストレッチや精読",
+  "ui_add_plus": "追加 +",
+  "ui_todays_plan": "今日の予定",
+  "ui_verified_7d": "完了セッション / 7日",
+  "ui_recorded_7d": "記録時間 / 7日",
+  "ui_fps_120": "120 FPS エンジン"
 }

@@ -19,6 +19,25 @@
   var EXCLUDED_CODES = new Set(["he", "iw", "syc", "ber", "zgh"]);
   var LOADED_LOCALES = {};
   var PHRASE_TO_KEY = {
+    "syllabus": "ui_syllabus",
+    "quick session": "ui_quick_session",
+    "studio suite": "ui_studio_suite",
+    "stem & exam studio": "ui_stem_studio",
+    "pure svg stem & strict exam simulator": "ui_stem_sub",
+    "quick training": "ui_quick_training",
+    "custom work-and-rest intervals": "ui_custom_intervals",
+    "rest (mm:ss)": "ui_rest_mmss",
+    "work (mm:ss)": "ui_work_mmss",
+    "sets": "ui_sets",
+    "skip final rest": "ui_skip_final_rest",
+    "exercise sequence": "ui_exercise_seq",
+    "e.g. stretches or deep reading": "ui_ex_placeholder",
+    "add +": "ui_add_plus",
+    "today's plan": "ui_todays_plan",
+    "120 fps engine": "ui_fps_120",
+    "fps engine 120": "ui_fps_120",
+    "verified sessions / 7 days": "ui_verified_7d",
+    "recorded minutes / 7 days": "ui_recorded_7d",
     "phaddtask": "phAddTask",
     "add study, workout or reading goal": "phAddTask",
     "add study, workout or reading goal...": "phAddTask",
@@ -264,6 +283,33 @@
             elA.setAttribute(attrName, origVal);
           }
         });
+      }
+
+
+      // 4. Task #815: Enforce Western digits (0-9) & fix Local Data contrast + dynamic stats labels
+      var allButtons815 = document.querySelectorAll("button, .pill, .chip, a");
+      for (var b = 0; b < allButtons815.length; b++) {
+        var btn815 = allButtons815[b];
+        var bt = (btn815.textContent || "").trim();
+        if (bt.indexOf("بيانات محلية") !== -1 || bt.toLowerCase().indexOf("local data") !== -1) {
+          btn815.style.setProperty("color", "#0F172A", "important");
+          btn815.style.setProperty("background", "#F1F5F9", "important");
+          btn815.style.setProperty("border", "1px solid #CBD5E1", "important");
+        }
+      }
+      var statNodes815 = document.querySelectorAll("div, span, p, small");
+      for (var s = 0; s < statNodes815.length; s++) {
+        var sn = statNodes815[s];
+        if (sn.children.length === 0 && sn.textContent) {
+          var st = sn.textContent.trim();
+          var stl = st.toLowerCase();
+          if (stl.indexOf("verified sessions / 7 days") !== -1 && dict.ui_verified_7d) {
+            sn.textContent = st.replace(/verified sessions \/ 7 days/i, dict.ui_verified_7d);
+          } else if (stl.indexOf("recorded minutes / 7 days") !== -1 && dict.ui_recorded_7d) {
+            sn.textContent = st.replace(/recorded minutes \/ 7 days/i, dict.ui_recorded_7d);
+          }
+          sn.textContent = sn.textContent.replace(/[٠-٩]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); });
+        }
       }
 
       // 2. Translate all [data-i18n] elements

@@ -100,5 +100,22 @@
   "phNoteTitle": "عنوان یا سوال",
   "phNoteBody": "یہاں لکھیں...",
   "langSearchPlaceholder": "زبان یا ملک تلاش کریں...",
-  "phRestorePayload": "اپنا بیک اپ کوڈ یہاں پیسٹ کریں..."
+  "phRestorePayload": "اپنا بیک اپ کوڈ یہاں پیسٹ کریں...",
+  "ui_quick_session": "فوری سیشن",
+  "ui_studio_suite": "اسٹوڈیو سوٹ",
+  "ui_stem_studio": "سائنس اور امتحان اسٹوڈیو",
+  "ui_stem_sub": "سائنسی خاکے اور امتحان سمیلیٹر",
+  "ui_quick_training": "فوری تربیت",
+  "ui_custom_intervals": "کام اور آرام کے حسب ضرورت وقفے",
+  "ui_rest_mmss": "آرام (MM:SS)",
+  "ui_work_mmss": "کام (MM:SS)",
+  "ui_sets": "سیٹ",
+  "ui_skip_final_rest": "آخری آرام چھوڑیں",
+  "ui_exercise_seq": "ورزش کی ترتیب",
+  "ui_ex_placeholder": "مثلاً اسٹریچنگ یا گہرا مطالعہ",
+  "ui_add_plus": "شامل کریں +",
+  "ui_todays_plan": "آج کا منصوبہ",
+  "ui_verified_7d": "تصدیق شدہ سیشن / 7 دن",
+  "ui_recorded_7d": "ریکارڈ منٹ / 7 دن",
+  "ui_fps_120": "120 FPS انجن"
 }

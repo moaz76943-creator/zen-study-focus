@@ -100,5 +100,22 @@
   "phNoteTitle": "Titel oder Frage",
   "phNoteBody": "Hier schreiben...",
   "langSearchPlaceholder": "Sprache oder Land suchen...",
-  "phRestorePayload": "Sicherungscode hier einfügen..."
+  "phRestorePayload": "Sicherungscode hier einfügen...",
+  "ui_quick_session": "Schnellsitzung",
+  "ui_studio_suite": "Studio-Suite",
+  "ui_stem_studio": "MINT- & Prüfungsstudio",
+  "ui_stem_sub": "SVG-Grafiken & Prüfungssimulator",
+  "ui_quick_training": "Schnelltraining",
+  "ui_custom_intervals": "Benutzerdefinierte Arbeits- & Ruhezeiten",
+  "ui_rest_mmss": "Pause (MM:SS)",
+  "ui_work_mmss": "Arbeit (MM:SS)",
+  "ui_sets": "Sätze",
+  "ui_skip_final_rest": "Letzte Pause überspringen",
+  "ui_exercise_seq": "Übungsablauf",
+  "ui_ex_placeholder": "z. B. Dehnen oder tiefes Lesen",
+  "ui_add_plus": "Hinzufügen +",
+  "ui_todays_plan": "Heutiger Plan",
+  "ui_verified_7d": "bestätigte Sitzungen / 7 Tage",
+  "ui_recorded_7d": "erfasste Minuten / 7 Tage",
+  "ui_fps_120": "120-FPS-Engine"
 }

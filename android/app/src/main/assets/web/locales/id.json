@@ -100,5 +100,22 @@
   "phNoteTitle": "Judul atau pertanyaan",
   "phNoteBody": "Tulis di sini...",
   "langSearchPlaceholder": "Cari bahasa atau negara...",
-  "phRestorePayload": "Tempel kode cadangan di sini..."
+  "phRestorePayload": "Tempel kode cadangan di sini...",
+  "ui_quick_session": "Sesi cepat",
+  "ui_studio_suite": "Paket Studio",
+  "ui_stem_studio": "Studio STEM & Ujian",
+  "ui_stem_sub": "Grafik SVG & Simulator Ujian",
+  "ui_quick_training": "Latihan cepat",
+  "ui_custom_intervals": "Interval kerja & istirahat kustom",
+  "ui_rest_mmss": "Istirahat (MM:SS)",
+  "ui_work_mmss": "Kerja (MM:SS)",
+  "ui_sets": "Set",
+  "ui_skip_final_rest": "Lewati istirahat akhir",
+  "ui_exercise_seq": "Urutan latihan",
+  "ui_ex_placeholder": "mis. peregangan atau membaca",
+  "ui_add_plus": "Tambah +",
+  "ui_todays_plan": "Rencana hari ini",
+  "ui_verified_7d": "sesi terverifikasi / 7 hari",
+  "ui_recorded_7d": "menit tercatat / 7 hari",
+  "ui_fps_120": "Mesin 120 FPS"
 }

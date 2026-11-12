@@ -100,5 +100,22 @@
   "phNoteTitle": "Tytuł lub pytanie",
   "phNoteBody": "Napisz tutaj...",
   "langSearchPlaceholder": "Szukaj języka lub kraju...",
-  "phRestorePayload": "Wklej kod kopii zapasowej tutaj..."
+  "phRestorePayload": "Wklej kod kopii zapasowej tutaj...",
+  "ui_quick_session": "Szybka sesja",
+  "ui_studio_suite": "Pakiet Studio",
+  "ui_stem_studio": "Studio STEM i Egzaminów",
+  "ui_stem_sub": "Grafika SVG i symulator egzaminu",
+  "ui_quick_training": "Szybki trening",
+  "ui_custom_intervals": "Własne interwały pracy i odpoczynku",
+  "ui_rest_mmss": "Odpoczynek (MM:SS)",
+  "ui_work_mmss": "Praca (MM:SS)",
+  "ui_sets": "Serie",
+  "ui_skip_final_rest": "Pomiń ostatnią przerwę",
+  "ui_exercise_seq": "Sekwencja ćwiczeń",
+  "ui_ex_placeholder": "np. rozciąganie lub czytanie",
+  "ui_add_plus": "Dodaj +",
+  "ui_todays_plan": "Plan na dziś",
+  "ui_verified_7d": "sesje / 7 dni",
+  "ui_recorded_7d": "minuty / 7 dni",
+  "ui_fps_120": "Silnik 120 FPS"
 }
