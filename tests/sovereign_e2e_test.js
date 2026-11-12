@@ -449,6 +449,26 @@ if (!handledIntent || global.SovereignShortcutsBridge.getLastAction() !== 'calm_
 }
 console.log('✅ PASS: Dynamic App Shortcuts & Intent Deep-Link Routing Verified');
 
+
+// TalkBack Semantics & ARIA Live Regions Hardening Gate
+const a11yModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_accessibility_suite.js');
+require(a11yModPath);
+if (!global.SovereignAccessibilitySuite || typeof global.SovereignAccessibilitySuite.announce !== 'function') {
+  console.error('❌ FAIL: SovereignAccessibilitySuite failed to initialize');
+  process.exit(1);
+}
+const announced = global.SovereignAccessibilitySuite.announce('Focus session active', 'polite');
+if (!announced || !global.SovereignAccessibilitySuite.getLastAnnouncement()) {
+  console.error('❌ FAIL: SovereignAccessibilitySuite failed to record announcement');
+  process.exit(1);
+}
+const last = global.SovereignAccessibilitySuite.getLastAnnouncement();
+if (last.text !== 'Focus session active' || last.priority !== 'polite') {
+  console.error('❌ FAIL: SovereignAccessibilitySuite corrupted announcement payload');
+  process.exit(1);
+}
+console.log('✅ PASS: TalkBack Semantics & ARIA Live Regions Hardening Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
