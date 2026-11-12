@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "603.0.0",
+  "appVersion": "611.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -175,6 +175,14 @@
       "file": "modules/sovereign_insets_calibrator.js",
       "description": "Android 15 Edge-to-Edge gesture navigation pill and notch cutout insets calibration.",
       "type": "ui"
+    },
+    {
+      "id": "sovereign_semantic_search",
+      "name": "Sovereign Semantic Search",
+      "version": "611.0.0",
+      "file": "modules/sovereign_semantic_search.js",
+      "description": "On-device semantic search, deterministic token vectorizer & embeddings cache for sovereign offline discovery.",
+      "type": "ai"
     }
   ],
   "styles": [
