@@ -12,6 +12,30 @@ const fs = require("fs");
 const path = require("path");
 const assert = require("assert");
 
+
+// Task #807: Functional 20-Language Completeness, Contrast & HTML Integrity Gate
+const funcAudit = require(path.resolve('android/app/src/main/assets/web/modules/qa/sovereign_functional_audit.js'));
+const core20Path = path.resolve('android/app/src/main/assets/web/locale_packs/core_20.json');
+if (fs.existsSync(core20Path)) {
+  const core20 = JSON.parse(fs.readFileSync(core20Path, 'utf8'));
+  const locRes = funcAudit.auditLocalePack(core20);
+  if (!locRes.ok) {
+    console.error('❌ FAIL: 20-Language Authentic Translation Audit failed:', locRes.failures);
+    process.exit(1);
+  }
+  console.log('✅ PASS: Functional 20-Language Authentic Translation Audit (20/20 verified)');
+}
+const idxPath = path.resolve('android/app/src/main/assets/web/index.html');
+if (fs.existsSync(idxPath)) {
+  const idxHtml = fs.readFileSync(idxPath, 'utf8');
+  const htmlRes = funcAudit.auditHtmlIntegrity(idxHtml);
+  if (!htmlRes.ok) {
+    console.error('❌ FAIL: HTML Contrast & Runtime Wiring Audit failed:', htmlRes.issues);
+    process.exit(1);
+  }
+  console.log('✅ PASS: HTML Contrast, i18n Hook & Button-Wiring Integrity Verified');
+}
+
 console.log("==================================================================");
 console.log("🧪 [Deep Focus E2E] Running Sovereign Integration Test Harness...");
 console.log("==================================================================");
