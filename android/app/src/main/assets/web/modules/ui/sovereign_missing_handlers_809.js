@@ -45,9 +45,30 @@
     } catch (e) {}
   }
 
+
+  function ensureFallbackModal(id, title, fieldsHtml, onSaveFnName) {
+    var existing = byId(id);
+    if (existing) return existing;
+    if (typeof document === "undefined" || !document.body) return null;
+    var wrap = document.createElement("div");
+    wrap.id = id;
+    wrap.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:none;align-items:center;justify-content:center;padding:16px;";
+    wrap.innerHTML =
+      '<div style="background:#111827;color:#F9FAFB;border:1px solid #374151;border-radius:16px;padding:20px;max-width:360px;width:100%;font-family:sans-serif;">' +
+        '<h3 style="margin:0 0 12px 0;font-size:18px;">' + title + '</h3>' +
+        fieldsHtml +
+        '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">' +
+          '<button type="button" onclick="this.closest(\'#' + id + '\').style.display=\'none\'" style="padding:10px 14px;border-radius:10px;border:1px solid #4B5563;background:transparent;color:#E5E7EB;">Close</button>' +
+          '<button type="button" onclick="' + onSaveFnName + '()" style="padding:10px 16px;border-radius:10px;border:none;background:#2563EB;color:#FFFFFF;font-weight:600;">Save</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(wrap);
+    return wrap;
+  }
+
   // --- 1. Timer Settings ---
   function openTimerSettings() {
-    var modal = byId("timerSettingsModal") || byId("timer-settings-modal") || byId("settingsModal");
+    var modal = byId("timerSettingsModal") || byId("timer-settings-modal") || byId("settingsModal") || ensureFallbackModal("timerSettingsModal", "Timer Settings", "<label>Focus (min)<input id=\"focusMinutesInput\" type=\"number\" value=\"25\" style=\"width:100%;padding:8px;margin:4px 0 10px;border-radius:8px;border:1px solid #374151;background:#1F2937;color:#fff;\"></label><label>Short Break (min)<input id=\"shortBreakInput\" type=\"number\" value=\"5\" style=\"width:100%;padding:8px;margin:4px 0 10px;border-radius:8px;border:1px solid #374151;background:#1F2937;color:#fff;\"></label><label>Long Break (min)<input id=\"longBreakInput\" type=\"number\" value=\"15\" style=\"width:100%;padding:8px;margin:4px 0;border-radius:8px;border:1px solid #374151;background:#1F2937;color:#fff;\"></label>", "saveTimerSettings");
     var cfg = readJson(KEY_TIMER_CFG, { focus: 25, shortBreak: 5, longBreak: 15 });
     var fIn = byId("focusMinutesInput") || byId("timerFocusInput") || byId("focusDuration");
     var sIn = byId("shortBreakInput") || byId("timerShortBreakInput");
@@ -90,7 +111,7 @@
 
   // --- 2. Daily Goals ---
   function openDailyGoalsModal() {
-    var modal = byId("dailyGoalsModal") || byId("daily-goals-modal");
+    var modal = byId("dailyGoalsModal") || byId("daily-goals-modal") || ensureFallbackModal("dailyGoalsModal", "Daily Goals", "<label>Daily Minutes<input id=\"dailyGoalMinutesInput\" type=\"number\" value=\"120\" style=\"width:100%;padding:8px;margin:4px 0 10px;border-radius:8px;border:1px solid #374151;background:#1F2937;color:#fff;\"></label><label>Daily Sessions<input id=\"dailyGoalSessionsInput\" type=\"number\" value=\"4\" style=\"width:100%;padding:8px;margin:4px 0;border-radius:8px;border:1px solid #374151;background:#1F2937;color:#fff;\"></label>", "saveDailyGoals");
     var goals = readJson(KEY_DAILY_GOALS, { targetMinutes: 120, targetSessions: 4 });
     var mIn = byId("dailyGoalMinutesInput") || byId("dailyMinutesGoal");
     var sIn = byId("dailyGoalSessionsInput") || byId("dailySessionsGoal");
