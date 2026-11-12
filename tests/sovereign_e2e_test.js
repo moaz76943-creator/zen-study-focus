@@ -1,3 +1,13 @@
+
+// Runtime PASS counter hook (always reflects exact PASS lines printed)
+let __e2ePassCount = 0;
+const __origLog = console.log.bind(console);
+console.log = (...args) => {
+  const msg = args.join(' ');
+  if (msg.includes('PASS:')) __e2ePassCount++;
+  __origLog(...args);
+};
+
 const fs = require("fs");
 const path = require("path");
 const assert = require("assert");
@@ -197,6 +207,27 @@ if (!rec || rec.minutes < 25 || grid.length !== 182) {
 }
 console.log('✅ PASS: Modular Analytics & 26-Week (182-Day) Heatmap Verified');
 
+
+// Modular Wellness UI, Breathing & CalmUI Live Execution Test
+const wellnessModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_wellness_ui.js');
+if (!fs.existsSync(wellnessModPath)) {
+  console.error('❌ FAIL: Missing modular wellness UI at ' + wellnessModPath);
+  process.exit(1);
+}
+require(wellnessModPath);
+const boxPhase = global.SovereignBreathing.evaluateAt('box', 5);
+if (!boxPhase || boxPhase.phase !== 'hold') {
+  console.error('❌ FAIL: SovereignBreathing Box 4-4-4-4 phase calculation error');
+  process.exit(1);
+}
+const twState = global.SovereignEyeComfort.toggle(true);
+const drState = global.SovereignCalmUI.toggleDrawer(true);
+if (twState !== true || drState !== true) {
+  console.error('❌ FAIL: SovereignEyeComfort or SovereignCalmUI state toggle failed');
+  process.exit(1);
+}
+console.log('✅ PASS: Modular Wellness UI (Breathing, EyeComfort & CalmUI) Verified');
+
 console.log("==================================================================");
-console.log("🎉 [E2E Summary]: 5 / 5 Integration Tests PASSED!");
+console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
