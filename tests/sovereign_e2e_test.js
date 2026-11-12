@@ -355,6 +355,20 @@ if (!mXml.includes('FocusAlarmReceiver') || !mXml.includes('android:exported="fa
 }
 console.log('✅ PASS: Android 15 (SDK 35) Background Alarm & Receiver Security Verified');
 
+
+// Xiaomi 17T Pro Edge-to-Edge WindowInsets & Notch Gate
+const amoledCssPath = path.resolve('android/app/src/main/assets/web/styles/amoled_120hz.css');
+if (!fs.existsSync(amoledCssPath)) {
+  console.error('❌ FAIL: Missing amoled_120hz.css');
+  process.exit(1);
+}
+const cssContent = fs.readFileSync(amoledCssPath, 'utf8');
+if (!cssContent.includes('df-notch-top') || !cssContent.includes('safe-area-inset-top')) {
+  console.error('❌ FAIL: amoled_120hz.css missing Xiaomi 17T Pro notch insets calibration');
+  process.exit(1);
+}
+console.log('✅ PASS: Xiaomi 17T Pro Edge-to-Edge WindowInsets & Notch Calibration Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
