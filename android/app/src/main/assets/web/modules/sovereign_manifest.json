@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "572.0.0",
+  "appVersion": "573.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -51,6 +51,12 @@
       "file": "modules/sovereign_frame_pacer.js",
       "required": true,
       "description": "120Hz/144Hz variable refresh pacing and idle battery suspension."
+    },
+    {
+      "id": "sovereign_memory_guard",
+      "file": "modules/sovereign_memory_guard.js",
+      "required": true,
+      "description": "LMKD prevention, onTrimMemory AudioContext release & memory drain guard."
     }
   ],
   "styles": [
