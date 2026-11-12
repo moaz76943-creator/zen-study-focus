@@ -1614,6 +1614,19 @@ body {
     color: #F9FAFB !important;
   }
 </style>
+<!-- TASK #821: Notes + FAB Clearance & Bottom-Nav Safe Padding -->
+<style id="task-821-fab-clearance">
+  main, .tab-content, .tab-panel, [id*="notes"], [id*="Notes"], [id*="section"] {
+    padding-bottom: 132px !important;
+  }
+  /* Prevent floating + FAB from overlapping Notes quick-template pills (9602.jpg) */
+  #quickAddFab, .fab-btn, .floating-fab, button[aria-label*="Quick Add"], button[aria-label*="إضافة سريعة"] {
+    bottom: 96px !important;
+    right: 16px !important;
+    left: auto !important;
+    z-index: 45 !important;
+  }
+</style>
 </head>
 <body>
 

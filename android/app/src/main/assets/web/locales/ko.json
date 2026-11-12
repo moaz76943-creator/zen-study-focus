@@ -121,5 +121,6 @@
   "ui_your_progress": "나의 진행도",
   "ui_view_all": "전체 보기 ↗",
   "ui_start_training": "훈련 시작",
-  "ui_pure_nature_ready": "자연의 소리 준비 완료"
+  "ui_pure_nature_ready": "자연의 소리 준비 완료",
+  "ui_sort_label": "정렬"
 }

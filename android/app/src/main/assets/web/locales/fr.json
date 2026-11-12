@@ -121,5 +121,6 @@
   "ui_your_progress": "Votre progression",
   "ui_view_all": "Voir tout ↗",
   "ui_start_training": "Commencer l'entraînement",
-  "ui_pure_nature_ready": "Sons naturels prêts"
+  "ui_pure_nature_ready": "Sons naturels prêts",
+  "ui_sort_label": "Trier"
 }

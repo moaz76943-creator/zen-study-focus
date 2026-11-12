@@ -121,5 +121,6 @@
   "ui_your_progress": "Ваш прогресс",
   "ui_view_all": "Все ↗",
   "ui_start_training": "Начать тренировку",
-  "ui_pure_nature_ready": "Звуки природы готовы"
+  "ui_pure_nature_ready": "Звуки природы готовы",
+  "ui_sort_label": "Сортировка"
 }
