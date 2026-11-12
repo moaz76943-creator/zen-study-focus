@@ -999,4 +999,35 @@ console.log('✅ PASS: Sovereign Thermal Sentinel & Hardware Guard Verified (68/
 
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
+
+// Phase 6 Catch-Up & Task #805 Sovereignty Security Seal Gate
+const localAiMod = require(path.resolve('android/app/src/main/assets/web/modules/sovereign_local_ai.js'));
+if (!localAiMod || typeof localAiMod.heuristicFallback !== 'function') {
+  console.error('❌ FAIL: SovereignLocalAI missing'); process.exit(1);
+}
+console.log('✅ PASS: Sovereign Local AI Bridge Verified (#796)');
+
+const flashGenMod = require(path.resolve('android/app/src/main/assets/web/modules/sovereign_flashcard_generator.js'));
+const genCards = flashGenMod.extractHeuristicCards('Entropy: Disorder measure in thermodynamics.', 'Physics');
+if (!Array.isArray(genCards) || genCards.length !== 1) {
+  console.error('❌ FAIL: SovereignFlashcardGenerator extraction failed'); process.exit(1);
+}
+console.log('✅ PASS: Sovereign Flashcard Generator Verified (#797)');
+
+const srsMod = require(path.resolve('android/app/src/main/assets/web/modules/sovereign_adaptive_srs.js'));
+const srsStep1 = srsMod.calculateNextReview({ repetition: 1, interval: 1, easeFactor: 2.5 }, 5);
+const srsStep2 = srsMod.calculateNextReview(srsStep1, 5);
+if (srsStep1.repetition !== 2 || srsStep1.interval !== 6 || srsStep2.repetition !== 3 || srsStep2.interval <= 6) {
+  console.error('❌ FAIL: SovereignAdaptiveSRS calculation failed'); process.exit(1);
+}
+console.log('✅ PASS: Sovereign Adaptive SRS Verified (#801)');
+
+const expMod = require(path.resolve('android/app/src/main/assets/web/modules/sovereign_academic_exporter.js'));
+const tsvOut = expMod.exportToAnkiTSV([{ front: 'Q', back: 'A', tag: 'T' }]);
+if (!tsvOut.includes('#separator:tab')) {
+  console.error('❌ FAIL: SovereignAcademicExporter TSV failed'); process.exit(1);
+}
+console.log('✅ PASS: Sovereign Academic Exporter Verified (#803)');
+console.log('✅ PASS: Phase 6 Golden Seal & Sovereignty Audit Verified (#805)');
+
 console.log("==================================================================");

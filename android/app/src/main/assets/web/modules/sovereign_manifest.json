@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "617.0.0",
+  "appVersion": "618.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -207,6 +207,34 @@
       "file": "modules/sovereign_thermal_sentinel.js",
       "description": "On-device hardware guard, cooling intervals, battery threshold protection & local AI throttling sentinel.",
       "type": "hardware"
+    },
+    {
+      "id": "sovereign_local_ai",
+      "name": "Sovereign Local AI",
+      "version": "618.0.0",
+      "file": "modules/sovereign_local_ai.js",
+      "type": "ai"
+    },
+    {
+      "id": "sovereign_flashcard_generator",
+      "name": "Sovereign Flashcard Generator",
+      "version": "618.0.0",
+      "file": "modules/sovereign_flashcard_generator.js",
+      "type": "ai"
+    },
+    {
+      "id": "sovereign_adaptive_srs",
+      "name": "Sovereign Adaptive SRS",
+      "version": "618.0.0",
+      "file": "modules/sovereign_adaptive_srs.js",
+      "type": "learning"
+    },
+    {
+      "id": "sovereign_academic_exporter",
+      "name": "Sovereign Academic Exporter",
+      "version": "618.0.0",
+      "file": "modules/sovereign_academic_exporter.js",
+      "type": "exporter"
     }
   ],
   "styles": [
