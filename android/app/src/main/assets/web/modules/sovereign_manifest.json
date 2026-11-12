@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "593.0.0",
+  "appVersion": "596.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -143,6 +143,14 @@
       "file": "modules/sovereign_indexed_db.js",
       "description": "High-performance transactional IndexedDB storage with zero UI thread jank and memory fallback.",
       "type": "storage"
+    },
+    {
+      "id": "sovereign_diagnostics_portal",
+      "name": "Sovereign Diagnostics Portal",
+      "version": "596.0.0",
+      "file": "modules/sovereign_diagnostics_portal.js",
+      "description": "Advanced hardware telemetry, storage health audit, and zero PII self-diagnostics portal.",
+      "type": "diagnostic"
     }
   ],
   "styles": [
