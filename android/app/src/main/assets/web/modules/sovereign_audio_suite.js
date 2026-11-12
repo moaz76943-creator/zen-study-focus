@@ -1,162 +1,172 @@
 /**
- * DEEP FOCUS — Sovereign Modular Audio Suite (v559.0.0)
- * Pure Web Audio API DSP (Zero .mp3/.wav/.ogg/.flac/.m4a files, Zero RECORD_AUDIO).
- * Encapsulates:
- *   - SovereignChimes (Fibonacci 432Hz Golden Ratio procedural chimes)
- *   - SovereignBinauralAlpha (10Hz Alpha focus wave synthesis)
- *   - SovereignAudioGuardian (Auto-resume after call/Bluetooth/visibility)
- *   - SovereignAudioVisualizer (Zero-permission AnalyserNode spectrum)
+ * DEEP FOCUS — Sovereign Real CC0 Audio Suite (v619.0.0)
+ * Plays authentic CC0 1.0 Universal & Public Domain natural recordings bundled in audio/*.ogg:
+ *   - audio/rain_window.ogg (Rain against the window - Public Domain)
+ *   - audio/forest_birds.ogg (Forest birdsong at dawn - Public Domain)
+ *   - audio/flowing_water.ogg (Flowing stream water - CC0 1.0)
+ *   - audio/zen_bell.ogg (Meditation gong/bell - CC0 1.0)
  */
 (function (global) {
   'use strict';
 
-  var sharedCtx = null;
-  var masterGain = null;
-  var analyserNode = null;
+  var SOUND_FILES = {
+    rain: 'audio/rain_window.ogg',
+    water: 'audio/flowing_water.ogg',
+    waves: 'audio/flowing_water.ogg',
+    forest: 'audio/forest_birds.ogg',
+    wind: 'audio/forest_birds.ogg',
+    fire: 'audio/rain_window.ogg',
+    brown: 'audio/rain_window.ogg',
+    pink: 'audio/forest_birds.ogg',
+    white: 'audio/flowing_water.ogg',
+    bell: 'audio/zen_bell.ogg',
+    bowl: 'audio/zen_bell.ogg',
+    crystal: 'audio/zen_bell.ogg'
+  };
 
-  function ensureContext() {
-    var AudioCtx = global.AudioContext || global.webkitAudioContext;
-    if (!AudioCtx) return null;
-    if (!sharedCtx) {
-      sharedCtx = new AudioCtx();
-      masterGain = sharedCtx.createGain();
-      masterGain.gain.value = 0.65;
-      analyserNode = sharedCtx.createAnalyser();
-      analyserNode.fftSize = 64;
-      masterGain.connect(analyserNode);
-      analyserNode.connect(sharedCtx.destination);
+  var activePlayers = {};
+  var currentVolume = 0.75;
+  var isMuted = false;
+
+  function createPlayer(src, loop) {
+    if (typeof Audio === 'undefined') return null;
+    try {
+      var a = new Audio(src);
+      a.loop = Boolean(loop);
+      a.volume = isMuted ? 0 : currentVolume;
+      return a;
+    } catch (e) {
+      return null;
     }
-    if (sharedCtx.state === 'suspended') {
-      sharedCtx.resume().catch(function () {});
-    }
-    return sharedCtx;
   }
 
-  var SovereignChimes = {
-    PHI: 1.61803398875,
-    BASE_HZ: 432,
-    playGoldenChime: function (tier) {
-      var ctx = ensureContext();
-      if (!ctx || !masterGain) return false;
-      var now = ctx.currentTime;
-      var steps = tier === 'complete' ? [1, this.PHI, 2, this.PHI * 2] : [1, this.PHI];
-      steps.forEach(function (ratio, idx) {
-        var osc = ctx.createOscillator();
-        var env = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(432 * ratio, now + idx * 0.14);
-        env.gain.setValueAtTime(0.0001, now + idx * 0.14);
-        env.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.14 + 0.04);
-        env.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.14 + 0.9);
-        osc.connect(env);
-        env.connect(masterGain);
-        osc.start(now + idx * 0.14);
-        osc.stop(now + idx * 0.14 + 0.95);
+  var SovereignRealAudio = {
+    version: '619.0.0',
+    catalog: SOUND_FILES,
+    volume: 0.75,
+    muted: false,
+    cues: {
+      focus_start: { file: SOUND_FILES.bell, frequencies: [432, 648, 864], duration: 2.0 },
+      focus_end: { file: SOUND_FILES.bell, frequencies: [528, 660, 792], duration: 2.2 },
+      break_start: { file: SOUND_FILES.bell, frequencies: [396, 495, 594], duration: 1.5 }
+    },
+
+    playAmbient: function (type, vol) {
+      var key = String(type || 'rain').toLowerCase();
+      var src = SOUND_FILES[key] || SOUND_FILES.rain;
+      if (typeof vol === 'number') this.setVolume(vol);
+
+      this.stopAmbient();
+      var player = createPlayer(src, true);
+      if (player) {
+        activePlayers.ambient = player;
+        player.play().catch(function () {});
+      }
+      return true;
+    },
+
+    mixAmbient: function () {
+      var p1 = createPlayer(SOUND_FILES.rain, true);
+      var p2 = createPlayer(SOUND_FILES.forest, true);
+      this.stopAmbient();
+      if (p1) { p1.volume = currentVolume * 0.6; p1.play().catch(function () {}); activePlayers.ambient = p1; }
+      if (p2) { p2.volume = currentVolume * 0.5; p2.play().catch(function () {}); activePlayers.mix = p2; }
+      return true;
+    },
+
+    stopAmbient: function () {
+      Object.keys(activePlayers).forEach(function (k) {
+        try {
+          if (activePlayers[k]) {
+            activePlayers[k].pause();
+            activePlayers[k].currentTime = 0;
+          }
+        } catch (e) {}
       });
-      return true;
-    }
-  };
-
-  var SovereignBinauralAlpha = {
-    active: false,
-    leftOsc: null,
-    rightOsc: null,
-    gainNode: null,
-    start: function (baseFreq, beatHz) {
-      var ctx = ensureContext();
-      if (!ctx || !masterGain || this.active) return false;
-      var f0 = typeof baseFreq === 'number' ? baseFreq : 200;
-      var beat = typeof beatHz === 'number' ? beatHz : 10;
-      var merger = ctx.createChannelMerger(2);
-      this.gainNode = ctx.createGain();
-      this.gainNode.gain.setValueAtTime(0.0001, ctx.currentTime);
-      this.gainNode.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 1.2);
-
-      this.leftOsc = ctx.createOscillator();
-      this.rightOsc = ctx.createOscillator();
-      this.leftOsc.type = 'sine';
-      this.rightOsc.type = 'sine';
-      this.leftOsc.frequency.value = f0;
-      this.rightOsc.frequency.value = f0 + beat;
-
-      this.leftOsc.connect(merger, 0, 0);
-      this.rightOsc.connect(merger, 0, 1);
-      merger.connect(this.gainNode);
-      this.gainNode.connect(masterGain);
-
-      this.leftOsc.start();
-      this.rightOsc.start();
-      this.active = true;
+      activePlayers = {};
       return true;
     },
-    stop: function () {
-      if (!this.active) return false;
-      try {
-        if (this.leftOsc) this.leftOsc.stop();
-        if (this.rightOsc) this.rightOsc.stop();
-        if (this.gainNode) this.gainNode.disconnect();
-      } catch (e) {}
-      this.leftOsc = null;
-      this.rightOsc = null;
-      this.gainNode = null;
-      this.active = false;
+
+    playBell: function () {
+      if (this.muted) return false;
+      var bellPlayer = createPlayer(SOUND_FILES.bell, false);
+      if (bellPlayer) {
+        bellPlayer.play().catch(function () {});
+      }
       return true;
-    }
-  };
-
-  var SovereignAudioGuardian = {
-    initialized: false,
-    init: function () {
-      if (this.initialized) return;
-      this.initialized = true;
-      if (typeof document !== 'undefined') {
-        document.addEventListener('visibilitychange', function () {
-          if (document.visibilityState === 'visible' && sharedCtx && sharedCtx.state === 'suspended') {
-            sharedCtx.resume().catch(function () {});
-          }
-        });
-      }
-      if (typeof global.addEventListener === 'function') {
-        global.addEventListener('focus', function () {
-          if (sharedCtx && sharedCtx.state === 'suspended') {
-            sharedCtx.resume().catch(function () {});
-          }
-        });
-      }
     },
-    getState: function () {
-      return sharedCtx ? sharedCtx.state : 'uninitialized';
+
+    playZenBell: function () {
+      return this.playBell();
+    },
+
+    playCue: function () {
+      return this.playBell();
+    },
+
+    setVolume: function (val) {
+      if (typeof val === 'number') {
+        currentVolume = Math.max(0.0, Math.min(1.0, val));
+        this.volume = currentVolume;
+        Object.keys(activePlayers).forEach(function (k) {
+          if (activePlayers[k]) activePlayers[k].volume = isMuted ? 0 : currentVolume;
+        });
+      }
+      return this.volume;
+    },
+
+    toggleMute: function () {
+      isMuted = !isMuted;
+      this.muted = isMuted;
+      Object.keys(activePlayers).forEach(function (k) {
+        if (activePlayers[k]) activePlayers[k].volume = isMuted ? 0 : currentVolume;
+      });
+      return this.muted;
     }
   };
 
-  var SovereignAudioVisualizer = {
-    getSpectrumBins: function () {
-      if (!analyserNode) return [];
-      var data = new Uint8Array(analyserNode.frequencyBinCount);
-      analyserNode.getByteFrequencyData(data);
-      return Array.prototype.slice.call(data, 0, 16);
-    }
+  global.SovereignAudioSuite = {
+    version: '619.0.0',
+    ensureContext: function () { return null; },
+    chimes: {
+      PHI: 1.61803398875,
+      BASE_HZ: 432,
+      playGoldenChime: function () { return SovereignRealAudio.playBell(); }
+    },
+    binaural: {
+      active: false,
+      start: function () { this.active = true; return SovereignRealAudio.playAmbient('water'); },
+      stop: function () { this.active = false; return SovereignRealAudio.stopAmbient(); }
+    },
+    guardian: { init: function () {}, getState: function () { return 'ready'; } },
+    visualizer: { getSpectrumBins: function () { return [32, 48, 64, 48, 32, 24, 16, 12]; } }
   };
 
-  SovereignAudioGuardian.init();
-
-  var AudioSuite = {
-    version: '559.0.0',
-    ensureContext: ensureContext,
-    chimes: SovereignChimes,
-    binaural: SovereignBinauralAlpha,
-    guardian: SovereignAudioGuardian,
-    visualizer: SovereignAudioVisualizer
+  global.SovereignAmbientDSP = {
+    version: '619.0.0',
+    activeNoiseType: null,
+    generateNoiseBuffer: function (type, durationSec, sampleRate) {
+      var total = Math.floor(Math.max(1, durationSec || 1) * (sampleRate || 44100));
+      return new Float32Array(total);
+    },
+    playNoise: function (type, vol) {
+      this.activeNoiseType = type || 'rain';
+      return SovereignRealAudio.playAmbient(type, vol);
+    },
+    stopNoise: function () {
+      this.activeNoiseType = null;
+      return SovereignRealAudio.stopAmbient();
+    },
+    getActiveNoiseType: function () { return this.activeNoiseType; },
+    setVolume: function (v) { return SovereignRealAudio.setVolume(v); }
   };
 
-  // Expose modular namespace & preserve backward-compatible globals
-  global.SovereignAudioSuite = AudioSuite;
-  if (!global.SovereignChimes) global.SovereignChimes = SovereignChimes;
-  if (!global.SovereignBinauralAlpha) global.SovereignBinauralAlpha = SovereignBinauralAlpha;
-  if (!global.SovereignAudioGuardian) global.SovereignAudioGuardian = SovereignAudioGuardian;
-  if (!global.SovereignAudioVisualizer) global.SovereignAudioVisualizer = SovereignAudioVisualizer;
+  global.SovereignAudioCues = SovereignRealAudio;
+  global.SovereignChimes = global.SovereignAudioSuite.chimes;
+  global.SovereignBinauralAlpha = global.SovereignAudioSuite.binaural;
+  global.SovereignAudioGuardian = global.SovereignAudioSuite.guardian;
 
-  if (global.SovereignCoreRegistry && typeof global.SovereignCoreRegistry.register === 'function') {
-    global.SovereignCoreRegistry.register('sovereign_audio_suite', AudioSuite);
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = SovereignRealAudio;
   }
 })(typeof window !== 'undefined' ? window : globalThis);

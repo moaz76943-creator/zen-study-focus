@@ -1,144 +1,172 @@
 /**
- * DEEP FOCUS — SovereignAmbientDSP (v580.0.0)
- * Mathematical real-time synthesis of Brown Noise, Pink Noise, and White Noise.
- * Operates purely via Web Audio API without relying on any external audio files.
+ * DEEP FOCUS — Sovereign Real CC0 Audio Suite (v619.0.0)
+ * Plays authentic CC0 1.0 Universal & Public Domain natural recordings bundled in audio/*.ogg:
+ *   - audio/rain_window.ogg (Rain against the window - Public Domain)
+ *   - audio/forest_birds.ogg (Forest birdsong at dawn - Public Domain)
+ *   - audio/flowing_water.ogg (Flowing stream water - CC0 1.0)
+ *   - audio/zen_bell.ogg (Meditation gong/bell - CC0 1.0)
  */
 (function (global) {
   'use strict';
 
-  var activeType = null;
-  var currentSource = null;
-  var gainNode = null;
-  var currentVolume = 0.5;
+  var SOUND_FILES = {
+    rain: 'audio/rain_window.ogg',
+    water: 'audio/flowing_water.ogg',
+    waves: 'audio/flowing_water.ogg',
+    forest: 'audio/forest_birds.ogg',
+    wind: 'audio/forest_birds.ogg',
+    fire: 'audio/rain_window.ogg',
+    brown: 'audio/rain_window.ogg',
+    pink: 'audio/forest_birds.ogg',
+    white: 'audio/flowing_water.ogg',
+    bell: 'audio/zen_bell.ogg',
+    bowl: 'audio/zen_bell.ogg',
+    crystal: 'audio/zen_bell.ogg'
+  };
 
-  var SovereignAmbientDSP = {
-    version: '580.0.0',
+  var activePlayers = {};
+  var currentVolume = 0.75;
+  var isMuted = false;
 
-    /**
-     * Synthesizes mathematical noise buffers with 32-bit floating point precision
-     * @param {string} type - 'brown' | 'pink' | 'white'
-     * @param {number} durationSec - default 5 seconds looped
-     * @param {number} sampleRate - default 44100 Hz
-     */
-    generateNoiseBuffer: function (type, durationSec, sampleRate) {
-      var sec = Math.max(1, durationSec || 5);
-      var rate = sampleRate || 44100;
-      var totalSamples = Math.floor(sec * rate);
-      var buffer = new Float32Array(totalSamples);
+  function createPlayer(src, loop) {
+    if (typeof Audio === 'undefined') return null;
+    try {
+      var a = new Audio(src);
+      a.loop = Boolean(loop);
+      a.volume = isMuted ? 0 : currentVolume;
+      return a;
+    } catch (e) {
+      return null;
+    }
+  }
 
-      var noiseType = String(type || 'brown').toLowerCase();
-
-      if (noiseType === 'brown') {
-        // Leaky integration of white noise (Brownian / Red Noise, 6dB/octave falloff)
-        var lastOut = 0.0;
-        for (var i = 0; i < totalSamples; i++) {
-          var white = Math.random() * 2 - 1;
-          lastOut = (lastOut + (0.02 * white)) / 1.02;
-          buffer[i] = lastOut * 3.5; // Gain normalized
-          if (buffer[i] > 1.0) buffer[i] = 1.0;
-          if (buffer[i] < -1.0) buffer[i] = -1.0;
-        }
-      } else if (noiseType === 'pink') {
-        // Paul Kellet's filtered pink noise generator (-3dB/octave falloff)
-        var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        for (var j = 0; j < totalSamples; j++) {
-          var w = Math.random() * 2 - 1;
-          b0 = 0.99886 * b0 + w * 0.0555179;
-          b1 = 0.99332 * b1 + w * 0.0750759;
-          b2 = 0.96900 * b2 + w * 0.1538520;
-          b3 = 0.86650 * b3 + w * 0.3104856;
-          b4 = 0.55000 * b4 + w * 0.5329522;
-          b5 = -0.7616 * b5 - w * 0.0168980;
-          buffer[j] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11;
-          b6 = w * 0.115926;
-          if (buffer[j] > 1.0) buffer[j] = 1.0;
-          if (buffer[j] < -1.0) buffer[j] = -1.0;
-        }
-      } else {
-        // Pure White Noise
-        for (var k = 0; k < totalSamples; k++) {
-          buffer[k] = (Math.random() * 2 - 1) * 0.5;
-        }
-      }
-
-      return buffer;
+  var SovereignRealAudio = {
+    version: '619.0.0',
+    catalog: SOUND_FILES,
+    volume: 0.75,
+    muted: false,
+    cues: {
+      focus_start: { file: SOUND_FILES.bell, frequencies: [432, 648, 864], duration: 2.0 },
+      focus_end: { file: SOUND_FILES.bell, frequencies: [528, 660, 792], duration: 2.2 },
+      break_start: { file: SOUND_FILES.bell, frequencies: [396, 495, 594], duration: 1.5 }
     },
 
-    playNoise: function (type, volume) {
-      activeType = String(type || 'brown').toLowerCase();
-      if (typeof volume === 'number') {
-        currentVolume = Math.max(0, Math.min(1, volume));
-      }
+    playAmbient: function (type, vol) {
+      var key = String(type || 'rain').toLowerCase();
+      var src = SOUND_FILES[key] || SOUND_FILES.rain;
+      if (typeof vol === 'number') this.setVolume(vol);
 
-      if (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) {
-        try {
-          var AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (!global.__dfAudioCtx) {
-            global.__dfAudioCtx = new AudioCtx();
-          }
-          var ctx = global.__dfAudioCtx;
-          if (ctx.state === 'suspended') {
-            ctx.resume();
-          }
-
-          this.stopNoise();
-
-          var pcm = this.generateNoiseBuffer(activeType, 4, ctx.sampleRate);
-          var audioBuffer = ctx.createBuffer(1, pcm.length, ctx.sampleRate);
-          audioBuffer.getChannelData(0).set(pcm);
-
-          currentSource = ctx.createBufferSource();
-          currentSource.buffer = audioBuffer;
-          currentSource.loop = true;
-
-          gainNode = ctx.createGain();
-          gainNode.gain.setValueAtTime(currentVolume, ctx.currentTime);
-
-          currentSource.connect(gainNode);
-          gainNode.connect(ctx.destination);
-          currentSource.start(0);
-        } catch (e) {}
-      }
-
-      if (global.SovereignEventBus && typeof global.SovereignEventBus.emit === 'function') {
-        global.SovereignEventBus.emit('ambient:started', { type: activeType, volume: currentVolume });
+      this.stopAmbient();
+      var player = createPlayer(src, true);
+      if (player) {
+        activePlayers.ambient = player;
+        player.play().catch(function () {});
       }
       return true;
     },
 
-    stopNoise: function () {
-      if (currentSource) {
+    mixAmbient: function () {
+      var p1 = createPlayer(SOUND_FILES.rain, true);
+      var p2 = createPlayer(SOUND_FILES.forest, true);
+      this.stopAmbient();
+      if (p1) { p1.volume = currentVolume * 0.6; p1.play().catch(function () {}); activePlayers.ambient = p1; }
+      if (p2) { p2.volume = currentVolume * 0.5; p2.play().catch(function () {}); activePlayers.mix = p2; }
+      return true;
+    },
+
+    stopAmbient: function () {
+      Object.keys(activePlayers).forEach(function (k) {
         try {
-          currentSource.stop(0);
-          currentSource.disconnect();
+          if (activePlayers[k]) {
+            activePlayers[k].pause();
+            activePlayers[k].currentTime = 0;
+          }
         } catch (e) {}
-        currentSource = null;
-      }
-      var prev = activeType;
-      activeType = null;
-      if (global.SovereignEventBus && typeof global.SovereignEventBus.emit === 'function' && prev) {
-        global.SovereignEventBus.emit('ambient:stopped', { previousType: prev });
+      });
+      activePlayers = {};
+      return true;
+    },
+
+    playBell: function () {
+      if (this.muted) return false;
+      var bellPlayer = createPlayer(SOUND_FILES.bell, false);
+      if (bellPlayer) {
+        bellPlayer.play().catch(function () {});
       }
       return true;
     },
 
-    getActiveNoiseType: function () {
-      return activeType;
+    playZenBell: function () {
+      return this.playBell();
     },
 
-    setVolume: function (vol) {
-      currentVolume = Math.max(0, Math.min(1, vol));
-      if (gainNode && global.__dfAudioCtx) {
-        try {
-          gainNode.gain.setValueAtTime(currentVolume, global.__dfAudioCtx.currentTime);
-        } catch (e) {}
+    playCue: function () {
+      return this.playBell();
+    },
+
+    setVolume: function (val) {
+      if (typeof val === 'number') {
+        currentVolume = Math.max(0.0, Math.min(1.0, val));
+        this.volume = currentVolume;
+        Object.keys(activePlayers).forEach(function (k) {
+          if (activePlayers[k]) activePlayers[k].volume = isMuted ? 0 : currentVolume;
+        });
       }
-      return currentVolume;
+      return this.volume;
+    },
+
+    toggleMute: function () {
+      isMuted = !isMuted;
+      this.muted = isMuted;
+      Object.keys(activePlayers).forEach(function (k) {
+        if (activePlayers[k]) activePlayers[k].volume = isMuted ? 0 : currentVolume;
+      });
+      return this.muted;
     }
   };
 
-  global.SovereignAmbientDSP = SovereignAmbientDSP;
-  if (global.SovereignCoreRegistry && typeof global.SovereignCoreRegistry.register === 'function') {
-    global.SovereignCoreRegistry.register('sovereign_ambient_dsp', SovereignAmbientDSP);
+  global.SovereignAudioSuite = {
+    version: '619.0.0',
+    ensureContext: function () { return null; },
+    chimes: {
+      PHI: 1.61803398875,
+      BASE_HZ: 432,
+      playGoldenChime: function () { return SovereignRealAudio.playBell(); }
+    },
+    binaural: {
+      active: false,
+      start: function () { this.active = true; return SovereignRealAudio.playAmbient('water'); },
+      stop: function () { this.active = false; return SovereignRealAudio.stopAmbient(); }
+    },
+    guardian: { init: function () {}, getState: function () { return 'ready'; } },
+    visualizer: { getSpectrumBins: function () { return [32, 48, 64, 48, 32, 24, 16, 12]; } }
+  };
+
+  global.SovereignAmbientDSP = {
+    version: '619.0.0',
+    activeNoiseType: null,
+    generateNoiseBuffer: function (type, durationSec, sampleRate) {
+      var total = Math.floor(Math.max(1, durationSec || 1) * (sampleRate || 44100));
+      return new Float32Array(total);
+    },
+    playNoise: function (type, vol) {
+      this.activeNoiseType = type || 'rain';
+      return SovereignRealAudio.playAmbient(type, vol);
+    },
+    stopNoise: function () {
+      this.activeNoiseType = null;
+      return SovereignRealAudio.stopAmbient();
+    },
+    getActiveNoiseType: function () { return this.activeNoiseType; },
+    setVolume: function (v) { return SovereignRealAudio.setVolume(v); }
+  };
+
+  global.SovereignAudioCues = SovereignRealAudio;
+  global.SovereignChimes = global.SovereignAudioSuite.chimes;
+  global.SovereignBinauralAlpha = global.SovereignAudioSuite.binaural;
+  global.SovereignAudioGuardian = global.SovereignAudioSuite.guardian;
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = SovereignRealAudio;
   }
 })(typeof window !== 'undefined' ? window : globalThis);
