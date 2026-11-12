@@ -271,7 +271,7 @@
     const status=document.getElementById('nsux-status');
     if(status){
       [['all','all'],['archived','archive'],['trash','trash']].forEach(([value,key])=>{
-        const option=[...status.options].find(o=>o.value===value);
+        const option=[...(Array.isArray(status && status.options) ? status.options : [])].find(o=>o.value===value);
         if(option)option.textContent=t(key);
       });
       status.setAttribute('aria-label',t('status'));
