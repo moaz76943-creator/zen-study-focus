@@ -1,0 +1,33 @@
+{
+  "policy": "100% CC0 1.0 Universal & Public Domain Natural Audio Recordings (Irrevocable, Zero Copyright Risk)",
+  "files": [
+    {
+      "file": "audio/rain_window.ogg",
+      "description": "Rain against the window",
+      "license": "Public Domain (PDSounds #600 / Wikimedia Commons)",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Rain_against_the_window.ogg",
+      "sizeKB": 1180.0
+    },
+    {
+      "file": "audio/forest_birds.ogg",
+      "description": "Bird singing at dawn",
+      "license": "Public Domain (PDSounds #604 / Wikimedia Commons)",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bird_singing.ogg",
+      "sizeKB": 789.5
+    },
+    {
+      "file": "audio/flowing_water.ogg",
+      "description": "Flowing stream water",
+      "license": "CC0 1.0 Universal (Wikimedia Commons)",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Flowing-water-100019.ogg",
+      "sizeKB": 338.8
+    },
+    {
+      "file": "audio/zen_bell.ogg",
+      "description": "Vibrant meditation gong/bell",
+      "license": "CC0 1.0 Universal (Wikimedia Commons)",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Gong_or_bell_vibrant_(short).ogg",
+      "sizeKB": 56.8
+    }
+  ]
+}

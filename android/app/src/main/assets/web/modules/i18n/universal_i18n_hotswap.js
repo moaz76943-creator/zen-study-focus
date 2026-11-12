@@ -1,166 +1,295 @@
 /**
- * DEEP FOCUS — Universal i18n Hot-Swap Engine (V3 MutationObserver Edition)
- * Module: modules/i18n/universal_i18n_hotswap.js
- * Version: v509.0.0
- * Architecture: Dynamic JSON Locale Loader + Live MutationObserver + Icon Shield
- * Guarantees: 0 ghost buttons, instant translation of runtime elements, 0 page reloads.
+ * DEEP FOCUS — Universal Authentic i18n Hot-Swap Engine (v619.0.0)
+ * Translates:
+ *   1. All [data-i18n] elements & placeholders
+ *   2. Any untagged DOM text nodes matching known English/Romanian/Arabic UI strings
+ *   3. Calendar Month + Year headers & Weekday headers via Intl.DateTimeFormat(code + '-u-nu-latn')
+ *   4. Enforces Western Arabic numerals (0123456789) across all inputs and labels.
  */
-
 (function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define([], factory);
-    } else if (typeof module === "object" && module.exports) {
-        module.exports = factory();
-    } else {
-        root.UniversalI18nHotSwap = factory();
-    }
+  if (typeof module === "object" && module.exports) {
+    module.exports = factory();
+  } else {
+    root.UniversalI18nHotSwap = factory();
+  }
 }(typeof self !== "undefined" ? self : this, function () {
-    "use strict";
+  "use strict";
 
-    const STORAGE_KEY_LANG = "zen_selected_language_v1";
-    const EXCLUDED_CODES = new Set(["he", "iw", "syc", "ber", "zgh"]);
-    const LOADED_LOCALES = {};
+  var STORAGE_KEY_LANG = "zen_selected_language_v1";
+  var EXCLUDED_CODES = new Set(["he", "iw", "syc", "ber", "zgh"]);
+  var LOADED_LOCALES = {};
+  var PHRASE_TO_KEY = {
+    "local data": "ui_local_data",
+    "🔒 local data": "ui_local_data",
+    "manual backup": "ui_manual_backup",
+    "☁️ manual backup": "ui_manual_backup",
+    "test sound": "ui_test_sound",
+    "🔔 test sound": "ui_test_sound",
+    "focus space": "ui_focus_space",
+    "✦ focus space": "ui_focus_space",
+    "ready to focus": "ui_ready_to_focus",
+    "custom": "ui_custom",
+    "custom ⚡": "ui_custom",
+    "study 25m": "ui_study_25m",
+    "plan • execute • achieve": "ui_plan_exec_achieve",
+    "plan · execute · achieve": "ui_plan_exec_achieve",
+    "120 fps engine": "ui_120fps_engine",
+    "⚡ 120 fps engine": "ui_120fps_engine",
+    "zen sanctuary & 365 heatmap": "ui_zen_sanctuary_heatmap",
+    "zen sanctuary & 365 heatmap ↗": "ui_zen_sanctuary_heatmap",
+    "active minutes": "ui_active_minutes",
+    "completed sessions": "ui_completed_sessions",
+    "0 recorded minutes / 7 days": "ui_recorded_min_7d",
+    "0 verified sessions / 7 days": "ui_verified_sess_7d",
+    "multi-domain distribution": "ui_multi_domain_dist",
+    "this week": "ui_this_week",
+    "study": "study",
+    "📚 study": "study",
+    "workout": "sport",
+    "sport": "sport",
+    "🏋️ sport": "sport",
+    "reading": "read",
+    "📖 reading": "read",
+    "deep work": "work",
+    "weekly performance index": "ui_weekly_perf_index",
+    "nature sound controls": "ui_nature_sound_controls",
+    "3d spatial & 40hz": "ui_3d_spatial",
+    "🎧 3d spatial & 40hz": "ui_3d_spatial",
+    "mix": "ui_mix",
+    "✨ mix": "ui_mix",
+    "stop": "ui_stop",
+    "⏹ stop": "ui_stop",
+    "all (12)": "ui_all_sounds",
+    "all (6)": "ui_all_sounds",
+    "water & rain": "soundRain",
+    "forest & wind": "soundForest",
+    "fire & earth": "soundWaves",
+    "completion sound": "ui_completion_sound",
+    "choose a sound": "ui_choose_sound",
+    "zen bell": "ui_zen_bell",
+    "tibetan bowl": "ui_tibetan_bowl",
+    "crystal bell": "ui_crystal_bell",
+    "preview": "ui_preview",
+    "structured notes": "ui_structured_notes",
+    "active recall": "flashcardTitle",
+    "reading summary": "ui_reading_summary",
+    "search notes": "shieldPlaceholder",
+    "+ add note to date": "ui_add_note_date",
+    "add note to date": "ui_add_note_date",
+    "all": "ui_all",
+    "active": "ui_active",
+    "completed": "completed",
+    "syllabus": "ui_syllabus",
+    "🗺️ syllabus": "ui_syllabus",
+    "sun": "sun",
+    "mon": "mon",
+    "tue": "tue",
+    "wed": "wed",
+    "thu": "thu",
+    "fri": "fri",
+    "sat": "sat"
+  };
 
-    let observer = null;
+  function toWesternDigits(str) {
+    if (typeof str !== "string") return str;
+    return str
+      .replace(/[٠-٩]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); })
+      .replace(/[۰-۹]/g, function (d) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)); });
+  }
 
-    const UniversalI18nHotSwap = {
-        currentLang: "ar",
-        activeDictionary: {},
-        isInitialized: false,
+  var UniversalI18nHotSwap = {
+    currentLang: "ar",
+    activeDictionary: {},
 
-        init: function () {
-            if (typeof document === "undefined" || this.isInitialized) return;
+    init: function () {
+      if (typeof document === "undefined") return;
+      var saved = null;
+      try { saved = localStorage.getItem(STORAGE_KEY_LANG); } catch (e) {}
+      var initial = (saved && this.isLanguageAllowed(saved)) ? saved : "ar";
+      this.applyLanguage(initial);
+    },
 
-            const saved = localStorage.getItem(STORAGE_KEY_LANG);
-            const initial = (saved && !EXCLUDED_CODES.has(saved.toLowerCase())) ? saved : "ar";
-            this.applyLanguage(initial);
-            this.setupMutationObserver();
-            this.isInitialized = true;
-            console.log("[UniversalI18nHotSwap V3] Active with MutationObserver & Icon Shield.");
-        },
+    getCurrentLocale: function () {
+      return this.currentLang || "ar";
+    },
 
-        isLanguageAllowed: function (code) {
-            if (!code) return false;
-            return !EXCLUDED_CODES.has(code.toLowerCase());
-        },
+    isLanguageAllowed: function (code) {
+      if (!code || typeof code !== "string") return false;
+      var c = code.toLowerCase().split("-")[0].split("_")[0];
+      return !EXCLUDED_CODES.has(c) && !c.startsWith("iso");
+    },
 
-        setupMutationObserver: function () {
-            if (observer || typeof MutationObserver === "undefined") return;
+    loadLocale: function (code, callback) {
+      var self = this;
+      var cleanCode = String(code || "ar").toLowerCase().split("-")[0].split("_")[0];
+      if (!this.isLanguageAllowed(cleanCode)) cleanCode = "ar";
 
-            observer = new MutationObserver((mutations) => {
-                if (!this.activeDictionary || Object.keys(this.activeDictionary).length === 0) return;
+      if (LOADED_LOCALES[cleanCode]) {
+        this.activeDictionary = LOADED_LOCALES[cleanCode];
+        if (callback) callback(LOADED_LOCALES[cleanCode]);
+        return;
+      }
 
-                mutations.forEach(mutation => {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === 1) { // ELEMENT_NODE
-                            if (node.hasAttribute("data-i18n")) {
-                                this.translateElement(node, this.activeDictionary);
-                            }
-                            const children = node.querySelectorAll ? node.querySelectorAll("[data-i18n]") : [];
-                            children.forEach(el => this.translateElement(el, this.activeDictionary));
-                        }
-                    });
-                });
-            });
+      if (typeof window !== "undefined" && window.SovereignLocaleResolver && typeof window.SovereignLocaleResolver.getLocale === "function") {
+        window.SovereignLocaleResolver.getLocale(cleanCode).then(function (dict) {
+          if (dict) {
+            LOADED_LOCALES[cleanCode] = dict;
+            self.activeDictionary = dict;
+            if (callback) callback(dict);
+          } else {
+            self._xhrLoad(cleanCode, callback);
+          }
+        }).catch(function () {
+          self._xhrLoad(cleanCode, callback);
+        });
+        return;
+      }
+      this._xhrLoad(cleanCode, callback);
+    },
 
-            observer.observe(document.body, { childList: true, subtree: true });
-            console.log("[UniversalI18nHotSwap] MutationObserver watching for dynamic DOM additions.");
-        },
-
-        loadLocale: function (code, callback) {
-            if (!this.isLanguageAllowed(code)) return;
-
-            if (LOADED_LOCALES[code]) {
-                this.activeDictionary = LOADED_LOCALES[code];
-                if (callback) callback(LOADED_LOCALES[code]);
-                return;
-            }
-
-            const xhr = new XMLHttpRequest();
-            xhr.open("GET", "locales/" + code + ".json", true);
-            xhr.onload = () => {
-                if (xhr.status === 200 || xhr.status === 0) {
-                    try {
-                        const parsed = JSON.parse(xhr.responseText);
-                        LOADED_LOCALES[code] = parsed;
-                        this.activeDictionary = parsed;
-                        if (callback) callback(parsed);
-                        return;
-                    } catch (e) {}
-                }
-                this.fallbackToEnglish(callback);
-            };
-            xhr.onerror = () => this.fallbackToEnglish(callback);
-            xhr.send();
-        },
-
-        fallbackToEnglish: function (callback) {
-            if (LOADED_LOCALES["en"]) {
-                this.activeDictionary = LOADED_LOCALES["en"];
-                if (callback) callback(LOADED_LOCALES["en"]);
-            } else {
-                const xhr = new XMLHttpRequest();
-                xhr.open("GET", "locales/en.json", true);
-                xhr.onload = () => {
-                    try {
-                        const enDict = JSON.parse(xhr.responseText);
-                        LOADED_LOCALES["en"] = enDict;
-                        this.activeDictionary = enDict;
-                        if (callback) callback(enDict);
-                    } catch (e) {}
-                };
-                xhr.send();
-            }
-        },
-
-        applyLanguage: function (code) {
-            if (!this.isLanguageAllowed(code)) return;
-
-            this.currentLang = code;
-            try { localStorage.setItem(STORAGE_KEY_LANG, code); } catch (e) {}
-
-            this.loadLocale(code, (dict) => {
-                const dir = dict.dir || "ltr";
-                document.documentElement.setAttribute("dir", dir);
-                document.documentElement.setAttribute("lang", code);
-
-                this.sweepDom(dict);
-            });
-        },
-
-        translateElement: function (el, dict) {
-            const key = el.getAttribute("data-i18n");
-            if (!key || !dict[key]) return;
-
-            const val = dict[key];
-
-            // 1. Inputs & Textareas
-            if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
-                if (el.placeholder !== undefined) el.placeholder = val;
-                return;
-            }
-
-            // 2. Icon Shield: Preserves leading emojis/icons if present
-            const iconMatch = el.textContent ? el.textContent.match(/^([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[🌀-🧿]|✨|🎯|📚|🏋️|📖|💻|🌐)\s*/u) : null;
-            if (iconMatch) {
-                el.textContent = iconMatch[0] + val;
-            } else {
-                el.textContent = val;
-            }
-
-            // 3. Update Title & Aria-Label for accessibility
-            if (el.hasAttribute("title")) el.setAttribute("title", val);
-            if (el.hasAttribute("aria-label")) el.setAttribute("aria-label", val);
-        },
-
-        sweepDom: function (dict) {
-            if (!dict) dict = this.activeDictionary;
-            if (!dict || Object.keys(dict).length === 0) return;
-
-            const elements = document.querySelectorAll("[data-i18n]");
-            elements.forEach(el => this.translateElement(el, dict));
+    _xhrLoad: function (cleanCode, callback) {
+      var self = this;
+      if (typeof XMLHttpRequest === "undefined") return;
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "locales/" + cleanCode + ".json", true);
+      xhr.onload = function () {
+        if (xhr.status === 200 || xhr.status === 0) {
+          try {
+            var parsed = JSON.parse(xhr.responseText);
+            LOADED_LOCALES[cleanCode] = parsed;
+            self.activeDictionary = parsed;
+            if (callback) callback(parsed);
+            return;
+          } catch (e) {}
         }
-    };
+      };
+      xhr.send();
+    },
 
-    return UniversalI18nHotSwap;
+    applyLanguage: function (code) {
+      var self = this;
+      var cleanCode = String(code || "ar").toLowerCase().split("-")[0].split("_")[0];
+      if (!this.isLanguageAllowed(cleanCode)) return;
+
+      this.currentLang = cleanCode;
+      try { localStorage.setItem(STORAGE_KEY_LANG, cleanCode); } catch (e) {}
+
+      this.loadLocale(cleanCode, function (dict) {
+        if (typeof document === "undefined") return;
+        var dir = dict.dir || "ltr";
+        document.documentElement.setAttribute("dir", dir);
+        document.documentElement.setAttribute("lang", cleanCode + "-u-nu-latn");
+        if (document.body) {
+          document.body.setAttribute("dir", dir);
+        }
+        if (window.SovereignBidiEngine && typeof window.SovereignBidiEngine.setDirection === "function") {
+          window.SovereignBidiEngine.setDirection(cleanCode);
+        }
+        self.sweepDom(dict);
+      });
+    },
+
+    sweepDom: function (dict) {
+      if (typeof document === "undefined") return;
+      dict = dict || this.activeDictionary || {};
+      var lang = this.currentLang || "ar";
+
+      // 1. Tag any untagged element whose text matches PHRASE_TO_KEY
+      var allEls = document.querySelectorAll("button, span, div, h1, h2, h3, h4, p, label, a, th, td, option");
+      for (var i = 0; i < allEls.length; i++) {
+        var el = allEls[i];
+        if (el.children.length === 0 && !el.hasAttribute("data-i18n")) {
+          var rawTxt = (el.textContent || "").trim().toLowerCase();
+          if (PHRASE_TO_KEY[rawTxt]) {
+            el.setAttribute("data-i18n", PHRASE_TO_KEY[rawTxt]);
+          }
+        }
+      }
+
+      // 2. Translate all [data-i18n] elements
+      var tagged = document.querySelectorAll("[data-i18n]");
+      for (var j = 0; j < tagged.length; j++) {
+        var node = tagged[j];
+        var key = node.getAttribute("data-i18n");
+        if (key && dict[key]) {
+          var val = toWesternDigits(dict[key]);
+          if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
+            node.placeholder = val;
+          } else {
+            node.textContent = val;
+          }
+        }
+      }
+
+      // 3. Translate input placeholders
+      var inputs = document.querySelectorAll("input[placeholder], textarea[placeholder]");
+      for (var k = 0; k < inputs.length; k++) {
+        var inp = inputs[k];
+        var ph = (inp.getAttribute("placeholder") || "").trim().toLowerCase();
+        if (ph.indexOf("search") !== -1 || ph.indexOf("add study") !== -1 || ph.indexOf("note") !== -1) {
+          if (dict.shieldPlaceholder) inp.setAttribute("placeholder", toWesternDigits(dict.shieldPlaceholder));
+        }
+      }
+
+      // 4. Localize Calendar Month + Year Header (e.g., "November 2026") using Intl.DateTimeFormat
+      var monthRegex = /^(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})$/i;
+      var monthNamesEn = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+      for (var m = 0; m < allEls.length; m++) {
+        var mel = allEls[m];
+        if (mel.children.length === 0) {
+          var mtxt = (mel.textContent || "").trim();
+          var mm = mtxt.match(monthRegex);
+          if (mm) {
+            var mIdx = monthNamesEn.indexOf(mm[1].toLowerCase());
+            var yr = parseInt(mm[2], 10);
+            if (mIdx !== -1 && typeof Intl !== "undefined" && Intl.DateTimeFormat) {
+              try {
+                var dtf = new Intl.DateTimeFormat(lang + "-u-nu-latn", { month: "long", year: "numeric" });
+                mel.textContent = toWesternDigits(dtf.format(new Date(yr, mIdx, 1)));
+                mel.setAttribute("data-cal-year", String(yr));
+                mel.setAttribute("data-cal-month", String(mIdx));
+              } catch (e) {}
+            }
+          } else if (mel.hasAttribute("data-cal-year") && mel.hasAttribute("data-cal-month")) {
+            var cy = parseInt(mel.getAttribute("data-cal-year"), 10);
+            var cm = parseInt(mel.getAttribute("data-cal-month"), 10);
+            if (typeof Intl !== "undefined" && Intl.DateTimeFormat) {
+              try {
+                var dtf2 = new Intl.DateTimeFormat(lang + "-u-nu-latn", { month: "long", year: "numeric" });
+                mel.textContent = toWesternDigits(dtf2.format(new Date(cy, cm, 1)));
+              } catch (e) {}
+            }
+          }
+          // Sanitize any Eastern digits inside text nodes
+          if (/[٠-٩۰-۹]/.test(mel.textContent)) {
+            mel.textContent = toWesternDigits(mel.textContent);
+          }
+        }
+      }
+
+      
+      // Filter any language dropdown/list items so only installed authentic languages appear
+      var ALLOWED_54 = new Set(["ar","en","ro","it","pt","nl","pl","uk","fr","es","de","tr","ru","zh","ja","ko","hi","bn","ur","fa","id","vi","th","el","cs","hu","sv","bg","sr","hr","bs","sk","da","fi","no","sq","sw","az","uz","kk","tl","ms","ca","eu","gl","af","is","et","lv","lt","ta","te","mr","gu","pa","am","ha","yo","so","ku","ps","hy","ka","eo","la"]);
+      var langOptions = document.querySelectorAll("option[value], [data-lang], [data-locale]");
+      for (var lIdx = 0; lIdx < langOptions.length; lIdx++) {
+        var lo = langOptions[lIdx];
+        var lval = (lo.getAttribute("data-lang") || lo.getAttribute("data-locale") || lo.getAttribute("value") || "").toLowerCase().split("-")[0].split("_")[0];
+        if (lval && (lval.startsWith("iso") || (lval.length <= 3 && !ALLOWED_54.has(lval) && (lo.tagName === "OPTION" || lo.hasAttribute("data-lang") || lo.hasAttribute("data-locale"))))) {
+          lo.style.display = "none";
+        }
+      }
+
+      // 5. Force Western digits on all date/number inputs
+      var dateInputs = document.querySelectorAll("input, select, option");
+      for (var dIdx = 0; dIdx < dateInputs.length; dIdx++) {
+        var di = dateInputs[dIdx];
+        di.setAttribute("lang", "en-GB");
+        if (di.value && /[٠-٩۰-۹]/.test(di.value)) {
+          di.value = toWesternDigits(di.value);
+        }
+      }
+    }
+  };
+
+  return UniversalI18nHotSwap;
 }));
