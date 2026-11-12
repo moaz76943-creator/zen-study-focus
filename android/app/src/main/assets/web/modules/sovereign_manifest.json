@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "appVersion": "566.0.0",
+  "architecture": "modular_event_driven",
+  "coreRegistry": "modules/sovereign_core_registry.js",
+  "modules": [
+    {
+      "id": "sovereign_core_registry",
+      "file": "modules/sovereign_core_registry.js",
+      "required": true,
+      "description": "Universal module registry and safeExecute Error Boundary."
+    },
+    {
+      "id": "sovereign_timer_engine",
+      "file": "modules/sovereign_timer_engine.js",
+      "required": true,
+      "description": "Error-isolated SovereignEventBus, DeltaClock, and WorkerTimer."
+    },
+    {
+      "id": "sovereign_audio_suite",
+      "file": "modules/sovereign_audio_suite.js",
+      "required": false,
+      "description": "Procedural 432Hz chimes and binaural Alpha wave synthesis (Web Audio DSP)."
+    },
+    {
+      "id": "sovereign_analytics_suite",
+      "file": "modules/sovereign_analytics_suite.js",
+      "required": false,
+      "description": "Weekly momentum chart and 26-week AMOLED Canvas heatmap."
+    },
+    {
+      "id": "sovereign_wellness_ui",
+      "file": "modules/sovereign_wellness_ui.js",
+      "required": false,
+      "description": "Breathing studio, Twilight night filter, and Calm tools drawer."
+    },
+    {
+      "id": "sovereign_data_vault",
+      "file": "modules/sovereign_data_vault.js",
+      "required": false,
+      "description": "Levenshtein deduplicator, QuotaExceeded vacuum, and AES-GCM deck exchange."
+    }
+  ],
+  "styles": [
+    "styles/amoled_120hz.css",
+    "styles/calm_drawer.css",
+    "styles/twilight_theme.css",
+    "styles/rtl_typography.css"
+  ]
+}
