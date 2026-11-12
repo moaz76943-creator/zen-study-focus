@@ -706,6 +706,31 @@ try {
 }
 console.log('✅ PASS: Locale Pack Key Parity & Strict Digits Audit Verified');
 
+
+// Bi-directional RTL / LTR Layout & Number Isolation Gate
+const bidiModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_bidi_engine.js');
+require(bidiModPath);
+if (!global.SovereignBidiEngine || typeof global.SovereignBidiEngine.setDirection !== 'function') {
+  console.error('❌ FAIL: SovereignBidiEngine failed to initialize');
+  process.exit(1);
+}
+const arDir = global.SovereignBidiEngine.setDirection('ar');
+if (arDir !== 'rtl' || !global.SovereignBidiEngine.isRTL()) {
+  console.error('❌ FAIL: SovereignBidiEngine failed to activate RTL for Arabic');
+  process.exit(1);
+}
+const enDir = global.SovereignBidiEngine.setDirection('en');
+if (enDir !== 'ltr' || global.SovereignBidiEngine.isRTL()) {
+  console.error('❌ FAIL: SovereignBidiEngine failed to activate LTR for English');
+  process.exit(1);
+}
+const isolated = global.SovereignBidiEngine.isolateNumber('25:00');
+if (!isolated.includes('25:00') || !isolated.startsWith('\u2066')) {
+  console.error('❌ FAIL: SovereignBidiEngine failed to wrap number in LTR directional isolate');
+  process.exit(1);
+}
+console.log('✅ PASS: Bi-directional RTL / LTR Dynamic Layout Mirroring Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
