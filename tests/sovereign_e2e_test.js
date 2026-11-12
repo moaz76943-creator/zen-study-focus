@@ -36,6 +36,29 @@ if (fs.existsSync(idxPath)) {
   console.log('✅ PASS: HTML Contrast, i18n Hook & Button-Wiring Integrity Verified');
 }
 
+
+// Task #808: Button-Wiring & CC0 Audio File Integrity Gate
+const btnAudit = require(path.resolve('android/app/src/main/assets/web/modules/qa/sovereign_button_audit.js'));
+const idxHtmlPath808 = path.resolve('android/app/src/main/assets/web/index.html');
+const appJsPath808 = path.resolve('android/app/src/main/assets/web/app.js');
+if (fs.existsSync(idxHtmlPath808) && fs.existsSync(appJsPath808)) {
+  const html808 = fs.readFileSync(idxHtmlPath808, 'utf8');
+  const app808 = fs.readFileSync(appJsPath808, 'utf8');
+  const btnRes = btnAudit.auditButtons(html808, app808);
+  if (!btnRes.ok) {
+    console.warn('⚠️ WARN: Unwired buttons detected:', JSON.stringify(btnRes.deadButtons));
+  } else {
+    console.log('✅ PASS: All ' + btnRes.totalButtons + ' <button> elements in index.html are wired');
+  }
+}
+const audioDir808 = path.resolve('android/app/src/main/assets/web/audio');
+const audioRes808 = btnAudit.auditAudioAssets(audioDir808, fs, path);
+if (!audioRes808.ok) {
+  console.error('❌ FAIL: CC0 audio assets missing or corrupted:', audioRes808.issues);
+  process.exit(1);
+}
+console.log('✅ PASS: All 4 CC0 .ogg audio assets verified (>10KB each)');
+
 console.log("==================================================================");
 console.log("🧪 [Deep Focus E2E] Running Sovereign Integration Test Harness...");
 console.log("==================================================================");
