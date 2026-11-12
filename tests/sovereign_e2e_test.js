@@ -564,6 +564,32 @@ if (stats.total < 1) {
 }
 console.log('✅ PASS: Sovereign Spaced Repetition (SM-2) Flashcards Engine Verified');
 
+
+// Flexible Weekly Habit & Non-Punitive Momentum Gate
+const habitModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_habit_momentum.js');
+require(habitModPath);
+if (!global.SovereignHabitMomentum || typeof global.SovereignHabitMomentum.recordSession !== 'function') {
+  console.error('❌ FAIL: SovereignHabitMomentum failed to initialize');
+  process.exit(1);
+}
+global.SovereignHabitMomentum.setWeeklyGoal(500, 2);
+const session = global.SovereignHabitMomentum.recordSession(50);
+if (!session || session.minutes !== 50) {
+  console.error('❌ FAIL: SovereignHabitMomentum failed to record study session');
+  process.exit(1);
+}
+const progress = global.SovereignHabitMomentum.getWeeklyProgress();
+if (!progress || progress.loggedMinutes < 50 || progress.targetMinutes !== 500) {
+  console.error('❌ FAIL: SovereignHabitMomentum weekly progress calculation mismatch');
+  process.exit(1);
+}
+const momentum = global.SovereignHabitMomentum.calculateMomentumScore();
+if (typeof momentum.score !== 'number' || !momentum.status) {
+  console.error('❌ FAIL: SovereignHabitMomentum failed to produce momentum score');
+  process.exit(1);
+}
+console.log('✅ PASS: Flexible Weekly Habit & Non-Punitive Momentum Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");

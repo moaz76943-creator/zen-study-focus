@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "581.0.0",
+  "appVersion": "582.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -93,6 +93,12 @@
       "file": "modules/sovereign_spaced_repetition.js",
       "required": true,
       "description": "SuperMemo-2 (SM-2) Spaced Repetition engine for active recall flashcards."
+    },
+    {
+      "id": "sovereign_habit_momentum",
+      "file": "modules/sovereign_habit_momentum.js",
+      "required": true,
+      "description": "Flexible weekly study habit and non-punitive momentum scoring."
     }
   ],
   "styles": [
