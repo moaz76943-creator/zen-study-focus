@@ -247,6 +247,25 @@ if (simExact !== 1 || simNear < 0.7 || dupes.length !== 1 || !probeVal || typeof
 }
 console.log('✅ PASS: Modular Data Vault (Levenshtein, Vacuum & AES-GCM) Verified');
 
+
+// Modular CSS Architecture & 48px Touch-Floor Gate
+const stylesDir = 'android/app/src/main/assets/web/styles';
+const reqCss = ['amoled_120hz.css', 'calm_drawer.css', 'twilight_theme.css', 'rtl_typography.css'];
+for (const cssFile of reqCss) {
+  const full = path.join(stylesDir, cssFile);
+  if (!fs.existsSync(full) || fs.statSync(full).size < 50) {
+    console.error('❌ FAIL: Missing or empty modular CSS: ' + full);
+    process.exit(1);
+  }
+}
+const amoledSrc = fs.readFileSync(path.join(stylesDir, 'amoled_120hz.css'), 'utf8');
+const rtlSrc = fs.readFileSync(path.join(stylesDir, 'rtl_typography.css'), 'utf8');
+if (!amoledSrc.includes('#000000') || !amoledSrc.includes('48px') || !rtlSrc.includes('tabular-nums')) {
+  console.error('❌ FAIL: Modular CSS missing #000000 AMOLED, 48px floor, or tabular-nums');
+  process.exit(1);
+}
+console.log('✅ PASS: Modular CSS Architecture (AMOLED 120Hz, Calm Drawer, Twilight & RTL) Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");

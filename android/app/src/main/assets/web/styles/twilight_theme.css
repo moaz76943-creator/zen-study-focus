@@ -1,0 +1,14 @@
+/* DEEP FOCUS — Persistent AMOLED Twilight Eye-Comfort Filter */
+html[data-twilight="on"] {
+  --df-accent: #F59E0B;
+}
+
+html[data-twilight="on"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 158, 68, 0.12);
+  pointer-events: none;
+  z-index: 99999;
+  mix-blend-mode: screen;
+}

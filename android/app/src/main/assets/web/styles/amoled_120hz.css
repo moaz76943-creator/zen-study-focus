@@ -1,0 +1,38 @@
+/* DEEP FOCUS — AMOLED 120Hz/144Hz Hardware & Accessibility Floor */
+:root {
+  --df-bg-oled: #000000;
+  --df-surface-elevated: #0A0D12;
+  --df-text-primary: #EDEDED;
+  --df-text-muted: #9CA3AF;
+  --df-accent: #10B981;
+  --df-touch-min: 48px;
+}
+
+html, body {
+  background-color: var(--df-bg-oled);
+  color: var(--df-text-primary);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-inline-start: env(safe-area-inset-left, 0px);
+  padding-inline-end: env(safe-area-inset-right, 0px);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: contain;
+}
+
+button, [role="button"], .df-touch-target {
+  min-height: var(--df-touch-min);
+  min-width: var(--df-touch-min);
+  touch-action: manipulation;
+}
+
+.df-gpu-layer {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
