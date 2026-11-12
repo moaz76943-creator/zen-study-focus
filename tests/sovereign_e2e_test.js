@@ -266,6 +266,34 @@ if (!amoledSrc.includes('#000000') || !amoledSrc.includes('48px') || !rtlSrc.inc
 }
 console.log('✅ PASS: Modular CSS Architecture (AMOLED 120Hz, Calm Drawer, Twilight & RTL) Verified');
 
+
+// Sovereign Module Manifest & Plug-and-Play Consistency Gate
+const manifestFilePath = path.resolve('android/app/src/main/assets/web/modules/sovereign_manifest.json');
+if (!fs.existsSync(manifestFilePath)) {
+  console.error('❌ FAIL: Missing sovereign_manifest.json');
+  process.exit(1);
+}
+const manifest = JSON.parse(fs.readFileSync(manifestFilePath, 'utf8'));
+if (!Array.isArray(manifest.modules) || manifest.modules.length < 6 || !Array.isArray(manifest.styles) || manifest.styles.length < 4) {
+  console.error('❌ FAIL: Invalid sovereign_manifest.json schema or missing items');
+  process.exit(1);
+}
+for (const m of manifest.modules) {
+  const p = path.resolve('android/app/src/main/assets/web', m.file);
+  if (!fs.existsSync(p)) {
+    console.error('❌ FAIL: Manifest references non-existent module file: ' + m.file);
+    process.exit(1);
+  }
+}
+for (const s of manifest.styles) {
+  const sp = path.resolve('android/app/src/main/assets/web', s);
+  if (!fs.existsSync(sp)) {
+    console.error('❌ FAIL: Manifest references non-existent style file: ' + s);
+    process.exit(1);
+  }
+}
+console.log('✅ PASS: Sovereign Module Manifest & Plug-and-Play File Consistency Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
