@@ -590,6 +590,33 @@ if (typeof momentum.score !== 'number' || !momentum.status) {
 }
 console.log('✅ PASS: Flexible Weekly Habit & Non-Punitive Momentum Verified');
 
+
+// Zen Lock-In Mode & Full Sensory Shielding Gate
+const lockinModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_lockin_mode.js');
+require(lockinModPath);
+if (!global.SovereignLockInMode || typeof global.SovereignLockInMode.activateLockIn !== 'function') {
+  console.error('❌ FAIL: SovereignLockInMode failed to initialize');
+  process.exit(1);
+}
+global.SovereignLockInMode.activateLockIn({ strictLock: true });
+if (!global.SovereignLockInMode.isLockInActive()) {
+  console.error('❌ FAIL: SovereignLockInMode failed to activate');
+  process.exit(1);
+}
+// Attempt premature exit without hold
+const normalExit = global.SovereignLockInMode.deactivateLockIn(false);
+if (normalExit || !global.SovereignLockInMode.isLockInActive()) {
+  console.error('❌ FAIL: SovereignLockInMode strict lock bypassed without hold');
+  process.exit(1);
+}
+// Valid emergency exit with 3000ms hold
+const heldExit = global.SovereignLockInMode.handleEmergencyExitPress(3200);
+if (!heldExit || global.SovereignLockInMode.isLockInActive()) {
+  console.error('❌ FAIL: SovereignLockInMode emergency hold exit failed');
+  process.exit(1);
+}
+console.log('✅ PASS: Zen Lock-In Mode & Full Sensory Shielding Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
