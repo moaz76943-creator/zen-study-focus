@@ -805,6 +805,35 @@ if (!selfCheck || !selfCheck.passed) {
 }
 console.log('✅ PASS: Sovereign Advanced Self-Diagnostics Portal Verified (47/47)');
 
+
+// Sovereign Cognitive Load Pacing & Fatigue Analyzer Gate
+const cognitivePacingModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_cognitive_pacing.js');
+require(cognitivePacingModPath);
+if (!global.SovereignCognitivePacing || typeof global.SovereignCognitivePacing.computePacingMetrics !== 'function') {
+  console.error('❌ FAIL: SovereignCognitivePacing failed to initialize');
+  process.exit(1);
+}
+const metricsShort = global.SovereignCognitivePacing.computePacingMetrics({ elapsedMinutes: 20, lastBreakMinutesAgo: 20 });
+if (metricsShort.statusLevel !== 'optimal' || metricsShort.shouldPromptBreak !== false) {
+  console.error('❌ FAIL: Cognitive pacing unexpected result for short session: ' + metricsShort.statusLevel);
+  process.exit(1);
+}
+const metricsLong = global.SovereignCognitivePacing.computePacingMetrics({ elapsedMinutes: 65, lastBreakMinutesAgo: 65, flashcardErrorSpikes: 2 });
+if (metricsLong.shouldPromptBreak !== true || metricsLong.recommendedIntermission < 15) {
+  console.error('❌ FAIL: Cognitive pacing failed to recommend break after 65m continuous: ' + metricsLong.recommendedIntermission);
+  process.exit(1);
+}
+const suggestedDuration = global.SovereignCognitivePacing.suggestOptimalSessionLength([
+  { durationMinutes: 25, completed: true },
+  { durationMinutes: 25, completed: true },
+  { durationMinutes: 25, completed: true }
+]);
+if (suggestedDuration !== 25) {
+  console.error('❌ FAIL: Unexpected suggested session duration: ' + suggestedDuration);
+  process.exit(1);
+}
+console.log('✅ PASS: Sovereign Cognitive Load Pacing & Rhythm Verified (64/64)');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
