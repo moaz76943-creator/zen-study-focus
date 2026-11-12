@@ -1,3 +1,70 @@
+
+// Task #821: Deep Automated DOM, Overlap, Contrast & Language-Leak Scanner
+async function runDeepDomAudit(page, contextLabel, activeLang) {
+  const report = await page.evaluate((lang) => {
+    const issues = [];
+    const isVisible = (el) => {
+      if (!el || !el.getBoundingClientRect) return false;
+      const st = window.getComputedStyle(el);
+      if (st.display === 'none' || st.visibility === 'hidden' || parseFloat(st.opacity) === 0) return false;
+      const r = el.getBoundingClientRect();
+      return r.width > 2 && r.height > 2 && r.bottom > 0 && r.top < window.innerHeight;
+    };
+
+    // A. Language Leak Check in EN mode (catch leftover Arabic words like الترتيب / نوفمبر)
+    if (lang === 'en') {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      while ((node = walker.nextNode())) {
+        const txt = (node.nodeValue || '').trim();
+        if (!txt) continue;
+        const p = node.parentElement;
+        if (!p || !isVisible(p)) continue;
+        if (/[\u0600-\u06FF]/.test(txt)) {
+          issues.push(`[LANG_LEAK_AR_IN_EN] "${txt.slice(0, 40)}" inside <${p.tagName.toLowerCase()} id="${p.id}" class="${p.className}">`);
+        }
+      }
+    }
+
+    // B. Floating/Fixed Element Overlap Check against Interactive Buttons/Pills
+    const clickables = Array.from(document.querySelectorAll('button, a, select, [role="button"]')).filter(isVisible);
+    const fixedEls = clickables.filter((el) => {
+      const pos = window.getComputedStyle(el).position;
+      return pos === 'fixed' || pos === 'sticky';
+    });
+    for (const fx of fixedEls) {
+      const r1 = fx.getBoundingClientRect();
+      for (const other of clickables) {
+        if (fx === other || fx.contains(other) || other.contains(fx)) continue;
+        const pos2 = window.getComputedStyle(other).position;
+        if (pos2 === 'fixed' || pos2 === 'sticky') continue;
+        const r2 = other.getBoundingClientRect();
+        const xOverlap = Math.max(0, Math.min(r1.right, r2.right) - Math.max(r1.left, r2.left));
+        const yOverlap = Math.max(0, Math.min(r1.bottom, r2.bottom) - Math.max(r1.top, r2.top));
+        const overlapArea = xOverlap * yOverlap;
+        const minArea = Math.min(r1.width * r1.height, r2.width * r2.height);
+        if (minArea > 0 && overlapArea / minArea > 0.25) {
+          issues.push(`[UI_OVERLAP] Fixed <${fx.tagName.toLowerCase()} "${(fx.innerText || fx.id || '').trim().slice(0,20)}"> overlaps <${other.tagName.toLowerCase()} "${(other.innerText || other.id || '').trim().slice(0,20)}">`);
+        }
+      }
+    }
+
+    // C. Horizontal Overflow Check
+    if (document.documentElement.scrollWidth > window.innerWidth + 4) {
+      issues.push(`[HORIZONTAL_OVERFLOW] scrollWidth=${document.documentElement.scrollWidth} > innerWidth=${window.innerWidth}`);
+    }
+
+    return issues;
+  }, activeLang);
+
+  if (report.length > 0) {
+    console.warn(`⚠️ [DeepAudit:${contextLabel}]:\n  - ` + report.join('\n  - '));
+  } else {
+    console.log(`✅ [DeepAudit:${contextLabel}]: 0 leaks, 0 overlaps, 0 overflow.`);
+  }
+  return report;
+}
+
 /**
  * DEEP FOCUS — Real Mobile Browser Visual & Functional QA (Playwright)
  * Simulates a real user on a 412x915 mobile viewport:

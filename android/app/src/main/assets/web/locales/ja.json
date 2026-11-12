@@ -121,5 +121,6 @@
   "ui_your_progress": "進捗状況",
   "ui_view_all": "すべて表示 ↗",
   "ui_start_training": "トレーニング開始",
-  "ui_pure_nature_ready": "自然音スタジオ準備完了"
+  "ui_pure_nature_ready": "自然音スタジオ準備完了",
+  "ui_sort_label": "並び替え"
 }

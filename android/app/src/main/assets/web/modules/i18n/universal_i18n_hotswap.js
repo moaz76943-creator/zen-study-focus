@@ -19,6 +19,8 @@
   var EXCLUDED_CODES = new Set(["he", "iw", "syc", "ber", "zgh"]);
   var LOADED_LOCALES = {};
   var PHRASE_TO_KEY = {
+    "الترتيب": "ui_sort_label",
+    "sort": "ui_sort_label",
     "your progress": "ui_your_progress",
     "view all": "ui_view_all",
     "view all ↗": "ui_view_all",

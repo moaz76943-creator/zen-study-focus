@@ -121,5 +121,6 @@
   "ui_your_progress": "Your progress",
   "ui_view_all": "View all ↗",
   "ui_start_training": "Start training",
-  "ui_pure_nature_ready": "Pure Nature Studio Ready"
+  "ui_pure_nature_ready": "Pure Nature Studio Ready",
+  "ui_sort_label": "Sort"
 }
