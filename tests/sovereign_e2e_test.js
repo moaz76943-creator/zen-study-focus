@@ -877,6 +877,37 @@ if (current.bottom !== 48) {
 }
 console.log('✅ PASS: Sovereign Android 15 Edge-to-Edge Insets Calibration Verified (54/54)');
 
+
+// Sovereign Semantic Search & Vectorized Embeddings Gate
+const semanticSearchModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_semantic_search.js');
+require(semanticSearchModPath);
+if (!global.SovereignSemanticSearch || typeof global.SovereignSemanticSearch.search !== 'function') {
+  console.error('❌ FAIL: SovereignSemanticSearch failed to initialize');
+  process.exit(1);
+}
+const testDocs = [
+  { id: 'doc1', title: 'Quantum Mechanics', content: 'Study of wave-particle duality and subatomic physics' },
+  { id: 'doc2', title: 'Cellular Biology', content: 'Mitochondria structure, ATP synthesis, and genetics' },
+  { id: 'doc3', title: 'World History', content: 'Ancient civilization dynamics and architectural monuments' }
+];
+const searchResults = global.SovereignSemanticSearch.search('physics particles quantum', testDocs);
+if (!Array.isArray(searchResults) || searchResults.length === 0) {
+  console.error('❌ FAIL: Semantic search returned empty results');
+  process.exit(1);
+}
+if (searchResults[0].id !== 'doc1') {
+  console.error('❌ FAIL: Semantic search ranking error, expected doc1 at rank 1, got ' + searchResults[0].id);
+  process.exit(1);
+}
+const vecA = global.SovereignSemanticSearch.generateDeterministicVector('Entropy and thermodynamics');
+const vecB = global.SovereignSemanticSearch.generateDeterministicVector('Thermodynamic state functions');
+const simScore = global.SovereignSemanticSearch.cosineSimilarity(vecA, vecB);
+if (typeof simScore !== 'number' || simScore <= 0.5) {
+  console.error('❌ FAIL: Cosine similarity calculation unexpected score: ' + simScore);
+  process.exit(1);
+}
+console.log('✅ PASS: Sovereign Semantic Search & Vector Embeddings Verified (62/62)');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
