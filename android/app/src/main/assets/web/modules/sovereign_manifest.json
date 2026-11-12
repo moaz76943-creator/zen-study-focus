@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "575.0.0",
+  "appVersion": "576.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -69,6 +69,12 @@
       "file": "modules/sovereign_shortcuts_bridge.js",
       "required": true,
       "description": "Dynamic App Shortcuts and intent deep-linking routing for Android 15."
+    },
+    {
+      "id": "sovereign_accessibility_suite",
+      "file": "modules/sovereign_accessibility_suite.js",
+      "required": true,
+      "description": "TalkBack screen-reader ARIA live regions and 48dp touch target auditing."
     }
   ],
   "styles": [
