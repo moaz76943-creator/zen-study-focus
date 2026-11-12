@@ -646,6 +646,30 @@ if (!tagDist.Physics || tagDist.Physics.totalMinutes < 45) {
 }
 console.log('✅ PASS: Detailed Study Session Log & Multi-Tag Engine Verified');
 
+
+// Canvas Study Milestone Card Exporter Gate
+const cardModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_card_exporter.js');
+require(cardModPath);
+if (!global.SovereignCardExporter || typeof global.SovereignCardExporter.generateCardSpec !== 'function') {
+  console.error('❌ FAIL: SovereignCardExporter failed to initialize');
+  process.exit(1);
+}
+const spec = global.SovereignCardExporter.generateCardSpec({
+  title: 'Quantum Physics Sprint',
+  statValue: '25 Hours',
+  statLabel: 'Deep Study Completed'
+});
+if (!spec || spec.width !== 1080 || spec.statValue !== '25 Hours') {
+  console.error('❌ FAIL: SovereignCardExporter spec generation failed');
+  process.exit(1);
+}
+const exportedUrl = global.SovereignCardExporter.exportDataUrl(spec);
+if (!exportedUrl || !exportedUrl.startsWith('data:image/png')) {
+  console.error('❌ FAIL: SovereignCardExporter exportDataUrl failed to produce PNG data URL');
+  process.exit(1);
+}
+console.log('✅ PASS: Canvas Study Milestone Card Exporter Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
