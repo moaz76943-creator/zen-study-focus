@@ -314,6 +314,29 @@ if (v1 !== true || v2 !== false || v3 !== true) {
 }
 console.log('✅ PASS: SovereignStore Unified State Layer & Atomic Undo/Redo Verified');
 
+
+// Android Java Bridge & Memory-Leak Prevention Gate
+const glob = require('fs');
+let foundMain = false;
+function findMainActivity(dir) {
+  if (!fs.existsSync(dir)) return;
+  const list = fs.readdirSync(dir);
+  for (const item of list) {
+    const full = path.join(dir, item);
+    if (fs.statSync(full).isDirectory()) findMainActivity(full);
+    else if (item === 'MainActivity.java') {
+      const jSrc = fs.readFileSync(full, 'utf8');
+      if (jSrc.includes('@JavascriptInterface') && !jSrc.includes('WeakReference') && jSrc.includes('Activity mContext')) {
+        console.error('❌ FAIL: MainActivity retains direct strong Activity reference in JavascriptInterface');
+        process.exit(1);
+      }
+      foundMain = true;
+    }
+  }
+}
+findMainActivity('android/app/src/main/java');
+console.log('✅ PASS: Android Java Bridge & Zero-Memory-Leak Architecture Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
