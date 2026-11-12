@@ -1563,6 +1563,28 @@ body {
     overflow: hidden !important;
   }
 </style>
+<!-- TASK #816: Unlock Vertical Touch Scrolling Inside ALL Modals & Body -->
+<style id="task-816-modal-scroll-fix">
+  html, body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  .modal, .modal-backdrop, .overlay, [id*="Modal"], [id*="modal"], [role="dialog"] {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    align-items: flex-start !important;
+    padding-top: 24px !important;
+    padding-bottom: 40px !important;
+  }
+  .modal > div, [id*="Modal"] > div, [id*="modal"] > div, [role="dialog"] > div, .modal-content, .modal-card {
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin: auto !important;
+  }
+</style>
 </head>
 <body>
 
