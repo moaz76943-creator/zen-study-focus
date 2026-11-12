@@ -385,6 +385,26 @@ if (!global.SovereignFramePacer.isSuspended()) {
 }
 console.log('✅ PASS: 120Hz/144Hz Adaptive Frame Pacer & Idle Battery Suspension Verified');
 
+
+// OnPause / OnTrimMemory Resource Drain Prevention Gate
+const guardModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_memory_guard.js');
+require(guardModPath);
+if (!global.SovereignMemoryDrainGuard || typeof global.SovereignMemoryDrainGuard.handleTrimMemory !== 'function') {
+  console.error('❌ FAIL: SovereignMemoryDrainGuard failed to initialize');
+  process.exit(1);
+}
+global.SovereignMemoryDrainGuard.handleTrimMemory('CRITICAL');
+if (!global.SovereignMemoryDrainGuard.isDrained()) {
+  console.error('❌ FAIL: SovereignMemoryDrainGuard failed to mark state as drained');
+  process.exit(1);
+}
+global.SovereignMemoryDrainGuard.handleResume();
+if (global.SovereignMemoryDrainGuard.isDrained()) {
+  console.error('❌ FAIL: SovereignMemoryDrainGuard failed to restore state upon resume');
+  process.exit(1);
+}
+console.log('✅ PASS: OnPause / OnTrimMemory Resource Drain & LMKD Guard Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
