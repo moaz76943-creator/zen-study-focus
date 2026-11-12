@@ -500,6 +500,36 @@ if (!custom || custom.id !== 'exam_prep' || custom.focusSec !== 3600) {
 }
 console.log('✅ PASS: Study Profiles & Zen Focus Presets Engine Verified');
 
+
+// Pure Real-Time DSP Brown & Pink Noise Generator Gate
+const dspModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_ambient_dsp.js');
+require(dspModPath);
+if (!global.SovereignAmbientDSP || typeof global.SovereignAmbientDSP.generateNoiseBuffer !== 'function') {
+  console.error('❌ FAIL: SovereignAmbientDSP failed to initialize');
+  process.exit(1);
+}
+const brownBuf = global.SovereignAmbientDSP.generateNoiseBuffer('brown', 1, 44100);
+if (!(brownBuf instanceof Float32Array) || brownBuf.length !== 44100) {
+  console.error('❌ FAIL: SovereignAmbientDSP failed to synthesize Brown Noise buffer');
+  process.exit(1);
+}
+const pinkBuf = global.SovereignAmbientDSP.generateNoiseBuffer('pink', 1, 44100);
+if (!(pinkBuf instanceof Float32Array) || pinkBuf.length !== 44100) {
+  console.error('❌ FAIL: SovereignAmbientDSP failed to synthesize Pink Noise buffer');
+  process.exit(1);
+}
+global.SovereignAmbientDSP.playNoise('brown', 0.8);
+if (global.SovereignAmbientDSP.getActiveNoiseType() !== 'brown') {
+  console.error('❌ FAIL: SovereignAmbientDSP active noise type mismatch');
+  process.exit(1);
+}
+global.SovereignAmbientDSP.stopNoise();
+if (global.SovereignAmbientDSP.getActiveNoiseType() !== null) {
+  console.error('❌ FAIL: SovereignAmbientDSP failed to stop cleanly');
+  process.exit(1);
+}
+console.log('✅ PASS: Pure Real-Time DSP Brown & Pink Noise Generator Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
