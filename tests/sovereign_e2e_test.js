@@ -228,6 +228,25 @@ if (twState !== true || drState !== true) {
 }
 console.log('✅ PASS: Modular Wellness UI (Breathing, EyeComfort & CalmUI) Verified');
 
+
+// Modular Data Vault (Deduplicator, StorageVacuum & AES-GCM) Verification
+const vaultModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_data_vault.js');
+if (!fs.existsSync(vaultModPath)) {
+  console.error('❌ FAIL: Missing modular data vault at ' + vaultModPath);
+  process.exit(1);
+}
+require(vaultModPath);
+const simExact = global.SovereignDeduplicator.similarity('focus', 'focus');
+const simNear = global.SovereignDeduplicator.similarity('study', 'stady');
+const dupes = global.SovereignDeduplicator.findDuplicates(['Algorithm', 'Algoritm', 'Physics'], 0.8);
+global.SovereignStorageVacuum.safeSetItem('e2e_vault_probe', { ok: true });
+const probeVal = global.SovereignStorageVacuum.safeGetItem('e2e_vault_probe');
+if (simExact !== 1 || simNear < 0.7 || dupes.length !== 1 || !probeVal || typeof global.SovereignDeckExchange.encryptDeck !== 'function') {
+  console.error('❌ FAIL: SovereignDataVault checks failed');
+  process.exit(1);
+}
+console.log('✅ PASS: Modular Data Vault (Levenshtein, Vacuum & AES-GCM) Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
