@@ -92,5 +92,13 @@
   "dyn_urgent_important": "Срочно и важно",
   "dyn_words_recalled": "Вспомненные слова",
   "dyn_yes": "Да",
-  "dyn_zero_music": "Звуки природы"
+  "dyn_zero_music": "Звуки природы",
+  "phAddTask": "Добавить цель: учёба, спорт или чтение...",
+  "phCustomMins": "Минуты (1-240)",
+  "phCustomTitle": "Название сеанса (Учёба, Спорт, Чтение, Работа)...",
+  "phSearchNotes": "Поиск заметок...",
+  "phNoteTitle": "Заголовок или вопрос",
+  "phNoteBody": "Пишите здесь...",
+  "langSearchPlaceholder": "Поиск языка или страны...",
+  "phRestorePayload": "Вставьте код резервной копии..."
 }

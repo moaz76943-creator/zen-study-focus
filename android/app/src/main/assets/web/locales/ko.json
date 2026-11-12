@@ -92,5 +92,13 @@
   "dyn_urgent_important": "긴급 및 중요",
   "dyn_words_recalled": "회상된 단어",
   "dyn_yes": "예",
-  "dyn_zero_music": "자연의 소리"
+  "dyn_zero_music": "자연의 소리",
+  "phAddTask": "공부, 운동 또는 독서 목표 추가...",
+  "phCustomMins": "분 (1-240)",
+  "phCustomTitle": "세션 이름 (공부, 운동, 독서, 업무)...",
+  "phSearchNotes": "노트 검색...",
+  "phNoteTitle": "제목 또는 질문",
+  "phNoteBody": "여기에 작성...",
+  "langSearchPlaceholder": "언어 또는 국가 검색...",
+  "phRestorePayload": "여기에 백업 코드 붙여넣기..."
 }

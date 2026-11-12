@@ -92,5 +92,13 @@
   "dyn_urgent_important": "अत्यावश्यक और महत्वपूर्ण",
   "dyn_words_recalled": "स्मरण शब्द",
   "dyn_yes": "हाँ",
-  "dyn_zero_music": "प्राकृतिक ध्वनि"
+  "dyn_zero_music": "प्राकृतिक ध्वनि",
+  "phAddTask": "अध्ययन, व्यायाम या पढ़ने का लक्ष्य जोड़ें...",
+  "phCustomMins": "मिनट (1-240)",
+  "phCustomTitle": "सत्र नाम (अध्ययन, व्यायाम, पठन, कार्य)...",
+  "phSearchNotes": "नोट्स खोजें...",
+  "phNoteTitle": "शीर्षक या प्रश्न",
+  "phNoteBody": "यहाँ लिखें...",
+  "langSearchPlaceholder": "भाषा या देश खोजें...",
+  "phRestorePayload": "अपना बैकअप कोड यहाँ पेस्ट करें..."
 }

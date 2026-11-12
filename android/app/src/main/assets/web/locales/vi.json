@@ -92,5 +92,13 @@
   "dyn_urgent_important": "Khẩn cấp & Quan trọng",
   "dyn_words_recalled": "Từ đã nhớ",
   "dyn_yes": "Có",
-  "dyn_zero_music": "Âm thanh tự nhiên"
+  "dyn_zero_music": "Âm thanh tự nhiên",
+  "phAddTask": "Thêm mục tiêu học tập, tập luyện hoặc đọc...",
+  "phCustomMins": "Phút (1-240)",
+  "phCustomTitle": "Tên phiên (Học, Tập, Đọc, Làm việc)...",
+  "phSearchNotes": "Tìm ghi chú...",
+  "phNoteTitle": "Tiêu đề hoặc câu hỏi",
+  "phNoteBody": "Viết tại đây...",
+  "langSearchPlaceholder": "Tìm ngôn ngữ hoặc quốc gia...",
+  "phRestorePayload": "Dán mã sao lưu tại đây..."
 }

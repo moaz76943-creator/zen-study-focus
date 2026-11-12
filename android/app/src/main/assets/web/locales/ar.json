@@ -92,5 +92,13 @@
   "dyn_urgent_important": "عاجل ومهم",
   "dyn_words_recalled": "كلمات مسترجعة",
   "dyn_yes": "نعم",
-  "dyn_zero_music": "أصوات طبيعية نقية"
+  "dyn_zero_music": "أصوات طبيعية نقية",
+  "phAddTask": "أضف مهمة دراسة أو تمرين أو قراءة...",
+  "phCustomMins": "الدقائق (1-240)",
+  "phCustomTitle": "اسم الجلسة (دراسة، رياضة، قراءة، عمل)...",
+  "phSearchNotes": "ابحث في الملاحظات...",
+  "phNoteTitle": "العنوان أو السؤال",
+  "phNoteBody": "اكتب هنا...",
+  "langSearchPlaceholder": "ابحث عن لغة أو دولة...",
+  "phRestorePayload": "الصق رمز النسخة الاحتياطية هنا..."
 }

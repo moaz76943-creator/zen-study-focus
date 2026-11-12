@@ -92,5 +92,13 @@
   "dyn_urgent_important": "Urgent et important",
   "dyn_words_recalled": "Mots retenus",
   "dyn_yes": "Oui",
-  "dyn_zero_music": "Sons naturels"
+  "dyn_zero_music": "Sons naturels",
+  "phAddTask": "Ajouter un objectif d'étude, sport ou lecture...",
+  "phCustomMins": "Minutes (1-240)",
+  "phCustomTitle": "Nom de session (Étude, Sport, Lecture, Travail)...",
+  "phSearchNotes": "Rechercher des notes...",
+  "phNoteTitle": "Titre ou question",
+  "phNoteBody": "Écrivez ici...",
+  "langSearchPlaceholder": "Rechercher une langue ou un pays...",
+  "phRestorePayload": "Collez votre code de sauvegarde ici..."
 }

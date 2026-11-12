@@ -92,5 +92,13 @@
   "dyn_urgent_important": "Pilne i ważne",
   "dyn_words_recalled": "Zapamiętane słowa",
   "dyn_yes": "Tak",
-  "dyn_zero_music": "Dźwięki natury"
+  "dyn_zero_music": "Dźwięki natury",
+  "phAddTask": "Dodaj cel nauki, treningu lub czytania...",
+  "phCustomMins": "Minuty (1-240)",
+  "phCustomTitle": "Nazwa sesji (Nauka, Siłownia, Czytanie, Praca)...",
+  "phSearchNotes": "Szukaj notatek...",
+  "phNoteTitle": "Tytuł lub pytanie",
+  "phNoteBody": "Napisz tutaj...",
+  "langSearchPlaceholder": "Szukaj języka lub kraju...",
+  "phRestorePayload": "Wklej kod kopii zapasowej tutaj..."
 }

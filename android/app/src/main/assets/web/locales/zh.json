@@ -92,5 +92,13 @@
   "dyn_urgent_important": "紧急且重要",
   "dyn_words_recalled": "已回忆词汇",
   "dyn_yes": "是",
-  "dyn_zero_music": "纯自然音效"
+  "dyn_zero_music": "纯自然音效",
+  "phAddTask": "添加学习、锻炼或阅读目标...",
+  "phCustomMins": "分钟 (1-240)",
+  "phCustomTitle": "专注名称（学习、健身、阅读、工作）...",
+  "phSearchNotes": "搜索笔记...",
+  "phNoteTitle": "标题或问题",
+  "phNoteBody": "在此输入...",
+  "langSearchPlaceholder": "搜索语言或国家...",
+  "phRestorePayload": "在此粘贴备份代码..."
 }

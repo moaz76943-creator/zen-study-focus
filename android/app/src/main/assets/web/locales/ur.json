@@ -92,5 +92,13 @@
   "dyn_urgent_important": "فوری اور اہم",
   "dyn_words_recalled": "یاد کیے گئے الفاظ",
   "dyn_yes": "جی ہاں",
-  "dyn_zero_music": "قدرتی آوازیں"
+  "dyn_zero_music": "قدرتی آوازیں",
+  "phAddTask": "مطالعہ، ورزش یا پڑھنے کا ہدف شامل کریں...",
+  "phCustomMins": "منٹ (1-240)",
+  "phCustomTitle": "سیشن کا نام (مطالعہ، ورزش، پڑھائی، کام)...",
+  "phSearchNotes": "نوٹس تلاش کریں...",
+  "phNoteTitle": "عنوان یا سوال",
+  "phNoteBody": "یہاں لکھیں...",
+  "langSearchPlaceholder": "زبان یا ملک تلاش کریں...",
+  "phRestorePayload": "اپنا بیک اپ کوڈ یہاں پیسٹ کریں..."
 }

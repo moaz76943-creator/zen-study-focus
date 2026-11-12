@@ -92,5 +92,13 @@
   "dyn_urgent_important": "Mendesak & Penting",
   "dyn_words_recalled": "Kata Diingat",
   "dyn_yes": "Ya",
-  "dyn_zero_music": "Suara Alam"
+  "dyn_zero_music": "Suara Alam",
+  "phAddTask": "Tambah target belajar, olahraga, atau baca...",
+  "phCustomMins": "Menit (1-240)",
+  "phCustomTitle": "Nama Sesi (Belajar, Gym, Baca, Kerja)...",
+  "phSearchNotes": "Cari catatan...",
+  "phNoteTitle": "Judul atau pertanyaan",
+  "phNoteBody": "Tulis di sini...",
+  "langSearchPlaceholder": "Cari bahasa atau negara...",
+  "phRestorePayload": "Tempel kode cadangan di sini..."
 }
