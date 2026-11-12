@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "579.0.0",
+  "appVersion": "580.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -81,6 +81,12 @@
       "file": "modules/sovereign_study_profiles.js",
       "required": true,
       "description": "Study Profiles, customizable presets (Deep Work, Pomodoro, Sprint, Reading)."
+    },
+    {
+      "id": "sovereign_ambient_dsp",
+      "file": "modules/sovereign_ambient_dsp.js",
+      "required": true,
+      "description": "Pure mathematical real-time DSP Brown & Pink Noise generator without audio files."
     }
   ],
   "styles": [
