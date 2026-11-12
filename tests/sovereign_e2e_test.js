@@ -115,6 +115,18 @@ test("AndroidManifest.xml Has Zero Duplicate Attributes", () => {
     });
 });
 
+
+// 7. Verify Decoupled version.properties & Modular Registry File
+test("Decoupled version.properties & Modular Registry Valid", () => {
+    const vpPath = path.join(__dirname, "..", "android/version.properties");
+    assert(fs.existsSync(vpPath), "android/version.properties missing!");
+    const vp = fs.readFileSync(vpPath, "utf8");
+    assert(vp.includes("VERSION_CODE=") && vp.includes("VERSION_NAME="), "Invalid version.properties!");
+
+    const regPath = path.join(__dirname, "..", "android/app/src/main/assets/web/modules/sovereign_core_registry.js");
+    assert(fs.existsSync(regPath), "sovereign_core_registry.js missing!");
+});
+
 console.log("==================================================================");
 console.log("🎉 [E2E Summary]: " + passed + " / " + passed + " Integration Tests PASSED!");
 console.log("==================================================================");
