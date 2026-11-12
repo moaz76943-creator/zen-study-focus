@@ -36,3 +36,15 @@ button, [role="button"], .df-touch-target {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Xiaomi 17T Pro Edge-to-Edge & Punch-Hole Calibration */
+:root {
+  --df-notch-top: max(env(safe-area-inset-top, 0px), 24px);
+  --df-nav-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+}
+
+.df-safe-viewport {
+  padding-top: var(--df-notch-top);
+  padding-bottom: var(--df-nav-bottom);
+  box-sizing: border-box;
+}
