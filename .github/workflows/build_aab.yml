@@ -15,7 +15,7 @@ permissions:
 jobs:
   build-production-bundle:
     name: Compile & Sign Production Android App
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: 📥 Checkout Repository Source
