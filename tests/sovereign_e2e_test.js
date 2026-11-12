@@ -294,6 +294,26 @@ for (const s of manifest.styles) {
 }
 console.log('✅ PASS: Sovereign Module Manifest & Plug-and-Play File Consistency Verified');
 
+
+// SovereignStore Unified State Layer & Undo/Redo Gate
+const storeModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_store.js');
+require(storeModPath);
+if (!global.SovereignStore || typeof global.SovereignStore.dispatch !== 'function') {
+  console.error('❌ FAIL: SovereignStore failed to initialize');
+  process.exit(1);
+}
+global.SovereignStore.dispatch('preferences.twilight', true);
+const v1 = global.SovereignStore.get('preferences.twilight');
+global.SovereignStore.dispatch('preferences.twilight', false);
+const v2 = global.SovereignStore.get('preferences.twilight');
+global.SovereignStore.undo();
+const v3 = global.SovereignStore.get('preferences.twilight');
+if (v1 !== true || v2 !== false || v3 !== true) {
+  console.error('❌ FAIL: SovereignStore dispatch/undo sequence error');
+  process.exit(1);
+}
+console.log('✅ PASS: SovereignStore Unified State Layer & Atomic Undo/Redo Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");

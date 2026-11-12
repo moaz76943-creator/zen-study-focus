@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "566.0.0",
+  "appVersion": "567.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -39,6 +39,12 @@
       "file": "modules/sovereign_data_vault.js",
       "required": false,
       "description": "Levenshtein deduplicator, QuotaExceeded vacuum, and AES-GCM deck exchange."
+    },
+    {
+      "id": "sovereign_store",
+      "file": "modules/sovereign_store.js",
+      "required": true,
+      "description": "Unified reactive state management with atomic undo/redo."
     }
   ],
   "styles": [
