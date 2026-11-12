@@ -731,6 +731,31 @@ if (!isolated.includes('25:00') || !isolated.startsWith('\u2066')) {
 }
 console.log('✅ PASS: Bi-directional RTL / LTR Dynamic Layout Mirroring Verified');
 
+
+// Unified Regional Date & Duration Formatter Gate
+const dtfModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_date_formatter.js');
+require(dtfModPath);
+if (!global.SovereignDateFormatter || typeof global.SovereignDateFormatter.formatDuration !== 'function') {
+  console.error('❌ FAIL: SovereignDateFormatter failed to initialize');
+  process.exit(1);
+}
+const dur25 = global.SovereignDateFormatter.formatDuration(1500);
+if (dur25 !== '25:00') {
+  console.error('❌ FAIL: SovereignDateFormatter duration 1500sec mismatch: expected 25:00, got ' + dur25);
+  process.exit(1);
+}
+const durHour = global.SovereignDateFormatter.formatDuration(3665);
+if (durHour !== '01:01:05') {
+  console.error('❌ FAIL: SovereignDateFormatter duration 3665sec mismatch: expected 01:01:05, got ' + durHour);
+  process.exit(1);
+}
+const arDate = global.SovereignDateFormatter.formatDate(Date.now(), 'ar');
+if (/[٠١٢٣٤٥٦٧٨٩]/.test(arDate)) {
+  console.error('❌ FAIL: SovereignDateFormatter leaked Eastern Arabic numerals in Arabic locale: ' + arDate);
+  process.exit(1);
+}
+console.log('✅ PASS: Unified Regional Date & Duration Formatter Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");

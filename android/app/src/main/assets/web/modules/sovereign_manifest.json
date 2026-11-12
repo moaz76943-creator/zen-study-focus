@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "590.0.0",
+  "appVersion": "591.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -129,6 +129,12 @@
       "file": "modules/sovereign_bidi_engine.js",
       "required": true,
       "description": "Bi-directional RTL/LTR dynamic layout mirroring and LTR number isolation."
+    },
+    {
+      "id": "sovereign_date_formatter",
+      "file": "modules/sovereign_date_formatter.js",
+      "required": true,
+      "description": "Unified regional date, wall-clock, duration MM:SS, and relative time formatter."
     }
   ],
   "styles": [
