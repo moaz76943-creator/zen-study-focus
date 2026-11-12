@@ -1594,6 +1594,26 @@ body {
     opacity: 1 !important;
   }
 </style>
+<!-- TASK #820: Solid Opaque Modal Backdrop & Card Background -->
+<style id="task-820-modal-bg">
+  .modal, .modal-backdrop, .overlay, [id*="Modal"], [id*="modal"], [role="dialog"] {
+    background: rgba(15, 23, 42, 0.72) !important;
+    backdrop-filter: blur(4px) !important;
+  }
+  .modal > div, [id*="Modal"] > div, [id*="modal"] > div, [role="dialog"] > div, .modal-content, .modal-card {
+    background: #FFFFFF !important;
+    color: #0F172A !important;
+    border-radius: 18px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
+    opacity: 1 !important;
+  }
+  body.dark-mode .modal > div, body.dark .modal > div,
+  body.dark-mode [id*="Modal"] > div, body.dark [id*="Modal"] > div,
+  body.dark-mode .modal-card, body.dark .modal-card {
+    background: #111827 !important;
+    color: #F9FAFB !important;
+  }
+</style>
 </head>
 <body>
 

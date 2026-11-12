@@ -229,6 +229,8 @@
       xhr.send();
     },
 
+    setLanguage: function (code) { return this.applyLanguage(code); },
+
     applyLanguage: function (code) {
       var self = this;
       var cleanCode = String(code || "ar").toLowerCase().split("-")[0].split("_")[0];
@@ -315,6 +317,19 @@
             sn.textContent = st.replace(/recorded minutes \/ 7 days/i, dict.ui_recorded_7d);
           }
           sn.textContent = sn.textContent.replace(/[٠-٩]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); });
+        }
+      }
+
+
+      // Task #820: Guarantee 🔒 Local Data button contrast on every tab
+      var lockBtns = document.querySelectorAll("button, .pill, .chip, a");
+      for (var lb = 0; lb < lockBtns.length; lb++) {
+        var b820 = lockBtns[lb];
+        if ((b820.textContent || "").indexOf("🔒") !== -1) {
+          b820.style.setProperty("color", "#0F172A", "important");
+          b820.style.setProperty("background", "#F1F5F9", "important");
+          b820.style.setProperty("border", "1px solid #CBD5E1", "important");
+          b820.style.setProperty("opacity", "1", "important");
         }
       }
 

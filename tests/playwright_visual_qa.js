@@ -108,7 +108,7 @@ const { chromium } = require('playwright');
   for (const lang of ['ar', 'ro', 'de']) {
     await page.evaluate(async (l) => {
       if (window.UniversalI18nHotSwap) {
-        await window.UniversalI18nHotSwap.setLanguage(l);
+        await (window.UniversalI18nHotSwap.setLanguage ? window.UniversalI18nHotSwap.setLanguage(l) : window.UniversalI18nHotSwap.applyLanguage(l));
       }
     }, lang);
     await page.waitForTimeout(400);
@@ -146,7 +146,7 @@ const { chromium } = require('playwright');
 
   // 7. Verify dynamic DOM translation after tab switching in Arabic
   await page.evaluate(async () => {
-    if (window.UniversalI18nHotSwap) await window.UniversalI18nHotSwap.setLanguage('ar');
+    if (window.UniversalI18nHotSwap) await (window.UniversalI18nHotSwap.setLanguage ? window.UniversalI18nHotSwap.setLanguage('ar') : window.UniversalI18nHotSwap.applyLanguage('ar'));
   });
   await page.waitForTimeout(500);
   const arabicUntranslated = await page.evaluate(() => {
