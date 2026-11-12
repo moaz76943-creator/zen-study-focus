@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "596.0.0",
+  "appVersion": "613.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -151,6 +151,14 @@
       "file": "modules/sovereign_diagnostics_portal.js",
       "description": "Advanced hardware telemetry, storage health audit, and zero PII self-diagnostics portal.",
       "type": "diagnostic"
+    },
+    {
+      "id": "sovereign_cognitive_pacing",
+      "name": "Sovereign Cognitive Pacing",
+      "version": "613.0.0",
+      "file": "modules/sovereign_cognitive_pacing.js",
+      "description": "On-device study stamina modeling, cognitive load pacing & optimal intermission recommendations.",
+      "type": "productivity"
     }
   ],
   "styles": [
