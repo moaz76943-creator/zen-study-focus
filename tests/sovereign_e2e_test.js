@@ -177,6 +177,26 @@ if (busDelivered !== 1) {
 }
 console.log('✅ PASS: Modular Timer Engine & Error-Isolated EventBus Verified');
 
+
+// Modular Analytics & 26-Week Heatmap Live Execution Test
+const analyticsModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_analytics_suite.js');
+if (!fs.existsSync(analyticsModPath)) {
+  console.error('❌ FAIL: Missing modular analytics suite at ' + analyticsModPath);
+  process.exit(1);
+}
+require(analyticsModPath);
+if (!global.SovereignAnalytics || !global.SovereignHeatmap) {
+  console.error('❌ FAIL: SovereignAnalytics or SovereignHeatmap failed to initialize');
+  process.exit(1);
+}
+const rec = global.SovereignAnalytics.recordSession(25);
+const grid = global.SovereignHeatmap.get26WeekGrid();
+if (!rec || rec.minutes < 25 || grid.length !== 182) {
+  console.error('❌ FAIL: Analytics recordSession or 26-week (182 days) grid invalid');
+  process.exit(1);
+}
+console.log('✅ PASS: Modular Analytics & 26-Week (182-Day) Heatmap Verified');
+
 console.log("==================================================================");
-console.log("🎉 [E2E Summary]: 3 / 3 Integration Tests PASSED!");
+console.log("🎉 [E2E Summary]: 5 / 5 Integration Tests PASSED!");
 console.log("==================================================================");
