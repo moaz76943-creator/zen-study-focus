@@ -856,6 +856,27 @@ if (!metrics || typeof metrics.totalBootMs !== 'number') {
 }
 console.log('✅ PASS: Sovereign Cold Startup Performance & Phased Boot Verified (52/52)');
 
+
+// Sovereign Android 15 Edge-to-Edge & Insets Calibration Gate
+const insetsModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_insets_calibrator.js');
+require(insetsModPath);
+if (!global.SovereignInsetsCalibrator || typeof global.SovereignInsetsCalibrator.updateInsets !== 'function') {
+  console.error('❌ FAIL: SovereignInsetsCalibrator failed to initialize');
+  process.exit(1);
+}
+global.SovereignInsetsCalibrator.init();
+const updated = global.SovereignInsetsCalibrator.updateInsets(36, 48, 0, 0);
+if (updated.top !== 36 || updated.bottom !== 48) {
+  console.error('❌ FAIL: SovereignInsetsCalibrator updateInsets mismatch: expected top=36, bottom=48');
+  process.exit(1);
+}
+const current = global.SovereignInsetsCalibrator.getInsets();
+if (current.bottom !== 48) {
+  console.error('❌ FAIL: SovereignInsetsCalibrator getInsets mismatch');
+  process.exit(1);
+}
+console.log('✅ PASS: Sovereign Android 15 Edge-to-Edge Insets Calibration Verified (54/54)');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
