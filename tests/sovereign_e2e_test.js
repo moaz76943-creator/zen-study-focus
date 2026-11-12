@@ -155,6 +155,28 @@ if (!audioModSrc.includes('SovereignChimes') || !audioModSrc.includes('Sovereign
 }
 console.log('✅ PASS: Modular Audio Suite (sovereign_audio_suite.js) Intact & Connected');
 
+
+// Modular Timer Engine & Error-Isolated EventBus Live Execution Test
+const timerModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_timer_engine.js');
+if (!fs.existsSync(timerModPath)) {
+  console.error('❌ FAIL: Missing modular timer engine at ' + timerModPath);
+  process.exit(1);
+}
+require(timerModPath);
+if (!global.SovereignTimerEngine || !global.SovereignEventBus) {
+  console.error('❌ FAIL: SovereignTimerEngine or SovereignEventBus failed to initialize');
+  process.exit(1);
+}
+let busDelivered = 0;
+global.SovereignEventBus.on('e2e:probe', () => { throw new Error('Simulated isolated module error'); });
+global.SovereignEventBus.on('e2e:probe', (p) => { if (p && p.ok) busDelivered++; });
+global.SovereignEventBus.emit('e2e:probe', { ok: true });
+if (busDelivered !== 1) {
+  console.error('❌ FAIL: SovereignEventBus error isolation failed');
+  process.exit(1);
+}
+console.log('✅ PASS: Modular Timer Engine & Error-Isolated EventBus Verified');
+
 console.log("==================================================================");
-console.log("🎉 [E2E Summary]: 10 / 10 Integration Tests PASSED!");
+console.log("🎉 [E2E Summary]: 3 / 3 Integration Tests PASSED!");
 console.log("==================================================================");
