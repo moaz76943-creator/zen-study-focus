@@ -939,6 +939,32 @@ if (global.SovereignAudioCues.muted === initialMute) {
 global.SovereignAudioCues.toggleMute(); // restore
 console.log('✅ PASS: Sovereign Audio Cues & DSP Synthesizer Verified (63/63)');
 
+
+// Sovereign Distraction Shield & Focus Integrity Gate
+const shieldModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_distraction_shield.js');
+require(shieldModPath);
+if (!global.SovereignDistractionShield || typeof global.SovereignDistractionShield.activate !== 'function') {
+  console.error('❌ FAIL: SovereignDistractionShield failed to initialize');
+  process.exit(1);
+}
+global.SovereignDistractionShield.activate('strict');
+if (global.SovereignDistractionShield.isActive !== true) {
+  console.error('❌ FAIL: Distraction shield activation failed');
+  process.exit(1);
+}
+global.SovereignDistractionShield.recordBreach('test_window_blur');
+global.SovereignDistractionShield.recordBreach('test_tab_switch');
+if (global.SovereignDistractionShield.breachLog.length !== 2) {
+  console.error('❌ FAIL: Breach logging mismatch, expected 2, got ' + global.SovereignDistractionShield.breachLog.length);
+  process.exit(1);
+}
+const report = global.SovereignDistractionShield.deactivate();
+if (report.totalBreaches !== 2 || report.integrityScore >= 100 || report.isFlawless !== false) {
+  console.error('❌ FAIL: Distraction shield integrity report calculation error');
+  process.exit(1);
+}
+console.log('✅ PASS: Sovereign Distraction Shield & Integrity Verified (66/66)');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
