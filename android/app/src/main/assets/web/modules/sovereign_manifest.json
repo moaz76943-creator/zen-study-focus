@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "583.0.0",
+  "appVersion": "584.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -105,6 +105,12 @@
       "file": "modules/sovereign_lockin_mode.js",
       "required": true,
       "description": "Zen Lock-In mode, full sensory shielding, and 3-second anti-impulse lock."
+    },
+    {
+      "id": "sovereign_session_logger",
+      "file": "modules/sovereign_session_logger.js",
+      "required": true,
+      "description": "Structured study session journal, multi-tag distribution, and focus quality analytics."
     }
   ],
   "styles": [
