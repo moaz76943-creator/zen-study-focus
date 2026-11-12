@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "611.0.0",
+  "appVersion": "612.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -183,6 +183,14 @@
       "file": "modules/sovereign_semantic_search.js",
       "description": "On-device semantic search, deterministic token vectorizer & embeddings cache for sovereign offline discovery.",
       "type": "ai"
+    },
+    {
+      "id": "sovereign_audio_cues",
+      "name": "Sovereign Audio Cues",
+      "version": "612.0.0",
+      "file": "modules/sovereign_audio_cues.js",
+      "description": "On-device Web Audio API synthesizer, harmonic Tibetan Zen bells, binaural focus tones & offline speech prompts.",
+      "type": "audio"
     }
   ],
   "styles": [

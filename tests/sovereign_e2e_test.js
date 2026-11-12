@@ -908,6 +908,37 @@ if (typeof simScore !== 'number' || simScore <= 0.5) {
 }
 console.log('✅ PASS: Sovereign Semantic Search & Vector Embeddings Verified (62/62)');
 
+
+// Sovereign Audio Cues & DSP Synthesizer Gate
+const audioCuesModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_audio_cues.js');
+require(audioCuesModPath);
+if (!global.SovereignAudioCues || typeof global.SovereignAudioCues.playZenBell !== 'function') {
+  console.error('❌ FAIL: SovereignAudioCues failed to initialize');
+  process.exit(1);
+}
+if (!global.SovereignAudioCues.cues || !global.SovereignAudioCues.cues.focus_start) {
+  console.error('❌ FAIL: SovereignAudioCues cues catalog is missing or incomplete');
+  process.exit(1);
+}
+const startCue = global.SovereignAudioCues.cues.focus_start;
+if (!Array.isArray(startCue.frequencies) || startCue.frequencies[0] !== 432) {
+  console.error('❌ FAIL: SovereignAudioCues frequency mapping mismatch for 432Hz harmonic');
+  process.exit(1);
+}
+global.SovereignAudioCues.setVolume(0.85);
+if (global.SovereignAudioCues.volume !== 0.85) {
+  console.error('❌ FAIL: SovereignAudioCues volume setter failed');
+  process.exit(1);
+}
+const initialMute = global.SovereignAudioCues.muted;
+global.SovereignAudioCues.toggleMute();
+if (global.SovereignAudioCues.muted === initialMute) {
+  console.error('❌ FAIL: SovereignAudioCues mute toggle failed');
+  process.exit(1);
+}
+global.SovereignAudioCues.toggleMute(); // restore
+console.log('✅ PASS: Sovereign Audio Cues & DSP Synthesizer Verified (63/63)');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
