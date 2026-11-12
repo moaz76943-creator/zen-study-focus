@@ -77,5 +77,20 @@
   "ui_recorded_min_7d": "0 मिनट / 7",
   "ui_verified_sess_7d": "0 पूर्ण सत्र / 7",
   "ui_3d_spatial": "3D • प्राकृतिक ध्वनि नियंत्रण",
-  "ui_all_sounds": "सभी (4)"
+  "ui_all_sounds": "सभी (4)",
+  "dyn_best_daily_minutes": "सर्वश्रेष्ठ दैनिक मिनट",
+  "dyn_consistency_grade": "निरंतरता ग्रेड",
+  "dyn_deep_focus_25m": "गहन फोकस 25m",
+  "dyn_delegate_batch": "सौंपें / समूहित करें",
+  "dyn_eliminate_defer": "हटाएं / टालें",
+  "dyn_fsrs_drill": "FSRS अभ्यास",
+  "dyn_fluency_speed": "प्रवाह गति",
+  "dyn_problem_effect": "समस्या / प्रभाव",
+  "dyn_recall_streak": "स्मरण श्रृंखला",
+  "dyn_recalled_facts": "स्मरण तथ्य",
+  "dyn_start_session": "सत्र शुरू करें",
+  "dyn_urgent_important": "अत्यावश्यक और महत्वपूर्ण",
+  "dyn_words_recalled": "स्मरण शब्द",
+  "dyn_yes": "हाँ",
+  "dyn_zero_music": "प्राकृतिक ध्वनि"
 }

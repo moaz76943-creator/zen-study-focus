@@ -77,5 +77,20 @@
   "ui_recorded_min_7d": "0 Minuten / 7",
   "ui_verified_sess_7d": "0 Voltooide Sessies / 7",
   "ui_3d_spatial": "3D • Natuurgeluiden Bediening",
-  "ui_all_sounds": "Alle (4)"
+  "ui_all_sounds": "Alle (4)",
+  "dyn_best_daily_minutes": "Beste dagminuten",
+  "dyn_consistency_grade": "Consistentiecijfer",
+  "dyn_deep_focus_25m": "Diepe focus 25m",
+  "dyn_delegate_batch": "Delegeren / Bundelen",
+  "dyn_eliminate_defer": "Schrappen / Uitstellen",
+  "dyn_fsrs_drill": "FSRS-oefening",
+  "dyn_fluency_speed": "Vloeiendheidssnelheid",
+  "dyn_problem_effect": "Probleem / Effect",
+  "dyn_recall_streak": "Herinneringsreeks",
+  "dyn_recalled_facts": "Onthouden feiten",
+  "dyn_start_session": "Sessie starten",
+  "dyn_urgent_important": "Urgent & Belangrijk",
+  "dyn_words_recalled": "Onthouden woorden",
+  "dyn_yes": "Ja",
+  "dyn_zero_music": "Natuurgeluiden"
 }

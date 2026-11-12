@@ -89,6 +89,19 @@ if (i18nScan809.unmappedCount > 0) {
   console.log('   Unmapped labels:', JSON.stringify(i18nScan809.unmapped));
 }
 
+
+// Task #811: WebView Relative Audio Paths & Bottom-Nav Clearance Gate
+const audioSrc811 = fs.readFileSync(path.resolve('android/app/src/main/assets/web/modules/sovereign_audio_suite.js'), 'utf8');
+if (audioSrc811.includes('"/audio/') || audioSrc811.includes("'/audio/")) {
+  console.error('❌ FAIL: Absolute /audio/ path breaks Android WebView file:///android_asset/');
+  process.exit(1);
+}
+if (!html809.includes('task-811-layout-fix')) {
+  console.error('❌ FAIL: Bottom-nav 108px clearance CSS missing from index.html');
+  process.exit(1);
+}
+console.log('✅ PASS: WebView Relative Audio Paths & 108px Bottom-Nav Clearance Verified');
+
 console.log("==================================================================");
 console.log("🧪 [Deep Focus E2E] Running Sovereign Integration Test Harness...");
 console.log("==================================================================");

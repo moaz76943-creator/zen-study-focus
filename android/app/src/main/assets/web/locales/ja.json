@@ -77,5 +77,20 @@
   "ui_recorded_min_7d": "0 分 / 7",
   "ui_verified_sess_7d": "0 完了セッション / 7",
   "ui_3d_spatial": "3D • 自然音コントロール",
-  "ui_all_sounds": "すべて (4)"
+  "ui_all_sounds": "すべて (4)",
+  "dyn_best_daily_minutes": "1日の最高分数",
+  "dyn_consistency_grade": "継続評価",
+  "dyn_deep_focus_25m": "ディープ集中 25m",
+  "dyn_delegate_batch": "委任 / まとめ処理",
+  "dyn_eliminate_defer": "削減 / 延期",
+  "dyn_fsrs_drill": "FSRS 復習ドリル",
+  "dyn_fluency_speed": "流暢さ速度",
+  "dyn_problem_effect": "問題 / 効果",
+  "dyn_recall_streak": "連続想起記録",
+  "dyn_recalled_facts": "思い出した項目",
+  "dyn_start_session": "セッション開始",
+  "dyn_urgent_important": "緊急かつ重要",
+  "dyn_words_recalled": "思い出した単語",
+  "dyn_yes": "はい",
+  "dyn_zero_music": "自然環境音"
 }
