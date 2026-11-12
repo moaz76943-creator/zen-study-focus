@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "601.0.0",
+  "appVersion": "603.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -167,6 +167,14 @@
       "file": "modules/sovereign_startup_booster.js",
       "description": "Phased zero-jank boot orchestrator with requestIdleCallback deferrals for <300ms cold start.",
       "type": "performance"
+    },
+    {
+      "id": "sovereign_insets_calibrator",
+      "name": "Sovereign Insets Calibrator",
+      "version": "603.0.0",
+      "file": "modules/sovereign_insets_calibrator.js",
+      "description": "Android 15 Edge-to-Edge gesture navigation pill and notch cutout insets calibration.",
+      "type": "ui"
     }
   ],
   "styles": [
