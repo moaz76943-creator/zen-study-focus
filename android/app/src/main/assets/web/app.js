@@ -378,11 +378,11 @@ document.addEventListener('DOMContentLoaded', () => {
    DEEP FOCUS — ACOUSTIC COMPLETION TONES & SELECTOR (M185)
    ======================================================== */
 const COMPLETION_TONES = {
-  zen_bell: { name: 'Zen Bell 🎐', nameKey: 'toneZenBell', desc: 'Gentle', descKey: 'toneDescGentle', freq: 587.33, decay: 2.8, level: 0.3 },
-  tibetan_bowl: { name: 'Tibetan Bowl 🧘', nameKey: 'toneTibetanBowl', desc: 'Deep', descKey: 'toneDescDeep', freq: 432, decay: 3.5, level: 0.35 },
+  zen_bell: { name: 'Water Drop 🎐', nameKey: 'toneZenBell', desc: 'Gentle', descKey: 'toneDescGentle', freq: 587.33, decay: 2.8, level: 0.3 },
+  tibetan_bowl: { name: 'Stream Ripple 🧘', nameKey: 'toneTibetanBowl', desc: 'Deep', descKey: 'toneDescDeep', freq: 432, decay: 3.5, level: 0.35 },
   woodblock: { name: 'Woodblock 🪵', nameKey: 'toneWoodblock', desc: 'Crisp', descKey: 'toneDescCrisp', freq: 800, decay: 0.25, level: 0.4 },
-  crystal: { name: 'Crystal Bell 🔔', nameKey: 'toneCrystalBell', desc: 'Clear', descKey: 'toneDescClear', freq: 1046.5, decay: 2.5, level: 0.35 },
-  gong: { name: 'Temple Gong ⛩️', nameKey: 'toneTempleGong', desc: 'Loud', descKey: 'toneDescLoud', freq: 220, decay: 4.0, level: 0.5 },
+  crystal: { name: 'Wind Rustle 🔔', nameKey: 'toneCrystalBell', desc: 'Clear', descKey: 'toneDescClear', freq: 1046.5, decay: 2.5, level: 0.35 },
+  gong: { name: 'Distant Thunder ⛩️', nameKey: 'toneTempleGong', desc: 'Loud', descKey: 'toneDescLoud', freq: 220, decay: 4.0, level: 0.5 },
   vibrate: { name: 'Vibrate Only 📳', nameKey: 'toneVibrateOnly', desc: 'Silent', descKey: 'toneDescSilent', freq: 0, decay: 0, level: 0 }
 };
 
@@ -2075,11 +2075,11 @@ const DF_EXTRA_UI_TRANSLATIONS = {
     taskCompleteContinueLater: '⏳ Continue Later',
     focusEndChimeTitle: 'Focus End Chime',
     zeroMusicBadge: 'Zero-Music',
-    toneZenBell: 'Zen Bell 🎐',
-    toneTibetanBowl: 'Tibetan Bowl 🧘',
+    toneZenBell: 'Water Drop 🎐',
+    toneTibetanBowl: 'Stream Ripple 🧘',
     toneWoodblock: 'Woodblock 🪵',
-    toneCrystalBell: 'Crystal Bell 🔔',
-    toneTempleGong: 'Temple Gong ⛩️',
+    toneCrystalBell: 'Wind Rustle 🔔',
+    toneTempleGong: 'Distant Thunder ⛩️',
     toneVibrateOnly: 'Vibrate Only 📳',
     toneDescGentle: 'Gentle',
     toneDescDeep: 'Deep',
@@ -2224,7 +2224,7 @@ const DF_EXTRA_UI_TRANSLATIONS = {
     taskCompleteContinueLater: '⏳ المتابعة لاحقاً',
     focusEndChimeTitle: 'نغمة انتهاء الجلسة',
     zeroMusicBadge: 'بدون موسيقى',
-    toneZenBell: 'جرس زن الهادئ 🎐',
+    toneZenBell: 'قطرة ماء الهادئ 🎐',
     toneTibetanBowl: 'وعاء الرنين العميق 🧘',
     toneWoodblock: 'إيقاع خشبي نقي 🪵',
     toneCrystalBell: 'جرس كريستالي صافي 🔔',

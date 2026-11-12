@@ -100,5 +100,22 @@
   "phNoteTitle": "शीर्षक या प्रश्न",
   "phNoteBody": "यहाँ लिखें...",
   "langSearchPlaceholder": "भाषा या देश खोजें...",
-  "phRestorePayload": "अपना बैकअप कोड यहाँ पेस्ट करें..."
+  "phRestorePayload": "अपना बैकअप कोड यहाँ पेस्ट करें...",
+  "ui_quick_session": "त्वरित सत्र",
+  "ui_studio_suite": "स्टूडियो सूट",
+  "ui_stem_studio": "STEM और परीक्षा स्टूडियो",
+  "ui_stem_sub": "SVG विज्ञान और परीक्षा सिम्युलेटर",
+  "ui_quick_training": "त्वरित प्रशिक्षण",
+  "ui_custom_intervals": "कस्टम कार्य और विश्राम अंतराल",
+  "ui_rest_mmss": "विश्राम (MM:SS)",
+  "ui_work_mmss": "कार्य (MM:SS)",
+  "ui_sets": "सेट",
+  "ui_skip_final_rest": "अंतिम विश्राम छोड़ें",
+  "ui_exercise_seq": "व्यायाम क्रम",
+  "ui_ex_placeholder": "उदा. स्ट्रेचिंग या गहन पठन",
+  "ui_add_plus": "जोड़ें +",
+  "ui_todays_plan": "आज की योजना",
+  "ui_verified_7d": "सत्यापित सत्र / 7 दिन",
+  "ui_recorded_7d": "दर्ज मिनट / 7 दिन",
+  "ui_fps_120": "120 FPS इंजन"
 }

@@ -1543,6 +1543,26 @@ body {
   }
 </style>
   <script src="modules/ui/sovereign_backup_modal_812.js"></script>
+<!-- TASK #815: Fix Local Data Contrast, FAB Overlap & Bottom Nav Icon Overlap -->
+<style id="task-815-ui-fix">
+  #localDataBtn, [onclick*="exportToClipboard"], [onclick*="LocalData"] {
+    color: #0F172A !important;
+    background: #F1F5F9 !important;
+    border: 1px solid #CBD5E1 !important;
+  }
+  .fab, #addNoteFab, button[class*="fab"] {
+    bottom: 96px !important;
+    z-index: 40 !important;
+  }
+  nav button, .bottom-nav button, .nav-bar button {
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    overflow: hidden !important;
+  }
+</style>
 </head>
 <body>
 

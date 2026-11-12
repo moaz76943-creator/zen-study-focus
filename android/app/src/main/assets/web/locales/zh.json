@@ -100,5 +100,22 @@
   "phNoteTitle": "标题或问题",
   "phNoteBody": "在此输入...",
   "langSearchPlaceholder": "搜索语言或国家...",
-  "phRestorePayload": "在此粘贴备份代码..."
+  "phRestorePayload": "在此粘贴备份代码...",
+  "ui_quick_session": "快速专注",
+  "ui_studio_suite": "工作室套件",
+  "ui_stem_studio": "理工与考试工作室",
+  "ui_stem_sub": "矢量科学绘图与严格考试模拟",
+  "ui_quick_training": "快速训练",
+  "ui_custom_intervals": "自定义工作与休息间隔",
+  "ui_rest_mmss": "休息 (MM:SS)",
+  "ui_work_mmss": "工作 (MM:SS)",
+  "ui_sets": "组数",
+  "ui_skip_final_rest": "跳过最后休息",
+  "ui_exercise_seq": "训练序列",
+  "ui_ex_placeholder": "例如：拉伸或深度阅读",
+  "ui_add_plus": "添加 +",
+  "ui_todays_plan": "今日计划",
+  "ui_verified_7d": "已验证专注 / 7天",
+  "ui_recorded_7d": "记录分钟数 / 7天",
+  "ui_fps_120": "120帧引擎"
 }
