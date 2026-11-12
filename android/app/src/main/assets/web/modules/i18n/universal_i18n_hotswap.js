@@ -19,6 +19,12 @@
   var EXCLUDED_CODES = new Set(["he", "iw", "syc", "ber", "zgh"]);
   var LOADED_LOCALES = {};
   var PHRASE_TO_KEY = {
+    "your progress": "ui_your_progress",
+    "view all": "ui_view_all",
+    "view all ↗": "ui_view_all",
+    "start training": "ui_start_training",
+    "pure nature studio ready": "ui_pure_nature_ready",
+    "pure nature\nstudio ready": "ui_pure_nature_ready",
     "syllabus": "ui_syllabus",
     "quick session": "ui_quick_session",
     "studio suite": "ui_studio_suite",

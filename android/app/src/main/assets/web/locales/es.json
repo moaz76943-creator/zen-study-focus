@@ -117,5 +117,9 @@
   "ui_todays_plan": "Plan de hoy",
   "ui_verified_7d": "sesiones verificadas / 7 días",
   "ui_recorded_7d": "minutos registrados / 7 días",
-  "ui_fps_120": "Motor 120 FPS"
+  "ui_fps_120": "Motor 120 FPS",
+  "ui_your_progress": "Tu progreso",
+  "ui_view_all": "Ver todo ↗",
+  "ui_start_training": "Iniciar entrenamiento",
+  "ui_pure_nature_ready": "Sonidos naturales listos"
 }

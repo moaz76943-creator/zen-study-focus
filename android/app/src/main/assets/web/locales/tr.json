@@ -117,5 +117,9 @@
   "ui_todays_plan": "Bugünün planı",
   "ui_verified_7d": "doğrulanmış oturum / 7 gün",
   "ui_recorded_7d": "kayıtlı dakika / 7 gün",
-  "ui_fps_120": "120 FPS Motoru"
+  "ui_fps_120": "120 FPS Motoru",
+  "ui_your_progress": "İlerlemeniz",
+  "ui_view_all": "Tümünü gör ↗",
+  "ui_start_training": "Antrenmanı Başlat",
+  "ui_pure_nature_ready": "Doğal Sesler Hazır"
 }

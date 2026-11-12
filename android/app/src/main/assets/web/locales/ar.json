@@ -117,5 +117,9 @@
   "ui_todays_plan": "خطة اليوم",
   "ui_verified_7d": "جلسات موثقة / 7 أيام",
   "ui_recorded_7d": "دقائق مسجلة / 7 أيام",
-  "ui_fps_120": "محرك 120 إطار/ث"
+  "ui_fps_120": "محرك 120 إطار/ث",
+  "ui_your_progress": "مستوى تقدمك",
+  "ui_view_all": "عرض الكل ↗",
+  "ui_start_training": "ابدأ التدريب",
+  "ui_pure_nature_ready": "أصوات الطبيعة النقية جاهزة"
 }

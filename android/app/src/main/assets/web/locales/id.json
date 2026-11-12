@@ -117,5 +117,9 @@
   "ui_todays_plan": "Rencana hari ini",
   "ui_verified_7d": "sesi terverifikasi / 7 hari",
   "ui_recorded_7d": "menit tercatat / 7 hari",
-  "ui_fps_120": "Mesin 120 FPS"
+  "ui_fps_120": "Mesin 120 FPS",
+  "ui_your_progress": "Kemajuan Anda",
+  "ui_view_all": "Lihat semua ↗",
+  "ui_start_training": "Mulai latihan",
+  "ui_pure_nature_ready": "Suara Alam Siap"
 }

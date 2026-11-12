@@ -117,5 +117,9 @@
   "ui_todays_plan": "План на сегодня",
   "ui_verified_7d": "сеансов / 7 дней",
   "ui_recorded_7d": "минут / 7 дней",
-  "ui_fps_120": "Движок 120 FPS"
+  "ui_fps_120": "Движок 120 FPS",
+  "ui_your_progress": "Ваш прогресс",
+  "ui_view_all": "Все ↗",
+  "ui_start_training": "Начать тренировку",
+  "ui_pure_nature_ready": "Звуки природы готовы"
 }
