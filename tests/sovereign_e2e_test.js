@@ -405,6 +405,25 @@ if (global.SovereignMemoryDrainGuard.isDrained()) {
 }
 console.log('✅ PASS: OnPause / OnTrimMemory Resource Drain & LMKD Guard Verified');
 
+
+// QuickTimerWidgetProvider Live AppWidgetManager Push Synchronization Gate
+const widgetModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_widget_bridge.js');
+require(widgetModPath);
+if (!global.SovereignWidgetBridge || typeof global.SovereignWidgetBridge.syncWidgetState !== 'function') {
+  console.error('❌ FAIL: SovereignWidgetBridge failed to initialize');
+  process.exit(1);
+}
+const synced = global.SovereignWidgetBridge.syncWidgetState({ remainingSec: 1200, totalSec: 1500, mode: 'focus', running: true, sessionCount: 3 });
+if (!synced || synced.remainingSec !== 1200 || !synced.running) {
+  console.error('❌ FAIL: SovereignWidgetBridge failed to generate proper payload');
+  process.exit(1);
+}
+if (!global.SovereignWidgetBridge.getLastPayload()) {
+  console.error('❌ FAIL: SovereignWidgetBridge failed to retain last payload');
+  process.exit(1);
+}
+console.log('✅ PASS: QuickTimerWidgetProvider Live AppWidgetManager Push Sync Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
