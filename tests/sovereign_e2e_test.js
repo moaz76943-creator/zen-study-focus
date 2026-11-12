@@ -59,6 +59,36 @@ if (!audioRes808.ok) {
 }
 console.log('✅ PASS: All 4 CC0 .ogg audio assets verified (>10KB each)');
 
+
+// Task #809: Pre-Build Deep Audit (onclick functions + untranslated UI tags)
+const deepAudit = require(path.resolve('android/app/src/main/assets/web/modules/qa/sovereign_deep_audit.js'));
+const webRoot809 = path.resolve('android/app/src/main/assets/web');
+const html809 = fs.readFileSync(path.join(webRoot809, 'index.html'), 'utf8');
+let combinedJs809 = fs.readFileSync(path.join(webRoot809, 'app.js'), 'utf8');
+const modsDir809 = path.join(webRoot809, 'modules');
+function walkJs809(dir) {
+  for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, ent.name);
+    if (ent.isDirectory()) walkJs809(p);
+    else if (ent.name.endsWith('.js')) combinedJs809 += '\n' + fs.readFileSync(p, 'utf8');
+  }
+}
+if (fs.existsSync(modsDir809)) walkJs809(modsDir809);
+
+const onclickRes809 = deepAudit.auditOnclickHandlers(html809, combinedJs809);
+if (!onclickRes809.ok) {
+  console.error('❌ FAIL: index.html onclick references missing functions:', onclickRes809.missing);
+  process.exit(1);
+}
+console.log('✅ PASS: All ' + onclickRes809.checked + ' onclick handlers in index.html resolve to real JS functions');
+
+const hotswap809 = fs.readFileSync(path.join(webRoot809, 'modules/i18n/universal_i18n_hotswap.js'), 'utf8');
+const i18nScan809 = deepAudit.auditUntranslatedTags(html809, hotswap809);
+console.log('ℹ️ [i18n Scan]: Unmapped English leaf tags in index.html = ' + i18nScan809.unmappedCount);
+if (i18nScan809.unmappedCount > 0) {
+  console.log('   Unmapped labels:', JSON.stringify(i18nScan809.unmapped));
+}
+
 console.log("==================================================================");
 console.log("🧪 [Deep Focus E2E] Running Sovereign Integration Test Harness...");
 console.log("==================================================================");
