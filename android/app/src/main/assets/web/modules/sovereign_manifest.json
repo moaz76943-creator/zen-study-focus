@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "613.0.0",
+  "appVersion": "615.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -191,6 +191,14 @@
       "file": "modules/sovereign_audio_cues.js",
       "description": "On-device Web Audio API synthesizer, harmonic Tibetan Zen bells, binaural focus tones & offline speech prompts.",
       "type": "audio"
+    },
+    {
+      "id": "sovereign_distraction_shield",
+      "name": "Sovereign Distraction Shield",
+      "version": "615.0.0",
+      "file": "modules/sovereign_distraction_shield.js",
+      "description": "On-device study mode containment shield, notification dampener & window blur focus integrity monitor.",
+      "type": "productivity"
     }
   ],
   "styles": [
