@@ -86757,3 +86757,36 @@ window.SovereignBackStack = (function() {
     });
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN TWILIGHT EYE-COMFORT & HALATION GUARD (TASK #739)
+// Reduces Visual Contrast Fatigue During Late-Night Midnight Study Sessions
+// ==============================================================================
+window.SovereignEyeComfort = (function() {
+    let isTwilightActive = false;
+
+    function toggleTwilight() {
+        isTwilightActive = !isTwilightActive;
+        const root = document.documentElement;
+        if (isTwilightActive) {
+            root.style.setProperty("--amoled-text", "#d1d5db");
+            root.style.setProperty("--amoled-accent", "#22c55e");
+            console.log("🌙 [EyeComfort] Twilight mode activated (Anti-Halation).");
+        } else {
+            root.style.setProperty("--amoled-text", "#ededed");
+            root.style.setProperty("--amoled-accent", "#4ade80");
+            console.log("☀️ [EyeComfort] Standard focus palette restored.");
+        }
+        const btn = document.getElementById("toggleTwilightBtn");
+        if (btn) {
+            btn.textContent = isTwilightActive ? "🌙 إيقاف وضع السكينة الليلي" : "🌙 وضع السكينة الليلي (Eye Comfort)";
+        }
+    }
+
+    return {
+        toggle: toggleTwilight,
+        isActive: () => isTwilightActive
+    };
+})();
+
