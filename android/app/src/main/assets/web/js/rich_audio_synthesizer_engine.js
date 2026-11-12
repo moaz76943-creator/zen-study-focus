@@ -21,7 +21,7 @@
     { id: "pink_noise", nameAr: "ضوضاء وردية مريحة للأذن", nameEn: "Soft Pink Noise", filterType: "lowpass", baseFreq: 600, license: "PROCEDURAL_ROYALTY_FREE_100%" },
     { id: "brown_noise", nameAr: "ضوضاء بنية عميقة للتركيز", nameEn: "Deep Brown Noise", filterType: "lowpass", baseFreq: 220, license: "PROCEDURAL_ROYALTY_FREE_100%" },
     { id: "deep_space_drone", nameAr: "تردد الفضاء الهادئ", nameEn: "Deep Space Drone", filterType: "lowpass", baseFreq: 110, license: "PROCEDURAL_ROYALTY_FREE_100%" },
-    { id: "tibetan_bowl_ambient", nameAr: "رنين وعاء التيبت المستمر", nameEn: "Tibetan Bowl Drone", filterType: "sine_harmonic", baseFreq: 432, license: "PROCEDURAL_ROYALTY_FREE_100%" },
+    { id: "tibetan_bowl_ambient", nameAr: "رنين وعاء التيبت المستمر", nameEn: "Stream Ripple Drone", filterType: "sine_harmonic", baseFreq: 432, license: "PROCEDURAL_ROYALTY_FREE_100%" },
     { id: "rainy_library_hall", nameAr: "أجواء قاعة المكتبة الماطرة", nameEn: "Rainy Library Hall", filterType: "lowpass", baseFreq: 480, license: "PROCEDURAL_ROYALTY_FREE_100%" }
   ];
 
@@ -43,7 +43,7 @@
     {
       id: "tibetan_zen_bell",
       nameAr: "جرس التأمل العميق (هادئ)",
-      nameEn: "Tibetan Zen Bell (Gentle)",
+      nameEn: "Tibetan Water Drop (Gentle)",
       tier: "gentle",
       isDefault: false,
       peakGain: 0.55,

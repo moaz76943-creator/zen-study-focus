@@ -53,7 +53,7 @@
     { id: "coffee_shop_murmur", cat: "spatial_ambient", nameAr: "همهمة المقهى البعيدة", nameEn: "Quiet Cafe Ambience", emoji: "☕", color: "#795548" },
     { id: "train_tracks", cat: "spatial_ambient", nameAr: "إيقاع عجلات القطار", nameEn: "Train on Distant Rails", emoji: "🚆", color: "#37474F" },
     { id: "deep_space_drone", cat: "spatial_ambient", nameAr: "تردد الفضاء العميق", nameEn: "Deep Space Drone", emoji: "🌌", color: "#0D47A1" },
-    { id: "tibetan_bowl_drone", cat: "spatial_ambient", nameAr: "رنين وعاء التبت الرنان", nameEn: "Tibetan Bowl Resonance", emoji: "🥣", color: "#C5A059" },
+    { id: "tibetan_bowl_drone", cat: "spatial_ambient", nameAr: "رنين وعاء التبت الرنان", nameEn: "Stream Ripple Resonance", emoji: "🥣", color: "#C5A059" },
     { id: "clock_pendulum", cat: "spatial_ambient", nameAr: "بندول الساعة الخشبية", nameEn: "Zen Pendulum Tick", emoji: "🕰️", color: "#8D6E63" }
   ];
 

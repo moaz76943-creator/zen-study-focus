@@ -12,19 +12,19 @@
   const CHOICES=Object.freeze(['zen_bell','tibetan_bowl','woodblock','crystal','gong','vibrate']);
   const ROWS={
   "en": [
-    "Zen Bell",
-    "Tibetan Bowl",
-    "Woodblock",
-    "Crystal Bell",
-    "Temple Gong",
+    "Water Drop",
+    "Stream Ripple",
+    "Rain Tap",
+    "Wind Rustle",
+    "Distant Thunder",
     "Vibration only"
   ],
   "ar": [
-    "جرس زن",
-    "الوعاء التبتي",
-    "نقرة خشبية",
-    "جرس بلوري",
-    "غونغ المعبد",
+    "قطرة ماء",
+    "خرير الماء",
+    "نقر المطر",
+    "حفيف الرياح",
+    "رعد بعيد",
     "اهتزاز فقط"
   ],
   "es": [

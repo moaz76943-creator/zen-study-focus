@@ -124,6 +124,25 @@ const { chromium } = require('playwright');
     console.warn('⚠️ Console warnings/errors:', consoleErrors);
   }
 
+
+  // 6. Check no "Advanced features unavailable" error banner & test Audio Play/Stop
+  const bannerText = await page.evaluate(() => document.body.innerText || '');
+  if (bannerText.includes('Advanced features unavailable')) {
+    throw new Error('Runtime crash banner visible: Advanced features unavailable');
+  }
+  const soundOk = await page.evaluate(() => {
+    if (window.SovereignAudioCues && typeof window.SovereignAudioCues.playAmbient === 'function') {
+      window.SovereignAudioCues.playAmbient('rain');
+      window.SovereignAudioCues.stopAmbient();
+      return true;
+    }
+    return false;
+  });
+  if (!soundOk) {
+    throw new Error('SovereignAudioCues playAmbient/stopAmbient failed');
+  }
+  console.log('✅ PASS: Zero Error Banner & Audio Play/Stop Verified');
+
   await browser.close();
   console.log('🎉 [Playwright Visual QA]: ALL MOBILE SCREEN CHECKS PASSED!');
 })();

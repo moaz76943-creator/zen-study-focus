@@ -55,8 +55,8 @@
   const I18N_STRINGS = {
     en: {
       voice_singing_bowl: "Tibetan Singing Bowl (Deep Resonance)",
-      voice_zen_bell: "Zen Bell (Crisp Clarity)",
-      voice_woodblock: "Organic Woodblock (Soft Tap)",
+      voice_zen_bell: "Water Drop (Crisp Clarity)",
+      voice_woodblock: "Organic Rain Tap (Soft Tap)",
       cue_triggered_toast: "Sensory cue triggered."
     },
     ar: {
