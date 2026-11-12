@@ -86743,3 +86743,17 @@ window.SovereignBackStack = (function() {
     };
 })();
 
+
+
+// ==============================================================================
+// SOVEREIGN BACK-STACK POPSTATE BRIDGE (TASK #738)
+// Intercepts Browser/WebView Back Navigation to Dismiss Overlays Gracefully
+// ==============================================================================
+(function() {
+    window.addEventListener("popstate", function() {
+        if (window.SovereignBackStack && window.SovereignBackStack.dismissTopOverlay()) {
+            try { history.pushState({ sovereignOverlayGuard: true }, ""); } catch(e) {}
+        }
+    });
+})();
+
