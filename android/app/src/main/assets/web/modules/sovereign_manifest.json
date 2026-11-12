@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "582.0.0",
+  "appVersion": "583.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -99,6 +99,12 @@
       "file": "modules/sovereign_habit_momentum.js",
       "required": true,
       "description": "Flexible weekly study habit and non-punitive momentum scoring."
+    },
+    {
+      "id": "sovereign_lockin_mode",
+      "file": "modules/sovereign_lockin_mode.js",
+      "required": true,
+      "description": "Zen Lock-In mode, full sensory shielding, and 3-second anti-impulse lock."
     }
   ],
   "styles": [
