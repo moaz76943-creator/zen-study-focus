@@ -221,6 +221,28 @@
         }
       }
 
+
+      // 3. Translate [placeholder], [title], and [aria-label] attributes cleanly
+      var attrTargets = document.querySelectorAll("[placeholder], [title], [aria-label]");
+      for (var a = 0; a < attrTargets.length; a++) {
+        var elA = attrTargets[a];
+        ["placeholder", "title", "aria-label"].forEach(function (attrName) {
+          if (!elA.hasAttribute(attrName)) return;
+          var origAttr = "data-orig-" + attrName;
+          if (!elA.hasAttribute(origAttr)) {
+            elA.setAttribute(origAttr, elA.getAttribute(attrName) || "");
+          }
+          var origVal = (elA.getAttribute(origAttr) || "").trim();
+          var lookup = origVal.toLowerCase().replace(/\.\.\.$/, "").trim();
+          var key = PHRASE_TO_KEY[origVal.toLowerCase()] || PHRASE_TO_KEY[lookup];
+          if (key && dict[key]) {
+            elA.setAttribute(attrName, dict[key]);
+          } else if (lang === "en" && origVal) {
+            elA.setAttribute(attrName, origVal);
+          }
+        });
+      }
+
       // 2. Translate all [data-i18n] elements
       var tagged = document.querySelectorAll("[data-i18n]");
       for (var j = 0; j < tagged.length; j++) {

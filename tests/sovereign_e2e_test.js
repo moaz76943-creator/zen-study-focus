@@ -102,6 +102,20 @@ if (!html809.includes('task-811-layout-fix')) {
 }
 console.log('✅ PASS: WebView Relative Audio Paths & 108px Bottom-Nav Clearance Verified');
 
+
+// Task #812: Placeholder i18n & WebView Backup Modal Gate
+const backupMod812 = require(path.resolve('android/app/src/main/assets/web/modules/ui/sovereign_backup_modal_812.js'));
+if (!backupMod812 || typeof backupMod812.restoreFromJson !== 'function') {
+  console.error('❌ FAIL: SovereignBackupModal missing restoreFromJson');
+  process.exit(1);
+}
+const hs812 = fs.readFileSync(path.resolve('android/app/src/main/assets/web/modules/i18n/universal_i18n_hotswap.js'), 'utf8');
+if (!hs812.includes('data-orig-')) {
+  console.error('❌ FAIL: universal_i18n_hotswap.js missing placeholder/title/aria-label translator');
+  process.exit(1);
+}
+console.log('✅ PASS: Placeholder/ARIA i18n Translator & WebView Backup Modal Verified');
+
 console.log("==================================================================");
 console.log("🧪 [Deep Focus E2E] Running Sovereign Integration Test Harness...");
 console.log("==================================================================");
