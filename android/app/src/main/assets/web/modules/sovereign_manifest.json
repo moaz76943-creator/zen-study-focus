@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "567.0.0",
+  "appVersion": "572.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -45,6 +45,12 @@
       "file": "modules/sovereign_store.js",
       "required": true,
       "description": "Unified reactive state management with atomic undo/redo."
+    },
+    {
+      "id": "sovereign_frame_pacer",
+      "file": "modules/sovereign_frame_pacer.js",
+      "required": true,
+      "description": "120Hz/144Hz variable refresh pacing and idle battery suspension."
     }
   ],
   "styles": [
