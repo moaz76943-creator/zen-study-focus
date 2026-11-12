@@ -694,6 +694,18 @@ if (!completed) {
 }
 console.log('✅ PASS: Sovereign Onboarding Tour & Phase 3 Sealing Verified');
 
+
+// Locale Pack Key Parity & Strict Digits Gate
+const cp = require('child_process');
+const parityScript = path.resolve('tools/verify_locale_parity.py');
+try {
+  cp.execSync('python3 ' + parityScript, { stdio: 'pipe' });
+} catch (err) {
+  console.error('❌ FAIL: Locale Parity Audit script failed: ' + err.message);
+  process.exit(1);
+}
+console.log('✅ PASS: Locale Pack Key Parity & Strict Digits Audit Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");
