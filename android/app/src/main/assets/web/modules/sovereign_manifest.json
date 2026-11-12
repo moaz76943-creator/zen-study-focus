@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "584.0.0",
+  "appVersion": "586.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -111,6 +111,12 @@
       "file": "modules/sovereign_session_logger.js",
       "required": true,
       "description": "Structured study session journal, multi-tag distribution, and focus quality analytics."
+    },
+    {
+      "id": "sovereign_card_exporter",
+      "file": "modules/sovereign_card_exporter.js",
+      "required": true,
+      "description": "High-DPI HTML5 Canvas study milestone card rendering and image export."
     }
   ],
   "styles": [
