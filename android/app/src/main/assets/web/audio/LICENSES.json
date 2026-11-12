@@ -1,33 +1,44 @@
 {
-  "policy": "100% CC0 1.0 Universal & Public Domain Natural Audio Recordings (Irrevocable, Zero Copyright Risk)",
+  "policy": "100% Pure Nature CC0 / Public Domain (Zero Music, Zero Meditation)",
   "files": [
     {
-      "file": "audio/rain_window.ogg",
-      "description": "Rain against the window",
-      "license": "Public Domain (PDSounds #600 / Wikimedia Commons)",
-      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Rain_against_the_window.ogg",
-      "sizeKB": 1180.0
+      "file": "rain_window.ogg",
+      "size_kb": 1180.0,
+      "license": "CC0 / Public Domain",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/41/Rain_against_the_window.ogg"
     },
     {
-      "file": "audio/forest_birds.ogg",
-      "description": "Bird singing at dawn",
-      "license": "Public Domain (PDSounds #604 / Wikimedia Commons)",
-      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bird_singing.ogg",
-      "sizeKB": 789.5
+      "file": "forest_birds.ogg",
+      "size_kb": 789.5,
+      "license": "CC0 / Public Domain",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/42/Bird_singing.ogg"
     },
     {
-      "file": "audio/flowing_water.ogg",
-      "description": "Flowing stream water",
-      "license": "CC0 1.0 Universal (Wikimedia Commons)",
-      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Flowing-water-100019.ogg",
-      "sizeKB": 338.8
+      "file": "flowing_water.ogg",
+      "size_kb": 338.8,
+      "license": "CC0 / Public Domain",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flowing-water-100019.ogg"
     },
     {
-      "file": "audio/zen_bell.ogg",
-      "description": "Vibrant meditation gong/bell",
-      "license": "CC0 1.0 Universal (Wikimedia Commons)",
-      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Gong_or_bell_vibrant_(short).ogg",
-      "sizeKB": 56.8
+      "file": "rain_thunder.ogg",
+      "size_kb": 221.6,
+      "license": "Public domain",
+      "source": "https://commons.wikimedia.org/wiki/File%3ARain_and_thunder.ogg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Rain_and_thunder.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+    },
+    {
+      "file": "wind_breeze.ogg",
+      "size_kb": 3385.9,
+      "license": "Public domain",
+      "source": "https://commons.wikimedia.org/wiki/File%3A20090610_0_ambience.ogg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/20090610_0_ambience.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+    },
+    {
+      "file": "water_drop.ogg",
+      "size_kb": 750.0,
+      "license": "Public domain",
+      "source": "https://commons.wikimedia.org/wiki/File%3ABathtub_water_splashes.ogg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Bathtub_water_splashes.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
     }
   ]
 }

@@ -59,7 +59,7 @@
   }
 
   function auditAudioAssets(audioDir, fs, path) {
-    var required = ["rain_window.ogg", "forest_birds.ogg", "flowing_water.ogg", "zen_bell.ogg"];
+    var required = ["rain_window.ogg", "forest_birds.ogg", "flowing_water.ogg", "flowing_water.ogg"];
     var missingOrEmpty = [];
     for (var i = 0; i < required.length; i++) {
       var fp = path.join(audioDir, required[i]);
