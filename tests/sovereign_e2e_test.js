@@ -530,6 +530,40 @@ if (global.SovereignAmbientDSP.getActiveNoiseType() !== null) {
 }
 console.log('✅ PASS: Pure Real-Time DSP Brown & Pink Noise Generator Verified');
 
+
+// Sovereign Spaced Repetition (SM-2) Flashcards Gate
+const srModPath = path.resolve('android/app/src/main/assets/web/modules/sovereign_spaced_repetition.js');
+require(srModPath);
+if (!global.SovereignSpacedRepetition || typeof global.SovereignSpacedRepetition.createCard !== 'function') {
+  console.error('❌ FAIL: SovereignSpacedRepetition failed to initialize');
+  process.exit(1);
+}
+const deck = global.SovereignSpacedRepetition.createDeck('math', 'Mathematics', 'Calculus and Linear Algebra');
+if (!deck || deck.id !== 'math') {
+  console.error('❌ FAIL: SovereignSpacedRepetition failed to create deck');
+  process.exit(1);
+}
+const card = global.SovereignSpacedRepetition.createCard({
+  deckId: 'math',
+  front: 'Derivative of e^x',
+  back: 'e^x'
+});
+if (!card || card.easeFactor !== 2.5) {
+  console.error('❌ FAIL: SovereignSpacedRepetition failed to initialize card with EF 2.5');
+  process.exit(1);
+}
+const reviewed = global.SovereignSpacedRepetition.reviewCard(card.id, 5);
+if (!reviewed || reviewed.repetitions !== 1 || reviewed.easeFactor <= 2.5) {
+  console.error('❌ FAIL: SovereignSpacedRepetition failed SM-2 interval/EF progression');
+  process.exit(1);
+}
+const stats = global.SovereignSpacedRepetition.getRetentionStats('math');
+if (stats.total < 1) {
+  console.error('❌ FAIL: SovereignSpacedRepetition corrupted retention stats');
+  process.exit(1);
+}
+console.log('✅ PASS: Sovereign Spaced Repetition (SM-2) Flashcards Engine Verified');
+
 console.log("==================================================================");
 console.log(`🎉 [E2E Summary]: ${__e2ePassCount} / ${__e2ePassCount} Integration Tests PASSED!`);
 console.log("==================================================================");

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "appVersion": "580.0.0",
+  "appVersion": "581.0.0",
   "architecture": "modular_event_driven",
   "coreRegistry": "modules/sovereign_core_registry.js",
   "modules": [
@@ -87,6 +87,12 @@
       "file": "modules/sovereign_ambient_dsp.js",
       "required": true,
       "description": "Pure mathematical real-time DSP Brown & Pink Noise generator without audio files."
+    },
+    {
+      "id": "sovereign_spaced_repetition",
+      "file": "modules/sovereign_spaced_repetition.js",
+      "required": true,
+      "description": "SuperMemo-2 (SM-2) Spaced Repetition engine for active recall flashcards."
     }
   ],
   "styles": [
