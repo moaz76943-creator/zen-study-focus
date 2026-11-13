@@ -14183,7 +14183,7 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   // Render user-imported vocabulary examples as inert HTML text/attributes.
   function dfEscapeExampleHtml(value) {
-    return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
   function dfRenderCardExampleTrayHtml(card) {
