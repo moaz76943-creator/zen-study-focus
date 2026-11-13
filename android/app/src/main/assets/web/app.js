@@ -68616,7 +68616,8 @@ window.dfComputeConsistencyReliabilityScore = function(successRate, totalContrac
 
 // NOTE: despite the legacy name this is a 32-bit local checksum receipt, NOT a cryptographic proof.
 window.dfGenerateCryptographicProofOfStudy = function(sessionId, durationMins, subject) {
-  const id = String(sessionId || 'sess_' + Date.now());
+  const randomPart = (typeof crypto !== 'undefined' && crypto.getRandomValues) ? Array.from(crypto.getRandomValues(new Uint32Array(2)), function(n) { return n.toString(16); }).join('') : String(Date.now());
+  const id = String(sessionId || 'sess_' + randomPart);
   const m = Number(durationMins) || 25;
   const sub = String(subject || 'General Focus');
   const rawSig = id + ':' + m + ':' + sub + ':' + Date.now();

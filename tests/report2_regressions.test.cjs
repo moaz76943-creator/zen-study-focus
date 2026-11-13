@@ -78,3 +78,11 @@ test('CodeQL-driven fixes: spelling card has no inline JS and escapes card text;
   assert.equal(ex._latexEscape('a\\b{c}'), 'a\\textbackslash{}b\\{c\\}');
   assert.ok(latex.length > 0);
 });
+
+test('STEM formula SVG escapes user input (no element/attribute injection)', () => {
+  const S = require(path.join(web, 'modules/stem/stem_typesetter_studio.js'));
+  const svg = new S().renderFormulaSvg('x<image href=x onerror=alert(1)>"\' E=mc^2');
+  assert.ok(!/<image/.test(svg) && !/onerror=alert\(1\)>/.test(svg));
+  assert.match(svg, /&lt;image/);
+  assert.match(svg, /tspan/);
+});
