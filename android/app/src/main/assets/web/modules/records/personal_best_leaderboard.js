@@ -61,12 +61,12 @@
     }
 
     _getTodayKey() {
-      return new Date().toISOString().slice(0, 10);
+      return (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
     }
 
     // M8488: dfTrackPersonalBestDailyMinutes
     dfTrackPersonalBestDailyMinutes(minutes, dateIso = null) {
-      const todayKey = dateIso ? new Date(dateIso).toISOString().slice(0, 10) : this._getTodayKey();
+      const todayKey = dateIso ? (function(v){if(typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v))return v;var d=new Date(v);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(dateIso) : this._getTodayKey();
       const currentDayTotal = (this.dailyLedger[todayKey] || 0) + (parseInt(minutes, 10) || 0);
       this.dailyLedger[todayKey] = currentDayTotal;
 
@@ -195,9 +195,9 @@
 
     // M8493: dfCalculateGhostPacerComparison
     dfCalculateGhostPacerComparison(nowDate = new Date()) {
-      const todayKey = nowDate.toISOString().slice(0, 10);
+      const todayKey = (function(v){if(typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v))return v;var d=new Date(v);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(nowDate);
       const yesterday = new Date(nowDate.getTime() - (24 * 60 * 60 * 1000));
-      const yesterdayKey = yesterday.toISOString().slice(0, 10);
+      const yesterdayKey = (function(v){if(typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v))return v;var d=new Date(v);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(yesterday);
 
       const todayMins = this.dailyLedger[todayKey] || 0;
       const yesterdayMins = this.dailyLedger[yesterdayKey] || 0;

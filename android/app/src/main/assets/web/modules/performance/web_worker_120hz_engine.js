@@ -108,7 +108,7 @@
           reps: reps,
           stability: Math.round(stability * 10) / 10,
           nextIntervalDays: nextIntervalDays,
-          scheduledDate: new Date(Date.now() + (nextIntervalDays * 86400000)).toISOString().slice(0, 10)
+          scheduledDate: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date(Date.now() + (nextIntervalDays * 86400000)))
         };
       });
 

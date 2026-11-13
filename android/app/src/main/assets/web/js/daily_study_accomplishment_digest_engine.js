@@ -23,7 +23,7 @@
   function generateDailyDigest(sessions, targetDate, options) {
     var opts = options || {};
     var locale = opts.locale || opts.lang || 'en';
-    var dateStr = targetDate || new Date().toISOString().split('T')[0];
+    var dateStr = targetDate || (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
 
     var daySessions = [];
     if (Array.isArray(sessions)) {
@@ -130,7 +130,7 @@
     var sessions = (digest && digest.sessionCount) || 0;
     var rate = (digest && digest.completionRate) || 0;
     var topSubject = (digest && digest.topTag) || 'General';
-    var dateStr = (digest && digest.date) || new Date().toISOString().split('T')[0];
+    var dateStr = (digest && digest.date) || (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
 
     var headerTitle = translate('digest.header.title', locale) || 'DAILY FOCUS DIGEST';
     var focusMinsLabel = translate('digest.metric.minutes', locale) || 'MINUTES OF FOCUS';

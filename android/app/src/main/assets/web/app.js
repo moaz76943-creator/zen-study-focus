@@ -6016,7 +6016,7 @@ const ShareCardEngine = (function() {
     const mins = document.querySelector('[class*="recorded-minutes"], .text-5xl, .stat-mins')?.textContent?.trim() || '25';
     const sessions = document.querySelector('[class*="sessions-count"], .stat-sessions')?.textContent?.trim() || '1';
     const task = s ? (s.getItem('df_focused_task_text') || 'Core Study Milestone') : 'Core Study Milestone';
-    const today = new Date().toISOString().slice(0, 10);
+    const today = (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
     return { streak, mins, sessions, task, today };
   }
 
@@ -6319,7 +6319,7 @@ const VocabAudioBankEngine = (function() {
             notes,
             color,
             reviews: 0,
-            created: new Date().toISOString().slice(0, 10)
+            created: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date())
           });
           addedCount++;
         }
@@ -6400,7 +6400,7 @@ const VocabAudioBankEngine = (function() {
     const grade = Number.isFinite(Number(gradeOpt))
       ? Math.min(4, Math.max(1, Math.round(Number(gradeOpt))))
       : (needsReview ? 1 : 3);
-    const nowIso = new Date().toISOString().slice(0, 10);
+    const nowIso = (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
     let updatedCardResult = null;
     const list = getVocabList().map(c => {
       if (c.id === cardId) {
@@ -12219,7 +12219,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 
   function dfGetTodaySynergyData() {
-    var todayKey = new Date().toISOString().slice(0, 10);
+    var todayKey = (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
     var focusMins = 0;
     try {
       var rawMins = localStorage.getItem("df_focus_today_minutes_v1");
@@ -12645,7 +12645,7 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     try {
       if (typeof document !== "undefined") {
-        var datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        var datePart = (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date()).replace(/-/g, "");
         var fileName = "deep_focus_vault_" + dfFormatWesternDigits(datePart) + ".json";
         var blob = new Blob([jsonStr], { type: "application/json" });
         var url = URL.createObjectURL(blob);
@@ -63738,7 +63738,7 @@ function() {
         code: 'MED-301',
         color: '#2563eb',
         icon: '🩺',
-        targetExamDate: new Date(now + 28 * dayMs).toISOString().slice(0, 10),
+        targetExamDate: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date(now + 28 * dayMs)),
         examWeight: 100,
         units: [
           {
@@ -63881,7 +63881,7 @@ function() {
         code: 'CS-202',
         color: '#059669',
         icon: '💻',
-        targetExamDate: new Date(now + 21 * dayMs).toISOString().slice(0, 10),
+        targetExamDate: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date(now + 21 * dayMs)),
         examWeight: 100,
         units: [
           {
@@ -64012,7 +64012,7 @@ function() {
         code: 'MATH-201',
         color: '#7c3aed',
         icon: '📐',
-        targetExamDate: new Date(now + 42 * dayMs).toISOString().slice(0, 10),
+        targetExamDate: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date(now + 42 * dayMs)),
         examWeight: 100,
         units: [
           {
@@ -64224,7 +64224,7 @@ function() {
         code: 'GEN-101',
         color: '#2563eb',
         icon: '📚',
-        targetExamDate: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+        targetExamDate: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date(Date.now() + 30 * 86400000)),
         examWeight: 100,
         units: []
       };
@@ -64412,7 +64412,7 @@ function() {
         if (typeof localStorage !== 'undefined') {
           const kH = 'df_session_history_v1';
           const raw = safeParse(localStorage.getItem(kH), []);
-          const todayIso = new Date().toISOString().slice(0, 10);
+          const todayIso = (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
           for (let i = 0; i < raw.length; i++) {
             const it = raw[i];
             if (it.completedAt && it.completedAt.slice(0, 10) === todayIso) {
@@ -66568,7 +66568,7 @@ function() {
           body: body,
           tag: 'cornell',
           cat: 'cornell',
-          date: new Date().toISOString().slice(0, 10),
+          date: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date()),
           pinned: true,
           feynmanApproved: true
         };
@@ -68793,7 +68793,7 @@ window.dfGetMilestoneM8477PeerExchangeSeal = function() {
 
 window.dfDraftPersonalFocusCommitment = function(targetHours, deadlineDate, peerWitness) {
   const h = Number(targetHours) || 20;
-  const dl = deadlineDate ? String(deadlineDate) : new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const dl = deadlineDate ? String(deadlineDate) : (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date(Date.now() + 7 * 86400000));
   const witness = String(peerWitness || 'Scholar #1 (Host)');
   const contractId = 'contract_' + Math.random().toString(36).slice(2, 9);
   return {
@@ -68922,7 +68922,7 @@ window.dfTrackPersonalBestDailyMinutes = function(mins) {
     dailyMinutes: m,
     recorded: true,
     isNewRecord: true,
-    recordDate: new Date().toISOString().slice(0, 10)
+    recordDate: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date())
   };
 };
 
@@ -70237,7 +70237,7 @@ const BotanicalGardenEngine = (function() {
       minutes: 25,
       palette: 'emerald',
       isWithered: false,
-      lastSessionDate: new Date().toISOString().slice(0, 10),
+      lastSessionDate: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date()),
       plantedCount: 0
     };
   }
@@ -70900,7 +70900,7 @@ const StreakShieldEngine = (function() {
       autoShieldEnabled: true,
       lastShieldUsedDate: null,
       history: [
-        { date: new Date().toISOString().slice(0, 10), reason: 'Default Scholar Protection Allotted' }
+        { date: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date()), reason: 'Default Scholar Protection Allotted' }
       ]
     };
   }
@@ -70911,7 +70911,7 @@ const StreakShieldEngine = (function() {
     if (st.shieldsRemaining <= 0) {
       return { success: false, message: 'No shields remaining. Complete 5 consecutive days to forge a new shield.' };
     }
-    const today = new Date().toISOString().slice(0, 10);
+    const today = (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
     st.shieldsRemaining--;
     st.protectedDaysCount++;
     st.lastShieldUsedDate = today;
@@ -70931,7 +70931,7 @@ const StreakShieldEngine = (function() {
     }
     st.shieldsRemaining++;
     st.history.unshift({
-      date: new Date().toISOString().slice(0, 10),
+      date: (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date()),
       reason: 'Forged from 5-day focus consistency!'
     });
     saveShieldState(st);
@@ -71448,7 +71448,7 @@ window.dfRecordCompletedSessionToGarden = function(minutes, domain) {
   const activeTree = BotanicalGardenEngine.getActiveTreeState();
   activeTree.minutes = (Number(activeTree.minutes) || 0) + (Number(minutes) || 25);
   activeTree.isWithered = false;
-  activeTree.lastSessionDate = new Date().toISOString().slice(0, 10);
+  activeTree.lastSessionDate = (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
   BotanicalGardenEngine.saveActiveTreeState(activeTree);
   if (typeof window.dfRefreshBotanicalStudioView === 'function') {
     window.dfRefreshBotanicalStudioView();
@@ -74504,7 +74504,7 @@ for(let i=0;i<tl.length;i++){if(String(tl[i].id)===String(s.linkedTaskId))return
 return null;}catch(e){return null;}}
 function dfComputeOptimalBreakPacing(){
 try{const kH='df_session_history_v1';const raw=typeof localStorage!=='undefined'?localStorage.getItem(kH):null;
-const h=raw?JSON.parse(raw):[];const d=new Date().toISOString().slice(0,10);
+const h=raw?JSON.parse(raw):[];const d=(function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
 const ts=h.filter(x=>(x.completedAt||x.date||'').startsWith(d));let tf=0,tb=0,cb=0;
 for(let i=ts.length-1;i>=0;i--){const s=ts[i];if(s.mode==='focus'||!s.mode){tf+=(s.durationMinutes||s.minutes||25);cb++;}
 else{tb+=(s.durationMinutes||s.minutes||5);break;}}const sh=tf/60;const rf=(cb*0.18)+(sh*0.12)-(tb*0.04);
@@ -74534,7 +74534,7 @@ function dfEvalDailyMilestones(){
 try{const kT='df_daily_targets_v1';const rT=typeof localStorage!=='undefined'?localStorage.getItem(kT):null;
 const cfg=rT?JSON.parse(rT):{};const tgtM=cfg.targetMins||120;const tgtB=cfg.targetBlocks||4;const kH='df_session_history_v1';
 const rH=typeof localStorage!=='undefined'?localStorage.getItem(kH):null;const h=rH?JSON.parse(rH):[];
-const today=new Date().toISOString().slice(0,10);let curM=0,curB=0;for(let i=0;i<h.length;i++){const s=h[i];
+const today=(function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());let curM=0,curB=0;for(let i=0;i<h.length;i++){const s=h[i];
 const d=(s.completedAt||s.date||'').slice(0,10);if(d===today&&(s.mode==='focus'||!s.mode)){curM+=(s.durationMinutes||s.minutes||25);curB++;}}
 const pct=Math.min(100,Math.round((curM/tgtM)*100));const st=pct>=100?'achieved':(pct>0?'in_progress':'pending');
 const res={focusedMins:curM,targetMins:tgtM,percent:pct,blocksCount:curB,targetBlocks:tgtB,status:st,evaluatedAt:new Date().toISOString()};
