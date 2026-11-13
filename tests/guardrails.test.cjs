@@ -27,9 +27,8 @@ test('no keystores, private keys, tokens or password literals are tracked', () =
   for (const f of files) {
     if (/\.(png|jpg|jpeg|webp|ogg|wav|mp3|jar|zip|pdf|ttf|woff2?)$/i.test(f)) continue;
     const p = path.join(root, f);
-    let st; try { st = fs.statSync(p); } catch (_) { continue; }
-    if (!st.isFile() || st.size > 6e6) continue;
-    const s = fs.readFileSync(p, 'utf8');
+    let s; try { s = fs.readFileSync(p, 'utf8'); } catch (_) { continue; }
+    if (s.length > 6e6) continue;
     for (const re of patterns) if (re.test(s)) hits.push(f + ' ~ ' + re);
   }
   assert.deepEqual(hits, []);

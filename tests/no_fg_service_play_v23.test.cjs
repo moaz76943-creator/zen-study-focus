@@ -10,7 +10,7 @@ const hasFg = m.includes(
 'foregroundServiceType');
 assert.ok(!hasFg, 'No foreground service');
 const pStr = '<service[^>]*ZenFocus' +
-'TileService[\s\S]*?<\/service>';
+'TileService[\\s\\S]*?</service>';
 const pat = new RegExp(pStr, 'g');
 const noTile = m.replace(pat, '');
 assert.ok(!noTile.includes('<service'),

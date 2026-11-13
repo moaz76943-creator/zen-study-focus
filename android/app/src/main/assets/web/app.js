@@ -209,18 +209,34 @@
       .replace(/'/g, "&#39;");
   };
 
+  // DOM-based allowlist sanitizer (no regex stripping): parse inert, drop dangerous elements,
+  // event-handler attributes and script-like URLs, then serialize.
   window.dfSanitizeHtmlFragment = function(html) {
     const raw = String(html == null ? "" : html);
-    // Repeat until stable so nested fragments such as "<scr<script>ipt>" cannot re-form after one pass.
-    var out = raw, prev;
-    do {
-      prev = out;
-      out = out
-        .replace(/<\/?(?:script|iframe|object|embed|base|meta|link)\b[^>]*>/gi, "")
-        .replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
-        .replace(/(href|src)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1=$2#$2');
-    } while (out !== prev);
-    return out;
+    if (typeof document === "undefined" || !document.createElement) {
+      // No DOM (non-browser context): reduce to plain text by removing tags until none remain.
+      var text = raw, prevText;
+      do { prevText = text; text = text.replace(/<[^<>]*>/g, ""); } while (text !== prevText);
+      return text.replace(/[<>]/g, "");
+    }
+    const tpl = document.createElement("template");
+    tpl.innerHTML = raw;
+    const blocked = { SCRIPT:1, IFRAME:1, OBJECT:1, EMBED:1, BASE:1, META:1, LINK:1, STYLE:1, FORM:1 };
+    const walk = function(node) {
+      Array.prototype.slice.call(node.children || []).forEach(function(el) {
+        if (blocked[el.tagName]) { el.remove(); return; }
+        Array.prototype.slice.call(el.attributes).forEach(function(attr) {
+          const name = attr.name.toLowerCase();
+          const val = attr.value.replace(/[\u0000-\u0020]+/g, "").toLowerCase();
+          if (name.indexOf("on") === 0 || ((name === "href" || name === "src" || name === "xlink:href" || name === "action" || name === "formaction") && /^(javascript|data|vbscript):/.test(val))) {
+            el.removeAttribute(attr.name);
+          }
+        });
+        walk(el);
+      });
+    };
+    walk(tpl.content);
+    return tpl.innerHTML;
   };
 
   window.dfSafeSetHtml = function(el, html) {
@@ -41676,7 +41692,7 @@ window.dfSafeRegexSearch = function(patternStr, targetText, maxScanLength) {
 window.dfSafeCopyToClipboard = async function(textToCopy) {
   if (!textToCopy || typeof navigator === "undefined" || !navigator.clipboard) return false;
   try {
-    const cleanText = textToCopy.replace(/<[^>]*>?/gm, "").trim(); // Strip HTML tags
+    const cleanText = String(textToCopy).replace(/[<>]/g, "").trim(); // Drop angle brackets (plain text only)
     await navigator.clipboard.writeText(cleanText);
     console.log("[CLIPBOARD] Clean text safely copied to system clipboard.");
     return true;
@@ -68450,8 +68466,8 @@ window.dfPackageStudyDeckForPeerShare = function(deckList, deckTitle) {
     cardsCount: arr.length,
     cards: arr.map(function(c) {
       return {
-        q: String(c.q || c.front || '').replace(/<[^>]*>/g, ''),
-        a: String(c.a || c.back || '').replace(/<[^>]*>/g, '')
+        q: String(c.q || c.front || '').replace(/[<>]/g, ''),
+        a: String(c.a || c.back || '').replace(/[<>]/g, '')
       };
     })
   };
@@ -68598,6 +68614,7 @@ window.dfComputeConsistencyReliabilityScore = function(successRate, totalContrac
   };
 };
 
+// NOTE: despite the legacy name this is a 32-bit local checksum receipt, NOT a cryptographic proof.
 window.dfGenerateCryptographicProofOfStudy = function(sessionId, durationMins, subject) {
   const id = String(sessionId || 'sess_' + Date.now());
   const m = Number(durationMins) || 25;
@@ -68614,7 +68631,8 @@ window.dfGenerateCryptographicProofOfStudy = function(sessionId, durationMins, s
     durationMins: m,
     subject: sub,
     valid: true,
-    signedLocal: true
+    signedLocal: true,
+    cryptographic: false
   };
 };
 
@@ -69502,7 +69520,7 @@ window.dfRenderMasterPillar8StudioDom = function(containerId) {
   }
 
   // =======================================================================
-  // SUB-TAB 3: Commitment Contracts & Cryptographic Proof of Study
+  // SUB-TAB 3: Commitment Contracts & local study receipt
   // =======================================================================
   function renderContractsTab(parent) {
     const box = document.createElement('div');
@@ -69510,7 +69528,7 @@ window.dfRenderMasterPillar8StudioDom = function(containerId) {
 
     const desc = document.createElement('div');
     desc.style.cssText = 'font-size:12px;color:#475569;line-height:1.45;';
-    desc.textContent = 'Peer-witnessed study commitments lock in daily discipline. Cryptographic proof-of-study hashes can be verified by peers without sharing private notes.';
+    desc.textContent = 'Set a weekly study commitment and a person you answer to. The receipt code below is a simple local checksum for your own records; it is not a cryptographic proof and nothing is sent to anyone.';
     box.appendChild(desc);
 
     const contractCard = document.createElement('div');
@@ -69574,7 +69592,7 @@ window.dfRenderMasterPillar8StudioDom = function(containerId) {
       const l2 = document.createElement('div');
       l2.style.fontFamily = 'monospace';
       l2.style.marginTop = '4px';
-      l2.textContent = 'Cryptographic Proof Hash: ' + proof.proofHash;
+      l2.textContent = 'Local receipt code: ' + proof.proofHash;
 
       const l3 = document.createElement('div');
       l3.style.color = '#059669';
