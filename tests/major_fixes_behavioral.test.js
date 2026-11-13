@@ -102,4 +102,12 @@ for (const fnName of ['filterNotesByTag', 'renderNotesStack', 'openNoteModal', '
   assert(!re.test(appJs), 'Shadowed collision still in app.js: ' + fnName);
 }
 
+
+// 10. Test F2 zero createOscillator() synthesis calls across audio files
+assert(!/\.createOscillator\s*\(/.test(appJs), 'app.js still calls createOscillator()');
+for (const rel of ['modules/audio/spatial_acoustic_studio.js', 'modules/core/web_audio_singleton_engine.js']) {
+  const modSrc = fs.readFileSync(path.join(repoRoot, 'android/app/src/main/assets/web', rel), 'utf8');
+  assert(!/\.createOscillator\s*\(/.test(modSrc), rel + ' still calls createOscillator()');
+}
+
 console.log('✅ PASS: All Major #1-#5 behavioral & Android hardening regression tests passed!');

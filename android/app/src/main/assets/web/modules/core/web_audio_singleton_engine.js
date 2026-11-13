@@ -62,7 +62,7 @@
             if (!ctx) return;
 
             try {
-                const osc = ctx.createOscillator();
+                const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
                 const gain = ctx.createGain();
 
                 osc.type = "sine";
@@ -87,7 +87,7 @@
             if (!ctx) return;
 
             try {
-                const osc = ctx.createOscillator();
+                const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
                 const gain = ctx.createGain();
 
                 osc.type = "sine";
@@ -113,7 +113,7 @@
 
             try {
                 [528, 660, 792].forEach((freq, index) => {
-                    const osc = ctx.createOscillator();
+                    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
                     const gain = ctx.createGain();
                     const startTime = ctx.currentTime + (index * 0.22);
 

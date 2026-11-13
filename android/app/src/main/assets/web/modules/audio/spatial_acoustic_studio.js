@@ -241,7 +241,7 @@
       const swellGain = this.audioCtx.createGain();
       swellGain.gain.setValueAtTime(0.5, this.audioCtx.currentTime);
 
-      const lfo = this.audioCtx.createOscillator();
+      const lfo = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       lfo.frequency.setValueAtTime(0.08, this.audioCtx.currentTime);
       const lfoGain = this.audioCtx.createGain();
       lfoGain.gain.setValueAtTime(0.4, this.audioCtx.currentTime);
@@ -263,7 +263,7 @@
     create40HzBinauralBeat() {
       const merger = this.audioCtx.createChannelMerger(2);
 
-      const oscLeft = this.audioCtx.createOscillator();
+      const oscLeft = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       oscLeft.type = 'sine';
       oscLeft.frequency.setValueAtTime(216, this.audioCtx.currentTime);
       const gainLeft = this.audioCtx.createGain();
@@ -271,7 +271,7 @@
       oscLeft.connect(gainLeft);
       gainLeft.connect(merger, 0, 0);
 
-      const oscRight = this.audioCtx.createOscillator();
+      const oscRight = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       oscRight.type = 'sine';
       oscRight.frequency.setValueAtTime(256, this.audioCtx.currentTime);
       const gainRight = this.audioCtx.createGain();
