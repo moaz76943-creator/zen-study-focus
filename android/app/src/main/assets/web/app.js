@@ -278,11 +278,6 @@ if (typeof UnhandledErrorShield !== "undefined") {
 }
 
 
-// [Task #680] Safe DOM Proxy Shield Initialization
-if (typeof SafeDOMProxyShield !== "undefined") {
-    SafeDOMProxyShield.init();
-}
-
 window.df_i18n_locales = window.df_i18n_locales || { en: {} };
 
 /* ========================================================
@@ -3313,13 +3308,18 @@ function applyLanguage(code) {
 
   renderAnalyticsBars();
 
-  syncHeaderMetrics();
-  updateTimerDisplay();
-  renderTasksList();
-  renderCalendar();
-  renderNotesStack();
-  renderSoundsStudio();
-  updateSyllabusCalc();
+  // One failing renderer must never abort the rest of the language switch
+  // (modal close, quick-training text and premium locale layer run after these).
+  // Thunks: renderNotesStack/renderSoundsStudio live in scripts loaded after app.js,
+  // so at first boot they do not exist yet (a ReferenceError here used to abort the
+  // whole app.js boot sequence). A late re-apply on window load covers those screens.
+  [() => syncHeaderMetrics(), () => updateTimerDisplay(), () => renderTasksList(),
+   () => renderCalendar(), () => renderNotesStack(), () => renderSoundsStudio(),
+   () => updateSyllabusCalc()].forEach(step => {
+    try { step(); } catch (error) {
+      if (!(error instanceof ReferenceError)) console.error('applyLanguage step failed:', error);
+    }
+  });
   closeModal('langModal');
   if (typeof quickL10n === 'function') quickL10n();
   // Premium labels may also be created by re-rendered screens; refresh last.
