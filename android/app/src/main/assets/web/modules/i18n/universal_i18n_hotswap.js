@@ -337,6 +337,13 @@
         }
       }
 
+
+      // Task #834: Force Western digits in native <input type="date"> even on Arabic Android OS
+      var dInputs = document.querySelectorAll('input[type="date"]');
+      for (var di = 0; di < dInputs.length; di++) {
+        dInputs[di].setAttribute("lang", "en");
+      }
+
       // 2. Translate all [data-i18n] elements
       var tagged = document.querySelectorAll("[data-i18n]");
       for (var j = 0; j < tagged.length; j++) {
