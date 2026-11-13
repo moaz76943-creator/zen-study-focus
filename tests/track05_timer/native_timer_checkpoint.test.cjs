@@ -1,5 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm');
+function runWithStubs(code,ctx){ctx.setPlayButtonIcon=ctx.setPlayButtonIcon||function(){};if(ctx.timerTotal===undefined)ctx.timerTotal=0;return require('node:vm').runInNewContext(code,ctx);}
+
 const fs=require('node:fs'),path=require('node:path');
 const app=fs.readFileSync(path.resolve(__dirname,'../../android/app/src/main/assets/web/app.js'),'utf8');
 const java=fs.readFileSync(path.resolve(__dirname,'../../android/app/src/main/java/com/zenstudy/focus/MainActivity.java'),'utf8');
@@ -31,7 +33,7 @@ function storageFixture(accept){
   saveFortressData(k,snapshot){assert.equal(k,key);const raw=packet(snapshot);map.set(key,raw);map.set(key+'_mirror',raw);events.push(['browser',raw]);return true;},
   showToast(){events.push(['error']);},L:()=>({saveFailed:'Save failed'})
  };
- vm.runInNewContext(actual('storeTimerSession','creditCompletedSession'),context);
+ runWithStubs(actual('storeTimerSession','creditCompletedSession'),context);
  return {context,map,events,old1,old2};
 }
 test('paused snapshot obtains a native durable receipt after writing the unchanged legacy packet',()=>{
@@ -64,7 +66,7 @@ test('reopening uses verified fsynced native pause checkpoint, not a stale WebVi
  assert.ok(a>=0&&b>a);
  const readA=app.indexOf('function readNativeTimerSession() {'),readB=app.indexOf('function creditCompletedSession()',readA);
  assert.ok(readA>=0&&readB>readA);
- vm.runInNewContext(app.slice(readA,readB)+'\n'+app.slice(a,b),ctx);
+ runWithStubs(app.slice(readA,readB)+'\n'+app.slice(a,b),ctx);
  ctx.restoreTimerSession();
  assert.equal(ctx.timerSessionId,'stable-id');
  assert.equal(ctx.timerLeft,1344);
@@ -83,7 +85,7 @@ test('rejected native Pause receipt cannot stop service, lose ID or report a pau
   accumulateActiveTime(){ctx.timerActiveMs+=2000;ctx.timerResumeMs=null},
   storeTimerSession:()=>false,updateTimerDisplay(){}
  };
- vm.runInNewContext(actual('toggleTimerPlay','resetTimerNow'),ctx);
+ runWithStubs(actual('toggleTimerPlay','resetTimerNow'),ctx);
  assert.equal(ctx.toggleTimerPlay(),false);
  assert.equal(ctx.timerRunning,true);
  assert.equal(ctx.timerSessionId,'active-id');
@@ -101,7 +103,7 @@ test('rejected start receipt cannot create a phantom running session or native a
   startNativeTimerForCurrentSession(){starts++},
   setInterval(){throw Error('No interval may start without ACK')}
  };
- vm.runInNewContext(actual('toggleTimerPlay','resetTimerNow'),ctx);
+ runWithStubs(actual('toggleTimerPlay','resetTimerNow'),ctx);
  assert.equal(ctx.toggleTimerPlay(),false);
  assert.equal(ctx.timerRunning,false);
  assert.equal(ctx.timerSessionId,null);
