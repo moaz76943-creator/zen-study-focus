@@ -898,9 +898,38 @@ function computeHash(str) {
   return (h >>> 0).toString(16);
 }
 
+// Data schema guard: the app understands v21 packets. If a newer build ever wrote a higher schema
+// (user downgraded the app), writing with this older code could destroy data it cannot read, so
+// the storage layer turns read-only instead of overwriting.
+const DF_DATA_SCHEMA = 21;
+const DF_DATA_SCHEMA_KEY = 'df_data_schema_v1';
+function dfDataSchemaTooNew() {
+  try {
+    const stored = Number(localStorage.getItem(DF_DATA_SCHEMA_KEY));
+    return Number.isFinite(stored) && stored > DF_DATA_SCHEMA;
+  } catch (_) { return false; }
+}
+// Parse stored JSON without letting prototype-polluting keys through.
+function dfSafeJsonParse(text) {
+  return JSON.parse(text, (k, v) => (k === '__proto__' || k === 'constructor' || k === 'prototype') ? undefined : v);
+}
+// A value that fails validation is kept (never silently overwritten): copy it to a bounded quarantine.
+function dfQuarantineRaw(key, raw) {
+  try {
+    if (typeof raw !== 'string' || !raw || raw.length > 400000) return;
+    const tag = 'df_quarantine_' + key;
+    const lastKey = tag + '_last';
+    if (localStorage.getItem(lastKey) === String(raw.length) + ':' + raw.slice(0, 64)) return;
+    const slotKey = tag + '_' + (Date.now() % 3);
+    localStorage.setItem(slotKey, raw);
+    localStorage.setItem(lastKey, String(raw.length) + ':' + raw.slice(0, 64));
+  } catch (_) { /* quarantine is best effort; never block boot */ }
+}
+
 function saveFortressData(key, obj) {
   // Legacy single-family write: verify BOTH durable packet copies before acknowledging success.
   // New multi-family Notes/Tasks edits still use DF22Integration's atomic journal.
+  if (dfDataSchemaTooNew()) throw new Error('DATA_SCHEMA_NEWER_THAN_APP');
   const raw = JSON.stringify(obj);
   if (typeof raw !== 'string') throw new Error('STORAGE_VALUE_NOT_SERIALIZABLE');
   const packet = JSON.stringify({payload:raw, sig:computeHash(raw), ts:Date.now()});
@@ -912,6 +941,7 @@ function saveFortressData(key, obj) {
     localStorage.setItem(mirrorKey, packet);
     if (localStorage.getItem(key) !== packet || localStorage.getItem(mirrorKey) !== packet)
       throw new Error('STORAGE_WRITE_NOT_VERIFIED');
+    try { if (localStorage.getItem(DF_DATA_SCHEMA_KEY) === null) localStorage.setItem(DF_DATA_SCHEMA_KEY, String(DF_DATA_SCHEMA)); } catch (_) { /* optional marker */ }
     // Android requires a durable six-family receipt, separate from #402 timer.
     if (['zen_fortress_cfg_v21','zen_fortress_tasks_v21','zen_fortress_notes_v21'].includes(key)
         && window.ZenNative && (!window.DF22Preflight || !window.DF22Preflight.nativeAcknowledge(localStorage)))
@@ -935,23 +965,38 @@ function saveFortressData(key, obj) {
 
 function loadFortressData(key, defaultObj) {
   const tryRead = k => {
+    let item = null;
     try {
-      const item = localStorage.getItem(k);
-      if (!item) return {valid:false};
-      const packet = JSON.parse(item);
+      item = localStorage.getItem(k);
+      if (!item) return {valid:false, empty:true};
+      const packet = dfSafeJsonParse(item);
       if (!packet || typeof packet.payload !== 'string'
-          || computeHash(packet.payload) !== packet.sig) return {valid:false};
-      return {valid:true, value:JSON.parse(packet.payload)};
+          || computeHash(packet.payload) !== packet.sig) return {valid:false, raw:item};
+      return {valid:true, value:dfSafeJsonParse(packet.payload)};
     } catch (e) {
       // A corrupt primary must not prevent recovery from its healthy mirror.
-      return {valid:false};
+      return {valid:false, raw:item};
     }
   };
   const primary = tryRead(key);
   if (primary.valid) return primary.value;
   const mirror = tryRead(key + '_mirror');
-  return mirror.valid ? mirror.value : defaultObj;
+  if (mirror.valid) {
+    // Keep the damaged primary for diagnosis; the next save re-creates both copies from healthy data.
+    if (primary.raw) dfQuarantineRaw(key, primary.raw);
+    return mirror.value;
+  }
+  if (primary.raw) dfQuarantineRaw(key, primary.raw);
+  if (mirror.raw) dfQuarantineRaw(key + '_mirror', mirror.raw);
+  return defaultObj;
 }
+window.dfStorageUsage = function() {
+  // Approximate bytes used by this origin's localStorage (UTF-16) versus a conservative 5 MB budget.
+  let chars = 0;
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); chars += k.length + (localStorage.getItem(k) || '').length; } } catch (_) { /* unreadable */ }
+  const bytes = chars * 2, budget = 5 * 1024 * 1024;
+  return { bytes, budget, ratio: Math.min(1, bytes / budget), warn: bytes / budget >= 0.7 };
+};
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 
