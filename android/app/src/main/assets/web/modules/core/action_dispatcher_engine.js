@@ -50,11 +50,16 @@
 
         registerDefaultHandlers: function () {
             const self = this;
-            this.register("domBtn-study", function () { self.applyPreset("study", 25 * 60, "مذاكرة مركزة (25:00)"); });
-            this.register("domBtn-sport", function () { self.applyPreset("sport", 30 * 60, "تمارين واستراحة نشطة (30:00)"); });
-            this.register("domBtn-read", function () { self.applyPreset("read", 20 * 60, "قراءة واستيعاب (20:00)"); });
-            this.register("domBtn-work", function () { self.applyPreset("work", 50 * 60, "عمل عميق مكثف (50:00)"); });
-            this.register("modelLongBtn", function () { self.applyPreset("long_break", 15 * 60, "استراحة طويلة (15:00)"); });
+            // Labels follow the page language instead of being hard-coded Arabic.
+            const t = function (ar, en) {
+                const lang = (typeof document !== "undefined" && document.documentElement && document.documentElement.lang) || "";
+                return String(lang).toLowerCase().indexOf("ar") === 0 ? ar : en;
+            };
+            this.register("domBtn-study", function () { self.applyPreset("study", 25 * 60, t("مذاكرة مركزة (25:00)", "Focused study (25:00)")); });
+            this.register("domBtn-sport", function () { self.applyPreset("sport", 30 * 60, t("تمارين واستراحة نشطة (30:00)", "Workout & active rest (30:00)")); });
+            this.register("domBtn-read", function () { self.applyPreset("read", 20 * 60, t("قراءة واستيعاب (20:00)", "Reading & comprehension (20:00)")); });
+            this.register("domBtn-work", function () { self.applyPreset("work", 50 * 60, t("عمل عميق مكثف (50:00)", "Deep work (50:00)")); });
+            this.register("modelLongBtn", function () { self.applyPreset("long_break", 15 * 60, t("استراحة طويلة (15:00)", "Long break (15:00)")); });
 
             this.register("homeQuick10", function () { self.setDurationSeconds(10 * 60, "10:00"); });
             this.register("homeQuick25", function () { self.setDurationSeconds(25 * 60, "25:00"); });
@@ -145,20 +150,14 @@
                 } else if (hasWin && window.timerState) {
                     window.timerState.isRunning = false;
                 }
-                if (startBtn) {
-                    startBtn.textContent = "▶️ متابعة";
-                    if (startBtn.setAttribute) startBtn.setAttribute("aria-label", "متابعة الجلسة");
-                }
+                // Button text / aria-label belong to the app's own localized renderer.
             } else {
                 if (hasWin && typeof window.startTimer === "function") {
                     window.startTimer();
                 } else if (hasWin && window.timerState) {
                     window.timerState.isRunning = true;
                 }
-                if (startBtn) {
-                    startBtn.textContent = "⏸️ إيقاف مؤقت";
-                    if (startBtn.setAttribute) startBtn.setAttribute("aria-label", "إيقاف مؤقت للجلسة");
-                }
+                // Button text / aria-label belong to the app's own localized renderer.
             }
             this.triggerHapticFeedback();
         },
@@ -215,18 +214,16 @@
             const self = this;
             Object.keys(this.handlers).forEach(id => {
                 const el = document.getElementById(id);
-                if (el) {
-                    el.onclick = function (e) {
-                        if (e && e.preventDefault) e.preventDefault();
-                        self.handlers[id](el, e);
-                    };
-                    if (el.setAttribute) el.setAttribute("data-action-bound", "true");
-                }
+                // Clicks are handled once, by the delegated listener below. Also assigning
+                // el.onclick made every handler run twice per tap (Start toggled start+pause).
+                if (el && el.setAttribute) el.setAttribute("data-action-bound", "true");
             });
         },
 
         setupEventDelegation: function () {
             if (typeof document === "undefined" || !document.body || !document.body.addEventListener) return;
+            if (this._delegated) return;
+            this._delegated = true;
             const self = this;
             document.body.addEventListener("click", function (e) {
                 if (!e || !e.target || typeof e.target.closest !== "function") return;
