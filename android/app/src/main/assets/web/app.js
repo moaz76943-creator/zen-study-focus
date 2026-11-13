@@ -50397,9 +50397,9 @@ window.dfTimeBoxMount = {
       row.style.padding = '6px 0';
       row.style.borderBottom = '1px solid #27272a';
       row.innerHTML = '<span style="color:#a1a1aa">' +
-        (b.slot || '09:00') + '</span> ' +
+        escapeHtmlText(b.slot || '09:00') + '</span> ' +
         '<strong style="color:#f4f4f5">' +
-        (b.subject || 'Focus') + '</strong>';
+        escapeHtmlText(b.subject || 'Focus') + '</strong>';
       wrap.appendChild(row);
     });
   }
@@ -67775,7 +67775,7 @@ function() {
           jInfo.suggestions.forEach(function(sug) {
             const row = document.createElement('div');
             row.style.cssText = 'font-size:11px;color:#334155;display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;background:#fee2e2;border:1px solid #fecaca;';
-            row.innerHTML = '<strong style="color:#b91c1c;">' + sug.word + '</strong> ➔ <span style="color:#15803d;font-weight:700;">' + sug.simpleAlt + '</span>';
+            row.innerHTML = '<strong style="color:#b91c1c;">' + escapeHtmlText(sug.word) + '</strong> ➔ <span style="color:#15803d;font-weight:700;">' + escapeHtmlText(sug.simpleAlt) + '</span>';
             listCard.appendChild(row);
           });
           resBox.appendChild(listCard);
@@ -80374,8 +80374,8 @@ window.SovereignSRSReviewer = (function() {
         }
 
         const card = dueCards[currentCardIndex];
-        frontEl.innerHTML = `<div style="font-size: 1.1rem; line-height: 1.6; color: #fff;">${card.front}</div><div style="font-size: 0.8rem; color: #666; margin-top: 1rem;">انقر لقلب البطاقة | Tap to Flip</div>`;
-        backEl.innerHTML = `<div style="font-size: 1.05rem; line-height: 1.6; color: #4ade80;">${card.back}</div>`;
+        frontEl.innerHTML = `<div style="font-size: 1.1rem; line-height: 1.6; color: #fff;">${escapeHtmlText(card.front)}</div><div style="font-size: 0.8rem; color: #666; margin-top: 1rem;">انقر لقلب البطاقة | Tap to Flip</div>`;
+        backEl.innerHTML = `<div style="font-size: 1.05rem; line-height: 1.6; color: #4ade80;">${escapeHtmlText(card.back)}</div>`;
         if (counterEl) counterEl.textContent = dueCards.length - currentCardIndex;
     }
 
@@ -80536,14 +80536,14 @@ window.SovereignSRSReviewer = (function() {
 
         const card = dueCards[currentCardIndex];
         frontEl.innerHTML = `
-            <div style="font-size: clamp(1rem, 2.8vw, 1.25rem); line-height: 1.6; color: #fff; width: 100%; text-align: center;">${card.front}</div>
+            <div style="font-size: clamp(1rem, 2.8vw, 1.25rem); line-height: 1.6; color: #fff; width: 100%; text-align: center;">${escapeHtmlText(card.front)}</div>
             <div style="display:flex; justify-content:space-between; align-items:center; width: 100%; margin-top: 1rem;">
                 <button type="button" class="btn" onclick="event.stopPropagation(); window.SovereignSRSReviewer.speak(window.SovereignSRSReviewer.getCurrentFront())" style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; border-radius: 6px; padding: 6px 12px; font-size: 0.85rem;" title="Listen">🔊 نطق</button>
                 <span style="font-size: 0.75rem; color: #666;">انقر لقلب البطاقة | Tap to Flip</span>
             </div>`;
 
         backEl.innerHTML = `
-            <div style="font-size: clamp(0.95rem, 2.5vw, 1.15rem); line-height: 1.6; color: #4ade80; width: 100%; text-align: center;">${card.back}</div>
+            <div style="font-size: clamp(0.95rem, 2.5vw, 1.15rem); line-height: 1.6; color: #4ade80; width: 100%; text-align: center;">${escapeHtmlText(card.back)}</div>
             <div style="display:flex; justify-content:flex-end; width: 100%; margin-top: 0.8rem;">
                 <button type="button" class="btn" onclick="event.stopPropagation(); window.SovereignSRSReviewer.speak(window.SovereignSRSReviewer.getCurrentBack())" style="background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; border-radius: 6px; padding: 6px 12px; font-size: 0.85rem;" title="Listen Answer">🔊 نطق الإجابة</button>
             </div>`;

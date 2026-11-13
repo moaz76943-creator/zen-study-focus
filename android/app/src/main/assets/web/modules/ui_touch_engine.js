@@ -35,7 +35,13 @@
       const before = word.substring(0, orpIdx);
       const orpChar = word.charAt(orpIdx);
       const after = word.substring(orpIdx + 1);
-      display.innerHTML = `${before}<span style="color:#2563EB;font-weight:800;text-decoration:underline;">${orpChar}</span>${after}`;
+      display.textContent = '';
+      display.appendChild(document.createTextNode(before));
+      const orpSpan = document.createElement('span');
+      orpSpan.style.cssText = 'color:#2563EB;font-weight:800;text-decoration:underline;';
+      orpSpan.textContent = orpChar;
+      display.appendChild(orpSpan);
+      display.appendChild(document.createTextNode(after));
     }
   }
 
@@ -115,7 +121,13 @@
         const b = word.substring(0, orp);
         const o = word.charAt(orp);
         const a = word.substring(orp + 1);
-        displayEl.innerHTML = `${b}<span style="color:#2563EB;font-weight:800;text-decoration:underline;">${o}</span>${a}`;
+        displayEl.textContent = '';
+        displayEl.appendChild(document.createTextNode(b));
+        const orpSpan = document.createElement('span');
+        orpSpan.style.cssText = 'color:#2563EB;font-weight:800;text-decoration:underline;';
+        orpSpan.textContent = o;
+        displayEl.appendChild(orpSpan);
+        displayEl.appendChild(document.createTextNode(a));
       }
     }
 

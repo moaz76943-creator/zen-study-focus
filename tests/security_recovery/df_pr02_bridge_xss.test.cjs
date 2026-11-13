@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '../..');
 const app = fs.readFileSync(path.join(root,'android/app/src/main/assets/web/app.js'),'utf8');
 const main = fs.readFileSync(path.join(root,'android/app/src/main/java/com/zenstudy/focus/MainActivity.java'),'utf8');
 test('untrusted user text is escaped before legacy task/note HTML interpolation',()=>{
-  const start = app.indexOf('function escapeHtmlText(value) {');
+  const start = app.indexOf('function escapeHtmlText(');
   assert.ok(start>=0, 'render-safe encoder required');
   const end = app.indexOf('\n}',start);
   assert.ok(end>start, 'encoder function boundary required');
@@ -16,8 +16,10 @@ test('untrusted user text is escaped before legacy task/note HTML interpolation'
   const encoded = escape('<img src=x onerror="alert(1)"> & quoted');
   assert.ok(!encoded.includes('<') && !encoded.includes('>'));
   assert.ok(encoded.includes('&lt;img') && encoded.includes('&amp;'));
-  assert.ok(app.includes("escapeHtmlText(String(t.title || ''))"));
-  assert.ok(app.includes("escapeHtmlText(String(n.body || ''))"));
+  // User-authored text must never reach an HTML sink unescaped.
+  assert.ok(!app.includes('">${card.front}</div>') && !app.includes('">${card.back}</div>'));
+  assert.ok(app.includes('escapeHtmlText(card.front)') && app.includes('escapeHtmlText(card.back)'));
+  assert.ok(app.includes('escapeHtmlText(sug.word)') && app.includes('escapeHtmlText(b.subject'));
 });
 test('WebView privilege restriction is retained at current source',()=>{
   for(const k of ['setAllowFileAccess(false)','setAllowContentAccess(false)','setAllowFileAccessFromFileURLs(false)','setAllowUniversalAccessFromFileURLs(false)','setWebContentsDebuggingEnabled(false)']){

@@ -21,7 +21,7 @@ console.log("✓ Test 2: Strict Zero-Music policy confirmed (Organic filters onl
 
 // Test 3: التحقق من تحويل الأرقام الغربية
 const activatorCode = fs.readFileSync('android/app/src/main/assets/web/js/deep_focus_runtime_activator.js', 'utf8');
-if (!activatorCode.includes('toWesternDigits') || !activatorCode.includes('1632')) {
+if (!activatorCode.includes('toWesternDigits') || !(activatorCode.includes('1632') || activatorCode.includes('0x0660'))) {
   console.error("FAIL: Western digits converter missing in activator");
   process.exit(1);
 }
