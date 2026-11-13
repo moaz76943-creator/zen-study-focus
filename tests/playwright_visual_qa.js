@@ -49,6 +49,43 @@ async function runDeepDomAudit(page, contextLabel, activeLang) {
       }
     }
 
+    
+    // D. WCAG Relative Luminance Contrast Auditor (catches invisible text like white-on-white)
+    const parseRgb = (str) => {
+      const m = (str || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+      if (!m) return null;
+      return { r: +m[1], g: +m[2], b: +m[3], a: m[4] !== undefined ? +m[4] : 1 };
+    };
+    const relLum = ({ r, g, b }) => {
+      const ch = [r, g, b].map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+    };
+    const getEffectiveBg = (el) => {
+      let cur = el;
+      while (cur && cur !== document.documentElement) {
+        const bg = parseRgb(window.getComputedStyle(cur).backgroundColor);
+        if (bg && bg.a > 0.2) return bg;
+        cur = cur.parentElement;
+      }
+      return { r: 248, g: 250, b: 252, a: 1 };
+    };
+    for (const btn of clickables) {
+      const txt = (btn.innerText || '').trim();
+      if (!txt || txt.length < 2) continue;
+      const fg = parseRgb(window.getComputedStyle(btn).color);
+      const bg = getEffectiveBg(btn);
+      if (fg && bg) {
+        const l1 = relLum(fg), l2 = relLum(bg);
+        const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        if (ratio < 2.5) {
+          issues.push(`[LOW_CONTRAST ratio=${ratio.toFixed(2)}] "${txt.slice(0, 28)}" fg=rgb(${fg.r},${fg.g},${fg.b}) bg=rgb(${bg.r},${bg.g},${bg.b})`);
+        }
+      }
+    }
+
     // C. Horizontal Overflow Check
     if (document.documentElement.scrollWidth > window.innerWidth + 4) {
       issues.push(`[HORIZONTAL_OVERFLOW] scrollWidth=${document.documentElement.scrollWidth} > innerWidth=${window.innerWidth}`);

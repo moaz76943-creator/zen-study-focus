@@ -1149,3 +1149,6 @@ console.log("=================================================================="
 
 // Task #822: Permanent 20-Language Parity & Leak Gate
 require("../android/app/src/main/assets/web/modules/qa/sovereign_i18n_permanent_gate.js").runPermanentI18nAndAssetGate(process.cwd());
+
+// Task #823: Zero-Broken-Audio-Reference Gate
+require("../android/app/src/main/assets/web/modules/qa/sovereign_audio_link_audit.js").runAudioLinkAudit(process.cwd());
