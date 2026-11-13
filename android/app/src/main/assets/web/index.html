@@ -1687,11 +1687,12 @@ body {
     }
   }
 </style>
-<!-- TASK #833: Fix Bottom-Nav 📄 Button Alignment & 🔒 Local Data Span Contrast -->
-<style id="task-833-ui-hotfix">
+
+<!-- TASK #835: Verified Bottom-Nav Alignment, 🔒 Span Contrast & Clean 412px Padding -->
+<style id="task-835-master-ui">
   nav button, .bottom-nav button, #bottomNav button, .nav-btn {
-    padding-bottom: 8px !important;
     padding-top: 8px !important;
+    padding-bottom: 8px !important;
     height: auto !important;
     min-height: 44px !important;
     align-self: center !important;
@@ -1700,10 +1701,13 @@ body {
     padding-bottom: 120px !important;
   }
   [data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *,
-  #localDataBadge, #localDataBadge *,
-  button:has([data-i18n="ui_local_data"]) {
+  #localDataBadge, #localDataBadge * {
     color: #0F172A !important;
     opacity: 1 !important;
+  }
+  input[type="date"] {
+    font-variant-numeric: tabular-nums !important;
+    direction: ltr !important;
   }
 </style>
 </head>
