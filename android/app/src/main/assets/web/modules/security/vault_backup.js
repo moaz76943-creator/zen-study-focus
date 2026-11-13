@@ -111,23 +111,38 @@
 
             const dec = new TextDecoder();
             const jsonStr = dec.decode(decryptedBuffer);
-            const dataObj = JSON.parse(jsonStr);
+            const dataObj = JSON.parse(jsonStr, (k, v) => (k === '__proto__' || k === 'constructor' || k === 'prototype') ? undefined : v);
+            if (!dataObj || typeof dataObj !== 'object' || Array.isArray(dataObj)) throw new Error('Vault file has an invalid structure.');
 
-            // Commit restored records to local storage
-            if (Array.isArray(dataObj.flashcards)) {
-                localStorage.setItem('df_flashcards_v1', JSON.stringify(dataObj.flashcards));
+            // 1) Validate every record BEFORE touching user data. 2) Snapshot. 3) Write and verify. 4) Roll back on any failure.
+            const plan = [];
+            const addArray = (field, key) => {
+                if (dataObj[field] === undefined) return;
+                if (!Array.isArray(dataObj[field])) throw new Error('Vault field "' + field + '" must be a list.');
+                plan.push([key, JSON.stringify(dataObj[field])]);
+            };
+            addArray('flashcards', 'df_flashcards_v1');
+            addArray('notes', 'df_trizone_notes_v1');
+            addArray('docs', 'df_reader_docs_v1');
+            if (dataObj.syllabus !== undefined) {
+                if (!dataObj.syllabus || typeof dataObj.syllabus !== 'object' || Array.isArray(dataObj.syllabus)) throw new Error('Vault field "syllabus" must be an object.');
+                plan.push(['df_syllabus_roadmap_v1', JSON.stringify(dataObj.syllabus)]);
             }
-            if (Array.isArray(dataObj.notes)) {
-                localStorage.setItem('df_trizone_notes_v1', JSON.stringify(dataObj.notes));
+            addArray('cognitiveHistory', 'df_cognitive_history_v1');
+            for (const [key, text] of plan) {
+                if (typeof text !== 'string' || text.length > 2 * 1024 * 1024) throw new Error('Vault record too large: ' + key);
             }
-            if (Array.isArray(dataObj.docs)) {
-                localStorage.setItem('df_reader_docs_v1', JSON.stringify(dataObj.docs));
-            }
-            if (dataObj.syllabus) {
-                localStorage.setItem('df_syllabus_roadmap_v1', JSON.stringify(dataObj.syllabus));
-            }
-            if (Array.isArray(dataObj.cognitiveHistory)) {
-                localStorage.setItem('df_cognitive_history_v1', JSON.stringify(dataObj.cognitiveHistory));
+            const snapshot = plan.map(([key]) => [key, localStorage.getItem(key)]);
+            try {
+                for (const [key, text] of plan) {
+                    localStorage.setItem(key, text);
+                    if (localStorage.getItem(key) !== text) throw new Error('STORAGE_WRITE_NOT_VERIFIED: ' + key);
+                }
+            } catch (err) {
+                for (const [key, old] of snapshot) {
+                    try { if (old === null) localStorage.removeItem(key); else localStorage.setItem(key, old); } catch (_) { /* best-effort rollback */ }
+                }
+                throw err;
             }
 
             return {

@@ -99,3 +99,9 @@ test('completion tones use bundled recordings, never synthesized sound', () => {
   const i = app.indexOf('function playCompletionTone');
   assert.ok(!/createOscillator|__dfNoopOsc/.test(app.slice(i, i + 2500)));
 });
+
+test('app.js derives calendar days from local date parts (no UTC day slicing)', () => {
+  const app = fs.readFileSync(path.join(web, 'app.js'), 'utf8');
+  const hits = app.split('\n').filter((l) => /toISOString\(\)\.(split\(["']T["']\)\[0\]|slice\(0, ?10\))/.test(l) && !/sessionUtcDate/.test(l));
+  assert.deepEqual(hits.map((h) => h.trim().slice(0, 80)), [], 'use dfLocalDayKey() instead');
+});
