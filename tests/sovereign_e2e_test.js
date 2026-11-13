@@ -1173,3 +1173,6 @@ require("../android/app/src/main/assets/web/modules/qa/sovereign_compliance_gate
   }
   console.log("✅ PASS: Global WebView Runtime Error Shield Verified (#828)");
 })();
+
+// Task #829: HTML Script/Link Integrity & Safe Storage Gate
+require("../android/app/src/main/assets/web/modules/qa/sovereign_script_integrity_audit_829.js").runScriptIntegrityAudit(process.cwd());
