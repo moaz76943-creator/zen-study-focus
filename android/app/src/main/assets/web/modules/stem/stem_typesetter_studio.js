@@ -139,7 +139,9 @@
       const width = options.width || 420;
 
       // Parse superscripts (e.g. ^2, ^t, ^-)
-      let formattedHtml = text
+      // The formula is user input placed into SVG markup: escape it first so it can never inject elements or attributes.
+      const safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      let formattedHtml = safeText
         .replace(/\^([0-9a-zA-Z\+\-\*\(\)]+)/g, '<tspan dy="-0.5em" font-size="0.75em" fill="#2563EB">$1</tspan><tspan dy="0.5em">&#8203;</tspan>')
         .replace(/_([0-9a-zA-Z\+\-\*\(\)]+)/g, '<tspan dy="0.3em" font-size="0.75em" fill="#64748B">$1</tspan><tspan dy="-0.3em">&#8203;</tspan>');
 
