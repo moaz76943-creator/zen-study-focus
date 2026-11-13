@@ -7205,6 +7205,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   function buildCsvText(items) {
@@ -7487,6 +7489,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   function shuffleArray(arr) {
@@ -7698,6 +7702,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfGetVocabMasteryStats = function() {
@@ -7787,6 +7793,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfMarkAllReviewAsMastered = function() {
@@ -8099,6 +8107,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfGetVocabCountsByFilter = function() {
@@ -8163,6 +8173,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfCleanDuplicateVocabWords = function() {
@@ -8330,6 +8342,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   var currentStreak = 0;
@@ -8455,6 +8469,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfCreateVocabBackupSnapshot = function() {
@@ -8700,6 +8716,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfUpdateQuizProgressBar = function(currentIdx, totalCount) {
@@ -9136,6 +9154,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfShowQuizSessionSummary = function(stats) {
@@ -10215,6 +10235,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   var quizStartTime = 0;
