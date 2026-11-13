@@ -22,3 +22,11 @@ const body = app.slice(start, start + 9000);
 assert(!/^\s*renderNotesStack\(\);/m.test(body), 'renderNotesStack() must be isolated in try/catch');
 assert(/closeModal\('langModal'\)/.test(body));
 console.log('✅ PASS: boot/language pipeline guards (shield removed, locale rows loaded, steps isolated)');
+
+// 4. The secondary hot-swap engine must follow the app language instead of defaulting to Arabic,
+//    and must never flatten container elements (it wiped the domain tiles' icon/title/duration).
+const hot = fs.readFileSync(path.join(web, 'modules/i18n/universal_i18n_hotswap.js'), 'utf8');
+assert(/window\.DF_CURRENT_LOCALE/.test(hot), 'hot-swap init must read the app language');
+assert(/node\.children\.length > 0/.test(hot), 'hot-swap sweep must skip container nodes');
+assert(/hot\.applyLanguage\(baseCode\)/.test(app), 'applyLanguage must sync the hot-swap engine');
+console.log('✅ PASS: hot-swap engine follows app language and preserves containers');

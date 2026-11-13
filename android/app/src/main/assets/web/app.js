@@ -3281,6 +3281,9 @@ function applyLanguage(code) {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     // Never replace an editable value or arbitrary user-generated content.
     if (el.isContentEditable || /^(INPUT|TEXTAREA)$/i.test(el.tagName || '')) return;
+    // Replacing textContent on a container would wipe its icon/title/duration children;
+    // such containers localise through their own labelled child elements.
+    if (el.children.length > 0) return;
     const k = el.getAttribute('data-i18n');
     const value = dfGetLocalizedText(k, meta.code, el.textContent);
     if (value && value !== k && el.textContent !== value) el.textContent = toWest(value);
@@ -3325,6 +3328,12 @@ function applyLanguage(code) {
   // Premium labels may also be created by re-rendered screens; refresh last.
   if (window.DF22Locale?.apply) window.DF22Locale.apply(document, baseCode);
   if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
+  // Keep the secondary hot-swap engine on the same language so its DOM sweeps never
+  // overwrite the language the user picked.
+  try {
+    const hot = window.UniversalI18nHotSwap;
+    if (hot && typeof hot.applyLanguage === 'function' && hot.currentLang !== baseCode) hot.applyLanguage(baseCode);
+  } catch (_) { /* optional engine */ }
   try {
     if (window.ZenNative && typeof window.ZenNative.setNativeLocale === 'function')
       window.ZenNative.setNativeLocale(meta.code);
