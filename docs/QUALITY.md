@@ -10,3 +10,5 @@
 | `build_aab.yml` | push to main / tags | unsigned or wrongly signed packages, AAB/APK signature mismatch |
 
 Adding a feature: add its strings to all 20 `locales/*.json`, keep panels responsive at 320px, add or extend a test.
+
+Browser suite also covers end-to-end flows (hostile task title persisted and inert, language/RTL restore), offline (no request leaves localhost) and timer start/pause/reset.
