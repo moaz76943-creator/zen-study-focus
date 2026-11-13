@@ -55138,7 +55138,7 @@ function() {
     headerRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;';
     const headerTitle = document.createElement('div');
     headerTitle.style.cssText = 'font-size:15px;font-weight:800;color:#0f172a;';
-    headerTitle.textContent = 'Master Pillar 1 — Tri-Zone Cornell Notes & Vector Mind-Map Studio';
+    headerTitle.textContent = 'Cornell Notes & Mind-Map Studio';
     const statusBadge = document.createElement('span');
     statusBadge.id = 'dfTriZoneSaveStatus';
     statusBadge.style.cssText = 'font-size:11px;font-weight:700;color:#059669;background:#f8fafc;border:1px solid #cbd5e1;padding:4px 10px;border-radius:999px;';
@@ -55180,7 +55180,7 @@ function() {
 
     // Cornell Tri-Zone Grid (Zone 1: Cues, Zone 2: Main Notes, Zone 3: Bottom Summary)
     const triGrid = document.createElement('div');
-    triGrid.style.cssText = 'display:grid;grid-template-columns:minmax(180px, 1fr) minmax(260px, 2fr);gap:12px;';
+    triGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px;';
 
     // Zone 1: Cues Column
     const cueCol = document.createElement('div');
@@ -56404,7 +56404,7 @@ function() {
     hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;';
     const hdrTitle = document.createElement('div');
     hdrTitle.style.cssText = 'font-size:15px;font-weight:800;color:#0f172a;';
-    hdrTitle.textContent = 'Master Pillar 2 — Focal Stream RSVP Reader & Visual Pacing Engine';
+    hdrTitle.textContent = 'Focal Stream Speed Reader';
     const wpmBadge = document.createElement('span');
     wpmBadge.id = 'dfRsvpLiveWpmBadge';
     wpmBadge.style.cssText = 'font-size:12px;font-weight:800;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;padding:4px 12px;border-radius:999px;';
@@ -56630,7 +56630,7 @@ function() {
     anHdr.appendChild(logSessionBtn);
 
     const kpiGrid = document.createElement('div');
-    kpiGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,minmax(70px,1fr));gap:8px;';
+    kpiGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,70px),1fr));gap:8px;';
 
     function makeKpiTile(label, valId, valColor) {
       const tile = document.createElement('div');
@@ -58511,7 +58511,7 @@ function() {
     hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;';
     const hdrTitle = document.createElement('div');
     hdrTitle.style.cssText = 'font-size:15px;font-weight:800;color:#0f172a;';
-    hdrTitle.textContent = 'Master Pillar 3 — Pure SVG STEM Typesetter & Strict Timed Exam Simulator';
+    hdrTitle.textContent = 'STEM Typesetter & Timed Exam Simulator';
 
     const statusBadge = document.createElement('span');
     statusBadge.id = 'dfStemStudioBadge';
@@ -60748,7 +60748,7 @@ function() {
     hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;';
     const hdrTitle = document.createElement('div');
     hdrTitle.style.cssText = 'font-size:15px;font-weight:800;color:#0f172a;';
-    hdrTitle.textContent = 'Master Pillar 4 — Infinite Study Whiteboard & Visual Diagram Occlusion';
+    hdrTitle.textContent = 'Infinite Whiteboard & Diagram Occlusion';
 
     const statusBadge = document.createElement('span');
     statusBadge.id = 'dfWhiteboardStudioBadge';
@@ -62808,7 +62808,7 @@ function() {
     const titleBox = document.createElement('div');
     const badgeTop = document.createElement('div');
     badgeTop.style.cssText = 'font-size:10px;font-weight:900;letter-spacing:0.8px;color:#7c3aed;text-transform:uppercase;margin-bottom:2px;';
-    badgeTop.textContent = '✦ Master Pillar 5 • 360° Acoustic Physics';
+    badgeTop.textContent = '✦ 360° Acoustic Physics';
 
     const h2 = document.createElement('h2');
     h2.style.cssText = 'font-size:16px;font-weight:900;color:#0f172a;margin:0;';
@@ -65206,7 +65206,7 @@ function() {
     const titleCol = document.createElement('div');
     const badgeTop = document.createElement('div');
     badgeTop.style.cssText = 'font-size:10px;font-weight:900;letter-spacing:0.8px;color:#2563eb;text-transform:uppercase;margin-bottom:2px;';
-    badgeTop.textContent = '✦ Master Pillar 6 • Dynamic Load-Balancer';
+    badgeTop.textContent = '✦ Dynamic Load-Balancer';
 
     const h2 = document.createElement('h2');
     h2.style.cssText = 'font-size:16px;font-weight:900;color:#0f172a;margin:0;display:flex;align-items:center;gap:6px;';
@@ -67228,7 +67228,7 @@ function() {
     const titleCol = document.createElement('div');
     const badgeTop = document.createElement('div');
     badgeTop.style.cssText = 'font-size:10px;font-weight:900;letter-spacing:0.8px;color:#db2777;text-transform:uppercase;margin-bottom:2px;';
-    badgeTop.textContent = '✦ Master Pillar 7 • Plain Language & Recall Lab';
+    badgeTop.textContent = '✦ Plain Language & Recall Lab';
 
     const h2 = document.createElement('h2');
     h2.style.cssText = 'font-size:16px;font-weight:900;color:#0f172a;margin:0;display:flex;align-items:center;gap:6px;';
@@ -69220,7 +69220,7 @@ window.dfRenderMasterPillar8StudioDom = function(containerId) {
   const titleCol = document.createElement('div');
   const badgeTop = document.createElement('div');
   badgeTop.style.cssText = 'font-size:10px;font-weight:900;letter-spacing:0.8px;color:#059669;text-transform:uppercase;margin-bottom:2px;';
-  badgeTop.textContent = '✦ Master Pillar 8 • Local LAN Study Pods & Peer Accountability';
+  badgeTop.textContent = '✦ Local LAN Study Pods & Peer Accountability';
 
   const h2 = document.createElement('h2');
   h2.style.cssText = 'font-size:16px;font-weight:900;color:#0f172a;margin:0;display:flex;align-items:center;gap:6px;';
@@ -71521,7 +71521,7 @@ window.dfRenderMasterPillar9StudioDom = function(containerId) {
   const titleCol = document.createElement('div');
   const badgeTop = document.createElement('div');
   badgeTop.style.cssText = 'font-size:10px;font-weight:900;letter-spacing:0.8px;color:#059669;text-transform:uppercase;margin-bottom:2px;';
-  badgeTop.textContent = '✦ Master Pillar 9 • Botanical Zen Sanctuary & 365-Day Habit Matrix';
+  badgeTop.textContent = '✦ Botanical Zen Sanctuary & 365-Day Habit Matrix';
 
   const h2 = document.createElement('h2');
   h2.style.cssText = 'font-size:16px;font-weight:900;color:#0f172a;margin:0;display:flex;align-items:center;gap:6px;';
@@ -73799,7 +73799,7 @@ window.dfRenderMasterPillar10StudioDom = function(containerId) {
   const titleCol = document.createElement('div');
   const badgeTop = document.createElement('div');
   badgeTop.style.cssText = 'font-size:10px;font-weight:900;letter-spacing:0.8px;color:#2563eb;text-transform:uppercase;margin-bottom:2px;';
-  badgeTop.textContent = '✦ Master Pillar 10 • High-Performance 120 FPS Engine & Zero-GC Architecture';
+  badgeTop.textContent = '✦ High-Performance 120 FPS Engine & Zero-GC Architecture';
 
   const h2 = document.createElement('h2');
   h2.style.cssText = 'font-size:16px;font-weight:900;color:#0f172a;margin:0;display:flex;align-items:center;gap:6px;';
@@ -74246,7 +74246,7 @@ window.dfRenderMasterPillar10StudioDom = function(containerId) {
     runBtn.onclick = function() {
       const res = window.dfRunLiveBenchmarkSuite();
       if (typeof window.showToast === 'function') {
-        window.showToast(`✓ Master Pillar 10 Verified: ${res.grade} (${res.systemPerformanceIndex}/100)`);
+        window.showToast(`✓ Verified: ${res.grade} (${res.systemPerformanceIndex}/100)`);
       }
     };
     bCard.appendChild(runBtn);

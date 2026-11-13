@@ -11,6 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Deep Focus - v21 Ultimate Edition</title>
   <style>
+    /* Studio panels must never be wider than the screen (320 px, large fonts, RTL). */
+    .df-white-premium { max-width: 100%; box-sizing: border-box; }
+    .df-white-premium div { flex-wrap: wrap !important; }
+    .df-white-premium div, .df-white-premium label, .df-white-premium p, .df-white-premium span,
+    .df-white-premium textarea, .df-white-premium input, .df-white-premium select, .df-white-premium button { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+
     :root {
       --bg-sheet: #fbfdff;
       --card-pure: #ffffff;
@@ -1995,7 +2001,7 @@ body {
         </div>
 
         <div class="tasks-showcase-list" id="tasksShowcaseBox"></div>
-        <div id="dfPillar6SyllabusMount" aria-label="Master Pillar 6: Dynamic Syllabus Load-Balancer & Adaptive Exam Pacing Engine"></div>
+        <div id="dfPillar6SyllabusMount"></div>
         <div id="df22TasksHost" aria-label="Advanced tasks and calendar"></div>
       </main>
 
@@ -2049,7 +2055,7 @@ body {
         <div id="dfPillar2SpeedReaderMount" aria-label="Speed Reading and Visual Pacing Engine"></div>
         <div id="dfPillar3StemMount" aria-label="Pure SVG STEM Typesetter and Strict Timed Exam Simulator"></div>
         <div id="dfPillar4WhiteboardMount" aria-label="Infinite Study Whiteboard and Image Occlusion Engine"></div>
-        <div id="dfPillar7FeynmanMount" aria-label="Master Pillar 7: Feynman Blank-Sheet Recall Lab & Jargon Simplification Engine"></div>
+        <div id="dfPillar7FeynmanMount"></div>
         <div class="learning-cards-stack ns-cards" id="notesStackBox"></div>
         <button class="floating-plus-fab" onclick="openNoteModal()" aria-label="New note" data-i18n-aria="nsNewButton">+</button>
       </main>
@@ -2067,7 +2073,7 @@ body {
           </div>
         </div>
 
-        <div id="dfPillar5SpatialMount" aria-label="Master Pillar 5: 3D Spatial Acoustic Physics & Bio-Frequency Synthesis"></div>
+        <div id="dfPillar5SpatialMount"></div>
 
         <div class="segmented-pills-bar">
           <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All</button>
@@ -2094,8 +2100,8 @@ body {
             <span>Zen Sanctuary</span>
           </button>
         </div>
-        <div id="dfPillar10HighPerfMount" aria-label="Master Pillar 10: High-Performance Engine, 120 FPS WebWorkers Architecture & Zero-GC Pooling"></div>
-        <div id="dfPillar9BotanicalHeatmapMount" aria-label="Master Pillar 9: Procedural Botanical Zen Garden & Yearly Habit Heatmap"></div>
+        <div id="dfPillar10HighPerfMount"></div>
+        <div id="dfPillar9BotanicalHeatmapMount"></div>
         <div id="dfSystemHealthMount" aria-label="Sovereign Dogfooding & System Health Report (Rating AAA)"></div>
         <div class="analytics-kpi-grid">
           <div class="an-kpi-card">
