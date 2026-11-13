@@ -19,6 +19,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebResourceRequest;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -81,6 +82,27 @@ public class MainActivity extends AppCompatActivity {
         appDialogs = new FocusAppWebChromeClient(this);
         webView.setWebChromeClient(appDialogs);
         webView.loadUrl("file:///android_asset/web/index.html");
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (webView != null && !isDestroyed()) {
+                    webView.evaluateJavascript(
+                        "Boolean(window.handleAndroidBack && window.handleAndroidBack())",
+                        result -> {
+                            if (!"true".equals(result)) {
+                                setEnabled(false);
+                                getOnBackPressedDispatcher().onBackPressed();
+                                setEnabled(true);
+                            }
+                        }
+                    );
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
     }
 
     private void requestNotificationPermissionForTimer() {
@@ -507,6 +529,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        if (webView != null) {
+            webView.onPause();
+            webView.pauseTimers();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (webView != null) {
+            webView.onResume();
+            webView.resumeTimers();
+        }
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (webView != null && level >= TRIM_MEMORY_RUNNING_LOW) {
+            webView.freeMemory();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         if (appDialogs != null) appDialogs.cancelPending();
         WebView old = webView;
@@ -517,12 +565,5 @@ public class MainActivity extends AppCompatActivity {
     super.onDestroy();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (webView != null) {
-            webView.evaluateJavascript("Boolean(window.handleAndroidBack && window.handleAndroidBack())", result -> { if (!"true".equals(result)) finish(); });
-        } else {
-            super.onBackPressed();
-        }
     }
 }
