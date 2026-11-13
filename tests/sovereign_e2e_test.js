@@ -1161,3 +1161,6 @@ require("../android/app/src/main/assets/web/modules/qa/sovereign_audio_link_audi
   }
   console.log("✅ PASS: Timestamp-Anchored Timer Drift Guard Verified (#826)");
 })();
+
+// Task #827: Offline Zero-PII & Zero-Medical-Term Compliance Gate
+require("../android/app/src/main/assets/web/modules/qa/sovereign_compliance_gate_827.js").runComplianceGate(process.cwd());

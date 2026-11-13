@@ -1646,6 +1646,24 @@ body {
     border-color: #475569 !important;
   }
 </style>
+<!-- TASK #827: Bi-Directional RTL/LTR Logical Alignment Polish -->
+<style id="task-827-rtl-polish">
+  [dir="rtl"] .modal-close, [dir="rtl"] button[aria-label="Close"] {
+    right: auto !important;
+    left: 14px !important;
+  }
+  [dir="rtl"] input, [dir="rtl"] textarea, [dir="rtl"] select {
+    text-align: right;
+  }
+  [dir="ltr"] input, [dir="ltr"] textarea, [dir="ltr"] select {
+    text-align: left;
+  }
+  .timer-display, #timerDisplay, [data-timer-display] {
+    direction: ltr !important;
+    unicode-bidi: isolate !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+</style>
 </head>
 <body>
 
