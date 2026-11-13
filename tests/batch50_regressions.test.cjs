@@ -128,3 +128,24 @@ test('storage write guard skips identical writes but never real ones', () => {
   const idx = read('android/app/src/main/assets/web/index.html');
   assert.ok(idx.indexOf('storage_write_guard.js') < idx.indexOf('sovereign_runtime_shield_828.js'));
 });
+
+test('locale JSON is inlined for the Android WebView (file:// fetch is blocked) and stays in sync', () => {
+  const { spawnSync } = require('node:child_process');
+  const r = spawnSync(process.execPath, [path.join(root, 'tools/build_locale_bundle.mjs'), '--check'], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr || r.stdout);
+  const html = read('android/app/src/main/assets/web/index.html');
+  const bundleAt = html.indexOf('locale_packs/locale_bundle.js');
+  assert.ok(bundleAt > 0 && bundleAt < html.indexOf('modules/i18n/universal_i18n_hotswap.js') && bundleAt < html.indexOf('src="app.js"'));
+  const app = read('android/app/src/main/assets/web/app.js');
+  assert.ok(app.includes('__DF_LOCALE_BUNDLE'));
+});
+
+test('i18n hot-swap sweeps are idempotent (no endless MutationObserver ping-pong)', () => {
+  const src = read('android/app/src/main/assets/web/modules/i18n/universal_i18n_hotswap.js');
+  assert.ok(src.includes('function setAttrIfChanged'));
+  assert.ok(!/\.setAttribute\("lang", "en"\)/.test(src));
+  assert.ok(/inp\.id === "inpSearchNotes"/.test(src), 'shield placeholder is for the search pill only');
+  assert.ok(!/eDigits(835)?\.test\(/.test(src), '.test() on a /g regex skips nodes');
+  const app = read('android/app/src/main/assets/web/app.js');
+  assert.ok(!app.includes("inp.setAttribute('lang', 'en-US')"));
+});
