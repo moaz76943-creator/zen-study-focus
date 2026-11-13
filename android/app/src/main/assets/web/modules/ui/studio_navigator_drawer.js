@@ -46,9 +46,10 @@
             const pill = document.createElement("button");
             pill.id = "zenStudioTriggerPill";
             pill.className = "interactive-action";
-            pill.setAttribute("aria-label", "فتح لوحة الاستوديوهات والأدوات");
+            pill.setAttribute("aria-label", (document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "فتح لوحة الاستوديوهات والأدوات" : "Open studios and tools panel");
             pill.style.position = "fixed";
-            pill.style.bottom = "20px";
+            // Sit above the bottom navigation bar instead of covering its centre tab.
+            pill.style.bottom = "calc(96px + env(safe-area-inset-bottom, 0px))";
             pill.style.left = "50%";
             pill.style.transform = "translateX(-50%)";
             pill.style.background = "rgba(18, 18, 18, 0.85)";
@@ -60,13 +61,13 @@
             pill.style.fontSize = "0.92rem";
             pill.style.fontWeight = "600";
             pill.style.cursor = "pointer";
-            pill.style.zIndex = "9000";
+            pill.style.zIndex = "800";
             pill.style.display = "flex";
             pill.style.alignItems = "center";
             pill.style.gap = "8px";
             pill.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.6)";
 
-            pill.innerHTML = '<span>✨ الاستوديوهات</span> <span style="opacity: 0.5; font-size: 0.75rem;">(10)</span>';
+            pill.innerHTML = '<span id="zenStudioTriggerLabel">' + ((document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "✨ الاستوديوهات" : "✨ Studios") + '</span> <span style="opacity: 0.5; font-size: 0.75rem;">(10)</span>';
 
             pill.onclick = () => {
                 this.toggleDrawer();

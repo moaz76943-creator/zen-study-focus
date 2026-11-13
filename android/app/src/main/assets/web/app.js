@@ -3328,6 +3328,18 @@ function applyLanguage(code) {
   // Premium labels may also be created by re-rendered screens; refresh last.
   if (window.DF22Locale?.apply) window.DF22Locale.apply(document, baseCode);
   if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
+  // Chrome created outside the dictionaries (studio pill, tools drawer) follows the UI language.
+  try {
+    const arUi = baseCode === 'ar';
+    const setText = (id, ar, en) => { const n = document.getElementById(id); if (n) n.textContent = arUi ? ar : en; };
+    const setAria = (id, ar, en) => { const n = document.getElementById(id); if (n) n.setAttribute('aria-label', arUi ? ar : en); };
+    setText('zenStudioTriggerLabel', '✨ الاستوديوهات', '✨ Studios');
+    setAria('zenStudioTriggerPill', 'فتح لوحة الاستوديوهات والأدوات', 'Open studios and tools panel');
+    setText('sovereignCalmToolsLabel', '⚙️ أدوات الاستوديو والصيانة المتقدمة', '⚙️ Advanced studio & maintenance tools');
+    setAria('sovereignCalmToolsToggle', 'فتح أو إغلاق أدوات الاستوديو والصيانة', 'Open or close studio and maintenance tools');
+    setText('toggleTwilightBtn', '🌙 وضع السكينة الليلي (Eye Comfort)', '🌙 Night calm mode (Eye Comfort)');
+    setAria('toggleTwilightBtn', 'تفعيل أو إيقاف وضع السكينة الليلي لحماية العين', 'Toggle night calm mode to protect your eyes');
+  } catch (_) { /* cosmetic */ }
   // Keep the secondary hot-swap engine on the same language so its DOM sweeps never
   // overwrite the language the user picked.
   try {
@@ -82785,7 +82797,10 @@ window.SovereignEyeComfort = (function() {
         }
         const btn = document.getElementById("toggleTwilightBtn");
         if (btn) {
-            btn.textContent = isTwilightActive ? "🌙 إيقاف وضع السكينة الليلي" : "🌙 وضع السكينة الليلي (Eye Comfort)";
+            const arUi = (document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0;
+            btn.textContent = isTwilightActive
+                ? (arUi ? "🌙 إيقاف وضع السكينة الليلي" : "🌙 Turn off night calm mode")
+                : (arUi ? "🌙 وضع السكينة الليلي (Eye Comfort)" : "🌙 Night calm mode (Eye Comfort)");
         }
     }
 

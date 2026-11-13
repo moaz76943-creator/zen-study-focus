@@ -30,3 +30,9 @@ assert(/window\.DF_CURRENT_LOCALE/.test(hot), 'hot-swap init must read the app l
 assert(/node\.children\.length > 0/.test(hot), 'hot-swap sweep must skip container nodes');
 assert(/hot\.applyLanguage\(baseCode\)/.test(app), 'applyLanguage must sync the hot-swap engine');
 console.log('✅ PASS: hot-swap engine follows app language and preserves containers');
+
+// 5. The floating studio pill must not cover the bottom navigation, and its text must follow the UI language.
+const pillSrc = fs.readFileSync(path.join(web, 'modules/ui/studio_navigator_drawer.js'), 'utf8');
+assert(!/pill\.style\.bottom = "20px"/.test(pillSrc), 'studio pill must sit above the bottom nav');
+assert(/Studios/.test(pillSrc), 'studio pill needs a non-Arabic label');
+console.log('✅ PASS: studio pill clears the nav and is localisable');
