@@ -90,4 +90,9 @@ assert(!manifestXml.includes('screenOrientation="portrait"'), 'Portrait lock mus
 const bloatLocales = (appJs.match(/window\.DF_I18N_LOCALES\[['"][a-zA-Z0-9_-]+['"]\]\s*=/g) || []).length;
 assert(bloatLocales < 10, 'Unexpected DF_I18N_LOCALES bloat count: ' + bloatLocales);
 
+
+// 8. Test Safe Storage & Binaural Synth removal
+assert(appJs.includes('__DF_SAFE_STORAGE_READY__'), 'dfSafeStorage missing');
+assert(!/function\s+dfSynthesizeBinauralBeats\s*\([^)]+\)\s*\{[\s\S]{30,}/.test(appJs), 'Binaural synth still active');
+
 console.log('✅ PASS: All Major #1-#5 behavioral & Android hardening regression tests passed!');
