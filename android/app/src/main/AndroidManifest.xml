@@ -37,52 +37,9 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".widget.QuickTimerWidgetProvider" android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
- android:name="android.appwidget.provider"
- android:resource="@xml/widget_quick_timer_info" />
-        </receiver>
 
-        <receiver android:name=".widget.DailyStreakWidgetProvider" android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
- android:name="android.appwidget.provider"
- android:resource="@xml/widget_daily_streak_bar_info" />
-        </receiver>
 
-        <receiver android:name=".widget.VocabFlashcardWidgetProvider" android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
- android:name="android.appwidget.provider"
- android:resource="@xml/widget_vocab_flashcard_info" />
-        </receiver>
 
-        <!-- Strict Google Play DF06 compliance: ZenFocusTileService is the sole declared service; no unauthorized foreground services. -->
-        <service
- android:name=".service.ZenFocusTileService"
- android:exported="true"
- android:icon="@mipmap/ic_launcher"
- android:label="Zen Focus"
- android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
-            </intent-filter>
-        </service>
 
-        <receiver android:name=".widget.WeeklySparklineWidgetProvider" android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
- android:name="android.appwidget.provider"
- android:resource="@xml/widget_weekly_sparkline_info" />
-        </receiver>
     </application>
 </manifest>
