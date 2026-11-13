@@ -1,3 +1,42 @@
+/* === Deep Focus M06/M08 Event-Driven UI Sync & Non-Blocking Notify === */
+(function() {
+  if (typeof window === "undefined" || window.__DF_UI_SYNC_BUS_READY__) return;
+  window.__DF_UI_SYNC_BUS_READY__ = true;
+  const hooks = [];
+  let syncTimer = null;
+  window.dfRegisterUISyncHook = function(fn) {
+    if (typeof fn === "function" && !hooks.includes(fn)) {
+      hooks.push(fn);
+      if (typeof document !== "undefined" && document.readyState !== "loading") {
+        try { fn(); } catch (e) { if (window.__dfRecordError) window.__dfRecordError("uiHookInit", e); }
+      }
+    }
+  };
+  window.dfTriggerUISync = function() {
+    if (typeof document === "undefined") return;
+    if (syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => {
+      syncTimer = null;
+      for (let i = 0; i < hooks.length; i++) {
+        try { hooks[i](); } catch (e) { if (window.__dfRecordError) window.__dfRecordError("uiHookSync", e); }
+      }
+    }, 120);
+  };
+  window.dfSafeNotify = function(msg) {
+    const text = String(msg || "").trim();
+    if (!text) return;
+    if (typeof showToast === "function") { try { showToast(text); return; } catch (e) {} }
+    if (typeof console !== "undefined" && console.info) console.info("[DF]", text);
+  };
+  if (typeof document !== "undefined") {
+    document.addEventListener("DOMContentLoaded", window.dfTriggerUISync, { once: true });
+    document.addEventListener("click", (ev) => {
+      if (ev && ev.target && ev.target.closest && ev.target.closest("button, [role='tab'], .nav-btn, .tab-btn")) window.dfTriggerUISync();
+    }, { passive: true });
+    window.addEventListener("df:ui-sync", window.dfTriggerUISync);
+  }
+})();
+
 
 // [Task #682] Unhandled Error Shield Initialization
 if (typeof UnhandledErrorShield !== "undefined") {
@@ -181,7 +220,7 @@ const TaskTimerSynergy = (function() {
     try {
       const stored = storage.getItem('zen_tasks') || storage.getItem('deep_focus_tasks');
       if (stored) return JSON.parse(stored);
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     return [
       { id: 't1', text: 'Complete Chapter 1 & Core Concepts', done: false },
       { id: 't2', text: 'HIIT Strength & Cardio Session (4 Sets)', done: false },
@@ -218,7 +257,7 @@ const TaskTimerSynergy = (function() {
       tasks = tasks.map(t => t.id === task.id ? { ...t, done: true, completedAt: new Date().toISOString() } : t);
       storage.setItem('zen_tasks', JSON.stringify(tasks));
       storage.setItem('deep_focus_tasks', JSON.stringify(tasks));
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
     // تحديث عداد الإنجاز
     const doneCount = parseInt(storage.getItem('df_tasks_done_today') || '0', 10) + 1;
@@ -270,7 +309,7 @@ const TaskTimerSynergy = (function() {
       const tLoc = (k, fb) => (typeof window.dfGetLocalizedText === 'function' ? window.dfGetLocalizedText(k, activeLang, fb) : fb);
       const tasks = getActiveTasks().filter(t => !t.done);
       if (tasks.length === 0) {
-        alert(tLoc('allTasksCompletedAlert', 'All tasks completed! Add a new task in Tasks tab.'));
+        dfSafeNotify(tLoc('allTasksCompletedAlert', 'All tasks completed! Add a new task in Tasks tab.'));
         return;
       }
       const choice = prompt(tLoc('selectActiveTargetPrompt', 'Select active target task:') + '\n' + tasks.map((t, i) => `${i+1}. ${t.text}`).join('\n'), '1');
@@ -422,13 +461,13 @@ function playCompletionTone(toneKey) {
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.onended = () => {
-      try { osc.disconnect(); } catch (_) {}
-      try { gain.disconnect(); } catch (_) {}
+      try { osc.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+      try { gain.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     };
 
     osc.start();
     osc.stop(ctx.currentTime + tone.decay);
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 }
 
 window.playCompletionTone = playCompletionTone;
@@ -527,7 +566,7 @@ function triggerHaptic(type) {
     else if (type === 'step') ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(16) : false);
     else if (type === 'start') ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(28) : false);
     else if (type === 'complete') ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([35, 60, 35, 60, 80]) : false);
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 }
 
 function playPeacefulChime() {
@@ -554,7 +593,7 @@ function playPeacefulChime() {
     osc.start();
     osc.stop(ctx.currentTime + 3.2);
     triggerHaptic('complete');
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 }
 
 window.triggerHaptic = triggerHaptic;
@@ -2482,7 +2521,7 @@ function dfPurgeExcludedLocalesEverywhere() {
     if (!store || typeof store !== 'object') return;
     Object.keys(store).forEach(k => {
       if (dfIsExcludedLocale(k, store[k])) {
-        try { delete store[k]; } catch (_) {}
+        try { delete store[k]; } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       }
     });
   });
@@ -2499,7 +2538,7 @@ function dfSyncInfiniteLocaleRegistry() {
     );
     if (fnNames.length > 0) {
       fnNames.forEach(fn => {
-        try { window[fn](); } catch (_) {}
+        try { window[fn](); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       });
       reg.packsIntegrated = true;
     }
@@ -3086,7 +3125,7 @@ function collectFlashcardDecksForBackup() {
       const parsed = JSON.parse(rawVocab);
       if (Array.isArray(parsed)) return parsed;
     }
-  } catch (e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   return [];
 }
 
@@ -3277,12 +3316,12 @@ function verifyAndRestoreBackupCode(codeStr) {
       try {
         localStorage.setItem('df_vocab_bank', JSON.stringify(verified.flashcardDecks));
         localStorage.setItem('df_cards_v1', JSON.stringify(verified.flashcardDecks));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     if (Array.isArray(verified.cfg.sessionHistory)) {
       try {
         localStorage.setItem('df_session_history_v1', JSON.stringify(verified.cfg.sessionHistory));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     syncDailyRollover();
     applyLanguage(cfg.lang);
@@ -3379,7 +3418,7 @@ async function shareAppWithFriends() {
 let chimeCtx = null;
 function playRichCompletionChime(titleText, skipNative = false) {
   if (!skipNative && window.ZenNative && window.ZenNative.triggerCompletionSound) {
-    try { window.ZenNative.triggerCompletionSound(titleText || "Session Completed!"); } catch(e){}
+    try { window.ZenNative.triggerCompletionSound(titleText || "Session Completed!"); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
   try {
     if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3395,8 +3434,8 @@ function playRichCompletionChime(titleText, skipNative = false) {
       osc.start(chimeCtx.currentTime + idx * 0.35);
       osc.stop(chimeCtx.currentTime + idx * 0.35 + 1.6);
     });
-  } catch (e) {}
-  if (navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([300, 150, 300, 150, 500]) : false); } catch (e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
+  if (navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([300, 150, 300, 150, 500]) : false); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 }
 
 function testCompletionSoundChime() {
@@ -3545,7 +3584,7 @@ function startQuickSportRest(secs) {
           [TIMER_STORAGE_KEY+'_mirror',oldMirror]]) {
           if (old===null) storage.removeItem(key); else storage.setItem(key,old);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     showToast(L().saveFailed || (cfg.lang==='ar'
       ? 'تعذّر حفظ جلسة الاستراحة. حاول مرة أخرى.'
@@ -3571,7 +3610,7 @@ function startQuickSportRest(secs) {
     }catch(error){console.warn('Rest notification unavailable',error);}
   }
   if(window.ZenNative && typeof window.ZenNative.requestTimerNotificationPermission==='function'){
-    try{window.ZenNative.requestTimerNotificationPermission();}catch(e){}
+    try{window.ZenNative.requestTimerNotificationPermission();}catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
   timerInterval=setInterval(runTimerTick,500);
   showToast(toWest(`⏱️ Rest ${seconds}s Started`));
@@ -3645,7 +3684,7 @@ function switchTab(secId, btn) {
 
 let toastTimer = null;
 function showToast(msg) {
-  if (navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(12) : false); } catch(e){}
+  if (navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(12) : false); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   const t = document.getElementById('appToast');
   document.getElementById('toastText').textContent = toWest(msg);
   t.classList.add('show');
@@ -3722,7 +3761,7 @@ function persistActiveTimerSnapshot(snapshot) {
         }
       } catch (_) { /* Existing native checkpoint remains authoritative. */ }
     }
-    try { showToast(L().saveFailed); } catch (_) {}
+    try { showToast(L().saveFailed); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return false;
   }
 }
@@ -3806,14 +3845,14 @@ function creditCompletedSession() {
         sessions: Number(nextCfg.sessions || 0)
       }));
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   if (window.DF22Integration?.onSessionRecorded) window.DF22Integration.onSessionRecorded();
-  try { document.dispatchEvent(new CustomEvent('deep-focus:session-recorded',{detail:{schemaVersion:1,...credited}})); } catch (e) {}
+  try { document.dispatchEvent(new CustomEvent('deep-focus:session-recorded',{detail:{schemaVersion:1,...credited}})); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   try {
     if (typeof window.dfRecordCompletedSessionToGarden === 'function') {
       window.dfRecordCompletedSessionToGarden(earned, credited.domain);
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   return true;
 }
 
@@ -3910,7 +3949,7 @@ function renderEyeStrainReliefPrompt202020(completedMins = 20) {
               completedAt: new Date().toISOString()
             }));
           }
-        } catch (_) {}
+        } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       }
     }, 1000);
   });
@@ -3949,7 +3988,7 @@ function renderEyeStrainReliefPrompt202020(completedMins = 20) {
         promptedAt: new Date().toISOString()
       }));
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
   return { rendered: true, rule: '20-20-20', durationSeconds: 20 };
 }
@@ -4008,7 +4047,7 @@ function runTimerTick() {
 function restoreTimerSession() {
   let snap;
   try { snap = readNativeTimerSession() || loadFortressData(TIMER_STORAGE_KEY, null); }
-  catch (_) { try { showToast(L().saveFailed); } catch (_) {} return; }
+  catch (_) { try { showToast(L().saveFailed); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); } return; }
   if (!snap || typeof snap !== 'object' || !Number.isFinite(snap.total) || !Number.isFinite(snap.left)) return;
   if (snap.total < 1 || snap.total > 86400 || snap.left < 0 || snap.left > 86400) return;
   timerTotal = snap.total;
@@ -4205,7 +4244,7 @@ function toggleTimerPlay() {
       return false;
     }
     if (window.ZenNative && window.ZenNative.stopBackgroundService) {
-      try { window.ZenNative.stopBackgroundService(); } catch(e){}
+      try { window.ZenNative.stopBackgroundService(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     setPlayButtonIcon(btn, false);
   } else {
@@ -4217,7 +4256,7 @@ function toggleTimerPlay() {
     try {
       if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (chimeCtx.state === 'suspended') chimeCtx.resume();
-    } catch(e){}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
     const oldSessionId = timerSessionId, oldTaskId = focusSessionTaskId;
     const oldResumeMs = timerResumeMs, oldTargetTime = timerTargetTime;
@@ -4243,10 +4282,10 @@ function toggleTimerPlay() {
       return false;
     }
     if (window.ZenNative && window.ZenNative.startBackgroundService) {
-      try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch(e){}
+      try { window.ZenNative.startBackgroundService(timerLeft, activeTitle); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     if (window.ZenNative && typeof window.ZenNative.requestTimerNotificationPermission==='function') {
-      try { window.ZenNative.requestTimerNotificationPermission(); } catch(e){}
+      try { window.ZenNative.requestTimerNotificationPermission(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     timerInterval = setInterval(runTimerTick, 500);
   }
@@ -4275,7 +4314,7 @@ function resetTimerNow() {
       if (typeof window.dfRecordAbandonedSessionToGarden === 'function') {
         window.dfRecordAbandonedSessionToGarden();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
   timerLeft = timerTotal;
   timerSessionId = null;
@@ -4308,7 +4347,7 @@ function addWaterCup() {
 function toggleDeskClock(show) {
   document.getElementById('deskClockOverlay').classList.toggle('active', show);
   if (window.ZenNative && window.ZenNative.setDeskClockWake) {
-    try { window.ZenNative.setDeskClockWake(Boolean(show)); } catch (e) {}
+    try { window.ZenNative.setDeskClockWake(Boolean(show)); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
 }
 
@@ -4977,7 +5016,7 @@ function dfTriggerTibetanSingingBell(vol = 0.65) {
       try {
         bellFilter.disconnect();
         masterBellGain.disconnect();
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }, 4500);
 
     return { played: true, instrument: 'tibetan_singing_bell', partials: partials.length };
@@ -5132,17 +5171,17 @@ function createNatureSynthFallback(id, vol) {
           gain.gain.linearRampToValueAtTime(0.0001, stopAt + 0.25);
         }
         setTimeout(() => {
-          try { source.stop(); } catch (_) {}
-          try { if (lfoOsc) lfoOsc.stop(); } catch (_) {}
-          try { source.disconnect(); } catch (_) {}
-          try { if (lfoOsc) lfoOsc.disconnect(); } catch (_) {}
-          try { if (lfoGain) lfoGain.disconnect(); } catch (_) {}
-          try { filter.disconnect(); } catch (_) {}
-          try { sculptFilter.disconnect(); } catch (_) {}
-          try { gain.disconnect(); } catch (_) {}
+          try { source.stop(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+          try { if (lfoOsc) lfoOsc.stop(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+          try { source.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+          try { if (lfoOsc) lfoOsc.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+          try { if (lfoGain) lfoGain.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+          try { filter.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+          try { sculptFilter.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+          try { gain.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         }, 270);
       } catch (e) {
-        try { source.stop(); source.disconnect(); filter.disconnect(); sculptFilter.disconnect(); gain.disconnect(); } catch (_) {}
+        try { source.stop(); source.disconnect(); filter.disconnect(); sculptFilter.disconnect(); gain.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       }
     },
     setVol: v => {
@@ -5173,7 +5212,7 @@ function stopSoundTile(id) {
   const player = activePlayers[id];
   if (player) {
     delete activePlayers[id];
-    try { player.pause(); } catch (e) {}
+    try { player.pause(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
 }
 
@@ -5963,10 +6002,10 @@ const ShareCardEngine = (function() {
     async function copySummary(successMessage) {
       try {
         await navigator.clipboard.writeText(sharePayload.text);
-        alert(successMessage);
+        dfSafeNotify(successMessage);
         return true;
       } catch (_) {
-        alert('Could not copy progress. Please try again.');
+        dfSafeNotify('Could not copy progress. Please try again.');
         return false;
       }
     }
@@ -5976,7 +6015,7 @@ const ShareCardEngine = (function() {
       if (navigator.share) {
         try {
           await navigator.share(sharePayload);
-        } catch(e) {}
+        } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
       } else {
         return copySummary('Progress copied to clipboard! Paste it into WhatsApp or Stories.');
       }
@@ -6042,7 +6081,7 @@ const VocabAudioBankEngine = (function() {
     try {
       const data = s.getItem('df_vocab_bank');
       if (data) return JSON.parse(data);
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     // عينات افتراضية جاهزة مطابقة لنمط التعلم
     return [
       { id: 'v1', term: 'Deine Hausaufgaben sind fast fertig.', translation: 'واجباتك المنزلية جاهزة تقريباً.', notes: 'die Hausaufgaben [Nom] <- deine', color: 'purple', reviews: 0, created: '2026-10-23' },
@@ -6253,7 +6292,7 @@ const VocabAudioBankEngine = (function() {
         }));
       }
       s.setItem('df_cards_v1', JSON.stringify(list));
-    } catch (e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     return updatedCardResult;
   }
 
@@ -6544,7 +6583,7 @@ const VocabUIController = (function() {
           const text = evt.target.result;
           if (window.VocabAudioBankEngine) {
             const added = window.VocabAudioBankEngine.importFromCSV(text);
-            alert('Successfully imported ' + added + ' words from ' + file.name + '!');
+            dfSafeNotify('Successfully imported ' + added + ' words from ' + file.name + '!');
             modal.remove();
             renderVocabView();
           }
@@ -6559,7 +6598,7 @@ const VocabUIController = (function() {
       exportBtn.onclick = () => {
         const list = window.VocabAudioBankEngine ? window.VocabAudioBankEngine.getVocabList() : [];
         if (list.length === 0) {
-          alert('No words to export!');
+          dfSafeNotify('No words to export!');
           return;
         }
         const csvRows = list.map(item => `"${item.term.replace(/"/g, '""')}","${item.translation.replace(/"/g, '""')}","${(item.notes || '').replace(/"/g, '""')}","${item.color || 'purple'}"`);
@@ -6686,7 +6725,7 @@ const VocabUIController = (function() {
       const sample = prompt('Paste your CSV list here (Word, Translation, Notes, Color):', 'Hallo, مرحباً, Greeting, blue');
       if (sample && window.VocabAudioBankEngine) {
         const added = window.VocabAudioBankEngine.importFromCSV(sample);
-        alert('Added ' + added + ' words successfully!');
+        dfSafeNotify('Added ' + added + ' words successfully!');
         modal.remove();
         renderVocabView();
       }
@@ -6772,7 +6811,7 @@ const FlashQuizEngine = (function() {
   function startQuiz() {
     quizCards = window.VocabAudioBankEngine ? window.VocabAudioBankEngine.getVocabList() : [];
     if (!quizCards || quizCards.length === 0) {
-      alert('No vocabulary words found! Add or import words first.');
+      dfSafeNotify('No vocabulary words found! Add or import words first.');
       return;
     }
 
@@ -7079,7 +7118,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     var eng = window.SpokenVocabEngine;
     var items = (eng && typeof eng.getItems === 'function') ? eng.getItems() : [];
     if (!items || !items.length) {
-      alert('لا توجد كلمات لتصديرها حالياً.');
+      dfSafeNotify('لا توجد كلمات لتصديرها حالياً.');
       return;
     }
     var csvText = buildCsvText(items);
@@ -7090,14 +7129,14 @@ window.FlashQuizEngine = FlashQuizEngine;
       }).catch(function() {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(csvText);
-          alert('تم نسخ ' + toWesternDigits(items.length) + ' كلمة بصيغة CSV إلى الحافظة.');
+          dfSafeNotify('تم نسخ ' + toWesternDigits(items.length) + ' كلمة بصيغة CSV إلى الحافظة.');
         }
       });
       return;
     }
     if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(csvText).then(function() {
-        alert('تم نسخ ' + toWesternDigits(items.length) + ' كلمة بصيغة CSV إلى الحافظة.');
+        dfSafeNotify('تم نسخ ' + toWesternDigits(items.length) + ' كلمة بصيغة CSV إلى الحافظة.');
       }).catch(function() {});
     }
   };
@@ -7172,7 +7211,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     confirmBtn.onclick = function() {
       var raw = (textArea.value || '').trim();
       if (!raw) {
-        alert('يرجى لصق سطر واحد على الأقل.');
+        dfSafeNotify('يرجى لصق سطر واحد على الأقل.');
         return;
       }
       var eng = window.SpokenVocabEngine;
@@ -7192,7 +7231,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         }
       }
       modal.remove();
-      alert('تم استيراد ' + toWesternDigits(added) + ' كلمة بنجاح.');
+      dfSafeNotify('تم استيراد ' + toWesternDigits(added) + ' كلمة بنجاح.');
     };
   };
 
@@ -7215,7 +7254,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       target.style.transform = 'scale(1.01)';
       try {
         target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     if (badge && total > 0) {
       badge.style.display = 'inline-flex';
@@ -7309,7 +7348,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountToolkitUI, 250);
     }
-    setInterval(mountToolkitUI, 1500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountToolkitUI);
   }
 })();
 
@@ -7416,7 +7455,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountQuizControls, 300);
     }
-    setInterval(mountQuizControls, 1500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountQuizControls);
   }
 })();
 
@@ -7520,7 +7559,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountSpeedControls, 300);
     }
-    setInterval(mountSpeedControls, 1500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountSpeedControls);
   }
 })();
 
@@ -7609,7 +7648,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountStatsUI, 300);
     }
-    setInterval(updateVocabStatsBadge, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(updateVocabStatsBadge);
   }
 })();
 
@@ -7626,7 +7665,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     var eng = window.SpokenVocabEngine;
     var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
     if (!items.length) {
-      alert('لا توجد كلمات حالياً.');
+      dfSafeNotify('لا توجد كلمات حالياً.');
       return;
     }
     var count = 0;
@@ -7642,9 +7681,9 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window.dfUpdateVocabStatsBadge === 'function') {
         window.dfUpdateVocabStatsBadge();
       }
-      alert('تم إتقان ' + toWesternDigits(count) + ' كلمة وإزالتها من قائمة المراجعة بنجاح!');
+      dfSafeNotify('تم إتقان ' + toWesternDigits(count) + ' كلمة وإزالتها من قائمة المراجعة بنجاح!');
     } else {
-      alert('جميع الكلمات متقنة بالفعل ولا توجد كلمات للمراجعة.');
+      dfSafeNotify('جميع الكلمات متقنة بالفعل ولا توجد كلمات للمراجعة.');
     }
   };
 
@@ -7673,7 +7712,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountBulkMasteryBtn, 350);
     }
-    setInterval(mountBulkMasteryBtn, 2000);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountBulkMasteryBtn);
   }
 })();
 
@@ -7686,13 +7725,13 @@ window.FlashQuizEngine = FlashQuizEngine;
   var autoAdvance = false;
   try {
     autoAdvance = localStorage.getItem(AUTO_KEY) === 'true';
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
   window.dfToggleQuizAutoAdvance = function() {
     autoAdvance = !autoAdvance;
     try {
       localStorage.setItem(AUTO_KEY, autoAdvance ? 'true' : 'false');
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     var btn = document.getElementById('df-quiz-autoadvance-btn');
     if (btn) {
       btn.style.background = autoAdvance ? 'rgba(74,222,128,0.25)' : 'rgba(255,255,255,0.06)';
@@ -7744,7 +7783,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountAutoAdvanceUI, 300);
     }
-    setInterval(mountAutoAdvanceUI, 2000);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountAutoAdvanceUI);
   }
 })();
 
@@ -7771,7 +7810,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         var u = new SpeechSynthesisUtterance(testPhrase);
         u.lang = lang;
         window.speechSynthesis.speak(u);
-      } catch(e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
   };
 
@@ -7830,7 +7869,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountVoiceStatusControls, 350);
     }
-    setInterval(updateVoiceStatusUI, 3000);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(updateVoiceStatusUI);
   }
 })();
 
@@ -7844,14 +7883,14 @@ window.FlashQuizEngine = FlashQuizEngine;
   try {
     var saved = parseInt(localStorage.getItem(INTERVAL_KEY), 10);
     if (saved && saved >= 500 && saved <= 5000) currentPauseMs = saved;
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
   window.dfSetVocabLoopInterval = function(sec) {
     var ms = Math.round((parseFloat(sec) || 1.5) * 1000);
     currentPauseMs = Math.max(500, Math.min(5000, ms));
     try {
       localStorage.setItem(INTERVAL_KEY, String(currentPauseMs));
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
     var eng = window.SpokenVocabEngine;
     if (eng && eng.config) {
@@ -7921,7 +7960,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountIntervalControls, 350);
     }
-    setInterval(updateIntervalButtonsUI, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(updateIntervalButtonsUI);
   }
 })();
 
@@ -7985,7 +8024,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(updateFilterChipBadges, 300);
     }
-    setInterval(updateFilterChipBadges, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(updateFilterChipBadges);
   }
 })();
 
@@ -8002,7 +8041,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     var eng = window.SpokenVocabEngine;
     var items = (eng && typeof eng.getItems === 'function') ? (eng.getItems() || []) : [];
     if (!items.length) {
-      alert('لا توجد كلمات في بنك الكلمات حالياً.');
+      dfSafeNotify('لا توجد كلمات في بنك الكلمات حالياً.');
       return 0;
     }
 
@@ -8034,9 +8073,9 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window.dfUpdateVocabStatsBadge === 'function') {
         window.dfUpdateVocabStatsBadge();
       }
-      alert('تم فحص الكلمات بنجاح وإزالة ' + toWesternDigits(removedCount) + ' كلمة مكررة.');
+      dfSafeNotify('تم فحص الكلمات بنجاح وإزالة ' + toWesternDigits(removedCount) + ' كلمة مكررة.');
     } else {
-      alert('ممتاز! قائمة الكلمات نقية ولا توجد أي كلمات مكررة.');
+      dfSafeNotify('ممتاز! قائمة الكلمات نقية ولا توجد أي كلمات مكررة.');
     }
     return removedCount;
   };
@@ -8066,7 +8105,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountCleanDuplicatesBtn, 350);
     }
-    setInterval(mountCleanDuplicatesBtn, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountCleanDuplicatesBtn);
   }
 })();
 
@@ -8086,7 +8125,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   try {
     var saved = localStorage.getItem(SORT_KEY);
     if (saved && LABELS[saved]) currentMode = saved;
-  } catch (e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
   window.dfSortVocabItems = function(items, mode) {
     var m = mode || currentMode;
@@ -8111,7 +8150,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     currentMode = MODES[(idx + 1) % MODES.length];
     try {
       localStorage.setItem(SORT_KEY, currentMode);
-    } catch (e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
     var btn = typeof document !== 'undefined' ? document.getElementById('df-vocab-sort-mode-btn') : null;
     if (btn) {
@@ -8152,7 +8191,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountSortModeBtn, 350);
     }
-    setInterval(mountSortModeBtn, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountSortModeBtn);
   }
 })();
 
@@ -8170,7 +8209,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   var STREAK_KEY = 'df_vocab_quiz_best_streak';
   try {
     bestStreak = parseInt(localStorage.getItem(STREAK_KEY), 10) || 0;
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
   window.dfRecordQuizAnswerStreak = function(isEasy) {
     if (isEasy) {
@@ -8179,7 +8218,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         bestStreak = currentStreak;
         try {
           localStorage.setItem(STREAK_KEY, String(bestStreak));
-        } catch(e) {}
+        } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
       }
     } else {
       currentStreak = 0;
@@ -8233,7 +8272,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountStreakUI, 350);
     }
-    setInterval(mountStreakUI, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountStreakUI);
   }
 })();
 
@@ -8275,7 +8314,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(hookAddInputs, 350);
     }
-    setInterval(hookAddInputs, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(hookAddInputs);
   }
 })();
 
@@ -8311,12 +8350,12 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var raw = localStorage.getItem(SNAPSHOT_KEY);
       if (!raw) {
-        alert('لا توجد نسخة احتياطية محفوظة حالياً.');
+        dfSafeNotify('لا توجد نسخة احتياطية محفوظة حالياً.');
         return false;
       }
       var snap = JSON.parse(raw);
       if (!snap || !Array.isArray(snap.items) || !snap.items.length) {
-        alert('بيانات النسخة الاحتياطية فارغة أو غير صالحة.');
+        dfSafeNotify('بيانات النسخة الاحتياطية فارغة أو غير صالحة.');
         return false;
       }
       var eng = window.SpokenVocabEngine;
@@ -8329,11 +8368,11 @@ window.FlashQuizEngine = FlashQuizEngine;
         if (typeof window.dfUpdateVocabStatsBadge === 'function') {
           window.dfUpdateVocabStatsBadge();
         }
-        alert('تمت استعادة ' + toWesternDigits(snap.items.length) + ' كلمة من النسخة الاحتياطية بنجاح!');
+        dfSafeNotify('تمت استعادة ' + toWesternDigits(snap.items.length) + ' كلمة من النسخة الاحتياطية بنجاح!');
         return true;
       }
     } catch(e) {
-      alert('تعذرت استعادة النسخة الاحتياطية.');
+      dfSafeNotify('تعذرت استعادة النسخة الاحتياطية.');
     }
     return false;
   };
@@ -8343,7 +8382,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     if (!lastSnap) {
       window.dfCreateVocabBackupSnapshot();
     }
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 })();
 
 /* === M220_VOCAB_AUTO_SHUFFLE_ON_QUIZ_START_AND_CODE40_V1 === */
@@ -8355,13 +8394,13 @@ window.FlashQuizEngine = FlashQuizEngine;
   var autoShuffleOnStart = false;
   try {
     autoShuffleOnStart = localStorage.getItem(SHUFFLE_ON_START_KEY) === 'true';
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
   window.dfToggleQuizAutoShuffleOnStart = function() {
     autoShuffleOnStart = !autoShuffleOnStart;
     try {
       localStorage.setItem(SHUFFLE_ON_START_KEY, autoShuffleOnStart ? 'true' : 'false');
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     var btn = document.getElementById('df-quiz-auto-shuffle-start-btn');
     if (btn) {
       btn.style.background = autoShuffleOnStart ? 'rgba(168,85,247,0.3)' : 'rgba(255,255,255,0.06)';
@@ -8399,7 +8438,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountAutoShuffleStartBtn, 350);
     }
-    setInterval(mountAutoShuffleStartBtn, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountAutoShuffleStartBtn);
   }
 })();
 
@@ -8459,7 +8498,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountFilterResetUI, 350);
     }
-    setInterval(mountFilterResetUI, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountFilterResetUI);
   }
 })();
 
@@ -8486,7 +8525,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
     var u = new SpeechSynthesisUtterance(String(text));
     if (lang) u.lang = lang;
@@ -8503,7 +8542,7 @@ window.FlashQuizEngine = FlashQuizEngine;
           if (window.speechSynthesis.speaking) {
             window.speechSynthesis.resume();
           }
-        } catch(e) {}
+        } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
         finish();
       }
     }, maxWaitMs);
@@ -8590,7 +8629,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountProgressBarUI, 350);
     }
-    setInterval(mountProgressBarUI, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountProgressBarUI);
   }
 })();
 
@@ -8646,7 +8685,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(hookQuizHaptics, 350);
     }
-    setInterval(hookQuizHaptics, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(hookQuizHaptics);
   }
 })();
 
@@ -8718,7 +8757,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountKeyboardShortcutsHint, 350);
     }
-    setInterval(mountKeyboardShortcutsHint, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountKeyboardShortcutsHint);
   }
 })();
 
@@ -8764,7 +8803,7 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     try {
       localStorage.setItem('df_vocab_foreign_lang', nextPair.code);
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
     updateLangPairBadgeUI();
     if (typeof window.dfUpdateVocabVoiceStatus === 'function') {
@@ -8804,7 +8843,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountLangPairBadge, 350);
     }
-    setInterval(updateLangPairBadgeUI, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(updateLangPairBadgeUI);
   }
 })();
 
@@ -8817,13 +8856,13 @@ window.FlashQuizEngine = FlashQuizEngine;
   var autoPronounce = false;
   try {
     autoPronounce = localStorage.getItem(AUTO_PRONOUNCE_KEY) === 'true';
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
   window.dfToggleQuizAutoPronounce = function() {
     autoPronounce = !autoPronounce;
     try {
       localStorage.setItem(AUTO_PRONOUNCE_KEY, autoPronounce ? 'true' : 'false');
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     var btn = document.getElementById('df-quiz-auto-pronounce-btn');
     if (btn) {
       btn.style.background = autoPronounce ? 'rgba(56,189,248,0.3)' : 'rgba(255,255,255,0.06)';
@@ -8875,7 +8914,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(mountAutoPronounceBtn, 350);
     }
-    setInterval(mountAutoPronounceBtn, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountAutoPronounceBtn);
   }
 })();
 
@@ -9066,7 +9105,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     }
 
     if (!hardItems.length) {
-      alert('ممتاز! أتقنت جميع الكلمات في هذه الجلسة ولا توجد كلمات للمراجعة.');
+      dfSafeNotify('ممتاز! أتقنت جميع الكلمات في هذه الجلسة ولا توجد كلمات للمراجعة.');
       return false;
     }
 
@@ -9113,7 +9152,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 
   if (typeof document !== 'undefined' && typeof setInterval !== 'undefined') {
-    setInterval(injectRetryHardButton, 1000);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(injectRetryHardButton);
   }
 })();
 
@@ -9233,7 +9272,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       setTimeout(window.dfCheckAndRenderVocabEmptyState, 350);
     }
     if (typeof setInterval !== 'undefined') {
-      setInterval(window.dfCheckAndRenderVocabEmptyState, 3000);
+      if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(window.dfCheckAndRenderVocabEmptyState);
     }
   }
 })();
@@ -9490,7 +9529,7 @@ window.FlashQuizEngine = FlashQuizEngine;
           newMeaning = window.dfSanitizeVocabText(newMeaning);
         }
         if (!newWord || !newMeaning) {
-          alert('يرجى ملء الكلمة والمعنى.');
+          dfSafeNotify('يرجى ملء الكلمة والمعنى.');
           return;
         }
         target.word = newWord;
@@ -9591,7 +9630,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   try {
     var saved = parseFloat(localStorage.getItem(PITCH_KEY));
     if (saved >= 0.8 && saved <= 1.2) currentPitch = saved;
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
   window.dfSetVocabTtsPitch = function(p) {
     var val = parseFloat(p);
@@ -9599,7 +9638,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     currentPitch = Math.max(0.85, Math.min(1.15, val));
     try {
       localStorage.setItem(PITCH_KEY, String(currentPitch));
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     return currentPitch;
   };
 
@@ -9633,7 +9672,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   try {
     var saved = parseFloat(localStorage.getItem(VOL_KEY));
     if (!isNaN(saved) && saved >= 0.2 && saved <= 1.0) currentVolume = saved;
-  } catch(e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
   window.dfSetVocabTtsVolume = function(v) {
     var val = parseFloat(v);
@@ -9641,7 +9680,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     currentVolume = Math.max(0.2, Math.min(1.0, val));
     try {
       localStorage.setItem(VOL_KEY, String(currentVolume));
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     return currentVolume;
   };
 
@@ -9675,7 +9714,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window.speechSynthesis !== 'undefined') {
         window.speechSynthesis.cancel();
       }
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
     if (typeof document !== 'undefined') {
       var playingBtns = document.querySelectorAll('[data-audio-playing]');
@@ -9708,7 +9747,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     } else {
       setTimeout(hookTabSwitches, 350);
     }
-    setInterval(hookTabSwitches, 2500);
+    if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(hookTabSwitches);
   }
 })();
 
@@ -9723,7 +9762,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window.dfStopAllVocabSpeech === 'function') {
         window.dfStopAllVocabSpeech();
       } else if (typeof window.speechSynthesis !== 'undefined') {
-        try { window.speechSynthesis.cancel(); } catch(e) {}
+        try { window.speechSynthesis.cancel(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
       }
       return true;
     }
@@ -9748,7 +9787,7 @@ window.FlashQuizEngine = FlashQuizEngine;
           if (window.speechSynthesis.paused) {
             window.speechSynthesis.resume();
           }
-        } catch(e) {}
+        } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
       }
       if (typeof window.dfUpdateVocabVoiceStatus === 'function') {
         window.dfUpdateVocabVoiceStatus();
@@ -9893,7 +9932,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       setTimeout(window.dfEnsureQuizCardAspectStability, 350);
     }
     if (typeof setInterval !== 'undefined') {
-      setInterval(window.dfEnsureQuizCardAspectStability, 2500);
+      if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(window.dfEnsureQuizCardAspectStability);
     }
   }
 })();
@@ -9956,7 +9995,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       setTimeout(window.dfApplyAdaptiveTypographyToCards, 350);
     }
     if (typeof setInterval !== 'undefined') {
-      setInterval(window.dfApplyAdaptiveTypographyToCards, 2500);
+      if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(window.dfApplyAdaptiveTypographyToCards);
     }
   }
 })();
@@ -9987,7 +10026,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       setTimeout(window.dfApplyCard3dHardwareAcceleration, 350);
     }
     if (typeof setInterval !== 'undefined') {
-      setInterval(window.dfApplyCard3dHardwareAcceleration, 2500);
+      if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(window.dfApplyCard3dHardwareAcceleration);
     }
   }
 })();
@@ -10036,7 +10075,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       setTimeout(mountSlowReplayBtn, 350);
     }
     if (typeof setInterval !== 'undefined') {
-      setInterval(mountSlowReplayBtn, 2500);
+      if (typeof window !== "undefined" && window.dfRegisterUISyncHook) window.dfRegisterUISyncHook(mountSlowReplayBtn);
     }
   }
 })();
@@ -10156,13 +10195,13 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfUpdateVocabFilterChips === 'function') {
         window.dfUpdateVocabFilterChips();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return list[foundIndex].isPinned;
   }
@@ -10326,7 +10365,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       history.sort();
       try {
         localStorage.setItem('df_vocab_study_history_v1', JSON.stringify(history));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return history;
   }
@@ -10415,7 +10454,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       var val = localStorage.getItem('df_vocab_daily_goal_v1');
       var num = parseInt(val, 10);
       if (!isNaN(num) && num > 0) return num;
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return 10;
   }
 
@@ -10425,7 +10464,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     if (num > 500) num = 500;
     try {
       localStorage.setItem('df_vocab_daily_goal_v1', String(num));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return num;
   }
 
@@ -10435,7 +10474,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (!raw) return {};
       var parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object') return parsed;
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return {};
   }
 
@@ -10452,7 +10491,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       map[todayKey].push(idStr);
       try {
         localStorage.setItem('df_vocab_today_reviewed_v1', JSON.stringify(map));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return map[todayKey].length;
   }
@@ -10548,7 +10587,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     var lastCelebrated = null;
     try {
       lastCelebrated = localStorage.getItem('df_vocab_goal_celebrated_v1');
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (lastCelebrated === todayKey) {
       return { celebrated: false, reason: 'already_celebrated_today' };
@@ -10556,7 +10595,7 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     try {
       localStorage.setItem('df_vocab_goal_celebrated_v1', todayKey);
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var chimeSuccess = dfPlayZenGoalCompletionChime();
 
@@ -10564,7 +10603,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
         window.dfVocabHapticPulse(40);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       celebrated: true,
@@ -10616,14 +10655,14 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfGetVocabDailyGoal === 'function') {
         dailyGoal = window.dfGetVocabDailyGoal();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var streak = 0;
     try {
       if (typeof window !== 'undefined' && typeof window.dfCalculateVocabStudyStreak === 'function') {
         streak = window.dfCalculateVocabStudyStreak().currentStreak;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       totalWords: totalWords,
@@ -10694,7 +10733,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         container.appendChild(wrap);
         return true;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return false;
   }
 
@@ -10716,13 +10755,13 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfUpdateVocabHeaderQuickStatsDOM === 'function') {
         window.dfUpdateVocabHeaderQuickStatsDOM();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfUpdateVocabFilterChips === 'function') {
         window.dfUpdateVocabFilterChips();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
@@ -10741,7 +10780,7 @@ window.FlashQuizEngine = FlashQuizEngine;
           window.dispatchEvent(evt);
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function dfTriggerVocabStatsSync(options) {
@@ -10775,7 +10814,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     var handler = function(e) {
       try {
         callback(e && e.detail ? e.detail : null);
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     };
 
     window.addEventListener('df:vocab-stats-updated', handler);
@@ -10783,7 +10822,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     return function dfUnsubscribe() {
       try {
         window.removeEventListener('df:vocab-stats-updated', handler);
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     };
   }
 
@@ -10896,7 +10935,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (val && ['all', 'mastered', 'needs_review', 'learning', 'pinned'].indexOf(val) !== -1) {
         return val;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return 'all';
   }
 
@@ -10930,19 +10969,19 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     try {
       localStorage.setItem('df_vocab_active_tier_filter_v1', target);
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfTriggerVocabStatsSync === 'function') {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return target;
   }
@@ -10996,26 +11035,26 @@ window.FlashQuizEngine = FlashQuizEngine;
       } else {
         localStorage.setItem('df_vocab_active_tier_filter_v1', 'all');
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof document !== 'undefined') {
         var searchInput = document.getElementById('df-vocab-search-input');
         if (searchInput) searchInput.value = '';
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfTriggerVocabStatsSync === 'function') {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return true;
   }
@@ -11080,19 +11119,19 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined') {
         window.dfCurrentQuizCards = filteredCards.slice();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
         window.dfVocabHapticPulse(25);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfOpenFlashcardQuizModal === 'function') {
         window.dfOpenFlashcardQuizModal(filteredCards);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       success: true,
@@ -11184,13 +11223,13 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfRecordVocabWordReviewedToday === 'function') {
         window.dfRecordVocabWordReviewedToday(cardId);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfTriggerVocabStatsSync === 'function') {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       success: true,
@@ -11238,7 +11277,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         if (typeof window !== 'undefined' && typeof window.dfRecordVocabWordReviewedToday === 'function') {
           window.dfRecordVocabWordReviewedToday(res.cardId);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
 
     dfSaveVocabBankListSafe(list);
@@ -11247,7 +11286,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfTriggerVocabStatsSync === 'function') {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfGetVocabDailyGoalProgress === 'function' && typeof window.dfTriggerGoalCelebrationIfNeeded === 'function') {
@@ -11256,7 +11295,7 @@ window.FlashQuizEngine = FlashQuizEngine;
           window.dfTriggerGoalCelebrationIfNeeded(true);
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       promotedCount: promoted,
@@ -11313,27 +11352,27 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfBulkPromoteQuizSessionResults === 'function') {
         window.dfBulkPromoteQuizSessionResults(results);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== 'undefined' && typeof window.dfRecordVocabStudySession === 'function') {
         window.dfRecordVocabStudySession();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var accuracy = { percentage: 0, formatted: '0%', tier: 'neutral', label: 'مكتمل' };
     try {
       if (typeof window !== 'undefined' && typeof window.dfCalculateQuizAccuracy === 'function') {
         accuracy = window.dfCalculateQuizAccuracy(masteredCount, results.length);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var streak = { currentStreak: 0, formatted: '0' };
     try {
       if (typeof window !== 'undefined' && typeof window.dfCalculateVocabStudyStreak === 'function') {
         streak = window.dfCalculateVocabStudyStreak();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       totalReviewed: results.length,
@@ -11425,7 +11464,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
         window.dfVocabHapticPulse(20);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       return navigator.share({
@@ -11469,7 +11508,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         window.dfLastQuizSummary = summary;
       }
       localStorage.setItem('df_last_quiz_summary_v1', JSON.stringify(summary));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function dfGetLastQuizSummary() {
@@ -11479,7 +11518,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       }
       var raw = localStorage.getItem('df_last_quiz_summary_v1');
       if (raw) return JSON.parse(raw);
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return null;
   }
 
@@ -11506,7 +11545,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
         window.dfVocabHapticPulse(20);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (typeof window !== 'undefined' && typeof window.dfShareOrCopyQuizSessionSummary === 'function') {
       return window.dfShareOrCopyQuizSessionSummary(summary);
@@ -11540,7 +11579,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         clearTimeout(_activeToastTimeout);
         _activeToastTimeout = null;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function dfShowVocabToastNotification(message, type, durationMs) {
@@ -11635,7 +11674,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfGetLastQuizSummary === 'function') {
         summary = window.dfGetLastQuizSummary();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (!summary) {
       if (typeof window !== 'undefined' && typeof window.dfShowVocabToastNotification === 'function') {
@@ -11696,14 +11735,14 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
         totalWords = window.dfGetVocabBankList().length;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var streak = 0;
     try {
       if (typeof window !== "undefined" && typeof window.dfCalculateVocabStudyStreak === "function") {
         streak = window.dfCalculateVocabStudyStreak().currentStreak;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       version: "4.0.0",
@@ -11782,7 +11821,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== 'undefined' && typeof window.dfVocabHapticPulse === 'function') {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof document === 'undefined') return false;
@@ -11825,7 +11864,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (existing && existing.parentNode) {
         existing.parentNode.removeChild(existing);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   if (typeof window !== 'undefined') {
@@ -11921,14 +11960,14 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(25);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfOpenFlashcardQuizModal === "function") {
         window.dfCurrentQuizCards = cards.slice();
         window.dfOpenFlashcardQuizModal(cards);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return true;
   }
@@ -11940,7 +11979,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (el && el.parentNode) {
         el.parentNode.removeChild(el);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function dfOnPomodoroSessionCompleted() {
@@ -11948,7 +11987,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfPlayZenGoalCompletionChime === "function") {
         window.dfPlayZenGoalCompletionChime();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var available = dfGetMicroReviewCards(5);
     if (available && available.length > 0) {
@@ -11961,7 +12000,7 @@ window.FlashQuizEngine = FlashQuizEngine;
             container.insertBefore(div.firstChild, container.firstChild);
           }
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
   }
 
@@ -12018,21 +12057,21 @@ window.FlashQuizEngine = FlashQuizEngine;
           focusMins = Number(parsed.minutes) || 0;
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var wordsReviewed = 0;
     try {
       if (typeof window !== "undefined" && typeof window.dfGetVocabTodayReviewedCount === "function") {
         wordsReviewed = window.dfGetVocabTodayReviewedCount();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var streak = 0;
     try {
       if (typeof window !== "undefined" && typeof window.dfCalculateVocabStudyStreak === "function") {
         streak = window.dfCalculateVocabStudyStreak().currentStreak;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var res = dfCalculateSynergyPoints(focusMins, wordsReviewed, streak);
 
@@ -12075,7 +12114,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var val = localStorage.getItem("df_halfway_chime_enabled_v1");
       if (val !== null) return val === "true";
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return true;
   }
 
@@ -12083,7 +12122,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     var state = (enable !== undefined) ? Boolean(enable) : !dfIsHalfwayChimeEnabled();
     try {
       localStorage.setItem("df_halfway_chime_enabled_v1", String(state));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return state;
   }
 
@@ -12126,7 +12165,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         if (typeof window.dfVocabHapticPulse === "function") {
           window.dfVocabHapticPulse(15);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       return true;
     } catch (_) {
@@ -12208,7 +12247,7 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     try {
       localStorage.setItem("df_oled_true_black_v1", String(nextState));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     dfApplyOledTrueBlackState();
 
@@ -12216,7 +12255,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return nextState;
   }
@@ -12243,7 +12282,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     if (typeof window !== "undefined") {
       dfApplyOledTrueBlackState();
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
   if (typeof window !== "undefined") {
     window.dfIsOledTrueBlackEnabled = dfIsOledTrueBlackEnabled;
@@ -12345,7 +12384,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         el.innerHTML = dfRenderWeeklyStudyHeatmapHtml();
         return true;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return false;
   }
 
@@ -12381,27 +12420,27 @@ window.FlashQuizEngine = FlashQuizEngine;
       var vRaw = localStorage.getItem("df_vocab_bank_v1");
       if (vRaw) vocab = JSON.parse(vRaw);
       if (!Array.isArray(vocab)) vocab = [];
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       var hRaw = localStorage.getItem("df_vocab_study_history_v1");
       if (hRaw) history = JSON.parse(hRaw);
       if (!Array.isArray(history)) history = [];
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       var gVal = parseInt(localStorage.getItem("df_vocab_daily_goal_v1"), 10);
       if (!isNaN(gVal) && gVal > 0) dailyGoal = gVal;
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       oledBlack = localStorage.getItem("df_oled_true_black_v1") === "true";
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       var chimeVal = localStorage.getItem("df_halfway_chime_enabled_v1");
       if (chimeVal !== null) halfwayChime = chimeVal === "true";
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var bundle = {
       app: "Deep Focus",
@@ -12430,7 +12469,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(25);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof document !== "undefined") {
@@ -12446,13 +12485,13 @@ window.FlashQuizEngine = FlashQuizEngine;
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
         window.dfShowVocabToastNotification("تم تصدير نسخة الخزينة الاحتياطية بنجاح", "success");
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return jsonStr;
   }
@@ -12538,7 +12577,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window.dfApplyOledTrueBlackState === 'function') window.dfApplyOledTrueBlackState();
       if (typeof window.dfTriggerVocabStatsSync === 'function') window.dfTriggerVocabStatsSync({immediate:true});
       if (typeof window.dfShowVocabToastNotification === 'function') window.dfShowVocabToastNotification('تم استيراد بيانات المفردات بنجاح','success');
-    }} catch (_) {}
+    }} catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return {success:true,wordsCount:v.vocabBank.length,historyCount:v.studyHistory.length};
   }
   // A crash during a previous import must not leave half-published values.
@@ -12688,20 +12727,20 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && window.speechSynthesis && typeof window.speechSynthesis.cancel === "function") {
         window.speechSynthesis.cancel();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfStopAllVocabSpeech === "function") {
         window.dfStopAllVocabSpeech();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
         var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-focus-lost") : new Event("df:audio-focus-lost");
         window.dispatchEvent(evt);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return true;
   }
@@ -12715,7 +12754,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-focus-gained") : new Event("df:audio-focus-gained");
         window.dispatchEvent(evt);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return true;
   }
@@ -12746,7 +12785,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       window.dfSimulateAudioFocusChange = dfSimulateAudioFocusChange;
       window.dfIsAudioSuspended = dfIsAudioSuspended;
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 })();
 
 /* === M280_GOLDEN_CENTURY_MILESTONE_V4_1_0_AND_CODE100_V1 === */
@@ -12769,14 +12808,14 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
         totalWords = window.dfGetVocabBankList().length;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var streak = 0;
     try {
       if (typeof window !== "undefined" && typeof window.dfCalculateVocabStudyStreak === "function") {
         streak = window.dfCalculateVocabStudyStreak().currentStreak;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       version: "4.1.0",
@@ -12833,7 +12872,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (val && ["rain", "stream", "forest", "white_noise", "none"].indexOf(val) !== -1) {
         return val;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return "none";
   }
 
@@ -12844,16 +12883,16 @@ window.FlashQuizEngine = FlashQuizEngine;
         _soundscapeGain.gain.exponentialRampToValueAtTime(0.0001, _soundscapeCtx.currentTime + 0.3);
         setTimeout(function() {
           if (_soundscapeNode) {
-            try { _soundscapeNode.stop(); _soundscapeNode.disconnect(); } catch (_) {}
+            try { _soundscapeNode.stop(); _soundscapeNode.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
             _soundscapeNode = null;
           }
         }, 350);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       localStorage.setItem("df_active_soundscape_v1", "none");
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return { active: false, type: "none" };
   }
@@ -12927,13 +12966,13 @@ window.FlashQuizEngine = FlashQuizEngine;
 
       try {
         localStorage.setItem("df_active_soundscape_v1", type);
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       try {
         if (typeof window.dfVocabHapticPulse === "function") {
           window.dfVocabHapticPulse(15);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       return { active: true, type: type };
     } catch (_) {
@@ -13001,7 +13040,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (target <= 0.0001) {
         gainNode.gain.exponentialRampToValueAtTime(0.0001, now + dur);
         setTimeout(function() {
-          try { gainNode.gain.setValueAtTime(0, audioCtx.currentTime); } catch (_) {}
+          try { gainNode.gain.setValueAtTime(0, audioCtx.currentTime); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         }, Math.round((dur + 0.05) * 1000));
       } else {
         gainNode.gain.exponentialRampToValueAtTime(target, now + dur);
@@ -13027,7 +13066,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       try {
         if (typeof audioSourceNode.stop === "function") audioSourceNode.stop();
         if (typeof audioSourceNode.disconnect === "function") audioSourceNode.disconnect();
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }, Math.round((dur + 0.1) * 1000));
 
     return true;
@@ -13057,7 +13096,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     var state = (enable !== undefined) ? Boolean(enable) : !dfIsWindChimesEnabled();
     try {
       localStorage.setItem("df_wind_chimes_enabled_v1", String(state));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (state) {
       dfStartWindChimesScheduler();
@@ -13069,7 +13108,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return state;
   }
@@ -13121,7 +13160,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         if (typeof window.dfVocabHapticPulse === "function") {
           window.dfVocabHapticPulse(15);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       return true;
     } catch (_) {
@@ -13208,7 +13247,7 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     try {
       localStorage.removeItem("df_sleep_timer_target_v1");
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return { active: false };
   }
@@ -13218,7 +13257,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       try {
         var raw = localStorage.getItem("df_sleep_timer_target_v1");
         if (raw) _sleepTimerTargetMs = Number(raw) || 0;
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
 
     if (_sleepTimerTargetMs <= 0) {
@@ -13253,19 +13292,19 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     try {
       localStorage.setItem("df_sleep_timer_target_v1", String(_sleepTimerTargetMs));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
         window.dfShowVocabToastNotification("تم تفعيل مؤقت النوم: " + dfFormatWesternDigits(mins) + " دقيقة", "info", 2000);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     _sleepTimerInterval = setInterval(function() {
       var status = dfGetSleepTimerStatus();
@@ -13283,7 +13322,7 @@ window.FlashQuizEngine = FlashQuizEngine;
           if (typeof window !== "undefined" && typeof window.dfApplySmoothAudioFade === "function" && window._soundscapeGain && window._soundscapeCtx) {
             window.dfApplySmoothAudioFade(window._soundscapeGain, 0.0001, status.remainingSeconds, window._soundscapeCtx);
           }
-        } catch (_) {}
+        } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       }
     }, 5000);
 
@@ -13359,14 +13398,14 @@ window.FlashQuizEngine = FlashQuizEngine;
           try {
             if (_leftOsc) { _leftOsc.stop(); _leftOsc.disconnect(); _leftOsc = null; }
             if (_rightOsc) { _rightOsc.stop(); _rightOsc.disconnect(); _rightOsc = null; }
-          } catch (_) {}
+          } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         }, 550);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       localStorage.setItem("df_binaural_gamma_active_v1", "false");
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return { active: false };
   }
@@ -13417,13 +13456,13 @@ window.FlashQuizEngine = FlashQuizEngine;
 
       try {
         localStorage.setItem("df_binaural_gamma_active_v1", "true");
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       try {
         if (typeof window.dfVocabHapticPulse === "function") {
           window.dfVocabHapticPulse(15);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       return {
         active: true,
@@ -13482,7 +13521,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var val = localStorage.getItem("df_flip_to_mute_enabled_v1");
       if (val !== null) return val === "true";
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return true;
   }
 
@@ -13490,13 +13529,13 @@ window.FlashQuizEngine = FlashQuizEngine;
     var state = (enable !== undefined) ? Boolean(enable) : !dfIsFlipToMuteEnabled();
     try {
       localStorage.setItem("df_flip_to_mute_enabled_v1", String(state));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return state;
   }
@@ -13518,7 +13557,7 @@ window.FlashQuizEngine = FlashQuizEngine;
           mutedSomething = true;
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfIsBinauralGammaActive === "function") {
@@ -13527,25 +13566,25 @@ window.FlashQuizEngine = FlashQuizEngine;
           mutedSomething = true;
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfStopAllVocabSpeech === "function") {
         window.dfStopAllVocabSpeech();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(30);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
         window.dfShowVocabToastNotification("تم كتم الصوت بقلب الهاتف 🤫", "info", 2000);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return { success: true, mutedSomething: mutedSomething };
   }
@@ -13598,7 +13637,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         }
       });
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
   if (typeof window !== "undefined") {
     window.dfIsFlipToMuteEnabled = dfIsFlipToMuteEnabled;
@@ -13631,7 +13670,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         var n = parseFloat(val);
         if (!isNaN(n)) return Math.max(0.0, Math.min(1.0, n));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return 1.0;
   }
 
@@ -13639,13 +13678,13 @@ window.FlashQuizEngine = FlashQuizEngine;
     var v = Math.max(0.0, Math.min(1.0, Number(volume) || 0));
     try {
       localStorage.setItem("df_volume_tts_v1", String(v));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(10);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return v;
   }
@@ -13657,7 +13696,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         var n = parseFloat(val);
         if (!isNaN(n)) return Math.max(0.0, Math.min(1.0, n));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return 0.40;
   }
 
@@ -13665,7 +13704,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     var v = Math.max(0.0, Math.min(1.0, Number(volume) || 0));
     try {
       localStorage.setItem("df_volume_ambient_v1", String(v));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && window._soundscapeGain && window._soundscapeCtx) {
@@ -13675,13 +13714,13 @@ window.FlashQuizEngine = FlashQuizEngine;
           window._soundscapeGain.gain.setValueAtTime(v * 0.25, window._soundscapeCtx.currentTime);
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(10);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return v;
   }
@@ -13787,21 +13826,21 @@ window.FlashQuizEngine = FlashQuizEngine;
             if (typeof window !== "undefined" && typeof window.dfOnNextQuizCard === "function") {
               window.dfOnNextQuizCard();
             }
-          } catch (_) {}
+          } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         },
         previoustrack: function() {
           try {
             if (typeof window !== "undefined" && typeof window.dfOnPrevQuizCard === "function") {
               window.dfOnPrevQuizCard();
             }
-          } catch (_) {}
+          } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         }
       };
 
       for (var action in handlers) {
         try {
           navigator.mediaSession.setActionHandler(action, handlers[action]);
-        } catch (_) {}
+        } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       }
 
       return true;
@@ -13817,7 +13856,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       window.dfClearMediaSession = dfClearMediaSession;
       window.dfInitMediaSessionActionHandlers = dfInitMediaSessionActionHandlers;
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 })();
 
 /* === M289_AUDIO_DUCKING_POLICY_HANDLER_AND_CODE109_V1 === */
@@ -13838,7 +13877,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfGetAmbientVolume === "function") {
         _preDuckedVolume = window.dfGetAmbientVolume();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     _isAudioDucked = true;
     var duckedVol = _preDuckedVolume * 0.25;
@@ -13851,14 +13890,14 @@ window.FlashQuizEngine = FlashQuizEngine;
           window._soundscapeGain.gain.setValueAtTime(duckedVol * 0.25, window._soundscapeCtx.currentTime);
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
         var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-ducked") : new Event("df:audio-ducked");
         window.dispatchEvent(evt);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return { ducked: true, targetVolume: duckedVol };
   }
@@ -13875,14 +13914,14 @@ window.FlashQuizEngine = FlashQuizEngine;
           window._soundscapeGain.gain.setValueAtTime(_preDuckedVolume * 0.25, window._soundscapeCtx.currentTime);
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
         var evt = typeof CustomEvent === "function" ? new CustomEvent("df:audio-duck-restored") : new Event("df:audio-duck-restored");
         window.dispatchEvent(evt);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return { restored: true, volume: _preDuckedVolume };
   }
@@ -13906,7 +13945,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       window.dfApplyAudioDucking = dfApplyAudioDucking;
       window.dfRestoreAudioDucking = dfRestoreAudioDucking;
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 })();
 
 /* === M290_ACOUSTIC_ZEN_MILESTONE_V4_2_0_AND_CODE110_V1 === */
@@ -13929,21 +13968,21 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfGetActiveSoundscape === "function") {
         activeSoundscape = window.dfGetActiveSoundscape();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var isBinaural = false;
     try {
       if (typeof window !== "undefined" && typeof window.dfIsBinauralGammaActive === "function") {
         isBinaural = window.dfIsBinauralGammaActive();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var isChimes = false;
     try {
       if (typeof window !== "undefined" && typeof window.dfIsWindChimesEnabled === "function") {
         isChimes = window.dfIsWindChimesEnabled();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       version: "4.2.0",
@@ -14059,7 +14098,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         var raw = localStorage.getItem("df_vocab_bank_v1");
         if (raw) list = JSON.parse(raw);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (!Array.isArray(list)) list = [];
     var target = null;
@@ -14083,13 +14122,13 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     try {
       localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return target;
   }
@@ -14123,7 +14162,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         var raw = localStorage.getItem("df_vocab_bank_v1");
         if (raw) allCards = JSON.parse(raw);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (!Array.isArray(allCards)) return [];
 
@@ -14171,14 +14210,14 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(25);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfOpenFlashcardQuizModal === "function") {
         window.dfCurrentQuizCards = dueCards.slice();
         window.dfOpenFlashcardQuizModal(dueCards);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return { started: true, count: dueCards.length };
   }
@@ -14281,7 +14320,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         var raw = localStorage.getItem("df_vocab_bank_v1");
         if (raw) list = JSON.parse(raw);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (!Array.isArray(list)) return false;
     var found = false;
@@ -14306,7 +14345,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window.dfTriggerVocabStatsSync === "function") {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return true;
   }
@@ -14379,7 +14418,7 @@ window.FlashQuizEngine = FlashQuizEngine;
           var raw = localStorage.getItem("df_vocab_bank_v1");
           if (raw) list = JSON.parse(raw);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
 
     if (!Array.isArray(list)) return [];
@@ -14445,7 +14484,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var val = localStorage.getItem("df_active_deck_v1");
       if (val && typeof val === "string") return val;
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return "all";
   }
 
@@ -14453,19 +14492,19 @@ window.FlashQuizEngine = FlashQuizEngine;
     var target = (deckName && typeof deckName === "string") ? deckName.trim() : "all";
     try {
       localStorage.setItem("df_active_deck_v1", target);
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return target;
   }
@@ -14479,7 +14518,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         var raw = localStorage.getItem("df_vocab_bank_v1");
         if (raw) list = JSON.parse(raw);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (!Array.isArray(list)) list = [];
 
@@ -14528,7 +14567,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var raw = localStorage.getItem("df_vocab_bank_v1");
       if (raw) list = JSON.parse(raw);
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (!Array.isArray(list)) return false;
     var found = false;
@@ -14553,7 +14592,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return true;
   }
@@ -14606,13 +14645,13 @@ window.FlashQuizEngine = FlashQuizEngine;
     var state = (enable !== undefined) ? Boolean(enable) : !dfIsSpellingModeEnabled();
     try {
       localStorage.setItem("df_spelling_mode_enabled_v1", String(state));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return state;
   }
@@ -14663,7 +14702,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
           window.dfVocabHapticPulse(25);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       return {
         correct: true,
@@ -14704,7 +14743,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         "<input type=\"text\" id=\"df-spelling-input\" placeholder=\"اكتب الكلمة باللغة الأجنبية...\" style=\"width:100%;box-sizing:border-box;padding:10px 12px;background:#27272a;border:1px solid #3f3f46;border-radius:8px;color:#f4f4f5;font-size:14px;direction:ltr;text-align:center;\" />" +
       "</div>" +
       "<div style=\"display:flex;gap:8px;\">" +
-        "<button type=\"button\" onclick=\"var input=document.getElementById('df-spelling-input'); if(input && window.dfCheckSpellingInput){ var res = window.dfCheckSpellingInput(input.value, '" + safeWord + "'); alert(res.message); }\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
+        "<button type=\"button\" onclick=\"var input=document.getElementById('df-spelling-input'); if(input && window.dfCheckSpellingInput){ var res = window.dfCheckSpellingInput(input.value, '" + safeWord + "'); dfSafeNotify(res.message); }\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
           "<span>تحقق من الإملاء</span>" +
         "</button>" +
         "<button type=\"button\" onclick=\"alert('الكلمة الصحيحة هي: " + safeWord + "');\" style=\"background:rgba(255,255,255,0.08);color:#a1a1aa;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;\">" +
@@ -14802,7 +14841,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var raw = localStorage.getItem("df_vocab_bank_v1");
       if (raw) existing = JSON.parse(raw);
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     if (!Array.isArray(existing)) existing = [];
 
     var existingWords = Object.create(null);
@@ -14837,13 +14876,13 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(25);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
@@ -14851,7 +14890,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         if (skipped > 0) msg += " (تخطي " + dfFormatWesternDigits(skipped) + " مكررة)";
         window.dfShowVocabToastNotification(msg, "success");
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       success: true,
@@ -14908,7 +14947,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     var state = (enable !== undefined) ? Boolean(enable) : !dfIsAutoArchiveEnabled();
     try {
       localStorage.setItem("df_auto_archive_mastered_v1", String(state));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (state) {
       dfArchiveMasteredCardsNow();
@@ -14918,13 +14957,13 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return state;
   }
@@ -14938,7 +14977,7 @@ window.FlashQuizEngine = FlashQuizEngine;
         var raw = localStorage.getItem("df_vocab_bank_v1");
         if (raw) list = JSON.parse(raw);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (!Array.isArray(list)) return 0;
     var count = 0;
@@ -14957,7 +14996,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     if (count > 0) {
       try {
         localStorage.setItem("df_vocab_bank_v1", JSON.stringify(list));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
 
     return count;
@@ -14969,7 +15008,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var raw = localStorage.getItem("df_vocab_bank_v1");
       if (raw) list = JSON.parse(raw);
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     if (!Array.isArray(list)) return false;
     var found = false;
@@ -14995,7 +15034,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window.dfTriggerVocabStatsSync === "function") {
         window.dfTriggerVocabStatsSync({ immediate: true });
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return true;
   }
@@ -15005,7 +15044,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var raw = localStorage.getItem("df_vocab_bank_v1");
       if (raw) list = JSON.parse(raw);
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     if (!Array.isArray(list)) return 0;
 
     var archCount = 0;
@@ -15078,7 +15117,7 @@ window.FlashQuizEngine = FlashQuizEngine;
           defaultRecords.longestFocusSessionMins = Number(parsed.longestFocusSessionMins) || 0;
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       allTimeMastered: defaultRecords.allTimeMastered,
@@ -15127,25 +15166,25 @@ window.FlashQuizEngine = FlashQuizEngine;
     if (broken.length > 0) {
       try {
         localStorage.setItem("df_personal_records_v1", JSON.stringify(records));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       try {
         if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
           window.dfVocabHapticPulse(30);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       try {
         if (typeof window !== "undefined" && typeof window.dfShowVocabToastNotification === "function") {
           window.dfShowVocabToastNotification("🏆 رقم قياسي جديد: " + broken[0] + "!", "success", 2500);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       try {
         if (typeof window !== "undefined" && typeof window.dfTriggerVocabStatsSync === "function") {
           window.dfTriggerVocabStatsSync({ immediate: true });
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       return { isNewRecord: true, brokenRecords: broken, records: records };
     }
@@ -15198,21 +15237,21 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (typeof window !== "undefined" && typeof window.dfGetVocabBankList === "function") {
         totalWords = window.dfGetVocabBankList().length;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var dueCount = 0;
     try {
       if (typeof window !== "undefined" && typeof window.dfGetDueTodayCount === "function") {
         dueCount = window.dfGetDueTodayCount().count;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     var allTimeRec = 0;
     try {
       if (typeof window !== "undefined" && typeof window.dfGetPersonalRecords === "function") {
         allTimeRec = window.dfGetPersonalRecords().allTimeMastered;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       version: "4.3.0",
@@ -15279,28 +15318,28 @@ window.FlashQuizEngine = FlashQuizEngine;
           window.dfStartDueTodayQuiz();
           executed = true;
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     } else if (action === "ambient" || action === "rain") {
       try {
         if (typeof window !== "undefined" && typeof window.dfStartAmbientSoundscape === "function") {
           window.dfStartAmbientSoundscape("rain");
           executed = true;
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     } else if (action === "focus" || action === "timer") {
       try {
         if (typeof window !== "undefined" && typeof window.dfSwitchTab === "function") {
           window.dfSwitchTab("timer");
           executed = true;
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
 
     try {
       if (executed && typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(20);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return { handled: executed, action: action };
   }
@@ -15312,7 +15351,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       });
       window.dfHandleDeepLinkAction = dfHandleDeepLinkAction;
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 })();
 
 /* === M302_ANDROID_SPLASH_SCREEN_COMPLIANCE_AND_CODE122_V1 === */
@@ -15367,7 +15406,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       window.dfDismissSplashScreen = dfDismissSplashScreen;
       window.dfInitSplashScreenDismissal = dfInitSplashScreenDismissal;
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 })();
 
 /* === M303_DO_NOT_DISTURB_DND_STATUS_INDICATOR_AND_CODE123_V1 === */
@@ -15378,7 +15417,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var val = localStorage.getItem("df_dnd_focus_reminder_v1");
       if (val !== null) return val === "true";
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return true;
   }
 
@@ -15386,13 +15425,13 @@ window.FlashQuizEngine = FlashQuizEngine;
     var state = (enable !== undefined) ? Boolean(enable) : !dfIsDndReminderEnabled();
     try {
       localStorage.setItem("df_dnd_focus_reminder_v1", String(state));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       if (typeof window !== "undefined" && typeof window.dfVocabHapticPulse === "function") {
         window.dfVocabHapticPulse(15);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return state;
   }
@@ -15407,7 +15446,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       try {
         window.location.href = "intent:#Intent;action=android.settings.NOTIFICATION_SETTINGS;end";
         return true;
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return false;
   }
@@ -15490,7 +15529,7 @@ window.FlashQuizEngine = FlashQuizEngine;
             purgedCount++;
           }
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
 
     return purgedCount;
@@ -15505,11 +15544,11 @@ window.FlashQuizEngine = FlashQuizEngine;
           window.speechSynthesis.cancel();
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     try {
       localStorage.removeItem("__df_temp_search_cache__");
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       success: true,
@@ -15547,7 +15586,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       window.dfRunMemoryGarbageCleanup = dfRunMemoryGarbageCleanup;
       window.dfSchedulePeriodicMemoryCleanup = dfSchedulePeriodicMemoryCleanup;
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 })();
 
 // ============================================================================
@@ -17942,21 +17981,21 @@ function dfOptimizeAudioNodeLifecycle(audioManager, action) {
     activeNodes = 0;
     isHardwareLocked = false;
     if (typeof mgr.onSuspendNodes === "function") {
-      try { mgr.onSuspendNodes(); } catch (e) {}
+      try { mgr.onSuspendNodes(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
   } else if (act === "RESUME_ACTIVE") {
     contextState = "running";
     activeNodes = typeof mgr.desiredNodesCount === "number" ? mgr.desiredNodesCount : 4;
     isHardwareLocked = true;
     if (typeof mgr.onResumeNodes === "function") {
-      try { mgr.onResumeNodes(); } catch (e) {}
+      try { mgr.onResumeNodes(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
   } else if (act === "RELEASE_ALL") {
     contextState = "closed";
     activeNodes = 0;
     isHardwareLocked = false;
     if (typeof mgr.onTeardownNodes === "function") {
-      try { mgr.onTeardownNodes(); } catch (e) {}
+      try { mgr.onTeardownNodes(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
   }
 
@@ -18315,7 +18354,7 @@ function dfCompressAndPruneVaultStorage(options, storageAdapter) {
 
     const rawArchive = storage.getItem("df_v21_history_monthly_archive");
     let existingArchive = {};
-    try { existingArchive = JSON.parse(rawArchive) || {}; } catch (e) {}
+    try { existingArchive = JSON.parse(rawArchive) || {}; } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
     for (const [m, b] of Object.entries(monthlyBuckets)) {
       if (!existingArchive[m]) existingArchive[m] = { totalMinutes: 0, sessionCount: 0, avgRating: 4.0 };
@@ -18896,7 +18935,7 @@ window.dfExportFlashcardVaultComprehensiveStats = function(options = {}) {
       try {
         const raw = localStorage.getItem('df_vocab_flashcards_v21');
         if (raw) flashcards = JSON.parse(raw);
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     if (Array.isArray(options.sampleCards)) flashcards = options.sampleCards;
     if (!flashcards || flashcards.length === 0) {
@@ -18949,7 +18988,7 @@ window.dfExportFlashcardVaultComprehensiveStats = function(options = {}) {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(storageKey, JSON.stringify({ totalCards: totalCards, maturityRatio: vaultMaturityRatio, exportedAt: result.timestamp }));
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     return result;
   } catch (err) {
@@ -18978,7 +19017,7 @@ window.dfSynthesizeForestCanopyRainAcoustics = function(options = {}) {
       updatedAt: Date.now()
     };
     if (typeof localStorage !== 'undefined') {
-      try { localStorage.setItem(storageKey, JSON.stringify(acousticProfile)); } catch (e) {}
+      try { localStorage.setItem(storageKey, JSON.stringify(acousticProfile)); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     return {
       success: true,
@@ -19047,7 +19086,7 @@ window.dfCalculateMultiSubjectPacingBalance = function(options = {}) {
       timestamp: Date.now()
     };
     if (typeof localStorage !== 'undefined') {
-      try { localStorage.setItem(storageKey, JSON.stringify(result)); } catch (e) {}
+      try { localStorage.setItem(storageKey, JSON.stringify(result)); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     return result;
   } catch (err) {
@@ -19091,7 +19130,7 @@ window.dfLinkFlashcardEtymologicalRoots = function(options = {}) {
         if (raw) allLinks = JSON.parse(raw);
         allLinks[entry.term] = entry;
         localStorage.setItem(storageKey, JSON.stringify(allLinks));
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
 
     return {
@@ -19113,40 +19152,7 @@ window.dfLinkFlashcardEtymologicalRoots = function(options = {}) {
  * Formal architectural audit verifying completion of 140 continuous development
  * missions (M311 through M450) elevating Deep Focus to versionCode 270 and Release v5.9.0.
  */
-window.dfGetMilestoneVersion590AuditSeal = function() {
-  try {
-    const storageKey = 'df_milestone_v590_m140_seal';
-    const audit = {
-      success: true,
-      milestone: "MILESTONE_MISSION_140_GRAND_SEAL",
-      releaseVersion: "5.9.0",
-      versionCode: 270,
-      totalArchitecturalMissions: 140,
-      startingMission: "M311",
-      currentMission: "M450",
-      invariantsAudit: {
-        v21StorageSchema: "100%_INTACT_AND_VERIFIED",
-        sevenTabTopology: "CONFIRMED_ACTIVE_UNTOUCHED",
-        westernDigitsPreservation: "100%_ENFORCED",
-        zeroMusicPolicy: "PURE_WEB_AUDIO_ACOUSTICS_ONLY",
-        hebrewLanguageExclusion: "STRICTLY_PURGED",
-        offlineAirplaneModeReadiness: "100%_SELF_CONTAINED_CERTIFIED"
-      },
-      auditSignature: "DEEP-FOCUS-M450-GOLDEN-MASTER-V590-140-MISSIONS-VERIFIED",
-      timestamp: Date.now()
-    };
 
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(audit));
-      } catch (e) {}
-    }
-
-    return audit;
-  } catch (err) {
-    return { success: false, error: err ? err.message : 'Unknown milestone seal error' };
-  }
-};
 
 
 /**
@@ -19177,7 +19183,7 @@ window.dfSynthesizeSubDeltaThetaAcoustics = function(options = {}) {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(storageKey, JSON.stringify(acousticProfile));
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
 
     return {
@@ -19250,7 +19256,7 @@ window.dfAssignMemoryPalaceLociPegs = function(options = {}) {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(storageKey, JSON.stringify(result));
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
 
     return result;
@@ -19292,7 +19298,7 @@ window.dfSynthesizeSolfeggioHarmonicResonance = function(options = {}) {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(storageKey, JSON.stringify(acousticProfile));
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
 
     return {
@@ -19361,7 +19367,7 @@ window.dfCalculateDailyStudyVelocityMeter = function(options = {}) {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(storageKey, JSON.stringify(result));
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
 
     return result;
@@ -19386,7 +19392,7 @@ window.dfGenerateInterleavedSmartShuffleQueue = function(options = {}) {
       try {
         const raw = localStorage.getItem('df_vocab_flashcards_v21');
         if (raw) flashcards = JSON.parse(raw);
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     if (Array.isArray(options.sampleCards)) {
       flashcards = options.sampleCards;
@@ -19440,7 +19446,7 @@ window.dfGenerateInterleavedSmartShuffleQueue = function(options = {}) {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(storageKey, JSON.stringify(result));
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
 
     return result;
@@ -19478,7 +19484,7 @@ window.dfSynthesizeSubterraneanAirflowAcoustics = function(options = {}) {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(storageKey, JSON.stringify(acousticProfile));
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
 
     return {
@@ -19540,7 +19546,7 @@ window.dfCalculateCognitiveStaminaIndex = function(options = {}) {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(storageKey, JSON.stringify(result));
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
 
     return result;
@@ -19566,9 +19572,7 @@ window.dfSynthesizeMedicalLatinPhonetics = function(term, opts) {
   };
 
 // --- dfGetMilestoneVersion600AuditSeal ---
-window.dfGetMilestoneVersion600AuditSeal = function() {
-    return { milestone: 'Centennial Mission #150 Golden Master Release', versionName: '6.0.0', versionCode: 280, releaseTag: 'v6.0.0-golden-master-v21', consecutiveMissionsCompleted: 150, cumulativeRoadmapMissions: 460, zeroMusicCertified: true, westernDigitsCertified: true, qaStatus: 'GOLDEN_MASTER_VERIFIED_100_PERCENT', timestamp: new Date().toISOString() };
-  };
+
 
 // --- dfSynthesizeAlphaThetaNeuroFeedbackBridge ---
 window.dfSynthesizeAlphaThetaNeuroFeedbackBridge = function(ctx, opts) {
@@ -19633,33 +19637,7 @@ window.dfConfigureMotorMemoryTapPacer = function(ctx, opts) {
   };
 
 // --- MISSION M470: Centennial Mission #160 Release v6.1.0 Audit Seal ---
-window.dfGetMilestoneVersion610AuditSeal = function() {
-  return {
-    milestone: 'Centennial Mission #160 Release v6.1.0',
-    versionName: '6.1.0',
-    versionCode: 290,
-    releaseTag: 'v6.1.0-milestone-m160-v21',
-    consecutiveMissionsCompleted: 160,
-    cumulativeRoadmapMissions: 470,
-    verifiedSubsystems: [
-      'Zen Pomodoro & Interval Engine',
-      'Leitner Box Adaptive Spaced Repetition',
-      'Zero-Music Procedural Web Audio Synthesis',
-      'Task Matrix & Multi-Subject Interleaving',
-      'Offline Vault & Memory Consolidation Aligner',
-      'Saccadic Reading Pacer & Client-Side Encryption'
-    ],
-    qualityAuditMetrics: {
-      zeroMusicCompliance: '100% (Pure Web Audio Math Only)',
-      westernDigitsEnforcement: 'STRICT (0123456789 verified)',
-      hebrewExclusion: 'VERIFIED_CLEAN',
-      v21StorageSchemaIntegrity: 'SECURE_ACTIVE',
-      sevenTabArchitecture: 'UNALTERED_PROTECTED'
-    },
-    qaStatus: 'RELEASE_v6_1_0_VERIFIED_100_PERCENT',
-    timestamp: new Date().toISOString()
-  };
-};
+
 
 // --- MISSION M471: Offline AES-GCM Encrypted JSON Vault Backup ---
 window.dfGenerateEncryptedVaultBackup = function(vaultData, passphrase) {
@@ -19852,9 +19830,9 @@ window.dfSynthesizeHarmonic432TuningAcoustics = function(audioCtx, options) {
         masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
       }
       setTimeout(function() {
-        try { if (oscLeft) oscLeft.stop(); } catch(e) {}
-        try { if (oscRight) oscRight.stop(); } catch(e) {}
-        try { if (harmonicFifth) harmonicFifth.stop(); } catch(e) {}
+        try { if (oscLeft) oscLeft.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
+        try { if (oscRight) oscRight.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
+        try { if (harmonicFifth) harmonicFifth.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
         isRunning = false;
       }, 1300);
       return true;
@@ -19964,8 +19942,8 @@ window.dfSynthesizeGamma40HzBlitzEntrainment = function(audioCtx, options) {
         masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
       }
       setTimeout(function() {
-        try { if (osc) osc.stop(); } catch(e) {}
-        try { if (modulator) modulator.stop(); } catch(e) {}
+        try { if (osc) osc.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
+        try { if (modulator) modulator.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
         isRunning = false;
       }, 1100);
       return true;
@@ -20065,9 +20043,7 @@ window.dfApplyCircadianChromaDimmer = function(containerElement, currentHour) {
 };
 
 // --- MISSION M480: Centennial Milestone #170 Release v6.2.0 Audit Seal ---
-window.dfGetMilestoneVersion620AuditSeal = function() {
-  return { milestone: 'Centennial Mission #170 Release v6.2.0', versionName: '6.2.0', versionCode: 300, releaseTag: 'v6.2.0-milestone-m170-v21', consecutiveMissionsCompleted: 170, cumulativeRoadmapMissions: 480, qaStatus: 'RELEASE_v6_2_0_VERIFIED_100_PERCENT' };
-};
+
 
 // --- MISSION M481: Binaural Delta 2.5Hz Deep Sleep Synthesizer ---
 window.dfSynthesizeBinauralDeltaSleepRestoration = function(audioCtx, options) {
@@ -20133,9 +20109,7 @@ window.dfSynthesizeSmr14HzFocusAcoustics = function(audioCtx, options) {
 };
 
 // --- MISSION M490: Centennial Milestone #180 Release v6.3.0 Audit Seal ---
-window.dfGetMilestoneVersion630AuditSeal = function() {
-  return { milestone: 'Centennial Mission #180 Release v6.3.0', versionName: '6.3.0', versionCode: 310, releaseTag: 'v6.3.0-milestone-m180-v21', consecutiveMissionsCompleted: 180, cumulativeRoadmapMissions: 490, qaStatus: 'RELEASE_v6_3_0_VERIFIED_100_PERCENT' };
-};
+
 
 // --- MISSION M491: Cognitive Refractory Period & Micro-Restitution Pacer ---
 window.dfConfigureCognitiveRefractoryPacer = function(options) {
@@ -20200,9 +20174,7 @@ window.dfPlanStudyDebtAmortization = function(backlog) {
 };
 
 // --- MISSION M500: Grand Semi-Millennium Milestone #500 & Release v6.4.0 Audit Seal ---
-window.dfGetMilestoneVersion640AuditSeal = function() {
-  return { milestone: 'Grand Semi-Millennium Milestone #500 & Release v6.4.0', versionName: '6.4.0', versionCode: 320, releaseTag: 'v6.4.0-semi-millennium-m500-v21', consecutiveMissionsCompleted: 190, cumulativeRoadmapMissions: 500, qaStatus: 'GRAND_SEMI_MILLENNIUM_VERIFIED_100_PERCENT' };
-};
+
 
 // --- MISSION M501: Semantic Spaced Retrieval Association Graph ---
 window.dfBuildSemanticRetrievalMesh = function(nodes) {
@@ -20264,9 +20236,7 @@ window.dfLinkCrossLingualCognates = function(terms) {
 };
 
 // --- MISSION M510: Grand Bicentennial Milestone #200 & Release v6.5.0 Audit Seal ---
-window.dfGetMilestoneVersion650AuditSeal = function() {
-  return { milestone: 'Grand Bicentennial Milestone #200 & Release v6.5.0', versionName: '6.5.0', versionCode: 330, releaseTag: 'v6.5.0-bicentennial-m200-v21', consecutiveMissionsCompleted: 200, cumulativeRoadmapMissions: 510, qaStatus: 'GRAND_BICENTENNIAL_VERIFIED_100_PERCENT' };
-};
+
 
 // --- MISSION M511: Procedural Campfire Embers Warmth Synthesizer ---
 window.dfSynthesizeCampfireEmbersAcoustics = function(audioCtx, options) {
@@ -20328,9 +20298,7 @@ window.dfGenerateCircadianChronoHeatmap = function(logs) {
 };
 
 // --- MISSION M520: Centennial Milestone #210 Release v6.6.0 Audit Seal ---
-window.dfGetMilestoneVersion660AuditSeal = function() {
-  return { milestone: 'Centennial Mission #210 Release v6.6.0', versionName: '6.6.0', versionCode: 340, releaseTag: 'v6.6.0-milestone-m210-v21', consecutiveMissionsCompleted: 210, cumulativeRoadmapMissions: 520, qaStatus: 'RELEASE_v6_6_0_VERIFIED_100_PERCENT' };
-};
+
 
 // --- UNIVERSAL 100% EXHAUSTIVE I18N LOCALIZATION ENGINE ---
 window.df_i18n = (function() {
@@ -20621,33 +20589,7 @@ window.dfConfigureDualEyeSaccadicTracker = function(options) {
 };
 
 // M540: Centennial Milestone #230 Release v6.8.0 Audit Seal
-window.dfGetMilestoneVersion680AuditSeal = function() {
-  return {
-    milestone: 'Centennial Mission #230 Release v6.8.0',
-    versionName: '6.8.0',
-    versionCode: 360,
-    releaseTag: 'v6.8.0-milestone-m230-v21',
-    consecutiveMissionsCompleted: 230,
-    cumulativeRoadmapMissions: 540,
-    verifiedSubsystems: [
-      'Zen Pomodoro & Saccadic Reading Tracker',
-      'Leitner Box Spaced Repetition Suite',
-      'Zero-Music Procedural Web Audio Engine',
-      'Finno-Ugric & Baltic Agglutinative Suites',
-      'Offline Crypt-Vault & Sync Architecture',
-      'Multilingual Parity Linter'
-    ],
-    qualityAuditMetrics: {
-      zeroMusicCompliance: '100% (Pure Web Audio Math Only)',
-      westernDigitsEnforcement: 'STRICT (0123456789 verified)',
-      hebrewExclusion: 'VERIFIED_CLEAN',
-      v21StorageSchemaIntegrity: 'SECURE_ACTIVE',
-      sevenTabArchitecture: 'UNALTERED_PROTECTED'
-    },
-    qaStatus: 'RELEASE_v6_8_0_VERIFIED_100_PERCENT',
-    timestamp: new Date().toISOString()
-  };
-};
+
 
 // M541: Celtic Initial Consonant Mutation Engine
 window.dfRegisterCelticRegionalPack = function() {
@@ -20795,32 +20737,7 @@ window.dfResolvePluralizationConcord = function(count, forms, lang) {
 };
 
 // M550: Centennial Milestone #240 Release v6.9.0 Audit Seal
-window.dfGetMilestoneVersion690AuditSeal = function() {
-  return {
-    milestone: 'Centennial Mission #240 Release v6.9.0',
-    versionName: '6.9.0',
-    versionCode: 370,
-    releaseTag: 'v6.9.0-milestone-m240-v21',
-    consecutiveMissionsCompleted: 240,
-    cumulativeRoadmapMissions: 550,
-    verifiedSubsystems: [
-      'Zen Pomodoro & FSRS Memory Tensor Calculator',
-      'Leitner Box Spaced Repetition Suite',
-      'Kyoto Bamboo Grove & Deep Ocean Hydro-Acoustics',
-      'Universal Creoles & Plural Concord Engines',
-      'Offline Crypt-Vault & Sync Architecture'
-    ],
-    qualityAuditMetrics: {
-      zeroMusicCompliance: '100% (Pure Web Audio Math Only)',
-      westernDigitsEnforcement: 'STRICT (0123456789 verified)',
-      hebrewExclusion: 'VERIFIED_CLEAN',
-      v21StorageSchemaIntegrity: 'SECURE_ACTIVE',
-      sevenTabArchitecture: 'UNALTERED_PROTECTED'
-    },
-    qaStatus: 'RELEASE_v6_9_0_VERIFIED_100_PERCENT',
-    timestamp: new Date().toISOString()
-  };
-};
+
 
 // M551: Kyoto Bamboo Grove Wind Acoustics Synthesizer
 window.dfSynthesizeKyotoBambooGroveAcoustics = function(audioCtx, options) {
@@ -20954,32 +20871,7 @@ window.dfSynthesizeSolfeggio963PureAwareness = function(audioCtx, options) {
 };
 
 // M560: Centennial Milestone #250 Release v7.0.0 Golden Master Audit Seal
-window.dfGetMilestoneVersion700AuditSeal = function() {
-  return {
-    milestone: 'Centennial Mission #250 Release v7.0.0 Golden Master',
-    versionName: '7.0.0',
-    versionCode: 380,
-    releaseTag: 'v7.0.0-golden-master-v21',
-    consecutiveMissionsCompleted: 250,
-    cumulativeRoadmapMissions: 560,
-    verifiedSubsystems: [
-      'Zen Pomodoro & FSRS Spaced Memory Engine',
-      'Leitner Box Adaptive Intervals & Anti-Bias Suite',
-      'Full Procedural Nature & Solfeggio Acoustics',
-      'Universal Multilingual Registry (Zero Missing Keys)',
-      'Offline Crypt-Vault & Sovereign Local Sync'
-    ],
-    qualityAuditMetrics: {
-      zeroMusicCompliance: '100% (Pure Web Audio Math Only)',
-      westernDigitsEnforcement: 'STRICT (0123456789 verified)',
-      hebrewExclusion: 'VERIFIED_CLEAN',
-      v21StorageSchemaIntegrity: 'SECURE_ACTIVE',
-      sevenTabArchitecture: 'UNALTERED_PROTECTED'
-    },
-    qaStatus: 'GOLDEN_MASTER_v7_0_0_VERIFIED_100_PERCENT',
-    timestamp: new Date().toISOString()
-  };
-};
+
 
 // M561: Intra-Day Micro-Spacing Scheduling Matrix
 window.dfCalculateIntraDayMicroIntervals = function(stepIndex) {
@@ -21134,32 +21026,7 @@ window.dfSynthesizeAutumnFootstepAcoustics = function(audioCtx, options) {
 };
 
 // M570: Centennial Milestone #260 Release v7.1.0 Audit Seal
-window.dfGetMilestoneVersion710AuditSeal = function() {
-  return {
-    milestone: 'Centennial Mission #260 Release v7.1.0',
-    versionName: '7.1.0',
-    versionCode: 390,
-    releaseTag: 'v7.1.0-milestone-m260-v21',
-    consecutiveMissionsCompleted: 260,
-    cumulativeRoadmapMissions: 570,
-    verifiedSubsystems: [
-      'Zen Pomodoro & Quad-Binaural Entrainment Matrix',
-      'Leitner Box Spaced Repetition Algorithms',
-      'Full Solfeggio & Nature Acoustics Spectrum',
-      'Universal Multilingual Registry (Zero Missing Keys)',
-      'Offline Crypt-Vault & Sovereign Local Sync'
-    ],
-    qualityAuditMetrics: {
-      zeroMusicCompliance: '100% (Pure Web Audio Math Only)',
-      westernDigitsEnforcement: 'STRICT (0123456789 verified)',
-      hebrewExclusion: 'VERIFIED_CLEAN',
-      v21StorageSchemaIntegrity: 'SECURE_ACTIVE',
-      sevenTabArchitecture: 'UNALTERED_PROTECTED'
-    },
-    qaStatus: 'RELEASE_v7_1_0_VERIFIED_100_PERCENT',
-    timestamp: new Date().toISOString()
-  };
-};
+
 
 // M571: Solfeggio 174Hz Physical Relief & Grounding Sub-Synthesizer
 window.dfSynthesizeSolfeggio174PhysicalRelief = function(audioCtx, options) {
@@ -21290,13 +21157,7 @@ window.dfSynthesizeIsochronicBeta20Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 20.0 };
 };
 
-window.dfGetMilestoneVersion720AuditSeal = function() {
-  return {
-    milestone: "M580", release: "v7.2.0", centennialIndex: 270, versionCode: 400,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfProjectFsrsMemoryHalfLife = function(stability, requestRetention) {
   const s = Math.max(0.1, Number(stability) || 1.0), r = Math.min(0.99, Math.max(0.1, Number(requestRetention) || 0.9));
@@ -21389,13 +21250,7 @@ window.dfSynthesizeThetaGammaCoupling = function(ctx, dur) {
   return { theta: thetaOsc, gamma: gammaOsc, output: masterGain };
 };
 
-window.dfGetMilestoneVersion730AuditSeal = function() {
-  return {
-    milestone: "M590", release: "v7.3.0", centennialIndex: 280, versionCode: 410,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfMigrateLeitnerVelocityMatrix = function(currentBox, accuracyRatio, consecutiveStreak) {
   let box = Math.max(1, Math.min(5, Number(currentBox) || 1));
@@ -21489,13 +21344,7 @@ window.dfSynthesizeDualAlphaSmrGrid = function(ctx, dur) {
   return { leftAlphaHz: 10.0, rightSmrHz: 14.0, output: merger };
 };
 
-window.dfGetMilestoneVersion740AuditSeal = function() {
-  return {
-    milestone: "M600", release: "v7.4.0", centennialIndex: 290, versionCode: 420,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfDecomposeMnemonicPegChunks = function(text, targetChunkSize) {
   const words = String(text || "").trim().split(/\s+/).filter(Boolean);
@@ -21600,13 +21449,7 @@ window.dfSynthesizeIsochronicAlpha12Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 12.0 };
 };
 
-window.dfGetMilestoneVersion750AuditSeal = function() {
-  return {
-    milestone: "M610", release: "v7.5.0", centennialIndex: 300, versionCode: 430,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfCalculateFsrsFailurePenalty = function(currentStability, elapsedDays) {
   const s = Math.max(0.1, Number(currentStability) || 1.0), t = Math.max(0.1, Number(elapsedDays) || 1.0);
@@ -21690,13 +21533,7 @@ window.dfSynthesizeDeltaThetaConsolidation = function(ctx, dur) {
   return { output: gain, duration: d, transition: "DELTA_TO_THETA" };
 };
 
-window.dfGetMilestoneVersion760AuditSeal = function() {
-  return {
-    milestone: "M620", release: "v7.6.0", centennialIndex: 310, versionCode: 440,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfLinkSemanticMemoryNodes = function(conceptA, conceptB, sharedTags) {
   const tags = Array.isArray(sharedTags) ? sharedTags : [];
@@ -21780,13 +21617,7 @@ window.dfSynthesizeIsochronicGamma40Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 40.0 };
 };
 
-window.dfGetMilestoneVersion770AuditSeal = function() {
-  return {
-    milestone: "M630", release: "v7.7.0", centennialIndex: 320, versionCode: 450,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfComputeRetentionCurveCoordinates = function(stability, stepsCount) {
   const s = Math.max(0.1, Number(stability) || 5.0), steps = Math.max(5, Number(stepsCount) || 10);
@@ -21884,13 +21715,7 @@ window.dfSynthesizeAlphaThetaInsight = function(ctx, dur) {
   return { frequency: 8.5, output: gain, type: "CREATIVE_INSIGHT_CROSSOVER" };
 };
 
-window.dfGetMilestoneVersion780AuditSeal = function() {
-  return {
-    milestone: "M640", release: "v7.8.0", centennialIndex: 330, versionCode: 460,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfComputeFsrsStabilityGain = function(currentStability, grade) {
   const s = Math.max(0.1, Number(currentStability) || 1.0);
@@ -21976,13 +21801,7 @@ window.dfSynthesizeIsochronicSmr135Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 13.5 };
 };
 
-window.dfGetMilestoneVersion790AuditSeal = function() {
-  return {
-    milestone: "M650", release: "v7.9.0", centennialIndex: 340, versionCode: 470,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfComputeMnemonicEntropyScore = function(cardText) {
   const text = String(cardText || "").trim();
@@ -22071,13 +21890,7 @@ window.dfSynthesizeHighGamma80HzVector = function(ctx, dur) {
   return { frequency: 80.0, output: panner };
 };
 
-window.dfGetMilestoneVersion800AuditSeal = function() {
-  return {
-    milestone: "M660", release: "v8.0.0", centennialIndex: 350, versionCode: 480,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfComputeLeitnerAmortizationTensor = function(boxesCountMap) {
   const map = boxesCountMap || { 1: 30, 2: 20, 3: 15, 4: 10, 5: 5 };
@@ -22174,13 +21987,7 @@ window.dfSynthesizeSchumannResonance783 = function(ctx, dur) {
   return { frequency: 7.83, output: gain, type: "SCHUMANN_EARTH_RESONANCE" };
 };
 
-window.dfGetMilestoneVersion810AuditSeal = function() {
-  return {
-    milestone: "M670", release: "v8.1.0", centennialIndex: 360, versionCode: 490,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfEqualizeDifficultyDrift = function(cardsDifficulties) {
   const diffs = Array.isArray(cardsDifficulties) ? cardsDifficulties.map(Number) : [5.0];
@@ -22273,13 +22080,7 @@ window.dfSynthesizeIsochronicSmr15Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 15.0 };
 };
 
-window.dfGetMilestoneVersion820AuditSeal = function() {
-  return {
-    milestone: "M680", release: "v8.2.0", centennialIndex: 370, versionCode: 500,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfShuffleClozeConcealment = function(itemsList, activeClozeIndex) {
   const items = Array.isArray(itemsList) ? [...itemsList] : [];
@@ -22379,13 +22180,7 @@ window.dfSynthesizeUltraGamma100HzVector = function(ctx, dur) {
   return { frequency: 100.0, output: panner };
 };
 
-window.dfGetMilestoneVersion830AuditSeal = function() {
-  return {
-    milestone: "M690", release: "v8.3.0", centennialIndex: 380, versionCode: 510,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceLeitnerReviewLoad = function(cardsDuePerBox, maxDailyLoad) {
   const dues = cardsDuePerBox || { 1: 20, 2: 15, 3: 10, 4: 5, 5: 2 };
@@ -22477,13 +22272,7 @@ window.dfSynthesizeIsochronicTheta45Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 4.5 };
 };
 
-window.dfGetMilestoneVersion840AuditSeal = function() {
-  return {
-    milestone: "M700", release: "v8.4.0", centennialIndex: 390, versionCode: 520,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfComputeSharedDeckStabilityMatrix = function(decksStabilityList) {
   const list = Array.isArray(decksStabilityList) ? decksStabilityList.map(Number) : [5.0];
@@ -22567,13 +22356,7 @@ window.dfSynthesizeIsochronicBeta16Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 16.0 };
 };
 
-window.dfGetMilestoneVersion850AuditSeal = function() {
-  return {
-    milestone: "M710", release: "v8.5.0", centennialIndex: 400, versionCode: 530,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfGridProgressiveWordMasking = function(word, revealTier) {
   const str = String(word || "").trim(), tier = Math.max(1, Math.min(3, Number(revealTier) || 1));
@@ -22660,13 +22443,7 @@ window.dfSynthesizeUltraGamma120HzVector = function(ctx, dur) {
   return { frequency: 120.0, output: panner };
 };
 
-window.dfGetMilestoneVersion860AuditSeal = function() {
-  return {
-    milestone: "M720", release: "v8.6.0", centennialIndex: 410, versionCode: 540,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRedistributeOverdueCards = function(totalOverdueCount, daysSpan) {
   const count = Math.max(0, Number(totalOverdueCount) || 0), days = Math.max(1, Number(daysSpan) || 7);
@@ -22758,13 +22535,7 @@ window.dfSynthesizeIsochronicAlpha9Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 9.0 };
 };
 
-window.dfGetMilestoneVersion870AuditSeal = function() {
-  return {
-    milestone: "M730", release: "v8.7.0", centennialIndex: 420, versionCode: 550,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfCrossLinkDeckMemoryMatrix = function(deckAStats, deckBStats) {
   const sA = Math.max(0.1, Number(deckAStats && deckAStats.stability) || 2.0);
@@ -22842,13 +22613,7 @@ window.dfSynchronizeThetaGammaPhase = function(thetaPhaseRadians, gammaFrequency
   return { thetaPhase: theta, gammaFrequency: gamma, isBurstPhase: burstActive, amplitudeScale: burstActive ? 1.0 : 0.2 };
 };
 
-window.dfGetMilestoneVersion880AuditSeal = function() {
-  return {
-    milestone: "M740", release: "v8.8.0", centennialIndex: 430, versionCode: 560,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfStripClozeConsonants = function(word) {
   const str = String(word || "").trim();
@@ -22936,13 +22701,7 @@ window.dfSynthesizeHyperGamma140HzVector = function(ctx, dur) {
   return { frequency: 140.0, output: panner };
 };
 
-window.dfGetMilestoneVersion890AuditSeal = function() {
-  return {
-    milestone: "M750", release: "v8.9.0", centennialIndex: 440, versionCode: 570,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfTensorRedistributeOverdue = function(overdueMatrixByDeck, targetDays) {
   const matrix = overdueMatrixByDeck || { A: 14, B: 21, C: 7 }, days = Math.max(1, Number(targetDays) || 7);
@@ -23034,13 +22793,7 @@ window.dfSynthesizeIsochronicBeta145Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 14.5 };
 };
 
-window.dfGetMilestoneVersion900AuditSeal = function() {
-  return {
-    milestone: "M760", release: "v9.0.0", centennialIndex: 450, versionCode: 580,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfMinimizeCategoryInterference = function(deckACategories, deckBCategories) {
   const setA = new Set(Array.isArray(deckACategories) ? deckACategories : []);
@@ -23116,13 +22869,7 @@ window.dfSynthesizeCoupledThetaGammaBursts = function(thetaPhaseRad) {
   return { thetaPhase: phase, burstActive: gammaBurstActive, gainMultiplier: gammaBurstActive ? 1.0 : 0.15 };
 };
 
-window.dfGetMilestoneVersion910AuditSeal = function() {
-  return {
-    milestone: "M770", release: "v9.1.0", centennialIndex: 460, versionCode: 590,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfMaskSelectiveClozeKeywords = function(text, keywordsArray) {
   let str = String(text || "");
@@ -23216,13 +22963,7 @@ window.dfSynthesizeIsochronicAlpha11Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 11.0 };
 };
 
-window.dfGetMilestoneVersion930AuditSeal = function() {
-  return {
-    milestone: "M790", release: "v9.3.0", centennialIndex: 480, versionCode: 610,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceDeckMemorySaturation = function(deckLoadsArray) {
   const arr = Array.isArray(deckLoadsArray) ? deckLoadsArray.map(Number) : [10];
@@ -23295,13 +23036,7 @@ window.dfSynthesizeThetaGammaWaveCoupling = function(thetaHz, gammaHz) {
   return { thetaModulatorHz: t, gammaCarrierHz: g, modulationDepth: 0.65, couplingStrength: "COHERENT_FLOW" };
 };
 
-window.dfGetMilestoneVersion940AuditSeal = function() {
-  return {
-    milestone: "M800", release: "v9.4.0", centennialIndex: 490, versionCode: 620,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfMaskClozeVowelsProgressive = function(word, maskPercentage) {
   const str = String(word || "").trim(), pct = Math.max(0, Math.min(100, Number(maskPercentage) || 50));
@@ -23397,13 +23132,7 @@ window.dfSynthesizeUltraGamma180HzVector = function(ctx, dur) {
   return { frequency: 140.0, output: panner };
 };
 
-window.dfGetMilestoneVersion950AuditSeal = function() {
-  return {
-    milestone: "M810", release: "v9.5.0", centennialIndex: 500, versionCode: 630,
-    timestamp: new Date().toISOString(), status: "GRAND_SEMI_MILLENNIUM_M500_SEAL_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfGovernOverdueCatchupLoad = function(overdueCardsCount, targetCatchupDays) {
   const tot = Math.max(0, Number(overdueCardsCount) || 0), days = Math.max(1, Number(targetCatchupDays) || 5);
@@ -23493,13 +23222,7 @@ window.dfSynthesizeIsochronicBeta17Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 17.0 };
 };
 
-window.dfGetMilestoneVersion960AuditSeal = function() {
-  return {
-    milestone: "M820", release: "v9.6.0", centennialIndex: 510, versionCode: 640,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceMemorySaturationMatrix = function(deckLoadsArray, maxTargetDisparity) {
   const loads = Array.isArray(deckLoadsArray) ? deckLoadsArray.map(Number) : [10, 15];
@@ -23577,13 +23300,7 @@ window.dfSynchronizeThetaGammaCoupled = function(thetaFrequencyHz, gammaFrequenc
   return { thetaHz: t, gammaHz: g, isCoupled: true, couplingRatio: Number((g / t).toFixed(2)) };
 };
 
-window.dfGetMilestoneVersion970AuditSeal = function() {
-  return {
-    milestone: "M830", release: "v9.7.0", centennialIndex: 520, versionCode: 650,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfScaffoldClozeFirstLetters = function(text) {
   const words = String(text || "").trim().split(/\s+/);
@@ -23668,13 +23385,7 @@ window.dfSynthesizeUltraGamma200HzVector = function(ctx, dur) {
   return { frequency: 200.0, output: panner };
 };
 
-window.dfGetMilestoneVersion980AuditSeal = function() {
-  return {
-    milestone: "M840", release: "v9.8.0", centennialIndex: 530, versionCode: 660,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceOverdueSpacingQuota = function(totalOverdue, daysTarget) {
   const tot = Math.max(0, Number(totalOverdue) || 0), d = Math.max(1, Number(daysTarget) || 7);
@@ -23769,13 +23480,7 @@ window.dfSynthesizeIsochronicCrossover8Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 8.0 };
 };
 
-window.dfGetMilestoneVersion990AuditSeal = function() {
-  return {
-    milestone: "M850", release: "v9.9.0", centennialIndex: 540, versionCode: 670,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfEqualizeCrossDeckDecay = function(deckDecaysList) {
   const arr = Array.isArray(deckDecaysList) ? deckDecaysList.map(Number) : [0.05, 0.08];
@@ -23853,13 +23558,7 @@ window.dfSynthesizeGammaThetaWaveCrossCoupling = function(gammaHz, thetaHz) {
   return { gammaHz: g, thetaHz: t, couplingType: "PHASE_AMPLITUDE_CROSS_FREQUENCY", synchronyScore: 0.92 };
 };
 
-window.dfGetMilestoneVersion1000AuditSeal = function() {
-  return {
-    milestone: "M860", release: "v10.0.0", centennialIndex: 550, versionCode: 680,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MILLENNIUM_PROD_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfScaffoldClozeSuffixes = function(word) {
   const str = String(word || "").trim();
@@ -23954,13 +23653,7 @@ window.dfSynthesizeUltraGamma220HzVector = function(ctx, dur) {
   return { frequency: 220.0, output: panner };
 };
 
-window.dfGetMilestoneVersion1010AuditSeal = function() {
-  return {
-    milestone: "M870", release: "v10.1.0", centennialIndex: 560, versionCode: 690,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfGovernOverdueSmoothingQuota = function(totalOverdueItems, horizonDays) {
   const tot = Math.max(0, Number(totalOverdueItems) || 0), days = Math.max(1, Number(horizonDays) || 10);
@@ -24049,13 +23742,7 @@ window.dfSynthesizeIsochronicTheta55Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 5.5 };
 };
 
-window.dfGetMilestoneVersion1020AuditSeal = function() {
-  return {
-    milestone: "M880", release: "v10.2.0", centennialIndex: 570, versionCode: 700,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceDeckMatrixInterference = function(similarityMatrix) {
   const sim = Array.isArray(similarityMatrix) ? similarityMatrix.map(Number) : [0.2, 0.4];
@@ -24133,13 +23820,7 @@ window.dfSynthesizeGammaThetaCoupledWave = function(gammaHz, thetaHz) {
   return { gammaHz: g, thetaHz: t, couplingType: "PHASE_SYNCHRONIZED_BURST", synchronyRatio: Number((g / t).toFixed(1)) };
 };
 
-window.dfGetMilestoneVersion1030AuditSeal = function() {
-  return {
-    milestone: "M890", release: "v10.3.0", centennialIndex: 580, versionCode: 710,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfScaffoldClozeStems = function(word) {
   const str = String(word || "").trim();
@@ -24234,13 +23915,7 @@ window.dfSynthesizeUltraGamma240HzVector = function(ctx, dur) {
   return { frequency: 240.0, output: panner };
 };
 
-window.dfGetMilestoneVersion1040AuditSeal = function() {
-  return {
-    milestone: "M900", release: "v10.4.0", centennialIndex: 590, versionCode: 720,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceOverdueSmoothingQuota = function(totalOverdueItems, horizonDays) {
   const tot = Math.max(0, Number(totalOverdueItems) || 0), days = Math.max(1, Number(horizonDays) || 12);
@@ -24329,13 +24004,7 @@ window.dfSynthesizeIsochronicAlpha95Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 9.5 };
 };
 
-window.dfGetMilestoneVersion1050AuditSeal = function() {
-  return {
-    milestone: "M910", release: "v10.5.0", centennialIndex: 600, versionCode: 730,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfEqualizeCrossDeckComplexity = function(deckComplexityScores) {
   const arr = Array.isArray(deckComplexityScores) ? deckComplexityScores.map(Number) : [3.5, 4.2];
@@ -24412,13 +24081,7 @@ window.dfSynthesizeGammaThetaCoupledEngine = function(gammaHz, thetaHz) {
   return { gammaHz: g, thetaHz: t, synchronyIndex: Number((g / t).toFixed(1)), isCoupled: true };
 };
 
-window.dfGetMilestoneVersion1060AuditSeal = function() {
-  return {
-    milestone: "M920", release: "v10.6.0", centennialIndex: 610, versionCode: 740,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfMaskClozeAffixes = function(word) {
   const str = String(word || "").trim();
@@ -24513,13 +24176,7 @@ window.dfSynthesizeUltraGamma260HzVector = function(ctx, dur) {
   return { frequency: 260.0, output: panner };
 };
 
-window.dfGetMilestoneVersion1070AuditSeal = function() {
-  return {
-    milestone: "M930", release: "v10.7.0", centennialIndex: 620, versionCode: 750,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfGovernOverdueSmoothingLoad = function(totalOverdueItems, horizonDays) {
   const tot = Math.max(0, Number(totalOverdueItems) || 0), days = Math.max(1, Number(horizonDays) || 14);
@@ -24610,13 +24267,7 @@ window.dfSynthesizeIsochronicBeta13Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 13.0 };
 };
 
-window.dfGetMilestoneVersion1080AuditSeal = function() {
-  return {
-    milestone: "M940", release: "v10.8.0", centennialIndex: 630, versionCode: 760,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfEqualizeCrossDeckRetentionIndex = function(retentionIndicesList) {
   const list = Array.isArray(retentionIndicesList) ? retentionIndicesList.map(Number) : [0.85, 0.90];
@@ -24693,13 +24344,7 @@ window.dfSynthesizeGammaThetaEngine46Hz = function(gammaHz, thetaHz) {
   return { gammaHz: g, thetaHz: t, synchronyRatio: Number((g / t).toFixed(1)), isEngineActive: true };
 };
 
-window.dfGetMilestoneVersion1090AuditSeal = function() {
-  return {
-    milestone: "M950", release: "v10.9.0", centennialIndex: 640, versionCode: 770,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfStripClozeAffixesMatrix = function(word) {
   const str = String(word || "").trim();
@@ -24794,13 +24439,7 @@ window.dfSynthesizeUltraGamma280HzVector = function(ctx, dur) {
   return { frequency: 280.0, output: panner };
 };
 
-window.dfGetMilestoneVersion1100AuditSeal = function() {
-  return {
-    milestone: "M960", release: "v11.0.0", centennialIndex: 650, versionCode: 780,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceOverdueSmoothingMatrix = function(totalOverdueItems, horizonDays) {
   const tot = Math.max(0, Number(totalOverdueItems) || 0), days = Math.max(1, Number(horizonDays) || 14);
@@ -24889,13 +24528,7 @@ window.dfSynthesizeIsochronicTheta50Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 5.0 };
 };
 
-window.dfGetMilestoneVersion1110AuditSeal = function() {
-  return {
-    milestone: "M970", release: "v11.1.0", centennialIndex: 660, versionCode: 790,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfEqualizeCategoryComplexityMatrix = function(categoryLoadsList) {
   const list = Array.isArray(categoryLoadsList) ? categoryLoadsList.map(Number) : [10, 15];
@@ -24972,13 +24605,7 @@ window.dfSynthesizeGammaThetaEngine48Hz = function(gammaHz, thetaHz) {
   return { gammaHz: g, thetaHz: t, synchronyRatio: Number((g / t).toFixed(1)), isEngineActive: true };
 };
 
-window.dfGetMilestoneVersion1120AuditSeal = function() {
-  return {
-    milestone: "M980", release: "v11.2.0", centennialIndex: 670, versionCode: 800,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfScaffoldClozeStemsMatrix = function(word) {
   const str = String(word || "").trim();
@@ -25073,13 +24700,7 @@ window.dfSynthesizeUltraGamma300HzVector = function(ctx, dur) {
   return { frequency: 300.0, output: panner };
 };
 
-window.dfGetMilestoneVersion1130AuditSeal = function() {
-  return {
-    milestone: "M990", release: "v11.3.0", centennialIndex: 680, versionCode: 810,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceOverdueSmoothingTensor = function(totalOverdueItems, horizonDays) {
   const tot = Math.max(0, Number(totalOverdueItems) || 0), days = Math.max(1, Number(horizonDays) || 14);
@@ -25253,13 +24874,7 @@ window.dfSynthesizeGammaThetaEngine50Hz = function(gammaHz, thetaHz) {
   return { gammaHz: g, thetaHz: t, synchronyRatio: Number((g / t).toFixed(1)), isEngineActive: true };
 };
 
-window.dfGetMilestoneVersion1150AuditSeal = function() {
-  return {
-    milestone: "M1010", release: "v11.5.0", centennialIndex: 700, versionCode: 830,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfScaffoldClozeStemsTensor = function(word) {
   const str = String(word || "").trim();
@@ -25354,13 +24969,7 @@ window.dfSynthesizeUltraGamma320HzVector = function(ctx, dur) {
   return { frequency: 320.0, output: panner };
 };
 
-window.dfGetMilestoneVersion1160AuditSeal = function() {
-  return {
-    milestone: "M1020", release: "v11.6.0", centennialIndex: 710, versionCode: 840,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceOverdueSmoothingTensorArray = function(totalOverdueItems, horizonDays) {
   const tot = Math.max(0, Number(totalOverdueItems) || 0), days = Math.max(1, Number(horizonDays) || 14);
@@ -25449,13 +25058,7 @@ window.dfSynthesizeIsochronicTheta48Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 4.8 };
 };
 
-window.dfGetMilestoneVersion1170AuditSeal = function() {
-  return {
-    milestone: "M1030", release: "v11.7.0", centennialIndex: 720, versionCode: 850,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfEqualizeUniversalDeckTensorArray = function(deckLoadsArray) {
   const loads = Array.isArray(deckLoadsArray) ? deckLoadsArray.map(Number) : [10, 15];
@@ -25532,13 +25135,7 @@ window.dfSynthesizeGammaThetaEngine52Hz = function(gammaHz, thetaHz) {
   return { gammaHz: g, thetaHz: t, synchronyRatio: Number((g / t).toFixed(1)), isEngineActive: true };
 };
 
-window.dfGetMilestoneVersion1180AuditSeal = function() {
-  return {
-    milestone: "M1040", release: "v11.8.0", centennialIndex: 730, versionCode: 860,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfScaffoldClozeStemsTensorArray = function(word) {
   const str = String(word || "").trim();
@@ -25633,13 +25230,7 @@ window.dfSynthesizeUltraGamma340HzVector = function(ctx, dur) {
   return { frequency: 340.0, output: panner };
 };
 
-window.dfGetMilestoneVersion1190AuditSeal = function() {
-  return {
-    milestone: "M1050", release: "v11.9.0", centennialIndex: 740, versionCode: 870,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceOverdueSmoothingTensorGrid = function(totalOverdueItems, horizonDays) {
   const tot = Math.max(0, Number(totalOverdueItems) || 0), days = Math.max(1, Number(horizonDays) || 14);
@@ -25728,13 +25319,7 @@ window.dfSynthesizeIsochronicTheta46Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 4.6 };
 };
 
-window.dfGetMilestoneVersion1200AuditSeal = function() {
-  return {
-    milestone: "M1060", release: "v12.0.0", centennialIndex: 750, versionCode: 880,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfEqualizeUniversalDeckTensorNode = function(deckLoadsArray) {
   const loads = Array.isArray(deckLoadsArray) ? deckLoadsArray.map(Number) : [10, 15];
@@ -25811,13 +25396,7 @@ window.dfSynthesizeGammaThetaEngine54Hz = function(gammaHz, thetaHz) {
   return { gammaHz: g, thetaHz: t, synchronyRatio: Number((g / t).toFixed(1)), isEngineActive: true };
 };
 
-window.dfGetMilestoneVersion1210AuditSeal = function() {
-  return {
-    milestone: "M1070", release: "v12.1.0", centennialIndex: 760, versionCode: 890,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfScaffoldClozeStemsMatrixTensor = function(word) {
   const str = String(word || "").trim();
@@ -25912,13 +25491,7 @@ window.dfSynthesizeUltraGamma360HzVector = function(ctx, dur) {
   return { frequency: 360.0, output: panner };
 };
 
-window.dfGetMilestoneVersion1220AuditSeal = function() {
-  return {
-    milestone: "M1080", release: "v12.2.0", centennialIndex: 770, versionCode: 900,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceOverdueSmoothingGridNode = function(totalOverdueItems, horizonDays) {
   const tot = Math.max(0, Number(totalOverdueItems) || 0), days = Math.max(1, Number(horizonDays) || 14);
@@ -26009,14 +25582,7 @@ window.dfSynthesizeIsochronicAlphaSmr125Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 12.5 };
 };
 
-window.dfGetMilestoneVersion1230AuditSeal = function() {
-  return {
-    milestone: "M1090", release: "v12.3.0", centennialIndex: 780, versionCode: 910,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, zeroTrackingSafe: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfTrackOfflineStudyVelocity = function(sessionStartTime, completedItemsCount) {
   const now = Date.now(), elapsedMins = Math.max(1, (now - (sessionStartTime || now)) / 60000);
@@ -26099,14 +25665,7 @@ window.dfSynthesizeIsochronicThetaAlpha7Hz = function(ctx, dur, carrierFreq) {
   return { carrier, pulse, output: panner, frequency: 7.0 };
 };
 
-window.dfGetMilestoneVersion1240AuditSeal = function() {
-  return {
-    milestone: "M1100", release: "v12.4.0", centennialIndex: 790, versionCode: 920,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, zeroTrackingSafe: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfComputeLocalFlashcardDecayTensor = function(stabilityValue, daysPast) {
   const s = Math.max(0.1, Number(stabilityValue) || 2.0), d = Math.max(0, Number(daysPast) || 0);
@@ -26180,13 +25739,7 @@ window.dfSynthesizeGammaThetaEngine56Hz = function(gammaHz, thetaHz) {
   return { gammaHz: g, thetaHz: t, synchronyRatio: Number((g / t).toFixed(1)), isEngineActive: true };
 };
 
-window.dfGetMilestoneVersion1250AuditSeal = function() {
-  return {
-    milestone: "M1110", release: "v12.5.0", centennialIndex: 800, versionCode: 930,
-    timestamp: new Date().toISOString(), status: "HISTORIC_CENTENNIAL_M800_PROD_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfScaffoldClozeStemsArrayNode = function(word) {
   const str = String(word || "").trim();
@@ -26281,13 +25834,7 @@ window.dfSynthesizeUltraGamma380HzVector = function(ctx, dur) {
   return { frequency: 380.0, output: panner };
 };
 
-window.dfGetMilestoneVersion1260AuditSeal = function() {
-  return {
-    milestone: "M1120", release: "v12.6.0", centennialIndex: 810, versionCode: 940,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfBalanceOverdueSmoothingNodeGrid = function(totalOverdueItems, horizonDays) {
   const tot = Math.max(0, Number(totalOverdueItems) || 0), days = Math.max(1, Number(horizonDays) || 14);
@@ -26379,14 +25926,7 @@ window.dfGenerateRealNaturalRainWav = function(ctx) {
   return { output: gain, type: "REAL_STEADY_RAIN_CC0" };
 };
 
-window.dfGetMilestoneVersion1270AuditSeal = function() {
-  return {
-    milestone: "M1130", release: "v12.7.0", centennialIndex: 820, versionCode: 950,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfGenerateRealWaterStreamWav = function(ctx) {
   const sampleRate = 22050, dur = 3, numSamples = sampleRate * dur;
@@ -26495,14 +26035,7 @@ window.dfGenerateRealCampfireEmbersWav = function(ctx) {
   return { output: bpf, type: "REAL_FIRE_EMBERS_CC0" };
 };
 
-window.dfGetMilestoneVersion1280AuditSeal = function() {
-  return {
-    milestone: "M1140", release: "v12.8.0", centennialIndex: 830, versionCode: 960,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCoreSpanishDictionary = function() {
   const es = {
@@ -26602,14 +26135,7 @@ window.dfRegisterCoreUrduDictionary = function() {
   return { lang: "ur", direction: "rtl", keysCount: Object.keys(ur).length, verified: true };
 };
 
-window.dfGetMilestoneVersion1290AuditSeal = function() {
-  return {
-    milestone: "M1150", release: "v12.9.0", centennialIndex: 840, versionCode: 970,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCorePersianDictionary = function() {
   const fa = {
@@ -26714,14 +26240,7 @@ window.dfSynthesizeRealMountainSpringWav = function(ctx) {
   return { output: bpf, type: "REAL_SPRING_WATER_CC0" };
 };
 
-window.dfGetMilestoneVersion1300AuditSeal = function() {
-  return {
-    milestone: "M1160", release: "v13.0.0", centennialIndex: 850, versionCode: 980,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCorePortugueseDictionary = function() {
   const pt = {
@@ -26823,14 +26342,7 @@ window.dfSynthesizeRealNightCricketsWav = function(ctx) {
   return { output: master, type: "REAL_NIGHT_CRICKETS_CC0" };
 };
 
-window.dfGetMilestoneVersion1310AuditSeal = function() {
-  return {
-    milestone: "M1170", release: "v13.1.0", centennialIndex: 860, versionCode: 990,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCoreJapaneseDictionary = function() {
   const ja = {
@@ -26933,14 +26445,7 @@ window.dfSynthesizeRealPineForestWindWav = function(ctx) {
   return { output: bpf, type: "REAL_PINE_WIND_CC0" };
 };
 
-window.dfGetMilestoneVersion1320AuditSeal = function() {
-  return {
-    milestone: "M1180", release: "v13.2.0", centennialIndex: 870, versionCode: 1000,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCoreHindiDictionary = function() {
   const hi = {
@@ -27042,14 +26547,7 @@ window.dfSynthesizeRealEveningCampfireWav = function(ctx) {
   return { output: bpf, type: "REAL_EVENING_CAMPFIRE_CC0" };
 };
 
-window.dfGetMilestoneVersion1330AuditSeal = function() {
-  return {
-    milestone: "M1190", release: "v13.3.0", centennialIndex: 880, versionCode: 1010,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCoreAzerbaijaniDictionary = function() {
   const aze = {
@@ -27156,14 +26654,7 @@ window.dfSynthesizeRealSpringGardenRainWav = function(ctx) {
   return { output: lpf, type: "REAL_GARDEN_RAIN_CC0" };
 };
 
-window.dfGetMilestoneVersion1340AuditSeal = function() {
-  return {
-    milestone: "M1200", release: "v13.4.0", centennialIndex: 890, versionCode: 1020,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCoreGreekDictionary = function() {
   const el = {
@@ -27276,14 +26767,7 @@ window.dfSynthesizeRealGlacierTrickleWav = function(ctx) {
   return { output: hpf, type: "REAL_GLACIER_TRICKLE_CC0" };
 };
 
-window.dfGetMilestoneVersion1350AuditSeal = function() {
-  return {
-    milestone: "M1210", release: "v13.5.0", centennialIndex: 900, versionCode: 1030,
-    timestamp: new Date().toISOString(), status: "HISTORIC_CENTENNIAL_M900_PROD_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCoreUkrainianDictionary = function() {
   const uk = {
@@ -27338,8 +26822,8 @@ window.dfRegisterCoreNorwegianDictionary = function() {
 };
 
 window.dfValidateWesternNumeralsOnly = function(str) {
-  const arabicEastern = /[0-9]/;
-  return { hasNonWesternDigits: arabicEastern.test(String(str || "")), standardAsciiStrict: true };
+  const nonWestern = /[\u0660-\u0669\u06F0-\u06F9]/;
+  return { hasNonWesternDigits: nonWestern.test(String(str || "")), standardAsciiStrict: true };
 };
 
 window.dfProtectAudioContextResume = function(ctx) {
@@ -27391,14 +26875,7 @@ window.dfSynthesizeRealDesertDunesWav = function(ctx) {
   return { output: bpf, type: "REAL_DESERT_DUNES_CC0" };
 };
 
-window.dfGetMilestoneVersion1360AuditSeal = function() {
-  return {
-    milestone: "M1220", release: "v13.6.0", centennialIndex: 910, versionCode: 1040,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCoreFilipinoDictionary = function() {
   const fil = {
@@ -27515,14 +26992,7 @@ window.dfSynthesizeRealPebbleBrookWav = function(ctx) {
   return { output: bpf, type: "REAL_PEBBLE_BROOK_CC0" };
 };
 
-window.dfGetMilestoneVersion1370AuditSeal = function() {
-  return {
-    milestone: "M1230", release: "v13.7.0", centennialIndex: 920, versionCode: 1050,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCoreNepaliDictionary = function() {
   const ne = {
@@ -27635,14 +27105,7 @@ window.dfSynthesizeRealCanyonWindRoarWav = function(ctx) {
   return { output: lpf, type: "REAL_CANYON_WIND_ROAR_CC0" };
 };
 
-window.dfGetMilestoneVersion1380AuditSeal = function() {
-  return {
-    milestone: "M1240", release: "v13.8.0", centennialIndex: 930, versionCode: 1060,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterCoreMongolianDictionary = function() {
   const mn = {
@@ -27746,14 +27209,7 @@ window.dfTranslateAllUI = function(targetLang) {
   return { updatedLanguage: lang, appliedKeysCount: Object.keys(dict).length };
 };
 
-window.dfGetMilestoneVersion1390AuditSeal = function() {
-  return {
-    milestone: "M1250", release: "v13.9.0", centennialIndex: 940, versionCode: 1070,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixEnforced: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveArabicDictionary = function() {
   const ar = {
@@ -27864,14 +27320,7 @@ window.dfIntegrateNorthwestCaucasianPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1258-M1267: EXHAUSTIVE PACKS TR/ID/RU/IT/PT/NL/PL & GRAND v14.0.0 */
-window.dfGetMilestoneVersion1400AuditSeal = function() {
-  return {
-    milestone: "M1260", release: "v14.0.0", centennialIndex: 950, versionCode: 1080,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    exhaustiveUIMatrixVerified: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveTurkishDictionary = function() {
   const tr = {
@@ -27965,14 +27414,7 @@ window.dfIntegrateDagestanExhaustivePack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1268-M1277: EXHAUSTIVE PACKS UR/FA/JA/KO/ZH/HI & M1270 SEAL */
-window.dfGetMilestoneVersion1410AuditSeal = function() {
-  return {
-    milestone: "M1270", release: "v14.1.0", centennialIndex: 960, versionCode: 1090,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    zeroMusicEnforced: true, nonClinicalSafe: true, halalAcousticsOnly: true,
-    exhaustiveUIMatrixVerified: true, forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveUrduDictionary = function() {
   const ur = {
@@ -28100,14 +27542,7 @@ window.dfIntegrateDravidianExhaustivePack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1278-M1287: EXHAUSTIVE PACKS FI/DA/NO/SV/ET & M1280 SEAL */
-window.dfGetMilestoneVersion1420AuditSeal = function() {
-  return {
-    milestone: "M1280", release: "v14.2.0", centennialIndex: 970, versionCode: 1100,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveFinnishDictionary = function() {
   const fi = {
@@ -28212,14 +27647,7 @@ window.dfIntegrateFinnoUgricSamoyedicPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1288-M1297: EXHAUSTIVE PACKS UK/CS/SK/BG/HR & M1290 SEAL */
-window.dfGetMilestoneVersion1430AuditSeal = function() {
-  return {
-    milestone: "M1290", release: "v14.3.0", centennialIndex: 980, versionCode: 1110,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveUkrainianDictionary = function() {
   const uk = {
@@ -28324,14 +27752,7 @@ window.dfIntegrateSlavicMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1298-M1307: EXHAUSTIVE PACKS EL/RO/HU/SR/GA & M1300 SEAL */
-window.dfGetMilestoneVersion1440AuditSeal = function() {
-  return {
-    milestone: "M1300", release: "v14.4.0", centennialIndex: 990, versionCode: 1120,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveGreekDictionary = function() {
   const el = {
@@ -28436,14 +27857,7 @@ window.dfIntegrateCelticInsularPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1308-M1317: EXHAUSTIVE PACKS AZ/UZ/KK/KA/HY & HISTORIC M1000 SEAL */
-window.dfGetMilestoneVersion1450AuditSeal = function() {
-  return {
-    milestone: "M1310", release: "v14.5.0", centennialIndex: 1000, versionCode: 1130,
-    timestamp: new Date().toISOString(), status: "HISTORIC_GRAND_CENTENNIAL_M1000_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveAzerbaijaniDictionary = function() {
   const az = {
@@ -28547,14 +27961,7 @@ window.dfIntegrateKartvelianSouthCaucasianPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1318-M1327: EXHAUSTIVE PACKS BN/MR/TE/TA/GU & M1320 SEAL */
-window.dfGetMilestoneVersion1460AuditSeal = function() {
-  return {
-    milestone: "M1320", release: "v14.6.0", centennialIndex: 1010, versionCode: 1140,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveBengaliDictionary = function() {
   const bn = {
@@ -28659,14 +28066,7 @@ window.dfIntegrateIndoAryanRegionalPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1328-M1337: EXHAUSTIVE PACKS MS/FIL/VI/TH/SW & M1330 SEAL */
-window.dfGetMilestoneVersion1470AuditSeal = function() {
-  return {
-    milestone: "M1330", release: "v14.7.0", centennialIndex: 1020, versionCode: 1150,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveMalayDictionary = function() {
   const ms = {
@@ -28771,14 +28171,7 @@ window.dfIntegrateAustronesianIslandPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1338-M1347: EXHAUSTIVE PACKS HA/YO/IG/AM/OM & M1340 SEAL */
-window.dfGetMilestoneVersion1480AuditSeal = function() {
-  return {
-    milestone: "M1340", release: "v14.8.0", centennialIndex: 1030, versionCode: 1160,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveHausaDictionary = function() {
   const ha = {
@@ -28883,14 +28276,7 @@ window.dfIntegrateWestAfricanCoastalPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1348-M1357: EXHAUSTIVE PACKS ZU/XH/SN/LN/RW & M1350 SEAL */
-window.dfGetMilestoneVersion1490AuditSeal = function() {
-  return {
-    milestone: "M1350", release: "v14.9.0", centennialIndex: 1040, versionCode: 1170,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveZuluDictionary = function() {
   const zu = {
@@ -28995,14 +28381,7 @@ window.dfIntegrateCentralSouthernBantuPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1358-M1367: EXHAUSTIVE PACKS QU/GN/AY/NAH/HT & GRAND v15.0.0 */
-window.dfGetMilestoneVersion1500AuditSeal = function() {
-  return {
-    milestone: "M1360", release: "v15.0.0", centennialIndex: 1050, versionCode: 1180,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveQuechuaDictionary = function() {
   const qu = {
@@ -29107,14 +28486,7 @@ window.dfIntegrateAmericasIndigenousMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1368-M1377: EXHAUSTIVE PACKS NY/ST/TN/SS/VE & M1370 SEAL */
-window.dfGetMilestoneVersion1510AuditSeal = function() {
-  return {
-    milestone: "M1370", release: "v15.1.0", centennialIndex: 1060, versionCode: 1190,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveChewaDictionary = function() {
   const ny = {
@@ -29219,14 +28591,7 @@ window.dfIntegrateSouthernBantuMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1378-M1387: EXHAUSTIVE PACKS MG/JV/SU/CEB/ILO & M1380 SEAL */
-window.dfGetMilestoneVersion1520AuditSeal = function() {
-  return {
-    milestone: "M1380", release: "v15.2.0", centennialIndex: 1070, versionCode: 1200,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveMalagasyDictionary = function() {
   const mg = {
@@ -29331,14 +28696,7 @@ window.dfIntegratePhilippineRegionalMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1388-M1397: EXHAUSTIVE PACKS SM/TO/FJ/MI/TY & M1390 SEAL */
-window.dfGetMilestoneVersion1530AuditSeal = function() {
-  return {
-    milestone: "M1390", release: "v15.3.0", centennialIndex: 1080, versionCode: 1210,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveSamoanDictionary = function() {
   const sm = {
@@ -29443,14 +28801,7 @@ window.dfIntegratePolynesianOutliersPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1398-M1407: EXHAUSTIVE PACKS MN/BUA/XAL/TYV/SAH & M1400 SEAL */
-window.dfGetMilestoneVersion1540AuditSeal = function() {
-  return {
-    milestone: "M1400", release: "v15.4.0", centennialIndex: 1090, versionCode: 1220,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveMongolianDictionary = function() {
   const mn = {
@@ -29555,14 +28906,7 @@ window.dfIntegrateSiberianMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1408-M1417: EXHAUSTIVE PACKS KM/LO/MNW/SHN/KAR & M1410 SEAL */
-window.dfGetMilestoneVersion1550AuditSeal = function() {
-  return {
-    milestone: "M1410", release: "v15.5.0", centennialIndex: 1100, versionCode: 1230,
-    timestamp: new Date().toISOString(), status: "HISTORIC_CENTENNIAL_M1100_PROD_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveKhmerDictionary = function() {
   const km = {
@@ -29667,14 +29011,7 @@ window.dfIntegrateMainlandSoutheastAsianPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1418-M1427: EXHAUSTIVE PACKS SO/AA/TI/SID/WAL & M1420 SEAL */
-window.dfGetMilestoneVersion1560AuditSeal = function() {
-  return {
-    milestone: "M1420", release: "v15.6.0", centennialIndex: 1110, versionCode: 1240,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveSomaliDictionary = function() {
   const so = {
@@ -29779,14 +29116,7 @@ window.dfIntegrateHornOfAfricaMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1428-M1437: EXHAUSTIVE PACKS AV/LEZ/CE/INH/LBE & M1430 SEAL */
-window.dfGetMilestoneVersion1570AuditSeal = function() {
-  return {
-    milestone: "M1430", release: "v15.7.0", centennialIndex: 1120, versionCode: 1250,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveAvarDictionary = function() {
   const av = {
@@ -29891,14 +29221,7 @@ window.dfIntegrateDagestanMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1438-M1447: EXHAUSTIVE PACKS PS/CKB/KMR/TG/BAL & M1440 SEAL */
-window.dfGetMilestoneVersion1580AuditSeal = function() {
-  return {
-    milestone: "M1440", release: "v15.8.0", centennialIndex: 1130, versionCode: 1260,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustivePashtoDictionary = function() {
   const ps = {
@@ -30003,14 +29326,7 @@ window.dfIntegratePamirCaspianPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1448-M1457: EXHAUSTIVE PACKS KR/SG/DJE/GYA/BAD & M1450 SEAL */
-window.dfGetMilestoneVersion1590AuditSeal = function() {
-  return {
-    milestone: "M1450", release: "v15.9.0", centennialIndex: 1140, versionCode: 1270,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveKanuriDictionary = function() {
   const kr = {
@@ -30115,14 +29431,7 @@ window.dfIntegrateChadBasinUbangiPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1458-M1467: EXHAUSTIVE PACKS NAH/NV/CHR/HAW/SM & GRAND v16.0.0 */
-window.dfGetMilestoneVersion1600AuditSeal = function() {
-  return {
-    milestone: "M1460", release: "v16.0.0", centennialIndex: 1150, versionCode: 1280,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveNahuatlDictionary = function() {
   const nah = {
@@ -30227,14 +29536,7 @@ window.dfIntegrateIndigenousPacificPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1468-M1477: EXHAUSTIVE PACKS WO/BM/LN/RW/LG & M1470 SEAL */
-window.dfGetMilestoneVersion1610AuditSeal = function() {
-  return {
-    milestone: "M1470", release: "v16.1.0", centennialIndex: 1160, versionCode: 1290,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveWolofDictionary = function() {
   const wo = {
@@ -30339,14 +29641,7 @@ window.dfIntegrateEquatorialAfricanPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1478-M1487: EXHAUSTIVE PACKS NE/SI/BO/DZ/AS & M1480 SEAL */
-window.dfGetMilestoneVersion1620AuditSeal = function() {
-  return {
-    milestone: "M1480", release: "v16.2.0", centennialIndex: 1170, versionCode: 1300,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveNepaliDictionary = function() {
   const ne = {
@@ -30450,14 +29745,7 @@ window.dfIntegrateHimalayanRegionalPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1488-M1497: EXHAUSTIVE PACKS AMI/PWN/TAY/BNN/TAO & M1490 SEAL */
-window.dfGetMilestoneVersion1630AuditSeal = function() {
-  return {
-    milestone: "M1490", release: "v16.3.0", centennialIndex: 1180, versionCode: 1310,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveAmisDictionary = function() {
   const ami = {
@@ -30561,14 +29849,7 @@ window.dfIntegrateFormosanIndigenousPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1498-M1507: EXHAUSTIVE PACKS SHP/CNI/TCA/WCA/MYP & M1500 SEAL */
-window.dfGetMilestoneVersion1640AuditSeal = function() {
-  return {
-    milestone: "M1500", release: "v16.4.0", centennialIndex: 1190, versionCode: 1320,
-    timestamp: new Date().toISOString(), status: "HISTORIC_SESQUICENTENNIAL_M1500_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveShipiboDictionary = function() {
   const shp = {
@@ -30672,14 +29953,7 @@ window.dfIntegrateAmazonianBasinMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1508-M1517: EXHAUSTIVE PACKS MOS/DYU/DAG/BCI/SNF & M1510 SEAL */
-window.dfGetMilestoneVersion1650AuditSeal = function() {
-  return {
-    milestone: "M1510", release: "v16.5.0", centennialIndex: 1200, versionCode: 1330,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveMossiDictionary = function() {
   const mos = {
@@ -30783,14 +30057,7 @@ window.dfIntegrateSahelVoltaicPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1518-M1527: EXHAUSTIVE PACKS OM/SO/AA/SID/SSY & M1520 SEAL */
-window.dfGetMilestoneVersion1660AuditSeal = function() {
-  return {
-    milestone: "M1520", release: "v16.6.0", centennialIndex: 1210, versionCode: 1340,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveOromoDictionary = function() {
   const om = {
@@ -30894,14 +30161,7 @@ window.dfIntegrateCushiticHornPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1528-M1537: EXHAUSTIVE PACKS CV/BA/KRC/KUM/NOG & M1530 SEAL */
-window.dfGetMilestoneVersion1670AuditSeal = function() {
-  return {
-    milestone: "M1530", release: "v16.7.0", centennialIndex: 1220, versionCode: 1350,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveChuvashDictionary = function() {
   const cv = {
@@ -31005,14 +30265,7 @@ window.dfIntegrateTurkicEurasianMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1538-M1547: EXHAUSTIVE PACKS KN/ML/TE/TA/TCY & M1540 SEAL */
-window.dfGetMilestoneVersion1680AuditSeal = function() {
-  return {
-    milestone: "M1540", release: "v16.8.0", centennialIndex: 1230, versionCode: 1360,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveKannadaDictionary = function() {
   const kn = {
@@ -31147,14 +30400,7 @@ window.dfAttachLiveTranslationObserver = function() {
   return { observerAttached: true };
 };
 
-window.dfGetMilestoneVersion1690AuditSeal = function() {
-  return {
-    milestone: "M1550", release: "v16.9.0", centennialIndex: 1240, versionCode: 1370,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    deepScannerActive: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfEnsureFullParityForAllLanguages = function() {
   const refKeys = Object.keys(window.df_i18n_locales.en || {});
@@ -31270,14 +30516,7 @@ window.dfIntegrateBalkanMediterraneanDialectsPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1558-M1567: EXHAUSTIVE PACKS MT/GL/EU/CA/LB/BE/LT/LV & GRAND v17.0.0 */
-window.dfGetMilestoneVersion1700AuditSeal = function() {
-  return {
-    milestone: "M1560", release: "v17.0.0", centennialIndex: 1250, versionCode: 1380,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveMalteseDictionary = function() {
   const mt = {
@@ -31432,14 +30671,7 @@ window.dfIntegrateBalticFinnicMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1568-M1577: EXHAUSTIVE RTL PACKS PS/CKB/SD/KS/UG/PA & M1570 SEAL */
-window.dfGetMilestoneVersion1710AuditSeal = function() {
-  return {
-    milestone: "M1570", release: "v17.1.0", centennialIndex: 1260, versionCode: 1390,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveSindhiDictionary = function() {
   const sd = {
@@ -31510,12 +30742,17 @@ window.dfRegisterExhaustivePunjabiShahmukhiDictionary = function() {
 };
 
 window.dfEnforceStrictAsciiDigitsInAllViews = function() {
-  const arabicEastern = /[0-9]/g;
-  document.querySelectorAll("[data-counter], .timer-display, .stats-value").forEach(el => {
-    if (el.textContent) {
-      el.textContent = el.textContent.replace(arabicEastern, d => "0123456789".indexOf(d));
-    }
-  });
+  const nonWestern = /[\u0660-\u0669\u06F0-\u06F9]/g;
+  if (typeof document !== "undefined") {
+    document.querySelectorAll("[data-counter], .timer-display, .stats-value").forEach(el => {
+      if (el.textContent && nonWestern.test(el.textContent)) {
+        el.textContent = el.textContent.replace(nonWestern, ch => {
+          const code = ch.charCodeAt(0);
+          return String(code >= 0x06F0 ? code - 0x06F0 : code - 0x0660);
+        });
+      }
+    });
+  }
   return { westernDigitsEnforced: true };
 };
 
@@ -31544,14 +30781,7 @@ window.dfIntegrateIranianRegionalPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1578-M1587: EXHAUSTIVE PACKS TYV/SAH/KJH/ALT/CJS & M1580 SEAL */
-window.dfGetMilestoneVersion1720AuditSeal = function() {
-  return {
-    milestone: "M1580", release: "v17.2.0", centennialIndex: 1270, versionCode: 1400,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveTuvanDictionary = function() {
   const tyv = {
@@ -31654,14 +30884,7 @@ window.dfIntegrateSiberianTurkicMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1588-M1597: EXHAUSTIVE PACKS HU/UDM/KOM/CHM/MDF & M1590 SEAL */
-window.dfGetMilestoneVersion1730AuditSeal = function() {
-  return {
-    milestone: "M1590", release: "v17.3.0", centennialIndex: 1280, versionCode: 1410,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveHungarianDictionary = function() {
   const hu = {
@@ -31764,14 +30987,7 @@ window.dfIntegrateUralicMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1598-M1607: EXHAUSTIVE PACKS NOD/TTS/SOU/SHN/MWW & M1600 SEAL */
-window.dfGetMilestoneVersion1740AuditSeal = function() {
-  return {
-    milestone: "M1600", release: "v17.4.0", centennialIndex: 1290, versionCode: 1420,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveLannaDictionary = function() {
   const nod = {
@@ -31874,14 +31090,7 @@ window.dfIntegrateTaiKadaiMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1608-M1617: EXHAUSTIVE PACKS FJ/TPI/MEU/HMO/BI & M1610 SEAL */
-window.dfGetMilestoneVersion1750AuditSeal = function() {
-  return {
-    milestone: "M1610", release: "v17.5.0", centennialIndex: 1300, versionCode: 1430,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveFijianDictionary = function() {
   const fj = {
@@ -31985,14 +31194,7 @@ window.dfIntegratePapuanMelanesianPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1618-M1627: EXHAUSTIVE PACKS CH/MH/PAU/CHK/PON & M1620 SEAL */
-window.dfGetMilestoneVersion1760AuditSeal = function() {
-  return {
-    milestone: "M1620", release: "v17.6.0", centennialIndex: 1310, versionCode: 1440,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveChamorroDictionary = function() {
   const ch = {
@@ -32096,14 +31298,7 @@ window.dfIntegrateMicronesianRegionalPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1628-M1637: EXHAUSTIVE PACKS QUC/MAM/KEK/CAK/BZD & M1630 SEAL */
-window.dfGetMilestoneVersion1770AuditSeal = function() {
-  return {
-    milestone: "M1630", release: "v17.7.0", centennialIndex: 1320, versionCode: 1450,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveKicheDictionary = function() {
   const quc = {
@@ -32207,14 +31402,7 @@ window.dfIntegrateCentralAmericanMayanPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1638-M1647: EXHAUSTIVE PACKS DRU/TSU/PYU/XSY/IVV & M1640 SEAL */
-window.dfGetMilestoneVersion1780AuditSeal = function() {
-  return {
-    milestone: "M1640", release: "v17.8.0", centennialIndex: 1330, versionCode: 1460,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveRukaiDictionary = function() {
   const dru = {
@@ -32318,14 +31506,7 @@ window.dfIntegrateBatanicLuzonPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1648-M1657: EXHAUSTIVE PACKS POC/TZO/TZH/TOJ/HUS & M1650 SEAL */
-window.dfGetMilestoneVersion1790AuditSeal = function() {
-  return {
-    milestone: "M1650", release: "v17.9.0", centennialIndex: 1340, versionCode: 1470,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustivePoqomamDictionary = function() {
   const poc = {
@@ -32429,14 +31610,7 @@ window.dfIntegrateChiapasMayanPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1658-M1667: EXHAUSTIVE PACKS TOB/WLV/PLG/MOC/ENX & GRAND v18.0.0 */
-window.dfGetMilestoneVersion1800AuditSeal = function() {
-  return {
-    milestone: "M1660", release: "v18.0.0", centennialIndex: 1350, versionCode: 1480,
-    timestamp: new Date().toISOString(), status: "GRAND_GOLDEN_MASTER_PROD_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveTobaQomDictionary = function() {
   const tob = {
@@ -32540,14 +31714,7 @@ window.dfIntegrateGranChacoIndigenousPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1668-M1677: EXHAUSTIVE PACKS WCA/PID/MCH/AOC/WBA & M1670 SEAL */
-window.dfGetMilestoneVersion1810AuditSeal = function() {
-  return {
-    milestone: "M1670", release: "v18.1.0", centennialIndex: 1360, versionCode: 1490,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveYanomamiDictionary = function() {
   const wca = {
@@ -32651,14 +31818,7 @@ window.dfIntegrateGuianaShieldPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1678-M1687: EXHAUSTIVE PACKS SGH/WBL/ISK/YAH/SRH & M1680 SEAL */
-window.dfGetMilestoneVersion1820AuditSeal = function() {
-  return {
-    milestone: "M1680", release: "v18.2.0", centennialIndex: 1370, versionCode: 1500,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveShughniDictionary = function() {
   const sgh = {
@@ -32760,14 +31920,7 @@ window.dfIntegrateBadakhshanPamirPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1688-M1697: EXHAUSTIVE PACKS TET/MDR/SAS/BHP/SMW & M1690 SEAL */
-window.dfGetMilestoneVersion1830AuditSeal = function() {
-  return {
-    milestone: "M1690", release: "v18.3.0", centennialIndex: 1380, versionCode: 1510,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveTetumDictionary = function() {
   const tet = {
@@ -32870,14 +32023,7 @@ window.dfIntegrateTimorFloresPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1698-M1707: EXHAUSTIVE PACKS TFT/TID/GBI/TLB/SAJ & M1700 SEAL */
-window.dfGetMilestoneVersion1840AuditSeal = function() {
-  return {
-    milestone: "M1700", release: "v18.4.0", centennialIndex: 1390, versionCode: 1520,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveTernateDictionary = function() {
   const tft = {
@@ -32981,14 +32127,7 @@ window.dfIntegrateHalmaheraMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1708-M1717: EXHAUSTIVE PACKS ENQ/MED/KUE/HUI/IAN & M1710 SEAL */
-window.dfGetMilestoneVersion1850AuditSeal = function() {
-  return {
-    milestone: "M1710", release: "v18.5.0", centennialIndex: 1400, versionCode: 1530,
-    timestamp: new Date().toISOString(), status: "HISTORIC_CENTENNIAL_M1400_PROD_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveEngaDictionary = function() {
   const enq = {
@@ -33092,14 +32231,7 @@ window.dfIntegrateSepikRamuMinoritiesPack = function() {
 
 
 /* DEEP FOCUS MISSIONS M1718-M1727: EXHAUSTIVE PACKS BGT/KJI/MRN/KKK/NTU & M1720 SEAL */
-window.dfGetMilestoneVersion1860AuditSeal = function() {
-  return {
-    milestone: "M1720", release: "v18.6.0", centennialIndex: 1410, versionCode: 1540,
-    timestamp: new Date().toISOString(), status: "GOLDEN_PRODUCTION_VERIFIED",
-    exhaustiveUIMatrixVerified: true, zeroMusic: true, halalOnly: true,
-    forbiddenLangsFiltered: ["he", "iw", "syc", "ber", "zgh"]
-  };
-};
+
 
 window.dfRegisterExhaustiveBugotuDictionary = function() {
   const bgt = {
@@ -33280,9 +32412,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1737: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1870AuditSeal = function(){
-    return { milestone:"M1730", version:"18.7.0", versionCode:1550, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1738-M1747: Northern Andean, Choco & Chibchan Universal UI Translations Pack */
 (function(){
@@ -33364,9 +32494,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1747: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1880AuditSeal = function(){
-    return { milestone:"M1740", version:"18.8.0", versionCode:1560, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1748-M1757: Amazonian Tupi & Macro-Je Universal UI Translations Pack */
 (function(){
@@ -33448,9 +32576,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1757: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1890AuditSeal = function(){
-    return { milestone:"M1750", version:"18.9.0", versionCode:1570, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1728-M1737: Gran Chaco & Zamucoan Universal UI Translations Pack */
 (function(){
@@ -33532,9 +32658,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1737: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1870AuditSeal = function(){
-    return { milestone:"M1730", version:"18.7.0", versionCode:1550, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1738-M1747: Northern Andean, Choco & Chibchan Universal UI Translations Pack */
 (function(){
@@ -33616,9 +32740,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1747: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1880AuditSeal = function(){
-    return { milestone:"M1740", version:"18.8.0", versionCode:1560, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1748-M1757: Amazonian Tupi & Macro-Je Universal UI Translations Pack */
 (function(){
@@ -33700,9 +32822,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1757: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1890AuditSeal = function(){
-    return { milestone:"M1750", version:"18.9.0", versionCode:1570, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1758-M1767: Amazonian Arawak & Carib Universal UI Translations Pack */
 (function(){
@@ -33784,9 +32904,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1767: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1900AuditSeal = function(){
-    return { milestone:"M1760", version:"19.0.0", versionCode:1580, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1768-M1777: Siberian Tungusic & Chukotkan Universal UI Translations Pack */
 (function(){
@@ -33868,9 +32986,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1777: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1910AuditSeal = function(){
-    return { milestone:"M1770", version:"19.1.0", versionCode:1590, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1778-M1787: Papuan Trans-New Guinea Universal UI Translations Pack */
 (function(){
@@ -33952,9 +33068,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1787: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1920AuditSeal = function(){
-    return { milestone:"M1780", version:"19.2.0", versionCode:1600, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1788-M1797: Australian Indigenous Universal UI Translations Pack */
 (function(){
@@ -34036,9 +33150,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1797: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1930AuditSeal = function(){
-    return { milestone:"M1790", version:"19.3.0", versionCode:1610, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1798-M1807: North American Plains & Plateau Universal UI Translations Pack */
 (function(){
@@ -34120,9 +33232,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1807: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1940AuditSeal = function(){
-    return { milestone:"M1800", version:"19.4.0", versionCode:1620, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1808-M1817: Southwest Indigenous & Pueblo Universal UI Translations Pack */
 (function(){
@@ -34204,9 +33314,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1817: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1950AuditSeal = function(){
-    return { milestone:"M1810", version:"19.5.0", versionCode:1630, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1818-M1827: Pacific Northwest Indigenous Universal UI Translations Pack */
 (function(){
@@ -34288,9 +33396,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1827: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1960AuditSeal = function(){
-    return { milestone:"M1820", version:"19.6.0", versionCode:1640, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1828-M1837: California Indigenous Universal UI Translations Pack */
 (function(){
@@ -34372,9 +33478,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1837: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1970AuditSeal = function(){
-    return { milestone:"M1830", version:"19.7.0", versionCode:1650, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1838-M1847: Patagonian & Fuegian Universal UI Translations Pack */
 (function(){
@@ -34456,9 +33560,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1847: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1980AuditSeal = function(){
-    return { milestone:"M1840", version:"19.8.0", versionCode:1660, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1848-M1857: Yanomami & Tucanoan Universal UI Translations Pack */
 (function(){
@@ -34540,9 +33642,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1857: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion1990AuditSeal = function(){
-    return { milestone:"M1850", version:"19.9.0", versionCode:1670, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1858-M1867: Mesoamerican Oto-Manguean Universal UI Translations Pack */
 (function(){
@@ -34624,9 +33724,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1867: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2000AuditSeal = function(){
-    return { milestone:"M1860", version:"20.0.0", versionCode:1680, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1868-M1877: Barbacoan & Isthmo-Colombian Universal UI Translations Pack */
 (function(){
@@ -34708,9 +33806,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1877: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2010AuditSeal = function(){
-    return { milestone:"M1870", version:"20.1.0", versionCode:1690, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1878-M1887: Cross River & Edoid Universal UI Translations Pack */
 (function(){
@@ -34792,9 +33888,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1887: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2020AuditSeal = function(){
-    return { milestone:"M1880", version:"20.2.0", versionCode:1700, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1888-M1897: Nilotic & Nilo-Saharan Universal UI Translations Pack */
 (function(){
@@ -34876,9 +33970,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1897: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2030AuditSeal = function(){
-    return { milestone:"M1890", version:"20.3.0", versionCode:1710, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1898-M1907: Ubangian & Central Sudanic Universal UI Translations Pack */
 (function(){
@@ -34960,9 +34052,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1907: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2040AuditSeal = function(){
-    return { milestone:"M1900", version:"20.4.0", versionCode:1720, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1908-M1917: Austroasiatic Mon-Khmer Universal UI Translations Pack */
 (function(){
@@ -35044,9 +34134,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1917: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2050AuditSeal = function(){
-    return { milestone:"M1910", version:"20.5.0", versionCode:1730, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1918-M1927: Himalayan Tibeto-Burman Universal UI Translations Pack */
 (function(){
@@ -35128,9 +34216,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1927: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2060AuditSeal = function(){
-    return { milestone:"M1920", version:"20.6.0", versionCode:1740, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1928-M1937: Sepik-Ramu & Torricelli Universal UI Translations Pack */
 (function(){
@@ -35212,9 +34298,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1937: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2070AuditSeal = function(){
-    return { milestone:"M1930", version:"20.7.0", versionCode:1750, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1918-M1927: Himalayan Tibeto-Burman Universal UI Translations Pack */
 (function(){
@@ -35296,9 +34380,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1927: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2060AuditSeal = function(){
-    return { milestone:"M1920", version:"20.6.0", versionCode:1740, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1928-M1937: Sepik-Ramu & Torricelli Universal UI Translations Pack */
 (function(){
@@ -35380,9 +34462,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1937: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2070AuditSeal = function(){
-    return { milestone:"M1930", version:"20.7.0", versionCode:1750, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1968-M1977: Gur & Voltaic Universal UI Translations Pack */
 (function(){
@@ -35464,9 +34544,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1977: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2110AuditSeal = function(){
-    return { milestone:"M1970", version:"21.1.0", versionCode:1790, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1938-M1947: Philippine & Bornean Universal UI Translations Pack */
 (function(){
@@ -35548,9 +34626,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1947: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2080AuditSeal = function(){
-    return { milestone:"M1940", version:"20.8.0", versionCode:1760, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1948-M1957: Polynesian & Micronesian Universal UI Translations Pack */
 (function(){
@@ -35632,9 +34708,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1957: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2090AuditSeal = function(){
-    return { milestone:"M1950", version:"20.9.0", versionCode:1770, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1958-M1967: Khoisan & Kalahari Universal UI Translations Pack */
 (function(){
@@ -35716,9 +34790,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1967: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2100AuditSeal = function(){
-    return { milestone:"M1960", version:"21.0.0", versionCode:1780, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1968-M1977: Gur & Voltaic Universal UI Translations Pack */
 (function(){
@@ -35800,9 +34872,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1977: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2110AuditSeal = function(){
-    return { milestone:"M1970", version:"21.1.0", versionCode:1790, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1978-M1987: Kru & Mande Universal UI Translations Pack */
 (function(){
@@ -35884,9 +34954,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1987: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2120AuditSeal = function(){
-    return { milestone:"M1980", version:"21.2.0", versionCode:1800, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1988-M1997: Zambezi & Limpopo Bantu Universal UI Translations Pack */
 (function(){
@@ -35968,9 +35036,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M1997: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2130AuditSeal = function(){
-    return { milestone:"M1990", version:"21.3.0", versionCode:1810, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M1998-M2007: Great Lakes Interlacustrine Bantu Universal UI Translations Pack */
 (function(){
@@ -36136,9 +35202,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2017: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2150AuditSeal = function(){
-    return { milestone:"M2010", version:"21.5.0", versionCode:1830, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2018-M2027: Upper Amazon & Putumayo Universal UI Translations Pack */
 (function(){
@@ -36220,9 +35284,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2027: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2160AuditSeal = function(){
-    return { milestone:"M2020", version:"21.6.0", versionCode:1840, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2028-M2037: Solomon Islands Oceanic Universal UI Translations Pack */
 (function(){
@@ -36304,9 +35366,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2037: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2170AuditSeal = function(){
-    return { milestone:"M2030", version:"21.7.0", versionCode:1850, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2038-M2047: Vanuatu & New Caledonia Universal UI Translations Pack */
 (function(){
@@ -36388,9 +35448,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2047: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2180AuditSeal = function(){
-    return { milestone:"M2040", version:"21.8.0", versionCode:1860, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2048-M2057: Micronesian Island Universal UI Translations Pack */
 (function(){
@@ -36472,9 +35530,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2057: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2190AuditSeal = function(){
-    return { milestone:"M2050", version:"21.9.0", versionCode:1870, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2058-M2067: Sierra Nevada Chibchan & Northern Andean Universal UI Translations Pack */
 (function(){
@@ -36640,9 +35696,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2077: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2210AuditSeal = function(){
-    return { milestone:"M2070", version:"22.1.0", versionCode:1890, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2078-M2087: Panoan & Tacanan Universal UI Translations Pack */
 (function(){
@@ -36724,9 +35778,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2087: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2220AuditSeal = function(){
-    return { milestone:"M2080", version:"22.2.0", versionCode:1900, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2088-M2097: Guapore & Upper Madeira Tupian Universal UI Translations Pack */
 (function(){
@@ -36807,9 +35859,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2097: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2230AuditSeal = function(){
-    return { milestone:"M2090", version:"22.3.0", versionCode:1910, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2098-M2107: Rondonia Indigenous Universal UI Translations Pack */
 (function(){
@@ -36975,9 +36025,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2117: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2250AuditSeal = function(){
-    return { milestone:"M2110", version:"22.5.0", versionCode:1930, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2118-M2127: Aymaran & Central Quechua Universal UI Translations Pack */
 (function(){
@@ -37059,9 +36107,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2127: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2260AuditSeal = function(){
-    return { milestone:"M2120", version:"22.6.0", versionCode:1940, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2128-M2137: Northern Quichua & Inga Universal UI Translations Pack */
 (function(){
@@ -37143,9 +36189,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2137: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2270AuditSeal = function(){
-    return { milestone:"M2130", version:"22.7.0", versionCode:1950, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2138-M2147: Pacific Choco & Barbacoan Universal UI Translations Pack */
 (function(){
@@ -37227,9 +36271,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2147: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2280AuditSeal = function(){
-    return { milestone:"M2140", version:"22.8.0", versionCode:1960, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2148-M2157: Guiana Shield Cariban Universal UI Translations Pack */
 (function(){
@@ -37311,9 +36353,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2157: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2290AuditSeal = function(){
-    return { milestone:"M2150", version:"22.9.0", versionCode:1970, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2158-M2167: Northern Arawakan Universal UI Translations Pack */
 (function(){
@@ -37479,9 +36519,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2177: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2310AuditSeal = function(){
-    return { milestone:"M2170", version:"23.1.0", versionCode:1990, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2178-M2187: Siouan & Muskogean Universal UI Translations Pack */
 (function(){
@@ -37563,9 +36601,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2187: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2320AuditSeal = function(){
-    return { milestone:"M2180", version:"23.2.0", versionCode:2000, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2188-M2197: Algonquian Universal UI Translations Pack */
 (function(){
@@ -37647,9 +36683,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2197: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2330AuditSeal = function(){
-    return { milestone:"M2190", version:"23.3.0", versionCode:2010, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2198-M2207: Eskimo-Aleut Arctic Universal UI Translations Pack */
 (function(){
@@ -37815,9 +36849,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2217: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2350AuditSeal = function(){
-    return { milestone:"M2210", version:"23.5.0", versionCode:2030, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2218-M2227: Pacific Choco & Northern Andean Universal UI Translations Pack */
 (function(){
@@ -37899,9 +36931,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2227: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2360AuditSeal = function(){
-    return { milestone:"M2220", version:"23.6.0", versionCode:2040, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2188-M2197: Algonquian Universal UI Translations Pack */
 (function(){
@@ -37983,9 +37013,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2197: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2330AuditSeal = function(){
-    return { milestone:"M2190", version:"23.3.0", versionCode:2010, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2228-M2237: Munda Universal UI Translations Pack */
 (function(){
@@ -38067,9 +37095,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2237: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2370AuditSeal = function(){
-    return { milestone:"M2230", version:"23.7.0", versionCode:2050, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2238-M2247: Dardic & Nuristani Universal UI Translations Pack */
 (function(){
@@ -38151,9 +37177,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2247: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2380AuditSeal = function(){
-    return { milestone:"M2240", version:"23.8.0", versionCode:2060, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2248-M2257: Bird's Head Papuan Universal UI Translations Pack */
 (function(){
@@ -38235,9 +37259,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2257: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2390AuditSeal = function(){
-    return { milestone:"M2250", version:"23.9.0", versionCode:2070, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2258-M2267: Papua Highlands & Grand Golden Master Universal UI Translations Pack */
 (function(){
@@ -38403,9 +37425,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2277: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2410AuditSeal = function(){
-    return { milestone:"M2270", version:"24.1.0", versionCode:2090, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2278-M2287: Central & Tribal Dravidian Universal UI Translations Pack */
 (function(){
@@ -38487,9 +37507,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2287: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2420AuditSeal = function(){
-    return { milestone:"M2280", version:"24.2.0", versionCode:2100, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2288-M2297: Horn of Africa Cushitic Universal UI Translations Pack */
 (function(){
@@ -38571,9 +37589,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2297: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2430AuditSeal = function(){
-    return { milestone:"M2290", version:"24.3.0", versionCode:2110, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2298-M2307: Adamawa & Chadic Universal UI Translations Pack */
 (function(){
@@ -38739,9 +37755,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2317: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2450AuditSeal = function(){
-    return { milestone:"M2310", version:"24.5.0", versionCode:2130, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2318-M2327: Atlantic Senegambian Universal UI Translations Pack */
 (function(){
@@ -38823,9 +37837,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2327: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2460AuditSeal = function(){
-    return { milestone:"M2320", version:"24.6.0", versionCode:2140, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2328-M2337: Batanic & Northern Formosan Universal UI Translations Pack */
 (function(){
@@ -38907,9 +37919,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2337: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2470AuditSeal = function(){
-    return { milestone:"M2330", version:"24.7.0", versionCode:2150, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2338-M2347: Mongolic & Northern Tungusic Universal UI Translations Pack */
 (function(){
@@ -38991,9 +38001,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2347: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2480AuditSeal = function(){
-    return { milestone:"M2340", version:"24.8.0", versionCode:2160, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2348-M2357: Kartvelian & Dagestanian Universal UI Translations Pack */
 (function(){
@@ -39075,9 +38083,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2357: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2490AuditSeal = function(){
-    return { milestone:"M2350", version:"24.9.0", versionCode:2170, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2358-M2367: Sayan Turkic & Yeniseian Universal UI Translations Pack */
 (function(){
@@ -39242,9 +38248,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2377: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2510AuditSeal = function(){
-    return { milestone:"M2370", version:"25.1.0", versionCode:2190, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2378-M2387: Adamawa & Ubangian Savanna Universal UI Translations Pack */
 (function(){
@@ -39326,9 +38330,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2387: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2520AuditSeal = function(){
-    return { milestone:"M2380", version:"25.2.0", versionCode:2200, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2388-M2397: South Sudan Borderland Universal UI Translations Pack */
 (function(){
@@ -39410,9 +38412,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2397: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2530AuditSeal = function(){
-    return { milestone:"M2390", version:"25.3.0", versionCode:2210, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2398-M2407: Nigerian Plateau & Benue-Congo Universal UI Translations Pack */
 (function(){
@@ -39578,9 +38578,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2417: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2550AuditSeal = function(){
-    return { milestone:"M2410", version:"25.5.0", versionCode:2230, certified:true, halalAudio:true };
-  };
+  
 })();
 /* M2418-M2427: Huon Peninsula & Madang Universal UI Translations Pack */
 (function(){
@@ -39662,9 +38660,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return b;
   };
   // M2427: Audit Seal & Baseline Registry
-  window.dfGetMilestoneVersion2560AuditSeal = function(){
-    return { milestone:"M2420", version:"25.6.0", versionCode:2240, certified:true, halalAudio:true };
-  };
+  
 })();
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {
@@ -39869,7 +38865,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('sjw');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2330AuditSeal = function() { return { milestone: 'v23.3.0', missions: 'M2188-M2197', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ike'] = {"app_name":"Deep Focus","timer_title":"Pinasuaritsi Focus","start_focus":"Aullaqtippaa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Qiturngait","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -39909,7 +38905,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('kax');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2350AuditSeal = function() { return { milestone: 'v23.5.0', missions: 'M2208-M2217', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cmi'] = {"app_name":"Deep Focus","timer_title":"Karia Focus","start_focus":"Dachi-karia","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Bedea","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -39929,7 +38925,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('kbh');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2360AuditSeal = function() { return { milestone: 'v23.6.0', missions: 'M2218-M2227', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tuo'] = {"app_name":"Deep Focus","timer_title":"Dahse Focus","start_focus":"Mee-dahse","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pee-yea","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -39949,7 +38945,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('yui');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2370AuditSeal = function() { return { milestone: 'v23.7.0', missions: 'M2228-M2237', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['shp'] = {"app_name":"Deep Focus","timer_title":"Koshi Focus","start_focus":"Moa-koshi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tene","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -39969,7 +38965,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mcd');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2380AuditSeal = function() { return { milestone: 'v23.8.0', missions: 'M2238-M2247', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['bzd'] = {"app_name":"Deep Focus","timer_title":"Kli Focus","start_focus":"Mika-kli","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Stok","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -39989,7 +38985,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pay');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2390AuditSeal = function() { return { milestone: 'v23.9.0', missions: 'M2248-M2257', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mbc'] = {"app_name":"Deep Focus","timer_title":"Moron Focus","start_focus":"T-moron","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Esa-ka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40029,7 +39025,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('trr');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2410AuditSeal = function() { return { milestone: 'v24.1.0', missions: 'M2268-M2277', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['zro'] = {"app_name":"Deep Focus","timer_title":"Ikwano Focus","start_focus":"Arata-ikwano","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tawano","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40049,7 +39045,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('boa');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2420AuditSeal = function() { return { milestone: 'v24.2.0', missions: 'M2278-M2287', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cni'] = {"app_name":"Deep Focus","timer_title":"Kemisantantsi Focus","start_focus":"Nampitsite","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Magempita","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40069,7 +39065,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('rgr');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2430AuditSeal = function() { return { milestone: 'v24.3.0', missions: 'M2288-M2297', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mzh'] = {"app_name":"Deep Focus","timer_title":"Tshot-lhame Focus","start_focus":"Lham-tshot","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Noyek","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40109,7 +39105,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('yuq');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2450AuditSeal = function() { return { milestone: 'v24.5.0', missions: 'M2308-M2317', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['enl'] = {"app_name":"Deep Focus","timer_title":"Valpa Focus","start_focus":"Appa-valpa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Metkoxe","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40129,7 +39125,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('cag');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2460AuditSeal = function() { return { milestone: 'v24.6.0', missions: 'M2318-M2327', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['arn'] = {"app_name":"Deep Focus","timer_title":"Kizu-rakiduam","start_focus":"Llitu-rakiduam","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ürkütun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40149,7 +39145,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('hpe');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2470AuditSeal = function() { return { milestone: 'v24.7.0', missions: 'M2328-M2337', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ayr'] = {"app_name":"Deep Focus","timer_title":"Lurawi Focus","start_focus":"Qalltaña-lurawi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Samaraña","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40169,7 +39165,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('cul');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2480AuditSeal = function() { return { milestone: 'v24.8.0', missions: 'M2338-M2347', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['quz'] = {"app_name":"Deep Focus","timer_title":"Allin Ruway Focus","start_focus":"Qallariy-allin","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Samarikuy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40189,7 +39185,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('qus');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2490AuditSeal = function() { return { milestone: 'v24.9.0', missions: 'M2348-M2357', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xav'] = {"app_name":"Deep Focus","timer_title":"Rowaeda Focus","start_focus":"Tsa-rowaeda","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Daza","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40229,7 +39225,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('lkd');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2510AuditSeal = function() { return { milestone: 'v25.1.0', missions: 'M2368-M2377', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pav'] = {"app_name":"Deep Focus","timer_title":"Oro-na Focus","start_focus":"Ka-orona","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Xikun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40249,7 +39245,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pur');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2520AuditSeal = function() { return { milestone: 'v25.2.0', missions: 'M2378-M2387', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['knt'] = {"app_name":"Deep Focus","timer_title":"Tukan Focus","start_focus":"Wa-tukan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hono-tu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40269,7 +39265,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pad');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2530AuditSeal = function() { return { milestone: 'v25.3.0', missions: 'M2388-M2397', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mda'] = {"app_name":"Deep Focus","timer_title":"Dza-koma Focus","start_focus":"I-dzakoma","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Bana-ri","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40309,7 +39305,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('yar');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2550AuditSeal = function() { return { milestone: 'v25.5.0', missions: 'M2408-M2417', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pid'] = {"app_name":"Deep Focus","timer_title":"Itso'fä Focus","start_focus":"Wani-itso","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Chawode","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40329,7 +39325,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('yae');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2560AuditSeal = function() { return { milestone: 'v25.6.0', missions: 'M2418-M2427', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tbn'] = {"app_name":"Deep Focus","timer_title":"Ubata Focus","start_focus":"Te-ubata","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sirina","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40349,7 +39345,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('kax');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2570AuditSeal = function() { return { milestone: 'v25.7.0', missions: 'M2428-M2437', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['arh'] = {"app_name":"Deep Focus","timer_title":"Kanku Focus","start_focus":"A-kanku","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Zatukua","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40369,7 +39365,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('tbn');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2580AuditSeal = function() { return { milestone: 'v25.8.0', missions: 'M2438-M2447', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cto'] = {"app_name":"Deep Focus","timer_title":"Wadubi Focus","start_focus":"Da-wadubi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Bedea-katio","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40389,7 +39385,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('gum');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2590AuditSeal = function() { return { milestone: 'v25.9.0', missions: 'M2448-M2457', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['miq'] = {"app_name":"Deep Focus","timer_title":"Luka Focus","start_focus":"Ta-krikan-luka","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Swakwan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40429,7 +39425,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('usp');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2610AuditSeal = function() { return { milestone: 'v26.1.0', missions: 'M2468-M2477', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yua'] = {"app_name":"Deep Focus","timer_title":"Meyaj Focus","start_focus":"Káajal-meyaj","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Jéelel","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40449,7 +39445,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('lac');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2620AuditSeal = function() { return { milestone: 'v26.2.0', missions: 'M2478-M2487', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['zai'] = {"app_name":"Deep Focus","timer_title":"Dxiiña Focus","start_focus":"Guzulú-dxiiña","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Gaxha","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40469,7 +39465,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('trs');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2630AuditSeal = function() { return { milestone: 'v26.3.0', missions: 'M2488-M2497', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['nhn'] = {"app_name":"Deep Focus","timer_title":"Tlanequiliztli Focus","start_focus":"Pehua-tlanequi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Cochiliztli","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40509,7 +39505,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('plo');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2650AuditSeal = function() { return { milestone: 'v26.5.0', missions: 'M2508-M2517', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mxp'] = {"app_name":"Deep Focus","timer_title":"Tu'ung Focus","start_focus":"Tuk-tuung","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Xon","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40529,7 +39525,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('zoh');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2660AuditSeal = function() { return { milestone: 'v26.6.0', missions: 'M2518-M2527', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tsz'] = {"app_name":"Deep Focus","timer_title":"Uandani Focus","start_focus":"Uénani-uandani","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"P'ikurhikua","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40549,7 +39545,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('coz');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2670AuditSeal = function() { return { milestone: 'v26.7.0', missions: 'M2528-M2537', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tip'] = {"app_name":"Deep Focus","timer_title":"Mat-iipai Focus","start_focus":"Nyum-matiipai","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Iiku","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40569,7 +39565,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('hav');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2680AuditSeal = function() { return { milestone: 'v26.8.0', missions: 'M2538-M2547', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['apw'] = {"app_name":"Deep Focus","timer_title":"Biniinaa Focus","start_focus":"Dagonzi-biniinaa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Haash-tih","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40589,7 +39585,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('tol');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2690AuditSeal = function() { return { milestone: 'v26.9.0', missions: 'M2548-M2557', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['dgr'] = {"app_name":"Deep Focus","timer_title":"Tsi-gote Focus","start_focus":"Hozi-tsigote","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Datsan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40629,7 +39625,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('sec');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2710AuditSeal = function() { return { milestone: 'v27.1.0', missions: 'M2568-M2577', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['noo'] = {"app_name":"Deep Focus","timer_title":"Haa-huu-pah Focus","start_focus":"Tsa-haahuupah","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Uuksti","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40649,7 +39645,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('cmk');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2720AuditSeal = function() { return { milestone: 'v27.2.0', missions: 'M2578-M2587', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tsi'] = {"app_name":"Deep Focus","timer_title":"Sm-algyax Focus","start_focus":"Ha-smalgyax","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Lip-galk","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40669,7 +39665,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('aes');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2730AuditSeal = function() { return { milestone: 'v27.3.0', missions: 'M2588-M2597', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lkt'] = {"app_name":"Deep Focus","timer_title":"Wounspe Focus","start_focus":"Tokaheya-wounspe","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Asninki","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40709,7 +39705,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('zkk');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2750AuditSeal = function() { return { milestone: 'v27.5.0', missions: 'M2608-M2617', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cho'] = {"app_name":"Deep Focus","timer_title":"Chukma Focus","start_focus":"Vlla-chukma","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Falamminchi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40729,7 +39725,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('ncz');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2760AuditSeal = function() { return { milestone: 'v27.6.0', missions: 'M2618-M2627', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yak'] = {"app_name":"Deep Focus","timer_title":"Tamanwit Focus","start_focus":"Tsi-tamanwit","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Wana","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40749,7 +39745,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mkn');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2770AuditSeal = function() { return { milestone: 'v27.7.0', missions: 'M2628-M2637', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['was'] = {"app_name":"Deep Focus","timer_title":"Wasiw Focus","start_focus":"Deek-wasiw","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Malo-p","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40769,7 +39765,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('acv');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2780AuditSeal = function() { return { milestone: 'v27.8.0', missions: 'M2638-M2647', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pao'] = {"app_name":"Deep Focus","timer_title":"Numu-tekwapu","start_focus":"Ti-numu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kwin-ha","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40789,7 +39785,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('chm');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2790AuditSeal = function() { return { milestone: 'v27.9.0', missions: 'M2648-M2657', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lui'] = {"app_name":"Deep Focus","timer_title":"Cham-teuna Focus","start_focus":"A-chamteuna","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Noo-va","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40829,7 +39825,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('cnt');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2810AuditSeal = function() { return { milestone: 'v28.1.0', missions: 'M2668-M2677', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['veo'] = {"app_name":"Deep Focus","timer_title":"Mitsqan-Focus","start_focus":"Al-mitsqanaqan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kus","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40849,7 +39845,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('esq');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2820AuditSeal = function() { return { milestone: 'v28.2.0', missions: 'M2678-M2687', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['skd'] = {"app_name":"Deep Focus","timer_title":"Miwok Focus","start_focus":"Tsi-miwok","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pee-le","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40869,7 +39865,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('css');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2830AuditSeal = function() { return { milestone: 'v28.3.0', missions: 'M2688-M2697', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tol'] = {"app_name":"Deep Focus","timer_title":"Dee-ni Focus","start_focus":"Xash-deeni","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mii-ni","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40909,7 +39905,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('yaq');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2850AuditSeal = function() { return { milestone: 'v28.5.0', missions: 'M2708-M2717', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wac'] = {"app_name":"Deep Focus","timer_title":"Wasco-Focus","start_focus":"Wa-wasco","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kax-wi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40929,7 +39925,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('tno');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2860AuditSeal = function() { return { milestone: 'v28.6.0', missions: 'M2718-M2727', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['qun'] = {"app_name":"Deep Focus","timer_title":"Quinault-Focus","start_focus":"Qui-quinault","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kwal-ts","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40949,7 +39945,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('ptw');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2870AuditSeal = function() { return { milestone: 'v28.7.0', missions: 'M2728-M2737', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ahs'] = {"app_name":"Deep Focus","timer_title":"Ahou-Focus","start_focus":"Ha-ahousaht","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tl-aat","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40969,7 +39965,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('hua');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2880AuditSeal = function() { return { milestone: 'v28.8.0', missions: 'M2738-M2747', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tli'] = {"app_name":"Deep Focus","timer_title":"Lingit Focus","start_focus":"Ha-lingit","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Wutee","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -40989,7 +39985,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('ump');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2890AuditSeal = function() { return { milestone: 'v28.9.0', missions: 'M2748-M2757', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lbr'] = {"app_name":"Deep Focus","timer_title":"Nunatsiavut Focus","start_focus":"Aulatsivik","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Saimavik","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41029,7 +40025,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('niv');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2910AuditSeal = function() { return { milestone: 'v29.1.0', missions: 'M2768-M2777', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['evn'] = {"app_name":"Deep Focus","timer_title":"Bakar Focus","start_focus":"Tyo-bakar","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Huran","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41049,7 +40045,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mnc');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2920AuditSeal = function() { return { milestone: 'v29.2.0', missions: 'M2778-M2787', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['bua'] = {"app_name":"Deep Focus","timer_title":"Harakha Focus","start_focus":"Ekhille-harakha","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Amaralta","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41069,7 +40065,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('khk');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2930AuditSeal = function() { return { milestone: 'v29.3.0', missions: 'M2788-M2797', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tyv'] = {"app_name":"Deep Focus","timer_title":"Shirgen Focus","start_focus":"Egelee-shirgen","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Dyzhyg","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41109,7 +40105,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mns');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2950AuditSeal = function() { return { milestone: 'v29.5.0', missions: 'M2808-M2817', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ket'] = {"app_name":"Deep Focus","timer_title":"Dyiq Focus","start_focus":"Ta-dyiq","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hure","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41129,7 +40125,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('nio');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2960AuditSeal = function() { return { milestone: 'v29.6.0', missions: 'M2818-M2827', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ykg'] = {"app_name":"Deep Focus","timer_title":"Wadul Focus","start_focus":"Ta-wadul","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Amu-te","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41149,7 +40145,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('kpy');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2970AuditSeal = function() { return { milestone: 'v29.7.0', missions: 'M2828-M2837', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ain'] = {"app_name":"Deep Focus","timer_title":"Aynu Focus","start_focus":"Yay-aynu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"E-hechaka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41169,7 +40165,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mnc');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2980AuditSeal = function() { return { milestone: 'v29.8.0', missions: 'M2838-M2847', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['geo'] = {"app_name":"Deep Focus","timer_title":"Fokusi Focus","start_focus":"Datskeba-fokusi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sveneba","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41189,7 +40185,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('lez');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion2990AuditSeal = function() { return { milestone: 'v29.9.0', missions: 'M2848-M2857', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['che'] = {"app_name":"Deep Focus","timer_title":"Fokus-che Focus","start_focus":"Dola-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sadukhotur","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41229,7 +40225,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('bzy');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion3010AuditSeal = function() { return { milestone: 'v30.1.0', missions: 'M2868-M2877', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sgh'] = {"app_name":"Deep Focus","timer_title":"Fokus-sgh Focus","start_focus":"Suraw-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ashtoy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41249,7 +40245,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('oru');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion3020AuditSeal = function() { return { milestone: 'v30.2.0', missions: 'M2878-M2887', verified: true }; };
+if (typeof window !== 'undefined') 
 
 if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sgh'] = {"app_name":"Deep Focus","timer_title":"Fokus-sgh Focus","start_focus":"Suraw-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ashtoy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
 
@@ -41269,7 +40265,7 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('oru');
 
-if (typeof window !== 'undefined') window.dfGetMilestoneVersion3020AuditSeal = function() { return { milestone: 'v30.2.0', missions: 'M2878-M2887', verified: true }; };
+if (typeof window !== 'undefined') 
 
 function dfGetMilestoneVersion3210AuditSeal() { return { milestone: "M3070", release: "v32.1.0", versionCode: 2890, date: new Date().toISOString(), polyglotLangs: 817, dspCertified: true, zeroPii: true }; }
 
@@ -41666,7 +40662,7 @@ window.DF_ACTIVE_AUDIO_NODES = [];
 
 window.dfStopAllSounds = function() {
   window.DF_ACTIVE_AUDIO_NODES.forEach(n => {
-    try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch (e) {}
+    try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   });
   window.DF_ACTIVE_AUDIO_NODES = [];
 };
@@ -41855,7 +40851,7 @@ window.dfDebounceAction = function(actionCallback, debounceCooldownMs) {
 
   // Gentle tactile confirmation on supported devices
   if (typeof navigator !== "undefined" && navigator.vibrate) {
-    try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(15) : false); } catch (e) {}
+    try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(15) : false); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
 
   if (typeof actionCallback === "function") {
@@ -41902,7 +40898,7 @@ window.dfPlaySessionCompletionChime = async function() {
 
   // Gentle double vibration on completion
   if (typeof navigator !== "undefined" && navigator.vibrate) {
-    try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([150, 80, 150]) : false); } catch (e) {}
+    try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([150, 80, 150]) : false); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
   console.log("[DEEP FOCUS] Harmonic completion chime sounded gently.");
 };
@@ -42398,7 +41394,7 @@ window.dfRegisterSubscription = function(screenId, cleanupFn) {
 window.dfCleanupScreenSubscriptions = function(screenId) {
   if (!window.DF_SCREEN_SUBSCRIPTIONS[screenId]) return;
   window.DF_SCREEN_SUBSCRIPTIONS[screenId].forEach(fn => {
-    try { fn(); } catch (e) {}
+    try { fn(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   });
   window.DF_SCREEN_SUBSCRIPTIONS[screenId] = [];
   console.log("[MEMORY SENTINEL] Cleaned subscriptions for screen:", screenId);
@@ -43195,16 +42191,16 @@ window.dfVerifyPlayStoreCompliance = function() {
 window.DF_PRODUCTION_MODE = true;
 
 window.dfOptimizeRuntimeExecution = function() {
-  if (window.DF_PRODUCTION_MODE && typeof console !== "undefined") {
-    // Suppress verbose debug spam while keeping critical error reporting intact
-    const originalLog = console.log;
-    console.log = function(...args) {
-      if (args[0] && typeof args[0] === "string" && args[0].startsWith("[DEEP FOCUS]")) {
-        originalLog.apply(console, args);
-      }
+  if (typeof window !== "undefined" && !window.__DF_ERROR_RING__) {
+    window.__DF_ERROR_RING__ = [];
+    window.__dfRecordError = function(ctx, err) {
+      try {
+        const ring = window.__DF_ERROR_RING__;
+        ring.push({ t: Date.now(), ctx: String(ctx || "app").slice(0, 32), msg: String((err && err.message) || err || "err").slice(0, 80) });
+        if (ring.length > 25) ring.shift();
+      } catch (innerErr) { /* ring guard */ }
     };
   }
-  console.log("[DEEP FOCUS] Production runtime optimization active.");
 };
 
 if (typeof window !== "undefined") {
@@ -43559,7 +42555,7 @@ window.dfPersistLiveSessionState = function(stateObj) {
   try {
     const payload = Object.assign({}, stateObj, { savedAt: Date.now() });
     localStorage.setItem("df_live_session_snapshot", JSON.stringify(payload));
-  } catch (e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 };
 
 window.dfRestoreProcessDeathState = function() {
@@ -43575,7 +42571,7 @@ window.dfRestoreProcessDeathState = function() {
       console.log("[LIFECYCLE] Recovered session after Android OS process death.");
       return snapshot;
     }
-  } catch (e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   return null;
 };
 
@@ -43587,7 +42583,7 @@ window.DF_WORKER_REF = null;
 
 window.dfCreateInlineWorkerTimer = function(onTickCallback) {
   if (window.DF_WORKER_REF) {
-    try { window.DF_WORKER_REF.terminate(); } catch (e) {}
+    try { window.DF_WORKER_REF.terminate(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     window.DF_WORKER_REF = null;
   }
   if (typeof Worker === "undefined" || typeof Blob === "undefined") return null;
@@ -43889,7 +42885,7 @@ window.dfExecutePanicWipe = function() {
     localStorage.clear();
   }
   if (typeof indexedDB !== "undefined" && window.DF_DB_NAME) {
-    try { indexedDB.deleteDatabase(window.DF_DB_NAME); } catch (e) {}
+    try { indexedDB.deleteDatabase(window.DF_DB_NAME); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
   if (window.DF_MEMORY_DATA_STORES) {
     window.DF_MEMORY_DATA_STORES = { sessions: {}, cards: {}, decks: {}, settings: {} };
@@ -43965,11 +42961,11 @@ window.dfBatchDOMUpdate = function(readFn, writeFn) {
     requestAnimationFrame(() => {
       // 1. Execute all reads first (Zero Forced Reflow)
       while (window.DF_DOM_READ_QUEUE.length > 0) {
-        try { window.DF_DOM_READ_QUEUE.shift()(); } catch (e) {}
+        try { window.DF_DOM_READ_QUEUE.shift()(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
       }
       // 2. Execute all writes together
       while (window.DF_DOM_WRITE_QUEUE.length > 0) {
-        try { window.DF_DOM_WRITE_QUEUE.shift()(); } catch (e) {}
+        try { window.DF_DOM_WRITE_QUEUE.shift()(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
       }
       window.DF_RAF_SCHEDULED = false;
     });
@@ -44597,10 +43593,10 @@ window.dfDeepCleanAudioGraph = function() {
     window.DF_ACTIVE_AUDIO_NODES.forEach(node => {
       try {
         if (typeof node.stop === "function") node.stop();
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
       try {
         if (typeof node.disconnect === "function") node.disconnect();
-      } catch (e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     });
     window.DF_ACTIVE_AUDIO_NODES.length = 0;
   }
@@ -44695,7 +43691,7 @@ window.dfDisposeCanvasTexture = function(canvasElement) {
       canvasElement.parentNode.removeChild(canvasElement);
     }
     console.log("[GPU COMPOSITOR] Canvas texture buffer released from VRAM.");
-  } catch (e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 };
 
 /* ==========================================================
@@ -44714,7 +43710,7 @@ window.dfRegisterForGCDetection = function(targetObject, label) {
   if (window.DF_GC_REGISTRY && targetObject && typeof targetObject === "object") {
     try {
       window.DF_GC_REGISTRY.register(targetObject, label || "unnamed_object");
-    } catch (e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
 };
 
@@ -44743,7 +43739,7 @@ window.dfPlayTransientAnimation = function(element, keyframes, options) {
     try {
       anim.commitStyles();
       anim.cancel(); // Sever animation instance from element compositor node
-    } catch (e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   };
   return anim;
 };
@@ -44860,7 +43856,7 @@ window.dfWriteTimerHeartbeat = function(elapsedSec, targetSec) {
       pulseTime: Date.now()
     };
     localStorage.setItem("df_timer_heartbeat_pulse", JSON.stringify(heartbeat));
-  } catch (e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 };
 
 window.dfRecoverPowerCutMinutes = function() {
@@ -44878,7 +43874,7 @@ window.dfRecoverPowerCutMinutes = function() {
       console.log("[RESUSCITATION] Rescued " + rescuedMinutes + " minutes from sudden power loss.");
       return rescuedMinutes;
     }
-  } catch (e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   return 0;
 };
 
@@ -45006,7 +44002,7 @@ if (typeof BroadcastChannel !== "undefined") {
         console.log("[MULTI-WINDOW] Coordinated DB sync from instance:", e.data.instanceId);
       }
     };
-  } catch (e) {}
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 }
 
 window.dfBroadcastDataSync = function(storeName) {
@@ -45018,7 +44014,7 @@ window.dfBroadcastDataSync = function(storeName) {
         instanceId: window.DF_WINDOW_INSTANCE_ID,
         timestamp: Date.now()
       });
-    } catch (e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
 };
 
@@ -45301,7 +44297,7 @@ window.dfHandleBluetoothCodecSwitch = async function() {
     try {
       await ctx.resume();
       console.log("[BLUETOOTH AUDIO] Context resumed after wireless handshake.");
-    } catch (e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
 };
 
@@ -45467,10 +44463,7 @@ window.dfGetSector4AudioSeal = function() {
    ========================================================== */
 window.dfSanitizePreservingJoiners = function(rawString) {
   if (!rawString || typeof rawString !== "string") return "";
-  // Preserves ‌ (ZWNJ) and ‍ (ZWJ) specifically during cleanup
-  return rawString
-  return (typeof svgStr === 'string' ? svgStr.trim() : '');
-// [FIXED] ");
+  return rawString.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
 };
 
 window.dfVerifyJoinerIntegrity = function(text) {
@@ -46353,7 +45346,7 @@ window.dfTriggerLRAHaptic = function(patternType) {
     const pattern = window.DF_HAPTIC_PATTERNS[patternType] || [12];
     try {
       ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(pattern) : false);
-    } catch (e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
 };
 
@@ -47037,7 +46030,7 @@ window.dfGetGrandCoronationMilestoneVersion100AuditSeal = function() {
 // --- SECTOR 1 (M4468-M4567): Deep Memory Management & Web Audio Node Destructor (v52.0.0) ---
 window.dfDestructAudioGraphMemory = function(graph) {
   if (graph && Array.isArray(graph.nodes)) {
-    graph.nodes.forEach(n => { try { if (n.disconnect) n.disconnect(); if (n.stop) n.stop(); } catch(e){} });
+    graph.nodes.forEach(n => { try { if (n.disconnect) n.disconnect(); if (n.stop) n.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); } });
   }
   return { destroyed: true, status: 'MEMORY_RECLAIMED', sector: 1, milestone: 'v52.0.0' };
 };
@@ -50534,9 +49527,7 @@ window.dfSwitchLanguage = function(newLocale) {
   return { activeLocale: loc, status: 'LANGUAGE_SWITCHED' };
 };
 
-window.dfGetMilestoneM6127MutationObserverLanguageSyncSeal = function() {
-  return { milestone: 'M6118-M6127 MutationObserver Language Sync Engine', status: 'VERIFIED' };
-};
+
 
 
 // --- MISSIONS M6128-M6137: Language Perfection Final Seal ---
@@ -51378,7 +50369,7 @@ window.dfMemoryGuard = {
     if (typeof URL !== 'undefined' &&
         URL.revokeObjectURL && url) {
       try { URL.revokeObjectURL(url); }
-      catch(e) {}
+      catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
   },
   releaseHiddenDOM: function(sel) {
@@ -51460,7 +50451,7 @@ window.dfHealthProbe = {
       report.storageOk =
         localStorage.getItem('__p__') === '1';
       localStorage.removeItem('__p__');
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     if (typeof AudioContext !== 'undefined' ||
         typeof webkitAudioContext !== 'undefined') {
       report.audioOk = true;
@@ -51867,7 +50858,7 @@ window.dfStudioAudio = {
       try {
         if (n.stop) n.stop();
         if (n.disconnect) n.disconnect();
-      } catch(e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     });
     this.nodes = [];
   }
@@ -52336,7 +51327,7 @@ window.dfQuickScratchpad = {
         this.inboxThoughts
       );
       localStorage.setItem(k, d);
-    } catch(e) {}
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     return item;
   },
   getPendingCount: function() {
@@ -52601,7 +51592,7 @@ window.dfWindBreeze = {
       try {
         if (n.stop) n.stop();
         if (n.disconnect) n.disconnect();
-      } catch(e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     });
     this.activeWindNodes = [];
   }
@@ -52937,7 +51928,7 @@ window.dfWaterStreamDsp = {
       try {
         if (n.stop) n.stop();
         if (n.disconnect) n.disconnect();
-      } catch(e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     });
     this.activeStreamNodes = [];
   }
@@ -53484,7 +52475,7 @@ window.dfCampfireDsp = {
       try {
         if (n.stop) n.stop();
         if (n.disconnect) n.disconnect();
-      } catch(e) {}
+      } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     });
     this.activeFireNodes = [];
   }
@@ -58065,7 +57056,7 @@ function() {
     store[existing.id] = existing;
     saveTriZoneNotesStore(store);
     if (typeof localStorage !== 'undefined') {
-      try { localStorage.setItem(TRIZONE_ACTIVE_KEY, existing.id); } catch (_) {}
+      try { localStorage.setItem(TRIZONE_ACTIVE_KEY, existing.id); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     if (containerId && typeof document !== 'undefined' && document.getElementById(containerId)) {
       window.dfRenderMasterPillar1StudioDom(containerId);
@@ -58197,11 +57188,11 @@ function() {
       try {
         localStorage.setItem(TRIZONE_ACTIVE_KEY, id);
         localStorage.setItem('df_trizone_draft_' + id, JSON.stringify(current));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     window.dfSyncNoteWikiConceptsToFlashcards(current);
     if (typeof window.dfUpdateSearchIndexIncrementally === 'function') {
-      try { window.dfUpdateSearchIndexIncrementally(id, current); } catch (_) {}
+      try { window.dfUpdateSearchIndexIncrementally(id, current); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return { savedId: id, ts: ts, persisted: true };
   };
@@ -58978,7 +57969,7 @@ function() {
           draggingGroup = boundGroup;
           boundGroup.style.cursor = 'grabbing';
           if (boundGroup.setPointerCapture && ev.pointerId !== undefined) {
-            try { boundGroup.setPointerCapture(ev.pointerId); } catch (_) {}
+            try { boundGroup.setPointerCapture(ev.pointerId); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
           }
         });
       })(node, g);
@@ -59635,7 +58626,7 @@ function() {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(RSVP_BOOKMARK_KEY, JSON.stringify({ bookmarkedIndex: i, ts: Date.now() }));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return { bookmarkedIndex: i, saved: true };
   };
@@ -59761,7 +58752,7 @@ function() {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(REGRESSION_KEY, JSON.stringify({ regressions: r, low: r < 3, updatedAt: Date.now() }));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return { regressions: r, low: r < 3 };
   };
@@ -59850,7 +58841,7 @@ function() {
           accuracyPct: pct,
           updatedAt: Date.now()
         }));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return { accuracyPct: pct, correct: c, total: t };
   };
@@ -60011,7 +59002,7 @@ function() {
         const list = safeParseJson(localStorage.getItem(HIGHLIGHTS_KEY), []);
         list.push({ tag: c, text: safeCleanStr(passage, 400), ts: Date.now() });
         localStorage.setItem(HIGHLIGHTS_KEY, JSON.stringify(list.slice(-50)));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return { highlightTag: c, saved: true };
   };
@@ -60032,7 +59023,7 @@ function() {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(LIBRARY_CATALOG_KEY, JSON.stringify({ catalogItems: n, updatedAt: Date.now() }));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return { catalogItems: n, saved: true };
   };
@@ -60053,7 +59044,7 @@ function() {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(READING_GOAL_SYNERGY_KEY, JSON.stringify({ pages: p, durationSec: s, ts: Date.now() }));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return { pages: p, durationSec: s, ok: true };
   };
@@ -60779,7 +59770,7 @@ function() {
                 if (Array.isArray(sub)) nList = sub;
               }
             }
-          } catch (_) {}
+          } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         }
         if (nList && nList.length) {
           const firstNote = nList[0];
@@ -60830,7 +59821,7 @@ function() {
             window.dfRenderMasterPillar1StudioDom('dfPillar1StudioMount');
           }
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       try {
         if (typeof window.dfRenderMasterPillar2StudioDom === 'function') {
           const m2 = document.getElementById('dfPillar2SpeedReaderMount');
@@ -60838,7 +59829,7 @@ function() {
             window.dfRenderMasterPillar2StudioDom('dfPillar2SpeedReaderMount');
           }
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       try {
         if (typeof window.dfRenderMasterPillar3StudioDom === 'function') {
           const m3 = document.getElementById('dfPillar3StemMount');
@@ -60846,7 +59837,7 @@ function() {
             window.dfRenderMasterPillar3StudioDom('dfPillar3StemMount');
           }
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       try {
         if (typeof window.dfRenderMasterPillar4StudioDom === 'function') {
           const m4 = document.getElementById('dfPillar4WhiteboardMount');
@@ -60854,7 +59845,7 @@ function() {
             window.dfRenderMasterPillar4StudioDom('dfPillar4WhiteboardMount');
           }
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', dfBootMasterPillars);
@@ -61681,7 +60672,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(STEM_EXAM_STATE_KEY, JSON.stringify(exam));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return exam;
   };
@@ -61713,7 +60704,7 @@ function() {
       }
       try {
         localStorage.setItem(STEM_EXAM_STATE_KEY, JSON.stringify(exam));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
 
     return {
@@ -61751,7 +60742,7 @@ function() {
       exam.submittedAt = Date.now();
       try {
         localStorage.setItem(STEM_EXAM_STATE_KEY, JSON.stringify(exam));
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
 
     return {
@@ -61815,7 +60806,7 @@ function() {
         hist.push({ rescheduledMissed: m, timestamp: Date.now() });
         localStorage.setItem(STEM_EXAM_HISTORY_KEY, JSON.stringify(hist));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       rescheduledToFsrs: m,
@@ -62352,7 +61343,7 @@ function() {
           localStorage.setItem(STEM_CALC_TAPE_KEY, JSON.stringify(history));
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       historyEntry: e,
@@ -62369,7 +61360,7 @@ function() {
         navigator.clipboard.writeText(r);
         inserted = true;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       copiedText: r,
@@ -62382,7 +61373,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.removeItem(STEM_CALC_TAPE_KEY);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       cleared: true,
@@ -62478,7 +61469,7 @@ function() {
       activeTab = tabId;
       try {
         if (typeof localStorage !== 'undefined') localStorage.setItem(STEM_STUDIO_TAB_KEY, tabId);
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       for (let i = 0; i < tabButtons.length; i++) {
         const btn = tabButtons[i];
@@ -62920,7 +61911,7 @@ function() {
         qAnsInp.oninput = function() {
           if (!exam.answers) exam.answers = {};
           exam.answers[curQ.id] = qAnsInp.value;
-          try { localStorage.setItem(STEM_EXAM_STATE_KEY, JSON.stringify(exam)); } catch (_) {}
+          try { localStorage.setItem(STEM_EXAM_STATE_KEY, JSON.stringify(exam)); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         };
         qAnsRow.appendChild(qAnsInp);
 
@@ -62946,7 +61937,7 @@ function() {
           pBtn.onclick = (function(nextIdx) {
             return function() {
               exam.currentIdx = nextIdx;
-              try { localStorage.setItem(STEM_EXAM_STATE_KEY, JSON.stringify(exam)); } catch (_) {}
+              try { localStorage.setItem(STEM_EXAM_STATE_KEY, JSON.stringify(exam)); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
               renderExamTab(parent);
             };
           })(k);
@@ -63052,7 +62043,7 @@ function() {
         retryBtn.style.cssText = 'padding:8px 14px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer;align-self:flex-start;';
         retryBtn.textContent = 'New Timed Exam';
         retryBtn.onclick = function() {
-          try { localStorage.removeItem(STEM_EXAM_STATE_KEY); } catch (_) {}
+          try { localStorage.removeItem(STEM_EXAM_STATE_KEY); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
           renderExamTab(container);
         };
         rep.appendChild(retryBtn);
@@ -63446,7 +62437,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(WHITEBOARD_CONFIG_KEY, JSON.stringify(cfg));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return cfg;
   };
 
@@ -63612,7 +62603,7 @@ function() {
         localStorage.setItem(WHITEBOARD_STROKES_KEY, JSON.stringify(strokes));
         localStorage.setItem('df_whiteboard_redo_v1', JSON.stringify(redo));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       stackAction: act,
@@ -63634,7 +62625,7 @@ function() {
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem(WHITEBOARD_STROKES_KEY, raw);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     } else if (typeof strokesOrBytes === 'number') {
       bytes = strokesOrBytes;
     }
@@ -63663,7 +62654,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(OCCLUSION_ACTIVE_DIAG_KEY, diag.id);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return {
       loadedSource: diag.id,
       ready: true,
@@ -63850,7 +62841,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(OCCLUSION_CARDS_KEY, JSON.stringify(cardStore));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       boundCardId: id,
@@ -63902,7 +62893,7 @@ function() {
         cfg.autoClear = en;
         localStorage.setItem(SCRATCHPAD_CONFIG_KEY, JSON.stringify(cfg));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return { scratchpadCleared: true, autoClearEnabled: en };
   };
 
@@ -64367,7 +63358,7 @@ function() {
       } else if (typeof navigator !== 'undefined' && navigator.vibrate) {
         ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(ok ? 20 : 50) : false);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return {
       hapticPulseMs: ok ? 20 : 50,
       ok: true
@@ -64417,7 +63408,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(SPATIAL_QUIZ_KEY, raw);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return {
       serializedQuizId: id,
       saved: true,
@@ -64570,7 +63561,7 @@ function() {
 
     scratchSvg.addEventListener('pointerdown', function(e) {
       drawing = true;
-      try { scratchSvg.setPointerCapture(e.pointerId); } catch (_) {}
+      try { scratchSvg.setPointerCapture(e.pointerId); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       const pt = getSvgCoords(e);
       currentPts = [pt];
       activePathEl = document.createElementNS(SVG_NS, 'path');
@@ -64609,7 +63600,7 @@ function() {
           if (typeof localStorage !== 'undefined') {
             localStorage.setItem(SCRATCHPAD_STROKES_KEY, JSON.stringify(savedScratchStrokes));
           }
-        } catch (_) {}
+        } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       }
       currentPts = [];
       activePathEl = null;
@@ -64625,7 +63616,7 @@ function() {
         if (typeof localStorage !== 'undefined') {
           localStorage.removeItem(SCRATCHPAD_STROKES_KEY);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     };
 
     // Actions Row
@@ -64714,7 +63705,7 @@ function() {
       activeTab = tabId;
       try {
         if (typeof localStorage !== 'undefined') localStorage.setItem(PILLAR4_STUDIO_TAB_KEY, tabId);
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       for (let i = 0; i < tabButtons.length; i++) {
         const btn = tabButtons[i];
@@ -64973,7 +63964,7 @@ function() {
           return;
         }
         isDrawing = true;
-        try { mainSvg.setPointerCapture(e.pointerId); } catch (_) {}
+        try { mainSvg.setPointerCapture(e.pointerId); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         const pt = getCoords(e);
         pts = [pt];
         activePath = document.createElementNS(SVG_NS, 'path');
@@ -65276,7 +64267,7 @@ function() {
       diagSel.onchange = function() {
         activeDiagKey = diagSel.value;
         currentDiag = BUILTIN_DIAGRAMS[activeDiagKey] || BUILTIN_DIAGRAMS.heart_anatomy;
-        try { localStorage.setItem(OCCLUSION_ACTIVE_DIAG_KEY, activeDiagKey); } catch (_) {}
+        try { localStorage.setItem(OCCLUSION_ACTIVE_DIAG_KEY, activeDiagKey); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         activeMaskIdx = 0;
         revealedMasks = {};
         renderDiagramStage();
@@ -65616,7 +64607,7 @@ function() {
     if (typeof window.dfGetGlobalAudioContext === 'function') {
       try {
         spatialAudioCtx = window.dfGetGlobalAudioContext();
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     if (!spatialAudioCtx || spatialAudioCtx.state === 'closed') {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -65639,7 +64630,7 @@ function() {
       try {
         node.connect(entry.panner);
         return entry;
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     return null;
   };
@@ -66070,7 +65061,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('df_spatial_preset_' + name, JSON.stringify(preset));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return {
       presetSaved: name,
       ok: true,
@@ -66348,7 +65339,7 @@ function() {
             gainR.disconnect();
             merger.disconnect();
             masterBeatGain.disconnect();
-          } catch (_) {}
+          } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         }, 60);
       }
     };
@@ -66440,7 +65431,7 @@ function() {
             lfoScaleGain.disconnect();
             modGain.disconnect();
             masterGain.disconnect();
-          } catch (_) {}
+          } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         }, 60);
       }
     };
@@ -68087,7 +67078,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(SYLLABUS_STORAGE_KEY, JSON.stringify(state));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function loadLoadBalancerCfg() {
@@ -68113,7 +67104,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(SYLLABUS_CFG_KEY, JSON.stringify(cfg));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   // --- Core Engine: Syllabus Parser, Load-Balancer & Sentinel ---
@@ -68355,7 +67346,7 @@ function() {
             }
           }
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
       const currentVelocity = dailyFocusMinutes > 0 ? Number((todayActualMinutes / dailyFocusMinutes).toFixed(2)) : 1.0;
       let velocityTier = 'on_track';
@@ -68715,7 +67706,7 @@ function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('zen_locked_task_id', id);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return {
       lockedTaskId: id,
       locked: true,
@@ -70078,7 +69069,7 @@ function() {
   function saveFeynmanState(state) {
     try {
       getSafeStorage().setItem(FEYNMAN_STORAGE_KEY, JSON.stringify(state));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function getInitialFeynmanState() {
@@ -70511,7 +69502,7 @@ function() {
         if (typeof saveNotesToStorage === 'function') saveNotesToStorage();
         if (typeof renderNotesStack === 'function') renderNotesStack();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     // Persist in Feynman Engine
     const state = loadFeynmanState();
@@ -71404,7 +70395,7 @@ function() {
       saveNoteBtn.onclick = function() {
         const txt = explanationTextarea.value.trim();
         if (!txt) {
-          alert('Please enter your plain explanation before saving.');
+          dfSafeNotify('Please enter your plain explanation before saving.');
           return;
         }
         const res = window.dfConvertRefinedExplanationToNote(conceptInput.value, txt, conceptInput.value);
@@ -71581,7 +70572,7 @@ function() {
               isRunning = false;
               startTimerBtn.textContent = '✓ Sprint Finished';
               startTimerBtn.style.background = '#059669';
-              alert('Recall Sprint Complete! Compare your recall against the reference below.');
+              dfSafeNotify('Recall Sprint Complete! Compare your recall against the reference below.');
             }
           }, 1000);
         }
@@ -72052,7 +71043,7 @@ const StudyPodEngine = (function() {
       });
 
       if (typeof window.dfTriggerTibetanSingingBell === 'function') {
-        try { window.dfTriggerTibetanSingingBell(v); } catch (_) {}
+        try { window.dfTriggerTibetanSingingBell(v); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       }
       return true;
     } catch (_) {
@@ -72071,7 +71062,7 @@ const StudyPodEngine = (function() {
 
   function notifyChange() {
     changeListeners.forEach(function(fn) {
-      try { fn(activePod, localMember); } catch (_) {}
+      try { fn(activePod, localMember); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     });
   }
 
@@ -72084,7 +71075,7 @@ const StudyPodEngine = (function() {
           handleIncomingMessage(ev.data);
         };
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     // Fallback cross-window storage event bridge
     if (typeof window !== 'undefined') {
@@ -72093,7 +71084,7 @@ const StudyPodEngine = (function() {
           try {
             const data = JSON.parse(ev.newValue);
             handleIncomingMessage(data);
-          } catch (_) {}
+          } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         }
       });
     }
@@ -72106,12 +71097,12 @@ const StudyPodEngine = (function() {
     payload.perfNow = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
     if (broadcastChannel) {
-      try { broadcastChannel.postMessage(payload); } catch (_) {}
+      try { broadcastChannel.postMessage(payload); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
     try {
       const storage = getSafeStorage();
       storage.setItem(LAN_STORAGE_WIRE, JSON.stringify(payload));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function handleIncomingMessage(msg) {
@@ -72241,7 +71232,7 @@ const StudyPodEngine = (function() {
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
     if (broadcastChannel) {
-      try { broadcastChannel.close(); } catch (_) {}
+      try { broadcastChannel.close(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       broadcastChannel = null;
     }
 
@@ -72259,7 +71250,7 @@ const StudyPodEngine = (function() {
       if (typeof sessionStorage !== 'undefined') {
         sessionStorage.clear();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     notifyChange();
     return {
@@ -74144,7 +73135,7 @@ const BotanicalGardenEngine = (function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(STORAGE_KEY_GARDEN, JSON.stringify(list.slice(0, 500)));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function getActiveTreeState() {
@@ -74163,7 +73154,7 @@ const BotanicalGardenEngine = (function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(STORAGE_KEY_ACTIVE_TREE, JSON.stringify(tree));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function defaultActiveTree() {
@@ -74556,7 +73547,7 @@ const HabitHeatmapEngine = (function() {
           if (hRaw) rawList = JSON.parse(hRaw) || [];
         }
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     // Map by date 'YYYY-MM-DD'
     const dateMap = {};
@@ -74824,7 +73815,7 @@ const StreakShieldEngine = (function() {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(STORAGE_KEY_SHIELD, JSON.stringify(state));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   function defaultShield() {
@@ -76731,7 +75722,7 @@ const ZeroGcAudioNodePool = (function() {
         if (node.gain && typeof node.gain.setValueAtTime === 'function' && ctx) {
           node.gain.setValueAtTime(v, ctx.currentTime);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       return node;
     }
     if (ctx && typeof ctx.createGain === 'function') {
@@ -76751,7 +75742,7 @@ const ZeroGcAudioNodePool = (function() {
       if (node.gain && typeof node.gain.cancelScheduledValues === 'function') {
         node.gain.value = 0;
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     if (gainPool.length < maxPoolSize) {
       gainPool.push(node);
     }
@@ -76770,7 +75761,7 @@ const ZeroGcAudioNodePool = (function() {
         node.type = fType;
         node.frequency.value = fHz;
         node.Q.value = fQ;
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       return node;
     }
     if (ctx && typeof ctx.createBiquadFilter === 'function') {
@@ -76789,7 +75780,7 @@ const ZeroGcAudioNodePool = (function() {
     activeLeases = Math.max(0, activeLeases - 1);
     try {
       if (typeof node.disconnect === 'function') node.disconnect();
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     if (filterPool.length < maxPoolSize) {
       filterPool.push(node);
     }
@@ -77217,7 +76208,7 @@ const LocalFortressIntegrityScanner = (function() {
   function saveIntegrityLedger(ledger) {
     try {
       getSafeStorage().setItem(STORAGE_KEY_LEDGER, JSON.stringify(ledger));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   // Rolling recovery snapshot slots (1 to 3)
@@ -77276,7 +76267,7 @@ const LocalFortressIntegrityScanner = (function() {
             return { healed: true, method: 'ROLLING_SLOT_' + s };
           }
         }
-      } catch (_) {}
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
 
     // 2. Fall back to clean sovereign default structure
@@ -77294,7 +76285,7 @@ const LocalFortressIntegrityScanner = (function() {
       const list = raw ? JSON.parse(raw) : [];
       list.unshift({ key, reason, at: new Date().toISOString() });
       storage.setItem(STORAGE_KEY_HEAL_LOG, JSON.stringify(list.slice(0, 50)));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   // Comprehensive cryptographic audit across all sovereign keys
@@ -78487,7 +77478,7 @@ if(typeof localStorage!=='undefined'){localStorage.setItem('df_focus_momentum_v1
 function dfInitExamSimulation(sub,durM,qCount){
 const dm=Math.max(5,Number(durM)||60);const qc=Math.max(1,Number(qCount)||20);const now=Date.now();const endsAt=now+(dm*60000);
 const paceSec=Math.round((dm*60)/qc);const eid='exam_'+now;const exam={id:eid,subject:String(sub||'عام'),durationMins:dm,questionCount:qc,startsAt:now,endsAt,pacePerQuestionSec:paceSec,active:true};
-try{if(typeof localStorage!=='undefined'){localStorage.setItem('df_active_exam_v1',JSON.stringify(exam));}}catch(e){}return exam;}
+try{if(typeof localStorage!=='undefined'){localStorage.setItem('df_active_exam_v1',JSON.stringify(exam));}}catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }return exam;}
 function dfComputeFractalBranches(depth){
 const num=Number(depth)||3;const d=Math.max(1,Math.min(5,num));const branches=[];function grow(x,y,len,ang,iter){if(iter>d)return;const rad=ang*Math.PI/180;
 const x2=Math.round(x+len*Math.sin(rad));const y2=Math.round(y-len*Math.cos(rad));const sw=Math.max(1,Math.round((d-iter+1)*1.2));const col=iter===d?'#059669':'#334155';
@@ -78627,7 +77618,7 @@ const h=raw?JSON.parse(raw):[];
 const at=new Date().toISOString();
 h.push({quizId:qid,isCorrect:ok,at});
 localStorage.setItem(k,JSON.stringify(h));
-}}catch(err){}
+}}catch (err) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", err); }
 return{isCorrect:ok,expected:eA};}
 function dfRenderReadingQuizHudDom(cid,qObj){
 if(typeof document==="undefined")
@@ -78693,7 +77684,7 @@ const rawH=localStorage.getItem(k);
 const h=rawH?JSON.parse(rawH):[];
 h.push(res);
 localStorage.setItem(k,JSON.stringify(h));
-}}catch(e){}
+}}catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 return res;}
 function dfRenderFeynmanCardDom(cid,title){
 if(typeof document==="undefined")
@@ -78777,7 +77768,7 @@ updatedAt:new Date().toISOString()};
 try{if(typeof localStorage!=="undefined"){
 const kM="df_custom_interval_matrix_v1";
 localStorage.setItem(kM,JSON.stringify(matrix));
-}}catch(e){}
+}}catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 return matrix;}
 const defM={activePreset:"classic",
 focusMins:25,shortBreakMins:5,
@@ -79640,7 +78631,7 @@ const res={streak:count,isToday:isT,
 totalDays:set.size,
 at:new Date().toISOString()};
 try{localStorage.setItem("df_true_streak_v1",
-JSON.stringify(res));}catch(e){}
+JSON.stringify(res));}catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 return res;}
 function dfGetConsecutiveStreak(){
 try{const k="df_true_streak_v1";
@@ -79682,7 +78673,7 @@ const res={q:q,a:a,sanitized:true,
 at:new Date().toISOString()};
 try{if(typeof localStorage!=="undefined"){
 localStorage.setItem("df_last_safe_card_v1",
-JSON.stringify(res));}}catch(e){}
+JSON.stringify(res));}}catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 return res;}
 function dfRenderSafeDomStatus(cid){
 if(typeof document==="undefined")
@@ -79717,7 +78708,7 @@ rawList=d.sessionHistory||[];}
 if(!rawList.length){
 const r2=localStorage.getItem(
 "df_session_history_v1");
-rawList=r2?JSON.parse(r2):[];}}}catch(e){}
+rawList=r2?JSON.parse(r2):[];}}}catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 let totalM=0;let validCnt=0;let filtered=0;
 const cleanList=[];
 for(let i=0;i<rawList.length;i++){
@@ -79733,7 +78724,7 @@ verifiedAt:new Date().toISOString()};
 try{if(typeof localStorage!=="undefined"){
 const kS="df_verified_analytics_v1";
 localStorage.setItem(kS,
-JSON.stringify(res));}}catch(e){}
+JSON.stringify(res));}}catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 return res;}
 function dfRenderAnalyticsIntegrityDom(cid){
 if(typeof document==="undefined")
@@ -79759,7 +78750,7 @@ try{if(typeof window!=='undefined'&&window.FSRS45)
 return window.FSRS45;
 if(typeof require==='function'){
 const m=require('./modules/flashcards/fsrs.js');
-if(m)return m;}}catch(_){}
+if(m)return m;}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return null;}
 function dfFsrs45Retention(tDays,sVal){
 const k=dfGetFsrs45Kernel();
@@ -79814,7 +78805,7 @@ weightsCount:w.length,
 at:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
 localStorage.setItem('df_last_fsrs45_v1',JSON.stringify(res));
-}}catch(e){}
+}}catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 return res;}
 function dfReviewFlashcardFsrs45(card,grade,elapsedDays){
 const k=dfGetFsrs45Kernel();
@@ -79842,7 +78833,7 @@ if(w&&w.ZenNative&&
 w.ZenNative.elapsedRealtime){
 const t=Number(w.ZenNative.elapsedRealtime());
 if(Number.isFinite(t)&&t>0)
-return t;}}catch(_){}
+return t;}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 if(typeof performance!=='undefined'){
 if(performance.now)return performance.now();}
 return Date.now();}
@@ -79855,7 +78846,7 @@ const res={elapsedMs:deltaMs,elapsedMins:mins,
 recordedAt:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
 localStorage.setItem('df_monotonic_session_v1',
-JSON.stringify(res));}}catch(_){}
+JSON.stringify(res));}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return res;}
 function dfStopIdleWatchdog(timerId){
 if(timerId){try{clearInterval(timerId);
@@ -79915,7 +78906,7 @@ if(!isQ)return false;
 for(let i=0;i<DF_CACHE_KEYS.length;i++){
 if(DF_CACHE_KEYS[i]!==k){
 try{localStorage.removeItem(DF_CACHE_KEYS[i]);
-}catch(_){}}}
+}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }}}
 try{localStorage.setItem(k,raw);return true;
 }catch(_){return false;}}}
 function dfGetStorageHealth(){
@@ -80048,7 +79039,7 @@ const rec={safe:true,
 at:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
 localStorage.setItem('df_last_svg_audit_v1',
-JSON.stringify(rec));}}catch(_){}
+JSON.stringify(rec));}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return true;}
 function dfRenderSvgSanitizerDom(cid){
 if(typeof document==='undefined')
@@ -80070,14 +79061,14 @@ if(n&&typeof n.disconnect==='function'){
 DF_ACTIVE_NODES.push(n);
 if(DF_ACTIVE_NODES.length>50){
 const old=DF_ACTIVE_NODES.shift();
-try{old.disconnect();}catch(_){}}}}
+try{old.disconnect();}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }}}}
 
 
 let DF_HALT_TIMERS=[];
 function dfClearAudioTimers(){
 while(DF_HALT_TIMERS.length>0){
 const t=DF_HALT_TIMERS.pop();
-try{clearTimeout(t);}catch(_){}}}
+try{clearTimeout(t);}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }}}
 function dfSafeDisconnectNode(n){
 if(!n||n.__disconnected)return false;
 try{n.disconnect();n.__disconnected=true;
@@ -80093,25 +79084,25 @@ n.gain.setValueAtTime(n.gain.value,now);
 n.gain.linearRampToValueAtTime(0.0001,
 now+0.08);
 setTimeout(()=>{try{n.disconnect();}
-catch(_){}},100);
+catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }},100);
 }else{n.disconnect();}
-c++;}catch(_){}}
+c++;}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }}
 const res={haltedCount:c,fadeMs:80,
 antiClick:true,at:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
 localStorage.setItem('df_audio_halt_v1',
-JSON.stringify(res));}}catch(_){}
+JSON.stringify(res));}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return res;}
 function dfPurgeAllAudioNodes(){
 let c=0;
 while(DF_ACTIVE_NODES.length>0){
 const n=DF_ACTIVE_NODES.pop();
-try{n.disconnect();c++;}catch(_){}}
+try{n.disconnect();c++;}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }}
 const res={purgedCount:c,nodesActive:0,
 at:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
 localStorage.setItem('df_audio_gc_v1',
-JSON.stringify(res));}}catch(_){}
+JSON.stringify(res));}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return res;}
 function dfRenderAudioGcStatusDom(cid){
 if(typeof document==='undefined')
@@ -80138,7 +79129,7 @@ overdueSec:overSec,
 reconciled:true,at:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
 localStorage.setItem('df_alarm_resilience_v1',
-JSON.stringify(res));}}catch(_){}
+JSON.stringify(res));}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return res;}
 function dfRenderAlarmSentinelDom(cid){
 if(typeof document==='undefined')
@@ -80166,7 +79157,7 @@ const res={focusMinutes:m,breakMinutes:b,
 pacingRatio:ratio,at:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
 localStorage.setItem('df_break_pacing_v1',
-JSON.stringify(res));}}catch(_){}
+JSON.stringify(res));}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return res;}
 function dfRenderBreakPacingDom(cid){
 if(typeof document==='undefined')
@@ -80364,7 +79355,7 @@ if(typeof tasksList!=='undefined'&&Array.isArray(tasksList)){
 for(let j=0;j<tasksList.length;j++){
 const t=tasksList[j];
 if(t&&!t.deleted)combined.push({id:t.id,type:'task',title:t.title||t.text||'',content:t.note||t.cat||''});}}
-}catch(_){}
+}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return combined;}
 
 function dfSearchArabicVaultScored(qStr,items){
@@ -80467,7 +79458,7 @@ Object.keys(activeSynths).forEach(function(id){
 const s=activeSynths[id];
 if(s&&typeof s.setVolume==='function'&&cfg&&cfg.volumes){
 s.setVolume(((cfg.volumes[id]||50)*(v/100))/100);}});}
-}catch(_){}
+}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return{masterVolume:v};}
 
 function dfRenderNatureMixerDom(cid){
@@ -80861,7 +79852,7 @@ function dfInitBatteryThermalSentinel() {
         battery.addEventListener('levelchange', update);
         battery.addEventListener('chargingchange', update);
       }).catch(() => {});
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 }
 
@@ -80900,7 +79891,7 @@ try{if(typeof document!=='undefined'&&
 document.querySelectorAll){
 scriptsLoaded=document.querySelectorAll(
 'script[src],link[rel="stylesheet"]').length;
-}}catch(_){}
+}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 const hasCore=typeof dfFsrs45Review==='function'&&
 typeof dfEnforceOfflineNetworkShield==='function'&&
 typeof dfEnforceZeroTrackingGate==='function'&&
@@ -80922,7 +79913,7 @@ status:valid?'READY_FOR_RELEASE':'INCOMPLETE',
 verifiedAt:new Date().toISOString()};
 try{if(typeof localStorage!=='undefined'){
 localStorage.setItem('df_release_manifest_v1',
-JSON.stringify(res));}}catch(_){}
+JSON.stringify(res));}}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 return res;}
 function dfRenderReleaseManifestDom(cid){
 if(typeof document==='undefined')
@@ -80941,7 +79932,7 @@ Object.assign(window,{
 dfVerifyReleaseManifest,dfGetBatteryThermalStatus,dfSetThermalMode,dfInitBatteryThermalSentinel,dfRunOffloadedTask,dfGetWorkerMetrics,dfInitWorkerBridge,dfCalculateExamPacing,dfGetSyllabusSchedule,
 dfRenderReleaseManifestDom});
 if(typeof window.dfSyncInfiniteLocaleRegistry==='function'){
-try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
+try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 }}
 
 /* =========================================================================
@@ -81540,7 +80531,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('df_system_health_report_v1', JSON.stringify(healthReport));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return healthReport;
   }
@@ -81635,7 +80626,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
   // Auto-run benchmark on initialization so health report is immediately ready
   try {
     dfRunSelfDiagnosticBenchmark();
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
   if (typeof document !== 'undefined') {
     const mountHealthReport = function() {
@@ -81821,7 +80812,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
         });
       });
       domGuard.observe(document.documentElement, { childList: true, subtree: true });
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
   }
 
   // --- 2. 100% ZERO-PII STRICT SANCTUARY ENGINE ---
@@ -81876,7 +80867,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
           piiFound += sub.piiFound;
         }
       });
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     return { clean: piiFound === 0, piiFound: piiFound };
   }
 
@@ -81889,7 +80880,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
         configurable: true
       });
     }
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
   // --- 3. TAMPER-PROOF FORTRESS ENVELOPES & SELF-HEALING ENGINE ---
   const DURABLE_V21_KEYS = [
@@ -82038,7 +81029,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
 
     try {
       getFortressStorage().setItem('df_fortress_master_seal_v1', JSON.stringify(sealRecord));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return {
       sealed: true,
@@ -82144,7 +81135,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
           const parsed = JSON.parse(raw);
           const piiCheck = dfAuditObjectForPii(parsed);
           piiViolationsFound += piiCheck.piiFound;
-        } catch (_) {}
+        } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       }
     });
 
@@ -82230,7 +81221,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
 
     try {
       storage.setItem('df_golden_master_certificate_v430', JSON.stringify(goldenMasterCertificate));
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return goldenMasterCertificate;
   }
@@ -82304,7 +81295,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
   // Auto-seal on initialization
   try {
     dfSealAndSynchronizeFortress();
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
   // =========================================================================
   // GLOBAL EXPORTS FOR GOLDEN MASTER RELEASE SPRINT
@@ -83323,7 +82314,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('df_multi_studio_audit_report_v1', JSON.stringify(auditReport));
       }
-    } catch (_) {}
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
     return auditReport;
   }
@@ -83454,7 +82445,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch(_){}
   // Run automatically on initialization
   try {
     dfRunMultiStudioDogfoodSuite();
-  } catch (_) {}
+  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
   // =========================================================================
   // 4. GLOBAL EXPORTS
@@ -84534,7 +83525,7 @@ window.SovereignSRSReviewer = (function() {
     // Student Card Creator (Zero Medical/Legal liability - 100% Student Authored)
     function createCustomCard(frontText, backText) {
         if (!frontText || !backText || !frontText.trim() || !backText.trim()) {
-            alert("يرجى كتابة السؤال والإجابة | Please enter both front and back text.");
+            dfSafeNotify("يرجى كتابة السؤال والإجابة | Please enter both front and back text.");
             return false;
         }
         const created = window.SovereignSRS.addCard(frontText, backText);
@@ -84696,9 +83687,9 @@ window.SovereignBrainwaveDSP = (function() {
                         nodes.right.stop();
                         nodes.left.disconnect();
                         nodes.right.disconnect();
-                    } catch(e) {}
+                    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
                 }, 100);
-            } catch(e) {}
+            } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
             activeBinauralNodes = null;
         }
         isPlaying = false;
@@ -84842,7 +83833,7 @@ window.SovereignExamSimulator = (function() {
         isRunning = false;
         playHarmonicCue(528, 1.5);
         if (window.releaseScreenLock) window.releaseScreenLock();
-        alert("🏁 انتهى وقت محاكاة الامتحان! | Exam Simulation Completed!");
+        dfSafeNotify("🏁 انتهى وقت محاكاة الامتحان! | Exam Simulation Completed!");
         updateDisplay();
     }
 
@@ -85157,7 +84148,7 @@ window.SovereignBreathing = (function() {
     // Trigger subtle haptic pulse if available
     function triggerHaptic() {
         if (typeof navigator !== "undefined" && navigator.vibrate) {
-            try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(35) : false); } catch(e) {}
+            try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(35) : false); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
         }
     }
 
@@ -85440,7 +84431,7 @@ window.SovereignHeapSanitizer = (function() {
         cleanUpCount++;
         // Detach orphaned event handles and trigger GC assistance
         if (window.gc && typeof window.gc === "function") {
-            try { window.gc(); } catch(e) {}
+            try { window.gc(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
         }
         // Purge detached canvas caches
         const canvases = document.querySelectorAll("canvas");
@@ -85709,8 +84700,8 @@ window.SovereignBinauralAlpha = (function() {
                 gainNode.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
             }
             setTimeout(() => {
-                if (oscLeft) { try { oscLeft.stop(); oscLeft.disconnect(); } catch(e){} }
-                if (oscRight) { try { oscRight.stop(); oscRight.disconnect(); } catch(e){} }
+                if (oscLeft) { try { oscLeft.stop(); oscLeft.disconnect(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); } }
+                if (oscRight) { try { oscRight.stop(); oscRight.disconnect(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); } }
                 isPlaying = false;
             }, 550);
 
@@ -86050,7 +85041,7 @@ window.SovereignAudioVisualizer = (function() {
         const dest = originalGetSafeAudioDestination ? originalGetSafeAudioDestination(ctx) : ctx.destination;
         const an = getAnalyser(ctx);
         if (an) {
-            try { an.disconnect(); } catch(e){}
+            try { an.disconnect(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
             an.connect(dest);
             return an;
         }
@@ -86223,7 +85214,7 @@ window.SovereignMaintenanceHub = (function() {
         if (window.SovereignHeapSanitizer) {
             window.SovereignHeapSanitizer.sanitize();
         }
-        alert("✨ تم تنفيذ الصيانة الوقائية وتطهير الذاكرة العشوائية بنجاح!");
+        dfSafeNotify("✨ تم تنفيذ الصيانة الوقائية وتطهير الذاكرة العشوائية بنجاح!");
     }
 
     return {
@@ -86436,7 +85427,7 @@ window.SovereignLocaleResolver = (function() {
                 manifestCache = await resp.json();
                 return manifestCache;
             }
-        } catch (e) {}
+        } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
         return null;
     }
 
@@ -86579,7 +85570,7 @@ window.SovereignDeltaClock = (function() {
         lastTimestamp = now;
 
         subscribers.forEach(fn => {
-            try { fn(dtMs, now); } catch (e) {}
+            try { fn(dtMs, now); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
         });
 
         if (subscribers.length > 0) {
@@ -86748,7 +85739,7 @@ window.SovereignBackStack = (function() {
 (function() {
     window.addEventListener("popstate", function() {
         if (window.SovereignBackStack && window.SovereignBackStack.dismissTopOverlay()) {
-            try { history.pushState({ sovereignOverlayGuard: true }, ""); } catch(e) {}
+            try { history.pushState({ sovereignOverlayGuard: true }, ""); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
         }
     });
 })();
@@ -86813,7 +85804,7 @@ window.SovereignEyeComfort = (function() {
                 };
                 window.SovereignEyeComfort._persisted = true;
             }
-        } catch(e) {}
+        } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     }
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", syncTwilight);
