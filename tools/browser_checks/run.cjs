@@ -32,7 +32,7 @@ async function layout(b, base) {
           const st = getComputedStyle(el); if (st.position === 'fixed' || st.visibility === 'hidden' || st.display === 'none') return;
           if (r.right > vw + 1 || r.left < -1) {
             let a = el, clipped = false; while (a && a !== cur) { const o = getComputedStyle(a).overflowX; if (o === 'auto' || o === 'scroll' || o === 'hidden') { clipped = true; break; } a = a.parentElement; }
-            if (!clipped) out.push((el.id ? '#' + el.id : el.tagName.toLowerCase()) + ' ' + Math.round(r.left) + '..' + Math.round(r.right));
+            if (!clipped) out.push((el.id ? '#' + el.id : el.tagName.toLowerCase() + (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.') : '') + ' < ' + (el.parentElement && (el.parentElement.id ? '#' + el.parentElement.id : el.parentElement.tagName.toLowerCase() + '.' + String(el.parentElement.className).trim().split(/\s+/)[0]))) + ' ' + Math.round(r.left) + '..' + Math.round(r.right));
           }
         });
         return out.slice(0, 3);
