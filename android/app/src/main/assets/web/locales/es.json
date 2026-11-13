@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "Bosque y viento 🌲",
   "ui_sound_tab_earth_thunder": "Cielo y truenos ⚡",
   "ui_copy_json": "Copiar JSON",
-  "ui_backup_copied": "Copia de seguridad copiada"
+  "ui_backup_copied": "Copia de seguridad copiada",
+  "ui_syllabus_tab": "Temario"
 }

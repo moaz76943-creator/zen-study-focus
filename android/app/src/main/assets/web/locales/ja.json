@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "森と風 🌲",
   "ui_sound_tab_earth_thunder": "空と雷 ⚡",
   "ui_copy_json": "JSONをコピー",
-  "ui_backup_copied": "クリップボードにコピーしました"
+  "ui_backup_copied": "クリップボードにコピーしました",
+  "ui_syllabus_tab": "シラバス"
 }

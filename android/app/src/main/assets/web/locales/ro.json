@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "Pădure și vânt 🌲",
   "ui_sound_tab_earth_thunder": "Cer și tunet ⚡",
   "ui_copy_json": "Copiază JSON",
-  "ui_backup_copied": "Datele au fost copiate"
+  "ui_backup_copied": "Datele au fost copiate",
+  "ui_syllabus_tab": "Programă"
 }

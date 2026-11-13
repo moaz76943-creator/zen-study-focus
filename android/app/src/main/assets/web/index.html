@@ -1615,19 +1615,7 @@ body {
     color: #F9FAFB !important;
   }
 </style>
-<!-- TASK #821: Notes + FAB Clearance & Bottom-Nav Safe Padding -->
-<style id="task-821-fab-clearance">
-  main, .tab-content, .tab-panel, [id*="notes"], [id*="Notes"], [id*="section"] {
-    padding-bottom: 132px !important;
-  }
-  /* Prevent floating + FAB from overlapping Notes quick-template pills (9602.jpg) */
-  #quickAddFab, .fab-btn, .floating-fab, button[aria-label*="Quick Add"], button[aria-label*="إضافة سريعة"] {
-    bottom: 96px !important;
-    right: 16px !important;
-    left: auto !important;
-    z-index: 45 !important;
-  }
-</style>
+
 <!-- TASK #825: Xiaomi 17T Pro 120Hz Scroll & Form Input Contrast -->
 <style id="task-825-amoled-inputs">
   html, body, main, .tab-panel, .modal-content {
@@ -1697,6 +1685,25 @@ body {
       min-width: 180px !important;
       flex: 1 1 100% !important;
     }
+  }
+</style>
+<!-- TASK #833: Fix Bottom-Nav 📄 Button Alignment & 🔒 Local Data Span Contrast -->
+<style id="task-833-ui-hotfix">
+  nav button, .bottom-nav button, #bottomNav button, .nav-btn {
+    padding-bottom: 8px !important;
+    padding-top: 8px !important;
+    height: auto !important;
+    min-height: 44px !important;
+    align-self: center !important;
+  }
+  main, .tab-content, .tab-panel {
+    padding-bottom: 120px !important;
+  }
+  [data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *,
+  #localDataBadge, #localDataBadge *,
+  button:has([data-i18n="ui_local_data"]) {
+    color: #0F172A !important;
+    opacity: 1 !important;
   }
 </style>
 </head>
