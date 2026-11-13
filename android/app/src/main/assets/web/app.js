@@ -1,3 +1,33 @@
+/* === Deep Focus M23/M24/M31/M36 Language Policy & Visibility Reconciliation === */
+(function() {
+  if (typeof window === "undefined" || window.__DF_LANG_AND_VISIBILITY_GUARD_READY__) return;
+  window.__DF_LANG_AND_VISIBILITY_GUARD_READY__ = true;
+
+  const FORBIDDEN_LANGS = new Set(["he", "iw", "syc", "ber", "zgh"]);
+  window.dfAssertAllowedLanguage = function(code) {
+    const norm = String(code || "en").trim().toLowerCase().split(/[-_]/)[0];
+    if (!norm || FORBIDDEN_LANGS.has(norm)) return "en";
+    return norm;
+  };
+
+  window.dfIsPageVisible = function() {
+    return typeof document === "undefined" ? true : !document.hidden;
+  };
+
+  if (typeof document !== "undefined") {
+    document.addEventListener("visibilitychange", function() {
+      if (!document.hidden) {
+        if (typeof window.dfEnforceStrictAsciiDigitsInAllViews === "function") {
+          try { window.dfEnforceStrictAsciiDigitsInAllViews(); } catch (e) {}
+        }
+        if (typeof window.dfTriggerUISync === "function") {
+          try { window.dfTriggerUISync(); } catch (e) {}
+        }
+      }
+    });
+  }
+})();
+
 /* === Deep Focus M09/M14/M19 Security Sanitizer, Schema Self-Repair & Engine Bridge === */
 (function() {
   if (typeof window === "undefined" || window.__DF_SECURITY_AND_SCHEMA_READY__) return;
