@@ -172,7 +172,11 @@
       if (typeof document === "undefined") return;
       var saved = null;
       try { saved = localStorage.getItem(STORAGE_KEY_LANG); } catch (e) {}
-      var initial = (saved && this.isLanguageAllowed(saved)) ? saved : "ar";
+      // The app's own language (cfg.lang -> window.DF_CURRENT_LOCALE) is the single source of
+      // truth; this engine used to default to Arabic and overwrite an English/French UI.
+      var appLang = (typeof window !== "undefined" && window.DF_CURRENT_LOCALE) || null;
+      var initial = (appLang && this.isLanguageAllowed(appLang)) ? appLang
+        : ((saved && this.isLanguageAllowed(saved)) ? saved : "ar");
       this.applyLanguage(initial);
     },
 
@@ -397,6 +401,8 @@
       for (var j = 0; j < tagged.length; j++) {
         var node = tagged[j];
         var key = node.getAttribute("data-i18n");
+        // A container with child elements (icon/title/duration) must not be flattened to text.
+        if (node.children && node.children.length > 0 && node.tagName !== "INPUT" && node.tagName !== "TEXTAREA") continue;
         if (key && dict[key]) {
           var val = toWesternDigits(dict[key]);
           if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
