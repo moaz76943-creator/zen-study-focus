@@ -93,7 +93,7 @@
       
       const now = new Date();
       now.setDate(now.getDate() + this.syllabus.defaultExamOffsetDays);
-      this.examDateString = now.toISOString().split('T')[0]; // Format YYYY-MM-DD (Western standard)
+      this.examDateString = (function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})(now); // Format YYYY-MM-DD (Western standard)
 
       this.loadSavedState();
     }
@@ -107,7 +107,7 @@
         this.syllabus = JSON.parse(JSON.stringify(CANONICAL_SYLLABI[key]));
         const now = new Date();
         now.setDate(now.getDate() + this.syllabus.defaultExamOffsetDays);
-        this.examDateString = now.toISOString().split('T')[0];
+        this.examDateString = (function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})(now);
         this.saveState();
         return this.syllabus;
       }

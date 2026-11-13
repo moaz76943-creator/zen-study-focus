@@ -336,11 +336,18 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Legacy WebView bridge names retained to preserve old v21 session behavior.
+        // Page-supplied text is untrusted: keep notification titles short and control-character free.
+        private String boundedTitle(String raw) {
+            if (raw == null) return "";
+            String clean = raw.replaceAll("[\\p{Cntrl}]", " ").trim();
+            return clean.length() > 80 ? clean.substring(0, 80) : clean;
+        }
+
         // No Android Service is started: user countdown end time is handled by AlarmManager.
         @JavascriptInterface
         public void startBackgroundService(int seconds, String title) {
             if (seconds < 1 || seconds > 86400) return;
-            FocusAlarmReceiver.schedule(MainActivity.this, seconds, title);
+            FocusAlarmReceiver.schedule(MainActivity.this, seconds, boundedTitle(title));
         }
 
         @JavascriptInterface
@@ -363,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void triggerCompletionSound(String title) {
-            FocusAlarmReceiver.completeNow(MainActivity.this, title);
+            FocusAlarmReceiver.completeNow(MainActivity.this, boundedTitle(title));
         }
 
         @JavascriptInterface
