@@ -126,5 +126,7 @@
   "ui_sound_tab_all": "Tümü",
   "ui_sound_tab_water_rain": "Su ve Yağmur 🌧️",
   "ui_sound_tab_forest_wind": "Orman ve Rüzgar 🌲",
-  "ui_sound_tab_earth_thunder": "Gökyüzü ve Gök Gürültüsü ⚡"
+  "ui_sound_tab_earth_thunder": "Gökyüzü ve Gök Gürültüsü ⚡",
+  "ui_copy_json": "Yedeği Kopyala",
+  "ui_backup_copied": "Yedek panoya kopyalandı"
 }

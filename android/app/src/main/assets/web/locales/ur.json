@@ -126,5 +126,7 @@
   "ui_sound_tab_all": "تمام",
   "ui_sound_tab_water_rain": "پانی اور بارش 🌧️",
   "ui_sound_tab_forest_wind": "جنگل اور ہوا 🌲",
-  "ui_sound_tab_earth_thunder": "آسمان اور گرج ⚡"
+  "ui_sound_tab_earth_thunder": "آسمان اور گرج ⚡",
+  "ui_copy_json": "بیک اپ کاپی کریں",
+  "ui_backup_copied": "بیک اپ کلپ بورڈ پر کاپی ہو گیا"
 }

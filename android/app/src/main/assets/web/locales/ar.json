@@ -126,5 +126,7 @@
   "ui_sound_tab_all": "الكل",
   "ui_sound_tab_water_rain": "ماء ومطر 🌧️",
   "ui_sound_tab_forest_wind": "غابة ورياح 🌲",
-  "ui_sound_tab_earth_thunder": "سماء ورعد ⚡"
+  "ui_sound_tab_earth_thunder": "سماء ورعد ⚡",
+  "ui_copy_json": "نسخ النسخة الاحتياطية",
+  "ui_backup_copied": "تم نسخ البيانات الاحتياطية بنجاح"
 }
