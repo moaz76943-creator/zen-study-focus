@@ -86,3 +86,23 @@ test('STEM formula SVG escapes user input (no element/attribute injection)', () 
   assert.match(svg, /&lt;image/);
   assert.match(svg, /tspan/);
 });
+
+// ---- Audit 3 regressions ----
+(function audit3() {
+  const fs = require('fs'), path = require('path'), assert = require('assert');
+  const W = path.join(__dirname, '..', 'android/app/src/main/assets/web/');
+  const rd = p => fs.readFileSync(W + p, 'utf8');
+  const worker = rd('modules/performance/web_worker_120hz_engine.js');
+  assert.ok(!/encryptedOffThread:\s*true/.test(worker) && !/spawned:\s*true/.test(worker), 'worker engine must not claim threads/encryption');
+  assert.ok(!/min-resolution: 120dpi/.test(worker), 'refresh rate must not be guessed from DPI');
+  const vault = rd('modules/security/vault_backup.js');
+  assert.ok(!/fromCharCode\(\.\.\./.test(vault), 'vault base64 must be chunked');
+  assert.ok(/MAX_VAULT_BYTES/.test(vault) && /length < 10/.test(vault));
+  const hard = rd('modules/ui/sovereign_backup_hardening_825.js');
+  assert.ok(/ALLOWED_KEY/.test(hard) && /rolledBack/.test(hard), 'backup restore needs allowlist + rollback');
+  const prof = rd('modules/analytics/cognitive_profiler.js');
+  assert.ok(/Number\.isFinite\(Number\(rawLatest\.score\)\)/.test(prof), 'profiler must validate score');
+  assert.ok(/delivered/.test(rd('modules/sovereign_widget_bridge.js')) && /previewOnly/.test(rd('modules/native/widget_sync.js')));
+  assert.ok(fs.existsSync(path.join(__dirname, '..', 'docs/KNOWN_LIMITATIONS.md')));
+  console.log('  ✓ audit3 regressions');
+})();
