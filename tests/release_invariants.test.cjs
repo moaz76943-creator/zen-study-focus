@@ -71,3 +71,31 @@ test('"today" is never computed in UTC (wrong day for users east/west of Greenwi
   }
   assert.deepEqual(bad, [], 'use local date parts, not toISOString(), for the current day');
 });
+
+test('release_manifest_v21.json always matches version.properties (no stale metadata)', () => {
+  const v = read('android/version.properties');
+  const m = JSON.parse(read('release_manifest_v21.json'));
+  assert.equal(m.versionCode, Number(/VERSION_CODE=(\d+)/.exec(v)[1]));
+  assert.equal(m.version, /VERSION_NAME=([\d.]+)/.exec(v)[1]);
+  assert.equal(m.package, 'com.deepfocus.study');
+});
+
+test('no built binaries (apk/aab) are tracked in Git', () => {
+  let files; try { files = require('node:child_process').execFileSync('git', ['ls-files'], { cwd: root }).toString().split('\n'); } catch (_) { return; }
+  assert.deepEqual(files.filter((f) => /\.(apk|aab)$/i.test(f)), []);
+});
+
+test('no global CSS breaks words mid-word (overflow-wrap: anywhere / word-break: break-word)', () => {
+  const walkAll = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walkAll(path.join(d, e.name)) : [path.join(d, e.name)]);
+  const bad = walkAll(web).filter((f) => /\.(css|html)$/.test(f))
+    .filter((f) => /overflow-wrap:\s*anywhere|word-break:\s*break-word/.test(fs.readFileSync(f, 'utf8'))).map((f) => path.relative(web, f));
+  assert.deepEqual(bad, [], 'use overflow-wrap: break-word; anywhere splits normal words in narrow buttons');
+});
+
+test('completion tones use bundled recordings, never synthesized sound', () => {
+  const app = read('android/app/src/main/assets/web/app.js');
+  assert.match(app, /COMPLETION_TONE_FILES/);
+  assert.ok(!/createNatureSynthFallback/.test(app));
+  const i = app.indexOf('function playCompletionTone');
+  assert.ok(!/createOscillator|__dfNoopOsc/.test(app.slice(i, i + 2500)));
+});

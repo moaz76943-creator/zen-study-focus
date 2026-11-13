@@ -37,7 +37,7 @@ button:active, .btn:active, [role="button"]:active {
 .card, .container, main, section, .studio-pane {
   max-width: 100% !important;
   box-sizing: border-box !important;
-  word-break: break-word !important;
+  word-break: normal !important; overflow-wrap: break-word;
 }
 
 /* Fix floating overlays from intercepting background clicks */
