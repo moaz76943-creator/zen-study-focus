@@ -57,7 +57,7 @@
 
     var title = escapeXml(sessionMetrics.taskTitle || (isRtl ? "جلسة تركيز عميق" : "Deep Focus Session"));
     var category = escapeXml(sessionMetrics.category || (isRtl ? "دراسة عامة" : "General Study"));
-    var dateStr = escapeXml(sessionMetrics.dateStr || new Date().toISOString().split('T')[0]);
+    var dateStr = escapeXml(sessionMetrics.dateStr || (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date()));
     var streakDays = typeof sessionMetrics.streakDays === 'number' ? Math.max(0, sessionMetrics.streakDays) : 1;
 
     var minsDigits = '\u200E' + durationMins;
