@@ -36,3 +36,11 @@ const pillSrc = fs.readFileSync(path.join(web, 'modules/ui/studio_navigator_draw
 assert(!/pill\.style\.bottom = "20px"/.test(pillSrc), 'studio pill must sit above the bottom nav');
 assert(/Studios/.test(pillSrc), 'studio pill needs a non-Arabic label');
 console.log('✅ PASS: studio pill clears the nav and is localisable');
+
+// 6. Reviving the boot sequence must not run QA simulations or invent unsigned v21 data.
+assert(!/\/\/ Run automatically on initialization\s*try \{\s*dfRunMultiStudioDogfoodSuite\(\);/.test(app),
+  'dogfood suite must not auto-run against real user data');
+assert(!/Initialize clean sovereign default/.test(app), 'envelope builder must not write raw defaults into v21 keys');
+const integ = fs.readFileSync(path.join(web, 'integration_v22.js'), 'utf8');
+assert(/delete normal\.sessionHistory/.test(integ), 'empty sessionHistory must compare equal to absent');
+console.log('✅ PASS: no boot-time dogfood data, no unsigned v21 defaults, stable cfg comparison');
