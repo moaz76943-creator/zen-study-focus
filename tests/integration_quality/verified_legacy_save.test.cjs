@@ -16,7 +16,7 @@ function fixture(){
   },
   removeItem:key=>map.delete(key)
  };
- const ctx=vm.createContext({localStorage:store,Date,JSON});
+ const ctx=vm.createContext({localStorage:store,Date,JSON,Number,Error,window:{}});
  vm.runInContext(saveCode,ctx,{timeout:1000});
  return {save:v=>vm.runInContext('saveFortressData("zen_fortress_notes_v21",'+JSON.stringify(v)+')',ctx),
   map,control,decode:key=>JSON.parse(map.get(key))};
