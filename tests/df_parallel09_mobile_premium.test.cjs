@@ -31,7 +31,7 @@ test('200% text zoom keeps timer and duration controls inside the hero without c
   assert.match(scoped, /\.focus-hero-card\s+\.ring-time\s*\{[^}]*font-size:\s*clamp\(1\.05rem,\s*9vw,\s*3rem\)/);
   assert.match(scoped, /\.focus-hero-card\s+\.time-delta-row\s*\{[^}]*flex-wrap:\s*wrap/);
   assert.match(scoped, /\.focus-hero-card\s+\.delta-chip\s*\{[^}]*min-block-size:\s*44px/);
-  assert.match(scoped, /\.focus-hero-card\s+\.delta-chip\s*\{[^}]*overflow-wrap:\s*anywhere/);
+  assert.match(scoped, /\.focus-hero-card\s+\.delta-chip\s*\{[^}]*overflow-wrap:\s*(?:anywhere|break-word)/);
 });
 
 test('white premium, Western numerals, RTL and offline fonts are not regressed by scoped CSS', () => {

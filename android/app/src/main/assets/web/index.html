@@ -15,7 +15,7 @@
     .df-white-premium { max-width: 100%; box-sizing: border-box; }
     .df-white-premium div { flex-wrap: wrap !important; }
     .df-white-premium div, .df-white-premium label, .df-white-premium p, .df-white-premium span,
-    .df-white-premium textarea, .df-white-premium input, .df-white-premium select, .df-white-premium button { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+    .df-white-premium textarea, .df-white-premium input, .df-white-premium select, .df-white-premium button { min-width: 0; max-width: 100%; overflow-wrap: break-word; }
 
     :root {
       --bg-sheet: #fbfdff;
@@ -182,6 +182,7 @@
       flex: 1; border: none; background: transparent; padding: 8px 10px;
       border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 800;
       color: var(--text-muted); white-space: nowrap; cursor: pointer; transition: 0.2s;
+      word-break: normal; overflow-wrap: normal; hyphens: none;
     }
     .seg-pill.active {
       background: var(--card-pure); color: var(--primary);
@@ -1399,13 +1400,13 @@ body {
         height: auto !important;
         line-height: 1.4;
         white-space: normal;
-        overflow-wrap: anywhere;
-        word-break: break-word;
+        overflow-wrap: break-word;
+        word-break: normal;
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
     }
     p, span, label, h1, h2, h3, div {
-        overflow-wrap: anywhere;
+        overflow-wrap: break-word;
     }
     .card, [id$="Container"], [id$="Controls"], [id$="Panel"] {
         height: auto !important;
@@ -1538,7 +1539,8 @@ body {
   }
   button, .pill, .chip, .tab-btn {
     white-space: normal !important;
-    word-break: break-word !important;
+    word-break: normal !important;
+    overflow-wrap: break-word;
     line-height: 1.25 !important;
   }
 </style>

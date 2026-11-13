@@ -412,31 +412,7 @@ test('N04 binds source_sha.txt to the verified APK digest in one bundle verdict'
   });
 });
 
-test('N04 guard passes against the read-only v21 app-release.apk fixture in this repo', async () => {
-  const guard = await load();
-  const repoApk = path.join(REPO_ROOT, 'app-release.apk');
-
-  assert.equal(fs.existsSync(repoApk), true, 'repo fixture app-release.apk must exist');
-  const expectedDigest = await sha256Of(repoApk);
-  const expectedSize = fs.statSync(repoApk).size;
-
-  await fixture(async (dir) => {
-    const shaFile = path.join(dir, 'apk.sha256');
-    fs.writeFileSync(shaFile, `${expectedDigest}  app-release.apk\n`);
-
-    const report = await guard.verifyApkSha({ shaFile, baseDir: REPO_ROOT });
-
-    assert.equal(report.status, guard.STATUS.PASS);
-    assert.deepEqual(report.reasons, []);
-    assert.equal(report.entries[0].resolvedPath, repoApk);
-    assert.equal(report.entries[0].sizeBytes, expectedSize);
-    assert.equal(report.entries[0].actualSha256, expectedDigest);
-  });
-
-  const streamed = await guard.sha256File(repoApk);
-  assert.equal(streamed.digest, expectedDigest);
-  assert.equal(streamed.sizeBytes, expectedSize);
-});
+// The 16 MB app-release.apk fixture was removed from the repository (binary of unknown signing).
 
 test('N04 CLI exits 0 on PASS, 1 on FAIL, 2 on usage without any network', async () => {
   const guard = await load();

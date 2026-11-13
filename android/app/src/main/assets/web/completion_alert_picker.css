@@ -12,7 +12,7 @@
   box-sizing: border-box;
   min-inline-size: 0;
   max-inline-size: 100%;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 #completionAlertPickerHost .completion-alert-picker {
   display: grid;
@@ -43,7 +43,7 @@
   font-weight: 700;
   line-height: 1.5;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 #completionAlertPickerHost .completion-alert-option {
   box-sizing: border-box;
@@ -66,7 +66,7 @@
   margin: 0;
   font-size: .92rem;
   line-height: 1.5;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   cursor: pointer;
 }
 #completionAlertPickerHost .completion-alert-option input[type="radio"] {
@@ -91,7 +91,7 @@
   font-size: .86rem;
   font-weight: 650;
   line-height: 1.3;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   cursor: pointer;
 }
 #completionAlertPickerHost .completion-alert-option > button:active {
@@ -102,7 +102,7 @@
   min-inline-size: 0;
   font-size: .92rem;
   line-height: 1.5;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 #completionAlertPickerHost .completion-alert-picker > label input[type="checkbox"] {
   margin-inline-end: 8px;
