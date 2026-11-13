@@ -11,7 +11,7 @@
 }
 .df-v22 *, .df-v22 *::before, .df-v22 *::after { box-sizing: border-box; }
 .df-v22 :where(h1,h2,h3,p,strong,label,button,span,small) {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .df-v22 :where(.screen-section,.main-white-sheet,.df22-card,.df22-grid,.df22-timer-zone) {
   min-width: 0;
@@ -181,7 +181,7 @@ html[dir="rtl"] .df-v22 .df22-icon--next { transform: scaleX(-1); }
   color: var(--df22-muted);
   font-size: .72rem;
   line-height: 1.25;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .df-v22 .df22-bottom-nav > button[aria-current="page"] { background: var(--df22-surface-selected); color: var(--df22-primary); }
 .df-v22 .df22-chart {
@@ -280,7 +280,7 @@ body.df-v22.timer-home:not(.deep-lockdown) .focus-hero-card .seg-pill {
   min-height: 42px;
   padding: 6px 3px;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   text-overflow: clip;
   line-height: 1.2;
   color: var(--df22-muted);
@@ -309,7 +309,7 @@ body.df-v22:not(.deep-lockdown) .training-summary-text { min-width: 0; flex: 1 1
 body.df-v22:not(.deep-lockdown) .training-summary-text :where(strong,small) {
   display: block;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   color: var(--df22-ink);
 }
 body.df-v22:not(.deep-lockdown) .training-fields {
@@ -329,7 +329,7 @@ body.df-v22:not(.deep-lockdown) .training-add-row { flex-wrap: wrap; }
 body.df-v22:not(.deep-lockdown) .training-add-row input { flex: 1 1 110px; }
 body.df-v22:not(.deep-lockdown) .training-add-row button { min-height: var(--df22-touch); }
 body.df-v22:not(.deep-lockdown) :where(.ns-card,.showcase-task-card,.an-kpi-card) {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   line-height: var(--df22-leading);
 }
 body.df-v22:not(.deep-lockdown) :where(.modal-card,.ns-editor) {
@@ -419,7 +419,7 @@ body.df-v22:not(.deep-lockdown) .df22-chart [role="img"] { color: var(--df22-ink
 }
 .df-v22 :where(.df22-button,.df22-card-title,.df22-card-subtitle,.df22-modal-heading,.df22-chart-title,.df22-bottom-nav > button) {
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   word-break: normal;
   line-height: 1.45;
 }
