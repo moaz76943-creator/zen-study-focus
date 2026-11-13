@@ -77,9 +77,13 @@
             el.setAttribute('data-a11y-warning', 'undersized-target');
           }
         }
-        if (!el.getAttribute('aria-label') && !el.textContent.trim() && !el.getAttribute('title')) {
-          el.setAttribute('aria-label', el.id || 'Action button');
-        }
+        // Never invent an accessible name from the element id ("qtSkipLast" is read aloud
+        // verbatim) and never override a real <label>, placeholder or aria-labelledby.
+        var named = el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') ||
+          el.getAttribute('title') || el.getAttribute('placeholder') ||
+          (el.labels && el.labels.length) || (el.textContent || '').trim() ||
+          (el.value && el.type !== 'checkbox' && el.type !== 'radio' && String(el.value).trim());
+        if (!named) el.setAttribute('data-a11y-warning', 'unnamed-control');
       }
       return { checked: interactive.length, violations: violations };
     },
