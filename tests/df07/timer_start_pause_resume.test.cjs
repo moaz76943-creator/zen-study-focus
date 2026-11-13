@@ -39,6 +39,7 @@ function rig({saveAcks=[]}={}){
     finalizeTimerSession(){calls.completions++}
   };
   vm.createContext(c);
+  c.setPlayButtonIcon=c.setPlayButtonIcon||function(){};
   vm.runInContext(accumulation+toggle+tick,c);
   const evaluate=code=>vm.runInContext(code,c);
   const state=()=>JSON.parse(evaluate('JSON.stringify({running:timerRunning,id:timerSessionId,left:timerLeft,total:timerTotal,resume:timerResumeMs,active:timerActiveMs})'));

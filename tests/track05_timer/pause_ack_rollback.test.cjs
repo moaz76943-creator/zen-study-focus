@@ -4,6 +4,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+function runWithStubs(code,ctx){ctx.setPlayButtonIcon=ctx.setPlayButtonIcon||function(){};if(ctx.timerTotal===undefined)ctx.timerTotal=0;return require('node:vm').runInNewContext(code,ctx);}
+
 
 const app = fs.readFileSync(path.resolve(__dirname, '../../android/app/src/main/assets/web/app.js'), 'utf8');
 function production(from, to) {
@@ -24,7 +26,7 @@ test('v21 timer save acknowledges success but fails closed on failed storage wri
     showToast:s=>events.push(['toast',s]),
     saveFortressData:(k,v)=>{events.push(['write',k]);assert.equal(k,key);return true;}
   };
-  vm.runInNewContext(production('storeTimerSession','creditCompletedSession'),ctx);
+  runWithStubs(production('storeTimerSession','creditCompletedSession'),ctx);
   assert.equal(ctx.storeTimerSession(),true);
   ctx.saveFortressData=()=>{throw Error('Injected storage failure');};
   assert.equal(ctx.storeTimerSession(),false,'Failed v21 save must NOT be acknowledged');
@@ -49,7 +51,7 @@ function timerContext(running) {
     runTimerTick(){},updateTimerDisplay(){events.push('DISPLAY')},
     storeTimerSession(){events.push('REJECTED_SAVE');return false;}
   };
-  vm.runInNewContext(production('toggleTimerPlay','resetTimerNow'),ctx);
+  runWithStubs(production('toggleTimerPlay','resetTimerNow'),ctx);
   return {ctx,button,events,record};
 }
 
@@ -84,7 +86,7 @@ test('reset stops before discarding the current session if Pause could not save'
     toggleTimerPlay:()=>false,storeTimerSession:()=>{throw Error('Reset must not save')},
     updateTimerDisplay:()=>{throw Error('Reset must not redraw')}
   };
-  vm.runInNewContext(production('resetTimerNow','skipTimerPhase'),ctx);
+  runWithStubs(production('resetTimerNow','skipTimerPhase'),ctx);
   assert.equal(ctx.resetTimerNow(),false);
   assert.equal(ctx.timerSessionId,'original');
   assert.equal(ctx.timerLeft,347);
@@ -101,7 +103,7 @@ test('mode switch cannot discard running focus when Pause write fails', () => {
     storeTimerSession:()=>{throw Error('Mode must not save')},
     updateTimerDisplay:()=>{throw Error('Mode must not redraw')}
   };
-  vm.runInNewContext(production('selectTimerMode','openCustomTimerModal'),ctx);
+  runWithStubs(production('selectTimerMode','openCustomTimerModal'),ctx);
   assert.equal(ctx.selectTimerMode(5,'short',null),false);
   assert.equal(ctx.currentTimerModeKey,'focus');
   assert.equal(ctx.timerTotal,1500);
