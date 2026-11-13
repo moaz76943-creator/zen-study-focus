@@ -5692,9 +5692,11 @@ function applyPristineUIElevations() {
 
   // 3. قسر الأرقام الغربية على حقول تواريخ التحليلات
   document.querySelectorAll('input[type="date"]').forEach(inp => {
-    inp.setAttribute('lang', 'en-US');
-    inp.style.direction = 'ltr';
-    inp.style.fontVariantNumeric = 'lining-nums';
+    // en-GB: the same value the i18n hot-swap uses. Two different values made both engines
+    // rewrite the attribute on every sweep (an endless mutation ping-pong).
+    if (inp.getAttribute('lang') !== 'en-GB') inp.setAttribute('lang', 'en-GB');
+    if (inp.style.direction !== 'ltr') inp.style.direction = 'ltr';
+    if (inp.style.fontVariantNumeric !== 'lining-nums') inp.style.fontVariantNumeric = 'lining-nums';
   });
 }
 
@@ -82482,8 +82484,17 @@ window.SovereignLocaleResolver = (function() {
         return null;
     }
 
+    // Inlined copy of the JSON (locale_packs/locale_bundle.js): the Android WebView refuses
+    // fetch()/XHR of file:// assets, so the network-style loaders below only work on desktop.
+    function bundled() { return (typeof window !== "undefined" && window.__DF_LOCALE_BUNDLE) || null; }
+
     async function loadPack(packName) {
         if (packCache[packName]) return packCache[packName];
+        const inline = bundled();
+        if (inline && inline.packs && inline.packs[packName]) {
+            packCache[packName] = inline.packs[packName];
+            return packCache[packName];
+        }
         const resp = await fetch("locale_packs/" + packName);
         if (!resp.ok) throw new Error("Pack not found: " + packName);
         const data = await resp.json();
@@ -82508,6 +82519,8 @@ window.SovereignLocaleResolver = (function() {
         }
 
         // 3. Legacy individual file fallback
+        const inlineFiles = bundled();
+        if (inlineFiles && inlineFiles.files && inlineFiles.files[langCode]) return inlineFiles.files[langCode];
         const resp = await fetch("locales/" + langCode + ".json");
         return resp.ok ? await resp.json() : null;
     }
