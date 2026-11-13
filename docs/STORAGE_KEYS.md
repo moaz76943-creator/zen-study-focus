@@ -79,3 +79,6 @@ Protected v21 packets (`{payload,sig,ts}` + `_mirror`) must never change shape.
 | `zen_locked_task_id` | app state |
 
 Dynamic keys: `df_quarantine_<key>_<0-2>` and `_last` (damaged raw copies, bounded), plus keys written via `dfSafeSetStorage`.
+
+## Flashcards (added)
+- `df_fc_meta_v1`, `df_fc_cards_v1_<n>`, `df_fc_quarantine_*` — see docs/FLASHCARDS.md. Legacy flashcard keys are read-only inputs to a one-time migration.

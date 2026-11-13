@@ -227,14 +227,16 @@ test('real integrated v21 web asset, when present, matches the six-section and F
     return;
   }
   const report = inspectRepository({ root });
-  assert.equal(report.screenSections.length, 6);
+  // Six navigation sections plus the Flashcards section, which is reached from the Notes screen (no 8th nav button).
+  assert.equal(report.screenSections.length, 7);
   assert.deepEqual(report.screenSections.map((section) => section.id), [
     'sec-timer',
     'sec-tasks',
     'sec-calendar',
     'sec-notes',
     'sec-sounds',
-    'sec-analytics'
+    'sec-analytics',
+    'sec-flashcards'
   ]);
   assert.equal(report.navigation.controls.length, 7);
   assert.equal(report.focusLab.indexMentionCount, 0);

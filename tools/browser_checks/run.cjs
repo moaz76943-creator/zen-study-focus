@@ -153,12 +153,65 @@ async function sounds(b, base) {
   await ctx.close();
 }
 
+async function flashcards(b, base) {
+  // Real UI flow through clicks and typing: first card, duplicate warning, study + rating, search (Arabic, diacritics),
+  // hostile text stays inert, restart persistence, backup round trip, layout at 320px/1.5x in en+ar, speech stops on tab change.
+  for (const lang of ['en', 'ar']) {
+    const ctx = await b.newContext({ viewport: { width: 320, height: 700 } }); const p = await ctx.newPage(); const errs = [];
+    p.on('pageerror', (e) => errs.push(String(e.message).slice(0, 140)));
+    p.on('dialog', (d) => d.accept());
+    await p.goto(base + '/index.html'); await p.waitForTimeout(1500);
+    await p.evaluate((l) => { try { applyLanguage(l); } catch (_) {} document.documentElement.style.fontSize = '24px'; }, lang);
+    await p.evaluate(() => { switchTab('sec-notes', document.getElementById('navNotes')); });
+    await p.click('#flashcardsEntry'); await p.waitForTimeout(300);
+    const empty = await p.evaluate(() => ({ active: document.getElementById('sec-flashcards').classList.contains('active'), addFirst: !!document.querySelector('#sec-flashcards .fc-empty .fc-btn.primary') }));
+    if (!empty.active || !empty.addFirst) fail(`flashcards ${lang}: entry/empty state broken ${JSON.stringify(empty)}`);
+    await p.click('#sec-flashcards .fc-empty .fc-btn.primary'); await p.waitForTimeout(150);
+    const evil = '<img src=x onerror="window.__fc=1"> Haus';
+    await p.evaluate(() => { document.querySelector('#sec-flashcards .fc-more').open = true; });
+    await p.fill('#fcFront', evil); await p.fill('#fcBack', 'كِتاب & "house"'); await p.fill('#fcSrc', 'de-DE'); await p.fill('#fcTgt', 'ar');
+    await p.click('#sec-flashcards .fc-row .fc-btn.primary'); await p.waitForTimeout(250);
+    // duplicate warning
+    await p.fill('#fcFront', evil); await p.fill('#fcBack', 'x');
+    await p.click('#sec-flashcards .fc-row .fc-btn.primary'); await p.waitForTimeout(150);
+    const dup = await p.evaluate(() => (document.querySelector('#sec-flashcards .fc-warn') || {}).textContent || '');
+    if (!dup) fail(`flashcards ${lang}: no duplicate warning`);
+    const st = await p.evaluate(() => ({ total: DFFlashcardsApp.stats().total, pwned: !!window.__fc, injected: !!document.querySelector('#sec-flashcards img') }));
+    if (st.total !== 1 || st.pwned || st.injected) fail(`flashcards ${lang}: add/inert text broken ${JSON.stringify(st)}`);
+    // study: reveal then rate Good
+    await p.evaluate(() => { DFFlashcardsUI.show(); }); await p.waitForTimeout(100);
+    await p.click('#sec-flashcards .fc-quick .fc-btn.primary'); await p.waitForTimeout(100);
+    await p.click('#sec-flashcards .fc-modes .fc-btn.primary'); await p.waitForTimeout(150);
+    await p.click('#sec-flashcards .fc-btn.primary.big'); await p.waitForTimeout(100);
+    const over = await p.evaluate(() => { const vw = document.documentElement.clientWidth; return [...document.querySelectorAll('#sec-flashcards *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && (r.right > vw + 1 || r.left < -1) && getComputedStyle(e).position !== 'fixed'; }).slice(0, 3).map((e) => e.className || e.tagName); });
+    if (over.length) fail(`flashcards ${lang}: overflow in study view ${over.join(',')}`);
+    await p.click('#sec-flashcards .fc-btn.rate.r3'); await p.waitForTimeout(200);
+    const after = await p.evaluate(() => { const s = DFFlashcardsApp.stats(); const c = DFFlashcardsApp.search('').items[0]; return { reviewed: s.reviewedToday, st: c.st, digits: /^[0-9]+$/.test(document.querySelector('#sec-flashcards .fc-stat strong') ? document.querySelector('#sec-flashcards .fc-stat strong').textContent : '0') }; });
+    if (after.reviewed !== 1 || after.st !== 'learning') fail(`flashcards ${lang}: rating not recorded ${JSON.stringify(after)}`);
+    // search: Arabic with and without diacritics
+    const found = await p.evaluate(() => [DFFlashcardsApp.search('كتاب').total, DFFlashcardsApp.search('كِتاب').total, DFFlashcardsApp.search('zzz').total]);
+    if (found[0] !== 1 || found[1] !== 1 || found[2] !== 0) fail(`flashcards ${lang}: search ${found}`);
+    // persistence across reload and backup round trip
+    await p.reload(); await p.waitForTimeout(1500);
+    const persisted = await p.evaluate(() => { const c = DFFlashcardsApp.search('').items[0]; return { total: DFFlashcardsApp.stats().total, reps: c && c.reps, front: c && c.frontText }; });
+    if (persisted.total !== 1 || persisted.reps !== 1 || !persisted.front.startsWith('<img')) fail(`flashcards ${lang}: not persisted ${JSON.stringify(persisted)}`);
+    const rt = await p.evaluate(() => { const snap = JSON.parse(JSON.stringify(DFFlashcardsApp.exportSnapshot())); const env = buildSovereignBackupEnvelopeObject(); const inBundle = JSON.parse(env.bundle).flashcardsV2; DFFlashcardsApp.deleteCard(snap.cards[0].id); const r = DFFlashcardsApp.importSnapshot(inBundle, { mode: 'replace' }); return { inBundle: !!inBundle && inBundle.cards.length === 1, restored: r.ok, total: DFFlashcardsApp.stats().total }; });
+    if (!rt.inBundle || !rt.restored || rt.total !== 1) fail(`flashcards ${lang}: ZEN21 backup does not carry flashcards ${JSON.stringify(rt)}`);
+    // leaving the section stops speech
+    const stopCalled = await p.evaluate(() => { let n = 0; window.ZenNative = Object.assign(window.ZenNative || {}, { ttsInit: () => '{"ok":true,"status":"ready"}', ttsStop: () => { n++; return '{"ok":true}'; }, ttsSpeak: () => '{"ok":true}' }); DFFlashcardsUI.show(); switchTab('sec-timer', document.getElementById('navTimer')); return n; });
+    if (stopCalled < 1) fail(`flashcards ${lang}: speech not stopped when leaving the section`);
+    if (lang === 'ar') { const dir = await p.evaluate(() => { switchTab('sec-flashcards', document.getElementById('navNotes')); return document.getElementById('sec-flashcards').getAttribute('dir'); }); if (dir !== 'rtl') fail('flashcards ar: section is not RTL'); }
+    if (errs.length) fail(`flashcards ${lang}: page errors ${errs.slice(0, 3).join(' | ')}`);
+    await ctx.close();
+  }
+}
+
 (async () => {
   await new Promise((r) => server.listen(0, r));
   const base = 'http://localhost:' + server.address().port;
   const b = await chromium.launch();
   const only = process.argv[2];
-  for (const [name, fn] of Object.entries({ layout, corruption, timezones, devText, sounds, flows, offline, timerFlow })) {
+  for (const [name, fn] of Object.entries({ layout, corruption, timezones, devText, sounds, flows, offline, timerFlow, flashcards })) {
     if (only && only !== name) continue;
     const before = problems.length; await fn(b, base); console.log(name, problems.length === before ? 'OK' : 'FAILED');
   }
