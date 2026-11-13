@@ -15,7 +15,7 @@ function state(mode='ok',integrated=false,training=null) {
  const original={lang:'en',sessions:2,todayMins:7,quickFocusRemainderSec:40,
   completedTimerIds:[],sessionHistory:[],focusCycleCount:2,roundsPerCycle:4,unknown:{keep:'legacy'}};
  const cfg=structuredClone(original);
- const c=vm.createContext({
+ const c=vm.createContext({timerTotal:0,timerSessionId:null,setPlayButtonIcon(){},
   cfg,currentTimerModeKey:'focus',timerSessionId:'session-native-1',focusSessionTaskId:null,
   tasksList:[],timerActiveMs:training?25000:60500,quickTraining:training,
   localDateISO:()=> '2026-10-26',computeActualStreak:()=>3,
@@ -29,7 +29,7 @@ function state(mode='ok',integrated=false,training=null) {
    return mode!=='false';
   },
   syncHeaderMetrics:()=>{info.renders++;},
-  document:{dispatchEvent:()=>{info.events++;},getElementById:()=>({innerHTML:'',textContent:'Focus'})},
+  document:{createElementNS:()=>({setAttribute(){},appendChild(){},style:{}}),createElement:()=>({setAttribute(){},appendChild(){},style:{}}),createTextNode:t=>({t}),dispatchEvent:()=>{info.events++;},getElementById:()=>({innerHTML:'',textContent:'Focus',appendChild(){},setAttribute(){},replaceChildren(){},classList:{add(){},remove(){}},style:{}})},
   CustomEvent:class {constructor(){}},
   clearInterval:()=>{},accumulateActiveTime:()=>{},setInterval:()=>1,
   updateTimerDisplay:()=>{},storeTimerSession:()=>{info.storeTimer++;return true;},

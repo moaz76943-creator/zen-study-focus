@@ -21,7 +21,7 @@ function fixture() {
     return nodes.get(id);
   };
   const clock=class extends Date {constructor(...args){super(...(args.length?args:[now]));} static now(){return now;}};
-  const ctx=vm.createContext({
+  const ctx=vm.createContext({timerTotal:0,timerSessionId:null,setPlayButtonIcon(){},
     crypto:require('node:crypto').webcrypto,
     Date:clock,Math:{...Math,random:()=>++serial/1000,round:Math.round,max:Math.max,min:Math.min,floor:Math.floor,ceil:Math.ceil},
     document:{getElementById:el,createElement:()=>el('child'+serial++),dispatchEvent:e=>events.push(e)},

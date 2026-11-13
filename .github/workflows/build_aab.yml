@@ -1,5 +1,14 @@
 name: Build Production AAB & APK
 
+# Single release path. Signing rules:
+#   * Secrets DEEPFOCUS_KEYSTORE_B64 / DEEPFOCUS_KEY_ALIAS / DEEPFOCUS_STORE_PASSWORD /
+#     DEEPFOCUS_KEY_PASSWORD present  -> artifacts are signed with the real upload key.
+#   * Secrets absent on a branch build -> a random, throw-away key (never stored, never a fixed
+#     password) so the APK can still be installed for testing. Such artifacts are named
+#     "...-ci-throwaway" and MUST NOT be uploaded to Google Play.
+#   * Secrets absent on a v* tag      -> the build fails. No release is ever made without the key.
+# Optional secret DEEPFOCUS_EXPECTED_CERT_SHA256 pins the certificate fingerprint; a mismatch fails.
+
 on:
   push:
     branches:
@@ -10,83 +19,115 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: build-aab-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-production-bundle:
     name: Compile & Sign Production Android App
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      DEEPFOCUS_REQUIRE_SIGNING: ${{ startsWith(github.ref, 'refs/tags/v') && 'true' || 'false' }}
+    outputs:
+      signing_mode: ${{ steps.signing.outputs.mode }}
 
     steps:
-      - name: 📥 Checkout Repository Source
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: 🟢 Set up Node.js & Run Sovereign E2E Tests
+      - name: Node tests (syntax + regression gate)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
-      - name: 🧪 Execute Sovereign E2E Integration Gate
+      - name: Run Sovereign gate
         run: |
           node --check android/app/src/main/assets/web/app.js
-          if [ -f "tests/sovereign_e2e_test.js" ]; then
-            node tests/sovereign_e2e_test.js
-          fi
+          if [ -f tests/sovereign_e2e_test.js ]; then node tests/sovereign_e2e_test.js; fi
+          node tools/run_tests.mjs
 
-      - name: ☕ Set up JDK 17 (Temurin)
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🐘 Set up Standalone Gradle 8.11.1
+      - name: Set up Gradle 8.11.1
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.11.1'
 
-      - name: 📱 Configure Android SDK 35 & Licenses
+      - name: Install Android SDK 36 (fails the job if it cannot)
         run: |
-          SDK_DIR="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
-          if [ -z "$SDK_DIR" ] && [ -d "/usr/local/lib/android/sdk" ]; then
-            SDK_DIR="/usr/local/lib/android/sdk"
-          fi
-          echo "ANDROID_HOME=$SDK_DIR" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$SDK_DIR" >> $GITHUB_ENV
-          SDKMANAGER=$(find "$SDK_DIR" -name sdkmanager 2>/dev/null | head -n 1)
-          echo "Using sdkmanager: $SDKMANAGER"
-          yes | "$SDKMANAGER" --licenses || true
-          "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "platforms;android-35" "build-tools;35.0.0" "platform-tools" || true
-          yes | "$SDKMANAGER" --licenses || true
+          set -eu
+          SDK_DIR="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK_DIR" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_DIR" >> "$GITHUB_ENV"
+          SDKMANAGER=$(find "$SDK_DIR" -name sdkmanager -type f 2>/dev/null | head -n 1)
+          test -n "$SDKMANAGER" || { echo "sdkmanager not found"; exit 1; }
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          set -o pipefail
+          "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+          test -d "$SDK_DIR/platforms/android-36"
 
-      - name: 🧹 Sanitize Gradle Environment
+      - name: Prepare signing key
+        id: signing
+        env:
+          KS_B64: ${{ secrets.DEEPFOCUS_KEYSTORE_B64 }}
+          KS_ALIAS: ${{ secrets.DEEPFOCUS_KEY_ALIAS }}
+          KS_STORE_PW: ${{ secrets.DEEPFOCUS_STORE_PASSWORD }}
+          KS_KEY_PW: ${{ secrets.DEEPFOCUS_KEY_PASSWORD }}
+        run: |
+          set -eu
+          KS="$RUNNER_TEMP/signing.jks"
+          if [ -n "$KS_B64" ] && [ -n "$KS_ALIAS" ] && [ -n "$KS_STORE_PW" ] && [ -n "$KS_KEY_PW" ]; then
+            echo "$KS_B64" | base64 -d > "$KS"
+            echo "::add-mask::$KS_STORE_PW"
+            echo "::add-mask::$KS_KEY_PW"
+            keytool -list -keystore "$KS" -storepass "$KS_STORE_PW" -alias "$KS_ALIAS" > /dev/null
+            MODE=upload-key
+            ALIAS="$KS_ALIAS"; SPW="$KS_STORE_PW"; KPW="$KS_KEY_PW"
+          elif [ "$DEEPFOCUS_REQUIRE_SIGNING" = "true" ]; then
+            echo "::error::Tag build without signing secrets. Add DEEPFOCUS_KEYSTORE_B64, DEEPFOCUS_KEY_ALIAS, DEEPFOCUS_STORE_PASSWORD, DEEPFOCUS_KEY_PASSWORD."
+            exit 1
+          else
+            SPW=$(openssl rand -hex 16); KPW="$SPW"; ALIAS=ci-throwaway
+            echo "::add-mask::$SPW"
+            keytool -genkeypair -keystore "$KS" -alias "$ALIAS" -keyalg RSA -keysize 3072 \
+              -validity 30 -storepass "$SPW" -keypass "$KPW" \
+              -dname "CN=Deep Focus CI throwaway, O=CI" > /dev/null 2>&1
+            MODE=ci-throwaway
+            echo "::warning::No signing secrets: artifacts use a throw-away key and must NOT go to Google Play."
+          fi
+          {
+            echo "DEEPFOCUS_UPLOAD_KEYSTORE=$KS"
+            echo "DEEPFOCUS_KEY_ALIAS=$ALIAS"
+            echo "DEEPFOCUS_STORE_PASSWORD=$SPW"
+            echo "DEEPFOCUS_KEY_PASSWORD=$KPW"
+            echo "SIGNING_MODE=$MODE"
+          } >> "$GITHUB_ENV"
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+
+      - name: Sanitize Gradle environment
         run: |
           rm -f android/local.properties
           sed -i 's/\r$//' android/gradlew 2>/dev/null || true
           chmod +x android/gradlew 2>/dev/null || true
 
-      - name: 🔑 Ensure Production Keystore
+      - name: Build release AAB and APK
         run: |
-          cd android/app
-          if [ ! -f "zenfocus2026.jks" ]; then
-            keytool -genkeypair -v -keystore zenfocus2026.jks -alias zenfocus2026 -keyalg RSA -keysize 2048 -validity 10000 -storepass zenfocus2026 -keypass zenfocus2026 -dname "CN=DeepFocus, OU=StudyOS, O=Sovereign, L=Global, ST=None, C=US"
-          fi
-          cd ../..
-
-      - name: 📦 Compile Production Android App Bundle (.AAB)
-        run: |
-          set -o pipefail
+          set -eo pipefail
           cd android
-          if [ -f "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            ./gradlew bundleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m" 2>&1 | tee gradle_build.log
-          else
-            echo "Wrapper jar absent; using Standalone Gradle 8.11.1..."
-            gradle bundleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m" 2>&1 | tee gradle_build.log
-          fi
-          cd ..
+          if [ -f gradlew ] && [ -f gradle/wrapper/gradle-wrapper.jar ]; then GR=./gradlew; else GR=gradle; fi
+          $GR bundleRelease assembleRelease --stacktrace --no-daemon \
+            -Dorg.gradle.jvmargs="-Xmx4096m" 2>&1 | tee gradle_build.log
 
-      - name: 🔍 Upload Gradle Failure Log (If Build Failed)
+      - name: Upload Gradle log on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
@@ -95,43 +136,81 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: 📦 Compile Production APK (For Direct Device Install)
+      - name: Verify signatures (AAB and APK)
+        env:
+          EXPECTED: ${{ secrets.DEEPFOCUS_EXPECTED_CERT_SHA256 }}
         run: |
-          cd android
-          if [ -f "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            ./gradlew assembleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m" || true
-          else
-            gradle assembleRelease --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m" || true
+          set -eu
+          AAB=$(ls android/app/build/outputs/bundle/release/*.aab | head -n 1)
+          APK=$(ls android/app/build/outputs/apk/release/*.apk | head -n 1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n 1)
+          test -n "$AAB" && test -n "$APK" && test -n "$APKSIGNER"
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee apk_cert.txt
+          grep -q "Verified using v2 scheme (APK Signature Scheme v2): true\|Verified using v3 scheme (APK Signature Scheme v3): true" apk_cert.txt \
+            || { echo "::error::APK is not v2/v3 signed"; exit 1; }
+          jarsigner -verify -certs "$AAB" | tee aab_verify.txt
+          grep -q "jar verified" aab_verify.txt || { echo "::error::AAB signature invalid or missing"; exit 1; }
+          keytool -printcert -jarfile "$AAB" > aab_cert.txt
+          APK_SHA=$(grep -m1 "certificate SHA-256 digest" apk_cert.txt | awk '{print toupper($NF)}')
+          AAB_SHA=$(grep -m1 "SHA256:" aab_cert.txt | awk '{print toupper($2)}' | tr -d ':')
+          echo "APK cert SHA-256: $APK_SHA"
+          echo "AAB cert SHA-256: $AAB_SHA"
+          [ "$APK_SHA" = "$AAB_SHA" ] || { echo "::error::AAB and APK are signed by different certificates"; exit 1; }
+          if [ -n "$EXPECTED" ]; then
+            WANT=$(echo "$EXPECTED" | tr -d ': ' | tr 'a-f' 'A-F')
+            [ "$WANT" = "$APK_SHA" ] || { echo "::error::Certificate does not match DEEPFOCUS_EXPECTED_CERT_SHA256"; exit 1; }
+            echo "Certificate matches the pinned fingerprint."
           fi
-          cd ..
+          {
+            echo "### Signing: \`$SIGNING_MODE\`"
+            echo "Certificate SHA-256: \`$APK_SHA\`"
+            if [ "$SIGNING_MODE" = "ci-throwaway" ]; then
+              echo "**Throw-away key: do NOT upload this AAB to Google Play.**"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: 📤 Upload Production AAB Artifact
+      - name: Remove signing material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/signing.jks"
+
+      - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: deep-focus-production-aab
+          name: deep-focus-aab-${{ steps.signing.outputs.mode }}
           path: android/app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
           retention-days: 30
 
-      - name: 📤 Upload Production APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: deep-focus-production-apk
+          name: deep-focus-apk-${{ steps.signing.outputs.mode }}
           path: android/app/build/outputs/apk/release/*.apk
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
 
-      - name: 🚀 Publish Official GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+  publish-release:
+    name: Publish GitHub Release (tags only)
+    needs: build-production-bundle
+    if: startsWith(github.ref, 'refs/tags/v') && needs.build-production-bundle.outputs.signing_mode == 'upload-key'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: deep-focus-*-upload-key
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
         with:
           files: |
-            android/app/build/outputs/bundle/release/*.aab
-            android/app/build/outputs/apk/release/*.apk
+            dist/*.aab
+            dist/*.apk
           name: Release ${{ github.ref_name }}
           body: |
-            ## DEEP FOCUS Sovereign Study OS
-            - Release Tag: ${{ github.ref_name }}
-            - 100% Offline-First (Zero PII, Pure Web Audio DSP, Zero Music)
+            Deep Focus ${{ github.ref_name }}
+            - 100% offline, no INTERNET permission, zero PII
+            - Signed with the upload key (certificate verified in CI)
           draft: false
           prerelease: false
