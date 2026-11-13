@@ -1,3 +1,51 @@
+/* === Deep Focus F3 MutationObserver 120Hz Coalescing Shield === */
+(function() {
+  if (typeof window === "undefined" || window.__DF_MUTATION_SHIELD__ || typeof window.MutationObserver !== "function") return;
+  window.__DF_MUTATION_SHIELD__ = true;
+  const NativeMO = window.MutationObserver;
+  window.MutationObserver = function(callback) {
+    if (typeof callback !== "function") return new NativeMO(callback);
+    let pending = false;
+    let queued = [];
+    let isSecurityObserver = false;
+    const wrapped = function(mutations, obs) {
+      if (isSecurityObserver) {
+        return callback.call(this, mutations, obs);
+      }
+      if (Array.isArray(mutations)) {
+        for (let i = 0; i < mutations.length; i++) queued.push(mutations[i]);
+      }
+      if (pending) return;
+      pending = true;
+      const flush = () => {
+        pending = false;
+        const batch = queued;
+        queued = [];
+        try {
+          callback.call(obs, batch, obs);
+        } catch (e) {
+          if (window.__dfRecordError) window.__dfRecordError("mutationBatch", e);
+        }
+      };
+      if (typeof requestAnimationFrame === "function") {
+        requestAnimationFrame(() => setTimeout(flush, 40));
+      } else {
+        setTimeout(flush, 60);
+      }
+    };
+    const instance = new NativeMO(wrapped);
+    const origObserve = instance.observe.bind(instance);
+    instance.observe = function(target, options) {
+      if (options && Array.isArray(options.attributeFilter)) {
+        isSecurityObserver = true;
+      }
+      return origObserve(target, options);
+    };
+    return instance;
+  };
+  window.MutationObserver.prototype = NativeMO.prototype;
+})();
+
 /* === Deep Focus F2 Zero-Oscillator Shield (CC0 .ogg Audio Only) === */
 (function() {
   if (typeof globalThis !== "undefined" && globalThis.__dfNoopOsc) return;
