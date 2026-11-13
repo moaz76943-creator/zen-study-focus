@@ -65,6 +65,9 @@ async function flows(b, base) {
   await p.reload(); await p.waitForTimeout(1500);
   const dir = await p.evaluate(() => ({ lang: cfg.lang, dir: document.documentElement.dir }));
   if (dir.lang !== 'ar' || dir.dir !== 'rtl') fail('flows: language/direction not restored: ' + JSON.stringify(dir));
+  const san = await p.evaluate(() => dfSanitizeHtmlFragment('<p onclick="x()">Hi</p><scr<script>ipt>bad()</script><a href="java\nscript:alert(1)">a</a><img src=x onerror=alert(1)><b>ok</b>'));
+  const reparsed = await p.evaluate((h) => { const t = document.createElement('template'); t.innerHTML = h; return { scripts: t.content.querySelectorAll('script,iframe,object,embed').length, handlers: [...t.content.querySelectorAll('*')].filter((e) => [...e.attributes].some((a) => /^on/i.test(a.name) || /^\s*(javascript|data):/i.test(a.value.replace(/[\s\u0000-\u001f]+/g, '')))).length, ok: !!t.content.querySelector('b') }; }, san);
+  if (reparsed.scripts || reparsed.handlers || !reparsed.ok) fail('flows: sanitizer output unsafe or too aggressive: ' + san);
   if (errs.length) fail('flows: page errors: ' + errs.slice(0, 3).join(' | '));
   await ctx.close();
 }
