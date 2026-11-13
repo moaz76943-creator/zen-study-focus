@@ -9,12 +9,12 @@
     const textNodes = document.querySelectorAll('svg text, svg tspan');
     textNodes.forEach(node => {
       if (node.textContent && (node.textContent.includes('&amp;') || node.textContent.includes('&quot;'))) {
+        // Single-pass decode (textContent only, never HTML): avoids double-unescaping "&amp;lt;".
         node.textContent = node.textContent
           .replace(/&amp;quot;/g, '"')
-          .replace(/&quot;/g, '"')
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>');
+          .replace(/&(quot|amp|lt|gt);/g, function (m, name) {
+            return { quot: '"', amp: '&', lt: '<', gt: '>' }[name];
+          });
       }
     });
   }
