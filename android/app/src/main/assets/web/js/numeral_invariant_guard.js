@@ -4,19 +4,23 @@
  */
 (function (global) {
   'use strict';
-  const TO_LATIN = Object.freeze({
-    '0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9',
-    '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9',
-    // Devanagari (Hindi/Marathi/Nepali) and Bengali display-only digits.
-    '०':'0','१':'1','२':'2','३':'3','४':'4','५':'5','६':'6','७':'7','८':'8','९':'9',
-    '০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9'
-  });
-  const REPLACE_DIGITS = /[0-9۰-۹०-९০-৯]/g;
-  const HAS_NON_LATIN_DIGITS = /[0-9۰-۹०-९০-৯]/; // Never use a global regex with test().
+  // Digit blocks (all written as escapes so no text-normalising tool can collapse them):
+  // Arabic-Indic U+0660, Persian U+06F0, Devanagari U+0966, Bengali U+09E6.
+  const BLOCKS = [0x0660, 0x06F0, 0x0966, 0x09E6];
+  const NON_LATIN_CLASS = '\\u0660-\\u0669\\u06F0-\\u06F9\\u0966-\\u096F\\u09E6-\\u09EF';
+  const REPLACE_DIGITS = new RegExp('[' + NON_LATIN_CLASS + ']', 'g');
+  const HAS_NON_LATIN_DIGITS = new RegExp('[' + NON_LATIN_CLASS + ']'); // Never use a global regex with test().
+  function toLatinDigit(char) {
+    const code = char.charCodeAt(0);
+    for (let i = 0; i < BLOCKS.length; i++) {
+      if (code >= BLOCKS[i] && code <= BLOCKS[i] + 9) return String(code - BLOCKS[i]);
+    }
+    return char;
+  }
 
   function sanitizeToWesternDigits(value) {
     const text = typeof value === 'string' ? value : String(value);
-    return text.replace(REPLACE_DIGITS, char => TO_LATIN[char]);
+    return text.replace(REPLACE_DIGITS, toLatinDigit);
   }
 
   // System-generated values only. Do not apply these functions to note/task input.
