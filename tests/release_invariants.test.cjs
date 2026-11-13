@@ -52,3 +52,12 @@ test('CSP forbids plugins, base-uri, forms and frames', () => {
   const h = read('android/app/src/main/assets/web/index.html');
   for (const d of ["object-src 'none'", "base-uri 'none'", "form-action 'none'", "frame-src 'none'"]) assert.ok(h.includes(d), d);
 });
+
+test('studio panels are responsive and carry no internal project labels', () => {
+  const app = read('android/app/src/main/assets/web/app.js');
+  const html = read('android/app/src/main/assets/web/index.html');
+  assert.ok(!/(textContent|showToast\(|innerHTML)[^\n]*Master Pillar \d/.test(app), 'internal "Master Pillar" label visible to users');
+  assert.ok(!/grid-template-columns:minmax\(180px, 1fr\) minmax\(260px, 2fr\)/.test(app), 'fixed-width Cornell grid overflows at 320px');
+  assert.ok(!/repeat\(4,minmax\(70px,1fr\)\)/.test(app), 'fixed 4-column KPI grid overflows at 320px');
+  assert.match(html, /\.df-white-premium div \{ flex-wrap: wrap !important; \}/);
+});
