@@ -1164,3 +1164,12 @@ require("../android/app/src/main/assets/web/modules/qa/sovereign_audio_link_audi
 
 // Task #827: Offline Zero-PII & Zero-Medical-Term Compliance Gate
 require("../android/app/src/main/assets/web/modules/qa/sovereign_compliance_gate_827.js").runComplianceGate(process.cwd());
+
+// Task #828: Runtime Error Shield Verification
+(function () {
+  require("../android/app/src/main/assets/web/modules/qa/sovereign_runtime_shield_828.js");
+  if (!global.SovereignRuntimeShield || global.SovereignRuntimeShield.safeRun(() => { throw new Error("test"); }, "ok") !== "ok") {
+    throw new Error("SovereignRuntimeShield.safeRun failed");
+  }
+  console.log("✅ PASS: Global WebView Runtime Error Shield Verified (#828)");
+})();
