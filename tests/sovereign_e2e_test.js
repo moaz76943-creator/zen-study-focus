@@ -1146,3 +1146,6 @@ console.log('✅ PASS: Sovereign Academic Exporter Verified (#803)');
 console.log('✅ PASS: Phase 6 Golden Seal & Sovereignty Audit Verified (#805)');
 
 console.log("==================================================================");
+
+// Task #822: Permanent 20-Language Parity & Leak Gate
+require("../android/app/src/main/assets/web/modules/qa/sovereign_i18n_permanent_gate.js").runPermanentI18nAndAssetGate(process.cwd());
