@@ -163,7 +163,7 @@ test('actual app language switch keeps v21 values and reopens saved offline loca
       L:()=>({sub:'Focus'}),renderAnalyticsBars:noop,localizeStarterPreviews:noop,
       syncHeaderMetrics:noop,updateTimerDisplay:noop,renderTasksList:noop,
       renderCalendar:noop,renderNotesStack:noop,renderSoundsStudio:noop,
-      updateSyllabusCalc:noop,closeModal:noop,quickL10n:noop
+      updateSyllabusCalc:noop,closeModal:noop,quickL10n:noop,dfSyncInfiniteLocaleRegistry:noop,dfGetLocalizedText:noop,toWest:noop,dfIsRtlLocale:(c)=>['ar','fa','ur'].includes(String(c).split('-')[0]),dfIsExcludedLocale:noop
     };
     vm.createContext(sandbox);
     vm.runInContext(realFn+'\nthis.applyLanguage=applyLanguage;',sandbox);
