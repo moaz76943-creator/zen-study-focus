@@ -1,3 +1,23 @@
+/* === Deep Focus F2 Zero-Oscillator Shield (CC0 .ogg Audio Only) === */
+(function() {
+  if (typeof globalThis !== "undefined" && globalThis.__dfNoopOsc) return;
+  const noopParam = () => ({ value: 0, setValueAtTime(){}, exponentialRampToValueAtTime(){}, linearRampToValueAtTime(){}, setTargetAtTime(){} });
+  globalThis.__dfNoopOsc = function() {
+    return {
+      type: "sine",
+      frequency: noopParam(),
+      detune: noopParam(),
+      connect(dest) { return dest || this; },
+      disconnect() {},
+      start() {},
+      stop() {},
+      addEventListener() {},
+      removeEventListener() {},
+      onended: null
+    };
+  };
+})();
+
 /* === Deep Focus F3 MutationObserver 120Hz Coalescing Shield === */
 (function() {
   if (typeof window === "undefined" || window.__DF_MUTATION_SHIELD__ || typeof window.MutationObserver !== "function") return;
