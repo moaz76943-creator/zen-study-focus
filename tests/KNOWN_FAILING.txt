@@ -4,7 +4,6 @@ test/golden_flow_06_arabic_rtl_destinations.test.js
 test/localization_fallback_guard.test.js
 test/runtime_activator_integration.test.js
 tests/accessibility/locale_button_name.test.cjs
-tests/critical_room7/m293_example_tray_html_safety.test.cjs
 tests/critical_room7/w03_contract.test.cjs
 tests/df_lane03_core_shell_locale.test.cjs
 tests/global_i18n_engine.test.js
@@ -12,9 +11,6 @@ tests/i18n/analytics/analytics_studio_i18n.test.cjs
 tests/i18n/core_authored_digit_integrity.test.cjs
 tests/i18n/tasks/tasks_studio_i18n.test.cjs
 tests/i18n/visual/rtl_typography_numerals.test.cjs
-tests/integration_quality/immutable_package_id.test.cjs
-tests/integration_quality/verified_legacy_save.test.cjs
-tests/regression_v21/qa_baseline_guards.test.cjs
 tests/runtime_activator/studio_runtime_user_text.test.cjs
 tests/termux_fix01_consent_kickstart_digits.test.cjs
 tests/termux_fix02_locale_ui.test.cjs
