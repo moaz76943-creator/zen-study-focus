@@ -9,9 +9,7 @@
     @android.webkit.JavascriptInterface <methods>;
 }
 
-# Keep Manifest-declared receivers, widgets, and Quick Settings tile
+# Keep Manifest-declared receivers
 -keep class com.zenstudy.focus.FocusAlarmReceiver { *; }
--keep class com.zenstudy.focus.widget.** { *; }
--keep class com.zenstudy.focus.ZenFocusTileService { *; }
 -keep class com.zenstudy.focus.NativeCsvWriter { *; }
 -keep class com.zenstudy.focus.NativeLocaleStrings { *; }
