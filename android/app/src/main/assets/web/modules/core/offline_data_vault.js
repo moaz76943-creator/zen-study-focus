@@ -69,25 +69,48 @@
             if (typeof navigator !== "undefined" && navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(30) : false); } catch (e) {}
         },
 
+        // Validate everything first, then write; on any failure restore every key to its previous value.
         importBackupJSON: function (jsonString) {
             if (typeof window === "undefined" || !window.localStorage) return false;
-
+            const MAX_BYTES = 2 * 1024 * 1024;
+            const previous = {};
+            let touched = [];
             try {
-                const parsed = JSON.parse(jsonString);
-                if (parsed.app !== "DEEP_FOCUS" || !parsed.data) {
+                if (typeof jsonString !== "string" || jsonString.length > MAX_BYTES) {
+                    throw new Error("Backup missing or too large.");
+                }
+                const parsed = JSON.parse(jsonString, function (k, v) {
+                    return (k === "__proto__" || k === "constructor" || k === "prototype") ? undefined : v;
+                });
+                if (!parsed || parsed.app !== "DEEP_FOCUS" || !parsed.data || typeof parsed.data !== "object" || Array.isArray(parsed.data)) {
                     throw new Error("Invalid backup signature or missing payload.");
                 }
-
-                Object.keys(parsed.data).forEach(key => {
+                const entries = [];
+                Object.keys(parsed.data).forEach(function (key) {
+                    // Only the keys this vault exports may be restored; anything else is rejected.
+                    if (VAULT_KEYS.indexOf(key) === -1) throw new Error("Backup contains a key that is not allowed: " + key);
                     const val = parsed.data[key];
                     const serialized = typeof val === "string" ? val : JSON.stringify(val);
-                    localStorage.setItem(key, serialized);
+                    if (typeof serialized !== "string" || serialized.length > 1024 * 1024) throw new Error("Invalid value for " + key);
+                    try { JSON.parse(serialized); } catch (_) { if (typeof val !== "string") throw new Error("Invalid JSON for " + key); }
+                    entries.push([key, serialized]);
                 });
-
+                entries.forEach(function (e) { previous[e[0]] = localStorage.getItem(e[0]); });
+                entries.forEach(function (e) {
+                    localStorage.setItem(e[0], e[1]);
+                    touched.push(e[0]);
+                    if (localStorage.getItem(e[0]) !== e[1]) throw new Error("Write not verified for " + e[0]);
+                });
                 console.log("[OfflineDataVault] Data restored successfully!");
                 if (typeof navigator !== "undefined" && navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([40, 30, 40]) : false); } catch (e) {}
                 return true;
             } catch (err) {
+                touched.forEach(function (key) {
+                    try {
+                        if (previous[key] === null || previous[key] === undefined) localStorage.removeItem(key);
+                        else localStorage.setItem(key, previous[key]);
+                    } catch (_) { /* best-effort rollback */ }
+                });
                 console.error("[OfflineDataVault] Import validation failed:", err);
                 return false;
             }

@@ -1,8 +1,11 @@
 /**
- * DEEP FOCUS — Tamper-Proof Integrity & Cryptographic Guard Engine
+ * DEEP FOCUS — Accidental-corruption detector for a few cache records.
  * Module: modules/security/tamper_proof_integrity_guard.js
- * Version: v488.0.0
- * Architecture: Web Crypto API SHA-256 Checksums + Corruption Rollback
+ * HONEST SCOPE: the checksum lives in the same localStorage as the data, so this detects accidental
+ * corruption only. It is NOT tamper-proofing and is not authentication. A mismatch is recorded in
+ * `mismatches` and the damaged raw value is copied to a bounded quarantine key before the baseline
+ * is refreshed; it never claims to have repaired data. Verification errors fail CLOSED (false).
+ * The user's real data (zen_fortress_*_v21) is protected by the packet+mirror scheme in app.js.
  * Compliance: 100% Offline, Zero PII, Strict Western Digits (0-9).
  */
 
@@ -36,12 +39,13 @@
 
     const TamperProofIntegrityGuard = {
         isGuarded: false,
+        mismatches: [],
 
         init: function () {
             if (typeof window === "undefined" || this.isGuarded) return;
             this.verifyAllProtectedRecords();
             this.isGuarded = true;
-            console.log("[IntegrityGuard] Active with SHA-256 tamper-proof validation.");
+            console.log("[IntegrityGuard] Active (accidental-corruption detection only).");
         },
 
         async signRecord(key, rawData) {
@@ -78,7 +82,8 @@
                 }
                 return true;
             } catch (e) {
-                return true;
+                // Fail closed: if integrity cannot be verified, do not report the record as healthy.
+                return false;
             }
         },
 
@@ -87,8 +92,12 @@
             for (const key of keys) {
                 const valid = await this.verifyRecord(key);
                 if (!valid) {
-                    console.log("[IntegrityGuard] Repaired corrupted record baseline for:", key);
                     const raw = localStorage.getItem(key);
+                    this.mismatches.push({ key: key, at: Date.now() });
+                    try {
+                        // Keep the mismatching value for diagnosis before accepting it as the new baseline.
+                        if (raw && raw.length <= 400000) localStorage.setItem("df_quarantine_" + key, raw);
+                    } catch (_) { /* quarantine is best effort */ }
                     if (raw) await this.signRecord(key, raw);
                 }
             }
