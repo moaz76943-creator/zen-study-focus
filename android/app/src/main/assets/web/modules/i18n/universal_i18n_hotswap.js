@@ -160,8 +160,8 @@
   function toWesternDigits(str) {
     if (typeof str !== "string") return str;
     return str
-      .replace(/[٠-٩]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); })
-      .replace(/[۰-۹]/g, function (d) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)); });
+      .replace(/[\u0660-\u0669]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)); });
   }
 
   var UniversalI18nHotSwap = {
@@ -324,7 +324,7 @@
           } else if (stl.indexOf("recorded minutes / 7 days") !== -1 && dict.ui_recorded_7d) {
             sn.textContent = st.replace(/recorded minutes \/ 7 days/i, dict.ui_recorded_7d);
           }
-          sn.textContent = sn.textContent.replace(/[٠-٩]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); });
+          sn.textContent = sn.textContent.replace(/[\u0660-\u0669]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); });
         }
       }
 
