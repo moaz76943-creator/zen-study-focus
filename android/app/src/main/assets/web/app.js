@@ -898,6 +898,17 @@ function computeHash(str) {
   return (h >>> 0).toString(16);
 }
 
+// Local calendar-day helpers: a user's "day" is their local day, never the UTC day.
+function dfLocalDayKey(value) {
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const d = value instanceof Date ? value : new Date(value);
+  if (isNaN(d.getTime())) return '';
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function dfParseDayKey(key) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(key));
+  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 12, 0, 0, 0) : new Date(NaN);
+}
 // Data schema guard: the app understands v21 packets. If a newer build ever wrote a higher schema
 // (user downgraded the app), writing with this older code could destroy data it cannot read, so
 // the storage layer turns read-only instead of overwriting.
@@ -37493,7 +37504,7 @@ window.dfCalculateNextSRS = function(card, rating) {
     reps: reps,
     interval: Math.max(1, interval),
     easeFactor: parseFloat(easeFactor.toFixed(2)),
-    dueDate: nextReviewDate.toISOString().split("T")[0]
+    dueDate: dfLocalDayKey(nextReviewDate)
   };
 };
 
@@ -37604,18 +37615,18 @@ window.dfStopThrottledTimer = function() {
    ========================================================== */
 window.dfCalculateDailyStreak = function(sessions) {
   if (!Array.isArray(sessions) || sessions.length === 0) return { currentStreak: 0, longestStreak: 0 };
-  const dates = [...new Set(sessions.map(s => s.date || (s.timestamp ? s.timestamp.split("T")[0] : null)).filter(Boolean))].sort().reverse();
+  const dates = [...new Set(sessions.map(s => s.date || (s.timestamp ? dfLocalDayKey(s.timestamp) : null)).filter(Boolean))].sort().reverse();
   if (dates.length === 0) return { currentStreak: 0, longestStreak: 0 };
 
   let currentStreak = 0;
-  const today = new Date().toISOString().split("T")[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+  const today = dfLocalDayKey(new Date());
+  const yesterday = dfLocalDayKey(new Date(Date.now() - 86400000));
 
   let checkDate = dates[0] === today ? today : (dates[0] === yesterday ? yesterday : null);
   if (checkDate) {
-    let d = new Date(checkDate);
+    let d = dfParseDayKey(checkDate);
     for (const dateStr of dates) {
-      if (dateStr === d.toISOString().split("T")[0]) {
+      if (dateStr === dfLocalDayKey(d)) {
         currentStreak++;
         d.setDate(d.getDate() - 1);
       } else {
@@ -37828,7 +37839,7 @@ if (typeof window !== "undefined") {
    ========================================================== */
 window.dfBuildDailyReviewQueue = function(cardsList) {
   if (!Array.isArray(cardsList) || cardsList.length === 0) return [];
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = dfLocalDayKey(new Date());
 
   const dueCards = [];
   const newCards = [];
@@ -38515,7 +38526,7 @@ window.dfParseCardsFromText = function(rawText) {
           reps: 0,
           interval: 0,
           easeFactor: 2.5,
-          dueDate: new Date().toISOString().split("T")[0]
+          dueDate: dfLocalDayKey(new Date())
         });
       }
     }
@@ -38605,7 +38616,7 @@ window.dfGenerateYearlyHeatmapSVG = function(sessionsList) {
   const sessions = Array.isArray(sessionsList) ? sessionsList : [];
   const dayMap = {};
   sessions.forEach(s => {
-    const d = s.date || (s.timestamp ? s.timestamp.split("T")[0] : null);
+    const d = s.date || (s.timestamp ? dfLocalDayKey(s.timestamp) : null);
     if (d) dayMap[d] = (dayMap[d] || 0) + (s.durationMinutes || Math.floor((s.durationSeconds || 0) / 60));
   });
 
@@ -38620,7 +38631,7 @@ window.dfGenerateYearlyHeatmapSVG = function(sessionsList) {
   for (let w = 0; w < 52; w++) {
     for (let d = 0; d < 7; d++) {
       const currentCellDate = new Date(oneYearAgo.getTime() + ((w * 7 + d) * 86400000));
-      const dateKey = currentCellDate.toISOString().split("T")[0];
+      const dateKey = dfLocalDayKey(currentCellDate);
       const minutes = dayMap[dateKey] || 0;
 
       let colorIdx = 0;
@@ -38685,12 +38696,12 @@ window.dfDetectPeakFocusHours = function(sessionsList) {
    ========================================================== */
 window.dfGetDailyGoalProgress = function(targetMinutes, todaySessionsList) {
   const target = targetMinutes || (window.dfSafeGetStorage ? window.dfSafeGetStorage("df_daily_goal_mins", 120) : 120);
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = dfLocalDayKey(new Date());
   const sessions = Array.isArray(todaySessionsList) ? todaySessionsList : [];
 
   let todayMins = 0;
   sessions.forEach(s => {
-    const d = s.date || (s.timestamp ? s.timestamp.split("T")[0] : null);
+    const d = s.date || (s.timestamp ? dfLocalDayKey(s.timestamp) : null);
     if (d === todayStr) {
       todayMins += (s.durationMinutes || Math.floor((s.durationSeconds || 0) / 60));
     }
@@ -38941,7 +38952,7 @@ window.dfDecompressDeckPayload = function(compressedBase64) {
       reps: 0,
       interval: 0,
       easeFactor: 2.5,
-      dueDate: new Date().toISOString().split("T")[0]
+      dueDate: dfLocalDayKey(new Date())
     }));
   } catch (e) {
     console.error("[DEEP FOCUS P2P] Decompression failed:", e.message);
@@ -39263,7 +39274,7 @@ window.dfCalculateFSRS = function(card, rating, targetRetention) {
     stability: parseFloat(stability.toFixed(2)),
     difficulty: parseFloat(difficulty.toFixed(2)),
     interval: intervalDays,
-    dueDate: nextDueDate.toISOString().split("T")[0]
+    dueDate: dfLocalDayKey(nextDueDate)
   };
 };
 
@@ -40122,7 +40133,7 @@ if (typeof window !== "undefined" && window.dfSafeGetStorage) {
    Exposes high-speed JSON payload for Android App Widgets
    ========================================================== */
 window.dfGetAndroidWidgetSnapshot = function() {
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = dfLocalDayKey(new Date());
   const sessions = window.dfSafeGetStorage ? window.dfSafeGetStorage("df_sessions", []) : [];
   let todayMins = 0;
   sessions.forEach(s => {
@@ -40349,7 +40360,7 @@ window.dfSimulateFullDaySession = function() {
     simulatedSessions.push({
       id: "sim_" + s,
       durationMinutes: 25,
-      date: new Date().toISOString().split("T")[0],
+      date: dfLocalDayKey(new Date()),
       timestamp: new Date().toISOString()
     });
   }
@@ -40781,15 +40792,15 @@ window.dfGetCalibratedExactSeconds = function(startEpochMs) {
 window.dfPartitionMidnightSession = function(startEpochMs, durationSeconds) {
   const startDate = new Date(startEpochMs);
   const endDate = new Date(startEpochMs + (durationSeconds * 1000));
-  const startDay = startDate.toISOString().split("T")[0];
-  const endDay = endDate.toISOString().split("T")[0];
+  const startDay = dfLocalDayKey(startDate);
+  const endDay = dfLocalDayKey(endDate);
 
   if (startDay === endDay) {
     return [{ date: startDay, durationMinutes: Math.floor(durationSeconds / 60) }];
   }
 
   // Cross-midnight split calculation
-  const midnightEpoch = new Date(startDay + "T23:59:59.999Z").getTime();
+  const midnightEpoch = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 23, 59, 59, 999).getTime();
   const day1Seconds = Math.max(0, Math.floor((midnightEpoch - startEpochMs) / 1000));
   const day2Seconds = Math.max(0, durationSeconds - day1Seconds);
 
@@ -41911,7 +41922,7 @@ window.dfGetSector7AndroidSeal = function() {
 window.dfSmoothOverdueBacklog = function(cardsList, maxDailyQuota) {
   if (!Array.isArray(cardsList)) return cardsList;
   const quota = maxDailyQuota || 30; // Max comfortable daily review intake
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = dfLocalDayKey(new Date());
 
   const overdue = cardsList.filter(c => c.dueDate && c.dueDate < todayStr);
   if (overdue.length <= quota) return cardsList;
@@ -41925,7 +41936,7 @@ window.dfSmoothOverdueBacklog = function(cardsList, maxDailyQuota) {
     if (dayOffset > 0) {
       const targetDate = new Date();
       targetDate.setDate(targetDate.getDate() + dayOffset);
-      card.dueDate = targetDate.toISOString().split("T")[0];
+      card.dueDate = dfLocalDayKey(targetDate);
     }
   });
 
@@ -42011,7 +42022,7 @@ window.dfCompressScheduleForExam = function(cardsList, targetExamDateISO) {
       if (cardDueEpoch >= examEpoch) {
         const compressedDays = Math.max(1, Math.floor(Math.random() * maxAvailableDays));
         const newDue = new Date(nowEpoch + (compressedDays * 86400000));
-        card.dueDate = newDue.toISOString().split("T")[0];
+        card.dueDate = dfLocalDayKey(newDue);
       }
     }
   });
@@ -42084,7 +42095,7 @@ window.DF_SAME_DAY_REVIEW_CACHE = {};
 
 window.dfDetectSameDayOverlearning = function(cardId) {
   if (!cardId) return false;
-  const today = new Date().toISOString().split("T")[0];
+  const today = dfLocalDayKey(new Date());
   const key = cardId + "_" + today;
   window.DF_SAME_DAY_REVIEW_CACHE[key] = (window.DF_SAME_DAY_REVIEW_CACHE[key] || 0) + 1;
 
@@ -42381,7 +42392,7 @@ window.dfRunSilentBootRepair = async function() {
       const deckStore = tx.objectStore("decks");
 
       let repairedCount = 0;
-      const today = new Date().toISOString().split("T")[0];
+      const today = dfLocalDayKey(new Date());
 
       const req = cardStore.openCursor();
       req.onsuccess = (e) => {
@@ -68345,11 +68356,14 @@ window.dfBroadcastSilentFocusPresence = function(memberId, status, nickname) {
   const id = String(memberId || 'm1');
   const st = String(status || 'FOCUSING');
   const nick = String(nickname || 'Scholar');
+  // No network layer exists: nothing is broadcast to other devices.
   return {
     memberId: id,
     status: st,
     nickname: nick,
-    broadcasted: true,
+    broadcasted: false,
+    supported: false,
+    reason: 'no_network_offline_app',
     timestamp: Date.now()
   };
 };
@@ -68359,8 +68373,10 @@ window.dfEnforceGroupStrictShieldPact = function(enabled) {
   const pod = StudyPodEngine.getActivePod();
   if (pod) pod.strictPact = en;
   return {
-    groupShieldPact: true,
-    lock: true,
+    groupShieldPact: false,
+    lock: false,
+    supported: false,
+    reason: 'no_network_offline_app',
     strictMode: en,
     peersCommitted: pod && pod.members ? pod.members.length : 1
   };
@@ -68471,26 +68487,12 @@ window.dfPreviewPeerSharedDeckMetadata = function(title, count, author) {
   };
 };
 
-window.dfImportPeerDeckWithFreshFsrs = function(cardCount, deckData) {
-  const cnt = Number(cardCount) || 10;
-  return {
-    importedWithFreshState: cnt,
-    stability: 0.4,
-    difficulty: 5.0,
-    initialReviewPending: cnt,
-    userHistoryPreserved: true
-  };
+window.dfImportPeerDeckWithFreshFsrs = function() {
+  return { supported: false, imported: 0, reason: 'not_implemented' };
 };
 
-window.dfCollaborativeDeckMergeDiff = function(existing, incoming) {
-  const a = Number(existing) || 20;
-  const b = Number(incoming) || 8;
-  return {
-    mergedCount: a + b,
-    duplicatesFiltered: 0,
-    addedNewCards: b,
-    existingProgressIntact: true
-  };
+window.dfCollaborativeDeckMergeDiff = function() {
+  return { supported: false, mergedCount: 0, reason: 'not_implemented' };
 };
 
 window.dfShareMockExamTemplateToPod = function(examId, title) {
@@ -68516,36 +68518,12 @@ window.dfCompareAnonymousPodExamScores = function(scoresList) {
   };
 };
 
-window.dfGenerateMultiPartQrCarousel = function(chunkCount, rawData) {
-  const c = Math.max(1, Math.min(10, Number(chunkCount) || 3));
-  const frames = [];
-  for (let i = 0; i < c; i++) {
-    const frameData = 'DF_QR_PART:' + (i + 1) + '/' + c + ':CHUNK_DATA_' + (i + 1);
-    frames.push({
-      frameIdx: i + 1,
-      totalFrames: c,
-      qrSvg: StudyPodEngine.generateSvgQrCode(frameData, 140)
-    });
-  }
-  return {
-    totalQrFrames: c,
-    frames: frames,
-    active: true,
-    fps: 2
-  };
+window.dfGenerateMultiPartQrCarousel = function() {
+  return { supported: false, frames: [], active: false, reason: 'not_implemented' };
 };
 
-window.dfScanAnimatedQrCarouselStream = function(received, total, chunk) {
-  const r = Number(received) || 1;
-  const t = Math.max(1, Number(total) || 1);
-  const pct = Math.round((r / t) * 100);
-  return {
-    progressPct: pct,
-    receivedCount: r,
-    totalExpected: t,
-    isComplete: r >= t,
-    reassembledData: r >= t ? 'FULL_PAYLOAD_DECODED' : null
-  };
+window.dfScanAnimatedQrCarouselStream = function() {
+  return { supported: false, isComplete: false, reassembledData: null, reason: 'not_implemented' };
 };
 
 window.dfGetMilestoneM8477PeerExchangeSeal = function() {
@@ -69014,12 +68992,12 @@ window.dfRenderMasterPillar8StudioDom = function(containerId) {
     statusBadge.style.background = '#f1f5f9';
     statusBadge.style.color = '#475569';
     statusBadge.style.border = '1px solid #cbd5e1';
-    statusBadge.textContent = '📡 Local LAN Offline Ready';
+    statusBadge.textContent = '📴 This device only — no network';
   }
 
   const driftBadge = document.createElement('span');
   driftBadge.style.cssText = 'font-size:11px;font-weight:800;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;padding:4px 10px;border-radius:999px;';
-  driftBadge.textContent = '⏱️ <50ms Drift Tolerance';
+  driftBadge.textContent = '🔒 Nothing leaves your phone';
 
   hdrBadges.appendChild(statusBadge);
   hdrBadges.appendChild(driftBadge);
@@ -69479,7 +69457,7 @@ window.dfRenderMasterPillar8StudioDom = function(containerId) {
 
     const desc = document.createElement('div');
     desc.style.cssText = 'font-size:12px;color:#475569;line-height:1.45;';
-    desc.textContent = 'Share flashcard decks and Cornell notes with peers on your local network. All incoming payloads pass strict Zero-XSS sanitization before preview or import.';
+    desc.textContent = 'Deep Focus has no network access, so decks are not sent to other phones automatically. Generate a share package here, then pass it on yourself (for example as a file or message). Any package you import is sanitized first.';
     box.appendChild(desc);
 
     const shareCard = document.createElement('div');
@@ -69502,13 +69480,7 @@ window.dfRenderMasterPillar8StudioDom = function(containerId) {
     pkgBtn.style.cssText = 'padding:8px 14px;border-radius:10px;border:none;background:#2563eb;color:#ffffff;font-size:11px;font-weight:800;cursor:pointer;';
     pkgBtn.textContent = '✨ Generate Share Package';
 
-    const qrCarouselBtn = document.createElement('button');
-    qrCarouselBtn.type = 'button';
-    qrCarouselBtn.style.cssText = 'padding:8px 14px;border-radius:10px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:800;cursor:pointer;';
-    qrCarouselBtn.textContent = '📲 Multi-Frame QR Carousel';
-
     btnRow.appendChild(pkgBtn);
-    btnRow.appendChild(qrCarouselBtn);
     shareCard.appendChild(sTitle);
     shareCard.appendChild(dInp);
     shareCard.appendChild(btnRow);
@@ -69522,29 +69494,6 @@ window.dfRenderMasterPillar8StudioDom = function(containerId) {
       const audit = window.dfVerifyIncomingDeckSanitized(res.payload);
       outBox.style.display = 'block';
       outBox.textContent = '✓ Deck Packaged (' + res.cards + ' cards). Security audit: Zero-XSS ' + (audit.safe ? 'PASSED ✓' : 'FAILED') + '. Hash: ' + res.hash;
-    };
-
-    qrCarouselBtn.onclick = function() {
-      const carousel = window.dfGenerateMultiPartQrCarousel(3);
-      outBox.style.display = 'block';
-      outBox.textContent = '';
-      const cTitle = document.createElement('div');
-      cTitle.style.cssText = 'font-weight:800;margin-bottom:6px;';
-      cTitle.textContent = 'Animated QR Carousel (3 Frames for Offline Transfer):';
-      outBox.appendChild(cTitle);
-      const frameWrap = document.createElement('div');
-      frameWrap.style.cssText = 'display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;';
-      carousel.frames.forEach(function(f) {
-        const item = document.createElement('div');
-        item.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
-        item.innerHTML = f.qrSvg;
-        const lbl = document.createElement('span');
-        lbl.style.cssText = 'font-size:9px;font-weight:700;color:#64748b;';
-        lbl.textContent = 'Part ' + f.frameIdx + ' / ' + f.totalFrames;
-        item.appendChild(lbl);
-        frameWrap.appendChild(item);
-      });
-      outBox.appendChild(frameWrap);
     };
 
     box.appendChild(shareCard);
@@ -80040,14 +79989,14 @@ window.SovereignSRS = (function() {
             repetitions: repetitions,
             interval: interval,
             easeFactor: parseFloat(easeFactor.toFixed(2)),
-            dueDate: nextDate.toISOString().split("T")[0],
+            dueDate: dfLocalDayKey(nextDate),
             lastReviewed: new Date().toISOString()
         };
     }
 
     // Default academic starter flashcards
     function getStarterDeck() {
-        const today = new Date().toISOString().split("T")[0];
+        const today = dfLocalDayKey(new Date());
         return [
             {
                 id: "card_01",
@@ -80082,7 +80031,7 @@ window.SovereignSRS = (function() {
     // Get cards scheduled for review today or overdue
     function getDueCards() {
         const decks = loadDecks();
-        const today = new Date().toISOString().split("T")[0];
+        const today = dfLocalDayKey(new Date());
         return decks.filter(c => !c.dueDate || c.dueDate <= today);
     }
 
@@ -80111,7 +80060,7 @@ window.SovereignSRS = (function() {
             repetitions: 0,
             interval: 1,
             easeFactor: 2.5,
-            dueDate: new Date().toISOString().split("T")[0]
+            dueDate: dfLocalDayKey(new Date())
         };
         decks.push(newCard);
         saveDecks(decks);
@@ -81771,7 +81720,7 @@ window.SovereignHeatmap = (function() {
         const now = new Date();
         for (let i = 0; i < 182; i++) {
             const d = new Date(now.getTime() - i * 86400000);
-            const key = d.toISOString().split("T")[0];
+            const key = dfLocalDayKey(d);
             // Deterministic activity curve for seamless baseline
             const intensity = (i % 7 === 0 || i % 5 === 0) ? Math.min(4, (i % 4) + 1) : (i % 2 === 0 ? 1 : 0);
             map[key] = intensity;
@@ -81782,7 +81731,7 @@ window.SovereignHeatmap = (function() {
     function recordActivity(grade = 1) {
         try {
             const map = getAnnualData();
-            const today = new Date().toISOString().split("T")[0];
+            const today = dfLocalDayKey(new Date());
             map[today] = Math.min(4, (map[today] || 0) + grade);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
             render();
@@ -81838,7 +81787,7 @@ window.SovereignHeatmap = (function() {
             for (let d = 0; d < DAYS_PER_WEEK; d++) {
                 const dayOffset = (WEEKS_IN_VIEW - 1 - w) * 7 + (6 - d);
                 const targetDate = new Date(now.getTime() - dayOffset * 86400000);
-                const dateKey = targetDate.toISOString().split("T")[0];
+                const dateKey = dfLocalDayKey(targetDate);
                 const intensity = data[dateKey] || 0;
 
                 const x = offsetX + w * (cellSize + cellGap);
@@ -82134,7 +82083,7 @@ window.SovereignStorageVacuum = (function() {
                     try {
                         const map = JSON.parse(raw);
                         if (map && typeof map === "object") {
-                            const cutoff = new Date(now - 370 * 86400000).toISOString().split("T")[0];
+                            const cutoff = dfLocalDayKey(new Date(now - 370 * 86400000));
                             let changed = false;
                             Object.keys(map).forEach(dateKey => {
                                 if (dateKey < cutoff) {
