@@ -23,12 +23,12 @@ def hasReleaseSigning = uploadKeyStorePath && uploadKeyAlias && uploadStorePassw
 
 android {
     namespace 'com.zenstudy.focus'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.deepfocus.study"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         versionCode appVersionCode
         versionName appVersionName
     }

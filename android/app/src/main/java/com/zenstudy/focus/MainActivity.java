@@ -19,10 +19,14 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.RenderProcessGoneDetail;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
@@ -33,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private String analyticsAwaitingRequest = null;
     private static final int REQUEST_BACKUP_IMPORT = 7412;
     private static final int MAX_BACKUP_IMPORT_BYTES = 8 * 1024 * 1024;
+    private static final int MAX_SHARE_TEXT_CHARS = 200 * 1000;
     private boolean backupImportPickerOpen = false;
     private String backupAwaitingSave = null;
 
@@ -49,6 +54,14 @@ public class MainActivity extends AppCompatActivity {
 
         webView = new WebView(this);
         setContentView(webView);
+        // targetSdk 35+ enforces edge-to-edge: keep web content clear of system bars,
+        // display cutouts and the on-screen keyboard.
+        ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
+            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -65,6 +78,15 @@ public class MainActivity extends AppCompatActivity {
 
         webView.addJavascriptInterface(new ZenNativeBridge(), "ZenNative");
         webView.setWebViewClient(new WebViewClient() {
+            // If the WebView renderer is killed (memory pressure), returning false would
+            // crash the whole app. Recreate the activity instead; durable data is on disk.
+            @Override
+            @android.annotation.TargetApi(26)
+            public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+                runOnUiThread(() -> { if (!isFinishing() && !isDestroyed()) recreate(); });
+                return true;
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
@@ -399,24 +421,41 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void shareAppInvite(String statsSummary) {
-            Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("text/plain");
-            share.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_subject));
-            share.putExtra(Intent.EXTRA_TEXT, statsSummary);
-            startActivity(Intent.createChooser(share, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_chooser)));
+            final String text = statsSummary == null ? "" : statsSummary;
+            runOnUiThread(() -> {
+                try {
+                    Intent share = new Intent(Intent.ACTION_SEND);
+                    share.setType("text/plain");
+                    share.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_subject));
+                    share.putExtra(Intent.EXTRA_TEXT, text.length() > MAX_SHARE_TEXT_CHARS ? text.substring(0, MAX_SHARE_TEXT_CHARS) : text);
+                    startActivity(Intent.createChooser(share, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_chooser)));
+                } catch (Exception ignored) { /* no share target or oversized transaction */ }
+            });
         }
 
         @JavascriptInterface
         public void syncBackupToGoogleEmailOrDrive(String encryptedBackupPayload) {
-            Intent send = new Intent(Intent.ACTION_SEND);
-            send.setType("text/plain");
-            send.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.format(MainActivity.this, R.string.native_backup_share_subject,
-                    new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date())));
-            send.putExtra(Intent.EXTRA_TEXT,
-                NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_privacy_warning) +
-                NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_copy_heading) + encryptedBackupPayload
-            );
-            startActivity(Intent.createChooser(send, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_share_chooser)));
+            final String payload = encryptedBackupPayload == null ? "" : encryptedBackupPayload;
+            // A truncated backup would be silently corrupt, and an oversized Intent extra throws
+            // TransactionTooLargeException. Refuse instead; file export handles large backups.
+            if (payload.length() > MAX_SHARE_TEXT_CHARS) {
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                    NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_save_failed), Toast.LENGTH_SHORT).show());
+                return;
+            }
+            runOnUiThread(() -> {
+                try {
+                    Intent send = new Intent(Intent.ACTION_SEND);
+                    send.setType("text/plain");
+                    send.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.format(MainActivity.this, R.string.native_backup_share_subject,
+                            new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date())));
+                    send.putExtra(Intent.EXTRA_TEXT,
+                        NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_privacy_warning) +
+                        NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_copy_heading) + payload
+                    );
+                    startActivity(Intent.createChooser(send, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_share_chooser)));
+                } catch (Exception ignored) { /* no share target or oversized transaction */ }
+            });
         }
     }
 
