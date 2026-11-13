@@ -67,7 +67,7 @@ jobs:
           test -s "$apk"
           test -s "$aab"
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" > "$evidence/apk-badging.txt"
-          grep -Eq "^package: name='(com\.deepfocus\.study|com\.zenstudy\.focus)' " "$evidence/apk-badging.txt" || { echo "::error::Debug APK package mismatch"; exit 1; }
+          grep -Eq "^package: name='com\.deepfocus\.study' " "$evidence/apk-badging.txt" || { echo "::error::Debug APK package mismatch"; exit 1; }
           grep -Fxq 'application-debuggable' "$evidence/apk-badging.txt" || { echo '::error::Debug APK is not reported debuggable'; exit 1; }
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$apk" > "$evidence/apk-signature.txt"
           # Ask AGP for the actual debug signing configuration; Android user-home
@@ -94,7 +94,7 @@ jobs:
           python3 - "$aab" "$evidence/aab-manifest.xml" <<'PY'
           import sys, zipfile, xml.etree.ElementTree as ET
           manifest = ET.parse(sys.argv[2]).getroot()
-          assert manifest.attrib.get('package') == 'com.zenstudy.focus', 'Unexpected bundle package'
+          assert manifest.attrib.get('package') == 'com.deepfocus.study', 'Unexpected bundle package'
           app = manifest.find('application')
           assert app is not None, 'Missing bundle application'
           assert app.get('{http://schemas.android.com/apk/res/android}debuggable', 'false') == 'false', 'Release bundle is debuggable'
@@ -112,7 +112,7 @@ jobs:
             sha256sum app-debug.apk app-release-unsigned.aab > SHA256SUMS
           )
           {
-            echo 'package=com.zenstudy.focus'
+            echo 'package=com.deepfocus.study'
             echo 'apk_signing=runner Android debug certificate; debuggable=true'
             echo 'aab_signing=unsigned; debuggable=false'
             echo 'bundletool=1.18.3; checksum verified'
