@@ -122,5 +122,9 @@
   "ui_view_all": "سب دیکھیں ↗",
   "ui_start_training": "تربیت شروع کریں",
   "ui_pure_nature_ready": "قدرتی آوازیں تیار ہیں",
-  "ui_sort_label": "ترتیب"
+  "ui_sort_label": "ترتیب",
+  "ui_sound_tab_all": "تمام",
+  "ui_sound_tab_water_rain": "پانی اور بارش 🌧️",
+  "ui_sound_tab_forest_wind": "جنگل اور ہوا 🌲",
+  "ui_sound_tab_earth_thunder": "آسمان اور گرج ⚡"
 }

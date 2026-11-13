@@ -122,5 +122,9 @@
   "ui_view_all": "مشاهده همه ↗",
   "ui_start_training": "شروع تمرین",
   "ui_pure_nature_ready": "صداهای طبیعت آماده است",
-  "ui_sort_label": "مرتب‌سازی"
+  "ui_sort_label": "مرتب‌سازی",
+  "ui_sound_tab_all": "همه",
+  "ui_sound_tab_water_rain": "آب و باران 🌧️",
+  "ui_sound_tab_forest_wind": "جنگل و باد 🌲",
+  "ui_sound_tab_earth_thunder": "آسمان و رعد ⚡"
 }

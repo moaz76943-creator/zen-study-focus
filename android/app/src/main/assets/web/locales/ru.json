@@ -122,5 +122,9 @@
   "ui_view_all": "Все ↗",
   "ui_start_training": "Начать тренировку",
   "ui_pure_nature_ready": "Звуки природы готовы",
-  "ui_sort_label": "Сортировка"
+  "ui_sort_label": "Сортировка",
+  "ui_sound_tab_all": "Все",
+  "ui_sound_tab_water_rain": "Вода и дождь 🌧️",
+  "ui_sound_tab_forest_wind": "Лес и ветер 🌲",
+  "ui_sound_tab_earth_thunder": "Небо и гром ⚡"
 }

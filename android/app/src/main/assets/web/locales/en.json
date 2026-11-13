@@ -122,5 +122,9 @@
   "ui_view_all": "View all ↗",
   "ui_start_training": "Start training",
   "ui_pure_nature_ready": "Pure Nature Studio Ready",
-  "ui_sort_label": "Sort"
+  "ui_sort_label": "Sort",
+  "ui_sound_tab_all": "All",
+  "ui_sound_tab_water_rain": "Water & Rain 🌧️",
+  "ui_sound_tab_forest_wind": "Forest & Wind 🌲",
+  "ui_sound_tab_earth_thunder": "Sky & Thunder ⚡"
 }
