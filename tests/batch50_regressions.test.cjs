@@ -102,3 +102,29 @@ test('native hardening invariants (MainActivity / receiver / manifest / CSP)', (
   const html = read('android/app/src/main/assets/web/index.html');
   for (const d of ["object-src 'none'", "base-uri 'none'", "form-action 'none'"]) assert.ok(html.includes(d), d);
 });
+
+test('action dispatcher handles each click once and never writes hard-coded Arabic labels onto buttons', () => {
+  const src = read('android/app/src/main/assets/web/modules/core/action_dispatcher_engine.js');
+  assert.ok(!/el\.onclick\s*=/.test(src), 'delegated listener is the single click path');
+  assert.ok(src.includes('this._delegated'));
+  assert.ok(!/startBtn\.textContent\s*=/.test(src) && !/setAttribute\("aria-label", "[^"]*[؀-ۿ]/.test(src));
+});
+
+test('accessibility suite never stamps ids as aria-labels', () => {
+  const src = read('android/app/src/main/assets/web/modules/sovereign_accessibility_suite.js');
+  assert.ok(!/setAttribute\('aria-label',\s*el\.id/.test(src));
+});
+
+test('storage write guard skips identical writes but never real ones', () => {
+  const store = new Map(); let real = 0;
+  class Storage { getItem(k) { return store.has(k) ? store.get(k) : null; } setItem(k, v) { real++; store.set(k, String(v)); } }
+  const ctx = { Storage }; ctx.window = ctx;
+  new Function('window', 'globalThis', read('android/app/src/main/assets/web/modules/core/storage_write_guard.js'))(ctx, ctx);
+  const s = new Storage();
+  s.setItem('a', '1'); s.setItem('a', '1'); s.setItem('a', 1); s.setItem('a', '2');
+  assert.equal(real, 2);
+  assert.equal(s.getItem('a'), '2');
+  assert.equal(ctx.DFStorageWriteGuard.skippedWrites(), 2);
+  const idx = read('android/app/src/main/assets/web/index.html');
+  assert.ok(idx.indexOf('storage_write_guard.js') < idx.indexOf('sovereign_runtime_shield_828.js'));
+});
