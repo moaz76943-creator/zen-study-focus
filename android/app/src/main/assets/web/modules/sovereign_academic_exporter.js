@@ -66,9 +66,10 @@
 
     _latexEscape: function (text) {
       if (!text || typeof text !== 'string') return '';
-      return text
-        .replace(/\\/g, '\\textbackslash{}')
-        .replace(/([&%$#_{}])/g, '\\$1');
+      // Single pass: escaping the backslash and the braces in separate passes would re-escape "{}".
+      return text.replace(/[\\&%$#_{}]/g, function (ch) {
+        return ch === '\\' ? '\\textbackslash{}' : '\\' + ch;
+      });
     }
   };
 

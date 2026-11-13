@@ -7,6 +7,7 @@ const path = require('node:path');
 const web = path.resolve(__dirname, '../android/app/src/main/assets/web');
 const html = fs.readFileSync(path.join(web, 'index.html'), 'utf8');
 const app = fs.readFileSync(path.join(web, 'app.js'), 'utf8');
+function stripTags(t) { let p; do { p = t; t = t.replace(/<[^<>]*>/g, ''); } while (t !== p); return t; }
 function size(d) { let t = 0; for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); t += e.isDirectory() ? size(p) : fs.statSync(p).size; } return t; }
 
 test('performance budgets (lower them when you shrink, never raise)', () => {
@@ -22,7 +23,7 @@ test('accessibility invariants in index.html', () => {
   assert.ok(!/user-scalable\s*=\s*no|maximum-scale\s*=\s*1(\.0)?\b/.test(html), 'zoom must not be disabled');
   assert.deepEqual((html.match(/<img\b[^>]*>/g) || []).filter((t) => !/\balt=/.test(t)), [], 'img without alt');
   const unnamed = [...html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)]
-    .filter((m) => !m[2].replace(/<[^>]+>/g, '').trim() && !/aria-label|title=/.test(m[1]));
+    .filter((m) => !stripTags(m[2]).trim() && !/aria-label|title=/.test(m[1]));
   assert.equal(unnamed.length, 0, 'buttons without accessible name');
 });
 
