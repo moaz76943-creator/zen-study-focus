@@ -72,7 +72,16 @@
     return errors;
   }
   function comparable(slot,records) {
-    if (slot === 'cfg' || !Array.isArray(records)) return records;
+    if (slot === 'cfg') {
+      // Boot repair adds an empty sessionHistory in memory only; an absent and an empty
+      // history are the same stored state, so they must not look like an external change
+      // (that made the first save of a fresh install fail with "Stored cfg changed").
+      if (!records || typeof records !== 'object' || Array.isArray(records)) return records;
+      const normal = {...records};
+      if (Array.isArray(normal.sessionHistory) && normal.sessionHistory.length === 0) delete normal.sessionHistory;
+      return normal;
+    }
+    if (!Array.isArray(records)) return records;
     return records.map(row => {
       if (!row || row.isStarter !== true) return row;
       const value = {...row,title:'__translated-starter__'};

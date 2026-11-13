@@ -77972,10 +77972,10 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
           val = mirrorVal;
           storage.setItem(key, val);
         } else {
-          // Initialize clean sovereign default
-          val = key.includes('cfg') ? JSON.stringify({ version: 21, streak: 0, lang: 'en', sound: 'rain', focusMin: 25 }) :
-                key.includes('tasks') ? JSON.stringify([]) : JSON.stringify([]);
-          storage.setItem(key, val);
+          // Never invent data in a v21 key: every family must be a signed
+          // {payload,sig,ts} packet. A raw '[]' made the native receipt reject
+          // the first save of a fresh install. An absent family stays null.
+          val = null;
         }
       }
       packets[key] = val;
@@ -79472,10 +79472,9 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
     return { rendered: true, report: report };
   }
 
-  // Run automatically on initialization
-  try {
-    dfRunMultiStudioDogfoodSuite();
-  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+  // The dogfood suite is a QA simulation that creates sample notes, cards, mind-map and LAN
+  // pod data. It must NEVER run automatically against a real user's data; it stays available
+  // only through the explicit global dfRunMultiStudioDogfoodSuite() below.
 
   // =========================================================================
   // 4. GLOBAL EXPORTS
