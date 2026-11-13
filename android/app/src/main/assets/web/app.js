@@ -3498,11 +3498,14 @@ function collectStudyStreaksForBackup() {
 function buildSovereignBackupEnvelopeObject() {
   const flashcardDecks = collectFlashcardDecksForBackup();
   const studyStreaks = collectStudyStreaksForBackup();
+  let flashcardsV2 = null;
+  try { if (window.DFFlashcardsApp) flashcardsV2 = window.DFFlashcardsApp.exportSnapshot(); } catch (_) { flashcardsV2 = null; }
   const bundleObj = {
     cfg,
     tasksList,
     notesList,
     flashcardDecks,
+    flashcardsV2,
     studyStreaks,
     v: 21
   };
@@ -3590,11 +3593,21 @@ function validateImportedBackup(raw) {
       }));
   }
 
+  // Flashcards v2 (decks, cards, review history, preferences): validated by the flashcards core before anything is written.
+  let validFlashcardsV2 = null;
+  if (raw.flashcardsV2 !== undefined && raw.flashcardsV2 !== null) {
+    if (!window.DFFlashcardsApp) return null;
+    const chk = window.DFFlashcardsApp.validateSnapshot(raw.flashcardsV2);
+    if (!chk.ok) return null;
+    validFlashcardsV2 = raw.flashcardsV2;
+  }
+
   return {
     cfg: candidateCfg,
     tasksList: raw.tasksList,
     notesList: raw.notesList,
     flashcardDecks: validFlashcards,
+    flashcardsV2: validFlashcardsV2,
     studyStreaks: raw.studyStreaks && typeof raw.studyStreaks === 'object' ? raw.studyStreaks : null
   };
 }
@@ -3667,6 +3680,10 @@ function verifyAndRestoreBackupCode(codeStr) {
       cfg = verified.cfg;
       tasksList = verified.tasksList;
       notesList = verified.notesList;
+    }
+    if (verified.flashcardsV2 && window.DFFlashcardsApp) {
+      const fcRes = window.DFFlashcardsApp.importSnapshot(verified.flashcardsV2, { mode: 'replace' });
+      if (!fcRes.ok) console.error('Flashcards restore failed; existing flashcards kept:', fcRes.code);
     }
     if (Array.isArray(verified.flashcardDecks)) {
       try {
@@ -3997,10 +4014,16 @@ const TAB_GRADS = {
   'sec-tasks': 'linear-gradient(125deg,#ffffff 0%,#f7f5ff 70%,#edfaff 100%)',
   'sec-calendar': 'linear-gradient(125deg,#ffffff 0%,#f1f9ff 75%,#f6f5ff 100%)',
   'sec-notes': 'linear-gradient(125deg,#ffffff 0%,#f1fffb 70%,#f4f7ff 100%)',
+  'sec-flashcards': 'linear-gradient(125deg,#ffffff 0%,#f1fffb 70%,#f4f7ff 100%)',
   'sec-sounds': 'linear-gradient(125deg,#ffffff 0%,#effdff 75%,#eff7ff 100%)',
   'sec-analytics': 'linear-gradient(125deg,#ffffff 0%,#f6f5ff 70%,#f1faff 100%)'
 };
 
+
+document.addEventListener('click', function (e) {
+  const t = e.target && e.target.closest ? e.target.closest('[data-fc-open]') : null;
+  if (t) switchTab('sec-flashcards', document.getElementById('navNotes'));
+});
 
 function openQuickTrainingFromNav(btn) {
   switchTab('sec-timer', btn);
@@ -4014,6 +4037,7 @@ function openQuickTrainingFromNav(btn) {
 
 function switchTab(secId, btn) {
   syncDailyRollover();
+  if (secId !== 'sec-flashcards' && window.DFFlashcardsUI) window.DFFlashcardsUI.leave();
   document.body.classList.toggle('timer-home', secId === 'sec-timer');
   document.querySelectorAll('.screen-section').forEach(s => s.classList.remove('active'));
   document.getElementById(secId).classList.add('active');
@@ -4035,6 +4059,7 @@ function switchTab(secId, btn) {
       window.dfRenderMasterPillar9StudioDom('dfPillar9BotanicalHeatmapMount');
     }
   }
+  if (secId === 'sec-flashcards' && window.DFFlashcardsUI) window.DFFlashcardsUI.show();
   if (window.DF22Integration?.onTab) window.DF22Integration.onTab(secId);
 }
 
