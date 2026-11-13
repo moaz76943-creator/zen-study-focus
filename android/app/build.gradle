@@ -10,10 +10,16 @@ if (verPropsFile.exists()) {
 def appVersionCode = (verProps.getProperty("VERSION_CODE") ?: "41274").toInteger()
 def appVersionName = verProps.getProperty("VERSION_NAME") ?: "554.0.0"
 
-def uploadKeyStorePath = System.getenv("DEEPFOCUS_UPLOAD_KEYSTORE") ?: "zenfocus2026.jks"
-def uploadKeyAlias = System.getenv("DEEPFOCUS_KEY_ALIAS") ?: "zenfocus2026"
-def uploadStorePassword = System.getenv("DEEPFOCUS_STORE_PASSWORD") ?: "zenfocus2026"
-def uploadKeyPassword = System.getenv("DEEPFOCUS_KEY_PASSWORD") ?: "zenfocus2026"
+def ksProps = new Properties()
+def ksPropsFile = rootProject.file("keystore.properties")
+if (ksPropsFile.exists()) {
+    ksPropsFile.withInputStream { ksProps.load(it) }
+}
+def uploadKeyStorePath = System.getenv("DEEPFOCUS_UPLOAD_KEYSTORE") ?: ksProps.getProperty("storeFile")
+def uploadKeyAlias = System.getenv("DEEPFOCUS_KEY_ALIAS") ?: ksProps.getProperty("keyAlias")
+def uploadStorePassword = System.getenv("DEEPFOCUS_STORE_PASSWORD") ?: ksProps.getProperty("storePassword")
+def uploadKeyPassword = System.getenv("DEEPFOCUS_KEY_PASSWORD") ?: ksProps.getProperty("keyPassword")
+def hasReleaseSigning = uploadKeyStorePath && uploadKeyAlias && uploadStorePassword && uploadKeyPassword && file(uploadKeyStorePath).exists()
 
 android {
     namespace 'com.zenstudy.focus'
@@ -29,18 +35,22 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(uploadKeyStorePath)
-            storePassword uploadStorePassword
-            keyAlias uploadKeyAlias
-            keyPassword uploadKeyPassword
+            if (hasReleaseSigning) {
+                storeFile file(uploadKeyStorePath)
+                storePassword uploadStorePassword
+                keyAlias uploadKeyAlias
+                keyPassword uploadKeyPassword
+            }
         }
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            shrinkResources false
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
