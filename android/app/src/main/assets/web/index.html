@@ -1686,6 +1686,19 @@ body {
   }
 })();
 </script>
+<!-- TASK #834: 412px Task Input Full-Width & Date Input Western Digits -->
+<style id="task-834-input-polish">
+  input[type="date"] {
+    font-variant-numeric: tabular-nums !important;
+    direction: ltr !important;
+  }
+  @media (max-width: 640px) {
+    #taskInput, input[placeholder*="Add study"] {
+      min-width: 180px !important;
+      flex: 1 1 100% !important;
+    }
+  }
+</style>
 </head>
 <body>
 
@@ -1968,7 +1981,7 @@ body {
 
         <div class="task-creator-bar">
           <input type="text" class="task-creator-inp" id="inpNewTask" data-i18n-placeholder="phAddTask" placeholder="Add study, workout or reading goal..." onkeydown="if(event.key==='Enter')createNewTask()">
-          <input type="date" class="task-mini-sel" id="inpTaskDate">
+          <input type="date" class="task-mini-sel" id="inpTaskDate" lang="en">
           <select class="task-mini-sel" id="selTaskCat">
             <option value="study" data-i18n="catStudy">📚 Study</option>
             <option value="sport" data-i18n="catSport">🏋️ Sport</option>
@@ -2057,7 +2070,7 @@ body {
           <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All (12)</button>
           <button class="seg-pill" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">Water & Rain 🌧️</button>
           <button class="seg-pill" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">Forest & Wind 🌲</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
+          <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Sky & Thunder ⚡</button>
         </div>
 
         <section id="df-tone-picker-card" aria-label="Completion sound"><div id="completionAlertPickerHost"></div></section>
@@ -2281,7 +2294,7 @@ body {
       <input type="text" class="modal-inp" id="inpNoteTitle" dir="auto" maxlength="250" data-i18n-placeholder="phNoteTitle" placeholder="Title or question" oninput="nsUpdateCount()">
       <div class="ns-meta">
         <label><span id="nsTypeLabel" data-i18n="nsTypeLabel">Type</span><select class="modal-inp" id="selNoteCat"><option value="cornell" data-i18n="tagCornell">Cornell</option><option value="flash" data-i18n="tagFlash">Recall</option><option value="quick" data-i18n="tagQuick">Log</option></select></label>
-        <label><span id="nsDateLabel" data-i18n="nsDateLabel">Date</span><input type="date" class="modal-inp" id="inpNoteCalDate"></label>
+        <label><span id="nsDateLabel" data-i18n="nsDateLabel">Date</span><input type="date" class="modal-inp" id="inpNoteCalDate" lang="en"></label>
       </div>
       <label for="inpNoteBody" id="nsBodyLabel" data-i18n="nsBodyLabel">Content</label><textarea class="modal-inp" id="inpNoteBody" dir="auto" maxlength="500000" rows="10" data-i18n-placeholder="phNoteBody" placeholder="Write here..." oninput="nsUpdateCount()"></textarea>
       <small id="nsCounter" aria-live="polite">0 words</small>
