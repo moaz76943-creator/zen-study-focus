@@ -211,10 +211,16 @@
 
   window.dfSanitizeHtmlFragment = function(html) {
     const raw = String(html == null ? "" : html);
-    return raw
-      .replace(/<\/?(?:script|iframe|object|embed|base|meta|link)\b[^>]*>/gi, "")
-      .replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
-      .replace(/(href|src)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1=$2#$2');
+    // Repeat until stable so nested fragments such as "<scr<script>ipt>" cannot re-form after one pass.
+    var out = raw, prev;
+    do {
+      prev = out;
+      out = out
+        .replace(/<\/?(?:script|iframe|object|embed|base|meta|link)\b[^>]*>/gi, "")
+        .replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+        .replace(/(href|src)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1=$2#$2');
+    } while (out !== prev);
+    return out;
   };
 
   window.dfSafeSetHtml = function(el, html) {
@@ -14633,8 +14639,10 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function dfRenderSpellingQuizCardHtml(card) {
     if (!card) return "";
-    var meaning = card.meaning || "بدون ترجمة";
-    var safeWord = String(card.word || "").replace(/"/g, "&quot;").replace(/'/g, "\\'");
+    // Untrusted card text is HTML-escaped and carried in a data attribute; handlers are delegated (no inline JS).
+    var esc = function(v) { return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); };
+    var meaning = esc(card.meaning || "بدون ترجمة");
+    var safeWord = esc(card.word || "");
 
     return "<div class=\"df-spelling-quiz-card\" style=\"padding:16px;background:#18181b;border:1px solid #27272a;border-radius:12px;direction:rtl;color:#f4f4f5;text-align:center;\">" +
       "<div style=\"margin-bottom:12px;\">" +
@@ -14645,14 +14653,32 @@ window.FlashQuizEngine = FlashQuizEngine;
         "<input type=\"text\" id=\"df-spelling-input\" placeholder=\"اكتب الكلمة باللغة الأجنبية...\" style=\"width:100%;box-sizing:border-box;padding:10px 12px;background:#27272a;border:1px solid #3f3f46;border-radius:8px;color:#f4f4f5;font-size:14px;direction:ltr;text-align:center;\" />" +
       "</div>" +
       "<div style=\"display:flex;gap:8px;\">" +
-        "<button type=\"button\" onclick=\"var input=document.getElementById('df-spelling-input'); if(input && window.dfCheckSpellingInput){ var res = window.dfCheckSpellingInput(input.value, '" + safeWord + "'); dfSafeNotify(res.message); }\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
+        "<button type=\"button\" data-df-spelling=\"check\" data-df-word=\"" + safeWord + "\" style=\"background:#2563eb;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:bold;cursor:pointer;flex:1;\">" +
           "<span>تحقق من الإملاء</span>" +
         "</button>" +
-        "<button type=\"button\" onclick=\"alert('الكلمة الصحيحة هي: " + safeWord + "');\" style=\"background:rgba(255,255,255,0.08);color:#a1a1aa;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;\">" +
+        "<button type=\"button\" data-df-spelling=\"reveal\" data-df-word=\"" + safeWord + "\" style=\"background:rgba(255,255,255,0.08);color:#a1a1aa;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;\">" +
           "<span>كشف الكلمة</span>" +
         "</button>" +
       "</div>" +
     "</div>";
+  }
+
+  if (typeof document !== "undefined" && !window.__dfSpellingDelegated) {
+    window.__dfSpellingDelegated = true;
+    document.addEventListener("click", function(ev) {
+      var btn = ev.target && ev.target.closest ? ev.target.closest("[data-df-spelling]") : null;
+      if (!btn) return;
+      var word = btn.getAttribute("data-df-word") || "";
+      if (btn.getAttribute("data-df-spelling") === "check") {
+        var input = document.getElementById("df-spelling-input");
+        if (input && window.dfCheckSpellingInput) {
+          var res = window.dfCheckSpellingInput(input.value, word);
+          if (typeof dfSafeNotify === "function") dfSafeNotify(res.message);
+        }
+      } else if (typeof dfSafeNotify === "function") {
+        dfSafeNotify("الكلمة الصحيحة هي: " + word);
+      }
+    });
   }
 
   if (typeof window !== "undefined") {
@@ -19494,41 +19520,11 @@ window.dfConfigureMotorMemoryTapPacer = function(ctx, opts) {
 // --- MISSION M470: Centennial Mission #160 Release v6.1.0 Audit Seal ---
 
 
-// --- MISSION M471: Offline AES-GCM Encrypted JSON Vault Backup ---
-window.dfGenerateEncryptedVaultBackup = function(vaultData, passphrase) {
-  if (!passphrase || typeof passphrase !== 'string' || passphrase.length < 4) {
-    throw new Error('Valid passphrase (min 4 characters) required for encryption.');
-  }
-  const rawData = typeof vaultData === 'string' ? vaultData : JSON.stringify(vaultData || {});
-  const salt = 'df_salt_' + Math.random().toString(36).substring(2, 10);
-  const iv = 'df_iv_' + Math.random().toString(36).substring(2, 10);
-  
-  let cipher = '';
-  for (let i = 0; i < rawData.length; i++) {
-    const keyChar = passphrase.charCodeAt(i % passphrase.length);
-    const cipherChar = rawData.charCodeAt(i) ^ keyChar;
-    cipher += ('00' + cipherChar.toString(16)).slice(-2);
-  }
-
-  return {
-    algorithm: 'AES-GCM-256-CLIENT',
-    salt: salt,
-    iv: iv,
-    encryptedPayload: cipher,
-    originalLengthBytes: rawData.length,
-    status: 'encrypted',
-    decrypt: function(enteredPassphrase) {
-      if (enteredPassphrase !== passphrase) throw new Error('Decryption failed: Invalid passphrase.');
-      let decrypted = '';
-      for (let i = 0; i < cipher.length; i += 2) {
-        const byteVal = parseInt(cipher.substr(i, 2), 16);
-        const keyChar = enteredPassphrase.charCodeAt((i / 2) % enteredPassphrase.length);
-        decrypted += String.fromCharCode(byteVal ^ keyChar);
-      }
-      return JSON.parse(decrypted);
-    },
-    timestamp: new Date().toISOString()
-  };
+// --- MISSION M471 (retired): the former dfGenerateEncryptedVaultBackup used a repeating-key XOR while
+// advertising AES-GCM. It was never used by the UI and has been removed; real AES-GCM (PBKDF2, random salt/IV)
+// lives in modules/security/vault_backup.js.
+window.dfGenerateEncryptedVaultBackup = function() {
+  throw new Error('dfGenerateEncryptedVaultBackup was removed: use SovereignVaultBackup (AES-GCM) instead.');
 };
 
 // --- MISSION M472: Retinal Eye-Movement Saccade Pacer for Rapid Reading ---
@@ -38742,7 +38738,12 @@ window.dfSanitizeHTML = function(dirtyInput) {
   const sanitized = dirtyInput.replace(/[&<>"'/]/g, (s) => map[s]);
   
   // Strip dangerous javascript: or data: pseudo protocols
-  return sanitized.replace(/javascript:/gi, "").replace(/data:/gi, "");
+  var cleaned = sanitized, before;
+  do {
+    before = cleaned;
+    cleaned = cleaned.replace(/javascript:/gi, "").replace(/data:/gi, "");
+  } while (cleaned !== before);
+  return cleaned;
 };
 
 window.dfSafeSetCardText = function(element, rawText) {
@@ -40285,8 +40286,8 @@ window.dfExportDeckAsPrintableMarkdown = function(deckName, cardsList) {
   md += "|---|---|---|---|\n";
 
   cards.forEach((c, idx) => {
-    const q = (c.front || c.question || "").replace(/\|/g, "\\|");
-    const a = (c.back || c.answer || "").replace(/\|/g, "\\|");
+    const q = (c.front || c.question || "").replace(/[\\|]/g, function(ch) { return "\\" + ch; });
+    const a = (c.back || c.answer || "").replace(/[\\|]/g, function(ch) { return "\\" + ch; });
     const s = c.stability ? c.stability + "d" : "New";
     md += "| " + (idx + 1) + " | " + q + " | " + a + " | " + s + " |\n";
   });

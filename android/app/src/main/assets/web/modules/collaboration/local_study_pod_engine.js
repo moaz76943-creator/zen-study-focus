@@ -94,8 +94,8 @@
     // M8458: dfHostLocalStudyPodSession
     dfHostLocalStudyPodSession(podName, durationMinutes = 25, subject = 'Deep STEM Work') {
       const duration = parseInt(durationMinutes, 10) || 25;
-      const cleanName = (podName || 'Sovereign Study Pod').replace(/<[^>]*>/g, '').trim();
-      const cleanSubject = (subject || 'General Study').replace(/<[^>]*>/g, '').trim();
+      const cleanName = (podName || 'Sovereign Study Pod').replace(/[<>]/g, '').trim();
+      const cleanSubject = (subject || 'General Study').replace(/[<>]/g, '').trim();
       
       const podId = 'pod_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
       const startTime = Date.now();

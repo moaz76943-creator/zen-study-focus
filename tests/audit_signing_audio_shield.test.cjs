@@ -98,7 +98,8 @@ test('MutationObserver shield: batches, delivers once, and drops pending batch o
 });
 
 test('dogfood QA suite never runs automatically', () => {
-  assert.ok(!/^\s*dfRunMultiStudioDogfoodSuite\(\);/m.test(app.replace(/retestBtn\.onclick[\s\S]*?\};/, '')));
+  const withoutRetest = app.slice(0, app.indexOf('retestBtn.onclick')) + app.slice(app.indexOf('};', app.indexOf('retestBtn.onclick')) + 2);
+  assert.ok(!/^\s*dfRunMultiStudioDogfoodSuite\(\);/m.test(withoutRetest));
   assert.ok(!/DOMContentLoaded[^\n]*dfRunMultiStudioDogfoodSuite/.test(app));
 });
 

@@ -62,3 +62,19 @@ test('collaboration stubs no longer claim network success', () => {
   }
   assert.ok(!/Local LAN Offline Ready/.test(app) && !/FULL_PAYLOAD_DECODED/.test(app) && !/<50ms Drift/.test(app));
 });
+
+test('CodeQL-driven fixes: spelling card has no inline JS and escapes card text; fake AES retired; sanitizers loop', () => {
+  const app = fs.readFileSync(path.join(web, 'app.js'), 'utf8');
+  const i = app.indexOf('function dfRenderSpellingQuizCardHtml(card)');
+  const fn = app.slice(i, i + 3200);
+  assert.ok(!/onclick=/.test(fn), 'no inline handlers in spelling card');
+  assert.match(fn, /data-df-spelling/);
+  assert.match(fn, /var meaning = esc\(/);
+  assert.match(app, /dfGenerateEncryptedVaultBackup was removed/);
+  assert.ok(!/AES-GCM-256-CLIENT/.test(app), 'XOR must not be labelled AES-GCM');
+  assert.match(app, /Repeat until stable/);
+  const latex = fs.readFileSync(path.join(web, 'modules/sovereign_academic_exporter.js'), 'utf8');
+  const ex = require(path.join(web, 'modules/sovereign_academic_exporter.js'));
+  assert.equal(ex._latexEscape('a\\b{c}'), 'a\\textbackslash{}b\\{c\\}');
+  assert.ok(latex.length > 0);
+});

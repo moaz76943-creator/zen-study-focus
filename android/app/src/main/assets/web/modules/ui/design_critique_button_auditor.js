@@ -39,7 +39,7 @@
 
       while ((match = buttonRegex.exec(htmlContent)) !== null) {
         const id = match[1];
-        const rawText = match[2].replace(/<[^>]+>/g, '').trim();
+        const rawText = (function (t) { var p; do { p = t; t = t.replace(/<[^<>]*>/g, ''); } while (t !== p); return t; })(match[2]).trim();
         buttons.push({ id, text: rawText });
       }
 
