@@ -14,7 +14,7 @@ const actualTick=app.slice(start,end);
 
 function timerFixture({running, target, now=2000000, left=10}){
   const events=[];
-  const context=vm.createContext({
+  const context=vm.createContext({timerTotal:0,timerSessionId:null,currentTimerModeKey:"focus",window:{},document:{getElementById:()=>null,querySelector:()=>null,querySelectorAll:()=>[]},setPlayButtonIcon(){},
     timerRunning:running,timerLeft:left,timerTargetTime:target,Date:{now:()=>now},
     finalizeTimerSession(chime){events.push(['completed',chime]);context.timerRunning=false;context.timerLeft=0;return true;},
     updateTimerDisplay(){events.push(['display',context.timerLeft]);}
