@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 if (uri != null && ("https".equalsIgnoreCase(uri.getScheme())
                          || "http".equalsIgnoreCase(uri.getScheme()))) {
                     try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); }
-                    catch (Exception ignored) {}
+                    catch (Exception e) { android.util.Log.w("DeepFocus", "external link not opened: " + e.getClass().getSimpleName()); }
                 }
                 return true;
             }

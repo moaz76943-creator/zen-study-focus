@@ -18,7 +18,12 @@
   };
 })();
 
-/* === Deep Focus F3 MutationObserver 120Hz Coalescing Shield === */
+/* === Deep Focus F3 MutationObserver Coalescing Shield ===
+   Batches callbacks of ordinary observers to one delivery per animation frame plus a short
+   settle delay (about 50-60 ms end to end, i.e. roughly 18-20 deliveries per second at most;
+   it is not tied to the display refresh rate). Observers that watch an attributeFilter are
+   treated as integrity/security observers and are delivered immediately. disconnect() drops
+   the pending batch and takeRecords() returns it, so no stale callback runs afterwards. */
 (function() {
   if (typeof window === "undefined" || window.__DF_MUTATION_SHIELD__ || typeof window.MutationObserver !== "function") return;
   window.__DF_MUTATION_SHIELD__ = true;
@@ -27,6 +32,7 @@
     if (typeof callback !== "function") return new NativeMO(callback);
     let pending = false;
     let queued = [];
+    let generation = 0;
     let isSecurityObserver = false;
     const wrapped = function(mutations, obs) {
       if (isSecurityObserver) {
@@ -37,8 +43,10 @@
       }
       if (pending) return;
       pending = true;
+      const myGeneration = generation;
       const flush = () => {
         pending = false;
+        if (myGeneration !== generation || !queued.length) return;
         const batch = queued;
         queued = [];
         try {
@@ -55,11 +63,27 @@
     };
     const instance = new NativeMO(wrapped);
     const origObserve = instance.observe.bind(instance);
+    const origDisconnect = instance.disconnect.bind(instance);
+    const origTake = instance.takeRecords.bind(instance);
     instance.observe = function(target, options) {
       if (options && Array.isArray(options.attributeFilter)) {
         isSecurityObserver = true;
       }
       return origObserve(target, options);
+    };
+    instance.disconnect = function() {
+      generation++;
+      queued = [];
+      pending = false;
+      return origDisconnect();
+    };
+    instance.takeRecords = function() {
+      const native = origTake();
+      const out = queued.concat(native);
+      queued = [];
+      generation++;
+      pending = false;
+      return out;
     };
     return instance;
   };
@@ -4979,19 +5003,15 @@ function saveQuickDump(toTasks) {
 /* ========================================================
    7. 12 PURE NATURE SOUNDS WITH PHOTOS & VOLUME SLIDERS
    ======================================================== */
+// Only sounds whose bundled recording really matches the name are offered (audio/LICENSES.json).
+// Ids that used to reuse another file (ocean, fire, leaves, waterfall, night, winrain, earth)
+// were removed: showing twelve names over five recordings was misleading.
 const SOUNDS_DATA = [
-  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
   { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: "audio/rain_window.ogg", url: "audio/rain_window.ogg" },
-  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
-  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: "audio/forest_birds.ogg", url: "audio/forest_birds.ogg" },
   { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
-  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
-  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
-  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: "audio/forest_birds.ogg", url: "audio/forest_birds.ogg" },
-  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" },
+  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: "audio/forest_birds.ogg", url: "audio/forest_birds.ogg" },
   { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
-  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: "audio/rain_window.ogg", url: "audio/rain_window.ogg" },
-  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" }
+  { id: 'thunder', cat: 'warm', cls: 'sbg-thunder', vol: 0.6, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" }
 ];
 
 let soundCat = 'all';
@@ -5418,7 +5438,7 @@ function setTileVolume(id, val) {
 function playPresetRelaxMix() {
   stopAllAudio();
   toggleSoundTile('rain');
-  toggleSoundTile('fire');
+  toggleSoundTile('forest');
 }
 function stopAllAudio() {
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
