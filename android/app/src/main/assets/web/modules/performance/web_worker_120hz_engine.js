@@ -1,7 +1,11 @@
 /**
  * DEEP FOCUS - Axis 10: Parallel WebWorkers & 120Hz High-Refresh Performance Engine
  * Milestone M8568 - M8577 | Sovereign Offline Architecture
- * Zero-Jank UI Thread, Off-Main-Thread FSRS, 8.3ms Frame Budget & Virtual DOM Pooling
+ * HONEST SCOPE: this module is a set of SYNCHRONOUS helpers and metrics. It does NOT
+ * start a Web Worker (the app CSP does not allow blob workers), does NOT run work off
+ * the main thread, does NOT encrypt anything (checksums are non-cryptographic DJB2), and
+ * its FSRS helper is a simplified preview multiplier, NOT the app's real scheduler.
+ * Result fields report this truthfully (spawned:false, uiThreadBlocked:true, ...).
  */
 
 (function (root, factory) {
@@ -39,7 +43,8 @@
     _detectRefreshRate() {
       if (typeof window !== 'undefined' && 'screen' in window) {
         // High refresh rate detection
-        const rate = window.screen.refreshRate || (window.matchMedia && window.matchMedia('(min-resolution: 120dpi)').matches ? 120 : 60);
+        // Screen DPI says nothing about refresh rate; only trust an explicit value.
+        const rate = Number(window.screen.refreshRate) > 0 ? Number(window.screen.refreshRate) : 60;
         this.targetFps = rate >= 90 ? rate : 60;
         this.is120HzSupported = this.targetFps >= 90;
         this.frameBudgetMs = Math.round((1000 / this.targetFps) * 100) / 100;
@@ -88,8 +93,9 @@
       `;
 
       return {
-        spawned: true,
-        workerSourceType: 'Inline Blob URL (Zero External File Dependencies)',
+        spawned: false,
+        reason: 'No Worker is created: blob workers are not permitted by the app CSP. Descriptor only.',
+        workerSourceType: 'Descriptor only (no Worker started)',
         codeLength: workerCode.length,
         supportedActions: ['BATCH_FSRS', 'SEARCH_INDEX', 'ENCRYPT_CHECKSUM']
       };
@@ -98,7 +104,7 @@
     // M8569: dfOffloadFsrsBatchCalcToWorker
     dfOffloadFsrsBatchCalcToWorker(cardsBatch = []) {
       const start = Date.now();
-      // Offload simulation (fast pure execution)
+      // Synchronous, simplified preview multiplier. NOT the app's FSRS scheduler.
       const scheduled = cardsBatch.map(card => {
         const reps = (card.reps || 0) + 1;
         const stability = (card.stability || 1.0) * 1.45;
@@ -116,7 +122,9 @@
       return {
         processedCount: scheduled.length,
         executionDurationMs: elapsed,
-        uiThreadBlocked: false,
+        uiThreadBlocked: true,
+        runsOnMainThread: true,
+        simplifiedPreview: true,
         scheduledCards: scheduled
       };
     }
@@ -150,7 +158,9 @@
       return {
         checksum: (hash >>> 0).toString(16),
         bytesProcessed: str.length,
-        encryptedOffThread: true
+        encrypted: false,
+        encryptedOffThread: false,
+        algorithm: 'DJB2 non-cryptographic checksum (main thread)'
       };
     }
 
@@ -225,7 +235,7 @@
         standards: 'Zero Main-Thread Janks, 8.3ms Frame Budget, Virtualized Rendering',
         numerals: 'Strict Western ASCII 0123456789',
         verifiedAt: new Date().toISOString(),
-        status: 'VERIFIED_SOVEREIGN'
+        status: 'HELPERS_ONLY_NO_WORKER'
       };
     }
   }

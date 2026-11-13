@@ -16,13 +16,19 @@
     return payload;
   }
 
+  var MAX_BACKUP_CHARS = 4 * 1024 * 1024;
+  var ALLOWED_KEY = /^(zen_fortress_(cfg|tasks|notes)_v21(_mirror)?|df_[A-Za-z0-9_]{1,80})$/;
+
   function validateBackupPayload(rawText) {
     if (!rawText || typeof rawText !== "string") {
       return { ok: false, error: "Empty backup payload" };
     }
+    if (rawText.length > MAX_BACKUP_CHARS) {
+      return { ok: false, error: "Backup is too large" };
+    }
     try {
       var parsed = JSON.parse(rawText);
-      if (!parsed || typeof parsed !== "object") {
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
         return { ok: false, error: "Invalid JSON structure" };
       }
       var store = parsed.storage && typeof parsed.storage === "object" ? parsed.storage : parsed;
@@ -30,7 +36,18 @@
       if (keys.length === 0) {
         return { ok: false, error: "Backup contains no keys" };
       }
-      return { ok: true, storage: store, count: keys.length };
+      var clean = Object.create(null);
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        if (k === "__proto__" || !ALLOWED_KEY.test(k)) {
+          return { ok: false, error: "Backup contains a key that is not allowed: " + String(k).slice(0, 40) };
+        }
+        if (typeof store[k] !== "string") {
+          return { ok: false, error: "Backup value is not text: " + k };
+        }
+        clean[k] = store[k];
+      }
+      return { ok: true, storage: clean, count: keys.length };
     } catch (err) {
       return { ok: false, error: err && err.message ? err.message : "Malformed JSON" };
     }
@@ -85,16 +102,29 @@
   function restoreValidatedBackup(rawText) {
     var res = validateBackupPayload(rawText);
     if (!res.ok) return res;
+    var keys = Object.keys(res.storage);
+    var snapshot = {};
+    var written = [];
     try {
-      var keys = Object.keys(res.storage);
       for (var i = 0; i < keys.length; i++) {
-        var k = keys[i];
-        var v = res.storage[k];
-        if (typeof v === "string") localStorage.setItem(k, v);
+        snapshot[keys[i]] = localStorage.getItem(keys[i]);
+      }
+      for (var j = 0; j < keys.length; j++) {
+        var k = keys[j];
+        localStorage.setItem(k, res.storage[k]);
+        written.push(k);
+        if (localStorage.getItem(k) !== res.storage[k]) throw new Error("Write verification failed for " + k);
       }
       return { ok: true, restoredKeys: keys.length };
     } catch (err) {
-      return { ok: false, error: err && err.message ? err.message : "Storage write failed" };
+      // Roll back every key already touched so a partial restore never remains.
+      for (var r = 0; r < written.length; r++) {
+        try {
+          if (snapshot[written[r]] === null) localStorage.removeItem(written[r]);
+          else localStorage.setItem(written[r], snapshot[written[r]]);
+        } catch (_) {}
+      }
+      return { ok: false, error: err && err.message ? err.message : "Storage write failed", rolledBack: true };
     }
   }
 

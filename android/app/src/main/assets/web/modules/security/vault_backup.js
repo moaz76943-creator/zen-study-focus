@@ -12,6 +12,16 @@
 (function (global) {
     'use strict';
 
+    const MAX_VAULT_BYTES = 4 * 1024 * 1024;
+    function bytesToBase64(bytes) {
+        // Chunked: spreading a large array into String.fromCharCode overflows the call stack.
+        let bin = '';
+        for (let i = 0; i < bytes.length; i += 0x8000) {
+            bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+        }
+        return btoa(bin);
+    }
+
     class SovereignEncryptedVaultStudio {
         constructor() {
             this.subtle = global.crypto ? global.crypto.subtle : null;
@@ -55,12 +65,13 @@
 
         async createEncryptedBackup(passphrase) {
             if (!this.subtle) throw new Error('Web Crypto API is not supported in this runtime.');
-            if (!passphrase || passphrase.length < 6) throw new Error('Passphrase must be at least 6 characters.');
+            if (!passphrase || passphrase.length < 10) throw new Error('Passphrase must be at least 10 characters.');
 
             const dataObj = this.collectVaultData();
             const jsonStr = JSON.stringify(dataObj);
             const enc = new TextEncoder();
             const plainBytes = enc.encode(jsonStr);
+            if (plainBytes.length > MAX_VAULT_BYTES) throw new Error('Backup is too large (limit 4 MB). Export fewer documents.');
 
             const salt = global.crypto.getRandomValues(new Uint8Array(16));
             const iv = global.crypto.getRandomValues(new Uint8Array(12));
@@ -78,7 +89,7 @@
                 timestamp: Date.now(),
                 saltHex: Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join(''),
                 ivHex: Array.from(iv).map(b => b.toString(16).padStart(2, '0')).join(''),
-                cipherBase64: btoa(String.fromCharCode(...new Uint8Array(cipherBuffer)))
+                cipherBase64: bytesToBase64(new Uint8Array(cipherBuffer))
             };
 
             return JSON.stringify(payload, null, 2);
@@ -86,7 +97,11 @@
 
         async restoreFromEncryptedBackup(backupJsonStr, passphrase) {
             if (!this.subtle) throw new Error('Web Crypto API is not supported in this runtime.');
+            if (typeof backupJsonStr === 'string' && backupJsonStr.length > MAX_VAULT_BYTES * 2) throw new Error('Backup file is too large.');
             const payload = typeof backupJsonStr === 'string' ? JSON.parse(backupJsonStr) : backupJsonStr;
+            if (!payload || typeof payload !== 'object' || typeof payload.saltHex !== 'string' || typeof payload.ivHex !== 'string' || typeof payload.cipherBase64 !== 'string') {
+                throw new Error('Invalid backup file format.');
+            }
 
             if (payload.seal !== 'DF_SOVEREIGN_VAULT_V1') {
                 throw new Error('Invalid backup file format: Sovereign seal mismatch.');
@@ -130,7 +145,7 @@
             }
             addArray('cognitiveHistory', 'df_cognitive_history_v1');
             for (const [key, text] of plan) {
-                if (typeof text !== 'string' || text.length > 2 * 1024 * 1024) throw new Error('Vault record too large: ' + key);
+                if (typeof text !== 'string' || text.length > MAX_VAULT_BYTES) throw new Error('Vault record too large: ' + key);
             }
             const snapshot = plan.map(([key]) => [key, localStorage.getItem(key)]);
             try {
@@ -170,8 +185,8 @@
                     <div style="grid-template-columns:1fr 1fr;display:grid;gap:16px;">
                         <div style="border:1px solid #E5E7EB;border-radius:8px;padding:14px;background:#FAFAFA;">
                             <h4 style="margin:0 0 8px 0;font-size:13px;font-weight:600;color:#111827;">Create Encrypted Vault</h4>
-                            <p style="margin:0 0 10px 0;font-size:12px;color:#6B7280;">Secure all study records, flashcards, and notes with a master passphrase.</p>
-                            <input type="password" id="dfBackupPassInput" placeholder="Master Passphrase (min 6 chars)" style="width:100%;box-sizing:border-box;padding:8px 10px;font-size:12px;border:1px solid #D1D5DB;border-radius:6px;margin-bottom:10px;" />
+                            <p style="margin:0 0 10px 0;font-size:12px;color:#6B7280;">Encrypts flashcards, notes, reader documents, syllabus and cognitive history. It does NOT include your tasks/settings packets (use the main export for those).</p>
+                            <input type="password" id="dfBackupPassInput" placeholder="Master Passphrase (min 10 chars)" style="width:100%;box-sizing:border-box;padding:8px 10px;font-size:12px;border:1px solid #D1D5DB;border-radius:6px;margin-bottom:10px;" />
                             <button id="dfBackupExportBtn" style="padding:8px 14px;font-size:12px;background:#111827;color:#FFFFFF;border:none;border-radius:6px;font-weight:600;cursor:pointer;width:100%;">
                                 Download .dfvault Backup ⇣
                             </button>

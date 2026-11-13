@@ -2,7 +2,11 @@
  * DEEP FOCUS — Android Home Screen Widget State Synchronizer
  * Version: 437.0.0 (Build 41157)
  *
- * Capabilities:
+ * HONEST STATUS: this build ships NO Android AppWidgetProvider and the native bridge is
+ * `ZenNative` (no `AndroidBridge`). The sync below is therefore a PREVIEW ONLY; it never
+ * reaches a home-screen widget. `syncWidgetState` returns delivered:false unless a real
+ * native hook exists.
+ * Intended capabilities (not active in this build):
  * - Emits real-time study timer and FSRS card counts to Android AppWidgetProvider.
  * - Handles widget quick-launch intents (e.g., widget button click -> start session).
  * - Strict DOM sanitization, Zero PII, Western Digits (0123456789).
@@ -49,11 +53,16 @@
             this.dueCount = this.calculateDueCards();
 
             // Dispatch to Android Native Bridge if present
+            let delivered = false;
             if (global.AndroidBridge && typeof global.AndroidBridge.updateWidgetData === 'function') {
-                global.AndroidBridge.updateWidgetData(this.activeTimeStr, this.dueCount, this.isRunning);
+                try {
+                    global.AndroidBridge.updateWidgetData(this.activeTimeStr, this.dueCount, this.isRunning);
+                    delivered = true;
+                } catch (_) { delivered = false; }
             }
 
             this.updateSimulatedDom();
+            return { delivered: delivered, previewOnly: !delivered };
         }
 
         renderWidgetSimulatorDom(containerId) {
@@ -66,7 +75,7 @@
                 <div class="df-widget-sim-card" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:20px;margin-top:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
                     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #F3F4F6;padding-bottom:12px;margin-bottom:16px;">
                         <div>
-                            <h3 style="margin:0;font-size:15px;font-weight:700;color:#111827;">✦ Android Home Screen Widget Preview</h3>
+                            <h3 style="margin:0;font-size:15px;font-weight:700;color:#111827;">✦ Widget Preview (no home-screen widget in this build)</h3>
                             <p style="margin:2px 0 0 0;font-size:12px;color:#6B7280;">RemoteViews Synchronization • FSRS Due Mirror • One-Tap Action</p>
                         </div>
                         <span style="font-size:11px;background:#F3F4F6;color:#374151;padding:4px 8px;border-radius:6px;font-family:monospace;">3x2 Cell</span>
