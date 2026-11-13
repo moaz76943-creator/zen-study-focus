@@ -61,3 +61,13 @@ test('studio panels are responsive and carry no internal project labels', () => 
   assert.ok(!/repeat\(4,minmax\(70px,1fr\)\)/.test(app), 'fixed 4-column KPI grid overflows at 320px');
   assert.match(html, /\.df-white-premium div \{ flex-wrap: wrap !important; \}/);
 });
+
+test('"today" is never computed in UTC (wrong day for users east/west of Greenwich)', () => {
+  const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
+  const bad = [];
+  for (const f of walk(web).filter((x) => x.endsWith('.js'))) {
+    const src = fs.readFileSync(f, 'utf8');
+    if (/new Date\(\)\.toISOString\(\)\.(slice\(0, ?10\)|split\('T'\)\[0\])/.test(src)) bad.push(path.relative(web, f));
+  }
+  assert.deepEqual(bad, [], 'use local date parts, not toISOString(), for the current day');
+});

@@ -25,7 +25,7 @@
     exportToMarkdown: function (data) {
       data = data || {};
       var title = data.title || 'Deep Focus Study Session';
-      var dateStr = data.date || new Date().toISOString().split('T')[0];
+      var dateStr = data.date || (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
       var notes = data.notes || '';
       var cards = Array.isArray(data.cards) ? data.cards : [];
       var md = ['---', 'title: "' + title + '"', 'date: ' + dateStr, 'generator: "Deep Focus OS v618.0.0"', '---', '', '# ' + title, ''];
