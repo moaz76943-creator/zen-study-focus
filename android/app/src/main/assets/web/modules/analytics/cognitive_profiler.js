@@ -20,7 +20,17 @@
         loadHistory() {
             try {
                 const raw = localStorage.getItem('df_cognitive_history_v1');
-                return raw ? JSON.parse(raw) : this.getSeedHistory();
+                if (!raw) return this.getSeedHistory();
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed)) return this.getSeedHistory();
+                // Validate every stored entry: finite 0-100 score, known velocity label.
+                const VEL = ['OPTIMAL', 'STEADY', 'RISING', 'FALLING', 'FATIGUED', 'LOW', 'HIGH'];
+                const clean = parsed.slice(-30).filter(e => e && typeof e === 'object' && Number.isFinite(Number(e.score)))
+                    .map(e => Object.assign({}, e, {
+                        score: Math.max(0, Math.min(100, Math.round(Number(e.score)))),
+                        velocity: VEL.indexOf(String(e.velocity)) >= 0 ? String(e.velocity) : 'OPTIMAL'
+                    }));
+                return clean.length ? clean : this.getSeedHistory();
             } catch (e) {
                 return this.getSeedHistory();
             }
@@ -112,7 +122,11 @@
             const mount = document.getElementById(containerId);
             if (!mount) return;
 
-            const latest = this.history[this.history.length - 1] || { score: 80, velocity: 'OPTIMAL' };
+            const rawLatest = this.history[this.history.length - 1] || { score: 80, velocity: 'OPTIMAL' };
+            const latest = {
+                score: Number.isFinite(Number(rawLatest.score)) ? Math.max(0, Math.min(100, Math.round(Number(rawLatest.score)))) : 80,
+                velocity: String(rawLatest.velocity || 'OPTIMAL').replace(/[^A-Z_]/g, '').slice(0, 16) || 'OPTIMAL'
+            };
             const svgMarkup = this.generateFlowSvg(480, 130);
 
             mount.innerHTML = `

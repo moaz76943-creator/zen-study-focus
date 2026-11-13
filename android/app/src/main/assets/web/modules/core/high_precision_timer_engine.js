@@ -4,6 +4,9 @@
  * Version: v470.0.0
  * Architecture: Date.now() Timestamp Delta + Page Visibility API Sync
  * Guarantees 0% drift even if the phone screen is locked or app is backgrounded.
+ * STATUS: standalone helper. The app's authoritative timer lives in app.js (absolute deadline).
+ * Nothing in the app calls start() on this engine, so it is NOT a second accounting system;
+ * do not use it to record sessions or minutes.
  */
 
 (function (root, factory) {

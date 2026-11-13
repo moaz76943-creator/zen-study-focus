@@ -1,6 +1,8 @@
 /**
  * DEEP FOCUS — SovereignWidgetBridge (v574.0.0)
- * Real-time event-driven push synchronization between WebView and native AppWidgetManager.
+ * Event-driven push hook for a native widget. HONEST STATUS: this build ships no
+ * AppWidgetProvider and exposes `ZenNative` (not AndroidBridge/QuickTimerWidgetBridge), so
+ * `delivered` in the returned payload is false unless one of those hooks really exists.
  * Ensures Xiaomi 17T Pro home-screen widget is consistently accurate without battery-draining polling.
  */
 (function (global) {
@@ -29,18 +31,21 @@
         timestamp: Date.now()
       };
 
+      payload.delivered = false;
       lastPayload = payload;
 
       // 1. AndroidBridge / QuickTimerWidget native hooks
       if (global.AndroidBridge && typeof global.AndroidBridge.updateWidgetState === 'function') {
         try {
           global.AndroidBridge.updateWidgetState(JSON.stringify(payload));
+          payload.delivered = true;
         } catch (e) {
           // Native call failed gracefully
         }
       } else if (global.QuickTimerWidgetBridge && typeof global.QuickTimerWidgetBridge.pushState === 'function') {
         try {
           global.QuickTimerWidgetBridge.pushState(JSON.stringify(payload));
+          payload.delivered = true;
         } catch (e) {}
       }
 

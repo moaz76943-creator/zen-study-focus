@@ -4,6 +4,9 @@
  * Version: v485.0.0
  * Architecture: Atomic 5-Second Local Heartbeat + Delta Catch-Up on Cold Boot
  * Guarantees: 0 lost focus minutes upon OS process kill or battery depletion.
+ * STATUS: heartbeat helper. Nothing in the app calls startHeartbeat() today, so no recovery
+ * claim is active; the authoritative timer/session state is app.js. Do not rely on the
+ * "0 lost minutes" guarantee below until it is wired and device-tested.
  */
 
 (function (root, factory) {

@@ -7,7 +7,7 @@ const engine = new WebWorker120HzEngine();
 
 // Test 1: Inline Blob Worker Spawn
 const worker = engine.dfSpawnInlineBlobWebWorker();
-assert.strictEqual(worker.spawned, true);
+assert.strictEqual(worker.spawned, false); // honest: no Worker is started
 assert.ok(worker.supportedActions.includes('BATCH_FSRS'));
 console.log('  ✓ dfSpawnInlineBlobWebWorker verified.');
 
@@ -20,7 +20,8 @@ const mockCards = [
 const fsrs = engine.dfOffloadFsrsBatchCalcToWorker(mockCards);
 assert.strictEqual(fsrs.processedCount, 3);
 assert.strictEqual(fsrs.scheduledCards[0].reps, 3);
-assert.strictEqual(fsrs.uiThreadBlocked, false);
+assert.strictEqual(fsrs.uiThreadBlocked, true); // synchronous helper
+assert.strictEqual(fsrs.simplifiedPreview, true);
 console.log('  ✓ dfOffloadFsrsBatchCalcToWorker verified.');
 
 // Test 3: Offload Search Indexing
@@ -37,7 +38,8 @@ console.log('  ✓ dfOffloadSearchIndexingToWorker verified.');
 // Test 4: Offload Encryption Vault
 const enc = engine.dfOffloadEncryptionVaultToWorker({ secret: 'Sovereign Knowledge' });
 assert.ok(typeof enc.checksum === 'string');
-assert.strictEqual(enc.encryptedOffThread, true);
+assert.strictEqual(enc.encrypted, false);
+assert.strictEqual(enc.encryptedOffThread, false);
 console.log('  ✓ dfOffloadEncryptionVaultToWorker verified.');
 
 // Test 5: 120Hz Lock
@@ -75,7 +77,7 @@ console.log('  ✓ dfMonitorFrameTimeBudgetUnder8ms verified.');
 // Test 10: Milestone Seal M8577
 const seal = engine.dfGetMilestoneM8577WebWorkerSeal();
 assert.strictEqual(seal.milestone, 'M8577');
-assert.strictEqual(seal.status, 'VERIFIED_SOVEREIGN');
+assert.strictEqual(seal.status, 'HELPERS_ONLY_NO_WORKER');
 console.log('  ✓ dfGetMilestoneM8577WebWorkerSeal verified.');
 
 console.log('🎉 All 10 WebWorker120HzEngine tests passed with 100% assertions!');
