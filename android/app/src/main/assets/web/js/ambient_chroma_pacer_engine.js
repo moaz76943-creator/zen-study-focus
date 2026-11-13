@@ -80,8 +80,8 @@
   function toWesternDigits(str) {
     if (str === null || str === undefined) return '';
     return String(str)
-      .replace(/[0-9]/g, function (d) { return '0123456789'['0123456789'.indexOf(d)]; })
-      .replace(/[۰-۹]/g, function (d) { return '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)]; });
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   function resolveLocale(locale) {

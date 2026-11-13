@@ -36,6 +36,6 @@ test('picker is live in existing nature section, CSS offline after premium theme
 test('unsupported languages show English fallback but are not counted as translated',()=>{
   assert.equal(T.label('xx','zen_bell'),T.label('en','zen_bell'));
   assert.equal(T.supported.includes('xx'),false);
-  assert.equal(T.label('ar','zen_bell'),'جرس زن');
-  assert.equal(T.label('de-DE','gong'),'Tempelgong');
+  assert.equal(T.label('ar','zen_bell'),'قطرة ماء');
+  assert.equal(T.label('de-DE','gong'),'Ferner Donner');
 });

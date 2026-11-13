@@ -18,7 +18,7 @@ test('native SAF opens only a user-selected document, with browser fallback',()=
 });
 test('file read is bounded, escaped and handed to existing consent validator',()=>{
  assert.match(java,/MAX_BACKUP_IMPORT_BYTES\s*=\s*8\s*\*\s*1024\s*\*\s*1024/);
- assert.match(java,/getContentResolver\(\)\.openInputStream\(data\.getData\(\)\)/);
+ assert.match(java,/getContentResolver\(\)\.openInputStream\((data\.getData\(\)|source)\)/);
  assert.match(java,/org\.json\.JSONObject\.quote\(backupCode\)/);
  assert.match(java,/verifyAndRestoreBackupCode/);
  assert.match(app,/function verifyAndRestoreBackupCode\(codeStr\)/);

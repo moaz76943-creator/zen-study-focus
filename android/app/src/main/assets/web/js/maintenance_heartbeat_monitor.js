@@ -49,7 +49,7 @@
    */
   function auditNumericalInvariant(stringOutput) {
     if (typeof stringOutput !== 'string') return { passed: true };
-    // Check for Eastern Arabic / Persian digits: [0-9] or [۰-۹]
+    // Check for Eastern Arabic / Persian digits: [0-9] or [\u06F0-\u06F9]
     var easternDigitsMatch = stringOutput.match(/[\u0660-\u0669\u06F0-\u06F9]/);
     return {
       passed: !easternDigitsMatch,
