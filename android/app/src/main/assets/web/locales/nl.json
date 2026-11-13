@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "Bos en wind 🌲",
   "ui_sound_tab_earth_thunder": "Hemel en donder ⚡",
   "ui_copy_json": "JSON kopiëren",
-  "ui_backup_copied": "Back-up gekopieerd"
+  "ui_backup_copied": "Back-up gekopieerd",
+  "ui_syllabus_tab": "Leerplan"
 }

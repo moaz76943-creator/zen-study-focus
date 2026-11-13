@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "숲과 바람 🌲",
   "ui_sound_tab_earth_thunder": "하늘과 천둥 ⚡",
   "ui_copy_json": "백업 복사",
-  "ui_backup_copied": "백업이 클립보드에 복사됨"
+  "ui_backup_copied": "백업이 클립보드에 복사됨",
+  "ui_syllabus_tab": "강의계획"
 }

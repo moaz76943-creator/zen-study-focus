@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "Orman ve Rüzgar 🌲",
   "ui_sound_tab_earth_thunder": "Gökyüzü ve Gök Gürültüsü ⚡",
   "ui_copy_json": "Yedeği Kopyala",
-  "ui_backup_copied": "Yedek panoya kopyalandı"
+  "ui_backup_copied": "Yedek panoya kopyalandı",
+  "ui_syllabus_tab": "Müfredat"
 }

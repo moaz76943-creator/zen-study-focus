@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "Rừng và gió 🌲",
   "ui_sound_tab_earth_thunder": "Bầu trời và sấm sét ⚡",
   "ui_copy_json": "Sao chép JSON",
-  "ui_backup_copied": "Đã sao chép bản sao lưu"
+  "ui_backup_copied": "Đã sao chép bản sao lưu",
+  "ui_syllabus_tab": "Giáo trình"
 }

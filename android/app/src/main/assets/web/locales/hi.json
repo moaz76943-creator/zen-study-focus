@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "वन और हवा 🌲",
   "ui_sound_tab_earth_thunder": "आकाश और गड़गड़ाहट ⚡",
   "ui_copy_json": "बैकअप कॉपी करें",
-  "ui_backup_copied": "बैकअप क्लिपबोर्ड पर कॉपी हुआ"
+  "ui_backup_copied": "बैकअप क्लिपबोर्ड पर कॉपी हुआ",
+  "ui_syllabus_tab": "पाठ्यक्रम"
 }

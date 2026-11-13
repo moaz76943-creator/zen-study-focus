@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "森林与清风 🌲",
   "ui_sound_tab_earth_thunder": "长空与雷鸣 ⚡",
   "ui_copy_json": "复制备份数据",
-  "ui_backup_copied": "备份已复制到剪贴板"
+  "ui_backup_copied": "备份已复制到剪贴板",
+  "ui_syllabus_tab": "课程大纲"
 }

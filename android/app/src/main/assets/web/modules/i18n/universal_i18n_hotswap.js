@@ -344,6 +344,28 @@
         dInputs[di].setAttribute("lang", "en");
       }
 
+
+      // Task #833: Force Western digits (0123456789) on all visible text & inputs + 🔒 span color
+      var eDigits = /[\u0660-\u0669\u06F0-\u06F9]/g;
+      var toWest = function (s) {
+        return String(s).replace(eDigits, function (c) {
+          var code = c.charCodeAt(0);
+          return String(code >= 0x06F0 ? code - 0x06F0 : code - 0x0660);
+        });
+      };
+      var w833 = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+      var n833;
+      while ((n833 = w833.nextNode())) {
+        if (n833.nodeValue && eDigits.test(n833.nodeValue)) {
+          n833.nodeValue = toWest(n833.nodeValue);
+        }
+      }
+      var lockSpans = document.querySelectorAll('[data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *');
+      for (var ls = 0; ls < lockSpans.length; ls++) {
+        lockSpans[ls].style.setProperty("color", "#0F172A", "important");
+        lockSpans[ls].style.setProperty("opacity", "1", "important");
+      }
+
       // 2. Translate all [data-i18n] elements
       var tagged = document.querySelectorAll("[data-i18n]");
       for (var j = 0; j < tagged.length; j++) {

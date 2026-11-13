@@ -128,5 +128,6 @@
   "ui_sound_tab_forest_wind": "Лес и ветер 🌲",
   "ui_sound_tab_earth_thunder": "Небо и гром ⚡",
   "ui_copy_json": "Копировать JSON",
-  "ui_backup_copied": "Резервная копия скопирована"
+  "ui_backup_copied": "Резервная копия скопирована",
+  "ui_syllabus_tab": "Программа"
 }
