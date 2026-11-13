@@ -7,3 +7,18 @@ generate_store.mjs
 *.jks
 keystore.properties
 .git-credentials
+
+# Build outputs / local tooling
+node_modules/
+.gradle/
+build/
+android/build/
+android/app/build/
+android/local.properties
+*.aab
+*.hprof
+.idea/
+*.iml
+.DS_Store
+.env
+.env.*
