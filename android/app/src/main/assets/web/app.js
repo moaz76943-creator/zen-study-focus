@@ -680,6 +680,16 @@ const COMPLETION_TONES = {
 
 let toneCtx = null;
 
+// Each tone is a short excerpt of a bundled CC0 / public-domain recording that matches its name
+// (see audio/LICENSES.json). No synthesized sound is produced.
+const COMPLETION_TONE_FILES = {
+  zen_bell: 'audio/water_drop.ogg',
+  tibetan_bowl: 'audio/flowing_water.ogg',
+  woodblock: 'audio/rain_window.ogg',
+  crystal: 'audio/wind_breeze.ogg',
+  gong: 'audio/rain_thunder.ogg'
+};
+let toneAudio = null;
 function playCompletionTone(toneKey) {
   const key = toneKey || localStorage.getItem('df_end_tone') || 'zen_bell';
   const tone = COMPLETION_TONES[key] || COMPLETION_TONES.zen_bell;
@@ -688,38 +698,27 @@ function playCompletionTone(toneKey) {
     window.triggerHaptic('complete');
   }
 
-  if (tone.freq === 0) return; // وضع الاهتزاز الصامت
+  const file = COMPLETION_TONE_FILES[COMPLETION_TONES[key] ? key : 'zen_bell'];
+  if (tone.freq === 0 || !file || typeof Audio !== 'function') return; // vibrate-only / no audio
 
   try {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-    if (!toneCtx) toneCtx = new AudioCtx();
-    if (toneCtx.state === 'suspended') toneCtx.resume();
-    const ctx = toneCtx;
-
-    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    const gain = ctx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(tone.freq, ctx.currentTime);
-    if (key === 'gong') {
-      osc.frequency.exponentialRampToValueAtTime(tone.freq * 0.75, ctx.currentTime + tone.decay);
-    } else {
-      osc.frequency.exponentialRampToValueAtTime(tone.freq * 0.95, ctx.currentTime + tone.decay);
-    }
-
-    gain.gain.setValueAtTime(tone.level, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + tone.decay);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.onended = () => {
-      try { osc.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-      try { gain.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-    };
-
-    osc.start();
-    osc.stop(ctx.currentTime + tone.decay);
+    if (toneAudio) { try { toneAudio.pause(); } catch (_) { /* already stopped */ } }
+    const audio = new Audio(file);
+    toneAudio = audio;
+    audio.loop = false;
+    audio.volume = Math.max(0, Math.min(1, tone.level * 2));
+    const stopAt = Math.min(3, Math.max(0.4, tone.decay)) * 1000;
+    const fadeStep = setInterval(() => {
+      if (toneAudio !== audio) { clearInterval(fadeStep); return; }
+      audio.volume = Math.max(0, audio.volume - 0.08);
+    }, Math.max(60, stopAt / 14));
+    setTimeout(() => {
+      clearInterval(fadeStep);
+      try { audio.pause(); } catch (_) { /* already stopped */ }
+      if (toneAudio === audio) toneAudio = null;
+    }, stopAt);
+    const started = audio.play();
+    if (started && typeof started.catch === 'function') started.catch(() => { clearInterval(fadeStep); });
   } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 }
 
@@ -5034,91 +5033,6 @@ function ensureProceduralAudioContext() {
 }
 window.dfGetGlobalAudioContext = ensureProceduralAudioContext;
 
-function getOrCreateProceduralBuffer(ctx, kind) {
-  const sr = ctx.sampleRate || 44100;
-  const cacheKey = `${kind}_${sr}`;
-  if (proceduralBufferCache[cacheKey]) return proceduralBufferCache[cacheKey];
-
-  const durationSec = 8;
-  const len = Math.round(sr * durationSec);
-  const crossfadeSamples = Math.min(2048, Math.floor(len * 0.05));
-  const buf = ctx.createBuffer(1, len, sr);
-  const samples = buf.getChannelData(0);
-
-  // Paul Kellet's 7-state Pink Noise filter variables & Brown integrator
-  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-  let brown = 0;
-  let crackleEnv = 0;
-
-  for (let i = 0; i < len; i++) {
-    const time = i / sr;
-    const white = Math.random() * 2 - 1;
-    b0 = 0.99886 * b0 + white * 0.0555179;
-    b1 = 0.99332 * b1 + white * 0.0750759;
-    b2 = 0.96900 * b2 + white * 0.1538520;
-    b3 = 0.86650 * b3 + white * 0.3104856;
-    b4 = 0.55000 * b4 + white * 0.5329522;
-    b5 = -0.7616 * b5 - white * 0.0168980;
-    const pink = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.042;
-    b6 = white * 0.115926;
-    brown = (brown + 0.02 * white) / 1.02;
-
-    let sample = 0;
-    if (kind === 'rain' || kind === 'winrain') {
-      // Pink + White noise bed with stochastic micro-droplet impulses
-      const dropTrigger = Math.random() > 0.9965 ? (Math.random() * 0.45) : 0;
-      crackleEnv = crackleEnv * 0.86 + dropTrigger;
-      const patter = Math.sin(2 * Math.PI * (980 + (i % 37) * 19) * time) * crackleEnv;
-      sample = pink * 0.72 + white * (kind === 'winrain' ? 0.14 : 0.22) + patter * 0.45;
-    } else if (kind === 'ocean') {
-      // Deep Brown + Pink noise surf bed shaped for wave LFO filter sweeps
-      const waveCycle = 0.58 + 0.42 * Math.sin(2 * Math.PI * (1 / durationSec) * time);
-      const foam = white * 0.18 * Math.pow(Math.max(0, Math.sin(2 * Math.PI * (1 / durationSec) * time)), 3);
-      sample = (brown * 2.1 + pink * 0.55) * waveCycle + foam;
-    } else if (kind === 'wind' || kind === 'leaves' || kind === 'forest') {
-      // Resonant Pink noise gust bed for Mountain Wind & Foliage
-      const gust = 0.65 + 0.35 * Math.sin(2 * Math.PI * (2 / durationSec) * time + 0.6);
-      const rustle = kind === 'leaves' ? white * 0.12 * gust : 0;
-      sample = (pink * 0.95 + brown * 0.65) * gust + rustle;
-    } else if (kind === 'fire' || kind === 'earth') {
-      // Warm Fireplace: low-frequency hearth rumble + stochastic wood crackle impulses
-      if (kind === 'fire' && Math.random() > 0.9978) {
-        crackleEnv = 0.65 + Math.random() * 0.35;
-      } else {
-        crackleEnv *= 0.91;
-      }
-      const pop = white * crackleEnv * 0.7;
-      const flicker = 0.8 + 0.2 * Math.sin(2 * Math.PI * 0.5 * time);
-      sample = brown * 2.4 * flicker + pink * 0.35 + pop;
-    } else if (kind === 'night') {
-      const chirp1 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 2.75 * time)), 9);
-      const chirp2 = Math.pow(Math.max(0, Math.sin(2 * Math.PI * 3.5 * time + 1.4)), 11);
-      sample = Math.sin(2 * Math.PI * 3150 * time) * chirp1 * 0.09
-             + Math.sin(2 * Math.PI * 3920 * time) * chirp2 * 0.065
-             + pink * 0.32;
-    } else if (kind === 'waterfall' || kind === 'stream') {
-      const ripple = 0.72 + 0.28 * Math.sin(2 * Math.PI * (kind === 'stream' ? 0.75 : 0.25) * time);
-      sample = (pink * 0.82 + white * 0.24 + brown * 0.9) * ripple;
-    } else if (kind === 'thunder') {
-      const rumbleEnv = 0.45 + 0.55 * Math.pow(Math.max(0, Math.sin(2 * Math.PI * (1 / durationSec) * time)), 4);
-      sample = (brown * 3.1 + pink * 0.4) * rumbleEnv;
-    } else {
-      sample = pink * 0.85 + brown * 0.8;
-    }
-
-    samples[i] = Math.max(-0.85, Math.min(0.85, sample));
-  }
-
-  // Crossfade splice at loop boundary to guarantee zero-click looping
-  for (let j = 0; j < crossfadeSamples; j++) {
-    const alpha = j / crossfadeSamples;
-    const tailIdx = len - crossfadeSamples + j;
-    samples[tailIdx] = samples[tailIdx] * (1 - alpha) + samples[j] * alpha;
-  }
-
-  proceduralBufferCache[cacheKey] = buf;
-  return buf;
-}
 
 function dfTriggerTibetanSingingBell(vol = 0.65) {
   try {
@@ -5173,187 +5087,6 @@ function dfTriggerTibetanSingingBell(vol = 0.65) {
   }
 }
 
-function createNatureSynthFallback(id, vol) {
-  const ctx = ensureProceduralAudioContext();
-  const now = ctx.currentTime;
-  const buf = getOrCreateProceduralBuffer(ctx, id);
-
-  const source = ctx.createBufferSource();
-  source.buffer = buf;
-  source.loop = true;
-
-  // Primary BiquadFilter with soundscape-specific topology
-  const filter = ctx.createBiquadFilter();
-  // Secondary BiquadFilter for spectral sculpting
-  const sculptFilter = ctx.createBiquadFilter();
-
-  // LFO Oscillator & Modulation Gain for dynamic BiquadFilter frequency sweeps
-  let lfoOsc = null;
-  let lfoGain = null;
-
-  if (id === 'ocean') {
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(380, now);
-    filter.Q.setValueAtTime(1.15, now);
-    sculptFilter.type = 'lowshelf';
-    sculptFilter.frequency.setValueAtTime(160, now);
-    sculptFilter.gain.setValueAtTime(4.5, now);
-
-    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    lfoGain = ctx.createGain();
-    lfoOsc.type = 'sine';
-    lfoOsc.frequency.setValueAtTime(0.12, now); // ~8.3s ocean wave cycle
-    lfoGain.gain.setValueAtTime(250, now);      // sweeps cutoff between 130Hz and 630Hz
-  } else if (id === 'wind' || id === 'leaves' || id === 'forest') {
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(id === 'wind' ? 480 : 680, now);
-    filter.Q.setValueAtTime(id === 'wind' ? 2.8 : 1.6, now);
-    sculptFilter.type = 'lowpass';
-    sculptFilter.frequency.setValueAtTime(1950, now);
-
-    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    lfoGain = ctx.createGain();
-    lfoOsc.type = 'sine';
-    lfoOsc.frequency.setValueAtTime(0.16, now); // mountain wind gust sweep
-    lfoGain.gain.setValueAtTime(id === 'wind' ? 270 : 180, now);
-  } else if (id === 'rain' || id === 'winrain') {
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(id === 'winrain' ? 1150 : 1650, now);
-    filter.Q.setValueAtTime(0.75, now);
-    sculptFilter.type = 'highpass';
-    sculptFilter.frequency.setValueAtTime(185, now);
-
-    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    lfoGain = ctx.createGain();
-    lfoOsc.type = 'sine';
-    lfoOsc.frequency.setValueAtTime(0.21, now);
-    lfoGain.gain.setValueAtTime(220, now);
-  } else if (id === 'fire' || id === 'earth') {
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(id === 'fire' ? 1420 : 340, now);
-    filter.Q.setValueAtTime(1.1, now);
-    sculptFilter.type = 'peaking';
-    sculptFilter.frequency.setValueAtTime(id === 'fire' ? 1850 : 140, now);
-    sculptFilter.gain.setValueAtTime(id === 'fire' ? 5.0 : 4.0, now);
-
-    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    lfoGain = ctx.createGain();
-    lfoOsc.type = 'triangle';
-    lfoOsc.frequency.setValueAtTime(0.32, now); // warm hearth flicker
-    lfoGain.gain.setValueAtTime(id === 'fire' ? 320 : 60, now);
-  } else if (id === 'stream' || id === 'waterfall') {
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(id === 'stream' ? 920 : 1380, now);
-    filter.Q.setValueAtTime(0.9, now);
-    sculptFilter.type = 'lowpass';
-    sculptFilter.frequency.setValueAtTime(2600, now);
-
-    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    lfoGain = ctx.createGain();
-    lfoOsc.type = 'sine';
-    lfoOsc.frequency.setValueAtTime(0.28, now);
-    lfoGain.gain.setValueAtTime(190, now);
-  } else if (id === 'thunder') {
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(190, now);
-    filter.Q.setValueAtTime(1.4, now);
-    sculptFilter.type = 'lowshelf';
-    sculptFilter.frequency.setValueAtTime(95, now);
-    sculptFilter.gain.setValueAtTime(6.0, now);
-
-    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    lfoGain = ctx.createGain();
-    lfoOsc.type = 'sine';
-    lfoOsc.frequency.setValueAtTime(0.09, now);
-    lfoGain.gain.setValueAtTime(85, now);
-  } else {
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(id === 'night' ? 5200 : 850, now);
-    sculptFilter.type = 'highpass';
-    sculptFilter.frequency.setValueAtTime(120, now);
-  }
-
-  if (lfoOsc && lfoGain && filter.frequency) {
-    lfoOsc.connect(lfoGain);
-    lfoGain.connect(filter.frequency);
-    lfoOsc.start(now);
-  }
-
-  const gain = ctx.createGain();
-  const targetGain = Math.max(0.0001, Math.min(1, Number(vol) || 0.65) * 0.58);
-  // Smooth fade-in ramp (zero click)
-  gain.gain.setValueAtTime(0.0001, now);
-  if (typeof gain.gain.linearRampToValueAtTime === 'function') {
-    gain.gain.linearRampToValueAtTime(targetGain, now + 0.32);
-  } else {
-    gain.gain.setValueAtTime(targetGain, now);
-  }
-
-  source.connect(filter);
-  filter.connect(sculptFilter);
-  sculptFilter.connect(gain);
-  let routedToSpatial = false;
-  if (typeof window.dfRouteSoundToSpatialPanner === 'function') {
-    routedToSpatial = !!window.dfRouteSoundToSpatialPanner(gain, id);
-  }
-  if (!routedToSpatial) {
-    gain.connect(ctx.destination);
-  }
-  source.start(now);
-
-  let stopped = false;
-  return {
-    pause: () => {
-      if (stopped) return;
-      stopped = true;
-      try {
-        const stopAt = ctx.currentTime;
-        if (typeof gain.gain.cancelScheduledValues === 'function') {
-          gain.gain.cancelScheduledValues(stopAt);
-        }
-        const curVal = Math.max(0.0001, Number(gain.gain.value) || targetGain);
-        gain.gain.setValueAtTime(curVal, stopAt);
-        if (typeof gain.gain.exponentialRampToValueAtTime === 'function') {
-          gain.gain.exponentialRampToValueAtTime(0.0001, stopAt + 0.25);
-        } else if (typeof gain.gain.linearRampToValueAtTime === 'function') {
-          gain.gain.linearRampToValueAtTime(0.0001, stopAt + 0.25);
-        }
-        setTimeout(() => {
-          try { source.stop(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-          try { if (lfoOsc) lfoOsc.stop(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-          try { source.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-          try { if (lfoOsc) lfoOsc.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-          try { if (lfoGain) lfoGain.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-          try { filter.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-          try { sculptFilter.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-          try { gain.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-        }, 270);
-      } catch (e) {
-        try { source.stop(); source.disconnect(); filter.disconnect(); sculptFilter.disconnect(); gain.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-      }
-    },
-    setVol: v => {
-      if (stopped) return;
-      const nextGain = Math.max(0.0001, Math.min(1, Number(v) || 0) * 0.58);
-      const t = ctx.currentTime;
-      try {
-        if (typeof gain.gain.cancelScheduledValues === 'function') {
-          gain.gain.cancelScheduledValues(t);
-        }
-        gain.gain.setValueAtTime(Math.max(0.0001, Number(gain.gain.value) || nextGain), t);
-        if (Number(v) <= 0.001) {
-          gain.gain.linearRampToValueAtTime(0.0001, t + 0.08);
-        } else if (typeof gain.gain.linearRampToValueAtTime === 'function') {
-          gain.gain.linearRampToValueAtTime(nextGain, t + 0.08);
-        } else {
-          gain.gain.setValueAtTime(nextGain, t);
-        }
-      } catch (_) {
-        gain.gain.setValueAtTime(nextGain, t);
-      }
-    }
-  };
-}
 
 function stopSoundTile(id) {
   soundGeneration[id] = (soundGeneration[id] || 0) + 1;
@@ -5393,16 +5126,8 @@ function toggleSoundTile(id) {
     fallbackUsed = true;
     audio.onerror = null;
     audio.pause();
-    try {
-      const fallback = createNatureSynthFallback(id, s.vol);
-      // Keep the same identity so late handlers can be invalidated safely.
-      player.pause = () => fallback.pause();
-      player.setVol = v => fallback.setVol(v);
-      showToast('⚠️ Local recording unavailable — synthesized ambience');
-    } catch (e) {
-      stopSoundTile(id);
-      showToast('⚠️ Audio output unavailable');
-    }
+    stopSoundTile(id);
+    showToast(cfg.lang === 'ar' ? '⚠️ تعذّر تشغيل التسجيل المحلي' : '⚠️ Local recording could not be played');
     renderSoundsStudio();
   };
   audio.onerror = activateFallback;
@@ -79174,6 +78899,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
     try {
       const storage = typeof localStorage !== 'undefined' ? localStorage : null;
       if (storage) {
+        const previousTimerSnapshot = storage.getItem('df_active_timer_snapshot_v1');
         storage.setItem('df_active_timer_snapshot_v1', forgedTimerPacket);
         if (typeof global.dfAuditFortressEnvelopes === 'function') {
           const timerAudit = global.dfAuditFortressEnvelopes();
@@ -79185,7 +78911,9 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
         } else {
           timerSnapshotRejected = true;
         }
-        storage.removeItem('df_active_timer_snapshot_v1');
+        // Never destroy a real running-timer snapshot: put back whatever was there.
+        if (previousTimerSnapshot === null) storage.removeItem('df_active_timer_snapshot_v1');
+        else storage.setItem('df_active_timer_snapshot_v1', previousTimerSnapshot);
       } else {
         timerSnapshotRejected = true;
       }

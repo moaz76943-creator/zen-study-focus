@@ -24,3 +24,19 @@
   };
   global.DFStorageWriteGuard = Object.freeze({ skippedWrites: function () { return skipped; } });
 })(typeof window !== 'undefined' ? window : globalThis);
+
+/**
+ * Production logging policy: console.log is silenced (it costs CPU on a phone and can leak
+ * user text into logcat). Enable for debugging with localStorage.setItem('df_debug','1').
+ */
+(function (global) {
+  'use strict';
+  try {
+    if (!global.console || global.console.__dfQuiet) return;
+    var on = false;
+    try { on = global.localStorage && global.localStorage.getItem('df_debug') === '1'; } catch (_) { on = false; }
+    if (on) return;
+    global.console.log = function () {};
+    Object.defineProperty(global.console, '__dfQuiet', { value: true });
+  } catch (_) { /* logging policy must never break boot */ }
+})(typeof window !== 'undefined' ? window : globalThis);

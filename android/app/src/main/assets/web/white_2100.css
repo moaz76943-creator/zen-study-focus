@@ -187,7 +187,7 @@ body.timer-home:not(.deep-lockdown) #sec-timer .dom-sport .domain-squircle {back
 body.timer-home:not(.deep-lockdown) #sec-timer .dom-read .domain-squircle {background:linear-gradient(145deg,#ece7ff,#f7f0ff);}
 body.timer-home:not(.deep-lockdown) #sec-timer .dom-work .domain-squircle {background:linear-gradient(145deg,#e6f4ff,#e5eaff);}
 body.timer-home:not(.deep-lockdown) #sec-timer .domain-title {
-  line-height:1.2;font-size:.69rem;font-weight:670;overflow-wrap:anywhere;
+  line-height:1.2;font-size:.69rem;font-weight:670;overflow-wrap: break-word;
 }
 .domain-duration {font-size:.59rem;font-weight:500;color:#8194b0;direction:ltr;}
 body.timer-home:not(.deep-lockdown) .quick-training-card,
@@ -421,7 +421,7 @@ body:not(.deep-lockdown) .bottom-nav-capsule #navTimer span {font-size:.59rem;fo
 body:not(.deep-lockdown) #sec-notes .ns-card{padding:15px;border:1px solid #e4ecf9;border-radius:24px;background:linear-gradient(160deg,#fff,#fcfdff);box-shadow:0 12px 30px -24px #325f9f}
 .ns-card-top{display:flex;align-items:center;justify-content:space-between;gap:6px}.ns-type{display:inline-block;border-radius:10px;padding:7px 10px;background:#eef6ff;color:#386daa;font-size:.69rem;font-weight:720}.ns-top-actions{display:flex;gap:2px}
 .ns-action{border:0;border-radius:11px;background:transparent;color:#647c9f;min-width:35px;min-height:35px;font:inherit;font-size:1.1rem;font-weight:750;cursor:pointer}.ns-action.danger{color:#cc5d6d}
-.ns-card-title{font-size:.94rem;font-weight:770;color:#1d365f;line-height:1.5;margin:10px 0;overflow-wrap:anywhere}.ns-desc{color:#617693;line-height:1.8;font-size:.79rem;white-space:pre-wrap;overflow-wrap:anywhere;max-height:10em;overflow:auto}
+.ns-card-title{font-size:.94rem;font-weight:770;color:#1d365f;line-height:1.5;margin:10px 0;overflow-wrap: break-word}.ns-desc{color:#617693;line-height:1.8;font-size:.79rem;white-space:pre-wrap;overflow-wrap: break-word;max-height:10em;overflow:auto}
 .ns-card-foot{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:13px 0 9px;border-top:1px solid #edf2fa;padding-top:10px;font-size:.66rem;color:#8795ac}.ns-card-actions{display:flex;gap:4px}.ns-card-actions .ns-action{flex:1;background:#f5f8ff;border:1px solid #edf1f8}.ns-empty{text-align:center;padding:27px 13px;border:1px dashed #cbdcf6;border-radius:22px;background:white;color:#7788a5;font-size:.82rem}
 .ns-editor{max-width:465px;max-height:87dvh}.ns-editor-templates{display:flex;gap:6px;overflow:auto;margin-bottom:10px}.ns-tiny-template{white-space:nowrap;display:flex;align-items:center;gap:5px;border:1px solid #e1eaf9;border-radius:11px;background:#f7faff;padding:7px 10px;color:#3f6396;font-size:.68rem;font:inherit}.ns-editor>label,.ns-meta label{font-size:.73rem;font-weight:720;color:#476386}.ns-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px}.ns-meta .modal-inp{min-width:0}.ns-editor #inpNoteBody{min-height:190px;max-height:38vh;resize:vertical;line-height:1.7}.ns-editor #nsCounter{display:block;text-align:end;font-size:.66rem;color:#8a9eb9;margin:-6px 0 10px}.ns-options{display:flex;gap:12px;flex-wrap:wrap;font-size:.69rem;margin:8px 0}.ns-options label{display:flex;align-items:center;gap:5px}.ns-options input{accent-color:#367bf3}
 @media(max-width:350px){.ns-template{flex-basis:91px}.ns-meta{grid-template-columns:1fr}}
@@ -498,7 +498,7 @@ body:not(.deep-lockdown) .dynamic-hero-header .header-top-row {
 body:not(.deep-lockdown) .dynamic-hero-header .header-titles-center {
   min-inline-size: 0;
   max-inline-size: 100%;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 body:not(.deep-lockdown) .dynamic-hero-header .lang-switcher-pill {
   max-inline-size: 100%;
@@ -509,12 +509,12 @@ body:not(.deep-lockdown) .dynamic-hero-header #currentLangLabel {
   white-space: normal !important;
   overflow: visible;
   text-overflow: clip;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   line-height: 1.35;
 }
 body:not(.deep-lockdown) :where(.header-main-title,.header-sub-caption,.domain-title,.training-summary-text,.today-plan-title,.modal-head,.modal-actions,.goal-row,.ns-card,.task-card,.note-card) {
   min-inline-size: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   word-break: normal;
 }
 body:not(.deep-lockdown) :where(.segmented-pills-bar,.timer-settings-grid,.home-quick-options,.domain-pedestal-grid) {
@@ -526,7 +526,7 @@ body:not(.deep-lockdown) .screen-section:not(#sec-timer) .seg-pill {
   white-space: normal !important;
   text-overflow: clip !important;
   overflow: visible !important;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   min-inline-size: 0;
   min-block-size: 44px;
   height: auto;
@@ -536,7 +536,7 @@ body:not(.deep-lockdown) :where(.home-quick-chip,.domain-card,.timer-settings-ch
   min-inline-size: 0;
   max-inline-size: 100%;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   line-height: 1.35;
 }
 body:not(.deep-lockdown) :where(.modal-card,.ns-editor,.timer-settings-dialog) {
@@ -582,7 +582,7 @@ html[dir="rtl"] body:not(.deep-lockdown) :where(.modal-head,.modal-actions,.trai
 body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
   min-inline-size: 0;
   min-block-size: 44px;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   white-space: normal;
   line-height: 1.25;
 }
@@ -646,7 +646,7 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
     margin: 0 !important;
     overflow: visible;
     white-space: normal;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     clip-path: none;
     font-size: clamp(.7rem, 2vw, .85rem) !important;
     line-height: 1.2;
@@ -683,7 +683,7 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
   min-block-size: 44px !important;
   max-inline-size: 100%;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   padding-block: 10px;
 }
 
